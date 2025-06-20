@@ -6,10 +6,16 @@ use cardano_blockchain_types::Slot;
 /// These events are used to track the state and progress of indexing operations.
 #[derive(Debug, Clone)]
 pub(crate) enum ChainIndexerEvent {
-    /// Event triggered when the synchronization process starts.
-    SyncStarted,
-    /// Event triggered when the synchronization process completes.
-    SyncCompleted,
+    /// Event triggered when the synchronization process of the live chain starts.
+    SyncLiveChainStarted,
+    /// Event triggered when the synchronization process of the immutable chain starts.
+    SyncImmutableChainStarted,
+    /// Event triggered when the synchronization process of the live chain completes
+    /// (live chain synchronization never stops, this event triggers when first tip is
+    /// reached).
+    SyncLiveChainCompleted,
+    /// Event triggered when the synchronization process of the immutable chain completes.
+    SyncImmutableChainCompleted,
     /// Event triggered when the number of current synchronization tasks changes.
     SyncTasksChanged {
         /// The current number of synchronization tasks.

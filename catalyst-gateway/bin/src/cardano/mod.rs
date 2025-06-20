@@ -1,6 +1,6 @@
 //! Logic for orchestrating followers
 
-use std::{fmt::Display, sync::Arc, time::Duration};
+use std::{fmt::Display, ops::Sub, sync::Arc, time::Duration};
 
 use cardano_blockchain_types::{MultiEraBlock, Network, Point, Slot};
 use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
@@ -309,6 +309,7 @@ fn sync_subchain(
                     if chain_update.tip && !live_follower_has_first_reached_tip() {
                         info!("Follower has reached LIVE TIP for the first time");
                         set_follower_live_first_reached_tip();
+                        let _ = event_sender.send(event::ChainIndexerEvent::SyncLiveChainCompleted);
                     }
 
                     update_block_state(
@@ -520,10 +521,10 @@ impl SyncTask {
             ),
             self.event_channel.0.clone(),
         );
+        self.dispatch_event(event::ChainIndexerEvent::SyncLiveChainStarted);
 
         self.start_immutable_followers();
-
-        self.dispatch_event(event::ChainIndexerEvent::SyncStarted);
+        self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainStarted);
 
         // Wait Sync tasks to complete.  If they fail and have not completed, reschedule them.
         // If an immutable sync task ends OK, and we still have immutable data to sync then
@@ -559,13 +560,14 @@ impl SyncTask {
                                     live_slot: self.live_tip_slot,
                                 },
                             );
-                            info!(chain=%self.cfg.chain, report=%finished,
-                            "Chain Indexer finished reaching TIP.");
+                            info!(chain=%self.cfg.chain, report=%finished, "Chain Indexer finished reaching TIP.");
 
                             self.start_immutable_followers();
+                            self.dispatch_event(
+                                event::ChainIndexerEvent::SyncImmutableChainStarted,
+                            );
                         } else {
-                            error!(chain=%self.cfg.chain, report=%finished,
-                            "Chain Indexer finished without to reach TIP.");
+                            error!(chain=%self.cfg.chain, report=%finished, "Chain Indexer finished without to reach TIP.");
                         }
 
                         // Start the Live Chain sync task again from where it left off.
@@ -621,8 +623,7 @@ impl SyncTask {
                     info!("Follower has reached IMMUTABLE TIP for the first time");
                     set_follower_immutable_first_reached_tip();
                 }
-
-                self.dispatch_event(event::ChainIndexerEvent::SyncCompleted);
+                self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
 
                 // Purge data up to this slot
                 // Slots arithmetic has saturating semantic, so this is ok.
@@ -717,8 +718,14 @@ impl event::EventTarget<event::ChainIndexerEvent> for SyncTask {
     fn add_event_listener(&mut self, listener: event::EventListenerFn<event::ChainIndexerEvent>) {
         let mut rx = self.event_channel.0.subscribe();
         tokio::spawn(async move {
-            while let Ok(event) = rx.recv().await {
-                (listener)(&event);
+            loop {
+                match rx.recv().await {
+                    Ok(event) => (listener)(&event),
+                    Err(broadcast::error::RecvError::Lagged(lag)) => {
+                        error!(lag = lag, "Sync tasks event listener lagged");
+                    },
+                    Err(broadcast::error::RecvError::Closed) => break,
+                }
             }
         });
     }
@@ -751,13 +758,23 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
 
         // add an event listener to watch for certain events to report as metrics
         sync_task.add_event_listener(Box::new(move |event: &Event| {
-            if let Event::SyncStarted = event {
-                reporter::REACHED_TIP
+            if let Event::SyncLiveChainStarted = event {
+                reporter::LIVE_REACHED_TIP
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(0);
             }
-            if let Event::SyncCompleted = event {
-                reporter::REACHED_TIP
+            if let Event::SyncImmutableChainStarted = event {
+                reporter::IMMUTABLE_REACHED_TIP
+                    .with_label_values(&[&api_host_names, service_id, &network])
+                    .set(0);
+            }
+            if let Event::SyncLiveChainCompleted = event {
+                reporter::LIVE_REACHED_TIP
+                    .with_label_values(&[&api_host_names, service_id, &network])
+                    .set(1);
+            }
+            if let Event::SyncImmutableChainCompleted = event {
+                reporter::IMMUTABLE_REACHED_TIP
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(1);
             }
@@ -774,16 +791,12 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                 reporter::CURRENT_LIVE_TIP_SLOT
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(i64::try_from(u64::from(*live_slot)).unwrap_or(-1));
-
                 reporter::SLOT_TIP_DIFF
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(
-                        i64::try_from(
-                            u64::from(*immutable_slot)
-                                .checked_sub(u64::from(*live_slot))
-                                .unwrap_or_default(),
-                        )
-                        .unwrap_or(-1),
+                        u64::from(live_slot.sub(*immutable_slot))
+                            .try_into()
+                            .unwrap_or(-1),
                     );
             }
             if let Event::ImmutableTipSlotChanged {
@@ -798,12 +811,9 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                 reporter::SLOT_TIP_DIFF
                     .with_label_values(&[&api_host_names, service_id, &network])
                     .set(
-                        i64::try_from(
-                            u64::from(*immutable_slot)
-                                .checked_sub(u64::from(*live_slot))
-                                .unwrap_or_default(),
-                        )
-                        .unwrap_or(-1),
+                        u64::from(live_slot.sub(*immutable_slot))
+                            .try_into()
+                            .unwrap_or(-1),
                     );
             }
             if let Event::IndexedSlotProgressed { slot } = event {
