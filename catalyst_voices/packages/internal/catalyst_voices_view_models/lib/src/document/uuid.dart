@@ -50,18 +50,6 @@ base class Uuid extends FormzInput<String, LocalizedException> {
   }
 }
 
-final class UuidV7 extends Uuid {
-  const UuidV7.dirty({super.value}) : super.dirty(version: 7);
-
-  const UuidV7.pure({super.value}) : super.pure(version: 7);
-}
-
-final class UuidV7Optional extends Uuid {
-  const UuidV7Optional.dirty({super.value}) : super.dirty(version: 7, isEmptyAllowed: true);
-
-  const UuidV7Optional.pure({super.value}) : super.pure(version: 7, isEmptyAllowed: true);
-}
-
 sealed class UuidValidationException extends LocalizedException {
   const UuidValidationException();
 }
