@@ -105,7 +105,6 @@ pub(crate) enum CassandraSessionError {
 #[derive(Clone)]
 pub(crate) struct CassandraSession {
     /// Is the session to the persistent or volatile DB?
-    #[allow(dead_code)]
     persistent: bool,
     /// Configuration for this session.
     cfg: Arc<cassandra_db::EnvVars>,
@@ -262,6 +261,11 @@ impl CassandraSession {
     /// Get underlying Raw Cassandra Session.
     pub(crate) fn get_raw_session(&self) -> Arc<Session> {
         self.session.clone()
+    }
+
+    /// Returns `true` if the database session is persistent.
+    pub fn is_persistent(&self) -> bool {
+        self.persistent
     }
 }
 

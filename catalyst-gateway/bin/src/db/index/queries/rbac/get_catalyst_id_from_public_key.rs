@@ -1,10 +1,11 @@
-//! Get Catalyst ID by transaction ID.
+//! Get Catalyst ID by public key.
 
 use std::sync::{Arc, LazyLock};
 
 use anyhow::{Context, Result};
-use cardano_blockchain_types::{Slot, TransactionId};
+use cardano_blockchain_types::Slot;
 use catalyst_types::catalyst_id::CatalystId;
+use ed25519_dalek::VerifyingKey;
 use futures::{StreamExt, TryStreamExt};
 use moka::{policy::EvictionPolicy, sync::Cache};
 use scylla::{
@@ -19,16 +20,16 @@ use crate::{
             queries::{PreparedQueries, PreparedSelectQuery},
             session::CassandraSession,
         },
-        types::{DbCatalystId, DbSlot, DbTransactionId},
+        types::{DbCatalystId, DbPublicKey, DbSlot},
     },
     settings::Settings,
 };
 
 /// A query string.
-const QUERY: &str = include_str!("../cql/get_catalyst_id_for_transaction_id.cql");
+const QUERY: &str = include_str!("../cql/get_catalyst_id_for_public_key.cql");
 
 /// A persistent cache instance.
-static PERSISTENT_CACHE: LazyLock<Cache<TransactionId, QueryResult>> = LazyLock::new(|| {
+static PERSISTENT_CACHE: LazyLock<Cache<VerifyingKey, QueryResult>> = LazyLock::new(|| {
     Cache::builder()
         .eviction_policy(EvictionPolicy::lru())
         .max_capacity(Settings::rbac_cfg().persistent_pub_keys_cache_size)
@@ -36,7 +37,7 @@ static PERSISTENT_CACHE: LazyLock<Cache<TransactionId, QueryResult>> = LazyLock:
 });
 
 /// A volatile cache instance.
-static VOLATILE_CACHE: LazyLock<Cache<TransactionId, QueryResult>> = LazyLock::new(|| {
+static VOLATILE_CACHE: LazyLock<Cache<VerifyingKey, QueryResult>> = LazyLock::new(|| {
     Cache::builder()
         .eviction_policy(EvictionPolicy::lru())
         .max_capacity(Settings::rbac_cfg().volatile_pub_keys_cache_size)
@@ -53,49 +54,46 @@ pub struct QueryResult {
     pub slot_no: Slot,
 }
 
-/// Get Catalyst ID by transaction ID query parameters.
+/// Get Catalyst ID by public key query parameters.
 #[derive(SerializeRow)]
 struct QueryParams {
-    /// A transaction hash.
-    txn_id: DbTransactionId,
+    /// A public key.
+    public_key: DbPublicKey,
 }
 
-/// Get Catalyst ID by transaction ID query.
+/// Get Catalyst ID by public key query.
 #[derive(Debug, Clone, DeserializeRow)]
 pub(crate) struct Query {
     /// A Catalyst ID.
-    pub catalyst_id: DbCatalystId,
+    catalyst_id: DbCatalystId,
     /// A slot number.
-    pub slot_no: DbSlot,
+    slot_no: DbSlot,
 }
 
 impl Query {
-    /// Prepares a "get catalyst ID by transaction ID" query.
+    /// Prepares a "get catalyst ID by public key" query.
     pub(crate) async fn prepare(session: Arc<Session>) -> Result<PreparedStatement> {
         PreparedQueries::prepare(session, QUERY, Consistency::All, true)
             .await
             .inspect_err(
-                |e| error!(error=%e, "Failed to prepare get Catalyst ID by transaction ID query"),
+                |e| error!(error=%e, "Failed to prepare get Catalyst ID by public key query"),
             )
     }
 
-    /// Executes the query and returns a result for the given transaction ID.
+    /// Executes the query and returns a result for the given public key.
     pub(crate) async fn get(
-        session: &CassandraSession, txn_id: TransactionId,
+        session: &CassandraSession, public_key: VerifyingKey,
     ) -> Result<Option<QueryResult>> {
         let cache = cache(session.is_persistent());
 
-        if let Some(res) = cache.get(&txn_id) {
+        if let Some(res) = cache.get(&public_key) {
             return Ok(Some(res));
         }
 
         session
-            .execute_iter(
-                PreparedSelectQuery::CatalystIdByTransactionId,
-                QueryParams {
-                    txn_id: txn_id.into(),
-                },
-            )
+            .execute_iter(PreparedSelectQuery::CatalystIdByPublicKey, QueryParams {
+                public_key: public_key.into(),
+            })
             .await?
             .rows_stream::<Query>()?
             .map_ok(Into::<QueryResult>::into)
@@ -104,10 +102,10 @@ impl Query {
             .transpose()
             .inspect(|v| {
                 if let Some(v) = v {
-                    cache.insert(txn_id, v.clone());
+                    cache.insert(public_key, v.clone());
                 }
             })
-            .context("Failed to get Catalyst ID by transaction ID query row")
+            .context("Failed to get Catalyst ID by public key query row")
     }
 }
 
@@ -122,11 +120,11 @@ impl From<Query> for QueryResult {
 
 /// Adds the given value to the cache.
 #[allow(dead_code)]
-pub fn cache_transaction(
-    is_persistent: bool, txn_id: TransactionId, catalyst_id: CatalystId, slot_no: Slot,
+pub fn cache_public_key(
+    is_persistent: bool, public_key: VerifyingKey, catalyst_id: CatalystId, slot_no: Slot,
 ) {
     let cache = cache(is_persistent);
-    cache.insert(txn_id, QueryResult {
+    cache.insert(public_key, QueryResult {
         catalyst_id,
         slot_no,
     });
@@ -140,7 +138,7 @@ pub fn invalidate_cache(is_persistent: bool) {
 }
 
 /// Returns a persistent or a volatile cache instance depending on the parameter value.
-fn cache(is_persistent: bool) -> &'static Cache<TransactionId, QueryResult> {
+fn cache(is_persistent: bool) -> &'static Cache<VerifyingKey, QueryResult> {
     if is_persistent {
         &PERSISTENT_CACHE
     } else {

@@ -1,4 +1,4 @@
-//! Catalyst ID For TX ID (RBAC 509 registrations) Queries used in purging data.
+//! Catalyst ID for transaction ID (RBAC 509 registrations) queries used in purging data.
 
 use std::{fmt::Debug, sync::Arc};
 
@@ -24,16 +24,11 @@ use crate::{
 
 pub(crate) mod result {
     //! Return values for Catalyst ID For TX ID registration purge queries.
-    use scylla::DeserializeRow;
 
-    use crate::db::types::DbTransactionId;
+    use crate::db::types::{DbSlot, DbTransactionId};
 
     /// Primary Key Row
-    #[derive(DeserializeRow)]
-    pub(crate) struct PrimaryKey {
-        /// A transaction hash.
-        pub(crate) txn_id: DbTransactionId,
-    }
+    pub(crate) type PrimaryKey = (DbTransactionId, DbSlot);
 }
 
 /// Select primary keys for Catalyst ID For TX ID registration.
@@ -56,9 +51,7 @@ impl Debug for Params {
 
 impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
-        Self {
-            txn_id: value.txn_id,
-        }
+        Self { txn_id: value.0 }
     }
 }
 
@@ -74,11 +67,11 @@ impl PrimaryKeyQuery {
             scylla::statement::Consistency::All,
             true,
         )
-        .await
-        .inspect_err(
-            |error| error!(error=%error, "Failed to prepare get Catalyst ID For TX ID registration primary key query."),
-        )
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{SELECT_QUERY}"))
+            .await
+            .inspect_err(
+                |error| error!(error=%error, "Failed to prepare get Catalyst ID For TX ID registration primary key query."),
+            )
+            .map_err(|error| anyhow::anyhow!("{error}\n--\n{SELECT_QUERY}"))
     }
 
     /// Executes a query to get all Catalyst ID For TX ID registration primary keys.
@@ -113,11 +106,11 @@ impl DeleteQuery {
             true,
             false,
         )
-        .await
-        .inspect_err(
-            |error| error!(error=%error, "Failed to prepare delete Catalyst ID For TX ID registration primary key query."),
-        )
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{DELETE_QUERY}"))
+            .await
+            .inspect_err(
+                |error| error!(error=%error, "Failed to prepare delete Catalyst ID For TX ID registration primary key query."),
+            )
+            .map_err(|error| anyhow::anyhow!("{error}\n--\n{DELETE_QUERY}"))
     }
 
     /// Executes a DELETE Query

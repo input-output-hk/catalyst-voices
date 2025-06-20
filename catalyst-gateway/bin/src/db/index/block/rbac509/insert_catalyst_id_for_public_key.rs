@@ -1,62 +1,57 @@
-//! Index RBAC Catalyst ID for Stake Address Insert Query.
+//! Index RBAC Catalyst ID for public key insert query.
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{Slot, StakeAddress, TxnIndex};
+use cardano_blockchain_types::Slot;
 use catalyst_types::catalyst_id::CatalystId;
+use ed25519_dalek::VerifyingKey;
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbCatalystId, DbSlot, DbStakeAddress, DbTxnIndex},
+        types::{DbCatalystId, DbPublicKey, DbSlot},
     },
     settings::cassandra_db::EnvVars,
 };
 
-/// Index RBAC Catalyst ID by Stake Address.
-const QUERY: &str = include_str!("cql/insert_catalyst_id_for_stake_address.cql");
+/// Index RBAC Catalyst ID by public key.
+const QUERY: &str = include_str!("cql/insert_catalyst_id_for_public_key.cql");
 
-/// Insert Catalyst ID For Stake Address Query Parameters
+/// Insert Catalyst ID for public key query parameters.
 #[derive(SerializeRow)]
 pub(crate) struct Params {
-    /// A stake address.
-    stake_address: DbStakeAddress,
-    /// A block slot number.
-    slot_no: DbSlot,
-    /// A transaction offset inside the block.
-    txn_index: DbTxnIndex,
+    /// A public key.
+    public_key: DbPublicKey,
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
+    /// A block slot number.
+    slot_no: DbSlot,
 }
 
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
-            .field("stake_address", &self.stake_address)
+            .field("public_key", &self.public_key)
             .field("catalyst_id", &self.catalyst_id)
             .field("slot_no", &self.slot_no)
-            .field("txn_index", &self.txn_index)
             .finish()
     }
 }
 
 impl Params {
-    /// Create a new record for this transaction.
+    /// Creates a new record for this transaction.
     #[allow(dead_code)]
-    pub(crate) fn new(
-        stake_address: StakeAddress, slot_no: Slot, txn_index: TxnIndex, catalyst_id: CatalystId,
-    ) -> Self {
+    pub(crate) fn new(public_key: VerifyingKey, slot_no: Slot, catalyst_id: CatalystId) -> Self {
         Params {
-            stake_address: stake_address.into(),
-            catalyst_id: catalyst_id.into(),
+            public_key: public_key.into(),
             slot_no: slot_no.into(),
-            txn_index: txn_index.into(),
+            catalyst_id: catalyst_id.into(),
         }
     }
 
-    /// Prepare Batch of RBAC Registration Index Data Queries
+    /// Prepares a batch of queries.
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &EnvVars,
     ) -> anyhow::Result<SizedBatch> {
@@ -69,7 +64,7 @@ impl Params {
             false,
         )
             .await
-            .inspect_err(|error| error!(error=%error, "Failed to prepare Insert Catalyst ID For Stake Address Query."))
+            .inspect_err(|error| error!(error=%error, "Failed to prepare 'insert Catalyst ID for public key query'."))
             .map_err(|error| anyhow::anyhow!("{error}\n--\n{QUERY}"))
     }
 }

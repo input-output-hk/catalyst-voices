@@ -1,4 +1,5 @@
--- Get all primary keys from Catalyst ID For TX ID (RBAC 509 Registrations).
+-- Get all primary key (txn_id) and slot from Catalyst ID for transaction ID (RBAC 509 Registrations).
 SELECT
-    txn_id
+    txn_id,
+    slot_no
 FROM catalyst_id_for_txn_id

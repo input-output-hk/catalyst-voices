@@ -24,6 +24,7 @@ use crate::{
 pub(crate) mod cassandra_db;
 pub(crate) mod chain_follower;
 pub(crate) mod event_db;
+pub(crate) mod rbac;
 pub(crate) mod signed_doc;
 mod str_env_var;
 
@@ -53,6 +54,9 @@ const METRICS_MEMORY_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
 
 /// Default `METRICS_FOLLOWER_INTERVAL`, 1 second.
 const METRICS_FOLLOWER_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
+
+/// Default `RBAC_CACHE_MAX_SIZE`, 10 GB.
+const RBAC_CACHE_MAX_SIZE_DEFAULT: u64 = 10 * 1024 * 1024 * 1024;
 
 /// Default number of slots used as overlap when purging Live Index data.
 const PURGE_BACKWARD_SLOT_BUFFER_DEFAULT: u64 = 100;
@@ -131,6 +135,9 @@ struct EnvVars {
     /// The Catalyst Signed Documents configuration
     signed_doc: signed_doc::EnvVars,
 
+    /// RBAC configuration.
+    rbac: rbac::EnvVars,
+
     /// Internal API Access API Key
     internal_api_key: Option<StringEnvVar>,
 
@@ -146,6 +153,9 @@ struct EnvVars {
 
     /// Interval for updating and sending Chain Follower metrics.
     metrics_follower_interval: Duration,
+
+    /// Maximum cache size on disk for RBAC data, in bytes.
+    rbac_cache_max_size: u64,
 
     /// Interval for determining if the service is live.
     service_live_timeout_interval: Duration,
@@ -209,6 +219,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         chain_follower: chain_follower::EnvVars::new(),
         event_db: event_db::EnvVars::new(),
         signed_doc: signed_doc::EnvVars::new(),
+        rbac: rbac::EnvVars::new(),
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
         check_config_tick: StringEnvVar::new_as_duration(
             "CHECK_CONFIG_TICK",
@@ -226,6 +237,12 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         service_live_timeout_interval: StringEnvVar::new_as_duration(
             "SERVICE_LIVE_TIMEOUT_INTERVAL",
             SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT,
+        ),
+        rbac_cache_max_size: StringEnvVar::new_as_int(
+            "RBAC_CACHE_MAX_DISK_SIZE",
+            RBAC_CACHE_MAX_SIZE_DEFAULT,
+            0,
+            u64::MAX,
         ),
         service_live_counter_threshold: StringEnvVar::new_as_int(
             "SERVICE_LIVE_COUNTER_THRESHOLD",
@@ -336,6 +353,13 @@ impl Settings {
         ENV_VARS.signed_doc.clone()
     }
 
+    /// Returns the RBAC configuration.
+    // TODO: Remove when used.
+    #[allow(unused)]
+    pub fn rbac_cfg() -> &'static rbac::EnvVars {
+        &ENV_VARS.rbac
+    }
+
     /// Chain Follower network (The Blockchain network we are configured to use).
     /// Note: Catalyst Gateway can ONLY follow one network at a time.
     pub(crate) fn cardano_network() -> Network {
@@ -365,6 +389,11 @@ impl Settings {
     /// The Chain Follower metrics interval
     pub(crate) fn metrics_follower_interval() -> Duration {
         ENV_VARS.metrics_follower_interval
+    }
+
+    /// Maximum in-memory cache size for RBAC data, in bytes.
+    pub(crate) fn rbac_cache_max_size() -> u64 {
+        ENV_VARS.rbac_cache_max_size
     }
 
     /// Get a list of all host names to serve the API on.
