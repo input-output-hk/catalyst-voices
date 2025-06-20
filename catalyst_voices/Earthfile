@@ -117,8 +117,9 @@ build-static-analysis:
 build-web:
     FROM +code-generator
     ARG WORKDIR=/frontend/apps/voices
+    ARG SENTRY_UPLOAD_DEBUG_SYMBOLS=true
 
-    DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --BUILD_MODE='--release' --TARGET=lib/configs/main_web.dart
+    DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --BUILD_MODE='--release' --TARGET=lib/configs/main_web.dart --SENTRY_UPLOAD_DEBUG_SYMBOLS=$SENTRY_UPLOAD_DEBUG_SYMBOLS
     SAVE ARTIFACT web
 
 package:
