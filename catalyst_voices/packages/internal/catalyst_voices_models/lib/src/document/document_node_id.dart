@@ -57,6 +57,17 @@ final class DocumentNodeId extends NodeId {
     ]);
   }
 
+  /// Returns true if this node id matches the given pattern, supporting '*' as a wildcard for
+  /// a single segment.
+  bool matchesPattern(DocumentNodeId pattern) {
+    if (pattern.paths.length != paths.length) return false;
+    for (var i = 0; i < paths.length; i++) {
+      if (pattern.paths[i] == '*') continue;
+      if (pattern.paths[i] != paths[i]) return false;
+    }
+    return true;
+  }
+
   /// Returns a parent node.
   ///
   /// For [root] node it returns [root] node as it doesn't have any parent.

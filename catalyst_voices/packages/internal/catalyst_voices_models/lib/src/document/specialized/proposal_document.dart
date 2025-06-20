@@ -34,7 +34,7 @@ final class ProposalDocument extends Equatable {
   // TODO(LynxLynxx): Add some sort of implementation of wildcards to the DocumentNodeId.
   // https://github.com/input-output-hk/catalyst-voices/issues/2661
   static final milestoneListChildNodeId =
-      DocumentNodeId.fromString('milestones.milestones.milestone_list.');
+      DocumentNodeId.fromString('milestones.milestones.milestone_list.*');
   static final tagNodeId = DocumentNodeId.fromString('theme.theme.grouped_tag');
 
   /// A list of all [DocumentNodeId] that are expected to appear
