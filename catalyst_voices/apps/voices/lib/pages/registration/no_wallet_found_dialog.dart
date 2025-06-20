@@ -70,6 +70,22 @@ class SupportedWallet extends StatelessWidget with LaunchUrlMixin {
   }
 }
 
+class _GoodToKnow extends StatelessWidget {
+  const _GoodToKnow();
+
+  @override
+  Widget build(BuildContext context) {
+    return TipCard(
+      headerText: context.l10n.goodToKnow,
+      tips: [
+        context.l10n.registrationTransactionFeeDescription(
+          CardanoWalletDetails.minAdaForRegistration.ada,
+        ),
+      ],
+    );
+  }
+}
+
 class _LeftSide extends StatelessWidget {
   const _LeftSide();
 
@@ -138,14 +154,7 @@ class _NoExtensionsFound extends StatelessWidget {
         const Spacer(),
         const _NoWalletAction(),
         const Spacer(),
-        TipCard(
-          headerText: context.l10n.goodToKnow,
-          tips: [
-            context.l10n.registrationTransactionFeeDescription(
-              CardanoWalletDetails.minAdaForRegistration.ada,
-            ),
-          ],
-        ),
+        const _GoodToKnow(),
       ],
     );
   }
@@ -275,7 +284,6 @@ class _RightSide extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           context.l10n.installCardanoWallet,
@@ -284,7 +292,10 @@ class _RightSide extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        if (CatalystBrowser.isSafari) const _SafariNotSupported() else const _NoExtensionsFound(),
+        Expanded(
+          child:
+              CatalystBrowser.isSafari ? const _SafariNotSupported() : const _NoExtensionsFound(),
+        ),
       ],
     );
   }
@@ -295,8 +306,15 @@ class _SafariNotSupported extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesErrorIndicator(
-      message: context.l10n.safariNotSupportedMessage,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        VoicesErrorIndicator(
+          message: context.l10n.safariNotSupportedMessage,
+        ),
+        const Spacer(),
+        const _GoodToKnow(),
+      ],
     );
   }
 }
