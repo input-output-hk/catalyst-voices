@@ -5,7 +5,7 @@ use std::sync::{Arc, LazyLock};
 use anyhow::{Context, Result};
 use cardano_blockchain_types::{Slot, StakeAddress, TxnIndex};
 use catalyst_types::catalyst_id::CatalystId;
-use futures::StreamExt;
+use futures::{StreamExt, TryStreamExt};
 use moka::{policy::EvictionPolicy, sync::Cache};
 use scylla::{
     prepared_statement::PreparedStatement, statement::Consistency,
@@ -100,14 +100,26 @@ impl Query {
     /// Returns the latest Catalyst ID for the given stake address.
     pub(crate) async fn latest(
         session: &CassandraSession, stake_address: StakeAddress,
-    ) -> Result<Option<Query>> {
+    ) -> Result<Option<QueryResult>> {
+        let cache = cache(session.is_persistent());
+
+        if let Some(res) = cache.get(&stake_address) {
+            return Ok(Some(res));
+        }
+
         Self::execute(session, QueryParams {
-            stake_address: stake_address.into(),
+            stake_address: stake_address.clone().into(),
         })
         .await?
+        .map_ok(Into::<QueryResult>::into)
         .next()
         .await
         .transpose()
+        .inspect(|v| {
+            if let Some(v) = v {
+                cache.insert(stake_address, v.clone());
+            }
+        })
         .context("Failed to get Catalyst ID by stake address query row")
     }
 }
