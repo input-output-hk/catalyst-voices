@@ -3,7 +3,6 @@
 //! This provides only the primary entrypoint to the service.
 
 use poem::{
-    endpoint::PrometheusExporter,
     listener::TcpListener,
     middleware::{CatchPanic, Compression, Cors, SensitiveHeader},
     web::CompressionLevel,
@@ -15,13 +14,13 @@ use super::{
     utilities::middleware::{db_check::DatabaseConnectionCheck, node_info::CatGatewayInfo},
 };
 use crate::{
-    metrics::init_prometheus,
+    metrics::{init_prometheus, metrics_updater_fn},
     service::{
         api::mk_api,
         docs::{docs, favicon},
         utilities::{
             catch_panic::{set_panic_hook, ServicePanicHandler},
-            middleware::tracing_mw::Tracing,
+            middleware::{metrics_updater::MetricsUpdaterMiddleware, tracing_mw::Tracing},
         },
     },
     settings::Settings,
@@ -43,7 +42,10 @@ fn mk_app(base_route: Option<Route>) -> impl Endpoint {
     base_route
         .nest(Settings::api_url_prefix(), api_service)
         .nest("/docs", docs)
-        .nest("/metrics", PrometheusExporter::new(prometheus_registry))
+        .nest(
+            "/metrics",
+            MetricsUpdaterMiddleware::new(prometheus_registry, metrics_updater_fn),
+        )
         .nest("/favicon.ico", favicon())
         .with(Cors::new())
         .with(Compression::new().with_quality(CompressionLevel::Fastest))

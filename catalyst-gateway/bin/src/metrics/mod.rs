@@ -14,8 +14,11 @@ pub(crate) mod memory;
 /// Returns the default prometheus registry.
 #[must_use]
 pub(crate) fn init_prometheus() -> Registry {
-    chain_follower::init_metrics_reporter();
-    memory::init_metrics_reporter();
-
     default_registry().clone()
+}
+
+/// Updates metrics to current values.
+pub(crate) fn metrics_updater_fn() {
+    chain_follower::update();
+    memory::update();
 }
