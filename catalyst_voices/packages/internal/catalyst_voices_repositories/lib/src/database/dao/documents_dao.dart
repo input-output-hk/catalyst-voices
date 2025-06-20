@@ -234,6 +234,29 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }).get();
   }
 
+  @visibleForTesting
+  Future<List<DocumentEntity>> queryDocumentsByMatchedDocumentNodeIdValue({
+    required DocumentNodeId nodeId,
+    required String value,
+    DocumentType? type,
+    required String content, 
+  }) async {
+    final query = select(documents)
+      ..where(
+        (tbl) => BaseJsonQueryExpression(
+          jsonContent: content,
+          nodeId: nodeId,
+          searchValue: value,
+        ),
+      );
+
+    if (type != null) {
+      query.where((doc) => doc.type.equals(type.uuid));
+    }
+
+    return query.get();
+  }
+
   @override
   Future<DocumentEntity?> queryLatestDocumentData({
     CatalystId? authorId,

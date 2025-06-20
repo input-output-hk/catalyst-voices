@@ -68,5 +68,65 @@ void main() {
       final node = DocumentNodeId.root.child('section1').child('paragraph1');
       expect(node.toString(), 'section1.paragraph1');
     });
+
+    group('wildcard support', () {
+      test('matchesPattern supports wildcard segment', () {
+        final pattern = DocumentNodeId.fromString('milestones.milestones.milestone_list.*.title');
+
+        final node1 = DocumentNodeId.fromString('milestones.milestones.milestone_list.0.title');
+        final node2 = DocumentNodeId.fromString('milestones.milestones.milestone_list.1.title');
+        final node3 = DocumentNodeId.fromString('milestones.milestones.milestone_list.foo.title');
+        final node4 = DocumentNodeId.fromString('milestones.milestones.milestone_list.title');
+
+        expect(node1.matchesPattern(pattern), isTrue);
+        expect(node2.matchesPattern(pattern), isTrue);
+        expect(node3.matchesPattern(pattern), isTrue);
+        expect(node4.matchesPattern(pattern), isFalse);
+      });
+
+      test('asPath outputs correct SQLite JSON path with wildcard', () {
+        final node = DocumentNodeId.fromString('milestones.milestones.milestone_list.*.title');
+        expect(node.asPath, r'$.milestones.milestones.milestone_list.*.title');
+      });
+
+      test('asPath outputs correct SQLite JSON path with numeric segment', () {
+        final node = DocumentNodeId.fromString('milestones.milestones.milestone_list.0.title');
+        expect(node.asPath, r'$.milestones.milestones.milestone_list.0.title');
+      });
+
+      test('asPath outputs correct SQLite JSON path with normal segments', () {
+        final node = DocumentNodeId.fromString('setup.title.title');
+        expect(node.asPath, r'$.setup.title.title');
+      });
+
+      test('hasWildcard correctly identifies paths with wildcards', () {
+        expect(DocumentNodeId.fromString('users.*.name').hasWildcard, isTrue);
+        expect(DocumentNodeId.fromString('users.name').hasWildcard, isFalse);
+        expect(DocumentNodeId.root.hasWildcard, isFalse);
+      });
+
+      test('wildcardComponents returns correct components for wildcard paths', () {
+        final nodeId1 = DocumentNodeId.fromString('milestones.milestones.milestone_list.*.title');
+        final wildcardPaths1 = nodeId1.wildcardPaths;
+        expect(wildcardPaths1, isNotNull);
+        expect(wildcardPaths1!.prefix, r'$.milestones.milestones.milestone_list');
+        expect(wildcardPaths1.suffix, 'title');
+
+        final nodeId2 = DocumentNodeId.fromString('users.*.addresses');
+        final wildcardPaths2 = nodeId2.wildcardPaths;
+        expect(wildcardPaths2, isNotNull);
+        expect(wildcardPaths2!.prefix, r'$.users');
+        expect(wildcardPaths2.suffix, 'addresses');
+
+        final nodeId3 = DocumentNodeId.fromString('users.*');
+        final wildcardPaths3 = nodeId3.wildcardPaths;
+        expect(wildcardPaths3, isNotNull);
+        expect(wildcardPaths3!.prefix, r'$.users');
+        expect(wildcardPaths3.suffix, isNull);
+
+        final nodeId4 = DocumentNodeId.fromString('users.name');
+        expect(nodeId4.wildcardPaths, isNull);
+      });
+    });
   });
 }
