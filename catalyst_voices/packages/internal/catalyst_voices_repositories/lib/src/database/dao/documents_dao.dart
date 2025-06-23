@@ -239,7 +239,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
     required DocumentNodeId nodeId,
     required String value,
     DocumentType? type,
-    required String content, 
+    required String content,
   }) async {
     final query = select(documents)
       ..where(
