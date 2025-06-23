@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/src/common/node_id.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 /// The interface that every object in a document should implement,
 /// helps to navigate to a certain segment/section/property of the document.
@@ -55,17 +55,6 @@ final class DocumentNodeId extends NodeId {
       ...paths,
       path,
     ]);
-  }
-
-  /// Returns true if this node id matches the given pattern, supporting '*' as a wildcard for
-  /// a single segment.
-  bool matchesPattern(DocumentNodeId pattern) {
-    if (pattern.paths.length != paths.length) return false;
-    for (var i = 0; i < paths.length; i++) {
-      if (pattern.paths[i] == '*') continue;
-      if (pattern.paths[i] != paths[i]) return false;
-    }
-    return true;
   }
 
   /// Returns a parent node.

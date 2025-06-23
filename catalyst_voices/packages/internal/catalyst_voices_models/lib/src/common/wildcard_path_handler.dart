@@ -1,48 +1,52 @@
+import 'package:catalyst_voices_models/src/common/node_id.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
 
-abstract class WildcardPathHandler extends Equatable {
-  final String value;
+/// A handler that processes paths with wildcards.
+/// This class interprets node paths and provides utilities for working with wildcards.
+class WildcardPathHandler extends Equatable {
+  final String path;
 
-  const WildcardPathHandler(this.value);
+  const WildcardPathHandler(this.path);
 
-  String get asPath {
-    if (pathSegments.isEmpty) return r'$';
-    final buffer = StringBuffer(r'$');
-    for (final segment in pathSegments) {
-      buffer.write('.$segment');
-    }
-    return buffer.toString();
+  /// Create a handler from a NodeId
+  factory WildcardPathHandler.fromNodeId(NodeId nodeId) => WildcardPathHandler(nodeId.value);
+
+  /// Returns all wildcard path segments in this path.
+  /// For each wildcard, returns the NodeId prefix leading to it and the NodeId suffix following it.
+  /// Returns null if no wildcards are present.
+  ({NodeId prefix, NodeId? suffix})? get getWildcardPaths {
+    if (!hasWildcard) return null;
+
+    final segments = path.split('*');
+    final prefixSegment = NodeId(segments.first);
+    if (segments.length == 1) return (prefix: prefixSegment, suffix: null);
+    final suffixSegment = NodeId(segments.last);
+    return (prefix: prefixSegment, suffix: suffixSegment);
   }
 
   bool get hasWildcard => pathSegments.contains('*');
 
-  List<String> get pathSegments => value.split('.');
+  List<String> get pathSegments => path.split('.');
 
   @override
-  @mustCallSuper
-  List<Object?> get props => [value];
+  List<Object?> get props => [path];
 
-  /// If the path contains a wildcard, returns the path before the wildcard
-  /// and the field after the wildcard. Otherwise returns null.
-  /// For example, for 'milestones.milestones.milestone_list.*.title',
-  /// returns ('$.milestones.milestones.milestone_list', 'title').
-  ({String prefix, String? suffix})? get wildcardPaths {
-    if (!hasWildcard) return null;
+  /// Determines if a given NodeId matches this wildcard pattern
+  bool matches(NodeId nodeId) {
+    final patternSegments = pathSegments;
+    final targetSegments = nodeId.value.split('.');
 
-    final wildcardIndex = pathSegments.indexOf('*');
-    if (wildcardIndex == -1) return null;
-
-    final pathBeforeWildcard = StringBuffer(r'$');
-    for (var i = 0; i < wildcardIndex; i++) {
-      pathBeforeWildcard.write('.${pathSegments[i]}');
+    if (patternSegments.length > targetSegments.length) {
+      return false; // The pattern can't be longer than the target.
     }
 
-    String? fieldAfterWildcard;
-    if (wildcardIndex < pathSegments.length - 1) {
-      fieldAfterWildcard = pathSegments[wildcardIndex + 1];
+    for (var i = 0; i < patternSegments.length; i++) {
+      if (patternSegments[i] == '*') continue; // Wildcard matches any segment.
+      if (patternSegments[i] != targetSegments[i]) return false; // Segments must match.
     }
 
-    return (prefix: pathBeforeWildcard.toString(), suffix: fieldAfterWildcard);
+    // Match if the target has been fully checked or only wildcards are left.
+    return patternSegments.length == targetSegments.length ||
+        (patternSegments.length < targetSegments.length && hasWildcard);
   }
 }

@@ -79,16 +79,17 @@ class JsonBExpressions {
     bool useExactMatch = false,
   }) {
     final valueComparison = useExactMatch ? "= '$searchValue'" : "LIKE '%$searchValue%'";
+    final handler = WildcardPathHandler.fromNodeId(nodeId);
 
-    if (nodeId.hasWildcard) {
-      final components = nodeId.wildcardPaths;
-      if (components != null) {
-        final arrayPath = components.prefix;
-        final fieldName = components.suffix;
+    if (handler.hasWildcard) {
+      final wildcardPaths = handler.getWildcardPaths;
+      if (wildcardPaths != null) {
+        final arrayPath = wildcardPaths.prefix.asPath;
+        final fieldName = wildcardPaths.suffix?.asPath;
 
         if (fieldName != null) {
           // Query for specific field in array elements
-          return "EXISTS (SELECT 1 FROM json_each(json_extract($jsonContent, '$arrayPath')) WHERE json_extract(value, '\$.$fieldName') $valueComparison)";
+          return "EXISTS (SELECT 1 FROM json_each(json_extract($jsonContent, '$arrayPath')) WHERE json_extract(value, '$fieldName') $valueComparison)";
         } else {
           // Just search in the array
           return "EXISTS (SELECT 1 FROM json_tree($jsonContent, '$arrayPath') WHERE json_tree.value $valueComparison)";
@@ -96,9 +97,18 @@ class JsonBExpressions {
       }
     }
 
-    final path = nodeId.asPath;
-    return "json_extract($jsonContent, '$path') $valueComparison";
+    return "json_extract($jsonContent, '${nodeId.asPath}') $valueComparison";
   }
+}
+
+extension on NodeId {
+  /// Converts [NodeId] into jsonb well-formatted path argument.
+  ///
+  /// This relies on fact that [NodeId] (especially [DocumentNodeId]) is already following
+  /// convention of separating paths with '.' (dots).
+  ///
+  /// Read more: https://sqlite.org/json1.html#path_arguments.
+  String get asPath => '\$.$value';
 }
 
 extension ContentColumnExt on GeneratedColumnWithTypeConverter<DocumentDataContent, Uint8List> {
