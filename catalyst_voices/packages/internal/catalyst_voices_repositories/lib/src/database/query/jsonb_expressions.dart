@@ -70,6 +70,8 @@ final class ContainsTitle extends BaseJsonQueryExpression {
 }
 
 class JsonBExpressions {
+  const JsonBExpressions();
+
   static String generateSqlForJsonQuery({
     required String jsonContent,
     required NodeId nodeId,
@@ -94,13 +96,8 @@ class JsonBExpressions {
       }
     }
 
-    // Standard path without wildcards
     final path = nodeId.asPath;
-    if (useExactMatch) {
-      return "json_extract($jsonContent, '$path') $valueComparison";
-    } else {
-      return "json_extract($jsonContent, '$path') $valueComparison";
-    }
+    return "json_extract($jsonContent, '$path') $valueComparison";
   }
 }
 

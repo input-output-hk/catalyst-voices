@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 
 abstract class WildcardPathHandler extends Equatable {
   final String value;
+
   const WildcardPathHandler(this.value);
 
   String get asPath {
