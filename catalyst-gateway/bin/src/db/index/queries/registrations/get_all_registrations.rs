@@ -1,19 +1,11 @@
 //! Get all registrations for snapshot
 
-use std::sync::Arc;
-
-use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
-    SerializeRow, Session,
-};
+use scylla::{transport::iterator::TypedRowStream, DeserializeRow, SerializeRow, Session};
 use tracing::error;
 
 use crate::{
     db::{
-        index::{
-            queries::{PreparedQueries, PreparedSelectQuery},
-            session::CassandraSession,
-        },
+        index::{queries::Query, session::CassandraSession},
         types::DbTxnIndex,
     },
     impl_query_statement,
@@ -50,25 +42,12 @@ pub(crate) struct GetAllRegistrationsQuery {
 impl_query_statement!(GetAllRegistrationsQuery, GET_ALL_REGISTRATIONS);
 
 impl GetAllRegistrationsQuery {
-    /// Prepares get all registrations
-    pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
-        PreparedQueries::prepare(
-            session,
-            GET_ALL_REGISTRATIONS,
-            scylla::statement::Consistency::All,
-            true,
-        )
-        .await
-        .inspect_err(|error| error!(error=%error, "Failed to prepare get all registrations"))
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{GET_ALL_REGISTRATIONS}"))
-    }
-
     /// Executes get all registrations for snapshot
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetAllRegistrationsParams,
     ) -> anyhow::Result<TypedRowStream<GetAllRegistrationsQuery>> {
         let iter = session
-            .execute_iter(PreparedSelectQuery::GetAllRegistrations, params)
+            .execute_iter(<Self as Query>::type_id(), params)
             .await?
             .rows_stream::<GetAllRegistrationsQuery>()?;
 

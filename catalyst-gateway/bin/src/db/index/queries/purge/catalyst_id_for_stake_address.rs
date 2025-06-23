@@ -1,26 +1,19 @@
 //! Catalyst ID For Stake Address (RBAC 509 registrations) Queries used in purging data.
 
-use std::{fmt::Debug, sync::Arc};
+use std::fmt::Debug;
 
-use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, SerializeRow,
-    Session,
-};
+use scylla::{transport::iterator::TypedRowStream, SerializeRow};
 use tracing::error;
 
 use crate::{
     db::{
         index::{
-            queries::{
-                purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
-                FallibleQueryResults, SizedBatch,
-            },
+            queries::{FallibleQueryResults, Query},
             session::CassandraSession,
         },
         types::DbStakeAddress,
     },
     impl_query_batch, impl_query_statement,
-    settings::cassandra_db,
 };
 
 pub(crate) mod result {
@@ -63,29 +56,13 @@ pub(crate) struct PrimaryKeyQuery;
 impl_query_statement!(PrimaryKeyQuery, SELECT_QUERY);
 
 impl PrimaryKeyQuery {
-    /// Prepares a query to get all Catalyst ID For Stake Address registration primary
-    /// keys.
-    pub(crate) async fn prepare(session: &Arc<Session>) -> anyhow::Result<PreparedStatement> {
-        PreparedQueries::prepare(
-            session.clone(),
-            SELECT_QUERY,
-            scylla::statement::Consistency::All,
-            true,
-        )
-        .await
-        .inspect_err(
-            |error| error!(error=%error, "Failed to prepare get Catalyst ID For Stake Address registration primary key query."),
-        )
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{SELECT_QUERY}"))
-    }
-
     /// Executes a query to get all Catalyst ID For Stake Address registration primary
     /// keys.
     pub(crate) async fn execute(
         session: &CassandraSession,
     ) -> anyhow::Result<TypedRowStream<result::PrimaryKey>> {
         let iter = session
-            .purge_execute_iter(PreparedSelectQuery::CatalystIdForStakeAddress)
+            .purge_execute_iter(<Self as Query>::type_id())
             .await?
             .rows_stream::<result::PrimaryKey>()?;
 
@@ -103,30 +80,16 @@ impl_query_batch!(DeleteQuery, DELETE_QUERY);
 
 impl DeleteQuery {
     /// Prepare Batch of Delete Queries
-    pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
-    ) -> anyhow::Result<SizedBatch> {
-        PreparedQueries::prepare_batch(
-            session.clone(),
-            DELETE_QUERY,
-            cfg,
-            scylla::statement::Consistency::Any,
-            true,
-            false,
-        )
-        .await
-        .inspect_err(
-            |error| error!(error=%error, "Failed to prepare delete Catalyst ID For Stake Address registration primary key query."),
-        )
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{DELETE_QUERY}"))
-    }
-
     /// Executes a DELETE Query
     pub(crate) async fn execute(
         session: &CassandraSession, params: Vec<Params>,
     ) -> FallibleQueryResults {
         let results = session
-            .purge_execute_batch(PreparedDeleteQuery::CatalystIdForStakeAddress, params)
+            .purge_execute_batch(
+                <Self as Query>::type_id(),
+                <Self as Query>::query_str(),
+                params,
+            )
             .await?;
 
         Ok(results)
