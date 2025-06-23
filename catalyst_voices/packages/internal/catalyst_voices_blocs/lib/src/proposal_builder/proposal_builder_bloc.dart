@@ -56,6 +56,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     on<RebuildCommentsProposalEvent>(_rebuildComments);
     on<RebuildActiveAccountProposalEvent>(_rebuildActiveAccount);
     on<SubmitProposalEvent>(_submitProposal);
+    on<RequestPublishProposalEvent>(_requestPublishProposal);
+    on<RequestSubmitProposalEvent>(_requestSubmitProposal);
     on<ValidateProposalEvent>(_validateProposal);
     on<UpdateProposalBuilderValidationStatusEvent>(_updateValidationStatus);
     on<ClearValidationProposalEvent>(_clearValidation);
@@ -65,9 +67,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     on<UpdateCommentRepliesEvent>(_updateCommentReplies);
     on<SubmitCommentEvent>(_submitComment);
     on<MaxProposalsLimitChangedEvent>(_updateMaxProposalsLimitReached);
-    on<MaxProposalsLimitReachedEvent>(_onMaxProposalsLimitReached);
     on<UpdateUsernameEvent>(_onUpdateUsername);
     on<UnlockProposalBuilderEvent>(_unlockProposal);
+    on<ForgetProposalBuilderEvent>(_forgetProposal);
 
     final activeAccount = _userService.user.activeAccount;
 
@@ -101,8 +103,12 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     return super.close();
   }
 
-  Future<bool> isAccountEmailVerified() {
-    return _userService.isActiveAccountPubliclyVerified();
+  Future<bool> isAccountEmailVerified() async {
+    try {
+      return _userService.isActiveAccountPubliclyVerified();
+    } catch (e) {
+      return false;
+    }
   }
 
   bool validate(ProposalBuilderValidationOrigin origin) {
@@ -330,6 +336,28 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     }
   }
 
+  Future<void> _forgetProposal(
+    ProposalBuilderEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    final categoryId = state.metadata.categoryId;
+    final proposalRef = state.metadata.documentRef;
+    try {
+      emit(state.copyWith(isChanging: true));
+      await _proposalService.forgetProposal(
+        proposalRef: proposalRef! as SignedDocumentRef,
+        categoryId: categoryId!,
+      );
+      unawaited(_clearCache());
+      emitSignal(const ForgotProposalSuccessBuilderSignal());
+    } catch (e, stackTrace) {
+      _logger.severe('Error forgetting proposal', e, stackTrace);
+      emitError(LocalizedException.create(e));
+    } finally {
+      emit(state.copyWith(isChanging: false));
+    }
+  }
+
   ProposalGuidance _getGuidanceForNodeId(NodeId? nodeId) {
     if (nodeId == null) {
       return const ProposalGuidance(isNoneSelected: true);
@@ -389,6 +417,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     proposalBuilder!.addChanges(event.changes);
     final document = proposalBuilder.build();
 
+    _cache = _cache.copyWith(proposalDocument: Optional(document));
+
     final documentSegments = _mapDocumentToSegments(
       document,
       showValidationErrors: state.validationErrors?.showErrors ?? false,
@@ -408,6 +438,10 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     // then proceed slow async operations
     await _saveDocumentLocally(emit, document);
+  }
+
+  bool _isLocal(ProposalPublish publish, int iteration) {
+    return publish == ProposalPublish.localDraft && iteration == DocumentVersion.firstNumber;
   }
 
   Future<void> _loadDefaultProposalCategory(
@@ -478,6 +512,13 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           isLatest: index == proposalData.versions.length - 1,
         );
       }).toList();
+      final notVerifiedAccount =
+          !(_userService.user.activeAccount?.publicStatus.isVerified ?? false);
+      final firstVersion =
+          versions.length == 1 && versions.first.number == DocumentVersion.firstNumber;
+      if (firstVersion && proposalData.publish.isLocal && notVerifiedAccount) {
+        emitSignal(const NewProposalAndEmailNotVerifiedSignal());
+      }
       final categoryId = proposalData.categoryId;
       final category = await _campaignService.getCategory(categoryId);
 
@@ -620,24 +661,6 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         schema: segment.schema as DocumentSegmentSchema,
       );
     }).toList();
-  }
-
-  Future<void> _onMaxProposalsLimitReached(
-    MaxProposalsLimitReachedEvent event,
-    Emitter<ProposalBuilderState> emit,
-  ) async {
-    final proposalSubmissionCloseDate = await _getProposalSubmissionCloseDate();
-    final count = await _proposalService.watchUserProposalsCount().first;
-
-    if (proposalSubmissionCloseDate != null) {
-      final signal = MaxProposalsLimitReachedSignal(
-        proposalSubmissionCloseDate: proposalSubmissionCloseDate,
-        currentSubmissions: count.finals,
-        maxSubmissions: ProposalDocument.maxSubmittedProposalsPerUser,
-      );
-
-      emitSignal(signal);
-    }
   }
 
   Future<void> _onUpdateUsername(
@@ -834,6 +857,111 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           isLatest: newRef.version == currentId,
         ),
     ];
+  }
+
+  Future<void> _requestPublishProposal(
+    RequestPublishProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(isChanging: true));
+      if (!await isAccountEmailVerified()) {
+        emitSignal(const EmailNotVerifiedProposalBuilderSignal());
+        return;
+      }
+
+      if (emit.isDone) {
+        return;
+      }
+
+      if (!validate(ProposalBuilderValidationOrigin.shareDraft)) {
+        return;
+      }
+
+      final proposalTitle = state.proposalTitle;
+      final nextIteration = state.metadata.latestVersion?.number ?? DocumentVersion.firstNumber;
+
+      // if it's local draft and the first version then
+      // it should be shown as local which corresponds to null
+      final currentIteration =
+          _isLocal(state.metadata.publish, nextIteration) ? null : nextIteration - 1;
+
+      emitSignal(
+        ShowPublishConfirmationSignal(
+          proposalTitle: proposalTitle,
+          currentIteration: currentIteration,
+          nextIteration: nextIteration,
+        ),
+      );
+    } finally {
+      emit(state.copyWith(isChanging: false));
+    }
+  }
+
+  Future<void> _requestSubmitProposal(
+    RequestSubmitProposalEvent event,
+    Emitter<ProposalBuilderState> emit,
+  ) async {
+    try {
+      emit(state.copyWith(isChanging: true));
+      if (state.isMaxProposalsLimitReached) {
+        final proposalSubmissionCloseDate = await _getProposalSubmissionCloseDate();
+        final count = await _proposalService.watchUserProposalsCount().first;
+
+        if (proposalSubmissionCloseDate != null) {
+          final signal = MaxProposalsLimitReachedSignal(
+            proposalSubmissionCloseDate: proposalSubmissionCloseDate,
+            currentSubmissions: count.finals,
+            maxSubmissions: ProposalDocument.maxSubmittedProposalsPerUser,
+          );
+
+          emitSignal(signal);
+        }
+
+        return;
+      }
+
+      if (!await isAccountEmailVerified()) {
+        emitSignal(const EmailNotVerifiedProposalBuilderSignal());
+        return;
+      }
+
+      if (!validate(ProposalBuilderValidationOrigin.submitForReview)) {
+        return;
+      }
+
+      if (emit.isDone) {
+        return;
+      }
+
+      final proposalTitle = state.proposalTitle;
+      final latestVersion = state.metadata.latestVersion;
+      final nextIteration = latestVersion?.number ?? DocumentVersion.firstNumber;
+
+      final int? currentIteration;
+      if (_isLocal(state.metadata.publish, nextIteration)) {
+        // if it's local draft and the first version then
+        // it should be shown as local which corresponds to null
+        currentIteration = null;
+      } else if (state.metadata.publish == ProposalPublish.localDraft) {
+        // current iteration is a local draft
+        // so next iteration must increment the version
+        currentIteration = nextIteration - 1;
+      } else {
+        // only changing status of the iteration, no need to increment the version
+        currentIteration = nextIteration;
+      }
+
+      emitSignal(
+        ShowSubmitConfirmationSignal(
+          proposalTitle: proposalTitle,
+          currentIteration: currentIteration,
+          nextIteration: nextIteration,
+        ),
+      );
+    } finally {
+      emit(state.copyWith(isChanging: false));
+    }
   }
 
   Future<void> _saveDocumentLocally(

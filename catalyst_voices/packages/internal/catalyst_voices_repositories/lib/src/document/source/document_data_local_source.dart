@@ -2,17 +2,21 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 
 abstract interface class DocumentDataLocalSource implements DocumentDataSource {
+  Future<int> deleteAll();
+
   Future<bool> exists({required DocumentRef ref});
+
+  Future<List<DocumentData>> getAll({required DocumentRef ref});
+
+  Future<DocumentData?> getLatest({
+    CatalystId? authorId,
+  });
 
   Future<List<DocumentData>> queryVersionsOfId({required String id});
 
   Future<void> save({required DocumentData data});
 
   Stream<DocumentData?> watch({required DocumentRef ref});
-
-  Future<DocumentData?> getLatest({
-    CatalystId? authorId,
-  });
 }
 
 /// See [DatabaseDraftsDataSource].

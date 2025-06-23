@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
+import 'package:catalyst_voices_repositories/src/common/http_headers.dart';
 import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:chopper/chopper.dart' as utils show applyHeader;
@@ -17,7 +18,6 @@ final _logger = Logger('RbacAuthInterceptor');
 /// - 403: The token is valid, we know who they are but either the timestamp is
 /// wrong (out of date) or the signature is wrong.
 final class RbacAuthInterceptor implements Interceptor {
-  static const _authHeaderName = 'Authorization';
   static const _retryCountHeaderName = 'Retry-Count';
   static const _retryStatusCodes = [401, 403];
   static const _maxRetries = 1;
@@ -30,7 +30,7 @@ final class RbacAuthInterceptor implements Interceptor {
   FutureOr<Response<BodyType>> intercept<BodyType>(
     Chain<BodyType> chain,
   ) async {
-    if (chain.request.headers[_authHeaderName] != null) {
+    if (chain.request.headers[HttpHeaders.authorization] != null) {
       // token is already added
       return chain.proceed(chain.request);
     }
@@ -87,7 +87,7 @@ final class RbacAuthInterceptor implements Interceptor {
 extension on Request {
   Request applyAuthToken(RbacToken token) {
     return applyHeader(
-      name: RbacAuthInterceptor._authHeaderName,
+      name: HttpHeaders.authorization,
       value: token.authHeader(),
     );
   }

@@ -15,6 +15,9 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
+  Future<int> deleteAll() => _database.draftsDao.deleteAll();
+
+  @override
   Future<bool> exists({required DocumentRef ref}) {
     return _database.draftsDao.count(ref: ref).then((count) => count > 0);
   }
@@ -27,6 +30,13 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
     }
 
     return entity.toModel();
+  }
+
+  @override
+  Future<List<DocumentData>> getAll({required DocumentRef ref}) {
+    return _database.draftsDao
+        .queryAll(ref: ref)
+        .then((value) => value.map((e) => e.toModel()).toList());
   }
 
   @override

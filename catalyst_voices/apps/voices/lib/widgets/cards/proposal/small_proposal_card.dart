@@ -27,6 +27,8 @@ class SmallProposalCard extends StatelessWidget {
       onTap: () async {
         if (!proposal.publish.isLocal) {
           return ProposalRoute.fromRef(ref: proposal.selfRef).push(context);
+        } else if (!proposal.hasNewerLocalIteration && proposal.publish.isLocal) {
+          return ProposalBuilderRoute.fromRef(ref: proposal.selfRef).push(context);
         }
       },
       child: Container(

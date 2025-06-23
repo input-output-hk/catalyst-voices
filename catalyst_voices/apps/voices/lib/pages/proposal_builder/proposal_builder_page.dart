@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
+import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_back_action.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_status_action.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_changing.dart';
@@ -19,17 +21,23 @@ import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_limit_reached_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_error_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/publish_proposal_iteration_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_error_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/proposals/submit_proposal_for_review_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/unlock_edit_proposal.dart';
+import 'package:catalyst_voices/widgets/snackbar/common_snackbars.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class ProposalBuilderPage extends StatefulWidget {
+class ProposalBuilderPage extends StatelessWidget {
   final DocumentRef? proposalId;
   final SignedDocumentRef? categoryId;
 
@@ -40,37 +48,34 @@ class ProposalBuilderPage extends StatefulWidget {
   });
 
   @override
-  State<ProposalBuilderPage> createState() => _ProposalBuilderPageState();
-}
-
-class _ProposalBuilderContent extends StatelessWidget {
-  final ItemScrollController controller;
-  final VoidCallback onRetryTap;
-
-  const _ProposalBuilderContent({
-    required this.controller,
-    required this.onRetryTap,
-  });
-
-  @override
   Widget build(BuildContext context) {
-    return FocusTraversalGroup(
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          ProposalBuilderErrorSelector(onRetryTap: onRetryTap),
-          ProposalBuilderSegmentsSelector(itemScrollController: controller),
-          const ProposalBuilderLoadingSelector(),
-        ],
+    return BlocProvider<ProposalBuilderBloc>(
+      create: (context) => Dependencies.instance.get<ProposalBuilderBloc>(),
+      child: _ProposalBuilderBody(
+        proposalId: proposalId,
+        categoryId: categoryId,
       ),
     );
   }
 }
 
-class _ProposalBuilderPageState extends State<ProposalBuilderPage>
+class _ProposalBuilderBody extends StatefulWidget {
+  final DocumentRef? proposalId;
+  final SignedDocumentRef? categoryId;
+
+  const _ProposalBuilderBody({
+    this.proposalId,
+    this.categoryId,
+  });
+
+  @override
+  State<_ProposalBuilderBody> createState() => _ProposalBuilderBodyState();
+}
+
+class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
     with
-        ErrorHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderPage>,
-        SignalHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderSignal, ProposalBuilderPage> {
+        ErrorHandlerStateMixin<ProposalBuilderBloc, _ProposalBuilderBody>,
+        SignalHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderSignal, _ProposalBuilderBody> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
 
@@ -114,7 +119,7 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
   }
 
   @override
-  void didUpdateWidget(ProposalBuilderPage oldWidget) {
+  void didUpdateWidget(_ProposalBuilderBody oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.proposalId != oldWidget.proposalId || widget.categoryId != oldWidget.categoryId) {
@@ -165,6 +170,14 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
         unawaited(_showProposalLimitReachedDialog(signal));
       case UnlockProposalSignal():
         unawaited(_showUnlockProposalDialog(signal));
+      case ForgotProposalSuccessBuilderSignal():
+        _showForgetProposalSuccessDialog();
+      case NewProposalAndEmailNotVerifiedSignal():
+        _showEmailVerificationNeededSnackbar();
+      case ShowPublishConfirmationSignal():
+        unawaited(_showPublishConfirmationDialog(signal));
+      case ShowSubmitConfirmationSignal():
+        unawaited(_showSubmitConfirmationDialog(signal));
     }
   }
 
@@ -231,7 +244,6 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
 
     final proposalId = widget.proposalId;
     final categoryId = widget.categoryId;
-
     if (proposalId != null) {
       bloc.add(LoadProposalEvent(proposalId: proposalId));
     } else if (categoryId != null) {
@@ -279,6 +291,36 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     }
   }
 
+  void _showEmailVerificationNeededSnackbar() {
+    VoicesSnackBar(
+      type: VoicesSnackBarType.error,
+      behavior: SnackBarBehavior.floating,
+      title: context.l10n.verifiedEmailNeededToPublishTitle,
+      message: context.l10n.verifiedEmailNeededToPublishMessage,
+      actions: [
+        VoicesTextButton(
+          onTap: () => unawaited(const AccountRoute().push(context)),
+          child: Text(
+            context.l10n.emailNotVerifiedDialogAction,
+            style: context.textTheme.labelLarge?.copyWith(
+              decoration: TextDecoration.underline,
+              decorationColor: context.colors.elevationsOnSurfaceNeutralLv0,
+              color: context.colors.elevationsOnSurfaceNeutralLv0,
+            ),
+          ),
+        ),
+      ],
+    ).show(context);
+  }
+
+  void _showForgetProposalSuccessDialog() {
+    CommonSnackbars.showForgetProposalSuccessDialog(context);
+
+    Router.neglect(context, () {
+      const WorkspaceRoute().replace(context);
+    });
+  }
+
   Future<void> _showProposalLimitReachedDialog(
     MaxProposalsLimitReachedSignal signal,
   ) {
@@ -288,6 +330,20 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
       maxSubmissions: signal.maxSubmissions,
       submissionCloseAt: signal.proposalSubmissionCloseDate,
     );
+  }
+
+  Future<void> _showPublishConfirmationDialog(ShowPublishConfirmationSignal signal) async {
+    final shouldPublish = await PublishProposalIterationDialog.show(
+          context: context,
+          proposalTitle: signal.proposalTitle ?? context.l10n.proposalEditorStatusDropdownViewTitle,
+          currentIteration: signal.currentIteration,
+          nextIteration: signal.nextIteration,
+        ) ??
+        false;
+
+    if (shouldPublish && mounted) {
+      context.read<ProposalBuilderBloc>().add(const PublishProposalEvent());
+    }
   }
 
   Future<void> _showPublishException(ProposalBuilderPublishException error) {
@@ -311,6 +367,20 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     }
   }
 
+  Future<void> _showSubmitConfirmationDialog(ShowSubmitConfirmationSignal signal) async {
+    final shouldSubmit = await SubmitProposalForReviewDialog.show(
+          context: context,
+          proposalTitle: signal.proposalTitle ?? context.l10n.proposalEditorStatusDropdownViewTitle,
+          currentIteration: signal.currentIteration,
+          nextIteration: signal.nextIteration,
+        ) ??
+        false;
+
+    if (shouldSubmit && mounted) {
+      context.read<ProposalBuilderBloc>().add(const SubmitProposalEvent());
+    }
+  }
+
   Future<void> _showSubmitException(ProposalBuilderSubmitException error) {
     return SubmitProposalErrorDialog.show(
       context: context,
@@ -318,25 +388,25 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
     );
   }
 
-  Future<void> _showUnlockProposalDialog(
-    UnlockProposalSignal signal, {
-    ProposalBuilderBloc? bloc,
-  }) async {
-    bloc ??= context.read<ProposalBuilderBloc>();
-    final unlock = await UnlockEditProposalDialog.show(
-          context: context,
-          title: signal.title,
-          version: signal.version,
-        ) ??
-        false;
+  Future<void> _showUnlockProposalDialog(UnlockProposalSignal signal) async {
+    if (!_isAboutToExit) {
+      final bloc = context.read<ProposalBuilderBloc>();
+      final unlock = await UnlockEditProposalDialog.show(
+            context: context,
+            title: signal.title,
+            version: signal.version,
+          ) ??
+          false;
 
-    if (unlock && mounted) {
-      return bloc.add(const UnlockProposalBuilderEvent());
-    }
-    if (mounted) {
-      Router.neglect(context, () {
-        const WorkspaceRoute().replace(context);
-      });
+      if (!mounted) {
+        return;
+      } else if (unlock) {
+        return bloc.add(const UnlockProposalBuilderEvent());
+      } else {
+        return Router.neglect(context, () {
+          const WorkspaceRoute().replace(context);
+        });
+      }
     }
   }
 
@@ -354,5 +424,29 @@ class _ProposalBuilderPageState extends State<ProposalBuilderPage>
           );
 
     _segmentsController.value = newState;
+  }
+}
+
+class _ProposalBuilderContent extends StatelessWidget {
+  final ItemScrollController controller;
+  final VoidCallback onRetryTap;
+
+  const _ProposalBuilderContent({
+    required this.controller,
+    required this.onRetryTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FocusTraversalGroup(
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ProposalBuilderErrorSelector(onRetryTap: onRetryTap),
+          ProposalBuilderSegmentsSelector(itemScrollController: controller),
+          const ProposalBuilderLoadingSelector(),
+        ],
+      ),
+    );
   }
 }

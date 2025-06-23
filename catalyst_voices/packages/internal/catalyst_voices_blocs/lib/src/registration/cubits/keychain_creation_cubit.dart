@@ -57,11 +57,10 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     }
   }
 
-  KeychainProgress createRecoverProgress() {
-    return KeychainProgress(
-      seedPhrase: _seedPhrase!,
-      password: password.value,
-    );
+  void clearSeedPhrase() {
+    _seedPhrase = SeedPhrase();
+    setSeedPhraseStored(false);
+    setUserSeedPhraseWords([]);
   }
 
   @override
