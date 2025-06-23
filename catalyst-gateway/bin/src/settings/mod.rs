@@ -48,12 +48,6 @@ const API_URL_PREFIX_DEFAULT: &str = "/api";
 /// Default `CHECK_CONFIG_TICK` used in development, 5 seconds.
 const CHECK_CONFIG_TICK_DEFAULT: Duration = Duration::from_secs(5);
 
-/// Default `METRICS_MEMORY_INTERVAL`, 1 second.
-const METRICS_MEMORY_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
-
-/// Default `METRICS_FOLLOWER_INTERVAL`, 1 second.
-const METRICS_FOLLOWER_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
-
 /// Default number of slots used as overlap when purging Live Index data.
 const PURGE_BACKWARD_SLOT_BUFFER_DEFAULT: u64 = 100;
 
@@ -141,12 +135,6 @@ struct EnvVars {
     /// Slot buffer used as overlap when purging Live Index data.
     purge_backward_slot_buffer: u64,
 
-    /// Interval for updating and sending memory metrics.
-    metrics_memory_interval: Duration,
-
-    /// Interval for updating and sending Chain Follower metrics.
-    metrics_follower_interval: Duration,
-
     /// Interval for determining if the service is live.
     service_live_timeout_interval: Duration,
 
@@ -215,14 +203,6 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             CHECK_CONFIG_TICK_DEFAULT,
         ),
         purge_backward_slot_buffer,
-        metrics_memory_interval: StringEnvVar::new_as_duration(
-            "METRICS_MEMORY_INTERVAL",
-            METRICS_MEMORY_INTERVAL_DEFAULT,
-        ),
-        metrics_follower_interval: StringEnvVar::new_as_duration(
-            "METRICS_FOLLOWER_INTERVAL",
-            METRICS_FOLLOWER_INTERVAL_DEFAULT,
-        ),
         service_live_timeout_interval: StringEnvVar::new_as_duration(
             "SERVICE_LIVE_TIMEOUT_INTERVAL",
             SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT,
@@ -355,16 +335,6 @@ impl Settings {
     /// The Service UUID
     pub(crate) fn service_id() -> &'static str {
         ENV_VARS.service_id.as_str()
-    }
-
-    /// The memory metrics interval
-    pub(crate) fn metrics_memory_interval() -> Duration {
-        ENV_VARS.metrics_memory_interval
-    }
-
-    /// The Chain Follower metrics interval
-    pub(crate) fn metrics_follower_interval() -> Duration {
-        ENV_VARS.metrics_follower_interval
     }
 
     /// Get a list of all host names to serve the API on.

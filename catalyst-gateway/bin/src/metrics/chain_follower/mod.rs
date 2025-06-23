@@ -1,10 +1,5 @@
 //! Metrics related to Chain Follower analytics.
 
-use std::{
-    sync::atomic::{AtomicBool, Ordering},
-    thread,
-};
-
 use cardano_blockchain_types::Network;
 use cardano_chain_follower::Statistics;
 
@@ -12,40 +7,23 @@ use crate::settings::Settings;
 
 mod reporter;
 
-/// This is to prevent the init function from accidentally being called multiple times.
-static IS_INITIALIZED: AtomicBool = AtomicBool::new(false);
-
-/// Starts a background thread to periodically update Chain Follower metrics.
-///
-/// This function spawns a thread that updates the Chain Follower metrics
-/// at regular intervals defined by `METRICS_FOLLOWER_INTERVAL`.
-pub(crate) fn init_metrics_reporter() {
-    if IS_INITIALIZED.swap(true, Ordering::SeqCst) {
-        return;
-    }
-
+/// Updates Chain Follower metrics to current values.
+pub(crate) fn update() {
     let api_host_names = Settings::api_host_names().join(",");
     let service_id = Settings::service_id();
     let network = Settings::cardano_network();
 
-    thread::spawn(move || {
-        loop {
-            {
-                let follower_stats = Statistics::new(network);
+    let follower_stats = Statistics::new(network);
 
-                report_mithril(&follower_stats, &api_host_names, service_id, network);
-                report_live(&follower_stats, &api_host_names, service_id, network);
-            }
-
-            thread::sleep(Settings::metrics_follower_interval());
-        }
-    });
+    report_mithril(&follower_stats, &api_host_names, service_id, network);
+    report_live(&follower_stats, &api_host_names, service_id, network);
 }
 
 /// Performs reporting Chain Follower's Mithril information to Prometheus.
 #[allow(clippy::indexing_slicing)]
 fn report_mithril(stats: &Statistics, api_host_names: &str, service_id: &str, network: Network) {
     let stats = &stats.mithril;
+    let net_idx = network as usize;
     let network = network.to_string();
 
     reporter::MITHRIL_UPDATES
@@ -126,6 +104,7 @@ fn report_mithril(stats: &Statistics, api_host_names: &str, service_id: &str, ne
 #[allow(clippy::indexing_slicing)]
 fn report_live(stats: &Statistics, api_host_names: &str, service_id: &str, network: Network) {
     let stats = &stats.live;
+    let net_idx = network as usize;
     let network = network.to_string();
 
     reporter::LIVE_SYNC_START
