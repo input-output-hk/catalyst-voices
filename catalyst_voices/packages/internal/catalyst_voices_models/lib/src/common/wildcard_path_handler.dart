@@ -17,11 +17,26 @@ class WildcardPathHandler extends Equatable {
   ({NodeId prefix, NodeId? suffix})? get getWildcardPaths {
     if (!hasWildcard) return null;
 
-    final segments = path.split('*');
-    final prefixSegment = NodeId(segments.first);
-    if (segments.length == 1) return (prefix: prefixSegment, suffix: null);
-    final suffixSegment = NodeId(segments.last);
-    return (prefix: prefixSegment, suffix: suffixSegment);
+    final segments = pathSegments;
+
+    for (var i = 0; i < segments.length; i++) {
+      if (segments[i] == '*') {
+        // Build prefix (everything up to this wildcard)
+        final prefixSegments = segments.sublist(0, i);
+        final prefixNodeId = NodeId(prefixSegments.join('.'));
+
+        // Get suffix (everything after this wildcard)
+        NodeId? suffixNodeId;
+        if (i < segments.length - 1) {
+          final suffixSegments = segments.sublist(i + 1);
+          suffixNodeId = NodeId(suffixSegments.join('.'));
+        }
+
+        return (prefix: prefixNodeId, suffix: suffixNodeId);
+      }
+    }
+
+    return null;
   }
 
   bool get hasWildcard => pathSegments.contains('*');
