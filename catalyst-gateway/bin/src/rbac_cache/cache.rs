@@ -272,12 +272,14 @@ impl RbacCache {
     }
 
     /// Returns the number of cached active address entries.
+    #[allow(dead_code)]
     pub fn active_address_entries(&self) -> u64 {
         self.active_addresses.run_pending_tasks();
         self.active_addresses.entry_count()
     }
 
     /// Returns the number of cached transaction entries.
+    #[allow(dead_code)]
     pub fn transaction_entries(&self) -> u64 {
         self.transactions.run_pending_tasks();
         self.transactions.entry_count()
