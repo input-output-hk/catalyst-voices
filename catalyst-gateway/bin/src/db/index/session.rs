@@ -21,9 +21,8 @@ use tracing::{error, info};
 
 use super::{
     queries::{
-        purge::{self, PreparedDeleteQuery},
-        FallibleQueryResults, PreparedQueries, PreparedQuery, PreparedSelectQuery,
-        PreparedUpsertQuery, QueryKind,
+        prepare_queries, session_execute_batch, session_execute_iter, session_execute_upsert,
+        FallibleQueryResults, QueryKind,
     },
     schema::create_schema,
 };
@@ -114,11 +113,6 @@ pub(crate) struct CassandraSession {
     /// The actual session.
     session: Arc<Session>,
     /// All prepared queries we can use on this session.
-    queries: Arc<PreparedQueries>,
-    /// All prepared purge queries we can use on this session.
-    purge_queries: Arc<purge::PreparedQueries>,
-    /// All prepared queries we can use on this session.
-    #[allow(dead_code)]
     prepared_queries: DashMap<TypeId, QueryKind>,
 }
 
@@ -185,13 +179,18 @@ impl CassandraSession {
     /// Returns an iterator that iterates over all the result pages that the query
     /// returns.
     pub(crate) async fn execute_iter<P>(
-        &self, select_query: PreparedSelectQuery, params: P,
+        &self, select_query: TypeId, params: P,
     ) -> anyhow::Result<QueryPager>
     where P: SerializeRow {
         let session = self.session.clone();
-        let queries = self.queries.clone();
+        let Some(key_value) = self.prepared_queries.get(&select_query) else {
+            anyhow::bail!("Unregistered Query");
+        };
+        let QueryKind::Statement(ref stmt) = key_value.value() else {
+            anyhow::bail!("Invalid query kind");
+        };
 
-        queries.execute_iter(session, select_query, params).await
+        session_execute_iter(session, stmt, params).await
     }
 
     /// Execute a Batch query with the given parameters.
@@ -202,24 +201,36 @@ impl CassandraSession {
     /// This will divide the batch into optimal sized chunks and execute them until all
     /// values have been executed or the first error is encountered.
     pub(crate) async fn execute_batch<T: SerializeRow + Debug>(
-        &self, query: PreparedQuery, values: Vec<T>,
+        &self, query: TypeId, query_str: &str, values: Vec<T>,
     ) -> FallibleQueryResults {
         let session = self.session.clone();
         let cfg = self.cfg.clone();
-        let queries = self.queries.clone();
 
-        queries.execute_batch(session, cfg, query, values).await
+        let Some(key_value) = self.prepared_queries.get(&query) else {
+            anyhow::bail!("Unregistered Query");
+        };
+        let QueryKind::Batch(ref batch) = key_value.value() else {
+            anyhow::bail!("Invalid query kind");
+        };
+
+        session_execute_batch(session, batch, cfg, query_str, values).await
     }
 
     /// Execute a query which returns no results, except an error if it fails.
     /// Can not be batched, takes a single set of parameters.
     pub(crate) async fn execute_upsert<T: SerializeRow + Debug>(
-        &self, query: PreparedUpsertQuery, value: T,
+        &self, query: TypeId, params: T,
     ) -> anyhow::Result<()> {
         let session = self.session.clone();
-        let queries = self.queries.clone();
 
-        queries.execute_upsert(session, query, value).await
+        let Some(key_value) = self.prepared_queries.get(&query) else {
+            anyhow::bail!("Unregistered Query");
+        };
+        let QueryKind::Statement(ref query) = key_value.value() else {
+            anyhow::bail!("Invalid query kind");
+        };
+
+        session_execute_upsert(session, query, params).await
     }
 
     /// Execute a purge query with the given parameters.
@@ -232,7 +243,7 @@ impl CassandraSession {
     ///
     /// NOTE: This is currently only used to purge volatile data.
     pub(crate) async fn purge_execute_batch<T: SerializeRow + Debug>(
-        &self, query: PreparedDeleteQuery, values: Vec<T>,
+        &self, query: TypeId, query_str: &str, values: Vec<T>,
     ) -> FallibleQueryResults {
         // Only execute purge queries on the volatile session
         let persistent = false;
@@ -241,15 +252,20 @@ impl CassandraSession {
             anyhow::bail!("Volatile DB Session not found");
         };
         let cfg = self.cfg.clone();
-        let queries = self.purge_queries.clone();
         let session = volatile_db.session.clone();
+        let Some(key_value) = self.prepared_queries.get(&query) else {
+            anyhow::bail!("Unregistered Query");
+        };
+        let QueryKind::Batch(ref batch) = key_value.value() else {
+            anyhow::bail!("Invalid query kind");
+        };
 
-        queries.execute_batch(session, cfg, query, values).await
+        session_execute_batch(session, batch, cfg, query_str, values).await
     }
 
     /// Execute a select query to gather primary keys for purging.
     pub(crate) async fn purge_execute_iter(
-        &self, query: purge::PreparedSelectQuery,
+        &self, query_type: TypeId,
     ) -> anyhow::Result<QueryPager> {
         // Only execute purge queries on the volatile session
         let persistent = false;
@@ -257,11 +273,15 @@ impl CassandraSession {
             // This should never happen
             anyhow::bail!("Volatile DB Session not found");
         };
-        let queries = self.purge_queries.clone();
 
-        queries
-            .execute_iter(volatile_db.session.clone(), query)
-            .await
+        let Some(key_value) = self.prepared_queries.get(&query_type) else {
+            anyhow::bail!("Unregistered Query");
+        };
+        let QueryKind::Statement(ref query) = key_value.value() else {
+            anyhow::bail!("Invalid query kind");
+        };
+
+        session_execute_iter(volatile_db.session.clone(), query, ()).await
     }
 
     /// Get underlying Raw Cassandra Session.
@@ -399,14 +419,14 @@ async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bo
             continue;
         }
 
-        let queries = match PreparedQueries::new(session.clone(), &cfg).await {
-            Ok(queries) => Arc::new(queries),
+        let prepared_queries = match prepare_queries(&session, &cfg).await {
+            Ok(queries) => queries,
             Err(error) => {
                 error!(
                     db_type = db_type,
                     network = %network,
-                    error = %error,
-                    "Failed to Create Cassandra Prepared Queries"
+                    error = format!("{error:?}"),
+                    "Failed to Prepare Queries for Cassandra DB Session"
                 );
                 drop(INIT_SESSION_ERROR.set(Arc::new(
                     CassandraSessionError::PreparingQueriesFailed { source: error },
@@ -415,30 +435,13 @@ async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bo
             },
         };
 
-        let purge_queries = match Box::pin(purge::PreparedQueries::new(session.clone(), &cfg)).await
-        {
-            Ok(queries) => Arc::new(queries),
-            Err(error) => {
-                error!(
-                    db_type = db_type,
-                    network = %network,
-                    error = %error,
-                    "Failed to Create Cassandra Prepared Purge Queries"
-                );
-                drop(INIT_SESSION_ERROR.set(Arc::new(
-                    CassandraSessionError::PreparingPurgeQueriesFailed { source: error },
-                )));
-                continue;
-            },
-        };
+        let cfg = Arc::new(cfg);
 
         let cassandra_session = CassandraSession {
             persistent,
-            cfg: Arc::new(cfg),
+            cfg,
             session,
-            queries,
-            purge_queries,
-            prepared_queries: DashMap::default(),
+            prepared_queries,
         };
 
         // Save the session so we can execute queries on the DB
