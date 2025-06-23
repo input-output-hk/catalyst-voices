@@ -23,7 +23,6 @@ pub(crate) fn update() {
 #[allow(clippy::indexing_slicing)]
 fn report_mithril(stats: &Statistics, api_host_names: &str, service_id: &str, network: Network) {
     let stats = &stats.mithril;
-    let net_idx = network as usize;
     let network = network.to_string();
 
     reporter::MITHRIL_UPDATES
@@ -104,7 +103,6 @@ fn report_mithril(stats: &Statistics, api_host_names: &str, service_id: &str, ne
 #[allow(clippy::indexing_slicing)]
 fn report_live(stats: &Statistics, api_host_names: &str, service_id: &str, network: Network) {
     let stats = &stats.live;
-    let net_idx = network as usize;
     let network = network.to_string();
 
     reporter::LIVE_SYNC_START
