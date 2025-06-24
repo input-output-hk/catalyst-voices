@@ -15,6 +15,10 @@ class WildcardPathHandler extends Equatable {
   /// For each wildcard, returns the NodeId prefix leading to it and the NodeId suffix following it.
   /// Returns null if no wildcards are present.
   ({NodeId prefix, NodeId? suffix})? get getWildcardPaths {
+    if ('*'.allMatches(path).length > 1) {
+      throw ArgumentError('Path must not contain more than one wildcard');
+    }
+
     if (!hasWildcard) return null;
 
     final segments = pathSegments;
@@ -50,6 +54,21 @@ class WildcardPathHandler extends Equatable {
   bool matches(NodeId nodeId) {
     final patternSegments = pathSegments;
     final targetSegments = nodeId.value.split('.');
+
+    if (patternSegments.isNotEmpty && patternSegments.first == '*') {
+      final subPattern = patternSegments.sublist(1);
+      for (var i = targetSegments.length - subPattern.length; i >= 0; --i) {
+        var matches = true;
+        for (var j = 0; j < subPattern.length; ++j) {
+          if (subPattern[j] != targetSegments[i + j] && subPattern[j] != '*') {
+            matches = false;
+            break;
+          }
+        }
+        if (matches) return true;
+      }
+      return false;
+    }
 
     if (patternSegments.length > targetSegments.length) {
       return false; // The pattern can't be longer than the target.

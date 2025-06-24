@@ -80,24 +80,74 @@ class JsonBExpressions {
   }) {
     final valueComparison = useExactMatch ? "= '$searchValue'" : "LIKE '%$searchValue%'";
     final handler = WildcardPathHandler.fromNodeId(nodeId);
+    final wildcardPaths = handler.getWildcardPaths;
 
-    if (handler.hasWildcard) {
-      final wildcardPaths = handler.getWildcardPaths;
-      if (wildcardPaths != null) {
-        final arrayPath = wildcardPaths.prefix.asPath;
-        final fieldName = wildcardPaths.suffix?.asPath;
-
-        if (fieldName != null) {
-          // Query for specific field in array elements
-          return "EXISTS (SELECT 1 FROM json_each(json_extract($jsonContent, '$arrayPath')) WHERE json_extract(value, '$fieldName') $valueComparison)";
-        } else {
-          // Just search in the array
-          return "EXISTS (SELECT 1 FROM json_tree($jsonContent, '$arrayPath') WHERE json_tree.value $valueComparison)";
-        }
-      }
+    if (!handler.hasWildcard || wildcardPaths == null) {
+      return _queryJsonExtract(
+        jsonContent: jsonContent,
+        nodeId: nodeId,
+        valueComparison: valueComparison,
+      );
     }
 
+    final arrayPath = wildcardPaths.prefix.value.isEmpty ? '' : wildcardPaths.prefix.asPath;
+    final fieldName = wildcardPaths.suffix?.asPath;
+
+    if (wildcardPaths.prefix.value.isEmpty) {
+      return _queryJsonTreeForKey(
+        jsonContent: jsonContent,
+        fieldName: fieldName?.substring(2),
+        valueComparison: valueComparison,
+      );
+    }
+
+    if (fieldName != null) {
+      return _queryJsonEachForWildcard(
+        jsonContent: jsonContent,
+        arrayPath: arrayPath,
+        fieldName: fieldName,
+        valueComparison: valueComparison,
+      );
+    }
+
+    return _queryJsonTreeForWildcard(
+      jsonContent: jsonContent,
+      arrayPath: arrayPath,
+      valueComparison: valueComparison,
+    );
+  }
+
+  static String _queryJsonEachForWildcard({
+    required String jsonContent,
+    required String arrayPath,
+    required String fieldName,
+    required String valueComparison,
+  }) {
+    return "EXISTS (SELECT 1 FROM json_each(json_extract($jsonContent, '$arrayPath')) WHERE json_extract(value, '$fieldName') $valueComparison)";
+  }
+
+  static String _queryJsonExtract({
+    required String jsonContent,
+    required NodeId nodeId,
+    required String valueComparison,
+  }) {
     return "json_extract($jsonContent, '${nodeId.asPath}') $valueComparison";
+  }
+
+  static String _queryJsonTreeForKey({
+    required String jsonContent,
+    required String? fieldName,
+    required String valueComparison,
+  }) {
+    return "EXISTS (SELECT 1 FROM json_tree($jsonContent) WHERE key LIKE '$fieldName' AND json_tree.value $valueComparison)";
+  }
+
+  static String _queryJsonTreeForWildcard({
+    required String jsonContent,
+    required String arrayPath,
+    required String valueComparison,
+  }) {
+    return "EXISTS (SELECT 1 FROM json_tree($jsonContent, '$arrayPath') WHERE json_tree.value $valueComparison)";
   }
 }
 
