@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
+import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/database.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
@@ -610,6 +611,253 @@ void main() {
         },
         onPlatform: driftOnPlatforms,
       );
+      group('wildcard support', () {
+        test(
+          'can query documents by matched DocumentNodeId value with wildcard',
+          () async {
+            final templateRef = DocumentRefFactory.randomUuidV7();
+
+            final proposalRef1 = DocumentRefFactory.randomUuidV7();
+            final proposalRef2 = DocumentRefFactory.randomUuidV7();
+
+            const content1 = DocumentDataContent({
+              'setup': {
+                'title': {
+                  'title': 'Milestone 2',
+                },
+              },
+              'milestones': {
+                'milestones': {
+                  'milestone_list': [
+                    {
+                      'title': 'Milestone 1',
+                      'cost': 100,
+                    },
+                    {
+                      'title': 'Milestone 2',
+                      'cost': 200,
+                    },
+                  ],
+                },
+              },
+            });
+
+            const content2 = DocumentDataContent({
+              'setup': {
+                'title': {
+                  'title': 'Milestone 2',
+                },
+              },
+              'milestones': {
+                'milestones': {
+                  'milestone_list': [
+                    {
+                      'title': 'Milestone 1',
+                      'cost': 100,
+                    },
+                    {
+                      'title': 'Milestone 1',
+                      'outputs': 'Milestone 2',
+                      'cost': 200,
+                    },
+                  ],
+                },
+              },
+            });
+
+            final ref1 = SignedDocumentRef(id: proposalRef1, version: proposalRef1);
+            final ref2 = SignedDocumentRef(id: proposalRef2, version: proposalRef2);
+
+            final doc1 = DocumentWithMetadataFactory.build(
+              content: content1,
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: ref1,
+                template: SignedDocumentRef(id: templateRef, version: templateRef),
+              ),
+            );
+
+            final doc2 = DocumentWithMetadataFactory.build(
+              content: content2,
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: ref2,
+                template: SignedDocumentRef(id: templateRef, version: templateRef),
+              ),
+            );
+
+            await database.documentsDao.saveAll([doc1, doc2]);
+
+            // When: query for documents with milestone_list.*.title == 'Milestone 2'
+            final results = await (database.documentsDao as DriftDocumentsDao)
+                .queryDocumentsByMatchedDocumentNodeIdValue(
+              nodeId: DocumentNodeId.fromString('milestones.milestones.milestone_list.*.title'),
+              value: 'Milestone 2',
+              type: DocumentType.proposalDocument,
+              content: 'content',
+            );
+
+            // Then: only doc1 should be returned
+            final refs = results.map((e) => e.metadata.selfRef).toList();
+            expect(refs, contains(ref1));
+            expect(refs, isNot(contains(ref2)));
+          },
+          onPlatform: driftOnPlatforms,
+        );
+
+        test(
+          'can query documents by matched DocumentNodeId value without wildcard',
+          () async {
+            final templateRef = DocumentRefFactory.randomUuidV7();
+
+            final proposalRef1 = DocumentRefFactory.randomUuidV7();
+
+            const content1 = DocumentDataContent({
+              'setup': {
+                'proposer': {
+                  'applicant': 'John Doe',
+                },
+                'title': {
+                  'title': 'Milestone 2',
+                },
+              },
+              'milestones': {
+                'milestones': {
+                  'milestone_list': [
+                    {
+                      'title': 'Milestone 1',
+                      'cost': 100,
+                    },
+                    {
+                      'title': 'Milestone 2',
+                      'cost': 200,
+                    },
+                  ],
+                },
+              },
+            });
+
+            final ref1 = SignedDocumentRef(id: proposalRef1, version: proposalRef1);
+
+            final doc1 = DocumentWithMetadataFactory.build(
+              content: content1,
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: ref1,
+                template: SignedDocumentRef(id: templateRef, version: templateRef),
+              ),
+            );
+
+            await database.documentsDao.saveAll([doc1]);
+
+            final results = await (database.documentsDao as DriftDocumentsDao)
+                .queryDocumentsByMatchedDocumentNodeIdValue(
+              nodeId: ProposalDocument.authorNameNodeId,
+              value: 'John Doe',
+              type: DocumentType.proposalDocument,
+              content: 'content',
+            );
+
+            final refs = results.map((e) => e.metadata.selfRef).toList();
+            expect(refs, contains(ref1));
+          },
+          onPlatform: driftOnPlatforms,
+        );
+
+        test(
+          'can query documents by matched DocumentNodeId value with wildcard at the beginning',
+          () async {
+            final templateRef = DocumentRefFactory.randomUuidV7();
+
+            final proposalRef1 = DocumentRefFactory.randomUuidV7();
+            final proposalRef2 = DocumentRefFactory.randomUuidV7();
+
+            const content1 = DocumentDataContent({
+              'setup': {
+                'title': {
+                  'title': 'Milestone 2',
+                  'subtitle': 'Subtitle',
+                },
+              },
+              'milestones': {
+                'milestones': {
+                  'milestone_list': [
+                    {
+                      'title': 'Milestone 1',
+                      'cost': 100,
+                    },
+                    {
+                      'title': 'Milestone 2',
+                      'cost': 200,
+                    },
+                  ],
+                },
+              },
+            });
+
+            const content2 = DocumentDataContent({
+              'setup': {
+                'title': {
+                  'title': 'Milestone 2',
+                },
+              },
+              'milestones': {
+                'milestones': {
+                  'milestone_list': [
+                    {
+                      'title': 'Milestone 1',
+                      'cost': 100,
+                    },
+                    {
+                      'title': 'Milestone 1',
+                      'outputs': 'Milestone 2',
+                      'cost': 200,
+                    },
+                  ],
+                },
+              },
+            });
+
+            final ref1 = SignedDocumentRef(id: proposalRef1, version: proposalRef1);
+            final ref2 = SignedDocumentRef(id: proposalRef2, version: proposalRef2);
+
+            final doc1 = DocumentWithMetadataFactory.build(
+              content: content1,
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: ref1,
+                template: SignedDocumentRef(id: templateRef, version: templateRef),
+              ),
+            );
+
+            final doc2 = DocumentWithMetadataFactory.build(
+              content: content2,
+              metadata: DocumentDataMetadata(
+                type: DocumentType.proposalDocument,
+                selfRef: ref2,
+                template: SignedDocumentRef(id: templateRef, version: templateRef),
+              ),
+            );
+
+            await database.documentsDao.saveAll([doc1, doc2]);
+
+            // When: query for documents with milestone_list.*.title == 'Milestone 2'
+            final results = await (database.documentsDao as DriftDocumentsDao)
+                .queryDocumentsByMatchedDocumentNodeIdValue(
+              nodeId: DocumentNodeId.fromString('*.subtitle'),
+              value: 'Subtitle',
+              type: DocumentType.proposalDocument,
+              content: 'content',
+            );
+
+            // Then: only doc1 should be returned
+            final refs = results.map((e) => e.metadata.selfRef).toList();
+            expect(refs, contains(ref1));
+            expect(refs, isNot(contains(ref2)));
+          },
+          onPlatform: driftOnPlatforms,
+        );
+      });
     });
 
     group('count', () {
