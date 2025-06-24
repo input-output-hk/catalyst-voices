@@ -54,7 +54,7 @@ export ASSETS_DATA_PATH="cardano-asset-preprod.json"
 export CAT_GATEWAY_TEST_URL="http://127.0.0.1:3030"
 export EVENT_DB_TEST_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 ```
-5. Run the tests, by specifying test marker from `pyproject.toml`.
+5. Run the tests, by specifying test marker (defined in "pyproject.toml").
 Here is a list of available markers at the moment:
    - ci (marks tests to be run in ci),
    - nightly (marks tests to be run nightly),
