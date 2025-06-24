@@ -141,6 +141,7 @@
         "html-symbol-entities",
         "java",
         "public-licenses",
+        "pyproject",
         "rust",
         "softwareTerms",
         "sql",

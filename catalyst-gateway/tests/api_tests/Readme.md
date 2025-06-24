@@ -1,17 +1,17 @@
-# Integration testing for DB Schema Version Mismatch behavior
+# Integration testing
 
-Sets up a containerized environment with the `EventDB` and `catalyst-gateway` services running.
+Sets up a containerized environment with the `event-db` and `scylla-node` services running.
 
 Integration tests are run in this environment that probes the behavior of the `catalyst-gateway` service in situations
 where the DB schema version changes during execution, and creates a mismatch with the version that gateway service expects.
 
 ## Running Locally
 
-* Spin up `scylla-node` and `event-db` databases
+* Spin up `scylla-node` and `event-db` databases as containers
 
 ```shell
 cd ..
-earthly ../event-db+build
+earthly ../../event-db+build
 docker compose up scylla-node event-db --detach
 ```
 
@@ -54,7 +54,7 @@ export ASSETS_DATA_PATH="cardano-asset-preprod.json"
 export CAT_GATEWAY_TEST_URL="http://127.0.0.1:3030"
 export EVENT_DB_TEST_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 ```
-5. Run the tests, by specifying test marker (defined in "pyproject.toml").
+5. Run the tests, by specifying test marker defined in `pyproject.toml`.
 Here is a list of available markers at the moment:
    - ci (marks tests to be run in ci),
    - nightly (marks tests to be run nightly),
