@@ -2571,6 +2571,10 @@
   "@cantFindYourWallet": {
     "description": "Error message when user doesn't have a wallet extension installed"
   },
+  "safariNotSupportedMessage": "Safari is not supported, please use Chrome or Firefox.",
+  "@safariNotSupportedMessage": {
+    "description": "Error message when no wallet extension is detected for Safari browser."
+  },
   "potentialReasons": "Potential reasons",
   "@potentialReasons": {
     "description": "Title for potential reasons for no wallet found"
@@ -2583,13 +2587,13 @@
   "@wrongBrowserDescription": {
     "description": "Description for wrong browser reason to not find wallet"
   },
-  "disableExtensionTitle": "Disable Extension",
+  "disableExtensionTitle": "Disabled Extension",
   "@disableExtensionTitle": {
-    "description": "Title for disable extension reason to not find wallet"
+    "description": "Title for disabled extension reason to not find wallet"
   },
   "disableExtensionDescription": "Please enable to continue your wallet extension, and refresh the application.",
   "@disableExtensionDescription": {
-    "description": "Description for disable extensions in the browser to not find wallet"
+    "description": "Description for disabled extensions in the browser to not find wallet"
   },
   "failedAuthenticationTitle": "No/Failed Authorisation",
   "@failedAuthenticationTitle": {
