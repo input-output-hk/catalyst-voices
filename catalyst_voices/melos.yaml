@@ -350,28 +350,11 @@ scripts:
       The coverages are saved in coverage/lcov.info file for each tested package.
       The combined coverage is saved in the /coverage/lcov.coverage.info file.
 
-  l10n-clean:
+  l10n-check:
     run: |
-      cd packages/internal/catalyst_voices_localization && dart lib/src/manage_l10n.dart --clean
+      cd packages/internal/catalyst_voices_localization && dart lib/src/manage_l10n.dart --check
     description: |
-      Clean up unused translation keys from .arb files and normalize line separators.
-
-  l10n-sort:
-    run: |
-      cd packages/internal/catalyst_voices_localization && dart lib/src/manage_l10n.dart --sort
-    description: |
-      Sort translation keys alphabetically in .arb files while preserving metadata structure.
-
-  l10n-isSorted:
-    run: |
-      cd packages/internal/catalyst_voices_localization && dart lib/src/manage_l10n.dart --isSorted
-    description: |
-      Check if translation keys in .arb files are properly sorted alphabetically.
-  l10n-isClean:
-    run: |
-      cd packages/internal/catalyst_voices_localization && dart lib/src/manage_l10n.dart --isClean
-    description: |
-      Check for unused translation keys in .arb files without modifying them.
+      Check for unused translation keys in .arb files without modifying them, and check if translation keys are sorted.
 
   l10n-manage:
     run: |

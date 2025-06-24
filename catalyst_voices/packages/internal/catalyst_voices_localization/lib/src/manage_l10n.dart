@@ -5,45 +5,37 @@ import 'dart:io';
 
 void main(List<String> args) {
   if (args.isEmpty) {
-    print('Usage: dart manage_arb.dart [--clean] [--sort] [--isClean] [--isSorted]');
+    print('Usage: dart manage_arb.dart [--clean] [--sort] [--check]');
     exit(1);
   }
 
   final clean = args.contains('--clean');
   final sort = args.contains('--sort');
-  final isClean = args.contains('--isClean');
-  final isSorted = args.contains('--isSorted');
+  final check = args.contains('--check');
 
-  if (isClean && (clean || sort || isSorted)) {
-    print('Error: --isClean cannot be used with other flags');
-    exit(1);
-  }
-  if (isSorted && (clean || sort || isClean)) {
-    print('Error: --isSorted cannot be used with other flags');
+  if (check && (clean || sort)) {
+    print('Error: --check cannot be used with --clean or --sort');
     exit(1);
   }
 
   ArbManager(
     clean: clean,
     sort: sort,
-    isClean: isClean,
-    isSorted: isSorted,
+    check: check,
   ).process();
 }
 
 class ArbManager {
   final bool clean;
   final bool sort;
-  final bool isClean;
-  final bool isSorted;
+  final bool check;
   late final String _dartContents;
   late final Directory _rootDir;
 
   ArbManager({
     this.clean = false,
     this.sort = false,
-    this.isClean = false,
-    this.isSorted = false,
+    this.check = false,
   }) {
     _rootDir = _findRootDir();
     final dartFiles = _getAllDartFiles(_rootDir);
@@ -54,11 +46,17 @@ class ArbManager {
     final arbFiles =
         _rootDir.listSync(recursive: true).whereType<File>().where((f) => f.path.endsWith('.arb'));
 
+    var allClean = true;
+    var allSorted = true;
+
     for (final arbFile in arbFiles) {
-      if (isClean) {
-        _checkIfClean(arbFile);
-      } else if (isSorted) {
-        _checkIfSorted(arbFile);
+      if (check) {
+        if (!_checkIfClean(arbFile)) {
+          allClean = false;
+        }
+        if (!_checkIfSorted(arbFile)) {
+          allSorted = false;
+        }
       } else {
         if (clean) {
           _cleanArbFile(arbFile);
@@ -67,11 +65,18 @@ class ArbManager {
           _sortArbFile(arbFile);
         }
       }
-      print('✅ Processed: ${arbFile.path}');
+    }
+    print('\n === SUMMARY ===\n');
+
+    if (check) {
+      if (allClean && allSorted) {
+        print('✅ All files are clean and sorted.');
+      }
+      exit(allClean && allSorted ? 0 : 1);
     }
   }
 
-  void _checkIfClean(File arbFile) {
+  bool _checkIfClean(File arbFile) {
     final original = json.decode(arbFile.readAsStringSync()) as Map<String, dynamic>;
     final usedKeys = _getUsedKeys(original);
     final originalTranslationKeys =
@@ -80,25 +85,29 @@ class ArbManager {
     final unusedKeys = originalTranslationKeys.where((key) => !usedKeys.contains(key)).toList();
 
     if (unusedKeys.isEmpty) {
-      print('✅ ${arbFile.path} is clean - no unused keys found');
+      print('✅ ${arbFile.name} is clean - no unused keys found');
+      return true;
     } else {
-      print('❌ ${arbFile.path} has unused keys:');
+      print('❌ ${arbFile.name} has unused keys:');
       for (final key in unusedKeys) {
         print('   - $key');
       }
+      return false;
     }
   }
 
-  void _checkIfSorted(File arbFile) {
+  bool _checkIfSorted(File arbFile) {
     final content = json.decode(arbFile.readAsStringSync()) as Map<String, dynamic>;
     final keys = content.keys.where((k) => !k.startsWith('@') && !k.startsWith('@@')).toList();
     final sortedKeys = [...keys]..sort();
 
     final isSorted = _listsEqual(keys, sortedKeys);
     if (isSorted) {
-      print('✅ ${arbFile.path} is properly sorted');
+      print('✅ ${arbFile.name} is properly sorted');
+      return true;
     } else {
-      print('❌ ${arbFile.path} is not sorted');
+      print('❌ ${arbFile.name} is not sorted');
+      return false;
     }
   }
 
@@ -211,4 +220,8 @@ class ArbManager {
 
     return sorted;
   }
+}
+
+extension on File {
+  String get name => uri.pathSegments.last;
 }
