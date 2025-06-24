@@ -1,17 +1,8 @@
 {
   "@@locale": "en",
   "local": "Local",
-  "emailLabelText": "Email",
-  "@emailLabelText": {
-    "description": "Text shown in email field"
-  },
-  "emailHintText": "mail@example.com",
-  "@emailHintText": {
-    "description": "Text shown in email field when empty"
-  },
-  "emailErrorText": "mail@example.com",
-  "@emailErrorText": {
-    "description": "Text shown in email field when input is invalid"
+  "@local": {
+    "description": "Text shown to indicate that something is locally stored"
   },
   "resumeButtonText": "Resume",
   "@resumeButtonText": {
@@ -41,16 +32,8 @@
   "@submitButtonText": {
     "description": "Text shown in submit button"
   },
-  "headerTooltipText": "Header",
-  "@headerTooltipText": {
-    "description": "Text shown in header tooltip"
-  },
   "placeholderRichText": "Start writing your text...",
   "@placeholderRichText": {
-    "description": "Text shown as placeholder in rich text editor"
-  },
-  "supportingTextLabelText": "Supporting text",
-  "@supportingTextLabelText": {
     "description": "Text shown as placeholder in rich text editor"
   },
   "saveButtonText": "Save",
@@ -64,18 +47,6 @@
   "passwordLabelText": "Password",
   "@passwordLabelText": {
     "description": "Text shown in password field"
-  },
-  "passwordHintText": "My1SecretPassword",
-  "@passwordHintText": {
-    "description": "Text shown in password field when empty"
-  },
-  "passwordErrorText": "Password must be at least 8 characters long",
-  "@passwordErrorText": {
-    "description": "Text shown in  password field when input is invalid"
-  },
-  "homeScreenText": "Catalyst Voices",
-  "@homeScreenText": {
-    "description": "Text shown in the home screen"
   },
   "connectingStatusLabelText": "re-connecting",
   "@connectingStatusLabelText": {
@@ -134,6 +105,9 @@
     "description": "Text shown in the Snackbar widget when the message is an error message."
   },
   "refresh": "Refresh",
+  "@refresh": {
+    "description": "Refresh button label"
+  },
   "ok": "Ok",
   "@ok": {
     "description": "Short confirmation (ok)."
@@ -191,10 +165,6 @@
   "@fundedProposal": {
     "description": "Label shown on a proposal card indicating that the proposal is funded."
   },
-  "publishedProposal": "Published proposal",
-  "@publishedProposal": {
-    "description": "Label shown on a proposal card indicating that the proposal is not yet funded."
-  },
   "fundedProposalDate": "Funded {date}",
   "@fundedProposalDate": {
     "description": "Indicates date of funding (a proposal).",
@@ -223,24 +193,6 @@
     "description": "Indicates the amount of comments on a proposal card.",
     "placeholders": {
       "count": {
-        "type": "num",
-        "format": "compact"
-      }
-    }
-  },
-  "noOfSegmentsCompleted": "{completed} of {total} ({percentage}%) {total, plural, =0{segments} =1{segment} other{segments}} completed",
-  "@noOfSegmentsCompleted": {
-    "description": "Indicates the amount of comments on a proposal card.",
-    "placeholders": {
-      "completed": {
-        "type": "num",
-        "format": "compact"
-      },
-      "total": {
-        "type": "num",
-        "format": "compact"
-      },
-      "percentage": {
         "type": "num",
         "format": "compact"
       }
@@ -315,10 +267,6 @@
   "@favorites": {
     "description": "Refers to a list of favorites."
   },
-  "treasuryCampaignBuilder": "Campaign builder",
-  "@treasuryCampaignBuilder": {
-    "description": "Left panel name in treasury space"
-  },
   "treasuryCampaignBuilderSegments": "Segments",
   "@treasuryCampaignBuilderSegments": {
     "description": "Tab name in campaign builder panel"
@@ -375,17 +323,9 @@
   "@stepEdit": {
     "description": "Button name in step"
   },
-  "workspaceProposalNavigation": "Proposal navigation",
-  "@workspaceProposalNavigation": {
-    "description": "Left panel name in workspace"
-  },
   "workspaceProposalNavigationSegments": "Segments",
   "@workspaceProposalNavigationSegments": {
     "description": "Tab name in proposal setup panel"
-  },
-  "workspaceProposalSetup": "Proposal setup",
-  "@workspaceProposalSetup": {
-    "description": "Segment name"
   },
   "drawerSpaceTreasury": "Treasury",
   "@drawerSpaceTreasury": {
@@ -423,14 +363,6 @@
   "followed": "Followed",
   "@followed": {
     "description": "Refers to a list of followed items."
-  },
-  "overallSpacesSearchBrands": "Search Brands",
-  "@overallSpacesSearchBrands": {
-    "description": "Overall spaces search brands tile name"
-  },
-  "overallSpacesTasks": "Tasks",
-  "@overallSpacesTasks": {
-    "description": "Overall spaces tasks tile name"
   },
   "voicesUpdateReady": "Voices update ready",
   "@voicesUpdateReady": {
@@ -536,11 +468,11 @@
   "@walletLinkTransactionSubheader": {
     "description": "A subheader in link wallet flow in registration for RBAC transaction."
   },
-  "walletLinkIntroTitle": "Link Cardano Wallet & Catalyst Roles \u2028to you Catalyst Keychain.",
+  "walletLinkIntroTitle": "Link Cardano Wallet & Catalyst Roles \nto you Catalyst Keychain.",
   "@walletLinkIntroTitle": {
     "description": "A title in link wallet flow on intro screen."
   },
-  "walletLinkIntroContent": "You're almost there! This is the final and most important step in your account setup. \u2028\u2028We're going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.  \u2028\u2028We'll start with your Contributor Key by default. You can decide to add a Proposer Key if you want.",
+  "walletLinkIntroContent": "You're almost there! This is the final and most important step in your account setup.\n\nWe're going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nWe'll start with your Contributor Key by default. You can decide to add a Proposer Key if you want.",
   "@walletLinkIntroContent": {
     "description": "A message (content) in link wallet flow on intro screen."
   },
@@ -625,7 +557,7 @@
   "@registrationTransactionFailed": {
     "description": "Indicates an error when submitting a registration transaction failed."
   },
-  "registrationNetworkIdMismatch": "It seems like you're trying to use\u00A0a wallet on the wrong network.\nPlease switch to {network} to continue.",
+  "registrationNetworkIdMismatch": "It seems like you're trying to use a wallet on the wrong network.\nPlease switch to {network} to continue.",
   "@registrationNetworkIdMismatch": {
     "description": "An error when user attempts to use a wallet on the wrong network, i.e. using preprod wallet on production environment.",
     "placeholders": {
@@ -709,6 +641,9 @@
     "description": "The last part of the message on the role summary screen in registration."
   },
   "nameOfWallet": "Name of the wallet",
+  "@nameOfWallet": {
+    "description": "Text used in wallet information summary"
+  },
   "seeAllSupportedWallets": "See all supported wallets",
   "@seeAllSupportedWallets": {
     "description": "Message shown when redirecting to external content that describes which wallets are supported."
@@ -726,21 +661,28 @@
     "description": "A cardano wallet address"
   },
   "accountCreationCreate": "Create a new \nCatalyst Keychain",
+  "@accountCreationCreate": {
+    "description": "CTA to create a new keychain"
+  },
   "accountCreationRecover": "Recover your\nCatalyst Keychain",
+  "@accountCreationRecover": {
+    "description": "CTA to recover a keychain"
+  },
   "accountCreationOnThisDevice": "On this device",
   "@accountCreationOnThisDevice": {
     "description": "Indicates that created keychain will be stored in this device only"
   },
   "accountCreationGetStartedTitle": "Welcome to Catalyst",
-  "accountCreationGetStatedDesc": "If you already have a Catalyst keychain you can restore it on this device, or you can create a new Catalyst Keychain.",
-  "accountCreationGetStatedWhatNext": "What do you want to do?",
-  "myAccountProfileKeychain": "My Account / Profile & Keychain",
-  "@myAccountProfileKeychain": {
-    "description": "Title of My Account page"
+  "@accountCreationGetStartedTitle": {
+    "description": "Title of dialog when user creates base profile"
   },
-  "yourCatalystKeychainAndRoleRegistration": "Your Catalyst keychain & role registration",
-  "@yourCatalystKeychainAndRoleRegistration": {
-    "description": "Subtitle of My Account page"
+  "accountCreationGetStatedDesc": "If you already have a Catalyst keychain you can restore it on this device, or you can create a new Catalyst Keychain.",
+  "@accountCreationGetStatedDesc": {
+    "description": "Description of dialog that user can restore his keychain or create a new one"
+  },
+  "accountCreationGetStatedWhatNext": "What do you want to do?",
+  "@accountCreationGetStatedWhatNext": {
+    "description": "Text to show user two login/registration options"
   },
   "profileAndKeychain": "Profile & Keychain",
   "@profileAndKeychain": {
@@ -753,10 +695,6 @@
   "walletConnected": "Wallet connected",
   "@walletConnected": {
     "description": "Describes that wallet is connected on Catalyst Keychain card"
-  },
-  "currentRoleRegistrations": "Current Role registrations",
-  "@currentRoleRegistrations": {
-    "description": "Describes roles on Catalyst Keychain card"
   },
   "contributor": "Contributor",
   "@contributor": {
@@ -775,6 +713,9 @@
     "description": "Related to account role"
   },
   "catalystKeychain": "Catalyst Keychain",
+  "@catalystKeychain": {
+    "description": "Name for Catalyst Keychain"
+  },
   "createProfileInstructionsTitle": "Introduction",
   "@createProfileInstructionsTitle": {
     "description": "Title for account creation steps"
@@ -880,10 +821,25 @@
     "description": "Text acknowledging that the Catalyst Ops team may use the user's email only for Catalyst communication"
   },
   "accountCreationSplashTitle": "Create your Catalyst Keychain",
-  "accountCreationSplashMessage": "Catalyst Keychain is your ticket to participate in innovation on the global stage.  \u2028\u2028These next steps will create your Catalyst keychain so you can enter new spaces, discover awesome ideas, and share your feedback to help improve ideas.",
+  "@accountCreationSplashTitle": {
+    "description": "Title for the account creation splash screen"
+  },
+  "accountCreationSplashMessage": "Catalyst Keychain is your ticket to participate in innovation on the global stage.  \n\nThese next steps will create your Catalyst keychain so you can enter new spaces, discover awesome ideas, and share your feedback to help improve ideas.",
+  "@accountCreationSplashMessage": {
+    "description": "Message for the account creation splash screen"
+  },
   "accountCreationSplashNextButton": "Create your Keychain now",
-  "accountInstructionsTitle": "Great! Your Catalyst Keychain \u2028has been created.",
-  "accountInstructionsMessage": "On the next screen, you're going to see 12 words. \u2028This is called your \"Catalyst seed phrase\".   \u2028\u2028It's like a super secure password that only you know, \u2028that allows you to prove ownership of your keychain.  \u2028\u2028Use your Catalyst seed phrase to login and recover your account on different devices, so be sure to put it somewhere safe!\n\nIt is a super secure password that only you know, so best is to write it down with pen and paper, so get this ready. ",
+  "@accountCreationSplashNextButton": {
+    "description": "CTA to move to the next step in account creation"
+  },
+  "accountInstructionsTitle": "Great! Your Catalyst Keychain \nhas been created.",
+  "@accountInstructionsTitle": {
+    "description": "Title for the account creation instructions screen"
+  },
+  "accountInstructionsMessage": "On the next screen, you're going to see 12 words. \nThis is called your \"Catalyst seed phrase\".\n\nIt's like a super secure password that only you know, \nthat allows you to prove ownership of your keychain.\n\nUse your Catalyst seed phrase to login and recover your account on different devices, so be sure to put it somewhere safe!\n\nIt is a super secure password that only you know, so best is to write it down with pen and paper, so get this ready.",
+  "@accountInstructionsMessage": {
+    "description": "Message for the account creation instructions screen"
+  },
   "previous": "Previous",
   "@previous": {
     "description": "(Action) switch to the previous item."
@@ -895,10 +851,6 @@
   "back": "Back",
   "@back": {
     "description": "For example in button that goes to previous stage of registration"
-  },
-  "backToList": "Back to list",
-  "@backToList": {
-    "description": "For example in button that goes to previous screen with a list like proposals"
   },
   "retry": "Retry",
   "@retry": {
@@ -982,25 +934,85 @@
     "description": "A description for drep"
   },
   "contributorSummarySelectFavorites": "Select favorites",
+  "@contributorSummarySelectFavorites": {
+    "description": "Text representing that contributor can select their favorite proposals"
+  },
   "contributorSummaryComment": "Comment on Proposals",
+  "@contributorSummaryComment": {
+    "description": "Text representing that contributor can comment on proposals"
+  },
   "proposerSummaryWriteEdit": "Write/edit functionality",
+  "@proposerSummaryWriteEdit": {
+    "description": "Text representing that proposer can write/edit proposals"
+  },
   "proposerSummarySubmitToFund": "Rights to Submit to Fund",
+  "@proposerSummarySubmitToFund": {
+    "description": "Text representing that proposer can submit proposals to fund"
+  },
   "proposerSummaryInviteTeamMembers": "Invite Team Members",
+  "@proposerSummaryInviteTeamMembers": {
+    "description": "Text representing that proposer can invite team members"
+  },
   "proposerSummaryComment": "Comment functionality",
+  "@proposerSummaryComment": {
+    "description": "Text representing that proposer can comment on proposals"
+  },
   "drepSummaryDelegatedVotes": "Delegated Votes",
+  "@drepSummaryDelegatedVotes": {
+    "description": "Text representing that dRep can used delegated votes"
+  },
   "drepSummaryRewards": "dRep rewards",
+  "@drepSummaryRewards": {
+    "description": "Text representing that dRep can used rewards"
+  },
   "drepSummaryCastVotes": "Cast delegated votes",
+  "@drepSummaryCastVotes": {
+    "description": "Text representing that dRep can cast delegated votes"
+  },
   "drepSummaryComment": "Comment Functionality",
+  "@drepSummaryComment": {
+    "description": "Text representing that dRep can comment on proposals"
+  },
   "delete": "Delete",
+  "@delete": {
+    "description": "CTA To delete something"
+  },
   "close": "Close",
+  "@close": {
+    "description": "CTA To close something"
+  },
   "notice": "Notice",
+  "@notice": {
+    "description": "Text that focus user that something is important"
+  },
   "yes": "Yes",
+  "@yes": {
+    "description": "CTA to confirm something"
+  },
   "no": "No",
+  "@no": {
+    "description": "CTA to cancel something"
+  },
   "total": "Total",
+  "@total": {
+    "description": "Text representing total amount"
+  },
   "file": "file",
+  "@file": {
+    "description": "Text indicating that user will interact with file"
+  },
   "key": "key",
+  "@key": {
+    "description": "Text indicating that user will interact with key"
+  },
   "upload": "Upload",
+  "@upload": {
+    "description": "Button text for uploading files"
+  },
   "browse": "browse",
+  "@browse": {
+    "description": "Button or link text for browsing files or content"
+  },
   "uploadDropInfo": "Drop your {itemNameToUpload} here or ",
   "@uploadDropInfo": {
     "description": "An info on upload dialog",
@@ -1011,6 +1023,9 @@
     }
   },
   "uploadProgressInfo": "Upload in progress",
+  "@uploadProgressInfo": {
+    "description": "Status message shown during file upload process"
+  },
   "uploadKeychainTitle": "Upload Catalyst Keychain",
   "@uploadKeychainTitle": {
     "description": "A title on keychain upload dialog"
@@ -1020,6 +1035,9 @@
     "description": "An info on keychain upload dialog"
   },
   "theme": "Theme",
+  "@theme": {
+    "description": "Label for theme/appearance settings"
+  },
   "themeLight": "Light",
   "@themeLight": {
     "description": "Refers to a light theme mode."
@@ -1029,12 +1047,33 @@
     "description": "Refers to a dark theme mode."
   },
   "keychainDeletedDialogTitle": "Catalyst keychain removed",
+  "@keychainDeletedDialogTitle": {
+    "description": "Title shown in dialog when a Catalyst keychain has been deleted"
+  },
   "keychainDeletedDialogSubtitle": "Your Catalyst Keychain is removed successfully from this device.\n\nWe reverted this device to Catalyst first use.",
+  "@keychainDeletedDialogSubtitle": {
+    "description": "Message shown in dialog confirming successful removal of Catalyst keychain"
+  },
   "registrationCompletedTitle": "Catalyst account setup",
+  "@registrationCompletedTitle": {
+    "description": "Title shown on completion screen of Catalyst account setup"
+  },
   "registrationCompletedSubtitle": "Completed!",
+  "@registrationCompletedSubtitle": {
+    "description": "Simple completion message shown below title on account setup completion screen"
+  },
   "registrationCompletedSummaryHeader": "Summary",
+  "@registrationCompletedSummaryHeader": {
+    "description": "Header text for summary section on registration completion screen"
+  },
   "registrationCompletedKeychainTitle": "Catalyst Keychain created",
+  "@registrationCompletedKeychainTitle": {
+    "description": "Title indicating successful Catalyst keychain creation in summary"
+  },
   "registrationCompletedKeychainInfo": "You created a Catalyst Keychain, backed up its seed phrase and set an unlock password.",
+  "@registrationCompletedKeychainInfo": {
+    "description": "Details about completed keychain setup actions in summary"
+  },
   "registrationCompletedWalletTitle": "Cardano {walletName} wallet selected",
   "@registrationCompletedWalletTitle": {
     "placeholders": {
@@ -1052,22 +1091,79 @@
     }
   },
   "registrationCompletedRolesTitle": "Catalyst roles selected",
+  "@registrationCompletedRolesTitle": {
+    "description": "Title showing that Catalyst roles were selected in summary"
+  },
   "registrationCompletedRolesInfo": "You linked your Cardano wallet and selected  Catalyst roles via a signed transaction.",
+  "@registrationCompletedRolesInfo": {
+    "description": "Information about wallet linking and role selection process"
+  },
   "registrationCompletedRoleRegistration": "role registration",
+  "@registrationCompletedRoleRegistration": {
+    "description": "Label for role registration action"
+  },
   "registrationCompletedDiscoveryButton": "Open Discovery Space",
+  "@registrationCompletedDiscoveryButton": {
+    "description": "Button text to navigate to Discovery Space"
+  },
   "registrationCompletedAccountButton": "Review my account",
+  "@registrationCompletedAccountButton": {
+    "description": "Button text to review account details"
+  },
   "createKeychainSeedPhraseSubtitle": "Write down your Catalyst seed phrase",
+  "@createKeychainSeedPhraseSubtitle": {
+    "description": "Subtitle prompting user to record their seed phrase"
+  },
   "createKeychainSeedPhraseBody": "Make sure you write down your 12-words in a safe place as well.",
+  "@createKeychainSeedPhraseBody": {
+    "description": "Instructions for safely storing the 12-word seed phrase"
+  },
   "createKeychainSeedPhraseExport": "Export Security Words",
+  "@createKeychainSeedPhraseExport": {
+    "description": "Button text for exporting seed phrase"
+  },
   "createKeychainSeedPhraseExportConfirmDialogSubtitle": "Are you sure you want to export your key?",
+  "@createKeychainSeedPhraseExportConfirmDialogSubtitle": {
+    "description": "Confirmation dialog subtitle for seed phrase export"
+  },
   "createKeychainSeedPhraseExportConfirmDialogContent": "Before using this feature, please read this {link}",
+  "@createKeychainSeedPhraseExportConfirmDialogContent": {
+    "description": "Warning message before exporting seed phrase",
+    "placeholders": {
+      "link": {
+        "type": "String",
+        "description": "Link text to best practices FAQ"
+      }
+    }
+  },
   "bestPracticesFAQ": "best practices FAQ",
+  "@bestPracticesFAQ": {
+    "description": "Text for link to best practices FAQ"
+  },
   "exportKey": "Export Key",
+  "@exportKey": {
+    "description": "Button text for exporting key"
+  },
   "createKeychainSeedPhraseStoreConfirmation": "I have written down/exported my 12 words",
+  "@createKeychainSeedPhraseStoreConfirmation": {
+    "description": "Confirmation checkbox text for seed phrase backup"
+  },
   "createKeychainSeedPhraseCheckInstructionsTitle": "Write down your Catalyst seed phrase",
-  "createKeychainSeedPhraseCheckInstructionsSubtitle": "Next, we're going to make sure that you've written down your Catalyst seed phrase correctly.   \u2028\u2028We don't save your Catalyst seed phrase, so it's important \u2028to make sure you have it right. Thats why we don't trust, we verify before continuing.   \u2028\u2028It's also good practice to get familiar with using a \nseed phrase if you're new to crypto.",
+  "@createKeychainSeedPhraseCheckInstructionsTitle": {
+    "description": "Title for seed phrase verification instructions"
+  },
+  "createKeychainSeedPhraseCheckInstructionsSubtitle": "Next, we're going to make sure that you've written down your Catalyst seed phrase correctly.   \n\nWe don't save your Catalyst seed phrase, so it's important \nto make sure you have it right. Thats why we don't trust, we verify before continuing.   \n\nIt's also good practice to get familiar with using a \nseed phrase if you're new to crypto.",
+  "@createKeychainSeedPhraseCheckInstructionsSubtitle": {
+    "description": "Detailed instructions for seed phrase verification process"
+  },
   "createKeychainSeedPhraseCheckSubtitle": "Input your Catalyst seed phrase",
-  "createKeychainSeedPhraseCheckBody": "Select your 12 written down words in \u2028the correct order.",
+  "@createKeychainSeedPhraseCheckSubtitle": {
+    "description": "Subtitle prompting user to input their seed phrase for verification"
+  },
+  "createKeychainSeedPhraseCheckBody": "Select your 12 written down words in \nthe correct order.",
+  "@createKeychainSeedPhraseCheckBody": {
+    "description": "Instructions for selecting seed phrase words in correct order"
+  },
   "importCatalystKey": "Import Catalyst Key",
   "@importCatalystKey": {
     "description": "When user checks correct seed phrase words order he can upload it too"
@@ -1077,33 +1173,81 @@
     "description": "Action to reset value in text field"
   },
   "createKeychainSeedPhraseCheckSuccessTitle": "Nice job! You've successfully verified your Catalyst seed phase",
-  "createKeychainSeedPhraseCheckSuccessSubtitle": "Enter your seed phrase to recover your Catalyst Keychain on any device.   \u2028\u2028It's kinda like your email and password all rolled into one, so keep it somewhere safe!\u2028\u2028In the next step we'll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.",
+  "@createKeychainSeedPhraseCheckSuccessTitle": {
+    "description": "Success message title shown after seed phrase verification"
+  },
+  "createKeychainSeedPhraseCheckSuccessSubtitle": "Enter your seed phrase to recover your Catalyst Keychain on any device.   \n\nIt's kinda like your email and password all rolled into one, so keep it somewhere safe!\n\nIn the next step we'll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.",
+  "@createKeychainSeedPhraseCheckSuccessSubtitle": {
+    "description": "Detailed explanation of seed phrase importance and next steps"
+  },
   "yourNextStep": "Your next step",
+  "@yourNextStep": {
+    "description": "Generic header for next step instructions"
+  },
   "createKeychainSeedPhraseCheckSuccessNextStep": "Now let's set your Unlock password for this device!",
+  "@createKeychainSeedPhraseCheckSuccessNextStep": {
+    "description": "Prompt to set device unlock password"
+  },
   "createKeychainUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password for this device",
-  "createKeychainUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
+  "@createKeychainUnlockPasswordInstructionsTitle": {
+    "description": "Title for unlock password setup instructions"
+  },
+  "createKeychainUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.  \n\nWhenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
+  "@createKeychainUnlockPasswordInstructionsSubtitle": {
+    "description": "Detailed explanation of unlock password purpose and usage"
+  },
   "createProfileCreatedTitle": "Congratulations your profile is setup!",
   "@createProfileCreatedTitle": {
     "description": "Title for the profile created"
   },
-  "createKeychainCreatedTitle": "Congratulations your Catalyst \u2028Keychain is created!",
+  "createKeychainCreatedTitle": "Congratulations your Catalyst \nKeychain is created!",
+  "@createKeychainCreatedTitle": {
+    "description": "Success message for keychain creation"
+  },
   "createProfileNextStep": "In the next step you Create your Catalyst Keychain",
   "@createProfileNextStep": {
     "description": "Title for the next step in the profile creation"
   },
-  "createKeychainCreatedNextStep": "In the next step you write your Catalyst roles and \u2028account to the Cardano Mainnet.",
+  "createKeychainCreatedNextStep": "In the next step you write your Catalyst roles and \naccount to the Cardano Mainnet.",
+  "@createKeychainCreatedNextStep": {
+    "description": "Information about the next step after keychain creation"
+  },
   "createKeychainLinkWalletAndRoles": "Link your Cardano Wallet & Roles",
+  "@createKeychainLinkWalletAndRoles": {
+    "description": "Button/header text for wallet and roles linking step"
+  },
   "registrationCreateProfileStepGroup": "Profile created",
   "@registrationCreateProfileStepGroup": {
     "description": "Title for successful profile creation"
   },
   "registrationCreateKeychainStepGroup": "Catalyst Keychain created",
+  "@registrationCreateKeychainStepGroup": {
+    "description": "Progress indicator for keychain creation step"
+  },
   "registrationLinkWalletStepGroup": "Link Cardano Wallet & Roles",
+  "@registrationLinkWalletStepGroup": {
+    "description": "Progress indicator for wallet and roles linking step"
+  },
   "registrationCompletedStepGroup": "Catalyst account creation completed!",
+  "@registrationCompletedStepGroup": {
+    "description": "Final step indicator for account creation process"
+  },
   "createKeychainUnlockPasswordIntoSubtitle": "Catalyst unlock password",
+  "@createKeychainUnlockPasswordIntoSubtitle": {
+    "description": "Subtitle for unlock password input section"
+  },
   "createKeychainUnlockPasswordIntoBody": "Please provide a password for your Catalyst Keychain.",
+  "@createKeychainUnlockPasswordIntoBody": {
+    "description": "Instruction text for password input"
+  },
   "enterPassword": "Enter password",
+  "@enterPassword": {
+    "description": "Label for password input field"
+  },
   "confirmPassword": "Confirm password",
+  "@confirmPassword": {
+    "description": "Label for password confirmation input field"
+  },
   "xCharactersMinimum": "{number} characters minimum length",
   "@xCharactersMinimum": {
     "placeholders": {
@@ -1117,35 +1261,125 @@
     "description": "When user confirms password but it does not match original one."
   },
   "warning": "Warning",
+  "@warning": {
+    "description": "Generic warning label text"
+  },
   "alert": "Alert",
+  "@alert": {
+    "description": "Generic alert label text"
+  },
   "registrationExitConfirmDialogSubtitle": "Account creation incomplete!",
-  "registrationExitConfirmDialogContent": "Leaving before creating your keychain means account creation is incomplete. \u2028\u2028You cannot login without \u2028completing your key chain.",
+  "@registrationExitConfirmDialogSubtitle": {
+    "description": "Warning subtitle shown when trying to exit during registration"
+  },
+  "registrationExitConfirmDialogContent": "Leaving before creating your keychain means account creation is incomplete. \n\nYou cannot login without \ncompleting your key chain.",
+  "@registrationExitConfirmDialogContent": {
+    "description": "Warning message explaining consequences of exiting registration flow"
+  },
   "registrationExitConfirmDialogContinue": "Continue keychain creation",
+  "@registrationExitConfirmDialogContinue": {
+    "description": "Button text to continue keychain creation process"
+  },
   "walletLinkExitConfirmDialogSubtitle": "Link wallet incomplete!",
-  "walletLinkExitConfirmDialogContent": "Leaving before linking wallet means account creation is incomplete. \u2028\u2028You cannot login without \u2028completing your account setup.",
+  "@walletLinkExitConfirmDialogSubtitle": {
+    "description": "Warning subtitle shown when trying to exit during wallet linking"
+  },
+  "walletLinkExitConfirmDialogContent": "Leaving before linking wallet means account creation is incomplete. \n\nYou cannot login without \ncompleting your account setup.",
+  "@walletLinkExitConfirmDialogContent": {
+    "description": "Warning message explaining consequences of exiting wallet linking flow"
+  },
   "walletLinkExitConfirmDialogContinue": "Continue to link wallet",
+  "@walletLinkExitConfirmDialogContinue": {
+    "description": "Button text to continue wallet linking process"
+  },
   "accountUpdateExitConfirmDialogSubtitle": "Account update incomplete!",
+  "@accountUpdateExitConfirmDialogSubtitle": {
+    "description": "Warning subtitle shown when trying to exit during account update"
+  },
   "accountUpdateExitConfirmDialogContent": "Leaving before submitting means no change.",
+  "@accountUpdateExitConfirmDialogContent": {
+    "description": "Warning message explaining consequences of exiting account update"
+  },
   "accountUpdateExitConfirmDialogContinue": "Continue to update",
+  "@accountUpdateExitConfirmDialogContinue": {
+    "description": "Button text to continue account update process"
+  },
   "cancelAnyways": "Cancel anyway",
+  "@cancelAnyways": {
+    "description": "Button text to confirm cancellation despite warnings"
+  },
   "recoverCatalystKeychain": "Restore Catalyst keychain",
+  "@recoverCatalystKeychain": {
+    "description": "Title for keychain recovery process"
+  },
   "recoverKeychainMethodsTitle": "Restore your Catalyst Keychain",
+  "@recoverKeychainMethodsTitle": {
+    "description": "Title for keychain recovery methods selection screen"
+  },
   "recoverKeychainMethodsNoKeychainFound": "No Catalyst Keychain found on this device.",
+  "@recoverKeychainMethodsNoKeychainFound": {
+    "description": "Message shown when no keychain is found on device"
+  },
   "recoverKeychainMethodsSubtitle": "Not to worry, in the next step you can choose the recovery option that applies to you for this device!",
+  "@recoverKeychainMethodsSubtitle": {
+    "description": "Subtitle explaining recovery options availability"
+  },
   "recoverKeychainMethodsListTitle": "How do you want Restore your Catalyst Keychain?",
-  "recoverKeychainNonFound": "No Catalyst Keychain found\u2028on this device.",
-  "recoverKeychainFound": "Keychain found!  \u2028Please unlock your device.",
+  "@recoverKeychainMethodsListTitle": {
+    "description": "Header for recovery methods selection list"
+  },
+  "recoverKeychainNonFound": "No Catalyst Keychain found\non this device.",
+  "@recoverKeychainNonFound": {
+    "description": "Message shown when no keychain is found during recovery"
+  },
+  "recoverKeychainFound": "Keychain found!  \nPlease unlock your device.",
+  "@recoverKeychainFound": {
+    "description": "Success message when keychain is found during recovery"
+  },
   "recoverWithSeedPhrase12Words": "Restore/Upload with 12-word seed phrase",
+  "@recoverWithSeedPhrase12Words": {
+    "description": "Option to recover keychain using seed phrase"
+  },
   "recoverySeedPhraseInstructionsTitle": "Restore your Catalyst Keychain with \nyour 12-word Catalyst seed phrase",
+  "@recoverySeedPhraseInstructionsTitle": {
+    "description": "Title for seed phrase recovery instructions"
+  },
   "recoverySeedPhraseInstructionsSubtitle": "Enter your security words in the correct order, and sign into your Catalyst account on a new device.",
+  "@recoverySeedPhraseInstructionsSubtitle": {
+    "description": "Instructions for entering seed phrase during recovery"
+  },
   "recoverySeedPhraseInputTitle": "Restore your Catalyst Keychain with \nyour 12-word Catalyst seed phrase",
+  "@recoverySeedPhraseInputTitle": {
+    "description": "Title for seed phrase input screen during recovery"
+  },
   "recoverySeedPhraseInputSubtitle": "Enter each word of your Catalyst seed phrase in the right order to bring your Catalyst account to this device.",
+  "@recoverySeedPhraseInputSubtitle": {
+    "description": "Subtitle with instructions for seed phrase input"
+  },
   "recoveryAccountTitle": "Catalyst account recovery",
+  "@recoveryAccountTitle": {
+    "description": "Main title for account recovery process"
+  },
   "recoveryAccountSuccessTitle": "Keychain recovered successfully!",
+  "@recoveryAccountSuccessTitle": {
+    "description": "Success message shown after successful keychain recovery"
+  },
   "recoveryAccountDetailsAction": "Set unlock password for this device",
+  "@recoveryAccountDetailsAction": {
+    "description": "Action button text to set device unlock password after recovery"
+  },
   "recoveryUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password for this device",
-  "recoveryUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
+  "@recoveryUnlockPasswordInstructionsTitle": {
+    "description": "Title for unlock password setup after recovery"
+  },
+  "recoveryUnlockPasswordInstructionsSubtitle": "In this next step, you'll set your Unlock Password for this device. It's like a shortcut for proving ownership of your Keychain.\n\nWhenever you recover your account for the first time on a new device, you'll need to use your Catalyst seed phrase to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
+  "@recoveryUnlockPasswordInstructionsSubtitle": {
+    "description": "Detailed explanation of unlock password purpose and usage after recovery"
+  },
   "recoverDifferentKeychain": "Restore a different keychain",
+  "@recoverDifferentKeychain": {
+    "description": "Button text to initiate different keychain recovery"
+  },
   "checkOnCardanoScan": "Check on Cardano scan",
   "@checkOnCardanoScan": {
     "description": "A button label to navigate to Cardano Scan to see wallet / transaction details."
@@ -1191,24 +1425,69 @@
     "description": "The message shown below the title in confirmation snackbar after locking the keychain."
   },
   "recoverySuccessTitle": "Congratulations your Catalyst \nKeychain is restored!",
+  "@recoverySuccessTitle": {
+    "description": "Success title shown after keychain restoration"
+  },
   "recoverySuccessSubtitle": "You have successfully restored your Catalyst Keychain, and unlocked Catalyst Voices on this device.",
+  "@recoverySuccessSubtitle": {
+    "description": "Success message explaining keychain restoration completion"
+  },
   "recoverySuccessGoToDashboard": "Jump into the Discovery Space",
+  "@recoverySuccessGoToDashboard": {
+    "description": "Button text to navigate to Discovery Space after recovery"
+  },
   "recoverySuccessGoAccount": "Check my account",
+  "@recoverySuccessGoAccount": {
+    "description": "Button text to view account details after recovery"
+  },
   "recoveryExitConfirmDialogSubtitle": "12 word keychain restoration incomplete",
+  "@recoveryExitConfirmDialogSubtitle": {
+    "description": "Warning subtitle shown when trying to exit during keychain restoration"
+  },
   "recoveryExitConfirmDialogContent": "Please continue your Catalyst Keychain restoration, if you cancel all input will be lost.",
+  "@recoveryExitConfirmDialogContent": {
+    "description": "Warning message explaining consequences of exiting restoration process"
+  },
   "recoveryExitConfirmDialogContinue": "Continue recovery process",
+  "@recoveryExitConfirmDialogContinue": {
+    "description": "Button text to continue recovery process"
+  },
   "forgotPassword": "Forgot password",
   "@forgotPassword": {
     "description": "Refers to the action label for recovering the user account."
   },
   "uploadConfirmDialogSubtitle": "SWITCH TO FILE UPLOAD",
+  "@uploadConfirmDialogSubtitle": {
+    "description": "Dialog subtitle for confirming switch to file upload method"
+  },
   "uploadConfirmDialogContent": "Do you want to cancel manual input, and switch to Catalyst key upload?",
+  "@uploadConfirmDialogContent": {
+    "description": "Dialog message asking user to confirm switching to key upload"
+  },
   "uploadConfirmDialogYesButton": "Yes, switch to Catalyst key upload",
+  "@uploadConfirmDialogYesButton": {
+    "description": "Confirmation button text to switch to key upload"
+  },
   "uploadConfirmDialogResumeButton": "Resume manual inputs",
+  "@uploadConfirmDialogResumeButton": {
+    "description": "Button text to continue with manual input method"
+  },
   "incorrectUploadDialogSubtitle": "CATALYST KEY INCORRECT",
+  "@incorrectUploadDialogSubtitle": {
+    "description": "Error dialog subtitle for incorrect key upload"
+  },
   "incorrectUploadDialogContent": "The Catalyst keychain that you entered or uploaded is incorrect, please try again.",
+  "@incorrectUploadDialogContent": {
+    "description": "Error message shown when uploaded keychain is invalid"
+  },
   "incorrectUploadDialogTryAgainButton": "Try again",
+  "@incorrectUploadDialogTryAgainButton": {
+    "description": "Button text to retry after failed key upload"
+  },
   "finishAccountCreation": "Finish account creation",
+  "@finishAccountCreation": {
+    "description": "Button text to complete account creation process"
+  },
   "reviewRegistrationTransaction": "Review registration transaction",
   "@reviewRegistrationTransaction": {
     "description": "A button label to review the registration transaction in wallet detail panel."
@@ -1225,11 +1504,22 @@
   "@datePickerDaysInMonthError": {
     "description": "Error message for the date picker when the selected day is greater than the maximum days for the selected month."
   },
-  "saveBeforeEditingErrorText": "Please save before editing something else",
   "errorWalletLinkInvalidRequest": "Wallet authorisation invalid request",
+  "@errorWalletLinkInvalidRequest": {
+    "description": "Error message shown when wallet authorization request is invalid"
+  },
   "errorWalletLinkInternalError": "Wallet authorisation internal error",
+  "@errorWalletLinkInternalError": {
+    "description": "Error message shown when internal error occurs during wallet authorization"
+  },
   "errorWalletLinkRefused": "Wallet authorisation failed",
+  "@errorWalletLinkRefused": {
+    "description": "Error message shown when wallet authorization is refused"
+  },
   "errorWalletLinkAccountChange": "Wallet account change",
+  "@errorWalletLinkAccountChange": {
+    "description": "Error message shown when wallet account has changed"
+  },
   "errorSeedPhraseWordsDoNotMatch": "Words do not match",
   "@errorSeedPhraseWordsDoNotMatch": {
     "description": "Error message when user inserts incorrect seed phrase words"
@@ -1241,10 +1531,6 @@
   "guidance": "Guidance",
   "@guidance": {
     "description": "A tab name of the guidance for the proposal editor."
-  },
-  "noGuidanceOfThisType": "There is no guidance of this type",
-  "@noGuidanceOfThisType": {
-    "description": "Message when there is no guidance of this type"
   },
   "selectASection": "Select a section",
   "@selectASection": {
@@ -1307,13 +1593,37 @@
     "description": "Title of the view voting results space"
   },
   "campaignDetails": "Campaign Details",
+  "@campaignDetails": {
+    "description": "Header text for campaign details section"
+  },
   "description": "Description",
+  "@description": {
+    "description": "Label for description field"
+  },
   "startDate": "Start Date",
+  "@startDate": {
+    "description": "Label for campaign start date"
+  },
   "endDate": "End Date",
+  "@endDate": {
+    "description": "Label for campaign end date"
+  },
   "categories": "Categories",
+  "@categories": {
+    "description": "Label for categories section"
+  },
   "fundingCategories": "Funding categories",
+  "@fundingCategories": {
+    "description": "Label for funding categories section"
+  },
   "proposals": "Proposals",
+  "@proposals": {
+    "description": "Label for proposals section"
+  },
   "totalSubmitted": "Total submitted",
+  "@totalSubmitted": {
+    "description": "Label showing total number of submitted proposals"
+  },
   "inXDays": "{x, plural, =1{In {x} day} other{In {x} days}}",
   "@inXDays": {
     "placeholders": {
@@ -1323,20 +1633,21 @@
     }
   },
   "campaignCategories": "Campaign Categories",
-  "cardanoUseCases": "Cardano Use Cases",
-  "discoverySpaceTitle": "Boost Social Entrepreneurship",
-  "@discoverySpaceTitle": {
-    "description": "Title for the discovery space for actor (unlocked) user."
+  "@campaignCategories": {
+    "description": "Header text for campaign categories section"
   },
-  "discoverySpaceDescription": "Project Catalyst is built on the ingenuity of our global network. Ideas can come from anyone, from any background, anywhere in the world. Proposers pitch their ideas to the community by submitting proposals onto the Catalyst collaboration platform.",
-  "@discoverySpaceDescription": {
-    "description": "Description for the discovery space for actor (unlocked) user."
+  "cardanoUseCases": "Cardano Use Cases",
+  "@cardanoUseCases": {
+    "description": "Label for Cardano use cases section"
   },
   "discoverySpaceEmptyProposals": "Once this campaign launches draft proposals will be shared here.",
   "@discoverySpaceEmptyProposals": {
     "description": "Description for empty state on discovery space when there are no draft proposals."
   },
   "campaign": "Campaign",
+  "@campaign": {
+    "description": "Label for campaign section"
+  },
   "campaignPreviewTitle": "Campaign Preview",
   "@campaignPreviewTitle": {
     "description": "Title for the campaign preview dialog (admin mode)."
@@ -1370,14 +1681,21 @@
     "description": "Activated state"
   },
   "campaignManagement": "Campaign Management",
-  "published": "Published",
-  "status": "Status",
-  "myProposals": "My Proposals",
-  "workspaceDescription": "In this space you can manage your existing proposals, view previous and archived proposal as well as creating new proposals.",
-  "@workspaceDescription": {
-    "description": "Workspace page description"
+  "@campaignManagement": {
+    "description": "Header text for campaign management section"
   },
-  "newDraftProposal": "New Draft Proposal",
+  "published": "Published",
+  "@published": {
+    "description": "Label indicating published status"
+  },
+  "status": "Status",
+  "@status": {
+    "description": "Label for status field"
+  },
+  "myProposals": "My Proposals",
+  "@myProposals": {
+    "description": "Header text for user's proposals section"
+  },
   "draftProposalsX": "Draft Proposals ({count})",
   "@draftProposalsX": {
     "description": "Workspace page tab",
@@ -1401,11 +1719,51 @@
     "description": "A username / nickname of the user."
   },
   "searchProposals": "Search Proposals",
+  "@searchProposals": {
+    "description": "Header text for proposals search function"
+  },
   "search": "Search…",
+  "@search": {
+    "description": "Placeholder text for search input field"
+  },
   "agree": "I Agree",
+  "@agree": {
+    "description": "Button text for confirming agreement"
+  },
   "requestedAmountShouldBeBetweenMinAndMax": "Requested amount should be between {min} and {max}",
+  "@requestedAmountShouldBeBetweenMinAndMax": {
+    "description": "Validation message when requested amount is outside allowed range",
+    "placeholders": {
+      "min": {
+        "type": "String",
+        "description": "Minimum allowed amount"
+      },
+      "max": {
+        "type": "String",
+        "description": "Maximum allowed amount"
+      }
+    }
+  },
   "requestedAmountShouldBeMoreThan": "Requested amount should be at least {min}",
+  "@requestedAmountShouldBeMoreThan": {
+    "description": "Validation message when requested amount is below minimum",
+    "placeholders": {
+      "min": {
+        "type": "String",
+        "description": "Minimum allowed amount"
+      }
+    }
+  },
   "requestedAmountShouldBeLessThan": "Requested amount should be at most {max}",
+  "@requestedAmountShouldBeLessThan": {
+    "description": "Validation message when requested amount exceeds maximum",
+    "placeholders": {
+      "max": {
+        "type": "String",
+        "description": "Maximum allowed amount"
+      }
+    }
+  },
   "sectionHasErrorsMessage": "Section has input errors that need to be cleared before publishing.",
   "@sectionHasErrorsMessage": {
     "description": "A validation error in proposal editor when user wants to publish a proposal with errors."
@@ -1560,49 +1918,105 @@
     "description": "For example in context of document builder"
   },
   "singleGroupedTagSelectorTitle": "Please choose the most relevant category group and tag related to the outcomes of your proposal",
+  "@singleGroupedTagSelectorTitle": {
+    "description": "Title for category and tag selection interface"
+  },
   "singleGroupedTagSelectorRelevantTag": "Select the most relevant tag",
+  "@singleGroupedTagSelectorRelevantTag": {
+    "description": "Prompt to select most relevant tag"
+  },
   "noUrlAdded": "No URL added",
+  "@noUrlAdded": {
+    "description": "Message shown when no URL has been added"
+  },
   "addUrl": "Add URL",
+  "@addUrl": {
+    "description": "Button text to add a URL"
+  },
   "clear": "Clear",
+  "@clear": {
+    "description": "Button text to clear input or selection"
+  },
   "errorNoActiveCampaignFound": "Currently there is no active campaign running",
+  "@errorNoActiveCampaignFound": {
+    "description": "Error message shown when no active campaign exists"
+  },
   "howItWorksCollaborate": "Innovate together",
   "@howItWorksCollaborate": {
     "description": "Used in discovery page in how it works section"
   },
   "howItWorks": "Here's how it works",
+  "@howItWorks": {
+    "description": "Section header explaining process flow"
+  },
   "howItWorksCollaborateDescription": "Got an Idea? Create an impactful proposal and collaborate with the community to develop and refine it.",
+  "@howItWorksCollaborateDescription": {
+    "description": "Description of collaboration process in how it works section"
+  },
   "howItWorksVote": "Vote for your favorite ideas",
   "@howItWorksVote": {
     "description": "Used in discovery page in how it works section"
   },
   "howItWorksVoteDescription": "Use a voting app to choose ideas with impact worth funding. Get rewarded in ada for taking part.",
+  "@howItWorksVoteDescription": {
+    "description": "Description of voting process and rewards"
+  },
   "howItWorksFollow": "Stay up to date",
   "@howItWorksFollow": {
     "description": "Used in discovery page in how it works section"
   },
   "howItWorksFollowDescription": "Receive regular updates on all the funded ideas, so you can follow along and see how things are progressing.",
+  "@howItWorksFollowDescription": {
+    "description": "Description of project follow-up process"
+  },
   "heroSectionTitle": "Create, fund and deliver the future of Cardano.",
-  "projectCatalystDescription": "Project Catalyst is the world’s largest decentralized innovation engine for solving real-world challenges.\n\nWe're putting the community at the heart of Cardano's future development.\n\nAre you ready for the Challenge?",
+  "@heroSectionTitle": {
+    "description": "Main title in hero section of discovery page"
+  },
+  "projectCatalystDescription": "Project Catalyst is the world's largest decentralized innovation engine for solving real-world challenges.\n\nWe're putting the community at the heart of Cardano's future development.\n\nAre you ready for the Challenge?",
   "@projectCatalystDescription": {
     "description": "description text for discovery page in hero section"
   },
-  "viewCurrentCampaign": "View Current Campaign",
   "catalystF14": "Catalyst Fund14",
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
   },
   "currentCampaign": "Current Campaign",
+  "@currentCampaign": {
+    "description": "Header for current campaign section"
+  },
   "currentCampaignDescription": "Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.",
+  "@currentCampaignDescription": {
+    "description": "Description of current campaign purpose"
+  },
   "campaignTreasury": "Campaign Treasury",
+  "@campaignTreasury": {
+    "description": "Label for campaign treasury amount"
+  },
   "campaignTreasuryDescription": "Total budget, including ecosystem incentives",
+  "@campaignTreasuryDescription": {
+    "description": "Description of campaign treasury contents"
+  },
   "campaignTotalAsk": "Campaign Total Ask",
+  "@campaignTotalAsk": {
+    "description": "Label for total funds requested in campaign"
+  },
   "campaignTotalAskDescription": "Funds requested for all final proposals",
   "@campaignTotalAskDescription": {
     "description": "Description for the total ask section"
   },
   "maximumAsk": "Maximum Ask",
+  "@maximumAsk": {
+    "description": "Label for maximum funding request allowed"
+  },
   "minimumAsk": "Minimum Ask",
+  "@minimumAsk": {
+    "description": "Label for minimum funding request allowed"
+  },
   "ideaJourney": "Idea Journey",
+  "@ideaJourney": {
+    "description": "Header for idea journey section"
+  },
   "ideaJourneyDescription": "#### Ideas come to life in Catalyst through the key stages below. For the full timeline, deadlines and latest updates, visit the [fund timeline]({link}) Gitbook page.",
   "@ideaJourneyDescription": {
     "description": "Description for the idea journey section",
@@ -1613,11 +2027,29 @@
     }
   },
   "ongoing": "Ongoing",
+  "@ongoing": {
+    "description": "Label indicating ongoing status"
+  },
   "from": "From",
+  "@from": {
+    "description": "Label for start point or date"
+  },
   "to": "To",
+  "@to": {
+    "description": "Label for end point or date"
+  },
   "weekOf": "Week of",
+  "@weekOf": {
+    "description": "Label prefix for specifying a particular week"
+  },
   "errorDisplayNameValidationEmpty": "Display name can not be empty",
+  "@errorDisplayNameValidationEmpty": {
+    "description": "Error message shown when display name field is empty"
+  },
   "errorDisplayNameValidationOutOfRange": "Invalid length",
+  "@errorDisplayNameValidationOutOfRange": {
+    "description": "Error message shown when display name length is invalid"
+  },
   "headsUp": "Heads up",
   "@headsUp": {
     "description": "In context for important information below"
@@ -1639,7 +2071,13 @@
     "description": "Action to hide the full list of issues."
   },
   "errorEmailValidationPattern": "Incorrect email pattern",
+  "@errorEmailValidationPattern": {
+    "description": "Error message shown when email format is invalid"
+  },
   "errorEmailValidationOutOfRange": "Invalid length",
+  "@errorEmailValidationOutOfRange": {
+    "description": "Error message shown when email length is outside allowed range"
+  },
   "errorEmailAlreadyInUseUpdateLater": "This email address is already in use. You can update your email later from your account settings.",
   "@errorEmailAlreadyInUseUpdateLater": {
     "description": "Error when trying to register with email that is taken already (in registration)."
@@ -1653,7 +2091,13 @@
     "description": "Generic error message when trying to access account resources but non was found."
   },
   "categoryDetails": "Category Details",
+  "@categoryDetails": {
+    "description": "Header text for category details section"
+  },
   "fundsAvailable": "Funds Available",
+  "@fundsAvailable": {
+    "description": "Label showing amount of funds available"
+  },
   "minBudgetRequest": "Min budget request",
   "@minBudgetRequest": {
     "description": "A label for the minimum budget request for a proposal."
@@ -1663,6 +2107,9 @@
     "description": "A label for the maximum budget request for a proposal."
   },
   "duration": "Duration",
+  "@duration": {
+    "description": "Label for duration of proposal"
+  },
   "valueMonths": "{value} {value, plural, =0{Months} =1{Month} other{Months}}",
   "@valueMonths": {
     "description": "Used in proposal card",
@@ -1673,8 +2120,17 @@
     }
   },
   "finalProposal": "Final",
+  "@finalProposal": {
+    "description": "Label indicating final proposal status"
+  },
   "mostRecent": "Most Recent",
+  "@mostRecent": {
+    "description": "Label for sorting or filtering by most recent items"
+  },
   "viewAllProposals": "View All Proposals",
+  "@viewAllProposals": {
+    "description": "Button text to show all available proposals"
+  },
   "publishedOn": "Published on {date} at {time}",
   "@publishedOn": {
     "placeholders": {
@@ -1698,13 +2154,37 @@
     }
   },
   "accountMenuPopupTooltip": "Account menu",
+  "@accountMenuPopupTooltip": {
+    "description": "Tooltip text for account menu popup"
+  },
   "account": "Account",
+  "@account": {
+    "description": "Label for account section or navigation"
+  },
   "settings": "Settings",
+  "@settings": {
+    "description": "Label for settings section or navigation"
+  },
   "setupCatalystRoles": "Setup Catalyst roles",
+  "@setupCatalystRoles": {
+    "description": "Menu item text for configuring Catalyst roles"
+  },
   "submitSupportRequest": "Submit support request",
+  "@submitSupportRequest": {
+    "description": "Menu item text for submitting support request"
+  },
   "catalystKnowledgeBase": "Catalyst knowledge base",
+  "@catalystKnowledgeBase": {
+    "description": "Menu item text for accessing knowledge base"
+  },
   "lockAccount": "Lock account",
+  "@lockAccount": {
+    "description": "Menu item text for locking the account"
+  },
   "timezone": "Timezone",
+  "@timezone": {
+    "description": "Label for timezone setting"
+  },
   "proposalsSubmittedCount": "{count} {count, plural, one{Proposal} other{Proposals}} Submitted",
   "@proposalsSubmittedCount": {
     "description": "Used in proposal card in campaign category",
@@ -1724,17 +2204,53 @@
     }
   },
   "startProposal": "Start Proposal",
+  "@startProposal": {
+    "description": "Button text to begin creating a new proposal"
+  },
   "categoryRequirements": "Category Requirements:",
+  "@categoryRequirements": {
+    "description": "Header for category requirements section"
+  },
   "createProposal": "Create Proposal",
+  "@createProposal": {
+    "description": "Button or header text for proposal creation"
+  },
   "proposalsSubmissionClose": "Proposals submission close:",
+  "@proposalsSubmissionClose": {
+    "description": "Label showing proposal submission deadline"
+  },
   "backToCampaign": "Back to Campaign",
+  "@backToCampaign": {
+    "description": "Navigation link text to return to campaign view"
+  },
   "category": "Category",
+  "@category": {
+    "description": "Label for category field or section"
+  },
   "exploreCategories": "Explore Categories",
+  "@exploreCategories": {
+    "description": "Header or button text for browsing categories"
+  },
   "categoryBudget": "Category Budget",
+  "@categoryBudget": {
+    "description": "Label for category budget information"
+  },
   "fundsAvailableForCategory": "Funds available for this category",
+  "@fundsAvailableForCategory": {
+    "description": "Label showing available funds for specific category"
+  },
   "currentAsk": "Current Ask",
+  "@currentAsk": {
+    "description": "Label showing current funding request amount"
+  },
   "displayName": "Display Name",
+  "@displayName": {
+    "description": "Label for display name input field"
+  },
   "emailAddress": "Email address",
+  "@emailAddress": {
+    "description": "Label for email address input field"
+  },
   "email": "Email",
   "@email": {
     "description": "Email address (short)"
@@ -1752,13 +2268,37 @@
     "description": "The balance the user holds / amount of Ada in the wallet"
   },
   "myAccount": "My account",
+  "@myAccount": {
+    "description": "Header text for user's account section"
+  },
   "myRoles": "My Roles",
+  "@myRoles": {
+    "description": "Header text for user's roles section"
+  },
   "addRole": "Add role",
+  "@addRole": {
+    "description": "Button text to add a new role"
+  },
   "accountFinishedNotificationTitle": "Account Finalized",
+  "@accountFinishedNotificationTitle": {
+    "description": "Title of notification shown when account setup is complete"
+  },
   "accountFinishedNotificationTitleDesc": "Account blockchain verified",
+  "@accountFinishedNotificationTitleDesc": {
+    "description": "Description of account verification status"
+  },
   "accountFinishedNotificationMessage": "You are now able to vote, submit proposals and…",
+  "@accountFinishedNotificationMessage": {
+    "description": "Message explaining new account capabilities"
+  },
   "editRolesDialogTitle": "Editing Roles",
-  "editRolesDialogMessage": "Before you can change your role, there are a few steps to complete first. Follow the instructions carefully to ensure a smooth transition.\u2028\u2028To continue you will need to re-register, this will allow you to select new roles. This process will take around 3-7 minutes.\u2028",
+  "@editRolesDialogTitle": {
+    "description": "Title of dialog for editing roles"
+  },
+  "editRolesDialogMessage": "Before you can change your role, there are a few steps to complete first. Follow the instructions carefully to ensure a smooth transition.\n\nTo continue you will need to re-register, this will allow you to select new roles. This process will take around 3-7 minutes.\n",
+  "@editRolesDialogMessage": {
+    "description": "Detailed instructions for role editing process and requirements"
+  },
   "continueText": "Continue",
   "@continueText": {
     "description": "Action to move to the next step"
@@ -1863,10 +2403,6 @@
   "proposalEditorValidationExitDialogTitle": "Exit form issue mode?",
   "@proposalEditorValidationExitDialogTitle": {
     "description": "Title in a dialog asking if the user wants to leave the form issue mode."
-  },
-  "proposalEditorValidationExitDialogMessage": "When you exit, any unsaved changes will be lost.",
-  "@proposalEditorValidationExitDialogMessage": {
-    "description": "Message in a dialog asking if the user wants to leave the form issue mode."
   },
   "proposalEditorValidationExitIssueMode": "Exit Issue Mode",
   "@proposalEditorValidationExitIssueMode": {
@@ -2092,10 +2628,6 @@
   "@feedbackOnProposals": {
     "description": "Title for tile in overall spaces page to go to proposals list page"
   },
-  "browseMyProposals": "Browse all my proposals",
-  "@browseMyProposals": {
-    "description": "Title for tile in workspace space page to go to proposals page"
-  },
   "notPublishedProposals": "Not published proposals",
   "@notPublishedProposals": {
     "description": "Title for section to show not published proposals"
@@ -2245,14 +2777,6 @@
   "@selectedCategory": {
     "description": "description of the selected category field"
   },
-  "jumpToCampaignCategory": "Jump to campaign category",
-  "@jumpToCampaignCategory": {
-    "description": "description of the button that takes to campaign category page"
-  },
-  "saveDraft": "Save draft",
-  "@saveDraft": {
-    "description": "description of the button that saves the draft"
-  },
   "openInEditor": "Open in editor",
   "@openInEditor": {
     "description": "description of the button that opens the proposal in editor"
@@ -2282,10 +2806,6 @@
       }
     }
   },
-  "emptyUserProposalDescriptionHelp": "Use Create Proposal in the top menu to get started.",
-  "@emptyUserProposalDescriptionHelp": {
-    "description": "Description shown when user has no proposals in workspace"
-  },
   "noFinalUserProposals": "No Final proposals found",
   "@noFinalUserProposals": {
     "description": "Title shown when user has no final proposals in workspace"
@@ -2313,10 +2833,6 @@
   "commentsSortOldest": "Oldest First",
   "@commentsSortOldest": {
     "description": "One of options for sorting comments under proposal"
-  },
-  "shortSummary": "Short summary",
-  "@shortSummary": {
-    "description": "A short description of something"
   },
   "view": "View",
   "@view": {
@@ -2385,10 +2901,6 @@
   "apiErrorMalformedBody": "Can not process response body",
   "@apiErrorMalformedBody": {
     "description": "Generic message when any endpoint response is different from expected and can not be processed"
-  },
-  "degradeFinalToDraftProposal": "You remove this proposal from review/voting stage.",
-  "@degradeFinalToDraftProposal": {
-    "description": "Information for user that his proposal is going back to draft. "
   },
   "resubmitAsFinalWarning": "You need to resubmit this proposal as final, to be eligible for funding, so make sure to Submit to review stage (Final) after editing.",
   "@resubmitAsFinalWarning": {
@@ -2478,10 +2990,6 @@
         "type": "String"
       }
     }
-  },
-  "votingRegistrationForF14": "Voting Registration for Fund14.",
-  "@votingRegistrationForF14": {
-    "description": "Title for the voting registration for f14 card in stay involved section"
   },
   "mobileAccessDescription": "For the best experience, head over to a desktop to get started. But don't worry - mobile is coming.\n\nStay tuned for more updates, or visit our Gitbook to learn more.\n\nSee you on the other side!",
   "@mobileAccessDescription": {
@@ -2838,7 +3346,7 @@
   "@emailNotVerifiedDialogTitle": {
     "description": "Title of dialog when trying to publish document but does not have verified email"
   },
-  "emailNotVerifiedDialogMessage": "Before you can publish proposals, please make sure your \u2028account has a verified email address.",
+  "emailNotVerifiedDialogMessage": "Before you can publish proposals, please make sure your \naccount has a verified email address.",
   "@emailNotVerifiedDialogMessage": {
     "description": "Message of dialog when trying to publish document but does not have verified email"
   },
@@ -3148,7 +3656,14 @@
   },
   "goToMyAccountForEmailVerification": "Go to {destination} to verify it.",
   "@goToMyAccountForEmailVerification": {
-    "description": "Message used in banner for CTA to inform user to go to My Account to verify email"
+    "description": "Message used in banner for CTA to inform user to go to My Account to verify email",
+    "placeholders": {
+      "destination": {
+        "type": "String",
+        "description": "Text for the destination link"
+      }
+    }
+
   },
   "verifiedEmailNeededToPublishTitle": "A verified email is required to publish your proposal",
   "@verifiedEmailNeededToPublishTitle": {
