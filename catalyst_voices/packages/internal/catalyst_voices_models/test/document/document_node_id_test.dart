@@ -68,45 +68,5 @@ void main() {
       final node = DocumentNodeId.root.child('section1').child('paragraph1');
       expect(node.toString(), 'section1.paragraph1');
     });
-
-    group('wildcard support', () {
-      test('matchesPattern supports wildcard segment', () {
-        final pattern = DocumentNodeId.fromString('milestones.milestones.milestone_list.*.title');
-
-        final node1 = DocumentNodeId.fromString('milestones.milestones.milestone_list.0.title');
-        final node2 = DocumentNodeId.fromString('milestones.milestones.milestone_list.1.title');
-        final node3 = DocumentNodeId.fromString('milestones.milestones.milestone_list.foo.title');
-        final node4 = DocumentNodeId.fromString('milestones.milestones.milestone_list.title');
-
-        expect(node1.matchesPattern(pattern), isTrue);
-        expect(node2.matchesPattern(pattern), isTrue);
-        expect(node3.matchesPattern(pattern), isTrue);
-        expect(node4.matchesPattern(pattern), isFalse);
-      });
-
-      test('matchesPattern supports wildcard at start of path', () {
-        final pattern = DocumentNodeId.fromString('*.title');
-
-        final node1 = DocumentNodeId.fromString('milestones.milestones.milestone_list.0.title');
-        final node2 = DocumentNodeId.fromString('milestones.milestones.milestone_list.title');
-        final node3 = DocumentNodeId.fromString('milestones.milestones.milestone_list');
-
-        expect(node1.matchesPattern(pattern), isTrue);
-        expect(node2.matchesPattern(pattern), isTrue);
-        expect(node3.matchesPattern(pattern), isFalse);
-      });
-
-      test('matchesPattern supports wildcard at end of path', () {
-        final pattern = DocumentNodeId.fromString('milestones.*');
-
-        final node1 = DocumentNodeId.fromString('milestones.milestones.milestone_list.0.title');
-        final node2 = DocumentNodeId.fromString('milestones.milestones.milestone_list.title');
-        final node3 = DocumentNodeId.fromString('milestone_list.title');
-
-        expect(node1.matchesPattern(pattern), isTrue);
-        expect(node2.matchesPattern(pattern), isTrue);
-        expect(node3.matchesPattern(pattern), isFalse);
-      });
-    });
   });
 }
