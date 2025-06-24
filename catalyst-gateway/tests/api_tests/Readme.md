@@ -27,6 +27,7 @@ export SIGNED_DOC_SK="0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3
 ```
 
 ### Get binary for building and signing Catalyst Signed Document objects
+
 * compile a [`mk_singed_doc` cli tool](https://github.com/input-output-hk/catalyst-libs/tree/r20250416-00/rust/signed_doc)
   (version tag `r20250416-00`)
 * Copy this binary under this directory `api_tests`
@@ -62,10 +63,10 @@ export EVENT_DB_TEST_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/Cata
 
 * Run the tests, by specifying one of the markers:
 
-   * ci (marks tests to be run in ci),
-   * nightly (marks tests to be run nightly),
-   * preprod_indexing (marks test which requires indexing of the cardano preprod network),
-   * health_endpoint (marks tests with requires a proxy for testing)
+  * ci (marks tests to be run in ci),
+  * nightly (marks tests to be run nightly),
+  * preprod_indexing (marks test which requires indexing of the cardano preprod network),
+  * health_endpoint (marks tests with requires a proxy for testing)
 
 ```shell
 poetry run pytest -s -m <marker>
