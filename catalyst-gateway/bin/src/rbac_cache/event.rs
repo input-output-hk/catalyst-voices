@@ -6,6 +6,7 @@ use std::time::Duration;
 #[derive(Debug, Clone)]
 pub(crate) enum RbacCacheManagerEvent {
     /// Emitted when the cache manager is initialized.
+    #[allow(dead_code)]
     Initialized {
         /// Time taken to complete startup.
         start_up_time: Duration,
