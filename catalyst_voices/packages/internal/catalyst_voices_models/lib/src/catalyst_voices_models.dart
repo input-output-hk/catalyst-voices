@@ -14,6 +14,7 @@ export 'common/markdown_data.dart';
 export 'common/node_id.dart';
 export 'common/optional.dart';
 export 'common/space.dart';
+export 'common/wildcard_path_handler.dart';
 export 'config/app_config.dart';
 export 'config/app_environment.dart';
 export 'crypto/catalyst_key_factory.dart';

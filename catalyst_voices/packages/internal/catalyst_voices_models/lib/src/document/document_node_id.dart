@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/src/common/node_id.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 /// The interface that every object in a document should implement,
 /// helps to navigate to a certain segment/section/property of the document.
