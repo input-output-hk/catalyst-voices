@@ -19,6 +19,7 @@ Future<void> main(List<String> args) async {
   final uniqueLines = _readUniqueLines(csvFiles);
   await _outputResult(outputFile, uniqueLines);
   await _deleteMergedFiles(csvFiles);
+  print('✅ Output file license file at ${outputFile.path}');
 }
 
 Future<void> _deleteMergedFiles(Iterable<File> csvFiles) async {
