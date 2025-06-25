@@ -21,6 +21,10 @@ use crate::{
         },
         types::{DbCatalystId, DbSlot, DbTransactionId},
     },
+    metrics::rbac_cache::reporter::{
+        PERSISTENT_TRANSACTION_IDS_CACHE_HIT, PERSISTENT_TRANSACTION_IDS_CACHE_MISS,
+        VOLATILE_TRANSACTION_IDS_CACHE_HIT, VOLATILE_TRANSACTION_IDS_CACHE_MISS,
+    },
     settings::Settings,
 };
 
@@ -85,7 +89,9 @@ impl Query {
     ) -> Result<Option<QueryResult>> {
         let cache = cache(session.is_persistent());
 
-        if let Some(res) = cache.get(&txn_id) {
+        let res = cache.get(&txn_id);
+        update_cache_metrics(session.is_persistent(), res.is_some());
+        if let Some(res) = res {
             return Ok(Some(res));
         }
 
@@ -139,11 +145,46 @@ pub fn invalidate_cache(is_persistent: bool) {
     cache.invalidate_all();
 }
 
+/// Returns an approximate number of entries in the transaction IDs cache.
+pub fn transaction_ids_cache_size(is_persistent: bool) -> u64 {
+    let cache = cache(is_persistent);
+    cache.entry_count()
+}
+
 /// Returns a persistent or a volatile cache instance depending on the parameter value.
 fn cache(is_persistent: bool) -> &'static Cache<TransactionId, QueryResult> {
     if is_persistent {
         &PERSISTENT_CACHE
     } else {
         &VOLATILE_CACHE
+    }
+}
+
+/// Updates metrics of the cache.
+fn update_cache_metrics(is_persistent: bool, is_found: bool) {
+    let api_host_names = Settings::api_host_names().join(",");
+    let service_id = Settings::service_id();
+
+    match (is_persistent, is_found) {
+        (true, true) => {
+            PERSISTENT_TRANSACTION_IDS_CACHE_HIT
+                .with_label_values(&[&api_host_names, service_id])
+                .inc();
+        },
+        (true, false) => {
+            PERSISTENT_TRANSACTION_IDS_CACHE_MISS
+                .with_label_values(&[&api_host_names, service_id])
+                .inc();
+        },
+        (false, true) => {
+            VOLATILE_TRANSACTION_IDS_CACHE_HIT
+                .with_label_values(&[&api_host_names, service_id])
+                .inc();
+        },
+        (false, false) => {
+            VOLATILE_TRANSACTION_IDS_CACHE_MISS
+                .with_label_values(&[&api_host_names, service_id])
+                .inc();
+        },
     }
 }

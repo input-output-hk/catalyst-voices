@@ -22,6 +22,10 @@ use crate::{
         },
         types::{DbCatalystId, DbPublicKey, DbSlot},
     },
+    metrics::rbac_cache::reporter::{
+        PERSISTENT_PUBLIC_KEYS_CACHE_HIT, PERSISTENT_PUBLIC_KEYS_CACHE_MISS,
+        VOLATILE_PUBLIC_KEYS_CACHE_HIT, VOLATILE_PUBLIC_KEYS_CACHE_MISS,
+    },
     settings::Settings,
 };
 
@@ -86,7 +90,9 @@ impl Query {
     ) -> Result<Option<QueryResult>> {
         let cache = cache(session.is_persistent());
 
-        if let Some(res) = cache.get(&public_key) {
+        let res = cache.get(&public_key);
+        update_cache_metrics(session.is_persistent(), res.is_some());
+        if let Some(res) = res {
             return Ok(Some(res));
         }
 
@@ -132,9 +138,15 @@ pub fn cache_public_key(
 
 /// Removes all cached values.
 #[allow(dead_code)]
-pub fn invalidate_cache(is_persistent: bool) {
+pub fn invalidate_public_keys_cache(is_persistent: bool) {
     let cache = cache(is_persistent);
     cache.invalidate_all();
+}
+
+/// Returns an approximate number of entries in the public keys cache.
+pub fn public_keys_cache_size(is_persistent: bool) -> u64 {
+    let cache = cache(is_persistent);
+    cache.entry_count()
 }
 
 /// Returns a persistent or a volatile cache instance depending on the parameter value.
@@ -143,5 +155,34 @@ fn cache(is_persistent: bool) -> &'static Cache<VerifyingKey, QueryResult> {
         &PERSISTENT_CACHE
     } else {
         &VOLATILE_CACHE
+    }
+}
+
+/// Updates metrics of the cache.
+fn update_cache_metrics(is_persistent: bool, is_found: bool) {
+    let api_host_names = Settings::api_host_names().join(",");
+    let service_id = Settings::service_id();
+
+    match (is_persistent, is_found) {
+        (true, true) => {
+            PERSISTENT_PUBLIC_KEYS_CACHE_HIT
+                .with_label_values(&[&api_host_names, service_id])
+                .inc();
+        },
+        (true, false) => {
+            PERSISTENT_PUBLIC_KEYS_CACHE_MISS
+                .with_label_values(&[&api_host_names, service_id])
+                .inc();
+        },
+        (false, true) => {
+            VOLATILE_PUBLIC_KEYS_CACHE_HIT
+                .with_label_values(&[&api_host_names, service_id])
+                .inc();
+        },
+        (false, false) => {
+            VOLATILE_PUBLIC_KEYS_CACHE_MISS
+                .with_label_values(&[&api_host_names, service_id])
+                .inc();
+        },
     }
 }

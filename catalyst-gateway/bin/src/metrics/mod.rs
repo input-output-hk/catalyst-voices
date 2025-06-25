@@ -22,4 +22,5 @@ pub(crate) fn init_prometheus() -> Registry {
 pub(crate) fn metrics_updater_fn() {
     chain_follower::update();
     memory::update();
+    rbac_cache::update();
 }
