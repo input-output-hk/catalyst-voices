@@ -240,6 +240,13 @@ scripts:
       melos exec -- lic_ck check-licenses -c $MELOS_ROOT_PATH/melos.yaml -i
     description: Run `lic_ck` checks for all packages.
 
+  license-list:
+    run: |
+      melos exec --ignore="catalyst_analysis" --ignore="example" -- \
+        'dart run $MELOS_ROOT_PATH/scripts/generate_licenses.dart $MELOS_PACKAGE_PATH $MELOS_ROOT_PATH/licenses/$MELOS_PACKAGE_NAME.csv'
+      dart run $MELOS_ROOT_PATH/scripts/merge_csv_files.dart $MELOS_ROOT_PATH/licenses/ $MELOS_ROOT_PATH/licenses/licenses.csv
+    description: Generate license list for all packages in licenses/licenses.csv file.
+
   test:select:
     run: |
       melos exec -c 1 --dir-exists="test" -- flutter test
