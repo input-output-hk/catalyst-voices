@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
+/// App wide settings, independent of [Account].
 final class UserSettings extends Equatable {
   final TimezonePreferences? timezone;
   final ThemePreferences? theme;

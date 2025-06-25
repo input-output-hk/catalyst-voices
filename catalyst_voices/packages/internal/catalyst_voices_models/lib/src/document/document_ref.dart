@@ -4,6 +4,22 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart' show Uint8List;
 import 'package:uuid_plus/uuid_plus.dart';
 
+/// Represents ref to any kind of document. Documents often have refs to other document
+/// and this class is representation of that.
+///
+/// [id] and [version] are usually a UUID, often UUIDv7.
+///
+/// Implements [Comparable] and tries to sort base on [version] date time extracted from UUIDv7
+/// timestamp.
+///
+/// Ref can be **exact** or **loose**:
+/// - when [version] is non null it is exact because it points to single document.
+/// - when [version] is null it is loose because it points to newest version of document.
+///
+/// Types:
+/// - [SignedDocumentRef] it points to signed, published document.
+/// - [DraftRef] it points to local version, sometimes called localDraft, of document. It can
+/// be malformed and incomplete.
 sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   final String id;
   final String? version;
@@ -84,21 +100,20 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   }
 }
 
+/// Ref to local draft document.
 final class DraftRef extends DocumentRef {
   const DraftRef({
     required super.id,
     super.version,
   });
 
-  /// Creates ref for first version of [id] draft.
+  /// Creates ref for first [version] of [id] draft.
   const DraftRef.first(String id) : this(id: id, version: id);
 
+  /// Shortcut for [DraftRef.first].
   factory DraftRef.generateFirstRef() {
     final id = const Uuid().v7();
-    return DraftRef(
-      id: id,
-      version: id,
-    );
+    return DraftRef.first(id);
   }
 
   @override
@@ -128,6 +143,7 @@ final class DraftRef extends DocumentRef {
   String toString() => isExact ? 'ExactDraftRef($id.v$version)' : 'LooseDraftRef($id)';
 }
 
+///
 final class SecuredDocumentRef extends Equatable {
   final DocumentRef ref;
   final Uint8List hash;
@@ -141,6 +157,7 @@ final class SecuredDocumentRef extends Equatable {
   List<Object?> get props => [ref, hash];
 }
 
+/// Ref to published document.
 final class SignedDocumentRef extends DocumentRef {
   const SignedDocumentRef({
     required super.id,
@@ -155,12 +172,10 @@ final class SignedDocumentRef extends DocumentRef {
   /// Creates ref for first version of [id] document.
   const SignedDocumentRef.first(String id) : this(id: id, version: id);
 
+  /// Shortcut for [SignedDocumentRef.first].
   factory SignedDocumentRef.generateFirstRef() {
     final id = const Uuid().v7();
-    return SignedDocumentRef(
-      id: id,
-      version: id,
-    );
+    return SignedDocumentRef.first(id);
   }
 
   const SignedDocumentRef.loose({required super.id});
