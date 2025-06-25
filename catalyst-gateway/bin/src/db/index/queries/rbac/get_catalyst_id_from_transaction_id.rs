@@ -140,7 +140,7 @@ pub fn cache_transaction(
 
 /// Removes all cached values.
 #[allow(dead_code)]
-pub fn invalidate_cache(is_persistent: bool) {
+pub fn invalidate_transactions_ids_cache(is_persistent: bool) {
     let cache = cache(is_persistent);
     cache.invalidate_all();
 }

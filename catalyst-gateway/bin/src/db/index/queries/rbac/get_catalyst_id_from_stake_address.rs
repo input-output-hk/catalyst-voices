@@ -156,7 +156,7 @@ pub fn cache_stake_address(
 
 /// Removes all cached values.
 #[allow(dead_code)]
-pub fn invalidate_cache(is_persistent: bool) {
+pub fn invalidate_stake_addresses_cache(is_persistent: bool) {
     let cache = cache(is_persistent);
     cache.invalidate_all();
 }
