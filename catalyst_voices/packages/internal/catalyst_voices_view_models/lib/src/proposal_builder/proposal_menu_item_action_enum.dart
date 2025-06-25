@@ -4,6 +4,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/widgets.dart';
 
+/// Enum representing proposal menu item actions
 enum ProposalMenuItemAction {
   view(clickable: false),
   edit,
@@ -97,6 +98,7 @@ enum ProposalMenuItemAction {
     );
   }
 
+  /// Returns the available options for a proposal in a proposal builder
   static List<ProposalMenuItemAction> proposalBuilderAvailableOptions(
     ProposalPublish proposalPublish,
   ) {
@@ -111,6 +113,7 @@ enum ProposalMenuItemAction {
     }
   }
 
+  /// Returns the available options for a proposal in a workspace
   static List<ProposalMenuItemAction> workspaceAvailableOptions(
     ProposalPublish proposalPublish,
   ) {

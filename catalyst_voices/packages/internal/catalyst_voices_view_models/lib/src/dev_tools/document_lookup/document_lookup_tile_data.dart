@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
+/// View model for document lookup tile data.
 final class DocumentLookupTileData extends Equatable {
   final DocumentRef ref;
   final String metadata;

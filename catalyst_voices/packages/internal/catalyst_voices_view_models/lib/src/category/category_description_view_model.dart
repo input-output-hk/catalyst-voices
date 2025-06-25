@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' show CategoryDescription;
 import 'package:equatable/equatable.dart';
 
+/// View model for category description.
 class CategoryDescriptionViewModel extends Equatable {
   final String title;
   final String description;

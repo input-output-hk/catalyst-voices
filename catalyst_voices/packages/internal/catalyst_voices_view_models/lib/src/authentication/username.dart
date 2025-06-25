@@ -4,6 +4,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
 import 'package:formz/formz.dart';
 
+/// Exception thrown when a username value is empty.
 final class EmptyUsernameException extends UsernameValidationException {
   const EmptyUsernameException();
 
@@ -13,6 +14,7 @@ final class EmptyUsernameException extends UsernameValidationException {
   }
 }
 
+/// Exception thrown when a username value is out of range.
 final class OutOfRangeUsernameException extends UsernameValidationException {
   const OutOfRangeUsernameException();
 
@@ -22,6 +24,7 @@ final class OutOfRangeUsernameException extends UsernameValidationException {
   }
 }
 
+/// Form input validator for username
 final class Username extends FormzInput<String, UsernameValidationException> {
   static const NumRange<int> lengthRange = NumRange(min: 1, max: 30);
 
@@ -43,6 +46,7 @@ final class Username extends FormzInput<String, UsernameValidationException> {
   }
 }
 
+/// Base class for username validation exceptions.
 sealed class UsernameValidationException extends LocalizedException {
   const UsernameValidationException();
 }

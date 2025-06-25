@@ -1,5 +1,9 @@
 import 'package:equatable/equatable.dart';
 
+/// Base class for video asset representations.
+///
+/// This class provides a common interface for video assets, including the asset's package name.
+/// All video asset types should extend this class.
 abstract class BaseVideoAsset extends Equatable {
   final String package;
 
@@ -11,6 +15,7 @@ abstract class BaseVideoAsset extends Equatable {
   List<Object?> get props => [package];
 }
 
+/// Represents a video cache key used to identify and manage a cached video asset.
 class VideoCacheKey extends BaseVideoAsset {
   final String name;
 
@@ -33,6 +38,7 @@ class VideoCacheKey extends BaseVideoAsset {
   }
 }
 
+/// Represents a list of video assets to be precached.
 class VideoPrecacheAssets extends BaseVideoAsset {
   final List<String> assets;
 
