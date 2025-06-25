@@ -3,5 +3,8 @@ name: catalyst_voices_workspace
 environment:
   sdk: ">=3.3.3 <4.0.0"
 
+dependencies:
+  dart_pubspec_licenses: ^3.0.4
+
 dev_dependencies:
   melos: ^6.1.0
