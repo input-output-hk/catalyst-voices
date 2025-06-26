@@ -1,5 +1,8 @@
 //! A cache for RBAC registrations.
 
+// The whole module will be eventually removed anyway.
+#![allow(dead_code)]
+
 mod add_result;
 mod cache;
 mod cache_manager;

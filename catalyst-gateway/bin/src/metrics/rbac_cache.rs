@@ -1,107 +1,41 @@
 //! Metrics related to RBAC Registration Chain Caching analytics.
 
-use std::{
-    sync::atomic::{AtomicBool, Ordering},
-    thread,
-    time::Duration,
-};
-
 use crate::{
-    rbac_cache::{
-        event::{EventTarget, RbacCacheManagerEvent as Event},
-        RBAC_CACHE,
+    db::index::queries::rbac::{
+        get_catalyst_id_from_public_key::public_keys_cache_size,
+        get_catalyst_id_from_stake_address::stake_addresses_cache_size,
+        get_catalyst_id_from_transaction_id::transaction_ids_cache_size,
     },
+    rbac::persistent_rbac_chains_cache_size,
     settings::Settings,
 };
 
-/// This is to prevent the init function from accidentally being called multiple times.
-static IS_INITIALIZED: AtomicBool = AtomicBool::new(false);
-
-/// Starts an event listener to `RBAC_CACHE` and listens for changes as metrics.
-pub(crate) fn init_metrics_reporter() {
-    if IS_INITIALIZED.swap(true, Ordering::SeqCst) {
-        return;
-    }
-
+/// Updates memory metrics to current values.
+pub(crate) fn update() {
     let api_host_names = Settings::api_host_names().join(",");
     let service_id = Settings::service_id();
-    let network = Settings::cardano_network().to_string();
 
-    RBAC_CACHE.add_event_listener(Box::new(move |event: &Event| {
-        if let Event::Initialized { start_up_time } = event {
-            reporter::START_UP_TIME
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .set(i64::try_from(start_up_time.as_millis()).unwrap_or(-1));
-        }
-        if let Event::CacheAccessed {
-            is_found,
-            is_persistent,
-            latency,
-            ..
-        } = event
-        {
-            if *is_persistent {
-                reporter::PERSISTENT_ACCESS
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .inc();
-
-                if *is_found {
-                    reporter::PERSISTENT_HIT
-                        .with_label_values(&[&api_host_names, service_id, &network])
-                        .inc();
-                } else {
-                    reporter::PERSISTENT_MISS
-                        .with_label_values(&[&api_host_names, service_id, &network])
-                        .inc();
-                }
-            } else {
-                reporter::VOLATILE_ACCESS
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .inc();
-
-                if *is_found {
-                    reporter::VOLATILE_HIT
-                        .with_label_values(&[&api_host_names, service_id, &network])
-                        .inc();
-                } else {
-                    reporter::VOLATILE_MISS
-                        .with_label_values(&[&api_host_names, service_id, &network])
-                        .inc();
-                }
-            }
-
-            if *is_found {
-                reporter::LATENCY
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .observe(latency.as_secs_f64());
-            }
-        }
-    }));
-
-    thread::spawn(move || {
-        loop {
-            {
-                let api_host_names = Settings::api_host_names().join(",");
-                let service_id = Settings::service_id();
-                let network = Settings::cardano_network().to_string();
-
-                let rbac_entries = RBAC_CACHE.rbac_entries();
-
-                reporter::MAX_CACHE_SIZE
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(i64::try_from(Settings::rbac_cache_max_size()).unwrap_or(-1));
-                reporter::RBAC_CHAIN_ENTRIES
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(i64::try_from(rbac_entries).unwrap_or(-1));
-                // TODO: add size approximation on storage caching when it's available
-                reporter::CACHE_SIZE
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(0);
-            }
-
-            thread::sleep(Duration::from_secs(1));
-        }
-    });
+    reporter::PERSISTENT_PUBLIC_KEYS_CACHE_SIZE
+        .with_label_values(&[&api_host_names, service_id])
+        .set(i64::try_from(public_keys_cache_size(true)).unwrap_or(-1));
+    reporter::VOLATILE_PUBLIC_KEYS_CACHE_SIZE
+        .with_label_values(&[&api_host_names, service_id])
+        .set(i64::try_from(public_keys_cache_size(false)).unwrap_or(-1));
+    reporter::PERSISTENT_STAKE_ADDRESSES_CACHE_SIZE
+        .with_label_values(&[&api_host_names, service_id])
+        .set(i64::try_from(stake_addresses_cache_size(true)).unwrap_or(-1));
+    reporter::VOLATILE_STAKE_ADDRESSES_CACHE_SIZE
+        .with_label_values(&[&api_host_names, service_id])
+        .set(i64::try_from(stake_addresses_cache_size(false)).unwrap_or(-1));
+    reporter::PERSISTENT_TRANSACTION_IDS_CACHE_SIZE
+        .with_label_values(&[&api_host_names, service_id])
+        .set(i64::try_from(transaction_ids_cache_size(true)).unwrap_or(-1));
+    reporter::VOLATILE_TRANSACTION_IDS_CACHE_SIZE
+        .with_label_values(&[&api_host_names, service_id])
+        .set(i64::try_from(transaction_ids_cache_size(false)).unwrap_or(-1));
+    reporter::PERSISTENT_CHAINS_CACHE_SIZE
+        .with_label_values(&[&api_host_names, service_id])
+        .set(i64::try_from(persistent_rbac_chains_cache_size()).unwrap_or(-1));
 }
 
 /// All the related RBAC Registration Chain Caching reporting metrics to the Prometheus
@@ -109,119 +43,232 @@ pub(crate) fn init_metrics_reporter() {
 pub(crate) mod reporter {
     use std::sync::LazyLock;
 
-    use prometheus::{
-        register_counter_vec, register_histogram_vec, register_int_gauge_vec, CounterVec,
-        HistogramVec, IntGaugeVec,
-    };
+    use prometheus::{register_counter_vec, register_int_gauge_vec, CounterVec, IntGaugeVec};
 
     /// Labels for the metrics.
     const METRIC_LABELS: [&str; 3] = ["api_host_names", "service_id", "network"];
 
-    /// Total count of cache hits for persistent.
-    pub(crate) static PERSISTENT_HIT: LazyLock<CounterVec> = LazyLock::new(|| {
+    /// A total count of the persistent public keys cache hits.
+    pub(crate) static PERSISTENT_PUBLIC_KEYS_CACHE_HIT: LazyLock<CounterVec> =
+        LazyLock::new(|| {
+            register_counter_vec!(
+                "rbac_persistent_public_keys_cache_hit",
+                "A total count of persistent public keys cache hits",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// A total count of the persistent public keys cache misses.
+    pub(crate) static PERSISTENT_PUBLIC_KEYS_CACHE_MISS: LazyLock<CounterVec> =
+        LazyLock::new(|| {
+            register_counter_vec!(
+                "rbac_persistent_public_keys_cache_miss",
+                "A total count of persistent public keys cache misses",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// An estimated size of the persistent public keys cache.
+    pub(crate) static PERSISTENT_PUBLIC_KEYS_CACHE_SIZE: LazyLock<IntGaugeVec> =
+        LazyLock::new(|| {
+            register_int_gauge_vec!(
+                "rbac_persistent_public_keys_cache_size",
+                "An estimated size of the persistent public keys cache",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// A total count of the volatile public keys cache hits.
+    pub(crate) static VOLATILE_PUBLIC_KEYS_CACHE_HIT: LazyLock<CounterVec> = LazyLock::new(|| {
         register_counter_vec!(
-            "cache_persistent_hit",
-            "Total count of cache hits for persistent",
+            "rbac_volatile_public_keys_cache_hit",
+            "A total count of volatile public keys cache hits",
             &METRIC_LABELS
         )
         .unwrap()
     });
 
-    /// Total count of cache misses for persistent.
-    pub(crate) static PERSISTENT_MISS: LazyLock<CounterVec> = LazyLock::new(|| {
+    /// A total count of the volatile public keys cache misses.
+    pub(crate) static VOLATILE_PUBLIC_KEYS_CACHE_MISS: LazyLock<CounterVec> = LazyLock::new(|| {
         register_counter_vec!(
-            "cache_persistent_miss",
-            "Total count of cache misses for persistent",
+            "rbac_volatile_public_keys_cache_miss",
+            "A total count of volatile public keys cache misses",
             &METRIC_LABELS
         )
         .unwrap()
     });
 
-    /// Total count of cache access attempts for persistent.
-    pub(crate) static PERSISTENT_ACCESS: LazyLock<CounterVec> = LazyLock::new(|| {
+    /// An estimated size of the volatile public keys cache.
+    pub(crate) static VOLATILE_PUBLIC_KEYS_CACHE_SIZE: LazyLock<IntGaugeVec> =
+        LazyLock::new(|| {
+            register_int_gauge_vec!(
+                "rbac_volatile_public_keys_cache_size",
+                "An estimated size of the volatile public keys cache",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// A total count of the persistent stake addresses cache hits.
+    pub(crate) static PERSISTENT_STAKE_ADDRESSES_CACHE_HIT: LazyLock<CounterVec> =
+        LazyLock::new(|| {
+            register_counter_vec!(
+                "rbac_persistent_stake_addresses_cache_hit",
+                "A total count of the persistent stake addresses cache hits",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// A total count of the persistent stake addresses cache misses.
+    pub(crate) static PERSISTENT_STAKE_ADDRESSES_CACHE_MISS: LazyLock<CounterVec> =
+        LazyLock::new(|| {
+            register_counter_vec!(
+                "rbac_persistent_stake_addresses_cache_miss",
+                "A total count of the persistent stake addresses cache misses",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// An estimated size of the persistent stake addresses cache.
+    pub(crate) static PERSISTENT_STAKE_ADDRESSES_CACHE_SIZE: LazyLock<IntGaugeVec> =
+        LazyLock::new(|| {
+            register_int_gauge_vec!(
+                "rbac_persistent_stake_addresses_cache_size",
+                "An estimated size of the persistent stake addresses cache",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// A total count of the volatile stake addresses cache hits.
+    pub(crate) static VOLATILE_STAKE_ADDRESSES_CACHE_HIT: LazyLock<CounterVec> =
+        LazyLock::new(|| {
+            register_counter_vec!(
+                "rbac_volatile_stake_addresses_cache_hit",
+                "A total count of the volatile stake addresses cache hits",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// A total count of the volatile stake addresses cache misses.
+    pub(crate) static VOLATILE_STAKE_ADDRESSES_CACHE_MISS: LazyLock<CounterVec> =
+        LazyLock::new(|| {
+            register_counter_vec!(
+                "rbac_volatile_stake_addresses_cache_miss",
+                "A total count of the volatile stake addresses cache misses",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// An estimated size of the volatile stake addresses cache.
+    pub(crate) static VOLATILE_STAKE_ADDRESSES_CACHE_SIZE: LazyLock<IntGaugeVec> =
+        LazyLock::new(|| {
+            register_int_gauge_vec!(
+                "rbac_volatile_stake_addresses_cache_size",
+                "An estimated size of the volatile stake addresses cache",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// A total count of the persistent transaction IDs cache hits.
+    pub(crate) static PERSISTENT_TRANSACTION_IDS_CACHE_HIT: LazyLock<CounterVec> =
+        LazyLock::new(|| {
+            register_counter_vec!(
+                "rbac_persistent_transaction_ids_cache_hit",
+                "A total count of the persistent transaction IDs cache hits",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// A total count of the persistent transaction IDs cache misses.
+    pub(crate) static PERSISTENT_TRANSACTION_IDS_CACHE_MISS: LazyLock<CounterVec> =
+        LazyLock::new(|| {
+            register_counter_vec!(
+                "rbac_persistent_transaction_ids_cache_miss",
+                "A total count of the persistent transaction IDs cache misses",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// An estimated size of the persistent transaction IDs cache.
+    pub(crate) static PERSISTENT_TRANSACTION_IDS_CACHE_SIZE: LazyLock<IntGaugeVec> =
+        LazyLock::new(|| {
+            register_int_gauge_vec!(
+                "rbac_persistent_transaction_ids_cache_size",
+                "An estimated size of the persistent transaction IDs cache",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// A total count of the volatile transaction IDs cache hits.
+    pub(crate) static VOLATILE_TRANSACTION_IDS_CACHE_HIT: LazyLock<CounterVec> =
+        LazyLock::new(|| {
+            register_counter_vec!(
+                "rbac_volatile_transaction_ids_cache_hit",
+                "A total count of volatile transaction IDs cache hits",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// A total count of the volatile transaction IDs cache misses.
+    pub(crate) static VOLATILE_TRANSACTION_IDS_CACHE_MISS: LazyLock<CounterVec> =
+        LazyLock::new(|| {
+            register_counter_vec!(
+                "rbac_volatile_transaction_ids_cache_miss",
+                "A total count of the volatile transaction IDs cache misses",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// An estimated size of the volatile transaction IDs cache.
+    pub(crate) static VOLATILE_TRANSACTION_IDS_CACHE_SIZE: LazyLock<IntGaugeVec> =
+        LazyLock::new(|| {
+            register_int_gauge_vec!(
+                "rbac_volatile_transaction_ids_cache_size",
+                "An estimated size of the volatile transaction IDs cache",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// A total count of the persistent RBAC chains cache hits.
+    pub(crate) static PERSISTENT_CHAINS_CACHE_HIT: LazyLock<CounterVec> = LazyLock::new(|| {
         register_counter_vec!(
-            "cache_persistent_access",
-            "Total count of cache access attempts for persistent",
+            "rbac_persistent_chains_cache_hit",
+            "A total count of the persistent RBAC chains cache hits",
             &METRIC_LABELS
         )
         .unwrap()
     });
 
-    /// Total count of cache hits for volatile.
-    pub(crate) static VOLATILE_HIT: LazyLock<CounterVec> = LazyLock::new(|| {
+    /// A total count of the persistent RBAC chains cache misses.
+    pub(crate) static PERSISTENT_CHAINS_CACHE_MISS: LazyLock<CounterVec> = LazyLock::new(|| {
         register_counter_vec!(
-            "cache_volatile_hit",
-            "Total count of cache hits for volatile",
+            "rbac_persistent_chains_cache_miss",
+            "A total count of the persistent RBAC chains cache misses",
             &METRIC_LABELS
         )
         .unwrap()
     });
 
-    /// Total count of cache misses for volatile.
-    pub(crate) static VOLATILE_MISS: LazyLock<CounterVec> = LazyLock::new(|| {
-        register_counter_vec!(
-            "cache_volatile_miss",
-            "Total count of cache misses for volatile",
-            &METRIC_LABELS
-        )
-        .unwrap()
-    });
-
-    /// Total count of cache access attempts for volatile.
-    pub(crate) static VOLATILE_ACCESS: LazyLock<CounterVec> = LazyLock::new(|| {
-        register_counter_vec!(
-            "cache_volatile_access",
-            "Total count of cache access attempts for volatile",
-            &METRIC_LABELS
-        )
-        .unwrap()
-    });
-
-    /// Duration measured in milliseconds for accessing cache on a cache hit.
-    pub(crate) static LATENCY: LazyLock<HistogramVec> = LazyLock::new(|| {
-        register_histogram_vec!(
-            "cache_latency",
-            "Duration measured in milliseconds for accessing cache on a cache hit",
-            &METRIC_LABELS
-        )
-        .unwrap()
-    });
-
-    /// Total storage space in bytes currently using for RBAC caching.
-    pub(crate) static CACHE_SIZE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+    /// An estimated size of the persistent RBAC chains cache.
+    pub(crate) static PERSISTENT_CHAINS_CACHE_SIZE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
-            "cache_size",
-            "Total storage space in bytes currently using for RBAC caching",
-            &METRIC_LABELS
-        )
-        .unwrap()
-    });
-
-    /// Maximum storage space in bytes for RBAC caching.
-    pub(crate) static MAX_CACHE_SIZE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
-        register_int_gauge_vec!(
-            "cache_max_size",
-            "Maximum storage space in bytes for RBAC caching",
-            &METRIC_LABELS
-        )
-        .unwrap()
-    });
-
-    /// Total time in milliseconds taken to set up RBAC caching service to be operational.
-    pub(crate) static START_UP_TIME: LazyLock<IntGaugeVec> = LazyLock::new(|| {
-        register_int_gauge_vec!(
-            "cache_start_up_time",
-            "Total time in milliseconds taken to set up RBAC caching service to be operational",
-            &METRIC_LABELS
-        )
-        .unwrap()
-    });
-
-    /// Total number of RBAC registration chain entries being stored as cache.
-    pub(crate) static RBAC_CHAIN_ENTRIES: LazyLock<IntGaugeVec> = LazyLock::new(|| {
-        register_int_gauge_vec!(
-            "cache_rbac_chain_entries",
-            "Total number of RBAC registration chain entries being stored as cache",
+            "rbac_persistent_chains_cache_size",
+            "An estimated size of the persistent RBAC chains cache",
             &METRIC_LABELS
         )
         .unwrap()
