@@ -16,22 +16,20 @@ class SetupPanel extends StatefulWidget {
   State<SetupPanel> createState() => _SetupPanelState();
 }
 
-class _IdeascaleInfoCard extends StatelessWidget {
-  const _IdeascaleInfoCard();
+class _EmailInfoCard extends StatelessWidget {
+  const _EmailInfoCard();
 
   @override
   Widget build(BuildContext context) {
     return ActionCard(
-      key: const Key('IdeascaleInfoCard'),
+      key: const Key('EmailInfoCard'),
       icon: VoicesAssets.icons.mailOpen.buildIcon(),
-      title: Text(
-        context.l10n.createProfileHasIdeascaleAccountAlready,
-        key: const Key('InfoCardTitle'),
-      ),
       desc: BulletList(
         key: const Key('InfoCardDesc'),
         items: [
-          context.l10n.createProfileSetupIdeascaleReason1,
+          context.l10n.createProfileSetupEmailReason1,
+          context.l10n.createProfileSetupEmailReason2,
+          context.l10n.createProfileSetupEmailReason3,
         ],
         spacing: 0,
       ),
@@ -69,7 +67,7 @@ class _SetupPanelState extends State<SetupPanel> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _IdeascaleInfoCard(),
+          _EmailInfoCard(),
           SizedBox(height: 24),
           SetupPanelNavigation(),
         ],
