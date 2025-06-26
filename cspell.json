@@ -183,7 +183,7 @@
         "**/*.svg",
         "catalyst_voices/packages/libs/catalyst_key_derivation/lib/src/rust/**",
         "catalyst_voices/packages/internal/catalyst_voices_driver/lib/src/browser_extensions/**",
-        "catalyst_voices/licenses/**",-
+        "catalyst_voices/licenses/**",
         "catalyst-gateway/tests/api_tests/test_data/**",
     ],
     "enableFiletypes": [
