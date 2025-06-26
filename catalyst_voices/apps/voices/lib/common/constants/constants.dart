@@ -6,9 +6,12 @@ abstract class VoicesConstants {
 
   /// External urls
   static const supportedWalletsUrl = '$_docs/current-fund/voter-registration/supported-wallets';
-  static const tosUrl = '$_docs/current-fund/fund-basics/project-catalyst-terms-and-conditions';
+  static const tosUrl =
+      '$_docs/current-fund/fund-basics/project-catalyst-terms-and-conditions/project-catalyst-platform-terms-of-use';
+  static const conditionsUrl =
+      '$_docs/current-fund/fund-basics/project-catalyst-terms-and-conditions';
   static const privacyPolicyUrl =
-      '$_docs/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy';
+      '$_docs/current-fund/fund-basics/project-catalyst-terms-and-conditions/project-catalyst-platform-privacy-policy';
   static const supportUrl = 'https://catalystiog.zendesk.com/hc/en-us/requests/new';
   static const docsUrl = '$_docs/';
   static const beforeSubmissionUrl = '$_catalystApp/app-timeline#before-submission';
