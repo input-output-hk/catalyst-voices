@@ -11,11 +11,6 @@ export const browserExtensions: BrowserExtensionModel[] = [
     HomeUrl: "app.html#/setup",
   },
   {
-    Name: BrowserExtensionName.Typhon,
-    Id: "kfdniefadaanbjodldohaedphafoffoh",
-    HomeUrl: "tab.html#/wallet/access/",
-  },
-  {
     Name: BrowserExtensionName.Eternl,
     Id: "kmhcihpebfmpgmihbkipmjlmmioameka",
     HomeUrl: "index.html#/app/preprod/welcome",

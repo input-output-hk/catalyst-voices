@@ -6,7 +6,6 @@ export class BrowserExtensionModel {
 
 export enum BrowserExtensionName {
   Lace = "Lace",
-  Typhon = "Typhon",
   Eternl = "Eternl",
   Yoroi = "Yoroi",
   Nufi = "Nufi",

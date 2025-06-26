@@ -1,5 +1,6 @@
 import { AccountModel } from "../models/accountModel";
 
+/* cspell: disable */
 export const accountModels: AccountModel[] = [
   {
     id: "1",
@@ -11,6 +12,7 @@ export const accountModels: AccountModel[] = [
     seedPhrase: [],
   },
 ];
+/* cspell: enable */
 
 export const getAccountModel = (id: string): AccountModel => {
   const accountModel = accountModels.find(
