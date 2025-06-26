@@ -1,0 +1,17 @@
+{
+  "name": "e2e_tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {},
+  "keywords": [],
+  "author": "Catalyst Voices - QA Team",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.53.1",
+    "@types/node": "^24.0.4"
+  }
+}
