@@ -49,7 +49,7 @@ impl Display for AssetValue {
 
 impl AssetValue {
     /// Performs saturating addition.
-    pub(crate) fn saturating_add(&self, v: Self) -> Self {
+    pub(crate) fn saturating_add(&self, v: &Self) -> Self {
         self.0.checked_add(v.0).map_or_else(
             || {
                 tracing::error!("Asset value overflow: {self} + {v}",);
