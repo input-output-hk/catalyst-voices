@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/pages/registration/create_base_profile/stage/widgets/display_name_text_field.dart';
 import 'package:catalyst_voices/pages/registration/create_base_profile/stage/widgets/email_text_field.dart';
+import 'package:catalyst_voices/pages/registration/create_base_profile/stage/widgets/receive_emails_checkbox.dart';
 import 'package:catalyst_voices/pages/registration/create_base_profile/stage/widgets/setup_panel_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -58,6 +59,8 @@ class _SetupPanelState extends State<SetupPanel> {
               DisplayNameTextField(),
               SizedBox(height: 24),
               EmailTextField(),
+              SizedBox(height: 20),
+              ReceiveEmailsCheckbox(),
             ],
           ),
         ),
