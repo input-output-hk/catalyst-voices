@@ -1,12 +1,11 @@
+import 'package:catalyst_voices/pages/registration/create_base_profile/stage/widgets/display_name_text_field.dart';
+import 'package:catalyst_voices/pages/registration/create_base_profile/stage/widgets/email_text_field.dart';
+import 'package:catalyst_voices/pages/registration/create_base_profile/stage/widgets/setup_panel_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
-import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class SetupPanel extends StatefulWidget {
@@ -14,102 +13,6 @@ class SetupPanel extends StatefulWidget {
 
   @override
   State<SetupPanel> createState() => _SetupPanelState();
-}
-
-class _DisplayNameSelector extends StatelessWidget {
-  const _DisplayNameSelector();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBaseProfileSelector<Username>(
-      selector: (state) => state.username,
-      builder: (context, state) => _DisplayNameTextField(displayName: state),
-    );
-  }
-}
-
-class _DisplayNameTextField extends StatelessWidget {
-  final Username displayName;
-
-  const _DisplayNameTextField({
-    required this.displayName,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-
-    return VoicesUsernameTextField(
-      key: const Key('DisplayNameTextField'),
-      initialText: displayName.value,
-      onChanged: (value) {
-        RegistrationCubit.of(context).baseProfile.updateUsername(Username.dirty(value ?? ''));
-      },
-      onFieldSubmitted: null,
-      decoration: VoicesTextFieldDecoration(
-        labelText: l10n.createProfileSetupDisplayNameLabel.starred(),
-        hintText: l10n.createProfileSetupDisplayNameHint,
-        helperText: l10n.createProfileSetupDisplayNameHelper,
-        errorText: displayName.displayError?.message(context),
-      ),
-      maxLength: Username.lengthRange.max,
-    );
-  }
-}
-
-class _EmailSelector extends StatelessWidget {
-  const _EmailSelector();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBaseProfileSelector<Email>(
-      selector: (state) => state.email,
-      builder: (context, state) => _EmailTextField(email: state),
-    );
-  }
-}
-
-class _EmailTextField extends StatelessWidget {
-  final Email email;
-
-  const _EmailTextField({
-    required this.email,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-
-    return VoicesEmailTextField(
-      key: const Key('EmailTextField'),
-      initialText: email.value,
-      onChanged: (value) {
-        RegistrationCubit.of(context).baseProfile.updateEmail(Email.dirty(value ?? ''));
-      },
-      onFieldSubmitted: (value) {
-        final email = Email.dirty(value);
-        final cubit = RegistrationCubit.of(context);
-
-        cubit.baseProfile.updateEmail(email);
-
-        if (cubit.state.baseProfileStateData.isBaseProfileDataValid) {
-          cubit.nextStep();
-        }
-      },
-      textInputAction: TextInputAction.done,
-      decoration: VoicesTextFieldDecoration(
-        labelText: l10n.createProfileSetupEmailLabel.withSuffix(
-          l10n.optional,
-          space: true,
-          brackets: true,
-        ),
-        hintText: l10n.createProfileSetupEmailHint,
-        helperText: l10n.createProfileSetupEmailHelper,
-        errorText: email.displayError?.message(context),
-      ),
-      maxLength: Email.lengthRange.max,
-    );
-  }
 }
 
 class _IdeascaleInfoCard extends StatelessWidget {
@@ -136,33 +39,6 @@ class _IdeascaleInfoCard extends StatelessWidget {
   }
 }
 
-class _Navigation extends StatelessWidget {
-  final bool isNextEnabled;
-
-  const _Navigation({
-    required this.isNextEnabled,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return RegistrationBackNextNavigation(
-      isNextEnabled: isNextEnabled,
-    );
-  }
-}
-
-class _NavigationSelector extends StatelessWidget {
-  const _NavigationSelector();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBaseProfileSelector<bool>(
-      selector: (state) => state.isBaseProfileDataValid,
-      builder: (context, state) => _Navigation(isNextEnabled: state),
-    );
-  }
-}
-
 class _SetupPanelState extends State<SetupPanel> {
   late final ScrollController _scrollController;
 
@@ -179,9 +55,9 @@ class _SetupPanelState extends State<SetupPanel> {
             controller: _scrollController,
             padding: EdgeInsets.zero,
             children: const [
-              _DisplayNameSelector(),
+              DisplayNameTextField(),
               SizedBox(height: 24),
-              _EmailSelector(),
+              EmailTextField(),
             ],
           ),
         ),
@@ -192,7 +68,7 @@ class _SetupPanelState extends State<SetupPanel> {
         children: [
           _IdeascaleInfoCard(),
           SizedBox(height: 24),
-          _NavigationSelector(),
+          SetupPanelNavigation(),
         ],
       ),
     );

@@ -829,11 +829,15 @@
   "@createProfileSetupEmailLabel": {
     "description": "Label for the email input"
   },
+  "createProfileSetupEmailSubLabel": "Optional except for proposers or reviewers",
+  "@createProfileSetupEmailSubLabel": {
+    "description": "Sub label for the email input"
+  },
   "createProfileSetupEmailHint": "E-mail",
   "@createProfileSetupEmailHint": {
     "description": "Hint for the email input"
   },
-  "createProfileSetupEmailHelper": "You must provide your e-mail if you want to become a proposer or a reviewer.",
+  "createProfileSetupEmailHelper": "Please provide your e-mail address.",
   "@createProfileSetupEmailHelper": {
     "description": "Helper text for the email input"
   },
