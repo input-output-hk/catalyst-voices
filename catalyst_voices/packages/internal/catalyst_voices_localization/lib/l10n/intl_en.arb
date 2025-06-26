@@ -1622,6 +1622,10 @@
   "weekOf": "Week of",
   "errorDisplayNameValidationEmpty": "Display name can not be empty",
   "errorDisplayNameValidationOutOfRange": "Invalid length",
+  "headsUp": "Heads up",
+  "@headsUp": {
+    "description": "In context for important information below"
+  },
   "shareNewDraft": "Share new draft",
   "@shareNewDraft": {
     "description": "In context of sharing proposal for public feedback."
