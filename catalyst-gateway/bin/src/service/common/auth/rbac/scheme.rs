@@ -4,11 +4,12 @@ use std::{env, error::Error, time::Duration};
 use catalyst_types::catalyst_id::role_index::RoleId;
 use poem::{error::ResponseError, http::StatusCode, IntoResponse, Request};
 use poem_openapi::{auth::Bearer, SecurityScheme};
-use tracing::debug;
+use tracing::{debug, error};
 
 use super::token::CatalystRBACTokenV1;
 use crate::{
-    rbac_cache::RBAC_CACHE,
+    db::index::session::CassandraSessionError,
+    rbac::latest_rbac_chain,
     service::common::{
         auth::api_key::check_api_key,
         responses::{ErrorResponses, WithErrorResponses},
@@ -62,6 +63,9 @@ impl ResponseError for ServiceUnavailableError {
 /// Authentication token error.
 #[derive(Debug, thiserror::Error)]
 enum AuthTokenError {
+    /// Registration chain cannot be built.
+    #[error("Unable to build registration chain, err: {0}")]
+    BuildRegChain(String),
     /// RBAC token cannot be parsed.
     #[error("Fail to parse RBAC token string, err: {0}")]
     ParseRbacToken(String),
@@ -115,7 +119,6 @@ const MAX_TOKEN_SKEW: Duration = Duration::from_secs(5 * 60); // 5 minutes
 /// is valid. The performed validation is described [here].
 ///
 /// [here]: https://github.com/input-output-hk/catalyst-voices/blob/main/docs/src/catalyst-standards/permissionless-auth/auth-header.md#backend-processing-of-the-token
-#[allow(clippy::unused_async)]
 async fn checker_api_catalyst_auth(
     req: &Request, bearer: Bearer,
 ) -> poem::Result<CatalystRBACTokenV1> {
@@ -134,17 +137,22 @@ async fn checker_api_catalyst_auth(
     };
 
     // Step 6: get the registration chain
-    // Get the registration from the volatile first, if not found, try persistent.
-    let reg_chain = RBAC_CACHE
-        .get(token.catalyst_id(), false)
-        .or_else(|| RBAC_CACHE.get(token.catalyst_id(), true));
-
-    let Some(reg_chain) = reg_chain else {
-        debug!(
-            "Unable to find registrations for {} Catalyst ID",
-            token.catalyst_id()
-        );
-        return Err(AuthTokenError::RegistrationNotFound.into());
+    let reg_chain = match latest_rbac_chain(token.catalyst_id()).await {
+        Ok(Some(c)) => c,
+        Ok(None) => {
+            debug!(
+                "Unable to find registrations for {} Catalyst ID",
+                token.catalyst_id()
+            );
+            return Err(AuthTokenError::RegistrationNotFound.into());
+        },
+        Err(e) if e.is::<CassandraSessionError>() => return Err(ServiceUnavailableError(e).into()),
+        Err(e) => {
+            // This should never happen normally because we validate RBAC registration transactions
+            // before adding them to the database.
+            error!("Unable to build a registration chain Catalyst ID: {e:?}");
+            return Err(AuthTokenError::BuildRegChain(e.to_string()).into());
+        },
     };
 
     // Step 7: Verify that the nonce is in the acceptable range.
