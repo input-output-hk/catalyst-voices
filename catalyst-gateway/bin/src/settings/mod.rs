@@ -21,6 +21,7 @@ use crate::{
     utils::blake2b_hash::generate_uuid_string_from_data,
 };
 
+pub(crate) mod cardano_assets_cache;
 pub(crate) mod cassandra_db;
 pub(crate) mod chain_follower;
 pub(crate) mod event_db;
