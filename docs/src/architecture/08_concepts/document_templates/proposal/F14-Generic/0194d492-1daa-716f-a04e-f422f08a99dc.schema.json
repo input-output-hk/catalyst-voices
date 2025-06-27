@@ -523,7 +523,7 @@
                             "title": "Who you’re targeting, how you’ll reach them, and why this matters for Cardano.",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your rationale for your target market.",
-                            "x-guidance": "- Number of new wallets created or ADA transactions initiated.\n- Growth in local/regional community participation.\n- Collaborations formed with local organizations, schools, or groups.",
+                            "x-guidance": "Grassroots Growth & Onboarding\n\n- Number of new wallets created or ADA transactions initiated.\n- Growth in local/regional community participation.\n- Collaborations formed with local organizations, schools, or groups.",
                             "minLength": 200,
                             "maxLength": 600
                         },
@@ -532,7 +532,7 @@
                             "title": "Provide a list of key activities of your project?",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your rationale for your key activities.",
-                            "x-guidance": "- Number of educational sessions, workshops, or webinars held.\n- Total number of participants reached or trained, and retention rates.\n- Increase in Cardano-related knowledge (measured via pre/post surveys or quizzes).",
+                            "x-guidance": "Education & Awareness\n\n- Number of educational sessions, workshops, or webinars held.\n- Total number of participants reached or trained, and retention rates.\n- Increase in Cardano-related knowledge (measured via pre/post surveys or quizzes).",
                             "minLength": 200,
                             "maxLength": 600
                         },
@@ -541,7 +541,7 @@
                             "title": "What are your success metrics?",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your rationale for your success metrics.",
-                            "x-guidance": "- Number of new community groups or meetups formed.\n- Number of events or meetups organized.\n- Event attendance and retention rates (in-person or online).\n- Participant feedback scores or testimonials.\n- Social media growth (followers, engagement rates).\n- Mailing list or community channel sign-ups.",
+                            "x-guidance": "Community Engagement\n\n- Number of new community groups or meetups formed.\n- Number of events or meetups organized.\n- Event attendance and retention rates (in-person or online).\n- Participant feedback scores or testimonials.\n- Social media growth (followers, engagement rates).\n- Mailing list or community channel sign-ups.",
                             "minLength": 200,
                             "maxLength": 600
                         }

@@ -523,7 +523,7 @@
                             "title": "Describe your established collaborations.",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your rationale for your established collaborations.",
-                            "x-guidance": "- Clearly identify the collaborators and describe their role in your project.\n- Describe the nature of the collaboration and, where applicable, include links to public materials (e.g., press releases, public endorsements).\n- If confidential, contact the Catalyst team.",
+                            "x-guidance": "Established collaborations\n\n- Clearly identify the collaborators and describe their role in your project.\n- Describe the nature of the collaboration and, where applicable, include links to public materials (e.g., press releases, public endorsements).\n- If confidential, contact the Catalyst team.",
                             "minLength": 200,
                             "maxLength": 600
                         },
@@ -532,7 +532,7 @@
                             "title": "Describe funding commitments.",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your rationale for your funding commitments.",
-                            "x-guidance": "- Clearly state contributors, including the nature and amount.\n- If confidential, contact the Catalyst team.",
+                            "x-guidance": "Collaborator funding commitments\n\n- Clearly state contributors, including the nature and amount.\n- If confidential, contact the Catalyst team.",
                             "minLength": 200,
                             "maxLength": 600
                         },
@@ -541,7 +541,7 @@
                             "title": "Describe your key performance metrics.",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your rationale for your key performance metrics.",
-                            "x-guidance": "- For instance, data (user numbers, transactions, traffic, adoption rates), screenshots of dashboards or live analytics.\n- Contextualize why your KPIs matter for your project goals.",
+                            "x-guidance": "Key Performance Metrics (KPIs)\n\n- For instance, data (user numbers, transactions, traffic, adoption rates), screenshots of dashboards or live analytics.\n- Contextualize why your KPIs matter for your project goals.",
                             "minLength": 200,
                             "maxLength": 600
                         }

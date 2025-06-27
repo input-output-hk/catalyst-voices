@@ -523,7 +523,7 @@
                             "title": "Describe what makes your idea innovative compared to what has been previously funded (whether by you or others).",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your rationale for your innovative idea.",
-                            "x-guidance": "- Clearly state how your idea is new to Cardano.\n- Highlight what innovation or unique approach your idea brings.\n- Avoid rehashing funded work without clear improvements.",
+                            "x-guidance": "Propose Innovative Ideas\n\n- Clearly state how your idea is new to Cardano.\n- Highlight what innovation or unique approach your idea brings.\n- Avoid rehashing funded work without clear improvements.",
                             "minLength": 200,
                             "maxLength": 600
                         },
@@ -532,7 +532,7 @@
                             "title": "Describe what your prototype or MVP will demonstrate, and where it can be accessed.",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your rationale for your prototype or MVP.",
-                            "x-guidance": "- Make sure your prototype or MVP is deployed or testable on-chain by the end of project phase.\n- Consider how the community could help test your prototype or MVP.",
+                            "x-guidance": "On-Chain Prototype or MVP\n\n- Make sure your prototype or MVP is deployed or testable on-chain by the end of project phase.\n- Consider how the community could help test your prototype or MVP.",
                             "minLength": 200,
                             "maxLength": 600
                         },
@@ -541,7 +541,7 @@
                             "title": "Describe realistic measures of success, ideally with on-chain metrics.",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your rationale for realistic measures of success.",
-                            "x-guidance": "- Estimate how many users, transactions, or smart contract calls your project expects.\n- Tie projections to Cardano network metrics or similar use cases.\n- Avoid inflated claims—keep it data-based and credible.",
+                            "x-guidance": "Blockchain usage projections\n\n- Estimate how many users, transactions, or smart contract calls your project expects.\n- Tie projections to Cardano network metrics or similar use cases.\n- Avoid inflated claims—keep it data-based and credible.",
                             "minLength": 200,
                             "maxLength": 600
                         }

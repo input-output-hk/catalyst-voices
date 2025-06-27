@@ -523,7 +523,7 @@
                             "title": "Mention your open-source License and describe your open-source license rationale.",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your open-source license rationale.",
-                            "x-guidance": "- For instance, any recognized open-source license (MIT, Apache 2.0, GPL or other).\n- Explain why this license fits your project goals (e.g. broad use, contribution rules, commercial compatibility).\n- Avoid vague terms like “custom license” without justification.",
+                            "x-guidance": "Open source license and reasons\n\n- For instance, any recognized open-source license (MIT, Apache 2.0, GPL or other).\n- Explain why this license fits your project goals (e.g. broad use, contribution rules, commercial compatibility).\n- Avoid vague terms like “custom license” without justification.",
                             "minLength": 200,
                             "maxLength": 600
                         },
@@ -532,7 +532,7 @@
                             "title": "How do you make sure your source code is accessible to the public from project start, and people are informed?",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your rationale for how you make sure your source code is accessible to the public from project start, and people are informed.",
-                            "x-guidance": "- Share a public repository link (e.g. GitHub, GitLab) early.\n- Use version control and quality commits regularly.\n- Set clear expectations on progression and communication.",
+                            "x-guidance": "Public Source Code Access\n\n- Share a public repository link (e.g. GitHub, GitLab) early.\n- Use version control and quality commits regularly.\n- Set clear expectations on progression and communication.",
                             "minLength": 200,
                             "maxLength": 600
                         },
@@ -541,7 +541,7 @@
                             "title": "How will you provide high quality documentation?",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your quality documentation.",
-                            "x-guidance": "- User and developer documentation (README, setup guide, API docs).\n- Use clear structure, visuals, and examples.\n- Mention tools or standards (e.g. Docusaurus, Markdown, OpenAPI).",
+                            "x-guidance": "High-Quality Documentation\n\n- User and developer documentation (README, setup guide, API docs).\n- Use clear structure, visuals, and examples.\n- Mention tools or standards (e.g. Docusaurus, Markdown, OpenAPI).",
                             "minLength": 200,
                             "maxLength": 600
                         }
