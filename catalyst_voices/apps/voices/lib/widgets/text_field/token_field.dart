@@ -115,7 +115,7 @@ class _Helper extends StatelessWidget {
 
     if (min != null && max != null) {
       return PlaceholderRichText(
-        context.l10n.requestedAmountShouldBeBetweenMinAndMax,
+        context.l10n.requestedAmountShouldBeBetweenMinAndMax('{min}', '{max}'),
         placeholderSpanBuilder: (context, placeholder) {
           return switch (placeholder) {
             'min' => TextSpan(text: currency.format(min), style: boldStyle),
@@ -129,7 +129,7 @@ class _Helper extends StatelessWidget {
 
     if (min != null) {
       return PlaceholderRichText(
-        context.l10n.requestedAmountShouldBeMoreThan,
+        context.l10n.requestedAmountShouldBeMoreThan('{min}'),
         placeholderSpanBuilder: (context, placeholder) {
           return switch (placeholder) {
             'min' => TextSpan(text: currency.format(min), style: boldStyle),
@@ -141,7 +141,7 @@ class _Helper extends StatelessWidget {
 
     if (max != null) {
       return PlaceholderRichText(
-        context.l10n.requestedAmountShouldBeLessThan,
+        context.l10n.requestedAmountShouldBeLessThan('{max}'),
         placeholderSpanBuilder: (context, placeholder) {
           return switch (placeholder) {
             'max' => TextSpan(text: currency.format(max), style: boldStyle),

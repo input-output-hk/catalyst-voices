@@ -42,7 +42,7 @@ class _EmailNeedVerificationProposerBannerState extends State<EmailNeedVerificat
                   pStyle: context.textTheme.labelLarge,
                 ),
                 PlaceholderRichText(
-                  context.l10n.goToMyAccountForEmailVerification.withPrefix('- '),
+                  context.l10n.goToMyAccountForEmailVerification('{destination}').withPrefix('- '),
                   placeholderSpanBuilder: (context, placeholder) {
                     return switch (placeholder) {
                       'destination' => TextSpan(
