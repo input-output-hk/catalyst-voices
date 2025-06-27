@@ -9,7 +9,6 @@ use tokio::sync::OnceCell;
 
 use super::session::CassandraSession;
 
-mod rbac_index;
 mod scylla_purge;
 mod scylla_queries;
 mod scylla_session;

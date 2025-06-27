@@ -6,6 +6,7 @@ pub(crate) mod chain_follower;
 pub(crate) mod chain_indexer;
 pub(crate) mod endpoint;
 pub(crate) mod memory;
+pub(crate) mod rbac_cache;
 
 /// Initialize Prometheus metrics.
 ///
@@ -21,4 +22,5 @@ pub(crate) fn init_prometheus() -> Registry {
 pub(crate) fn metrics_updater_fn() {
     chain_follower::update();
     memory::update();
+    rbac_cache::update();
 }
