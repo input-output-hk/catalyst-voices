@@ -12,8 +12,8 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
               ? const BaseProfileStateData(
                   email: Email.dirty('dev@iokh.com'),
                   username: Username.dirty('Dev'),
-                  isToSAccepted: true,
-                  isPrivacyPolicyAccepted: true,
+                  conditionsAccepted: true,
+                  tosAndPrivacyPolicyAccepted: true,
                 )
               : const BaseProfileStateData(),
         );
@@ -26,22 +26,22 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
   }
 
   @override
+  void updateConditions({
+    required bool accepted,
+  }) {
+    emit(state.copyWith(conditionsAccepted: accepted));
+  }
+
+  @override
   void updateEmail(Email value) {
     emit(state.copyWith(email: value));
   }
 
   @override
-  void updatePrivacyPolicy({
-    required bool isAccepted,
+  void updateTosAndPrivacyPolicy({
+    required bool accepted,
   }) {
-    emit(state.copyWith(isPrivacyPolicyAccepted: isAccepted));
-  }
-
-  @override
-  void updateToS({
-    required bool isAccepted,
-  }) {
-    emit(state.copyWith(isToSAccepted: isAccepted));
+    emit(state.copyWith(tosAndPrivacyPolicyAccepted: accepted));
   }
 
   @override
@@ -51,11 +51,11 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
 }
 
 abstract interface class BaseProfileManager {
+  void updateConditions({required bool accepted});
+
   void updateEmail(Email value);
 
-  void updatePrivacyPolicy({required bool isAccepted});
-
-  void updateToS({required bool isAccepted});
+  void updateTosAndPrivacyPolicy({required bool accepted});
 
   void updateUsername(Username value);
 }

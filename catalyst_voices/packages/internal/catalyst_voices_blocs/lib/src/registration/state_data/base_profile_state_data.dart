@@ -4,17 +4,17 @@ import 'package:equatable/equatable.dart';
 final class BaseProfileStateData extends Equatable {
   final Email email;
   final Username username;
-  final bool isToSAccepted;
-  final bool isPrivacyPolicyAccepted;
+  final bool conditionsAccepted;
+  final bool tosAndPrivacyPolicyAccepted;
 
   const BaseProfileStateData({
     this.email = const Email.pure(),
     this.username = const Username.pure(),
-    this.isToSAccepted = false,
-    this.isPrivacyPolicyAccepted = false,
+    this.conditionsAccepted = false,
+    this.tosAndPrivacyPolicyAccepted = false,
   });
 
-  bool get arAcknowledgementsAccepted => isToSAccepted && isPrivacyPolicyAccepted;
+  bool get arAcknowledgementsAccepted => conditionsAccepted && tosAndPrivacyPolicyAccepted;
 
   bool get isBaseProfileDataValid => email.isValid && username.isValid;
 
@@ -24,21 +24,21 @@ final class BaseProfileStateData extends Equatable {
   List<Object?> get props => [
         email,
         username,
-        isToSAccepted,
-        isPrivacyPolicyAccepted,
+        conditionsAccepted,
+        tosAndPrivacyPolicyAccepted,
       ];
 
   BaseProfileStateData copyWith({
     Email? email,
     Username? username,
-    bool? isToSAccepted,
-    bool? isPrivacyPolicyAccepted,
+    bool? conditionsAccepted,
+    bool? tosAndPrivacyPolicyAccepted,
   }) {
     return BaseProfileStateData(
       email: email ?? this.email,
       username: username ?? this.username,
-      isToSAccepted: isToSAccepted ?? this.isToSAccepted,
-      isPrivacyPolicyAccepted: isPrivacyPolicyAccepted ?? this.isPrivacyPolicyAccepted,
+      conditionsAccepted: conditionsAccepted ?? this.conditionsAccepted,
+      tosAndPrivacyPolicyAccepted: tosAndPrivacyPolicyAccepted ?? this.tosAndPrivacyPolicyAccepted,
     );
   }
 }
