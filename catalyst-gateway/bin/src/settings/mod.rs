@@ -126,6 +126,9 @@ struct EnvVars {
     /// The Catalyst Signed Documents configuration
     signed_doc: signed_doc::EnvVars,
 
+    /// The Cardano assets caches configuration
+    cardano_assets_cache: cardano_assets_cache::EnvVars,
+
     /// Internal API Access API Key
     internal_api_key: Option<StringEnvVar>,
 
@@ -198,6 +201,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         chain_follower: chain_follower::EnvVars::new(),
         event_db: event_db::EnvVars::new(),
         signed_doc: signed_doc::EnvVars::new(),
+        cardano_assets_cache: cardano_assets_cache::EnvVars::new(),
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
         check_config_tick: StringEnvVar::new_as_duration(
             "CHECK_CONFIG_TICK",
@@ -315,6 +319,11 @@ impl Settings {
     /// Get the configuration of the Catalyst Signed Documents.
     pub(crate) fn signed_doc_cfg() -> signed_doc::EnvVars {
         ENV_VARS.signed_doc.clone()
+    }
+
+    /// Get the configuration of the Cardano assets cache.
+    pub(crate) fn cardano_assets_cache() -> cardano_assets_cache::EnvVars {
+        ENV_VARS.cardano_assets_cache.clone()
     }
 
     /// Chain Follower network (The Blockchain network we are configured to use).

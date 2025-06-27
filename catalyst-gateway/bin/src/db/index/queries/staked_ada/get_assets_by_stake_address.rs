@@ -1,24 +1,35 @@
 //! Get assets by stake address.
-use std::sync::Arc;
+use std::sync::{Arc, LazyLock};
 
 use cardano_blockchain_types::StakeAddress;
-use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
-    SerializeRow, Session,
-};
+use futures::TryStreamExt;
+use scylla::{prepared_statement::PreparedStatement, DeserializeRow, SerializeRow, Session};
 use tracing::error;
 
-use crate::db::{
-    index::{
-        queries::{PreparedQueries, PreparedSelectQuery},
-        session::CassandraSession,
+use crate::{
+    db::{
+        index::{
+            queries::{PreparedQueries, PreparedSelectQuery},
+            session::CassandraSession,
+        },
+        types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
     },
-    types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
+    settings::Settings,
 };
 
 /// Get assets by stake address query string.
 const GET_ASSETS_BY_STAKE_ADDRESS_QUERY: &str =
     include_str!("../cql/get_assets_by_stake_address.cql");
+
+/// In memory cache of the Cardano native assets data
+static ASSETS_CACHE: LazyLock<
+    moka::future::Cache<DbStakeAddress, Vec<GetAssetsByStakeAddressQuery>>,
+> = LazyLock::new(|| {
+    moka::future::Cache::builder()
+        .name("Cardano native assets cache")
+        .max_capacity(Settings::cardano_assets_cache().native_assets_cache_size())
+        .build()
+});
 
 /// Get assets by stake address query parameters.
 #[derive(SerializeRow)]
@@ -37,7 +48,7 @@ impl GetAssetsByStakeAddressParams {
 }
 
 /// Get native assets query.
-#[derive(DeserializeRow)]
+#[derive(DeserializeRow, Clone)]
 pub(crate) struct GetAssetsByStakeAddressQuery {
     /// TXO transaction index within the slot.
     pub txn_index: DbTxnIndex,
@@ -70,12 +81,29 @@ impl GetAssetsByStakeAddressQuery {
     /// Executes a get assets by stake address query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetAssetsByStakeAddressParams,
-    ) -> anyhow::Result<TypedRowStream<GetAssetsByStakeAddressQuery>> {
-        let iter = session
-            .execute_iter(PreparedSelectQuery::AssetsByStakeAddress, params)
-            .await?
-            .rows_stream::<GetAssetsByStakeAddressQuery>()?;
+    ) -> anyhow::Result<Vec<GetAssetsByStakeAddressQuery>> {
+        if session.is_persistent() {
+            if let Some(res) = ASSETS_CACHE.get(&params.stake_address).await {
+                return Ok(res);
+            }
+        }
 
-        Ok(iter)
+        let res = session
+            .execute_iter(PreparedSelectQuery::AssetsByStakeAddress, &params)
+            .await?
+            .rows_stream::<GetAssetsByStakeAddressQuery>()?
+            .map_err(Into::<anyhow::Error>::into)
+            .try_fold(Vec::new(), |mut res: Vec<_>, item| {
+                async move {
+                    res.push(item);
+                    Ok(res)
+                }
+            })
+            .await?;
+        // update cache
+        if session.is_persistent() {
+            ASSETS_CACHE.insert(params.stake_address, res.clone()).await;
+        }
+        Ok(res)
     }
 }

@@ -39,10 +39,11 @@ async fn test_get_assets_by_stake_addr() {
         GetAssetsByStakeAddressParams::new(stake_address_1()),
     )
     .await
-    .unwrap();
+    .unwrap()
+    .into_iter();
 
-    while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
+    while let Some(row_res) = row_stream.next() {
+        drop(row_res);
     }
 }
 

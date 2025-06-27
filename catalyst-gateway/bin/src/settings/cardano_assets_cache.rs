@@ -1,7 +1,5 @@
 //! Environment variable settings for the Cardano assets in memory cache
 
-#![allow(dead_code)]
-
 use crate::settings::str_env_var::StringEnvVar;
 
 /// Default value for the Cardano UTXO cache size (disabled cache)
@@ -33,10 +31,21 @@ impl EnvVars {
             ),
             native_assets_cache_size: StringEnvVar::new_as_int(
                 "CARDANO_NATIVE_ASSETS_CACHE_SIZE",
-                DEFAULT_CARDANO_UTXO_CACHE_SIZE,
+                DEFAULT_CARDANO_NATIVE_ASSETS_CACHE_SIZE,
                 0,
                 u64::MAX,
             ),
         }
+    }
+
+    /// Returns the maximum size of the Cardano UTXO cache
+    #[allow(dead_code)]
+    pub(crate) fn utxo_cache_size(&self) -> u64 {
+        self.utxo_cache_size
+    }
+
+    /// Returns the maximum size of the Cardano native asset cache
+    pub(crate) fn native_assets_cache_size(&self) -> u64 {
+        self.native_assets_cache_size
     }
 }

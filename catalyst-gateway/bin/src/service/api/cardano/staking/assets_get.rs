@@ -232,31 +232,31 @@ async fn get_txo_assets(
     )
     .await?;
 
-    let tokens_map = assets_txos_stream
-        .map_err(Into::<anyhow::Error>::into)
-        .try_fold(HashMap::new(), |mut tokens_map: TxoAssetsMap, row| {
-            async move {
-                let key = (row.slot_no.into(), row.txn_index.into(), row.txo.into());
-                match tokens_map.entry(key) {
-                    std::collections::hash_map::Entry::Occupied(mut o) => {
-                        o.get_mut().push(TxoAssetInfo {
-                            id: row.policy_id,
-                            name: row.asset_name.into(),
-                            amount: row.value,
-                        });
-                    },
-                    std::collections::hash_map::Entry::Vacant(v) => {
-                        v.insert(vec![TxoAssetInfo {
-                            id: row.policy_id,
-                            name: row.asset_name.into(),
-                            amount: row.value,
-                        }]);
-                    },
+    let tokens_map =
+        assets_txos_stream
+            .into_iter()
+            .fold(HashMap::new(), |mut tokens_map: TxoAssetsMap, row| {
+                {
+                    let key = (row.slot_no.into(), row.txn_index.into(), row.txo.into());
+                    match tokens_map.entry(key) {
+                        std::collections::hash_map::Entry::Occupied(mut o) => {
+                            o.get_mut().push(TxoAssetInfo {
+                                id: row.policy_id,
+                                name: row.asset_name.into(),
+                                amount: row.value,
+                            });
+                        },
+                        std::collections::hash_map::Entry::Vacant(v) => {
+                            v.insert(vec![TxoAssetInfo {
+                                id: row.policy_id,
+                                name: row.asset_name.into(),
+                                amount: row.value,
+                            }]);
+                        },
+                    }
+                    tokens_map
                 }
-                Ok(tokens_map)
-            }
-        })
-        .await?;
+            });
     Ok(tokens_map)
 }
 
