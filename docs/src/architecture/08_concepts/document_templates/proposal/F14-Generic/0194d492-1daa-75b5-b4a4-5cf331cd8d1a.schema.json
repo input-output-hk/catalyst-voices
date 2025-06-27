@@ -528,7 +528,7 @@
                             "title": "Describe funding commitments.",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your rationale for your funding commitments.",
-                            "x-guidance": "- For instance, financial or in-kind contributions (time, resources, services).\n- Clearly state contributors, the kind of contribution, the amount,  and how it will be managed.\n- Avoid general claims without named partners.",
+                            "x-guidance": "- Clearly state contributors, including the nature and amount.\n- If confidential, contact the Catalyst team.",
                             "minLength": 200,
                             "maxLength": 600
                         },
