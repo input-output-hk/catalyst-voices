@@ -138,7 +138,7 @@ async fn checker_api_catalyst_auth(
 
     // Step 6: get the registration chain
     let reg_chain = match latest_rbac_chain(token.catalyst_id()).await {
-        Ok(Some(c)) => c,
+        Ok(Some(c)) => c.chain,
         Ok(None) => {
             debug!(
                 "Unable to find registrations for {} Catalyst ID",
