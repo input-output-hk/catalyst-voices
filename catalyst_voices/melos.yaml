@@ -349,3 +349,15 @@ scripts:
       The test reports are saved in /test_reports folder.
       The coverages are saved in coverage/lcov.info file for each tested package.
       The combined coverage is saved in the /coverage/lcov.coverage.info file.
+
+  l10n-check:
+    run: |
+      cd packages/internal/catalyst_voices_localization && dart lib/src/manage_l10n.dart --check
+    description: |
+      Check for unused translation keys in .arb files without modifying them, and check if translation keys are sorted.
+
+  l10n-clean:
+    run: |
+      cd packages/internal/catalyst_voices_localization && dart lib/src/manage_l10n.dart --clean --sort
+    description: |
+      Clean up unused translation keys and sort them alphabetically in .arb files.
