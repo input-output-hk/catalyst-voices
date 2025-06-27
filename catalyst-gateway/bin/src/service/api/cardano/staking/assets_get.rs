@@ -112,7 +112,6 @@ async fn build_full_stake_info_response(
     let persistent_txo_state = calculate_assets_state(
         persistent_session,
         stake_address.clone(),
-        adjusted_slot_num,
         TxoAssetsState::default(),
     )
     .await?;
@@ -120,7 +119,6 @@ async fn build_full_stake_info_response(
     let volatile_txo_state = calculate_assets_state(
         volatile_session,
         stake_address.clone(),
-        adjusted_slot_num,
         persistent_txo_state.clone(),
     )
     .await?;
@@ -143,14 +141,14 @@ async fn build_full_stake_info_response(
 /// This function also updates the spent column if it detects that a TXO was spent
 /// between lookups.
 async fn calculate_assets_state(
-    session: Arc<CassandraSession>, stake_address: Cip19StakeAddress, slot_num: SlotNo,
+    session: Arc<CassandraSession>, stake_address: Cip19StakeAddress,
     mut txo_base_state: TxoAssetsState,
 ) -> anyhow::Result<TxoAssetsState> {
     let address: StakeAddress = stake_address.try_into()?;
 
     let (mut txos, txo_assets) = futures::try_join!(
         get_txo(&session, &address),
-        get_txo_assets(&session, &address, slot_num)
+        get_txo_assets(&session, &address)
     )?;
 
     let params = update_spent(&session, &address, &mut txo_base_state.txos, &mut txos).await?;
@@ -226,11 +224,11 @@ impl TxoAssetsState {
 
 /// Returns a map of txo asset infos for the given stake address.
 async fn get_txo_assets(
-    session: &CassandraSession, stake_address: &StakeAddress, slot_num: SlotNo,
+    session: &CassandraSession, stake_address: &StakeAddress,
 ) -> anyhow::Result<TxoAssetsMap> {
     let assets_txos_stream = GetAssetsByStakeAddressQuery::execute(
         session,
-        GetAssetsByStakeAddressParams::new(stake_address.clone(), slot_num.into()),
+        GetAssetsByStakeAddressParams::new(stake_address.clone()),
     )
     .await?;
 
