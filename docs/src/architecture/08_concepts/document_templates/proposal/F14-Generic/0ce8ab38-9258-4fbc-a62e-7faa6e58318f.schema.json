@@ -5,6 +5,10 @@
     "description": "Schema for the F14 Catalyst Proposal Submission Form",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
+        "2025-06-27": [
+            "Legal wording changes.",
+            "Removed coproposers property."
+        ],
         "2025-06-18": [
             "Added maximum constraint for milestone cost."
         ],
