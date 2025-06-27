@@ -3,6 +3,10 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
 
+/// Exception thrown when an API request fails with an error response, with localization support.
+///
+/// This exception is used to indicate that the application was unable to process an API request
+/// and provides a localized error message based on [statusCode].
 final class ErrorResponseException extends LocalizedApiException {
   final int statusCode;
   final Object? error;
@@ -27,6 +31,9 @@ final class ErrorResponseException extends LocalizedApiException {
   }
 }
 
+/// Base class for localized API exceptions.
+///
+/// Class depending on [ApiException] returns a specific [LocalizedApiException].
 sealed class LocalizedApiException extends LocalizedException {
   const LocalizedApiException();
 
@@ -41,6 +48,10 @@ sealed class LocalizedApiException extends LocalizedException {
   }
 }
 
+/// Exception thrown when an API request fails with a malformed body, with localization support.
+///
+/// This exception is used to indicate that the application was unable to process an API request
+/// and provides a localized error message for display in the UI.
 final class MalformedBodyApiException extends LocalizedApiException {
   const MalformedBodyApiException();
 
@@ -50,6 +61,10 @@ final class MalformedBodyApiException extends LocalizedApiException {
   }
 }
 
+/// Exception thrown when an API request fails with an unknown error, with localization support.
+///
+/// This exception is used to indicate that the application was unable to process an API request
+/// and provides a localized error message for display in the UI.
 final class UnknownApiException extends LocalizedApiException {
   const UnknownApiException();
 

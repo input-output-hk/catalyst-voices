@@ -2,6 +2,10 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
+/// Represents the current session account.
+///
+/// This class is used to store information about the current session account,
+/// including the catalyst id, admin status, proposer status, and drep status.
 final class SessionAccount extends Equatable {
   final CatalystId? catalystId;
   final bool isAdmin;

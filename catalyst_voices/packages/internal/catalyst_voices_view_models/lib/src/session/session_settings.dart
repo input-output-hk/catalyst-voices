@@ -1,6 +1,10 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
+/// Represents the current session settings.
+///
+/// This class is used to store information about the current session settings,
+/// including the timezone, theme, and show submission closing warning.
 final class SessionSettings extends Equatable {
   static const _defaultTimezone = TimezonePreferences.local;
   static const _defaultTheme = ThemePreferences.light;

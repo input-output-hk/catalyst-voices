@@ -3,6 +3,10 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 
+/// Single item representing proposal order in a dropdown menu
+///
+/// This is used in the proposals list to allow users to sort proposals
+/// by different criteria, which are determined by the [ProposalsOrder] enum.
 final class ProposalsDropdownOrderItem extends Equatable {
   final ProposalsOrder value;
   final bool isSelected;
