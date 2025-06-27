@@ -6,15 +6,7 @@
         },
         "proposer": {
             "applicant": "John Smith",
-            "type": "Individual",
-            "coproposers": [
-                {
-                    "name": "Jane Doe"
-                },
-                {
-                    "name": "Bob Wilson"
-                }
-            ]
+            "type": "Individual"
         }
     },
     "summary": {
