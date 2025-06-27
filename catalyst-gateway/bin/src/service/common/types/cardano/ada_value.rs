@@ -48,10 +48,13 @@ impl Display for AdaValue {
 impl AdaValue {
     /// Performs saturating addition.
     pub(crate) fn saturating_add(self, v: Self) -> Self {
-        self.0
-            .checked_add(v.0)
-            .inspect(|_| tracing::error!("Ada value overflow: {self} + {v}",))
-            .map_or(Self(u64::MAX), Self)
+        self.0.checked_add(v.0).map_or_else(
+            || {
+                tracing::error!("Ada value overflow: {self} + {v}",);
+                Self(u64::MAX)
+            },
+            Self,
+        )
     }
 }
 
