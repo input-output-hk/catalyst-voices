@@ -478,7 +478,7 @@
                             "description": "Provide the license type and any additional context regarding the open-source status of your project. If partially open source, specify which parts are open source.",
                             "x-placeholder": "Describe the open source status of your project and the license type",
                             "maxLength": 500,
-                            "x-guidance": "Open-source software is software whose source code is publicly accessible and licensed in a way that allows anyone to use, modify, and share it freely, typically under licenses approved by the Open Source Initiative.\n\nProprietary software source code is not publicly available and the rights to use, modify, or redistribute proprietary software are restricted and typically reserved by the software's owner.\n\nhttps://opensource.org/licenses"
+                            "x-guidance": "Open source licenses ensure intellectual property (IP) (such as source code) remains publicly accessible and licensed in a way that allows anyone to use, modify, and share the IP freely, typically under licenses approved by the Open Source Initiative.\n\nProprietary IP (such as source code) is not publicly available and the rights to use, modify, or redistribute the proprietary IP are restricted and typically reserved by the IP's owner.\n\nhttps://opensource.org/licenses"
                         }
                     },
                     "required": ["isOpenSource", "licenseInformation"],
