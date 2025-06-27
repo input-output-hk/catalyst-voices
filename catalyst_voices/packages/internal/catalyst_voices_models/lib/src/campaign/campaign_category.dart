@@ -10,7 +10,7 @@ final staticCampaignCategories = [
     categoryName: 'Cardano Use Case:',
     categorySubname: 'Partners & Products',
     description:
-        '''Cardano Use Cases: Partners & Products empowers exceptional applications and enterprise partnerships to enhance products and services with capabilities that drive high-volume transactions and accelerates mainstream adoption.''',
+        '''Cardano Use Cases: Partners & Products empowers exceptional applications and enterprise collaborations to enhance products and services with capabilities that drive high-volume transactions and accelerates mainstream adoption.''',
     shortDescription:
         'For Tier-1 partnerships and real-world pilots that scale Cardano adoption through high-impact use cases.',
     proposalsCount: 0,
@@ -25,19 +25,18 @@ final staticCampaignCategories = [
       CategoryDescription(
         title: 'Overview',
         description: '''
-Cardano Partners & Products accelerates Cardano’s mainstream adoption by supporting mature, mainnet-deployed products and strategic enterprise partnerships that deliver real-world utility and high-value transactions. 
-\nUnlike Cardano Use Cases: Concepts, which funds novel, early-stage ideas like prototypes or MVPs, this funding category is for established teams or enterprises with proven products or partnerships driving measurable adoption.''',
+Cardano Partners & Products accelerates Cardano’s mainstream adoption by supporting mature, mainnet-deployed products and strategic enterprise collaborations that deliver real-world utility and high-value transactions.\n\nUnlike Cardano Use Cases: Concepts, which funds novel, early-stage ideas like prototypes or MVPs, this funding category is for established teams or enterprises with proven products or collaborations driving measurable adoption.''',
       ),
       CategoryDescription(
         title: 'Who should apply',
         description: '''
-Cardano Partners & Products funds enterprise R&D collaborations between Cardano-based businesses and teams with Tier-1 industry leaders to integrate Cardano solutions into real world use cases.\nThis category is for established enterprises or startups with mainnet-deployed Cardano-based products or industry leading partnerships.\nIf your project is an early-stage concept, prototype, or lacks mainnet deployment, apply to _Cardano Use Cases: Concepts_ instead.
+Cardano Partners & Products funds enterprise R&D collaborations between Cardano-based businesses and teams with Tier-1 industry leaders to integrate Cardano solutions into real world use cases.\n\nThis category is for established enterprises or startups with mainnet-deployed Cardano-based products or industry leading collaborations.\n\nIf your project is an early-stage concept, prototype, or lacks mainnet deployment, apply to _Cardano Use Cases: Concepts_ instead.
 ''',
       ),
       CategoryDescription(
         title: 'Areas of Interest',
         description: '''
-Proposals should focus on mature R&D for products with Tier-1 partnerships, such as:
+Proposals should focus on mature R&D for products with Tier-1 collaborations, such as:
 
 - Enterprise integrations and demonstrator pilots with Tier-1 industry leaders _e.g. embedding Cardano wallets in automotive systems._
 - Stablecoin use-cases: Partner-led pilots that show Cardano stablecoins in action supporting real transactions, liquidity, utility, or payments on Cardano.
@@ -53,7 +52,7 @@ Proposals should focus on mature R&D for products with Tier-1 partnerships, such
 - Projects must be led by or partnered with industry leading businesses that have 2+ years business track record
 - Projects must provide evidence of a working product
 - Projects should be prepared to demonstrate a business partnership as well as relevant experience in the area
-- Clearly state matching funds or in-kind contributions from partners to show their commitment to the project
+- Clearly state matching funds or in-kind contributions from funding commitments to show their commitment to the project
 - Projects may be proprietary or open source but must drive high-volume/value transactions and co-marketing opportunities.
 - Co-marketing plans and community engagement to amplify Cardano’s partnership visibility.
 - Early-stage concepts or prototypes should apply to _Cardano Use Cases: Concepts._
@@ -68,7 +67,7 @@ The following will **not** be funded:
 
 - Early-stage concepts or prototypes _e.g. a new DeFi protocol MVP proposal belongs in Cardano Use Cases: Concepts._
 - Foundational R&D or maintenance for critical infrastructure. These belong to other Cardano funding streams such as via a members organization or direct governance action for treasury withdrawal and administrations _e.g. Cardano protocol, Layer 2 solutions_
-- Proposals lacking evidence of a mainnet-deployed product or partnership with a Tier-1 industry leader.
+- Proposals lacking evidence of a mainnet-deployed product or collaboration with a Tier-1 industry leader.
 - Developer tools, middleware, APIs, or integrated development environments belong in Cardano Open: Developers.
 - Projects lacking measurable adoption outcomes or Cardano relevance.
 - Proposals to use funds primarily for liquidity, loans, NFTs, or buying token-based products without technical integration.
@@ -77,9 +76,9 @@ The following will **not** be funded:
       ),
     ],
     dos: const [
-      '**Provide proof** of established partnerships',
+      '**Provide proof** of established collaborations',
       '**Provide proof** of key performance metrics',
-      '**Clarify** match funding commitments',
+      '**Clarify** funding commitments',
     ],
     donts: const [
       '**No** prototype R&D',
@@ -113,13 +112,13 @@ Cardano Use Cases: Concepts category fuels disruptive, untested Cardano-based us
 
 The funding category supports early-stage ideas - spanning proof of concept, design research, basic prototyping, and minimum viable products (MVPs) - to lay the foundation for innovative products, services, or business models.
 
-Unlike _Cardano Use Cases: Partners & Products_, which funds mature, deployed products or enterprise partnerships with proven adoption, this category is for newer Catalyst entrants or innovators validating novel concepts and product market fit with no prior development or funding.
+Unlike _Cardano Use Cases: Partners & Products_, which funds mature, deployed products or enterprise collaborations with proven adoption, this category is for newer Catalyst entrants or innovators validating novel concepts and product market fit with no prior development or funding.
 ''',
       ),
       CategoryDescription(
         title: 'Who should apply?',
         description: '''
-This category is for entrepreneurs, designers, and innovators with original, untested Cardano-based concepts, such as a DeFi startup researching a novel lending protocol, a Web3 developer prototyping a zero-knowledge identity solution, or a researcher exploring AI-blockchain integration. If your project involves a mature product, enterprise partnership, or incremental feature enhancements, apply to _Cardano Use Cases: Partners & Products_ instead.
+This category is for entrepreneurs, designers, and innovators with original, untested Cardano-based concepts, such as a DeFi startup researching a novel lending protocol, a Web3 developer prototyping a zero-knowledge identity solution, or a researcher exploring AI-blockchain integration. If your project involves a mature product, enterprise collaboration, or incremental feature enhancements, apply to _Cardano Use Cases: Partners & Products_ instead.
 ''',
       ),
       CategoryDescription(
@@ -239,13 +238,13 @@ The following will **not** be funded:
       ),
     ],
     dos: const [
-      '**Open source** is required',
+      '**Open source** licensing of project outputs is required',
       '**Clear statement** of your open source license',
-      '**Open source code** from project start',
+      '**Open source outputs** from project start',
       '**Provide** high quality documentation',
     ],
     donts: const [
-      '**No** proprietary software or hardware',
+      '**No** proprietary materials (including software or hardware)',
       '**No** projects that are non-technical',
       '**No** info-only websites and content',
       '**Forget to be open**, public, and available on Day 1',
