@@ -15,31 +15,53 @@ use crate::{
         },
         session::CassandraSession,
     },
-    rbac::{cache_persistent_rbac_chain, chains_cache::cached_persistent_rbac_chain},
+    rbac::{cache_persistent_rbac_chain, chains_cache::cached_persistent_rbac_chain, ChainInfo},
     settings::Settings,
 };
 
 /// Returns the latest (including the volatile part) registration chain by the given
 /// Catalyst ID.
-pub async fn latest_rbac_chain(id: &CatalystId) -> Result<Option<RegistrationChain>> {
-    let persistent_session =
-        CassandraSession::get(true).context("Failed to get persistent Cassandra session")?;
+pub async fn latest_rbac_chain(id: &CatalystId) -> Result<Option<ChainInfo>> {
     let volatile_session =
         CassandraSession::get(false).context("Failed to get volatile Cassandra session")?;
-    let (persistent_regs, volatile_regs) = try_join(
-        indexed_regs(&persistent_session, id),
+    let (chain, volatile_regs) = try_join(
+        persistent_rbac_chain(id),
         indexed_regs(&volatile_session, id),
     )
     .await?;
-    let regs = persistent_regs.into_iter().chain(volatile_regs.into_iter());
-    build_rbac_chain(regs).await
+
+    let mut last_persistent_txn = None;
+    let mut last_persistent_slot = 0.into();
+
+    let chain = match chain {
+        Some(c) => {
+            last_persistent_txn = Some(c.current_tx_id_hash());
+            last_persistent_slot = c.current_point().slot_or_default();
+            Some(apply_regs(c, volatile_regs).await?)
+        },
+        None => build_rbac_chain(volatile_regs).await?,
+    };
+
+    Ok(chain.map(|chain| {
+        let last_txn = Some(chain.current_tx_id_hash());
+        let last_volatile_txn = if last_persistent_txn == last_txn {
+            None
+        } else {
+            last_txn
+        };
+
+        ChainInfo {
+            chain,
+            last_persistent_txn,
+            last_volatile_txn,
+            last_persistent_slot,
+        }
+    }))
 }
 
 /// Returns the latest (including the volatile part) registration chain by the given stake
 /// address.
-pub async fn latest_rbac_chain_by_address(
-    address: &StakeAddress,
-) -> Result<Option<RegistrationChain>> {
+pub async fn latest_rbac_chain_by_address(address: &StakeAddress) -> Result<Option<ChainInfo>> {
     let persistent_session =
         CassandraSession::get(true).context("Failed to get persistent Cassandra session")?;
     let volatile_session =
@@ -90,17 +112,30 @@ async fn build_rbac_chain(
     let Some(root) = regs.next() else {
         return Ok(None);
     };
-    let network = Settings::cardano_network();
-    let root = cip509(network, root.slot_no.into(), root.txn_index.into()).await?;
+    let root = cip509(
+        Settings::cardano_network(),
+        root.slot_no.into(),
+        root.txn_index.into(),
+    )
+    .await?;
 
-    let mut chain = RegistrationChain::new(root)?;
+    let chain = RegistrationChain::new(root)?;
+    let chain = apply_regs(chain, regs).await?;
+    Ok(Some(chain))
+}
+
+/// Applies the given registration to the given chain.
+async fn apply_regs(
+    mut chain: RegistrationChain, regs: impl IntoIterator<Item = RbacQuery>,
+) -> Result<RegistrationChain> {
+    let network = Settings::cardano_network();
 
     for reg in regs {
         let reg = cip509(network, reg.slot_no.into(), reg.txn_index.into()).await?;
         chain = chain.update(reg)?;
     }
 
-    Ok(Some(chain))
+    Ok(chain)
 }
 
 /// Loads and parses a `Cip509` registration from a block using chain follower.
