@@ -11,6 +11,7 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
           kDebugMode
               ? const BaseProfileStateData(
                   email: Email.dirty('dev@iokh.com'),
+                  receiveEmails: ReceiveEmails(isAccepted: true, isEnabled: true),
                   username: Username.dirty('Dev'),
                   conditionsAccepted: true,
                   tosAndPrivacyPolicyAccepted: true,
@@ -34,7 +35,18 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
 
   @override
   void updateEmail(Email value) {
-    emit(state.copyWith(email: value));
+    final receiveEmails = state.receiveEmails.copyWith(
+      isAccepted: value.isNotValid ? false : null,
+      isEnabled: value.isNonEmptyAndValid,
+    );
+
+    emit(state.copyWith(email: value, receiveEmails: receiveEmails));
+  }
+
+  @override
+  void updateReceiveEmails({required bool isAccepted}) {
+    final receiveEmails = state.receiveEmails.copyWith(isAccepted: isAccepted);
+    emit(state.copyWith(receiveEmails: receiveEmails));
   }
 
   @override
@@ -54,6 +66,8 @@ abstract interface class BaseProfileManager {
   void updateConditions({required bool accepted});
 
   void updateEmail(Email value);
+
+  void updateReceiveEmails({required bool isAccepted});
 
   void updateTosAndPrivacyPolicy({required bool accepted});
 
