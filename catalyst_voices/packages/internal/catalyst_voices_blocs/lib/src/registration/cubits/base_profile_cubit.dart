@@ -13,8 +13,8 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
                   email: Email.dirty('dev@iokh.com'),
                   receiveEmails: ReceiveEmails(isAccepted: true, isEnabled: true),
                   username: Username.dirty('Dev'),
-                  isToSAccepted: true,
-                  isPrivacyPolicyAccepted: true,
+                  conditionsAccepted: true,
+                  tosAndPrivacyPolicyAccepted: true,
                 )
               : const BaseProfileStateData(),
         );
@@ -24,6 +24,13 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
       username: state.username.value,
       email: state.email.value,
     );
+  }
+
+  @override
+  void updateConditions({
+    required bool accepted,
+  }) {
+    emit(state.copyWith(conditionsAccepted: accepted));
   }
 
   @override
@@ -37,23 +44,16 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
   }
 
   @override
-  void updatePrivacyPolicy({
-    required bool isAccepted,
-  }) {
-    emit(state.copyWith(isPrivacyPolicyAccepted: isAccepted));
-  }
-
-  @override
   void updateReceiveEmails({required bool isAccepted}) {
     final receiveEmails = state.receiveEmails.copyWith(isAccepted: isAccepted);
     emit(state.copyWith(receiveEmails: receiveEmails));
   }
 
   @override
-  void updateToS({
-    required bool isAccepted,
+  void updateTosAndPrivacyPolicy({
+    required bool accepted,
   }) {
-    emit(state.copyWith(isToSAccepted: isAccepted));
+    emit(state.copyWith(tosAndPrivacyPolicyAccepted: accepted));
   }
 
   @override
@@ -63,13 +63,13 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
 }
 
 abstract interface class BaseProfileManager {
-  void updateEmail(Email value);
+  void updateConditions({required bool accepted});
 
-  void updatePrivacyPolicy({required bool isAccepted});
+  void updateEmail(Email value);
 
   void updateReceiveEmails({required bool isAccepted});
 
-  void updateToS({required bool isAccepted});
+  void updateTosAndPrivacyPolicy({required bool accepted});
 
   void updateUsername(Username value);
 }

@@ -1,7 +1,7 @@
+import 'package:catalyst_voices/pages/registration/create_base_profile/stage/widgets/instructions_acknowledgements.dart';
+import 'package:catalyst_voices/pages/registration/create_base_profile/stage/widgets/instructions_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -17,22 +17,11 @@ class InstructionsPanel extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _NextButton(),
+          InstructionsAcknowledgements(),
+          SizedBox(height: 24),
+          InstructionsNavigation(),
         ],
       ),
-    );
-  }
-}
-
-class _NextButton extends StatelessWidget {
-  const _NextButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesFilledButton(
-      key: const Key('CreateBaseProfileNext'),
-      onTap: () => RegistrationCubit.of(context).nextStep(),
-      child: Text(context.l10n.createProfileInstructionsNext),
     );
   }
 }

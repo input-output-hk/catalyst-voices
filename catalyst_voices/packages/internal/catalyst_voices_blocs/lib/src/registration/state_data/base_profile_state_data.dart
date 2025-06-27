@@ -5,18 +5,18 @@ final class BaseProfileStateData extends Equatable {
   final Email email;
   final ReceiveEmails receiveEmails;
   final Username username;
-  final bool isToSAccepted;
-  final bool isPrivacyPolicyAccepted;
+  final bool conditionsAccepted;
+  final bool tosAndPrivacyPolicyAccepted;
 
   const BaseProfileStateData({
     this.email = const Email.pure(),
     this.receiveEmails = const ReceiveEmails(),
     this.username = const Username.pure(),
-    this.isToSAccepted = false,
-    this.isPrivacyPolicyAccepted = false,
+    this.conditionsAccepted = false,
+    this.tosAndPrivacyPolicyAccepted = false,
   });
 
-  bool get arAcknowledgementsAccepted => isToSAccepted && isPrivacyPolicyAccepted;
+  bool get arAcknowledgementsAccepted => conditionsAccepted && tosAndPrivacyPolicyAccepted;
 
   bool get isBaseProfileDataValid {
     if (!email.isValid || !username.isValid) {
@@ -37,23 +37,23 @@ final class BaseProfileStateData extends Equatable {
         email,
         username,
         receiveEmails,
-        isToSAccepted,
-        isPrivacyPolicyAccepted,
+        conditionsAccepted,
+        tosAndPrivacyPolicyAccepted,
       ];
 
   BaseProfileStateData copyWith({
     Email? email,
     ReceiveEmails? receiveEmails,
     Username? username,
-    bool? isToSAccepted,
-    bool? isPrivacyPolicyAccepted,
+    bool? conditionsAccepted,
+    bool? tosAndPrivacyPolicyAccepted,
   }) {
     return BaseProfileStateData(
       email: email ?? this.email,
       receiveEmails: receiveEmails ?? this.receiveEmails,
       username: username ?? this.username,
-      isToSAccepted: isToSAccepted ?? this.isToSAccepted,
-      isPrivacyPolicyAccepted: isPrivacyPolicyAccepted ?? this.isPrivacyPolicyAccepted,
+      conditionsAccepted: conditionsAccepted ?? this.conditionsAccepted,
+      tosAndPrivacyPolicyAccepted: tosAndPrivacyPolicyAccepted ?? this.tosAndPrivacyPolicyAccepted,
     );
   }
 }

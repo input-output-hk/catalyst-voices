@@ -853,29 +853,36 @@
   "@createProfileAcknowledgementsTitle": {
     "description": "Title for the acknowledgements section"
   },
-  "createProfileAcknowledgementsToS": "I confirm that I have read and agree to be bound by {tos}.",
-  "@createProfileAcknowledgementsToS": {
+  "createProfileAcknowledgementsConditions": "I agree to the {conditions}.",
+  "@createProfileAcknowledgementsConditions": {
     "description": "Text acknowledging that the user has read and agreed to the Catalyst FC's Terms and Conditions",
     "placeholders": {
-      "tos": {
+      "conditions": {
         "type": "String"
       }
     }
   },
-  "catalystTos": "Project Catalyst Terms and Conditions",
-  "@catalystTos": {
+  "catalystConditions": "Project Catalyst Terms and Conditions",
+  "@catalystConditions": {
     "description": "Link to the Catalyst FC's Terms and Conditions"
   },
-  "createProfileAcknowledgementsPrivacyPolicy": "I acknowledge and agree that any data I share in connection with my participation in Project Catalyst Funds will be collected, stored, used and processed in accordance with the {privacy_policy}.",
-  "@createProfileAcknowledgementsPrivacyPolicy": {
+  "catalystTos": "Project Catalyst Terms of Use",
+  "@catalystTos": {
+    "description": "Link to the Catalyst FC's Terms of Use"
+  },
+  "createProfileAcknowledgementsTosAndPrivacyPolicy": "I agree to the {tos} & {privacy_policy}.",
+  "@createProfileAcknowledgementsTosAndPrivacyPolicy": {
     "description": "Text acknowledging that the user has read and agreed to the Catalyst FC's Privacy Policy",
     "placeholders": {
+      "tos": {
+        "type": "String"
+      },
       "privacy_policy": {
         "type": "String"
       }
     }
   },
-  "catalystPrivacyPolicy": "Catalyst FC's Privacy Policy",
+  "catalystPrivacyPolicy": "Project Catalyst Platform Privacy Policy",
   "@catalystPrivacyPolicy": {
     "description": "Link to the Catalyst FC's Privacy Policy"
   },
