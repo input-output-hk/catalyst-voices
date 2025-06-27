@@ -149,7 +149,7 @@ async fn calculate_assets_state(
     let address: StakeAddress = stake_address.try_into()?;
 
     let (mut txos, txo_assets) = futures::try_join!(
-        get_txo(&session, &address, slot_num),
+        get_txo(&session, &address),
         get_txo_assets(&session, &address, slot_num)
     )?;
 
@@ -178,11 +178,11 @@ type TxoMap = HashMap<(TransactionId, i16), TxoInfo>;
 
 /// Returns a map of TXO infos for the given stake address.
 async fn get_txo(
-    session: &CassandraSession, stake_address: &StakeAddress, slot_num: SlotNo,
+    session: &CassandraSession, stake_address: &StakeAddress,
 ) -> anyhow::Result<TxoMap> {
     let txos_stream = GetTxoByStakeAddressQuery::execute(
         session,
-        GetTxoByStakeAddressQueryParams::new(stake_address.clone(), slot_num.into()),
+        GetTxoByStakeAddressQueryParams::new(stake_address.clone()),
     )
     .await?;
 
