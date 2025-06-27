@@ -1,10 +1,9 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
-// ignore: one_member_abstracts
 abstract interface class CampaignRepository {
   const factory CampaignRepository() = CampaignRepositoryImpl;
 
-  Future<CampaignBase> getCampaign({
+  Future<Campaign> getCampaign({
     required String id,
   });
 
@@ -21,12 +20,12 @@ final class CampaignRepositoryImpl implements CampaignRepository {
   const CampaignRepositoryImpl();
 
   @override
-  Future<CampaignBase> getCampaign({
+  Future<Campaign> getCampaign({
     required String id,
   }) async {
     final now = DateTime.now();
 
-    return CampaignBase(
+    return Campaign(
       id: id,
       name: 'Boost Social Entrepreneurship',
       description: 'We are currently only decentralizing our technology, '
@@ -36,6 +35,7 @@ final class CampaignRepositoryImpl implements CampaignRepository {
       endDate: now.add(const Duration(days: 92)),
       proposalsCount: 0,
       publish: CampaignPublish.draft,
+      categoriesCount: 0,
     );
   }
 

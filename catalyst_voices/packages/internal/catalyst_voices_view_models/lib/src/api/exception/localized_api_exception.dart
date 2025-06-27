@@ -18,10 +18,10 @@ final class ErrorResponseException extends LocalizedApiException {
   @override
   String message(BuildContext context) {
     return switch (statusCode) {
-      ApiErrorResponseException.notFound => context.l10n.apiErrorNotFound,
-      ApiErrorResponseException.tooManyRequests => context.l10n.apiErrorTooManyRequests,
-      ApiErrorResponseException.internalServerError => context.l10n.apiErrorInternalServerError,
-      ApiErrorResponseException.serviceUnavailable => context.l10n.apiErrorServiceUnavailable,
+      ApiResponseStatusCode.notFound => context.l10n.apiErrorNotFound,
+      ApiResponseStatusCode.tooManyRequests => context.l10n.apiErrorTooManyRequests,
+      ApiResponseStatusCode.internalServerError => context.l10n.apiErrorInternalServerError,
+      ApiResponseStatusCode.serviceUnavailable => context.l10n.apiErrorServiceUnavailable,
       _ => context.l10n.apiErrorUnknown,
     };
   }

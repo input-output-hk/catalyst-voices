@@ -32,9 +32,9 @@ extension ResponseMapper<T> on chopper.Response<T> {
   Uint8List successBodyBytesOrThrow() {
     if (isSuccessful) {
       return bodyBytes;
-    } else if (statusCode == ApiErrorResponseException.notFound) {
+    } else if (statusCode == ApiResponseStatusCode.notFound) {
       throw NotFoundException(message: error.toString());
-    } else if (statusCode == ApiErrorResponseException.conflict) {
+    } else if (statusCode == ApiResponseStatusCode.conflict) {
       throw ResourceConflictException(message: _extractErrorMessage(error));
     } else {
       throw toApiException();
@@ -44,11 +44,11 @@ extension ResponseMapper<T> on chopper.Response<T> {
   T successBodyOrThrow() {
     if (isSuccessful) {
       return bodyOrThrow;
-    } else if (statusCode == ApiErrorResponseException.notFound) {
+    } else if (statusCode == ApiResponseStatusCode.notFound) {
       throw NotFoundException(message: _extractErrorMessage(error));
-    } else if (statusCode == ApiErrorResponseException.unauthorized) {
+    } else if (statusCode == ApiResponseStatusCode.unauthorized) {
       throw UnauthorizedException(message: error.toString());
-    } else if (statusCode == ApiErrorResponseException.conflict) {
+    } else if (statusCode == ApiResponseStatusCode.conflict) {
       throw ResourceConflictException(message: _extractErrorMessage(error));
     } else {
       throw toApiException();
@@ -58,9 +58,9 @@ extension ResponseMapper<T> on chopper.Response<T> {
   void successOrThrow() {
     if (isSuccessful) {
       return;
-    } else if (statusCode == ApiErrorResponseException.notFound) {
+    } else if (statusCode == ApiResponseStatusCode.notFound) {
       throw NotFoundException(message: _extractErrorMessage(error));
-    } else if (statusCode == ApiErrorResponseException.conflict) {
+    } else if (statusCode == ApiResponseStatusCode.conflict) {
       throw ResourceConflictException(message: _extractErrorMessage(error));
     } else {
       throw toApiException();
