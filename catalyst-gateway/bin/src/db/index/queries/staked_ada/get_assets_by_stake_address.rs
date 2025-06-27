@@ -8,12 +8,15 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::{
-    index::{
-        queries::{PreparedQueries, PreparedSelectQuery},
-        session::CassandraSession,
+use crate::{
+    db::{
+        index::{
+            queries::{PreparedQueries, PreparedSelectQuery},
+            session::CassandraSession,
+        },
+        types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
     },
-    types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
+    impl_query_statement,
 };
 
 /// Get assets by stake address query string.
@@ -55,6 +58,11 @@ pub(crate) struct GetAssetsByStakeAddressQuery {
     /// Asset value.
     pub value: num_bigint::BigInt,
 }
+
+impl_query_statement!(
+    GetAssetsByStakeAddressQuery,
+    GET_ASSETS_BY_STAKE_ADDRESS_QUERY
+);
 
 impl GetAssetsByStakeAddressQuery {
     /// Prepares a get assets by stake address query.

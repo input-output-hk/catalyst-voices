@@ -14,12 +14,15 @@ use scylla::{
 };
 use tracing::{debug, error};
 
-use crate::db::{
-    index::{
-        queries::{PreparedQueries, PreparedSelectQuery},
-        session::CassandraSession,
+use crate::{
+    db::{
+        index::{
+            queries::{PreparedQueries, PreparedSelectQuery},
+            session::CassandraSession,
+        },
+        types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex, DbUuidV4},
     },
-    types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex, DbUuidV4},
+    impl_query_statement,
 };
 
 /// Get registrations by Catalyst ID query.
@@ -34,7 +37,7 @@ pub(crate) struct QueryParams {
 
 /// Get registrations by Catalyst ID query.
 #[derive(DeserializeRow, Clone)]
-pub(crate) struct Query {
+pub(crate) struct GetRbac509Registrations {
     /// Registration transaction id.
     #[allow(dead_code)]
     pub txn_id: DbTransactionId,
@@ -49,7 +52,9 @@ pub(crate) struct Query {
     pub purpose: DbUuidV4,
 }
 
-impl Query {
+impl_query_statement!(GetRbac509Registrations, QUERY);
+
+impl GetRbac509Registrations {
     /// Prepares a query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         PreparedQueries::prepare(session, QUERY, Consistency::All, true)
@@ -62,11 +67,11 @@ impl Query {
     /// Executes a get registrations by Catalyst ID query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: QueryParams,
-    ) -> anyhow::Result<TypedRowStream<Query>> {
+    ) -> anyhow::Result<TypedRowStream<GetRbac509Registrations>> {
         session
             .execute_iter(PreparedSelectQuery::RbacRegistrationsByCatalystId, params)
             .await?
-            .rows_stream::<Query>()
+            .rows_stream::<GetRbac509Registrations>()
             .map_err(Into::into)
     }
 }
@@ -75,8 +80,8 @@ impl Query {
 /// database.
 pub(crate) async fn indexed_registrations(
     session: &CassandraSession, catalyst_id: &CatalystId,
-) -> anyhow::Result<Vec<Query>> {
-    let mut result: Vec<_> = Query::execute(session, QueryParams {
+) -> anyhow::Result<Vec<GetRbac509Registrations>> {
+    let mut result: Vec<_> = GetRbac509Registrations::execute(session, QueryParams {
         catalyst_id: catalyst_id.clone().into(),
     })
     .and_then(|r| r.try_collect().map_err(Into::into))
@@ -90,7 +95,7 @@ pub(crate) async fn indexed_registrations(
 ///
 /// # NOTE: provided `reg_queries` must be sorted by `slot_no`, look into `indexed_registrations` function.
 pub(crate) async fn build_reg_chain<OnSuccessFn: FnMut(bool, Slot, &RegistrationChain)>(
-    mut reg_queries_iter: impl Iterator<Item = (bool, Query)>, network: Network,
+    mut reg_queries_iter: impl Iterator<Item = (bool, GetRbac509Registrations)>, network: Network,
     mut on_success: OnSuccessFn,
 ) -> anyhow::Result<Option<RegistrationChain>> {
     let Some((is_persistent, root)) = reg_queries_iter.next() else {

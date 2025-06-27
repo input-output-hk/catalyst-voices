@@ -11,6 +11,7 @@ use crate::{
         index::queries::{PreparedQueries, SizedBatch},
         types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
     },
+    impl_query_batch,
     settings::cassandra_db,
 };
 
@@ -36,6 +37,8 @@ pub(crate) struct Params {
     /// Value of the asset
     value: num_bigint::BigInt,
 }
+
+impl_query_batch!(Params, INSERT_TXO_ASSET_QUERY);
 
 impl Params {
     /// Create a new record for this transaction.

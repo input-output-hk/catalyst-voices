@@ -10,6 +10,7 @@ use crate::{
         index::queries::{PreparedQueries, SizedBatch},
         types::{DbSlot, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
     },
+    impl_query_batch,
     settings::cassandra_db,
 };
 
@@ -33,6 +34,8 @@ pub(crate) struct Params {
     /// Actual TXO Value in lovelace
     value: num_bigint::BigInt,
 }
+
+impl_query_batch!(Params, INSERT_UNSTAKED_TXO_QUERY);
 
 impl Params {
     /// Create a new record for this transaction.
