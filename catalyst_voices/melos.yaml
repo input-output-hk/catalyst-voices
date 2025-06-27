@@ -356,7 +356,7 @@ scripts:
     description: |
       Check for unused translation keys in .arb files without modifying them, and check if translation keys are sorted.
 
-  l10n-manage:
+  l10n-clean:
     run: |
       cd packages/internal/catalyst_voices_localization && dart lib/src/manage_l10n.dart --clean --sort
     description: |
