@@ -12,7 +12,7 @@ final staticCampaignCategories = [
     description:
         '''Cardano Use Cases: Partners & Products empowers exceptional applications and enterprise collaborations to enhance products and services with capabilities that drive high-volume transactions and accelerates mainstream adoption.''',
     shortDescription:
-        'For Tier-1 partnerships and real-world pilots that scale Cardano adoption through high-impact use cases.',
+        'For Tier-1 collaborations and real-world pilots that scale Cardano adoption through high-impact use cases.',
     proposalsCount: 0,
     availableFunds: const Coin.fromWholeAda(8500000),
     imageUrl: '',
@@ -51,8 +51,8 @@ Proposals should focus on mature R&D for products with Tier-1 collaborations, su
 - Proposals must demonstrate measurable adoption outcomes and a clear link to Cardano’s blockchain _e.g. transaction volume, user growth, liquidity metrics_
 - Projects must be led by or partnered with industry leading businesses that have 2+ years business track record
 - Projects must provide evidence of a working product
-- Projects should be prepared to demonstrate a business partnership as well as relevant experience in the area
-- Clearly state matching funds or in-kind contributions from funding commitments to show their commitment to the project
+- Projects should be prepared to demonstrate an established business collaboration as well as relevant experience in the area to at least the Catalyst Team as the Fund Operator, if commercial details cannot be made public
+- Clearly state funding commitments to show their commitment to the project
 - Projects may be proprietary or open source but must drive high-volume/value transactions and co-marketing opportunities.
 - Co-marketing plans and community engagement to amplify Cardano’s partnership visibility.
 - Early-stage concepts or prototypes should apply to _Cardano Use Cases: Concepts._
