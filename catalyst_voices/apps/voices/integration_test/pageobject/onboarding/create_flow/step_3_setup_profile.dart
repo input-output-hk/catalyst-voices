@@ -11,13 +11,14 @@ class SetupProfilePanel extends OnboardingPageBase {
   final titleText = const Key('TitleText');
   final displayNameTextField = const Key('DisplayNameTextField');
   final emailTextField = const Key('EmailTextField');
-  final ideascaleInfoCard = const Key('IdeascaleInfoCard');
+  final emailInfoCard = const Key('EmailInfoCard');
 
   SetupProfilePanel(super.$);
 
   PatrolFinder get infoCardDescriptionLocator =>
-      $(ideascaleInfoCard).$(#InfoCardDesc).$(Flexible).$(Text);
-  PatrolFinder get infoCardTitleLocator => $(ideascaleInfoCard).$(#InfoCardTitle);
+      $(emailInfoCard).$(#InfoCardDesc).$(Flexible).$(Text);
+
+  PatrolFinder get infoCardTitleLocator => $(emailInfoCard).$(#InfoCardTitle);
 
   Future<void> clickNext() async {
     await $(nextButton).tap();
@@ -46,14 +47,10 @@ class SetupProfilePanel extends OnboardingPageBase {
     );
     expect($(backButton), findsOneWidget);
     expect($(nextButton), findsOneWidget);
-    expect($(ideascaleInfoCard), findsOneWidget);
-    expect(
-      infoCardTitleLocator.text,
-      (await t()).createProfileHasIdeascaleAccountAlready,
-    );
+    expect($(emailInfoCard), findsOneWidget);
     expect(
       infoCardDescriptionLocator.text,
-      (await t()).createProfileSetupIdeascaleReason1,
+      (await t()).createProfileSetupEmailReason1,
     );
   }
 

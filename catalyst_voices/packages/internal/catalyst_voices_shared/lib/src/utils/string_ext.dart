@@ -43,6 +43,8 @@ extension StringExt on String {
     };
   }
 
+  String inBrackets() => '($this)';
+
   String? nullIfEmpty() {
     if (isEmpty) {
       return null;

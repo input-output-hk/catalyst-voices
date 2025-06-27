@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 class ActionCard extends StatelessWidget {
   final Widget icon;
-  final Widget title;
+  final Widget? title;
   final Widget desc;
   final Widget? statusIcon;
   final Widget? body;
@@ -15,7 +15,7 @@ class ActionCard extends StatelessWidget {
   const ActionCard({
     super.key,
     required this.icon,
-    required this.title,
+    this.title,
     required this.desc,
     this.statusIcon,
     this.body,
@@ -32,6 +32,7 @@ class ActionCard extends StatelessWidget {
     final descTextStyle = (theme.textTheme.bodySmall ?? const TextStyle())
         .copyWith(color: theme.colors.textOnPrimaryLevel1);
 
+    final title = this.title;
     final statusIcon = this.statusIcon;
 
     return Material(
@@ -48,11 +49,13 @@ class ActionCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  DefaultTextStyle(
-                    style: titleTextStyle,
-                    child: title,
-                  ),
-                  const SizedBox(height: 2),
+                  if (title != null) ...[
+                    DefaultTextStyle(
+                      style: titleTextStyle,
+                      child: title,
+                    ),
+                    const SizedBox(height: 2),
+                  ],
                   DefaultTextStyle(
                     style: descTextStyle,
                     child: desc,

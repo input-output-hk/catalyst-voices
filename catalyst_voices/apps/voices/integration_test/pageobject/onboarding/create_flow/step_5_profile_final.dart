@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
-import 'step_4_acknowledgments.dart';
+import 'step_3_setup_profile.dart';
 
 class ProfileFinalPanel extends OnboardingPageBase {
   static const createKeychainButton = Key('CreateKeychainButton');
@@ -19,8 +19,8 @@ class ProfileFinalPanel extends OnboardingPageBase {
 
   @override
   Future<void> goto() async {
-    await AcknowledgmentsPanel($).goto();
-    await AcknowledgmentsPanel($).clickNext();
+    await SetupProfilePanel($).goto();
+    await SetupProfilePanel($).clickNext();
   }
 
   Future<void> verifyDetailsPanel() async {
