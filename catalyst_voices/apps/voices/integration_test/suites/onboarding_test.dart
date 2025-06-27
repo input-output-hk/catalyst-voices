@@ -16,7 +16,6 @@ import '../pageobject/onboarding/create_flow/step_15_link_wallet_info.dart';
 import '../pageobject/onboarding/create_flow/step_16_wallet_list.dart';
 import '../pageobject/onboarding/create_flow/step_2_profile_info.dart';
 import '../pageobject/onboarding/create_flow/step_3_setup_profile.dart';
-import '../pageobject/onboarding/create_flow/step_4_acknowledgments.dart';
 import '../pageobject/onboarding/create_flow/step_5_profile_final.dart';
 import '../pageobject/onboarding/create_flow/step_6_catalyst_keychain_info.dart';
 import '../pageobject/onboarding/create_flow/step_7_catalyst_keychain_success.dart';
@@ -66,13 +65,6 @@ void main() async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await SetupProfilePanel($).goto();
         await SetupProfilePanel($).verifyPageElements();
-      });
-
-      patrolWidgetTest('visitor - create - keychain acknowledgement screen looks OK',
-          (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await AcknowledgmentsPanel($).goto();
-        await AcknowledgmentsPanel($).verifyPageElements();
       });
 
       patrolWidgetTest('visitor - create - profile setup screen looks OK', (PatrolTester $) async {
