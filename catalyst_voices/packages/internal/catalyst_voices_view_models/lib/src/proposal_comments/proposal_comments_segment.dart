@@ -6,7 +6,7 @@ import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-/// Section for adding a comment to a proposal 
+/// Section for adding a comment to a proposal
 final class ProposalAddCommentSection extends ProposalCommentsSection {
   final DocumentSchema schema;
   final bool showUsernameRequired;

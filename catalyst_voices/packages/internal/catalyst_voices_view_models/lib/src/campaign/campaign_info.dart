@@ -4,9 +4,9 @@ import 'package:catalyst_voices_view_models/src/campaign/campaign_stage.dart';
 import 'package:equatable/equatable.dart';
 
 /// View model for campaign info.
-/// 
+///
 /// This view model is used to display the info of a campaign.
-/// 
+///
 /// Data for this view model is extracted from the [Campaign] model.
 final class CampaignInfo extends Equatable {
   final String id;

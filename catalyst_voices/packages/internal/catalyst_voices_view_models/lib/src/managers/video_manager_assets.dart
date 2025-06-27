@@ -38,7 +38,7 @@ class VideoCacheKey extends BaseVideoAsset {
   }
 }
 
-/// Represents a list of video assets to be precached.
+/// Represents a list of video assets to be pre-cached.
 class VideoPrecacheAssets extends BaseVideoAsset {
   final List<String> assets;
 
