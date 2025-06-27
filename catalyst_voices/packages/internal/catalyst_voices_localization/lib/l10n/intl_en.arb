@@ -801,14 +801,6 @@
   "@createProfileInstructionsEmailRequest": {
     "description": "Request to provide email address"
   },
-  "createProfileInstructionsEmailReason1": "Email is stored in Catalyst database.",
-  "@createProfileInstructionsEmailReason1": {
-    "description": "Reason to store email in a mutable database"
-  },
-  "createProfileInstructionsEmailReason2": "Email is never published on chain",
-  "@createProfileInstructionsEmailReason2": {
-    "description": "Reason to not store email on-chain"
-  },
   "createProfileSetupTitle": "Setup your profile",
   "@createProfileSetupTitle": {
     "description": "Title for the setup of the profile"
@@ -829,20 +821,32 @@
   "@createProfileSetupEmailLabel": {
     "description": "Label for the email input"
   },
+  "createProfileSetupEmailSubLabel": "Optional except for proposers or reviewers",
+  "@createProfileSetupEmailSubLabel": {
+    "description": "Sub label for the email input"
+  },
   "createProfileSetupEmailHint": "E-mail",
   "@createProfileSetupEmailHint": {
     "description": "Hint for the email input"
   },
-  "createProfileSetupEmailHelper": "You must provide your e-mail if you want to become a proposer or a reviewer.",
+  "createProfileSetupEmailHelper": "Please provide your e-mail address.",
   "@createProfileSetupEmailHelper": {
     "description": "Helper text for the email input"
   },
-  "createProfileHasIdeascaleAccountAlready": "Submitted proposals in Ideascale before?",
-  "@createProfileHasIdeascaleAccountAlready": {
-    "description": "Label for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
+  "createProfileSetupReceiveEmails": "I agree to receive emails. I can unsubscribe anytime.",
+  "@createProfileSetupReceiveEmails": {
+    "description": "Checkbox description about agreeing to receive emails"
   },
-  "createProfileSetupIdeascaleReason1": "Be sure to use the same email associated with your Ideascale account",
-  "@createProfileSetupIdeascaleReason1": {
+  "createProfileSetupEmailReason1": "If you have an Ideascale account, using the same email works best.",
+  "@createProfileSetupEmailReason1": {
+    "description": "Description for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
+  },
+  "createProfileSetupEmailReason2": "Email is stored in Catalyst database",
+  "@createProfileSetupEmailReason2": {
+    "description": "Description for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
+  },
+  "createProfileSetupEmailReason3": "Email is never published on chain",
+  "@createProfileSetupEmailReason3": {
     "description": "Description for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
   },
   "createProfileAcknowledgementsTitle": "Mandatory Acknowledgements",
