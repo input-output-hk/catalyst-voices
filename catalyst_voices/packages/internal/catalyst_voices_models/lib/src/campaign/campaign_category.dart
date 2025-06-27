@@ -3,6 +3,11 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
+/// List of static [CampaignCategory] definitions.
+///
+/// Categories will come from documents later.
+///
+/// See [CampaignCategory].
 final staticCampaignCategories = [
   CampaignCategory(
     selfRef: constantDocumentsRefs[0].category,
@@ -339,6 +344,9 @@ The following will **not** be funded:
   ),
 ];
 
+/// Representation of single [Campaign] category.
+///
+/// Should have factory constructor from document representation.
 class CampaignCategory extends Equatable {
   final SignedDocumentRef selfRef;
   final SignedDocumentRef proposalTemplateRef;

@@ -41,11 +41,9 @@ final class CampaignServiceImpl implements CampaignService {
   Future<Campaign> getCampaign({
     required String id,
   }) async {
-    final campaignBase = await _campaignRepository.getCampaign(id: id);
+    final campaign = await _campaignRepository.getCampaign(id: id);
 
     // TODO(damian-molinski): get proposalTemplateRef, document and map.
-
-    final campaign = campaignBase.toCampaign();
 
     return campaign;
   }

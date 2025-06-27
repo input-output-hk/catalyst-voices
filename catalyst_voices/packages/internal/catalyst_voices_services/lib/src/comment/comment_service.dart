@@ -47,7 +47,7 @@ final class CommentServiceImpl implements CommentService {
         ?.comment;
 
     if (commentTemplateRef == null) {
-      throw const ApiErrorResponseException(statusCode: 404);
+      throw const ApiErrorResponseException.notFound();
     }
 
     return _commentRepository.getCommentTemplate(ref: commentTemplateRef);

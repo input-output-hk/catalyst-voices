@@ -2,6 +2,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/src/exception/localized_exception.dart';
 import 'package:flutter/material.dart';
 
+/// Localized exception thrown when a proposal builder fails to publish a proposal.
 final class ProposalBuilderPublishException extends LocalizedException {
   const ProposalBuilderPublishException();
 
@@ -15,6 +16,7 @@ final class ProposalBuilderPublishException extends LocalizedException {
   }
 }
 
+/// Localized exception thrown when a proposal builder fails to submit a proposal.
 final class ProposalBuilderSubmitException extends LocalizedException {
   const ProposalBuilderSubmitException();
 

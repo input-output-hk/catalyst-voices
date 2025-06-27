@@ -4,6 +4,7 @@ import 'package:catalyst_voices_view_models/src/exception/localized_exception.da
 import 'package:flutter/material.dart';
 import 'package:formz/formz.dart';
 
+/// Form input validator for proposal title.
 final class ProposalTitle extends FormzInput<String, ProposalTitleValidationException> {
   final NumRange<int>? titleLengthRange;
 
@@ -34,6 +35,7 @@ final class ProposalTitle extends FormzInput<String, ProposalTitleValidationExce
   }
 }
 
+/// Exception thrown when a proposal title is empty.
 final class ProposalTitleEmptyValidationException extends ProposalTitleValidationException {
   const ProposalTitleEmptyValidationException();
 
@@ -43,6 +45,7 @@ final class ProposalTitleEmptyValidationException extends ProposalTitleValidatio
   }
 }
 
+/// Exception thrown when a proposal title is too long.
 final class ProposalTitleMaxLengthValidationException extends ProposalTitleValidationException {
   final int maxLength;
 
@@ -54,6 +57,7 @@ final class ProposalTitleMaxLengthValidationException extends ProposalTitleValid
   }
 }
 
+/// Exception thrown when a proposal title is too short.
 final class ProposalTitleMinLengthValidationException extends ProposalTitleValidationException {
   final int minLength;
 
@@ -65,6 +69,7 @@ final class ProposalTitleMinLengthValidationException extends ProposalTitleValid
   }
 }
 
+/// Base class for proposal title validation exceptions.
 sealed class ProposalTitleValidationException extends LocalizedException {
   const ProposalTitleValidationException();
 }

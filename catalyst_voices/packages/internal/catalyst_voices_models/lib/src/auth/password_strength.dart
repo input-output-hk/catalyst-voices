@@ -16,6 +16,11 @@ enum PasswordStrength {
   /// The minimum length of accepted password.
   static const int minimumLength = 8;
 
+  /// Builds [PasswordStrength] value base on [text] strength.
+  ///
+  /// This constructor is using password_strength package to estimate strength.
+  ///
+  /// If [text] is shorter then [minimumLength] returns [PasswordStrength.weak].
   factory PasswordStrength.calculate(String text) {
     if (text.length < minimumLength) return PasswordStrength.weak;
 

@@ -14,6 +14,7 @@ void main() {
       endDate: date,
       proposalsCount: 0,
       publish: CampaignPublish.draft,
+      categoriesCount: 0,
     );
 
     test('draft campaign resolves to draft stage', () {

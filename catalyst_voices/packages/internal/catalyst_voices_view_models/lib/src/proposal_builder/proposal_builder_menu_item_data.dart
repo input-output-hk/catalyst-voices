@@ -7,6 +7,7 @@ const _publishActions = [
   ProposalMenuItemAction.submit,
 ];
 
+/// Menu item data for proposal builder publishing actions
 final class ProposalBuilderMenuItemData extends Equatable {
   final ProposalMenuItemAction action;
   final String? proposalTitle;

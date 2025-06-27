@@ -15,6 +15,11 @@ const _defaultTransactionBuilderConfig = TransactionBuilderConfig(
   selectionStrategy: ExactBiggestAssetSelectionStrategy(),
 );
 
+/// A comprehensive configuration class for the application.
+///
+/// It encapsulates all environment-specific settings, including versioning,
+/// caching, database, error tracking (Sentry), and blockchain configurations.
+/// Named constructors are provided for different environments ([AppEnvironmentType]).
 final class AppConfig extends Equatable {
   final String version;
   final CacheConfig cache;
