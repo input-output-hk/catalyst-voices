@@ -8,20 +8,21 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-class ConditionsRichText extends StatefulWidget {
-  const ConditionsRichText({super.key});
+class RegistrationConditionsRichText extends StatefulWidget {
+  const RegistrationConditionsRichText({super.key});
 
   @override
-  State<ConditionsRichText> createState() => _ConditionsRichTextState();
+  State<RegistrationConditionsRichText> createState() => _RegistrationConditionsRichTextState();
 }
 
-class _ConditionsRichTextState extends State<ConditionsRichText> with LaunchUrlMixin {
+class _RegistrationConditionsRichTextState extends State<RegistrationConditionsRichText>
+    with LaunchUrlMixin {
   late final TapGestureRecognizer _recognizer;
 
   @override
   Widget build(BuildContext context) {
     return PlaceholderRichText(
-      key: const Key('ConditionsRichText'),
+      key: const Key('RegistrationConditionsRichText'),
       context.l10n.createProfileAcknowledgementsConditions('{conditions}'),
       style: context.textTheme.bodySmall,
       placeholderSpanBuilder: (context, placeholder) {
