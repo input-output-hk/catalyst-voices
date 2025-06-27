@@ -320,6 +320,10 @@ fn build_stake_info(mut txo_state: TxoAssetsState, slot_num: SlotNo) -> anyhow::
 
     for txo_info in txo_state.txos.into_values() {
         // Filter out spent TXOs.
+        if txo_info.slot_no >= slot_num {
+            continue;
+        }
+        // Filter out spent TXOs.
         if let Some(spent_slot) = txo_info.spent_slot_no {
             if spent_slot <= slot_num {
                 continue;
