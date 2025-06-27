@@ -272,57 +272,35 @@
                 },
                 "proposer": {
                     "$ref": "#/definitions/section",
-                    "title": "Proposer",
+                    "title": "Applicant",
                     "description": "Proposer Information",
                     "properties": {
                         "applicant": {
                             "$ref": "#/definitions/singleLineTextEntry",
-                            "title": "Lead participant name and surname",
+                            "title": "Applicant name and surname",
                             "description": "Name and surname of main applicant",
-                            "x-guidance": "The lead project participant is considered as the individual responsible for the proposed project and the person authorized to act on behalf of other applicants (where applicable).",
-                            "x-placeholder": "Enter the full name of the lead project participant",
+                            "x-guidance": "The applicant is the individual or entity responsible for the proposed project.",
+                            "x-placeholder": "Enter the full name of the applicant submitting the proposal",
                             "minLength": 2,
                             "maxLength": 100
                         },
                         "type": {
                             "$ref": "#/definitions/radioButtonSelect",
-                            "title": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)?",
-                            "description": "Are you delivering this project as an individual or as an entity (whether formally incorporated or not)",
+                            "title": "Are you submitting this proposal as an individual or as an entity (whether formally incorporated or not)?",
+                            "description": "Are you submitting this proposal as an individual or as an entity (whether formally incorporated or not)",
                             "x-guidance": "Please select from one of the following:\n\n1. Individual\n2. Entity (Incorporated)\n3. Entity (Not Incorporated)",
                             "enum": [
                                 "Individual",
                                 "Entity (Incorporated)",
                                 "Entity (Not Incorporated)"
                             ]
-                        },
-                        "coproposers": {
-                            "$ref": "#/definitions/tagInput",
-                            "title": "Co-proposers and additional applicants",
-                            "description": "Co-proposers and additional applicants",
-                            "x-guidance": "List any person who is submitting the proposal jointly with the lead applicant.\n\nBy listing additional persons, you confirm these individuals approve of being jointly responsible for the project and proposal.\n\n**IMPORTANT - A maximum of 6 (six) proposals can be led or co-proposed by the same applicant or enterprise per fund. Please, reference [Fund14 rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules) for added detail**",
-                            "x-subsection": true,
-                            "maxItems": 5,
-                            "minItems": 0,
-                            "items": {
-                                "type": "object",
-                                "required": ["name"],
-                                "properties": {
-                                    "name": {
-                                        "type": "string",
-                                        "title": "Full Name",
-                                        "description": "Full name of the co-proposer",
-                                        "minLength": 2,
-                                        "maxLength": 100
-                                    }
-                                }
-                            }
                         }
                     },
                     "required": [
                         "applicant",
                         "type"
                     ],
-                    "x-order": ["applicant", "type", "coproposers"]
+                    "x-order": ["applicant", "type"]
                 }
             },
             "required": [
@@ -364,7 +342,7 @@
                             "$ref": "#/definitions/durationInMonths",
                             "title": "Please specify how many months you expect your project to last ",
                             "description": "Specify the expected duration of your project. Projects must be completable within 2-12 months.",
-                            "x-guidance": "You are expected to produce the deliverables specified in the proposal within the timeframe selected, with a minimum of 2 months and a maximum of 12 months.\n\nProjects can be completed earlier if milestone Proof-of-Achievements and Project Completion steps are submitted and approved ahead of the expected delivery due dates.",
+                            "x-guidance": "You are expected to produce the deliverables specified in the proposal within the timeframe selected, with a minimum of 2 months and a maximum of 12 months.\n\nProjects can be completed earlier if milestone Proof-of-Achievements and Project Completion steps are submitted and approved ahead of the expected delivery due dates in compliance with the Fund Rules.",
                             "x-placeholder": "Select the expected duration of your project (2-12 months)",
                             "minimum": 2,
                             "maximum": 12
@@ -441,7 +419,7 @@
                     "$ref": "#/definitions/section",
                     "title": "Supporting Documentation",
                     "description": "Additional resources and documentation for your proposal",
-                    "x-guidance": "Here, provide links to your or your partner’s organization’s website, repository, or marketing materials. Alternatively, provide links to any whitepaper or publication relevant to your proposal.\n\nNote that this is additional information that voters and Community Reviewers might choose not to read. Attaching files does not mean you do not need to answer the questions in this form.",
+                    "x-guidance": "Here, provide links to your or your organization’s website, repository, or marketing materials. Alternatively, provide links to any whitepaper or publication relevant to your proposal.\n\nNote that this is additional information that voters and Community Reviewers might choose not to read. Attaching files does not mean you do not need to answer the questions in this form.",
                     "x-placeholder": "Enter relevant links (website, GitHub, whitepaper, etc.)",
                     "properties": {
                         "links": {
@@ -469,7 +447,7 @@
                             "$ref": "#/definitions/singleLineTextEntry",
                             "title": "Describe any dependencies or write 'No dependencies'",
                             "description": "Here you should list any dependencies and prerequisites for your project's success. These are usually external factors (such as third-party suppliers, external resources, third-party software, etc.) that may cause a delay, since a project has less control over them. In case of third party software, indicate whether you have the necessary licenses and permission to use such software.",
-                            "x-guidance": "If “YES”, please describe the dependencies and why you believe them essential to the project's delivery. If “NO”, please write \"No dependencies\"",
+                            "x-guidance": "If “YES”, please describe the dependencies and why you believe them essential to the project's delivery. If “NO”, please write \"No dependencies\".",
                             "minLength": 15,
                             "maxLength": 10240
                         }
@@ -488,15 +466,15 @@
                             "$ref": "#/definitions/yesNoChoice",
                             "title": "Will your project's outputs be fully open source?",
                             "description": "Select Yes if the project is open source, No if it is not.",
-                            "x-guidance": "If you answered “YES” to the question above:\n\nIf you declare that the project will be open-source in the application form, it must remain open-source throughout the entire lifecycle of the project, with a publicly accessible repository.\n\nPlease indicate the type of open-source license you intend to use and provide any additional information relevant to the open-source status of your project outputs. If only specific components of the code will be open-source, please specify which parts.\n\nIf you answered “NO” to the question above:\n\nPlease explain why the outputs of your project will not be made open-source."
+                            "x-guidance": "If you answered “YES” to the question above:\n\nIf you declare that the project will be open source in the application form, it must remain open source throughout the entire lifecycle of the project, with a publicly accessible repository.\n\nPlease indicate the type of open source license you intend to use and provide any additional information relevant to the open source status of your project outputs. If only specific components of the code will be open source, please specify which parts.\n\nIf you answered “NO” to the question above:\n\nPlease explain why the outputs of your project will not be made open source."
                         },
                         "licenseInformation": {
                             "$ref": "#/definitions/multiLineTextEntry",
                             "title": "License and Additional Information",
-                            "description": "Provide the license type and any additional context regarding the open-source status of your project. If partially open source, specify which parts are open source.",
+                            "description": "Provide the license type and any additional context regarding the open source status of your project. If partially open source, specify which parts are open source.",
                             "x-placeholder": "Describe the open source status of your project and the license type",
                             "maxLength": 500,
-                            "x-guidance": "Open-source software is software whose source code is publicly accessible and licensed in a way that allows anyone to use, modify, and share it freely, typically under licenses approved by the Open Source Initiative.\n\nProprietary software source code is not publicly available and the rights to use, modify, or redistribute proprietary software are restricted and typically reserved by the software's owner.\n\nhttps://opensource.org/licenses"
+                            "x-guidance": "Open source licenses ensure intellectual property (IP) (such as source code) remains publicly accessible and licensed in a way that allows anyone to use, modify, and share the IP freely, typically under licenses approved by the Open Source Initiative.\n\nProprietary IP (such as source code) is not publicly available and the rights to use, modify, or redistribute the proprietary IP are restricted and typically reserved by the IP's owner.\n\nhttps://opensource.org/licenses"
                         }
                     },
                     "required": ["isOpenSource", "licenseInformation"],
@@ -538,10 +516,10 @@
                     "properties": {
                         "innovative_idea": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Describe what makes your idea innovative compared to what has been previously funded.",
+                            "title": "Describe what makes your idea innovative compared to what has been previously funded (whether by you or others).",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your rationale for your innovative idea.",
-                            "x-guidance": "- Clearly state how your idea is new to Cardano or the blockchain space.\n- Highlight what innovation or unique approach your idea brings.\n- Avoid rehashing funded work without clear improvements.",
+                            "x-guidance": "- Clearly state how your idea is new to Cardano.\n- Highlight what innovation or unique approach your idea brings.\n- Avoid rehashing funded work without clear improvements.",
                             "minLength": 200,
                             "maxLength": 600
                         },
@@ -583,7 +561,7 @@
                     "properties": {
                         "grouped_tag": {
                             "$ref": "#/definitions/singleGroupedTagSelector",
-                            "title": "Please choose the most relevant category group and tag related to the outcomes of your proposal.",
+                            "title": "Please choose the most relevant theme and tags (as many that apply) related to the outcomes of your proposal.",
                             "oneOf": [
                                 {
                                     "properties": {
@@ -984,13 +962,13 @@
             "properties": {
                 "team": {
                     "$ref": "#/definitions/section",
-                    "title": "Team",
+                    "title": "Project Team",
                     "properties": {
                         "who": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Who is in the project team and what are their roles?",
-                            "description": "Who is in the project team and what are their roles?",
-                            "x-guidance": "List your team, their Linkedin profiles (or similar) and state what aspect of the proposal  each team member will undertake.\n\nIf additional team members need to be recruited, please state what skills gaps you are looking to fill so readers understand what other roles will be needed to complete the project.\n\nYou are expected to have already engaged the relevant members of the organizations referenced so you have their commitment and capacity to support the project. If you have not taken any steps to this effect, it is likely that the resources will not be available if you are approved for funding, which can jeopardize the project before it has even begun.\n\nYour proposal will be publicly available, so make sure to obtain any consent required before including confidential or third party information.\n\nAll Project Participants must disclose their role and scope of services across any submitted proposals, even if they are not in the lead or co-proposer role, such as an implementer, vendor, service provider.. Failure to disclose this information may lead to disqualification from the current fund round.",
+                            "title": "Who is participating in the project team and what are their roles?",
+                            "description": "Who is participating in the project team and what are their roles?",
+                            "x-guidance": "List your team and collaborators, include links to their Linkedin profiles (or similar) and state what aspect of the project each participant will undertake.\n\nIf additional team members need to be recruited, please state what skills gaps you are looking to fill so readers understand what other roles will be needed to complete the project.\n\nYou are expected to have already engaged the relevant members of the organizations referenced so you have their commitment and capacity to support the project. If you have not taken any steps to this effect, it is likely that the resources will not be available if you are approved for funding, which can jeopardize the project before it has even begun.\n\nYour proposal will be publicly available, so make sure to obtain any consent required before including confidential or third party information.\n\nAll applicants must disclose their project team’s roles and scope of services across all submitted proposals. Failure to disclose this information may lead to disqualification from the current fund round.",
                             "minLength": 100,
                             "maxLength": 10240
                         }
@@ -1005,7 +983,7 @@
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
                             "title": "Please provide a cost breakdown of the proposed work and resources",
                             "description": "Please provide a cost breakdown of the proposed work and resources",
-                            "x-guidance": "Make sure every item of work is budgeted. It may be helpful to refer to your plan and timeline, list the resources you will need at each stage, and what they cost.\n\nProvide a clear description of any third party product or service you will be using: hardware, software licenses, professional services (e.g. legal, accounting, code auditing).\n\nIf the cost of the project will exceed the funding request, please provide information about how you will cover the shortfall of funding.\n\nMost proposers forget to budget for: publicity,  marketing,  promotion, community engagement, project management, documentation, and reporting back to the community.\n\nIt is your team’s responsibility to properly manage the funds provided. Make sure to reference [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules) to understand eligibility around costs.",
+                            "x-guidance": "Make sure every item of work is budgeted. It may be helpful to refer to your plan and timeline, list the resources you will need at each stage, and what they cost.\n\nProvide a clear description of any third party product or service you will be using: hardware, software licenses, professional services (e.g. legal, accounting, code auditing).\n\nIf the cost of the project will exceed the funding request, please provide information about how you will cover the shortfall of funding.\n\nMost applicants forget to budget for: publicity,  marketing,  promotion, community engagement, project management, documentation, and reporting back to the community.\n\nIt is your responsibility to properly manage the funds provided. Make sure to reference [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules) to understand eligibility around costs.",
                             "minLength": 200,
                             "maxLength": 10240
                         }
@@ -1018,8 +996,8 @@
                     "properties": {
                         "note": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "How does the cost of the project represent value for money for the Cardano ecosystem?",
-                            "description": "How does the cost of the project represent value for money for the Cardano ecosystem?",
+                            "title": "How does the cost of the project represent value for the Cardano ecosystem?",
+                            "description": "How does the cost of the project represent value for the Cardano ecosystem?",
                             "x-guidance": "Provide a compelling reason about how your project represents a good use of funds and justify how it will create value for the Cardano ecosystem.\n\nProvide context or justification about the costs you listed and why you need them.\n\nFor instance, can you reason with supporting evidence that costs are proportional to the average wage in your country, or typical freelance rates in your industry? Is there anything else that helps to support how the project represents value for money?",
                             "minLength": 200,
                             "maxLength": 10240
@@ -1043,14 +1021,14 @@
                     "properties": {
                         "has_ongoing_projects": {
                             "$ref": "#/definitions/yesNoChoice",
-                            "title": "Have you or any of your co-applicants previously submitted a project in Catalyst that was funded and is not yet completed?",
+                            "title": "Have you previously submitted a project in Catalyst that was funded and is not yet completed?",
                             "description": "Do you have not yet completed projects?",
                             "x-placeholder": "Select if you or co-proposers have any ongoing projects"
                         },
                         "projects": {
                             "$ref": "#/definitions/tagInput",
                             "title": "Project ID's",
-                            "description": "If you answered “yes” to the previous question, please select first how many there are in total and then list all IDs for any projects you or your co-applicants are currently involved in that have not been completed yet.",
+                            "description": "If you answered “yes” to the previous question, please select first how many there are in total and then list all IDs for any projects you are currently involved in that have not been completed yet.",
                             "x-guidance": "You can find a seven digit project ID on each original proposal page listed on Catalyst website. [Search for yours here.](https://projectcatalyst.io/search)",
                             "x-subsection": false,
                             "maxItems": 15,
@@ -1087,7 +1065,7 @@
                         "terms_and_conditions": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "title": "Terms and Conditions:",
-                            "description": "I adhere to the [Terms & Conditions](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions), [Fund rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules), [Privacy Policy](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy) and I understand that providing accurate and truthful information is essential for my proposal to remain eligible to participate in the current Fund."
+                            "description": "I confirm that I have read, understand and shall adhere to the [Terms & Conditions](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions), [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules), [Privacy Policy](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy). I understand that providing accurate and truthful information is essential for my proposal to remain eligible to participate in the current Fund."
                         }
                     },
                     "required": ["terms_and_conditions"],
