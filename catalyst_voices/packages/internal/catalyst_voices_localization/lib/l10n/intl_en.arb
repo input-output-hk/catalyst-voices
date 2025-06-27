@@ -801,14 +801,6 @@
   "@createProfileInstructionsEmailRequest": {
     "description": "Request to provide email address"
   },
-  "createProfileInstructionsEmailReason1": "Email is stored in Catalyst database.",
-  "@createProfileInstructionsEmailReason1": {
-    "description": "Reason to store email in a mutable database"
-  },
-  "createProfileInstructionsEmailReason2": "Email is never published on chain",
-  "@createProfileInstructionsEmailReason2": {
-    "description": "Reason to not store email on-chain"
-  },
   "createProfileSetupTitle": "Setup your profile",
   "@createProfileSetupTitle": {
     "description": "Title for the setup of the profile"
@@ -829,49 +821,68 @@
   "@createProfileSetupEmailLabel": {
     "description": "Label for the email input"
   },
+  "createProfileSetupEmailSubLabel": "Optional except for proposers or reviewers",
+  "@createProfileSetupEmailSubLabel": {
+    "description": "Sub label for the email input"
+  },
   "createProfileSetupEmailHint": "E-mail",
   "@createProfileSetupEmailHint": {
     "description": "Hint for the email input"
   },
-  "createProfileSetupEmailHelper": "You must provide your e-mail if you want to become a proposer or a reviewer.",
+  "createProfileSetupEmailHelper": "Please provide your e-mail address.",
   "@createProfileSetupEmailHelper": {
     "description": "Helper text for the email input"
   },
-  "createProfileHasIdeascaleAccountAlready": "Submitted proposals in Ideascale before?",
-  "@createProfileHasIdeascaleAccountAlready": {
-    "description": "Label for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
+  "createProfileSetupReceiveEmails": "I agree to receive emails. I can unsubscribe anytime.",
+  "@createProfileSetupReceiveEmails": {
+    "description": "Checkbox description about agreeing to receive emails"
   },
-  "createProfileSetupIdeascaleReason1": "Be sure to use the same email associated with your Ideascale account",
-  "@createProfileSetupIdeascaleReason1": {
+  "createProfileSetupEmailReason1": "If you have an Ideascale account, using the same email works best.",
+  "@createProfileSetupEmailReason1": {
+    "description": "Description for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
+  },
+  "createProfileSetupEmailReason2": "Email is stored in Catalyst database",
+  "@createProfileSetupEmailReason2": {
+    "description": "Description for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
+  },
+  "createProfileSetupEmailReason3": "Email is never published on chain",
+  "@createProfileSetupEmailReason3": {
     "description": "Description for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
   },
   "createProfileAcknowledgementsTitle": "Mandatory Acknowledgements",
   "@createProfileAcknowledgementsTitle": {
     "description": "Title for the acknowledgements section"
   },
-  "createProfileAcknowledgementsToS": "I confirm that I have read and agree to be bound by {tos}.",
-  "@createProfileAcknowledgementsToS": {
+  "createProfileAcknowledgementsConditions": "I agree to the {conditions}.",
+  "@createProfileAcknowledgementsConditions": {
     "description": "Text acknowledging that the user has read and agreed to the Catalyst FC's Terms and Conditions",
     "placeholders": {
-      "tos": {
+      "conditions": {
         "type": "String"
       }
     }
   },
-  "catalystTos": "Project Catalyst Terms and Conditions",
-  "@catalystTos": {
+  "catalystConditions": "Project Catalyst Terms and Conditions",
+  "@catalystConditions": {
     "description": "Link to the Catalyst FC's Terms and Conditions"
   },
-  "createProfileAcknowledgementsPrivacyPolicy": "I acknowledge and agree that any data I share in connection with my participation in Project Catalyst Funds will be collected, stored, used and processed in accordance with the {privacy_policy}.",
-  "@createProfileAcknowledgementsPrivacyPolicy": {
+  "catalystTos": "Project Catalyst Terms of Use",
+  "@catalystTos": {
+    "description": "Link to the Catalyst FC's Terms of Use"
+  },
+  "createProfileAcknowledgementsTosAndPrivacyPolicy": "I agree to the {tos} & {privacy_policy}.",
+  "@createProfileAcknowledgementsTosAndPrivacyPolicy": {
     "description": "Text acknowledging that the user has read and agreed to the Catalyst FC's Privacy Policy",
     "placeholders": {
+      "tos": {
+        "type": "String"
+      },
       "privacy_policy": {
         "type": "String"
       }
     }
   },
-  "catalystPrivacyPolicy": "Catalyst FC's Privacy Policy",
+  "catalystPrivacyPolicy": "Project Catalyst Platform Privacy Policy",
   "@catalystPrivacyPolicy": {
     "description": "Link to the Catalyst FC's Privacy Policy"
   },
@@ -920,7 +931,7 @@
   "@removeKeychainDialogTitle": {
     "description": "A title on delete keychain dialog"
   },
-  "removeKeychainDialogSubtitle": "Are you sure you wants to delete your Catalyst Keychain from this device? Make sure you have a working Catalyst 12-word seed-phrase!\nYour Catalyst account will be removed, this action cannot be undone!",
+  "removeKeychainDialogSubtitle": "Are you sure you wants to delete your Catalyst Keychain from this device? Make sure you have a working Catalyst 12 words seed-phrase!\nYour Catalyst account will be removed, this action cannot be undone!",
   "@removeKeychainDialogSubtitle": {
     "description": "A subtitle on delete keychain dialog"
   },
@@ -1057,7 +1068,7 @@
   "registrationCompletedDiscoveryButton": "Open Discovery Space",
   "registrationCompletedAccountButton": "Review my account",
   "createKeychainSeedPhraseSubtitle": "Write down your Catalyst seed phrase",
-  "createKeychainSeedPhraseBody": "Make sure you write down your 12-words in a safe place as well.",
+  "createKeychainSeedPhraseBody": "Make sure you write down or export your 12 words and secure them in a safe place.",
   "createKeychainSeedPhraseExport": "Export Security Words",
   "createKeychainSeedPhraseExportConfirmDialogSubtitle": "Are you sure you want to export your key?",
   "createKeychainSeedPhraseExportConfirmDialogContent": "Before using this feature, please read this {link}",
@@ -1135,10 +1146,10 @@
   "recoverKeychainMethodsListTitle": "How do you want Restore your Catalyst Keychain?",
   "recoverKeychainNonFound": "No Catalyst Keychain found\u2028on this device.",
   "recoverKeychainFound": "Keychain found!  \u2028Please unlock your device.",
-  "recoverWithSeedPhrase12Words": "Restore/Upload with 12-word seed phrase",
-  "recoverySeedPhraseInstructionsTitle": "Restore your Catalyst Keychain with \nyour 12-word Catalyst seed phrase",
+  "recoverWithSeedPhrase12Words": "Restore/Upload with 12 words seed phrase",
+  "recoverySeedPhraseInstructionsTitle": "Restore your Catalyst Keychain with \nyour 12 words Catalyst seed phrase",
   "recoverySeedPhraseInstructionsSubtitle": "Enter your security words in the correct order, and sign into your Catalyst account on a new device.",
-  "recoverySeedPhraseInputTitle": "Restore your Catalyst Keychain with \nyour 12-word Catalyst seed phrase",
+  "recoverySeedPhraseInputTitle": "Restore your Catalyst Keychain with \nyour 12 words Catalyst seed phrase",
   "recoverySeedPhraseInputSubtitle": "Enter each word of your Catalyst seed phrase in the right order to bring your Catalyst account to this device.",
   "recoveryAccountTitle": "Catalyst account recovery",
   "recoveryAccountSuccessTitle": "Keychain recovered successfully!",
@@ -1194,7 +1205,7 @@
   "recoverySuccessSubtitle": "You have successfully restored your Catalyst Keychain, and unlocked Catalyst Voices on this device.",
   "recoverySuccessGoToDashboard": "Jump into the Discovery Space",
   "recoverySuccessGoAccount": "Check my account",
-  "recoveryExitConfirmDialogSubtitle": "12 word keychain restoration incomplete",
+  "recoveryExitConfirmDialogSubtitle": "12 words keychain restoration incomplete",
   "recoveryExitConfirmDialogContent": "Please continue your Catalyst Keychain restoration, if you cancel all input will be lost.",
   "recoveryExitConfirmDialogContinue": "Continue recovery process",
   "forgotPassword": "Forgot password",
