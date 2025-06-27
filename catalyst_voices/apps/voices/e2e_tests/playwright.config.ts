@@ -21,7 +21,7 @@ export default defineConfig({
   ],
   webServer: {
     command:
-      "cd ../../ && flutter run -d web-server --web-port=5555 --web-hostname=localhost lib/configs/main_dev.dart",
+      "flutter run -d web-server --web-port=5555 --web-hostname=localhost --web-header=Cross-Origin-Opener-Policy=same-origin --web-header=Cross-Origin-Embedder-Policy=require-corp ./lib/configs/main_dev.dart",
     url: "http://localhost:5555",
     reuseExistingServer: !process.env.CI,
   },
