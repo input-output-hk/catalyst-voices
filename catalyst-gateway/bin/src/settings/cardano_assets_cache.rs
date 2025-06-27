@@ -1,5 +1,7 @@
 //! Environment variable settings for the Cardano assets in memory cache
 
+#![allow(dead_code)]
+
 use crate::settings::str_env_var::StringEnvVar;
 
 /// Default value for the Cardano UTXO cache size (disabled cache)
