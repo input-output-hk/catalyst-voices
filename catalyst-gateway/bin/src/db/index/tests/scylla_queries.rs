@@ -34,17 +34,12 @@ async fn test_get_assets_by_stake_addr() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let mut row_stream = GetAssetsByStakeAddressQuery::execute(
+    let _row_stream = GetAssetsByStakeAddressQuery::execute(
         &session,
         GetAssetsByStakeAddressParams::new(stake_address_1()),
     )
     .await
-    .unwrap()
-    .into_iter();
-
-    while let Some(row_res) = row_stream.next() {
-        drop(row_res);
-    }
+    .unwrap();
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]
