@@ -3,6 +3,7 @@ use std::sync::{Arc, LazyLock};
 
 use cardano_blockchain_types::StakeAddress;
 use futures::TryStreamExt;
+use moka::policy::EvictionPolicy;
 use scylla::{prepared_statement::PreparedStatement, DeserializeRow, SerializeRow, Session};
 use tracing::error;
 
@@ -27,6 +28,7 @@ static ASSETS_CACHE: LazyLock<
 > = LazyLock::new(|| {
     moka::future::Cache::builder()
         .name("Cardano native assets cache")
+        .eviction_policy(EvictionPolicy::lru())
         .max_capacity(Settings::cardano_assets_cache().native_assets_cache_size())
         .build()
 });
