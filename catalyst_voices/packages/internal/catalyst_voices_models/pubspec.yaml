@@ -27,7 +27,7 @@ dependencies:
 
 dev_dependencies:
   analyzer: 7.3.0
-  build_runner: ^2.4.12
+  build_runner: ^2.5.4
   catalyst_analysis: ^3.0.0
   flutter_test:
     sdk: flutter

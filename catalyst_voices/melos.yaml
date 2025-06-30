@@ -169,7 +169,7 @@ command:
       # After the packages are migrated we can remove the direct dependency on analyzer and let it be a transitive dependency.
       analyzer: 7.3.0
       test: ^1.24.9
-      build_runner: ^2.4.12
+      build_runner: ^2.5.4
       chopper_generator: ^8.0.4
       flutter_gen_runner: ^5.10.0
       mocktail: ^1.0.1
