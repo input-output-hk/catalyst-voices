@@ -184,6 +184,7 @@
         "catalyst_voices/packages/libs/catalyst_key_derivation/lib/src/rust/**",
         "catalyst_voices/packages/internal/catalyst_voices_driver/lib/src/browser_extensions/**",
         "catalyst_voices/docs/licenses/**",
+        "catalyst_voices/docs/dependency_graph.dot",
         "catalyst-gateway/tests/api_tests/test_data/**",
     ],
     "enableFiletypes": [
