@@ -1,6 +1,6 @@
 //! Utilities for obtaining a RBAC registration chain (`RegistrationChain`).
 
-use anyhow::{Context, Result};
+use anyhow::{bail, Context, Result};
 use cardano_blockchain_types::{Network, Point, Slot, StakeAddress, TxnIndex};
 use cardano_chain_follower::ChainFollower;
 use catalyst_types::catalyst_id::CatalystId;
@@ -112,6 +112,11 @@ async fn build_rbac_chain(
     let Some(root) = regs.next() else {
         return Ok(None);
     };
+    if !root.removed_stake_addresses.is_empty() {
+        // This set contains addresses that were removed from the chain. It is impossible to
+        // remove an addresses before the chain was even started.
+        bail!("The root registration shouldn't contain removed stake addresses");
+    }
     let root = cip509(
         Settings::cardano_network(),
         root.slot_no.into(),
@@ -131,6 +136,11 @@ async fn apply_regs(
     let network = Settings::cardano_network();
 
     for reg in regs {
+        if !reg.removed_stake_addresses.is_empty() {
+            // TODO: This should be handled as a part of the
+            // github.com/input-output-hk/catalyst-voices/issues/2599 task.
+            continue;
+        }
         let reg = cip509(network, reg.slot_no.into(), reg.txn_index.into()).await?;
         chain = chain.update(reg)?;
     }
