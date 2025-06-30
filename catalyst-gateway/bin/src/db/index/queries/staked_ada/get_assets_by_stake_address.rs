@@ -106,4 +106,11 @@ impl GetAssetsByStakeAddressQuery {
         }
         Ok(res)
     }
+
+    /// Fully drops the underlying Cardano native assets cache.
+    /// Its totally safe operation and only could have a performance implications, because
+    /// of the empty cache.
+    pub(crate) fn drop_cache() {
+        ASSETS_CACHE.invalidate_all();
+    }
 }
