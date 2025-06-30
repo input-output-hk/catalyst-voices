@@ -114,7 +114,7 @@ async fn build_rbac_chain(
     };
     if !root.removed_stake_addresses.is_empty() {
         // This set contains addresses that were removed from the chain. It is impossible to
-        // remove an addresses before the chain was even started.
+        // remove an address before the chain was even started.
         bail!("The root registration shouldn't contain removed stake addresses");
     }
     let root = cip509(
@@ -138,7 +138,7 @@ async fn apply_regs(
     for reg in regs {
         if !reg.removed_stake_addresses.is_empty() {
             // TODO: This should be handled as a part of the
-            // github.com/input-output-hk/catalyst-voices/issues/2599 task.
+            // https://github.com/input-output-hk/catalyst-voices/issues/2599 task.
             continue;
         }
         let reg = cip509(network, reg.slot_no.into(), reg.txn_index.into()).await?;
