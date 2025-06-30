@@ -250,13 +250,13 @@ scripts:
 
   dependency-graph:
     run: |
+      dart pub global activate pubviz
       melos exec --scope "catalyst_voices" -- \
         'pubviz print --direct-dependencies --production-dependencies --format dot > $MELOS_ROOT_PATH/docs/dependency_graph.dot'
       echo "✅ Output file: $MELOS_ROOT_PATH/docs/dependency_graph.dot"
     description: |
       Generate license list for all packages in docs/dependency_graph.dot file.
       The .dot file can be viewed using software available online such as graphviz.
-      Make sure to install the pubviz with `dart pub global activate pubviz` before running this script.
 
   test:select:
     run: |
