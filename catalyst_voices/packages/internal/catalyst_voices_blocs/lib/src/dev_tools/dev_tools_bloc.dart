@@ -9,6 +9,9 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 const _requiredTapCount = 6;
 final _logger = Logger('DevToolsBloc');
 
+/// Manages the dev tools.
+
+/// It allows developers to obtain information about the system.
 final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     with BlocSignalEmitterMixin<DevToolsSignal, DevToolsState> {
   final DevToolsService _devToolsService;

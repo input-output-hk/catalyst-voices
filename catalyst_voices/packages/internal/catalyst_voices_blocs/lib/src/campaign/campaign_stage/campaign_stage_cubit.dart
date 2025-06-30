@@ -9,6 +9,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _logger = Logger('CampaignStageCubit');
 
+/// Manages the campaign stage.
+///
+/// This Cubit can lock down the application when the campaign is not in the proposal
+/// submission stage.
 class CampaignStageCubit extends Cubit<CampaignStageState> {
   final CampaignService _campaignService;
   Timer? _timer;

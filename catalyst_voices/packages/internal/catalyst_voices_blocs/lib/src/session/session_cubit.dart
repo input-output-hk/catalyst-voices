@@ -18,6 +18,8 @@ set alwaysAllowRegistration(bool newValue) {
 }
 
 /// Manages the user session.
+///
+/// Manages the user session and provides access to the user settings, account, and admin tools.
 final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin {
   final UserService _userService;
   final RegistrationService _registrationService;
