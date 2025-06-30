@@ -37,7 +37,7 @@ class _ExportCatalystKeyConfirmDialogState extends State<ExportCatalystKeyConfir
       title: context.l10n.warning,
       subtitle: l10n.createKeychainSeedPhraseExportConfirmDialogSubtitle,
       content: PlaceholderRichText(
-        l10n.createKeychainSeedPhraseExportConfirmDialogContent,
+        l10n.createKeychainSeedPhraseExportConfirmDialogContent('{link}'),
         placeholderSpanBuilder: (context, placeholder) {
           return switch (placeholder) {
             'link' => TextSpan(
