@@ -1,7 +1,9 @@
 name: Allure Report Generation
 
 on:
-  workflow_dispatch:
+  workflow_call:
+  push:
+    branches: [ 2867-api-test-in-ci ]
 
 permissions:
   contents: write
