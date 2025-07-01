@@ -26,7 +26,7 @@ import 'package:rxdart/rxdart.dart';
   ],
 )
 
-/// Exposes only public operation on proposals, and related, tables.
+/// Exposes only public operation on proposals, and related tables.
 /// This is a wrapper around [DocumentsDao] and [DraftsDao] to provide a single interface for proposals.
 /// Since proposals are composed of multiple documents (template, action, comments, etc.) we need to
 /// join multiple tables to get all the information about a proposal, which make sense to create this specialized dao.
