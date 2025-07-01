@@ -62,6 +62,7 @@ jobs:
         uses: lhotari/action-upterm@v1
 
       - name: Run cat-gateway binary
+        if: success()
         env:
           EVENT_DB_URL: "postgres://catalyst-event-dev:CHANGE_ME@localhost:5432/CatalystEventDev"
           CHAIN_NETWORK: "Preprod"
@@ -70,7 +71,7 @@ jobs:
 
       - name: Check if Gateway is synced and ready
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
-        if: always()
+        if: success()
         continue-on-error: true
         with:
           command: run
@@ -78,7 +79,7 @@ jobs:
 
       - name: Run api tests
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
-        if: always()
+        if: success()
         continue-on-error: true
         with:
           command: run
