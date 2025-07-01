@@ -58,9 +58,6 @@ jobs:
           command: run
           args: ./catalyst-gateway+build
 
-#      - name: Setup upterm session
-#        uses: lhotari/action-upterm@v1
-
       - name: Run cat-gateway binary
         if: success()
         env:
@@ -68,6 +65,9 @@ jobs:
           CHAIN_NETWORK: "Preprod"
           SIGNED_DOC_SK: "0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd"
         run: ./catalyst-gateway/cat-gateway run&
+
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
 
       - name: Check if Gateway is synced and ready
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
