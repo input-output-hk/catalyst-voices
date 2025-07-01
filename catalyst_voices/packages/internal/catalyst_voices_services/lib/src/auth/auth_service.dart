@@ -5,6 +5,11 @@ import 'package:catalyst_voices_services/src/auth/auth_token_generator.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:synchronized/synchronized.dart';
 
+/// AuthService is a service that provides authentication tokens.
+/// 
+/// [UserObserver] is used to get the current user.
+/// [AuthTokenCache] is used to cache the authentication tokens.
+/// [AuthTokenGenerator] is used to generate the authentication tokens.
 abstract interface class AuthService implements AuthTokenProvider {
   factory AuthService(
     AuthTokenCache cache,

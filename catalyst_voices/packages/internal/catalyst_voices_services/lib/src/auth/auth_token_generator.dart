@@ -5,6 +5,14 @@ import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart'
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 
+/// Generates AuthToken for a given [CatalystPrivateKey] and [CatalystId].
+/// 
+/// The token is generated using the following steps:
+/// 1. Derive the account role key pair from the master key using [KeyDerivationService].
+/// 2. Create a CatalystId token from the CatalystId.
+/// 3. Sign the CatalystId token using the account role key pair.
+/// 4. Encode the signature using base64UrlNoPad.
+/// 5. Return the AuthToken.
 final class AuthTokenGenerator {
   @visibleForTesting
   static const String tokenPrefix = 'catid';

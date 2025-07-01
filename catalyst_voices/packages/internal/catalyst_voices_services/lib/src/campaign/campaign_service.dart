@@ -2,10 +2,15 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 
+/// CampaignService provides campaign-related functionality.
+///
+/// [CampaignRepository] is used to get the campaign data.
+/// [ProposalRepository] is used to get specific information about proposals that are related to the campaign.
+/// like total ask, proposals count, etc, with need to be calculated.
 abstract interface class CampaignService {
   const factory CampaignService(
     CampaignRepository campaignRepository,
-    ProposalRepository documentRepository,
+    ProposalRepository proposalRepository,
   ) = CampaignServiceImpl;
 
   Future<Campaign?> getActiveCampaign();
