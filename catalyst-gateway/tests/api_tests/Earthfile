@@ -28,7 +28,7 @@ test-no-docker:
     ENV EVENT_DB_TEST_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
     ENV CAT_GATEWAY_EXECUTABLE_PATH "./release/cat-gateway"
 
-    RUN poetry run pytest -s -m preprod_indexing
+    RUN poetry run pytest -s -m ci
     RUN bash
 
 check-return-code:
