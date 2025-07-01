@@ -1,46 +1,56 @@
 //! Get assets by stake address.
-use std::sync::Arc;
+use std::sync::{Arc, LazyLock};
 
-use cardano_blockchain_types::{Slot, StakeAddress};
-use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
-    SerializeRow, Session,
-};
+use cardano_blockchain_types::StakeAddress;
+use futures::TryStreamExt;
+use moka::policy::EvictionPolicy;
+use scylla::{prepared_statement::PreparedStatement, DeserializeRow, SerializeRow, Session};
 use tracing::error;
 
-use crate::db::{
-    index::{
-        queries::{PreparedQueries, PreparedSelectQuery},
-        session::CassandraSession,
+use crate::{
+    db::{
+        index::{
+            queries::{PreparedQueries, PreparedSelectQuery},
+            session::CassandraSession,
+        },
+        types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
     },
-    types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
+    settings::Settings,
 };
 
 /// Get assets by stake address query string.
 const GET_ASSETS_BY_STAKE_ADDRESS_QUERY: &str =
     include_str!("../cql/get_assets_by_stake_address.cql");
 
+/// In memory cache of the Cardano native assets data
+static ASSETS_CACHE: LazyLock<
+    moka::future::Cache<DbStakeAddress, Vec<GetAssetsByStakeAddressQuery>>,
+> = LazyLock::new(|| {
+    moka::future::Cache::builder()
+        .name("Cardano native assets cache")
+        .eviction_policy(EvictionPolicy::lru())
+        .max_capacity(Settings::cardano_assets_cache().native_assets_cache_size())
+        .build()
+});
+
 /// Get assets by stake address query parameters.
 #[derive(SerializeRow)]
 pub(crate) struct GetAssetsByStakeAddressParams {
     /// Stake address.
     stake_address: DbStakeAddress,
-    /// Max slot num.
-    slot_no: DbSlot,
 }
 
 impl GetAssetsByStakeAddressParams {
     /// Creates a new [`GetAssetsByStakeAddressParams`].
-    pub(crate) fn new(stake_address: StakeAddress, slot_no: Slot) -> Self {
+    pub(crate) fn new(stake_address: StakeAddress) -> Self {
         Self {
             stake_address: stake_address.into(),
-            slot_no: slot_no.into(),
         }
     }
 }
 
 /// Get native assets query.
-#[derive(DeserializeRow)]
+#[derive(DeserializeRow, Clone)]
 pub(crate) struct GetAssetsByStakeAddressQuery {
     /// TXO transaction index within the slot.
     pub txn_index: DbTxnIndex,
@@ -73,12 +83,31 @@ impl GetAssetsByStakeAddressQuery {
     /// Executes a get assets by stake address query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetAssetsByStakeAddressParams,
-    ) -> anyhow::Result<TypedRowStream<GetAssetsByStakeAddressQuery>> {
-        let iter = session
-            .execute_iter(PreparedSelectQuery::AssetsByStakeAddress, params)
-            .await?
-            .rows_stream::<GetAssetsByStakeAddressQuery>()?;
+    ) -> anyhow::Result<Vec<GetAssetsByStakeAddressQuery>> {
+        if session.is_persistent() {
+            if let Some(res) = ASSETS_CACHE.get(&params.stake_address).await {
+                return Ok(res);
+            }
+        }
 
-        Ok(iter)
+        let res: Vec<_> = session
+            .execute_iter(PreparedSelectQuery::AssetsByStakeAddress, &params)
+            .await?
+            .rows_stream::<GetAssetsByStakeAddressQuery>()?
+            .map_err(Into::<anyhow::Error>::into)
+            .try_collect()
+            .await?;
+        // update cache
+        if session.is_persistent() {
+            ASSETS_CACHE.insert(params.stake_address, res.clone()).await;
+        }
+        Ok(res)
+    }
+
+    /// Fully drops the underlying Cardano native assets cache.
+    /// Its totally safe operation and only could have a performance implications, because
+    /// of the empty cache.
+    pub(crate) fn drop_cache() {
+        ASSETS_CACHE.invalidate_all();
     }
 }

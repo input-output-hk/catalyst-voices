@@ -112,7 +112,6 @@ async fn build_full_stake_info_response(
     let persistent_txo_state = calculate_assets_state(
         persistent_session,
         stake_address.clone(),
-        adjusted_slot_num,
         TxoAssetsState::default(),
     )
     .await?;
@@ -120,7 +119,6 @@ async fn build_full_stake_info_response(
     let volatile_txo_state = calculate_assets_state(
         volatile_session,
         stake_address.clone(),
-        adjusted_slot_num,
         persistent_txo_state.clone(),
     )
     .await?;
@@ -143,14 +141,14 @@ async fn build_full_stake_info_response(
 /// This function also updates the spent column if it detects that a TXO was spent
 /// between lookups.
 async fn calculate_assets_state(
-    session: Arc<CassandraSession>, stake_address: Cip19StakeAddress, slot_num: SlotNo,
+    session: Arc<CassandraSession>, stake_address: Cip19StakeAddress,
     mut txo_base_state: TxoAssetsState,
 ) -> anyhow::Result<TxoAssetsState> {
     let address: StakeAddress = stake_address.try_into()?;
 
     let (mut txos, txo_assets) = futures::try_join!(
-        get_txo(&session, &address, slot_num),
-        get_txo_assets(&session, &address, slot_num)
+        get_txo(&session, &address),
+        get_txo_assets(&session, &address)
     )?;
 
     let params = update_spent(&session, &address, &mut txo_base_state.txos, &mut txos).await?;
@@ -178,11 +176,11 @@ type TxoMap = HashMap<(TransactionId, i16), TxoInfo>;
 
 /// Returns a map of TXO infos for the given stake address.
 async fn get_txo(
-    session: &CassandraSession, stake_address: &StakeAddress, slot_num: SlotNo,
+    session: &CassandraSession, stake_address: &StakeAddress,
 ) -> anyhow::Result<TxoMap> {
     let txos_stream = GetTxoByStakeAddressQuery::execute(
         session,
-        GetTxoByStakeAddressQueryParams::new(stake_address.clone(), slot_num.into()),
+        GetTxoByStakeAddressQueryParams::new(stake_address.clone()),
     )
     .await?;
 
@@ -226,39 +224,39 @@ impl TxoAssetsState {
 
 /// Returns a map of txo asset infos for the given stake address.
 async fn get_txo_assets(
-    session: &CassandraSession, stake_address: &StakeAddress, slot_num: SlotNo,
+    session: &CassandraSession, stake_address: &StakeAddress,
 ) -> anyhow::Result<TxoAssetsMap> {
     let assets_txos_stream = GetAssetsByStakeAddressQuery::execute(
         session,
-        GetAssetsByStakeAddressParams::new(stake_address.clone(), slot_num.into()),
+        GetAssetsByStakeAddressParams::new(stake_address.clone()),
     )
     .await?;
 
-    let tokens_map = assets_txos_stream
-        .map_err(Into::<anyhow::Error>::into)
-        .try_fold(HashMap::new(), |mut tokens_map: TxoAssetsMap, row| {
-            async move {
-                let key = (row.slot_no.into(), row.txn_index.into(), row.txo.into());
-                match tokens_map.entry(key) {
-                    std::collections::hash_map::Entry::Occupied(mut o) => {
-                        o.get_mut().push(TxoAssetInfo {
-                            id: row.policy_id,
-                            name: row.asset_name.into(),
-                            amount: row.value,
-                        });
-                    },
-                    std::collections::hash_map::Entry::Vacant(v) => {
-                        v.insert(vec![TxoAssetInfo {
-                            id: row.policy_id,
-                            name: row.asset_name.into(),
-                            amount: row.value,
-                        }]);
-                    },
+    let tokens_map =
+        assets_txos_stream
+            .into_iter()
+            .fold(HashMap::new(), |mut tokens_map: TxoAssetsMap, row| {
+                {
+                    let key = (row.slot_no.into(), row.txn_index.into(), row.txo.into());
+                    match tokens_map.entry(key) {
+                        std::collections::hash_map::Entry::Occupied(mut o) => {
+                            o.get_mut().push(TxoAssetInfo {
+                                id: row.policy_id,
+                                name: row.asset_name.into(),
+                                amount: row.value,
+                            });
+                        },
+                        std::collections::hash_map::Entry::Vacant(v) => {
+                            v.insert(vec![TxoAssetInfo {
+                                id: row.policy_id,
+                                name: row.asset_name.into(),
+                                amount: row.value,
+                            }]);
+                        },
+                    }
+                    tokens_map
                 }
-                Ok(tokens_map)
-            }
-        })
-        .await?;
+            });
     Ok(tokens_map)
 }
 
@@ -319,6 +317,10 @@ fn build_stake_info(mut txo_state: TxoAssetsState, slot_num: SlotNo) -> anyhow::
     let mut assets = HashMap::<(HexEncodedHash28, AssetName), AssetValue>::new();
 
     for txo_info in txo_state.txos.into_values() {
+        // Filter out spent TXOs.
+        if txo_info.slot_no >= slot_num {
+            continue;
+        }
         // Filter out spent TXOs.
         if let Some(spent_slot) = txo_info.spent_slot_no {
             if spent_slot <= slot_num {
