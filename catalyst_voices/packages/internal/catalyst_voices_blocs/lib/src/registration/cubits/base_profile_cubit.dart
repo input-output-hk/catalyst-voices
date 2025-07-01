@@ -4,7 +4,6 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 
 /// Manages the profile data.
-
 final class BaseProfileCubit extends Cubit<BaseProfileStateData>
     with BlocErrorEmitterMixin
     implements BaseProfileManager {
