@@ -81,6 +81,7 @@ build:
 
     SAVE ARTIFACT target/doc doc
     SAVE ARTIFACT target/release/cat-gateway cat-gateway
+    SAVE ARTIFACT target/release/cat-gateway AS LOCAL cat-gateway
 
 test-openapi-diff:
     FROM openapitools/openapi-diff:2.1.1
