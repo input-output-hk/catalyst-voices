@@ -1,6 +1,6 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 
-/// Represents an asset identified by a [PolicyId] and [AssetName].
+/// Represents a native asset identified by a [PolicyId] and [AssetName].
 typedef AssetId = (PolicyId, AssetName);
 
 /// A list of asset group entries, each mapping an asset to its associated
