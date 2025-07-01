@@ -5,7 +5,17 @@ use std::sync::Arc;
 use cardano_blockchain_types::Slot;
 use futures::StreamExt;
 
-use crate::db::index::{block::CassandraSession, queries::purge};
+use crate::db::index::{
+    block::CassandraSession,
+    queries::{
+        purge,
+        rbac::{
+            get_catalyst_id_from_public_key::invalidate_public_keys_cache,
+            get_catalyst_id_from_stake_address::invalidate_stake_addresses_cache,
+            get_catalyst_id_from_transaction_id::invalidate_transactions_ids_cache,
+        },
+    },
+};
 
 /// Purge condition option
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -179,6 +189,8 @@ async fn purge_catalyst_id_for_stake_address(
 ) -> anyhow::Result<()> {
     use purge::catalyst_id_for_stake_address::{DeleteQuery, Params, PrimaryKeyQuery};
 
+    invalidate_stake_addresses_cache(false);
+
     let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
 
     let mut delete_params: Vec<Params> = Vec::new();
@@ -198,6 +210,8 @@ async fn purge_catalyst_id_for_txn_id(
 ) -> anyhow::Result<()> {
     use purge::catalyst_id_for_txn_id::{DeleteQuery, Params, PrimaryKeyQuery};
 
+    invalidate_transactions_ids_cache(false);
+
     let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
 
     let mut delete_params: Vec<Params> = Vec::new();
@@ -216,6 +230,8 @@ async fn purge_catalyst_id_for_public_key(
     session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
 ) -> anyhow::Result<()> {
     use purge::catalyst_id_for_public_key::{DeleteQuery, Params, PrimaryKeyQuery};
+
+    invalidate_public_keys_cache(false);
 
     let mut primary_keys_stream = PrimaryKeyQuery::execute(session).await?;
 
