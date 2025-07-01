@@ -74,6 +74,9 @@ jobs:
           command: run
           args: ./catalyst-gateway/tests/api_tests+check-return-code
 
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
+
       - name: Check if Gateway is synced and ready
         run: ./tests/api_tests/scripts/check_return_code.sh http://127.0.0.1:3030/api/v1/health/ready 204 30 10
 
@@ -84,9 +87,6 @@ jobs:
 #        with:
 #          command: run
 #          args: ./catalyst-gateway/tests/api_tests+check-gateway-ready
-
-      - name: Setup upterm session
-        uses: lhotari/action-upterm@v1
 
       - name: Run api tests
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
