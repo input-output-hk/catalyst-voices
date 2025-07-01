@@ -243,9 +243,20 @@ scripts:
   license-list:
     run: |
       melos exec --ignore="catalyst_analysis" --ignore="example" -- \
-        'dart run $MELOS_ROOT_PATH/scripts/generate_licenses.dart $MELOS_PACKAGE_PATH $MELOS_ROOT_PATH/licenses/$MELOS_PACKAGE_NAME.csv'
-      dart run $MELOS_ROOT_PATH/scripts/merge_csv_files.dart $MELOS_ROOT_PATH/licenses/ $MELOS_ROOT_PATH/licenses/licenses.csv
-    description: Generate license list for all packages in licenses/licenses.csv file.
+        'dart run $MELOS_ROOT_PATH/scripts/generate_licenses.dart $MELOS_PACKAGE_PATH $MELOS_ROOT_PATH/docs/licenses/$MELOS_PACKAGE_NAME.csv'
+      dart run $MELOS_ROOT_PATH/scripts/merge_csv_files.dart $MELOS_ROOT_PATH/docs/licenses/ $MELOS_ROOT_PATH/docs/licenses/licenses.csv
+      echo "✅ Output file: $MELOS_ROOT_PATH/docs/licenses/licenses.csv"
+    description: Generate license list for all packages in docs/licenses/licenses.csv file.
+
+  dependency-graph:
+    run: |
+      dart pub global activate pubviz
+      melos exec --scope "catalyst_voices" -- \
+        'pubviz print --direct-dependencies --production-dependencies --format dot > $MELOS_ROOT_PATH/docs/dependency_graph.dot'
+      echo "✅ Output file: $MELOS_ROOT_PATH/docs/dependency_graph.dot"
+    description: |
+      Generate license list for all packages in docs/dependency_graph.dot file.
+      The .dot file can be viewed using software available online such as graphviz.
 
   test:select:
     run: |
