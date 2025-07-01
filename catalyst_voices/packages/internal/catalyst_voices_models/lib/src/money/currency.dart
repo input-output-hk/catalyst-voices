@@ -23,7 +23,7 @@ final class Currency extends Equatable {
         symbol,
       ];
 
-  /// Returns formated [money] with prefix of this [Currency][symbol].
+  /// Returns formatted [money] with prefix of this [Currency][symbol].
   String format(num money) {
     return '$symbol$money';
   }
