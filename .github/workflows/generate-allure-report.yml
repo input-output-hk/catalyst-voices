@@ -58,6 +58,9 @@ jobs:
           command: run
           args: ./catalyst-gateway+build
 
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
+
       - name: Run cat-gateway binary
         env:
           EVENT_DB_URL: "postgres://catalyst-event-dev:CHANGE_ME@localhost:5432/CatalystEventDev"
