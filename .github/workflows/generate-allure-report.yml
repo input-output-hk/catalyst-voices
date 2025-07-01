@@ -2,6 +2,7 @@ name: Allure Report Generation
 
 on:
   workflow_call:
+  workflow_dispatch:
 
 permissions:
   contents: write
