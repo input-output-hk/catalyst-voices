@@ -90,7 +90,7 @@ impl GetAssetsByStakeAddressQuery {
             }
         }
 
-        let res = session
+        let res: Vec<_> = session
             .execute_iter(PreparedSelectQuery::AssetsByStakeAddress, &params)
             .await?
             .rows_stream::<GetAssetsByStakeAddressQuery>()?
