@@ -1,0 +1,521 @@
+digraph pubviz {
+  graph [nodesep="0.2"];
+  edge [fontcolor=gray];
+
+  animated_text_kit [label="animated_text_kit
+4.2.3", shape=box, margin="0.25,0.15", style=bold];
+  animated_text_kit -> characters [label="^1.1.0"];
+  animated_text_kit -> flutter;
+
+  animations [label="animations
+2.0.11", shape=box, margin="0.25,0.15", style=bold];
+  animations -> flutter;
+
+  auto_size_text [label="auto_size_text
+3.0.0", shape=box, margin="0.25,0.15", style=bold];
+  auto_size_text -> flutter;
+
+  catalyst_cardano [label="catalyst_cardano
+1.0.0", shape=box, margin="0.25,0.15", style=bold];
+  catalyst_cardano -> catalyst_cardano_platform_interface [label="^1.0.0"];
+  catalyst_cardano -> catalyst_cardano_serialization [label="^1.0.0"];
+  catalyst_cardano -> catalyst_cardano_web [label="^1.0.0"];
+  catalyst_cardano -> flutter;
+
+  catalyst_cardano_serialization [label="catalyst_cardano_serialization
+1.0.0", shape=box, margin="0.25,0.15", style=bold];
+  catalyst_cardano_serialization -> asn1lib;
+  catalyst_cardano_serialization -> bech32 [label="^0.2.2"];
+  catalyst_cardano_serialization -> bip32_ed25519 [label="^0.6.0"];
+  catalyst_cardano_serialization -> catalyst_compression [label="^1.0.0"];
+  catalyst_cardano_serialization -> catalyst_compression_web [label="^1.0.0"];
+  catalyst_cardano_serialization -> catalyst_key_derivation [label="^1.0.0"];
+  catalyst_cardano_serialization -> cbor [label="^6.2.0"];
+  catalyst_cardano_serialization -> collection [label="^1.19.0"];
+  catalyst_cardano_serialization -> convert [label="^3.1.1"];
+  catalyst_cardano_serialization -> cryptography [label="^2.7.0"];
+  catalyst_cardano_serialization -> equatable [label="^2.0.7"];
+  catalyst_cardano_serialization -> meta [label="^1.16.0"];
+  catalyst_cardano_serialization -> pinenacl [label="^0.6.0"];
+  catalyst_cardano_serialization -> uuid_plus [label="^0.1.0"];
+
+  catalyst_cardano_web [label="catalyst_cardano_web
+1.0.0", shape=box, margin="0.25,0.15", style=bold];
+  catalyst_cardano_web -> catalyst_cardano_platform_interface [label="^1.0.0"];
+  catalyst_cardano_web -> catalyst_cardano_serialization [label="^1.0.0"];
+  catalyst_cardano_web -> cbor [label="^6.2.0"];
+  catalyst_cardano_web -> convert [label="^3.1.1"];
+  catalyst_cardano_web -> flutter;
+  catalyst_cardano_web -> flutter_web_plugins;
+  catalyst_cardano_web -> web [label="^1.1.0"];
+
+  catalyst_key_derivation [label="catalyst_key_derivation
+1.0.0", shape=box, margin="0.25,0.15", style=bold];
+  catalyst_key_derivation -> catalyst_cardano_serialization [label="^1.0.0"];
+  catalyst_key_derivation -> cbor [label="^6.2.0"];
+  catalyst_key_derivation -> collection [label="^1.19.0"];
+  catalyst_key_derivation -> convert [label="^3.1.1"];
+  catalyst_key_derivation -> cryptography [label="^2.7.0"];
+  catalyst_key_derivation -> equatable [label="^2.0.7"];
+  catalyst_key_derivation -> flutter;
+  catalyst_key_derivation -> flutter_rust_bridge [label="2.5.1"];
+  catalyst_key_derivation -> plugin_platform_interface [label="^2.1.7"];
+
+  catalyst_voices [label=catalyst_voices, fontsize="18", style=bold, shape=box, margin="0.25,0.15"];
+  catalyst_voices -> animated_text_kit [label="^4.2.2", penwidth="2"];
+  catalyst_voices -> animations [label="^2.0.11", penwidth="2"];
+  catalyst_voices -> auto_size_text [label="^3.0.0", penwidth="2"];
+  catalyst_voices -> catalyst_cardano [label="^1.0.0", penwidth="2"];
+  catalyst_voices -> catalyst_cardano_serialization [label="^1.0.0", penwidth="2"];
+  catalyst_voices -> catalyst_cardano_web [label="^1.0.0", penwidth="2"];
+  catalyst_voices -> catalyst_key_derivation [label="^1.0.0", penwidth="2"];
+  catalyst_voices -> catalyst_voices_assets [label="<empty>", penwidth="2"];
+  catalyst_voices -> catalyst_voices_blocs [label="<empty>", penwidth="2"];
+  catalyst_voices -> catalyst_voices_brands [label="<empty>", penwidth="2"];
+  catalyst_voices -> catalyst_voices_localization [label="<empty>", penwidth="2"];
+  catalyst_voices -> catalyst_voices_models [label="<empty>", penwidth="2"];
+  catalyst_voices -> catalyst_voices_repositories [label="<empty>", penwidth="2"];
+  catalyst_voices -> catalyst_voices_services [label="<empty>", penwidth="2"];
+  catalyst_voices -> catalyst_voices_shared [label="<empty>", penwidth="2"];
+  catalyst_voices -> catalyst_voices_view_models [label="<empty>", penwidth="2"];
+  catalyst_voices -> collection [label="^1.19.0", penwidth="2"];
+  catalyst_voices -> dotted_border [label="^2.1.0", penwidth="2"];
+  catalyst_voices -> equatable [label="^2.0.7", penwidth="2"];
+  catalyst_voices -> file_picker [label="^8.0.7", penwidth="2"];
+  catalyst_voices -> flutter [label="<empty>", penwidth="2"];
+  catalyst_voices -> flutter_adaptive_scaffold [label="^0.2.4", penwidth="2"];
+  catalyst_voices -> flutter_bloc [label="^8.1.5", penwidth="2"];
+  catalyst_voices -> flutter_dropzone [label="^4.2.1", penwidth="2"];
+  catalyst_voices -> flutter_inappwebview [label="^6.1.5", penwidth="2"];
+  catalyst_voices -> flutter_localized_locales [label="^2.0.5", penwidth="2"];
+  catalyst_voices -> flutter_markdown [label="^0.7.4+3", penwidth="2"];
+  catalyst_voices -> flutter_native_splash [label="^2.4.6", penwidth="2"];
+  catalyst_voices -> flutter_quill [label="<empty>", penwidth="2"];
+  catalyst_voices -> flutter_quill_extensions [label="<empty>", penwidth="2"];
+  catalyst_voices -> flutter_secure_storage [label="^9.2.2", penwidth="2"];
+  catalyst_voices -> flutter_web_plugins [label="<empty>", penwidth="2"];
+  catalyst_voices -> formz [label="^0.7.0", penwidth="2"];
+  catalyst_voices -> go_router [label="^14.8.0", penwidth="2"];
+  catalyst_voices -> google_fonts [label="^6.2.1", penwidth="2"];
+  catalyst_voices -> intl [label="^0.19.0", penwidth="2"];
+  catalyst_voices -> lottie [label="^3.3.1", penwidth="2"];
+  catalyst_voices -> markdown [label="^7.2.2", penwidth="2"];
+  catalyst_voices -> markdown_quill [label="<empty>", penwidth="2"];
+  catalyst_voices -> mask_text_input_formatter [label="^2.9.0", penwidth="2"];
+  catalyst_voices -> result_type [label="^0.2.0", penwidth="2"];
+  catalyst_voices -> scrollable_positioned_list [label="^0.3.8", penwidth="2"];
+  catalyst_voices -> sentry_flutter [label="^9.0.0", penwidth="2"];
+  catalyst_voices -> shared_preferences [label="^2.3.3", penwidth="2"];
+  catalyst_voices -> skeletonizer [label="^1.4.3", penwidth="2"];
+  catalyst_voices -> url_launcher [label="^6.2.2", penwidth="2"];
+  catalyst_voices -> url_strategy [label="^0.3.0", penwidth="2"];
+  catalyst_voices -> uuid_plus [label="^0.1.0", penwidth="2"];
+  catalyst_voices -> video_player [label="^2.9.2", penwidth="2"];
+
+  catalyst_voices_assets [label="catalyst_voices_assets
+0.1.0+1", shape=box, margin="0.25,0.15", style=bold];
+  catalyst_voices_assets -> flutter;
+  catalyst_voices_assets -> flutter_svg [label="^2.0.10+1"];
+  catalyst_voices_assets -> lottie [label="^3.3.1"];
+
+  catalyst_voices_blocs [label="catalyst_voices_blocs
+0.1.0+1", shape=box, margin="0.25,0.15", style=bold];
+  catalyst_voices_blocs -> bloc_concurrency [label="^0.2.2"];
+  catalyst_voices_blocs -> catalyst_cardano [label="^1.0.0"];
+  catalyst_voices_blocs -> catalyst_cardano_serialization [label="^1.0.0"];
+  catalyst_voices_blocs -> catalyst_cardano_web [label="^1.0.0"];
+  catalyst_voices_blocs -> catalyst_key_derivation [label="^1.0.0"];
+  catalyst_voices_blocs -> catalyst_voices_brands;
+  catalyst_voices_blocs -> catalyst_voices_models;
+  catalyst_voices_blocs -> catalyst_voices_repositories;
+  catalyst_voices_blocs -> catalyst_voices_services;
+  catalyst_voices_blocs -> catalyst_voices_shared;
+  catalyst_voices_blocs -> catalyst_voices_view_models;
+  catalyst_voices_blocs -> collection [label="^1.19.0"];
+  catalyst_voices_blocs -> equatable [label="^2.0.7"];
+  catalyst_voices_blocs -> flutter;
+  catalyst_voices_blocs -> flutter_bloc [label="^8.1.5"];
+  catalyst_voices_blocs -> flutter_secure_storage [label="^9.2.2"];
+  catalyst_voices_blocs -> formz [label="^0.7.0"];
+  catalyst_voices_blocs -> meta [label="^1.16.0"];
+  catalyst_voices_blocs -> result_type [label="^0.2.0"];
+  catalyst_voices_blocs -> rxdart [label="^0.27.7"];
+  catalyst_voices_blocs -> uuid_plus [label="^0.1.0"];
+
+  catalyst_voices_brands [label="catalyst_voices_brands
+0.1.0+1", shape=box, margin="0.25,0.15", style=bold];
+  catalyst_voices_brands -> catalyst_voices_assets;
+  catalyst_voices_brands -> equatable [label="^2.0.7"];
+  catalyst_voices_brands -> flutter;
+  catalyst_voices_brands -> google_fonts [label="^6.2.1"];
+
+  catalyst_voices_localization [label="catalyst_voices_localization
+0.1.0+1", shape=box, margin="0.25,0.15", style=bold];
+  catalyst_voices_localization -> flutter;
+  catalyst_voices_localization -> flutter_localizations;
+  catalyst_voices_localization -> intl [label="^0.19.0"];
+
+  catalyst_voices_models [label="catalyst_voices_models
+0.1.0+1", shape=box, margin="0.25,0.15", style=bold];
+  catalyst_voices_models -> bip39 [label="^1.0.6"];
+  catalyst_voices_models -> catalyst_cardano [label="^1.0.0"];
+  catalyst_voices_models -> catalyst_cardano_serialization [label="^1.0.0"];
+  catalyst_voices_models -> catalyst_cardano_web [label="^1.0.0"];
+  catalyst_voices_models -> catalyst_voices_shared;
+  catalyst_voices_models -> collection [label="^1.19.0"];
+  catalyst_voices_models -> convert [label="^3.1.1"];
+  catalyst_voices_models -> equatable [label="^2.0.7"];
+  catalyst_voices_models -> flutter;
+  catalyst_voices_models -> json_annotation [label="^4.9.0"];
+  catalyst_voices_models -> meta [label="^1.16.0"];
+  catalyst_voices_models -> password_strength [label="^0.2.0"];
+  catalyst_voices_models -> uuid_plus [label="^0.1.0"];
+
+  catalyst_voices_repositories [label="catalyst_voices_repositories
+0.1.0+1", shape=box, margin="0.25,0.15", style=bold];
+  catalyst_voices_repositories -> async [label="^2.11.0"];
+  catalyst_voices_repositories -> build [label="^2.4.1"];
+  catalyst_voices_repositories -> catalyst_cardano_serialization [label="^1.0.0"];
+  catalyst_voices_repositories -> catalyst_compression [label="^1.0.0"];
+  catalyst_voices_repositories -> catalyst_cose [label="^1.0.0"];
+  catalyst_voices_repositories -> catalyst_key_derivation [label="^1.0.0"];
+  catalyst_voices_repositories -> catalyst_voices_assets;
+  catalyst_voices_repositories -> catalyst_voices_models;
+  catalyst_voices_repositories -> catalyst_voices_shared;
+  catalyst_voices_repositories -> cbor [label="^6.2.0"];
+  catalyst_voices_repositories -> chopper [label="^8.0.3"];
+  catalyst_voices_repositories -> collection [label="^1.19.0"];
+  catalyst_voices_repositories -> convert [label="^3.1.1"];
+  catalyst_voices_repositories -> drift [label="^2.24.0"];
+  catalyst_voices_repositories -> drift_flutter [label="^0.2.4"];
+  catalyst_voices_repositories -> equatable [label="^2.0.7"];
+  catalyst_voices_repositories -> flutter;
+  catalyst_voices_repositories -> http [label="^1.2.2"];
+  catalyst_voices_repositories -> json_annotation [label="^4.8.1"];
+  catalyst_voices_repositories -> logging [label="^1.3.0"];
+  catalyst_voices_repositories -> meta [label="^1.16.0"];
+  catalyst_voices_repositories -> package_info_plus [label="^8.3.0"];
+  catalyst_voices_repositories -> path [label="^1.9.1"];
+  catalyst_voices_repositories -> result_type [label="^0.2.0"];
+  catalyst_voices_repositories -> rxdart [label="^0.27.7"];
+  catalyst_voices_repositories -> synchronized [label="^3.3.0+3"];
+  catalyst_voices_repositories -> uuid_plus [label="^0.1.0"];
+
+  catalyst_voices_services [label="catalyst_voices_services
+0.1.0+1", shape=box, margin="0.25,0.15", style=bold];
+  catalyst_voices_services -> catalyst_cardano [label="^1.0.0"];
+  catalyst_voices_services -> catalyst_cardano_serialization [label="^1.0.0"];
+  catalyst_voices_services -> catalyst_cardano_web [label="^1.0.0"];
+  catalyst_voices_services -> catalyst_key_derivation [label="^1.0.0"];
+  catalyst_voices_services -> catalyst_voices_models;
+  catalyst_voices_services -> catalyst_voices_repositories;
+  catalyst_voices_services -> catalyst_voices_shared;
+  catalyst_voices_services -> collection [label="^1.19.0"];
+  catalyst_voices_services -> equatable [label="^2.0.7"];
+  catalyst_voices_services -> flutter;
+  catalyst_voices_services -> flutter_driver;
+  catalyst_voices_services -> flutter_secure_storage [label="^9.2.2"];
+  catalyst_voices_services -> flutter_test;
+  catalyst_voices_services -> logging [label="^1.3.0"];
+  catalyst_voices_services -> path [label="^1.9.1"];
+  catalyst_voices_services -> pool [label="^1.5.1"];
+  catalyst_voices_services -> result_type [label="^0.2.0"];
+  catalyst_voices_services -> rxdart [label="^0.27.7"];
+  catalyst_voices_services -> sentry_flutter [label="^9.0.0"];
+  catalyst_voices_services -> shared_preferences [label="^2.3.3"];
+  catalyst_voices_services -> synchronized [label="^3.3.0+3"];
+  catalyst_voices_services -> url_launcher [label="^6.3.1"];
+  catalyst_voices_services -> uuid_plus [label="^0.1.0"];
+  catalyst_voices_services -> web [label="^1.1.0"];
+  catalyst_voices_services -> webdriver [label="^3.0.3"];
+
+  catalyst_voices_shared [label="catalyst_voices_shared
+0.1.0+1", shape=box, margin="0.25,0.15", style=bold];
+  catalyst_voices_shared -> catalyst_cardano_serialization [label="^1.0.0"];
+  catalyst_voices_shared -> catalyst_key_derivation [label="^1.0.0"];
+  catalyst_voices_shared -> catalyst_voices_models;
+  catalyst_voices_shared -> collection [label="^1.19.0"];
+  catalyst_voices_shared -> convert [label="^3.1.1"];
+  catalyst_voices_shared -> cryptography [label="^2.7.0"];
+  catalyst_voices_shared -> equatable [label="^2.0.7"];
+  catalyst_voices_shared -> fake_async [label="^1.3.1"];
+  catalyst_voices_shared -> flutter;
+  catalyst_voices_shared -> flutter_secure_storage [label="^9.2.2"];
+  catalyst_voices_shared -> get_it [label="^7.6.7"];
+  catalyst_voices_shared -> intl [label="^0.19.0"];
+  catalyst_voices_shared -> json_annotation [label="^4.9.0"];
+  catalyst_voices_shared -> logging [label="^1.3.0"];
+  catalyst_voices_shared -> shared_preferences [label="^2.3.3"];
+  catalyst_voices_shared -> url_launcher [label="^6.2.2"];
+  catalyst_voices_shared -> uuid_plus [label="^0.1.0"];
+  catalyst_voices_shared -> web [label="^1.1.0"];
+
+  catalyst_voices_view_models [label="catalyst_voices_view_models
+0.1.0+1", shape=box, margin="0.25,0.15", style=bold];
+  catalyst_voices_view_models -> catalyst_cardano [label="^1.0.0"];
+  catalyst_voices_view_models -> catalyst_cardano_serialization [label="^1.0.0"];
+  catalyst_voices_view_models -> catalyst_cardano_web [label="^1.0.0"];
+  catalyst_voices_view_models -> catalyst_voices_assets;
+  catalyst_voices_view_models -> catalyst_voices_brands;
+  catalyst_voices_view_models -> catalyst_voices_localization;
+  catalyst_voices_view_models -> catalyst_voices_models;
+  catalyst_voices_view_models -> catalyst_voices_shared;
+  catalyst_voices_view_models -> collection [label="^1.19.0"];
+  catalyst_voices_view_models -> email_validator [label="^3.0.0"];
+  catalyst_voices_view_models -> equatable [label="^2.0.7"];
+  catalyst_voices_view_models -> flutter;
+  catalyst_voices_view_models -> formz [label="^0.7.0"];
+  catalyst_voices_view_models -> intl [label="^0.19.0"];
+  catalyst_voices_view_models -> uuid_plus [label="^0.1.0"];
+
+  collection [label="collection
+1.19.1", shape=box, margin="0.25,0.15", style=bold];
+
+  dotted_border [label="dotted_border
+2.1.0", shape=box, margin="0.25,0.15", style=bold];
+  dotted_border -> flutter;
+  dotted_border -> path_drawing [label="^1.0.0"];
+
+  equatable [label="equatable
+2.0.7", shape=box, margin="0.25,0.15", style=bold];
+  equatable -> collection [label="^1.15.0"];
+  equatable -> meta [label="^1.3.0"];
+
+  file_picker [label="file_picker
+8.3.7", shape=box, margin="0.25,0.15", style=bold];
+  file_picker -> cross_file [label="^0.3.4+2"];
+  file_picker -> ffi [label="^2.1.3"];
+  file_picker -> flutter;
+  file_picker -> flutter_plugin_android_lifecycle [label="^2.0.22"];
+  file_picker -> flutter_web_plugins;
+  file_picker -> path [label="^1.9.0"];
+  file_picker -> plugin_platform_interface [label="^2.1.8"];
+  file_picker -> web [label="^1.1.0"];
+  file_picker -> win32 [label="^5.9.0"];
+
+  flutter [label="flutter
+0.0.0", shape=box, margin="0.25,0.15", style=bold];
+  flutter -> characters [label="1.4.0"];
+  flutter -> collection [label="1.19.1"];
+  flutter -> material_color_utilities [label="0.11.1"];
+  flutter -> meta [label="1.16.0"];
+  flutter -> vector_math [label="2.1.4"];
+
+  flutter_adaptive_scaffold [label="flutter_adaptive_scaffold
+0.2.6", shape=box, margin="0.25,0.15", style=bold];
+  flutter_adaptive_scaffold -> flutter;
+
+  flutter_bloc [label="flutter_bloc
+8.1.6", shape=box, margin="0.25,0.15", style=bold];
+  flutter_bloc -> bloc [label="^8.1.1"];
+  flutter_bloc -> flutter;
+  flutter_bloc -> provider [label="^6.0.0"];
+
+  flutter_dropzone [label="flutter_dropzone
+4.2.1", shape=box, margin="0.25,0.15", style=bold];
+  flutter_dropzone -> flutter;
+  flutter_dropzone -> flutter_dropzone_platform_interface [label="^2.2.0"];
+  flutter_dropzone -> flutter_dropzone_web [label="^4.2.0"];
+  flutter_dropzone -> web [label=">=0.5.1 <2.0.0"];
+
+  flutter_inappwebview [label="flutter_inappwebview
+6.1.5", shape=box, margin="0.25,0.15", style=bold];
+  flutter_inappwebview -> flutter;
+  flutter_inappwebview -> flutter_inappwebview_android [label="^1.1.3"];
+  flutter_inappwebview -> flutter_inappwebview_ios [label="^1.1.2"];
+  flutter_inappwebview -> flutter_inappwebview_macos [label="^1.1.2"];
+  flutter_inappwebview -> flutter_inappwebview_platform_interface [label="^1.3.0"];
+  flutter_inappwebview -> flutter_inappwebview_web [label="^1.1.2"];
+  flutter_inappwebview -> flutter_inappwebview_windows [label="^0.6.0"];
+
+  flutter_localized_locales [label="flutter_localized_locales
+2.0.5", shape=box, margin="0.25,0.15", style=bold];
+  flutter_localized_locales -> flutter;
+  flutter_localized_locales -> intl;
+
+  flutter_markdown [label="flutter_markdown
+0.7.6+2", shape=box, margin="0.25,0.15", style=bold];
+  flutter_markdown -> flutter;
+  flutter_markdown -> markdown [label="^7.1.1"];
+  flutter_markdown -> meta [label="^1.3.0"];
+  flutter_markdown -> path [label="^1.8.0"];
+
+  flutter_native_splash [label="flutter_native_splash
+2.4.6", shape=box, margin="0.25,0.15", style=bold];
+  flutter_native_splash -> ansicolor [label="^2.0.3"];
+  flutter_native_splash -> args [label="^2.7.0"];
+  flutter_native_splash -> flutter;
+  flutter_native_splash -> flutter_web_plugins;
+  flutter_native_splash -> html [label="^0.15.5"];
+  flutter_native_splash -> image [label="^4.5.4"];
+  flutter_native_splash -> meta [label="^1.16.0"];
+  flutter_native_splash -> path [label="^1.9.1"];
+  flutter_native_splash -> universal_io [label="^2.2.2"];
+  flutter_native_splash -> xml [label="^6.5.0"];
+  flutter_native_splash -> yaml [label="^3.1.3"];
+
+  flutter_quill [label="flutter_quill
+11.1.0", shape=box, margin="0.25,0.15", style=bold];
+  flutter_quill -> charcode [label="^1.3.0"];
+  flutter_quill -> collection [label="^1.17.0"];
+  flutter_quill -> dart_quill_delta [label="^10.0.0"];
+  flutter_quill -> flutter;
+  flutter_quill -> flutter_colorpicker [label="^1.1.0"];
+  flutter_quill -> flutter_keyboard_visibility_temp_fork [label="^0.1.1"];
+  flutter_quill -> flutter_localizations;
+  flutter_quill -> flutter_quill_delta_from_html [label="^1.4.1"];
+  flutter_quill -> html [label="^0.15.0"];
+  flutter_quill -> intl [label=">=0.19.0 <0.21.0"];
+  flutter_quill -> markdown [label="^7.1.0"];
+  flutter_quill -> meta [label="^1.7.0"];
+  flutter_quill -> quill_native_bridge [label="^11.0.0"];
+  flutter_quill -> quiver [label="^3.2.0"];
+  flutter_quill -> url_launcher [label="^6.2.1"];
+
+  flutter_quill_extensions [label="flutter_quill_extensions
+11.0.0", shape=box, margin="0.25,0.15", style=bold];
+  flutter_quill_extensions -> flutter;
+  flutter_quill_extensions -> flutter_quill;
+  flutter_quill_extensions -> image_picker [label="^1.0.0"];
+  flutter_quill_extensions -> meta [label="^1.7.0"];
+  flutter_quill_extensions -> path [label="^1.8.0"];
+  flutter_quill_extensions -> photo_view [label="^0.15.0"];
+  flutter_quill_extensions -> url_launcher [label="^6.2.1"];
+  flutter_quill_extensions -> video_player [label="^2.8.0"];
+  flutter_quill_extensions -> web [label=">=0.5.0 <2.0.0"];
+  flutter_quill_extensions -> webviewimage [label="^0.0.6"];
+
+  flutter_secure_storage [label="flutter_secure_storage
+9.2.4", shape=box, margin="0.25,0.15", style=bold];
+  flutter_secure_storage -> flutter;
+  flutter_secure_storage -> flutter_secure_storage_linux [label="^1.2.2"];
+  flutter_secure_storage -> flutter_secure_storage_macos [label="^3.1.3"];
+  flutter_secure_storage -> flutter_secure_storage_platform_interface [label="^1.1.2"];
+  flutter_secure_storage -> flutter_secure_storage_web [label="^1.2.1"];
+  flutter_secure_storage -> flutter_secure_storage_windows [label="^3.1.2"];
+  flutter_secure_storage -> meta [label="^1.3.0"];
+
+  flutter_web_plugins [label="flutter_web_plugins
+0.0.0", shape=box, margin="0.25,0.15", style=bold];
+  flutter_web_plugins -> characters [label="1.4.0"];
+  flutter_web_plugins -> collection [label="1.19.1"];
+  flutter_web_plugins -> flutter;
+  flutter_web_plugins -> material_color_utilities [label="0.11.1"];
+  flutter_web_plugins -> meta [label="1.16.0"];
+  flutter_web_plugins -> vector_math [label="2.1.4"];
+
+  formz [label="formz
+0.7.0", shape=box, margin="0.25,0.15", style=bold];
+  formz -> meta [label="^1.7.0"];
+
+  go_router [label="go_router
+14.8.1", shape=box, margin="0.25,0.15", style=bold];
+  go_router -> collection [label="^1.15.0"];
+  go_router -> flutter;
+  go_router -> flutter_web_plugins;
+  go_router -> logging [label="^1.0.0"];
+  go_router -> meta [label="^1.7.0"];
+
+  google_fonts [label="google_fonts
+6.2.1", shape=box, margin="0.25,0.15", style=bold];
+  google_fonts -> crypto [label="^3.0.0"];
+  google_fonts -> flutter;
+  google_fonts -> http [label="^1.0.0"];
+  google_fonts -> path_provider [label="^2.0.0"];
+
+  intl [label="intl
+0.19.0", shape=box, margin="0.25,0.15", style=bold];
+  intl -> clock [label="^1.1.0"];
+  intl -> meta [label="^1.0.2"];
+  intl -> path [label="^1.8.0"];
+
+  lottie [label="lottie
+3.3.1", shape=box, margin="0.25,0.15", style=bold];
+  lottie -> archive [label="^4.0.0"];
+  lottie -> flutter;
+  lottie -> http [label="^1.0.0"];
+  lottie -> path [label="^1.8.0"];
+  lottie -> vector_math [label="^2.1.0"];
+
+  markdown [label="markdown
+7.3.0", shape=box, margin="0.25,0.15", style=bold];
+  markdown -> args [label="^2.0.0"];
+  markdown -> meta [label="^1.3.0"];
+
+  markdown_quill [label="markdown_quill
+4.3.0", shape=box, margin="0.25,0.15", style=bold];
+  markdown_quill -> charcode [label="^1.3.1"];
+  markdown_quill -> collection [label="^1.18.0"];
+  markdown_quill -> flutter_quill;
+  markdown_quill -> markdown [label="^7.2.1"];
+
+  mask_text_input_formatter [label="mask_text_input_formatter
+2.9.0", shape=box, margin="0.25,0.15", style=bold];
+  mask_text_input_formatter -> flutter;
+
+  result_type [label="result_type
+0.2.0", shape=box, margin="0.25,0.15", style=bold];
+  result_type -> meta [label="^1.8.0"];
+
+  scrollable_positioned_list [label="scrollable_positioned_list
+0.3.8", shape=box, margin="0.25,0.15", style=bold];
+  scrollable_positioned_list -> collection [label="^1.15.0"];
+  scrollable_positioned_list -> flutter;
+
+  sentry_flutter [label="sentry_flutter
+9.0.0", shape=box, margin="0.25,0.15", style=bold];
+  sentry_flutter -> collection [label="^1.16.0"];
+  sentry_flutter -> ffi [label="^2.0.0"];
+  sentry_flutter -> flutter;
+  sentry_flutter -> flutter_web_plugins;
+  sentry_flutter -> jni [label="0.14.1"];
+  sentry_flutter -> meta [label="^1.3.0"];
+  sentry_flutter -> package_info_plus [label=">=1.0.0"];
+  sentry_flutter -> sentry [label="9.0.0"];
+  sentry_flutter -> web [label="^1.1.0"];
+
+  shared_preferences [label="shared_preferences
+2.5.2", shape=box, margin="0.25,0.15", style=bold];
+  shared_preferences -> flutter;
+  shared_preferences -> shared_preferences_android [label="^2.3.4"];
+  shared_preferences -> shared_preferences_foundation [label="^2.5.0"];
+  shared_preferences -> shared_preferences_linux [label="^2.4.0"];
+  shared_preferences -> shared_preferences_platform_interface [label="^2.4.0"];
+  shared_preferences -> shared_preferences_web [label="^2.4.0"];
+  shared_preferences -> shared_preferences_windows [label="^2.4.0"];
+
+  skeletonizer [label="skeletonizer
+1.4.3", shape=box, margin="0.25,0.15", style=bold];
+  skeletonizer -> flutter;
+
+  url_launcher [label="url_launcher
+6.3.1", shape=box, margin="0.25,0.15", style=bold];
+  url_launcher -> flutter;
+  url_launcher -> url_launcher_android [label="^6.3.0"];
+  url_launcher -> url_launcher_ios [label="^6.2.4"];
+  url_launcher -> url_launcher_linux [label="^3.1.0"];
+  url_launcher -> url_launcher_macos [label="^3.1.0"];
+  url_launcher -> url_launcher_platform_interface [label="^2.3.0"];
+  url_launcher -> url_launcher_web [label="^2.2.0"];
+  url_launcher -> url_launcher_windows [label="^3.1.0"];
+
+  url_strategy [label="url_strategy
+0.3.0", shape=box, margin="0.25,0.15", style=bold];
+  url_strategy -> flutter_web_plugins;
+
+  uuid_plus [label="uuid_plus
+0.1.0", shape=box, margin="0.25,0.15", style=bold];
+  uuid_plus -> crypto [label="^3.0.6"];
+  uuid_plus -> fixnum [label="^1.1.1"];
+  uuid_plus -> meta [label="^1.16.0"];
+
+  video_player [label="video_player
+2.9.3", shape=box, margin="0.25,0.15", style=bold];
+  video_player -> flutter;
+  video_player -> html [label="^0.15.0"];
+  video_player -> video_player_android [label="^2.3.5"];
+  video_player -> video_player_avfoundation [label="^2.5.6"];
+  video_player -> video_player_platform_interface [label="^6.2.0"];
+  video_player -> video_player_web [label="^2.1.0"];
+}
+
