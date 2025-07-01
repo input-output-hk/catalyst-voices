@@ -11,9 +11,7 @@ import 'package:drift/drift.dart';
   ],
 )
 
-/// Exposes only public operation on favorites, and related, tables.
-/// Favorites documents are stored separately from [DocumentsDao] and [DraftsDao] due to the fact
-/// that favorites document might be [SignedDocumentRef] or [DocumentRef]
+/// Exposes only public operations on favorites documents. It saves only document id and type.
 class DriftFavoritesDao extends DatabaseAccessor<DriftCatalystDatabase>
     with $DriftFavoritesDaoMixin
     implements FavoritesDao {
