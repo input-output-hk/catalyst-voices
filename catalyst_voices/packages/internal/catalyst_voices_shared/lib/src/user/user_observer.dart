@@ -64,6 +64,10 @@ final class StreamUserObserver implements UserObserver {
   }
 }
 
+/// An interface that provides a streamable [User] to observe the current user.
+/// 
+/// The changes reflected in the stream might be related to the same user,
+/// i.e. in case of profile change or the user might be completely different when another user logins.
 abstract interface class UserObserver implements ActiveAware {
   User get user;
 
