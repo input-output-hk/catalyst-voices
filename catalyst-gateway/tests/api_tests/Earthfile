@@ -35,6 +35,7 @@ check-return-code:
     FROM scratch
     COPY ./scripts/check_return_code.sh .
     SAVE ARTIFACT ./check_return_code.sh
+    SAVE ARTIFACT ./check_return_code.sh AS LOCAL check_return_code.sh
 
 check-gateway-ready:
     FROM alpine:3.18
