@@ -25,7 +25,7 @@ until [ $COUNT -ge $MAX_RETRIES ]; do
   echo "Attempt $((COUNT+1)): HTTP $ACTUAL_STATUS"
 
   if [ "$ACTUAL_STATUS" -eq $STATUS ]; then
-    echo "✅ Received $STATUS"
+    echo "✅ Received $STATUS in $((COUNT*SLEEP_SECONDS)) seconds..."
     exit 0
   fi
 
