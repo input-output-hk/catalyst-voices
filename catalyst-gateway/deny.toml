@@ -23,7 +23,7 @@ multiple-versions = "warn"
 wildcards = 'deny'
 deny = [
     # Scylla DB Drivers currently require OpenSSL.  Its unavoidable.
-    # However, there is movement to enable support for Rustls. 
+    # However, there is movement to enable support for Rustls.
     # So, for now, allow open-ssl but it needs to be disabled as soon as Scylla DB enables Rustls.
     #{ crate = "openssl", use-instead = "rustls" },
     #{ crate = "openssl-sys", use-instead = "rustls" },
@@ -94,14 +94,15 @@ expression = "Apache-2.0 WITH LLVM-exception"
 license-files = [{ path = "../../../LICENSE", hash = 0x001c7e6c }]
 
 [[licenses.clarify]]
-crate = "hdf5-src"
+crate = "hdf5-metno-src"
 expression = "MIT"
-license-files = [{ path = "../LICENSE-MIT", hash = 0x001c7e6c }]
+license-files = [{ path = "ext/hdf5/COPYING", hash = 0xf13e3591 }]
 
 [[licenses.clarify]]
 crate = "ring"
 expression = "MIT"
 license-files = [{ path = "LICENSE", hash = 0xbd0eed23 }]
+
 
 # SPDX considers OpenSSL to encompass both the OpenSSL and SSLeay licenses
 # https://spdx.org/licenses/OpenSSL.html

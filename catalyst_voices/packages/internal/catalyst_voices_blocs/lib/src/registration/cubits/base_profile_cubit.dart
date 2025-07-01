@@ -11,9 +11,10 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
           kDebugMode
               ? const BaseProfileStateData(
                   email: Email.dirty('dev@iokh.com'),
+                  receiveEmails: ReceiveEmails(isAccepted: true, isEnabled: true),
                   username: Username.dirty('Dev'),
-                  isToSAccepted: true,
-                  isPrivacyPolicyAccepted: true,
+                  conditionsAccepted: true,
+                  tosAndPrivacyPolicyAccepted: true,
                 )
               : const BaseProfileStateData(),
         );
@@ -26,22 +27,33 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
   }
 
   @override
+  void updateConditions({
+    required bool accepted,
+  }) {
+    emit(state.copyWith(conditionsAccepted: accepted));
+  }
+
+  @override
   void updateEmail(Email value) {
-    emit(state.copyWith(email: value));
+    final receiveEmails = state.receiveEmails.copyWith(
+      isAccepted: value.isNotValid ? false : null,
+      isEnabled: value.isNonEmptyAndValid,
+    );
+
+    emit(state.copyWith(email: value, receiveEmails: receiveEmails));
   }
 
   @override
-  void updatePrivacyPolicy({
-    required bool isAccepted,
-  }) {
-    emit(state.copyWith(isPrivacyPolicyAccepted: isAccepted));
+  void updateReceiveEmails({required bool isAccepted}) {
+    final receiveEmails = state.receiveEmails.copyWith(isAccepted: isAccepted);
+    emit(state.copyWith(receiveEmails: receiveEmails));
   }
 
   @override
-  void updateToS({
-    required bool isAccepted,
+  void updateTosAndPrivacyPolicy({
+    required bool accepted,
   }) {
-    emit(state.copyWith(isToSAccepted: isAccepted));
+    emit(state.copyWith(tosAndPrivacyPolicyAccepted: accepted));
   }
 
   @override
@@ -51,11 +63,13 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
 }
 
 abstract interface class BaseProfileManager {
+  void updateConditions({required bool accepted});
+
   void updateEmail(Email value);
 
-  void updatePrivacyPolicy({required bool isAccepted});
+  void updateReceiveEmails({required bool isAccepted});
 
-  void updateToS({required bool isAccepted});
+  void updateTosAndPrivacyPolicy({required bool accepted});
 
   void updateUsername(Username value);
 }

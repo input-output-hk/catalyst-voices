@@ -12,6 +12,8 @@ final class Email extends FormzInput<String, EmailValidationException> {
 
   const Email.pure([super.value = '']) : super.pure();
 
+  bool get isNonEmptyAndValid => value.isNotEmpty && isValid;
+
   @override
   EmailValidationException? validator(String value) {
     if (!lengthRange.contains(value.length)) {
