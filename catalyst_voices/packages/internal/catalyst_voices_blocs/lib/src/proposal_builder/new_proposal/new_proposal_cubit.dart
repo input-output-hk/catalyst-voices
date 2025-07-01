@@ -10,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _logger = Logger('NewProposalCubit');
 
+/// Manages creation of new proposal.
 class NewProposalCubit extends Cubit<NewProposalState>
     with BlocErrorEmitterMixin<NewProposalState> {
   final CampaignService _campaignService;

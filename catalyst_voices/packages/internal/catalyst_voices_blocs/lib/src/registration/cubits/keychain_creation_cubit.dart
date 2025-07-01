@@ -12,6 +12,10 @@ import 'package:flutter/foundation.dart';
 
 final _logger = Logger('KeychainCreationCubit');
 
+/// Manages the keychain creation.
+///
+/// Allows to create a new keychain and export it to a file.
+/// Allows recovery of the keychain from the seed phrase.
 final class KeychainCreationCubit extends Cubit<KeychainStateData>
     with BlocErrorEmitterMixin, UnlockPasswordMixin
     implements KeychainCreationManager {

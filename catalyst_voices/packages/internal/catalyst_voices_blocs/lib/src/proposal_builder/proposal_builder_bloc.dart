@@ -18,6 +18,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _logger = Logger('ProposalBuilderBloc');
 
+/// Manages proposal builder.
+///
+/// Handles loading of proposal, editing of proposal and comments, publishing of proposal and comments,
+/// and other related actions.
 final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuilderState>
     with
         BlocErrorEmitterMixin,

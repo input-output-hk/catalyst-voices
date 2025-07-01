@@ -6,6 +6,7 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 
+/// This cubit allows user to change their account information.
 final class AccountCubit extends Cubit<AccountState>
     with BlocErrorEmitterMixin, BlocSignalEmitterMixin<AccountSignal, AccountState> {
   final _logger = Logger('AccountCubit');

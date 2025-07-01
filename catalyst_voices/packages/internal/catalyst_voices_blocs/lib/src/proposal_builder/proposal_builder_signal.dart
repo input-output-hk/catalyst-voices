@@ -1,5 +1,7 @@
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:equatable/equatable.dart';
 
+/// Signal emitted by [ProposalBuilderBloc]. Tells the UI that the proposal has been deleted.
 final class DeletedProposalBuilderSignal extends ProposalBuilderSignal {
   const DeletedProposalBuilderSignal();
 
@@ -7,6 +9,7 @@ final class DeletedProposalBuilderSignal extends ProposalBuilderSignal {
   List<Object?> get props => [];
 }
 
+/// Signal emitted by [ProposalBuilderBloc]. Tells the UI that the email is not verified.
 final class EmailNotVerifiedProposalBuilderSignal extends ProposalBuilderSignal {
   const EmailNotVerifiedProposalBuilderSignal();
 
@@ -14,6 +17,7 @@ final class EmailNotVerifiedProposalBuilderSignal extends ProposalBuilderSignal 
   List<Object?> get props => [];
 }
 
+/// Signal emitted by [ProposalBuilderBloc]. Tells the UI that the proposal has been successfully forgot.
 final class ForgotProposalSuccessBuilderSignal extends ProposalBuilderSignal {
   const ForgotProposalSuccessBuilderSignal();
 
@@ -21,13 +25,7 @@ final class ForgotProposalSuccessBuilderSignal extends ProposalBuilderSignal {
   List<Object?> get props => [];
 }
 
-final class NewProposalAndEmailNotVerifiedSignal extends ProposalBuilderSignal {
-  const NewProposalAndEmailNotVerifiedSignal();
-
-  @override
-  List<Object?> get props => [];
-}
-
+/// Signal emitted by [ProposalBuilderBloc]. Tells the UI that the max proposals limit has been reached.
 final class MaxProposalsLimitReachedSignal extends ProposalBuilderSignal {
   final int currentSubmissions;
   final int maxSubmissions;
@@ -47,10 +45,21 @@ final class MaxProposalsLimitReachedSignal extends ProposalBuilderSignal {
       ];
 }
 
+/// Signal emitted by [ProposalBuilderBloc]. Tells the UI that the proposal has been successfully forgot.
+final class NewProposalAndEmailNotVerifiedSignal extends ProposalBuilderSignal {
+  const NewProposalAndEmailNotVerifiedSignal();
+
+  @override
+  List<Object?> get props => [];
+}
+
+/// Signal emitted by [ProposalBuilderBloc]. Tells the UI that the proposal submission close date has been updated.
 sealed class ProposalBuilderSignal extends Equatable {
   const ProposalBuilderSignal();
 }
 
+/// Signal emitted by [ProposalBuilderBloc]. Tells the UI that the proposal submission close date is
+/// near to the current date.
 final class ProposalSubmissionCloseDate extends ProposalBuilderSignal {
   final DateTime date;
 
@@ -60,6 +69,7 @@ final class ProposalSubmissionCloseDate extends ProposalBuilderSignal {
   List<Object?> get props => [date];
 }
 
+/// Signal emitted by [ProposalBuilderBloc]. Tells the UI that the proposal has been published.
 final class PublishedProposalBuilderSignal extends ProposalBuilderSignal {
   const PublishedProposalBuilderSignal();
 
@@ -67,6 +77,7 @@ final class PublishedProposalBuilderSignal extends ProposalBuilderSignal {
   List<Object?> get props => [];
 }
 
+/// Signal emitted by [ProposalBuilderBloc]. Tells the UI that the proposal was successfully published.
 final class ShowPublishConfirmationSignal extends ProposalBuilderSignal {
   final String? proposalTitle;
   final int? currentIteration;
@@ -86,6 +97,7 @@ final class ShowPublishConfirmationSignal extends ProposalBuilderSignal {
       ];
 }
 
+/// Signal emitted by [ProposalBuilderBloc]. Tells the UI that the user wants to submit the proposal.
 final class ShowSubmitConfirmationSignal extends ProposalBuilderSignal {
   final String? proposalTitle;
   final int? currentIteration;
@@ -105,6 +117,7 @@ final class ShowSubmitConfirmationSignal extends ProposalBuilderSignal {
       ];
 }
 
+/// Signal emitted by [ProposalBuilderBloc]. Tells the UI that the proposal was successfully submitted.
 final class SubmittedProposalBuilderSignal extends ProposalBuilderSignal {
   const SubmittedProposalBuilderSignal();
 
@@ -112,6 +125,7 @@ final class SubmittedProposalBuilderSignal extends ProposalBuilderSignal {
   List<Object?> get props => [];
 }
 
+/// Signal emitted by [ProposalBuilderBloc]. Tells the UI that the proposal needs to be unlocked to be edited.
 final class UnlockProposalSignal extends ProposalBuilderSignal {
   final String title;
   final int version;
