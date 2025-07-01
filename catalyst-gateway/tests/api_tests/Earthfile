@@ -19,7 +19,6 @@ builder:
     DO python-ci+BUILDER
 
 test-no-docker:
-
     FROM +builder
 
     ENV CAT_GATEWAY_INTERNAL_API_KEY "123"
@@ -28,7 +27,7 @@ test-no-docker:
     ENV EVENT_DB_TEST_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
     ENV CAT_GATEWAY_EXECUTABLE_PATH "./release/cat-gateway"
 
-    RUN poetry run pytest -s -m ci
+    RUN poetry run pytest -s -m preprod_indexing
     RUN bash
 
 check-return-code:
