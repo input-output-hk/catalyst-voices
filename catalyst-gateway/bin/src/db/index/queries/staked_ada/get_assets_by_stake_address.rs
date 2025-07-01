@@ -95,12 +95,7 @@ impl GetAssetsByStakeAddressQuery {
             .await?
             .rows_stream::<GetAssetsByStakeAddressQuery>()?
             .map_err(Into::<anyhow::Error>::into)
-            .try_fold(Vec::new(), |mut res: Vec<_>, item| {
-                async move {
-                    res.push(item);
-                    Ok(res)
-                }
-            })
+            .try_collect()
             .await?;
         // update cache
         if session.is_persistent() {
