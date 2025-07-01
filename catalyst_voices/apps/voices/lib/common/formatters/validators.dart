@@ -1,10 +1,12 @@
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+
 /// Validates if a given URL is an image URL
 final class ImageUrlValidator {
   ImageUrlValidator._();
 
   /// Returns true if the URL is a valid image URL
   static bool isValid(String url) {
-    if (url.trim().isEmpty) {
+    if (url.isBlank) {
       return false;
     }
 

@@ -7,7 +7,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
-/// Restricts access to screen base on current Campaign state.
+/// Restricts access to screen based on current Campaign state.
 final class ProposalSubmissionGuard implements RouteGuard {
   const ProposalSubmissionGuard();
 
