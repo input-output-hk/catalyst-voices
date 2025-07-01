@@ -20,13 +20,14 @@ builder:
 test-no-docker:
     FROM +builder
 
+    RUN curl -L -o cardano-asset-preprod.json ${CAT_STORAGE}/cardano-asset-preprod.json
+
     ENV CAT_GATEWAY_INTERNAL_API_KEY "123"
     ENV ASSETS_DATA_PATH="cardano-asset-preprod.json"
     ENV CAT_GATEWAY_TEST_URL "http://127.0.0.1:3030"
     ENV EVENT_DB_TEST_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
     ENV CAT_GATEWAY_EXECUTABLE_PATH "./release/cat-gateway"
 
-    RUN curl -L -o cardano-asset-preprod.json ${CAT_STORAGE}/cardano-asset-preprod.json
     RUN poetry run pytest -s -m preprod_indexing
     RUN bash
 
