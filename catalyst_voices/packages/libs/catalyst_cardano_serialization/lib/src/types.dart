@@ -7,7 +7,7 @@ import 'package:equatable/equatable.dart';
 
 /// Represents the balance of the wallet in terms of [Coin].
 final class Balance extends Equatable implements CborEncodable {
-  /// The amount of [Coin] that the wallet holds.
+  /// The amount of Ada [Coin] that the wallet holds.
   final Coin coin;
 
   /// The amounts of native assets that the wallet holds.
