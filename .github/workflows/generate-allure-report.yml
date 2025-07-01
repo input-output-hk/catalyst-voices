@@ -78,7 +78,7 @@ jobs:
         uses: lhotari/action-upterm@v1
 
       - name: Check if Gateway is synced and ready
-        run: ./catalyst-gateway/tests/api_tests/scripts/check_return_code.sh http://127.0.0.1:3030/api/v1/health/ready 204 30 10
+        run: ./catalyst-gateway/tests/api_tests/scripts/check_return_code.sh http://127.0.0.1:3030/api/v1/health/ready 204 300 10
 
 #      - name: Check if Gateway is synced and ready
 #        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
