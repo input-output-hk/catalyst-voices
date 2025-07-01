@@ -66,13 +66,24 @@ jobs:
           SIGNED_DOC_SK: "0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd"
         run: ./catalyst-gateway/cat-gateway run&
 
-      - name: Check if Gateway is synced and ready
+      - name: Get healtcheck script
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
         if: success()
         continue-on-error: true
         with:
           command: run
-          args: ./catalyst-gateway/tests/api_tests+check-gateway-ready
+          args: ./catalyst-gateway/tests/api_tests+check-return-code
+
+      - name: Check if Gateway is synced and ready
+        run: ./tests/api_tests/scripts/check_return_code.sh http://127.0.0.1:3030/api/v1/health/ready 204 30 10
+
+#      - name: Check if Gateway is synced and ready
+#        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
+#        if: success()
+#        continue-on-error: true
+#        with:
+#          command: run
+#          args: ./catalyst-gateway/tests/api_tests+check-gateway-ready
 
       - name: Setup upterm session
         uses: lhotari/action-upterm@v1
