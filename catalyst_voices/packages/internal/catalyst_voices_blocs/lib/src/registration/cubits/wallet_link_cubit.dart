@@ -11,6 +11,9 @@ import 'package:result_type/result_type.dart';
 
 final _logger = Logger('WalletLinkCubit');
 
+/// Manages the wallet linking process.
+///
+/// Allows to link a wallet to the account.
 final class WalletLinkCubit extends Cubit<WalletLinkStateData>
     with BlocErrorEmitterMixin
     implements WalletLinkManager {
