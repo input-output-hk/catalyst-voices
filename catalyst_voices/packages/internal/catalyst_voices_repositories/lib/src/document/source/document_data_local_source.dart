@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 
+/// Base interface to interact with locally document data.
 abstract interface class DocumentDataLocalSource implements DocumentDataSource {
   Future<int> deleteAll();
 

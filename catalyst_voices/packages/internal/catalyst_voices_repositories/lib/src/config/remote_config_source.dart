@@ -6,6 +6,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/dto/config/config.dart';
 
+/// Implementation for [RemoteConfigSource].
 final class ApiConfigSource implements RemoteConfigSource {
   final ApiServices _api;
 

@@ -22,6 +22,7 @@ const _clauseKeywords = [
 ];
 const _indent = '  ';
 
+/// Interceptor that logs all database operations.
 final class DatabaseLoggingInterceptor extends QueryInterceptor {
   final bool isEnabled;
   final bool onlyErrors;

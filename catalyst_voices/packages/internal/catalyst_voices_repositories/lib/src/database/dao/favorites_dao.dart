@@ -1,8 +1,8 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/favorites_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.dart';
-import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.drift.dart';
 import 'package:drift/drift.dart';
 
 @DriftAccessor(
@@ -10,6 +10,10 @@ import 'package:drift/drift.dart';
     DocumentsFavorites,
   ],
 )
+
+/// Exposes only public operation on favorites, and related, tables.
+/// Favorites documents are stored separately from [DocumentsDao] and [DraftsDao] due to the fact
+/// that favorites document might be [SignedDocumentRef] or [DocumentRef]
 class DriftFavoritesDao extends DatabaseAccessor<DriftCatalystDatabase>
     with $DriftFavoritesDaoMixin
     implements FavoritesDao {

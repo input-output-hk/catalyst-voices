@@ -3,6 +3,7 @@ import 'package:catalyst_voices_repositories/src/dev_tools/dev_tools_storage.dar
 import 'package:catalyst_voices_repositories/src/dto/dev_tools/dev_tools_config_dto.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
+/// Repository for reading and writing data for DevTools.
 abstract interface class DevToolsRepository {
   const factory DevToolsRepository(
     DevToolsStorage storage,
