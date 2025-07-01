@@ -29,7 +29,7 @@ class AppGlobalShortcuts extends StatelessWidget {
       bindings: {
         if (isDeveloper)
           devToolsShortcut: () {
-            final routerContext = AppRouter.rootNavigatorKey.currentContext;
+            final routerContext = AppRouterFactory.rootNavigatorKey.currentContext;
             if (routerContext != null) {
               unawaited(DevToolsPage.show(routerContext));
             }

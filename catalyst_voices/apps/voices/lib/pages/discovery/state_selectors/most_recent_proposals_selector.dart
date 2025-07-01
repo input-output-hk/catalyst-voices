@@ -47,15 +47,15 @@ class _MostRecentProposalsError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<DiscoveryCubit, DiscoveryState, VisibilityState>(
+    return BlocSelector<DiscoveryCubit, DiscoveryState, ErrorVisibilityState>(
       selector: (state) {
         return (
           show: state.proposals.showError,
-          error: state.proposals.error,
+          data: state.proposals.error,
         );
       },
       builder: (context, state) {
-        final errorMessage = state.error?.message(context);
+        final errorMessage = state.data?.message(context);
         return Offstage(
           key: const Key('MostRecentError'),
           offstage: !state.show,

@@ -12,6 +12,9 @@ import 'package:markdown_quill/markdown_quill.dart';
 //
 // If we could have just Delta package it would be preferred to live in
 // models/shared package
+/// Global instance for [MarkdownCodec].
+///
+/// It's syntax sugar as const constructor works same way.
 const markdown = MarkdownCodec();
 
 final _deltaToMd = DeltaToMarkdown(
@@ -20,6 +23,11 @@ final _deltaToMd = DeltaToMarkdown(
 final _mdDocument = md.Document();
 final _mdToDelta = MarkdownToDelta(markdownDocument: _mdDocument);
 
+/// In the app we support Quill's [Delta] format for rich text editor but for everything else
+/// like communicating with backend or data models we're expecting Markdown String data
+/// (enforced by [MarkdownData]).
+///
+/// This class provides utilities for converting between [MarkdownData] and [Delta].
 final class MarkdownCodec extends Codec<MarkdownData, Delta> {
   const MarkdownCodec();
 
@@ -30,6 +38,7 @@ final class MarkdownCodec extends Codec<MarkdownData, Delta> {
   Converter<MarkdownData, Delta> get encoder => const MarkdownDecoder();
 }
 
+/// Decoder for [MarkdownCodec].
 class MarkdownDecoder extends Converter<MarkdownData, Delta> {
   const MarkdownDecoder();
 
@@ -43,6 +52,7 @@ class MarkdownDecoder extends Converter<MarkdownData, Delta> {
   }
 }
 
+/// Encoder for [MarkdownCodec].
 class MarkdownEncoder extends Converter<Delta, MarkdownData> {
   const MarkdownEncoder();
 

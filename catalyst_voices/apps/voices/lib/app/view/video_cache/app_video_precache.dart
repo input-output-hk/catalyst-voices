@@ -1,9 +1,11 @@
 import 'package:catalyst_voices/app/view/video_cache/app_video_manager.dart';
-import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
+/// Caching app assets before rendering UI.
+///
+/// Its theme aware and adjusts changes accordingly.
 class AppVideoPrecache extends StatefulWidget {
   final Widget child;
 
@@ -33,10 +35,7 @@ class _AppVideoPrecacheState extends State<AppVideoPrecache> {
           return const Offstage();
         }
 
-        return VideoManagerScope(
-          manager: _manager!,
-          child: widget.child,
-        );
+        return widget.child;
       },
     );
   }
@@ -46,6 +45,8 @@ class _AppVideoPrecacheState extends State<AppVideoPrecache> {
     super.didChangeDependencies();
     final theme = Theme.of(context);
     final currentBrightness = theme.brightness;
+
+    _manager = VideoManagerScope.of(context);
 
     if (_previousBrightness != currentBrightness) {
       _previousBrightness = currentBrightness;
@@ -60,12 +61,6 @@ class _AppVideoPrecacheState extends State<AppVideoPrecache> {
   void dispose() {
     _manager = null;
     super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _manager = Dependencies.instance.get<VideoManager>();
   }
 
   Future<void> _precacheVideos() {
