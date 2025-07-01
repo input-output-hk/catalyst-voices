@@ -2,6 +2,7 @@ VERSION 0.8
 
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.4.2 AS python-ci
 IMPORT github.com/input-output-hk/catalyst-libs/rust:r20250627-00 AS cat-libs-rust
+ARG --global CAT_STORAGE = "https://github.com/input-output-hk/catalyst-storage/blob/main"
 
 builder:
     FROM python-ci+python-base
@@ -14,7 +15,41 @@ builder:
     COPY --dir ./utils .
     COPY --dir ./wrappers .
     COPY cat-libs-rust+build/mk_signed_doc .
+    RUN curl -L -o cardano-asset-preprod.json ${CAT_STORAGE}/cardano-asset-preprod.json
     DO python-ci+BUILDER
+
+test-no-docker:
+
+    FROM +builder
+
+    ENV CAT_GATEWAY_INTERNAL_API_KEY "123"
+    ENV ASSETS_DATA_PATH="cardano-asset-preprod.json"
+    ENV CAT_GATEWAY_TEST_URL "http://127.0.0.1:3030"
+    ENV EVENT_DB_TEST_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+    ENV CAT_GATEWAY_EXECUTABLE_PATH "./release/cat-gateway"
+
+    RUN poetry run pytest -s -m ci
+    RUN bash
+
+check-return-code:
+    FROM scratch
+    COPY ./scripts/check_return_code.sh .
+    SAVE ARTIFACT ./check_return_code.sh
+
+check-gateway-ready:
+    FROM alpine:3.18
+
+    COPY +check-return-code/check_return_code.sh .
+
+    RUN apk add --no-cache curl
+
+    # Script variables
+    ARG URL=http://127.0.0.1:3030/api/v1/health/ready
+    ARG STATUS=204
+    ARG MAX_RETRIES=30 # Waiting 5 minutes (30 * 10 seconds)
+    ARG SLEEP_SECONDS=10
+
+    RUN ./check_return_code.sh $URL $STATUS $MAX_RETRIES $SLEEP_SECONDS
 
 test:
     FROM +builder
@@ -31,7 +66,7 @@ test:
         --load event-db:latest=(./../../event-db+build) \
         --load cat-gateway-with-scylla:latest=(./../+package-cat-gateway-with-scylla) \
         --service cat-gateway-with-scylla-is-running
-        RUN poetry run pytest -s --junitxml=junit-report.xml --cov=integration --cov-report lcov
+        RUN poetry run pytest -s -m ci
     END
     WAIT
         SAVE ARTIFACT junit-report.xml AS LOCAL api-tests.junit-report.xml
