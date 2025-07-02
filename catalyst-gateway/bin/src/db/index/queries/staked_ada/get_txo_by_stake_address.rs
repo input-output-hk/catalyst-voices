@@ -1,23 +1,36 @@
 //! Get the TXO by Stake Address
-use std::sync::Arc;
+use std::sync::{Arc, LazyLock};
 
 use cardano_blockchain_types::StakeAddress;
-use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
-    SerializeRow, Session,
-};
+use futures::TryStreamExt;
+use moka::{ops::compute::Op, policy::EvictionPolicy};
+use scylla::{prepared_statement::PreparedStatement, DeserializeRow, SerializeRow, Session};
 use tracing::error;
 
-use crate::db::{
-    index::{
-        queries::{PreparedQueries, PreparedSelectQuery},
-        session::CassandraSession,
+use super::update_txo_spent::UpdateTxoSpentQueryParams;
+use crate::{
+    db::{
+        index::{
+            queries::{PreparedQueries, PreparedSelectQuery},
+            session::CassandraSession,
+        },
+        types::{DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
     },
-    types::{DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
+    settings::Settings,
 };
 
 /// Get txo by stake address query string.
 const GET_TXO_BY_STAKE_ADDRESS_QUERY: &str = include_str!("../cql/get_txo_by_stake_address.cql");
+
+/// In memory cache of the most recent Cardano UTXO assets by Stake Address.
+static ASSETS_CACHE: LazyLock<moka::future::Cache<DbStakeAddress, Vec<GetTxoByStakeAddressQuery>>> =
+    LazyLock::new(|| {
+        moka::future::Cache::builder()
+            .name("Cardano UTXO assets")
+            .eviction_policy(EvictionPolicy::lru())
+            .max_capacity(Settings::cardano_assets_cache().utxo_cache_size())
+            .build()
+    });
 
 /// Get txo by stake address query parameters.
 #[derive(SerializeRow)]
