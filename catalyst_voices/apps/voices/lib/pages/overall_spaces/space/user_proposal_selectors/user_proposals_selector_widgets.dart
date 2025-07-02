@@ -43,9 +43,9 @@ class _ErrorProposalSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState, VisibilityState>(
+    return BlocSelector<WorkspaceBloc, WorkspaceState, ErrorVisibilityState>(
       selector: (state) {
-        return (error: state.error, show: state.showError);
+        return (data: state.error, show: state.showError);
       },
       builder: (context, state) {
         return Offstage(
@@ -53,7 +53,7 @@ class _ErrorProposalSelector extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(top: 60),
             child: VoicesErrorIndicator(
-              message: state.error?.message(context) ??
+              message: state.data?.message(context) ??
                   const LocalizedUnknownException().message(context),
               onRetry: () => context.read<WorkspaceBloc>().add(const WatchUserProposalsEvent()),
             ),

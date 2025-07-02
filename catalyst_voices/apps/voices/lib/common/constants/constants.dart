@@ -1,5 +1,6 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 
+/// Exposes static refs to external services.
 abstract class VoicesConstants {
   static const _docs = 'https://docs.projectcatalyst.io';
   static const _catalystApp = '$_docs/catalyst-tools/catalyst-app';
@@ -37,6 +38,8 @@ abstract class VoicesConstants {
   static const unlockAccountUrl = '$_catalystApp/my-account#lock-unlock-account';
   static const confirmSeedPhraseUrl = '$_catalystApp/getting-started#confirm-seed-phrase';
   static const campaignTimeline = '$_docs/current-fund/fund-basics/fund-timeline';
+
+  VoicesConstants._();
 
   static String cardanoScanStakeAddressUrl(ShelleyAddress stakeAddress) {
     switch (stakeAddress.network) {
