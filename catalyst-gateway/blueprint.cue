@@ -155,7 +155,7 @@ project: {
 						nodeSelector: {
 							"node-group": "catalyst-gateway"
 						}
-						replicas:       1
+						replicas:       3
 						serviceAccount: "catalyst-gateway"
 						strategy:       "RollingUpdate"
 						tolerations: [
