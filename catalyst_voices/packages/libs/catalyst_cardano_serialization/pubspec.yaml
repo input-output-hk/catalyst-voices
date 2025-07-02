@@ -30,14 +30,11 @@ dependencies:
 
 dev_dependencies:
   analyzer: 7.3.0
-  build_runner: ^2.4.12
+  build_runner: ^2.5.4
   catalyst_analysis: ^3.0.0
   flutter_test:
     sdk: flutter
-  # TODO(dtscalac): revert to pub.dev version when https://github.com/szktty/kiri-check/pull/26 is released.
-  kiri_check:
-    git:
-      url: https://github.com/szktty/kiri-check
+  kiri_check: ^1.3.0
   mockito: ^5.4.4
   mocktail: ^1.0.1
   test: ^1.24.9
