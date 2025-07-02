@@ -89,7 +89,7 @@ Future<void> bootstrapAndRun(
 GoRouter buildAppRouter({
   String? initialLocation,
 }) {
-  return AppRouter.init(
+  return AppRouterFactory.create(
     initialLocation: initialLocation,
   );
 }
