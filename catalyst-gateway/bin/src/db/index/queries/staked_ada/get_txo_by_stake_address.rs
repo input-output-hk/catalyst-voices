@@ -114,7 +114,10 @@ impl GetTxoByStakeAddressQuery {
             let _entry = ASSETS_CACHE
                 .entry(stake_address.clone())
                 .and_compute_with(|maybe_entry| {
-                    let op = if let Some(entry) = maybe_entry {
+                    let op = maybe_entry.map_or_else(|| {
+                        tracing::debug!(utxo_params = ?update, stake_address = %stake_address, "Stake Address not found in Assets Cache");
+                        Op::Nop
+                    }, |entry| {
                         let mut txos = entry.into_value();
                         if let Some(txo) = txos.iter_mut().find(|t| {
                             t.txo == update.txo
@@ -122,15 +125,13 @@ impl GetTxoByStakeAddressQuery {
                                 && t.slot_no == update.slot_no
                         }) {
                             txo.spent_slot = Some(update.spent_slot);
+                            tracing::debug!(utxo_params = ?update, stake_address = %stake_address, "Updated UTXO for Stake Address in Assets Cache");
                             Op::Put(txos)
                         } else {
                             tracing::debug!(utxo_params = ?update, stake_address = %stake_address, "UTXOs not found for Stake Address in Assets Cache");
                             Op::Nop
                         }
-                    } else {
-                        tracing::debug!(utxo_params = ?update, stake_address = %stake_address, "Stake Address not found in Assets Cache");
-                        Op::Nop
-                    };
+                    });
                     std::future::ready(op)
                 })
                 .await;
