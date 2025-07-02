@@ -235,16 +235,14 @@ async fn test_get_txo_by_stake_address() {
         panic!("{SESSION_ERR_MSG}");
     };
 
-    let mut row_stream = GetTxoByStakeAddressQuery::execute(
+    let row_stream = GetTxoByStakeAddressQuery::execute(
         &session,
         GetTxoByStakeAddressQueryParams::new(stake_address_1()),
     )
     .await
     .unwrap();
 
-    while let Some(row_res) = row_stream.next().await {
-        drop(row_res.unwrap());
-    }
+    row_stream.into_iter().for_each(drop);
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]

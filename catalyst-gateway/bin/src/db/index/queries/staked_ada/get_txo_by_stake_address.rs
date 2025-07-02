@@ -49,7 +49,7 @@ impl GetTxoByStakeAddressQueryParams {
 }
 
 /// Get txo by stake address query.
-#[derive(DeserializeRow)]
+#[derive(DeserializeRow, Clone)]
 pub(crate) struct GetTxoByStakeAddressQuery {
     /// TXO transaction hash.
     pub txn_id: DbTransactionId,
@@ -82,12 +82,63 @@ impl GetTxoByStakeAddressQuery {
     /// Executes a get txo by stake address query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetTxoByStakeAddressQueryParams,
-    ) -> anyhow::Result<TypedRowStream<GetTxoByStakeAddressQuery>> {
-        let iter = session
-            .execute_iter(PreparedSelectQuery::TxoByStakeAddress, params)
-            .await?
-            .rows_stream::<GetTxoByStakeAddressQuery>()?;
+    ) -> anyhow::Result<Vec<GetTxoByStakeAddressQuery>> {
+        if session.is_persistent() {
+            if let Some(rows) = ASSETS_CACHE.get(&params.stake_address).await {
+                return Ok(rows);
+            }
+        }
 
-        Ok(iter)
+        let rows: Vec<_> = session
+            .execute_iter(PreparedSelectQuery::TxoByStakeAddress, &params)
+            .await?
+            .rows_stream::<GetTxoByStakeAddressQuery>()?
+            .map_err(Into::<anyhow::Error>::into)
+            .try_collect()
+            .await?;
+
+        // update cache
+        if session.is_persistent() {
+            ASSETS_CACHE
+                .insert(params.stake_address, rows.clone())
+                .await;
+        }
+
+        Ok(rows)
+    }
+
+    /// Update spent UTXO data. Returns true if entry was found and updated.
+    pub(crate) async fn update_cache(params: Vec<UpdateTxoSpentQueryParams>) {
+        for update in params {
+            let stake_address = &update.stake_address;
+            let _entry = ASSETS_CACHE
+                .entry(stake_address.clone())
+                .and_compute_with(|maybe_entry| {
+                    let op = if let Some(entry) = maybe_entry {
+                        let mut txos = entry.into_value();
+                        if let Some(txo) = txos.iter_mut().find(|t| {
+                            t.txo == update.txo
+                                && t.txn_index == update.txn_index
+                                && t.slot_no == update.slot_no
+                        }) {
+                            txo.spent_slot = Some(update.spent_slot);
+                            Op::Put(txos)
+                        } else {
+                            tracing::debug!(utxo_params = ?update, stake_address = %stake_address, "UTXOs not found for Stake Address in Assets Cache");
+                            Op::Nop
+                        }
+                    } else {
+                        tracing::debug!(utxo_params = ?update, stake_address = %stake_address, "Stake Address not found in Assets Cache");
+                        Op::Nop
+                    };
+                    std::future::ready(op)
+                })
+                .await;
+        }
+    }
+
+    /// Empty the UTXO assets cache.
+    pub(crate) fn drop_cache() {
+        ASSETS_CACHE.invalidate_all();
     }
 }

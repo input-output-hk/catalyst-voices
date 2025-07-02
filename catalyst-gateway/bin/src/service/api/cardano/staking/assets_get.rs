@@ -174,21 +174,18 @@ async fn get_txo(
     .await?;
 
     let txo_map = txos_stream
-        .map_err(Into::<anyhow::Error>::into)
-        .try_fold(HashMap::new(), |mut txo_map, row| {
-            async move {
-                let key = (row.txn_id.into(), row.txo.into());
-                txo_map.insert(key, TxoInfo {
-                    value: row.value,
-                    txn_index: row.txn_index.into(),
-                    txo: row.txo.into(),
-                    slot_no: row.slot_no.into(),
-                    spent_slot_no: row.spent_slot.map(Into::into),
-                });
-                Ok(txo_map)
-            }
-        })
-        .await?;
+        .into_iter()
+        .fold(HashMap::new(), |mut txo_map, row| {
+            let key = (row.txn_id.into(), row.txo.into());
+            txo_map.insert(key, TxoInfo {
+                value: row.value,
+                txn_index: row.txn_index.into(),
+                txo: row.txo.into(),
+                slot_no: row.slot_no.into(),
+                spent_slot_no: row.spent_slot.map(Into::into),
+            });
+            txo_map
+        });
     Ok(txo_map)
 }
 
