@@ -18,6 +18,8 @@ typedef _LayoutData = ({
   bool isMobile,
 });
 
+/// At the moment we're supporting only desktops. This widget replaces app content with
+/// placeholder on not supported devices.
 class AppMobileAccessRestriction extends StatelessWidget {
   final Widget child;
 
