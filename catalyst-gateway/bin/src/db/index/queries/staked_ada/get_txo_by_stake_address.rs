@@ -107,7 +107,7 @@ impl GetTxoByStakeAddressQuery {
         Ok(rows)
     }
 
-    /// Update spent UTXO data. Returns true if entry was found and updated.
+    /// Update spent UTXO Assets.
     pub(crate) async fn update_cache(params: Vec<UpdateTxoSpentQueryParams>) {
         for update in params {
             let stake_address = &update.stake_address;
