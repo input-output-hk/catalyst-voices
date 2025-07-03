@@ -106,7 +106,7 @@ struct EnvVars {
     client_id_key: StringEnvVar,
 
     /// A List of servers to provide
-    api_host_names: Option<StringEnvVar>,
+    api_host_names: Vec<String>,
 
     /// The base path the API is served at.
     api_url_prefix: StringEnvVar,
@@ -187,7 +187,11 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         server_name: StringEnvVar::new_optional("SERVER_NAME", false),
         service_id: StringEnvVar::new("SERVICE_ID", calculate_service_uuid().into()),
         client_id_key: StringEnvVar::new("CLIENT_ID_KEY", CLIENT_ID_KEY_DEFAULT.into()),
-        api_host_names: StringEnvVar::new_optional("API_HOST_NAMES", false),
+        api_host_names: string_to_api_host_names(
+            &StringEnvVar::new_optional("c", false)
+                .map(|v| v.as_string())
+                .unwrap_or_default(),
+        ),
         api_url_prefix: StringEnvVar::new("API_URL_PREFIX", API_URL_PREFIX_DEFAULT.into()),
 
         cassandra_persistent_db: cassandra_db::EnvVars::new(
@@ -357,14 +361,8 @@ impl Settings {
     ///
     /// Host names are taken from the `API_HOST_NAMES` environment variable.
     /// If that is not set, returns an empty list.
-    pub(crate) fn api_host_names() -> Vec<String> {
-        string_to_api_host_names(
-            ENV_VARS
-                .api_host_names
-                .as_ref()
-                .map(StringEnvVar::as_str)
-                .unwrap_or_default(),
-        )
+    pub(crate) fn api_host_names() -> &'static [String] {
+        &ENV_VARS.api_host_names
     }
 
     /// The socket address we are bound to.
@@ -449,12 +447,15 @@ impl Settings {
 fn string_to_api_host_names(hosts: &str) -> Vec<String> {
     /// Log an invalid hostname.
     fn invalid_hostname(hostname: &str) -> String {
-        error!("Invalid host name for API: {}", hostname);
+        error!(hostname = hostname, "Invalid host name for API");
         String::new()
     }
 
     let configured_hosts: Vec<String> = hosts
         .split(',')
+        // filters out at the beginning all empty entries, because they all would be invalid and
+        // filtered out anyway
+        .filter(|s| !s.is_empty())
         .map(|s| {
             let url = Url::parse(s.trim());
             match url {

@@ -1,7 +1,4 @@
 import { defineConfig, devices } from "@playwright/test";
-import { configDotenv } from "dotenv";
-
-configDotenv();
 
 export default defineConfig({
   testDir: "./tests",
@@ -11,7 +8,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   use: {
-    baseURL: `https://app.${process.env.ENVIRONMENT}.projectcatalyst.io/`,
+    baseURL: "http://localhost:5555",
     trace: "on-first-retry",
   },
 
@@ -22,4 +19,12 @@ export default defineConfig({
       use: { ...devices["Desktop Chrome"] },
     },
   ],
+
+  webServer: {
+    command:
+      "flutter run -d web-server --web-port=5555 --web-hostname=localhost --web-header=Cross-Origin-Opener-Policy=same-origin --web-header=Cross-Origin-Embedder-Policy=require-corp ./lib/configs/main_qa.dart",
+    url: "http://localhost:5555",
+    timeout: 120 * 1000,
+    reuseExistingServer: false,
+  },
 });
