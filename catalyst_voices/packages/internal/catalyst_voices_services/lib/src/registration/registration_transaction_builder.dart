@@ -128,7 +128,6 @@ final class RegistrationTransactionBuilder {
       // instead of using dummy metadata we will use the real one but for both of them the size
       // would be the same.
       final selectedUtxos = _findSelectedUtxos(utxos, dummyTransaction.body.inputs);
-
       final realX509Envelope = await _buildMetadataEnvelope(
         rootKeyPair: rootKeyPair,
         selectedUtxos: selectedUtxos,
