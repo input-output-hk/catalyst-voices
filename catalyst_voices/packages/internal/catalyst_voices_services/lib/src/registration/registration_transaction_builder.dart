@@ -366,7 +366,7 @@ extension on CatalystPublicKey {
   }
 }
 
-extension on X509MetadataEnvelope<RegistrationData> {
+extension on RegistrationMetadata {
   Future<AuxiliaryData> toAuxiliaryData() async {
     return AuxiliaryData.fromCbor(
       await toCbor(serializer: (e) => e.toCbor()),
