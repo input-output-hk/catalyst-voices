@@ -99,6 +99,12 @@ check-license:
     FROM +builder
     RUN melos run license-check
 
+generate-internal-docs:
+    FROM +code-generator
+    RUN melos docs-generate
+    
+    SAVE ARTIFACT docs/dartdoc AS LOCAL docs/dartdoc
+
 # Run unit tests
 test-unit-native:
     FROM +code-generator
