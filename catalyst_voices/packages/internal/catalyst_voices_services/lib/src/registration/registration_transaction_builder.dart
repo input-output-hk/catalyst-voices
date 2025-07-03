@@ -112,9 +112,10 @@ final class RegistrationTransactionBuilder {
       // We can't upfront calculate the txInputsHash because we don't know the exact metadata size
       // at this point which the coin selection algorithm needs to calculate the appropriate
       // fee and select inputs.
+      final dummyUtxos = <TransactionUnspentOutput>{};
       final dummyX509Envelope = await _buildMetadataEnvelope(
         rootKeyPair: rootKeyPair,
-        selectedUtxos: {},
+        selectedUtxos: dummyUtxos,
         derCert: derCert,
         publicKeys: publicKeys,
       );
@@ -127,7 +128,7 @@ final class RegistrationTransactionBuilder {
       // instead of using dummy metadata we will use the real one but for both of them the size
       // would be the same.
       final selectedUtxos = _findSelectedUtxos(utxos, dummyTransaction.body.inputs);
-      
+
       final realX509Envelope = await _buildMetadataEnvelope(
         rootKeyPair: rootKeyPair,
         selectedUtxos: selectedUtxos,
