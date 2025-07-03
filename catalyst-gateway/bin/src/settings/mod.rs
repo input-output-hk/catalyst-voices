@@ -435,7 +435,7 @@ impl Settings {
 fn string_to_api_host_names(hosts: &str) -> Vec<String> {
     /// Log an invalid hostname.
     fn invalid_hostname(hostname: &str) -> String {
-        error!("Invalid host name for API: {hostname}");
+        error!(hostname = hostname, "Invalid host name for API");
         String::new()
     }
 
