@@ -8,13 +8,13 @@ use std::{
 use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
 use futures::TryStreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
-use tracing::debug;
 
 use crate::{
     db::index::{
         queries::staked_ada::{
             get_assets_by_stake_address::{
                 GetAssetsByStakeAddressParams, GetAssetsByStakeAddressQuery,
+                GetAssetsByStakeAddressQueryKey, GetAssetsByStakeAddressQueryValue,
             },
             get_txi_by_txn_hash::{GetTxiByTxnHashesQuery, GetTxiByTxnHashesQueryParams},
             get_txo_by_stake_address::{
@@ -65,17 +65,6 @@ pub(crate) async fn endpoint(
         Ok(Some(full_stake_info)) => Responses::Ok(Json(full_stake_info)).into(),
         Err(err) => AllResponses::handle_error(&err),
     }
-}
-
-/// TXO asset information.
-#[derive(Clone)]
-struct TxoAssetInfo {
-    /// Asset hash.
-    id: Vec<u8>,
-    /// Asset name.
-    name: AssetName,
-    /// Asset amount.
-    amount: num_bigint::BigInt,
 }
 
 /// TXO information used when calculating a user's stake info.
@@ -204,7 +193,8 @@ async fn get_txo(
 }
 
 /// TXO Assets map type alias
-type TxoAssetsMap = HashMap<(Slot, TxnIndex, i16), Vec<TxoAssetInfo>>;
+type TxoAssetsMap =
+    HashMap<Arc<GetAssetsByStakeAddressQueryKey>, Vec<Arc<GetAssetsByStakeAddressQueryValue>>>;
 
 /// TXO Assets state
 #[derive(Default, Clone)]
@@ -234,28 +224,18 @@ async fn get_txo_assets(
 
     let tokens_map =
         assets_txos_stream
-            .into_iter()
+            .iter()
             .fold(HashMap::new(), |mut tokens_map: TxoAssetsMap, row| {
-                {
-                    let key = (row.slot_no.into(), row.txn_index.into(), row.txo.into());
-                    match tokens_map.entry(key) {
-                        std::collections::hash_map::Entry::Occupied(mut o) => {
-                            o.get_mut().push(TxoAssetInfo {
-                                id: row.policy_id,
-                                name: row.asset_name.into(),
-                                amount: row.value,
-                            });
-                        },
-                        std::collections::hash_map::Entry::Vacant(v) => {
-                            v.insert(vec![TxoAssetInfo {
-                                id: row.policy_id,
-                                name: row.asset_name.into(),
-                                amount: row.value,
-                            }]);
-                        },
-                    }
-                    tokens_map
+                let key = row.key.clone();
+                match tokens_map.entry(key) {
+                    std::collections::hash_map::Entry::Occupied(mut o) => {
+                        o.get_mut().push(row.value.clone());
+                    },
+                    std::collections::hash_map::Entry::Vacant(v) => {
+                        v.insert(vec![row.value.clone()]);
+                    },
                 }
+                tokens_map
             });
     Ok(tokens_map)
 }
@@ -331,22 +311,23 @@ fn build_stake_info(mut txo_state: TxoAssetsState, slot_num: SlotNo) -> anyhow::
         let value = AdaValue::try_from(txo_info.value)?;
         total_ada_amount = total_ada_amount.saturating_add(value);
 
-        let key = (txo_info.slot_no, txo_info.txn_index, txo_info.txo);
+        let key = GetAssetsByStakeAddressQueryKey {
+            slot_no: txo_info.slot_no.into(),
+            txn_index: txo_info.txn_index.into(),
+            txo: txo_info.txo.into(),
+        };
         if let Some(native_assets) = txo_state.txo_assets.remove(&key) {
             for native_asset in native_assets {
-                match native_asset.amount.try_into() {
-                    Ok(amount) => {
-                        match assets.entry((native_asset.id.try_into()?, native_asset.name)) {
-                            std::collections::hash_map::Entry::Occupied(mut o) => {
-                                *o.get_mut() = o.get().saturating_add(&amount);
-                            },
-                            std::collections::hash_map::Entry::Vacant(v) => {
-                                v.insert(amount);
-                            },
-                        }
+                let amount = (&native_asset.value).into();
+                match assets.entry((
+                    (&native_asset.policy_id).try_into()?,
+                    (&native_asset.asset_name).into(),
+                )) {
+                    std::collections::hash_map::Entry::Occupied(mut o) => {
+                        *o.get_mut() = o.get().saturating_add(&amount);
                     },
-                    Err(e) => {
-                        debug!("Invalid TXO Asset for {key:?}: {e}");
+                    std::collections::hash_map::Entry::Vacant(v) => {
+                        v.insert(amount.clone());
                     },
                 }
             }
