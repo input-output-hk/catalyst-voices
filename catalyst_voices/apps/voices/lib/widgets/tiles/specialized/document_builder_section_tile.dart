@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/document_builder/viewer/document_property_builder_viewer.dart';
+import 'package:catalyst_voices/widgets/tiles/specialized/document_builder_section_tile_controller.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -60,7 +61,9 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
 
   final _pendingChanges = <model.DocumentChange>[];
 
-  bool _isEditMode = false;
+  DocumentBuilderSectionTileController get _controller {
+    return DocumentBuilderSectionTileControllerScope.of(context);
+  }
 
   String? get _errorText {
     if (widget.autovalidateMode == AutovalidateMode.always &&
@@ -69,6 +72,14 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
     }
 
     return null;
+  }
+
+  bool get _isEditMode {
+    return _controller.getData(widget.section.nodeId) as bool? ?? false;
+  }
+
+  set _isEditMode(bool value) {
+    _controller.setData(widget.section.nodeId, value);
   }
 
   Widget? get _overrideAction {
@@ -80,11 +91,12 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
   @override
   Widget build(BuildContext context) {
     final title = _editedSection.schema.title;
+    final isEditMode = _isEditMode;
 
     return EditableTile(
       title: title,
       statesController: _statesController,
-      isEditMode: _isEditMode,
+      isEditMode: isEditMode,
       isSaveEnabled: true,
       isEditEnabled: widget.isEditable,
       saveText: context.l10n.saveChangesButtonText,
@@ -96,11 +108,11 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
       child: Form(
         key: _formKey,
         autovalidateMode: widget.autovalidateMode,
-        child: _isEditMode
+        child: isEditMode
             ? DocumentPropertyBuilder(
                 key: ValueKey(_editedSection.schema.nodeId),
                 property: _editedSection,
-                isEditMode: _isEditMode,
+                isEditMode: isEditMode,
                 onChanged: _handlePropertyChanges,
                 overrides: widget.overrides,
               )

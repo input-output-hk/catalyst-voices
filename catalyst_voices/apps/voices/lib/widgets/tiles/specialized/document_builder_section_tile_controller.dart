@@ -1,0 +1,42 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:flutter/material.dart';
+
+final class DocumentBuilderSectionTileController {
+  final Map<DocumentNodeId, Object> _data = {};
+
+  T? getData<T extends Object?>(DocumentNodeId nodeId) {
+    return _data[nodeId] as T?;
+  }
+
+  void setData(DocumentNodeId nodeId, Object data) {
+    _data[nodeId] = data;
+  }
+}
+
+final class DocumentBuilderSectionTileControllerScope extends InheritedWidget {
+  final DocumentBuilderSectionTileController controller;
+
+  const DocumentBuilderSectionTileControllerScope({
+    super.key,
+    required this.controller,
+    required super.child,
+  });
+
+  @override
+  bool updateShouldNotify(DocumentBuilderSectionTileControllerScope oldWidget) {
+    return controller != oldWidget.controller;
+  }
+
+  static DocumentBuilderSectionTileController of(BuildContext context) {
+    final controller = context
+        .dependOnInheritedWidgetOfExactType<DocumentBuilderSectionTileControllerScope>()
+        ?.controller;
+
+    assert(
+      controller != null,
+      'Unable to find DocumentBuilderSectionTileControllerScope in widget tree',
+    );
+
+    return controller!;
+  }
+}

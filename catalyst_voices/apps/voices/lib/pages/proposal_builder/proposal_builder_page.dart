@@ -28,6 +28,7 @@ import 'package:catalyst_voices/widgets/modals/proposals/unlock_edit_proposal.da
 import 'package:catalyst_voices/widgets/snackbar/common_snackbars.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
+import 'package:catalyst_voices/widgets/tiles/specialized/document_builder_section_tile_controller.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -78,6 +79,7 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         SignalHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderSignal, _ProposalBuilderBody> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
+  late final DocumentBuilderSectionTileController _documentSectionTileController;
 
   StreamSubscription<DocumentRef?>? _proposalRefSub;
   StreamSubscription<dynamic>? _segmentsSub;
@@ -103,14 +105,17 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
           endDrawer: const OpportunitiesDrawer(),
           body: SegmentsControllerScope(
             controller: _segmentsController,
-            child: SidebarScaffold(
-              leftRail: const ProposalBuilderNavigationPanel(),
-              rightRail: const ProposalBuilderSetupPanel(),
-              body: _ProposalBuilderContent(
-                controller: _segmentsScrollController,
-                onRetryTap: _loadProposal,
+            child: DocumentBuilderSectionTileControllerScope(
+              controller: _documentSectionTileController,
+              child: SidebarScaffold(
+                leftRail: const ProposalBuilderNavigationPanel(),
+                rightRail: const ProposalBuilderSetupPanel(),
+                body: _ProposalBuilderContent(
+                  controller: _segmentsScrollController,
+                  onRetryTap: _loadProposal,
+                ),
+                bodyConstraints: const BoxConstraints.expand(),
               ),
-              bodyConstraints: const BoxConstraints.expand(),
             ),
           ),
         ),
@@ -189,6 +194,7 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
 
     _segmentsController = SegmentsController();
     _segmentsScrollController = ItemScrollController();
+    _documentSectionTileController = DocumentBuilderSectionTileController();
 
     _segmentsController
       ..addListener(_handleSegmentsControllerChange)
