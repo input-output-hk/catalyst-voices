@@ -24,7 +24,6 @@ use crate::{
         session::CassandraSession,
     },
     service::utilities::health::{
-        immutable_follower_has_first_reached_tip, live_follower_has_first_reached_tip,
         set_follower_immutable_first_reached_tip, set_follower_live_first_reached_tip,
     },
     settings::{chain_follower, Settings},
@@ -306,8 +305,7 @@ fn sync_subchain(
                         );
                     }
 
-                    if chain_update.tip && !live_follower_has_first_reached_tip() {
-                        set_follower_live_first_reached_tip();
+                    if chain_update.tip && !set_follower_live_first_reached_tip() {
                         let _ = event_sender.send(event::ChainIndexerEvent::SyncLiveChainCompleted);
                     }
 
@@ -526,9 +524,7 @@ impl SyncTask {
         // IF there is only 1 chain follower spawn, then the immutable state already indexed and
         // filled in the db.
         if self.sync_tasks.len() == 1 {
-            if !immutable_follower_has_first_reached_tip() {
-                set_follower_immutable_first_reached_tip();
-            }
+            set_follower_immutable_first_reached_tip();
             self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
         } else {
             self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainStarted);
@@ -625,9 +621,7 @@ impl SyncTask {
             // between the live chain and immutable chain.  This gap should be
             // a parameter.
             if self.sync_tasks.len() == 1 {
-                if !immutable_follower_has_first_reached_tip() {
-                    set_follower_immutable_first_reached_tip();
-                }
+                set_follower_immutable_first_reached_tip();
                 self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
 
                 // Purge data up to this slot
