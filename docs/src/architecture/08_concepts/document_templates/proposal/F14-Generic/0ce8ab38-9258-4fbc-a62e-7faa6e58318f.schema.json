@@ -359,7 +359,7 @@
                             "$ref": "#/definitions/durationInMonths",
                             "title": "Please specify how many months you expect your project to last ",
                             "description": "Specify the expected duration of your project. Projects must be completable within 2-12 months.",
-                            "x-guidance": "You are expected to produce the deliverables specified in the proposal within the timeframe selected, with a minimum of 2 months and a maximum of 12 months.\n\nProjects can be completed earlier if milestone Proof-of-Achievements and Project Completion steps are submitted and approved ahead of the expected delivery due dates in compliance with the Fund Rules.",
+                            "x-guidance": "You are expected to produce the deliverables specified in the proposal within the timeframe selected, with a minimum of 2 months and a maximum of 12 months.\n\nProjects can be completed earlier if milestone [Proof-of-Achievements](https://docs.projectcatalyst.io/current-fund/project-onboarding/milestone-based-proposals) and [Project Completion](https://docs.projectcatalyst.io/current-fund/general-information/project-close-out-report-and-project-close-out-video-pcr-and-pcv) steps are submitted and approved ahead of the expected delivery due dates in compliance with the [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules).",
                             "x-placeholder": "Select the expected duration of your project (2-12 months)",
                             "minimum": 2,
                             "maximum": 12
