@@ -83,7 +83,7 @@ pub(crate) fn live_follower_has_first_reached_tip() -> bool {
 }
 
 /// Set the `INITIAL_IMMUTABLE_FOLLOWER_TIP_REACHED` as `true`.
-/// returning the previous `INITIAL_IMMUTABLE_FOLLOWER_TIP_REACHED` value.
+/// returns the previous `INITIAL_IMMUTABLE_FOLLOWER_TIP_REACHED` value.
 ///
 /// This value can not be set to `false` afterwards.
 pub(crate) fn set_follower_immutable_first_reached_tip() -> bool {
@@ -95,7 +95,7 @@ pub(crate) fn set_follower_immutable_first_reached_tip() -> bool {
 }
 
 /// Set the `INITIAL_LIVE_FOLLOWER_TIP_REACHED` as `true`,
-/// returning the previous `INITIAL_LIVE_FOLLOWER_TIP_REACHED` value.
+/// returns the previous `INITIAL_LIVE_FOLLOWER_TIP_REACHED` value.
 ///
 /// This value can not be set to `false` afterwards.
 pub(crate) fn set_follower_live_first_reached_tip() -> bool {
