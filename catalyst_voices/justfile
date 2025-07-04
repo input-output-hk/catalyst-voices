@@ -34,7 +34,7 @@ license-list: setup-code
 dependency-graph: setup-code
     melos dependency-graph
 
-generate-docs:
+generate-docs: setup-code
     melos docs-generate
     melos license-list
     melos dependency-graph
