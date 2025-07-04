@@ -245,7 +245,7 @@ fn sync_subchain(
 
         // Wait for indexing DB to be ready before continuing.
         drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
-        info!(chain=%params.chain, params=%params,"Starting Chain Indexing");
+        info!(chain=%params.chain, params=%params,"Starting Chain Indexing Task");
 
         let mut first_indexed_block = params.first_indexed_block.clone();
         let mut first_immutable = params.first_is_immutable;
@@ -675,9 +675,6 @@ impl SyncTask {
                     break;
                 }
             }
-            // `start_slot` is still used, because it is used to keep syncing chunks as required
-            // while each immutable sync task finishes.
-            info!(chain=%self.cfg.chain, tasks=self.current_sync_tasks, until=?self.start_slot, "Persistent Indexing DB tasks started");
         }
     }
 
