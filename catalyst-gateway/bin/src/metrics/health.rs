@@ -64,7 +64,7 @@ pub(crate) mod reporter {
     pub(crate) static LIVE_INDICATOR: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
             "health_live_indicator",
-            "Health `live` endpoint indicator whether its healthy or not, returns the repsonse `204` or something else.",
+            "Health `live` endpoint indicator whether its healthy or not, returns the response `204` or something else.",
             &METRIC_LABELS
         )
         .unwrap()
@@ -74,7 +74,7 @@ pub(crate) mod reporter {
     pub(crate) static STARTED_INDICATOR: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
                 "health_started_indicator",
-                "Health `started` endpoint indicator whether its healthy or not, returns the repsonse `204` or something else.",
+                "Health `started` endpoint indicator whether its healthy or not, returns the response `204` or something else.",
                 &METRIC_LABELS
             )
             .unwrap()
@@ -84,7 +84,7 @@ pub(crate) mod reporter {
     pub(crate) static READY_INDICATOR: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
                     "health_ready_indicator",
-                    "Health `ready` endpoint indicator whether its healthy or not, returns the repsonse `204` or something else.",
+                    "Health `ready` endpoint indicator whether its healthy or not, returns the response `204` or something else.",
                     &METRIC_LABELS
                 )
                 .unwrap()
