@@ -565,7 +565,7 @@
                     "properties": {
                         "grouped_tag": {
                             "$ref": "#/definitions/singleGroupedTagSelector",
-                            "title": "Please choose the most relevant theme and tags (as many that apply) related to the outcomes of your proposal.",
+                            "title": "Please choose the most relevant theme and tag related to the outcomes of your proposal.",
                             "oneOf": [
                                 {
                                     "properties": {
