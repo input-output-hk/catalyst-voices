@@ -307,7 +307,6 @@ fn sync_subchain(
                     }
 
                     if chain_update.tip && !live_follower_has_first_reached_tip() {
-                        info!("Follower has reached LIVE TIP for the first time");
                         set_follower_live_first_reached_tip();
                         let _ = event_sender.send(event::ChainIndexerEvent::SyncLiveChainCompleted);
                     }
@@ -524,7 +523,16 @@ impl SyncTask {
         self.dispatch_event(event::ChainIndexerEvent::SyncLiveChainStarted);
 
         self.start_immutable_followers();
-        self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainStarted);
+        // IF there is only 1 chain follower spaw, then the immutable state already indexed and
+        // filled in the db.
+        if self.sync_tasks.len() == 1 {
+            if !immutable_follower_has_first_reached_tip() {
+                set_follower_immutable_first_reached_tip();
+            }
+            self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
+        } else {
+            self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainStarted);
+        }
 
         // Wait Sync tasks to complete.  If they fail and have not completed, reschedule them.
         // If an immutable sync task ends OK, and we still have immutable data to sync then
@@ -608,8 +616,6 @@ impl SyncTask {
                 },
             }
 
-            let sync_task_count = self.sync_tasks.len();
-
             // IF there is only 1 chain follower left in sync_tasks, then all
             // immutable followers have finished.
             // When this happens we need to purge the live index of any records that exist
@@ -618,9 +624,8 @@ impl SyncTask {
             // want to put a gap in this, so that there are X slots of overlap
             // between the live chain and immutable chain.  This gap should be
             // a parameter.
-            if sync_task_count == 1 {
+            if self.sync_tasks.len() == 1 {
                 if !immutable_follower_has_first_reached_tip() {
-                    info!("Follower has reached IMMUTABLE TIP for the first time");
                     set_follower_immutable_first_reached_tip();
                 }
                 self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
