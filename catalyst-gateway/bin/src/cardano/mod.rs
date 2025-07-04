@@ -17,9 +17,12 @@ use crate::{
             index_block,
             roll_forward::{self, PurgeCondition},
         },
-        queries::sync_status::{
-            get::{get_sync_status, SyncStatus},
-            update::update_sync_status,
+        queries::{
+            staked_ada::get_assets_by_stake_address::GetAssetsByStakeAddressQuery,
+            sync_status::{
+                get::{get_sync_status, SyncStatus},
+                update::update_sync_status,
+            },
         },
         session::CassandraSession,
     },
@@ -623,6 +626,7 @@ impl SyncTask {
             if self.sync_tasks.len() == 1 {
                 set_follower_immutable_first_reached_tip();
                 self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
+                GetAssetsByStakeAddressQuery::drop_cache();
 
                 // Purge data up to this slot
                 // Slots arithmetic has saturating semantic, so this is ok.
