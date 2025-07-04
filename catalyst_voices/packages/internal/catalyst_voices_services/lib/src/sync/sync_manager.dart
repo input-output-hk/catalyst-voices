@@ -8,6 +8,7 @@ import 'package:synchronized/synchronized.dart';
 
 final _logger = Logger('SyncManager');
 
+/// [SyncManager] provides synchronization functionality for documents.
 abstract interface class SyncManager {
   factory SyncManager(
     SyncStatsStorage statsStorage,

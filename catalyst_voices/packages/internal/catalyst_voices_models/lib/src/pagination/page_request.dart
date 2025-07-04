@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+/// Pagination page request parameters.
 final class PageRequest extends Equatable {
   final int page;
   final int size;

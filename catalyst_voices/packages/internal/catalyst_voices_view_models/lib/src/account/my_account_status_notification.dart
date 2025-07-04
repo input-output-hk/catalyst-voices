@@ -29,6 +29,10 @@ enum MyAccountStatusNotificationType {
   }
 }
 
+/// Base class that represents current user's account status.
+///
+/// This class is used to display a notification to the user about the status of their account.
+/// It contains the [type] of the notification and provides a localized title, description, and message.
 sealed class MyAccountStatusNotification extends Equatable {
   final MyAccountStatusNotificationType type;
 

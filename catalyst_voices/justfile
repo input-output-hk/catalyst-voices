@@ -27,3 +27,14 @@ test-code:
 
 # Pre Push Checks
 pre-push: check-code
+
+license-list: setup-code
+    melos license-list
+ 
+dependency-graph: setup-code
+    melos dependency-graph
+
+generate-docs: setup-code
+    melos docs-generate
+    melos license-list
+    melos dependency-graph

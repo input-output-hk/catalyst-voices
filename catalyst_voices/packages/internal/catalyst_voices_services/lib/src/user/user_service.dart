@@ -6,6 +6,8 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 
+/// [UserService] allows to manage user accounts.
+/// [watchUser] returns a stream of user changes which allows to react to user changes.
 abstract interface class UserService implements ActiveAware {
   const factory UserService(
     UserRepository userRepository,

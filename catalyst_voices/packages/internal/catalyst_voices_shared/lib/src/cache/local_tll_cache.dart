@@ -8,6 +8,7 @@ Set<String> _extendAllowList(Set<String> allowList) {
   return allowList.expand((element) => [element, _buildExpireKey(element)]).toSet();
 }
 
+/// A base [TtlCache] implementation that stores the cached values in the [LocalStorage].
 base class LocalTllCache extends LocalStorage implements TtlCache<String, String> {
   final Duration _defaultTtl;
 

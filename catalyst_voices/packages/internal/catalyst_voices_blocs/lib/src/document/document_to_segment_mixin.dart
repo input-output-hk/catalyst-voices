@@ -2,6 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 
+/// Mixin that provides a method to map a document to a list of segments.
 mixin DocumentToSegmentMixin {
   List<DocumentSegment> mapDocumentToSegments(
     Document document, {

@@ -6,6 +6,11 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
+/// View model for campaign category details.
+///
+/// This view model is used to display the details of a campaign category.
+///
+/// Data for this view model is extracted from the [CampaignCategory] model.
 final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   final String subname;
   final String description;
