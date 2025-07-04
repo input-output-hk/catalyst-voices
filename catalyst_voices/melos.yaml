@@ -367,3 +367,21 @@ scripts:
       The test reports are saved in /test_reports folder.
       The coverages are saved in coverage/lcov.info file for each tested package.
       The combined coverage is saved in the /coverage/lcov.coverage.info file.
+
+  docs-generate:
+    run: |
+      dart pub global activate dartdoc 8.0.5
+      melos exec -c 1 --scope="*catalyst_voices*" --ignore="*example*" -- flutter analyze && 
+      melos exec -c 1 --scope="*catalyst_voices*" --ignore="*example*" -- dart doc --output=MELOS_ROOT_PATH/docs/dartdoc/MELOS_PACKAGE_NAME .
+    
+    description: |
+      Generate internal documentation and saves it to docs/dartdoc directory
+  
+  docs-view:
+    steps:
+     - dart pub global activate dhttpd
+     - dart pub global run dhttpd --path docs/dartdoc/
+
+    description: |
+      Documentation will be served at localhost:8080/<packageName>
+      For example catalyst_voices_repository is served at localhost:8080/catalyst_voices_repository
