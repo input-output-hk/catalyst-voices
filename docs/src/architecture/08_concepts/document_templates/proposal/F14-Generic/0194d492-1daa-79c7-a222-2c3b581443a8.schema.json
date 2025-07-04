@@ -470,12 +470,12 @@
                             "$ref": "#/definitions/yesNoChoice",
                             "title": "Will your project's outputs be fully open source?",
                             "description": "Select Yes if the project is open source, No if it is not.",
-                            "x-guidance": "If you answered “YES” to the question above:\n\nIf you declare that the project will be open-source in the application form, it must remain open-source throughout the entire lifecycle of the project, with a publicly accessible repository.\n\nPlease indicate the type of open-source license you intend to use and provide any additional information relevant to the open-source status of your project outputs. If only specific components of the code will be open-source, please specify which parts.\n\nIf you answered “NO” to the question above:\n\nPlease explain why the outputs of your project will not be made open-source."
+                            "x-guidance": "If you answered “YES” to the question above:\n\nIf you declare that the project will be open source in the application form, it must remain open source throughout the entire lifecycle of the project, with a publicly accessible repository.\n\nPlease indicate the type of open source license you intend to use and provide any additional information relevant to the open source status of your project outputs. If only specific components of the code will be open source, please specify which parts.\n\nIf you answered “NO” to the question above:\n\nPlease explain why the outputs of your project will not be made open source."
                         },
                         "licenseInformation": {
                             "$ref": "#/definitions/multiLineTextEntry",
                             "title": "License and Additional Information",
-                            "description": "Provide the license type and any additional context regarding the open-source status of your project. If partially open source, specify which parts are open source.",
+                            "description": "Provide the license type and any additional context regarding the open source status of your project. If partially open source, specify which parts are open source.",
                             "x-placeholder": "Describe the open source status of your project and the license type",
                             "maxLength": 500,
                             "x-guidance": "Open source licenses ensure intellectual property (IP) (such as source code) remains publicly accessible and licensed in a way that allows anyone to use, modify, and share the IP freely, typically under licenses approved by the Open Source Initiative.\n\nProprietary IP (such as source code) is not publicly available and the rights to use, modify, or redistribute the proprietary IP are restricted and typically reserved by the IP's owner.\n\nhttps://opensource.org/licenses"
@@ -520,10 +520,10 @@
                     "properties": {
                         "license_information": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Mention your open-source License and describe your open-source license rationale.",
+                            "title": "Mention your open source license and describe your open source license rationale.",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your open-source license rationale.",
-                            "x-guidance": "Open source license and reasons\n\n- For instance, any recognized open-source license (MIT, Apache 2.0, GPL or other).\n- Explain why this license fits your project goals (e.g. broad use, contribution rules, commercial compatibility).\n- Avoid vague terms like “custom license” without justification.",
+                            "description": "Please provide your open source license rationale.",
+                            "x-guidance": "Open source license and reasons\n\n- For instance, any recognized open source license (MIT, Apache 2.0, GPL or other).\n- Explain why this license fits your project goals (e.g. broad use, contribution rules, commercial compatibility).\n- Avoid vague terms like “custom license” without justification.",
                             "minLength": 200,
                             "maxLength": 600
                         },
