@@ -523,7 +523,7 @@ impl SyncTask {
         self.dispatch_event(event::ChainIndexerEvent::SyncLiveChainStarted);
 
         self.start_immutable_followers();
-        // IF there is only 1 chain follower spaw, then the immutable state already indexed and
+        // IF there is only 1 chain follower spawn, then the immutable state already indexed and
         // filled in the db.
         if self.sync_tasks.len() == 1 {
             if !immutable_follower_has_first_reached_tip() {
