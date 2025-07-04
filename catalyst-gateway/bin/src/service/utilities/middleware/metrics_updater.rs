@@ -3,33 +3,44 @@
 //! For every request to this endpoint, it will call the `updater` function to update
 //! metrics to the latest before sending to the service.
 
+use std::future::Future;
+
 use poem::{
     http::{Method, StatusCode},
     Endpoint, Request, Response, Result,
 };
 use prometheus::{Encoder, Registry, TextEncoder};
 
-/// The function type to call when a request sent to the endpoint.
-type UpdateFn = fn();
-
 /// A Middleware wrapping the Prometheus registry to report as metrics.
 ///
 /// The middleware is originally from `poem::endpoint::PrometheusExporter`.
-pub struct MetricsUpdaterMiddleware {
+pub struct MetricsUpdaterMiddleware<UpdateFn, UpdateFuture>
+where
+    UpdateFn: Fn() -> UpdateFuture,
+    UpdateFuture: Future<Output = ()>,
+{
     /// The Prometheus registry.
     registry: Registry,
     /// The updater function, called for every request for this endpoint.
     updater: UpdateFn,
 }
 
-impl MetricsUpdaterMiddleware {
+impl<UpdateFn, UpdateFuture> MetricsUpdaterMiddleware<UpdateFn, UpdateFuture>
+where
+    UpdateFn: Fn() -> UpdateFuture,
+    UpdateFuture: Future<Output = ()>,
+{
     /// Create a `PrometheusExporter` endpoint.
     pub fn new(registry: Registry, updater: UpdateFn) -> Self {
         Self { registry, updater }
     }
 }
 
-impl Endpoint for MetricsUpdaterMiddleware {
+impl<UpdateFn, UpdateFuture> Endpoint for MetricsUpdaterMiddleware<UpdateFn, UpdateFuture>
+where
+    UpdateFn: (Fn() -> UpdateFuture) + Send + Sync,
+    UpdateFuture: Future<Output = ()> + Send + Sync,
+{
     type Output = Response;
 
     async fn call(&self, req: Request) -> Result<Self::Output> {
@@ -37,7 +48,7 @@ impl Endpoint for MetricsUpdaterMiddleware {
             return Ok(StatusCode::METHOD_NOT_ALLOWED.into());
         }
 
-        (self.updater)();
+        (self.updater)().await;
 
         let encoder = TextEncoder::new();
         let metric_families = self.registry.gather();
