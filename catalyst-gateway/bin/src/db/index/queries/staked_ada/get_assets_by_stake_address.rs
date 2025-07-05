@@ -3,7 +3,7 @@ use std::sync::{Arc, LazyLock};
 
 use cardano_blockchain_types::StakeAddress;
 use futures::TryStreamExt;
-use moka::policy::EvictionPolicy;
+use moka::{policy::EvictionPolicy, sync::Cache};
 use scylla::{prepared_statement::PreparedStatement, DeserializeRow, SerializeRow, Session};
 use tracing::error;
 
@@ -23,15 +23,14 @@ const GET_ASSETS_BY_STAKE_ADDRESS_QUERY: &str =
     include_str!("../cql/get_assets_by_stake_address.cql");
 
 /// In memory cache of the Cardano native assets data
-static ASSETS_CACHE: LazyLock<
-    moka::future::Cache<DbStakeAddress, Arc<Vec<GetAssetsByStakeAddressQuery>>>,
-> = LazyLock::new(|| {
-    moka::future::Cache::builder()
-        .name("Cardano native assets cache")
-        .eviction_policy(EvictionPolicy::lru())
-        .max_capacity(Settings::cardano_assets_cache().native_assets_cache_size())
-        .build()
-});
+static ASSETS_CACHE: LazyLock<Cache<DbStakeAddress, Arc<Vec<GetAssetsByStakeAddressQuery>>>> =
+    LazyLock::new(|| {
+        Cache::builder()
+            .name("Cardano native assets cache")
+            .eviction_policy(EvictionPolicy::lru())
+            .max_capacity(Settings::cardano_assets_cache().native_assets_cache_size())
+            .build()
+    });
 
 /// Get assets by stake address query parameters.
 #[derive(SerializeRow)]
@@ -134,7 +133,7 @@ impl GetAssetsByStakeAddressQuery {
         session: &CassandraSession, params: GetAssetsByStakeAddressParams,
     ) -> anyhow::Result<Arc<Vec<GetAssetsByStakeAddressQuery>>> {
         if session.is_persistent() {
-            if let Some(res) = ASSETS_CACHE.get(&params.stake_address).await {
+            if let Some(res) = ASSETS_CACHE.get(&params.stake_address) {
                 return Ok(res);
             }
         }
@@ -155,7 +154,7 @@ impl GetAssetsByStakeAddressQuery {
 
         // update cache
         if session.is_persistent() {
-            ASSETS_CACHE.insert(params.stake_address, res.clone()).await;
+            ASSETS_CACHE.insert(params.stake_address, res.clone());
         }
         Ok(res)
     }
