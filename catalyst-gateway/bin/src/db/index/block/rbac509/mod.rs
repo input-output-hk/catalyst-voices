@@ -18,7 +18,9 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    rbac_cache::{RbacCacheAddError, RbacCacheAddSuccess, RBAC_CACHE},
+    rbac::{
+        validate_rbac_registration, RbacIndexingContext, RbacValidationError, RbacValidationSuccess,
+    },
     settings::cassandra_db::EnvVars,
 };
 
@@ -64,8 +66,9 @@ impl Rbac509InsertQuery {
     }
 
     /// Index the RBAC 509 registrations in a transaction.
-    pub(crate) fn index(
+    pub(crate) async fn index(
         &mut self, txn_hash: TransactionId, index: TxnIndex, block: &MultiEraBlock,
+        context: &mut RbacIndexingContext,
     ) {
         let slot = block.slot();
         let cip509 = match Cip509::new(block, index, &[]) {
@@ -102,8 +105,8 @@ impl Rbac509InsertQuery {
         }
 
         let previous_transaction = cip509.previous_transaction();
-        match RBAC_CACHE.add(cip509, block.is_immutable()) {
-            Ok(RbacCacheAddSuccess { catalyst_id }) => {
+        match validate_rbac_registration(cip509, block.is_immutable(), context).await {
+            Ok(RbacValidationSuccess { catalyst_id }) => {
                 self.registrations.push(insert_rbac509::Params::new(
                     catalyst_id.clone(),
                     txn_hash,
@@ -114,7 +117,7 @@ impl Rbac509InsertQuery {
                     std::collections::HashSet::new(),
                 ));
             },
-            Err(RbacCacheAddError::InvalidRegistration {
+            Err(RbacValidationError::InvalidRegistration {
                 catalyst_id,
                 purpose,
                 report,
@@ -129,7 +132,7 @@ impl Rbac509InsertQuery {
                     &report,
                 ));
             },
-            Err(RbacCacheAddError::UnknownCatalystId) => {
+            Err(RbacValidationError::UnknownCatalystId) => {
                 debug!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}");
             },
         }
@@ -175,13 +178,13 @@ mod tests {
         let txn_hash = "1bf8eb4da8fe5910cc890025deb9740ba5fa4fd2ac418ccbebfd6a09ed10e88b"
             .parse()
             .unwrap();
-        query.index(txn_hash, 0.into(), &block);
+        let mut context = RbacIndexingContext::new();
+        query.index(txn_hash, 0.into(), &block, &mut context).await;
         assert!(query.invalid.is_empty());
         assert_eq!(1, query.registrations.len());
     }
 
-    // The invalid vec is empty in this test because `RBAC_CACHE.add()` returns
-    // `UnknownCatalystId` for that registration.
+    // The invalid vec is empty in this test because it doesn't contain a Catalyst ID.
     #[tokio::test]
     async fn index_invalid() {
         let block = test_utils::block_4();
@@ -189,7 +192,8 @@ mod tests {
         let txn_hash = "337d35026efaa48b5ee092d38419e102add1b535364799eb8adec8ac6d573b79"
             .parse()
             .unwrap();
-        query.index(txn_hash, 0.into(), &block);
+        let mut context = RbacIndexingContext::new();
+        query.index(txn_hash, 0.into(), &block, &mut context).await;
         assert!(query.registrations.is_empty());
         assert!(query.invalid.is_empty());
     }

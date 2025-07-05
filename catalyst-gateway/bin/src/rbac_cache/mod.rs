@@ -2,6 +2,7 @@
 
 // The whole module will be eventually removed anyway.
 #![allow(dead_code)]
+#![allow(unused_imports)]
 
 mod add_result;
 mod cache;
