@@ -9,8 +9,7 @@ use poem::{
 };
 use prometheus::{Encoder, Registry, TextEncoder};
 
-/// The function type to call when a request sent to the endpoint.
-type UpdateFn = fn();
+use crate::metrics::{init_prometheus, metrics_updater_fn};
 
 /// A Middleware wrapping the Prometheus registry to report as metrics.
 ///
@@ -18,14 +17,13 @@ type UpdateFn = fn();
 pub struct MetricsUpdaterMiddleware {
     /// The Prometheus registry.
     registry: Registry,
-    /// The updater function, called for every request for this endpoint.
-    updater: UpdateFn,
 }
 
 impl MetricsUpdaterMiddleware {
     /// Create a `PrometheusExporter` endpoint.
-    pub fn new(registry: Registry, updater: UpdateFn) -> Self {
-        Self { registry, updater }
+    pub fn new() -> Self {
+        let registry = init_prometheus();
+        Self { registry }
     }
 }
 
@@ -37,7 +35,7 @@ impl Endpoint for MetricsUpdaterMiddleware {
             return Ok(StatusCode::METHOD_NOT_ALLOWED.into());
         }
 
-        (self.updater)();
+        metrics_updater_fn().await;
 
         let encoder = TextEncoder::new();
         let metric_families = self.registry.gather();

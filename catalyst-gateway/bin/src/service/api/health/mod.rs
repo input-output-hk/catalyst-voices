@@ -7,9 +7,9 @@ use crate::service::common::{
 };
 
 mod inspection_get;
-mod live_get;
-mod ready_get;
-mod started_get;
+pub(crate) mod live_get;
+pub(crate) mod ready_get;
+pub(crate) mod started_get;
 
 /// Health API Endpoints
 pub(crate) struct HealthApi;

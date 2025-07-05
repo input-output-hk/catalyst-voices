@@ -5,6 +5,7 @@ use prometheus::{default_registry, Registry};
 pub(crate) mod chain_follower;
 pub(crate) mod chain_indexer;
 pub(crate) mod endpoint;
+pub(crate) mod health;
 pub(crate) mod memory;
 
 /// Initialize Prometheus metrics.
@@ -18,7 +19,8 @@ pub(crate) fn init_prometheus() -> Registry {
 }
 
 /// Updates metrics to current values.
-pub(crate) fn metrics_updater_fn() {
+pub(crate) async fn metrics_updater_fn() {
     chain_follower::update();
     memory::update();
+    health::update().await;
 }

@@ -94,8 +94,8 @@ pub(crate) async fn endpoint() -> AllResponses {
     if is_live() {
         Responses::NoContent.into()
     } else {
-        AllResponses::service_unavailable(
-            &anyhow::anyhow!("Service is not live, do not send other requests."),
+        AllResponses::service_unavailable_with_msg(
+            "Service is not live, do not send other requests.".to_string(),
             RetryAfterOption::Default,
         )
     }

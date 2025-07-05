@@ -1,7 +1,7 @@
 //! Main entrypoint to the service
 
 // These Modules contain endpoints
-mod api;
+pub(crate) mod api;
 
 mod docs;
 // These modules are utility or common types/functions
