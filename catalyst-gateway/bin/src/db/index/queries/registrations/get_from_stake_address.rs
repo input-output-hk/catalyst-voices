@@ -9,12 +9,15 @@ use scylla::{
 };
 use tracing::error;
 
-use crate::db::{
-    index::{
-        queries::{PreparedQueries, PreparedSelectQuery},
-        session::CassandraSession,
+use crate::{
+    db::{
+        index::{
+            queries::{PreparedQueries, PreparedSelectQuery},
+            session::CassandraSession,
+        },
+        types::DbStakeAddress,
     },
-    types::DbStakeAddress,
+    impl_query_statement,
 };
 
 /// Get stake addr from stake hash query string.
@@ -42,6 +45,8 @@ pub(crate) struct GetStakeAddrQuery {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
     pub stake_public_key: Vec<u8>,
 }
+
+impl_query_statement!(GetStakeAddrQuery, GET_QUERY);
 
 impl GetStakeAddrQuery {
     /// Prepares a get get stake addr from stake hash query.

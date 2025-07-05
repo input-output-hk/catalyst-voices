@@ -28,7 +28,7 @@ use crate::{
 /// There are multiple possible parameters to a query, which are represented separately.
 pub(crate) struct TxoInsertQuery {
     /// Staked TXO Data Parameters
-    staked_txo: Vec<insert_txo::Params>,
+    staked_txo: Vec<insert_txo::TxoInsertQuery>,
     /// Unstaked TXO Data Parameters
     unstaked_txo: Vec<insert_unstaked_txo::Params>,
     /// Staked TXO Asset Data Parameters
@@ -52,7 +52,7 @@ impl TxoInsertQuery {
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch, SizedBatch)> {
-        let txo_staked_insert_batch = insert_txo::Params::prepare_batch(session, cfg).await;
+        let txo_staked_insert_batch = insert_txo::TxoInsertQuery::prepare_batch(session, cfg).await;
         let txo_unstaked_insert_batch =
             insert_unstaked_txo::Params::prepare_batch(session, cfg).await;
         let txo_staked_asset_insert_batch =
@@ -152,7 +152,7 @@ impl TxoInsertQuery {
 
             let txo_index = TxnOutputOffset::from(txo_index);
             if let Some(stake_address) = stake_address.clone() {
-                let params = insert_txo::Params::new(
+                let params = insert_txo::TxoInsertQuery::new(
                     stake_address,
                     slot_no,
                     index,

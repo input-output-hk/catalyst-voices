@@ -26,7 +26,9 @@ use tracing::error;
 
 use crate::{
     db::index::{
-        queries::rbac::get_catalyst_id_from_stake_address::{Query, QueryParams},
+        queries::rbac::get_catalyst_id_from_stake_address::{
+            GetCatalystIdForStakeAddress, QueryParams,
+        },
         session::CassandraSession,
     },
     service::{
@@ -110,7 +112,7 @@ pub(crate) async fn endpoint(
 async fn catalyst_id_from_stake(
     session: &CassandraSession, address: StakeAddress,
 ) -> anyhow::Result<Option<CatalystId>> {
-    let mut result: Vec<_> = Query::execute(session, QueryParams {
+    let mut result: Vec<_> = GetCatalystIdForStakeAddress::execute(session, QueryParams {
         stake_address: address.into(),
     })
     .and_then(|r| r.try_collect().map_err(Into::into))

@@ -11,6 +11,7 @@ use crate::{
         index::queries::{PreparedQueries, SizedBatch},
         types::{DbSlot, DbTxnIndex},
     },
+    impl_query_batch,
     settings::cassandra_db,
 };
 
@@ -20,7 +21,7 @@ const INSERT_CIP36_REGISTRATION_FOR_VOTE_KEY_QUERY: &str =
 
 /// Insert CIP-36 Registration Invalid Query Parameters
 #[derive(SerializeRow, Debug)]
-pub(crate) struct Params {
+pub(crate) struct Cip36ForVoteKeyInsert {
     /// Voting Public Key
     vote_key: Vec<u8>,
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
@@ -33,12 +34,17 @@ pub(crate) struct Params {
     valid: bool,
 }
 
-impl Params {
+impl_query_batch!(
+    Cip36ForVoteKeyInsert,
+    INSERT_CIP36_REGISTRATION_FOR_VOTE_KEY_QUERY
+);
+
+impl Cip36ForVoteKeyInsert {
     /// Create a new Insert Query.
     pub fn new(
         vote_key: &VotingPubKey, slot_no: Slot, txn_index: TxnIndex, cip36: &Cip36, valid: bool,
     ) -> Self {
-        Params {
+        Cip36ForVoteKeyInsert {
             vote_key: vote_key
                 .voting_pk()
                 .map(|k| k.to_bytes().to_vec())

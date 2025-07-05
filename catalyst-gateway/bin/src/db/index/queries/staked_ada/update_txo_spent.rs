@@ -13,6 +13,7 @@ use crate::{
         },
         types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
     },
+    impl_query_batch,
     settings::cassandra_db,
 };
 
@@ -37,10 +38,12 @@ pub(crate) struct UpdateTxoSpentQueryParams {
 /// Update TXO spent query.
 pub(crate) struct UpdateTxoSpentQuery;
 
+impl_query_batch!(UpdateTxoSpentQuery, UPDATE_TXO_SPENT_QUERY);
+
 impl UpdateTxoSpentQuery {
     /// Prepare a batch of update TXO spent queries.
     pub(crate) async fn prepare_batch(
-        session: Arc<Session>, cfg: &cassandra_db::EnvVars,
+        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),
