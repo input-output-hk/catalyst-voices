@@ -242,7 +242,8 @@ async fn test_get_txo_by_stake_address() {
     .await
     .unwrap();
 
-    row_stream.into_iter().for_each(drop);
+    let rows = Arc::into_inner(row_stream).unwrap();
+    rows.into_iter().for_each(drop);
 }
 
 #[ignore = "An integration test which requires a running Scylla node instance, disabled from `testunit` CI run"]

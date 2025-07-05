@@ -173,19 +173,25 @@ async fn get_txo(
     )
     .await?;
 
-    let txo_map = txos_stream
-        .into_iter()
-        .fold(HashMap::new(), |mut txo_map, row| {
-            let key = (row.txn_id.into(), row.txo.into());
-            txo_map.insert(key, TxoInfo {
-                value: row.value,
-                txn_index: row.txn_index.into(),
-                txo: row.txo.into(),
-                slot_no: row.slot_no.into(),
-                spent_slot_no: row.spent_slot.map(Into::into),
-            });
-            txo_map
+    let txo_map = txos_stream.iter().fold(HashMap::new(), |mut txo_map, row| {
+        let query_value = row.value.read().unwrap_or_else(|err| {
+            tracing::error!(
+                    error = %err,
+                    "UTXO Assets Cache lock is poisoned, recovering lock.");
+            row.value.clear_poison();
+            err.into_inner()
         });
+        let query_key = &row.key;
+        let key = (query_value.txn_id.into(), query_key.txo.into());
+        txo_map.insert(key, TxoInfo {
+            value: query_value.value.clone(),
+            txn_index: query_key.txn_index.into(),
+            txo: query_key.txo.into(),
+            slot_no: query_key.slot_no.into(),
+            spent_slot_no: query_value.spent_slot.map(Into::into),
+        });
+        txo_map
+    });
     Ok(txo_map)
 }
 

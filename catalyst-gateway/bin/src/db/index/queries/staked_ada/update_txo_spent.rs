@@ -64,7 +64,7 @@ impl UpdateTxoSpentQuery {
             .execute_batch(PreparedQuery::TxoSpentUpdateQuery, params.clone())
             .await?;
 
-        GetTxoByStakeAddressQuery::update_cache(params).await;
+        GetTxoByStakeAddressQuery::update_cache(params);
 
         Ok(results)
     }
