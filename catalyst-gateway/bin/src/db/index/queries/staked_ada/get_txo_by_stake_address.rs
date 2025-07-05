@@ -48,7 +48,7 @@ impl GetTxoByStakeAddressQueryParams {
     }
 }
 
-/// Get UTXO assets by stake address query.
+/// Get UTXO assets internal query data.
 #[derive(DeserializeRow)]
 pub(crate) struct GetTxoByStakeAddressQueryInner {
     /// TXO transaction hash.
@@ -65,7 +65,7 @@ pub(crate) struct GetTxoByStakeAddressQueryInner {
     pub spent_slot: Option<DbSlot>,
 }
 
-/// Get UTXO assets query.
+/// Get UTXO assets query value.
 pub(crate) struct GetTxoByStakeAddressQueryValue {
     /// TXO transaction hash.
     pub txn_id: DbTransactionId,
@@ -75,7 +75,7 @@ pub(crate) struct GetTxoByStakeAddressQueryValue {
     pub spent_slot: Option<DbSlot>,
 }
 
-/// Get UTXO assets query.
+/// Get UTXO assets query key.
 #[derive(Hash, PartialEq, Eq, Debug)]
 pub(crate) struct GetTxoByStakeAddressQueryKey {
     /// TXO transaction index within the slot.
