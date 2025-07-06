@@ -69,10 +69,11 @@ services:
     image: cat-gateway:latest
     container_name: cat-gateway
     healthcheck:
-      test: "curl -s -i localhost:3030/api/v1/health/started | head -n 1 | grep 204"
-      interval: 15s
+      test: "curl -s -i localhost:3030/api/v1/health/ready | head -n 1 | grep 204"
+      start_period: 30s
+      interval: 20s
       timeout: 30s
-      retries: 10
+      retries: 45
     environment:
       - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
       - CASSANDRA_PERSISTENT_URL=scylla-node:9042
