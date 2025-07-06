@@ -29,6 +29,11 @@ services:
     container_name: scylla-node
     restart: unless-stopped
     command: --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0
+    healthcheck:
+      test: cqlsh -e "SHOW VERSION" || exit 1
+      interval: 15s
+      timeout: 30s
+      retries: 10
     ports:
       - "9042:9042"
 
@@ -58,6 +63,36 @@ services:
       - 3030:3030
     depends_on:
       event-db:
+        condition: service_healthy
+
+  cat-gateway:
+    image: cat-gateway:latest
+    container_name: cat-gateway
+    healthcheck:
+      test: "curl -s -i localhost:3030/api/v1/health/ready | head -n 1 | grep 204"
+      interval: 60s
+      timeout: 300s
+      retries: 10
+    environment:
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
+      - CASSANDRA_PERSISTENT_URL=scylla-node:9042
+      - CASSANDRA_VOLATILE_URL=scylla-node:9042
+      - CAT_ADDRESS=0.0.0.0:3030
+      - CHAIN_NETWORK=Preprod
+      - SIGNED_DOC_SK=0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd
+      - LOG_LEVEL=error
+      - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
+      - DATA_REFRESH_TICK=5
+      - CHECK_CONFIG_TICK=5
+      - MACHINE_ID=UID
+      - INTERNAL_API_KEY=123
+      - RBAC_OFF=true
+    ports:
+      - 3030:3030
+    depends_on:
+      event-db:
+        condition: service_healthy
+      scylla-node:
         condition: service_healthy
 
   api-tests-runner:
