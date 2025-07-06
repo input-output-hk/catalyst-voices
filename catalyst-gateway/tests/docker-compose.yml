@@ -101,7 +101,7 @@ services:
       # for the current setup its not possible to provide a path to the cat-gateway binary, because its running under the container
       - CAT_GATEWAY_EXECUTABLE_PATH=SOME_VALUE
     depends_on:
-      cat-gateway-with-scylla:
+      cat-gateway:
         condition: service_healthy
 
 
