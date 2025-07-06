@@ -1,10 +1,10 @@
 import 'package:catalyst_voices/widgets/document_builder/viewer/document_property_builder_viewer.dart';
 import 'package:catalyst_voices/widgets/tiles/specialized/document_builder_section_tile_controller.dart';
+import 'package:catalyst_voices/widgets/tiles/specialized/document_builder_section_tile_data.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' as model;
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 /// Displays a [model.DocumentSectionSchema] as list tile in edit / view mode.
@@ -52,37 +52,6 @@ class DocumentBuilderSectionTile extends StatefulWidget {
   }
 }
 
-final class _DocumentBuilderSectionTileData extends Equatable {
-  final bool isEditMode;
-  final model.DocumentProperty editedSection;
-  final model.DocumentPropertyBuilder builder;
-  final List<model.DocumentChange> pendingChanges;
-
-  const _DocumentBuilderSectionTileData({
-    required this.isEditMode,
-    required this.editedSection,
-    required this.builder,
-    required this.pendingChanges,
-  });
-
-  @override
-  List<Object?> get props => [isEditMode, editedSection, builder, pendingChanges];
-
-  _DocumentBuilderSectionTileData copyWith({
-    bool? isEditMode,
-    model.DocumentProperty? editedSection,
-    model.DocumentPropertyBuilder? builder,
-    List<model.DocumentChange>? pendingChanges,
-  }) {
-    return _DocumentBuilderSectionTileData(
-      isEditMode: isEditMode ?? this.isEditMode,
-      editedSection: editedSection ?? this.editedSection,
-      builder: builder ?? this.builder,
-      pendingChanges: pendingChanges ?? this.pendingChanges,
-    );
-  }
-}
-
 class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile> {
   final _formKey = GlobalKey<FormState>();
 
@@ -96,9 +65,9 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
     _tileController.setData(widget.section.nodeId, newData);
   }
 
-  _DocumentBuilderSectionTileData get _data {
-    return _tileController.getData<_DocumentBuilderSectionTileData>(widget.section.nodeId) ??
-        _DocumentBuilderSectionTileData(
+  DocumentBuilderSectionTileData get _data {
+    return _tileController.getData<DocumentBuilderSectionTileData>(widget.section.nodeId) ??
+        DocumentBuilderSectionTileData(
           isEditMode: false,
           editedSection: widget.section,
           builder: widget.section.toBuilder(),

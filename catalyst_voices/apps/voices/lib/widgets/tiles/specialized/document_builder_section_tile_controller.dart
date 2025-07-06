@@ -1,6 +1,9 @@
+import 'package:catalyst_voices/widgets/tiles/specialized/document_builder_section_tile.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
+/// A controller that holds cached data for [DocumentBuilderSectionTile] to allow these tiles
+/// be disposed and reinitialized later without losing the cached data.
 final class DocumentBuilderSectionTileController {
   final Map<DocumentNodeId, Object> _data = {};
 
@@ -19,6 +22,8 @@ final class DocumentBuilderSectionTileController {
   }
 }
 
+/// An [InheritedWidget] which should be injected above the [DocumentBuilderSectionTile]
+/// in the widget tree that provides a [DocumentBuilderSectionTileController].
 final class DocumentBuilderSectionTileControllerScope extends InheritedWidget {
   final DocumentBuilderSectionTileController controller;
 
