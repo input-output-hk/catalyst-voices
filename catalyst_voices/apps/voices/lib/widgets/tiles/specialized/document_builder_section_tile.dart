@@ -102,7 +102,7 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
           isEditMode: false,
           editedSection: widget.section,
           builder: widget.section.toBuilder(),
-          pendingChanges: const [],
+          pendingChanges: List.empty(growable: true),
         );
   }
 
@@ -136,11 +136,6 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
   }
 
   List<model.DocumentChange> get _pendingChanges => _data.pendingChanges;
-
-  set _pendingChanges(List<model.DocumentChange> value) {
-    final newData = _data.copyWith(pendingChanges: value);
-    _tileController.setData(widget.section.nodeId, newData);
-  }
 
   @override
   Widget build(BuildContext context) {
