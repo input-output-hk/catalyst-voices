@@ -38,6 +38,14 @@ test:
         SAVE ARTIFACT coverage.lcov AS LOCAL api-tests.coverage.info
     END
 
+# Creates a package of the python integration test runner
+package:
+    FROM +builder
+
+    ENTRYPOINT poetry run pytest -s --junitxml=junit-report.xml --cov=integration --cov-report lcov
+    SAVE IMAGE api-tests:latest
+
+
 disabled-nightly-test:
     FROM +builder
     COPY ./docker-compose.yml .
