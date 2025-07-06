@@ -7,6 +7,7 @@ import 'package:catalyst_voices/widgets/comment/proposal_add_comment_tile.dart';
 import 'package:catalyst_voices/widgets/comment/proposal_comments_header_tile.dart';
 import 'package:catalyst_voices/widgets/list/category_requirements_list.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/category_brief_dialog.dart';
+import 'package:catalyst_voices/widgets/tiles/specialized/document_builder_section_tile_controller.dart';
 import 'package:catalyst_voices/widgets/tiles/specialized/proposal_tile_decoration.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -32,10 +33,12 @@ final DocumentPropertyBuilderOverrides _widgetOverrides = {
 
 class ProposalBuilderSegmentsSelector extends StatelessWidget {
   final ItemScrollController itemScrollController;
+  final DocumentBuilderSectionTileController sectionTileController;
 
   const ProposalBuilderSegmentsSelector({
     super.key,
     required this.itemScrollController,
+    required this.sectionTileController,
   });
 
   @override
@@ -47,6 +50,7 @@ class ProposalBuilderSegmentsSelector extends StatelessWidget {
           offstage: !state,
           child: _ProposalBuilderSegments(
             itemScrollController: itemScrollController,
+            sectionTileController: sectionTileController,
           ),
         );
       },
@@ -108,67 +112,72 @@ class _DocumentSection extends StatelessWidget {
 
 class _ProposalBuilderSegments extends StatelessWidget {
   final ItemScrollController itemScrollController;
+  final DocumentBuilderSectionTileController sectionTileController;
 
   const _ProposalBuilderSegments({
     required this.itemScrollController,
+    required this.sectionTileController,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: SegmentsControllerScope.of(context),
-      builder: (context, value, child) {
-        final items = value.listItems;
-        final selectedNodeId = value.activeSectionId;
-        return BasicSegmentsListView(
-          key: const ValueKey('ProposalBuilderSegmentsListView'),
-          items: items,
-          itemScrollController: itemScrollController,
-          padding: const EdgeInsets.only(top: 16, bottom: 64),
-          itemBuilder: (context, index) {
-            final item = items[index];
-            final previousItem = index == 0 ? null : items.elementAtOrNull(index - 1);
-            final nextItem = items.elementAtOrNull(index + 1);
-
-            return KeyedSubtree(
-              key: ValueKey(item.id),
-              child: _buildItem(
-                context: context,
-                item: item,
-                previousItem: previousItem,
-                nextItem: nextItem,
-                selectedNodeId: selectedNodeId,
-              ),
-            );
-          },
-          separatorBuilder: (context, index) {
-            final item = items[index];
-            final nextItem = items.elementAtOrNull(index + 1);
-
-            if (nextItem is ProposalCommentsSegment) {
-              return const SizedBox(height: 32);
-            }
-
-            if (item is ProposalCommentsSegment && nextItem != null) {
-              return const SizedBox(height: 32);
-            }
-
-            if (item is ProposalViewCommentsSection && nextItem != null) {
-              return const ProposalSeparatorBox(height: 24);
-            }
-
-            if (item is ProposalViewCommentsSection && nextItem is ProposalAddCommentSection) {
-              return const ProposalDivider(height: 48);
-            }
-
-            if (item is DocumentSegment || item is DocumentSection) {
-              return const SizedBox(height: 12);
-            }
-
-            return const SizedBox.shrink();
-          },
-        );
-      },
+    return DocumentBuilderSectionTileControllerScope(
+      controller: sectionTileController,
+      child: ValueListenableBuilder(
+        valueListenable: SegmentsControllerScope.of(context),
+        builder: (context, value, child) {
+          final items = value.listItems;
+          final selectedNodeId = value.activeSectionId;
+          return BasicSegmentsListView(
+            key: const ValueKey('ProposalBuilderSegmentsListView'),
+            items: items,
+            itemScrollController: itemScrollController,
+            padding: const EdgeInsets.only(top: 16, bottom: 64),
+            itemBuilder: (context, index) {
+              final item = items[index];
+              final previousItem = index == 0 ? null : items.elementAtOrNull(index - 1);
+              final nextItem = items.elementAtOrNull(index + 1);
+      
+              return KeyedSubtree(
+                key: ValueKey(item.id),
+                child: _buildItem(
+                  context: context,
+                  item: item,
+                  previousItem: previousItem,
+                  nextItem: nextItem,
+                  selectedNodeId: selectedNodeId,
+                ),
+              );
+            },
+            separatorBuilder: (context, index) {
+              final item = items[index];
+              final nextItem = items.elementAtOrNull(index + 1);
+      
+              if (nextItem is ProposalCommentsSegment) {
+                return const SizedBox(height: 32);
+              }
+      
+              if (item is ProposalCommentsSegment && nextItem != null) {
+                return const SizedBox(height: 32);
+              }
+      
+              if (item is ProposalViewCommentsSection && nextItem != null) {
+                return const ProposalSeparatorBox(height: 24);
+              }
+      
+              if (item is ProposalViewCommentsSection && nextItem is ProposalAddCommentSection) {
+                return const ProposalDivider(height: 48);
+              }
+      
+              if (item is DocumentSegment || item is DocumentSection) {
+                return const SizedBox(height: 12);
+              }
+      
+              return const SizedBox.shrink();
+            },
+          );
+        },
+      ),
     );
   }
 

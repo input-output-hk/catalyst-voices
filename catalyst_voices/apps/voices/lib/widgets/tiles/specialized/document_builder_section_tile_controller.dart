@@ -4,6 +4,12 @@ import 'package:flutter/material.dart';
 final class DocumentBuilderSectionTileController {
   final Map<DocumentNodeId, Object> _data = {};
 
+  DocumentBuilderSectionTileController();
+
+  void dispose() {
+    _data.clear();
+  }
+
   T? getData<T extends Object?>(DocumentNodeId nodeId) {
     return _data[nodeId] as T?;
   }

@@ -4,6 +4,7 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' as model;
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 /// Displays a [model.DocumentSectionSchema] as list tile in edit / view mode.
@@ -51,18 +52,65 @@ class DocumentBuilderSectionTile extends StatefulWidget {
   }
 }
 
+final class _DocumentBuilderSectionTileData extends Equatable {
+  final bool isEditMode;
+  final model.DocumentProperty editedSection;
+  final model.DocumentPropertyBuilder builder;
+  final List<model.DocumentChange> pendingChanges;
+
+  const _DocumentBuilderSectionTileData({
+    required this.isEditMode,
+    required this.editedSection,
+    required this.builder,
+    required this.pendingChanges,
+  });
+
+  @override
+  List<Object?> get props => [isEditMode, editedSection, builder, pendingChanges];
+
+  _DocumentBuilderSectionTileData copyWith({
+    bool? isEditMode,
+    model.DocumentProperty? editedSection,
+    model.DocumentPropertyBuilder? builder,
+    List<model.DocumentChange>? pendingChanges,
+  }) {
+    return _DocumentBuilderSectionTileData(
+      isEditMode: isEditMode ?? this.isEditMode,
+      editedSection: editedSection ?? this.editedSection,
+      builder: builder ?? this.builder,
+      pendingChanges: pendingChanges ?? this.pendingChanges,
+    );
+  }
+}
+
 class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile> {
   final _formKey = GlobalKey<FormState>();
 
   late final WidgetStatesController _statesController;
+  late DocumentBuilderSectionTileController _tileController;
 
-  late model.DocumentProperty _editedSection;
-  late model.DocumentPropertyBuilder _builder;
+  model.DocumentPropertyBuilder get _builder => _data.builder;
 
-  final _pendingChanges = <model.DocumentChange>[];
+  set _builder(model.DocumentPropertyBuilder value) {
+    final newData = _data.copyWith(builder: value);
+    _tileController.setData(widget.section.nodeId, newData);
+  }
 
-  DocumentBuilderSectionTileController get _controller {
-    return DocumentBuilderSectionTileControllerScope.of(context);
+  _DocumentBuilderSectionTileData get _data {
+    return _tileController.getData<_DocumentBuilderSectionTileData>(widget.section.nodeId) ??
+        _DocumentBuilderSectionTileData(
+          isEditMode: false,
+          editedSection: widget.section,
+          builder: widget.section.toBuilder(),
+          pendingChanges: const [],
+        );
+  }
+
+  model.DocumentProperty get _editedSection => _data.editedSection;
+
+  set _editedSection(model.DocumentProperty value) {
+    final newData = _data.copyWith(editedSection: value);
+    _tileController.setData(widget.section.nodeId, newData);
   }
 
   String? get _errorText {
@@ -74,12 +122,11 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
     return null;
   }
 
-  bool get _isEditMode {
-    return _controller.getData(widget.section.nodeId) as bool? ?? false;
-  }
+  bool get _isEditMode => _data.isEditMode;
 
   set _isEditMode(bool value) {
-    _controller.setData(widget.section.nodeId, value);
+    final newData = _data.copyWith(isEditMode: value);
+    _tileController.setData(widget.section.nodeId, newData);
   }
 
   Widget? get _overrideAction {
@@ -88,15 +135,21 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
     return overrides;
   }
 
+  List<model.DocumentChange> get _pendingChanges => _data.pendingChanges;
+
+  set _pendingChanges(List<model.DocumentChange> value) {
+    final newData = _data.copyWith(pendingChanges: value);
+    _tileController.setData(widget.section.nodeId, newData);
+  }
+
   @override
   Widget build(BuildContext context) {
     final title = _editedSection.schema.title;
-    final isEditMode = _isEditMode;
 
     return EditableTile(
       title: title,
       statesController: _statesController,
-      isEditMode: isEditMode,
+      isEditMode: _isEditMode,
       isSaveEnabled: true,
       isEditEnabled: widget.isEditable,
       saveText: context.l10n.saveChangesButtonText,
@@ -108,11 +161,11 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
       child: Form(
         key: _formKey,
         autovalidateMode: widget.autovalidateMode,
-        child: isEditMode
+        child: _isEditMode
             ? DocumentPropertyBuilder(
                 key: ValueKey(_editedSection.schema.nodeId),
                 property: _editedSection,
-                isEditMode: isEditMode,
+                isEditMode: _isEditMode,
                 onChanged: _handlePropertyChanges,
                 overrides: widget.overrides,
               )
@@ -123,6 +176,12 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
               ),
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _tileController = DocumentBuilderSectionTileControllerScope.of(context);
   }
 
   @override
@@ -155,9 +214,6 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
     _statesController = WidgetStatesController({
       if (widget.isSelected) WidgetState.selected,
     });
-
-    _editedSection = widget.section;
-    _builder = _editedSection.toBuilder();
   }
 
   void _handlePropertyChanges(List<model.DocumentChange> changes) {

@@ -79,7 +79,7 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         SignalHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderSignal, _ProposalBuilderBody> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
-  late final DocumentBuilderSectionTileController _documentSectionTileController;
+  late final DocumentBuilderSectionTileController _sectionTileController;
 
   StreamSubscription<DocumentRef?>? _proposalRefSub;
   StreamSubscription<dynamic>? _segmentsSub;
@@ -105,17 +105,15 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
           endDrawer: const OpportunitiesDrawer(),
           body: SegmentsControllerScope(
             controller: _segmentsController,
-            child: DocumentBuilderSectionTileControllerScope(
-              controller: _documentSectionTileController,
-              child: SidebarScaffold(
-                leftRail: const ProposalBuilderNavigationPanel(),
-                rightRail: const ProposalBuilderSetupPanel(),
-                body: _ProposalBuilderContent(
-                  controller: _segmentsScrollController,
-                  onRetryTap: _loadProposal,
-                ),
-                bodyConstraints: const BoxConstraints.expand(),
+            child: SidebarScaffold(
+              leftRail: const ProposalBuilderNavigationPanel(),
+              rightRail: const ProposalBuilderSetupPanel(),
+              body: _ProposalBuilderContent(
+                itemScrollController: _segmentsScrollController,
+                sectionTileController: _sectionTileController,
+                onRetryTap: _loadProposal,
               ),
+              bodyConstraints: const BoxConstraints.expand(),
             ),
           ),
         ),
@@ -135,6 +133,7 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
   @override
   void dispose() {
     _segmentsController.dispose();
+    _sectionTileController.dispose();
 
     unawaited(_proposalRefSub?.cancel());
     _proposalRefSub = null;
@@ -194,7 +193,7 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
 
     _segmentsController = SegmentsController();
     _segmentsScrollController = ItemScrollController();
-    _documentSectionTileController = DocumentBuilderSectionTileController();
+    _sectionTileController = DocumentBuilderSectionTileController();
 
     _segmentsController
       ..addListener(_handleSegmentsControllerChange)
@@ -434,11 +433,13 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
 }
 
 class _ProposalBuilderContent extends StatelessWidget {
-  final ItemScrollController controller;
+  final ItemScrollController itemScrollController;
+  final DocumentBuilderSectionTileController sectionTileController;
   final VoidCallback onRetryTap;
 
   const _ProposalBuilderContent({
-    required this.controller,
+    required this.itemScrollController,
+    required this.sectionTileController,
     required this.onRetryTap,
   });
 
@@ -449,7 +450,10 @@ class _ProposalBuilderContent extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           ProposalBuilderErrorSelector(onRetryTap: onRetryTap),
-          ProposalBuilderSegmentsSelector(itemScrollController: controller),
+          ProposalBuilderSegmentsSelector(
+            itemScrollController: itemScrollController,
+            sectionTileController: sectionTileController,
+          ),
           const ProposalBuilderLoadingSelector(),
         ],
       ),
