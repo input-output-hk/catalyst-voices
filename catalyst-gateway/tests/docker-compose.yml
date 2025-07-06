@@ -77,16 +77,12 @@ services:
       - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
       - CASSANDRA_PERSISTENT_URL=scylla-node:9042
       - CASSANDRA_VOLATILE_URL=scylla-node:9042
-      - CAT_ADDRESS=0.0.0.0:3030
       - CHAIN_NETWORK=Preprod
       - SIGNED_DOC_SK=0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd
-      # - LOG_LEVEL=error
-      # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
-      - DATA_REFRESH_TICK=5
-      - CHECK_CONFIG_TICK=5
-      - MACHINE_ID=UID
       - INTERNAL_API_KEY=123
       - RBAC_OFF=true
+      # - LOG_LEVEL=error
+      # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
     ports:
       - 3030:3030
     depends_on:
@@ -100,7 +96,7 @@ services:
     container_name: api-tests-runner
     environment:
       - EVENT_DB_TEST_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
-      - CAT_GATEWAY_TEST_URL=http://cat-gateway-with-scylla:3030
+      - CAT_GATEWAY_TEST_URL=http://cat-gateway:3030
       - CAT_GATEWAY_INTERNAL_API_KEY=123
       # for the current setup its not possible to provide a path to the cat-gateway binary, because its running under the container
       - CAT_GATEWAY_EXECUTABLE_PATH=SOME_VALUE
