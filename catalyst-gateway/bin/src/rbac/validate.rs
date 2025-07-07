@@ -1,14 +1,18 @@
 //! Utilities for RBAC registrations validation.
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use cardano_blockchain_types::TransactionId;
 use catalyst_types::catalyst_id::CatalystId;
+use futures::TryFutureExt;
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
-use tracing::error;
+use tracing::{debug, error};
 
-use crate::rbac::{
-    latest_rbac_chain, persistent_rbac_chain, RbacIndexingContext, RbacValidationError,
-    RbacValidationResult,
+use crate::{
+    db::index::session::CassandraSession,
+    rbac::{
+        latest_rbac_chain, persistent_rbac_chain, RbacIndexingContext, RbacValidationError,
+        RbacValidationResult,
+    },
 };
 
 /// Validates a new registration by either starting a new chain or adding it to the
@@ -20,24 +24,46 @@ pub async fn validate_rbac_registration(
     reg: Cip509, is_persistent: bool, context: &mut RbacIndexingContext,
 ) -> RbacValidationResult {
     match reg.previous_transaction() {
-        Some(previous_txn) => update_chain(reg, previous_txn),
+        Some(previous_txn) => update_chain(reg, previous_txn, is_persistent, context).await,
         None => start_new_chain(reg, is_persistent).await,
     }
 }
 
-fn update_chain(reg: Cip509, previous_txn: TransactionId) -> RbacValidationResult {
+async fn update_chain(
+    reg: Cip509, previous_txn: TransactionId, is_persistent: bool,
+    context: &mut RbacIndexingContext,
+) -> RbacValidationResult {
     let purpose = reg.purpose();
     let report = reg.report().to_owned();
 
-    // TODO: FIXME:
+    // Find a chain this registration belongs to.
+    let catalyst_id = match catalyst_id(previous_txn, is_persistent, context).await {
+        Ok(Some(id)) => id,
+        Ok(None) => {
+            // TODO: FIXME: Describe reasons for this error?
+            debug!("Unable to find previous transaction {previous_txn} in the RBAC cache");
+            // We are unable to determine a Catalyst ID, so there is no sense to update the
+            // problem report because we would be unable to store this registration anyway.
+            return Err(RbacValidationError::UnknownCatalystId);
+        },
+        Err(e) => {
+            error!("'Get Catalyst ID from transaction ID' query failed: {e:?}");
+            return Err(RbacValidationError::UnknownCatalystId);
+        },
+    };
 
-    // // Find a chain this registration belongs to.
-    // let catalyst_id = self.transactions.get(&previous_txn).ok_or_else(|| {
-    //     debug!("Unable to find previous transaction {previous_txn} in the RBAC cache");
-    //     // We are unable to determine a Catalyst ID, so there is no sense to update the
-    //     // problem report because we would be unable to store this registration anyway.
-    //     RbacCacheAddError::UnknownCatalystId
-    // })?;
+    let chain = match chain(&catalyst_id, is_persistent).await {
+        Ok(Some(c)) => c,
+        Ok(None) => {
+            //
+            todo!();
+        },
+        Err(e) => {
+            //
+            todo!();
+        },
+    };
+
     // let chain = self.chains.get(&catalyst_id).ok_or_else(|| {
     //     // This means the cache is broken. This should never normally happen.
     //     error!("Broken RBAC cache: {catalyst_id} is present in TRANSACTIONS cache, but
@@ -123,6 +149,7 @@ async fn start_new_chain(reg: Cip509, is_persistent: bool) -> RbacValidationResu
     let catalyst_id = new_chain.catalyst_id().to_owned();
     // // TODO: FIXME: Check context and instead of building full chain just check the
     // presence // of any information in the database!
+
     // match chain(&catalyst_id, is_persistent).await {
     //     Err(e) => {
     //         error!("Error finding a chain for {catalyst_id}: {e:?}");
@@ -208,12 +235,46 @@ async fn start_new_chain(reg: Cip509, is_persistent: bool) -> RbacValidationResu
     todo!()
 }
 
+/// Returns a Catalyst ID corresponding to the given transaction hash.
+async fn catalyst_id(
+    txn_id: TransactionId, is_persistent: bool, context: &mut RbacIndexingContext,
+) -> Result<Option<CatalystId>> {
+    use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::Query;
+
+    // Check the context first.
+    if let Some(catalyst_id) = context.find_transaction(&txn_id) {
+        return Ok(Some(catalyst_id.to_owned()));
+    }
+
+    // Then try to find in the persistent database.
+    let session =
+        CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
+    if let Some(r) = Query::get(&session, txn_id).await? {
+        return Ok(Some(r.catalyst_id));
+    };
+
+    // Conditionally check the volatile database.
+    if !is_persistent {
+        let session =
+            CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
+        return Query::get(&session, txn_id)
+            .map_ok(|r| r.map(|r| r.catalyst_id))
+            .await;
+    }
+
+    Ok(None)
+}
+
 /// Returns either persistent or "latest" (persistent + volatile) registration chain for
 /// the given Catalyst ID.
-async fn chain(id: &CatalystId, is_persistent: bool) -> Result<Option<RegistrationChain>> {
+async fn chain(
+    id: &CatalystId, is_persistent: bool, context: &mut RbacIndexingContext,
+) -> Result<Option<RegistrationChain>> {
     if is_persistent {
         persistent_rbac_chain(id).await
     } else {
         Ok(latest_rbac_chain(id).await?.map(|i| i.chain))
     }
+
+    // TODO: FIXME: Use context to potentially append registrations!
 }
