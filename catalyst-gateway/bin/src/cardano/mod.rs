@@ -24,7 +24,6 @@ use crate::{
         session::CassandraSession,
     },
     service::utilities::health::{
-        immutable_follower_has_first_reached_tip, live_follower_has_first_reached_tip,
         set_follower_immutable_first_reached_tip, set_follower_live_first_reached_tip,
     },
     settings::{chain_follower, Settings},
@@ -245,7 +244,7 @@ fn sync_subchain(
 
         // Wait for indexing DB to be ready before continuing.
         drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
-        info!(chain=%params.chain, params=%params,"Starting Chain Indexing");
+        info!(chain=%params.chain, params=%params,"Starting Chain Indexing Task");
 
         let mut first_indexed_block = params.first_indexed_block.clone();
         let mut first_immutable = params.first_is_immutable;
@@ -306,9 +305,7 @@ fn sync_subchain(
                         );
                     }
 
-                    if chain_update.tip && !live_follower_has_first_reached_tip() {
-                        info!("Follower has reached LIVE TIP for the first time");
-                        set_follower_live_first_reached_tip();
+                    if chain_update.tip && !set_follower_live_first_reached_tip() {
                         let _ = event_sender.send(event::ChainIndexerEvent::SyncLiveChainCompleted);
                     }
 
@@ -524,7 +521,14 @@ impl SyncTask {
         self.dispatch_event(event::ChainIndexerEvent::SyncLiveChainStarted);
 
         self.start_immutable_followers();
-        self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainStarted);
+        // IF there is only 1 chain follower spawn, then the immutable state already indexed and
+        // filled in the db.
+        if self.sync_tasks.len() == 1 {
+            set_follower_immutable_first_reached_tip();
+            self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
+        } else {
+            self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainStarted);
+        }
 
         // Wait Sync tasks to complete.  If they fail and have not completed, reschedule them.
         // If an immutable sync task ends OK, and we still have immutable data to sync then
@@ -608,8 +612,6 @@ impl SyncTask {
                 },
             }
 
-            let sync_task_count = self.sync_tasks.len();
-
             // IF there is only 1 chain follower left in sync_tasks, then all
             // immutable followers have finished.
             // When this happens we need to purge the live index of any records that exist
@@ -618,11 +620,8 @@ impl SyncTask {
             // want to put a gap in this, so that there are X slots of overlap
             // between the live chain and immutable chain.  This gap should be
             // a parameter.
-            if sync_task_count == 1 {
-                if !immutable_follower_has_first_reached_tip() {
-                    info!("Follower has reached IMMUTABLE TIP for the first time");
-                    set_follower_immutable_first_reached_tip();
-                }
+            if self.sync_tasks.len() == 1 {
+                set_follower_immutable_first_reached_tip();
                 self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
 
                 // Purge data up to this slot
@@ -675,9 +674,6 @@ impl SyncTask {
                     break;
                 }
             }
-            // `start_slot` is still used, because it is used to keep syncing chunks as required
-            // while each immutable sync task finishes.
-            info!(chain=%self.cfg.chain, tasks=self.current_sync_tasks, until=?self.start_slot, "Persistent Indexing DB tasks started");
         }
     }
 
