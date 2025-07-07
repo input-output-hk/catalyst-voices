@@ -5,6 +5,7 @@ use std::sync::Arc;
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
+use super::get_txo_by_stake_address::GetTxoByStakeAddressQuery;
 use crate::{
     db::{
         index::{
@@ -20,7 +21,7 @@ use crate::{
 const UPDATE_TXO_SPENT_QUERY: &str = include_str!("../cql/update_txo_spent.cql");
 
 /// Update TXO spent query params.
-#[derive(SerializeRow, Debug)]
+#[derive(SerializeRow, Clone, Debug)]
 pub(crate) struct UpdateTxoSpentQueryParams {
     /// TXO stake address.
     pub stake_address: DbStakeAddress,
@@ -60,8 +61,10 @@ impl UpdateTxoSpentQuery {
         session: &CassandraSession, params: Vec<UpdateTxoSpentQueryParams>,
     ) -> FallibleQueryResults {
         let results = session
-            .execute_batch(PreparedQuery::TxoSpentUpdateQuery, params)
+            .execute_batch(PreparedQuery::TxoSpentUpdateQuery, params.clone())
             .await?;
+
+        GetTxoByStakeAddressQuery::update_cache(params);
 
         Ok(results)
     }
