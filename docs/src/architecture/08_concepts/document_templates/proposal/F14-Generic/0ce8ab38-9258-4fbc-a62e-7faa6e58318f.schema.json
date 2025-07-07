@@ -9,7 +9,8 @@
             "Added maxLength constraint for singleLineHttpsURLEntry.",
             "Change title for Theme",
             "Change guidance text for requestedFunds",
-            "Change guidance text for time"
+            "Change guidance text for time",
+            "Remove maximum constraint for milestone cost."
         ],
         "2025-06-27": [
             "Legal wording changes.",
@@ -1080,8 +1081,7 @@
                                         "$ref": "#/definitions/tokenValueCardanoADA",
                                         "title": "Cost",
                                         "description": "The cost of this milestone in ADA",
-                                        "x-placeholder": "Enter the cost associated with this milestone",
-                                        "maximum": 1000000
+                                        "x-placeholder": "Enter the cost associated with this milestone"
                                     },
                                     "progress": {
                                         "$ref": "#/definitions/dropDownSingleSelect",
