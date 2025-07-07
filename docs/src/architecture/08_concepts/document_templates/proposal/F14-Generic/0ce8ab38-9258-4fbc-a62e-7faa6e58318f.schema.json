@@ -88,6 +88,7 @@
             "type": "string",
             "format": "uri",
             "pattern": "^https://[^\\s]+$",
+            "maxLength": 255,
             "x-note": "Must start with 'https://' and is followed by one or more non-whitespace characters, ending at the end of the string."
         },
         "multiLineTextEntry": {
@@ -157,7 +158,7 @@
             "default": [],
             "items": {
                 "$ref": "#/definitions/singleLineHttpsURLEntry",
-                "maxLength": 1024
+                "maxLength": 255
             },
             "x-note": "Enter multiple HTTPS URLs. Each URL should be unique and under 1024 characters."
         },
