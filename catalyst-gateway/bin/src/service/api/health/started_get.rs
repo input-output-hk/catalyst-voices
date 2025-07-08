@@ -130,8 +130,8 @@ pub(crate) async fn endpoint() -> AllResponses {
     if service_has_started() {
         Responses::NoContent.into()
     } else {
-        AllResponses::service_unavailable(
-            &anyhow::anyhow!("Service is not ready, do not send other requests."),
+        AllResponses::service_unavailable_with_msg(
+            "Service is not started, do not send other requests.".to_string(),
             RetryAfterOption::Default,
         )
     }

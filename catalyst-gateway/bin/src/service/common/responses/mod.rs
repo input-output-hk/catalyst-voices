@@ -170,6 +170,21 @@ impl<T> WithErrorResponses<T> {
         }
     }
 
+    /// Handle a 503 service unavailable error response with passing a response `msg`.
+    /// Its different with the original `service_unavailable` as it does not handles an
+    /// error, though its no need to log the id of this response.
+    ///
+    /// Returns a 503 Service unavailable Error response.
+    pub(crate) fn service_unavailable_with_msg(msg: String, retry: RetryAfterOption) -> Self {
+        let error = ServiceUnavailable::new(Some(msg));
+        let retry = match retry {
+            RetryAfterOption::Default => Some(RetryAfterHeader::default()),
+            RetryAfterOption::None => None,
+            RetryAfterOption::Some(value) => Some(value),
+        };
+        WithErrorResponses::Error(ErrorResponses::ServiceUnavailable(Json(error), retry))
+    }
+
     /// Handle a 503 service unavailable error response.
     ///
     /// Returns a 503 Service unavailable Error response.
