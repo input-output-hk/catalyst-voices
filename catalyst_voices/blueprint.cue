@@ -7,7 +7,7 @@ project: {
 		}
 
 		bundle: {
-			env: "dev"
+			env: string | *"dev"
 			modules: main: {
 				name:    "app"
 				version: "0.11.0"
