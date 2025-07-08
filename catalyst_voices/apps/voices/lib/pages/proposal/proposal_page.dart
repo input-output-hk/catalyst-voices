@@ -185,7 +185,7 @@ class _ProposalPageState extends State<ProposalPage>
 
     final newState = state.segments.isEmpty
         ? SegmentsControllerState.initial(segments: data)
-        : state.copyWith(segments: data);
+        : state.updateSegments(data);
 
     _segmentsController.value = newState;
   }
