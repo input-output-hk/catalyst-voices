@@ -4,7 +4,7 @@ use anyhow::{bail, Context, Result};
 use cardano_blockchain_types::{Network, Point, Slot, StakeAddress, TxnIndex};
 use cardano_chain_follower::ChainFollower;
 use catalyst_types::catalyst_id::CatalystId;
-use futures::{future::try_join, FutureExt, StreamExt, TryFutureExt, TryStreamExt};
+use futures::{future::try_join, TryFutureExt, TryStreamExt};
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
 
 use crate::{
@@ -105,7 +105,7 @@ async fn indexed_regs(session: &CassandraSession, id: &CatalystId) -> Result<Vec
 }
 
 /// Builds a chain from the given registrations.
-async fn build_rbac_chain(
+pub async fn build_rbac_chain(
     regs: impl IntoIterator<Item = RbacQuery>,
 ) -> Result<Option<RegistrationChain>> {
     let mut regs = regs.into_iter();
@@ -130,7 +130,7 @@ async fn build_rbac_chain(
 }
 
 /// Applies the given registration to the given chain.
-async fn apply_regs(
+pub async fn apply_regs(
     mut chain: RegistrationChain, regs: impl IntoIterator<Item = RbacQuery>,
 ) -> Result<RegistrationChain> {
     let network = Settings::cardano_network();

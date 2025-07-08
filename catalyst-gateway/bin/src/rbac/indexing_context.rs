@@ -1,9 +1,12 @@
 //! A RBAC context used during indexing.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
-use cardano_blockchain_types::{StakeAddress, TransactionId};
+use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
 use catalyst_types::catalyst_id::CatalystId;
+use ed25519_dalek::VerifyingKey;
+
+use crate::db::index::queries::rbac::get_rbac_registrations::Query as RbacQuery;
 
 /// A RBAC context used during indexing.
 ///
@@ -19,6 +22,12 @@ pub struct RbacIndexingContext {
     /// A map contains pending data that will be written in the
     /// `catalyst_id_for_stake_address` table.
     addresses: HashMap<StakeAddress, CatalystId>,
+    /// A map containing pending data that will be written in the
+    /// `catalyst_id_for_public_key` table.
+    public_keys: HashMap<VerifyingKey, CatalystId>,
+    /// A map containing pending data that will be written in the `rbac_registration`
+    /// table.
+    registrations: HashMap<CatalystId, Vec<RbacQuery>>,
 }
 
 impl RbacIndexingContext {
@@ -26,10 +35,14 @@ impl RbacIndexingContext {
     pub fn new() -> Self {
         let transactions = HashMap::new();
         let addresses = HashMap::new();
+        let registrations = HashMap::new();
+        let public_keys = HashMap::new();
 
         Self {
             transactions,
             addresses,
+            registrations,
+            public_keys,
         }
     }
 
@@ -48,8 +61,65 @@ impl RbacIndexingContext {
         self.addresses.insert(address, catalyst_id);
     }
 
-    /// Returns a Catalyst ID corresponding the the given stake address.
+    /// Adds multiple addresses to the context.
+    pub fn insert_addresses(&mut self, addresses: HashSet<StakeAddress>, catalyst_id: CatalystId) {
+        for address in addresses {
+            self.insert_address(address, catalyst_id.clone());
+        }
+    }
+
+    /// Returns a Catalyst ID corresponding the given stake address.
     pub fn find_address(&self, address: &StakeAddress) -> Option<&CatalystId> {
         self.addresses.get(address)
+    }
+
+    /// Adds a public key to the context.
+    pub fn insert_public_key(&mut self, key: VerifyingKey, catalyst_id: CatalystId) {
+        self.public_keys.insert(key, catalyst_id);
+    }
+
+    /// Adds multiple public keys to the context.
+    pub fn insert_public_keys(&mut self, keys: &[VerifyingKey], catalyst_id: CatalystId) {
+        for key in keys {
+            self.insert_public_key(*key, catalyst_id.clone());
+        }
+    }
+
+    /// Returns a Catalyst ID corresponding the given public key.
+    pub fn find_public_key(&self, key: &VerifyingKey) -> Option<&CatalystId> {
+        self.public_keys.get(key)
+    }
+
+    /// Adds a registration to the context.
+    pub fn insert_registration(
+        &mut self, id: CatalystId, txn_id: TransactionId, slot: Slot, txn_index: TxnIndex,
+        prv_txn: Option<TransactionId>, removed_stake_addresses: HashSet<StakeAddress>,
+    ) {
+        use std::collections::hash_map::Entry;
+
+        let value = RbacQuery {
+            txn_id: txn_id.into(),
+            slot_no: slot.into(),
+            txn_index: txn_index.into(),
+            prv_txn_id: prv_txn.map(Into::into),
+            removed_stake_addresses: removed_stake_addresses
+                .into_iter()
+                .map(Into::into)
+                .collect(),
+        };
+
+        match self.registrations.entry(id) {
+            Entry::Occupied(e) => {
+                e.into_mut().push(value);
+            },
+            Entry::Vacant(e) => {
+                e.insert(vec![value]);
+            },
+        }
+    }
+
+    /// Returns a list of registrations.
+    pub fn find_registrations(&self, id: &CatalystId) -> Option<&[RbacQuery]> {
+        self.registrations.get(id).map(|r| r.as_slice())
     }
 }

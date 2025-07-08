@@ -1,6 +1,6 @@
 //! A cache of RBAC chains.
 
-use std::sync::{Arc, LazyLock};
+use std::sync::LazyLock;
 
 use catalyst_types::catalyst_id::CatalystId;
 use moka::{policy::EvictionPolicy, sync::Cache};

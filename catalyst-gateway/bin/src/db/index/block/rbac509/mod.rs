@@ -18,9 +18,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    rbac::{
-        validate_rbac_registration, RbacIndexingContext, RbacValidationError, RbacValidationSuccess,
-    },
+    rbac::{validate_rbac_registration, RbacIndexingContext, RbacValidationError},
     settings::cassandra_db::EnvVars,
 };
 
@@ -106,16 +104,24 @@ impl Rbac509InsertQuery {
 
         let previous_transaction = cip509.previous_transaction();
         match validate_rbac_registration(cip509, block.is_immutable(), context).await {
-            Ok(RbacValidationSuccess { catalyst_id }) => {
-                self.registrations.push(insert_rbac509::Params::new(
-                    catalyst_id.clone(),
-                    txn_hash,
-                    slot,
-                    index,
-                    previous_transaction,
-                    // TODO: FIXME: This should be fixed along with updating indexing logic.
-                    std::collections::HashSet::new(),
-                ));
+            Ok(updates) => {
+                for update in updates {
+                    // In this case stake addresses are removed from another chain, so it doesn't
+                    // make sense to preserve a previous transaction of this chain.
+                    let previous_transaction = if update.removed_stake_addresses.is_empty() {
+                        previous_transaction
+                    } else {
+                        None
+                    };
+                    self.registrations.push(insert_rbac509::Params::new(
+                        update.catalyst_id.clone(),
+                        txn_hash,
+                        slot,
+                        index,
+                        previous_transaction,
+                        update.removed_stake_addresses,
+                    ));
+                }
             },
             Err(RbacValidationError::InvalidRegistration {
                 catalyst_id,
@@ -134,6 +140,9 @@ impl Rbac509InsertQuery {
             },
             Err(RbacValidationError::UnknownCatalystId) => {
                 debug!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}");
+            },
+            Err(RbacValidationError::Other(e)) => {
+                error!("Error indexing RBAC registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}: {e:?}");
             },
         }
     }
