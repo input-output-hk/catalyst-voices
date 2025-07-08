@@ -9,7 +9,7 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.4.4 AS flutter-
 repo-catalyst-voices:
     FROM scratch
     WORKDIR /repo
-    COPY --dir . .
+    COPY --keep-ts --dir . .
     # Copy docs as some doc files are used for test inputs
     COPY repo-ci+copy-docs/docs ./docs
 
