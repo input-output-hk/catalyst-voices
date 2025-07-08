@@ -67,10 +67,10 @@ pub async fn latest_rbac_chain_by_address(address: &StakeAddress) -> Result<Opti
     let volatile_session =
         CassandraSession::get(false).context("Failed to get volatile Cassandra session")?;
 
-    let id = match CatalystIdQuery::latest(&volatile_session, address.clone()).await? {
+    let id = match CatalystIdQuery::latest(&volatile_session, address).await? {
         Some(id) => id.catalyst_id,
         None => {
-            match CatalystIdQuery::latest(&persistent_session, address.clone()).await? {
+            match CatalystIdQuery::latest(&persistent_session, address).await? {
                 Some(id) => id.catalyst_id,
                 None => return Ok(None),
             }

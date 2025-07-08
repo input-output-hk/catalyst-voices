@@ -1,7 +1,7 @@
 //! Utilities for RBAC registrations validation.
 
 use anyhow::{Context, Result};
-use cardano_blockchain_types::TransactionId;
+use cardano_blockchain_types::{StakeAddress, TransactionId};
 use catalyst_types::catalyst_id::CatalystId;
 use futures::TryFutureExt;
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
@@ -37,10 +37,11 @@ async fn update_chain(
     let report = reg.report().to_owned();
 
     // Find a chain this registration belongs to.
-    let catalyst_id = match catalyst_id(previous_txn, is_persistent, context).await {
+    let catalyst_id = match catalyst_id_from_txn_id(previous_txn, is_persistent, context).await {
         Ok(Some(id)) => id,
         Ok(None) => {
-            // TODO: FIXME: Describe reasons for this error?
+            // TODO: FIXME: Describe reasons!
+            // TODO: FIXME: Can there be rollback during processing?
             debug!("Unable to find previous transaction {previous_txn} in the RBAC cache");
             // We are unable to determine a Catalyst ID, so there is no sense to update the
             // problem report because we would be unable to store this registration anyway.
@@ -51,44 +52,49 @@ async fn update_chain(
             return Err(RbacValidationError::UnknownCatalystId);
         },
     };
-
-    let chain = match chain(&catalyst_id, is_persistent).await {
+    let chain = match chain(&catalyst_id, is_persistent, context).await {
         Ok(Some(c)) => c,
         Ok(None) => {
-            //
+            // TODO: FIXME: Can this happen if rollback occurs during indexing?..
             todo!();
         },
         Err(e) => {
-            //
+            // TODO: FIXME: DB error handling?..
+            // TODO: FIXME: Revise error logging.
+            error!("{catalyst_id} is present in 'catalyst_id_for_txn_id' table, but not in 'rbac_registration'");
+
+            // TODO: FIXME: Return the following error?
+            // return Err(RbacValidationError::InvalidRegistration {});
+
             todo!();
         },
     };
 
-    // let chain = self.chains.get(&catalyst_id).ok_or_else(|| {
-    //     // This means the cache is broken. This should never normally happen.
-    //     error!("Broken RBAC cache: {catalyst_id} is present in TRANSACTIONS cache, but
-    // missing in CHAINS");     RbacCacheAddError::InvalidRegistration {
-    //         catalyst_id: catalyst_id.clone(),
-    //         purpose,
-    //         report: report.clone(),
-    //     }
-    // })?;
-    //
-    // // Check that addresses from the new registration aren't used in other chains.
-    // let previous_addresses = chain.role_0_stake_addresses();
-    // let registration_addresses = registration.role_0_stake_addresses();
-    // let new_addresses: Vec<_> = registration_addresses
-    //     .difference(&previous_addresses)
-    //     .collect();
-    // for address in &new_addresses {
-    //     if self.active_addresses.get(address).is_some() {
-    //         report.functional_validation(
-    //             &format!("{address} stake addresses is already used"),
-    //             "It isn't allowed to use same stake address in multiple registration
-    // chains",         );
-    //     }
-    // }
-    //
+    // Check that addresses from the new registration aren't used in other chains.
+    let previous_addresses = chain.role_0_stake_addresses();
+    let reg_addresses = reg.role_0_stake_addresses();
+    let new_addresses: Vec<_> = reg_addresses.difference(&previous_addresses).collect();
+    for address in &new_addresses {
+        match catalyst_id_from_stake_address(address, is_persistent, context).await {
+            Ok(None) => {
+                // All good: the address wasn't used before.
+            },
+            Ok(Some(_)) => {
+                report.functional_validation(
+                    &format!("{address} stake addresses is already used"),
+                    "It isn't allowed to use same stake address in multiple registration chains",
+                );
+            },
+            Err(e) => {
+                // TODO: FIXME: Recheck the error handling.
+                error!("'Get Catalyst ID from stake address' query failed: {e:?}");
+                todo!();
+            },
+        }
+    }
+
+    // TODO: FIXME: Check that new public keys aren't used by other chains.
+
     // // Try to add a new registration to the chain.
     // let new_chain = chain.update(registration).map_err(|e| {
     //     report.other(
@@ -236,7 +242,7 @@ async fn start_new_chain(reg: Cip509, is_persistent: bool) -> RbacValidationResu
 }
 
 /// Returns a Catalyst ID corresponding to the given transaction hash.
-async fn catalyst_id(
+async fn catalyst_id_from_txn_id(
     txn_id: TransactionId, is_persistent: bool, context: &mut RbacIndexingContext,
 ) -> Result<Option<CatalystId>> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::Query;
@@ -277,4 +283,34 @@ async fn chain(
     }
 
     // TODO: FIXME: Use context to potentially append registrations!
+}
+
+/// Returns a Catalyst ID corresponding to the given stake address.
+async fn catalyst_id_from_stake_address(
+    address: &StakeAddress, is_persistent: bool, context: &mut RbacIndexingContext,
+) -> Result<Option<CatalystId>> {
+    use crate::db::index::queries::rbac::get_catalyst_id_from_stake_address::Query;
+
+    // Check the context first.
+    if let Some(catalyst_id) = context.find_address(address) {
+        return Ok(Some(catalyst_id.to_owned()));
+    }
+
+    // Then try to find in the persistent database.
+    let session =
+        CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
+    if let Some(r) = Query::latest(&session, address).await? {
+        return Ok(Some(r.catalyst_id));
+    };
+
+    // Conditionally check the volatile database.
+    if !is_persistent {
+        let session =
+            CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
+        return Query::latest(&session, address)
+            .map_ok(|r| r.map(|r| r.catalyst_id))
+            .await;
+    }
+
+    Ok(None)
 }

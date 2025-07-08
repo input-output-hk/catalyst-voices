@@ -103,7 +103,7 @@ impl Query {
 
     /// Returns the latest Catalyst ID for the given stake address.
     pub(crate) async fn latest(
-        session: &CassandraSession, stake_address: StakeAddress,
+        session: &CassandraSession, stake_address: &StakeAddress,
     ) -> Result<Option<QueryResult>> {
         let cache = cache(session.is_persistent());
 
@@ -123,7 +123,7 @@ impl Query {
         .transpose()
         .inspect(|v| {
             if let Some(v) = v {
-                cache.insert(stake_address, v.clone());
+                cache.insert(stake_address.to_owned(), v.clone());
             }
         })
         .context("Failed to get Catalyst ID by stake address query row")
