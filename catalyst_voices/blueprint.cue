@@ -1,4 +1,3 @@
-version: "1.0.0"
 project: {
 	name: "voices"
 	deployment: {
@@ -8,6 +7,7 @@ project: {
 		}
 
 		bundle: {
+			env: "dev"
 			modules: main: {
 				name:    "app"
 				version: "0.11.0"
