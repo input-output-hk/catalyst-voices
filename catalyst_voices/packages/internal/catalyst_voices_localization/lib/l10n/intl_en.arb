@@ -3192,5 +3192,14 @@
         "type": "int"
       }
     }
+  },
+  "milestoneGuidelinesLink": "Important: Read the [milestone guidelines]({link}) before proceeding.",
+  "@milestoneGuidelinesLink": {
+    "description": "Helper text for milestone cost field",
+    "placeholders": {
+      "link": {
+        "type": "String"
+      }
+    }
   }
 }
