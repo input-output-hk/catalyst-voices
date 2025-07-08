@@ -21,6 +21,7 @@ class TokenField extends StatelessWidget {
   final bool enabled;
   final bool readOnly;
   final bool? ignorePointers;
+  final Widget? helperWidget;
 
   const TokenField({
     super.key,
@@ -38,6 +39,7 @@ class TokenField extends StatelessWidget {
     this.enabled = true,
     this.readOnly = false,
     this.ignorePointers,
+    this.helperWidget,
   }) : assert(
           currency == const Currency.ada(),
           'Only supports ADA at the moment',
@@ -55,13 +57,14 @@ class TokenField extends StatelessWidget {
         errorText: errorText,
         prefixText: currency.symbol,
         hintText: range != null && range.min != null ? '${range.min}' : null,
-        helper: showHelper
-            ? _Helper(
-                currency: currency,
-                range: range,
-                placeholder: placeholder,
-              )
-            : null,
+        helper: helperWidget ??
+            (showHelper
+                ? _Helper(
+                    currency: currency,
+                    range: range,
+                    placeholder: placeholder,
+                  )
+                : null),
         labelStyle: context.textTheme.labelLarge?.copyWith(
           color: context.colors.textOnPrimaryLevel1,
         ),
