@@ -1,36 +1,25 @@
 //! Get assets by stake address.
-use std::sync::{Arc, LazyLock};
+use std::sync::Arc;
 
 use cardano_blockchain_types::StakeAddress;
 use futures::TryStreamExt;
-use moka::{policy::EvictionPolicy, sync::Cache};
 use scylla::{prepared_statement::PreparedStatement, DeserializeRow, SerializeRow, Session};
 use tracing::error;
 
-use crate::{
-    db::{
-        index::{
-            queries::{PreparedQueries, PreparedSelectQuery},
-            session::CassandraSession,
+use crate::db::{
+    index::{
+        queries::{
+            caches::txo_assets_by_stake::{cache_get, cache_insert},
+            PreparedQueries, PreparedSelectQuery,
         },
-        types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
+        session::CassandraSession,
     },
-    settings::Settings,
+    types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
 };
 
 /// Get assets by stake address query string.
 const GET_ASSETS_BY_STAKE_ADDRESS_QUERY: &str =
     include_str!("../cql/get_assets_by_stake_address.cql");
-
-/// In memory cache of the Cardano native assets data
-static ASSETS_CACHE: LazyLock<Cache<DbStakeAddress, Arc<Vec<GetAssetsByStakeAddressQuery>>>> =
-    LazyLock::new(|| {
-        Cache::builder()
-            .name("Cardano native assets cache")
-            .eviction_policy(EvictionPolicy::lru())
-            .max_capacity(Settings::cardano_assets_cache().native_assets_cache_size())
-            .build()
-    });
 
 /// Get assets by stake address query parameters.
 #[derive(SerializeRow)]
@@ -133,7 +122,7 @@ impl GetAssetsByStakeAddressQuery {
         session: &CassandraSession, params: GetAssetsByStakeAddressParams,
     ) -> anyhow::Result<Arc<Vec<GetAssetsByStakeAddressQuery>>> {
         if session.is_persistent() {
-            if let Some(res) = ASSETS_CACHE.get(&params.stake_address) {
+            if let Some(res) = cache_get(&params.stake_address) {
                 return Ok(res);
             }
         }
@@ -154,15 +143,8 @@ impl GetAssetsByStakeAddressQuery {
 
         // update cache
         if session.is_persistent() {
-            ASSETS_CACHE.insert(params.stake_address, res.clone());
+            cache_insert(params.stake_address, res.clone());
         }
         Ok(res)
-    }
-
-    /// Fully drops the underlying Cardano native assets cache.
-    /// Its totally safe operation and only could have a performance implications, because
-    /// of the empty cache.
-    pub(crate) fn drop_cache() {
-        ASSETS_CACHE.invalidate_all();
     }
 }
