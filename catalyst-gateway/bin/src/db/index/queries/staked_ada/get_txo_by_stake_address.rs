@@ -1,36 +1,24 @@
 //! Get the TXO by Stake Address
-use std::sync::{Arc, LazyLock, RwLock};
+use std::sync::{Arc, RwLock};
 
 use cardano_blockchain_types::StakeAddress;
 use futures::TryStreamExt;
-use moka::{ops::compute::Op, policy::EvictionPolicy, sync::Cache};
 use scylla::{prepared_statement::PreparedStatement, DeserializeRow, SerializeRow, Session};
 use tracing::error;
 
-use super::update_txo_spent::UpdateTxoSpentQueryParams;
-use crate::{
-    db::{
-        index::{
-            queries::{PreparedQueries, PreparedSelectQuery},
-            session::CassandraSession,
+use crate::db::{
+    index::{
+        queries::{
+            caches::txo_by_stake::{cache_get, cache_insert},
+            PreparedQueries, PreparedSelectQuery,
         },
-        types::{DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
+        session::CassandraSession,
     },
-    settings::Settings,
+    types::{DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
 };
 
 /// Get txo by stake address query string.
 const GET_TXO_BY_STAKE_ADDRESS_QUERY: &str = include_str!("../cql/get_txo_by_stake_address.cql");
-
-/// In memory cache of the most recent Cardano UTXO assets by Stake Address.
-static ASSETS_CACHE: LazyLock<Cache<DbStakeAddress, Arc<Vec<GetTxoByStakeAddressQuery>>>> =
-    LazyLock::new(|| {
-        Cache::builder()
-            .name("Cardano UTXO assets")
-            .eviction_policy(EvictionPolicy::lru())
-            .max_capacity(Settings::cardano_assets_cache().utxo_cache_size())
-            .build()
-    });
 
 /// Get txo by stake address query parameters.
 #[derive(SerializeRow)]
@@ -133,7 +121,7 @@ impl GetTxoByStakeAddressQuery {
         session: &CassandraSession, params: GetTxoByStakeAddressQueryParams,
     ) -> anyhow::Result<Arc<Vec<GetTxoByStakeAddressQuery>>> {
         if session.is_persistent() {
-            if let Some(rows) = ASSETS_CACHE.get(&params.stake_address) {
+            if let Some(rows) = cache_get(&params.stake_address) {
                 return Ok(rows);
             }
         }
@@ -153,57 +141,9 @@ impl GetTxoByStakeAddressQuery {
 
         // update cache
         if session.is_persistent() {
-            ASSETS_CACHE.insert(params.stake_address, rows.clone());
+            cache_insert(params.stake_address, rows.clone());
         }
 
         Ok(rows)
-    }
-
-    /// Update spent UTXO Assets.
-    pub(crate) fn update_cache(params: Vec<UpdateTxoSpentQueryParams>) {
-        for update in params {
-            let stake_address = &update.stake_address;
-            let _entry = ASSETS_CACHE
-                .entry(stake_address.clone())
-                .and_compute_with(|maybe_entry| {
-                    maybe_entry.map_or_else(|| {
-                        tracing::debug!(utxo_params = ?update, stake_address = %stake_address, "Stake Address not found in Assets Cache");
-                        Op::Nop
-                    }, |entry| {
-                        if let Some(txo) = entry.into_value().iter().find(|t| {
-                            t.key.txo == update.txo
-                                && t.key.txn_index == update.txn_index
-                                && t.key.slot_no == update.slot_no
-                        }) {
-                            let mut value = txo.value.write().unwrap_or_else(|error| {
-                                tracing::error!(
-                                    ?update,
-                                    %stake_address,
-                                    %error,
-                                    "UTXO Assets Cache lock is poisoned, recovering lock.");
-                                txo.value.clear_poison();
-                                error.into_inner()
-
-                            });
-                            value.spent_slot = Some(update.spent_slot);
-                            tracing::debug!(
-                                ?update,
-                                %stake_address,
-                                "Updated UTXO for Stake Address in Assets Cache");
-                        } else {
-                            tracing::debug!(
-                                ?update,
-                                %stake_address,
-                                "UTXOs not found for Stake Address in Assets Cache");
-                        }
-                        Op::Nop
-                    })
-                });
-        }
-    }
-
-    /// Empty the UTXO assets cache.
-    pub(crate) fn drop_cache() {
-        ASSETS_CACHE.invalidate_all();
     }
 }

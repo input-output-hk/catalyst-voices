@@ -18,10 +18,8 @@ use crate::{
             roll_forward::{self, PurgeCondition},
         },
         queries::{
-            staked_ada::{
-                get_assets_by_stake_address::GetAssetsByStakeAddressQuery,
-                get_txo_by_stake_address::GetTxoByStakeAddressQuery,
-            },
+            caches::txo_by_stake::cache_drop,
+            staked_ada::get_assets_by_stake_address::GetAssetsByStakeAddressQuery,
             sync_status::{
                 get::{get_sync_status, SyncStatus},
                 update::update_sync_status,
@@ -630,7 +628,7 @@ impl SyncTask {
                 set_follower_immutable_first_reached_tip();
                 self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
                 GetAssetsByStakeAddressQuery::drop_cache();
-                GetTxoByStakeAddressQuery::drop_cache();
+                cache_drop();
 
                 // Purge data up to this slot
                 // Slots arithmetic has saturating semantic, so this is ok.
