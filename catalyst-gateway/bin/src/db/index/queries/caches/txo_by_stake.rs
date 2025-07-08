@@ -49,7 +49,7 @@ pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
             .entry(stake_address.clone())
             .and_compute_with(|maybe_entry| {
                 maybe_entry.map_or_else(|| {
-                    tracing::debug!(utxo_params = ?update, stake_address = %stake_address, "Stake Address not found in Assets Cache");
+                    tracing::debug!(utxo_params = ?update, stake_address = %stake_address, "Stake Address not found in TXO Assets Cache, cannot update.");
                     Op::Nop
                 }, |entry| {
                     if let Some(txo) = entry.into_value().iter().find(|t| {
