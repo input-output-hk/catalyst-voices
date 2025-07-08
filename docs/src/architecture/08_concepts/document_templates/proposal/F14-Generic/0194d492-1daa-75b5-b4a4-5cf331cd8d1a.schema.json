@@ -5,6 +5,13 @@
     "description": "Schema for the F14 Cardano Use Cases: Partners & Products Form",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
+        "2025-07-04": [
+            "Added maxLength constraint for singleLineHttpsURLEntry.",
+            "Change title for Theme",
+            "Change guidance text for requestedFunds",
+            "Change guidance text for time",
+            "Remove maximum constraint for milestone cost."
+        ],
         "2025-06-27": [
             "Legal wording changes.",
             "Removed coproposers property."
@@ -69,6 +76,7 @@
             "type": "string",
             "format": "uri",
             "pattern": "^https://[^\\s]+$",
+            "maxLength": 255,
             "x-note": "Must start with 'https://' and is followed by one or more non-whitespace characters, ending at the end of the string."
         },
         "multiLineTextEntry": {
@@ -138,7 +146,7 @@
             "default": [],
             "items": {
                 "$ref": "#/definitions/singleLineHttpsURLEntry",
-                "maxLength": 1024
+                "maxLength": 255
             },
             "x-note": "Enter multiple HTTPS URLs. Each URL should be unique and under 1024 characters."
         },
@@ -327,7 +335,7 @@
                             "$ref": "#/definitions/tokenValueCardanoADA",
                             "title": "Enter the amount of funding you are requesting in ADA",
                             "description": "The amount of funding requested for your proposal",
-                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Use Cases: Partners & Products**\nMinimum Funding Amount per proposal: **₳250K**\nMaximum Funding Amount per proposal: **₳1M**",
+                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Use Cases: Partners & Products**\n\n- Minimum Funding Amount per proposal: **₳250K**\n- Maximum Funding Amount per proposal: **₳1M**",
                             "x-placeholder": "Enter the amount of funding you are requesting in ADA",
                             "minimum": 250000,
                             "maximum": 1000000
@@ -346,7 +354,7 @@
                             "$ref": "#/definitions/durationInMonths",
                             "title": "Please specify how many months you expect your project to last ",
                             "description": "Specify the expected duration of your project. Projects must be completable within 2-12 months.",
-                            "x-guidance": "You are expected to produce the deliverables specified in the proposal within the timeframe selected, with a minimum of 2 months and a maximum of 12 months.\n\nProjects can be completed earlier if milestone Proof-of-Achievements and Project Completion steps are submitted and approved ahead of the expected delivery due dates in compliance with the Fund Rules.",
+                            "x-guidance": "You are expected to produce the deliverables specified in the proposal within the timeframe selected, with a minimum of 2 months and a maximum of 12 months.\n\nProjects can be completed earlier if milestone [Proof-of-Achievements](https://docs.projectcatalyst.io/current-fund/project-onboarding/milestone-based-proposals) and [Project Completion](https://docs.projectcatalyst.io/current-fund/general-information/project-close-out-report-and-project-close-out-video-pcr-and-pcv) steps are submitted and approved ahead of the expected delivery due dates in compliance with the [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules).",
                             "x-placeholder": "Select the expected duration of your project (2-12 months)",
                             "minimum": 2,
                             "maximum": 12
@@ -470,12 +478,12 @@
                             "$ref": "#/definitions/yesNoChoice",
                             "title": "Will your project's outputs be fully open source?",
                             "description": "Select Yes if the project is open source, No if it is not.",
-                            "x-guidance": "If you answered “YES” to the question above:\n\nIf you declare that the project will be open-source in the application form, it must remain open-source throughout the entire lifecycle of the project, with a publicly accessible repository.\n\nPlease indicate the type of open-source license you intend to use and provide any additional information relevant to the open-source status of your project outputs. If only specific components of the code will be open-source, please specify which parts.\n\nIf you answered “NO” to the question above:\n\nPlease explain why the outputs of your project will not be made open-source."
+                            "x-guidance": "If you answered “YES” to the question above:\n\nIf you declare that the project will be open source in the application form, it must remain open source throughout the entire lifecycle of the project, with a publicly accessible repository.\n\nPlease indicate the type of open source license you intend to use and provide any additional information relevant to the open source status of your project outputs. If only specific components of the code will be open source, please specify which parts.\n\nIf you answered “NO” to the question above:\n\nPlease explain why the outputs of your project will not be made open source."
                         },
                         "licenseInformation": {
                             "$ref": "#/definitions/multiLineTextEntry",
                             "title": "License and Additional Information",
-                            "description": "Provide the license type and any additional context regarding the open-source status of your project. If partially open source, specify which parts are open source.",
+                            "description": "Provide the license type and any additional context regarding the open source status of your project. If partially open source, specify which parts are open source.",
                             "x-placeholder": "Describe the open source status of your project and the license type",
                             "maxLength": 500,
                             "x-guidance": "Open source licenses ensure intellectual property (IP) (such as source code) remains publicly accessible and licensed in a way that allows anyone to use, modify, and share the IP freely, typically under licenses approved by the Open Source Initiative.\n\nProprietary IP (such as source code) is not publicly available and the rights to use, modify, or redistribute the proprietary IP are restricted and typically reserved by the IP's owner.\n\nhttps://opensource.org/licenses"
@@ -565,7 +573,7 @@
                     "properties": {
                         "grouped_tag": {
                             "$ref": "#/definitions/singleGroupedTagSelector",
-                            "title": "Please choose the most relevant theme and tags (as many that apply) related to the outcomes of your proposal",
+                            "title": "Please choose the most relevant theme and tag related to the outcomes of your proposal",
                             "oneOf": [
                                 {
                                     "properties": {
@@ -940,8 +948,7 @@
                                         "$ref": "#/definitions/tokenValueCardanoADA",
                                         "title": "Cost",
                                         "description": "The cost of this milestone in ADA",
-                                        "x-placeholder": "Enter the cost associated with this milestone",
-                                        "maximum": 1000000
+                                        "x-placeholder": "Enter the cost associated with this milestone"
                                     },
                                     "progress": {
                                         "$ref": "#/definitions/dropDownSingleSelect",
