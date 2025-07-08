@@ -1,7 +1,5 @@
 //! Implementation of the GET `/cardano/cip36` endpoint
 
-use tracing::error;
-
 use super::{
     filter::{get_registration_given_stake_key_hash, get_registration_given_vote_key, snapshot},
     response, SlotNo,
@@ -27,7 +25,6 @@ pub(crate) async fn cip36_registrations(
     _limit: common::types::generic::query::pagination::Limit,
 ) -> AllRegistration {
     let Some(session) = CassandraSession::get(true) else {
-        error!("Failed to acquire db session");
         return AllRegistration::service_unavailable(
             &anyhow::anyhow!("Failed to acquire db session"),
             RetryAfterOption::Default,
