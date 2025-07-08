@@ -626,8 +626,8 @@ impl SyncTask {
             if self.sync_tasks.len() == 1 {
                 set_follower_immutable_first_reached_tip();
                 self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
-                caches::txo_assets_by_stake::cache_drop();
-                caches::txo_by_stake::cache_drop();
+                caches::txo_assets_by_stake::drop();
+                caches::txo_by_stake::drop();
 
                 // Purge data up to this slot
                 // Slots arithmetic has saturating semantic, so this is ok.

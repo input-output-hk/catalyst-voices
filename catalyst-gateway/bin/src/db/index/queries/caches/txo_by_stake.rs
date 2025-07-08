@@ -15,20 +15,18 @@ use crate::{
     settings::Settings,
 };
 
-/// In memory cache of the most recent Cardano UTXO assets by Stake Address.
+/// In memory cache of the most recent Cardano TXO assets by Stake Address.
 static ASSETS_CACHE: LazyLock<Cache<DbStakeAddress, Arc<Vec<GetTxoByStakeAddressQuery>>>> =
     LazyLock::new(|| {
         Cache::builder()
-            .name("Cardano UTXO assets")
+            .name("Cardano TXO assets")
             .eviction_policy(EvictionPolicy::lru())
             .max_capacity(Settings::cardano_assets_cache().utxo_cache_size())
             .build()
     });
 
 /// Get TXO Assets entry from Cache.
-pub(crate) fn cache_get(
-    stake_address: &DbStakeAddress,
-) -> Option<Arc<Vec<GetTxoByStakeAddressQuery>>> {
+pub(crate) fn get(stake_address: &DbStakeAddress) -> Option<Arc<Vec<GetTxoByStakeAddressQuery>>> {
     ASSETS_CACHE
         .get(stake_address)
         .inspect(|_| txo_assets_hits_inc())
@@ -39,14 +37,12 @@ pub(crate) fn cache_get(
 }
 
 /// Insert TXO Assets entry in Cache.
-pub(crate) fn cache_insert(
-    stake_address: DbStakeAddress, rows: Arc<Vec<GetTxoByStakeAddressQuery>>,
-) {
+pub(crate) fn insert(stake_address: DbStakeAddress, rows: Arc<Vec<GetTxoByStakeAddressQuery>>) {
     ASSETS_CACHE.insert(stake_address, rows);
 }
 
-/// Update spent UTXO Assets in Cache.
-pub(crate) fn cache_update(params: Vec<UpdateTxoSpentQueryParams>) {
+/// Update spent TXO Assets in Cache.
+pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
     for update in params {
         let stake_address = &update.stake_address;
         let _entry = ASSETS_CACHE
@@ -66,7 +62,7 @@ pub(crate) fn cache_update(params: Vec<UpdateTxoSpentQueryParams>) {
                                 ?update,
                                 %stake_address,
                                 %error,
-                                "UTXO Assets Cache lock is poisoned, recovering lock.");
+                                "TXO Assets Cache lock is poisoned, recovering lock.");
                             txo.value.clear_poison();
                             error.into_inner()
 
@@ -75,12 +71,12 @@ pub(crate) fn cache_update(params: Vec<UpdateTxoSpentQueryParams>) {
                         tracing::debug!(
                             ?update,
                             %stake_address,
-                            "Updated UTXO for Stake Address in Assets Cache");
+                            "Updated TXO for Stake Address in Assets Cache");
                     } else {
                         tracing::debug!(
                             ?update,
                             %stake_address,
-                            "UTXOs not found for Stake Address in Assets Cache");
+                            "TXOs not found for Stake Address in Assets Cache");
                     }
                     Op::Nop
                 })
@@ -88,7 +84,7 @@ pub(crate) fn cache_update(params: Vec<UpdateTxoSpentQueryParams>) {
     }
 }
 
-/// Empty the UTXO assets cache.
-pub(crate) fn cache_drop() {
+/// Empty the TXO assets cache.
+pub(crate) fn drop() {
     ASSETS_CACHE.invalidate_all();
 }

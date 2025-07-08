@@ -9,7 +9,7 @@ use tracing::error;
 use crate::db::{
     index::{
         queries::{
-            caches::txo_by_stake::{cache_get, cache_insert},
+            caches::txo_by_stake::{get as cache_get, insert as cache_insert},
             PreparedQueries, PreparedSelectQuery,
         },
         session::CassandraSession,
