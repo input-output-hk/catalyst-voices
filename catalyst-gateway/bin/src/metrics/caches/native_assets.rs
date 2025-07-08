@@ -81,7 +81,7 @@ pub(crate) fn native_assets_hits_inc() {
 }
 
 /// Increment the Native Assets Cache misses count.
-pub(crate) fn native_assets_miss_inc() {
+pub(crate) fn native_assets_misses_inc() {
     let api_host_names = Settings::api_host_names().join(",");
     let service_id = Settings::service_id();
     let network = Settings::cardano_network().to_string();

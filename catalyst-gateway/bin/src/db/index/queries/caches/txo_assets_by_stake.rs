@@ -5,7 +5,7 @@ use moka::{policy::EvictionPolicy, sync::Cache};
 
 use crate::{
     db::{index::queries::GetAssetsByStakeAddressQuery, types::DbStakeAddress},
-    metrics::caches::native_assets::{native_assets_hits_inc, native_assets_miss_inc},
+    metrics::caches::native_assets::{native_assets_hits_inc, native_assets_misses_inc},
     settings::Settings,
 };
 
@@ -27,7 +27,7 @@ pub(crate) fn cache_get(
         .get(stake_address)
         .inspect(|_| native_assets_hits_inc())
         .or_else(|| {
-            native_assets_miss_inc();
+            native_assets_misses_inc();
             None
         })
 }

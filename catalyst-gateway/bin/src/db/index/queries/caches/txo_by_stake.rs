@@ -11,7 +11,7 @@ use crate::{
         },
         types::DbStakeAddress,
     },
-    metrics::caches::txo_assets::{txo_assets_hits_inc, txo_assets_miss_inc},
+    metrics::caches::txo_assets::{txo_assets_hits_inc, txo_assets_misses_inc},
     settings::Settings,
 };
 
@@ -33,7 +33,7 @@ pub(crate) fn cache_get(
         .get(stake_address)
         .inspect(|_| txo_assets_hits_inc())
         .or_else(|| {
-            txo_assets_miss_inc();
+            txo_assets_misses_inc();
             None
         })
 }
