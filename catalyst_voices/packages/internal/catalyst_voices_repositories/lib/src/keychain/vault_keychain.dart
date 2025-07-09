@@ -54,12 +54,7 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
   Future<CatalystKeyPair> getRoleKeyPair({
     required AccountRole role,
   }) {
-    return getMasterKey().use((masterKey) {
-      return signer.deriveKeyPair(
-        masterKey: masterKey,
-        role: role,
-      );
-    });
+    return signer.deriveAccountRoleKeyPair(keychain: this, role: role);
   }
 
   @override
@@ -72,13 +67,7 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
     Uint8List message, {
     required AccountRole role,
   }) {
-    return getMasterKey().use((masterKey) {
-      return signer.sign(
-        message,
-        masterKey: masterKey,
-        role: role,
-      );
-    });
+    return signer.sign(message, keychain: this, role: role);
   }
 
   @override

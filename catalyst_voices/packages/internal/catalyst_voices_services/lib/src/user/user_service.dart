@@ -111,8 +111,6 @@ final class UserServiceImpl implements UserService {
     );
   }
 
-
-
   @override
   Future<User> getUser() => _userRepository.getUser();
 

@@ -10,27 +10,31 @@ final class KeychainSignerService implements KeychainSigner {
   const KeychainSignerService(this._keyDerivationService);
 
   @override
-  Future<CatalystKeyPair> deriveKeyPair({
-    required CatalystPrivateKey masterKey,
+  Future<CatalystKeyPair> deriveAccountRoleKeyPair({
+    required Keychain keychain,
     required AccountRole role,
   }) {
-    return _keyDerivationService.deriveAccountRoleKeyPair(
-      masterKey: masterKey,
-      role: role,
-    );
+    return keychain.getMasterKey().use((masterKey) {
+      return _keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: masterKey,
+        role: role,
+      );
+    });
   }
 
   @override
   Future<CatalystSignature> sign(
     Uint8List message, {
-    required CatalystPrivateKey masterKey,
+    required Keychain keychain,
     required AccountRole role,
   }) async {
-    final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
-      masterKey: masterKey,
-      role: role,
-    );
+    return keychain.getMasterKey().use((masterKey) {
+      final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: masterKey,
+        role: role,
+      );
 
-    return keyPair.use((keyPair) => keyPair.privateKey.sign(message));
+      return keyPair.use((keyPair) => keyPair.privateKey.sign(message));
+    });
   }
 }
