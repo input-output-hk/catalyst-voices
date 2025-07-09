@@ -94,7 +94,18 @@ pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
     }
 }
 
-/// Empty the TXO assets cache.
+/// Empty the TXO Assets cache.
 pub(crate) fn drop() {
     ASSETS_CACHE.invalidate_all();
+}
+
+/// Size of TXO Assets cache.
+pub(crate) fn size() -> u64 {
+    ASSETS_CACHE.run_pending_tasks();
+    ASSETS_CACHE.weighted_size()
+}
+/// Number of entries in TXO Assets cache.
+pub(crate) fn entry_count() -> u64 {
+    ASSETS_CACHE.run_pending_tasks();
+    ASSETS_CACHE.entry_count()
 }

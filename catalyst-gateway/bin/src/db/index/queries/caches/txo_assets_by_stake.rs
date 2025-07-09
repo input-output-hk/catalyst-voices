@@ -41,3 +41,14 @@ pub(crate) fn insert(stake_address: DbStakeAddress, rows: Arc<Vec<GetAssetsBySta
 pub(crate) fn drop() {
     ASSETS_CACHE.invalidate_all();
 }
+
+/// Size of TXO Assets cache.
+pub(crate) fn size() -> u64 {
+    ASSETS_CACHE.run_pending_tasks();
+    ASSETS_CACHE.weighted_size()
+}
+/// Number of entries in TXO Assets cache.
+pub(crate) fn entry_count() -> u64 {
+    ASSETS_CACHE.run_pending_tasks();
+    ASSETS_CACHE.entry_count()
+}

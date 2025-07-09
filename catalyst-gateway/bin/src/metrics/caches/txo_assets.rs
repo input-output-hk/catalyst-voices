@@ -1,6 +1,9 @@
 //! Metrics for the TXO Assets Cache
 
-use crate::settings::Settings;
+use crate::{
+    db::index::queries::caches::txo_by_stake::{entry_count, size as cache_size},
+    settings::Settings,
+};
 
 mod reporter {
     //! Prometheus reporter metrics.
@@ -60,13 +63,11 @@ pub(crate) fn update() {
 
     reporter::TXO_ASSETS_CACHE_SIZE
         .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(0u64).unwrap_or(-1));
+        .set(i64::try_from(cache_size()).unwrap_or(-1));
 
     reporter::TXO_ASSETS_CACHE_ENTRIES_COUNT
         .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(0u64).unwrap_or(-1));
-
-    // todo!("WIP: get cache values after refactoring");
+        .set(i64::try_from(entry_count()).unwrap_or(-1));
 }
 
 /// Increment the TXO Assets Cache hits count.

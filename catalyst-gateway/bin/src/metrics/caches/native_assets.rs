@@ -1,6 +1,9 @@
 //! Cache metrics for Native Assets.
 
-use crate::settings::Settings;
+use crate::{
+    db::index::queries::caches::txo_assets_by_stake::{entry_count, size as cache_size},
+    settings::Settings,
+};
 
 mod reporter {
     //! Prometheus reporter metrics.
@@ -62,11 +65,11 @@ pub(crate) fn update() {
 
     reporter::NATIVE_ASSETS_CACHE_SIZE
         .with_label_values(&[&api_host_names, service_id, &network])
-        .set(0i64);
+        .set(i64::try_from(cache_size()).unwrap_or(-1));
 
     reporter::NATIVE_ASSETS_CACHE_ENTRIES_COUNT
         .with_label_values(&[&api_host_names, service_id, &network])
-        .set(0i64);
+        .set(i64::try_from(entry_count()).unwrap_or(-1));
 }
 
 /// Increment the Native Assets Cache hits count.
