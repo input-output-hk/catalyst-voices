@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:catalyst_voices_shared/src/storage/storage_string_mixin.dart';
+import 'package:catalyst_voices_repositories/src/storage/storage.dart';
+import 'package:catalyst_voices_repositories/src/storage/storage_string_mixin.dart';
 
 base class MemoryStorage with StorageAsStringMixin implements Storage {
   final _data = <String, String>{};

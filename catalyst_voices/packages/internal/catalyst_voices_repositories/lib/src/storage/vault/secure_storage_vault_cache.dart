@@ -1,21 +1,21 @@
 import 'dart:async';
 
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_repositories/src/cache/local_tll_cache.dart';
 
 const _isUnlockedKey = 'IsUnlocked';
 
 abstract interface class SecureStorageVaultCache {
-  Future<bool> getIsUnlocked();
-
-  Future<void> setIsUnlocked({required bool value});
+  Future<void> clear();
 
   Future<bool> containsIsUnlocked();
 
-  Future<bool> isUnlockedExpired();
-
   Future<void> extendIsUnlocked();
 
-  Future<void> clear();
+  Future<bool> getIsUnlocked();
+
+  Future<bool> isUnlockedExpired();
+
+  Future<void> setIsUnlocked({required bool value});
 }
 
 final class SecureStorageVaultTtlCache extends LocalTllCache implements SecureStorageVaultCache {
@@ -28,21 +28,21 @@ final class SecureStorageVaultTtlCache extends LocalTllCache implements SecureSt
         );
 
   @override
+  Future<bool> containsIsUnlocked() async => contains(key: _isUnlockedKey);
+
+  @override
+  Future<void> extendIsUnlocked() => extendExpiration(key: _isUnlockedKey);
+
+  @override
   Future<bool> getIsUnlocked() {
     return get(key: _isUnlockedKey).then((value) => value == 'true');
   }
 
   @override
-  Future<void> setIsUnlocked({required bool value}) {
-    return set('$value', key: _isUnlockedKey);
-  }
-
-  @override
-  Future<bool> containsIsUnlocked() => contains(key: _isUnlockedKey);
-
-  @override
   Future<bool> isUnlockedExpired() => isExpired(key: _isUnlockedKey);
 
   @override
-  Future<void> extendIsUnlocked() => extendExpiration(key: _isUnlockedKey);
+  Future<void> setIsUnlocked({required bool value}) {
+    return set('$value', key: _isUnlockedKey);
+  }
 }

@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/src/storage/vault/secure_storage_vault.dart';
+import 'package:catalyst_voices_repositories/src/storage/vault/secure_storage_vault.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
-import 'package:test/test.dart';
 
 void main() {
   late final FlutterSecureStorage flutterSecureStorage;

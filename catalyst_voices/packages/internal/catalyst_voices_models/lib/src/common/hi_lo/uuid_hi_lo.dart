@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/src/hi_lo/hi_lo.dart';
+import 'package:catalyst_voices_models/src/common/hi_lo/hi_lo.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:uuid_plus/uuid_plus.dart';

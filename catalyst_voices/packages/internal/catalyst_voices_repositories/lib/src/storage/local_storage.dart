@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:catalyst_voices_shared/src/storage/storage_string_mixin.dart';
+import 'package:catalyst_voices_repositories/src/storage/storage.dart';
+import 'package:catalyst_voices_repositories/src/storage/storage_string_mixin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 base class LocalStorage with StorageAsStringMixin implements Storage {

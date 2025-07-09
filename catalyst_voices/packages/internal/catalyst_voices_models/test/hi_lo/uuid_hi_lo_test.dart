@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/src/hi_lo/uuid_hi_lo.dart';
+import 'package:catalyst_voices_models/src/common/hi_lo/uuid_hi_lo.dart';
 import 'package:test/test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 

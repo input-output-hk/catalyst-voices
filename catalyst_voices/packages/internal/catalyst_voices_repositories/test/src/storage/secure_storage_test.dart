@@ -1,6 +1,6 @@
-import 'package:catalyst_voices_shared/src/storage/secure_storage.dart';
+import 'package:catalyst_voices_repositories/src/storage/secure_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 const _key = 'Testing';
 

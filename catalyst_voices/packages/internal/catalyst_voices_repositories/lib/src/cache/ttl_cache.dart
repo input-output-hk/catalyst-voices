@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices_shared/src/cache/cache.dart';
+import 'package:catalyst_voices_repositories/src/cache/cache.dart';
 
 abstract interface class TtlCache<K, V> implements Cache<K, V> {
   FutureOr<void> extendExpiration({
