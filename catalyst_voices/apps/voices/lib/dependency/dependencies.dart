@@ -272,6 +272,9 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<KeyDerivationService>(() {
       return KeyDerivationService(get<CatalystKeyDerivation>());
     });
+    registerLazySingleton<KeychainSigner>(() {
+      return KeychainSignerService(get<KeyDerivationService>());
+    });
     registerLazySingleton<KeychainProvider>(() {
       return VaultKeychainProvider(
         secureStorage: get<FlutterSecureStorage>(),
