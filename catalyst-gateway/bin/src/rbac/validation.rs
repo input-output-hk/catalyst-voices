@@ -213,8 +213,7 @@ async fn start_new_chain(
         catalyst_id.clone(),
         new_chain.current_tx_id_hash(),
         new_chain.current_point().slot_or_default(),
-        // TODO: FIXME: https://github.com/input-output-hk/catalyst-libs/pull/409
-        0.into(),
+        new_chain.current_txn_index(),
         // No previous transaction for the root registration.
         None,
         // This chain has just been created, so no addresses have been removed from it.
