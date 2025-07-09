@@ -13,13 +13,21 @@ final class KeychainSignerService implements KeychainSigner {
   Future<CatalystKeyPair> deriveAccountRoleKeyPair({
     required Keychain keychain,
     required AccountRole role,
-  }) {
-    return keychain.getMasterKey().use((masterKey) {
-      return _keyDerivationService.deriveAccountRoleKeyPair(
+  }) async {
+    CatalystPrivateKey? masterKey;
+    try {
+      masterKey = await keychain.getMasterKey();
+      if (masterKey == null) {
+        throw ArgumentError.notNull('masterKey');
+      }
+
+      return await _keyDerivationService.deriveAccountRoleKeyPair(
         masterKey: masterKey,
         role: role,
       );
-    });
+    } finally {
+      masterKey?.drop();
+    }
   }
 
   @override
