@@ -60,7 +60,7 @@ abstract interface class RegistrationService {
   /// Throws a subclass of [RegistrationException] in case of a failure.
   Future<Transaction> prepareRegistration({
     required CardanoWallet wallet,
-    required CatalystPrivateKey masterKey,
+    required Keychain keychain,
     required Set<RegistrationTransactionRole> roles,
   });
 
@@ -179,7 +179,7 @@ final class RegistrationServiceImpl implements RegistrationService {
   @override
   Future<Transaction> prepareRegistration({
     required CardanoWallet wallet,
-    required CatalystPrivateKey masterKey,
+    required Keychain keychain,
     required Set<RegistrationTransactionRole> roles,
   }) async {
     try {
@@ -204,8 +204,7 @@ final class RegistrationServiceImpl implements RegistrationService {
 
       final registrationBuilder = RegistrationTransactionBuilder(
         transactionConfig: config,
-        keyDerivationService: _keyDerivationService,
-        masterKey: masterKey,
+        keychain: keychain,
         networkId: _blockchainConfig.networkId,
         slotNumberTtl: slotNumber,
         roles: roles,
