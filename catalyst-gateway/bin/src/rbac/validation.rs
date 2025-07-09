@@ -5,7 +5,7 @@ use std::{
     iter,
 };
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result};
 use cardano_blockchain_types::{StakeAddress, TransactionId};
 use catalyst_types::{
     catalyst_id::{role_index::RoleId, CatalystId},
@@ -48,20 +48,14 @@ async fn update_chain(
     let report = reg.report().to_owned();
 
     // Find a chain this registration belongs to.
-    let catalyst_id = match catalyst_id_from_txn_id(previous_txn, is_persistent, context).await? {
-        Some(id) => id,
-        None => {
-            // We are unable to determine a Catalyst ID, so there is no sense to update the
-            // problem report because we would be unable to store this registration anyway.
-            return Err(RbacValidationError::UnknownCatalystId);
-        },
+    let Some(catalyst_id) = catalyst_id_from_txn_id(previous_txn, is_persistent, context).await?
+    else {
+        // We are unable to determine a Catalyst ID, so there is no sense to update the problem
+        // report because we would be unable to store this registration anyway.
+        return Err(RbacValidationError::UnknownCatalystId);
     };
-    let chain = match chain(&catalyst_id, is_persistent, context).await? {
-        Some(c) => c,
-        None => {
-            return Err(anyhow!("{catalyst_id} is present in 'catalyst_id_for_txn_id' table, but not in 'rbac_registration'").into());
-        },
-    };
+    let chain = chain(&catalyst_id, is_persistent, context).await?
+        .context("{catalyst_id} is present in 'catalyst_id_for_txn_id' table, but not in 'rbac_registration'")?;
 
     // Check that addresses from the new registration aren't used in other chains.
     let previous_addresses = chain.role_0_stake_addresses();
@@ -112,8 +106,8 @@ async fn update_chain(
 
     // Everything is fine: update the context.
     context.insert_transaction(txn_id, catalyst_id.clone());
-    context.insert_addresses(stake_addresses, catalyst_id.clone());
-    context.insert_public_keys(&keys, catalyst_id.clone());
+    context.insert_addresses(stake_addresses, &catalyst_id);
+    context.insert_public_keys(&keys, &catalyst_id);
     context.insert_registration(
         catalyst_id.clone(),
         txn_id,
@@ -169,7 +163,7 @@ async fn start_new_chain(
     let new_addresses = new_chain.role_0_stake_addresses();
     let mut updated_chains: HashMap<_, HashSet<StakeAddress>> = HashMap::new();
     for address in &new_addresses {
-        if let Some(id) = catalyst_id_from_stake_address(&address, is_persistent, context).await? {
+        if let Some(id) = catalyst_id_from_stake_address(address, is_persistent, context).await? {
             // If an address is used in existing chain then a new chain must have different role 0
             // signing key.
             let previous_chain = chain(&id, is_persistent, context)
@@ -211,10 +205,10 @@ async fn start_new_chain(
 
     // Everything is fine: update the context.
     context.insert_transaction(new_chain.current_tx_id_hash(), catalyst_id.clone());
-    // This will also remove
-    //
-    context.insert_addresses(new_addresses, catalyst_id.clone());
-    context.insert_public_keys(&keys, catalyst_id.clone());
+    // This will also update the addresses that are already present in the context if they
+    // were reassigned to the new chain.
+    context.insert_addresses(new_addresses, &catalyst_id);
+    context.insert_public_keys(&keys, &catalyst_id);
     context.insert_registration(
         catalyst_id.clone(),
         new_chain.current_tx_id_hash(),
@@ -423,7 +417,7 @@ pub async fn is_chain_known(
 async fn is_cat_id_known(session: &CassandraSession, id: &CatalystId) -> Result<bool> {
     use crate::db::index::queries::rbac::get_rbac_registrations::{Query, QueryParams};
 
-    Ok(Query::execute(&session, QueryParams {
+    Ok(Query::execute(session, QueryParams {
         catalyst_id: id.clone().into(),
     })
     .await?

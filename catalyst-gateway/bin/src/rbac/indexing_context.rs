@@ -35,14 +35,14 @@ impl RbacIndexingContext {
     pub fn new() -> Self {
         let transactions = HashMap::new();
         let addresses = HashMap::new();
-        let registrations = HashMap::new();
         let public_keys = HashMap::new();
+        let registrations = HashMap::new();
 
         Self {
             transactions,
             addresses,
-            registrations,
             public_keys,
+            registrations,
         }
     }
 
@@ -62,7 +62,7 @@ impl RbacIndexingContext {
     }
 
     /// Adds multiple addresses to the context.
-    pub fn insert_addresses(&mut self, addresses: HashSet<StakeAddress>, catalyst_id: CatalystId) {
+    pub fn insert_addresses(&mut self, addresses: HashSet<StakeAddress>, catalyst_id: &CatalystId) {
         for address in addresses {
             self.insert_address(address, catalyst_id.clone());
         }
@@ -79,7 +79,7 @@ impl RbacIndexingContext {
     }
 
     /// Adds multiple public keys to the context.
-    pub fn insert_public_keys(&mut self, keys: &[VerifyingKey], catalyst_id: CatalystId) {
+    pub fn insert_public_keys(&mut self, keys: &[VerifyingKey], catalyst_id: &CatalystId) {
         for key in keys {
             self.insert_public_key(*key, catalyst_id.clone());
         }
@@ -120,6 +120,6 @@ impl RbacIndexingContext {
 
     /// Returns a list of registrations.
     pub fn find_registrations(&self, id: &CatalystId) -> Option<&[RbacQuery]> {
-        self.registrations.get(id).map(|r| r.as_slice())
+        self.registrations.get(id).map(Vec::as_slice)
     }
 }

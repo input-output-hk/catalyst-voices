@@ -103,7 +103,13 @@ impl Rbac509InsertQuery {
         }
 
         let previous_transaction = cip509.previous_transaction();
-        match validate_rbac_registration(cip509, block.is_immutable(), context).await {
+        match Box::pin(validate_rbac_registration(
+            cip509,
+            block.is_immutable(),
+            context,
+        ))
+        .await
+        {
             Ok(updates) => {
                 for update in updates {
                     // In this case stake addresses are removed from another chain, so it doesn't
@@ -188,7 +194,7 @@ mod tests {
             .parse()
             .unwrap();
         let mut context = RbacIndexingContext::new();
-        query.index(txn_hash, 0.into(), &block, &mut context).await;
+        Box::pin(query.index(txn_hash, 0.into(), &block, &mut context)).await;
         assert!(query.invalid.is_empty());
         assert_eq!(1, query.registrations.len());
     }
@@ -202,7 +208,7 @@ mod tests {
             .parse()
             .unwrap();
         let mut context = RbacIndexingContext::new();
-        query.index(txn_hash, 0.into(), &block, &mut context).await;
+        Box::pin(query.index(txn_hash, 0.into(), &block, &mut context)).await;
         assert!(query.registrations.is_empty());
         assert!(query.invalid.is_empty());
     }

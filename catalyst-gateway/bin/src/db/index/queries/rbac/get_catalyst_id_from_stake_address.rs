@@ -107,7 +107,7 @@ impl Query {
     ) -> Result<Option<QueryResult>> {
         let cache = cache(session.is_persistent());
 
-        let res = cache.get(&stake_address);
+        let res = cache.get(stake_address);
         update_cache_metrics(session.is_persistent(), res.is_some());
         if let Some(res) = res {
             return Ok(Some(res));
