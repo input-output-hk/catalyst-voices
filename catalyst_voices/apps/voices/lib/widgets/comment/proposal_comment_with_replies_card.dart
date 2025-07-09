@@ -33,11 +33,14 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
 
   bool get _showReplies => showReplies[comment.ref] ?? true;
 
-  bool get _showToggleReplies => comment.replies.isEmpty;
+  bool get _showToggleReplies => comment.replies.isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
     final repliesIndent = 56 * comment.depth;
+
+    final showReplies = _showReplies;
+    final showToggleReplies = _showToggleReplies;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -53,17 +56,17 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
               ? Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (_showToggleReplies)
+                    if (showToggleReplies)
                       _ToggleRepliesChip(
                         repliesCount: comment.replies.length,
-                        hide: _showReplies,
-                        onTap: () => onToggleReplies(!_showReplies),
+                        hide: showReplies,
+                        onTap: () => onToggleReplies(!showReplies),
                       ),
                   ],
                 )
               : null,
         ),
-        if (_showReplies)
+        if (showReplies)
           Padding(
             padding: EdgeInsets.only(left: repliesIndent.toDouble()),
             child: Column(
@@ -74,7 +77,7 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
                   _RepliesCard(
                     key: ValueKey('ReplyComment.${reply.comment.metadata.selfRef.id}'),
                     comment: reply,
-                    showReplies: showReplies,
+                    showReplies: this.showReplies,
                     onSubmit: onSubmit,
                     onCancel: onCancel,
                     onToggleBuilder: onToggleBuilder,
