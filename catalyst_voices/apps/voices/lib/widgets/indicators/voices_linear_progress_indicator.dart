@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/indicators/voices_progress_indicator_type.dart';
 import 'package:flutter/material.dart';
 
 /// Animated version of [VoicesLinearProgressIndicator].
@@ -8,10 +9,14 @@ class AnimatedVoicesLinearProgressIndicator extends StatelessWidget {
   /// Whether to show the progress indicator's track.
   final bool showTrack;
 
+  /// The type of the progress indicator.
+  final VoicesProgressIndicatorType type;
+
   const AnimatedVoicesLinearProgressIndicator({
     super.key,
     required this.value,
     this.showTrack = true,
+    this.type = VoicesProgressIndicatorType.medium,
   });
 
   @override
@@ -24,6 +29,7 @@ class AnimatedVoicesLinearProgressIndicator extends StatelessWidget {
         return VoicesLinearProgressIndicator(
           value: value,
           showTrack: showTrack,
+          type: type,
         );
       },
     );
@@ -43,18 +49,23 @@ class VoicesLinearProgressIndicator extends StatelessWidget {
   /// Whether to show the progress indicator's track.
   final bool showTrack;
 
+  /// The type of the progress indicator.
+  final VoicesProgressIndicatorType type;
+
   /// Creates a [VoicesLinearProgressIndicator] widget.
   const VoicesLinearProgressIndicator({
     super.key,
     this.value,
     this.showTrack = true,
+    this.type = VoicesProgressIndicatorType.medium,
   });
 
   @override
   Widget build(BuildContext context) {
     return LinearProgressIndicator(
       value: value,
-      borderRadius: BorderRadius.circular(4),
+      borderRadius: BorderRadius.circular(5),
+      minHeight: type.minHeight,
       backgroundColor: showTrack ? null : Colors.transparent,
     );
   }
