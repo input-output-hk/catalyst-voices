@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/indicators/voices_progress_indicator_type.dart';
+import 'package:catalyst_voices/widgets/indicators/voices_progress_indicator_weight.dart';
 import 'package:flutter/material.dart';
 
 /// Animated version of [VoicesLinearProgressIndicator].
@@ -9,14 +9,14 @@ class AnimatedVoicesLinearProgressIndicator extends StatelessWidget {
   /// Whether to show the progress indicator's track.
   final bool showTrack;
 
-  /// The type of the progress indicator.
-  final VoicesProgressIndicatorType type;
+  /// The weight of the progress indicator.
+  final VoicesProgressIndicatorWeight weight;
 
   const AnimatedVoicesLinearProgressIndicator({
     super.key,
     required this.value,
     this.showTrack = true,
-    this.type = VoicesProgressIndicatorType.medium,
+    this.weight = VoicesProgressIndicatorWeight.medium,
   });
 
   @override
@@ -29,7 +29,7 @@ class AnimatedVoicesLinearProgressIndicator extends StatelessWidget {
         return VoicesLinearProgressIndicator(
           value: value,
           showTrack: showTrack,
-          type: type,
+          weight: weight,
         );
       },
     );
@@ -49,15 +49,15 @@ class VoicesLinearProgressIndicator extends StatelessWidget {
   /// Whether to show the progress indicator's track.
   final bool showTrack;
 
-  /// The type of the progress indicator.
-  final VoicesProgressIndicatorType type;
+  /// The weight of the progress indicator.
+  final VoicesProgressIndicatorWeight weight;
 
   /// Creates a [VoicesLinearProgressIndicator] widget.
   const VoicesLinearProgressIndicator({
     super.key,
     this.value,
     this.showTrack = true,
-    this.type = VoicesProgressIndicatorType.medium,
+    this.weight = VoicesProgressIndicatorWeight.medium,
   });
 
   @override
@@ -65,7 +65,7 @@ class VoicesLinearProgressIndicator extends StatelessWidget {
     return LinearProgressIndicator(
       value: value,
       borderRadius: BorderRadius.circular(5),
-      minHeight: type.minHeight,
+      minHeight: weight.minHeight,
       backgroundColor: showTrack ? null : Colors.transparent,
     );
   }
