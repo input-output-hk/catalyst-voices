@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/src/keychain/keychain_signer.dart';
-import 'package:catalyst_voices_repositories/src/keychain/vault_keychain.dart';
+import 'package:catalyst_voices_repositories/src/user/keychain/vault_keychain.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
