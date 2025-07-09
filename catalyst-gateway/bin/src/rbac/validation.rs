@@ -1,17 +1,24 @@
 //! Utilities for RBAC registrations validation.
 
-use std::collections::HashSet;
+use std::{
+    collections::{HashMap, HashSet},
+    iter,
+};
 
 use anyhow::{anyhow, Context, Result};
 use cardano_blockchain_types::{StakeAddress, TransactionId};
-use catalyst_types::{catalyst_id::CatalystId, problem_report::ProblemReport};
+use catalyst_types::{
+    catalyst_id::{role_index::RoleId, CatalystId},
+    problem_report::ProblemReport,
+};
 use ed25519_dalek::VerifyingKey;
-use futures::TryFutureExt;
+use futures::{StreamExt, TryFutureExt};
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
 
 use crate::{
     db::index::session::CassandraSession,
     rbac::{
+        chains_cache::cached_persistent_rbac_chain,
         get_chain::{apply_regs, build_rbac_chain},
         latest_rbac_chain, persistent_rbac_chain,
         validation_result::RbacUpdate,
@@ -29,7 +36,7 @@ pub async fn validate_rbac_registration(
 ) -> RbacValidationResult {
     match reg.previous_transaction() {
         Some(previous_txn) => update_chain(reg, previous_txn, is_persistent, context).await,
-        None => start_new_chain(reg, is_persistent).await,
+        None => start_new_chain(reg, is_persistent, context).await,
     }
 }
 
@@ -123,11 +130,14 @@ async fn update_chain(
     }])
 }
 
-async fn start_new_chain(reg: Cip509, is_persistent: bool) -> RbacValidationResult {
+async fn start_new_chain(
+    reg: Cip509, is_persistent: bool, context: &mut RbacIndexingContext,
+) -> RbacValidationResult {
     let catalyst_id = reg.catalyst_id().cloned();
     let purpose = reg.purpose();
     let report = reg.report().to_owned();
 
+    // Try to start a new chain.
     let new_chain = RegistrationChain::new(reg).map_err(|e| {
         report.other(&format!("{e:?}"), "Failed to start a registration chain");
         if let Some(catalyst_id) = catalyst_id {
@@ -141,93 +151,95 @@ async fn start_new_chain(reg: Cip509, is_persistent: bool) -> RbacValidationResu
         }
     })?;
 
+    // Verify that a Catalyst ID of this chain is unique.
     let catalyst_id = new_chain.catalyst_id().to_owned();
-    // // TODO: FIXME: Check context and instead of building full chain just check the
-    // presence // of any information in the database!
+    if is_chain_known(&catalyst_id, is_persistent, context).await? {
+        report.functional_validation(
+            &format!("{catalyst_id} is already used"),
+            "It isn't allowed to use same Catalyst ID (certificate subject public key) in multiple registration chains",
+        );
+        return Err(RbacValidationError::InvalidRegistration {
+            catalyst_id,
+            purpose,
+            report,
+        });
+    }
 
-    // match chain(&catalyst_id, is_persistent).await {
-    //     Err(e) => {
-    //         error!("Error finding a chain for {catalyst_id}: {e:?}");
-    //     },
-    //     Ok(Some(_)) => {
-    //         report.functional_validation(
-    //             &format!("{catalyst_id} is already used"),
-    //             "It isn't allowed to use same Catalyst ID (certificate subject public key)
-    // in multiple registration chains",         );
-    //         return Err(RbacValidationError::InvalidRegistration {
-    //             catalyst_id,
-    //             purpose,
-    //             report,
-    //         });
-    //     },
-    //     Ok(None) => {},
-    // }
-    // if self.chains.get(&catalyst_id).is_some() {
-    //     report.functional_validation(
-    //         &format!("{catalyst_id} is already used"),
-    //         "It isn't allowed to use same Catalyst ID (certificate subject public key)
-    // in multiple registration chains",
-    //     );
-    //     return Err(RbacValidationError::InvalidRegistration {
-    //         catalyst_id,
-    //         purpose,
-    //         report,
-    //     });
-    // }
+    // Validate stake addresses.
+    let new_addresses = new_chain.role_0_stake_addresses();
+    let mut updated_chains: HashMap<_, HashSet<StakeAddress>> = HashMap::new();
+    for address in &new_addresses {
+        if let Some(id) = catalyst_id_from_stake_address(&address, is_persistent, context).await? {
+            // If an address is used in existing chain then a new chain must have different role 0
+            // signing key.
+            let previous_chain = chain(&id, is_persistent, context)
+                .await?
+                .context("{id} is present in 'catalyst_id_for_stake_address', but not in 'rbac_registration'")?;
 
-    // let new_addresses = new_chain.role_0_stake_addresses();
-    // for address in &new_addresses {
-    //     if let Some(id) = self.active_addresses.get(address) {
-    //         let previous_chain = self.chains.get(&id).ok_or_else(|| {
-    //             // This means the cache is broken. This should never normally happen.
-    //             error!("Broken RBAC cache: {id} is present in ACTIVE_ADDRESSES cache,
-    // but missing in CHAINS");             RbacCacheAddError::InvalidRegistration {
-    //                 catalyst_id: catalyst_id.clone(),
-    //                 purpose,
-    //                 report: report.clone(),
-    //             }
-    //         })?;
+            if previous_chain.get_latest_signing_pk_for_role(&RoleId::Role0)
+                == new_chain.get_latest_signing_pk_for_role(&RoleId::Role0)
+            {
+                report.functional_validation(
+                    &format!("A new registration ({catalyst_id}) uses the same public key as the previous one ({})",
+                        previous_chain.catalyst_id()
+                    ),
+                    "It is only allowed to override the existing chain by using different public key",
+                );
+            } else {
+                // The new root registration "takes" an address(es) from the existing chain, so that
+                // chain needs to be updated.
+                updated_chains
+                    .entry(id)
+                    .and_modify(|e| {
+                        e.insert(address.clone());
+                    })
+                    .or_insert([address.clone()].into_iter().collect());
+            }
+        }
+    }
+
+    // Check that new public keys aren't used by other chains.
+    let keys = validate_public_keys(&new_chain, is_persistent, &report, context).await?;
+
+    if report.is_problematic() {
+        return Err(RbacValidationError::InvalidRegistration {
+            catalyst_id,
+            purpose,
+            report,
+        });
+    }
+
+    // Everything is fine: update the context.
+    context.insert_transaction(new_chain.current_tx_id_hash(), catalyst_id.clone());
+    // This will also remove
     //
-    //         if previous_chain.get_latest_signing_pk_for_role(&RoleId::Role0)
-    //             == new_chain.get_latest_signing_pk_for_role(&RoleId::Role0)
-    //         {
-    //             report.functional_validation(
-    //                 &format!("A new registration ({catalyst_id}) uses the same public
-    // key as the previous one ({})",
-    // previous_chain.catalyst_id()),                 "It is only allowed to override
-    // the existing chain by using different public key",             );
-    //         }
-    //     }
-    // }
-    //
-    // self.verify_public_keys(&new_chain, &report);
-    //
-    // if report.is_problematic() {
-    //     return Err(RbacCacheAddError::InvalidRegistration {
-    //         catalyst_id,
-    //         purpose,
-    //         report,
-    //     });
-    // }
-    //
-    // // Everything is fine: update caches.
-    // for address in new_addresses {
-    //     self.active_addresses
-    //         .insert(address.clone(), catalyst_id.clone());
-    // }
-    // self.transactions
-    //     .insert(new_chain.current_tx_id_hash(), catalyst_id.clone());
-    // if let Some((key, _)) = new_chain.get_latest_signing_pk_for_role(&RoleId::Role0) {
-    //     self.public_keys.insert(key, catalyst_id.clone());
-    // } else {
-    //     // A root registration should always contain role 0 with a signing key. The
-    // registration     // must already be validated, so this should never happen.
-    //     error!("{catalyst_id} root registration doesn't have a signing key");
-    // }
-    // self.chains.insert(catalyst_id.clone(), new_chain);
-    //
-    // Ok(RbacCacheAddSuccess { catalyst_id })
-    todo!()
+    context.insert_addresses(new_addresses, catalyst_id.clone());
+    context.insert_public_keys(&keys, catalyst_id.clone());
+    context.insert_registration(
+        catalyst_id.clone(),
+        new_chain.current_tx_id_hash(),
+        new_chain.current_point().slot_or_default(),
+        // TODO: FIXME: https://github.com/input-output-hk/catalyst-libs/pull/409
+        0.into(),
+        // No previous transaction for the root registration.
+        None,
+        // This chain has just been created, so no addresses have been removed from it.
+        HashSet::new(),
+    );
+
+    Ok(updated_chains
+        .into_iter()
+        .map(|(catalyst_id, removed_stake_addresses)| {
+            RbacUpdate {
+                catalyst_id,
+                removed_stake_addresses,
+            }
+        })
+        .chain(iter::once(RbacUpdate {
+            catalyst_id,
+            removed_stake_addresses: HashSet::new(),
+        }))
+        .collect())
 }
 
 /// Returns a Catalyst ID corresponding to the given transaction hash.
@@ -370,4 +382,52 @@ async fn catalyst_id_from_public_key(
     }
 
     Ok(None)
+}
+
+/// Returns `true` if a chain with the given Catalyst ID already exists.
+///
+/// This function behaves in the same way as `latest_rbac_chain(...).is_some()` but the
+/// implementation is more optimized because we don't need to build the whole chain.
+pub async fn is_chain_known(
+    id: &CatalystId, is_persistent: bool, context: &mut RbacIndexingContext,
+) -> Result<bool> {
+    if context.find_registrations(id).is_some() {
+        return Ok(true);
+    }
+
+    // We only cache persistent chains, so it is ok to check the cache in any case.
+    if cached_persistent_rbac_chain(id).is_some() {
+        return Ok(true);
+    }
+
+    // Then try to find in the persistent database.
+    let session =
+        CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
+    if is_cat_id_known(&session, id).await? {
+        return Ok(true);
+    }
+
+    // Conditionally check the volatile database.
+    if !is_persistent {
+        let session =
+            CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
+        if is_cat_id_known(&session, id).await? {
+            return Ok(true);
+        }
+    }
+
+    Ok(false)
+}
+
+/// Returns `true` if there is at least one registration with the given Catalyst ID.
+async fn is_cat_id_known(session: &CassandraSession, id: &CatalystId) -> Result<bool> {
+    use crate::db::index::queries::rbac::get_rbac_registrations::{Query, QueryParams};
+
+    Ok(Query::execute(&session, QueryParams {
+        catalyst_id: id.clone().into(),
+    })
+    .await?
+    .next()
+    .await
+    .is_some())
 }
