@@ -110,10 +110,14 @@ impl Rbac509InsertQuery {
         ))
         .await
         {
+            // Write updates to the database. There can be multiple updates in one registration
+            // because a new chain can take ownership of stake addresses of the existing chains and
+            // in that case we want to record changes to all those chains as well as the new one.
             Ok(updates) => {
                 for update in updates {
-                    // In this case stake addresses are removed from another chain, so it doesn't
-                    // make sense to preserve a previous transaction of this chain.
+                    // In this case the addresses were removed by another chain, so it doesn't make
+                    // sense to include a previous transaction ID unrelated to the chain that is
+                    // being updated.
                     let previous_transaction = if update.removed_stake_addresses.is_empty() {
                         previous_transaction
                     } else {
@@ -129,6 +133,7 @@ impl Rbac509InsertQuery {
                     ));
                 }
             },
+            // Invalid registrations are being recorded in order to report failure.
             Err(RbacValidationError::InvalidRegistration {
                 catalyst_id,
                 purpose,
@@ -144,6 +149,9 @@ impl Rbac509InsertQuery {
                     &report,
                 ));
             },
+            // This isn't a hard error because user input can contain invalid information. If there
+            // is no Catalyst ID, then we cannot record this registration as invalid and can only
+            // ignore (and log) it.
             Err(RbacValidationError::UnknownCatalystId) => {
                 debug!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}");
             },

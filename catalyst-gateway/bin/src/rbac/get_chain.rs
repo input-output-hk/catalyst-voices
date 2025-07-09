@@ -15,7 +15,10 @@ use crate::{
         },
         session::CassandraSession,
     },
-    rbac::{cache_persistent_rbac_chain, chains_cache::cached_persistent_rbac_chain, ChainInfo},
+    rbac::{
+        chains_cache::{cache_persistent_rbac_chain, cached_persistent_rbac_chain},
+        ChainInfo,
+    },
     settings::Settings,
 };
 
@@ -24,6 +27,8 @@ use crate::{
 pub async fn latest_rbac_chain(id: &CatalystId) -> Result<Option<ChainInfo>> {
     let volatile_session =
         CassandraSession::get(false).context("Failed to get volatile Cassandra session")?;
+    // Get the persistent part of the chain and volatile registrations. Both of these parts
+    // can be non-existing.
     let (chain, volatile_regs) = try_join(
         persistent_rbac_chain(id),
         indexed_regs(&volatile_session, id),
@@ -33,6 +38,7 @@ pub async fn latest_rbac_chain(id: &CatalystId) -> Result<Option<ChainInfo>> {
     let mut last_persistent_txn = None;
     let mut last_persistent_slot = 0.into();
 
+    // Either update the persistent chain or build a new one.
     let chain = match chain {
         Some(c) => {
             last_persistent_txn = Some(c.current_tx_id_hash());
@@ -44,6 +50,8 @@ pub async fn latest_rbac_chain(id: &CatalystId) -> Result<Option<ChainInfo>> {
 
     Ok(chain.map(|chain| {
         let last_txn = Some(chain.current_tx_id_hash());
+        // If the last persistent transaction ID is the same is the last one, then there are no
+        // volatile registrations in this chain.
         let last_volatile_txn = if last_persistent_txn == last_txn {
             None
         } else {
@@ -67,6 +75,7 @@ pub async fn latest_rbac_chain_by_address(address: &StakeAddress) -> Result<Opti
     let volatile_session =
         CassandraSession::get(false).context("Failed to get volatile Cassandra session")?;
 
+    // We always check the latest (volatile) data first.
     let id = match CatalystIdQuery::latest(&volatile_session, address).await? {
         Some(id) => id.catalyst_id,
         None => {
@@ -158,7 +167,7 @@ async fn cip509(network: Network, slot: Slot, txn_index: TxnIndex) -> Result<Cip
     if block.point().slot_or_default() != slot {
         // The `ChainFollower::get_block` function can return the next consecutive block if it
         // cannot find the exact one. This shouldn't happen, but we need to check anyway.
-        anyhow::bail!(
+        bail!(
             "Unable to find exact {slot:?} block. Found block slot {:?}",
             block.point().slot_or_default()
         );

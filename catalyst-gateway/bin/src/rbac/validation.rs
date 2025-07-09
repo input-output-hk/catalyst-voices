@@ -18,9 +18,9 @@ use rbac_registration::{cardano::cip509::Cip509, registration::cardano::Registra
 use crate::{
     db::index::session::CassandraSession,
     rbac::{
-        chains_cache::cached_persistent_rbac_chain,
-        get_chain::{apply_regs, build_rbac_chain},
-        latest_rbac_chain, persistent_rbac_chain,
+        chains_cache::{cache_persistent_rbac_chain, cached_persistent_rbac_chain},
+        get_chain::{apply_regs, build_rbac_chain, persistent_rbac_chain},
+        latest_rbac_chain,
         validation_result::RbacUpdate,
         RbacIndexingContext, RbacValidationError, RbacValidationResult,
     },
@@ -40,6 +40,7 @@ pub async fn validate_rbac_registration(
     }
 }
 
+/// Tries to update an existing RBAC chain.
 async fn update_chain(
     reg: Cip509, previous_txn: TransactionId, is_persistent: bool,
     context: &mut RbacIndexingContext,
@@ -96,6 +97,7 @@ async fn update_chain(
     // Check that new public keys aren't used by other chains.
     let keys = validate_public_keys(&new_chain, is_persistent, &report, context).await?;
 
+    // Return an error if any issues were recorded in the report.
     if report.is_problematic() {
         return Err(RbacValidationError::InvalidRegistration {
             catalyst_id,
@@ -118,12 +120,17 @@ async fn update_chain(
         HashSet::new(),
     );
 
+    cache_persistent_rbac_chain(catalyst_id.clone(), new_chain);
+
+    // Only new chains can take ownership of stake addresses of existing chains, so in this
+    // case we always have just one update.
     Ok(vec![RbacUpdate {
         catalyst_id,
         removed_stake_addresses: HashSet::new(),
     }])
 }
 
+/// Tries to start a new RBAC chain.
 async fn start_new_chain(
     reg: Cip509, is_persistent: bool, context: &mut RbacIndexingContext,
 ) -> RbacValidationResult {
@@ -169,7 +176,6 @@ async fn start_new_chain(
             let previous_chain = chain(&id, is_persistent, context)
                 .await?
                 .context("{id} is present in 'catalyst_id_for_stake_address', but not in 'rbac_registration'")?;
-
             if previous_chain.get_latest_signing_pk_for_role(&RoleId::Role0)
                 == new_chain.get_latest_signing_pk_for_role(&RoleId::Role0)
             {
@@ -220,6 +226,8 @@ async fn start_new_chain(
         HashSet::new(),
     );
 
+    // Return a new registration along with (potentially empty) list of updated to other
+    // chains if their addresses were taken.
     Ok(updated_chains
         .into_iter()
         .map(|(catalyst_id, removed_stake_addresses)| {
@@ -388,7 +396,8 @@ pub async fn is_chain_known(
         return Ok(true);
     }
 
-    // We only cache persistent chains, so it is ok to check the cache in any case.
+    // We only cache persistent chains, so it is ok to check the cache regardless of the
+    // `is_persistent` parameter value.
     if cached_persistent_rbac_chain(id).is_some() {
         return Ok(true);
     }
