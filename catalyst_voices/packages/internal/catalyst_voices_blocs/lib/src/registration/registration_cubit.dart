@@ -336,8 +336,8 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
       _baseProfileCubit
         ..updateUsername(Username.dirty(baseProfileProgress.username))
         ..updateEmail(Email.dirty(baseProfileProgress.email))
-        ..updateToS(isAccepted: true)
-        ..updatePrivacyPolicy(isAccepted: true);
+        ..updateConditions(accepted: true)
+        ..updateTosAndPrivacyPolicy(accepted: true);
     }
 
     if (keychainProgress != null) {

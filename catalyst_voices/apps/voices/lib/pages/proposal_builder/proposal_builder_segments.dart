@@ -137,7 +137,7 @@ class _ProposalBuilderSegments extends StatelessWidget {
               final item = items[index];
               final previousItem = index == 0 ? null : items.elementAtOrNull(index - 1);
               final nextItem = items.elementAtOrNull(index + 1);
-      
+
               return KeyedSubtree(
                 key: ValueKey(item.id),
                 child: _buildItem(
@@ -152,27 +152,27 @@ class _ProposalBuilderSegments extends StatelessWidget {
             separatorBuilder: (context, index) {
               final item = items[index];
               final nextItem = items.elementAtOrNull(index + 1);
-      
+
               if (nextItem is ProposalCommentsSegment) {
                 return const SizedBox(height: 32);
               }
-      
+
               if (item is ProposalCommentsSegment && nextItem != null) {
                 return const SizedBox(height: 32);
               }
-      
+
               if (item is ProposalViewCommentsSection && nextItem != null) {
                 return const ProposalSeparatorBox(height: 24);
               }
-      
+
               if (item is ProposalViewCommentsSection && nextItem is ProposalAddCommentSection) {
                 return const ProposalDivider(height: 48);
               }
-      
+
               if (item is DocumentSegment || item is DocumentSection) {
                 return const SizedBox(height: 12);
               }
-      
+
               return const SizedBox.shrink();
             },
           );

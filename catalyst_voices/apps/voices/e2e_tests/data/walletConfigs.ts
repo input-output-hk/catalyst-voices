@@ -29,30 +29,6 @@ export const walletConfigs: WalletConfigModel[] = [
   },
   {
     id: "2",
-    extension: getBrowserExtension(BrowserExtensionName.Typhon),
-    seed: [
-      "stomach",
-      "horn",
-      "rail",
-      "afraid",
-      "flip",
-      "also",
-      "abandon",
-      "speed",
-      "chaos",
-      "daring",
-      "soon",
-      "soft",
-      "okay",
-      "online",
-      "benefit",
-    ],
-    username: "test123",
-    password: "test12345678@",
-    cipBridge: ["cip-30"],
-  },
-  {
-    id: "3",
     extension: getBrowserExtension(BrowserExtensionName.Eternl),
     seed: [
       "stomach",
@@ -76,7 +52,7 @@ export const walletConfigs: WalletConfigModel[] = [
     cipBridge: ["cip-30", "cip-95"],
   },
   {
-    id: "4",
+    id: "3",
     extension: getBrowserExtension(BrowserExtensionName.Yoroi),
     seed: [
       "stomach",
@@ -100,7 +76,7 @@ export const walletConfigs: WalletConfigModel[] = [
     cipBridge: ["cip-95"],
   },
   {
-    id: "5",
+    id: "4",
     extension: getBrowserExtension(BrowserExtensionName.Nufi),
     seed: [
       "stomach",
