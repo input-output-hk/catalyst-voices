@@ -4,7 +4,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-typedef RoleCredentialsCallback<T> = Future<T> Function(
+typedef AccountCredentialsCallback<T> = Future<T> Function(
   CatalystId catalystId,
   CatalystPrivateKey privateKey,
 );
@@ -131,14 +131,11 @@ final class Account extends Equatable {
     Uint8List message, {
     required AccountRole role,
   }) {
-    return keychain.sign(
-      message,
-      role: role,
-    );
+    return keychain.sign(message, role: role);
   }
 
   Future<T> useRoleCredentials<T>(
-    RoleCredentialsCallback<T> callback, {
+    AccountCredentialsCallback<T> callback, {
     required AccountRole role,
     int rotation = 0,
   }) async {
