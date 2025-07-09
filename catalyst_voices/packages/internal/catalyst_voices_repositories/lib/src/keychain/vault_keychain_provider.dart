@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/keychain/keychain_signer.dart';
 import 'package:catalyst_voices_repositories/src/keychain/vault_keychain.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -11,6 +12,7 @@ final class VaultKeychainProvider implements KeychainProvider {
   final FlutterSecureStorage _secureStorage;
   final SharedPreferencesAsync _sharedPreferences;
   final CacheConfig _cacheConfig;
+  final KeychainSigner _keychainSigner;
 
   // Note. caching keychains because of .isUnlocked is stored as a property
   // and when updating any other properties of Account we don't want to lose
@@ -21,9 +23,11 @@ final class VaultKeychainProvider implements KeychainProvider {
     required FlutterSecureStorage secureStorage,
     required SharedPreferencesAsync sharedPreferences,
     required CacheConfig cacheConfig,
+    required KeychainSigner keychainSigner,
   })  : _secureStorage = secureStorage,
         _sharedPreferences = sharedPreferences,
-        _cacheConfig = cacheConfig;
+        _cacheConfig = cacheConfig,
+        _keychainSigner = keychainSigner;
 
   @override
   Future<Keychain> create(String id) async {
@@ -98,6 +102,7 @@ final class VaultKeychainProvider implements KeychainProvider {
           secureStorage: _secureStorage,
           sharedPreferences: _sharedPreferences,
           unlockTtl: _cacheConfig.expiryDuration.keychainUnlock,
+          signer: _keychainSigner,
         );
       },
     );

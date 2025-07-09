@@ -1,6 +1,13 @@
+import 'dart:typed_data';
+
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
+
+typedef RoleCredentialsCallback<T> = Future<T> Function(
+  CatalystId catalystId,
+  CatalystPrivateKey privateKey,
+);
 
 /// Defines singular account used by [User] (physical person).
 /// One [User] may have multiple [Account]'s.
@@ -119,6 +126,30 @@ final class Account extends Equatable {
   }
 
   bool isSameRef(Account other) => catalystId.isReferringTo(other);
+
+  Future<CatalystSignature> sign(
+    Uint8List message, {
+    required AccountRole role,
+  }) {
+    return keychain.sign(
+      message,
+      role: role,
+    );
+  }
+
+  Future<T> useRoleCredentials<T>(
+    RoleCredentialsCallback<T> callback, {
+    required AccountRole role,
+    int rotation = 0,
+  }) async {
+    final roleCatalystId = catalystId.copyWith(
+      role: Optional(role),
+      rotation: Optional(rotation),
+    );
+
+    final keyPair = keychain.getRoleKeyPair(role: role);
+    return keyPair.use((keyPair) => callback(roleCatalystId, keyPair.privateKey));
+  }
 }
 
 extension CatalystIdExt on CatalystId {

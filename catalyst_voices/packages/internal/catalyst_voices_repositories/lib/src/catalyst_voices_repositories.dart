@@ -21,6 +21,7 @@ export 'document/source/document_data_source.dart';
 export 'document/source/document_favorites_source.dart';
 export 'dto/document/document_dto.dart' show DocumentExt;
 export 'keychain/keychain_provider.dart' show KeychainProvider;
+export 'keychain/keychain_signer.dart' show KeychainSigner;
 export 'keychain/vault_keychain_provider.dart' show VaultKeychainProvider;
 export 'logging/logging_settings_storage.dart';
 export 'proposal/proposal_repository.dart' show ProposalRepository;

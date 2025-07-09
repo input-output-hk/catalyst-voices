@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/keychain/vault_keychain_provider.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,6 +27,7 @@ void main() {
       secureStorage: const FlutterSecureStorage(),
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: AppConfig.dev().cache,
+      keychainSigner: _FakeKeychainSigner(),
     );
   });
 
@@ -160,3 +161,5 @@ class _FakeCatalystPrivateKeyFactory extends Fake implements CatalystPrivateKeyF
     return _FakeCatalystPrivateKey(bytes: bytes);
   }
 }
+
+class _FakeKeychainSigner extends Fake implements KeychainSigner {}

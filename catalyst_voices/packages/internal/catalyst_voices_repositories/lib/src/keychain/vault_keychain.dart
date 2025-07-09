@@ -13,6 +13,8 @@ const _allKeys = [
 const _rootKey = 'rootKey';
 
 final class VaultKeychain extends SecureStorageVault implements Keychain {
+  final KeychainSigner signer;
+
   VaultKeychain({
     required super.id,
     super.key,
@@ -20,6 +22,7 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
     required super.sharedPreferences,
     super.unlockTtl,
     super.cryptoService,
+    required this.signer,
   });
 
   @override
@@ -48,14 +51,34 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
   }
 
   @override
+  Future<CatalystKeyPair> getRoleKeyPair({
+    required AccountRole role,
+  }) {
+    return getMasterKey().use((masterKey) {
+      return signer.deriveKeyPair(
+        masterKey: masterKey,
+        role: role,
+      );
+    });
+  }
+
+  @override
   Future<void> setMasterKey(CatalystPrivateKey data) async {
     await writeString(hex.encode(data.bytes), key: _rootKey);
   }
 
   @override
-  Future<CatalystSignature> sign(Uint8List message, {required AccountRole role}) {
-    // TODO: implement sign
-    throw UnimplementedError();
+  Future<CatalystSignature> sign(
+    Uint8List message, {
+    required AccountRole role,
+  }) {
+    return getMasterKey().use((masterKey) {
+      return signer.sign(
+        message,
+        masterKey: masterKey,
+        role: role,
+      );
+    });
   }
 
   @override

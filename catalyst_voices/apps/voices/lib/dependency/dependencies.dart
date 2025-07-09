@@ -277,6 +277,7 @@ final class Dependencies extends DependencyProvider {
         secureStorage: get<FlutterSecureStorage>(),
         sharedPreferences: get<SharedPreferencesAsync>(),
         cacheConfig: get<AppConfig>().cache,
+        keychainSigner: get<KeychainSigner>(),
       );
     });
     registerLazySingleton<AuthTokenGenerator>(() {
@@ -325,7 +326,6 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<SignerService>(() {
       return AccountSignerService(
         get<UserService>(),
-        get<KeyDerivationService>(),
       );
     });
     registerLazySingleton<AccessControl>(AccessControl.new);
