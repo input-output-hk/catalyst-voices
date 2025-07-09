@@ -359,6 +359,10 @@
       }
     }
   },
+  "catalystConditions": "Project Catalyst Terms and Conditions",
+  "@catalystConditions": {
+    "description": "Link to the Catalyst FC's Terms and Conditions"
+  },
   "catalystF14": "Catalyst Fund14",
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
@@ -636,15 +640,11 @@
   "@createKeychainUnlockPasswordIntoSubtitle": {
     "description": "Subtitle for unlock password input section"
   },
-  "createProfileAcknowledgementsDataUsage": "I acknowledge that the Catalyst Ops team may use my email only for Catalyst communication.",
-  "@createProfileAcknowledgementsDataUsage": {
-    "description": "Text acknowledging that the Catalyst Ops team may use the user's email only for Catalyst communication"
-  },
-  "createProfileAcknowledgementsPrivacyPolicy": "I acknowledge and agree that any data I share in connection with my participation in Project Catalyst Funds will be collected, stored, used and processed in accordance with the {privacy_policy}.",
-  "@createProfileAcknowledgementsPrivacyPolicy": {
-    "description": "Text acknowledging that the user has read and agreed to the Catalyst FC's Privacy Policy",
+  "createProfileAcknowledgementsConditions": "I agree to the {conditions}.",
+  "@createProfileAcknowledgementsConditions": {
+    "description": "Text acknowledging that the user has read and agreed to the Catalyst FC's Terms and Conditions",
     "placeholders": {
-      "privacy_policy": {
+      "conditions": {
         "type": "String"
       }
     }
@@ -653,11 +653,14 @@
   "@createProfileAcknowledgementsTitle": {
     "description": "Title for the acknowledgements section"
   },
-  "createProfileAcknowledgementsToS": "I confirm that I have read and agree to be bound by {tos}.",
-  "@createProfileAcknowledgementsToS": {
-    "description": "Text acknowledging that the user has read and agreed to the Catalyst FC's Terms and Conditions",
+  "createProfileAcknowledgementsTosAndPrivacyPolicy": "I agree to the {tos} & {privacy_policy}.",
+  "@createProfileAcknowledgementsTosAndPrivacyPolicy": {
+    "description": "Text acknowledging that the user has read and agreed to the Catalyst FC's Privacy Policy",
     "placeholders": {
       "tos": {
+        "type": "String"
+      },
+      "privacy_policy": {
         "type": "String"
       }
     }
@@ -665,18 +668,6 @@
   "createProfileCreatedTitle": "Congratulations your profile is setup!",
   "@createProfileCreatedTitle": {
     "description": "Title for the profile created"
-  },
-  "createProfileHasIdeascaleAccountAlready": "Submitted proposals in Ideascale before?",
-  "@createProfileHasIdeascaleAccountAlready": {
-    "description": "Label for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
-  },
-  "createProfileInstructionsEmailReason1": "Email is stored in Catalyst database.",
-  "@createProfileInstructionsEmailReason1": {
-    "description": "Reason to store email in a mutable database"
-  },
-  "createProfileInstructionsEmailReason2": "Email is never published on chain",
-  "@createProfileInstructionsEmailReason2": {
-    "description": "Reason to not store email on-chain"
   },
   "createProfileInstructionsEmailRequest": "Email request",
   "@createProfileInstructionsEmailRequest": {
@@ -732,9 +723,25 @@
   "@createProfileSetupEmailLabel": {
     "description": "Label for the email input"
   },
-  "createProfileSetupIdeascaleReason1": "Be sure to use the same email associated with your Ideascale account",
-  "@createProfileSetupIdeascaleReason1": {
+  "createProfileSetupEmailReason1": "If you have an Ideascale account, using the same email works best.",
+  "@createProfileSetupEmailReason1": {
     "description": "Description for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
+  },
+  "createProfileSetupEmailReason2": "Email is stored in Catalyst database",
+  "@createProfileSetupEmailReason2": {
+    "description": "Description for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
+  },
+  "createProfileSetupEmailReason3": "Email is never published on chain",
+  "@createProfileSetupEmailReason3": {
+    "description": "Description for info card to let user know to use the same email as in Ideascale if they have already submitted a proposal there."
+  },
+  "createProfileSetupEmailSubLabel": "Optional except for proposers or reviewers",
+  "@createProfileSetupEmailSubLabel": {
+    "description": "Sub label for the email input"
+  },
+  "createProfileSetupReceiveEmails": "I agree to receive emails. I can unsubscribe anytime.",
+  "@createProfileSetupReceiveEmails": {
+    "description": "Checkbox description about agreeing to receive emails"
   },
   "createProfileSetupTitle": "Setup your profile",
   "@createProfileSetupTitle": {
@@ -1690,6 +1697,15 @@
   "maximumAsk": "Maximum Ask",
   "@maximumAsk": {
     "description": "Label for maximum funding request allowed"
+  },
+  "milestoneGuidelinesLink": "Important: Read the [milestone guidelines]({link}) before proceeding.",
+  "@milestoneGuidelinesLink": {
+    "description": "Helper text for milestone cost field",
+    "placeholders": {
+      "link": {
+        "type": "String"
+      }
+    }
   },
   "minBudgetRequest": "Min budget request",
   "@minBudgetRequest": {

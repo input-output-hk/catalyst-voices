@@ -1,4 +1,3 @@
-version: "1.0.0"
 project: {
 	name: "gateway"
 	ci: {
@@ -13,6 +12,7 @@ project: {
 		}
 
 		bundle: {
+			env: string | *"dev"
 			modules: main: {
 				name:    "app"
 				version: "0.11.0"

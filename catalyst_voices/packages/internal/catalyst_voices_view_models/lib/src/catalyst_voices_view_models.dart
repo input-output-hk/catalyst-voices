@@ -47,6 +47,7 @@ export 'proposals/proposals_filter_type_ext.dart';
 export 'registration/exception/localized_registration_email_already_used_exception.dart';
 export 'registration/exception/localized_registration_exception.dart';
 export 'registration/network_id_ext.dart';
+export 'registration/receive_emails.dart';
 export 'registration/registration.dart';
 export 'registration/registration_role.dart';
 export 'segments/segments_navigation.dart';

@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/common/resizable_box_parent.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
@@ -147,13 +148,10 @@ class VoicesTextField extends VoicesFormField<String> {
             }
           },
           builder: (field) {
-            final context = field.context;
             final state = field as VoicesTextFieldState;
-            final theme = Theme.of(context);
-            final textTheme = theme.textTheme;
 
             final labelText = decoration?.labelText ?? '';
-            final labelStyle = decoration?.labelStyle;
+            final subLabelText = decoration?.subLabelText ?? '';
 
             final resizableVertically = state._isResizableVertically;
             final resizableHorizontally = state._isResizableHorizontally;
@@ -165,17 +163,16 @@ class VoicesTextField extends VoicesFormField<String> {
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 4,
               children: [
-                if (labelText.isNotEmpty) ...[
-                  Text(
-                    key: const Key('EnterPasswordText'),
-                    labelText,
-                    style: enabled
-                        ? (labelStyle ?? textTheme.titleSmall)
-                        : (labelStyle ?? textTheme.titleSmall)
-                            ?.copyWith(color: theme.colors.textDisabled),
+                if (labelText.isNotEmpty || subLabelText.isNotEmpty) ...[
+                  _TextFieldLabel(
+                    text: labelText,
+                    subText: subLabelText,
+                    textStyle: decoration?.labelStyle,
+                    subTextStyle: decoration?.subLabelStyle,
+                    isEnabled: enabled,
                   ),
-                  const SizedBox(height: 4),
                 ],
                 ResizableBoxParent(
                   resizableHorizontally: resizableHorizontally,
@@ -244,6 +241,9 @@ class VoicesTextFieldDecoration {
   /// the floating behavior and is instead above the text field instead.
   final String? labelText;
 
+  /// Displayed below [labelText] is set. If not instead of [labelText] with different style.
+  final String? subLabelText;
+
   /// [InputDecoration.helper].
   final Widget? helper;
 
@@ -297,7 +297,11 @@ class VoicesTextFieldDecoration {
   /// If not specified, no radius will be applied.
   final BorderRadius? borderRadius;
 
+  /// Style for [labelText].
   final TextStyle? labelStyle;
+
+  /// Style for [subLabelStyle].
+  final TextStyle? subLabelStyle;
 
   /// Creates a new text field decoration.
   const VoicesTextFieldDecoration({
@@ -308,6 +312,7 @@ class VoicesTextFieldDecoration {
     this.focusedBorder,
     this.focusedErrorBorder,
     this.labelText,
+    this.subLabelText,
     this.helper,
     this.helperText,
     this.helperMaxLines = 2,
@@ -326,6 +331,7 @@ class VoicesTextFieldDecoration {
     this.fillColor,
     this.borderRadius,
     this.labelStyle,
+    this.subLabelStyle,
   });
 }
 
@@ -851,4 +857,53 @@ class VoicesTextFieldValidationResult with EquatableMixin {
 
   @override
   List<Object?> get props => [status, errorMessage];
+}
+
+class _TextFieldLabel extends StatelessWidget {
+  final String text;
+  final String subText;
+  final TextStyle? textStyle;
+  final TextStyle? subTextStyle;
+  final bool isEnabled;
+
+  const _TextFieldLabel({
+    required this.text,
+    required this.subText,
+    this.textStyle,
+    this.subTextStyle,
+    this.isEnabled = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textColor = isEnabled ? context.colors.textOnPrimaryLevel0 : context.colors.textDisabled;
+
+    final effectiveTextStyle =
+        (textStyle ?? context.textTheme.titleSmall ?? const TextStyle()).copyWith(
+      color: textColor,
+    );
+    final effectiveSubTextStyle =
+        (subTextStyle ?? context.textTheme.bodyMedium ?? const TextStyle()).copyWith(
+      color: textColor,
+    );
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (text.isNotEmpty)
+          Text(
+            text,
+            key: const Key('TextFieldLabelText'),
+            style: effectiveTextStyle,
+          ),
+        if (subText.isNotEmpty)
+          Text(
+            subText,
+            key: const Key('TextFieldSubLabelText'),
+            style: effectiveSubTextStyle,
+          ),
+      ],
+    );
+  }
 }
