@@ -5,11 +5,13 @@ use std::sync::Arc;
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
-use super::get_txo_by_stake_address::GetTxoByStakeAddressQuery;
 use crate::{
     db::{
         index::{
-            queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, SizedBatch},
+            queries::{
+                caches::txo_by_stake::update as cache_update, FallibleQueryResults,
+                PreparedQueries, PreparedQuery, SizedBatch,
+            },
             session::CassandraSession,
         },
         types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
@@ -64,7 +66,7 @@ impl UpdateTxoSpentQuery {
             .execute_batch(PreparedQuery::TxoSpentUpdateQuery, params.clone())
             .await?;
 
-        GetTxoByStakeAddressQuery::update_cache(params);
+        cache_update(params);
 
         Ok(results)
     }
