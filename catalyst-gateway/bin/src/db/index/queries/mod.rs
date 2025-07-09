@@ -8,10 +8,58 @@ pub(crate) mod registrations;
 pub(crate) mod staked_ada;
 pub(crate) mod sync_status;
 
-use std::{fmt::Debug, sync::Arc};
+use std::{any::TypeId, fmt::Debug, sync::Arc};
 
 use anyhow::bail;
-use crossbeam_skiplist::SkipMap;
+use dashmap::DashMap;
+use purge::{
+    catalyst_id_for_stake_address::{
+        DeleteQuery as PurgeCatalystIdForStakeAddressDelete,
+        PrimaryKeyQuery as PurgeCatalystIdForStakeAddressSelect,
+    },
+    catalyst_id_for_txn_id::{
+        DeleteQuery as PurgeCatalystIdForTxnIdDelete,
+        PrimaryKeyQuery as PurgeCatalystIdForTxnIdSelect,
+    },
+    cip36_registration::{
+        DeleteQuery as PurgeCip36RegistrationDelete,
+        PrimaryKeyQuery as PurgeCip36RegistrationSelect,
+    },
+    cip36_registration_for_vote_key::{
+        DeleteQuery as PurgeCip36RegistrationForVoteKeyDelete,
+        PrimaryKeyQuery as PurgeCip36RegistrationForVoteKeySelect,
+    },
+    cip36_registration_invalid::{
+        DeleteQuery as PurgeCip36RegistrationInvalidDelete,
+        PrimaryKeyQuery as PurgeCip36RegistrationInvalidSelect,
+    },
+    rbac509_invalid_registration::{
+        DeleteQuery as PurgeRbacRegistrationInvalidDelete,
+        PrimaryKeyQuery as PurgeRbacRegistrationInvalidSelect,
+    },
+    rbac509_registration::{
+        DeleteQuery as PurgeRbacRegistrationDelete, PrimaryKeyQuery as PurgeRbacRegistrationSelect,
+    },
+    stake_registration::{
+        DeleteQuery as PurgeStakeRegistrationDelete,
+        PrimaryKeyQuery as PurgeStakeRegistrationSelect,
+    },
+    txi_by_hash::{DeleteQuery as PurgeTxiByHashDelete, PrimaryKeyQuery as PurgeTxiByHashSelect},
+    txo_ada::{DeleteQuery as PurgeTxoAdaDelete, PrimaryKeyQuery as PurgeTxoAdaSelect},
+    txo_assets::{DeleteQuery as PurgeTxoAssetsDelete, PrimaryKeyQuery as PurgeTxoAssetsSelect},
+    unstaked_txo_ada::{
+        DeleteQuery as PurgeTxoUnstakedAdaDelete, PrimaryKeyQuery as PurgeTxoUnstakedAdaSelect,
+    },
+    unstaked_txo_assets::{
+        DeleteQuery as PurgeTxoUnstakedAssetDelete, PrimaryKeyQuery as PurgeTxoUnstakedAssetSelect,
+    },
+};
+use rbac::{
+    get_catalyst_id_from_stake_address::GetCatalystIdForStakeAddress,
+    get_catalyst_id_from_transaction_id::GetCatalystIdForTxnId,
+    get_rbac_invalid_registrations::GetRbac509InvalidRegistrations,
+    get_rbac_registrations::GetRbac509Registrations,
+};
 use registrations::{
     get_all_invalids::GetAllInvalidRegistrationsQuery,
     get_all_registrations::GetAllRegistrationsQuery, get_from_stake_addr::GetRegistrationQuery,
@@ -33,403 +81,266 @@ use staked_ada::{
 use sync_status::update::SyncStatusInsertQuery;
 use tracing::error;
 
-use super::block::{
-    certs::CertInsertQuery, cip36::Cip36InsertQuery, rbac509::Rbac509InsertQuery,
-    txi::TxiInsertQuery, txo::TxoInsertQuery,
-};
-use crate::{
-    db::index::{
-        queries::rbac::{
-            get_catalyst_id_from_stake_address, get_catalyst_id_from_transaction_id,
-            get_rbac_invalid_registrations, get_rbac_registrations,
+use super::{
+    block::{
+        certs::StakeRegistrationInsertQuery,
+        cip36::{
+            insert_cip36::Cip36Insert, insert_cip36_for_vote_key::Cip36ForVoteKeyInsert,
+            insert_cip36_invalid::Cip36InvalidInsert,
         },
-        session::CassandraSessionError,
+        rbac509::{
+            insert_catalyst_id_for_stake_address::CatalystIdForStakeAddressInsert,
+            insert_catalyst_id_for_txn_id::CatalystIdForTxnIdInsert, insert_rbac509::Rbac509Insert,
+            insert_rbac509_invalid::Rbac509InvalidInsert,
+        },
+        txi::TxiInsertQuery,
+        txo::{
+            insert_txo::TxoInsertQuery, insert_txo_asset::Params as TxoAssetInsert,
+            insert_unstaked_txo::Params as TxoUnstakedInsert,
+            insert_unstaked_txo_asset::Params as TxoUnstakedAssetInsert,
+        },
     },
-    service::utilities::health::set_index_db_liveness,
-    settings::cassandra_db,
+    session::{CassandraSession, CassandraSessionError},
 };
+use crate::{service::utilities::health::set_index_db_liveness, settings::cassandra_db};
 
 /// Batches of different sizes, prepared and ready for use.
-pub(crate) type SizedBatch = SkipMap<u16, Arc<Batch>>;
+pub(crate) type SizedBatch = DashMap<u16, Arc<Batch>>;
 
-/// All Prepared insert Queries that we know about.
-#[derive(strum_macros::Display)]
-#[allow(clippy::enum_variant_names)]
-pub(crate) enum PreparedQuery {
-    /// TXO Insert query.
-    TxoAdaInsertQuery,
-    /// TXO Asset Insert query.
-    TxoAssetInsertQuery,
-    /// Unstaked TXO Insert query.
-    UnstakedTxoAdaInsertQuery,
-    /// Unstaked TXO Asset Insert query.
-    UnstakedTxoAssetInsertQuery,
-    /// TXI Insert query.
-    TxiInsertQuery,
-    /// Stake Registration Insert query.
-    StakeRegistrationInsertQuery,
-    /// CIP 36 Registration Insert Query.
-    Cip36RegistrationInsertQuery,
-    /// CIP 36 Registration Error Insert query.
-    Cip36RegistrationInsertErrorQuery,
-    /// CIP 36 Registration for voting key Insert query.
-    Cip36RegistrationForVoteKeyInsertQuery,
-    /// TXO spent Update query.
-    TxoSpentUpdateQuery,
-    /// RBAC 509 Registration Insert query.
-    Rbac509InsertQuery,
-    /// An invalid RBAC 509 registration Insert query.
-    Rbac509InvalidInsertQuery,
-    /// A Catalyst ID for transaction ID insert query.
-    CatalystIdForTxnIdInsertQuery,
-    /// A Catalyst ID for stake address insert query.
-    CatalystIdForStakeAddressInsertQuery,
+/// Kind of result
+#[derive(Clone)]
+#[allow(dead_code)]
+pub(crate) enum QueryKind {
+    /// Sized-batch
+    Batch(SizedBatch),
+    /// Prepared statement
+    Statement(PreparedStatement),
 }
 
-/// All prepared SELECT query statements (return data).
-pub(crate) enum PreparedSelectQuery {
-    /// Get TXO by stake address query.
-    TxoByStakeAddress,
-    /// Get TXI by transaction hash query.
-    TxiByTransactionHash,
-    /// Get native assets by stake address query.
-    AssetsByStakeAddress,
-    /// Get Registrations
-    RegistrationFromStakeAddr,
-    /// Get invalid Registration
-    InvalidRegistrationsFromStakeAddr,
-    /// Get stake addr from stake hash
-    StakeAddrFromStakeHash,
-    /// Get stake addr from vote key
-    StakeAddrFromVoteKey,
-    /// Get Catalyst ID by transaction ID.
-    CatalystIdByTransactionId,
-    /// Get Catalyst ID by stake address.
-    CatalystIdByStakeAddress,
-    /// Get RBAC registrations by Catalyst ID.
-    RbacRegistrationsByCatalystId,
-    /// Get invalid RBAC registrations by Catalyst ID.
-    RbacInvalidRegistrationsByCatalystId,
-    /// Get all registrations for snapshot
-    GetAllRegistrations,
-    /// Get all invalid registrations for snapshot
-    GetAllInvalidRegistrations,
+/// A trait to prepare Index DB queries.
+#[allow(dead_code)]
+pub(crate) trait Query: std::fmt::Display + std::any::Any {
+    /// CQL for query preparation.
+    const QUERY_STR: &'static str;
+
+    /// Returns the type id for the query.
+    fn type_id() -> std::any::TypeId {
+        std::any::TypeId::of::<Self>()
+    }
+
+    /// Returns the CQL statement for the query in plain text.
+    fn query_str() -> &'static str {
+        Self::QUERY_STR
+    }
+
+    /// Prepare the query
+    async fn prepare_query(
+        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+    ) -> anyhow::Result<QueryKind>;
 }
 
-/// All prepared UPSERT query statements (inserts/updates a single value of data).
-pub(crate) enum PreparedUpsertQuery {
-    /// Sync Status Insert
-    SyncStatusInsert,
+/// Implement Display trait for types that implement Query
+#[macro_export]
+macro_rules! impl_display_for_query_type {
+    ($i:ty) => {
+        impl std::fmt::Display for $i {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                write!(
+                    f,
+                    "{}",
+                    <Self as $crate::db::index::queries::Query>::query_str()
+                )
+            }
+        }
+    };
 }
 
-/// All prepared queries for a session.
-#[allow(clippy::struct_field_names)]
-pub(crate) struct PreparedQueries {
-    /// TXO Insert query.
-    txo_insert_queries: SizedBatch,
-    /// TXO Asset Insert query.
-    txo_asset_insert_queries: SizedBatch,
-    /// Unstaked TXO Insert query.
-    unstaked_txo_insert_queries: SizedBatch,
-    /// Unstaked TXO Asset Insert query.
-    unstaked_txo_asset_insert_queries: SizedBatch,
-    /// TXI Insert query.
-    txi_insert_queries: SizedBatch,
-    /// TXI Insert query.
-    stake_registration_insert_queries: SizedBatch,
-    /// CIP36 Registrations.
-    cip36_registration_insert_queries: SizedBatch,
-    /// CIP36 Registration errors.
-    cip36_registration_error_insert_queries: SizedBatch,
-    /// CIP36 Registration for Stake Address Insert query.
-    cip36_registration_for_vote_key_insert_queries: SizedBatch,
-    /// Update TXO spent query.
-    txo_spent_update_queries: SizedBatch,
-    /// Get TXO by stake address query.
-    txo_by_stake_address_query: PreparedStatement,
-    /// Get TXI by transaction hash.
-    txi_by_txn_hash_query: PreparedStatement,
-    /// RBAC 509 Registrations.
-    rbac509_registration_insert_queries: SizedBatch,
-    /// Invalid RBAC 509 registrations.
-    rbac509_invalid_registration_insert_queries: SizedBatch,
-    /// Catalyst ID for transaction ID insert query.
-    catalyst_id_for_txn_id_insert_queries: SizedBatch,
-    /// Catalyst ID for stake address insert query.
-    catalyst_id_for_stake_address_insert_queries: SizedBatch,
-    /// Get native assets by stake address query.
-    native_assets_by_stake_address_query: PreparedStatement,
-    /// Get registrations
-    registration_from_stake_addr_query: PreparedStatement,
-    /// stake addr from stake hash
-    stake_addr_from_stake_address_query: PreparedStatement,
-    /// stake addr from vote key
-    stake_addr_from_vote_key_query: PreparedStatement,
-    /// Get invalid registrations
-    invalid_registrations_from_stake_addr_query: PreparedStatement,
-    /// Insert Sync Status update.
-    sync_status_insert: PreparedStatement,
-    /// Get Catalyst ID by stake address.
-    catalyst_id_by_stake_address_query: PreparedStatement,
-    /// Get Catalyst ID by transaction ID.
-    catalyst_id_by_transaction_id_query: PreparedStatement,
-    /// Get RBAC registrations by Catalyst ID.
-    rbac_registrations_by_catalyst_id_query: PreparedStatement,
-    /// Get invalid RBAC registrations by Catalyst ID.
-    rbac_invalid_registrations_by_catalyst_id_query: PreparedStatement,
-    /// Get all registrations for snapshot
-    get_all_registrations_query: PreparedStatement,
-    /// Get all invalid registrations for snapshot
-    get_all_invalid_registrations_query: PreparedStatement,
+/// Implement Query trait for batched types
+#[macro_export]
+macro_rules! impl_query_batch {
+    ($i:ty, $c:ident) => {
+        impl $crate::db::index::queries::Query for $i {
+
+            const QUERY_STR: &'static str = $c;
+
+            async fn prepare_query(
+                session: &std::sync::Arc<scylla::Session>,
+                cfg: &$crate::settings::cassandra_db::EnvVars,
+            ) -> anyhow::Result<$crate::db::index::queries::QueryKind> {
+                $crate::db::index::queries::prepare_batch(
+                    session.clone(),
+                    $c,
+                    cfg,
+                    scylla::statement::Consistency::Any,
+                    true,
+                    false,
+                )
+                .await
+                .map($crate::db::index::queries::QueryKind::Batch)
+                .inspect_err(|error| error!(error=%error,"Failed to prepare $c Query."))
+                .map_err(|error| anyhow::anyhow!("{error}\n--\n{{$c}}"))
+            }
+        }
+
+        $crate::impl_display_for_query_type!($i);
+    };
+}
+
+/// Implement Query trait for statement types
+#[macro_export]
+macro_rules! impl_query_statement {
+    ($i:ty, $c:ident) => {
+        impl $crate::db::index::queries::Query for $i {
+
+            const QUERY_STR: &'static str = $c;
+
+            async fn prepare_query(
+                session: &std::sync::Arc<scylla::Session>,
+                _: &$crate::settings::cassandra_db::EnvVars,
+            ) -> anyhow::Result<$crate::db::index::queries::QueryKind> {
+
+                $crate::db::index::queries::prepare_statement(
+                    session,
+                    $c,
+                    scylla::statement::Consistency::All,
+                    true,
+                )
+                    .await
+                    .map($crate::db::index::queries::QueryKind::Statement)
+                    .inspect_err(|error| error!(error=%error, "Failed to prepare $c query."))
+                    .map_err(|error| anyhow::anyhow!("{error}\n--\n{{$c}}"))
+
+            }
+        }
+
+        $crate::impl_display_for_query_type!($i);
+    };
+}
+
+/// Prepare Queries
+pub(crate) async fn prepare_queries(
+    session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+) -> anyhow::Result<DashMap<TypeId, QueryKind>> {
+    // Prepare a query dashmap
+    macro_rules! prepare_q {
+        ( $( $i:ty),* ) => {
+            {
+                let queries = vec![
+                    $( (<$i as Query>::type_id(), <$i as Query>::prepare_query(session, cfg).await?), )*
+                ];
+                DashMap::from_iter(queries)
+            }
+        }
+    }
+    // WIP: Adding queries as they implement trait
+    let queries = prepare_q!(
+        // prepared batch queries
+        TxiInsertQuery,
+        TxoInsertQuery,
+        TxoAssetInsert,
+        TxoUnstakedInsert,
+        TxoUnstakedAssetInsert,
+        StakeRegistrationInsertQuery,
+        Cip36Insert,
+        Cip36InvalidInsert,
+        Cip36ForVoteKeyInsert,
+        UpdateTxoSpentQuery,
+        Rbac509Insert,
+        Rbac509InvalidInsert,
+        CatalystIdForTxnIdInsert,
+        CatalystIdForStakeAddressInsert,
+        // prepared statement queries
+        GetTxoByStakeAddressQuery,
+        GetTxiByTxnHashesQuery,
+        GetAssetsByStakeAddressQuery,
+        GetRegistrationQuery,
+        GetStakeAddrQuery,
+        GetStakeAddrFromVoteKeyQuery,
+        GetInvalidRegistrationQuery,
+        GetAllRegistrationsQuery,
+        GetAllInvalidRegistrationsQuery,
+        SyncStatusInsertQuery,
+        GetCatalystIdForStakeAddress,
+        GetCatalystIdForTxnId,
+        GetRbac509Registrations,
+        GetRbac509InvalidRegistrations,
+        // purge queries
+        PurgeTxoAdaSelect,
+        PurgeTxoAdaDelete,
+        PurgeTxoAssetsSelect,
+        PurgeTxoAssetsDelete,
+        PurgeTxoUnstakedAdaSelect,
+        PurgeTxoUnstakedAdaDelete,
+        PurgeTxoUnstakedAssetSelect,
+        PurgeTxoUnstakedAssetDelete,
+        PurgeTxiByHashSelect,
+        PurgeTxiByHashDelete,
+        PurgeStakeRegistrationSelect,
+        PurgeStakeRegistrationDelete,
+        PurgeCip36RegistrationSelect,
+        PurgeCip36RegistrationDelete,
+        PurgeCip36RegistrationInvalidSelect,
+        PurgeCip36RegistrationInvalidDelete,
+        PurgeCip36RegistrationForVoteKeySelect,
+        PurgeCip36RegistrationForVoteKeyDelete,
+        PurgeRbacRegistrationSelect,
+        PurgeRbacRegistrationDelete,
+        PurgeRbacRegistrationInvalidSelect,
+        PurgeRbacRegistrationInvalidDelete,
+        PurgeCatalystIdForTxnIdSelect,
+        PurgeCatalystIdForTxnIdDelete,
+        PurgeCatalystIdForStakeAddressSelect,
+        PurgeCatalystIdForStakeAddressDelete
+    );
+    Ok(queries)
+}
+
+/// Prepares a statement.
+pub(crate) async fn prepare_statement<Q: std::fmt::Display>(
+    session: &Arc<Session>, query: Q, consistency: scylla::statement::Consistency, idempotent: bool,
+) -> anyhow::Result<PreparedStatement> {
+    let mut prepared = session.prepare(format!("{query}")).await?;
+    prepared.set_consistency(consistency);
+    prepared.set_is_idempotent(idempotent);
+
+    Ok(prepared)
+}
+
+/// Prepares all permutations of the batch from 1 to max.
+/// It is necessary to do this because batches are pre-sized, they can not be dynamic.
+/// Preparing the batches in advance is a very larger performance increase.
+pub(crate) async fn prepare_batch<Q: std::fmt::Display>(
+    session: Arc<Session>, query: Q, cfg: &cassandra_db::EnvVars,
+    consistency: scylla::statement::Consistency, idempotent: bool, logged: bool,
+) -> anyhow::Result<SizedBatch> {
+    let sized_batches: SizedBatch = DashMap::new();
+
+    // First prepare the query. Only needs to be done once, all queries on a batch are the
+    // same.
+    let prepared = prepare_statement(&session, query, consistency, idempotent).await?;
+
+    for batch_size in cassandra_db::MIN_BATCH_SIZE..=cfg.max_batch_size {
+        let mut batch: Batch = Batch::new(if logged {
+            scylla::batch::BatchType::Logged
+        } else {
+            scylla::batch::BatchType::Unlogged
+        });
+        batch.set_consistency(consistency);
+        batch.set_is_idempotent(idempotent);
+        for _ in cassandra_db::MIN_BATCH_SIZE..=batch_size {
+            batch.append_statement(prepared.clone());
+        }
+
+        sized_batches.insert(batch_size.try_into()?, Arc::new(batch));
+    }
+
+    Ok(sized_batches)
 }
 
 /// A set of query responses that can fail.
 pub(crate) type FallibleQueryResults = anyhow::Result<Vec<QueryResult>>;
 /// A set of query responses from tasks that can fail.
 pub(crate) type FallibleQueryTasks = Vec<tokio::task::JoinHandle<FallibleQueryResults>>;
-
-impl PreparedQueries {
-    /// Create new prepared queries for a given session.
-    #[allow(clippy::too_many_lines)]
-    pub(crate) async fn new(
-        session: Arc<Session>, cfg: &cassandra_db::EnvVars,
-    ) -> anyhow::Result<Self> {
-        // We initialize like this, so that all errors preparing querys get shown before aborting.
-        let txi_insert_queries = TxiInsertQuery::prepare_batch(&session, cfg).await?;
-        let all_txo_queries = TxoInsertQuery::prepare_batch(&session, cfg).await;
-        let stake_registration_insert_queries =
-            CertInsertQuery::prepare_batch(&session, cfg).await?;
-        let all_cip36_queries = Cip36InsertQuery::prepare_batch(&session, cfg).await;
-        let txo_spent_update_queries =
-            UpdateTxoSpentQuery::prepare_batch(session.clone(), cfg).await?;
-        let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;
-        let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(session.clone()).await;
-        let all_rbac_queries = Rbac509InsertQuery::prepare_batch(&session, cfg).await;
-        let native_assets_by_stake_address_query =
-            GetAssetsByStakeAddressQuery::prepare(session.clone()).await;
-        let registration_from_stake_addr_query =
-            GetRegistrationQuery::prepare(session.clone()).await;
-        let stake_addr_from_stake_address = GetStakeAddrQuery::prepare(session.clone()).await;
-        let stake_addr_from_vote_key = GetStakeAddrFromVoteKeyQuery::prepare(session.clone()).await;
-        let invalid_registrations = GetInvalidRegistrationQuery::prepare(session.clone()).await;
-        let get_all_registrations_query = GetAllRegistrationsQuery::prepare(session.clone()).await;
-        let get_all_invalid_registrations_query =
-            GetAllInvalidRegistrationsQuery::prepare(session.clone()).await;
-        let sync_status_insert = SyncStatusInsertQuery::prepare(session.clone()).await?;
-        let catalyst_id_by_stake_address_query =
-            get_catalyst_id_from_stake_address::Query::prepare(session.clone()).await?;
-        let catalyst_id_by_transaction_id_query =
-            get_catalyst_id_from_transaction_id::Query::prepare(session.clone()).await?;
-        let rbac_registrations_by_catalyst_id_query =
-            get_rbac_registrations::Query::prepare(session.clone()).await?;
-        let rbac_invalid_registrations_by_catalyst_id_query =
-            get_rbac_invalid_registrations::Query::prepare(session.clone()).await?;
-
-        let (
-            txo_insert_queries,
-            unstaked_txo_insert_queries,
-            txo_asset_insert_queries,
-            unstaked_txo_asset_insert_queries,
-        ) = all_txo_queries?;
-
-        let (
-            cip36_registration_insert_queries,
-            cip36_registration_error_insert_queries,
-            cip36_registration_for_vote_key_insert_queries,
-        ) = all_cip36_queries?;
-
-        let (
-            rbac509_registration_insert_queries,
-            rbac509_invalid_registration_insert_queries,
-            catalyst_id_for_txn_id_insert_queries,
-            catalyst_id_for_stake_address_insert_queries,
-        ) = all_rbac_queries?;
-
-        Ok(Self {
-            txo_insert_queries,
-            txo_asset_insert_queries,
-            unstaked_txo_insert_queries,
-            unstaked_txo_asset_insert_queries,
-            txi_insert_queries,
-            stake_registration_insert_queries,
-            cip36_registration_insert_queries,
-            cip36_registration_error_insert_queries,
-            cip36_registration_for_vote_key_insert_queries,
-            txo_spent_update_queries,
-            txo_by_stake_address_query: txo_by_stake_address_query?,
-            txi_by_txn_hash_query: txi_by_txn_hash_query?,
-            rbac509_registration_insert_queries,
-            rbac509_invalid_registration_insert_queries,
-            catalyst_id_for_txn_id_insert_queries,
-            catalyst_id_for_stake_address_insert_queries,
-            native_assets_by_stake_address_query: native_assets_by_stake_address_query?,
-            registration_from_stake_addr_query: registration_from_stake_addr_query?,
-            stake_addr_from_stake_address_query: stake_addr_from_stake_address?,
-            stake_addr_from_vote_key_query: stake_addr_from_vote_key?,
-            invalid_registrations_from_stake_addr_query: invalid_registrations?,
-            sync_status_insert,
-            rbac_registrations_by_catalyst_id_query,
-            rbac_invalid_registrations_by_catalyst_id_query,
-            catalyst_id_by_stake_address_query,
-            catalyst_id_by_transaction_id_query,
-            get_all_registrations_query: get_all_registrations_query?,
-            get_all_invalid_registrations_query: get_all_invalid_registrations_query?,
-        })
-    }
-
-    /// Prepares a statement.
-    pub(crate) async fn prepare(
-        session: Arc<Session>, query: &str, consistency: scylla::statement::Consistency,
-        idempotent: bool,
-    ) -> anyhow::Result<PreparedStatement> {
-        let mut prepared = session.prepare(query).await?;
-        prepared.set_consistency(consistency);
-        prepared.set_is_idempotent(idempotent);
-
-        Ok(prepared)
-    }
-
-    /// Prepares all permutations of the batch from 1 to max.
-    /// It is necessary to do this because batches are pre-sized, they can not be dynamic.
-    /// Preparing the batches in advance is a very larger performance increase.
-    pub(crate) async fn prepare_batch(
-        session: Arc<Session>, query: &str, cfg: &cassandra_db::EnvVars,
-        consistency: scylla::statement::Consistency, idempotent: bool, logged: bool,
-    ) -> anyhow::Result<SizedBatch> {
-        let sized_batches: SizedBatch = SkipMap::new();
-
-        // First prepare the query. Only needs to be done once, all queries on a batch are the
-        // same.
-        let prepared = Self::prepare(session, query, consistency, idempotent).await?;
-
-        for batch_size in cassandra_db::MIN_BATCH_SIZE..=cfg.max_batch_size {
-            let mut batch: Batch = Batch::new(if logged {
-                scylla::batch::BatchType::Logged
-            } else {
-                scylla::batch::BatchType::Unlogged
-            });
-            batch.set_consistency(consistency);
-            batch.set_is_idempotent(idempotent);
-            for _ in cassandra_db::MIN_BATCH_SIZE..=batch_size {
-                batch.append_statement(prepared.clone());
-            }
-
-            sized_batches.insert(batch_size.try_into()?, Arc::new(batch));
-        }
-
-        Ok(sized_batches)
-    }
-
-    /// Executes a single query with the given parameters.
-    ///
-    /// Returns no data, and an error if the query fails.
-    pub(crate) async fn execute_upsert<P>(
-        &self, session: Arc<Session>, upsert_query: PreparedUpsertQuery, params: P,
-    ) -> anyhow::Result<()>
-    where P: SerializeRow {
-        let prepared_stmt = match upsert_query {
-            PreparedUpsertQuery::SyncStatusInsert => &self.sync_status_insert,
-        };
-
-        session
-            .execute_unpaged(prepared_stmt, params)
-            .await
-            .map_err(|e| {
-                match e {
-                    QueryError::ConnectionPoolError(err) => {
-                        set_index_db_liveness(false);
-                        error!(error = %err, "Index DB connection failed. Liveness set to false.");
-                        CassandraSessionError::ConnectionUnavailable { source: err.into() }.into()
-                    },
-                    _ => anyhow::anyhow!(e),
-                }
-            })?;
-
-        Ok(())
-    }
-
-    /// Executes a select query with the given parameters.
-    ///
-    /// Returns an iterator that iterates over all the result pages that the query
-    /// returns.
-    pub(crate) async fn execute_iter<P>(
-        &self, session: Arc<Session>, select_query: PreparedSelectQuery, params: P,
-    ) -> anyhow::Result<QueryPager>
-    where P: SerializeRow {
-        let prepared_stmt = match select_query {
-            PreparedSelectQuery::TxoByStakeAddress => &self.txo_by_stake_address_query,
-            PreparedSelectQuery::TxiByTransactionHash => &self.txi_by_txn_hash_query,
-            PreparedSelectQuery::AssetsByStakeAddress => &self.native_assets_by_stake_address_query,
-            PreparedSelectQuery::RegistrationFromStakeAddr => {
-                &self.registration_from_stake_addr_query
-            },
-            PreparedSelectQuery::StakeAddrFromStakeHash => {
-                &self.stake_addr_from_stake_address_query
-            },
-            PreparedSelectQuery::StakeAddrFromVoteKey => &self.stake_addr_from_vote_key_query,
-            PreparedSelectQuery::InvalidRegistrationsFromStakeAddr => {
-                &self.invalid_registrations_from_stake_addr_query
-            },
-            PreparedSelectQuery::RbacRegistrationsByCatalystId => {
-                &self.rbac_registrations_by_catalyst_id_query
-            },
-            PreparedSelectQuery::RbacInvalidRegistrationsByCatalystId => {
-                &self.rbac_invalid_registrations_by_catalyst_id_query
-            },
-            PreparedSelectQuery::CatalystIdByTransactionId => {
-                &self.catalyst_id_by_transaction_id_query
-            },
-            PreparedSelectQuery::CatalystIdByStakeAddress => {
-                &self.catalyst_id_by_stake_address_query
-            },
-            PreparedSelectQuery::GetAllRegistrations => &self.get_all_registrations_query,
-            PreparedSelectQuery::GetAllInvalidRegistrations => {
-                &self.get_all_invalid_registrations_query
-            },
-        };
-        session_execute_iter(session, prepared_stmt, params).await
-    }
-
-    /// Execute a Batch query with the given parameters.
-    ///
-    /// Values should be a Vec of values which implement `SerializeRow` and they MUST be
-    /// the same, and must match the query being executed.
-    ///
-    /// This will divide the batch into optimal sized chunks and execute them until all
-    /// values have been executed or the first error is encountered.
-    pub(crate) async fn execute_batch<T: SerializeRow + Debug>(
-        &self, session: Arc<Session>, cfg: Arc<cassandra_db::EnvVars>, query: PreparedQuery,
-        values: Vec<T>,
-    ) -> FallibleQueryResults {
-        let query_map = match query {
-            PreparedQuery::TxoAdaInsertQuery => &self.txo_insert_queries,
-            PreparedQuery::TxoAssetInsertQuery => &self.txo_asset_insert_queries,
-            PreparedQuery::UnstakedTxoAdaInsertQuery => &self.unstaked_txo_insert_queries,
-            PreparedQuery::UnstakedTxoAssetInsertQuery => &self.unstaked_txo_asset_insert_queries,
-            PreparedQuery::TxiInsertQuery => &self.txi_insert_queries,
-            PreparedQuery::StakeRegistrationInsertQuery => &self.stake_registration_insert_queries,
-            PreparedQuery::Cip36RegistrationInsertQuery => &self.cip36_registration_insert_queries,
-            PreparedQuery::Cip36RegistrationInsertErrorQuery => {
-                &self.cip36_registration_error_insert_queries
-            },
-            PreparedQuery::Cip36RegistrationForVoteKeyInsertQuery => {
-                &self.cip36_registration_for_vote_key_insert_queries
-            },
-            PreparedQuery::TxoSpentUpdateQuery => &self.txo_spent_update_queries,
-            PreparedQuery::Rbac509InsertQuery => &self.rbac509_registration_insert_queries,
-            PreparedQuery::Rbac509InvalidInsertQuery => {
-                &self.rbac509_invalid_registration_insert_queries
-            },
-            PreparedQuery::CatalystIdForTxnIdInsertQuery => {
-                &self.catalyst_id_for_txn_id_insert_queries
-            },
-            PreparedQuery::CatalystIdForStakeAddressInsertQuery => {
-                &self.catalyst_id_for_stake_address_insert_queries
-            },
-        };
-        session_execute_batch(session, query_map, cfg, query, values).await
-    }
-}
 
 /// Execute a Batch query with the given parameters.
 ///
@@ -438,7 +349,7 @@ impl PreparedQueries {
 ///
 /// This will divide the batch into optimal sized chunks and execute them until all
 /// values have been executed or the first error is encountered.
-async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
+pub(crate) async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
     session: Arc<Session>, query_map: &SizedBatch, cfg: Arc<cassandra_db::EnvVars>, query: Q,
     values: Vec<T>,
 ) -> FallibleQueryResults {
@@ -498,4 +409,28 @@ where P: SerializeRow {
                 e.into()
             }
         })
+}
+
+/// Executes a single query with the given parameters.
+///
+/// Returns no data, and an error if the query fails.
+pub(crate) async fn session_execute_upsert<P>(
+    session: Arc<Session>, prepared_stmt: &PreparedStatement, params: P,
+) -> anyhow::Result<()>
+where P: SerializeRow {
+    session
+        .execute_unpaged(prepared_stmt, params)
+        .await
+        .map_err(|e| {
+            match e {
+                QueryError::ConnectionPoolError(err) => {
+                    set_index_db_liveness(false);
+                    error!(error = %err, "Index DB connection failed. Liveness set to false.");
+                    CassandraSessionError::ConnectionUnavailable { source: err.into() }.into()
+                },
+                _ => anyhow::anyhow!(e),
+            }
+        })?;
+
+    Ok(())
 }

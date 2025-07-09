@@ -12,6 +12,7 @@ use crate::{
         index::queries::{PreparedQueries, SizedBatch},
         types::{DbCatalystId, DbTransactionId},
     },
+    impl_query_batch,
     settings::cassandra_db::EnvVars,
 };
 
@@ -20,26 +21,28 @@ const QUERY: &str = include_str!("cql/insert_catalyst_id_for_txn_id.cql");
 
 /// Insert Catalyst ID For Transaction ID Query Parameters
 #[derive(SerializeRow)]
-pub(crate) struct Params {
+pub(crate) struct CatalystIdForTxnIdInsert {
     /// A transaction hash.
     txn_id: DbTransactionId,
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
 }
 
-impl Debug for Params {
+impl_query_batch!(CatalystIdForTxnIdInsert, QUERY);
+
+impl Debug for CatalystIdForTxnIdInsert {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Params")
+        f.debug_struct("CatalystIdForTxnIdInsert")
             .field("txn_id", &self.txn_id)
             .field("catalyst_id", &self.catalyst_id)
             .finish()
     }
 }
 
-impl Params {
+impl CatalystIdForTxnIdInsert {
     /// Creates a new record for this transaction.
     pub(crate) fn new(catalyst_id: CatalystId, txn_id: TransactionId) -> Self {
-        Params {
+        CatalystIdForTxnIdInsert {
             txn_id: txn_id.into(),
             catalyst_id: catalyst_id.into(),
         }

@@ -1,6 +1,6 @@
 //! Insert CIP36 Registration Query
 
-use std::{fmt::Debug, sync::Arc};
+use std::{fmt, sync::Arc};
 
 use cardano_blockchain_types::{Cip36, Slot, TxnIndex, VotingPubKey};
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
@@ -11,6 +11,7 @@ use crate::{
         index::queries::{PreparedQueries, SizedBatch},
         types::{DbSlot, DbTxnIndex},
     },
+    impl_query_batch,
     settings::cassandra_db,
 };
 
@@ -19,7 +20,7 @@ const INSERT_CIP36_REGISTRATION_QUERY: &str = include_str!("./cql/insert_cip36.c
 
 /// Insert CIP-36 Registration Query Parameters
 #[derive(SerializeRow, Clone)]
-pub(crate) struct Params {
+pub(crate) struct Cip36Insert {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
     stake_public_key: Vec<u8>,
     /// Nonce value after normalization.
@@ -40,13 +41,15 @@ pub(crate) struct Params {
     cip36: bool,
 }
 
-impl Debug for Params {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl_query_batch!(Cip36Insert, INSERT_CIP36_REGISTRATION_QUERY);
+
+impl fmt::Debug for Cip36Insert {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let payment_address = match self.payment_address {
             MaybeUnset::Unset => "UNSET",
             MaybeUnset::Set(ref v) => &hex::encode(v),
         };
-        f.debug_struct("Params")
+        f.debug_struct("Cip36Insert")
             .field("stake_public_key", &self.stake_public_key)
             .field("nonce", &self.nonce)
             .field("slot_no", &self.slot_no)
@@ -60,7 +63,7 @@ impl Debug for Params {
     }
 }
 
-impl Params {
+impl Cip36Insert {
     /// Create a new Insert Query.
     pub fn new(vote_key: &VotingPubKey, slot_no: Slot, txn_index: TxnIndex, cip36: &Cip36) -> Self {
         let stake_public_key = cip36
@@ -73,7 +76,7 @@ impl Params {
             .payment_address()
             .map_or(MaybeUnset::Unset, |a| MaybeUnset::Set(a.to_vec()));
         let is_cip36 = cip36.is_cip36().unwrap_or_default();
-        Params {
+        Cip36Insert {
             stake_public_key,
             nonce: cip36.nonce().unwrap_or_default().into(),
             slot_no: slot_no.into(),
