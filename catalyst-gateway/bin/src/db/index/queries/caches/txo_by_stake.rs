@@ -19,7 +19,7 @@ use crate::{
 static ASSETS_CACHE: LazyLock<Cache<DbStakeAddress, Arc<Vec<GetTxoByStakeAddressQuery>>>> =
     LazyLock::new(|| {
         Cache::builder()
-            .name("Cardano TXO assets")
+            .name("Cardano TXO Assets")
             .eviction_policy(EvictionPolicy::lru())
             .max_capacity(Settings::cardano_assets_cache().utxo_cache_size())
             .build()
@@ -71,7 +71,8 @@ pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
                                 ?txo_update,
                                 %stake_address,
                                 %error,
-                                "TXO Assets Cache lock is poisoned, recovering lock.");
+                                cache_name = ?ASSETS_CACHE.name(),
+                                "RwLock for cache entry is poisoned, recovering.");
                                 txo.value.clear_poison();
                                 error.into_inner()
                             });
