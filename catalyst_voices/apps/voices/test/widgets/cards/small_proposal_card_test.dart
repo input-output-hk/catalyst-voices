@@ -3,6 +3,8 @@ import 'package:catalyst_voices/widgets/cards/proposal/proposal_card_widgets.dar
     show DraftProposalChip, FinalProposalChip, PrivateProposalChip;
 import 'package:catalyst_voices/widgets/cards/proposal/small_proposal_card.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
+    show UserProposalWorkspace;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
@@ -11,7 +13,7 @@ import '../../helpers/helpers.dart';
 
 void main() {
   group('SmallProposalCard', () {
-    late Proposal mockProposal;
+    late UserProposalWorkspace mockProposal;
     late String proposalId;
     late String latestVersion;
     late String localVersion;
@@ -24,13 +26,11 @@ void main() {
       latestVersion = const Uuid().v7();
       await Future.delayed(const Duration(milliseconds: 10), () {});
       localVersion = const Uuid().v7();
-      mockProposal = Proposal(
+      mockProposal = UserProposalWorkspace(
         selfRef: SignedDocumentRef(id: proposalId, version: latestVersion),
         title: 'Test Proposal',
-        description: 'Test Description',
         updateDate: DateTime.now(),
         fundsRequested: const Coin(0),
-        status: ProposalStatus.inProgress,
         publish: ProposalPublish.publishedDraft,
         versions: [
           ProposalVersion(
@@ -46,8 +46,7 @@ void main() {
             createdAt: DateTime.now(),
           ),
         ],
-        duration: 0,
-        author: 'Alex Wells',
+        fundNumber: 14,
         commentsCount: 0,
         category: 'Cardano Use Cases: Concept',
         categoryId: SignedDocumentRef.generateFirstRef(),

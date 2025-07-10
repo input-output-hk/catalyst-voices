@@ -95,14 +95,6 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
     required this.categoryId,
   });
 
-  bool get hasNewerLocalIteration {
-    if (versions.isEmpty) return false;
-    final latestVersion = versions.first;
-    return latestVersion.isLatestVersion(
-      selfRef.version ?? '',
-    );
-  }
-
   @override
   List<Object?> get props => [
         selfRef,

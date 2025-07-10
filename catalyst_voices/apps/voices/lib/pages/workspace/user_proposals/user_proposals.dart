@@ -4,10 +4,11 @@ import 'package:catalyst_voices/pages/workspace/user_proposals/user_proposal_sec
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
 
 class UserProposals extends StatefulWidget {
-  final List<Proposal> items;
+  final List<UserProposalWorkspace> items;
 
   const UserProposals({super.key, required this.items});
 
@@ -28,9 +29,10 @@ class _Header extends StatelessWidget {
 }
 
 class _UserProposalsState extends State<UserProposals> {
-  List<Proposal> get _draft => widget.items.where((e) => e.publish.isDraft).toList();
-  List<Proposal> get _local => widget.items.where((e) => e.publish.isLocal).toList();
-  List<Proposal> get _submitted => widget.items.where((e) => e.publish.isPublished).toList();
+  List<UserProposalWorkspace> get _draft => widget.items.where((e) => e.publish.isDraft).toList();
+  List<UserProposalWorkspace> get _local => widget.items.where((e) => e.publish.isLocal).toList();
+  List<UserProposalWorkspace> get _submitted =>
+      widget.items.where((e) => e.publish.isPublished).toList();
 
   @override
   Widget build(BuildContext context) {
