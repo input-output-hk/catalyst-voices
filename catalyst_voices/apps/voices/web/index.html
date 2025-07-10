@@ -27,9 +27,6 @@
     <meta content="Catalyst Voices" name="apple-mobile-web-app-title">
     <link href="icons/favicon-192.png" rel="apple-touch-icon">
 
-    <!-- Favicon -->
-    <link href="icons/favicon.png" rel="icon" type="image/png">
-
     <title>Catalyst</title>
     <link href="manifest.json" rel="manifest">
     <script src="/assets/packages/catalyst_cardano_web/assets/js/catalyst_cardano.js"
@@ -124,6 +121,29 @@
             srcset="splash/img/dark-1x.png 1x, splash/img/dark-2x.png 2x, splash/img/dark-3x.png 3x, splash/img/dark-4x.png 4x">
     <img alt="" aria-hidden="true" class="center" src="splash/img/light-1x.png">
 </picture>
+
+<script>
+  function setThemeFavicon() {
+    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const faviconPath = isDarkMode ? 'icons/favicon_dark.png' : 'icons/favicon_light.png';
+    
+    const existingFavicons = document.querySelectorAll('link[rel="icon"]');
+    existingFavicons.forEach(favicon => {
+      favicon.remove();
+    });
+    
+    const newFavicon = document.createElement('link');
+    newFavicon.rel = 'icon';
+    newFavicon.href = faviconPath;
+    newFavicon.type = 'image/png';
+    document.head.appendChild(newFavicon);
+  }
+
+  setThemeFavicon();
+
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  mediaQuery.addEventListener('change', setThemeFavicon);
+</script>
 
 <script async="" src="flutter_bootstrap.js"></script>
 
