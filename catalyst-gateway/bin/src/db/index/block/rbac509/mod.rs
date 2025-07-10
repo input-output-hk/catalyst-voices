@@ -18,7 +18,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    rbac_cache::{RbacCacheAddError, RbacCacheAddSuccess, RBAC_CACHE},
+    rbac::{validate_rbac_registration, RbacBlockIndexingContext, RbacValidationError},
     settings::cassandra_db::EnvVars,
 };
 
@@ -64,8 +64,9 @@ impl Rbac509InsertQuery {
     }
 
     /// Index the RBAC 509 registrations in a transaction.
-    pub(crate) fn index(
+    pub(crate) async fn index(
         &mut self, txn_hash: TransactionId, index: TxnIndex, block: &MultiEraBlock,
+        context: &mut RbacBlockIndexingContext,
     ) {
         let slot = block.slot();
         let cip509 = match Cip509::new(block, index, &[]) {
@@ -102,19 +103,38 @@ impl Rbac509InsertQuery {
         }
 
         let previous_transaction = cip509.previous_transaction();
-        match RBAC_CACHE.add(cip509, block.is_immutable()) {
-            Ok(RbacCacheAddSuccess { catalyst_id }) => {
-                self.registrations.push(insert_rbac509::Params::new(
-                    catalyst_id.clone(),
-                    txn_hash,
-                    slot,
-                    index,
-                    previous_transaction,
-                    // TODO: FIXME: This should be fixed along with updating indexing logic.
-                    std::collections::HashSet::new(),
-                ));
+        match Box::pin(validate_rbac_registration(
+            cip509,
+            block.is_immutable(),
+            context,
+        ))
+        .await
+        {
+            // Write updates to the database. There can be multiple updates in one registration
+            // because a new chain can take ownership of stake addresses of the existing chains and
+            // in that case we want to record changes to all those chains as well as the new one.
+            Ok(updates) => {
+                for update in updates {
+                    // In this case the addresses were removed by another chain, so it doesn't make
+                    // sense to include a previous transaction ID unrelated to the chain that is
+                    // being updated.
+                    let previous_transaction = if update.removed_stake_addresses.is_empty() {
+                        previous_transaction
+                    } else {
+                        None
+                    };
+                    self.registrations.push(insert_rbac509::Params::new(
+                        update.catalyst_id.clone(),
+                        txn_hash,
+                        slot,
+                        index,
+                        previous_transaction,
+                        update.removed_stake_addresses,
+                    ));
+                }
             },
-            Err(RbacCacheAddError::InvalidRegistration {
+            // Invalid registrations are being recorded in order to report failure.
+            Err(RbacValidationError::InvalidRegistration {
                 catalyst_id,
                 purpose,
                 report,
@@ -129,8 +149,14 @@ impl Rbac509InsertQuery {
                     &report,
                 ));
             },
-            Err(RbacCacheAddError::UnknownCatalystId) => {
+            // This isn't a hard error because user input can contain invalid information. If there
+            // is no Catalyst ID, then we cannot record this registration as invalid and can only
+            // ignore (and log) it.
+            Err(RbacValidationError::UnknownCatalystId) => {
                 debug!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}");
+            },
+            Err(RbacValidationError::Other(e)) => {
+                error!("Error indexing RBAC registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}: {e:?}");
             },
         }
     }
@@ -175,13 +201,13 @@ mod tests {
         let txn_hash = "1bf8eb4da8fe5910cc890025deb9740ba5fa4fd2ac418ccbebfd6a09ed10e88b"
             .parse()
             .unwrap();
-        query.index(txn_hash, 0.into(), &block);
+        let mut context = RbacBlockIndexingContext::new();
+        Box::pin(query.index(txn_hash, 0.into(), &block, &mut context)).await;
         assert!(query.invalid.is_empty());
         assert_eq!(1, query.registrations.len());
     }
 
-    // The invalid vec is empty in this test because `RBAC_CACHE.add()` returns
-    // `UnknownCatalystId` for that registration.
+    // The invalid vec is empty in this test because it doesn't contain a Catalyst ID.
     #[tokio::test]
     async fn index_invalid() {
         let block = test_utils::block_4();
@@ -189,7 +215,8 @@ mod tests {
         let txn_hash = "337d35026efaa48b5ee092d38419e102add1b535364799eb8adec8ac6d573b79"
             .parse()
             .unwrap();
-        query.index(txn_hash, 0.into(), &block);
+        let mut context = RbacBlockIndexingContext::new();
+        Box::pin(query.index(txn_hash, 0.into(), &block, &mut context)).await;
         assert!(query.registrations.is_empty());
         assert!(query.invalid.is_empty());
     }

@@ -18,6 +18,7 @@ use txi::TxiInsertQuery;
 use txo::TxoInsertQuery;
 
 use super::{queries::FallibleQueryTasks, session::CassandraSession};
+use crate::rbac::RbacBlockIndexingContext;
 
 /// Add all data needed from the block into the indexes.
 pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
@@ -34,6 +35,8 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
     let mut txo_index = TxoInsertQuery::new();
 
     let slot_no = block.point().slot_or_default();
+
+    let mut rbac_context = RbacBlockIndexingContext::new();
 
     // We add all transactions in the block to their respective index data sets.
     for (index, txn) in block.enumerate_txs() {
@@ -55,7 +58,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
         txo_index.index(block.network(), &txn, slot_no, txn_id, index);
 
         // Index RBAC 509 inside the transaction.
-        rbac509_index.index(txn_id, index, block);
+        Box::pin(rbac509_index.index(txn_id, index, block, &mut rbac_context)).await;
     }
 
     // We then execute each batch of data from the block.

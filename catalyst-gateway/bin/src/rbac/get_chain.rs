@@ -4,7 +4,7 @@ use anyhow::{bail, Context, Result};
 use cardano_blockchain_types::{Network, Point, Slot, StakeAddress, TxnIndex};
 use cardano_chain_follower::ChainFollower;
 use catalyst_types::catalyst_id::CatalystId;
-use futures::{future::try_join, FutureExt, StreamExt, TryFutureExt, TryStreamExt};
+use futures::{future::try_join, TryFutureExt, TryStreamExt};
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
 
 use crate::{
@@ -15,7 +15,10 @@ use crate::{
         },
         session::CassandraSession,
     },
-    rbac::{cache_persistent_rbac_chain, chains_cache::cached_persistent_rbac_chain, ChainInfo},
+    rbac::{
+        chains_cache::{cache_persistent_rbac_chain, cached_persistent_rbac_chain},
+        ChainInfo,
+    },
     settings::Settings,
 };
 
@@ -24,6 +27,8 @@ use crate::{
 pub async fn latest_rbac_chain(id: &CatalystId) -> Result<Option<ChainInfo>> {
     let volatile_session =
         CassandraSession::get(false).context("Failed to get volatile Cassandra session")?;
+    // Get the persistent part of the chain and volatile registrations. Both of these parts
+    // can be non-existing.
     let (chain, volatile_regs) = try_join(
         persistent_rbac_chain(id),
         indexed_regs(&volatile_session, id),
@@ -33,6 +38,7 @@ pub async fn latest_rbac_chain(id: &CatalystId) -> Result<Option<ChainInfo>> {
     let mut last_persistent_txn = None;
     let mut last_persistent_slot = 0.into();
 
+    // Either update the persistent chain or build a new one.
     let chain = match chain {
         Some(c) => {
             last_persistent_txn = Some(c.current_tx_id_hash());
@@ -44,6 +50,8 @@ pub async fn latest_rbac_chain(id: &CatalystId) -> Result<Option<ChainInfo>> {
 
     Ok(chain.map(|chain| {
         let last_txn = Some(chain.current_tx_id_hash());
+        // If the last persistent transaction ID is the same as the last one, then there are no
+        // volatile registrations in this chain.
         let last_volatile_txn = if last_persistent_txn == last_txn {
             None
         } else {
@@ -67,10 +75,11 @@ pub async fn latest_rbac_chain_by_address(address: &StakeAddress) -> Result<Opti
     let volatile_session =
         CassandraSession::get(false).context("Failed to get volatile Cassandra session")?;
 
-    let id = match CatalystIdQuery::latest(&volatile_session, address.clone()).await? {
+    // We always check the latest (volatile) data first.
+    let id = match CatalystIdQuery::latest(&volatile_session, address).await? {
         Some(id) => id.catalyst_id,
         None => {
-            match CatalystIdQuery::latest(&persistent_session, address.clone()).await? {
+            match CatalystIdQuery::latest(&persistent_session, address).await? {
                 Some(id) => id.catalyst_id,
                 None => return Ok(None),
             }
@@ -105,7 +114,7 @@ async fn indexed_regs(session: &CassandraSession, id: &CatalystId) -> Result<Vec
 }
 
 /// Builds a chain from the given registrations.
-async fn build_rbac_chain(
+pub async fn build_rbac_chain(
     regs: impl IntoIterator<Item = RbacQuery>,
 ) -> Result<Option<RegistrationChain>> {
     let mut regs = regs.into_iter();
@@ -130,7 +139,7 @@ async fn build_rbac_chain(
 }
 
 /// Applies the given registration to the given chain.
-async fn apply_regs(
+pub async fn apply_regs(
     mut chain: RegistrationChain, regs: impl IntoIterator<Item = RbacQuery>,
 ) -> Result<RegistrationChain> {
     let network = Settings::cardano_network();
@@ -158,7 +167,7 @@ async fn cip509(network: Network, slot: Slot, txn_index: TxnIndex) -> Result<Cip
     if block.point().slot_or_default() != slot {
         // The `ChainFollower::get_block` function can return the next consecutive block if it
         // cannot find the exact one. This shouldn't happen, but we need to check anyway.
-        anyhow::bail!(
+        bail!(
             "Unable to find exact {slot:?} block. Found block slot {:?}",
             block.point().slot_or_default()
         );
