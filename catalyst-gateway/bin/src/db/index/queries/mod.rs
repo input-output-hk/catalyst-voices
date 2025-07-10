@@ -21,7 +21,7 @@ use registrations::{
 };
 use scylla::{
     client::{pager::QueryPager, session::Session},
-    errors::{ExecutionError, PagerExecutionError, PrepareError},
+    errors::{ExecutionError, NextPageError, PagerExecutionError, PrepareError, RequestError},
     response::query_result::QueryResult,
     serialize::row::SerializeRow,
     statement::{batch::Batch, prepared::PreparedStatement},
@@ -283,7 +283,19 @@ impl PreparedQueries {
         session: Arc<Session>, query: &str, consistency: scylla::statement::Consistency,
         idempotent: bool,
     ) -> anyhow::Result<PreparedStatement> {
-        let mut prepared = session.prepare(query).await?;
+        let mut prepared = session
+            .prepare(query)
+            .await
+            .map_err(|e| {
+                match e {
+                    PrepareError::ConnectionPoolError(err) => {
+                        set_index_db_liveness(false);
+                        error!(error = %err, "Index DB connection failed when preparing. Liveness set to false.");
+                        CassandraSessionError::ConnectionUnavailable { source: err.into() }
+                    },
+                    _ => CassandraSessionError::PreparingQueriesFailed { source: e.into() },
+                }
+            })?;
         prepared.set_consistency(consistency);
         prepared.set_is_idempotent(idempotent);
 
@@ -491,12 +503,18 @@ where P: SerializeRow {
         .execute_iter(prepared_stmt.clone(), params)
         .await
         .map_err(|e| {
-            if let PagerExecutionError::PrepareError(PrepareError::ConnectionPoolError(err)) = e {
-                set_index_db_liveness(false);
-                error!(error = %err, "Index DB connection failed. Liveness set to false.");
-                CassandraSessionError::ConnectionUnavailable { source: err.into() }.into()
-            } else {
-                e.into()
+            match e {
+                PagerExecutionError::PrepareError(PrepareError::ConnectionPoolError(err)) => {
+                    set_index_db_liveness(false);
+                    error!(error = %err, "Index DB connection failed when preparing. Liveness set to false.");
+                    CassandraSessionError::ConnectionUnavailable { source: err.into() }.into()
+                },
+                PagerExecutionError::NextPageError(NextPageError::RequestFailure(RequestError::ConnectionPoolError(err))) => {
+                    set_index_db_liveness(false);
+                    error!(error = %err, "Index DB connection failed during request. Liveness set to false.");
+                    CassandraSessionError::ConnectionUnavailable { source: err.into() }.into()
+                },
+                _ => e.into(),
             }
         })
 }
