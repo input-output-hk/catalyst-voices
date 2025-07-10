@@ -9,8 +9,9 @@ use catalyst_signed_doc::CatalystId;
 use futures::{TryFutureExt, TryStreamExt};
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
 use scylla::{
-    prepared_statement::PreparedStatement, statement::Consistency,
-    transport::iterator::TypedRowStream, DeserializeRow, SerializeRow, Session,
+    client::{pager::TypedRowStream, session::Session},
+    statement::{prepared::PreparedStatement, Consistency},
+    DeserializeRow, SerializeRow,
 };
 use tracing::{debug, error};
 

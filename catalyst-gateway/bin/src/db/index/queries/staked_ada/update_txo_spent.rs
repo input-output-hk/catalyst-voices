@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use scylla::{SerializeRow, Session};
+use scylla::{client::session::Session, SerializeRow};
 use tracing::error;
 
 use crate::{

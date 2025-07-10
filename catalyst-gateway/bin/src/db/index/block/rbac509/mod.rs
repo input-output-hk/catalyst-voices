@@ -14,7 +14,7 @@ use cardano_blockchain_types::{
 use catalyst_types::catalyst_id::CatalystId;
 use pallas::ledger::addresses::Address;
 use rbac_registration::cardano::cip509::{Cip509, Cip509RbacMetadata};
-use scylla::Session;
+use scylla::client::session::Session;
 use tracing::{debug, error};
 
 use crate::{
