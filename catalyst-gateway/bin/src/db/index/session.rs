@@ -10,8 +10,12 @@ use std::{
 use cardano_blockchain_types::Network;
 use openssl::ssl::{SslContextBuilder, SslFiletype, SslMethod, SslVerifyMode};
 use scylla::{
-    frame::Compression, serialize::row::SerializeRow, transport::iterator::QueryPager,
-    ExecutionProfile, Session, SessionBuilder,
+    client::{
+        execution_profile::ExecutionProfile, pager::QueryPager, session::Session,
+        session_builder::SessionBuilder,
+    },
+    frame::Compression,
+    serialize::row::SerializeRow,
 };
 use thiserror::Error;
 use tokio::fs;
@@ -277,14 +281,14 @@ fn make_execution_profile(_cfg: &cassandra_db::EnvVars) -> ExecutionProfile {
     ExecutionProfile::builder()
         .consistency(scylla::statement::Consistency::LocalQuorum)
         .serial_consistency(Some(scylla::statement::SerialConsistency::LocalSerial))
-        .retry_policy(Arc::new(scylla::retry_policy::DefaultRetryPolicy::new()))
+        .retry_policy(Arc::new(scylla::policies::retry::DefaultRetryPolicy::new()))
         .load_balancing_policy(
-            scylla::load_balancing::DefaultPolicyBuilder::new()
+            scylla::policies::load_balancing::DefaultPolicyBuilder::new()
                 .permit_dc_failover(true)
                 .build(),
         )
         .speculative_execution_policy(Some(Arc::new(
-            scylla::speculative_execution::SimpleSpeculativeExecutionPolicy {
+            scylla::policies::speculative_execution::SimpleSpeculativeExecutionPolicy {
                 max_retry_count: 3,
                 retry_interval: Duration::from_millis(100),
             },
@@ -325,7 +329,7 @@ async fn make_session(cfg: &cassandra_db::EnvVars) -> anyhow::Result<Arc<Session
 
         let ssl_context = context_builder.build();
 
-        sb = sb.ssl_context(Some(ssl_context));
+        sb = sb.tls_context(Some(ssl_context));
     }
 
     // Set the username and password, if required.

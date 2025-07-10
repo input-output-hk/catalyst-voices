@@ -3,7 +3,7 @@
 use std::sync::Arc;
 
 use cardano_blockchain_types::{Slot, StakeAddress, TxnIndex, TxnOutputOffset};
-use scylla::{SerializeRow, Session};
+use scylla::{client::session::Session, SerializeRow};
 use tracing::error;
 
 use crate::{

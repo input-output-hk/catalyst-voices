@@ -8,8 +8,9 @@ use catalyst_types::catalyst_id::CatalystId;
 use futures::StreamExt;
 use moka::{policy::EvictionPolicy, sync::Cache};
 use scylla::{
-    prepared_statement::PreparedStatement, statement::Consistency,
-    transport::iterator::TypedRowStream, DeserializeRow, SerializeRow, Session,
+    client::{pager::TypedRowStream, session::Session},
+    statement::{prepared::PreparedStatement, Consistency},
+    DeserializeRow, SerializeRow,
 };
 use tracing::error;
 

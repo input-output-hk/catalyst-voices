@@ -4,7 +4,9 @@ use std::{sync::Arc, time::SystemTime};
 
 use cardano_blockchain_types::Slot;
 use row::SyncStatusQueryParams;
-use scylla::{frame::value::CqlTimestamp, prepared_statement::PreparedStatement, Session};
+use scylla::{
+    client::session::Session, statement::prepared::PreparedStatement, value::CqlTimestamp,
+};
 use tokio::task;
 use tracing::{debug, error, warn};
 
@@ -22,7 +24,7 @@ const INSERT_SYNC_STATUS_QUERY: &str = include_str!("../cql/insert_sync_status.c
 
 /// Sync Status Row Record Module
 pub(crate) mod row {
-    use scylla::{frame::value::CqlTimestamp, DeserializeRow, SerializeRow};
+    use scylla::{value::CqlTimestamp, DeserializeRow, SerializeRow};
 
     use crate::db::types::DbSlot;
 

@@ -20,11 +20,11 @@ use registrations::{
     get_invalid::GetInvalidRegistrationQuery,
 };
 use scylla::{
-    batch::Batch,
-    prepared_statement::PreparedStatement,
+    client::{pager::QueryPager, session::Session},
+    errors::{ExecutionError, PagerExecutionError, PrepareError},
+    response::query_result::QueryResult,
     serialize::row::SerializeRow,
-    transport::{errors::QueryError, iterator::QueryPager},
-    QueryResult, Session,
+    statement::{batch::Batch, prepared::PreparedStatement},
 };
 use staked_ada::{
     get_assets_by_stake_address::GetAssetsByStakeAddressQuery,
@@ -305,9 +305,9 @@ impl PreparedQueries {
 
         for batch_size in cassandra_db::MIN_BATCH_SIZE..=cfg.max_batch_size {
             let mut batch: Batch = Batch::new(if logged {
-                scylla::batch::BatchType::Logged
+                scylla::statement::batch::BatchType::Logged
             } else {
-                scylla::batch::BatchType::Unlogged
+                scylla::statement::batch::BatchType::Unlogged
             });
             batch.set_consistency(consistency);
             batch.set_is_idempotent(idempotent);
@@ -337,7 +337,7 @@ impl PreparedQueries {
             .await
             .map_err(|e| {
                 match e {
-                    QueryError::ConnectionPoolError(err) => {
+                    ExecutionError::ConnectionPoolError(err) => {
                         set_index_db_liveness(false);
                         error!(error = %err, "Index DB connection failed. Liveness set to false.");
                         CassandraSessionError::ConnectionUnavailable { source: err.into() }.into()
@@ -458,15 +458,15 @@ async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
         let batch_query_statements = batch_query.value().clone();
         match session.batch(&batch_query_statements, chunk).await {
             Ok(result) => results.push(result),
-            Err(err) => {
+            Err(error) => {
                 let chunk_str = format!("{chunk:?}");
-                if let QueryError::ConnectionPoolError(_) = err {
+                if let ExecutionError::ConnectionPoolError(err) = error {
                     set_index_db_liveness(false);
                     error!(error=%err, query=query_str, chunk=chunk_str, "Index DB connection failed. Liveness set to false.");
                     bail!(CassandraSessionError::ConnectionUnavailable { source: err.into() })
                 };
-                error!(error=%err, query=query_str, chunk=chunk_str, "Query Execution Failed");
-                errors.push(err);
+                error!(%error, query=query_str, chunk=chunk_str, "Query Execution Failed");
+                errors.push(error);
                 // Defer failure until all batches have been processed.
             },
         }
@@ -491,7 +491,7 @@ where P: SerializeRow {
         .execute_iter(prepared_stmt.clone(), params)
         .await
         .map_err(|e| {
-            if let QueryError::ConnectionPoolError(err) = e {
+            if let PagerExecutionError::PrepareError(PrepareError::ConnectionPoolError(err)) = e {
                 set_index_db_liveness(false);
                 error!(error = %err, "Index DB connection failed. Liveness set to false.");
                 CassandraSessionError::ConnectionUnavailable { source: err.into() }.into()
