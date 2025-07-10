@@ -50,7 +50,7 @@ pub async fn latest_rbac_chain(id: &CatalystId) -> Result<Option<ChainInfo>> {
 
     Ok(chain.map(|chain| {
         let last_txn = Some(chain.current_tx_id_hash());
-        // If the last persistent transaction ID is the same is the last one, then there are no
+        // If the last persistent transaction ID is the same as the last one, then there are no
         // volatile registrations in this chain.
         let last_volatile_txn = if last_persistent_txn == last_txn {
             None
