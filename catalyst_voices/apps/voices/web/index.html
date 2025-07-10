@@ -128,22 +128,6 @@
     <img alt="" aria-hidden="true" class="center" src="splash/img/light-1x.png">
 </picture>
 
-<script>
-  const faviconEl = document.querySelector('link[rel="icon"]')
-
-  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-  mediaQuery.addEventListener('change', themeChange)
-
-  function themeChange(event) {
-    if (event.matches) {
-      faviconEl.setAttribute('href', 'icons/favicon_dark.png')
-    } else {
-      faviconEl.setAttribute('href', 'icons/favicon_light.png')
-    }
-  }
-
-</script>
-
 <script async="" src="flutter_bootstrap.js"></script>
 
 </body>
