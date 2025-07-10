@@ -22,7 +22,7 @@ use crate::{
         get_chain::{apply_regs, build_rbac_chain, persistent_rbac_chain},
         latest_rbac_chain,
         validation_result::RbacUpdate,
-        RbacIndexingContext, RbacValidationError, RbacValidationResult,
+        RbacBlockIndexingContext, RbacValidationError, RbacValidationResult,
     },
 };
 
@@ -32,7 +32,7 @@ use crate::{
 /// In case of failure a problem report from the given registration is updated and
 /// returned.
 pub async fn validate_rbac_registration(
-    reg: Cip509, is_persistent: bool, context: &mut RbacIndexingContext,
+    reg: Cip509, is_persistent: bool, context: &mut RbacBlockIndexingContext,
 ) -> RbacValidationResult {
     match reg.previous_transaction() {
         Some(previous_txn) => update_chain(reg, previous_txn, is_persistent, context).await,
@@ -43,7 +43,7 @@ pub async fn validate_rbac_registration(
 /// Tries to update an existing RBAC chain.
 async fn update_chain(
     reg: Cip509, previous_txn: TransactionId, is_persistent: bool,
-    context: &mut RbacIndexingContext,
+    context: &mut RbacBlockIndexingContext,
 ) -> RbacValidationResult {
     let purpose = reg.purpose();
     let report = reg.report().to_owned();
@@ -132,7 +132,7 @@ async fn update_chain(
 
 /// Tries to start a new RBAC chain.
 async fn start_new_chain(
-    reg: Cip509, is_persistent: bool, context: &mut RbacIndexingContext,
+    reg: Cip509, is_persistent: bool, context: &mut RbacBlockIndexingContext,
 ) -> RbacValidationResult {
     let catalyst_id = reg.catalyst_id().cloned();
     let purpose = reg.purpose();
@@ -245,7 +245,7 @@ async fn start_new_chain(
 
 /// Returns a Catalyst ID corresponding to the given transaction hash.
 async fn catalyst_id_from_txn_id(
-    txn_id: TransactionId, is_persistent: bool, context: &mut RbacIndexingContext,
+    txn_id: TransactionId, is_persistent: bool, context: &mut RbacBlockIndexingContext,
 ) -> Result<Option<CatalystId>> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::Query;
 
@@ -276,7 +276,7 @@ async fn catalyst_id_from_txn_id(
 /// Returns either persistent or "latest" (persistent + volatile) registration chain for
 /// the given Catalyst ID.
 async fn chain(
-    id: &CatalystId, is_persistent: bool, context: &mut RbacIndexingContext,
+    id: &CatalystId, is_persistent: bool, context: &mut RbacBlockIndexingContext,
 ) -> Result<Option<RegistrationChain>> {
     let chain = if is_persistent {
         persistent_rbac_chain(id).await?
@@ -298,7 +298,7 @@ async fn chain(
 
 /// Returns a Catalyst ID corresponding to the given stake address.
 async fn catalyst_id_from_stake_address(
-    address: &StakeAddress, is_persistent: bool, context: &mut RbacIndexingContext,
+    address: &StakeAddress, is_persistent: bool, context: &mut RbacBlockIndexingContext,
 ) -> Result<Option<CatalystId>> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_stake_address::Query;
 
@@ -330,7 +330,7 @@ async fn catalyst_id_from_stake_address(
 /// other chain. Returns a list of public keys in the registration.
 async fn validate_public_keys(
     chain: &RegistrationChain, is_persistent: bool, report: &ProblemReport,
-    context: &mut RbacIndexingContext,
+    context: &mut RbacBlockIndexingContext,
 ) -> Result<Vec<VerifyingKey>> {
     let mut keys = Vec::new();
 
@@ -357,7 +357,7 @@ async fn validate_public_keys(
 
 /// Returns a Catalyst ID corresponding to the given public key.
 async fn catalyst_id_from_public_key(
-    key: VerifyingKey, is_persistent: bool, context: &mut RbacIndexingContext,
+    key: VerifyingKey, is_persistent: bool, context: &mut RbacBlockIndexingContext,
 ) -> Result<Option<CatalystId>> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_public_key::Query;
 
@@ -390,7 +390,7 @@ async fn catalyst_id_from_public_key(
 /// This function behaves in the same way as `latest_rbac_chain(...).is_some()` but the
 /// implementation is more optimized because we don't need to build the whole chain.
 pub async fn is_chain_known(
-    id: &CatalystId, is_persistent: bool, context: &mut RbacIndexingContext,
+    id: &CatalystId, is_persistent: bool, context: &mut RbacBlockIndexingContext,
 ) -> Result<bool> {
     if context.find_registrations(id).is_some() {
         return Ok(true);

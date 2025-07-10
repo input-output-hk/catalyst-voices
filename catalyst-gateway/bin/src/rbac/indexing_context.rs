@@ -15,7 +15,7 @@ use crate::db::index::queries::rbac::get_rbac_registrations::Query as RbacQuery;
 /// validating subsequent transactions we wouldn't be able to find information about the
 /// previous ones in the database. This context is used to hold such information during
 /// block processing in order to mitigate that issue.
-pub struct RbacIndexingContext {
+pub struct RbacBlockIndexingContext {
     /// A map containing pending data that will be written in the `catalyst_id_for_txn_id`
     /// table.
     transactions: HashMap<TransactionId, CatalystId>,
@@ -30,7 +30,7 @@ pub struct RbacIndexingContext {
     registrations: HashMap<CatalystId, Vec<RbacQuery>>,
 }
 
-impl RbacIndexingContext {
+impl RbacBlockIndexingContext {
     /// Creates a new context issue.
     pub fn new() -> Self {
         let transactions = HashMap::new();

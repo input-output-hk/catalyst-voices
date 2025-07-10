@@ -18,7 +18,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    rbac::{validate_rbac_registration, RbacIndexingContext, RbacValidationError},
+    rbac::{validate_rbac_registration, RbacBlockIndexingContext, RbacValidationError},
     settings::cassandra_db::EnvVars,
 };
 
@@ -66,7 +66,7 @@ impl Rbac509InsertQuery {
     /// Index the RBAC 509 registrations in a transaction.
     pub(crate) async fn index(
         &mut self, txn_hash: TransactionId, index: TxnIndex, block: &MultiEraBlock,
-        context: &mut RbacIndexingContext,
+        context: &mut RbacBlockIndexingContext,
     ) {
         let slot = block.slot();
         let cip509 = match Cip509::new(block, index, &[]) {
@@ -201,7 +201,7 @@ mod tests {
         let txn_hash = "1bf8eb4da8fe5910cc890025deb9740ba5fa4fd2ac418ccbebfd6a09ed10e88b"
             .parse()
             .unwrap();
-        let mut context = RbacIndexingContext::new();
+        let mut context = RbacBlockIndexingContext::new();
         Box::pin(query.index(txn_hash, 0.into(), &block, &mut context)).await;
         assert!(query.invalid.is_empty());
         assert_eq!(1, query.registrations.len());
@@ -215,7 +215,7 @@ mod tests {
         let txn_hash = "337d35026efaa48b5ee092d38419e102add1b535364799eb8adec8ac6d573b79"
             .parse()
             .unwrap();
-        let mut context = RbacIndexingContext::new();
+        let mut context = RbacBlockIndexingContext::new();
         Box::pin(query.index(txn_hash, 0.into(), &block, &mut context)).await;
         assert!(query.registrations.is_empty());
         assert!(query.invalid.is_empty());
