@@ -9,10 +9,11 @@ import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class SmallProposalCard extends StatelessWidget {
-  final Proposal proposal;
+  final UserProposalWorkspace proposal;
   final bool showLatestLocal;
 
   const SmallProposalCard({
@@ -60,13 +61,13 @@ class SmallProposalCard extends StatelessWidget {
               ),
             ),
             Offstage(
-              offstage: !proposal.versions.hasLatestLocalDraft(proposal.selfRef.version) ||
-                  !showLatestLocal,
+              offstage: !proposal.hasNewerLocalIteration || !showLatestLocal,
               child: _NewIterationDetails(
-                title: proposal.title,
-                iteration: proposal.versionCount,
-                datetime: proposal.updateDate,
-                ref: proposal.selfRef,
+                title: proposal.versions.latest.title,
+                iteration:
+                    proposal.versions.versionNumber(proposal.versions.latest.selfRef.version ?? ''),
+                datetime: proposal.versions.latest.createdAt,
+                ref: proposal.versions.latest.selfRef,
               ),
             ),
             const SizedBox(height: 12),
@@ -79,7 +80,7 @@ class SmallProposalCard extends StatelessWidget {
 }
 
 class _Details extends StatelessWidget {
-  final Proposal proposal;
+  final UserProposalWorkspace proposal;
 
   const _Details({
     required this.proposal,
@@ -97,7 +98,7 @@ class _Details extends StatelessWidget {
           ProposalPublish.localDraft => const PrivateProposalChip(),
         },
         ProposalVersionChip(
-          version: proposal.versionCount.toString(),
+          version: proposal.iteration.toString(),
           useInternalBackground: !isPublished,
         ),
         DayMonthTimeTextWithTooltip(

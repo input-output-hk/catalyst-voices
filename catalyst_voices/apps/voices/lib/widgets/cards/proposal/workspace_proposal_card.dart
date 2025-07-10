@@ -6,10 +6,11 @@ import 'package:catalyst_voices/widgets/text/last_edit_date.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class WorkspaceProposalCard extends StatelessWidget {
-  final Proposal proposal;
+  final UserProposalWorkspace proposal;
 
   const WorkspaceProposalCard({
     super.key,
@@ -54,7 +55,7 @@ class WorkspaceProposalCard extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  final Proposal proposal;
+  final UserProposalWorkspace proposal;
 
   const _Body(this.proposal);
 
@@ -99,7 +100,7 @@ class _Body extends StatelessWidget {
                       width: 300,
                       child: _CampaignData(
                         leadValue: proposal.category,
-                        subValue: context.l10n.fundNoCategory(14),
+                        subValue: context.l10n.fundNoCategory(proposal.fundNumber),
                       ),
                     ),
                     _CampaignData(

@@ -49,6 +49,8 @@ final class ProposalVersion extends Equatable implements Comparable<ProposalVers
 }
 
 extension ProposalVersionsList on List<ProposalVersion> {
+  ProposalVersion get latest => first;
+
   bool hasLatestLocalDraft(String? version) {
     if (isEmpty) return false;
     final latestVersion = first;

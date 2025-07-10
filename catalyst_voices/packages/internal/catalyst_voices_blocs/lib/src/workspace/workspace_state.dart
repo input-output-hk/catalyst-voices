@@ -6,7 +6,7 @@ import 'package:equatable/equatable.dart';
 final class WorkspaceState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
-  final List<Proposal> userProposals;
+  final List<UserProposalWorkspace> userProposals;
   final List<CampaignTimelineViewModel> timelineItems;
 
   const WorkspaceState({
@@ -18,7 +18,7 @@ final class WorkspaceState extends Equatable {
 
   bool get hasComments => userProposals.any((e) => e.commentsCount > 0);
 
-  List<Proposal> get notPublished => userProposals
+  List<UserProposalWorkspace> get notPublished => userProposals
       .where(
         (element) =>
             element.versions.hasLatestLocalDraft(element.selfRef.version) ||
@@ -34,8 +34,8 @@ final class WorkspaceState extends Equatable {
         timelineItems,
       ];
 
-  List<Proposal> get published =>
-      userProposals.where((e) => (e.publish.isPublished || e.publish.isDraft)).toList()..sort();
+  List<UserProposalWorkspace> get published =>
+      userProposals.where((e) => (e.publish.isPublished || e.publish.isDraft)).toList();
 
   bool get showError => error != null && !isLoading;
   bool get showProposals => error == null;
@@ -52,7 +52,7 @@ final class WorkspaceState extends Equatable {
   WorkspaceState copyWith({
     bool? isLoading,
     Optional<LocalizedException>? error,
-    List<Proposal>? userProposals,
+    List<UserProposalWorkspace>? userProposals,
     List<CampaignTimelineViewModel>? timelineItems,
   }) {
     return WorkspaceState(

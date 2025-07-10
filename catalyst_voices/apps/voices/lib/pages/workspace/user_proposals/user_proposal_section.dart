@@ -1,11 +1,11 @@
 import 'package:catalyst_voices/widgets/cards/proposal/workspace_proposal_card.dart';
 import 'package:catalyst_voices/widgets/headers/section_learn_more_header.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class UserProposalSection extends StatefulWidget {
-  final List<Proposal> items;
+  final List<UserProposalWorkspace> items;
   final String title;
   final String info;
   final String learnMoreUrl;
@@ -25,7 +25,7 @@ class UserProposalSection extends StatefulWidget {
 }
 
 class _ListOfProposals extends StatelessWidget {
-  final List<Proposal> items;
+  final List<UserProposalWorkspace> items;
   final String emptyTextMessage;
 
   const _ListOfProposals({
@@ -57,7 +57,7 @@ class _ListOfProposals extends StatelessWidget {
 
 class _ProposalVisibility extends StatelessWidget {
   final bool isExpanded;
-  final List<Proposal> items;
+  final List<UserProposalWorkspace> items;
   final String emptyTextMessage;
 
   const _ProposalVisibility({
