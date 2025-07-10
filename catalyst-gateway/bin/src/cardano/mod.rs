@@ -723,7 +723,7 @@ impl event::EventTarget<event::ChainIndexerEvent> for SyncTask {
                 match rx.recv().await {
                     Ok(event) => (listener)(&event),
                     Err(broadcast::error::RecvError::Lagged(lag)) => {
-                        error!(lag = lag, "Sync tasks event listener lagged");
+                        debug!(lag = lag, "Sync tasks event listener lagged");
                     },
                     Err(broadcast::error::RecvError::Closed) => break,
                 }

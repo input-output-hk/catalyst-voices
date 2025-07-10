@@ -58,7 +58,6 @@ poetry install
 export CAT_GATEWAY_INTERNAL_API_KEY="123"
 export ASSETS_DATA_PATH="cardano-asset-preprod.json"
 export CAT_GATEWAY_TEST_URL="http://127.0.0.1:3030"
-export EVENT_DB_TEST_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 ```
 
 * Run the tests, by specifying one of the markers:
