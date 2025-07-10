@@ -54,7 +54,6 @@ use crate::{
 pub(crate) type SizedBatch = SkipMap<u16, Arc<Batch>>;
 
 /// All Prepared insert Queries that we know about.
-#[allow(dead_code)]
 #[derive(strum_macros::Display)]
 #[allow(clippy::enum_variant_names)]
 pub(crate) enum PreparedQuery {
@@ -91,7 +90,6 @@ pub(crate) enum PreparedQuery {
 }
 
 /// All prepared SELECT query statements (return data).
-#[allow(dead_code)]
 pub(crate) enum PreparedSelectQuery {
     /// Get TXO by stake address query.
     TxoByStakeAddress,

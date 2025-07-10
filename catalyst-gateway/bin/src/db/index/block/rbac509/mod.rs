@@ -23,7 +23,6 @@ use crate::{
 };
 
 /// Index RBAC 509 Registration Query Parameters
-#[allow(dead_code)]
 #[derive(Debug)]
 pub(crate) struct Rbac509InsertQuery {
     /// RBAC Registration Data captured during indexing.
@@ -132,6 +131,24 @@ impl Rbac509InsertQuery {
                         update.removed_stake_addresses,
                     ));
                 }
+                // TODO: FIXME:
+                self.catalyst_id_for_txn_id
+                    .push(insert_catalyst_id_for_txn_id::Params::new(
+                        todo!(),
+                        txn_hash,
+                        slot,
+                    ));
+                self.catalyst_id_for_stake_address.push(
+                    insert_catalyst_id_for_stake_address::Params::new(
+                        todo!(),
+                        slot,
+                        index,
+                        todo!(),
+                    ),
+                );
+                self.catalyst_id_for_public_key.push(
+                    insert_catalyst_id_for_public_key::Params::new(todo!(), slot, todo!()),
+                );
             },
             // Invalid registrations are being recorded in order to report failure.
             Err(RbacValidationError::InvalidRegistration {
@@ -181,6 +198,42 @@ impl Rbac509InsertQuery {
             query_handles.push(tokio::spawn(async move {
                 inner_session
                     .execute_batch(PreparedQuery::Rbac509InvalidInsertQuery, self.invalid)
+                    .await
+            }));
+        }
+
+        if !self.catalyst_id_for_txn_id.is_empty() {
+            let inner_session = session.clone();
+            query_handles.push(tokio::spawn(async move {
+                inner_session
+                    .execute_batch(
+                        PreparedQuery::CatalystIdForTxnIdInsertQuery,
+                        self.catalyst_id_for_txn_id,
+                    )
+                    .await
+            }));
+        }
+
+        if !self.catalyst_id_for_stake_address.is_empty() {
+            let inner_session = session.clone();
+            query_handles.push(tokio::spawn(async move {
+                inner_session
+                    .execute_batch(
+                        PreparedQuery::CatalystIdForStakeAddressInsertQuery,
+                        self.catalyst_id_for_stake_address,
+                    )
+                    .await
+            }));
+        }
+
+        if !self.catalyst_id_for_public_key.is_empty() {
+            let inner_session = session.clone();
+            query_handles.push(tokio::spawn(async move {
+                inner_session
+                    .execute_batch(
+                        PreparedQuery::CatalystIdForPublicKeyInsertQuery,
+                        self.catalyst_id_for_public_key,
+                    )
                     .await
             }));
         }

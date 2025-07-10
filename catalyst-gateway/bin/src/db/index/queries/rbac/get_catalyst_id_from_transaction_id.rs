@@ -48,12 +48,12 @@ static VOLATILE_CACHE: LazyLock<Cache<TransactionId, QueryResult>> = LazyLock::n
 });
 
 /// A result of query execution.
-#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct QueryResult {
     /// A Catalyst ID.
     pub catalyst_id: CatalystId,
     /// A slot number.
+    #[allow(dead_code)]
     pub slot_no: Slot,
 }
 
@@ -126,20 +126,7 @@ impl From<Query> for QueryResult {
     }
 }
 
-/// Adds the given value to the cache.
-#[allow(dead_code)]
-pub fn cache_transaction(
-    is_persistent: bool, txn_id: TransactionId, catalyst_id: CatalystId, slot_no: Slot,
-) {
-    let cache = cache(is_persistent);
-    cache.insert(txn_id, QueryResult {
-        catalyst_id,
-        slot_no,
-    });
-}
-
 /// Removes all cached values.
-#[allow(dead_code)]
 pub fn invalidate_transactions_ids_cache(is_persistent: bool) {
     let cache = cache(is_persistent);
     cache.invalidate_all();

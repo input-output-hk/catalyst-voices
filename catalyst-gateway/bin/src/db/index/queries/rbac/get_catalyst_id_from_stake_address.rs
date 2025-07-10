@@ -48,14 +48,15 @@ static VOLATILE_CACHE: LazyLock<Cache<StakeAddress, QueryResult>> = LazyLock::ne
 });
 
 /// A result of query execution.
-#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct QueryResult {
     /// A Catalyst ID.
     pub catalyst_id: CatalystId,
     /// A slot number.
+    #[allow(dead_code)]
     pub slot_no: Slot,
     /// A transaction index.
+    #[allow(dead_code)]
     pub txn_index: TxnIndex,
 }
 
@@ -67,7 +68,6 @@ pub(crate) struct QueryParams {
 }
 
 /// Get Catalyst ID by stake address query.
-#[allow(dead_code)]
 #[derive(Debug, Clone, DeserializeRow)]
 pub(crate) struct Query {
     /// Catalyst ID for the queries stake address.
@@ -140,22 +140,7 @@ impl From<Query> for QueryResult {
     }
 }
 
-/// Adds the given value to the cache.
-#[allow(dead_code)]
-pub fn cache_stake_address(
-    is_persistent: bool, stake_address: StakeAddress, catalyst_id: CatalystId, slot_no: Slot,
-    txn_index: TxnIndex,
-) {
-    let cache = cache(is_persistent);
-    cache.insert(stake_address, QueryResult {
-        catalyst_id,
-        slot_no,
-        txn_index,
-    });
-}
-
 /// Removes all cached values.
-#[allow(dead_code)]
 pub fn invalidate_stake_addresses_cache(is_persistent: bool) {
     let cache = cache(is_persistent);
     cache.invalidate_all();

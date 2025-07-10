@@ -33,7 +33,6 @@ pub(crate) struct QueryParams {
 }
 
 /// Get registrations by Catalyst ID query.
-#[allow(dead_code)]
 #[derive(DeserializeRow, Clone)]
 pub(crate) struct Query {
     /// Registration transaction id.
@@ -44,6 +43,7 @@ pub(crate) struct Query {
     /// A transaction index.
     pub txn_index: DbTxnIndex,
     /// A previous  transaction id.
+    #[allow(dead_code)]
     pub prv_txn_id: Option<DbTransactionId>,
     /// A set of removed stake addresses.
     pub removed_stake_addresses: HashSet<DbStakeAddress>,
