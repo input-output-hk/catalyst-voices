@@ -18,17 +18,17 @@ mod reporter {
     pub(crate) static TXO_ASSETS_CACHE_SIZE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
             "cache_txo_assets_size",
-            "Returns an approximate total weighted size of TXO Assets entries in this cache",
+            "Returns the total weighted size of TXO Assets entries in this cache",
             &METRIC_LABELS
         )
         .unwrap()
     });
 
-    /// Approximate number of entries in the TXO Assets cache.
+    /// Number of entries in the TXO Assets cache.
     pub(crate) static TXO_ASSETS_CACHE_ENTRIES_COUNT: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
             "cache_txo_assets_entries_count",
-            "Returns an approximate number of TXO Assets entries in this cache",
+            "Returns the number of TXO Assets entries in this cache",
             &METRIC_LABELS
         )
         .unwrap()
@@ -38,7 +38,7 @@ mod reporter {
     pub(crate) static TXO_ASSETS_CACHE_HIT_COUNT: LazyLock<CounterVec> = LazyLock::new(|| {
         register_counter_vec!(
             "cache_txo_assets_hits_count",
-            "Returns an approximate number of TXO Assets entries in this cache",
+            "Returns the number of hits (entries found) in the TXO Assets cache",
             &METRIC_LABELS
         )
         .unwrap()
@@ -48,7 +48,7 @@ mod reporter {
     pub(crate) static TXO_ASSETS_CACHE_MISSES_COUNT: LazyLock<CounterVec> = LazyLock::new(|| {
         register_counter_vec!(
             "cache_txo_assets_misses_count",
-            "Returns an approximate number of TXO Assets entries in this cache",
+            "Returns the number of misses (entries not found) in the TXO Assets cache",
             &METRIC_LABELS
         )
         .unwrap()
