@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["INSERT_TXI_QUERY"],"struct":["TxiInsertParams","TxiInsertQuery"]};

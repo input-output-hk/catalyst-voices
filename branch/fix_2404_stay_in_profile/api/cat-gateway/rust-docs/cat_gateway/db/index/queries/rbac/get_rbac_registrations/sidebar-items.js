@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["QUERY"],"fn":["build_reg_chain","indexed_registrations","registration"],"struct":["Query","QueryParams"]};

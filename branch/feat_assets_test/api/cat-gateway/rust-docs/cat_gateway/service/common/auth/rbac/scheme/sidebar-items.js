@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["AUTHORIZATION_HEADER","MAX_TOKEN_AGE","MAX_TOKEN_SKEW"],"fn":["checker_api_catalyst_auth","indexed_registrations","last_signing_key","registration","registration_chain","service_unavailable"],"static":["CACHE"],"struct":["AuthTokenAccessViolation","AuthTokenError","CatalystRBACSecurityScheme"],"type":["EncodedAuthToken"]};

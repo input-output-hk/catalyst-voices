@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DESCRIPTION","ENCODED_LENGTH","EXAMPLE","EXAMPLE_MAX","EXAMPLE_MIN","FORMAT","PATTERN","TITLE","URI","URI_DESCRIPTION"],"enum":["EqOrRangedId"],"fn":["is_valid"],"static":["SCHEMA"],"struct":["DocumentId","EqOrRangedIdDocumented","IdEq","IdEqDocumented","IdRange","IdRangeDocumented"]};

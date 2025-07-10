@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DESCRIPTION","EXAMPLE_TIME","EXAMPLE_WHENCE","PATTERN","SLOT_DISCRIMINATOR","TIME_DISCRIMINATOR","TITLE"],"fn":["parse_parameter"],"static":["EXAMPLE","MAX_LENGTH","MIN_LENGTH","SCHEMA"],"struct":["AsAt"]};

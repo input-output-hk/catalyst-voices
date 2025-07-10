@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DESCRIPTION","EXAMPLE","FORMAT","PATTERN","TITLE"],"enum":["CatIdOrStake"],"static":["SCHEMA"]};

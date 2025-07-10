@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["SCHEMA_VERSION"],"fn":["extract_json_schema_for","extract_ref","get_nested_value","merge_json","update_refs"],"static":["OPENAPI_SPEC"]};

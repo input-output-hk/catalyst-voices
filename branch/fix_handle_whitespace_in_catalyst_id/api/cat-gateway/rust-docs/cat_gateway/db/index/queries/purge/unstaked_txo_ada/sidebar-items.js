@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DELETE_QUERY","SELECT_QUERY"],"mod":["result"],"struct":["DeleteQuery","Params","PrimaryKeyQuery"]};

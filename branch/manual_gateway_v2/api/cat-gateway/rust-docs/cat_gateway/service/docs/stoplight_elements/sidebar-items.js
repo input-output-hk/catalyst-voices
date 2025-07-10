@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["STOPLIGHT_UI_CSS","STOPLIGHT_UI_JS","STOPLIGHT_UI_TEMPLATE"],"fn":["create_endpoint","create_html"]};

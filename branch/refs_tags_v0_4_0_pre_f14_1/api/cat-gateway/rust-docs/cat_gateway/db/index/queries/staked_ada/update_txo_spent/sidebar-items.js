@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["UPDATE_TXO_SPENT_QUERY"],"struct":["UpdateTxoSpentQuery","UpdateTxoSpentQueryParams"]};

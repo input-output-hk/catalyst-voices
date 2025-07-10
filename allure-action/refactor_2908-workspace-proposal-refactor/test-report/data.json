@@ -1,0 +1,50 @@
+[
+  {
+    "runId": 16194308091,
+    "runUniqueId": "16194308091_1752150086106",
+    "testResult": "FAIL",
+    "timestamp": 1752056504359,
+    "summary": {
+      "statistic": {
+        "failed": 0,
+        "broken": 1,
+        "skipped": 3,
+        "passed": 796,
+        "unknown": 0,
+        "total": 800
+      },
+      "time": {
+        "start": 1752056504359,
+        "stop": 1752149132013,
+        "duration": 92627654,
+        "minDuration": 1,
+        "maxDuration": 9142,
+        "sumDuration": 59737
+      }
+    }
+  },
+  {
+    "runId": 16190717065,
+    "runUniqueId": "16190717065_1752139199650",
+    "testResult": "FAIL",
+    "timestamp": 1752056504359,
+    "summary": {
+      "statistic": {
+        "failed": 0,
+        "broken": 1,
+        "skipped": 3,
+        "passed": 796,
+        "unknown": 0,
+        "total": 800
+      },
+      "time": {
+        "start": 1752056504359,
+        "stop": 1752138057013,
+        "duration": 81552654,
+        "minDuration": 1,
+        "maxDuration": 9323,
+        "sumDuration": 59091
+      }
+    }
+  }
+]

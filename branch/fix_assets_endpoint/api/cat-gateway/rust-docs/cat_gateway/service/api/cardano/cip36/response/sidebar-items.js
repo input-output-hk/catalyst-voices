@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Cip36Registration"],"mod":["cip36_reg"],"struct":["Cip36RegistrationList","Cip36RegistrationListPage","Cip36RegistrationUnprocessableContent"],"type":["AllRegistration"]};
