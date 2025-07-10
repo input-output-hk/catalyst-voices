@@ -20,6 +20,9 @@ void main() {
     late String draftVersion;
 
     setUpAll(() async {
+      // TODO(LynxLynxx): When we create dev test package use DocumentFactoryRef here
+      // Extracting DocumentFactoryRef to Shared not possible due to need of importing classes from
+      // repository package
       proposalId = const Uuid().v7();
       draftVersion = const Uuid().v7();
       await Future.delayed(const Duration(milliseconds: 10), () {});
@@ -33,6 +36,12 @@ void main() {
         fundsRequested: const Coin(0),
         publish: ProposalPublish.publishedDraft,
         versions: [
+          ProposalVersion(
+            publish: ProposalPublish.publishedDraft,
+            selfRef: SignedDocumentRef(id: proposalId, version: latestVersion),
+            title: 'Test Proposal',
+            createdAt: DateTime.now(),
+          ),
           ProposalVersion(
             publish: ProposalPublish.localDraft,
             selfRef: DraftRef(id: proposalId, version: localVersion),
@@ -82,7 +91,7 @@ void main() {
       await pumpCard(tester);
       await tester.pumpAndSettle();
 
-      expect(find.text('2'), findsOneWidget);
+      expect(find.text('3'), findsOneWidget);
     });
 
     testWidgets(
