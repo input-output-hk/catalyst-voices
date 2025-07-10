@@ -18,18 +18,18 @@ mod reporter {
     pub(crate) static NATIVE_ASSETS_CACHE_SIZE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
             "cache_native_assets_size",
-            "Returns an approximate total weighted size of Native Assets entries in this cache",
+            "Returns the total weighted size of Native Assets entries in this cache",
             &METRIC_LABELS
         )
         .unwrap()
     });
 
-    /// Approximate number of entries in the Native Assets cache.
+    /// Number of entries in the Native Assets cache.
     pub(crate) static NATIVE_ASSETS_CACHE_ENTRIES_COUNT: LazyLock<IntGaugeVec> =
         LazyLock::new(|| {
             register_int_gauge_vec!(
                 "cache_native_assets_entries_count",
-                "Returns an approximate number of Native Assets entries in this cache",
+                "Returns the number of Native Assets entries in this cache",
                 &METRIC_LABELS
             )
             .unwrap()
@@ -39,7 +39,7 @@ mod reporter {
     pub(crate) static NATIVE_ASSETS_CACHE_HIT_COUNT: LazyLock<CounterVec> = LazyLock::new(|| {
         register_counter_vec!(
             "cache_native_assets_hits_count",
-            "Returns an approximate number of Native Assets entries in this cache",
+            "Returns the number of hits (entries found) in the Native Assets cache",
             &METRIC_LABELS
         )
         .unwrap()
@@ -50,7 +50,7 @@ mod reporter {
         LazyLock::new(|| {
             register_counter_vec!(
                 "cache_native_assets_misses_count",
-                "Returns an approximate number of Native Assets entries in this cache",
+                "Returns the number of misses (entries not found) in the Native Assets cache",
                 &METRIC_LABELS
             )
             .unwrap()
