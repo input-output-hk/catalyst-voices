@@ -250,7 +250,7 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
         let mut template = None;
         let mut parameters = None;
         if let Some(json_meta) = doc.metadata() {
-            let meta: catalyst_signed_doc::ExtraFields = serde_json::from_value(json_meta.clone())?;
+            let meta = catalyst_signed_doc::Metadata::from_json(json_meta.clone())?;
             doc_ref = meta.doc_ref().map(Into::into);
             reply = meta.reply().map(Into::into);
             template = meta.template().map(Into::into);
