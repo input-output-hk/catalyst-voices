@@ -38,7 +38,7 @@ mod reporter {
     /// Number of hits in the Native Assets cache.
     pub(crate) static NATIVE_ASSETS_CACHE_HIT_COUNT: LazyLock<CounterVec> = LazyLock::new(|| {
         register_counter_vec!(
-            "cache_txo_assets_hits_count",
+            "cache_native_assets_hits_count",
             "Returns an approximate number of Native Assets entries in this cache",
             &METRIC_LABELS
         )
@@ -49,7 +49,7 @@ mod reporter {
     pub(crate) static NATIVE_ASSETS_CACHE_MISSES_COUNT: LazyLock<CounterVec> =
         LazyLock::new(|| {
             register_counter_vec!(
-                "cache_txo_assets_misses_count",
+                "cache_native_assets_misses_count",
                 "Returns an approximate number of Native Assets entries in this cache",
                 &METRIC_LABELS
             )
