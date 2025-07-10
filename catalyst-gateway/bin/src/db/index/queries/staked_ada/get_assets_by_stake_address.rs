@@ -3,7 +3,11 @@ use std::sync::Arc;
 
 use cardano_blockchain_types::StakeAddress;
 use futures::TryStreamExt;
-use scylla::{prepared_statement::PreparedStatement, DeserializeRow, SerializeRow, Session};
+use scylla::{
+    client::{pager::TypedRowStream, session::Session},
+    statement::prepared::PreparedStatement,
+    DeserializeRow, SerializeRow,
+};
 use tracing::error;
 
 use crate::db::{
