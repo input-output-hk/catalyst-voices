@@ -27,6 +27,12 @@
     <meta content="Catalyst Voices" name="apple-mobile-web-app-title">
     <link href="icons/favicon-192.png" rel="apple-touch-icon">
 
+    <!-- Light mode favicon -->
+    <link rel="icon" href="icons/favicon_light.png" media="(prefers-color-scheme: light)" />
+
+    <!-- Dark mode favicon -->
+    <link rel="icon" href="icons/favicon_dark.png" media="(prefers-color-scheme: dark)" />
+
     <title>Catalyst</title>
     <link href="manifest.json" rel="manifest">
     <script src="/assets/packages/catalyst_cardano_web/assets/js/catalyst_cardano.js"
@@ -123,26 +129,19 @@
 </picture>
 
 <script>
-  function setThemeFavicon() {
-    const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const faviconPath = isDarkMode ? 'icons/favicon_dark.png' : 'icons/favicon_light.png';
-    
-    const existingFavicons = document.querySelectorAll('link[rel="icon"]');
-    existingFavicons.forEach(favicon => {
-      favicon.remove();
-    });
-    
-    const newFavicon = document.createElement('link');
-    newFavicon.rel = 'icon';
-    newFavicon.href = faviconPath;
-    newFavicon.type = 'image/png';
-    document.head.appendChild(newFavicon);
+  const faviconEl = document.querySelector('link[rel="icon"]')
+
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+  mediaQuery.addEventListener('change', themeChange)
+
+  function themeChange(event) {
+    if (event.matches) {
+      faviconEl.setAttribute('href', 'icons/favicon_dark.png')
+    } else {
+      faviconEl.setAttribute('href', 'icons/favicon_light.png')
+    }
   }
 
-  setThemeFavicon();
-
-  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-  mediaQuery.addEventListener('change', setThemeFavicon);
 </script>
 
 <script async="" src="flutter_bootstrap.js"></script>
