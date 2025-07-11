@@ -1,12 +1,17 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
+/// Representation of campaign timeline.
+///
+/// Defines timeline of different stages for [Campaign].
 final class CampaignTimeline extends Equatable {
   final String title;
   final String description;
   final DateRange timeline;
   final CampaignTimelineStage stage;
   final bool offstage;
+
   // NOTE. later we can add enum for stage that campaign is in when today is
   // in timeline range
 
@@ -44,6 +49,7 @@ final class CampaignTimeline extends Equatable {
   }
 }
 
+/// Types of [Campaign] stages.
 enum CampaignTimelineStage {
   proposalSubmission,
   communityReview,
@@ -55,6 +61,7 @@ enum CampaignTimelineStage {
 }
 
 extension CampaignTimelineX on CampaignTimeline {
+  /// Statically defined timeline.
   static List<CampaignTimeline> staticContent = [
     CampaignTimeline(
       title: 'Proposal Submission',

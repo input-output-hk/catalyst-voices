@@ -26,6 +26,9 @@ const _testWords = [
 
 final _logger = Logger('RecoverCubit');
 
+/// Manages the recovery process.
+///
+/// Allows to recover an account from the seed phrase.
 final class RecoverCubit extends Cubit<RecoverStateData>
     with BlocErrorEmitterMixin, UnlockPasswordMixin
     implements RecoverManager {

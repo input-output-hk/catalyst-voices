@@ -10,6 +10,9 @@ import 'package:flutter/foundation.dart';
 const _maxRecentProposalsCount = 7;
 final _logger = Logger('DiscoveryCubit');
 
+/// Manages all data for the discovery screen.
+///
+/// Communicates with the services to get the data and emits it to the UI.
 class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   final CampaignService _campaignService;
   final ProposalService _proposalService;

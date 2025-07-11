@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
+/// WIP. Merges multiple documents. Source for such document would be local db.
 final class ProposalDocumentData extends Equatable {
   final DocumentData proposal;
   final DocumentData template;

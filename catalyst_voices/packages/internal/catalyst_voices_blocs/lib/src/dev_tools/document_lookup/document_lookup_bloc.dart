@@ -6,6 +6,7 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+/// Allows lookup of documents by their ref.
 final class DocumentLookupBloc extends Bloc<DocumentLookupEvent, DocumentLookupState> {
   final DocumentsService _documentsService;
   final DocumentMapper _documentMapper;

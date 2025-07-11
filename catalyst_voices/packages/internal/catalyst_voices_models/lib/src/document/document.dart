@@ -1,8 +1,4 @@
-import 'package:catalyst_voices_models/src/document/builder/document_builder.dart';
-import 'package:catalyst_voices_models/src/document/document_node_id.dart';
-import 'package:catalyst_voices_models/src/document/schema/document_schema.dart';
-import 'package:catalyst_voices_models/src/document/schema/property/document_property_schema.dart';
-import 'package:catalyst_voices_models/src/document/validation/document_validation_result.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
@@ -10,6 +6,10 @@ import 'package:equatable/equatable.dart';
 ///
 /// The document is immutable, in order to edit it make use
 /// of [toBuilder] method and act on [DocumentBuilder] instance.
+///
+/// Do not confuse this with metadata of single document.
+/// We have concept of *useful* document such as [ProposalDocument] or [CommentDocument]
+/// which is combination of multiple documents(eg. template + data).
 final class Document extends Equatable {
   /// The schema which explains how to interpret this document.
   final DocumentSchema schema;

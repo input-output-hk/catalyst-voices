@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
+/// Single item representing proposal category in a category selector (dropdown menu)
 final class ProposalsCategorySelectorItem extends Equatable {
   final SignedDocumentRef ref;
   final String name;

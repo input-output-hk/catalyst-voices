@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+/// Abstract HiLo pattern representation.
 abstract base class HiLo<T extends Object> extends Equatable {
   final T high;
   final T low;

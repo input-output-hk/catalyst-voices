@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:formz/formz.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
+/// Form input validator for UUID.
 base class Uuid extends FormzInput<String, LocalizedException> {
   final int? version;
   final bool isEmptyAllowed;
@@ -50,10 +51,12 @@ base class Uuid extends FormzInput<String, LocalizedException> {
   }
 }
 
+/// Base exception for UUID validation errors.
 sealed class UuidValidationException extends LocalizedException {
   const UuidValidationException();
 }
 
+/// Exception thrown when a UUID value is invalid.
 final class UuidValidationFormatException extends UuidValidationException {
   const UuidValidationFormatException();
 
@@ -63,6 +66,7 @@ final class UuidValidationFormatException extends UuidValidationException {
   }
 }
 
+/// Exception thrown when a UUID length is invalid.
 final class UuidValidationLengthException extends UuidValidationException {
   const UuidValidationLengthException();
 
@@ -72,6 +76,7 @@ final class UuidValidationLengthException extends UuidValidationException {
   }
 }
 
+/// Exception thrown when a UUID version is invalid.
 final class UuidValidationVersionException extends UuidValidationException {
   final int version;
   final int requiredVersion;

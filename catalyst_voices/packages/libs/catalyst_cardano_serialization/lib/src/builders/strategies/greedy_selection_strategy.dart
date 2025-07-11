@@ -3,6 +3,8 @@ import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 import 'package:cbor/cbor.dart';
 
 /// A greedy selection strategy that selects UTxOs by length and value.
+///
+/// The algorithm prefers UTxOs which balance byte encoding is the largest.
 final class GreedySelectionStrategy implements CoinSelectionStrategy {
   /// Default const constructor for [GreedySelectionStrategy]
   const GreedySelectionStrategy();

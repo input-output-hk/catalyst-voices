@@ -13,6 +13,7 @@ final class Password extends FormzInput<String, PasswordValidationError> {
   }
 }
 
+/// Enum representing the different types of password validation errors.
 enum PasswordValidationError {
   invalid;
 

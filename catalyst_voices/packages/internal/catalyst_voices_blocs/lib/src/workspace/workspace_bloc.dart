@@ -14,6 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _logger = Logger('WorkspaceBloc');
 
+/// Manages users' proposals. Allows to load, import, export, forget, unlock and delete proposals.
 final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     with BlocSignalEmitterMixin<WorkspaceSignal, WorkspaceState>, BlocErrorEmitterMixin {
   // ignore: unused_field
