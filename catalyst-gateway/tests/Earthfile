@@ -39,10 +39,12 @@ package-cat-gateway-with-scylla:
 # build all necessary docker images required to run `docker-compose.yml` services
 prepare-all-images:
     FROM scratch
-    BUILD ../+docker
+    BUILD gateway+docker
     BUILD ../event-db+docker
     BUILD ./api_tests+docker
     BUILD ./schemathesis_tests+docker
+    BUILD +docker-postgres-runner
+    BUILD +docker-scylla-runner
 
 # cspell: words oapi
 # test-lint-openapi - OpenAPI linting from an artifact
@@ -55,6 +57,24 @@ test-lint-openapi:
     COPY --dir ./openapi-v3.0-lints/* .
     # Scan the doc directory where type of file is JSON.
     DO spectral-ci+LINT --dir=./doc
+
+test-buider:
+    FROM gateway+builder-src
+
+    RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
+        cargo b --release --all-targets
+
+docker-postgres-runner:
+    FROM +test-buider
+
+    ENTRYPOINT cargo nextest run --release --run-ignored=only signed_docs
+    SAVE IMAGE postgres-runner:latest
+
+docker-scylla-runner:
+    FROM +test-buider
+
+    ENTRYPOINT cargo nextest run --release --run-ignored=only scylla_session scylla_queries scylla_purge rbac_index --no-fail-fast
+    SAVE IMAGE scylla-runner:latest
 
 test-postgres:
     FROM gateway+builder-src
