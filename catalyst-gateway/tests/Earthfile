@@ -36,6 +36,13 @@ package-cat-gateway-with-scylla:
     ENTRYPOINT ./scylla_entry.sh && ./cat-gateway run
     SAVE IMAGE cat-gateway-with-scylla:latest
 
+# build all necessary docker images required to run `docker-compose.yml` services
+package-prepare-all-images:
+    FROM scratch
+    BUILD ../+docker
+    BUILD ../event-db+docker
+    BUILD ./api_tests+docker
+
 # cspell: words oapi
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.

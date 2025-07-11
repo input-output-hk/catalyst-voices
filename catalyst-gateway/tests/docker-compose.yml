@@ -94,6 +94,7 @@ services:
   api-tests-runner:
     image: api-tests-runner:latest
     container_name: api-tests-runner
+    command: -m preprod_indexing
     environment:
       - CAT_GATEWAY_TEST_URL=http://cat-gateway:3030
       - CAT_GATEWAY_INTERNAL_API_KEY=123
