@@ -42,7 +42,7 @@ dependencies:
   uuid_plus: ^0.1.0
 
 dev_dependencies:
-  build_runner: ^2.4.12
+  build_runner: ^2.5.4
   catalyst_analysis: ^3.0.0
   chopper_generator: ^8.0.4
   drift_dev: ^2.24.0

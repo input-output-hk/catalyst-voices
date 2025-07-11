@@ -4,40 +4,151 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
 
-final class ContainsAuthorId extends CustomExpression<bool> {
+class BaseJsonQueryExpression extends Expression<bool> {
+  final String jsonContent;
+  final NodeId nodeId;
+  final String searchValue;
+  final bool useExactMatch;
+
+  const BaseJsonQueryExpression({
+    required this.jsonContent,
+    required this.nodeId,
+    required this.searchValue,
+    this.useExactMatch = false,
+  });
+
+  @override
+  void writeInto(GenerationContext context) {
+    final sql = JsonBExpressions.generateSqlForJsonQuery(
+      jsonContent: jsonContent,
+      nodeId: nodeId,
+      searchValue: searchValue,
+    );
+
+    context.buffer.write(sql);
+  }
+}
+
+final class ContainsAuthorId extends BaseJsonQueryExpression {
   ContainsAuthorId({
     required CatalystId id,
   }) : super(
-          "json_extract(metadata, '${ProposalMetadata.authorsNode.asPath}') "
-          "LIKE '%${id.toSignificant().toUri().toStringWithoutScheme()}%'",
+          searchValue: id.toSignificant().toUri().toStringWithoutScheme(),
+          nodeId: ProposalMetadata.authorsNode,
+          jsonContent: 'metadata',
         );
 }
 
-final class ContainsContentAuthorName extends CustomExpression<bool> {
+final class ContainsContentAuthorName extends BaseJsonQueryExpression {
   ContainsContentAuthorName({
     required String query,
   }) : super(
-          "json_extract(content, '${ProposalDocument.authorNameNodeId.asPath}') "
-          "LIKE '%$query%'",
+          searchValue: query,
+          nodeId: ProposalDocument.authorNameNodeId,
+          jsonContent: 'content',
         );
 }
 
-final class ContainsMetadataAuthorName extends CustomExpression<bool> {
+final class ContainsMetadataAuthorName extends BaseJsonQueryExpression {
   ContainsMetadataAuthorName({
     required String query,
   }) : super(
-          "json_extract(metadata, '${ProposalMetadata.authorsNode.asPath}') "
-          "LIKE '%$query%'",
+          searchValue: query,
+          nodeId: ProposalMetadata.authorsNode,
+          jsonContent: 'metadata',
         );
 }
 
-final class ContainsTitle extends CustomExpression<bool> {
+final class ContainsTitle extends BaseJsonQueryExpression {
   ContainsTitle({
     required String query,
   }) : super(
-          "json_extract(content, '${ProposalDocument.titleNodeId.asPath}') "
-          "LIKE '%$query%'",
+          searchValue: query,
+          nodeId: ProposalDocument.titleNodeId,
+          jsonContent: 'content',
         );
+}
+
+class JsonBExpressions {
+  const JsonBExpressions();
+
+  static String generateSqlForJsonQuery({
+    required String jsonContent,
+    required NodeId nodeId,
+    required String searchValue,
+    bool useExactMatch = false,
+  }) {
+    final valueComparison = useExactMatch ? "= '$searchValue'" : "LIKE '%$searchValue%'";
+    final handler = WildcardPathHandler.fromNodeId(nodeId);
+    final wildcardPaths = handler.getWildcardPaths;
+
+    if (!handler.hasWildcard || wildcardPaths == null) {
+      return _queryJsonExtract(
+        jsonContent: jsonContent,
+        nodeId: nodeId,
+        valueComparison: valueComparison,
+      );
+    }
+
+    final arrayPath = wildcardPaths.prefix.value.isEmpty ? '' : wildcardPaths.prefix.asPath;
+    final fieldName = wildcardPaths.suffix?.asPath;
+
+    if (wildcardPaths.prefix.value.isEmpty) {
+      return _queryJsonTreeForKey(
+        jsonContent: jsonContent,
+        fieldName: fieldName?.substring(2),
+        valueComparison: valueComparison,
+      );
+    }
+
+    if (fieldName != null) {
+      return _queryJsonEachForWildcard(
+        jsonContent: jsonContent,
+        arrayPath: arrayPath,
+        fieldName: fieldName,
+        valueComparison: valueComparison,
+      );
+    }
+
+    return _queryJsonTreeForWildcard(
+      jsonContent: jsonContent,
+      arrayPath: arrayPath,
+      valueComparison: valueComparison,
+    );
+  }
+
+  static String _queryJsonEachForWildcard({
+    required String jsonContent,
+    required String arrayPath,
+    required String fieldName,
+    required String valueComparison,
+  }) {
+    return "EXISTS (SELECT 1 FROM json_each(json_extract($jsonContent, '$arrayPath')) WHERE json_extract(value, '$fieldName') $valueComparison)";
+  }
+
+  static String _queryJsonExtract({
+    required String jsonContent,
+    required NodeId nodeId,
+    required String valueComparison,
+  }) {
+    return "json_extract($jsonContent, '${nodeId.asPath}') $valueComparison";
+  }
+
+  static String _queryJsonTreeForKey({
+    required String jsonContent,
+    required String? fieldName,
+    required String valueComparison,
+  }) {
+    return "EXISTS (SELECT 1 FROM json_tree($jsonContent) WHERE key LIKE '$fieldName' AND json_tree.value $valueComparison)";
+  }
+
+  static String _queryJsonTreeForWildcard({
+    required String jsonContent,
+    required String arrayPath,
+    required String valueComparison,
+  }) {
+    return "EXISTS (SELECT 1 FROM json_tree($jsonContent, '$arrayPath') WHERE json_tree.value $valueComparison)";
+  }
 }
 
 extension on NodeId {
