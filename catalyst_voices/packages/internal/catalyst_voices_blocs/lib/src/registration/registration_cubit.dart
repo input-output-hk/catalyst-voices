@@ -240,8 +240,8 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
       );
 
       final accountId = _accountId;
-      final masterKey = await _keychain?.getMasterKey();
-      if (masterKey == null) {
+      final keychain = _keychain;
+      if (keychain == null) {
         emitError(const LocalizedRegistrationKeychainNotFoundException());
         return;
       }
@@ -272,7 +272,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
 
       final transaction = await _registrationService.prepareRegistration(
         wallet: wallet,
-        masterKey: masterKey,
+        keychain: keychain,
         roles: transactionRoles,
       );
 
