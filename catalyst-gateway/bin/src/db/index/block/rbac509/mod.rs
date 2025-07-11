@@ -66,6 +66,7 @@ impl Rbac509InsertQuery {
     }
 
     /// Index the RBAC 509 registrations in a transaction.
+    #[allow(clippy::too_many_lines)]
     pub(crate) async fn index(
         &mut self, txn_hash: TransactionId, index: TxnIndex, block: &MultiEraBlock,
         context: &mut RbacBlockIndexingContext,
