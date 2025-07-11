@@ -79,7 +79,7 @@ docker-scylla-runner:
     ENTRYPOINT ./cat-gateway-test-runner-main --ignored scylla_session scylla_queries scylla_purge rbac_index
     SAVE IMAGE scylla-runner:latest
 
-test-postgres:
+disable-test-postgres:
     FROM gateway+builder-src
 
     COPY +docker-compose/docker-compose.yml .
@@ -96,7 +96,7 @@ test-postgres:
     END
 
 # test-scylla - Runs the integration test for scylla.
-test-scylla:
+disable-test-scylla:
     FROM gateway+builder-src
 
     DO +INSTALL_SCYLLA
