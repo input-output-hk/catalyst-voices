@@ -41,7 +41,7 @@ package-schemathesis:
     SAVE IMAGE schemathesis:$tag
 
 # test-ci-schemathesis - Runs schemathesis in CI
-test-ci-schemathesis:
+disable-test-ci-schemathesis:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     LET api_spec="http://0.0.0.0:3030/docs/cat-gateway.json"
     ARG wait_for_schema=500

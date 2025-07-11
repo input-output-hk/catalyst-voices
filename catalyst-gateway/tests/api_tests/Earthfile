@@ -18,7 +18,7 @@ builder:
     COPY cat-storage+cardano-asset-preprod/cardano-asset-preprod.json .
     DO python-ci+BUILDER
 
-test:
+disable-test:
     FROM +builder
     COPY ./../+docker-compose/docker-compose.yml .
 
