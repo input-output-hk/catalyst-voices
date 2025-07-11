@@ -90,7 +90,7 @@ docker:
 
     ENV SCHEMATHESIS_HOOKS hooks
 
-    ENTRYPOINT ["entry.sh"]
+    ENTRYPOINT ["./entry.sh"]
 
     SAVE IMAGE schemathesis-runner:latest
 
