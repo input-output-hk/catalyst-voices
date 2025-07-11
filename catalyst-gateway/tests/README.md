@@ -6,7 +6,7 @@ So to run any of the corresponding tests runner it could be done using already s
 As a first step to prepare all required docker images run:
 
 ```shell
-earthly +package-prepare-all-images
+earthly +prepare-all-images
 ```
 
 ## API tests

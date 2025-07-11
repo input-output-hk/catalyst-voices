@@ -37,7 +37,7 @@ package-cat-gateway-with-scylla:
     SAVE IMAGE cat-gateway-with-scylla:latest
 
 # build all necessary docker images required to run `docker-compose.yml` services
-package-prepare-all-images:
+prepare-all-images:
     FROM scratch
     BUILD ../+docker
     BUILD ../event-db+docker
