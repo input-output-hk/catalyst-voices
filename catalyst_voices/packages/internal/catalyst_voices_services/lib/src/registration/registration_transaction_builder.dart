@@ -9,6 +9,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
 import 'package:catalyst_voices_services/src/registration/registration_transaction_role.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 
 /// The transaction metadata used for registration.
 typedef RegistrationMetadata = X509MetadataEnvelope<RegistrationData>;
@@ -102,46 +103,12 @@ final class RegistrationTransactionBuilder {
       role: AccountRole.root,
     );
 
-    return rootKeyPair.use((rootKeyPair) async {
-      final derCert = await _generateX509CertificateIfNeeded(rootKeyPair);
-      final publicKeys = await _generatePublicKeysForAllRoles(rootKeyPair);
-
-      // Build dummy metadata to allow the transaction builder to select utxos,
-      // the selected utxos are needed to calculate txInputsHash that is included in the metadata.
-      //
-      // We can't upfront calculate the txInputsHash because we don't know the exact metadata size
-      // at this point which the coin selection algorithm needs to calculate the appropriate
-      // fee and select inputs.
-      final dummyUtxos = <TransactionUnspentOutput>{};
-      final dummyX509Envelope = await _buildMetadataEnvelope(
-        rootKeyPair: rootKeyPair,
-        selectedUtxos: dummyUtxos,
-        derCert: derCert,
-        publicKeys: publicKeys,
-      );
-
-      // Build dummy transaction to see what utxos need to be selected.
-      final dummyTransaction = _buildUnsignedRbacTx(await dummyX509Envelope.toAuxiliaryData());
-
-      // We are assuming that the utxos selected for the dummy transaction will satisfy
-      // the fee requirements for the real transaction since the transaction size is the same,
-      // instead of using dummy metadata we will use the real one but for both of them the size
-      // would be the same.
-      final selectedUtxos = _findSelectedUtxos(utxos, dummyTransaction.body.inputs);
-      final realX509Envelope = await _buildMetadataEnvelope(
-        rootKeyPair: rootKeyPair,
-        selectedUtxos: selectedUtxos,
-        derCert: derCert,
-        publicKeys: publicKeys,
-      );
-
-      return _buildUnsignedRbacTx(await realX509Envelope.toAuxiliaryData());
-    });
+    return rootKeyPair.use(_buildTransaction);
   }
 
   Future<RegistrationMetadata> _buildMetadataEnvelope({
     required CatalystKeyPair rootKeyPair,
-    required Set<TransactionUnspentOutput> selectedUtxos,
+    required TransactionInputsHash txInputsHash,
     required X509DerCertificate? derCert,
     required List<RbacField<cs.Ed25519PublicKey>> publicKeys,
   }) async {
@@ -151,7 +118,7 @@ final class RegistrationTransactionBuilder {
 
     final x509Envelope = X509MetadataEnvelope.unsigned(
       purpose: UuidV4.fromString(_catalystUserRoleRegistrationPurpose),
-      txInputsHash: TransactionInputsHash.fromTransactionInputs(selectedUtxos),
+      txInputsHash: txInputsHash,
       previousTransactionId: roles.isFirstRegistration ? null : previousTransactionId!,
       chunkedData: RegistrationData(
         derCerts: [
@@ -209,7 +176,20 @@ final class RegistrationTransactionBuilder {
     };
   }
 
-  Transaction _buildUnsignedRbacTx(AuxiliaryData auxiliaryData) {
+  Future<Transaction> _buildTransaction(CatalystKeyPair rootKeyPair) async {
+    final derCert = await _generateX509CertificateIfNeeded(rootKeyPair);
+    final publicKeys = await _generatePublicKeysForAllRoles(rootKeyPair);
+
+    final dummyTxInputsHashBytes = List.filled(TransactionInputsHash.hashLength, 0);
+    final dummyTxInputsHash = TransactionInputsHash.fromBytes(bytes: dummyTxInputsHashBytes);
+    final dummyX509Envelope = await _buildMetadataEnvelope(
+      rootKeyPair: rootKeyPair,
+      txInputsHash: dummyTxInputsHash,
+      derCert: derCert,
+      publicKeys: publicKeys,
+    );
+    final dummyAuxiliaryData = await dummyX509Envelope.toAuxiliaryData();
+
     final txBuilder = TransactionBuilder(
       requiredSigners: {
         _stakeAddress.publicKeyHash,
@@ -218,21 +198,46 @@ final class RegistrationTransactionBuilder {
       inputs: utxos,
       networkId: networkId,
       ttl: slotNumberTtl,
-      auxiliaryData: auxiliaryData,
+      auxiliaryData: dummyAuxiliaryData,
       changeAddress: changeAddress,
     );
 
-    final txBody = txBuilder
-        .applySelection(
-          changeOutputStrategy: ChangeOutputAdaStrategy.noBurn,
-        )
-        .buildBody();
+    final (selectedUtxo, changes, totalFee) = txBuilder.selectInputs(
+      changeOutputStrategy: ChangeOutputAdaStrategy.noBurn,
+    );
+
+    final realTxInputHash = TransactionInputsHash.fromTransactionInputs(selectedUtxo);
+    final realTxX509Envelope = await _buildMetadataEnvelope(
+      rootKeyPair: rootKeyPair,
+      txInputsHash: realTxInputHash,
+      derCert: derCert,
+      publicKeys: publicKeys,
+    );
+    final realAuxiliaryData = await realTxX509Envelope.toAuxiliaryData();
+    final realTxBuilder = txBuilder.copyWith(
+      inputs: selectedUtxo,
+      outputs: changes,
+      fee: totalFee,
+      auxiliaryData: realAuxiliaryData,
+    );
+
+    if (!setEquals(selectedUtxo, realTxBuilder.inputs)) {
+      throw ArgumentError('Different selected utxos', 'realTxBuilder.inputs');
+    }
+
+    final txBody = realTxBuilder.buildBody();
+
+    for (var i = 0; i < txBody.inputs.length; i++) {
+      if (txBody.inputs.elementAt(i) != selectedUtxo.elementAt(i).input) {
+        throw ArgumentError('Utxo at index [$i] is different in txBody and selectedUtxo');
+      }
+    }
 
     return Transaction(
       body: txBody,
       isValid: true,
       witnessSet: const TransactionWitnessSet(),
-      auxiliaryData: auxiliaryData,
+      auxiliaryData: realAuxiliaryData,
     );
   }
 
@@ -252,13 +257,6 @@ final class RegistrationTransactionBuilder {
     );
 
     return keyPair.use((keyPair) => keyPair.publicKey.toEd25519());
-  }
-
-  Set<TransactionUnspentOutput> _findSelectedUtxos(
-    Set<TransactionUnspentOutput> utxos,
-    Set<TransactionInput> inputs,
-  ) {
-    return utxos.where((e) => inputs.contains(e.input)).toSet();
   }
 
   Future<RbacField<cs.Ed25519PublicKey>> _generatePublicKeyForOffset(
