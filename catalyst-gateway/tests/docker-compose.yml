@@ -96,7 +96,20 @@ services:
     depends_on:
       cat-gateway:
         condition: service_healthy
-
+  
+  schemathesis-runner:
+    image: schemathesis-runner:latest
+    container_name: schemathesis-runner
+    environment:
+      - API_SPEC=http://cat-gateway:3030/docs/cat-gateway.json
+      - WAIT_FOR_SCHEMA=500
+      - MAX_RESPONSE_TIME=5000
+      - HYPOTHESIS_MAX_EXAMPLES=1000
+      # place a seed value to reproduce some specific schemathesis test scenario
+      # - SEED=""
+    depends_on:
+      cat-gateway:
+        condition: service_healthy
 
 # A helper service that waits for the event-db to be fully initialized. 
 # This is a workaround for Earthly to handle service dependencies properly 

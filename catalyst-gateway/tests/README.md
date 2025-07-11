@@ -14,3 +14,9 @@ earthly +package-prepare-all-images
 ```shell
 docker compose up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
 ```
+
+## Schemathesis
+
+```shell
+docker compose up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
+```

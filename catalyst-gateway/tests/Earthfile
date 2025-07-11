@@ -42,6 +42,7 @@ package-prepare-all-images:
     BUILD ../+docker
     BUILD ../event-db+docker
     BUILD ./api_tests+docker
+    BUILD ./schemathesis_tests+docker
 
 # cspell: words oapi
 # test-lint-openapi - OpenAPI linting from an artifact
