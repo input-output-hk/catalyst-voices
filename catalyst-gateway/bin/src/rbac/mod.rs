@@ -12,4 +12,4 @@ pub use chains_cache::persistent_rbac_chains_cache_size;
 pub use get_chain::{latest_rbac_chain, latest_rbac_chain_by_address};
 pub use indexing_context::RbacBlockIndexingContext;
 pub use validation::validate_rbac_registration;
-pub use validation_result::{RbacValidationError, RbacValidationResult};
+pub use validation_result::{RbacValidationError, RbacValidationResult, RbacValidationSuccess};

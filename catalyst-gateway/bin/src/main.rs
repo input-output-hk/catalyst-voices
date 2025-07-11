@@ -9,7 +9,6 @@ mod jinja;
 mod logger;
 mod metrics;
 mod rbac;
-mod rbac_cache;
 mod service;
 mod settings;
 mod utils;

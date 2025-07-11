@@ -14,14 +14,10 @@ use cardano_blockchain_types::Network;
 use catalyst_types::catalyst_id::CatalystId;
 use chrono::{TimeDelta, Utc};
 use ed25519_dalek::{ed25519::signature::Signer, Signature, SigningKey, VerifyingKey};
-use futures::future::try_join;
 use rbac_registration::registration::cardano::RegistrationChain;
 use regex::Regex;
 
-use crate::db::index::{
-    queries::rbac::get_rbac_registrations::{build_reg_chain, indexed_registrations},
-    session::{CassandraSession, CassandraSessionError},
-};
+use crate::rbac::latest_rbac_chain;
 
 /// Captures just the digits after last slash
 /// This Regex should not fail
@@ -173,29 +169,16 @@ impl CatalystRBACTokenV1 {
     }
 
     /// Returns a network.
+    #[allow(dead_code)]
     pub(crate) fn network(&self) -> Network {
         self.network
     }
 
     /// Returns a corresponded registration chain if any registrations present.
     /// If it is a first call, fetch all data from the database and initialize it.
-    pub(crate) async fn reg_chain(&mut self) -> anyhow::Result<Option<RegistrationChain>> {
+    pub(crate) async fn reg_chain(&mut self) -> Result<Option<RegistrationChain>> {
         if self.reg_chain.is_none() {
-            let persistent_session =
-                CassandraSession::get(true).ok_or(CassandraSessionError::FailedAcquiringSession)?;
-            let volatile_session = CassandraSession::get(false)
-                .ok_or(CassandraSessionError::FailedAcquiringSession)?;
-            let (persistent_regs, volatile_regs) = try_join(
-                indexed_registrations(&persistent_session, self.catalyst_id()),
-                indexed_registrations(&volatile_session, self.catalyst_id()),
-            )
-            .await?;
-            // Combine persistent and volatile registrations.
-            let combined_regs = persistent_regs
-                .into_iter()
-                .map(|r| (true, r))
-                .chain(volatile_regs.into_iter().map(|r| (false, r)));
-            self.reg_chain = build_reg_chain(combined_regs, self.network(), |_, _, _| {}).await?;
+            self.reg_chain = latest_rbac_chain(&self.catalyst_id).await?.map(|i| i.chain);
         }
         Ok(self.reg_chain.clone())
     }
