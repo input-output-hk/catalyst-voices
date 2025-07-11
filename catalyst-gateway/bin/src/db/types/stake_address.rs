@@ -5,7 +5,7 @@ use std::fmt::{Debug, Display, Formatter};
 
 use cardano_blockchain_types::StakeAddress;
 use scylla::{
-    deserialize::{DeserializationError, DeserializeValue, FrameSlice, TypeCheckError},
+    deserialize::{value::DeserializeValue, DeserializationError, FrameSlice, TypeCheckError},
     frame::response::result::ColumnType,
     serialize::{
         value::SerializeValue,

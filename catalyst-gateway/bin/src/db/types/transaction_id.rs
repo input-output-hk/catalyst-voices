@@ -4,7 +4,7 @@ use std::fmt::{Display, Formatter};
 
 use cardano_blockchain_types::TransactionId;
 use scylla::{
-    deserialize::{DeserializationError, DeserializeValue, FrameSlice, TypeCheckError},
+    deserialize::{value::DeserializeValue, DeserializationError, FrameSlice, TypeCheckError},
     frame::response::result::ColumnType,
     serialize::{
         value::SerializeValue,

@@ -12,7 +12,7 @@ use std::sync::Arc;
 use cardano_blockchain_types::{
     Network, Slot, StakeAddress, TransactionId, TxnIndex, TxnOutputOffset,
 };
-use scylla::Session;
+use scylla::client::session::Session;
 use tracing::{error, warn};
 
 use crate::{

@@ -5,7 +5,7 @@ use std::{fmt::Debug, sync::Arc};
 use cardano_blockchain_types::{MultiEraBlock, Slot, StakeAddress, TxnIndex, VKeyHash};
 use ed25519_dalek::VerifyingKey;
 use pallas::ledger::primitives::{alonzo, conway};
-use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
+use scylla::{client::session::Session, value::MaybeUnset, SerializeRow};
 use tracing::error;
 
 use crate::{
