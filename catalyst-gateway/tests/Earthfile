@@ -58,20 +58,20 @@ test-lint-openapi:
     # Scan the doc directory where type of file is JSON.
     DO spectral-ci+LINT --dir=./doc
 
-test-buider:
+test-builder:
     FROM gateway+builder-src
 
     RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
         cargo b --release --all-targets
 
 docker-postgres-runner:
-    FROM +test-buider
+    FROM +test-builder
 
     ENTRYPOINT cargo nextest run --release --run-ignored=only signed_docs
     SAVE IMAGE postgres-runner:latest
 
 docker-scylla-runner:
-    FROM +test-buider
+    FROM +test-builder
 
     ENTRYPOINT cargo nextest run --release --run-ignored=only scylla_session scylla_queries scylla_purge rbac_index --no-fail-fast
     SAVE IMAGE scylla-runner:latest
