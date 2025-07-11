@@ -76,7 +76,7 @@ test-ci-schemathesis:
 docker:
     FROM python:3.12-alpine3.20
 
-    ARG version=3.39.8
+    ARG version=3.39.16
 
     RUN apk add --no-cache gcc musl-dev
     RUN python -m pip install schemathesis==$version
