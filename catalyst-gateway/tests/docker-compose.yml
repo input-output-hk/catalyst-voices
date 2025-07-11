@@ -16,8 +16,6 @@ services:
 
       - INIT_AND_DROP_DB=true
       - WITH_MIGRATIONS=true
-    ports:
-      - 5432:5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${DB_SUPERUSER} -d $${DB_SUPERUSER_PASSWORD}"]
       interval: 10s
@@ -34,8 +32,6 @@ services:
       interval: 15s
       timeout: 30s
       retries: 10
-    ports:
-      - "9042:9042"
 
   cat-gateway-with-scylla:
     image: cat-gateway-with-scylla:latest
@@ -83,8 +79,6 @@ services:
       - INTERNAL_API_KEY=123
       # - LOG_LEVEL=error
       # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
-    ports:
-      - 3030:3030
     depends_on:
       event-db:
         condition: service_healthy
@@ -94,7 +88,6 @@ services:
   api-tests-runner:
     image: api-tests-runner:latest
     container_name: api-tests-runner
-    command: -m preprod_indexing
     environment:
       - CAT_GATEWAY_TEST_URL=http://cat-gateway:3030
       - CAT_GATEWAY_INTERNAL_API_KEY=123
