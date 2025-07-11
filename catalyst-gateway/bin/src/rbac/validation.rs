@@ -13,7 +13,10 @@ use futures::{StreamExt, TryFutureExt};
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
 
 use crate::{
-    db::index::session::CassandraSession,
+    db::index::{
+        queries::rbac::get_catalyst_id_from_stake_address::cache_stake_address,
+        session::CassandraSession,
+    },
     rbac::{
         chains_cache::{cache_persistent_rbac_chain, cached_persistent_rbac_chain},
         get_chain::{apply_regs, build_rbac_chain, persistent_rbac_chain},
@@ -116,7 +119,9 @@ async fn update_chain(
         HashSet::new(),
     );
 
-    cache_persistent_rbac_chain(catalyst_id.clone(), new_chain);
+    if is_persistent {
+        cache_persistent_rbac_chain(catalyst_id.clone(), new_chain);
+    }
 
     Ok(RbacValidationSuccess {
         catalyst_id,
@@ -135,6 +140,8 @@ async fn start_new_chain(
     let catalyst_id = reg.catalyst_id().cloned();
     let purpose = reg.purpose();
     let report = reg.report().to_owned();
+    let slot = reg.origin().point().slot_or_default();
+    let txn_index = reg.origin().txn_index();
 
     // Try to start a new chain.
     let new_chain = RegistrationChain::new(reg).map_err(|e| {
@@ -223,6 +230,19 @@ async fn start_new_chain(
         // This chain has just been created, so no addresses have been removed from it.
         HashSet::new(),
     );
+
+    // This cache must be updated because these addresses previously belonged to other chains.
+    for (catalyst_id, addresses) in &updated_chains {
+        for address in addresses {
+            cache_stake_address(
+                is_persistent,
+                address.clone(),
+                catalyst_id.clone(),
+                slot,
+                txn_index,
+            );
+        }
+    }
 
     Ok(RbacValidationSuccess {
         catalyst_id,

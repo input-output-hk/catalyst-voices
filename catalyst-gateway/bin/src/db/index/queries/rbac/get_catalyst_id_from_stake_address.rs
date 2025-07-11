@@ -140,6 +140,19 @@ impl From<Query> for QueryResult {
     }
 }
 
+/// Adds the given value to the cache.
+pub fn cache_stake_address(
+    is_persistent: bool, stake_address: StakeAddress, catalyst_id: CatalystId, slot_no: Slot,
+    txn_index: TxnIndex,
+) {
+    let cache = cache(is_persistent);
+    cache.insert(stake_address, QueryResult {
+        catalyst_id,
+        slot_no,
+        txn_index,
+    });
+}
+
 /// Removes all cached values.
 pub fn invalidate_stake_addresses_cache(is_persistent: bool) {
     let cache = cache(is_persistent);
