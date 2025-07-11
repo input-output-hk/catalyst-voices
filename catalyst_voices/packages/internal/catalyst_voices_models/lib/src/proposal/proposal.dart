@@ -120,7 +120,7 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
         versions,
       ];
 
-  int get versionCount => versions.isEmpty ? 1 : versions.length;
+  int get versionCount => versions.versionNumber(selfRef.version ?? '');
 
   @override
   int compareTo(Proposal other) {

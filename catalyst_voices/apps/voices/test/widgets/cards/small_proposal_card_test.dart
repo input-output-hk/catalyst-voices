@@ -34,6 +34,12 @@ void main() {
         publish: ProposalPublish.publishedDraft,
         versions: [
           ProposalVersion(
+            publish: ProposalPublish.publishedDraft,
+            selfRef: SignedDocumentRef(id: proposalId, version: latestVersion),
+            title: 'Test Proposal',
+            createdAt: DateTime.now(),
+          ),
+          ProposalVersion(
             publish: ProposalPublish.localDraft,
             selfRef: DraftRef(id: proposalId, version: localVersion),
             title: 'Title ver 1',

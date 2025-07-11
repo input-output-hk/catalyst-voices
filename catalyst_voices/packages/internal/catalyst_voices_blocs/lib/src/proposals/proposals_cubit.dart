@@ -211,17 +211,10 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       return;
     }
 
-    final campaignStage = CampaignStage.fromCampaign(
-      campaign,
-      DateTimeExt.now(),
-    );
-
     final mappedPage = page.map(
       (proposal) {
-        return ProposalViewModel.fromProposalAtStage(
-          proposal: proposal,
-          campaignName: campaign.name,
-          campaignStage: campaignStage,
+        return ProposalBrief.fromProposal(
+          proposal,
         );
       },
     );
