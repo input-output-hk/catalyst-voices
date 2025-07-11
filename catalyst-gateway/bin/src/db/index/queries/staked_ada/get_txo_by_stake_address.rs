@@ -4,9 +4,7 @@ use std::sync::{Arc, RwLock};
 use cardano_blockchain_types::StakeAddress;
 use futures::TryStreamExt;
 use scylla::{
-    client::{pager::TypedRowStream, session::Session},
-    statement::prepared::PreparedStatement,
-    DeserializeRow, SerializeRow,
+    client::session::Session, statement::prepared::PreparedStatement, DeserializeRow, SerializeRow,
 };
 use tracing::error;
 
