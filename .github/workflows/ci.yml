@@ -21,6 +21,20 @@ jobs:
     with:
       forge_version: 0.18.0
 
+  api-tests:
+    needs: ci
+    name: Running integration API tests
+    runs-on: ubuntu-latest
+    steps:
+      - run: docker compose -f "./catalyst-gateway/tests/docker-compose.yml" up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+
+  schemathesis-tests:
+    needs: ci
+    name: Running integration API tests
+    runs-on: ubuntu-latest
+    steps:
+      - run: docker compose -f "./catalyst-gateway/tests/docker-compose.yml" up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
+
   test_reporting:
     if: always()
     needs: ci
