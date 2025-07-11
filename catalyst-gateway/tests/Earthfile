@@ -1,3 +1,5 @@
+# cspell: words unittests
+
 VERSION 0.8
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.4.4 AS spectral-ci
 IMPORT .. AS gateway
@@ -46,7 +48,6 @@ prepare-all-images:
     BUILD +docker-postgres-runner
     BUILD +docker-scylla-runner
 
-# cspell: words oapi
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.
 test-lint-openapi:
