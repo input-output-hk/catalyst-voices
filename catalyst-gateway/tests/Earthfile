@@ -61,19 +61,22 @@ test-lint-openapi:
 test-builder:
     FROM gateway+builder-src
 
-    RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
-        cargo b --release --all-targets
+    RUN cargo test --release --no-run > out.txt 2>&1
+    RUN mv ./$(grep 'Executable unittests src/lib.rs' out.txt | grep -oP 'target/release/deps/cat_gateway-[a-f0-9]+') \
+        cat-gateway-test-runner-lib
+    RUN mv ./$(grep 'Executable unittests src/main.rs' out.txt | grep -oP 'target/release/deps/cat_gateway-[a-f0-9]+') \
+        cat-gateway-test-runner-main
 
 docker-postgres-runner:
     FROM +test-builder
 
-    ENTRYPOINT cargo nextest run --release --run-ignored=only signed_docs
+    ENTRYPOINT ./cat-gateway-test-runner-main --ignored signed_docs
     SAVE IMAGE postgres-runner:latest
 
 docker-scylla-runner:
     FROM +test-builder
 
-    ENTRYPOINT cargo nextest run --release --run-ignored=only scylla_session scylla_queries scylla_purge rbac_index --no-fail-fast
+    ENTRYPOINT ./cat-gateway-test-runner-main --ignored scylla_session scylla_queries scylla_purge rbac_index
     SAVE IMAGE scylla-runner:latest
 
 test-postgres:
