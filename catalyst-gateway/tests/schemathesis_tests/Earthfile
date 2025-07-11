@@ -73,7 +73,7 @@ disable-test-ci-schemathesis:
             exit 1
     END
 
-docker:
+package:
     FROM python:3.12-alpine3.20
 
     ARG version=3.39.16

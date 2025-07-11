@@ -43,10 +43,10 @@ prepare-all-images:
     FROM scratch
     BUILD gateway+docker
     BUILD ../event-db+docker
-    BUILD ./api_tests+docker
-    BUILD ./schemathesis_tests+docker
-    BUILD +docker-postgres-runner
-    BUILD +docker-scylla-runner
+    BUILD ./api_tests+package
+    BUILD ./schemathesis_tests+package
+    BUILD +package-postgres-runner
+    BUILD +package-scylla-runner
 
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.
@@ -68,13 +68,13 @@ test-builder:
     RUN mv ./$(grep 'Executable unittests src/main.rs' out.txt | grep -oP 'target/release/deps/cat_gateway-[a-f0-9]+') \
         cat-gateway-test-runner-main
 
-docker-postgres-runner:
+package-postgres-runner:
     FROM +test-builder
 
     ENTRYPOINT ./cat-gateway-test-runner-main --ignored signed_docs
     SAVE IMAGE postgres-runner:latest
 
-docker-scylla-runner:
+package-scylla-runner:
     FROM +test-builder
 
     ENTRYPOINT ./cat-gateway-test-runner-main --ignored scylla_session scylla_queries scylla_purge rbac_index

@@ -41,7 +41,7 @@ disable-test:
     END
 
 # Creates a package of the python integration test runner
-docker:
+package:
     FROM +builder
 
     ENV ASSETS_DATA_PATH="./cardano-asset-preprod.json"
