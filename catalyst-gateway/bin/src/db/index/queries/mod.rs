@@ -108,6 +108,7 @@ pub(crate) enum PreparedSelectQuery {
     /// Get RBAC registrations by Catalyst ID.
     RbacRegistrationsByCatalystId,
     /// Get invalid RBAC registrations by Catalyst ID.
+    #[allow(dead_code)]
     RbacInvalidRegistrationsByCatalystId,
     /// Get Catalyst ID by transaction ID.
     CatalystIdByTransactionId,
