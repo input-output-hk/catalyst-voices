@@ -33,34 +33,6 @@ services:
       timeout: 30s
       retries: 10
 
-  cat-gateway-with-scylla:
-    image: cat-gateway-with-scylla:latest
-    container_name: cat-gateway-with-scylla
-    healthcheck:
-      test: "curl -s -i localhost:3030/api/v1/health/ready | head -n 1 | grep 204"
-      interval: 60s
-      timeout: 300s
-      retries: 10
-    environment:
-      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
-      - CASSANDRA_PERSISTENT_URL=localhost:9042
-      - CASSANDRA_VOLATILE_URL=localhost:9042
-      - CAT_ADDRESS=0.0.0.0:3030
-      - CHAIN_NETWORK=Preprod
-      - SIGNED_DOC_SK=0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd
-      - LOG_LEVEL=error
-      - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
-      - DATA_REFRESH_TICK=5
-      - CHECK_CONFIG_TICK=5
-      - MACHINE_ID=UID
-      - INTERNAL_API_KEY=123
-      - RBAC_OFF=true
-    ports:
-      - 3030:3030
-    depends_on:
-      event-db:
-        condition: service_healthy
-
   cat-gateway:
     image: cat-gateway:latest
     container_name: cat-gateway
@@ -128,22 +100,4 @@ services:
       # - SEED=""
     depends_on:
       cat-gateway:
-        condition: service_healthy
-
-# A helper service that waits for the event-db to be fully initialized. 
-# This is a workaround for Earthly to handle service dependencies properly 
-# and ensure dependent services only start after the event-db is healthy and ready.
-  event-db-is-running:
-    image: alpine:3.20.3
-    depends_on:
-      event-db:
-        condition: service_healthy
-
-# A helper service that waits for the cat-gateway and Scylla to be fully initialized. 
-# This is a workaround for Earthly to handle service dependencies properly 
-# and ensure dependent services only start after the cat-gateway and Scylla are healthy and ready.
-  cat-gateway-with-scylla-is-running:
-    image: alpine:3.20.3
-    depends_on:
-      cat-gateway-with-scylla:
         condition: service_healthy
