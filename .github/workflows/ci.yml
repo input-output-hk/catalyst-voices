@@ -17,10 +17,10 @@ permissions:
   pull-requests: write
 
 jobs:
-  ci:
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.3
-    with:
-      forge_version: 0.18.0
+  # ci:
+  #   uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.3
+  #   with:
+  #     forge_version: 0.18.0
 
   tests:
     # needs: ci
