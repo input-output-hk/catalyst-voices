@@ -17,10 +17,10 @@ permissions:
   pull-requests: write
 
 jobs:
-  # ci:
-  #   uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.3
-  #   with:
-  #     forge_version: 0.18.0
+  ci:
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.3
+    with:
+      forge_version: 0.18.0
 
   tests:
     # needs: ci
@@ -28,11 +28,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Prepare all necessary atrifacts
-        uses: input-output-hk/catalyst-forge/.github/workflows/run.yml@run/v1.7.3
+      - name: Install Forge
+        uses: input-output-hk/catalyst-forge/actions/install@v1.7.3
         with:
-          forge_version: 0.18.0
-          earthfiles: " ['./catalyst-gateway/tests/+prepare-all-images']"
+          version: 0.18.0
+      - name: Setup
+        uses: input-output-hk/catalyst-forge/actions/setup@master
+      - name: Prepare artifacts
+        uses: input-output-hk/catalyst-forge/actions/run@master
+        with:
+          command: run
+          args: " ['./catalyst-gateway/tests/+prepare-all-images'] "
 
       - name: Running Postgres tests
         run: docker compose -f "./catalyst-gateway/tests/docker-compose.yml" up postgres-runner --abort-on-container-exit --exit-code-from postgres-runner
