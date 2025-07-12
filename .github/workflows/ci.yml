@@ -17,13 +17,13 @@ permissions:
   pull-requests: write
 
 jobs:
-  # ci:
-  #   uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.3
-  #   with:
-  #     forge_version: 0.18.0
+  ci:
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.3
+    with:
+      forge_version: 0.18.0
 
   tests:
-    # needs: ci
+    needs: ci
     name: Cat-Gateway ALL integration tests
     runs-on: ubuntu-latest
     steps:
@@ -52,7 +52,7 @@ jobs:
       - name: Running integration API tests
         run: docker compose -f "./catalyst-gateway/tests/docker-compose.yml" up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
 
-  # test_reporting:
-  #   if: always()
-  #   needs: ci
-  #   uses: ./.github/workflows/generate-allure-report.yml
+  test_reporting:
+    if: always()
+    needs: ci
+    uses: ./.github/workflows/generate-allure-report.yml
