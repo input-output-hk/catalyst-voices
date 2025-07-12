@@ -38,7 +38,7 @@ jobs:
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
         with:
           command: run
-          args: " ['./catalyst-gateway/tests/+prepare-all-images'] "
+          args: "./catalyst-gateway/tests/+prepare-all-images"
 
       - name: Running Postgres tests
         run: docker compose -f "./catalyst-gateway/tests/docker-compose.yml" up postgres-runner --abort-on-container-exit --exit-code-from postgres-runner
