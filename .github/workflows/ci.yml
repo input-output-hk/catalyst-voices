@@ -24,18 +24,18 @@ jobs:
 
   tests:
     # needs: ci
-    name: Running ALL integration tests for the cat-gateway
+    name: Cat-Gateway ALL integration tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@v1.7.3
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.7.3
         with:
           version: 0.18.0
       - name: Setup
-        uses: input-output-hk/catalyst-forge/actions/setup@master
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.7.3
       - name: Prepare artifacts
-        uses: input-output-hk/catalyst-forge/actions/run@master
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
         with:
           command: run
           args: " ['./catalyst-gateway/tests/+prepare-all-images'] "
