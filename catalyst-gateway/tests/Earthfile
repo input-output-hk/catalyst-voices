@@ -1,3 +1,5 @@
+# cspell: words unittests
+
 VERSION 0.8
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.4.4 AS spectral-ci
 IMPORT .. AS gateway
@@ -36,7 +38,16 @@ package-cat-gateway-with-scylla:
     ENTRYPOINT ./scylla_entry.sh && ./cat-gateway run
     SAVE IMAGE cat-gateway-with-scylla:latest
 
-# cspell: words oapi
+# build all necessary docker images required to run `docker-compose.yml` services
+prepare-all-images:
+    FROM scratch
+    BUILD gateway+docker
+    BUILD ../event-db+docker
+    BUILD ./api_tests+package
+    BUILD ./schemathesis_tests+package
+    BUILD +package-postgres-runner
+    BUILD +package-scylla-runner
+
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.
 test-lint-openapi:
@@ -48,7 +59,24 @@ test-lint-openapi:
     # Scan the doc directory where type of file is JSON.
     DO spectral-ci+LINT --dir=./doc
 
-test-postgres:
+test-builder:
+    FROM gateway+builder-src
+
+    RUN cargo nextest archive --release --archive-file cat-gateway-tests.tar.zst 
+
+package-postgres-runner:
+    FROM +test-builder
+
+    ENTRYPOINT cargo nextest run --archive-file=cat-gateway-tests.tar.zst --run-ignored=only signed_docs --no-fail-fast
+    SAVE IMAGE postgres-runner:latest
+
+package-scylla-runner:
+    FROM +test-builder
+
+    ENTRYPOINT cargo nextest run --archive-file=cat-gateway-tests.tar.zst --run-ignored=only scylla_session scylla_queries scylla_purge rbac_index --no-fail-fast
+    SAVE IMAGE scylla-runner:latest
+
+disable-test-postgres:
     FROM gateway+builder-src
 
     COPY +docker-compose/docker-compose.yml .
@@ -65,7 +93,7 @@ test-postgres:
     END
 
 # test-scylla - Runs the integration test for scylla.
-test-scylla:
+disable-test-scylla:
     FROM gateway+builder-src
 
     DO +INSTALL_SCYLLA

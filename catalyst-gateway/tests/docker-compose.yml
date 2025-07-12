@@ -16,8 +16,6 @@ services:
 
       - INIT_AND_DROP_DB=true
       - WITH_MIGRATIONS=true
-    ports:
-      - 5432:5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${DB_SUPERUSER} -d $${DB_SUPERUSER_PASSWORD}"]
       interval: 10s
@@ -34,8 +32,6 @@ services:
       interval: 15s
       timeout: 30s
       retries: 10
-    ports:
-      - "9042:9042"
 
   cat-gateway-with-scylla:
     image: cat-gateway-with-scylla:latest
@@ -83,8 +79,6 @@ services:
       - INTERNAL_API_KEY=123
       # - LOG_LEVEL=error
       # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
-    ports:
-      - 3030:3030
     depends_on:
       event-db:
         condition: service_healthy
@@ -102,7 +96,39 @@ services:
     depends_on:
       cat-gateway:
         condition: service_healthy
+  
+  postgres-runner:
+    image: postgres-runner:latest
+    container_name: postgres-runner
+    environment:
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
+    depends_on:
+      event-db:
+        condition: service_healthy
 
+  scylla-runner:
+    image: scylla-runner:latest
+    container_name: scylla-runner
+    environment:
+      - CASSANDRA_PERSISTENT_URL=scylla-node:9042
+      - CASSANDRA_VOLATILE_URL=scylla-node:9042
+    depends_on:
+      scylla-node:
+        condition: service_healthy
+
+  schemathesis-runner:
+    image: schemathesis-runner:latest
+    container_name: schemathesis-runner
+    environment:
+      - API_SPEC=http://cat-gateway:3030/docs/cat-gateway.json
+      - WAIT_FOR_SCHEMA=500
+      - MAX_RESPONSE_TIME=5000
+      - HYPOTHESIS_MAX_EXAMPLES=1000
+      # place a seed value to reproduce some specific schemathesis test scenario
+      # - SEED=""
+    depends_on:
+      cat-gateway:
+        condition: service_healthy
 
 # A helper service that waits for the event-db to be fully initialized. 
 # This is a workaround for Earthly to handle service dependencies properly 

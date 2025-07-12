@@ -23,7 +23,7 @@ src:
 
 
 # Build the docs here.
-docs:
+disable-docs:
     FROM +src
 
     DO docs-ci+BUILD
