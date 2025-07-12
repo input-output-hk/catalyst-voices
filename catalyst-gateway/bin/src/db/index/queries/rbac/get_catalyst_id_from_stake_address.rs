@@ -178,26 +178,27 @@ fn cache(is_persistent: bool) -> &'static Cache<StakeAddress, QueryResult> {
 fn update_cache_metrics(is_persistent: bool, is_found: bool) {
     let api_host_names = Settings::api_host_names().join(",");
     let service_id = Settings::service_id();
+    let network = Settings::cardano_network().to_string();
 
     match (is_persistent, is_found) {
         (true, true) => {
             PERSISTENT_STAKE_ADDRESSES_CACHE_HIT
-                .with_label_values(&[&api_host_names, service_id])
+                .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
         },
         (true, false) => {
             PERSISTENT_STAKE_ADDRESSES_CACHE_MISS
-                .with_label_values(&[&api_host_names, service_id])
+                .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
         },
         (false, true) => {
             VOLATILE_STAKE_ADDRESSES_CACHE_HIT
-                .with_label_values(&[&api_host_names, service_id])
+                .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
         },
         (false, false) => {
             VOLATILE_STAKE_ADDRESSES_CACHE_MISS
-                .with_label_values(&[&api_host_names, service_id])
+                .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
         },
     }
