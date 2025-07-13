@@ -274,6 +274,7 @@ mod tests {
     use super::*;
     use crate::db::index::tests::test_utils;
 
+    // TODO: FIXME: These tests need to access the database.
     #[tokio::test]
     async fn index() {
         let block = test_utils::block_3();
