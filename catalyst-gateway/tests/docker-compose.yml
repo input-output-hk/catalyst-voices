@@ -39,8 +39,9 @@ services:
     healthcheck:
       test: "curl -s -i localhost:3030/api/v1/health/ready | head -n 1 | grep 204"
       start_period: 30s
-      interval: 20s
+      interval: 30s
       timeout: 30s
+      # aproximately an 1.5 hour of waiting
       retries: 180
     environment:
       - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
