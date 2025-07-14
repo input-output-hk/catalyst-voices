@@ -32,7 +32,7 @@ use crate::{
 const QUERY: &str = include_str!("../cql/get_catalyst_id_for_transaction_id.cql");
 
 /// A persistent cache instance.
-static PERSISTENT_CACHE: LazyLock<Cache<TransactionId, QueryResult>> = LazyLock::new(|| {
+static PERSISTENT_CACHE: LazyLock<Cache<TransactionId, Arc<CatalystId>>> = LazyLock::new(|| {
     Cache::builder()
         .eviction_policy(EvictionPolicy::lru())
         .max_capacity(Settings::rbac_cfg().persistent_pub_keys_cache_size)
@@ -40,19 +40,12 @@ static PERSISTENT_CACHE: LazyLock<Cache<TransactionId, QueryResult>> = LazyLock:
 });
 
 /// A volatile cache instance.
-static VOLATILE_CACHE: LazyLock<Cache<TransactionId, QueryResult>> = LazyLock::new(|| {
+static VOLATILE_CACHE: LazyLock<Cache<TransactionId, Arc<CatalystId>>> = LazyLock::new(|| {
     Cache::builder()
         .eviction_policy(EvictionPolicy::lru())
         .max_capacity(Settings::rbac_cfg().volatile_pub_keys_cache_size)
         .build()
 });
-
-/// A result of query execution.
-#[derive(Debug, Clone)]
-pub struct QueryResult {
-    /// A Catalyst ID.
-    pub catalyst_id: CatalystId,
-}
 
 /// Get Catalyst ID by transaction ID query parameters.
 #[derive(SerializeRow)]
@@ -81,7 +74,7 @@ impl Query {
     /// Executes the query and returns a result for the given transaction ID.
     pub(crate) async fn get(
         session: &CassandraSession, txn_id: TransactionId,
-    ) -> Result<Option<QueryResult>> {
+    ) -> Result<Option<Arc<CatalystId>>> {
         let cache = cache(session.is_persistent());
 
         let res = cache.get(&txn_id);
@@ -99,7 +92,7 @@ impl Query {
             )
             .await?
             .rows_stream::<Query>()?
-            .map_ok(Into::<QueryResult>::into)
+            .map_ok(|v| Arc::<CatalystId>::new(v.catalyst_id.into()))
             .next()
             .await
             .transpose()
@@ -109,14 +102,6 @@ impl Query {
                 }
             })
             .context("Failed to get Catalyst ID by transaction ID query row")
-    }
-}
-
-impl From<Query> for QueryResult {
-    fn from(v: Query) -> Self {
-        Self {
-            catalyst_id: v.catalyst_id.into(),
-        }
     }
 }
 
@@ -133,7 +118,7 @@ pub fn transaction_ids_cache_size(is_persistent: bool) -> u64 {
 }
 
 /// Returns a persistent or a volatile cache instance depending on the parameter value.
-fn cache(is_persistent: bool) -> &'static Cache<TransactionId, QueryResult> {
+fn cache(is_persistent: bool) -> &'static Cache<TransactionId, Arc<CatalystId>> {
     if is_persistent {
         &PERSISTENT_CACHE
     } else {

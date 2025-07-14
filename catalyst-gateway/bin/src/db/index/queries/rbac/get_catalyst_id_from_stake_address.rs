@@ -32,7 +32,7 @@ use crate::{
 const QUERY: &str = include_str!("../cql/get_catalyst_id_for_stake_address.cql");
 
 /// A persistent cache instance.
-static PERSISTENT_CACHE: LazyLock<Cache<StakeAddress, QueryResult>> = LazyLock::new(|| {
+static PERSISTENT_CACHE: LazyLock<Cache<StakeAddress, Arc<CatalystId>>> = LazyLock::new(|| {
     Cache::builder()
         .eviction_policy(EvictionPolicy::lru())
         .max_capacity(Settings::rbac_cfg().persistent_pub_keys_cache_size)
@@ -40,19 +40,12 @@ static PERSISTENT_CACHE: LazyLock<Cache<StakeAddress, QueryResult>> = LazyLock::
 });
 
 /// A volatile cache instance.
-static VOLATILE_CACHE: LazyLock<Cache<StakeAddress, QueryResult>> = LazyLock::new(|| {
+static VOLATILE_CACHE: LazyLock<Cache<StakeAddress, Arc<CatalystId>>> = LazyLock::new(|| {
     Cache::builder()
         .eviction_policy(EvictionPolicy::lru())
         .max_capacity(Settings::rbac_cfg().volatile_pub_keys_cache_size)
         .build()
 });
-
-/// A result of query execution.
-#[derive(Debug, Clone)]
-pub struct QueryResult {
-    /// A Catalyst ID.
-    pub catalyst_id: CatalystId,
-}
 
 /// Get Catalyst ID by stake address query params.
 #[derive(SerializeRow)]
@@ -94,7 +87,7 @@ impl Query {
     /// Returns the latest Catalyst ID for the given stake address.
     pub(crate) async fn latest(
         session: &CassandraSession, stake_address: &StakeAddress,
-    ) -> Result<Option<QueryResult>> {
+    ) -> Result<Option<Arc<CatalystId>>> {
         let cache = cache(session.is_persistent());
 
         let res = cache.get(stake_address);
@@ -107,7 +100,7 @@ impl Query {
             stake_address: stake_address.clone().into(),
         })
         .await?
-        .map_ok(Into::<QueryResult>::into)
+        .map_ok(|v| Arc::<CatalystId>::new(v.catalyst_id.into()))
         .next()
         .await
         .transpose()
@@ -120,20 +113,12 @@ impl Query {
     }
 }
 
-impl From<Query> for QueryResult {
-    fn from(v: Query) -> Self {
-        Self {
-            catalyst_id: v.catalyst_id.into(),
-        }
-    }
-}
-
 /// Adds the given value to the cache.
 pub fn cache_stake_address(
     is_persistent: bool, stake_address: StakeAddress, catalyst_id: CatalystId,
 ) {
     let cache = cache(is_persistent);
-    cache.insert(stake_address, QueryResult { catalyst_id });
+    cache.insert(stake_address, Arc::new(catalyst_id));
 }
 
 /// Removes all cached values.
@@ -149,7 +134,7 @@ pub fn stake_addresses_cache_size(is_persistent: bool) -> u64 {
 }
 
 /// Returns a persistent or a volatile cache instance depending on the parameter value.
-fn cache(is_persistent: bool) -> &'static Cache<StakeAddress, QueryResult> {
+fn cache(is_persistent: bool) -> &'static Cache<StakeAddress, Arc<CatalystId>> {
     if is_persistent {
         &PERSISTENT_CACHE
     } else {
