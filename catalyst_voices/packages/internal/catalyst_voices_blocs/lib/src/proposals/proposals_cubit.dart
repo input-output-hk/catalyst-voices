@@ -211,13 +211,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       return;
     }
 
-    final mappedPage = page.map(
-      (proposal) {
-        return ProposalBrief.fromProposal(
-          proposal,
-        );
-      },
-    );
+    final mappedPage = page.map(ProposalBrief.fromProposal);
 
     final signal = ProposalsPageReadySignal(page: mappedPage);
 
