@@ -88,7 +88,7 @@ class VoicesDrawer extends StatelessWidget {
                 left: 0,
                 right: 0,
                 child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
+                  duration: _animDuration,
                   child: bottomSheet,
                 ),
               ),
