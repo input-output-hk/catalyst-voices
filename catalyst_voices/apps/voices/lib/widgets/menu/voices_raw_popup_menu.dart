@@ -139,6 +139,19 @@ class _VoicesRawPopupMenuStateRoute<T> extends PopupRoute<T> {
       ),
     );
   }
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return FadeTransition(
+      opacity: CurvedAnimation(parent: animation, curve: Curves.linear),
+      child: child,
+    );
+  }
 }
 
 class _VoicesRawPopupMenuStateRoutePage extends StatelessWidget {
