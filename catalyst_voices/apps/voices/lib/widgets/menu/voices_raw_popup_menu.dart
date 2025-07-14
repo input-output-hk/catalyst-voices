@@ -216,17 +216,7 @@ class _VoicesRawPopupMenuStateRoutePageLayout extends SingleChildLayoutDelegate 
 
     final subScreens = DisplayFeatureSubScreen.subScreensInBounds(Offset.zero & size, const []);
     final subScreen = _closestScreen(subScreens, originCenter);
-    final finalPosition = _fitInsideScreen(subScreen, childSize, wantedPosition: wantedPosition);
-
-    print(
-      'wantedPosition: $wantedPosition, '
-      'finalPosition: $finalPosition, '
-      'buttonPosition: $buttonPosition, '
-      'size: $size, '
-      'childSize: $childSize',
-    );
-
-    return finalPosition;
+    return _fitInsideScreen(subScreen, childSize, wantedPosition: wantedPosition);
   }
 
   @override
