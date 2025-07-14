@@ -60,6 +60,7 @@ export 'list/bullet_list.dart';
 export 'menu/voices_menu.dart';
 export 'menu/voices_modal_menu.dart';
 export 'menu/voices_node_menu.dart';
+export 'menu/voices_raw_popup_menu.dart';
 export 'modals/account/email_not_verified_dialog.dart';
 export 'modals/details/voices_details_dialog.dart';
 export 'modals/voices_alert_dialog.dart';
