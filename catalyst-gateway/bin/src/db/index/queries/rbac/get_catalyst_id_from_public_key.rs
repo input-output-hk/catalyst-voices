@@ -3,7 +3,6 @@
 use std::sync::{Arc, LazyLock};
 
 use anyhow::{Context, Result};
-use cardano_blockchain_types::Slot;
 use catalyst_types::catalyst_id::CatalystId;
 use ed25519_dalek::VerifyingKey;
 use futures::{StreamExt, TryStreamExt};
@@ -20,7 +19,7 @@ use crate::{
             queries::{PreparedQueries, PreparedSelectQuery},
             session::CassandraSession,
         },
-        types::{DbCatalystId, DbPublicKey, DbSlot},
+        types::{DbCatalystId, DbPublicKey},
     },
     metrics::rbac_cache::reporter::{
         PERSISTENT_PUBLIC_KEYS_CACHE_HIT, PERSISTENT_PUBLIC_KEYS_CACHE_MISS,
@@ -53,9 +52,6 @@ static VOLATILE_CACHE: LazyLock<Cache<VerifyingKey, QueryResult>> = LazyLock::ne
 pub struct QueryResult {
     /// A Catalyst ID.
     pub catalyst_id: CatalystId,
-    /// A slot number.
-    #[allow(dead_code)]
-    pub slot_no: Slot,
 }
 
 /// Get Catalyst ID by public key query parameters.
@@ -70,8 +66,6 @@ struct QueryParams {
 pub(crate) struct Query {
     /// A Catalyst ID.
     catalyst_id: DbCatalystId,
-    /// A slot number.
-    slot_no: DbSlot,
 }
 
 impl Query {
@@ -119,7 +113,6 @@ impl From<Query> for QueryResult {
     fn from(v: Query) -> Self {
         Self {
             catalyst_id: v.catalyst_id.into(),
-            slot_no: v.slot_no.into(),
         }
     }
 }

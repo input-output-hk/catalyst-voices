@@ -140,8 +140,6 @@ async fn start_new_chain(
     let catalyst_id = reg.catalyst_id().cloned();
     let purpose = reg.purpose();
     let report = reg.report().to_owned();
-    let slot = reg.origin().point().slot_or_default();
-    let txn_index = reg.origin().txn_index();
 
     // Try to start a new chain.
     let new_chain = RegistrationChain::new(reg).map_err(|e| {
@@ -234,13 +232,7 @@ async fn start_new_chain(
     // This cache must be updated because these addresses previously belonged to other chains.
     for (catalyst_id, addresses) in &updated_chains {
         for address in addresses {
-            cache_stake_address(
-                is_persistent,
-                address.clone(),
-                catalyst_id.clone(),
-                slot,
-                txn_index,
-            );
+            cache_stake_address(is_persistent, address.clone(), catalyst_id.clone());
         }
     }
 

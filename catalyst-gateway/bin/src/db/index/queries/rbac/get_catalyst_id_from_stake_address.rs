@@ -3,7 +3,7 @@
 use std::sync::{Arc, LazyLock};
 
 use anyhow::{Context, Result};
-use cardano_blockchain_types::{Slot, StakeAddress, TxnIndex};
+use cardano_blockchain_types::StakeAddress;
 use catalyst_types::catalyst_id::CatalystId;
 use futures::{StreamExt, TryStreamExt};
 use moka::{policy::EvictionPolicy, sync::Cache};
@@ -19,7 +19,7 @@ use crate::{
             queries::{PreparedQueries, PreparedSelectQuery},
             session::CassandraSession,
         },
-        types::{DbCatalystId, DbSlot, DbStakeAddress, DbTxnIndex},
+        types::{DbCatalystId, DbStakeAddress},
     },
     metrics::rbac_cache::reporter::{
         PERSISTENT_STAKE_ADDRESSES_CACHE_HIT, PERSISTENT_STAKE_ADDRESSES_CACHE_MISS,
@@ -52,12 +52,6 @@ static VOLATILE_CACHE: LazyLock<Cache<StakeAddress, QueryResult>> = LazyLock::ne
 pub struct QueryResult {
     /// A Catalyst ID.
     pub catalyst_id: CatalystId,
-    /// A slot number.
-    #[allow(dead_code)]
-    pub slot_no: Slot,
-    /// A transaction index.
-    #[allow(dead_code)]
-    pub txn_index: TxnIndex,
 }
 
 /// Get Catalyst ID by stake address query params.
@@ -72,10 +66,6 @@ pub(crate) struct QueryParams {
 pub(crate) struct Query {
     /// Catalyst ID for the queries stake address.
     pub catalyst_id: DbCatalystId,
-    /// A slot number.
-    pub slot_no: DbSlot,
-    /// A transaction index.
-    pub txn_index: DbTxnIndex,
 }
 
 impl Query {
@@ -134,23 +124,16 @@ impl From<Query> for QueryResult {
     fn from(v: Query) -> Self {
         Self {
             catalyst_id: v.catalyst_id.into(),
-            slot_no: v.slot_no.into(),
-            txn_index: v.txn_index.into(),
         }
     }
 }
 
 /// Adds the given value to the cache.
 pub fn cache_stake_address(
-    is_persistent: bool, stake_address: StakeAddress, catalyst_id: CatalystId, slot_no: Slot,
-    txn_index: TxnIndex,
+    is_persistent: bool, stake_address: StakeAddress, catalyst_id: CatalystId,
 ) {
     let cache = cache(is_persistent);
-    cache.insert(stake_address, QueryResult {
-        catalyst_id,
-        slot_no,
-        txn_index,
-    });
+    cache.insert(stake_address, QueryResult { catalyst_id });
 }
 
 /// Removes all cached values.

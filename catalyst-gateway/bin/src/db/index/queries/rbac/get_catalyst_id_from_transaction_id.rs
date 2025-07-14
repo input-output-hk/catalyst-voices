@@ -3,7 +3,7 @@
 use std::sync::{Arc, LazyLock};
 
 use anyhow::{Context, Result};
-use cardano_blockchain_types::{Slot, TransactionId};
+use cardano_blockchain_types::TransactionId;
 use catalyst_types::catalyst_id::CatalystId;
 use futures::{StreamExt, TryStreamExt};
 use moka::{policy::EvictionPolicy, sync::Cache};
@@ -19,7 +19,7 @@ use crate::{
             queries::{PreparedQueries, PreparedSelectQuery},
             session::CassandraSession,
         },
-        types::{DbCatalystId, DbSlot, DbTransactionId},
+        types::{DbCatalystId, DbTransactionId},
     },
     metrics::rbac_cache::reporter::{
         PERSISTENT_TRANSACTION_IDS_CACHE_HIT, PERSISTENT_TRANSACTION_IDS_CACHE_MISS,
@@ -52,9 +52,6 @@ static VOLATILE_CACHE: LazyLock<Cache<TransactionId, QueryResult>> = LazyLock::n
 pub struct QueryResult {
     /// A Catalyst ID.
     pub catalyst_id: CatalystId,
-    /// A slot number.
-    #[allow(dead_code)]
-    pub slot_no: Slot,
 }
 
 /// Get Catalyst ID by transaction ID query parameters.
@@ -69,8 +66,6 @@ struct QueryParams {
 pub(crate) struct Query {
     /// A Catalyst ID.
     pub catalyst_id: DbCatalystId,
-    /// A slot number.
-    pub slot_no: DbSlot,
 }
 
 impl Query {
@@ -121,7 +116,6 @@ impl From<Query> for QueryResult {
     fn from(v: Query) -> Self {
         Self {
             catalyst_id: v.catalyst_id.into(),
-            slot_no: v.slot_no.into(),
         }
     }
 }
