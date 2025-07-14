@@ -74,14 +74,14 @@ impl Example for HexEncodedHash28 {
     }
 }
 
-impl TryFrom<Vec<u8>> for HexEncodedHash28 {
+impl TryFrom<&Vec<u8>> for HexEncodedHash28 {
     type Error = anyhow::Error;
 
-    fn try_from(value: Vec<u8>) -> Result<Self, Self::Error> {
+    fn try_from(value: &Vec<u8>) -> Result<Self, Self::Error> {
         if value.len() != HASH_LENGTH {
             bail!("Hash Length Invalid.")
         }
-        Ok(Self(as_hex_string(&value)))
+        Ok(Self(as_hex_string(value)))
     }
 }
 
