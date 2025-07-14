@@ -70,7 +70,7 @@ jobs:
       #     services: scylla-runner
       #     up-flags: --abort-on-container-exit --exit-code-from scylla-runner
 
-  test_reporting:
-    if: always()
-    needs: ci
-    uses: ./.github/workflows/generate-allure-report.yml
+  # test_reporting:
+  #   if: always()
+  #   needs: ci
+  #   uses: ./.github/workflows/generate-allure-report.yml
