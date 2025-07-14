@@ -9,7 +9,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
 import 'package:catalyst_voices_services/src/registration/registration_transaction_role.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/foundation.dart';
 
 /// The transaction metadata used for registration.
 typedef RegistrationMetadata = X509MetadataEnvelope<RegistrationData>;
@@ -202,11 +201,11 @@ final class RegistrationTransactionBuilder {
       changeAddress: changeAddress,
     );
 
-    final (selectedUtxo, changes, totalFee) = txBuilder.selectInputs(
+    final (selectedUtxos, changes, totalFee) = txBuilder.selectInputs(
       changeOutputStrategy: ChangeOutputAdaStrategy.noBurn,
     );
 
-    final realTxInputHash = TransactionInputsHash.fromTransactionInputs(selectedUtxo);
+    final realTxInputHash = TransactionInputsHash.fromTransactionInputs(selectedUtxos);
     final realTxX509Envelope = await _buildMetadataEnvelope(
       rootKeyPair: rootKeyPair,
       txInputsHash: realTxInputHash,
@@ -215,23 +214,17 @@ final class RegistrationTransactionBuilder {
     );
     final realAuxiliaryData = await realTxX509Envelope.toAuxiliaryData();
     final realTxBuilder = txBuilder.copyWith(
-      inputs: selectedUtxo,
+      inputs: selectedUtxos,
       outputs: changes,
       fee: totalFee,
       auxiliaryData: realAuxiliaryData,
     );
 
-    if (!setEquals(selectedUtxo, realTxBuilder.inputs)) {
-      throw ArgumentError('Different selected utxos', 'realTxBuilder.inputs');
-    }
+    _validateSameUtxo(selectedUtxos, realTxBuilder.inputs);
 
     final txBody = realTxBuilder.buildBody();
 
-    for (var i = 0; i < txBody.inputs.length; i++) {
-      if (txBody.inputs.elementAt(i) != selectedUtxo.elementAt(i).input) {
-        throw ArgumentError('Utxo at index [$i] is different in txBody and selectedUtxo');
-      }
-    }
+    _validateUtxoAndTxBodyInputs(selectedUtxos, txBody.inputs);
 
     return Transaction(
       body: txBody,
@@ -352,6 +345,36 @@ final class RegistrationTransactionBuilder {
   int _randomSerialNumber() {
     const maxInt = 4294967296;
     return Random().nextInt(maxInt);
+  }
+
+  void _validateSameUtxo(
+    Set<TransactionUnspentOutput> first,
+    Set<TransactionUnspentOutput> second,
+  ) {
+    if (first.length != second.length) {
+      throw ArgumentError('Different length of utxos');
+    }
+
+    for (var i = 0; i < first.length; i++) {
+      if (first.elementAt(i) != second.elementAt(i)) {
+        throw ArgumentError('Utxo at index [$i] is different');
+      }
+    }
+  }
+
+  void _validateUtxoAndTxBodyInputs(
+    Set<TransactionUnspentOutput> utxos,
+    Set<TransactionInput> inputs,
+  ) {
+    if (utxos.length != inputs.length) {
+      throw ArgumentError('Different length of utxos and inputs');
+    }
+
+    for (var i = 0; i < inputs.length; i++) {
+      if (inputs.elementAt(i) != utxos.elementAt(i).input) {
+        throw ArgumentError('Utxo at index [$i] is different in txBody and selectedUtxo');
+      }
+    }
   }
 }
 
