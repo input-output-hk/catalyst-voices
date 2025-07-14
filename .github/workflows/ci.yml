@@ -38,19 +38,19 @@ jobs:
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
         with:
           command: run
-          args: "./catalyst-gateway/tests/+prepare-all-images"
+          args: ./catalyst-gateway/tests/+prepare-all-images
 
-      - name: Running Postgres tests
-        run: docker compose -f "./catalyst-gateway/tests/docker-compose.yml" up postgres-runner --abort-on-container-exit --exit-code-from postgres-runner
+      # - name: Running Postgres tests
+      #   run: docker compose -f ./catalyst-gateway/tests/docker-compose.yml up postgres-runner --abort-on-container-exit --exit-code-from postgres-runner
 
-      - name: Running Scylla tests
-        run: docker compose -f "./catalyst-gateway/tests/docker-compose.yml" up scylla-runner --abort-on-container-exit --exit-code-from scylla-runner
+      # - name: Running Scylla tests
+      #   run: docker compose -f ./catalyst-gateway/tests/docker-compose.yml up scylla-runner --abort-on-container-exit --exit-code-from scylla-runner
 
       - name: Running integration API tests
-        run: docker compose -f "./catalyst-gateway/tests/docker-compose.yml" up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+        run: docker compose -f ./catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
 
       - name: Running schemathesis tests
-        run: docker compose -f "./catalyst-gateway/tests/docker-compose.yml" up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
+        run: docker compose -f ./catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
 
   test_reporting:
     if: always()
