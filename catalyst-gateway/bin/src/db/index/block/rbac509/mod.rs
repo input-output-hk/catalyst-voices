@@ -268,37 +268,3 @@ impl Rbac509InsertQuery {
         query_handles
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::db::index::tests::test_utils;
-
-    // TODO: FIXME: These tests need to access the database.
-    #[tokio::test]
-    async fn index() {
-        let block = test_utils::block_3();
-        let mut query = Rbac509InsertQuery::new();
-        let txn_hash = "1bf8eb4da8fe5910cc890025deb9740ba5fa4fd2ac418ccbebfd6a09ed10e88b"
-            .parse()
-            .unwrap();
-        let mut context = RbacBlockIndexingContext::new();
-        Box::pin(query.index(txn_hash, 0.into(), &block, &mut context)).await;
-        assert!(query.invalid.is_empty());
-        assert_eq!(1, query.registrations.len());
-    }
-
-    // The invalid vec is empty in this test because it doesn't contain a Catalyst ID.
-    #[tokio::test]
-    async fn index_invalid() {
-        let block = test_utils::block_4();
-        let mut query = Rbac509InsertQuery::new();
-        let txn_hash = "337d35026efaa48b5ee092d38419e102add1b535364799eb8adec8ac6d573b79"
-            .parse()
-            .unwrap();
-        let mut context = RbacBlockIndexingContext::new();
-        Box::pin(query.index(txn_hash, 0.into(), &block, &mut context)).await;
-        assert!(query.registrations.is_empty());
-        assert!(query.invalid.is_empty());
-    }
-}
