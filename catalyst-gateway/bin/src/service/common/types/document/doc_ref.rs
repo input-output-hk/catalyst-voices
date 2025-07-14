@@ -219,8 +219,8 @@ impl Example for DocumentReference {
 impl From<catalyst_signed_doc::DocumentRef> for DocumentReference {
     fn from(value: catalyst_signed_doc::DocumentRef) -> Self {
         Self {
-            doc_id: value.id.into(),
-            ver: value.ver.into(),
+            doc_id: value.id().clone().into(),
+            ver: value.ver().clone().into(),
         }
     }
 }
