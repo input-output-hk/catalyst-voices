@@ -41,7 +41,7 @@ services:
       start_period: 30s
       interval: 30s
       timeout: 30s
-      # aproximately an 1.5 hour of waiting
+      # approximately an 1.5 hour of waiting
       retries: 180
     environment:
       - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
