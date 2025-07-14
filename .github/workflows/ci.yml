@@ -46,11 +46,11 @@ jobs:
       - name: Running Scylla tests
         run: docker compose -f "./catalyst-gateway/tests/docker-compose.yml" up scylla-runner --abort-on-container-exit --exit-code-from scylla-runner
 
-      - name: Running schemathesis tests
-        run: docker compose -f "./catalyst-gateway/tests/docker-compose.yml" up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
-
       - name: Running integration API tests
         run: docker compose -f "./catalyst-gateway/tests/docker-compose.yml" up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+
+      - name: Running schemathesis tests
+        run: docker compose -f "./catalyst-gateway/tests/docker-compose.yml" up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
 
   test_reporting:
     if: always()

@@ -38,8 +38,8 @@ services:
     container_name: cat-gateway
     healthcheck:
       # TODO: enable it after it will be ready to sync with the mithril snapshot 
-      # test: "curl -s -i localhost:3030/api/v1/health/started | head -n 1 | grep 204"
-      test: "! curl -s -i localhost:3030/api/v1/config/frontend | head -n 1 | grep 503"
+      test: "curl -s -i localhost:3030/api/v1/health/started | head -n 1 | grep 204"
+      # test: "! curl -s -i localhost:3030/api/v1/config/frontend | head -n 1 | grep 503"
       start_period: 30s
       interval: 30s
       timeout: 30s
