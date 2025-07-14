@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
 const Duration _animDuration = Duration(milliseconds: 200);
@@ -105,7 +106,7 @@ class _BottomSheetOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black26,
+      color: Theme.of(context).colors.onSurfaceNeutral016.withAlpha(50),
     );
   }
 }
