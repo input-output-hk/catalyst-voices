@@ -24,5 +24,7 @@ package:
 
     ENV ASSETS_DATA_PATH="./cardano-asset-preprod.json"
 
-    ENTRYPOINT poetry run pytest -s -m preprod_indexing --junitxml=junit-report.xml --cov=integration --cov-report lcov
+    # TODO: enable it after it will be ready to sync with the mithril snapshot 
+    # ENTRYPOINT poetry run pytest -s -m preprod_indexing --junitxml=junit-report.xml --cov=integration --cov-report lcov
+    ENTRYPOINT poetry run pytest -s --junitxml=junit-report.xml --cov=integration --cov-report lcov
     SAVE IMAGE api-tests-runner:latest
