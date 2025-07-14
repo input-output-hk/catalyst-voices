@@ -29,6 +29,7 @@ export 'menu/menu_item.dart';
 export 'menu/popup_menu_item.dart';
 export 'proposal/exception/localized_proposal_deletion_exception.dart';
 export 'proposal/exception/localized_unknown_publish_comment_exception.dart';
+export 'proposal/proposal_brief.dart';
 export 'proposal/proposal_overview_segment.dart';
 export 'proposal/proposal_title.dart';
 export 'proposal/proposal_version_view_model.dart';
