@@ -21,6 +21,7 @@ use crate::{
     utils::blake2b_hash::generate_uuid_string_from_data,
 };
 
+pub(crate) mod cardano_assets_cache;
 pub(crate) mod cassandra_db;
 pub(crate) mod chain_follower;
 pub(crate) mod event_db;
@@ -129,6 +130,9 @@ struct EnvVars {
     /// RBAC configuration.
     rbac: rbac::EnvVars,
 
+    /// The Cardano assets caches configuration
+    cardano_assets_cache: cardano_assets_cache::EnvVars,
+
     /// Internal API Access API Key
     internal_api_key: Option<StringEnvVar>,
 
@@ -206,6 +210,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         event_db: event_db::EnvVars::new(),
         signed_doc: signed_doc::EnvVars::new(),
         rbac: rbac::EnvVars::new(),
+        cardano_assets_cache: cardano_assets_cache::EnvVars::new(),
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
         check_config_tick: StringEnvVar::new_as_duration(
             "CHECK_CONFIG_TICK",
@@ -326,10 +331,13 @@ impl Settings {
     }
 
     /// Returns the RBAC configuration.
-    // TODO: Remove when used.
-    #[allow(unused)]
     pub fn rbac_cfg() -> &'static rbac::EnvVars {
         &ENV_VARS.rbac
+    }
+
+    /// Get the configuration of the Cardano assets cache.
+    pub(crate) fn cardano_assets_cache() -> cardano_assets_cache::EnvVars {
+        ENV_VARS.cardano_assets_cache.clone()
     }
 
     /// Chain Follower network (The Blockchain network we are configured to use).

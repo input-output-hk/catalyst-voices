@@ -174,6 +174,11 @@ impl CassandraSession {
         }
     }
 
+    /// Returns a flag notifying that the current `CassandraSession` is persistent or not
+    pub(crate) fn is_persistent(&self) -> bool {
+        self.persistent
+    }
+
     /// Executes a select query with the given parameters.
     ///
     /// Returns an iterator that iterates over all the result pages that the query
