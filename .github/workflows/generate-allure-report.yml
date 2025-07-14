@@ -50,32 +50,43 @@ jobs:
       - name: Run scylla-node image
         run: docker compose -f catalyst-gateway/tests/docker-compose.yml up -d scylla-node
 
-      - name: Build cat-gateway binary
+      - name: Build cat-gateway image
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
         if: always()
         continue-on-error: true
         with:
           command: run
-          args: ./catalyst-gateway+build
+          args: ./catalyst-gateway+docker
 
-      - name: Run cat-gateway binary
-        if: success()
-        env:
-          EVENT_DB_URL: "postgres://catalyst-event-dev:CHANGE_ME@localhost:5432/CatalystEventDev"
-          CHAIN_NETWORK: "Preprod"
-          SIGNED_DOC_SK: "0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd"
-        run: ./catalyst-gateway/cat-gateway run&
-
-      - name: Get healtcheck script
+      - name: Build api-tests image
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
-        if: success()
+        if: always()
         continue-on-error: true
         with:
           command: run
-          args: ./catalyst-gateway/tests/api_tests+check-return-code
+          args: ./catalyst-gateway/tests/api_tests+package
 
-      - name: Check if Gateway is synced and ready
-        run: ./catalyst-gateway/tests/api_tests/scripts/check_return_code.sh http://127.0.0.1:3030/api/v1/health/ready 204 300 10
+      - name: Run api-test
+        run: docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+
+#      - name: Run cat-gateway binary
+#        if: success()
+#        env:
+#          EVENT_DB_URL: "postgres://catalyst-event-dev:CHANGE_ME@localhost:5432/CatalystEventDev"
+#          CHAIN_NETWORK: "Preprod"
+#          SIGNED_DOC_SK: "0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd"
+#        run: ./catalyst-gateway/cat-gateway run&
+
+#      - name: Get healtcheck script
+#        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
+#        if: success()
+#        continue-on-error: true
+#        with:
+#          command: run
+#          args: ./catalyst-gateway/tests/api_tests+check-return-code
+
+#      - name: Check if Gateway is synced and ready
+#        run: ./catalyst-gateway/tests/api_tests/scripts/check_return_code.sh http://127.0.0.1:3030/api/v1/health/ready 204 300 10
 
 #      - name: Check if Gateway is synced and ready
 #        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
@@ -85,16 +96,16 @@ jobs:
 #          command: run
 #          args: ./catalyst-gateway/tests/api_tests+check-gateway-ready
 
-      - name: Run api tests
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
-        if: success()
-        continue-on-error: true
-        with:
-          command: run
-          args: ./catalyst-gateway/tests/api_tests+test-no-docker
+#      - name: Run api tests
+#        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
+#        if: success()
+#        continue-on-error: true
+#        with:
+#          command: run
+#          args: ./catalyst-gateway/tests/api_tests+test-no-docker
 
-      - name: Setup upterm session
-        uses: lhotari/action-upterm@v1
+#      - name: Setup upterm session
+#        uses: lhotari/action-upterm@v1
 
 #      - name: Get python api test report
 #        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
