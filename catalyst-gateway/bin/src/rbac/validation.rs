@@ -1,9 +1,6 @@
 //! Utilities for RBAC registrations validation.
 
-use std::{
-    collections::{HashMap, HashSet},
-    iter,
-};
+use std::collections::{HashMap, HashSet};
 
 use anyhow::{Context, Result};
 use cardano_blockchain_types::{StakeAddress, TransactionId};
@@ -16,13 +13,15 @@ use futures::{StreamExt, TryFutureExt};
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
 
 use crate::{
-    db::index::session::CassandraSession,
+    db::index::{
+        queries::rbac::get_catalyst_id_from_stake_address::cache_stake_address,
+        session::CassandraSession,
+    },
     rbac::{
         chains_cache::{cache_persistent_rbac_chain, cached_persistent_rbac_chain},
         get_chain::{apply_regs, build_rbac_chain, persistent_rbac_chain},
-        latest_rbac_chain,
-        validation_result::RbacUpdate,
-        RbacBlockIndexingContext, RbacValidationError, RbacValidationResult,
+        latest_rbac_chain, RbacBlockIndexingContext, RbacValidationError, RbacValidationResult,
+        RbacValidationSuccess,
     },
 };
 
@@ -95,7 +94,7 @@ async fn update_chain(
     })?;
 
     // Check that new public keys aren't used by other chains.
-    let keys = validate_public_keys(&new_chain, is_persistent, &report, context).await?;
+    let public_keys = validate_public_keys(&new_chain, is_persistent, &report, context).await?;
 
     // Return an error if any issues were recorded in the report.
     if report.is_problematic() {
@@ -108,8 +107,8 @@ async fn update_chain(
 
     // Everything is fine: update the context.
     context.insert_transaction(txn_id, catalyst_id.clone());
-    context.insert_addresses(stake_addresses, &catalyst_id);
-    context.insert_public_keys(&keys, &catalyst_id);
+    context.insert_addresses(stake_addresses.clone(), &catalyst_id);
+    context.insert_public_keys(public_keys.clone(), &catalyst_id);
     context.insert_registration(
         catalyst_id.clone(),
         txn_id,
@@ -120,14 +119,18 @@ async fn update_chain(
         HashSet::new(),
     );
 
-    cache_persistent_rbac_chain(catalyst_id.clone(), new_chain);
+    if is_persistent {
+        cache_persistent_rbac_chain(catalyst_id.clone(), new_chain);
+    }
 
-    // Only new chains can take ownership of stake addresses of existing chains, so in this
-    // case we always have just one update.
-    Ok(vec![RbacUpdate {
+    Ok(RbacValidationSuccess {
         catalyst_id,
-        removed_stake_addresses: HashSet::new(),
-    }])
+        stake_addresses,
+        public_keys,
+        // Only new chains can take ownership of stake addresses of existing chains, so in this case
+        // other chains aren't affected.
+        modified_chains: Vec::new(),
+    })
 }
 
 /// Tries to start a new RBAC chain.
@@ -199,7 +202,7 @@ async fn start_new_chain(
     }
 
     // Check that new public keys aren't used by other chains.
-    let keys = validate_public_keys(&new_chain, is_persistent, &report, context).await?;
+    let public_keys = validate_public_keys(&new_chain, is_persistent, &report, context).await?;
 
     if report.is_problematic() {
         return Err(RbacValidationError::InvalidRegistration {
@@ -213,8 +216,8 @@ async fn start_new_chain(
     context.insert_transaction(new_chain.current_tx_id_hash(), catalyst_id.clone());
     // This will also update the addresses that are already present in the context if they
     // were reassigned to the new chain.
-    context.insert_addresses(new_addresses, &catalyst_id);
-    context.insert_public_keys(&keys, &catalyst_id);
+    context.insert_addresses(new_addresses.clone(), &catalyst_id);
+    context.insert_public_keys(public_keys.clone(), &catalyst_id);
     context.insert_registration(
         catalyst_id.clone(),
         new_chain.current_tx_id_hash(),
@@ -226,21 +229,19 @@ async fn start_new_chain(
         HashSet::new(),
     );
 
-    // Return a new registration along with (potentially empty) list of updated to other
-    // chains if their addresses were taken.
-    Ok(updated_chains
-        .into_iter()
-        .map(|(catalyst_id, removed_stake_addresses)| {
-            RbacUpdate {
-                catalyst_id,
-                removed_stake_addresses,
-            }
-        })
-        .chain(iter::once(RbacUpdate {
-            catalyst_id,
-            removed_stake_addresses: HashSet::new(),
-        }))
-        .collect())
+    // This cache must be updated because these addresses previously belonged to other chains.
+    for (catalyst_id, addresses) in &updated_chains {
+        for address in addresses {
+            cache_stake_address(is_persistent, address.clone(), catalyst_id.clone());
+        }
+    }
+
+    Ok(RbacValidationSuccess {
+        catalyst_id,
+        stake_addresses: new_addresses,
+        public_keys,
+        modified_chains: updated_chains.into_iter().collect(),
+    })
 }
 
 /// Returns a Catalyst ID corresponding to the given transaction hash.
@@ -331,15 +332,15 @@ async fn catalyst_id_from_stake_address(
 async fn validate_public_keys(
     chain: &RegistrationChain, is_persistent: bool, report: &ProblemReport,
     context: &mut RbacBlockIndexingContext,
-) -> Result<Vec<VerifyingKey>> {
-    let mut keys = Vec::new();
+) -> Result<HashSet<VerifyingKey>> {
+    let mut keys = HashSet::new();
 
     let roles: Vec<_> = chain.role_data_history().keys().collect();
     let catalyst_id = chain.catalyst_id();
 
     for role in roles {
         if let Some((key, _)) = chain.get_latest_signing_pk_for_role(role) {
-            keys.push(key);
+            keys.insert(key);
             if let Some(previous) = catalyst_id_from_public_key(key, is_persistent, context).await?
             {
                 if &previous != catalyst_id {

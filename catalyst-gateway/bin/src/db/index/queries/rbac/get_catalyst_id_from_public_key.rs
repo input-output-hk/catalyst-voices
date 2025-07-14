@@ -3,7 +3,6 @@
 use std::sync::{Arc, LazyLock};
 
 use anyhow::{Context, Result};
-use cardano_blockchain_types::Slot;
 use catalyst_types::catalyst_id::CatalystId;
 use ed25519_dalek::VerifyingKey;
 use futures::{StreamExt, TryStreamExt};
@@ -20,7 +19,7 @@ use crate::{
             queries::{PreparedQueries, PreparedSelectQuery},
             session::CassandraSession,
         },
-        types::{DbCatalystId, DbPublicKey, DbSlot},
+        types::{DbCatalystId, DbPublicKey},
     },
     metrics::rbac_cache::reporter::{
         PERSISTENT_PUBLIC_KEYS_CACHE_HIT, PERSISTENT_PUBLIC_KEYS_CACHE_MISS,
@@ -49,13 +48,10 @@ static VOLATILE_CACHE: LazyLock<Cache<VerifyingKey, QueryResult>> = LazyLock::ne
 });
 
 /// A result of query execution.
-#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct QueryResult {
     /// A Catalyst ID.
     pub catalyst_id: CatalystId,
-    /// A slot number.
-    pub slot_no: Slot,
 }
 
 /// Get Catalyst ID by public key query parameters.
@@ -70,8 +66,6 @@ struct QueryParams {
 pub(crate) struct Query {
     /// A Catalyst ID.
     catalyst_id: DbCatalystId,
-    /// A slot number.
-    slot_no: DbSlot,
 }
 
 impl Query {
@@ -119,25 +113,11 @@ impl From<Query> for QueryResult {
     fn from(v: Query) -> Self {
         Self {
             catalyst_id: v.catalyst_id.into(),
-            slot_no: v.slot_no.into(),
         }
     }
 }
 
-/// Adds the given value to the cache.
-#[allow(dead_code)]
-pub fn cache_public_key(
-    is_persistent: bool, public_key: VerifyingKey, catalyst_id: CatalystId, slot_no: Slot,
-) {
-    let cache = cache(is_persistent);
-    cache.insert(public_key, QueryResult {
-        catalyst_id,
-        slot_no,
-    });
-}
-
 /// Removes all cached values.
-#[allow(dead_code)]
 pub fn invalidate_public_keys_cache(is_persistent: bool) {
     let cache = cache(is_persistent);
     cache.invalidate_all();
@@ -162,26 +142,27 @@ fn cache(is_persistent: bool) -> &'static Cache<VerifyingKey, QueryResult> {
 fn update_cache_metrics(is_persistent: bool, is_found: bool) {
     let api_host_names = Settings::api_host_names().join(",");
     let service_id = Settings::service_id();
+    let network = Settings::cardano_network().to_string();
 
     match (is_persistent, is_found) {
         (true, true) => {
             PERSISTENT_PUBLIC_KEYS_CACHE_HIT
-                .with_label_values(&[&api_host_names, service_id])
+                .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
         },
         (true, false) => {
             PERSISTENT_PUBLIC_KEYS_CACHE_MISS
-                .with_label_values(&[&api_host_names, service_id])
+                .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
         },
         (false, true) => {
             VOLATILE_PUBLIC_KEYS_CACHE_HIT
-                .with_label_values(&[&api_host_names, service_id])
+                .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
         },
         (false, false) => {
             VOLATILE_PUBLIC_KEYS_CACHE_MISS
-                .with_label_values(&[&api_host_names, service_id])
+                .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
         },
     }

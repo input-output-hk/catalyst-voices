@@ -62,7 +62,9 @@ impl RbacBlockIndexingContext {
     }
 
     /// Adds multiple addresses to the context.
-    pub fn insert_addresses(&mut self, addresses: HashSet<StakeAddress>, catalyst_id: &CatalystId) {
+    pub fn insert_addresses(
+        &mut self, addresses: impl IntoIterator<Item = StakeAddress>, catalyst_id: &CatalystId,
+    ) {
         for address in addresses {
             self.insert_address(address, catalyst_id.clone());
         }
@@ -79,9 +81,11 @@ impl RbacBlockIndexingContext {
     }
 
     /// Adds multiple public keys to the context.
-    pub fn insert_public_keys(&mut self, keys: &[VerifyingKey], catalyst_id: &CatalystId) {
+    pub fn insert_public_keys(
+        &mut self, keys: impl IntoIterator<Item = VerifyingKey>, catalyst_id: &CatalystId,
+    ) {
         for key in keys {
-            self.insert_public_key(*key, catalyst_id.clone());
+            self.insert_public_key(key, catalyst_id.clone());
         }
     }
 

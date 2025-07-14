@@ -3,7 +3,7 @@
 use std::sync::{Arc, LazyLock};
 
 use anyhow::{Context, Result};
-use cardano_blockchain_types::{Slot, StakeAddress, TxnIndex};
+use cardano_blockchain_types::StakeAddress;
 use catalyst_types::catalyst_id::CatalystId;
 use futures::{StreamExt, TryStreamExt};
 use moka::{policy::EvictionPolicy, sync::Cache};
@@ -19,7 +19,7 @@ use crate::{
             queries::{PreparedQueries, PreparedSelectQuery},
             session::CassandraSession,
         },
-        types::{DbCatalystId, DbSlot, DbStakeAddress, DbTxnIndex},
+        types::{DbCatalystId, DbStakeAddress},
     },
     metrics::rbac_cache::reporter::{
         PERSISTENT_STAKE_ADDRESSES_CACHE_HIT, PERSISTENT_STAKE_ADDRESSES_CACHE_MISS,
@@ -48,15 +48,10 @@ static VOLATILE_CACHE: LazyLock<Cache<StakeAddress, QueryResult>> = LazyLock::ne
 });
 
 /// A result of query execution.
-#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct QueryResult {
     /// A Catalyst ID.
     pub catalyst_id: CatalystId,
-    /// A slot number.
-    pub slot_no: Slot,
-    /// A transaction index.
-    pub txn_index: TxnIndex,
 }
 
 /// Get Catalyst ID by stake address query params.
@@ -67,15 +62,10 @@ pub(crate) struct QueryParams {
 }
 
 /// Get Catalyst ID by stake address query.
-#[allow(dead_code)]
 #[derive(Debug, Clone, DeserializeRow)]
 pub(crate) struct Query {
     /// Catalyst ID for the queries stake address.
     pub catalyst_id: DbCatalystId,
-    /// A slot number.
-    pub slot_no: DbSlot,
-    /// A transaction index.
-    pub txn_index: DbTxnIndex,
 }
 
 impl Query {
@@ -134,28 +124,19 @@ impl From<Query> for QueryResult {
     fn from(v: Query) -> Self {
         Self {
             catalyst_id: v.catalyst_id.into(),
-            slot_no: v.slot_no.into(),
-            txn_index: v.txn_index.into(),
         }
     }
 }
 
 /// Adds the given value to the cache.
-#[allow(dead_code)]
 pub fn cache_stake_address(
-    is_persistent: bool, stake_address: StakeAddress, catalyst_id: CatalystId, slot_no: Slot,
-    txn_index: TxnIndex,
+    is_persistent: bool, stake_address: StakeAddress, catalyst_id: CatalystId,
 ) {
     let cache = cache(is_persistent);
-    cache.insert(stake_address, QueryResult {
-        catalyst_id,
-        slot_no,
-        txn_index,
-    });
+    cache.insert(stake_address, QueryResult { catalyst_id });
 }
 
 /// Removes all cached values.
-#[allow(dead_code)]
 pub fn invalidate_stake_addresses_cache(is_persistent: bool) {
     let cache = cache(is_persistent);
     cache.invalidate_all();
@@ -180,26 +161,27 @@ fn cache(is_persistent: bool) -> &'static Cache<StakeAddress, QueryResult> {
 fn update_cache_metrics(is_persistent: bool, is_found: bool) {
     let api_host_names = Settings::api_host_names().join(",");
     let service_id = Settings::service_id();
+    let network = Settings::cardano_network().to_string();
 
     match (is_persistent, is_found) {
         (true, true) => {
             PERSISTENT_STAKE_ADDRESSES_CACHE_HIT
-                .with_label_values(&[&api_host_names, service_id])
+                .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
         },
         (true, false) => {
             PERSISTENT_STAKE_ADDRESSES_CACHE_MISS
-                .with_label_values(&[&api_host_names, service_id])
+                .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
         },
         (false, true) => {
             VOLATILE_STAKE_ADDRESSES_CACHE_HIT
-                .with_label_values(&[&api_host_names, service_id])
+                .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
         },
         (false, false) => {
             VOLATILE_STAKE_ADDRESSES_CACHE_MISS
-                .with_label_values(&[&api_host_names, service_id])
+                .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
         },
     }

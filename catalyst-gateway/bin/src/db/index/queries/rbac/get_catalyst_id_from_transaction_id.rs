@@ -3,7 +3,7 @@
 use std::sync::{Arc, LazyLock};
 
 use anyhow::{Context, Result};
-use cardano_blockchain_types::{Slot, TransactionId};
+use cardano_blockchain_types::TransactionId;
 use catalyst_types::catalyst_id::CatalystId;
 use futures::{StreamExt, TryStreamExt};
 use moka::{policy::EvictionPolicy, sync::Cache};
@@ -19,7 +19,7 @@ use crate::{
             queries::{PreparedQueries, PreparedSelectQuery},
             session::CassandraSession,
         },
-        types::{DbCatalystId, DbSlot, DbTransactionId},
+        types::{DbCatalystId, DbTransactionId},
     },
     metrics::rbac_cache::reporter::{
         PERSISTENT_TRANSACTION_IDS_CACHE_HIT, PERSISTENT_TRANSACTION_IDS_CACHE_MISS,
@@ -48,13 +48,10 @@ static VOLATILE_CACHE: LazyLock<Cache<TransactionId, QueryResult>> = LazyLock::n
 });
 
 /// A result of query execution.
-#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct QueryResult {
     /// A Catalyst ID.
     pub catalyst_id: CatalystId,
-    /// A slot number.
-    pub slot_no: Slot,
 }
 
 /// Get Catalyst ID by transaction ID query parameters.
@@ -69,8 +66,6 @@ struct QueryParams {
 pub(crate) struct Query {
     /// A Catalyst ID.
     pub catalyst_id: DbCatalystId,
-    /// A slot number.
-    pub slot_no: DbSlot,
 }
 
 impl Query {
@@ -121,25 +116,11 @@ impl From<Query> for QueryResult {
     fn from(v: Query) -> Self {
         Self {
             catalyst_id: v.catalyst_id.into(),
-            slot_no: v.slot_no.into(),
         }
     }
 }
 
-/// Adds the given value to the cache.
-#[allow(dead_code)]
-pub fn cache_transaction(
-    is_persistent: bool, txn_id: TransactionId, catalyst_id: CatalystId, slot_no: Slot,
-) {
-    let cache = cache(is_persistent);
-    cache.insert(txn_id, QueryResult {
-        catalyst_id,
-        slot_no,
-    });
-}
-
 /// Removes all cached values.
-#[allow(dead_code)]
 pub fn invalidate_transactions_ids_cache(is_persistent: bool) {
     let cache = cache(is_persistent);
     cache.invalidate_all();
@@ -164,26 +145,27 @@ fn cache(is_persistent: bool) -> &'static Cache<TransactionId, QueryResult> {
 fn update_cache_metrics(is_persistent: bool, is_found: bool) {
     let api_host_names = Settings::api_host_names().join(",");
     let service_id = Settings::service_id();
+    let network = Settings::cardano_network().to_string();
 
     match (is_persistent, is_found) {
         (true, true) => {
             PERSISTENT_TRANSACTION_IDS_CACHE_HIT
-                .with_label_values(&[&api_host_names, service_id])
+                .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
         },
         (true, false) => {
             PERSISTENT_TRANSACTION_IDS_CACHE_MISS
-                .with_label_values(&[&api_host_names, service_id])
+                .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
         },
         (false, true) => {
             VOLATILE_TRANSACTION_IDS_CACHE_HIT
-                .with_label_values(&[&api_host_names, service_id])
+                .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
         },
         (false, false) => {
             VOLATILE_TRANSACTION_IDS_CACHE_MISS
-                .with_label_values(&[&api_host_names, service_id])
+                .with_label_values(&[&api_host_names, service_id, &network])
                 .inc();
         },
     }

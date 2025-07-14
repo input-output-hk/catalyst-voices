@@ -28,15 +28,16 @@ pub fn cache_persistent_rbac_chain(id: CatalystId, chain: RegistrationChain) {
 pub fn cached_persistent_rbac_chain(id: &CatalystId) -> Option<RegistrationChain> {
     let api_host_names = Settings::api_host_names().join(",");
     let service_id = Settings::service_id();
+    let network = Settings::cardano_network().to_string();
 
     let res = PERSISTENT_CHAINS.get(id);
     if res.is_some() {
         PERSISTENT_CHAINS_CACHE_HIT
-            .with_label_values(&[&api_host_names, service_id])
+            .with_label_values(&[&api_host_names, service_id, &network])
             .inc();
     } else {
         PERSISTENT_CHAINS_CACHE_MISS
-            .with_label_values(&[&api_host_names, service_id])
+            .with_label_values(&[&api_host_names, service_id, &network])
             .inc();
     }
     res
