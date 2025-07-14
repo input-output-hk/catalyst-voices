@@ -26,7 +26,7 @@ class VoicesNavigationExample extends StatelessWidget {
       ),
       body: const Center(child: Text('Content')),
       drawer: VoicesDrawer(
-        bottom: const _DrawerChooser(),
+        footer: const _DrawerChooser(),
         child: ListView(
           padding: const EdgeInsets.all(12),
           physics: const ClampingScrollPhysics(),
