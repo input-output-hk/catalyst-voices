@@ -15,14 +15,6 @@ class OpportunitiesDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return const VoicesDrawer(
       width: 488,
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(16),
-        bottomLeft: Radius.circular(16),
-      ),
-      padding: EdgeInsets.symmetric(
-        horizontal: 32,
-        vertical: 24,
-      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

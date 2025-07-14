@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+const Duration _animDuration = Duration(milliseconds: 200);
+
 /// A custom [Drawer] component that implements the Voices style
 /// navigation drawer.
 ///
@@ -8,8 +10,6 @@ import 'package:flutter/material.dart';
 /// The [VoicesDrawer] is indented to be used as the [Scaffold.drawer].
 class VoicesDrawer extends StatelessWidget {
   final double width;
-  final EdgeInsets padding;
-  final BorderRadius borderRadius;
 
   /// This widget is main "body" of [VoicesDrawer].
   final Widget child;
@@ -25,8 +25,6 @@ class VoicesDrawer extends StatelessWidget {
   const VoicesDrawer({
     super.key,
     this.width = 360,
-    this.padding = const EdgeInsets.all(16),
-    this.borderRadius = const BorderRadius.all(Radius.circular(16)),
     required this.child,
     this.footer,
     this.bottomSheet,
@@ -49,15 +47,16 @@ class VoicesDrawer extends StatelessWidget {
         ),
       ),
       child: Padding(
-        padding: padding,
+        padding: const EdgeInsets.all(16),
         child: Container(
           clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            borderRadius: borderRadius,
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
           child: Stack(
             children: [
               Drawer(
+                key: const Key('Drawer'),
                 width: width,
                 child: Column(
                   children: [
@@ -75,23 +74,38 @@ class VoicesDrawer extends StatelessWidget {
                   ],
                 ),
               ),
-              if (bottomSheet != null)
-                Positioned.fill(
-                  child: Container(
-                    color: Colors.black26,
-                  ),
+              Positioned.fill(
+                key: const Key('BottomSheetOverlay'),
+                child: AnimatedSwitcher(
+                  duration: _animDuration,
+                  child: bottomSheet != null ? const _BottomSheetOverlay() : null,
                 ),
-              if (bottomSheet != null)
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
+              ),
+              Positioned(
+                key: const Key('BottomSheet'),
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
                   child: bottomSheet,
                 ),
+              ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _BottomSheetOverlay extends StatelessWidget {
+  const _BottomSheetOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black26,
     );
   }
 }
