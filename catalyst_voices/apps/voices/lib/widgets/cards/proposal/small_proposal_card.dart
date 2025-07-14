@@ -64,8 +64,7 @@ class SmallProposalCard extends StatelessWidget {
               offstage: !proposal.hasNewerLocalIteration || !showLatestLocal,
               child: _NewIterationDetails(
                 title: proposal.versions.latest.title,
-                iteration:
-                    proposal.versions.versionNumber(proposal.versions.latest.selfRef.version ?? ''),
+                iteration: proposal.versions.latest.versionNumber,
                 datetime: proposal.versions.latest.createdAt,
                 ref: proposal.versions.latest.selfRef,
               ),

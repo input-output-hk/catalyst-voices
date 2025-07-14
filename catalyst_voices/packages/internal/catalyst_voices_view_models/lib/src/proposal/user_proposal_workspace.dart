@@ -9,7 +9,7 @@ final class UserProposalWorkspace extends Equatable {
   final DateTime updateDate;
   final Coin fundsRequested;
   final ProposalPublish publish;
-  final List<ProposalVersion> versions;
+  final List<ProposalVersionViewModel> versions;
   final int commentsCount;
   final String category;
   final SignedDocumentRef categoryId;
@@ -35,7 +35,7 @@ final class UserProposalWorkspace extends Equatable {
       updateDate: proposal.updateDate,
       fundsRequested: proposal.fundsRequested,
       publish: proposal.publish,
-      versions: proposal.versions,
+      versions: proposal.versions.toViewModels(),
       commentsCount: proposal.commentsCount,
       category: proposal.category,
       categoryId: proposal.categoryId,
@@ -45,16 +45,13 @@ final class UserProposalWorkspace extends Equatable {
 
   bool get hasNewerLocalIteration {
     if (versions.isEmpty) return false;
-    final latestVersion = versions.first;
-    return latestVersion.isLatestVersion(
-      selfRef.version ?? '',
-    );
+    return versions.any((version) => version.isLatestLocal) && !publish.isLocal;
   }
 
   int get iteration {
     if (versions.isEmpty) return DocumentVersion.firstNumber;
 
-    return versions.versionNumber(selfRef.version ?? '');
+    return versions.firstWhere((version) => version.selfRef == selfRef).versionNumber;
   }
 
   @override
@@ -77,7 +74,7 @@ final class UserProposalWorkspace extends Equatable {
     DateTime? updateDate,
     Coin? fundsRequested,
     ProposalPublish? publish,
-    List<ProposalVersion>? versions,
+    List<ProposalVersionViewModel>? versions,
     int? commentsCount,
     String? category,
     SignedDocumentRef? categoryId,

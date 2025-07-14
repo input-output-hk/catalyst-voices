@@ -21,7 +21,7 @@ final class WorkspaceState extends Equatable {
   List<UserProposalWorkspace> get notPublished => userProposals
       .where(
         (element) =>
-            element.versions.hasLatestLocalDraft(element.selfRef.version) ||
+            element.versions.any((version) => version.isLatestLocal) ||
             element.publish == ProposalPublish.localDraft,
       )
       .toList();

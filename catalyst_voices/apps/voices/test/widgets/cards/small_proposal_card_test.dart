@@ -4,7 +4,7 @@ import 'package:catalyst_voices/widgets/cards/proposal/proposal_card_widgets.dar
 import 'package:catalyst_voices/widgets/cards/proposal/small_proposal_card.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
-    show UserProposalWorkspace;
+    show ProposalVersionViewModel, UserProposalWorkspace;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
@@ -36,23 +36,32 @@ void main() {
         fundsRequested: const Coin(0),
         publish: ProposalPublish.publishedDraft,
         versions: [
-          ProposalVersion(
-            publish: ProposalPublish.publishedDraft,
-            selfRef: SignedDocumentRef(id: proposalId, version: latestVersion),
-            title: 'Test Proposal',
-            createdAt: DateTime.now(),
-          ),
-          ProposalVersion(
+          ProposalVersionViewModel(
             publish: ProposalPublish.localDraft,
             selfRef: DraftRef(id: proposalId, version: localVersion),
             title: 'Title ver 1',
             createdAt: DateTime.now(),
+            isLatest: true,
+            isLatestLocal: true,
+            versionNumber: 3,
           ),
-          ProposalVersion(
+          ProposalVersionViewModel(
+            publish: ProposalPublish.publishedDraft,
+            selfRef: SignedDocumentRef(id: proposalId, version: latestVersion),
+            title: 'Test Proposal',
+            createdAt: DateTime.now(),
+            isLatest: false,
+            isLatestLocal: false,
+            versionNumber: 2,
+          ),
+          ProposalVersionViewModel(
             publish: ProposalPublish.publishedDraft,
             selfRef: SignedDocumentRef(id: proposalId, version: draftVersion),
             title: 'Title ver 2',
             createdAt: DateTime.now(),
+            isLatest: false,
+            isLatestLocal: false,
+            versionNumber: 1,
           ),
         ],
         fundNumber: 14,
@@ -91,7 +100,7 @@ void main() {
       await pumpCard(tester);
       await tester.pumpAndSettle();
 
-      expect(find.text('3'), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
     });
 
     testWidgets(

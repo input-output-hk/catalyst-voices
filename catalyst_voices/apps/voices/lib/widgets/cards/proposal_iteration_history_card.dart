@@ -81,12 +81,10 @@ class _Actions extends StatelessWidget {
 }
 
 class _IterationVersion extends StatelessWidget {
-  final ProposalVersion version;
-  final int iteration;
+  final ProposalVersionViewModel version;
 
   const _IterationVersion({
     required this.version,
-    required this.iteration,
   });
 
   @override
@@ -101,7 +99,7 @@ class _IterationVersion extends StatelessWidget {
       padding: const EdgeInsets.all(6),
       child: _Title(
         title: version.title,
-        iteration: iteration,
+        iteration: version.versionNumber,
         publish: version.publish,
         updateDate: version.createdAt,
       ),
@@ -111,7 +109,7 @@ class _IterationVersion extends StatelessWidget {
 
 class _IterationVersionList extends StatelessWidget {
   final bool _isExpanded;
-  final List<ProposalVersion> versions;
+  final List<ProposalVersionViewModel> versions;
 
   const _IterationVersionList({
     required bool isExpanded,
@@ -135,9 +133,6 @@ class _IterationVersionList extends StatelessWidget {
                     .map(
                       (e) => _IterationVersion(
                         version: e,
-                        iteration: versions.versionNumber(
-                          e.selfRef.version ?? '',
-                        ),
                       ),
                     )
                     .toList(),
@@ -179,9 +174,7 @@ class _ProposalIterationHistoryState extends State<ProposalIterationHistory> {
                     _Title(
                       publish: widget.proposal.versions.first.publish,
                       title: widget.proposal.versions.first.title,
-                      iteration: widget.proposal.versions.versionNumber(
-                        widget.proposal.versions.first.selfRef.version ?? '',
-                      ),
+                      iteration: widget.proposal.versions.first.versionNumber,
                       updateDate: widget.proposal.versions.first.createdAt,
                       boldTitle: true,
                     )
