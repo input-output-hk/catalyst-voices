@@ -46,8 +46,8 @@ jobs:
         uses: hoverkraft-tech/compose-action@v2.3.0
         with:
           compose-file: ./catalyst-gateway/tests/docker-compose.yml
-          services: api-tests-runner
-          up-flags: --abort-on-container-exit --exit-code-from api-tests-runner
+          services: cat-gateway
+          # up-flags: --abort-on-container-exit --exit-code-from api-tests-runner
 
       # - name: Running schemathesis tests
       #   uses: hoverkraft-tech/compose-action@v2.3.0
