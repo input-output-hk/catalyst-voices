@@ -44,9 +44,12 @@ jobs:
 
       - name: Run api-test
         continue-on-error: true
-        run: docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner
+        run: docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner -d
 
-      - name: cat-gateway-logs
+      - name: api-tests-runner logs
+        run: sleep 30; docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
+
+      - name: cat-gateway logs
         run: docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
 
       - name: Down
