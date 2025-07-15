@@ -1,8 +1,7 @@
 project: {
-	name: "voices-wallet-automation-test"
-	ci: {
-		targets: {
-			"nightly-test": privileged: true
-		}
-	}
+    name: "voices-wallet-automation-test"
+    ci: {
+    targets: {
+    }
+  }
 }

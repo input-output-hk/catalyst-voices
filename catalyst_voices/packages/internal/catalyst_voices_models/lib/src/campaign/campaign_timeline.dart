@@ -6,6 +6,5 @@ final class CampaignTimeline extends Equatable {
 
   const CampaignTimeline({required this.phases});
 
-  @override
   List<Object?> get props => [phases];
 }
