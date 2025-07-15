@@ -1,3 +1,5 @@
+import 'package:catalyst_voices/widgets/tabbar/voices_tab.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab_bar.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -37,35 +39,33 @@ class _ProposalsTabs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isProposerUnlock =
-        !context.select<SessionCubit, bool>((cubit) => cubit.state.isProposerUnlock);
-    return TabBar(
-      isScrollable: true,
-      tabAlignment: TabAlignment.start,
-      dividerHeight: 0,
+        context.select<SessionCubit, bool>((cubit) => cubit.state.isProposerUnlock);
+
+    return VoicesTabBar(
       controller: controller,
-      onTap: (index) {
-        final type = ProposalsFilterType.values[index];
+      onTap: (tab) {
+        final type = tab.data;
         context.read<ProposalsCubit>().emitSignal(ChangeFilterTypeSignal(type));
       },
-      tabs: ProposalsFilterType.values.map(
-        (value) {
-          final count = switch (value) {
-            ProposalsFilterType.total => data.total,
-            ProposalsFilterType.drafts => data.drafts,
-            ProposalsFilterType.finals => data.finals,
-            ProposalsFilterType.favorites => data.favorites,
-            ProposalsFilterType.my => data.my,
-          };
-
-          return Offstage(
-            offstage: isProposerUnlock && value.isMy,
-            child: Tab(
-              key: value.tabKey(),
-              text: value.noOf(context, count: count),
-            ),
-          );
-        },
-      ).toList(),
+      tabs: [
+        for (final type in ProposalsFilterType.values)
+          VoicesTab.text(
+            data: type,
+            key: type.tabKey(),
+            isOffstage: !isProposerUnlock && type.isMy,
+            text: type.noOf(context, count: _getCount(type)),
+          ),
+      ],
     );
+  }
+
+  int _getCount(ProposalsFilterType type) {
+    return switch (type) {
+      ProposalsFilterType.total => data.total,
+      ProposalsFilterType.drafts => data.drafts,
+      ProposalsFilterType.finals => data.finals,
+      ProposalsFilterType.favorites => data.favorites,
+      ProposalsFilterType.my => data.my,
+    };
   }
 }

@@ -1,4 +1,6 @@
 import 'package:catalyst_voices/widgets/common/tab_bar_stack_view.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,10 +17,10 @@ void main() {
             length: 2,
             child: Column(
               children: [
-                TabBar(
+                VoicesTabBar(
                   tabs: [
-                    Tab(text: 'one'),
-                    Tab(text: 'two'),
+                    VoicesTab.text(data: 1, text: 'one'),
+                    VoicesTab.text(data: 2, text: 'two'),
                   ],
                 ),
                 TabBarStackView(
@@ -61,11 +63,11 @@ void main() {
             length: 2,
             child: Column(
               children: [
-                TabBar(
+                VoicesTabBar(
                   controller: controller,
                   tabs: const [
-                    Tab(text: 'one'),
-                    Tab(text: 'two'),
+                    VoicesTab.text(data: 1, text: 'one'),
+                    VoicesTab.text(data: 2, text: 'two'),
                   ],
                 ),
                 TabBarStackView(

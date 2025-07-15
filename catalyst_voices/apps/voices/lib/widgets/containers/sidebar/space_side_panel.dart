@@ -1,5 +1,7 @@
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/common/tab_bar_stack_view.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab_bar.dart';
 import 'package:catalyst_voices/widgets/widgets.dart' show SidebarScaffold;
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -209,11 +211,9 @@ class _Tabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TabBar(
+    return VoicesTabBar(
       controller: controller,
-      isScrollable: true,
-      tabAlignment: TabAlignment.start,
-      tabs: tabs.map((e) => Tab(text: e.name)).toList(),
+      tabs: tabs.map((e) => VoicesTab.text(data: e, text: e.name)).toList(),
     );
   }
 }

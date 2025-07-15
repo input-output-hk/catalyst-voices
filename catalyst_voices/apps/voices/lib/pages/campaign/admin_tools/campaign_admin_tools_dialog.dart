@@ -297,14 +297,16 @@ class _TabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TabBar(
+    return VoicesTabBar(
       tabAlignment: TabAlignment.fill,
       indicatorSize: TabBarIndicatorSize.tab,
       tabs: [
-        Tab(
+        VoicesTab.text(
+          data: 'events',
           text: context.l10n.campaignPreviewEvents,
         ),
-        Tab(
+        VoicesTab.text(
+          data: 'views',
           text: context.l10n.campaignPreviewViews,
         ),
       ],
