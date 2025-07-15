@@ -42,6 +42,7 @@ class _ProposalsTabs extends StatelessWidget {
         context.select<SessionCubit, bool>((cubit) => cubit.state.isProposerUnlock);
 
     return VoicesTabBar(
+      dividerHeight: 0,
       controller: controller,
       onTap: (tab) {
         final type = tab.data;

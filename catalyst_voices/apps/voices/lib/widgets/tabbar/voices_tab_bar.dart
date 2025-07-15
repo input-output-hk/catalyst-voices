@@ -5,17 +5,19 @@ import 'package:flutter/material.dart';
 class VoicesTabBar<T extends Object> extends StatelessWidget {
   final List<VoicesTab<T>> tabs;
   final TabController? controller;
-  final ValueChanged<VoicesTab<T>>? onTap;
+  final double? dividerHeight;
   final TabBarIndicatorSize? indicatorSize;
   final TabAlignment? tabAlignment;
+  final ValueChanged<VoicesTab<T>>? onTap;
 
   const VoicesTabBar({
     super.key,
     required this.tabs,
     this.controller,
-    this.onTap,
+    this.dividerHeight,
     this.indicatorSize,
     this.tabAlignment = TabAlignment.start,
+    this.onTap,
   });
 
   @override
@@ -23,7 +25,7 @@ class VoicesTabBar<T extends Object> extends StatelessWidget {
     return TabBar(
       controller: controller,
       isScrollable: true,
-      dividerHeight: 0,
+      dividerHeight: dividerHeight,
       indicatorSize: indicatorSize,
       tabAlignment: tabAlignment,
       onTap: onTap != null ? _onTap : null,
