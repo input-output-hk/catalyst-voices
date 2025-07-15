@@ -42,12 +42,37 @@ jobs:
           command: run
           args: ./catalyst-gateway/tests/+prepare-all-images
 
-      - name: Running integration API tests
-        uses: hoverkraft-tech/compose-action@v2.3.0
+      - name: Run event-db image
+        run: docker compose -f catalyst-gateway/tests/docker-compose.yml up -d event-db
+
+      - name: Run scylla-node image
+        run: docker compose -f catalyst-gateway/tests/docker-compose.yml up -d scylla-node
+
+      - name: Build cat-gateway image
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
+        if: always()
+        continue-on-error: true
         with:
-          compose-file: ./catalyst-gateway/tests/docker-compose.yml
-          services: cat-gateway
-          # up-flags: --abort-on-container-exit --exit-code-from api-tests-runner
+          command: run
+          args: ./catalyst-gateway+docker
+
+      - name: Build api-tests image
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
+        if: always()
+        continue-on-error: true
+        with:
+          command: run
+          args: ./catalyst-gateway/tests/api_tests+package
+
+      - name: Run api-test
+        run: docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+
+      # - name: Running integration API tests
+      #   uses: hoverkraft-tech/compose-action@v2.3.0
+      #   with:
+      #     compose-file: ./catalyst-gateway/tests/docker-compose.yml
+      #     services: api-tests-runner
+      #     up-flags: --abort-on-container-exit --exit-code-from api-tests-runner
 
       # - name: Running schemathesis tests
       #   uses: hoverkraft-tech/compose-action@v2.3.0
