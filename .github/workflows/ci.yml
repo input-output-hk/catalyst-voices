@@ -4,7 +4,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/api-tests2]
     tags: ["**"]
   pull_request:
     types:
@@ -17,6 +17,10 @@ permissions:
   contents: write
   packages: write
   pull-requests: write
+
+env:
+  REPORT_EXT: .junit-report.xml
+  COVERAGE_EXT: .coverage.lcov
 
 jobs:
   ci:
@@ -49,9 +53,32 @@ jobs:
       - name: cat-gateway-logs
         run: docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
 
+      - name: Get tests artifacts
+        if: always()
+        run: |
+          docker cp api-tests-runner:/poetry/junit-report.xml .
+          docker cp api-tests-runner:/poetry/coverage.lcov .
+
       - name: Down
         run: docker compose -f catalyst-gateway/tests/docker-compose.yml down
 
+      - name: Collect and upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports
+          path: "**/*${{ env.REPORT_EXT }}"
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Collect and upload test coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-reports
+          path: "**/*${{ env.COVERAGE_EXT }}"
+          if-no-files-found: error
+          retention-days: 1
       # - name: Running integration API tests
       #   uses: hoverkraft-tech/compose-action@v2.3.0
       #   with:
@@ -80,7 +107,7 @@ jobs:
       #     services: scylla-runner
       #     up-flags: --abort-on-container-exit --exit-code-from scylla-runner
 
-  # test_reporting:
-  #   if: always()
-  #   needs: ci
-  #   uses: ./.github/workflows/generate-allure-report.yml
+  test_reporting:
+     if: always()
+     needs: ci
+     uses: ./.github/workflows/generate-allure-report.yml
