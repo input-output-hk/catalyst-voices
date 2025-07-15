@@ -42,7 +42,7 @@ services:
       interval: 30s
       timeout: 30s
       # approximately a 15 minutes of waiting
-      retries: 30
+      retries: 60
     environment:
       - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
       - CASSANDRA_PERSISTENT_URL=scylla-node:9042
@@ -69,7 +69,7 @@ services:
     depends_on:
       cat-gateway:
         condition: service_healthy
-  
+
   postgres-runner:
     image: postgres-runner:latest
     container_name: postgres-runner
