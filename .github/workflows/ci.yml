@@ -109,5 +109,5 @@ jobs:
 
   test_reporting:
      if: always()
-     needs: ci
+     needs: tests
      uses: ./.github/workflows/generate-allure-report.yml
