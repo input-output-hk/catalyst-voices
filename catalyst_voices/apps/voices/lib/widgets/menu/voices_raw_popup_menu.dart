@@ -10,12 +10,9 @@ typedef VoicesRawPopupBuilder = Widget Function(
   required bool isMenuOpen,
 });
 
-/// Popup menu itself widget.
-typedef VoicesRawPopupMenuBuilder = Widget Function(BuildContext context);
-
 class VoicesRawPopupMenu<T> extends StatefulWidget {
   final VoicesRawPopupBuilder buttonBuilder;
-  final VoicesRawPopupMenuBuilder menuBuilder;
+  final WidgetBuilder menuBuilder;
   final ValueChanged<T> onSelected;
   final RouteSettings? routeSettings;
   final Offset menuOffset;
@@ -85,8 +82,6 @@ class _VoicesRawPopupMenuState<T> extends State<VoicesRawPopupMenu<T>> {
           setState(() {
             _isMenuOpen = false;
           });
-        } else {
-          _isMenuOpen = false;
         }
       }),
     );
@@ -169,7 +164,7 @@ class _VoicesRawPopupMenuStateRoutePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mediaQuery = MediaQuery.of(context);
+    final padding = MediaQuery.paddingOf(context);
 
     return MediaQuery.removePadding(
       context: context,
@@ -182,7 +177,7 @@ class _VoicesRawPopupMenuStateRoutePage extends StatelessWidget {
           buttonPosition: buttonPosition,
           offset: offset,
           textDirection: Directionality.of(context),
-          padding: mediaQuery.padding,
+          padding: padding,
           menuPosition: menuPosition,
         ),
         child: builder(context),
@@ -224,7 +219,8 @@ class _VoicesRawPopupMenuStateRoutePageLayout extends SingleChildLayoutDelegate 
     return buttonPosition != oldDelegate.buttonPosition ||
         offset != oldDelegate.offset ||
         textDirection != oldDelegate.textDirection ||
-        padding != oldDelegate.padding;
+        padding != oldDelegate.padding ||
+        menuPosition != oldDelegate.menuPosition;
   }
 
   Rect _closestScreen(Iterable<Rect> screens, Offset point) {
