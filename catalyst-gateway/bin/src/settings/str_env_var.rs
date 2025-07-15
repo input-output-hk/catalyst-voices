@@ -185,7 +185,7 @@ impl StringEnvVar {
         .as_string();
 
         DurationString::try_from(raw_value.clone())
-            .inspect(|err| {
+            .inspect_err(|err| {
                 error!("Invalid Duration: {raw_value} : {err}. Defaulting to {default}.",);
             })
             .unwrap_or(default)
