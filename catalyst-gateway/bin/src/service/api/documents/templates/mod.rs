@@ -83,7 +83,7 @@ pub(crate) struct SignedDocData {
     /// Version.
     ver: &'static str,
     /// Document type.
-    doc_type: Uuid,
+    doc_type: Vec<Uuid>,
     /// Content bytes.
     content: &'static [u8],
     /// Category ID.

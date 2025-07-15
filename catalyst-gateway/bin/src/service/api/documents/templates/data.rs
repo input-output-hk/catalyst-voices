@@ -32,7 +32,11 @@ impl From<CategoryDocData> for SignedDocData {
         Self {
             id: value.0,
             ver: value.0,
-            doc_type: catalyst_signed_doc::doc_types::CATEGORY_DOCUMENT_UUID_TYPE,
+            doc_type: catalyst_signed_doc::doc_types::CATEGORY_PARAMETERS
+                .doc_types()
+                .iter()
+                .map(catalyst_signed_doc::UuidV4::uuid)
+                .collect(),
             content: EMPTY_JSON_OBJECT_BYTES,
             category_id: None,
         }
@@ -71,7 +75,11 @@ impl From<ProposalTemplateDocData> for SignedDocData {
         Self {
             id: value.0,
             ver: value.0,
-            doc_type: catalyst_signed_doc::doc_types::PROPOSAL_TEMPLATE_UUID_TYPE,
+            doc_type: catalyst_signed_doc::doc_types::PROPOSAL
+                .doc_types()
+                .iter()
+                .map(catalyst_signed_doc::UuidV4::uuid)
+                .collect(),
             content: value.2,
             category_id: Some(value.1),
         }
@@ -107,7 +115,11 @@ impl From<CommentTemplateDocData> for SignedDocData {
         Self {
             id: value.0,
             ver: value.0,
-            doc_type: catalyst_signed_doc::doc_types::COMMENT_TEMPLATE_UUID_TYPE,
+            doc_type: catalyst_signed_doc::doc_types::CATEGORY_PARAMETERS
+                .doc_types()
+                .iter()
+                .map(catalyst_signed_doc::UuidV4::uuid)
+                .collect(),
             content: include_bytes!("./docs/f14_comment_template.schema.json"),
             category_id: Some(value.1),
         }
