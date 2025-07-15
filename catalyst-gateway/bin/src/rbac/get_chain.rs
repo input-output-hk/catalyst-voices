@@ -77,10 +77,10 @@ pub async fn latest_rbac_chain_by_address(address: &StakeAddress) -> Result<Opti
 
     // We always check the latest (volatile) data first.
     let id = match CatalystIdQuery::latest(&volatile_session, address).await? {
-        Some(id) => id.catalyst_id,
+        Some(id) => id,
         None => {
             match CatalystIdQuery::latest(&persistent_session, address).await? {
-                Some(id) => id.catalyst_id,
+                Some(id) => id,
                 None => return Ok(None),
             }
         },
