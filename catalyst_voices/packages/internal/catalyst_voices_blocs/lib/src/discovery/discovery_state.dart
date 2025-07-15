@@ -80,7 +80,7 @@ final class DiscoveryCurrentCampaignState extends Equatable {
 final class DiscoveryMostRecentProposalsState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
-  final List<PendingProposal> proposals;
+  final List<ProposalBrief> proposals;
   final List<String> favoritesIds;
 
   const DiscoveryMostRecentProposalsState({
@@ -105,7 +105,7 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
   DiscoveryMostRecentProposalsState copyWith({
     bool? isLoading,
     LocalizedException? error,
-    List<PendingProposal>? proposals,
+    List<ProposalBrief>? proposals,
     List<String>? favoritesIds,
   }) {
     return DiscoveryMostRecentProposalsState(
@@ -118,7 +118,7 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
 
   DiscoveryMostRecentProposalsState updateFavorites(List<String> ids) {
     final updatedProposals =
-        [...proposals].map((e) => e.copyWith(isFavorite: ids.contains(e.ref.id))).toList();
+        [...proposals].map((e) => e.copyWith(isFavorite: ids.contains(e.selfRef.id))).toList();
     return copyWith(proposals: updatedProposals, favoritesIds: ids);
   }
 }

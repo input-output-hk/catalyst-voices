@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/widgets/avatars/space_avatar.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
-import 'package:catalyst_voices/widgets/drawer/voices_drawer.dart';
+import 'package:catalyst_voices/widgets/drawer/voices_drawer_chooser.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';

@@ -176,9 +176,8 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   void _emitMostRecentProposals(List<Proposal> proposals) {
     final proposalList = proposals
         .map(
-          (e) => PendingProposal.fromProposal(
+          (e) => ProposalBrief.fromProposal(
             e,
-            campaignName: 'f14',
             isFavorite: state.proposals.favoritesIds.contains(e.selfRef.id),
           ),
         )

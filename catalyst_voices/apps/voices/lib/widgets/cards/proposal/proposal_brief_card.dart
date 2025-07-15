@@ -11,27 +11,23 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-/// Displays a proposal in pending state on a card.
-class PendingProposalCard extends StatefulWidget {
-  final PendingProposal proposal;
-  final bool showStatus;
-  final bool showLastUpdate;
+/// Displays a proposal brief on a card.
+class ProposalBriefCard extends StatefulWidget {
+  final ProposalBrief proposal;
   final bool isFavorite;
   final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
 
-  const PendingProposalCard({
+  const ProposalBriefCard({
     super.key,
     required this.proposal,
-    this.showStatus = true,
-    this.showLastUpdate = true,
     this.isFavorite = false,
     this.onTap,
     this.onFavoriteChanged,
   });
 
   @override
-  State<PendingProposalCard> createState() => _PendingProposalCardState();
+  State<ProposalBriefCard> createState() => _PendingProposalCardState();
 }
 
 class _Author extends StatelessWidget {
@@ -138,7 +134,7 @@ class _FundsAndDuration extends StatelessWidget {
   }
 }
 
-class _PendingProposalCardState extends State<PendingProposalCard> {
+class _PendingProposalCardState extends State<ProposalBriefCard> {
   late final WidgetStatesController _statesController;
 
   @override
@@ -159,7 +155,7 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
           highlightColor: Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           child: ProposalBorder(
-            publishStage: widget.proposal.publishStage,
+            publish: widget.proposal.publish,
             statesController: _statesController,
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -167,13 +163,12 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _Topbar(
-                    proposalRef: widget.proposal.ref,
-                    showStatus: widget.showStatus,
+                    proposalRef: widget.proposal.selfRef,
                     isFavorite: widget.isFavorite,
                     onFavoriteChanged: widget.onFavoriteChanged,
                   ),
                   _Category(
-                    category: widget.proposal.category,
+                    category: widget.proposal.categoryName,
                   ),
                   const SizedBox(height: 4),
                   Expanded(
@@ -181,7 +176,7 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
                   ),
                   _Author(author: widget.proposal.author),
                   _FundsAndDuration(
-                    funds: widget.proposal.fundsRequested,
+                    funds: widget.proposal.formattedFunds,
                     duration: widget.proposal.duration,
                   ),
                   const SizedBox(height: 12),
@@ -190,11 +185,10 @@ class _PendingProposalCardState extends State<PendingProposalCard> {
                   ),
                   const SizedBox(height: 12),
                   _ProposalInfo(
-                    proposalStage: widget.proposal.publishStage,
-                    version: widget.proposal.version,
-                    lastUpdate: widget.proposal.lastUpdateDate,
+                    publish: widget.proposal.publish,
+                    version: widget.proposal.versionNumber,
+                    updateDate: widget.proposal.updateDate,
                     commentsCount: widget.proposal.commentsCount,
-                    showLastUpdate: widget.showLastUpdate,
                   ),
                 ],
               ),
@@ -254,18 +248,16 @@ class _PropertyValue extends StatelessWidget {
 }
 
 class _ProposalInfo extends StatelessWidget {
-  final ProposalPublish proposalStage;
+  final ProposalPublish publish;
   final int version;
-  final DateTime? lastUpdate;
+  final DateTime updateDate;
   final int commentsCount;
-  final bool showLastUpdate;
 
   const _ProposalInfo({
-    required this.proposalStage,
+    required this.publish,
     required this.version,
-    required this.lastUpdate,
+    required this.updateDate,
     required this.commentsCount,
-    required this.showLastUpdate,
   });
 
   @override
@@ -273,18 +265,16 @@ class _ProposalInfo extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (proposalStage.isDraft) const DraftProposalChip() else const FinalProposalChip(),
+        if (publish.isDraft) const DraftProposalChip() else const FinalProposalChip(),
         const SizedBox(width: 4),
         ProposalVersionChip(version: version.toString()),
-        if (showLastUpdate && lastUpdate != null) ...[
-          const SizedBox(width: 4),
-          VoicesPlainTooltip(
-            message: _tooltipMessage(context),
-            child: DayMonthTimeText(
-              dateTime: lastUpdate!,
-            ),
+        const SizedBox(width: 4),
+        VoicesPlainTooltip(
+          message: _tooltipMessage(context),
+          child: DayMonthTimeText(
+            dateTime: updateDate,
           ),
-        ],
+        ),
         const Spacer(),
         ProposalCommentsChip(
           commentsCount: commentsCount,
@@ -294,16 +284,13 @@ class _ProposalInfo extends StatelessWidget {
   }
 
   String _tooltipMessage(BuildContext context) {
-    if (lastUpdate == null) {
-      return '';
-    }
     final timezone = context.select<SessionCubit?, TimezonePreferences>(
       (value) => value?.state.settings.timezone ?? TimezonePreferences.local,
     );
 
     final effectiveData = switch (timezone) {
-      TimezonePreferences.utc => lastUpdate!.toUtc(),
-      TimezonePreferences.local => lastUpdate!.toLocal(),
+      TimezonePreferences.utc => updateDate.toUtc(),
+      TimezonePreferences.local => updateDate.toLocal(),
     };
     final dt = DateFormatter.formatDateTimeParts(effectiveData, includeYear: true);
 
@@ -330,13 +317,11 @@ class _Title extends StatelessWidget {
 
 class _Topbar extends StatelessWidget {
   final DocumentRef proposalRef;
-  final bool showStatus;
   final bool isFavorite;
   final ValueChanged<bool>? onFavoriteChanged;
 
   const _Topbar({
     required this.proposalRef,
-    required this.showStatus,
     required this.isFavorite,
     required this.onFavoriteChanged,
   });

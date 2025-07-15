@@ -1,15 +1,13 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_voices/widgets/cards/proposal/pending_proposal_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-final _favoriteProposals = ValueNotifier<List<PendingProposal>>([]);
+final _favoriteProposals = ValueNotifier<List<ProposalBrief>>([]);
 
 final _proposalDescription = """
 Zanzibar is becoming one of the hotspots for DID's through
@@ -20,51 +18,48 @@ and PRISM, but its potential is only barely exploited.
     .replaceAll('\n', ' ');
 
 final _proposals = [
-  PendingProposal(
-    ref: SignedDocumentRef.generateFirstRef(),
-    campaignName: 'F14',
-    category: 'Cardano Use Cases / MVP',
+  ProposalBrief(
+    selfRef: SignedDocumentRef.generateFirstRef(),
     title: 'Proposal Title that rocks the world',
-    lastUpdateDate: DateTime.now().minusDays(2),
+    categoryName: 'Cardano Use Cases / MVP',
+    author: 'Alex Wells',
     fundsRequested: const Coin.fromWholeAda(100000),
     commentsCount: 0,
     description: _proposalDescription,
-    publishStage: ProposalPublish.publishedDraft,
-    version: 1,
+    publish: ProposalPublish.submittedProposal,
+    versionNumber: 1,
     duration: 6,
-    author: 'Alex Wells',
+    updateDate: DateTime.now(),
   ),
-  PendingProposal(
-    ref: SignedDocumentRef.generateFirstRef(),
-    campaignName: 'F14',
-    category: 'Cardano Use Cases / MVP',
+  ProposalBrief(
+    selfRef: SignedDocumentRef.generateFirstRef(),
     title: 'Proposal Title that rocks the world',
-    lastUpdateDate: DateTime.now().minusDays(2),
+    categoryName: 'Cardano Use Cases / MVP',
+    author: 'Alex Wells',
     fundsRequested: const Coin.fromWholeAda(100000),
     commentsCount: 0,
     description: _proposalDescription,
-    publishStage: ProposalPublish.submittedProposal,
-    version: 1,
+    publish: ProposalPublish.submittedProposal,
+    versionNumber: 1,
     duration: 6,
-    author: 'Alex Wells',
+    updateDate: DateTime.now(),
   ),
-  PendingProposal(
-    ref: SignedDocumentRef.generateFirstRef(),
-    campaignName: 'F14',
-    category: 'Cardano Use Cases / MVP',
+  ProposalBrief(
+    selfRef: SignedDocumentRef.generateFirstRef(),
     title: 'Proposal Title that rocks the world',
-    lastUpdateDate: DateTime.now().minusDays(2),
+    categoryName: 'Cardano Use Cases / MVP',
+    author: 'Alex Wells',
     fundsRequested: const Coin.fromWholeAda(100000),
     commentsCount: 0,
     description: _proposalDescription,
-    publishStage: ProposalPublish.publishedDraft,
-    version: 1,
+    publish: ProposalPublish.submittedProposal,
+    versionNumber: 1,
     duration: 6,
-    author: 'Alex Wells',
+    updateDate: DateTime.now(),
   ),
 ];
 
-void _onFavoriteChanged(PendingProposal proposal, bool isFavorite) {
+void _onFavoriteChanged(ProposalBrief proposal, bool isFavorite) {
   final proposals = Set.of(_favoriteProposals.value);
   if (isFavorite) {
     proposals.add(proposal);
@@ -96,7 +91,7 @@ class _AllProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<List<PendingProposal>>(
+    return ValueListenableBuilder<List<ProposalBrief>>(
       valueListenable: _favoriteProposals,
       builder: (context, favoriteProposals, child) {
         return Wrap(
@@ -104,7 +99,7 @@ class _AllProposals extends StatelessWidget {
           runSpacing: 16,
           children: [
             for (final proposal in _proposals)
-              PendingProposalCard(
+              ProposalBriefCard(
                 proposal: proposal,
                 isFavorite: favoriteProposals.contains(proposal),
                 onFavoriteChanged: (isFavorite) => _onFavoriteChanged(proposal, isFavorite),
@@ -121,7 +116,7 @@ class _FavoriteProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<List<PendingProposal>>(
+    return ValueListenableBuilder<List<ProposalBrief>>(
       valueListenable: _favoriteProposals,
       builder: (context, favoriteProposals, child) {
         return Wrap(
@@ -129,7 +124,7 @@ class _FavoriteProposals extends StatelessWidget {
           runSpacing: 16,
           children: [
             for (final proposal in favoriteProposals)
-              PendingProposalCard(
+              ProposalBriefCard(
                 proposal: proposal,
                 isFavorite: true,
                 onFavoriteChanged: (isFavorite) => _onFavoriteChanged(proposal, isFavorite),

@@ -34,7 +34,7 @@ class _SpacesDrawerState extends State<SpacesDrawer> {
   @override
   Widget build(BuildContext context) {
     return VoicesDrawer(
-      bottom: !widget.isUnlocked
+      footer: !widget.isUnlocked
           ? null
           : VoicesDrawerSpaceChooser(
               key: const ValueKey('DrawerSpaceChooser'),
