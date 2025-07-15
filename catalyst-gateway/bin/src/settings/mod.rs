@@ -166,12 +166,15 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
 
     let address = StringEnvVar::new("ADDRESS", ADDRESS_DEFAULT.to_string().into());
     let address = SocketAddr::from_str(address.as_str())
-        .inspect(|err| {
+        .inspect_err(|err| {
             error!(
-                "Invalid binding address {}, err: {err}. Using default binding address value {ADDRESS_DEFAULT}.",
-                address.as_str(),
+                error = ?err,
+                default_addr = ?ADDRESS_DEFAULT,
+                invalid_addr = ?address,
+                "Invalid binding address. Using default binding address value.",
             );
-        }).unwrap_or(ADDRESS_DEFAULT);
+        })
+        .unwrap_or(ADDRESS_DEFAULT);
 
     let purge_backward_slot_buffer = StringEnvVar::new_as_int(
         "PURGE_BACKWARD_SLOT_BUFFER",
