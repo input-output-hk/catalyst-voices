@@ -80,7 +80,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
         campaign: const DiscoveryCurrentCampaignState(),
       ),
     );
-    final campaign = await _campaignService.getCurrentCampaign();
+    final campaign = await _campaignService.getActiveCampaignBrief();
     final campaignTimeline = await _campaignService.getCampaignTimeline();
     final currentCampaign = CurrentCampaignInfoViewModel.fromModel(campaign);
 

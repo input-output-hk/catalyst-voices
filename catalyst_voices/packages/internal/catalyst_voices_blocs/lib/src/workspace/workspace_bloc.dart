@@ -163,7 +163,14 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     final timelineItems = await _campaignService.getCampaignTimeline();
-    final timeline = timelineItems.map(CampaignTimelineViewModel.fromModel).toList();
+    final timeline = timelineItems.phases
+        .map(
+          (e) => CampaignTimelineViewModel.fromModel(
+            e,
+            offstage: e.stage == CampaignPhaseStage.reviewRegistration,
+          ),
+        )
+        .toList();
 
     emit(state.copyWith(timelineItems: timeline));
     emitSignal(SubmissionCloseDate(date: state.submissionCloseDate));

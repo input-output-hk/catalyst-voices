@@ -9,14 +9,14 @@ import 'package:skeletonizer/skeletonizer.dart';
 class FundsDetailCard extends StatelessWidget {
   final Coin allFunds;
   final Coin totalAsk;
-  final ComparableRange<Coin> askRange;
+  final ComparableRange<Coin>? askRange;
   final FundsDetailCardType type;
 
   const FundsDetailCard({
     super.key,
     required this.allFunds,
     required this.totalAsk,
-    required this.askRange,
+    this.askRange,
     this.type = FundsDetailCardType.found,
   });
 
@@ -63,8 +63,8 @@ class FundsDetailCard extends StatelessWidget {
                   ),
                 ),
                 Offstage(
-                  offstage: type.isFound,
-                  child: _RangeAsk(range: askRange),
+                  offstage: type.isFound || askRange == null,
+                  child: _RangeAsk(range: askRange!),
                 ),
               ],
             ),

@@ -1,6 +1,5 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_models/src/campaign/campaign_phase.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
@@ -14,6 +13,7 @@ class Campaign extends Equatable {
   final int fundNumber;
   final CampaignTimeline timeline;
   final CampaignPublish publish;
+  final List<CampaignCategory> categories;
 
   const Campaign({
     required this.selfRef,
@@ -23,6 +23,7 @@ class Campaign extends Equatable {
     required this.fundNumber,
     required this.timeline,
     required this.publish,
+    required this.categories,
   });
 
   @override
@@ -34,6 +35,7 @@ class Campaign extends Equatable {
         fundNumber,
         timeline,
         publish,
+        categories,
       ];
 
   CampaignState get state {
@@ -74,6 +76,7 @@ class Campaign extends Equatable {
     int? fundNumber,
     CampaignTimeline? timeline,
     CampaignPublish? publish,
+    List<CampaignCategory>? categories,
   }) {
     return Campaign(
       selfRef: selfRef ?? this.selfRef,
@@ -83,6 +86,7 @@ class Campaign extends Equatable {
       fundNumber: fundNumber ?? this.fundNumber,
       timeline: timeline ?? this.timeline,
       publish: publish ?? this.publish,
+      categories: categories ?? this.categories,
     );
   }
 
@@ -91,6 +95,36 @@ class Campaign extends Equatable {
     return CampaignState(
       phase: phase,
       status: CampaignPhaseStatus.fromRange(phase.timeline),
+    );
+  }
+}
+
+final class CampaignDetail extends Campaign {
+  final Coin totalAsk;
+
+  const CampaignDetail({
+    required super.selfRef,
+    required super.name,
+    required super.description,
+    required super.allFunds,
+    required super.fundNumber,
+    required super.timeline,
+    required super.publish,
+    required super.categories,
+    required this.totalAsk,
+  });
+
+  factory CampaignDetail.fromCampaign(Campaign campaign, Coin totalAsk) {
+    return CampaignDetail(
+      selfRef: campaign.selfRef,
+      name: campaign.name,
+      description: campaign.description,
+      allFunds: campaign.allFunds,
+      fundNumber: campaign.fundNumber,
+      timeline: campaign.timeline,
+      publish: campaign.publish,
+      categories: campaign.categories,
+      totalAsk: totalAsk,
     );
   }
 }
@@ -150,5 +184,6 @@ Project Catalyst turns economic power into innovation power by using the Cardano
     fundNumber: 14,
     timeline: CampaignTimeline(phases: CampaignPhaseX.f14StaticContent),
     publish: CampaignPublish.published,
+    categories: staticCampaignCategories,
   );
 }

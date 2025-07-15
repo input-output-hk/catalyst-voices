@@ -384,9 +384,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
   Future<DateTime?> _getProposalSubmissionCloseDate() async {
     final timeline = await _campaignService.getCampaignTimeline();
-    return timeline
+    return timeline.phases
         .firstWhereOrNull(
-          (e) => e.stage == CampaignTimelineStage.proposalSubmission,
+          (e) => e.stage == CampaignPhaseStage.proposalSubmission,
         )
         ?.timeline
         .to;
