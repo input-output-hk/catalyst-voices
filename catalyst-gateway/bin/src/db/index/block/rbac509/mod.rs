@@ -105,6 +105,10 @@ impl Rbac509InsertQuery {
             );
         }
 
+        // Need to wait until the `cip509.previous_transaction` would be definitely indexed
+        let (mithril_tip, _) =
+            cardano_chain_follower::ChainFollower::get_tips(block.network()).await;
+
         let previous_transaction = cip509.previous_transaction();
         match Box::pin(validate_rbac_registration(
             cip509,
