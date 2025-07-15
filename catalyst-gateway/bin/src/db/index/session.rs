@@ -19,7 +19,7 @@ use scylla::{
 };
 use thiserror::Error;
 use tokio::fs;
-use tracing::{error, info};
+use tracing::{debug, error, info};
 
 use super::{
     queries::{
@@ -30,7 +30,7 @@ use super::{
     schema::create_schema,
 };
 use crate::{
-    service::utilities::health::set_index_db_liveness,
+    service::utilities::health::{index_db_is_live, set_index_db_liveness},
     settings::{cassandra_db, Settings},
 };
 
@@ -144,8 +144,43 @@ impl CassandraSession {
     }
 
     /// Check to see if the Cassandra Indexing DB is ready for use
-    pub(crate) fn is_ready() -> bool {
-        PERSISTENT_SESSION.get().is_some() && VOLATILE_SESSION.get().is_some()
+    pub(crate) async fn is_ready() -> bool {
+        let persistent_ready = if let Some(cassandra) = PERSISTENT_SESSION.get() {
+            cassandra
+                .session
+                .refresh_metadata()
+                .await
+                .inspect_err(|e| {
+                    error!(error=%e, is_persistent=cassandra.is_persistent(), "Session connection failed");
+                })
+                .is_ok()
+        } else {
+            debug!(is_persistent = true, "Session has not been created");
+            false
+        };
+        let volatile_ready = if let Some(cassandra) = VOLATILE_SESSION.get() {
+            cassandra
+                .session
+                .refresh_metadata()
+                .await
+                .inspect_err(|e| {
+                    error!(error=%e, is_persistent=cassandra.is_persistent(), "Session connection failed");
+                })
+                .is_ok()
+        } else {
+            debug!(is_persistent = false, "Session has not been created");
+            false
+        };
+        let current_liveness = index_db_is_live();
+        let is_ready = persistent_ready && volatile_ready;
+        if is_ready {
+            if !current_liveness {
+                set_index_db_liveness(true);
+            }
+        } else if current_liveness {
+            set_index_db_liveness(false);
+        }
+        is_ready
     }
 
     /// Wait for the Cassandra Indexing DB to be ready before continuing
@@ -155,13 +190,11 @@ impl CassandraSession {
         loop {
             if !ignore_err {
                 if let Some(err) = INIT_SESSION_ERROR.get() {
-                    set_index_db_liveness(false);
                     return Err(err.clone());
                 }
             }
 
-            if Self::is_ready() {
-                set_index_db_liveness(true);
+            if Self::is_ready().await {
                 return Ok(());
             }
 
