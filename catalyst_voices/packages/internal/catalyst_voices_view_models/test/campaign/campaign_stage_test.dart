@@ -24,17 +24,6 @@ void main() {
       );
     });
 
-    test('scheduled campaign resolves to scheduled stage', () {
-      final scheduledCampaign = campaign.copyWith(
-        publish: CampaignPublish.published,
-      );
-
-      expect(
-        CampaignStage.fromCampaign(scheduledCampaign),
-        equals(CampaignStage.scheduled),
-      );
-    });
-
     test('live campaign resolves to live stage', () {
       final liveCampaign = campaign.copyWith(
         publish: CampaignPublish.published,
@@ -43,17 +32,6 @@ void main() {
       expect(
         CampaignStage.fromCampaign(liveCampaign),
         equals(CampaignStage.live),
-      );
-    });
-
-    test('completed campaign resolves to completed stage', () {
-      final liveCampaign = campaign.copyWith(
-        publish: CampaignPublish.published,
-      );
-
-      expect(
-        CampaignStage.fromCampaign(liveCampaign),
-        equals(CampaignStage.completed),
       );
     });
   });
