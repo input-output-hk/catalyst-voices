@@ -16,7 +16,7 @@ env:
   ALLURE_REPORT_FOLDER: allure-report
   COVERAGE_REPORT_FOLDER: coverage-report
   REPORT_EXT: junit-report.xml
-  COVERAGE_EXT: coverage.info
+  COVERAGE_EXT: coverage.lcov
 
 jobs:
 #  generate-test-reports:
