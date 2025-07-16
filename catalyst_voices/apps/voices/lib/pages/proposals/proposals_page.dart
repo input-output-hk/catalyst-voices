@@ -50,30 +50,24 @@ class _ProposalsPageState extends State<ProposalsPage>
                 const SizedBox(height: 16),
                 const ProposalsHeader(),
                 const SizedBox(height: 40),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: Wrap(
-                        alignment: WrapAlignment.spaceBetween,
-                        crossAxisAlignment: WrapCrossAlignment.end,
-                        runSpacing: 10,
-                        children: [
-                          ProposalsTabs(controller: _tabController),
-                          const ProposalsControls(),
-                        ],
-                      ),
-                    ),
-                    const ProposalsTabsDivider(),
-                    const SizedBox(height: 16),
-                    const ProposalsSubHeader(),
-                    const SizedBox(height: 16),
-                    ProposalsPagination(controller: _pagingController),
-                    const SizedBox(height: 12),
-                  ],
+                SizedBox(
+                  width: double.infinity,
+                  child: Wrap(
+                    alignment: WrapAlignment.spaceBetween,
+                    crossAxisAlignment: WrapCrossAlignment.end,
+                    runSpacing: 10,
+                    children: [
+                      ProposalsTabs(controller: _tabController),
+                      const ProposalsControls(),
+                    ],
+                  ),
                 ),
+                const ProposalsTabsDivider(),
+                const SizedBox(height: 16),
+                const ProposalsSubHeader(),
+                const SizedBox(height: 16),
+                ProposalsPagination(controller: _pagingController),
+                const SizedBox(height: 12),
               ],
             ),
           ),
