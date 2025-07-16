@@ -66,15 +66,16 @@ jobs:
         run: docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
 
       - name: cat-gateway-logs
-        run: |
-          docker compose stop cat-gateway
-          docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
+        run:  docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
 
       - name: Get tests artifacts
         if: always()
         run: |
           docker cp api-tests-runner:/poetry/junit-report.xml .
           docker cp api-tests-runner:/poetry/coverage.lcov .
+
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
 
       - name: Down
         run: docker compose -f catalyst-gateway/tests/docker-compose.yml down
