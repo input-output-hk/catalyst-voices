@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group(CampaignPhaseStatus, () {
-    late final DateTime now;
+    late DateTime now;
 
     setUp(() {
       now = DateTime.now();
@@ -100,7 +100,7 @@ void main() {
   });
 
   group(Campaign, () {
-    late final DateTime now;
+    late DateTime now;
 
     setUp(() {
       now = DateTime.now();
