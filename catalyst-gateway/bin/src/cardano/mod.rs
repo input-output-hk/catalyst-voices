@@ -10,7 +10,10 @@ use rand::{Rng, SeedableRng};
 use tracing::{debug, error, info};
 
 use crate::{
-    cardano::channels::event::{ChainIndexerEvent, ChainIndexerEventSender},
+    cardano::channels::{
+        event::{ChainIndexerEvent, ChainIndexerEventSender},
+        state::{ChainIndexerStateReceiver, ChainIndexerStateSender},
+    },
     db::index::{
         block::{
             index_block,
@@ -240,6 +243,7 @@ impl SyncParams {
 #[allow(clippy::too_many_lines)]
 fn sync_subchain(
     params: SyncParams, event_sender: ChainIndexerEventSender,
+    mut state_recv: ChainIndexerStateReceiver,
 ) -> tokio::task::JoinHandle<SyncParams> {
     tokio::spawn(async move {
         // Backoff hitting the database if we need to.
@@ -291,7 +295,7 @@ fn sync_subchain(
                 cardano_chain_follower::Kind::Block => {
                     let block = chain_update.block_data();
 
-                    if let Err(error) = index_block(block).await {
+                    if let Err(error) = index_block(block, &mut state_recv).await {
                         let error_msg = format!("Failed to index block {}", block.point());
                         error!(chain=%params.chain, error=%error, params=%params, error_msg);
                         return params.done(
@@ -342,7 +346,7 @@ fn sync_subchain(
 
                         // Purge success, now index the current block
                         let block = chain_update.block_data();
-                        if let Err(error) = index_block(block).await {
+                        if let Err(error) = index_block(block, &mut state_recv).await {
                             let error_msg =
                                 format!("Failed to index block after rollback {}", block.point());
                             error!(chain=%params.chain, error=%error, params=%params, error_msg);
@@ -426,6 +430,9 @@ struct SyncTask {
 
     /// `ChainIndexerEvent` sender during the process of sync tasks.
     event_channel: ChainIndexerEventSender,
+
+    /// Chain Indexer State sender during the process of sync tasks.
+    state_channel: ChainIndexerStateSender,
 }
 
 impl SyncTask {
@@ -440,12 +447,23 @@ impl SyncTask {
             live_tip_slot: 0.into(),
             sync_status: Vec::new(),
             event_channel: ChainIndexerEventSender::new(),
+            state_channel: ChainIndexerStateSender::new(),
         }
     }
 
     /// Add a new `SyncTask` to the queue.
-    fn add_sync_task(&mut self, params: SyncParams, event_sender: ChainIndexerEventSender) {
-        self.sync_tasks.push(sync_subchain(params, event_sender));
+    fn add_sync_task(&mut self, params: SyncParams) {
+        let state_recv = self.state_channel.subscribe();
+        // immediately setting the latest state, do the `state_recv` will always have at least one
+        // value
+        self.state_channel.update_state(());
+
+        self.sync_tasks.push(sync_subchain(
+            params,
+            self.event_channel.clone(),
+            state_recv,
+        ));
+
         self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
         debug!(current_sync_tasks=%self.current_sync_tasks, "Added new Sync Task");
         self.event_channel
@@ -508,14 +526,11 @@ impl SyncTask {
 
         // Start the Live Chain sync task - This can never end because it is syncing to TIP.
         // So, if it fails, it will automatically be restarted.
-        self.add_sync_task(
-            SyncParams::new(
-                self.cfg.chain,
-                Point::fuzzy(self.immutable_tip_slot),
-                Point::TIP,
-            ),
-            self.event_channel.clone(),
-        );
+        self.add_sync_task(SyncParams::new(
+            self.cfg.chain,
+            Point::fuzzy(self.immutable_tip_slot),
+            Point::TIP,
+        ));
         self.event_channel
             .dispatch_event(ChainIndexerEvent::SyncLiveChainStarted);
 
@@ -565,6 +580,7 @@ impl SyncTask {
                                     live_slot: self.live_tip_slot,
                                 },
                             );
+                            self.state_channel.update_state(());
                             info!(chain=%self.cfg.chain, report=%finished, "Chain Indexer finished reaching TIP.");
 
                             self.start_immutable_followers();
@@ -575,12 +591,14 @@ impl SyncTask {
                         }
 
                         // Start the Live Chain sync task again from where it left off.
-                        self.add_sync_task(finished.retry(), self.event_channel.clone());
+                        self.add_sync_task(finished.retry());
                     } else if let Some(result) = finished.result.as_ref() {
                         match result {
                             Ok(()) => {
                                 info!(chain=%self.cfg.chain, report=%finished,
                                     "The Immutable follower completed successfully.");
+
+                                self.state_channel.update_state(());
 
                                 finished.last_indexed_block.as_ref().inspect(|block| {
                                     self.event_channel.dispatch_event(
@@ -599,7 +617,7 @@ impl SyncTask {
                                         "An Immutable follower failed, restarting it.");
                                 // Restart the Immutable Chain sync task again from where it left
                                 // off.
-                                self.add_sync_task(finished.retry(), self.event_channel.clone());
+                                self.add_sync_task(finished.retry());
                             },
                         }
                     } else {
@@ -664,10 +682,11 @@ impl SyncTask {
                 if let Some((first_point, last_point)) =
                     self.get_syncable_range(self.start_slot, end_slot)
                 {
-                    self.add_sync_task(
-                        SyncParams::new(self.cfg.chain, first_point, last_point.clone()),
-                        self.event_channel.clone(),
-                    );
+                    self.add_sync_task(SyncParams::new(
+                        self.cfg.chain,
+                        first_point,
+                        last_point.clone(),
+                    ));
                 }
 
                 // The one slot overlap is deliberate, it doesn't hurt anything and prevents all off

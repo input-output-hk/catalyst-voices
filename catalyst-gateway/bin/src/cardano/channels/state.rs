@@ -18,8 +18,8 @@ impl ChainIndexerStateSender {
         Self(tokio::sync::broadcast::channel(1).0)
     }
 
-    /// Dispatches an state to all registered listeners.
-    pub(crate) fn dispatch_event(&self, state: ()) {
+    /// Updates to the latest state to all registered listeners.
+    pub(crate) fn update_state(&self, state: ()) {
         dispatch_message(&self.0, state);
     }
 
@@ -33,7 +33,7 @@ impl ChainIndexerStateSender {
 impl ChainIndexerStateReceiver {
     /// Receives the latest Chain Indexer state from the channel.
     /// Return `None` if the channel is closed.
-    pub(crate) async fn receive_event(&mut self) -> Option<()> {
+    pub(crate) async fn latest_state(&mut self) -> Option<()> {
         receive_msg(&mut self.0).await
     }
 }

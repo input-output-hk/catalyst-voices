@@ -14,6 +14,7 @@ use scylla::Session;
 use tracing::{debug, error};
 
 use crate::{
+    cardano::channels::state::ChainIndexerStateReceiver,
     db::index::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
@@ -69,7 +70,7 @@ impl Rbac509InsertQuery {
     #[allow(clippy::too_many_lines)]
     pub(crate) async fn index(
         &mut self, txn_hash: TransactionId, index: TxnIndex, block: &MultiEraBlock,
-        context: &mut RbacBlockIndexingContext,
+        context: &mut RbacBlockIndexingContext, indexer_state: &mut ChainIndexerStateReceiver,
     ) {
         let slot = block.slot();
         let cip509 = match Cip509::new(block, index, &[]) {
@@ -106,8 +107,17 @@ impl Rbac509InsertQuery {
         }
 
         // Need to wait until the `cip509.previous_transaction` would be definitely indexed
-        let (_mithril_tip, _) =
-            cardano_chain_follower::ChainFollower::get_tips(block.network()).await;
+        loop {
+            let Some(_state) = indexer_state.latest_state().await else {
+                error!(
+                    tx_hash = ?cip509.txn_hash(),
+                    "Chain indexer state channel closed during the RBAC 509 transaction indexing",
+                );
+                return;
+            };
+
+            break;
+        }
 
         let previous_transaction = cip509.previous_transaction();
         match Box::pin(validate_rbac_registration(
