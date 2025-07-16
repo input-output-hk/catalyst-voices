@@ -15,8 +15,8 @@ concurrency:
 env:
   ALLURE_REPORT_FOLDER: allure-report
   COVERAGE_REPORT_FOLDER: coverage-report
-  REPORT_EXT: .junit-report.xml
-  COVERAGE_EXT: .coverage.info
+  REPORT_EXT: junit-report.xml
+  COVERAGE_EXT: coverage.info
 
 jobs:
 #  generate-test-reports:
