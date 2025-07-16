@@ -115,7 +115,7 @@ impl From<CommentTemplateDocData> for SignedDocData {
         Self {
             id: value.0,
             ver: value.0,
-            doc_type: catalyst_signed_doc::doc_types::CATEGORY_PARAMETERS
+            doc_type: catalyst_signed_doc::doc_types::PROPOSAL_COMMENT
                 .doc_types()
                 .iter()
                 .map(catalyst_signed_doc::UuidV4::uuid)

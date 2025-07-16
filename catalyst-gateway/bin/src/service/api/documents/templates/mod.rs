@@ -113,10 +113,14 @@ fn build_signed_doc(data: &SignedDocData, sk: &SigningKey) -> (Uuid, CatalystSig
     let doc = Builder::new()
         .with_json_metadata(metadata.clone())
         .expect("Failed to build Metadata from template")
-        .with_decoded_content(data.content.to_vec())
-        .add_signature(|m| sk.sign(&m).to_vec(), &kid)
+        .with_json_content(
+            &serde_json::from_slice(data.content).expect("Failed to convert content into JSON"),
+        )
+        .expect("Failed to add JSON content")
+        .add_signature(|m| sk.sign(&m).to_vec(), kid)
         .expect("Failed to add signature for template")
-        .build();
+        .build()
+        .expect("Failed to build signed doc");
     let doc_id = doc
         .doc_id()
         .expect("Template document must have id field")
