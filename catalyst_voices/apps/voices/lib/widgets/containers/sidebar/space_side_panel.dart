@@ -213,7 +213,7 @@ class _Tabs extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesTabBar(
       controller: controller,
-      tabs: tabs.map((e) => VoicesTab.text(data: e, text: e.name)).toList(),
+      tabs: tabs.map((e) => VoicesTab(data: e, child: VoicesTabText(e.name))).toList(),
     );
   }
 }

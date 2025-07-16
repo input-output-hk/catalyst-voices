@@ -35,7 +35,7 @@ class VoicesTabBar<T extends Object> extends StatelessWidget {
             offstage: tab.isOffstage,
             child: Tab(
               key: tab.key ?? ValueKey(tab.data),
-              text: tab.text,
+              child: tab.child,
             ),
           ),
       ],

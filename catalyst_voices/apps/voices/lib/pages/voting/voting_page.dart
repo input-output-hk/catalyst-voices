@@ -171,17 +171,17 @@ class _Tabs extends StatelessWidget {
         children: [
           VoicesTabBar(
             tabs: [
-              VoicesTab.text(
+              VoicesTab(
                 data: 'all',
-                text: context.l10n.noOfAll(_proposals.length),
+                child: VoicesTabText(context.l10n.noOfAll(_proposals.length)),
               ),
-              VoicesTab.child(
+              VoicesTab(
                 data: 'favorites',
                 child: Row(
                   children: [
                     VoicesAssets.icons.starOutlined.buildIcon(),
                     const SizedBox(width: 8),
-                    Text(context.l10n.favorites),
+                    VoicesTabText(context.l10n.favorites),
                   ],
                 ),
               ),

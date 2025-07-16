@@ -301,13 +301,13 @@ class _TabBar extends StatelessWidget {
       tabAlignment: TabAlignment.fill,
       indicatorSize: TabBarIndicatorSize.tab,
       tabs: [
-        VoicesTab.text(
+        VoicesTab(
           data: 'events',
-          text: context.l10n.campaignPreviewEvents,
+          child: VoicesTabText(context.l10n.campaignPreviewEvents),
         ),
-        VoicesTab.text(
+        VoicesTab(
           data: 'views',
-          text: context.l10n.campaignPreviewViews,
+          child: VoicesTabText(context.l10n.campaignPreviewViews),
         ),
       ],
     );

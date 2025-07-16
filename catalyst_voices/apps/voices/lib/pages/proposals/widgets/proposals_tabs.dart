@@ -50,11 +50,11 @@ class _ProposalsTabs extends StatelessWidget {
       },
       tabs: [
         for (final type in ProposalsFilterType.values)
-          VoicesTab.text(
+          VoicesTab(
             data: type,
             key: type.tabKey(),
             isOffstage: !isProposerUnlock && type.isMy,
-            text: type.noOf(context, count: _getCount(type)),
+            child: VoicesTabText(type.noOf(context, count: _getCount(type))),
           ),
       ],
     );

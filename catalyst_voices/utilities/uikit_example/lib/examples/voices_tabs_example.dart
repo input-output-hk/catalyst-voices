@@ -16,8 +16,8 @@ class VoicesTabsExample extends StatelessWidget {
           children: [
             const VoicesTabBar(
               tabs: [
-                VoicesTab.text(data: 'sections', text: 'Sections'),
-                VoicesTab.text(data: 'comments', text: 'Comments'),
+                VoicesTab(data: 'sections', child: VoicesTabText('Sections')),
+                VoicesTab(data: 'comments', child: VoicesTabText('Comments')),
               ],
             ),
             Expanded(

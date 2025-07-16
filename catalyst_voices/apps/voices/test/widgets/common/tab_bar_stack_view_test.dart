@@ -19,8 +19,8 @@ void main() {
               children: [
                 VoicesTabBar(
                   tabs: [
-                    VoicesTab.text(data: 1, text: 'one'),
-                    VoicesTab.text(data: 2, text: 'two'),
+                    VoicesTab(data: 1, child: VoicesTabText('one')),
+                    VoicesTab(data: 2, child: VoicesTabText('two')),
                   ],
                 ),
                 TabBarStackView(
@@ -66,8 +66,8 @@ void main() {
                 VoicesTabBar(
                   controller: controller,
                   tabs: const [
-                    VoicesTab.text(data: 1, text: 'one'),
-                    VoicesTab.text(data: 2, text: 'two'),
+                    VoicesTab(data: 1, child: VoicesTabText('one')),
+                    VoicesTab(data: 2, child: VoicesTabText('two')),
                   ],
                 ),
                 TabBarStackView(

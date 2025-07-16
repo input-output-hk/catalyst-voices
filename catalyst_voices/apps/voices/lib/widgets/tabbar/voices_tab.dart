@@ -15,26 +15,35 @@ final class VoicesTab<T extends Object> extends Equatable {
   /// When the tab is hidden it's still possible to programmatically navigate to it.
   final bool isOffstage;
 
-  /// The text for the tab. Exclusive with [child].
-  final String? text;
+  /// The child for the tab.
+  final Widget child;
 
-  /// The child for the tab. Exclusive with [text].
-  final Widget? child;
-
-  const VoicesTab.child({
+  const VoicesTab({
     required this.data,
     this.key,
     this.isOffstage = false,
     required this.child,
-  }) : text = null;
-
-  const VoicesTab.text({
-    required this.data,
-    this.key,
-    this.isOffstage = false,
-    required this.text,
-  }) : child = null;
+  });
 
   @override
-  List<Object?> get props => [data, key, isOffstage, text, child];
+  List<Object?> get props => [data, key, isOffstage, child];
+}
+
+/// A default widget to be used as [VoicesTab.child].
+class VoicesTabText extends StatelessWidget {
+  final String text;
+
+  const VoicesTabText(
+    this.text, {
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      softWrap: false,
+      overflow: TextOverflow.fade,
+    );
+  }
 }
