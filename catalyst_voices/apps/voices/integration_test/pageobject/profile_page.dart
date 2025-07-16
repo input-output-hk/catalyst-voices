@@ -29,6 +29,7 @@ class ProfilePage {
   final deleteKeychainContinueButton = const Key('DeleteKeychainContinueButton');
   final deleteKeychainTextField = const Key('DeleteKeychainTextField');
   final keychainDeletedDialogCloseButton = const Key('KeychainDeletedDialogCloseButton');
+  final verificationEmailOkButton = const Key('VerificationEmailOkButton');
   Future<void> clickDisplayNameEdit() async {
     await $(displayNameTile).$(editBtn).tap();
   }
@@ -39,6 +40,10 @@ class ProfilePage {
 
   Future<void> addRoleClick() async {
     await $(accountRolesTile).$(addRole).tap();
+  }
+
+  Future<void> clickBackButton() async {
+    await $(navigationBackBtn).tap();
   }
 
   Future<void> removeKeychainClick() async {

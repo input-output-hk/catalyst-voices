@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../utils/test_state_utils.dart';
 import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
-import 'step_7_unlock_password_input_panel.dart';
+import 'step_5_unlock_password_input_panel.dart';
 
 class UnlockPasswordSuccessPanel extends OnboardingPageBase {
   UnlockPasswordSuccessPanel(super.$);
@@ -18,6 +20,13 @@ class UnlockPasswordSuccessPanel extends OnboardingPageBase {
     await UnlockPasswordInputPanel($).goto();
     await UnlockPasswordInputPanel($).enterPassword('Test1234', 'Test1234');
     await UnlockPasswordInputPanel($).clickNext();
+  }
+
+  /// Smart goto method that ensures clean visitor state first
+  /// This checks if user is already logged in and handles logout automatically
+  Future<void> gotoWithCleanState(GoRouter router) async {
+    await TestStateUtils.ensureCleanVisitorState($, router);
+    await goto();
   }
 
   Future<void> clickGoToDashboard() async {

@@ -71,6 +71,10 @@ class OnboardingPageBase {
     await $(backButton).waitUntilVisible().tap();
   }
 
+  Future<void> clickNext() async {
+    await $(nextButton).waitUntilVisible().tap();
+  }
+
   Future<void> goto() async {
     throw UnimplementedError('goto() must be overridden in subclasses');
   }
