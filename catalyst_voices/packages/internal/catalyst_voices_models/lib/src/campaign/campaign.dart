@@ -35,34 +35,54 @@ class Campaign extends Equatable {
         publish,
       ];
 
-  CampaignState get state {
+  // We can have more than one state if the campaign timeline supports concurrent phases. For example
+  // proposal submission can be concurrent with voting registration.
+  List<CampaignState> get state {
+    final states = <CampaignState>[];
+
+    for (final phase in timeline.phases) {
+      final status = CampaignPhaseStatus.fromRange(phase.timeline);
+      if (status.isActive) {
+        states.add(CampaignState(phase: phase, status: status));
+      }
+    }
+
+    if (states.isNotEmpty) return states;
+
     final today = DateTime.now();
     CampaignPhase? closestPhase;
     Duration? minDistance;
 
     for (final phase in timeline.phases) {
-      if (phase.timeline.from != null) {
-        final distance = phase.timeline.from!.difference(today).abs();
-        if (minDistance == null || distance < minDistance) {
-          minDistance = distance;
-          closestPhase = phase;
-        }
+      Duration? distance;
+
+      // Calculate distance to the closest date point (from or to) of the phase
+      if (phase.timeline.from != null && phase.timeline.to != null) {
+        final distanceFromStart = phase.timeline.from!.difference(today).abs();
+        final distanceFromEnd = phase.timeline.to!.difference(today).abs();
+        distance = distanceFromStart < distanceFromEnd ? distanceFromStart : distanceFromEnd;
+      } else if (phase.timeline.from != null) {
+        distance = phase.timeline.from!.difference(today).abs();
       } else if (phase.timeline.to != null) {
-        final distance = today.difference(phase.timeline.to!).abs();
-        if (minDistance == null || distance < minDistance) {
-          minDistance = distance;
-          closestPhase = phase;
-        }
+        distance = phase.timeline.to!.difference(today).abs();
+      }
+
+      if (distance != null && (minDistance == null || distance < minDistance)) {
+        minDistance = distance;
+        closestPhase = phase;
       }
     }
+
     if (closestPhase == null) {
       throw Exception('No closest phase found');
     }
 
-    return CampaignState(
-      phase: closestPhase,
-      status: CampaignPhaseStatus.fromRange(closestPhase.timeline),
-    );
+    return [
+      CampaignState(
+        phase: closestPhase,
+        status: CampaignPhaseStatus.fromRange(closestPhase.timeline),
+      ),
+    ];
   }
 
   Campaign copyWith({
@@ -86,7 +106,10 @@ class Campaign extends Equatable {
   }
 
   CampaignState stateTo(CampaignPhaseStage stage) {
-    final phase = timeline.phases.firstWhere((phase) => phase.stage == stage);
+    final phase = timeline.phases.firstWhere(
+      (phase) => phase.stage == stage,
+      orElse: () => throw StateError('Stage $stage not found'),
+    );
     return CampaignState(
       phase: phase,
       status: CampaignPhaseStatus.fromRange(phase.timeline),
@@ -131,12 +154,15 @@ enum CampaignPhaseStatus {
 
   factory CampaignPhaseStatus.fromRange(DateRange range) {
     final rangeStatus = range.rangeStatusNow();
+
     return switch (rangeStatus) {
       DateRangeStatus.before => CampaignPhaseStatus.upcoming,
       DateRangeStatus.inRange => CampaignPhaseStatus.active,
       DateRangeStatus.after => CampaignPhaseStatus.post,
     };
   }
+
+  bool get isActive => this == CampaignPhaseStatus.active;
 }
 
 enum CampaignPublish {
