@@ -2,6 +2,8 @@
 
 use cardano_blockchain_types::Slot;
 
+use super::{dispatch_message, receive_msg};
+
 /// Represents various events that can occur in the chain indexer.
 /// These events are used to track the state and progress of indexing operations.
 #[derive(Debug, Clone)]
@@ -66,14 +68,8 @@ impl ChainIndexerEventSender {
     }
 
     /// Dispatches an event to all registered listeners.
-    ///
-    /// # Arguments
-    /// * `message` - The event message to be dispatched.
-    pub(crate) fn dispatch_event(&self, message: ChainIndexerEvent) {
-        tracing::debug!(event = ?message, "Dispatching Chain Indexer Event");
-        if let Err(err) = self.0.send(message) {
-            tracing::error!(error=%err, "Unable to dispatch Chain Indexer Event.");
-        }
+    pub(crate) fn dispatch_event(&self, event: ChainIndexerEvent) {
+        dispatch_message(&self.0, event);
     }
 
     /// Creates a new multi-consumer `ChainIndexerEventReceiver` that will receive values
@@ -84,17 +80,9 @@ impl ChainIndexerEventSender {
 }
 
 impl ChainIndexerEventReceiver {
-    /// Receives the next `ChainIndexerEvent` event from the channel.
+    /// Receives the next `ChainIndexerEvent` from the channel.
     /// Return `None` if the channel is closed.
     pub(crate) async fn receive_event(&mut self) -> Option<ChainIndexerEvent> {
-        loop {
-            match self.0.recv().await {
-                Ok(event) => return Some(event),
-                Err(tokio::sync::broadcast::error::RecvError::Lagged(lag)) => {
-                    tracing::debug!(lag = lag, "Chain Indexer Event Receiver lagged");
-                },
-                Err(tokio::sync::broadcast::error::RecvError::Closed) => return None,
-            }
-        }
+        receive_msg(&mut self.0).await
     }
 }
