@@ -169,20 +169,17 @@ class _Tabs extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TabBar(
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
+          VoicesTabBar(
             tabs: [
-              Tab(
-                text: context.l10n.noOfAll(_proposals.length),
+              VoicesTab(
+                data: 'all',
+                child: VoicesTabText(context.l10n.noOfAll(_proposals.length)),
               ),
-              Tab(
-                child: Row(
-                  children: [
-                    VoicesAssets.icons.starOutlined.buildIcon(),
-                    const SizedBox(width: 8),
-                    Text(context.l10n.favorites),
-                  ],
+              VoicesTab(
+                data: 'favorites',
+                child: VoicesTabTextWithIcon(
+                  icon: VoicesAssets.icons.starOutlined.buildIcon(),
+                  text: context.l10n.favorites,
                 ),
               ),
             ],
