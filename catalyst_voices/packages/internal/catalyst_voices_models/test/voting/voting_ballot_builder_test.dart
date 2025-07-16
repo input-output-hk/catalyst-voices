@@ -11,15 +11,15 @@ void main() {
 
       // When
       builder
-        ..voteOn(ref: proposalRef, type: VoteType.yes)
-        ..voteOn(ref: proposalRef, type: VoteType.abstain);
+        ..voteOn(proposal: proposalRef, type: VoteType.yes)
+        ..voteOn(proposal: proposalRef, type: VoteType.abstain);
 
       // Then
       expect(builder.length, 1);
 
       final votes = builder.votes;
 
-      expect(votes[0].ref, proposalRef);
+      expect(votes[0].proposal, proposalRef);
       expect(votes[0].type, VoteType.abstain);
     });
 
@@ -31,8 +31,8 @@ void main() {
       final refTwo = SignedDocumentRef.generateFirstRef();
 
       // When
-      final voteOne = builder.voteOn(ref: refOne, type: VoteType.yes);
-      final voteTwo = builder.voteOn(ref: refTwo, type: VoteType.abstain);
+      final voteOne = builder.voteOn(proposal: refOne, type: VoteType.yes);
+      final voteTwo = builder.voteOn(proposal: refTwo, type: VoteType.abstain);
 
       final votes = [voteOne, voteTwo];
 
@@ -54,15 +54,15 @@ void main() {
 
       // When
       builder
-        ..voteOn(ref: ref, type: VoteType.abstain)
-        ..voteOn(ref: ref, type: VoteType.yes);
+        ..voteOn(proposal: ref, type: VoteType.abstain)
+        ..voteOn(proposal: ref, type: VoteType.yes);
 
       // Then
       final vote = builder.getVoteOn(ref);
 
       expect(vote, isNotNull);
       expect(vote!.type, VoteType.yes);
-      expect(vote.ref, ref);
+      expect(vote.proposal, ref);
     });
 
     test('votes is not modifiable', () {
@@ -76,7 +76,7 @@ void main() {
 
       // When
       for (final ref in refs) {
-        builder.voteOn(ref: ref, type: VoteType.yes);
+        builder.voteOn(proposal: ref, type: VoteType.yes);
       }
 
       // Then
@@ -87,6 +87,29 @@ void main() {
       }
 
       expect(removeVote, throwsA(isA<UnsupportedError>()));
+    });
+
+    test('throws error when adding second version of same vote', () {
+      // Given
+      final builder = VotingBallotBuilder();
+      final proposal = SignedDocumentRef.generateFirstRef();
+
+      // When
+      final firstVote = Vote.draft(proposal: proposal, type: VoteType.abstain);
+      final secondVote = Vote(
+        selfRef: firstVote.selfRef.nextVersion(),
+        proposal: proposal,
+        type: VoteType.yes,
+      );
+
+      // Then
+      builder.addVote(firstVote);
+
+      void addingSecondVote() {
+        builder.addVote(secondVote);
+      }
+
+      expect(addingSecondVote, throwsA(isA<AssertionError>()));
     });
   });
 }

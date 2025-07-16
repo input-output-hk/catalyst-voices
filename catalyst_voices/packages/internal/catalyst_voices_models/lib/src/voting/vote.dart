@@ -7,19 +7,19 @@ final class Vote extends Equatable {
   final DocumentRef selfRef;
 
   /// Reference to proposal on which vote was casted.
-  final DocumentRef ref;
+  final DocumentRef proposal;
 
   /// Type of vote. See [VoteType].
   final VoteType type;
 
   Vote({
     required this.selfRef,
-    required this.ref,
+    required this.proposal,
     required this.type,
   }) : assert(selfRef.version != null, 'selfRef have to be exact!');
 
   Vote.draft({
-    required this.ref,
+    required this.proposal,
     required this.type,
   }) : selfRef = DraftRef.generateFirstRef();
 
@@ -32,18 +32,18 @@ final class Vote extends Equatable {
   @override
   List<Object?> get props => [
         selfRef,
-        ref,
+        proposal,
         type,
       ];
 
   Vote copyWith({
     DocumentRef? selfRef,
-    DocumentRef? ref,
+    DocumentRef? proposal,
     VoteType? type,
   }) {
     return Vote(
       selfRef: selfRef ?? this.selfRef,
-      ref: ref ?? this.ref,
+      proposal: proposal ?? this.proposal,
       type: type ?? this.type,
     );
   }

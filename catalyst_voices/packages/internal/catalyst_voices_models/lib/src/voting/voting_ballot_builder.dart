@@ -11,7 +11,7 @@ final class VotingBallotBuilder {
   }) {
     assert(votes.none((vote) => vote.isCasted), 'Can not add already casted votes');
 
-    final votesMap = Map.fromEntries(votes.map((vote) => MapEntry(vote.ref, vote)));
+    final votesMap = Map.fromEntries(votes.map((vote) => MapEntry(vote.proposal, vote)));
 
     return VotingBallotBuilder._(votesMap);
   }
@@ -24,28 +24,42 @@ final class VotingBallotBuilder {
   /// Returns unmodifiable copy of votes made.
   List<Vote> get votes => List.unmodifiable(_votes.values);
 
+  /// Adds [vote] to the list.
+  void addVote(Vote vote) {
+    assert(!vote.isCasted, 'Can not add already casted vote!');
+    assert(
+      () {
+        final id = vote.selfRef.id;
+        return _votes.values.every((vote) => vote.selfRef.id != id);
+      }(),
+      'Only one vote version is allowed',
+    );
+
+    _votes[vote.proposal] = vote;
+  }
+
   /// Builds [VotingBallot] with unmodifiable list of votes.
   VotingBallot build() {
     return VotingBallot(votes: votes);
   }
 
-  /// Returns [Vote] made on [ref].
-  Vote? getVoteOn(DocumentRef ref) => _votes[ref];
+  /// Returns [Vote] made on [proposal].
+  Vote? getVoteOn(DocumentRef proposal) => _votes[proposal];
 
-  /// Removes [Vote] on [ref].
-  Vote? removeVoteOn(DocumentRef ref) => _votes.remove(ref);
+  /// Removes [Vote] on [proposal].
+  Vote? removeVoteOn(DocumentRef proposal) => _votes.remove(proposal);
 
-  /// Updates vote made on [ref] if already had any or adds new draft vote otherwise.
+  /// Updates vote made on [proposal] if already had any or adds new draft vote otherwise.
   ///
-  /// Returns current [Vote] on [ref] after update.
+  /// Returns current [Vote] on [proposal] after update.
   Vote voteOn({
-    required DocumentRef ref,
+    required DocumentRef proposal,
     required VoteType type,
   }) {
     return _votes.update(
-      ref,
+      proposal,
       (vote) => vote.copyWith(type: type),
-      ifAbsent: () => Vote.draft(ref: ref, type: type),
+      ifAbsent: () => Vote.draft(proposal: proposal, type: type),
     );
   }
 }
