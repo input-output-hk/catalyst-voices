@@ -38,9 +38,76 @@ final class AuxiliaryData extends Equatable implements CborEncodable {
   }
 }
 
+///
+abstract base class BaseTransaction extends Equatable {
+  ///
+  const BaseTransaction();
+
+  ///
+  List<int> get bytes;
+
+  ///
+  Coin get fee;
+
+  ///
+  NetworkId? get networkId;
+
+  ///
+  BaseTransaction withWitnessSet(TransactionWitnessSet witnessSet);
+}
+
+///
+final class RawTransaction extends BaseTransaction {
+  @override
+  final List<int> bytes;
+
+  ///
+  final int txWitnessSetIndex;
+
+  ///
+  final int txWitnessSetSize;
+
+  ///
+  const RawTransaction(
+    this.bytes, {
+    required this.txWitnessSetIndex,
+    required this.txWitnessSetSize,
+  });
+
+  @override
+  Coin get fee => const Coin(0);
+
+  @override
+  NetworkId? get networkId => null;
+
+  @override
+  List<Object?> get props => [
+        bytes,
+        txWitnessSetIndex,
+        txWitnessSetSize,
+      ];
+
+  @override
+  BaseTransaction withWitnessSet(
+    TransactionWitnessSet witnessSet,
+  ) {
+    final encodedWitnessSet = cbor.encode(witnessSet.toCbor());
+    final start = txWitnessSetIndex;
+    final end = start + txWitnessSetSize;
+
+    final bytes = List.of(this.bytes)..replaceRange(start, end, encodedWitnessSet);
+
+    return RawTransaction(
+      bytes,
+      txWitnessSetIndex: start,
+      txWitnessSetSize: encodedWitnessSet.length,
+    );
+  }
+}
+
 /// Represents the signed transaction with a list of witnesses
 /// which are used to verify the validity of a transaction.
-final class Transaction extends Equatable implements CborEncodable {
+final class Transaction extends BaseTransaction implements CborEncodable {
   /// The transaction body containing the inputs, outputs, fees, etc.
   final TransactionBody body;
 
@@ -80,6 +147,15 @@ final class Transaction extends Equatable implements CborEncodable {
   }
 
   @override
+  List<int> get bytes => cbor.encode(toCbor());
+
+  @override
+  Coin get fee => body.fee;
+
+  @override
+  NetworkId? get networkId => body.networkId;
+
+  @override
   List<Object?> get props => [body, isValid, witnessSet, auxiliaryData];
 
   /// Serializes the type as cbor.
@@ -93,6 +169,16 @@ final class Transaction extends Equatable implements CborEncodable {
         auxiliaryData?.toCbor() ?? const CborNull(),
       ],
       tags: tags,
+    );
+  }
+
+  @override
+  Transaction withWitnessSet(TransactionWitnessSet witnessSet) {
+    return Transaction(
+      body: body,
+      isValid: isValid,
+      witnessSet: witnessSet,
+      auxiliaryData: auxiliaryData,
     );
   }
 }
