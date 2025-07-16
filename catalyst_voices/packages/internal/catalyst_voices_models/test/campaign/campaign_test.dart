@@ -213,7 +213,7 @@ void main() {
       );
     });
     test('state return closest phase when no active phase', () {
-      // Arange
+      // Arrange
       final campaign = Campaign(
         selfRef: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
@@ -272,7 +272,7 @@ void main() {
     });
 
     test('state return closest phase that is post when there is no active phase', () {
-      // Arange
+      // Arrange
       final campaign = Campaign(
         selfRef: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',

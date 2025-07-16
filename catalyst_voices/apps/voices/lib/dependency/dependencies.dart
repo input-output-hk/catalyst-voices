@@ -99,7 +99,6 @@ final class Dependencies extends DependencyProvider {
           get<ProposalService>(),
         ),
       )
-
       // TODO(LynxLynxx): add repository for campaign management
       ..registerLazySingleton<CampaignBuilderCubit>(
         CampaignBuilderCubit.new,
