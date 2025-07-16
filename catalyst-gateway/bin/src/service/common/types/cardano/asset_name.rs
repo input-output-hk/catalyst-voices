@@ -68,8 +68,8 @@ impl Example for AssetName {
     }
 }
 
-impl From<Vec<u8>> for AssetName {
-    fn from(value: Vec<u8>) -> Self {
+impl From<&Vec<u8>> for AssetName {
+    fn from(value: &Vec<u8>) -> Self {
         match String::from_utf8(value.clone()) {
             Ok(name) => {
                 // UTF8 - Yay

@@ -2,6 +2,7 @@
 //!
 //! This improves query execution time.
 
+pub(crate) mod caches;
 pub(crate) mod purge;
 pub(crate) mod rbac;
 pub(crate) mod registrations;
