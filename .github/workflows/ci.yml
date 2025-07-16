@@ -19,8 +19,8 @@ permissions:
   pull-requests: write
 
 env:
-  REPORT_EXT: .junit-report.xml
-  COVERAGE_EXT: .coverage.lcov
+  REPORT_EXT: junit-report.xml
+  COVERAGE_EXT: coverage.lcov
 
 jobs:
   ci:
@@ -74,8 +74,8 @@ jobs:
           docker cp api-tests-runner:/poetry/junit-report.xml .
           docker cp api-tests-runner:/poetry/coverage.lcov .
 
-      - name: Setup upterm session
-        uses: lhotari/action-upterm@v1
+#      - name: Setup upterm session
+#        uses: lhotari/action-upterm@v1
 
       - name: Down
         run: docker compose -f catalyst-gateway/tests/docker-compose.yml down
