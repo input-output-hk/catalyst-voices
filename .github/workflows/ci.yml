@@ -51,7 +51,9 @@ jobs:
         run: docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
 
       - name: cat-gateway-logs
-        run: docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
+        run: |
+          docker compose stop cat-gateway
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
 
       - name: Get tests artifacts
         if: always()

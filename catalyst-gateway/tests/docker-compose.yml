@@ -42,7 +42,7 @@ services:
       interval: 30s
       timeout: 30s
       # approximately a 15 minutes of waiting
-      retries: 55
+      retries: 50
     environment:
       - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
       - CASSANDRA_PERSISTENT_URL=scylla-node:9042
