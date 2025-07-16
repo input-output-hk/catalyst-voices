@@ -177,12 +177,9 @@ class _Tabs extends StatelessWidget {
               ),
               VoicesTab(
                 data: 'favorites',
-                child: Row(
-                  children: [
-                    VoicesAssets.icons.starOutlined.buildIcon(),
-                    const SizedBox(width: 8),
-                    VoicesTabText(context.l10n.favorites),
-                  ],
+                child: VoicesTabTextWithIcon(
+                  icon: VoicesAssets.icons.starOutlined.buildIcon(),
+                  text: context.l10n.favorites,
                 ),
               ),
             ],

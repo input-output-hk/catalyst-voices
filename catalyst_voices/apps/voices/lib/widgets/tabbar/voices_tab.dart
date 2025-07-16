@@ -47,3 +47,26 @@ class VoicesTabText extends StatelessWidget {
     );
   }
 }
+
+/// A [VoicesTabText] with a leading icon.
+class VoicesTabTextWithIcon extends StatelessWidget {
+  final Widget icon;
+  final String text;
+
+  const VoicesTabTextWithIcon({
+    super.key,
+    required this.icon,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        icon,
+        const SizedBox(width: 8),
+        VoicesTabText(text),
+      ],
+    );
+  }
+}
