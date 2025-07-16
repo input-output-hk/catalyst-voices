@@ -1,6 +1,4 @@
-//! Event types for Chain Indexer.
-
-#![allow(dead_code)]
+//! multi-consumer, multi-producer Cardano Chain Indexer Events channel.
 
 use cardano_blockchain_types::Slot;
 

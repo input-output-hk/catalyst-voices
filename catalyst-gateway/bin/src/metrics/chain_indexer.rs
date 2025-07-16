@@ -3,7 +3,7 @@
 use std::ops::Sub;
 
 use crate::{
-    cardano::event::{ChainIndexerEvent as Event, ChainIndexerEventReceiver},
+    cardano::channels::event::{ChainIndexerEvent as Event, ChainIndexerEventReceiver},
     settings::Settings,
 };
 

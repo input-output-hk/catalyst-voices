@@ -10,7 +10,7 @@ use rand::{Rng, SeedableRng};
 use tracing::{debug, error, info};
 
 use crate::{
-    cardano::event::ChainIndexerEventSender,
+    cardano::channels::event::{ChainIndexerEvent, ChainIndexerEventSender},
     db::index::{
         block::{
             index_block,
@@ -32,7 +32,7 @@ use crate::{
     settings::{chain_follower, Settings},
 };
 
-pub(crate) mod event;
+pub(crate) mod channels;
 
 /// How long we wait between checks for connection to the indexing DB to be ready.
 pub(crate) const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs(1);
@@ -261,7 +261,7 @@ fn sync_subchain(
             let tips = ChainFollower::get_tips(params.chain).await;
             let immutable_slot = tips.0.slot_or_default();
             let live_slot = tips.1.slot_or_default();
-            let event = event::ChainIndexerEvent::LiveTipSlotChanged {
+            let event = ChainIndexerEvent::LiveTipSlotChanged {
                 immutable_slot,
                 live_slot,
             };
@@ -305,8 +305,7 @@ fn sync_subchain(
                     }
 
                     if chain_update.tip && !set_follower_live_first_reached_tip() {
-                        event_sender
-                            .dispatch_event(event::ChainIndexerEvent::SyncLiveChainCompleted);
+                        event_sender.dispatch_event(ChainIndexerEvent::SyncLiveChainCompleted);
                     }
 
                     update_block_state(
@@ -337,7 +336,7 @@ fn sync_subchain(
                             // Slots arithmetic has saturating semantic, so this is ok
                             .map_or(0.into(), |l| l.slot_or_default() - rollback_slot);
 
-                        event_sender.dispatch_event(event::ChainIndexerEvent::ForwardDataPurged {
+                        event_sender.dispatch_event(ChainIndexerEvent::ForwardDataPurged {
                             purge_slots: purge_slots.into(),
                         });
 
@@ -450,7 +449,7 @@ impl SyncTask {
         self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
         debug!(current_sync_tasks=%self.current_sync_tasks, "Added new Sync Task");
         self.event_channel
-            .dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
+            .dispatch_event(ChainIndexerEvent::SyncTasksChanged {
                 current_sync_tasks: self.current_sync_tasks,
             });
     }
@@ -463,7 +462,7 @@ impl SyncTask {
         });
         debug!(current_sync_tasks=%self.current_sync_tasks, "Finished Sync Task");
         self.event_channel
-            .dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
+            .dispatch_event(ChainIndexerEvent::SyncTasksChanged {
                 current_sync_tasks: self.current_sync_tasks,
             });
     }
@@ -486,12 +485,12 @@ impl SyncTask {
         info!(chain=%self.cfg.chain, immutable_tip=?self.immutable_tip_slot, live_tip=?self.live_tip_slot, "Running the primary blockchain follower task.");
 
         self.event_channel
-            .dispatch_event(event::ChainIndexerEvent::ImmutableTipSlotChanged {
+            .dispatch_event(ChainIndexerEvent::ImmutableTipSlotChanged {
                 immutable_slot: self.immutable_tip_slot,
                 live_slot: self.live_tip_slot,
             });
         self.event_channel
-            .dispatch_event(event::ChainIndexerEvent::LiveTipSlotChanged {
+            .dispatch_event(ChainIndexerEvent::LiveTipSlotChanged {
                 immutable_slot: self.immutable_tip_slot,
                 live_slot: self.live_tip_slot,
             });
@@ -518,7 +517,7 @@ impl SyncTask {
             self.event_channel.clone(),
         );
         self.event_channel
-            .dispatch_event(event::ChainIndexerEvent::SyncLiveChainStarted);
+            .dispatch_event(ChainIndexerEvent::SyncLiveChainStarted);
 
         self.start_immutable_followers();
         // IF there is only 1 chain follower spawn, then the immutable state already indexed and
@@ -526,10 +525,10 @@ impl SyncTask {
         if self.sync_tasks.len() == 1 {
             set_follower_immutable_first_reached_tip();
             self.event_channel
-                .dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
+                .dispatch_event(ChainIndexerEvent::SyncImmutableChainCompleted);
         } else {
             self.event_channel
-                .dispatch_event(event::ChainIndexerEvent::SyncImmutableChainStarted);
+                .dispatch_event(ChainIndexerEvent::SyncImmutableChainStarted);
         }
 
         // Wait Sync tasks to complete.  If they fail and have not completed, reschedule them.
@@ -561,7 +560,7 @@ impl SyncTask {
                             self.immutable_tip_slot = roll_forward_point.slot_or_default();
 
                             self.event_channel.dispatch_event(
-                                event::ChainIndexerEvent::ImmutableTipSlotChanged {
+                                ChainIndexerEvent::ImmutableTipSlotChanged {
                                     immutable_slot: self.immutable_tip_slot,
                                     live_slot: self.live_tip_slot,
                                 },
@@ -569,9 +568,8 @@ impl SyncTask {
                             info!(chain=%self.cfg.chain, report=%finished, "Chain Indexer finished reaching TIP.");
 
                             self.start_immutable_followers();
-                            self.event_channel.dispatch_event(
-                                event::ChainIndexerEvent::SyncImmutableChainStarted,
-                            );
+                            self.event_channel
+                                .dispatch_event(ChainIndexerEvent::SyncImmutableChainStarted);
                         } else {
                             error!(chain=%self.cfg.chain, report=%finished, "Chain Indexer finished without to reach TIP.");
                         }
@@ -586,7 +584,7 @@ impl SyncTask {
 
                                 finished.last_indexed_block.as_ref().inspect(|block| {
                                     self.event_channel.dispatch_event(
-                                        event::ChainIndexerEvent::IndexedSlotProgressed {
+                                        ChainIndexerEvent::IndexedSlotProgressed {
                                             slot: block.slot_or_default(),
                                         },
                                     );
@@ -625,7 +623,7 @@ impl SyncTask {
             if self.sync_tasks.len() == 1 {
                 set_follower_immutable_first_reached_tip();
                 self.event_channel
-                    .dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
+                    .dispatch_event(ChainIndexerEvent::SyncImmutableChainCompleted);
                 caches::txo_assets_by_stake::drop();
                 caches::txo_by_stake::drop();
 
@@ -640,7 +638,7 @@ impl SyncTask {
                     error!(chain=%self.cfg.chain, error=%error, "BUG: Purging volatile data task failed.");
                 } else {
                     self.event_channel
-                        .dispatch_event(event::ChainIndexerEvent::BackwardDataPurged);
+                        .dispatch_event(ChainIndexerEvent::BackwardDataPurged);
                 }
             }
         }
