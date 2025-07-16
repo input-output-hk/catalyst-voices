@@ -28,7 +28,7 @@ final class AccountSubmitFullData extends AccountSubmitData {
 
 final class AccountSubmitMetadata {
   final CardanoWallet wallet;
-  final Transaction transaction;
+  final BaseTransaction transaction;
 
   const AccountSubmitMetadata({
     required this.wallet,

@@ -3,13 +3,17 @@ import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart' as kd;
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy.dart';
+import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy_bytes.dart';
+import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy_models.dart';
+import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy_type.dart';
 import 'package:cbor/cbor.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:test/test.dart';
 
 void main() {
-  group(RegistrationTransactionBuilder, () {
+  group(RegistrationTransactionStrategy, () {
     late KeyDerivationService keyDerivationService;
 
     setUpAll(() {
@@ -30,8 +34,9 @@ void main() {
       ).thenAnswer((_) async => _voterKeyPair);
     });
 
-    test('txInputsHash is calculated from selected utxos, not from all utxos', () async {
-      final allUtxos = {
+    test('comparing models and bytes transactions should give same output', () async {
+      // Given
+      final utxos = {
         TransactionUnspentOutput(
           input: TransactionInput(
             transactionId: _buildDummyTransactionId(0),
@@ -53,175 +58,41 @@ void main() {
           ),
         ),
       };
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
 
-      final selectedUtxos = {allUtxos.first};
-
-      final transactionBuilder = RegistrationTransactionBuilder(
-        transactionConfig: _defaultTransactionBuilderConfig,
-        keyDerivationService: keyDerivationService,
-        masterKey: _masterKey,
-        networkId: NetworkId.testnet,
-        slotNumberTtl: const SlotBigNum(100000),
-        roles: {const RegistrationTransactionRole.set(AccountRole.voter)},
-        changeAddress: _changeAddress,
-        rewardAddresses: [_rewardAddress],
-        utxos: allUtxos,
-        previousTransactionId: null,
-      );
-
-      final transaction = (await transactionBuilder.build()) as Transaction;
-
-      final metadata = await X509MetadataEnvelope.fromCbor(
-        transaction.auxiliaryData!.toCbor(),
-        deserializer: RegistrationData.fromCbor,
-      );
-
-      final allUtxosHash = TransactionInputsHash.fromTransactionInputs(allUtxos);
-      final selectedUtxosHash = TransactionInputsHash.fromTransactionInputs(selectedUtxos);
-
-      expect(metadata.txInputsHash, isNot(equals(allUtxosHash)));
-      expect(metadata.txInputsHash, equals(selectedUtxosHash));
-    });
-
-    test('txInputsHash matches hash calculated from selected inputs', () async {
-      // Given
-      final utxo1 = TransactionUnspentOutput(
-        input: TransactionInput(
-          transactionId: _buildDummyTransactionId(0),
-          index: 0,
-        ),
-        output: TransactionOutput(
-          address: _changeAddress,
-          amount: Balance(coin: Coin.fromAda(0.3)),
-        ),
-      );
-      final utxo2 = TransactionUnspentOutput(
-        input: TransactionInput(
-          transactionId: _buildDummyTransactionId(1),
-          index: 1,
-        ),
-        output: TransactionOutput(
-          address: _changeAddress,
-          amount: Balance(coin: Coin.fromAda(0.2)),
-        ),
-      );
-      final utxo3 = TransactionUnspentOutput(
-        input: TransactionInput(
-          transactionId: _buildDummyTransactionId(2),
-          index: 2,
-        ),
-        output: TransactionOutput(
-          address: _changeAddress,
-          amount: Balance(coin: Coin.fromAda(0.9)),
-        ),
-      );
-
-      final allUtxos = {utxo1, utxo2, utxo3};
-      final expectedUtxos = {utxo3, utxo1};
-      final expectedInputs = {utxo3.input, utxo1.input};
+      final derCert = X509DerCertificate.fromBytes(bytes: List.filled(32, 0));
 
       // When
-      final transactionBuilder = RegistrationTransactionBuilder(
-        transactionConfig: _defaultTransactionBuilderConfig,
-        keyDerivationService: keyDerivationService,
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
         masterKey: _masterKey,
-        networkId: NetworkId.testnet,
-        slotNumberTtl: const SlotBigNum(100000),
-        roles: {const RegistrationTransactionRole.set(AccountRole.voter)},
-        changeAddress: _changeAddress,
-        rewardAddresses: [_rewardAddress],
-        utxos: allUtxos,
-        previousTransactionId: null,
+        role: AccountRole.voter,
       );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+      ];
+
+      final models = _pickStrategy(RegistrationTransactionStrategyType.models, utxos: utxos);
+      final bytes = _pickStrategy(RegistrationTransactionStrategyType.bytes, utxos: utxos);
 
       // Then
-      final transaction = (await transactionBuilder.build()) as Transaction;
-      final inputs = transaction.body.inputs;
-
-      final metadata = await X509MetadataEnvelope.fromCbor(
-        transaction.auxiliaryData!.toCbor(),
-        deserializer: RegistrationData.fromCbor,
+      final modelsTransaction = await models.build(
+        purpose: _purpose,
+        rootKeyPair: rootKeyPair,
+        derCert: derCert,
+        publicKeys: publicKeys,
+        requiredSigners: requiredSigners,
+      );
+      final bytesTransaction = await bytes.build(
+        purpose: _purpose,
+        rootKeyPair: rootKeyPair,
+        derCert: derCert,
+        publicKeys: publicKeys,
+        requiredSigners: requiredSigners,
       );
 
-      expect(
-        TransactionInputsHash.fromTransactionInputs(expectedUtxos),
-        equals(metadata.txInputsHash),
-        reason: 'Should calculate same hash from same utxos',
-      );
-      expect(
-        inputs,
-        containsAllInOrder(expectedInputs),
-        reason: 'Order of selected utxos is kept',
-      );
-    });
-
-    // Emirs test
-    test('order of selected utxo is consistent', () async {
-      // Given
-      final address = ShelleyAddress.fromBech32(
-        /* cSpell:disable */
-        'addr_test1qrg3glkhgr446yh0vlun2fwg3yznyxvulru96tjewej7ea059qfhuxkk4c8tmtxvtvelqgvgaw8jfpw22yd48suy4u3qu4zkyk',
-        /* cSpell:enable */
-      );
-
-      const biggerUtxoIndex = 5;
-      final allUtxos = Set.of(
-        List.generate(
-          7,
-          (index) {
-            final id = _buildDummyTransactionId(index);
-            final amount = index == biggerUtxoIndex
-                ? const Balance(coin: Coin(1157046))
-                : const Balance(coin: Coin(969750));
-
-            final input = TransactionInput(transactionId: id, index: index);
-            final output = TransactionOutput(address: address, amount: amount);
-
-            return TransactionUnspentOutput(input: input, output: output);
-          },
-        ),
-      );
-
-      final firstExpectedUtxo = allUtxos.elementAt(biggerUtxoIndex);
-      final secondExpectedUtxo = allUtxos.elementAt(0);
-
-      final expectedUtxos = {firstExpectedUtxo, secondExpectedUtxo};
-      final expectedInputs = {firstExpectedUtxo.input, secondExpectedUtxo.input};
-
-      // When
-      final transactionBuilder = RegistrationTransactionBuilder(
-        transactionConfig: _defaultTransactionBuilderConfig,
-        keyDerivationService: keyDerivationService,
-        masterKey: _masterKey,
-        networkId: NetworkId.testnet,
-        slotNumberTtl: const SlotBigNum(100000),
-        roles: {const RegistrationTransactionRole.set(AccountRole.voter)},
-        changeAddress: address,
-        rewardAddresses: [address],
-        utxos: allUtxos,
-        previousTransactionId: null,
-      );
-
-      // Then
-      final transaction = (await transactionBuilder.build()) as Transaction;
-      final inputs = transaction.body.inputs;
-
-      final metadata = await X509MetadataEnvelope.fromCbor(
-        transaction.auxiliaryData!.toCbor(),
-        deserializer: RegistrationData.fromCbor,
-      );
-
-      final transactionInputsHash = TransactionInputsHash.fromTransactionInputs(expectedUtxos);
-      expect(
-        transactionInputsHash,
-        equals(metadata.txInputsHash),
-        reason: 'Should calculate same hash from same utxos',
-      );
-      expect(
-        inputs,
-        containsAllInOrder(expectedInputs),
-        reason: 'Order of selected utxos is kept',
-      );
+      expect(modelsTransaction.bytes, equals(bytesTransaction.bytes));
     });
   });
 }
@@ -238,6 +109,8 @@ const _defaultTransactionBuilderConfig = TransactionBuilderConfig(
   coinsPerUtxoByte: Coin(4310),
   selectionStrategy: ExactBiggestAssetSelectionStrategy(),
 );
+
+const _purpose = 'ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c';
 
 final _changeAddress = ShelleyAddress.fromBech32(
   /* cSpell:disable */
@@ -261,6 +134,41 @@ final _voterKeyPair = CatalystKeyPair(
 TransactionHash _buildDummyTransactionId(int seed) {
   final hex = List.filled(64, '$seed').join();
   return TransactionHash.fromHex(hex);
+}
+
+RegistrationTransactionStrategy _pickStrategy(
+  RegistrationTransactionStrategyType type, {
+  TransactionBuilderConfig transactionConfig = _defaultTransactionBuilderConfig,
+  ShelleyAddress? changeAddress,
+  SlotBigNum slotNumberTtl = const SlotBigNum(100000),
+  Set<RegistrationTransactionRole>? roles,
+  required Set<TransactionUnspentOutput> utxos,
+}) {
+  changeAddress ??= _changeAddress;
+  roles ??= {const RegistrationTransactionRole.set(AccountRole.voter)};
+
+  switch (type) {
+    case RegistrationTransactionStrategyType.models:
+      return RegistrationTransactionStrategyModels(
+        transactionConfig: transactionConfig,
+        networkId: NetworkId.testnet,
+        slotNumberTtl: slotNumberTtl,
+        roles: roles,
+        changeAddress: changeAddress,
+        utxos: utxos,
+        previousTransactionId: null,
+      );
+    case RegistrationTransactionStrategyType.bytes:
+      return RegistrationTransactionStrategyBytes(
+        transactionConfig: transactionConfig,
+        networkId: NetworkId.testnet,
+        slotNumberTtl: slotNumberTtl,
+        roles: roles,
+        changeAddress: changeAddress,
+        utxos: utxos,
+        previousTransactionId: null,
+      );
+  }
 }
 
 class _FakeBip32Ed25519XPrivateKey extends Fake implements kd.Bip32Ed25519XPrivateKey {

@@ -22,18 +22,22 @@ final class AuxiliaryDataHash extends BaseHash {
 
   /// Constructs the [AuxiliaryDataHash] from a [AuxiliaryData].
   AuxiliaryDataHash.fromAuxiliaryData(AuxiliaryData data)
-      : super.fromBytes(
-          bytes: Hash.blake2b(
-            Uint8List.fromList(cbor.encode(data.toCbor())),
-            digestSize: hashLength,
-          ),
-        );
+      : this.fromHashedBytes(cbor.encode(data.toCbor()));
 
   /// Constructs the [AuxiliaryDataHash] from raw [bytes].
   AuxiliaryDataHash.fromBytes({required super.bytes}) : super.fromBytes();
 
   /// Deserializes the type from cbor.
   AuxiliaryDataHash.fromCbor(super.value) : super.fromCbor();
+
+  /// Crates a hash from [bytes].
+  AuxiliaryDataHash.fromHashedBytes(List<int> bytes)
+      : super.fromBytes(
+          bytes: Hash.blake2b(
+            Uint8List.fromList(bytes),
+            digestSize: hashLength,
+          ),
+        );
 
   /// Constructs the [AuxiliaryDataHash] from a hex string representation
   /// of [bytes].
@@ -216,6 +220,15 @@ final class TransactionInputsHash extends BaseHash {
   /// Deserializes the type from cbor.
   TransactionInputsHash.fromCbor(super.value) : super.fromCbor();
 
+  /// Crates a hash from [bytes].
+  TransactionInputsHash.fromHashedBytes(List<int> bytes)
+      : super.fromBytes(
+          bytes: Hash.blake2b(
+            Uint8List.fromList(bytes),
+            digestSize: hashLength,
+          ),
+        );
+
   /// Constructs the [TransactionInputsHash] from a hex string representation
   /// of [bytes].
   TransactionInputsHash.fromHex(super.string) : super.fromHex();
@@ -223,16 +236,11 @@ final class TransactionInputsHash extends BaseHash {
   /// Constructs the [TransactionInputsHash] from a [TransactionBody].
   TransactionInputsHash.fromTransactionInputs(
     Set<TransactionUnspentOutput> utxos,
-  ) : super.fromBytes(
-          bytes: Hash.blake2b(
-            Uint8List.fromList(
-              cbor.encode(
-                CborList([
-                  for (final utxo in utxos) utxo.input.toCbor(),
-                ]),
-              ),
-            ),
-            digestSize: hashLength,
+  ) : this.fromHashedBytes(
+          cbor.encode(
+            CborList([
+              for (final utxo in utxos) utxo.input.toCbor(),
+            ]),
           ),
         );
 
