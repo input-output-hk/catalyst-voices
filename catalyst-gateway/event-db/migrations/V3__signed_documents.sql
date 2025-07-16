@@ -23,6 +23,9 @@ ALTER TABLE IF EXISTS signed_docs (
   CONSTRAINT pk PRIMARY KEY (id, ver)
 );
 
+ALTER TABLE signed_docs
+ALTER COLUMN type TYPE UUID[] USING ARRAY[type];
+
 COMMENT ON TABLE signed_docs IS
 'Storage for Signed Documents.';
 
