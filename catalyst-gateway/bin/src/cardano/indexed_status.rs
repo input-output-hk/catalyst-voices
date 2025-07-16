@@ -1,5 +1,7 @@
 //! An `IndexedStatus` structure.
 
+use std::ops::Deref;
+
 use cardano_blockchain_types::Slot;
 
 use crate::db::index::queries::sync_status::get::SyncStatus;
@@ -15,6 +17,24 @@ use crate::db::index::queries::sync_status::get::SyncStatus;
 /// indexed already
 #[derive(Debug, Clone, Default)]
 pub(crate) struct IndexedStatus(Vec<(Slot, Slot)>);
+
+impl IndexedStatus {
+    /// Apply an update by the provided index range
+    pub(crate) fn update(&mut self, start: Slot, end: Slot) {
+        let _ = self;
+        let _ = start;
+        let _ = end;
+        unimplemented!("TODO: in progress");
+    }
+}
+
+impl Deref for IndexedStatus {
+    type Target = Vec<(Slot, Slot)>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 impl IntoIterator for IndexedStatus {
     type IntoIter = <Vec<(Slot, Slot)> as IntoIterator>::IntoIter;
@@ -53,6 +73,7 @@ fn merge_consecutive_indexed_chunks(mut synced_chunks: Vec<(Slot, Slot)>) -> Vec
 
     let mut best_sync: Vec<(Slot, Slot)> = vec![];
     let mut current_status: Option<(Slot, Slot)> = None;
+
     for rec in synced_chunks {
         if let Some(current) = current_status.take() {
             if rec.0 >= current.0 && rec.1 <= current.1 {

@@ -3,6 +3,7 @@
 use cardano_blockchain_types::Slot;
 
 use super::{dispatch_message, receive_msg};
+use crate::cardano::indexed_status::IndexedStatus;
 
 /// Chain Indexer State structure
 #[derive(Debug, Clone)]
@@ -11,8 +12,31 @@ pub(crate) struct ChainIndexerState {
     /// The immutable tip slot.
     pub immutable_tip_slot: Slot,
 
-    /// The live tip slot.
-    pub live_tip_slot: Slot,
+    /// Current Immutable db status of indexed data.
+    pub immutable_indexed_status: IndexedStatus,
+}
+
+impl ChainIndexerState {
+    /// Returns true if the Chain indexer reached immutable tip, so the all immutable data
+    /// if fully is indexed. False otherwise.
+    pub(crate) fn is_reached_immutable_tip(&self) -> bool {
+        if let Some((_, end)) = self.immutable_indexed_status.last() {
+            end == &self.immutable_tip_slot
+        } else {
+            false
+        }
+    }
+
+    /// Returns true if provided `slot` is contained by the `immutable_indexed_status`,
+    /// which means it was already indexed.
+    pub(crate) fn is_immutable_indexed(&self, slot: Slot) -> bool {
+        for (start, end) in &self.immutable_indexed_status {
+            if *start <= slot && slot <= *end {
+                return true;
+            }
+        }
+        false
+    }
 }
 
 /// Chain Indexer state sender multi-producer channel

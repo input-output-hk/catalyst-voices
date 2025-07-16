@@ -108,15 +108,18 @@ impl Rbac509InsertQuery {
 
         // Need to wait until the `cip509.previous_transaction` would be definitely indexed
         loop {
-            let Some(_state) = indexer_state.latest_state().await else {
+            let Some(state) = indexer_state.latest_state().await else {
                 error!(
                     tx_hash = ?cip509.txn_hash(),
                     "Chain indexer state channel closed during the RBAC 509 transaction indexing",
                 );
                 return;
             };
-
-            break;
+            if block.is_immutable() && state.is_immutable_indexed(block.slot()) {
+                break;
+            } else if state.is_reached_immutable_tip() {
+                break;
+            }
         }
 
         let previous_transaction = cip509.previous_transaction();

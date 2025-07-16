@@ -598,7 +598,10 @@ impl SyncTask {
                             Ok(()) => {
                                 info!(chain=%self.cfg.chain, report=%finished,
                                     "The Immutable follower completed successfully.");
-
+                                self.immutable_indexed_status.update(
+                                    finished.start.slot_or_default(),
+                                    finished.end.slot_or_default(),
+                                );
                                 self.update_state();
 
                                 finished.last_indexed_block.as_ref().inspect(|block| {
@@ -706,13 +709,11 @@ impl SyncTask {
     /// If it has, return a subset that hasn't been indexed if any, or None if its been
     /// completely indexed already.
     fn get_syncable_range(&self, start: Slot, end: Slot) -> Option<(Point, Point)> {
-        for indexed_chunk in &self.immutable_indexed_status {
-            let indexed_start = indexed_chunk.0;
-            let indexed_end = indexed_chunk.0;
+        for (indexed_start, indexed_end) in &self.immutable_indexed_status {
             // Check if we start within a previously synchronized block.
-            if start >= indexed_start && start <= indexed_end {
+            if start >= *indexed_start && start <= *indexed_end {
                 // Check if we are fully contained by the sync block, if so, nothing to sync.
-                if end <= indexed_end {
+                if end <= *indexed_end {
                     return None;
                 }
 
@@ -722,7 +723,7 @@ impl SyncTask {
                 // It is not a problem to sync the same data mutiple times, so for simplicity we do
                 // not account for this, if the requested range goes beyond the sync
                 // block it starts within we assume that the rest is not synced.
-                return Some((Point::fuzzy(indexed_end), Point::fuzzy(end)));
+                return Some((Point::fuzzy(*indexed_end), Point::fuzzy(end)));
             }
         }
 
@@ -739,7 +740,7 @@ impl SyncTask {
     fn update_state(&self) {
         let state = ChainIndexerState {
             immutable_tip_slot: self.immutable_tip_slot,
-            live_tip_slot: self.live_tip_slot,
+            immutable_indexed_status: self.immutable_indexed_status.clone(),
         };
         self.state_channel.update_state(state);
     }
