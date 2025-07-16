@@ -128,7 +128,8 @@ final class RegistrationTransactionBuilder {
       _stakeAddress.publicKeyHash,
     };
 
-    final strategy = _pickStrategy(RegistrationTransactionStrategyType.models);
+    final strategy = _pickStrategy(RegistrationTransactionStrategyType.bytes);
+
     return strategy.build(
       purpose: _catalystUserRoleRegistrationPurpose,
       rootKeyPair: rootKeyPair,
