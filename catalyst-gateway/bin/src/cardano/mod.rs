@@ -10,9 +10,12 @@ use rand::{Rng, SeedableRng};
 use tracing::{debug, error, info};
 
 use crate::{
-    cardano::channels::{
-        event::{ChainIndexerEvent, ChainIndexerEventSender},
-        state::{ChainIndexerStateReceiver, ChainIndexerStateSender},
+    cardano::{
+        channels::{
+            event::{ChainIndexerEvent, ChainIndexerEventSender},
+            state::{ChainIndexerState, ChainIndexerStateReceiver, ChainIndexerStateSender},
+        },
+        indexed_status::IndexedStatus,
     },
     db::index::{
         block::{
@@ -21,10 +24,7 @@ use crate::{
         },
         queries::{
             caches,
-            sync_status::{
-                get::{get_sync_status, SyncStatus},
-                update::update_sync_status,
-            },
+            sync_status::{get::get_sync_status, update::update_sync_status},
         },
         session::CassandraSession,
     },
@@ -36,6 +36,7 @@ use crate::{
 };
 
 pub(crate) mod channels;
+pub(crate) mod indexed_status;
 
 /// How long we wait between checks for connection to the indexing DB to be ready.
 pub(crate) const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs(1);
@@ -425,8 +426,8 @@ struct SyncTask {
     /// The live tip slot.
     live_tip_slot: Slot,
 
-    /// Current Sync Status.
-    sync_status: Vec<SyncStatus>,
+    /// Current Immutable db status of indexed data.
+    immutable_indexed_status: IndexedStatus,
 
     /// `ChainIndexerEvent` sender during the process of sync tasks.
     event_channel: ChainIndexerEventSender,
@@ -445,7 +446,7 @@ impl SyncTask {
             current_sync_tasks: 0,
             immutable_tip_slot: 0.into(),
             live_tip_slot: 0.into(),
-            sync_status: Vec::new(),
+            immutable_indexed_status: IndexedStatus::default(),
             event_channel: ChainIndexerEventSender::new(),
             state_channel: ChainIndexerStateSender::new(),
         }
@@ -456,7 +457,7 @@ impl SyncTask {
         let state_recv = self.state_channel.subscribe();
         // immediately setting the latest state, do the `state_recv` will always have at least one
         // value
-        self.state_channel.update_state(());
+        self.update_state();
 
         self.sync_tasks.push(sync_subchain(
             params,
@@ -521,8 +522,8 @@ impl SyncTask {
         drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
 
         info!(chain=%self.cfg.chain, "Indexing DB is ready - Getting recovery state for indexing");
-        self.sync_status = get_sync_status().await;
-        debug!(chain=%self.cfg.chain, "Sync Status: {:?}", self.sync_status);
+        self.immutable_indexed_status = get_sync_status().await.into();
+        debug!(chain=%self.cfg.chain, "Sync Status: {:?}", self.immutable_indexed_status);
 
         // Start the Live Chain sync task - This can never end because it is syncing to TIP.
         // So, if it fails, it will automatically be restarted.
@@ -580,7 +581,7 @@ impl SyncTask {
                                     live_slot: self.live_tip_slot,
                                 },
                             );
-                            self.state_channel.update_state(());
+                            self.update_state();
                             info!(chain=%self.cfg.chain, report=%finished, "Chain Indexer finished reaching TIP.");
 
                             self.start_immutable_followers();
@@ -598,7 +599,7 @@ impl SyncTask {
                                 info!(chain=%self.cfg.chain, report=%finished,
                                     "The Immutable follower completed successfully.");
 
-                                self.state_channel.update_state(());
+                                self.update_state();
 
                                 finished.last_indexed_block.as_ref().inspect(|block| {
                                     self.event_channel.dispatch_event(
@@ -705,11 +706,13 @@ impl SyncTask {
     /// If it has, return a subset that hasn't been indexed if any, or None if its been
     /// completely indexed already.
     fn get_syncable_range(&self, start: Slot, end: Slot) -> Option<(Point, Point)> {
-        for sync_block in &self.sync_status {
+        for indexed_chunk in &self.immutable_indexed_status {
+            let indexed_start = indexed_chunk.0;
+            let indexed_end = indexed_chunk.0;
             // Check if we start within a previously synchronized block.
-            if start >= sync_block.start_slot && start <= sync_block.end_slot {
+            if start >= indexed_start && start <= indexed_end {
                 // Check if we are fully contained by the sync block, if so, nothing to sync.
-                if end <= sync_block.end_slot {
+                if end <= indexed_end {
                     return None;
                 }
 
@@ -719,7 +722,7 @@ impl SyncTask {
                 // It is not a problem to sync the same data mutiple times, so for simplicity we do
                 // not account for this, if the requested range goes beyond the sync
                 // block it starts within we assume that the rest is not synced.
-                return Some((Point::fuzzy(sync_block.end_slot), Point::fuzzy(end)));
+                return Some((Point::fuzzy(indexed_end), Point::fuzzy(end)));
             }
         }
 
@@ -730,6 +733,15 @@ impl SyncTask {
         };
 
         Some((start_slot, Point::fuzzy(end)))
+    }
+
+    /// Updates with the current state a `state_channel`
+    fn update_state(&self) {
+        let state = ChainIndexerState {
+            immutable_tip_slot: self.immutable_tip_slot,
+            live_tip_slot: self.live_tip_slot,
+        };
+        self.state_channel.update_state(state);
     }
 }
 
