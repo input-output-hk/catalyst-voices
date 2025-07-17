@@ -313,11 +313,9 @@ fn is_deprecated(doc: &SignedDocBody) -> Result<bool, anyhow::Error> {
                 .iter()
                 .any(|doc_ref| doc_ref.doc_locator().is_empty());
 
-            Ok(result)
-        } else {
-            Ok(false)
+            return Ok(result);
         }
-    } else {
-        Ok(false)
     }
+
+    Ok(false)
 }
