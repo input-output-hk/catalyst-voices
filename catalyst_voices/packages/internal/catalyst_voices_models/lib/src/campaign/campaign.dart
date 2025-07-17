@@ -127,6 +127,9 @@ Project Catalyst turns economic power into innovation power by using the Cardano
     );
   }
 
+  /// Returns the state of the campaign for a specific phase.
+  /// It's a shortcut for [state] when you are only interested in a specific phase. And want to know
+  /// the status of that phase.
   CampaignState stateTo(CampaignPhaseType type) {
     final phase = timeline.phases.firstWhere(
       (phase) => phase.type == type,
