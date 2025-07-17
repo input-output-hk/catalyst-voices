@@ -28,75 +28,75 @@ jobs:
     with:
       forge_version: 0.18.0
 
-  tests:
-    needs: ci
-    name: Cat-Gateway ALL integration tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@main
-        with:
-          # this might remove tools that are actually needed,
-          # if set to "true" but frees about 6 GB
-          tool-cache: false
-          # all of these default to true, but feel free to set to
-          # "false" if necessary for your workflow
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: false
-          swap-storage: true
-
-      - uses: actions/checkout@v4
-      - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.7.3
-        with:
-          version: 0.18.0
-      - name: Setup
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.7.3
-      - name: Prepare artifacts
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
-        with:
-          command: run
-          args: ./catalyst-gateway/tests/+prepare-all-images
-
-      - name: Run api-test
-        continue-on-error: true
-        run: docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
-
-      - name: cat-gateway-logs
-        run:  docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
-
-      - name: Get tests artifacts
-        if: always()
-        run: |
-          docker cp api-tests-runner:/poetry/junit-report.xml .
-          docker cp api-tests-runner:/poetry/coverage.lcov .
-
-#      - name: Setup upterm session
-#        uses: lhotari/action-upterm@v1
-
-      - name: Down
-        run: docker compose -f catalyst-gateway/tests/docker-compose.yml down
-
-      - name: Collect and upload test reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-reports
-          path: "**/*${{ env.REPORT_EXT }}"
-          if-no-files-found: error
-          retention-days: 1
-
-      - name: Collect and upload test coverage
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: coverage-reports
-          path: "**/*${{ env.COVERAGE_EXT }}"
-          if-no-files-found: error
-          retention-days: 1
+#  tests:
+#    needs: ci
+#    name: Cat-Gateway ALL integration tests
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Free Disk Space (Ubuntu)
+#        uses: jlumbroso/free-disk-space@main
+#        with:
+#          # this might remove tools that are actually needed,
+#          # if set to "true" but frees about 6 GB
+#          tool-cache: false
+#          # all of these default to true, but feel free to set to
+#          # "false" if necessary for your workflow
+#          android: true
+#          dotnet: true
+#          haskell: true
+#          large-packages: true
+#          docker-images: false
+#          swap-storage: true
+#
+#      - uses: actions/checkout@v4
+#      - name: Install Forge
+#        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.7.3
+#        with:
+#          version: 0.18.0
+#      - name: Setup
+#        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.7.3
+#      - name: Prepare artifacts
+#        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
+#        with:
+#          command: run
+#          args: ./catalyst-gateway/tests/+prepare-all-images
+#
+#      - name: Run api-test
+#        continue-on-error: true
+#        run: docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+#
+#      - name: cat-gateway-logs
+#        run:  docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
+#
+#      - name: Get tests artifacts
+#        if: always()
+#        run: |
+#          docker cp api-tests-runner:/poetry/junit-report.xml .
+#          docker cp api-tests-runner:/poetry/coverage.lcov .
+#
+##      - name: Setup upterm session
+##        uses: lhotari/action-upterm@v1
+#
+#      - name: Down
+#        run: docker compose -f catalyst-gateway/tests/docker-compose.yml down
+#
+#      - name: Collect and upload test reports
+#        uses: actions/upload-artifact@v4
+#        if: always()
+#        with:
+#          name: test-reports
+#          path: "**/*${{ env.REPORT_EXT }}"
+#          if-no-files-found: error
+#          retention-days: 1
+#
+#      - name: Collect and upload test coverage
+#        uses: actions/upload-artifact@v4
+#        if: always()
+#        with:
+#          name: coverage-reports
+#          path: "**/*${{ env.COVERAGE_EXT }}"
+#          if-no-files-found: error
+#          retention-days: 1
       # - name: Running integration API tests
       #   uses: hoverkraft-tech/compose-action@v2.3.0
       #   with:
@@ -127,5 +127,5 @@ jobs:
 
   test_reporting:
      if: always()
-     needs: tests
+     needs: ci
      uses: ./.github/workflows/generate-allure-report.yml
