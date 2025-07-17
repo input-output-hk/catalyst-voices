@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   ci:
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.3
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.4
     with:
       forge_version: 0.18.0
 
