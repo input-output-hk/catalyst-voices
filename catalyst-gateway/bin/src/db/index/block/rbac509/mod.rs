@@ -278,13 +278,21 @@ async fn wait_for_indexing_up_to_block(
     indexer_state: &mut ChainIndexerStateReceiver, block: &MultiEraBlock, tx_id: TransactionId,
 ) {
     loop {
-        let Some(state) = indexer_state.latest_state().await else {
-            error!(
-                tx_hash = ?tx_id,
-                "Chain indexer state channel closed during the RBAC 509 transaction indexing",
-            );
-            return;
+        let state = match indexer_state.current_state() {
+            Some(s) => s,
+            None => {
+                if let Some(s) = indexer_state.latest_state().await {
+                    s
+                } else {
+                    error!(
+                        tx_hash = ?tx_id,
+                        "Chain indexer state channel closed during the RBAC 509 transaction indexing",
+                    );
+                    return;
+                }
+            },
         };
+
         if block.is_immutable() {
             // for the immutable block we need to wait when everything would be indexed up to the
             // current block
