@@ -108,7 +108,7 @@ class _ProposalsPageState extends State<ProposalsPage>
       length: ProposalsFilterType.values.length,
       vsync: this,
     );
-    
+
     _pagingController = PagingController(
       initialPage: 0,
       initialMaxResults: 0,
