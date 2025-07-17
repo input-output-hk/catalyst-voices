@@ -307,14 +307,18 @@ fn is_deprecated(doc: &SignedDocBody) -> Result<bool, anyhow::Error> {
     if let Some(json_meta) = doc.metadata() {
         let meta = catalyst_signed_doc::Metadata::from_json(json_meta.clone())?;
 
+        let doc_type_old = doc.doc_type().len() == 1;
+
         if let Some(doc_refs) = meta.doc_ref() {
-            let result = doc_refs
+            let doc_ref_old = doc_refs
                 .doc_refs()
                 .iter()
                 .any(|doc_ref| doc_ref.doc_locator().is_empty());
 
-            return Ok(result);
+            return Ok(doc_ref_old || doc_type_old);
         }
+
+        return Ok(doc_type_old);
     }
 
     Ok(false)
