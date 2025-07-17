@@ -1,8 +1,8 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/common/formatters/input_formatters.dart';
 import 'package:catalyst_voices/widgets/rich_text/insert_new_image_dialog_body.dart';
 import 'package:catalyst_voices/widgets/rich_text/insert_new_image_dialog_footer.dart';
 import 'package:catalyst_voices/widgets/rich_text/insert_new_image_dialog_header.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class InsertNewImageDialog extends StatefulWidget {

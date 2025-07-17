@@ -1,8 +1,8 @@
-import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/widgets/text/timezone_date_time_text.dart';
 import 'package:catalyst_voices/widgets/tooltips/voices_plain_tooltip.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class DayMonthTimeText extends StatelessWidget {
@@ -40,6 +40,7 @@ class DayMonthTimeTextWithTooltip extends StatelessWidget {
   final DateTime datetime;
   final bool showTimezone;
   final Color? color;
+
   const DayMonthTimeTextWithTooltip({
     super.key,
     required this.datetime,

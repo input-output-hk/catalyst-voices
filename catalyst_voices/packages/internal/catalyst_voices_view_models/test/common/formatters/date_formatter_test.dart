@@ -8,18 +8,25 @@ import 'package:intl/intl.dart';
 class _FakeVoicesLocalizations extends Fake implements VoicesLocalizations {
   @override
   String get today => 'Today';
+
   @override
   String get tomorrow => 'Tomorrow';
+
   @override
   String get yesterday => 'Yesterday';
+
   @override
   String get twoDaysAgo => '2 days ago';
+
   @override
   String get weekOf => 'Week of';
+
   @override
   String get from => 'From';
+
   @override
   String get to => 'To';
+
   @override
   String publishedOn(String date, String time) {
     return 'Published on $date at $time';
@@ -28,6 +35,7 @@ class _FakeVoicesLocalizations extends Fake implements VoicesLocalizations {
 
 class _FakeMaterialLocalizations extends Fake implements MaterialLocalizations {
   int _firstDayOfWeekIndex = 0;
+
   @override
   int get firstDayOfWeekIndex => _firstDayOfWeekIndex;
 
