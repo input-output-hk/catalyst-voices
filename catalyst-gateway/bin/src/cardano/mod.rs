@@ -455,7 +455,7 @@ impl SyncTask {
     /// Add a new `SyncTask` to the queue.
     fn add_sync_task(&mut self, params: SyncParams) {
         let state_recv = self.state_channel.subscribe();
-        // immediately setting the latest state, do the `state_recv` will always have at least one
+        // immediately setting the latest state, so the `state_recv` will always have at least one
         // value
         self.dispatch_state();
 
