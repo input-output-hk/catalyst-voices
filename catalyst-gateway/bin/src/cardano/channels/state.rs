@@ -1,5 +1,7 @@
 //! multi-consumer, multi-producer Cardano Chain Indexer State channel.
 
+use std::ops::Sub;
+
 use cardano_blockchain_types::Slot;
 
 use super::{dispatch_message, receive_msg};
@@ -20,22 +22,25 @@ impl ChainIndexerState {
     /// Returns true if the Chain indexer reached immutable tip, so the all immutable data
     /// if fully is indexed. False otherwise.
     pub(crate) fn is_reached_immutable_tip(&self) -> bool {
-        if let Some((_, end)) = self.immutable_indexed_status.last() {
-            end == &self.immutable_tip_slot
+        // If the immutable part is fully indexed it must be only a one chunk
+        if let Some((_, end)) = self.immutable_indexed_status.first() {
+            end == &self.immutable_tip_slot && self.immutable_indexed_status.len() == 1
         } else {
             false
         }
     }
 
-    /// Returns true if provided `slot` is contained by the `immutable_indexed_status`,
-    /// which means it was already indexed.
-    pub(crate) fn is_immutable_indexed(&self, slot: Slot) -> bool {
-        for (start, end) in &self.immutable_indexed_status {
-            if *start <= slot && slot <= *end {
-                return true;
-            }
+    /// Returns true of the immutable part is fully consecutive indexed up to the
+    /// provided slot.
+    pub(crate) fn is_immutable_fully_indexed_up_to(&self, slot: Slot) -> bool {
+        // Looking into the first chunk, which represents a definetly consecutive indexed
+        // chunk of blocks.
+        if let Some((start, end)) = self.immutable_indexed_status.first() {
+            let slot = slot.sub(1.into());
+            start <= &slot && &slot <= end
+        } else {
+            false
         }
-        false
     }
 }
 

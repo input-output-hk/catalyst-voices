@@ -1,6 +1,6 @@
 //! An `IndexedStatus` structure.
 
-use std::ops::Deref;
+use std::ops::{Deref, Sub};
 
 use cardano_blockchain_types::Slot;
 
@@ -25,14 +25,14 @@ impl IndexedStatus {
         let (mut current_start, mut current_end) = (start, end);
 
         for (rec_start, rec_end) in self.0.iter().copied() {
-            if rec_end < current_start {
+            if rec_end < current_start.sub(1.into()) {
                 // `current` value is fully after the `rec`.
                 // [ ... (`rec_start`, `rec_end`), (`current_start`, `current_end`) ...],
                 // store the `rec` and keep going without changing `current`.
                 new.push((rec_start, rec_end));
                 continue;
             }
-            if current_end < rec_start {
+            if current_end < rec_start.sub(1.into()) {
                 // `current` value is fully before the `rec`.
                 // [ ... (`current_start`, `current_end`), (`rec_start`, `rec_end`) ...],
                 // store the `current` update it with `rec`.
@@ -258,6 +258,60 @@ mod tests {
             (5.into(), 85.into()),
         ]
         ; "case 9"
+    )]
+    #[test_case(
+        vec![
+            (10.into(), 20.into()),
+            (30.into(), 50.into()),
+            (60.into(), 80.into()),
+        ],
+        21.into(), 21.into() =>
+        vec![
+            (10.into(), 21.into()),
+            (30.into(), 50.into()),
+            (60.into(), 80.into()),
+        ]
+        ; "case 10"
+    )]
+    #[test_case(
+        vec![
+            (10.into(), 20.into()),
+            (30.into(), 50.into()),
+            (60.into(), 80.into()),
+        ],
+        29.into(), 29.into() =>
+        vec![
+            (10.into(), 20.into()),
+            (29.into(), 50.into()),
+            (60.into(), 80.into()),
+        ]
+        ; "case 11"
+    )]
+    #[test_case(
+        vec![
+            (10.into(), 20.into()),
+            (22.into(), 50.into()),
+            (60.into(), 80.into()),
+        ],
+        21.into(), 21.into() =>
+        vec![
+            (10.into(), 50.into()),
+            (60.into(), 80.into()),
+        ]
+        ; "case 12"
+    )]
+    #[test_case(
+        vec![
+            (10.into(), 20.into()),
+            (30.into(), 50.into()),
+            (60.into(), 80.into()),
+        ],
+        21.into(), 29.into() =>
+        vec![
+            (10.into(), 50.into()),
+            (60.into(), 80.into()),
+        ]
+        ; "case 13"
     )]
     fn test_update(input: Vec<(Slot, Slot)>, start: Slot, end: Slot) -> Vec<(Slot, Slot)> {
         let mut v = IndexedStatus(input);

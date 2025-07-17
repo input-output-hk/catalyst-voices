@@ -288,13 +288,13 @@ async fn wait_for_indexing_up_to_block(
         if block.is_immutable() {
             // for the immutable block we need to wait when everything would be indexed up to the
             // current block
-            if state.is_immutable_indexed(block.slot()) {
+            if state.is_immutable_fully_indexed_up_to(block.slot()) {
                 break;
             }
         } else if state.is_reached_immutable_tip() {
-            // for the live block we should wait until the whole immutable part would be indexed, we are
-            // not waiting for the live part to be indexed, because in any case its indexing
-            // sequentially
+            // for the live block we should wait until the whole immutable part would be indexed, we
+            // are not waiting for the live part to be indexed, because in any case its
+            // indexing sequentially
             break;
         }
     }
