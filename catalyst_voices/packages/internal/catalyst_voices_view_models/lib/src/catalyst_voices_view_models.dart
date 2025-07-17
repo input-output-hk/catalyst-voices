@@ -58,6 +58,7 @@ export 'session/session_settings.dart';
 export 'session/session_status.dart';
 export 'share/share_channel_ext.dart';
 export 'treasury/treasury_segments.dart';
+export 'voting/user_vote_colors.dart';
 export 'voting/user_vote_state.dart';
 export 'voting/vote_type_view_model.dart';
 export 'workspace/workspace_proposal_list_item.dart';

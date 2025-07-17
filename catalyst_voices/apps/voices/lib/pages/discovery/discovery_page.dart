@@ -10,7 +10,10 @@ import 'package:catalyst_voices/pages/discovery/state_selectors/current_campaign
 import 'package:catalyst_voices/pages/discovery/state_selectors/most_recent_proposals_selector.dart';
 import 'package:catalyst_voices/widgets/banner/widgets/email_need_verification_banner.dart';
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_wide_screen_constrained.dart';
+import 'package:catalyst_voices/widgets/voting/vote_button.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class DiscoveryPage extends StatefulWidget {
@@ -53,8 +56,22 @@ class _Body extends StatelessWidget {
 
 class _DiscoveryPageState extends State<DiscoveryPage>
     with ErrorHandlerStateMixin<DiscoveryCubit, DiscoveryPage> {
+  Vote? _draftVote;
+
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: VoteButton(
+          data: UserVoteState.fromVotes(currentDraft: _draftVote),
+          onSelected: (voteType) {
+            setState(() {
+              _draftVote = Vote.draft(proposal: DraftRef.generateFirstRef(), type: voteType);
+            });
+          },
+        ),
+      ),
+    );
     return const SelectionArea(
       child: Stack(
         children: [

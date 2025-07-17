@@ -143,8 +143,16 @@ abstract class DateFormatter {
   /// Example:
   /// - 7/10/1996 5:08 PM
   /// - 7/10/1996 17:08
-  static String formatTimestamp(DateTime dateTime) {
-    return DateFormat.yMd().add_jm().format(dateTime);
+  static String formatTimestamp(
+    DateTime dateTime, {
+    bool includeTime = true,
+  }) {
+    var format = DateFormat.yMd();
+    if (includeTime) {
+      format = format.add_jm();
+    }
+
+    return format.format(dateTime);
   }
 
   /// Formats the timezone info extracted from the [dateTime].

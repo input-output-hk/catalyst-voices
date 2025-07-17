@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
@@ -27,15 +28,39 @@ final class UserVoteState extends Equatable {
     return UserVoteState(draft: draft, casted: casted);
   }
 
+  DateTime? get castedVotedAt => casted?.createdAt;
+
+  bool get hasDraftVote => draft != null;
+
+  bool get hasVoted => draft != null || casted != null;
+
+  VoteType? get latestVoteType => draft?.type ?? casted?.type;
+
   @override
   List<Object?> get props => [draft, casted];
 
-  Color btnBackgroundColor(BuildContext context) {
-    return Theme.of(context).colorScheme.primary;
-  }
+  UserVoteColors colors(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final colors = theme.colors;
 
-  Color btnForegroundColor(BuildContext context) {
-    return Theme.of(context).colors.textOnPrimaryWhite;
+    final voteType = latestVoteType;
+    final isCasted = draft == null && casted != null;
+
+    final background = UserVoteBackgroundColor(
+      voteType: voteType,
+      isCasted: isCasted,
+      colorScheme: colorScheme,
+      colors: colors,
+    );
+    final foreground = UserVoteForegroundColor(
+      voteType: voteType,
+      isCasted: isCasted,
+      colorScheme: colorScheme,
+      colors: colors,
+    );
+
+    return (background: background, foreground: foreground);
   }
 
   UserVoteState copyWith({
