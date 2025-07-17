@@ -292,7 +292,7 @@ async fn wait_for_indexing_up_to_block(
                 break;
             }
         } else if state.is_reached_immutable_tip() {
-            // for the live block we should until the whole immutable part would be indexed, we are
+            // for the live block we should wait until the whole immutable part would be indexed, we are
             // not waiting for the live part to be indexed, because in any case its indexing
             // sequentially
             break;
