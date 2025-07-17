@@ -1,4 +1,3 @@
-version: "1.0.0"
 project: {
 	name: "gateway"
 	ci: {
@@ -13,9 +12,10 @@ project: {
 		}
 
 		bundle: {
+			env: string | *"dev"
 			modules: main: {
 				name:    "app"
-				version: "0.11.0"
+				version: "0.11.1"
 				values: {
 					stateful: {
 						containers: gateway: {
@@ -143,22 +143,22 @@ project: {
 							}
 							resources: {
 								requests: {
-									cpu:    "1"
-									memory: "8Gi"
+									cpu:    string | *"1"
+									memory: string | *"8Gi"
 								}
 								limits: {
-									cpu:    "8"
-									memory: "12Gi"
+									cpu:    string | *"8"
+									memory: string | *"12Gi"
 								}
 							}
 						}
-						nodeSelector: {
+						nodeSelector: _ | *{
 							"node-group": "catalyst-gateway"
 						}
-						replicas:       3
-						serviceAccount: "catalyst-gateway"
-						strategy:       "RollingUpdate"
-						tolerations: [
+						replicas:       number | *3
+						serviceAccount: string | *"catalyst-gateway"
+						strategy:       string | *"RollingUpdate"
+						tolerations: _ | *[
 							{
 								key:      "app"
 								operator: "Equal"
@@ -193,10 +193,10 @@ project: {
 								}
 							}
 							DB_NAME: {
-								value: "gateway"
+								value: string | *"gateway"
 							}
 							DB_DESCRIPTION: {
-								value: "Gateway Event Database"
+								value: string | *"Gateway Event Database"
 							}
 							DB_SUPERUSER: {
 								secret: {
@@ -223,10 +223,10 @@ project: {
 								}
 							}
 							INIT_AND_DROP_DB: {
-								value: "true"
+								value: string | *"true"
 							}
 							WITH_MIGRATIONS: {
-								value: "true"
+								value: string | *"true"
 							}
 						}
 					}

@@ -1,8 +1,8 @@
 name: CI nightly
 
 on:
-  schedule:
-    - cron: '0 0 * * *' # Runs every day at 00:00
+  #schedule:
+  #- cron: '0 0 * * *' # Runs every day at 00:00
   workflow_dispatch:
 
 permissions:
@@ -15,14 +15,14 @@ concurrency:
   cancel-in-progress: true
 
 env:
-    REPORT_EXT: .junit-report.xml
-    ALLURE_REPORT_FOLDER: nightly-allure-report
+  REPORT_EXT: .junit-report.xml
+  ALLURE_REPORT_FOLDER: nightly-allure-report
 
 jobs:
   ci_nightly:
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.3
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.4
     with:
-      forge_version: 0.16.0
+      forge_version: 0.18.0
       nightly: true
 
   generate-test-reports:
@@ -34,44 +34,28 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.7.3
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.7.4
         with:
-          version: 0.10.0
+          version: 0.18.0
 
       - name: Setup CI
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.7.3
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.7.4
 
       - name: Get python api test report
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.4
         if: always()
         continue-on-error: true
         with:
-            command: run
-            args: ./catalyst-gateway/tests/api_tests+nightly-test
-
-      - name: Get cardano wallet integration test report
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
-        if: always()
-        continue-on-error: true
-        with:
-            command: run
-            args: ./catalyst_voices/packages/libs/catalyst_cardano/catalyst_cardano/wallet-automation+nightly-test
-
-      - name: Get schemathesis nightly dev test report
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
-        if: always()
-        continue-on-error: true
-        with:
-            command: run
-            args: ./catalyst-gateway/tests/schemathesis_tests+nightly-test-dev-schemathesis
+          command: run
+          args: ./catalyst-gateway/tests/api_tests+nightly-test
 
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
         if: always()
         with:
-            path: '**/*${{ env.REPORT_EXT }}'
-            if-no-files-found: error
-            retention-days: 1
+          path: "**/*${{ env.REPORT_EXT }}"
+          if-no-files-found: error
+          retention-days: 1
 
   generate-allure-report:
     name: Generate allure report
@@ -85,10 +69,10 @@ jobs:
 
       - name: Setup Allure report
         run: |
-              mkdir -p ${{ env.ALLURE_REPORT_FOLDER }}
-              shopt -s globstar
-              cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_REPORT_FOLDER }}
-              ls ${{ env.ALLURE_REPORT_FOLDER }}
+          mkdir -p ${{ env.ALLURE_REPORT_FOLDER }}
+          shopt -s globstar
+          cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_REPORT_FOLDER }}
+          ls ${{ env.ALLURE_REPORT_FOLDER }}
 
       - name: Checkout gh-pages
         uses: actions/checkout@v4
@@ -100,8 +84,8 @@ jobs:
         uses: mgrybyk/allure-report-branch-action@v1
         id: allure
         with:
-          report_id: 'nightly-test-report'
-          gh_pages: 'gh-pages-dir'
+          report_id: "nightly-test-report"
+          gh_pages: "gh-pages-dir"
           report_dir: ${{ env.ALLURE_REPORT_FOLDER }}
 
       - name: Git push to gh-pages

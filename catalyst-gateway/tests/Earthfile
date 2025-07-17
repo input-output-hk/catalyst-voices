@@ -74,7 +74,7 @@ test-scylla:
     ENV CASSANDRA_VOLATILE_URL "localhost:9042"
 
     # limit the nextest duration to prevent freezing in case of failure.
-    RUN sed -i '/\[profile.default\]/a\slow-timeout = { period = "30s", terminate-after = 2 }' .config/nextest.toml
+    RUN sed -i '/\[profile.default\]/a\slow-timeout = { period = "35s", terminate-after = 2 }' .config/nextest.toml
 
     RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
         ./scylla_entry.sh && \

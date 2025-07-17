@@ -1,7 +1,10 @@
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
+import 'package:catalyst_voices/widgets/rich_text/markdown_text.dart';
 import 'package:catalyst_voices/widgets/text_field/token_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_int_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +35,17 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   late final VoicesIntFieldController _controller;
   late final FocusNode _focusNode;
 
+  // TODO(LynxxLynx): After https://github.com/input-output-hk/catalyst-voices/pull/2865
+  // is merged use wildcard support for NodeId
+  bool get _isMilestone {
+    final milestoneWildcardNodeId = ProposalDocument.milestoneCostNodeId.toString().split('*');
+    if (widget.property.nodeId.value.startsWith(milestoneWildcardNodeId[0]) &&
+        widget.property.nodeId.value.endsWith(milestoneWildcardNodeId[1])) {
+      return true;
+    }
+    return false;
+  }
+
   int? get _value => widget.property.value ?? widget.schema.defaultValue;
 
   @override
@@ -51,6 +65,7 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
       showHelper: widget.isEditMode,
       enabled: widget.isEditMode,
       ignorePointers: !widget.isEditMode,
+      helperWidget: _isMilestone ? const _MilestoneCostHelpText() : null,
     );
   }
 
@@ -112,5 +127,16 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
       final localized = LocalizedDocumentValidationResult.from(result);
       return VoicesTextFieldValidationResult.error(localized.message(context));
     }
+  }
+}
+
+class _MilestoneCostHelpText extends StatelessWidget {
+  const _MilestoneCostHelpText();
+
+  @override
+  Widget build(BuildContext context) {
+    return MarkdownText(
+      MarkdownData(context.l10n.milestoneGuidelinesLink(VoicesConstants.milestoneGuideline)),
+    );
   }
 }

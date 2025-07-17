@@ -57,7 +57,6 @@ Proposals should focus on mature R&D for products with Tier-1 collaborations, su
 - Co-marketing plans and community engagement to amplify Cardano’s partnership visibility.
 - Early-stage concepts or prototypes should apply to _Cardano Use Cases: Concepts._
 - Projects that aren’t primarily focused on R&D and demonstrating the utility of enabling applications
-- **_Important Note_**_:_ Proposals will be evaluated by a review panel from Cardano member organizations and Catalyst management, with top proposals shortlisted for a community vote. Eligibility does not guarantee funding.
 ''',
       ),
       CategoryDescription(

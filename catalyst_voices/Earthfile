@@ -9,7 +9,7 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.4.4 AS flutter-
 repo-catalyst-voices:
     FROM scratch
     WORKDIR /repo
-    COPY --dir . .
+    COPY --keep-ts --dir . .
     # Copy docs as some doc files are used for test inputs
     COPY repo-ci+copy-docs/docs ./docs
 
@@ -119,13 +119,13 @@ build-web:
     ARG WORKDIR=/frontend/apps/voices
 
     DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --BUILD_MODE='--release' --TARGET=lib/configs/main_web.dart
-    SAVE ARTIFACT web
+    SAVE ARTIFACT --keep-ts web
 
 package:
     FROM caddy:2.10
     ARG tag='latest'
 
-    COPY +build-web/web /app
+    COPY --keep-ts +build-web/web /app
 
     # Note this is only used for local development, a different Caddyfile is
     # used during deployment. See the blueprint.cue file.

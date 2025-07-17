@@ -14,7 +14,6 @@ use super::{
     utilities::middleware::{db_check::DatabaseConnectionCheck, node_info::CatGatewayInfo},
 };
 use crate::{
-    metrics::{init_prometheus, metrics_updater_fn},
     service::{
         api::mk_api,
         docs::{docs, favicon},
@@ -37,15 +36,10 @@ fn mk_app(base_route: Option<Route>) -> impl Endpoint {
     let api_service = mk_api();
     let docs = docs(&api_service);
 
-    let prometheus_registry = init_prometheus();
-
     base_route
         .nest(Settings::api_url_prefix(), api_service)
         .nest("/docs", docs)
-        .nest(
-            "/metrics",
-            MetricsUpdaterMiddleware::new(prometheus_registry, metrics_updater_fn),
-        )
+        .nest("/metrics", MetricsUpdaterMiddleware::new())
         .nest("/favicon.ico", favicon())
         .with(Cors::new())
         .with(Compression::new().with_quality(CompressionLevel::Fastest))

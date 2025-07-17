@@ -22,7 +22,6 @@ use cardano_blockchain_types::StakeAddress;
 use catalyst_types::catalyst_id::CatalystId;
 use futures::{TryFutureExt, TryStreamExt};
 use poem_openapi::payload::Json;
-use tracing::error;
 
 use crate::{
     db::index::{
@@ -49,14 +48,16 @@ pub(crate) async fn endpoint(
     lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>,
 ) -> AllResponses {
     let Some(persistent_session) = CassandraSession::get(true) else {
-        let err = anyhow!("Failed to acquire persistent db session");
-        error!("{err:?}");
-        return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
+        return AllResponses::service_unavailable(
+            &anyhow!("Failed to acquire persistent db session"),
+            RetryAfterOption::Default,
+        );
     };
     let Some(volatile_session) = CassandraSession::get(false) else {
-        let err = anyhow!("Failed to acquire volatile db session");
-        error!("{err:?}");
-        return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
+        return AllResponses::service_unavailable(
+            &anyhow!("Failed to acquire volatile db session"),
+            RetryAfterOption::Default,
+        );
     };
 
     let catalyst_id = match lookup {
