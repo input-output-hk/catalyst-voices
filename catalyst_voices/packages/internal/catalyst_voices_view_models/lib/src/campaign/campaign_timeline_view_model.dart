@@ -6,7 +6,7 @@ class CampaignTimelineViewModel extends Equatable {
   final String title;
   final String description;
   final DateRange timeline;
-  final CampaignPhaseStage stage;
+  final CampaignPhaseType stage;
   final bool offstage;
 
   const CampaignTimelineViewModel({
@@ -25,7 +25,7 @@ class CampaignTimelineViewModel extends Equatable {
           from: model.timeline.from,
           to: model.timeline.to,
         ),
-        stage: model.stage,
+        stage: model.type,
         offstage: offstage,
       );
 

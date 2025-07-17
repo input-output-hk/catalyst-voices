@@ -4,6 +4,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 class Campaign extends Equatable {
+  static final f14Ref = SignedDocumentRef.generateFirstRef();
   // Using DocumentRef instead of SignedDocumentRef because in Campaign Treasury user can create
   // 'draft' version of campaign like Proposal
   final DocumentRef selfRef;
@@ -12,6 +13,7 @@ class Campaign extends Equatable {
   final Coin allFunds;
   final int fundNumber;
   final CampaignTimeline timeline;
+
   final CampaignPublish publish;
 
   const Campaign({
@@ -24,6 +26,48 @@ class Campaign extends Equatable {
     required this.publish,
   });
 
+  factory Campaign.f14() {
+    return Campaign(
+      selfRef: f14Ref,
+      name: 'Catalyst Fund14',
+      description: '''
+Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.''',
+      allFunds: const Coin.fromWholeAda(20000000),
+      fundNumber: 14,
+      timeline: CampaignTimeline(phases: CampaignPhaseX.f14StaticContent),
+      publish: CampaignPublish.published,
+    );
+  }
+
+  CampaignPhase? get closestPhaseState {
+    final today = DateTimeExt.now();
+    CampaignPhase? closestPhase;
+    Duration? minDistance;
+
+    for (final phase in timeline.phases) {
+      Duration? distance;
+
+      // Calculate distance to the closest date point (from or to) of the phase
+      final from = phase.timeline.from;
+      final to = phase.timeline.to;
+      if (from != null && to != null) {
+        final distanceFromStart = from.difference(today).abs();
+        final distanceFromEnd = to.difference(today).abs();
+        distance = distanceFromStart < distanceFromEnd ? distanceFromStart : distanceFromEnd;
+      } else if (from != null) {
+        distance = from.difference(today).abs();
+      } else if (to != null) {
+        distance = to.difference(today).abs();
+      }
+
+      if (distance != null && (minDistance == null || distance < minDistance)) {
+        minDistance = distance;
+        closestPhase = phase;
+      }
+    }
+    return closestPhase;
+  }
+
   @override
   List<Object?> get props => [
         selfRef,
@@ -34,55 +78,33 @@ class Campaign extends Equatable {
         timeline,
         publish,
       ];
-
   // We can have more than one state if the campaign timeline supports concurrent phases. For example
   // proposal submission can be concurrent with voting registration.
-  List<CampaignState> get state {
-    final states = <CampaignState>[];
+  CampaignState get state {
+    final states = <CampaignPhaseState>[];
 
     for (final phase in timeline.phases) {
       final status = CampaignPhaseStatus.fromRange(phase.timeline);
       if (status.isActive) {
-        states.add(CampaignState(phase: phase, status: status));
+        states.add(CampaignPhaseState(phase: phase, status: status));
       }
     }
 
-    if (states.isNotEmpty) return states;
+    if (states.isNotEmpty) return CampaignState(activePhases: states);
 
-    final today = DateTime.now();
-    CampaignPhase? closestPhase;
-    Duration? minDistance;
+    final closestPhase = closestPhaseState;
 
-    for (final phase in timeline.phases) {
-      Duration? distance;
-
-      // Calculate distance to the closest date point (from or to) of the phase
-      if (phase.timeline.from != null && phase.timeline.to != null) {
-        final distanceFromStart = phase.timeline.from!.difference(today).abs();
-        final distanceFromEnd = phase.timeline.to!.difference(today).abs();
-        distance = distanceFromStart < distanceFromEnd ? distanceFromStart : distanceFromEnd;
-      } else if (phase.timeline.from != null) {
-        distance = phase.timeline.from!.difference(today).abs();
-      } else if (phase.timeline.to != null) {
-        distance = phase.timeline.to!.difference(today).abs();
-      }
-
-      if (distance != null && (minDistance == null || distance < minDistance)) {
-        minDistance = distance;
-        closestPhase = phase;
-      }
+    if (closestPhase case final phase?) {
+      return CampaignState(
+        activePhases: [
+          CampaignPhaseState(
+            phase: phase,
+            status: CampaignPhaseStatus.fromRange(phase.timeline),
+          ),
+        ],
+      );
     }
-
-    if (closestPhase == null) {
-      throw Exception('No closest phase found');
-    }
-
-    return [
-      CampaignState(
-        phase: closestPhase,
-        status: CampaignPhaseStatus.fromRange(closestPhase.timeline),
-      ),
-    ];
+    throw Exception('No closest phase found');
   }
 
   Campaign copyWith({
@@ -105,14 +127,18 @@ class Campaign extends Equatable {
     );
   }
 
-  CampaignState stateTo(CampaignPhaseStage stage) {
+  CampaignState stateTo(CampaignPhaseType type) {
     final phase = timeline.phases.firstWhere(
-      (phase) => phase.stage == stage,
-      orElse: () => throw StateError('Stage $stage not found'),
+      (phase) => phase.type == type,
+      orElse: () => throw StateError('Type $type not found'),
     );
     return CampaignState(
-      phase: phase,
-      status: CampaignPhaseStatus.fromRange(phase.timeline),
+      activePhases: [
+        CampaignPhaseState(
+          phase: phase,
+          status: CampaignPhaseStatus.fromRange(phase.timeline),
+        ),
+      ],
     );
   }
 }
@@ -143,6 +169,19 @@ final class CampaignDetail extends Campaign {
       totalAsk: totalAsk,
     );
   }
+}
+
+final class CampaignPhaseState extends Equatable {
+  final CampaignPhase phase;
+  final CampaignPhaseStatus status;
+
+  const CampaignPhaseState({
+    required this.phase,
+    required this.status,
+  });
+
+  @override
+  List<Object?> get props => [phase, status];
 }
 
 enum CampaignPhaseStatus {
@@ -180,28 +219,12 @@ enum CampaignPublish {
 }
 
 final class CampaignState extends Equatable {
-  final CampaignPhase phase;
-  final CampaignPhaseStatus status;
+  final List<CampaignPhaseState> activePhases;
 
   const CampaignState({
-    required this.phase,
-    required this.status,
+    required this.activePhases,
   });
 
   @override
-  List<Object?> get props => [phase, status];
-}
-
-extension F14Campaign on Campaign {
-  static final f14Ref = SignedDocumentRef.generateFirstRef();
-  static Campaign staticContent = Campaign(
-    selfRef: f14Ref,
-    name: 'Catalyst Fund14',
-    description: '''
-Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.''',
-    allFunds: const Coin.fromWholeAda(20000000),
-    fundNumber: 14,
-    timeline: CampaignTimeline(phases: CampaignPhaseX.f14StaticContent),
-    publish: CampaignPublish.published,
-  );
+  List<Object?> get props => [activePhases];
 }

@@ -5,13 +5,13 @@ final class CampaignPhase extends Equatable {
   final String title;
   final String description;
   final DateRange timeline;
-  final CampaignPhaseStage stage;
+  final CampaignPhaseType type;
 
   const CampaignPhase({
     required this.title,
     required this.description,
     required this.timeline,
-    required this.stage,
+    required this.type,
   });
 
   @override
@@ -19,33 +19,33 @@ final class CampaignPhase extends Equatable {
         title,
         description,
         timeline,
-        stage,
+        type,
       ];
 
   CampaignPhase copyWith({
     String? title,
     String? description,
     DateRange? timeline,
-    CampaignPhaseStage? stage,
-    bool? offstage,
+    CampaignPhaseType? type,
+    bool? offtype,
   }) {
     return CampaignPhase(
       title: title ?? this.title,
       description: description ?? this.description,
       timeline: timeline ?? this.timeline,
-      stage: stage ?? this.stage,
+      type: type ?? this.type,
     );
   }
 }
 
-enum CampaignPhaseStage {
+enum CampaignPhaseType {
   proposalSubmission,
   communityReview,
   communityVoting,
-  votingResults,
-  projectOnboarding,
   votingRegistration,
   reviewRegistration,
+  votingResults,
+  projectOnboarding,
 }
 
 extension CampaignPhaseX on CampaignPhase {
@@ -58,7 +58,7 @@ extension CampaignPhaseX on CampaignPhase {
         from: DateTime.utc(2025, 07, 01, 18),
         to: DateTime.utc(2025, 07, 20, 20),
       ),
-      stage: CampaignPhaseStage.proposalSubmission,
+      type: CampaignPhaseType.proposalSubmission,
     ),
     CampaignPhase(
       title: 'Voting Registration',
@@ -68,7 +68,7 @@ extension CampaignPhaseX on CampaignPhase {
         from: DateTime.utc(2025, 07, 05, 18),
         to: DateTime.utc(2025, 07, 12, 10),
       ),
-      stage: CampaignPhaseStage.votingRegistration,
+      type: CampaignPhaseType.votingRegistration,
     ),
     CampaignPhase(
       title: 'Community Review',
@@ -78,7 +78,7 @@ extension CampaignPhaseX on CampaignPhase {
         from: DateTime.utc(2025, 07, 03, 8),
         to: DateTime.utc(2025, 07, 08, 20),
       ),
-      stage: CampaignPhaseStage.communityReview,
+      type: CampaignPhaseType.communityReview,
     ),
     CampaignPhase(
       title: 'Reviewers and Moderators registration',
@@ -87,7 +87,7 @@ extension CampaignPhaseX on CampaignPhase {
         from: DateTime.utc(2025, 07, 03, 8),
         to: DateTime.utc(2025, 07, 04, 20),
       ),
-      stage: CampaignPhaseStage.reviewRegistration,
+      type: CampaignPhaseType.reviewRegistration,
     ),
     CampaignPhase(
       title: 'Community Voting',
@@ -96,7 +96,7 @@ extension CampaignPhaseX on CampaignPhase {
         from: DateTime.utc(2025, 07, 16, 12),
         to: DateTime.utc(2025, 07, 18, 9),
       ),
-      stage: CampaignPhaseStage.communityVoting,
+      type: CampaignPhaseType.communityVoting,
     ),
     CampaignPhase(
       title: 'Voting Results',
@@ -106,17 +106,17 @@ extension CampaignPhaseX on CampaignPhase {
         from: DateTime.utc(2025, 07, 18, 9),
         to: DateTime.utc(2025, 07, 21, 2),
       ),
-      stage: CampaignPhaseStage.votingResults,
+      type: CampaignPhaseType.votingResults,
     ),
     CampaignPhase(
       title: 'Project Onboarding',
       description:
-          '''This phase involves finalizing the key milestones submitted in the Catalyst App during the proposal submission stage within the Catalyst Milestone Module. It also includes conducting formal due diligence, and fulfilling all required onboarding steps to become eligible for funding.''',
+          '''This phase involves finalizing the key milestones submitted in the Catalyst App during the proposal submission type within the Catalyst Milestone Module. It also includes conducting formal due diligence, and fulfilling all required onboarding steps to become eligible for funding.''',
       timeline: DateRange(
         from: DateTime.utc(2025, 07, 25, 06),
         to: DateTime.utc(2025, 07, 30, 06),
       ),
-      stage: CampaignPhaseStage.projectOnboarding,
+      type: CampaignPhaseType.projectOnboarding,
     ),
   ];
 }

@@ -20,7 +20,7 @@ void main() {
       title: 'Test Title',
       description: 'Test Description',
       timeline: timeline,
-      stage: CampaignPhaseStage.proposalSubmission,
+      stage: CampaignPhaseType.proposalSubmission,
     );
 
     testWidgets(
@@ -96,7 +96,7 @@ void main() {
             from: DateTime.now().subtract(const Duration(days: 1)),
             to: DateTime.now().add(const Duration(days: 1)),
           ),
-          stage: CampaignPhaseStage.proposalSubmission,
+          stage: CampaignPhaseType.proposalSubmission,
         );
 
         final widget = CampaignTimelineCard(

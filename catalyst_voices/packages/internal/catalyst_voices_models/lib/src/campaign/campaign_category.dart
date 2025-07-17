@@ -7,7 +7,7 @@ final staticCampaignCategories = [
   CampaignCategory(
     selfRef: constantDocumentsRefs[0].category,
     proposalTemplateRef: constantDocumentsRefs[0].proposal,
-    campaignRef: F14Campaign.f14Ref,
+    campaignRef: Campaign.f14Ref,
     categoryName: 'Cardano Use Case:',
     categorySubname: 'Partners & Products',
     description:
@@ -90,7 +90,7 @@ The following will **not** be funded:
   CampaignCategory(
     selfRef: constantDocumentsRefs[1].category,
     proposalTemplateRef: constantDocumentsRefs[1].proposal,
-    campaignRef: F14Campaign.f14Ref,
+    campaignRef: Campaign.f14Ref,
     categoryName: 'Cardano Use Case:',
     categorySubname: 'Concept',
     description:
@@ -172,7 +172,7 @@ The following will **not** be funded:
   CampaignCategory(
     selfRef: constantDocumentsRefs[2].category,
     proposalTemplateRef: constantDocumentsRefs[2].proposal,
-    campaignRef: F14Campaign.f14Ref,
+    campaignRef: Campaign.f14Ref,
     categoryName: 'Cardano Open:',
     categorySubname: 'Developers',
     description: '''
@@ -256,7 +256,7 @@ The following will **not** be funded:
   CampaignCategory(
     selfRef: constantDocumentsRefs[3].category,
     proposalTemplateRef: constantDocumentsRefs[3].proposal,
-    campaignRef: F14Campaign.f14Ref,
+    campaignRef: Campaign.f14Ref,
     categoryName: 'Cardano Open:',
     categorySubname: 'Ecosystem',
     description: '''

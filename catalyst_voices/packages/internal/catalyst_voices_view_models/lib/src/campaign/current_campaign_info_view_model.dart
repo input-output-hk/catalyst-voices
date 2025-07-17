@@ -38,7 +38,7 @@ class CurrentCampaignInfoViewModel extends Equatable {
           .map(
             (e) => CampaignTimelineViewModel.fromModel(
               e,
-              offstage: e.stage == CampaignPhaseStage.reviewRegistration,
+              offstage: e.type == CampaignPhaseType.reviewRegistration,
             ),
           )
           .toList(),

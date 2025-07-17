@@ -28,7 +28,7 @@ class CampaignStageCubit extends Cubit<CampaignStageState> {
     try {
       emit(const LoadingCampaignStage());
       final campaignTimeline = await _campaignService.getCampaignTimelineByStage(
-        CampaignPhaseStage.proposalSubmission,
+        CampaignPhaseType.proposalSubmission,
       );
       final dateRangeStatus = campaignTimeline.timeline.rangeStatusNow();
       final startDate = campaignTimeline.timeline.from;

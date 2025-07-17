@@ -4,14 +4,14 @@ import 'package:catalyst_voices_view_models/src/campaign/campaign_stage.dart';
 import 'package:equatable/equatable.dart';
 
 final class CampaignInfo extends Equatable {
-  final String id;
+  final DocumentRef selfRef;
   final CampaignStage stage;
   final DateTime startDate;
   final DateTime endDate;
   final String description;
 
   const CampaignInfo({
-    required this.id,
+    required this.selfRef,
     required this.stage,
     required this.startDate,
     required this.endDate,
@@ -22,7 +22,7 @@ final class CampaignInfo extends Equatable {
   factory CampaignInfo.fromCampaign(Campaign campaign) {
     final stage = CampaignStage.fromCampaign(campaign);
     return CampaignInfo(
-      id: campaign.selfRef.id,
+      selfRef: campaign.selfRef,
       stage: stage,
       startDate: campaign.timeline.phases.first.timeline.from ?? DateTime.now(),
       endDate: campaign.timeline.phases.last.timeline.to ?? DateTime.now(),
@@ -36,7 +36,7 @@ final class CampaignInfo extends Equatable {
     CampaignStage campaignStage,
   ) {
     return CampaignInfo(
-      id: campaign.selfRef.id,
+      selfRef: campaign.selfRef,
       stage: campaignStage,
       startDate: _mockCampaignStartDate(campaignStage),
       endDate: _mockCampaignEndDate(campaignStage),
@@ -45,7 +45,7 @@ final class CampaignInfo extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, stage, startDate, endDate, description];
+  List<Object?> get props => [selfRef, stage, startDate, endDate, description];
 
   static DateTime _mockCampaignEndDate(CampaignStage stage) {
     return switch (stage) {

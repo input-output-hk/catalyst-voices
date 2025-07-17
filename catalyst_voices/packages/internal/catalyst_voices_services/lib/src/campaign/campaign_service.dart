@@ -20,7 +20,7 @@ abstract interface class CampaignService {
 
   Future<CampaignTimeline> getCampaignTimeline();
 
-  Future<CampaignPhase> getCampaignTimelineByStage(CampaignPhaseStage stage);
+  Future<CampaignPhase> getCampaignTimelineByStage(CampaignPhaseType stage);
 
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 }
@@ -35,7 +35,7 @@ final class CampaignServiceImpl implements CampaignService {
   );
 
   @override
-  Future<Campaign?> getActiveCampaign() => getCampaign(id: F14Campaign.f14Ref.id);
+  Future<Campaign?> getActiveCampaign() => getCampaign(id: Campaign.f14Ref.id);
 
   @override
   Future<CampaignDetail> getActiveCampaignBrief() async {
@@ -65,7 +65,7 @@ final class CampaignServiceImpl implements CampaignService {
     final categories = await _campaignRepository.getCampaignCategories();
     final updatedCategories = <CampaignCategory>[];
     final proposalSubmissionStage =
-        await getCampaignTimelineByStage(CampaignPhaseStage.proposalSubmission);
+        await getCampaignTimelineByStage(CampaignPhaseType.proposalSubmission);
 
     for (final category in categories) {
       final categoryProposals = await _proposalRepository.getProposals(
@@ -85,16 +85,22 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Future<CampaignTimeline> getCampaignTimeline() {
-    return _campaignRepository.getCampaignTimeline();
+  Future<CampaignTimeline> getCampaignTimeline() async {
+    final campaignData = await getActiveCampaign();
+
+    if (campaignData case final campaign?) {
+      return campaign.timeline;
+    }
+
+    throw StateError('No active campaign found');
   }
 
   @override
-  Future<CampaignPhase> getCampaignTimelineByStage(CampaignPhaseStage stage) async {
+  Future<CampaignPhase> getCampaignTimelineByStage(CampaignPhaseType type) async {
     final timeline = await getCampaignTimeline();
     final timelineStage = timeline.phases.firstWhere(
-      (element) => element.stage == stage,
-      orElse: () => throw (StateError('Stage $stage not found')),
+      (element) => element.type == type,
+      orElse: () => throw (StateError('Type $type not found')),
     );
     return timelineStage;
   }
@@ -107,7 +113,7 @@ final class CampaignServiceImpl implements CampaignService {
       categoryRef: ref,
     );
     final proposalSubmissionStage =
-        await getCampaignTimelineByStage(CampaignPhaseStage.proposalSubmission);
+        await getCampaignTimelineByStage(CampaignPhaseType.proposalSubmission);
     final totalAsk = _calculateTotalAsk(categoryProposals);
 
     return category.copyWith(

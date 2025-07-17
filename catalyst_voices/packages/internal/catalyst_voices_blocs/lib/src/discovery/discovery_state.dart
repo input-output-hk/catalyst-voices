@@ -49,13 +49,13 @@ final class DiscoveryCurrentCampaignState extends Equatable {
 
   DateRange? get reviewRegistrationStartsAt {
     return campaignTimeline.phases
-        .firstWhere((e) => e.stage == CampaignPhaseStage.reviewRegistration)
+        .firstWhere((e) => e.type == CampaignPhaseType.reviewRegistration)
         .timeline;
   }
 
   DateRange? get reviewStartsAt {
     return campaignTimeline.phases
-        .firstWhere((e) => e.stage == CampaignPhaseStage.communityReview)
+        .firstWhere((e) => e.type == CampaignPhaseType.communityReview)
         .timeline;
   }
 
@@ -66,13 +66,13 @@ final class DiscoveryCurrentCampaignState extends Equatable {
 
   DateRange? get votingRegistrationStartsAt {
     return campaignTimeline.phases
-        .firstWhere((e) => e.stage == CampaignPhaseStage.votingRegistration)
+        .firstWhere((e) => e.type == CampaignPhaseType.votingRegistration)
         .timeline;
   }
 
   DateRange? get votingStartsAt {
     return campaignTimeline.phases
-        .firstWhere((e) => e.stage == CampaignPhaseStage.communityVoting)
+        .firstWhere((e) => e.type == CampaignPhaseType.communityVoting)
         .timeline;
   }
 }

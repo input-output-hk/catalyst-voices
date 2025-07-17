@@ -167,7 +167,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         .map(
           (e) => CampaignTimelineViewModel.fromModel(
             e,
-            offstage: e.stage == CampaignPhaseStage.reviewRegistration,
+            offstage: e.type == CampaignPhaseType.reviewRegistration,
           ),
         )
         .toList();

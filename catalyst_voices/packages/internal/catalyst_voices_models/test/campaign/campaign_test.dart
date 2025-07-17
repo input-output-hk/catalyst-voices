@@ -9,13 +9,12 @@ void main() {
     late DateTime now;
 
     setUp(() {
-      now = DateTime.now();
+      DateTimeExt.mockedDateTime = DateTime(2025, 7, 17);
+      now = DateTimeExt.now();
     });
 
     test('fromRange returns upcoming status when current date is before the range', () {
       // Arrange
-      final now = DateTime.now();
-
       final range = DateRange(
         from: now.plusDays(2),
         to: now.plusDays(1),
@@ -103,7 +102,7 @@ void main() {
     late DateTime now;
 
     setUp(() {
-      now = DateTime.now();
+      now = DateTimeExt.now();
     });
 
     test('state returns correct state for single active phase', () {
@@ -119,7 +118,7 @@ void main() {
             CampaignPhase(
               title: 'Proposal Submission',
               description: 'Description 1',
-              stage: CampaignPhaseStage.proposalSubmission,
+              type: CampaignPhaseType.proposalSubmission,
               timeline: DateRange(
                 from: now.minusDays(1),
                 to: now.plusDays(1),
@@ -135,13 +134,14 @@ void main() {
 
       // Assert
       expect(
-        result.any((state) => state.phase.stage == CampaignPhaseStage.proposalSubmission),
+        result.activePhases
+            .any((state) => state.phase.type == CampaignPhaseType.proposalSubmission),
         isTrue,
       );
 
       expect(
-        result
-            .firstWhereOrNull((state) => state.phase.stage == CampaignPhaseStage.proposalSubmission)
+        result.activePhases
+            .firstWhereOrNull((state) => state.phase.type == CampaignPhaseType.proposalSubmission)
             ?.status,
         equals(CampaignPhaseStatus.active),
       );
@@ -160,7 +160,7 @@ void main() {
             CampaignPhase(
               title: 'Proposal Submission',
               description: 'Description 1',
-              stage: CampaignPhaseStage.proposalSubmission,
+              type: CampaignPhaseType.proposalSubmission,
               timeline: DateRange(
                 from: now.minusDays(1),
                 to: now.plusDays(1),
@@ -169,7 +169,7 @@ void main() {
             CampaignPhase(
               title: 'Voting Registration',
               description: 'Description 1',
-              stage: CampaignPhaseStage.votingRegistration,
+              type: CampaignPhaseType.votingRegistration,
               timeline: DateRange(
                 from: now.minusDays(1),
                 to: now.plusDays(1),
@@ -178,7 +178,7 @@ void main() {
             CampaignPhase(
               title: 'Voting Registration',
               description: 'Description 1',
-              stage: CampaignPhaseStage.votingRegistration,
+              type: CampaignPhaseType.votingRegistration,
               timeline: DateRange(
                 from: now.plusDays(1),
                 to: now.plusDays(2),
@@ -194,20 +194,20 @@ void main() {
 
       // Assert
       expect(
-        result.length,
+        result.activePhases.length,
         equals(2),
       );
 
       expect(
-        result
-            .firstWhereOrNull((state) => state.phase.stage == CampaignPhaseStage.proposalSubmission)
+        result.activePhases
+            .firstWhereOrNull((state) => state.phase.type == CampaignPhaseType.proposalSubmission)
             ?.status,
         equals(CampaignPhaseStatus.active),
       );
 
       expect(
-        result
-            .firstWhereOrNull((state) => state.phase.stage == CampaignPhaseStage.votingRegistration)
+        result.activePhases
+            .firstWhereOrNull((state) => state.phase.type == CampaignPhaseType.votingRegistration)
             ?.status,
         equals(CampaignPhaseStatus.active),
       );
@@ -225,7 +225,7 @@ void main() {
             CampaignPhase(
               title: 'Proposal Submission',
               description: 'Description 1',
-              stage: CampaignPhaseStage.proposalSubmission,
+              type: CampaignPhaseType.proposalSubmission,
               timeline: DateRange(
                 from: now.minusDays(10),
                 to: now.minusDays(9),
@@ -234,7 +234,7 @@ void main() {
             CampaignPhase(
               title: 'Voting Registration',
               description: 'Description 1',
-              stage: CampaignPhaseStage.votingRegistration,
+              type: CampaignPhaseType.votingRegistration,
               timeline: DateRange(
                 from: now.minusDays(8),
                 to: now.minusDays(7),
@@ -243,7 +243,7 @@ void main() {
             CampaignPhase(
               title: 'Reviewers and Moderators registration',
               description: 'Description 1',
-              stage: CampaignPhaseStage.reviewRegistration,
+              type: CampaignPhaseType.reviewRegistration,
               timeline: DateRange(
                 from: now.plusDays(1),
                 to: now.plusDays(2),
@@ -258,15 +258,15 @@ void main() {
       final result = campaign.state;
 
       // Assert
-      expect(result.length, equals(1));
+      expect(result.activePhases.length, equals(1));
 
       expect(
-        result.first.phase.stage,
-        equals(CampaignPhaseStage.reviewRegistration),
+        result.activePhases.first.phase.type,
+        equals(CampaignPhaseType.reviewRegistration),
       );
 
       expect(
-        result.first.status,
+        result.activePhases.first.status,
         equals(CampaignPhaseStatus.upcoming),
       );
     });
@@ -284,7 +284,7 @@ void main() {
             CampaignPhase(
               title: 'Proposal Submission',
               description: 'Description 1',
-              stage: CampaignPhaseStage.proposalSubmission,
+              type: CampaignPhaseType.proposalSubmission,
               timeline: DateRange(
                 from: now.minusDays(10),
                 to: now.minusDays(9),
@@ -293,7 +293,7 @@ void main() {
             CampaignPhase(
               title: 'Voting Registration',
               description: 'Description 1',
-              stage: CampaignPhaseStage.votingRegistration,
+              type: CampaignPhaseType.votingRegistration,
               timeline: DateRange(
                 from: now.minusDays(2),
                 to: now.minusDays(1),
@@ -302,7 +302,7 @@ void main() {
             CampaignPhase(
               title: 'Reviewers and Moderators registration',
               description: 'Description 1',
-              stage: CampaignPhaseStage.reviewRegistration,
+              type: CampaignPhaseType.reviewRegistration,
               timeline: DateRange(
                 from: now.plusDays(2),
                 to: now.plusDays(3),
@@ -317,15 +317,15 @@ void main() {
       final result = campaign.state;
 
       // Assert
-      expect(result.length, equals(1));
+      expect(result.activePhases.length, equals(1));
 
       expect(
-        result.first.phase.stage,
-        equals(CampaignPhaseStage.votingRegistration),
+        result.activePhases.first.phase.type,
+        equals(CampaignPhaseType.votingRegistration),
       );
 
       expect(
-        result.first.status,
+        result.activePhases.first.status,
         equals(CampaignPhaseStatus.post),
       );
     });
@@ -343,7 +343,7 @@ void main() {
             CampaignPhase(
               title: 'Proposal Submission',
               description: 'Description 1',
-              stage: CampaignPhaseStage.proposalSubmission,
+              type: CampaignPhaseType.proposalSubmission,
               timeline: DateRange(
                 from: now.minusDays(10),
                 to: now.minusDays(9),
@@ -352,7 +352,7 @@ void main() {
             CampaignPhase(
               title: 'Voting Registration',
               description: 'Description 1',
-              stage: CampaignPhaseStage.votingRegistration,
+              type: CampaignPhaseType.votingRegistration,
               timeline: DateRange(
                 from: now.minusDays(1),
                 to: now.plusDays(1),
@@ -361,7 +361,7 @@ void main() {
             CampaignPhase(
               title: 'Reviewers and Moderators registration',
               description: 'Description 1',
-              stage: CampaignPhaseStage.reviewRegistration,
+              type: CampaignPhaseType.reviewRegistration,
               timeline: DateRange(
                 from: now.plusDays(2),
                 to: now.plusDays(3),
@@ -373,19 +373,34 @@ void main() {
       );
 
       // Act
-      final resultProposalSubmission = campaign.stateTo(CampaignPhaseStage.proposalSubmission);
-      final resultVotingRegistration = campaign.stateTo(CampaignPhaseStage.votingRegistration);
-      final resultReviewRegistration = campaign.stateTo(CampaignPhaseStage.reviewRegistration);
+      final resultProposalSubmission = campaign.stateTo(CampaignPhaseType.proposalSubmission);
+      final resultVotingRegistration = campaign.stateTo(CampaignPhaseType.votingRegistration);
+      final resultReviewRegistration = campaign.stateTo(CampaignPhaseType.reviewRegistration);
 
       // Assert
-      expect(resultProposalSubmission.phase.stage, equals(CampaignPhaseStage.proposalSubmission));
-      expect(resultProposalSubmission.status, equals(CampaignPhaseStatus.post));
+      expect(
+        resultProposalSubmission.activePhases.first.phase.type,
+        equals(CampaignPhaseType.proposalSubmission),
+      );
+      expect(resultProposalSubmission.activePhases.first.status, equals(CampaignPhaseStatus.post));
 
-      expect(resultVotingRegistration.phase.stage, equals(CampaignPhaseStage.votingRegistration));
-      expect(resultVotingRegistration.status, equals(CampaignPhaseStatus.active));
+      expect(
+        resultVotingRegistration.activePhases.first.phase.type,
+        equals(CampaignPhaseType.votingRegistration),
+      );
+      expect(
+        resultVotingRegistration.activePhases.first.status,
+        equals(CampaignPhaseStatus.active),
+      );
 
-      expect(resultReviewRegistration.phase.stage, equals(CampaignPhaseStage.reviewRegistration));
-      expect(resultReviewRegistration.status, equals(CampaignPhaseStatus.upcoming));
+      expect(
+        resultReviewRegistration.activePhases.first.phase.type,
+        equals(CampaignPhaseType.reviewRegistration),
+      );
+      expect(
+        resultReviewRegistration.activePhases.first.status,
+        equals(CampaignPhaseStatus.upcoming),
+      );
     });
   });
 }
