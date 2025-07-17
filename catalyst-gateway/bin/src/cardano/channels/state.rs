@@ -52,7 +52,8 @@ pub(crate) struct ChainIndexerStateSender(broadcast::Sender<ChainIndexerState>);
 /// Chain Indexer state receiver multi-consumer channel
 #[derive(Debug)]
 pub(crate) struct ChainIndexerStateReceiver {
-    /// The chain indexer's state.
+    /// The chain indexer's stored state, from the last `latest_state` call from the
+    /// `receiver`.
     state: Option<ChainIndexerState>,
     /// A `ChainIndexerState` receiver.
     receiver: broadcast::Receiver<ChainIndexerState>,
@@ -83,8 +84,9 @@ impl ChainIndexerStateSender {
 }
 
 impl ChainIndexerStateReceiver {
-    /// Returns the currently stored state. Returns `None` if the state was never updated.
-    pub(crate) fn current_state(&self) -> Option<&ChainIndexerState> {
+    /// Returns the stored state, from the last `latest_state` call. Returns `None` if the
+    /// state was never updated.
+    pub(crate) fn stored_state(&self) -> Option<&ChainIndexerState> {
         self.state.as_ref()
     }
 
@@ -92,6 +94,6 @@ impl ChainIndexerStateReceiver {
     /// Return `None` if the channel is closed.
     pub(crate) async fn latest_state(&mut self) -> Option<&ChainIndexerState> {
         self.state = receive_msg(&mut self.receiver).await;
-        self.current_state()
+        self.stored_state()
     }
 }

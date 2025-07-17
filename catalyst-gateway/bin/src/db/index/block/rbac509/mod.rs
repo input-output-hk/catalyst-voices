@@ -290,33 +290,32 @@ async fn wait_for_indexing_up_to_block(
     indexer_state: &mut ChainIndexerStateReceiver, slot: Slot, tx_id: TransactionId,
     is_immutable: bool,
 ) {
+    // firstly look at the stored, current recorded state
+    let mut state = indexer_state.stored_state();
     loop {
-        let state = match indexer_state.current_state() {
-            Some(s) => s,
-            None => {
-                if let Some(s) = indexer_state.latest_state().await {
-                    s
-                } else {
-                    error!(
-                        tx_hash = ?tx_id,
-                        "Chain indexer state channel closed during the RBAC 509 transaction indexing",
-                    );
-                    return;
+        if let Some(state) = state {
+            if is_immutable {
+                // for the immutable block we need to wait when everything would be indexed up to
+                // the current block
+                if state.is_immutable_fully_indexed_up_to(slot) {
+                    break;
                 }
-            },
-        };
-
-        if is_immutable {
-            // for the immutable block we need to wait when everything would be indexed up to the
-            // current block
-            if state.is_immutable_fully_indexed_up_to(slot) {
+            } else if state.is_reached_immutable_tip() {
+                // for the live block we should wait until the whole immutable part would be
+                // indexed, we are not waiting for the live part to be indexed,
+                // because in any case its indexing sequentially
                 break;
             }
-        } else if state.is_reached_immutable_tip() {
-            // for the live block we should wait until the whole immutable part would be indexed, we
-            // are not waiting for the live part to be indexed, because in any case its
-            // indexing sequentially
-            break;
         }
+
+        // if it didn't passed with the stored state, wait for the latest
+        let Some(latest_state) = indexer_state.latest_state().await else {
+            error!(
+                tx_hash = ?tx_id,
+                "Chain indexer state channel closed during the RBAC 509 transaction indexing",
+            );
+            return;
+        };
+        state = Some(latest_state);
     }
 }
