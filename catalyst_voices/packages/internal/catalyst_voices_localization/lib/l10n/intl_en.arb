@@ -868,7 +868,7 @@
     "placeholders": {
       "fund14ProposalSubmissionNotice": {
         "type": "String"
-        }
+      }
     }
   },
   "createProfileAcknowledgementsTosAndPrivacyPolicy": "I agree to the {tos} & {privacy_policy}.",
