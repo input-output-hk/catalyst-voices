@@ -296,7 +296,13 @@ fn sync_subchain(
                 cardano_chain_follower::Kind::Block => {
                     let block = chain_update.block_data();
 
-                    if let Err(error) = index_block(block, &mut state_recv).await {
+                    if let Err(error) = index_block(
+                        block,
+                        &mut state_recv,
+                        params.actual_start().slot_or_default(),
+                    )
+                    .await
+                    {
                         let error_msg = format!("Failed to index block {}", block.point());
                         error!(chain=%params.chain, error=%error, params=%params, error_msg);
                         return params.done(
@@ -347,7 +353,13 @@ fn sync_subchain(
 
                         // Purge success, now index the current block
                         let block = chain_update.block_data();
-                        if let Err(error) = index_block(block, &mut state_recv).await {
+                        if let Err(error) = index_block(
+                            block,
+                            &mut state_recv,
+                            params.actual_start().slot_or_default(),
+                        )
+                        .await
+                        {
                             let error_msg =
                                 format!("Failed to index block after rollback {}", block.point());
                             error!(chain=%params.chain, error=%error, params=%params, error_msg);

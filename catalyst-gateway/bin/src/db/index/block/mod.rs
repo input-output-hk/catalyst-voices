@@ -8,7 +8,7 @@ pub(crate) mod roll_forward;
 pub(crate) mod txi;
 pub(crate) mod txo;
 
-use cardano_blockchain_types::MultiEraBlock;
+use cardano_blockchain_types::{MultiEraBlock, Slot};
 use catalyst_types::hashes::Blake2b256Hash;
 use certs::CertInsertQuery;
 use cip36::Cip36InsertQuery;
@@ -22,7 +22,7 @@ use crate::{cardano::channels::state::ChainIndexerStateReceiver, rbac::RbacBlock
 
 /// Add all data needed from the block into the indexes.
 pub(crate) async fn index_block(
-    block: &MultiEraBlock, indexer_state: &mut ChainIndexerStateReceiver,
+    block: &MultiEraBlock, indexer_state: &mut ChainIndexerStateReceiver, range_start: Slot,
 ) -> anyhow::Result<()> {
     // Get the session.  This should never fail.
     let Some(session) = CassandraSession::get(block.is_immutable()) else {
@@ -60,7 +60,15 @@ pub(crate) async fn index_block(
         txo_index.index(block.network(), &txn, slot_no, txn_id, index);
 
         // Index RBAC 509 inside the transaction.
-        Box::pin(rbac509_index.index(txn_id, index, block, &mut rbac_context, indexer_state)).await;
+        Box::pin(rbac509_index.index(
+            txn_id,
+            index,
+            block,
+            &mut rbac_context,
+            indexer_state,
+            range_start,
+        ))
+        .await;
     }
 
     // We then execute each batch of data from the block.

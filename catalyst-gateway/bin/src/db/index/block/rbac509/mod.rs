@@ -8,7 +8,7 @@ pub(crate) mod insert_rbac509_invalid;
 
 use std::{collections::HashSet, sync::Arc};
 
-use cardano_blockchain_types::{MultiEraBlock, TransactionId, TxnIndex};
+use cardano_blockchain_types::{MultiEraBlock, Slot, TransactionId, TxnIndex};
 use rbac_registration::cardano::cip509::Cip509;
 use scylla::Session;
 use tracing::{debug, error};
@@ -71,6 +71,7 @@ impl Rbac509InsertQuery {
     pub(crate) async fn index(
         &mut self, txn_hash: TransactionId, index: TxnIndex, block: &MultiEraBlock,
         context: &mut RbacBlockIndexingContext, indexer_state: &mut ChainIndexerStateReceiver,
+        range_start: Slot,
     ) {
         let slot = block.slot();
         let cip509 = match Cip509::new(block, index, &[]) {
@@ -106,8 +107,19 @@ impl Rbac509InsertQuery {
             );
         }
 
-        // Need to wait until the `cip509.previous_transaction` would be definitely indexed
-        wait_for_indexing_up_to_block(indexer_state, block, cip509.txn_hash()).await;
+        // Slots arithmetic has saturating semantic, so this is ok.
+        #[allow(clippy::arithmetic_side_effects)]
+        let wait_to = range_start - 1.into();
+        // There are multiple parallel tasks that are indexing ranges of blocks such as `0..100`,
+        // `100..200`, etc. We need to wait for all previous ranges to be indexed before
+        // processing a RBAC registration.
+        wait_for_indexing_up_to_block(
+            indexer_state,
+            wait_to,
+            cip509.txn_hash(),
+            block.is_immutable(),
+        )
+        .await;
 
         let previous_transaction = cip509.previous_transaction();
         match Box::pin(validate_rbac_registration(
@@ -273,9 +285,10 @@ impl Rbac509InsertQuery {
     }
 }
 
-/// Wait until up to the provided `block` everything would be indexed.
+/// Waits until all blocks up to the provided slot are indexed.
 async fn wait_for_indexing_up_to_block(
-    indexer_state: &mut ChainIndexerStateReceiver, block: &MultiEraBlock, tx_id: TransactionId,
+    indexer_state: &mut ChainIndexerStateReceiver, slot: Slot, tx_id: TransactionId,
+    is_immutable: bool,
 ) {
     loop {
         let state = match indexer_state.current_state() {
@@ -293,10 +306,10 @@ async fn wait_for_indexing_up_to_block(
             },
         };
 
-        if block.is_immutable() {
+        if is_immutable {
             // for the immutable block we need to wait when everything would be indexed up to the
             // current block
-            if state.is_immutable_fully_indexed_up_to(block.slot()) {
+            if state.is_immutable_fully_indexed_up_to(slot) {
                 break;
             }
         } else if state.is_reached_immutable_tip() {
