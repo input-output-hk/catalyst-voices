@@ -11,8 +11,10 @@ void main() {
       description: 'description',
       publish: CampaignPublish.draft,
       allFunds: const Coin(0),
+      totalAsk: const Coin(0),
       fundNumber: 1,
       timeline: const CampaignTimeline(phases: []),
+      categories: const [],
     );
 
     test('draft campaign resolves to draft stage', () {

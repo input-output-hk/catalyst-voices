@@ -112,7 +112,9 @@ void main() {
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: const Coin(100),
+        totalAsk: const Coin(0),
         fundNumber: 1,
+        categories: const [],
         timeline: CampaignTimeline(
           phases: [
             CampaignPhase(
@@ -154,7 +156,9 @@ void main() {
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: const Coin(100),
+        totalAsk: const Coin(0),
         fundNumber: 1,
+        categories: const [],
         timeline: CampaignTimeline(
           phases: [
             CampaignPhase(
@@ -219,7 +223,9 @@ void main() {
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: const Coin(100),
+        totalAsk: const Coin(0),
         fundNumber: 1,
+        categories: const [],
         timeline: CampaignTimeline(
           phases: [
             CampaignPhase(
@@ -278,7 +284,9 @@ void main() {
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: const Coin(100),
+        totalAsk: const Coin(0),
         fundNumber: 1,
+        categories: const [],
         timeline: CampaignTimeline(
           phases: [
             CampaignPhase(
@@ -337,7 +345,9 @@ void main() {
         name: 'Campaign 1',
         description: 'Description 1',
         allFunds: const Coin(100),
+        totalAsk: const Coin(0),
         fundNumber: 1,
+        categories: const [],
         timeline: CampaignTimeline(
           phases: [
             CampaignPhase(

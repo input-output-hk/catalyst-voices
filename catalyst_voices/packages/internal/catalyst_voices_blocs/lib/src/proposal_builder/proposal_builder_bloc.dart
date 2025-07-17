@@ -383,8 +383,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   }
 
   Future<DateTime?> _getProposalSubmissionCloseDate() async {
-    final timeline = await _campaignService.getCampaignTimeline();
-    return timeline.phases
+    final campaign = await _campaignService.getActiveCampaign();
+    if (campaign == null) {
+      return null;
+    }
+    return campaign.timeline.phases
         .firstWhereOrNull(
           (e) => e.type == CampaignPhaseType.proposalSubmission,
         )
@@ -451,8 +454,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     _logger.info('Loading default proposal category');
 
     await _loadState(emit, () async {
-      final categories = await _campaignService.getCampaignCategories();
-      final category = categories.first;
+      final campaign = await _campaignService.getActiveCampaign();
+      if (campaign == null) {
+        throw StateError('Cannot load proposal, active campaign not found');
+      }
+      final category = campaign.categories.first;
       final templateRef = category.proposalTemplateRef;
 
       final proposalTemplate = await _proposalService.getProposalTemplate(

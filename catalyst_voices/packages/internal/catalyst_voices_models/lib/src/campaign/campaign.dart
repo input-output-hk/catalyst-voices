@@ -11,8 +11,10 @@ class Campaign extends Equatable {
   final String name;
   final String description;
   final Coin allFunds;
+  final Coin totalAsk;
   final int fundNumber;
   final CampaignTimeline timeline;
+  final List<CampaignCategory> categories;
 
   final CampaignPublish publish;
 
@@ -21,8 +23,10 @@ class Campaign extends Equatable {
     required this.name,
     required this.description,
     required this.allFunds,
+    required this.totalAsk,
     required this.fundNumber,
     required this.timeline,
+    required this.categories,
     required this.publish,
   });
 
@@ -33,9 +37,11 @@ class Campaign extends Equatable {
       description: '''
 Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.''',
       allFunds: const Coin.fromWholeAda(20000000),
+      totalAsk: const Coin.fromWholeAda(0),
       fundNumber: 14,
       timeline: CampaignTimeline(phases: CampaignPhaseX.f14StaticContent),
       publish: CampaignPublish.published,
+      categories: staticCampaignCategories,
     );
   }
 
@@ -74,9 +80,11 @@ Project Catalyst turns economic power into innovation power by using the Cardano
         name,
         description,
         allFunds,
+        totalAsk,
         fundNumber,
         timeline,
         publish,
+        categories,
       ];
   // We can have more than one state if the campaign timeline supports concurrent phases. For example
   // proposal submission can be concurrent with voting registration.
@@ -112,18 +120,22 @@ Project Catalyst turns economic power into innovation power by using the Cardano
     String? name,
     String? description,
     Coin? allFunds,
+    Coin? totalAsk,
     int? fundNumber,
     CampaignTimeline? timeline,
     CampaignPublish? publish,
+    List<CampaignCategory>? categories,
   }) {
     return Campaign(
       selfRef: selfRef ?? this.selfRef,
       name: name ?? this.name,
       description: description ?? this.description,
       allFunds: allFunds ?? this.allFunds,
+      totalAsk: totalAsk ?? this.totalAsk,
       fundNumber: fundNumber ?? this.fundNumber,
       timeline: timeline ?? this.timeline,
       publish: publish ?? this.publish,
+      categories: categories ?? this.categories,
     );
   }
 
@@ -142,34 +154,6 @@ Project Catalyst turns economic power into innovation power by using the Cardano
           status: CampaignPhaseStatus.fromRange(phase.timeline),
         ),
       ],
-    );
-  }
-}
-
-final class CampaignDetail extends Campaign {
-  final Coin totalAsk;
-
-  const CampaignDetail({
-    required super.selfRef,
-    required super.name,
-    required super.description,
-    required super.allFunds,
-    required super.fundNumber,
-    required super.timeline,
-    required super.publish,
-    required this.totalAsk,
-  });
-
-  factory CampaignDetail.fromCampaign(Campaign campaign, Coin totalAsk) {
-    return CampaignDetail(
-      selfRef: campaign.selfRef,
-      name: campaign.name,
-      description: campaign.description,
-      allFunds: campaign.allFunds,
-      fundNumber: campaign.fundNumber,
-      timeline: campaign.timeline,
-      publish: campaign.publish,
-      totalAsk: totalAsk,
     );
   }
 }

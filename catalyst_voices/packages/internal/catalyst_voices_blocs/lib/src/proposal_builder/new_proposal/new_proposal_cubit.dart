@@ -74,14 +74,20 @@ class NewProposalCubit extends Cubit<NewProposalState>
       final step = categoryRef == null
           ? const CreateProposalWithoutPreselectedCategoryStep()
           : const CreateProposalWithPreselectedCategoryStep();
-      final categoriesModels = await _campaignService.getCampaignCategories();
+      final categoriesModels = await _campaignService.getActiveCampaign();
+      if (categoriesModels == null) {
+        throw StateError('Cannot load proposal, active campaign not found');
+      }
       final templateRef = await _proposalService.getProposalTemplate(
         // TODO(LynxLynxx): when we have separate proposal template for generic questions use it here
         // right now user can start creating proposal without selecting category.
         // Right now every category have the same requirements for title so we can do a fallback for
         // first category from the list.
-        ref: categoriesModels
-            .firstWhere((e) => e.selfRef == categoryRef, orElse: () => categoriesModels.first)
+        ref: categoriesModels.categories
+            .firstWhere(
+              (e) => e.selfRef == categoryRef,
+              orElse: () => categoriesModels.categories.first,
+            )
             .proposalTemplateRef,
       );
 
@@ -89,7 +95,8 @@ class NewProposalCubit extends Cubit<NewProposalState>
           .getPropertySchema(ProposalDocument.titleNodeId)! as DocumentStringSchema;
       final titleRange = titlePropertySchema.strLengthRange;
 
-      final categories = categoriesModels.map(CampaignCategoryDetailsViewModel.fromModel).toList();
+      final categories =
+          categoriesModels.categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
       final newState = state.copyWith(
         isLoading: false,
         step: step,
