@@ -18,10 +18,6 @@ permissions:
   packages: write
   pull-requests: write
 
-env:
-  REPORT_EXT: .junit-report.xml
-  COVERAGE_EXT: .coverage.lcov
-
 jobs:
   ci:
     uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.3
