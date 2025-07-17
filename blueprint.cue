@@ -32,9 +32,9 @@ global: {
 					provider: "aws"
 					path:     "global/ci/earthly"
 				}
-				org:       "Catalyst"
-				satellite: "ci"
-				version:   "0.8.16"
+				org: "Catalyst"
+				// satellite: "ci"
+				version: "0.8.16"
 			}
 
 			github: registry: "ghcr.io"
