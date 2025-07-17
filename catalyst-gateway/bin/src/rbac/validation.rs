@@ -9,7 +9,7 @@ use catalyst_types::{
     problem_report::ProblemReport,
 };
 use ed25519_dalek::VerifyingKey;
-use futures::{StreamExt, TryFutureExt};
+use futures::StreamExt;
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
 
 use crate::{
@@ -258,17 +258,15 @@ async fn catalyst_id_from_txn_id(
     // Then try to find in the persistent database.
     let session =
         CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
-    if let Some(r) = Query::get(&session, txn_id).await? {
-        return Ok(Some(r.catalyst_id));
+    if let Some(id) = Query::get(&session, txn_id).await? {
+        return Ok(Some(id));
     };
 
     // Conditionally check the volatile database.
     if !is_persistent {
         let session =
             CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
-        return Query::get(&session, txn_id)
-            .map_ok(|r| r.map(|r| r.catalyst_id))
-            .await;
+        return Query::get(&session, txn_id).await;
     }
 
     Ok(None)
@@ -311,17 +309,15 @@ async fn catalyst_id_from_stake_address(
     // Then try to find in the persistent database.
     let session =
         CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
-    if let Some(r) = Query::latest(&session, address).await? {
-        return Ok(Some(r.catalyst_id));
+    if let Some(id) = Query::latest(&session, address).await? {
+        return Ok(Some(id));
     };
 
     // Conditionally check the volatile database.
     if !is_persistent {
         let session =
             CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
-        return Query::latest(&session, address)
-            .map_ok(|r| r.map(|r| r.catalyst_id))
-            .await;
+        return Query::latest(&session, address).await;
     }
 
     Ok(None)
@@ -370,17 +366,15 @@ async fn catalyst_id_from_public_key(
     // Then try to find in the persistent database.
     let session =
         CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
-    if let Some(r) = Query::get(&session, key).await? {
-        return Ok(Some(r.catalyst_id));
+    if let Some(id) = Query::get(&session, key).await? {
+        return Ok(Some(id));
     };
 
     // Conditionally check the volatile database.
     if !is_persistent {
         let session =
             CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
-        return Query::get(&session, key)
-            .map_ok(|r| r.map(|r| r.catalyst_id))
-            .await;
+        return Query::get(&session, key).await;
     }
 
     Ok(None)
