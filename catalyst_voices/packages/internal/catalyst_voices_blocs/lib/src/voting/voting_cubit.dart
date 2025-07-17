@@ -8,7 +8,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 
-const _recentProposalsMaxAge = Duration(hours: 72);
 final _logger = Logger('VotingCubit');
 
 /// Manages the voting.
@@ -28,7 +27,7 @@ final class VotingCubit extends Cubit<VotingState>
     this._userService,
     this._campaignService,
     this._proposalService,
-  ) : super(const VotingState(recentProposalsMaxAge: _recentProposalsMaxAge)) {
+  ) : super(const VotingState()) {
     _resetCache();
 
     _activeAccountIdSub = _userService.watchUser
@@ -48,7 +47,6 @@ final class VotingCubit extends Cubit<VotingState>
     Optional<SignedDocumentRef>? category,
     ProposalsFilterType? type,
     Optional<String>? searchQuery,
-    bool? isRecentEnabled,
     bool resetProposals = false,
   }) {
     final filters = _cache.filters.copyWith(
@@ -57,9 +55,6 @@ final class VotingCubit extends Cubit<VotingState>
       onlyAuthor: onlyMy,
       category: category,
       searchQuery: searchQuery,
-      maxAge: isRecentEnabled != null
-          ? Optional(isRecentEnabled ? _recentProposalsMaxAge : null)
-          : null,
     );
 
     if (_cache.filters == filters) {
@@ -71,7 +66,6 @@ final class VotingCubit extends Cubit<VotingState>
     emit(
       state.copyWith(
         isOrderEnabled: _cache.filters.type == ProposalsFilterType.total,
-        isRecentProposalsEnabled: _cache.filters.maxAge != null,
       ),
     );
 

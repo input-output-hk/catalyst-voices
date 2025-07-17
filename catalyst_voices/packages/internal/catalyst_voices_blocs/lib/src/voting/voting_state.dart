@@ -9,8 +9,6 @@ class VotingState extends Equatable {
   final List<String> favoritesIds;
   final ProposalsCount count;
   final List<ProposalsCategorySelectorItem> categorySelectorItems;
-  final Duration recentProposalsMaxAge;
-  final bool isRecentProposalsEnabled;
   final List<ProposalsDropdownOrderItem> orderItems;
   final bool isOrderEnabled;
 
@@ -19,8 +17,6 @@ class VotingState extends Equatable {
     this.favoritesIds = const [],
     this.count = const ProposalsCount(),
     this.categorySelectorItems = const [],
-    required this.recentProposalsMaxAge,
-    this.isRecentProposalsEnabled = false,
     this.orderItems = const [],
     this.isOrderEnabled = false,
   });
@@ -35,8 +31,6 @@ class VotingState extends Equatable {
         favoritesIds,
         count,
         categorySelectorItems,
-        recentProposalsMaxAge,
-        isRecentProposalsEnabled,
         orderItems,
         isOrderEnabled,
       ];
@@ -50,8 +44,6 @@ class VotingState extends Equatable {
     List<String>? favoritesIds,
     ProposalsCount? count,
     List<ProposalsCategorySelectorItem>? categorySelectorItems,
-    Duration? recentProposalsMaxAge,
-    bool? isRecentProposalsEnabled,
     List<ProposalsDropdownOrderItem>? orderItems,
     bool? isOrderEnabled,
   }) {
@@ -60,8 +52,6 @@ class VotingState extends Equatable {
       favoritesIds: favoritesIds ?? this.favoritesIds,
       count: count ?? this.count,
       categorySelectorItems: categorySelectorItems ?? this.categorySelectorItems,
-      recentProposalsMaxAge: recentProposalsMaxAge ?? this.recentProposalsMaxAge,
-      isRecentProposalsEnabled: isRecentProposalsEnabled ?? this.isRecentProposalsEnabled,
       orderItems: orderItems ?? this.orderItems,
       isOrderEnabled: isOrderEnabled ?? this.isOrderEnabled,
     );
