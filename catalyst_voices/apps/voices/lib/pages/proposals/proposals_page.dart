@@ -80,13 +80,13 @@ class _ProposalsPageState extends State<ProposalsPage>
   @override
   void handleSignal(ProposalsSignal signal) {
     switch (signal) {
-      case ChangeCategorySignal(:final to):
+      case ChangeCategoryProposalsSignal(:final to):
         _updateRoute(categoryId: Optional(to?.id));
-      case ChangeFilterTypeSignal(:final type):
+      case ChangeFilterTypeProposalsSignal(:final type):
         _updateRoute(filterType: type);
-      case ResetProposalsPaginationSignal():
+      case ResetPaginationProposalsSignal():
         _doResetPagination();
-      case ProposalsPageReadySignal(:final page):
+      case PageReadyProposalsSignal(:final page):
         _pagingController.value = _pagingController.value.copyWith(
           currentPage: page.page,
           maxResults: page.total,

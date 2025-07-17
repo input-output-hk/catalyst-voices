@@ -46,7 +46,7 @@ class _ProposalsTabs extends StatelessWidget {
       controller: controller,
       onTap: (tab) {
         final type = tab.data;
-        context.read<ProposalsCubit>().emitSignal(ChangeFilterTypeSignal(type));
+        context.read<ProposalsCubit>().emitSignal(ChangeFilterTypeProposalsSignal(type));
       },
       tabs: [
         for (final type in ProposalsFilterType.values)

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_blocs/src/proposals/proposals_cubit_cache.dart';
+import 'package:catalyst_voices_blocs/src/voting/voting_cubit_cache.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -9,26 +9,26 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 
 const _recentProposalsMaxAge = Duration(hours: 72);
-final _logger = Logger('ProposalsCubit');
+final _logger = Logger('VotingCubit');
 
-/// Manages the proposals.
-final class ProposalsCubit extends Cubit<ProposalsState>
-    with BlocErrorEmitterMixin, BlocSignalEmitterMixin<ProposalsSignal, ProposalsState> {
+/// Manages the voting.
+final class VotingCubit extends Cubit<VotingState>
+    with BlocErrorEmitterMixin, BlocSignalEmitterMixin<VotingSignal, VotingState> {
   final UserService _userService;
   final CampaignService _campaignService;
   final ProposalService _proposalService;
 
-  ProposalsCubitCache _cache = const ProposalsCubitCache();
+  VotingCubitCache _cache = const VotingCubitCache();
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<List<String>>? _favoritesProposalsIdsSub;
   StreamSubscription<ProposalsCount>? _proposalsCountSub;
 
-  ProposalsCubit(
+  VotingCubit(
     this._userService,
     this._campaignService,
     this._proposalService,
-  ) : super(const ProposalsState(recentProposalsMaxAge: _recentProposalsMaxAge)) {
+  ) : super(const VotingState(recentProposalsMaxAge: _recentProposalsMaxAge)) {
     _resetCache();
 
     _activeAccountIdSub = _userService.watchUser
@@ -81,7 +81,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     _watchProposalsCount(filters: filters.toCountFilters());
 
     if (resetProposals) {
-      emitSignal(const ResetPaginationProposalsSignal());
+      emitSignal(const ResetPaginationVotingSignal());
     }
   }
 
@@ -98,12 +98,12 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     _rebuildOrder();
 
     if (resetProposals) {
-      emitSignal(const ResetPaginationProposalsSignal());
+      emitSignal(const ResetPaginationVotingSignal());
     }
   }
 
   void changeSelectedCategory(SignedDocumentRef? categoryId) {
-    emitSignal(ChangeCategoryProposalsSignal(to: categoryId));
+    emitSignal(ChangeCategoryVotingSignal(to: categoryId));
   }
 
   @override
@@ -213,7 +213,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
     final mappedPage = page.map(ProposalBrief.fromProposal);
 
-    final signal = PageReadyProposalsSignal(page: mappedPage);
+    final signal = PageReadyVotingSignal(page: mappedPage);
 
     emitSignal(signal);
   }
@@ -281,7 +281,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   void _resetCache() {
     final activeAccount = _userService.user.activeAccount;
     final filters = ProposalsFilters(author: activeAccount?.catalystId);
-    _cache = ProposalsCubitCache(filters: filters);
+    _cache = VotingCubitCache(filters: filters);
   }
 
   ProposalsOrder _resolveEffectiveOrder() {

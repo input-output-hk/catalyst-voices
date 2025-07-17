@@ -1,3 +1,5 @@
+import 'package:catalyst_voices/common/error_handler.dart';
+import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/layouts/header_and_content_layout.dart';
 import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
@@ -23,7 +25,11 @@ class VotingPage extends StatefulWidget {
   State<VotingPage> createState() => _VotingPageState();
 }
 
-class _VotingPageState extends State<VotingPage> with SingleTickerProviderStateMixin {
+class _VotingPageState extends State<VotingPage>
+    with
+        SingleTickerProviderStateMixin,
+        ErrorHandlerStateMixin<VotingCubit, VotingPage>,
+        SignalHandlerStateMixin<VotingCubit, VotingSignal, VotingPage> {
   late final TabController _tabController;
   late final PagingController<ProposalBrief> _pagingController;
 
@@ -36,10 +42,49 @@ class _VotingPageState extends State<VotingPage> with SingleTickerProviderStateM
   }
 
   @override
+  void didUpdateWidget(VotingPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.categoryId != oldWidget.categoryId || widget.type != oldWidget.type) {
+      context.read<VotingCubit>().changeFilters(
+            onlyMy: Optional(widget.type?.isMy ?? false),
+            category: Optional(widget.categoryId),
+            type: widget.type ?? ProposalsFilterType.total,
+          );
+
+      _doResetPagination();
+    }
+
+    if (widget.type != oldWidget.type) {
+      _tabController.animateTo(widget.type?.index ?? 0);
+    }
+  }
+
+  @override
   void dispose() {
     _tabController.dispose();
     _pagingController.dispose();
     super.dispose();
+  }
+
+  @override
+  void handleSignal(VotingSignal signal) {
+    switch (signal) {
+      case ChangeCategoryVotingSignal(:final to):
+        _updateRoute(categoryId: Optional(to?.id));
+      case ChangeFilterTypeVotingSignal(:final type):
+        _updateRoute(filterType: type);
+      case ResetPaginationVotingSignal():
+        _doResetPagination();
+      case PageReadyVotingSignal(:final page):
+        _pagingController.value = _pagingController.value.copyWith(
+          currentPage: page.page,
+          maxResults: page.total,
+          itemList: page.items,
+          error: const Optional.empty(),
+          isLoading: false,
+        );
+    }
   }
 
   @override
@@ -59,13 +104,12 @@ class _VotingPageState extends State<VotingPage> with SingleTickerProviderStateM
       initialMaxResults: 0,
     );
 
-    // TODO(dt-iohk): handle cubit initialisation when VotingCubit is there.
-    // context.read<ProposalsCubit>().init(
-    //       onlyMyProposals: widget.type?.isMy ?? false,
-    //       category: widget.categoryId,
-    //       type: proposalsFilterType,
-    //       order: const Alphabetical(),
-    //     );
+    context.read<VotingCubit>().init(
+          onlyMyProposals: widget.type?.isMy ?? false,
+          category: widget.categoryId,
+          type: proposalsFilterType,
+          order: const Alphabetical(),
+        );
 
     _pagingController
       ..addPageRequestListener(_handleProposalsPageRequest)
@@ -83,14 +127,17 @@ class _VotingPageState extends State<VotingPage> with SingleTickerProviderStateM
     return requestedType ?? ProposalsFilterType.total;
   }
 
+  void _doResetPagination() {
+    _pagingController.notifyPageRequestListeners(0);
+  }
+
   Future<void> _handleProposalsPageRequest(
     int pageKey,
     int pageSize,
     ProposalBrief? lastProposalId,
   ) async {
-    // TODO(dt-iohk): handle cubit callback when VotingCubit is there
-    // final request = PageRequest(page: pageKey, size: pageSize);
-    // await context.read<ProposalsCubit>().getProposals(request);
+    final request = PageRequest(page: pageKey, size: pageSize);
+    await context.read<VotingCubit>().getProposals(request);
   }
 
   void _updateRoute({
