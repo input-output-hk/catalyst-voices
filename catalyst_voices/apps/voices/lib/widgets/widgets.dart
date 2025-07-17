@@ -123,3 +123,4 @@ export 'user/catalyst_id_text.dart';
 export 'user/profile_avatar.dart';
 export 'user/profile_container.dart';
 export 'user/username_text.dart';
+export 'voting/vote_button.dart';
