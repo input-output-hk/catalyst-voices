@@ -19,20 +19,39 @@ use crate::db::index::queries::sync_status::get::SyncStatus;
 pub(crate) struct IndexedStatus(Vec<(Slot, Slot)>);
 
 impl IndexedStatus {
-    /// Apply an update by the provided index range
+    /// Apply an update by the provided index range.
     pub(crate) fn update(&mut self, start: Slot, end: Slot) {
         let mut new = Vec::new();
-        let mut current = (start, end);
+        let (mut current_start, mut current_end) = (start, end);
 
-        for rec in &self.0 {
-            if current.1 < rec.0 {
-                new.push(current);
+        for (rec_start, rec_end) in self.0.iter().copied() {
+            if rec_end < current_start {
+                // `current` value is fully after the `rec`.
+                // [ ... (`rec_start`, `rec_end`), (`current_start`, `current_end`) ...],
+                // store the `rec` and keep going without changing `current`.
+                new.push((rec_start, rec_end));
+                continue;
             }
-
-            current = *rec;
+            if current_end < rec_start {
+                // `current` value is fully before the `rec`.
+                // [ ... (`current_start`, `current_end`), (`rec_start`, `rec_end`) ...],
+                // store the `current` update it with `rec`.
+                new.push((current_start, current_end));
+                current_start = rec_start;
+                current_end = rec_end;
+                continue;
+            }
+            if rec_start < current_start {
+                // `rec` overlaps with the `current` one, update `current`.
+                current_start = rec_start;
+            }
+            if rec_end > current_end {
+                // `rec` overlaps with the `current` one, update `current`.
+                current_end = rec_end;
+            }
         }
 
-        new.push(current);
+        new.push((current_start, current_end));
 
         self.0 = new;
     }
@@ -202,19 +221,44 @@ mod tests {
         ]
         ; "case 6"
     )]
-    // #[test_case(
-    //     vec![
-    //         (10.into(), 20.into()),
-    //         (30.into(), 50.into()),
-    //         (60.into(), 80.into()),
-    //     ],
-    //     25.into(), 85.into() =>
-    //     vec![
-    //         (10.into(), 20.into()),
-    //         (25.into(), 85.into()),
-    //     ]
-    //     ; "case 3"
-    // )]
+    #[test_case(
+        vec![
+            (10.into(), 20.into()),
+            (30.into(), 50.into()),
+            (60.into(), 80.into()),
+        ],
+        25.into(), 85.into() =>
+        vec![
+            (10.into(), 20.into()),
+            (25.into(), 85.into()),
+        ]
+        ; "case 7"
+    )]
+    #[test_case(
+        vec![
+            (10.into(), 20.into()),
+            (30.into(), 50.into()),
+            (60.into(), 80.into()),
+        ],
+        5.into(), 55.into() =>
+        vec![
+            (5.into(), 55.into()),
+            (60.into(), 80.into()),
+        ]
+        ; "case 8"
+    )]
+    #[test_case(
+        vec![
+            (10.into(), 20.into()),
+            (30.into(), 50.into()),
+            (60.into(), 80.into()),
+        ],
+        5.into(), 85.into() =>
+        vec![
+            (5.into(), 85.into()),
+        ]
+        ; "case 9"
+    )]
     fn test_update(input: Vec<(Slot, Slot)>, start: Slot, end: Slot) -> Vec<(Slot, Slot)> {
         let mut v = IndexedStatus(input);
         v.update(start, end);
