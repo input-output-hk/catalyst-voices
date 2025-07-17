@@ -131,7 +131,7 @@ final class CoseSign extends Equatable {
     required Uint8List payload,
     required List<CatalystCoseSigner> signers,
   }) async {
-    // TODO(dtscalac): remove when server stops
+    // TODO(dt-iohk): remove when server stops
     // requiring alg header in body protected headers.
     protectedHeaders = protectedHeaders.copyWith(
       alg: () => signers.firstOrNull?.alg,

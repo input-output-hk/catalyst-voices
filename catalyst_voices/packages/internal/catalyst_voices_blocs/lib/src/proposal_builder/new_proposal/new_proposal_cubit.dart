@@ -102,7 +102,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
     } catch (error, stackTrace) {
       _logger.severe('Load', error, stackTrace);
 
-      // TODO(dtscalac): handle error state as dialog content,
+      // TODO(dt-iohk): handle error state as dialog content,
       // don't emit the error
       emitError(LocalizedException.create(error));
     }
