@@ -15,7 +15,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class ProposalIterationHistory extends StatefulWidget {
-  final UserProposalWorkspace proposal;
+  final UsersProposalOverview proposal;
 
   const ProposalIterationHistory({
     super.key,

@@ -3,7 +3,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-typedef UserProposalsSelectorState = ({bool show, List<UserProposalWorkspace> proposals});
+typedef UserProposalsSelectorState = ({bool show, List<UsersProposalOverview> proposals});
 
 class WorkspaceUserProposalsSelector extends StatelessWidget {
   const WorkspaceUserProposalsSelector({super.key});

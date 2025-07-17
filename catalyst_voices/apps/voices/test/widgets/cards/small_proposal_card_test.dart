@@ -4,7 +4,7 @@ import 'package:catalyst_voices/widgets/cards/proposal/proposal_card_widgets.dar
 import 'package:catalyst_voices/widgets/cards/proposal/small_proposal_card.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart'
-    show ProposalVersionViewModel, UserProposalWorkspace;
+    show ProposalVersionViewModel, UsersProposalOverview;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
@@ -13,7 +13,7 @@ import '../../helpers/helpers.dart';
 
 void main() {
   group('SmallProposalCard', () {
-    late UserProposalWorkspace mockProposal;
+    late UsersProposalOverview mockProposal;
     late String proposalId;
     late String latestVersion;
     late String localVersion;
@@ -29,7 +29,7 @@ void main() {
       latestVersion = const Uuid().v7();
       await Future.delayed(const Duration(milliseconds: 10), () {});
       localVersion = const Uuid().v7();
-      mockProposal = UserProposalWorkspace(
+      mockProposal = UsersProposalOverview(
         selfRef: SignedDocumentRef(id: proposalId, version: latestVersion),
         title: 'Test Proposal',
         updateDate: DateTime.now(),

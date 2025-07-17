@@ -9,7 +9,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class WorkspaceProposalCard extends StatelessWidget {
-  final UserProposalWorkspace proposal;
+  final UsersProposalOverview proposal;
 
   const WorkspaceProposalCard({
     super.key,
@@ -54,7 +54,7 @@ class WorkspaceProposalCard extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  final UserProposalWorkspace proposal;
+  final UsersProposalOverview proposal;
 
   const _Body(this.proposal);
 

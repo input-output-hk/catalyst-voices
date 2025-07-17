@@ -13,7 +13,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class SmallProposalCard extends StatelessWidget {
-  final UserProposalWorkspace proposal;
+  final UsersProposalOverview proposal;
   final bool showLatestLocal;
 
   const SmallProposalCard({
@@ -79,7 +79,7 @@ class SmallProposalCard extends StatelessWidget {
 }
 
 class _Details extends StatelessWidget {
-  final UserProposalWorkspace proposal;
+  final UsersProposalOverview proposal;
 
   const _Details({
     required this.proposal,

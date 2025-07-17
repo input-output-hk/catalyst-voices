@@ -3,7 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
-final class UserProposalWorkspace extends Equatable {
+final class UsersProposalOverview extends Equatable {
   final DocumentRef selfRef;
   final String title;
   final DateTime updateDate;
@@ -15,7 +15,7 @@ final class UserProposalWorkspace extends Equatable {
   final SignedDocumentRef categoryId;
   final int fundNumber;
 
-  const UserProposalWorkspace({
+  const UsersProposalOverview({
     required this.selfRef,
     required this.title,
     required this.updateDate,
@@ -28,8 +28,8 @@ final class UserProposalWorkspace extends Equatable {
     required this.fundNumber,
   });
 
-  factory UserProposalWorkspace.fromProposal(Proposal proposal, int fundNumber) {
-    return UserProposalWorkspace(
+  factory UsersProposalOverview.fromProposal(Proposal proposal, int fundNumber) {
+    return UsersProposalOverview(
       selfRef: proposal.selfRef,
       title: proposal.title,
       updateDate: proposal.updateDate,
@@ -68,7 +68,7 @@ final class UserProposalWorkspace extends Equatable {
         fundNumber,
       ];
 
-  UserProposalWorkspace copyWith({
+  UsersProposalOverview copyWith({
     DocumentRef? selfRef,
     String? title,
     DateTime? updateDate,
@@ -80,7 +80,7 @@ final class UserProposalWorkspace extends Equatable {
     SignedDocumentRef? categoryId,
     int? fundNumber,
   }) {
-    return UserProposalWorkspace(
+    return UsersProposalOverview(
       selfRef: selfRef ?? this.selfRef,
       title: title ?? this.title,
       updateDate: updateDate ?? this.updateDate,

@@ -202,14 +202,14 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     );
   }
 
-  List<UserProposalWorkspace> _mapProposalToViewModel(
+  List<UsersProposalOverview> _mapProposalToViewModel(
     List<Proposal> proposals,
     int fundNumber,
   ) {
-    return proposals.map((e) => UserProposalWorkspace.fromProposal(e, fundNumber)).toList();
+    return proposals.map((e) => UsersProposalOverview.fromProposal(e, fundNumber)).toList();
   }
 
-  List<UserProposalWorkspace> _removeProposal(
+  List<UsersProposalOverview> _removeProposal(
     DocumentRef proposalRef,
   ) {
     return [...state.userProposals]..removeWhere((e) => e.selfRef.id == proposalRef.id);
@@ -220,8 +220,8 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       (proposals) {
         if (isClosed) return;
         _logger.info('Stream received ${proposals.length} proposals');
-        // TODO(LynxxLynx): Get fund number from campaign service
-        add(LoadProposalsEvent(_mapProposalToViewModel(proposals..sort(), 14)));
+        // TODO(LynxxLynx): Get fund number from campaign service after #3056 is merged
+        add(LoadProposalsEvent(_mapProposalToViewModel(proposals..sort(), Campaign.f14FundNumber)));
       },
       onError: (Object error, StackTrace stackTrace) {
         if (isClosed) return;

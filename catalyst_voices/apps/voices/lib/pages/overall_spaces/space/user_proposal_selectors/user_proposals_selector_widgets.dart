@@ -1,7 +1,7 @@
 part of 'user_proposal_selectors.dart';
 
 class _DataProposalWidget extends StatelessWidget {
-  final List<UserProposalWorkspace> proposals;
+  final List<UsersProposalOverview> proposals;
   final String emptyMessage;
   final bool showLatestLocal;
 

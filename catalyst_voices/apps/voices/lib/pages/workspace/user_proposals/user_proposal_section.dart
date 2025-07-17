@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class UserProposalSection extends StatefulWidget {
-  final List<UserProposalWorkspace> items;
+  final List<UsersProposalOverview> items;
   final String title;
   final String info;
   final String learnMoreUrl;
@@ -25,7 +25,7 @@ class UserProposalSection extends StatefulWidget {
 }
 
 class _ListOfProposals extends StatelessWidget {
-  final List<UserProposalWorkspace> items;
+  final List<UsersProposalOverview> items;
   final String emptyTextMessage;
 
   const _ListOfProposals({
@@ -57,7 +57,7 @@ class _ListOfProposals extends StatelessWidget {
 
 class _ProposalVisibility extends StatelessWidget {
   final bool isExpanded;
-  final List<UserProposalWorkspace> items;
+  final List<UsersProposalOverview> items;
   final String emptyTextMessage;
 
   const _ProposalVisibility({

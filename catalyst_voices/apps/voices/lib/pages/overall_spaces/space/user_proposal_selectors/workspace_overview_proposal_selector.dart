@@ -26,7 +26,7 @@ class _WorkspaceDataProposalSelector extends StatelessWidget {
       children: [
         _Header(title: context.l10n.notPublishedProposals),
         BlocSelector<WorkspaceBloc, WorkspaceState,
-            DataVisibilityState<List<UserProposalWorkspace>>>(
+            DataVisibilityState<List<UsersProposalOverview>>>(
           selector: (state) {
             return (data: state.notPublished, show: state.showProposals && !state.isLoading);
           },

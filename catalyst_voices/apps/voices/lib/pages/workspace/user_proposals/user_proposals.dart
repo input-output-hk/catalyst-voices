@@ -8,7 +8,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
 
 class UserProposals extends StatefulWidget {
-  final List<UserProposalWorkspace> items;
+  final List<UsersProposalOverview> items;
 
   const UserProposals({super.key, required this.items});
 
@@ -29,9 +29,9 @@ class _Header extends StatelessWidget {
 }
 
 class _UserProposalsState extends State<UserProposals> {
-  List<UserProposalWorkspace> get _draft => widget.items.where((e) => e.publish.isDraft).toList();
-  List<UserProposalWorkspace> get _local => widget.items.where((e) => e.publish.isLocal).toList();
-  List<UserProposalWorkspace> get _submitted =>
+  List<UsersProposalOverview> get _draft => widget.items.where((e) => e.publish.isDraft).toList();
+  List<UsersProposalOverview> get _local => widget.items.where((e) => e.publish.isLocal).toList();
+  List<UsersProposalOverview> get _submitted =>
       widget.items.where((e) => e.publish.isPublished).toList();
 
   @override

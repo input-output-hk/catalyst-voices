@@ -32,6 +32,8 @@ final class Campaign extends CampaignBase {
     );
   }
 
+  static const f14FundNumber = 14;
+
   @override
   List<Object?> get props => [
         ...super.props,
