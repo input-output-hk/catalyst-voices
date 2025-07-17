@@ -11,7 +11,7 @@ fn dispatch_message<T: Debug>(s: &tokio::sync::broadcast::Sender<T>, msg: T) {
     let msg_debug = format!("{msg:?}");
     tracing::debug!(msg = msg_debug, "Dispatching message");
     if let Err(err) = s.send(msg) {
-        tracing::error!(error=%err, msg = msg_debug, "Unable to dispatch message.");
+        tracing::error!(error=%err, msg = msg_debug, "Unable to dispatch message. No any active receivers.");
     }
 }
 
