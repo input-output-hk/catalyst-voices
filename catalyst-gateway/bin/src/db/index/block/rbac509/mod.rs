@@ -107,20 +107,7 @@ impl Rbac509InsertQuery {
         }
 
         // Need to wait until the `cip509.previous_transaction` would be definitely indexed
-        loop {
-            let Some(state) = indexer_state.latest_state().await else {
-                error!(
-                    tx_hash = ?cip509.txn_hash(),
-                    "Chain indexer state channel closed during the RBAC 509 transaction indexing",
-                );
-                return;
-            };
-            if block.is_immutable() && state.is_immutable_indexed(block.slot()) {
-                break;
-            } else if state.is_reached_immutable_tip() {
-                break;
-            }
-        }
+        wait_for_indexing_up_to_block(indexer_state, block, cip509.txn_hash()).await;
 
         let previous_transaction = cip509.previous_transaction();
         match Box::pin(validate_rbac_registration(
@@ -283,5 +270,32 @@ impl Rbac509InsertQuery {
         }
 
         query_handles
+    }
+}
+
+/// Wait until up to the provided `block` everything would be indexed.
+async fn wait_for_indexing_up_to_block(
+    indexer_state: &mut ChainIndexerStateReceiver, block: &MultiEraBlock, tx_id: TransactionId,
+) {
+    loop {
+        let Some(state) = indexer_state.latest_state().await else {
+            error!(
+                tx_hash = ?tx_id,
+                "Chain indexer state channel closed during the RBAC 509 transaction indexing",
+            );
+            return;
+        };
+        if block.is_immutable() {
+            // for the immutable block we need to wait when everything would be indexed up to the
+            // current block
+            if state.is_immutable_indexed(block.slot()) {
+                break;
+            }
+        } else if state.is_reached_immutable_tip() {
+            // for the live block we should until the whole immutable part would be indexed, we are
+            // not waiting for the live part to be indexed, because in any case its indexing
+            // sequentially
+            break;
+        }
     }
 }

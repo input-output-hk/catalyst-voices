@@ -55,8 +55,8 @@ impl ChainIndexerStateSender {
         Self(tokio::sync::broadcast::channel(1).0)
     }
 
-    /// Updates to the latest state to all registered listeners.
-    pub(crate) fn update_state(&self, state: ChainIndexerState) {
+    /// Dispatches the latest state to all registered listeners.
+    pub(crate) fn dispatch_state(&self, state: ChainIndexerState) {
         dispatch_message(&self.0, state);
     }
 

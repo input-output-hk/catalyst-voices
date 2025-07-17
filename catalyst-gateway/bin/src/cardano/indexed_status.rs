@@ -15,16 +15,26 @@ use crate::db::index::queries::sync_status::get::SyncStatus;
 /// [(`block_0`, `block_100`), (`block_150`, `block_TIP`)],
 /// NOT indexed chunk is from `block_100` to `block_150`, the rest of the data is
 /// indexed already
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub(crate) struct IndexedStatus(Vec<(Slot, Slot)>);
 
 impl IndexedStatus {
     /// Apply an update by the provided index range
     pub(crate) fn update(&mut self, start: Slot, end: Slot) {
-        let _ = self;
-        let _ = start;
-        let _ = end;
-        unimplemented!("TODO: in progress");
+        let mut new = Vec::new();
+        let mut current = (start, end);
+
+        for rec in &self.0 {
+            if current.1 < rec.0 {
+                new.push(current);
+            }
+
+            current = *rec;
+        }
+
+        new.push(current);
+
+        self.0 = new;
     }
 }
 
@@ -104,7 +114,112 @@ fn merge_consecutive_indexed_chunks(mut synced_chunks: Vec<(Slot, Slot)>) -> Vec
 
 #[cfg(test)]
 mod tests {
+    use test_case::test_case;
+
     use super::*;
+
+    #[test_case(
+        vec![
+            (10.into(), 20.into()),
+            (30.into(), 50.into()),
+            (60.into(), 80.into()),
+        ],
+        5.into(), 25.into() =>
+        vec![
+            (5.into(), 25.into()),
+            (30.into(), 50.into()),
+            (60.into(), 80.into()),
+        ]
+        ; "case 1"
+    )]
+    #[test_case(
+        vec![
+            (10.into(), 20.into()),
+            (30.into(), 50.into()),
+            (60.into(), 80.into()),
+        ],
+        25.into(), 55.into() =>
+        vec![
+            (10.into(), 20.into()),
+            (25.into(), 55.into()),
+            (60.into(), 80.into()),
+        ]
+        ; "case 2"
+    )]
+    #[test_case(
+        vec![
+            (10.into(), 20.into()),
+            (30.into(), 50.into()),
+            (60.into(), 80.into()),
+        ],
+        5.into(), 15.into() =>
+        vec![
+            (5.into(), 20.into()),
+            (30.into(), 50.into()),
+            (60.into(), 80.into()),
+        ]
+        ; "case 3"
+    )]
+    #[test_case(
+        vec![
+            (10.into(), 20.into()),
+            (30.into(), 50.into()),
+            (60.into(), 80.into()),
+        ],
+        25.into(), 40.into() =>
+        vec![
+            (10.into(), 20.into()),
+            (25.into(), 50.into()),
+            (60.into(), 80.into()),
+        ]
+        ; "case 4"
+    )]
+    #[test_case(
+        vec![
+            (10.into(), 20.into()),
+            (30.into(), 50.into()),
+            (60.into(), 80.into()),
+        ],
+        15.into(), 25.into() =>
+        vec![
+            (10.into(), 25.into()),
+            (30.into(), 50.into()),
+            (60.into(), 80.into()),
+        ]
+        ; "case 5"
+    )]
+    #[test_case(
+        vec![
+            (10.into(), 20.into()),
+            (30.into(), 50.into()),
+            (60.into(), 80.into()),
+        ],
+        35.into(), 55.into() =>
+        vec![
+            (10.into(), 20.into()),
+            (30.into(), 55.into()),
+            (60.into(), 80.into()),
+        ]
+        ; "case 6"
+    )]
+    // #[test_case(
+    //     vec![
+    //         (10.into(), 20.into()),
+    //         (30.into(), 50.into()),
+    //         (60.into(), 80.into()),
+    //     ],
+    //     25.into(), 85.into() =>
+    //     vec![
+    //         (10.into(), 20.into()),
+    //         (25.into(), 85.into()),
+    //     ]
+    //     ; "case 3"
+    // )]
+    fn test_update(input: Vec<(Slot, Slot)>, start: Slot, end: Slot) -> Vec<(Slot, Slot)> {
+        let mut v = IndexedStatus(input);
+        v.update(start, end);
+        v.0
+    }
 
     #[test]
     fn test_merge_consecutive_indexed_chunks() {

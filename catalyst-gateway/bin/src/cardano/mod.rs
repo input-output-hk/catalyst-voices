@@ -457,7 +457,7 @@ impl SyncTask {
         let state_recv = self.state_channel.subscribe();
         // immediately setting the latest state, do the `state_recv` will always have at least one
         // value
-        self.update_state();
+        self.dispatch_state();
 
         self.sync_tasks.push(sync_subchain(
             params,
@@ -581,7 +581,7 @@ impl SyncTask {
                                     live_slot: self.live_tip_slot,
                                 },
                             );
-                            self.update_state();
+                            self.dispatch_state();
                             info!(chain=%self.cfg.chain, report=%finished, "Chain Indexer finished reaching TIP.");
 
                             self.start_immutable_followers();
@@ -602,7 +602,7 @@ impl SyncTask {
                                     finished.start.slot_or_default(),
                                     finished.end.slot_or_default(),
                                 );
-                                self.update_state();
+                                self.dispatch_state();
 
                                 finished.last_indexed_block.as_ref().inspect(|block| {
                                     self.event_channel.dispatch_event(
@@ -736,13 +736,13 @@ impl SyncTask {
         Some((start_slot, Point::fuzzy(end)))
     }
 
-    /// Updates with the current state a `state_channel`
-    fn update_state(&self) {
+    /// Dispatches the current state through the `state_channel`
+    fn dispatch_state(&self) {
         let state = ChainIndexerState {
             immutable_tip_slot: self.immutable_tip_slot,
             immutable_indexed_status: self.immutable_indexed_status.clone(),
         };
-        self.state_channel.update_state(state);
+        self.state_channel.dispatch_state(state);
     }
 }
 
