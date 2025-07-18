@@ -194,7 +194,6 @@ async fn store_document_in_db(
         doc.doc_id()?.into(),
         doc.doc_ver()?.into(),
         doc.doc_type()?
-            .doc_types()
             .into_iter()
             .map(catalyst_signed_doc::UuidV4::uuid)
             .collect(),
