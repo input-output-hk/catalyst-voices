@@ -37,7 +37,7 @@ jobs:
           command: run
           args: +check-spelling
 
-  test_reporting:
-    if: always()
-    needs: ci
-    uses: ./.github/workflows/generate-allure-report.yml
+  # test_reporting:
+  #   if: always()
+  #   needs: ci
+  #   uses: ./.github/workflows/generate-allure-report.yml
