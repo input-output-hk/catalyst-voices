@@ -30,6 +30,7 @@ jobs:
           version: 0.18.0
       - name: Setup
         uses: input-output-hk/catalyst-forge/actions/setup@fix/earthly-issues
+      - run: docker info
       - name: Run
         uses: input-output-hk/catalyst-forge/actions/run@fix/earthly-issues
         with:
