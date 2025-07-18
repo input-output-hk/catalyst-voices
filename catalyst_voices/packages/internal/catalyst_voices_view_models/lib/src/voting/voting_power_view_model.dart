@@ -2,12 +2,12 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class VotingPowerViewModel extends Equatable {
-  final String power;
+  final String amount;
   final VotingPowerStatus status;
   final DateTime updatedAt;
 
   const VotingPowerViewModel({
-    required this.power,
+    required this.amount,
     required this.status,
     required this.updatedAt,
   });
@@ -15,12 +15,12 @@ final class VotingPowerViewModel extends Equatable {
   factory VotingPowerViewModel.fromModel(VotingPower votingPower) {
     return VotingPowerViewModel(
       // TODO(dt-iohk): consider how to format big numbers
-      power: votingPower.power.toString(),
+      amount: votingPower.amount.toString(),
       status: votingPower.status,
       updatedAt: votingPower.updatedAt,
     );
   }
 
   @override
-  List<Object?> get props => [power, status, updatedAt];
+  List<Object?> get props => [amount, status, updatedAt];
 }

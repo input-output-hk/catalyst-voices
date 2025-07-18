@@ -189,7 +189,7 @@ class _VotingPowerValueRow extends StatelessWidget {
         SizedBox(
           width: _votingPowerWidth,
           child: Text(
-            votingPower.power,
+            votingPower.amount,
             style: theme.textTheme.displayMedium?.copyWith(
               color: theme.colors.textOnPrimaryLevel1,
             ),
