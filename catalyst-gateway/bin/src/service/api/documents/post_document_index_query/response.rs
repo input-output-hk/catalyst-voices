@@ -6,12 +6,16 @@ use poem_openapi::{
 };
 
 use super::SignedDocBody;
-use crate::service::common::{
-    self,
-    types::{
-        array_types::impl_array_types,
-        document::{
-            doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
+use crate::service::{
+    api::documents::common::compat,
+    common::{
+        self,
+        types::{
+            array_types::impl_array_types,
+            document::{
+                doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId,
+                ver::DocumentVer,
+            },
         },
     },
 };
@@ -248,7 +252,8 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
 
     fn try_from(doc: SignedDocBody) -> Result<Self, Self::Error> {
         // this will accept only older version
-        if !is_deprecated(&doc)? {
+        let (doc_type_old, doc_ref_old) = compat::is_deprecated(&doc)?;
+        if doc_type_old || doc_ref_old {
             return Err(anyhow::anyhow!(DEPRECATED_MARK));
         }
 
@@ -301,25 +306,4 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
             parameters,
         }))
     }
-}
-
-fn is_deprecated(doc: &SignedDocBody) -> Result<bool, anyhow::Error> {
-    if let Some(json_meta) = doc.metadata() {
-        let meta = catalyst_signed_doc::Metadata::from_json(json_meta.clone())?;
-
-        let doc_type_old = doc.doc_type().len() == 1;
-
-        if let Some(doc_refs) = meta.doc_ref() {
-            let doc_ref_old = doc_refs
-                .doc_refs()
-                .iter()
-                .any(|doc_ref| doc_ref.doc_locator().is_empty());
-
-            return Ok(doc_ref_old || doc_type_old);
-        }
-
-        return Ok(doc_type_old);
-    }
-
-    Ok(false)
 }
