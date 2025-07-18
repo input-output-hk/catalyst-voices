@@ -106,17 +106,6 @@ final class Dependencies extends DependencyProvider {
           get<ProposalService>(),
         ),
       )
-      ..registerFactory<CampaignDetailsBloc>(() {
-        return CampaignDetailsBloc(
-          get<CampaignService>(),
-        );
-      })
-      ..registerLazySingleton<CampaignInfoCubit>(() {
-        return CampaignInfoCubit(
-          get<CampaignService>(),
-          get<AdminTools>(),
-        );
-      })
       // TODO(LynxLynxx): add repository for campaign management
       ..registerLazySingleton<CampaignBuilderCubit>(
         CampaignBuilderCubit.new,

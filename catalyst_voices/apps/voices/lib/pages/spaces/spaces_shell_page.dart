@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/space_ext.dart';
 import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_dialog.dart';
-import 'package:catalyst_voices/pages/campaign/details/widgets/campaign_management.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
@@ -177,9 +176,7 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
 
   List<Widget> _getActions(Space space, bool isProposer) {
     if (space == Space.treasury) {
-      return const [
-        CampaignManagement(),
-      ];
+      return const [];
     } else {
       return [
         if (space == Space.discovery && isProposer) const CreateProposalButton(),

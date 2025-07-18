@@ -162,8 +162,12 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     GetTimelineItemsEvent event,
     Emitter<WorkspaceState> emit,
   ) async {
-    final timelineItems = await _campaignService.getCampaignTimeline();
-    final timeline = timelineItems.map(CampaignTimelineViewModel.fromModel).toList();
+    final campaign = await _campaignService.getActiveCampaign();
+    if (campaign == null) {
+      return emitError(const LocalizedUnknownException());
+    }
+
+    final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
 
     emit(state.copyWith(timelineItems: timeline));
     emitSignal(SubmissionCloseDate(date: state.submissionCloseDate));
