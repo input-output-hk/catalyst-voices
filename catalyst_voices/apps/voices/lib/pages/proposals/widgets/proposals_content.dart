@@ -1,10 +1,18 @@
-part of '../proposals_page.dart';
+import 'package:catalyst_voices/pages/proposals/widgets/proposals_controls.dart';
+import 'package:catalyst_voices/pages/proposals/widgets/proposals_pagination.dart';
+import 'package:catalyst_voices/pages/proposals/widgets/proposals_sub_header.dart';
+import 'package:catalyst_voices/pages/proposals/widgets/proposals_tabs.dart';
+import 'package:catalyst_voices/pages/proposals/widgets/proposals_tabs_divider.dart';
+import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:flutter/material.dart';
 
-class _ProposalsContent extends StatelessWidget {
+class ProposalsContent extends StatelessWidget {
   final TabController tabController;
   final PagingController<ProposalBrief> pagingController;
 
-  const _ProposalsContent({
+  const ProposalsContent({
+    super.key,
     required this.tabController,
     required this.pagingController,
   });

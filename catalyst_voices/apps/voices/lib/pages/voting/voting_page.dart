@@ -1,5 +1,7 @@
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
+import 'package:catalyst_voices/pages/voting/widgets/voting_content.dart';
+import 'package:catalyst_voices/pages/voting/widgets/voting_header.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/layouts/header_and_content_layout.dart';
 import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
@@ -7,9 +9,6 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
-
-part 'widgets/voting_content.dart';
-part 'widgets/voting_header.dart';
 
 class VotingPage extends StatefulWidget {
   final SignedDocumentRef? categoryId;
@@ -36,8 +35,8 @@ class _VotingPageState extends State<VotingPage>
   @override
   Widget build(BuildContext context) {
     return const HeaderAndContentLayout(
-      header: _VotingHeader(),
-      content: _VotingContent(),
+      header: VotingHeader(),
+      content: VotingContent(),
     );
   }
 

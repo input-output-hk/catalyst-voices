@@ -1,7 +1,7 @@
-part of '../voting_page.dart';
+import 'package:flutter/material.dart';
 
-class _VotingHeader extends StatelessWidget {
-  const _VotingHeader();
+class VotingHeader extends StatelessWidget {
+  const VotingHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
