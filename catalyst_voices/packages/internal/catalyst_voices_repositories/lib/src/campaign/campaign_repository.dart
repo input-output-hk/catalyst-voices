@@ -8,8 +8,6 @@ abstract interface class CampaignRepository {
     required String id,
   });
 
-  Future<List<CampaignCategory>> getCampaignCategories();
-
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 }
 
@@ -21,11 +19,6 @@ final class CampaignRepositoryImpl implements CampaignRepository {
     required String id,
   }) async {
     return Campaign.f14();
-  }
-
-  @override
-  Future<List<CampaignCategory>> getCampaignCategories() async {
-    return staticCampaignCategories;
   }
 
   @override
