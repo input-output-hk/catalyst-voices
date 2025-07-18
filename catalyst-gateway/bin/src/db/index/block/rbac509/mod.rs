@@ -107,15 +107,12 @@ impl Rbac509InsertQuery {
             );
         }
 
-        // Slots arithmetic has saturating semantic, so this is ok.
-        #[allow(clippy::arithmetic_side_effects)]
-        let wait_to = range_start - 1.into();
         // There are multiple parallel tasks that are indexing ranges of blocks such as `0..100`,
         // `100..200`, etc. We need to wait for all previous ranges to be indexed before
         // processing a RBAC registration.
         wait_for_indexing_up_to_block(
             indexer_state,
-            wait_to,
+            range_start,
             cip509.txn_hash(),
             block.is_immutable(),
         )
