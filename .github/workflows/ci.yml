@@ -22,7 +22,7 @@ jobs:
       forge_version: 0.18.0
       local: true
 
-  # TODO: disable it when `local: true` would be enabled for the `ci` job, enable when the solution would be reworked
+  # TODO: Enable when our earthly self-satellites will be back and remove `local: true` flag
   # test_reporting:
   #   if: always()
   #   needs: ci
