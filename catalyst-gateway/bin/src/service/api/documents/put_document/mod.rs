@@ -16,7 +16,6 @@ use crate::{
         index::session::CassandraSessionError,
     },
     service::{
-        api::documents::common::compat,
         common::{
             auth::rbac::token::CatalystRBACTokenV1, responses::WithErrorResponses,
             types::headers::retry_after::RetryAfterOption,
@@ -200,8 +199,6 @@ async fn store_document_in_db(
         authors,
         Some(doc_meta_json),
     );
-
-    let doc_body = compat::to_new_version(doc_body)?;
 
     FullSignedDoc::new(doc_body, payload, doc_bytes)
         .store()

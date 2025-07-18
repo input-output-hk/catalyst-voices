@@ -39,23 +39,19 @@ pub(crate) fn to_new_version(doc: SignedDocBody) -> Result<SignedDocBody, anyhow
     if doc_type_old || doc_ref_old {
         // TODO: rename brand_id, campaign_id and category_id to
         // the parameters and also make transformation of the DocumentRef  type
-        // TODO: transform all template, ref,  reply  etc. fields which are DocumentRef into the
-        // newer format.
-
+        
         let doc_type = if doc_type_old {
-            let uuid = doc
+            match doc
                 .doc_type()
                 .first()
                 .map(|uuid| -> Result<_, anyhow::Error> {
                     let uuid = UuidV4::try_from(uuid.clone())?;
                     Ok(catalyst_signed_doc::map_doc_type(uuid))
                 })
-                .transpose()?;
-
-            if let Some(uuid) = uuid {
-                uuid.try_into()?
-            } else {
-                doc.doc_type().clone()
+                .transpose()?
+            {
+                Some(uuid) => uuid.try_into()?,
+                None => doc.doc_type().clone(),
             }
         } else {
             doc.doc_type().clone()
@@ -70,7 +66,13 @@ pub(crate) fn to_new_version(doc: SignedDocBody) -> Result<SignedDocBody, anyhow
             None
         };
 
-        let doc = SignedDocBody::new(*doc.id(), *doc.ver(), doc_type, doc.authors().clone(), metadata);
+        let doc = SignedDocBody::new(
+            *doc.id(),
+            *doc.ver(),
+            doc_type,
+            doc.authors().clone(),
+            metadata,
+        );
 
         Ok(doc)
     } else {
