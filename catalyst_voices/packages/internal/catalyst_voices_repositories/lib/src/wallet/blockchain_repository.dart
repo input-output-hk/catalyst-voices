@@ -5,7 +5,7 @@ import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/dto/blockchain/network_id_dto.dart';
 
-// TODO(dtscalac): move wallet related repository code here
+// TODO(dt-iohk): move wallet related repository code here
 // ignore: one_member_abstracts
 abstract interface class BlockchainRepository {
   const factory BlockchainRepository(ApiServices apiServices) = BlockchainRepositoryImpl;
