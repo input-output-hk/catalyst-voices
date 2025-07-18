@@ -169,7 +169,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
     final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
 
-    emit(state.copyWith(timelineItems: timeline));
+    emit(state.copyWith(timelineItems: timeline, fundNumber: campaign.fundNumber));
     emitSignal(SubmissionCloseDate(date: state.submissionCloseDate));
   }
 
@@ -224,8 +224,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       (proposals) {
         if (isClosed) return;
         _logger.info('Stream received ${proposals.length} proposals');
-        // TODO(LynxxLynx): Get fund number from campaign service after #3056 is merged
-        add(LoadProposalsEvent(_mapProposalToViewModel(proposals..sort(), Campaign.f14FundNumber)));
+        add(LoadProposalsEvent(_mapProposalToViewModel(proposals..sort(), state.fundNumber)));
       },
       onError: (Object error, StackTrace stackTrace) {
         if (isClosed) return;

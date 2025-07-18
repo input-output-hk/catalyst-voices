@@ -8,12 +8,14 @@ final class WorkspaceState extends Equatable {
   final LocalizedException? error;
   final List<UsersProposalOverview> userProposals;
   final List<CampaignTimelineViewModel> timelineItems;
+  final int fundNumber;
 
   const WorkspaceState({
     this.isLoading = false,
     this.error,
     this.userProposals = const [],
     this.timelineItems = const [],
+    this.fundNumber = 0,
   });
 
   bool get hasComments => userProposals.any((e) => e.commentsCount > 0);
@@ -32,6 +34,7 @@ final class WorkspaceState extends Equatable {
         error,
         userProposals,
         timelineItems,
+        fundNumber,
       ];
 
   List<UsersProposalOverview> get published =>
@@ -54,12 +57,14 @@ final class WorkspaceState extends Equatable {
     Optional<LocalizedException>? error,
     List<UsersProposalOverview>? userProposals,
     List<CampaignTimelineViewModel>? timelineItems,
+    int? fundNumber,
   }) {
     return WorkspaceState(
       isLoading: isLoading ?? this.isLoading,
       error: error.dataOr(this.error),
       userProposals: userProposals ?? this.userProposals,
       timelineItems: timelineItems ?? this.timelineItems,
+      fundNumber: fundNumber ?? this.fundNumber,
     );
   }
 }
