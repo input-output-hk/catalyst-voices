@@ -7,23 +7,27 @@ class CampaignPhaseCountdownViewModel extends Equatable {
   final int fundNumber;
   final CampaignPhaseType type;
 
-  CampaignPhaseCountdownViewModel({
-    DateTime? dateTime,
+  const CampaignPhaseCountdownViewModel({
+    required this.date,
     required this.fundNumber,
     required this.type,
-  })  : assert(dateTime != null, 'dateTime must not be null'),
-        date = dateTime!;
+  });
 
   factory CampaignPhaseCountdownViewModel.fromCampaignPhase({
     required CampaignPhase phase,
     required int fundNumber,
     bool useFromDate = true,
   }) {
-    return CampaignPhaseCountdownViewModel(
-      dateTime: useFromDate ? phase.timeline.from : phase.timeline.to,
-      fundNumber: fundNumber,
-      type: phase.type,
-    );
+    final dateTime = useFromDate ? phase.timeline.from : phase.timeline.to;
+
+    if (dateTime case final date?) {
+      return CampaignPhaseCountdownViewModel(
+        date: date,
+        fundNumber: fundNumber,
+        type: phase.type,
+      );
+    }
+    throw ArgumentError('DateTime is null');
   }
 
   @override

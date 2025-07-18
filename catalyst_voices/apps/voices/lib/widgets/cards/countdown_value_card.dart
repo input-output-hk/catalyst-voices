@@ -77,7 +77,7 @@ class CountDownValueCard extends StatelessWidget {
       : Colors.black.withValues(alpha: 0.2);
 
   List<int> _getDigits(int value) {
-    final digits = value.toString().split('').map(int.parse).toList();
+    final digits = value.toString().characters.map(int.parse).toList();
     if (digits.length == 1) {
       return [0, digits[0]];
     }
@@ -129,52 +129,59 @@ class _DigitWidgetState extends State<_DigitWidget> with SingleTickerProviderSta
       width: 45,
       height: _digitHeight,
       child: ClipRect(
-        child: AnimatedBuilder(
-          animation: _animation,
-          builder: (context, child) {
-            return Stack(
-              alignment: Alignment.topCenter,
-              clipBehavior: Clip.none,
-              fit: StackFit.expand,
-              children: [
-                if (_previousDigit != widget.digit) ...[
-                  // Previous digit - moves down and fades out
-                  Positioned(
-                    top: _offset,
-                    left: 0,
-                    right: 0,
-                    height: _digitHeight,
-                    child: Transform.translate(
+        child: Stack(
+          alignment: Alignment.topCenter,
+          clipBehavior: Clip.none,
+          fit: StackFit.expand,
+          children: [
+            if (_previousDigit != widget.digit) ...[
+              // Previous digit - moves down and fades out
+              Positioned(
+                top: _offset,
+                left: 0,
+                right: 0,
+                height: _digitHeight,
+                child: AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    return Transform.translate(
                       offset: Offset(0, _animation.value * _fallDistance),
                       child: Opacity(
                         opacity: 1 - _animation.value,
-                        child: _DigitText(value: _previousDigit, textAlign: widget.textAlign),
+                        child: child,
                       ),
-                    ),
-                  ),
-                  // New digit - falls from top of container
-                  Positioned(
-                    top: -_fallDistance + _offset,
-                    left: 0,
-                    right: 0,
-                    height: _digitHeight,
-                    child: Transform.translate(
+                    );
+                  },
+                  child: _DigitText(value: _previousDigit, textAlign: widget.textAlign),
+                ),
+              ),
+              // New digit - falls from top of container
+              Positioned(
+                top: -_fallDistance + _offset,
+                left: 0,
+                right: 0,
+                height: _digitHeight,
+                child: AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    return Transform.translate(
                       offset: Offset(0, _animation.value * _fallDistance),
                       child: Opacity(
                         opacity: _animation.value,
-                        child: _DigitText(value: widget.digit, textAlign: widget.textAlign),
+                        child: child,
                       ),
-                    ),
-                  ),
-                ] else ...[
-                  Positioned(
-                    top: _offset,
-                    child: _DigitText(value: widget.digit, textAlign: widget.textAlign),
-                  ),
-                ],
-              ],
-            );
-          },
+                    );
+                  },
+                  child: _DigitText(value: widget.digit, textAlign: widget.textAlign),
+                ),
+              ),
+            ] else ...[
+              Positioned(
+                top: _offset,
+                child: _DigitText(value: widget.digit, textAlign: widget.textAlign),
+              ),
+            ],
+          ],
         ),
       ),
     );
