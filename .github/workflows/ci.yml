@@ -17,28 +17,28 @@ permissions:
 
 jobs:
   ci:
-    # uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.4
-    # with:
-    #   forge_version: 0.18.0
-    #   local: true
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@fix/earthly-issues
-        with:
-          version: 0.18.0
-      - name: Setup
-        uses: input-output-hk/catalyst-forge/actions/setup@fix/earthly-issues
-      - run: docker info
-      - name: Run
-        uses: input-output-hk/catalyst-forge/actions/run@fix/earthly-issues
-        with:
-          local: true
-          command: run
-          args: +check-spelling
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.4
+    with:
+      forge_version: 0.18.0
+      local: true
+    # runs-on: ubuntu-latest
+    # steps:
+    #   - uses: actions/checkout@v4
+    #   - name: Install Forge
+    #     uses: input-output-hk/catalyst-forge/actions/install@fix/earthly-issues
+    #     with:
+    #       version: 0.18.0
+    #   - name: Setup
+    #     uses: input-output-hk/catalyst-forge/actions/setup@fix/earthly-issues
+    #   - run: docker info
+    #   - name: Run
+    #     uses: input-output-hk/catalyst-forge/actions/run@fix/earthly-issues
+    #     with:
+    #       local: true
+    #       command: run
+    #       args: +check-spelling
 
-  # test_reporting:
-  #   if: always()
-  #   needs: ci
-  #   uses: ./.github/workflows/generate-allure-report.yml
+  test_reporting:
+    if: always()
+    needs: ci
+    uses: ./.github/workflows/generate-allure-report.yml
