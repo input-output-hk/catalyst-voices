@@ -39,10 +39,18 @@ final class CampaignServiceImpl implements CampaignService {
     final campaignProposals = await _proposalRepository.getProposals(
       type: ProposalsFilterType.finals,
     );
+    final proposalSubmissionTime =
+        campaign.phaseStateTo(CampaignPhaseType.proposalSubmission).phase.timeline.to;
     final totalAsk = _calculateTotalAsk(campaignProposals);
-    final updatedCategories = await _updateCategories(campaign.categories);
+    final updatedCategories = await _updateCategories(
+      campaign.categories,
+      proposalSubmissionTime,
+    );
 
-    return campaign.copyWith(totalAsk: totalAsk, categories: updatedCategories);
+    return campaign.copyWith(
+      totalAsk: totalAsk,
+      categories: updatedCategories,
+    );
   }
 
   @override
@@ -88,10 +96,11 @@ final class CampaignServiceImpl implements CampaignService {
     return totalAskBalance.coin;
   }
 
-  Future<List<CampaignCategory>> _updateCategories(List<CampaignCategory> categories) async {
+  Future<List<CampaignCategory>> _updateCategories(
+    List<CampaignCategory> categories,
+    DateTime? proposalSubmissionTime,
+  ) async {
     final updatedCategories = <CampaignCategory>[];
-    final proposalSubmissionStage =
-        await getCampaignPhaseTimeline(CampaignPhaseType.proposalSubmission);
 
     for (final category in categories) {
       final categoryProposals = await _proposalRepository.getProposals(
@@ -103,7 +112,7 @@ final class CampaignServiceImpl implements CampaignService {
       final updatedCategory = category.copyWith(
         totalAsk: totalAsk,
         proposalsCount: categoryProposals.length,
-        submissionCloseDate: proposalSubmissionStage.timeline.to,
+        submissionCloseDate: proposalSubmissionTime,
       );
       updatedCategories.add(updatedCategory);
     }

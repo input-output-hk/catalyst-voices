@@ -50,30 +50,40 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   }
 
   Future<void> getCurrentCampaign() async {
-    emit(
-      state.copyWith(
-        campaign: const DiscoveryCurrentCampaignState(),
-      ),
-    );
-    // TODO(LynxLynxx): remove this when we have a better way to get the active campaign
-    final campaign = await _campaignService.getCampaign(id: Campaign.f14Ref.id);
-    final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
-    final currentCampaign = CurrentCampaignInfoViewModel.fromModel(campaign);
-    final categoriesModel =
-        campaign.categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
-
-    if (!isClosed) {
+    try {
       emit(
         state.copyWith(
-          campaign: DiscoveryCurrentCampaignState(
-            currentCampaign: currentCampaign,
-            campaignTimeline: timeline,
-            isLoading: false,
+          campaign: const DiscoveryCurrentCampaignState(),
+          categories: const DiscoveryCampaignCategoriesState(),
+        ),
+      );
+      // TODO(LynxLynxx): remove this when we have a better way to get the active campaign
+      final campaign = await _campaignService.getCampaign(id: Campaign.f14Ref.id);
+      final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
+      final currentCampaign = CurrentCampaignInfoViewModel.fromModel(campaign);
+      final categoriesModel =
+          campaign.categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
+      if (!isClosed) {
+        emit(
+          state.copyWith(
+            campaign: DiscoveryCurrentCampaignState(
+              currentCampaign: currentCampaign,
+              campaignTimeline: timeline,
+              isLoading: false,
+            ),
+            categories: DiscoveryCampaignCategoriesState(
+              isLoading: false,
+              categories: categoriesModel,
+            ),
           ),
-          categories: DiscoveryCampaignCategoriesState(
-            isLoading: false,
-            categories: categoriesModel,
-          ),
+        );
+      }
+    } catch (e, st) {
+      _logger.severe('Error getting current campaign', e, st);
+      emit(
+        state.copyWith(
+          categories: DiscoveryCampaignCategoriesState(error: LocalizedException.create(e)),
+          campaign: DiscoveryCurrentCampaignState(error: LocalizedException.create(e)),
         ),
       );
     }
