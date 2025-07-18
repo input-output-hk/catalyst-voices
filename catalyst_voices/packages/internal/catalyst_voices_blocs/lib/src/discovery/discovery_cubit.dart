@@ -45,33 +45,8 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   Future<void> getAllData() async {
     await Future.wait([
       getCurrentCampaign(),
-      getCampaignCategories(),
       getMostRecentProposals(),
     ]);
-  }
-
-  Future<void> getCampaignCategories() async {
-    emit(
-      state.copyWith(
-        categories: const DiscoveryCampaignCategoriesState(),
-      ),
-    );
-
-    final categories = await _campaignService.getCampaignCategories();
-    final categoriesModel = categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
-
-    // TODO(damian-molinski): create VoicesBloc / VoicesCubit where this
-    // always will be checked.
-    if (!isClosed) {
-      emit(
-        state.copyWith(
-          categories: DiscoveryCampaignCategoriesState(
-            isLoading: false,
-            categories: categoriesModel,
-          ),
-        ),
-      );
-    }
   }
 
   Future<void> getCurrentCampaign() async {
@@ -80,17 +55,24 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
         campaign: const DiscoveryCurrentCampaignState(),
       ),
     );
-    final campaign = await _campaignService.getCurrentCampaign();
-    final campaignTimeline = await _campaignService.getCampaignTimeline();
+    // TODO(LynxLynxx): remove this when we have a better way to get the active campaign
+    final campaign = await _campaignService.getCampaign(id: Campaign.f14Ref.id);
+    final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
     final currentCampaign = CurrentCampaignInfoViewModel.fromModel(campaign);
+    final categoriesModel =
+        campaign.categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
 
     if (!isClosed) {
       emit(
         state.copyWith(
           campaign: DiscoveryCurrentCampaignState(
             currentCampaign: currentCampaign,
-            campaignTimeline: campaignTimeline,
+            campaignTimeline: timeline,
             isLoading: false,
+          ),
+          categories: DiscoveryCampaignCategoriesState(
+            isLoading: false,
+            categories: categoriesModel,
           ),
         ),
       );
