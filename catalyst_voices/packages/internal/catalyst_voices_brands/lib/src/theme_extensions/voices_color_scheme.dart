@@ -72,6 +72,16 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final List<Color> headerGradient;
   final List<Color> headerGradientSecondary;
   final List<Color> cardBackgroundGradient;
+  final Color votingPositivePrimary;
+  final Color votingPositiveHover;
+  final Color votingPositiveVoted;
+  final Color votingAbstainPrimary;
+  final Color votingAbstainHover;
+  final Color votingAbstainVoted;
+  final Color votingNegativePrimary;
+  final Color votingNegativeHover;
+  final Color votingNegativeVoted;
+  final Color votingOverlay;
 
   const VoicesColorScheme({
     required this.textPrimary,
@@ -139,6 +149,16 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.headerGradient,
     required this.headerGradientSecondary,
     required this.cardBackgroundGradient,
+    required this.votingPositivePrimary,
+    required this.votingPositiveHover,
+    required this.votingPositiveVoted,
+    required this.votingAbstainPrimary,
+    required this.votingAbstainHover,
+    required this.votingAbstainVoted,
+    required this.votingNegativePrimary,
+    required this.votingNegativeHover,
+    required this.votingNegativeVoted,
+    required this.votingOverlay,
   });
 
   @visibleForTesting
@@ -208,6 +228,16 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     this.headerGradient = const [],
     this.headerGradientSecondary = const [],
     this.cardBackgroundGradient = const [],
+    this.votingPositivePrimary = Colors.black,
+    this.votingPositiveHover = Colors.black,
+    this.votingPositiveVoted = Colors.black,
+    this.votingAbstainPrimary = Colors.black,
+    this.votingAbstainHover = Colors.black,
+    this.votingAbstainVoted = Colors.black,
+    this.votingNegativePrimary = Colors.black,
+    this.votingNegativeHover = Colors.black,
+    this.votingNegativeVoted = Colors.black,
+    this.votingOverlay = Colors.black,
   });
 
   @override
@@ -277,6 +307,16 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     List<Color>? headerGradient,
     List<Color>? headerGradientSecondary,
     List<Color>? cardBackgroundGradient,
+    Color? votingPositivePrimary,
+    Color? votingPositiveHover,
+    Color? votingPositiveVoted,
+    Color? votingAbstainPrimary,
+    Color? votingAbstainHover,
+    Color? votingAbstainVoted,
+    Color? votingNegativePrimary,
+    Color? votingNegativeHover,
+    Color? votingNegativeVoted,
+    Color? votingOverlay,
   }) {
     return VoicesColorScheme(
       textPrimary: textPrimary ?? this.textPrimary,
@@ -348,6 +388,16 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       headerGradient: headerGradient ?? this.headerGradient,
       headerGradientSecondary: headerGradientSecondary ?? this.headerGradientSecondary,
       cardBackgroundGradient: cardBackgroundGradient ?? this.cardBackgroundGradient,
+      votingPositivePrimary: votingPositivePrimary ?? this.votingPositivePrimary,
+      votingPositiveHover: votingPositiveHover ?? this.votingPositiveHover,
+      votingPositiveVoted: votingPositiveVoted ?? this.votingPositiveVoted,
+      votingAbstainPrimary: votingAbstainPrimary ?? this.votingAbstainPrimary,
+      votingAbstainHover: votingAbstainHover ?? this.votingAbstainHover,
+      votingAbstainVoted: votingAbstainVoted ?? this.votingAbstainVoted,
+      votingNegativePrimary: votingNegativePrimary ?? this.votingNegativePrimary,
+      votingNegativeHover: votingNegativeHover ?? this.votingNegativeHover,
+      votingNegativeVoted: votingNegativeVoted ?? this.votingNegativeVoted,
+      votingOverlay: votingOverlay ?? this.votingOverlay,
     );
   }
 
@@ -490,6 +540,16 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
         cardBackgroundGradient.length,
         (i) => Color.lerp(cardBackgroundGradient[i], other.cardBackgroundGradient[i], t)!,
       ),
+      votingPositivePrimary: Color.lerp(votingPositivePrimary, other.votingPositivePrimary, t)!,
+      votingPositiveHover: Color.lerp(votingPositiveHover, other.votingPositiveHover, t)!,
+      votingPositiveVoted: Color.lerp(votingPositiveVoted, other.votingPositiveVoted, t)!,
+      votingAbstainVoted: Color.lerp(votingAbstainVoted, other.votingAbstainVoted, t)!,
+      votingAbstainHover: Color.lerp(votingAbstainHover, other.votingAbstainHover, t)!,
+      votingAbstainPrimary: Color.lerp(votingAbstainPrimary, other.votingAbstainPrimary, t)!,
+      votingNegativePrimary: Color.lerp(votingNegativePrimary, other.votingNegativePrimary, t)!,
+      votingNegativeHover: Color.lerp(votingNegativeHover, other.votingNegativeHover, t)!,
+      votingNegativeVoted: Color.lerp(votingNegativeVoted, other.votingNegativeVoted, t)!,
+      votingOverlay: Color.lerp(votingOverlay, other.votingOverlay, t)!,
     );
   }
 }

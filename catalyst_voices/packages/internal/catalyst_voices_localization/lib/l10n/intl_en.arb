@@ -3200,5 +3200,25 @@
         "type": "String"
       }
     }
+  },
+  "inVoteList": "In Vote List",
+  "@inVoteList": {
+    "description": "Text indicates that vote on proposal is added to the list but not casted yet"
+  },
+  "voteYes": "Yes",
+  "@voteYes": {
+    "description": "Vote yes on proposal"
+  },
+  "votedYes": "Voted Yes",
+  "@votedYes": {
+    "description": "Voted yes on proposal"
+  },
+  "voteAbstain": "Abstain",
+  "@voteAbstain": {
+    "description": "Vote abstain on proposal"
+  },
+  "votedAbstain": "Abstained",
+  "@votedAbstain": {
+    "description": "Voted abstain on proposal"
   }
 }
