@@ -25,13 +25,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.7.3
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.7.4
         with:
           version: 0.18.0
       - name: Setup
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.7.3
-      - name: Prepare artifacts
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.7.4
+      - name: Run
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.4
         with:
           local: true
           command: run

@@ -28,7 +28,7 @@ global: {
 			}
 
 			earthly: {
-				version:   "0.8.16"
+				version:   "0.8.15"
 			}
 
 			github: registry: "ghcr.io"
