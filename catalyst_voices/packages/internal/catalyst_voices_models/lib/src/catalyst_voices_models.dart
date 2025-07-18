@@ -96,6 +96,7 @@ export 'voting/vote.dart';
 export 'voting/vote_type.dart';
 export 'voting/voting_ballot.dart';
 export 'voting/voting_ballot_builder.dart';
+export 'voting/voting_power.dart';
 export 'wallet/cardano_address_uri.dart';
 export 'wallet/cardano_wallet_details.dart';
 export 'wallet/wallet_info.dart';
