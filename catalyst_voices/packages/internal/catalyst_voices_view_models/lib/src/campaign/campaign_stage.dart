@@ -17,14 +17,19 @@ enum CampaignStage {
   live,
   completed;
 
-  // TODO(LynxLynxx): Return correct stage based on campaign phase and status when requirements
-  // are clear
-  factory CampaignStage.fromCampaign(Campaign campaign) {
+  /// Calculates the [campaign] stage at given [date].
+  factory CampaignStage.fromCampaign(Campaign campaign, DateTime date) {
     switch (campaign.publish) {
       case CampaignPublish.draft:
         return CampaignStage.draft;
       case CampaignPublish.published:
-        return CampaignStage.live;
+        if (date.isBefore(campaign.startDate)) {
+          return CampaignStage.scheduled;
+        } else if (date.isAfter(campaign.endDate)) {
+          return CampaignStage.completed;
+        } else {
+          return CampaignStage.live;
+        }
     }
   }
 

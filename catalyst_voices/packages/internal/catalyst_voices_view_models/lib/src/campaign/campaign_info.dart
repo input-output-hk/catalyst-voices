@@ -4,28 +4,28 @@ import 'package:catalyst_voices_view_models/src/campaign/campaign_stage.dart';
 import 'package:equatable/equatable.dart';
 
 final class CampaignInfo extends Equatable {
-  final DocumentRef selfRef;
+  final String id;
   final CampaignStage stage;
   final DateTime startDate;
   final DateTime endDate;
   final String description;
 
   const CampaignInfo({
-    required this.selfRef,
+    required this.id,
     required this.stage,
     required this.startDate,
     required this.endDate,
     required this.description,
   });
 
-  // TODO(LynxLynxx): Calculate stage based on campaign phase and status when requirements are clear.
-  factory CampaignInfo.fromCampaign(Campaign campaign) {
-    final stage = CampaignStage.fromCampaign(campaign);
+  /// Calculates the [campaign] info state at given [date].
+  factory CampaignInfo.fromCampaign(Campaign campaign, DateTime date) {
+    final stage = CampaignStage.fromCampaign(campaign, date);
     return CampaignInfo(
-      selfRef: campaign.selfRef,
+      id: campaign.id,
       stage: stage,
-      startDate: campaign.timeline.phases.first.timeline.from ?? DateTime.now(),
-      endDate: campaign.timeline.phases.last.timeline.to ?? DateTime.now(),
+      startDate: campaign.startDate,
+      endDate: campaign.endDate,
       description: campaign.description,
     );
   }
@@ -36,24 +36,12 @@ final class CampaignInfo extends Equatable {
     CampaignStage campaignStage,
   ) {
     return CampaignInfo(
-      selfRef: campaign.selfRef,
+      id: campaign.id,
       stage: campaignStage,
       startDate: _mockCampaignStartDate(campaignStage),
       endDate: _mockCampaignEndDate(campaignStage),
       description: campaign.description,
     );
-  }
-
-  @override
-  List<Object?> get props => [selfRef, stage, startDate, endDate, description];
-
-  static DateTime _mockCampaignEndDate(CampaignStage stage) {
-    return switch (stage) {
-      CampaignStage.draft => DateTimeExt.now().plusDays(5),
-      CampaignStage.scheduled => DateTimeExt.now().plusDays(5),
-      CampaignStage.live => DateTimeExt.now().minusDays(2),
-      CampaignStage.completed => DateTimeExt.now().minusDays(5),
-    };
   }
 
   static DateTime _mockCampaignStartDate(CampaignStage stage) {
@@ -64,4 +52,16 @@ final class CampaignInfo extends Equatable {
       CampaignStage.completed => DateTimeExt.now().minusDays(7),
     };
   }
+
+  static DateTime _mockCampaignEndDate(CampaignStage stage) {
+    return switch (stage) {
+      CampaignStage.draft => DateTimeExt.now().plusDays(5),
+      CampaignStage.scheduled => DateTimeExt.now().plusDays(5),
+      CampaignStage.live => DateTimeExt.now().minusDays(2),
+      CampaignStage.completed => DateTimeExt.now().minusDays(5),
+    };
+  }
+
+  @override
+  List<Object?> get props => [id, stage, startDate, endDate, description];
 }

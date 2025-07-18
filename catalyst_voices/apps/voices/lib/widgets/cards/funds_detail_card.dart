@@ -9,15 +9,15 @@ import 'package:skeletonizer/skeletonizer.dart';
 class FundsDetailCard extends StatelessWidget {
   final Coin allFunds;
   final Coin totalAsk;
-  final ComparableRange<Coin>? askRange;
+  final ComparableRange<Coin> askRange;
   final FundsDetailCardType type;
 
   const FundsDetailCard({
     super.key,
     required this.allFunds,
     required this.totalAsk,
-    this.askRange,
-    this.type = FundsDetailCardType.fund,
+    required this.askRange,
+    this.type = FundsDetailCardType.found,
   });
 
   @override
@@ -35,7 +35,7 @@ class FundsDetailCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (type == FundsDetailCardType.fund) ...[
+          if (type == FundsDetailCardType.found) ...[
             VoicesAssets.icons.library.buildIcon(),
             const SizedBox(height: 32),
           ],
@@ -62,7 +62,10 @@ class FundsDetailCard extends StatelessWidget {
                     largeFundsText: false,
                   ),
                 ),
-                if (askRange != null && !type.isFund) _RangeAsk(range: askRange!),
+                Offstage(
+                  offstage: type.isFound,
+                  child: _RangeAsk(range: askRange),
+                ),
               ],
             ),
           ),
@@ -73,23 +76,23 @@ class FundsDetailCard extends StatelessWidget {
 }
 
 enum FundsDetailCardType {
-  fund,
+  found,
   categoryCompact,
   category;
 
   bool get isCategoryCompact => this == FundsDetailCardType.categoryCompact;
-  bool get isFund => this == FundsDetailCardType.fund;
+  bool get isFound => this == FundsDetailCardType.found;
 
   String localizedTotalAsk(VoicesLocalizations l10n) {
     return switch (this) {
-      FundsDetailCardType.fund => l10n.campaignTotalAsk,
+      FundsDetailCardType.found => l10n.campaignTotalAsk,
       FundsDetailCardType.category || FundsDetailCardType.categoryCompact => l10n.currentAsk,
     };
   }
 
   String localizedTypeDescription(VoicesLocalizations l10n) {
     return switch (this) {
-      FundsDetailCardType.fund => l10n.campaignTreasuryDescription,
+      FundsDetailCardType.found => l10n.campaignTreasuryDescription,
       FundsDetailCardType.category ||
       FundsDetailCardType.categoryCompact =>
         l10n.fundsAvailableForCategory,
@@ -98,7 +101,7 @@ enum FundsDetailCardType {
 
   String localizedTypeName(VoicesLocalizations l10n) {
     return switch (this) {
-      FundsDetailCardType.fund => l10n.campaignTreasury,
+      FundsDetailCardType.found => l10n.campaignTreasury,
       FundsDetailCardType.category || FundsDetailCardType.categoryCompact => l10n.categoryBudget,
     };
   }

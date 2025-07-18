@@ -233,9 +233,9 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   }
 
   Future<void> _loadCampaignCategories() async {
-    final campaign = await _campaignService.getActiveCampaign();
+    final categories = await _campaignService.getCampaignCategories();
 
-    _cache = _cache.copyWith(categories: Optional(campaign?.categories));
+    _cache = _cache.copyWith(categories: Optional(categories));
 
     if (!isClosed) {
       _rebuildCategories();
