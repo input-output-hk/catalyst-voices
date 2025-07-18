@@ -23,7 +23,7 @@ final class ChangeFilterTypeSignal extends ProposalsSignal {
 }
 
 final class ProposalsPageReadySignal extends ProposalsSignal {
-  final Page<ProposalViewModel> page;
+  final Page<ProposalBrief> page;
 
   const ProposalsPageReadySignal({required this.page});
 

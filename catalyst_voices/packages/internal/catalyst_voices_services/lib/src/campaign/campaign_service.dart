@@ -14,15 +14,9 @@ abstract interface class CampaignService {
     required String id,
   });
 
-  Future<List<CampaignCategory>> getCampaignCategories();
-
-  Future<List<CampaignTimeline>> getCampaignTimeline();
-
-  Future<CampaignTimeline> getCampaignTimelineByStage(CampaignTimelineStage stage);
+  Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType stage);
 
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
-
-  Future<CurrentCampaign> getCurrentCampaign();
 }
 
 final class CampaignServiceImpl implements CampaignService {
@@ -35,27 +29,69 @@ final class CampaignServiceImpl implements CampaignService {
   );
 
   @override
-  Future<Campaign?> getActiveCampaign() => getCampaign(id: 'F14');
+  Future<Campaign?> getActiveCampaign() => getCampaign(id: Campaign.f14Ref.id);
 
   @override
   Future<Campaign> getCampaign({
     required String id,
   }) async {
-    final campaignBase = await _campaignRepository.getCampaign(id: id);
+    final campaign = await _campaignRepository.getCampaign(id: id);
+    final campaignProposals = await _proposalRepository.getProposals(
+      type: ProposalsFilterType.finals,
+    );
+    final totalAsk = _calculateTotalAsk(campaignProposals);
+    final updatedCategories = await _updateCategories(campaign.categories);
 
-    // TODO(damian-molinski): get proposalTemplateRef, document and map.
-
-    final campaign = campaignBase.toCampaign();
-
-    return campaign;
+    return campaign.copyWith(totalAsk: totalAsk, categories: updatedCategories);
   }
 
   @override
-  Future<List<CampaignCategory>> getCampaignCategories() async {
-    final categories = await _campaignRepository.getCampaignCategories();
+  Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType type) async {
+    final campaign = await getActiveCampaign();
+    if (campaign == null) {
+      throw StateError('No active campaign found');
+    }
+
+    final timelineStage = campaign.timeline.phases.firstWhere(
+      (element) => element.type == type,
+      orElse: () => throw (StateError('Type $type not found')),
+    );
+    return timelineStage;
+  }
+
+  @override
+  Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
+    final category = await _campaignRepository.getCategory(ref);
+    final categoryProposals = await _proposalRepository.getProposals(
+      type: ProposalsFilterType.finals,
+      categoryRef: ref,
+    );
+    final proposalSubmissionStage =
+        await getCampaignPhaseTimeline(CampaignPhaseType.proposalSubmission);
+    final totalAsk = _calculateTotalAsk(categoryProposals);
+
+    return category.copyWith(
+      totalAsk: totalAsk,
+      proposalsCount: categoryProposals.length,
+      submissionCloseDate: proposalSubmissionStage.timeline.to,
+    );
+  }
+
+  Coin _calculateTotalAsk(List<ProposalData> proposals) {
+    var totalAskBalance = const Balance.zero();
+    for (final proposal in proposals) {
+      final fundsRequested = proposal.document.fundsRequested;
+      final askBalance = Balance(coin: fundsRequested ?? const Coin(0));
+
+      totalAskBalance += askBalance;
+    }
+    return totalAskBalance.coin;
+  }
+
+  Future<List<CampaignCategory>> _updateCategories(List<CampaignCategory> categories) async {
     final updatedCategories = <CampaignCategory>[];
     final proposalSubmissionStage =
-        await getCampaignTimelineByStage(CampaignTimelineStage.proposalSubmission);
+        await getCampaignPhaseTimeline(CampaignPhaseType.proposalSubmission);
 
     for (final category in categories) {
       final categoryProposals = await _proposalRepository.getProposals(
@@ -72,60 +108,5 @@ final class CampaignServiceImpl implements CampaignService {
       updatedCategories.add(updatedCategory);
     }
     return updatedCategories;
-  }
-
-  @override
-  Future<List<CampaignTimeline>> getCampaignTimeline() {
-    return _campaignRepository.getCampaignTimeline();
-  }
-
-  @override
-  Future<CampaignTimeline> getCampaignTimelineByStage(CampaignTimelineStage stage) async {
-    final timeline = await getCampaignTimeline();
-    final timelineStage = timeline.firstWhere(
-      (element) => element.stage == stage,
-      orElse: () => throw (StateError('Stage $stage not found')),
-    );
-    return timelineStage;
-  }
-
-  @override
-  Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
-    final category = await _campaignRepository.getCategory(ref);
-    final categoryProposals = await _proposalRepository.getProposals(
-      type: ProposalsFilterType.finals,
-      categoryRef: ref,
-    );
-    final proposalSubmissionStage =
-        await getCampaignTimelineByStage(CampaignTimelineStage.proposalSubmission);
-    final totalAsk = _calculateTotalAsk(categoryProposals);
-
-    return category.copyWith(
-      totalAsk: totalAsk,
-      proposalsCount: categoryProposals.length,
-      submissionCloseDate: proposalSubmissionStage.timeline.to,
-    );
-  }
-
-  @override
-  Future<CurrentCampaign> getCurrentCampaign() async {
-    final currentCampaign = await _campaignRepository.getCurrentCampaign();
-    final campaignProposals = await _proposalRepository.getProposals(
-      type: ProposalsFilterType.finals,
-    );
-    final totalAsk = _calculateTotalAsk(campaignProposals);
-
-    return currentCampaign.copyWith(totalAsk: totalAsk);
-  }
-
-  Coin _calculateTotalAsk(List<ProposalData> proposals) {
-    var totalAskBalance = const Balance.zero();
-    for (final proposal in proposals) {
-      final fundsRequested = proposal.document.fundsRequested;
-      final askBalance = Balance(coin: fundsRequested ?? const Coin(0));
-
-      totalAskBalance += askBalance;
-    }
-    return totalAskBalance.coin;
   }
 }

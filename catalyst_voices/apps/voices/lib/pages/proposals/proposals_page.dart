@@ -35,7 +35,7 @@ class _ProposalsPageState extends State<ProposalsPage>
         ErrorHandlerStateMixin<ProposalsCubit, ProposalsPage>,
         SignalHandlerStateMixin<ProposalsCubit, ProposalsSignal, ProposalsPage> {
   late final TabController _tabController;
-  late final PagingController<ProposalViewModel> _pagingController;
+  late final PagingController<ProposalBrief> _pagingController;
 
   @override
   Widget build(BuildContext context) {
@@ -174,7 +174,7 @@ class _ProposalsPageState extends State<ProposalsPage>
   Future<void> _handleProposalsPageRequest(
     int pageKey,
     int pageSize,
-    ProposalViewModel? lastProposalId,
+    ProposalBrief? lastProposalId,
   ) async {
     final request = PageRequest(page: pageKey, size: pageSize);
     await context.read<ProposalsCubit>().getProposals(request);

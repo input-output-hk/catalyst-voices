@@ -30,7 +30,7 @@ final class DiscoveryCurrentCampaignState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
   final CurrentCampaignInfoViewModel currentCampaign;
-  final List<CampaignTimeline> campaignTimeline;
+  final List<CampaignTimelineViewModel> campaignTimeline;
 
   const DiscoveryCurrentCampaignState({
     this.isLoading = true,
@@ -49,14 +49,12 @@ final class DiscoveryCurrentCampaignState extends Equatable {
 
   DateRange? get reviewRegistrationStartsAt {
     return campaignTimeline
-        .firstWhere((e) => e.stage == CampaignTimelineStage.reviewRegistration)
+        .firstWhere((e) => e.type == CampaignPhaseType.reviewRegistration)
         .timeline;
   }
 
   DateRange? get reviewStartsAt {
-    return campaignTimeline
-        .firstWhere((e) => e.stage == CampaignTimelineStage.communityReview)
-        .timeline;
+    return campaignTimeline.firstWhere((e) => e.type == CampaignPhaseType.communityReview).timeline;
   }
 
   bool get showCurrentCampaign =>
@@ -66,21 +64,19 @@ final class DiscoveryCurrentCampaignState extends Equatable {
 
   DateRange? get votingRegistrationStartsAt {
     return campaignTimeline
-        .firstWhere((e) => e.stage == CampaignTimelineStage.votingRegistration)
+        .firstWhere((e) => e.type == CampaignPhaseType.votingRegistration)
         .timeline;
   }
 
   DateRange? get votingStartsAt {
-    return campaignTimeline
-        .firstWhere((e) => e.stage == CampaignTimelineStage.communityVoting)
-        .timeline;
+    return campaignTimeline.firstWhere((e) => e.type == CampaignPhaseType.communityVoting).timeline;
   }
 }
 
 final class DiscoveryMostRecentProposalsState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
-  final List<PendingProposal> proposals;
+  final List<ProposalBrief> proposals;
   final List<String> favoritesIds;
 
   const DiscoveryMostRecentProposalsState({
@@ -105,7 +101,7 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
   DiscoveryMostRecentProposalsState copyWith({
     bool? isLoading,
     LocalizedException? error,
-    List<PendingProposal>? proposals,
+    List<ProposalBrief>? proposals,
     List<String>? favoritesIds,
   }) {
     return DiscoveryMostRecentProposalsState(
@@ -118,7 +114,7 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
 
   DiscoveryMostRecentProposalsState updateFavorites(List<String> ids) {
     final updatedProposals =
-        [...proposals].map((e) => e.copyWith(isFavorite: ids.contains(e.ref.id))).toList();
+        [...proposals].map((e) => e.copyWith(isFavorite: ids.contains(e.selfRef.id))).toList();
     return copyWith(proposals: updatedProposals, favoritesIds: ids);
   }
 }

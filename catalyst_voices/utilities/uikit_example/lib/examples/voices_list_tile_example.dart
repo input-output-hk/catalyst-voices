@@ -1,7 +1,4 @@
-import 'package:catalyst_voices/widgets/app_bar/voices_app_bar.dart';
-import 'package:catalyst_voices/widgets/menu/voices_expandable_list_tile.dart';
-import 'package:catalyst_voices/widgets/menu/voices_list_tile.dart';
-import 'package:catalyst_voices/widgets/menu/voices_wallet_tile.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 

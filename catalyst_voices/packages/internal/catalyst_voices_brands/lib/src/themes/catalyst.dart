@@ -383,7 +383,7 @@ ThemeData _buildThemeData(
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(
       color: colorScheme.primary,
-      linearTrackColor: colorScheme.secondaryContainer,
+      linearTrackColor: voicesColorScheme.onSurfaceNeutralOpaqueLv2,
       circularTrackColor: colorScheme.secondaryContainer,
       refreshBackgroundColor: colorScheme.secondaryContainer,
     ),

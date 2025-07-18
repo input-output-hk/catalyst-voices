@@ -36,7 +36,6 @@ class CurrentCampaign extends StatelessWidget {
                   key: const Key('FundsDetailCard'),
                   allFunds: currentCampaignInfo.allFunds,
                   totalAsk: currentCampaignInfo.totalAsk,
-                  askRange: currentCampaignInfo.askRange,
                 ),
               ),
               const SizedBox(height: 80),

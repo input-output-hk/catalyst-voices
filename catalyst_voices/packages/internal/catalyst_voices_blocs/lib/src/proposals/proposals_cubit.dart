@@ -211,20 +211,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       return;
     }
 
-    final campaignStage = CampaignStage.fromCampaign(
-      campaign,
-      DateTimeExt.now(),
-    );
-
-    final mappedPage = page.map(
-      (proposal) {
-        return ProposalViewModel.fromProposalAtStage(
-          proposal: proposal,
-          campaignName: campaign.name,
-          campaignStage: campaignStage,
-        );
-      },
-    );
+    final mappedPage = page.map(ProposalBrief.fromProposal);
 
     final signal = ProposalsPageReadySignal(page: mappedPage);
 
@@ -246,9 +233,9 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   }
 
   Future<void> _loadCampaignCategories() async {
-    final categories = await _campaignService.getCampaignCategories();
+    final campaign = await _campaignService.getActiveCampaign();
 
-    _cache = _cache.copyWith(categories: Optional(categories));
+    _cache = _cache.copyWith(categories: Optional(campaign?.categories));
 
     if (!isClosed) {
       _rebuildCategories();
