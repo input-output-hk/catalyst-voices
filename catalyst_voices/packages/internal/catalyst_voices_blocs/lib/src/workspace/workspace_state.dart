@@ -42,7 +42,7 @@ final class WorkspaceState extends Equatable {
 
   DateTime? get submissionCloseDate => timelineItems
       .firstWhereOrNull(
-        (e) => e.stage == CampaignPhaseType.proposalSubmission,
+        (e) => e.type == CampaignPhaseType.proposalSubmission,
       )
       ?.timeline
       .to;
