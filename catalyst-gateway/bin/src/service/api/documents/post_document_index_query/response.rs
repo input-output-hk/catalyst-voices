@@ -6,12 +6,16 @@ use poem_openapi::{
 };
 
 use super::SignedDocBody;
-use crate::service::common::{
-    self,
-    types::{
-        array_types::impl_array_types,
-        document::{
-            doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
+use crate::service::{
+    api::documents::common::compat,
+    common::{
+        self,
+        types::{
+            array_types::impl_array_types,
+            document::{
+                doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId,
+                ver::DocumentVer,
+            },
         },
     },
 };
@@ -241,25 +245,61 @@ impl Example for IndexedDocumentVersionDocumented {
     }
 }
 
+pub(crate) const DEPRECATED_MARK: &'static str = "deprecated";
+
 impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
     type Error = anyhow::Error;
 
     fn try_from(doc: SignedDocBody) -> Result<Self, Self::Error> {
+        // this will accept only older version
+        let (doc_type_old, doc_ref_old) = compat::is_deprecated(&doc)?;
+        if doc_type_old || doc_ref_old {
+            return Err(anyhow::anyhow!(DEPRECATED_MARK));
+        }
+
         let mut doc_ref = None;
         let mut reply = None;
         let mut template = None;
         let mut parameters = None;
         if let Some(json_meta) = doc.metadata() {
-            let meta: catalyst_signed_doc::ExtraFields = serde_json::from_value(json_meta.clone())?;
-            doc_ref = meta.doc_ref().map(Into::into);
-            reply = meta.reply().map(Into::into);
-            template = meta.template().map(Into::into);
-            parameters = meta.parameters().map(Into::into);
+            let meta = catalyst_signed_doc::Metadata::from_json(json_meta.clone())?;
+
+            // note: perform conversion from the new version
+            // to the older version
+            doc_ref = meta
+                .doc_ref()
+                .map(|doc_ref| doc_ref.doc_refs().first())
+                .flatten()
+                .cloned()
+                .map(Into::into);
+            reply = meta
+                .reply()
+                .map(|doc_ref| doc_ref.doc_refs().first())
+                .flatten()
+                .cloned()
+                .map(Into::into);
+            template = meta
+                .template()
+                .map(|doc_ref| doc_ref.doc_refs().first())
+                .flatten()
+                .cloned()
+                .map(Into::into);
+            parameters = meta
+                .parameters()
+                .map(|doc_ref| doc_ref.doc_refs().first())
+                .flatten()
+                .cloned()
+                .map(Into::into);
         }
+
+        let doc_type = doc
+            .doc_type()
+            .first()
+            .ok_or_else(|| anyhow::anyhow!("Cannot get doc type"))?;
 
         Ok(IndexedDocumentVersionDocumented(IndexedDocumentVersion {
             ver: DocumentVer::new_unchecked(doc.ver().to_string()),
-            doc_type: DocumentType::new_unchecked(doc.doc_type().to_string()),
+            doc_type: DocumentType::new_unchecked(doc_type.to_string()),
             doc_ref,
             reply,
             template,

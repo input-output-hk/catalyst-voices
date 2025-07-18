@@ -12,6 +12,8 @@ use crate::{
     settings::Settings,
 };
 
+pub(crate) mod compat;
+
 /// Get document from the database
 pub(crate) async fn get_document(
     document_id: &uuid::Uuid, version: Option<&uuid::Uuid>,
@@ -34,8 +36,8 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
     async fn try_get_doc(
         &self, doc_ref: &catalyst_signed_doc::DocumentRef,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
-        let id = doc_ref.id.uuid();
-        let ver = doc_ref.ver.uuid();
+        let id = doc_ref.id().uuid();
+        let ver = doc_ref.ver().uuid();
         match get_document(&id, Some(&ver)).await {
             Ok(doc) => Ok(Some(doc)),
             Err(err) if err.is::<NotFoundError>() => Ok(None),

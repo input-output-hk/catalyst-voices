@@ -15,9 +15,12 @@ use crate::{
         },
         index::session::CassandraSessionError,
     },
-    service::common::{
-        auth::rbac::token::CatalystRBACTokenV1, responses::WithErrorResponses,
-        types::headers::retry_after::RetryAfterOption,
+    service::{
+        api::documents::common::compat,
+        common::{
+            auth::rbac::token::CatalystRBACTokenV1, responses::WithErrorResponses,
+            types::headers::retry_after::RetryAfterOption,
+        },
     },
 };
 
@@ -171,18 +174,13 @@ async fn store_document_in_db(
 ) -> anyhow::Result<bool> {
     let authors = doc.authors().iter().map(ToString::to_string).collect();
 
-    let doc_meta_json = match serde_json::to_value(doc.doc_meta()) {
-        Ok(json) => json,
-        Err(e) => {
-            anyhow::bail!("Cannot decode document metadata into JSON, err: {e}");
-        },
-    };
+    let doc_meta_json = doc.doc_meta().to_json()?;
 
     let payload = if matches!(
         doc.doc_content_type()?,
         catalyst_signed_doc::ContentType::Json
     ) {
-        match serde_json::from_slice(doc.doc_content().decoded_bytes()?) {
+        match serde_json::from_slice(doc.decoded_content()?.as_slice()) {
             Ok(payload) => Some(payload),
             Err(e) => {
                 anyhow::bail!("Invalid Document Content, not Json encoded: {e}");
@@ -195,10 +193,15 @@ async fn store_document_in_db(
     let doc_body = SignedDocBody::new(
         doc.doc_id()?.into(),
         doc.doc_ver()?.into(),
-        doc.doc_type()?.into(),
+        doc.doc_type()?
+            .into_iter()
+            .map(catalyst_signed_doc::UuidV4::uuid)
+            .collect(),
         authors,
         Some(doc_meta_json),
     );
+
+    let doc_body = compat::to_new_version(doc_body)?;
 
     FullSignedDoc::new(doc_body, payload, doc_bytes)
         .store()

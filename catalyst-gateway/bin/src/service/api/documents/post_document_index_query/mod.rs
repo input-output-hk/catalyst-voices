@@ -90,7 +90,13 @@ pub(crate) async fn endpoint(
             })))
             .into()
         },
-        Err(e) => AllResponses::handle_error(&e),
+        Err(e) => {
+            if e.to_string() == response::DEPRECATED_MARK {
+                AllResponses::With(Responses::NotFound)
+            } else {
+                AllResponses::handle_error(&e)
+            }
+        },
     }
 }
 
