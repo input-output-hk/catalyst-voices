@@ -1317,6 +1317,22 @@
   "@viewVotingResults": {
     "description": "Title of the view voting results space"
   },
+  "votingPower": "Voting Power",
+  "@votingPower": {
+    "description": "Label for the user's voting power"
+  },
+  "updated": "Updated",
+  "@updated": {
+    "description": "A label when something was last updated."
+  },
+  "confirmed": "Confirmed",
+  "@confirmed": {
+    "description": "A label when something is final and not provisional."
+  },
+  "provisional": "Provisional",
+  "@provisional": {
+    "description": "A label when something is provisional / not confirmed."
+  },
   "campaignDetails": "Campaign Details",
   "description": "Description",
   "startDate": "Start Date",
