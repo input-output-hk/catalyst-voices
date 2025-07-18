@@ -28,6 +28,7 @@ global: {
 			}
 
 			earthly: {
+				satellite: "ci"
 				version:   "0.8.16"
 			}
 
