@@ -15,7 +15,6 @@ class Campaign extends Equatable {
   final int fundNumber;
   final CampaignTimeline timeline;
   final List<CampaignCategory> categories;
-
   final CampaignPublish publish;
 
   const Campaign({
@@ -112,7 +111,7 @@ Project Catalyst turns economic power into innovation power by using the Cardano
         ],
       );
     }
-    throw Exception('No closest phase found');
+    return const CampaignState(activePhases: []);
   }
 
   Campaign copyWith({
@@ -142,18 +141,14 @@ Project Catalyst turns economic power into innovation power by using the Cardano
   /// Returns the state of the campaign for a specific phase.
   /// It's a shortcut for [state] when you are only interested in a specific phase. And want to know
   /// the status of that phase.
-  CampaignState stateTo(CampaignPhaseType type) {
+  CampaignPhaseState phaseStateTo(CampaignPhaseType type) {
     final phase = timeline.phases.firstWhere(
       (phase) => phase.type == type,
       orElse: () => throw StateError('Type $type not found'),
     );
-    return CampaignState(
-      activePhases: [
-        CampaignPhaseState(
-          phase: phase,
-          status: CampaignPhaseStatus.fromRange(phase.timeline),
-        ),
-      ],
+    return CampaignPhaseState(
+      phase: phase,
+      status: CampaignPhaseStatus.fromRange(phase.timeline),
     );
   }
 }

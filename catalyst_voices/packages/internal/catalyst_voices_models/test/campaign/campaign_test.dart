@@ -383,32 +383,32 @@ void main() {
       );
 
       // Act
-      final resultProposalSubmission = campaign.stateTo(CampaignPhaseType.proposalSubmission);
-      final resultVotingRegistration = campaign.stateTo(CampaignPhaseType.votingRegistration);
-      final resultReviewRegistration = campaign.stateTo(CampaignPhaseType.reviewRegistration);
+      final resultProposalSubmission = campaign.phaseStateTo(CampaignPhaseType.proposalSubmission);
+      final resultVotingRegistration = campaign.phaseStateTo(CampaignPhaseType.votingRegistration);
+      final resultReviewRegistration = campaign.phaseStateTo(CampaignPhaseType.reviewRegistration);
 
       // Assert
       expect(
-        resultProposalSubmission.activePhases.first.phase.type,
+        resultProposalSubmission.phase.type,
         equals(CampaignPhaseType.proposalSubmission),
       );
-      expect(resultProposalSubmission.activePhases.first.status, equals(CampaignPhaseStatus.post));
+      expect(resultProposalSubmission.status, equals(CampaignPhaseStatus.post));
 
       expect(
-        resultVotingRegistration.activePhases.first.phase.type,
+        resultVotingRegistration.phase.type,
         equals(CampaignPhaseType.votingRegistration),
       );
       expect(
-        resultVotingRegistration.activePhases.first.status,
+        resultVotingRegistration.status,
         equals(CampaignPhaseStatus.active),
       );
 
       expect(
-        resultReviewRegistration.activePhases.first.phase.type,
+        resultReviewRegistration.phase.type,
         equals(CampaignPhaseType.reviewRegistration),
       );
       expect(
-        resultReviewRegistration.activePhases.first.status,
+        resultReviewRegistration.status,
         equals(CampaignPhaseStatus.upcoming),
       );
     });

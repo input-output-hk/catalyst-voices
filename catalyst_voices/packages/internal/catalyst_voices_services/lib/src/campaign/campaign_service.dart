@@ -14,7 +14,7 @@ abstract interface class CampaignService {
     required String id,
   });
 
-  Future<CampaignPhase> getCampaignTimelineByStage(CampaignPhaseType stage);
+  Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType stage);
 
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 }
@@ -46,7 +46,7 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Future<CampaignPhase> getCampaignTimelineByStage(CampaignPhaseType type) async {
+  Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType type) async {
     final campaign = await getActiveCampaign();
     if (campaign == null) {
       throw StateError('No active campaign found');
@@ -67,7 +67,7 @@ final class CampaignServiceImpl implements CampaignService {
       categoryRef: ref,
     );
     final proposalSubmissionStage =
-        await getCampaignTimelineByStage(CampaignPhaseType.proposalSubmission);
+        await getCampaignPhaseTimeline(CampaignPhaseType.proposalSubmission);
     final totalAsk = _calculateTotalAsk(categoryProposals);
 
     return category.copyWith(
@@ -91,7 +91,7 @@ final class CampaignServiceImpl implements CampaignService {
   Future<List<CampaignCategory>> _updateCategories(List<CampaignCategory> categories) async {
     final updatedCategories = <CampaignCategory>[];
     final proposalSubmissionStage =
-        await getCampaignTimelineByStage(CampaignPhaseType.proposalSubmission);
+        await getCampaignPhaseTimeline(CampaignPhaseType.proposalSubmission);
 
     for (final category in categories) {
       final categoryProposals = await _proposalRepository.getProposals(
