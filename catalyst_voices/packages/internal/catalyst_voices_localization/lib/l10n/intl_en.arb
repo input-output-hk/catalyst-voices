@@ -3200,5 +3200,18 @@
         "type": "String"
       }
     }
+  },
+  "campaignPhaseCountdownCommunityVoting": "Voting for Fund{fundNumber} opens {date}",
+  "@campaignPhaseCountdownCommunityVoting": {
+    "description": "Title for the community voting countdown",
+    "placeholders": {
+      "fundNumber": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
   }
+  
 }
