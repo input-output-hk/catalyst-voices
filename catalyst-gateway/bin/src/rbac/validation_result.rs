@@ -46,14 +46,17 @@ pub enum RbacValidationError {
     ///
     /// This can happen if a previous transaction ID in the registration is incorrect.
     UnknownCatalystId,
-    /// A different error occurred during validation.
+    /// A "fatal" error occurred during validation.
     ///
-    /// This error isn't processed specifically and is just logged.
-    Other(anyhow::Error),
+    /// This means that the validation wasn't performed properly (usually because of a
+    /// database failure) and we cannot process the given registration. This error is
+    /// propagated on a higher level, so there will be another attempt to index that
+    /// block.
+    Fatal(anyhow::Error),
 }
 
 impl From<anyhow::Error> for RbacValidationError {
     fn from(e: anyhow::Error) -> Self {
-        RbacValidationError::Other(e)
+        RbacValidationError::Fatal(e)
     }
 }
