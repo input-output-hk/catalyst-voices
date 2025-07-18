@@ -1,17 +1,22 @@
 //! Logic for orchestrating followers
 
-use std::{fmt::Display, ops::Sub, sync::Arc, time::Duration};
+use std::{fmt::Display, sync::Arc, time::Duration};
 
 use cardano_blockchain_types::{MultiEraBlock, Network, Point, Slot};
 use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
 use duration_string::DurationString;
-use event::EventTarget;
 use futures::{stream::FuturesUnordered, StreamExt};
 use rand::{Rng, SeedableRng};
-use tokio::sync::broadcast;
 use tracing::{debug, error, info};
 
 use crate::{
+    cardano::{
+        channels::{
+            event::{ChainIndexerEvent, ChainIndexerEventSender},
+            state::{ChainIndexerState, ChainIndexerStateReceiver, ChainIndexerStateSender},
+        },
+        indexed_status::IndexedStatus,
+    },
     db::index::{
         block::{
             index_block,
@@ -19,20 +24,19 @@ use crate::{
         },
         queries::{
             caches,
-            sync_status::{
-                get::{get_sync_status, SyncStatus},
-                update::update_sync_status,
-            },
+            sync_status::{get::get_sync_status, update::update_sync_status},
         },
         session::CassandraSession,
     },
+    metrics,
     service::utilities::health::{
         set_follower_immutable_first_reached_tip, set_follower_live_first_reached_tip,
     },
     settings::{chain_follower, Settings},
 };
 
-pub(crate) mod event;
+pub(crate) mod channels;
+pub(crate) mod indexed_status;
 
 /// How long we wait between checks for connection to the indexing DB to be ready.
 pub(crate) const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs(1);
@@ -239,7 +243,8 @@ impl SyncParams {
 /// Set end to `Point::TIP` to sync the tip continuously.
 #[allow(clippy::too_many_lines)]
 fn sync_subchain(
-    params: SyncParams, event_sender: broadcast::Sender<event::ChainIndexerEvent>,
+    params: SyncParams, event_sender: ChainIndexerEventSender,
+    mut state_recv: ChainIndexerStateReceiver,
 ) -> tokio::task::JoinHandle<SyncParams> {
     tokio::spawn(async move {
         // Backoff hitting the database if we need to.
@@ -261,15 +266,11 @@ fn sync_subchain(
             let tips = ChainFollower::get_tips(params.chain).await;
             let immutable_slot = tips.0.slot_or_default();
             let live_slot = tips.1.slot_or_default();
-            let event = event::ChainIndexerEvent::LiveTipSlotChanged {
+            let event = ChainIndexerEvent::LiveTipSlotChanged {
                 immutable_slot,
                 live_slot,
             };
-            if let Err(err) = event_sender.send(event) {
-                error!(error=%err, "Unable to send event.");
-            } else {
-                debug!(live_tip_slot=?live_slot, "Chain Indexer update");
-            }
+            event_sender.dispatch_event(event);
             match chain_update.kind {
                 cardano_chain_follower::Kind::ImmutableBlockRollForward => {
                     // We only process these on the follower tracking the TIP.
@@ -295,7 +296,13 @@ fn sync_subchain(
                 cardano_chain_follower::Kind::Block => {
                     let block = chain_update.block_data();
 
-                    if let Err(error) = index_block(block).await {
+                    if let Err(error) = index_block(
+                        block,
+                        &mut state_recv,
+                        params.actual_start().slot_or_default(),
+                    )
+                    .await
+                    {
                         let error_msg = format!("Failed to index block {}", block.point());
                         error!(chain=%params.chain, error=%error, params=%params, error_msg);
                         return params.done(
@@ -309,7 +316,7 @@ fn sync_subchain(
                     }
 
                     if chain_update.tip && !set_follower_live_first_reached_tip() {
-                        let _ = event_sender.send(event::ChainIndexerEvent::SyncLiveChainCompleted);
+                        event_sender.dispatch_event(ChainIndexerEvent::SyncLiveChainCompleted);
                     }
 
                     update_block_state(
@@ -340,13 +347,19 @@ fn sync_subchain(
                             // Slots arithmetic has saturating semantic, so this is ok
                             .map_or(0.into(), |l| l.slot_or_default() - rollback_slot);
 
-                        let _ = event_sender.send(event::ChainIndexerEvent::ForwardDataPurged {
+                        event_sender.dispatch_event(ChainIndexerEvent::ForwardDataPurged {
                             purge_slots: purge_slots.into(),
                         });
 
                         // Purge success, now index the current block
                         let block = chain_update.block_data();
-                        if let Err(error) = index_block(block).await {
+                        if let Err(error) = index_block(
+                            block,
+                            &mut state_recv,
+                            params.actual_start().slot_or_default(),
+                        )
+                        .await
+                        {
                             let error_msg =
                                 format!("Failed to index block after rollback {}", block.point());
                             error!(chain=%params.chain, error=%error, params=%params, error_msg);
@@ -425,14 +438,14 @@ struct SyncTask {
     /// The live tip slot.
     live_tip_slot: Slot,
 
-    /// Current Sync Status.
-    sync_status: Vec<SyncStatus>,
+    /// Current Immutable db status of indexed data.
+    immutable_indexed_status: IndexedStatus,
 
-    /// Event sender during the process of sync tasks.
-    event_channel: (
-        broadcast::Sender<event::ChainIndexerEvent>,
-        broadcast::Receiver<event::ChainIndexerEvent>,
-    ),
+    /// `ChainIndexerEvent` sender during the process of sync tasks.
+    event_channel: ChainIndexerEventSender,
+
+    /// Chain Indexer State sender during the process of sync tasks.
+    state_channel: ChainIndexerStateSender,
 }
 
 impl SyncTask {
@@ -445,21 +458,31 @@ impl SyncTask {
             current_sync_tasks: 0,
             immutable_tip_slot: 0.into(),
             live_tip_slot: 0.into(),
-            sync_status: Vec::new(),
-            event_channel: broadcast::channel(10),
+            immutable_indexed_status: IndexedStatus::default(),
+            event_channel: ChainIndexerEventSender::new(),
+            state_channel: ChainIndexerStateSender::new(),
         }
     }
 
     /// Add a new `SyncTask` to the queue.
-    fn add_sync_task(
-        &mut self, params: SyncParams, event_sender: broadcast::Sender<event::ChainIndexerEvent>,
-    ) {
-        self.sync_tasks.push(sync_subchain(params, event_sender));
+    fn add_sync_task(&mut self, params: SyncParams) {
+        let state_recv = self.state_channel.subscribe();
+        // immediately setting the latest state, so the `state_recv` will always have at least one
+        // value
+        self.dispatch_state();
+
+        self.sync_tasks.push(sync_subchain(
+            params,
+            self.event_channel.clone(),
+            state_recv,
+        ));
+
         self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
         debug!(current_sync_tasks=%self.current_sync_tasks, "Added new Sync Task");
-        self.dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
-            current_sync_tasks: self.current_sync_tasks,
-        });
+        self.event_channel
+            .dispatch_event(ChainIndexerEvent::SyncTasksChanged {
+                current_sync_tasks: self.current_sync_tasks,
+            });
     }
 
     /// Update `SyncTask` count.
@@ -469,9 +492,10 @@ impl SyncTask {
             0
         });
         debug!(current_sync_tasks=%self.current_sync_tasks, "Finished Sync Task");
-        self.dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
-            current_sync_tasks: self.current_sync_tasks,
-        });
+        self.event_channel
+            .dispatch_event(ChainIndexerEvent::SyncTasksChanged {
+                current_sync_tasks: self.current_sync_tasks,
+            });
     }
 
     /// Primary Chain Follower task.
@@ -491,14 +515,16 @@ impl SyncTask {
         self.live_tip_slot = tips.1.slot_or_default();
         info!(chain=%self.cfg.chain, immutable_tip=?self.immutable_tip_slot, live_tip=?self.live_tip_slot, "Running the primary blockchain follower task.");
 
-        self.dispatch_event(event::ChainIndexerEvent::ImmutableTipSlotChanged {
-            immutable_slot: self.immutable_tip_slot,
-            live_slot: self.live_tip_slot,
-        });
-        self.dispatch_event(event::ChainIndexerEvent::LiveTipSlotChanged {
-            immutable_slot: self.immutable_tip_slot,
-            live_slot: self.live_tip_slot,
-        });
+        self.event_channel
+            .dispatch_event(ChainIndexerEvent::ImmutableTipSlotChanged {
+                immutable_slot: self.immutable_tip_slot,
+                live_slot: self.live_tip_slot,
+            });
+        self.event_channel
+            .dispatch_event(ChainIndexerEvent::LiveTipSlotChanged {
+                immutable_slot: self.immutable_tip_slot,
+                live_slot: self.live_tip_slot,
+            });
 
         // Wait for indexing DB to be ready before continuing.
         // We do this after the above, because other nodes may have finished already, and we don't
@@ -508,29 +534,29 @@ impl SyncTask {
         drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
 
         info!(chain=%self.cfg.chain, "Indexing DB is ready - Getting recovery state for indexing");
-        self.sync_status = get_sync_status().await;
-        debug!(chain=%self.cfg.chain, "Sync Status: {:?}", self.sync_status);
+        self.immutable_indexed_status = get_sync_status().await.into();
+        debug!(chain=%self.cfg.chain, "Sync Status: {:?}", self.immutable_indexed_status);
 
         // Start the Live Chain sync task - This can never end because it is syncing to TIP.
         // So, if it fails, it will automatically be restarted.
-        self.add_sync_task(
-            SyncParams::new(
-                self.cfg.chain,
-                Point::fuzzy(self.immutable_tip_slot),
-                Point::TIP,
-            ),
-            self.event_channel.0.clone(),
-        );
-        self.dispatch_event(event::ChainIndexerEvent::SyncLiveChainStarted);
+        self.add_sync_task(SyncParams::new(
+            self.cfg.chain,
+            Point::fuzzy(self.immutable_tip_slot),
+            Point::TIP,
+        ));
+        self.event_channel
+            .dispatch_event(ChainIndexerEvent::SyncLiveChainStarted);
 
         self.start_immutable_followers();
         // IF there is only 1 chain follower spawn, then the immutable state already indexed and
         // filled in the db.
         if self.sync_tasks.len() == 1 {
             set_follower_immutable_first_reached_tip();
-            self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
+            self.event_channel
+                .dispatch_event(ChainIndexerEvent::SyncImmutableChainCompleted);
         } else {
-            self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainStarted);
+            self.event_channel
+                .dispatch_event(ChainIndexerEvent::SyncImmutableChainStarted);
         }
 
         // Wait Sync tasks to complete.  If they fail and have not completed, reschedule them.
@@ -561,33 +587,38 @@ impl SyncTask {
                             // it.
                             self.immutable_tip_slot = roll_forward_point.slot_or_default();
 
-                            self.dispatch_event(
-                                event::ChainIndexerEvent::ImmutableTipSlotChanged {
+                            self.event_channel.dispatch_event(
+                                ChainIndexerEvent::ImmutableTipSlotChanged {
                                     immutable_slot: self.immutable_tip_slot,
                                     live_slot: self.live_tip_slot,
                                 },
                             );
+                            self.dispatch_state();
                             info!(chain=%self.cfg.chain, report=%finished, "Chain Indexer finished reaching TIP.");
 
                             self.start_immutable_followers();
-                            self.dispatch_event(
-                                event::ChainIndexerEvent::SyncImmutableChainStarted,
-                            );
+                            self.event_channel
+                                .dispatch_event(ChainIndexerEvent::SyncImmutableChainStarted);
                         } else {
                             error!(chain=%self.cfg.chain, report=%finished, "Chain Indexer finished without to reach TIP.");
                         }
 
                         // Start the Live Chain sync task again from where it left off.
-                        self.add_sync_task(finished.retry(), self.event_channel.0.clone());
+                        self.add_sync_task(finished.retry());
                     } else if let Some(result) = finished.result.as_ref() {
                         match result {
                             Ok(()) => {
                                 info!(chain=%self.cfg.chain, report=%finished,
                                     "The Immutable follower completed successfully.");
+                                self.immutable_indexed_status.update(
+                                    finished.start.slot_or_default(),
+                                    finished.end.slot_or_default(),
+                                );
+                                self.dispatch_state();
 
                                 finished.last_indexed_block.as_ref().inspect(|block| {
-                                    self.dispatch_event(
-                                        event::ChainIndexerEvent::IndexedSlotProgressed {
+                                    self.event_channel.dispatch_event(
+                                        ChainIndexerEvent::IndexedSlotProgressed {
                                             slot: block.slot_or_default(),
                                         },
                                     );
@@ -602,7 +633,7 @@ impl SyncTask {
                                         "An Immutable follower failed, restarting it.");
                                 // Restart the Immutable Chain sync task again from where it left
                                 // off.
-                                self.add_sync_task(finished.retry(), self.event_channel.0.clone());
+                                self.add_sync_task(finished.retry());
                             },
                         }
                     } else {
@@ -625,7 +656,8 @@ impl SyncTask {
             // a parameter.
             if self.sync_tasks.len() == 1 {
                 set_follower_immutable_first_reached_tip();
-                self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
+                self.event_channel
+                    .dispatch_event(ChainIndexerEvent::SyncImmutableChainCompleted);
                 caches::txo_assets_by_stake::drop();
                 caches::txo_by_stake::drop();
 
@@ -639,7 +671,8 @@ impl SyncTask {
                 if let Err(error) = roll_forward::purge_live_index(purge_condition).await {
                     error!(chain=%self.cfg.chain, error=%error, "BUG: Purging volatile data task failed.");
                 } else {
-                    self.dispatch_event(event::ChainIndexerEvent::BackwardDataPurged);
+                    self.event_channel
+                        .dispatch_event(ChainIndexerEvent::BackwardDataPurged);
                 }
             }
         }
@@ -665,10 +698,11 @@ impl SyncTask {
                 if let Some((first_point, last_point)) =
                     self.get_syncable_range(self.start_slot, end_slot)
                 {
-                    self.add_sync_task(
-                        SyncParams::new(self.cfg.chain, first_point, last_point.clone()),
-                        self.event_channel.0.clone(),
-                    );
+                    self.add_sync_task(SyncParams::new(
+                        self.cfg.chain,
+                        first_point,
+                        last_point.clone(),
+                    ));
                 }
 
                 // The one slot overlap is deliberate, it doesn't hurt anything and prevents all off
@@ -687,11 +721,11 @@ impl SyncTask {
     /// If it has, return a subset that hasn't been indexed if any, or None if its been
     /// completely indexed already.
     fn get_syncable_range(&self, start: Slot, end: Slot) -> Option<(Point, Point)> {
-        for sync_block in &self.sync_status {
+        for (indexed_start, indexed_end) in &self.immutable_indexed_status {
             // Check if we start within a previously synchronized block.
-            if start >= sync_block.start_slot && start <= sync_block.end_slot {
+            if start >= *indexed_start && start <= *indexed_end {
                 // Check if we are fully contained by the sync block, if so, nothing to sync.
-                if end <= sync_block.end_slot {
+                if end <= *indexed_end {
                     return None;
                 }
 
@@ -701,7 +735,7 @@ impl SyncTask {
                 // It is not a problem to sync the same data mutiple times, so for simplicity we do
                 // not account for this, if the requested range goes beyond the sync
                 // block it starts within we assume that the rest is not synced.
-                return Some((Point::fuzzy(sync_block.end_slot), Point::fuzzy(end)));
+                return Some((Point::fuzzy(*indexed_end), Point::fuzzy(end)));
             }
         }
 
@@ -713,27 +747,14 @@ impl SyncTask {
 
         Some((start_slot, Point::fuzzy(end)))
     }
-}
 
-impl event::EventTarget<event::ChainIndexerEvent> for SyncTask {
-    fn add_event_listener(&mut self, listener: event::EventListenerFn<event::ChainIndexerEvent>) {
-        let mut rx = self.event_channel.0.subscribe();
-        tokio::spawn(async move {
-            loop {
-                match rx.recv().await {
-                    Ok(event) => (listener)(&event),
-                    Err(broadcast::error::RecvError::Lagged(lag)) => {
-                        debug!(lag = lag, "Sync tasks event listener lagged");
-                    },
-                    Err(broadcast::error::RecvError::Closed) => break,
-                }
-            }
-        });
-    }
-
-    fn dispatch_event(&self, message: event::ChainIndexerEvent) {
-        debug!(event = ?message, "Chain Indexer Event");
-        let _ = self.event_channel.0.send(message);
+    /// Dispatches the current state through the `state_channel`
+    fn dispatch_state(&self) {
+        let state = ChainIndexerState {
+            immutable_tip_slot: self.immutable_tip_slot,
+            immutable_indexed_status: self.immutable_indexed_status.clone(),
+        };
+        self.state_channel.dispatch_state(state);
     }
 }
 
@@ -748,94 +769,10 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
     start_sync_for(&cfg).await?;
 
     tokio::spawn(async move {
-        use self::event::ChainIndexerEvent as Event;
-        use crate::metrics::chain_indexer::reporter;
-
-        let api_host_names = Settings::api_host_names().join(",");
-        let service_id = Settings::service_id();
-        let network = cfg.chain.to_string();
-
         let mut sync_task = SyncTask::new(cfg);
 
         // add an event listener to watch for certain events to report as metrics
-        sync_task.add_event_listener(Box::new(move |event: &Event| {
-            if let Event::SyncLiveChainStarted = event {
-                reporter::LIVE_REACHED_TIP
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(0);
-            }
-            if let Event::SyncImmutableChainStarted = event {
-                reporter::IMMUTABLE_REACHED_TIP
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(0);
-            }
-            if let Event::SyncLiveChainCompleted = event {
-                reporter::LIVE_REACHED_TIP
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(1);
-            }
-            if let Event::SyncImmutableChainCompleted = event {
-                reporter::IMMUTABLE_REACHED_TIP
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(1);
-            }
-            if let Event::SyncTasksChanged { current_sync_tasks } = event {
-                reporter::RUNNING_INDEXER_TASKS_COUNT
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(From::from(*current_sync_tasks));
-            }
-            if let Event::LiveTipSlotChanged {
-                live_slot,
-                immutable_slot,
-            } = event
-            {
-                reporter::CURRENT_LIVE_TIP_SLOT
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(i64::try_from(u64::from(*live_slot)).unwrap_or(-1));
-                reporter::SLOT_TIP_DIFF
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(
-                        u64::from(live_slot.sub(*immutable_slot))
-                            .try_into()
-                            .unwrap_or(-1),
-                    );
-            }
-            if let Event::ImmutableTipSlotChanged {
-                live_slot,
-                immutable_slot,
-            } = event
-            {
-                reporter::CURRENT_IMMUTABLE_TIP_SLOT
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(i64::try_from(u64::from(*immutable_slot)).unwrap_or(-1));
-
-                reporter::SLOT_TIP_DIFF
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(
-                        u64::from(live_slot.sub(*immutable_slot))
-                            .try_into()
-                            .unwrap_or(-1),
-                    );
-            }
-            if let Event::IndexedSlotProgressed { slot } = event {
-                reporter::HIGHEST_COMPLETE_INDEXED_SLOT
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(i64::try_from(u64::from(*slot)).unwrap_or(-1));
-            }
-            if let Event::BackwardDataPurged = event {
-                reporter::TRIGGERED_BACKWARD_PURGES_COUNT
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .inc();
-            }
-            if let Event::ForwardDataPurged { purge_slots } = event {
-                reporter::TRIGGERED_FORWARD_PURGES_COUNT
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .inc();
-                reporter::PURGED_SLOTS
-                    .with_label_values(&[&api_host_names, service_id, &network])
-                    .set(i64::try_from(*purge_slots).unwrap_or(-1));
-            }
-        }));
+        metrics::chain_indexer::run_updater(sync_task.event_channel.subscribe());
 
         sync_task.run().await;
     });

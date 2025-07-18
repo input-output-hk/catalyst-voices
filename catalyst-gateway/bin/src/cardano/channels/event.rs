@@ -1,6 +1,8 @@
-//! Event types for Chain Indexer.
+//! multi-consumer, multi-producer Cardano Chain Indexer Events channel.
 
 use cardano_blockchain_types::Slot;
+
+use super::{dispatch_message, receive_msg};
 
 /// Represents various events that can occur in the chain indexer.
 /// These events are used to track the state and progress of indexing operations.
@@ -49,20 +51,38 @@ pub(crate) enum ChainIndexerEvent {
     },
 }
 
-pub(crate) type EventListenerFn<T> = Box<dyn Fn(&T) + Send + Sync + 'static>;
+/// `ChainIndexerEvent` sender multi-producer channel
+#[derive(Debug, Clone)]
+pub(crate) struct ChainIndexerEventSender(tokio::sync::broadcast::Sender<ChainIndexerEvent>);
+#[derive(Debug)]
+/// `ChainIndexerEvent` receiver multi-consumer channel
+pub(crate) struct ChainIndexerEventReceiver(tokio::sync::broadcast::Receiver<ChainIndexerEvent>);
 
-/// A trait that allows adding and dispatching events to listeners.
-pub(crate) trait EventTarget<T: Send + Sync> {
-    /// Adds an event listener to the target.
-    ///
-    /// # Arguments
-    /// * `listener` - A function that will be called whenever an event of type `T`
-    ///   occurs.
-    fn add_event_listener(&mut self, listener: EventListenerFn<T>);
+impl ChainIndexerEventSender {
+    /// Creates a multi-producer channel for processing
+    /// `ChainIndexerEvent` events.
+    /// To subscribe on processing events and instantiate `ChainIndexerEventReceiver` call
+    /// `subscribe` method of the `ChainIndexerEventSender`
+    pub(crate) fn new() -> Self {
+        Self(tokio::sync::broadcast::channel(30).0)
+    }
 
     /// Dispatches an event to all registered listeners.
-    ///
-    /// # Arguments
-    /// * `message` - The event message to be dispatched.
-    fn dispatch_event(&self, message: T);
+    pub(crate) fn dispatch_event(&self, event: ChainIndexerEvent) {
+        dispatch_message(&self.0, event);
+    }
+
+    /// Creates a new multi-consumer `ChainIndexerEventReceiver` that will receive values
+    /// sent **after** this call to `subscribe`.
+    pub(crate) fn subscribe(&self) -> ChainIndexerEventReceiver {
+        ChainIndexerEventReceiver(self.0.subscribe())
+    }
+}
+
+impl ChainIndexerEventReceiver {
+    /// Receives the next `ChainIndexerEvent` from the channel.
+    /// Return `None` if the channel is closed.
+    pub(crate) async fn receive_event(&mut self) -> Option<ChainIndexerEvent> {
+        receive_msg(&mut self.0).await
+    }
 }

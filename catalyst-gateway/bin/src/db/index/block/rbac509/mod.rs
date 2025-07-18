@@ -8,12 +8,13 @@ pub(crate) mod insert_rbac509_invalid;
 
 use std::{collections::HashSet, sync::Arc};
 
-use cardano_blockchain_types::{MultiEraBlock, TransactionId, TxnIndex};
+use cardano_blockchain_types::{MultiEraBlock, Slot, TransactionId, TxnIndex};
 use rbac_registration::cardano::cip509::Cip509;
 use scylla::Session;
 use tracing::{debug, error};
 
 use crate::{
+    cardano::channels::state::ChainIndexerStateReceiver,
     db::index::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
@@ -69,7 +70,8 @@ impl Rbac509InsertQuery {
     #[allow(clippy::too_many_lines)]
     pub(crate) async fn index(
         &mut self, txn_hash: TransactionId, index: TxnIndex, block: &MultiEraBlock,
-        context: &mut RbacBlockIndexingContext,
+        context: &mut RbacBlockIndexingContext, indexer_state: &mut ChainIndexerStateReceiver,
+        range_start: Slot,
     ) {
         let slot = block.slot();
         let cip509 = match Cip509::new(block, index, &[]) {
@@ -104,6 +106,17 @@ impl Rbac509InsertQuery {
                 cip509.txn_hash()
             );
         }
+
+        // There are multiple parallel tasks that are indexing ranges of blocks such as `0..100`,
+        // `100..200`, etc. We need to wait for all previous ranges to be indexed before
+        // processing a RBAC registration.
+        wait_for_indexing_up_to_block(
+            indexer_state,
+            range_start,
+            cip509.txn_hash(),
+            block.is_immutable(),
+        )
+        .await;
 
         let previous_transaction = cip509.previous_transaction();
         match Box::pin(validate_rbac_registration(
@@ -266,5 +279,40 @@ impl Rbac509InsertQuery {
         }
 
         query_handles
+    }
+}
+
+/// Waits until all blocks up to the provided slot are indexed.
+async fn wait_for_indexing_up_to_block(
+    indexer_state: &mut ChainIndexerStateReceiver, slot: Slot, tx_id: TransactionId,
+    is_immutable: bool,
+) {
+    // firstly look at the stored, current recorded state
+    let mut state = indexer_state.stored_state();
+    loop {
+        if let Some(state) = state {
+            if is_immutable {
+                // for the immutable block we need to wait when everything would be indexed up to
+                // the current block
+                if state.is_immutable_fully_indexed_up_to(slot) {
+                    break;
+                }
+            } else if state.is_reached_immutable_tip() {
+                // for the live block we should wait until the whole immutable part would be
+                // indexed, we are not waiting for the live part to be indexed,
+                // because in any case its indexing sequentially
+                break;
+            }
+        }
+
+        // if it didn't passed with the stored state, wait for the latest
+        let Some(latest_state) = indexer_state.latest_state().await else {
+            error!(
+                tx_hash = ?tx_id,
+                "Chain indexer state channel closed during the RBAC 509 transaction indexing",
+            );
+            return;
+        };
+        state = Some(latest_state);
     }
 }
