@@ -20,9 +20,9 @@ class CampaignPhaseCountdownViewModel extends Equatable {
   }) {
     final dateTime = useFromDate ? phase.timeline.from : phase.timeline.to;
 
-    if (dateTime case final date?) {
+    if (dateTime != null) {
       return CampaignPhaseCountdownViewModel(
-        date: date,
+        date: dateTime,
         fundNumber: fundNumber,
         type: phase.type,
       );
