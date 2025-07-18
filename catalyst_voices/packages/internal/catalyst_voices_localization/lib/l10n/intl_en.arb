@@ -771,13 +771,9 @@
   "@createProfileInstructionsTitle": {
     "description": "Title for account creation steps"
   },
-  "createProfileInstructionsMessage": "In the following account creation steps we will:\n\n1. Setup your profile\n2. Create your Catalyst Keychain\n3. Link Cardano wallet & roles\n\nTo ensure a smooth experience, completing your account setup in one session is essential—stay focused and avoid interruptions to finalize everything efficiently.",
+  "createProfileInstructionsMessage": "In the following account creation steps we will:\n\n1. Setup your profile\n2. Create your Catalyst Keychain\n3. Link Cardano wallet & roles\n\nTo ensure a smooth experience, completing your account setup in one session is essential—stay focused and avoid interruptions to finalize everything efficiently.\n\nMake sure your Cardano wallet has at least {amount} ADA before continuing.",
   "@createProfileInstructionsMessage": {
-    "description": "Information about account creation steps"
-  },
-  "createProfileInstructionsNotice": "Please ensure your Cardano wallet has at least {amount} ADA before continuing.",
-  "@createProfileInstructionsNotice": {
-    "description": "Information about minimum wallet balance",
+    "description": "Information about account creation steps",
     "placeholders": {
       "amount": {
         "type": "double",
@@ -861,6 +857,19 @@
   "catalystTos": "Project Catalyst Terms of Use",
   "@catalystTos": {
     "description": "Link to the Catalyst FC's Terms of Use"
+  },
+  "fund14ProposalSubmissionNotice": "Fund14 Proposal Submission Notice",
+  "@fund14ProposalSubmissionNotice": {
+    "description": "Link to the Fund14 Proposal Submission Notice"
+  },
+  "createProfileDrepApprovalContingency": "I understand proposals will not proceed to Community Review or Voting until Cardano DRep's have approved a Catalyst Budget proposal, as detailed in the {fund14ProposalSubmissionNotice}.",
+  "@createProfileDrepApprovalContingency": {
+    "description": "Text acknowledging that the user is aware of the Drep Approval Contingency",
+    "placeholders": {
+      "fund14ProposalSubmissionNotice": {
+        "type": "String"
+      }
+    }
   },
   "createProfileAcknowledgementsTosAndPrivacyPolicy": "I agree to the {tos} & {privacy_policy}.",
   "@createProfileAcknowledgementsTosAndPrivacyPolicy": {
