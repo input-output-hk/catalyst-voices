@@ -8,7 +8,7 @@ use std::sync::Arc;
 
 use cardano_blockchain_types::{Cip36, MultiEraBlock, Slot, StakeAddress, TxnIndex};
 use catalyst_types::hashes::Blake2b224Hash;
-use scylla::Session;
+use scylla::client::session::Session;
 
 use super::certs;
 use crate::{
