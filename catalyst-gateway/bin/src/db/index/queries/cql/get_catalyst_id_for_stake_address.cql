@@ -1,7 +1,6 @@
-SELECT  
-    catalyst_id,
-    slot_no
-FROM 
+SELECT
+    catalyst_id
+FROM
     catalyst_id_for_stake_address
-WHERE 
+WHERE
     stake_address = :stake_address
