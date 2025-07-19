@@ -24,7 +24,7 @@ void main() {
         title: 'Test Title 1',
         description: 'Test Description 1',
         timeline: timeline,
-        stage: CampaignTimelineStage.proposalSubmission,
+        type: CampaignPhaseType.proposalSubmission,
       ),
       CampaignTimelineViewModel(
         title: 'Test Title 2',
@@ -33,7 +33,7 @@ void main() {
           from: DateTime.now().add(const Duration(days: 8)),
           to: DateTime.now().add(const Duration(days: 15)),
         ),
-        stage: CampaignTimelineStage.proposalSubmission,
+        type: CampaignPhaseType.proposalSubmission,
       ),
     ];
 
@@ -158,7 +158,7 @@ void main() {
                   title: 'Title $index',
                   description: 'Description $index',
                   timeline: timeline,
-                  stage: CampaignTimelineStage.proposalSubmission,
+                  type: CampaignPhaseType.proposalSubmission,
                 ),
               ),
             ),

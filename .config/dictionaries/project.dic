@@ -99,6 +99,7 @@ dotglob
 drep
 dreps
 dtscalac
+dt-iohk
 earthfile
 earthlyignore
 Easterling
@@ -273,6 +274,7 @@ qrcode
 rapidoc
 ratelimit
 redoc
+Relayout
 reloadable
 Replayability
 repr

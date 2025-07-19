@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/widgets/app_bar/actions/voices_app_bar_actions.dart';
-import 'package:catalyst_voices/widgets/menu/voices_expandable_list_tile.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -26,7 +25,7 @@ class VoicesNavigationExample extends StatelessWidget {
       ),
       body: const Center(child: Text('Content')),
       drawer: VoicesDrawer(
-        bottom: const _DrawerChooser(),
+        footer: const _DrawerChooser(),
         child: ListView(
           padding: const EdgeInsets.all(12),
           physics: const ClampingScrollPhysics(),

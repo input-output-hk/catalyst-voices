@@ -81,7 +81,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     _watchProposalsCount(filters: filters.toCountFilters());
 
     if (resetProposals) {
-      emitSignal(const ResetProposalsPaginationSignal());
+      emitSignal(const ResetPaginationProposalsSignal());
     }
   }
 
@@ -98,12 +98,12 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     _rebuildOrder();
 
     if (resetProposals) {
-      emitSignal(const ResetProposalsPaginationSignal());
+      emitSignal(const ResetPaginationProposalsSignal());
     }
   }
 
   void changeSelectedCategory(SignedDocumentRef? categoryId) {
-    emitSignal(ChangeCategorySignal(to: categoryId));
+    emitSignal(ChangeCategoryProposalsSignal(to: categoryId));
   }
 
   @override
@@ -211,22 +211,9 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       return;
     }
 
-    final campaignStage = CampaignStage.fromCampaign(
-      campaign,
-      DateTimeExt.now(),
-    );
+    final mappedPage = page.map(ProposalBrief.fromProposal);
 
-    final mappedPage = page.map(
-      (proposal) {
-        return ProposalViewModel.fromProposalAtStage(
-          proposal: proposal,
-          campaignName: campaign.name,
-          campaignStage: campaignStage,
-        );
-      },
-    );
-
-    final signal = ProposalsPageReadySignal(page: mappedPage);
+    final signal = PageReadyProposalsSignal(page: mappedPage);
 
     emitSignal(signal);
   }
@@ -246,9 +233,9 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   }
 
   Future<void> _loadCampaignCategories() async {
-    final categories = await _campaignService.getCampaignCategories();
+    final campaign = await _campaignService.getActiveCampaign();
 
-    _cache = _cache.copyWith(categories: Optional(categories));
+    _cache = _cache.copyWith(categories: Optional(campaign?.categories));
 
     if (!isClosed) {
       _rebuildCategories();

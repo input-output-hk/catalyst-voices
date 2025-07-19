@@ -43,7 +43,7 @@ class BasicSegmentsListView extends StatelessWidget {
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(
         // Disables the iOS like overscroll behavior to avoid jumping UI.
-        // TODO(dtscalac): remove the workaround when
+        // TODO(dt-iohk): remove the workaround when
         // https://github.com/google/flutter.widgets/issues/276 is fixed
         physics: const ClampingScrollPhysics(),
       ),

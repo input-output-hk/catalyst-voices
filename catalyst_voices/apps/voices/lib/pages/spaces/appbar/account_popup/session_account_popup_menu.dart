@@ -150,37 +150,28 @@ class _PopupMenu extends StatelessWidget {
         color: theme.color,
         shape: theme.shape ?? const RoundedRectangleBorder(),
       ),
-      child: const Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _AccountHeader(),
-          VoicesDivider.expanded(),
-          _Opportunities(),
-          VoicesDivider.expanded(),
-          _Account(),
-          _Settings(),
-          VoicesDivider.expanded(height: 17),
-          _Links(),
-          VoicesDivider.expanded(height: 17),
-          _Session(),
-          SizedBox(height: 8),
-        ],
+      child: ConstrainedBox(
+        constraints: const BoxConstraints.tightFor(width: 320),
+        child: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _AccountHeader(),
+            VoicesDivider.expanded(),
+            _Opportunities(),
+            VoicesDivider.expanded(),
+            _Account(),
+            _Settings(),
+            VoicesDivider.expanded(height: 17),
+            _Links(),
+            VoicesDivider.expanded(height: 17),
+            _Session(),
+            SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }
-}
-
-class _PopupMenuItem extends PopupMenuItem<_MenuItemEvent> {
-  const _PopupMenuItem()
-      : super(
-          // disabled because PopupMenuItem always adds InkWell
-          // and ripple which we don't want.
-          enabled: false,
-          padding: EdgeInsets.zero,
-          value: null,
-          child: const _PopupMenu(),
-        );
 }
 
 final class _RedirectToDocs extends _MenuItemEvent {
@@ -252,36 +243,24 @@ class _Session extends StatelessWidget {
 }
 
 class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> with LaunchUrlMixin {
-  final _popupMenuButtonKey = GlobalKey<PopupMenuButtonState<_MenuItemEvent>>();
-
   @override
   Widget build(BuildContext context) {
-    // TODO(damian-molinski): replace `PopupMenuButton` by `showMenu`.
-    // Consider to replace all usages of PopupMenuButton
-    // by creating a custom replacement.
-    //
-    // Reason (when navigating away from a page that opened a PopupMenuButton):
-    // To safely refer to a widget's ancestor in its dispose() method, save
-    // a reference to the ancestor by calling
-    // dependOnInheritedWidgetOfExactType() in the widget's
-    // didChangeDependencies() method.
-    return PopupMenuButton<_MenuItemEvent>(
-      key: _popupMenuButtonKey,
+    return VoicesRawPopupMenu<_MenuItemEvent>(
+      buttonBuilder: (
+        context,
+        onTapCallback, {
+        required isMenuOpen,
+      }) {
+        return SessionAccountAvatar(
+          key: const Key('SessionAccountPopupMenuAvatar'),
+          onTap: onTapCallback,
+        );
+      },
+      menuBuilder: (context) => const _PopupMenu(),
       onSelected: _handleEvent,
-      itemBuilder: (context) => const [_PopupMenuItem()],
-      tooltip: context.l10n.accountMenuPopupTooltip,
-      constraints: const BoxConstraints(maxWidth: 320),
       routeSettings: const RouteSettings(name: '/account_menu'),
-      color: PopupMenuTheme.of(context).color,
-      // disable because PopupMenuButton internally always wraps child in
-      // InkWell which adds unwanted background over color.
-      enabled: false,
-      child: SessionAccountAvatar(
-        key: const Key('SessionAccountPopupMenuAvatar'),
-        onTap: () {
-          _popupMenuButtonKey.currentState?.showButtonMenu();
-        },
-      ),
+      position: VoicesRawPopupMenuPosition.over,
+      menuOffset: Offset.zero,
     );
   }
 

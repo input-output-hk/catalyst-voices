@@ -179,7 +179,13 @@ final class TreasuryRoute extends GoRouteData
 }
 
 final class VotingRoute extends GoRouteData with FadePageTransitionMixin, CompositeRouteGuardMixin {
-  const VotingRoute();
+  final String? categoryId;
+  final String? type;
+
+  const VotingRoute({
+    this.categoryId,
+    this.type,
+  });
 
   @override
   List<RouteGuard> get routeGuards => const [
@@ -190,7 +196,15 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin, Compos
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const VotingPage();
+    final categoryId = this.categoryId;
+    final categoryRef = categoryId != null ? SignedDocumentRef(id: categoryId) : null;
+
+    final type = ProposalsFilterType.values.asNameMap()[this.type];
+
+    return VotingPage(
+      categoryId: categoryRef,
+      type: type,
+    );
   }
 }
 

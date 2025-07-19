@@ -78,7 +78,7 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
     );
   }
 
-  const Proposal._({
+  Proposal._({
     required this.selfRef,
     required this.title,
     required this.description,
@@ -93,14 +93,15 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
     required this.commentsCount,
     required this.category,
     required this.categoryId,
-  });
+  }) : assert(
+          selfRef.version != null,
+          'SelfRef version always should have non null version',
+        );
 
   bool get hasNewerLocalIteration {
     if (versions.isEmpty) return false;
     final latestVersion = versions.first;
-    return latestVersion.isLatestVersion(
-      selfRef.version ?? '',
-    );
+    return latestVersion.isLatestVersion(selfRef.version!);
   }
 
   @override
@@ -120,7 +121,7 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
         versions,
       ];
 
-  int get versionCount => versions.isEmpty ? 1 : versions.length;
+  int get versionCount => versions.versionNumber(selfRef.version!);
 
   @override
   int compareTo(Proposal other) {

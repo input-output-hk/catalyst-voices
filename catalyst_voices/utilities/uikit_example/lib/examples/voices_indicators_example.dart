@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
+import 'package:catalyst_voices/widgets/indicators/voices_progress_indicator_weight.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -59,9 +60,25 @@ class VoicesIndicatorsExample extends StatelessWidget {
           const Text('Linear - Indeterminate'),
           const VoicesLinearProgressIndicator(),
           const VoicesLinearProgressIndicator(showTrack: false),
+          const Text('Linear - Heavy - Indeterminate'),
+          const VoicesLinearProgressIndicator(weight: VoicesProgressIndicatorWeight.heavy),
+          const VoicesLinearProgressIndicator(
+            weight: VoicesProgressIndicatorWeight.heavy,
+            showTrack: false,
+          ),
           const Text('Linear - Fixed'),
           const VoicesLinearProgressIndicator(value: 0.25),
           const VoicesLinearProgressIndicator(value: 0.25, showTrack: false),
+          const Text('Linear - Heavy - Fixed'),
+          const VoicesLinearProgressIndicator(
+            value: 0.25,
+            weight: VoicesProgressIndicatorWeight.heavy,
+          ),
+          const VoicesLinearProgressIndicator(
+            value: 0.25,
+            showTrack: false,
+            weight: VoicesProgressIndicatorWeight.heavy,
+          ),
           const Text('Circular - Indeterminate'),
           const Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -127,13 +144,6 @@ enum _OnboardingStep {
   four,
   five;
 
-  ProcessProgressStep asStep() {
-    return ProcessProgressStep(
-      value: this,
-      name: stepName,
-    );
-  }
-
   String get stepName {
     return switch (this) {
       _OnboardingStep.one => 'Step 1',
@@ -142,6 +152,13 @@ enum _OnboardingStep {
       _OnboardingStep.four => 'Step 4',
       _OnboardingStep.five => 'Step 5',
     };
+  }
+
+  ProcessProgressStep asStep() {
+    return ProcessProgressStep(
+      value: this,
+      name: stepName,
+    );
   }
 }
 
