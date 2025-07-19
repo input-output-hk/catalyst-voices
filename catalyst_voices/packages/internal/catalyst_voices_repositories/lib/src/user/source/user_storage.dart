@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_repositories/src/storage/secure_storage.dart';
 
 const _key = 'UserStorage';
 const _userKey = 'User';

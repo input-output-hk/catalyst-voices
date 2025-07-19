@@ -29,6 +29,7 @@ void main() {
         secureStorage: const FlutterSecureStorage(),
         sharedPreferences: SharedPreferencesAsync(),
         cacheConfig: AppConfig.dev().cache,
+        keychainSigner: _FakeKeychainSigner(),
       );
       userObserver = StreamUserObserver();
     });
@@ -690,6 +691,8 @@ void main() {
 final _transactionHash = TransactionHash.fromHex(
   '4d3f576f26db29139981a69443c2325daa812cc353a31b5a4db794a5bcbb06c2',
 );
+
+class _FakeKeychainSigner extends Fake implements KeychainSigner {}
 
 class _FakeUserRepository extends Fake implements UserRepository {
   User? _user;

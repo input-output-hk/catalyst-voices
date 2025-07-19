@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/logging_settings_dto.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_repositories/src/storage/local_storage.dart';
 
 const _key = 'Logging';
 const _settingsKey = 'Settings';
