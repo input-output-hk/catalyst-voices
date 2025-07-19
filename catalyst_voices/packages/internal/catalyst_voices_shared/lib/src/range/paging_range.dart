@@ -1,5 +1,6 @@
 import 'dart:math';
 
+/// A set of utils related to paginating data.
 class PagingRange {
   const PagingRange();
 

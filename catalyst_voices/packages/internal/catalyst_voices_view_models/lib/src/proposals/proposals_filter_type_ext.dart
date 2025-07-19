@@ -2,6 +2,10 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/widgets.dart';
 
+/// Extension on [ProposalsFilterType] to provide utility methods:
+///
+/// - [noOf]: Returns the number of proposals for the given filter type.
+/// - [tabKey]: Returns the key for the given filter type.
 extension ProposalsFilterTypeExt on ProposalsFilterType {
   String noOf(
     BuildContext context, {

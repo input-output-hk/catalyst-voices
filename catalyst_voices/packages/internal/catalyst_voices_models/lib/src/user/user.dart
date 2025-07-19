@@ -3,7 +3,7 @@ import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
-/// Defines user or the app.
+/// Defines user of the app.
 final class User extends Equatable {
   final List<Account> accounts;
   final UserSettings settings;
@@ -51,16 +51,24 @@ final class User extends Equatable {
     );
   }
 
+  /// Returns [Account] with corresponding [id] (comparing significant part).
+  ///
+  /// Throws exception if not found.
   Account getAccount(CatalystId id) {
     return accounts.singleWhere((account) => id.isReferringTo(account));
   }
 
+  ///
   bool hasAccount({
     required CatalystId id,
   }) {
     return accounts.any((account) => id.isReferringTo(account));
   }
 
+  /// Removes matching [Account] from [accounts] with corresponding [id] (comparing
+  /// significant part).
+  ///
+  /// Returns copy of [User] with updated [accounts].
   User removeAccount({
     required CatalystId id,
   }) {
@@ -69,12 +77,18 @@ final class User extends Equatable {
     return copyWith(accounts: accounts);
   }
 
+  /// Tries to find matching [Account] (compares ids) and replaces it with [account].
+  ///
+  /// Returns copy of [User] with updated [accounts].
   User updateAccount(Account account) {
     final accounts = List.of(this.accounts).map((e) => e.isSameRef(account) ? account : e).toList();
 
     return copyWith(accounts: accounts);
   }
 
+  /// Tries to find [Account] with corresponding [id] and marks it as active.
+  ///
+  /// Returns copy of [User] with updated [accounts].
   User useAccount({
     required CatalystId id,
   }) {

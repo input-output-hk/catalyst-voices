@@ -5,6 +5,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
+/// Creates dummy catalystId, useful for fast, dev-mode sign in or tests.
 final class DummyCatalystIdFactory {
   DummyCatalystIdFactory._();
 

@@ -13,7 +13,7 @@ import 'package:equatable/equatable.dart';
 /// Represents a seed phrase consisting of a mnemonic and provides methods for
 /// generating and deriving cryptographic data from the mnemonic.
 ///
-/// The `SeedPhrase` class allows creation of a seed phrase either randomly,
+/// The [SeedPhrase] class allows creation of a seed phrase either randomly,
 /// from a given mnemonic, or from entropy data. It supports converting between
 /// different formats, including Uint8List and hex strings.
 final class SeedPhrase extends Equatable {
@@ -27,7 +27,7 @@ final class SeedPhrase extends Equatable {
   ///
   /// Throws an [ArgumentError] if the word count is invalid.
   ///
-  /// [wordCount]: The number of words in the mnemonic.
+  /// - [wordCount]: The number of words in the mnemonic.
   /// The default word count is 12, but can specify 12, 15, 18, 21, or 24 words.
   /// with a higher word count providing greater entropy and security.
   factory SeedPhrase({int wordCount = 12}) {
@@ -40,7 +40,7 @@ final class SeedPhrase extends Equatable {
 
   /// Creates a SeedPhrase from an existing hex-encoded entropy.
   ///
-  /// [encodedData]: The entropy data as a hex string.
+  /// - [encodedData]: The entropy data as a hex string.
   factory SeedPhrase.fromHexEntropy(String encodedData) {
     final mnemonic = bip39.entropyToMnemonic(encodedData);
     return SeedPhrase.fromMnemonic(mnemonic);
@@ -50,7 +50,7 @@ final class SeedPhrase extends Equatable {
   ///
   /// Throws an [ArgumentError] if the mnemonic is invalid.
   ///
-  /// [mnemonic]: The mnemonic to derive the seed from.
+  /// - [mnemonic]: The mnemonic to derive the seed from.
   factory SeedPhrase.fromMnemonic(String mnemonic) {
     assert(bip39.validateMnemonic(mnemonic), 'Invalid mnemonic phrase');
 
@@ -59,7 +59,7 @@ final class SeedPhrase extends Equatable {
 
   /// Creates a SeedPhrase from an existing [Uint8List] entropy.
   ///
-  /// [encodedData]: The entropy data as a Uint8List.
+  /// - [encodedData]: The entropy data as a [Uint8List].
   factory SeedPhrase.fromUint8ListEntropy(Uint8List encodedData) {
     final hexEncodedData = hex.encode(encodedData);
     return SeedPhrase.fromHexEntropy(hexEncodedData);

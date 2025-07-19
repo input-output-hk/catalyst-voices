@@ -9,10 +9,10 @@ class WorkspaceErrorSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState, VisibilityState>(
-      selector: (state) => (show: state.showError, error: state.error),
+    return BlocSelector<WorkspaceBloc, WorkspaceState, ErrorVisibilityState>(
+      selector: (state) => (show: state.showError, data: state.error),
       builder: (context, state) {
-        final errorMessage = state.error?.message(context);
+        final errorMessage = state.data?.message(context);
 
         return Offstage(
           offstage: !state.show,

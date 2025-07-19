@@ -1,0 +1,7 @@
+dartdoc:
+  ignore:
+    - ambiguous-doc-reference
+    - unresolved-doc-reference
+    - no-library-level-docs
+  warnings:
+    - tool-error
