@@ -23,8 +23,7 @@ import 'package:webdriver/async_io.dart';
 /// -d web-server --browser-name=chrome --driver-port=4444
 /// ```
 void main() {
-  group('Test if extensions are installed and driver can communicate with them',
-      () {
+  group('Test if extensions are installed and driver can communicate with them', () {
     late final VoicesWebDriver driver;
 
     // Connect to the Flutter driver before running any tests.
@@ -50,8 +49,7 @@ void main() {
 
         await driver.switchToWindow(extensions[0].id);
 
-        final cancelButtonFinder =
-            await driver.webDriver.findElement(const By.tagName('button'));
+        final cancelButtonFinder = await driver.webDriver.findElement(const By.tagName('button'));
 
         await cancelButtonFinder.click();
         await currentWindow.setAsActive();

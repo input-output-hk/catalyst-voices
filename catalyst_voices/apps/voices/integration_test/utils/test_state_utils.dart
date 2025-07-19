@@ -1,0 +1,58 @@
+import 'package:catalyst_voices/routes/routes.dart';
+import 'package:go_router/go_router.dart';
+import 'package:patrol_finders/patrol_finders.dart';
+
+import '../pageobject/account_dropdown_page.dart';
+import '../pageobject/app_bar_page.dart';
+import '../pageobject/profile_page.dart';
+
+/// Utilities for managing test state between tests
+class TestStateUtils {
+  /// Helper method to ensure we start from a clean visitor state
+  /// This checks if user is logged in and logs them out if needed
+  /// NOTE: App must already be pumped before calling this function
+  static Future<void> ensureCleanVisitorState(
+    PatrolTester $,
+    GoRouter router,
+  ) async {
+    // Give app time to initialize and restore any previous session
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+
+    // Check if user is already logged in (sessionAccountPopupMenuAvatar visible)
+    final isLoggedIn = await AppBarPage($).getStartedBtnExists();
+
+    if (!isLoggedIn) {
+      // User is logged in - need to logout
+      print('🔄 User already logged in, logging out...');
+
+      // Try to access account dropdown and remove keychain
+      try {
+        await AppBarPage($).accountPopupBtnClick();
+        await AccountDropdownPage($).clickProfileAndKeychain();
+        await ProfilePage($).removeKeychainClick();
+        await $(ProfilePage($).deleteKeychainTextField).enterText('Remove Keychain');
+        await $(ProfilePage($).deleteKeychainContinueButton).tap();
+        await $(ProfilePage($).keychainDeletedDialogCloseButton).tap();
+
+        // Verify we're back to visitor state
+        await AppBarPage($).visitorBtnIsVisible();
+        await AppBarPage($).getStartedBtnIsVisible();
+        print('✅ Successfully logged out user');
+      } catch (e) {
+        print('⚠️ Could not logout via UI, user might be in locked state: $e');
+      }
+    }
+
+    // Ensure we're on discovery route in visitor state
+    router.go(const DiscoveryRoute().location);
+
+    // Final verification - should see visitor UI
+    try {
+      await AppBarPage($).visitorBtnIsVisible();
+      await AppBarPage($).getStartedBtnIsVisible();
+      print('✅ Clean visitor state confirmed');
+    } catch (e) {
+      print('⚠️ Not in expected visitor state: $e');
+    }
+  }
+}

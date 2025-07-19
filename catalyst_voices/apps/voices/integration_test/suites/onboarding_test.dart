@@ -617,6 +617,5 @@ void main() async {
         await WalletListPanel($).verifyDetailsPanel();
       });
     },
-    skip: true,
   );
 }

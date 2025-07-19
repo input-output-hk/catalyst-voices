@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
-import 'step_5_restore_keychain_success_panel.dart';
+import 'step_3_restore_keychain_success_panel.dart';
 
 class UnlockPasswordInfoPanel extends OnboardingPageBase {
   UnlockPasswordInfoPanel(super.$);
@@ -15,10 +15,6 @@ class UnlockPasswordInfoPanel extends OnboardingPageBase {
   Future<void> goto() async {
     await RestoreKeychainSuccessPanel($).goto();
     await RestoreKeychainSuccessPanel($).clickSetUnlockPassword();
-  }
-
-  Future<void> clickNext() async {
-    await $(nextButton).tap();
   }
 
   @override
