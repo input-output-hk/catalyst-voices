@@ -35,42 +35,17 @@ class _PanelMainMessage extends StatelessWidget {
 
     return RegistrationStageMessage(
       title: Text(l10n.createProfileInstructionsTitle),
+      spacing: 12,
       subtitle: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 10,
         children: [
-          Text(l10n.createProfileInstructionsMessage),
-          const _WalletBalanceNotice(),
+          Text(
+            l10n.createProfileInstructionsMessage(CardanoWalletDetails.minAdaForRegistration.ada),
+          ),
         ],
       ),
-    );
-  }
-}
-
-class _WalletBalanceNotice extends StatelessWidget {
-  const _WalletBalanceNotice();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          context.l10n.notice,
-          style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          context.l10n.createProfileInstructionsNotice(
-            CardanoWalletDetails.minAdaForRegistration.ada,
-          ),
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ],
     );
   }
 }

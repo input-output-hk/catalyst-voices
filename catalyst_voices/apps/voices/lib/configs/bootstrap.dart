@@ -66,7 +66,7 @@ Future<BootstrapArgs> bootstrap({
   );
 }
 
-/// The entry point for Catalyst Voices,
+/// The entry point for Catalyst App,
 /// initializes and runs the application.
 ///
 /// Should configure dependency injection, setup logger and do

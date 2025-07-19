@@ -81,7 +81,7 @@ enum AppEnvironmentType {
 
       /// [AppEnvironmentType.relative] type does not now where its backends
       /// are hosted.
-      AppEnvironmentType.relative => Uri(),
+      AppEnvironmentType.relative => Uri.base,
     };
   }
 
