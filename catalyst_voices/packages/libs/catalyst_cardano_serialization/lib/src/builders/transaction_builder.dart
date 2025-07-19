@@ -215,6 +215,7 @@ final class TransactionBuilder extends Equatable {
     Set<TransactionUnspentOutput>? inputs,
     List<ShelleyMultiAssetTransactionOutput>? outputs,
     Coin? fee,
+    AuxiliaryData? auxiliaryData,
     TransactionWitnessSetBuilder? witnessBuilder,
   }) {
     return TransactionBuilder(
@@ -223,7 +224,7 @@ final class TransactionBuilder extends Equatable {
       outputs: outputs ?? this.outputs,
       fee: fee ?? this.fee,
       ttl: ttl,
-      auxiliaryData: auxiliaryData,
+      auxiliaryData: auxiliaryData ?? this.auxiliaryData,
       validityStart: validityStart,
       mint: mint,
       scriptData: scriptData,
