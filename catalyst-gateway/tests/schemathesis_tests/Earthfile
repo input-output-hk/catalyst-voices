@@ -41,7 +41,8 @@ package-schemathesis:
     SAVE IMAGE schemathesis:$tag
 
 # test-ci-schemathesis - Runs schemathesis in CI
-test-ci-schemathesis:
+# TODO: Enable when our earthly self-satellites will be back
+disable-test-ci-schemathesis:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     LET api_spec="http://0.0.0.0:3030/docs/cat-gateway.json"
     ARG wait_for_schema=500
@@ -74,7 +75,7 @@ test-ci-schemathesis:
     END
 
 # nightly-test-dev-schemathesis - Runs schemathesis on nightly dev envrionment
-nightly-test-dev-schemathesis:
+disabled-nightly-test-dev-schemathesis:
     FROM earthly/dind:alpine-3.19-docker-25.0.5-r0
     RUN apk update && apk add iptables-legacy curl zstd # workaround for https://github.com/earthly/earthly/issues/3784
     LET api_spec="https://gateway.dev.projectcatalyst.io/docs/cat-gateway.json"

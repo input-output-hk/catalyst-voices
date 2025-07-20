@@ -1,4 +1,3 @@
-version: "1.0.0"
 project: {
 	name: "voices"
 	deployment: {
@@ -8,12 +7,13 @@ project: {
 		}
 
 		bundle: {
+			env: string | *"dev"
 			modules: main: {
 				name:    "app"
-				version: "0.11.0"
+				version: "0.11.1"
 				values: {
 					deployment: {
-						replicas: 3
+						replicas: number | *1
 						containers: main: {
 							image: {
 								name: _ @forge(name="CONTAINER_IMAGE")
@@ -43,6 +43,10 @@ project: {
 									path: "/healthz"
 									port: 8080
 								}
+							}
+							resources: requests: {
+								cpu:    string | *"256m"
+								memory: string | *"256Mi"
 							}
 						}
 					}
