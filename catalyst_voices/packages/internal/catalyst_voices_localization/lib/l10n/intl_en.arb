@@ -582,22 +582,6 @@
   "@walletLinkIntroTitle": {
     "description": "A title in link wallet flow on intro screen."
   },
-  "dayAbbr": "d",
-  "@dayAbbr": {
-    "description": "A single letter abbreviation for day."
-  },
-  "hourAbbr": "h",
-  "@hourAbbr": {
-    "description": "A single letter abbreviation for hour."
-  },
-  "minuteAbbr": "m",
-  "@minuteAbbr": {
-    "description": "A single letter abbreviation for minute."
-  },
-  "secondAbbr": "s",
-  "@secondAbbr": {
-    "description": "A single letter abbreviation for second."
-  },
   "walletLinkIntroContent": "You're almost there! This is the final and most important step in your account setup. \u2028\u2028We're going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.  \u2028\u2028We'll start with your Contributor Key by default. You can decide to add a Proposer Key if you want.",
   "@walletLinkIntroContent": {
     "description": "A message (content) in link wallet flow on intro screen."
@@ -2316,6 +2300,22 @@
   "notAvailableAbbr": "N/A",
   "@notAvailableAbbr": {
     "description": "Abbreviation for not available"
+  },
+  "dayAbbr": "d",
+  "@dayAbbr": {
+    "description": "A single letter abbreviation for day."
+  },
+  "hourAbbr": "h",
+  "@hourAbbr": {
+    "description": "A single letter abbreviation for hour."
+  },
+  "minuteAbbr": "m",
+  "@minuteAbbr": {
+    "description": "A single letter abbreviation for minute."
+  },
+  "secondAbbr": "s",
+  "@secondAbbr": {
+    "description": "A single letter abbreviation for second."
   },
   "title": "Title",
   "@title": {

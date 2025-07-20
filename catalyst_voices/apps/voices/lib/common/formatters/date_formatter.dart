@@ -8,13 +8,12 @@ abstract class DateFormatter {
   static String formatDateRange(
     MaterialLocalizations localizations,
     VoicesLocalizations l10n,
-    DateRange range, {
-    bool formatSameWeek = true,
-  }) {
+    DateRange range,
+  ) {
     final from = range.from;
     final to = range.to;
     if (from != null && to != null) {
-      if (formatSameWeek && range.areDatesInSameWeek(localizations.firstDayOfWeekIndex)) {
+      if (range.areDatesInSameWeek(localizations.firstDayOfWeekIndex)) {
         return '${l10n.weekOf} ${DateFormat.MMMd().format(from)}';
       }
 
