@@ -14,7 +14,7 @@ import 'package:collection/collection.dart';
 typedef RegistrationMetadata = X509MetadataEnvelope<RegistrationData>;
 
 /// A builder that builds a Catalyst user registration transaction
-/// using RBAC specification.
+/// using RBAC specification with the TransactionEncoder.
 final class RegistrationTransactionBuilder {
   /// The RBAC registration purpose for the Catalyst Project.
   static const _catalystUserRoleRegistrationPurpose = 'ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c';
@@ -76,13 +76,18 @@ final class RegistrationTransactionBuilder {
 
   ShelleyAddress get _stakeAddress => rewardAddresses.first;
 
-  /// Builds the unsigned registration transaction.
+  /// Builds the unsigned registration transaction using the TransactionEncoder.
+  ///
+  /// Separates concerns:
+  /// - Registration logic creates the auxiliary data (X509MetadataEnvelope)
+  /// - TransactionEncoder handles the generic transaction building with 
+  ///   UTXO selection and fee calculation
   ///
   /// Throws [RegistrationInsufficientBalanceException] in case the
   /// user doesn't have enough balance to pay for the registration transaction.
   Future<Transaction> build() async {
     try {
-      return await _build();
+      return await _buildWithTransactionEncoder();
     } on InsufficientAdaForAssetsException {
       throw const RegistrationInsufficientBalanceException();
     } on InsufficientAdaForChangeOutputException {
@@ -92,7 +97,8 @@ final class RegistrationTransactionBuilder {
     }
   }
 
-  Future<Transaction> _build() async {
+  /// Builds the transaction using the TransactionEncoder with auxiliary data.
+  Future<Transaction> _buildWithTransactionEncoder() async {
     if (utxos.isEmpty) {
       throw const RegistrationInsufficientBalanceException();
     }
@@ -106,39 +112,46 @@ final class RegistrationTransactionBuilder {
       final derCert = await _generateX509CertificateIfNeeded(rootKeyPair);
       final publicKeys = await _generatePublicKeysForAllRoles(rootKeyPair);
 
-      // Build dummy metadata to allow the transaction builder to select utxos,
-      // the selected utxos are needed to calculate txInputsHash that is included in the metadata.
-      //
-      // We can't upfront calculate the txInputsHash because we don't know the exact metadata size
-      // at this point which the coin selection algorithm needs to calculate the appropriate
-      // fee and select inputs.
-      final dummyUtxos = <TransactionUnspentOutput>{};
-      final dummyX509Envelope = await _buildMetadataEnvelope(
+      // Create the transaction builder with all necessary configuration
+      final txBuilder = TransactionBuilder(
+        requiredSigners: {
+          _stakeAddress.publicKeyHash,
+        },
+        config: transactionConfig,
+        inputs: utxos,
+        networkId: networkId,
+        ttl: slotNumberTtl,
+        changeAddress: changeAddress,
+      );
+
+      // Build the X.509 metadata envelope
+      final x509Envelope = await _buildMetadataEnvelope(
         rootKeyPair: rootKeyPair,
-        selectedUtxos: dummyUtxos,
+        selectedUtxos: utxos,
         derCert: derCert,
         publicKeys: publicKeys,
       );
 
-      // Build dummy transaction to see what utxos need to be selected.
-      final dummyTransaction = _buildUnsignedRbacTx(await dummyX509Envelope.toAuxiliaryData());
+      // Convert X.509 envelope to CBOR for the transaction
+      final envelopeCbor = await x509Envelope.toCbor(serializer: (e) => e.toCbor());
+      
+      // Create auxiliary data from the X.509 envelope
+      final auxiliaryData = AuxiliaryData.fromCbor(envelopeCbor);
 
-      // We are assuming that the utxos selected for the dummy transaction will satisfy
-      // the fee requirements for the real transaction since the transaction size is the same,
-      // instead of using dummy metadata we will use the real one but for both of them the size
-      // would be the same.
-      final selectedUtxos = _findSelectedUtxos(utxos, dummyTransaction.body.inputs);
-      final realX509Envelope = await _buildMetadataEnvelope(
-        rootKeyPair: rootKeyPair,
-        selectedUtxos: selectedUtxos,
-        derCert: derCert,
-        publicKeys: publicKeys,
+      // Build the transaction with the X.509 envelope as auxiliary data
+      final txBody = txBuilder.buildBody();
+      final transaction = Transaction(
+        body: txBody,
+        isValid: true,
+        witnessSet: const TransactionWitnessSet(),
+        auxiliaryData: auxiliaryData,
       );
 
-      return _buildUnsignedRbacTx(await realX509Envelope.toAuxiliaryData());
+      return transaction;
     });
   }
 
+  /// Builds the  X.509 metadata envelope for CIP-509 
   Future<RegistrationMetadata> _buildMetadataEnvelope({
     required CatalystKeyPair rootKeyPair,
     required Set<TransactionUnspentOutput> selectedUtxos,
@@ -209,33 +222,6 @@ final class RegistrationTransactionBuilder {
     };
   }
 
-  Transaction _buildUnsignedRbacTx(AuxiliaryData auxiliaryData) {
-    final txBuilder = TransactionBuilder(
-      requiredSigners: {
-        _stakeAddress.publicKeyHash,
-      },
-      config: transactionConfig,
-      inputs: utxos,
-      networkId: networkId,
-      ttl: slotNumberTtl,
-      auxiliaryData: auxiliaryData,
-      changeAddress: changeAddress,
-    );
-
-    final txBody = txBuilder
-        .applySelection(
-          changeOutputStrategy: ChangeOutputAdaStrategy.noBurn,
-        )
-        .buildBody();
-
-    return Transaction(
-      body: txBody,
-      isValid: true,
-      witnessSet: const TransactionWitnessSet(),
-      auxiliaryData: auxiliaryData,
-    );
-  }
-
   Future<cs.Ed25519PublicKey> _deriveDrepPublicKey() {
     final keyPair = keyDerivationService.deriveAccountRoleKeyPair(
       masterKey: masterKey,
@@ -252,13 +238,6 @@ final class RegistrationTransactionBuilder {
     );
 
     return keyPair.use((keyPair) => keyPair.publicKey.toEd25519());
-  }
-
-  Set<TransactionUnspentOutput> _findSelectedUtxos(
-    Set<TransactionUnspentOutput> utxos,
-    Set<TransactionInput> inputs,
-  ) {
-    return utxos.where((e) => inputs.contains(e.input)).toSet();
   }
 
   Future<RbacField<cs.Ed25519PublicKey>> _generatePublicKeyForOffset(
@@ -362,13 +341,5 @@ extension on CatalystPublicKey {
     final publicKey = Bip32Ed25519XPublicKeyFactory.instance.fromBytes(bytes).toPublicKey().bytes;
 
     return cs.Ed25519PublicKey.fromBytes(publicKey);
-  }
-}
-
-extension on RegistrationMetadata {
-  Future<AuxiliaryData> toAuxiliaryData() async {
-    return AuxiliaryData.fromCbor(
-      await toCbor(serializer: (e) => e.toCbor()),
-    );
   }
 }

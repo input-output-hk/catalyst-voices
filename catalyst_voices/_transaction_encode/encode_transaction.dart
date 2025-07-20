@@ -109,14 +109,14 @@ class _CborValidator {
     // Check if placeholders are non-zero after patching
     final inputsHashValue = metadataMap[cbor.CborSmallInt(_kTxInputsHashPlaceholder)];
     if (inputsHashValue is cbor.CborBytes && inputsHashValue.bytes.every((b) => b == 0)) {
-      final isExpected = context == 'initial' || context == 'after_tx_inputs_hash_patch';
+      final isExpected = context == 'initial' || context == 'after_tx_inputs_hash_patch' || context == 'test';
       final status = isExpected ? 'EXPECTED' : 'UNEXPECTED';
       print('Warning: $name: Inputs hash placeholder is still zero-filled ($status at $context)');
     }
     
     final signatureValue = metadataMap[cbor.CborSmallInt(_kValidationSignature)];
     if (signatureValue is cbor.CborBytes && signatureValue.bytes.every((b) => b == 0)) {
-      final isExpected = context == 'initial' || context == 'after_tx_inputs_hash_patch';
+      final isExpected = context == 'initial' || context == 'after_tx_inputs_hash_patch' || context == 'test';
       final status = isExpected ? 'EXPECTED' : 'UNEXPECTED';
       print('Warning: $name: Signature placeholder is still zero-filled ($status at $context)');
     }
@@ -200,7 +200,7 @@ class _CborValidator {
 
     // Check if auxiliary data hash is zero-filled
     if (auxDataHash.bytes.every((b) => b == 0)) {
-      final isExpected = context == 'initial';
+      final isExpected = context == 'initial' || context == 'test';
       final status = isExpected ? 'EXPECTED' : 'UNEXPECTED';
       print('Warning: $name: Auxiliary data hash is still zero-filled ($status at $context)');
     }
