@@ -62,7 +62,7 @@ Proposals should focus on mature R&D for products with Tier-1 collaborations, su
       ),
       CategoryDescription(
         title: 'Eligibility Criteria',
-      description: '''
+        description: '''
 The following will **not** be funded:
 
 - Early-stage concepts or prototypes _e.g. a new DeFi protocol MVP proposal belongs in Cardano Use Cases: Concepts._
