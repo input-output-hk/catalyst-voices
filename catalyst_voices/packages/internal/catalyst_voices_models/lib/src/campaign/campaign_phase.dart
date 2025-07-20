@@ -27,7 +27,6 @@ final class CampaignPhase extends Equatable {
     String? description,
     DateRange? timeline,
     CampaignPhaseType? type,
-    bool? offtype,
   }) {
     return CampaignPhase(
       title: title ?? this.title,
