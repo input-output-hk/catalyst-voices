@@ -1,18 +1,10 @@
 import 'package:catalyst_voices/common/formatters/duration_formatter.dart';
 import 'package:catalyst_voices_localization/generated/catalyst_voices_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 
 void main() {
   group(DurationFormatter, () {
-    final localizations = MockVoicesLocalizations();
-
-    setUpAll(() {
-      when(() => localizations.dayAbbr).thenReturn('d');
-      when(() => localizations.hourAbbr).thenReturn('h');
-      when(() => localizations.minuteAbbr).thenReturn('m');
-      when(() => localizations.secondAbbr).thenReturn('s');
-    });
+    final localizations = _FakeVoicesLocalizations();
 
     group('formatDurationMMss', () {
       test('formats full duration with days, hours, and minutes', () {
@@ -108,4 +100,13 @@ void main() {
   });
 }
 
-class MockVoicesLocalizations extends Mock implements VoicesLocalizations {}
+class _FakeVoicesLocalizations extends Fake implements VoicesLocalizations {
+  @override
+  String get dayAbbr => 'd';
+  @override
+  String get hourAbbr => 'h';
+  @override
+  String get minuteAbbr => 'm';
+  @override
+  String get secondAbbr => 's';
+}
