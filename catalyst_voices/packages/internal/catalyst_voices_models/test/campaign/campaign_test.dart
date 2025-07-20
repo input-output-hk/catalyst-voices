@@ -21,7 +21,7 @@ void main() {
       );
 
       // Act
-      final result = CampaignPhaseStatus.fromRange(range);
+      final result = CampaignPhaseStatus.fromRange(range, now);
 
       // Assert
       expect(result, equals(CampaignPhaseStatus.upcoming));
@@ -35,7 +35,7 @@ void main() {
       );
 
       // Act
-      final result = CampaignPhaseStatus.fromRange(range);
+      final result = CampaignPhaseStatus.fromRange(range, now);
 
       // Assert
       expect(result, equals(CampaignPhaseStatus.active));
@@ -49,7 +49,7 @@ void main() {
       );
 
       // Act
-      final result = CampaignPhaseStatus.fromRange(range);
+      final result = CampaignPhaseStatus.fromRange(range, now);
 
       // Assert
       expect(result, equals(CampaignPhaseStatus.post));
@@ -63,7 +63,7 @@ void main() {
       );
 
       // Act
-      final result = CampaignPhaseStatus.fromRange(range);
+      final result = CampaignPhaseStatus.fromRange(range, now);
 
       // Assert
       expect(result, equals(CampaignPhaseStatus.active));
@@ -77,7 +77,7 @@ void main() {
       );
 
       // Act
-      final result = CampaignPhaseStatus.fromRange(range);
+      final result = CampaignPhaseStatus.fromRange(range, now);
 
       // Assert
       expect(result, equals(CampaignPhaseStatus.active));
@@ -91,7 +91,7 @@ void main() {
       );
 
       // Act
-      final result = CampaignPhaseStatus.fromRange(range);
+      final result = CampaignPhaseStatus.fromRange(range, now);
 
       // Assert
       expect(result, equals(CampaignPhaseStatus.active));

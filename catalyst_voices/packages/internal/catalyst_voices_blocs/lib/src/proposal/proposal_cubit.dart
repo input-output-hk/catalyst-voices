@@ -389,7 +389,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     final campaignTimeline = await _campaignService.getCampaignPhaseTimeline(
       CampaignPhaseType.proposalSubmission,
     );
-    final dateRangeStatus = campaignTimeline.timeline.rangeStatusNow();
+    final dateRangeStatus = campaignTimeline.timeline.rangeStatus(DateTimeExt.now());
 
     return switch (dateRangeStatus) {
       DateRangeStatus.after => true,

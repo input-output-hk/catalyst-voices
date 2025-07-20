@@ -34,14 +34,13 @@ class AccountVotingPowerCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           VoicesAssets.icons.lightningBolt.buildIcon(
             color: theme.colors.textOnPrimaryLevel1,
             size: 24,
           ),
-          const SizedBox(height: 44),
+          const Spacer(),
           _VotingPowerLabelRow(
             votingPower: votingPower,
             labelStyle: labelStyle,

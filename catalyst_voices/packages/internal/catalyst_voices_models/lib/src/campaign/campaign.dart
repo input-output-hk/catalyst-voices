@@ -91,7 +91,7 @@ Project Catalyst turns economic power into innovation power by using the Cardano
     final states = <CampaignPhaseState>[];
 
     for (final phase in timeline.phases) {
-      final status = CampaignPhaseStatus.fromRange(phase.timeline);
+      final status = CampaignPhaseStatus.fromRange(phase.timeline, DateTimeExt.now());
       if (status.isActive) {
         states.add(CampaignPhaseState(phase: phase, status: status));
       }
@@ -106,7 +106,7 @@ Project Catalyst turns economic power into innovation power by using the Cardano
         activePhases: [
           CampaignPhaseState(
             phase: phase,
-            status: CampaignPhaseStatus.fromRange(phase.timeline),
+            status: CampaignPhaseStatus.fromRange(phase.timeline, DateTimeExt.now()),
           ),
         ],
       );
@@ -148,7 +148,7 @@ Project Catalyst turns economic power into innovation power by using the Cardano
     );
     return CampaignPhaseState(
       phase: phase,
-      status: CampaignPhaseStatus.fromRange(phase.timeline),
+      status: CampaignPhaseStatus.fromRange(phase.timeline, DateTimeExt.now()),
     );
   }
 }
@@ -173,8 +173,8 @@ enum CampaignPhaseStatus {
 
   const CampaignPhaseStatus();
 
-  factory CampaignPhaseStatus.fromRange(DateRange range) {
-    final rangeStatus = range.rangeStatusNow();
+  factory CampaignPhaseStatus.fromRange(DateRange range, DateTime now) {
+    final rangeStatus = range.rangeStatus(now);
 
     return switch (rangeStatus) {
       DateRangeStatus.before => CampaignPhaseStatus.upcoming,

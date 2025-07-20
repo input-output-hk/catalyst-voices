@@ -30,7 +30,7 @@ class CampaignStageCubit extends Cubit<CampaignStageState> {
       final campaignTimeline = await _campaignService.getCampaignPhaseTimeline(
         CampaignPhaseType.proposalSubmission,
       );
-      final dateRangeStatus = campaignTimeline.timeline.rangeStatusNow();
+      final dateRangeStatus = campaignTimeline.timeline.rangeStatus(DateTimeExt.now());
       final startDate = campaignTimeline.timeline.from;
       final endDate = campaignTimeline.timeline.to;
 
