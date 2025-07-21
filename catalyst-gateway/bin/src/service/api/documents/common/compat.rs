@@ -37,10 +37,8 @@ pub(crate) fn to_new_version(doc: SignedDocBody) -> Result<SignedDocBody, anyhow
     let (doc_type_old, doc_ref_old) = is_deprecated(&doc)?;
 
     if doc_type_old || doc_ref_old {
-        // TODO: rename brand_id, campaign_id and category_id to
-        // the parameters and also make transformation of the DocumentRef  type
-        
         let doc_type = if doc_type_old {
+            // note: transform `type` to new version
             match doc
                 .doc_type()
                 .first()
@@ -58,7 +56,9 @@ pub(crate) fn to_new_version(doc: SignedDocBody) -> Result<SignedDocBody, anyhow
         };
 
         let metadata = if let Some(json_meta) = doc.metadata() {
-            // transform metadata by decoding and encoding it again
+            // note: transform metadata by decoding and encoding it again
+            // this will convert `brand_id`, `campaign_id` and `category_id` to `parameters`,
+            // and `ref` to new format
             let meta = catalyst_signed_doc::Metadata::from_json(json_meta.clone())?;
 
             Some(meta.to_json()?)
