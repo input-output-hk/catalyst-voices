@@ -16,7 +16,7 @@ dependencies:
   catalyst_compression: ^1.0.0
   catalyst_compression_web: ^1.0.0
   catalyst_key_derivation: ^1.0.0
-  cbor: ^6.3.7
+  cbor: 6.3.7
   collection: ^1.19.0
   convert: ^3.1.1
   cryptography: ^2.7.0
