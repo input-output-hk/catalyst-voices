@@ -15,7 +15,7 @@ void main() {
           from: DateTime.utc(2025, 7, 10),
           to: DateTime.utc(2025, 7, 21),
         ),
-        previousPhaseStartDate: DateTime.utc(2025, 6),
+        campaignStartDate: DateTime.utc(2025, 6),
       );
 
       // Then
@@ -41,7 +41,7 @@ void main() {
           from: DateTime.utc(2025, 7, 10),
           to: DateTime.utc(2025, 7, 21),
         ),
-        previousPhaseStartDate: DateTime.utc(2025, 6),
+        campaignStartDate: DateTime.utc(2025, 6),
       );
 
       // Then
@@ -67,7 +67,7 @@ void main() {
           from: DateTime.utc(2025, 7, 10),
           to: DateTime.utc(2025, 7, 21),
         ),
-        previousPhaseStartDate: DateTime.utc(2025, 6),
+        campaignStartDate: DateTime.utc(2025, 6),
       );
 
       // Then

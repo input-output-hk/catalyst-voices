@@ -1659,6 +1659,10 @@
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
   },
+  "catalystF15": "Catalyst Fund15",
+  "@catalystF15": {
+    "description": "Used in hero section to indicate current fund."
+  },
   "currentCampaign": "Current Campaign",
   "currentCampaignDescription": "Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.",
   "campaignTreasury": "Campaign Treasury",

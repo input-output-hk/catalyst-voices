@@ -216,6 +216,7 @@ void main() {
         equals(CampaignPhaseStatus.active),
       );
     });
+
     test('state return closest phase when no active phase', () {
       // Arrange
       final campaign = Campaign(
@@ -411,6 +412,57 @@ void main() {
         resultReviewRegistration.status,
         equals(CampaignPhaseStatus.upcoming),
       );
+    });
+
+    test('campaign start date returns earliest phase start date', () {
+      // Arrange
+      final campaign = Campaign(
+        selfRef: SignedDocumentRef.generateFirstRef(),
+        name: 'Campaign 1',
+        description: 'Description 1',
+        allFunds: const Coin(100),
+        totalAsk: const Coin(0),
+        fundNumber: 1,
+        categories: const [],
+        timeline: CampaignTimeline(
+          phases: [
+            CampaignPhase(
+              title: 'Proposal Submission',
+              description: 'Description 1',
+              type: CampaignPhaseType.proposalSubmission,
+              timeline: DateRange(
+                from: now,
+                to: now.plusDays(1),
+              ),
+            ),
+            CampaignPhase(
+              title: 'Voting Registration',
+              description: 'Description 1',
+              type: CampaignPhaseType.votingRegistration,
+              timeline: DateRange(
+                from: now.plusDays(2),
+                to: now.plusDays(3),
+              ),
+            ),
+            CampaignPhase(
+              title: 'Voting Registration',
+              description: 'Description 1',
+              type: CampaignPhaseType.votingRegistration,
+              timeline: DateRange(
+                from: now.plusDays(4),
+                to: now.plusDays(5),
+              ),
+            ),
+          ],
+        ),
+        publish: CampaignPublish.published,
+      );
+
+      // Act
+      final result = campaign.startDate;
+
+      // Assert
+      expect(result, equals(now));
     });
   });
 }

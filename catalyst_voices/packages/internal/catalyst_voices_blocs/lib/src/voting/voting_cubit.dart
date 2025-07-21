@@ -63,15 +63,7 @@ final class VotingCubit extends Cubit<VotingState>
 
     _cache = _cache.copyWith(filters: filters);
 
-    emit(
-      state.copyWith(
-        isOrderEnabled: _cache.filters.type == ProposalsFilterType.total,
-      ),
-    );
-
-    if (category != null) _rebuildCategories();
-    if (type != null) _rebuildOrder();
-
+    _dispatchState();
     _watchProposalsCount(filters: filters.toCountFilters());
 
     if (resetProposals) {
@@ -88,8 +80,7 @@ final class VotingCubit extends Cubit<VotingState>
     }
 
     _cache = _cache.copyWith(selectedOrder: Optional(order));
-
-    _rebuildOrder();
+    _dispatchState();
 
     if (resetProposals) {
       emitSignal(const ResetPaginationVotingSignal());
@@ -122,18 +113,18 @@ final class VotingCubit extends Cubit<VotingState>
       }
 
       final filters = _cache.filters;
-      final order = _resolveEffectiveOrder();
+      final selectedOrder = _cache.selectedOrder;
+      final effectiveOrder = _resolveEffectiveOrder(filters.type, selectedOrder);
 
-      _logger.finer('Proposals request[$request], filters[$filters], order[$order]');
+      _logger.finer('Proposals request[$request], filters[$filters], order[$effectiveOrder]');
 
       final page = await _proposalService.getProposalsPage(
         request: request,
         filters: filters,
-        order: order,
+        order: effectiveOrder,
       );
 
       _cache = _cache.copyWith(page: Optional(page));
-
       _emitCachedProposalsPage();
     } catch (error, stackTrace) {
       _logger.severe('Failed loading page $request', error, stackTrace);
@@ -147,8 +138,8 @@ final class VotingCubit extends Cubit<VotingState>
     required ProposalsOrder order,
   }) {
     _resetCache();
-    _rebuildOrder();
-    unawaited(_loadCampaignCategories());
+    unawaited(_loadCampaign());
+    unawaited(_loadVotingPower());
 
     changeFilters(onlyMy: Optional(onlyMyProposals), category: Optional(category), type: type);
     changeOrder(order);
@@ -167,17 +158,15 @@ final class VotingCubit extends Cubit<VotingState>
       favoritesIds.removeWhere((element) => element == ref.id);
     }
 
-    emit(state.copyWith(favoritesIds: favoritesIds));
+    _cache = _cache.copyWith(favoriteIds: Optional(favoritesIds));
+    _dispatchState();
 
     if (!isFavorite && _cache.filters.type == ProposalsFilterType.favorites) {
       final page = _cache.page;
       if (page != null) {
         final proposals = List.of(page.items).where((element) => element.selfRef != ref).toList();
-
         final updatedPage = page.copyWithItems(proposals);
-
         _cache = _cache.copyWith(page: Optional(updatedPage));
-
         _emitCachedProposalsPage();
       }
     }
@@ -193,68 +182,26 @@ final class VotingCubit extends Cubit<VotingState>
     }
 
     changeFilters(searchQuery: asOptional, resetProposals: true);
-
-    emit(state.copyWith(hasSearchQuery: !asOptional.isEmpty));
   }
 
-  void _emitCachedProposalsPage() {
-    final campaign = _cache.campaign;
-    final page = _cache.page;
-
-    if (campaign == null || page == null) {
-      return;
-    }
-
-    final mappedPage = page.map(ProposalBrief.fromProposal);
-
-    final signal = PageReadyVotingSignal(page: mappedPage);
-
-    emitSignal(signal);
-  }
-
-  void _handleActiveAccountIdChange(CatalystId? id) {
-    changeFilters(author: Optional(id), resetProposals: true);
-  }
-
-  void _handleFavoriteProposalsIds(List<String> ids) {
-    emit(state.copyWith(favoritesIds: ids));
-  }
-
-  void _handleProposalsCount(ProposalsCount count) {
-    _cache = _cache.copyWith(count: count);
-
-    emit(state.copyWith(count: count));
-  }
-
-  Future<void> _loadCampaignCategories() async {
-    final campaign = await _campaignService.getActiveCampaign();
-    final categories = campaign?.categories ?? [];
-
-    _cache = _cache.copyWith(categories: Optional(categories));
-
-    if (!isClosed) {
-      _rebuildCategories();
-    }
-  }
-
-  void _rebuildCategories() {
-    final selectedCategory = _cache.filters.category;
-    final categories = _cache.categories ?? const [];
-
-    final categorySelectorItems = categories.map((e) {
+  List<ProposalsCategorySelectorItem> _buildCategorySelectorItems(
+    List<CampaignCategory> categories,
+    SignedDocumentRef? selectedCategory,
+  ) {
+    return categories.map((e) {
       return ProposalsCategorySelectorItem(
         ref: e.selfRef,
         name: e.categoryText,
         isSelected: e.selfRef.id == selectedCategory?.id,
       );
     }).toList();
-
-    emit(state.copyWith(categorySelectorItems: categorySelectorItems));
   }
 
-  void _rebuildOrder() {
-    final filterType = _cache.filters.type;
-    final selectedOrder = _resolveEffectiveOrder();
+  List<ProposalsDropdownOrderItem> _buildOrderItems(
+    ProposalsFilterType filterType,
+    ProposalsOrder? selectedOrder,
+  ) {
+    final effectiveOrder = _resolveEffectiveOrder(filterType, selectedOrder);
 
     final options = filterType == ProposalsFilterType.total
         ? const [
@@ -266,11 +213,111 @@ final class VotingCubit extends Cubit<VotingState>
             UpdateDate(isAscending: false),
           ];
 
-    final orderItem = options
-        .map((order) => ProposalsDropdownOrderItem(order, isSelected: order == selectedOrder))
+    return options
+        .map((order) => ProposalsDropdownOrderItem(order, isSelected: order == effectiveOrder))
         .toList();
+  }
 
-    emit(state.copyWith(orderItems: orderItem));
+  VotingPhaseProgressViewModel? _buildVotingPhase(Campaign? campaign) {
+    final campaignVotingPhase = campaign?.phaseStateTo(CampaignPhaseType.communityVoting);
+    final campaignStartDate = campaign?.startDate;
+
+    if (campaignVotingPhase != null && campaignStartDate != null) {
+      return VotingPhaseProgressViewModel.fromModel(
+        state: campaignVotingPhase,
+        campaignStartDate: campaignStartDate,
+      );
+    } else {
+      return null;
+    }
+  }
+
+  void _dispatchState() {
+    final newState = _rebuildState();
+    if (state != newState) {
+      emit(newState);
+    }
+  }
+
+  void _emitCachedProposalsPage() {
+    final campaign = _cache.campaign;
+    final page = _cache.page;
+
+    if (campaign == null || page == null) {
+      return;
+    }
+
+    final mappedPage = page.map(ProposalBrief.fromProposal);
+    final signal = PageReadyVotingSignal(page: mappedPage);
+
+    emitSignal(signal);
+  }
+
+  void _handleActiveAccountIdChange(CatalystId? id) {
+    changeFilters(author: Optional(id), resetProposals: true);
+  }
+
+  void _handleFavoriteProposalsIds(List<String> ids) {
+    _cache = _cache.copyWith(favoriteIds: Optional(ids));
+    _dispatchState();
+  }
+
+  void _handleProposalsCount(ProposalsCount count) {
+    _cache = _cache.copyWith(count: count);
+    _dispatchState();
+  }
+
+  Future<void> _loadCampaign() async {
+    final campaign = await _campaignService.getActiveCampaign();
+    _cache = _cache.copyWith(campaign: Optional(campaign));
+
+    if (!isClosed) {
+      _dispatchState();
+    }
+  }
+
+  Future<void> _loadVotingPower() async {
+    // TODO(dt-iohk): fetch voting power from service
+    final votingPower = VotingPower(
+      amount: 1520,
+      status: VotingPowerStatus.confirmed,
+      updatedAt: DateTime(2025, 5, 1, 13, 45),
+    );
+
+    _cache = _cache.copyWith(votingPower: Optional(votingPower));
+
+    if (!isClosed) {
+      _dispatchState();
+    }
+  }
+
+  VotingState _rebuildState() {
+    final campaign = _cache.campaign;
+    final favoriteIds = _cache.favoriteIds ?? const [];
+    final votingPower = _cache.votingPower;
+    final categories = campaign?.categories ?? const [];
+    final selectedCategory = _cache.filters.category;
+    final filters = _cache.filters;
+    final count = _cache.count;
+
+    final votingPowerViewModel =
+        votingPower != null ? VotingPowerViewModel.fromModel(votingPower) : null;
+    final votingPhaseViewModel = _buildVotingPhase(campaign);
+    final hasSearchQuery = filters.searchQuery == null;
+    final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategory);
+    final orderItems = _buildOrderItems(_cache.filters.type, _cache.selectedOrder);
+    final isOrderEnabled = _cache.filters.type == ProposalsFilterType.total;
+
+    return state.copyWith(
+      votingPower: Optional(votingPowerViewModel),
+      votingPhase: Optional(votingPhaseViewModel),
+      hasSearchQuery: hasSearchQuery,
+      favoritesIds: favoriteIds,
+      count: count,
+      categorySelectorItems: categorySelectorItems,
+      orderItems: orderItems,
+      isOrderEnabled: isOrderEnabled,
+    );
   }
 
   void _resetCache() {
@@ -279,10 +326,10 @@ final class VotingCubit extends Cubit<VotingState>
     _cache = VotingCubitCache(filters: filters);
   }
 
-  ProposalsOrder _resolveEffectiveOrder() {
-    final filterType = _cache.filters.type;
-    final selectedOrder = _cache.selectedOrder;
-
+  ProposalsOrder _resolveEffectiveOrder(
+    ProposalsFilterType filterType,
+    ProposalsOrder? selectedOrder,
+  ) {
     // skip order for non total
     if (filterType != ProposalsFilterType.total) {
       return const UpdateDate(isAscending: false);
