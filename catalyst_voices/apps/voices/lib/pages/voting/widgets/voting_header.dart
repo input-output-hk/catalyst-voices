@@ -76,6 +76,7 @@ class _CategoryPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO(dt-iohk): implement in https://github.com/input-output-hk/catalyst-voices/issues/2965
     return const SizedBox(
       width: 100,
       height: 50,
