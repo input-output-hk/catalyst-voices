@@ -8,7 +8,7 @@ pub(crate) mod insert_rbac509_invalid;
 
 use std::{collections::HashSet, sync::Arc};
 
-use anyhow::Result;
+use anyhow::{bail, Result};
 use cardano_blockchain_types::{MultiEraBlock, Slot, TransactionId, TxnIndex};
 use rbac_registration::cardano::cip509::Cip509;
 use scylla::Session;
@@ -118,7 +118,7 @@ impl Rbac509InsertQuery {
             cip509.txn_hash(),
             block.is_immutable(),
         )
-        .await;
+        .await?;
 
         let previous_transaction = cip509.previous_transaction();
         match Box::pin(validate_rbac_registration(
@@ -303,7 +303,7 @@ impl Rbac509InsertQuery {
 async fn wait_for_indexing_up_to_block(
     indexer_state: &mut ChainIndexerStateReceiver, slot: Slot, tx_id: TransactionId,
     is_immutable: bool,
-) {
+) -> Result<()> {
     // firstly look at the stored, current recorded state
     let mut state = indexer_state.stored_state();
     loop {
@@ -312,13 +312,13 @@ async fn wait_for_indexing_up_to_block(
                 // for the immutable block we need to wait when everything would be indexed up to
                 // the current block
                 if state.is_immutable_fully_indexed_up_to(slot) {
-                    break;
+                    return Ok(());
                 }
             } else if state.is_reached_immutable_tip() {
                 // for the live block we should wait until the whole immutable part would be
                 // indexed, we are not waiting for the live part to be indexed,
                 // because in any case its indexing sequentially
-                break;
+                return Ok(());
             }
         }
 
@@ -328,7 +328,7 @@ async fn wait_for_indexing_up_to_block(
                 tx_hash = ?tx_id,
                 "Chain indexer state channel closed during the RBAC 509 transaction indexing",
             );
-            return;
+            bail!("Chain indexer state channel closed during the RBAC 509 transaction indexing");
         };
         state = Some(latest_state);
     }
