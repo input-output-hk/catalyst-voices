@@ -6,16 +6,12 @@ use poem_openapi::{
 };
 
 use super::SignedDocBody;
-use crate::service::{
-    api::documents::common::compat,
-    common::{
-        self,
-        types::{
-            array_types::impl_array_types,
-            document::{
-                doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId,
-                ver::DocumentVer,
-            },
+use crate::service::common::{
+    self,
+    types::{
+        array_types::impl_array_types,
+        document::{
+            doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
         },
     },
 };
@@ -252,7 +248,7 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
 
     fn try_from(doc: SignedDocBody) -> Result<Self, Self::Error> {
         // this will accept only older version
-        let (doc_type_old, doc_ref_old) = compat::is_deprecated(&doc)?;
+        let (doc_type_old, doc_ref_old) = doc.is_deprecated()?;
         if doc_type_old || doc_ref_old {
             return Err(anyhow::anyhow!(DEPRECATED_MARK));
         }

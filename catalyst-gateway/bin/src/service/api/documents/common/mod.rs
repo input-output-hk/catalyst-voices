@@ -12,8 +12,6 @@ use crate::{
     settings::Settings,
 };
 
-pub(crate) mod compat;
-
 /// Get document from the database
 pub(crate) async fn get_document(
     document_id: &uuid::Uuid, version: Option<&uuid::Uuid>,

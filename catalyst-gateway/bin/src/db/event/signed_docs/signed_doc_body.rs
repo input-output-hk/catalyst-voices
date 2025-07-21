@@ -86,6 +86,83 @@ impl SignedDocBody {
         }
     }
 
+    /// Checks if the given signed document is in the deprecated version of below v0.04
+    /// format.
+    ///
+    /// Returns a tuple `(doc_type_deprecated, doc_refs_deprecated)` where:
+    /// - `doc_type_deprecated`: `true` if the document type itself is marked as
+    ///   deprecated.
+    /// - `doc_refs_deprecated`: `true` if any document references are deprecated.
+    pub(crate) fn is_deprecated(&self) -> Result<(bool, bool), anyhow::Error> {
+        if let Some(json_meta) = self.metadata() {
+            let meta = catalyst_signed_doc::Metadata::from_json(json_meta.clone())?;
+
+            let doc_type_old = self.doc_type().len() == 1;
+
+            if let Some(doc_refs) = meta.doc_ref() {
+                let doc_ref_old = doc_refs
+                    .doc_refs()
+                    .iter()
+                    .any(|doc_ref| doc_ref.doc_locator().is_empty());
+
+                return Ok((doc_type_old, doc_ref_old));
+            }
+
+            return Ok((doc_type_old, false));
+        }
+
+        Ok((false, false))
+    }
+
+    /// Converts the given signed document to the newer version of v0.04 if it is in the
+    /// deprecated version.
+    pub(crate) fn to_new_version(self) -> Result<SignedDocBody, anyhow::Error> {
+        let (doc_type_old, doc_ref_old) = self.is_deprecated()?;
+
+        if doc_type_old || doc_ref_old {
+            let doc_type = if doc_type_old {
+                // note: transform `type` to new version
+                match self
+                    .doc_type()
+                    .first()
+                    .map(|uuid| -> Result<_, anyhow::Error> {
+                        let uuid = catalyst_signed_doc::UuidV4::try_from(uuid.clone())?;
+                        Ok(catalyst_signed_doc::map_doc_type(uuid))
+                    })
+                    .transpose()?
+                {
+                    Some(uuid) => uuid.try_into()?,
+                    None => self.doc_type().clone(),
+                }
+            } else {
+                self.doc_type().clone()
+            };
+
+            let metadata = if let Some(json_meta) = self.metadata() {
+                // note: transform metadata by decoding and encoding it again
+                // this will convert `brand_id`, `campaign_id` and `category_id` to `parameters`,
+                // and `ref` to new format
+                let meta = catalyst_signed_doc::Metadata::from_json(json_meta.clone())?;
+
+                Some(meta.to_json()?)
+            } else {
+                None
+            };
+
+            let doc = SignedDocBody::new(
+                *self.id(),
+                *self.ver(),
+                doc_type,
+                self.authors().clone(),
+                metadata,
+            );
+
+            Ok(doc)
+        } else {
+            Ok(self)
+        }
+    }
+
     /// Loads a async stream of `SignedDocBody` from the event db.
     pub(crate) async fn retrieve(
         conditions: &DocsQueryFilter, query_limits: &QueryLimits,
