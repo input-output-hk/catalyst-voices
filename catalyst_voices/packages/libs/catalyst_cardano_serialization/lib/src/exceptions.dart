@@ -166,6 +166,40 @@ final class MaxTxSizeExceededException extends Equatable implements Exception {
       ')';
 }
 
+/// Exception thrown when validating size of AuxiliaryData.
+final class RawTransactionAuxiliaryDataSizeChanged extends Equatable implements Exception {
+  /// Bytes size expected.
+  final int expectedSize;
+
+  /// Actual bytes size.
+  final int actualSize;
+
+  /// The default constructor for [RawTransactionMalformed].
+  const RawTransactionAuxiliaryDataSizeChanged({
+    required this.expectedSize,
+    required this.actualSize,
+  });
+
+  @override
+  List<Object?> get props => [expectedSize, actualSize];
+
+  @override
+  String toString() =>
+      'RawTransactionAuxiliaryDataSizeChanged(expected($expectedSize) but got $actualSize )';
+}
+
+/// Exception thrown when validating integrity of transaction bytes.
+final class RawTransactionMalformed extends Equatable implements Exception {
+  /// The default constructor for [RawTransactionMalformed].
+  const RawTransactionMalformed();
+
+  @override
+  List<Object?> get props => [];
+
+  @override
+  String toString() => 'TransactionBytesFormatInvalid(bytes could not be decoded into valid tx)';
+}
+
 /// Exception thrown when the total size of reference scripts exceeds the limit.
 final class ReferenceScriptSizeLimitExceededException extends Equatable implements Exception {
   /// The maximum size of reference scripts allowed per transaction.

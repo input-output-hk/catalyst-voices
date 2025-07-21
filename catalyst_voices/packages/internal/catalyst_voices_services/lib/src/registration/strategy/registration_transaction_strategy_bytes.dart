@@ -6,6 +6,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_services/src/registration/registration_transaction_role.dart';
 import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy.dart';
+import 'package:cbor/cbor.dart';
 
 final class RegistrationTransactionStrategyBytes implements RegistrationTransactionStrategy {
   final TransactionBuilderConfig transactionConfig;
@@ -27,7 +28,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
   });
 
   @override
-  Future<BaseTransaction> build({
+  Future<RawTransaction> build({
     required String purpose,
     required CatalystKeyPair rootKeyPair,
     required X509DerCertificate? derCert,
@@ -77,6 +78,8 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
       auxiliaryData: dummyAuxiliaryData,
     );
 
+    final auxiliaryDataSizeBeforePatching = rawTx.auxiliaryData.length;
+
     // 1. txInputsHash
     final txInputsHash = TransactionInputsHash.fromHashedBytes(rawTx.inputs);
     rawTx.patchTxInputsHash(txInputsHash.bytes);
@@ -91,6 +94,10 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     // 3. auxiliaryData
     final auxiliaryDataHash = AuxiliaryDataHash.fromHashedBytes(rawTx.auxiliaryData);
     rawTx.patchAuxiliaryDataHash(auxiliaryDataHash.bytes);
+
+    // 4. validate
+    _validateCborFormat(rawTx);
+    _validateAuxiliaryDataSize(rawTx, expectedSize: auxiliaryDataSizeBeforePatching);
 
     return rawTx;
   }
@@ -141,5 +148,29 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
         },
       ),
     );
+  }
+
+  void _validateAuxiliaryDataSize(
+    RawTransaction rawTx, {
+    required int expectedSize,
+  }) {
+    final actualSize = rawTx.auxiliaryData.length;
+
+    if (actualSize != expectedSize) {
+      throw RawTransactionAuxiliaryDataSizeChanged(
+        expectedSize: expectedSize,
+        actualSize: actualSize,
+      );
+    }
+  }
+
+  void _validateCborFormat(RawTransaction rawTx) {
+    try {
+      final bytes = rawTx.bytes;
+      final cborValue = cbor.decode(bytes);
+      Transaction.fromCbor(cborValue);
+    } on FormatException catch (_) {
+      throw const RawTransactionMalformed();
+    }
   }
 }

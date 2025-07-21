@@ -1,19 +1,17 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart' as kd;
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart' show Bip32Ed25519XSignature;
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
-import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy.dart';
 import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy_bytes.dart';
-import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy_models.dart';
-import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy_type.dart';
 import 'package:cbor/cbor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 void main() {
-  group(RegistrationTransactionStrategy, () {
+  group(RegistrationTransactionStrategyBytes, () {
     late KeyDerivationService keyDerivationService;
 
     setUpAll(() {
@@ -34,7 +32,7 @@ void main() {
       ).thenAnswer((_) async => _voterKeyPair);
     });
 
-    test('comparing models and bytes transactions should give same output', () async {
+    test('raw transaction have correctly patched txInputsHash', () async {
       // Given
       final utxos = {
         TransactionUnspentOutput(
@@ -63,6 +61,7 @@ void main() {
       };
 
       final derCert = X509DerCertificate.fromBytes(bytes: List.filled(32, 0));
+      final strategy = _buildStrategy(utxos: utxos);
 
       // When
       final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
@@ -73,18 +72,64 @@ void main() {
         RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
       ];
 
-      final models = _pickStrategy(RegistrationTransactionStrategyType.models, utxos: utxos);
-      final bytes = _pickStrategy(RegistrationTransactionStrategyType.bytes, utxos: utxos);
+      // Then
+      final rawTransaction = await strategy.build(
+        purpose: _purpose,
+        rootKeyPair: rootKeyPair,
+        derCert: derCert,
+        publicKeys: publicKeys,
+        requiredSigners: requiredSigners,
+      );
+
+      expect(
+        rawTransaction.txInputsHash,
+        allOf(hasLength(TransactionInputsHash.hashLength), isNot(everyElement(0))),
+        reason: 'txInputsHash have correct size and is non zero',
+      );
+    });
+
+    test('raw transaction have correctly patched signature', () async {
+      // Given
+      final utxos = {
+        TransactionUnspentOutput(
+          input: TransactionInput(
+            transactionId: _buildDummyTransactionId(0),
+            index: 0,
+          ),
+          output: TransactionOutput(
+            address: _changeAddress,
+            amount: Balance(coin: Coin.fromAda(1.2)),
+          ),
+        ),
+        TransactionUnspentOutput(
+          input: TransactionInput(
+            transactionId: _buildDummyTransactionId(1),
+            index: 1,
+          ),
+          output: TransactionOutput(
+            address: _changeAddress,
+            amount: Balance(coin: Coin.fromAda(1.2)),
+          ),
+        ),
+      };
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
+
+      final derCert = X509DerCertificate.fromBytes(bytes: List.filled(32, 0));
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+      ];
 
       // Then
-      final modelsTransaction = await models.build(
-        purpose: _purpose,
-        rootKeyPair: rootKeyPair,
-        derCert: derCert,
-        publicKeys: publicKeys,
-        requiredSigners: requiredSigners,
-      );
-      final rawTransaction = await bytes.build(
+      final rawTransaction = await strategy.build(
         purpose: _purpose,
         rootKeyPair: rootKeyPair,
         derCert: derCert,
@@ -92,11 +137,123 @@ void main() {
         requiredSigners: requiredSigners,
       );
 
-      final modelsTxBytes = modelsTransaction.bytes;
-      final rawTxBytes = rawTransaction.bytes;
+      expect(
+        rawTransaction.signature,
+        allOf(hasLength(Bip32Ed25519XSignature.length), isNot(everyElement(0))),
+        reason: 'signature have correct size and is non zero',
+      );
+    });
 
-      expect(modelsTxBytes.length, equals(rawTxBytes.length));
-      expect(modelsTxBytes, equals(rawTxBytes));
+    test('raw transaction have correct auxiliaryDataHash', () async {
+      // Given
+      final utxos = {
+        TransactionUnspentOutput(
+          input: TransactionInput(
+            transactionId: _buildDummyTransactionId(0),
+            index: 0,
+          ),
+          output: TransactionOutput(
+            address: _changeAddress,
+            amount: Balance(coin: Coin.fromAda(1.2)),
+          ),
+        ),
+        TransactionUnspentOutput(
+          input: TransactionInput(
+            transactionId: _buildDummyTransactionId(1),
+            index: 1,
+          ),
+          output: TransactionOutput(
+            address: _changeAddress,
+            amount: Balance(coin: Coin.fromAda(1.2)),
+          ),
+        ),
+      };
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
+
+      final derCert = X509DerCertificate.fromBytes(bytes: List.filled(32, 0));
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+      ];
+
+      // Then
+      final rawTransaction = await strategy.build(
+        purpose: _purpose,
+        rootKeyPair: rootKeyPair,
+        derCert: derCert,
+        publicKeys: publicKeys,
+        requiredSigners: requiredSigners,
+      );
+
+      final auxiliaryData = rawTransaction.auxiliaryData;
+      final auxiliaryDataHash = AuxiliaryDataHash.fromHashedBytes(auxiliaryData);
+
+      expect(
+        rawTransaction.auxiliaryDataHash,
+        equals(auxiliaryDataHash.bytes),
+      );
+    });
+
+    test('auxiliary data size does not change', () async {
+      // Given
+      final utxos = {
+        TransactionUnspentOutput(
+          input: TransactionInput(
+            transactionId: _buildDummyTransactionId(0),
+            index: 0,
+          ),
+          output: TransactionOutput(
+            address: _changeAddress,
+            amount: Balance(coin: Coin.fromAda(1.2)),
+          ),
+        ),
+        TransactionUnspentOutput(
+          input: TransactionInput(
+            transactionId: _buildDummyTransactionId(1),
+            index: 1,
+          ),
+          output: TransactionOutput(
+            address: _changeAddress,
+            amount: Balance(coin: Coin.fromAda(1.2)),
+          ),
+        ),
+      };
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
+
+      final derCert = X509DerCertificate.fromBytes(bytes: List.filled(32, 0));
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+      ];
+
+      // Then
+      Future<RawTransaction> build() async {
+        return strategy.build(
+          purpose: _purpose,
+          rootKeyPair: rootKeyPair,
+          derCert: derCert,
+          publicKeys: publicKeys,
+          requiredSigners: requiredSigners,
+        );
+      }
+
+      expect(build, returnsNormally);
     });
   });
 }
@@ -140,8 +297,7 @@ TransactionHash _buildDummyTransactionId(int seed) {
   return TransactionHash.fromHex(hex);
 }
 
-RegistrationTransactionStrategy _pickStrategy(
-  RegistrationTransactionStrategyType type, {
+RegistrationTransactionStrategyBytes _buildStrategy({
   TransactionBuilderConfig transactionConfig = _defaultTransactionBuilderConfig,
   ShelleyAddress? changeAddress,
   SlotBigNum slotNumberTtl = const SlotBigNum(100000),
@@ -151,28 +307,15 @@ RegistrationTransactionStrategy _pickStrategy(
   changeAddress ??= _changeAddress;
   roles ??= {const RegistrationTransactionRole.set(AccountRole.voter)};
 
-  switch (type) {
-    case RegistrationTransactionStrategyType.models:
-      return RegistrationTransactionStrategyModels(
-        transactionConfig: transactionConfig,
-        networkId: NetworkId.testnet,
-        slotNumberTtl: slotNumberTtl,
-        roles: roles,
-        changeAddress: changeAddress,
-        utxos: utxos,
-        previousTransactionId: null,
-      );
-    case RegistrationTransactionStrategyType.bytes:
-      return RegistrationTransactionStrategyBytes(
-        transactionConfig: transactionConfig,
-        networkId: NetworkId.testnet,
-        slotNumberTtl: slotNumberTtl,
-        roles: roles,
-        changeAddress: changeAddress,
-        utxos: utxos,
-        previousTransactionId: null,
-      );
-  }
+  return RegistrationTransactionStrategyBytes(
+    transactionConfig: transactionConfig,
+    networkId: NetworkId.testnet,
+    slotNumberTtl: slotNumberTtl,
+    roles: roles,
+    changeAddress: changeAddress,
+    utxos: utxos,
+    previousTransactionId: null,
+  );
 }
 
 class _FakeBip32Ed25519XPrivateKey extends Fake implements kd.Bip32Ed25519XPrivateKey {
