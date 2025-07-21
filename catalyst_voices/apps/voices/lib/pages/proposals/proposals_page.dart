@@ -2,13 +2,10 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_controls.dart';
+import 'package:catalyst_voices/pages/proposals/widgets/proposals_content.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_header.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_pagination.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_sub_header.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_tabs.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_tabs_divider.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/widgets/layouts/header_and_content_layout.dart';
 import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -39,46 +36,12 @@ class _ProposalsPageState extends State<ProposalsPage>
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverPadding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 32).add(const EdgeInsets.only(bottom: 32)),
-          sliver: SliverList(
-            delegate: SliverChildListDelegate(
-              [
-                const SizedBox(height: 16),
-                const ProposalsHeader(),
-                const SizedBox(height: 40),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: Wrap(
-                        alignment: WrapAlignment.spaceBetween,
-                        crossAxisAlignment: WrapCrossAlignment.end,
-                        runSpacing: 10,
-                        children: [
-                          ProposalsTabs(controller: _tabController),
-                          const ProposalsControls(),
-                        ],
-                      ),
-                    ),
-                    const ProposalsTabsDivider(),
-                    const SizedBox(height: 16),
-                    const ProposalsSubHeader(),
-                    const SizedBox(height: 16),
-                    ProposalsPagination(controller: _pagingController),
-                    const SizedBox(height: 12),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
+    return HeaderAndContentLayout(
+      header: const ProposalsHeader(),
+      content: ProposalsContent(
+        tabController: _tabController,
+        pagingController: _pagingController,
+      ),
     );
   }
 
@@ -111,13 +74,13 @@ class _ProposalsPageState extends State<ProposalsPage>
   @override
   void handleSignal(ProposalsSignal signal) {
     switch (signal) {
-      case ChangeCategorySignal(:final to):
+      case ChangeCategoryProposalsSignal(:final to):
         _updateRoute(categoryId: Optional(to?.id));
-      case ChangeFilterTypeSignal(:final type):
+      case ChangeFilterTypeProposalsSignal(:final type):
         _updateRoute(filterType: type);
-      case ResetProposalsPaginationSignal():
+      case ResetPaginationProposalsSignal():
         _doResetPagination();
-      case ProposalsPageReadySignal(:final page):
+      case PageReadyProposalsSignal(:final page):
         _pagingController.value = _pagingController.value.copyWith(
           currentPage: page.page,
           maxResults: page.total,
@@ -139,6 +102,7 @@ class _ProposalsPageState extends State<ProposalsPage>
       length: ProposalsFilterType.values.length,
       vsync: this,
     );
+
     _pagingController = PagingController(
       initialPage: 0,
       initialMaxResults: 0,
