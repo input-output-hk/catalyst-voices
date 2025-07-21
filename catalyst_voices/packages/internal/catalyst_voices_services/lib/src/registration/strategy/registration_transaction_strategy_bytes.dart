@@ -6,7 +6,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_services/src/registration/registration_transaction_role.dart';
 import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy.dart';
-import 'package:cbor/cbor.dart';
 
 final class RegistrationTransactionStrategyBytes implements RegistrationTransactionStrategy {
   final TransactionBuilderConfig transactionConfig;
@@ -28,7 +27,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
   });
 
   @override
-  Future<RawTransaction> build({
+  Future<BaseTransaction> build({
     required String purpose,
     required CatalystKeyPair rootKeyPair,
     required X509DerCertificate? derCert,
@@ -45,19 +44,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
       publicKeys: publicKeys,
     );
 
-    final dummyMetadata = await unsignedMetadata.toAuxiliaryData();
-    final dummyMetadataBytes = cbor.encode(dummyMetadata.toCbor());
-
-    final dummyTxInputsHashCborBytes = cbor.encode(dummyTxInputsHash.toCbor());
-    final dummySignatureBytes = cbor.encode(unsignedMetadata.validationSignature.toCbor());
-
-    // Keep indexes of txInputsHash, signature and metadataSize as they don't change now.
-    final metadataTxInputsHashIndex = _indexOfSubList(
-      dummyMetadataBytes,
-      dummyTxInputsHashCborBytes,
-    );
-    final metadataSignatureIndex = _indexOfSubList(dummyMetadataBytes, dummySignatureBytes);
-    final metadataSize = dummyMetadataBytes.length;
+    final dummyAuxiliaryData = await unsignedMetadata.toAuxiliaryData();
 
     final txBuilder = TransactionBuilder(
       requiredSigners: requiredSigners,
@@ -65,7 +52,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
       inputs: utxos,
       networkId: networkId,
       ttl: slotNumberTtl,
-      auxiliaryData: dummyMetadata,
+      auxiliaryData: dummyAuxiliaryData,
       changeAddress: changeAddress,
     );
 
@@ -81,85 +68,30 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
         )
         .buildBody();
 
-    final tx = Transaction(
+    // Only one encoding here.
+    final rawTx = RawTransaction.from(
       body: txBody,
-      isValid: true,
       witnessSet: const TransactionWitnessSet(),
-      auxiliaryData: dummyMetadata,
+      isValid: true,
+      auxiliaryData: dummyAuxiliaryData,
     );
 
-    final txCbor = tx.toCbor() as CborList;
+    // 1. txInputsHash
+    final txInputsHash = TransactionInputsHash.fromHashedBytes(rawTx.inputs);
+    rawTx.patchTxInputsHash(txInputsHash.bytes);
 
-    // Encoded transaction with padding values (00's)
-    final txBytes = cbor.encode(txCbor);
-    final txMetadataIndex = _indexOfSubList(txBytes, dummyMetadataBytes);
-
-    final txBodyBytes = cbor.encode(txCbor[0]);
-    final txBodyIndex = _indexOfSubList(txBytes, txBodyBytes);
-    final txBodyLength = txBodyBytes.length;
-
-    final txMetadataHash = (txCbor[0] as CborMap)[const CborSmallInt(7)];
-    final txMetadataHashBytes = cbor.encode(txMetadataHash!);
-    final txMetadataHashIndex = _indexOfSubList(txBytes, txMetadataHashBytes);
-
-    final txInputs = (txCbor[0] as CborMap)[const CborSmallInt(0)];
-    final txInputsBytesReEncoded = cbor.encode(txInputs!);
-    final txInputsIndex = _indexOfSubList(txBytes, txInputsBytesReEncoded);
-
-    final txWitnessSet = txCbor[1];
-    final txWitnessSetReEncoded = cbor.encode(txWitnessSet);
-    final txWitnessSetIndex = _indexOfSubList(
-      txBytes,
-      txWitnessSetReEncoded,
-      txBodyIndex + txBodyLength,
-    );
-    final txWitnessSetSize = txWitnessSetReEncoded.length;
-
-    // Selected inputs bytes from txBytes
-    final txInputsBytes = txBytes.sublist(
-      txInputsIndex,
-      txInputsIndex + txInputsBytesReEncoded.length,
-    );
-
-    // Final hash of selected inputs
-    final txInputHash = TransactionInputsHash.fromHashedBytes(txInputsBytes);
-    final txInputHashBytes = cbor.encode(txInputHash.toCbor());
-
-    // Patch txInputHash
-    final startInputHash = txMetadataIndex + metadataTxInputsHashIndex;
-    final endInputHash = startInputHash + txInputHashBytes.length;
-    txBytes.replaceRange(startInputHash, endInputHash, txInputHashBytes);
-
-    // Create signature over metadata
-    final metadataBytes = txBytes.sublist(txMetadataIndex, txMetadataIndex + metadataSize);
-
+    // 2. signature
     final privateKey = Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(
       rootKeyPair.privateKey.bytes,
     );
+    final signature = await privateKey.use((privateKey) => privateKey.sign(rawTx.auxiliaryData));
+    rawTx.patchSignature(signature.bytes);
 
-    final signature = await privateKey.use((privateKey) => privateKey.sign(metadataBytes));
-    final signatureBytes = cbor.encode(signature.toCbor());
+    // 3.
+    final auxiliaryDataHash = AuxiliaryDataHash.fromHashedBytes(rawTx.auxiliaryData);
+    rawTx.patchAuxiliaryDataHash(auxiliaryDataHash.bytes);
 
-    // Patch metadata signature
-    final startSignature = txMetadataIndex + metadataSignatureIndex;
-    final endSignature = startSignature + signatureBytes.length;
-    txBytes.replaceRange(startSignature, endSignature, signatureBytes);
-
-    // Create final metadata hash
-    final finalMetadataBytes = txBytes.sublist(txMetadataIndex, txMetadataIndex + metadataSize);
-    final finalMetadataHash = AuxiliaryDataHash.fromHashedBytes(finalMetadataBytes);
-    final finalMetadataHashBytes = cbor.encode(finalMetadataHash.toCbor());
-
-    // Patch metadata hash
-    final startMetadataHash = txMetadataHashIndex;
-    final endMetadataHash = startMetadataHash + finalMetadataHashBytes.length;
-    txBytes.replaceRange(startMetadataHash, endMetadataHash, finalMetadataHashBytes);
-
-    return RawTransaction(
-      txBytes,
-      txWitnessSetIndex: txWitnessSetIndex,
-      txWitnessSetSize: txWitnessSetSize,
-    );
+    return rawTx;
   }
 
   RegistrationMetadata _buildUnsignedMetadata({
@@ -208,20 +140,6 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
         },
       ),
     );
-  }
-
-  int _indexOfSubList(List<int> list, List<int> sublist, [int start = 0]) {
-    for (var i = start; i <= list.length - sublist.length; i++) {
-      var found = true;
-      for (var j = 0; j < sublist.length; j++) {
-        if (list[i + j] != sublist[j]) {
-          found = false;
-          break;
-        }
-      }
-      if (found) return i;
-    }
-    return -1;
   }
 }
 
