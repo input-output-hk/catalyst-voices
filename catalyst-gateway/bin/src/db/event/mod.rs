@@ -247,7 +247,7 @@ impl EventDB {
 ///
 /// This function will return an error if:
 /// * `url` is None and the environment variable "`DATABASE_URL`" isn't set.
-/// * There is any error communicating the the database to check its schema.
+/// * There is any error communicating the database to check its schema.
 /// * The database schema in the DB does not 100% match the schema supported by this
 ///   library.
 ///

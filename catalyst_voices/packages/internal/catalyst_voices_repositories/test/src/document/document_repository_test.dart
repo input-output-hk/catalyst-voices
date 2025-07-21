@@ -341,7 +341,7 @@ void main() {
       );
 
       test(
-        'loose refs are are specified to latest version',
+        'loose refs are specified to latest version',
         () async {
           // Given
           final exactRefs = List.generate(

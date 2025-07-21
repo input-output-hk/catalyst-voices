@@ -44,7 +44,7 @@ class VoicesSnackBar extends StatelessWidget {
   /// Defaults to 4s.
   final Duration duration;
 
-  /// The padding around the the [VoicesSnackBar].
+  /// The padding around the [VoicesSnackBar].
   final EdgeInsetsGeometry? padding;
 
   /// The width of the [VoicesSnackBar].
