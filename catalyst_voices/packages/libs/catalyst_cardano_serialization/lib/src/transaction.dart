@@ -56,55 +56,6 @@ abstract base class BaseTransaction extends Equatable {
   BaseTransaction withWitnessSet(TransactionWitnessSet witnessSet);
 }
 
-///
-final class RawTransaction extends BaseTransaction {
-  @override
-  final List<int> bytes;
-
-  ///
-  final int txWitnessSetIndex;
-
-  ///
-  final int txWitnessSetSize;
-
-  ///
-  const RawTransaction(
-    this.bytes, {
-    required this.txWitnessSetIndex,
-    required this.txWitnessSetSize,
-  });
-
-  @override
-  Coin get fee => const Coin(0);
-
-  @override
-  NetworkId? get networkId => null;
-
-  @override
-  List<Object?> get props => [
-        bytes,
-        txWitnessSetIndex,
-        txWitnessSetSize,
-      ];
-
-  @override
-  BaseTransaction withWitnessSet(
-    TransactionWitnessSet witnessSet,
-  ) {
-    final encodedWitnessSet = cbor.encode(witnessSet.toCbor());
-    final start = txWitnessSetIndex;
-    final end = start + txWitnessSetSize;
-
-    final bytes = List.of(this.bytes)..replaceRange(start, end, encodedWitnessSet);
-
-    return RawTransaction(
-      bytes,
-      txWitnessSetIndex: start,
-      txWitnessSetSize: encodedWitnessSet.length,
-    );
-  }
-}
-
 /// Represents the signed transaction with a list of witnesses
 /// which are used to verify the validity of a transaction.
 final class Transaction extends BaseTransaction implements CborEncodable {
@@ -187,6 +138,34 @@ final class Transaction extends BaseTransaction implements CborEncodable {
 ///
 /// Does not contain the witnesses which are used to verify the transaction.
 final class TransactionBody extends Equatable implements CborEncodable {
+  static const inputsKey = CborSmallInt(0);
+
+  static const outputsKey = CborSmallInt(1);
+
+  static const feeKey = CborSmallInt(2);
+
+  static const ttlKey = CborSmallInt(3);
+
+  static const auxiliaryDataHashKey = CborSmallInt(7);
+
+  static const validityStartKey = CborSmallInt(8);
+
+  static const mintKey = CborSmallInt(9);
+
+  static const scriptDataHashKey = CborSmallInt(11);
+
+  static const collateralInputsKey = CborSmallInt(13);
+
+  static const requiredSignersKey = CborSmallInt(14);
+
+  static const networkIdKey = CborSmallInt(15);
+
+  static const collateralReturnKey = CborSmallInt(16);
+
+  static const totalCollateralKey = CborSmallInt(17);
+
+  static const referenceInputsKey = CborSmallInt(18);
+
   /// The transaction inputs. tag: 0
   final Set<TransactionInput> inputs;
 
@@ -196,7 +175,6 @@ final class TransactionBody extends Equatable implements CborEncodable {
   /// The fee for the transaction. tag: 2
   final Coin fee;
 
-  // > Note: All properties below are optional.
   /// The absolute slot value before the tx becomes invalid. tag: 3
   final SlotBigNum? ttl;
 
@@ -262,24 +240,32 @@ final class TransactionBody extends Equatable implements CborEncodable {
       final map = value as CborMap;
 
       return TransactionBody(
-        inputs: _extractList(map, 0, TransactionInput.fromCbor)!.toSet(),
-        outputs: _extractList(map, 1, TransactionOutput.fromCbor)!,
-        fee: _extractValue(map, 2, Coin.fromCbor)!,
-        ttl: _extractValue(map, 3, SlotBigNum.fromCbor),
-        auxiliaryDataHash: _extractValue(map, 7, AuxiliaryDataHash.fromCbor),
-        validityStart: _extractValue(map, 8, SlotBigNum.fromCbor),
-        mint: _extractValue(map, 9, MultiAsset.fromCbor),
-        scriptDataHash: _extractValue(map, 11, ScriptDataHash.fromCbor),
-        collateralInputs: _extractList(map, 13, TransactionInput.fromCbor)?.toSet(),
-        requiredSigners: _extractList(map, 14, Ed25519PublicKeyHash.fromCbor)?.toSet(),
+        inputs: _extractList(map, inputsKey, TransactionInput.fromCbor)!.toSet(),
+        outputs: _extractList(map, outputsKey, TransactionOutput.fromCbor)!,
+        fee: _extractValue(map, feeKey, Coin.fromCbor)!,
+        ttl: _extractValue(map, ttlKey, SlotBigNum.fromCbor),
+        auxiliaryDataHash: _extractValue(map, auxiliaryDataHashKey, AuxiliaryDataHash.fromCbor),
+        validityStart: _extractValue(map, validityStartKey, SlotBigNum.fromCbor),
+        mint: _extractValue(map, mintKey, MultiAsset.fromCbor),
+        scriptDataHash: _extractValue(map, scriptDataHashKey, ScriptDataHash.fromCbor),
+        collateralInputs: _extractList(
+          map,
+          collateralInputsKey,
+          TransactionInput.fromCbor,
+        )?.toSet(),
+        requiredSigners: _extractList(
+          map,
+          requiredSignersKey,
+          Ed25519PublicKeyHash.fromCbor,
+        )?.toSet(),
         networkId: _extractValue(
           map,
-          15,
+          networkIdKey,
           (value) => NetworkId.fromId((value as CborSmallInt).value),
         ),
-        collateralReturn: _extractValue(map, 16, TransactionOutput.fromCbor),
-        totalCollateral: _extractValue(map, 17, Coin.fromCbor),
-        referenceInputs: _extractList(map, 18, TransactionInput.fromCbor)?.toSet(),
+        collateralReturn: _extractValue(map, collateralReturnKey, TransactionOutput.fromCbor),
+        totalCollateral: _extractValue(map, totalCollateralKey, Coin.fromCbor),
+        referenceInputs: _extractList(map, referenceInputsKey, TransactionInput.fromCbor)?.toSet(),
       );
     } catch (e) {
       throw ArgumentError('Invalid CBOR input: $e');
@@ -307,28 +293,35 @@ final class TransactionBody extends Equatable implements CborEncodable {
   /// Serializes the type as cbor.
   @override
   CborValue toCbor({List<int> tags = const []}) {
+    final items = toCborValuesMap();
+
     return CborMap(
-      {
-        const CborSmallInt(0): _toCborList(inputs),
-        const CborSmallInt(1): _toCborList(outputs),
-        const CborSmallInt(2): fee.toCbor(),
-        if (ttl != null) const CborSmallInt(3): ttl!.toCbor(),
-        if (auxiliaryDataHash != null) const CborSmallInt(7): auxiliaryDataHash!.toCbor(),
-        if (validityStart != null) const CborSmallInt(8): validityStart!.toCbor(),
-        if (mint != null) const CborSmallInt(9): mint!.toCbor(),
-        if (scriptDataHash != null) const CborSmallInt(11): scriptDataHash!.toCbor(),
-        if (collateralInputs != null && collateralInputs!.isNotEmpty)
-          const CborSmallInt(13): _toCborList(collateralInputs!),
-        if (requiredSigners != null && requiredSigners!.isNotEmpty)
-          const CborSmallInt(14): _toCborList(requiredSigners!),
-        if (networkId != null) const CborSmallInt(15): CborSmallInt(networkId!.id),
-        if (collateralReturn != null) const CborSmallInt(16): collateralReturn!.toCbor(),
-        if (totalCollateral != null) const CborSmallInt(17): totalCollateral!.toCbor(),
-        if (referenceInputs != null && referenceInputs!.isNotEmpty)
-          const CborSmallInt(18): _toCborList(referenceInputs!),
-      },
+      items,
       tags: tags,
     );
+  }
+
+  ///
+  Map<CborValue, CborValue> toCborValuesMap() {
+    return <CborValue, CborValue>{
+      inputsKey: _toCborList(inputs),
+      outputsKey: _toCborList(outputs),
+      feeKey: fee.toCbor(),
+      if (ttl != null) ttlKey: ttl!.toCbor(),
+      if (auxiliaryDataHash != null) auxiliaryDataHashKey: auxiliaryDataHash!.toCbor(),
+      if (validityStart != null) validityStartKey: validityStart!.toCbor(),
+      if (mint != null) mintKey: mint!.toCbor(),
+      if (scriptDataHash != null) scriptDataHashKey: scriptDataHash!.toCbor(),
+      if (collateralInputs != null && collateralInputs!.isNotEmpty)
+        collateralInputsKey: _toCborList(collateralInputs!),
+      if (requiredSigners != null && requiredSigners!.isNotEmpty)
+        requiredSignersKey: _toCborList(requiredSigners!),
+      if (networkId != null) networkIdKey: CborSmallInt(networkId!.id),
+      if (collateralReturn != null) collateralReturnKey: collateralReturn!.toCbor(),
+      if (totalCollateral != null) totalCollateralKey: totalCollateral!.toCbor(),
+      if (referenceInputs != null && referenceInputs!.isNotEmpty)
+        referenceInputsKey: _toCborList(referenceInputs!),
+    };
   }
 
   CborList _toCborList(Iterable<CborEncodable> iterable) {
@@ -339,19 +332,19 @@ final class TransactionBody extends Equatable implements CborEncodable {
 
   static List<T>? _extractList<T>(
     CborMap map,
-    int key,
+    CborSmallInt key,
     T Function(CborValue) fromCbor,
   ) {
-    final list = map[CborSmallInt(key)] as CborList?;
+    final list = map[key] as CborList?;
     return list?.map(fromCbor).toList();
   }
 
   static T? _extractValue<T>(
     CborMap map,
-    int key,
+    CborSmallInt key,
     T Function(CborValue) fromCbor,
   ) {
-    final value = map[CborSmallInt(key)];
+    final value = map[key];
     return value != null ? fromCbor(value) : null;
   }
 }
