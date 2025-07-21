@@ -1,6 +1,8 @@
 //ignore_for_file: implementation_imports,invalid_use_of_internal_member
 
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
+import 'package:catalyst_cardano_serialization/src/raw_transaction_aspect.dart';
+import 'package:catalyst_cardano_serialization/src/raw_transaction_tracing_encode_sink.dart';
 import 'package:catalyst_cardano_serialization/src/rbac/x509_metadata_envelope.dart';
 import 'package:catalyst_cardano_serialization/src/structured_bytes.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
@@ -18,7 +20,7 @@ import 'package:typed_data/typed_buffers.dart';
 ///
 /// It enables single encode transaction build.
 final class RawTransaction extends BaseTransaction {
-  final StructuredBytes<_RawTransactionAspect> _structuredBytes;
+  final StructuredBytes<RawTransactionAspect> _structuredBytes;
 
   /// Default factory constructor for [RawTransaction].
   ///
@@ -31,21 +33,21 @@ final class RawTransaction extends BaseTransaction {
     required AuxiliaryData auxiliaryData,
   }) {
     final buffer = Uint8Buffer();
-    final sink = _TrackingSink(cbor_internal_sink.EncodeSink.withBuffer(buffer), 0)
-      // [body, witnessSet, isValid, auxiliaryData]
-      ..addHeaderInfo(CborMajorType.array, const cbor_internal_arg.Arg.int(4));
+    final sink =
+        RawTransactionTracingEncodeSink(cbor_internal_sink.EncodeSink.withBuffer(buffer), 0)
+          // [body, witnessSet, isValid, auxiliaryData]
+          ..addHeaderInfo(CborMajorType.array, const cbor_internal_arg.Arg.int(4));
 
     // 1. body
     final txBodyMap = body.toCborValuesMap();
     final txBodyKeyAspectMap = {
-      TransactionBody.inputsKey: const _TrackingAspect(_RawTransactionAspect.inputs),
-      TransactionBody.outputsKey: const _TrackingAspect(_RawTransactionAspect.outputs),
-      TransactionBody.feeKey: const _TrackingAspect(_RawTransactionAspect.fee),
+      TransactionBody.inputsKey: const _TrackingAspect(RawTransactionAspect.inputs),
+      TransactionBody.feeKey: const _TrackingAspect(RawTransactionAspect.fee),
       TransactionBody.auxiliaryDataHashKey: const _TrackingAspect(
-        _RawTransactionAspect.auxiliaryDataHash,
+        RawTransactionAspect.auxiliaryDataHash,
         dataSize: AuxiliaryDataHash.hashLength,
       ),
-      TransactionBody.networkIdKey: const _TrackingAspect(_RawTransactionAspect.networkId),
+      TransactionBody.networkIdKey: const _TrackingAspect(RawTransactionAspect.networkId),
     };
 
     sink.addHeaderInfo(CborMajorType.map, cbor_internal_arg.Arg.int(txBodyMap.length));
@@ -65,40 +67,40 @@ final class RawTransaction extends BaseTransaction {
     // 2. witnessSet
     final witnessSetMap = witnessSet.toCborValuesMap();
     sink
-      ..beginAspect(_RawTransactionAspect.witnessSet)
+      ..beginAspect(RawTransactionAspect.witnessSet)
       ..addHeaderInfo(CborMajorType.map, cbor_internal_arg.Arg.int(witnessSetMap.length));
 
     for (final entry in witnessSetMap.entries) {
       entry.key.encode(sink);
       entry.value.encode(sink);
     }
-    sink.endAspect(_RawTransactionAspect.witnessSet);
+    sink.endAspect(RawTransactionAspect.witnessSet);
 
     // 3. isValid
     CborBool(isValid).encode(sink);
 
     // 4. auxiliaryData
-    sink.beginAspect(_RawTransactionAspect.auxiliaryData);
+    sink.beginAspect(RawTransactionAspect.auxiliaryData);
 
     final auxiliaryDataMap = auxiliaryData.map;
     sink.addHeaderInfo(CborMajorType.map, cbor_internal_arg.Arg.int(auxiliaryDataMap.length));
 
     for (final axEntry in auxiliaryDataMap.entries) {
-      // 4.1 envelope
       final axKey = axEntry.key;
       final axValue = axEntry.value;
 
       axKey.encode(sink);
 
+      // 4.1 envelope
       if (axKey == X509MetadataEnvelope.envelopeKey) {
         final envelope = axValue as CborMap;
         final envelopeAspectMap = {
           X509MetadataEnvelope.txInputsHashKey: const _TrackingAspect(
-            _RawTransactionAspect.txInputsHash,
+            RawTransactionAspect.txInputsHash,
             dataSize: TransactionInputsHash.hashLength,
           ),
           X509MetadataEnvelope.validationSignatureKey: _TrackingAspect(
-            _RawTransactionAspect.signature,
+            RawTransactionAspect.signature,
             dataSize: Bip32Ed25519XSignature.length,
           ),
         };
@@ -124,9 +126,9 @@ final class RawTransaction extends BaseTransaction {
       }
     }
 
-    sink.endAspect(_RawTransactionAspect.auxiliaryData);
+    sink.endAspect(RawTransactionAspect.auxiliaryData);
 
-    final structuredBytes = StructuredBytes(buffer, context: sink._context);
+    final structuredBytes = StructuredBytes(buffer, context: sink.context);
 
     return RawTransaction._(structuredBytes);
   }
@@ -136,14 +138,14 @@ final class RawTransaction extends BaseTransaction {
 
   /// Returns auxiliary data bytes from [bytes].
   List<int> get auxiliaryData {
-    final range = _structuredBytes.context[_RawTransactionAspect.auxiliaryData]!;
+    final range = _structuredBytes.context[RawTransactionAspect.auxiliaryData]!;
 
     return _structuredBytes.bytes.sublist(range.start, range.end);
   }
 
   /// Returns auxiliary data hash bytes from [bytes].
   List<int> get auxiliaryDataHash {
-    final range = _structuredBytes.context[_RawTransactionAspect.auxiliaryDataHash]!;
+    final range = _structuredBytes.context[RawTransactionAspect.auxiliaryDataHash]!;
 
     return _structuredBytes.bytes.sublist(range.dataStart!, range.end);
   }
@@ -153,7 +155,7 @@ final class RawTransaction extends BaseTransaction {
 
   @override
   Coin get fee {
-    final range = _structuredBytes.context[_RawTransactionAspect.fee];
+    final range = _structuredBytes.context[RawTransactionAspect.fee];
     if (range == null) {
       throw StateError('Fee not found!');
     }
@@ -165,14 +167,14 @@ final class RawTransaction extends BaseTransaction {
 
   /// Returns inputs bytes from [bytes].
   List<int> get inputs {
-    final range = _structuredBytes.context[_RawTransactionAspect.inputs]!;
+    final range = _structuredBytes.context[RawTransactionAspect.inputs]!;
 
     return _structuredBytes.bytes.sublist(range.start, range.end);
   }
 
   @override
   NetworkId? get networkId {
-    final range = _structuredBytes.context[_RawTransactionAspect.networkId];
+    final range = _structuredBytes.context[RawTransactionAspect.networkId];
     if (range == null) {
       return null;
     }
@@ -190,112 +192,50 @@ final class RawTransaction extends BaseTransaction {
 
   /// Returns auxiliary data signature bytes from [bytes].
   List<int> get signature {
-    final range = _structuredBytes.context[_RawTransactionAspect.signature]!;
+    final range = _structuredBytes.context[RawTransactionAspect.signature]!;
 
     return _structuredBytes.bytes.sublist(range.dataStart!, range.end);
   }
 
   /// Returns [inputs] hash bytes from [bytes].
   List<int> get txInputsHash {
-    final range = _structuredBytes.context[_RawTransactionAspect.txInputsHash]!;
+    final range = _structuredBytes.context[RawTransactionAspect.txInputsHash]!;
 
     return _structuredBytes.bytes.sublist(range.dataStart!, range.end);
   }
 
   /// Patching [bytes]'s [auxiliaryDataHash] with given [data].
   void patchAuxiliaryDataHash(List<int> data) {
-    _structuredBytes.patchData(_RawTransactionAspect.auxiliaryDataHash, data);
+    _structuredBytes.patchData(RawTransactionAspect.auxiliaryDataHash, data);
   }
 
   /// Patching [bytes]'s [signature] with given [data].
   void patchSignature(List<int> data) {
-    _structuredBytes.patchData(_RawTransactionAspect.signature, data);
+    _structuredBytes.patchData(RawTransactionAspect.signature, data);
   }
 
   /// Patching [bytes]'s [txInputsHash] with given [data].
   void patchTxInputsHash(List<int> data) {
-    _structuredBytes.patchData(_RawTransactionAspect.txInputsHash, data);
+    _structuredBytes.patchData(RawTransactionAspect.txInputsHash, data);
   }
 
   @override
   RawTransaction withWitnessSet(TransactionWitnessSet witnessSet) {
     final encoded = cbor.encode(witnessSet.toCbor());
     _structuredBytes.replaceValue(
-      _RawTransactionAspect.witnessSet,
+      RawTransactionAspect.witnessSet,
       encoded,
     );
     return this;
   }
 }
 
-enum _RawTransactionAspect {
-  inputs,
-  outputs,
-  fee,
-  txInputsHash,
-  auxiliaryData,
-  auxiliaryDataHash,
-  networkId,
-  signature,
-  witnessSet,
-}
-
 final class _TrackingAspect extends Equatable {
-  final _RawTransactionAspect aspect;
+  final RawTransactionAspect aspect;
   final int? dataSize;
 
   const _TrackingAspect(this.aspect, {this.dataSize});
 
   @override
   List<Object?> get props => [aspect, dataSize];
-}
-
-class _TrackingSink extends cbor_internal_sink.EncodeSink {
-  final cbor_internal_sink.EncodeSink _inner;
-  final _context = <_RawTransactionAspect, CborValueByteRange>{};
-  final _recordingAspect = <_RawTransactionAspect, _TrackingSinkRecord>{};
-
-  int _cursor;
-
-  _TrackingSink(
-    this._inner,
-    this._cursor,
-  );
-
-  @override
-  void add(List<int> data) {
-    _inner.add(data);
-    _cursor += data.length;
-  }
-
-  void beginAspect(_RawTransactionAspect aspect, {int? dataSize}) {
-    _recordingAspect[aspect] = _TrackingSinkRecord(start: _cursor, dataSize: dataSize);
-  }
-
-  @override
-  void close() => _inner.close();
-
-  void endAspect(_RawTransactionAspect aspect) {
-    final record = _recordingAspect.remove(aspect);
-    assert(record != null, 'Record not found for $aspect');
-
-    final start = record!.start;
-    final end = _cursor;
-    final dataSize = record.dataSize;
-
-    _context[aspect] = CborValueByteRange(start: start, end: end, dataSize: dataSize);
-  }
-}
-
-final class _TrackingSinkRecord extends Equatable {
-  final int start;
-  final int? dataSize;
-
-  const _TrackingSinkRecord({
-    required this.start,
-    this.dataSize,
-  });
-
-  @override
-  List<Object?> get props => [start, dataSize];
 }

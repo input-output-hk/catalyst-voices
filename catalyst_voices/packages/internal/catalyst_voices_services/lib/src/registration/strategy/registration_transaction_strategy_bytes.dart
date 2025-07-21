@@ -88,7 +88,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     final signature = await privateKey.use((privateKey) => privateKey.sign(rawTx.auxiliaryData));
     rawTx.patchSignature(signature.bytes);
 
-    // 3.
+    // 3. auxiliaryData
     final auxiliaryDataHash = AuxiliaryDataHash.fromHashedBytes(rawTx.auxiliaryData);
     rawTx.patchAuxiliaryDataHash(auxiliaryDataHash.bytes);
 
