@@ -1,4 +1,4 @@
-//ignore_for_file: implementation_imports
+//ignore_for_file: implementation_imports,invalid_use_of_internal_member
 
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/rbac/x509_metadata_envelope.dart';
@@ -13,11 +13,17 @@ import 'package:cbor/src/utils/arg.dart' as cbor_internal_arg;
 import 'package:equatable/equatable.dart';
 import 'package:typed_data/typed_buffers.dart';
 
+/// Version of [BaseTransaction] which works on bytes and patching
+/// of different parts.
 ///
+/// It enables single encode transaction build.
 final class RawTransaction extends BaseTransaction {
   final StructuredBytes<_RawTransactionAspect> _structuredBytes;
 
+  /// Default factory constructor for [RawTransaction].
   ///
+  /// It does custom encoding of each part of transaction and keeping
+  /// track of important bytes parts for future patching.
   factory RawTransaction.from({
     required TransactionBody body,
     required TransactionWitnessSet witnessSet,
@@ -125,17 +131,17 @@ final class RawTransaction extends BaseTransaction {
     return RawTransaction._(structuredBytes);
   }
 
-  ///
+  /// Internal constructor for [RawTransaction].
   const RawTransaction._(this._structuredBytes);
 
-  ///
+  /// Returns auxiliary data bytes from [bytes].
   List<int> get auxiliaryData {
     final range = _structuredBytes.context[_RawTransactionAspect.auxiliaryData]!;
 
     return _structuredBytes.bytes.sublist(range.start, range.end);
   }
 
-  ///
+  /// Returns auxiliary data hash bytes from [bytes].
   List<int> get auxiliaryDataHash {
     final range = _structuredBytes.context[_RawTransactionAspect.auxiliaryDataHash]!;
 
@@ -157,7 +163,7 @@ final class RawTransaction extends BaseTransaction {
     return Coin(value);
   }
 
-  ///
+  /// Returns inputs bytes from [bytes].
   List<int> get inputs {
     final range = _structuredBytes.context[_RawTransactionAspect.inputs]!;
 
@@ -182,31 +188,31 @@ final class RawTransaction extends BaseTransaction {
   @override
   List<Object?> get props => [bytes, _structuredBytes.context];
 
-  ///
+  /// Returns auxiliary data signature bytes from [bytes].
   List<int> get signature {
     final range = _structuredBytes.context[_RawTransactionAspect.signature]!;
 
     return _structuredBytes.bytes.sublist(range.dataStart!, range.end);
   }
 
-  ///
+  /// Returns [inputs] hash bytes from [bytes].
   List<int> get txInputsHash {
     final range = _structuredBytes.context[_RawTransactionAspect.txInputsHash]!;
 
     return _structuredBytes.bytes.sublist(range.dataStart!, range.end);
   }
 
-  ///
+  /// Patching [bytes]'s [auxiliaryDataHash] with given [data].
   void patchAuxiliaryDataHash(List<int> data) {
     _structuredBytes.patchData(_RawTransactionAspect.auxiliaryDataHash, data);
   }
 
-  ///
+  /// Patching [bytes]'s [signature] with given [data].
   void patchSignature(List<int> data) {
     _structuredBytes.patchData(_RawTransactionAspect.signature, data);
   }
 
-  ///
+  /// Patching [bytes]'s [txInputsHash] with given [data].
   void patchTxInputsHash(List<int> data) {
     _structuredBytes.patchData(_RawTransactionAspect.txInputsHash, data);
   }
@@ -222,7 +228,6 @@ final class RawTransaction extends BaseTransaction {
   }
 }
 
-///
 enum _RawTransactionAspect {
   inputs,
   outputs,

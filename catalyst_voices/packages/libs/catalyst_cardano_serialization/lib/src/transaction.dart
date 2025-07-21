@@ -38,21 +38,21 @@ final class AuxiliaryData extends Equatable implements CborEncodable {
   }
 }
 
-///
+/// Low level representation of transaction. It exposes minimum necessary data.
 abstract base class BaseTransaction extends Equatable {
-  ///
+  /// A constructor of [BaseTransaction].
   const BaseTransaction();
 
-  ///
+  /// Bytes representation of this transaction.
   List<int> get bytes;
 
-  ///
+  /// The fee for the transaction. See [TransactionBody.fee].
   Coin get fee;
 
-  ///
+  /// Network for this transaction. See [TransactionBody.networkId].
   NetworkId? get networkId;
 
-  ///
+  /// Updates this [BaseTransaction] with given [witnessSet].
   BaseTransaction withWitnessSet(TransactionWitnessSet witnessSet);
 }
 
@@ -138,32 +138,46 @@ final class Transaction extends BaseTransaction implements CborEncodable {
 ///
 /// Does not contain the witnesses which are used to verify the transaction.
 final class TransactionBody extends Equatable implements CborEncodable {
+  /// A cbor key for [TransactionBody.inputs].
   static const inputsKey = CborSmallInt(0);
 
+  /// A cbor key for [TransactionBody.outputs].
   static const outputsKey = CborSmallInt(1);
 
+  /// A cbor key for [TransactionBody.fee].
   static const feeKey = CborSmallInt(2);
 
+  /// A cbor key for [TransactionBody.ttl].
   static const ttlKey = CborSmallInt(3);
 
+  /// A cbor key for [TransactionBody.auxiliaryDataHash].
   static const auxiliaryDataHashKey = CborSmallInt(7);
 
+  /// A cbor key for [TransactionBody.validityStart].
   static const validityStartKey = CborSmallInt(8);
 
+  /// A cbor key for [TransactionBody.mint].
   static const mintKey = CborSmallInt(9);
 
+  /// A cbor key for [TransactionBody.scriptDataHash].
   static const scriptDataHashKey = CborSmallInt(11);
 
+  /// A cbor key for [TransactionBody.collateralInputs].
   static const collateralInputsKey = CborSmallInt(13);
 
+  /// A cbor key for [TransactionBody.requiredSigners].
   static const requiredSignersKey = CborSmallInt(14);
 
+  /// A cbor key for [TransactionBody.networkId].
   static const networkIdKey = CborSmallInt(15);
 
+  /// A cbor key for [TransactionBody.collateralReturn].
   static const collateralReturnKey = CborSmallInt(16);
 
+  /// A cbor key for [TransactionBody.totalCollateral].
   static const totalCollateralKey = CborSmallInt(17);
 
+  /// A cbor key for [TransactionBody.referenceInputs].
   static const referenceInputsKey = CborSmallInt(18);
 
   /// The transaction inputs. tag: 0
@@ -175,6 +189,7 @@ final class TransactionBody extends Equatable implements CborEncodable {
   /// The fee for the transaction. tag: 2
   final Coin fee;
 
+  // > Note: All properties below are optional.
   /// The absolute slot value before the tx becomes invalid. tag: 3
   final SlotBigNum? ttl;
 
@@ -301,7 +316,9 @@ final class TransactionBody extends Equatable implements CborEncodable {
     );
   }
 
+  /// Utility method for [toCbor]. It returns map of cbor values for this [TransactionBody].
   ///
+  /// It is useful when implementing custom or tracking encoding.
   Map<CborValue, CborValue> toCborValuesMap() {
     return <CborValue, CborValue>{
       inputsKey: _toCborList(inputs),

@@ -47,28 +47,37 @@ final class CborValueByteRange extends Equatable {
   }
 }
 
+/// A class which helps getting specific parts of [bytes] and provides basic
+/// functionality like patching parts of it.
 ///
+/// This class is mutable. It keeps internal list of [_bytes] which is mutable and can
+/// be modified via public methods but public [bytes] is not modifiable.
 final class StructuredBytes<T> {
-  ///
+  /// Internal mutable list of bytes.
   final List<int> _bytes;
 
-  ///
+  /// Keeping track of important parts of [_bytes].
   final Map<T, CborValueByteRange> _context;
 
-  ///
+  /// Default constructor for [StructuredBytes].
   const StructuredBytes(
     List<int> bytes, {
     required Map<T, CborValueByteRange> context,
   })  : _bytes = bytes,
         _context = context;
 
-  ///
+  /// Returns bytes as unmodifiable list.
   List<int> get bytes => List.unmodifiable(_bytes);
 
-  ///
+  /// Returns context for [bytes].
   Map<T, CborValueByteRange> get context => Map.unmodifiable(_context);
 
+  /// Updates internal list of bytes associated with [key] with [data].
   ///
+  /// Patching is supported only for [CborValueByteRange] with dataSize.
+  ///
+  /// It requires [key] to be present in [context] + size of [data] have to match
+  /// recorded [CborValueByteRange.dataSize].
   void patchData(T key, Iterable<int> data) {
     final range = _context[key];
     if (range == null) {
@@ -87,7 +96,8 @@ final class StructuredBytes<T> {
     _bytes.setRange(start, end, data);
   }
 
-  ///
+  /// Similar to [patchData] but allows to change range of bytes for [key] and .dataSize
+  /// is not required here.
   void replaceValue(T key, Iterable<int> value) {
     final range = _context[key];
     if (range == null) {

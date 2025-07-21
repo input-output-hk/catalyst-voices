@@ -29,14 +29,19 @@ final class X509MetadataEnvelope<T> extends Equatable {
   /// the field size limitation.
   static const int metadataChunkSize = 64;
 
+  /// A cbor key for [X509MetadataEnvelope.envelopeKey].
   static const envelopeKey = CborSmallInt(509);
 
+  /// A cbor key for [X509MetadataEnvelope.purpose].
   static const purposeKey = CborSmallInt(0);
 
+  /// A cbor key for [X509MetadataEnvelope.txInputsHash].
   static const txInputsHashKey = CborSmallInt(1);
 
+  /// A cbor key for [X509MetadataEnvelope.previousTransactionId].
   static const previousTransactionIdKey = CborSmallInt(2);
 
+  /// A cbor key for [X509MetadataEnvelope.validationSignature].
   static const validationSignatureKey = CborSmallInt(99);
 
   /// Purpose is defined by the consuming dApp. It allows a dApp to have

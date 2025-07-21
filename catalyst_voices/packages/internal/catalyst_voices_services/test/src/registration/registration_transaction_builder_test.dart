@@ -69,7 +69,9 @@ void main() {
         previousTransactionId: null,
       );
 
-      final transaction = (await transactionBuilder.build()) as Transaction;
+      final baseTransaction = await transactionBuilder.build();
+      final transactionCbor = cbor.decode(baseTransaction.bytes);
+      final transaction = Transaction.fromCbor(transactionCbor);
 
       final metadata = await X509MetadataEnvelope.fromCbor(
         transaction.auxiliaryData!.toCbor(),
@@ -135,7 +137,9 @@ void main() {
       );
 
       // Then
-      final transaction = (await transactionBuilder.build()) as Transaction;
+      final baseTransaction = await transactionBuilder.build();
+      final transactionCbor = cbor.decode(baseTransaction.bytes);
+      final transaction = Transaction.fromCbor(transactionCbor);
       final inputs = transaction.body.inputs;
 
       final metadata = await X509MetadataEnvelope.fromCbor(
@@ -203,7 +207,9 @@ void main() {
       );
 
       // Then
-      final transaction = (await transactionBuilder.build()) as Transaction;
+      final baseTransaction = await transactionBuilder.build();
+      final transactionCbor = cbor.decode(baseTransaction.bytes);
+      final transaction = Transaction.fromCbor(transactionCbor);
       final inputs = transaction.body.inputs;
 
       final metadata = await X509MetadataEnvelope.fromCbor(

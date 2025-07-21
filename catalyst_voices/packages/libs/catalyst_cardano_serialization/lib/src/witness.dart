@@ -91,7 +91,9 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
     );
   }
 
+  /// Utility method for [toCbor]. It returns map of cbor values for this [TransactionWitnessSet].
   ///
+  /// It is useful when implementing custom or tracking encoding.
   Map<CborValue, CborValue> toCborValuesMap() {
     return <CborValue, CborValue>{
       ..._generateCborPair(WitnessType.vkeyWitness, vkeyWitnesses),
