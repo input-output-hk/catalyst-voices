@@ -44,7 +44,8 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
       publicKeys: publicKeys,
     );
 
-    final dummyAuxiliaryData = await unsignedMetadata.toAuxiliaryData();
+    final dummyMetadataCbor = await unsignedMetadata.toCbor(serializer: (e) => e.toCbor());
+    final dummyAuxiliaryData = AuxiliaryData.fromCbor(dummyMetadataCbor);
 
     final txBuilder = TransactionBuilder(
       requiredSigners: requiredSigners,
@@ -139,14 +140,6 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
             ),
         },
       ),
-    );
-  }
-}
-
-extension on RegistrationMetadata {
-  Future<AuxiliaryData> toAuxiliaryData() async {
-    return AuxiliaryData.fromCbor(
-      await toCbor(serializer: (e) => e.toCbor()),
     );
   }
 }
