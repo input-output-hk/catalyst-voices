@@ -227,7 +227,8 @@ final class VotingCubit extends Cubit<VotingState>
   }
 
   Future<void> _loadCampaignCategories() async {
-    final categories = await _campaignService.getCampaignCategories();
+    final campaign = await _campaignService.getActiveCampaign();
+    final categories = campaign?.categories ?? [];
 
     _cache = _cache.copyWith(categories: Optional(categories));
 
