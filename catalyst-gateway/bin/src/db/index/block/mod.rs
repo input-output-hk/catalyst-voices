@@ -68,7 +68,7 @@ pub(crate) async fn index_block(
             indexer_state,
             range_start,
         ))
-        .await;
+        .await?;
     }
 
     // We then execute each batch of data from the block.

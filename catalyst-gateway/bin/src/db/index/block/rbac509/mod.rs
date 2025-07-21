@@ -8,6 +8,7 @@ pub(crate) mod insert_rbac509_invalid;
 
 use std::{collections::HashSet, sync::Arc};
 
+use anyhow::Result;
 use cardano_blockchain_types::{MultiEraBlock, Slot, TransactionId, TxnIndex};
 use rbac_registration::cardano::cip509::Cip509;
 use scylla::Session;
@@ -56,7 +57,7 @@ impl Rbac509InsertQuery {
     /// Prepare Batch of Insert RBAC 509 Registration Data Queries
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &EnvVars,
-    ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch, SizedBatch, SizedBatch)> {
+    ) -> Result<(SizedBatch, SizedBatch, SizedBatch, SizedBatch, SizedBatch)> {
         Ok((
             insert_rbac509::Params::prepare_batch(session, cfg).await?,
             insert_rbac509_invalid::Params::prepare_batch(session, cfg).await?,
@@ -72,13 +73,13 @@ impl Rbac509InsertQuery {
         &mut self, txn_hash: TransactionId, index: TxnIndex, block: &MultiEraBlock,
         context: &mut RbacBlockIndexingContext, indexer_state: &mut ChainIndexerStateReceiver,
         range_start: Slot,
-    ) {
+    ) -> Result<()> {
         let slot = block.slot();
         let cip509 = match Cip509::new(block, index, &[]) {
             Ok(Some(v)) => v,
             Ok(None) => {
                 // Nothing to index.
-                return;
+                return Ok(());
             },
             Err(e) => {
                 // This registration is either completely corrupted or someone else is using "our"
@@ -87,9 +88,10 @@ impl Rbac509InsertQuery {
                 debug!(
                     slot = ?slot,
                     index = ?index,
-                    "Invalid RBAC Registration Metadata in transaction: {e:?}"
+                    err = ?e,
+                    "Invalid RBAC Registration Metadata in transaction"
                 );
-                return;
+                return Ok(());
             },
         };
 
@@ -210,12 +212,27 @@ impl Rbac509InsertQuery {
             // is no Catalyst ID, then we cannot record this registration as invalid and can only
             // ignore (and log) it.
             Err(RbacValidationError::UnknownCatalystId) => {
-                debug!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}");
+                debug!(
+                    slot = ?slot,
+                    index = ?index,
+                    txn_hash = ?txn_hash,
+                    "Unable to determine Catalyst id for registration"
+                );
             },
-            Err(RbacValidationError::Other(e)) => {
-                error!("Error indexing RBAC registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}: {e:?}");
+            Err(RbacValidationError::Fatal(e)) => {
+                error!(
+                   slot = ?slot,
+                   index = ?index,
+                   txn_hash = ?txn_hash,
+                   err = ?e,
+                   "Error indexing RBAC registration"
+                );
+                // Propagate an error.
+                return Err(e);
             },
         }
+
+        Ok(())
     }
 
     /// Execute the RBAC 509 Registration Indexing Queries.
