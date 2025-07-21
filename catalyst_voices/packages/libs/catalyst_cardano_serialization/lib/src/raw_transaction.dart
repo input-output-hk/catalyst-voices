@@ -1,3 +1,5 @@
+//ignore_for_file: implementation_imports
+
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/rbac/x509_metadata_envelope.dart';
 import 'package:catalyst_cardano_serialization/src/structured_bytes.dart';
