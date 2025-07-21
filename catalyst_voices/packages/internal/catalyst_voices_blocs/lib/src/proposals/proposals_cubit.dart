@@ -81,7 +81,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     _watchProposalsCount(filters: filters.toCountFilters());
 
     if (resetProposals) {
-      emitSignal(const ResetProposalsPaginationSignal());
+      emitSignal(const ResetPaginationProposalsSignal());
     }
   }
 
@@ -98,12 +98,12 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     _rebuildOrder();
 
     if (resetProposals) {
-      emitSignal(const ResetProposalsPaginationSignal());
+      emitSignal(const ResetPaginationProposalsSignal());
     }
   }
 
   void changeSelectedCategory(SignedDocumentRef? categoryId) {
-    emitSignal(ChangeCategorySignal(to: categoryId));
+    emitSignal(ChangeCategoryProposalsSignal(to: categoryId));
   }
 
   @override
@@ -213,7 +213,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
     final mappedPage = page.map(ProposalBrief.fromProposal);
 
-    final signal = ProposalsPageReadySignal(page: mappedPage);
+    final signal = PageReadyProposalsSignal(page: mappedPage);
 
     emitSignal(signal);
   }

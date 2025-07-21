@@ -420,6 +420,48 @@
       }
     }
   },
+  "getReadyToVote": "Get ready to vote",
+  "@getReadyToVote": {
+    "description": "Label before the voting phase starts."
+  },
+  "votingIsOpen": "Voting is open!",
+  "@votingIsOpen": {
+    "description": "Label when voting phase is active."
+  },
+  "votingIsClosed": "Voting is closed!",
+  "@votingIsClosed": {
+    "description": "Label when the voting phase is closed."
+  },
+  "votingStarts": "Voting starts",
+  "@votingStarts": {
+    "description": "Label when the voting phase starts."
+  },
+  "votingPhase": "Voting Phase",
+  "@votingPhase": {
+    "description": "Label when the voting phase is active."
+  },
+  "votingEnded": "Voting ended",
+  "@votingEnded": {
+    "description": "Label when the voting phase is closed."
+  },
+  "votingEndsIn": "Ends in {duration}",
+  "@votingEndsIn": {
+    "description": "Label when voting phase ends after the duration.",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "votingStartsIn": "in {duration}",
+  "@votingStartsIn": {
+    "description": "Label when voting phase starts after the duration.",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "followed": "Followed",
   "@followed": {
     "description": "Refers to a list of followed items."
@@ -1316,6 +1358,22 @@
   "viewVotingResults": "View Voting Results",
   "@viewVotingResults": {
     "description": "Title of the view voting results space"
+  },
+  "votingPower": "Voting Power",
+  "@votingPower": {
+    "description": "Label for the user's voting power"
+  },
+  "updated": "Updated",
+  "@updated": {
+    "description": "A label when something was last updated."
+  },
+  "confirmed": "Confirmed",
+  "@confirmed": {
+    "description": "A label when something is final and not provisional."
+  },
+  "provisional": "Provisional",
+  "@provisional": {
+    "description": "A label when something is provisional / not confirmed."
   },
   "campaignDetails": "Campaign Details",
   "description": "Description",
@@ -2242,6 +2300,22 @@
   "notAvailableAbbr": "N/A",
   "@notAvailableAbbr": {
     "description": "Abbreviation for not available"
+  },
+  "dayAbbr": "d",
+  "@dayAbbr": {
+    "description": "A single letter abbreviation for day."
+  },
+  "hourAbbr": "h",
+  "@hourAbbr": {
+    "description": "A single letter abbreviation for hour."
+  },
+  "minuteAbbr": "m",
+  "@minuteAbbr": {
+    "description": "A single letter abbreviation for minute."
+  },
+  "secondAbbr": "s",
+  "@secondAbbr": {
+    "description": "A single letter abbreviation for second."
   },
   "title": "Title",
   "@title": {

@@ -61,12 +61,7 @@ class DateRange extends Equatable {
     return min <= valueMillis && valueMillis <= max;
   }
 
-  bool isTodayInRange() {
-    return isInRange(DateTime.now());
-  }
-
-  DateRangeStatus rangeStatusNow() {
-    final now = DateTime.now();
+  DateRangeStatus rangeStatus(DateTime now) {
     if (isInRange(now)) {
       return DateRangeStatus.inRange;
     } else if (isBeforeRange(now)) {
