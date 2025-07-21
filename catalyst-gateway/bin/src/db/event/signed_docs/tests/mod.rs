@@ -2,12 +2,15 @@
 
 use std::str::FromStr;
 
-use catalyst_signed_doc::{doc_types, DocType};
+use catalyst_signed_doc::doc_types;
 use futures::TryStreamExt;
 
 use super::*;
 use crate::db::event::{
-    common::{eq_or_ranged_uuid::EqOrRangedUuid, query_limits::QueryLimits},
+    common::{
+        array_query_uuid::ArrayQueryUuid, eq_or_ranged_uuid::EqOrRangedUuid,
+        query_limits::QueryLimits,
+    },
     establish_connection_pool,
 };
 
@@ -184,12 +187,7 @@ async fn filter_by_id_and_ver(doc: &FullSignedDoc) {
 }
 
 async fn filter_by_type(docs: &[FullSignedDoc], doc_type: Vec<uuid::Uuid>) {
-    let doc_type = catalyst_signed_doc::to_deprecated_doc_type(
-        &DocType::try_from(doc_type).expect("Cannot convert UUIDs into DocType"),
-    )
-    .expect("Cannot convert into deprecated DocType");
-
-    let filter = DocsQueryFilter::all().with_type(doc_type.uuid());
+    let filter = DocsQueryFilter::all().with_type(ArrayQueryUuid::Equals(doc_type));
     let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
         .await
         .unwrap();
