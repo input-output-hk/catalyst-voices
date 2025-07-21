@@ -6,6 +6,8 @@ abstract class VoicesConstants {
 
   /// External urls
   static const supportedWalletsUrl = '$_docs/current-fund/voter-registration/supported-wallets';
+  static const f14ProposalSubmissionNoticeUrl =
+      '$_docs/current-fund/fund-basics/fund14-proposal-submission-notice';
   static const tosUrl =
       '$_docs/current-fund/fund-basics/project-catalyst-terms-and-conditions/project-catalyst-platform-terms-of-use';
   static const conditionsUrl =
