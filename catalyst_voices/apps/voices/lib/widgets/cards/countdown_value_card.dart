@@ -22,8 +22,10 @@ class CountDownValueCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12),
-      height: 167,
-      width: 144,
+      constraints: const BoxConstraints(
+        minWidth: 144,
+        maxHeight: 167,
+      ),
       decoration: BoxDecoration(
         color: _backgroundColor(context),
         borderRadius: BorderRadius.circular(16),
@@ -33,39 +35,50 @@ class CountDownValueCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _DigitWidget(
-                    key: const ValueKey('tens'),
-                    digit: digits[0],
-                    textAlign: TextAlign.right,
-                  ),
-                  _DigitWidget(
-                    key: const ValueKey('ones'),
-                    digit: digits[1],
-                    textAlign: TextAlign.left,
-                  ),
-                ],
-              ),
-              Positioned(
-                bottom: 35,
-                child: Text(
-                  unit,
-                  style: context.textTheme.bodyLarge?.copyWith(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w400,
-                    letterSpacing: 1.03,
-                    height: 1,
-                    color: context.colorScheme.primary,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Offstage(
+                      offstage: digits.length < 3,
+                      child: _DigitWidget(
+                        key: const ValueKey('hundreds'),
+                        digit: digits[0],
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
+                    _DigitWidget(
+                      key: const ValueKey('tens'),
+                      digit: digits.length < 3 ? digits[0] : digits[1],
+                      textAlign: TextAlign.right,
+                    ),
+                    _DigitWidget(
+                      key: const ValueKey('ones'),
+                      digit: digits.length < 3 ? digits[1] : digits[2],
+                      textAlign: TextAlign.left,
+                    ),
+                  ],
+                ),
+                Positioned(
+                  bottom: 35,
+                  child: Text(
+                    unit,
+                    style: context.textTheme.bodyLarge?.copyWith(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: 1.03,
+                      height: 1,
+                      color: context.colorScheme.primary,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
