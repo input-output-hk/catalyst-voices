@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CountDownValueCard extends StatelessWidget {
   final int value;
@@ -109,10 +110,11 @@ class _DigitText extends StatelessWidget {
     return Text(
       value.toString(),
       textAlign: textAlign,
-      style: context.textTheme.displayMedium?.copyWith(
+      style: GoogleFonts.robotoMono(
         fontSize: 72,
         fontWeight: FontWeight.bold,
         color: context.colorScheme.primary,
+        fontFeatures: [const FontFeature.tabularFigures()],
       ),
     );
   }
