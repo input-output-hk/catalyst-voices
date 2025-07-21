@@ -38,9 +38,27 @@ final class AuxiliaryData extends Equatable implements CborEncodable {
   }
 }
 
+/// Low level representation of transaction. It exposes minimum necessary data.
+abstract base class BaseTransaction extends Equatable {
+  /// A constructor of [BaseTransaction].
+  const BaseTransaction();
+
+  /// Bytes representation of this transaction.
+  List<int> get bytes;
+
+  /// The fee for the transaction. See [TransactionBody.fee].
+  Coin get fee;
+
+  /// Network for this transaction. See [TransactionBody.networkId].
+  NetworkId? get networkId;
+
+  /// Updates this [BaseTransaction] with given [witnessSet].
+  BaseTransaction withWitnessSet(TransactionWitnessSet witnessSet);
+}
+
 /// Represents the signed transaction with a list of witnesses
 /// which are used to verify the validity of a transaction.
-final class Transaction extends Equatable implements CborEncodable {
+final class Transaction extends BaseTransaction implements CborEncodable {
   /// The transaction body containing the inputs, outputs, fees, etc.
   final TransactionBody body;
 
@@ -80,6 +98,15 @@ final class Transaction extends Equatable implements CborEncodable {
   }
 
   @override
+  List<int> get bytes => cbor.encode(toCbor());
+
+  @override
+  Coin get fee => body.fee;
+
+  @override
+  NetworkId? get networkId => body.networkId;
+
+  @override
   List<Object?> get props => [body, isValid, witnessSet, auxiliaryData];
 
   /// Serializes the type as cbor.
@@ -93,6 +120,16 @@ final class Transaction extends Equatable implements CborEncodable {
         auxiliaryData?.toCbor() ?? const CborNull(),
       ],
       tags: tags,
+    );
+  }
+
+  @override
+  Transaction withWitnessSet(TransactionWitnessSet witnessSet) {
+    return Transaction(
+      body: body,
+      isValid: isValid,
+      witnessSet: witnessSet,
+      auxiliaryData: auxiliaryData,
     );
   }
 }
