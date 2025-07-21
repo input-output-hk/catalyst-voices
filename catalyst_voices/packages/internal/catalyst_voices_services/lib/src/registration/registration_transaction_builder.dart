@@ -4,8 +4,9 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
     hide Ed25519PublicKey;
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart' as cs
     show Ed25519PublicKey;
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_services/src/crypto/bip32_ed25519_catalyst_private_key.dart';
+import 'package:catalyst_voices_services/src/crypto/bip32_ed25519_catalyst_public_key.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
 import 'package:catalyst_voices_services/src/registration/registration_transaction_role.dart';
 import 'package:collection/collection.dart';
@@ -124,10 +125,14 @@ final class RegistrationTransactionBuilder {
         changeAddress: changeAddress,
       );
 
-      // Build the X.509 metadata envelope
+      // Apply coin selection to get the actually selected UTXOs
+      final builderWithSelection = txBuilder.applySelection();
+      final selectedUtxos = builderWithSelection.inputs;
+
+      // Build the X.509 metadata envelope with the selected UTXOs
       final x509Envelope = await _buildMetadataEnvelope(
         rootKeyPair: rootKeyPair,
-        selectedUtxos: utxos,
+        selectedUtxos: selectedUtxos,
         derCert: derCert,
         publicKeys: publicKeys,
       );
@@ -139,7 +144,7 @@ final class RegistrationTransactionBuilder {
       final auxiliaryData = AuxiliaryData.fromCbor(envelopeCbor);
 
       // Build the transaction with the X.509 envelope as auxiliary data
-      final txBody = txBuilder.buildBody();
+      final txBody = builderWithSelection.buildBody();
       final transaction = Transaction(
         body: txBody,
         isValid: true,
@@ -199,7 +204,7 @@ final class RegistrationTransactionBuilder {
       ),
     );
 
-    final privateKey = Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(
+    final privateKey = const Bip32Ed25519XCatalystPrivateKeyFactory().create(
       rootKeyPair.privateKey.bytes,
     );
 

@@ -210,33 +210,20 @@ class _CborValidator {
 
   /// Validates metadata CBOR structure.
   static void _validateMetadata(cbor.CborValue decoded, String name, String? context) {
-    // Expect: [map, [], []]
-    if (decoded is! cbor.CborList || decoded.length != 3) {
-      throw CborValidationError('$name: Metadata must be a 3-element array');
-    }
-    final decodedList = decoded as cbor.CborList;
-    if (decodedList[1] is! cbor.CborList || (decodedList[1] as cbor.CborList).length != 0) {
-      throw CborValidationError('$name: Second element must be an empty array');
-    }
-    if (decodedList[2] is! cbor.CborList || (decodedList[2] as cbor.CborList).length != 0) {
-      throw CborValidationError('$name: Third element must be an empty array');
-    }
 
-    // Validate metadata map
-    final metadataMap = decodedList[0];
-    if (metadataMap is! cbor.CborMap) {
-      throw CborValidationError('$name: First element must be a map');
+    if (decoded is! cbor.CborMap) {
+      throw CborValidationError('$name: Metadata must be a map');
     }
 
     // Check required keys
     final requiredKeys = {_kPurpose, _kTxInputsHashPlaceholder, _kValidationSignature};
-    final mapKeys = metadataMap.keys.map((k) => _extractIntValue(k as cbor.CborValue)).toSet();
+    final mapKeys = decoded.keys.map((k) => _extractIntValue(k as cbor.CborValue)).toSet();
     if (!requiredKeys.every((k) => mapKeys.contains(k))) {
       throw CborValidationError('$name: Missing required keys: $requiredKeys');
     }
 
     // Validate key types and sizes
-    for (final entry in metadataMap.entries) {
+    for (final entry in decoded.entries) {
       final key = _extractIntValue(entry.key as cbor.CborValue);
       final value = entry.value;
 
@@ -438,10 +425,8 @@ class TransactionEncoder {
     final out = Uint8Buffer();
     final sink = _TrackingSink(cbor_internal.EncodeSink.withBuffer(out), ctx);
 
-    // Start metadata array [metadata_map, [], []]
-    sink.addHeaderInfo(cbor.CborMajorType.array, Arg.int(3));
-
-    // Create metadata map
+    // According to Cardano CDDL specification, auxiliary data should be a map
+    // not a 3-element array [map, [], []]
     final mapSize = _requiredMetadataFields + additionalMetadata.length;
     sink.addHeaderInfo(cbor.CborMajorType.map, Arg.int(mapSize));
 
@@ -466,10 +451,6 @@ class TransactionEncoder {
       cbor.CborSmallInt(e.key).encode(sink);
       cbor.CborBytes(e.value).encode(sink);
     }
-
-    // Empty arrays for metadata structure
-    sink.addHeaderInfo(cbor.CborMajorType.array, Arg.int(0));
-    sink.addHeaderInfo(cbor.CborMajorType.array, Arg.int(0));
 
     sink.close();
     return {'bytes': out.toList(), 'ctx': ctx};
