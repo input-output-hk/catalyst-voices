@@ -155,6 +155,7 @@ command:
       shared_preferences_platform_interface: ^2.4.1
       skeletonizer: ^1.4.3
       synchronized: ^3.3.0+3
+      typed_data: ^1.4.0
       web: ^1.1.0
       webdriver: ^3.0.3
     dev_dependencies:
