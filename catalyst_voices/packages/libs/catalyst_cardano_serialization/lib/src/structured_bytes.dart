@@ -1,24 +1,29 @@
 import 'package:equatable/equatable.dart';
 
-///
+/// A helper class for [StructuredBytes] to keep track of important parts of bytes.
 final class CborValueByteRange extends Equatable {
-  ///
+  /// Start of section.
   final int start;
 
-  ///
+  /// End of section
   final int end;
 
+  /// If given section size is known. Setting this fields enables
+  /// operations on data only (without headers).
   ///
+  /// Its required for patching.
   final int? dataSize;
 
-  ///
+  /// A default constructor for [CborValueByteRange].
   const CborValueByteRange({
     required this.start,
     required this.end,
     this.dataSize,
   });
 
+  /// Start of data in this range.
   ///
+  /// Returns null if [dataSize] is unknown otherwise calculates header and start of data itself.
   int? get dataStart {
     final dataSize = this.dataSize;
     if (dataSize == null) {
@@ -33,7 +38,7 @@ final class CborValueByteRange extends Equatable {
   @override
   List<Object?> get props => [start, end, dataSize];
 
-  ///
+  /// Makes a copy of [CborValueByteRange].
   CborValueByteRange copyWith({
     int? start,
     int? end,
