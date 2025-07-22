@@ -64,7 +64,7 @@ impl ChainIndexerEventSender {
     /// To subscribe on processing events and instantiate `ChainIndexerEventReceiver` call
     /// `subscribe` method of the `ChainIndexerEventSender`
     pub(crate) fn new() -> Self {
-        Self(tokio::sync::broadcast::channel(30).0)
+        Self(tokio::sync::broadcast::channel(1).0)
     }
 
     /// Dispatches an event to all registered listeners.
