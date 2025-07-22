@@ -20,7 +20,7 @@ env:
 
 jobs:
   ci_nightly:
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.8.0
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@fixes-install-local
     with:
       forge_version: 0.19.0
       nightly: true
@@ -34,15 +34,15 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.8.0
+        uses: input-output-hk/catalyst-forge/actions/install@fixes-install-local
         with:
           version: 0.19.0
 
       - name: Setup CI
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.8.0
+        uses: input-output-hk/catalyst-forge/actions/setup@fixes-install-local
 
       - name: Get python api test report
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.8.0
+        uses: input-output-hk/catalyst-forge/actions/run@fixes-install-local
         if: always()
         continue-on-error: true
         with:
