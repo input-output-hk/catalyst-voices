@@ -95,8 +95,11 @@ void main() {
       final modelsTxBytes = modelsTransaction.bytes;
       final rawTxBytes = rawTransaction.bytes;
 
-      expect(modelsTxBytes.length, equals(rawTxBytes.length));
-      expect(modelsTxBytes, equals(rawTxBytes));
+      expect(
+        modelsTxBytes,
+        allOf(hasLength(rawTxBytes.length), equals(rawTxBytes)),
+        reason: 'Two bytes and models strategy have to produce same outcome',
+      );
     });
   });
 }

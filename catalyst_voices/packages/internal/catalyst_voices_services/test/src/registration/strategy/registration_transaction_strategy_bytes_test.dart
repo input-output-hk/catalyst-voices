@@ -34,28 +34,7 @@ void main() {
 
     test('raw transaction have correctly patched txInputsHash', () async {
       // Given
-      final utxos = {
-        TransactionUnspentOutput(
-          input: TransactionInput(
-            transactionId: _buildDummyTransactionId(0),
-            index: 0,
-          ),
-          output: TransactionOutput(
-            address: _changeAddress,
-            amount: Balance(coin: Coin.fromAda(1.2)),
-          ),
-        ),
-        TransactionUnspentOutput(
-          input: TransactionInput(
-            transactionId: _buildDummyTransactionId(1),
-            index: 1,
-          ),
-          output: TransactionOutput(
-            address: _changeAddress,
-            amount: Balance(coin: Coin.fromAda(1.2)),
-          ),
-        ),
-      };
+      final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
       };
@@ -90,33 +69,12 @@ void main() {
 
     test('raw transaction have correctly patched signature', () async {
       // Given
-      final utxos = {
-        TransactionUnspentOutput(
-          input: TransactionInput(
-            transactionId: _buildDummyTransactionId(0),
-            index: 0,
-          ),
-          output: TransactionOutput(
-            address: _changeAddress,
-            amount: Balance(coin: Coin.fromAda(1.2)),
-          ),
-        ),
-        TransactionUnspentOutput(
-          input: TransactionInput(
-            transactionId: _buildDummyTransactionId(1),
-            index: 1,
-          ),
-          output: TransactionOutput(
-            address: _changeAddress,
-            amount: Balance(coin: Coin.fromAda(1.2)),
-          ),
-        ),
-      };
+      final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
       };
 
-      final derCert = X509DerCertificate.fromBytes(bytes: List.filled(32, 0));
+      final derCert = _buildCert();
       final strategy = _buildStrategy(utxos: utxos);
 
       // When
@@ -146,33 +104,12 @@ void main() {
 
     test('raw transaction have correct auxiliaryDataHash', () async {
       // Given
-      final utxos = {
-        TransactionUnspentOutput(
-          input: TransactionInput(
-            transactionId: _buildDummyTransactionId(0),
-            index: 0,
-          ),
-          output: TransactionOutput(
-            address: _changeAddress,
-            amount: Balance(coin: Coin.fromAda(1.2)),
-          ),
-        ),
-        TransactionUnspentOutput(
-          input: TransactionInput(
-            transactionId: _buildDummyTransactionId(1),
-            index: 1,
-          ),
-          output: TransactionOutput(
-            address: _changeAddress,
-            amount: Balance(coin: Coin.fromAda(1.2)),
-          ),
-        ),
-      };
+      final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
       };
 
-      final derCert = X509DerCertificate.fromBytes(bytes: List.filled(32, 0));
+      final derCert = _buildCert();
       final strategy = _buildStrategy(utxos: utxos);
 
       // When
@@ -204,33 +141,12 @@ void main() {
 
     test('auxiliary data size does not change', () async {
       // Given
-      final utxos = {
-        TransactionUnspentOutput(
-          input: TransactionInput(
-            transactionId: _buildDummyTransactionId(0),
-            index: 0,
-          ),
-          output: TransactionOutput(
-            address: _changeAddress,
-            amount: Balance(coin: Coin.fromAda(1.2)),
-          ),
-        ),
-        TransactionUnspentOutput(
-          input: TransactionInput(
-            transactionId: _buildDummyTransactionId(1),
-            index: 1,
-          ),
-          output: TransactionOutput(
-            address: _changeAddress,
-            amount: Balance(coin: Coin.fromAda(1.2)),
-          ),
-        ),
-      };
+      final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
       };
 
-      final derCert = X509DerCertificate.fromBytes(bytes: List.filled(32, 0));
+      final derCert = _buildCert();
       final strategy = _buildStrategy(utxos: utxos);
 
       // When
@@ -280,17 +196,22 @@ final _changeAddress = ShelleyAddress.fromBech32(
 );
 
 final _masterKey = _FakeCatalystPrivateKey(bytes: _masterKeyBytes);
-final _masterKeyBytes = Uint8List.fromList(List.filled(96, 0));
 
+final _masterKeyBytes = Uint8List.fromList(List.filled(96, 0));
 final _rewardAddress = ShelleyAddress.fromBech32(
   /* cSpell:disable */
   'stake_test1urhsxq8996yy7varz0kgr0ev2e9wltvkcr0kuzd4wwzsdzqvt0e8t',
   /* cSpell:enable */
 );
+
 final _voterKeyPair = CatalystKeyPair(
   publicKey: _FakeCatalystPublicKey(bytes: Uint8List.fromList(List.filled(64, 1))),
   privateKey: _FakeCatalystPrivateKey(bytes: Uint8List.fromList(List.filled(96, 2))),
 );
+
+X509DerCertificate _buildCert() {
+  return X509DerCertificate.fromBytes(bytes: List.filled(1000, 0));
+}
 
 TransactionHash _buildDummyTransactionId(int seed) {
   final hex = List.filled(64, '$seed').join();
@@ -316,6 +237,31 @@ RegistrationTransactionStrategyBytes _buildStrategy({
     utxos: utxos,
     previousTransactionId: null,
   );
+}
+
+Set<TransactionUnspentOutput> _buildUtxos() {
+  return {
+    TransactionUnspentOutput(
+      input: TransactionInput(
+        transactionId: _buildDummyTransactionId(0),
+        index: 0,
+      ),
+      output: TransactionOutput(
+        address: _changeAddress,
+        amount: Balance(coin: Coin.fromAda(1.2)),
+      ),
+    ),
+    TransactionUnspentOutput(
+      input: TransactionInput(
+        transactionId: _buildDummyTransactionId(1),
+        index: 1,
+      ),
+      output: TransactionOutput(
+        address: _changeAddress,
+        amount: Balance(coin: Coin.fromAda(1.2)),
+      ),
+    ),
+  };
 }
 
 class _FakeBip32Ed25519XPrivateKey extends Fake implements kd.Bip32Ed25519XPrivateKey {
