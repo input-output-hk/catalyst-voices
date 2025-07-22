@@ -78,6 +78,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
       auxiliaryData: dummyAuxiliaryData,
     );
 
+    final txSizeBeforePatching = rawTx.bytes.length;
     final auxiliaryDataSizeBeforePatching = rawTx.auxiliaryData.length;
 
     // 1. txInputsHash
@@ -97,6 +98,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
 
     // 4. validate
     _validateCborFormat(rawTx);
+    _validateTransactionSize(rawTx, expectedSize: txSizeBeforePatching);
     _validateAuxiliaryDataSize(rawTx, expectedSize: auxiliaryDataSizeBeforePatching);
 
     return rawTx;
@@ -157,9 +159,10 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     final actualSize = rawTx.auxiliaryData.length;
 
     if (actualSize != expectedSize) {
-      throw RawTransactionAuxiliaryDataSizeChanged(
+      throw RawTransactionSizeChanged(
         expectedSize: expectedSize,
         actualSize: actualSize,
+        aspect: 'AuxiliaryData',
       );
     }
   }
@@ -171,6 +174,21 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
       Transaction.fromCbor(cborValue);
     } on FormatException catch (_) {
       throw const RawTransactionMalformed();
+    }
+  }
+
+  void _validateTransactionSize(
+    RawTransaction rawTx, {
+    required int expectedSize,
+  }) {
+    final actualSize = rawTx.bytes.length;
+
+    if (actualSize != expectedSize) {
+      throw RawTransactionSizeChanged(
+        expectedSize: expectedSize,
+        actualSize: actualSize,
+        aspect: 'Transaction',
+      );
     }
   }
 }
