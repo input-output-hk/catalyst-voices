@@ -99,7 +99,7 @@ final class RawTransaction extends BaseTransaction {
             RawTransactionAspect.txInputsHash,
             dataSize: TransactionInputsHash.hashLength,
           ),
-          X509MetadataEnvelope.validationSignatureKey: _TrackingAspect(
+          X509MetadataEnvelope.validationSignatureKey: const _TrackingAspect(
             RawTransactionAspect.signature,
             dataSize: Bip32Ed25519XSignature.length,
           ),
