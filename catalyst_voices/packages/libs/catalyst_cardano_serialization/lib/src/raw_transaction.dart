@@ -138,16 +138,24 @@ final class RawTransaction extends BaseTransaction {
 
   /// Returns auxiliary data bytes from [bytes].
   List<int> get auxiliaryData {
-    final range = _structuredBytes.context[RawTransactionAspect.auxiliaryData]!;
+    final data = _structuredBytes.getValueOf(RawTransactionAspect.auxiliaryData);
 
-    return _structuredBytes.bytes.sublist(range.start, range.end);
+    if (data == null) {
+      throw StateError('AuxiliaryData not found!');
+    }
+
+    return data;
   }
 
   /// Returns auxiliary data hash bytes from [bytes].
   List<int> get auxiliaryDataHash {
-    final range = _structuredBytes.context[RawTransactionAspect.auxiliaryDataHash]!;
+    final data = _structuredBytes.getDataOf(RawTransactionAspect.auxiliaryDataHash);
 
-    return _structuredBytes.bytes.sublist(range.dataStart!, range.end);
+    if (data == null) {
+      throw StateError('AuxiliaryDataHash not found!');
+    }
+
+    return data;
   }
 
   @override
@@ -155,31 +163,35 @@ final class RawTransaction extends BaseTransaction {
 
   @override
   Coin get fee {
-    final range = _structuredBytes.context[RawTransactionAspect.fee];
-    if (range == null) {
+    final value = _structuredBytes.getValueOf(RawTransactionAspect.fee);
+
+    if (value == null) {
       throw StateError('Fee not found!');
     }
-    final bytes = _structuredBytes.bytes.sublist(range.start, range.end);
-    final value = (cbor.decode(bytes) as CborSmallInt).value;
 
-    return Coin(value);
+    final cborValue = cbor.decode(value) as CborSmallInt;
+
+    return Coin(cborValue.value);
   }
 
   /// Returns inputs bytes from [bytes].
   List<int> get inputs {
-    final range = _structuredBytes.context[RawTransactionAspect.inputs]!;
+    final value = _structuredBytes.getValueOf(RawTransactionAspect.inputs);
 
-    return _structuredBytes.bytes.sublist(range.start, range.end);
+    if (value == null) {
+      throw StateError('AuxiliaryDataHash not found!');
+    }
+
+    return value;
   }
 
   @override
   NetworkId? get networkId {
-    final range = _structuredBytes.context[RawTransactionAspect.networkId];
-    if (range == null) {
+    final value = _structuredBytes.getValueOf(RawTransactionAspect.networkId);
+    if (value == null) {
       return null;
     }
-    final bytes = _structuredBytes.bytes.sublist(range.start, range.end);
-    final decoded = cbor.decode(bytes);
+    final decoded = cbor.decode(value);
     if (decoded is! CborSmallInt) {
       return null;
     }
@@ -192,16 +204,24 @@ final class RawTransaction extends BaseTransaction {
 
   /// Returns auxiliary data signature bytes from [bytes].
   List<int> get signature {
-    final range = _structuredBytes.context[RawTransactionAspect.signature]!;
+    final data = _structuredBytes.getDataOf(RawTransactionAspect.signature);
 
-    return _structuredBytes.bytes.sublist(range.dataStart!, range.end);
+    if (data == null) {
+      throw StateError('Signature not found!');
+    }
+
+    return data;
   }
 
   /// Returns [inputs] hash bytes from [bytes].
   List<int> get txInputsHash {
-    final range = _structuredBytes.context[RawTransactionAspect.txInputsHash]!;
+    final data = _structuredBytes.getDataOf(RawTransactionAspect.txInputsHash);
 
-    return _structuredBytes.bytes.sublist(range.dataStart!, range.end);
+    if (data == null) {
+      throw StateError('TxInputsHash not found!');
+    }
+
+    return data;
   }
 
   /// Patching [bytes]'s [auxiliaryDataHash] with given [data].

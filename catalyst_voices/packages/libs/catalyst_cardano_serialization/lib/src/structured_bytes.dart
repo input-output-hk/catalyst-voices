@@ -77,6 +77,28 @@ final class StructuredBytes<T> {
   /// Returns context for [bytes].
   Map<T, CborValueByteRange> get context => Map.unmodifiable(_context);
 
+  /// Returns matching data range (See [CborValueByteRange.dataStart]).
+  ///
+  /// If no context found for [key] or it does not have [CborValueByteRange.dataStart] returns null.
+  List<int>? getDataOf(T key) {
+    final range = context[key];
+    if (range == null) return null;
+    final dataStart = range.dataStart;
+    if (dataStart == null) return null;
+
+    return _bytes.sublist(dataStart, range.end);
+  }
+
+  /// Returns matching data range (See [CborValueByteRange.dataStart]).
+  ///
+  /// If no context found for [key]..
+  List<int>? getValueOf(T key) {
+    final range = context[key];
+    if (range == null) return null;
+
+    return _bytes.sublist(range.start, range.end);
+  }
+
   /// Updates internal list of bytes associated with [key] with [data].
   ///
   /// Patching is supported only for [CborValueByteRange] with dataSize.
