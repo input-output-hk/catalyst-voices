@@ -17,13 +17,11 @@ permissions:
 
 jobs:
   ci:
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.4
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.8.0
     with:
-      forge_version: 0.18.0
-      local: true
+      forge_version: 0.19.0
 
-  # TODO: Enable when our earthly self-satellites will be back and remove `local: true` flag
-  # test_reporting:
-  #   if: always()
-  #   needs: ci
-  #   uses: ./.github/workflows/generate-allure-report.yml
+  test_reporting:
+    if: always()
+    needs: ci
+    uses: ./.github/workflows/generate-allure-report.yml
