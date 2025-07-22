@@ -20,7 +20,7 @@ final class AuxiliaryDataHash extends BaseHash {
   /// Length of the [AuxiliaryDataHash].
   static const int hashLength = 32;
 
-  /// Crates a blake2b hash from [bytes].
+  /// Creates a blake2b hash from [bytes].
   AuxiliaryDataHash.blake2b(List<int> bytes)
       : super.fromBytes(
           bytes: Hash.blake2b(
@@ -214,7 +214,7 @@ final class TransactionInputsHash extends BaseHash {
   /// Length of the [TransactionInputsHash].
   static const int hashLength = 16;
 
-  /// Crates a blake2b hash from [bytes].
+  /// Creates a blake2b hash from [bytes].
   TransactionInputsHash.blake2b(List<int> bytes)
       : super.fromBytes(
           bytes: Hash.blake2b(
