@@ -1,12 +1,16 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_services/src/campaign/active_campaign_observer.dart';
 
 abstract interface class CampaignService {
   const factory CampaignService(
     CampaignRepository campaignRepository,
     ProposalRepository documentRepository,
+    ActiveCampaignObserver activeCampaignObserver,
   ) = CampaignServiceImpl;
+
+  Stream<Campaign> get watchActiveCampaign;
 
   Future<Campaign?> getActiveCampaign();
 
@@ -22,14 +26,27 @@ abstract interface class CampaignService {
 final class CampaignServiceImpl implements CampaignService {
   final CampaignRepository _campaignRepository;
   final ProposalRepository _proposalRepository;
+  final ActiveCampaignObserver _activeCampaignObserver;
 
   const CampaignServiceImpl(
     this._campaignRepository,
     this._proposalRepository,
+    this._activeCampaignObserver,
   );
 
   @override
-  Future<Campaign?> getActiveCampaign() => getCampaign(id: Campaign.f14Ref.id);
+  Stream<Campaign> get watchActiveCampaign => _activeCampaignObserver.watchCampaign;
+
+  @override
+  Future<Campaign?> getActiveCampaign() async {
+    if (_activeCampaignObserver.campaign != null) {
+      return _activeCampaignObserver.campaign;
+    }
+    // TODO(LynxLynxx): Call backend to get latest active campaign
+    final campaign = await getCampaign(id: Campaign.f14Ref.id);
+    _activeCampaignObserver.campaign = campaign;
+    return campaign;
+  }
 
   @override
   Future<Campaign> getCampaign({
