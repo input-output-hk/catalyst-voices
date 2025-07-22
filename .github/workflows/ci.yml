@@ -20,10 +20,8 @@ jobs:
     uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@master
     with:
       forge_version: 0.19.0
-      local: true
 
-  # TODO: Enable when our earthly self-satellites will be back and remove `local: true` flag
-  # test_reporting:
-  #   if: always()
-  #   needs: ci
-  #   uses: ./.github/workflows/generate-allure-report.yml
+  test_reporting:
+    if: always()
+    needs: ci
+    uses: ./.github/workflows/generate-allure-report.yml
