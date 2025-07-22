@@ -23,6 +23,7 @@ src:
 
 
 # Build the docs here.
+# TODO: enable it after the target would be fully passing
 disable-docs:
     FROM +src
 
