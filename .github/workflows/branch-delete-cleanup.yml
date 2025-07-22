@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   ci:
-    uses: input-output-hk/catalyst-ci/.github/workflows/branch-pages-delete.yml@master
+    uses: input-output-hk/catalyst-ci/.github/workflows/branch-pages-delete.yml@ci/v1.8.0
     with:
       aws_role_arn: arn:aws:iam::332405224602:role/ci
       aws_region: eu-central-1
