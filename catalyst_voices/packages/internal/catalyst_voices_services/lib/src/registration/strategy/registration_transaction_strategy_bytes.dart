@@ -81,7 +81,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     final auxiliaryDataSizeBeforePatching = rawTx.auxiliaryData.length;
 
     // 1. txInputsHash
-    final txInputsHash = TransactionInputsHash.fromHashedBytes(rawTx.inputs);
+    final txInputsHash = TransactionInputsHash.blake2b(rawTx.inputs);
     rawTx.patchTxInputsHash(txInputsHash.bytes);
 
     // 2. signature
@@ -92,7 +92,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     rawTx.patchSignature(signature.bytes);
 
     // 3. auxiliaryData
-    final auxiliaryDataHash = AuxiliaryDataHash.fromHashedBytes(rawTx.auxiliaryData);
+    final auxiliaryDataHash = AuxiliaryDataHash.blake2b(rawTx.auxiliaryData);
     rawTx.patchAuxiliaryDataHash(auxiliaryDataHash.bytes);
 
     // 4. validate

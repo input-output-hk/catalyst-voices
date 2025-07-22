@@ -20,24 +20,24 @@ final class AuxiliaryDataHash extends BaseHash {
   /// Length of the [AuxiliaryDataHash].
   static const int hashLength = 32;
 
-  /// Constructs the [AuxiliaryDataHash] from a [AuxiliaryData].
-  AuxiliaryDataHash.fromAuxiliaryData(AuxiliaryData data)
-      : this.fromHashedBytes(cbor.encode(data.toCbor()));
-
-  /// Constructs the [AuxiliaryDataHash] from raw [bytes].
-  AuxiliaryDataHash.fromBytes({required super.bytes}) : super.fromBytes();
-
-  /// Deserializes the type from cbor.
-  AuxiliaryDataHash.fromCbor(super.value) : super.fromCbor();
-
-  /// Crates a hash from [bytes].
-  AuxiliaryDataHash.fromHashedBytes(List<int> bytes)
+  /// Crates a blake2b hash from [bytes].
+  AuxiliaryDataHash.blake2b(List<int> bytes)
       : super.fromBytes(
           bytes: Hash.blake2b(
             Uint8List.fromList(bytes),
             digestSize: hashLength,
           ),
         );
+
+  /// Constructs the [AuxiliaryDataHash] from a [AuxiliaryData].
+  AuxiliaryDataHash.fromAuxiliaryData(AuxiliaryData data)
+      : this.blake2b(cbor.encode(data.toCbor()));
+
+  /// Constructs the [AuxiliaryDataHash] from raw [bytes].
+  AuxiliaryDataHash.fromBytes({required super.bytes}) : super.fromBytes();
+
+  /// Deserializes the type from cbor.
+  AuxiliaryDataHash.fromCbor(super.value) : super.fromCbor();
 
   /// Constructs the [AuxiliaryDataHash] from a hex string representation
   /// of [bytes].
@@ -214,20 +214,20 @@ final class TransactionInputsHash extends BaseHash {
   /// Length of the [TransactionInputsHash].
   static const int hashLength = 16;
 
-  /// Constructs the [TransactionInputsHash] from raw [bytes].
-  TransactionInputsHash.fromBytes({required super.bytes}) : super.fromBytes();
-
-  /// Deserializes the type from cbor.
-  TransactionInputsHash.fromCbor(super.value) : super.fromCbor();
-
-  /// Crates a hash from [bytes].
-  TransactionInputsHash.fromHashedBytes(List<int> bytes)
+  /// Crates a blake2b hash from [bytes].
+  TransactionInputsHash.blake2b(List<int> bytes)
       : super.fromBytes(
           bytes: Hash.blake2b(
             Uint8List.fromList(bytes),
             digestSize: hashLength,
           ),
         );
+
+  /// Constructs the [TransactionInputsHash] from raw [bytes].
+  TransactionInputsHash.fromBytes({required super.bytes}) : super.fromBytes();
+
+  /// Deserializes the type from cbor.
+  TransactionInputsHash.fromCbor(super.value) : super.fromCbor();
 
   /// Constructs the [TransactionInputsHash] from a hex string representation
   /// of [bytes].
@@ -236,7 +236,7 @@ final class TransactionInputsHash extends BaseHash {
   /// Constructs the [TransactionInputsHash] from a [TransactionBody].
   TransactionInputsHash.fromTransactionInputs(
     Set<TransactionUnspentOutput> utxos,
-  ) : this.fromHashedBytes(
+  ) : this.blake2b(
           cbor.encode(
             CborList([
               for (final utxo in utxos) utxo.input.toCbor(),

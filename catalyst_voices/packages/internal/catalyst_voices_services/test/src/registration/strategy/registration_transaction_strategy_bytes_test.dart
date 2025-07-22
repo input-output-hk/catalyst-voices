@@ -194,7 +194,7 @@ void main() {
       );
 
       final auxiliaryData = rawTransaction.auxiliaryData;
-      final auxiliaryDataHash = AuxiliaryDataHash.fromHashedBytes(auxiliaryData);
+      final auxiliaryDataHash = AuxiliaryDataHash.blake2b(auxiliaryData);
 
       expect(
         rawTransaction.auxiliaryDataHash,
