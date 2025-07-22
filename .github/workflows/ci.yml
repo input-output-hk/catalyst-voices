@@ -92,7 +92,7 @@ jobs:
         run: |
           docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
           docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
-          docker cp schemathesis-runner:/junit-report.xml ./schemathesis{{ env.REPORT_EXT }}
+          docker cp schemathesis-runner:/results/junit-report.xml ./schemathesis{{ env.REPORT_EXT }}
 
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
