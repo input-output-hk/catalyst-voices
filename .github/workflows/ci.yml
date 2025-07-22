@@ -18,6 +18,10 @@ permissions:
   packages: write
   pull-requests: write
 
+env:
+  REPORT_EXT: .junit-report.xml
+  COVERAGE_EXT: .coverage.info
+
 jobs:
   ci:
     if: ${{ !github.event.pull_request.draft }}
@@ -59,6 +63,18 @@ jobs:
           command: run
           args: ./catalyst-gateway/tests/+prepare-all-images
 
+      - name: Running Postgres tests
+        if: always()
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up postgres-runner --abort-on-container-exit --exit-code-from postgres-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs postgres-runner
+
+      - name: Running Scylla tests
+        if: always()
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up scylla-runner --abort-on-container-exit --exit-code-from scylla-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs scylla-runner
+
       - name: Running integration API tests
         if: always()
         run: |
@@ -71,17 +87,30 @@ jobs:
           docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml logs schemathesis-runner
 
-      - name: Running Postgres tests
+      - name: Collecting reports
         if: always()
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up postgres-runner --abort-on-container-exit --exit-code-from postgres-runner
-          docker compose -f catalyst-gateway/tests/docker-compose.yml logs postgres-runner
+          docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
+          docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
+          docker cp schemathesis-runner:/junit-report.xml ./schemathesis{{ env.REPORT_EXT }}
 
-      - name: Running Scylla tests
+      - name: Collect and upload test reports
+        uses: actions/upload-artifact@v4
         if: always()
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up scylla-runner --abort-on-container-exit --exit-code-from scylla-runner
-          docker compose -f catalyst-gateway/tests/docker-compose.yml logs scylla-runner
+        with:
+          name: test-reports
+          path: "**/*${{ env.REPORT_EXT }}"
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Collect and upload test coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-reports
+          path: "**/*${{ env.COVERAGE_EXT }}"
+          if-no-files-found: error
+          retention-days: 1
 
       - name: Shutting down all services
         if: always()
