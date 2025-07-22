@@ -1,3 +1,5 @@
+# cspell: words hoverkraft
+
 name: CI
 
 on:
@@ -7,6 +9,7 @@ on:
   pull_request:
     types:
       - synchronize
+      - review_requested
       - ready_for_review
 
 permissions:
