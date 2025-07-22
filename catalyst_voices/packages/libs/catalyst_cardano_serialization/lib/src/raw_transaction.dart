@@ -179,7 +179,7 @@ final class RawTransaction extends BaseTransaction {
     final value = _structuredBytes.getValueOf(RawTransactionAspect.inputs);
 
     if (value == null) {
-      throw StateError('AuxiliaryDataHash not found!');
+      throw StateError('Inputs not found!');
     }
 
     return value;
