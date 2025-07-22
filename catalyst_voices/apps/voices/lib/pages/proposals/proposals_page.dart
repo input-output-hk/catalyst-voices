@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
+import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_content.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_header.dart';
 import 'package:catalyst_voices/routes/routes.dart';
@@ -36,11 +37,13 @@ class _ProposalsPageState extends State<ProposalsPage>
 
   @override
   Widget build(BuildContext context) {
-    return HeaderAndContentLayout(
-      header: const ProposalsHeader(),
-      content: ProposalsContent(
-        tabController: _tabController,
-        pagingController: _pagingController,
+    return ProposalSubmissionPhaseAware(
+      activeChild: HeaderAndContentLayout(
+        header: const ProposalsHeader(),
+        content: ProposalsContent(
+          tabController: _tabController,
+          pagingController: _pagingController,
+        ),
       ),
     );
   }
