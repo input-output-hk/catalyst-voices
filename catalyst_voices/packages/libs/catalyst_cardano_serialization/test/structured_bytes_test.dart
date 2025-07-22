@@ -47,7 +47,7 @@ void main() {
             isA<ArgumentError>().having(
               (e) => e.message,
               'message',
-              'Cannot patch ByteKey.header because data start is unknown',
+              'Cannot patch _ByteKey.header because data start is unknown',
             ),
           ),
         );
@@ -61,7 +61,7 @@ void main() {
             isA<ArgumentError>().having(
               (e) => e.message,
               'message',
-              'Cannot patch ByteKey.payload because data size is different',
+              'Cannot patch _ByteKey.payload because data size is different',
             ),
           ),
         );
@@ -91,6 +91,50 @@ void main() {
 
         final updatedRange = structuredBytes.context[_ByteKey.header]!;
         expect(updatedRange.end, 3);
+      });
+
+      test('updates subsequent ranges correctly when length changes', () {
+        // Arrange
+        // initialContext:
+        // - header:    start: 0, end: 2
+        // - payload:   start: 2, end: 7 (length 5)
+        // - signature: start: 7, end: 10
+
+        // Act
+        // Replace payload (length 5) with a new value of length 7
+        final newValue = [10, 11, 12, 13, 14, 15, 16];
+        const lengthDelta = 2;
+        structuredBytes.replaceValue(_ByteKey.payload, newValue);
+
+        // Assert
+        // 1. The header range (before the change) should be unaffected.
+        expect(
+          structuredBytes.context[_ByteKey.header],
+          initialContext[_ByteKey.header],
+          reason: 'Header range should not change.',
+        );
+
+        // 2. The payload range should be updated to its new end.
+        final payloadRange = structuredBytes.context[_ByteKey.payload]!;
+        expect(payloadRange.start, 2);
+        expect(payloadRange.end, 2 + newValue.length);
+
+        // 3. The signature range (after the change) should be shifted.
+        final originalSignatureRange = initialContext[_ByteKey.signature]!;
+        final signatureRange = structuredBytes.context[_ByteKey.signature]!;
+        expect(
+          signatureRange.start,
+          originalSignatureRange.start + lengthDelta,
+          reason: 'Signature start should be shifted.',
+        );
+        expect(
+          signatureRange.end,
+          originalSignatureRange.end + lengthDelta,
+          reason: 'Signature end should be shifted.',
+        );
+
+        // 4. The total byte list should be longer.
+        expect(structuredBytes.bytes.length, initialBytes.length + lengthDelta);
       });
     });
   });

@@ -113,7 +113,25 @@ final class StructuredBytes<T> {
     final end = range.end;
     final newEnd = start + value.length;
 
+    final lengthDelta = value.length - (end - start);
+
     _bytes.replaceRange(start, end, value);
     _context[key] = range.copyWith(end: newEnd);
+
+    if (lengthDelta != 0) {
+      for (final entry in _context.entries) {
+        // Skip the key we just updated
+        if (entry.key == key) {
+          continue;
+        }
+
+        if (entry.value.start >= end) {
+          _context[entry.key] = entry.value.copyWith(
+            start: entry.value.start + lengthDelta,
+            end: entry.value.end + lengthDelta,
+          );
+        }
+      }
+    }
   }
 }
