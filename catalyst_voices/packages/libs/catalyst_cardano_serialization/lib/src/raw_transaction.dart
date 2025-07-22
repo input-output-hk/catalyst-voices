@@ -1,18 +1,14 @@
 //ignore_for_file: implementation_imports,invalid_use_of_internal_member
 
-import 'package:catalyst_cardano_serialization/src/hashes.dart';
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_cardano_serialization/src/raw_transaction_aspect.dart';
 import 'package:catalyst_cardano_serialization/src/raw_transaction_tracing_encode_sink.dart';
-import 'package:catalyst_cardano_serialization/src/rbac/x509_metadata_envelope.dart';
-import 'package:catalyst_cardano_serialization/src/structured_bytes.dart';
-import 'package:catalyst_cardano_serialization/src/transaction.dart';
-import 'package:catalyst_cardano_serialization/src/types.dart';
-import 'package:catalyst_cardano_serialization/src/witness.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:cbor/src/encoder/sink.dart' as cbor_internal_sink;
 import 'package:cbor/src/utils/arg.dart' as cbor_internal_arg;
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 import 'package:typed_data/typed_buffers.dart';
 
 /// Version of [BaseTransaction] which works on bytes and patching
@@ -21,6 +17,10 @@ import 'package:typed_data/typed_buffers.dart';
 /// It enables single encode transaction build.
 final class RawTransaction extends BaseTransaction {
   final StructuredBytes<RawTransactionAspect> _structuredBytes;
+
+  /// For testing only. Internal constructor for [RawTransaction].
+  @visibleForTesting
+  const RawTransaction(this._structuredBytes);
 
   /// Default factory constructor for [RawTransaction].
   ///
@@ -130,11 +130,8 @@ final class RawTransaction extends BaseTransaction {
 
     final structuredBytes = StructuredBytes(buffer, context: sink.context);
 
-    return RawTransaction._(structuredBytes);
+    return RawTransaction(structuredBytes);
   }
-
-  /// Internal constructor for [RawTransaction].
-  const RawTransaction._(this._structuredBytes);
 
   /// Returns auxiliary data bytes from [bytes].
   List<int> get auxiliaryData {
@@ -160,6 +157,10 @@ final class RawTransaction extends BaseTransaction {
 
   @override
   List<int> get bytes => _structuredBytes.bytes;
+
+  /// See [StructuredBytes].
+  @visibleForTesting
+  Map<RawTransactionAspect, CborValueByteRange> get context => _structuredBytes.context;
 
   @override
   Coin get fee {
@@ -237,6 +238,145 @@ final class RawTransaction extends BaseTransaction {
   /// Patching [bytes]'s [txInputsHash] with given [data].
   void patchTxInputsHash(List<int> data) {
     _structuredBytes.patchData(RawTransactionAspect.txInputsHash, data);
+  }
+
+  /// Validates internal bytes against expected cbor format.
+  ///
+  /// Throw [RawTransactionMalformed] if invalid.
+  void validate({bool allowPaddings = false}) {
+    final invalidationReasons = <String>[];
+
+    try {
+      final asCbor = cbor.decode(bytes);
+      if (asCbor is! CborList) {
+        invalidationReasons.add('Top level object is not a list');
+      }
+      asCbor as CborList;
+
+      if (asCbor.length != 4) {
+        invalidationReasons.add('Top level list length is not 4');
+      }
+
+      final txBody = asCbor[0];
+      if (txBody is! CborMap) {
+        invalidationReasons.add('txBody is not a map');
+      }
+      if (txBody is CborMap) {
+        final missingTxBodyKeys = [
+          TransactionBody.inputsKey,
+          TransactionBody.feeKey,
+          TransactionBody.auxiliaryDataHashKey,
+          TransactionBody.ttlKey,
+          TransactionBody.networkIdKey,
+        ].where((key) => !txBody.keys.contains(key));
+        if (missingTxBodyKeys.isNotEmpty) {
+          invalidationReasons.add('txBody is missing ${missingTxBodyKeys.join(',')}');
+        }
+
+        final fee = txBody[TransactionBody.feeKey];
+        if (fee is! CborInt || fee.toInt() < 0) {
+          invalidationReasons.add('fee is not CborInt or negative');
+        }
+
+        final ttl = txBody[TransactionBody.ttlKey];
+        if (ttl is! CborInt || ttl.toInt() < 0) {
+          invalidationReasons.add('ttl is not CborInt or negative');
+        }
+
+        final auxDataHash = txBody[TransactionBody.auxiliaryDataHashKey];
+        if (auxDataHash is! CborBytes) {
+          invalidationReasons.add('auxiliaryDataHash is not CborBytes');
+        }
+        if (auxDataHash is CborBytes && auxDataHash.bytes.length != AuxiliaryDataHash.hashLength) {
+          invalidationReasons.add('auxiliaryDataHash invalid length(${auxDataHash.bytes.length})');
+        }
+        if (!allowPaddings &&
+            auxDataHash is CborBytes &&
+            auxDataHash.bytes.isNotEmpty &&
+            auxDataHash.bytes.every((element) => element == 0)) {
+          invalidationReasons.add('auxiliaryDataHash is zeroed');
+        }
+      }
+
+      final auxiliaryData = asCbor[3];
+      if (auxiliaryData is! CborMap) {
+        invalidationReasons.add('auxiliaryData is not CborMap');
+      }
+
+      if (auxiliaryData is CborMap) {
+        if (!auxiliaryData.keys.contains(X509MetadataEnvelope.envelopeKey)) {
+          invalidationReasons.add('auxiliaryData is does not contain envelope key');
+        }
+
+        final envelope = auxiliaryData[X509MetadataEnvelope.envelopeKey];
+        if (envelope is! CborMap) {
+          invalidationReasons.add('envelope is not CborMap');
+        }
+
+        if (envelope is CborMap) {
+          final missingEnvelopeKeys = [
+            X509MetadataEnvelope.purposeKey,
+            X509MetadataEnvelope.txInputsHashKey,
+            X509MetadataEnvelope.validationSignatureKey,
+          ].where((key) => !envelope.keys.contains(key));
+          if (missingEnvelopeKeys.isNotEmpty) {
+            invalidationReasons.add('envelope is missing ${missingEnvelopeKeys.join(',')}');
+          }
+
+          final keys = List.of(envelope.keys);
+          final uniqueKeys = keys.toSet();
+          if (keys.length != uniqueKeys.length) {
+            final duplicatedKeys = List.of(keys)..removeWhere(uniqueKeys.contains);
+            invalidationReasons.add('envelope has duplicated keys - ${duplicatedKeys.join(',')}');
+          }
+
+          final purpose = envelope[X509MetadataEnvelope.purposeKey];
+          if (purpose is! CborBytes || purpose.bytes.length != 16) {
+            invalidationReasons.add('purpose is not a CborBytes');
+          }
+          if (purpose is CborBytes && purpose.bytes.length != 16) {
+            invalidationReasons.add('purpose invalid length');
+          }
+
+          final txInputsHash = envelope[X509MetadataEnvelope.txInputsHashKey];
+          if (txInputsHash is! CborBytes) {
+            invalidationReasons.add('txInputsHash is not a CborBytes');
+          }
+          if (txInputsHash is CborBytes &&
+              txInputsHash.bytes.length != TransactionInputsHash.hashLength) {
+            invalidationReasons.add('txInputsHash invalid length');
+          }
+          if (!allowPaddings &&
+              txInputsHash is CborBytes &&
+              txInputsHash.bytes.isNotEmpty &&
+              txInputsHash.bytes.every((element) => element == 0)) {
+            invalidationReasons.add('auxiliaryDataHash is zeroed');
+          }
+
+          final signature = envelope[X509MetadataEnvelope.validationSignatureKey];
+          if (signature is! CborBytes) {
+            invalidationReasons.add('signature is not a CborBytes');
+          }
+          if (signature is CborBytes && signature.bytes.length != Bip32Ed25519XSignature.length) {
+            invalidationReasons.add('signature length is invalid');
+          }
+          if (!allowPaddings &&
+              signature is CborBytes &&
+              signature.bytes.isNotEmpty &&
+              signature.bytes.every((element) => element == 0)) {
+            invalidationReasons.add('signature is zeroed');
+          }
+        }
+      }
+
+      if (invalidationReasons.isNotEmpty) {
+        throw RawTransactionMalformed(reasons: invalidationReasons);
+      }
+    } catch (e) {
+      invalidationReasons.add(e.toString());
+
+      throw RawTransactionMalformed(reasons: invalidationReasons);
+    }
   }
 
   @override

@@ -168,14 +168,19 @@ final class MaxTxSizeExceededException extends Equatable implements Exception {
 
 /// Exception thrown when validating integrity of transaction bytes.
 final class RawTransactionMalformed extends Equatable implements Exception {
+  /// List of reasons for malformed transaction.
+  final List<String> reasons;
+
   /// The default constructor for [RawTransactionMalformed].
-  const RawTransactionMalformed();
+  const RawTransactionMalformed({this.reasons = const []});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [reasons];
 
   @override
-  String toString() => 'RawTransactionMalformed(bytes could not be decoded into valid tx)';
+  String toString() => reasons.isEmpty
+      ? 'RawTransactionMalformed(bytes could not be decoded into valid tx)'
+      : 'RawTransactionMalformed(${reasons.join(', ')})';
 }
 
 /// Exception thrown when validating size of transaction.
@@ -218,6 +223,21 @@ final class ReferenceScriptSizeLimitExceededException extends Equatable implemen
   @override
   String toString() => 'Total size of reference scripts exceeds the limit of $maxRefScriptSize '
       'bytes';
+}
+
+/// Exception thrown when transaction signature does not match.
+final class RegistrationTxCertValidationException extends Equatable implements Exception {
+  /// List of reasons for invalid cert.
+  final List<String> reasons;
+
+  /// The default constructor for [RegistrationTxCertValidationException].
+  const RegistrationTxCertValidationException({required this.reasons});
+
+  @override
+  List<Object?> get props => [reasons];
+
+  @override
+  String toString() => 'RegistrationTxCertValidationException - ${reasons.join(', ')}';
 }
 
 /// Exception thrown when transaction signature does not match.

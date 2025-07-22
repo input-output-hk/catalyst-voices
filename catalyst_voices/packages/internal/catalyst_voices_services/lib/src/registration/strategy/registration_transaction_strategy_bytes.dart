@@ -7,6 +7,13 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_services/src/registration/registration_transaction_role.dart';
 import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy.dart';
 import 'package:cbor/cbor.dart';
+import 'package:flutter/foundation.dart';
+
+@visibleForTesting
+ValueGetter<RawTransaction>? testRegTxGetter;
+
+@visibleForTesting
+ValueGetter<RegistrationMetadata>? testRegTxMetadataGetter;
 
 final class RegistrationTransactionStrategyBytes implements RegistrationTransactionStrategy {
   final TransactionBuilderConfig transactionConfig;
@@ -45,6 +52,8 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
       publicKeys: publicKeys,
     );
 
+    _validateMetadataCertFields(unsignedMetadata);
+
     final dummyMetadataCbor = await unsignedMetadata.toCbor(serializer: (e) => e.toCbor());
     final dummyAuxiliaryData = AuxiliaryData.fromCbor(dummyMetadataCbor);
 
@@ -71,7 +80,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
         .buildBody();
 
     // Only one encoding here.
-    final rawTx = RawTransaction.from(
+    var rawTx = RawTransaction.from(
       body: txBody,
       witnessSet: const TransactionWitnessSet(),
       isValid: true,
@@ -106,8 +115,12 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     final auxiliaryDataHash = AuxiliaryDataHash.blake2b(rawTx.auxiliaryData);
     rawTx.patchAuxiliaryDataHash(auxiliaryDataHash.bytes);
 
+    if (testRegTxGetter != null) {
+      rawTx = testRegTxGetter!();
+    }
+
     // 4. validate
-    _validateCborFormat(rawTx);
+    _validateRawTxStructure(rawTx);
     _validateTransactionSize(rawTx, expectedSize: txSizeBeforePatching);
     _validateAuxiliaryDataSize(rawTx, expectedSize: auxiliaryDataSizeBeforePatching);
 
@@ -120,6 +133,10 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     required X509DerCertificate? derCert,
     required List<RbacField<cs.Ed25519PublicKey>> publicKeys,
   }) {
+    if (testRegTxMetadataGetter != null) {
+      return testRegTxMetadataGetter!();
+    }
+
     if (!roles.isFirstRegistration && previousTransactionId == null) {
       throw ArgumentError.notNull('previousTransactionId');
     }
@@ -177,8 +194,27 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     }
   }
 
-  void _validateCborFormat(RawTransaction rawTx) {
+  void _validateMetadataCertFields(RegistrationMetadata metadata) {
+    final invalidationReasons = <String>[];
+    if (metadata.chunkedData?.derCerts == null) {
+      invalidationReasons.add('missing derCerts');
+    }
+    if (metadata.chunkedData?.publicKeys == null) {
+      invalidationReasons.add('missing publicKeys');
+    }
+    if (metadata.chunkedData?.roleDataSet == null) {
+      invalidationReasons.add('missing roleDataSet');
+    }
+
+    if (invalidationReasons.isNotEmpty) {
+      throw RegistrationTxCertValidationException(reasons: invalidationReasons);
+    }
+  }
+
+  void _validateRawTxStructure(RawTransaction rawTx) {
     try {
+      rawTx.validate();
+
       final bytes = rawTx.bytes;
       final cborValue = cbor.decode(bytes);
       Transaction.fromCbor(cborValue);
