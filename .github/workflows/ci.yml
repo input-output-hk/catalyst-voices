@@ -11,6 +11,7 @@ on:
       - synchronize
       - review_requested
       - ready_for_review
+      - opened
 
 permissions:
   id-token: write
@@ -20,11 +21,12 @@ permissions:
 
 jobs:
   ci:
+    if: ${{ !github.event.pull_request.draft }}
     uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.8.0
     with:
       forge_version: 0.19.0
 
   test_reporting:
-    if: always()
+    if: ${{ !github.event.pull_request.draft }}
     needs: ci
     uses: ./.github/workflows/generate-allure-report.yml
