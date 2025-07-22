@@ -166,28 +166,6 @@ final class MaxTxSizeExceededException extends Equatable implements Exception {
       ')';
 }
 
-/// Exception thrown when validating size of AuxiliaryData.
-final class RawTransactionAuxiliaryDataSizeChanged extends Equatable implements Exception {
-  /// Bytes size expected.
-  final int expectedSize;
-
-  /// Actual bytes size.
-  final int actualSize;
-
-  /// The default constructor for [RawTransactionMalformed].
-  const RawTransactionAuxiliaryDataSizeChanged({
-    required this.expectedSize,
-    required this.actualSize,
-  });
-
-  @override
-  List<Object?> get props => [expectedSize, actualSize];
-
-  @override
-  String toString() =>
-      'RawTransactionAuxiliaryDataSizeChanged(expected($expectedSize) but got $actualSize )';
-}
-
 /// Exception thrown when validating integrity of transaction bytes.
 final class RawTransactionMalformed extends Equatable implements Exception {
   /// The default constructor for [RawTransactionMalformed].
@@ -197,7 +175,33 @@ final class RawTransactionMalformed extends Equatable implements Exception {
   List<Object?> get props => [];
 
   @override
-  String toString() => 'TransactionBytesFormatInvalid(bytes could not be decoded into valid tx)';
+  String toString() => 'RawTransactionMalformed(bytes could not be decoded into valid tx)';
+}
+
+/// Exception thrown when validating size of transaction.
+final class RawTransactionSizeChanged extends Equatable implements Exception {
+  /// Bytes size expected.
+  final int expectedSize;
+
+  /// Actual bytes size.
+  final int actualSize;
+
+  /// Provides more details about size miss match.
+  final String aspect;
+
+  /// The default constructor for [RawTransactionSizeChanged].
+  const RawTransactionSizeChanged({
+    required this.expectedSize,
+    required this.actualSize,
+    required this.aspect,
+  });
+
+  @override
+  List<Object?> get props => [expectedSize, actualSize, aspect];
+
+  @override
+  String toString() =>
+      'RawTransactionSizeChanged - $aspect - (expected($expectedSize) but got $actualSize )';
 }
 
 /// Exception thrown when the total size of reference scripts exceeds the limit.
