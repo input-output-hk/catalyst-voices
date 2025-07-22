@@ -60,13 +60,34 @@ jobs:
           args: ./catalyst-gateway/tests/+prepare-all-images
 
       - name: Running integration API tests
-        uses: hoverkraft-tech/compose-action@v2.3.0
-        with:
-          compose-file: ./catalyst-gateway/tests/docker-compose.yml
-          services: api-tests-runner
-          up-flags: --abort-on-container-exit --exit-code-from api-tests-runner
+        if: always()
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
 
-  # test_reporting:
-  #   if: ${{ !github.event.pull_request.draft }}
-  #   needs: ci
-  #   uses: ./.github/workflows/generate-allure-report.yml
+      - name: Running schemathesis tests
+        if: always()
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs schemathesis-runner
+
+      - name: Running Postgres tests
+        if: always()
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up postgres-runner --abort-on-container-exit --exit-code-from postgres-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs postgres-runner
+
+      - name: Running Scylla tests
+        if: always()
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up scylla-runner --abort-on-container-exit --exit-code-from scylla-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs scylla-runner
+
+      - name: Shutting down all services
+        if: always()
+        run: docker compose -f catalyst-gateway/tests/docker-compose.yml down
+
+  test_reporting:
+    if: ${{ !github.event.pull_request.draft }}
+    needs: ci
+    uses: ./.github/workflows/generate-allure-report.yml

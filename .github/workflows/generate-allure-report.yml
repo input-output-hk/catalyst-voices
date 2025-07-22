@@ -25,21 +25,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@main
-        with:
-          # this might remove tools that are actually needed,
-          # if set to "true" but frees about 6 GB
-          tool-cache: false
-          # all of these default to true, but feel free to set to
-          # "false" if necessary for your workflow
-          android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
-          docker-images: false
-          swap-storage: true
-
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.8.0
         with:
@@ -49,12 +34,6 @@ jobs:
       - name: Setup CI
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.8.0
 
-      - name: Prepare artifacts
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.7.3
-        with:
-          command: run
-          args: ./catalyst-gateway/tests/+prepare-all-images
-
       - name: Get catalyst gateway unit test report
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.8.0
         if: always()
@@ -62,31 +41,6 @@ jobs:
         with:
           command: run
           args: ./catalyst-gateway+build
-
-      - name: Get catalyst gateway api tests
-        continue-on-error: true
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
-          docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
-          docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
-
-      - name: Get catalyst gateway api tests logs
-        run: sleep 30; docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
-
-      - name: Get catalyst gateway logs
-        run: docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
-
-#      - name: Get catalyst gateway Schemathesis tests
-#        continue-on-error: true
-#        run: docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
-
-      - name: Get catalyst gateway Postgres tests
-        continue-on-error: true
-        run: docker compose -f catalyst-gateway/tests/docker-compose.yml up postgres-runner --abort-on-container-exit --exit-code-from postgres-runner
-
-      - name: Get catalyst gateway Scylla tests
-        continue-on-error: true
-        run: docker compose -f catalyst-gateway/tests/docker-compose.yml up scylla-runner --abort-on-container-exit --exit-code-from scylla-runner
 
       - name: Get flutter unit test report
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.8.0
