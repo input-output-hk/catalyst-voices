@@ -3274,5 +3274,9 @@
         "type": "String"
       }
     }
+  },
+  "noActiveCampaignFound": "We can't find an active campaign.",
+  "@noActiveCampaignFound": {
+    "description": "Error message when no active campaign is found"
   }
 }

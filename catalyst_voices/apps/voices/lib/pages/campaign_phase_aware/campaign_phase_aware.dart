@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/pages/campaign_phase_aware/error_campaign_phase_aware.dart';
+import 'package:catalyst_voices/pages/campaign_phase_aware/loading_campaign_phase_aware.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -62,12 +64,8 @@ class CampaignPhaseAware extends StatelessWidget {
     return BlocBuilder<CampaignPhaseAwareCubit, CampaignPhaseAwareState>(
       builder: (context, state) {
         return switch (state) {
-          ErrorCampaignPhaseAwareState(:final error) => Center(
-              child: Text(error.message(context)),
-            ),
-          LoadingCampaignPhaseAwareState() => const Center(
-              child: CircularProgressIndicator(),
-            ),
+          ErrorCampaignPhaseAwareState(:final error) => ErrorCampaignPhaseAware(error: error),
+          LoadingCampaignPhaseAwareState() => const LoadingCampaignPhaseAware(),
           DataCampaignPhaseAwareState(:final campaign) => _CampaignPhaseAwareBuilder(
               key: const Key('CampaignPhaseAwareBuilder'),
               campaign: campaign,
