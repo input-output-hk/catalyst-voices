@@ -197,6 +197,11 @@ class _FakeBip32Ed25519XPrivateKey extends Fake implements kd.Bip32Ed25519XPriva
     Future<R> Function(kd.Bip32Ed25519XPrivateKey privateKey) callback,
   ) =>
       callback(this);
+
+  @override
+  Future<bool> verify(List<int> message, {required kd.Bip32Ed25519XSignature signature}) async {
+    return true;
+  }
 }
 
 class _FakeBip32Ed25519XPrivateKeyFactory extends kd.Bip32Ed25519XPrivateKeyFactory {

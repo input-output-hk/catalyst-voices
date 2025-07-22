@@ -86,10 +86,20 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     rawTx.patchTxInputsHash(txInputsHash.bytes);
 
     // 2. signature
-    final privateKey = Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(
-      rootKeyPair.privateKey.bytes,
-    );
-    final signature = await privateKey.use((privateKey) => privateKey.sign(rawTx.auxiliaryData));
+    final auxData = rawTx.auxiliaryData;
+    final signature = await Bip32Ed25519XPrivateKeyFactory.instance
+        .fromBytes(rootKeyPair.privateKey.bytes)
+        .use((privateKey) => privateKey.sign(auxData));
+
+    final isVerified = await Bip32Ed25519XPrivateKeyFactory.instance
+        .fromBytes(rootKeyPair.privateKey.bytes)
+        .use((privateKey) => privateKey.verify(auxData, signature: signature))
+        .onError((_, __) => false);
+
+    if (!isVerified) {
+      throw const SignatureNotVerifiedException();
+    }
+
     rawTx.patchSignature(signature.bytes);
 
     // 3. auxiliaryData

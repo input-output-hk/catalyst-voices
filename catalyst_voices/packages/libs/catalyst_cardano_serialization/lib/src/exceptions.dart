@@ -220,6 +220,18 @@ final class ReferenceScriptSizeLimitExceededException extends Equatable implemen
       'bytes';
 }
 
+/// Exception thrown when transaction signature does not match.
+final class SignatureNotVerifiedException extends Equatable implements Exception {
+  /// The default constructor for [SignatureNotVerifiedException].
+  const SignatureNotVerifiedException();
+
+  @override
+  List<Object?> get props => [];
+
+  @override
+  String toString() => 'SignatureNotVerifiedException';
+}
+
 /// Exception thrown when transaction inputs are not equal to outputs + fee.
 final class TxBalanceMismatchException extends Equatable implements Exception {
   /// The total balance of inputs.
