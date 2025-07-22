@@ -1,15 +1,12 @@
-# cspell: words hoverkraft
-
 name: CI
 
 on:
   push:
-    branches: [main, feat/api-tests2]
+    branches: [main]
     tags: ["**"]
   pull_request:
     types:
       - synchronize
-      - review_requested
       - ready_for_review
 
 permissions:
@@ -20,9 +17,9 @@ permissions:
 
 jobs:
   ci:
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.4
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.8.0
     with:
-      forge_version: 0.18.0
+      forge_version: 0.19.0
 
   test_reporting:
     if: always()

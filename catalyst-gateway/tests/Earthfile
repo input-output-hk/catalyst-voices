@@ -1,7 +1,7 @@
 # cspell: words unittests
 
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.4.4 AS spectral-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.4.7 AS spectral-ci
 IMPORT .. AS gateway
 
 docker-compose:
