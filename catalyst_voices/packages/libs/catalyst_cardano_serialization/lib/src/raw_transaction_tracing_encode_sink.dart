@@ -20,7 +20,7 @@ class RawTransactionTracingEncodeSink extends cbor_internal_sink.EncodeSink {
     this._cursor,
   );
 
-  ///
+  /// Returns current context of this sink.
   Map<RawTransactionAspect, CborValueByteRange> get context => Map.of(_context);
 
   @override

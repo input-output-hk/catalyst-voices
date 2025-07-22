@@ -2,10 +2,10 @@ import 'package:equatable/equatable.dart';
 
 /// A helper class for [StructuredBytes] to keep track of important parts of bytes.
 final class CborValueByteRange extends Equatable {
-  /// Start of section.
+  /// Start of section. Inclusive.
   final int start;
 
-  /// End of section
+  /// End of section, Exclusive.
   final int end;
 
   /// If given section size is known. Setting this fields enables
