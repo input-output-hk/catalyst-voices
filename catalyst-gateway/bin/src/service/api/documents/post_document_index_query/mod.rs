@@ -35,6 +35,11 @@ pub(crate) enum Responses {
     /// The Index of documents which match the query filter.
     #[oai(status = 200)]
     Ok(Json<DocumentIndexListDocumented>),
+    /// ## OK
+    ///
+    /// The Index of documents which match the query filter.
+    #[oai(status = 200)]
+    OkV2(Json<DocumentIndexListDocumented>),
     /// ## Not Found
     ///
     /// No documents were found which match the query filter.
