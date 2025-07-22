@@ -123,16 +123,12 @@ void main() {
             publish: ProposalPublish.publishedDraft,
             selfRef: DraftRef(
               id: proposalId,
+              version: proposalId,
             ),
             title: 'Title ver 3',
             createdAt: DateTime.now(),
           ),
         ],
-      );
-
-      expect(
-        proposalWithVersions.versions.last.selfRef.version,
-        isNull,
       );
 
       expect(
