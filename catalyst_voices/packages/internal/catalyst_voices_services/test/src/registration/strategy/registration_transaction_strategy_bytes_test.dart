@@ -32,6 +32,11 @@ void main() {
       ).thenAnswer((_) async => _voterKeyPair);
     });
 
+    tearDown(() {
+      testRegTxGetter = null;
+      testRegTxMetadataGetter = null;
+    });
+
     test('raw transaction have correctly patched txInputsHash', () async {
       // Given
       final utxos = _buildUtxos();
@@ -171,6 +176,444 @@ void main() {
 
       expect(build, returnsNormally);
     });
+
+    test('Input Hash Range Accuracy', () async {
+      // Given
+      final utxos = _buildUtxos();
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
+
+      final derCert = _buildCert();
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+      ];
+
+      // Then
+      final rawTx = await strategy.build(
+        purpose: _purpose,
+        rootKeyPair: rootKeyPair,
+        derCert: derCert,
+        publicKeys: publicKeys,
+        requiredSigners: requiredSigners,
+      );
+
+      final selectedInputs = rawTx.inputs;
+      final txInputsHash = rawTx.txInputsHash;
+      final expectedHash = TransactionInputsHash.blake2b(selectedInputs).bytes;
+
+      expect(
+        txInputsHash,
+        expectedHash,
+        reason: 'Confirms deterministic hashing over correct CBOR section',
+      );
+    });
+
+    test('Transaction Metadata Hash Patching', () async {
+      // Given
+      final utxos = _buildUtxos();
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
+
+      final derCert = _buildCert();
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+      ];
+
+      // Then
+      final rawTx = await strategy.build(
+        purpose: _purpose,
+        rootKeyPair: rootKeyPair,
+        derCert: derCert,
+        publicKeys: publicKeys,
+        requiredSigners: requiredSigners,
+      );
+
+      final auxiliaryData = rawTx.auxiliaryData;
+      final auxiliaryDataHash = rawTx.auxiliaryDataHash;
+      final expectedHash = AuxiliaryDataHash.blake2b(auxiliaryData);
+
+      expect(
+        auxiliaryDataHash,
+        expectedHash.bytes,
+        reason: 'Verifies final link between metadata and transaction body',
+      );
+    });
+
+    test('Signature Over Complete Metadata', () async {
+      // Given
+      final utxos = _buildUtxos();
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
+
+      final derCert = _buildCert();
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+      ];
+
+      // Then
+      Future<RawTransaction> buildTx() async {
+        return strategy.build(
+          purpose: _purpose,
+          rootKeyPair: rootKeyPair,
+          derCert: derCert,
+          publicKeys: publicKeys,
+          requiredSigners: requiredSigners,
+        );
+      }
+
+      expect(
+        buildTx,
+        returnsNormally,
+        reason: 'Does not throw SignatureNotVerifiedException',
+      );
+    });
+
+    test('Multiple Metadata Keys Support', () async {
+      // Given
+      final utxos = _buildUtxos();
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
+
+      final derCert = _buildCert();
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 1))),
+      ];
+
+      // Then
+      Future<RawTransaction> buildTx() async {
+        return strategy.build(
+          purpose: _purpose,
+          rootKeyPair: rootKeyPair,
+          derCert: derCert,
+          publicKeys: publicKeys,
+          requiredSigners: requiredSigners,
+        );
+      }
+
+      expect(
+        buildTx,
+        returnsNormally,
+        reason: 'Does not throw SignatureNotVerifiedException',
+      );
+    });
+
+    test('CBOR Structural Integrity After Patch', () async {
+      // Given
+      final utxos = _buildUtxos();
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
+
+      final derCert = _buildCert();
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 1))),
+      ];
+
+      // Then
+      Future<CborValue> buildTx() async {
+        final rawTx = await strategy.build(
+          purpose: _purpose,
+          rootKeyPair: rootKeyPair,
+          derCert: derCert,
+          publicKeys: publicKeys,
+          requiredSigners: requiredSigners,
+        );
+
+        return cbor.decode(rawTx.bytes);
+      }
+
+      expect(
+        buildTx,
+        returnsNormally,
+        reason: 'full decode is valid cbor',
+      );
+    });
+
+    test('Negative Test. Malformed CBOR or Placeholder', () async {
+      // Given
+      final utxos = _buildUtxos();
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
+
+      final derCert = _buildCert();
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+      ];
+
+      // Then
+      testRegTxGetter = () {
+        return RawTransaction(StructuredBytes(List.filled(1000, 2), context: {}));
+      };
+
+      Future<CborValue> buildTx() async {
+        final rawTx = await strategy.build(
+          purpose: _purpose,
+          rootKeyPair: rootKeyPair,
+          derCert: derCert,
+          publicKeys: publicKeys,
+          requiredSigners: requiredSigners,
+        );
+
+        return cbor.decode(rawTx.bytes);
+      }
+
+      expect(
+        buildTx,
+        throwsA(isA<RawTransactionMalformed>()),
+        reason: 'Errors thrown; no corruption',
+      );
+    });
+
+    test('X.509 Certificate Inclusion', () async {
+      // Given
+      final utxos = _buildUtxos();
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
+
+      final derCert = _buildCert();
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+      ];
+
+      // Then
+      final rawTx = await strategy.build(
+        purpose: _purpose,
+        rootKeyPair: rootKeyPair,
+        derCert: derCert,
+        publicKeys: publicKeys,
+        requiredSigners: requiredSigners,
+      );
+      final decodedTx = Transaction.fromCbor(cbor.decode(rawTx.bytes));
+
+      expect(decodedTx.auxiliaryData, isNotNull);
+
+      final envelope = await X509MetadataEnvelope.fromCbor<RegistrationData>(
+        decodedTx.auxiliaryData!.toCbor(),
+        deserializer: RegistrationData.fromCbor,
+      );
+
+      expect(envelope.chunkedData, isNotNull);
+      expect(envelope.chunkedData!.derCerts, isNotEmpty);
+    });
+
+    test('Chunked Certificate Encoding', () async {
+      // Given
+      final utxos = _buildUtxos();
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
+
+      final derCert = _buildCert(size: 2000);
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+      ];
+
+      // Then
+      final rawTx = await strategy.build(
+        purpose: _purpose,
+        rootKeyPair: rootKeyPair,
+        derCert: derCert,
+        publicKeys: publicKeys,
+        requiredSigners: requiredSigners,
+      );
+      final decodedTx = Transaction.fromCbor(cbor.decode(rawTx.bytes));
+      final chunkedData = (decodedTx.auxiliaryData!.map[X509MetadataEnvelope.envelopeKey]!
+          as CborMap)[const CborSmallInt(10)];
+
+      expect(chunkedData, isA<CborList>());
+      expect(
+        chunkedData,
+        hasLength(greaterThan(1)),
+        reason: 'Lagre cert is split into multiple chunks',
+      );
+    });
+
+    test('Role-Based Key Validation', () async {
+      // Given
+      final utxos = _buildUtxos();
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
+
+      final derCert = _buildCert();
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+      ];
+
+      // Then
+      final rawTx = await strategy.build(
+        purpose: _purpose,
+        rootKeyPair: rootKeyPair,
+        derCert: derCert,
+        publicKeys: publicKeys,
+        requiredSigners: requiredSigners,
+      );
+      final decodedTx = Transaction.fromCbor(cbor.decode(rawTx.bytes));
+
+      expect(decodedTx.auxiliaryData, isNotNull);
+
+      final envelope = await X509MetadataEnvelope.fromCbor<RegistrationData>(
+        decodedTx.auxiliaryData!.toCbor(),
+        deserializer: RegistrationData.fromCbor,
+      );
+
+      expect(envelope.chunkedData, isNotNull);
+      expect(envelope.chunkedData!.roleDataSet, isNotEmpty);
+
+      expect(
+        envelope.chunkedData!.roleDataSet!.first.roleSigningKey,
+        isNotNull,
+        reason: 'Role validated, signature checks',
+      );
+    });
+
+    test('Certificate Validity With Fields', () async {
+      // Given
+      final utxos = _buildUtxos();
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
+
+      final derCert = _buildCert();
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+      ];
+
+      // Then
+      Future<RawTransaction> buildTx() async {
+        return strategy.build(
+          purpose: _purpose,
+          rootKeyPair: rootKeyPair,
+          derCert: derCert,
+          publicKeys: publicKeys,
+          requiredSigners: requiredSigners,
+        );
+      }
+
+      expect(buildTx, returnsNormally);
+    });
+
+    test('Certificate Validity Without Fields', () async {
+      // Given
+      final utxos = _buildUtxos();
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
+
+      final derCert = _buildCert();
+      final strategy = _buildStrategy(
+        roles: {},
+        utxos: utxos,
+      );
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[];
+
+      testRegTxMetadataGetter = () {
+        return X509MetadataEnvelope.unsigned(
+          purpose: UuidV4.fromString('ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c'),
+          txInputsHash: TransactionInputsHash.fromBytes(
+            bytes: List.filled(TransactionInputsHash.hashLength, 0),
+          ),
+          chunkedData: const RegistrationData(),
+        );
+      };
+
+      // Then
+      Future<RawTransaction> buildTx() async {
+        return strategy.build(
+          purpose: _purpose,
+          rootKeyPair: rootKeyPair,
+          derCert: derCert,
+          publicKeys: publicKeys,
+          requiredSigners: requiredSigners,
+        );
+      }
+
+      expect(buildTx, throwsA(isA<RegistrationTxCertValidationException>()));
+    });
   });
 }
 
@@ -209,8 +652,8 @@ final _voterKeyPair = CatalystKeyPair(
   privateKey: _FakeCatalystPrivateKey(bytes: Uint8List.fromList(List.filled(96, 2))),
 );
 
-X509DerCertificate _buildCert() {
-  return X509DerCertificate.fromBytes(bytes: List.filled(1000, 0));
+X509DerCertificate _buildCert({int size = 1000}) {
+  return X509DerCertificate.fromBytes(bytes: List.filled(size, 1));
 }
 
 TransactionHash _buildDummyTransactionId(int seed) {
