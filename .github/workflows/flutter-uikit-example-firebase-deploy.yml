@@ -20,13 +20,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@fixes-install-local
+        uses: input-output-hk/catalyst-forge/actions/install@master
         with:
           version: 0.16.0
       - name: Setup CI
-        uses: input-output-hk/catalyst-forge/actions/setup@fixes-install-local
+        uses: input-output-hk/catalyst-forge/actions/setup@master
       - name: Build Flutter Web
-        uses: input-output-hk/catalyst-forge/actions/run@fixes-install-local
+        uses: input-output-hk/catalyst-forge/actions/run@master
         if: always()
         continue-on-error: true
         with:

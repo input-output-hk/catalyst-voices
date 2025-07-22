@@ -26,16 +26,16 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@fixes-install-local
+        uses: input-output-hk/catalyst-forge/actions/install@master
         with:
           version: 0.19.0
         if: always()
 
       - name: Setup CI
-        uses: input-output-hk/catalyst-forge/actions/setup@fixes-install-local
+        uses: input-output-hk/catalyst-forge/actions/setup@master
 
       - name: Get catalyst gateway unit test report
-        uses: input-output-hk/catalyst-forge/actions/run@fixes-install-local
+        uses: input-output-hk/catalyst-forge/actions/run@master
         if: always()
         continue-on-error: true
         with:
@@ -43,7 +43,7 @@ jobs:
           args: ./catalyst-gateway+build
 
       - name: Get schemathesis test report
-        uses: input-output-hk/catalyst-forge/actions/run@fixes-install-local
+        uses: input-output-hk/catalyst-forge/actions/run@master
         if: always()
         continue-on-error: true
         with:
@@ -51,7 +51,7 @@ jobs:
           args: ./catalyst-gateway/tests/schemathesis_tests+test-ci-schemathesis
 
       - name: Get flutter unit test report
-        uses: input-output-hk/catalyst-forge/actions/run@fixes-install-local
+        uses: input-output-hk/catalyst-forge/actions/run@master
         if: always()
         continue-on-error: true
         with:
@@ -59,7 +59,7 @@ jobs:
           args: ./catalyst_voices+test-unit-native
 
       - name: Get python api test report
-        uses: input-output-hk/catalyst-forge/actions/run@fixes-install-local
+        uses: input-output-hk/catalyst-forge/actions/run@master
         if: always()
         continue-on-error: true
         with:

@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   ci:
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@fixes-install-local
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@master
     with:
       forge_version: 0.19.0
       local: true
