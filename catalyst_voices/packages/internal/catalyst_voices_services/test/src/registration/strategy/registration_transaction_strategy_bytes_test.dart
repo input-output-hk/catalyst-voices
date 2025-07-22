@@ -39,7 +39,7 @@ void main() {
         _rewardAddress.publicKeyHash,
       };
 
-      final derCert = X509DerCertificate.fromBytes(bytes: List.filled(32, 0));
+      final derCert = _buildCert();
       final strategy = _buildStrategy(utxos: utxos);
 
       // When
