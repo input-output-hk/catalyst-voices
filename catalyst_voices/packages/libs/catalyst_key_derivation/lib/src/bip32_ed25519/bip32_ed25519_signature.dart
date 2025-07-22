@@ -10,7 +10,7 @@ import 'package:equatable/equatable.dart';
 /// This class provides methods to create, serialize, and manipulate
 /// cryptographic signatures based on the BIP-32 HD wallet standard.
 class Bip32Ed25519XSignature extends Equatable {
-  static int length = rust.U8Array64.arraySize;
+  static const int length = rust.U8Array64.arraySize;
 
   final rust.Bip32Ed25519Signature _bytes;
 
