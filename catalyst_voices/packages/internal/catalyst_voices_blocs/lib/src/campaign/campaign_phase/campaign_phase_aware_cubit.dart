@@ -18,6 +18,30 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
     unawaited(getActiveCampaign());
   }
 
+  Future<CampaignPhaseType?> activeCampaignPhaseType() async {
+    if (state is DataCampaignPhaseAwareState) {
+      return (state as DataCampaignPhaseAwareState)
+          .campaign
+          .state
+          .activePhases
+          .firstOrNull
+          ?.phase
+          .type;
+    } else if (state is ErrorCampaignPhaseAwareState) {
+      return null;
+    }
+
+    await for (final currentState in stream) {
+      if (currentState is DataCampaignPhaseAwareState) {
+        return currentState.campaign.state.activePhases.firstOrNull?.phase.type;
+      } else if (currentState is ErrorCampaignPhaseAwareState) {
+        return null;
+      }
+    }
+
+    return null;
+  }
+
   @override
   Future<void> close() async {
     await _campaignSubscription?.cancel();
@@ -29,6 +53,9 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
     emit(const LoadingCampaignPhaseAwareState());
     try {
       final campaign = await _campaignService.getActiveCampaign();
+      if (campaign == null) {
+        return emit(const ErrorCampaignPhaseAwareState(error: LocalizedUnknownException()));
+      }
       _handleCampaignChange(campaign);
     } catch (error, stackTrace) {
       _logger.severe('Error getting active campaign', error, stackTrace);
@@ -36,10 +63,8 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
     }
   }
 
-  void _handleCampaignChange(Campaign? campaign) {
-    if (campaign == null) {
-      emit(const LoadingCampaignPhaseAwareState());
-    } else if (!isClosed) {
+  void _handleCampaignChange(Campaign campaign) {
+    if (!isClosed) {
       emit(DataCampaignPhaseAwareState(campaign: campaign));
     }
   }

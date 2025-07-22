@@ -176,7 +176,7 @@ enum CampaignPhaseStatus {
   factory CampaignPhaseStatus.fromRange(DateRange range, DateTime now) {
     final rangeStatus = range.rangeStatus(now);
 
-  return switch (rangeStatus) {
+    return switch (rangeStatus) {
       DateRangeStatus.before => CampaignPhaseStatus.upcoming,
       DateRangeStatus.inRange => CampaignPhaseStatus.active,
       DateRangeStatus.after => CampaignPhaseStatus.post,

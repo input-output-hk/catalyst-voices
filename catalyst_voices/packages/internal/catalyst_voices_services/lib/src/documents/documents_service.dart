@@ -46,7 +46,7 @@ final class DocumentsServiceImpl implements DocumentsService {
     this._documentRepository,
   );
 
-@override
+  @override
   Future<int> clear() => _documentRepository.removeAll();
 
   @override
