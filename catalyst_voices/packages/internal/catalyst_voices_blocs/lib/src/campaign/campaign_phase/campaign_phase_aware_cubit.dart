@@ -53,8 +53,11 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
     emit(const LoadingCampaignPhaseAwareState());
     try {
       final campaign = await _campaignService.getActiveCampaign();
+
+      if (isClosed) return;
+
       if (campaign == null) {
-        return emit(const ErrorCampaignPhaseAwareState(error: LocalizedUnknownException()));
+        return emit(const NoActiveCampaignPhaseAwareState());
       }
       _handleCampaignChange(campaign);
     } catch (error, stackTrace) {
@@ -64,8 +67,6 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
   }
 
   void _handleCampaignChange(Campaign campaign) {
-    if (!isClosed) {
-      emit(DataCampaignPhaseAwareState(campaign: campaign));
-    }
+    emit(DataCampaignPhaseAwareState(campaign: campaign));
   }
 }

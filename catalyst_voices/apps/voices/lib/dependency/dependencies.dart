@@ -329,7 +329,7 @@ final class Dependencies extends DependencyProvider {
       return CampaignService(
         get<CampaignRepository>(),
         get<ProposalRepository>(),
-        ActiveCampaignObserverImpl(),
+        get<ActiveCampaignObserver>(),
       );
     });
     registerLazySingleton<ProposalService>(() {
@@ -437,5 +437,9 @@ final class Dependencies extends DependencyProvider {
       dispose: (manager) => manager.dispose(),
     );
     registerLazySingleton<ShareManager>(() => DelegatingShareManager(get<ShareService>()));
+    registerLazySingleton<ActiveCampaignObserver>(
+      ActiveCampaignObserverImpl.new,
+      dispose: (observer) async => observer.dispose(),
+    );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/campaign_phase_aware/widgets/bubble_campaign_phase_aware_background.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +10,7 @@ class LoadingCampaignPhaseAware extends StatelessWidget {
     return Stack(
       children: [
         const Positioned.fill(
-          child: _Background(),
+          child: BubbleCampaignPhaseAwareBackground(),
         ),
         Align(
           child: VoicesAssets.lottie.voicesLoader.buildLottie(
@@ -19,18 +20,6 @@ class LoadingCampaignPhaseAware extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _Background extends StatelessWidget {
-  const _Background();
-
-  @override
-  Widget build(BuildContext context) {
-    return CatalystImage.asset(
-      VoicesAssets.images.bgBubbles.path,
-      fit: BoxFit.fill,
     );
   }
 }

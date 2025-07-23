@@ -1,28 +1,26 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/campaign_phase_aware/error_campaign_phase_aware.dart';
-import 'package:catalyst_voices/pages/campaign_phase_aware/loading_campaign_phase_aware.dart';
+import 'package:catalyst_voices/pages/campaign_phase_aware/widgets/error_campaign_phase_aware.dart';
+import 'package:catalyst_voices/pages/campaign_phase_aware/widgets/loading_campaign_phase_aware.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-typedef CampaignPhaseAwareBuilder = Widget Function(BuildContext context, CampaignPhase phase);
-
 class CampaignPhaseAware extends StatelessWidget {
   final CampaignPhaseType phase;
-  final CampaignPhaseAwareBuilder? upcoming;
-  final CampaignPhaseAwareBuilder? active;
-  final CampaignPhaseAwareBuilder? post;
-  final CampaignPhaseAwareBuilder? orElse;
+  final DataWidgetBuilder<CampaignPhase>? upcoming;
+  final DataWidgetBuilder<CampaignPhase>? active;
+  final DataWidgetBuilder<CampaignPhase>? post;
+  final DataWidgetBuilder<CampaignPhase>? orElse;
 
   factory CampaignPhaseAware.orElse({
     Key? key,
     required CampaignPhaseType phase,
-    required CampaignPhaseAwareBuilder orElse,
-    CampaignPhaseAwareBuilder? upcoming,
-    CampaignPhaseAwareBuilder? active,
-    CampaignPhaseAwareBuilder? post,
+    required DataWidgetBuilder<CampaignPhase> orElse,
+    DataWidgetBuilder<CampaignPhase>? upcoming,
+    DataWidgetBuilder<CampaignPhase>? active,
+    DataWidgetBuilder<CampaignPhase>? post,
   }) {
     return CampaignPhaseAware._(
       key: key,
@@ -37,9 +35,9 @@ class CampaignPhaseAware extends StatelessWidget {
   factory CampaignPhaseAware.when({
     Key? key,
     required CampaignPhaseType phase,
-    required CampaignPhaseAwareBuilder upcoming,
-    required CampaignPhaseAwareBuilder active,
-    required CampaignPhaseAwareBuilder post,
+    required DataWidgetBuilder<CampaignPhase> upcoming,
+    required DataWidgetBuilder<CampaignPhase> active,
+    required DataWidgetBuilder<CampaignPhase> post,
   }) {
     return CampaignPhaseAware._(
       key: key,
@@ -65,6 +63,7 @@ class CampaignPhaseAware extends StatelessWidget {
       builder: (context, state) {
         return switch (state) {
           ErrorCampaignPhaseAwareState(:final error) => ErrorCampaignPhaseAware(error: error),
+          NoActiveCampaignPhaseAwareState() => const ErrorCampaignPhaseAware(),
           LoadingCampaignPhaseAwareState() => const LoadingCampaignPhaseAware(),
           DataCampaignPhaseAwareState(:final campaign) => _CampaignPhaseAwareBuilder(
               key: const Key('CampaignPhaseAwareBuilder'),
@@ -84,10 +83,10 @@ class CampaignPhaseAware extends StatelessWidget {
 class _CampaignPhaseAwareBuilder extends StatefulWidget {
   final Campaign campaign;
   final CampaignPhaseType phase;
-  final CampaignPhaseAwareBuilder? upcoming;
-  final CampaignPhaseAwareBuilder? active;
-  final CampaignPhaseAwareBuilder? post;
-  final CampaignPhaseAwareBuilder? orElse;
+  final DataWidgetBuilder<CampaignPhase>? upcoming;
+  final DataWidgetBuilder<CampaignPhase>? active;
+  final DataWidgetBuilder<CampaignPhase>? post;
+  final DataWidgetBuilder<CampaignPhase>? orElse;
 
   const _CampaignPhaseAwareBuilder({
     super.key,
@@ -139,6 +138,8 @@ class _CampaignPhaseAwareBuilderState extends State<_CampaignPhaseAwareBuilder> 
   @override
   void didUpdateWidget(_CampaignPhaseAwareBuilder oldWidget) {
     if (oldWidget.phase != widget.phase || oldWidget.campaign != widget.campaign) {
+      _phaseTimer?.cancel();
+      _phaseTimer = null;
       _setupTimer();
     }
     super.didUpdateWidget(oldWidget);
@@ -158,16 +159,11 @@ class _CampaignPhaseAwareBuilderState extends State<_CampaignPhaseAwareBuilder> 
   }
 
   void _setupTimer() {
-    _phaseTimer?.cancel();
-    _phaseTimer = null;
-
     final duration = _phaseDuration;
     if (duration != null) {
       _phaseTimer = Timer(duration, () {
-        if (mounted) {
-          setState(() {});
-          _setupTimer();
-        }
+        setState(() {});
+        _setupTimer();
       });
     }
   }

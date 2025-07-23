@@ -30,3 +30,7 @@ final class ErrorCampaignPhaseAwareState extends CampaignPhaseAwareState {
 final class LoadingCampaignPhaseAwareState extends CampaignPhaseAwareState {
   const LoadingCampaignPhaseAwareState();
 }
+
+final class NoActiveCampaignPhaseAwareState extends CampaignPhaseAwareState {
+  const NoActiveCampaignPhaseAwareState();
+}

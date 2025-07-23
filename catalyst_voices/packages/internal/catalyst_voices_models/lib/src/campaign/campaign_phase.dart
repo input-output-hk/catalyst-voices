@@ -54,8 +54,8 @@ extension CampaignPhaseX on CampaignPhase {
       description:
           '''Proposers submit initial ideas to solve challenges. Each proposal includes the problem, solution, requested ADA budget, and a clear implementation plan.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 07, 22, 7, 38),
-        to: DateTime.utc(2025, 07, 22, 7, 39),
+        from: DateTime.utc(2025, 07, 01, 18),
+        to: DateTime.utc(2025, 12, 20, 20),
       ),
       type: CampaignPhaseType.proposalSubmission,
     ),

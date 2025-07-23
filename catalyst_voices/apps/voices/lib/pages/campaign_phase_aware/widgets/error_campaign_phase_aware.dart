@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:catalyst_voices/pages/campaign_phase_aware/widgets/bubble_campaign_phase_aware_background.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -9,16 +10,16 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class ErrorCampaignPhaseAware extends StatelessWidget {
-  final LocalizedException error;
+  final LocalizedException? error;
 
-  const ErrorCampaignPhaseAware({super.key, required this.error});
+  const ErrorCampaignPhaseAware({super.key, this.error});
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         const Positioned.fill(
-          child: _Background(),
+          child: BubbleCampaignPhaseAwareBackground(),
         ),
         Positioned.fill(
           left: 24,
@@ -29,8 +30,10 @@ class ErrorCampaignPhaseAware extends StatelessWidget {
               const _Image(),
               const SizedBox(height: 56),
               const _Title(),
-              const SizedBox(height: 12),
-              _Message(error: error),
+              if (error != null) ...[
+                const SizedBox(height: 12),
+                _Message(error: error!),
+              ],
               const SizedBox(height: 32),
               const _Button(),
               const Spacer(flex: 4),
@@ -38,18 +41,6 @@ class ErrorCampaignPhaseAware extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _Background extends StatelessWidget {
-  const _Background();
-
-  @override
-  Widget build(BuildContext context) {
-    return CatalystImage.asset(
-      VoicesAssets.images.bgBubbles.path,
-      fit: BoxFit.fill,
     );
   }
 }
