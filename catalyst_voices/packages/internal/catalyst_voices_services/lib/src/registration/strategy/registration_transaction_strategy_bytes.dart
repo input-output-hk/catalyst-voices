@@ -196,12 +196,18 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
 
   void _validateMetadataCertFields(RegistrationMetadata metadata) {
     final invalidationReasons = <String>[];
-    if (metadata.chunkedData?.derCerts == null) {
+    if (roles.isFirstRegistration && (metadata.chunkedData?.derCerts ?? const []).isEmpty) {
       invalidationReasons.add('missing derCerts');
     }
-    if (metadata.chunkedData?.publicKeys == null) {
-      invalidationReasons.add('missing publicKeys');
+
+    if (roles.isFirstRegistration && metadata.chunkedData?.publicKeys == null) {
+      invalidationReasons.add('missing publicKeys is null');
     }
+
+    if (roles.containsProposer && (metadata.chunkedData?.publicKeys ?? const []).isEmpty) {
+      invalidationReasons.add('missing proposer publicKeys');
+    }
+
     if (metadata.chunkedData?.roleDataSet == null) {
       invalidationReasons.add('missing roleDataSet');
     }
