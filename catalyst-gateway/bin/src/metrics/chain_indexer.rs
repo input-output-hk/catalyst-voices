@@ -7,7 +7,7 @@ use crate::{
     settings::Settings,
 };
 
-/// Spawn an updater backround task, which follows `ChainIndexerEvent` from the provided
+/// Spawn an updater background task, which follows `ChainIndexerEvent` from the provided
 /// channel and updates the corresponding metrics
 pub(crate) fn run_updater(mut event_channel: ChainIndexerEventReceiver) {
     let api_host_names = Settings::api_host_names().join(",");
