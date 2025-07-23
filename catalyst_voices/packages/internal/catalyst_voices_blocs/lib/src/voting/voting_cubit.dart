@@ -300,8 +300,9 @@ final class VotingCubit extends Cubit<VotingState>
     final filters = _cache.filters;
     final count = _cache.count;
 
-    final votingPowerViewModel =
-        votingPower != null ? VotingPowerViewModel.fromModel(votingPower) : null;
+    final votingPowerViewModel = votingPower != null
+        ? VotingPowerViewModel.fromModel(votingPower)
+        : const VotingPowerViewModel();
     final votingPhaseViewModel = _buildVotingPhase(campaign);
     final hasSearchQuery = filters.searchQuery == null;
     final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategory);
@@ -309,8 +310,8 @@ final class VotingCubit extends Cubit<VotingState>
     final isOrderEnabled = _cache.filters.type == ProposalsFilterType.total;
 
     return state.copyWith(
-      votingPower: Optional(votingPowerViewModel),
-      votingPhase: Optional(votingPhaseViewModel),
+      votingPower: votingPowerViewModel,
+      votingPhase: votingPhaseViewModel,
       hasSearchQuery: hasSearchQuery,
       favoritesIds: favoriteIds,
       count: count,

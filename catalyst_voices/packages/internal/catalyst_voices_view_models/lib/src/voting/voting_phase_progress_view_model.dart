@@ -22,17 +22,17 @@ final class VotingPhaseProgressDetailsViewModel extends Equatable {
 }
 
 final class VotingPhaseProgressViewModel extends Equatable {
-  final DateRange votingDateRange;
+  final DateRange? votingDateRange;
 
   /// The starting date of a phase that precedes the voting phase.
   ///
   /// Usually this is needed when voting hasn't yet started
   /// to show a progress bar when the voting starts.
-  final DateTime campaignStartDate;
+  final DateTime? campaignStartDate;
 
   const VotingPhaseProgressViewModel({
-    required this.votingDateRange,
-    required this.campaignStartDate,
+    this.votingDateRange,
+    this.campaignStartDate,
   });
 
   factory VotingPhaseProgressViewModel.fromModel({
@@ -48,14 +48,17 @@ final class VotingPhaseProgressViewModel extends Equatable {
   @override
   List<Object?> get props => [votingDateRange, campaignStartDate];
 
-  VotingPhaseProgressDetailsViewModel progress(DateTime now) {
+  VotingPhaseProgressDetailsViewModel? progress(DateTime now) {
+    final votingDateRange = this.votingDateRange;
+    if (votingDateRange == null) return null;
+
     DateTime start;
     DateTime end;
 
     final status = CampaignPhaseStatus.fromRange(votingDateRange, now);
     switch (status) {
       case CampaignPhaseStatus.upcoming:
-        start = campaignStartDate;
+        start = campaignStartDate ?? now;
         end = votingDateRange.from ?? now;
 
       case CampaignPhaseStatus.active:

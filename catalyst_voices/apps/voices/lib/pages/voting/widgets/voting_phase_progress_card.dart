@@ -25,7 +25,7 @@ class VotingPhaseProgressCard extends StatefulWidget {
 }
 
 class _Captions extends StatelessWidget {
-  final VotingPhaseProgressDetailsViewModel progress;
+  final VotingPhaseProgressDetailsViewModel? progress;
 
   const _Captions({required this.progress});
 
@@ -51,14 +51,18 @@ class _Captions extends StatelessWidget {
   }
 
   String _labelText(BuildContext context) {
-    return switch (progress.status) {
+    return switch (progress?.status) {
       CampaignPhaseStatus.upcoming => context.l10n.votingStarts,
       CampaignPhaseStatus.active => context.l10n.votingPhase,
       CampaignPhaseStatus.post => context.l10n.votingEnded,
+      null => '',
     };
   }
 
   String _valueText(BuildContext context) {
+    final progress = this.progress;
+    if (progress == null) return '';
+
     return switch (progress.status) {
       CampaignPhaseStatus.upcoming =>
         context.l10n.votingStartsIn(_formatDuration(context, progress.phaseEndsIn)),
@@ -70,21 +74,24 @@ class _Captions extends StatelessWidget {
 }
 
 class _DateRange extends StatelessWidget {
-  final DateRange dateRange;
+  final DateRange? dateRange;
 
   const _DateRange({required this.dateRange});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final dateRange = this.dateRange;
 
     return Text(
-      DateFormatter.formatDateRange(
-        MaterialLocalizations.of(context),
-        context.l10n,
-        dateRange,
-        formatSameWeek: false,
-      ),
+      dateRange != null
+          ? DateFormatter.formatDateRange(
+              MaterialLocalizations.of(context),
+              context.l10n,
+              dateRange,
+              formatSameWeek: false,
+            )
+          : '---',
       style: theme.textTheme.bodyMedium?.copyWith(color: theme.colors.textOnPrimaryLevel1),
     );
   }
@@ -128,11 +135,11 @@ class _VotingPhaseProgressCardState extends State<VotingPhaseProgressCard> {
             size: 24,
           ),
           const Spacer(),
-          _VotingStatus(status: progress.status),
+          _VotingStatus(status: progress?.status),
           const SizedBox(height: 4),
           _DateRange(dateRange: widget.votingPhase.votingDateRange),
           const Spacer(),
-          _ProgressBar(value: progress.progressValue),
+          _ProgressBar(value: progress?.progressValue ?? 0),
           const SizedBox(height: 6),
           _Captions(progress: progress),
         ],
@@ -159,7 +166,7 @@ class _VotingPhaseProgressCardState extends State<VotingPhaseProgressCard> {
 }
 
 class _VotingStatus extends StatelessWidget {
-  final CampaignPhaseStatus status;
+  final CampaignPhaseStatus? status;
 
   const _VotingStatus({required this.status});
 
@@ -181,6 +188,7 @@ class _VotingStatus extends StatelessWidget {
       CampaignPhaseStatus.upcoming => context.l10n.getReadyToVote,
       CampaignPhaseStatus.active => context.l10n.votingIsOpen,
       CampaignPhaseStatus.post => context.l10n.votingIsClosed,
+      null => '',
     };
   }
 }

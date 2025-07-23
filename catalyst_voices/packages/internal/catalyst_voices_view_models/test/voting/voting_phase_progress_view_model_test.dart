@@ -86,10 +86,11 @@ void main() {
 }
 
 void _expectActualEqualsExpected(
-  VotingPhaseProgressDetailsViewModel actual,
+  VotingPhaseProgressDetailsViewModel? actual,
   VotingPhaseProgressDetailsViewModel expected,
 ) {
-  expect(actual.status, equals(expected.status));
+  expect(actual, isNotNull);
+  expect(actual!.status, equals(expected.status));
   expect(actual.start, equals(expected.start));
   expect(actual.end, equals(expected.end));
   expect(actual.phaseEndsIn, equals(expected.phaseEndsIn));

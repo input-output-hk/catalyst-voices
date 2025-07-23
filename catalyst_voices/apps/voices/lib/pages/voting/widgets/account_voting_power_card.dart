@@ -57,7 +57,7 @@ class AccountVotingPowerCard extends StatelessWidget {
 }
 
 class _Status extends StatelessWidget {
-  final VotingPowerStatus status;
+  final VotingPowerStatus? status;
   final TextStyle labelStyle;
 
   const _Status({
@@ -95,12 +95,13 @@ class _Status extends StatelessWidget {
     return switch (status) {
       VotingPowerStatus.provisional => context.l10n.provisional,
       VotingPowerStatus.confirmed => context.l10n.confirmed,
+      null => '',
     };
   }
 }
 
 class _UpdatedAt extends StatelessWidget {
-  final DateTime updatedAt;
+  final DateTime? updatedAt;
   final TextStyle labelStyle;
 
   const _UpdatedAt({
@@ -111,6 +112,7 @@ class _UpdatedAt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final updatedAt = this.updatedAt;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -121,11 +123,12 @@ class _UpdatedAt extends StatelessWidget {
           context.l10n.updated,
           style: labelStyle,
         ),
-        TimezoneDateTimeText(
-          updatedAt,
-          formatter: (context, dateTime) => DateFormatter.formatFullDate24Format(dateTime),
-          style: theme.textTheme.labelMedium!.copyWith(color: theme.colors.textOnPrimaryLevel1),
-        ),
+        if (updatedAt != null)
+          TimezoneDateTimeText(
+            updatedAt,
+            formatter: (context, dateTime) => DateFormatter.formatFullDate24Format(dateTime),
+            style: theme.textTheme.labelMedium!.copyWith(color: theme.colors.textOnPrimaryLevel1),
+          ),
       ],
     );
   }

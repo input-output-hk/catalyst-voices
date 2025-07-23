@@ -88,16 +88,8 @@ Project Catalyst turns economic power into innovation power by using the Cardano
       ];
 
   DateTime? get startDate {
-    final dates = timeline.phases.map((e) => e.timeline.from).nonNulls;
-    DateTime? result;
-
-    for (final date in dates) {
-      if (result == null || date.isBefore(result)) {
-        result = date;
-      }
-    }
-
-    return result;
+    final dates = timeline.phases.map((e) => e.timeline.from).nonNulls.toList()..sort();
+    return dates.firstOrNull;
   }
 
   // We can have more than one state if the campaign timeline supports concurrent phases. For example
