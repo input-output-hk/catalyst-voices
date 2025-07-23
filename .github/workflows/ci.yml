@@ -92,7 +92,7 @@ jobs:
         run: |
           docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
           docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
-          docker cp schemathesis-runner:/results/junit-report.xml ./schemathesis{{ env.REPORT_EXT }}
+          docker cp schemathesis-runner:/results/junit-report.xml ./schemathesis${{ env.REPORT_EXT }}
 
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
@@ -117,6 +117,6 @@ jobs:
         run: docker compose -f catalyst-gateway/tests/docker-compose.yml down
 
   test_reporting:
-    if: ${{ !github.event.pull_request.draft }}
+    if: ${{ !github.event.pull_request.draft && always() }}
     needs: ci
     uses: ./.github/workflows/generate-allure-report.yml
