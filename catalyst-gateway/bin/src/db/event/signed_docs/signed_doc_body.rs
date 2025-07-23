@@ -28,7 +28,7 @@ pub(crate) struct SignedDocBody {
     /// `signed_doc` table `ver` field
     ver: uuid::Uuid,
     /// `signed_doc` table `type` field
-    doc_type: Vec<uuid::Uuid>,
+    doc_type: uuid::Uuid,
     /// `signed_doc` table `authors` field
     authors: Vec<String>,
     /// `signed_doc` table `metadata` field
@@ -47,7 +47,7 @@ impl SignedDocBody {
     }
 
     /// Returns the document type.
-    pub(crate) fn doc_type(&self) -> &Vec<uuid::Uuid> {
+    pub(crate) fn doc_type(&self) -> &uuid::Uuid {
         &self.doc_type
     }
 
@@ -74,7 +74,7 @@ impl SignedDocBody {
 
     /// Creates a  `SignedDocBody` instance.
     pub(crate) fn new(
-        id: uuid::Uuid, ver: uuid::Uuid, doc_type: Vec<uuid::Uuid>, authors: Vec<String>,
+        id: uuid::Uuid, ver: uuid::Uuid, doc_type: uuid::Uuid, authors: Vec<String>,
         metadata: Option<serde_json::Value>,
     ) -> Self {
         Self {
@@ -93,11 +93,10 @@ impl SignedDocBody {
     /// - `doc_type_deprecated`: `true` if the document type itself is marked as
     ///   deprecated.
     /// - `doc_refs_deprecated`: `true` if any document references are deprecated.
-    pub(crate) fn is_deprecated(&self) -> Result<(bool, bool), anyhow::Error> {
+    pub(crate) fn is_deprecated(&self) -> Result<bool, anyhow::Error> {
+        // TODO: determine deprecation from cbor bytes payload
         if let Some(json_meta) = self.metadata() {
             let meta = catalyst_signed_doc::Metadata::from_json(json_meta.clone())?;
-
-            let doc_type_old = self.doc_type().len() == 1;
 
             if let Some(doc_refs) = meta.doc_ref() {
                 let doc_ref_old = doc_refs
@@ -105,39 +104,21 @@ impl SignedDocBody {
                     .iter()
                     .any(|doc_ref| doc_ref.doc_locator().is_empty());
 
-                return Ok((doc_type_old, doc_ref_old));
+                return Ok(doc_ref_old);
             }
 
-            return Ok((doc_type_old, false));
+            return Ok(false);
         }
 
-        Ok((false, false))
+        Ok(false)
     }
 
     /// Converts the given signed document to the newer version of v0.04 if it is in the
     /// deprecated version.
     pub(crate) fn to_new_version(self) -> Result<SignedDocBody, anyhow::Error> {
-        let (doc_type_old, doc_ref_old) = self.is_deprecated()?;
+        let is_deprecated = self.is_deprecated()?;
 
-        if doc_type_old || doc_ref_old {
-            let doc_type = if doc_type_old {
-                // note: transform `type` to new version
-                match self
-                    .doc_type()
-                    .first()
-                    .map(|uuid| -> Result<_, anyhow::Error> {
-                        let uuid = catalyst_signed_doc::UuidV4::try_from(uuid.clone())?;
-                        Ok(catalyst_signed_doc::map_doc_type(uuid))
-                    })
-                    .transpose()?
-                {
-                    Some(uuid) => uuid.try_into()?,
-                    None => self.doc_type().clone(),
-                }
-            } else {
-                self.doc_type().clone()
-            };
-
+        if is_deprecated {
             let metadata = if let Some(json_meta) = self.metadata() {
                 // note: transform metadata by decoding and encoding it again
                 // this will convert `brand_id`, `campaign_id` and `category_id` to `parameters`,
@@ -152,7 +133,7 @@ impl SignedDocBody {
             let doc = SignedDocBody::new(
                 *self.id(),
                 *self.ver(),
-                doc_type,
+                self.doc_type().clone(),
                 self.authors().clone(),
                 metadata,
             );

@@ -3,7 +3,7 @@
 use poem_openapi::{types::Example, NewType, Object};
 
 use crate::{
-    db::event::{common::array_query_uuid::ArrayQueryUuid, signed_docs::DocsQueryFilter},
+    db::event::signed_docs::DocsQueryFilter,
     service::common::types::document::{
         doc_ref::IdAndVerRefDocumented, doc_type::DocumentType, id::EqOrRangedIdDocumented,
         ver::EqOrRangedVerDocumented,
@@ -164,7 +164,7 @@ impl TryFrom<DocumentIndexQueryFilter> for DocsQueryFilter {
     fn try_from(value: DocumentIndexQueryFilter) -> Result<Self, Self::Error> {
         let mut db_filter = DocsQueryFilter::all();
         if let Some(doc_type) = value.doc_type {
-            db_filter = db_filter.with_type(ArrayQueryUuid::Has(doc_type.parse()?));
+            db_filter = db_filter.with_type(doc_type.parse()?);
         }
         if let Some(id) = value.id {
             db_filter = db_filter.with_id(id.try_into()?);

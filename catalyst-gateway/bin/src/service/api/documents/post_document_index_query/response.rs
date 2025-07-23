@@ -248,8 +248,8 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
 
     fn try_from(doc: SignedDocBody) -> Result<Self, Self::Error> {
         // this will accept only older version
-        let (doc_type_old, doc_ref_old) = doc.is_deprecated()?;
-        if doc_type_old || doc_ref_old {
+        let is_deprecated = doc.is_deprecated()?;
+        if is_deprecated {
             return Err(anyhow::anyhow!(DEPRECATED_MARK));
         }
 
@@ -288,14 +288,9 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
                 .map(Into::into);
         }
 
-        let doc_type = doc
-            .doc_type()
-            .first()
-            .ok_or_else(|| anyhow::anyhow!("Cannot get doc type"))?;
-
         Ok(IndexedDocumentVersionDocumented(IndexedDocumentVersion {
             ver: DocumentVer::new_unchecked(doc.ver().to_string()),
-            doc_type: DocumentType::new_unchecked(doc_type.to_string()),
+            doc_type: DocumentType::new_unchecked(doc.doc_type().to_string()),
             doc_ref,
             reply,
             template,

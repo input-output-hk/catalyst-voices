@@ -2,15 +2,11 @@
 
 use std::str::FromStr;
 
-use catalyst_signed_doc::doc_types;
 use futures::TryStreamExt;
 
 use super::*;
 use crate::db::event::{
-    common::{
-        array_query_uuid::ArrayQueryUuid, eq_or_ranged_uuid::EqOrRangedUuid,
-        query_limits::QueryLimits,
-    },
+    common::{eq_or_ranged_uuid::EqOrRangedUuid, query_limits::QueryLimits},
     establish_connection_pool,
 };
 
@@ -21,15 +17,11 @@ mod filter_by_field;
 async fn queries_test() {
     establish_connection_pool().await;
 
-    let doc_type: Vec<_> = doc_types::PROPOSAL
-        .clone()
-        .into_iter()
-        .map(|uuid| uuid.uuid())
-        .collect();
-    let docs = test_docs(doc_type.clone());
+    let doc_type = uuid::Uuid::new_v4();
+    let docs = test_docs(doc_type);
 
     for doc in &docs {
-        store_full_signed_doc(doc, doc_type.clone()).await;
+        store_full_signed_doc(doc, doc_type).await;
         retrieve_full_signed_doc(doc).await;
         filter_by_id(doc).await;
         filter_by_ver(doc).await;
@@ -43,18 +35,18 @@ async fn queries_test() {
         filter_by_field::filter_by_field!(doc, "category_id", with_category_id);
     }
 
-    filter_by_type(&docs, doc_type.clone()).await;
+    filter_by_type(&docs, doc_type).await;
     filter_all(&docs).await;
     filter_count(docs.len().try_into().unwrap()).await;
 }
 
-fn test_docs(doc_type: Vec<uuid::Uuid>) -> Vec<FullSignedDoc> {
+fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
     vec![
         FullSignedDoc::new(
             SignedDocBody::new(
                 uuid::Uuid::now_v7(),
                 uuid::Uuid::now_v7(),
-                doc_type.clone(),
+                doc_type,
                 vec!["Alex".to_string()],
                 Some(serde_json::json!(
                     {
@@ -74,7 +66,7 @@ fn test_docs(doc_type: Vec<uuid::Uuid>) -> Vec<FullSignedDoc> {
             SignedDocBody::new(
                 uuid::Uuid::now_v7(),
                 uuid::Uuid::now_v7(),
-                doc_type.clone(),
+                doc_type,
                 vec!["Steven".to_string()],
                 Some(serde_json::json!(
                     {
@@ -94,7 +86,7 @@ fn test_docs(doc_type: Vec<uuid::Uuid>) -> Vec<FullSignedDoc> {
             SignedDocBody::new(
                 uuid::Uuid::now_v7(),
                 uuid::Uuid::now_v7(),
-                doc_type.clone(),
+                doc_type,
                 vec!["Sasha".to_string()],
                 None,
             ),
@@ -104,7 +96,7 @@ fn test_docs(doc_type: Vec<uuid::Uuid>) -> Vec<FullSignedDoc> {
     ]
 }
 
-async fn store_full_signed_doc(doc: &FullSignedDoc, doc_type: Vec<uuid::Uuid>) {
+async fn store_full_signed_doc(doc: &FullSignedDoc, doc_type: uuid::Uuid) {
     assert!(doc.store().await.unwrap());
     // try to insert the same data again
     assert!(!doc.store().await.unwrap());
@@ -186,8 +178,8 @@ async fn filter_by_id_and_ver(doc: &FullSignedDoc) {
     assert!(res_docs.try_next().await.unwrap().is_none());
 }
 
-async fn filter_by_type(docs: &[FullSignedDoc], doc_type: Vec<uuid::Uuid>) {
-    let filter = DocsQueryFilter::all().with_type(ArrayQueryUuid::Equals(doc_type));
+async fn filter_by_type(docs: &[FullSignedDoc], doc_type: uuid::Uuid) {
+    let filter = DocsQueryFilter::all().with_type(doc_type);
     let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
         .await
         .unwrap();

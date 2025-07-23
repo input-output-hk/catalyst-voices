@@ -190,10 +190,12 @@ async fn store_document_in_db(
     let doc_body = SignedDocBody::new(
         doc.doc_id()?.into(),
         doc.doc_ver()?.into(),
-        doc.doc_type()?
-            .into_iter()
-            .map(catalyst_signed_doc::UuidV4::uuid)
-            .collect(),
+        // doc.doc_type()?
+        //     .into_iter()
+        //     .map(catalyst_signed_doc::UuidV4::uuid)
+        //     .collect(),
+        // FIXME: back to use doc type when ready
+        uuid::Uuid::new_v4(),
         authors,
         Some(doc_meta_json),
     );
