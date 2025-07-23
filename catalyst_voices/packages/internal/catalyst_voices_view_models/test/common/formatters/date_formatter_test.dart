@@ -5,45 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
 
-class _FakeVoicesLocalizations extends Fake implements VoicesLocalizations {
-  @override
-  String get today => 'Today';
-
-  @override
-  String get tomorrow => 'Tomorrow';
-
-  @override
-  String get yesterday => 'Yesterday';
-
-  @override
-  String get twoDaysAgo => '2 days ago';
-
-  @override
-  String get weekOf => 'Week of';
-
-  @override
-  String get from => 'From';
-
-  @override
-  String get to => 'To';
-
-  @override
-  String publishedOn(String date, String time) {
-    return 'Published on $date at $time';
-  }
-}
-
-class _FakeMaterialLocalizations extends Fake implements MaterialLocalizations {
-  int _firstDayOfWeekIndex = 0;
-
-  @override
-  int get firstDayOfWeekIndex => _firstDayOfWeekIndex;
-
-  set firstDayOfWeekIndex(int value) {
-    _firstDayOfWeekIndex = value;
-  }
-}
-
 void main() {
   group(DateFormatter, () {
     final l10n = _FakeVoicesLocalizations();
@@ -105,6 +66,26 @@ void main() {
 
       expect(resultSunday, 'Week of Jan 19');
       expect(resultMonday, 'Jan 20 - Jan 26');
+    });
+
+    test(
+        'Dates are not formatted as in the same week for Local '
+        'when Sunday is first day of week but formatting is disabled', () {
+      // Set Sunday as first day of week
+      mockLocalizations.firstDayOfWeekIndex = 0;
+      final dateRangeWhenSundayFirst = DateRange(
+        from: DateTime(2025, 1, 19),
+        to: DateTime(2025, 1, 25),
+      );
+
+      final resultSunday = DateFormatter.formatDateRange(
+        mockLocalizations,
+        l10n,
+        dateRangeWhenSundayFirst,
+        formatSameWeek: false,
+      );
+
+      expect(resultSunday, 'Jan 19 - Jan 25');
     });
 
     test('Dates are in the same week for Local when Monday is first day of week', () {
@@ -219,4 +200,43 @@ void main() {
       expect(result.time, '14:30');
     });
   });
+}
+
+class _FakeMaterialLocalizations extends Fake implements MaterialLocalizations {
+  int _firstDayOfWeekIndex = 0;
+
+  @override
+  int get firstDayOfWeekIndex => _firstDayOfWeekIndex;
+
+  set firstDayOfWeekIndex(int value) {
+    _firstDayOfWeekIndex = value;
+  }
+}
+
+class _FakeVoicesLocalizations extends Fake implements VoicesLocalizations {
+  @override
+  String get from => 'From';
+
+  @override
+  String get to => 'To';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get tomorrow => 'Tomorrow';
+
+  @override
+  String get twoDaysAgo => '2 days ago';
+
+  @override
+  String get weekOf => 'Week of';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String publishedOn(String date, String time) {
+    return 'Published on $date at $time';
+  }
 }

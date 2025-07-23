@@ -386,10 +386,10 @@ final class ProposalCubit extends Cubit<ProposalState>
   }
 
   Future<bool> _isReadOnlyMode() async {
-    final campaignTimeline = await _campaignService.getCampaignTimelineByStage(
-      CampaignTimelineStage.proposalSubmission,
+    final campaignTimeline = await _campaignService.getCampaignPhaseTimeline(
+      CampaignPhaseType.proposalSubmission,
     );
-    final dateRangeStatus = campaignTimeline.timeline.rangeStatusNow();
+    final dateRangeStatus = campaignTimeline.timeline.rangeStatus(DateTimeExt.now());
 
     return switch (dateRangeStatus) {
       DateRangeStatus.after => true,

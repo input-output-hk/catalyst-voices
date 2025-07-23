@@ -30,7 +30,7 @@ final class DiscoveryCurrentCampaignState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
   final CurrentCampaignInfoViewModel currentCampaign;
-  final List<CampaignTimeline> campaignTimeline;
+  final List<CampaignTimelineViewModel> campaignTimeline;
 
   const DiscoveryCurrentCampaignState({
     this.isLoading = true,
@@ -49,14 +49,12 @@ final class DiscoveryCurrentCampaignState extends Equatable {
 
   DateRange? get reviewRegistrationStartsAt {
     return campaignTimeline
-        .firstWhere((e) => e.stage == CampaignTimelineStage.reviewRegistration)
+        .firstWhere((e) => e.type == CampaignPhaseType.reviewRegistration)
         .timeline;
   }
 
   DateRange? get reviewStartsAt {
-    return campaignTimeline
-        .firstWhere((e) => e.stage == CampaignTimelineStage.communityReview)
-        .timeline;
+    return campaignTimeline.firstWhere((e) => e.type == CampaignPhaseType.communityReview).timeline;
   }
 
   bool get showCurrentCampaign =>
@@ -66,14 +64,12 @@ final class DiscoveryCurrentCampaignState extends Equatable {
 
   DateRange? get votingRegistrationStartsAt {
     return campaignTimeline
-        .firstWhere((e) => e.stage == CampaignTimelineStage.votingRegistration)
+        .firstWhere((e) => e.type == CampaignPhaseType.votingRegistration)
         .timeline;
   }
 
   DateRange? get votingStartsAt {
-    return campaignTimeline
-        .firstWhere((e) => e.stage == CampaignTimelineStage.communityVoting)
-        .timeline;
+    return campaignTimeline.firstWhere((e) => e.type == CampaignPhaseType.communityVoting).timeline;
   }
 }
 
