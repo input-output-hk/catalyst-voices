@@ -26,16 +26,16 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.8.0
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.8.1
         with:
-          version: 0.19.0
+          version: 0.19.1
         if: always()
 
       - name: Setup CI
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.8.0
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.8.1
 
       - name: Get catalyst gateway unit test report
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.8.0
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.8.1
         if: always()
         continue-on-error: true
         with:
@@ -43,7 +43,7 @@ jobs:
           args: ./catalyst-gateway+build
 
       - name: Get flutter unit test report
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.8.0
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.8.1
         if: always()
         continue-on-error: true
         with:

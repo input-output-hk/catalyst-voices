@@ -329,6 +329,7 @@ SYSROOT
 tablestats
 tabview
 tacho
+tailscale
 testcov
 testdocs
 testid
