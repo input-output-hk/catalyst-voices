@@ -8,6 +8,7 @@ on:
     types:
       - synchronize
       - ready_for_review
+      - opened
 
 permissions:
   id-token: write
@@ -17,13 +18,12 @@ permissions:
 
 jobs:
   ci:
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.7.4
+    if: ${{ !github.event.pull_request.draft }}
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.8.1
     with:
-      forge_version: 0.18.0
-      local: true
+      forge_version: 0.19.1
 
-  # TODO: Enable when our earthly self-satellites will be back and remove `local: true` flag
-  # test_reporting:
-  #   if: always()
-  #   needs: ci
-  #   uses: ./.github/workflows/generate-allure-report.yml
+  test_reporting:
+    if: ${{ !github.event.pull_request.draft }}
+    needs: ci
+    uses: ./.github/workflows/generate-allure-report.yml
