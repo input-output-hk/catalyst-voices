@@ -118,5 +118,5 @@ jobs:
 
   test_reporting:
     if: ${{ !github.event.pull_request.draft && always() }}
-    needs: ci
+    needs: tests
     uses: ./.github/workflows/generate-allure-report.yml
