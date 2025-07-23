@@ -14,7 +14,7 @@ You can copy the `.env.example` to `.env` and replace the key accordingly.
 ## Example
 
 ```sh
-uv run python config/set_config.py --retry dev
+uv run python set_config.py --retry dev
 ```
 
 Will try and set the config for the dev environment by reading all the settings and the configs from the `<repo root>/config/dev/`
