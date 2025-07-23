@@ -5,6 +5,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -95,13 +96,13 @@ class _Status extends StatelessWidget {
     return switch (status) {
       VotingPowerStatus.provisional => context.l10n.provisional,
       VotingPowerStatus.confirmed => context.l10n.confirmed,
-      null => '',
+      null => '                ', // reserve space for actual status
     };
   }
 }
 
 class _UpdatedAt extends StatelessWidget {
-  final DateTime? updatedAt;
+  final DateTime updatedAt;
   final TextStyle labelStyle;
 
   const _UpdatedAt({
@@ -112,7 +113,6 @@ class _UpdatedAt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final updatedAt = this.updatedAt;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -123,12 +123,11 @@ class _UpdatedAt extends StatelessWidget {
           context.l10n.updated,
           style: labelStyle,
         ),
-        if (updatedAt != null)
-          TimezoneDateTimeText(
-            updatedAt,
-            formatter: (context, dateTime) => DateFormatter.formatFullDate24Format(dateTime),
-            style: theme.textTheme.labelMedium!.copyWith(color: theme.colors.textOnPrimaryLevel1),
-          ),
+        TimezoneDateTimeText(
+          updatedAt,
+          formatter: (context, dateTime) => DateFormatter.formatFullDate24Format(dateTime),
+          style: theme.textTheme.labelMedium!.copyWith(color: theme.colors.textOnPrimaryLevel1),
+        ),
       ],
     );
   }
@@ -198,7 +197,7 @@ class _VotingPowerValueRow extends StatelessWidget {
           ),
         ),
         _UpdatedAt(
-          updatedAt: votingPower.updatedAt,
+          updatedAt: votingPower.updatedAt ?? DateTimeExt.now(),
           labelStyle: labelStyle,
         ),
       ],

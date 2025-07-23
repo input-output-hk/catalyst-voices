@@ -7,7 +7,7 @@ final class VotingPowerViewModel extends Equatable {
   final DateTime? updatedAt;
 
   const VotingPowerViewModel({
-    this.amount = '',
+    this.amount = '---',
     this.status,
     this.updatedAt,
   });

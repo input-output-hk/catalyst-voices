@@ -55,13 +55,13 @@ class _Captions extends StatelessWidget {
       CampaignPhaseStatus.upcoming => context.l10n.votingStarts,
       CampaignPhaseStatus.active => context.l10n.votingPhase,
       CampaignPhaseStatus.post => context.l10n.votingEnded,
-      null => '',
+      null => '--',
     };
   }
 
   String _valueText(BuildContext context) {
     final progress = this.progress;
-    if (progress == null) return '';
+    if (progress == null) return '--';
 
     return switch (progress.status) {
       CampaignPhaseStatus.upcoming =>
@@ -91,7 +91,7 @@ class _DateRange extends StatelessWidget {
               dateRange,
               formatSameWeek: false,
             )
-          : '---',
+          : '',
       style: theme.textTheme.bodyMedium?.copyWith(color: theme.colors.textOnPrimaryLevel1),
     );
   }
@@ -188,7 +188,7 @@ class _VotingStatus extends StatelessWidget {
       CampaignPhaseStatus.upcoming => context.l10n.getReadyToVote,
       CampaignPhaseStatus.active => context.l10n.votingIsOpen,
       CampaignPhaseStatus.post => context.l10n.votingIsClosed,
-      null => '',
+      null => '--',
     };
   }
 }
