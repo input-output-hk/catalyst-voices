@@ -61,18 +61,28 @@ extension CampaignTimelineX on CampaignTimeline {
       description:
           '''Proposers submit initial ideas to solve challenges. Each proposal includes the problem, solution, requested ADA budget, and a clear implementation plan.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 07, 01, 18),
-        to: DateTime.utc(2025, 12, 12, 20),
+        from: DateTime.utc(2025, 07, 24, 12),
+        to: DateTime.utc(2025, 08, 18, 06),
       ),
       stage: CampaignTimelineStage.proposalSubmission,
+    ),
+    CampaignTimeline(
+      title: 'Reviewers and Moderators registration',
+      description: '',
+      timeline: DateRange(
+        from: DateTime.utc(2025, 07, 24, 12),
+        to: DateTime.utc(2025, 08, 18, 06),
+      ),
+      stage: CampaignTimelineStage.reviewRegistration,
+      offstage: true,
     ),
     CampaignTimeline(
       title: 'Voting Registration',
       description:
           'During Voter registration, ADA holders register via supported wallet to participate in the Voting.',
       timeline: DateRange(
-        from: DateTime.utc(2025, 07, 05, 18),
-        to: DateTime.utc(2025, 07, 12, 10),
+        from: DateTime.utc(2025, 07, 24, 12),
+        to: DateTime.utc(2025, 09, 06, 21, 45),
       ),
       stage: CampaignTimelineStage.votingRegistration,
     ),
@@ -81,27 +91,17 @@ extension CampaignTimelineX on CampaignTimeline {
       description:
           '''Community members help improve proposals through two key steps: LV0 and LV1 reviewers assess the proposals, then LV2 moderators oversee the process to ensure quality and fairness.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 07, 03, 8),
-        to: DateTime.utc(2025, 07, 08, 20),
+        from: DateTime.utc(2025, 08, 22, 12),
+        to: DateTime.utc(2025, 09, 05, 06),
       ),
       stage: CampaignTimelineStage.communityReview,
-    ),
-    CampaignTimeline(
-      title: 'Reviewers and Moderators registration',
-      description: '',
-      timeline: DateRange(
-        from: DateTime.utc(2025, 07, 03, 8),
-        to: DateTime.utc(2025, 07, 04, 20),
-      ),
-      stage: CampaignTimelineStage.reviewRegistration,
-      offstage: true,
     ),
     CampaignTimeline(
       title: 'Community Voting',
       description: '''Community members cast their votes using the Catalyst Voting app.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 07, 16, 12),
-        to: DateTime.utc(2025, 07, 18, 9),
+        from: DateTime.utc(2025, 09, 22, 12),
+        to: DateTime.utc(2025, 10, 06, 6),
       ),
       stage: CampaignTimelineStage.communityVoting,
     ),
@@ -110,8 +110,8 @@ extension CampaignTimelineX on CampaignTimeline {
       description:
           '''Votes are tallied and the results are announced. Rewards are distributed to both voters and community reviewers.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 07, 18, 9),
-        to: DateTime.utc(2025, 07, 21, 2),
+        from: DateTime.utc(2025, 10, 06, 9),
+        to: DateTime.utc(2025, 10, 08, 21),
       ),
       stage: CampaignTimelineStage.votingResults,
     ),
