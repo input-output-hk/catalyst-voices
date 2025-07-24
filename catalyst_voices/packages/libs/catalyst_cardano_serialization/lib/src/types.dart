@@ -363,12 +363,16 @@ enum NetworkId {
 
 /// The name of a native asset.
 extension type AssetName(String name) {
+  /// Maximum length of [AssetName.name].
+  static const maxLength = 64;
+
   /// Deserializes the type from cbor.
   factory AssetName.fromCbor(CborValue value) {
     final bytes = (value as CborBytes).bytes;
 
     // FIXME(ilap): Handle non ASCII/UTF-8 characters.
 
+    // check if hex
     if (bytes.length == 32) {
       return AssetName(hex.encode(bytes));
     }
@@ -377,7 +381,7 @@ extension type AssetName(String name) {
   }
 
   /// Returns true if asset name is too long.
-  bool get isTooLong => name.length > 64;
+  bool get isTooLong => name.length > maxLength;
 
   /// Serializes the type as cbor.
   CborValue toCbor() {

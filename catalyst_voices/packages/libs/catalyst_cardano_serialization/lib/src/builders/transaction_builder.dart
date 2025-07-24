@@ -182,6 +182,7 @@ final class TransactionBuilder extends Equatable {
       referenceInputs: referenceInputs,
     );
     _validateMaxTxSize(fullTxSize);
+    _validateAssetsSize(outputs: outputs);
 
     return body;
   }
@@ -527,6 +528,21 @@ final class TransactionBuilder extends Equatable {
 
     changeAssets.add(output.amount.multiAsset!);
     return changeAssets;
+  }
+
+  void _validateAssetsSize({
+    required List<ShelleyMultiAssetTransactionOutput> outputs,
+  }) {
+    for (final output in outputs) {
+      final tooLongAssets = output.amount
+          .listNonZeroAssetIds()
+          .where((assetId) => assetId.$2.isTooLong)
+          .map((assetId) => assetId.$2);
+
+      if (tooLongAssets.isNotEmpty) {
+        throw UtxoAssetNameTooLongException(assets: tooLongAssets.toList());
+      }
+    }
   }
 
   void _validateInputsMatchOutputsAndFee({
