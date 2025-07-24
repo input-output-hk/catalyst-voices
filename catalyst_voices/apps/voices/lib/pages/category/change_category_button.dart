@@ -15,7 +15,6 @@ class ChangeCategoryButton extends StatefulWidget {
 }
 
 class _ChangeCategoryButtonState extends State<ChangeCategoryButton> {
-
   @override
   Widget build(BuildContext context) {
     return BlocSelector<CategoryDetailCubit, CategoryDetailState,
@@ -67,5 +66,4 @@ class _ChangeCategoryButtonState extends State<ChangeCategoryButton> {
     }
     await context.read<CategoryDetailCubit>().getCategoryDetail(ref);
   }
-
 }
