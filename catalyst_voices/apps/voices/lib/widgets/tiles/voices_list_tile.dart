@@ -14,6 +14,9 @@ class VoicesListTile extends StatelessWidget {
   /// A callback called when the widget is pressed.
   final VoidCallback? onTap;
 
+  /// See [ListTile.tileColor].
+  final Color? tileColor;
+
   /// The default constructor for the [VoicesListTile].
   const VoicesListTile({
     super.key,
@@ -21,6 +24,7 @@ class VoicesListTile extends StatelessWidget {
     this.trailing,
     this.title,
     this.onTap,
+    this.tileColor,
   });
 
   @override
@@ -39,6 +43,7 @@ class VoicesListTile extends StatelessWidget {
       leading: leading,
       trailing: trailing,
       onTap: onTap,
+      tileColor: tileColor,
     );
   }
 }

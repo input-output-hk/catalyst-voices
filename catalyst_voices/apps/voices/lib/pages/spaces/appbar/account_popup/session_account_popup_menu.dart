@@ -8,6 +8,7 @@ import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_accoun
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_theme_menu_tile.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_timezone_menu_tile.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/widgets/menu/voices_raw_popup_menu.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -144,12 +145,7 @@ class _PopupMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = PopupMenuTheme.of(context);
-    return DecoratedBox(
-      decoration: ShapeDecoration(
-        color: theme.color,
-        shape: theme.shape ?? const RoundedRectangleBorder(),
-      ),
+    return VoicesRawPopupMenu(
       child: ConstrainedBox(
         constraints: const BoxConstraints.tightFor(width: 320),
         child: const Column(
@@ -245,7 +241,7 @@ class _Session extends StatelessWidget {
 class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> with LaunchUrlMixin {
   @override
   Widget build(BuildContext context) {
-    return VoicesRawPopupMenu<_MenuItemEvent>(
+    return VoicesRawPopupMenuButton<_MenuItemEvent>(
       buttonBuilder: (
         context,
         onTapCallback, {
