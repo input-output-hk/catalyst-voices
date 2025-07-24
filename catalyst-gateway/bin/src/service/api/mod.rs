@@ -17,7 +17,7 @@ use crate::settings::Settings;
 pub(crate) mod cardano;
 mod config;
 mod documents;
-mod health;
+pub(crate) mod health;
 
 /// The name of the API
 const API_TITLE: &str = "Catalyst Gateway";
