@@ -1,9 +1,61 @@
+import 'dart:convert';
+
 import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
 import 'package:catalyst_cardano_serialization/src/utils/hex.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
+
+/// The name of a native asset.
+final class AssetName extends Equatable implements CborEncodable {
+  /// Maximum length of [AssetName.bytes].
+  static const maxLength = 32;
+
+  final List<int> _bytes;
+
+  /// utf8 name
+  AssetName(String name) : this._(utf8.encode(name));
+
+  /// Raw version of [AssetName].
+  const AssetName.bytes(List<int> bytes) : this._(bytes);
+
+  /// Deserializes the type from cbor.
+  factory AssetName.fromCbor(CborValue value) {
+    return AssetName._((value as CborBytes).bytes);
+  }
+
+  const AssetName._(this._bytes);
+
+  /// Original list of bytes for this [AssetName].
+  List<int> get bytes => List.unmodifiable(_bytes);
+
+  /// Returns true bytes value is too long.
+  bool get isTooLong => _bytes.length > 32;
+
+  /// Decoded name of this asset.
+  // FIXME(ilap): Handle non ASCII/UTF-8 characters.
+  String get name {
+    // check if hex
+    if (_bytes.length == 32) {
+      return hex.encode(_bytes);
+    }
+
+    return CborString.fromUtf8(_bytes).toString(allowMalformed: true);
+  }
+
+  @override
+  List<Object?> get props => [_bytes];
+
+  /// Serializes the type as cbor.
+  @override
+  CborBytes toCbor({List<int> tags = const []}) {
+    return CborBytes(
+      _bytes,
+      tags: tags,
+    );
+  }
+}
 
 /// Represents the balance of the wallet in terms of [Coin].
 final class Balance extends Equatable implements CborEncodable {
@@ -358,39 +410,6 @@ enum NetworkId {
     }
 
     throw ArgumentError('Unsupported NetworkId: $id');
-  }
-}
-
-/// The name of a native asset.
-extension type AssetName(String name) {
-  /// Maximum length of [AssetName.name].
-  static const maxLength = 64;
-
-  /// Deserializes the type from cbor.
-  factory AssetName.fromCbor(CborValue value) {
-    final bytes = (value as CborBytes).bytes;
-
-    // FIXME(ilap): Handle non ASCII/UTF-8 characters.
-
-    // check if hex
-    if (bytes.length == 32) {
-      return AssetName(hex.encode(bytes));
-    }
-
-    return AssetName(CborString.fromUtf8(bytes).toString(allowMalformed: true));
-  }
-
-  /// Returns true if asset name is too long.
-  bool get isTooLong => name.length > maxLength;
-
-  /// Serializes the type as cbor.
-  CborValue toCbor() {
-    // check if hex
-    if (name.length.isEven && RegExp(r'^[0-9a-fA-F]+$').hasMatch(name)) {
-      return CborBytes(hex.decode(name));
-    }
-
-    return CborBytes(CborString(name).utf8Bytes);
   }
 }
 
