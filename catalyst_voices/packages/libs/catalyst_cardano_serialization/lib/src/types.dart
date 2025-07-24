@@ -414,17 +414,39 @@ enum NetworkId {
 }
 
 /// The hash of policy ID that minted native assets.
-extension type PolicyId(String hash) {
+final class PolicyId extends Equatable implements CborEncodable {
   /// The fixed byte length of a policy ID hash.
   static const hashLength = 28;
 
+  final List<int> _bytes;
+
+  /// hex hash of [PolicyId].
+  PolicyId(String hash) : this._(hexDecode(hash));
+
   /// Deserializes the type from cbor.
   factory PolicyId.fromCbor(CborValue value) {
-    return PolicyId(hex.encode((value as CborBytes).bytes));
+    return PolicyId._((value as CborBytes).bytes);
   }
 
+  const PolicyId._(this._bytes);
+
+  /// Original list of bytes for this [PolicyId].
+  List<int> get bytes => List.unmodifiable(_bytes);
+
+  /// Hex encoded hash of [PolicyId].
+  String get hash => hex.encode(_bytes);
+
+  @override
+  List<Object?> get props => [_bytes];
+
   /// Serializes the type as cbor.
-  CborValue toCbor() => CborBytes(hexDecode(hash));
+  @override
+  CborBytes toCbor({List<int> tags = const []}) {
+    return CborBytes(
+      _bytes,
+      tags: tags,
+    );
+  }
 }
 
 /// A blockchain slot number.
