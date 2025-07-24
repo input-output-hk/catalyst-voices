@@ -15,11 +15,11 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
-cardano-chain-follower = { version = "0.0.9", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "feat/get-rid-of-path-dependecies" }
-rbac-registration = { version = "0.0.5", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "feat/get-rid-of-path-dependecies" }
+cardano-chain-follower = { version = "0.0.9", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower-v0.0.9" }
+rbac-registration = { version = "0.0.5", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower-v0.0.9" }
 catalyst-types = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250724-01" }
 cardano-blockchain-types = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250724-01" }
-catalyst-signed-doc = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "feat/get-rid-of-path-dependecies" }
+catalyst-signed-doc = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower-v0.0.9" }
 c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250724-01" }
 
 pallas = { version = "0.33.0" }
