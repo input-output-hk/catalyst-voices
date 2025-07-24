@@ -311,7 +311,7 @@ final class VotingCubit extends Cubit<VotingState>
     final isOrderEnabled = _cache.filters.type == ProposalsFilterType.total;
 
     return state.copyWith(
-      fundNumber: fundNumber != null ? Optional(fundNumber) : const Optional.empty(),
+      fundNumber: Optional(fundNumber),
       votingPower: votingPowerViewModel,
       votingPhase: votingPhaseViewModel,
       hasSearchQuery: hasSearchQuery,
