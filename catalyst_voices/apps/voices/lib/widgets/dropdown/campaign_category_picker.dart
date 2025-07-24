@@ -22,7 +22,7 @@ class CampaignCategoryPicker extends StatelessWidget {
     required this.onSelected,
     this.menuKey,
     this.menuTitle,
-    this.menuOffset = const Offset(0, 4),
+    this.menuOffset = const Offset(0, 8),
     this.menuConstraints = const BoxConstraints(maxWidth: 400),
     this.menuWithIcons = true,
     this.buttonBuilder,
@@ -73,9 +73,13 @@ class _PopupMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final title = this.title;
-    final listTileTheme = ListTileTheme.of(context).copyWith(shape: const RoundedRectangleBorder());
+    final listTileTheme = ListTileTheme.of(context).copyWith(
+      shape: const RoundedRectangleBorder(),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+    );
 
     return VoicesRawPopupMenu(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: ListTileTheme(
         data: listTileTheme,
         child: ConstrainedBox(
@@ -131,7 +135,7 @@ class _PopupMenuTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(16),
       child: Text(
         title,
         style: theme.textTheme.titleMedium,

@@ -25,7 +25,7 @@ class CategorySelector extends StatelessWidget {
   }
 }
 
-class _CategorySelector extends StatefulWidget {
+class _CategorySelector extends StatelessWidget {
   final List<ProposalsCategorySelectorItem> items;
 
   const _CategorySelector({
@@ -34,20 +34,15 @@ class _CategorySelector extends StatefulWidget {
   });
 
   @override
-  State<_CategorySelector> createState() => _CategorySelectorState();
-}
-
-class _CategorySelectorState extends State<_CategorySelector> {
-  @override
   Widget build(BuildContext context) {
     return CampaignCategoryPicker(
       items: [
         DropdownMenuViewModel(
           value: const ProposalsAnyCategoryFilter(),
           name: context.l10n.showAll,
-          isSelected: widget.items.none((e) => e.isSelected),
+          isSelected: items.none((e) => e.isSelected),
         ),
-        ...widget.items.map((item) => item.toDropdownItem()),
+        ...items.map((item) => item.toDropdownItem()),
       ],
       onSelected: (value) {
         context.read<ProposalsCubit>().changeSelectedCategory(value.ref);
@@ -82,7 +77,7 @@ class _CategorySelectorState extends State<_CategorySelector> {
                 const SizedBox(width: 4),
                 Text(
                   key: const Key('CategorySelectorValue'),
-                  widget.items.firstWhereOrNull((e) => e.isSelected)?.name ?? context.l10n.showAll,
+                  items.firstWhereOrNull((e) => e.isSelected)?.name ?? context.l10n.showAll,
                   style: context.textTheme.bodyMedium,
                 ),
                 const SizedBox(width: 8),
