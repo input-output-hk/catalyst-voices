@@ -120,8 +120,8 @@ extension CampaignTimelineX on CampaignTimeline {
       description:
           '''This phase involves finalizing the key milestones submitted in the Catalyst App during the proposal submission stage within the Catalyst Milestone Module. It also includes conducting formal due diligence, and fulfilling all required onboarding steps to become eligible for funding.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 07, 25, 06),
-        to: DateTime.utc(2025, 07, 30, 06),
+        from: DateTime.utc(2025, 10, 07, 08),
+        to: DateTime.utc(2025, 12, 07, 08),
       ),
       stage: CampaignTimelineStage.projectOnboarding,
     ),
