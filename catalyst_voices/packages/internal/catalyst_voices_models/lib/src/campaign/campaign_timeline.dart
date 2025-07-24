@@ -61,7 +61,7 @@ extension CampaignTimelineX on CampaignTimeline {
       description:
           '''Proposers submit initial ideas to solve challenges. Each proposal includes the problem, solution, requested ADA budget, and a clear implementation plan.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 07, 24, 12),
+        from: DateTime.utc(2025, 07, 28, 12),
         to: DateTime.utc(2025, 08, 18, 06),
       ),
       stage: CampaignTimelineStage.proposalSubmission,
@@ -70,7 +70,7 @@ extension CampaignTimelineX on CampaignTimeline {
       title: 'Reviewers and Moderators registration',
       description: '',
       timeline: DateRange(
-        from: DateTime.utc(2025, 07, 24, 12),
+        from: DateTime.utc(2025, 07, 28, 12),
         to: DateTime.utc(2025, 08, 18, 06),
       ),
       stage: CampaignTimelineStage.reviewRegistration,
@@ -81,7 +81,7 @@ extension CampaignTimelineX on CampaignTimeline {
       description:
           'During Voter registration, ADA holders register via supported wallet to participate in the Voting.',
       timeline: DateRange(
-        from: DateTime.utc(2025, 07, 24, 12),
+        from: DateTime.utc(2025, 07, 28, 12),
         to: DateTime.utc(2025, 09, 06, 21, 45),
       ),
       stage: CampaignTimelineStage.votingRegistration,
@@ -92,7 +92,7 @@ extension CampaignTimelineX on CampaignTimeline {
           '''Community members help improve proposals through two key steps: LV0 and LV1 reviewers assess the proposals, then LV2 moderators oversee the process to ensure quality and fairness.''',
       timeline: DateRange(
         from: DateTime.utc(2025, 08, 22, 12),
-        to: DateTime.utc(2025, 09, 05, 06),
+        to: DateTime.utc(2025, 09, 17, 06),
       ),
       stage: CampaignTimelineStage.communityReview,
     ),
