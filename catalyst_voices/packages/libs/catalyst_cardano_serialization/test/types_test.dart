@@ -63,7 +63,7 @@ void main() {
     });
   });
 
-  group('$AssetName', () {
+  group(AssetName, () {
     test('hex asset name round trip produces same cbor', () {
       // Given
       final value = CborBytes(

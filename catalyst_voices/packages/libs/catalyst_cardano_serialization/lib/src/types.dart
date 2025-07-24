@@ -31,7 +31,7 @@ final class AssetName extends Equatable implements CborEncodable {
   List<int> get bytes => List.unmodifiable(_bytes);
 
   /// Returns true bytes value is too long.
-  bool get isTooLong => _bytes.length > 32;
+  bool get isTooLong => _bytes.length > AssetName.maxLength;
 
   /// Decoded name of this asset.
   // FIXME(ilap): Handle non ASCII/UTF-8 characters.
