@@ -366,12 +366,28 @@ extension type AssetName(String name) {
   /// Deserializes the type from cbor.
   factory AssetName.fromCbor(CborValue value) {
     final bytes = (value as CborBytes).bytes;
+
     // FIXME(ilap): Handle non ASCII/UTF-8 characters.
+
+    if (bytes.length == 32) {
+      return AssetName(hex.encode(bytes));
+    }
+
     return AssetName(CborString.fromUtf8(bytes).toString(allowMalformed: true));
   }
 
+  /// Returns true if asset name is too long.
+  bool get isTooLong => name.length > 64;
+
   /// Serializes the type as cbor.
-  CborValue toCbor() => CborBytes(CborString(name).utf8Bytes);
+  CborValue toCbor() {
+    // check if hex
+    if (name.length.isEven && RegExp(r'^[0-9a-fA-F]+$').hasMatch(name)) {
+      return CborBytes(hex.decode(name));
+    }
+
+    return CborBytes(CborString(name).utf8Bytes);
+  }
 }
 
 /// The hash of policy ID that minted native assets.
