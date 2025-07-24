@@ -8,8 +8,9 @@ use ed25519_dalek::VerifyingKey;
 use futures::{StreamExt, TryStreamExt};
 use moka::{policy::EvictionPolicy, sync::Cache};
 use scylla::{
-    prepared_statement::PreparedStatement, statement::Consistency, DeserializeRow, SerializeRow,
-    Session,
+    client::session::Session,
+    statement::{prepared::PreparedStatement, Consistency},
+    DeserializeRow, SerializeRow,
 };
 use tracing::error;
 

@@ -128,3 +128,6 @@ browser_extensions/
 #Test report and coverage
 *.junit-report.xml
 *.coverage.info
+
+# Secrets
+.env

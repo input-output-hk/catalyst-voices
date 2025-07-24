@@ -11,7 +11,7 @@ use std::{collections::HashSet, sync::Arc};
 use anyhow::Result;
 use cardano_blockchain_types::{MultiEraBlock, TransactionId, TxnIndex};
 use rbac_registration::cardano::cip509::Cip509;
-use scylla::Session;
+use scylla::client::session::Session;
 use tracing::{debug, error};
 
 use crate::{

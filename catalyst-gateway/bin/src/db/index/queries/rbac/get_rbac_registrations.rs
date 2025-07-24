@@ -3,8 +3,9 @@
 use std::{collections::HashSet, sync::Arc};
 
 use scylla::{
-    prepared_statement::PreparedStatement, statement::Consistency,
-    transport::iterator::TypedRowStream, DeserializeRow, SerializeRow, Session,
+    client::{pager::TypedRowStream, session::Session},
+    statement::{prepared::PreparedStatement, Consistency},
+    DeserializeRow, SerializeRow,
 };
 use tracing::error;
 

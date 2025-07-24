@@ -18,8 +18,9 @@ pub(crate) mod unstaked_txo_assets;
 use std::{fmt::Debug, sync::Arc};
 
 use scylla::{
-    prepared_statement::PreparedStatement, serialize::row::SerializeRow,
-    transport::iterator::QueryPager, Session,
+    client::{pager::QueryPager, session::Session},
+    serialize::row::SerializeRow,
+    statement::prepared::PreparedStatement,
 };
 
 use super::{FallibleQueryResults, SizedBatch};

@@ -4,7 +4,7 @@ use std::{fmt::Debug, sync::Arc};
 
 use cardano_blockchain_types::{Slot, TransactionId};
 use catalyst_types::catalyst_id::CatalystId;
-use scylla::{SerializeRow, Session};
+use scylla::{client::session::Session, SerializeRow};
 use tracing::error;
 
 use crate::{

@@ -5,7 +5,7 @@ use std::sync::Arc;
 use anyhow::Context;
 use cardano_blockchain_types::Network;
 use handlebars::Handlebars;
-use scylla::Session;
+use scylla::client::session::Session;
 use serde_json::json;
 use tracing::error;
 

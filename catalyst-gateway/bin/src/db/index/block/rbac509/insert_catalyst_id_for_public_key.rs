@@ -5,7 +5,7 @@ use std::{fmt::Debug, sync::Arc};
 use cardano_blockchain_types::Slot;
 use catalyst_types::catalyst_id::CatalystId;
 use ed25519_dalek::VerifyingKey;
-use scylla::{SerializeRow, Session};
+use scylla::{client::session::Session, SerializeRow};
 use tracing::error;
 
 use crate::{
