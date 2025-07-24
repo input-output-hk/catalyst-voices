@@ -117,7 +117,6 @@ class _VotingPhaseProgressCard extends StatefulWidget {
   final VotingPhaseProgressViewModel votingPhase;
 
   const _VotingPhaseProgressCard({
-    super.key,
     required this.votingPhase,
   });
 
