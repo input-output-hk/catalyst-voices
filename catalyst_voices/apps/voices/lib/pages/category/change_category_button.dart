@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices/widgets/dropdown/campaign_category_picker.dart';
@@ -7,14 +9,9 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart' hide PopupMenuItem;
 import 'package:flutter/material.dart';
 
-class ChangeCategoryButton extends StatefulWidget {
+class ChangeCategoryButton extends StatelessWidget {
   const ChangeCategoryButton({super.key});
 
-  @override
-  State<ChangeCategoryButton> createState() => _ChangeCategoryButtonState();
-}
-
-class _ChangeCategoryButtonState extends State<ChangeCategoryButton> {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<CategoryDetailCubit, CategoryDetailState,
@@ -33,7 +30,7 @@ class _ChangeCategoryButtonState extends State<ChangeCategoryButton> {
       },
       builder: (context, state) {
         return CampaignCategoryPicker(
-          onSelected: _changeCategory,
+          onSelected: (value) => unawaited(_changeCategory(context, value)),
           items: state,
           buttonBuilder: (
             context,
@@ -59,7 +56,7 @@ class _ChangeCategoryButtonState extends State<ChangeCategoryButton> {
     );
   }
 
-  Future<void> _changeCategory(ProposalsCategoryFilter value) async {
+  Future<void> _changeCategory(BuildContext context, ProposalsCategoryFilter value) async {
     final ref = value.ref;
     if (ref == null) {
       return;

@@ -255,8 +255,6 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> with 
       menuBuilder: (context) => const _PopupMenu(),
       onSelected: _handleEvent,
       routeSettings: const RouteSettings(name: '/account_menu'),
-      position: VoicesRawPopupMenuPosition.over,
-      menuOffset: Offset.zero,
     );
   }
 

@@ -22,7 +22,7 @@ class CampaignCategoryPicker extends StatelessWidget {
     required this.onSelected,
     this.menuKey,
     this.menuTitle,
-    this.menuOffset = const Offset(0, 48),
+    this.menuOffset = const Offset(0, 4),
     this.menuConstraints = const BoxConstraints(maxWidth: 400),
     this.menuWithIcons = true,
     this.buttonBuilder,
@@ -53,7 +53,6 @@ class CampaignCategoryPicker extends StatelessWidget {
       menuOffset: menuOffset,
       onSelected: onSelected,
       routeSettings: const RouteSettings(name: '/campaign-category-picker'),
-      position: VoicesRawPopupMenuPosition.over,
     );
   }
 }
