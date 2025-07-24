@@ -5,6 +5,7 @@ import 'package:catalyst_voices/common/formatters/duration_formatter.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_progress_indicator_weight.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -12,16 +13,16 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class VotingPhaseProgressCard extends StatefulWidget {
-  final VotingPhaseProgressViewModel votingPhase;
-
-  const VotingPhaseProgressCard({
-    super.key,
-    required this.votingPhase,
-  });
+class VotingPhaseProgressCardSelector extends StatelessWidget {
+  const VotingPhaseProgressCardSelector({super.key});
 
   @override
-  State<VotingPhaseProgressCard> createState() => _VotingPhaseProgressCardState();
+  Widget build(BuildContext context) {
+    return BlocSelector<VotingCubit, VotingState, VotingPhaseProgressViewModel>(
+      selector: (state) => state.votingPhase,
+      builder: (context, votingPhase) => _VotingPhaseProgressCard(votingPhase: votingPhase),
+    );
+  }
 }
 
 class _Captions extends StatelessWidget {
@@ -112,7 +113,22 @@ class _ProgressBar extends StatelessWidget {
   }
 }
 
-class _VotingPhaseProgressCardState extends State<VotingPhaseProgressCard> {
+class _VotingPhaseProgressCard extends StatefulWidget {
+  final VotingPhaseProgressViewModel votingPhase;
+
+  const _VotingPhaseProgressCard({
+    super.key,
+    required this.votingPhase,
+  });
+
+  @override
+  State<_VotingPhaseProgressCard> createState() => _VotingPhaseProgressCardState();
+}
+
+class _VotingPhaseProgressCardState extends State<_VotingPhaseProgressCard> {
+  static const _minWidth = 256.0;
+  static const _maxWidth = 570.0;
+
   late Timer _timer;
 
   @override
@@ -121,7 +137,10 @@ class _VotingPhaseProgressCardState extends State<VotingPhaseProgressCard> {
     final now = DateTimeExt.now();
     final progress = widget.votingPhase.progress(now);
 
+    final width = (MediaQuery.sizeOf(context).width * 0.35).clamp(_minWidth, _maxWidth);
+
     return Container(
+      width: width,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
       decoration: BoxDecoration(
         color: theme.colors.elevationsOnSurfaceNeutralLv1White,

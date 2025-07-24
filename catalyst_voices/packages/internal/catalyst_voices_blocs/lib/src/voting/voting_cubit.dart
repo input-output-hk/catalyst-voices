@@ -300,6 +300,7 @@ final class VotingCubit extends Cubit<VotingState>
     final filters = _cache.filters;
     final count = _cache.count;
 
+    final fundNumber = campaign?.fundNumber;
     final votingPowerViewModel = votingPower != null
         ? VotingPowerViewModel.fromModel(votingPower)
         : const VotingPowerViewModel();
@@ -310,6 +311,7 @@ final class VotingCubit extends Cubit<VotingState>
     final isOrderEnabled = _cache.filters.type == ProposalsFilterType.total;
 
     return state.copyWith(
+      fundNumber: fundNumber != null ? Optional(fundNumber) : const Optional.empty(),
       votingPower: votingPowerViewModel,
       votingPhase: votingPhaseViewModel,
       hasSearchQuery: hasSearchQuery,

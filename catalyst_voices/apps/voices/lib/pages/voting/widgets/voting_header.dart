@@ -3,7 +3,6 @@ import 'package:catalyst_voices/pages/voting/widgets/voting_phase_progress_card.
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class VotingHeader extends StatelessWidget {
@@ -38,24 +37,12 @@ class VotingHeader extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             spacing: 24,
             children: [
-              _VotingPhaseCard(),
-              _AccountVotingPowerCard(),
+              VotingPhaseProgressCardSelector(),
+              AccountVotingPowerCardSelector(),
             ],
           ),
         ),
       ],
-    );
-  }
-}
-
-class _AccountVotingPowerCard extends StatelessWidget {
-  const _AccountVotingPowerCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<VotingCubit, VotingState, VotingPowerViewModel>(
-      selector: (state) => state.votingPower,
-      builder: (context, votingPower) => AccountVotingPowerCard(votingPower: votingPower),
     );
   }
 }
@@ -90,28 +77,6 @@ class _CategoryPicker extends StatelessWidget {
       width: 100,
       height: 50,
       child: Placeholder(),
-    );
-  }
-}
-
-class _VotingPhaseCard extends StatelessWidget {
-  static const _minWidth = 256.0;
-  static const _maxWidth = 570.0;
-
-  const _VotingPhaseCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<VotingCubit, VotingState, VotingPhaseProgressViewModel>(
-      selector: (state) => state.votingPhase,
-      builder: (context, votingPhase) {
-
-        final width = (MediaQuery.sizeOf(context).width * 0.35).clamp(_minWidth, _maxWidth);
-        return SizedBox(
-          width: width,
-          child: VotingPhaseProgressCard(votingPhase: votingPhase),
-        );
-      },
     );
   }
 }
