@@ -90,7 +90,6 @@ impl SignedDocBody {
     /// format. By checking its metadata parts if one of them contains an empty
     /// `doc_locator`.
     pub(crate) fn is_deprecated(&self) -> Result<bool, anyhow::Error> {
-        // TODO: determine deprecation from cbor bytes payload
         if let Some(json_meta) = self.metadata() {
             let meta = catalyst_signed_doc::Metadata::from_json(json_meta.clone())?;
 
