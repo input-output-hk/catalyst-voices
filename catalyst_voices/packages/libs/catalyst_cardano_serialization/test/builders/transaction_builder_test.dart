@@ -486,5 +486,33 @@ void main() {
         hasLength(2),
       );
     });
+
+    test('transaction with too big asset name throws exception', () {
+      final txOutput = PreBabbageTransactionOutput(
+        address: testnetAddr,
+        amount: Balance(
+          coin: const Coin.fromWholeAda(10),
+          multiAsset: MultiAsset(
+            bundle: {
+              PolicyId(SelectionUtils.randomHexString(PolicyId.hashLength)): {
+                AssetName.bytes(List.filled(AssetName.maxLength * 2, 1)): const Coin(1000),
+              }
+            },
+          ),
+        ),
+      );
+
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(),
+        inputs: const {},
+        outputs: [txOutput],
+        fee: Coin.fromAda(0.2),
+      );
+
+      expect(
+        txBuilder.buildBody,
+        throwsA(isA<AssetNameTooLongException>()),
+      );
+    });
   });
 }

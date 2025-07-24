@@ -14,6 +14,23 @@ final class AssetDoesNotExistException extends Equatable implements Exception {
   String toString() => 'AssetDoesNotExistException';
 }
 
+/// Exception thrown when selected tx outputs holds assets with too long names.
+final class AssetNameTooLongException extends Equatable implements Exception {
+  /// List of invalid assets.
+  final List<AssetName> assets;
+
+  /// The default constructor for [AssetNameTooLongException].
+  const AssetNameTooLongException({
+    required this.assets,
+  });
+
+  @override
+  List<Object?> get props => [assets];
+
+  @override
+  String toString() => 'UtxoAssetNameTooLongException(${assets.join(',')})';
+}
+
 /// Exception thrown when parsing a hash that has incorrect length.
 final class HashFormatException extends Equatable implements Exception {
   /// Exception details.
@@ -390,21 +407,4 @@ final class TxValueSizeExceededException extends Equatable implements Exception 
       'actualValueSize:$actualValueSize'
       ', maxValueSize:$maxValueSize'
       ')';
-}
-
-/// Exception thrown when selected tx outputs holds assets with too long names.
-final class UtxoAssetNameTooLongException extends Equatable implements Exception {
-  /// List of invalid assets.
-  final List<AssetName> assets;
-
-  /// The default constructor for [UtxoAssetNameTooLongException].
-  const UtxoAssetNameTooLongException({
-    required this.assets,
-  });
-
-  @override
-  List<Object?> get props => [assets];
-
-  @override
-  String toString() => 'UtxoAssetNameTooLongException(${assets.join(',')})';
 }

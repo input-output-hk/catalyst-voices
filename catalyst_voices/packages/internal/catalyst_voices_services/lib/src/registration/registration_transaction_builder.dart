@@ -93,7 +93,7 @@ final class RegistrationTransactionBuilder {
       throw const RegistrationInsufficientBalanceException();
     } on InsufficientUtxoBalanceException {
       throw const RegistrationInsufficientBalanceException();
-    } on UtxoAssetNameTooLongException catch (e) {
+    } on AssetNameTooLongException catch (e) {
       throw RegistrationAssetNameTooLongException(assets: e.assets);
     }
   }
