@@ -771,7 +771,7 @@
   "@createProfileInstructionsTitle": {
     "description": "Title for account creation steps"
   },
-  "createProfileInstructionsMessage": "In the following account creation steps we will:\n\n1. Setup your profile\n2. Create your Catalyst Keychain\n3. Link Cardano wallet & roles\n\nTo ensure a smooth experience, completing your account setup in one session is essential—stay focused and avoid interruptions to finalize everything efficiently.\n\nMake sure your Cardano wallet has at least {amount} ADA before continuing.",
+  "createProfileInstructionsMessage": "In the following account creation steps we will:\n\n1. Setup your profile\n2. Create your Catalyst Keychain\n3. Link Cardano wallet & roles\n\nTo ensure a smooth experience, completing your account setup in one session is essential—stay focused and avoid interruptions to finalize everything efficiently. Make sure your Cardano wallet has at least {amount} ADA before continuing.",
   "@createProfileInstructionsMessage": {
     "description": "Information about account creation steps",
     "placeholders": {
@@ -862,7 +862,7 @@
   "@fund14ProposalSubmissionNotice": {
     "description": "Link to the Fund14 Proposal Submission Notice"
   },
-  "createProfileDrepApprovalContingency": "I understand proposals will not proceed to Community Review or Voting until Cardano DRep's have approved a Catalyst Budget proposal, as detailed in the {fund14ProposalSubmissionNotice}.",
+  "createProfileDrepApprovalContingency": "I understand that for my proposal to move to Community Review and/or Voting and be eligible for funding, the Project Catalyst budget proposal must first be approved by the Cardano DReps, as detailed in the {fund14ProposalSubmissionNotice}. If the budget is not approved, my proposal will not move forward and no funding will be provided.",
   "@createProfileDrepApprovalContingency": {
     "description": "Text acknowledging that the user is aware of the Drep Approval Contingency",
     "placeholders": {

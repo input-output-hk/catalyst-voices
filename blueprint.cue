@@ -1,4 +1,3 @@
-version: "1.0"
 global: {
 	ci: {
 		local: [
@@ -28,20 +27,22 @@ global: {
 			}
 
 			earthly: {
-				credentials: {
+				satellite: credentials: {
 					provider: "aws"
-					path:     "global/ci/earthly"
+					path:     "global/ci/ci-tls"
 				}
-				org:       "Catalyst"
-				satellite: "ci"
-				version:   "0.8.15"
+				version: "0.8.16"
 			}
 
 			github: registry: "ghcr.io"
 
-			kcl: {
-				install: true
-				version: "v0.11.0"
+			tailscale: {
+				credentials: {
+					provider: "aws"
+					path:     "global/ci/tailscale"
+				}
+				tags:    "tag:cat-github"
+				version: "latest"
 			}
 		}
 		secrets: [
