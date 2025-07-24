@@ -10,12 +10,16 @@ use std::{
 use cardano_blockchain_types::Network;
 use openssl::ssl::{SslContextBuilder, SslFiletype, SslMethod, SslVerifyMode};
 use scylla::{
-    frame::Compression, serialize::row::SerializeRow, transport::iterator::QueryPager,
-    ExecutionProfile, Session, SessionBuilder,
+    client::{
+        execution_profile::ExecutionProfile, pager::QueryPager, session::Session,
+        session_builder::SessionBuilder,
+    },
+    frame::Compression,
+    serialize::row::SerializeRow,
 };
 use thiserror::Error;
 use tokio::fs;
-use tracing::{error, info};
+use tracing::{debug, error, info};
 
 use super::{
     queries::{
@@ -26,7 +30,7 @@ use super::{
     schema::create_schema,
 };
 use crate::{
-    service::utilities::health::set_index_db_liveness,
+    service::utilities::health::{index_db_is_live, set_index_db_liveness},
     settings::{cassandra_db, Settings},
 };
 
@@ -140,8 +144,43 @@ impl CassandraSession {
     }
 
     /// Check to see if the Cassandra Indexing DB is ready for use
-    pub(crate) fn is_ready() -> bool {
-        PERSISTENT_SESSION.get().is_some() && VOLATILE_SESSION.get().is_some()
+    pub(crate) async fn is_ready() -> bool {
+        let persistent_ready = if let Some(cassandra) = PERSISTENT_SESSION.get() {
+            cassandra
+                .session
+                .refresh_metadata()
+                .await
+                .inspect_err(|e| {
+                    error!(error=%e, is_persistent=cassandra.is_persistent(), "Session connection failed");
+                })
+                .is_ok()
+        } else {
+            debug!(is_persistent = true, "Session has not been created");
+            false
+        };
+        let volatile_ready = if let Some(cassandra) = VOLATILE_SESSION.get() {
+            cassandra
+                .session
+                .refresh_metadata()
+                .await
+                .inspect_err(|e| {
+                    error!(error=%e, is_persistent=cassandra.is_persistent(), "Session connection failed");
+                })
+                .is_ok()
+        } else {
+            debug!(is_persistent = false, "Session has not been created");
+            false
+        };
+        let current_liveness = index_db_is_live();
+        let is_ready = persistent_ready && volatile_ready;
+        if is_ready {
+            if !current_liveness {
+                set_index_db_liveness(true);
+            }
+        } else if current_liveness {
+            set_index_db_liveness(false);
+        }
+        is_ready
     }
 
     /// Wait for the Cassandra Indexing DB to be ready before continuing
@@ -151,13 +190,11 @@ impl CassandraSession {
         loop {
             if !ignore_err {
                 if let Some(err) = INIT_SESSION_ERROR.get() {
-                    set_index_db_liveness(false);
                     return Err(err.clone());
                 }
             }
 
-            if Self::is_ready() {
-                set_index_db_liveness(true);
+            if Self::is_ready().await {
                 return Ok(());
             }
 
@@ -277,14 +314,14 @@ fn make_execution_profile(_cfg: &cassandra_db::EnvVars) -> ExecutionProfile {
     ExecutionProfile::builder()
         .consistency(scylla::statement::Consistency::LocalQuorum)
         .serial_consistency(Some(scylla::statement::SerialConsistency::LocalSerial))
-        .retry_policy(Arc::new(scylla::retry_policy::DefaultRetryPolicy::new()))
+        .retry_policy(Arc::new(scylla::policies::retry::DefaultRetryPolicy::new()))
         .load_balancing_policy(
-            scylla::load_balancing::DefaultPolicyBuilder::new()
+            scylla::policies::load_balancing::DefaultPolicyBuilder::new()
                 .permit_dc_failover(true)
                 .build(),
         )
         .speculative_execution_policy(Some(Arc::new(
-            scylla::speculative_execution::SimpleSpeculativeExecutionPolicy {
+            scylla::policies::speculative_execution::SimpleSpeculativeExecutionPolicy {
                 max_retry_count: 3,
                 retry_interval: Duration::from_millis(100),
             },
@@ -325,7 +362,7 @@ async fn make_session(cfg: &cassandra_db::EnvVars) -> anyhow::Result<Arc<Session
 
         let ssl_context = context_builder.build();
 
-        sb = sb.ssl_context(Some(ssl_context));
+        sb = sb.tls_context(Some(ssl_context));
     }
 
     // Set the username and password, if required.
