@@ -271,7 +271,10 @@ class _VoicesRawPopupMenuStateRoutePageLayout extends SingleChildLayoutDelegate 
     if (x < screen.left + padding.left) {
       x = screen.left + padding.left;
     } else if (x + childSize.width > screen.right - padding.right) {
-      x = screen.right - childSize.width - padding.right;
+      x = math.max(
+        buttonPosition.right - childSize.width,
+        screen.left + padding.left,
+      );
     }
 
     if (y < screen.top + padding.top) {
