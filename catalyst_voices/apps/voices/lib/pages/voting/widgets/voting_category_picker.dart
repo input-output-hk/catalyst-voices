@@ -48,7 +48,7 @@ class _CategorySelector extends StatelessWidget {
         for (final item in items) item.toDropdownItem(),
       ],
       onSelected: (value) {
-        context.read<ProposalsCubit>().changeSelectedCategory(value.ref);
+        context.read<VotingCubit>().changeSelectedCategory(value.ref);
       },
       menuTitle: context.l10n.catalystFundNo(fundNumber?.toString() ?? ''),
     );
