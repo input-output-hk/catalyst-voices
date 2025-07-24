@@ -402,7 +402,7 @@ enum NetworkId {
 }
 
 /// The hash of policy ID that minted native assets.
-final class PolicyId extends Equatable implements CborEncodable {
+final class PolicyId extends Equatable implements CborEncodable, Comparable<PolicyId> {
   /// The fixed byte length of a policy ID hash.
   static const hashLength = 28;
 
@@ -423,6 +423,21 @@ final class PolicyId extends Equatable implements CborEncodable {
 
   @override
   List<Object?> get props => [_bytes];
+
+  @override
+  int compareTo(PolicyId other) {
+    final minLength = _bytes.length < other._bytes.length ? _bytes.length : other._bytes.length;
+
+    for (var i = 0; i < minLength; i++) {
+      final comparison = _bytes[i].compareTo(other._bytes[i]);
+      if (comparison != 0) {
+        return comparison;
+      }
+    }
+
+    // If all elements are equal up to minLength, compare lengths
+    return _bytes.length.compareTo(other._bytes.length);
+  }
 
   /// Serializes the type as cbor.
   @override

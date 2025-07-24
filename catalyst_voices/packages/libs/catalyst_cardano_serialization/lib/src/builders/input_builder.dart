@@ -1,6 +1,5 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_cardano_serialization/src/builders/types.dart';
-import 'package:convert/convert.dart';
 
 /// A builder that constructs the minimal required transaction inputs from a set
 /// of inputs using a coin selection algorithm.
@@ -57,8 +56,7 @@ final class InputBuilder implements CoinSelector {
       }
     }
 
-    return assetMap.entries.toList()
-      ..sort((a, b) => hex.encode(b.key.$1.bytes).compareTo(hex.encode(a.key.$1.bytes)));
+    return assetMap.entries.toList()..sort((a, b) => a.key.$1.compareTo(b.key.$1));
   }
 
   /// Selects inputs to satisfy transaction outputs and fees.
