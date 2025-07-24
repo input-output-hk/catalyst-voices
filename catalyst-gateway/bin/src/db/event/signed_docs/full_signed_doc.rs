@@ -36,8 +36,6 @@ impl FullSignedDoc {
     pub(crate) fn new(
         body: SignedDocBody, payload: Option<serde_json::Value>, raw: Vec<u8>,
     ) -> Self {
-        let body = body.clone().to_new_version().unwrap_or(body);
-
         Self { body, payload, raw }
     }
 

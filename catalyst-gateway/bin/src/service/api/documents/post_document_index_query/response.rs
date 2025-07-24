@@ -247,9 +247,8 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
     type Error = anyhow::Error;
 
     fn try_from(doc: SignedDocBody) -> Result<Self, Self::Error> {
-        // this will accept only older version
-        let is_deprecated = doc.is_deprecated()?;
-        if is_deprecated {
+        // should allow deprecated only for this response
+        if !doc.is_deprecated()? {
             return Err(anyhow::anyhow!(DEPRECATED_MARK));
         }
 

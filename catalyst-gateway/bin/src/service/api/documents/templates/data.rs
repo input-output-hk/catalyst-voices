@@ -74,10 +74,8 @@ impl From<ProposalTemplateDocData> for SignedDocData {
         Self {
             id: value.0,
             ver: value.0,
-            doc_type: uuid::Uuid::parse_str(
-                &catalyst_signed_doc::doc_types::PROPOSAL.to_string(),
-            )
-            .expect("Failed to convert UUID"),
+            doc_type: uuid::Uuid::parse_str(&catalyst_signed_doc::doc_types::PROPOSAL.to_string())
+                .expect("Failed to convert UUID"),
             content: value.2,
             category_id: Some(value.1),
         }

@@ -87,61 +87,42 @@ impl SignedDocBody {
     }
 
     /// Checks if the given signed document is in the deprecated version of below v0.04
-    /// format.
-    ///
-    /// Returns a tuple `(doc_type_deprecated, doc_refs_deprecated)` where:
-    /// - `doc_type_deprecated`: `true` if the document type itself is marked as
-    ///   deprecated.
-    /// - `doc_refs_deprecated`: `true` if any document references are deprecated.
+    /// format. By checking its metadata parts if one of them contains an empty
+    /// `doc_locator`.
     pub(crate) fn is_deprecated(&self) -> Result<bool, anyhow::Error> {
         // TODO: determine deprecation from cbor bytes payload
         if let Some(json_meta) = self.metadata() {
             let meta = catalyst_signed_doc::Metadata::from_json(json_meta.clone())?;
 
-            if let Some(doc_refs) = meta.doc_ref() {
-                let doc_ref_old = doc_refs
+            let doc_refs_old = meta.doc_ref().is_some_and(|doc_refs| {
+                doc_refs
                     .doc_refs()
                     .iter()
-                    .any(|doc_ref| doc_ref.doc_locator().is_empty());
+                    .any(|doc_ref| doc_ref.doc_locator().is_empty())
+            });
+            let reply_old = meta.reply().is_some_and(|doc_refs| {
+                doc_refs
+                    .doc_refs()
+                    .iter()
+                    .any(|doc_ref| doc_ref.doc_locator().is_empty())
+            });
+            let template_old = meta.template().is_some_and(|doc_refs| {
+                doc_refs
+                    .doc_refs()
+                    .iter()
+                    .any(|doc_ref| doc_ref.doc_locator().is_empty())
+            });
+            let parameters_old = meta.parameters().is_some_and(|doc_refs| {
+                doc_refs
+                    .doc_refs()
+                    .iter()
+                    .any(|doc_ref| doc_ref.doc_locator().is_empty())
+            });
 
-                return Ok(doc_ref_old);
-            }
-
-            return Ok(false);
+            return Ok(doc_refs_old || reply_old || template_old || parameters_old);
         }
 
         Ok(false)
-    }
-
-    /// Converts the given signed document to the newer version of v0.04 if it is in the
-    /// deprecated version.
-    pub(crate) fn to_new_version(self) -> Result<SignedDocBody, anyhow::Error> {
-        let is_deprecated = self.is_deprecated()?;
-
-        if is_deprecated {
-            let metadata = if let Some(json_meta) = self.metadata() {
-                // note: transform metadata by decoding and encoding it again
-                // this will convert `brand_id`, `campaign_id` and `category_id` to `parameters`,
-                // and `ref` to new format
-                let meta = catalyst_signed_doc::Metadata::from_json(json_meta.clone())?;
-
-                Some(meta.to_json()?)
-            } else {
-                None
-            };
-
-            let doc = SignedDocBody::new(
-                *self.id(),
-                *self.ver(),
-                self.doc_type().clone(),
-                self.authors().clone(),
-                metadata,
-            );
-
-            Ok(doc)
-        } else {
-            Ok(self)
-        }
     }
 
     /// Loads a async stream of `SignedDocBody` from the event db.
