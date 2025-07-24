@@ -173,7 +173,7 @@ impl CertInsertQuery {
                 // witnessed.
                 (stake_address, addr, false)
             },
-            conway::StakeCredential::Scripthash(h) => {
+            conway::StakeCredential::ScriptHash(h) => {
                 (
                     StakeAddress::new(block.network(), true, h.into()),
                     None,
