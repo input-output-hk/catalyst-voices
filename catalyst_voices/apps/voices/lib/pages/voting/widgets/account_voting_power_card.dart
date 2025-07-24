@@ -2,9 +2,11 @@ import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/widgets/chips/voices_chip.dart';
 import 'package:catalyst_voices/widgets/text/timezone_date_time_text.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -13,11 +15,22 @@ import 'package:flutter/material.dart';
 /// when displayed one above the other.
 const _votingPowerWidth = 192.0;
 
-class AccountVotingPowerCard extends StatelessWidget {
+class AccountVotingPowerCardSelector extends StatelessWidget {
+  const AccountVotingPowerCardSelector({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<VotingCubit, VotingState, VotingPowerViewModel>(
+      selector: (state) => state.votingPower,
+      builder: (context, votingPower) => _AccountVotingPowerCard(votingPower: votingPower),
+    );
+  }
+}
+
+class _AccountVotingPowerCard extends StatelessWidget {
   final VotingPowerViewModel votingPower;
 
-  const AccountVotingPowerCard({
-    super.key,
+  const _AccountVotingPowerCard({
     required this.votingPower,
   });
 
@@ -57,7 +70,7 @@ class AccountVotingPowerCard extends StatelessWidget {
 }
 
 class _Status extends StatelessWidget {
-  final VotingPowerStatus status;
+  final VotingPowerStatus? status;
   final TextStyle labelStyle;
 
   const _Status({
@@ -95,6 +108,7 @@ class _Status extends StatelessWidget {
     return switch (status) {
       VotingPowerStatus.provisional => context.l10n.provisional,
       VotingPowerStatus.confirmed => context.l10n.confirmed,
+      null => '                ', // reserve space for actual status
     };
   }
 }
@@ -195,7 +209,7 @@ class _VotingPowerValueRow extends StatelessWidget {
           ),
         ),
         _UpdatedAt(
-          updatedAt: votingPower.updatedAt,
+          updatedAt: votingPower.updatedAt ?? DateTimeExt.now(),
           labelStyle: labelStyle,
         ),
       ],

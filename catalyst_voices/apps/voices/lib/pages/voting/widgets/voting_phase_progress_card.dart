@@ -5,6 +5,7 @@ import 'package:catalyst_voices/common/formatters/duration_formatter.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_progress_indicator_weight.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -12,20 +13,20 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class VotingPhaseProgressCard extends StatefulWidget {
-  final VotingPhaseProgressViewModel votingPhase;
-
-  const VotingPhaseProgressCard({
-    super.key,
-    required this.votingPhase,
-  });
+class VotingPhaseProgressCardSelector extends StatelessWidget {
+  const VotingPhaseProgressCardSelector({super.key});
 
   @override
-  State<VotingPhaseProgressCard> createState() => _VotingPhaseProgressCardState();
+  Widget build(BuildContext context) {
+    return BlocSelector<VotingCubit, VotingState, VotingPhaseProgressViewModel>(
+      selector: (state) => state.votingPhase,
+      builder: (context, votingPhase) => _VotingPhaseProgressCard(votingPhase: votingPhase),
+    );
+  }
 }
 
 class _Captions extends StatelessWidget {
-  final VotingPhaseProgressDetailsViewModel progress;
+  final VotingPhaseProgressDetailsViewModel? progress;
 
   const _Captions({required this.progress});
 
@@ -51,14 +52,18 @@ class _Captions extends StatelessWidget {
   }
 
   String _labelText(BuildContext context) {
-    return switch (progress.status) {
+    return switch (progress?.status) {
       CampaignPhaseStatus.upcoming => context.l10n.votingStarts,
       CampaignPhaseStatus.active => context.l10n.votingPhase,
       CampaignPhaseStatus.post => context.l10n.votingEnded,
+      null => '--',
     };
   }
 
   String _valueText(BuildContext context) {
+    final progress = this.progress;
+    if (progress == null) return '--';
+
     return switch (progress.status) {
       CampaignPhaseStatus.upcoming =>
         context.l10n.votingStartsIn(_formatDuration(context, progress.phaseEndsIn)),
@@ -70,21 +75,24 @@ class _Captions extends StatelessWidget {
 }
 
 class _DateRange extends StatelessWidget {
-  final DateRange dateRange;
+  final DateRange? dateRange;
 
   const _DateRange({required this.dateRange});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final dateRange = this.dateRange;
 
     return Text(
-      DateFormatter.formatDateRange(
-        MaterialLocalizations.of(context),
-        context.l10n,
-        dateRange,
-        formatSameWeek: false,
-      ),
+      dateRange != null
+          ? DateFormatter.formatDateRange(
+              MaterialLocalizations.of(context),
+              context.l10n,
+              dateRange,
+              formatSameWeek: false,
+            )
+          : '',
       style: theme.textTheme.bodyMedium?.copyWith(color: theme.colors.textOnPrimaryLevel1),
     );
   }
@@ -105,7 +113,21 @@ class _ProgressBar extends StatelessWidget {
   }
 }
 
-class _VotingPhaseProgressCardState extends State<VotingPhaseProgressCard> {
+class _VotingPhaseProgressCard extends StatefulWidget {
+  final VotingPhaseProgressViewModel votingPhase;
+
+  const _VotingPhaseProgressCard({
+    required this.votingPhase,
+  });
+
+  @override
+  State<_VotingPhaseProgressCard> createState() => _VotingPhaseProgressCardState();
+}
+
+class _VotingPhaseProgressCardState extends State<_VotingPhaseProgressCard> {
+  static const _minWidth = 256.0;
+  static const _maxWidth = 570.0;
+
   late Timer _timer;
 
   @override
@@ -114,7 +136,10 @@ class _VotingPhaseProgressCardState extends State<VotingPhaseProgressCard> {
     final now = DateTimeExt.now();
     final progress = widget.votingPhase.progress(now);
 
+    final width = (MediaQuery.sizeOf(context).width * 0.35).clamp(_minWidth, _maxWidth);
+
     return Container(
+      width: width,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
       decoration: BoxDecoration(
         color: theme.colors.elevationsOnSurfaceNeutralLv1White,
@@ -128,11 +153,11 @@ class _VotingPhaseProgressCardState extends State<VotingPhaseProgressCard> {
             size: 24,
           ),
           const Spacer(),
-          _VotingStatus(status: progress.status),
+          _VotingStatus(status: progress?.status),
           const SizedBox(height: 4),
           _DateRange(dateRange: widget.votingPhase.votingDateRange),
           const Spacer(),
-          _ProgressBar(value: progress.progressValue),
+          _ProgressBar(value: progress?.progressValue ?? 0),
           const SizedBox(height: 6),
           _Captions(progress: progress),
         ],
@@ -159,7 +184,7 @@ class _VotingPhaseProgressCardState extends State<VotingPhaseProgressCard> {
 }
 
 class _VotingStatus extends StatelessWidget {
-  final CampaignPhaseStatus status;
+  final CampaignPhaseStatus? status;
 
   const _VotingStatus({required this.status});
 
@@ -181,6 +206,7 @@ class _VotingStatus extends StatelessWidget {
       CampaignPhaseStatus.upcoming => context.l10n.getReadyToVote,
       CampaignPhaseStatus.active => context.l10n.votingIsOpen,
       CampaignPhaseStatus.post => context.l10n.votingIsClosed,
+      null => '--',
     };
   }
 }
