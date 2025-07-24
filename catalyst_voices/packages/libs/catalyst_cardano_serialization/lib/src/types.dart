@@ -4,7 +4,6 @@ import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
 import 'package:catalyst_cardano_serialization/src/utils/hex.dart';
 import 'package:cbor/cbor.dart';
-import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
 
 /// The name of a native asset.
@@ -32,17 +31,6 @@ final class AssetName extends Equatable implements CborEncodable {
 
   /// Returns true bytes value is too long.
   bool get isTooLong => _bytes.length > AssetName.maxLength;
-
-  /// Decoded name of this asset.
-  // FIXME(ilap): Handle non ASCII/UTF-8 characters.
-  String get name {
-    // check if hex
-    if (_bytes.length == 32) {
-      return hex.encode(_bytes);
-    }
-
-    return CborString.fromUtf8(_bytes).toString(allowMalformed: true);
-  }
 
   @override
   List<Object?> get props => [_bytes];
@@ -432,9 +420,6 @@ final class PolicyId extends Equatable implements CborEncodable {
 
   /// Original list of bytes for this [PolicyId].
   List<int> get bytes => List.unmodifiable(_bytes);
-
-  /// Hex encoded hash of [PolicyId].
-  String get hash => hex.encode(_bytes);
 
   @override
   List<Object?> get props => [_bytes];

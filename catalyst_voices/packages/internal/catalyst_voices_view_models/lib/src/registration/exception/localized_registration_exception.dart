@@ -37,7 +37,7 @@ final class LocalizedRegistrationAssetNameTooLongException extends LocalizedRegi
 
   @override
   String message(BuildContext context) {
-    final names = assets.map((e) => e.name).join(', ');
+    final names = assets.map((e) => '(${e.bytes.length}) -> ${e.bytes}').join(', ');
     return context.l10n.registrationAssetNameTooLong(names);
   }
 }

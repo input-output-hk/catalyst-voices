@@ -185,62 +185,61 @@ void main() {
     group('fromCbor', () {
       test('hex-encoded asset name decoding', () {
         // Given
-        final value = CborBytes(
-          [
-            200,
-            8,
-            224,
-            219,
-            215,
-            147,
-            62,
-            106,
-            252,
-            98,
-            34,
-            82,
-            226,
-            159,
-            236,
-            183,
-            53,
-            248,
-            42,
-            50,
-            135,
-            132,
-            161,
-            55,
-            147,
-            45,
-            102,
-            104,
-            209,
-            39,
-            190,
-            73,
-          ],
-        );
-        final expectedName = hex.encode(value.bytes);
+        final bytes = [
+          200,
+          8,
+          224,
+          219,
+          215,
+          147,
+          62,
+          106,
+          252,
+          98,
+          34,
+          82,
+          226,
+          159,
+          236,
+          183,
+          53,
+          248,
+          42,
+          50,
+          135,
+          132,
+          161,
+          55,
+          147,
+          45,
+          102,
+          104,
+          209,
+          39,
+          190,
+          73,
+        ];
+        final value = CborBytes(bytes);
 
         // When
         final assetName = AssetName.fromCbor(value);
 
         // Then
-        expect(assetName.name, expectedName);
+        expect(assetName.bytes, bytes);
         expect(assetName.toCbor().bytes, hasLength(32));
       });
 
       test('utf8-encoded asset name decoding', () {
         // Given
         const name = 'catalyst';
-        final value = CborBytes(utf8.encode(name));
+        final encoded = utf8.encode(name);
+        final value = CborBytes(encoded);
 
         // When
         final assetName = AssetName.fromCbor(value);
 
         // Then
-        expect(assetName.name, name);
+        expect(assetName.bytes, encoded);
       });
 
       test('empty name', () {
@@ -251,32 +250,7 @@ void main() {
         final assetName = AssetName.fromCbor(value);
 
         // Then
-        expect(assetName.name, isEmpty);
-      });
-    });
-
-    group('name', () {
-      test('utf8 is decoded as for as normal string', () {
-        // Given
-        const name = 'catalyst';
-        final bytes = utf8.encode(name);
-
-        // When
-        final assetName = AssetName.bytes(bytes);
-
-        // Then
-        expect(assetName.name, name);
-      });
-      test('hex is decoded as for as normal string', () {
-        // Given
-        const name = 'c808e0dbd7933e6afc622252e29fecb735f82a328784a137932d6668d127be49';
-        final bytes = hexDecode(name);
-
-        // When
-        final assetName = AssetName.bytes(bytes);
-
-        // Then
-        expect(assetName.name, name);
+        expect(assetName.bytes, isEmpty);
       });
     });
 
