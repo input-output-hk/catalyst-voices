@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/pages/voting/widgets/account_voting_power_card.dart';
+import 'package:catalyst_voices/pages/voting/widgets/voting_category_picker.dart';
 import 'package:catalyst_voices/pages/voting/widgets/voting_phase_progress_card.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -27,7 +28,7 @@ class VotingHeader extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             _CatalystFund(),
-            _CategoryPicker(),
+            VotingCategoryPickerSelector(),
           ],
         ),
         const SizedBox(height: 32),
@@ -63,20 +64,6 @@ class _CatalystFund extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class _CategoryPicker extends StatelessWidget {
-  const _CategoryPicker();
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO(dt-iohk): implement in https://github.com/input-output-hk/catalyst-voices/issues/2965
-    return const SizedBox(
-      width: 100,
-      height: 50,
-      child: Placeholder(),
     );
   }
 }
