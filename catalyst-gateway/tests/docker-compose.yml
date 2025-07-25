@@ -13,11 +13,10 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-
-  # runs migrations for the separate `postgres` service
-  event-db-migrations:
-    image: event-db:latest
-    container_name: event-db-migrations
+  
+  event-db-v2-migrations:
+    image: event-db:v2
+    container_name: event-db-v2-migrations
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
@@ -33,6 +32,26 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  # runs migrations for the separate `postgres` service
+  event-db-migrations:
+    image: event-db:latest
+    container_name: event-db-migrations
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=CatalystEventDev
+      - DB_DESCRIPTION="Catalyst Event DB"
+      - DB_SUPERUSER=postgres
+      - DB_SUPERUSER_PASSWORD=postgres
+      - DB_USER=catalyst-event-dev
+      - DB_USER_PASSWORD=CHANGE_ME
+
+      - INIT_AND_DROP_DB=false
+      - WITH_MIGRATIONS=true
+    depends_on:
+      event-db-v2-migrations:
+        condition: service_started
 
   scylla-node:
     image: scylladb/scylla:latest

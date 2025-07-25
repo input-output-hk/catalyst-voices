@@ -4,10 +4,16 @@ VERSION 0.8
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.4.7 AS spectral-ci
 IMPORT .. AS gateway
 
-docker-compose:
-    FROM scratch
-    COPY ./docker-compose.yml .
-    SAVE ARTIFACT ./docker-compose.yml
+# a special package for applying migrations only up to "V2_**"
+package-event-db-v2:
+    FROM github.com/input-output-hk/catalyst-voices/catalyst-gateway/event-db:event-db-old-signed-doc+build
+
+    WORKDIR /build
+
+    ARG container="event-db"
+    ARG tag="v2"
+
+    DO postgresql-ci+BUILD --image_name=${container} --image_tag=${tag}
 
 # build all necessary docker images required to run `docker-compose.yml` services
 prepare-all-images:
@@ -18,6 +24,7 @@ prepare-all-images:
     BUILD ./schemathesis_tests+package
     BUILD +package-postgres-runner
     BUILD +package-scylla-runner
+    BUILD +package-event-db-old-signed-doc
 
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.
