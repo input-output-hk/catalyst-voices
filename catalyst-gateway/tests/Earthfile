@@ -11,6 +11,8 @@ package-event-db-v2:
     ARG container="event-db"
     ARG tag="v2"
 
+    COPY --dir ./event_db_v2_seed_data ./seed
+
     SAVE IMAGE ${container}:${tag}
 
 # build all necessary docker images required to run `docker-compose.yml` services
