@@ -496,7 +496,7 @@ void main() {
             bundle: {
               PolicyId(SelectionUtils.randomHexString(PolicyId.hashLength)): {
                 AssetName.bytes(List.filled(AssetName.maxLength * 2, 1)): const Coin(1000),
-              }
+              },
             },
           ),
         ),

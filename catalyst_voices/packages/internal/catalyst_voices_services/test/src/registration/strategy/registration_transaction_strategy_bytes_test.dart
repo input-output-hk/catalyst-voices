@@ -488,7 +488,7 @@ void main() {
       expect(
         chunkedData,
         hasLength(greaterThan(1)),
-        reason: 'Lagre cert is split into multiple chunks',
+        reason: 'Large cert is split into multiple chunks',
       );
     });
 
