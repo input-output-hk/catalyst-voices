@@ -170,7 +170,9 @@ void main() {
 
       test('invalid hex (non-hex chars)', () {
         // Given
+        /* cSpell:disable */
         const name = 'abcxyz';
+        /* cSpell:enable */
         final expected = CborBytes(utf8.encode(name));
 
         // When
