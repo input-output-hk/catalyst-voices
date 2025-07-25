@@ -1,0 +1,926 @@
+<?xml version="1.0" encoding="utf-8"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" d2Version="v0.6.3-HEAD" preserveAspectRatio="xMinYMin meet" viewBox="0 0 2696 3908"><svg id="d2-svg" class="d2-1992443321" width="2696" height="3908" viewBox="-89 -204 2696 3908"><rect x="-89.000000" y="-204.000000" width="2696.000000" height="3908.000000" rx="0.000000" class=" fill-N7" stroke-width="0" /><style type="text/css"><![CDATA[
+.d2-1992443321 .text {
+	font-family: "d2-1992443321-font-regular";
+}
+@font-face {
+	font-family: d2-1992443321-font-regular;
+	src: url("data:application/font-woff;base64,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");
+}
+@font-face {
+	font-family: d2-1992443321-font-semibold;
+	src: url("data:application/font-woff;base64,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");
+}
+@keyframes dashdraw {
+	from {
+		stroke-dashoffset: 0;
+	}
+}
+
+.appendix-icon {
+	filter: drop-shadow(0px 0px 32px rgba(31, 36, 58, 0.1));
+}
+.d2-1992443321 .text-italic {
+	font-family: "d2-1992443321-font-italic";
+}
+@font-face {
+	font-family: d2-1992443321-font-italic;
+	src: url("data:application/font-woff;base64,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");
+}]]></style><style type="text/css"><![CDATA[.shape {
+  shape-rendering: geometricPrecision;
+  stroke-linejoin: round;
+}
+.connection {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.blend {
+  mix-blend-mode: multiply;
+  opacity: 0.5;
+}
+
+		.d2-1992443321 .fill-N1{fill:#0A0F25;}
+		.d2-1992443321 .fill-N2{fill:#676C7E;}
+		.d2-1992443321 .fill-N3{fill:#9499AB;}
+		.d2-1992443321 .fill-N4{fill:#CFD2DD;}
+		.d2-1992443321 .fill-N5{fill:#DEE1EB;}
+		.d2-1992443321 .fill-N6{fill:#EEF1F8;}
+		.d2-1992443321 .fill-N7{fill:#FFFFFF;}
+		.d2-1992443321 .fill-B1{fill:#0D32B2;}
+		.d2-1992443321 .fill-B2{fill:#0D32B2;}
+		.d2-1992443321 .fill-B3{fill:#E3E9FD;}
+		.d2-1992443321 .fill-B4{fill:#E3E9FD;}
+		.d2-1992443321 .fill-B5{fill:#EDF0FD;}
+		.d2-1992443321 .fill-B6{fill:#F7F8FE;}
+		.d2-1992443321 .fill-AA2{fill:#4A6FF3;}
+		.d2-1992443321 .fill-AA4{fill:#EDF0FD;}
+		.d2-1992443321 .fill-AA5{fill:#F7F8FE;}
+		.d2-1992443321 .fill-AB4{fill:#EDF0FD;}
+		.d2-1992443321 .fill-AB5{fill:#F7F8FE;}
+		.d2-1992443321 .stroke-N1{stroke:#0A0F25;}
+		.d2-1992443321 .stroke-N2{stroke:#676C7E;}
+		.d2-1992443321 .stroke-N3{stroke:#9499AB;}
+		.d2-1992443321 .stroke-N4{stroke:#CFD2DD;}
+		.d2-1992443321 .stroke-N5{stroke:#DEE1EB;}
+		.d2-1992443321 .stroke-N6{stroke:#EEF1F8;}
+		.d2-1992443321 .stroke-N7{stroke:#FFFFFF;}
+		.d2-1992443321 .stroke-B1{stroke:#0D32B2;}
+		.d2-1992443321 .stroke-B2{stroke:#0D32B2;}
+		.d2-1992443321 .stroke-B3{stroke:#E3E9FD;}
+		.d2-1992443321 .stroke-B4{stroke:#E3E9FD;}
+		.d2-1992443321 .stroke-B5{stroke:#EDF0FD;}
+		.d2-1992443321 .stroke-B6{stroke:#F7F8FE;}
+		.d2-1992443321 .stroke-AA2{stroke:#4A6FF3;}
+		.d2-1992443321 .stroke-AA4{stroke:#EDF0FD;}
+		.d2-1992443321 .stroke-AA5{stroke:#F7F8FE;}
+		.d2-1992443321 .stroke-AB4{stroke:#EDF0FD;}
+		.d2-1992443321 .stroke-AB5{stroke:#F7F8FE;}
+		.d2-1992443321 .background-color-N1{background-color:#0A0F25;}
+		.d2-1992443321 .background-color-N2{background-color:#676C7E;}
+		.d2-1992443321 .background-color-N3{background-color:#9499AB;}
+		.d2-1992443321 .background-color-N4{background-color:#CFD2DD;}
+		.d2-1992443321 .background-color-N5{background-color:#DEE1EB;}
+		.d2-1992443321 .background-color-N6{background-color:#EEF1F8;}
+		.d2-1992443321 .background-color-N7{background-color:#FFFFFF;}
+		.d2-1992443321 .background-color-B1{background-color:#0D32B2;}
+		.d2-1992443321 .background-color-B2{background-color:#0D32B2;}
+		.d2-1992443321 .background-color-B3{background-color:#E3E9FD;}
+		.d2-1992443321 .background-color-B4{background-color:#E3E9FD;}
+		.d2-1992443321 .background-color-B5{background-color:#EDF0FD;}
+		.d2-1992443321 .background-color-B6{background-color:#F7F8FE;}
+		.d2-1992443321 .background-color-AA2{background-color:#4A6FF3;}
+		.d2-1992443321 .background-color-AA4{background-color:#EDF0FD;}
+		.d2-1992443321 .background-color-AA5{background-color:#F7F8FE;}
+		.d2-1992443321 .background-color-AB4{background-color:#EDF0FD;}
+		.d2-1992443321 .background-color-AB5{background-color:#F7F8FE;}
+		.d2-1992443321 .color-N1{color:#0A0F25;}
+		.d2-1992443321 .color-N2{color:#676C7E;}
+		.d2-1992443321 .color-N3{color:#9499AB;}
+		.d2-1992443321 .color-N4{color:#CFD2DD;}
+		.d2-1992443321 .color-N5{color:#DEE1EB;}
+		.d2-1992443321 .color-N6{color:#EEF1F8;}
+		.d2-1992443321 .color-N7{color:#FFFFFF;}
+		.d2-1992443321 .color-B1{color:#0D32B2;}
+		.d2-1992443321 .color-B2{color:#0D32B2;}
+		.d2-1992443321 .color-B3{color:#E3E9FD;}
+		.d2-1992443321 .color-B4{color:#E3E9FD;}
+		.d2-1992443321 .color-B5{color:#EDF0FD;}
+		.d2-1992443321 .color-B6{color:#F7F8FE;}
+		.d2-1992443321 .color-AA2{color:#4A6FF3;}
+		.d2-1992443321 .color-AA4{color:#EDF0FD;}
+		.d2-1992443321 .color-AA5{color:#F7F8FE;}
+		.d2-1992443321 .color-AB4{color:#EDF0FD;}
+		.d2-1992443321 .color-AB5{color:#F7F8FE;}.appendix text.text{fill:#0A0F25}.md{--color-fg-default:#0A0F25;--color-fg-muted:#676C7E;--color-fg-subtle:#9499AB;--color-canvas-default:#FFFFFF;--color-canvas-subtle:#EEF1F8;--color-border-default:#0D32B2;--color-border-muted:#0D32B2;--color-neutral-muted:#EEF1F8;--color-accent-fg:#0D32B2;--color-accent-emphasis:#0D32B2;--color-attention-subtle:#676C7E;--color-danger-fg:red;}.sketch-overlay-B1{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-B2{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-B3{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-B4{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-B5{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-B6{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-AA2{fill:url(#streaks-dark);mix-blend-mode:overlay}.sketch-overlay-AA4{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-AA5{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-AB4{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-AB5{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-N1{fill:url(#streaks-darker);mix-blend-mode:lighten}.sketch-overlay-N2{fill:url(#streaks-dark);mix-blend-mode:overlay}.sketch-overlay-N3{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-N4{fill:url(#streaks-normal);mix-blend-mode:color-burn}.sketch-overlay-N5{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-N6{fill:url(#streaks-bright);mix-blend-mode:darken}.sketch-overlay-N7{fill:url(#streaks-bright);mix-blend-mode:darken}.light-code{display: block}.dark-code{display: none}]]></style><style type="text/css">.d2-1992443321 .md em,
+.d2-1992443321 .md dfn {
+  font-family: "d2-1992443321-font-italic";
+}
+
+.d2-1992443321 .md b,
+.d2-1992443321 .md strong {
+  font-family: "d2-1992443321-font-bold";
+}
+
+.d2-1992443321 .md code,
+.d2-1992443321 .md kbd,
+.d2-1992443321 .md pre,
+.d2-1992443321 .md samp {
+  font-family: "d2-1992443321-font-mono";
+  font-size: 1em;
+}
+
+.d2-1992443321 .md {
+  tab-size: 4;
+}
+
+/* variables are provided in d2renderers/d2svg/d2svg.go */
+
+.d2-1992443321 .md {
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  margin: 0;
+  color: var(--color-fg-default);
+  background-color: transparent; /* we don't want to define the background color */
+  font-family: "d2-1992443321-font-regular";
+  font-size: 16px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.d2-1992443321 .md details,
+.d2-1992443321 .md figcaption,
+.d2-1992443321 .md figure {
+  display: block;
+}
+
+.d2-1992443321 .md summary {
+  display: list-item;
+}
+
+.d2-1992443321 .md [hidden] {
+  display: none !important;
+}
+
+.d2-1992443321 .md a {
+  background-color: transparent;
+  color: var(--color-accent-fg);
+  text-decoration: none;
+}
+
+.d2-1992443321 .md a:active,
+.d2-1992443321 .md a:hover {
+  outline-width: 0;
+}
+
+.d2-1992443321 .md abbr[title] {
+  border-bottom: none;
+  text-decoration: underline dotted;
+}
+
+.d2-1992443321 .md dfn {
+  font-style: italic;
+}
+
+.d2-1992443321 .md h1 {
+  margin: 0.67em 0;
+  padding-bottom: 0.3em;
+  font-size: 2em;
+  border-bottom: 1px solid var(--color-border-muted);
+}
+
+.d2-1992443321 .md mark {
+  background-color: var(--color-attention-subtle);
+  color: var(--color-text-primary);
+}
+
+.d2-1992443321 .md small {
+  font-size: 90%;
+}
+
+.d2-1992443321 .md sub,
+.d2-1992443321 .md sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+.d2-1992443321 .md sub {
+  bottom: -0.25em;
+}
+
+.d2-1992443321 .md sup {
+  top: -0.5em;
+}
+
+.d2-1992443321 .md img {
+  border-style: none;
+  max-width: 100%;
+  box-sizing: content-box;
+  background-color: var(--color-canvas-default);
+}
+
+.d2-1992443321 .md figure {
+  margin: 1em 40px;
+}
+
+.d2-1992443321 .md hr {
+  box-sizing: content-box;
+  overflow: hidden;
+  background: transparent;
+  border-bottom: 1px solid var(--color-border-muted);
+  height: 0.25em;
+  padding: 0;
+  margin: 24px 0;
+  background-color: var(--color-border-default);
+  border: 0;
+}
+
+.d2-1992443321 .md input {
+  font: inherit;
+  margin: 0;
+  overflow: visible;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.d2-1992443321 .md [type="button"],
+.d2-1992443321 .md [type="reset"],
+.d2-1992443321 .md [type="submit"] {
+  -webkit-appearance: button;
+}
+
+.d2-1992443321 .md [type="button"]::-moz-focus-inner,
+.d2-1992443321 .md [type="reset"]::-moz-focus-inner,
+.d2-1992443321 .md [type="submit"]::-moz-focus-inner {
+  border-style: none;
+  padding: 0;
+}
+
+.d2-1992443321 .md [type="button"]:-moz-focusring,
+.d2-1992443321 .md [type="reset"]:-moz-focusring,
+.d2-1992443321 .md [type="submit"]:-moz-focusring {
+  outline: 1px dotted ButtonText;
+}
+
+.d2-1992443321 .md [type="checkbox"],
+.d2-1992443321 .md [type="radio"] {
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.d2-1992443321 .md [type="number"]::-webkit-inner-spin-button,
+.d2-1992443321 .md [type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+
+.d2-1992443321 .md [type="search"] {
+  -webkit-appearance: textfield;
+  outline-offset: -2px;
+}
+
+.d2-1992443321 .md [type="search"]::-webkit-search-cancel-button,
+.d2-1992443321 .md [type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+.d2-1992443321 .md ::-webkit-input-placeholder {
+  color: inherit;
+  opacity: 0.54;
+}
+
+.d2-1992443321 .md ::-webkit-file-upload-button {
+  -webkit-appearance: button;
+  font: inherit;
+}
+
+.d2-1992443321 .md a:hover {
+  text-decoration: underline;
+}
+
+.d2-1992443321 .md hr::before {
+  display: table;
+  content: "";
+}
+
+.d2-1992443321 .md hr::after {
+  display: table;
+  clear: both;
+  content: "";
+}
+
+.d2-1992443321 .md table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow: auto;
+}
+
+.d2-1992443321 .md td,
+.d2-1992443321 .md th {
+  padding: 0;
+}
+
+.d2-1992443321 .md details summary {
+  cursor: pointer;
+}
+
+.d2-1992443321 .md details:not([open]) > *:not(summary) {
+  display: none !important;
+}
+
+.d2-1992443321 .md kbd {
+  display: inline-block;
+  padding: 3px 5px;
+  color: var(--color-fg-default);
+  vertical-align: middle;
+  background-color: var(--color-canvas-subtle);
+  border: solid 1px var(--color-neutral-muted);
+  border-bottom-color: var(--color-neutral-muted);
+  border-radius: 6px;
+  box-shadow: inset 0 -1px 0 var(--color-neutral-muted);
+}
+
+.d2-1992443321 .md h1,
+.d2-1992443321 .md h2,
+.d2-1992443321 .md h3,
+.d2-1992443321 .md h4,
+.d2-1992443321 .md h5,
+.d2-1992443321 .md h6 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 400;
+  line-height: 1.25;
+  font-family: "d2-1992443321-font-semibold";
+}
+
+.d2-1992443321 .md h2 {
+  padding-bottom: 0.3em;
+  font-size: 1.5em;
+  border-bottom: 1px solid var(--color-border-muted);
+}
+
+.d2-1992443321 .md h3 {
+  font-size: 1.25em;
+}
+
+.d2-1992443321 .md h4 {
+  font-size: 1em;
+}
+
+.d2-1992443321 .md h5 {
+  font-size: 0.875em;
+}
+
+.d2-1992443321 .md h6 {
+  font-size: 0.85em;
+  color: var(--color-fg-muted);
+}
+
+.d2-1992443321 .md p {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.d2-1992443321 .md blockquote {
+  margin: 0;
+  padding: 0 1em;
+  color: var(--color-fg-muted);
+  border-left: 0.25em solid var(--color-border-default);
+}
+
+.d2-1992443321 .md ul,
+.d2-1992443321 .md ol {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-left: 2em;
+}
+
+.d2-1992443321 .md ol ol,
+.d2-1992443321 .md ul ol {
+  list-style-type: lower-roman;
+}
+
+.d2-1992443321 .md ul ul ol,
+.d2-1992443321 .md ul ol ol,
+.d2-1992443321 .md ol ul ol,
+.d2-1992443321 .md ol ol ol {
+  list-style-type: lower-alpha;
+}
+
+.d2-1992443321 .md dd {
+  margin-left: 0;
+}
+
+.d2-1992443321 .md pre {
+  margin-top: 0;
+  margin-bottom: 0;
+  word-wrap: normal;
+}
+
+.d2-1992443321 .md ::placeholder {
+  color: var(--color-fg-subtle);
+  opacity: 1;
+}
+
+.d2-1992443321 .md input::-webkit-outer-spin-button,
+.d2-1992443321 .md input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.d2-1992443321 .md::before {
+  display: table;
+  content: "";
+}
+
+.d2-1992443321 .md::after {
+  display: table;
+  clear: both;
+  content: "";
+}
+
+.d2-1992443321 .md > *:first-child {
+  margin-top: 0 !important;
+}
+
+.d2-1992443321 .md > *:last-child {
+  margin-bottom: 0 !important;
+}
+
+.d2-1992443321 .md a:not([href]) {
+  color: inherit;
+  text-decoration: none;
+}
+
+.d2-1992443321 .md .absent {
+  color: var(--color-danger-fg);
+}
+
+.d2-1992443321 .md .anchor {
+  float: left;
+  padding-right: 4px;
+  margin-left: -20px;
+  line-height: 1;
+}
+
+.d2-1992443321 .md .anchor:focus {
+  outline: none;
+}
+
+.d2-1992443321 .md p,
+.d2-1992443321 .md blockquote,
+.d2-1992443321 .md ul,
+.d2-1992443321 .md ol,
+.d2-1992443321 .md dl,
+.d2-1992443321 .md table,
+.d2-1992443321 .md pre,
+.d2-1992443321 .md details {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.d2-1992443321 .md blockquote > :first-child {
+  margin-top: 0;
+}
+
+.d2-1992443321 .md blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.d2-1992443321 .md sup > a::before {
+  content: "[";
+}
+
+.d2-1992443321 .md sup > a::after {
+  content: "]";
+}
+
+.d2-1992443321 .md h1:hover .anchor,
+.d2-1992443321 .md h2:hover .anchor,
+.d2-1992443321 .md h3:hover .anchor,
+.d2-1992443321 .md h4:hover .anchor,
+.d2-1992443321 .md h5:hover .anchor,
+.d2-1992443321 .md h6:hover .anchor {
+  text-decoration: none;
+}
+
+.d2-1992443321 .md h1 tt,
+.d2-1992443321 .md h1 code,
+.d2-1992443321 .md h2 tt,
+.d2-1992443321 .md h2 code,
+.d2-1992443321 .md h3 tt,
+.d2-1992443321 .md h3 code,
+.d2-1992443321 .md h4 tt,
+.d2-1992443321 .md h4 code,
+.d2-1992443321 .md h5 tt,
+.d2-1992443321 .md h5 code,
+.d2-1992443321 .md h6 tt,
+.d2-1992443321 .md h6 code {
+  padding: 0 0.2em;
+  font-size: inherit;
+}
+
+.d2-1992443321 .md ul.no-list,
+.d2-1992443321 .md ol.no-list {
+  padding: 0;
+  list-style-type: none;
+}
+
+.d2-1992443321 .md ol[type="1"] {
+  list-style-type: decimal;
+}
+
+.d2-1992443321 .md ol[type="a"] {
+  list-style-type: lower-alpha;
+}
+
+.d2-1992443321 .md ol[type="i"] {
+  list-style-type: lower-roman;
+}
+
+.d2-1992443321 .md div > ol:not([type]) {
+  list-style-type: decimal;
+}
+
+.d2-1992443321 .md ul ul,
+.d2-1992443321 .md ul ol,
+.d2-1992443321 .md ol ol,
+.d2-1992443321 .md ol ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.d2-1992443321 .md li > p {
+  margin-top: 16px;
+}
+
+.d2-1992443321 .md li + li {
+  margin-top: 0.25em;
+}
+
+.d2-1992443321 .md dl {
+  padding: 0;
+}
+
+.d2-1992443321 .md dl dt {
+  padding: 0;
+  margin-top: 16px;
+  font-size: 1em;
+  font-style: italic;
+  font-family: "d2-1992443321-font-semibold";
+}
+
+.d2-1992443321 .md dl dd {
+  padding: 0 16px;
+  margin-bottom: 16px;
+}
+
+.d2-1992443321 .md table th {
+  font-family: "d2-1992443321-font-semibold";
+}
+
+.d2-1992443321 .md table th,
+.d2-1992443321 .md table td {
+  padding: 6px 13px;
+  border: 1px solid var(--color-border-default);
+}
+
+.d2-1992443321 .md table tr {
+  background-color: var(--color-canvas-default);
+  border-top: 1px solid var(--color-border-muted);
+}
+
+.d2-1992443321 .md table tr:nth-child(2n) {
+  background-color: var(--color-canvas-subtle);
+}
+
+.d2-1992443321 .md table img {
+  background-color: transparent;
+}
+
+.d2-1992443321 .md img[align="right"] {
+  padding-left: 20px;
+}
+
+.d2-1992443321 .md img[align="left"] {
+  padding-right: 20px;
+}
+
+.d2-1992443321 .md span.frame {
+  display: block;
+  overflow: hidden;
+}
+
+.d2-1992443321 .md span.frame > span {
+  display: block;
+  float: left;
+  width: auto;
+  padding: 7px;
+  margin: 13px 0 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border-default);
+}
+
+.d2-1992443321 .md span.frame span img {
+  display: block;
+  float: left;
+}
+
+.d2-1992443321 .md span.frame span span {
+  display: block;
+  padding: 5px 0 0;
+  clear: both;
+  color: var(--color-fg-default);
+}
+
+.d2-1992443321 .md span.align-center {
+  display: block;
+  overflow: hidden;
+  clear: both;
+}
+
+.d2-1992443321 .md span.align-center > span {
+  display: block;
+  margin: 13px auto 0;
+  overflow: hidden;
+  text-align: center;
+}
+
+.d2-1992443321 .md span.align-center span img {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.d2-1992443321 .md span.align-right {
+  display: block;
+  overflow: hidden;
+  clear: both;
+}
+
+.d2-1992443321 .md span.align-right > span {
+  display: block;
+  margin: 13px 0 0;
+  overflow: hidden;
+  text-align: right;
+}
+
+.d2-1992443321 .md span.align-right span img {
+  margin: 0;
+  text-align: right;
+}
+
+.d2-1992443321 .md span.float-left {
+  display: block;
+  float: left;
+  margin-right: 13px;
+  overflow: hidden;
+}
+
+.d2-1992443321 .md span.float-left span {
+  margin: 13px 0 0;
+}
+
+.d2-1992443321 .md span.float-right {
+  display: block;
+  float: right;
+  margin-left: 13px;
+  overflow: hidden;
+}
+
+.d2-1992443321 .md span.float-right > span {
+  display: block;
+  margin: 13px auto 0;
+  overflow: hidden;
+  text-align: right;
+}
+
+.d2-1992443321 .md code,
+.d2-1992443321 .md tt {
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  background-color: var(--color-neutral-muted);
+  border-radius: 6px;
+}
+
+.d2-1992443321 .md code br,
+.d2-1992443321 .md tt br {
+  display: none;
+}
+
+.d2-1992443321 .md del code {
+  text-decoration: inherit;
+}
+
+.d2-1992443321 .md pre code {
+  font-size: 100%;
+}
+
+.d2-1992443321 .md pre > code {
+  padding: 0;
+  margin: 0;
+  word-break: normal;
+  white-space: pre;
+  background: transparent;
+  border: 0;
+}
+
+.d2-1992443321 .md .highlight {
+  margin-bottom: 16px;
+}
+
+.d2-1992443321 .md .highlight pre {
+  margin-bottom: 0;
+  word-break: normal;
+}
+
+.d2-1992443321 .md .highlight pre,
+.d2-1992443321 .md pre {
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: var(--color-canvas-subtle);
+  border-radius: 6px;
+}
+
+.d2-1992443321 .md pre code,
+.d2-1992443321 .md pre tt {
+  display: inline;
+  max-width: auto;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  line-height: inherit;
+  word-wrap: normal;
+  background-color: transparent;
+  border: 0;
+}
+
+.d2-1992443321 .md .csv-data td,
+.d2-1992443321 .md .csv-data th {
+  padding: 5px;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.d2-1992443321 .md .csv-data .blob-num {
+  padding: 10px 8px 9px;
+  text-align: right;
+  background: var(--color-canvas-default);
+  border: 0;
+}
+
+.d2-1992443321 .md .csv-data tr {
+  border-top: 0;
+}
+
+.d2-1992443321 .md .csv-data th {
+  font-family: "d2-1992443321-font-semibold";
+  background: var(--color-canvas-subtle);
+  border-top: 0;
+}
+
+.d2-1992443321 .md .footnotes {
+  font-size: 12px;
+  color: var(--color-fg-muted);
+  border-top: 1px solid var(--color-border-default);
+}
+
+.d2-1992443321 .md .footnotes ol {
+  padding-left: 16px;
+}
+
+.d2-1992443321 .md .footnotes li {
+  position: relative;
+}
+
+.d2-1992443321 .md .footnotes li:target::before {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  bottom: -8px;
+  left: -24px;
+  pointer-events: none;
+  content: "";
+  border: 2px solid var(--color-accent-emphasis);
+  border-radius: 6px;
+}
+
+.d2-1992443321 .md .footnotes li:target {
+  color: var(--color-fg-default);
+}
+
+.d2-1992443321 .md .task-list-item {
+  list-style-type: none;
+}
+
+.d2-1992443321 .md .task-list-item label {
+  font-weight: 400;
+}
+
+.d2-1992443321 .md .task-list-item.enabled label {
+  cursor: pointer;
+}
+
+.d2-1992443321 .md .task-list-item + .task-list-item {
+  margin-top: 3px;
+}
+
+.d2-1992443321 .md .task-list-item .handle {
+  display: none;
+}
+
+.d2-1992443321 .md .task-list-item-checkbox {
+  margin: 0 0.2em 0.25em -1.6em;
+  vertical-align: middle;
+}
+
+.d2-1992443321 .md .contains-task-list:dir(rtl) .task-list-item-checkbox {
+  margin: 0 -1.6em 0.25em 0.2em;
+}
+</style><g id="title"><g class="shape" ></g><g><foreignObject requiredFeatures="http://www.w3.org/TR/SVG11/feature#Extensibility" x="816.000000" y="-103.000000" width="800" height="95"><div xmlns="http://www.w3.org/1999/xhtml" class="md" style="font-size:30px"><h1>x509 Transaction - Complete</h1>
+</div></foreignObject></g></g><a href="https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L13-L18" xlink:href="https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L13-L18"><g id="individual_transaction"><g class="shape" ><rect x="100.000000" y="12.000000" width="364.000000" height="144.000000" class="shape stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="100.000000" y="12.000000" width="364.000000" height="36.000000" class="class_header fill-N1" /><text x="110.000000" y="37.750000" class="text fill-N7" style="text-anchor:start;font-size:24px">Cardano Transaction</text><text x="110.000000" y="71.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">body</text><text x="248.000000" y="71.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">transaction body</text><text x="454.000000" y="71.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="100.000000" x2="464.000000" y1="84.000000" y2="84.000000" class=" stroke-N1" style="stroke-width:2" /><text x="110.000000" y="107.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">auxiliary_data</text><text x="248.000000" y="107.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">Option&lt;auxiliary_data&gt;</text><text x="454.000000" y="107.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="100.000000" x2="464.000000" y1="120.000000" y2="120.000000" class=" stroke-N1" style="stroke-width:2" /><text x="110.000000" y="143.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">witnesses</text><text x="248.000000" y="143.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">transaction witness set</text><text x="454.000000" y="143.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="100.000000" x2="464.000000" y1="156.000000" y2="156.000000" class=" stroke-N1" style="stroke-width:2" /></g></g></a><a href="https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L53-L71" xlink:href="https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L53-L71"><g id="transaction_body"><g class="shape" ><rect x="1633.000000" y="2118.000000" width="787.000000" height="648.000000" class="shape stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="1633.000000" y="2118.000000" width="787.000000" height="36.000000" class="class_header fill-N1" /><text x="1643.000000" y="2143.750000" class="text fill-N7" style="text-anchor:start;font-size:24px">transaction body</text><text x="1643.000000" y="2177.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">0 = transaction inputs</text><text x="1932.000000" y="2177.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[ * [transaction hash, index] ]</text><text x="2410.000000" y="2177.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2190.000000" y2="2190.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1643.000000" y="2213.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">1 = transaction outputs</text><text x="1932.000000" y="2213.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[ * transaction_output ]</text><text x="2410.000000" y="2213.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2226.000000" y2="2226.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1643.000000" y="2249.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">2 = transaction fee</text><text x="1932.000000" y="2249.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">coin (lovelace uint64)</text><text x="2410.000000" y="2249.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2262.000000" y2="2262.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1643.000000" y="2285.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 3 = Time to live [TTL]</text><text x="1932.000000" y="2285.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">uint64</text><text x="2410.000000" y="2285.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2298.000000" y2="2298.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1643.000000" y="2321.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 4 = certificates</text><text x="1932.000000" y="2321.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[* certificate]</text><text x="2410.000000" y="2321.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2334.000000" y2="2334.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1643.000000" y="2357.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 5 = reward withdrawals</text><text x="1932.000000" y="2357.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">{ * reward_account =&gt; coin (lovelace uint64) }</text><text x="2410.000000" y="2357.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2370.000000" y2="2370.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1643.000000" y="2393.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 6 = protocol parameter update</text><text x="1932.000000" y="2393.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[ proposed_protocol_parameter_updates, epoch ]</text><text x="2410.000000" y="2393.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2406.000000" y2="2406.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1643.000000" y="2429.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 7 = auxiliary_data_hash</text><text x="1932.000000" y="2429.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">32 byte hash</text><text x="2410.000000" y="2429.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2442.000000" y2="2442.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1643.000000" y="2465.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 8 = validity interval start</text><text x="1932.000000" y="2465.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">uint64</text><text x="2410.000000" y="2465.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2478.000000" y2="2478.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1643.000000" y="2501.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 9 = mint</text><text x="1932.000000" y="2501.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">{ * policy_id =&gt; { * asset_name =&gt; a } }</text><text x="2410.000000" y="2501.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2514.000000" y2="2514.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1643.000000" y="2537.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 11 = script_data_hash</text><text x="1932.000000" y="2537.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">32 byte hash</text><text x="2410.000000" y="2537.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2550.000000" y2="2550.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1643.000000" y="2573.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 13 = collateral inputs</text><text x="1932.000000" y="2573.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[ * [transaction hash, index] ]</text><text x="2410.000000" y="2573.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2586.000000" y2="2586.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1643.000000" y="2609.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 14 = required_signers</text><text x="1932.000000" y="2609.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[ * address key hash (blake2b-224) of signing public key ]</text><text x="2410.000000" y="2609.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2622.000000" y2="2622.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1643.000000" y="2645.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 15 = network_id</text><text x="1932.000000" y="2645.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">0 or 1</text><text x="2410.000000" y="2645.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2658.000000" y2="2658.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1643.000000" y="2681.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 16 = collateral return</text><text x="1932.000000" y="2681.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">transaction_output (collateral return)</text><text x="2410.000000" y="2681.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2694.000000" y2="2694.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1643.000000" y="2717.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 17 = total collateral</text><text x="1932.000000" y="2717.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">coin (lovelace uint64)</text><text x="2410.000000" y="2717.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2730.000000" y2="2730.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1643.000000" y="2753.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 18 = reference inputs</text><text x="1932.000000" y="2753.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">set&lt;transaction_input&gt;</text><text x="2410.000000" y="2753.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1633.000000" x2="2420.000000" y1="2766.000000" y2="2766.000000" class=" stroke-N1" style="stroke-width:2" /></g></g></a><g id="auxiliary"><g class="shape" ><rect x="12.000000" y="348.000000" width="1272.000000" height="1534.000000" class=" stroke-B1 fill-B4" style="stroke-width:2;" /></g></g><g id="root-ca"><g class="shape" ><rect x="417.000000" y="3008.000000" width="788.000000" height="595.000000" class=" stroke-B1 fill-B4" style="stroke-width:2;" /></g><text x="811.000000" y="3041.000000" class="text fill-N1" style="text-anchor:middle;font-size:28px">ROOT CERTIFICATE AUTHORITY (CA)</text></g><g id="transaction_witness"><g class="shape" ><rect x="1304.000000" y="348.000000" width="686.000000" height="566.000000" class=" stroke-B1 fill-B4" style="stroke-width:2;" /></g></g><a href="https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L359C1-L368" xlink:href="https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L359C1-L368"><g id="auxiliary.data"><g class="shape" ><rect x="323.000000" y="398.000000" width="544.000000" height="180.000000" class="shape stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="323.000000" y="398.000000" width="544.000000" height="36.000000" class="class_header fill-N1" /><text x="333.000000" y="423.750000" class="text fill-N7" style="text-anchor:start;font-size:24px">auxiliary data</text><text x="333.000000" y="457.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">metadata</text><text x="462.000000" y="457.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">{ * uint =&gt; transaction_metadatum } : Optional</text><text x="857.000000" y="457.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="323.000000" x2="867.000000" y1="470.000000" y2="470.000000" class=" stroke-N1" style="stroke-width:2" /><text x="333.000000" y="493.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">native_script</text><text x="462.000000" y="493.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[ * native_script ] : Optional</text><text x="857.000000" y="493.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="323.000000" x2="867.000000" y1="506.000000" y2="506.000000" class=" stroke-N1" style="stroke-width:2" /><text x="333.000000" y="529.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">plutus_v1</text><text x="462.000000" y="529.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[ * plutus_v1_script ] : Optional</text><text x="857.000000" y="529.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="323.000000" x2="867.000000" y1="542.000000" y2="542.000000" class=" stroke-N1" style="stroke-width:2" /><text x="333.000000" y="565.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">plutus_v2</text><text x="462.000000" y="565.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[ * plutus_v2_script ] : Optional</text><text x="857.000000" y="565.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="323.000000" x2="867.000000" y1="578.000000" y2="578.000000" class=" stroke-N1" style="stroke-width:2" /></g></g></a><g id="auxiliary.509_envelope"><g class="shape" ><rect x="632.000000" y="739.000000" width="550.000000" height="180.000000" class="shape stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="632.000000" y="739.000000" width="550.000000" height="36.000000" class="class_header fill-N1" /><text x="642.000000" y="764.750000" class="text fill-N7" style="text-anchor:start;font-size:24px">x509 envelope metadata (Key 509)</text><text x="642.000000" y="798.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">0</text><text x="735.000000" y="798.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">purpose : 128bit UUID V4 of the Metadata Purpose</text><text x="1172.000000" y="798.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="632.000000" x2="1182.000000" y1="811.000000" y2="811.000000" class=" stroke-N1" style="stroke-width:2" /><text x="642.000000" y="834.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">1</text><text x="735.000000" y="834.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">txn-inputs-hash : Hash of the transaction inputs</text><text x="1172.000000" y="834.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="632.000000" x2="1182.000000" y1="847.000000" y2="847.000000" class=" stroke-N1" style="stroke-width:2" /><text x="642.000000" y="870.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">10/11/12</text><text x="735.000000" y="870.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">X509 chunks: [ + x509_chunk ] - x509 Update Data.</text><text x="1172.000000" y="870.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="632.000000" x2="1182.000000" y1="883.000000" y2="883.000000" class=" stroke-N1" style="stroke-width:2" /><text x="642.000000" y="906.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">99</text><text x="735.000000" y="906.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">validation signature : Signature calculated in step 6</text><text x="1172.000000" y="906.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="632.000000" x2="1182.000000" y1="919.000000" y2="919.000000" class=" stroke-N1" style="stroke-width:2" /></g></g><clipPath id="d2-1992443321-auxiliary.rbac"><path d="M 114.000000 1004.000000 L 114.000000 1004.000000 S 114.000000 989.000000 129.000000 989.000000 L 554.000000 989.000000 L 554.000000 989.000000 S 569.000000 989.000000 569.000000 1004.000000 L 569.000000 1262.000000 L 569.000000 1277.000000 L 114.000000 1277.000000Z 114.000000 989.000000" fill="none" /> </clipPath><g id="auxiliary.rbac" class="RBAC_TABLE"><g class="shape" ><rect x="114.000000" y="989.000000" width="455.000000" height="288.000000" rx="15.000000" ry="15.000000" class="shape stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="114.000000" y="989.000000" width="455.000000" height="36.000000" class="class_header fill-N1" clip-path="url(#d2-1992443321-auxiliary.rbac)" /><text x="124.000000" y="1014.750000" class="text fill-N7" style="text-anchor:start;font-size:24px">x509 Role based Access Control</text><text x="124.000000" y="1048.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 10=x509 certs</text><text x="365.000000" y="1048.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[ + DER Certs ]</text><text x="559.000000" y="1048.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="114.000000" x2="569.000000" y1="1061.000000" y2="1061.000000" class=" stroke-N1" style="stroke-width:2" /><text x="124.000000" y="1084.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 20=c509 certs</text><text x="365.000000" y="1084.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[ + CBOR Certs ]</text><text x="559.000000" y="1084.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="114.000000" x2="569.000000" y1="1097.000000" y2="1097.000000" class=" stroke-N1" style="stroke-width:2" /><text x="124.000000" y="1120.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 30=public keys</text><text x="365.000000" y="1120.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[ + Public Keys ]</text><text x="559.000000" y="1120.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="114.000000" x2="569.000000" y1="1133.000000" y2="1133.000000" class=" stroke-N1" style="stroke-width:2" /><text x="124.000000" y="1156.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 40=revocation set</text><text x="365.000000" y="1156.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[ + Revoked Cert hash]</text><text x="559.000000" y="1156.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="114.000000" x2="569.000000" y1="1169.000000" y2="1169.000000" class=" stroke-N1" style="stroke-width:2" /><text x="124.000000" y="1192.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 50=DiD</text><text x="365.000000" y="1192.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">DiD???</text><text x="559.000000" y="1192.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="114.000000" x2="569.000000" y1="1205.000000" y2="1205.000000" class=" stroke-N1" style="stroke-width:2" /><text x="124.000000" y="1228.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 51=Verifiable Credentials</text><text x="365.000000" y="1228.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[ + VC??? ]</text><text x="559.000000" y="1228.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="114.000000" x2="569.000000" y1="1241.000000" y2="1241.000000" class=" stroke-N1" style="stroke-width:2" /><text x="124.000000" y="1264.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 100=Role Data Set</text><text x="365.000000" y="1264.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[ + Role Data ]</text><text x="559.000000" y="1264.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="129.000000" x2="554.000000" y1="1277.000000" y2="1277.000000" class=" stroke-N1" style="stroke-width:2" /></g></g><clipPath id="d2-1992443321-auxiliary.role_data"><path d="M 650.000000 1362.000000 L 650.000000 1362.000000 S 650.000000 1347.000000 665.000000 1347.000000 L 1177.000000 1347.000000 L 1177.000000 1347.000000 S 1192.000000 1347.000000 1192.000000 1362.000000 L 1192.000000 1548.000000 L 1192.000000 1563.000000 L 650.000000 1563.000000Z 650.000000 1347.000000" fill="none" /> </clipPath><g id="auxiliary.role_data" class="RBAC_TABLE"><g class="shape" ><rect x="650.000000" y="1347.000000" width="542.000000" height="216.000000" rx="15.000000" ry="15.000000" class="shape stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="650.000000" y="1347.000000" width="542.000000" height="36.000000" class="class_header fill-N1" clip-path="url(#d2-1992443321-auxiliary.role_data)" /><text x="660.000000" y="1372.750000" class="text fill-N7" style="text-anchor:start;font-size:24px">Role Data</text><text x="660.000000" y="1406.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">0=role number</text><text x="898.000000" y="1406.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">uint</text><text x="1182.000000" y="1406.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="650.000000" x2="1192.000000" y1="1419.000000" y2="1419.000000" class=" stroke-N1" style="stroke-width:2" /><text x="660.000000" y="1442.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 1=role-signing-key</text><text x="898.000000" y="1442.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">Key Reference</text><text x="1182.000000" y="1442.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="650.000000" x2="1192.000000" y1="1455.000000" y2="1455.000000" class=" stroke-N1" style="stroke-width:2" /><text x="660.000000" y="1478.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 2=role-encryption-key</text><text x="898.000000" y="1478.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">Key Reference</text><text x="1182.000000" y="1478.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="650.000000" x2="1192.000000" y1="1491.000000" y2="1491.000000" class=" stroke-N1" style="stroke-width:2" /><text x="660.000000" y="1514.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 3=payment-key</text><text x="898.000000" y="1514.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">OnChain Payment Key Reference</text><text x="1182.000000" y="1514.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="650.000000" x2="1192.000000" y1="1527.000000" y2="1527.000000" class=" stroke-N1" style="stroke-width:2" /><text x="660.000000" y="1550.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 10-99=Role Specific Data</text><text x="898.000000" y="1550.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">Variable per Role</text><text x="1182.000000" y="1550.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="665.000000" x2="1177.000000" y1="1563.000000" y2="1563.000000" class=" stroke-N1" style="stroke-width:2" /></g></g><clipPath id="d2-1992443321-auxiliary.role_0"><path d="M 734.000000 1739.000000 L 734.000000 1739.000000 S 734.000000 1724.000000 749.000000 1724.000000 L 1092.000000 1724.000000 L 1092.000000 1724.000000 S 1107.000000 1724.000000 1107.000000 1739.000000 L 1107.000000 1817.000000 L 1107.000000 1832.000000 L 734.000000 1832.000000Z 734.000000 1724.000000" fill="none" /> </clipPath><g id="auxiliary.role_0" class="RBAC_TABLE"><g class="shape" ><rect x="734.000000" y="1724.000000" width="373.000000" height="108.000000" rx="15.000000" ry="15.000000" class="shape stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="734.000000" y="1724.000000" width="373.000000" height="36.000000" class="class_header fill-N1" clip-path="url(#d2-1992443321-auxiliary.role_0)" /><text x="744.000000" y="1749.750000" class="text fill-N7" style="text-anchor:start;font-size:24px">Role 0 - Metadata Validation Role</text><text x="744.000000" y="1783.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">0=role number</text><text x="919.000000" y="1783.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">0</text><text x="1097.000000" y="1783.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="734.000000" x2="1107.000000" y1="1796.000000" y2="1796.000000" class=" stroke-N1" style="stroke-width:2" /><text x="744.000000" y="1819.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">1=role-signing-key</text><text x="919.000000" y="1819.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">Key Reference</text><text x="1097.000000" y="1819.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="749.000000" x2="1092.000000" y1="1832.000000" y2="1832.000000" class=" stroke-N1" style="stroke-width:2" /></g></g><clipPath id="d2-1992443321-root-ca.key"><path d="M 788.000000 3073.000000 L 788.000000 3073.000000 S 788.000000 3058.000000 803.000000 3058.000000 L 991.000000 3058.000000 L 991.000000 3058.000000 S 1006.000000 3058.000000 1006.000000 3073.000000 L 1006.000000 3151.000000 L 1006.000000 3166.000000 L 788.000000 3166.000000Z 788.000000 3058.000000" fill="none" /> </clipPath><g id="root-ca.key" class="PRIVATE_KEY"><g class="shape" ><rect x="788.000000" y="3058.000000" width="218.000000" height="108.000000" rx="15.000000" ry="15.000000" stroke="cornsilk" fill="wheat" class="shape" style="stroke-width:2;" /><rect x="788.000000" y="3058.000000" width="218.000000" height="36.000000" fill="cornsilk" class="class_header" clip-path="url(#d2-1992443321-root-ca.key)" /><text x="798.000000" y="3083.750000" fill="red" class="text" style="text-anchor:start;font-size:24px">Root CA&#39;s Key Pair</text><text x="798.000000" y="3117.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">private</text><text x="877.000000" y="3117.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">Secret</text><text x="996.000000" y="3117.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="788.000000" x2="1006.000000" y1="3130.000000" y2="3130.000000" stroke="cornsilk" style="stroke-width:2" /><text x="798.000000" y="3153.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">public</text><text x="877.000000" y="3153.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">Shared</text><text x="996.000000" y="3153.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="803.000000" x2="991.000000" y1="3166.000000" y2="3166.000000" stroke="cornsilk" style="stroke-width:2" /></g></g><g id="root-ca.certificate"><g class="shape" ><rect x="540.000000" y="3337.000000" width="439.000000" height="216.000000" class="shape stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="540.000000" y="3337.000000" width="439.000000" height="36.000000" class="class_header fill-N1" /><text x="550.000000" y="3362.750000" class="text fill-N7" style="text-anchor:start;font-size:24px">Root Certificate (ROOT CA)</text><text x="550.000000" y="3396.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">Subject`s Name</text><text x="741.000000" y="3396.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">ROOT CA Name</text><text x="969.000000" y="3396.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="540.000000" x2="979.000000" y1="3409.000000" y2="3409.000000" class=" stroke-N1" style="stroke-width:2" /><text x="550.000000" y="3432.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">Subject`s PublicKey</text><text x="741.000000" y="3432.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">Public Key</text><text x="969.000000" y="3432.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="540.000000" x2="979.000000" y1="3445.000000" y2="3445.000000" class=" stroke-N1" style="stroke-width:2" /><text x="550.000000" y="3468.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">Issuer`s Name</text><text x="741.000000" y="3468.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">ROOT CA Name</text><text x="969.000000" y="3468.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="540.000000" x2="979.000000" y1="3481.000000" y2="3481.000000" class=" stroke-N1" style="stroke-width:2" /><text x="550.000000" y="3504.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">Issuer`s Signature</text><text x="741.000000" y="3504.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">Signature</text><text x="969.000000" y="3504.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="540.000000" x2="979.000000" y1="3517.000000" y2="3517.000000" class=" stroke-N1" style="stroke-width:2" /><text x="550.000000" y="3540.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">Subject Alt Name</text><text x="741.000000" y="3540.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">URI:S:ada:stake1vpu...p0u</text><text x="969.000000" y="3540.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="540.000000" x2="979.000000" y1="3553.000000" y2="3553.000000" class=" stroke-N1" style="stroke-width:2" /></g></g><a href="https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L295C1-L303" xlink:href="https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L295C1-L303"><g id="transaction_witness.set"><g class="shape" ><rect x="1354.000000" y="398.000000" width="271.000000" height="288.000000" class="shape stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="1354.000000" y="398.000000" width="271.000000" height="36.000000" class="class_header fill-N1" /><text x="1364.000000" y="423.750000" class="text fill-N7" style="text-anchor:start;font-size:24px">transaction witness set</text><text x="1364.000000" y="457.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 0</text><text x="1407.000000" y="457.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[* vkeywitness ]</text><text x="1615.000000" y="457.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1354.000000" x2="1625.000000" y1="470.000000" y2="470.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1364.000000" y="493.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 1</text><text x="1407.000000" y="493.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[* native_script]</text><text x="1615.000000" y="493.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1354.000000" x2="1625.000000" y1="506.000000" y2="506.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1364.000000" y="529.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 2</text><text x="1407.000000" y="529.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[* bootstrap_witness]</text><text x="1615.000000" y="529.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1354.000000" x2="1625.000000" y1="542.000000" y2="542.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1364.000000" y="565.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 3</text><text x="1407.000000" y="565.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[* plutus_v1_script]</text><text x="1615.000000" y="565.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1354.000000" x2="1625.000000" y1="578.000000" y2="578.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1364.000000" y="601.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 4</text><text x="1407.000000" y="601.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[* plutus_data]</text><text x="1615.000000" y="601.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1354.000000" x2="1625.000000" y1="614.000000" y2="614.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1364.000000" y="637.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 5</text><text x="1407.000000" y="637.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[* redeemer]</text><text x="1615.000000" y="637.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1354.000000" x2="1625.000000" y1="650.000000" y2="650.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1364.000000" y="673.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">? 6</text><text x="1407.000000" y="673.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">[* plutus_v2_script]</text><text x="1615.000000" y="673.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1354.000000" x2="1625.000000" y1="686.000000" y2="686.000000" class=" stroke-N1" style="stroke-width:2" /></g></g></a><a href="https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L370" xlink:href="https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L370"><g id="transaction_witness.vkeywitness"><g class="shape" ><rect x="1390.000000" y="756.000000" width="549.000000" height="108.000000" class="shape stroke-N1 fill-N7" style="stroke-width:2;" /><rect x="1390.000000" y="756.000000" width="549.000000" height="36.000000" class="class_header fill-N1" /><text x="1400.000000" y="781.750000" class="text fill-N7" style="text-anchor:start;font-size:24px">vkeywitness</text><text x="1400.000000" y="815.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">vkey</text><text x="1499.000000" y="815.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">ED25519-Bip32 Public Key [32 Bytes]</text><text x="1929.000000" y="815.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1390.000000" x2="1939.000000" y1="828.000000" y2="828.000000" class=" stroke-N1" style="stroke-width:2" /><text x="1400.000000" y="851.000000" class="text fill-B2" style="text-anchor:start;font-size:20px">signature</text><text x="1499.000000" y="851.000000" class="text fill-N2" style="text-anchor:start;font-size:20px">ED25519-Bip32 Signature of Transaction [64 bytes]</text><text x="1929.000000" y="851.000000" class="text fill-AA2" style="text-anchor:end;font-size:20px" /><line x1="1390.000000" x2="1939.000000" y1="864.000000" y2="864.000000" class=" stroke-N1" style="stroke-width:2" /></g></g></a><g id="(individual_transaction -&gt; transaction_body)[0]"><marker id="mk-3488378134" markerWidth="10.000000" markerHeight="12.000000" refX="7.000000" refY="6.000000" viewBox="0.000000 0.000000 10.000000 12.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="0.000000,0.000000 10.000000,6.000000 0.000000,12.000000" class="connection fill-B1" stroke-width="2" /> </marker><path d="M 466.500000 66.000000 L 2016.500000 66.000000 S 2026.500000 66.000000 2026.500000 76.000000 L 2026.500000 2114.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1992443321)" /><text x="2027.000000" y="317.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">body</text></g><g id="(individual_transaction -&gt; auxiliary.data)[0]"><path d="M 466.333008 102.000000 L 494.333008 102.000000 S 504.333008 102.000000 504.333008 112.000000 L 504.333008 394.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1992443321)" /><text x="504.000000" y="228.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px"><tspan x="504.000000" dy="0.000000">auxiliary_data</tspan><tspan x="504.000000" dy="18.500000">(optional)</tspan></text></g><g id="auxiliary.(data -&gt; 509_envelope)[0]"><path d="M 869.000000 452.000000 L 897.000000 452.000000 S 907.000000 452.000000 907.000000 462.000000 L 907.000000 735.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1992443321)" /><text x="907.000000" y="581.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">509</text></g><g id="auxiliary.(509_envelope -&gt; rbac)[0]"><path d="M 630.500000 865.000000 L 351.500000 865.000000 S 341.500000 865.000000 341.500000 875.000000 L 341.500000 985.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1992443321)" /></g><g id="auxiliary.(rbac -&gt; role_data)[0]"><path d="M 571.000000 1259.000000 L 911.000000 1259.000000 S 921.000000 1259.000000 921.000000 1269.000000 L 921.000000 1343.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1992443321)" /></g><g id="auxiliary.(role_data -&gt; role_0)[0]"><path d="M 921.000000 1565.000000 L 921.000000 1720.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1992443321)" /><text x="921.000000" y="1649.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">Required</text></g><g id="(transaction_body -&gt; auxiliary.data)[0]"><path d="M 2422.000000 2424.000000 L 2450.000000 2424.000000 S 2460.000000 2424.000000 2460.000000 2414.000000 L 2460.000000 313.000000 S 2460.000000 303.000000 2450.000000 303.000000 L 695.666016 303.000000 S 685.666016 303.000000 685.666016 313.000000 L 685.666016 394.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1992443321)" /><text x="2460.500000" y="454.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">blake2b_256()</text></g><g id="(auxiliary.509_envelope &lt;- transaction_body)[0]"><marker id="mk-2451250203" markerWidth="10.000000" markerHeight="12.000000" refX="3.000000" refY="6.000000" viewBox="0.000000 0.000000 10.000000 12.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="10.000000,0.000000 0.000000,6.000000 10.000000,12.000000" class="connection fill-B1" stroke-width="2" /> </marker><path d="M 1186.000000 829.000000 L 1212.000000 829.000000 S 1222.000000 829.000000 1222.000000 839.000000 L 1222.000000 2162.000000 S 1222.000000 2172.000000 1232.000000 2172.000000 L 1631.000000 2172.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-start="url(#mk-2451250203)" mask="url(#d2-1992443321)" /><text x="1222.500000" y="1692.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">blake2b_256()</text></g><g id="(auxiliary.role_data -&gt; transaction_body)[0]"><path d="M 1194.000000 1509.000000 L 1223.000000 1509.000000 S 1233.000000 1509.000000 1233.000000 1519.000000 L 1233.000000 1917.000000 S 1233.000000 1927.000000 1243.000000 1927.000000 L 1304.500000 1927.000000 S 1314.500000 1927.000000 1314.500000 1937.000000 L 1314.500000 2068.000000 S 1314.500000 2078.000000 1304.500000 2078.000000 L 1237.000000 2078.000000 S 1227.000000 2078.000000 1227.000000 2088.000000 L 1227.000000 2162.000000 S 1227.000000 2172.000000 1237.000000 2172.000000 L 1629.000000 2172.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1992443321)" /></g><g id="(auxiliary.role_data -&gt; transaction_body)[1]"><path d="M 1194.000000 1509.000000 L 1223.000000 1509.000000 S 1233.000000 1509.000000 1233.000000 1519.000000 L 1233.000000 1917.000000 S 1233.000000 1927.000000 1243.000000 1927.000000 L 1304.500000 1927.000000 S 1314.500000 1927.000000 1314.500000 1937.000000 L 1314.500000 2198.000000 S 1314.500000 2208.000000 1324.500000 2208.000000 L 1629.500000 2208.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1992443321)" /></g><g id="root-ca.(key -&gt; certificate)[0]"><path d="M 786.750000 3148.000000 L 510.750000 3148.000000 S 500.750000 3148.000000 500.750000 3158.000000 L 500.750000 3417.000000 S 500.750000 3427.000000 510.750000 3427.000000 L 536.750000 3427.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1992443321)" /><text x="501.000000" y="3169.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">Published</text></g><g id="root-ca.(key -&gt; certificate)[1]" class="SIGN"><marker id="mk-354533580" markerWidth="10.000000" markerHeight="12.000000" refX="7.000000" refY="6.000000" viewBox="0.000000 0.000000 10.000000 12.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="0.000000,0.000000 10.000000,6.000000 0.000000,12.000000" fill="blueviolet" class="connection" stroke-width="2" /> </marker><path d="M 1008.375000 3112.000000 L 1116.375000 3112.000000 S 1126.375000 3112.000000 1126.375000 3122.000000 L 1126.375000 3489.000000 S 1126.375000 3499.000000 1116.375000 3499.000000 L 983.375000 3499.000000" stroke="blueviolet" fill="none" class="connection animated-connection" style="stroke-width:2;stroke-dasharray:6.000000,5.919384;stroke-dashoffset:-119.193836;animation: dashdraw 2.959692s linear infinite;" marker-end="url(#mk-354533580)" mask="url(#d2-1992443321)" /><text x="1126.000000" y="3325.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">Self Sign</text></g><g id="(auxiliary.rbac -&gt; root-ca.certificate)[0]"><path d="M 112.000000 1043.000000 L 72.000000 1043.000000 S 62.000000 1043.000000 62.000000 1053.000000 L 62.000000 2953.000000 S 62.000000 2963.000000 72.000000 2963.000000 L 589.750000 2963.000000 S 599.750000 2963.000000 599.750000 2973.000000 L 599.750000 3333.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1992443321)" /><text x="62.500000" y="2438.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">contains</text></g><g id="(auxiliary.rbac -&gt; root-ca.certificate)[1]"><path d="M 571.000000 1079.000000 L 599.000000 1079.000000 S 609.000000 1079.000000 609.000000 1089.000000 L 609.000000 1917.000000 S 609.000000 1927.000000 619.000000 1927.000000 L 737.375000 1927.000000 S 747.375000 1927.000000 747.375000 1937.000000 L 747.375000 3333.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1992443321)" /><text x="747.500000" y="2124.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">contains</text></g><g id="(auxiliary.role_0 -&gt; root-ca.certificate)[0]"><path d="M 1109.750000 1814.000000 L 1174.750000 1814.000000 S 1184.750000 1814.000000 1184.750000 1824.000000 L 1184.750000 2903.000000 S 1184.750000 2913.000000 1174.750000 2913.000000 L 1056.375000 2913.000000 S 1046.375000 2913.000000 1046.375000 2923.000000 L 1046.375000 3287.000000 S 1046.375000 3297.000000 1036.375000 3297.000000 L 880.000000 3297.000000 S 870.000000 3297.000000 870.000000 3307.000000 L 870.000000 3333.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1992443321)" /></g><g id="(auxiliary.509_envelope &lt;- root-ca.key)[0]" class="SIGN"><marker id="mk-1051939797" markerWidth="10.000000" markerHeight="12.000000" refX="3.000000" refY="6.000000" viewBox="0.000000 0.000000 10.000000 12.000000" orient="auto" markerUnits="userSpaceOnUse"> <polygon points="10.000000,0.000000 0.000000,6.000000 10.000000,12.000000" fill="blueviolet" class="connection" stroke-width="2" /> </marker><path d="M 628.000000 901.000000 L 83.000000 901.000000 S 73.000000 901.000000 73.000000 911.000000 L 73.000000 1917.000000 S 73.000000 1927.000000 83.000000 1927.000000 L 444.062012 1927.000000 S 454.062012 1927.000000 454.062012 1937.000000 L 454.062012 2903.000000 S 454.062012 2913.000000 464.062012 2913.000000 L 613.625000 2913.000000 S 623.625000 2913.000000 623.625000 2923.000000 L 623.625000 3102.000000 S 623.625000 3112.000000 633.625000 3112.000000 L 786.625000 3112.000000" stroke="blueviolet" fill="none" class="connection animated-connection" style="stroke-width:2;stroke-dasharray:6.000000,5.919384;stroke-dashoffset:119.193836;animation: dashdraw 2.959692s linear infinite;" marker-start="url(#mk-1051939797)" mask="url(#d2-1992443321)" /><text x="230.500000" y="1933.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">Sign</text></g><g id="(transaction_body &lt;- root-ca.certificate)[0]"><path d="M 2424.000000 2604.000000 L 2460.000000 2604.000000 S 2470.000000 2604.000000 2470.000000 2614.000000 L 2470.000000 3525.000000 S 2470.000000 3535.000000 2460.000000 3535.000000 L 981.375000 3535.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-start="url(#mk-2451250203)" mask="url(#d2-1992443321)" /><text x="2215.500000" y="3533.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px"><tspan x="2215.500000" dy="0.000000">transaction must</tspan><tspan x="2215.500000" dy="18.500000">be witnessed by</tspan></text></g><g id="transaction_witness.(set -&gt; vkeywitness)[0]"><path d="M 1627.000000 452.000000 L 1655.000000 452.000000 S 1665.000000 452.000000 1665.000000 462.000000 L 1665.000000 752.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1992443321)" /></g><g id="(individual_transaction -&gt; transaction_witness.set)[0]"><path d="M 466.500000 138.000000 L 1479.500000 138.000000 S 1489.500000 138.000000 1489.500000 148.000000 L 1489.500000 394.000000" fill="none" class="connection stroke-B1" style="stroke-width:2;" marker-end="url(#mk-3488378134)" mask="url(#d2-1992443321)" /><text x="1107.500000" y="144.000000" class="text-italic fill-N2" style="text-anchor:middle;font-size:16px">witnesses</text></g><g transform="translate(448 -4)" class="appendix-icon"><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3440_35088111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M14.3909 16.7965C14.7364 17.2584 15.1772 17.6406 15.6834 17.9171C16.1896 18.1938 16.7494 18.3582 17.3248 18.3993C17.9001 18.4405 18.4777 18.3575 19.0181 18.1559C19.5586 17.9543 20.0492 17.6389 20.4571 17.2309L22.8708 14.8173C23.6036 14.0586 24.0089 13.0425 23.9998 11.9877C23.9906 10.933 23.5676 9.92404 22.8217 9.17821C22.0759 8.43237 21.067 8.00931 20.0123 8.00015C18.9575 7.99098 17.9413 8.39644 17.1827 9.1292L15.7988 10.505" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17.609 15.1874C17.2635 14.7255 16.8227 14.3433 16.3165 14.0667C15.8103 13.7902 15.2505 13.6257 14.6752 13.5845C14.0998 13.5433 13.5223 13.6263 12.9819 13.8279C12.4414 14.0295 11.9506 14.345 11.5428 14.753L9.1292 17.1666C8.39644 17.9252 7.99098 18.9414 8.00015 19.9962C8.00931 21.0509 8.43237 22.0598 9.17821 22.8056C9.92405 23.5515 10.933 23.9745 11.9877 23.9837C13.0425 23.9928 14.0586 23.5875 14.8173 22.8547L16.193 21.4788" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3440_35088111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(2404 2102)" class="appendix-icon"><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3440_35088111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M14.3909 16.7965C14.7364 17.2584 15.1772 17.6406 15.6834 17.9171C16.1896 18.1938 16.7494 18.3582 17.3248 18.3993C17.9001 18.4405 18.4777 18.3575 19.0181 18.1559C19.5586 17.9543 20.0492 17.6389 20.4571 17.2309L22.8708 14.8173C23.6036 14.0586 24.0089 13.0425 23.9998 11.9877C23.9906 10.933 23.5676 9.92404 22.8217 9.17821C22.0759 8.43237 21.067 8.00931 20.0123 8.00015C18.9575 7.99098 17.9413 8.39644 17.1827 9.1292L15.7988 10.505" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17.609 15.1874C17.2635 14.7255 16.8227 14.3433 16.3165 14.0667C15.8103 13.7902 15.2505 13.6257 14.6752 13.5845C14.0998 13.5433 13.5223 13.6263 12.9819 13.8279C12.4414 14.0295 11.9506 14.345 11.5428 14.753L9.1292 17.1666C8.39644 17.9252 7.99098 18.9414 8.00015 19.9962C8.00931 21.0509 8.43237 22.0598 9.17821 22.8056C9.92405 23.5515 10.933 23.9745 11.9877 23.9837C13.0425 23.9928 14.0586 23.5875 14.8173 22.8547L16.193 21.4788" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3440_35088111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(851 382)" class="appendix-icon"><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3440_35088111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M14.3909 16.7965C14.7364 17.2584 15.1772 17.6406 15.6834 17.9171C16.1896 18.1938 16.7494 18.3582 17.3248 18.3993C17.9001 18.4405 18.4777 18.3575 19.0181 18.1559C19.5586 17.9543 20.0492 17.6389 20.4571 17.2309L22.8708 14.8173C23.6036 14.0586 24.0089 13.0425 23.9998 11.9877C23.9906 10.933 23.5676 9.92404 22.8217 9.17821C22.0759 8.43237 21.067 8.00931 20.0123 8.00015C18.9575 7.99098 17.9413 8.39644 17.1827 9.1292L15.7988 10.505" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17.609 15.1874C17.2635 14.7255 16.8227 14.3433 16.3165 14.0667C15.8103 13.7902 15.2505 13.6257 14.6752 13.5845C14.0998 13.5433 13.5223 13.6263 12.9819 13.8279C12.4414 14.0295 11.9506 14.345 11.5428 14.753L9.1292 17.1666C8.39644 17.9252 7.99098 18.9414 8.00015 19.9962C8.00931 21.0509 8.43237 22.0598 9.17821 22.8056C9.92405 23.5515 10.933 23.9745 11.9877 23.9837C13.0425 23.9928 14.0586 23.5875 14.8173 22.8547L16.193 21.4788" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3440_35088111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(1609 382)" class="appendix-icon"><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3440_35088111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M14.3909 16.7965C14.7364 17.2584 15.1772 17.6406 15.6834 17.9171C16.1896 18.1938 16.7494 18.3582 17.3248 18.3993C17.9001 18.4405 18.4777 18.3575 19.0181 18.1559C19.5586 17.9543 20.0492 17.6389 20.4571 17.2309L22.8708 14.8173C23.6036 14.0586 24.0089 13.0425 23.9998 11.9877C23.9906 10.933 23.5676 9.92404 22.8217 9.17821C22.0759 8.43237 21.067 8.00931 20.0123 8.00015C18.9575 7.99098 17.9413 8.39644 17.1827 9.1292L15.7988 10.505" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17.609 15.1874C17.2635 14.7255 16.8227 14.3433 16.3165 14.0667C15.8103 13.7902 15.2505 13.6257 14.6752 13.5845C14.0998 13.5433 13.5223 13.6263 12.9819 13.8279C12.4414 14.0295 11.9506 14.345 11.5428 14.753L9.1292 17.1666C8.39644 17.9252 7.99098 18.9414 8.00015 19.9962C8.00931 21.0509 8.43237 22.0598 9.17821 22.8056C9.92405 23.5515 10.933 23.9745 11.9877 23.9837C13.0425 23.9928 14.0586 23.5875 14.8173 22.8547L16.193 21.4788" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3440_35088111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><g transform="translate(1923 740)" class="appendix-icon"><svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_3440_35088111)">
+<path d="M16 31.1109C24.3456 31.1109 31.1111 24.3454 31.1111 15.9998C31.1111 7.65415 24.3456 0.888672 16 0.888672C7.65436 0.888672 0.888885 7.65415 0.888885 15.9998C0.888885 24.3454 7.65436 31.1109 16 31.1109Z" fill="white" stroke="#DEE1EB"/>
+<path d="M14.3909 16.7965C14.7364 17.2584 15.1772 17.6406 15.6834 17.9171C16.1896 18.1938 16.7494 18.3582 17.3248 18.3993C17.9001 18.4405 18.4777 18.3575 19.0181 18.1559C19.5586 17.9543 20.0492 17.6389 20.4571 17.2309L22.8708 14.8173C23.6036 14.0586 24.0089 13.0425 23.9998 11.9877C23.9906 10.933 23.5676 9.92404 22.8217 9.17821C22.0759 8.43237 21.067 8.00931 20.0123 8.00015C18.9575 7.99098 17.9413 8.39644 17.1827 9.1292L15.7988 10.505" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M17.609 15.1874C17.2635 14.7255 16.8227 14.3433 16.3165 14.0667C15.8103 13.7902 15.2505 13.6257 14.6752 13.5845C14.0998 13.5433 13.5223 13.6263 12.9819 13.8279C12.4414 14.0295 11.9506 14.345 11.5428 14.753L9.1292 17.1666C8.39644 17.9252 7.99098 18.9414 8.00015 19.9962C8.00931 21.0509 8.43237 22.0598 9.17821 22.8056C9.92405 23.5515 10.933 23.9745 11.9877 23.9837C13.0425 23.9928 14.0586 23.5875 14.8173 22.8547L16.193 21.4788" stroke="#2E3346" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_3440_35088111">
+<rect width="32" height="32" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+</g><mask id="d2-1992443321" maskUnits="userSpaceOnUse" x="-89" y="-204" width="2696" height="3908">
+<rect x="-89" y="-204" width="2696" height="3908" fill="white"></rect>
+<rect x="816.000000" y="-103.000000" width="736" height="95" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="602.000000" y="3013.000000" width="418" height="36" fill="rgba(0,0,0,0.75)"></rect>
+<rect x="2010.000000" y="301.000000" width="34" height="21" fill="black"></rect>
+<rect x="456.000000" y="212.000000" width="96" height="37" fill="black"></rect>
+<rect x="895.000000" y="565.000000" width="24" height="21" fill="black"></rect>
+<rect x="891.000000" y="1633.000000" width="60" height="21" fill="black"></rect>
+<rect x="2414.000000" y="438.000000" width="93" height="21" fill="black"></rect>
+<rect x="1176.000000" y="1676.000000" width="93" height="21" fill="black"></rect>
+<rect x="468.000000" y="3153.000000" width="66" height="21" fill="black"></rect>
+<rect x="1098.000000" y="3309.000000" width="56" height="21" fill="black"></rect>
+<rect x="34.000000" y="2422.000000" width="57" height="21" fill="black"></rect>
+<rect x="719.000000" y="2108.000000" width="57" height="21" fill="black"></rect>
+<rect x="216.000000" y="1917.000000" width="29" height="21" fill="black"></rect>
+<rect x="2159.000000" y="3517.000000" width="113" height="37" fill="black"></rect>
+<rect x="1076.000000" y="128.000000" width="63" height="21" fill="black"></rect>
+</mask></svg></svg>

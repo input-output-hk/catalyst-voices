@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["GET_ASSETS_BY_STAKE_ADDRESS_QUERY"],"struct":["GetAssetsByStakeAddressParams","GetAssetsByStakeAddressQuery","GetAssetsByStakeAddressQueryInner","GetAssetsByStakeAddressQueryKey","GetAssetsByStakeAddressQueryValue"]};

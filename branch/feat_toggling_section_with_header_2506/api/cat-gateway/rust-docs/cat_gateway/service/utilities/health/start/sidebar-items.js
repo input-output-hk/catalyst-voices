@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["condition_for_started","event_db_is_live","follower_has_first_reached_tip","index_db_is_live","service_has_started","set_event_db_liveness","set_follower_first_reached_tip","set_index_db_liveness","set_to_started"],"static":["INITIAL_FOLLOWER_TIP_REACHED","LIVE_EVENT_DB","LIVE_INDEX_DB","STARTED"]};

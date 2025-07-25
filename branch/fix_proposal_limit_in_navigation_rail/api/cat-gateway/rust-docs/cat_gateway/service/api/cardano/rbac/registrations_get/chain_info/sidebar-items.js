@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["last_registration_chain"],"struct":["ChainInfo"]};

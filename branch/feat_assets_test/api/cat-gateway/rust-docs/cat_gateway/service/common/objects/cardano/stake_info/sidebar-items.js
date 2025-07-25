@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["FullStakeInfo","PersistentStakeInfo","StakeInfo","StakedAssetInfoList","StakedTxoAssetInfo","VolatileStakeInfo"]};

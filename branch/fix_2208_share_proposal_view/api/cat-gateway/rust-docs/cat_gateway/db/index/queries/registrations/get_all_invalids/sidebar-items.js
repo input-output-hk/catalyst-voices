@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["GET_ALL_INVALIDS"],"struct":["GetAllInvalidRegistrationsParams","GetAllInvalidRegistrationsQuery"]};

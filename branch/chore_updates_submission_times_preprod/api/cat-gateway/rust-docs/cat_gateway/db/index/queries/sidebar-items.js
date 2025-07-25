@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["PreparedQuery","PreparedSelectQuery","PreparedUpsertQuery"],"fn":["session_execute_batch","session_execute_iter"],"mod":["caches","purge","rbac","registrations","staked_ada","sync_status"],"struct":["PreparedQueries"],"type":["FallibleQueryResults","FallibleQueryTasks","SizedBatch"]};

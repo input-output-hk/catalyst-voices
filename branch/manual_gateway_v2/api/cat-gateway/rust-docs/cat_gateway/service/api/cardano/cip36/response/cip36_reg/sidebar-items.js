@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["Cip36Details","Cip36List"]};

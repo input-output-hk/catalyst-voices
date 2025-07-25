@@ -1,0 +1,410 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+  }
+}
+
+classes: {
+  action: {
+    style: {
+      stroke-dash: 3
+      fill: green
+    }
+  }
+  template: {
+    style: {
+      fill: blue
+    }
+  }
+}
+
+RBACAccountRef: {
+  shape: class
+  +onchain_ref: ref
+}
+
+Brand: {
+  shape: class
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+Campaign: {
+  shape: class
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+Category: {
+  shape: class
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+Proposal: {
+  shape: class
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+Comment: {
+  shape: class
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+Event: {
+  shape: class
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+Review: {
+  shape: class
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+Role: {
+  shape: class
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+Rule: {
+  shape: class
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+Space: {
+  shape: class
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+Vote: {
+  shape: class
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+BrandTemplate: {
+  shape: class
+  class: template
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+CampaignTemplate: {
+  shape: class
+  class: template
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+CategoryTemplate: {
+  shape: class
+  class: template
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+ProposalTemplate: {
+  shape: class
+  class: template
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+ProposalTemplateMetaSchema: {
+  shape: class
+  class: template
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+ReviewTemplate: {
+  shape: class
+  class: template
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+ProposalSubmission: {
+  shape: class
+  class: action
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+ProposalRetraction: {
+  shape: class
+  class: action
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+ProposalModerationBlock: {
+  shape: class
+  class: action
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+DocumentRetraction: {
+  shape: class
+  class: action
+  +id: ULID
+  +ver: ULID
+  +ref: ULID
+  +template: CBOR Array
+  +reply: CBOR Array
+  +section: CBOR String
+  +collabs: CBOR Array
+}
+
+# Relationships
+Brand -> BrandTemplate: {
+  label: "+has"
+  source-arrowhead: "0..*"
+  target-arrowhead: "1"
+}
+
+CampaignTemplate -> Campaign: {
+  label: "+has"
+  source-arrowhead: "0..*"
+  target-arrowhead: "1"
+}
+
+CategoryTemplate -> Category: {
+  label: "+has"
+  source-arrowhead: "0..*"
+  target-arrowhead: "1"
+}
+
+ProposalTemplate -> Proposal: {
+  label: "+has"
+  source-arrowhead: "0..*"
+  target-arrowhead: "1"
+}
+
+ReviewTemplate -> Review: {
+  label: "+has"
+  source-arrowhead: "0..*"
+  target-arrowhead: "1"
+}
+
+ProposalTemplateMetaSchema -> ProposalTemplate: {
+  label: "+has"
+  source-arrowhead: "0..*"
+  target-arrowhead: "1"
+}
+
+RBACAccountRef -> Proposal: {
+  label: "+owns and creates"
+  source-arrowhead: "1..*"
+  target-arrowhead: "0..*"
+}
+
+RBACAccountRef -> Comment: {
+  label: "+owns and creates"
+  source-arrowhead: "1"
+  target-arrowhead: "0..*"
+}
+
+RBACAccountRef -> Vote: {
+  label: "+owns and casts"
+  source-arrowhead: "1"
+  target-arrowhead: "0..*"
+}
+
+RBACAccountRef -> Review: {
+  label: "+owns and creates"
+  source-arrowhead: "1"
+  target-arrowhead: "0..*"
+}
+
+RBACAccountRef -> ProposalSubmission: {
+  label: "+owns and creates"
+  source-arrowhead: "1"
+  target-arrowhead: "0..*"
+}
+
+RBACAccountRef -> ProposalRetraction: {
+  label: "+owns and creates"
+  source-arrowhead: "1"
+  target-arrowhead: "0..*"
+}
+
+RBACAccountRef -- Role: {
+  label: "+has"
+  source-arrowhead: "1..*"
+  target-arrowhead: "1..*"
+}
+
+Brand -- Campaign: {
+  label: "+has"
+  source-arrowhead: "1"
+  target-arrowhead: "1..*"
+}
+
+Campaign -- Category: {
+  label: "+has"
+  source-arrowhead: "1"
+  target-arrowhead: "1..*"
+}
+
+Campaign -- Event: {
+  label: "+has"
+  source-arrowhead: "1"
+  target-arrowhead: "1..*"
+}
+
+Campaign -- Rule: {
+  label: "+has"
+  source-arrowhead: "1"
+  target-arrowhead: "0..*"
+}
+
+Proposal -- Comment: {
+  label: "+has"
+  source-arrowhead: "1"
+  target-arrowhead: "0..*"
+}
+
+Proposal -- Vote: {
+  label: "+has"
+  source-arrowhead: "1"
+  target-arrowhead: "0..*"
+}
+
+Proposal -- Review: {
+  label: "+has"
+  source-arrowhead: "1"
+  target-arrowhead: "0..*"
+}
+
+Proposal -- Space: {
+  label: "+has"
+  source-arrowhead: "1..*"
+  target-arrowhead: "0..*"
+}
+
+Proposal -> ProposalSubmission: {
+  label: "+has"
+  source-arrowhead: "1"
+  target-arrowhead: "0..*"
+}
+
+Proposal -> ProposalRetraction: {
+  label: "+has"
+  source-arrowhead: "1"
+  target-arrowhead: "0..*"
+}
+
+Proposal -> ProposalModerationBlock: {
+  label: "+has"
+  source-arrowhead: "1"
+  target-arrowhead: "0..*"
+}

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["update"],"mod":["native_assets","txo_assets"]};
