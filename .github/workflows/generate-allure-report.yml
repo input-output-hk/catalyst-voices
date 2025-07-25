@@ -95,6 +95,10 @@ jobs:
         with:
           name: test-reports
 
+      - uses: actions/download-artifact@v4
+        with:
+          name: test-reports-gateway
+
       - name: Setup Allure report
         run: |
           mkdir -p ${{ env.ALLURE_REPORT_FOLDER }}
@@ -141,6 +145,10 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: coverage-reports
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: coverage-reports-gateway
 
       - name: Collect coverage report
         run: |
