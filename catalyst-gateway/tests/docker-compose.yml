@@ -29,6 +29,7 @@ services:
       - DB_USER_PASSWORD=CHANGE_ME
 
       - INIT_AND_DROP_DB=true
+      - WITH_SEED_DATA=.
       - WITH_MIGRATIONS=true
     depends_on:
       postgres:
