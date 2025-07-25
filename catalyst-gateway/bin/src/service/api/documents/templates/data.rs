@@ -32,10 +32,7 @@ impl From<CategoryDocData> for SignedDocData {
         Self {
             id: value.0,
             ver: value.0,
-            doc_type: catalyst_signed_doc::doc_types::CATEGORY_PARAMETERS
-                .to_string()
-                .parse()
-                .expect("Failed to convert UUID"),
+            doc_type: catalyst_signed_doc::doc_types::CATEGORY_PARAMETERS.uuid(),
             content: EMPTY_JSON_OBJECT_BYTES,
             category_id: None,
         }
@@ -74,10 +71,7 @@ impl From<ProposalTemplateDocData> for SignedDocData {
         Self {
             id: value.0,
             ver: value.0,
-            doc_type: catalyst_signed_doc::doc_types::PROPOSAL
-                .to_string()
-                .parse()
-                .expect("Failed to convert UUID"),
+            doc_type: catalyst_signed_doc::doc_types::PROPOSAL.uuid(),
             content: value.2,
             category_id: Some(value.1),
         }
@@ -113,10 +107,7 @@ impl From<CommentTemplateDocData> for SignedDocData {
         Self {
             id: value.0,
             ver: value.0,
-            doc_type: catalyst_signed_doc::doc_types::PROPOSAL_COMMENT
-                .to_string()
-                .parse()
-                .expect("Failed to convert UUID"),
+            doc_type: catalyst_signed_doc::doc_types::PROPOSAL_COMMENT.uuid(),
             content: include_bytes!("./docs/f14_comment_template.schema.json"),
             category_id: Some(value.1),
         }

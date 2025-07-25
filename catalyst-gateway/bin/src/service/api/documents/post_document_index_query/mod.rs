@@ -64,11 +64,13 @@ pub(crate) async fn endpoint(
     let limit = limit.unwrap_or_default();
 
     let total: u32 = match total_doc_count {
-        Ok(total) => match total.try_into() {
-            Ok(t) => t,
-            Err(e) => {
-                return AllResponses::handle_error(&e.into());
-            },
+        Ok(total) => {
+            match total.try_into() {
+                Ok(t) => t,
+                Err(e) => {
+                    return AllResponses::handle_error(&e.into());
+                },
+            }
         },
         Err(e) => return AllResponses::handle_error(&e),
     };
@@ -107,13 +109,15 @@ async fn fetch_docs(
     let (indexed_docs, total_fetched_doc_count) = docs_stream
         .try_fold(
             (HashMap::new(), 0u32),
-            |(mut indexed_docs, mut total_fetched_doc_count), doc| async move {
-                let id = *doc.id();
-                indexed_docs.entry(id).or_insert_with(Vec::new).push(doc);
-                total_fetched_doc_count = total_fetched_doc_count
-                    .checked_add(1)
-                    .ok_or(anyhow::anyhow!("Fetched Signed Documents overflow"))?;
-                Ok((indexed_docs, total_fetched_doc_count))
+            |(mut indexed_docs, mut total_fetched_doc_count), doc| {
+                async move {
+                    let id = *doc.id();
+                    indexed_docs.entry(id).or_insert_with(Vec::new).push(doc);
+                    total_fetched_doc_count = total_fetched_doc_count
+                        .checked_add(1)
+                        .ok_or(anyhow::anyhow!("Fetched Signed Documents overflow"))?;
+                    Ok((indexed_docs, total_fetched_doc_count))
+                }
             },
         )
         .await?;

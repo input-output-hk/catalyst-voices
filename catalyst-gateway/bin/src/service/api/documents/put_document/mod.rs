@@ -190,7 +190,7 @@ async fn store_document_in_db(
     let doc_body = SignedDocBody::new(
         doc.doc_id()?.into(),
         doc.doc_ver()?.into(),
-        doc.doc_type()?.to_string().parse()?,
+        doc.doc_type()?.uuid(),
         authors,
         Some(doc_meta_json),
     );
