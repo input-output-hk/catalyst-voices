@@ -1,11 +1,24 @@
 # cspell: words statusgossip
 
 services:
-  event-db:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+
+  # runs migrations for the separate `postgres` service
+  event-db-migrations:
     image: event-db:latest
     container_name: event-db
     environment:
-      - DB_HOST=localhost
+      - DB_HOST=postgres
       - DB_PORT=5432
       - DB_NAME=CatalystEventDev
       - DB_DESCRIPTION="Catalyst Event DB"
@@ -16,11 +29,9 @@ services:
 
       - INIT_AND_DROP_DB=true
       - WITH_MIGRATIONS=true
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${DB_SUPERUSER} -d $${DB_SUPERUSER_PASSWORD}"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   scylla-node:
     image: scylladb/scylla:latest
@@ -44,7 +55,7 @@ services:
       # approximately a 25 minutes of waiting
       retries: 50
     environment:
-      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@postgres/CatalystEventDev
       - CASSANDRA_PERSISTENT_URL=scylla-node:9042
       - CASSANDRA_VOLATILE_URL=scylla-node:9042
       - CHAIN_NETWORK=Preprod
@@ -53,8 +64,8 @@ services:
       # - LOG_LEVEL=error
       # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
     depends_on:
-      event-db:
-        condition: service_healthy
+      event-db-migrations:
+        condition: service_started
       scylla-node:
         condition: service_healthy
 
@@ -74,10 +85,10 @@ services:
     image: postgres-runner:latest
     container_name: postgres-runner
     environment:
-      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@postgres/CatalystEventDev
     depends_on:
-      event-db:
-        condition: service_healthy
+      event-db-migrations:
+        condition: service_started
 
   scylla-runner:
     image: scylla-runner:latest
