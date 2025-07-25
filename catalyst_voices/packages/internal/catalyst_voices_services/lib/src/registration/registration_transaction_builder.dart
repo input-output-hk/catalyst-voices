@@ -93,6 +93,8 @@ final class RegistrationTransactionBuilder {
       throw const RegistrationInsufficientBalanceException();
     } on InsufficientUtxoBalanceException {
       throw const RegistrationInsufficientBalanceException();
+    } on AssetNameTooLongException catch (e) {
+      throw RegistrationAssetNameTooLongException(assets: e.assets);
     }
   }
 
@@ -128,7 +130,7 @@ final class RegistrationTransactionBuilder {
       _stakeAddress.publicKeyHash,
     };
 
-    final strategy = _pickStrategy(RegistrationTransactionStrategyType.models);
+    final strategy = _pickStrategy(RegistrationTransactionStrategyType.bytes);
 
     return strategy.build(
       purpose: _catalystUserRoleRegistrationPurpose,

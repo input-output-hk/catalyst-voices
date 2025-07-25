@@ -607,6 +607,15 @@ final class TransactionBuilder extends Equatable {
           maxCount: config.maxAssetsPerOutput,
         );
       }
+
+      final tooLongAssets = output.amount
+          .listNonZeroAssetIds()
+          .where((assetId) => assetId.$2.isTooLong)
+          .map((assetId) => assetId.$2);
+
+      if (tooLongAssets.isNotEmpty) {
+        throw AssetNameTooLongException(assets: tooLongAssets.toList());
+      }
     }
   }
 

@@ -74,8 +74,7 @@ void main() {
       ];
 
       final models = _pickStrategy(RegistrationTransactionStrategyType.models, utxos: utxos);
-      // TODO(damian-molinski): enable when implemented.
-      // final bytes = _pickStrategy(RegistrationTransactionStrategyType.bytes, utxos: utxos);
+      final bytes = _pickStrategy(RegistrationTransactionStrategyType.bytes, utxos: utxos);
 
       // Then
       final modelsTransaction = await models.build(
@@ -85,17 +84,22 @@ void main() {
         publicKeys: publicKeys,
         requiredSigners: requiredSigners,
       );
-
-      expect(modelsTransaction.bytes, isNotEmpty);
-      /*final bytesTransaction = await bytes.build(
+      final rawTransaction = await bytes.build(
         purpose: _purpose,
         rootKeyPair: rootKeyPair,
         derCert: derCert,
         publicKeys: publicKeys,
         requiredSigners: requiredSigners,
-      );*/
+      );
 
-      // expect(modelsTransaction.bytes, equals(bytesTransaction.bytes));
+      final modelsTxBytes = modelsTransaction.bytes;
+      final rawTxBytes = rawTransaction.bytes;
+
+      expect(
+        modelsTxBytes,
+        allOf(hasLength(rawTxBytes.length), equals(rawTxBytes)),
+        reason: 'Two bytes and models strategy have to produce same outcome',
+      );
     });
   });
 }
@@ -193,6 +197,11 @@ class _FakeBip32Ed25519XPrivateKey extends Fake implements kd.Bip32Ed25519XPriva
     Future<R> Function(kd.Bip32Ed25519XPrivateKey privateKey) callback,
   ) =>
       callback(this);
+
+  @override
+  Future<bool> verify(List<int> message, {required kd.Bip32Ed25519XSignature signature}) async {
+    return true;
+  }
 }
 
 class _FakeBip32Ed25519XPrivateKeyFactory extends kd.Bip32Ed25519XPrivateKeyFactory {

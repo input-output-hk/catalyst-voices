@@ -670,6 +670,15 @@
   "@registrationAccountNotFound": {
     "description": "Error message shown when recovering account with invalid seed phrase."
   },
+  "registrationAssetNameTooLong": "UTxO asset name too long. \n{names}",
+  "@registrationAssetNameTooLong": {
+    "description": "Error message selected UTxO name is too long.",
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
   "walletLinkRoleChooserTitle": "How do you want to participate in Catalyst?",
   "@walletLinkRoleChooserTitle": {
     "description": "A title on the role chooser screen in registration."
