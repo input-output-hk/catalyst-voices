@@ -13,7 +13,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-  
+
+  # runs old migrations for the separate `postgres` service
   event-db-v2-migrations:
     image: event-db:v2
     container_name: event-db-v2-migrations

@@ -6,14 +6,12 @@ IMPORT .. AS gateway
 
 # a special package for applying migrations only up to "V2_**"
 package-event-db-v2:
-    FROM github.com/input-output-hk/catalyst-voices/catalyst-gateway/event-db:event-db-old-signed-doc+build
-
-    WORKDIR /build
+    FROM github.com/input-output-hk/catalyst-voices/catalyst-gateway/event-db:event-db-old-signed-doc+docker
 
     ARG container="event-db"
     ARG tag="v2"
 
-    DO postgresql-ci+BUILD --image_name=${container} --image_tag=${tag}
+    SAVE IMAGE ${container}:${tag}
 
 # build all necessary docker images required to run `docker-compose.yml` services
 prepare-all-images:
