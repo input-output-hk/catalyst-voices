@@ -101,7 +101,7 @@ extension CampaignTimelineX on CampaignTimeline {
       description: '''Community members cast their votes using the Catalyst Voting app.''',
       timeline: DateRange(
         from: DateTime.utc(2025, 09, 22, 12),
-        to: DateTime.utc(2025, 10, 06, 6),
+        to: DateTime.utc(2025, 10, 06, 11),
       ),
       stage: CampaignTimelineStage.communityVoting,
     ),
@@ -110,8 +110,8 @@ extension CampaignTimelineX on CampaignTimeline {
       description:
           '''Votes are tallied and the results are announced. Rewards are distributed to both voters and community reviewers.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 10, 06, 9),
-        to: DateTime.utc(2025, 10, 08, 21),
+        from: DateTime.utc(2025, 10, 06, 11),
+        to: DateTime.utc(2025, 10, 09, 18),
       ),
       stage: CampaignTimelineStage.votingResults,
     ),
@@ -120,8 +120,8 @@ extension CampaignTimelineX on CampaignTimeline {
       description:
           '''This phase involves finalizing the key milestones submitted in the Catalyst App during the proposal submission stage within the Catalyst Milestone Module. It also includes conducting formal due diligence, and fulfilling all required onboarding steps to become eligible for funding.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 10, 07, 08),
-        to: DateTime.utc(2025, 12, 07, 08),
+        from: DateTime.utc(2025, 10, 10, 08),
+        to: DateTime.utc(2025, 12, 10, 08),
       ),
       stage: CampaignTimelineStage.projectOnboarding,
     ),
