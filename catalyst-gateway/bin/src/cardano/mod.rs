@@ -1,6 +1,6 @@
 //! Logic for orchestrating followers
 
-use std::{fmt::Display, ops::Sub, sync::Arc, time::Duration};
+use std::{collections::BTreeSet, fmt::Display, ops::Sub, sync::Arc, time::Duration};
 
 use cardano_blockchain_types::{MultiEraBlock, Network, Point, Slot};
 use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
@@ -8,7 +8,7 @@ use duration_string::DurationString;
 use event::EventTarget;
 use futures::{stream::FuturesUnordered, StreamExt};
 use rand::{Rng, SeedableRng};
-use tokio::sync::broadcast;
+use tokio::sync::{broadcast, watch};
 use tracing::{debug, error, info};
 
 use crate::{
@@ -240,6 +240,7 @@ impl SyncParams {
 #[allow(clippy::too_many_lines)]
 fn sync_subchain(
     params: SyncParams, event_sender: broadcast::Sender<event::ChainIndexerEvent>,
+    mut unprocessed_blocks: watch::Receiver<BTreeSet<Slot>>,
 ) -> tokio::task::JoinHandle<SyncParams> {
     tokio::spawn(async move {
         // Backoff hitting the database if we need to.
@@ -295,7 +296,10 @@ fn sync_subchain(
                 cardano_chain_follower::Kind::Block => {
                     let block = chain_update.block_data();
 
-                    if let Err(error) = index_block(block).await {
+                    if let Err(error) =
+                        index_block(block, &mut unprocessed_blocks, params.end.slot_or_default())
+                            .await
+                    {
                         let error_msg = format!("Failed to index block {}", block.point());
                         error!(chain=%params.chain, error=%error, params=%params, error_msg);
                         return params.done(
@@ -346,7 +350,13 @@ fn sync_subchain(
 
                         // Purge success, now index the current block
                         let block = chain_update.block_data();
-                        if let Err(error) = index_block(block).await {
+                        if let Err(error) = index_block(
+                            block,
+                            &mut unprocessed_blocks,
+                            params.end.slot_or_default(),
+                        )
+                        .await
+                        {
                             let error_msg =
                                 format!("Failed to index block after rollback {}", block.point());
                             error!(chain=%params.chain, error=%error, params=%params, error_msg);
@@ -433,6 +443,17 @@ struct SyncTask {
         broadcast::Sender<event::ChainIndexerEvent>,
         broadcast::Receiver<event::ChainIndexerEvent>,
     ),
+
+    /// A channel that contains an end slot number for every immutable sync task.
+    ///
+    /// For example, if there are 3 tasks with `0..100`, `100..200` and `200..300` block
+    /// ranges (where the end bounds aren't inclusive), then the channel will contain the
+    /// following list: `[99, 199, 299]`. A slot value is removed when that task is done,
+    /// so when the second task is finished the list will be updated to `[99, 299]`.
+    unprocessed_blocks: (
+        watch::Sender<BTreeSet<Slot>>,
+        watch::Receiver<BTreeSet<Slot>>,
+    ),
 }
 
 impl SyncTask {
@@ -447,6 +468,7 @@ impl SyncTask {
             live_tip_slot: 0.into(),
             sync_status: Vec::new(),
             event_channel: broadcast::channel(10),
+            unprocessed_blocks: watch::channel(BTreeSet::new()),
         }
     }
 
@@ -454,7 +476,14 @@ impl SyncTask {
     fn add_sync_task(
         &mut self, params: SyncParams, event_sender: broadcast::Sender<event::ChainIndexerEvent>,
     ) {
-        self.sync_tasks.push(sync_subchain(params, event_sender));
+        self.unprocessed_blocks.0.send_modify(|blocks| {
+            blocks.insert(params.end.slot_or_default());
+        });
+        self.sync_tasks.push(sync_subchain(
+            params,
+            event_sender,
+            self.unprocessed_blocks.1.clone(),
+        ));
         self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
         debug!(current_sync_tasks=%self.current_sync_tasks, "Added new Sync Task");
         self.dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
@@ -591,6 +620,14 @@ impl SyncTask {
                                             slot: block.slot_or_default(),
                                         },
                                     );
+                                });
+
+                                self.unprocessed_blocks.0.send_modify(|blocks| {
+                                    if !blocks.remove(&finished.end.slot_or_default()) {
+                                        error!(chain=%self.cfg.chain, end=?finished.end,
+                                            "The immutable follower completed successfully, but its end point isn't present in index_sync_channel"
+                                        );
+                                    }
                                 });
 
                                 // If we need more immutable chain followers to sync the block

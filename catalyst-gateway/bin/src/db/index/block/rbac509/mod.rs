@@ -6,12 +6,16 @@ pub(crate) mod insert_catalyst_id_for_txn_id;
 pub(crate) mod insert_rbac509;
 pub(crate) mod insert_rbac509_invalid;
 
-use std::{collections::HashSet, sync::Arc};
+use std::{
+    collections::{BTreeSet, HashSet},
+    sync::Arc,
+};
 
-use anyhow::Result;
-use cardano_blockchain_types::{MultiEraBlock, TransactionId, TxnIndex};
+use anyhow::{Context, Result};
+use cardano_blockchain_types::{MultiEraBlock, Slot, TransactionId, TxnIndex};
 use rbac_registration::cardano::cip509::Cip509;
 use scylla::client::session::Session;
+use tokio::sync::watch;
 use tracing::{debug, error};
 
 use crate::{
@@ -70,6 +74,7 @@ impl Rbac509InsertQuery {
     #[allow(clippy::too_many_lines)]
     pub(crate) async fn index(
         &mut self, txn_hash: TransactionId, index: TxnIndex, block: &MultiEraBlock,
+        unprocessed_blocks: &mut watch::Receiver<BTreeSet<Slot>>, our_end: Slot,
         context: &mut RbacBlockIndexingContext,
     ) -> Result<()> {
         let slot = block.slot();
@@ -106,6 +111,10 @@ impl Rbac509InsertQuery {
                 cip509.txn_hash()
             );
         }
+
+        // To properly validate a new registration we need to index all the previous blocks, so
+        // here we are going to wait till the other tasks have indexed the blocks before this one.
+        wait_for_previous_blocks(unprocessed_blocks, our_end, block.slot()).await?;
 
         let previous_transaction = cip509.previous_transaction();
         match Box::pin(validate_rbac_registration(
@@ -283,5 +292,27 @@ impl Rbac509InsertQuery {
         }
 
         query_handles
+    }
+}
+
+/// Waits till all previous blocks are indexed.
+///
+/// The given `our_end` is excluded from the list of unprocessed blocks.
+async fn wait_for_previous_blocks(
+    unprocessed_blocks: &mut watch::Receiver<BTreeSet<Slot>>, our_end: Slot, current_slot: Slot,
+) -> Result<()> {
+    loop {
+        if unprocessed_blocks
+            .borrow_and_update()
+            .iter()
+            .filter(|&&v| v == our_end)
+            .all(|&slot| slot > current_slot)
+        {
+            return Ok(());
+        }
+        unprocessed_blocks
+            .changed()
+            .await
+            .context("Unprocessed blocks channel was closed unexpectedly")?;
     }
 }
