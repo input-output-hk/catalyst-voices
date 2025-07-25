@@ -70,15 +70,14 @@ class _AppState extends State<App> {
       BlocProvider<NewProposalCubit>(
         create: (_) => Dependencies.instance.get<NewProposalCubit>(),
       ),
-      BlocProvider<CampaignStageCubit>(
-        lazy: false,
-        create: (_) => Dependencies.instance.get<CampaignStageCubit>(),
-      ),
       BlocProvider<DevToolsBloc>(
         create: (_) => Dependencies.instance.get<DevToolsBloc>(),
       ),
       BlocProvider<PublicProfileEmailStatusCubit>(
         create: (_) => Dependencies.instance.get<PublicProfileEmailStatusCubit>(),
+      ),
+      BlocProvider<CampaignPhaseAwareCubit>(
+        create: (_) => Dependencies.instance.get<CampaignPhaseAwareCubit>(),
       ),
     ];
   }
