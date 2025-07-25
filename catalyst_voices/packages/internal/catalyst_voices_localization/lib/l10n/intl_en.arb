@@ -3210,5 +3210,21 @@
         "type": "String"
       }
     }
+  },
+  "catalystAppClosed": "The Catalyst app is closed.",
+  "@catalystAppClosed": {
+    "description": "Text shown when Catalyst app is closed"
+  },
+  "browseProposalsOnProjectCatalyst": "Please browse other Catalyst Fund14 proposals on ProjectCatalyst.io",
+  "@browseProposalsOnProjectCatalyst": {
+    "description": "Text shown when Catalyst app is closed"
+  },
+  "browseFund14Proposals": "Browse Fund14 proposals",
+  "@browseFund14Proposals": {
+    "description": "Text shown when Catalyst app is closed"
+  },
+  "headsUpTitle": "Heads Up",
+  "@headsUpTitle": {
+    "description": "Text to tell user that something important is happening"
   }
 }

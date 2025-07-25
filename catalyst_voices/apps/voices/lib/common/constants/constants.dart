@@ -3,6 +3,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 abstract class VoicesConstants {
   static const _docs = 'https://docs.projectcatalyst.io';
   static const _catalystApp = '$_docs/catalyst-tools/catalyst-app';
+  static const _projectCatalyst = 'https://projectcatalyst.io';
 
   /// External urls
   static const supportedWalletsUrl = '$_docs/current-fund/voter-registration/supported-wallets';
@@ -44,6 +45,7 @@ abstract class VoicesConstants {
   static const campaignTimeline = '$_docs/current-fund/fund-basics/fund-timeline';
   static const milestoneGuideline =
       '$_docs/current-fund/project-onboarding/milestone-based-proposals';
+  static const projectCatalystFund14Url = '$_projectCatalyst/funds/14';
 
   static String cardanoScanStakeAddressUrl(ShelleyAddress stakeAddress) {
     switch (stakeAddress.network) {
