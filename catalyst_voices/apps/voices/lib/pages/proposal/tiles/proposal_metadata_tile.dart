@@ -52,7 +52,7 @@ class ProposalMetadataTile extends StatelessWidget {
           children: <Widget>[
             ProposalPublishChip(proposalPublish: status),
             const SizedBox(width: 8),
-            const ProposalVersion(readOnly: true),
+            ProposalVersion(readOnly: !CatalystPlatform.isMobileWeb),
             if (createdAt != null) ...[
               const SizedBox(width: 16),
               _CreatedAtText(
