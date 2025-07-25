@@ -1,26 +1,30 @@
-import 'dart:async';
-
 import 'package:catalyst_voices/pages/campaign_phase_aware/widgets/error_campaign_phase_aware.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/widgets/loading_campaign_phase_aware.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
+
+typedef CampaignPhaseAwareBuilder = Widget Function(
+  BuildContext context,
+  CampaignPhase phase,
+  int fundNumber,
+);
 
 class CampaignPhaseAware extends StatelessWidget {
   final CampaignPhaseType phase;
-  final DataWidgetBuilder<CampaignPhase>? upcoming;
-  final DataWidgetBuilder<CampaignPhase>? active;
-  final DataWidgetBuilder<CampaignPhase>? post;
-  final DataWidgetBuilder<CampaignPhase>? orElse;
+  final CampaignPhaseAwareBuilder? upcoming;
+  final CampaignPhaseAwareBuilder? active;
+  final CampaignPhaseAwareBuilder? post;
+  final CampaignPhaseAwareBuilder? orElse;
 
   factory CampaignPhaseAware.orElse({
     Key? key,
     required CampaignPhaseType phase,
-    required DataWidgetBuilder<CampaignPhase> orElse,
-    DataWidgetBuilder<CampaignPhase>? upcoming,
-    DataWidgetBuilder<CampaignPhase>? active,
-    DataWidgetBuilder<CampaignPhase>? post,
+    required CampaignPhaseAwareBuilder orElse,
+    CampaignPhaseAwareBuilder? upcoming,
+    CampaignPhaseAwareBuilder? active,
+    CampaignPhaseAwareBuilder? post,
   }) {
     return CampaignPhaseAware._(
       key: key,
@@ -35,9 +39,9 @@ class CampaignPhaseAware extends StatelessWidget {
   factory CampaignPhaseAware.when({
     Key? key,
     required CampaignPhaseType phase,
-    required DataWidgetBuilder<CampaignPhase> upcoming,
-    required DataWidgetBuilder<CampaignPhase> active,
-    required DataWidgetBuilder<CampaignPhase> post,
+    required CampaignPhaseAwareBuilder upcoming,
+    required CampaignPhaseAwareBuilder active,
+    required CampaignPhaseAwareBuilder post,
   }) {
     return CampaignPhaseAware._(
       key: key,
@@ -59,39 +63,35 @@ class CampaignPhaseAware extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<CampaignPhaseAwareCubit, CampaignPhaseAwareState>(
-      builder: (context, state) {
-        return switch (state) {
-          ErrorCampaignPhaseAwareState(:final error) => ErrorCampaignPhaseAware(error: error),
-          NoActiveCampaignPhaseAwareState() => const ErrorCampaignPhaseAware(),
-          LoadingCampaignPhaseAwareState() => const LoadingCampaignPhaseAware(),
-          DataCampaignPhaseAwareState(:final campaign) => _CampaignPhaseAwareBuilder(
-              key: const Key('CampaignPhaseAwareBuilder'),
-              campaign: campaign,
-              phase: phase,
-              upcoming: upcoming,
-              active: active,
-              post: post,
-              orElse: orElse,
-            ),
-        };
-      },
+    return Stack(
+      children: [
+        const _ErrorCampaignPhaseAwareSelector(),
+        const _LoadingCampaignPhaseAwareSelector(),
+        _DataCampaignPhaseAwareSelector(
+          phase: phase,
+          upcoming: upcoming,
+          active: active,
+          post: post,
+          orElse: orElse,
+        ),
+      ],
     );
   }
 }
 
-class _CampaignPhaseAwareBuilder extends StatefulWidget {
-  final Campaign campaign;
-  final CampaignPhaseType phase;
-  final DataWidgetBuilder<CampaignPhase>? upcoming;
-  final DataWidgetBuilder<CampaignPhase>? active;
-  final DataWidgetBuilder<CampaignPhase>? post;
-  final DataWidgetBuilder<CampaignPhase>? orElse;
+class _CampaignPhaseAwareBuilder extends StatelessWidget {
+  final CampaignPhaseStatus status;
+  final CampaignPhase phase;
+  final int fundNumber;
+  final CampaignPhaseAwareBuilder? upcoming;
+  final CampaignPhaseAwareBuilder? active;
+  final CampaignPhaseAwareBuilder? post;
+  final CampaignPhaseAwareBuilder? orElse;
 
   const _CampaignPhaseAwareBuilder({
-    super.key,
-    required this.campaign,
+    required this.status,
     required this.phase,
+    required this.fundNumber,
     required this.upcoming,
     required this.active,
     required this.post,
@@ -99,72 +99,100 @@ class _CampaignPhaseAwareBuilder extends StatefulWidget {
   });
 
   @override
-  State<_CampaignPhaseAwareBuilder> createState() => _CampaignPhaseAwareBuilderState();
-}
-
-class _CampaignPhaseAwareBuilderState extends State<_CampaignPhaseAwareBuilder> {
-  Timer? _phaseTimer;
-
-  Duration? get _phaseDuration {
-    final now = DateTimeExt.now();
-    final phaseDate = switch (_phaseState.status) {
-      CampaignPhaseStatus.upcoming => _phaseState.phase.timeline.from,
-      CampaignPhaseStatus.active => _phaseState.phase.timeline.to,
-      _ => null
-    };
-
-    if (phaseDate == null) return null;
-    final duration = phaseDate.difference(now);
-    return duration.isNegative ? null : duration;
-  }
-
-  CampaignPhaseState get _phaseState => widget.campaign.phaseStateTo(widget.phase);
-
-  @override
   Widget build(BuildContext context) {
-    return switch (_phaseState.status) {
-      CampaignPhaseStatus.upcoming when widget.upcoming != null =>
-        widget.upcoming!(context, _phaseState.phase),
-      CampaignPhaseStatus.active when widget.active != null =>
-        widget.active!(context, _phaseState.phase),
-      CampaignPhaseStatus.post when widget.post != null => widget.post!(context, _phaseState.phase),
-      _ when widget.orElse != null => widget.orElse!(context, _phaseState.phase),
+    return switch (status) {
+      CampaignPhaseStatus.upcoming when upcoming != null => upcoming!(context, phase, fundNumber),
+      CampaignPhaseStatus.active when active != null => active!(context, phase, fundNumber),
+      CampaignPhaseStatus.post when post != null => post!(context, phase, fundNumber),
+      _ when orElse != null => orElse!(context, phase, fundNumber),
       _ => throw ArgumentError(
-          'No builder provided for phase status ${_phaseState.status}',
+          'No builder provided for phase type $phase',
         ),
     };
   }
+}
+
+class _DataCampaignPhaseAwareSelector extends StatelessWidget {
+  final CampaignPhaseType phase;
+  final CampaignPhaseAwareBuilder? upcoming;
+  final CampaignPhaseAwareBuilder? active;
+  final CampaignPhaseAwareBuilder? post;
+  final CampaignPhaseAwareBuilder? orElse;
+
+  const _DataCampaignPhaseAwareSelector({
+    required this.phase,
+    this.upcoming,
+    this.active,
+    this.post,
+    this.orElse,
+  });
 
   @override
-  void didUpdateWidget(_CampaignPhaseAwareBuilder oldWidget) {
-    if (oldWidget.phase != widget.phase || oldWidget.campaign != widget.campaign) {
-      _phaseTimer?.cancel();
-      _phaseTimer = null;
-      _setupTimer();
-    }
-    super.didUpdateWidget(oldWidget);
+  Widget build(BuildContext context) {
+    return BlocSelector<CampaignPhaseAwareCubit, CampaignPhaseAwareState,
+        (bool, CampaignPhaseState?, int)>(
+      selector: (state) {
+        if (state is DataCampaignPhaseAwareState) {
+          return (true, state.getPhaseStatus(phase), state.fundNumber);
+        }
+        return (false, null, 0);
+      },
+      builder: (context, state) {
+        if (!state.$1 || state.$2 == null) return const SizedBox.shrink();
+        return _CampaignPhaseAwareBuilder(
+          status: state.$2!.status,
+          phase: state.$2!.phase,
+          fundNumber: state.$3,
+          upcoming: upcoming,
+          active: active,
+          post: post,
+          orElse: orElse,
+        );
+      },
+    );
   }
+}
+
+class _ErrorCampaignPhaseAwareSelector extends StatelessWidget {
+  const _ErrorCampaignPhaseAwareSelector();
 
   @override
-  void dispose() {
-    _phaseTimer?.cancel();
-    _phaseTimer = null;
-    super.dispose();
+  Widget build(BuildContext context) {
+    return BlocSelector<CampaignPhaseAwareCubit, CampaignPhaseAwareState,
+        (bool, LocalizedException?)>(
+      selector: (state) => switch (state) {
+        ErrorCampaignPhaseAwareState(:final error) => (true, error),
+        _ => (false, null)
+      },
+      builder: (context, state) {
+        return Offstage(
+          offstage: !state.$1,
+          child: ErrorCampaignPhaseAware(error: state.$2),
+        );
+      },
+    );
   }
+}
+
+class _LoadingCampaignPhaseAwareSelector extends StatelessWidget {
+  const _LoadingCampaignPhaseAwareSelector();
 
   @override
-  void initState() {
-    super.initState();
-    _setupTimer();
-  }
-
-  void _setupTimer() {
-    final duration = _phaseDuration;
-    if (duration != null) {
-      _phaseTimer = Timer(duration, () {
-        setState(() {});
-        _setupTimer();
-      });
-    }
+  Widget build(BuildContext context) {
+    return BlocSelector<CampaignPhaseAwareCubit, CampaignPhaseAwareState, bool>(
+      selector: (state) => switch (state) {
+        LoadingCampaignPhaseAwareState() => true,
+        _ => false,
+      },
+      builder: (context, isLoading) {
+        return Offstage(
+          offstage: !isLoading,
+          child: TickerMode(
+            enabled: isLoading,
+            child: const LoadingCampaignPhaseAware(),
+          ),
+        );
+      },
+    );
   }
 }

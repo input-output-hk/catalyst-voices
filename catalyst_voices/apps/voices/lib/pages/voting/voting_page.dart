@@ -37,12 +37,12 @@ class _VotingPageState extends State<VotingPage>
   Widget build(BuildContext context) {
     return CampaignPhaseAware.when(
       phase: CampaignPhaseType.communityVoting,
-      upcoming: (_, phase) => Container(),
-      active: (_, __) => const HeaderAndContentLayout(
+      upcoming: (_, phase, __) => Container(),
+      active: (_, __, ___) => const HeaderAndContentLayout(
         header: VotingHeader(),
         content: VotingContent(),
       ),
-      post: (_, __) => Container(),
+      post: (_, __, ___) => Container(),
     );
   }
 

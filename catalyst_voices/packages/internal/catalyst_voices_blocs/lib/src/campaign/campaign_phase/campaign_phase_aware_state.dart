@@ -10,12 +10,22 @@ sealed class CampaignPhaseAwareState extends Equatable {
 }
 
 final class DataCampaignPhaseAwareState extends CampaignPhaseAwareState {
-  final Campaign campaign;
+  final CampaignPhaseType? activeCampaignPhaseType;
+  final List<CampaignPhaseState> phasesStates;
+  final int fundNumber;
 
-  const DataCampaignPhaseAwareState({required this.campaign});
+  const DataCampaignPhaseAwareState({
+    required this.activeCampaignPhaseType,
+    required this.phasesStates,
+    required this.fundNumber,
+  });
 
   @override
-  List<Object?> get props => [campaign];
+  List<Object?> get props => [activeCampaignPhaseType, phasesStates, fundNumber];
+
+  CampaignPhaseState getPhaseStatus(CampaignPhaseType phaseType) {
+    return phasesStates.firstWhere((e) => e.phase.type == phaseType);
+  }
 }
 
 final class ErrorCampaignPhaseAwareState extends CampaignPhaseAwareState {

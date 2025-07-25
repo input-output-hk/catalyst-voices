@@ -2652,9 +2652,14 @@
       }
     }
   },
-  "proposalSubmissionIsClosed": "Proposal submission  is closed for Fund14.",
+  "proposalSubmissionIsClosed": "Proposal submission is closed for Fund{fundNumber}.",
   "@proposalSubmissionIsClosed": {
-    "description": "Title text when proposal submission is closed."
+    "description": "Title text when proposal submission is closed.",
+    "placeholders": {
+      "fundNumber": {
+        "type": "int"
+      }
+    }
   },
   "proposalSubmissionClosedDescription": "We’re moving into the Community Review stage!\nWant to stay involved and earn rewards? Check out our knowledge base.",
   "@proposalSubmissionClosedDescription": {
