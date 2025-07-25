@@ -24,7 +24,7 @@ prepare-all-images:
     BUILD ./schemathesis_tests+package
     BUILD +package-postgres-runner
     BUILD +package-scylla-runner
-    BUILD +package-event-db-old-signed-doc
+    BUILD +package-event-db-v2
 
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.
