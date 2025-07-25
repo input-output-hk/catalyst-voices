@@ -1,3 +1,5 @@
+# cspell: words hoverkraft
+
 name: CI
 
 on:
@@ -16,14 +18,105 @@ permissions:
   packages: write
   pull-requests: write
 
+env:
+  REPORT_EXT: .gateway.junit-report.xml
+  COVERAGE_EXT: .gateway.coverage.info
+
 jobs:
   ci:
     if: ${{ !github.event.pull_request.draft }}
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.8.0
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.8.1
     with:
-      forge_version: 0.19.0
+      forge_version: 0.19.1
+
+  tests:
+    needs: ci
+    name: Cat-Gateway ALL integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: false
+          swap-storage: true
+
+      - name: Install Forge
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.8.1
+        with:
+          version: 0.19.1
+      - name: Setup
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.8.1
+      - name: Prepare artifacts
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.8.1
+        with:
+          command: run
+          args: ./catalyst-gateway/tests/+prepare-all-images
+
+      - name: Running Postgres tests
+        if: always()
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up postgres-runner --abort-on-container-exit --exit-code-from postgres-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs postgres-runner
+
+      - name: Running Scylla tests
+        if: always()
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up scylla-runner --abort-on-container-exit --exit-code-from scylla-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs scylla-runner
+
+      - name: Running integration API tests
+        if: always()
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
+
+      - name: Running schemathesis tests
+        if: always()
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs schemathesis-runner
+
+      - name: Collecting reports
+        if: always()
+        run: |
+          docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
+          docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
+          docker cp schemathesis-runner:/results/junit-report.xml ./schemathesis${{ env.REPORT_EXT }}
+
+      - name: Collect and upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports
+          path: "**/*${{ env.REPORT_EXT }}"
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Collect and upload test coverage
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-reports
+          path: "**/*${{ env.COVERAGE_EXT }}"
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Shutting down all services
+        if: always()
+        run: docker compose -f catalyst-gateway/tests/docker-compose.yml down
 
   test_reporting:
-    if: ${{ !github.event.pull_request.draft }}
-    needs: ci
+    if: ${{ !github.event.pull_request.draft && always() }}
+    needs: tests
     uses: ./.github/workflows/generate-allure-report.yml

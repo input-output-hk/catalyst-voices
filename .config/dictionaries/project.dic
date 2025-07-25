@@ -159,6 +159,7 @@ iphoneos
 iphonesimulator
 jdbc
 jetbrains
+jlumbroso
 Joaquín
 jorm
 jormungandr
@@ -328,6 +329,7 @@ SYSROOT
 tablestats
 tabview
 tacho
+tailscale
 testcov
 testdocs
 testid
