@@ -3,13 +3,13 @@ import 'package:equatable/equatable.dart';
 
 final class VotingPowerViewModel extends Equatable {
   final String amount;
-  final VotingPowerStatus status;
-  final DateTime updatedAt;
+  final VotingPowerStatus? status;
+  final DateTime? updatedAt;
 
   const VotingPowerViewModel({
-    required this.amount,
-    required this.status,
-    required this.updatedAt,
+    this.amount = '---',
+    this.status,
+    this.updatedAt,
   });
 
   factory VotingPowerViewModel.fromModel(VotingPower votingPower) {

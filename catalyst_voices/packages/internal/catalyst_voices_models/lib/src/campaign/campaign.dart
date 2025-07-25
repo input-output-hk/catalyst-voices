@@ -3,8 +3,9 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
-class Campaign extends Equatable {
+final class Campaign extends Equatable {
   static final f14Ref = SignedDocumentRef.generateFirstRef();
+
   // Using DocumentRef instead of SignedDocumentRef because in Campaign Treasury user can create
   // 'draft' version of campaign like Proposal
   final DocumentRef selfRef;
@@ -85,6 +86,12 @@ Project Catalyst turns economic power into innovation power by using the Cardano
         publish,
         categories,
       ];
+
+  DateTime? get startDate {
+    final dates = timeline.phases.map((e) => e.timeline.from).nonNulls.toList()..sort();
+    return dates.firstOrNull;
+  }
+
   // We can have more than one state if the campaign timeline supports concurrent phases. For example
   // proposal submission can be concurrent with voting registration.
   CampaignState get state {

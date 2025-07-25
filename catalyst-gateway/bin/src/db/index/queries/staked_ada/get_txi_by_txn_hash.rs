@@ -4,8 +4,9 @@ use std::sync::Arc;
 
 use cardano_blockchain_types::TransactionId;
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
-    SerializeRow, Session,
+    client::{pager::TypedRowStream, session::Session},
+    statement::prepared::PreparedStatement,
+    DeserializeRow, SerializeRow,
 };
 use tracing::error;
 
