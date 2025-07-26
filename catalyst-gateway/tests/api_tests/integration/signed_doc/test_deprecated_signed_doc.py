@@ -3,8 +3,8 @@
 from api.v1 import document
 
 
-# Try to fetch documents which should pass sucessfully through the migration process,
-# which were pre-seeded via `old_format_signed_doc.sql`
+# Getting documents using GET `/v1/document` endpoint.
+# Data `old_format_signed_doc.sql` should sucessfully passing through the migration process.
 def test_get_migrated_documents():
     values = [
         (
@@ -45,3 +45,26 @@ def test_get_migrated_documents():
         assert (
             resp.text == doc_cbor
         ), f"Unnexpected document cbor bytes, got: {resp.text}, expected: {doc_cbor}"
+
+
+# Quering documents using POST `/v1/document/index` endpoint.
+# Data `old_format_signed_doc.sql` should sucessfully passing through the migration process.
+def test_v1_index_migrated_documents():
+    values = [
+        ({"template": {"id": {"eq": "019846aa-ecb7-7ce1-b7ce-c95cf8f078c2"}}}, {}),
+        ({"ref": {"id": {"eq": "019846ad-4676-73f3-899f-a39cfd0df291"}}}, {}),
+        ({"reply": {"id": {"eq": "019846ae-fad8-73c2-84e0-f482cc5d5332"}}}, {}),
+        ({"parameters": {"id": {"eq": "019846b0-09d9-7d92-befe-133d24cf102e"}}}, {}),
+        ({"parameters": {"id": {"eq": "019846b0-fa10-7f13-a1aa-57b4529ffcd4"}}}, {}),
+        ({"parameters": {"id": {"eq": "019846b1-def7-77f2-b5f4-bb92f3e9383f"}}}, {}),
+        ({"parameters": {"id": {"eq": "019846b4-f0a9-7583-aa8b-5c25d8cf2f06"}}}, {}),
+    ]
+
+    for filter_json, exp_json in values:
+        resp = document.post(filter=filter_json)
+        assert (
+            resp.status_code == 200
+        ), f"Failed to post document: {resp.status_code} - {resp.text}"
+        assert (
+            resp.json == exp_json
+        ), f"Unnexpected index of documents which match the query filter, got: {resp.json}, expected: {exp_json}"

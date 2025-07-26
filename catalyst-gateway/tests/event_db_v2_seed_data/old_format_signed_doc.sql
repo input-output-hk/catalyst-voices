@@ -119,7 +119,7 @@ VALUES (
   '019846b4-f0a9-7583-aa8b-5c1ba4e9bbad',
   '0eee1a2d-caaf-4e7b-be4f-4aaa2e80b6e2',
   ARRAY[]::TEXT[],
-  '{"content-type":"application/json","id":"019846b4-f0a9-7583-aa8b-5c0a991d50c0","parameters":{"id":"019846b4-f0a9-7583-aa8b-5c25d8cf2f06","ver":"019846b4-f0a9-7583-aa8b-5c36e1f4b274"},"type":"0eee1a2d-caaf-4e7b-be4f-4aaa2e80b6e2","ver":"019846b4-f0a9-7583-aa8b-5c1ba4e9bbad"}',
+  '{"content-type":"application/json","id":"019846b4-f0a9-7583-aa8b-5c0a991d50c0","campaign_id":{"id":"019846b4-f0a9-7583-aa8b-5c25d8cf2f06","ver":"019846b4-f0a9-7583-aa8b-5c36e1f4b274"},"type":"0eee1a2d-caaf-4e7b-be4f-4aaa2e80b6e2","ver":"019846b4-f0a9-7583-aa8b-5c1ba4e9bbad"}',
   '{}',
   decode('d86284588ba503706170706c69636174696f6e2f6a736f6e626964d82550019846b4f0a97583aa8b5c0a991d50c063766572d82550019846b4f0a97583aa8b5c1ba4e9bbad6474797065d825500eee1a2dcaaf4e7bbe4f4aaa2e80b6e26b63616d706169676e5f696482d82550019846b4f0a97583aa8b5c25d8cf2f06d82550019846b4f0a97583aa8b5c36e1f4b274a0427b7d80', 'hex')
 );
