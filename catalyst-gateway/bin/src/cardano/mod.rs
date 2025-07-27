@@ -450,10 +450,7 @@ struct SyncTask {
     /// ranges (where the end bounds aren't inclusive), then the channel will contain the
     /// following list: `[99, 199, 299]`. A slot value is removed when that task is done,
     /// so when the second task is finished the list will be updated to `[99, 299]`.
-    unprocessed_blocks: (
-        watch::Sender<BTreeSet<Slot>>,
-        watch::Receiver<BTreeSet<Slot>>,
-    ),
+    unprocessed_blocks: watch::Sender<BTreeSet<Slot>>,
 }
 
 impl SyncTask {
@@ -468,7 +465,7 @@ impl SyncTask {
             live_tip_slot: 0.into(),
             sync_status: Vec::new(),
             event_channel: broadcast::channel(10),
-            unprocessed_blocks: watch::channel(BTreeSet::new()),
+            unprocessed_blocks: watch::channel(BTreeSet::new()).0,
         }
     }
 
@@ -476,13 +473,13 @@ impl SyncTask {
     fn add_sync_task(
         &mut self, params: SyncParams, event_sender: broadcast::Sender<event::ChainIndexerEvent>,
     ) {
-        self.unprocessed_blocks.0.send_modify(|blocks| {
+        self.unprocessed_blocks.send_modify(|blocks| {
             blocks.insert(params.end.slot_or_default());
         });
         self.sync_tasks.push(sync_subchain(
             params,
             event_sender,
-            self.unprocessed_blocks.1.clone(),
+            self.unprocessed_blocks.subscribe(),
         ));
         self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
         debug!(current_sync_tasks=%self.current_sync_tasks, "Added new Sync Task");
@@ -622,7 +619,7 @@ impl SyncTask {
                                     );
                                 });
 
-                                self.unprocessed_blocks.0.send_modify(|blocks| {
+                                self.unprocessed_blocks.send_modify(|blocks| {
                                     if !blocks.remove(&finished.end.slot_or_default()) {
                                         error!(chain=%self.cfg.chain, end=?finished.end,
                                             "The immutable follower completed successfully, but its end point isn't present in index_sync_channel"
