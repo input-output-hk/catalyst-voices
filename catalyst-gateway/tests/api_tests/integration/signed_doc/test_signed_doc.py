@@ -1,5 +1,5 @@
 import pytest
-from utils import health, signed_doc, uuid_v7
+from utils import uuid_v7
 from signed_doc import (
     SignedDocument,
     proposal_templates,
@@ -9,10 +9,6 @@ from signed_doc import (
     submission_action_factory,
 )
 from api.v1 import document
-import os
-import json
-from typing import Dict, Any, List
-import copy
 from utils.rbac_chain import rbac_chain_factory, RoleID
 import cbor2
 import uuid
