@@ -4,7 +4,7 @@ from api.v1 import document
 
 
 # Getting documents using GET `/v1/document` endpoint.
-# Data `old_format_signed_doc.sql` should sucessfully passing through the migration process.
+# Data `old_format_signed_doc.sql` should successfully passing through the migration process.
 def test_get_migrated_documents():
     values = [
         (
@@ -44,11 +44,11 @@ def test_get_migrated_documents():
         ), f"Failed to get document: {resp.status_code} - {resp.text}"
         assert (
             resp.text == doc_cbor
-        ), f"Unnexpected document cbor bytes, got: {resp.text}, expected: {doc_cbor}"
+        ), f"Unexpected document cbor bytes, got: {resp.text}, expected: {doc_cbor}"
 
 
-# Quering documents using POST `/v1/document/index` endpoint.
-# Data `old_format_signed_doc.sql` should sucessfully passing through the migration process.
+# Querying documents using POST `/v1/document/index` endpoint.
+# Data `old_format_signed_doc.sql` should successfully passing through the migration process.
 def test_v1_index_migrated_documents():
     values = [
         ({"template": {"id": {"eq": "019846aa-ecb7-7ce1-b7ce-c95cf8f078c2"}}}, {}),
