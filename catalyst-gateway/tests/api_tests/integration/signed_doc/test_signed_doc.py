@@ -1,6 +1,13 @@
 import pytest
 from utils import health, signed_doc, uuid_v7
-from signed_doc import SignedDocument, proposal_templates, comment_templates
+from signed_doc import (
+    SignedDocument,
+    proposal_templates,
+    comment_templates,
+    proposal_doc_factory,
+    comment_doc_factory,
+    submission_action_factory,
+)
 from api.v1 import document
 import os
 import json
@@ -9,132 +16,6 @@ import copy
 from utils.rbac_chain import rbac_chain_factory, RoleID
 import cbor2
 import uuid
-
-
-# return a Proposal document which is already published to the cat-gateway and the corresponding RoleID
-@pytest.fixture
-def proposal_doc_factory(proposal_templates, rbac_chain_factory):
-    def __proposal_doc_factory() -> tuple[SignedDocument, RoleID]:
-        role_id = RoleID.PROPOSER
-        rbac_chain = rbac_chain_factory()
-        proposal_doc_id = uuid_v7.uuid_v7()
-        category_id = "0194d490-30bf-7473-81c8-a0eaef369619"
-        proposal_metadata_json = {
-            "id": proposal_doc_id,
-            "ver": proposal_doc_id,
-            # Proposal document type
-            "type": "7808d2ba-d511-40af-84e8-c0d1625fdfdc",
-            "content-type": "application/json",
-            "content-encoding": "br",
-            # referenced to the defined proposal template id, comes from the 'templates/data.rs' file
-            "template": {
-                "id": proposal_templates[0],
-                "ver": proposal_templates[0],
-            },
-            # referenced to the defined category id, comes from the 'templates/data.rs' file
-            "parameters": {
-                "id": category_id,
-                "ver": category_id,
-            },
-        }
-        with open("./test_data/signed_docs/proposal.json", "r") as proposal_json_file:
-            proposal_json = json.load(proposal_json_file)
-
-        doc = SignedDocument(proposal_metadata_json, proposal_json)
-        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-        resp = document.put(
-            data=doc.build_and_sign(cat_id, sk_hex),
-            token=rbac_chain.auth_token(),
-        )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
-
-        return doc, role_id
-
-    return __proposal_doc_factory
-
-
-# return a Comment document which is already published to the cat-gateway, with the relevant RoleID
-@pytest.fixture
-def comment_doc_factory(proposal_doc_factory, comment_templates, rbac_chain_factory):
-    def __comment_doc_factory() -> tuple[SignedDocument, RoleID]:
-        role_id = RoleID.ROLE_0
-        rbac_chain = rbac_chain_factory()
-        proposal_doc = proposal_doc_factory()[0]
-        comment_doc_id = uuid_v7.uuid_v7()
-        comment_metadata_json = {
-            "id": comment_doc_id,
-            "ver": comment_doc_id,
-            # Comment document type
-            "type": "b679ded3-0e7c-41ba-89f8-da62a17898ea",
-            "content-type": "application/json",
-            "content-encoding": "br",
-            "ref": {
-                "id": proposal_doc.metadata["id"],
-                "ver": proposal_doc.metadata["ver"],
-            },
-            "template": {
-                "id": comment_templates[0],
-                "ver": comment_templates[0],
-            },
-        }
-        with open("./test_data/signed_docs/comment.json", "r") as comment_json_file:
-            comment_json = json.load(comment_json_file)
-
-        doc = SignedDocument(comment_metadata_json, comment_json)
-        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-        resp = document.put(
-            data=doc.build_and_sign(cat_id, sk_hex),
-            token=rbac_chain.auth_token(),
-        )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
-
-        return doc, role_id
-
-    return __comment_doc_factory
-
-
-# return a submission action document which is already published to the cat-gateway, with the relevant RoleID
-@pytest.fixture
-def submission_action_factory(proposal_doc_factory, rbac_chain_factory):
-    def __submission_action_factory() -> tuple[SignedDocument, RoleID]:
-        role_id = RoleID.PROPOSER
-        rbac_chain = rbac_chain_factory()
-        proposal_doc = proposal_doc_factory()[0]
-        submission_action_id = uuid_v7.uuid_v7()
-        sub_action_metadata_json = {
-            "id": submission_action_id,
-            "ver": submission_action_id,
-            # submission action type
-            "type": "5e60e623-ad02-4a1b-a1ac-406db978ee48",
-            "content-type": "application/json",
-            "content-encoding": "br",
-            "ref": {
-                "id": proposal_doc.metadata["id"],
-                "ver": proposal_doc.metadata["ver"],
-            },
-        }
-        with open(
-            "./test_data/signed_docs/submission_action.json", "r"
-        ) as comment_json_file:
-            comment_json = json.load(comment_json_file)
-
-        doc = SignedDocument(sub_action_metadata_json, comment_json)
-        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-        resp = document.put(
-            data=doc.build_and_sign(cat_id, sk_hex),
-            token=rbac_chain.auth_token(),
-        )
-        assert (
-            resp.status_code == 201
-        ), f"Failed to publish sub_action: {resp.status_code} - {resp.text}"
-
-        return doc, role_id
-
-    return __submission_action_factory
 
 
 def test_templates(proposal_templates, comment_templates):

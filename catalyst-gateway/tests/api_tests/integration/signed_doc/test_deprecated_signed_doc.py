@@ -112,3 +112,8 @@ def test_put_deprecated_proposal(proposal_templates, rbac_chain_factory):
     assert (
         resp.status_code == 201
     ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+    resp = document.get(document_id=doc.metadata["id"])
+    assert (
+        resp.status_code == 200
+    ), f"Failed to get document: {resp.status_code} - {resp.text}"
