@@ -63,6 +63,7 @@ pub(crate) async fn index_block(
         txo_index.index(block.network(), &txn, slot_no, txn_id, index);
 
         // Index RBAC 509 inside the transaction.
+        // `Box::pin` is used here because of the future size (`clippy::large_futures` lint).
         Box::pin(rbac509_index.index(
             txn_id,
             index,

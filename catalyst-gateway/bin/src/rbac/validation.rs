@@ -35,6 +35,7 @@ pub async fn validate_rbac_registration(
 ) -> RbacValidationResult {
     match reg.previous_transaction() {
         Some(previous_txn) => update_chain(reg, previous_txn, is_persistent, context).await,
+        // `Box::pin` is used here because of the future size (`clippy::large_futures` lint).
         None => Box::pin(start_new_chain(reg, is_persistent, context)).await,
     }
 }

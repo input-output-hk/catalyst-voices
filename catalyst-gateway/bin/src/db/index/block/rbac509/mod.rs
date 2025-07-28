@@ -117,6 +117,7 @@ impl Rbac509InsertQuery {
         wait_for_previous_blocks(unprocessed_blocks, our_end, block.slot()).await?;
 
         let previous_transaction = cip509.previous_transaction();
+        // `Box::pin` is used here because of the future size (`clippy::large_futures` lint).
         match Box::pin(validate_rbac_registration(
             cip509,
             block.is_immutable(),
