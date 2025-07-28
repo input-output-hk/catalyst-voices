@@ -1,0 +1,67 @@
+name: 'Merge Artifact Contents'
+description: 'Downloads an existing artifact, adds new files to it, and re-uploads under the same name.'
+
+inputs:
+  artifact-name:
+    description: 'The name of the artifact to download, merge, and re-upload.'
+    required: true
+
+  new-files-path:
+    description: 'The path to the directory containing the new files to add to the artifact.'
+    required: true
+
+  download-path:
+    description: 'Optional: The temporary directory where the artifact will be downloaded. Defaults to a unique temp path.'
+    required: false
+    default: ${{ runner.temp }}/merge-artifact-temp
+
+  retention-days:
+    description: 'Optional: The number of days to retain the merged artifact. Defaults to GitHub Actions retention policy.'
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Ensure download path exists
+      shell: bash
+      run: |
+        mkdir -p ${{ inputs.download-path }}
+
+    - name: Download existing artifact (if it exists)
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.download-path }}
+      # Use continue-on-error if the artifact might not exist initially.
+      # If it doesn't exist, this step will still succeed, and the next step
+      # will just copy new files into an empty 'downloaded-artifact-content' directory.
+      continue-on-error: true
+      # Note: download-artifact@v4 will create a sub-directory with the artifact name.
+      # E.g., if download-path is 'temp_dir', artifact content goes into 'temp_dir/artifact-name/'
+
+    - name: Get actual downloaded artifact path
+      # Determine the exact path where download-artifact placed the content.
+      # It's usually inputs.download-path/inputs.artifact-name/
+      shell: bash
+      id: get_download_path
+      run: |
+        ACTUAL_ARTIFACT_DIR="${{ inputs.download-path }}/${{ inputs.artifact-name }}"
+        # If artifact didn't exist, download-artifact might not create the sub-dir.
+        # Ensure the target directory for merging exists.
+        mkdir -p "$ACTUAL_ARTIFACT_DIR"
+        echo "actual_path=$ACTUAL_ARTIFACT_DIR" >> $GITHUB_OUTPUT
+
+    - name: Merge new files into downloaded artifact
+      shell: bash
+      run: |
+        # Copy new files into the downloaded artifact's directory.
+        # `cp -r` will overwrite existing files with the same name if they conflict,
+        # which is typically the desired "merge" behavior (new files take precedence).
+        cp -r "${{ inputs.new-files-path }}"/* "${{ steps.get_download_path.outputs.actual_path }}"/
+
+    - name: Re-upload merged artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ steps.get_download_path.outputs.actual_path }}/
+        retention-days: ${{ inputs.retention-days }}
