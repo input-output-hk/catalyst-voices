@@ -35,7 +35,7 @@ jobs:
       - name: Upload Part 1 (initial artifact)
         uses: actions/upload-artifact@v4
         with:
-          name: my-combined-artifact
+          name: 1.my-combined-artifact
           path: part1_output/
           retention-days: 1
 
@@ -50,13 +50,36 @@ jobs:
           echo "Updated Config B" > part2_output/config.txt # This will conflict with part1/config.txt
           echo "Report 1" > part2_output/report.txt
 
-      - name: Merge Part 2 files into existing artifact
-        uses: input-output-hk/catalyst-voices/.github/actions/merge-artifact@3109-disable-generate-allure-report
-        # If the action is in the same repo, use: ./github/actions/merge-artifact
+      - name: Upload Part 2 (initial artifact)
+        uses: actions/upload-artifact@v4
         with:
-          artifact-name: my-combined-artifact
-          new-files-path: part2_output/
+          name: 2.my-combined-artifact
+          path: part2_output/
           retention-days: 1
+
+#      - name: download few
+#        uses: actions/download-artifact@v4
+#        with:
+#          path: my-artifact
+#          pattern: "*my-combined-artifact"
+#          merge-multiple: true
+
+#      - name: Merge Artifacts
+#        uses: actions/upload-artifact/merge@v4
+#        with:
+#          name: my-amazing-merged-artifact
+#          pattern: *my-combined-artifact
+#          separate-directories: true
+#          delete-merged: true
+#          retention-days: 1
+
+#      - name: Merge Part 2 files into existing artifact
+#        uses: input-output-hk/catalyst-voices/.github/actions/merge-artifact@3109-disable-generate-allure-report
+#        # If the action is in the same repo, use: ./github/actions/merge-artifact
+#        with:
+#          artifact-name: my-combined-artifact
+#          new-files-path: part2_output/
+#          retention-days: 1
 
   verify-merged-artifact:
     runs-on: ubuntu-latest
@@ -67,6 +90,8 @@ jobs:
         with:
           name: my-combined-artifact
           path: ./final-merged-content
+          pattern: "*my-combined-artifact"
+          merge-multiple: true
 
       - name: List contents of merged artifact
         run: ls -R ./final-merged-content/my-combined-artifact/
