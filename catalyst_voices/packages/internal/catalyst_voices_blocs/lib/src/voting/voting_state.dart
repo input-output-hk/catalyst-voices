@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 
 /// The state of available proposals in the voting page.
 class VotingState extends Equatable {
-  final CampaignCategory? selectedCategory;
+  final CampaignCategoryDetailsViewModel? selectedCategory;
   final int? fundNumber;
   final VotingPowerViewModel votingPower;
   final VotingPhaseProgressViewModel votingPhase;
@@ -52,7 +52,7 @@ class VotingState extends Equatable {
   }
 
   VotingState copyWith({
-    Optional<CampaignCategory>? selectedCategory,
+    Optional<CampaignCategoryDetailsViewModel>? selectedCategory,
     Optional<int>? fundNumber,
     VotingPowerViewModel? votingPower,
     VotingPhaseProgressViewModel? votingPhase,

@@ -302,7 +302,10 @@ final class VotingCubit extends Cubit<VotingState>
     final count = _cache.count;
 
     final selectedCategory =
-        campaign?.categories.firstWhereOrNull((e) => e.selfRef == selectedCategoryRef);
+        campaign?.categories.firstWhereOrNull((e) => e.selfRef.id == selectedCategoryRef?.id);
+    final selectedCategoryViewModel = selectedCategory != null
+        ? CampaignCategoryDetailsViewModel.fromModel(selectedCategory)
+        : null;
     final fundNumber = campaign?.fundNumber;
     final votingPowerViewModel = votingPower != null
         ? VotingPowerViewModel.fromModel(votingPower)
@@ -314,7 +317,7 @@ final class VotingCubit extends Cubit<VotingState>
     final isOrderEnabled = _cache.filters.type == ProposalsFilterType.total;
 
     return state.copyWith(
-      selectedCategory: Optional(selectedCategory),
+      selectedCategory: Optional(selectedCategoryViewModel),
       fundNumber: Optional(fundNumber),
       votingPower: votingPowerViewModel,
       votingPhase: votingPhaseViewModel,
