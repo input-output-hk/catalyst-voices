@@ -42,7 +42,7 @@ class _VotingPageState extends State<VotingPage>
         header: VotingHeader(),
         content: VotingContent(),
       ),
-      post: (_, __, ___) => Container(),
+      post: (_, __, ___) => const Text('Post'),
     );
   }
 
