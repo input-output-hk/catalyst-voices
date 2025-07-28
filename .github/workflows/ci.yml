@@ -35,7 +35,7 @@ jobs:
       - name: Upload Part 1 (initial artifact)
         uses: actions/upload-artifact@v4
         with:
-          name: 1.my-combined-artifact
+          name: my-combined-artifact.1
           path: part1_output/
           retention-days: 1
 
@@ -53,7 +53,7 @@ jobs:
       - name: Upload Part 2 (initial artifact)
         uses: actions/upload-artifact@v4
         with:
-          name: 2.my-combined-artifact
+          name: my-combined-artifact.2
           path: part2_output/
           retention-days: 1
 
@@ -90,7 +90,7 @@ jobs:
         with:
           name: my-combined-artifact
           path: ./final-merged-content
-          pattern: "*my-combined-artifact"
+          pattern: my-combined-artifact*
           merge-multiple: true
 
       - name: List contents of merged artifact
