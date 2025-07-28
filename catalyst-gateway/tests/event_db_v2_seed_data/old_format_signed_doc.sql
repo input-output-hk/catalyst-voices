@@ -50,6 +50,7 @@
 --     let doc = CatalystSignedDocument::try_from(e.into_writer().as_slice())?;
 -- ```
 
+-- cspell: words noqa
 
 INSERT INTO signed_docs (
   id,
