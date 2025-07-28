@@ -47,6 +47,7 @@ impl SignedDocBody {
     }
 
     /// Returns the document type.
+    #[allow(dead_code)]
     pub(crate) fn doc_type(&self) -> &uuid::Uuid {
         &self.doc_type
     }
@@ -84,44 +85,6 @@ impl SignedDocBody {
             authors,
             metadata,
         }
-    }
-
-    /// Checks if the given signed document is in the deprecated version of below v0.04
-    /// format. By checking its metadata parts if one of them contains an empty
-    /// `doc_locator`.
-    pub(crate) fn is_deprecated(&self) -> Result<bool, anyhow::Error> {
-        if let Some(json_meta) = self.metadata() {
-            let meta = catalyst_signed_doc::Metadata::from_json(json_meta.clone())?;
-
-            let doc_refs_old = meta.doc_ref().is_some_and(|doc_refs| {
-                doc_refs
-                    .doc_refs()
-                    .iter()
-                    .any(|doc_ref| doc_ref.doc_locator().is_empty())
-            });
-            let reply_old = meta.reply().is_some_and(|doc_refs| {
-                doc_refs
-                    .doc_refs()
-                    .iter()
-                    .any(|doc_ref| doc_ref.doc_locator().is_empty())
-            });
-            let template_old = meta.template().is_some_and(|doc_refs| {
-                doc_refs
-                    .doc_refs()
-                    .iter()
-                    .any(|doc_ref| doc_ref.doc_locator().is_empty())
-            });
-            let parameters_old = meta.parameters().is_some_and(|doc_refs| {
-                doc_refs
-                    .doc_refs()
-                    .iter()
-                    .any(|doc_ref| doc_ref.doc_locator().is_empty())
-            });
-
-            return Ok(doc_refs_old || reply_old || template_old || parameters_old);
-        }
-
-        Ok(false)
     }
 
     /// Loads a async stream of `SignedDocBody` from the event db.

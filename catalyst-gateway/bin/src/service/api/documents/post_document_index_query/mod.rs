@@ -91,7 +91,7 @@ pub(crate) async fn endpoint(
             .into()
         },
         Err(e) => {
-            if e.to_string() == response::DEPRECATED_MARK {
+            if e.to_string() == response::NEWER_DOC_ON_DEPRECATED_ENDPOINT {
                 AllResponses::With(Responses::NotFound)
             } else {
                 AllResponses::handle_error(&e)
@@ -131,7 +131,9 @@ async fn fetch_docs(
     });
 
     let results = join_all(tasks).await;
-    let _results = results.into_iter().collect::<Result<Vec<_>, _>>()?;
+    let results = results.into_iter().collect::<Result<Vec<_>, _>>()?;
+
+    let indexed_docs = group_by(results, |doc| *doc.id());
 
     // convert to output response
     let docs = indexed_docs
@@ -150,4 +152,21 @@ async fn fetch_docs(
         })
         .collect::<Result<_, _>>()?;
     Ok((docs, total_fetched_doc_count))
+}
+
+fn group_by<T, K, F>(items: Vec<T>, key_fn: F) -> Vec<(K, Vec<T>)>
+where
+    F: Fn(&T) -> K,
+    K: Eq + std::hash::Hash + Ord,
+{
+    let mut map: HashMap<K, Vec<T>> = HashMap::new();
+    for item in items {
+        let key = key_fn(&item);
+        map.entry(key).or_default().push(item);
+    }
+
+    let mut vec: Vec<_> = map.into_iter().collect();
+    // Descending order
+    vec.sort_by(|a, b| b.0.cmp(&a.0));
+    vec
 }

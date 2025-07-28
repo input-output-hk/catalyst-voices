@@ -1,17 +1,21 @@
 //! Catalyst Signed Document Endpoint Response Objects.
+use catalyst_signed_doc::CatalystSignedDocument;
 use derive_more::{From, Into};
 use poem_openapi::{
     types::{Example, ToJSON},
     NewType, Object,
 };
 
-use super::SignedDocBody;
-use crate::service::common::{
-    self,
-    types::{
-        array_types::impl_array_types,
-        document::{
-            doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
+use crate::{
+    db::event::signed_docs::FullSignedDoc,
+    service::common::{
+        self,
+        types::{
+            array_types::impl_array_types,
+            document::{
+                doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId,
+                ver::DocumentVer,
+            },
         },
     },
 };
@@ -241,17 +245,19 @@ impl Example for IndexedDocumentVersionDocumented {
     }
 }
 
-pub(crate) const DEPRECATED_MARK: &'static str = "deprecated";
+pub(crate) const NEWER_DOC_ON_DEPRECATED_ENDPOINT: &'static str =
+    "NEWER_DOC_ON_DEPRECATED_ENDPOINT";
 
-impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
+impl TryFrom<FullSignedDoc> for IndexedDocumentVersionDocumented {
     type Error = anyhow::Error;
 
-    fn try_from(doc: SignedDocBody) -> Result<Self, Self::Error> {
+    fn try_from(doc: FullSignedDoc) -> Result<Self, Self::Error> {
         // should allow deprecated only for this response
-        if !doc.is_deprecated()? {
-            return Err(anyhow::anyhow!(DEPRECATED_MARK));
+        if !CatalystSignedDocument::try_from(doc.raw())?.is_deprecated()? {
+            return Err(anyhow::anyhow!(NEWER_DOC_ON_DEPRECATED_ENDPOINT));
         }
 
+        let mut doc_type = None;
         let mut doc_ref = None;
         let mut reply = None;
         let mut template = None;
@@ -261,6 +267,7 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
 
             // note: perform conversion from the new version
             // to the older version
+            doc_type = Some(meta.doc_type()?).cloned();
             doc_ref = meta
                 .doc_ref()
                 .map(|doc_ref| doc_ref.doc_refs().first())
@@ -287,13 +294,17 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
                 .map(Into::into);
         }
 
-        Ok(IndexedDocumentVersionDocumented(IndexedDocumentVersion {
-            ver: DocumentVer::new_unchecked(doc.ver().to_string()),
-            doc_type: DocumentType::new_unchecked(doc.doc_type().to_string()),
-            doc_ref,
-            reply,
-            template,
-            parameters,
-        }))
+        if let Some(doc_type) = doc_type {
+            Ok(IndexedDocumentVersionDocumented(IndexedDocumentVersion {
+                ver: DocumentVer::new_unchecked(doc.ver().to_string()),
+                doc_type: DocumentType::new_unchecked(doc_type.to_string()),
+                doc_ref,
+                reply,
+                template,
+                parameters,
+            }))
+        } else {
+            Err(anyhow::anyhow!("Missing doc type"))
+        }
     }
 }
