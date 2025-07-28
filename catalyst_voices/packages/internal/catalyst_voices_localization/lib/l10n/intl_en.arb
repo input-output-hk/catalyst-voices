@@ -3216,6 +3216,14 @@
   "@votingTimelineHeader": {
     "description": "Header for the voting timeline"
   },
+  "voteListButton": "Vote List",
+  "@voteListButton": {
+    "description": "The label for the overview of votes."
+  },
+  "delegationButton": "Delegation",
+  "@delegationButton": {
+    "description": "The label for voting power delegation."
+  },
   "reviewRegistration": "Reviewers registration:",
   "@reviewRegistration": {
     "description": "Title for the review registration timeline"

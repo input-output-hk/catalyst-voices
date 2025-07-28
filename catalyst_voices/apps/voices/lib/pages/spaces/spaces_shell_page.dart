@@ -2,12 +2,9 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/space_ext.dart';
 import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_dialog.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/spaces_app_bar.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
-import 'package:catalyst_voices/widgets/buttons/create_proposal_button.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/foundation.dart';
@@ -103,14 +100,16 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
       child: _Shortcuts(
         onToggleAdminTools: _toggleAdminTools,
         child: BlocSelector<SessionCubit, SessionState, _SessionStateData>(
-          selector: (state) =>
-              (isActive: state.isActive, isProposer: state.account?.isProposer ?? false),
+          selector: (state) => (
+            isActive: state.isActive,
+            isProposer: state.account?.isProposer ?? false,
+          ),
           builder: (context, state) {
             return Scaffold(
-              appBar: VoicesAppBar(
-                leading: state.isActive ? const DrawerToggleButton() : null,
-                automaticallyImplyLeading: false,
-                actions: _getActions(widget.space, state.isProposer),
+              appBar: SpacesAppBar(
+                space: widget.space,
+                isActive: state.isActive,
+                isProposer: state.isProposer,
               ),
               drawer: state.isActive
                   ? SpacesDrawer(
@@ -172,18 +171,6 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
         );
       },
     );
-  }
-
-  List<Widget> _getActions(Space space, bool isProposer) {
-    if (space == Space.treasury) {
-      return const [];
-    } else {
-      return [
-        if (space == Space.discovery && isProposer) const CreateProposalButton(),
-        const SessionActionHeader(),
-        const SessionStateHeader(),
-      ];
-    }
   }
 
   void _insertAdminToolsOverlay() {
