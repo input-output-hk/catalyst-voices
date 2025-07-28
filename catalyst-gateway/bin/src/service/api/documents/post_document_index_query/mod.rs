@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use catalyst_signed_doc::CatalystSignedDocument;
-use futures::{future::join_all, TryStreamExt};
+use futures::TryStreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
 use query_filter::DocumentIndexQueryFilter;
 use response::{
@@ -99,7 +99,7 @@ pub(crate) async fn endpoint(
 async fn fetch_docs(
     conditions: &DocsQueryFilter, query_limits: &QueryLimits,
 ) -> anyhow::Result<(Vec<IndexedDocumentDocumented>, u32)> {
-    let docs_stream = SignedDocBody::retrieve(conditions, query_limits).await?;
+    let docs_stream = FullSignedDoc::retrieve_conditions(conditions, query_limits).await?;
 
     let (indexed_docs, total_fetched_doc_count) = docs_stream
         .try_fold(
@@ -117,32 +117,19 @@ async fn fetch_docs(
         )
         .await?;
 
-    // need `FullSignedDoc` in order to read the `raw` part to check its deprecation.
-    // this is performance hit, but we use this endpoint for transition temporarily.
-    let tasks = indexed_docs.iter().flat_map(|(id, docs)| {
-        docs.iter()
-            .map(|item| async move { FullSignedDoc::retrieve(id, Some(item.ver())).await })
-            .collect::<Vec<_>>()
-    });
-
-    let results = join_all(tasks).await;
-    let results = results.into_iter().collect::<Result<Vec<_>, _>>()?;
-
-    // filter for only deprecated signed docs
-    let mut deprecated_docs = vec![];
-    for doc in results.into_iter() {
-        if CatalystSignedDocument::try_from(doc.raw())?.is_deprecated()? {
-            deprecated_docs.push(doc);
-        }
-    }
-
-    let indexed_docs = group_by(deprecated_docs, |doc| *doc.id());
-
     // convert to output response
     let docs = indexed_docs
         .into_iter()
         .map(|(id, docs)| -> anyhow::Result<_> {
-            let ver = docs
+            // filter for only deprecated signed docs
+            let mut deprecated_docs = vec![];
+            for doc in docs.into_iter() {
+                if CatalystSignedDocument::try_from(doc.raw())?.is_deprecated()? {
+                    deprecated_docs.push(doc);
+                }
+            }
+
+            let ver = deprecated_docs
                 .into_iter()
                 .map(TryInto::try_into)
                 .collect::<Result<Vec<_>, _>>()?
@@ -153,23 +140,10 @@ async fn fetch_docs(
                 ver,
             }))
         })
-        .collect::<Result<_, _>>()?;
+        .collect::<Result<Vec<_>, _>>()?
+        .into_iter()
+        .filter(|indexed_doc| !indexed_doc.0.ver.is_empty())
+        .collect::<_>();
+
     Ok((docs, total_fetched_doc_count))
-}
-
-fn group_by<T, K, F>(items: Vec<T>, key_fn: F) -> Vec<(K, Vec<T>)>
-where
-    F: Fn(&T) -> K,
-    K: Eq + std::hash::Hash + Ord,
-{
-    let mut map: HashMap<K, Vec<T>> = HashMap::new();
-    for item in items {
-        let key = key_fn(&item);
-        map.entry(key).or_default().push(item);
-    }
-
-    let mut vec: Vec<_> = map.into_iter().collect();
-    // Descending order
-    vec.sort_by(|a, b| b.0.cmp(&a.0));
-    vec
 }
