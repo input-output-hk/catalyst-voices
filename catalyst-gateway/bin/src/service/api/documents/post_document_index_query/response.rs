@@ -1,5 +1,4 @@
 //! Catalyst Signed Document Endpoint Response Objects.
-use catalyst_signed_doc::CatalystSignedDocument;
 use derive_more::{From, Into};
 use poem_openapi::{
     types::{Example, ToJSON},
@@ -245,18 +244,10 @@ impl Example for IndexedDocumentVersionDocumented {
     }
 }
 
-pub(crate) const NEWER_DOC_ON_DEPRECATED_ENDPOINT: &'static str =
-    "NEWER_DOC_ON_DEPRECATED_ENDPOINT";
-
 impl TryFrom<FullSignedDoc> for IndexedDocumentVersionDocumented {
     type Error = anyhow::Error;
 
     fn try_from(doc: FullSignedDoc) -> Result<Self, Self::Error> {
-        // should allow deprecated only for this response
-        if !CatalystSignedDocument::try_from(doc.raw())?.is_deprecated()? {
-            return Err(anyhow::anyhow!(NEWER_DOC_ON_DEPRECATED_ENDPOINT));
-        }
-
         let mut doc_type = None;
         let mut doc_ref = None;
         let mut reply = None;

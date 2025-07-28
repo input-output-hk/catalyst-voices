@@ -9,6 +9,7 @@ SET
     - 'brand_id'
     - 'category_id'
     - 'campaign_id'
+    - 'parameters'
     - 'template'
     - 'ref'
     - 'reply'
@@ -28,6 +29,11 @@ SET
         JSONB_BUILD_OBJECT(
           'id', metadata -> 'campaign_id' ->> 'id',
           'ver', metadata -> 'campaign_id' ->> 'ver',
+          'cid', '0x'
+        ),
+        JSONB_BUILD_OBJECT(
+          'id', metadata -> 'parameters' ->> 'id',
+          'ver', metadata -> 'parameters' ->> 'ver',
           'cid', '0x'
         )
       ),

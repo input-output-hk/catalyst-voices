@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 
+use catalyst_signed_doc::CatalystSignedDocument;
 use futures::{future::join_all, TryStreamExt};
 use poem_openapi::{payload::Json, ApiResponse};
 use query_filter::DocumentIndexQueryFilter;
@@ -90,13 +91,7 @@ pub(crate) async fn endpoint(
             })))
             .into()
         },
-        Err(e) => {
-            if e.to_string() == response::NEWER_DOC_ON_DEPRECATED_ENDPOINT {
-                AllResponses::With(Responses::NotFound)
-            } else {
-                AllResponses::handle_error(&e)
-            }
-        },
+        Err(e) => AllResponses::handle_error(&e),
     }
 }
 
@@ -133,7 +128,15 @@ async fn fetch_docs(
     let results = join_all(tasks).await;
     let results = results.into_iter().collect::<Result<Vec<_>, _>>()?;
 
-    let indexed_docs = group_by(results, |doc| *doc.id());
+    // filter for only deprecated signed docs
+    let mut deprecated_docs = vec![];
+    for doc in results.into_iter() {
+        if CatalystSignedDocument::try_from(doc.raw())?.is_deprecated()? {
+            deprecated_docs.push(doc);
+        }
+    }
+
+    let indexed_docs = group_by(deprecated_docs, |doc| *doc.id());
 
     // convert to output response
     let docs = indexed_docs
