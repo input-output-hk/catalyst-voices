@@ -67,4 +67,4 @@ def test_v1_index_migrated_documents():
         ), f"Failed to post document: {resp.status_code} - {resp.text}"
         assert (
             resp.json == exp_json
-        ), f"Unnexpected index of documents which match the query filter, got: {resp.json}, expected: {exp_json}"
+        ), f"Unexpected index of documents which match the query filter, got: {resp.json}, expected: {exp_json}"
