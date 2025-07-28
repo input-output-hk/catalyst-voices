@@ -21,7 +21,7 @@ package:
 docker:
     FROM +package
 
-    ARG container="voices"
+    ARG container="voices-frontend-config"
     ARG tag="latest"
 
     SAVE IMAGE ${container}:${tag}
