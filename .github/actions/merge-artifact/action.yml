@@ -25,7 +25,8 @@ runs:
     - name: Ensure download path exists
       shell: bash
       run: |
-        mkdir -p ${{ inputs.download-path }}
+        mkdir -p "${{ inputs.download-path }}"
+        echo "Created download root path: ${{ inputs.download-path }}"
 
     - name: Download existing artifact (if it exists)
       uses: actions/download-artifact@v4
@@ -39,17 +40,28 @@ runs:
       # Note: download-artifact@v4 will create a sub-directory with the artifact name.
       # E.g., if download-path is 'temp_dir', artifact content goes into 'temp_dir/artifact-name/'
 
-    - name: Get actual downloaded artifact path
+    - name: Set actual downloaded artifact path
       # Determine the exact path where download-artifact placed the content.
       # It's usually inputs.download-path/inputs.artifact-name/
       shell: bash
-      id: get_download_path
+      id: set_download_path
       run: |
         ACTUAL_ARTIFACT_DIR="${{ inputs.download-path }}/${{ inputs.artifact-name }}"
         # If artifact didn't exist, download-artifact might not create the sub-dir.
         # Ensure the target directory for merging exists.
         mkdir -p "$ACTUAL_ARTIFACT_DIR"
         echo "actual_path=$ACTUAL_ARTIFACT_DIR" >> $GITHUB_OUTPUT
+        echo "Actual path for merged content: $ACTUAL_ARTIFACT_DIR"
+
+    - name: DEBUG - List content after download (before merge)
+      shell: bash
+      run: |
+          echo "--- Contents of download-root-path before merge ---"
+          ls -lR "${{ inputs.download-path }}" || true
+          echo "--- Contents of actual merged_content_path before merge ---"
+          ls -lR "${{ steps.set_download_path.outputs.actual_path }}" || true
+          echo "--- Contents of new-files-path ---"
+          ls -lR "${{ inputs.new-files-path }}" || true
 
     - name: Merge new files into downloaded artifact
       shell: bash
@@ -57,12 +69,18 @@ runs:
         # Copy new files into the downloaded artifact's directory.
         # `cp -r` will overwrite existing files with the same name if they conflict,
         # which is typically the desired "merge" behavior (new files take precedence).
-        cp -r "${{ inputs.new-files-path }}"/* "${{ steps.get_download_path.outputs.actual_path }}"/
+        cp -r "${{ inputs.new-files-path }}"/* "${{ steps.set_download_path.outputs.actual_path }}"/
+
+    - name: DEBUG - List content after merge
+      shell: bash
+      run: |
+          echo "--- Contents of merged_content_path after merge ---"
+          ls -lR "${{ steps.set_download_path.outputs.actual_path }}"
 
     - name: Re-upload merged artifact
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.artifact-name }}
-        path: ${{ steps.get_download_path.outputs.actual_path }}/
+        path: ${{ steps.set_download_path.outputs.actual_path }}/
         retention-days: ${{ inputs.retention-days }}
         overwrite: true
