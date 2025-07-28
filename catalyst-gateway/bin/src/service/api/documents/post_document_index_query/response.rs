@@ -261,26 +261,22 @@ impl TryFrom<FullSignedDoc> for IndexedDocumentVersionDocumented {
             doc_type = Some(meta.doc_type()?).cloned();
             doc_ref = meta
                 .doc_ref()
-                .map(|doc_ref| doc_ref.doc_refs().first())
-                .flatten()
+                .and_then(|doc_ref| doc_ref.doc_refs().first())
                 .cloned()
                 .map(Into::into);
             reply = meta
                 .reply()
-                .map(|doc_ref| doc_ref.doc_refs().first())
-                .flatten()
+                .and_then(|doc_ref| doc_ref.doc_refs().first())
                 .cloned()
                 .map(Into::into);
             template = meta
                 .template()
-                .map(|doc_ref| doc_ref.doc_refs().first())
-                .flatten()
+                .and_then(|doc_ref| doc_ref.doc_refs().first())
                 .cloned()
                 .map(Into::into);
             parameters = meta
                 .parameters()
-                .map(|doc_ref| doc_ref.doc_refs().first())
-                .flatten()
+                .and_then(|doc_ref| doc_ref.doc_refs().first())
                 .cloned()
                 .map(Into::into);
         }

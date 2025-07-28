@@ -123,7 +123,7 @@ async fn fetch_docs(
         .map(|(id, docs)| -> anyhow::Result<_> {
             // filter for only deprecated signed docs
             let mut deprecated_docs = vec![];
-            for doc in docs.into_iter() {
+            for doc in docs {
                 if CatalystSignedDocument::try_from(doc.raw())?.is_deprecated()? {
                     deprecated_docs.push(doc);
                 }
