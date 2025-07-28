@@ -24,7 +24,7 @@ class VotingCategoryHeader extends StatelessWidget {
             child: _Background(image: category.image),
           ),
           Padding(
-            padding: const EdgeInsets.all(28),
+            padding: const EdgeInsets.fromLTRB(28, 32, 32, 44),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: 24,
