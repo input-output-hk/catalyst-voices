@@ -94,7 +94,10 @@ jobs:
           merge-multiple: true
 
       - name: List contents of merged artifact
-        run: ls -R ./final-merged-content/my-combined-artifact/
+        run: |
+          pwd
+          ls -R .
+          ls -R ./final-merged-content/my-combined-artifact/
 
 #  ci:
 #    if: ${{ !github.event.pull_request.draft }}
