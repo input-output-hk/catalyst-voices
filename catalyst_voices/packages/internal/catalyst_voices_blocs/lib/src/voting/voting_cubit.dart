@@ -6,6 +6,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
 final _logger = Logger('VotingCubit');
@@ -296,21 +297,24 @@ final class VotingCubit extends Cubit<VotingState>
     final favoriteIds = _cache.favoriteIds ?? const [];
     final votingPower = _cache.votingPower;
     final categories = campaign?.categories ?? const [];
-    final selectedCategory = _cache.filters.category;
+    final selectedCategoryRef = _cache.filters.category;
     final filters = _cache.filters;
     final count = _cache.count;
 
+    final selectedCategory =
+        campaign?.categories.firstWhereOrNull((e) => e.selfRef == selectedCategoryRef);
     final fundNumber = campaign?.fundNumber;
     final votingPowerViewModel = votingPower != null
         ? VotingPowerViewModel.fromModel(votingPower)
         : const VotingPowerViewModel();
     final votingPhaseViewModel = _buildVotingPhase(campaign);
     final hasSearchQuery = filters.searchQuery == null;
-    final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategory);
+    final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategoryRef);
     final orderItems = _buildOrderItems(_cache.filters.type, _cache.selectedOrder);
     final isOrderEnabled = _cache.filters.type == ProposalsFilterType.total;
 
     return state.copyWith(
+      selectedCategory: Optional(selectedCategory),
       fundNumber: Optional(fundNumber),
       votingPower: votingPowerViewModel,
       votingPhase: votingPhaseViewModel,
