@@ -1,31 +1,30 @@
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-final class UserVoteState extends Equatable {
-  final UserVoteStateDraft? draft;
-  final UserVoteStateCasted? casted;
+final class VoteButtonData extends Equatable {
+  final VoteButtonDataDraft? draft;
+  final VoteButtonDataCasted? casted;
 
-  const UserVoteState({
+  const VoteButtonData({
     this.draft,
     this.casted,
   });
 
-  factory UserVoteState.fromVotes({
+  factory VoteButtonData.fromVotes({
     Vote? currentDraft,
     Vote? lastCasted,
   }) {
-    final draft = currentDraft != null ? UserVoteStateDraft(type: currentDraft.type) : null;
+    final draft = currentDraft != null ? VoteButtonDataDraft(type: currentDraft.type) : null;
     final casted = lastCasted != null
-        ? UserVoteStateCasted(
+        ? VoteButtonDataCasted(
             type: lastCasted.type,
             createdAt: lastCasted.createdAt,
           )
         : null;
 
-    return UserVoteState(draft: draft, casted: casted);
+    return VoteButtonData(draft: draft, casted: casted);
   }
 
   DateTime? get castedVotedAt => casted?.createdAt;
@@ -39,7 +38,11 @@ final class UserVoteState extends Equatable {
   @override
   List<Object?> get props => [draft, casted];
 
-  UserVoteColors colors(BuildContext context) {
+  SceneColors btnColors(BuildContext context) {
+    throw UnimplementedError();
+  }
+
+  /*UserVoteColors colors(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final colors = theme.colors;
@@ -61,24 +64,28 @@ final class UserVoteState extends Equatable {
     );
 
     return (background: background, foreground: foreground);
-  }
+  }*/
 
-  UserVoteState copyWith({
-    Optional<UserVoteStateDraft>? draft,
-    Optional<UserVoteStateCasted>? casted,
+  VoteButtonData copyWith({
+    Optional<VoteButtonDataDraft>? draft,
+    Optional<VoteButtonDataCasted>? casted,
   }) {
-    return UserVoteState(
+    return VoteButtonData(
       draft: draft.dataOr(this.draft),
       casted: casted.dataOr(this.casted),
     );
   }
+
+  SceneColors menuBtnColors(BuildContext context) {
+    throw UnimplementedError();
+  }
 }
 
-final class UserVoteStateCasted extends Equatable {
+final class VoteButtonDataCasted extends Equatable {
   final VoteType type;
   final DateTime createdAt;
 
-  const UserVoteStateCasted({
+  const VoteButtonDataCasted({
     required this.type,
     required this.createdAt,
   });
@@ -90,10 +97,10 @@ final class UserVoteStateCasted extends Equatable {
       ];
 }
 
-final class UserVoteStateDraft extends Equatable {
+final class VoteButtonDataDraft extends Equatable {
   final VoteType type;
 
-  const UserVoteStateDraft({
+  const VoteButtonDataDraft({
     required this.type,
   });
 
@@ -102,10 +109,10 @@ final class UserVoteStateDraft extends Equatable {
         type,
       ];
 
-  UserVoteStateDraft copyWith({
+  VoteButtonDataDraft copyWith({
     VoteType? type,
   }) {
-    return UserVoteStateDraft(
+    return VoteButtonDataDraft(
       type: type ?? this.type,
     );
   }

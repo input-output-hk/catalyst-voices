@@ -63,7 +63,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     return Scaffold(
       body: Center(
         child: VoteButton(
-          data: UserVoteState.fromVotes(currentDraft: _draftVote),
+          data: VoteButtonData.fromVotes(currentDraft: _draftVote),
           onSelected: (voteType) {
             setState(() {
               _draftVote = Vote.draft(proposal: DraftRef.generateFirstRef(), type: voteType);
