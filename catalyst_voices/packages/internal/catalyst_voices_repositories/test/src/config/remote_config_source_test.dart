@@ -74,6 +74,24 @@ void main() {
       expect(config.sentry, isNull);
       expect(config.cache, isNull);
     });
+
+    test('a json map is passed thru not changed', () async {
+      // Given
+      const configJson = <String, dynamic>{
+        'blockchain': {
+          'networkId': 'mainnet',
+        },
+      };
+      final response = Response<Object>(http.Response('', 200), configJson);
+
+      // When
+      when(gateway.apiGatewayV1ConfigFrontendGet).thenAnswer((_) => Future.value(response));
+
+      // Then
+      final config = await source.get();
+
+      expect(config.blockchain?.networkId, 'mainnet');
+    });
   });
 }
 
