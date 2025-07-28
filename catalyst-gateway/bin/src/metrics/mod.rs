@@ -8,7 +8,7 @@ pub(crate) mod chain_indexer;
 pub(crate) mod endpoint;
 pub(crate) mod health;
 pub(crate) mod memory;
-pub(crate) mod rbac_cache;
+pub(crate) mod rbac;
 
 /// Initialize Prometheus metrics.
 ///
@@ -26,5 +26,5 @@ pub(crate) async fn metrics_updater_fn() {
     memory::update();
     health::update().await;
     caches::update();
-    rbac_cache::update();
+    rbac::update();
 }

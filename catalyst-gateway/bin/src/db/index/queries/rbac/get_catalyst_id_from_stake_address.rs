@@ -22,7 +22,7 @@ use crate::{
         },
         types::{DbCatalystId, DbStakeAddress},
     },
-    metrics::rbac_cache::reporter::{
+    metrics::rbac::reporter::{
         PERSISTENT_STAKE_ADDRESSES_CACHE_HIT, PERSISTENT_STAKE_ADDRESSES_CACHE_MISS,
         VOLATILE_STAKE_ADDRESSES_CACHE_HIT, VOLATILE_STAKE_ADDRESSES_CACHE_MISS,
     },

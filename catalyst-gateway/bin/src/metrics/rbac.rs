@@ -274,4 +274,15 @@ pub(crate) mod reporter {
         )
         .unwrap()
     });
+
+    /// This counter increases every time we need to synchronize RBAC indexing by waiting
+    /// for other tasks to finish before processing a new registration.
+    pub(crate) static INDEXING_SYNCHRONIZATION_COUNT: LazyLock<CounterVec> = LazyLock::new(|| {
+        register_counter_vec!(
+            "indexing_synchronization_count",
+            "Number of RBAC indexing synchronizations",
+            &METRIC_LABELS
+        )
+        .unwrap()
+    });
 }

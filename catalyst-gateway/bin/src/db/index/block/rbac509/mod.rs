@@ -23,11 +23,12 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
+    metrics::rbac::reporter::INDEXING_SYNCHRONIZATION_COUNT,
     rbac::{
         validate_rbac_registration, RbacBlockIndexingContext, RbacValidationError,
         RbacValidationSuccess,
     },
-    settings::cassandra_db::EnvVars,
+    settings::{cassandra_db::EnvVars, Settings},
 };
 
 /// Index RBAC 509 Registration Query Parameters
@@ -311,6 +312,14 @@ async fn wait_for_previous_blocks(
         {
             return Ok(());
         }
+
+        let api_host_names = Settings::api_host_names().join(",");
+        let service_id = Settings::service_id();
+        let network = Settings::cardano_network().to_string();
+        INDEXING_SYNCHRONIZATION_COUNT
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .inc();
+
         pending_blocks
             .changed()
             .await
