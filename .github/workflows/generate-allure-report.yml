@@ -93,11 +93,12 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: test-reports
+          pattern: test-reports*
+          merge-multiple: true
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: test-reports-gateway
+#      - uses: actions/download-artifact@v4
+#        with:
+#          name: test-reports-gateway
 
       - name: Setup Allure report
         run: |
@@ -144,11 +145,12 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: coverage-reports
+          pattern: coverage-reports*
+          merge-multiple: true
 
-      - uses: actions/download-artifact@v4
-        with:
-          name: coverage-reports-gateway
+#      - uses: actions/download-artifact@v4
+#        with:
+#          name: coverage-reports-gateway
 
       - name: Collect coverage report
         run: |
@@ -185,7 +187,7 @@ jobs:
           flag-name: api-test
           parallel: true
 
-      - name: Coveralls
+      - name: Coveralls Flutter tests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: coverallsapp/github-action@v2
