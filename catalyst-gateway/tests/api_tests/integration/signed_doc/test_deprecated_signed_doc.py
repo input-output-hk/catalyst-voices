@@ -61,7 +61,7 @@ def test_v1_index_migrated_documents():
     ]
 
     for filter_json, exp_json in values:
-        resp = document.post(filter=filter_json)
+        resp = document.v1_post(filter=filter_json)
         assert (
             resp.status_code == 200
         ), f"Failed to post document: {resp.status_code} - {resp.text}"
