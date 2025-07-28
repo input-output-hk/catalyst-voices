@@ -5,11 +5,15 @@ import 'package:flutter/material.dart';
 class TimestampText extends StatelessWidget {
   final DateTime data;
   final bool showTimezone;
+  final bool includeTime;
+  final TextStyle? style;
 
   const TimestampText(
     this.data, {
     super.key,
     this.showTimezone = true,
+    this.includeTime = true,
+    this.style,
   });
 
   @override
@@ -17,8 +21,9 @@ class TimestampText extends StatelessWidget {
     return TimezoneDateTimeText(
       data,
       showTimezone: showTimezone,
+      style: style,
       formatter: (context, dateTime) {
-        return DateFormatter.formatTimestamp(dateTime);
+        return DateFormatter.formatTimestamp(dateTime, includeTime: includeTime);
       },
     );
   }

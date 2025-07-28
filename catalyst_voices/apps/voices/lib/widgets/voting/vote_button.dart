@@ -1,10 +1,12 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 part 'vote_button_expanded.dart';
@@ -14,7 +16,7 @@ const _expandedWidth = 294.0;
 
 class VoteButton extends StatelessWidget {
   final VoteButtonData data;
-  final ValueChanged<VoteType> onSelected;
+  final ValueChanged<VoteButtonAction> onSelected;
   final VoidCallback? onRemove;
 
   const VoteButton({
@@ -27,11 +29,10 @@ class VoteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final states = <WidgetState>{
-      if (data.draft == null && data.casted != null) WidgetState.selected,
+      if (data.hasVoted) WidgetState.selected,
     };
 
-    data.latestVoteType?.backgroundColor(context).resolve(states);
-    data.latestVoteType?.foregroundColor(context).resolve(states);
+    final colors = data.colors(context);
 
     final backgroundColor = colors.background.resolve(states);
     final foregroundColor = colors.foreground.resolve(states);

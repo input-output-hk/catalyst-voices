@@ -2,7 +2,7 @@ part of 'vote_button.dart';
 
 class _VoteButtonExpanded extends StatelessWidget {
   final VoteButtonData data;
-  final ValueChanged<VoteType> onSelected;
+  final ValueChanged<VoteButtonAction> onSelected;
 
   const _VoteButtonExpanded(
     this.data, {
@@ -15,41 +15,38 @@ class _VoteButtonExpanded extends StatelessWidget {
       constraints: const BoxConstraints.tightFor(width: _expandedWidth, height: 32),
       child: data.hasVoted
           ? _VoteButtonHasVoted(
-              voteType: data.draft?.type ?? data.casted?.type,
-              votedAt: !data.hasDraftVote ? data.castedVotedAt : null,
-              inVoteList: data.hasDraftVote,
+              latestVote: data.votes.first,
+              casted: data.casted,
               onChanged: onSelected,
             )
-          : _VoteButtonNoVote(onSelected: onSelected),
+          : _VoteButtonNoVote(onSelected: (value) => onSelected(VoteButtonActionVote(value))),
     );
   }
 }
 
 class _VoteButtonHasVoted extends StatelessWidget {
-  final VoteType? voteType;
-  final DateTime? votedAt;
-  final bool inVoteList;
-  final ValueChanged<VoteType> onChanged;
+  final VoteTypeData? latestVote;
+  final VoteTypeDataCasted? casted;
+  final ValueChanged<VoteButtonAction> onChanged;
 
   const _VoteButtonHasVoted({
-    this.voteType,
-    this.votedAt,
-    this.inVoteList = false,
+    this.latestVote,
+    this.casted,
     required this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    return VoicesRawPopupMenuButton<VoteType>(
+    return VoicesRawPopupMenuButton<VoteButtonAction>(
       buttonBuilder: (context, onTapCallback, {required isMenuOpen}) {
         return _VoteButtonHasVotedButton(
           onTap: onTapCallback,
-          voteType: voteType,
-          votedAt: votedAt,
-          inVoteList: inVoteList,
+          voteType: latestVote?.type,
+          votedAt: latestVote?.castedAt,
+          inVoteList: latestVote?.isDraft ?? false,
         );
       },
-      menuBuilder: (context) => _VoteButtonMenu(selected: voteType),
+      menuBuilder: (context) => _VoteButtonMenu(latest: latestVote, casted: casted),
       onSelected: onChanged,
       routeSettings: const RouteSettings(),
     );
@@ -83,7 +80,13 @@ class _VoteButtonHasVotedButton extends StatelessWidget {
         children: [
           ...<Widget>[
             if (voteType != null) Text(voteType.localisedName(context, present: inVoteList)),
-            if (votedAt != null) TimestampText(votedAt, showTimezone: false),
+            if (votedAt != null)
+              TimestampText(
+                votedAt,
+                showTimezone: false,
+                includeTime: false,
+                style: DefaultTextStyle.of(context).style,
+              ),
             if (inVoteList) const _VoteInVoteListText(),
           ].separatedBy(const Text('·')),
           VoicesAssets.icons.chevronDown.buildIcon(),

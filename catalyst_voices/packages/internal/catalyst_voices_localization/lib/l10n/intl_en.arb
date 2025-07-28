@@ -3315,5 +3315,9 @@
   "votedAbstain": "Abstained",
   "@votedAbstain": {
     "description": "Voted abstain on proposal"
+  },
+  "removeFromVoteList": "Remove from Vote List",
+  "@removeFromVoteList": {
+    "description": "When vote is added but not casted yet it can be removed."
   }
 }

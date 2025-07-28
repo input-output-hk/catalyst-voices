@@ -1,10 +1,12 @@
 part of 'vote_button.dart';
 
 class _VoteButtonMenu extends StatelessWidget {
-  final VoteType? selected;
+  final VoteTypeData? latest;
+  final VoteTypeDataCasted? casted;
 
   const _VoteButtonMenu({
-    this.selected,
+    this.latest,
+    this.casted,
   });
 
   @override
@@ -26,16 +28,50 @@ class _VoteButtonMenu extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _VoteButtonMenuTypesRow(selected: selected),
-          const SizedBox(height: 8),
-          const VoicesDivider(
-            indent: 8,
-            endIndent: 8,
-            height: 8 * 2 + 1,
+          _VoteButtonMenuTypesRow(selected: latest),
+          ...[
+            if (latest?.isDraft ?? false) const _VoteButtonMenuRemoveFromVoteList(),
+            if (casted case final VoteTypeDataCasted casted) _VoteButtonMenuCasted(data: casted),
+          ].separatedBy(const _VoteButtonMenuDivider()).expandIndexed((index, element) {
+            return [
+              if (index == 0) const SizedBox(height: 8),
+              element,
+            ];
+          }),
+        ],
+      ),
+    );
+  }
+}
+
+class _VoteButtonMenuCasted extends StatelessWidget {
+  final VoteTypeDataCasted data;
+
+  const _VoteButtonMenuCasted({
+    required this.data,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = (context.textTheme.labelLarge ?? const TextStyle()).copyWith(
+      color: context.colors.textOnPrimaryLevel1,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.all(8),
+      child: Row(
+        children: [
+          Text(
+            data.type.localisedName(context, present: false),
+            style: textStyle,
+            maxLines: 1,
           ),
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: Text('Voted Yes'),
+          const Spacer(),
+          TimestampText(
+            data.castedAt,
+            showTimezone: false,
+            includeTime: false,
+            style: textStyle,
           ),
         ],
       ),
@@ -43,8 +79,60 @@ class _VoteButtonMenu extends StatelessWidget {
   }
 }
 
+class _VoteButtonMenuDivider extends StatelessWidget {
+  const _VoteButtonMenuDivider();
+
+  @override
+  Widget build(BuildContext context) {
+    return const VoicesDivider(
+      indent: 8,
+      endIndent: 8,
+      height: 8 * 2 + 1,
+    );
+  }
+}
+
+class _VoteButtonMenuRemoveFromVoteList extends StatelessWidget {
+  const _VoteButtonMenuRemoveFromVoteList();
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = (context.textTheme.labelLarge ?? const TextStyle()).copyWith(
+      color: context.colors.textOnPrimaryLevel0,
+    );
+
+    return Material(
+      textStyle: textStyle,
+      type: MaterialType.transparency,
+      borderRadius: BorderRadius.circular(8),
+      child: InkWell(
+        onTap: () => Navigator.pop(context, const VoteButtonActionRemoveDraft()),
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Row(
+            children: [
+              Text(
+                context.l10n.removeFromVoteList,
+                style: textStyle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const Spacer(),
+              VoicesAssets.icons.x.buildIcon(
+                size: 18,
+                color: context.colors.iconsForeground,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _VoteButtonMenuTypesRow extends StatelessWidget {
-  final VoteType? selected;
+  final VoteTypeData? selected;
 
   const _VoteButtonMenuTypesRow({
     this.selected,
@@ -61,8 +149,9 @@ class _VoteButtonMenuTypesRow extends StatelessWidget {
               (type) {
                 return _VoteButtonMenuTypesRowButton(
                   type: type,
-                  isSelected: type == selected,
-                  onTap: () => Navigator.pop(context, type),
+                  isCasted: selected?.isCasted ?? false,
+                  isSelected: selected?.type == type,
+                  onTap: () => Navigator.pop(context, VoteButtonActionVote(type)),
                 );
               },
             )
@@ -75,11 +164,13 @@ class _VoteButtonMenuTypesRow extends StatelessWidget {
 
 class _VoteButtonMenuTypesRowButton extends StatefulWidget {
   final VoteType type;
+  final bool isCasted;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _VoteButtonMenuTypesRowButton({
     required this.type,
+    required this.isCasted,
     required this.isSelected,
     required this.onTap,
   });
@@ -93,15 +184,35 @@ class _VoteButtonMenuTypesRowButtonState extends State<_VoteButtonMenuTypesRowBu
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = (context.textTheme.labelLarge ?? const TextStyle())
-        .copyWith(color: context.colors.textOnPrimaryLevel0);
-    final iconStyle = IconThemeData(size: 24, color: context.colors.iconsForeground);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final colors = theme.colors;
+
+    final backgroundColor = VoteButtonBackgroundColor(
+      voteType: widget.type,
+      isCasted: widget.isCasted,
+      colorScheme: colorScheme,
+      colors: colors,
+    );
+    final foregroundColor = VoteButtonForegroundColor(
+      voteType: widget.type,
+      isCasted: widget.isCasted,
+      colorScheme: colorScheme,
+      colors: colors,
+    );
 
     return ListenableBuilder(
       listenable: _statesController,
       builder: (context, child) {
+        final effectiveBackgroundColor = backgroundColor.resolve(_statesController.value);
+        final effectiveForegroundColor = foregroundColor.resolve(_statesController.value);
+
+        final textStyle = (context.textTheme.labelLarge ?? const TextStyle())
+            .copyWith(color: effectiveForegroundColor);
+        final iconStyle = IconThemeData(size: 24, color: effectiveForegroundColor);
+
         return Material(
-          color: context.colors.onSurfaceNeutral08,
+          color: effectiveBackgroundColor,
           borderRadius: BorderRadius.circular(8),
           textStyle: textStyle,
           child: InkWell(
