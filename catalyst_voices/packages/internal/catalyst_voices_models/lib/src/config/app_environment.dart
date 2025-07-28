@@ -81,7 +81,7 @@ enum AppEnvironmentType {
 
       /// [AppEnvironmentType.relative] type does not now where its backends
       /// are hosted.
-      AppEnvironmentType.relative => Uri.base,
+      AppEnvironmentType.relative => normalizedBaseUri(),
     };
   }
 
@@ -91,7 +91,7 @@ enum AppEnvironmentType {
       AppEnvironmentType.prod => _getBaseUrl('reviews'),
       AppEnvironmentType.relative => _getBaseUrl(
           'reviews',
-          envName: tryUriBaseEnvName(from: Uri.base.toString()),
+          envName: tryUriBaseEnvName(from: normalizedBaseUri().toString()),
         ),
     };
   }
@@ -122,5 +122,16 @@ enum AppEnvironmentType {
     }
 
     return null;
+  }
+
+  @visibleForTesting
+  static Uri normalizedBaseUri([Uri? base]) {
+    base ??= Uri.base;
+
+    return Uri(
+      scheme: base.scheme,
+      host: base.host,
+      port: base.port,
+    );
   }
 }
