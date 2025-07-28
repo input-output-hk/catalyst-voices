@@ -1,5 +1,5 @@
 # A collection of tests with the deprecated signed documents
-
+import pytest
 from api.v1 import document
 
 from utils import uuid_v7
