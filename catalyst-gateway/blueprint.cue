@@ -12,7 +12,8 @@ project: {
 		}
 
 		bundle: {
-			env: string | *"dev"
+			env:  string | *"dev"
+			_env: env
 			modules: main: {
 				name:    "app"
 				version: "0.11.1"
@@ -174,59 +175,79 @@ project: {
 						}
 					}
 
-					jobs: migration: containers: main: {
-						image: {
-							name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/gateway-event-db"
-							tag:  _ @forge(name="GIT_HASH_OR_TAG")
+					jobs:
+					{
+						"frontend-config": containers: main: {
+							image: {
+								name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/voices-frontend-config"
+								tag:  _ @forge(name="GIT_HASH_OR_TAG")
+							}
+							env: {
+								ENVIRONMENT: {
+									value: string | *_env
+								}
+								API_KEY: {
+									secret: {
+										name: "gateway"
+										key:  "api-key"
+									}
+								}
+							}
 						}
-						env: {
-							DB_HOST: {
-								secret: {
-									name: "db"
-									key:  "host"
+						migration: containers: main: {
+							image: {
+								name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/gateway-event-db"
+								tag:  _ @forge(name="GIT_HASH_OR_TAG")
+							}
+							env: {
+								DB_HOST: {
+									secret: {
+										name: "db"
+										key:  "host"
+									}
 								}
-							}
-							DB_PORT: {
-								secret: {
-									name: "db"
-									key:  "port"
+								DB_PORT: {
+									secret: {
+										name: "db"
+										key:  "port"
+									}
 								}
-							}
-							DB_NAME: {
-								value: string | *"gateway"
-							}
-							DB_DESCRIPTION: {
-								value: string | *"Gateway Event Database"
-							}
-							DB_SUPERUSER: {
-								secret: {
-									name: "db-root"
-									key:  "username"
+								DB_NAME: {
+									value: string | *"gateway"
 								}
-							}
-							DB_SUPERUSER_PASSWORD: {
-								secret: {
-									name: "db-root"
-									key:  "password"
+								DB_DESCRIPTION: {
+									value: string | *"Gateway Event Database"
 								}
-							}
-							DB_USER: {
-								secret: {
-									name: "db"
-									key:  "username"
+								DB_SUPERUSER: {
+									secret: {
+										name: "db-root"
+										key:  "username"
+									}
 								}
-							}
-							DB_USER_PASSWORD: {
-								secret: {
-									name: "db"
-									key:  "password"
+								DB_SUPERUSER_PASSWORD: {
+									secret: {
+										name: "db-root"
+										key:  "password"
+									}
 								}
-							}
-							INIT_AND_DROP_DB: {
-								value: string | *"true"
-							}
-							WITH_MIGRATIONS: {
-								value: string | *"true"
+								DB_USER: {
+									secret: {
+										name: "db"
+										key:  "username"
+									}
+								}
+								DB_USER_PASSWORD: {
+									secret: {
+										name: "db"
+										key:  "password"
+									}
+								}
+								INIT_AND_DROP_DB: {
+									value: string | *"true"
+								}
+								WITH_MIGRATIONS: {
+									value: string | *"true"
+								}
 							}
 						}
 					}
