@@ -2,6 +2,12 @@
 
 from api.v1 import document
 
+from utils import uuid_v7
+from signed_doc import SignedDocument, proposal_templates
+from api.v1 import document
+import json
+from utils.rbac_chain import rbac_chain_factory, RoleID
+
 
 # Getting documents using GET `/v1/document` endpoint.
 # Data `old_format_signed_doc.sql` should successfully passing through the migration process.
@@ -68,3 +74,41 @@ def test_v1_index_migrated_documents():
         assert (
             resp.json == exp_json
         ), f"Unexpected index of documents which match the query filter, got: {resp.json}, expected: {exp_json}"
+
+
+# Trying to submit a deprecated proposal document via
+def test_put_deprecated_proposal(proposal_templates, rbac_chain_factory):
+    role_id = RoleID.PROPOSER
+    rbac_chain = rbac_chain_factory()
+    proposal_doc_id = uuid_v7.uuid_v7()
+    category_id = "0194d490-30bf-7473-81c8-a0eaef369619"
+    proposal_metadata_json = {
+        "id": proposal_doc_id,
+        "ver": proposal_doc_id,
+        # Proposal document type
+        "type": "7808d2ba-d511-40af-84e8-c0d1625fdfdc",
+        "content-type": "application/json",
+        "content-encoding": "br",
+        # referenced to the defined proposal template id, comes from the 'templates/data.rs' file
+        "template": {
+            "id": proposal_templates[0],
+            "ver": proposal_templates[0],
+        },
+        # referenced to the defined category id, comes from the 'templates/data.rs' file
+        "parameters": {
+            "id": category_id,
+            "ver": category_id,
+        },
+    }
+    with open("./test_data/signed_docs/proposal.json", "r") as proposal_json_file:
+        proposal_json = json.load(proposal_json_file)
+
+    doc = SignedDocument(proposal_metadata_json, proposal_json)
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+    resp = document.put(
+        data=doc.build_and_sign(cat_id, sk_hex, is_deprecated=True),
+        token=rbac_chain.auth_token(),
+    )
+    assert (
+        resp.status_code == 201
+    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
