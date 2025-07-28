@@ -96,10 +96,6 @@ jobs:
           pattern: test-reports*
           merge-multiple: true
 
-#      - uses: actions/download-artifact@v4
-#        with:
-#          name: test-reports-gateway
-
       - name: Setup Allure report
         run: |
           mkdir -p ${{ env.ALLURE_REPORT_FOLDER }}
@@ -147,10 +143,6 @@ jobs:
         with:
           pattern: coverage-reports*
           merge-multiple: true
-
-#      - uses: actions/download-artifact@v4
-#        with:
-#          name: coverage-reports-gateway
 
       - name: Collect coverage report
         run: |
