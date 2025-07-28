@@ -240,7 +240,7 @@ impl SyncParams {
 #[allow(clippy::too_many_lines)]
 fn sync_subchain(
     params: SyncParams, event_sender: broadcast::Sender<event::ChainIndexerEvent>,
-    mut unprocessed_blocks: watch::Receiver<BTreeSet<Slot>>,
+    mut pending_blocks: watch::Receiver<BTreeSet<Slot>>,
 ) -> tokio::task::JoinHandle<SyncParams> {
     tokio::spawn(async move {
         // Backoff hitting the database if we need to.
@@ -297,8 +297,7 @@ fn sync_subchain(
                     let block = chain_update.block_data();
 
                     if let Err(error) =
-                        index_block(block, &mut unprocessed_blocks, params.end.slot_or_default())
-                            .await
+                        index_block(block, &mut pending_blocks, params.end.slot_or_default()).await
                     {
                         let error_msg = format!("Failed to index block {}", block.point());
                         error!(chain=%params.chain, error=%error, params=%params, error_msg);
@@ -350,12 +349,9 @@ fn sync_subchain(
 
                         // Purge success, now index the current block
                         let block = chain_update.block_data();
-                        if let Err(error) = index_block(
-                            block,
-                            &mut unprocessed_blocks,
-                            params.end.slot_or_default(),
-                        )
-                        .await
+                        if let Err(error) =
+                            index_block(block, &mut pending_blocks, params.end.slot_or_default())
+                                .await
                         {
                             let error_msg =
                                 format!("Failed to index block after rollback {}", block.point());
@@ -450,7 +446,7 @@ struct SyncTask {
     /// ranges (where the end bounds aren't inclusive), then the channel will contain the
     /// following list: `[99, 199, 299]`. A slot value is removed when that task is done,
     /// so when the second task is finished the list will be updated to `[99, 299]`.
-    unprocessed_blocks: watch::Sender<BTreeSet<Slot>>,
+    pending_blocks: watch::Sender<BTreeSet<Slot>>,
 }
 
 impl SyncTask {
@@ -465,7 +461,7 @@ impl SyncTask {
             live_tip_slot: 0.into(),
             sync_status: Vec::new(),
             event_channel: broadcast::channel(10),
-            unprocessed_blocks: watch::channel(BTreeSet::new()).0,
+            pending_blocks: watch::channel(BTreeSet::new()).0,
         }
     }
 
@@ -473,13 +469,13 @@ impl SyncTask {
     fn add_sync_task(
         &mut self, params: SyncParams, event_sender: broadcast::Sender<event::ChainIndexerEvent>,
     ) {
-        self.unprocessed_blocks.send_modify(|blocks| {
+        self.pending_blocks.send_modify(|blocks| {
             blocks.insert(params.end.slot_or_default());
         });
         self.sync_tasks.push(sync_subchain(
             params,
             event_sender,
-            self.unprocessed_blocks.subscribe(),
+            self.pending_blocks.subscribe(),
         ));
         self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
         debug!(current_sync_tasks=%self.current_sync_tasks, "Added new Sync Task");
@@ -619,7 +615,7 @@ impl SyncTask {
                                     );
                                 });
 
-                                self.unprocessed_blocks.send_modify(|blocks| {
+                                self.pending_blocks.send_modify(|blocks| {
                                     if !blocks.remove(&finished.end.slot_or_default()) {
                                         error!(chain=%self.cfg.chain, end=?finished.end,
                                             "The immutable follower completed successfully, but its end point isn't present in index_sync_channel"
