@@ -37,20 +37,22 @@ class _VotingPageState extends State<VotingPage>
 
   @override
   Widget build(BuildContext context) {
-    return CampaignPhaseAware.when(
-      phase: CampaignPhaseType.communityVoting,
-      upcoming: (_, phase, fundNumber) => HeaderAndContentLayout(
-        header: const VotingHeader(),
-        content: PreVotingContent(phase: phase, fundNumber: fundNumber),
-        background: const VotingBackground(),
-      ),
-      active: (_, __, ___) => const HeaderAndContentLayout(
-        header: VotingHeader(),
-        content: VotingContent(),
-      ),
-      post: (_, __, ___) => const HeaderAndContentLayout(
-        header: VotingHeader(),
-        content: Text('Post'),
+    return SelectionArea(
+      child: CampaignPhaseAware.when(
+        phase: CampaignPhaseType.communityVoting,
+        upcoming: (_, phase, fundNumber) => HeaderAndContentLayout(
+          header: const VotingHeader(),
+          content: PreVotingContent(phase: phase, fundNumber: fundNumber),
+          background: const VotingBackground(),
+        ),
+        active: (_, __, ___) => const HeaderAndContentLayout(
+          header: VotingHeader(),
+          content: VotingContent(),
+        ),
+        post: (_, __, ___) => const HeaderAndContentLayout(
+          header: VotingHeader(),
+          content: Text('Post'),
+        ),
       ),
     );
   }
