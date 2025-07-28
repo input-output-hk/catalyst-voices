@@ -1,5 +1,6 @@
 import pytest
 from utils import health, signed_doc, uuid_v7
+from signed_doc import SignedDocument
 from api.v1 import document
 import os
 import json
@@ -8,29 +9,6 @@ import copy
 from utils.rbac_chain import rbac_chain_factory, RoleID
 import cbor2
 import uuid
-
-
-class SignedDocument:
-    def __init__(self, metadata: Dict[str, Any], content: Dict[str, Any]):
-        self.metadata = metadata
-        self.content = content
-
-    def copy(self):
-        new_copy = SignedDocument(
-            metadata=copy.deepcopy(self.metadata),
-            content=copy.deepcopy(self.content),
-        )
-        return new_copy
-
-    # Build and sign document, returns hex str of document bytes
-    def build_and_sign(
-        self,
-        cat_id: str,
-        bip32_sk_hex: str,
-    ) -> str:
-        return signed_doc.build_signed_doc(
-            self.metadata, self.content, bip32_sk_hex, cat_id
-        )
 
 
 @pytest.fixture
