@@ -88,7 +88,7 @@ jobs:
       - name: Download final merged artifact
         uses: actions/download-artifact@v4
         with:
-          name: my-combined-artifact
+#          name: my-combined-artifact
           path: ./final-merged-content
           pattern: "**/*my-combined-artifact"
           merge-multiple: true
