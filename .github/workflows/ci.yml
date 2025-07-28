@@ -51,7 +51,7 @@ jobs:
           echo "Report 1" > part2_output/report.txt
 
       - name: Merge Part 2 files into existing artifact
-        uses: ./.github/actions/merge-artifact@3109-disable-generate-allure-report
+        uses: input-output-hk/catalyst-voices/.github/actions/merge-artifact@3109-disable-generate-allure-report
         # If the action is in the same repo, use: ./github/actions/merge-artifact
         with:
           artifact-name: my-combined-artifact
