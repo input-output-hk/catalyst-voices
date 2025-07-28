@@ -75,7 +75,7 @@ void main() {
       expect(config.cache, isNull);
     });
 
-    test('a json map is passed thru not changed', () async {
+    test('a json map is passed through not changed', () async {
       // Given
       const configJson = <String, dynamic>{
         'blockchain': {
