@@ -16,7 +16,7 @@ package:
 
     ENTRYPOINT ["/app/entrypoint.sh"]
 
-    SAVE IMAGE AS voices-frontend-config:${tag}
+    SAVE IMAGE voices-frontend-config:${tag}
 
 docker:
     FROM +package
