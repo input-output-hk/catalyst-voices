@@ -26,9 +26,7 @@ class VotingBackground extends StatelessWidget {
         },
         blendMode: BlendMode.dstIn,
         child: CatalystImage.asset(
-          context.theme.isLight
-              ? VoicesAssets.images.votingBgLight.path
-              : VoicesAssets.images.votingBgDark.path,
+          context.theme.brandAssets.brand.votingBg(context).path,
           width: double.infinity,
           height: (MediaQuery.sizeOf(context).height * 0.55).clamp(620, 1200),
           fit: BoxFit.fitWidth,

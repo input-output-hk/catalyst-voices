@@ -50,7 +50,7 @@ class _Header extends StatelessWidget {
             style: context.textTheme.headlineSmall,
           ),
           const SizedBox(height: 4),
-          // unknown if its final copy text so right now using hardcoded values
+          // TODO(LynxxLynx): unknown if it's final copy text so right now using hardcoded values
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 420),
             child: Text(
