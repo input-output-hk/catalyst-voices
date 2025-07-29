@@ -77,8 +77,10 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
       child: _Shortcuts(
         onToggleAdminTools: _toggleAdminTools,
         child: BlocSelector<SessionCubit, SessionState, _SessionStateData>(
-          selector: (state) =>
-              (isActive: state.isActive, isProposer: state.account?.isProposer ?? false),
+          selector: (state) => (
+            isActive: state.isActive,
+            isProposer: state.account?.isProposer ?? false,
+          ),
           builder: (context, state) {
             return Scaffold(
               appBar: SpacesAppbar(

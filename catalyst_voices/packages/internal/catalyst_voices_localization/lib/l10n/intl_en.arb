@@ -2604,14 +2604,11 @@
   "@preSubmitProposalStageDescription": {
     "description": "Description for the pre-submission stage"
   },
-  "proposalSubmissionStageStartAt": "Proposal submission opens {date} at {time}",
+  "proposalSubmissionStageStartAt": "Proposal submission opens {date}",
   "@proposalSubmissionStageStartAt": {
     "description": "Description for the pre-submission stage",
     "placeholders": {
       "date": {
-        "type": "String"
-      },
-      "time": {
         "type": "String"
       }
     }

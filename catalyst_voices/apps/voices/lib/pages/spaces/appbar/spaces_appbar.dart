@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/spaces/appbar/app_bar_config.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/appbar_config.dart';
 import 'package:catalyst_voices/widgets/app_bar/voices_app_bar.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -19,11 +19,11 @@ class SpacesAppbar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Size get preferredSize => VoicesAppBar.size;
 
-  SpaceAppBarConfig get _config => switch (space) {
-        Space.discovery => DiscoveryAppBarConfig(isAppUnlock: isAppUnlock, isProposer: isProposer),
-        Space.workspace => WorkspaceAppBarConfig(isAppUnlock: isAppUnlock, isProposer: isProposer),
-        Space.voting => VotingAppBarConfig(isAppUnlock: isAppUnlock, isProposer: isProposer),
-        _ => const DefaultSpaceAppBarConfig(),
+  SpaceAppbarConfig get _config => switch (space) {
+        Space.discovery => DiscoveryAppbarConfig(isAppUnlock: isAppUnlock, isProposer: isProposer),
+        Space.workspace => WorkspaceAppbarConfig(isAppUnlock: isAppUnlock, isProposer: isProposer),
+        Space.voting => VotingAppbarConfig(isAppUnlock: isAppUnlock, isProposer: isProposer),
+        _ => const DefaultSpaceAppbarConfig(),
       };
 
   @override
@@ -38,27 +38,27 @@ class SpacesAppbar extends StatelessWidget implements PreferredSizeWidget {
       builder: (context, state) {
         return switch (state) {
           CampaignPhaseStatus.upcoming => Offstage(
-              offstage: !_config.showAppBarUpcoming,
+              offstage: !_config.showAppbarUpcoming,
               child: VoicesAppBar(
                 automaticallyImplyLeading: false,
-                leading: _config.upcomingAppBarLeading,
-                actions: _config.upcomingAppBarActions,
+                leading: _config.upcomingAppbarLeading,
+                actions: _config.upcomingAppbarActions,
               ),
             ),
           CampaignPhaseStatus.active => Offstage(
-              offstage: !_config.showAppBarActive,
+              offstage: !_config.showAppbarActive,
               child: VoicesAppBar(
                 automaticallyImplyLeading: false,
-                leading: _config.activeAppBarLeading,
-                actions: _config.activeAppBarActions,
+                leading: _config.activeAppbarLeading,
+                actions: _config.activeAppbarActions,
               ),
             ),
           CampaignPhaseStatus.post => Offstage(
-              offstage: !_config.showAppBarPost,
+              offstage: !_config.showAppbarPost,
               child: VoicesAppBar(
                 automaticallyImplyLeading: false,
-                leading: _config.postAppBarLeading,
-                actions: _config.postAppBarActions,
+                leading: _config.postAppbarLeading,
+                actions: _config.postAppbarActions,
               ),
             ),
           _ => const SizedBox.shrink(),
