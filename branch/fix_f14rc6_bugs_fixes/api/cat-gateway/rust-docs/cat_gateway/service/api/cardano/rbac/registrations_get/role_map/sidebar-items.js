@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["DESCRIPTION","TITLE"],"static":["SCHEMA"],"struct":["RoleMap"]};
