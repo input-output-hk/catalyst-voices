@@ -77,6 +77,7 @@ def test_v1_index_migrated_documents():
 
 
 # Trying to submit a deprecated proposal document via
+@pytest.mark.preprod_indexing
 def test_put_deprecated_proposal(proposal_templates, rbac_chain_factory):
     role_id = RoleID.PROPOSER
     rbac_chain = rbac_chain_factory()
