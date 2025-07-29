@@ -268,6 +268,7 @@ pubkey
 PUBLICKEY
 pubspec
 pycardano
+pyproject
 pyright
 pytest
 qrcode
