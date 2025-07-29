@@ -82,6 +82,22 @@ class _DiscoveryPageState extends State<DiscoveryPage>
                 });
               },
             ),
+            VoteButton(
+              data: VoteButtonData.fromVotes(currentDraft: _draftVote, lastCasted: _castedVote),
+              onSelected: (value) {
+                setState(() {
+                  _draftVote = switch (value) {
+                    VoteButtonActionRemoveDraft() => null,
+                    VoteButtonActionVote(:final type) => Vote.draft(
+                        proposal: DraftRef.generateFirstRef(),
+                        type: type,
+                      ),
+                  };
+                });
+              },
+              isCompact: true,
+            ),
+            const Text(' | '),
             VoicesFilledButton(
               onTap: () {
                 setState(() {

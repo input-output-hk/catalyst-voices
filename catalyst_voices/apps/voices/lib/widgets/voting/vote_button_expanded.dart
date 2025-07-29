@@ -12,7 +12,7 @@ class _VoteButtonExpanded extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: const BoxConstraints.tightFor(width: _expandedWidth, height: 32),
+      constraints: const BoxConstraints.tightFor(width: _expandedWidth),
       child: data.hasVoted
           ? _VoteButtonHasVoted(
               latestVote: data.votes.first,
@@ -46,7 +46,13 @@ class _VoteButtonHasVoted extends StatelessWidget {
           inVoteList: latestVote?.isDraft ?? false,
         );
       },
-      menuBuilder: (context) => _VoteButtonMenu(latest: latestVote, casted: casted),
+      menuBuilder: (context) {
+        return _VoteButtonMenu(
+          latest: latestVote,
+          casted: casted,
+          onSelected: (result) => Navigator.pop(context, result),
+        );
+      },
       onSelected: onChanged,
       routeSettings: const RouteSettings(),
     );

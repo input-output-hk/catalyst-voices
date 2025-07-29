@@ -3,10 +3,12 @@ part of 'vote_button.dart';
 class _VoteButtonMenu extends StatelessWidget {
   final VoteTypeData? latest;
   final VoteTypeDataCasted? casted;
+  final ValueChanged<VoteButtonAction> onSelected;
 
   const _VoteButtonMenu({
     this.latest,
     this.casted,
+    required this.onSelected,
   });
 
   @override
@@ -28,9 +30,15 @@ class _VoteButtonMenu extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _VoteButtonMenuTypesRow(selected: latest),
+          _VoteButtonMenuTypesRow(
+            selected: latest,
+            onSelected: onSelected,
+          ),
           ...[
-            if (latest?.isDraft ?? false) const _VoteButtonMenuRemoveFromVoteList(),
+            if (latest?.isDraft ?? false)
+              _VoteButtonMenuRemoveFromVoteList(
+                onTap: () => onSelected(const VoteButtonActionRemoveDraft()),
+              ),
             if (casted case final VoteTypeDataCasted casted) _VoteButtonMenuCasted(data: casted),
           ].separatedBy(const _VoteButtonMenuDivider()).expandIndexed((index, element) {
             return [
@@ -93,7 +101,11 @@ class _VoteButtonMenuDivider extends StatelessWidget {
 }
 
 class _VoteButtonMenuRemoveFromVoteList extends StatelessWidget {
-  const _VoteButtonMenuRemoveFromVoteList();
+  final VoidCallback onTap;
+
+  const _VoteButtonMenuRemoveFromVoteList({
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -106,7 +118,7 @@ class _VoteButtonMenuRemoveFromVoteList extends StatelessWidget {
       type: MaterialType.transparency,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
-        onTap: () => Navigator.pop(context, const VoteButtonActionRemoveDraft()),
+        onTap: onTap,
         borderRadius: BorderRadius.circular(8),
         child: Padding(
           padding: const EdgeInsets.all(8),
@@ -133,9 +145,11 @@ class _VoteButtonMenuRemoveFromVoteList extends StatelessWidget {
 
 class _VoteButtonMenuTypesRow extends StatelessWidget {
   final VoteTypeData? selected;
+  final ValueChanged<VoteButtonAction> onSelected;
 
   const _VoteButtonMenuTypesRow({
     this.selected,
+    required this.onSelected,
   });
 
   @override
@@ -151,7 +165,7 @@ class _VoteButtonMenuTypesRow extends StatelessWidget {
                   type: type,
                   isCasted: selected?.isCasted ?? false,
                   isSelected: selected?.type == type,
-                  onTap: () => Navigator.pop(context, VoteButtonActionVote(type)),
+                  onTap: () => onSelected(VoteButtonActionVote(type)),
                 );
               },
             )

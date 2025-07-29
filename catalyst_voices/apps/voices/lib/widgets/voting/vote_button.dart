@@ -9,6 +9,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
+part 'vote_button_compact.dart';
 part 'vote_button_expanded.dart';
 part 'vote_button_menu.dart';
 
@@ -17,13 +18,13 @@ const _expandedWidth = 294.0;
 class VoteButton extends StatelessWidget {
   final VoteButtonData data;
   final ValueChanged<VoteButtonAction> onSelected;
-  final VoidCallback? onRemove;
+  final bool isCompact;
 
   const VoteButton({
     super.key,
     this.data = const VoteButtonData(),
     required this.onSelected,
-    this.onRemove,
+    this.isCompact = false,
   });
 
   @override
@@ -41,18 +42,20 @@ class VoteButton extends StatelessWidget {
     final textStyle = (textTheme.labelLarge ?? const TextStyle()).copyWith(color: foregroundColor);
     final iconStyle = IconThemeData(size: 18, color: foregroundColor);
 
-    return Material(
-      color: backgroundColor,
-      borderRadius: BorderRadius.circular(8),
-      child: DefaultTextStyle(
-        style: textStyle,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        child: IconTheme(
-          data: iconStyle,
-          child: _VoteButtonExpanded(
-            data,
-            onSelected: onSelected,
+    return ConstrainedBox(
+      constraints: const BoxConstraints.tightFor(height: 32),
+      child: Material(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(8),
+        child: DefaultTextStyle(
+          style: textStyle,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          child: IconTheme(
+            data: iconStyle,
+            child: isCompact
+                ? _VoteButtonCompact(data, onSelected: onSelected)
+                : _VoteButtonExpanded(data, onSelected: onSelected),
           ),
         ),
       ),
