@@ -4,12 +4,12 @@ VERSION 0.8
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.4.7 AS spectral-ci
 IMPORT .. AS gateway
 
-# a special package for applying migrations only up to "V2_**"
-package-event-db-v2:
+# a special package for applying migrations only up to "V2_**" migrations
+package-event-db-v1:
     FROM github.com/input-output-hk/catalyst-voices/catalyst-gateway/event-db:event-db-old-signed-doc+docker
 
     ARG container="event-db"
-    ARG tag="v2"
+    ARG tag="v1"
 
     COPY ./event_db_v2_seed_data ./seed
 

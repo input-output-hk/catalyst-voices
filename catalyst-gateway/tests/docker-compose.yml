@@ -15,9 +15,10 @@ services:
       retries: 10
 
   # runs old migrations for the separate `postgres` service
-  event-db-v2-migrations:
-    image: event-db:v2
-    container_name: event-db-v2-migrations
+  # a special package for applying migrations only up to "V2_**" migrations
+  event-db-v1-migrations:
+    image: event-db:v1
+    container_name: event-db-v1-migrations
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
@@ -52,7 +53,7 @@ services:
       - INIT_AND_DROP_DB=false
       - WITH_MIGRATIONS=true
     depends_on:
-      event-db-v2-migrations:
+      event-db-v1-migrations:
         condition: service_started
 
   scylla-node:
