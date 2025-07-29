@@ -22,7 +22,7 @@ use crate::{
         },
         types::{DbCatalystId, DbPublicKey},
     },
-    metrics::rbac_cache::reporter::{
+    metrics::rbac::reporter::{
         PERSISTENT_PUBLIC_KEYS_CACHE_HIT, PERSISTENT_PUBLIC_KEYS_CACHE_MISS,
         VOLATILE_PUBLIC_KEYS_CACHE_HIT, VOLATILE_PUBLIC_KEYS_CACHE_MISS,
     },

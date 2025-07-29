@@ -7,7 +7,7 @@ use moka::{policy::EvictionPolicy, sync::Cache};
 use rbac_registration::registration::cardano::RegistrationChain;
 
 use crate::{
-    metrics::rbac_cache::reporter::{PERSISTENT_CHAINS_CACHE_HIT, PERSISTENT_CHAINS_CACHE_MISS},
+    metrics::rbac::reporter::{PERSISTENT_CHAINS_CACHE_HIT, PERSISTENT_CHAINS_CACHE_MISS},
     settings::Settings,
 };
 
