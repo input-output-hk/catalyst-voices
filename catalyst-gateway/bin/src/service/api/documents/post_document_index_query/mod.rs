@@ -25,7 +25,7 @@ use crate::{
 
 pub(crate) mod query_filter;
 pub(crate) mod response;
-pub(crate) mod response_v2;
+pub(crate) mod v2;
 
 /// Endpoint responses.
 #[derive(ApiResponse)]

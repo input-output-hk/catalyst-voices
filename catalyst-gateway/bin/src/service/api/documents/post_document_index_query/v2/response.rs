@@ -5,13 +5,16 @@ use poem_openapi::{
     NewType, Object,
 };
 
-use super::SignedDocBody;
-use crate::service::common::{
-    self,
-    types::{
-        array_types::impl_array_types,
-        document::{
-            doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
+use crate::{
+    db::event::signed_docs::FullSignedDoc,
+    service::common::{
+        self,
+        types::{
+            array_types::impl_array_types,
+            document::{
+                doc_ref::DocumentReference, doc_type::DocumentType, id::DocumentId,
+                ver::DocumentVer,
+            },
         },
     },
 };
@@ -143,32 +146,32 @@ impl Example for IndexedDocumentDocumented {
 /// List of Documents that matched the filter
 #[derive(Object, Debug, Clone)]
 #[oai(example = true)]
-pub(crate) struct IndexedDocumentVersion {
+pub(crate) struct IndexedDocumentVersionV2 {
     /// Document Version that matches the filter
     pub ver: DocumentVer,
     /// Document Type that matches the filter
     #[oai(rename = "type")]
-    pub doc_type: Vec<DocumentType>,
+    pub doc_type: DocumentType,
     /// Document Reference that matches the filter
     #[oai(rename = "ref", skip_serializing_if_is_none)]
-    pub doc_ref: Option<FilteredDocumentReferences>,
+    pub doc_ref: Option<FilteredDocumentReference>,
     /// Document Reply Reference that matches the filter
     #[oai(skip_serializing_if_is_none)]
-    pub reply: Option<FilteredDocumentReferences>,
+    pub reply: Option<FilteredDocumentReference>,
     /// Document Template Reference that matches the filter
     #[oai(skip_serializing_if_is_none)]
-    pub template: Option<FilteredDocumentReferences>,
+    pub template: Option<FilteredDocumentReference>,
     /// Document Parameter Reference that matches the filter
     #[oai(rename = "doc_parameters", skip_serializing_if_is_none)]
-    pub parameters: Option<FilteredDocumentReferences>,
+    pub parameters: Option<FilteredDocumentReference>,
 }
 
-impl Example for IndexedDocumentVersion {
+impl Example for IndexedDocumentVersionV2 {
     fn example() -> Self {
         Self {
             ver: DocumentVer::example(),
-            doc_type: vec![DocumentType::example()],
-            doc_ref: Some(FilteredDocumentReferences::example()),
+            doc_type: DocumentType::example(),
+            doc_ref: Some(DocumentReference::example().into()),
             reply: None,
             template: None,
             parameters: None,
@@ -184,28 +187,28 @@ impl Example for IndexedDocumentVersion {
     to_header = false,
     example = true
 )]
-pub(crate) struct FilteredDocumentReferences(pub(crate) Vec<DocumentReference>);
+pub(crate) struct FilteredDocumentReference(DocumentReference);
 
-impl From<catalyst_signed_doc::DocumentRefs> for FilteredDocumentReferences {
-    fn from(value: catalyst_signed_doc::DocumentRefs) -> Self {
-        Self(value.doc_refs().into_iter().cloned().map(DocumentReference::from).collect())
+impl From<catalyst_signed_doc::DocumentRef> for FilteredDocumentReference {
+    fn from(value: catalyst_signed_doc::DocumentRef) -> Self {
+        Self(value.into())
     }
 }
 
-impl Example for FilteredDocumentReferences {
+impl Example for FilteredDocumentReference {
     fn example() -> Self {
-        Self(vec![Example::example()])
+        Self(Example::example())
     }
 }
 
 // List of Indexed Document Version Documented
 impl_array_types!(
     IndexedDocumentVersionDocumentedList,
-    IndexedDocumentVersionDocumented,
+    IndexedDocumentVersionDocumentedV2,
     Some(poem_openapi::registry::MetaSchema {
         example: Self::example().to_json(),
         max_items: Some(100),
-        items: Some(Box::new(IndexedDocumentVersionDocumented::schema_ref())),
+        items: Some(Box::new(IndexedDocumentVersionDocumentedV2::schema_ref())),
         ..poem_openapi::registry::MetaSchema::ANY
     })
 );
@@ -233,26 +236,19 @@ impl Example for IndexedDocumentVersionDocumentedList {
 /// information. used to filter documents based on those metadata fields.
 /// This is equivalent to returning documents where those metadata fields either do not
 /// exist, or do exist, but have any value.
-pub(crate) struct IndexedDocumentVersionDocumented(pub(crate) IndexedDocumentVersion);
+pub(crate) struct IndexedDocumentVersionDocumentedV2(pub(crate) IndexedDocumentVersionV2);
 
-impl Example for IndexedDocumentVersionDocumented {
+impl Example for IndexedDocumentVersionDocumentedV2 {
     fn example() -> Self {
-        Self(IndexedDocumentVersion::example())
+        Self(IndexedDocumentVersionV2::example())
     }
 }
 
-pub(crate) const DEPRECATED_MARK: &'static str = "deprecated";
-
-impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
+impl TryFrom<FullSignedDoc> for IndexedDocumentVersionDocumentedV2 {
     type Error = anyhow::Error;
 
-    fn try_from(doc: SignedDocBody) -> Result<Self, Self::Error> {
-        // this will accept only older version
-        let (doc_type_old, doc_ref_old) = doc.is_deprecated()?;
-        if doc_type_old || doc_ref_old {
-            return Err(anyhow::anyhow!(DEPRECATED_MARK));
-        }
-
+    fn try_from(doc: FullSignedDoc) -> Result<Self, Self::Error> {
+        let mut doc_type = None;
         let mut doc_ref = None;
         let mut reply = None;
         let mut template = None;
@@ -262,31 +258,42 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumented {
 
             // note: perform conversion from the new version
             // to the older version
+            doc_type = Some(meta.doc_type()?).cloned();
             doc_ref = meta
                 .doc_ref()
+                .and_then(|doc_ref| doc_ref.doc_refs().first())
                 .cloned()
                 .map(Into::into);
             reply = meta
                 .reply()
+                .and_then(|doc_ref| doc_ref.doc_refs().first())
                 .cloned()
                 .map(Into::into);
             template = meta
                 .template()
+                .and_then(|doc_ref| doc_ref.doc_refs().first())
                 .cloned()
                 .map(Into::into);
             parameters = meta
                 .parameters()
+                .and_then(|doc_ref| doc_ref.doc_refs().first())
                 .cloned()
                 .map(Into::into);
         }
 
-        Ok(IndexedDocumentVersionDocumented(IndexedDocumentVersion {
-            ver: DocumentVer::new_unchecked(doc.ver().to_string()),
-            doc_type: doc.doc_type().into_iter().map(|uuid| DocumentType::new_unchecked(uuid.to_string())).collect(),
-            doc_ref,
-            reply,
-            template,
-            parameters,
-        }))
+        if let Some(doc_type) = doc_type {
+            Ok(IndexedDocumentVersionDocumentedV2(
+                IndexedDocumentVersionV2 {
+                    ver: DocumentVer::new_unchecked(doc.ver().to_string()),
+                    doc_type: DocumentType::new_unchecked(doc_type.to_string()),
+                    doc_ref,
+                    reply,
+                    template,
+                    parameters,
+                },
+            ))
+        } else {
+            Err(anyhow::anyhow!("Missing doc type"))
+        }
     }
 }

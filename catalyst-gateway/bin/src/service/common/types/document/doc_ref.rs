@@ -10,6 +10,7 @@ use poem_openapi::{
 
 use super::{
     id::{DocumentId, EqOrRangedIdDocumented},
+    locator::DocumentLocator,
     ver::{DocumentVer, EqOrRangedVerDocumented},
 };
 use crate::{
@@ -210,6 +211,9 @@ pub(crate) struct DocumentReference {
     /// Document Version
     #[oai(skip_serializing_if_is_none)]
     ver: DocumentVer,
+    /// Document Locator
+    #[oai(skip_serializing_if_is_none)]
+    cid: Option<DocumentLocator>,
 }
 
 impl Example for DocumentReference {
@@ -217,6 +221,7 @@ impl Example for DocumentReference {
         Self {
             doc_id: DocumentId::example(),
             ver: DocumentVer::example(),
+            cid: Some(DocumentLocator::example()),
         }
     }
 }
@@ -226,6 +231,11 @@ impl From<catalyst_signed_doc::DocumentRef> for DocumentReference {
         Self {
             doc_id: (*value.id()).into(),
             ver: (*value.ver()).into(),
+            cid: if value.doc_locator().is_empty() {
+                None
+            } else {
+                Some(value.doc_locator().clone().into())
+            },
         }
     }
 }
