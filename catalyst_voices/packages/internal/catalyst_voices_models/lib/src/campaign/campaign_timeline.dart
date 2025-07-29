@@ -68,7 +68,8 @@ extension CampaignTimelineX on CampaignTimeline {
     ),
     CampaignTimeline(
       title: 'Reviewers and Moderators registration',
-      description: '',
+      description:
+          '''During the registration period, Community Reviewers (LV0 and LV1) and Moderators (LV2) register in the Catalyst app and in the Community Review module to participate in the Community Review stage.''',
       timeline: DateRange(
         from: DateTime.utc(2025, 07, 28, 12),
         to: DateTime.utc(2025, 08, 18, 06),
