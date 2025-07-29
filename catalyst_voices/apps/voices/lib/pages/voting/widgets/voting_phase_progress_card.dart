@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/common/formatters/date_formatter.dart';
-import 'package:catalyst_voices/common/formatters/duration_formatter.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_progress_indicator_weight.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
