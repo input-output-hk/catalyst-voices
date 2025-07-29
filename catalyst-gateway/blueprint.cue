@@ -16,7 +16,7 @@ project: {
 			_env: env
 			modules: main: {
 				name:    "app"
-				version: "0.13.0"
+				version: "0.13.1"
 				values: {
 					stateful: {
 						argo: wave: 1
@@ -185,6 +185,7 @@ project: {
 									deletePolicy: ["BeforeHookCreation"]
 								}
 							}
+							hashName: false
 							containers: main: {
 								image: {
 									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/voices-frontend-config"
@@ -210,6 +211,7 @@ project: {
 									deletePolicy: ["BeforeHookCreation"]
 								}
 							}
+							hashName: false
 							containers: main: {
 								image: {
 									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/gateway-event-db"
