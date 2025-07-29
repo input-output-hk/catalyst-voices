@@ -13,6 +13,8 @@ class _VoteButtonMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final canRemoveLatestVote = latest?.isDraft ?? false;
+
     return Container(
       constraints: const BoxConstraints.tightFor(width: _expandedWidth),
       decoration: BoxDecoration(
@@ -34,21 +36,29 @@ class _VoteButtonMenu extends StatelessWidget {
             selected: latest,
             onSelected: onSelected,
           ),
+          // Additional options. Depends
           ...[
-            if (latest?.isDraft ?? false)
-              _VoteButtonMenuRemoveFromVoteList(
-                onTap: () => onSelected(const VoteButtonActionRemoveDraft()),
-              ),
+            if (canRemoveLatestVote) _VoteButtonMenuRemoveFromVoteList(onTap: _removeLatest),
             if (casted case final VoteTypeDataCasted casted) _VoteButtonMenuCasted(data: casted),
-          ].separatedBy(const _VoteButtonMenuDivider()).expandIndexed((index, element) {
-            return [
-              if (index == 0) const SizedBox(height: 8),
-              element,
-            ];
-          }),
+          ]
+              // Separate only available options (no divider if empty or 1 element).
+              .separatedBy(const _VoteButtonMenuDivider())
+              // Insert spacing before first element.
+              .expandIndexed(_insertOptionsSpacing),
         ],
       ),
     );
+  }
+
+  List<Widget> _insertOptionsSpacing(int index, Widget element) {
+    return [
+      if (index == 0) const SizedBox(height: 8),
+      element,
+    ];
+  }
+
+  void _removeLatest() {
+    onSelected(const VoteButtonActionRemoveDraft());
   }
 }
 
