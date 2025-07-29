@@ -140,17 +140,14 @@ async fn checker_api_catalyst_auth(
     let reg_chain = match latest_rbac_chain(token.catalyst_id()).await {
         Ok(Some(c)) => c.chain,
         Ok(None) => {
-            debug!(
-                "Unable to find registrations for {} Catalyst ID",
-                token.catalyst_id()
-            );
+            debug!(cat_id = %token.catalyst_id(), "Unable to find registrations for Catalyst ID");
             return Err(AuthTokenError::RegistrationNotFound.into());
         },
         Err(e) if e.is::<CassandraSessionError>() => return Err(ServiceUnavailableError(e).into()),
         Err(e) => {
             // This should never happen normally because we validate RBAC registration transactions
             // before adding them to the database.
-            error!("Unable to build a registration chain Catalyst ID: {e:?}");
+            error!(cat_id = %token.catalyst_id(), err = ?e, "Unable to build a registration chain");
             return Err(AuthTokenError::BuildRegChain(e.to_string()).into());
         },
     };

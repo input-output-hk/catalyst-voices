@@ -44,7 +44,8 @@ pub(crate) async fn endpoint(
         .into();
     }
 
-    match chain_info(lookup, token).await {
+    // `Box::pin` is used here because of the future size (`clippy::large_futures` lint).
+    match Box::pin(chain_info(lookup, token)).await {
         Err(e) => AllResponses::handle_error(&e),
         Ok(Some(info)) => {
             match RbacRegistrationChain::new(&info) {

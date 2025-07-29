@@ -39,6 +39,7 @@ pub(crate) fn update() {
         .set(i64::try_from(persistent_rbac_chains_cache_size()).unwrap_or(-1));
 }
 
+/// Increments the `INDEXING_SYNCHRONIZATION_COUNT` metric.
 pub(crate) fn inc_index_sync() {
     let api_host_names = Settings::api_host_names().join(",");
     let service_id = Settings::service_id();
