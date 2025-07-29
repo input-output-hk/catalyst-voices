@@ -28,7 +28,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
 
   CatalystId? _accountId;
   Keychain? _keychain;
-  Transaction? _transaction;
+  BaseTransaction? _transaction;
 
   RegistrationCubit({
     required DownloaderService downloaderService,
@@ -278,7 +278,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
 
       _transaction = transaction;
 
-      final fee = transaction.body.fee;
+      final fee = transaction.fee;
       final formattedFree = CryptocurrencyFormatter.formatAmount(fee);
 
       _onRegistrationStateDataChanged(

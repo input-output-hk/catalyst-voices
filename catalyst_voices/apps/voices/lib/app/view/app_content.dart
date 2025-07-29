@@ -83,6 +83,7 @@ final class _AppContent extends StatelessWidget {
                     // screen behavior.
                     child: AppSplashScreenManager(
                       child: AppMobileAccessRestriction(
+                        routerConfig: routerConfig,
                         child: DefaultShareManager(
                           child: child ?? const SizedBox.shrink(),
                         ),

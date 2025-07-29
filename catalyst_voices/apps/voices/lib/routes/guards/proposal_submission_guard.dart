@@ -19,8 +19,7 @@ final class ProposalSubmissionGuard implements RouteGuard {
     return switch (campaignState) {
       AfterProposalSubmissionStage() when path != null && ProposalRoute.isPath(path) => null,
       AfterProposalSubmissionStage() => const CampaignStageRoute().location,
-      PreProposalSubmissionStage() when path != null && ProposalRoute.isPath(path) =>
-        const CampaignStageRoute().location,
+      PreProposalSubmissionStage() => const CampaignStageRoute().location,
       ProposalSubmissionStage() when state.matchedLocation == const CampaignStageRoute().location =>
         const DiscoveryRoute().location,
       _ => null,
