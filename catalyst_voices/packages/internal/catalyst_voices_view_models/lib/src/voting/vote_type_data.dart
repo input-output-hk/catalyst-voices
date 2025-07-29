@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-sealed class VoteTypeData extends Equatable implements Comparable<VoteTypeData> {
+sealed class VoteTypeData extends Equatable {
   final VoteType type;
 
   const VoteTypeData({
@@ -13,25 +13,6 @@ sealed class VoteTypeData extends Equatable implements Comparable<VoteTypeData> 
   bool get isCasted => this is VoteTypeDataCasted;
 
   bool get isDraft => this is VoteTypeDataDraft;
-
-  @override
-  int compareTo(VoteTypeData other) {
-    final instance = this;
-
-    if (instance is VoteTypeDataCasted && other is VoteTypeDataCasted) {
-      return instance.castedAt.compareTo(other.castedAt);
-    }
-
-    if (instance is VoteTypeDataCasted && other is VoteTypeDataDraft) {
-      return 1;
-    }
-
-    if (instance is VoteTypeDataDraft && other is VoteTypeDataCasted) {
-      return -1;
-    }
-
-    return 0;
-  }
 }
 
 final class VoteTypeDataCasted extends VoteTypeData {

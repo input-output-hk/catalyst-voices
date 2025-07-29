@@ -39,7 +39,7 @@ final class VoteButtonData extends Equatable {
 
   List<VoteTypeData> get votes => [
         if (draft case final VoteTypeDataDraft draft) draft,
-        if (casted case final VoteTypeDataCasted draft) draft,
+        if (casted case final VoteTypeDataCasted casted) casted,
       ];
 
   SceneColors colors(BuildContext context) {
@@ -73,9 +73,5 @@ final class VoteButtonData extends Equatable {
       draft: draft.dataOr(this.draft),
       casted: casted.dataOr(this.casted),
     );
-  }
-
-  SceneColors menuBtnColors(BuildContext context) {
-    throw UnimplementedError();
   }
 }
