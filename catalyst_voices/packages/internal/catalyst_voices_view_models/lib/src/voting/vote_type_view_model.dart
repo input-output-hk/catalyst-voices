@@ -11,7 +11,7 @@ extension VoteTypeViewModel on VoteType {
     };
   }
 
-  String localisedName(
+  String localizedName(
     BuildContext context, {
     bool present = true,
   }) {

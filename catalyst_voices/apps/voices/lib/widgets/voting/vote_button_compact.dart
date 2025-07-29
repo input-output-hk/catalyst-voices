@@ -33,7 +33,7 @@ class _VoteButtonCompact extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
           child: Text(
-            latestVote?.type.localisedName(context, present: latestVote.isDraft) ?? '--',
+            latestVote?.type.localizedName(context, present: latestVote.isDraft) ?? '--',
           ),
         ),
       ),

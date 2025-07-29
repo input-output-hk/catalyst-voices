@@ -85,7 +85,7 @@ class _VoteButtonHasVotedButton extends StatelessWidget {
         spacing: 8,
         children: [
           ...<Widget>[
-            if (voteType != null) Text(voteType.localisedName(context, present: inVoteList)),
+            if (voteType != null) Text(voteType.localizedName(context, present: inVoteList)),
             if (votedAt != null)
               TimestampText(
                 votedAt,
@@ -161,7 +161,7 @@ class _VoteButtonNoVoteChoice extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             voteType.icon().buildIcon(),
-            Text(voteType.localisedName(context)),
+            Text(voteType.localizedName(context)),
           ],
         ),
       ),

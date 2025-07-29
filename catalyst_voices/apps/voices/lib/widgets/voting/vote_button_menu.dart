@@ -70,7 +70,7 @@ class _VoteButtonMenuCasted extends StatelessWidget {
       child: Row(
         children: [
           Text(
-            data.type.localisedName(context, present: false),
+            data.type.localizedName(context, present: false),
             style: textStyle,
             maxLines: 1,
           ),
@@ -247,7 +247,7 @@ class _VoteButtonMenuTypesRowButtonState extends State<_VoteButtonMenuTypesRowBu
         children: [
           widget.type.icon().buildIcon(),
           Text(
-            widget.type.localisedName(context),
+            widget.type.localizedName(context),
             textAlign: TextAlign.center,
             maxLines: 1,
           ),
