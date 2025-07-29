@@ -14,7 +14,7 @@ class _VoteButtonCompact extends StatelessWidget {
     final latestVote = data.votes.firstOrNull;
 
     return Tooltip(
-      waitDuration: const Duration(milliseconds: 200),
+      waitDuration: const Duration(milliseconds: 400),
       exitDuration: Duration.zero,
       enableTapToDismiss: false,
       richMessage: WidgetSpan(
