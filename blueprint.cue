@@ -9,6 +9,10 @@ global: {
 		registries: [
 			ci.providers.aws.ecr.registry,
 		]
+		release: docs: {
+			bucket: "docs.dev.projectcatalyst.io"
+			url:    "https://docs.dev.projectcatalyst.io/"
+		}
 		providers: {
 			aws: {
 				region: "eu-central-1"
