@@ -2,6 +2,7 @@ export 'auth/auth_service.dart' show AuthService;
 export 'auth/auth_token_cache.dart';
 export 'auth/auth_token_generator.dart' show AuthTokenGenerator;
 export 'blockchain/blockchain_service.dart' show BlockchainService;
+export 'campaign/active_campaign_observer.dart';
 export 'campaign/campaign_service.dart' show CampaignService;
 export 'comment/comment_service.dart' show CommentService;
 export 'config/config_service.dart' show ConfigService;

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
+import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
 import 'package:catalyst_voices/pages/workspace/header/workspace_header.dart';
 import 'package:catalyst_voices/pages/workspace/page/workspace_error.dart';
 import 'package:catalyst_voices/pages/workspace/page/workspace_loading.dart';
@@ -30,27 +31,29 @@ class _WorkspacePageState extends State<WorkspacePage>
         ErrorHandlerStateMixin<WorkspaceBloc, WorkspacePage> {
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: WorkspaceLoadingSelector(
-        child: Stack(
-          children: [
-            SingleChildScrollView(
-              child: Column(
-                children: [
-                  SizedBox(height: 10),
-                  WorkspaceHeader(),
-                  Stack(
-                    children: [
-                      WorkspaceErrorSelector(),
-                      WorkspaceUserProposalsSelector(),
-                    ],
-                  ),
-                  SizedBox(height: 50),
-                ],
+    return const ProposalSubmissionPhaseAware(
+      activeChild: Scaffold(
+        body: WorkspaceLoadingSelector(
+          child: Stack(
+            children: [
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(height: 10),
+                    WorkspaceHeader(),
+                    Stack(
+                      children: [
+                        WorkspaceErrorSelector(),
+                        WorkspaceUserProposalsSelector(),
+                      ],
+                    ),
+                    SizedBox(height: 50),
+                  ],
+                ),
               ),
-            ),
-            EmailNeedVerificationBanner(),
-          ],
+              EmailNeedVerificationBanner(),
+            ],
+          ),
         ),
       ),
     );

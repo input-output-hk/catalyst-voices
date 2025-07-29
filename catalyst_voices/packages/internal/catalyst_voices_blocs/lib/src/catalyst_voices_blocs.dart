@@ -3,7 +3,7 @@ export 'account/public_profile/public_profile_email.dart';
 export 'admin_tools/admin_tools.dart';
 export 'brand/brand.dart';
 export 'campaign/campaign_builder/campaign_builder.dart';
-export 'campaign/campaign_stage/campaign_stage.dart';
+export 'campaign/campaign_phase/campaign_phase_aware.dart';
 export 'category/category_detail.dart';
 export 'common/bloc_error_emitter_mixin.dart';
 export 'common/bloc_event_transformers.dart';
