@@ -22,7 +22,7 @@ use crate::{
         },
         types::{DbCatalystId, DbTransactionId},
     },
-    metrics::rbac_cache::reporter::{
+    metrics::rbac::reporter::{
         PERSISTENT_TRANSACTION_IDS_CACHE_HIT, PERSISTENT_TRANSACTION_IDS_CACHE_MISS,
         VOLATILE_TRANSACTION_IDS_CACHE_HIT, VOLATILE_TRANSACTION_IDS_CACHE_MISS,
     },

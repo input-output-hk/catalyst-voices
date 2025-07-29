@@ -23,6 +23,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
+    metrics::rbac::inc_index_sync,
     rbac::{
         validate_rbac_registration, RbacBlockIndexingContext, RbacValidationError,
         RbacValidationSuccess,
@@ -311,6 +312,9 @@ async fn wait_for_previous_blocks(
         {
             return Ok(());
         }
+
+        inc_index_sync();
+
         pending_blocks
             .changed()
             .await

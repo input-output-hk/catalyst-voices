@@ -39,6 +39,16 @@ pub(crate) fn update() {
         .set(i64::try_from(persistent_rbac_chains_cache_size()).unwrap_or(-1));
 }
 
+pub(crate) fn inc_index_sync() {
+    let api_host_names = Settings::api_host_names().join(",");
+    let service_id = Settings::service_id();
+    let network = Settings::cardano_network().to_string();
+
+    reporter::INDEXING_SYNCHRONIZATION_COUNT
+        .with_label_values(&[&api_host_names, service_id, &network])
+        .inc();
+}
+
 /// All the related RBAC Registration Chain Caching reporting metrics to the Prometheus
 /// service are inside this module.
 pub(crate) mod reporter {
@@ -270,6 +280,17 @@ pub(crate) mod reporter {
         register_int_gauge_vec!(
             "rbac_persistent_chains_cache_size",
             "An estimated size of the persistent RBAC chains cache",
+            &METRIC_LABELS
+        )
+        .unwrap()
+    });
+
+    /// This counter increases every time we need to synchronize RBAC indexing by waiting
+    /// for other tasks to finish before processing a new registration.
+    pub(crate) static INDEXING_SYNCHRONIZATION_COUNT: LazyLock<CounterVec> = LazyLock::new(|| {
+        register_counter_vec!(
+            "indexing_synchronization_count",
+            "Number of RBAC indexing synchronizations",
             &METRIC_LABELS
         )
         .unwrap()
