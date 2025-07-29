@@ -340,7 +340,7 @@ async fn validate_public_keys(
             keys.insert(key);
             if let Some(previous) = catalyst_id_from_public_key(key, is_persistent, context).await?
             {
-                if &previous != catalyst_id {
+                if previous.as_short_id() != catalyst_id.as_short_id() {
                     report.functional_validation(
                         &format!("An update to {catalyst_id} registration chain uses the same public key ({key:?}) as {previous} chain"),
                         "It isn't allowed to use role 0 signing (certificate subject public) key in different chains",
