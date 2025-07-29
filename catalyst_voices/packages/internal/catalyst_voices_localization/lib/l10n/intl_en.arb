@@ -2662,9 +2662,14 @@
       }
     }
   },
-  "proposalSubmissionIsClosed": "Proposal submission  is closed for Fund14.",
+  "proposalSubmissionIsClosed": "Proposal submission is closed for Fund{fundNumber}.",
   "@proposalSubmissionIsClosed": {
-    "description": "Title text when proposal submission is closed."
+    "description": "Title text when proposal submission is closed.",
+    "placeholders": {
+      "fundNumber": {
+        "type": "int"
+      }
+    }
   },
   "proposalSubmissionClosedDescription": "We’re moving into the Community Review stage!\nWant to stay involved and earn rewards? Check out our knowledge base.",
   "@proposalSubmissionClosedDescription": {
@@ -3294,6 +3299,22 @@
       }
     }
   },
+  "noActiveCampaignFound": "We can't find an active campaign.",
+  "@noActiveCampaignFound": {
+    "description": "Error message when no active campaign is found"
+  },
+  "campaignPhaseCountdownCommunityVoting": "Voting for Fund{fundNumber} opens {date}",
+  "@campaignPhaseCountdownCommunityVoting": {
+    "description": "Title for the community voting countdown",
+    "placeholders": {
+      "fundNumber": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "catalystAppClosed": "The Catalyst app is closed.",
   "@catalystAppClosed": {
     "description": "Text shown when Catalyst app is closed"
@@ -3309,17 +3330,5 @@
   "headsUpTitle": "Heads Up",
   "@headsUpTitle": {
     "description": "Text to tell user that something important is happening"
-  },
-  "campaignPhaseCountdownCommunityVoting": "Voting for Fund{fundNumber} opens {date}",
-  "@campaignPhaseCountdownCommunityVoting": {
-    "description": "Title for the community voting countdown",
-    "placeholders": {
-      "fundNumber": {
-        "type": "int"
-      },
-      "date": {
-        "type": "String"
-      }
-    }
   }
 }
