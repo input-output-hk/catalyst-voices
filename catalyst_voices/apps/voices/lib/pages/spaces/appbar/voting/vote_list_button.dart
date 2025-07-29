@@ -24,7 +24,7 @@ class VoteListButton extends StatelessWidget {
     if (count == 0) {
       return context.l10n.voteListButton;
     } else {
-      return '${context.l10n.voteListButton}· $count';
+      return '${context.l10n.voteListButton} · $count';
     }
   }
 }
