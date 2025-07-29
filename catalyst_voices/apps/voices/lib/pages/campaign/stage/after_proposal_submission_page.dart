@@ -8,7 +8,9 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class AfterProposalSubmissionPage extends StatelessWidget {
-  const AfterProposalSubmissionPage({super.key});
+  final int fundNumber;
+
+  const AfterProposalSubmissionPage(this.fundNumber, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,7 @@ class AfterProposalSubmissionPage extends StatelessWidget {
                 height: 340,
               ),
               const SizedBox(height: 17),
-              const _Header(),
+              _Header(fundNumber),
               const SizedBox(height: 35),
               const _Description(),
               const SizedBox(height: 24),
@@ -67,12 +69,14 @@ class _Description extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header();
+  final int fundNumber;
+
+  const _Header(this.fundNumber);
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      context.l10n.proposalSubmissionIsClosed,
+      context.l10n.proposalSubmissionIsClosed(fundNumber),
       style: context.textTheme.displaySmall,
       textAlign: TextAlign.center,
     );
