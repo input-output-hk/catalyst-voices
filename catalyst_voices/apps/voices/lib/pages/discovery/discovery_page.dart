@@ -9,12 +9,8 @@ import 'package:catalyst_voices/pages/discovery/state_selectors/campaign_categor
 import 'package:catalyst_voices/pages/discovery/state_selectors/current_campaign_selector.dart';
 import 'package:catalyst_voices/pages/discovery/state_selectors/most_recent_proposals_selector.dart';
 import 'package:catalyst_voices/widgets/banner/widgets/email_need_verification_banner.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_wide_screen_constrained.dart';
-import 'package:catalyst_voices/widgets/voting/vote_button.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class DiscoveryPage extends StatefulWidget {
@@ -57,60 +53,8 @@ class _Body extends StatelessWidget {
 
 class _DiscoveryPageState extends State<DiscoveryPage>
     with ErrorHandlerStateMixin<DiscoveryCubit, DiscoveryPage> {
-  Vote? _draftVote;
-  Vote? _castedVote;
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Row(
-          spacing: 12,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            VoteButton(
-              data: VoteButtonData.fromVotes(currentDraft: _draftVote, lastCasted: _castedVote),
-              onSelected: (value) {
-                setState(() {
-                  _draftVote = switch (value) {
-                    VoteButtonActionRemoveDraft() => null,
-                    VoteButtonActionVote(:final type) => Vote.draft(
-                        proposal: DraftRef.generateFirstRef(),
-                        type: type,
-                      ),
-                  };
-                });
-              },
-            ),
-            VoteButton(
-              data: VoteButtonData.fromVotes(currentDraft: _draftVote, lastCasted: _castedVote),
-              onSelected: (value) {
-                setState(() {
-                  _draftVote = switch (value) {
-                    VoteButtonActionRemoveDraft() => null,
-                    VoteButtonActionVote(:final type) => Vote.draft(
-                        proposal: DraftRef.generateFirstRef(),
-                        type: type,
-                      ),
-                  };
-                });
-              },
-              isCompact: true,
-            ),
-            const Text(' | '),
-            VoicesFilledButton(
-              onTap: () {
-                setState(() {
-                  _castedVote = _draftVote?.toCasted();
-                  _draftVote = null;
-                });
-              },
-              child: Text('Cast'),
-            ),
-          ],
-        ),
-      ),
-    );
     return const SelectionArea(
       child: Stack(
         children: [

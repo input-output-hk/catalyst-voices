@@ -12,8 +12,6 @@ final class ProposalSubmissionGuard implements RouteGuard {
 
   @override
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) {
-    return null;
-
     final path = state.path;
     final campaignState = context.read<CampaignStageCubit>().state;
 
