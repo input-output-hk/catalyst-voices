@@ -13,4 +13,4 @@ CREATE TABLE IF NOT EXISTS rbac_registration (
 
     PRIMARY KEY (catalyst_id, slot_no, txn_index)
 )
-WITH CLUSTERING ORDER BY (slot_no DESC, txn_index DESC);
+WITH CLUSTERING ORDER BY (slot_no ASC, txn_index ASC);
