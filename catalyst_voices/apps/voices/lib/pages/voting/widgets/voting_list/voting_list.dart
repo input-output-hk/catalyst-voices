@@ -1,0 +1,47 @@
+import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_ballot.dart';
+import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_campaign_phase_progress.dart';
+import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_footer.dart';
+import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_header.dart';
+import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_user_summary.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:flutter/material.dart';
+
+class VotingList extends StatelessWidget {
+  const VotingList({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [
+        VotingListHeader(),
+        Expanded(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              children: [
+                SizedBox(height: 8),
+                VotingListCampaignPhaseProgress(),
+                SizedBox(height: 16),
+                VotingListUserSummary(),
+                Expanded(child: VotingListBallot()),
+              ],
+            ),
+          ),
+        ),
+        VotingListFooter(),
+      ],
+    );
+  }
+}
+
+class VotingListDrawer extends StatelessWidget {
+  const VotingListDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const VoicesDrawer(
+      width: 500,
+      child: VotingList(),
+    );
+  }
+}
