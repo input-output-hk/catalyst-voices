@@ -14,6 +14,23 @@ final class AssetDoesNotExistException extends Equatable implements Exception {
   String toString() => 'AssetDoesNotExistException';
 }
 
+/// Exception thrown when selected tx outputs holds assets with too long names.
+final class AssetNameTooLongException extends Equatable implements Exception {
+  /// List of invalid assets.
+  final List<AssetName> assets;
+
+  /// The default constructor for [AssetNameTooLongException].
+  const AssetNameTooLongException({
+    required this.assets,
+  });
+
+  @override
+  List<Object?> get props => [assets];
+
+  @override
+  String toString() => 'UtxoAssetNameTooLongException(${assets.join(',')})';
+}
+
 /// Exception thrown when parsing a hash that has incorrect length.
 final class HashFormatException extends Equatable implements Exception {
   /// Exception details.
@@ -166,6 +183,49 @@ final class MaxTxSizeExceededException extends Equatable implements Exception {
       ')';
 }
 
+/// Exception thrown when validating integrity of transaction bytes.
+final class RawTransactionMalformed extends Equatable implements Exception {
+  /// List of reasons for malformed transaction.
+  final List<String> reasons;
+
+  /// The default constructor for [RawTransactionMalformed].
+  const RawTransactionMalformed({this.reasons = const []});
+
+  @override
+  List<Object?> get props => [reasons];
+
+  @override
+  String toString() => reasons.isEmpty
+      ? 'RawTransactionMalformed(bytes could not be decoded into valid tx)'
+      : 'RawTransactionMalformed(${reasons.join(', ')})';
+}
+
+/// Exception thrown when validating size of transaction.
+final class RawTransactionSizeChanged extends Equatable implements Exception {
+  /// Bytes size expected.
+  final int expectedSize;
+
+  /// Actual bytes size.
+  final int actualSize;
+
+  /// Provides more details about size miss match.
+  final String aspect;
+
+  /// The default constructor for [RawTransactionSizeChanged].
+  const RawTransactionSizeChanged({
+    required this.expectedSize,
+    required this.actualSize,
+    required this.aspect,
+  });
+
+  @override
+  List<Object?> get props => [expectedSize, actualSize, aspect];
+
+  @override
+  String toString() =>
+      'RawTransactionSizeChanged - $aspect - (expected($expectedSize) but got $actualSize )';
+}
+
 /// Exception thrown when the total size of reference scripts exceeds the limit.
 final class ReferenceScriptSizeLimitExceededException extends Equatable implements Exception {
   /// The maximum size of reference scripts allowed per transaction.
@@ -180,6 +240,33 @@ final class ReferenceScriptSizeLimitExceededException extends Equatable implemen
   @override
   String toString() => 'Total size of reference scripts exceeds the limit of $maxRefScriptSize '
       'bytes';
+}
+
+/// Exception thrown when transaction signature does not match.
+final class RegistrationTxCertValidationException extends Equatable implements Exception {
+  /// List of reasons for invalid cert.
+  final List<String> reasons;
+
+  /// The default constructor for [RegistrationTxCertValidationException].
+  const RegistrationTxCertValidationException({required this.reasons});
+
+  @override
+  List<Object?> get props => [reasons];
+
+  @override
+  String toString() => 'RegistrationTxCertValidationException - ${reasons.join(', ')}';
+}
+
+/// Exception thrown when transaction signature does not match.
+final class SignatureNotVerifiedException extends Equatable implements Exception {
+  /// The default constructor for [SignatureNotVerifiedException].
+  const SignatureNotVerifiedException();
+
+  @override
+  List<Object?> get props => [];
+
+  @override
+  String toString() => 'SignatureNotVerifiedException';
 }
 
 /// Exception thrown when transaction inputs are not equal to outputs + fee.

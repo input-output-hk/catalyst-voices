@@ -73,10 +73,6 @@
   "@passwordErrorText": {
     "description": "Text shown in  password field when input is invalid"
   },
-  "homeScreenText": "Catalyst Voices",
-  "@homeScreenText": {
-    "description": "Text shown in the home screen"
-  },
   "connectingStatusLabelText": "re-connecting",
   "@connectingStatusLabelText": {
     "description": "Label text shown in the ConnectingStatus widget during re-connection."
@@ -474,10 +470,6 @@
   "@overallSpacesTasks": {
     "description": "Overall spaces tasks tile name"
   },
-  "voicesUpdateReady": "Voices update ready",
-  "@voicesUpdateReady": {
-    "description": "In different places update popup title"
-  },
   "clickToRestart": "Click to restart",
   "@clickToRestart": {
     "description": "In different places update popup body"
@@ -720,6 +712,15 @@
   "@registrationAccountNotFound": {
     "description": "Error message shown when recovering account with invalid seed phrase."
   },
+  "registrationAssetNameTooLong": "UTxO asset name too long. \n{names}",
+  "@registrationAssetNameTooLong": {
+    "description": "Error message selected UTxO name is too long.",
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
   "walletLinkRoleChooserTitle": "How do you want to participate in Catalyst?",
   "@walletLinkRoleChooserTitle": {
     "description": "A title on the role chooser screen in registration."
@@ -821,13 +822,9 @@
   "@createProfileInstructionsTitle": {
     "description": "Title for account creation steps"
   },
-  "createProfileInstructionsMessage": "In the following account creation steps we will:\n\n1. Setup your profile\n2. Create your Catalyst Keychain\n3. Link Cardano wallet & roles\n\nTo ensure a smooth experience, completing your account setup in one session is essential—stay focused and avoid interruptions to finalize everything efficiently.",
+  "createProfileInstructionsMessage": "In the following account creation steps we will:\n\n1. Setup your profile\n2. Create your Catalyst Keychain\n3. Link Cardano wallet & roles\n\nTo ensure a smooth experience, completing your account setup in one session is essential—stay focused and avoid interruptions to finalize everything efficiently. Make sure your Cardano wallet has at least {amount} ADA before continuing.",
   "@createProfileInstructionsMessage": {
-    "description": "Information about account creation steps"
-  },
-  "createProfileInstructionsNotice": "Please ensure your Cardano wallet has at least {amount} ADA before continuing.",
-  "@createProfileInstructionsNotice": {
-    "description": "Information about minimum wallet balance",
+    "description": "Information about account creation steps",
     "placeholders": {
       "amount": {
         "type": "double",
@@ -911,6 +908,19 @@
   "catalystTos": "Project Catalyst Terms of Use",
   "@catalystTos": {
     "description": "Link to the Catalyst FC's Terms of Use"
+  },
+  "fund14ProposalSubmissionNotice": "Fund14 Proposal Submission Notice",
+  "@fund14ProposalSubmissionNotice": {
+    "description": "Link to the Fund14 Proposal Submission Notice"
+  },
+  "createProfileDrepApprovalContingency": "I understand that for my proposal to move to Community Review and/or Voting and be eligible for funding, the Project Catalyst budget proposal must first be approved by the Cardano DReps, as detailed in the {fund14ProposalSubmissionNotice}. If the budget is not approved, my proposal will not move forward and no funding will be provided.",
+  "@createProfileDrepApprovalContingency": {
+    "description": "Text acknowledging that the user is aware of the Drep Approval Contingency",
+    "placeholders": {
+      "fund14ProposalSubmissionNotice": {
+        "type": "String"
+      }
+    }
   },
   "createProfileAcknowledgementsTosAndPrivacyPolicy": "I agree to the {tos} & {privacy_policy}.",
   "@createProfileAcknowledgementsTosAndPrivacyPolicy": {
@@ -1130,7 +1140,7 @@
     "description": "Action to reset value in text field"
   },
   "createKeychainSeedPhraseCheckSuccessTitle": "Nice job! You've successfully verified your Catalyst seed phase",
-  "createKeychainSeedPhraseCheckSuccessSubtitle": "Enter your seed phrase to recover your Catalyst Keychain on any device.   \u2028\u2028It's kinda like your email and password all rolled into one, so keep it somewhere safe!\u2028\u2028In the next step we'll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.",
+  "createKeychainSeedPhraseCheckSuccessSubtitle": "Enter your seed phrase to recover your Catalyst Keychain on any device.   \u2028\u2028It's kinda like your email and password all rolled into one, so keep it somewhere safe!\u2028\u2028In the next step we'll add a password to your Catalyst Keychain, so you can lock/unlock access to Catalyst App.",
   "yourNextStep": "Your next step",
   "createKeychainSeedPhraseCheckSuccessNextStep": "Now let's set your Unlock password for this device!",
   "createKeychainUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password for this device",
@@ -1211,7 +1221,7 @@
   "@unlockDialogTitle": {
     "description": "The title label in unlock dialog."
   },
-  "unlockDialogContent": "Please enter your device specific unlock password\nto unlock Catalyst Voices.",
+  "unlockDialogContent": "Please enter your device specific unlock password\nto unlock Catalyst App.",
   "@unlockDialogContent": {
     "description": "The content (body) in unlock dialog."
   },
@@ -1244,7 +1254,7 @@
     "description": "The message shown below the title in confirmation snackbar after locking the keychain."
   },
   "recoverySuccessTitle": "Congratulations your Catalyst \nKeychain is restored!",
-  "recoverySuccessSubtitle": "You have successfully restored your Catalyst Keychain, and unlocked Catalyst Voices on this device.",
+  "recoverySuccessSubtitle": "You have successfully restored your Catalyst Keychain, and unlocked Catalyst App on this device.",
   "recoverySuccessGoToDashboard": "Jump into the Discovery Space",
   "recoverySuccessGoAccount": "Check my account",
   "recoveryExitConfirmDialogSubtitle": "12 words keychain restoration incomplete",
@@ -3304,6 +3314,22 @@
         "type": "String"
       }
     }
+  },
+  "catalystAppClosed": "The Catalyst app is closed.",
+  "@catalystAppClosed": {
+    "description": "Text shown when Catalyst app is closed"
+  },
+  "browseProposalsOnProjectCatalyst": "Please browse other Catalyst Fund14 proposals on ProjectCatalyst.io",
+  "@browseProposalsOnProjectCatalyst": {
+    "description": "Text shown when Catalyst app is closed"
+  },
+  "browseFund14Proposals": "Browse Fund14 proposals",
+  "@browseFund14Proposals": {
+    "description": "Text shown when Catalyst app is closed"
+  },
+  "headsUpTitle": "Heads Up",
+  "@headsUpTitle": {
+    "description": "Text to tell user that something important is happening"
   },
   "inVoteList": "In Vote List",
   "@inVoteList": {

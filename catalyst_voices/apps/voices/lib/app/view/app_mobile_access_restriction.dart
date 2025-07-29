@@ -19,41 +19,54 @@ typedef _LayoutData = ({
 });
 
 class AppMobileAccessRestriction extends StatelessWidget {
+  final RouterConfig<Object> routerConfig;
   final Widget child;
 
   const AppMobileAccessRestriction({
     super.key,
+    required this.routerConfig,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    return PlatformAwareBuilder<Widget>(
-      mobileWeb: ResponsiveBuilder<_LayoutData>(
-        xs: (
-          titleStyle: context.textTheme.displayMedium?.copyWith(
-            color: context.colorScheme.primary,
+    final provider = routerConfig.routeInformationProvider!;
+
+    return ListenableBuilder(
+      listenable: provider,
+      builder: (context, _) {
+        final currentPath = provider.value.uri.path;
+        final isProposalRoute = currentPath.contains('/proposal/');
+
+        return PlatformAwareBuilder<Widget>(
+          enabled: !isProposalRoute,
+          mobileWeb: ResponsiveBuilder<_LayoutData>(
+            xs: (
+              titleStyle: context.textTheme.displayMedium?.copyWith(
+                color: context.colorScheme.primary,
+              ),
+              subtitleStyle: context.textTheme.titleSmall,
+              descriptionStyle: context.textTheme.bodyMedium,
+              isMobile: true,
+            ),
+            other: (
+              titleStyle: context.textTheme.displayMedium?.copyWith(
+                color: context.colorScheme.primary,
+                fontSize: 78,
+                height: 1.15,
+              ),
+              subtitleStyle: context.textTheme.titleMedium,
+              descriptionStyle: context.textTheme.bodyLarge,
+              isMobile: false,
+            ),
+            builder: (context, data) => _MobileSplashScreen(
+              data: data,
+            ),
           ),
-          subtitleStyle: context.textTheme.titleSmall,
-          descriptionStyle: context.textTheme.bodyMedium,
-          isMobile: true,
-        ),
-        other: (
-          titleStyle: context.textTheme.displayMedium?.copyWith(
-            color: context.colorScheme.primary,
-            fontSize: 78,
-            height: 1.15,
-          ),
-          subtitleStyle: context.textTheme.titleMedium,
-          descriptionStyle: context.textTheme.bodyLarge,
-          isMobile: false,
-        ),
-        builder: (context, data) => _MobileSplashScreen(
-          data: data,
-        ),
-      ),
-      other: child,
-      builder: (context, child) => child!,
+          other: child,
+          builder: (context, child) => child!,
+        );
+      },
     );
   }
 }
