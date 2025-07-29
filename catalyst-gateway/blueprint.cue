@@ -16,9 +16,10 @@ project: {
 			_env: env
 			modules: main: {
 				name:    "app"
-				version: "0.11.1"
+				version: "0.13.0"
 				values: {
 					stateful: {
+						argo: wave: 1
 						containers: gateway: {
 							image: {
 								name: _ @forge(name="CONTAINER_IMAGE")
@@ -177,76 +178,92 @@ project: {
 
 					jobs:
 					{
-						"frontend-config": containers: main: {
-							image: {
-								name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/voices-frontend-config"
-								tag:  _ @forge(name="GIT_HASH_OR_TAG")
-							}
-							env: {
-								ENVIRONMENT: {
-									value: string | *_env
+						"frontend-config": {
+							argo: {
+								hook: {
+									type: "PostSync"
+									deletePolicy: ["BeforeHookCreation"]
 								}
-								API_KEY: {
-									secret: {
-										name: "gateway"
-										key:  "api-key"
+							}
+							containers: main: {
+								image: {
+									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/voices-frontend-config"
+									tag:  _ @forge(name="GIT_HASH_OR_TAG")
+								}
+								env: {
+									ENVIRONMENT: {
+										value: string | *_env
+									}
+									API_KEY: {
+										secret: {
+											name: "gateway"
+											key:  "api-key"
+										}
 									}
 								}
 							}
 						}
-						migration: containers: main: {
-							image: {
-								name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/gateway-event-db"
-								tag:  _ @forge(name="GIT_HASH_OR_TAG")
+						migration: {
+							argo: {
+								hook: {
+									type: "PreSync"
+									deletePolicy: ["BeforeHookCreation"]
+								}
 							}
-							env: {
-								DB_HOST: {
-									secret: {
-										name: "db"
-										key:  "host"
+							containers: main: {
+								image: {
+									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/gateway-event-db"
+									tag:  _ @forge(name="GIT_HASH_OR_TAG")
+								}
+								env: {
+									DB_HOST: {
+										secret: {
+											name: "db"
+											key:  "host"
+										}
 									}
-								}
-								DB_PORT: {
-									secret: {
-										name: "db"
-										key:  "port"
+									DB_PORT: {
+										secret: {
+											name: "db"
+											key:  "port"
+										}
 									}
-								}
-								DB_NAME: {
-									value: string | *"gateway"
-								}
-								DB_DESCRIPTION: {
-									value: string | *"Gateway Event Database"
-								}
-								DB_SUPERUSER: {
-									secret: {
-										name: "db-root"
-										key:  "username"
+									DB_NAME: {
+										value: string | *"gateway"
 									}
-								}
-								DB_SUPERUSER_PASSWORD: {
-									secret: {
-										name: "db-root"
-										key:  "password"
+									DB_DESCRIPTION: {
+										value: string | *"Gateway Event Database"
 									}
-								}
-								DB_USER: {
-									secret: {
-										name: "db"
-										key:  "username"
+									DB_SUPERUSER: {
+										secret: {
+											name: "db-root"
+											key:  "username"
+										}
 									}
-								}
-								DB_USER_PASSWORD: {
-									secret: {
-										name: "db"
-										key:  "password"
+									DB_SUPERUSER_PASSWORD: {
+										secret: {
+											name: "db-root"
+											key:  "password"
+										}
 									}
-								}
-								INIT_AND_DROP_DB: {
-									value: string | *"true"
-								}
-								WITH_MIGRATIONS: {
-									value: string | *"true"
+									DB_USER: {
+										secret: {
+											name: "db"
+											key:  "username"
+										}
+									}
+									DB_USER_PASSWORD: {
+										secret: {
+											name: "db"
+											key:  "password"
+										}
+									}
+									INIT_AND_DROP_DB: {
+										value: string | *"true"
+									}
+									WITH_MIGRATIONS: {
+										value: string | *"true"
+									}
 								}
 							}
 						}
