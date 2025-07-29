@@ -34,8 +34,10 @@ pub async fn validate_rbac_registration(
     reg: Cip509, is_persistent: bool, context: &mut RbacBlockIndexingContext,
 ) -> RbacValidationResult {
     match reg.previous_transaction() {
-        Some(previous_txn) => update_chain(reg, previous_txn, is_persistent, context).await,
         // `Box::pin` is used here because of the future size (`clippy::large_futures` lint).
+        Some(previous_txn) => {
+            Box::pin(update_chain(reg, previous_txn, is_persistent, context)).await
+        },
         None => Box::pin(start_new_chain(reg, is_persistent, context)).await,
     }
 }
@@ -138,7 +140,7 @@ async fn update_chain(
 async fn start_new_chain(
     reg: Cip509, is_persistent: bool, context: &mut RbacBlockIndexingContext,
 ) -> RbacValidationResult {
-    let catalyst_id = reg.catalyst_id().cloned();
+    let catalyst_id = reg.catalyst_id().map(CatalystId::as_short_id);
     let purpose = reg.purpose();
     let report = reg.report().to_owned();
 
@@ -157,7 +159,7 @@ async fn start_new_chain(
     })?;
 
     // Verify that a Catalyst ID of this chain is unique.
-    let catalyst_id = new_chain.catalyst_id().to_owned();
+    let catalyst_id = new_chain.catalyst_id().as_short_id();
     if is_chain_known(&catalyst_id, is_persistent, context).await? {
         report.functional_validation(
             &format!("{catalyst_id} is already used"),
@@ -185,7 +187,7 @@ async fn start_new_chain(
             {
                 report.functional_validation(
                     &format!("A new registration ({catalyst_id}) uses the same public key as the previous one ({})",
-                        previous_chain.catalyst_id()
+                        previous_chain.catalyst_id().as_short_id()
                     ),
                     "It is only allowed to override the existing chain by using different public key",
                 );
@@ -333,14 +335,14 @@ async fn validate_public_keys(
     let mut keys = HashSet::new();
 
     let roles: Vec<_> = chain.role_data_history().keys().collect();
-    let catalyst_id = chain.catalyst_id();
+    let catalyst_id = chain.catalyst_id().as_short_id();
 
     for role in roles {
         if let Some((key, _)) = chain.get_latest_signing_pk_for_role(role) {
             keys.insert(key);
             if let Some(previous) = catalyst_id_from_public_key(key, is_persistent, context).await?
             {
-                if previous.as_short_id() != catalyst_id.as_short_id() {
+                if previous != catalyst_id {
                     report.functional_validation(
                         &format!("An update to {catalyst_id} registration chain uses the same public key ({key:?}) as {previous} chain"),
                         "It isn't allowed to use role 0 signing (certificate subject public) key in different chains",
