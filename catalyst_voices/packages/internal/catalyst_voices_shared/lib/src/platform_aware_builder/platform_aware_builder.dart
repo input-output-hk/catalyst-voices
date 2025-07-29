@@ -46,6 +46,7 @@ import 'package:flutter/widgets.dart';
 class PlatformAwareBuilder<T> extends StatelessWidget {
   final Widget Function(BuildContext context, T? data) builder;
   final Map<PlatformKey, T?> _platformData;
+  final bool enabled;
 
   PlatformAwareBuilder({
     super.key,
@@ -61,6 +62,7 @@ class PlatformAwareBuilder<T> extends StatelessWidget {
     T? web,
     T? webDesktop,
     T? windows,
+    this.enabled = true,
     required T other,
   }) : _platformData = {
           PlatformKey.android: android,
@@ -79,6 +81,9 @@ class PlatformAwareBuilder<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!enabled) {
+      return builder(context, _platformData[PlatformKey.other]);
+    }
     return builder(context, _getPlatformData());
   }
 

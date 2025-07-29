@@ -56,7 +56,7 @@ final class InputBuilder implements CoinSelector {
       }
     }
 
-    return assetMap.entries.toList()..sort((a, b) => b.key.$1.hash.compareTo(a.key.$1.hash));
+    return assetMap.entries.toList()..sort((a, b) => a.key.$1.compareTo(b.key.$1));
   }
 
   /// Selects inputs to satisfy transaction outputs and fees.
