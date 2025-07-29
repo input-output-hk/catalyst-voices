@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:catalyst_voices/common/ext/space_ext.dart';
 import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_dialog.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/spaces_appbar.dart';
-import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
+import 'package:catalyst_voices/pages/spaces/drawer/spaces_end_drawer.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -95,7 +95,7 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
                       isUnlocked: state.isActive,
                     )
                   : null,
-              endDrawer: const OpportunitiesDrawer(),
+              endDrawer: SpacesEndDrawer(space: widget.space),
               body: widget.child,
             );
           },

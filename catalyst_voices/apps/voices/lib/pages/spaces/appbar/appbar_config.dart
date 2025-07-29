@@ -129,6 +129,7 @@ final class VotingAppbarConfig extends SpaceAppbarConfig {
     required super.isProposer,
     super.phaseType = CampaignPhaseType.communityVoting,
   }) : super(
+          // TODO(LynxxLynx): Add voting specific actions
           defaultAppbarActions: const [],
         );
 }
