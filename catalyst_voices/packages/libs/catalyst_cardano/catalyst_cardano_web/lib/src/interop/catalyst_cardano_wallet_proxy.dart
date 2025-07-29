@@ -230,11 +230,11 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
 
   @override
   Future<TransactionWitnessSet> signTx({
-    required Transaction transaction,
+    required BaseTransaction transaction,
     bool partialSign = false,
   }) async {
     try {
-      final bytes = cbor.encode(transaction.toCbor());
+      final bytes = transaction.bytes;
       final hexString = hex.encode(bytes);
 
       return await _delegate.signTx(hexString.toJS, partialSign.toJS).toDart.then(
@@ -248,9 +248,9 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   }
 
   @override
-  Future<TransactionHash> submitTx({required Transaction transaction}) async {
+  Future<TransactionHash> submitTx({required BaseTransaction transaction}) async {
     try {
-      final bytes = cbor.encode(transaction.toCbor());
+      final bytes = transaction.bytes;
       final hexString = hex.encode(bytes);
       final result = await _delegate.submitTx(hexString.toJS).toDart;
       return TransactionHash.fromHex(result.toDart);

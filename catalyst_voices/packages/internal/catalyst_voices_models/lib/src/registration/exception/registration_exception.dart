@@ -1,6 +1,18 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:equatable/equatable.dart';
 
+/// An exception throw when selected utxo has too long asset name.
+final class RegistrationAssetNameTooLongException extends RegistrationException {
+  final List<AssetName> assets;
+
+  const RegistrationAssetNameTooLongException({
+    required this.assets,
+  });
+
+  @override
+  String toString() => 'RegistrationAssetNameTooLongException(${assets.join(',')})';
+}
+
 /// A base exception thrown during user registration.
 sealed class RegistrationException with EquatableMixin implements Exception {
   const RegistrationException();
@@ -34,20 +46,20 @@ final class RegistrationNetworkIdMismatchException extends RegistrationException
   String toString() => 'RegistrationNetworkIdMismatchException(target: $targetNetworkId)';
 }
 
-/// An exception thrown when attempting to register and the transaction fails.
-final class RegistrationTransactionException extends RegistrationException {
-  const RegistrationTransactionException();
-
-  @override
-  String toString() => 'RegistrationTransactionException';
-}
-
 /// An exception thrown when recovering registration but keychain was not found locally.
 final class RegistrationRecoverKeychainNotFoundException extends RegistrationException {
   const RegistrationRecoverKeychainNotFoundException();
 
   @override
   String toString() => 'RegistrationRecoverKeychainNotFoundException';
+}
+
+/// An exception thrown when attempting to register and the transaction fails.
+final class RegistrationTransactionException extends RegistrationException {
+  const RegistrationTransactionException();
+
+  @override
+  String toString() => 'RegistrationTransactionException';
 }
 
 /// An exception thrown when attempting to register and the transaction fails.
