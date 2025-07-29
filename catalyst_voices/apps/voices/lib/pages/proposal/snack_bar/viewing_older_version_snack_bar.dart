@@ -21,11 +21,13 @@ final class ViewingOlderVersionSnackBar extends VoicesSnackBar {
         },
         child: Text(context.l10n.viewLatestDocumentVersion),
       ),
+      title: context.l10n.headsUpTitle,
     );
   }
 
   ViewingOlderVersionSnackBar._({
     required super.message,
+    super.title,
     required Widget action,
   }) : super(
           type: VoicesSnackBarType.warning,
