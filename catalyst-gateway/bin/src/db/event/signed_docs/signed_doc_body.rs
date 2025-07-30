@@ -47,6 +47,7 @@ impl SignedDocBody {
     }
 
     /// Returns the document type.
+    #[allow(dead_code)]
     pub(crate) fn doc_type(&self) -> &uuid::Uuid {
         &self.doc_type
     }
@@ -87,6 +88,7 @@ impl SignedDocBody {
     }
 
     /// Loads a async stream of `SignedDocBody` from the event db.
+    #[allow(dead_code)]
     pub(crate) async fn retrieve(
         conditions: &DocsQueryFilter, query_limits: &QueryLimits,
     ) -> anyhow::Result<impl Stream<Item = anyhow::Result<Self>>> {
@@ -115,6 +117,7 @@ impl SignedDocBody {
     }
 
     /// Creates a  `SignedDocBody` from postgresql row object.
+    #[allow(dead_code)]
     fn from_row(row: &tokio_postgres::Row) -> anyhow::Result<Self> {
         let id = row.try_get("id")?;
         let ver = row.try_get("ver")?;

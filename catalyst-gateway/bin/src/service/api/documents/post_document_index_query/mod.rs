@@ -2,6 +2,7 @@
 
 use std::collections::HashMap;
 
+use catalyst_signed_doc::CatalystSignedDocument;
 use futures::TryStreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
 use query_filter::DocumentIndexQueryFilter;
@@ -13,7 +14,7 @@ use super::{Limit, Page};
 use crate::{
     db::event::{
         common::query_limits::QueryLimits,
-        signed_docs::{DocsQueryFilter, SignedDocBody},
+        signed_docs::{DocsQueryFilter, FullSignedDoc, SignedDocBody},
     },
     service::common::{
         objects::generic::pagination::CurrentPage,
@@ -98,7 +99,7 @@ pub(crate) async fn endpoint(
 async fn fetch_docs(
     conditions: &DocsQueryFilter, query_limits: &QueryLimits,
 ) -> anyhow::Result<(Vec<IndexedDocumentDocumented>, u32)> {
-    let docs_stream = SignedDocBody::retrieve(conditions, query_limits).await?;
+    let docs_stream = FullSignedDoc::retrieve_conditions(conditions, query_limits).await?;
 
     let (indexed_docs, total_fetched_doc_count) = docs_stream
         .try_fold(
@@ -116,10 +117,19 @@ async fn fetch_docs(
         )
         .await?;
 
+    // convert to output response
     let docs = indexed_docs
         .into_iter()
         .map(|(id, docs)| -> anyhow::Result<_> {
-            let ver = docs
+            // filter for only deprecated signed docs
+            let mut deprecated_docs = vec![];
+            for doc in docs {
+                if CatalystSignedDocument::try_from(doc.raw())?.is_deprecated()? {
+                    deprecated_docs.push(doc);
+                }
+            }
+
+            let ver = deprecated_docs
                 .into_iter()
                 .map(TryInto::try_into)
                 .collect::<Result<Vec<_>, _>>()?
@@ -130,6 +140,10 @@ async fn fetch_docs(
                 ver,
             }))
         })
-        .collect::<Result<_, _>>()?;
+        .collect::<Result<Vec<_>, _>>()?
+        .into_iter()
+        .filter(|indexed_doc| !indexed_doc.0.ver.is_empty())
+        .collect::<_>();
+
     Ok((docs, total_fetched_doc_count))
 }

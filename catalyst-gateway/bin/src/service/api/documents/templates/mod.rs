@@ -98,25 +98,36 @@ fn build_signed_doc(data: &SignedDocData, sk: &SigningKey) -> (Uuid, CatalystSig
     /// ID URI network.
     const KID_NETWORK: &str = "cardano";
 
+    let mut parameters = vec![];
+
+    if let Some(v) = data.category_id {
+        parameters.push(serde_json::json!({ "id": v, "ver": v, "cid": "0x" }));
+    }
+
+    parameters.push(serde_json::json!({ "id": CAMPAIGN_ID, "ver": CAMPAIGN_VERSION, "cid": "0x" }));
+    parameters.push(serde_json::json!({ "id": BRAND_ID, "ver": BRAND_VERSION, "cid": "0x" }));
+
     let metadata = serde_json::json!({
         "type": data.doc_type,
         "id": data.id,
         "ver": data.ver,
-        "category_id": data.category_id.map(|v| serde_json::json!({"id": v, "ver": v })),
         "content-type": ContentType::Json.to_string(),
         "content-encoding": ContentEncoding::Brotli.to_string(),
-        "campaign_id": {"id": CAMPAIGN_ID, "ver": CAMPAIGN_VERSION},
-        "brand_id":  {"id": BRAND_ID, "ver": BRAND_VERSION},
+        "parameters": parameters
     });
 
     let kid = CatalystId::new(KID_NETWORK, None, sk.verifying_key());
     let doc = Builder::new()
         .with_json_metadata(metadata.clone())
         .expect("Failed to build Metadata from template")
-        .with_decoded_content(data.content.to_vec())
-        .add_signature(|m| sk.sign(&m).to_vec(), &kid)
+        .with_json_content(
+            &serde_json::from_slice(data.content).expect("Failed to convert content into JSON"),
+        )
+        .expect("Failed to add JSON content")
+        .add_signature(|m| sk.sign(&m).to_vec(), kid)
         .expect("Failed to add signature for template")
-        .build();
+        .build()
+        .expect("Failed to build signed doc");
     let doc_id = doc
         .doc_id()
         .expect("Template document must have id field")
