@@ -1,5 +1,5 @@
-import 'package:catalyst_voices/common/formatters/input_formatters.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
