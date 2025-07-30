@@ -79,12 +79,17 @@ const SCHEMAS: &[(&str, &str)] = &[
     (
         // Catalyst ID for transaction ID table schema.
         include_str!("cql/catalyst_id_for_txn_id.cql"),
-        "Create Table Catalyst ID For TX ID",
+        "Create table Catalyst ID for transaction ID",
     ),
     (
         // Catalyst ID for stake address table schema.
         include_str!("cql/catalyst_id_for_stake_address.cql"),
-        "Create Table Catalyst ID For Stake Address",
+        "Create table Catalyst ID for stake address",
+    ),
+    (
+        // Catalyst ID for public key table schema.
+        include_str!("cql/catalyst_id_for_public_key.cql"),
+        "Create table Catalyst ID for public key",
     ),
 ];
 
@@ -260,7 +265,7 @@ mod tests {
     /// This constant is ONLY used by Unit tests to identify when the schema version will
     /// change accidentally, and is NOT to be used directly to set the schema version of
     /// the table namespaces.
-    const SCHEMA_VERSION: &str = "504c9e72-9737-849c-8212-37824eff881a";
+    const SCHEMA_VERSION: &str = "141f7b75-6a5f-8fe4-91cb-596e3584fd7d";
 
     #[test]
     /// This test is designed to fail if the schema version has changed.
