@@ -5,14 +5,16 @@ use std::collections::HashMap;
 use catalyst_types::catalyst_id::role_index::RoleId;
 use poem_openapi::{types::Example, Object};
 
-use crate::service::{
-    api::cardano::rbac::registrations_get::{
-        chain_info::ChainInfo, purpose_list::PurposeList, role_data::RbacRoleData,
-        role_map::RoleMap,
-    },
-    common::types::{
-        cardano::{catalyst_id::CatalystId, transaction_id::TxnId},
-        generic::uuidv4::UUIDv4,
+use crate::{
+    rbac::ChainInfo,
+    service::{
+        api::cardano::rbac::registrations_get::{
+            purpose_list::PurposeList, role_data::RbacRoleData, role_map::RoleMap,
+        },
+        common::types::{
+            cardano::{catalyst_id::CatalystId, transaction_id::TxnId},
+            generic::uuidv4::UUIDv4,
+        },
     },
 };
 

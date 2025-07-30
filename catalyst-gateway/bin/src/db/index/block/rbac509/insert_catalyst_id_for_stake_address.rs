@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{Slot, StakeAddress};
+use cardano_blockchain_types::{Slot, StakeAddress, TxnIndex};
 use catalyst_types::catalyst_id::CatalystId;
 use scylla::{client::session::Session, SerializeRow};
 use tracing::error;
@@ -10,7 +10,7 @@ use tracing::error;
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbCatalystId, DbSlot, DbStakeAddress},
+        types::{DbCatalystId, DbSlot, DbStakeAddress, DbTxnIndex},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -23,10 +23,12 @@ const QUERY: &str = include_str!("cql/insert_catalyst_id_for_stake_address.cql")
 pub(crate) struct Params {
     /// A stake address.
     stake_address: DbStakeAddress,
-    /// A Catalyst short identifier.
-    catalyst_id: DbCatalystId,
     /// A block slot number.
     slot_no: DbSlot,
+    /// A transaction offset inside the block.
+    txn_index: DbTxnIndex,
+    /// A Catalyst short identifier.
+    catalyst_id: DbCatalystId,
 }
 
 impl Debug for Params {
@@ -35,17 +37,21 @@ impl Debug for Params {
             .field("stake_address", &self.stake_address)
             .field("catalyst_id", &self.catalyst_id)
             .field("slot_no", &self.slot_no)
+            .field("txn_index", &self.txn_index)
             .finish()
     }
 }
 
 impl Params {
     /// Create a new record for this transaction.
-    pub(crate) fn new(stake_address: StakeAddress, slot_no: Slot, catalyst_id: CatalystId) -> Self {
+    pub(crate) fn new(
+        stake_address: StakeAddress, slot_no: Slot, txn_index: TxnIndex, catalyst_id: CatalystId,
+    ) -> Self {
         Params {
             stake_address: stake_address.into(),
             catalyst_id: catalyst_id.into(),
             slot_no: slot_no.into(),
+            txn_index: txn_index.into(),
         }
     }
 
@@ -61,8 +67,8 @@ impl Params {
             true,
             false,
         )
-        .await
-        .inspect_err(|error| error!(error=%error, "Failed to prepare Insert Catalyst ID For Stake Address Query."))
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{QUERY}"))
+            .await
+            .inspect_err(|error| error!(error=%error, "Failed to prepare Insert Catalyst ID For Stake Address Query."))
+            .map_err(|error| anyhow::anyhow!("{error}\n--\n{QUERY}"))
     }
 }
