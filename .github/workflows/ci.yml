@@ -63,17 +63,11 @@ jobs:
           command: run
           args: ./catalyst-gateway/tests/+prepare-all-images
 
-      - name: Running Postgres tests
+      - name: Running Postgres and Scylla tests
         if: always()
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up postgres-runner --abort-on-container-exit --exit-code-from postgres-runner
-          docker compose -f catalyst-gateway/tests/docker-compose.yml logs postgres-runner
-
-      - name: Running Scylla tests
-        if: always()
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up scylla-runner --abort-on-container-exit --exit-code-from scylla-runner
-          docker compose -f catalyst-gateway/tests/docker-compose.yml logs scylla-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up postgres-scylla-runner --abort-on-container-exit --exit-code-from postgres-scylla-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs postgres-scylla-runner
 
       - name: Running integration API tests
         if: always()

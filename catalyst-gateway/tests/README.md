@@ -21,14 +21,8 @@ docker compose up api-tests-runner --abort-on-container-exit --exit-code-from ap
 docker compose up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
 ```
 
-## Postgres
+## Postgres and Scylla tests
 
 ```shell
-docker compose up postgres-runner --abort-on-container-exit --exit-code-from postgres-runner
-```
-
-## Scylla
-
-```shell
-docker compose up scylla-runner --abort-on-container-exit --exit-code-from scylla-runner
+docker compose up postgres-scylla-runner --abort-on-container-exit --exit-code-from postgres-scylla-runner
 ```
