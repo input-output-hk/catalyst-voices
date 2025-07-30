@@ -41,6 +41,19 @@ package-postgres-runner:
     ENTRYPOINT cargo nextest run --archive-file=cat-gateway-tests.tar.zst --run-ignored=only signed_docs --no-fail-fast
     SAVE IMAGE postgres-runner:latest
 
+package-postgres-scylla-runner:
+    FROM gateway+builder-src
+
+    ENTRYPOINT cargo nextest run \
+                --run-ignored=only \
+                scylla_session \
+                scylla_queries \
+                scylla_purge \
+                rbac_index \
+                signed_docs \
+                --no-fail-fast
+    SAVE IMAGE postgres-runner:latest
+
 package-scylla-runner:
     FROM +test-builder
 
