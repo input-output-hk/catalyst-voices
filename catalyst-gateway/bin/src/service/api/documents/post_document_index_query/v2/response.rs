@@ -1,18 +1,10 @@
 //! Catalyst Signed Document Endpoint Response Objects.
-use poem_openapi::{
-    types::Example,
-    NewType, Object,
-};
+use poem_openapi::{types::Example, NewType, Object};
 
 use crate::{
     db::event::signed_docs::FullSignedDoc,
-    service::common::{
-        types::{
-            document::{
-                doc_ref::DocumentReferenceList, doc_type::DocumentType,
-                ver::DocumentVer,
-            },
-        },
+    service::common::types::document::{
+        doc_ref_v2::DocumentReferenceListV2, doc_type::DocumentType, ver::DocumentVer
     },
 };
 
@@ -27,24 +19,24 @@ pub(crate) struct IndexedDocumentVersionV2 {
     pub doc_type: DocumentType,
     /// Document Reference that matches the filter
     #[oai(rename = "ref", skip_serializing_if_is_none)]
-    pub doc_ref: Option<DocumentReferenceList>,
+    pub doc_ref: Option<DocumentReferenceListV2>,
     /// Document Reply Reference that matches the filter
     #[oai(skip_serializing_if_is_none)]
-    pub reply: Option<DocumentReferenceList>,
+    pub reply: Option<DocumentReferenceListV2>,
     /// Document Template Reference that matches the filter
     #[oai(skip_serializing_if_is_none)]
-    pub template: Option<DocumentReferenceList>,
+    pub template: Option<DocumentReferenceListV2>,
     /// Document Parameter Reference that matches the filter
     #[oai(rename = "doc_parameters", skip_serializing_if_is_none)]
-    pub parameters: Option<DocumentReferenceList>,
+    pub parameters: Option<DocumentReferenceListV2>,
 }
 
 impl Example for IndexedDocumentVersionV2 {
     fn example() -> Self {
         Self {
-            ver: DocumentVer::example(),
-            doc_type: DocumentType::example(),
-            doc_ref: Some(DocumentReferenceList::example()),
+            ver: Example::example(),
+            doc_type: Example::example(),
+            doc_ref: Some(Example::example()),
             reply: None,
             template: None,
             parameters: None,
@@ -73,7 +65,7 @@ pub(crate) struct IndexedDocumentVersionDocumentedV2(pub(crate) IndexedDocumentV
 
 impl Example for IndexedDocumentVersionDocumentedV2 {
     fn example() -> Self {
-        Self(IndexedDocumentVersionV2::example())
+        Self(Example::example())
     }
 }
 
