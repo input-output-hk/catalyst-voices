@@ -6,6 +6,22 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+/// Guards admin only routes.
+final class AdminAccessGuard implements RouteGuard {
+  const AdminAccessGuard();
+
+  @override
+  FutureOr<String?> redirect(BuildContext context, GoRouterState state) {
+    final account = context.read<SessionCubit>().state.account;
+    if (account?.isAdmin ?? false) {
+      return null;
+    } else {
+      return const DiscoveryRoute().location;
+    }
+  }
+}
+
+/// User related routes restrictions.
 final class UserAccessGuard implements RouteGuard {
   const UserAccessGuard();
 
@@ -29,19 +45,5 @@ final class UserAccessGuard implements RouteGuard {
     }
 
     return const DiscoveryRoute().location;
-  }
-}
-
-final class AdminAccessGuard implements RouteGuard {
-  const AdminAccessGuard();
-
-  @override
-  FutureOr<String?> redirect(BuildContext context, GoRouterState state) {
-    final account = context.read<SessionCubit>().state.account;
-    if (account?.isAdmin ?? false) {
-      return null;
-    } else {
-      return const DiscoveryRoute().location;
-    }
   }
 }
