@@ -15,12 +15,12 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
-cardano-chain-follower = { version = "0.0.9", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "feat/new-cat-signed-doc" }
-rbac-registration = { version = "0.0.5", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "feat/new-cat-signed-doc" }
-catalyst-types = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "feat/new-cat-signed-doc" }
-cardano-blockchain-types = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "feat/new-cat-signed-doc" }
-catalyst-signed-doc = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "feat/new-cat-signed-doc" }
-c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "feat/new-cat-signed-doc" }
+cardano-chain-follower = { version = "0.0.9", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "fix/parameters-rule" }
+rbac-registration = { version = "0.0.5", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "fix/parameters-rule" }
+catalyst-types = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "fix/parameters-rule" }
+cardano-blockchain-types = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "fix/parameters-rule" }
+catalyst-signed-doc = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "fix/parameters-rule" }
+c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "fix/parameters-rule" }
 
 pallas = { version = "0.33.0" }
 pallas-traverse = { version = "0.33.0" }
