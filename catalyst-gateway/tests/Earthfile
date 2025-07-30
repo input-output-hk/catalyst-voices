@@ -52,7 +52,7 @@ package-postgres-scylla-runner:
                 rbac_index \
                 signed_docs \
                 --no-fail-fast
-    SAVE IMAGE postgres-runner:latest
+    SAVE IMAGE postgres-scylla-runner:latest
 
 package-scylla-runner:
     FROM +test-builder

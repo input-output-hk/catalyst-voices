@@ -70,6 +70,19 @@ services:
       cat-gateway:
         condition: service_healthy
 
+  postgres-scylla-runner:
+    image: postgres-scylla-runner:latest
+    container_name: postgres-scylla-runner
+    environment:
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
+      - CASSANDRA_PERSISTENT_URL=scylla-node:9042
+      - CASSANDRA_VOLATILE_URL=scylla-node:9042
+    depends_on:
+      event-db:
+        condition: service_healthy
+      scylla-node:
+        condition: service_healthy
+
   postgres-runner:
     image: postgres-runner:latest
     container_name: postgres-runner
