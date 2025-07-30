@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+/// Simple pagination page representation.
 base class Page<E> extends Equatable {
   final int page;
   final int maxPerPage;

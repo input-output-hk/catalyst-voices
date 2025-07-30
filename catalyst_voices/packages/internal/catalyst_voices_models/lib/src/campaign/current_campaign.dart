@@ -1,8 +1,9 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_voices_models/src/campaign/campaign_timeline.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
+/// Possibly duplicates some of information from [Campaign].
 final class CurrentCampaign extends Equatable {
   final String id;
   final String name;
