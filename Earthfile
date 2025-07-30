@@ -6,7 +6,7 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:feat/optimise-p
 
 FROM debian:stable-slim
 
-# cspell: words livedocs sitedocs
+# cspell: words livedocs sitedocs optimise
 
 # check-markdown markdown check using catalyst-ci.
 check-markdown:
