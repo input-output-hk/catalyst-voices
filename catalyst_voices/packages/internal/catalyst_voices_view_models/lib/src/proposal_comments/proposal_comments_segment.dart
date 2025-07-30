@@ -6,6 +6,7 @@ import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
+/// Section for adding a comment to a proposal
 final class ProposalAddCommentSection extends ProposalCommentsSection {
   final DocumentSchema schema;
   final bool showUsernameRequired;
@@ -30,6 +31,7 @@ final class ProposalAddCommentSection extends ProposalCommentsSection {
   }
 }
 
+/// List item for a comment in a proposal
 final class ProposalCommentListItem extends Equatable implements SegmentsListViewItem {
   @override
   final NodeId id;
@@ -50,12 +52,14 @@ final class ProposalCommentListItem extends Equatable implements SegmentsListVie
       ];
 }
 
+/// Section for comments in a proposal
 sealed class ProposalCommentsSection extends BaseSection {
   const ProposalCommentsSection({
     required super.id,
   });
 }
 
+/// Segment for comments in a proposal
 final class ProposalCommentsSegment extends BaseSegment<ProposalCommentsSection> {
   final ProposalCommentsSort sort;
 
@@ -111,6 +115,7 @@ final class ProposalCommentsSegment extends BaseSegment<ProposalCommentsSection>
   }
 }
 
+/// Section for viewing comments in a proposal
 final class ProposalViewCommentsSection extends ProposalCommentsSection
     implements SegmentGroupedListViewItems {
   final ProposalCommentsSort sort;
