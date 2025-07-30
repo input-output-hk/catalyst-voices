@@ -1,12 +1,12 @@
 VERSION 0.8
 
-# cspell: words livedocs sitedocs optimise
-
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.4.7 AS mdlint-ci
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.4.7 AS cspell-ci
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:feat/optimise-postgres AS postgresql-ci
 
 FROM debian:stable-slim
+
+# cspell: words livedocs sitedocs optimise
 
 # check-markdown markdown check using catalyst-ci.
 check-markdown:

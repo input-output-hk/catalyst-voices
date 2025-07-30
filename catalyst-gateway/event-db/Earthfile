@@ -5,7 +5,7 @@ VERSION 0.8
 
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:feat/optimise-postgres AS postgresql-ci
 
-# cspell: words
+# cspell: words optimise
 
 # Internal: builder is our Event db builder target. Prepares all necessary artifacts.
 #   CI target : dependency
