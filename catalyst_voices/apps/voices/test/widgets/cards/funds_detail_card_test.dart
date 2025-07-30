@@ -64,7 +64,7 @@ void main() {
       });
     });
 
-    group(FundsDetailCardType.found, () {
+    group(FundsDetailCardType.fund, () {
       testWidgets('Displays corrects translation', (tester) async {
         await tester.pumpApp(
           const Scaffold(

@@ -162,10 +162,14 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     GetTimelineItemsEvent event,
     Emitter<WorkspaceState> emit,
   ) async {
-    final timelineItems = await _campaignService.getCampaignTimeline();
-    final timeline = timelineItems.map(CampaignTimelineViewModel.fromModel).toList();
+    final campaign = await _campaignService.getActiveCampaign();
+    if (campaign == null) {
+      return emitError(const LocalizedUnknownException());
+    }
 
-    emit(state.copyWith(timelineItems: timeline));
+    final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
+
+    emit(state.copyWith(timelineItems: timeline, fundNumber: campaign.fundNumber));
     emitSignal(SubmissionCloseDate(date: state.submissionCloseDate));
   }
 
@@ -202,7 +206,14 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     );
   }
 
-  List<Proposal> _removeProposal(
+  List<UsersProposalOverview> _mapProposalToViewModel(
+    List<Proposal> proposals,
+    int fundNumber,
+  ) {
+    return proposals.map((e) => UsersProposalOverview.fromProposal(e, fundNumber)).toList();
+  }
+
+  List<UsersProposalOverview> _removeProposal(
     DocumentRef proposalRef,
   ) {
     return [...state.userProposals]..removeWhere((e) => e.selfRef.id == proposalRef.id);
@@ -213,7 +224,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       (proposals) {
         if (isClosed) return;
         _logger.info('Stream received ${proposals.length} proposals');
-        add(LoadProposalsEvent(proposals));
+        add(LoadProposalsEvent(_mapProposalToViewModel(proposals..sort(), state.fundNumber)));
       },
       onError: (Object error, StackTrace stackTrace) {
         if (isClosed) return;

@@ -416,6 +416,48 @@
       }
     }
   },
+  "getReadyToVote": "Get ready to vote",
+  "@getReadyToVote": {
+    "description": "Label before the voting phase starts."
+  },
+  "votingIsOpen": "Voting is open!",
+  "@votingIsOpen": {
+    "description": "Label when voting phase is active."
+  },
+  "votingIsClosed": "Voting is closed!",
+  "@votingIsClosed": {
+    "description": "Label when the voting phase is closed."
+  },
+  "votingStarts": "Voting starts",
+  "@votingStarts": {
+    "description": "Label when the voting phase starts."
+  },
+  "votingPhase": "Voting Phase",
+  "@votingPhase": {
+    "description": "Label when the voting phase is active."
+  },
+  "votingEnded": "Voting ended",
+  "@votingEnded": {
+    "description": "Label when the voting phase is closed."
+  },
+  "votingEndsIn": "Ends in {duration}",
+  "@votingEndsIn": {
+    "description": "Label when voting phase ends after the duration.",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "votingStartsIn": "in {duration}",
+  "@votingStartsIn": {
+    "description": "Label when voting phase starts after the duration.",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "followed": "Followed",
   "@followed": {
     "description": "Refers to a list of followed items."
@@ -1327,6 +1369,22 @@
   "@viewVotingResults": {
     "description": "Title of the view voting results space"
   },
+  "votingPower": "Voting Power",
+  "@votingPower": {
+    "description": "Label for the user's voting power"
+  },
+  "updated": "Updated",
+  "@updated": {
+    "description": "A label when something was last updated."
+  },
+  "confirmed": "Confirmed",
+  "@confirmed": {
+    "description": "A label when something is final and not provisional."
+  },
+  "provisional": "Provisional",
+  "@provisional": {
+    "description": "A label when something is provisional / not confirmed."
+  },
   "campaignDetails": "Campaign Details",
   "description": "Description",
   "startDate": "Start Date",
@@ -1610,6 +1668,15 @@
   "catalystF14": "Catalyst Fund14",
   "@catalystF14": {
     "description": "Used in discovery page in hero section"
+  },
+  "catalystFundNo": "Catalyst Fund{number}",
+  "@catalystFundNo": {
+    "description": "Used in hero section to indicate current fund.",
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
   },
   "currentCampaign": "Current Campaign",
   "currentCampaignDescription": "Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.",
@@ -2253,6 +2320,22 @@
   "@notAvailableAbbr": {
     "description": "Abbreviation for not available"
   },
+  "dayAbbr": "d",
+  "@dayAbbr": {
+    "description": "A single letter abbreviation for day."
+  },
+  "hourAbbr": "h",
+  "@hourAbbr": {
+    "description": "A single letter abbreviation for hour."
+  },
+  "minuteAbbr": "m",
+  "@minuteAbbr": {
+    "description": "A single letter abbreviation for minute."
+  },
+  "secondAbbr": "s",
+  "@secondAbbr": {
+    "description": "A single letter abbreviation for second."
+  },
   "title": "Title",
   "@title": {
     "description": "description of the title field"
@@ -2579,9 +2662,14 @@
       }
     }
   },
-  "proposalSubmissionIsClosed": "Proposal submission  is closed for Fund14.",
+  "proposalSubmissionIsClosed": "Proposal submission is closed for Fund{fundNumber}.",
   "@proposalSubmissionIsClosed": {
-    "description": "Title text when proposal submission is closed."
+    "description": "Title text when proposal submission is closed.",
+    "placeholders": {
+      "fundNumber": {
+        "type": "int"
+      }
+    }
   },
   "proposalSubmissionClosedDescription": "We’re moving into the Community Review stage!\nWant to stay involved and earn rewards? Check out our knowledge base.",
   "@proposalSubmissionClosedDescription": {
@@ -3211,6 +3299,22 @@
       }
     }
   },
+  "noActiveCampaignFound": "We can't find an active campaign.",
+  "@noActiveCampaignFound": {
+    "description": "Error message when no active campaign is found"
+  },
+  "campaignPhaseCountdownCommunityVoting": "Voting for Fund{fundNumber} opens {date}",
+  "@campaignPhaseCountdownCommunityVoting": {
+    "description": "Title for the community voting countdown",
+    "placeholders": {
+      "fundNumber": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
   "catalystAppClosed": "The Catalyst app is closed.",
   "@catalystAppClosed": {
     "description": "Text shown when Catalyst app is closed"
@@ -3226,5 +3330,29 @@
   "headsUpTitle": "Heads Up",
   "@headsUpTitle": {
     "description": "Text to tell user that something important is happening"
+  },
+  "inVoteList": "In Vote List",
+  "@inVoteList": {
+    "description": "Text indicates that vote on proposal is added to the list but not casted yet"
+  },
+  "voteYes": "Yes",
+  "@voteYes": {
+    "description": "Vote yes on proposal"
+  },
+  "votedYes": "Voted Yes",
+  "@votedYes": {
+    "description": "Voted yes on proposal"
+  },
+  "voteAbstain": "Abstain",
+  "@voteAbstain": {
+    "description": "Vote abstain on proposal"
+  },
+  "votedAbstain": "Abstained",
+  "@votedAbstain": {
+    "description": "Voted abstain on proposal"
+  },
+  "removeFromVoteList": "Remove from Vote List",
+  "@removeFromVoteList": {
+    "description": "When vote is added but not casted yet it can be removed."
   }
 }

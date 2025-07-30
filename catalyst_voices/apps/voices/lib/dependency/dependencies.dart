@@ -99,17 +99,13 @@ final class Dependencies extends DependencyProvider {
           get<ProposalService>(),
         ),
       )
-      ..registerFactory<CampaignDetailsBloc>(() {
-        return CampaignDetailsBloc(
+      ..registerLazySingleton<VotingCubit>(
+        () => VotingCubit(
+          get<UserService>(),
           get<CampaignService>(),
-        );
-      })
-      ..registerLazySingleton<CampaignInfoCubit>(() {
-        return CampaignInfoCubit(
-          get<CampaignService>(),
-          get<AdminTools>(),
-        );
-      })
+          get<ProposalService>(),
+        ),
+      )
       // TODO(LynxLynxx): add repository for campaign management
       ..registerLazySingleton<CampaignBuilderCubit>(
         CampaignBuilderCubit.new,
@@ -162,11 +158,6 @@ final class Dependencies extends DependencyProvider {
           get<DocumentMapper>(),
         );
       })
-      ..registerFactory<CampaignStageCubit>(() {
-        return CampaignStageCubit(
-          get<CampaignService>(),
-        );
-      })
       ..registerFactory<DevToolsBloc>(() {
         return DevToolsBloc(
           get<DevToolsService>(),
@@ -185,6 +176,11 @@ final class Dependencies extends DependencyProvider {
         return DocumentLookupBloc(
           get<DocumentsService>(),
           get<DocumentMapper>(),
+        );
+      })
+      ..registerFactory<CampaignPhaseAwareCubit>(() {
+        return CampaignPhaseAwareCubit(
+          get<CampaignService>(),
         );
       });
   }
@@ -333,6 +329,7 @@ final class Dependencies extends DependencyProvider {
       return CampaignService(
         get<CampaignRepository>(),
         get<ProposalRepository>(),
+        get<ActiveCampaignObserver>(),
       );
     });
     registerLazySingleton<ProposalService>(() {
@@ -440,5 +437,9 @@ final class Dependencies extends DependencyProvider {
       dispose: (manager) => manager.dispose(),
     );
     registerLazySingleton<ShareManager>(() => DelegatingShareManager(get<ShareService>()));
+    registerLazySingleton<ActiveCampaignObserver>(
+      ActiveCampaignObserverImpl.new,
+      dispose: (observer) async => observer.dispose(),
+    );
   }
 }

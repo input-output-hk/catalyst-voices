@@ -147,7 +147,7 @@ class _VoicesDesktopDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(dtscalac): remove SelectionArea when https://github.com/flutter/flutter/pull/167275
+    // TODO(dt-iohk): remove SelectionArea when https://github.com/flutter/flutter/pull/167275
     // is released and we're using this flutter version
     return SelectionArea(
       child: Dialog(

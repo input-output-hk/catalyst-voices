@@ -60,7 +60,7 @@ class VoicesAlertDialog extends StatelessWidget {
       xs: double.infinity,
       other: _width,
       builder: (context, width) {
-        // TODO(dtscalac): remove SelectionArea when https://github.com/flutter/flutter/pull/167275
+        // TODO(dt-iohk): remove SelectionArea when https://github.com/flutter/flutter/pull/167275
         // is released and we're using this flutter version
         return SelectionArea(
           child: Dialog(

@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/menu/voices_wallet_tile.dart';
+import 'package:catalyst_voices/widgets/tiles/voices_wallet_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

@@ -7,7 +7,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class ProposalsPagination extends StatelessWidget {
-  final PagingController<ProposalViewModel> controller;
+  final PagingController<ProposalBrief> controller;
 
   const ProposalsPagination({
     super.key,
@@ -16,12 +16,12 @@ class ProposalsPagination extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PaginatedGridView<ProposalViewModel>(
+    return PaginatedGridView<ProposalBrief>(
       pagingController: controller,
-      builderDelegate: PagedWrapChildBuilder<ProposalViewModel>(
+      builderDelegate: PagedWrapChildBuilder<ProposalBrief>(
         builder: (context, item) {
           return ProposalsPaginationTile(
-            key: ValueKey(item.ref),
+            key: ValueKey(item.selfRef),
             proposal: item,
           );
         },

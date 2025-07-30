@@ -61,14 +61,14 @@ WalletApiException? _mapApiException(Object ex) {
 }
 
 WalletDataSignException? _mapDataSignException(Object ex) {
-  // TODO(dtscalac): extract exception
+  // TODO(dt-iohk): extract exception
   return null;
 }
 
 WalletPaginateException? _mapPaginateException(Object ex) {
   final message = ex.toString();
 
-  // TODO(dtscalac): extract maxSize from underlying JS exception
+  // TODO(dt-iohk): extract maxSize from underlying JS exception
   if (message.contains('page out of range')) {
     return const WalletPaginateException(maxSize: -1);
   }
@@ -76,12 +76,12 @@ WalletPaginateException? _mapPaginateException(Object ex) {
 }
 
 TxSendException? _mapTxSendException(Object ex) {
-  // TODO(dtscalac): extract exception
+  // TODO(dt-iohk): extract exception
   return null;
 }
 
 TxSignException? _mapTxSignException(Object ex) {
-  // TODO(dtscalac): extract exception
+  // TODO(dt-iohk): extract exception
   return null;
 }
 

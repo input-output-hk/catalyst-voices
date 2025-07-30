@@ -44,12 +44,10 @@ final class AccessControl {
     if (account == null) return defaultSpacesAccess;
     if (account.isAdmin) return Space.values;
     if (_hasProposerOrDrepRole(account)) {
-      // TODO(LynxLynxx): After F14 use _proposalAccess
-      return [Space.discovery, Space.workspace];
+      return _proposalAccess;
     }
 
-    // TODO(LynxLynxx): After F14 use _contributorAccess
-    return defaultSpacesAccess;
+    return _contributorAccess;
   }
 
   Map<Space, ShortcutActivator> spacesShortcutsActivators(
@@ -60,13 +58,7 @@ final class AccessControl {
     }
     if (account.isAdmin) return allSpacesShortcutsActivators;
     if (_hasProposerOrDrepRole(account)) {
-      return allSpacesShortcutsActivators.useKeys([
-        Space.discovery,
-        Space.workspace,
-        // TODO(LynxLynxx): After F14 add
-        // Space.voting and Space.fundedProjects
-        // OR use values from _proposalAccess
-      ]);
+      return allSpacesShortcutsActivators.useKeys(_proposalAccess);
     }
     return allSpacesShortcutsActivators.useKeys([Space.discovery]);
   }

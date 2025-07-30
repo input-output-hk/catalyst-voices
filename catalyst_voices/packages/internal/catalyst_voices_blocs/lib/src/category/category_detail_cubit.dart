@@ -15,9 +15,18 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
       emit(state.copyWith(isLoading: true));
     }
 
-    final categories = await _campaignService.getCampaignCategories();
+    final campaign = await _campaignService.getActiveCampaign();
+    if (campaign == null) {
+      return emit(
+        state.copyWith(
+          isLoading: false,
+          error: const Optional.of(LocalizedUnknownException()),
+        ),
+      );
+    }
 
-    final categoriesModels = categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
+    final categoriesModels =
+        campaign.categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
 
     emit(
       state.copyWith(
