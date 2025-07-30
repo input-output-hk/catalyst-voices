@@ -17,6 +17,8 @@ class CampaignPhaseAware extends StatelessWidget {
   final CampaignPhaseAwareBuilder? active;
   final CampaignPhaseAwareBuilder? post;
   final CampaignPhaseAwareBuilder? orElse;
+  // Won't show Error and Loading states if true
+  final bool showOnlyDataState;
 
   factory CampaignPhaseAware.orElse({
     Key? key,
@@ -25,6 +27,7 @@ class CampaignPhaseAware extends StatelessWidget {
     CampaignPhaseAwareBuilder? upcoming,
     CampaignPhaseAwareBuilder? active,
     CampaignPhaseAwareBuilder? post,
+    bool showOnlyDataState = false,
   }) {
     return CampaignPhaseAware._(
       key: key,
@@ -33,6 +36,7 @@ class CampaignPhaseAware extends StatelessWidget {
       upcoming: upcoming,
       active: active,
       post: post,
+      showOnlyDataState: showOnlyDataState,
     );
   }
 
@@ -42,6 +46,7 @@ class CampaignPhaseAware extends StatelessWidget {
     required CampaignPhaseAwareBuilder upcoming,
     required CampaignPhaseAwareBuilder active,
     required CampaignPhaseAwareBuilder post,
+    bool showOnlyDataState = false,
   }) {
     return CampaignPhaseAware._(
       key: key,
@@ -49,6 +54,7 @@ class CampaignPhaseAware extends StatelessWidget {
       upcoming: upcoming,
       active: active,
       post: post,
+      showOnlyDataState: showOnlyDataState,
     );
   }
 
@@ -59,14 +65,15 @@ class CampaignPhaseAware extends StatelessWidget {
     this.active,
     this.post,
     this.orElse,
+    this.showOnlyDataState = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        const _ErrorCampaignPhaseAwareSelector(),
-        const _LoadingCampaignPhaseAwareSelector(),
+        if (!showOnlyDataState) const _ErrorCampaignPhaseAwareSelector(),
+        if (!showOnlyDataState) const _LoadingCampaignPhaseAwareSelector(),
         _DataCampaignPhaseAwareSelector(
           phase: phase,
           upcoming: upcoming,
