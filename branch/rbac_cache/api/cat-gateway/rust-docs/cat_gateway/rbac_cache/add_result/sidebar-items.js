@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["RbacCacheAddError"],"struct":["RbacCacheAddSuccess"],"type":["AddResult"]};
