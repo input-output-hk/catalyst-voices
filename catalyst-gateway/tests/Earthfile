@@ -16,7 +16,8 @@ prepare-all-images:
     BUILD ../event-db+docker
     BUILD ./api_tests+package
     BUILD ./schemathesis_tests+package
-    BUILD +package-postgres-scylla-runner
+    BUILD +package-postgres-runner
+    BUILD +package-scylla-runner
 
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.
@@ -34,15 +35,15 @@ test-builder:
 
     RUN cargo nextest archive --release --archive-file cat-gateway-tests.tar.zst 
 
-package-postgres-scylla-runner:
-    FROM gateway+builder-src
+package-postgres-runner:
+    FROM +test-builder
 
-    ENTRYPOINT cargo nextest run \
-                --run-ignored=only \
-                scylla_session \
-                scylla_queries \
-                scylla_purge \
-                rbac_index \
-                signed_docs \
-                --no-fail-fast
-    SAVE IMAGE postgres-scylla-runner:latest
+    ENTRYPOINT cargo nextest run --archive-file=cat-gateway-tests.tar.zst --run-ignored=only signed_docs --no-fail-fast
+    SAVE IMAGE postgres-runner:latest
+
+package-scylla-runner:
+    FROM +test-builder
+
+    ENTRYPOINT cargo nextest run --archive-file=cat-gateway-tests.tar.zst --run-ignored=only scylla_session scylla_queries scylla_purge rbac_index --no-fail-fast
+    SAVE IMAGE scylla-runner:latest
+
