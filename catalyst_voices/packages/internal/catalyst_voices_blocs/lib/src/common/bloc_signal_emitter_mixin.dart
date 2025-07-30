@@ -2,6 +2,13 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+/// Mixin that provides a signal emitter.
+///
+/// It allows to emit signals to notify listeners.
+/// But it is not altering the state of the bloc.
+///
+/// Useful when you want to notify listeners about some events
+/// that are not related to the state of the bloc.
 mixin BlocSignalEmitterMixin<Signal extends Object, State> on BlocBase<State>
     implements SignalEmitter<Signal> {
   late final _signalController = StreamController<Signal>.broadcast();

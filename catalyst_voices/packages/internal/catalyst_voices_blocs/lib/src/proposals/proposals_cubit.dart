@@ -12,6 +12,11 @@ const _recentProposalsMaxAge = Duration(hours: 72);
 final _logger = Logger('ProposalsCubit');
 
 /// Manages the proposals.
+///
+/// This cubit has [ProposalsCubitCache] to store the data which allows to reduce
+/// the number of calls to the services.
+///
+/// Allows to get paginated proposals based on the filters and order.
 final class ProposalsCubit extends Cubit<ProposalsState>
     with BlocErrorEmitterMixin, BlocSignalEmitterMixin<ProposalsSignal, ProposalsState> {
   final UserService _userService;
