@@ -70,6 +70,7 @@ export 'voting/vote_type_data.dart';
 export 'voting/vote_type_view_model.dart';
 export 'voting/voting_list_campaign_phase_data.dart';
 export 'voting/voting_list_tile_data.dart';
+export 'voting/voting_list_user_summary_data.dart';
 export 'voting/voting_phase_progress_view_model.dart';
 export 'voting/voting_power_view_model.dart';
 export 'workspace/workspace_proposal_list_item.dart';

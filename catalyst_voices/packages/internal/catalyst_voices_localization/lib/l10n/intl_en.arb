@@ -3376,5 +3376,9 @@
         "type": "int"
       }
     }
+  },
+  "totalVotingPower": "Total Voting Power",
+  "@totalVotingPower": {
+    "description": "Label for user voting power number"
   }
 }
