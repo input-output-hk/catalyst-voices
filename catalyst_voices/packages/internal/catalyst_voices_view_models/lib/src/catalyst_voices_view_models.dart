@@ -68,6 +68,7 @@ export 'voting/vote_button_colors.dart';
 export 'voting/vote_button_data.dart';
 export 'voting/vote_type_data.dart';
 export 'voting/vote_type_view_model.dart';
+export 'voting/voting_list_tile_data.dart';
 export 'voting/voting_phase_progress_view_model.dart';
 export 'voting/voting_power_view_model.dart';
 export 'workspace/workspace_proposal_list_item.dart';
