@@ -1,5 +1,7 @@
 import pytest
 
+# cspell: words modifyitems
+
 
 # marks all not marked tests with the `unmarked` mark so it will possible to run
 # `pytest -m "unmarked"` to run all unmarked tests
