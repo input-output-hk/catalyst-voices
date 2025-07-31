@@ -1,3 +1,5 @@
+-- Fund 14 Proposal and Comment Templates, which were served as hardcoded data  
+
 INSERT INTO signed_docs (
   id,
   ver,
