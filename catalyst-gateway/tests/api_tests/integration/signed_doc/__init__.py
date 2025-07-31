@@ -94,15 +94,11 @@ def proposal_doc_factory(proposal_templates, rbac_chain_factory):
             "content-type": "application/json",
             "content-encoding": "br",
             # referenced to the defined proposal template id, comes from the 'templates/data.rs' file
-            "template": {
-                "id": proposal_templates[0],
-                "ver": proposal_templates[0],
-            },
+            "template": [
+                {"id": proposal_templates[0], "ver": proposal_templates[0], "cid": "0x"}
+            ],
             # referenced to the defined category id, comes from the 'templates/data.rs' file
-            "parameters": {
-                "id": CATEGORY_ID,
-                "ver": CATEGORY_ID,
-            },
+            "parameters": [{"id": CATEGORY_ID, "ver": CATEGORY_ID, "cid": "0x"}],
         }
         with open("./test_data/signed_docs/proposal.json", "r") as proposal_json_file:
             proposal_json = json.load(proposal_json_file)
@@ -141,14 +137,10 @@ def comment_doc_factory(proposal_doc_factory, comment_templates, rbac_chain_fact
                 "id": proposal_doc.metadata["id"],
                 "ver": proposal_doc.metadata["ver"],
             },
-            "template": {
-                "id": comment_templates[0],
-                "ver": comment_templates[0],
-            },
-            "parameters": {
-                "id": CATEGORY_ID,
-                "ver": CATEGORY_ID,
-            },
+            "template": [
+                {"id": comment_templates[0], "ver": comment_templates[0], "cid": "0x"}
+            ],
+            "parameters": [{"id": CATEGORY_ID, "ver": CATEGORY_ID, "cid": "0x"}],
         }
         with open("./test_data/signed_docs/comment.json", "r") as comment_json_file:
             comment_json = json.load(comment_json_file)
@@ -183,14 +175,14 @@ def submission_action_factory(proposal_doc_factory, rbac_chain_factory):
             "type": "5e60e623-ad02-4a1b-a1ac-406db978ee48",
             "content-type": "application/json",
             "content-encoding": "br",
-            "ref": {
-                "id": proposal_doc.metadata["id"],
-                "ver": proposal_doc.metadata["ver"],
-            },
-            "parameters": {
-                "id": CATEGORY_ID,
-                "ver": CATEGORY_ID,
-            },
+            "ref": [
+                {
+                    "id": proposal_doc.metadata["id"],
+                    "ver": proposal_doc.metadata["ver"],
+                    "cid": "0x",
+                }
+            ],
+            "parameters": [{"id": CATEGORY_ID, "ver": CATEGORY_ID, "cid": "0x"}],
         }
         with open(
             "./test_data/signed_docs/submission_action.json", "r"
