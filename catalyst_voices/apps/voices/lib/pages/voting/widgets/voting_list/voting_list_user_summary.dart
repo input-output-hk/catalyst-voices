@@ -6,13 +6,13 @@ class VotingListUserSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: SizedBox(
-        height: 58,
-        child: Material(
-          borderRadius: BorderRadius.circular(12),
-          color: context.colors.elevationsOnSurfaceNeutralLv1Grey,
+    return SizedBox(
+      height: 58,
+      child: Material(
+        borderRadius: BorderRadius.circular(12),
+        color: context.colors.elevationsOnSurfaceNeutralLv1Grey,
+        child: const Padding(
+          padding: EdgeInsets.all(8),
           child: Center(child: Text('Hi')),
         ),
       ),
