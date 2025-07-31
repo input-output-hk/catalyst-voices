@@ -27,7 +27,7 @@ pub(crate) mod signed_docs;
 
 /// Database version this crate matches.
 /// Must equal the last Migrations Version Number from `event-db/migrations`.
-pub(crate) const DATABASE_SCHEMA_VERSION: i32 = 3;
+pub(crate) const DATABASE_SCHEMA_VERSION: i32 = 4;
 
 /// Postgres Connection Manager DB Pool
 type SqlDbPool = Arc<Pool<PostgresConnectionManager<NoTls>>>;
