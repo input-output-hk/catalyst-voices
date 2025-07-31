@@ -9,6 +9,8 @@ final class ProposalCubitCache extends Equatable {
   final CommentTemplate? commentTemplate;
   final List<CommentWithReplies>? comments;
   final bool? isFavorite;
+  final bool? isVotingStage;
+  final bool? readOnlyMode;
 
   const ProposalCubitCache({
     this.activeAccountId,
@@ -18,6 +20,8 @@ final class ProposalCubitCache extends Equatable {
     this.commentTemplate,
     this.comments,
     this.isFavorite,
+    this.isVotingStage,
+    this.readOnlyMode,
   });
 
   @override
@@ -29,6 +33,8 @@ final class ProposalCubitCache extends Equatable {
         commentTemplate,
         comments,
         isFavorite,
+        isVotingStage,
+        readOnlyMode,
       ];
 
   ProposalCubitCache copyWith({
@@ -39,6 +45,8 @@ final class ProposalCubitCache extends Equatable {
     Optional<CommentTemplate>? commentTemplate,
     Optional<List<CommentWithReplies>>? comments,
     Optional<bool>? isFavorite,
+    Optional<bool>? isVotingStage,
+    Optional<bool>? readOnlyMode,
   }) {
     return ProposalCubitCache(
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
@@ -48,6 +56,8 @@ final class ProposalCubitCache extends Equatable {
       commentTemplate: commentTemplate.dataOr(this.commentTemplate),
       comments: comments.dataOr(this.comments),
       isFavorite: isFavorite.dataOr(this.isFavorite),
+      isVotingStage: isVotingStage.dataOr(this.isVotingStage),
+      readOnlyMode: readOnlyMode.dataOr(this.readOnlyMode),
     );
   }
 }

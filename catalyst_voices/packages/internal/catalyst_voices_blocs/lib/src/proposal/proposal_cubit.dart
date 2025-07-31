@@ -57,6 +57,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   Future<void> load({required DocumentRef ref}) async {
     try {
       final isReadOnlyMode = await _isReadOnlyMode();
+      final isVotingStage = await _isVotingStage();
       _logger.info('Loading $ref');
 
       _cache = _cache.copyWith(ref: Optional.of(ref));
@@ -76,6 +77,8 @@ final class ProposalCubit extends Cubit<ProposalState>
         commentTemplate: Optional(commentTemplate),
         comments: const Optional([]),
         isFavorite: Optional(isFavorite),
+        isVotingStage: Optional(isVotingStage),
+        readOnlyMode: Optional(isReadOnlyMode),
       );
 
       await _commentsSub?.cancel();
@@ -90,7 +93,11 @@ final class ProposalCubit extends Cubit<ProposalState>
 
         emit(ProposalState(data: proposalState, readOnlyMode: isReadOnlyMode));
 
-        if (proposalState.isCurrentVersionLatest == false) {
+        if (proposalState.isCurrentVersionLatest == false &&
+            isVotingStage &&
+            _cache.activeAccountId != null) {
+          emitSignal(const ViewingOlderVersionWhileVotingSignal());
+        } else if (proposalState.isCurrentVersionLatest == false) {
           emitSignal(const ViewingOlderVersionSignal());
         }
       }
@@ -102,6 +109,8 @@ final class ProposalCubit extends Cubit<ProposalState>
         commentTemplate: const Optional.empty(),
         comments: const Optional.empty(),
         isFavorite: const Optional.empty(),
+        isVotingStage: const Optional.empty(),
+        readOnlyMode: const Optional.empty(),
       );
 
       emit(ProposalState(error: LocalizedException.create(error)));
@@ -252,6 +261,8 @@ final class ProposalCubit extends Cubit<ProposalState>
     required DocumentSchema? commentSchema,
     required ProposalCommentsSort commentsSort,
     required bool isFavorite,
+    required bool isVotingStage,
+    required bool readOnlyMode,
   }) {
     final proposalDocument = proposal?.document;
     final proposalDocumentRef = proposalDocument?.metadata.selfRef;
@@ -284,6 +295,8 @@ final class ProposalCubit extends Cubit<ProposalState>
             hasActiveAccount: hasActiveAccount,
             hasAccountUsername: hasAccountUsername,
             commentsCount: commentsCount,
+            isVotingStage: isVotingStage,
+            readOnlyMode: readOnlyMode,
           )
         : const <Segment>[];
 
@@ -304,6 +317,27 @@ final class ProposalCubit extends Cubit<ProposalState>
     );
   }
 
+  ProposalVotingOverviewSegment? _buildProposalVotingOverviewSegment({
+    required bool isVotingStage,
+    required bool hasActiveAccount,
+    required bool isLatestVersion,
+    required bool isFinal,
+    required DocumentRef proposalRef,
+  }) {
+    final appCheck = (isVotingStage && hasActiveAccount);
+    final proposalCheck = isLatestVersion && isFinal && proposalRef is SignedDocumentRef;
+    if (!appCheck || !proposalCheck) {
+      return null;
+    }
+
+    // TODO(LynxLynxx): Fetch voting data
+    return ProposalVotingOverviewSegment.build(
+      data: const ProposalViewVoting(
+        VoteButtonData(),
+      ),
+    );
+  }
+
   List<Segment> _buildSegments({
     required ProposalData proposal,
     required CampaignCategory? category,
@@ -314,13 +348,25 @@ final class ProposalCubit extends Cubit<ProposalState>
     required bool hasActiveAccount,
     required bool hasAccountUsername,
     required int commentsCount,
+    required bool isVotingStage,
+    required bool readOnlyMode,
   }) {
     final document = proposal.document;
     final isDraftProposal = document.metadata.selfRef is DraftRef;
+    final isLatestVersion = version?.isLatest ?? false;
+
+    final votingSegment = _buildProposalVotingOverviewSegment(
+      isVotingStage: isVotingStage,
+      hasActiveAccount: hasActiveAccount,
+      isLatestVersion: isLatestVersion,
+      isFinal: version?.isLatest ?? false,
+      proposalRef: proposal.document.metadata.selfRef,
+    );
 
     final overviewSegment = ProposalOverviewSegment.build(
       categoryName: category?.categoryText ?? '',
       proposalTitle: document.title ?? '',
+      isVotingStage: (isVotingStage && isLatestVersion),
       data: ProposalViewMetadata(
         author: Profile(catalystId: document.authorId!),
         description: document.description,
@@ -344,7 +390,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     final isNotLocalAndHasActiveAccount = !isDraftProposal && hasActiveAccount;
     final canReply = isNotLocalAndHasActiveAccount && hasAccountUsername;
-    final canComment = isNotLocalAndHasActiveAccount && commentSchema != null;
+    final canComment = isNotLocalAndHasActiveAccount && commentSchema != null && !readOnlyMode;
 
     final commentsSegment = ProposalCommentsSegment(
       id: const NodeId('comments'),
@@ -366,9 +412,10 @@ final class ProposalCubit extends Cubit<ProposalState>
     );
 
     return [
+      if (votingSegment != null) votingSegment,
       overviewSegment,
       ...proposalSegments,
-      if (canComment || comments.isNotEmpty) commentsSegment,
+      if ((canComment || comments.isNotEmpty) && !isVotingStage) commentsSegment,
     ];
   }
 
@@ -397,6 +444,13 @@ final class ProposalCubit extends Cubit<ProposalState>
     };
   }
 
+  Future<bool> _isVotingStage() async {
+    final activeCampaign = await _campaignService.getActiveCampaign();
+    final votingState = activeCampaign?.phaseStateTo(CampaignPhaseType.communityVoting);
+
+    return votingState?.status.isActive ?? false;
+  }
+
   ProposalViewData _rebuildProposalState() {
     final proposal = _cache.proposal;
     final category = _cache.category;
@@ -404,6 +458,8 @@ final class ProposalCubit extends Cubit<ProposalState>
     final comments = _cache.comments ?? const [];
     final commentsSort = state.comments.commentsSort;
     final isFavorite = _cache.isFavorite ?? false;
+    final isVotingStage = _cache.isVotingStage ?? false;
+    final readOnlyMode = _cache.readOnlyMode ?? false;
     final activeAccountId = _cache.activeAccountId;
 
     final username = activeAccountId?.username;
@@ -417,6 +473,8 @@ final class ProposalCubit extends Cubit<ProposalState>
       commentSchema: commentTemplate?.schema,
       commentsSort: commentsSort,
       isFavorite: isFavorite,
+      readOnlyMode: readOnlyMode,
+      isVotingStage: isVotingStage,
     );
   }
 }
