@@ -19,8 +19,8 @@ permissions:
   pull-requests: write
 
 env:
-  REPORT_EXT: .gateway.junit-report.xml
-  COVERAGE_EXT: .gateway.coverage.info
+  REPORT_EXT: .junit-report.xml
+  COVERAGE_EXT: .coverage.info
 
 jobs:
   ci:
