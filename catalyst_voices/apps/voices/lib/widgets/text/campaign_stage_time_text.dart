@@ -1,12 +1,13 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/widgets/text/timezone_date_time_text.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class CampaignStageTimeText extends StatelessWidget {
   final DateRange dateRange;
+
   const CampaignStageTimeText({super.key, required this.dateRange});
 
   @override

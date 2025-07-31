@@ -1,6 +1,6 @@
-import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/intl.dart';
@@ -204,6 +204,7 @@ void main() {
 
 class _FakeMaterialLocalizations extends Fake implements MaterialLocalizations {
   int _firstDayOfWeekIndex = 0;
+
   @override
   int get firstDayOfWeekIndex => _firstDayOfWeekIndex;
 
@@ -215,18 +216,25 @@ class _FakeMaterialLocalizations extends Fake implements MaterialLocalizations {
 class _FakeVoicesLocalizations extends Fake implements VoicesLocalizations {
   @override
   String get from => 'From';
+
   @override
   String get to => 'To';
+
   @override
   String get today => 'Today';
+
   @override
   String get tomorrow => 'Tomorrow';
+
   @override
   String get twoDaysAgo => '2 days ago';
+
   @override
   String get weekOf => 'Week of';
+
   @override
   String get yesterday => 'Yesterday';
+
   @override
   String publishedOn(String date, String time) {
     return 'Published on $date at $time';

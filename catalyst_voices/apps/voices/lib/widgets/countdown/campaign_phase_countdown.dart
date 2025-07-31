@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/widgets/countdown/animated_voices_countdown.dart';
 import 'package:catalyst_voices/widgets/text/timezone_date_time_text.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';

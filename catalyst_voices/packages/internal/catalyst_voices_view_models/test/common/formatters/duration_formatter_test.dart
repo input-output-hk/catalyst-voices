@@ -1,5 +1,5 @@
-import 'package:catalyst_voices/common/formatters/duration_formatter.dart';
 import 'package:catalyst_voices_localization/generated/catalyst_voices_localizations.dart';
+import 'package:catalyst_voices_view_models/src/common/formatters/duration_formatter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -103,10 +103,13 @@ void main() {
 class _FakeVoicesLocalizations extends Fake implements VoicesLocalizations {
   @override
   String get dayAbbr => 'd';
+
   @override
   String get hourAbbr => 'h';
+
   @override
   String get minuteAbbr => 'm';
+
   @override
   String get secondAbbr => 's';
 }

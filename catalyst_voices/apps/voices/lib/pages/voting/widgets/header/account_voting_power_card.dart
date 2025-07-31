@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/widgets/chips/voices_chip.dart';
 import 'package:catalyst_voices/widgets/text/timezone_date_time_text.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';

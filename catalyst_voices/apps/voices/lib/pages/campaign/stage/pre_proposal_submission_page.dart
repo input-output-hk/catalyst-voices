@@ -11,7 +11,6 @@ import 'package:flutter/material.dart';
 
 class PreProposalSubmissionPage extends StatelessWidget {
   final CampaignPhaseCountdownViewModel phaseCountdown;
-
   final ValueChanged<bool>? onCountdownEnd;
 
   const PreProposalSubmissionPage({super.key, required this.phaseCountdown, this.onCountdownEnd});
@@ -26,6 +25,7 @@ class PreProposalSubmissionPage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             _Header(phaseCountdown.fundNumber),
+            const SizedBox(height: 12),
             CampaignPhaseCountdown(phaseCountdown: phaseCountdown),
             const SizedBox(height: 48),
             const _Description(),

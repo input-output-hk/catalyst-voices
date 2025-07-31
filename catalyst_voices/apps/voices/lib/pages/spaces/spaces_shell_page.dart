@@ -2,41 +2,18 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/space_ext.dart';
 import 'package:catalyst_voices/pages/campaign/admin_tools/campaign_admin_tools_dialog.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/spaces_app_bar.dart';
-import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/spaces_appbar.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
+import 'package:catalyst_voices/pages/spaces/drawer/spaces_end_drawer.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 typedef _SessionStateData = ({bool isActive, bool isProposer});
 
 class SpacesShellPage extends StatefulWidget {
-  static final Map<Space, ShortcutActivator> _spacesShortcutsActivators = {
-    Space.discovery: LogicalKeySet(
-      LogicalKeyboardKey.control,
-      LogicalKeyboardKey.digit1,
-    ),
-    Space.workspace: LogicalKeySet(
-      LogicalKeyboardKey.control,
-      LogicalKeyboardKey.digit2,
-    ),
-    Space.voting: LogicalKeySet(
-      LogicalKeyboardKey.control,
-      LogicalKeyboardKey.digit3,
-    ),
-    Space.fundedProjects: LogicalKeySet(
-      LogicalKeyboardKey.control,
-      LogicalKeyboardKey.digit4,
-    ),
-    Space.treasury: LogicalKeySet(
-      LogicalKeyboardKey.control,
-      LogicalKeyboardKey.keyT,
-    ),
-  };
-
   final Space space;
   final Widget child;
 
@@ -106,19 +83,19 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
           ),
           builder: (context, state) {
             return Scaffold(
-              appBar: SpacesAppBar(
+              appBar: SpacesAppbar(
                 space: widget.space,
-                isActive: state.isActive,
+                isAppUnlock: state.isActive,
                 isProposer: state.isProposer,
               ),
               drawer: state.isActive
                   ? SpacesDrawer(
                       space: widget.space,
-                      spacesShortcutsActivators: SpacesShellPage._spacesShortcutsActivators,
+                      spacesShortcutsActivators: AccessControl.allSpacesShortcutsActivators,
                       isUnlocked: state.isActive,
                     )
                   : null,
-              endDrawer: const OpportunitiesDrawer(),
+              endDrawer: SpacesEndDrawer(space: widget.space),
               body: widget.child,
             );
           },

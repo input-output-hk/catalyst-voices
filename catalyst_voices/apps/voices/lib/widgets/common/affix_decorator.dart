@@ -34,13 +34,16 @@ class AffixDecorator extends StatelessWidget {
   /// The widget to be displayed after the child widget.
   final Widget? suffix;
 
-  /// See [Row.mainAxisSize].
+  /// See [Flex.mainAxisSize].
   final MainAxisSize mainAxisSize;
+
+  /// See [Flex.mainAxisAlignment].
+  final MainAxisAlignment mainAxisAlignment;
 
   /// The widget to be decorated with prefix and/or suffix.
   final Widget child;
 
-  /// See [Row.crossAxisAlignment].
+  /// See [Flex.crossAxisAlignment].
   final CrossAxisAlignment crossAxisAlignment;
 
   /// Creates a new instance of PrefixSuffixDecorator.
@@ -55,6 +58,7 @@ class AffixDecorator extends StatelessWidget {
     this.prefix,
     this.suffix,
     this.mainAxisSize = MainAxisSize.min,
+    this.mainAxisAlignment = MainAxisAlignment.start,
     this.crossAxisAlignment = CrossAxisAlignment.center,
     required this.child,
   });
@@ -78,6 +82,7 @@ class AffixDecorator extends StatelessWidget {
     return Flex(
       direction: axis,
       mainAxisSize: mainAxisSize,
+      mainAxisAlignment: mainAxisAlignment,
       crossAxisAlignment: crossAxisAlignment,
       spacing: gap,
       children: [
