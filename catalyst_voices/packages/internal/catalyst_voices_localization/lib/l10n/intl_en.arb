@@ -3367,5 +3367,14 @@
   "voteList": "Vote List",
   "@coteList": {
     "description": "Name of place where user adds votes on proposals"
+  },
+  "fundX": "Fund{fundNumber}",
+  "@fundX": {
+    "description": "Generic text about nr. of fund / campaign",
+    "placeholders": {
+      "fundNumber": {
+        "type": "int"
+      }
+    }
   }
 }
