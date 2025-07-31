@@ -71,8 +71,8 @@ class _VotingListVoteListTileVote extends StatelessWidget {
       onTap: () {},
       borderRadius: BorderRadius.circular(8),
       child: Container(
-        constraints: BoxConstraints(minHeight: 52),
-        padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        constraints: const BoxConstraints(minHeight: 52),
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         child: Row(
           spacing: 32,
           children: [
@@ -81,18 +81,10 @@ class _VotingListVoteListTileVote extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  _VotingListVoteListTileVoteProposalTitleText(
                     'Blockchain-Based Microlending Platform for SMEs',
-                    style: context.textTheme.bodyMedium?.copyWith(
-                      color: context.colors.textOnPrimaryLevel0,
-                    ),
                   ),
-                  Text(
-                    'Tyler Durden',
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: context.colors.textOnPrimaryLevel1,
-                    ),
-                  ),
+                  _VotingListVoteListTileVoteProposalAuthorNameText('Tyler Durden'),
                 ],
               ),
             ),
@@ -104,6 +96,46 @@ class _VotingListVoteListTileVote extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _VotingListVoteListTileVoteProposalAuthorNameText extends StatelessWidget {
+  final String data;
+
+  const _VotingListVoteListTileVoteProposalAuthorNameText(this.data);
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = (context.textTheme.bodySmall ?? const TextStyle()).copyWith(
+      color: context.colors.textOnPrimaryLevel1,
+    );
+
+    return Text(
+      data,
+      style: textStyle,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+}
+
+class _VotingListVoteListTileVoteProposalTitleText extends StatelessWidget {
+  final String data;
+
+  const _VotingListVoteListTileVoteProposalTitleText(this.data);
+
+  @override
+  Widget build(BuildContext context) {
+    final textStyle = (context.textTheme.bodyMedium ?? const TextStyle()).copyWith(
+      color: context.colors.textOnPrimaryLevel0,
+    );
+
+    return Text(
+      data,
+      style: textStyle,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 }
