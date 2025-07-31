@@ -189,18 +189,24 @@ async fn filter_by_type(docs: &[FullSignedDoc], doc_type: uuid::Uuid) {
     }
 }
 
+/// Amount of documents already pre-seeded inside the event-db
+const PRESEED_DATA: usize = 43;
+
 async fn filter_all(docs: &[FullSignedDoc]) {
     let filter = DocsQueryFilter::all();
     let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
         .await
         .unwrap();
-    for exp_doc in docs.iter().rev() {
+    for exp_doc in docs.iter().skip(PRESEED_DATA).rev() {
         let res_doc = res_docs.try_next().await.unwrap().unwrap();
         assert_eq!(exp_doc.body(), &res_doc);
     }
 }
 
-async fn filter_count(len: i64) {
+async fn filter_count(docs: &[FullSignedDoc]) {
+    let len: i64 = (docs.len().saturating_add(PRESEED_DATA))
+        .try_into()
+        .unwrap();
     let filter = DocsQueryFilter::all();
     let count = SignedDocBody::retrieve_count(&filter).await.unwrap();
     assert_eq!(len, count);
