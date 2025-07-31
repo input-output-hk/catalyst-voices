@@ -154,7 +154,7 @@ jobs:
       - name: Normalize coverage report paths
         run: |
           sed -i -e 's/SF:\/root\/build/SF:catalyst-gateway/g' ${{ env.COVERAGE_REPORT_FOLDER }}/cat-gateway${{ env.COVERAGE_EXT }}
-          sed -i -e 's/SF:/SF:catalyst-gateway\/tests\/api_tests\//g' ${{ env.COVERAGE_REPORT_FOLDER }}/api-tests.gateway${{ env.COVERAGE_EXT }}
+          sed -i -e 's/SF:/SF:catalyst-gateway\/tests\/api_tests\//g' ${{ env.COVERAGE_REPORT_FOLDER }}/api-tests${{ env.COVERAGE_EXT }}
           sed -i -e 's/SF:/SF:catalyst_voices/g' ${{ env.COVERAGE_REPORT_FOLDER }}/lcov${{ env.COVERAGE_EXT }}
 
       - name: Coveralls Gateway Rust Unit tests
@@ -173,7 +173,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: coverallsapp/github-action@v2
         with:
-          path-to-lcov: "${{ env.COVERAGE_REPORT_FOLDER }}/api-tests.gateway${{ env.COVERAGE_EXT }}"
+          path-to-lcov: "${{ env.COVERAGE_REPORT_FOLDER }}/api-tests${{ env.COVERAGE_EXT }}"
           allow-empty: true
           debug: true
           flag-name: api-test

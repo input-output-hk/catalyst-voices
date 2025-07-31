@@ -45,8 +45,8 @@ jobs:
           # all of these default to true, but feel free to set to
           # "false" if necessary for your workflow
           android: true
-          dotnet: true
-          haskell: true
+          dotnet: false
+          haskell: false
           large-packages: true
           docker-images: false
           swap-storage: true
