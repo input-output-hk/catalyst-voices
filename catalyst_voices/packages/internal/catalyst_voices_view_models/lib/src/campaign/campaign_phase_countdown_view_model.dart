@@ -37,6 +37,7 @@ class CampaignPhaseCountdownViewModel extends Equatable {
     return switch (type) {
       CampaignPhaseType.communityVoting =>
         l10n.campaignPhaseCountdownCommunityVoting(fundNumber, formattedDate),
+      CampaignPhaseType.proposalSubmission => l10n.proposalSubmissionStageStartAt(formattedDate),
       _ => '',
     };
   }
