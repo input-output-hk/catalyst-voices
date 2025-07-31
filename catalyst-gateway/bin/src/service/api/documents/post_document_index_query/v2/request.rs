@@ -171,28 +171,28 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
                     .collect::<Result<Vec<_>, _>>()?,
             );
         }
-        if let Some(params) = value.id {
-            let params = params
+        if let Some(ids) = value.id {
+            let ids = ids
                 .into_iter()
                 .map(|doc_type| doc_type.try_into())
                 .collect::<Result<Vec<_>, _>>()?;
 
-            for id in params {
+            for id in ids {
                 db_filter = db_filter.with_id(id);
             }
         }
-        if let Some(params) = value.ver {
-            let params = params
+        if let Some(verions) = value.ver {
+            let versions = verions
                 .into_iter()
                 .map(|doc_type| doc_type.try_into())
                 .collect::<Result<Vec<_>, _>>()?;
 
-            for id in params {
-                db_filter = db_filter.with_ver(id);
+            for ver in versions {
+                db_filter = db_filter.with_ver(ver);
             }
         }
-        if let Some(doc_ref) = value.doc_ref {
-            let doc_refs = doc_ref
+        if let Some(doc_refs) = value.doc_ref {
+            let doc_refs = doc_refs
                 .into_iter()
                 .map(|doc_type| doc_type.try_into())
                 .collect::<Result<Vec<_>, _>>()?;
@@ -201,39 +201,38 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
                 db_filter = db_filter.with_ref(doc_ref);
             }
         }
-        if let Some(template) = value.template {
-            let doc_refs = template
+        if let Some(templates) = value.template {
+            let templates = templates
                 .into_iter()
                 .map(|doc_type| doc_type.try_into())
                 .collect::<Result<Vec<_>, _>>()?;
 
-            for doc_ref in doc_refs {
-                db_filter = db_filter.with_template(doc_ref);
+            for template in templates {
+                db_filter = db_filter.with_template(template);
             }
         }
-        if let Some(reply) = value.reply {
-            let doc_refs = reply
+        if let Some(replies) = value.reply {
+            let replies = replies
                 .into_iter()
                 .map(|doc_type| doc_type.try_into())
                 .collect::<Result<Vec<_>, _>>()?;
 
-            for doc_ref in doc_refs {
-                db_filter = db_filter.with_reply(doc_ref);
+            for reply in replies {
+                db_filter = db_filter.with_reply(reply);
             }
         }
-        for doc_refs in [value.brand, value.campaign, value.category] {
-            if let Some(doc_refs) = doc_refs {
-                let doc_refs = doc_refs
+        for field in [value.brand, value.campaign, value.category] {
+            if let Some(params) = field {
+                let params = params
                     .into_iter()
                     .map(|doc_type| doc_type.try_into())
                     .collect::<Result<Vec<_>, _>>()?;
 
-                for doc_ref in doc_refs {
-                    db_filter = db_filter.with_parameters(doc_ref);
+                for param in params {
+                    db_filter = db_filter.with_parameters(param);
                 }
             }
         }
-        // TODO process also the rest of the fields like `ref`, `template` etc.
         Ok(db_filter)
     }
 }
