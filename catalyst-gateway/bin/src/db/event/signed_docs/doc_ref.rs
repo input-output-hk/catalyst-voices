@@ -18,15 +18,18 @@ impl DocumentRef {
         if let Some(id) = &self.id {
             stmt.push_str(&format!(
                 " AND {}",
-                id.conditional_stmt(&format!("({table_field}->>'id')::uuid"))
+                id.conditional_stmt(&format!("(doc_ref->>'id')::uuid"))
             ));
         }
         if let Some(ver) = &self.ver {
             stmt.push_str(&format!(
                 " AND {}",
-                ver.conditional_stmt(&format!("({table_field}->>'ver')::uuid"))
+                ver.conditional_stmt(&format!("(doc_ref->>'ver')::uuid"))
             ));
         }
-        stmt
+
+        format!(
+            "EXISTS (SELECT 1 FROM JSONB_ARRAY_ELEMENTS({table_field}) AS doc_ref WHERE {stmt})"
+        )
     }
 }

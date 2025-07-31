@@ -4,7 +4,7 @@ use poem_openapi::{types::Example, NewType, Object};
 use crate::{
     db::event::signed_docs::FullSignedDoc,
     service::common::types::document::{
-        doc_ref_v2::DocumentReferenceListV2, doc_type::DocumentType, ver::DocumentVer
+        doc_ref_v2::DocumentReferenceListV2, doc_type::DocumentType, ver::DocumentVer,
     },
 };
 

@@ -10,23 +10,19 @@ use crate::db::event::common::eq_or_ranged_uuid::EqOrRangedUuid;
 #[derive(Clone, Debug, Default)]
 pub(crate) struct DocsQueryFilter {
     /// `type` field
-    doc_type: Option<uuid::Uuid>,
+    doc_type: Option<Vec<uuid::Uuid>>,
     /// `id` field
     id: Option<EqOrRangedUuid>,
     /// `ver` field
     ver: Option<EqOrRangedUuid>,
     /// `metadata->'ref'` field
-    doc_ref: Option<DocumentRef>,
+    doc_ref: Option<Vec<DocumentRef>>,
     /// `metadata->'template'` field
-    template: Option<DocumentRef>,
+    template: Option<Vec<DocumentRef>>,
     /// `metadata->'reply'` field
-    reply: Option<DocumentRef>,
-    /// `metadata->'brand_id'` field
-    brand_id: Option<DocumentRef>,
-    /// `metadata->'campaign_id'` field
-    campaign_id: Option<DocumentRef>,
-    /// `metadata->'category_id'` field
-    category_id: Option<DocumentRef>,
+    reply: Option<Vec<DocumentRef>>,
+    /// `metadata->'parameters'` field
+    parameters: Option<Vec<DocumentRef>>,
 }
 
 impl Display for DocsQueryFilter {
@@ -35,7 +31,17 @@ impl Display for DocsQueryFilter {
         let mut query = "TRUE".to_string();
 
         if let Some(doc_type) = &self.doc_type {
-            write!(&mut query, " AND signed_docs.type = '{doc_type}'")?;
+            if !doc_type.is_empty() {
+                write!(
+                    &mut query,
+                    " AND signed_docs.type IN ({})",
+                    doc_type
+                        .iter()
+                        .map(|uuid| format!("'{uuid}'"))
+                        .collect::<Vec<_>>()
+                        .join(",")
+                )?;
+            }
         }
 
         if let Some(id) = &self.id {
@@ -48,47 +54,23 @@ impl Display for DocsQueryFilter {
                 ver.conditional_stmt("signed_docs.ver")
             )?;
         }
-        if let Some(doc_ref) = &self.doc_ref {
-            write!(
-                &mut query,
-                " AND {}",
-                doc_ref.conditional_stmt("metadata->'ref'")
-            )?;
-        }
-        if let Some(template) = &self.template {
-            write!(
-                &mut query,
-                " AND {}",
-                template.conditional_stmt("metadata->'template'")
-            )?;
-        }
-        if let Some(reply) = &self.reply {
-            write!(
-                &mut query,
-                " AND {}",
-                reply.conditional_stmt("metadata->'reply'")
-            )?;
-        }
-        if let Some(brand_id) = &self.brand_id {
-            write!(
-                &mut query,
-                " AND {}",
-                brand_id.conditional_stmt("metadata->'brand_id'")
-            )?;
-        }
-        if let Some(campaign_id) = &self.campaign_id {
-            write!(
-                &mut query,
-                " AND {}",
-                campaign_id.conditional_stmt("metadata->'campaign_id'")
-            )?;
-        }
-        if let Some(category_id) = &self.category_id {
-            write!(
-                &mut query,
-                " AND {}",
-                category_id.conditional_stmt("metadata->'category_id'")
-            )?;
+        let doc_ref_queries = [
+            ("ref", &self.doc_ref),
+            ("template", &self.template),
+            ("reply", &self.reply),
+            ("parameters", &self.parameters),
+        ];
+
+        for (field_name, doc_refs) in doc_ref_queries {
+            if let Some(doc_refs) = doc_refs {
+                let stmt = doc_refs
+                    .iter()
+                    .map(|doc_ref| doc_ref.conditional_stmt(&format!("metadata->'{field_name}'")))
+                    .collect::<Vec<_>>()
+                    .join(" OR ");
+
+                write!(&mut query, " AND ({stmt})")?;
+            }
         }
 
         write!(f, "{query}")
@@ -102,7 +84,7 @@ impl DocsQueryFilter {
     }
 
     /// Set the `type` field filter condition
-    pub fn with_type(self, doc_type: uuid::Uuid) -> Self {
+    pub fn with_type(self, doc_type: Vec<uuid::Uuid>) -> Self {
         DocsQueryFilter {
             doc_type: Some(doc_type),
             ..self
@@ -126,7 +108,10 @@ impl DocsQueryFilter {
     }
 
     /// Set the `metadata->'ref'` field filter condition
-    pub fn with_ref(self, doc_ref: DocumentRef) -> Self {
+    pub fn with_ref(self, arg: DocumentRef) -> Self {
+        let mut doc_ref = self.doc_ref.unwrap_or_else(Vec::new);
+        doc_ref.push(arg);
+
         DocsQueryFilter {
             doc_ref: Some(doc_ref),
             ..self
@@ -134,7 +119,10 @@ impl DocsQueryFilter {
     }
 
     /// Set the `metadata->'template'` field filter condition
-    pub fn with_template(self, template: DocumentRef) -> Self {
+    pub fn with_template(self, arg: DocumentRef) -> Self {
+        let mut template = self.template.unwrap_or_else(Vec::new);
+        template.push(arg);
+
         DocsQueryFilter {
             template: Some(template),
             ..self
@@ -142,33 +130,23 @@ impl DocsQueryFilter {
     }
 
     /// Set the `metadata->'reply'` field filter condition
-    pub fn with_reply(self, reply: DocumentRef) -> Self {
+    pub fn with_reply(self, arg: DocumentRef) -> Self {
+        let mut reply = self.reply.unwrap_or_else(Vec::new);
+        reply.push(arg);
+
         DocsQueryFilter {
             reply: Some(reply),
             ..self
         }
     }
 
-    /// Set the `metadata->'brand_id'` field filter condition
-    pub fn with_brand_id(self, brand_id: DocumentRef) -> Self {
-        DocsQueryFilter {
-            brand_id: Some(brand_id),
-            ..self
-        }
-    }
+    /// Set the `metadata->'parameters'` field filter condition
+    pub fn with_parameters(self, arg: DocumentRef) -> Self {
+        let mut parameters = self.parameters.unwrap_or_else(Vec::new);
+        parameters.push(arg);
 
-    /// Set the `metadata->'campaign_id'` field filter condition
-    pub fn with_campaign_id(self, campaign_id: DocumentRef) -> Self {
         DocsQueryFilter {
-            campaign_id: Some(campaign_id),
-            ..self
-        }
-    }
-
-    /// Set the `metadata->'category_id'` field filter condition
-    pub fn with_category_id(self, category_id: DocumentRef) -> Self {
-        DocsQueryFilter {
-            category_id: Some(category_id),
+            parameters: Some(parameters),
             ..self
         }
     }

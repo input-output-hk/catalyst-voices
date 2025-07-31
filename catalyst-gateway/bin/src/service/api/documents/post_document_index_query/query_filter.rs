@@ -164,7 +164,7 @@ impl TryFrom<DocumentIndexQueryFilter> for DocsQueryFilter {
     fn try_from(value: DocumentIndexQueryFilter) -> Result<Self, Self::Error> {
         let mut db_filter = DocsQueryFilter::all();
         if let Some(doc_type) = value.doc_type {
-            db_filter = db_filter.with_type(doc_type.parse()?);
+            db_filter = db_filter.with_type(vec![doc_type.parse()?]);
         }
         if let Some(id) = value.id {
             db_filter = db_filter.with_id(id.try_into()?);
@@ -182,13 +182,13 @@ impl TryFrom<DocumentIndexQueryFilter> for DocsQueryFilter {
             db_filter = db_filter.with_reply(reply.try_into()?);
         }
         if let Some(brand) = value.brand {
-            db_filter = db_filter.with_brand_id(brand.try_into()?);
+            db_filter = db_filter.with_parameters(brand.try_into()?);
         }
         if let Some(campaign) = value.campaign {
-            db_filter = db_filter.with_campaign_id(campaign.try_into()?);
+            db_filter = db_filter.with_parameters(campaign.try_into()?);
         }
         if let Some(category) = value.category {
-            db_filter = db_filter.with_category_id(category.try_into()?);
+            db_filter = db_filter.with_parameters(category.try_into()?);
         }
         // TODO process also the rest of the fields like `ref`, `template` etc.
         Ok(db_filter)
