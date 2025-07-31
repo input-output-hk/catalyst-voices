@@ -3,13 +3,18 @@
 //! A Reference is used by the `ref` metadata, and any other reference to another
 //! document.
 
-use poem_openapi::{types::Example, NewType, Object, Union};
+use poem_openapi::{
+    types::{Example, ToJSON},
+    NewType, Object, Union,
+};
 
 use super::{
     id::{DocumentId, EqOrRangedIdDocumented},
     ver::{DocumentVer, EqOrRangedVerDocumented},
 };
-use crate::db::event::signed_docs::DocumentRef;
+use crate::{
+    db::event::signed_docs::DocumentRef, service::common::types::array_types::impl_array_types,
+};
 
 #[derive(Object, Debug, PartialEq)]
 #[oai(example = true)]
@@ -219,8 +224,38 @@ impl Example for DocumentReference {
 impl From<catalyst_signed_doc::DocumentRef> for DocumentReference {
     fn from(value: catalyst_signed_doc::DocumentRef) -> Self {
         Self {
-            doc_id: value.id.into(),
-            ver: value.ver.into(),
+            doc_id: (*value.id()).into(),
+            ver: (*value.ver()).into(),
         }
+    }
+}
+
+impl_array_types!(
+    DocumentReferenceList,
+    DocumentReference,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(10),
+        items: Some(Box::new(DocumentReference::schema_ref())),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
+impl Example for DocumentReferenceList {
+    fn example() -> Self {
+        Self(vec![DocumentReference::example()])
+    }
+}
+
+impl From<catalyst_signed_doc::DocumentRefs> for DocumentReferenceList {
+    fn from(value: catalyst_signed_doc::DocumentRefs) -> Self {
+        let doc_refs = value
+            .doc_refs()
+            .iter()
+            .cloned()
+            .map(DocumentReference::from)
+            .collect();
+
+        Self(doc_refs)
     }
 }
