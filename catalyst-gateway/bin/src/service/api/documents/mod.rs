@@ -31,6 +31,7 @@ mod common;
 mod get_document;
 mod post_document_index_query;
 mod put_document;
+mod templates;
 
 /// Cardano Follower API Endpoints
 pub(crate) struct DocumentApi;

@@ -1,5 +1,7 @@
 //! Catalyst signed document templates.
 
+#![allow(dead_code)]
+
 mod data;
 
 use std::{collections::HashMap, env, sync::LazyLock};
