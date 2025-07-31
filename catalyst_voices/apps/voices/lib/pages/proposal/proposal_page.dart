@@ -143,7 +143,10 @@ class _ProposalPageState extends State<ProposalPage>
         ViewingOlderVersionSnackBar(context).show(context);
       case ViewingOlderVersionWhileVotingSignal():
         VoicesSnackBar.hideCurrent(context);
-        ViewingOlderVersionSnackBar(context, message: context.l10n.viewingOlderDocumentVersionWhileVoting).show(context);
+        ViewingOlderVersionSnackBar(
+          context,
+          message: context.l10n.viewingOlderDocumentVersionWhileVoting,
+        ).show(context);
       case ChangeVersionSignal():
         _changeVersion(signal.to);
       case UsernameUpdatedSignal():
