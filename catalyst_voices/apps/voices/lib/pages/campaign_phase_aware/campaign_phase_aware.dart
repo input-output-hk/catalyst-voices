@@ -17,6 +17,7 @@ class CampaignPhaseAware extends StatelessWidget {
   final CampaignPhaseAwareBuilder? active;
   final CampaignPhaseAwareBuilder? post;
   final CampaignPhaseAwareBuilder? orElse;
+
   /// Won't show Error and Loading states if true
   final bool showOnlyDataState;
 
