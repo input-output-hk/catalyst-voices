@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 
 /// The state of available proposals in the voting page.
 class VotingState extends Equatable {
+  final CampaignCategoryDetailsViewModel? selectedCategory;
   final int? fundNumber;
   final VotingPowerViewModel votingPower;
   final VotingPhaseProgressViewModel votingPhase;
@@ -16,6 +17,7 @@ class VotingState extends Equatable {
   final bool isOrderEnabled;
 
   const VotingState({
+    this.selectedCategory,
     this.fundNumber,
     this.votingPower = const VotingPowerViewModel(),
     this.votingPhase = const VotingPhaseProgressViewModel(),
@@ -33,6 +35,7 @@ class VotingState extends Equatable {
 
   @override
   List<Object?> get props => [
+        selectedCategory,
         fundNumber,
         votingPower,
         votingPhase,
@@ -49,6 +52,7 @@ class VotingState extends Equatable {
   }
 
   VotingState copyWith({
+    Optional<CampaignCategoryDetailsViewModel>? selectedCategory,
     Optional<int>? fundNumber,
     VotingPowerViewModel? votingPower,
     VotingPhaseProgressViewModel? votingPhase,
@@ -60,6 +64,7 @@ class VotingState extends Equatable {
     bool? isOrderEnabled,
   }) {
     return VotingState(
+      selectedCategory: selectedCategory.dataOr(this.selectedCategory),
       fundNumber: fundNumber.dataOr(this.fundNumber),
       votingPower: votingPower ?? this.votingPower,
       votingPhase: votingPhase ?? this.votingPhase,
