@@ -37,7 +37,7 @@ async fn queries_test() {
 
     filter_by_type(&docs, doc_type).await;
     filter_all(&docs).await;
-    filter_count(docs.len().try_into().unwrap()).await;
+    filter_count(&docs).await;
 }
 
 fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
