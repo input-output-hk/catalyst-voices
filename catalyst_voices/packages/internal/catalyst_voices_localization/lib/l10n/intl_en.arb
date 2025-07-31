@@ -3363,5 +3363,9 @@
         "type": "int"
       }
     }
+  },
+  "voteList": "Vote List",
+  "@coteList": {
+    "description": "Name of place where user adds votes on proposals"
   }
 }

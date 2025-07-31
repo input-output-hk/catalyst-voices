@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class VotingListHeader extends StatelessWidget {
@@ -28,7 +29,7 @@ class _TitleText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      'Vote List',
+      context.l10n.voteList,
       style: context.textTheme.titleLarge?.copyWith(color: context.colors.textOnPrimaryLevel0),
     );
   }
