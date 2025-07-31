@@ -5,7 +5,6 @@ use std::collections::HashMap;
 
 use catalyst_signed_doc::CatalystSignedDocument;
 
-use super::templates::get_doc_static_template;
 use crate::{
     db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
     service::common::auth::rbac::token::CatalystRBACTokenV1,
@@ -16,11 +15,6 @@ use crate::{
 pub(crate) async fn get_document(
     document_id: &uuid::Uuid, version: Option<&uuid::Uuid>,
 ) -> anyhow::Result<CatalystSignedDocument> {
-    // Find the doc in the static templates first
-    if let Some(doc) = get_doc_static_template(document_id) {
-        return Ok(doc);
-    }
-
     // If doesn't exist in the static templates, try to find it in the database
     let db_doc = FullSignedDoc::retrieve(document_id, version).await?;
     db_doc.raw().try_into()
