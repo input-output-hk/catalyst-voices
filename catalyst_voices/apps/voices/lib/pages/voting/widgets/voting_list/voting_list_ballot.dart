@@ -9,7 +9,7 @@ class VotingListBallot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.only(bottom: 16),
       itemCount: 20,
       itemBuilder: (context, index) {
         return VotingListVoteListTile(

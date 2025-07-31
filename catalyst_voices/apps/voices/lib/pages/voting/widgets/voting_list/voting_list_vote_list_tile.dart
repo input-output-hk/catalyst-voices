@@ -1,26 +1,21 @@
-import 'dart:math';
-
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class VotingListVoteListTile extends StatefulWidget {
+class VotingListVoteListTile extends StatelessWidget {
   const VotingListVoteListTile({super.key});
 
-  @override
-  State<VotingListVoteListTile> createState() => _VotingListVoteListTileState();
-}
-
-class _VotingListVoteListTileState extends State<VotingListVoteListTile> {
   @override
   Widget build(BuildContext context) {
     return VoicesExpansionTile(
       title: _VotingListVoteListTileTitle(),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       tilePadding: const EdgeInsets.all(16),
-      childrenPadding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
+      childrenPadding: const EdgeInsets.only(left: 8, right: 8, bottom: 16),
       backgroundColor: context.colors.elevationsOnSurfaceNeutralLv1Grey,
       initiallyExpanded: true,
       children: [
@@ -72,12 +67,43 @@ class _VotingListVoteListTileVote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final keys = Colors.orange.keys;
-    final key = keys.elementAt(Random(index).nextInt(keys.length));
-
-    return Container(
-      height: 52,
-      color: Colors.orange[key],
+    return InkWell(
+      onTap: () {},
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        constraints: BoxConstraints(minHeight: 52),
+        padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        child: Row(
+          spacing: 32,
+          children: [
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Blockchain-Based Microlending Platform for SMEs',
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      color: context.colors.textOnPrimaryLevel0,
+                    ),
+                  ),
+                  Text(
+                    'Tyler Durden',
+                    style: context.textTheme.bodySmall?.copyWith(
+                      color: context.colors.textOnPrimaryLevel1,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            VoteButton(
+              data: VoteButtonData(draft: VoteTypeDataDraft(type: VoteType.yes)),
+              onSelected: (value) {},
+              isCompact: true,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

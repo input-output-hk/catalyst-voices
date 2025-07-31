@@ -23,6 +23,7 @@ class VotingList extends StatelessWidget {
                 VotingListCampaignPhaseProgress(),
                 SizedBox(height: 16),
                 VotingListUserSummary(),
+                SizedBox(height: 16),
                 Expanded(child: VotingListBallot()),
               ],
             ),
