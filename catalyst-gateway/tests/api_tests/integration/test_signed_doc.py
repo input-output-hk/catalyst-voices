@@ -10,6 +10,8 @@ import cbor2
 import uuid
 
 
+CATEGORY_ID = "0194d490-30bf-7473-81c8-a0eaef369619"
+
 class SignedDocument:
     def __init__(self, metadata: Dict[str, Any], content: Dict[str, Any]):
         self.metadata = metadata
@@ -78,7 +80,6 @@ def proposal_doc_factory(proposal_templates, rbac_chain_factory):
         role_id = RoleID.PROPOSER
         rbac_chain = rbac_chain_factory()
         proposal_doc_id = uuid_v7.uuid_v7()
-        category_id = "0194d490-30bf-7473-81c8-a0eaef369619"
         proposal_metadata_json = {
             "id": proposal_doc_id,
             "ver": proposal_doc_id,
@@ -93,8 +94,8 @@ def proposal_doc_factory(proposal_templates, rbac_chain_factory):
             },
             # referenced to the defined category id, comes from the 'templates/data.rs' file
             "parameters": {
-                "id": category_id,
-                "ver": category_id,
+                "id": CATEGORY_ID,
+                "ver": CATEGORY_ID,
             },
         }
         with open("./test_data/signed_docs/proposal.json", "r") as proposal_json_file:
@@ -138,6 +139,10 @@ def comment_doc_factory(proposal_doc_factory, comment_templates, rbac_chain_fact
                 "id": comment_templates[0],
                 "ver": comment_templates[0],
             },
+            "parameters": {
+                "id": CATEGORY_ID,
+                "ver": CATEGORY_ID,
+            },
         }
         with open("./test_data/signed_docs/comment.json", "r") as comment_json_file:
             comment_json = json.load(comment_json_file)
@@ -175,6 +180,10 @@ def submission_action_factory(proposal_doc_factory, rbac_chain_factory):
             "ref": {
                 "id": proposal_doc.metadata["id"],
                 "ver": proposal_doc.metadata["ver"],
+            },
+            "parameters": {
+                "id": CATEGORY_ID,
+                "ver": CATEGORY_ID,
             },
         }
         with open(
