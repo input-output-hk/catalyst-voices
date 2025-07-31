@@ -31,7 +31,7 @@ class VotingGeneralHeader extends StatelessWidget {
               child: _CatalystFund(),
             ),
             Padding(
-              padding: EdgeInsets.only(top: 6, right: 32),
+              padding: EdgeInsets.only(top: 7, right: 32),
               child: VotingCategoryPickerSelector(),
             ),
           ],
