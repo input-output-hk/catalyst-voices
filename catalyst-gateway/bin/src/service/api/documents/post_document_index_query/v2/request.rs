@@ -174,7 +174,7 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
         if let Some(ids) = value.id {
             let ids = ids
                 .into_iter()
-                .map(|doc_type| doc_type.try_into())
+                .map(TryInto::try_into)
                 .collect::<Result<Vec<_>, _>>()?;
 
             for id in ids {
@@ -184,7 +184,7 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
         if let Some(versions) = value.ver {
             let versions = versions
                 .into_iter()
-                .map(|doc_type| doc_type.try_into())
+                .map(TryInto::try_into)
                 .collect::<Result<Vec<_>, _>>()?;
 
             for ver in versions {
@@ -194,7 +194,7 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
         if let Some(doc_refs) = value.doc_ref {
             let doc_refs = doc_refs
                 .into_iter()
-                .map(|doc_type| doc_type.try_into())
+                .map(TryInto::try_into)
                 .collect::<Result<Vec<_>, _>>()?;
 
             for doc_ref in doc_refs {
@@ -204,7 +204,7 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
         if let Some(templates) = value.template {
             let templates = templates
                 .into_iter()
-                .map(|doc_type| doc_type.try_into())
+                .map(TryInto::try_into)
                 .collect::<Result<Vec<_>, _>>()?;
 
             for template in templates {
@@ -214,23 +214,24 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
         if let Some(replies) = value.reply {
             let replies = replies
                 .into_iter()
-                .map(|doc_type| doc_type.try_into())
+                .map(TryInto::try_into)
                 .collect::<Result<Vec<_>, _>>()?;
 
             for reply in replies {
                 db_filter = db_filter.with_reply(reply);
             }
         }
-        for field in [value.brand, value.campaign, value.category] {
-            if let Some(params) = field {
-                let params = params
-                    .into_iter()
-                    .map(|doc_type| doc_type.try_into())
-                    .collect::<Result<Vec<_>, _>>()?;
+        for params in [value.brand, value.campaign, value.category]
+            .into_iter()
+            .flatten()
+        {
+            let params = params
+                .into_iter()
+                .map(TryInto::try_into)
+                .collect::<Result<Vec<_>, _>>()?;
 
-                for param in params {
-                    db_filter = db_filter.with_parameters(param);
-                }
+            for param in params {
+                db_filter = db_filter.with_parameters(param);
             }
         }
         Ok(db_filter)

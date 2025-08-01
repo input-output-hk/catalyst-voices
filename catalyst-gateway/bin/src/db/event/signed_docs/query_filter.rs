@@ -109,7 +109,7 @@ impl DocsQueryFilter {
 
     /// Set the `metadata->'ref'` field filter condition
     pub fn with_ref(self, arg: DocumentRef) -> Self {
-        let mut doc_ref = self.doc_ref.unwrap_or_else(Vec::new);
+        let mut doc_ref = self.doc_ref.unwrap_or_default();
         doc_ref.push(arg);
 
         DocsQueryFilter {
@@ -120,7 +120,7 @@ impl DocsQueryFilter {
 
     /// Set the `metadata->'template'` field filter condition
     pub fn with_template(self, arg: DocumentRef) -> Self {
-        let mut template = self.template.unwrap_or_else(Vec::new);
+        let mut template = self.template.unwrap_or_default();
         template.push(arg);
 
         DocsQueryFilter {
@@ -131,7 +131,7 @@ impl DocsQueryFilter {
 
     /// Set the `metadata->'reply'` field filter condition
     pub fn with_reply(self, arg: DocumentRef) -> Self {
-        let mut reply = self.reply.unwrap_or_else(Vec::new);
+        let mut reply = self.reply.unwrap_or_default();
         reply.push(arg);
 
         DocsQueryFilter {
@@ -142,7 +142,7 @@ impl DocsQueryFilter {
 
     /// Set the `metadata->'parameters'` field filter condition
     pub fn with_parameters(self, arg: DocumentRef) -> Self {
-        let mut parameters = self.parameters.unwrap_or_else(Vec::new);
+        let mut parameters = self.parameters.unwrap_or_default();
         parameters.push(arg);
 
         DocsQueryFilter {

@@ -18,13 +18,13 @@ impl DocumentRef {
         if let Some(id) = &self.id {
             stmt.push_str(&format!(
                 " AND {}",
-                id.conditional_stmt(&format!("(doc_ref->>'id')::uuid"))
+                id.conditional_stmt("(doc_ref->>'id')::uuid")
             ));
         }
         if let Some(ver) = &self.ver {
             stmt.push_str(&format!(
                 " AND {}",
-                ver.conditional_stmt(&format!("(doc_ref->>'ver')::uuid"))
+                ver.conditional_stmt("(doc_ref->>'ver')::uuid")
             ));
         }
 

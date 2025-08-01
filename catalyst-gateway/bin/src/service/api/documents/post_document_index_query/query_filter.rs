@@ -181,10 +181,11 @@ impl TryFrom<DocumentIndexQueryFilter> for DocsQueryFilter {
         if let Some(reply) = value.reply {
             db_filter = db_filter.with_reply(reply.try_into()?);
         }
-        for field in [value.brand, value.campaign, value.category] {
-            if let Some(brand) = field {
-                db_filter = db_filter.with_parameters(brand.try_into()?);
-            }
+        for param in [value.brand, value.campaign, value.category]
+            .into_iter()
+            .flatten()
+        {
+            db_filter = db_filter.with_parameters(param.try_into()?);
         }
         Ok(db_filter)
     }

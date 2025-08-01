@@ -30,9 +30,7 @@ async fn queries_test() {
         filter_by_field::filter_by_field!(doc, "ref", with_ref);
         filter_by_field::filter_by_field!(doc, "template", with_template);
         filter_by_field::filter_by_field!(doc, "reply", with_reply);
-        filter_by_field::filter_by_field!(doc, "brand_id", with_brand_id);
-        filter_by_field::filter_by_field!(doc, "campaign_id", with_campaign_id);
-        filter_by_field::filter_by_field!(doc, "category_id", with_category_id);
+        filter_by_field::filter_by_field!(doc, "parameters", with_parameters);
     }
 
     filter_by_type(&docs, doc_type).await;
@@ -179,7 +177,7 @@ async fn filter_by_id_and_ver(doc: &FullSignedDoc) {
 }
 
 async fn filter_by_type(docs: &[FullSignedDoc], doc_type: uuid::Uuid) {
-    let filter = DocsQueryFilter::all().with_type(doc_type);
+    let filter = DocsQueryFilter::all().with_type(vec![doc_type]);
     let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
         .await
         .unwrap();
