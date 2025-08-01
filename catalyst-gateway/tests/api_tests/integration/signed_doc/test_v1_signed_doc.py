@@ -248,9 +248,9 @@ def deprecated_proposal(rbac_chain):
         },
     }
     with open("./test_data/signed_docs/proposal.json", "r") as json_file:
-        json = json.load(json_file)
+        content = json.load(json_file)
 
-    doc = SignedDocument(proposal_metadata_json, json)
+    doc = SignedDocument(proposal_metadata_json, content)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
     return (doc.build_and_sign(cat_id, sk_hex, is_deprecated=True), proposal_doc_id)
 
@@ -276,9 +276,9 @@ def deprecated_comment(rbac_chain, proposal_id):
         },
     }
     with open("./test_data/signed_docs/comment.json", "r") as json_file:
-        json = json.load(json_file)
+        content = json.load(json_file)
 
-    doc = SignedDocument(comment_metadata_json, json)
+    doc = SignedDocument(comment_metadata_json, content)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
     return (doc.build_and_sign(cat_id, sk_hex, is_deprecated=True), comment_doc_id)
 
@@ -299,9 +299,9 @@ def deprecated_proposal_submission(rbac_chain, proposal_id):
         },
     }
     with open("./test_data/signed_docs/submission_action.json", "r") as json_file:
-        json = json.load(json_file)
+        content = json.load(json_file)
 
-    doc = SignedDocument(sub_action_metadata_json, json)
+    doc = SignedDocument(sub_action_metadata_json, content)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
     return (
         doc.build_and_sign(cat_id, sk_hex, is_deprecated=True),
