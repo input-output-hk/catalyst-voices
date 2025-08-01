@@ -220,8 +220,8 @@ def test_v1_index_migrated_documents():
             resp.status_code == 200
         ), f"Failed to post document: {resp.status_code} - {resp.text}"
         assert (
-            resp.json == exp_json
-        ), f"Unexpected index of documents which match the query filter, got: {resp.json}, expected: {exp_json}"
+            resp.json() == exp_json
+        ), f"Unexpected index of documents which match the query filter, got: {resp.json()}, expected: {exp_json}"
 
 
 # Trying to submit a deprecated proposal, comment and proposal actions documents
