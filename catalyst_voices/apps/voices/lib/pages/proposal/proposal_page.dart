@@ -19,6 +19,7 @@ import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -140,6 +141,12 @@ class _ProposalPageState extends State<ProposalPage>
       case ViewingOlderVersionSignal():
         VoicesSnackBar.hideCurrent(context);
         ViewingOlderVersionSnackBar(context).show(context);
+      case ViewingOlderVersionWhileVotingSignal():
+        VoicesSnackBar.hideCurrent(context);
+        ViewingOlderVersionSnackBar(
+          context,
+          message: context.l10n.viewingOlderDocumentVersionWhileVoting,
+        ).show(context);
       case ChangeVersionSignal():
         _changeVersion(signal.to);
       case UsernameUpdatedSignal():
