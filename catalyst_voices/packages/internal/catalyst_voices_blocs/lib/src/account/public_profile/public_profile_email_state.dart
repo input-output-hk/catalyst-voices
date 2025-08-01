@@ -6,16 +6,18 @@ final class PublicProfileEmailStatusState extends Equatable {
   final bool isEmailVerified;
   final bool isProposer;
   final bool isVisible;
+  final bool isUnlock;
 
   const PublicProfileEmailStatusState({
     this.email,
     this.isEmailVerified = false,
     this.isProposer = false,
     this.isVisible = false,
+    this.isUnlock = false,
   });
 
   @override
-  List<Object?> get props => [email, isEmailVerified, isProposer, isVisible];
+  List<Object?> get props => [email, isEmailVerified, isProposer, isVisible, isUnlock];
 
   bool get showDiscoveryEmailVerificationBanner {
     if (email == null) {
@@ -32,7 +34,7 @@ final class PublicProfileEmailStatusState extends Equatable {
   }
 
   bool get showProposerEmailVerificationBanner {
-    if (email == null) {
+    if (email != null && isEmailVerified) {
       return false;
     }
     if (isProposer && !isEmailVerified) {
@@ -47,12 +49,14 @@ final class PublicProfileEmailStatusState extends Equatable {
     bool? isEmailVerified,
     bool? isProposer,
     bool? isVisible,
+    bool? isUnlock,
   }) {
     return PublicProfileEmailStatusState(
       email: email?.dataOr(this.email),
       isEmailVerified: isEmailVerified ?? this.isEmailVerified,
       isProposer: isProposer ?? this.isProposer,
       isVisible: isVisible ?? this.isVisible,
+      isUnlock: isUnlock ?? this.isUnlock,
     );
   }
 }
