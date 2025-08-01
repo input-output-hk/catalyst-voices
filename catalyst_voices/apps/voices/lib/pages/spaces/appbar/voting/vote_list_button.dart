@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -14,9 +15,7 @@ class VoteListButton extends StatelessWidget {
         // TODO(dt-iohk): update count
         _getText(context, 10),
       ),
-      onTap: () {
-        // TODO(dt-iohk): handle vote list button
-      },
+      onTap: () => VotingListDrawer.open(context),
     );
   }
 
