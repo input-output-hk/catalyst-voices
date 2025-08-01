@@ -19,8 +19,8 @@ permissions:
   pull-requests: write
 
 env:
-  REPORT_EXT: .gateway.junit-report.xml
-  COVERAGE_EXT: .gateway.coverage.info
+  REPORT_EXT: .junit-report.xml
+  COVERAGE_EXT: .coverage.info
 
 jobs:
   reject:
@@ -65,9 +65,9 @@ jobs:
           # all of these default to true, but feel free to set to
           # "false" if necessary for your workflow
           android: true
-          dotnet: true
-          haskell: true
-          large-packages: true
+          dotnet: false
+          haskell: false
+          large-packages: false
           docker-images: false
           swap-storage: true
 
@@ -119,7 +119,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-reports
+          name: test-reports-gateway
           path: "**/*${{ env.REPORT_EXT }}"
           if-no-files-found: error
           retention-days: 1
@@ -128,7 +128,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: coverage-reports
+          name: coverage-reports-gateway
           path: "**/*${{ env.COVERAGE_EXT }}"
           if-no-files-found: error
           retention-days: 1
