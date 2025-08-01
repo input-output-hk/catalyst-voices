@@ -24,12 +24,15 @@ env:
 
 jobs:
   reject:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install Local Forge
-        id: install-local
-        uses: input-output-hk/catalyst-forge/actions/install-local@ci/v1.10.0
+      - name: Install Forge
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
+        with:
+          enable_caching: "true"
+          version: 0.21.0
       - name: Reject Earthfile
         uses: input-output-hk/catalyst-forge/actions/reject-earthfile@ci/v1.10.0
         with:
