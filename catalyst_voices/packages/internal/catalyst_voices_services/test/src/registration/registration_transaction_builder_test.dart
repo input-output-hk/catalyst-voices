@@ -10,7 +10,7 @@ import 'package:test/test.dart';
 
 void main() {
   group(RegistrationTransactionBuilder, () {
-    late KeyDerivationService keyDerivationService;
+    late Keychain keychain;
 
     setUpAll(() {
       kd.Bip32Ed25519XPublicKeyFactory.instance = _FakeBip32Ed25519XPublicKeyFactory();
@@ -20,14 +20,10 @@ void main() {
     });
 
     setUp(() async {
-      keyDerivationService = _MockKeyDerivationService();
+      keychain = _MockKeychain();
 
-      when(
-        () => keyDerivationService.deriveAccountRoleKeyPair(
-          masterKey: _masterKey,
-          role: AccountRole.voter,
-        ),
-      ).thenAnswer((_) async => _voterKeyPair);
+      when(() => keychain.getRoleKeyPair(role: AccountRole.voter))
+          .thenAnswer((_) async => _voterKeyPair);
     });
 
     test('txInputsHash is calculated from selected utxos, not from all utxos', () async {
@@ -58,8 +54,7 @@ void main() {
 
       final transactionBuilder = RegistrationTransactionBuilder(
         transactionConfig: _defaultTransactionBuilderConfig,
-        keyDerivationService: keyDerivationService,
-        masterKey: _masterKey,
+        keychain: keychain,
         networkId: NetworkId.testnet,
         slotNumberTtl: const SlotBigNum(100000),
         roles: {const RegistrationTransactionRole.set(AccountRole.voter)},
@@ -125,8 +120,7 @@ void main() {
       // When
       final transactionBuilder = RegistrationTransactionBuilder(
         transactionConfig: _defaultTransactionBuilderConfig,
-        keyDerivationService: keyDerivationService,
-        masterKey: _masterKey,
+        keychain: keychain,
         networkId: NetworkId.testnet,
         slotNumberTtl: const SlotBigNum(100000),
         roles: {const RegistrationTransactionRole.set(AccountRole.voter)},
@@ -195,8 +189,7 @@ void main() {
       // When
       final transactionBuilder = RegistrationTransactionBuilder(
         transactionConfig: _defaultTransactionBuilderConfig,
-        keyDerivationService: keyDerivationService,
-        masterKey: _masterKey,
+        keychain: keychain,
         networkId: NetworkId.testnet,
         slotNumberTtl: const SlotBigNum(100000),
         roles: {const RegistrationTransactionRole.set(AccountRole.voter)},
@@ -250,9 +243,6 @@ final _changeAddress = ShelleyAddress.fromBech32(
   'addr_test1vzpwq95z3xyum8vqndgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
   /* cSpell:enable */
 );
-
-final _masterKey = _FakeCatalystPrivateKey(bytes: _masterKeyBytes);
-final _masterKeyBytes = Uint8List.fromList(List.filled(96, 0));
 
 final _rewardAddress = ShelleyAddress.fromBech32(
   /* cSpell:disable */
@@ -391,4 +381,4 @@ final class _FakeCompressor implements CatalystCompressor {
   Future<List<int>> decompress(List<int> bytes) async => bytes;
 }
 
-class _MockKeyDerivationService extends Mock implements KeyDerivationService {}
+class _MockKeychain extends Mock implements Keychain {}

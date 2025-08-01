@@ -6,7 +6,6 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
     show Ed25519PublicKey;
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
 import 'package:catalyst_voices_services/src/registration/registration_transaction_role.dart';
 import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy.dart';
 import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy_bytes.dart';
@@ -26,11 +25,8 @@ final class RegistrationTransactionBuilder {
   /// The transaction config with current network parameters.
   final TransactionBuilderConfig transactionConfig;
 
-  /// The algorithm for deriving keys.
-  final KeyDerivationService keyDerivationService;
-
-  /// The master key derived from the seed phrase.
-  final CatalystPrivateKey masterKey;
+  /// The keychain which holds the master key derived from the seed phrase.
+  final Keychain keychain;
 
   /// The network ID where the transaction will be submitted.
   final NetworkId networkId;
@@ -59,8 +55,7 @@ final class RegistrationTransactionBuilder {
 
   RegistrationTransactionBuilder({
     required this.transactionConfig,
-    required this.keyDerivationService,
-    required this.masterKey,
+    required this.keychain,
     required this.networkId,
     required this.slotNumberTtl,
     required this.roles,
@@ -68,11 +63,7 @@ final class RegistrationTransactionBuilder {
     required this.rewardAddresses,
     required this.utxos,
     required this.previousTransactionId,
-  })  : assert(
-          masterKey.algorithm == CatalystSignatureAlgorithm.ed25519,
-          'RegistrationTransaction requires Ed25519 signatures',
-        ),
-        assert(
+  }) : assert(
           roles.isFirstRegistration || previousTransactionId != null,
           "When it's not a first registration then "
           'previousTransactionId must be provided',
@@ -103,10 +94,7 @@ final class RegistrationTransactionBuilder {
       throw const RegistrationInsufficientBalanceException();
     }
 
-    final rootKeyPair = keyDerivationService.deriveAccountRoleKeyPair(
-      masterKey: masterKey,
-      role: AccountRole.root,
-    );
+    final rootKeyPair = keychain.getRoleKeyPair(role: AccountRole.root);
 
     return rootKeyPair.use(_buildTransaction);
   }
@@ -142,19 +130,13 @@ final class RegistrationTransactionBuilder {
   }
 
   Future<cs.Ed25519PublicKey> _deriveDrepPublicKey() {
-    final keyPair = keyDerivationService.deriveAccountRoleKeyPair(
-      masterKey: masterKey,
-      role: AccountRole.drep,
-    );
+    final keyPair = keychain.getRoleKeyPair(role: AccountRole.drep);
 
     return keyPair.use((keyPair) => keyPair.publicKey.toEd25519());
   }
 
   Future<cs.Ed25519PublicKey> _deriveProposerPublicKey() {
-    final keyPair = keyDerivationService.deriveAccountRoleKeyPair(
-      masterKey: masterKey,
-      role: AccountRole.proposer,
-    );
+    final keyPair = keychain.getRoleKeyPair(role: AccountRole.proposer);
 
     return keyPair.use((keyPair) => keyPair.publicKey.toEd25519());
   }
