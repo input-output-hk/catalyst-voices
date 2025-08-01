@@ -1,5 +1,5 @@
 {
-  "url": "https://gateway.preprod.projectcatalyst.io/api/v1/config/frontend",
+  "url": "https://app.preprod.projectcatalyst.io/api/gateway/v1/config/frontend",
   "timeout": 10,
   "api_key_env": "API_KEY"
 }

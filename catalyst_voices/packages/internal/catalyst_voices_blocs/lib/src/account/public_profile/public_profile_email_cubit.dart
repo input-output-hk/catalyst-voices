@@ -5,6 +5,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
+/// Manages the email status of the active account.
 final class PublicProfileEmailStatusCubit extends Cubit<PublicProfileEmailStatusState> {
   final _logger = Logger('PublicProfileEmailStatusCubit');
   final UserService _userService;

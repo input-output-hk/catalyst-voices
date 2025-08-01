@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT ../ AS repo-ci
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.4.4 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.4.7 AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
@@ -98,6 +98,12 @@ check-package-publishing:
 check-license:
     FROM +builder
     RUN melos run license-check
+
+generate-internal-docs:
+    FROM +code-generator
+    RUN melos docs-generate
+    
+    SAVE ARTIFACT docs/dartdoc AS LOCAL docs/dartdoc
 
 # Run unit tests
 test-unit-native:

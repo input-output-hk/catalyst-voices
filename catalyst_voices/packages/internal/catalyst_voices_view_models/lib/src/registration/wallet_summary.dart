@@ -1,6 +1,11 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:equatable/equatable.dart';
 
+/// Data class representing a wallet summary.
+///
+/// This class is used to store information about a wallet summary,
+/// including the wallet name, balance, address, clipboard address,
+/// show low balance, and show expected network id.
 final class WalletSummaryData extends Equatable {
   final String walletName;
   final String balance;

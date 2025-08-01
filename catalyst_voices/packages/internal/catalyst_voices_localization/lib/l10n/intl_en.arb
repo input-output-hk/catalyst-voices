@@ -586,6 +586,15 @@
   "@createKeychainSeedPhraseCheckSubtitle": {
     "description": "Subtitle prompting user to input their seed phrase for verification"
   },
+  "registrationAssetNameTooLong": "UTxO asset name too long. \n{names}",
+  "@registrationAssetNameTooLong": {
+    "description": "Error message selected UTxO name is too long.",
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
   "createKeychainSeedPhraseCheckSuccessNextStep": "Now let's set your Unlock password for this device!",
   "@createKeychainSeedPhraseCheckSuccessNextStep": {
     "description": "Prompt to set device unlock password"
@@ -673,7 +682,7 @@
   "@createProfileInstructionsEmailRequest": {
     "description": "Request to provide email address"
   },
-  "createProfileInstructionsMessage": "In the following account creation steps we will:\n\n1. Setup your profile\n2. Create your Catalyst Keychain\n3. Link Cardano wallet & roles\n\nTo ensure a smooth experience, completing your account setup in one session is essential—stay focused and avoid interruptions to finalize everything efficiently.",
+  "createProfileInstructionsMessage": "In the following account creation steps we will:\n\n1. Setup your profile\n2. Create your Catalyst Keychain\n3. Link Cardano wallet & roles\n\nTo ensure a smooth experience, completing your account setup in one session is essential—stay focused and avoid interruptions to finalize everything efficiently. Make sure your Cardano wallet has at least {amount} ADA before continuing.",
   "@createProfileInstructionsMessage": {
     "description": "Information about account creation steps"
   },
@@ -772,12 +781,22 @@
   "@currentCampaignDescription": {
     "description": "Description of current campaign purpose"
   },
-  "currentlySupportedWallets": "We currently support the following wallets:",
-  "@currentlySupportedWallets": {
-    "description": "Text to show currently supported wallets"
+  "fund14ProposalSubmissionNotice": "Fund14 Proposal Submission Notice",
+  "@fund14ProposalSubmissionNotice": {
+    "description": "Link to the Fund14 Proposal Submission Notice"
   },
-  "dateAtTime": "{date} at {time}",
-  "@dateAtTime": {
+  "createProfileDrepApprovalContingency": "I understand that for my proposal to move to Community Review and/or Voting and be eligible for funding, the Project Catalyst budget proposal must first be approved by the Cardano DReps, as detailed in the {fund14ProposalSubmissionNotice}. If the budget is not approved, my proposal will not move forward and no funding will be provided.",
+  "@createProfileDrepApprovalContingency": {
+    "description": "Text acknowledging that the user is aware of the Drep Approval Contingency",
+    "placeholders": {
+      "fund14ProposalSubmissionNotice": {
+        "type": "String"
+      }
+    }
+  },
+  "createProfileAcknowledgementsTosAndPrivacyPolicy": "I agree to the {tos} & {privacy_policy}.",
+  "@createProfileAcknowledgementsTosAndPrivacyPolicy": {
+    "description": "Text acknowledging that the user has read and agreed to the Catalyst FC's Privacy Policy",
     "placeholders": {
       "date": {
         "type": "String"
@@ -3613,6 +3632,114 @@
       }
     }
   },
+  "catalystAppClosed": "The Catalyst app is closed.",
+  "@catalystAppClosed": {
+    "description": "Text shown when Catalyst app is closed"
+  },
+  "browseProposalsOnProjectCatalyst": "Please browse other Catalyst Fund14 proposals on ProjectCatalyst.io",
+  "@browseProposalsOnProjectCatalyst": {
+    "description": "Text shown when Catalyst app is closed"
+  },
+  "browseFund14Proposals": "Browse Fund14 proposals",
+  "@browseFund14Proposals": {
+    "description": "Text shown when Catalyst app is closed"
+  },
+  "headsUpTitle": "Heads Up",
+  "@headsUpTitle": {
+    "description": "Text to tell user that something important is happening"
+  },
+  "walletLinkTransactionSign": "Sign transaction with wallet",
+  "@walletLinkTransactionSign": {
+    "description": "The primary button label to sign a transaction on transaction summary screen."
+  },
+  "walletLinkTransactionSubheader": "Sign your Catalyst roles to the\nCardano mainnet",
+  "@walletLinkTransactionSubheader": {
+    "description": "A subheader in link wallet flow in registration for RBAC transaction."
+  },
+  "walletLinkTransactionSubtitle": "To complete this action, you'll submit a signed transaction to Cardano. There will be an ADA transaction fee.",
+  "@walletLinkTransactionSubtitle": {
+    "description": "A subtitle in link wallet flow on transaction screen."
+  },
+  "walletLinkTransactionTitle": "Let's make sure everything looks right.",
+  "@walletLinkTransactionTitle": {
+    "description": "A title in link wallet flow on transaction screen."
+  },
+  "walletLinkWalletDetailsContent": "{wallet} connected successfully!",
+  "@walletLinkWalletDetailsContent": {
+    "description": "A message in link wallet flow on wallet details screen.",
+    "placeholders": {
+      "wallet": {
+        "type": "String"
+      }
+    }
+  },
+  "walletLinkWalletDetailsLowBalanceHeadsUpText": "Please ensure your Cardano wallet has at least {amount} ADA before continuing.",
+  "@walletLinkWalletDetailsLowBalanceHeadsUpText": {
+    "description": "A heads up content explaining that the user needs to have some ada for registration.",
+    "placeholders": {
+      "amount": {
+        "type": "double",
+        "format": "compact"
+      }
+    }
+  },
+  "walletLinkWalletDetailsNotice": "To calculate voting power, Catalyst reads your wallet balance from the blockchain. ",
+  "@walletLinkWalletDetailsNotice": {
+    "description": "A message in link wallet flow on wallet details screen explaining why Catalyst reads user wallet balance."
+  },
+  "walletLinkWalletDetailsTitle": "Cardano wallet detection",
+  "@walletLinkWalletDetailsTitle": {
+    "description": "A title in link wallet flow on wallet details screen."
+  },
+  "walletLinkWalletSubheader": "Link your Cardano wallet",
+  "@walletLinkWalletSubheader": {
+    "description": "A subheader in link wallet flow in registration for wallet connection."
+  },
+  "wantToBackUpProposals": "Want to back up your proposals?",
+  "@wantToBackUpProposals": {
+    "description": "Title for section informing user that they can backup their proposals"
+  },
+  "warning": "Warning",
+  "@warning": {
+    "description": "Generic warning label text"
+  },
+  "weakPasswordStrength": "Weak password strength",
+  "@weakPasswordStrength": {
+    "description": "Describes a password that is weak"
+  },
+  "weekOf": "Week of",
+  "@weekOf": {
+    "description": "Label prefix for specifying a particular week"
+  },
+  "workspaceProposalNavigationSegments": "Segments",
+  "@workspaceProposalNavigationSegments": {
+    "description": "Tab name in proposal setup panel"
+  },
+  "wrongBrowserDescription": "Please launch the browser with your wallets extension and revisit Catalyst.",
+  "@wrongBrowserDescription": {
+    "description": "Description for wrong browser reason to not find wallet"
+  },
+  "wrongBrowserTitle": "Wrong Browser",
+  "@wrongBrowserTitle": {
+    "description": "Title for wrong browser reason to not find wallet"
+  },
+  "xCharactersMinimum": "{number} characters minimum length",
+  "@xCharactersMinimum": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "milestoneGuidelinesLink": "Important: Read the [milestone guidelines]({link}) before proceeding.",
+  "@milestoneGuidelinesLink": {
+    "description": "Helper text for milestone cost field",
+    "placeholders": {
+      "link": {
+        "type": "String"
+      }
+    }
+  },
   "walletLinkTransactionSign": "Sign transaction with wallet",
   "@walletLinkTransactionSign": {
     "description": "The primary button label to sign a transaction on transaction summary screen."
@@ -3711,5 +3838,21 @@
   "yourNextStep": "Your next step",
   "@yourNextStep": {
     "description": "Generic header for next step instructions"
+  },
+  "catalystAppClosed": "The Catalyst app is closed.",
+  "@catalystAppClosed": {
+    "description": "Text shown when Catalyst app is closed"
+  },
+  "browseProposalsOnProjectCatalyst": "Please browse other Catalyst Fund14 proposals on ProjectCatalyst.io",
+  "@browseProposalsOnProjectCatalyst": {
+    "description": "Text shown when Catalyst app is closed"
+  },
+  "browseFund14Proposals": "Browse Fund14 proposals",
+  "@browseFund14Proposals": {
+    "description": "Text shown when Catalyst app is closed"
+  },
+  "headsUpTitle": "Heads Up",
+  "@headsUpTitle": {
+    "description": "Text to tell user that something important is happening"
   }
 }

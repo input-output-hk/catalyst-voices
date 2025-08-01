@@ -423,10 +423,7 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
             segments: data,
             activeSectionId: activeSectionId,
           )
-        : state.copyWith(
-            segments: data,
-            activeSectionId: Optional(activeSectionId),
-          );
+        : state.updateSegments(data).copyWith(activeSectionId: Optional(activeSectionId));
 
     _segmentsController.value = newState;
   }

@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/database/table/documents.dart' show Documents;
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:drift/drift.dart';
@@ -161,6 +162,7 @@ extension on NodeId {
   String get asPath => '\$.$value';
 }
 
+/// Extension allowing extraction of commonly used values from [DocumentDataContent] in a type-safe way.
 extension ContentColumnExt on GeneratedColumnWithTypeConverter<DocumentDataContent, Uint8List> {
   Expression<int> get requestedFunds => jsonExtract(ProposalDocument.requestedFundsNodeId.asPath);
 
@@ -169,6 +171,7 @@ extension ContentColumnExt on GeneratedColumnWithTypeConverter<DocumentDataConte
   Expression<bool> hasTitle(String query) => ContainsTitle(query: query);
 }
 
+/// Extension allowing extraction of commonly used values from [Documents] table in a type-safe way.
 extension DocumentTableExt on $DocumentsTable {
   Expression<bool> search(String query) {
     return Expression.or(
@@ -180,6 +183,7 @@ extension DocumentTableExt on $DocumentsTable {
   }
 }
 
+/// Extension allowing extraction of commonly used values from [DocumentDataMetadata] in a type-safe way.
 extension MetadataColumnExt on GeneratedColumnWithTypeConverter<DocumentDataMetadata, Uint8List> {
   List<Expression<bool>> hasAuthorName(String name) {
     return [
