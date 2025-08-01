@@ -1,59 +1,37 @@
-//! Document Index Query
+//! Document Index Query V2
+
+pub(crate) mod request;
+pub(crate) mod response;
 
 use std::collections::HashMap;
 
-use catalyst_signed_doc::CatalystSignedDocument;
 use futures::TryStreamExt;
-use poem_openapi::{payload::Json, ApiResponse};
-use query_filter::DocumentIndexQueryFilter;
-use response::{
-    DocumentIndexList, DocumentIndexListDocumented, IndexedDocument, IndexedDocumentDocumented,
-};
+use poem_openapi::payload::Json;
 
-use super::{Limit, Page};
+use super::{AllResponses, Limit, Page, Responses};
 use crate::{
     db::event::{
         common::query_limits::QueryLimits,
-        signed_docs::{DocsQueryFilter, FullSignedDoc, SignedDocBody},
+        signed_docs::{DocsQueryFilter, SignedDocBody},
     },
-    service::common::{
-        objects::generic::pagination::CurrentPage,
-        responses::WithErrorResponses,
-        types::{document::id::DocumentId, generic::query::pagination::Remaining},
+    service::{
+        api::documents::post_document_index_query::v2::{
+            request::DocumentIndexQueryFilterV2,
+            response::{
+                DocumentIndexListDocumentedV2, DocumentIndexListV2, IndexedDocumentDocumentedV2,
+                IndexedDocumentV2,
+            },
+        },
+        common::{
+            objects::generic::pagination::CurrentPage,
+            types::{document::id::DocumentId, generic::query::pagination::Remaining},
+        },
     },
 };
 
-pub(crate) mod query_filter;
-pub(crate) mod response;
-pub(crate) mod v2;
-
-/// Endpoint responses.
-#[derive(ApiResponse)]
-#[allow(dead_code)]
-pub(crate) enum Responses {
-    /// ## OK
-    ///
-    /// The Index of documents which match the query filter.
-    #[oai(status = 200)]
-    Ok(Json<DocumentIndexListDocumented>),
-    /// ## OK
-    ///
-    /// The Index of documents which match the query filter.
-    #[oai(status = 200)]
-    OkV2(Json<v2::response::DocumentIndexListDocumentedV2>),
-    /// ## Not Found
-    ///
-    /// No documents were found which match the query filter.
-    #[oai(status = 404)]
-    NotFound,
-}
-
-/// All responses.
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
-
-/// # POST `/v1/document/index`
-pub(crate) async fn endpoint(
-    filter: DocumentIndexQueryFilter, page: Option<Page>, limit: Option<Limit>,
+/// # POST `/v2/document/index`
+pub(crate) async fn endpoint_v2(
+    filter: DocumentIndexQueryFilterV2, page: Option<Page>, limit: Option<Limit>,
 ) -> AllResponses {
     let query_limits = QueryLimits::new(limit, page);
     let conditions = match filter.try_into() {
@@ -62,7 +40,7 @@ pub(crate) async fn endpoint(
     };
 
     let (fetched_docs, total_doc_count) = tokio::join!(
-        fetch_docs(&conditions, &query_limits),
+        fetch_docs_v2(&conditions, &query_limits),
         SignedDocBody::retrieve_count(&conditions)
     );
 
@@ -86,7 +64,7 @@ pub(crate) async fn endpoint(
         Ok((docs, doc_count)) => {
             let remaining = Remaining::calculate(page.into(), limit.into(), total, doc_count);
 
-            Responses::Ok(Json(DocumentIndexListDocumented(DocumentIndexList {
+            Responses::OkV2(Json(DocumentIndexListDocumentedV2(DocumentIndexListV2 {
                 docs: docs.into(),
                 page: CurrentPage {
                     page,
@@ -102,10 +80,10 @@ pub(crate) async fn endpoint(
 }
 
 /// Fetch documents from the event db
-async fn fetch_docs(
+async fn fetch_docs_v2(
     conditions: &DocsQueryFilter, query_limits: &QueryLimits,
-) -> anyhow::Result<(Vec<IndexedDocumentDocumented>, u32)> {
-    let docs_stream = FullSignedDoc::retrieve_conditions(conditions, query_limits).await?;
+) -> anyhow::Result<(Vec<IndexedDocumentDocumentedV2>, u32)> {
+    let docs_stream = SignedDocBody::retrieve(conditions, query_limits).await?;
 
     let (indexed_docs, total_fetched_doc_count) = docs_stream
         .try_fold(
@@ -127,21 +105,13 @@ async fn fetch_docs(
     let docs = indexed_docs
         .into_iter()
         .map(|(id, docs)| -> anyhow::Result<_> {
-            // filter for only deprecated signed docs
-            let mut deprecated_docs = vec![];
-            for doc in docs {
-                if CatalystSignedDocument::try_from(doc.raw())?.is_deprecated()? {
-                    deprecated_docs.push(doc);
-                }
-            }
-
-            let ver = deprecated_docs
+            let ver = docs
                 .into_iter()
                 .map(TryInto::try_into)
                 .collect::<Result<Vec<_>, _>>()?
                 .into();
 
-            Ok(IndexedDocumentDocumented(IndexedDocument {
+            Ok(IndexedDocumentDocumentedV2(IndexedDocumentV2 {
                 doc_id: DocumentId::new_unchecked(id.to_string()),
                 ver,
             }))

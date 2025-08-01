@@ -1,4 +1,4 @@
-//! Catalyst Singed Document Request Filter Query Object
+//! Catalyst Singed Document Request Filter Query Object V2
 
 use poem_openapi::{types::Example, NewType, Object};
 
@@ -18,7 +18,7 @@ use crate::{
 #[allow(clippy::doc_markdown)]
 #[derive(Object, Default)]
 #[oai(example = true)]
-pub(crate) struct DocumentIndexQueryFilter {
+pub(crate) struct DocumentIndexQueryFilterV2 {
     /// ## Signed Document Type.  
     ///
     /// The document type must match one of the
@@ -26,19 +26,19 @@ pub(crate) struct DocumentIndexQueryFilter {
     ///
     /// UUIDv4 Formatted 128bit value.
     #[oai(rename = "type", skip_serializing_if_is_none)]
-    doc_type: Option<DocumentType>,
+    doc_type: Option<Vec<DocumentType>>,
     /// ## Document ID
     ///
     /// Either an absolute single Document ID or a range of
     /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
     #[oai(skip_serializing_if_is_none)]
-    id: Option<EqOrRangedIdDocumented>,
+    id: Option<Vec<EqOrRangedIdDocumented>>,
     /// ## Document Version
     ///
     /// Either an absolute single Document Version or a range of
     /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
     #[oai(skip_serializing_if_is_none)]
-    ver: Option<EqOrRangedVerDocumented>,
+    ver: Option<Vec<EqOrRangedVerDocumented>>,
     /// ## Document Reference
     ///
     /// A [reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#ref-document-reference)
@@ -50,7 +50,7 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// The kind of document that the reference refers to is defined by the
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
     #[oai(rename = "ref", skip_serializing_if_is_none)]
-    doc_ref: Option<IdAndVerRefDocumented>,
+    doc_ref: Option<Vec<IdAndVerRefDocumented>>,
     /// ## Document Template
     ///
     /// Documents that are created based on a template include the
@@ -65,7 +65,7 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// however, it will always be a template type document that matches the document
     /// itself.
     #[oai(skip_serializing_if_is_none)]
-    template: Option<IdAndVerRefDocumented>,
+    template: Option<Vec<IdAndVerRefDocumented>>,
     /// ## Document Reply
     ///
     /// This is a
@@ -80,7 +80,7 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// The kind of document that the reference refers to is defined by the
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
-    reply: Option<IdAndVerRefDocumented>,
+    reply: Option<Vec<IdAndVerRefDocumented>>,
     /// ## Brand
     ///
     /// This is a
@@ -94,7 +94,7 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// Whether a Document Type has a brand reference is defined by its
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
-    brand: Option<IdAndVerRefDocumented>,
+    brand: Option<Vec<IdAndVerRefDocumented>>,
     /// ## Campaign
     ///
     /// This is a
@@ -108,7 +108,7 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// Whether a Document Type has a campaign reference is defined by its
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
-    campaign: Option<IdAndVerRefDocumented>,
+    campaign: Option<Vec<IdAndVerRefDocumented>>,
     /// ## Category
     ///
     /// This is a
@@ -122,18 +122,18 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// Whether a Document Type has a category reference is defined by its
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
-    category: Option<IdAndVerRefDocumented>,
+    category: Option<Vec<IdAndVerRefDocumented>>,
 }
 
-impl Example for DocumentIndexQueryFilter {
+impl Example for DocumentIndexQueryFilterV2 {
     fn example() -> Self {
         Self {
-            doc_type: Some(DocumentType::example()),
-            id: Some(EqOrRangedIdDocumented::example()),
-            ver: Some(EqOrRangedVerDocumented::example()),
-            doc_ref: Some(IdAndVerRefDocumented::example_id_ref()),
-            template: Some(IdAndVerRefDocumented::example_id_and_ver_ref()),
-            reply: Some(IdAndVerRefDocumented::example()),
+            doc_type: Some(vec![DocumentType::example()]),
+            id: Some(vec![EqOrRangedIdDocumented::example()]),
+            ver: Some(vec![EqOrRangedVerDocumented::example()]),
+            doc_ref: Some(vec![IdAndVerRefDocumented::example_id_ref()]),
+            template: Some(vec![IdAndVerRefDocumented::example_id_and_ver_ref()]),
+            reply: Some(vec![IdAndVerRefDocumented::example()]),
             ..Default::default()
         }
     }
@@ -156,43 +156,90 @@ impl Example for DocumentIndexQueryFilter {
 /// Fields which are not set, are not used to filter documents based on those metadata
 /// fields. This is equivalent to returning documents where those metadata fields either
 /// do not exist, or do exist, but have any value.
-pub(crate) struct DocumentIndexQueryFilterBody(pub(crate) DocumentIndexQueryFilter);
+pub(crate) struct DocumentIndexQueryFilterBodyV2(pub(crate) DocumentIndexQueryFilterV2);
 
-impl TryFrom<DocumentIndexQueryFilter> for DocsQueryFilter {
+impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
     type Error = anyhow::Error;
 
-    fn try_from(value: DocumentIndexQueryFilter) -> Result<Self, Self::Error> {
+    fn try_from(value: DocumentIndexQueryFilterV2) -> Result<Self, Self::Error> {
         let mut db_filter = DocsQueryFilter::all();
         if let Some(doc_type) = value.doc_type {
-            db_filter = db_filter.with_type(vec![doc_type.parse()?]);
+            db_filter = db_filter.with_type(
+                doc_type
+                    .into_iter()
+                    .map(|doc_type| doc_type.parse())
+                    .collect::<Result<Vec<_>, _>>()?,
+            );
         }
-        if let Some(id) = value.id {
-            db_filter = db_filter.with_id(id.try_into()?);
+        if let Some(ids) = value.id {
+            let ids = ids
+                .into_iter()
+                .map(TryInto::try_into)
+                .collect::<Result<Vec<_>, _>>()?;
+
+            for id in ids {
+                db_filter = db_filter.with_id(id);
+            }
         }
-        if let Some(ver) = value.ver {
-            db_filter = db_filter.with_ver(ver.try_into()?);
+        if let Some(versions) = value.ver {
+            let versions = versions
+                .into_iter()
+                .map(TryInto::try_into)
+                .collect::<Result<Vec<_>, _>>()?;
+
+            for ver in versions {
+                db_filter = db_filter.with_ver(ver);
+            }
         }
-        if let Some(doc_ref) = value.doc_ref {
-            db_filter = db_filter.with_ref(doc_ref.try_into()?);
+        if let Some(doc_refs) = value.doc_ref {
+            let doc_refs = doc_refs
+                .into_iter()
+                .map(TryInto::try_into)
+                .collect::<Result<Vec<_>, _>>()?;
+
+            for doc_ref in doc_refs {
+                db_filter = db_filter.with_ref(doc_ref);
+            }
         }
-        if let Some(template) = value.template {
-            db_filter = db_filter.with_template(template.try_into()?);
+        if let Some(templates) = value.template {
+            let templates = templates
+                .into_iter()
+                .map(TryInto::try_into)
+                .collect::<Result<Vec<_>, _>>()?;
+
+            for template in templates {
+                db_filter = db_filter.with_template(template);
+            }
         }
-        if let Some(reply) = value.reply {
-            db_filter = db_filter.with_reply(reply.try_into()?);
+        if let Some(replies) = value.reply {
+            let replies = replies
+                .into_iter()
+                .map(TryInto::try_into)
+                .collect::<Result<Vec<_>, _>>()?;
+
+            for reply in replies {
+                db_filter = db_filter.with_reply(reply);
+            }
         }
-        for param in [value.brand, value.campaign, value.category]
+        for params in [value.brand, value.campaign, value.category]
             .into_iter()
             .flatten()
         {
-            db_filter = db_filter.with_parameters(param.try_into()?);
+            let params = params
+                .into_iter()
+                .map(TryInto::try_into)
+                .collect::<Result<Vec<_>, _>>()?;
+
+            for param in params {
+                db_filter = db_filter.with_parameters(param);
+            }
         }
         Ok(db_filter)
     }
 }
 
-impl Example for DocumentIndexQueryFilterBody {
+impl Example for DocumentIndexQueryFilterBodyV2 {
     fn example() -> Self {
-        Self(DocumentIndexQueryFilter::example())
+        Self(DocumentIndexQueryFilterV2::example())
     }
 }
