@@ -359,7 +359,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       isVotingStage: isVotingStage,
       hasActiveAccount: hasActiveAccount,
       isLatestVersion: isLatestVersion,
-      isFinal: version?.isLatest ?? false,
+      isFinal: proposal.publish.isPublished,
       proposalRef: proposal.document.metadata.selfRef,
     );
 
