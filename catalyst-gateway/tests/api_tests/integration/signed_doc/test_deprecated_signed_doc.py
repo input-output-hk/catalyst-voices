@@ -197,8 +197,8 @@ def test_get_migrated_and_f14_documents():
             resp.status_code == 200
         ), f"Failed to get document: {resp.status_code} - {resp.text}"
         assert (
-            resp.text == doc_cbor
-        ), f"Unexpected document cbor bytes, got: {resp.text}, expected: {doc_cbor}"
+            resp.content.hex() == doc_cbor
+        ), f"Unexpected document cbor bytes for {doc_id}"
 
 
 # Querying documents using POST `/v1/document/index` endpoint.
@@ -224,13 +224,12 @@ def test_v1_index_migrated_documents():
         ), f"Unexpected index of documents which match the query filter, got: {resp.json}, expected: {exp_json}"
 
 
-# Trying to submit a deprecated proposal document via
+# Trying to submit a deprecated proposal, comment and proposal actions documents
 @pytest.mark.preprod_indexing
-def test_put_deprecated_proposal(proposal_templates, rbac_chain_factory):
+def test_put_deprecated_documents(rbac_chain_factory):
     role_id = RoleID.PROPOSER
     rbac_chain = rbac_chain_factory()
     proposal_doc_id = uuid_v7.uuid_v7()
-    category_id = "0194d490-30bf-7473-81c8-a0eaef369619"
     proposal_metadata_json = {
         "id": proposal_doc_id,
         "ver": proposal_doc_id,
@@ -238,15 +237,15 @@ def test_put_deprecated_proposal(proposal_templates, rbac_chain_factory):
         "type": "7808d2ba-d511-40af-84e8-c0d1625fdfdc",
         "content-type": "application/json",
         "content-encoding": "br",
-        # referenced to the defined proposal template id, comes from the 'templates/data.rs' file
+        # Fund 14 proposal template, defined in `V3__signed_documents.sql`
         "template": {
-            "id": proposal_templates[0],
-            "ver": proposal_templates[0],
+            "id": "0194d492-1daa-75b5-b4a4-5cf331cd8d1a",
+            "ver": "0194d492-1daa-75b5-b4a4-5cf331cd8d1a",
         },
-        # referenced to the defined category id, comes from the 'templates/data.rs' file
+        # Fund 14 category, defined in `V3__signed_documents.sql`
         "parameters": {
-            "id": category_id,
-            "ver": category_id,
+            "id": "0194d490-30bf-7473-81c8-a0eaef369619",
+            "ver": "0194d490-30bf-7473-81c8-a0eaef369619",
         },
     }
     with open("./test_data/signed_docs/proposal.json", "r") as proposal_json_file:
