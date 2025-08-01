@@ -11,13 +11,13 @@ use crate::{
     settings::Settings,
 };
 
-/// Get document from the database
-pub(crate) async fn get_document(
+/// Get document cbor bytes from the database
+pub(crate) async fn get_document_cbor_bytes(
     document_id: &uuid::Uuid, version: Option<&uuid::Uuid>,
-) -> anyhow::Result<CatalystSignedDocument> {
+) -> anyhow::Result<Vec<u8>> {
     // If doesn't exist in the static templates, try to find it in the database
     let db_doc = FullSignedDoc::retrieve(document_id, version).await?;
-    db_doc.raw().try_into()
+    Ok(db_doc.raw().to_vec())
 }
 
 /// A struct which implements a
@@ -30,8 +30,8 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         let id = doc_ref.id().uuid();
         let ver = doc_ref.ver().uuid();
-        match get_document(&id, Some(&ver)).await {
-            Ok(doc) => Ok(Some(doc)),
+        match get_document_cbor_bytes(&id, Some(&ver)).await {
+            Ok(doc_cbor_bytes) => Ok(Some(doc_cbor_bytes.as_slice().try_into()?)),
             Err(err) if err.is::<NotFoundError>() => Ok(None),
             Err(err) => Err(err),
         }
@@ -45,6 +45,32 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
     fn past_threshold(&self) -> Option<std::time::Duration> {
         let signed_doc_cfg = Settings::signed_doc_cfg();
         Some(signed_doc_cfg.past_threshold())
+    }
+}
+
+impl catalyst_signed_doc_v1::providers::CatalystSignedDocumentProvider for DocProvider {
+    async fn try_get_doc(
+        &self, doc_ref: &catalyst_signed_doc_v1::DocumentRef,
+    ) -> anyhow::Result<Option<catalyst_signed_doc_v1::CatalystSignedDocument>> {
+        let id = doc_ref.id.uuid();
+        let ver = doc_ref.ver.uuid();
+        match get_document_cbor_bytes(&id, Some(&ver)).await {
+            Ok(doc_cbor_bytes) => Ok(Some(doc_cbor_bytes.as_slice().try_into()?)),
+            Err(err) if err.is::<NotFoundError>() => Ok(None),
+            Err(err) => Err(err),
+        }
+    }
+
+    fn future_threshold(&self) -> Option<std::time::Duration> {
+        <Self as catalyst_signed_doc::providers::CatalystSignedDocumentProvider>::future_threshold(
+            self,
+        )
+    }
+
+    fn past_threshold(&self) -> Option<std::time::Duration> {
+        <Self as catalyst_signed_doc::providers::CatalystSignedDocumentProvider>::past_threshold(
+            self,
+        )
     }
 }
 
