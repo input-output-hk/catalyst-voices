@@ -3402,5 +3402,13 @@
   "votingListNotYetVoted": "Not yet voted",
   "@votingListNotYetVoted": {
     "description": "no votes casted yet"
+  },
+  "votingListNoVotesAdded": "No votes added.",
+  "@votingListNoVotesAdded": {
+    "description": "Part of voting list empty state"
+  },
+  "votingListNoVotesAddedViewProposal": "View proposal details pages to cast votes",
+  "@votingListNoVotesAddedViewProposal": {
+    "description": "Part of voting list empty state"
   }
 }
