@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/spaces/spaces.dart';
 import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_ballot.dart';
 import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_campaign_phase_progress.dart';
 import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_footer.dart';
@@ -44,5 +45,10 @@ class VotingListDrawer extends StatelessWidget {
       width: 500,
       child: VotingList(),
     );
+  }
+
+  /// This method is meant to be used inside [SpacesShellPage].
+  static void open(BuildContext context) {
+    Scaffold.of(context).openEndDrawer();
   }
 }
