@@ -82,7 +82,6 @@ services:
       - CASSANDRA_PERSISTENT_URL=scylla-node:9042
       - CASSANDRA_VOLATILE_URL=scylla-node:9042
       - CHAIN_NETWORK=Preprod
-      - SIGNED_DOC_SK=0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd
       - INTERNAL_API_KEY=123
       # - LOG_LEVEL=error
       # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
