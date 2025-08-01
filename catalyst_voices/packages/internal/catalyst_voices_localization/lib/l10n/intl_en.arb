@@ -2614,14 +2614,11 @@
   "@preSubmitProposalStageDescription": {
     "description": "Description for the pre-submission stage"
   },
-  "proposalSubmissionStageStartAt": "Proposal submission opens {date} at {time}",
+  "proposalSubmissionStageStartAt": "Proposal submission opens {date}",
   "@proposalSubmissionStageStartAt": {
     "description": "Description for the pre-submission stage",
     "placeholders": {
       "date": {
-        "type": "String"
-      },
-      "time": {
         "type": "String"
       }
     }
@@ -3225,6 +3222,14 @@
   "votingTimelineHeader": "Voting:",
   "@votingTimelineHeader": {
     "description": "Header for the voting timeline"
+  },
+  "voteListButton": "Vote List",
+  "@voteListButton": {
+    "description": "The label for the overview of votes."
+  },
+  "delegationButton": "Delegation",
+  "@delegationButton": {
+    "description": "The label for voting power delegation."
   },
   "reviewRegistration": "Reviewers registration:",
   "@reviewRegistration": {

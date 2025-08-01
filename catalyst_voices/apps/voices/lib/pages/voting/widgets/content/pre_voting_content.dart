@@ -11,7 +11,11 @@ class PreVotingContent extends StatelessWidget {
   final CampaignPhase phase;
   final int fundNumber;
 
-  const PreVotingContent({super.key, required this.phase, required this.fundNumber});
+  const PreVotingContent({
+    super.key,
+    required this.phase,
+    required this.fundNumber,
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -298,7 +298,6 @@ class _TabBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesTabBar(
-      tabAlignment: TabAlignment.fill,
       indicatorSize: TabBarIndicatorSize.tab,
       tabs: [
         VoicesTab(
