@@ -45,8 +45,9 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
     # Put document with different ver
     new_doc = proposal_doc.copy()
     new_doc.metadata["ver"] = uuid_v7.uuid_v7()
+    new_doc_cbor = new_doc.build_and_sign(cat_id, sk_hex)
     resp = document.put(
-        data=new_doc.build_and_sign(cat_id, sk_hex),
+        data=new_doc_cbor,
         token=rbac_chain.auth_token(),
     )
     assert (
@@ -55,7 +56,7 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
 
     # Put a comment document again
     resp = document.put(
-        data=new_doc.build_and_sign(cat_id, sk_hex),
+        data=new_doc_cbor,
         token=rbac_chain.auth_token(),
     )
     assert (
@@ -145,8 +146,9 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
     # Put document with different ver
     new_doc = comment_doc.copy()
     new_doc.metadata["ver"] = uuid_v7.uuid_v7()
+    new_doc_cbor = new_doc.build_and_sign(cat_id, sk_hex)
     resp = document.put(
-        data=new_doc.build_and_sign(cat_id, sk_hex),
+        data=new_doc_cbor,
         token=rbac_chain.auth_token(),
     )
     assert (
@@ -155,7 +157,7 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
 
     # Put a comment document again
     resp = document.put(
-        data=new_doc.build_and_sign(cat_id, sk_hex),
+        data=new_doc_cbor,
         token=rbac_chain.auth_token(),
     )
     assert (
@@ -226,8 +228,9 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
     # Put document with different ver
     new_doc = submission_action.copy()
     new_doc.metadata["ver"] = uuid_v7.uuid_v7()
+    new_doc_cbor = new_doc.build_and_sign(cat_id, sk_hex)
     resp = document.put(
-        data=new_doc.build_and_sign(cat_id, sk_hex),
+        data=new_doc_cbor,
         token=rbac_chain.auth_token(),
     )
     assert (
@@ -236,7 +239,7 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
 
     # Put a comment document again
     resp = document.put(
-        data=new_doc.build_and_sign(cat_id, sk_hex),
+        data=new_doc_cbor,
         token=rbac_chain.auth_token(),
     )
     assert (
