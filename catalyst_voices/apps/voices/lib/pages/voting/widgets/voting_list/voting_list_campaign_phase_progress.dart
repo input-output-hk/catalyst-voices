@@ -90,14 +90,16 @@ class _VotingListCampaignPhaseProgressOverviewText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final parts = <String>[
+    return Text(
+      _buildParts(context).join(' · '),
+      textAlign: TextAlign.start,
+    );
+  }
+
+  List<String> _buildParts(BuildContext context) {
+    return [
       if (activeFundNumber != null) context.l10n.fundX(activeFundNumber!),
       context.l10n.votingPhase,
     ];
-
-    return Text(
-      parts.join(' · '),
-      textAlign: TextAlign.start,
-    );
   }
 }

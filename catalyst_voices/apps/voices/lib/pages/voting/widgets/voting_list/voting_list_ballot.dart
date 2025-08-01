@@ -83,18 +83,20 @@ class _VotingListBallotEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final titleParts = [
-      context.l10n.votingListNoVotesAdded,
-      context.l10n.votingListNoVotesAddedViewProposal,
-    ];
-
     return Align(
       alignment: const Alignment(0, -0.3),
       child: EmptyState(
         image: VoicesAssets.images.noVotes.buildPicture(),
-        title: Text(titleParts.join('\n')),
+        title: Text(_buildTitleParts(context).join('\n')),
         constraints: const BoxConstraints(maxWidth: 236),
       ),
     );
+  }
+
+  List<String> _buildTitleParts(BuildContext context) {
+    return [
+      context.l10n.votingListNoVotesAdded,
+      context.l10n.votingListNoVotesAddedViewProposal,
+    ];
   }
 }
