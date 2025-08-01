@@ -30,8 +30,8 @@ class _DocumentRefFieldState extends State<DocumentRefField> {
   late final TextEditingController _verController;
   late final ValueNotifier<bool> _isLocalController;
 
-  Uuid _id = const UuidV7.pure();
-  Uuid _ver = const UuidV7Optional.pure();
+  Uuid _id = const Uuid.pure();
+  Uuid _ver = const Uuid.pure(isEmptyAllowed: true);
   bool _isLocal = true;
 
   DocumentRefController get _effectiveController {
@@ -123,8 +123,8 @@ class _DocumentRefFieldState extends State<DocumentRefField> {
     final controller = _effectiveController..addListener(_onRefControllerChanged);
     final ref = controller.value;
 
-    _id = UuidV7.pure(value: ref?.id ?? '');
-    _ver = UuidV7Optional.pure(value: ref?.version ?? '');
+    _id = Uuid.pure(value: ref?.id ?? '');
+    _ver = Uuid.pure(value: ref?.version ?? '', isEmptyAllowed: true);
     _isLocal = ref is DraftRef;
 
     _idController = TextEditingController(text: _id.value)..addListener(_onPartControllerChanged);
@@ -143,8 +143,8 @@ class _DocumentRefFieldState extends State<DocumentRefField> {
   }
 
   void _syncPartsWithRef(DocumentRef? ref) {
-    _id = UuidV7.pure(value: ref?.id ?? '');
-    _ver = UuidV7Optional.pure(value: ref?.version ?? '');
+    _id = Uuid.pure(value: ref?.id ?? '');
+    _ver = Uuid.pure(value: ref?.version ?? '', isEmptyAllowed: true);
     _isLocal = ref is DraftRef;
 
     _idController.removeListener(_onPartControllerChanged);
@@ -165,8 +165,8 @@ class _DocumentRefFieldState extends State<DocumentRefField> {
     Uuid? ver,
     bool? isLocal,
   }) {
-    _id = id ??= UuidV7.dirty(value: _idController.text);
-    _ver = ver ??= UuidV7Optional.dirty(value: _verController.text);
+    _id = id ??= Uuid.dirty(value: _idController.text);
+    _ver = ver ??= Uuid.dirty(value: _verController.text, isEmptyAllowed: true);
     _isLocal = isLocal ??= _isLocalController.value;
 
     final ref = _ref;
@@ -193,7 +193,7 @@ class _IdTextField extends StatelessWidget {
       controller: controller,
       decoration: VoicesTextFieldDecoration(
         labelText: 'ID',
-        hintText: 'UUID-v7',
+        hintText: 'UUID',
         errorText: error?.message(context),
       ),
       onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
@@ -204,7 +204,7 @@ class _IdTextField extends StatelessWidget {
 class _VerTextField extends StatelessWidget {
   final LocalizedException? error;
   final TextEditingController controller;
-  final ValueChanged<UuidV7Optional> onSubmitted;
+  final ValueChanged<Uuid> onSubmitted;
 
   const _VerTextField({
     this.error,
@@ -218,11 +218,11 @@ class _VerTextField extends StatelessWidget {
       controller: controller,
       decoration: VoicesTextFieldDecoration(
         labelText: 'Ver',
-        hintText: 'UUID-v7',
+        hintText: 'UUID',
         errorText: error?.message(context),
       ),
       onFieldSubmitted: (value) {
-        onSubmitted(UuidV7Optional.dirty(value: value));
+        onSubmitted(Uuid.dirty(value: value, isEmptyAllowed: true));
       },
     );
   }

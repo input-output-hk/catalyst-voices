@@ -28,9 +28,9 @@ final class Optional<T extends Object> extends Equatable {
 
   const Optional(this.data);
 
-  const Optional.of(T this.data);
-
   const Optional.empty() : data = null;
+
+  const Optional.of(T this.data);
 
   bool get isEmpty => data == null;
 

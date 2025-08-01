@@ -12,7 +12,7 @@ use std::sync::Arc;
 use cardano_blockchain_types::{
     Network, Slot, StakeAddress, TransactionId, TxnIndex, TxnOutputOffset,
 };
-use scylla::Session;
+use scylla::client::session::Session;
 use tracing::{error, warn};
 
 use crate::{
@@ -158,7 +158,7 @@ impl TxoInsertQuery {
                     index,
                     txo_index,
                     &address,
-                    txo.lovelace_amount(),
+                    txo.value().coin(),
                     txn_hash,
                 );
                 self.staked_txo.push(params);
@@ -169,12 +169,12 @@ impl TxoInsertQuery {
                     slot_no,
                     index,
                     &address,
-                    txo.lovelace_amount(),
+                    txo.value().coin(),
                 );
                 self.unstaked_txo.push(params);
             }
 
-            for asset in txo.non_ada_assets() {
+            for asset in txo.value().assets() {
                 let policy_id = asset.policy().to_vec();
                 for policy_asset in asset.assets() {
                     if policy_asset.is_output() {

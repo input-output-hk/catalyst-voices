@@ -60,6 +60,7 @@ class _SingleGroupedTagSelectorWidgetState extends State<SingleGroupedTagSelecto
       onChanged: _onChanged,
       validator: _validator,
       enabled: widget.isEditMode,
+      title: widget.schema.title,
     );
   }
 
@@ -203,6 +204,7 @@ class _TagSelector extends StatelessWidget {
   final String? hintText;
   final String? errorText;
   final bool isRequired;
+  final String title;
 
   const _TagSelector({
     required this.groupedTags,
@@ -212,6 +214,7 @@ class _TagSelector extends StatelessWidget {
     required this.hintText,
     required this.errorText,
     required this.isRequired,
+    required this.title,
   });
 
   GroupedTags? get _selectedGroupedTags {
@@ -232,7 +235,7 @@ class _TagSelector extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         DocumentPropertyBuilderTitle(
-          title: context.l10n.singleGroupedTagSelectorTitle,
+          title: title,
           isRequired: isRequired,
         ),
         const SizedBox(height: 4),
@@ -277,6 +280,7 @@ class _TagWidget extends VoicesFormField<GroupedTagsSelection> {
     required List<GroupedTags> groupedTags,
     required String? hintText,
     required bool isRequired,
+    required String title,
   }) : super(
           builder: (field) {
             final selection = field.value ?? const GroupedTagsSelection();
@@ -304,6 +308,7 @@ class _TagWidget extends VoicesFormField<GroupedTagsSelection> {
                 onGroupChanged: onGroupChanged,
                 onSelectionChanged: onSelectionChanged,
                 hintText: hintText,
+                title: title,
                 errorText: field.errorText,
                 isRequired: isRequired,
               );

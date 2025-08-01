@@ -4,6 +4,9 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
+/// View model for current campaign info.
+///
+/// This view model is used to display the info of a current campaign.
 class CurrentCampaignInfoViewModel extends Equatable {
   final String title;
   final String description;

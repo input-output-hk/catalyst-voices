@@ -1,3 +1,4 @@
+export 'browser/catalyst_browser.dart';
 export 'cache/cache.dart';
 export 'cache/local_tll_cache.dart';
 export 'cache/ttl_cache.dart';

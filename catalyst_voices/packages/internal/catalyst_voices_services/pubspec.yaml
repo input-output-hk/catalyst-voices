@@ -18,6 +18,7 @@ dependencies:
     path: ../catalyst_voices_repositories
   catalyst_voices_shared:
     path: ../catalyst_voices_shared
+  cbor: 6.3.7
   collection: ^1.19.0
   equatable: ^2.0.7
   flutter:
@@ -43,6 +44,7 @@ dependencies:
 dev_dependencies:
   analyzer: 7.3.0
   catalyst_analysis: ^3.0.0
+  catalyst_compression: ^1.0.0
   mocktail: ^1.0.1
   shared_preferences_platform_interface: ^2.4.1
   test: ^1.24.9

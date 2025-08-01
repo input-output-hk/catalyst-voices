@@ -18,8 +18,13 @@ final class ApiConfigSource implements RemoteConfigSource {
     return _api.gateway
         .apiGatewayV1ConfigFrontendGet()
         .successBodyOrThrow()
-        .then((value) => value is String ? value : '{}')
-        .then((value) => jsonDecode(value) as Map<String, dynamic>)
+        .then((value) {
+          if (value is Map<String, dynamic>) {
+            return value;
+          }
+          final encoded = value is String ? value : '{}';
+          return jsonDecode(encoded) as Map<String, dynamic>;
+        })
         .catchError((_) => <String, dynamic>{})
         .then(RemoteConfig.fromJson);
   }

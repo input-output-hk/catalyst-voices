@@ -9,6 +9,8 @@ import 'package:catalyst_voices_repositories/src/dto/document/schema/document_sc
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:rxdart/rxdart.dart';
 
+/// Base interface to interact with proposals. A specialized version of [DocumentRepository] which
+/// provides additional methods specific to proposals.
 abstract interface class ProposalRepository {
   const factory ProposalRepository(
     SignedDocumentManager signedDocumentManager,

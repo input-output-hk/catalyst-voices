@@ -6,18 +6,14 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+/// Caches [VideoPlayerController] so it can be initialized and reused in different parts
+/// of app.
 class VideoManager extends ValueNotifier<VideoManagerState> {
   bool _isInitialized = false;
 
   VideoManager() : super(const VideoManagerState(controllers: {}));
 
   bool get isInitialized => _isInitialized;
-
-  @override
-  void dispose() {
-    unawaited(_disposeControllers());
-    super.dispose();
-  }
 
   Future<VideoPlayerController> createOrReinitializeController(
     VideoCacheKey asset,
@@ -40,6 +36,12 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
     value = value.copyWith(controllers: newControllers);
 
     return controller;
+  }
+
+  @override
+  void dispose() {
+    unawaited(_disposeControllers());
+    super.dispose();
   }
 
   Future<void> precacheVideos(
@@ -103,6 +105,7 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
   }
 }
 
+/// Makes [VideoManager] accessible via [BuildContext].
 class VideoManagerScope extends InheritedWidget {
   final VideoManager manager;
 
@@ -122,6 +125,7 @@ class VideoManagerScope extends InheritedWidget {
   }
 }
 
+/// State of [VideoManager].
 class VideoManagerState extends Equatable {
   final Map<String, VideoPlayerController> controllers;
   final Brightness? brightness;
