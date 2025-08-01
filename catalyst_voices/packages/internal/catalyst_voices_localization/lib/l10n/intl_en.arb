@@ -3360,6 +3360,18 @@
   "@removeFromVoteList": {
     "description": "When vote is added but not casted yet it can be removed."
   },
+  "viewingOlderDocumentVersionWhileVoting": "You are viewing an older version of this document while voting. Please view the latest version if you want to vote.",
+  "@viewingOlderDocumentVersionWhileVoting": {
+    "description": "Text shown when user is viewing an older version of a document while voting stage is active"
+  },
+  "votingOverview": "Voting Overview",
+  "@votingOverview": {
+    "description": "Text shown in voting overview segment"
+  },
+  "votingStatus": "Voting Status",
+  "@votingStatus": {
+    "description": "Text shown in voting status section"
+  },
   "xVotes": "{count} {count, plural, =0{Votes} =1{Vote} other{Votes}}",
   "@xVotes": {
     "description": "Generic text describing number of votes on made. In context of proposals.",
