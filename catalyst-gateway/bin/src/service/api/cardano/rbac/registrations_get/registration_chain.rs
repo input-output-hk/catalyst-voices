@@ -9,7 +9,8 @@ use crate::{
     rbac::ChainInfo,
     service::{
         api::cardano::rbac::registrations_get::{
-            purpose_list::PurposeList, role_data::RbacRoleData, role_map::RoleMap,
+            invalid_registration_list::InvalidRegistrationList, purpose_list::PurposeList,
+            role_data::RbacRoleData, role_map::RoleMap,
         },
         common::types::{
             cardano::{catalyst_id::CatalystId, transaction_id::TxnId},
@@ -36,9 +37,11 @@ pub struct RbacRegistrationChain {
     #[oai(skip_serializing_if_is_empty)]
     purpose: PurposeList,
     /// A map of role number to role data.
-    // This map is never empty, so there is no need to add the `skip_serializing_if_is_empty`
-    // attribute.
+    #[oai(skip_serializing_if_is_empty)]
     roles: RoleMap,
+    /// A list of invalid registrations.
+    #[oai(skip_serializing_if_is_empty)]
+    invalid: InvalidRegistrationList,
 }
 
 impl Example for RbacRegistrationChain {
@@ -49,33 +52,46 @@ impl Example for RbacRegistrationChain {
             last_persistent_txn: Some(TxnId::example()),
             last_volatile_txn: Some(TxnId::example()),
             roles: RoleMap::example(),
+            invalid: InvalidRegistrationList::example(),
         }
     }
 }
 
 impl RbacRegistrationChain {
     /// Creates a new registration chain instance.
-    pub fn new(info: &ChainInfo) -> anyhow::Result<Self> {
-        let catalyst_id = info.chain.catalyst_id().clone().into();
-        let last_persistent_txn = info.last_persistent_txn.map(Into::into);
-        let last_volatile_txn = info.last_volatile_txn.map(Into::into);
-        let purpose = info
-            .chain
-            .purpose()
-            .iter()
-            .copied()
-            .map(UUIDv4::from)
-            .collect::<Vec<_>>()
-            .into();
-        let roles = role_data(info)?.into();
+    pub(crate) fn new(
+        catalyst_id: CatalystId, info: Option<&ChainInfo>, invalid: InvalidRegistrationList,
+    ) -> anyhow::Result<Option<Self>> {
+        if info.is_none() && invalid.is_empty() {
+            return Ok(None);
+        }
 
-        Ok(Self {
+        let mut last_persistent_txn = None;
+        let mut last_volatile_txn = None;
+        let mut purpose = Vec::new().into();
+        let mut roles = HashMap::new().into();
+        if let Some(info) = info {
+            last_persistent_txn = info.last_persistent_txn.map(Into::into);
+            last_volatile_txn = info.last_volatile_txn.map(Into::into);
+            purpose = info
+                .chain
+                .purpose()
+                .iter()
+                .copied()
+                .map(UUIDv4::from)
+                .collect::<Vec<_>>()
+                .into();
+            roles = role_data(info)?.into();
+        }
+
+        Ok(Some(Self {
             catalyst_id,
             last_persistent_txn,
             last_volatile_txn,
             purpose,
             roles,
-        })
+            invalid,
+        }))
     }
 }
 
