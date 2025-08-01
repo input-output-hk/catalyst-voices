@@ -95,100 +95,8 @@ final class RegistrationTransactionBuilder {
     }
 
     final rootKeyPair = keychain.getRoleKeyPair(role: AccountRole.root);
-    return rootKeyPair.use((rootKeyPair) async {
-      final derCert = await _generateX509CertificateIfNeeded(rootKeyPair);
-      final publicKeys = await _generatePublicKeysForAllRoles(rootKeyPair);
 
-      // Build dummy metadata to allow the transaction builder to select utxos,
-      // the selected utxos are needed to calculate txInputsHash that is included in the metadata.
-      //
-      // We can't upfront calculate the txInputsHash because we don't know the exact metadata size
-      // at this point which the coin selection algorithm needs to calculate the appropriate
-      // fee and select inputs.
-      final dummyUtxos = <TransactionUnspentOutput>{};
-      final dummyX509Envelope = await _buildMetadataEnvelope(
-        rootKeyPair: rootKeyPair,
-        selectedUtxos: dummyUtxos,
-        derCert: derCert,
-        publicKeys: publicKeys,
-      );
-
-      // Build dummy transaction to see what utxos need to be selected.
-      final dummyTransaction = _buildUnsignedRbacTx(await dummyX509Envelope.toAuxiliaryData());
-
-      // We are assuming that the utxos selected for the dummy transaction will satisfy
-      // the fee requirements for the real transaction since the transaction size is the same,
-      // instead of using dummy metadata we will use the real one but for both of them the size
-      // would be the same.
-      final selectedUtxos = _findSelectedUtxos(utxos, dummyTransaction.body.inputs);
-      final realX509Envelope = await _buildMetadataEnvelope(
-        rootKeyPair: rootKeyPair,
-        selectedUtxos: selectedUtxos,
-        derCert: derCert,
-        publicKeys: publicKeys,
-      );
-
-      return _buildUnsignedRbacTx(await realX509Envelope.toAuxiliaryData());
-    });
-  }
-
-  Future<RegistrationMetadata> _buildMetadataEnvelope({
-    required CatalystKeyPair rootKeyPair,
-    required Set<TransactionUnspentOutput> selectedUtxos,
-    required X509DerCertificate? derCert,
-    required List<RbacField<cs.Ed25519PublicKey>> publicKeys,
-  }) async {
-    if (!roles.isFirstRegistration && previousTransactionId == null) {
-      throw ArgumentError.notNull('previousTransactionId');
-    }
-
-    final x509Envelope = X509MetadataEnvelope.unsigned(
-      purpose: UuidV4.fromString(_catalystUserRoleRegistrationPurpose),
-      txInputsHash: TransactionInputsHash.fromTransactionInputs(selectedUtxos),
-      previousTransactionId: roles.isFirstRegistration ? null : previousTransactionId!,
-      chunkedData: RegistrationData(
-        derCerts: [
-          if (derCert != null) RbacField.set(derCert),
-        ],
-        publicKeys: publicKeys,
-        roleDataSet: {
-          if (roles.any((element) => element.setVoter))
-            RoleData(
-              roleNumber: AccountRole.root.number,
-              roleSigningKey: LocalKeyReference(
-                keyType: LocalKeyReferenceType.x509Certs,
-                offset: AccountRole.root.registrationOffset,
-              ),
-              // Refer to first key in transaction outputs,
-              // in our case it's the change address
-              // (which the user controls).
-              paymentKey: 0,
-            ),
-          if (roles.any((element) => element.setProposer))
-            RoleData(
-              roleNumber: AccountRole.proposer.number,
-              roleSigningKey: LocalKeyReference(
-                keyType: LocalKeyReferenceType.pubKeys,
-                offset: AccountRole.proposer.registrationOffset,
-              ),
-              // Refer to first key in transaction outputs, in our case
-              // it's the change address (which the user controls).
-              paymentKey: 0,
-            ),
-        },
-      ),
-    );
-
-    final privateKey = Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(
-      rootKeyPair.privateKey.bytes,
-    );
-
-    return privateKey.use((privateKey) {
-      return x509Envelope.sign(
-        privateKey: privateKey,
-        serializer: (e) => e.toCbor(),
-      );
-    });
+    return rootKeyPair.use(_buildTransaction);
   }
 
   Future<cs.Ed25519PublicKey> _buildRolePublicKey(
@@ -223,11 +131,13 @@ final class RegistrationTransactionBuilder {
 
   Future<cs.Ed25519PublicKey> _deriveDrepPublicKey() {
     final keyPair = keychain.getRoleKeyPair(role: AccountRole.drep);
+
     return keyPair.use((keyPair) => keyPair.publicKey.toEd25519());
   }
 
   Future<cs.Ed25519PublicKey> _deriveProposerPublicKey() {
     final keyPair = keychain.getRoleKeyPair(role: AccountRole.proposer);
+
     return keyPair.use((keyPair) => keyPair.publicKey.toEd25519());
   }
 

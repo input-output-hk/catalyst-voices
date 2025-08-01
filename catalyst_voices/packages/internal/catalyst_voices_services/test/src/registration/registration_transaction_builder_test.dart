@@ -120,8 +120,7 @@ void main() {
       // When
       final transactionBuilder = RegistrationTransactionBuilder(
         transactionConfig: _defaultTransactionBuilderConfig,
-        keyDerivationService: keyDerivationService,
-        masterKey: _masterKey,
+        keychain: keychain,
         networkId: NetworkId.testnet,
         slotNumberTtl: const SlotBigNum(100000),
         roles: {const RegistrationTransactionRole.set(AccountRole.voter)},
@@ -190,8 +189,7 @@ void main() {
       // When
       final transactionBuilder = RegistrationTransactionBuilder(
         transactionConfig: _defaultTransactionBuilderConfig,
-        keyDerivationService: keyDerivationService,
-        masterKey: _masterKey,
+        keychain: keychain,
         networkId: NetworkId.testnet,
         slotNumberTtl: const SlotBigNum(100000),
         roles: {const RegistrationTransactionRole.set(AccountRole.voter)},
