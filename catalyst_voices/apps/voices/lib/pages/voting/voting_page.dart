@@ -1,10 +1,10 @@
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/campaign_phase_aware.dart';
-import 'package:catalyst_voices/pages/voting/widgets/pre_voting_content.dart';
-import 'package:catalyst_voices/pages/voting/widgets/voting_background.dart';
-import 'package:catalyst_voices/pages/voting/widgets/voting_content.dart';
-import 'package:catalyst_voices/pages/voting/widgets/voting_header.dart';
+import 'package:catalyst_voices/pages/voting/widgets/content/pre_voting_content.dart';
+import 'package:catalyst_voices/pages/voting/widgets/content/voting_background.dart';
+import 'package:catalyst_voices/pages/voting/widgets/content/voting_content.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/voting_header.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/layouts/header_and_content_layout.dart';
 import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
@@ -37,20 +37,22 @@ class _VotingPageState extends State<VotingPage>
 
   @override
   Widget build(BuildContext context) {
-    return CampaignPhaseAware.when(
-      phase: CampaignPhaseType.communityVoting,
-      upcoming: (_, phase, fundNumber) => HeaderAndContentLayout(
-        header: const VotingHeader(),
-        content: PreVotingContent(phase: phase, fundNumber: fundNumber),
-        background: const VotingBackground(),
-      ),
-      active: (_, __, ___) => const HeaderAndContentLayout(
-        header: VotingHeader(),
-        content: VotingContent(),
-      ),
-      post: (_, __, ___) => const HeaderAndContentLayout(
-        header: VotingHeader(),
-        content: Text('Post'),
+    return SelectionArea(
+      child: CampaignPhaseAware.when(
+        phase: CampaignPhaseType.communityVoting,
+        upcoming: (_, phase, fundNumber) => HeaderAndContentLayout(
+          header: const VotingHeader(),
+          content: PreVotingContent(phase: phase, fundNumber: fundNumber),
+          background: const VotingBackground(),
+        ),
+        active: (_, __, ___) => const HeaderAndContentLayout(
+          header: VotingHeader(),
+          content: VotingContent(),
+        ),
+        post: (_, __, ___) => const HeaderAndContentLayout(
+          header: VotingHeader(),
+          content: Text('Post'),
+        ),
       ),
     );
   }

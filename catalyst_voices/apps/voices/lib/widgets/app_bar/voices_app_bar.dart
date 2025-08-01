@@ -22,6 +22,7 @@ import 'package:go_router/go_router.dart';
 class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
   /// The [PreferredSizeWidget.preferredSize] constant.
   static const size = Size.fromHeight(64);
+
   final Widget? leading;
   final List<Widget> actions;
   final bool showSearch;
