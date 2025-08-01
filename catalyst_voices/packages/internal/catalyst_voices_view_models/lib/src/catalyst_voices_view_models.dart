@@ -74,6 +74,7 @@ export 'voting/voting_list_footer_data.dart';
 export 'voting/voting_list_tile_data.dart';
 export 'voting/voting_list_user_summary_data.dart';
 export 'voting/voting_phase_progress_view_model.dart';
+export 'voting/voting_power_status_view_model.dart';
 export 'voting/voting_power_view_model.dart';
 export 'workspace/workspace_proposal_list_item.dart';
 export 'workspace/workspace_tab_type.dart';

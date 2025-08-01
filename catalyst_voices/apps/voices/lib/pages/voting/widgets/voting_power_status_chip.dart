@@ -1,7 +1,9 @@
+import 'dart:math';
+
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class VotingPowerStatusChip extends StatelessWidget {
@@ -28,10 +30,17 @@ class VotingPowerStatusChip extends StatelessWidget {
 
 extension on VotingPowerStatus? {
   String localizedName(BuildContext context) {
-    return switch (this) {
-      VotingPowerStatus.provisional => context.l10n.provisional,
-      VotingPowerStatus.confirmed => context.l10n.confirmed,
-      null => '                ', // reserve space for actual status
-    };
+    final instance = this;
+    if (instance != null) {
+      return instance.localizedName(context);
+    }
+
+    // reserve space for actual status
+    final longestCount = VotingPowerStatus.values
+        .map((e) => e.localizedName(context))
+        .fold(0, (previousValue, element) => max(previousValue, element.length));
+
+    // *2 because empty space is rendered ~ 2 times smaller then letter
+    return List.generate(longestCount * 2, (_) => ' ').join();
   }
 }
