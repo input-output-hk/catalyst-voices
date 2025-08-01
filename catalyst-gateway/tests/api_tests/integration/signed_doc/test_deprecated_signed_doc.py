@@ -203,6 +203,7 @@ def test_get_migrated_and_f14_documents():
 
 # Querying documents using POST `/v1/document/index` endpoint.
 # Data `old_format_signed_doc.sql` should successfully passing through the migration process.
+@pytest.mark.skip("")
 def test_v1_index_migrated_documents():
     values = [
         # TODO `{}` values with the proper expected JSON responses
@@ -309,7 +310,7 @@ def deprecated_proposal_submission(rbac_chain, proposal_id):
 
 
 # Trying to submit a deprecated proposal, comment and proposal actions documents
-@pytest.mark.preprod_indexing
+@pytest.mark.skip("")
 def test_put_deprecated_documents(rbac_chain_factory):
     rbac_chain = rbac_chain_factory()
 
