@@ -262,7 +262,7 @@
   "@activeVotingRound": {
     "description": "Title of the voting space."
   },
-  "noOfAll": "All ({count})",
+  "noOfAll": "All · {count}",
   "@noOfAll": {
     "description": "Tab label for all proposals in voting space",
     "placeholders": {
@@ -271,7 +271,7 @@
       }
     }
   },
-  "noOfDraft": "Draft proposals ({count})",
+  "noOfDraft": "Draft proposals · {count}",
   "@noOfDraft": {
     "description": "Tab label for draft proposals in voting space",
     "placeholders": {
@@ -280,7 +280,7 @@
       }
     }
   },
-  "noOfFinal": "Final proposals ({count})",
+  "noOfFinal": "Final proposals · {count}",
   "@noOfFinal": {
     "description": "Tab label for final proposals in voting space",
     "placeholders": {
@@ -289,7 +289,7 @@
       }
     }
   },
-  "noOfMyProposals": "My proposals ({count})",
+  "noOfMyProposals": "My proposals · {count}",
   "@noOfMyProposals": {
     "description": "Tab label for my proposals in voting space",
     "placeholders": {
@@ -298,7 +298,7 @@
       }
     }
   },
-  "noOfFavorites": "Favorites ({count})",
+  "noOfFavorites": "Favorites · {count}",
   "@noOfFavorites": {
     "description": "Tab label for draft proposals in voting space",
     "placeholders": {
@@ -1392,6 +1392,11 @@
   "categories": "Categories",
   "fundingCategories": "Funding categories",
   "proposals": "Proposals",
+  "categoryProposals": "Category Proposals",
+  "@categoryProposals": {
+    "description": "Title for proposals filtered by a campaign category."
+  },
+  "discoverySpaceTitle": "Category Proposals",
   "totalSubmitted": "Total submitted",
   "inXDays": "{x, plural, =1{In {x} day} other{In {x} days}}",
   "@inXDays": {

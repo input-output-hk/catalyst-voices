@@ -45,13 +45,19 @@ class _VotingPageState extends State<VotingPage>
           content: PreVotingContent(phase: phase, fundNumber: fundNumber),
           background: const VotingBackground(),
         ),
-        active: (_, __, ___) => const HeaderAndContentLayout(
-          header: VotingHeader(),
-          content: VotingContent(),
+        active: (_, __, ___) => HeaderAndContentLayout(
+          header: const VotingHeader(),
+          content: VotingContent(
+            tabController: _tabController,
+            pagingController: _pagingController,
+          ),
         ),
-        post: (_, __, ___) => const HeaderAndContentLayout(
-          header: VotingHeader(),
-          content: Text('Post'),
+        post: (_, __, ___) => HeaderAndContentLayout(
+          header: const VotingHeader(),
+          content: VotingContent(
+            tabController: _tabController,
+            pagingController: _pagingController,
+          ),
         ),
       ),
     );

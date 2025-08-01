@@ -16,7 +16,7 @@ class ProposalsPaginationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalsCubit, ProposalsState, bool>(
+    return BlocSelector<VotingCubit, VotingState, bool>(
       selector: (state) => state.isFavorite(proposal.selfRef.id),
       builder: (context, isFavorite) {
         return _ProposalsPaginationTile(
@@ -45,7 +45,7 @@ class _ProposalsPaginationTile extends StatelessWidget {
         unawaited(route.push(context));
       },
       onFavoriteChanged: (isFavorite) {
-        context.read<ProposalsCubit>().onChangeFavoriteProposal(
+        context.read<VotingCubit>().onChangeFavoriteProposal(
               proposal.selfRef,
               isFavorite: isFavorite,
             );

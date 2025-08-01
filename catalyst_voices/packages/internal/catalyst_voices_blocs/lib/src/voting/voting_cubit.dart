@@ -311,7 +311,7 @@ final class VotingCubit extends Cubit<VotingState>
         ? VotingPowerViewModel.fromModel(votingPower)
         : const VotingPowerViewModel();
     final votingPhaseViewModel = _buildVotingPhase(campaign);
-    final hasSearchQuery = filters.searchQuery == null;
+    final hasSearchQuery = filters.searchQuery != null;
     final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategoryRef);
     final orderItems = _buildOrderItems(_cache.filters.type, _cache.selectedOrder);
     final isOrderEnabled = _cache.filters.type == ProposalsFilterType.total;

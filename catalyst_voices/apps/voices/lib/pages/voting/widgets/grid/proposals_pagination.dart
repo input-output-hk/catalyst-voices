@@ -1,5 +1,5 @@
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_pagination_empty_state.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_pagination_tile.dart';
+import 'package:catalyst_voices/pages/voting/widgets/grid/proposals_pagination_empty_state.dart';
+import 'package:catalyst_voices/pages/voting/widgets/grid/proposals_pagination_tile.dart';
 import 'package:catalyst_voices/widgets/pagination/builders/paged_wrap_child_builder.dart';
 import 'package:catalyst_voices/widgets/pagination/layouts/paginated_grid_view.dart';
 import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
