@@ -1,4 +1,4 @@
--- Manually generated Catalyst Signed Documents from the CBOR, using `minicbor` crate
+-- Manually generated Catalyst Signed Documents v0.0.3 spec version from the CBOR, using `minicbor` crate
 -- Its not a fully valid Catalyst Signed Document according to the all `catalyst-gateway` enforced rules
 -- Code reference
 -- ```rust
