@@ -310,7 +310,7 @@ def deprecated_proposal_submission(rbac_chain, proposal_id):
 
 
 # Trying to submit a deprecated proposal, comment and proposal actions documents
-@pytest.mark.skip("")
+@pytest.mark.preprod_indexing
 def test_put_deprecated_documents(rbac_chain_factory):
     rbac_chain = rbac_chain_factory()
 
