@@ -205,6 +205,7 @@ def test_get_migrated_and_f14_documents():
 # Data `old_format_signed_doc.sql` should successfully passing through the migration process.
 def test_v1_index_migrated_documents():
     values = [
+        # TODO `{}` values with the proper expected JSON responses
         ({"template": {"id": {"eq": "019846aa-ecb7-7ce1-b7ce-c95cf8f078c2"}}}, {}),
         ({"ref": {"id": {"eq": "019846ad-4676-73f3-899f-a39cfd0df291"}}}, {}),
         ({"reply": {"id": {"eq": "019846ae-fad8-73c2-84e0-f482cc5d5332"}}}, {}),
@@ -224,11 +225,8 @@ def test_v1_index_migrated_documents():
         ), f"Unexpected index of documents which match the query filter, got: {resp.json()}, expected: {exp_json}"
 
 
-# Trying to submit a deprecated proposal, comment and proposal actions documents
-@pytest.mark.preprod_indexing
-def test_put_deprecated_documents(rbac_chain_factory):
+def deprecated_proposal(rbac_chain):
     role_id = RoleID.PROPOSER
-    rbac_chain = rbac_chain_factory()
     proposal_doc_id = uuid_v7.uuid_v7()
     proposal_metadata_json = {
         "id": proposal_doc_id,
@@ -248,20 +246,93 @@ def test_put_deprecated_documents(rbac_chain_factory):
             "ver": "0194d490-30bf-7473-81c8-a0eaef369619",
         },
     }
-    with open("./test_data/signed_docs/proposal.json", "r") as proposal_json_file:
-        proposal_json = json.load(proposal_json_file)
+    with open("./test_data/signed_docs/proposal.json", "r") as json_file:
+        json = json.load(json_file)
 
-    doc = SignedDocument(proposal_metadata_json, proposal_json)
+    doc = SignedDocument(proposal_metadata_json, json)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-    resp = document.put(
-        data=doc.build_and_sign(cat_id, sk_hex, is_deprecated=True),
-        token=rbac_chain.auth_token(),
-    )
-    assert (
-        resp.status_code == 201
-    ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+    return (doc.build_and_sign(cat_id, sk_hex, is_deprecated=True), proposal_doc_id)
 
-    resp = document.get(document_id=doc.metadata["id"])
-    assert (
-        resp.status_code == 200
-    ), f"Failed to get document: {resp.status_code} - {resp.text}"
+
+def deprecated_comment(rbac_chain, proposal_id):
+    role_id = RoleID.ROLE_0
+    comment_doc_id = uuid_v7.uuid_v7()
+    comment_metadata_json = {
+        "id": comment_doc_id,
+        "ver": comment_doc_id,
+        # Comment document type
+        "type": "b679ded3-0e7c-41ba-89f8-da62a17898ea",
+        "content-type": "application/json",
+        "content-encoding": "br",
+        "ref": {
+            "id": proposal_id,
+            "ver": proposal_id,
+        },
+        # Fund 14 comment template, defined in `V3__signed_documents.sql`
+        "template": {
+            "id": "0194d494-4402-7e0e-b8d6-171f8fea18b0",
+            "ver": "0194d494-4402-7e0e-b8d6-171f8fea18b0",
+        },
+    }
+    with open("./test_data/signed_docs/comment.json", "r") as json_file:
+        json = json.load(json_file)
+
+    doc = SignedDocument(comment_metadata_json, json)
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+    return (doc.build_and_sign(cat_id, sk_hex, is_deprecated=True), comment_doc_id)
+
+
+def deprecated_proposal_submission(rbac_chain, proposal_id):
+    role_id = RoleID.PROPOSER
+    submission_action_id = uuid_v7.uuid_v7()
+    sub_action_metadata_json = {
+        "id": submission_action_id,
+        "ver": submission_action_id,
+        # submission action type
+        "type": "5e60e623-ad02-4a1b-a1ac-406db978ee48",
+        "content-type": "application/json",
+        "content-encoding": "br",
+        "ref": {
+            "id": proposal_id,
+            "ver": proposal_id,
+        },
+    }
+    with open("./test_data/signed_docs/submission_action.json", "r") as json_file:
+        json = json.load(json_file)
+
+    doc = SignedDocument(sub_action_metadata_json, json)
+    (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+    return (
+        doc.build_and_sign(cat_id, sk_hex, is_deprecated=True),
+        submission_action_id,
+    )
+
+
+# Trying to submit a deprecated proposal, comment and proposal actions documents
+@pytest.mark.preprod_indexing
+def test_put_deprecated_documents(rbac_chain_factory):
+    rbac_chain = rbac_chain_factory()
+
+    proposal_cbor, proposal_id = deprecated_proposal(rbac_chain)
+    comment_cbor, comment_id = deprecated_comment(rbac_chain, proposal_id)
+    proposal_submission_cbor, proposal_submission_id = deprecated_proposal_submission(
+        rbac_chain, proposal_id
+    )
+
+    for cbor, id in [
+        (proposal_cbor, proposal_id),
+        (comment_cbor, comment_id),
+        (proposal_submission_cbor, proposal_submission_id),
+    ]:
+        resp = document.put(
+            data=cbor,
+            token=rbac_chain.auth_token(),
+        )
+        assert (
+            resp.status_code == 201
+        ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+        resp = document.get(document_id=id)
+        assert (
+            resp.status_code == 200
+        ), f"Failed to get document: {resp.status_code} - {resp.text}"
