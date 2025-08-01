@@ -3380,5 +3380,27 @@
   "totalVotingPower": "Total Voting Power",
   "@totalVotingPower": {
     "description": "Label for user voting power number"
+  },
+  "votingListPendingVotes": "Pending votes not yet cast",
+  "@votingListPendingVotes": {
+    "description": "Disclaimer about proposal votes not casted yet"
+  },
+  "votingListCastVotes": "Cast Votes",
+  "@votingListCastVotes": {
+    "description": "Button text which triggers casting votes"
+  },
+  "votingListLastVotedX": "Last voted: {x}",
+  "@votingListLastVotedX": {
+    "description": "For example when was last vote on proposal",
+    "placeholders": {
+      "x": {
+        "type": "String",
+        "example": "Not yet voted"
+      }
+    }
+  },
+  "votingListNotYetVoted": "Not yet voted",
+  "@votingListNotYetVoted": {
+    "description": "no votes casted yet"
   }
 }
