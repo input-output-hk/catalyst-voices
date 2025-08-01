@@ -6,6 +6,7 @@ import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
+import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list.dart';
 import 'package:catalyst_voices/widgets/buttons/create_proposal_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -119,7 +120,10 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
                       isUnlocked: state.isActive,
                     )
                   : null,
-              endDrawer: const OpportunitiesDrawer(),
+              endDrawer: switch (widget.space) {
+                Space.voting => const VotingListDrawer(),
+                _ => const OpportunitiesDrawer(),
+              },
               body: widget.child,
             );
           },

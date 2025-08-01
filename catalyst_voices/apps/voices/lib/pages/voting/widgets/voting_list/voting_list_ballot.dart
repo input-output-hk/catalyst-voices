@@ -17,7 +17,7 @@ class VotingListBallot extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO(damian-molinski): use selector
     final items = List.generate(
-      0,
+      5,
       (index) {
         return VotingListTileData(
           category: SignedDocumentRef.generateFirstRef(),
