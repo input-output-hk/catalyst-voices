@@ -13,6 +13,7 @@ use put_document::{
 };
 
 use crate::service::{
+    api::documents::post_document_index_query::v2,
     common::{
         auth::{none_or_rbac::NoneOrRBAC, rbac::scheme::CatalystRBACSecurityScheme},
         tags::ApiTags,
@@ -136,12 +137,13 @@ impl DocumentApi {
         transform = "schema_version_validation"
     )]
     async fn post_document_v2(
-        &self, /// The Query Filter Specification
-        query: Json<DocumentIndexQueryFilterBody>,
+        &self,
+        /// The Query Filter Specification
+        query: Json<v2::request::DocumentIndexQueryFilterBodyV2>,
         page: Query<Option<Page>>, limit: Query<Option<Limit>>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> post_document_index_query::AllResponses {
-        post_document_index_query::endpoint(query.0 .0, page.0, limit.0).await
+        post_document_index_query::v2::endpoint_v2(query.0 .0, page.0, limit.0).await
     }
 }

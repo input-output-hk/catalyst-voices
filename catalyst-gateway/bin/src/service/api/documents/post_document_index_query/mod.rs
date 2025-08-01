@@ -40,7 +40,7 @@ pub(crate) enum Responses {
     ///
     /// The Index of documents which match the query filter.
     #[oai(status = 200)]
-    OkV2(Json<DocumentIndexListDocumented>),
+    OkV2(Json<v2::response::DocumentIndexListDocumentedV2>),
     /// ## Not Found
     ///
     /// No documents were found which match the query filter.
@@ -51,7 +51,7 @@ pub(crate) enum Responses {
 /// All responses.
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
-/// # POST `/document/index`
+/// # POST `/v1/document/index`
 pub(crate) async fn endpoint(
     filter: DocumentIndexQueryFilter, page: Option<Page>, limit: Option<Limit>,
 ) -> AllResponses {
