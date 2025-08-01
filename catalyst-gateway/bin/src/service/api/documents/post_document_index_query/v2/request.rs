@@ -181,8 +181,8 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
                 db_filter = db_filter.with_id(id);
             }
         }
-        if let Some(verions) = value.ver {
-            let versions = verions
+        if let Some(versions) = value.ver {
+            let versions = versions
                 .into_iter()
                 .map(|doc_type| doc_type.try_into())
                 .collect::<Result<Vec<_>, _>>()?;
