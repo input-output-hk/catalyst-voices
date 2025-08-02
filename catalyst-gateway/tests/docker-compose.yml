@@ -1,26 +1,11 @@
 # cspell: words statusgossip
 
 services:
-  postgres:
-    image: postgres:16
-    container_name: postgres
-    restart: unless-stopped
+  event-db:
+    image: event-db:latest
+    container_name: event-db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_PASSWORD}"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-
-  # runs old migrations for the separate `postgres` service
-  # a special package for applying migrations only up to "V2_**" migrations
-  event-db-v1-migrations:
-    image: event-db:v1
-    container_name: event-db-v1-migrations
-    environment:
-      - DB_HOST=postgres
+      - DB_HOST=localhost
       - DB_PORT=5432
       - DB_NAME=CatalystEventDev
       - DB_DESCRIPTION="Catalyst Event DB"
@@ -30,10 +15,32 @@ services:
       - DB_USER_PASSWORD=CHANGE_ME
 
       - INIT_AND_DROP_DB=true
+      - WITH_MIGRATIONS=false
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      
+  # runs old migrations for the separate `postgres` service
+  # a special package for applying migrations only up to "V2_**" migrations
+  event-db-v1-migrations:
+    image: event-db:v1
+    container_name: event-db-v1-migrations
+    environment:
+      - DB_HOST=event-db
+      - DB_PORT=5432
+      - DB_NAME=CatalystEventDev
+      - DB_SUPERUSER=postgres
+      - DB_SUPERUSER_PASSWORD=postgres
+      - DB_USER=catalyst-event-dev
+      - DB_USER_PASSWORD=CHANGE_ME
+
+      - INIT_AND_DROP_DB=false
       - WITH_SEED_DATA=.
       - WITH_MIGRATIONS=true
     depends_on:
-      postgres:
+      event-db:
         condition: service_healthy
 
   # runs migrations for the separate `postgres` service
@@ -41,10 +48,9 @@ services:
     image: event-db:latest
     container_name: event-db-migrations
     environment:
-      - DB_HOST=postgres
+      - DB_HOST=event-db
       - DB_PORT=5432
       - DB_NAME=CatalystEventDev
-      - DB_DESCRIPTION="Catalyst Event DB"
       - DB_SUPERUSER=postgres
       - DB_SUPERUSER_PASSWORD=postgres
       - DB_USER=catalyst-event-dev
@@ -78,7 +84,7 @@ services:
       # approximately a 25 minutes of waiting
       retries: 50
     environment:
-      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@postgres/CatalystEventDev
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
       - CASSANDRA_PERSISTENT_URL=scylla-node:9042
       - CASSANDRA_VOLATILE_URL=scylla-node:9042
       - CHAIN_NETWORK=Preprod
@@ -107,7 +113,7 @@ services:
     image: postgres-runner:latest
     container_name: postgres-runner
     environment:
-      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@postgres/CatalystEventDev
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
     depends_on:
       event-db-migrations:
         condition: service_started
