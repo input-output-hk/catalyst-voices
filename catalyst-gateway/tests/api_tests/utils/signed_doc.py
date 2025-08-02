@@ -10,6 +10,7 @@ def build_signed_doc(
     bip32_sk_hex: str,
     # corresponded to the `bip32_sk_hex` `cat_id` string
     cat_id: str,
+    mk_signed_doc_path,
 ) -> str:
     with NamedTemporaryFile() as metadata_file, NamedTemporaryFile() as doc_content_file, NamedTemporaryFile() as signed_doc_file:
 
@@ -23,7 +24,7 @@ def build_signed_doc(
 
         subprocess.run(
             [
-                "./mk_signed_doc",
+                mk_signed_doc_path,
                 "build",
                 doc_content_file.name,
                 signed_doc_file.name,
@@ -34,7 +35,7 @@ def build_signed_doc(
 
         subprocess.run(
             [
-                "./mk_signed_doc",
+                mk_signed_doc_path,
                 "sign",
                 signed_doc_file.name,
                 bip32_sk_hex,

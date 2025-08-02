@@ -39,6 +39,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 markers = [
+    "unmarked: tests without any specific environment",
     "ci: marks tests to be run in ci",
     "nightly: marks tests to be run nightly",
     "preprod_indexing: marks test which requires indexing of the cardano preprod network",
