@@ -85,7 +85,7 @@ jobs:
         if: always()
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
-          docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs schemathesis-runner
 
       - name: Collecting reports
         if: always()
