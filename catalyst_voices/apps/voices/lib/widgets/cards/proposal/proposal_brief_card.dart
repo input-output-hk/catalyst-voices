@@ -26,7 +26,7 @@ class ProposalBriefCard extends StatefulWidget {
   });
 
   @override
-  State<ProposalBriefCard> createState() => _PendingProposalCardState();
+  State<ProposalBriefCard> createState() => _ProposalBriefCardState();
 }
 
 class _Author extends StatelessWidget {
@@ -42,7 +42,12 @@ class _Author extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        spacing: 8,
         children: [
+          ProfileAvatar(
+            size: 32,
+            username: author,
+          ),
           UsernameText(
             key: const Key('Author'),
             author,
@@ -133,7 +138,42 @@ class _FundsAndDuration extends StatelessWidget {
   }
 }
 
-class _PendingProposalCardState extends State<ProposalBriefCard> {
+class _PropertyValue extends StatelessWidget {
+  final String title;
+  final String formattedValue;
+
+  const _PropertyValue({
+    required this.title,
+    required this.formattedValue,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          key: const Key('Title'),
+          title,
+          style: context.textTheme.bodySmall?.copyWith(
+            color: context.colors.textOnPrimaryLevel1,
+          ),
+        ),
+        Text(
+          key: const Key('Value'),
+          formattedValue,
+          style: context.textTheme.titleLarge?.copyWith(
+            color: context.colors.textOnPrimaryLevel1,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ProposalBriefCardState extends State<ProposalBriefCard> {
   late final WidgetStatesController _statesController;
 
   @override
@@ -166,6 +206,7 @@ class _PendingProposalCardState extends State<ProposalBriefCard> {
                     isFavorite: widget.isFavorite,
                     onFavoriteChanged: widget.onFavoriteChanged,
                   ),
+                  const SizedBox(height: 2),
                   _Category(
                     category: widget.proposal.categoryName,
                   ),
@@ -208,41 +249,6 @@ class _PendingProposalCardState extends State<ProposalBriefCard> {
   void initState() {
     super.initState();
     _statesController = WidgetStatesController();
-  }
-}
-
-class _PropertyValue extends StatelessWidget {
-  final String title;
-  final String formattedValue;
-
-  const _PropertyValue({
-    required this.title,
-    required this.formattedValue,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          key: const Key('Title'),
-          title,
-          style: context.textTheme.bodySmall?.copyWith(
-            color: context.colors.textOnPrimaryLevel1,
-          ),
-        ),
-        Text(
-          key: const Key('Value'),
-          formattedValue,
-          style: context.textTheme.titleLarge?.copyWith(
-            color: context.colors.textOnPrimaryLevel1,
-          ),
-        ),
-      ],
-    );
   }
 }
 
