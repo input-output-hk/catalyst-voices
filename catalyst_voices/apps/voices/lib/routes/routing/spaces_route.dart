@@ -78,7 +78,7 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
   }
 
   factory ProposalsRoute.myProposals() {
-    return ProposalsRoute(tab: ProposalsFilterType.my.name);
+    return ProposalsRoute(tab: ProposalsPageTab.my.name);
   }
 
   @override

@@ -30,6 +30,8 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     implements ProposalsDao {
   DriftProposalsDao(super.attachedDatabase);
 
+  // TODO(dt-iohk): it seems that this method doesn't correctly filter by ProposalsFilterType.my
+  // since it does not check for author, consider to use another type which doesn't have "my" case.
   @override
   Future<List<JoinedProposalEntity>> queryProposals({
     SignedDocumentRef? categoryRef,
@@ -182,7 +184,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       );
     }
 
-    if ((filters.onlyAuthor ?? false) || filters.type == ProposalsFilterType.my) {
+    if ((filters.onlyAuthor ?? false) || filters.type.isMy) {
       if (author != null) {
         mainQuery.where(proposal.metadata.isAuthor(author));
       } else {
@@ -380,6 +382,8 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         return _includeFavoriteRefsExcludingHiddenProposalsFilter();
       case ProposalsFilterType.my:
         return _excludeHiddenProposalsFilter();
+      case ProposalsFilterType.myFinals:
+        return _includeFinalProposalsFilter();
       case ProposalsFilterType.voted:
         return _includeVotedRefsExcludingHiddenProposalsFilter();
     }
@@ -634,21 +638,21 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
       final notHidden = allRefs.where((ref) => hiddenRefs.none((myRef) => myRef.id == ref.id));
 
-      final total = notHidden.length;
-      final finals = notHidden.where((ref) => finalsRefs.any((myRef) => myRef.id == ref.id)).length;
-      final drafts = total - finals;
-      final favorites =
-          notHidden.where((ref) => favoritesRefs.any((fav) => fav.id == ref.id)).length;
-      final my = notHidden.where((ref) => myRefs.any((myRef) => myRef.id == ref.id)).length;
-      final votedOn = notHidden.where((ref) => votedRefs.any((voted) => voted.id == ref.id)).length;
+      final total = notHidden;
+      final finals = notHidden.where((ref) => finalsRefs.any((myRef) => myRef.id == ref.id));
+      final favorites = notHidden.where((ref) => favoritesRefs.any((fav) => fav.id == ref.id));
+      final my = notHidden.where((ref) => myRefs.any((myRef) => myRef.id == ref.id));
+      final myFinals = my.where((ref) => finalsRefs.any((myRef) => myRef.id == ref.id));
+      final votedOn = notHidden.where((ref) => votedRefs.any((voted) => voted.id == ref.id));
 
       yield ProposalsCount(
-        total: total,
-        drafts: drafts,
-        finals: finals,
-        favorites: favorites,
-        my: my,
-        voted: votedOn,
+        total: total.length,
+        drafts: total.length - finals.length,
+        finals: finals.length,
+        favorites: favorites.length,
+        my: my.length,
+        myFinals: myFinals.length,
+        voted: votedOn.length,
       );
     }
   }

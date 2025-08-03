@@ -7,6 +7,7 @@ final class ProposalsCount extends Equatable {
   final int finals;
   final int favorites;
   final int my;
+  final int myFinals;
   final int voted;
 
   const ProposalsCount({
@@ -15,6 +16,7 @@ final class ProposalsCount extends Equatable {
     this.finals = 0,
     this.favorites = 0,
     this.my = 0,
+    this.myFinals = 0,
     this.voted = 0,
   });
 
@@ -25,6 +27,7 @@ final class ProposalsCount extends Equatable {
         finals,
         favorites,
         my,
+        myFinals,
         voted,
       ];
 
@@ -35,6 +38,7 @@ final class ProposalsCount extends Equatable {
       ProposalsFilterType.finals => finals,
       ProposalsFilterType.favorites => favorites,
       ProposalsFilterType.my => my,
+      ProposalsFilterType.myFinals => myFinals,
       ProposalsFilterType.voted => voted,
     };
   }
@@ -47,6 +51,7 @@ final class ProposalsCount extends Equatable {
         'finals[$finals], '
         'favorites[$favorites], '
         'my[$my], '
+        'myFinals[$myFinals], '
         'voted[$voted]'
         ')';
   }

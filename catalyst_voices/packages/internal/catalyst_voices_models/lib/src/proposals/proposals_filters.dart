@@ -73,7 +73,8 @@ enum ProposalsFilterType {
   finals,
   favorites,
   my,
+  myFinals,
   voted;
 
-  bool get isMy => this == ProposalsFilterType.my;
+  bool get isMy => this == ProposalsFilterType.my || this == ProposalsFilterType.myFinals;
 }
