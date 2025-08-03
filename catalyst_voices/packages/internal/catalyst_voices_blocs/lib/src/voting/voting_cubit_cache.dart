@@ -6,7 +6,6 @@ final class VotingCubitCache extends Equatable {
   final VotingPower? votingPower;
   final Page<Proposal>? page;
   final ProposalsFilters filters;
-  final ProposalsOrder? selectedOrder;
   final ProposalsCount count;
   final List<String>? favoriteIds;
 
@@ -15,7 +14,6 @@ final class VotingCubitCache extends Equatable {
     this.votingPower,
     this.page,
     this.filters = const ProposalsFilters(),
-    this.selectedOrder,
     this.count = const ProposalsCount(),
     this.favoriteIds,
   });
@@ -26,7 +24,6 @@ final class VotingCubitCache extends Equatable {
         votingPower,
         page,
         filters,
-        selectedOrder,
         count,
         favoriteIds,
       ];
@@ -36,7 +33,6 @@ final class VotingCubitCache extends Equatable {
     Optional<VotingPower>? votingPower,
     Optional<Page<Proposal>>? page,
     ProposalsFilters? filters,
-    Optional<ProposalsOrder>? selectedOrder,
     ProposalsCount? count,
     Optional<List<String>>? favoriteIds,
   }) {
@@ -45,7 +41,6 @@ final class VotingCubitCache extends Equatable {
       votingPower: votingPower.dataOr(this.votingPower),
       page: page.dataOr(this.page),
       filters: filters ?? this.filters,
-      selectedOrder: selectedOrder.dataOr(this.selectedOrder),
       count: count ?? this.count,
       favoriteIds: favoriteIds?.dataOr(this.favoriteIds),
     );

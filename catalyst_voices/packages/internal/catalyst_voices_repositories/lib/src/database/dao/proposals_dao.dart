@@ -380,6 +380,8 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         return _includeFavoriteRefsExcludingHiddenProposalsFilter();
       case ProposalsFilterType.my:
         return _excludeHiddenProposalsFilter();
+      case ProposalsFilterType.voted:
+        return _includeVotedRefsExcludingHiddenProposalsFilter();
     }
   }
 
@@ -540,6 +542,11 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }).get();
   }
 
+  Future<List<SignedDocumentRef>> _getVotedRefs() async {
+    // TODO(dt-iohk): query refs of voted proposals
+    return [];
+  }
+
   Future<_IdsFilter> _includeFavoriteRefsExcludingHiddenProposalsFilter() {
     return _getFavoritesRefs().then((favoriteRefs) {
       return _getProposalsLatestAction().then((actions) async {
@@ -563,6 +570,17 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
             .map(UuidHiLo.from);
       },
     ).then(_IdsFilter.include);
+  }
+
+  Future<_IdsFilter> _includeVotedRefsExcludingHiddenProposalsFilter() {
+    return _getVotedRefs().then((votedRefs) {
+      return _getProposalsLatestAction().then((actions) async {
+        final hiddenProposalsIds =
+            actions.where((e) => e.action.isHidden).map((e) => e.proposalRef.id);
+
+        return votedRefs.map((e) => e.id).whereNot(hiddenProposalsIds.contains).map(UuidHiLo.from);
+      });
+    }).then(_IdsFilter.include);
   }
 
   Future<List<SignedDocumentRef>> _maybeGetAuthorProposalsLooseRefs({
@@ -611,6 +629,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
           latestActions.where((element) => element.action.isFinal).map((e) => e.proposalRef);
 
       final favoritesRefs = await _getFavoritesRefs();
+      final votedRefs = await _getVotedRefs();
       final myRefs = await _maybeGetAuthorProposalsLooseRefs(author: author);
 
       final notHidden = allRefs.where((ref) => hiddenRefs.none((myRef) => myRef.id == ref.id));
@@ -621,6 +640,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       final favorites =
           notHidden.where((ref) => favoritesRefs.any((fav) => fav.id == ref.id)).length;
       final my = notHidden.where((ref) => myRefs.any((myRef) => myRef.id == ref.id)).length;
+      final votedOn = notHidden.where((ref) => votedRefs.any((voted) => voted.id == ref.id)).length;
 
       yield ProposalsCount(
         total: total,
@@ -628,6 +648,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         finals: finals,
         favorites: favorites,
         my: my,
+        voted: votedOn,
       );
     }
   }

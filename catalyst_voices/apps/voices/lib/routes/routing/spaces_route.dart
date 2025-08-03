@@ -12,6 +12,7 @@ import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
 import 'package:catalyst_voices/routes/guards/user_access_guard.dart';
 import 'package:catalyst_voices/routes/routing/transitions/transitions.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -65,11 +66,11 @@ final class FundedProjectsRoute extends GoRouteData
 
 final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
   final String? categoryId;
-  final String? type;
+  final String? tab;
 
   const ProposalsRoute({
     this.categoryId,
-    this.type,
+    this.tab,
   });
 
   factory ProposalsRoute.fromRef({SignedDocumentRef? categoryRef}) {
@@ -77,7 +78,7 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
   }
 
   factory ProposalsRoute.myProposals() {
-    return ProposalsRoute(type: ProposalsFilterType.my.name);
+    return ProposalsRoute(tab: ProposalsFilterType.my.name);
   }
 
   @override
@@ -85,11 +86,11 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
     final categoryId = this.categoryId;
     final categoryRef = categoryId != null ? SignedDocumentRef(id: categoryId) : null;
 
-    final type = ProposalsFilterType.values.asNameMap()[this.type];
+    final tab = ProposalsPageTab.values.asNameMap()[this.tab];
 
     return ProposalsPage(
       categoryId: categoryRef,
-      type: type,
+      tab: tab,
     );
   }
 }
@@ -165,11 +166,11 @@ final class TreasuryRoute extends GoRouteData
 
 final class VotingRoute extends GoRouteData with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String? categoryId;
-  final String? type;
+  final String? tab;
 
   const VotingRoute({
     this.categoryId,
-    this.type,
+    this.tab,
   });
 
   @override
@@ -183,11 +184,11 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin, Compos
     final categoryId = this.categoryId;
     final categoryRef = categoryId != null ? SignedDocumentRef(id: categoryId) : null;
 
-    final type = ProposalsFilterType.values.asNameMap()[this.type];
+    final tab = VotingPageTab.values.asNameMap()[this.tab];
 
     return VotingPage(
       categoryId: categoryRef,
-      type: type,
+      tab: tab,
     );
   }
 }

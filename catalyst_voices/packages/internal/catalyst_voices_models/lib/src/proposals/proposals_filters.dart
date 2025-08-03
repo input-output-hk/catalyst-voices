@@ -72,7 +72,8 @@ enum ProposalsFilterType {
   drafts,
   finals,
   favorites,
-  my;
+  my,
+  voted;
 
   bool get isMy => this == ProposalsFilterType.my;
 }

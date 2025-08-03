@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/widgets/tabbar/voices_tab.dart';
 import 'package:catalyst_voices/widgets/tabbar/voices_tab_bar.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -45,28 +46,42 @@ class _ProposalsTabs extends StatelessWidget {
       dividerHeight: 0,
       controller: controller,
       onTap: (tab) {
-        final type = tab.data;
-        context.read<ProposalsCubit>().emitSignal(ChangeFilterTypeProposalsSignal(type));
+        context.read<ProposalsCubit>().emitSignal(ChangeTabProposalsSignal(tab.data));
       },
       tabs: [
-        for (final type in ProposalsFilterType.values)
+        for (final tab in ProposalsPageTab.values)
           VoicesTab(
-            data: type,
-            key: type.tabKey(),
-            isOffstage: !isProposerUnlock && type.isMy,
-            child: VoicesTabText(type.noOf(context, count: _getCount(type))),
+            data: tab,
+            key: tab.tabKey(),
+            isOffstage: !isProposerUnlock && tab == ProposalsPageTab.my,
+            child: VoicesTabText(tab.noOf(context, count: data.ofType(tab.filter))),
           ),
       ],
     );
   }
+}
 
-  int _getCount(ProposalsFilterType type) {
-    return switch (type) {
-      ProposalsFilterType.total => data.total,
-      ProposalsFilterType.drafts => data.drafts,
-      ProposalsFilterType.finals => data.finals,
-      ProposalsFilterType.favorites => data.favorites,
-      ProposalsFilterType.my => data.my,
+extension on ProposalsPageTab {
+  String noOf(
+    BuildContext context, {
+    required int count,
+  }) {
+    return switch (this) {
+      ProposalsPageTab.total => context.l10n.noOfAll(count),
+      ProposalsPageTab.drafts => context.l10n.noOfDraft(count),
+      ProposalsPageTab.finals => context.l10n.noOfFinal(count),
+      ProposalsPageTab.favorites => context.l10n.noOfFavorites(count),
+      ProposalsPageTab.my => context.l10n.noOfMyProposals(count),
+    };
+  }
+
+  Key tabKey() {
+    return switch (this) {
+      ProposalsPageTab.total => const Key('AllProposalsTab'),
+      ProposalsPageTab.drafts => const Key('DraftProposalsTab'),
+      ProposalsPageTab.finals => const Key('FinalProposalsTab'),
+      ProposalsPageTab.favorites => const Key('FavoriteProposalsTab'),
+      ProposalsPageTab.my => const Key('MyProposalsTab'),
     };
   }
 }

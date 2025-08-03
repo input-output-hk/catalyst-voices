@@ -307,6 +307,15 @@
       }
     }
   },
+  "noOfVotedOn": "Voted On · {count}",
+  "@noOfVotedOn": {
+    "description": "Tab label for voted on proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "favorites": "Favorites",
   "@favorites": {
     "description": "Refers to a list of favorites."
