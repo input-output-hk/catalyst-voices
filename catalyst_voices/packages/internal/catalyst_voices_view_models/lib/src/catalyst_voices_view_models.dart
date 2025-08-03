@@ -40,6 +40,8 @@ export 'proposal/proposal_version_view_model.dart';
 export 'proposal/proposal_view_data.dart';
 export 'proposal/proposal_view_header.dart';
 export 'proposal/proposal_view_metadata.dart';
+export 'proposal/proposal_view_voting.dart';
+export 'proposal/proposal_voting_overview_segment.dart';
 export 'proposal/user_proposal_overview.dart';
 export 'proposal_builder/exception/proposal_builder_exception.dart';
 export 'proposal_builder/proposal_builder_menu_item_data.dart';

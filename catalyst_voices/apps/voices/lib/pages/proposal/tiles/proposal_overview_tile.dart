@@ -8,11 +8,13 @@ import 'package:flutter/material.dart';
 class ProposalOverviewTile extends StatelessWidget {
   final String categoryName;
   final String proposalTitle;
+  final bool isVotingStage;
 
   const ProposalOverviewTile({
     super.key,
     required this.categoryName,
     required this.proposalTitle,
+    required this.isVotingStage,
   });
 
   @override
@@ -47,14 +49,17 @@ class ProposalOverviewTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            const ProposalShareButton(),
-            const SizedBox(width: 8),
-            // TODO(LynxLynxx): Remove when we support mobile web
-            Offstage(
-              offstage: context.select<ProposalCubit, bool>((cubit) => cubit.state.readOnlyMode) ||
-                  CatalystPlatform.isMobileWeb,
-              child: const ProposalFavoriteButton(),
-            ),
+            if (!isVotingStage) ...[
+              const ProposalShareButton(),
+              const SizedBox(width: 8),
+              // TODO(LynxLynxx): Remove when we support mobile web
+              Offstage(
+                offstage:
+                    context.select<ProposalCubit, bool>((cubit) => cubit.state.readOnlyMode) ||
+                        CatalystPlatform.isMobileWeb,
+                child: const ProposalFavoriteButton(),
+              ),
+            ],
           ],
         ),
         const SizedBox(height: 16),
