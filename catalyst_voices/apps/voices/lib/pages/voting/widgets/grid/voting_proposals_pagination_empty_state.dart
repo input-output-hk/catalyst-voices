@@ -2,8 +2,8 @@ import 'package:catalyst_voices/widgets/empty_state/specialized/proposals_pagina
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 
-class ProposalsPaginationEmptyStateSelector extends StatelessWidget {
-  const ProposalsPaginationEmptyStateSelector({super.key});
+class VotingProposalsPaginationEmptyStateSelector extends StatelessWidget {
+  const VotingProposalsPaginationEmptyStateSelector({super.key});
 
   @override
   Widget build(BuildContext context) {

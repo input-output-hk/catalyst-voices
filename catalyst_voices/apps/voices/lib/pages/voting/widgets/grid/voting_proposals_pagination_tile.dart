@@ -6,10 +6,10 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class ProposalsPaginationTile extends StatelessWidget {
+class VotingProposalsPaginationTile extends StatelessWidget {
   final ProposalBrief proposal;
 
-  const ProposalsPaginationTile({
+  const VotingProposalsPaginationTile({
     super.key,
     required this.proposal,
   });
@@ -19,7 +19,7 @@ class ProposalsPaginationTile extends StatelessWidget {
     return BlocSelector<VotingCubit, VotingState, bool>(
       selector: (state) => state.isFavorite(proposal.selfRef.id),
       builder: (context, isFavorite) {
-        return _ProposalsPaginationTile(
+        return _VotingProposalsPaginationTile(
           proposal: proposal.copyWith(isFavorite: isFavorite),
         );
       },
@@ -27,10 +27,10 @@ class ProposalsPaginationTile extends StatelessWidget {
   }
 }
 
-class _ProposalsPaginationTile extends StatelessWidget {
+class _VotingProposalsPaginationTile extends StatelessWidget {
   final ProposalBrief proposal;
 
-  const _ProposalsPaginationTile({
+  const _VotingProposalsPaginationTile({
     required this.proposal,
   });
 

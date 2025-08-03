@@ -4,14 +4,14 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-class ProposalsSearch extends StatefulWidget {
-  const ProposalsSearch({super.key});
+class VotingProposalsSearch extends StatefulWidget {
+  const VotingProposalsSearch({super.key});
 
   @override
-  State<ProposalsSearch> createState() => _ProposalsSearchState();
+  State<VotingProposalsSearch> createState() => _VotingProposalsSearchState();
 }
 
-class _ProposalsSearchState extends State<ProposalsSearch> {
+class _VotingProposalsSearchState extends State<VotingProposalsSearch> {
   final _debouncer = Debouncer(delay: const Duration(milliseconds: 400));
 
   @override

@@ -6,10 +6,10 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class ProposalsTabs extends StatelessWidget {
+class VotingProposalsTabs extends StatelessWidget {
   final TabController controller;
 
-  const ProposalsTabs({
+  const VotingProposalsTabs({
     super.key,
     required this.controller,
   });
@@ -19,7 +19,7 @@ class ProposalsTabs extends StatelessWidget {
     return BlocSelector<VotingCubit, VotingState, ProposalsCount>(
       selector: (state) => state.count,
       builder: (context, state) {
-        return _ProposalsTabs(
+        return _VotingProposalsTabs(
           data: state,
           controller: controller,
         );
@@ -28,11 +28,11 @@ class ProposalsTabs extends StatelessWidget {
   }
 }
 
-class _ProposalsTabs extends StatelessWidget {
+class _VotingProposalsTabs extends StatelessWidget {
   final ProposalsCount data;
   final TabController controller;
 
-  const _ProposalsTabs({
+  const _VotingProposalsTabs({
     required this.data,
     required this.controller,
   });
