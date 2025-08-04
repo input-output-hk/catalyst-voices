@@ -3,10 +3,10 @@ import pytest
 from api.v1 import document
 
 from utils import uuid_v7
-from signed_doc import SignedDocument, proposal_templates
 from api.v1 import document
 import json
 from utils.rbac_chain import rbac_chain_factory, RoleID
+from utils.signed_doc import SignedDocument, proposal_templates
 
 
 # Getting documents using GET `/v1/document` endpoint.
@@ -217,7 +217,7 @@ def test_v1_index_migrated_documents():
     ]
 
     for filter_json, exp_json in values:
-        resp = document.v1_post(filter=filter_json)
+        resp = document.post(filter=filter_json)
         assert (
             resp.status_code == 200
         ), f"Failed to post document: {resp.status_code} - {resp.text}"

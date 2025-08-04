@@ -1,15 +1,14 @@
 import pytest
 from utils import uuid_v7
-from signed_doc import (
-    SignedDocument,
+from api.v1 import document
+from utils.rbac_chain import rbac_chain_factory, RoleID
+from utils.signed_doc import (
     proposal_templates,
     comment_templates,
     proposal_doc_factory,
     comment_doc_factory,
     submission_action_factory,
 )
-from api.v1 import document
-from utils.rbac_chain import rbac_chain_factory, RoleID
 import cbor2
 import uuid
 
