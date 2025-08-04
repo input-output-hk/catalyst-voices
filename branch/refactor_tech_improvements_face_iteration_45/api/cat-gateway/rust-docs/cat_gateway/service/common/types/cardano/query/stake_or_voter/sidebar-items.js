@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["DESCRIPTION","EXAMPLE","FORMAT","PATTERN","TITLE"],"enum":["StakeOrVoter"],"static":["MAX_LENGTH","MIN_LENGTH","SCHEMA"]};
