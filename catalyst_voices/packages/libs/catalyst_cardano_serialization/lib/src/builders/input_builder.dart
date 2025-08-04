@@ -87,7 +87,8 @@ final class InputBuilder implements CoinSelector {
       );
     }
 
-    final result = _selectInputs(
+    // Attempt to make input selection without burning any Ada.
+    final resultWithoutBurning = _selectInputs(
       builder: builder,
       targetTotal: targetTotal,
       minInputs: minInputs,
@@ -96,8 +97,8 @@ final class InputBuilder implements CoinSelector {
       mustIncludeChangeOutputs: changeOutputStrategy == ChangeOutputAdaStrategy.mustInclude,
     );
 
-    if (result != null) {
-      return result;
+    if (resultWithoutBurning != null) {
+      return resultWithoutBurning;
     }
 
     // If burning Ada is allowed attempt to make a selection that burns remaining Ada.
