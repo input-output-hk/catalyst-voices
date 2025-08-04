@@ -1,7 +1,7 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/user/keychain/keychain_provider.dart';
 import 'package:catalyst_voices_repositories/src/utils/json_converters.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user_dto.g.dart';
