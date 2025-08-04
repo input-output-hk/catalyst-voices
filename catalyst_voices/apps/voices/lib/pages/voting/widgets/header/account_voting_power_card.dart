@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/chips/voices_chip.dart';
+import 'package:catalyst_voices/pages/voting/widgets/voting_power_status_chip.dart';
 import 'package:catalyst_voices/widgets/text/timezone_date_time_text.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -79,8 +79,6 @@ class _Status extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -90,25 +88,9 @@ class _Status extends StatelessWidget {
           context.l10n.status,
           style: labelStyle,
         ),
-        VoicesChip(
-          padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 4),
-          borderRadius: BorderRadius.circular(4),
-          backgroundColor: Theme.of(context).colors.onSurfacePrimary016,
-          content: Text(
-            _getStatusText(context),
-            style: theme.textTheme.labelSmall!.copyWith(color: theme.colors.textOnPrimaryLevel1),
-          ),
-        ),
+        VotingPowerStatusChip(status: status),
       ],
     );
-  }
-
-  String _getStatusText(BuildContext context) {
-    return switch (status) {
-      VotingPowerStatus.provisional => context.l10n.provisional,
-      VotingPowerStatus.confirmed => context.l10n.confirmed,
-      null => '                ', // reserve space for actual status
-    };
   }
 }
 

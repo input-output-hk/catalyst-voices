@@ -3385,5 +3385,61 @@
   "votingStatus": "Voting Status",
   "@votingStatus": {
     "description": "Text shown in voting status section"
+  },
+  "xVotes": "{count} {count, plural, =0{Votes} =1{Vote} other{Votes}}",
+  "@xVotes": {
+    "description": "Generic text describing number of votes on made. In context of proposals.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "voteList": "Vote List",
+  "@coteList": {
+    "description": "Name of place where user adds votes on proposals"
+  },
+  "fundX": "Fund{fundNumber}",
+  "@fundX": {
+    "description": "Generic text about nr. of fund / campaign",
+    "placeholders": {
+      "fundNumber": {
+        "type": "int"
+      }
+    }
+  },
+  "totalVotingPower": "Total Voting Power",
+  "@totalVotingPower": {
+    "description": "Label for user voting power number"
+  },
+  "votingListPendingVotes": "Pending votes not yet cast",
+  "@votingListPendingVotes": {
+    "description": "Disclaimer about proposal votes not casted yet"
+  },
+  "votingListCastVotes": "Cast Votes",
+  "@votingListCastVotes": {
+    "description": "Button text which triggers casting votes"
+  },
+  "votingListLastVotedX": "Last voted: {x}",
+  "@votingListLastVotedX": {
+    "description": "For example when was last vote on proposal",
+    "placeholders": {
+      "x": {
+        "type": "String",
+        "example": "Not yet voted"
+      }
+    }
+  },
+  "votingListNotYetVoted": "Not yet voted",
+  "@votingListNotYetVoted": {
+    "description": "no votes casted yet"
+  },
+  "votingListNoVotesAdded": "No votes added.",
+  "@votingListNoVotesAdded": {
+    "description": "Part of voting list empty state"
+  },
+  "votingListNoVotesAddedViewProposal": "View proposal details pages to cast votes",
+  "@votingListNoVotesAddedViewProposal": {
+    "description": "Part of voting list empty state"
   }
 }
