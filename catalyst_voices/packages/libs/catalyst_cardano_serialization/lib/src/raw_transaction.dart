@@ -268,7 +268,7 @@ final class RawTransaction extends BaseTransaction {
 
   /// Validates internal bytes against expected cbor format.
   ///
-  /// Throw [RawTransactionMalformed] if invalid.
+  /// Throw [RawTransactionMalformedException] if invalid.
   void validate({bool allowPaddings = false}) {
     final invalidationReasons = <String>[];
 
@@ -396,12 +396,12 @@ final class RawTransaction extends BaseTransaction {
       }
 
       if (invalidationReasons.isNotEmpty) {
-        throw RawTransactionMalformed(reasons: invalidationReasons);
+        throw RawTransactionMalformedException(reasons: invalidationReasons);
       }
     } catch (e) {
       invalidationReasons.add(e.toString());
 
-      throw RawTransactionMalformed(reasons: invalidationReasons);
+      throw RawTransactionMalformedException(reasons: invalidationReasons);
     }
   }
 

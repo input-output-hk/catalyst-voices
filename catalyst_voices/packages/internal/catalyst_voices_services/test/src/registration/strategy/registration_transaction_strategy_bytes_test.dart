@@ -418,7 +418,7 @@ void main() {
 
       expect(
         buildTx,
-        throwsA(isA<RawTransactionMalformed>()),
+        throwsA(isA<RawTransactionMalformedException>()),
         reason: 'Errors thrown; no corruption',
       );
     });

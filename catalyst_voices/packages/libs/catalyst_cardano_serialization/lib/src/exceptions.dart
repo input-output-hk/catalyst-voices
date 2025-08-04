@@ -215,12 +215,12 @@ final class OutputPublicKeyHashNotInRequiredSignerException extends Equatable im
 }
 
 /// Exception thrown when validating integrity of transaction bytes.
-final class RawTransactionMalformed extends Equatable implements Exception {
+final class RawTransactionMalformedException extends Equatable implements Exception {
   /// List of reasons for malformed transaction.
   final List<String> reasons;
 
-  /// The default constructor for [RawTransactionMalformed].
-  const RawTransactionMalformed({this.reasons = const []});
+  /// The default constructor for [RawTransactionMalformedException].
+  const RawTransactionMalformedException({this.reasons = const []});
 
   @override
   List<Object?> get props => [reasons];
@@ -232,7 +232,7 @@ final class RawTransactionMalformed extends Equatable implements Exception {
 }
 
 /// Exception thrown when validating size of transaction.
-final class RawTransactionSizeChanged extends Equatable implements Exception {
+final class RawTransactionSizeChangedException extends Equatable implements Exception {
   /// Bytes size expected.
   final int expectedSize;
 
@@ -242,8 +242,8 @@ final class RawTransactionSizeChanged extends Equatable implements Exception {
   /// Provides more details about size miss match.
   final String aspect;
 
-  /// The default constructor for [RawTransactionSizeChanged].
-  const RawTransactionSizeChanged({
+  /// The default constructor for [RawTransactionSizeChangedException].
+  const RawTransactionSizeChangedException({
     required this.expectedSize,
     required this.actualSize,
     required this.aspect,
@@ -298,6 +298,23 @@ final class SignatureNotVerifiedException extends Equatable implements Exception
 
   @override
   String toString() => 'SignatureNotVerifiedException';
+}
+
+/// Exception thrown when the transaction doesn't have required change outputs.
+///
+/// In some scenarios such as RBAC registration the transaction must have
+/// change outputs because the [RegistrationData] references them.
+final class TransactionMissingChangeOutputsException extends Equatable implements Exception {
+  /// The default constructor for [TransactionMissingChangeOutputsException].
+  const TransactionMissingChangeOutputsException();
+
+  @override
+  List<Object?> get props => [];
+
+  @override
+  String toString() {
+    return 'TransactionMissingChangeOutputsException';
+  }
 }
 
 /// Exception thrown when transaction inputs are not equal to outputs + fee.

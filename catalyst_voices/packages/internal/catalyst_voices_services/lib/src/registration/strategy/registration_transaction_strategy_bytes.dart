@@ -123,6 +123,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     _validateRawTxStructure(rawTx);
     _validateTransactionSize(rawTx, expectedSize: txSizeBeforePatching);
     _validateAuxiliaryDataSize(rawTx, expectedSize: auxiliaryDataSizeBeforePatching);
+    _validateTransactionHasChangeOutputs(rawTx);
     _validateRequiredSigners(rawTx);
 
     return rawTx;
@@ -187,7 +188,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     final actualSize = rawTx.auxiliaryData.length;
 
     if (actualSize != expectedSize) {
-      throw RawTransactionSizeChanged(
+      throw RawTransactionSizeChangedException(
         expectedSize: expectedSize,
         actualSize: actualSize,
         aspect: 'AuxiliaryData',
@@ -226,7 +227,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
       final cborValue = cbor.decode(bytes);
       Transaction.fromCbor(cborValue);
     } on FormatException catch (_) {
-      throw const RawTransactionMalformed();
+      throw const RawTransactionMalformedException();
     }
   }
 
@@ -255,6 +256,15 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     }
   }
 
+  void _validateTransactionHasChangeOutputs(RawTransaction rawTx) {
+    final outputs = (cborDecode(rawTx.outputs) as CborList).map(TransactionOutput.fromCbor).toSet();
+
+    final hasChangeOutputs = outputs.any((e) => e.address == changeAddress);
+    if (!hasChangeOutputs) {
+      throw const TransactionMissingChangeOutputsException();
+    }
+  }
+
   void _validateTransactionSize(
     RawTransaction rawTx, {
     required int expectedSize,
@@ -262,7 +272,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     final actualSize = rawTx.bytes.length;
 
     if (actualSize != expectedSize) {
-      throw RawTransactionSizeChanged(
+      throw RawTransactionSizeChangedException(
         expectedSize: expectedSize,
         actualSize: actualSize,
         aspect: 'Transaction',
