@@ -129,6 +129,8 @@ final class CatalystId extends Equatable {
     );
   }
 
+  CatalystId withoutUsername() => copyWith(username: const Optional.empty());
+
   String _formatPath() {
     final encodedRole0Key = base64UrlNoPadEncode(role0Key);
     final role = this.role?.number.toString();
