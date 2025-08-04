@@ -3,7 +3,7 @@
       adr:
         author: Damian Molinski
         created: 06-Jun-2025
-        status: proposed
+        status: accepted
         extends:
           - 0001-flutter
           - 0005-flutter-app
