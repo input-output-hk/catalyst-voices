@@ -35,7 +35,7 @@ enum ChangeOutputAdaStrategy {
   /// then do not burn the remaining Ada as fee and throw [InsufficientAdaForChangeOutputException].
   noBurn,
 
-  /// A change output must be included, otherwise a [InsufficientAdaForChangeOutputException]
+  /// A change output must be included, otherwise an [InsufficientAdaForChangeOutputException]
   /// is thrown when the remaining Ada is not enough to create one.
   mustInclude,
 }
