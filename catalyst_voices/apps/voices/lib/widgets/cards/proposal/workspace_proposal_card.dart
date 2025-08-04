@@ -62,33 +62,61 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     final isSubmitted = _ProposalSubmitState.of(context)?.isSubmitted ?? false;
     final commentsCount = proposal.commentsCount;
-    return Wrap(
-      alignment: WrapAlignment.spaceBetween,
-      spacing: 10,
-      runSpacing: 10,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _BodyHeader(
-          title: proposal.title,
-          lastUpdate: proposal.updateDate,
-        ),
-        ProposalIterationStageChip(
-          status: proposal.publish,
-          versionNumber: proposal.versions.versionNumber(
-            proposal.selfRef.version ?? '',
+        Expanded(
+          child: Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            spacing: 50,
+            runSpacing: 20,
+            children: [
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 750),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _BodyHeader(
+                      title: proposal.title,
+                      lastUpdate: proposal.updateDate,
+                    ),
+                    ProposalIterationStageChip(
+                      status: proposal.publish,
+                      versionNumber: proposal.versions.versionNumber(
+                        proposal.selfRef.version ?? '',
+                      ),
+                      useInternalBackground: !isSubmitted,
+                    ),
+                  ],
+                ),
+              ),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 630),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(
+                      width: 300,
+                      child: _CampaignData(
+                        leadValue: proposal.category,
+                        subValue: context.l10n.fundNoCategory(14),
+                      ),
+                    ),
+                    _CampaignData(
+                      leadValue: CryptocurrencyFormatter.decimalFormat(proposal.fundsRequested),
+                      subValue: context.l10n.proposalViewFundingRequested,
+                    ),
+                    _CampaignData(
+                      leadValue: commentsCount == 0
+                          ? context.l10n.notAvailableAbbr
+                          : commentsCount.toString(),
+                      subValue: context.l10n.comments(commentsCount),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          useInternalBackground: !isSubmitted,
-        ),
-        _CampaignData(
-          leadValue: proposal.category,
-          subValue: context.l10n.fundNoCategory(14),
-        ),
-        _CampaignData(
-          leadValue: CryptocurrencyFormatter.decimalFormat(proposal.fundsRequested),
-          subValue: context.l10n.proposalViewFundingRequested,
-        ),
-        _CampaignData(
-          leadValue: commentsCount == 0 ? context.l10n.notAvailableAbbr : commentsCount.toString(),
-          subValue: context.l10n.comments(commentsCount),
         ),
         ProposalMenuActionButton(
           ref: proposal.selfRef,
@@ -115,28 +143,25 @@ class _BodyHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final headerColor = _ProposalSubmitState.of(context)?.headerColor(context);
     final labelColor = _ProposalSubmitState.of(context)?.headerLabelColor(context);
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 439),
-      child: Column(
-        spacing: 2,
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            title,
-            style: context.textTheme.titleSmall?.copyWith(
-              color: headerColor,
-            ),
+    return Column(
+      spacing: 2,
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: context.textTheme.titleSmall?.copyWith(
+            color: headerColor,
           ),
-          LastEditDate(
-            dateTime: lastUpdate,
-            showTimezone: false,
-            textStyle: context.textTheme.labelMedium?.copyWith(
-              color: labelColor,
-            ),
+        ),
+        LastEditDate(
+          dateTime: lastUpdate,
+          showTimezone: false,
+          textStyle: context.textTheme.labelMedium?.copyWith(
+            color: labelColor,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

@@ -18,16 +18,19 @@ final class BaseProfileProgress extends Equatable {
 }
 
 final class KeychainProgress extends Equatable {
+  final String keychainId;
   final SeedPhrase seedPhrase;
   final String password;
 
   const KeychainProgress({
+    required this.keychainId,
     required this.seedPhrase,
     required this.password,
   });
 
   @override
   List<Object?> get props => [
+        keychainId,
         seedPhrase,
         password,
       ];

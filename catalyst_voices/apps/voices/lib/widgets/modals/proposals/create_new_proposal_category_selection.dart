@@ -1,12 +1,13 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/category/category_compact_detail_view.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
-class CreateNewProposalCategorySelection extends StatelessWidget {
+class CreateNewProposalCategorySelection extends StatefulWidget {
   final List<CampaignCategoryDetailsViewModel> categories;
   final SignedDocumentRef? selectedCategory;
   final ValueChanged<SignedDocumentRef?> onCategorySelected;
@@ -18,45 +19,9 @@ class CreateNewProposalCategorySelection extends StatelessWidget {
     required this.onCategorySelected,
   });
 
-  CampaignCategoryDetailsViewModel? get _selectedCategory {
-    return categories.firstWhereOrNull((element) => element.id == selectedCategory);
-  }
-
   @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 50),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: ListView.separated(
-                itemBuilder: (context, index) => _CategoryCard(
-                  name: categories[index].formattedName,
-                  description: categories[index].shortDescription,
-                  ref: categories[index].id,
-                  isSelected: categories[index].id == selectedCategory,
-                  onCategorySelected: onCategorySelected,
-                ),
-                separatorBuilder: (context, index) => const SizedBox(height: 16),
-                itemCount: categories.length,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              flex: 2,
-              child: _selectedCategory != null
-                  ? SingleChildScrollView(
-                      child: CategoryCompactDetailView(category: _selectedCategory!),
-                    )
-                  : const _NoneCategorySelected(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  State<CreateNewProposalCategorySelection> createState() =>
+      _CreateNewProposalCategorySelectionState();
 }
 
 class _CategoryCard extends StatelessWidget {
@@ -115,6 +80,67 @@ class _CategoryCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _CreateNewProposalCategorySelectionState extends State<CreateNewProposalCategorySelection> {
+  late final ScrollController _scrollController;
+
+  CampaignCategoryDetailsViewModel? get _selectedCategory {
+    return widget.categories.firstWhereOrNull((element) => element.id == widget.selectedCategory);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 68),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ListView.separated(
+                itemBuilder: (context, index) => _CategoryCard(
+                  name: widget.categories[index].formattedName,
+                  description: widget.categories[index].shortDescription,
+                  ref: widget.categories[index].id,
+                  isSelected: widget.categories[index].id == widget.selectedCategory,
+                  onCategorySelected: widget.onCategorySelected,
+                ),
+                separatorBuilder: (context, index) => const SizedBox(height: 16),
+                itemCount: widget.categories.length,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              flex: 2,
+              child: _selectedCategory != null
+                  ? VoicesScrollbar(
+                      controller: _scrollController,
+                      alwaysVisible: true,
+                      child: SingleChildScrollView(
+                        controller: _scrollController,
+                        child: CategoryCompactDetailView(category: _selectedCategory!),
+                      ),
+                    )
+                  : const _NoneCategorySelected(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
   }
 }
 

@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/formatters/date_formatter.dart';
-import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/cards/proposal/proposal_border.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
@@ -352,8 +351,7 @@ class _Topbar extends StatelessWidget {
           key: const Key('ShareBtn'),
           circle: false,
           onTap: () async {
-            final url = ProposalRoute.fromRef(ref: proposalRef).location;
-            await ShareProposalDialog.show(context, url);
+            await ShareProposalDialog.show(context, ref: proposalRef);
           },
         ),
         if (onFavoriteChanged != null) ...[

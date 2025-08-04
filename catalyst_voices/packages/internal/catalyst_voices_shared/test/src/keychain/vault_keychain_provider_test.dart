@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:convert/convert.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -57,7 +57,7 @@ void main() {
       const lockFactor = PasswordLockFactor('Test1234');
       final key = keyFactory.create(
         Uint8List.fromList(
-          hex.decode(
+          hexDecode(
             '8a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c',
           ),
         ),
@@ -147,16 +147,16 @@ void main() {
   });
 }
 
-class _FakeCatalystPrivateKeyFactory extends Fake implements CatalystPrivateKeyFactory {
-  @override
-  CatalystPrivateKey create(Uint8List bytes) {
-    return _FakeCatalystPrivateKey(bytes: bytes);
-  }
-}
-
 class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   @override
   final Uint8List bytes;
 
   _FakeCatalystPrivateKey({required this.bytes});
+}
+
+class _FakeCatalystPrivateKeyFactory extends Fake implements CatalystPrivateKeyFactory {
+  @override
+  CatalystPrivateKey create(Uint8List bytes) {
+    return _FakeCatalystPrivateKey(bytes: bytes);
+  }
 }

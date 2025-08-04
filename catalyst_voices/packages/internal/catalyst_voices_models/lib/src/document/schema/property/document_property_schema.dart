@@ -64,24 +64,6 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
   /// rather than a child in a parent section.
   bool get isSectionOrSubsection => this is DocumentSectionSchema || isSubsection;
 
-  /// Creates a new property from this schema with a default value.
-  ///
-  /// Specify the [nodeId] where the property should be created.
-  /// Optionally specify a new [title] that should replace the old title.
-  ///
-  /// This is useful to create new items for the [DocumentListProperty].
-  DocumentProperty createChildPropertyAt({
-    required DocumentNodeId nodeId,
-    String? title,
-  });
-
-  /// Creates a new copy of the schema.
-  ///
-  /// - If [nodeId] is not null then it moves the schema
-  /// and it's children to the [nodeId].
-  /// - If [title] is not null then the new schema will use the updated title.
-  DocumentPropertySchema copyWith({DocumentNodeId? nodeId, String? title});
-
   @override
   @mustCallSuper
   List<Object?> get props => [
@@ -95,6 +77,28 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
         isSubsection,
         isRequired,
       ];
+
+  /// Creates a new copy of the schema.
+  ///
+  /// - If [nodeId] is not null then it moves the schema
+  /// and it's children to the [nodeId].
+  /// - If [title] is not null then the new schema will use the updated title.
+  DocumentPropertySchema copyWith({DocumentNodeId? nodeId, String? title});
+
+  /// Creates a new property from this schema with a default value.
+  ///
+  /// Specify the [nodeId] where the property should be created.
+  /// Optionally specify a new [title] that should replace the old title.
+  ///
+  /// This is useful to create new items for the [DocumentListProperty].
+  DocumentProperty createChildPropertyAt({
+    required DocumentNodeId nodeId,
+    String? title,
+  });
+
+  DocumentPropertySchema? getPropertySchema(DocumentNodeId nodeId) {
+    return nodeId == this.nodeId ? this : null;
+  }
 }
 
 /// A schema property that can have a value.
@@ -124,6 +128,10 @@ sealed class DocumentValueSchema<T extends Object> extends DocumentPropertySchem
     required this.enumValues,
   });
 
+  @override
+  @mustCallSuper
+  List<Object?> get props => super.props + [defaultValue, constValue, enumValues];
+
   /// A method that builds typed properties.
   ///
   /// Helps to create properties which generic type [T]
@@ -134,19 +142,6 @@ sealed class DocumentValueSchema<T extends Object> extends DocumentPropertySchem
       value: value,
       validationResult: validate(value),
     );
-  }
-
-  @override
-  DocumentValueProperty<T> createChildPropertyAt({
-    required DocumentNodeId nodeId,
-    String? title,
-  }) {
-    final updatedSchema = copyWith(
-      nodeId: nodeId,
-      title: title,
-    );
-
-    return updatedSchema.buildProperty(value: defaultValue);
   }
 
   /// Casts the property linked to this schema so that
@@ -171,10 +166,19 @@ sealed class DocumentValueSchema<T extends Object> extends DocumentPropertySchem
   @override
   DocumentValueSchema<T> copyWith({DocumentNodeId? nodeId, String? title});
 
+  @override
+  DocumentValueProperty<T> createChildPropertyAt({
+    required DocumentNodeId nodeId,
+    String? title,
+  }) {
+    final updatedSchema = copyWith(
+      nodeId: nodeId,
+      title: title,
+    );
+
+    return updatedSchema.buildProperty(value: defaultValue);
+  }
+
   /// Validates the property [value] against document rules.
   DocumentValidationResult validate(T? value);
-
-  @override
-  @mustCallSuper
-  List<Object?> get props => super.props + [defaultValue, constValue, enumValues];
 }

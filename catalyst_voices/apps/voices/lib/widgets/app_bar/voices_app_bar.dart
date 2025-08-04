@@ -1,9 +1,7 @@
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/app_bar/actions/search_button.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices/widgets/dev_tools/dev_tools_enabler.dart';
-import 'package:catalyst_voices/widgets/gesture/voices_gesture_detector.dart';
-import 'package:catalyst_voices/widgets/separators/voices_divider.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -27,6 +25,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool showSearch;
   final bool automaticallyImplyLeading;
   final Color? backgroundColor;
+  final bool enableBackHome;
 
   const VoicesAppBar({
     super.key,
@@ -35,6 +34,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showSearch = false,
     this.automaticallyImplyLeading = true,
     this.backgroundColor,
+    this.enableBackHome = true,
   });
 
   @override
@@ -58,7 +58,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
                 leadingWidth: 48.0 + spacing,
                 automaticallyImplyLeading: false,
                 backgroundColor: backgroundColor,
-                title: _Title(showSearch: showSearch),
+                title: _Title(showSearch: showSearch, enableBackHome: enableBackHome),
                 actions: [
                   _Actions(children: actions),
                 ],
@@ -81,7 +81,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     final child = leading ??
         (canImplyDrawerToggleButton ? const DrawerToggleButton() : null) ??
-        (canImplyPopButton ? const NavigationPopButton() : null);
+        (canImplyPopButton ? const NavigationBack(isCompact: true) : null);
 
     if (child == null) {
       return null;
@@ -135,14 +135,16 @@ class _Actions extends StatelessWidget {
 }
 
 class _BrandPicture extends StatelessWidget {
-  const _BrandPicture();
+  final bool enableBackHome;
+
+  const _BrandPicture({required this.enableBackHome});
 
   @override
   Widget build(BuildContext context) {
     return DevToolsEnabler(
       child: VoicesGestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () => GoRouter.of(context).go(Routes.initialLocation),
+        onTap: () => enableBackHome ? GoRouter.of(context).go(Routes.initialLocation) : null,
         child: Theme.of(context).brandAssets.brand.logo(context).buildPicture(),
       ),
     );
@@ -171,8 +173,9 @@ class _Theme extends StatelessWidget {
 
 class _Title extends StatelessWidget {
   final bool showSearch;
+  final bool enableBackHome;
 
-  const _Title({required this.showSearch});
+  const _Title({required this.showSearch, required this.enableBackHome});
 
   @override
   Widget build(BuildContext context) {
@@ -191,13 +194,13 @@ class _Title extends StatelessWidget {
         ),
         xs: (
           widgets: [
-            const _BrandPicture(),
+            _BrandPicture(enableBackHome: enableBackHome),
           ],
           itemGap: 8
         ),
         sm: (
           widgets: [
-            const _BrandPicture(),
+            _BrandPicture(enableBackHome: enableBackHome),
             if (showSearch)
               SearchButton(
                 onPressed: () {},
@@ -207,7 +210,7 @@ class _Title extends StatelessWidget {
         ),
         other: (
           widgets: [
-            const _BrandPicture(),
+            _BrandPicture(enableBackHome: enableBackHome),
             if (showSearch)
               SearchButton(
                 onPressed: () {},

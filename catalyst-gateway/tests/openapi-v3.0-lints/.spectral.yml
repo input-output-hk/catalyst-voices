@@ -185,15 +185,15 @@ rules:
         length: 20
 
   api-path:
-    message: "Invalid API path - should be /api/draft/* or /api/v<number>/*"
+    message: "Invalid API path - should be /api/gateway/draft/* or /api/gateway/v<number>/*"
     given: "$.paths"
     severity: error
     then:
       field: "@key"
       function: pattern
       functionOptions:
-        # Match paths that start with /api/draft/* or /api/v<number>/*
-        match: "^/api/(draft|v\\d+)/.*$"
+        # Match paths that start with /api/gateway/draft/* or /api/gateway/v<number>/*
+        match: "^/api/gateway/(draft|v\\d+)/.*$"
   api-content-type:
     message: "Content type must not be text/plain"
     given: "$.paths[*][*].responses[*].content"

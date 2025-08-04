@@ -39,9 +39,6 @@ final class DocumentSchema extends Equatable implements DocumentNode {
   @override
   DocumentNodeId get nodeId => DocumentNodeId.root;
 
-  List<DocumentSegmentSchema> get segments =>
-      properties.whereType<DocumentSegmentSchema>().toList();
-
   @override
   List<Object?> get props => [
         parentSchemaUrl,
@@ -51,19 +48,19 @@ final class DocumentSchema extends Equatable implements DocumentNode {
         properties,
         order,
       ];
-}
 
-final class DocumentSchemaLogicalGroup extends Equatable {
-  final List<DocumentSchemaLogicalCondition> conditions;
+  List<DocumentSegmentSchema> get segments =>
+      properties.whereType<DocumentSegmentSchema>().toList();
 
-  const DocumentSchemaLogicalGroup({
-    required this.conditions,
-  });
-
-  @override
-  List<Object?> get props => [
-        conditions,
-      ];
+  DocumentPropertySchema? getPropertySchema(DocumentNodeId nodeId) {
+    for (final property in properties) {
+      final foundProperty = property.getPropertySchema(nodeId);
+      if (foundProperty != null) {
+        return foundProperty;
+      }
+    }
+    return null;
+  }
 }
 
 final class DocumentSchemaLogicalCondition extends Equatable {
@@ -82,5 +79,18 @@ final class DocumentSchemaLogicalCondition extends Equatable {
         schema,
         constValue,
         enumValues,
+      ];
+}
+
+final class DocumentSchemaLogicalGroup extends Equatable {
+  final List<DocumentSchemaLogicalCondition> conditions;
+
+  const DocumentSchemaLogicalGroup({
+    required this.conditions,
+  });
+
+  @override
+  List<Object?> get props => [
+        conditions,
       ];
 }

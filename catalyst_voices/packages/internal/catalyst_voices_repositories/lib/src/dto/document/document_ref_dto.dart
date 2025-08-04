@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:convert/convert.dart' show hex;
 import 'package:flutter/foundation.dart';
@@ -72,7 +73,7 @@ final class SecuredDocumentRefDto {
   SecuredDocumentRef toModel() {
     return SecuredDocumentRef(
       ref: ref.toModel(),
-      hash: Uint8List.fromList(hex.decode(hash)),
+      hash: Uint8List.fromList(hexDecode(hash)),
     );
   }
 }

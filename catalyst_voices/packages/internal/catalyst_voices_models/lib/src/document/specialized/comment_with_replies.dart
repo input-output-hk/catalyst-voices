@@ -12,6 +12,13 @@ final class CommentWithReplies extends Equatable {
     this.depth = 1,
   });
 
+  int get repliesCount {
+    return replies.fold(
+      0,
+      (previousValue, element) => previousValue + 1 + element.repliesCount,
+    );
+  }
+
   factory CommentWithReplies.build(
     CommentDocument comment, {
     required List<CommentDocument> comments,

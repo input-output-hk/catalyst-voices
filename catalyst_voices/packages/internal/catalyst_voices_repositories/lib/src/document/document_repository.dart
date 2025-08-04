@@ -17,6 +17,8 @@ final _logger = Logger('DocumentRepository');
 
 DocumentRef _templateResolver(DocumentData data) => data.metadata.template!;
 
+/// Base interface to interact with documents. This interface is used to allow interaction with any
+/// document type.
 abstract interface class DocumentRepository {
   factory DocumentRepository(
     DraftDataSource drafts,
@@ -42,6 +44,11 @@ abstract interface class DocumentRepository {
   /// so that it can be saved as a file.
   Future<Uint8List> encodeDocumentForExport({
     required DocumentData document,
+  });
+
+  /// Returns all matching [DocumentData] to given [ref].
+  Future<List<DocumentData>> getAllDocumentsData({
+    required DocumentRef ref,
   });
 
   /// Returns list of refs to all published and any refs it may hold.
@@ -120,6 +127,11 @@ abstract interface class DocumentRepository {
     required String id,
     bool includeLocalDrafts = false,
   });
+
+  /// Removes all locally stored documents.
+  ///
+  /// Returns number of deleted rows.
+  Future<int> removeAll();
 
   /// Updates fav status matching [ref].
   Future<void> updateDocumentFavorite({
@@ -233,6 +245,17 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
+  Future<List<DocumentData>> getAllDocumentsData({required DocumentRef ref}) async {
+    final all = switch (ref) {
+      DraftRef() => await _drafts.getAll(ref: ref),
+      SignedDocumentRef() => await _localDocuments.getAll(ref: ref),
+    }
+      ..sort();
+
+    return all;
+  }
+
+  @override
   Future<List<TypedDocumentRef>> getAllDocumentsRefs() async {
     final allRefs = await _remoteDocuments.index().then(_uniqueTypedRefs);
     final allConstRefs = constantDocumentsRefs.expand((element) => element.all);
@@ -320,8 +343,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required Uint8List data,
     required CatalystId authorId,
   }) async {
-    final jsonData = json.fuse(utf8).decode(data)! as Map<String, dynamic>;
-    final document = DocumentDataDto.fromJson(jsonData).toModel();
+    final document = _parseDocumentData(data);
 
     final newMetadata = document.metadata.copyWith(
       selfRef: DraftRef.generateFirstRef(),
@@ -377,6 +399,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
           ),
         )
         .toList();
+  }
+
+  @override
+  Future<int> removeAll() async {
+    final deletedDrafts = await _drafts.deleteAll();
+    final deletedDocuments = await _localDocuments.deleteAll();
+
+    return deletedDrafts + deletedDocuments;
   }
 
   @override
@@ -595,6 +625,15 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     await _localDocuments.save(data: remoteData);
 
     return remoteData;
+  }
+
+  DocumentData _parseDocumentData(Uint8List data) {
+    try {
+      final jsonData = json.fuse(utf8).decode(data)! as Map<String, dynamic>;
+      return DocumentDataDto.fromJson(jsonData).toModel();
+    } catch (e) {
+      throw DocumentImportInvalidDataException(e);
+    }
   }
 
   Future<List<DocumentsDataWithRefData>> _processDocuments({

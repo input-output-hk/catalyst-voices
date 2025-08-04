@@ -1,6 +1,5 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/widgets/buttons/clipboard_button.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -40,6 +39,7 @@ class WalletSummary extends StatelessWidget {
         ),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -65,34 +65,8 @@ class WalletSummary extends StatelessWidget {
             const SizedBox(height: 12),
             _NetworkIdMismatchError(networkId: showExpectedNetworkId),
           ],
-          if (showLowBalance) ...[
-            const SizedBox(height: 12),
-            Text(
-              context.l10n.notice,
-              style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              context.l10n.walletLinkWalletDetailsNotice,
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
-            const SizedBox(height: 6),
-            Text(
-              context.l10n.walletLinkWalletDetailsNoticeTopUp,
-              style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-            ),
-            const SizedBox(height: 6),
-            BulletList(
-              items: [
-                context.l10n.walletLinkWalletDetailsNoticeTopUpLink,
-              ],
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
-          ],
+          const SizedBox(height: 12),
+          const _WalletBalanceNotice(),
         ],
       ),
     );
@@ -115,6 +89,31 @@ class _NetworkIdMismatchError extends StatelessWidget {
       style: Theme.of(context).textTheme.labelSmall!.copyWith(
             color: Theme.of(context).colors.iconsError,
           ),
+    );
+  }
+}
+
+class _WalletBalanceNotice extends StatelessWidget {
+  const _WalletBalanceNotice();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 6,
+      children: [
+        Text(
+          context.l10n.notice,
+          style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+        ),
+        Text(
+          context.l10n.walletLinkWalletDetailsNotice,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ],
     );
   }
 }

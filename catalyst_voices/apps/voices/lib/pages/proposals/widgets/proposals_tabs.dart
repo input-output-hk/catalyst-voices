@@ -36,6 +36,8 @@ class _ProposalsTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isProposerUnlock =
+        !context.select<SessionCubit, bool>((cubit) => cubit.state.isProposerUnlock);
     return TabBar(
       isScrollable: true,
       tabAlignment: TabAlignment.start,
@@ -55,9 +57,12 @@ class _ProposalsTabs extends StatelessWidget {
             ProposalsFilterType.my => data.my,
           };
 
-          return Tab(
-            key: value.tabKey(),
-            text: value.noOf(context, count: count),
+          return Offstage(
+            offstage: isProposerUnlock && value.isMy,
+            child: Tab(
+              key: value.tabKey(),
+              text: value.noOf(context, count: count),
+            ),
           );
         },
       ).toList(),

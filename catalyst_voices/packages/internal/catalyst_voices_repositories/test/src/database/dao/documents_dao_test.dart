@@ -33,10 +33,7 @@ void main() {
         'documents can be queried back correctly',
         () async {
           // Given
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
-            10,
-            (index) => DocumentWithMetadataFactory.build(),
-          );
+          final documentsWithMetadata = _generateDocumentEntitiesWithMetadata(10);
           final expectedDocuments = documentsWithMetadata.map((e) => e.document);
 
           // When
@@ -54,11 +51,7 @@ void main() {
         'conflicting documents are ignored',
         () async {
           // Given
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
-            20,
-            (index) => DocumentWithMetadataFactory.build(),
-          );
-
+          final documentsWithMetadata = _generateDocumentEntitiesWithMetadata(20);
           final expectedDocuments = documentsWithMetadata.map((e) => e.document);
 
           // When
@@ -82,11 +75,7 @@ void main() {
         'stream emits data when new entities are saved',
         () async {
           // Given
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
-            1,
-            (index) => DocumentWithMetadataFactory.build(),
-          );
-
+          final documentsWithMetadata = _generateDocumentEntitiesWithMetadata(1);
           final expectedDocuments = documentsWithMetadata.map((e) => e.document).toList();
 
           // When
@@ -110,10 +99,7 @@ void main() {
         'returns specific version matching exact ref',
         () async {
           // Given
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
-            2,
-            (index) => DocumentWithMetadataFactory.build(),
-          );
+          final documentsWithMetadata = _generateDocumentEntitiesWithMetadata(2);
           final document = documentsWithMetadata.first.document;
           final ref = SignedDocumentRef(
             id: document.metadata.id,
@@ -141,7 +127,7 @@ void main() {
         'returns newest version when ver is not specified',
         () async {
           // Given
-          final id = const Uuid().v7();
+          final id = DocumentRefFactory.randomUuidV7();
           final firstVersionId = const Uuid().v7(
             config: V7Options(
               DateTime(2025, 2, 10).millisecondsSinceEpoch,
@@ -200,11 +186,8 @@ void main() {
         'returns null when id does not match any id',
         () async {
           // Given
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
-            2,
-            (index) => DocumentWithMetadataFactory.build(),
-          );
-          final ref = SignedDocumentRef(id: const Uuid().v7());
+          final documentsWithMetadata = _generateDocumentEntitiesWithMetadata(2);
+          final ref = SignedDocumentRef(id: DocumentRefFactory.randomUuidV7());
 
           // When
           await database.documentsDao.saveAll(documentsWithMetadata);
@@ -223,8 +206,9 @@ void main() {
           // Given
           final refs = List.generate(
             10,
-            (_) => SignedDocumentRef.generateFirstRef(),
+            (_) => DocumentRefFactory.signedDocumentRef(),
           );
+
           final documentsWithMetadata = refs.map((ref) {
             return DocumentWithMetadataFactory.build(
               metadata: DocumentDataMetadata(
@@ -252,10 +236,10 @@ void main() {
       test(
         'Return latest unique documents',
         () async {
-          final id = const Uuid().v7();
-          final version = const Uuid().v7();
-          await Future<void>.delayed(const Duration(milliseconds: 1));
-          final version2 = const Uuid().v7();
+          final id = DocumentRefFactory.randomUuidV7();
+          final version = DocumentRefFactory.randomUuidV7();
+          final version2 = DocumentRefFactory.randomUuidV7();
+
           final document = DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
@@ -290,10 +274,7 @@ void main() {
         'Returns latest document limited by quantity if provided',
         () async {
           // Given
-          final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
-            20,
-            (index) => DocumentWithMetadataFactory.build(),
-          );
+          final documentsWithMetadata = _generateDocumentEntitiesWithMetadata(20);
 
           final expectedDocuments = documentsWithMetadata
               .map((e) => e.document)
@@ -349,10 +330,9 @@ void main() {
       test(
         'returns latest version when document has more than 1 version',
         () async {
-          final id = const Uuid().v7();
-          final v1 = const Uuid().v7();
-          await Future<void>.delayed(const Duration(milliseconds: 1));
-          final v2 = const Uuid().v7();
+          final id = DocumentRefFactory.randomUuidV7();
+          final v1 = DocumentRefFactory.randomUuidV7();
+          final v2 = DocumentRefFactory.randomUuidV7();
 
           final documentsWithMetadata = [v1, v2].map((version) {
             final metadata = DocumentDataMetadata(
@@ -391,13 +371,11 @@ void main() {
         'emits new version of recent document',
         () async {
           // Generate base ID
-          final id = const Uuid().v7();
+          final id = DocumentRefFactory.randomUuidV7();
 
           // Create versions with enforced order (v2 is newer than v1)
-          final v1 = const Uuid().v7();
-          // Wait a moment to ensure second UUID is newer
-          await Future<void>.delayed(const Duration(milliseconds: 1));
-          final v2 = const Uuid().v7();
+          final v1 = DocumentRefFactory.randomUuidV7();
+          final v2 = DocumentRefFactory.randomUuidV7();
 
           final documentsWithMetadata = DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
@@ -442,14 +420,13 @@ void main() {
         'emits new document when is inserted',
         () async {
           // Generate base ID
-          final id1 = const Uuid().v7();
+          final id1 = DocumentRefFactory.randomUuidV7();
 
           // Create versions with enforced order (v2 is newer than v1)
-          final v1 = const Uuid().v7();
-          // Wait a moment to ensure second UUID is newer
-          await Future<void>.delayed(const Duration(milliseconds: 1));
-          final id2 = const Uuid().v7();
-          final v2 = const Uuid().v7();
+          final v1 = DocumentRefFactory.randomUuidV7();
+
+          final id2 = DocumentRefFactory.randomUuidV7();
+          final v2 = DocumentRefFactory.randomUuidV7();
 
           final document1 = DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
@@ -502,14 +479,15 @@ void main() {
           final document1 = DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: SignedDocumentRef.generateFirstRef(),
+              selfRef: DocumentRefFactory.signedDocumentRef(),
               authors: [originalId],
             ),
           );
+
           final document2 = DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: SignedDocumentRef.generateFirstRef(),
+              selfRef: DocumentRefFactory.signedDocumentRef(),
               authors: [updatedId],
             ),
           );
@@ -546,13 +524,13 @@ void main() {
           final document1 = DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: SignedDocumentRef.generateFirstRef(),
+              selfRef: DocumentRefFactory.signedDocumentRef(),
             ),
           );
           final document2 = DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: SignedDocumentRef.generateFirstRef(),
+              selfRef: DocumentRefFactory.signedDocumentRef(),
               ref: document1.document.metadata.selfRef,
             ),
           );
@@ -579,25 +557,24 @@ void main() {
           final baseDocument = DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.proposalDocument,
-              selfRef: SignedDocumentRef.generateFirstRef(),
+              selfRef: DocumentRefFactory.signedDocumentRef(),
             ),
           );
 
           final referencingDocument = DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.commentTemplate,
-              selfRef: SignedDocumentRef.generateFirstRef(),
+              selfRef: DocumentRefFactory.signedDocumentRef(),
               ref: baseDocument.document.metadata.selfRef,
             ),
           );
 
-          await Future<void>.delayed(const Duration(milliseconds: 1));
           final newerVersion = DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.commentTemplate,
               selfRef: SignedDocumentRef(
                 id: referencingDocument.document.metadata.id,
-                version: const Uuid().v7(),
+                version: DocumentRefFactory.randomUuidV7(),
               ),
               ref: baseDocument.document.metadata.selfRef,
             ),
@@ -667,13 +644,13 @@ void main() {
         'two versions of same document will be counted as one',
         () async {
           // Given
-          final id = const Uuid().v7();
+          final id = DocumentRefFactory.randomUuidV7();
           final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
             2,
             (index) {
               final metadata = DocumentDataMetadata(
                 type: DocumentType.proposalDocument,
-                selfRef: SignedDocumentRef(id: id, version: const Uuid().v7()),
+                selfRef: SignedDocumentRef(id: id, version: DocumentRefFactory.randomUuidV7()),
               );
               return DocumentWithMetadataFactory.build(metadata: metadata);
             },
@@ -694,13 +671,13 @@ void main() {
         'where without ver counts all versions',
         () async {
           // Given
-          final id = const Uuid().v7();
+          final id = DocumentRefFactory.randomUuidV7();
           final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
             2,
             (index) {
               final metadata = DocumentDataMetadata(
                 type: DocumentType.proposalDocument,
-                selfRef: SignedDocumentRef(id: id, version: const Uuid().v7()),
+                selfRef: SignedDocumentRef(id: id, version: DocumentRefFactory.randomUuidV7()),
               );
               return DocumentWithMetadataFactory.build(metadata: metadata);
             },
@@ -724,13 +701,13 @@ void main() {
         'where with ver counts only matching results',
         () async {
           // Given
-          final id = const Uuid().v7();
+          final id = DocumentRefFactory.randomUuidV7();
           final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
             2,
             (index) {
               final metadata = DocumentDataMetadata(
                 type: DocumentType.proposalDocument,
-                selfRef: SignedDocumentRef(id: id, version: const Uuid().v7()),
+                selfRef: SignedDocumentRef(id: id, version: DocumentRefFactory.randomUuidV7()),
               );
               return DocumentWithMetadataFactory.build(metadata: metadata);
             },
@@ -759,7 +736,7 @@ void main() {
             (index) {
               final metadata = DocumentDataMetadata(
                 type: DocumentType.proposalDocument,
-                selfRef: SignedDocumentRef.generateFirstRef(),
+                selfRef: DocumentRefFactory.signedDocumentRef(),
               );
               return DocumentWithMetadataFactory.build(metadata: metadata);
             },
@@ -783,8 +760,8 @@ void main() {
       test(
         'Counts comments for specific proposal document version',
         () async {
-          final proposalId = const Uuid().v7();
-          final versionId = const Uuid().v7();
+          final proposalId = DocumentRefFactory.randomUuidV7();
+          final versionId = DocumentRefFactory.randomUuidV7();
           final proposalRef = SignedDocumentRef(
             id: proposalId,
             version: versionId,
@@ -803,7 +780,7 @@ void main() {
             (index) => DocumentWithMetadataFactory.build(
               metadata: DocumentDataMetadata(
                 type: DocumentType.commentTemplate,
-                selfRef: SignedDocumentRef.generateFirstRef(),
+                selfRef: DocumentRefFactory.signedDocumentRef(),
                 ref: proposalRef,
               ),
             ),
@@ -813,8 +790,8 @@ void main() {
             (index) => DocumentWithMetadataFactory.build(
               metadata: DocumentDataMetadata(
                 type: DocumentType.commentTemplate,
-                selfRef: SignedDocumentRef.generateFirstRef(),
-                ref: SignedDocumentRef.generateFirstRef(),
+                selfRef: DocumentRefFactory.signedDocumentRef(),
+                ref: DocumentRefFactory.signedDocumentRef(),
               ),
             ),
           );
@@ -833,8 +810,8 @@ void main() {
       test(
         'Count versions of specific document',
         () async {
-          final proposalId = const Uuid().v7();
-          final versionId = const Uuid().v7();
+          final proposalId = DocumentRefFactory.randomUuidV7();
+          final versionId = DocumentRefFactory.randomUuidV7();
           final proposalRef = SignedDocumentRef(
             id: proposalId,
             version: versionId,
@@ -856,7 +833,7 @@ void main() {
                   type: DocumentType.proposalDocument,
                   selfRef: SignedDocumentRef(
                     id: proposalId,
-                    version: const Uuid().v7(),
+                    version: DocumentRefFactory.randomUuidV7(),
                   ),
                   ref: proposalRef,
                 ),
@@ -878,10 +855,10 @@ void main() {
       test(
         'Watches comments count',
         () async {
-          final proposalId = const Uuid().v7();
-          await Future<void>.delayed(const Duration(milliseconds: 1));
-          final versionId = const Uuid().v7();
-          final proposalId2 = const Uuid().v7();
+          final proposalId = DocumentRefFactory.randomUuidV7();
+          final versionId = DocumentRefFactory.randomUuidV7();
+          final proposalId2 = DocumentRefFactory.randomUuidV7();
+
           final proposalRef = SignedDocumentRef(
             id: proposalId,
             version: versionId,
@@ -904,7 +881,7 @@ void main() {
             return DocumentWithMetadataFactory.build(
               metadata: DocumentDataMetadata(
                 type: DocumentType.commentTemplate,
-                selfRef: SignedDocumentRef.generateFirstRef(),
+                selfRef: DocumentRefFactory.signedDocumentRef(),
                 ref: proposalRef,
               ),
             );
@@ -913,7 +890,7 @@ void main() {
           final otherComment = DocumentWithMetadataFactory.build(
             metadata: DocumentDataMetadata(
               type: DocumentType.commentTemplate,
-              selfRef: SignedDocumentRef.generateFirstRef(),
+              selfRef: DocumentRefFactory.signedDocumentRef(),
               ref: proposalRef2,
             ),
           );
@@ -995,4 +972,11 @@ SignedDocumentRef _buildRefAt(DateTime dateTime) {
   final config = V7Options(dateTime.millisecondsSinceEpoch, null);
   final val = const Uuid().v7(config: config);
   return SignedDocumentRef.first(val);
+}
+
+List<DocumentEntityWithMetadata> _generateDocumentEntitiesWithMetadata(int count) {
+  return List.generate(
+    count,
+    (index) => DocumentWithMetadataFactory.build(),
+  );
 }

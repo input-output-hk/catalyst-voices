@@ -2,13 +2,16 @@
 
 use std::sync::Arc;
 
-use scylla::{SerializeRow, Session};
+use scylla::{client::session::Session, SerializeRow};
 use tracing::error;
 
 use crate::{
     db::{
         index::{
-            queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, SizedBatch},
+            queries::{
+                caches::txo_by_stake::update as cache_update, FallibleQueryResults,
+                PreparedQueries, PreparedQuery, SizedBatch,
+            },
             session::CassandraSession,
         },
         types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
@@ -20,7 +23,7 @@ use crate::{
 const UPDATE_TXO_SPENT_QUERY: &str = include_str!("../cql/update_txo_spent.cql");
 
 /// Update TXO spent query params.
-#[derive(SerializeRow, Debug)]
+#[derive(SerializeRow, Clone, Debug)]
 pub(crate) struct UpdateTxoSpentQueryParams {
     /// TXO stake address.
     pub stake_address: DbStakeAddress,
@@ -60,8 +63,10 @@ impl UpdateTxoSpentQuery {
         session: &CassandraSession, params: Vec<UpdateTxoSpentQueryParams>,
     ) -> FallibleQueryResults {
         let results = session
-            .execute_batch(PreparedQuery::TxoSpentUpdateQuery, params)
+            .execute_batch(PreparedQuery::TxoSpentUpdateQuery, params.clone())
             .await?;
+
+        cache_update(params);
 
         Ok(results)
     }

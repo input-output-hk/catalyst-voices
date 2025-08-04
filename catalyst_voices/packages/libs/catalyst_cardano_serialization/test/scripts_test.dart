@@ -1,6 +1,5 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:cbor/cbor.dart';
-import 'package:convert/convert.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -23,7 +22,7 @@ void main() {
         // Golden hash test.
         expect(
           simpleScript.hash,
-          equals(hex.decode(script['hash']! as String)),
+          equals(hexDecode(script['hash']! as String)),
         );
       }
     });
@@ -35,7 +34,7 @@ void main() {
         final compiledCode = script['compiledCode']!;
         final scriptLength = compiledCode.length ~/ 2;
 
-        final decodedCode = cbor.decode(hex.decode(compiledCode));
+        final decodedCode = cbor.decode(hexDecode(compiledCode));
 
         final plutusScript = PlutusV2Script.fromHex(compiledCode);
         final cborValue = plutusScript.toCbor();
@@ -47,7 +46,7 @@ void main() {
         expect(cborValue, equals(decodedCode));
 
         // Golden hash test
-        expect(plutusScript.hash, equals(hex.decode(script['hash']!)));
+        expect(plutusScript.hash, equals(hexDecode(script['hash']!)));
       }
     });
   });
@@ -74,7 +73,7 @@ void main() {
         expect(scriptLength, equals(plutusScript.length));
 
         // Golden hash test
-        expect(plutusScript.hash, equals(hex.decode(hash)));
+        expect(plutusScript.hash, equals(hexDecode(hash)));
       }
     });
   });

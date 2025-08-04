@@ -12,6 +12,10 @@ import 'package:flutter/foundation.dart';
 
 final _logger = Logger('KeychainCreationCubit');
 
+/// Manages the keychain creation.
+///
+/// Allows to create a new keychain and export it to a file.
+/// Allows recovery of the keychain from the seed phrase.
 final class KeychainCreationCubit extends Cubit<KeychainStateData>
     with BlocErrorEmitterMixin, UnlockPasswordMixin
     implements KeychainCreationManager {
@@ -57,11 +61,10 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     }
   }
 
-  KeychainProgress createRecoverProgress() {
-    return KeychainProgress(
-      seedPhrase: _seedPhrase!,
-      password: password.value,
-    );
+  void clearSeedPhrase() {
+    _seedPhrase = SeedPhrase();
+    setSeedPhraseStored(false);
+    setUserSeedPhraseWords([]);
   }
 
   @override

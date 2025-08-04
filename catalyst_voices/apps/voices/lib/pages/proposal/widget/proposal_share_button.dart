@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/routes/routing/proposal_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/share_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
@@ -23,8 +22,7 @@ class ProposalShareButton extends StatelessWidget {
         return ShareButton(
           onTap: () {
             if (proposalRef != null) {
-              final url = ProposalRoute.fromRef(ref: proposalRef).location;
-              unawaited(ShareProposalDialog.show(context, url));
+              unawaited(ShareProposalDialog.show(context, ref: proposalRef));
             } else {
               _showErrorSnackbar(context);
             }

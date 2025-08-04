@@ -3,18 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 
-abstract interface class BaseProfileManager {
-  void updateUsername(Username value);
-
-  void updateEmail(Email value);
-
-  void updateToS({required bool isAccepted});
-
-  void updatePrivacyPolicy({required bool isAccepted});
-
-  void updateDataUsage({required bool isAccepted});
-}
-
+/// Manages the profile data.
 final class BaseProfileCubit extends Cubit<BaseProfileStateData>
     with BlocErrorEmitterMixin
     implements BaseProfileManager {
@@ -23,44 +12,14 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
           kDebugMode
               ? const BaseProfileStateData(
                   email: Email.dirty('dev@iokh.com'),
+                  receiveEmails: ReceiveEmails(isAccepted: true, isEnabled: true),
                   username: Username.dirty('Dev'),
-                  isToSAccepted: true,
-                  isPrivacyPolicyAccepted: true,
-                  isDataUsageAccepted: true,
+                  conditionsAccepted: true,
+                  tosAndPrivacyPolicyAccepted: true,
+                  drepApprovalContingencyAccepted: true,
                 )
               : const BaseProfileStateData(),
         );
-
-  @override
-  void updateUsername(Username value) {
-    emit(state.copyWith(username: value));
-  }
-
-  @override
-  void updateEmail(Email value) {
-    emit(state.copyWith(email: value));
-  }
-
-  @override
-  void updateToS({
-    required bool isAccepted,
-  }) {
-    emit(state.copyWith(isToSAccepted: isAccepted));
-  }
-
-  @override
-  void updatePrivacyPolicy({
-    required bool isAccepted,
-  }) {
-    emit(state.copyWith(isPrivacyPolicyAccepted: isAccepted));
-  }
-
-  @override
-  void updateDataUsage({
-    required bool isAccepted,
-  }) {
-    emit(state.copyWith(isDataUsageAccepted: isAccepted));
-  }
 
   BaseProfileProgress createRecoverProgress() {
     return BaseProfileProgress(
@@ -68,4 +27,60 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
       email: state.email.value,
     );
   }
+
+  @override
+  void updateConditions({
+    required bool accepted,
+  }) {
+    emit(state.copyWith(conditionsAccepted: accepted));
+  }
+
+  @override
+  void updateDrepApprovalContingency({
+    required bool accepted,
+  }) {
+    emit(state.copyWith(drepApprovalContingencyAccepted: accepted));
+  }
+
+  @override
+  void updateEmail(Email value) {
+    final receiveEmails = state.receiveEmails.copyWith(
+      isAccepted: value.isNotValid ? false : null,
+      isEnabled: value.isNonEmptyAndValid,
+    );
+
+    emit(state.copyWith(email: value, receiveEmails: receiveEmails));
+  }
+
+  @override
+  void updateReceiveEmails({required bool isAccepted}) {
+    final receiveEmails = state.receiveEmails.copyWith(isAccepted: isAccepted);
+    emit(state.copyWith(receiveEmails: receiveEmails));
+  }
+
+  @override
+  void updateTosAndPrivacyPolicy({
+    required bool accepted,
+  }) {
+    emit(state.copyWith(tosAndPrivacyPolicyAccepted: accepted));
+  }
+
+  @override
+  void updateUsername(Username value) {
+    emit(state.copyWith(username: value));
+  }
+}
+
+abstract interface class BaseProfileManager {
+  void updateConditions({required bool accepted});
+
+  void updateDrepApprovalContingency({required bool accepted});
+
+  void updateEmail(Email value);
+
+  void updateReceiveEmails({required bool isAccepted});
+
+  void updateTosAndPrivacyPolicy({required bool accepted});
+
+  void updateUsername(Username value);
 }

@@ -1,4 +1,5 @@
 import 'package:catalyst_cardano_serialization/src/types.dart';
+import 'package:catalyst_cardano_serialization/src/utils/hex.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:cryptography/cryptography.dart';
@@ -65,7 +66,7 @@ final class Ed25519PublicKey extends Equatable implements CborEncodable {
 
   /// Constructs [Ed25519PublicKey] from a hex [string].
   factory Ed25519PublicKey.fromHex(String string) {
-    return Ed25519PublicKey.fromBytes(hex.decode(string));
+    return Ed25519PublicKey.fromBytes(hexDecode(string));
   }
 
   /// Creates the [Ed25519PublicKey] from [bytes].
@@ -118,7 +119,7 @@ extension type Ed25519PrivateKey._(List<int> bytes) {
 
   /// Constructs [Ed25519PrivateKey] from a hex [string].
   factory Ed25519PrivateKey.fromHex(String string) {
-    return Ed25519PrivateKey.fromBytes(hex.decode(string));
+    return Ed25519PrivateKey.fromBytes(hexDecode(string));
   }
 
   /// Returns the [Ed25519PrivateKey] filled with [byte] that can be
@@ -170,7 +171,7 @@ extension type Ed25519Signature._(List<int> bytes) {
 
   /// Constructs [Ed25519Signature] from a hex [string].
   factory Ed25519Signature.fromHex(String string) {
-    return Ed25519Signature.fromBytes(hex.decode(string));
+    return Ed25519Signature.fromBytes(hexDecode(string));
   }
 
   /// Returns the [Ed25519Signature] filled with [byte]

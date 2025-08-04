@@ -6,7 +6,7 @@ import 'package:equatable/equatable.dart';
 final class CardanoWalletDetails extends Equatable {
   /// The minimum amount of ADA the user
   /// must posses to proceed with the registration.
-  static const Coin minAdaForRegistration = Coin.fromWholeAda(1);
+  static const Coin minAdaForRegistration = Coin.fromWholeAda(5);
 
   final CardanoWallet wallet;
   final Coin balance;

@@ -20,17 +20,6 @@ extension StringExt on String {
     return toLowerCase() == other?.toLowerCase();
   }
 
-  String replaceAllMappedIndexed(
-    Pattern from,
-    String Function(Match match, int index) replace,
-  ) {
-    var index = 0;
-    return replaceAllMapped(
-      from,
-      (match) => replace(match, index++),
-    );
-  }
-
   // TODO(dtscalac): temporary solution to format dynamic strings as plural,
   // after F14 the document schema must be altered to support
   // other languages than English.
@@ -54,11 +43,24 @@ extension StringExt on String {
     };
   }
 
+  String inBrackets() => '($this)';
+
   String? nullIfEmpty() {
     if (isEmpty) {
       return null;
     }
     return this;
+  }
+
+  String replaceAllMappedIndexed(
+    Pattern from,
+    String Function(Match match, int index) replace,
+  ) {
+    var index = 0;
+    return replaceAllMapped(
+      from,
+      (match) => replace(match, index++),
+    );
   }
 
   String starred({
@@ -73,6 +75,8 @@ extension StringExt on String {
   }
 
   String withBullet() => withPrefix('• ');
+
+  String withIndent() => '  $this';
 
   String withPrefix(String value) => '$value$this';
 

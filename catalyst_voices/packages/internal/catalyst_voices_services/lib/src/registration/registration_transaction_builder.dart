@@ -8,6 +8,10 @@ import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/crypto/key_derivation_service.dart';
 import 'package:catalyst_voices_services/src/registration/registration_transaction_role.dart';
+import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy.dart';
+import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy_bytes.dart';
+import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy_models.dart';
+import 'package:catalyst_voices_services/src/registration/strategy/registration_transaction_strategy_type.dart';
 import 'package:collection/collection.dart';
 
 /// The transaction metadata used for registration.
@@ -80,23 +84,23 @@ final class RegistrationTransactionBuilder {
   ///
   /// Throws [RegistrationInsufficientBalanceException] in case the
   /// user doesn't have enough balance to pay for the registration transaction.
-  Future<Transaction> build() async {
-    if (utxos.isEmpty) {
+  Future<BaseTransaction> build() async {
+    try {
+      return await _build();
+    } on InsufficientAdaForAssetsException {
       throw const RegistrationInsufficientBalanceException();
+    } on InsufficientAdaForChangeOutputException {
+      throw const RegistrationInsufficientBalanceException();
+    } on InsufficientUtxoBalanceException {
+      throw const RegistrationInsufficientBalanceException();
+    } on AssetNameTooLongException catch (e) {
+      throw RegistrationAssetNameTooLongException(assets: e.assets);
     }
-
-    final x509Envelope = await _buildMetadataEnvelope();
-
-    return _buildUnsignedRbacTx(
-      auxiliaryData: AuxiliaryData.fromCbor(
-        await x509Envelope.toCbor(serializer: (e) => e.toCbor()),
-      ),
-    );
   }
 
-  Future<RegistrationMetadata> _buildMetadataEnvelope() async {
-    if (!roles.isFirstRegistration && previousTransactionId == null) {
-      throw ArgumentError.notNull('previousTransactionId');
+  Future<BaseTransaction> _build() async {
+    if (utxos.isEmpty) {
+      throw const RegistrationInsufficientBalanceException();
     }
 
     final rootKeyPair = keyDerivationService.deriveAccountRoleKeyPair(
@@ -104,59 +108,7 @@ final class RegistrationTransactionBuilder {
       role: AccountRole.root,
     );
 
-    return rootKeyPair.use((rootKeyPair) async {
-      final derCert =
-          roles.isFirstRegistration ? await _generateX509Certificate(keyPair: rootKeyPair) : null;
-      final publicKeys = await _generatePublicKeysForAllRoles(rootKeyPair);
-
-      final x509Envelope = X509MetadataEnvelope.unsigned(
-        purpose: UuidV4.fromString(_catalystUserRoleRegistrationPurpose),
-        txInputsHash: TransactionInputsHash.fromTransactionInputs(utxos),
-        previousTransactionId: roles.isFirstRegistration ? null : previousTransactionId!,
-        chunkedData: RegistrationData(
-          derCerts: [
-            if (derCert != null) RbacField.set(derCert),
-          ],
-          publicKeys: publicKeys,
-          roleDataSet: {
-            if (roles.any((element) => element.setVoter))
-              RoleData(
-                roleNumber: AccountRole.root.number,
-                roleSigningKey: LocalKeyReference(
-                  keyType: LocalKeyReferenceType.x509Certs,
-                  offset: AccountRole.root.registrationOffset,
-                ),
-                // Refer to first key in transaction outputs,
-                // in our case it's the change address
-                // (which the user controls).
-                paymentKey: 0,
-              ),
-            if (roles.any((element) => element.setProposer))
-              RoleData(
-                roleNumber: AccountRole.proposer.number,
-                roleSigningKey: LocalKeyReference(
-                  keyType: LocalKeyReferenceType.pubKeys,
-                  offset: AccountRole.proposer.registrationOffset,
-                ),
-                // Refer to first key in transaction outputs, in our case
-                // it's the change address (which the user controls).
-                paymentKey: 0,
-              ),
-          },
-        ),
-      );
-
-      final privateKey = Bip32Ed25519XPrivateKeyFactory.instance.fromBytes(
-        rootKeyPair.privateKey.bytes,
-      );
-
-      return privateKey.use((privateKey) {
-        return x509Envelope.sign(
-          privateKey: privateKey,
-          serializer: (e) => e.toCbor(),
-        );
-      });
-    });
+    return rootKeyPair.use(_buildTransaction);
   }
 
   Future<cs.Ed25519PublicKey> _buildRolePublicKey(
@@ -170,26 +122,22 @@ final class RegistrationTransactionBuilder {
     };
   }
 
-  Transaction _buildUnsignedRbacTx({required AuxiliaryData auxiliaryData}) {
-    final txBuilder = TransactionBuilder(
-      requiredSigners: {
-        _stakeAddress.publicKeyHash,
-      },
-      config: transactionConfig,
-      inputs: utxos,
-      networkId: networkId,
-      ttl: slotNumberTtl,
-      auxiliaryData: auxiliaryData,
-      changeAddress: changeAddress,
-    );
+  Future<BaseTransaction> _buildTransaction(CatalystKeyPair rootKeyPair) async {
+    final derCert = await _generateX509CertificateIfNeeded(rootKeyPair);
+    final publicKeys = await _generatePublicKeysForAllRoles(rootKeyPair);
 
-    final txBody = txBuilder.applySelection().buildBody();
+    final requiredSigners = {
+      _stakeAddress.publicKeyHash,
+    };
 
-    return Transaction(
-      body: txBody,
-      isValid: true,
-      witnessSet: const TransactionWitnessSet(),
-      auxiliaryData: auxiliaryData,
+    final strategy = _pickStrategy(RegistrationTransactionStrategyType.bytes);
+
+    return strategy.build(
+      purpose: _catalystUserRoleRegistrationPurpose,
+      rootKeyPair: rootKeyPair,
+      derCert: derCert,
+      publicKeys: publicKeys,
+      requiredSigners: requiredSigners,
     );
   }
 
@@ -244,9 +192,7 @@ final class RegistrationTransactionBuilder {
     ];
   }
 
-  Future<X509DerCertificate> _generateX509Certificate({
-    required CatalystKeyPair keyPair,
-  }) async {
+  Future<X509DerCertificate> _generateX509Certificate(CatalystKeyPair keyPair) async {
     const issuer = X509DistinguishedName();
 
     final tbs = X509TBSCertificate(
@@ -280,6 +226,14 @@ final class RegistrationTransactionBuilder {
     return cert.toDer();
   }
 
+  Future<X509DerCertificate?> _generateX509CertificateIfNeeded(CatalystKeyPair rootKeyPair) async {
+    if (!roles.isFirstRegistration) {
+      return null;
+    }
+
+    return _generateX509Certificate(rootKeyPair);
+  }
+
   RegistrationTransactionRoleAction _getPublicKeyRoleAction(AccountRole role) {
     if (role == AccountRole.voter) {
       // Voters must not register their own public keys,
@@ -293,6 +247,31 @@ final class RegistrationTransactionBuilder {
           orElse: () => RegistrationTransactionRole.undefined(role),
         )
         .action;
+  }
+
+  RegistrationTransactionStrategy _pickStrategy(RegistrationTransactionStrategyType type) {
+    switch (type) {
+      case RegistrationTransactionStrategyType.models:
+        return RegistrationTransactionStrategyModels(
+          transactionConfig: transactionConfig,
+          networkId: networkId,
+          slotNumberTtl: slotNumberTtl,
+          roles: roles,
+          changeAddress: changeAddress,
+          utxos: utxos,
+          previousTransactionId: previousTransactionId,
+        );
+      case RegistrationTransactionStrategyType.bytes:
+        return RegistrationTransactionStrategyBytes(
+          transactionConfig: transactionConfig,
+          networkId: networkId,
+          slotNumberTtl: slotNumberTtl,
+          roles: roles,
+          changeAddress: changeAddress,
+          utxos: utxos,
+          previousTransactionId: previousTransactionId,
+        );
+    }
   }
 
   int _randomSerialNumber() {

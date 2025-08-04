@@ -1,5 +1,6 @@
 //! Queries for purging volatile data.
 
+pub(crate) mod catalyst_id_for_public_key;
 pub(crate) mod catalyst_id_for_stake_address;
 pub(crate) mod catalyst_id_for_txn_id;
 pub(crate) mod cip36_registration;
@@ -17,8 +18,9 @@ pub(crate) mod unstaked_txo_assets;
 use std::{fmt::Debug, sync::Arc};
 
 use scylla::{
-    prepared_statement::PreparedStatement, serialize::row::SerializeRow,
-    transport::iterator::QueryPager, Session,
+    client::{pager::QueryPager, session::Session},
+    serialize::row::SerializeRow,
+    statement::prepared::PreparedStatement,
 };
 
 use super::{FallibleQueryResults, SizedBatch};
@@ -52,10 +54,12 @@ pub(crate) enum PreparedDeleteQuery {
     Rbac509,
     /// Invalid RBAC 509 Registration Delete query.
     Rbac509Invalid,
-    /// Catalyst ID For Transaction ID Delete query.
+    /// Catalyst ID for transaction ID delete query.
     CatalystIdForTxnId,
-    /// Catalyst ID For Stake Address Delete query.
+    /// Catalyst ID for stake address delete query.
     CatalystIdForStakeAddress,
+    /// Catalyst ID for public key delete query.
+    CatalystIdForPublicKey,
 }
 
 /// All prepared SELECT query statements (primary keys from table).
@@ -83,10 +87,12 @@ pub(crate) enum PreparedSelectQuery {
     Rbac509,
     /// Invalid RBAC 509 Registration Select query.
     Rbac509Invalid,
-    /// Catalyst ID For Transaction ID Select query.
+    /// Catalyst ID for transaction ID select query.
     CatalystIdForTxnId,
-    /// Catalyst ID For Stake Address Select query.
+    /// Catalyst ID for stake address select query.
     CatalystIdForStakeAddress,
+    /// Catalyst ID for public key select query.
+    CatalystIdForPublicKey,
 }
 
 /// All prepared purge queries for a session.
@@ -135,14 +141,18 @@ pub(crate) struct PreparedQueries {
     select_rbac509_invalid_registration: PreparedStatement,
     /// RBAC 509 invalid registrations Delete Query.
     delete_rbac509_invalid_registration: SizedBatch,
-    /// Catalyst ID for TX ID Primary Key Query..
+    /// A Catalyst ID for transaction ID primary key query.
     select_catalyst_id_for_txn_id: PreparedStatement,
-    /// Catalyst ID for TX ID Delete Query..
+    /// A Catalyst ID for transaction ID delete query.
     delete_catalyst_id_for_txn_id: SizedBatch,
-    /// Catalyst ID for Stake Address Primary Key Query..
+    /// A Catalyst ID for stake address primary key query.
     select_catalyst_id_for_stake_address: PreparedStatement,
-    /// Catalyst ID for Stake Address Delete Query..
+    /// A Catalyst ID for stake address delete query.
     delete_catalyst_id_for_stake_address: SizedBatch,
+    /// A Catalyst ID for public key primary key query.
+    select_catalyst_id_for_public_key: PreparedStatement,
+    /// A Catalyst ID for public key delete query.
+    delete_catalyst_id_for_public_key: SizedBatch,
 }
 
 impl PreparedQueries {
@@ -209,6 +219,10 @@ impl PreparedQueries {
                 catalyst_id_for_stake_address::PrimaryKeyQuery::prepare(&session).await?,
             delete_catalyst_id_for_stake_address:
                 catalyst_id_for_stake_address::DeleteQuery::prepare_batch(&session, cfg).await?,
+            select_catalyst_id_for_public_key:
+                catalyst_id_for_public_key::PrimaryKeyQuery::prepare(&session).await?,
+            delete_catalyst_id_for_public_key:
+                catalyst_id_for_public_key::DeleteQuery::prepare_batch(&session, cfg).await?,
         })
     }
 
@@ -258,6 +272,7 @@ impl PreparedQueries {
             PreparedSelectQuery::CatalystIdForStakeAddress => {
                 &self.select_catalyst_id_for_stake_address
             },
+            PreparedSelectQuery::CatalystIdForPublicKey => &self.select_catalyst_id_for_public_key,
         };
 
         super::session_execute_iter(session, prepared_stmt, NO_PARAMS).await
@@ -288,6 +303,7 @@ impl PreparedQueries {
             PreparedDeleteQuery::CatalystIdForStakeAddress => {
                 &self.delete_catalyst_id_for_stake_address
             },
+            PreparedDeleteQuery::CatalystIdForPublicKey => &self.delete_catalyst_id_for_public_key,
         };
 
         super::session_execute_batch(session, query_map, cfg, query, values).await

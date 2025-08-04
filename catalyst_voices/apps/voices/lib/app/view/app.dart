@@ -6,6 +6,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:flutter/material.dart';
 
+/// Main app widget. Builds globally accessible [Bloc]s via [MultiBlocProvider].
 final class App extends StatefulWidget {
   final RouterConfig<Object> routerConfig;
 
@@ -55,9 +56,6 @@ class _AppState extends State<App> {
       BlocProvider<WorkspaceBloc>(
         create: (context) => Dependencies.instance.get<WorkspaceBloc>(),
       ),
-      BlocProvider<ProposalBuilderBloc>(
-        create: (context) => Dependencies.instance.get<ProposalBuilderBloc>(),
-      ),
       BlocProvider<DiscoveryCubit>(
         create: (context) => Dependencies.instance.get<DiscoveryCubit>(),
       ),
@@ -79,6 +77,9 @@ class _AppState extends State<App> {
       ),
       BlocProvider<DevToolsBloc>(
         create: (_) => Dependencies.instance.get<DevToolsBloc>(),
+      ),
+      BlocProvider<PublicProfileEmailStatusCubit>(
+        create: (_) => Dependencies.instance.get<PublicProfileEmailStatusCubit>(),
       ),
     ];
   }

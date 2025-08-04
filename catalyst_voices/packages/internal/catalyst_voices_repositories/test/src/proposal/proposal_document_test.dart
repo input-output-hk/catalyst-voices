@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../fixture/voices_document_templates.dart';
+import '../utils/test_factories.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -32,9 +33,9 @@ void main() {
 
         return ProposalDocument(
           metadata: ProposalMetadata(
-            selfRef: DraftRef.generateFirstRef(),
-            templateRef: SignedDocumentRef.generateFirstRef(),
-            categoryId: SignedDocumentRef.generateFirstRef(),
+            selfRef: DocumentRefFactory.draftRef(),
+            templateRef: DocumentRefFactory.signedDocumentRef(),
+            categoryId: DocumentRefFactory.signedDocumentRef(),
             authors: const [],
           ),
           document: document,

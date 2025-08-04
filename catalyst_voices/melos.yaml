@@ -90,14 +90,7 @@ command:
     dependencies:
       auto_size_text: ^3.0.0
       async: ^2.11.0
-      # TODO(dtscalac): revert to official version from pub.dev when dart 3.8.0 is stable
-      # and it's possible to configure the `dart format` with:
-      #   trailing_commas: preserve
-      # Official version enforces dart 3.7.0 which messes the formatting.
-      # https://github.com/dart-lang/sdk/blob/main/CHANGELOG.md#dart-format-1
-      asn1lib:
-        git:
-          url: https://github.com/dtscalac/asn1lib
+      asn1lib: ^1.6.5
       bip39: ^1.0.6
       bloc_concurrency: ^0.2.2
       chopper: ^8.0.3
@@ -147,19 +140,22 @@ command:
       plugin_platform_interface: ^2.1.7
       bech32: ^0.2.2
       bip32_ed25519: ^0.6.0
-      cbor: ^6.2.0
+      # TODO(damian): un-pin version when cbor will expose EncodeSink, .encode, Arg.
+      # RawTransaction requires those internal classes.
+      cbor: 6.3.7
       convert: ^3.1.1
       path: ^1.9.1
       package_info_plus: ^8.3.0
       pinenacl: ^0.6.0
       pool: ^1.5.1
       uuid_plus: ^0.1.0
-      sentry_flutter: ^8.8.0
+      sentry_flutter: ^9.0.0
       scrollable_positioned_list: ^0.3.8
       shared_preferences: ^2.3.3
       shared_preferences_platform_interface: ^2.4.1
       skeletonizer: ^1.4.3
       synchronized: ^3.3.0+3
+      typed_data: ^1.4.0
       web: ^1.1.0
       webdriver: ^3.0.3
     dev_dependencies:
@@ -173,6 +169,7 @@ command:
       chopper_generator: ^8.0.4
       flutter_gen_runner: ^5.10.0
       mocktail: ^1.0.1
+      sentry_dart_plugin: ^2.4.1
 
 scripts:
   l10n:
@@ -238,6 +235,24 @@ scripts:
     run: |
       melos exec -- lic_ck check-licenses -c $MELOS_ROOT_PATH/melos.yaml -i
     description: Run `lic_ck` checks for all packages.
+
+  license-list:
+    run: |
+      melos exec --ignore="catalyst_analysis" --ignore="example" -- \
+        'dart run $MELOS_ROOT_PATH/scripts/generate_licenses.dart $MELOS_PACKAGE_PATH $MELOS_ROOT_PATH/docs/licenses/$MELOS_PACKAGE_NAME.csv'
+      dart run $MELOS_ROOT_PATH/scripts/merge_csv_files.dart $MELOS_ROOT_PATH/docs/licenses/ $MELOS_ROOT_PATH/docs/licenses/licenses.csv
+      echo "✅ Output file: $MELOS_ROOT_PATH/docs/licenses/licenses.csv"
+    description: Generate license list for all packages in docs/licenses/licenses.csv file.
+
+  dependency-graph:
+    run: |
+      dart pub global activate pubviz
+      melos exec --scope "catalyst_voices" -- \
+        'pubviz print --direct-dependencies --production-dependencies --format dot > $MELOS_ROOT_PATH/docs/dependency_graph.dot'
+      echo "✅ Output file: $MELOS_ROOT_PATH/docs/dependency_graph.dot"
+    description: |
+      Generate license list for all packages in docs/dependency_graph.dot file.
+      The .dot file can be viewed using software available online such as graphviz.
 
   test:select:
     run: |
@@ -348,3 +363,21 @@ scripts:
       The test reports are saved in /test_reports folder.
       The coverages are saved in coverage/lcov.info file for each tested package.
       The combined coverage is saved in the /coverage/lcov.coverage.info file.
+
+  docs-generate:
+    run: |
+      dart pub global activate dartdoc 8.0.5
+      melos exec -c 1 --scope="*catalyst_voices*" --ignore="*example*" -- flutter analyze && 
+      melos exec -c 1 --scope="*catalyst_voices*" --ignore="*example*" -- dart doc --output=MELOS_ROOT_PATH/docs/dartdoc/MELOS_PACKAGE_NAME .
+    
+    description: |
+      Generate internal documentation and saves it to docs/dartdoc directory
+  
+  docs-view:
+    steps:
+     - dart pub global activate dhttpd
+     - dart pub global run dhttpd --path docs/dartdoc/
+
+    description: |
+      Documentation will be served at localhost:8080/<packageName>
+      For example catalyst_voices_repository is served at localhost:8080/catalyst_voices_repository

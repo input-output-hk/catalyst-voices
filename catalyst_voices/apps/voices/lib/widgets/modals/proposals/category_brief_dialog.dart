@@ -36,6 +36,7 @@ class _CategoryBriefDialogState extends State<CategoryBriefDialog> {
   Widget build(BuildContext context) {
     return VoicesScrollbar(
       controller: _scrollController,
+      alwaysVisible: true,
       child: SingleChildScrollView(
         controller: _scrollController,
         child: CategoryCompactDetailView(category: widget.category),

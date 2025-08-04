@@ -28,6 +28,7 @@ class CategoryPage extends StatefulWidget {
 class _Body extends StatelessWidget {
   final CampaignCategoryDetailsViewModel category;
   final bool isLoading;
+
   const _Body({
     required this.category,
     this.isLoading = false,
@@ -43,8 +44,10 @@ class _Body extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: CategoryDetailView(
-                category: category,
+              child: SingleChildScrollView(
+                child: CategoryDetailView(
+                  category: category,
+                ),
               ),
             ),
             const SizedBox(width: 48),
@@ -69,9 +72,9 @@ class _CardInformation extends StatelessWidget {
   Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: const BoxConstraints.tightFor(width: 300),
-      child: Column(
+      child: ListView(
+        padding: const EdgeInsets.only(top: 96, bottom: 42),
         children: [
-          const SizedBox(height: 96),
           CategoryProposalsDetailsCard(
             categoryId: category.id,
             categoryName: category.formattedName,
@@ -166,21 +169,19 @@ class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
 class _CategoryPageState extends State<CategoryPage> {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: ResponsivePadding(
-        xs: const EdgeInsets.symmetric(horizontal: 12),
-        sm: const EdgeInsets.symmetric(horizontal: 20),
-        md: const EdgeInsets.symmetric(horizontal: 120),
-        lg: const EdgeInsets.symmetric(horizontal: 120),
-        other: const EdgeInsets.symmetric(horizontal: 120),
-        child: Stack(
-          children: [
-            const _CategoryDetailLoadingOrDataSelector(),
-            _CategoryDetailErrorSelector(
-              categoryId: widget.categoryId,
-            ),
-          ].constrainedDelegate(maxWidth: 1200),
-        ),
+    return ResponsivePadding(
+      xs: const EdgeInsets.symmetric(horizontal: 12),
+      sm: const EdgeInsets.symmetric(horizontal: 20),
+      md: const EdgeInsets.symmetric(horizontal: 120),
+      lg: const EdgeInsets.symmetric(horizontal: 120),
+      other: const EdgeInsets.symmetric(horizontal: 120),
+      child: Stack(
+        children: [
+          const _CategoryDetailLoadingOrDataSelector(),
+          _CategoryDetailErrorSelector(
+            categoryId: widget.categoryId,
+          ),
+        ].constrainedDelegate(maxWidth: 1200),
       ),
     );
   }

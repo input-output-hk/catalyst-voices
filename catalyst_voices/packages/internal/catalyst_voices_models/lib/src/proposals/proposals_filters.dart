@@ -67,4 +67,12 @@ final class ProposalsFilters extends Equatable {
       ')';
 }
 
-enum ProposalsFilterType { total, drafts, finals, favorites, my }
+enum ProposalsFilterType {
+  total,
+  drafts,
+  finals,
+  favorites,
+  my;
+
+  bool get isMy => this == ProposalsFilterType.my;
+}

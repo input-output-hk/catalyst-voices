@@ -10,7 +10,8 @@ environment:
   flutter: ">=3.29.3"
 
 dependencies:
-  cbor: ^6.2.0
+  catalyst_cardano_serialization: ^1.0.0
+  cbor: 6.3.7
   collection: ^1.19.0
   convert: ^3.1.1
   cryptography: ^2.7.0

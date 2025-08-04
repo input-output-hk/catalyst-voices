@@ -2,7 +2,6 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
 import 'package:collection/collection.dart';
-import 'package:convert/convert.dart';
 
 /// DTO utils for [RbacRegistrationChain], mostly helpers to decode **complex**
 /// data types that can't just be json deserialized.
@@ -76,7 +75,7 @@ extension RbacRegistrationChainExt on RbacRegistrationChain {
   }
 
   X509Certificate _decodeX509Certificate(String hexString) {
-    final certificateBytes = hex.decode(hexString.replaceFirst('0x', ''));
+    final certificateBytes = hexDecode(hexString);
     final derCertificate = X509DerCertificate.fromBytes(bytes: certificateBytes);
     return X509Certificate.fromDer(derCertificate);
   }

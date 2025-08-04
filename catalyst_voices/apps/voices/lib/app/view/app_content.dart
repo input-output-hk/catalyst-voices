@@ -4,8 +4,10 @@ import 'package:catalyst_voices/app/view/app_mobile_access_restriction.dart';
 import 'package:catalyst_voices/app/view/app_precache_image_assets.dart';
 import 'package:catalyst_voices/app/view/app_session_listener.dart';
 import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
+import 'package:catalyst_voices/app/view/video_cache/app_video_manager_scope.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_precache.dart';
 import 'package:catalyst_voices/common/ext/preferences_ext.dart';
+import 'package:catalyst_voices/share/share_manager.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -15,6 +17,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 
 const _restorationScopeId = 'rootVoices';
 
+/// Widget where app is setup with [MaterialApp] and router is added to the widget tree.
 class AppContent extends StatelessWidget {
   final RouterConfig<Object> routerConfig;
 
@@ -64,24 +67,27 @@ final class _AppContent extends StatelessWidget {
       routerConfig: routerConfig,
       themeMode: themeMode,
       theme: ThemeBuilder.buildTheme(),
-      darkTheme: ThemeBuilder.buildTheme(
-        brightness: Brightness.dark,
-      ),
+      darkTheme: ThemeBuilder.buildTheme(brightness: Brightness.dark),
       debugShowCheckedModeBanner: false,
       builder: (_, child) {
         return AppGlobalShortcuts(
           child: AppActiveStateListener(
-            child: AppVideoPrecache(
-              child: GlobalPrecacheImages(
-                child: GlobalSessionListener(
-                  // IMPORTANT: AppSplashScreenManager must be placed above all
-                  // widgets that render visible UI elements. Any widget that
-                  // displays content should be a descendant of
-                  // AppSplashScreenManager to ensure proper splash
-                  // screen behavior.
-                  child: AppSplashScreenManager(
-                    child: AppMobileAccessRestriction(
-                      child: child ?? const SizedBox.shrink(),
+            child: AppVideoManagerScope(
+              child: AppVideoPrecache(
+                child: GlobalPrecacheImages(
+                  child: GlobalSessionListener(
+                    // IMPORTANT: AppSplashScreenManager must be placed above all
+                    // widgets that render visible UI elements. Any widget that
+                    // displays content should be a descendant of
+                    // AppSplashScreenManager to ensure proper splash
+                    // screen behavior.
+                    child: AppSplashScreenManager(
+                      child: AppMobileAccessRestriction(
+                        routerConfig: routerConfig,
+                        child: DefaultShareManager(
+                          child: child ?? const SizedBox.shrink(),
+                        ),
+                      ),
                     ),
                   ),
                 ),

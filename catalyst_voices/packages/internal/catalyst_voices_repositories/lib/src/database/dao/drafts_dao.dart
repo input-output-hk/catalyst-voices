@@ -19,6 +19,9 @@ abstract interface class DraftsDao {
   /// matching [ref] id.
   Future<int> count({DocumentRef? ref});
 
+  /// Clears table.
+  Future<int> deleteAll();
+
   /// Deletes a document draft with [ref].
   ///
   /// If [ref] is null then all drafts are deleted.
@@ -28,8 +31,12 @@ abstract interface class DraftsDao {
   /// Returns newest version with matching id or null of none found.
   Future<DocumentDraftEntity?> query({required DocumentRef ref});
 
-  /// Returns all drafts
-  Future<List<DocumentDraftEntity>> queryAll();
+  /// Returns all drafts.
+  ///
+  /// Optionally matching [ref].
+  Future<List<DocumentDraftEntity>> queryAll({
+    DocumentRef? ref,
+  });
 
   /// Returns all known document drafts refs.
   Future<List<TypedDocumentRef>> queryAllTypedRefs();
@@ -85,6 +92,9 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<int> deleteAll() => delete(drafts).go();
+
+  @override
   Future<void> deleteWhere({DraftRef? ref}) async {
     if (ref == null) {
       await drafts.deleteAll();
@@ -99,8 +109,16 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<List<DocumentDraftEntity>> queryAll() {
-    return select(drafts).get();
+  Future<List<DocumentDraftEntity>> queryAll({
+    DocumentRef? ref,
+  }) {
+    final query = select(drafts);
+
+    if (ref != null) {
+      query.where((tbl) => _filterRef(tbl, ref, filterVersion: false));
+    }
+
+    return query.get();
   }
 
   @override

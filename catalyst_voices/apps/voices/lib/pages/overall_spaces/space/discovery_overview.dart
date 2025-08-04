@@ -56,23 +56,13 @@ class _FeedbackTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<SessionCubit, SessionState, bool>(
-      selector: (state) {
-        return state.account?.isProposer ?? false;
-      },
-      builder: (context, state) {
-        return Visibility.maintain(
-          visible: state,
-          child: SpaceOverviewNavTile(
-            leading: VoicesAssets.icons.documentText.buildIcon(),
-            title: Text(
-              context.l10n.feedbackOnProposals,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            onTap: state ? () => GoRouter.of(context).go(const ProposalsRoute().location) : null,
-          ),
-        );
-      },
+    return SpaceOverviewNavTile(
+      leading: VoicesAssets.icons.documentText.buildIcon(),
+      title: Text(
+        context.l10n.feedbackOnProposals,
+        style: Theme.of(context).textTheme.bodyLarge,
+      ),
+      onTap: () => const ProposalsRoute().go(context),
     );
   }
 }

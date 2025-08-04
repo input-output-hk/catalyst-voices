@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
+import 'package:catalyst_voices/pages/account/pending_email_change_dialog.dart';
 import 'package:catalyst_voices/pages/account/verification_email_send_dialog.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_action_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_email_tile.dart';
@@ -101,6 +102,8 @@ class _AccountPageState extends State<AccountPage>
     switch (signal) {
       case AccountVerificationEmailSendSignal():
         _showVerificationEmailSendDialog();
+      case PendingEmailChangeSignal():
+        _showPendingEmailChangeDialog();
     }
   }
 
@@ -109,6 +112,10 @@ class _AccountPageState extends State<AccountPage>
     super.initState();
 
     unawaited(context.read<AccountCubit>().updateAccountDetails());
+  }
+
+  void _showPendingEmailChangeDialog() {
+    unawaited(PendingEmailChangeDialog.show(context));
   }
 
   void _showVerificationEmailSendDialog() {

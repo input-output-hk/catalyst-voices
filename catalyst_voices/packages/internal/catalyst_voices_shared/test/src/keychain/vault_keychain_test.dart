@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:convert/convert.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -57,7 +57,7 @@ void main() {
       const lock = PasswordLockFactor('Test1234');
       final key = CatalystPrivateKey.factory.create(
         Uint8List.fromList(
-          hex.decode(
+          hexDecode(
             '8a88e3dd7409f195fd52db2d3cba5d72ca6709bf1d94121bf3748801b40f6f5c',
           ),
         ),

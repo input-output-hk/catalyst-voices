@@ -6,18 +6,18 @@ import 'package:flutter/material.dart';
 
 class ActionCard extends StatelessWidget {
   final Widget icon;
-  final Widget title;
+  final Widget? title;
   final Widget desc;
-  final Widget statusIcon;
+  final Widget? statusIcon;
   final Widget? body;
   final bool isExpanded;
 
   const ActionCard({
     super.key,
     required this.icon,
-    required this.title,
+    this.title,
     required this.desc,
-    required this.statusIcon,
+    this.statusIcon,
     this.body,
     this.isExpanded = false,
   });
@@ -31,6 +31,9 @@ class ActionCard extends StatelessWidget {
 
     final descTextStyle = (theme.textTheme.bodySmall ?? const TextStyle())
         .copyWith(color: theme.colors.textOnPrimaryLevel1);
+
+    final title = this.title;
+    final statusIcon = this.statusIcon;
 
     return Material(
       color: theme.colors.elevationsOnSurfaceNeutralLv1Grey,
@@ -46,11 +49,13 @@ class ActionCard extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  DefaultTextStyle(
-                    style: titleTextStyle,
-                    child: title,
-                  ),
-                  const SizedBox(height: 2),
+                  if (title != null) ...[
+                    DefaultTextStyle(
+                      style: titleTextStyle,
+                      child: title,
+                    ),
+                    const SizedBox(height: 2),
+                  ],
                   DefaultTextStyle(
                     style: descTextStyle,
                     child: desc,
@@ -64,7 +69,7 @@ class ActionCard extends StatelessWidget {
                 ],
               ),
             ),
-            _StatusIconAvatar(icon: statusIcon),
+            if (statusIcon != null) _StatusIconAvatar(icon: statusIcon),
           ].separatedBy(const SizedBox(width: 12)).toList(),
         ),
       ),

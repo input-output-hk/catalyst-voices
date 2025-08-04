@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
@@ -10,6 +11,7 @@ class NewProposalState extends Equatable {
   final bool isAgreeToNoFurtherCategoryChange;
   final ProposalCreationStep step;
   final ProposalTitle title;
+  final NumRange<int>? titleLengthRange;
   final SignedDocumentRef? categoryRef;
   final List<CampaignCategoryDetailsViewModel> categories;
 
@@ -20,6 +22,7 @@ class NewProposalState extends Equatable {
     this.isAgreeToNoFurtherCategoryChange = false,
     this.step = const CreateProposalWithoutPreselectedCategoryStep(),
     required this.title,
+    this.titleLengthRange,
     this.categoryRef,
     this.categories = const [],
   });
@@ -41,6 +44,7 @@ class NewProposalState extends Equatable {
         isAgreeToNoFurtherCategoryChange,
         step,
         title,
+        titleLengthRange,
         categoryRef,
         categories,
       ];
@@ -57,6 +61,7 @@ class NewProposalState extends Equatable {
     bool? isAgreeToNoFurtherCategoryChange,
     ProposalCreationStep? step,
     ProposalTitle? title,
+    Optional<NumRange<int>>? titleLengthRange,
     Optional<SignedDocumentRef>? categoryRef,
     List<CampaignCategoryDetailsViewModel>? categories,
   }) {
@@ -68,6 +73,7 @@ class NewProposalState extends Equatable {
           isAgreeToNoFurtherCategoryChange ?? this.isAgreeToNoFurtherCategoryChange,
       step: step ?? this.step,
       title: title ?? this.title,
+      titleLengthRange: titleLengthRange.dataOr(this.titleLengthRange),
       categoryRef: categoryRef.dataOr(this.categoryRef),
       categories: categories ?? this.categories,
     );

@@ -12,6 +12,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 typedef _SelectedCategoryData = ({
   List<CampaignCategoryDetailsViewModel> categories,
@@ -91,17 +92,17 @@ class _ContentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-      child: Stack(
-        children: [
-          child,
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: CreateNewProposalActionButtons(step: step),
-          ),
-        ],
-      ),
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+          child: child,
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: CreateNewProposalActionButtons(step: step),
+        ),
+      ],
     );
   }
 }
@@ -114,7 +115,8 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog>
       constraints: const BoxConstraints.tightFor(height: 800, width: 1200),
       header: VoicesAlignTitleHeader(
         title: _getTitle(),
-        padding: const EdgeInsets.all(24),
+        titleStyle: context.textTheme.titleLarge,
+        padding: const EdgeInsets.all(20),
       ),
       body: const _Content(),
     );
@@ -243,8 +245,7 @@ class _TitleTextField extends StatelessWidget {
         return VoicesTextField(
           initialText: title.value,
           onFieldSubmitted: (_) {},
-          onChanged: (value) =>
-              context.read<NewProposalCubit>().updateTitle(ProposalTitle.dirty(value ?? '')),
+          onChanged: (value) => context.read<NewProposalCubit>().updateTitle(value ?? ''),
           decoration: VoicesTextFieldDecoration(
             borderRadius: BorderRadius.circular(8),
             filled: false,
@@ -256,6 +257,8 @@ class _TitleTextField extends StatelessWidget {
             errorText: title.displayError?.message(context),
             helperText: context.l10n.required.starred().toLowerCase(),
           ),
+          maxLength: title.titleLengthRange?.max,
+          maxLengthEnforcement: MaxLengthEnforcement.none,
         );
       },
     );

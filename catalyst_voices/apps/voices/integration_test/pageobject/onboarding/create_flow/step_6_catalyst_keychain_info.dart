@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
-import 'step_5_base_profile_final.dart';
+import 'step_5_profile_final.dart';
 
 class CatalystKeychainInfoPanel extends OnboardingPageBase {
   CatalystKeychainInfoPanel(super.$);
@@ -16,8 +16,8 @@ class CatalystKeychainInfoPanel extends OnboardingPageBase {
 
   @override
   Future<void> goto() async {
-    await BaseProfileFinalPanel($).goto();
-    await BaseProfileFinalPanel($).clickCreateKeychain();
+    await ProfileFinalPanel($).goto();
+    await ProfileFinalPanel($).clickCreateKeychain();
   }
 
   @override

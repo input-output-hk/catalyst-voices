@@ -31,6 +31,7 @@ impl Api {
         auth: NoneOrRBAC,
     ) -> registrations_get::AllResponses {
         let token = auth.into();
-        registrations_get::endpoint(lookup, token).await
+        // `Box::pin` is used here because of the future size (`clippy::large_futures` lint).
+        Box::pin(registrations_get::endpoint(lookup, token)).await
     }
 }

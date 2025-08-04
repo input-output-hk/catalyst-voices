@@ -1,7 +1,7 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_key_derivation/src/bip32_ed25519/bip32_ed25519_signature.dart';
 import 'package:catalyst_key_derivation/src/rust/api/key_derivation.dart' as rust;
 import 'package:cbor/cbor.dart';
-import 'package:convert/convert.dart';
 
 /// A factory that builds instances of [Bip32Ed25519XSignature].
 ///
@@ -12,8 +12,6 @@ import 'package:convert/convert.dart';
 abstract class Bip32Ed25519XSignatureFactory {
   static Bip32Ed25519XSignatureFactory _instance = const DefaultBip32Ed25519XSignatureFactory();
 
-  const Bip32Ed25519XSignatureFactory();
-
   // ignore: unnecessary_getters_setters
   static Bip32Ed25519XSignatureFactory get instance => _instance;
 
@@ -21,12 +19,19 @@ abstract class Bip32Ed25519XSignatureFactory {
     _instance = factory;
   }
 
+  const Bip32Ed25519XSignatureFactory();
+
   /// Constructs a [Bip32Ed25519XSignature] from a list of [bytes].
   Bip32Ed25519XSignature fromBytes(List<int> bytes);
 
+  /// Deserializes the type from cbor.
+  Bip32Ed25519XSignature fromCbor(CborValue value) {
+    return fromBytes((value as CborBytes).bytes);
+  }
+
   /// Constructs a [Bip32Ed25519XSignature] from a hex-encoded list of bytes.
   Bip32Ed25519XSignature fromHex(String string) {
-    return fromBytes(hex.decode(string));
+    return fromBytes(hexDecode(string));
   }
 
   /// Creates a [Bip32Ed25519XSignature] initialized
@@ -36,11 +41,6 @@ abstract class Bip32Ed25519XSignatureFactory {
   /// pattern, primarily for testing or experimentation purposes.
   Bip32Ed25519XSignature seeded(int byte) {
     return fromBytes(List.filled(rust.U8Array64.arraySize, byte));
-  }
-
-  /// Deserializes the type from cbor.
-  Bip32Ed25519XSignature fromCbor(CborValue value) {
-    return fromBytes((value as CborBytes).bytes);
   }
 }
 

@@ -6,6 +6,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+/// Caches [VideoPlayerController] so it can be initialized and reused in different parts
+/// of app.
 class VideoManager extends ValueNotifier<VideoManagerState> {
   bool _isInitialized = false;
 
@@ -13,18 +15,19 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
 
   bool get isInitialized => _isInitialized;
 
-  @override
-  void dispose() {
-    unawaited(_disposeControllers());
-    super.dispose();
-  }
-
-  Future<VideoPlayerController> getOrCreateController(
+  Future<VideoPlayerController> createOrReinitializeController(
     VideoCacheKey asset,
   ) async {
     final key = _createKey(asset.name, asset.package);
     if (value.controllers.containsKey(key)) {
-      return value.controllers[key]!;
+      final controller = value.controllers[key]!;
+
+      // Re-initialize is needed to properly connect the cached controller
+      // to a new VideoPlayer widget instance, even though controller state remains unchanged
+      // it has to do with internal logic of VideoPlayer widget that is not exposed to us
+      await controller.initialize();
+      await controller.play();
+      return controller;
     }
     final controller = await _initializeController(asset.name, package: asset.package);
 
@@ -33,6 +36,12 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
     value = value.copyWith(controllers: newControllers);
 
     return controller;
+  }
+
+  @override
+  void dispose() {
+    unawaited(_disposeControllers());
+    super.dispose();
   }
 
   Future<void> precacheVideos(
@@ -96,6 +105,7 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
   }
 }
 
+/// Makes [VideoManager] accessible via [BuildContext].
 class VideoManagerScope extends InheritedWidget {
   final VideoManager manager;
 
@@ -115,6 +125,7 @@ class VideoManagerScope extends InheritedWidget {
   }
 }
 
+/// State of [VideoManager].
 class VideoManagerState extends Equatable {
   final Map<String, VideoPlayerController> controllers;
   final Brightness? brightness;

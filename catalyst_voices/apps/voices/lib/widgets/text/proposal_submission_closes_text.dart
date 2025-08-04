@@ -18,7 +18,7 @@ class ProposalSubmissionClosesText extends StatelessWidget {
     return TimezoneDateTimeTextTheme(
       data: TimezoneDateTimeTextThemeData(
         timestampTextStyle: WidgetStatePropertyAll<TextStyle>(
-          context.textTheme.titleLarge ?? const TextStyle(),
+          context.textTheme.titleMedium ?? const TextStyle(),
         ),
         foregroundColor: WidgetStatePropertyAll(context.colors.textOnPrimaryLevel1),
       ),

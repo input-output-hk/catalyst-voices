@@ -3,82 +3,6 @@ import 'package:test/test.dart';
 
 void main() {
   group(AppEnvironmentType, () {
-    group('gateway', () {
-      test('url is correct for dev', () {
-        // Given
-        const type = AppEnvironmentType.dev;
-        const expectedBaseUrl = 'https://app.dev.projectcatalyst.io/api/gateway';
-
-        // When
-        final baseUrl = type.appGatewayApi;
-
-        // Then
-        expect(baseUrl.toString(), expectedBaseUrl);
-      });
-
-      test('url is correct for prod', () {
-        // Given
-        const type = AppEnvironmentType.prod;
-        const expectedBaseUrl = 'https://app.projectcatalyst.io/api/gateway';
-
-        // When
-        final baseUrl = type.appGatewayApi;
-
-        // Then
-        expect(baseUrl.toString(), expectedBaseUrl);
-      });
-
-      test('url is correct for relative', () {
-        // Given
-        const type = AppEnvironmentType.relative;
-        const expectedBaseUrl = '/api/gateway';
-
-        // When
-        final baseUrl = type.appGatewayApi;
-
-        // Then
-        expect(baseUrl.toString(), expectedBaseUrl);
-      });
-    });
-
-    group('reviews', () {
-      test('url is correct for dev', () {
-        // Given
-        const type = AppEnvironmentType.dev;
-        const expectedBaseUrl = 'https://app.dev.projectcatalyst.io/api/reviews';
-
-        // When
-        final baseUrl = type.appReviewsApi;
-
-        // Then
-        expect(baseUrl.toString(), expectedBaseUrl);
-      });
-
-      test('url is correct for prod', () {
-        // Given
-        const type = AppEnvironmentType.prod;
-        const expectedBaseUrl = 'https://app.projectcatalyst.io/api/reviews';
-
-        // When
-        final baseUrl = type.appReviewsApi;
-
-        // Then
-        expect(baseUrl.toString(), expectedBaseUrl);
-      });
-
-      test('url is correct for relative', () {
-        // Given
-        const type = AppEnvironmentType.relative;
-        const expectedBaseUrl = '/api/reviews';
-
-        // When
-        final baseUrl = type.appReviewsApi;
-
-        // Then
-        expect(baseUrl.toString(), expectedBaseUrl);
-      });
-    });
-
     group('tryUriBaseEnvName', () {
       test('returns dev correctly for dev base url', () {
         // Given
@@ -114,6 +38,34 @@ void main() {
 
         // Then
         expect(envName, expectedEnv);
+      });
+    });
+
+    group('normalizedBaseUri', () {
+      test('removes path params', () {
+        // Given
+        const host = 'https://app.dev.projectcatalyst.io';
+        final base = Uri.parse('$host/discovery');
+        final expectedBase = Uri.parse(host);
+
+        // When
+        final normalizedBase = AppEnvironmentType.normalizedBaseUri(base);
+
+        // Then
+        expect(normalizedBase, expectedBase);
+      });
+
+      test('keeps original when no path provided', () {
+        // Given
+        const host = 'https://app.dev.projectcatalyst.io';
+        final base = Uri.parse(host);
+        final expectedBase = Uri.parse(host);
+
+        // When
+        final normalizedBase = AppEnvironmentType.normalizedBaseUri(base);
+
+        // Then
+        expect(normalizedBase, expectedBase);
       });
     });
   });

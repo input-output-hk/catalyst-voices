@@ -100,7 +100,7 @@ class _RegistrationDialogState extends State<RegistrationDialog> {
       case RecoverRegistration():
         _cubit.goToStep(const RecoverWithSeedPhraseStep());
       case ContinueRegistration():
-        _cubit.recoverProgress();
+        unawaited(_cubit.recoverProgress());
     }
   }
 

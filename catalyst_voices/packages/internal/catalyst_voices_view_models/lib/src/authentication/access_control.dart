@@ -2,20 +2,31 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+/// Class responsible for managing access control for different spaces.
+///
+/// This class is used to determine which spaces a user has access to based on their account role.
 final class AccessControl {
+  /// Default spaces access.
+  /// For example, spaces that are used in the main drawer of the app.
   static const defaultSpacesAccess = [Space.discovery];
-  static const List<Space> _votingAccess = [
+
+  /// Contributor spaces access.
+  /// For example, spaces that are used in the main drawer of the app.
+  static const List<Space> _contributorAccess = [
     Space.discovery,
     Space.voting,
-    Space.fundedProjects,
   ];
 
+  /// Proposal spaces access.
+  /// For example, spaces that are used in the main drawer of the app.
   static const List<Space> _proposalAccess = [
     Space.discovery,
     Space.workspace,
     Space.voting,
   ];
 
+  /// Admin spaces access.
+  /// For example, spaces that are used in the main drawer of the app.
   static const List<Space> _adminAccess = [
     Space.discovery,
     Space.workspace,
@@ -24,6 +35,8 @@ final class AccessControl {
     Space.fundedProjects,
   ];
 
+  /// All spaces shortcuts activators.
+  /// For example, spaces that are used in the main drawer of the app.
   static final Map<Space, LogicalKeySet> allSpacesShortcutsActivators = {
     Space.discovery: LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit1),
     Space.workspace: LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.digit2),
@@ -32,20 +45,13 @@ final class AccessControl {
     Space.treasury: LogicalKeySet(LogicalKeyboardKey.control, LogicalKeyboardKey.keyT),
   };
 
-  static const List<Space> defaultAvailableSpaces = [
-    Space.discovery,
-    Space.workspace,
-    Space.voting,
-    Space.fundedProjects,
-  ];
-
   const AccessControl();
 
   List<Space> overallSpaces(Account? account) {
-    if (account == null) return _votingAccess;
+    if (account == null) return _contributorAccess;
     if (account.isAdmin) return _adminAccess;
     if (_hasProposerOrDrepRole(account)) return _proposalAccess;
-    return _votingAccess;
+    return _contributorAccess;
   }
 
   List<Space> spacesAccess(Account? account) {
@@ -56,7 +62,7 @@ final class AccessControl {
       return [Space.discovery, Space.workspace];
     }
 
-    // TODO(LynxLynxx): After F14 use _votingAccess
+    // TODO(LynxLynxx): After F14 use _contributorAccess
     return defaultSpacesAccess;
   }
 

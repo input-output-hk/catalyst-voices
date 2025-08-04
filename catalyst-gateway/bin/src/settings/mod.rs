@@ -21,9 +21,11 @@ use crate::{
     utils::blake2b_hash::generate_uuid_string_from_data,
 };
 
+pub(crate) mod cardano_assets_cache;
 pub(crate) mod cassandra_db;
 pub(crate) mod chain_follower;
 pub(crate) mod event_db;
+pub(crate) mod rbac;
 pub(crate) mod signed_doc;
 mod str_env_var;
 
@@ -47,12 +49,6 @@ const API_URL_PREFIX_DEFAULT: &str = "/api";
 
 /// Default `CHECK_CONFIG_TICK` used in development, 5 seconds.
 const CHECK_CONFIG_TICK_DEFAULT: Duration = Duration::from_secs(5);
-
-/// Default `METRICS_MEMORY_INTERVAL`, 1 second.
-const METRICS_MEMORY_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
-
-/// Default `METRICS_FOLLOWER_INTERVAL`, 1 second.
-const METRICS_FOLLOWER_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
 
 /// Default number of slots used as overlap when purging Live Index data.
 const PURGE_BACKWARD_SLOT_BUFFER_DEFAULT: u64 = 100;
@@ -111,7 +107,7 @@ struct EnvVars {
     client_id_key: StringEnvVar,
 
     /// A List of servers to provide
-    api_host_names: Option<StringEnvVar>,
+    api_host_names: Vec<String>,
 
     /// The base path the API is served at.
     api_url_prefix: StringEnvVar,
@@ -131,6 +127,12 @@ struct EnvVars {
     /// The Catalyst Signed Documents configuration
     signed_doc: signed_doc::EnvVars,
 
+    /// RBAC configuration.
+    rbac: rbac::EnvVars,
+
+    /// The Cardano assets caches configuration
+    cardano_assets_cache: cardano_assets_cache::EnvVars,
+
     /// Internal API Access API Key
     internal_api_key: Option<StringEnvVar>,
 
@@ -141,17 +143,14 @@ struct EnvVars {
     /// Slot buffer used as overlap when purging Live Index data.
     purge_backward_slot_buffer: u64,
 
-    /// Interval for updating and sending memory metrics.
-    metrics_memory_interval: Duration,
-
-    /// Interval for updating and sending Chain Follower metrics.
-    metrics_follower_interval: Duration,
-
     /// Interval for determining if the service is live.
     service_live_timeout_interval: Duration,
 
     /// Threshold for determining if the service is live.
     service_live_counter_threshold: u64,
+
+    /// Set to Log 404 not found.
+    log_not_found: Option<StringEnvVar>,
 }
 
 // Lazy initialization of all env vars which are not command line parameters.
@@ -167,12 +166,15 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
 
     let address = StringEnvVar::new("ADDRESS", ADDRESS_DEFAULT.to_string().into());
     let address = SocketAddr::from_str(address.as_str())
-        .inspect(|err| {
+        .inspect_err(|err| {
             error!(
-                "Invalid binding address {}, err: {err}. Using default binding address value {ADDRESS_DEFAULT}.",
-                address.as_str(),
+                error = ?err,
+                default_addr = ?ADDRESS_DEFAULT,
+                invalid_addr = ?address,
+                "Invalid binding address. Using default binding address value.",
             );
-        }).unwrap_or(ADDRESS_DEFAULT);
+        })
+        .unwrap_or(ADDRESS_DEFAULT);
 
     let purge_backward_slot_buffer = StringEnvVar::new_as_int(
         "PURGE_BACKWARD_SLOT_BUFFER",
@@ -192,7 +194,11 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         server_name: StringEnvVar::new_optional("SERVER_NAME", false),
         service_id: StringEnvVar::new("SERVICE_ID", calculate_service_uuid().into()),
         client_id_key: StringEnvVar::new("CLIENT_ID_KEY", CLIENT_ID_KEY_DEFAULT.into()),
-        api_host_names: StringEnvVar::new_optional("API_HOST_NAMES", false),
+        api_host_names: string_to_api_host_names(
+            &StringEnvVar::new_optional("c", false)
+                .map(|v| v.as_string())
+                .unwrap_or_default(),
+        ),
         api_url_prefix: StringEnvVar::new("API_URL_PREFIX", API_URL_PREFIX_DEFAULT.into()),
 
         cassandra_persistent_db: cassandra_db::EnvVars::new(
@@ -206,20 +212,14 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         chain_follower: chain_follower::EnvVars::new(),
         event_db: event_db::EnvVars::new(),
         signed_doc: signed_doc::EnvVars::new(),
+        rbac: rbac::EnvVars::new(),
+        cardano_assets_cache: cardano_assets_cache::EnvVars::new(),
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
         check_config_tick: StringEnvVar::new_as_duration(
             "CHECK_CONFIG_TICK",
             CHECK_CONFIG_TICK_DEFAULT,
         ),
         purge_backward_slot_buffer,
-        metrics_memory_interval: StringEnvVar::new_as_duration(
-            "METRICS_MEMORY_INTERVAL",
-            METRICS_MEMORY_INTERVAL_DEFAULT,
-        ),
-        metrics_follower_interval: StringEnvVar::new_as_duration(
-            "METRICS_FOLLOWER_INTERVAL",
-            METRICS_FOLLOWER_INTERVAL_DEFAULT,
-        ),
         service_live_timeout_interval: StringEnvVar::new_as_duration(
             "SERVICE_LIVE_TIMEOUT_INTERVAL",
             SERVICE_LIVE_TIMEOUT_INTERVAL_DEFAULT,
@@ -230,6 +230,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             0,
             u64::MAX,
         ),
+        log_not_found: StringEnvVar::new_optional("LOG_NOT_FOUND", false),
     }
 });
 
@@ -332,6 +333,16 @@ impl Settings {
         ENV_VARS.signed_doc.clone()
     }
 
+    /// Returns the RBAC configuration.
+    pub fn rbac_cfg() -> &'static rbac::EnvVars {
+        &ENV_VARS.rbac
+    }
+
+    /// Get the configuration of the Cardano assets cache.
+    pub(crate) fn cardano_assets_cache() -> cardano_assets_cache::EnvVars {
+        ENV_VARS.cardano_assets_cache.clone()
+    }
+
     /// Chain Follower network (The Blockchain network we are configured to use).
     /// Note: Catalyst Gateway can ONLY follow one network at a time.
     pub(crate) fn cardano_network() -> Network {
@@ -353,16 +364,6 @@ impl Settings {
         ENV_VARS.service_id.as_str()
     }
 
-    /// The memory metrics interval
-    pub(crate) fn metrics_memory_interval() -> Duration {
-        ENV_VARS.metrics_memory_interval
-    }
-
-    /// The Chain Follower metrics interval
-    pub(crate) fn metrics_follower_interval() -> Duration {
-        ENV_VARS.metrics_follower_interval
-    }
-
     /// Get a list of all host names to serve the API on.
     ///
     /// Used by the `OpenAPI` Documentation to point to the correct backend.
@@ -371,14 +372,8 @@ impl Settings {
     ///
     /// Host names are taken from the `API_HOST_NAMES` environment variable.
     /// If that is not set, returns an empty list.
-    pub(crate) fn api_host_names() -> Vec<String> {
-        string_to_api_host_names(
-            ENV_VARS
-                .api_host_names
-                .as_ref()
-                .map(StringEnvVar::as_str)
-                .unwrap_or_default(),
-        )
+    pub(crate) fn api_host_names() -> &'static [String] {
+        &ENV_VARS.api_host_names
     }
 
     /// The socket address we are bound to.
@@ -452,18 +447,26 @@ impl Settings {
     pub(crate) fn service_live_counter_threshold() -> u64 {
         ENV_VARS.service_live_counter_threshold
     }
+
+    /// If set log the 404 not found, else do not log.
+    pub(crate) fn log_not_found() -> bool {
+        ENV_VARS.log_not_found.is_some()
+    }
 }
 
 /// Transform a string list of host names into a vec of host names.
 fn string_to_api_host_names(hosts: &str) -> Vec<String> {
     /// Log an invalid hostname.
     fn invalid_hostname(hostname: &str) -> String {
-        error!("Invalid host name for API: {}", hostname);
+        error!(hostname = hostname, "Invalid host name for API");
         String::new()
     }
 
     let configured_hosts: Vec<String> = hosts
         .split(',')
+        // filters out at the beginning all empty entries, because they all would be invalid and
+        // filtered out anyway
+        .filter(|s| !s.is_empty())
         .map(|s| {
             let url = Url::parse(s.trim());
             match url {

@@ -115,7 +115,7 @@ class _TitleText extends StatelessWidget {
 extension _AccountCreateStepType on AccountCreateStepType {
   String? _nextStepText(BuildContext context) {
     return switch (this) {
-      AccountCreateStepType.baseProfile => context.l10n.createBaseProfileNextStep,
+      AccountCreateStepType.baseProfile => context.l10n.createProfileNextStep,
       AccountCreateStepType.keychain => context.l10n.createKeychainCreatedNextStep,
       AccountCreateStepType.walletLink => null,
     };
@@ -123,7 +123,7 @@ extension _AccountCreateStepType on AccountCreateStepType {
 
   String? _title(BuildContext context) {
     return switch (this) {
-      AccountCreateStepType.baseProfile => context.l10n.createBaseProfileCreatedTitle,
+      AccountCreateStepType.baseProfile => context.l10n.createProfileCreatedTitle,
       AccountCreateStepType.keychain => context.l10n.createKeychainCreatedTitle,
       AccountCreateStepType.walletLink => null,
     };

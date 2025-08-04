@@ -18,6 +18,7 @@ dependencies:
     path: ../catalyst_voices_repositories
   catalyst_voices_shared:
     path: ../catalyst_voices_shared
+  cbor: 6.3.7
   collection: ^1.19.0
   equatable: ^2.0.7
   flutter:
@@ -32,8 +33,10 @@ dependencies:
   pool: ^1.5.1
   result_type: ^0.2.0
   rxdart: ^0.27.7
+  sentry_flutter: ^9.0.0
   shared_preferences: ^2.3.3
   synchronized: ^3.3.0+3
+  url_launcher: ^6.3.1
   uuid_plus: ^0.1.0
   web: ^1.1.0
   webdriver: ^3.0.3
@@ -41,6 +44,7 @@ dependencies:
 dev_dependencies:
   analyzer: 7.3.0
   catalyst_analysis: ^3.0.0
+  catalyst_compression: ^1.0.0
   mocktail: ^1.0.1
   shared_preferences_platform_interface: ^2.4.1
   test: ^1.24.9

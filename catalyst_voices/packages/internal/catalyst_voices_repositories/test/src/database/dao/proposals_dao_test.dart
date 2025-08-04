@@ -66,7 +66,7 @@ void main() {
           'exists there are counted as one',
           () async {
             // Given
-            final ref = SignedDocumentRef.generateFirstRef();
+            final ref = DocumentRefFactory.signedDocumentRef();
             final proposals = [
               _buildProposal(selfRef: ref),
               _buildProposal(selfRef: ref.nextVersion().toSignedDocumentRef()),
@@ -92,7 +92,7 @@ void main() {
           'returns one final proposal if final submission is found',
           () async {
             // Given
-            final ref = SignedDocumentRef.generateFirstRef();
+            final ref = DocumentRefFactory.signedDocumentRef();
             final proposals = [
               _buildProposal(selfRef: ref),
               _buildProposal(),
@@ -125,7 +125,7 @@ void main() {
           'latest action but old draft action exists',
           () async {
             // Given
-            final ref = SignedDocumentRef.generateFirstRef();
+            final ref = DocumentRefFactory.signedDocumentRef();
             final proposals = [
               _buildProposal(selfRef: ref),
             ];
@@ -168,7 +168,7 @@ void main() {
           'submission is draft',
           () async {
             // Given
-            final ref = SignedDocumentRef.generateFirstRef();
+            final ref = DocumentRefFactory.signedDocumentRef();
             final proposals = [
               _buildProposal(selfRef: ref),
             ];
@@ -206,8 +206,8 @@ void main() {
           'complex action history',
           () async {
             // Given
-            final proposalOneRef = SignedDocumentRef.generateFirstRef();
-            final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+            final proposalOneRef = DocumentRefFactory.signedDocumentRef();
+            final proposalTwoRef = DocumentRefFactory.signedDocumentRef();
             final proposals = [
               _buildProposal(selfRef: proposalOneRef),
               _buildProposal(selfRef: proposalTwoRef),
@@ -255,8 +255,8 @@ void main() {
           'returns calculated drafts and finals count',
           () async {
             // Given
-            final proposalOneRef = SignedDocumentRef.generateFirstRef();
-            final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+            final proposalOneRef = DocumentRefFactory.signedDocumentRef();
+            final proposalTwoRef = DocumentRefFactory.signedDocumentRef();
             final proposals = [
               _buildProposal(selfRef: proposalOneRef),
               _buildProposal(selfRef: proposalTwoRef),
@@ -294,8 +294,8 @@ void main() {
           'returns correct favorites count',
           () async {
             // Given
-            final proposalOneRef = SignedDocumentRef.generateFirstRef();
-            final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+            final proposalOneRef = DocumentRefFactory.signedDocumentRef();
+            final proposalTwoRef = DocumentRefFactory.signedDocumentRef();
             final proposals = [
               _buildProposal(selfRef: proposalOneRef),
               _buildProposal(selfRef: proposalTwoRef),
@@ -330,8 +330,8 @@ void main() {
           () async {
             // Given
             final userId = DummyCatalystIdFactory.create(username: 'damian');
-            final proposalOneRef = SignedDocumentRef.generateFirstRef();
-            final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+            final proposalOneRef = DocumentRefFactory.signedDocumentRef();
+            final proposalTwoRef = DocumentRefFactory.signedDocumentRef();
             final proposals = [
               _buildProposal(selfRef: proposalOneRef),
               _buildProposal(selfRef: proposalTwoRef, author: userId),
@@ -360,8 +360,8 @@ void main() {
           () async {
             // Given
             final userId = DummyCatalystIdFactory.create(username: 'damian');
-            final proposalOneRef = SignedDocumentRef.generateFirstRef();
-            final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+            final proposalOneRef = DocumentRefFactory.signedDocumentRef();
+            final proposalTwoRef = DocumentRefFactory.signedDocumentRef();
             final proposals = [
               _buildProposal(selfRef: proposalOneRef),
               _buildProposal(selfRef: proposalTwoRef, author: userId),
@@ -412,8 +412,8 @@ void main() {
             final userId = DummyCatalystIdFactory.create(username: 'damian');
             final categoryId = constantDocumentsRefs.first.category;
 
-            final proposalOneRef = SignedDocumentRef.generateFirstRef();
-            final proposalTwoRef = SignedDocumentRef.generateFirstRef();
+            final proposalOneRef = DocumentRefFactory.signedDocumentRef();
+            final proposalTwoRef = DocumentRefFactory.signedDocumentRef();
             final proposals = [
               _buildProposal(
                 selfRef: proposalOneRef,
@@ -566,7 +566,7 @@ void main() {
           'returns correctly counted proposals',
           () async {
             // Given
-            final one = SignedDocumentRef.generateFirstRef();
+            final one = DocumentRefFactory.signedDocumentRef();
             final two = one.nextVersion().toSignedDocumentRef();
             final three = two.nextVersion().toSignedDocumentRef();
 
@@ -577,7 +577,7 @@ void main() {
             ];
             final actions = [
               _buildProposalAction(
-                selfRef: SignedDocumentRef.generateFirstRef(),
+                selfRef: DocumentRefFactory.signedDocumentRef(),
                 action: ProposalSubmissionActionDto.aFinal,
                 proposalRef: two,
               ),
@@ -607,8 +607,8 @@ void main() {
           'hidden proposals are excluded from count',
           () async {
             // Given
-            final one = SignedDocumentRef.generateFirstRef();
-            final two = SignedDocumentRef.generateFirstRef();
+            final one = DocumentRefFactory.signedDocumentRef();
+            final two = DocumentRefFactory.signedDocumentRef();
 
             final proposals = [
               _buildProposal(selfRef: one),
@@ -616,7 +616,7 @@ void main() {
             ];
             final actions = [
               _buildProposalAction(
-                selfRef: SignedDocumentRef.generateFirstRef(),
+                selfRef: DocumentRefFactory.signedDocumentRef(),
                 action: ProposalSubmissionActionDto.hide,
                 proposalRef: two,
               ),
@@ -649,7 +649,7 @@ void main() {
         'only newest version of proposal is returned',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
 
           final ref = _buildRefAt(DateTime(2025, 4, 7));
           final nextRef = _buildRefAt(DateTime(2025, 4, 8)).copyWith(id: ref.id);
@@ -704,7 +704,7 @@ void main() {
         'proposals are split into pages correctly',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
 
           final templates = [
             _buildProposalTemplate(selfRef: templateRef),
@@ -757,7 +757,7 @@ void main() {
         'proposals category filter works as expected',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
           final categoryId = constantDocumentsRefs.first.category;
 
           final templates = [
@@ -814,7 +814,7 @@ void main() {
         'final proposals filter works as expected',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
 
           final templates = [
             _buildProposalTemplate(selfRef: templateRef),
@@ -885,7 +885,7 @@ void main() {
         'final proposals is one with latest action as final',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
 
           final templates = [
             _buildProposalTemplate(selfRef: templateRef),
@@ -957,7 +957,7 @@ void main() {
         'JoinedProposal is build correctly ',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
 
           final templates = [
             _buildProposalTemplate(selfRef: templateRef),
@@ -1045,7 +1045,7 @@ void main() {
           const authorName = 'Damian';
           final searchQuery = authorName.substring(0, 3);
 
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
 
           final templates = [
             _buildProposalTemplate(selfRef: templateRef),
@@ -1111,8 +1111,8 @@ void main() {
         'hidden proposals are filtered out when pointing to older version',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
-          final proposalRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
+          final proposalRef = DocumentRefFactory.signedDocumentRef();
           final nextProposalRef = proposalRef.nextVersion().toSignedDocumentRef();
 
           final templates = [
@@ -1180,7 +1180,7 @@ void main() {
         'order alphabetical works against title',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
           const titles = [
             'Abc',
             'Bcd',
@@ -1193,7 +1193,7 @@ void main() {
 
           final proposals = titles.map((title) {
             return _buildProposal(
-              selfRef: SignedDocumentRef.generateFirstRef(),
+              selfRef: DocumentRefFactory.signedDocumentRef(),
               template: templateRef,
               title: title,
             );
@@ -1234,7 +1234,7 @@ void main() {
         'order budget asc works against content path',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
           const budgets = [
             Coin.fromWholeAda(100000),
             Coin.fromWholeAda(199999),
@@ -1247,7 +1247,7 @@ void main() {
 
           final proposals = budgets.map((requestedFund) {
             return _buildProposal(
-              selfRef: SignedDocumentRef.generateFirstRef(),
+              selfRef: DocumentRefFactory.signedDocumentRef(),
               template: templateRef,
               requestedFunds: requestedFund,
             );
@@ -1289,7 +1289,7 @@ void main() {
         'order budget desc works against content path',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
           const budgets = [
             Coin.fromWholeAda(200000),
             Coin.fromWholeAda(199999),
@@ -1302,7 +1302,7 @@ void main() {
 
           final proposals = budgets.map((requestedFund) {
             return _buildProposal(
-              selfRef: SignedDocumentRef.generateFirstRef(),
+              selfRef: DocumentRefFactory.signedDocumentRef(),
               template: templateRef,
               requestedFunds: requestedFund,
             );
@@ -1344,7 +1344,7 @@ void main() {
         'order updateDate asc works against content path',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
           final dates = [
             DateTime.utc(2025, 5, 10),
             DateTime.utc(2025, 5, 20),
@@ -1399,7 +1399,7 @@ void main() {
         'order updateDate desc works against content path',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
           final dates = [
             DateTime.utc(2025, 5, 29),
             DateTime.utc(2025, 5, 20),
@@ -1454,7 +1454,7 @@ void main() {
         'latest version value is one ordered against',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
           final proposalRef = SignedDocumentRef.first(_buildUuidAt(DateTime.utc(2025, 5, 10)));
           final latestProposalRef = proposalRef.copyWith(
             version: Optional(_buildUuidAt(DateTime.utc(2025, 5, 29))),
@@ -1467,7 +1467,7 @@ void main() {
           final refsBudgets = <SignedDocumentRef, Coin>{
             proposalRef: const Coin.fromWholeAda(10000),
             latestProposalRef: expectedBudgets[0],
-            SignedDocumentRef.generateFirstRef(): expectedBudgets[1],
+            DocumentRefFactory.signedDocumentRef(): expectedBudgets[1],
           };
 
           final templates = [
@@ -1521,7 +1521,7 @@ void main() {
         'returns only newest version of each proposal',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
 
           final ref = _buildRefAt(DateTime(2025, 4, 7));
           final nextRef = _buildRefAt(DateTime(2025, 4, 8)).copyWith(id: ref.id);
@@ -1566,7 +1566,7 @@ void main() {
         'filters by category when categoryRef is provided',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
 
           final templates = [
             _buildProposalTemplate(selfRef: templateRef),
@@ -1618,7 +1618,7 @@ void main() {
         'filters final proposals correctly',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
 
           final templates = [
             _buildProposalTemplate(selfRef: templateRef),
@@ -1684,7 +1684,7 @@ void main() {
         'returns correct JoinedProposal structure',
         () async {
           // Given
-          final templateRef = SignedDocumentRef.generateFirstRef();
+          final templateRef = DocumentRefFactory.signedDocumentRef();
 
           final templates = [
             _buildProposalTemplate(selfRef: templateRef),
@@ -1764,6 +1764,138 @@ void main() {
         },
         onPlatform: driftOnPlatforms,
       );
+
+      test(
+        'order alphabetical works case-insensitively with null titles',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          const titles = [
+            'ABC',
+            'bcd',
+            null,
+            'Xyz',
+            'aabc', //cspell:disable-line
+          ];
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = titles.map((title) {
+            return _buildProposal(
+              selfRef: SignedDocumentRef.generateFirstRef(),
+              template: templateRef,
+              title: title,
+            );
+          }).shuffled();
+
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+          const order = Alphabetical();
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+
+          final proposalsTitles = page.items.map((e) => e.proposal.content.title).toList();
+
+          final expectedOrder = [
+            'aabc', //cspell:disable-line
+            'ABC',
+            'bcd',
+            'Xyz',
+            null,
+          ];
+
+          expect(proposalsTitles, containsAllInOrder(expectedOrder));
+        },
+        onPlatform: driftOnPlatforms,
+      );
+
+      test(
+        'order alphabetical works case-insensitively',
+        () async {
+          // Given
+          final templateRef = SignedDocumentRef.generateFirstRef();
+          const titles = [
+            'Bravo',
+            'Lima',
+            'Test',
+            'alpha',
+            'beta',
+            'leet',
+            'tango',
+          ];
+
+          final templates = [
+            _buildProposalTemplate(selfRef: templateRef),
+          ];
+
+          final proposals = titles.map((title) {
+            return _buildProposal(
+              selfRef: SignedDocumentRef.generateFirstRef(),
+              template: templateRef,
+              title: title,
+            );
+          }).shuffled();
+
+          final actions = <DocumentEntityWithMetadata>[];
+          final comments = <DocumentEntityWithMetadata>[];
+
+          const filters = ProposalsFilters();
+          const order = Alphabetical();
+
+          // When
+          await database.documentsDao.saveAll([
+            ...templates,
+            ...proposals,
+            ...actions,
+            ...comments,
+          ]);
+
+          // Then
+          const request = PageRequest(page: 0, size: 25);
+          final page = await database.proposalsDao.queryProposalsPage(
+            request: request,
+            filters: filters,
+            order: order,
+          );
+
+          expect(page.page, 0);
+
+          final proposalsTitles = page.items.map((e) => e.proposal.content.title).toList();
+
+          final expectedOrder = [
+            'alpha',
+            'beta',
+            'Bravo',
+            'leet',
+            'Lima',
+            'tango',
+            'Test',
+          ];
+
+          expect(proposalsTitles, containsAllInOrder(expectedOrder));
+        },
+        onPlatform: driftOnPlatforms,
+      );
     });
   });
 }
@@ -1779,8 +1911,8 @@ DocumentEntityWithMetadata _buildProposal({
 }) {
   final metadata = DocumentDataMetadata(
     type: DocumentType.proposalDocument,
-    selfRef: selfRef ?? SignedDocumentRef.generateFirstRef(),
-    template: template ?? SignedDocumentRef.generateFirstRef(),
+    selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
+    template: template ?? DocumentRefFactory.signedDocumentRef(),
     authors: [
       if (author != null) author,
     ],
@@ -1830,7 +1962,7 @@ DocumentEntityWithMetadata _buildProposalAction({
 }) {
   final metadata = DocumentDataMetadata(
     type: DocumentType.proposalActionDocument,
-    selfRef: selfRef ?? SignedDocumentRef.generateFirstRef(),
+    selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
     ref: proposalRef,
   );
   final dto = ProposalSubmissionActionDocumentDto(action: action);
@@ -1852,7 +1984,7 @@ DocumentEntityWithMetadata _buildProposalComment({
 }) {
   final metadata = DocumentDataMetadata(
     type: DocumentType.commentDocument,
-    selfRef: selfRef ?? SignedDocumentRef.generateFirstRef(),
+    selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
     ref: proposalRef,
   );
   const content = DocumentDataContent({});
@@ -1884,7 +2016,7 @@ DocumentEntityWithMetadata _buildProposalTemplate({
 }) {
   final metadata = DocumentDataMetadata(
     type: DocumentType.proposalTemplate,
-    selfRef: selfRef ?? SignedDocumentRef.generateFirstRef(),
+    selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
   );
   const content = DocumentDataContent({});
 

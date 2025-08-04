@@ -58,6 +58,6 @@ class _VoicesVideoPlayerState extends State<VoicesVideoPlayer> with AutomaticKee
   }
 
   Future<VideoPlayerController> _getController() {
-    return VideoManagerScope.of(context).getOrCreateController(widget.asset);
+    return VideoManagerScope.of(context).createOrReinitializeController(widget.asset);
   }
 }

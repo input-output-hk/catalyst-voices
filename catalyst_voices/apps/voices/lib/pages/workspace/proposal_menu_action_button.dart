@@ -183,8 +183,7 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
   }
 
   void _shareProposal() {
-    final url = ProposalRoute.fromRef(ref: widget.ref).location;
-    unawaited(ShareProposalDialog.show(context, url));
+    unawaited(ShareProposalDialog.show(context, ref: widget.ref));
   }
 
   void _showLatestLocalProposalWarningSnackbar() {

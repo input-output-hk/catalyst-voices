@@ -1,6 +1,6 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 
-/// Represents an asset identified by a [PolicyId] and [AssetName].
+/// Represents a native asset identified by a [PolicyId] and [AssetName].
 typedef AssetId = (PolicyId, AssetName);
 
 /// A list of asset group entries, each mapping an asset to its associated
@@ -22,6 +22,19 @@ typedef SelectionResult = (
 /// Represents the valid range for coin values as a tuple of minimum and
 /// maximum [Coin] values.
 typedef ValidRange = (Coin minInclusive, Coin maxInclusive);
+
+/// Defines a strategy applied to the remaining Ada when planning change outputs.
+enum ChangeOutputAdaStrategy {
+  /// Attempt to create change outputs first but if that fails due to various reasons
+  /// (i.e. Ada not enough to satisfy the minimum Ada requirement for the UTXO)
+  /// then the implementation will attempt to burn remaining Ada as fee.
+  burn,
+
+  /// Attempt to create change outputs first but if that fails due to various reasons
+  /// (i.e. Ada not enough to satisfy the minimum Ada requirement for the UTXO)
+  /// then do not burn the remaining Ada as fee and throw [InsufficientAdaForChangeOutputException].
+  noBurn,
+}
 
 /// Interface for coin selection strategies applied to asset maps.
 // ignore: one_member_abstracts

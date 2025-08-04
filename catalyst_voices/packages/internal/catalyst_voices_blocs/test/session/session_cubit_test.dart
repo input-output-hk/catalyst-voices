@@ -4,13 +4,14 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart' hide Uuid;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   late final KeychainProvider keychainProvider;
@@ -144,6 +145,7 @@ void main() {
         'session is in Visitor state with correct flag', () async {
       // Given
       final keychainProgress = KeychainProgress(
+        keychainId: const Uuid().v4(),
         seedPhrase: SeedPhrase(),
         password: 'Test1234',
       );
@@ -307,10 +309,12 @@ class _FakeUserRepository extends Fake implements UserRepository {
   Future<User> getUser() async => _user ?? const User.empty();
 
   @override
-  Future<void> publishUserProfile({
+  Future<AccountPublicProfile> publishUserProfile({
     required CatalystId catalystId,
     required String email,
-  }) async {}
+  }) async {
+    return AccountPublicProfile(email: email, status: AccountPublicStatus.verifying);
+  }
 
   void reset() {
     _user = null;

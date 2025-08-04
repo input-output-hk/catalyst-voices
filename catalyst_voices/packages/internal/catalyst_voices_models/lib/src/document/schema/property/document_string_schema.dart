@@ -323,6 +323,17 @@ final class DocumentSingleLineHttpsUrlEntrySchema extends DocumentStringSchema {
       pattern: pattern,
     );
   }
+
+  @override
+  DocumentValidationResult validate(String? value) {
+    return DocumentValidationResult.merge([
+      DocumentValidator.validateIfRequired(this, value),
+      DocumentValidator.validateStringLength(this, value),
+      DocumentValidator.validateStringPattern(this, value, DocumentPatternType.https),
+      DocumentValidator.validateConstValue(this, value),
+      DocumentValidator.validateEnumValues(this, value),
+    ]);
+  }
 }
 
 final class DocumentSingleLineTextEntrySchema extends DocumentStringSchema {
@@ -415,7 +426,7 @@ sealed class DocumentStringSchema extends DocumentValueSchema<String> {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
       DocumentValidator.validateStringLength(this, value),
-      DocumentValidator.validateStringPattern(this, value),
+      DocumentValidator.validateStringPattern(this, value, DocumentPatternType.generic),
       DocumentValidator.validateConstValue(this, value),
       DocumentValidator.validateEnumValues(this, value),
     ]);

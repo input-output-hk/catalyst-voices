@@ -39,7 +39,6 @@ class _CategoryDetails extends StatelessWidget {
             CategoryRequirementsList(
               dos: category.dos,
               donts: category.donts,
-              iconColor: context.colors.primaryContainer,
             ),
           ],
         );

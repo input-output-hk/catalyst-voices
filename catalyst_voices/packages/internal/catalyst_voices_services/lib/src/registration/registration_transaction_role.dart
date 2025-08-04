@@ -43,6 +43,9 @@ enum RegistrationTransactionRoleAction {
 }
 
 extension IterableRegistrationTransactionRoleExt on Iterable<RegistrationTransactionRole> {
+  /// Whether contains set proposer role.
+  bool get containsProposer => any((e) => e.setProposer);
+
   /// Whether the configured roles indicate this is a first
   /// registration (true) or registration update - role change (false).
   bool get isFirstRegistration => any((e) => e.setVoter);

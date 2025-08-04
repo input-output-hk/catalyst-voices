@@ -9,10 +9,12 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 final class SegmentsController extends ValueNotifier<SegmentsControllerState> {
   ItemScrollController? _itemsScrollController;
+  final double scrollAlignment;
 
-  SegmentsController([
-    super.value = const SegmentsControllerState(),
-  ]) : super();
+  SegmentsController({
+    SegmentsControllerState value = const SegmentsControllerState(),
+    this.scrollAlignment = 0,
+  }) : super(value);
 
   // ignore: use_setters_to_change_properties
   void attachItemsScrollController(ItemScrollController value) {
@@ -124,6 +126,7 @@ final class SegmentsController extends ValueNotifier<SegmentsControllerState> {
     await controller.scrollTo(
       index: index,
       duration: const Duration(milliseconds: 300),
+      alignment: scrollAlignment,
     );
   }
 }
@@ -229,5 +232,24 @@ final class SegmentsControllerState extends Equatable {
 
   bool isEditing(NodeId stepId) {
     return editSectionId.contains(stepId);
+  }
+
+  /// Making a copy with [segments] as well as adding any new segments
+  /// to [openedSegments] by default.
+  SegmentsControllerState updateSegments(List<Segment> segments) {
+    final ids = segments.map((e) => e.id);
+    final currentIds = this.segments.map((e) => e.id);
+
+    final newSegmentsIds = ids.whereNot(currentIds.contains);
+
+    final openedSegments = {
+      ...this.openedSegments,
+      ...newSegmentsIds,
+    };
+
+    return copyWith(
+      segments: segments,
+      openedSegments: openedSegments,
+    );
   }
 }

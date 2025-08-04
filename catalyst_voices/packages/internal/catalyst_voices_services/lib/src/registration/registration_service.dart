@@ -43,6 +43,11 @@ abstract interface class RegistrationService {
   /// Returns the available cardano wallet extensions.
   Future<List<CardanoWallet>> getCardanoWallets();
 
+  /// Tries to find keychain with matching [id] and return it.
+  ///
+  /// Throws error if not found.
+  Future<Keychain> getKeychain(String id);
+
   /// Loads the wallet balance for given [address].
   Future<Coin> getWalletBalance({
     required SeedPhrase seedPhrase,
@@ -52,7 +57,7 @@ abstract interface class RegistrationService {
   /// Builds an unsigned registration transaction from given parameters.
   ///
   /// Throws a subclass of [RegistrationException] in case of a failure.
-  Future<Transaction> prepareRegistration({
+  Future<BaseTransaction> prepareRegistration({
     required CardanoWallet wallet,
     required CatalystPrivateKey masterKey,
     required Set<RegistrationTransactionRole> roles,
@@ -85,7 +90,7 @@ abstract interface class RegistrationService {
   /// Sends [unsignedTx] via [wallet] in to the blockchain.
   Future<WalletInfo> submitTransaction({
     required CardanoWallet wallet,
-    required Transaction unsignedTx,
+    required BaseTransaction unsignedTx,
   });
 }
 
@@ -146,6 +151,17 @@ final class RegistrationServiceImpl implements RegistrationService {
   }
 
   @override
+  Future<Keychain> getKeychain(String id) async {
+    final exists = await _keychainProvider.exists(id);
+
+    if (!exists) {
+      throw const RegistrationRecoverKeychainNotFoundException();
+    }
+
+    return _keychainProvider.get(id);
+  }
+
+  @override
   Future<Coin> getWalletBalance({
     required SeedPhrase seedPhrase,
     required ShelleyAddress address,
@@ -160,7 +176,7 @@ final class RegistrationServiceImpl implements RegistrationService {
   }
 
   @override
-  Future<Transaction> prepareRegistration({
+  Future<BaseTransaction> prepareRegistration({
     required CardanoWallet wallet,
     required CatalystPrivateKey masterKey,
     required Set<RegistrationTransactionRole> roles,
@@ -342,11 +358,11 @@ final class RegistrationServiceImpl implements RegistrationService {
   @override
   Future<WalletInfo> submitTransaction({
     required CardanoWallet wallet,
-    required Transaction unsignedTx,
+    required BaseTransaction unsignedTx,
   }) async {
     final enabledWallet = await wallet.enable();
     final walletNetworkId = await enabledWallet.getNetworkId();
-    final targetNetworkId = unsignedTx.body.networkId;
+    final targetNetworkId = unsignedTx.networkId;
 
     if (targetNetworkId != null && walletNetworkId != targetNetworkId) {
       throw RegistrationNetworkIdMismatchException(
@@ -356,12 +372,7 @@ final class RegistrationServiceImpl implements RegistrationService {
 
     final witnessSet = await enabledWallet.signTx(transaction: unsignedTx);
 
-    final signedTx = Transaction(
-      body: unsignedTx.body,
-      isValid: true,
-      witnessSet: witnessSet,
-      auxiliaryData: unsignedTx.auxiliaryData,
-    );
+    final signedTx = unsignedTx.withWitnessSet(witnessSet);
 
     final txHash = await enabledWallet.submitTx(transaction: signedTx);
 

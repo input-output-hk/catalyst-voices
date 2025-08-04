@@ -4,6 +4,8 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
+/// When the field value is required to match [constValue]
+/// or if [constValue] is a boolean and this field is required to be true.
 final class LocalizedDocumentConstValueMismatch extends LocalizedDocumentValidationResult {
   final Object constValue;
 
@@ -23,6 +25,7 @@ final class LocalizedDocumentConstValueMismatch extends LocalizedDocumentValidat
   }
 }
 
+/// When enum values are mismatched.
 final class LocalizedDocumentEnumValuesMismatch extends LocalizedDocumentValidationResult {
   final List<Object> enumValues;
 
@@ -39,6 +42,7 @@ final class LocalizedDocumentEnumValuesMismatch extends LocalizedDocumentValidat
   }
 }
 
+/// When list items are not unique.
 final class LocalizedDocumentListItemsNotUnique extends LocalizedDocumentValidationResult {
   const LocalizedDocumentListItemsNotUnique();
 
@@ -51,6 +55,7 @@ final class LocalizedDocumentListItemsNotUnique extends LocalizedDocumentValidat
   }
 }
 
+/// When list items are out of range.
 final class LocalizedDocumentListItemsOutOfRange extends LocalizedDocumentValidationResult {
   final NumRange<int> range;
 
@@ -77,6 +82,7 @@ final class LocalizedDocumentListItemsOutOfRange extends LocalizedDocumentValida
   }
 }
 
+/// When a numeric value is out of range.
 final class LocalizedDocumentNumOutOfRange extends LocalizedDocumentValidationResult {
   final NumRange<num> range;
 
@@ -103,18 +109,27 @@ final class LocalizedDocumentNumOutOfRange extends LocalizedDocumentValidationRe
   }
 }
 
+/// When a string value does not match the expected pattern.
+///
+/// [DocumentPatternType] is used to determine specific localized message.
 final class LocalizedDocumentPatternMismatch extends LocalizedDocumentValidationResult {
-  const LocalizedDocumentPatternMismatch();
+  final DocumentPatternType patternType;
+
+  const LocalizedDocumentPatternMismatch({required this.patternType});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [patternType];
 
   @override
   String? message(BuildContext context) {
-    return context.l10n.errorValidationPatternMismatch;
+    return switch (patternType) {
+      DocumentPatternType.generic => context.l10n.errorValidationPatternMismatch,
+      DocumentPatternType.https => context.l10n.errorValidationHttpsPatternMismatch
+    };
   }
 }
 
+/// When a string length is out of range.
 final class LocalizedDocumentStringOutOfRange extends LocalizedDocumentValidationResult {
   final NumRange<int> range;
 
@@ -129,7 +144,9 @@ final class LocalizedDocumentStringOutOfRange extends LocalizedDocumentValidatio
     final max = range.max;
 
     if (min != null && max != null) {
-      return context.l10n.errorValidationStringLengthOutOfRange(min, max);
+      return min == max
+          ? context.l10n.errorValidationStringLengthOutOfExactRange(min)
+          : context.l10n.errorValidationStringLengthOutOfRange(min, max);
     } else if (min != null) {
       return context.l10n.errorValidationStringLengthBelowMin(min);
     } else if (max != null) {
@@ -162,7 +179,8 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
         LocalizedDocumentConstValueMismatch(constValue: result.constValue),
       DocumentEnumValueMismatch() =>
         LocalizedDocumentEnumValuesMismatch(enumValues: result.enumValues),
-      DocumentPatternMismatch() => const LocalizedDocumentPatternMismatch(),
+      DocumentPatternMismatch(:final patternType) =>
+        LocalizedDocumentPatternMismatch(patternType: patternType),
     };
   }
 
@@ -174,6 +192,7 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
   String? message(BuildContext context);
 }
 
+/// When a required document value is missing.
 final class LocalizedMissingRequiredDocumentValue extends LocalizedDocumentValidationResult {
   const LocalizedMissingRequiredDocumentValue();
 
@@ -186,6 +205,7 @@ final class LocalizedMissingRequiredDocumentValue extends LocalizedDocumentValid
   }
 }
 
+/// When the whole document is valid.
 final class LocalizedSuccessfulDocumentValidation extends LocalizedDocumentValidationResult {
   const LocalizedSuccessfulDocumentValidation();
 

@@ -85,9 +85,7 @@ use crate::{
     },
     service::{
         common::{responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption},
-        utilities::health::{
-            condition_for_started, event_db_is_live, index_db_is_live, set_event_db_liveness,
-        },
+        utilities::health::condition_for_started,
     },
 };
 
@@ -121,28 +119,26 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// and is not able to properly service requests while it is occurring.
 /// This would let the load balancer shift traffic to other instances of this
 /// service that are ready.
-#[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
     // Check Event DB connection
-    let event_db_live = event_db_is_live();
-
-    // When check fails, attempt to re-connect
-    if !event_db_live {
+    if !EventDB::connection_is_ok().await {
+        // When check fails, attempt to re-connect
         establish_connection_pool().await;
         // Re-check, and update Event DB service liveness flag
-        let event_db_is_live = EventDB::connection_is_ok().await;
-        debug!("Event DB Reconnected?: {event_db_is_live}");
-        set_event_db_liveness(event_db_is_live);
+        let retry_success = EventDB::connection_is_ok().await;
+        debug!(retry_success, "Event DB re-connect attempt.");
     };
 
     // Check Index DB connection
-    let index_db_live = index_db_is_live();
-
-    // When check fails, attempt to re-connect
-    if !index_db_live {
+    if !CassandraSession::is_ready().await {
+        // When check fails, attempt to re-connect
         CassandraSession::init();
         // Re-check connection to Indexing DB (internally updates the liveness flag)
-        drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
+        let retry_success =
+            CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true)
+                .await
+                .is_ok();
+        debug!(retry_success, "Cassandra Session re-connect attempt.");
     }
 
     // Otherwise, re-check, and return 204 response if all is good.
@@ -151,8 +147,8 @@ pub(crate) async fn endpoint() -> AllResponses {
     }
 
     // Otherwise, return 503 response.
-    AllResponses::service_unavailable(
-        &anyhow::anyhow!("Service is not ready, do not send other requests."),
+    AllResponses::service_unavailable_with_msg(
+        "Service is not ready, do not send other requests.".to_string(),
         RetryAfterOption::Default,
     )
 }

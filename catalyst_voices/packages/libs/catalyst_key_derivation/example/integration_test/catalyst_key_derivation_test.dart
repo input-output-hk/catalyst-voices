@@ -1,5 +1,5 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart' show hexDecode;
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
-import 'package:convert/convert.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
@@ -42,11 +42,11 @@ void main() {
       final xprv = await keyDerivation.deriveMasterKey(mnemonic: mnemonic);
 
       expect(xprv.bytes, isNotEmpty);
-      expect(xprv.bytes, equals(hex.decode(xprv.toHex())));
+      expect(xprv.bytes, equals(hexDecode(xprv.toHex())));
 
       final xpub = await xprv.derivePublicKey();
       expect(xpub.bytes, isNotEmpty);
-      expect(xpub.bytes, equals(hex.decode(xpub.toHex())));
+      expect(xpub.bytes, equals(hexDecode(xpub.toHex())));
     });
 
     testWidgets('deriveKeys, sign data and verify signature', (tester) async {

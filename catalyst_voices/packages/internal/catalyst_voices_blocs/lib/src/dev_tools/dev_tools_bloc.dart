@@ -9,6 +9,9 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 const _requiredTapCount = 6;
 final _logger = Logger('DevToolsBloc');
 
+/// Manages the dev tools.
+
+/// It allows developers to obtain information about the system.
 final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     with BlocSignalEmitterMixin<DevToolsSignal, DevToolsState> {
   final DevToolsService _devToolsService;
@@ -43,6 +46,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     on<ChangeLogLevelEvent>(_handleChangeLogLevel);
     on<ChangeCollectLogsEvent>(_handleChangeCollectLogs);
     on<PrepareAndExportLogsEvent>(_handleExportLogs);
+    on<ClearDocumentsEvent>(_handleClearDocuments);
 
     add(const RecoverDataEvent());
   }
@@ -85,6 +89,19 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     final settings = await _loggingService!.updateSettings(level: Optional(level));
 
     if (!isClosed) emit(state.copyWith(logsLevel: Optional(settings.effectiveLevel)));
+  }
+
+  Future<void> _handleClearDocuments(
+    ClearDocumentsEvent event,
+    Emitter<DevToolsState> emit,
+  ) async {
+    try {
+      final deleteRows = await _documentsService.clear();
+
+      _logger.finer('Deleted $deleteRows rows');
+    } catch (error, stack) {
+      _logger.warning('Documents clear', error, stack);
+    }
   }
 
   Future<void> _handleEnablerTap(

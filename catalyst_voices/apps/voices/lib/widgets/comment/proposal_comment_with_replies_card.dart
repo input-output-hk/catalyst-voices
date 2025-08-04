@@ -29,30 +29,44 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
     required this.onToggleReplies,
   });
 
+  bool get _showCommentFooter => _showToggleReplies;
+
   bool get _showReplies => showReplies[comment.ref] ?? true;
+
+  bool get _showToggleReplies => comment.replies.isNotEmpty;
 
   @override
   Widget build(BuildContext context) {
     final repliesIndent = 56 * comment.depth;
+
+    final showReplies = _showReplies;
+    final showToggleReplies = _showToggleReplies;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       spacing: 8,
       children: [
         ProposalCommentCard(
+          key: ValueKey('ProposalComment${comment.comment.metadata.selfRef}Card'),
           document: comment.comment,
           canReply: canReply,
+          trimLines: 6,
           onReplyTap: () => onToggleBuilder(true),
-          footer: Offstage(
-            offstage: comment.replies.isEmpty,
-            child: _ToggleRepliesChip(
-              repliesCount: comment.replies.length,
-              hide: _showReplies,
-              onTap: () => onToggleReplies(!_showReplies),
-            ),
-          ),
+          footer: _showCommentFooter
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (showToggleReplies)
+                      _ToggleRepliesChip(
+                        repliesCount: comment.replies.length,
+                        hide: showReplies,
+                        onTap: () => onToggleReplies(!showReplies),
+                      ),
+                  ],
+                )
+              : null,
         ),
-        if (_showReplies)
+        if (showReplies)
           Padding(
             padding: EdgeInsets.only(left: repliesIndent.toDouble()),
             child: Column(
@@ -61,11 +75,9 @@ class ProposalCommentWithRepliesCard extends StatelessWidget {
               children: [
                 for (final reply in comment.replies)
                   _RepliesCard(
-                    key: ValueKey(
-                      'ReplyComment.${reply.comment.metadata.selfRef.id}',
-                    ),
+                    key: ValueKey('ReplyComment.${reply.comment.metadata.selfRef.id}'),
                     comment: reply,
-                    showReplies: showReplies,
+                    showReplies: this.showReplies,
                     onSubmit: onSubmit,
                     onCancel: onCancel,
                     onToggleBuilder: onToggleBuilder,

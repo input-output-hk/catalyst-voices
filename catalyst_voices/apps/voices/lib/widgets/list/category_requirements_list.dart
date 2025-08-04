@@ -7,13 +7,11 @@ import 'package:flutter/material.dart';
 class CategoryRequirementsList extends StatelessWidget {
   final List<String> dos;
   final List<String> donts;
-  final Color? iconColor;
 
   const CategoryRequirementsList({
     super.key,
     required this.dos,
     required this.donts,
-    this.iconColor,
   });
 
   @override
@@ -33,14 +31,13 @@ class CategoryRequirementsList extends StatelessWidget {
           if (dos.isNotEmpty)
             VoicesList(
               items: dos,
-              icon: VoicesAssets.icons.check
-                  .buildIcon(color: iconColor ?? context.colors.iconsPrimary),
+              icon: VoicesAssets.icons.check.buildIcon(color: context.colors.iconsPrimary),
             ),
           if (donts.isNotEmpty) ...[
             const SizedBox(height: 12),
             VoicesList(
               items: donts,
-              icon: VoicesAssets.icons.x.buildIcon(color: iconColor ?? context.colors.iconsPrimary),
+              icon: VoicesAssets.icons.x.buildIcon(color: context.colors.iconsPrimary),
             ),
           ],
         ],
