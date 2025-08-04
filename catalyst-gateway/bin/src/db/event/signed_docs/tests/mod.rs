@@ -189,8 +189,8 @@ async fn filter_by_type(docs: &[FullSignedDoc], doc_type: uuid::Uuid) {
     }
 }
 
-/// Amount of documents already pre-seeded inside the event-db
-const PRE_SEED_DATA: usize = 43;
+/// Pre-seeded Fund 14 documents `V3__signed_documents.sql`
+const PRE_SEED_DATA: usize = 36;
 
 async fn filter_all(docs: &[FullSignedDoc]) {
     let filter = DocsQueryFilter::all();
