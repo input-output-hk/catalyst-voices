@@ -130,6 +130,7 @@ final class RegistrationTransactionBuilder {
 
     final requiredSigners = {
       _stakeAddress.publicKeyHash,
+      changeAddress.publicKeyHash,
     };
 
     final strategy = _pickStrategy(RegistrationTransactionStrategyType.bytes);
