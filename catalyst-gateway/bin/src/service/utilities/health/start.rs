@@ -2,10 +2,10 @@
 
 use std::sync::atomic::{
     AtomicBool,
-    Ordering::{Acquire, Release},
+    Ordering::{Acquire, Relaxed, Release},
 };
 
-use tracing::debug;
+use tracing::{debug, info};
 
 /// Flag to determine if the service has started
 static STARTED: AtomicBool = AtomicBool::new(false);
@@ -36,12 +36,15 @@ pub(crate) fn set_to_started() {
 
 /// Returns whether the service has started or not.
 pub(crate) fn condition_for_started() -> bool {
-    let event_db = event_db_is_live();
-    let index_db = index_db_is_live();
-    let follower =
+    let event_db_is_live = event_db_is_live();
+    let index_db_is_live = index_db_is_live();
+    let follower_is_live =
         live_follower_has_first_reached_tip() && immutable_follower_has_first_reached_tip();
-    debug!("Checking if service has started. Event DB: {event_db}, Index DB: {index_db}, Follower: {follower}");
-    event_db && index_db && follower
+    debug!(
+        event_db_is_live,
+        index_db_is_live, follower_is_live, "Checking if service has started."
+    );
+    event_db_is_live && index_db_is_live && follower_is_live
 }
 
 /// Returns whether the Event DB is live or not.
@@ -83,15 +86,25 @@ pub(crate) fn live_follower_has_first_reached_tip() -> bool {
 }
 
 /// Set the `INITIAL_IMMUTABLE_FOLLOWER_TIP_REACHED` as `true`.
+/// returns the previous `INITIAL_IMMUTABLE_FOLLOWER_TIP_REACHED` value.
 ///
 /// This value can not be set to `false` afterwards.
-pub(crate) fn set_follower_immutable_first_reached_tip() {
-    INITIAL_IMMUTABLE_FOLLOWER_TIP_REACHED.store(true, Release);
+pub(crate) fn set_follower_immutable_first_reached_tip() -> bool {
+    let prev_value = INITIAL_IMMUTABLE_FOLLOWER_TIP_REACHED.swap(true, Relaxed);
+    if !prev_value {
+        info!("Follower has reached IMMUTABLE TIP for the first time");
+    }
+    prev_value
 }
 
-/// Set the `INITIAL_LIVE_FOLLOWER_TIP_REACHED` as `true`.
+/// Set the `INITIAL_LIVE_FOLLOWER_TIP_REACHED` as `true`,
+/// returns the previous `INITIAL_LIVE_FOLLOWER_TIP_REACHED` value.
 ///
 /// This value can not be set to `false` afterwards.
-pub(crate) fn set_follower_live_first_reached_tip() {
-    INITIAL_LIVE_FOLLOWER_TIP_REACHED.store(true, Release);
+pub(crate) fn set_follower_live_first_reached_tip() -> bool {
+    let prev_value = INITIAL_LIVE_FOLLOWER_TIP_REACHED.swap(true, Relaxed);
+    if !prev_value {
+        info!("Follower has reached LIVE TIP for the first time");
+    }
+    prev_value
 }

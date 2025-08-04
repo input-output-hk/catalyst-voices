@@ -70,6 +70,22 @@ class SupportedWallet extends StatelessWidget with LaunchUrlMixin {
   }
 }
 
+class _GoodToKnow extends StatelessWidget {
+  const _GoodToKnow();
+
+  @override
+  Widget build(BuildContext context) {
+    return TipCard(
+      headerText: context.l10n.goodToKnow,
+      tips: [
+        context.l10n.registrationTransactionFeeDescription(
+          CardanoWalletDetails.minAdaForRegistration.ada,
+        ),
+      ],
+    );
+  }
+}
+
 class _LeftSide extends StatelessWidget {
   const _LeftSide();
 
@@ -117,6 +133,33 @@ class _LeftSide extends StatelessWidget {
   }
 }
 
+class _NoExtensionsFound extends StatelessWidget {
+  const _NoExtensionsFound();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          context.l10n.currentlySupportedWallets,
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: context.colors.textOnPrimaryLevel1,
+          ),
+        ),
+        const SizedBox(height: 24),
+        const _SupportedWallets(),
+        const VoicesDivider.expanded(),
+        const Spacer(),
+        const _NoWalletAction(),
+        const Spacer(),
+        const _GoodToKnow(),
+      ],
+    );
+  }
+}
+
 class _NoWalletAction extends StatefulWidget {
   const _NoWalletAction();
 
@@ -125,10 +168,11 @@ class _NoWalletAction extends StatefulWidget {
 }
 
 class _NoWalletActionState extends State<_NoWalletAction> {
-  bool isLoading = false;
+  bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
-    return isLoading
+    return _isLoading
         ? const Center(child: VoicesCircularProgressIndicator())
         : SizedBox(
             width: double.infinity,
@@ -139,19 +183,22 @@ class _NoWalletActionState extends State<_NoWalletAction> {
           );
   }
 
-  void _changeIsLoading() {
-    setState(() {
-      isLoading = !isLoading;
-    });
-  }
-
   Future<void> _checkAvailableWallets(BuildContext context) async {
-    _changeIsLoading();
+    _updateIsLoading(true);
+
     final hasWallets = await context.read<SessionCubit>().checkAvailableWallets();
     if (hasWallets && context.mounted) {
       Navigator.of(context).pop(true);
     } else {
-      _changeIsLoading();
+      _updateIsLoading(false);
+    }
+  }
+
+  void _updateIsLoading(bool isLoading) {
+    if (mounted) {
+      setState(() {
+        _isLoading = isLoading;
+      });
     }
   }
 }
@@ -237,7 +284,6 @@ class _RightSide extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
       children: [
         Text(
           context.l10n.installCardanoWallet,
@@ -246,13 +292,42 @@ class _RightSide extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 24),
-        Text(
-          context.l10n.currentlySupportedWallets,
-          style: context.textTheme.bodyMedium?.copyWith(
-            color: context.colors.textOnPrimaryLevel1,
-          ),
+        Expanded(
+          child:
+              CatalystBrowser.isSafari ? const _SafariNotSupported() : const _NoExtensionsFound(),
         ),
-        const SizedBox(height: 24),
+      ],
+    );
+  }
+}
+
+class _SafariNotSupported extends StatelessWidget {
+  const _SafariNotSupported();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        VoicesErrorIndicator(
+          message: context.l10n.safariNotSupportedMessage,
+        ),
+        const Spacer(),
+        const _GoodToKnow(),
+      ],
+    );
+  }
+}
+
+class _SupportedWallets extends StatelessWidget {
+  const _SupportedWallets();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
         SupportedWallet(
           image: VoicesAssets.images.eternlWallet,
           name: context.l10n.eternlWallet,
@@ -267,18 +342,6 @@ class _RightSide extends StatelessWidget {
           image: VoicesAssets.images.namiWallet,
           name: context.l10n.namiWallet,
           url: 'https://www.namiwallet.io/',
-        ),
-        const VoicesDivider.expanded(),
-        const Spacer(),
-        const _NoWalletAction(),
-        const Spacer(),
-        TipCard(
-          headerText: context.l10n.goodToKnow,
-          tips: [
-            context.l10n.registrationTransactionFeeDescription(
-              CardanoWalletDetails.minAdaForRegistration.ada,
-            ),
-          ],
         ),
       ],
     );

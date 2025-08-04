@@ -2,7 +2,6 @@
 
 use std::{fmt::Display, sync::LazyLock};
 
-use anyhow::bail;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseResult, ToJSON, Type},
@@ -50,10 +49,13 @@ impl Display for AssetValue {
 impl AssetValue {
     /// Performs saturating addition.
     pub(crate) fn saturating_add(&self, v: &Self) -> Self {
-        self.0
-            .checked_add(v.0)
-            .inspect(|_| tracing::error!("Asset value overflow: {self} + {v}",))
-            .map_or(Self(i128::MAX), Self)
+        self.0.checked_add(v.0).map_or_else(
+            || {
+                tracing::error!("Asset value overflow: {self} + {v}",);
+                Self(i128::MAX)
+            },
+            Self,
+        )
     }
 }
 
@@ -110,15 +112,21 @@ impl ToJSON for AssetValue {
     }
 }
 
-impl TryFrom<num_bigint::BigInt> for AssetValue {
-    type Error = anyhow::Error;
-
-    fn try_from(value: num_bigint::BigInt) -> Result<Self, Self::Error> {
-        let value: i128 = value.try_into()?;
-        if !is_valid(value) {
-            bail!("Invalid Asset Value");
+// Really no need for this to be fallible.
+// Its not possible for it to be outside the range of an i128, and if it is.
+// Just saturate.
+impl From<&num_bigint::BigInt> for AssetValue {
+    fn from(value: &num_bigint::BigInt) -> Self {
+        let sign = value.sign();
+        match TryInto::<i128>::try_into(value) {
+            Ok(v) => Self(v),
+            Err(_) => {
+                match sign {
+                    num_bigint::Sign::Minus => Self(i128::MIN),
+                    _ => Self(i128::MAX),
+                }
+            },
         }
-        Ok(Self(value))
     }
 }
 

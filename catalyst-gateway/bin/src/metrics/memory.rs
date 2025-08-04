@@ -1,10 +1,6 @@
 //! Metrics related to memory analytics.
 
-use std::{
-    alloc::System,
-    sync::atomic::{AtomicBool, Ordering},
-    thread,
-};
+use std::alloc::System;
 
 use memory_stats::{memory_stats, MemoryStats};
 use stats_alloc::{Region, StatsAlloc, INSTRUMENTED_SYSTEM};
@@ -17,62 +13,44 @@ use crate::settings::Settings;
 #[global_allocator]
 static GLOBAL: &StatsAlloc<System> = &INSTRUMENTED_SYSTEM;
 
-/// This is to prevent the init function from accidentally being called multiple times.
-static IS_INITIALIZED: AtomicBool = AtomicBool::new(false);
-
-/// Starts a background thread to periodically update memory metrics.
-///
-/// This function spawns a thread that updates the memory metrics
-/// at regular intervals defined by `METRICS_MEMORY_INTERVAL`.
-pub(crate) fn init_metrics_reporter() {
-    if IS_INITIALIZED.swap(true, Ordering::SeqCst) {
-        return;
-    }
-
+/// Updates memory metrics to current values.
+pub(crate) fn update() {
     let stats = Region::new(GLOBAL);
     let api_host_names = Settings::api_host_names().join(",");
     let service_id = Settings::service_id();
 
-    thread::spawn(move || {
-        loop {
-            {
-                let allocator_stats = stats.change();
-                let mem_stats = memory_stats().unwrap_or({
-                    MemoryStats {
-                        physical_mem: 0,
-                        virtual_mem: 0,
-                    }
-                });
-
-                reporter::MEMORY_PHYSICAL_USAGE
-                    .with_label_values(&[&api_host_names, service_id])
-                    .set(i64::try_from(mem_stats.physical_mem).unwrap_or(-1));
-                reporter::MEMORY_VIRTUAL_USAGE
-                    .with_label_values(&[&api_host_names, service_id])
-                    .set(i64::try_from(mem_stats.virtual_mem).unwrap_or(-1));
-                reporter::MEMORY_ALLOCATION_COUNT
-                    .with_label_values(&[&api_host_names, service_id])
-                    .set(i64::try_from(allocator_stats.allocations).unwrap_or(-1));
-                reporter::MEMORY_DEALLOCATION_COUNT
-                    .with_label_values(&[&api_host_names, service_id])
-                    .set(i64::try_from(allocator_stats.deallocations).unwrap_or(-1));
-                reporter::MEMORY_REALLOCATION_COUNT
-                    .with_label_values(&[&api_host_names, service_id])
-                    .set(i64::try_from(allocator_stats.reallocations).unwrap_or(-1));
-                reporter::MEMORY_BYTES_ALLOCATED
-                    .with_label_values(&[&api_host_names, service_id])
-                    .set(i64::try_from(allocator_stats.bytes_allocated).unwrap_or(-1));
-                reporter::MEMORY_BYTES_DEALLOCATED
-                    .with_label_values(&[&api_host_names, service_id])
-                    .set(i64::try_from(allocator_stats.bytes_deallocated).unwrap_or(-1));
-                reporter::MEMORY_BYTES_REALLOCATED
-                    .with_label_values(&[&api_host_names, service_id])
-                    .set(i64::try_from(allocator_stats.bytes_reallocated).unwrap_or(-1));
-            }
-
-            thread::sleep(Settings::metrics_memory_interval());
+    let allocator_stats = stats.change();
+    let mem_stats = memory_stats().unwrap_or({
+        MemoryStats {
+            physical_mem: 0,
+            virtual_mem: 0,
         }
     });
+
+    reporter::MEMORY_PHYSICAL_USAGE
+        .with_label_values(&[&api_host_names, service_id])
+        .set(i64::try_from(mem_stats.physical_mem).unwrap_or(-1));
+    reporter::MEMORY_VIRTUAL_USAGE
+        .with_label_values(&[&api_host_names, service_id])
+        .set(i64::try_from(mem_stats.virtual_mem).unwrap_or(-1));
+    reporter::MEMORY_ALLOCATION_COUNT
+        .with_label_values(&[&api_host_names, service_id])
+        .set(i64::try_from(allocator_stats.allocations).unwrap_or(-1));
+    reporter::MEMORY_DEALLOCATION_COUNT
+        .with_label_values(&[&api_host_names, service_id])
+        .set(i64::try_from(allocator_stats.deallocations).unwrap_or(-1));
+    reporter::MEMORY_REALLOCATION_COUNT
+        .with_label_values(&[&api_host_names, service_id])
+        .set(i64::try_from(allocator_stats.reallocations).unwrap_or(-1));
+    reporter::MEMORY_BYTES_ALLOCATED
+        .with_label_values(&[&api_host_names, service_id])
+        .set(i64::try_from(allocator_stats.bytes_allocated).unwrap_or(-1));
+    reporter::MEMORY_BYTES_DEALLOCATED
+        .with_label_values(&[&api_host_names, service_id])
+        .set(i64::try_from(allocator_stats.bytes_deallocated).unwrap_or(-1));
+    reporter::MEMORY_BYTES_REALLOCATED
+        .with_label_values(&[&api_host_names, service_id])
+        .set(i64::try_from(allocator_stats.bytes_reallocated).unwrap_or(-1));
 }
 
 /// All the related memory reporting metrics to the Prometheus service are inside this

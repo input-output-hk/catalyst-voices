@@ -2,6 +2,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
+/// View model representing proposal metadata in a view mode
 final class ProposalViewMetadata extends Equatable {
   final Profile author;
   final String? description;

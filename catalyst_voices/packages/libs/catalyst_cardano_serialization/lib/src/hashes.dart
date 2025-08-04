@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_equals_and_hash_code_on_mutable_classes
-
 import 'dart:typed_data';
 
 import 'package:catalyst_cardano_serialization/src/certificate.dart';
@@ -20,14 +18,18 @@ final class AuxiliaryDataHash extends BaseHash {
   /// Length of the [AuxiliaryDataHash].
   static const int hashLength = 32;
 
-  /// Constructs the [AuxiliaryDataHash] from a [AuxiliaryData].
-  AuxiliaryDataHash.fromAuxiliaryData(AuxiliaryData data)
+  /// Creates a blake2b hash from [bytes].
+  AuxiliaryDataHash.blake2b(List<int> bytes)
       : super.fromBytes(
           bytes: Hash.blake2b(
-            Uint8List.fromList(cbor.encode(data.toCbor())),
+            Uint8List.fromList(bytes),
             digestSize: hashLength,
           ),
         );
+
+  /// Constructs the [AuxiliaryDataHash] from a [AuxiliaryData].
+  AuxiliaryDataHash.fromAuxiliaryData(AuxiliaryData data)
+      : this.blake2b(cbor.encode(data.toCbor()));
 
   /// Constructs the [AuxiliaryDataHash] from raw [bytes].
   AuxiliaryDataHash.fromBytes({required super.bytes}) : super.fromBytes();
@@ -210,6 +212,15 @@ final class TransactionInputsHash extends BaseHash {
   /// Length of the [TransactionInputsHash].
   static const int hashLength = 16;
 
+  /// Creates a blake2b hash from [bytes].
+  TransactionInputsHash.blake2b(List<int> bytes)
+      : super.fromBytes(
+          bytes: Hash.blake2b(
+            Uint8List.fromList(bytes),
+            digestSize: hashLength,
+          ),
+        );
+
   /// Constructs the [TransactionInputsHash] from raw [bytes].
   TransactionInputsHash.fromBytes({required super.bytes}) : super.fromBytes();
 
@@ -223,16 +234,11 @@ final class TransactionInputsHash extends BaseHash {
   /// Constructs the [TransactionInputsHash] from a [TransactionBody].
   TransactionInputsHash.fromTransactionInputs(
     Set<TransactionUnspentOutput> utxos,
-  ) : super.fromBytes(
-          bytes: Hash.blake2b(
-            Uint8List.fromList(
-              cbor.encode(
-                CborList([
-                  for (final utxo in utxos) utxo.input.toCbor(),
-                ]),
-              ),
-            ),
-            digestSize: hashLength,
+  ) : this.blake2b(
+          cbor.encode(
+            CborList([
+              for (final utxo in utxos) utxo.input.toCbor(),
+            ]),
           ),
         );
 

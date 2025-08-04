@@ -1,6 +1,6 @@
 //! Logic for orchestrating followers
 
-use std::{fmt::Display, ops::Sub, sync::Arc, time::Duration};
+use std::{collections::BTreeSet, fmt::Display, ops::Sub, sync::Arc, time::Duration};
 
 use cardano_blockchain_types::{MultiEraBlock, Network, Point, Slot};
 use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
@@ -8,7 +8,7 @@ use duration_string::DurationString;
 use event::EventTarget;
 use futures::{stream::FuturesUnordered, StreamExt};
 use rand::{Rng, SeedableRng};
-use tokio::sync::broadcast;
+use tokio::sync::{broadcast, watch};
 use tracing::{debug, error, info};
 
 use crate::{
@@ -17,14 +17,16 @@ use crate::{
             index_block,
             roll_forward::{self, PurgeCondition},
         },
-        queries::sync_status::{
-            get::{get_sync_status, SyncStatus},
-            update::update_sync_status,
+        queries::{
+            caches,
+            sync_status::{
+                get::{get_sync_status, SyncStatus},
+                update::update_sync_status,
+            },
         },
         session::CassandraSession,
     },
     service::utilities::health::{
-        immutable_follower_has_first_reached_tip, live_follower_has_first_reached_tip,
         set_follower_immutable_first_reached_tip, set_follower_live_first_reached_tip,
     },
     settings::{chain_follower, Settings},
@@ -238,6 +240,7 @@ impl SyncParams {
 #[allow(clippy::too_many_lines)]
 fn sync_subchain(
     params: SyncParams, event_sender: broadcast::Sender<event::ChainIndexerEvent>,
+    mut pending_blocks: watch::Receiver<BTreeSet<Slot>>,
 ) -> tokio::task::JoinHandle<SyncParams> {
     tokio::spawn(async move {
         // Backoff hitting the database if we need to.
@@ -245,7 +248,7 @@ fn sync_subchain(
 
         // Wait for indexing DB to be ready before continuing.
         drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
-        info!(chain=%params.chain, params=%params,"Starting Chain Indexing");
+        info!(chain=%params.chain, params=%params,"Starting Chain Indexing Task");
 
         let mut first_indexed_block = params.first_indexed_block.clone();
         let mut first_immutable = params.first_is_immutable;
@@ -293,7 +296,9 @@ fn sync_subchain(
                 cardano_chain_follower::Kind::Block => {
                     let block = chain_update.block_data();
 
-                    if let Err(error) = index_block(block).await {
+                    if let Err(error) =
+                        index_block(block, &mut pending_blocks, params.end.slot_or_default()).await
+                    {
                         let error_msg = format!("Failed to index block {}", block.point());
                         error!(chain=%params.chain, error=%error, params=%params, error_msg);
                         return params.done(
@@ -306,9 +311,7 @@ fn sync_subchain(
                         );
                     }
 
-                    if chain_update.tip && !live_follower_has_first_reached_tip() {
-                        info!("Follower has reached LIVE TIP for the first time");
-                        set_follower_live_first_reached_tip();
+                    if chain_update.tip && !set_follower_live_first_reached_tip() {
                         let _ = event_sender.send(event::ChainIndexerEvent::SyncLiveChainCompleted);
                     }
 
@@ -346,7 +349,10 @@ fn sync_subchain(
 
                         // Purge success, now index the current block
                         let block = chain_update.block_data();
-                        if let Err(error) = index_block(block).await {
+                        if let Err(error) =
+                            index_block(block, &mut pending_blocks, params.end.slot_or_default())
+                                .await
+                        {
                             let error_msg =
                                 format!("Failed to index block after rollback {}", block.point());
                             error!(chain=%params.chain, error=%error, params=%params, error_msg);
@@ -433,6 +439,14 @@ struct SyncTask {
         broadcast::Sender<event::ChainIndexerEvent>,
         broadcast::Receiver<event::ChainIndexerEvent>,
     ),
+
+    /// A channel that contains an end slot number for every immutable sync task.
+    ///
+    /// For example, if there are 3 tasks with `0..100`, `100..200` and `200..300` block
+    /// ranges (where the end bounds aren't inclusive), then the channel will contain the
+    /// following list: `[99, 199, 299]`. A slot value is removed when that task is done,
+    /// so when the second task is finished the list will be updated to `[99, 299]`.
+    pending_blocks: watch::Sender<BTreeSet<Slot>>,
 }
 
 impl SyncTask {
@@ -447,6 +461,7 @@ impl SyncTask {
             live_tip_slot: 0.into(),
             sync_status: Vec::new(),
             event_channel: broadcast::channel(10),
+            pending_blocks: watch::channel(BTreeSet::new()).0,
         }
     }
 
@@ -454,7 +469,14 @@ impl SyncTask {
     fn add_sync_task(
         &mut self, params: SyncParams, event_sender: broadcast::Sender<event::ChainIndexerEvent>,
     ) {
-        self.sync_tasks.push(sync_subchain(params, event_sender));
+        self.pending_blocks.send_modify(|blocks| {
+            blocks.insert(params.end.slot_or_default());
+        });
+        self.sync_tasks.push(sync_subchain(
+            params,
+            event_sender,
+            self.pending_blocks.subscribe(),
+        ));
         self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
         debug!(current_sync_tasks=%self.current_sync_tasks, "Added new Sync Task");
         self.dispatch_event(event::ChainIndexerEvent::SyncTasksChanged {
@@ -524,7 +546,14 @@ impl SyncTask {
         self.dispatch_event(event::ChainIndexerEvent::SyncLiveChainStarted);
 
         self.start_immutable_followers();
-        self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainStarted);
+        // IF there is only 1 chain follower spawn, then the immutable state already indexed and
+        // filled in the db.
+        if self.sync_tasks.len() == 1 {
+            set_follower_immutable_first_reached_tip();
+            self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
+        } else {
+            self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainStarted);
+        }
 
         // Wait Sync tasks to complete.  If they fail and have not completed, reschedule them.
         // If an immutable sync task ends OK, and we still have immutable data to sync then
@@ -586,6 +615,14 @@ impl SyncTask {
                                     );
                                 });
 
+                                self.pending_blocks.send_modify(|blocks| {
+                                    if !blocks.remove(&finished.end.slot_or_default()) {
+                                        error!(chain=%self.cfg.chain, end=?finished.end,
+                                            "The immutable follower completed successfully, but its end point isn't present in index_sync_channel"
+                                        );
+                                    }
+                                });
+
                                 // If we need more immutable chain followers to sync the block
                                 // chain, we can now start them.
                                 self.start_immutable_followers();
@@ -608,8 +645,6 @@ impl SyncTask {
                 },
             }
 
-            let sync_task_count = self.sync_tasks.len();
-
             // IF there is only 1 chain follower left in sync_tasks, then all
             // immutable followers have finished.
             // When this happens we need to purge the live index of any records that exist
@@ -618,12 +653,11 @@ impl SyncTask {
             // want to put a gap in this, so that there are X slots of overlap
             // between the live chain and immutable chain.  This gap should be
             // a parameter.
-            if sync_task_count == 1 {
-                if !immutable_follower_has_first_reached_tip() {
-                    info!("Follower has reached IMMUTABLE TIP for the first time");
-                    set_follower_immutable_first_reached_tip();
-                }
+            if self.sync_tasks.len() == 1 {
+                set_follower_immutable_first_reached_tip();
                 self.dispatch_event(event::ChainIndexerEvent::SyncImmutableChainCompleted);
+                caches::txo_assets_by_stake::drop();
+                caches::txo_by_stake::drop();
 
                 // Purge data up to this slot
                 // Slots arithmetic has saturating semantic, so this is ok.
@@ -675,9 +709,6 @@ impl SyncTask {
                     break;
                 }
             }
-            // `start_slot` is still used, because it is used to keep syncing chunks as required
-            // while each immutable sync task finishes.
-            info!(chain=%self.cfg.chain, tasks=self.current_sync_tasks, until=?self.start_slot, "Persistent Indexing DB tasks started");
         }
     }
 
@@ -722,7 +753,7 @@ impl event::EventTarget<event::ChainIndexerEvent> for SyncTask {
                 match rx.recv().await {
                     Ok(event) => (listener)(&event),
                     Err(broadcast::error::RecvError::Lagged(lag)) => {
-                        error!(lag = lag, "Sync tasks event listener lagged");
+                        debug!(lag = lag, "Sync tasks event listener lagged");
                     },
                     Err(broadcast::error::RecvError::Closed) => break,
                 }

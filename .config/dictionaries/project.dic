@@ -35,6 +35,7 @@ bkioshn
 bluefireteam
 bridgefor
 BROTLI
+buildkitd
 Caddyfile
 canvaskit
 cardano
@@ -79,6 +80,7 @@ damian-molinski
 daos
 DAPPLICATION
 dartify
+dartdoc
 dashmap
 dbeaver
 dbschema
@@ -96,6 +98,7 @@ donts
 dotenv
 dotenvy
 dotglob
+dhttpd
 drep
 dreps
 dtscalac
@@ -159,6 +162,7 @@ iphoneos
 iphonesimulator
 jdbc
 jetbrains
+jlumbroso
 Joaquín
 jorm
 jormungandr
@@ -207,6 +211,7 @@ mdlint
 metadatum
 metadatums
 metamap
+metno
 mgrybyk
 miniaturizable
 minicbor
@@ -267,6 +272,7 @@ pubkey
 PUBLICKEY
 pubspec
 pycardano
+pyproject
 pyright
 pytest
 qrcode
@@ -328,6 +334,7 @@ SYSROOT
 tablestats
 tabview
 tacho
+tailscale
 testcov
 testdocs
 testid

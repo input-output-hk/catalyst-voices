@@ -17,7 +17,7 @@ use crate::settings::Settings;
 pub(crate) mod cardano;
 mod config;
 mod documents;
-mod health;
+pub(crate) mod health;
 
 /// The name of the API
 const API_TITLE: &str = "Catalyst Gateway";
@@ -74,7 +74,7 @@ pub(crate) fn mk_api() -> OpenApiService<(HealthApi, CardanoApi, ConfigApi, Docu
     if hosts.is_empty() {
         service = set_localhost_addresses(service);
     } else {
-        for host in &hosts {
+        for host in hosts {
             service = service.server(
                 ServerObject::new(host).description("Server host staging/production location."),
             );

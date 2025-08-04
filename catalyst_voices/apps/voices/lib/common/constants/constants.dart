@@ -1,14 +1,21 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 
+/// Exposes static refs to external services.
 abstract class VoicesConstants {
   static const _docs = 'https://docs.projectcatalyst.io';
   static const _catalystApp = '$_docs/catalyst-tools/catalyst-app';
+  static const _projectCatalyst = 'https://projectcatalyst.io';
 
   /// External urls
   static const supportedWalletsUrl = '$_docs/current-fund/voter-registration/supported-wallets';
-  static const tosUrl = '$_docs/current-fund/fund-basics/project-catalyst-terms-and-conditions';
+  static const f14ProposalSubmissionNoticeUrl =
+      '$_docs/current-fund/fund-basics/fund14-proposal-submission-notice';
+  static const tosUrl =
+      '$_docs/current-fund/fund-basics/project-catalyst-terms-and-conditions/project-catalyst-platform-terms-of-use';
+  static const conditionsUrl =
+      '$_docs/current-fund/fund-basics/project-catalyst-terms-and-conditions';
   static const privacyPolicyUrl =
-      '$_docs/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy';
+      '$_docs/current-fund/fund-basics/project-catalyst-terms-and-conditions/project-catalyst-platform-privacy-policy';
   static const supportUrl = 'https://catalystiog.zendesk.com/hc/en-us/requests/new';
   static const docsUrl = '$_docs/';
   static const beforeSubmissionUrl = '$_catalystApp/app-timeline#before-submission';
@@ -37,6 +44,11 @@ abstract class VoicesConstants {
   static const unlockAccountUrl = '$_catalystApp/my-account#lock-unlock-account';
   static const confirmSeedPhraseUrl = '$_catalystApp/getting-started#confirm-seed-phrase';
   static const campaignTimeline = '$_docs/current-fund/fund-basics/fund-timeline';
+  static const milestoneGuideline =
+      '$_docs/current-fund/project-onboarding/milestone-based-proposals';
+  static const projectCatalystFund14Url = '$_projectCatalyst/funds/14';
+
+  VoicesConstants._();
 
   static String cardanoScanStakeAddressUrl(ShelleyAddress stakeAddress) {
     switch (stakeAddress.network) {

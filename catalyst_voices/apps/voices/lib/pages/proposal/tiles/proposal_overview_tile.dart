@@ -1,6 +1,8 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_favorite_button.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_share_button.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class ProposalOverviewTile extends StatelessWidget {
@@ -47,7 +49,12 @@ class ProposalOverviewTile extends StatelessWidget {
             const SizedBox(width: 16),
             const ProposalShareButton(),
             const SizedBox(width: 8),
-            const ProposalFavoriteButton(),
+            // TODO(LynxLynxx): Remove when we support mobile web
+            Offstage(
+              offstage: context.select<ProposalCubit, bool>((cubit) => cubit.state.readOnlyMode) ||
+                  CatalystPlatform.isMobileWeb,
+              child: const ProposalFavoriteButton(),
+            ),
           ],
         ),
         const SizedBox(height: 16),

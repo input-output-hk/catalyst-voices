@@ -1,0 +1,13 @@
+name: Sync labels from catalyst-ci
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [catalyst-labels-updated]
+
+permissions:
+  issues: write
+
+jobs:
+  sync:
+    uses: input-output-hk/catalyst-ci/.github/workflows/sync-labels.yml@master

@@ -1,4 +1,3 @@
-version: "1.0.0"
 project: {
 	name: "voices"
 	deployment: {
@@ -8,38 +7,46 @@ project: {
 		}
 
 		bundle: {
+			env: string | *"dev"
 			modules: main: {
 				name:    "app"
-				version: "0.11.0"
+				version: "0.11.1"
 				values: {
-					deployment: containers: main: {
-						image: {
-							name: _ @forge(name="CONTAINER_IMAGE")
-							tag:  _ @forge(name="GIT_HASH_OR_TAG")
-						}
-						mounts: {
-							config: {
-								ref: {
-									config: {
-										name: "caddy"
+					deployment: {
+						replicas: number | *1
+						containers: main: {
+							image: {
+								name: _ @forge(name="CONTAINER_IMAGE")
+								tag:  _ @forge(name="GIT_HASH_OR_TAG")
+							}
+							mounts: {
+								config: {
+									ref: {
+										config: {
+											name: "caddy"
+										}
 									}
+									path:    "/etc/caddy/Caddyfile"
+									subPath: "Caddyfile"
 								}
-								path:    "/etc/caddy/Caddyfile"
-								subPath: "Caddyfile"
 							}
-						}
-						ports: {
-							http: port:    8080
-							metrics: port: 8081
-						}
-						probes: {
-							liveness: {
-								path: "/healthz"
-								port: 8080
+							ports: {
+								http: port:    8080
+								metrics: port: 8081
 							}
-							readiness: {
-								path: "/healthz"
-								port: 8080
+							probes: {
+								liveness: {
+									path: "/healthz"
+									port: 8080
+								}
+								readiness: {
+									path: "/healthz"
+									port: 8080
+								}
+							}
+							resources: requests: {
+								cpu:    string | *"256m"
+								memory: string | *"256Mi"
 							}
 						}
 					}

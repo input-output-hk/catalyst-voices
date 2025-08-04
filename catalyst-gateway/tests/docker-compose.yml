@@ -16,8 +16,6 @@ services:
 
       - INIT_AND_DROP_DB=true
       - WITH_MIGRATIONS=true
-    ports:
-      - 5432:5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${DB_SUPERUSER} -d $${DB_SUPERUSER_PASSWORD}"]
       interval: 10s
@@ -29,51 +27,78 @@ services:
     container_name: scylla-node
     restart: unless-stopped
     command: --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0
-    ports:
-      - "9042:9042"
-
-  cat-gateway-with-scylla:
-    image: cat-gateway-with-scylla:latest
-    container_name: cat-gateway-with-scylla
     healthcheck:
-      test: "curl -s -i localhost:3030/api/v1/health/ready | head -n 1 | grep 204"
-      interval: 60s
-      timeout: 300s
+      test: cqlsh -e "SHOW VERSION" || exit 1
+      interval: 15s
+      timeout: 30s
       retries: 10
+
+  cat-gateway:
+    image: cat-gateway:latest
+    container_name: cat-gateway
+    healthcheck:
+      test: "curl -s -i localhost:3030/api/v1/health/started | head -n 1 | grep 204"
+      start_period: 30s
+      interval: 30s
+      timeout: 30s
+      # approximately a 25 minutes of waiting
+      retries: 50
     environment:
       - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
-      - CASSANDRA_PERSISTENT_URL=localhost:9042
-      - CASSANDRA_VOLATILE_URL=localhost:9042
-      - CAT_ADDRESS=0.0.0.0:3030
+      - CASSANDRA_PERSISTENT_URL=scylla-node:9042
+      - CASSANDRA_VOLATILE_URL=scylla-node:9042
       - CHAIN_NETWORK=Preprod
       - SIGNED_DOC_SK=0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd
-      - LOG_LEVEL=error
-      - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
-      - DATA_REFRESH_TICK=5
-      - CHECK_CONFIG_TICK=5
-      - MACHINE_ID=UID
       - INTERNAL_API_KEY=123
-      - RBAC_OFF=true
-    ports:
-      - 3030:3030
+      # - LOG_LEVEL=error
+      # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
+    depends_on:
+      event-db:
+        condition: service_healthy
+      scylla-node:
+        condition: service_healthy
+
+  api-tests-runner:
+    image: api-tests-runner:latest
+    container_name: api-tests-runner
+    environment:
+      - CAT_GATEWAY_TEST_URL=http://cat-gateway:3030
+      - CAT_GATEWAY_INTERNAL_API_KEY=123
+      # for the current setup its not possible to provide a path to the cat-gateway binary, because its running under the container
+      - CAT_GATEWAY_EXECUTABLE_PATH=SOME_VALUE
+    depends_on:
+      cat-gateway:
+        condition: service_healthy
+
+  postgres-runner:
+    image: postgres-runner:latest
+    container_name: postgres-runner
+    environment:
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
     depends_on:
       event-db:
         condition: service_healthy
 
-# A helper service that waits for the event-db to be fully initialized. 
-# This is a workaround for Earthly to handle service dependencies properly 
-# and ensure dependent services only start after the event-db is healthy and ready.
-  event-db-is-running:
-    image: alpine:3.20.3
+  scylla-runner:
+    image: scylla-runner:latest
+    container_name: scylla-runner
+    environment:
+      - CASSANDRA_PERSISTENT_URL=scylla-node:9042
+      - CASSANDRA_VOLATILE_URL=scylla-node:9042
     depends_on:
-      event-db:
+      scylla-node:
         condition: service_healthy
 
-# A helper service that waits for the cat-gateway and Scylla to be fully initialized. 
-# This is a workaround for Earthly to handle service dependencies properly 
-# and ensure dependent services only start after the cat-gateway and Scylla are healthy and ready.
-  cat-gateway-with-scylla-is-running:
-    image: alpine:3.20.3
+  schemathesis-runner:
+    image: schemathesis-runner:latest
+    container_name: schemathesis-runner
+    environment:
+      - API_SPEC=http://cat-gateway:3030/docs/cat-gateway.json
+      - WAIT_FOR_SCHEMA=500
+      - MAX_RESPONSE_TIME=5000
+      - HYPOTHESIS_MAX_EXAMPLES=1000
+      # place a seed value to reproduce some specific schemathesis test scenario
+      # - SEED=""
     depends_on:
-      cat-gateway-with-scylla:
+      cat-gateway:
         condition: service_healthy
