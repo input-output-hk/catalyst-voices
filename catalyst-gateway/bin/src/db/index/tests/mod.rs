@@ -27,7 +27,7 @@ async fn setup_test_database() -> Result<(), String> {
         .await
         .map_err(|err| format!("{err}"))?;
 
-    if !CassandraSession::is_ready() {
+    if !CassandraSession::is_ready().await {
         return Err(String::from("Cassandra session is not ready"));
     }
 
