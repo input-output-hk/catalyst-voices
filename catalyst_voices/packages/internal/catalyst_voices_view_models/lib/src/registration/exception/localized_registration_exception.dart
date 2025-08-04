@@ -63,7 +63,7 @@ sealed class LocalizedRegistrationException extends LocalizedException {
         const LocalizedRegistrationKeychainNotFoundException(),
       RegistrationAssetNameTooLongException(:final assets) =>
         LocalizedRegistrationAssetNameTooLongException(assets),
-      RegistrationMissingRequiredSigner(:final missingRequiredSigners) =>
+      RegistrationMissingRequiredSignerException(:final missingRequiredSigners) =>
         LocalizedRegistrationOutputPublicKeyHashNotInRequiredSigner(missingRequiredSigners),
     };
   }

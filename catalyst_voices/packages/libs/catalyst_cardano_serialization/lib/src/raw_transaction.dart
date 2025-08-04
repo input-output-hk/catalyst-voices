@@ -204,12 +204,12 @@ final class RawTransaction extends BaseTransaction {
     return NetworkId.fromId(decoded.value);
   }
 
-  /// Returns inputs bytes from [bytes].
+  /// Returns outputs bytes from [bytes].
   List<int> get outputs {
     final value = _structuredBytes.getValueOf(RawTransactionAspect.outputs);
 
     if (value == null) {
-      throw StateError('Inputs not found!');
+      throw StateError('Outputs not found!');
     }
 
     return value;
@@ -218,12 +218,12 @@ final class RawTransaction extends BaseTransaction {
   @override
   List<Object?> get props => [bytes, _structuredBytes.context];
 
-  /// Returns inputs bytes from [bytes].
+  /// Returns requiredSigners bytes from [bytes].
   List<int> get requiredSigners {
     final value = _structuredBytes.getValueOf(RawTransactionAspect.requiredSigners);
 
     if (value == null) {
-      throw StateError('Inputs not found!');
+      throw StateError('RequiredSigners not found!');
     }
 
     return value;

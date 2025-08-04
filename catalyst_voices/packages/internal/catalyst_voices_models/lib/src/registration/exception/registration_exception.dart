@@ -31,17 +31,17 @@ final class RegistrationInsufficientBalanceException extends RegistrationExcepti
 }
 
 /// Exception thrown when the transaction requiredSigners does not include output address publicKeyHash.
-final class RegistrationMissingRequiredSigner extends RegistrationException {
+final class RegistrationMissingRequiredSignerException extends RegistrationException {
   /// List of outputs public keys hashes
   final Set<Ed25519PublicKeyHash> missingRequiredSigners;
 
-  const RegistrationMissingRequiredSigner({
+  const RegistrationMissingRequiredSignerException({
     required this.missingRequiredSigners,
   });
 
   @override
   String toString() {
-    return 'RegistrationMissingRequiredSigner(missingRequiredSigners: $missingRequiredSigners)';
+    return 'RegistrationMissingRequiredSignerException(missingRequiredSigners: $missingRequiredSigners)';
   }
 }
 

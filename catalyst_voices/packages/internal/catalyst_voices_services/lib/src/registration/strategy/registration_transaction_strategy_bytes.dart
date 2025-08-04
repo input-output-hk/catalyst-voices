@@ -248,7 +248,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     }
 
     if (missingSigners.isNotEmpty) {
-      throw OutputPublicKeyHashNotInRequiredSigner(
+      throw OutputPublicKeyHashNotInRequiredSignerException(
         outputsPublicKeysHashes: outputsPublicKeysHashes,
         requiredSigners: requiredSigners,
       );
