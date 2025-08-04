@@ -142,7 +142,7 @@ impl DocumentApi {
         page: Query<Option<Page>>, limit: Query<Option<Limit>>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
-    ) -> post_document_index_query::AllResponses {
-        post_document_index_query::v2::endpoint_v2(query.0 .0, page.0, limit.0).await
+    ) -> post_document_index_query::v2::AllResponses {
+        post_document_index_query::v2::endpoint(query.0 .0, page.0, limit.0).await
     }
 }

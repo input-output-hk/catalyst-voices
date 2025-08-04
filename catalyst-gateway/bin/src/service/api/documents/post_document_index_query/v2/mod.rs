@@ -6,9 +6,9 @@ pub(crate) mod response;
 use std::collections::HashMap;
 
 use futures::TryStreamExt;
-use poem_openapi::payload::Json;
+use poem_openapi::{payload::Json, ApiResponse};
 
-use super::{AllResponses, Limit, Page, Responses};
+use super::{Limit, Page};
 use crate::{
     db::event::{
         common::query_limits::QueryLimits,
@@ -23,14 +23,32 @@ use crate::{
             },
         },
         common::{
-            objects::generic::pagination::CurrentPage,
-            types::{document::id::DocumentId, generic::query::pagination::Remaining},
+            objects::generic::pagination::CurrentPage, responses::WithErrorResponses, types::{document::id::DocumentId, generic::query::pagination::Remaining}
         },
     },
 };
 
+/// Endpoint responses.
+#[derive(ApiResponse)]
+#[allow(dead_code)]
+pub(crate) enum Responses {
+    /// ## OK
+    ///
+    /// The Index of documents which match the query filter.
+    #[oai(status = 200)]
+    Ok(Json<response::DocumentIndexListDocumentedV2>),
+    /// ## Not Found
+    ///
+    /// No documents were found which match the query filter.
+    #[oai(status = 404)]
+    NotFound,
+}
+
+/// All responses.
+pub(crate) type AllResponses = WithErrorResponses<Responses>;
+
 /// # POST `/v2/document/index`
-pub(crate) async fn endpoint_v2(
+pub(crate) async fn endpoint(
     filter: DocumentIndexQueryFilterV2, page: Option<Page>, limit: Option<Limit>,
 ) -> AllResponses {
     let query_limits = QueryLimits::new(limit, page);
@@ -40,7 +58,7 @@ pub(crate) async fn endpoint_v2(
     };
 
     let (fetched_docs, total_doc_count) = tokio::join!(
-        fetch_docs_v2(&conditions, &query_limits),
+        fetch_docs(&conditions, &query_limits),
         SignedDocBody::retrieve_count(&conditions)
     );
 
@@ -64,7 +82,7 @@ pub(crate) async fn endpoint_v2(
         Ok((docs, doc_count)) => {
             let remaining = Remaining::calculate(page.into(), limit.into(), total, doc_count);
 
-            Responses::OkV2(Json(DocumentIndexListDocumentedV2(DocumentIndexListV2 {
+            Responses::Ok(Json(DocumentIndexListDocumentedV2(DocumentIndexListV2 {
                 docs: docs.into(),
                 page: CurrentPage {
                     page,
@@ -80,7 +98,7 @@ pub(crate) async fn endpoint_v2(
 }
 
 /// Fetch documents from the event db
-async fn fetch_docs_v2(
+async fn fetch_docs(
     conditions: &DocsQueryFilter, query_limits: &QueryLimits,
 ) -> anyhow::Result<(Vec<IndexedDocumentDocumentedV2>, u32)> {
     let docs_stream = SignedDocBody::retrieve(conditions, query_limits).await?;
