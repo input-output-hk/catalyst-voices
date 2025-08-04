@@ -40,6 +40,7 @@ void main() {
       secureStorage: const FlutterSecureStorage(),
       sharedPreferences: SharedPreferencesAsync(),
       cacheConfig: AppConfig.dev().cache,
+      keychainSigner: _FakeKeychainSigner(),
     );
     userRepository = _FakeUserRepository();
     userObserver = StreamUserObserver();
@@ -301,6 +302,8 @@ void main() {
     });
   });
 }
+
+class _FakeKeychainSigner extends Fake implements KeychainSigner {}
 
 class _FakeUserRepository extends Fake implements UserRepository {
   User? _user;
