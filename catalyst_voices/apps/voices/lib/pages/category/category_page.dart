@@ -28,6 +28,7 @@ class CategoryPage extends StatefulWidget {
 class _Body extends StatelessWidget {
   final CampaignCategoryDetailsViewModel category;
   final bool isLoading;
+
   const _Body({
     required this.category,
     this.isLoading = false,
@@ -71,9 +72,9 @@ class _CardInformation extends StatelessWidget {
   Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: const BoxConstraints.tightFor(width: 300),
-      child: Column(
+      child: ListView(
+        padding: const EdgeInsets.only(top: 96, bottom: 42),
         children: [
-          const SizedBox(height: 96),
           CategoryProposalsDetailsCard(
             categoryId: category.id,
             categoryName: category.formattedName,

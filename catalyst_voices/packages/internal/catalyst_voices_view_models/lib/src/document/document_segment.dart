@@ -3,6 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
+/// Represent a document section from a document template
 final class DocumentSection extends BaseSection {
   final DocumentProperty property;
   final DocumentPropertySchema schema;
@@ -25,6 +26,7 @@ final class DocumentSection extends BaseSection {
   }
 }
 
+/// Represent a document segment from a document template
 final class DocumentSegment extends BaseSegment<DocumentSection> {
   final DocumentObjectProperty property;
   final DocumentSegmentSchema schema;
