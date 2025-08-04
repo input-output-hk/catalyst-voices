@@ -174,6 +174,7 @@ class _VotingPhaseProgressCardState extends State<_VotingPhaseProgressCard> {
   void initState() {
     super.initState();
 
+    // TODO(damian-molinski): move it to bloc and take user timezone pref into count
     _timer = Timer.periodic(
       const Duration(seconds: 1),
       (_) => setState(() {}),

@@ -1,5 +1,7 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
+import 'package:catalyst_voices/widgets/images/voices_image_scheme.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
@@ -40,10 +42,20 @@ class _ProposalsPaginationEmptyState extends StatelessWidget {
           ),
         EmptyState(
           key: const Key('EmptyProposals'),
-          title: hasSearchQuery ? context.l10n.emptySearchResultTitle : null,
+          title: hasSearchQuery ? Text(context.l10n.emptySearchResultTitle) : null,
           description: hasSearchQuery
-              ? context.l10n.tryDifferentSearch
-              : context.l10n.discoverySpaceEmptyProposals,
+              ? Text(context.l10n.tryDifferentSearch)
+              : Text(context.l10n.discoverySpaceEmptyProposals),
+          image: VoicesImagesScheme(
+            image: VoicesAssets.images.noProposalForeground.buildPicture(),
+            background: Container(
+              height: 180,
+              decoration: BoxDecoration(
+                color: context.colors.onSurfaceNeutral08,
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
         ),
       ],
     );
