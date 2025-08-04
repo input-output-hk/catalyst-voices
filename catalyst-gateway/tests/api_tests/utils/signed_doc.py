@@ -10,7 +10,7 @@ from utils.rbac_chain import rbac_chain_factory, RoleID
 from tempfile import NamedTemporaryFile
 
 
-class SignedDocument:
+class SignedDocumentBase:
     def __init__(self, metadata: Dict[str, Any], content: Dict[str, Any]):
         self.metadata = metadata
         self.content = content
@@ -22,20 +22,36 @@ class SignedDocument:
         )
         return new_copy
 
+
+class SignedDocumentV1(SignedDocumentBase):
     # Build and sign document, returns hex str of document bytes
     def build_and_sign(
         self,
         cat_id: str,
         bip32_sk_hex: str,
-        is_deprecated: bool = False,
     ) -> str:
-        if not is_deprecated:
-            mk_signed_doc_path = os.environ["MK_SIGNED_DOC_PATH"]
-        else:
-            mk_signed_doc_path = os.environ["DEP_MK_SIGNED_DOC_PATH"]
-
         return signed_doc.build_signed_doc(
-            self.metadata, self.content, bip32_sk_hex, cat_id, mk_signed_doc_path
+            self.metadata,
+            self.content,
+            bip32_sk_hex,
+            cat_id,
+            os.environ["DEP_MK_SIGNED_DOC_PATH"],
+        )
+
+
+class SignedDocument(SignedDocumentBase):
+    # Build and sign document, returns hex str of document bytes
+    def build_and_sign(
+        self,
+        cat_id: str,
+        bip32_sk_hex: str,
+    ) -> str:
+        return signed_doc.build_signed_doc(
+            self.metadata,
+            self.content,
+            bip32_sk_hex,
+            cat_id,
+            os.environ["MK_SIGNED_DOC_PATH"],
         )
 
 

@@ -6,7 +6,7 @@ from utils import uuid_v7
 from api.v1 import document
 import json
 from utils.rbac_chain import rbac_chain_factory, RoleID
-from utils.signed_doc import SignedDocument, proposal_templates
+from utils.signed_doc import SignedDocumentV1, proposal_templates
 
 
 # Getting documents using GET `/v1/document` endpoint.
@@ -250,9 +250,9 @@ def deprecated_proposal(rbac_chain):
     with open("./test_data/signed_docs/proposal.json", "r") as json_file:
         content = json.load(json_file)
 
-    doc = SignedDocument(proposal_metadata_json, content)
+    doc = SignedDocumentV1(proposal_metadata_json, content)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-    return (doc.build_and_sign(cat_id, sk_hex, is_deprecated=True), proposal_doc_id)
+    return (doc.build_and_sign(cat_id, sk_hex), proposal_doc_id)
 
 
 def deprecated_comment(rbac_chain, proposal_id):
@@ -278,9 +278,9 @@ def deprecated_comment(rbac_chain, proposal_id):
     with open("./test_data/signed_docs/comment.json", "r") as json_file:
         content = json.load(json_file)
 
-    doc = SignedDocument(comment_metadata_json, content)
+    doc = SignedDocumentV1(comment_metadata_json, content)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
-    return (doc.build_and_sign(cat_id, sk_hex, is_deprecated=True), comment_doc_id)
+    return (doc.build_and_sign(cat_id, sk_hex), comment_doc_id)
 
 
 def deprecated_proposal_submission(rbac_chain, proposal_id):
@@ -301,10 +301,10 @@ def deprecated_proposal_submission(rbac_chain, proposal_id):
     with open("./test_data/signed_docs/submission_action.json", "r") as json_file:
         content = json.load(json_file)
 
-    doc = SignedDocument(sub_action_metadata_json, content)
+    doc = SignedDocumentV1(sub_action_metadata_json, content)
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
     return (
-        doc.build_and_sign(cat_id, sk_hex, is_deprecated=True),
+        doc.build_and_sign(cat_id, sk_hex),
         submission_action_id,
     )
 
