@@ -89,6 +89,7 @@ jobs:
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up rust-tests-runner --abort-on-container-exit --exit-code-from rust-tests-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml logs rust-tests-runner
+          docker compose down
 
       - name: Running integration API tests
         if: always()
