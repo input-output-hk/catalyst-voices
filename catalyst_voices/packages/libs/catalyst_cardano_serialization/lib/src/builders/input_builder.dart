@@ -87,17 +87,17 @@ final class InputBuilder implements CoinSelector {
       );
     }
 
-    // Attempt to make input selection without burning any Ada.
-    final resultWithoutBurning = _selectInputs(
+    final result = _selectInputs(
       builder: builder,
       targetTotal: targetTotal,
       minInputs: minInputs,
       maxInputs: maxInputs,
       canBurnChangeAsFee: false,
+      mustIncludeChangeOutputs: changeOutputStrategy == ChangeOutputAdaStrategy.mustInclude,
     );
 
-    if (resultWithoutBurning != null) {
-      return resultWithoutBurning;
+    if (result != null) {
+      return result;
     }
 
     // If burning Ada is allowed attempt to make a selection that burns remaining Ada.
@@ -108,6 +108,7 @@ final class InputBuilder implements CoinSelector {
         minInputs: minInputs,
         maxInputs: maxInputs,
         canBurnChangeAsFee: true,
+        mustIncludeChangeOutputs: false,
       );
 
       if (resultWithBurning != null) {
@@ -129,6 +130,7 @@ final class InputBuilder implements CoinSelector {
     required int minInputs,
     required int maxInputs,
     required bool canBurnChangeAsFee,
+    required bool mustIncludeChangeOutputs,
   }) {
     final availableInputs = builder.inputs.toSet();
 
@@ -146,6 +148,7 @@ final class InputBuilder implements CoinSelector {
       targetTotal: targetTotal,
       assetGroups: assetGroups,
       canBurnChangeAsFee: canBurnChangeAsFee,
+      mustIncludeChangeOutputs: mustIncludeChangeOutputs,
     );
 
     return selector.selectInputs();
@@ -160,6 +163,7 @@ class _InputSelector {
   final Balance targetTotal;
   final AssetsGroup assetGroups;
   final bool canBurnChangeAsFee;
+  final bool mustIncludeChangeOutputs;
 
   final selectedInputs = <TransactionUnspentOutput>{};
   Balance selectedTotal = const Balance.zero();
@@ -172,6 +176,7 @@ class _InputSelector {
     required this.targetTotal,
     required this.assetGroups,
     required this.canBurnChangeAsFee,
+    required this.mustIncludeChangeOutputs,
   });
 
   SelectionResult? selectInputs() {
@@ -311,6 +316,9 @@ class _InputSelector {
     final changeAndFee = _getChangeAndFee(builder, selectedInputs, selectedTotal, targetTotal);
     if (changeAndFee != null) {
       final (changeOutputs, totalFee) = changeAndFee;
+      if (mustIncludeChangeOutputs && changeOutputs.isEmpty) {
+        return null;
+      }
       return (selectedInputs, changeOutputs, totalFee);
     }
 

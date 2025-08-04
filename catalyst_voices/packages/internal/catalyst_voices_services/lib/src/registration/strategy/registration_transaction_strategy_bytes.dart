@@ -68,7 +68,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     );
 
     final (selectedUtxos, changes, totalFee) = txBuilder.selectInputs(
-      changeOutputStrategy: ChangeOutputAdaStrategy.noBurn,
+      changeOutputStrategy: ChangeOutputAdaStrategy.mustInclude,
     );
 
     final txBody = txBuilder
