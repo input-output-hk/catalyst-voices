@@ -6,7 +6,7 @@ URL = cat_gateway_endpoint_url("api/v1/document")
 
 # Signed document GET
 def get(document_id: str):
-    document_url = f"{URL/{document_id}"
+    document_url = f"{URL}/{document_id}"
     return requests.get(document_url)
 
 
@@ -17,7 +17,7 @@ def put(data: str, token: str):
     return requests.put(URL, headers=headers, data=data)
 
 
-# Signed document latest POST
+# Signed document POST
 def post(filter: dict, limit=None, page=None):
     headers = {"Content-Type": "application/json"}
     url = f"{URL}/index"
