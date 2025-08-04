@@ -660,7 +660,7 @@ void main() {
         );
       }
 
-      expect(buildTx, throwsA(isA<OutputPublicKeyHashNotInRequiredSigner>()));
+      expect(buildTx, throwsA(isA<OutputPublicKeyHashNotInRequiredSignerException>()));
     });
 
     test('Validate requiredSigners returns normally when outputs address is required', () async {

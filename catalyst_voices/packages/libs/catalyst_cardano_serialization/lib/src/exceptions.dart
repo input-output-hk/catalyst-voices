@@ -184,15 +184,15 @@ final class MaxTxSizeExceededException extends Equatable implements Exception {
 }
 
 /// Exception thrown when the transaction requiredSigners does not include output address publicKeyHash.
-final class OutputPublicKeyHashNotInRequiredSigner extends Equatable implements Exception {
+final class OutputPublicKeyHashNotInRequiredSignerException extends Equatable implements Exception {
   /// List of outputs public keys hashes
   final Set<Ed25519PublicKeyHash> outputsPublicKeysHashes;
 
   /// List of required signers.
   final Set<Ed25519PublicKeyHash> requiredSigners;
 
-  /// The default constructor for [OutputPublicKeyHashNotInRequiredSigner].
-  const OutputPublicKeyHashNotInRequiredSigner({
+  /// The default constructor for [OutputPublicKeyHashNotInRequiredSignerException].
+  const OutputPublicKeyHashNotInRequiredSignerException({
     required this.outputsPublicKeysHashes,
     required this.requiredSigners,
   });
