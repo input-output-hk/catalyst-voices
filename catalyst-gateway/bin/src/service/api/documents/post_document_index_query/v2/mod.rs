@@ -1,4 +1,4 @@
-//! Document Index Query V2
+//! Document Index Query V2 endpoint implementation.
 
 pub(crate) mod request;
 pub(crate) mod response;

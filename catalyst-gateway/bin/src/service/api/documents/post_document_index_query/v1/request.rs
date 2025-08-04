@@ -1,4 +1,4 @@
-//! Catalyst Singed Document Request Objects for `postDocument`.
+//! Document Index Query V1 endpoint request objects.
 
 use poem_openapi::{types::Example, NewType, Object};
 

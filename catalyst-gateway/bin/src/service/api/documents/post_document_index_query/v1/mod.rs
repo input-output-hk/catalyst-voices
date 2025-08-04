@@ -1,4 +1,4 @@
-//! Document Index Query
+//! Document Index Query V1 endpoint implementation.
 
 use std::collections::HashMap;
 
