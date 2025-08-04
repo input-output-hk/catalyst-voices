@@ -5,7 +5,9 @@
 pub(crate) mod reporter {
     use std::sync::LazyLock;
 
-    use prometheus::{register_counter_vec, register_int_gauge_vec, CounterVec, IntGaugeVec};
+    use prometheus::{
+        register_int_counter_vec, register_int_gauge_vec, IntCounterVec, IntGaugeVec,
+    };
 
     /// Labels for the metrics.
     const METRIC_LABELS: [&str; 3] = ["api_host_names", "service_id", "network"];
@@ -51,24 +53,26 @@ pub(crate) mod reporter {
     });
 
     /// Chain Indexer number of times triggering backward data purge.
-    pub(crate) static TRIGGERED_BACKWARD_PURGES_COUNT: LazyLock<CounterVec> = LazyLock::new(|| {
-        register_counter_vec!(
-            "indexer_triggered_backward_purges_count",
-            "Chain Indexer number of times triggering backward data purge",
-            &METRIC_LABELS
-        )
-        .unwrap()
-    });
+    pub(crate) static TRIGGERED_BACKWARD_PURGES_COUNT: LazyLock<IntCounterVec> =
+        LazyLock::new(|| {
+            register_int_counter_vec!(
+                "indexer_triggered_backward_purges_count",
+                "Chain Indexer number of times triggering backward data purge",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
 
     /// Chain Indexer number of times triggering forward data purge.
-    pub(crate) static TRIGGERED_FORWARD_PURGES_COUNT: LazyLock<CounterVec> = LazyLock::new(|| {
-        register_counter_vec!(
-            "indexer_triggered_forward_purges_count",
-            "Chain Indexer number of times triggering forward data purge",
-            &METRIC_LABELS
-        )
-        .unwrap()
-    });
+    pub(crate) static TRIGGERED_FORWARD_PURGES_COUNT: LazyLock<IntCounterVec> =
+        LazyLock::new(|| {
+            register_int_counter_vec!(
+                "indexer_triggered_forward_purges_count",
+                "Chain Indexer number of times triggering forward data purge",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
 
     /// Chain Indexer number of purged slots.
     pub(crate) static PURGED_SLOTS: LazyLock<IntGaugeVec> = LazyLock::new(|| {

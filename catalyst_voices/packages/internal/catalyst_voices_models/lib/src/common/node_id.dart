@@ -23,4 +23,11 @@ base class NodeId extends Equatable {
 
   /// Returns true if this node is a child of [parent] node, false otherwise.
   bool isChildOf(NodeId parent) => value.startsWith(parent.value);
+
+  /// Returns true if this node id matches the given pattern, supporting '*' as a wildcard for
+  /// a single segment.
+  bool matchesPattern(NodeId pattern) {
+    final handler = WildcardPathHandler.fromNodeId(pattern);
+    return handler.matches(this);
+  }
 }

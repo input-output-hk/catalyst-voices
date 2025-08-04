@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 
 final _logger = Logger('LocalCryptoService');
 
-/// [CryptoService] implementation used by default in [Vault].
+/// [CryptoService] implementation used by default in Vault.
 ///
 /// It uses Pbkdf2 for key derivation as well as
 /// AesGcm for encryption/decryption.

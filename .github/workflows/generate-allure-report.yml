@@ -29,7 +29,7 @@ jobs:
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
         with:
           enable_caching: "true"
-          version: v0.21.0
+          version: 0.21.0
         if: always()
 
       - name: Setup CI
