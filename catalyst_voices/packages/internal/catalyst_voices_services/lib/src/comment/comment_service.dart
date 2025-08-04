@@ -3,6 +3,10 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:collection/collection.dart';
 
+/// CommentService provides comment-related functionality.
+///
+/// [CommentRepository] is used to get the comment data.
+/// [SignerService] is used to sign the comment.
 abstract interface class CommentService {
   const factory CommentService(
     CommentRepository commentRepository,
@@ -47,7 +51,7 @@ final class CommentServiceImpl implements CommentService {
         ?.comment;
 
     if (commentTemplateRef == null) {
-      throw const ApiErrorResponseException(statusCode: 404);
+      throw const ApiErrorResponseException.notFound();
     }
 
     return _commentRepository.getCommentTemplate(ref: commentTemplateRef);

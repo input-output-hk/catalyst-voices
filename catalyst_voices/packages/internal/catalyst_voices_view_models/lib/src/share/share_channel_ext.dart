@@ -3,6 +3,11 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
+/// Extension on [ShareChannel] to provide utility methods:
+///
+/// - [icon]: Returns the icon for the share channel.
+/// - [description]: Returns the description for the share channel.
+/// - [title]: Returns the title for the share channel.
 extension ShareChannelExt on ShareChannel {
   SvgGenImage get icon => switch (this) {
         ShareChannel.clipboard => VoicesAssets.icons.duplicate,

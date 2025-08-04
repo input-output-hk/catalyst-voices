@@ -1,0 +1,1 @@
+enum RegistrationTransactionStrategyType { models, bytes }

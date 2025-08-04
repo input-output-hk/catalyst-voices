@@ -215,6 +215,7 @@ final class TransactionBuilder extends Equatable {
     Set<TransactionUnspentOutput>? inputs,
     List<ShelleyMultiAssetTransactionOutput>? outputs,
     Coin? fee,
+    AuxiliaryData? auxiliaryData,
     TransactionWitnessSetBuilder? witnessBuilder,
   }) {
     return TransactionBuilder(
@@ -223,7 +224,7 @@ final class TransactionBuilder extends Equatable {
       outputs: outputs ?? this.outputs,
       fee: fee ?? this.fee,
       ttl: ttl,
-      auxiliaryData: auxiliaryData,
+      auxiliaryData: auxiliaryData ?? this.auxiliaryData,
       validityStart: validityStart,
       mint: mint,
       scriptData: scriptData,
@@ -605,6 +606,15 @@ final class TransactionBuilder extends Equatable {
           actualCount: assetsPerOutput,
           maxCount: config.maxAssetsPerOutput,
         );
+      }
+
+      final tooLongAssets = output.amount
+          .listNonZeroAssetIds()
+          .where((assetId) => assetId.$2.isTooLong)
+          .map((assetId) => assetId.$2);
+
+      if (tooLongAssets.isNotEmpty) {
+        throw AssetNameTooLongException(assets: tooLongAssets.toList());
       }
     }
   }

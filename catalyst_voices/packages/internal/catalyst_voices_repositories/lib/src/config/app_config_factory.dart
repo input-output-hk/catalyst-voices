@@ -3,6 +3,10 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/config/config.dart';
 import 'package:collection/collection.dart';
 
+/// Allows to build configuration for the app.
+///
+/// It takes remote config [RemoteConfig] and environment type [AppEnvironmentType]
+/// and returns [AppConfig].
 final class AppConfigFactory {
   const AppConfigFactory._();
 
