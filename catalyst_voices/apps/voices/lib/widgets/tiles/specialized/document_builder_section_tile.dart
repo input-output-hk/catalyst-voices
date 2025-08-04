@@ -1,4 +1,6 @@
 import 'package:catalyst_voices/widgets/document_builder/viewer/document_property_builder_viewer.dart';
+import 'package:catalyst_voices/widgets/tiles/specialized/document_builder_section_tile_controller.dart';
+import 'package:catalyst_voices/widgets/tiles/specialized/document_builder_section_tile_data.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -54,13 +56,31 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
   final _formKey = GlobalKey<FormState>();
 
   late final WidgetStatesController _statesController;
+  late DocumentBuilderSectionTileController _tileController;
 
-  late model.DocumentProperty _editedSection;
-  late model.DocumentPropertyBuilder _builder;
+  model.DocumentPropertyBuilder get _builder => _data.builder;
 
-  final _pendingChanges = <model.DocumentChange>[];
+  set _builder(model.DocumentPropertyBuilder value) {
+    final newData = _data.copyWith(builder: value);
+    _tileController.setData(widget.section.nodeId, newData);
+  }
 
-  bool _isEditMode = false;
+  DocumentBuilderSectionTileData get _data {
+    return _tileController.getData<DocumentBuilderSectionTileData>(widget.section.nodeId) ??
+        DocumentBuilderSectionTileData(
+          isEditMode: false,
+          editedSection: widget.section,
+          builder: widget.section.toBuilder(),
+          pendingChanges: List.empty(growable: true),
+        );
+  }
+
+  model.DocumentProperty get _editedSection => _data.editedSection;
+
+  set _editedSection(model.DocumentProperty value) {
+    final newData = _data.copyWith(editedSection: value);
+    _tileController.setData(widget.section.nodeId, newData);
+  }
 
   String? get _errorText {
     if (widget.autovalidateMode == AutovalidateMode.always &&
@@ -71,11 +91,20 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
     return null;
   }
 
+  bool get _isEditMode => _data.isEditMode;
+
+  set _isEditMode(bool value) {
+    final newData = _data.copyWith(isEditMode: value);
+    _tileController.setData(widget.section.nodeId, newData);
+  }
+
   Widget? get _overrideAction {
     final overrides = widget.actionOverrides?[widget.section.nodeId];
 
     return overrides;
   }
+
+  List<model.DocumentChange> get _pendingChanges => _data.pendingChanges;
 
   @override
   Widget build(BuildContext context) {
@@ -114,6 +143,12 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _tileController = DocumentBuilderSectionTileControllerScope.of(context);
+  }
+
+  @override
   void didUpdateWidget(DocumentBuilderSectionTile oldWidget) {
     super.didUpdateWidget(oldWidget);
 
@@ -143,9 +178,6 @@ class _DocumentBuilderSectionTileState extends State<DocumentBuilderSectionTile>
     _statesController = WidgetStatesController({
       if (widget.isSelected) WidgetState.selected,
     });
-
-    _editedSection = widget.section;
-    _builder = _editedSection.toBuilder();
   }
 
   void _handlePropertyChanges(List<model.DocumentChange> changes) {

@@ -1,0 +1,91 @@
+import 'dart:async';
+import 'dart:typed_data';
+
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:convert/convert.dart';
+
+const _allKeys = [
+  _rootKey,
+];
+
+const _rootKey = 'rootKey';
+
+final class VaultKeychain extends SecureStorageVault implements Keychain {
+  final KeychainSigner signer;
+
+  VaultKeychain({
+    required super.id,
+    super.key,
+    required super.secureStorage,
+    required super.sharedPreferences,
+    super.unlockTtl,
+    super.cryptoService,
+    required this.signer,
+  });
+
+  @override
+  Future<bool> get isEmpty async {
+    for (final key in _allKeys) {
+      if (await contains(key: key)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  @override
+  Future<void> erase() => clear();
+
+  @override
+  Future<CatalystPrivateKey?> getMasterKey() async {
+    final masterKeyHex = await readString(key: _rootKey);
+    if (masterKeyHex == null) {
+      return null;
+    }
+
+    final masterKeyBytes = Uint8List.fromList(hexDecode(masterKeyHex));
+    return CatalystPrivateKey.factory.create(masterKeyBytes);
+  }
+
+  @override
+  Future<CatalystKeyPair> getRoleKeyPair({
+    required AccountRole role,
+  }) {
+    return signer.deriveAccountRoleKeyPair(keychain: this, role: role);
+  }
+
+  @override
+  Future<void> setMasterKey(CatalystPrivateKey data) async {
+    await writeString(hex.encode(data.bytes), key: _rootKey);
+  }
+
+  @override
+  Future<CatalystSignature> sign(
+    Uint8List message, {
+    required AccountRole role,
+  }) {
+    return signer.sign(message, keychain: this, role: role);
+  }
+
+  @override
+  String toString() => 'VaultKeychain[$id]';
+
+  /// See [SecureStorageVault.getStorageId].
+  static String getStorageId(
+    String value, {
+    String key = SecureStorageVault.defaultKey,
+  }) {
+    return SecureStorageVault.getStorageId(value, key: key);
+  }
+
+  /// See [SecureStorageVault.isStorageKey].
+  static bool isKeychainKey(
+    String value, {
+    String key = SecureStorageVault.defaultKey,
+  }) {
+    return SecureStorageVault.isStorageKey(value, key: key);
+  }
+}
