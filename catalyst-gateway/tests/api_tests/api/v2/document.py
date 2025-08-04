@@ -7,7 +7,7 @@ URL = cat_gateway_endpoint_url("api/v2/document")
 # Signed document POST
 def post(filter: dict, limit=None, page=None):
     headers = {"Content-Type": "application/json"}
-    url = f"{cat_gateway_endpoint_url(URL)}/index"
+    url = f"{URL}/index"
     query_params = []
     if limit is not None:
         query_params.append(f"limit={limit}")
