@@ -42,6 +42,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -77,6 +78,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -112,6 +114,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -149,6 +152,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -182,6 +186,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -221,6 +226,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -260,6 +266,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -297,6 +304,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -335,6 +343,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -375,6 +384,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -418,6 +428,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -458,6 +469,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert(size: 2000);
@@ -497,6 +509,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -543,6 +556,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -576,6 +590,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();

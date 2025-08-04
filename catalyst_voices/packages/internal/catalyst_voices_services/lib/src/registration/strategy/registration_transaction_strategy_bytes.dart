@@ -247,10 +247,6 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
       }
     }
 
-    print('outputsPublicKeysHashes -> $outputsPublicKeysHashes');
-    print('requiredSigners -> $requiredSigners');
-    print('missingSigners -> $missingSigners');
-
     if (missingSigners.isNotEmpty) {
       throw OutputPublicKeyHashNotInRequiredSigner(
         outputsPublicKeysHashes: outputsPublicKeysHashes,
