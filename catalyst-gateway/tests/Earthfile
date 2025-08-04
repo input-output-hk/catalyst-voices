@@ -42,15 +42,8 @@ test-builder:
 
     RUN cargo nextest archive --release --archive-file cat-gateway-tests.tar.zst 
 
-package-postgres-runner:
+package-rust-tests-runner:
     FROM +test-builder
 
-    ENTRYPOINT cargo nextest run --archive-file=cat-gateway-tests.tar.zst --run-ignored=only signed_docs --no-fail-fast
-    SAVE IMAGE postgres-runner:latest
-
-package-scylla-runner:
-    FROM +test-builder
-
-    ENTRYPOINT cargo nextest run --archive-file=cat-gateway-tests.tar.zst --run-ignored=only scylla_session scylla_queries scylla_purge rbac_index --no-fail-fast
-    SAVE IMAGE scylla-runner:latest
-
+    ENTRYPOINT cargo nextest run --archive-file=cat-gateway-tests.tar.zst --run-ignored=only signed_docs scylla_session scylla_queries scylla_purge rbac_index --no-fail-fast
+    SAVE IMAGE rust-tests-runner:latest

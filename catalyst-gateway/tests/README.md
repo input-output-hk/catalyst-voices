@@ -12,23 +12,17 @@ earthly +prepare-all-images
 ## API tests
 
 ```shell
-docker compose up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+docker compose -p p1 up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
 ```
 
 ## Schemathesis
 
 ```shell
-docker compose up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
+docker compose -p p1 up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
 ```
 
-## Postgres
+## Rust integration tests (a rust unit tests, which requires `event-db` or `index-db` instances)
 
 ```shell
-docker compose up postgres-runner --abort-on-container-exit --exit-code-from postgres-runner
-```
-
-## Scylla
-
-```shell
-docker compose up scylla-runner --abort-on-container-exit --exit-code-from scylla-runner
+docker compose up rust-tests-runner --abort-on-container-exit --exit-code-from rust-tests-runner
 ```
