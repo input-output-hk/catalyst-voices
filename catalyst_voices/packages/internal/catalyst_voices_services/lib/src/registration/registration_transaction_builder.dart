@@ -95,6 +95,8 @@ final class RegistrationTransactionBuilder {
       throw const RegistrationInsufficientBalanceException();
     } on AssetNameTooLongException catch (e) {
       throw RegistrationAssetNameTooLongException(assets: e.assets);
+    } on OutputPublicKeyHashNotInRequiredSignerException catch (e) {
+      throw RegistrationMissingRequiredSignerException(missingRequiredSigners: e.missing);
     }
   }
 
@@ -128,6 +130,7 @@ final class RegistrationTransactionBuilder {
 
     final requiredSigners = {
       _stakeAddress.publicKeyHash,
+      changeAddress.publicKeyHash,
     };
 
     final strategy = _pickStrategy(RegistrationTransactionStrategyType.bytes);

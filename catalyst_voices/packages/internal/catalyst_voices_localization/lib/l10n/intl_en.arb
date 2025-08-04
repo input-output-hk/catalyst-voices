@@ -650,6 +650,10 @@
   "@registrationSaveProgressKeychainNotFoundException": {
     "description": "Error message shown when could not save keychain progress"
   },
+  "registrationMissingRequiredSignersFromOutputs": "Missing required signers from outputs",
+  "@registrationMissingRequiredSignersFromOutputs": {
+    "description": "When transaction does not include required signers from outputs"
+  },
   "registrationSaveProgressSeedPhraseNotFoundException": "Keychain not found",
   "@registrationSaveProgressSeedPhraseNotFoundException": {
     "description": "Error message shown when could not save seed phrase progress"
