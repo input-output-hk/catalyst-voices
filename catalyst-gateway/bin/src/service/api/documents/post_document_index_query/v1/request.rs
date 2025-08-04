@@ -1,4 +1,4 @@
-//! Catalyst Singed Document Request Filter Query Object
+//! Catalyst Singed Document Request Objects for `postDocument`.
 
 use poem_openapi::{types::Example, NewType, Object};
 

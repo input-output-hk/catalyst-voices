@@ -1,4 +1,4 @@
-//! Catalyst Signed Document Endpoint Response Objects V2.
+//! Catalyst Signed Document Endpoint Response Objects for `postDocumentV2`.
 
 use derive_more::{From, Into};
 use poem_openapi::{

@@ -1,4 +1,5 @@
-//! Catalyst Signed Document Endpoint Response Objects.
+//! Catalyst Signed Document Endpoint Response Objects for `postDocument`.
+
 use derive_more::{From, Into};
 use poem_openapi::{
     types::{Example, ToJSON},

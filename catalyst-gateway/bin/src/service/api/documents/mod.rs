@@ -7,13 +7,11 @@ use poem_openapi::{
     payload::Json,
     OpenApi,
 };
-use post_document_index_query::query_filter::DocumentIndexQueryFilterBody;
 use put_document::{
     unprocessable_content_request::PutDocumentUnprocessableContent, MAXIMUM_DOCUMENT_SIZE,
 };
 
 use crate::service::{
-    api::documents::post_document_index_query::v2,
     common::{
         auth::{none_or_rbac::NoneOrRBAC, rbac::scheme::CatalystRBACSecurityScheme},
         tags::ApiTags,
@@ -112,14 +110,15 @@ impl DocumentApi {
         operation_id = "postDocument",
         transform = "schema_version_validation"
     )]
-    async fn post_document(
-        &self, /// The Query Filter Specification
-        query: Json<DocumentIndexQueryFilterBody>,
+    async fn post_document_v1(
+        &self,
+        /// The Query Filter Specification
+        query: Json<post_document_index_query::v1::request::DocumentIndexQueryFilterBody>,
         page: Query<Option<Page>>, limit: Query<Option<Limit>>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
-    ) -> post_document_index_query::AllResponses {
-        post_document_index_query::endpoint(query.0 .0, page.0, limit.0).await
+    ) -> post_document_index_query::v1::AllResponses {
+        post_document_index_query::v1::endpoint(query.0 .0, page.0, limit.0).await
     }
 
     /// Post A Signed Document Index Query for Newer Versions of v0.04.
@@ -138,7 +137,7 @@ impl DocumentApi {
     async fn post_document_v2(
         &self,
         /// The Query Filter Specification
-        query: Json<v2::request::DocumentIndexQueryFilterBodyV2>,
+        query: Json<post_document_index_query::v2::request::DocumentIndexQueryFilterBodyV2>,
         page: Query<Option<Page>>, limit: Query<Option<Limit>>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,

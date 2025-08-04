@@ -8,7 +8,6 @@ use std::collections::HashMap;
 use futures::TryStreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
 
-use super::{Limit, Page};
 use crate::{
     db::event::{
         common::query_limits::QueryLimits,
@@ -23,7 +22,12 @@ use crate::{
             },
         },
         common::{
-            objects::generic::pagination::CurrentPage, responses::WithErrorResponses, types::{document::id::DocumentId, generic::query::pagination::Remaining}
+            objects::generic::pagination::CurrentPage,
+            responses::WithErrorResponses,
+            types::{
+                document::id::DocumentId,
+                generic::query::pagination::{Limit, Page, Remaining},
+            },
         },
     },
 };
