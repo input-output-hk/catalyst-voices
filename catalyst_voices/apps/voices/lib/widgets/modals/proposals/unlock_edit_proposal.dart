@@ -180,34 +180,36 @@ class _UnlockEditProposalDialogState extends State<UnlockEditProposalDialog> {
     return VoicesSinglePaneDialog(
       constraints: const BoxConstraints(maxWidth: 450, maxHeight: 576),
       showClose: false,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const _Header(),
-          const Padding(
-            padding: padding,
-            child: _CautionInfo(),
-          ),
-          const _Divider(),
-          Padding(
-            padding: padding,
-            child: _VersionUnlock(
-              version: widget.version.toString(),
-              title: widget.title,
+      child: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const _Header(),
+            const Padding(
+              padding: padding,
+              child: _CautionInfo(),
             ),
-          ),
-          const _Divider(),
-          const _Warnings(),
-          const _Divider(),
-          _Agreement(
-            value: _agreement,
-            onChanged: _agreementChanged,
-          ),
-          const Spacer(),
-          _ActionButtons(
-            agreement: _agreement,
-          ),
-        ],
+            const _Divider(),
+            Padding(
+              padding: padding,
+              child: _VersionUnlock(
+                version: widget.version.toString(),
+                title: widget.title,
+              ),
+            ),
+            const _Divider(),
+            const _Warnings(),
+            const _Divider(),
+            _Agreement(
+              value: _agreement,
+              onChanged: _agreementChanged,
+            ),
+            const SizedBox(height: 24),
+            _ActionButtons(
+              agreement: _agreement,
+            ),
+          ],
+        ),
       ),
     );
   }
