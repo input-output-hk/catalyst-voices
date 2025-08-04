@@ -30,6 +30,21 @@ final class RegistrationInsufficientBalanceException extends RegistrationExcepti
   String toString() => 'RegistrationInsufficientBalanceException';
 }
 
+/// Exception thrown when the transaction requiredSigners does not include output address publicKeyHash.
+final class RegistrationMissingRequiredSigner extends RegistrationException {
+  /// List of outputs public keys hashes
+  final Set<Ed25519PublicKeyHash> missingRequiredSigners;
+
+  const RegistrationMissingRequiredSigner({
+    required this.missingRequiredSigners,
+  });
+
+  @override
+  String toString() {
+    return 'RegistrationMissingRequiredSigner(missingRequiredSigners: $missingRequiredSigners)';
+  }
+}
+
 /// An exception thrown when wallet ID doesn't match the configured network ID.
 ///
 /// I.e. trying to create transaction on preprod with production wallet.

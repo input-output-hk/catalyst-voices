@@ -1,4 +1,4 @@
-import 'package:catalyst_cardano_serialization/src/types.dart';
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:equatable/equatable.dart';
 
 /// Exception thrown when a native asset that is required
@@ -181,6 +181,37 @@ final class MaxTxSizeExceededException extends Equatable implements Exception {
       'maxTxSize:$maxTxSize'
       ', actualTxSize:$actualTxSize'
       ')';
+}
+
+/// Exception thrown when the transaction requiredSigners does not include output address publicKeyHash.
+final class OutputPublicKeyHashNotInRequiredSigner extends Equatable implements Exception {
+  /// List of outputs public keys hashes
+  final Set<Ed25519PublicKeyHash> outputsPublicKeysHashes;
+
+  /// List of required signers.
+  final Set<Ed25519PublicKeyHash> requiredSigners;
+
+  /// The default constructor for [OutputPublicKeyHashNotInRequiredSigner].
+  const OutputPublicKeyHashNotInRequiredSigner({
+    required this.outputsPublicKeysHashes,
+    required this.requiredSigners,
+  });
+
+  /// Set of missing keys hashes.
+  Set<Ed25519PublicKeyHash> get missing {
+    return outputsPublicKeysHashes.where((element) => !requiredSigners.contains(element)).toSet();
+  }
+
+  @override
+  List<Object?> get props => [
+        outputsPublicKeysHashes,
+        requiredSigners,
+      ];
+
+  @override
+  String toString() {
+    return 'OutputPublicKeyHashNotInRequiredSigner(requiredSigners: $requiredSigners, outputsPublicKeysHashes: $outputsPublicKeysHashes)';
+  }
 }
 
 /// Exception thrown when validating integrity of transaction bytes.

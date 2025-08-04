@@ -123,6 +123,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     _validateRawTxStructure(rawTx);
     _validateTransactionSize(rawTx, expectedSize: txSizeBeforePatching);
     _validateAuxiliaryDataSize(rawTx, expectedSize: auxiliaryDataSizeBeforePatching);
+    _validateRequiredSigners(rawTx);
 
     return rawTx;
   }
@@ -226,6 +227,35 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
       Transaction.fromCbor(cborValue);
     } on FormatException catch (_) {
       throw const RawTransactionMalformed();
+    }
+  }
+
+  void _validateRequiredSigners(RawTransaction rawTx) {
+    final outputsPublicKeysHashes = (cborDecode(rawTx.outputs) as CborList)
+        .map(TransactionOutput.fromCbor)
+        .map((e) => e.address.publicKeyHash)
+        .toSet();
+
+    final requiredSigners =
+        (cborDecode(rawTx.requiredSigners) as CborList).map(Ed25519PublicKeyHash.fromCbor).toSet();
+
+    final missingSigners = <Ed25519PublicKeyHash>[];
+
+    for (final outputPublicKeyHash in outputsPublicKeysHashes) {
+      if (!requiredSigners.contains(outputPublicKeyHash)) {
+        missingSigners.add(outputPublicKeyHash);
+      }
+    }
+
+    print('outputsPublicKeysHashes -> $outputsPublicKeysHashes');
+    print('requiredSigners -> $requiredSigners');
+    print('missingSigners -> $missingSigners');
+
+    if (missingSigners.isNotEmpty) {
+      throw OutputPublicKeyHashNotInRequiredSigner(
+        outputsPublicKeysHashes: outputsPublicKeysHashes,
+        requiredSigners: requiredSigners,
+      );
     }
   }
 

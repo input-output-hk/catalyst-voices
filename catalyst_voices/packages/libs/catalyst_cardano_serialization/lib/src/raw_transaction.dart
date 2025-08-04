@@ -42,10 +42,14 @@ final class RawTransaction extends BaseTransaction {
     final txBodyMap = body.toCborValuesMap();
     final txBodyKeyAspectMap = {
       TransactionBody.inputsKey: const _TrackingAspect(RawTransactionAspect.inputs),
+      TransactionBody.outputsKey: const _TrackingAspect(RawTransactionAspect.outputs),
       TransactionBody.feeKey: const _TrackingAspect(RawTransactionAspect.fee),
       TransactionBody.auxiliaryDataHashKey: const _TrackingAspect(
         RawTransactionAspect.auxiliaryDataHash,
         dataSize: AuxiliaryDataHash.hashLength,
+      ),
+      TransactionBody.requiredSignersKey: const _TrackingAspect(
+        RawTransactionAspect.requiredSigners,
       ),
       TransactionBody.networkIdKey: const _TrackingAspect(RawTransactionAspect.networkId),
     };
@@ -200,8 +204,30 @@ final class RawTransaction extends BaseTransaction {
     return NetworkId.fromId(decoded.value);
   }
 
+  /// Returns inputs bytes from [bytes].
+  List<int> get outputs {
+    final value = _structuredBytes.getValueOf(RawTransactionAspect.outputs);
+
+    if (value == null) {
+      throw StateError('Inputs not found!');
+    }
+
+    return value;
+  }
+
   @override
   List<Object?> get props => [bytes, _structuredBytes.context];
+
+  /// Returns inputs bytes from [bytes].
+  List<int> get requiredSigners {
+    final value = _structuredBytes.getValueOf(RawTransactionAspect.requiredSigners);
+
+    if (value == null) {
+      throw StateError('Inputs not found!');
+    }
+
+    return value;
+  }
 
   /// Returns auxiliary data signature bytes from [bytes].
   List<int> get signature {

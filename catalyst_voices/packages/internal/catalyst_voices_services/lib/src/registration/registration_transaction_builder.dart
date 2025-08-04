@@ -95,6 +95,8 @@ final class RegistrationTransactionBuilder {
       throw const RegistrationInsufficientBalanceException();
     } on AssetNameTooLongException catch (e) {
       throw RegistrationAssetNameTooLongException(assets: e.assets);
+    } on OutputPublicKeyHashNotInRequiredSigner catch (e) {
+      throw RegistrationMissingRequiredSigner(missingRequiredSigners: e.missing);
     }
   }
 

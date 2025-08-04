@@ -614,6 +614,73 @@ void main() {
 
       expect(buildTx, throwsA(isA<RegistrationTxCertValidationException>()));
     });
+
+    test('Validate requiredSigners throws exception when output address not in', () async {
+      // Given
+      final utxos = _buildUtxos(address: _changeAddress);
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
+
+      final derCert = _buildCert();
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+      ];
+
+      // Then
+      Future<RawTransaction> buildTx() async {
+        return strategy.build(
+          purpose: _purpose,
+          rootKeyPair: rootKeyPair,
+          derCert: derCert,
+          publicKeys: publicKeys,
+          requiredSigners: requiredSigners,
+        );
+      }
+
+      expect(buildTx, throwsA(isA<OutputPublicKeyHashNotInRequiredSigner>()));
+    });
+
+    test('Validate requiredSigners returns normally when outputs address is required', () async {
+      // Given
+      final utxos = _buildUtxos(address: _changeAddress);
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
+      };
+
+      final derCert = _buildCert();
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+      ];
+
+      // Then
+      Future<RawTransaction> buildTx() async {
+        return strategy.build(
+          purpose: _purpose,
+          rootKeyPair: rootKeyPair,
+          derCert: derCert,
+          publicKeys: publicKeys,
+          requiredSigners: requiredSigners,
+        );
+      }
+
+      expect(buildTx, returnsNormally);
+    });
   });
 }
 
@@ -682,7 +749,9 @@ RegistrationTransactionStrategyBytes _buildStrategy({
   );
 }
 
-Set<TransactionUnspentOutput> _buildUtxos() {
+Set<TransactionUnspentOutput> _buildUtxos({
+  ShelleyAddress? address,
+}) {
   return {
     TransactionUnspentOutput(
       input: TransactionInput(
@@ -690,7 +759,7 @@ Set<TransactionUnspentOutput> _buildUtxos() {
         index: 0,
       ),
       output: TransactionOutput(
-        address: _changeAddress,
+        address: address ?? _changeAddress,
         amount: Balance(coin: Coin.fromAda(1.2)),
       ),
     ),
@@ -700,7 +769,7 @@ Set<TransactionUnspentOutput> _buildUtxos() {
         index: 1,
       ),
       output: TransactionOutput(
-        address: _changeAddress,
+        address: address ?? _changeAddress,
         amount: Balance(coin: Coin.fromAda(1.2)),
       ),
     ),

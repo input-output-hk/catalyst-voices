@@ -63,6 +63,8 @@ sealed class LocalizedRegistrationException extends LocalizedException {
         const LocalizedRegistrationKeychainNotFoundException(),
       RegistrationAssetNameTooLongException(:final assets) =>
         LocalizedRegistrationAssetNameTooLongException(assets),
+      RegistrationMissingRequiredSigner(:final missingRequiredSigners) =>
+        LocalizedRegistrationOutputPublicKeyHashNotInRequiredSigner(missingRequiredSigners),
     };
   }
 }
@@ -95,6 +97,19 @@ final class LocalizedRegistrationNetworkIdMismatchException extends LocalizedReg
   String message(BuildContext context) => context.l10n.registrationNetworkIdMismatch(
         targetNetworkId.localizedName(context),
       );
+}
+
+final class LocalizedRegistrationOutputPublicKeyHashNotInRequiredSigner
+    extends LocalizedRegistrationException {
+  /// List of outputs public keys hashes
+  final Set<Ed25519PublicKeyHash> missingRequiredSigners;
+
+  LocalizedRegistrationOutputPublicKeyHashNotInRequiredSigner(this.missingRequiredSigners);
+
+  @override
+  String message(BuildContext context) {
+    return context.l10n.registrationMissingRequiredSignersFromOutputs;
+  }
 }
 
 /// Localized exception thrown when attempting to execute register operation
