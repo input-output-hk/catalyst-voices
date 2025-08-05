@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:catalyst_voices_repositories/src/dto/dev_tools/dev_tools_config_dto.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_repositories/src/storage/local_storage.dart';
 
 const _configKey = 'Config';
 const _key = 'DevTools';

@@ -14,7 +14,7 @@ class ProposalsFundInfo extends StatelessWidget {
         children: [
           Text(
             key: const Key('CurrentCampaignTitle'),
-            context.l10n.catalystF14,
+            context.l10n.catalystFundNo(14),
             style: Theme.of(context).textTheme.displayMedium,
           ),
           const SizedBox(height: 16),

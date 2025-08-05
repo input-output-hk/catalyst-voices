@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+/// Migration strategy for drift database.
 final class DriftMigrationStrategy extends MigrationStrategy {
   DriftMigrationStrategy({
     required GeneratedDatabase database,

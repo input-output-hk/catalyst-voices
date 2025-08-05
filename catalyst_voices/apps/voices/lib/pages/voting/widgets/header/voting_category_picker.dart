@@ -50,7 +50,7 @@ class _CategorySelector extends StatelessWidget {
       onSelected: (value) {
         context.read<VotingCubit>().changeSelectedCategory(value.ref);
       },
-      menuTitle: context.l10n.catalystFundNo(fundNumber?.toString() ?? ''),
+      menuTitle: context.l10n.catalystFundNo(fundNumber ?? 14),
     );
   }
 }

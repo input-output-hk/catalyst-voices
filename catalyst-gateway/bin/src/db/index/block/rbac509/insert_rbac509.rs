@@ -1,16 +1,16 @@
 //! Insert RBAC 509 Registration Query.
 
-use std::{fmt::Debug, sync::Arc};
+use std::{collections::HashSet, fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{Slot, TransactionId, TxnIndex};
-use catalyst_types::{catalyst_id::CatalystId, uuid::UuidV4};
+use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
+use catalyst_types::catalyst_id::CatalystId;
 use scylla::{client::session::Session, value::MaybeUnset, SerializeRow};
 use tracing::error;
 
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex, DbUuidV4},
+        types::{DbCatalystId, DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -23,16 +23,16 @@ const QUERY: &str = include_str!("cql/insert_rbac509.cql");
 pub(crate) struct Params {
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
-    /// A transaction hash
-    txn_id: DbTransactionId,
     /// A block slot number.
     slot_no: DbSlot,
     /// A transaction offset inside the block.
     txn_index: DbTxnIndex,
+    /// A transaction hash
+    txn_id: DbTransactionId,
     /// Hash of Previous Transaction. Is `None` for the first registration. 32 Bytes.
     prv_txn_id: MaybeUnset<DbTransactionId>,
-    /// Purpose.`UUIDv4`. 16 bytes.
-    purpose: DbUuidV4,
+    /// A set of removed stake addresses.
+    removed_stake_addresses: HashSet<DbStakeAddress>,
 }
 
 impl Debug for Params {
@@ -47,7 +47,7 @@ impl Debug for Params {
             .field("slot_no", &self.slot_no)
             .field("txn_index", &self.txn_index)
             .field("prv_txn_id", &prv_txn_id)
-            .field("purpose", &self.purpose)
+            .field("removed_stake_addresses", &self.removed_stake_addresses)
             .finish()
     }
 }
@@ -56,17 +56,21 @@ impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
         catalyst_id: CatalystId, txn_id: TransactionId, slot_no: Slot, txn_index: TxnIndex,
-        purpose: UuidV4, prv_txn_id: Option<TransactionId>,
+        prv_txn_id: Option<TransactionId>, removed_stake_addresses: HashSet<StakeAddress>,
     ) -> Self {
         let prv_txn_id = prv_txn_id.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
+        let removed_stake_addresses = removed_stake_addresses
+            .into_iter()
+            .map(Into::into)
+            .collect();
 
         Self {
             catalyst_id: catalyst_id.into(),
             txn_id: txn_id.into(),
-            purpose: purpose.into(),
             slot_no: slot_no.into(),
             txn_index: txn_index.into(),
             prv_txn_id,
+            removed_stake_addresses,
         }
     }
 

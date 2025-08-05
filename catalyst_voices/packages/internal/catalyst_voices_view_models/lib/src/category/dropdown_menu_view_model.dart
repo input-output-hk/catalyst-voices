@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+/// Represent a dropdown menu item. Used in conjunction with any widget that has a dropdown menu behavior.
 class DropdownMenuViewModel<T extends Object> extends Equatable {
   final T? value;
   final String name;

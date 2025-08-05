@@ -2,20 +2,43 @@ import 'package:catalyst_voices_models/src/config/env_vars/dart_define_env_vars.
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
+/// Fallback environment type used when an environment cannot be determined.
+/// Defaults to [AppEnvironmentType.relative] on web and [AppEnvironmentType.dev]
+/// on other platforms.
 const _fallbackEnvType = kIsWeb ? AppEnvironmentType.relative : AppEnvironmentType.dev;
+
+/// The base domain for the Project Catalyst services.
 const _projectCatalyst = 'projectcatalyst.io';
+
+/// A regular expression to parse the environment name from a hostname.
+/// e.g., "app.dev.projectcatalyst.io" -> "dev"
 final _envRegExp = RegExp(r'app\.([a-z]+)\.projectcatalyst\.io', caseSensitive: false);
 
+/// Represents the application's current runtime environment.
+///
+/// This class provides a structured way to manage different deployment environments
+/// like development, pre-production, and production. It determines the
+/// environment from Dart's compile-time environment variables or the host URL.
 final class AppEnvironment extends Equatable {
+  /// The specific type of the current environment.
   final AppEnvironmentType type;
 
+  /// Creates an [AppEnvironment] with a custom environment type.
+  ///
+  /// This constructor is primarily for testing purposes, allowing the injection
+  /// of a specific environment type.
   @visibleForTesting
   const AppEnvironment.custom({
     required this.type,
   });
 
+  /// Creates a [AppEnvironmentType.dev] environment configuration.
   const AppEnvironment.dev() : this._(type: AppEnvironmentType.dev);
 
+  /// Creates an [AppEnvironment] by reading Dart's environment variables.
+  ///
+  /// It looks for an 'envName' variable and maps it to an [AppEnvironmentType].
+  /// If the variable is not found or is unsupported, it falls back to [_fallbackEnvType].
   factory AppEnvironment.fromEnv() {
     final envVars = getDartEnvVars();
     final envName = envVars.envName;
@@ -36,10 +59,16 @@ final class AppEnvironment extends Equatable {
     return AppEnvironment._(type: effectiveType);
   }
 
+  /// Creates a [AppEnvironmentType.preprod] environment configuration.
   const AppEnvironment.preprod() : this._(type: AppEnvironmentType.preprod);
 
+  /// Creates a [AppEnvironmentType.prod] environment configuration.
   const AppEnvironment.prod() : this._(type: AppEnvironmentType.prod);
 
+  /// Creates a [AppEnvironmentType.relative] environment configuration.
+  ///
+  /// This is typically used for web builds where the backend services are
+  /// located relative to the web app's hosting domain.
   const AppEnvironment.relative() : this._(type: AppEnvironmentType.relative);
 
   const AppEnvironment._({
@@ -50,6 +79,7 @@ final class AppEnvironment extends Equatable {
   List<Object?> get props => [type];
 }
 
+/// Defines the different deployment environments the application can run in.
 /// See https://github.com/input-output-hk/catalyst-internal-docs/issues/178
 enum AppEnvironmentType {
   /// This type tells app to always talk to full, hardcoded dev backend
@@ -74,6 +104,10 @@ enum AppEnvironmentType {
   /// It useful when building app one time and it can be deployed anywhere.
   relative;
 
+  /// Gets the base URI for the main application services.
+  ///
+  /// For [relative], it returns an empty URI as the base is determined at runtime
+  /// from the browser's URL.
   Uri get app {
     return switch (this) {
       AppEnvironmentType.dev || AppEnvironmentType.preprod => _getBaseUrl('app', envName: name),
@@ -85,6 +119,10 @@ enum AppEnvironmentType {
     };
   }
 
+  /// Gets the base URI for the reviews service.
+  ///
+  /// For [relative], it attempts to parse the environment name from the
+  /// browser's current URL ([Uri.base]).
   Uri get reviews {
     return switch (this) {
       AppEnvironmentType.dev || AppEnvironmentType.preprod => _getBaseUrl('reviews', envName: name),
@@ -96,6 +134,9 @@ enum AppEnvironmentType {
     };
   }
 
+  /// Constructs a base URL from a service name and an optional environment name.
+  ///
+  /// Example: `_getBaseUrl('api', envName: 'dev')` -> `https://api.dev.projectcatalyst.io`
   Uri _getBaseUrl(
     String name, {
     String? envName,
@@ -111,6 +152,11 @@ enum AppEnvironmentType {
     return Uri.https(authority);
   }
 
+  /// Tries to extract the environment name from a given URI string.
+  ///
+  /// It uses [_envRegExp] to find a match (e.g., 'dev', 'preprod') and
+  /// returns it if the found value corresponds to a valid [AppEnvironmentType].
+  /// Returns `null` if no valid environment name is found.
   @visibleForTesting
   static String? tryUriBaseEnvName({required String from}) {
     final match = _envRegExp.firstMatch(from);
