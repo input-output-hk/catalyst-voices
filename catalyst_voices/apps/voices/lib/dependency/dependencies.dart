@@ -182,6 +182,12 @@ final class Dependencies extends DependencyProvider {
         return CampaignPhaseAwareCubit(
           get<CampaignService>(),
         );
+      })
+      ..registerFactory<VotingBallotBloc>(() {
+        return VotingBallotBloc(
+          get<UserService>(),
+          get<CampaignService>(),
+        );
       });
   }
 
