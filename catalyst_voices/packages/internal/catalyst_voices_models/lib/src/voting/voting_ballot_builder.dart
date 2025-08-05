@@ -46,20 +46,27 @@ final class VotingBallotBuilder {
   /// Returns [Vote] made on [proposal].
   Vote? getVoteOn(DocumentRef proposal) => _votes[proposal];
 
+  /// Lookup if has draft votes on [proposal].
+  bool hasVotedOn(DocumentRef proposal) => _votes.containsKey(proposal);
+
   /// Removes [Vote] on [proposal].
   Vote? removeVoteOn(DocumentRef proposal) => _votes.remove(proposal);
 
   /// Updates vote made on [proposal] if already had any or adds new draft vote otherwise.
   ///
   /// Returns current [Vote] on [proposal] after update.
+  ///
+  /// [voteId] is optional argument which will be used on new draft votes with
+  /// fresh version.
   Vote voteOn({
     required DocumentRef proposal,
     required VoteType type,
+    String? voteId,
   }) {
     return _votes.update(
       proposal,
       (vote) => vote.copyWith(type: type),
-      ifAbsent: () => Vote.draft(proposal: proposal, type: type),
+      ifAbsent: () => Vote.draft(id: voteId, proposal: proposal, type: type),
     );
   }
 }

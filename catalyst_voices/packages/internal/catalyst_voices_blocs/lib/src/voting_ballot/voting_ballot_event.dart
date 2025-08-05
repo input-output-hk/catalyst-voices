@@ -2,6 +2,17 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
+final class RemoveVoteEvent extends VotingBallotEvent {
+  final DocumentRef proposal;
+
+  const RemoveVoteEvent({
+    required this.proposal,
+  });
+
+  @override
+  List<Object?> get props => [proposal];
+}
+
 final class UpdateFooterFromBallotBuilderEvent extends VotingBallotEvent {
   final bool canCastVotes;
   final bool showPendingVotesDisclaimer;
@@ -34,6 +45,19 @@ final class UpdateLastCastedVoteEvent extends VotingBallotEvent {
 
   @override
   List<Object?> get props => [votedAt];
+}
+
+final class UpdateVoteEvent extends VotingBallotEvent {
+  final DocumentRef proposal;
+  final VoteType type;
+
+  const UpdateVoteEvent({
+    required this.proposal,
+    required this.type,
+  });
+
+  @override
+  List<Object?> get props => [proposal, type];
 }
 
 final class UpdateVoteTiles extends VotingBallotEvent {

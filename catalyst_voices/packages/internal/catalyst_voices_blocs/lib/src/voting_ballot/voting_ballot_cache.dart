@@ -20,6 +20,20 @@ final class VotingBallotCache extends Equatable {
         votesProposals,
       ];
 
+  VotingBallotCache addProposal(VoteProposal proposal) {
+    final votesProposals = Map.of(this.votesProposals);
+
+    votesProposals[proposal.ref] = proposal;
+
+    return copyWith(votesProposals: votesProposals);
+  }
+
+  VotingBallotCache removeProposal(DocumentRef ref) {
+    final votesProposals = Map.of(this.votesProposals)..remove(ref);
+
+    return copyWith(votesProposals: votesProposals);
+  }
+
   VotingBallotCache copyWith({
     Optional<DateRange>? votingTimeline,
     Optional<TimezonePreferences>? preferredTimezone,

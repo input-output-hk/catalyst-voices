@@ -35,6 +35,8 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     on<UpdateFooterFromBallotBuilderEvent>(_updateFooterFromBallot, transformer: uniqueEvents());
     on<UpdateLastCastedVoteEvent>(_updateLastCastedVote, transformer: uniqueEvents());
     on<UpdateVoteTiles>(_updateTiles);
+    on<UpdateVoteEvent>(_updateVote);
+    on<RemoveVoteEvent>(_removeVote);
 
     _votingPowerSub = _userService.watchUser
         .map((user) {
@@ -83,7 +85,31 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     return super.close();
   }
 
-  List<VotingListTileData> _buildTiles(List<_VoteWithProposal> data) {
+  List<VotingListTileData> _buildTiles() {
+    final votes = _ballotBuilder.votes;
+    final proposals = _cache.votesProposals;
+
+    final tilesData = _mapVotesWithProposals(votes, proposals);
+    final tiles = _buildTilesFrom(tilesData);
+
+    assert(
+      () {
+        final votesCount = votes.length;
+        final tilesVotesCount = tiles.fold(
+          0,
+          (previousValue, element) => previousValue + element.votes.length,
+        );
+
+        return votesCount == tilesVotesCount;
+      }(),
+      'Tiles have different votes count then votes itself. '
+      'Make sure to add VoteProposal for every vote',
+    );
+
+    return tiles;
+  }
+
+  List<VotingListTileData> _buildTilesFrom(List<_VoteWithProposal> data) {
     return data
         .groupListsBy((element) => element.proposal?.category)
         .entries
@@ -194,6 +220,15 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     return progress.clamp(0.0, 1.0);
   }
 
+  // TODO(damian-molinski): call voting service.
+  Future<Vote?> _getLastCastedVoteOn(DocumentRef proposal) async {
+    return Vote(
+      selfRef: SignedDocumentRef.generateFirstRef(),
+      proposal: proposal,
+      type: VoteType.yes,
+    );
+  }
+
   void _handleBallotBuilderChange() {
     final canCastVotes = _ballotBuilder.length > 0;
     final showPendingVotesDisclaimer = _ballotBuilder.length > 0;
@@ -247,27 +282,20 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
   }
 
   void _rebuildTilesAndSendEvent() {
-    final votes = _ballotBuilder.votes;
-    final proposals = _cache.votesProposals;
-
-    final tilesData = _mapVotesWithProposals(votes, proposals);
-    final tiles = _buildTiles(tilesData);
-
-    assert(
-      () {
-        final votesCount = votes.length;
-        final tilesVotesCount = tiles.fold(
-          0,
-          (previousValue, element) => previousValue + element.votes.length,
-        );
-
-        return votesCount == tilesVotesCount;
-      }(),
-      'Tiles have different votes count then votes itself. '
-      'Make sure to add VoteProposal for every vote',
-    );
+    final tiles = _buildTiles();
 
     add(UpdateVoteTiles(tiles));
+  }
+
+  void _removeVote(
+    RemoveVoteEvent event,
+    Emitter<VotingBallotState> emit,
+  ) {
+    _ballotBuilder.removeVoteOn(event.proposal);
+    _cache = _cache.removeProposal(event.proposal);
+
+    final tiles = _buildTiles();
+    emit(state.copyWith(tiles: tiles));
   }
 
   void _updateFooterFromBallot(
@@ -304,6 +332,51 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     Emitter<VotingBallotState> emit,
   ) {
     emit(state.copyWith(tiles: event.tiles));
+  }
+
+  Future<void> _updateVote(
+    UpdateVoteEvent event,
+    Emitter<VotingBallotState> emit,
+  ) async {
+    final proposalRef = event.proposal;
+
+    // If already has vote in ballot when we don't need to do anything
+    // because .voteOn will just update type with and keep it the same.
+    final voteId = _ballotBuilder.hasVotedOn(proposalRef)
+        ? null
+        : await _getLastCastedVoteOn(proposalRef).then((vote) => vote?.selfRef.id);
+
+    final vote = _ballotBuilder.voteOn(
+      proposal: proposalRef,
+      type: event.type,
+      voteId: voteId,
+    );
+
+    final isProposalCached = _cache.votesProposals.containsKey(proposalRef);
+
+    if (!isProposalCached) {
+      // TODO(damian-molinski): call voting service and get
+      final proposal = VoteProposal(
+        ref: proposalRef,
+        category: VoteProposalCategory(
+          ref: SignedDocumentRef.generateFirstRef(),
+          name: 'Dummy Category Name',
+        ),
+        title: 'Dummy Proposal Title',
+        authorName: 'XYZ',
+        lastCastedVote: Vote(
+          selfRef: SignedDocumentRef.first(vote.selfRef.id),
+          proposal: proposalRef,
+          type: VoteType.yes,
+        ),
+      );
+
+      _cache = _cache.addProposal(proposal);
+    }
+
+    final tiles = _buildTiles();
+
+    emit(state.copyWith(tiles: tiles));
   }
 
   void _updateVotingPhaseProgress(
