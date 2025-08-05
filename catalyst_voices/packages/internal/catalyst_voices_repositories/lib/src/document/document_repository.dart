@@ -17,6 +17,8 @@ final _logger = Logger('DocumentRepository');
 
 DocumentRef _templateResolver(DocumentData data) => data.metadata.template!;
 
+/// Base interface to interact with documents. This interface is used to allow interaction with any
+/// document type.
 abstract interface class DocumentRepository {
   factory DocumentRepository(
     DraftDataSource drafts,

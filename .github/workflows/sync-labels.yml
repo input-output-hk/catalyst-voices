@@ -10,4 +10,4 @@ permissions:
 
 jobs:
   sync:
-    uses: input-output-hk/catalyst-ci/.github/workflows/sync-labels.yml@ci/v1.8.1
+    uses: input-output-hk/catalyst-ci/.github/workflows/sync-labels.yml@master

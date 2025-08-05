@@ -211,11 +211,6 @@ impl CassandraSession {
         }
     }
 
-    /// Returns a flag notifying that the current `CassandraSession` is persistent or not
-    pub(crate) fn is_persistent(&self) -> bool {
-        self.persistent
-    }
-
     /// Executes a select query with the given parameters.
     ///
     /// Returns an iterator that iterates over all the result pages that the query
@@ -303,6 +298,11 @@ impl CassandraSession {
     /// Get underlying Raw Cassandra Session.
     pub(crate) fn get_raw_session(&self) -> Arc<Session> {
         self.session.clone()
+    }
+
+    /// Returns `true` if the database session is persistent.
+    pub fn is_persistent(&self) -> bool {
+        self.persistent
     }
 }
 

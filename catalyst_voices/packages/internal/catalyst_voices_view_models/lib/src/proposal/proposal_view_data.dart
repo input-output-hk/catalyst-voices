@@ -2,6 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
+/// View model representing proposal in a view mode
 final class ProposalViewData extends Equatable {
   final bool? isCurrentVersionLatest;
   final ProposalViewHeader header;

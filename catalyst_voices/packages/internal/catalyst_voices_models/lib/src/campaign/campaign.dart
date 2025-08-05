@@ -1,17 +1,40 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:equatable/equatable.dart';
 
-final class Campaign extends CampaignBase {
+/// Representation of campaign.
+///
+/// Should have factory constructor from document representation.
+final class Campaign extends Equatable {
+  final String id;
+  final String name;
+  final String description;
+  final DateTime startDate;
+  final DateTime endDate;
+  final int proposalsCount;
+  final CampaignPublish publish;
+  final int categoriesCount;
+
   const Campaign({
-    required super.id,
-    required super.name,
-    required super.description,
-    required super.startDate,
-    required super.endDate,
-    required super.proposalsCount,
-    required super.publish,
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.startDate,
+    required this.endDate,
+    required this.proposalsCount,
+    required this.publish,
+    required this.categoriesCount,
   });
 
   @override
+  List<Object?> get props => [
+        id,
+        name,
+        description,
+        startDate,
+        endDate,
+        proposalsCount,
+        publish,
+      ];
+
   Campaign copyWith({
     String? id,
     String? name,
@@ -20,6 +43,7 @@ final class Campaign extends CampaignBase {
     DateTime? endDate,
     int? proposalsCount,
     CampaignPublish? publish,
+    int? categoriesCount,
   }) {
     return Campaign(
       id: id ?? this.id,
@@ -29,11 +53,14 @@ final class Campaign extends CampaignBase {
       endDate: endDate ?? this.endDate,
       proposalsCount: proposalsCount ?? this.proposalsCount,
       publish: publish ?? this.publish,
+      categoriesCount: categoriesCount ?? this.categoriesCount,
     );
   }
+}
 
-  @override
-  List<Object?> get props => [
-        ...super.props,
-      ];
+enum CampaignPublish {
+  draft,
+  published;
+
+  bool get isDraft => this == draft;
 }

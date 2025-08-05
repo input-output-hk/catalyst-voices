@@ -3,6 +3,8 @@ import 'package:catalyst_voices_repositories/src/config/app_config_factory.dart'
 import 'package:catalyst_voices_repositories/src/config/remote_config_source.dart';
 import 'package:catalyst_voices_repositories/src/dto/config/config.dart';
 
+/// Allows to get app configuration from the server.
+/// Contains a method which returns [AppConfig].
 // ignore: one_member_abstracts
 abstract interface class ConfigRepository {
   const factory ConfigRepository(

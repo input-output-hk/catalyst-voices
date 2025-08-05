@@ -1,0 +1,31 @@
+VERSION 0.8
+
+package:
+    FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
+
+    WORKDIR /app
+
+    ARG tag='latest'
+
+    COPY pyproject.toml .
+    COPY uv.lock .
+    COPY set_config.py .
+
+    COPY --dir dev .
+    COPY --dir preprod .
+    COPY --dir prod .
+
+    COPY entrypoint.sh .
+    RUN chmod +x entrypoint.sh
+
+    ENTRYPOINT ["/app/entrypoint.sh"]
+
+    SAVE IMAGE voices-frontend-config:${tag}
+
+docker:
+    FROM +package
+
+    ARG container="voices-frontend-config"
+    ARG tag="latest"
+
+    SAVE IMAGE ${container}:${tag}

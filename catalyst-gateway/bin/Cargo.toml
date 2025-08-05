@@ -23,6 +23,7 @@ cardano-blockchain-types = { version = "0.0.5", git = "https://github.com/input-
 c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "c509-certificate-v0.0.3" }
 catalyst-types = { version = "0.0.5", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-types-v0.0.5" }
 
+
 pallas = { version = "0.33.0" }
 pallas-traverse = { version = "0.33.0" }
 
@@ -111,6 +112,7 @@ poem-openapi-derive = { version = "=5.1.4" }
 darling = { version = "=0.20.10" }
 
 [dev-dependencies]
+test-case = "3.3.1"
 
 [build-dependencies]
 build-info-build = "0.0.39"
