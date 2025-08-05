@@ -1,7 +1,8 @@
 //! Cache for TXO Assets by Stake Address Queries
 use std::sync::{Arc, LazyLock};
 
-use moka::{ops::compute::Op, policy::EvictionPolicy, sync::Cache};
+use moka::{policy::EvictionPolicy, sync::Cache};
+use tracing::{debug, error};
 
 use crate::{
     db::{
@@ -19,7 +20,7 @@ use crate::{
 static ASSETS_CACHE: LazyLock<Cache<DbStakeAddress, Arc<Vec<GetTxoByStakeAddressQuery>>>> =
     LazyLock::new(|| {
         Cache::builder()
-            .name("Cardano TXO Assets")
+            .name("Cardano UTXO Assets Cache")
             .eviction_policy(EvictionPolicy::lru())
             .max_capacity(Settings::cardano_assets_cache().utxo_cache_size())
             .build()
@@ -64,47 +65,51 @@ pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
             txo: txo_update.txo,
             slot_no: txo_update.slot_no,
         };
-        let _entry = ASSETS_CACHE
-            .entry(stake_address.clone())
-            .and_compute_with(|maybe_entry| {
-                maybe_entry.map_or_else(
-                    || {
-                        tracing::debug!(
-                        ?txo_update,
+        if let Some(txo_rows) = ASSETS_CACHE.get(stake_address) {
+            if let Some(txo) = txo_rows
+                .clone()
+                .iter()
+                .find(|tx| tx.key.as_ref() == update_key)
+            {
+                // Avoid wrting if txo has already been spent,
+                if txo.is_spent() {
+                    debug!(
                         %stake_address,
-                        "Stake Address not found in TXO Assets Cache, cannot update.");
-                    },
-                    |entry| {
-                        if let Some(txo) = entry
-                            .into_value()
-                            .iter()
-                            .find(|t| t.key.as_ref() == update_key)
-                        {
-                            let mut value = txo.value.write().unwrap_or_else(|error| {
-                                tracing::error!(
-                                ?txo_update,
-                                %stake_address,
-                                %error,
-                                cache_name = ?ASSETS_CACHE.name(),
-                                "RwLock for cache entry is poisoned, recovering.");
-                                txo.value.clear_poison();
-                                error.into_inner()
-                            });
-                            value.spent_slot = Some(txo_update.spent_slot);
-                            tracing::debug!(
-                            ?txo_update,
-                            %stake_address,
-                            "Updated TXO for Stake Address in Assets Cache");
-                        } else {
-                            tracing::debug!(
-                            ?txo_update,
-                            %stake_address,
-                            "TXOs not found for Stake Address in Assets Cache");
-                        }
-                    },
-                );
-                Op::Nop
-            });
+                        txn_index = i16::from(update_key.txn_index),
+                        txo = i16::from(update_key.txo),
+                        slot_no = u64::from(update_key.slot_no),
+                        "TXO for Stake Address was already spent!");
+                    continue;
+                }
+
+                let mut value = txo.value.write().unwrap_or_else(|error| {
+                    error!(
+                        %stake_address,
+                        txn_index = i16::from(update_key.txn_index),
+                        txo = i16::from(update_key.txo),
+                        slot_no = u64::from(update_key.slot_no),
+                        %error,
+                        "RwLock for cache entry is poisoned, recovering.");
+                    txo.value.clear_poison();
+                    error.into_inner()
+                });
+                // update spent_slot in cache
+                value.spent_slot.replace(txo_update.spent_slot);
+                debug!(
+                        %stake_address,
+                        txn_index = i16::from(update_key.txn_index),
+                        txo = i16::from(update_key.txo),
+                        slot_no = u64::from(update_key.slot_no),
+                        "Updated TXO for Stake Address");
+            }
+        } else {
+            debug!(
+                %stake_address,
+                txn_index = i16::from(txo_update.txn_index),
+                txo = i16::from(txo_update.txo),
+                slot_no = u64::from(txo_update.slot_no),
+                "Stake Address not found in TXO Assets Cache, cannot update.");
+        }
     }
 }
 
