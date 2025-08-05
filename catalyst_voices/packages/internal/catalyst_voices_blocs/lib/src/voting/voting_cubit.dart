@@ -206,12 +206,18 @@ final class VotingCubit extends Cubit<VotingState>
   void _emitCachedProposalsPage() {
     final campaign = _cache.campaign;
     final page = _cache.page;
+    final favoriteIds = _cache.favoriteIds ?? [];
 
     if (campaign == null || page == null) {
       return;
     }
 
-    final mappedPage = page.map(ProposalBrief.fromProposal);
+    final mappedPage = page.map(
+      (proposal) => ProposalBrief.fromProposal(
+        proposal,
+        isFavorite: favoriteIds.contains(proposal.selfRef.id),
+      ),
+    );
     final signal = PageReadyVotingSignal(page: mappedPage);
 
     emitSignal(signal);
@@ -223,6 +229,7 @@ final class VotingCubit extends Cubit<VotingState>
 
   void _handleFavoriteProposalsIds(List<String> ids) {
     _cache = _cache.copyWith(favoriteIds: Optional(ids));
+    _emitCachedProposalsPage();
     _dispatchState();
   }
 

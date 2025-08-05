@@ -25,7 +25,7 @@ class ProposalsPagination extends StatelessWidget {
             proposal: item,
           );
         },
-        emptyIndicatorBuilder: (_) => const ProposalsPaginationEmptyStateSelector(),
+        emptyIndicatorBuilder: (_) => const DiscoveryProposalsEmptyState(),
       ),
     );
   }

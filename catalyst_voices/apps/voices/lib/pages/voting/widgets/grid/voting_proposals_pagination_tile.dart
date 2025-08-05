@@ -16,26 +16,6 @@ class VotingProposalsPaginationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<VotingCubit, VotingState, bool>(
-      selector: (state) => state.isFavorite(proposal.selfRef.id),
-      builder: (context, isFavorite) {
-        return _VotingProposalsPaginationTile(
-          proposal: proposal.copyWith(isFavorite: isFavorite),
-        );
-      },
-    );
-  }
-}
-
-class _VotingProposalsPaginationTile extends StatelessWidget {
-  final ProposalBrief proposal;
-
-  const _VotingProposalsPaginationTile({
-    required this.proposal,
-  });
-
-  @override
-  Widget build(BuildContext context) {
     return ProposalBriefCard(
       proposal: proposal,
       isFavorite: proposal.isFavorite,

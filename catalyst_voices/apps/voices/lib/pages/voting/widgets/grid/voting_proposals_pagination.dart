@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/voting/widgets/grid/voting_proposals_pagination_empty_state.dart';
+import 'package:catalyst_voices/pages/voting/widgets/grid/voting_proposals_empty_state.dart';
 import 'package:catalyst_voices/pages/voting/widgets/grid/voting_proposals_pagination_tile.dart';
 import 'package:catalyst_voices/widgets/pagination/builders/paged_wrap_child_builder.dart';
 import 'package:catalyst_voices/widgets/pagination/layouts/paginated_grid_view.dart';
@@ -25,7 +25,7 @@ class VotingProposalsPagination extends StatelessWidget {
             proposal: item,
           );
         },
-        emptyIndicatorBuilder: (_) => const VotingProposalsPaginationEmptyStateSelector(),
+        emptyIndicatorBuilder: (_) => const VotingProposalsEmptyState(),
       ),
     );
   }

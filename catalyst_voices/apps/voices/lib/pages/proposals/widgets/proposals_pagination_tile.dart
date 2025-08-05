@@ -16,6 +16,8 @@ class ProposalsPaginationTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO(dt-iohk): get rid of the selector, let ProposalsCubit emit state with
+    // proposalBrief which already has the isFavorite set to correct value
     return BlocSelector<ProposalsCubit, ProposalsState, bool>(
       selector: (state) => state.isFavorite(proposal.selfRef.id),
       builder: (context, isFavorite) {
