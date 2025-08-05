@@ -32,7 +32,13 @@ class VotingProposalsPaginationTile extends StatelessWidget {
       },
       voteData: const VoteButtonData(),
       onVoteAction: (action) {
-        // TODO(dt-iohk): handle the vote action when vote ballot is finished
+        final proposal = this.proposal.selfRef;
+        final event = switch (action) {
+          VoteButtonActionRemoveDraft() => RemoveVoteEvent(proposal: proposal),
+          VoteButtonActionVote(:final type) => UpdateVoteEvent(proposal: proposal, type: type),
+        };
+
+        context.read<VotingBallotBloc>().add(event);
       },
     );
   }
