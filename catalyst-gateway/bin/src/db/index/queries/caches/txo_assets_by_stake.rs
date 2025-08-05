@@ -13,7 +13,7 @@ use crate::{
 static ASSETS_CACHE: LazyLock<Cache<DbStakeAddress, Arc<Vec<GetAssetsByStakeAddressQuery>>>> =
     LazyLock::new(|| {
         Cache::builder()
-            .name("Cardano native assets cache")
+            .name("Cardano Native Assets Cache")
             .eviction_policy(EvictionPolicy::lru())
             .max_capacity(Settings::cardano_assets_cache().native_assets_cache_size())
             .build()
