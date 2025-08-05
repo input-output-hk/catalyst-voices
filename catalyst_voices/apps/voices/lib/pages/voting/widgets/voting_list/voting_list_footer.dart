@@ -1,7 +1,7 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -10,14 +10,12 @@ class VotingListFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(damian-molinski): use selector
-    final data = VotingListFooterData(
-      canCastVotes: true,
-      showPendingVotesDisclaimer: true,
-      lastCastedVoteAt: DateTimeExt.now(),
+    return BlocSelector<VotingBallotBloc, VotingBallotState, VotingListFooterData>(
+      selector: (state) => state.footer,
+      builder: (context, state) {
+        return _VotingListFooter(data: state);
+      },
     );
-
-    return _VotingListFooter(data: data);
   }
 }
 
@@ -125,7 +123,7 @@ class _VotingListFooter extends StatelessWidget {
             child: _CastVotesButton(
               onTap: data.canCastVotes
                   ? () {
-                      // TODO(damian-molinski): send cast votes event
+                      context.read<VotingBallotBloc>().add(const CastVotesEvent());
                     }
                   : null,
             ),

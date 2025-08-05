@@ -43,6 +43,11 @@ final class VotingBallotBuilder {
     return VotingBallot(votes: votes);
   }
 
+  /// Removes votes from this builder.
+  void clear() {
+    _votes.clear();
+  }
+
   /// Returns [Vote] made on [proposal].
   Vote? getVoteOn(DocumentRef proposal) => _votes[proposal];
 

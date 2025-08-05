@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_blocs/src/voting_ballot/voting_ballot.dart';
 import 'package:catalyst_voices_blocs/src/voting_ballot/voting_ballot_cache.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -37,6 +36,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     on<UpdateVoteTiles>(_updateTiles);
     on<UpdateVoteEvent>(_updateVote);
     on<RemoveVoteEvent>(_removeVote);
+    on<CastVotesEvent>(_castVotes);
 
     _votingPowerSub = _userService.watchUser
         .map((user) {
@@ -218,6 +218,19 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     final elapsedDuration = now.difference(start).inMilliseconds;
     final progress = elapsedDuration / totalDuration;
     return progress.clamp(0.0, 1.0);
+  }
+
+  Future<void> _castVotes(
+    CastVotesEvent event,
+    Emitter<VotingBallotState> emit,
+  ) async {
+    final _ = _ballotBuilder.build();
+    _ballotBuilder.clear();
+
+    // TODO(damian-molinski): call voting service
+
+    final tiles = _buildTiles();
+    emit(state.copyWith(tiles: tiles));
   }
 
   // TODO(damian-molinski): call voting service.

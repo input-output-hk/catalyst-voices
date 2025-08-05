@@ -2,6 +2,13 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
+final class CastVotesEvent extends VotingBallotEvent {
+  const CastVotesEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
 final class RemoveVoteEvent extends VotingBallotEvent {
   final DocumentRef proposal;
 
