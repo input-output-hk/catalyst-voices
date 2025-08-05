@@ -17,47 +17,49 @@ use crate::{
 };
 
 /// In memory cache of the most recent Cardano TXO assets by Stake Address.
-static ASSETS_CACHE: LazyLock<Cache<DbStakeAddress, Arc<Vec<GetTxoByStakeAddressQuery>>>> =
+static ASSETS_CACHE: LazyLock<Option<Cache<DbStakeAddress, Arc<Vec<GetTxoByStakeAddressQuery>>>>> =
     LazyLock::new(|| {
-        Cache::builder()
-            .name("Cardano UTXO Assets Cache")
-            .eviction_policy(EvictionPolicy::lru())
-            .max_capacity(Settings::cardano_assets_cache().utxo_cache_size())
-            .build()
+        if Settings::cardano_assets_cache().utxo_cache_size() > 0 {
+            Some(
+                Cache::builder()
+                    .name("Cardano UTXO Assets Cache")
+                    .eviction_policy(EvictionPolicy::lru())
+                    .max_capacity(Settings::cardano_assets_cache().utxo_cache_size())
+                    .build(),
+            )
+        } else {
+            None
+        }
     });
-
-/// Returns true if Cache is enabled.
-fn is_enabled() -> bool {
-    Settings::cardano_assets_cache().utxo_cache_size() > 0
-}
 
 /// Get TXO Assets entry from Cache.
 pub(crate) fn get(stake_address: &DbStakeAddress) -> Option<Arc<Vec<GetTxoByStakeAddressQuery>>> {
-    if !is_enabled() {
-        return None;
+    if let Some(ref cache) = *ASSETS_CACHE {
+        let result = cache
+            .get(stake_address)
+            .inspect(|_| txo_assets_hits_inc())
+            .or_else(|| {
+                txo_assets_misses_inc();
+                None
+            });
+        return result;
     }
-    ASSETS_CACHE
-        .get(stake_address)
-        .inspect(|_| txo_assets_hits_inc())
-        .or_else(|| {
-            txo_assets_misses_inc();
-            None
-        })
+    None
 }
 
 /// Insert TXO Assets entry in Cache.
 pub(crate) fn insert(stake_address: DbStakeAddress, rows: Arc<Vec<GetTxoByStakeAddressQuery>>) {
-    if !is_enabled() {
+    let Some(ref cache) = *ASSETS_CACHE else {
         return;
-    }
-    ASSETS_CACHE.insert(stake_address, rows);
+    };
+    cache.insert(stake_address, rows);
 }
 
 /// Update spent TXO Assets in Cache.
 pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
-    if !is_enabled() {
+    let Some(ref cache) = *ASSETS_CACHE else {
         return;
-    }
+    };
     for txo_update in params {
         let stake_address = &txo_update.stake_address;
         let update_key = &GetTxoByStakeAddressQueryKey {
@@ -65,7 +67,7 @@ pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
             txo: txo_update.txo,
             slot_no: txo_update.slot_no,
         };
-        if let Some(txo_rows) = ASSETS_CACHE.get(stake_address) {
+        if let Some(txo_rows) = cache.get(stake_address) {
             if let Some(txo) = txo_rows
                 .clone()
                 .iter()
@@ -96,11 +98,11 @@ pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
                 // update spent_slot in cache
                 value.spent_slot.replace(txo_update.spent_slot);
                 debug!(
-                        %stake_address,
-                        txn_index = i16::from(update_key.txn_index),
-                        txo = i16::from(update_key.txo),
-                        slot_no = u64::from(update_key.slot_no),
-                        "Updated TXO for Stake Address");
+                    %stake_address,
+                    txn_index = i16::from(update_key.txn_index),
+                    txo = i16::from(update_key.txo),
+                    slot_no = u64::from(update_key.slot_no),
+                    "Updated TXO for Stake Address");
             }
         } else {
             debug!(
@@ -115,25 +117,24 @@ pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
 
 /// Empty the TXO Assets cache.
 pub(crate) fn drop() {
-    if !is_enabled() {
-        return;
+    if let Some(ref cache) = *ASSETS_CACHE {
+        cache.invalidate_all();
     }
-    ASSETS_CACHE.invalidate_all();
 }
 
 /// Size of TXO Assets cache.
 pub(crate) fn size() -> u64 {
-    if !is_enabled() {
-        return 0;
+    if let Some(ref cache) = *ASSETS_CACHE {
+        cache.run_pending_tasks();
+        return cache.weighted_size();
     }
-    ASSETS_CACHE.run_pending_tasks();
-    ASSETS_CACHE.weighted_size()
+    0u64
 }
 /// Number of entries in TXO Assets cache.
 pub(crate) fn entry_count() -> u64 {
-    if !is_enabled() {
-        return 0;
+    if let Some(ref cache) = *ASSETS_CACHE {
+        cache.run_pending_tasks();
+        return cache.entry_count();
     }
-    ASSETS_CACHE.run_pending_tasks();
-    ASSETS_CACHE.entry_count()
+    0u64
 }
