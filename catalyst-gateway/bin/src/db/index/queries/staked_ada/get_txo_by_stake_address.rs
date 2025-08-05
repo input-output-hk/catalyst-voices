@@ -89,10 +89,9 @@ impl GetTxoByStakeAddressQuery {
     /// Returns true if the UTXO has been already spent.
     pub(crate) fn is_spent(&self) -> bool {
         let query = self.value.read().unwrap_or_else(|error| {
-            tracing::error!(
-                        txo_key=?self.key,
-                        %error,
-                        "UTXO entry is poisoned, recovering.");
+            error!(
+                %error,
+                "UTXO entry is poisoned, recovering.");
             self.value.clear_poison();
             error.into_inner()
         });
