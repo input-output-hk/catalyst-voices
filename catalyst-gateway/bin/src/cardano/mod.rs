@@ -1,13 +1,12 @@
 //! Logic for orchestrating followers
 
-use std::{collections::BTreeSet, fmt::Display, sync::Arc, time::Duration};
+use std::{fmt::Display, sync::Arc, time::Duration};
 
 use cardano_blockchain_types::{MultiEraBlock, Network, Point, Slot};
 use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
 use duration_string::DurationString;
 use futures::{stream::FuturesUnordered, StreamExt};
 use rand::{Rng, SeedableRng};
-use tokio::sync::watch;
 use tracing::{debug, error, info};
 
 use crate::{
@@ -413,14 +412,6 @@ struct SyncTask {
 
     /// Current Sync Status.
     sync_status: Vec<SyncStatus>,
-
-    /// A channel that contains an end slot number for every immutable sync task.
-    ///
-    /// For example, if there are 3 tasks with `0..100`, `100..200` and `200..300` block
-    /// ranges (where the end bounds aren't inclusive), then the channel will contain the
-    /// following list: `[99, 199, 299]`. A slot value is removed when that task is done,
-    /// so when the second task is finished the list will be updated to `[99, 299]`.
-    pending_blocks: watch::Sender<BTreeSet<Slot>>,
 }
 
 impl SyncTask {
@@ -434,15 +425,11 @@ impl SyncTask {
             immutable_tip_slot: 0.into(),
             live_tip_slot: 0.into(),
             sync_status: Vec::new(),
-            pending_blocks: watch::channel(BTreeSet::new()).0,
         }
     }
 
     /// Add a new `SyncTask` to the queue.
     fn add_sync_task(&mut self, params: SyncParams) {
-        self.pending_blocks.send_modify(|blocks| {
-            blocks.insert(params.end.slot_or_default());
-        });
         self.sync_tasks.push(sync_subchain(params));
         self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
         debug!(current_sync_tasks=%self.current_sync_tasks, "Added new Sync Task");
@@ -560,14 +547,6 @@ impl SyncTask {
                                     metrics_updater::highest_complete_indexed_slot(
                                         block.slot_or_default(),
                                     );
-                                });
-
-                                self.pending_blocks.send_modify(|blocks| {
-                                    if !blocks.remove(&finished.end.slot_or_default()) {
-                                        error!(chain=%self.cfg.chain, end=?finished.end,
-                                            "The immutable follower completed successfully, but its end point isn't present in index_sync_channel"
-                                        );
-                                    }
                                 });
 
                                 // If we need more immutable chain followers to sync the block
