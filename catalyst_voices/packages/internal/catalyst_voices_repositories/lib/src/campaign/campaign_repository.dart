@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
-// ignore: one_member_abstracts
+/// Allows access to campaign data, categories, and timeline.
 abstract interface class CampaignRepository {
   const factory CampaignRepository() = CampaignRepositoryImpl;
 

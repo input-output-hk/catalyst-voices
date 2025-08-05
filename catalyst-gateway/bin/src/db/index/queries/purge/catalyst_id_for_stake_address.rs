@@ -1,4 +1,4 @@
-//! Catalyst ID For Stake Address (RBAC 509 registrations) Queries used in purging data.
+//! Catalyst ID For Stake Address (RBAC 509 registrations) queries used in purging data.
 
 use std::{fmt::Debug, sync::Arc};
 
@@ -18,18 +18,17 @@ use crate::{
             },
             session::CassandraSession,
         },
-        types::DbStakeAddress,
+        types::{DbSlot, DbStakeAddress, DbTxnIndex},
     },
     settings::cassandra_db,
 };
 
 pub(crate) mod result {
     //! Return values for Catalyst ID For Stake Address registration purge queries.
-
-    use crate::db::types::{DbSlot, DbStakeAddress};
+    use crate::db::types::{DbSlot, DbStakeAddress, DbTxnIndex};
 
     /// Primary Key Row
-    pub(crate) type PrimaryKey = (DbStakeAddress, DbSlot);
+    pub(crate) type PrimaryKey = (DbStakeAddress, DbSlot, DbTxnIndex);
 }
 
 /// Select primary keys for Catalyst ID For Stake Address registration.
@@ -40,12 +39,18 @@ const SELECT_QUERY: &str = include_str!("cql/get_catalyst_id_for_stake_address.c
 pub(crate) struct Params {
     /// A stake address.
     pub(crate) stake_address: DbStakeAddress,
+    /// A lost number.
+    pub(crate) slot_no: DbSlot,
+    /// A transaction index.
+    pub(crate) txn_index: DbTxnIndex,
 }
 
 impl Debug for Params {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Params")
             .field("stake_address", &self.stake_address.to_string())
+            .field("slot_no", &self.slot_no)
+            .field("txn_index", &self.txn_index)
             .finish()
     }
 }
@@ -54,6 +59,8 @@ impl From<result::PrimaryKey> for Params {
     fn from(value: result::PrimaryKey) -> Self {
         Self {
             stake_address: value.0,
+            slot_no: value.1,
+            txn_index: value.2,
         }
     }
 }
@@ -70,11 +77,11 @@ impl PrimaryKeyQuery {
             scylla::statement::Consistency::All,
             true,
         )
-        .await
-        .inspect_err(
-            |error| error!(error=%error, "Failed to prepare get Catalyst ID For Stake Address registration primary key query."),
-        )
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{SELECT_QUERY}"))
+            .await
+            .inspect_err(
+                |error| error!(error=%error, "Failed to prepare get Catalyst ID For Stake Address registration primary key query."),
+            )
+            .map_err(|error| anyhow::anyhow!("{error}\n--\n{SELECT_QUERY}"))
     }
 
     /// Executes a query to get all Catalyst ID For Stake Address registration primary
@@ -110,11 +117,11 @@ impl DeleteQuery {
             true,
             false,
         )
-        .await
-        .inspect_err(
-            |error| error!(error=%error, "Failed to prepare delete Catalyst ID For Stake Address registration primary key query."),
-        )
-        .map_err(|error| anyhow::anyhow!("{error}\n--\n{DELETE_QUERY}"))
+            .await
+            .inspect_err(
+                |error| error!(error=%error, "Failed to prepare delete Catalyst ID For Stake Address registration primary key query."),
+            )
+            .map_err(|error| anyhow::anyhow!("{error}\n--\n{DELETE_QUERY}"))
     }
 
     /// Executes a DELETE Query

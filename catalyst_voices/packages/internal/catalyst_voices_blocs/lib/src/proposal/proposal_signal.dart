@@ -1,5 +1,7 @@
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:equatable/equatable.dart';
 
+/// Signal emitted by [ProposalCubit]. Tells the UI that the version of the Proposal has changed.
 final class ChangeVersionSignal extends ProposalSignal {
   final String? to;
 
@@ -11,6 +13,7 @@ final class ChangeVersionSignal extends ProposalSignal {
   List<Object?> get props => [to];
 }
 
+/// Base class for signals emitted by [ProposalCubit].
 sealed class ProposalSignal extends Equatable {
   const ProposalSignal();
 
@@ -18,10 +21,12 @@ sealed class ProposalSignal extends Equatable {
   List<Object?> get props => [];
 }
 
+/// Signal emitted by [ProposalCubit]. Tells the UI that the username has been updated.
 final class UsernameUpdatedSignal extends ProposalSignal {
   const UsernameUpdatedSignal();
 }
 
+/// Signal emitted by [ProposalCubit]. Tells the UI that the user is viewing an older version of the Proposal.
 final class ViewingOlderVersionSignal extends ProposalSignal {
   const ViewingOlderVersionSignal();
 }

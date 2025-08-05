@@ -5,6 +5,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
+/// ProposalService provides proposal-related functionality like: creating and signing proposals,
+/// retrieving proposals data from local storage, which needs to be merged from different document types.
 abstract interface class ProposalService {
   const factory ProposalService(
     ProposalRepository proposalRepository,

@@ -6,6 +6,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+/// Guards admin only routes.
 final class AdminAccessGuard implements RouteGuard {
   const AdminAccessGuard();
 
@@ -20,6 +21,7 @@ final class AdminAccessGuard implements RouteGuard {
   }
 }
 
+/// User related routes restrictions.
 final class UserAccessGuard implements RouteGuard {
   const UserAccessGuard();
 
