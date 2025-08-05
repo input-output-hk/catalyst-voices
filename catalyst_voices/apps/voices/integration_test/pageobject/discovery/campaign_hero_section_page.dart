@@ -12,7 +12,6 @@ class CampaignHeroSection {
   final campaignBriefDescription = const Key('CampaignBriefDescription');
   final viewProposalsButton = const Key('ViewProposalsBtn');
   final unlockBtn = const Key('UnlockButton');
-  final visitorBtn = const Key('VisitorBtn');
   final loadingError = const Key('ErrorIndicator');
   final campaignHeroSectionRoot = const Key('CampaignHeroSection');
 

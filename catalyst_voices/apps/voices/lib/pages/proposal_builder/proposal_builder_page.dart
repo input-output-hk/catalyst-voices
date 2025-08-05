@@ -13,7 +13,7 @@ import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigati
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_validation_snackbar.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/common/account_details_button.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/actions/account_settings_action.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
 import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialog.dart';
 import 'package:catalyst_voices/routes/routes.dart';
@@ -99,7 +99,7 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
             actions: [
               ProposalBuilderBackAction(),
               ProposalBuilderStatusAction(),
-              AccountDetailsButton(),
+              AccountSettingsAction(),
             ],
           ),
           endDrawer: const OpportunitiesDrawer(),
