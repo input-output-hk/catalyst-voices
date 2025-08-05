@@ -8,6 +8,7 @@ pub(crate) mod chain_indexer;
 pub(crate) mod endpoint;
 pub(crate) mod health;
 pub(crate) mod memory;
+pub(crate) mod rbac;
 
 /// Initialize Prometheus metrics.
 ///

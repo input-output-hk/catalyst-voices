@@ -22,6 +22,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
+    metrics,
     settings::cassandra_db::EnvVars,
 };
 
@@ -145,6 +146,7 @@ impl Rbac509InsertQuery {
                 }
             },
             Err(report) => {
+                metrics::rbac::inc_invalid_rbac_reg_count();
                 self.invalid.push(insert_rbac509_invalid::Params::new(
                     catalyst_id,
                     txn_hash,
