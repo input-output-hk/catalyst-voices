@@ -28,8 +28,8 @@ pub(crate) mod reporter {
     pub(crate) static INVALID_RBAC_REGISTRATION_COUNT: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
-                "indexing_synchronization_count",
-                "Number of RBAC indexing synchronizations",
+                "invalid_rbac_registration_count",
+                "Number of Invalid RBAC registrations found during indexing",
                 &METRIC_LABELS
             )
             .unwrap()
