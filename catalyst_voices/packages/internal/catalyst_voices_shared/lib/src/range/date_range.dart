@@ -1,8 +1,12 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
+/// A [from] - [to] date range, inclusive on both sides.
 class DateRange extends Equatable {
+  /// The from date, inclusive. Null if not limited.
   final DateTime? from;
+
+  /// The to date, inclusive. Null if not limited.
   final DateTime? to;
 
   const DateRange({

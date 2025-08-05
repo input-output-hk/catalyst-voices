@@ -6,6 +6,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:flutter/material.dart';
 
+/// Main app widget. Builds globally accessible [Bloc]s via [MultiBlocProvider].
 final class App extends StatefulWidget {
   final RouterConfig<Object> routerConfig;
 

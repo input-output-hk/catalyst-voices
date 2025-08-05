@@ -12,6 +12,10 @@ import 'package:flutter/foundation.dart';
 
 final _logger = Logger('ProposalBloc');
 
+/// Manages data for the proposal viewer screen
+///
+/// This Cubit has [ProposalCubitCache] to store the data which allows to reduce
+/// the number of calls to the services.
 final class ProposalCubit extends Cubit<ProposalState>
     with
         DocumentToSegmentMixin,

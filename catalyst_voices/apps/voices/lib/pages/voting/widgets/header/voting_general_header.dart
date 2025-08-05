@@ -63,7 +63,7 @@ class _CatalystFund extends StatelessWidget {
       builder: (context, fundNumber) {
         final theme = Theme.of(context);
         return Text(
-          context.l10n.catalystFundNo(fundNumber?.toString() ?? ''),
+          context.l10n.catalystFundNo(fundNumber ?? 14),
           style: theme.textTheme.displaySmall?.copyWith(
             color: theme.colorScheme.primary,
           ),

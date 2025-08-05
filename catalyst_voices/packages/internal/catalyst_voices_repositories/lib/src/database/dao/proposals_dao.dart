@@ -25,11 +25,18 @@ import 'package:rxdart/rxdart.dart';
     DocumentsFavorites,
   ],
 )
+
+/// Exposes only public operation on proposals, and related tables.
+/// This is a wrapper around [DocumentsDao] and [DraftsDao] to provide a single interface for proposals.
+/// Since proposals are composed of multiple documents (template, action, comments, etc.) we need to
+/// join multiple tables to get all the information about a proposal, which make sense to create this specialized dao.
 class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     with $DriftProposalsDaoMixin
     implements ProposalsDao {
   DriftProposalsDao(super.attachedDatabase);
 
+  // TODO(dt-iohk): it seems that this method doesn't correctly filter by ProposalsFilterType.my
+  // since it does not check for author, consider to use another type which doesn't have "my" case.
   @override
   Future<List<JoinedProposalEntity>> queryProposals({
     SignedDocumentRef? categoryRef,
@@ -182,7 +189,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       );
     }
 
-    if ((filters.onlyAuthor ?? false) || filters.type == ProposalsFilterType.my) {
+    if ((filters.onlyAuthor ?? false) || filters.type.isMy) {
       if (author != null) {
         mainQuery.where(proposal.metadata.isAuthor(author));
       } else {
@@ -378,8 +385,14 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         return _includeFinalProposalsFilter();
       case ProposalsFilterType.favorites:
         return _includeFavoriteRefsExcludingHiddenProposalsFilter();
+      case ProposalsFilterType.favoritesFinals:
+        return _includeFinalFavoriteRefsProposalsFilter();
       case ProposalsFilterType.my:
         return _excludeHiddenProposalsFilter();
+      case ProposalsFilterType.myFinals:
+        return _includeFinalProposalsFilter();
+      case ProposalsFilterType.voted:
+        return _includeVotedRefsExcludingHiddenProposalsFilter();
     }
   }
 
@@ -540,6 +553,11 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }).get();
   }
 
+  Future<List<SignedDocumentRef>> _getVotedRefs() async {
+    // TODO(dt-iohk): query refs of voted proposals
+    return [];
+  }
+
   Future<_IdsFilter> _includeFavoriteRefsExcludingHiddenProposalsFilter() {
     return _getFavoritesRefs().then((favoriteRefs) {
       return _getProposalsLatestAction().then((actions) async {
@@ -554,6 +572,17 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }).then(_IdsFilter.include);
   }
 
+  Future<_IdsFilter> _includeFinalFavoriteRefsProposalsFilter() {
+    return _getFavoritesRefs().then((favoriteRefs) {
+      return _getProposalsLatestAction().then((actions) async {
+        final finalProposalIds =
+            actions.where((e) => e.action.isFinal).map((e) => e.proposalRef.id);
+
+        return favoriteRefs.map((e) => e.id).where(finalProposalIds.contains).map(UuidHiLo.from);
+      });
+    }).then(_IdsFilter.include);
+  }
+
   Future<_IdsFilter> _includeFinalProposalsFilter() {
     return _getProposalsLatestAction().then(
       (value) {
@@ -563,6 +592,17 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
             .map(UuidHiLo.from);
       },
     ).then(_IdsFilter.include);
+  }
+
+  Future<_IdsFilter> _includeVotedRefsExcludingHiddenProposalsFilter() {
+    return _getVotedRefs().then((votedRefs) {
+      return _getProposalsLatestAction().then((actions) async {
+        final hiddenProposalsIds =
+            actions.where((e) => e.action.isHidden).map((e) => e.proposalRef.id);
+
+        return votedRefs.map((e) => e.id).whereNot(hiddenProposalsIds.contains).map(UuidHiLo.from);
+      });
+    }).then(_IdsFilter.include);
   }
 
   Future<List<SignedDocumentRef>> _maybeGetAuthorProposalsLooseRefs({
@@ -611,23 +651,28 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
           latestActions.where((element) => element.action.isFinal).map((e) => e.proposalRef);
 
       final favoritesRefs = await _getFavoritesRefs();
+      final votedRefs = await _getVotedRefs();
       final myRefs = await _maybeGetAuthorProposalsLooseRefs(author: author);
 
       final notHidden = allRefs.where((ref) => hiddenRefs.none((myRef) => myRef.id == ref.id));
 
-      final total = notHidden.length;
-      final finals = notHidden.where((ref) => finalsRefs.any((myRef) => myRef.id == ref.id)).length;
-      final drafts = total - finals;
-      final favorites =
-          notHidden.where((ref) => favoritesRefs.any((fav) => fav.id == ref.id)).length;
-      final my = notHidden.where((ref) => myRefs.any((myRef) => myRef.id == ref.id)).length;
+      final total = notHidden;
+      final finals = notHidden.where((ref) => finalsRefs.any((myRef) => myRef.id == ref.id));
+      final favorites = notHidden.where((ref) => favoritesRefs.any((fav) => fav.id == ref.id));
+      final favoritesFinals = finals.where((ref) => favoritesRefs.any((fav) => fav.id == ref.id));
+      final my = notHidden.where((ref) => myRefs.any((myRef) => myRef.id == ref.id));
+      final myFinals = my.where((ref) => finalsRefs.any((myRef) => myRef.id == ref.id));
+      final votedOn = notHidden.where((ref) => votedRefs.any((voted) => voted.id == ref.id));
 
       yield ProposalsCount(
-        total: total,
-        drafts: drafts,
-        finals: finals,
-        favorites: favorites,
-        my: my,
+        total: total.length,
+        drafts: total.length - finals.length,
+        finals: finals.length,
+        favorites: favorites.length,
+        favoritesFinals: favoritesFinals.length,
+        my: my.length,
+        myFinals: myFinals.length,
+        voted: votedOn.length,
       );
     }
   }

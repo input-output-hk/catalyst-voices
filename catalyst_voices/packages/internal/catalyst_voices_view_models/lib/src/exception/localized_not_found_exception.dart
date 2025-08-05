@@ -2,6 +2,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
 
+/// Exception thrown when a resource is not found.
 final class LocalizedNotFoundException extends LocalizedException {
   const LocalizedNotFoundException();
 

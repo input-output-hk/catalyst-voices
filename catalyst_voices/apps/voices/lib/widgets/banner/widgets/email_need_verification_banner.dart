@@ -10,7 +10,7 @@ class EmailNeedVerificationBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSelector<PublicProfileEmailStatusCubit, PublicProfileEmailStatusState, bool>(
       selector: (state) {
-        return state.isVisible && !state.isEmailVerified;
+        return state.isVisible && !state.isEmailVerified && state.isUnlock;
       },
       builder: (context, shouldShowBanner) {
         if (!shouldShowBanner) {

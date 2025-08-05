@@ -73,7 +73,7 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      context.l10n.catalystFundNo(fundNumber.toString()),
+      context.l10n.catalystFundNo(fundNumber),
       style: context.textTheme.displaySmall?.copyWith(
         color: context.colorScheme.primary,
       ),

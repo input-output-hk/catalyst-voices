@@ -15,12 +15,12 @@ import 'package:flutter/material.dart';
 
 class VotingPage extends StatefulWidget {
   final SignedDocumentRef? categoryId;
-  final ProposalsFilterType? type;
+  final VotingPageTab? tab;
 
   const VotingPage({
     super.key,
     this.categoryId,
-    this.type,
+    this.tab,
   });
 
   @override
@@ -45,13 +45,19 @@ class _VotingPageState extends State<VotingPage>
           content: PreVotingContent(phase: phase, fundNumber: fundNumber),
           background: const VotingBackground(),
         ),
-        active: (_, __, ___) => const HeaderAndContentLayout(
-          header: VotingHeader(),
-          content: VotingContent(),
+        active: (_, __, ___) => HeaderAndContentLayout(
+          header: const VotingHeader(),
+          content: VotingContent(
+            tabController: _tabController,
+            pagingController: _pagingController,
+          ),
         ),
-        post: (_, __, ___) => const HeaderAndContentLayout(
-          header: VotingHeader(),
-          content: Text('Post'),
+        post: (_, __, ___) => HeaderAndContentLayout(
+          header: const VotingHeader(),
+          content: VotingContent(
+            tabController: _tabController,
+            pagingController: _pagingController,
+          ),
         ),
       ),
     );
@@ -61,18 +67,20 @@ class _VotingPageState extends State<VotingPage>
   void didUpdateWidget(VotingPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.categoryId != oldWidget.categoryId || widget.type != oldWidget.type) {
+    final tab = widget.tab ?? VotingPageTab.total;
+
+    if (widget.categoryId != oldWidget.categoryId || widget.tab != oldWidget.tab) {
       context.read<VotingCubit>().changeFilters(
-            onlyMy: Optional(widget.type?.isMy ?? false),
+            onlyMy: Optional(tab == VotingPageTab.my),
             category: Optional(widget.categoryId),
-            type: widget.type ?? ProposalsFilterType.total,
+            type: tab.filter,
           );
 
       _doResetPagination();
     }
 
-    if (widget.type != oldWidget.type) {
-      _tabController.animateTo(widget.type?.index ?? 0);
+    if (widget.tab != oldWidget.tab) {
+      _tabController.animateTo(tab.index);
     }
   }
 
@@ -88,8 +96,8 @@ class _VotingPageState extends State<VotingPage>
     switch (signal) {
       case ChangeCategoryVotingSignal(:final to):
         _updateRoute(categoryId: Optional(to?.id));
-      case ChangeFilterTypeVotingSignal(:final type):
-        _updateRoute(filterType: type);
+      case ChangeTabVotingSignal(:final tab):
+        _updateRoute(tab: tab);
       case ResetPaginationVotingSignal():
         _doResetPagination();
       case PageReadyVotingSignal(:final page):
@@ -107,11 +115,11 @@ class _VotingPageState extends State<VotingPage>
   void initState() {
     super.initState();
 
-    final proposalsFilterType = _determineFilterType();
+    final tab = _determineTab();
 
     _tabController = TabController(
-      initialIndex: proposalsFilterType.index,
-      length: ProposalsFilterType.values.length,
+      initialIndex: tab.index,
+      length: VotingPageTab.values.length,
       vsync: this,
     );
 
@@ -121,10 +129,9 @@ class _VotingPageState extends State<VotingPage>
     );
 
     context.read<VotingCubit>().init(
-          onlyMyProposals: widget.type?.isMy ?? false,
+          onlyMyProposals: tab == VotingPageTab.my,
           category: widget.categoryId,
-          type: proposalsFilterType,
-          order: const Alphabetical(),
+          type: tab.filter,
         );
 
     _pagingController
@@ -132,15 +139,16 @@ class _VotingPageState extends State<VotingPage>
       ..notifyPageRequestListeners(0);
   }
 
-  ProposalsFilterType _determineFilterType() {
+  VotingPageTab _determineTab() {
     final isProposerUnlock = context.read<SessionCubit>().state.isProposerUnlock;
-    final requestedType = widget.type;
+    final requestedTab = widget.tab ?? VotingPageTab.total;
 
-    if (!isProposerUnlock && (requestedType?.isMy ?? false)) {
-      _updateRoute(filterType: ProposalsFilterType.total);
+    if (!isProposerUnlock && requestedTab == VotingPageTab.my) {
+      _updateRoute(tab: VotingPageTab.total);
+      return VotingPageTab.total;
     }
 
-    return requestedType ?? ProposalsFilterType.total;
+    return requestedTab;
   }
 
   void _doResetPagination() {
@@ -158,15 +166,15 @@ class _VotingPageState extends State<VotingPage>
 
   void _updateRoute({
     Optional<String>? categoryId,
-    ProposalsFilterType? filterType,
+    VotingPageTab? tab,
   }) {
     Router.neglect(context, () {
       final effectiveCategoryId = categoryId.dataOr(widget.categoryId?.id);
-      final effectiveType = filterType?.name ?? widget.type?.name;
+      final effectiveTab = tab?.name ?? widget.tab?.name;
 
       VotingRoute(
         categoryId: effectiveCategoryId,
-        type: effectiveType,
+        tab: effectiveTab,
       ).replace(context);
     });
   }

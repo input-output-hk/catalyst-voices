@@ -12,6 +12,11 @@ const _recentProposalsMaxAge = Duration(hours: 72);
 final _logger = Logger('ProposalsCubit');
 
 /// Manages the proposals.
+///
+/// This cubit has [ProposalsCubitCache] to store the data which allows to reduce
+/// the number of calls to the services.
+///
+/// Allows to get paginated proposals based on the filters and order.
 final class ProposalsCubit extends Cubit<ProposalsState>
     with BlocErrorEmitterMixin, BlocSignalEmitterMixin<ProposalsSignal, ProposalsState> {
   final UserService _userService;
@@ -36,7 +41,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
         .distinct()
         .listen(_handleActiveAccountIdChange);
 
-    _favoritesProposalsIdsSub = _favoritesProposalsIdsSub = _proposalService
+    _favoritesProposalsIdsSub = _proposalService
         .watchFavoritesProposalsIds()
         .distinct(listEquals)
         .listen(_handleFavoriteProposalsIds);
@@ -175,7 +180,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
     emit(state.copyWith(favoritesIds: favoritesIds));
 
-    if (!isFavorite && _cache.filters.type == ProposalsFilterType.favorites) {
+    if (!isFavorite && _cache.filters.type.isFavorite) {
       final page = _cache.page;
       if (page != null) {
         final proposals = List.of(page.items).where((element) => element.selfRef != ref).toList();

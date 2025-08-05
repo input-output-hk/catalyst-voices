@@ -49,6 +49,12 @@ global: {
 				version: "latest"
 			}
 		}
+		retries: {
+			attempts: 2
+			filters: [
+				"buildkitd did not respond",
+			]
+		}
 		secrets: [
 			{
 				name:     "GITHUB_TOKEN"

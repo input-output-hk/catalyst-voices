@@ -5,17 +5,19 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
+/// Creates dummy catalystId, useful for fast, dev-mode sign in or tests.
 final class DummyCatalystIdFactory {
   DummyCatalystIdFactory._();
 
   static CatalystId create({
     CatalystIdHost host = CatalystIdHost.cardano,
+    Uint8List? role0KeyBytes,
     String? username = 'Dummy',
     AccountRole? role,
     int? nonce,
   }) {
     /* cSpell:disable */
-    final role0KeyBytes = base64UrlNoPadDecode('FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE');
+    role0KeyBytes ??= base64UrlNoPadDecode('FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE');
     /* cSpell:enable */
 
     final role0Key = _DummyCatalystPublicKeyFactory().create(role0KeyBytes);

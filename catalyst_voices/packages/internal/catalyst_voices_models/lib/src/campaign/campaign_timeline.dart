@@ -1,7 +1,10 @@
-import 'package:catalyst_voices_models/src/campaign/campaign_phase.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
+/// Representation of campaign timeline.
+///
+/// Defines timeline of different stages for [Campaign].
 final class CampaignTimeline extends Equatable {
   final List<CampaignPhase> phases;
 
