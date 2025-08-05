@@ -86,23 +86,23 @@ class ProposalsPage {
 
   Future<void> proposalsTabsLookAsExpected() async {
     expect(
-      $(allProposalsTab).$(Text).text?.startsWith((await t()).noOfAll(0).split('(')[0]),
+      $(allProposalsTab).$(Text).text?.startsWith((await t()).noOfAll(0).split('·')[0]),
       true,
     );
     expect(
-      $(draftProposalsTab).$(Text).text?.startsWith((await t()).noOfDraft(0).split('(')[0]),
+      $(draftProposalsTab).$(Text).text?.startsWith((await t()).noOfDraft(0).split('·')[0]),
       true,
     );
     expect(
-      $(finalProposalsTab).$(Text).text?.startsWith((await t()).noOfFinal(0).split('(')[0]),
+      $(finalProposalsTab).$(Text).text?.startsWith((await t()).noOfFinal(0).split('·')[0]),
       true,
     );
     expect(
-      $(favoriteProposalsTab).$(Text).text?.startsWith((await t()).noOfFavorites(0).split('(')[0]),
+      $(favoriteProposalsTab).$(Text).text?.startsWith((await t()).noOfFavorites(0).split('·')[0]),
       true,
     );
     expect(
-      $(myProposalsTab).$(Text).text?.startsWith((await t()).noOfMyProposals(0).split('(')[0]),
+      $(myProposalsTab).$(Text).text?.startsWith((await t()).noOfMyProposals(0).split('·')[0]),
       true,
     );
   }

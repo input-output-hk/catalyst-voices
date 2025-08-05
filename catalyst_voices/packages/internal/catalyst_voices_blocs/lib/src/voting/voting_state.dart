@@ -13,8 +13,6 @@ class VotingState extends Equatable {
   final List<String> favoritesIds;
   final ProposalsCount count;
   final List<ProposalsCategorySelectorItem> categorySelectorItems;
-  final List<ProposalsDropdownOrderItem> orderItems;
-  final bool isOrderEnabled;
 
   const VotingState({
     this.selectedCategory,
@@ -25,13 +23,7 @@ class VotingState extends Equatable {
     this.favoritesIds = const [],
     this.count = const ProposalsCount(),
     this.categorySelectorItems = const [],
-    this.orderItems = const [],
-    this.isOrderEnabled = false,
   });
-
-  VotingStateOrderDropdown get orderDropdown {
-    return VotingStateOrderDropdown._(items: orderItems, isEnabled: isOrderEnabled);
-  }
 
   @override
   List<Object?> get props => [
@@ -43,8 +35,6 @@ class VotingState extends Equatable {
         favoritesIds,
         count,
         categorySelectorItems,
-        orderItems,
-        isOrderEnabled,
       ];
 
   SignedDocumentRef? get selectedCategoryId {
@@ -60,8 +50,6 @@ class VotingState extends Equatable {
     List<String>? favoritesIds,
     ProposalsCount? count,
     List<ProposalsCategorySelectorItem>? categorySelectorItems,
-    List<ProposalsDropdownOrderItem>? orderItems,
-    bool? isOrderEnabled,
   }) {
     return VotingState(
       selectedCategory: selectedCategory.dataOr(this.selectedCategory),
@@ -72,8 +60,6 @@ class VotingState extends Equatable {
       favoritesIds: favoritesIds ?? this.favoritesIds,
       count: count ?? this.count,
       categorySelectorItems: categorySelectorItems ?? this.categorySelectorItems,
-      orderItems: orderItems ?? this.orderItems,
-      isOrderEnabled: isOrderEnabled ?? this.isOrderEnabled,
     );
   }
 

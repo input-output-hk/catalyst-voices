@@ -36,7 +36,7 @@ final class VotingCubit extends Cubit<VotingState>
         .distinct()
         .listen(_handleActiveAccountIdChange);
 
-    _favoritesProposalsIdsSub = _favoritesProposalsIdsSub = _proposalService
+    _favoritesProposalsIdsSub = _proposalService
         .watchFavoritesProposalsIds()
         .distinct(listEquals)
         .listen(_handleFavoriteProposalsIds);
@@ -72,22 +72,6 @@ final class VotingCubit extends Cubit<VotingState>
     }
   }
 
-  void changeOrder(
-    ProposalsOrder? order, {
-    bool resetProposals = false,
-  }) {
-    if (_cache.selectedOrder == order) {
-      return;
-    }
-
-    _cache = _cache.copyWith(selectedOrder: Optional(order));
-    _dispatchState();
-
-    if (resetProposals) {
-      emitSignal(const ResetPaginationVotingSignal());
-    }
-  }
-
   void changeSelectedCategory(SignedDocumentRef? categoryId) {
     emitSignal(ChangeCategoryVotingSignal(to: categoryId));
   }
@@ -114,15 +98,13 @@ final class VotingCubit extends Cubit<VotingState>
       }
 
       final filters = _cache.filters;
-      final selectedOrder = _cache.selectedOrder;
-      final effectiveOrder = _resolveEffectiveOrder(filters.type, selectedOrder);
 
-      _logger.finer('Proposals request[$request], filters[$filters], order[$effectiveOrder]');
+      _logger.finer('Proposals request[$request], filters[$filters]');
 
       final page = await _proposalService.getProposalsPage(
         request: request,
         filters: filters,
-        order: effectiveOrder,
+        order: const Alphabetical(),
       );
 
       _cache = _cache.copyWith(page: Optional(page));
@@ -136,14 +118,17 @@ final class VotingCubit extends Cubit<VotingState>
     required bool onlyMyProposals,
     required SignedDocumentRef? category,
     required ProposalsFilterType type,
-    required ProposalsOrder order,
   }) {
     _resetCache();
     unawaited(_loadCampaign());
     unawaited(_loadVotingPower());
+    unawaited(_loadFavoriteProposals());
 
-    changeFilters(onlyMy: Optional(onlyMyProposals), category: Optional(category), type: type);
-    changeOrder(order);
+    changeFilters(
+      onlyMy: Optional(onlyMyProposals),
+      category: Optional(category),
+      type: type,
+    );
   }
 
   /// Changes the favorite status of the proposal with [ref].
@@ -162,7 +147,7 @@ final class VotingCubit extends Cubit<VotingState>
     _cache = _cache.copyWith(favoriteIds: Optional(favoritesIds));
     _dispatchState();
 
-    if (!isFavorite && _cache.filters.type == ProposalsFilterType.favorites) {
+    if (!isFavorite && _cache.filters.type.isFavorite) {
       final page = _cache.page;
       if (page != null) {
         final proposals = List.of(page.items).where((element) => element.selfRef != ref).toList();
@@ -198,27 +183,6 @@ final class VotingCubit extends Cubit<VotingState>
     }).toList();
   }
 
-  List<ProposalsDropdownOrderItem> _buildOrderItems(
-    ProposalsFilterType filterType,
-    ProposalsOrder? selectedOrder,
-  ) {
-    final effectiveOrder = _resolveEffectiveOrder(filterType, selectedOrder);
-
-    final options = filterType == ProposalsFilterType.total
-        ? const [
-            Alphabetical(),
-            Budget(isAscending: false),
-            Budget(isAscending: true),
-          ]
-        : const [
-            UpdateDate(isAscending: false),
-          ];
-
-    return options
-        .map((order) => ProposalsDropdownOrderItem(order, isSelected: order == effectiveOrder))
-        .toList();
-  }
-
   VotingPhaseProgressViewModel? _buildVotingPhase(Campaign? campaign) {
     final campaignVotingPhase = campaign?.phaseStateTo(CampaignPhaseType.communityVoting);
     final campaignStartDate = campaign?.startDate;
@@ -243,12 +207,18 @@ final class VotingCubit extends Cubit<VotingState>
   void _emitCachedProposalsPage() {
     final campaign = _cache.campaign;
     final page = _cache.page;
+    final favoriteIds = _cache.favoriteIds ?? [];
 
     if (campaign == null || page == null) {
       return;
     }
 
-    final mappedPage = page.map(ProposalBrief.fromProposal);
+    final mappedPage = page.map(
+      (proposal) => ProposalBrief.fromProposal(
+        proposal,
+        isFavorite: favoriteIds.contains(proposal.selfRef.id),
+      ),
+    );
     final signal = PageReadyVotingSignal(page: mappedPage);
 
     emitSignal(signal);
@@ -260,6 +230,7 @@ final class VotingCubit extends Cubit<VotingState>
 
   void _handleFavoriteProposalsIds(List<String> ids) {
     _cache = _cache.copyWith(favoriteIds: Optional(ids));
+    _emitCachedProposalsPage();
     _dispatchState();
   }
 
@@ -274,6 +245,13 @@ final class VotingCubit extends Cubit<VotingState>
 
     if (!isClosed) {
       _dispatchState();
+    }
+  }
+
+  Future<void> _loadFavoriteProposals() async {
+    final favorites = await _proposalService.getFavoritesProposalsIds();
+    if (!isClosed) {
+      _handleFavoriteProposalsIds(favorites);
     }
   }
 
@@ -311,10 +289,8 @@ final class VotingCubit extends Cubit<VotingState>
         ? VotingPowerViewModel.fromModel(votingPower)
         : const VotingPowerViewModel();
     final votingPhaseViewModel = _buildVotingPhase(campaign);
-    final hasSearchQuery = filters.searchQuery == null;
+    final hasSearchQuery = filters.searchQuery != null;
     final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategoryRef);
-    final orderItems = _buildOrderItems(_cache.filters.type, _cache.selectedOrder);
-    final isOrderEnabled = _cache.filters.type == ProposalsFilterType.total;
 
     return state.copyWith(
       selectedCategory: Optional(selectedCategoryViewModel),
@@ -325,8 +301,6 @@ final class VotingCubit extends Cubit<VotingState>
       favoritesIds: favoriteIds,
       count: count,
       categorySelectorItems: categorySelectorItems,
-      orderItems: orderItems,
-      isOrderEnabled: isOrderEnabled,
     );
   }
 
@@ -334,18 +308,6 @@ final class VotingCubit extends Cubit<VotingState>
     final activeAccount = _userService.user.activeAccount;
     final filters = ProposalsFilters(author: activeAccount?.catalystId);
     _cache = VotingCubitCache(filters: filters);
-  }
-
-  ProposalsOrder _resolveEffectiveOrder(
-    ProposalsFilterType filterType,
-    ProposalsOrder? selectedOrder,
-  ) {
-    // skip order for non total
-    if (filterType != ProposalsFilterType.total) {
-      return const UpdateDate(isAscending: false);
-    }
-
-    return selectedOrder ?? const Alphabetical();
   }
 
   Future<void> _updateFavoriteProposal(

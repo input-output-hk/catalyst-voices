@@ -16,6 +16,8 @@ class ProposalBriefCard extends StatefulWidget {
   final bool isFavorite;
   final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
+  final VoteButtonData? voteData;
+  final ValueChanged<VoteButtonAction>? onVoteAction;
 
   const ProposalBriefCard({
     super.key,
@@ -23,10 +25,12 @@ class ProposalBriefCard extends StatefulWidget {
     this.isFavorite = false,
     this.onTap,
     this.onFavoriteChanged,
+    this.voteData,
+    this.onVoteAction,
   });
 
   @override
-  State<ProposalBriefCard> createState() => _PendingProposalCardState();
+  State<ProposalBriefCard> createState() => _ProposalBriefCardState();
 }
 
 class _Author extends StatelessWidget {
@@ -42,7 +46,12 @@ class _Author extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         mainAxisSize: MainAxisSize.min,
+        spacing: 8,
         children: [
+          ProfileAvatar(
+            size: 32,
+            username: author,
+          ),
           UsernameText(
             key: const Key('Author'),
             author,
@@ -133,84 +142,6 @@ class _FundsAndDuration extends StatelessWidget {
   }
 }
 
-class _PendingProposalCardState extends State<ProposalBriefCard> {
-  late final WidgetStatesController _statesController;
-
-  @override
-  Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(
-        minHeight: 454,
-        maxHeight: 454,
-        maxWidth: 326,
-      ),
-      child: Material(
-        key: const Key('ProposalCard'),
-        color: context.colors.elevationsOnSurfaceNeutralLv1White,
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          statesController: _statesController,
-          onTap: widget.onTap,
-          highlightColor: Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          child: ProposalBorder(
-            publish: widget.proposal.publish,
-            statesController: _statesController,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _Topbar(
-                    proposalRef: widget.proposal.selfRef,
-                    isFavorite: widget.isFavorite,
-                    onFavoriteChanged: widget.onFavoriteChanged,
-                  ),
-                  _Category(
-                    category: widget.proposal.categoryName,
-                  ),
-                  const SizedBox(height: 4),
-                  Expanded(
-                    child: _Title(text: widget.proposal.title),
-                  ),
-                  _Author(author: widget.proposal.author),
-                  _FundsAndDuration(
-                    funds: widget.proposal.formattedFunds,
-                    duration: widget.proposal.duration,
-                  ),
-                  const SizedBox(height: 12),
-                  Expanded(
-                    child: _Description(text: widget.proposal.description),
-                  ),
-                  const SizedBox(height: 12),
-                  _ProposalInfo(
-                    publish: widget.proposal.publish,
-                    version: widget.proposal.versionNumber,
-                    updateDate: widget.proposal.updateDate,
-                    commentsCount: widget.proposal.commentsCount,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _statesController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _statesController = WidgetStatesController();
-  }
-}
-
 class _PropertyValue extends StatelessWidget {
   final String title;
   final String formattedValue;
@@ -243,6 +174,95 @@ class _PropertyValue extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class _ProposalBriefCardState extends State<ProposalBriefCard> {
+  late final WidgetStatesController _statesController;
+
+  @override
+  Widget build(BuildContext context) {
+    final voteData = widget.voteData;
+    final onVoteAction = widget.onVoteAction;
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        minHeight: 454,
+        maxHeight: 454,
+        maxWidth: 326,
+      ),
+      child: Material(
+        key: const Key('ProposalCard'),
+        color: context.colors.elevationsOnSurfaceNeutralLv1White,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          statesController: _statesController,
+          onTap: widget.onTap,
+          highlightColor: Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          child: ProposalBorder(
+            publish: widget.proposal.publish,
+            statesController: _statesController,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _Topbar(
+                    proposalRef: widget.proposal.selfRef,
+                    isFavorite: widget.isFavorite,
+                    onFavoriteChanged: widget.onFavoriteChanged,
+                  ),
+                  const SizedBox(height: 2),
+                  _Category(
+                    category: widget.proposal.categoryName,
+                  ),
+                  const SizedBox(height: 4),
+                  Expanded(
+                    child: _Title(text: widget.proposal.title),
+                  ),
+                  _Author(author: widget.proposal.author),
+                  _FundsAndDuration(
+                    funds: widget.proposal.formattedFunds,
+                    duration: widget.proposal.duration,
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: _Description(text: widget.proposal.description),
+                  ),
+                  const SizedBox(height: 12),
+                  _ProposalInfo(
+                    publish: widget.proposal.publish,
+                    version: widget.proposal.versionNumber,
+                    updateDate: widget.proposal.updateDate,
+                    commentsCount: widget.proposal.commentsCount,
+                  ),
+                  if (voteData != null && onVoteAction != null) ...[
+                    const SizedBox(height: 12),
+                    VoteButton(
+                      data: voteData,
+                      onSelected: onVoteAction,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _statesController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _statesController = WidgetStatesController();
   }
 }
 
