@@ -10,19 +10,19 @@ use crate::db::event::common::eq_or_ranged_uuid::EqOrRangedUuid;
 #[derive(Clone, Debug, Default)]
 pub(crate) struct DocsQueryFilter {
     /// `type` field
-    doc_type: Option<Vec<uuid::Uuid>>,
+    doc_type: Vec<uuid::Uuid>,
     /// `id` field
     id: Option<EqOrRangedUuid>,
     /// `ver` field
     ver: Option<EqOrRangedUuid>,
     /// `metadata->'ref'` field
-    doc_ref: Option<Vec<DocumentRef>>,
+    doc_ref: Vec<DocumentRef>,
     /// `metadata->'template'` field
-    template: Option<Vec<DocumentRef>>,
+    template: Vec<DocumentRef>,
     /// `metadata->'reply'` field
-    reply: Option<Vec<DocumentRef>>,
+    reply: Vec<DocumentRef>,
     /// `metadata->'parameters'` field
-    parameters: Option<Vec<DocumentRef>>,
+    parameters: Vec<DocumentRef>,
 }
 
 impl Display for DocsQueryFilter {
@@ -30,18 +30,16 @@ impl Display for DocsQueryFilter {
         use std::fmt::Write;
         let mut query = "TRUE".to_string();
 
-        if let Some(doc_type) = &self.doc_type {
-            if !doc_type.is_empty() {
-                write!(
-                    &mut query,
-                    " AND signed_docs.type IN ({})",
-                    doc_type
-                        .iter()
-                        .map(|uuid| format!("'{uuid}'"))
-                        .collect::<Vec<_>>()
-                        .join(",")
-                )?;
-            }
+        if !self.doc_type.is_empty() {
+            write!(
+                &mut query,
+                " AND signed_docs.type IN ({})",
+                self.doc_type
+                    .iter()
+                    .map(|uuid| format!("'{uuid}'"))
+                    .collect::<Vec<_>>()
+                    .join(",")
+            )?;
         }
 
         if let Some(id) = &self.id {
@@ -62,7 +60,7 @@ impl Display for DocsQueryFilter {
         ];
 
         for (field_name, doc_refs) in doc_ref_queries {
-            if let Some(doc_refs) = doc_refs {
+            if !doc_refs.is_empty() {
                 let stmt = doc_refs
                     .iter()
                     .map(|doc_ref| doc_ref.conditional_stmt(&format!("metadata->'{field_name}'")))
@@ -85,10 +83,7 @@ impl DocsQueryFilter {
 
     /// Set the `type` field filter condition
     pub fn with_type(self, doc_type: Vec<uuid::Uuid>) -> Self {
-        DocsQueryFilter {
-            doc_type: Some(doc_type),
-            ..self
-        }
+        DocsQueryFilter { doc_type, ..self }
     }
 
     /// Set the `id` field filter condition
@@ -109,45 +104,33 @@ impl DocsQueryFilter {
 
     /// Set the `metadata->'ref'` field filter condition
     pub fn with_ref(self, arg: DocumentRef) -> Self {
-        let mut doc_ref = self.doc_ref.unwrap_or_default();
+        let mut doc_ref = self.doc_ref;
         doc_ref.push(arg);
 
-        DocsQueryFilter {
-            doc_ref: Some(doc_ref),
-            ..self
-        }
+        DocsQueryFilter { doc_ref, ..self }
     }
 
     /// Set the `metadata->'template'` field filter condition
     pub fn with_template(self, arg: DocumentRef) -> Self {
-        let mut template = self.template.unwrap_or_default();
+        let mut template = self.template;
         template.push(arg);
 
-        DocsQueryFilter {
-            template: Some(template),
-            ..self
-        }
+        DocsQueryFilter { template, ..self }
     }
 
     /// Set the `metadata->'reply'` field filter condition
     pub fn with_reply(self, arg: DocumentRef) -> Self {
-        let mut reply = self.reply.unwrap_or_default();
+        let mut reply = self.reply;
         reply.push(arg);
 
-        DocsQueryFilter {
-            reply: Some(reply),
-            ..self
-        }
+        DocsQueryFilter { reply, ..self }
     }
 
     /// Set the `metadata->'parameters'` field filter condition
     pub fn with_parameters(self, arg: DocumentRef) -> Self {
-        let mut parameters = self.parameters.unwrap_or_default();
+        let mut parameters = self.parameters;
         parameters.push(arg);
 
-        DocsQueryFilter {
-            parameters: Some(parameters),
-            ..self
-        }
+        DocsQueryFilter { parameters, ..self }
     }
 }
