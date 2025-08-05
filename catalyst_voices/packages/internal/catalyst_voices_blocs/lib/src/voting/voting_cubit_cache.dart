@@ -42,7 +42,7 @@ final class VotingCubitCache extends Equatable {
       page: page.dataOr(this.page),
       filters: filters ?? this.filters,
       count: count ?? this.count,
-      favoriteIds: favoriteIds?.dataOr(this.favoriteIds),
+      favoriteIds: favoriteIds.dataOr(this.favoriteIds),
     );
   }
 }
