@@ -30,7 +30,6 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     on<UpdateVotingPowerEvent>(_updateVotingPower, transformer: uniqueEvents());
     on<UpdateVotingPhaseProgressEvent>(_updateVotingPhaseProgress, transformer: uniqueEvents());
     on<UpdateFundNumberEvent>(_updateFundNumber, transformer: uniqueEvents());
-    on<UpdateFundNumberEvent>(_updateFundNumber, transformer: uniqueEvents());
     on<UpdateFooterFromBallotBuilderEvent>(_updateFooterFromBallot, transformer: uniqueEvents());
     on<UpdateLastCastedVoteEvent>(_updateLastCastedVote, transformer: uniqueEvents());
     on<UpdateVoteTiles>(_updateTiles);
