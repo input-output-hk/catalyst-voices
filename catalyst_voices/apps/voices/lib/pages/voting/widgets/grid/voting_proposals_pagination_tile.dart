@@ -30,6 +30,10 @@ class VotingProposalsPaginationTile extends StatelessWidget {
               isFavorite: isFavorite,
             );
       },
+      voteData: const VoteButtonData(),
+      onVoteAction: (action) {
+        // TODO(dt-iohk): handle the vote action when vote ballot is finished
+      },
     );
   }
 }
