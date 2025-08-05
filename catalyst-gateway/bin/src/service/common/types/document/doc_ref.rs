@@ -16,7 +16,7 @@ use crate::{
     db::event::signed_docs::DocumentRef, service::common::types::array_types::impl_array_types,
 };
 
-#[derive(Object, Debug, PartialEq)]
+#[derive(Object, Debug, Clone, PartialEq)]
 #[oai(example = true)]
 /// A Reference to a Document ID/s and their version/s.
 pub(crate) struct IdRefOnly {
@@ -34,7 +34,7 @@ impl Example for IdRefOnly {
 
 // Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
 // openapi docs on an object.
-#[derive(NewType, Debug, PartialEq)]
+#[derive(NewType, Debug, Clone, PartialEq)]
 #[oai(
     from_multipart = false,
     from_parameter = false,
@@ -55,7 +55,7 @@ impl Example for IdRefOnlyDocumented {
     }
 }
 
-#[derive(Object, Debug, PartialEq)]
+#[derive(Object, Debug, Clone, PartialEq)]
 /// A Reference to a Document ID/s and their version/s.
 pub(crate) struct VerRefWithOptionalId {
     /// Document ID, or range of Document IDs
@@ -86,7 +86,7 @@ impl VerRefWithOptionalId {
 
 // Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
 // openapi docs on an object.
-#[derive(NewType, Debug, PartialEq)]
+#[derive(NewType, Debug, Clone, PartialEq)]
 #[oai(
     from_multipart = false,
     from_parameter = false,
@@ -116,7 +116,7 @@ impl VerRefWithOptionalIdDocumented {
     }
 }
 
-#[derive(Union, Debug, PartialEq)]
+#[derive(Union, Debug, Clone, PartialEq)]
 /// Either a Single Document ID, or a Range of Document IDs
 pub(crate) enum IdAndVerRef {
     /// Document ID Reference ONLY
@@ -145,7 +145,7 @@ impl IdAndVerRef {
 
 // Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
 // openapi docs on an object.
-#[derive(NewType, Debug, PartialEq)]
+#[derive(NewType, Debug, Clone, PartialEq)]
 #[oai(
     from_multipart = false,
     from_parameter = false,

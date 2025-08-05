@@ -1,12 +1,18 @@
 //! Document Index Query V1 endpoint request objects.
 
-use poem_openapi::{types::Example, NewType, Object};
+use poem_openapi::{
+    types::{Example, ToJSON},
+    NewType, Object,
+};
 
 use crate::{
     db::event::signed_docs::DocsQueryFilter,
-    service::common::types::document::{
-        doc_ref::IdAndVerRefDocumented, doc_type::DocumentType, id::EqOrRangedIdDocumented,
-        ver::EqOrRangedVerDocumented,
+    service::common::types::{
+        array_types::impl_array_types,
+        document::{
+            doc_ref::IdAndVerRefDocumented, doc_type::DocumentType, id::EqOrRangedIdDocumented,
+            ver::EqOrRangedVerDocumented,
+        },
     },
 };
 
@@ -26,19 +32,19 @@ pub(crate) struct DocumentIndexQueryFilterV2 {
     ///
     /// UUIDv4 Formatted 128bit value.
     #[oai(rename = "type", skip_serializing_if_is_none)]
-    doc_type: Option<Vec<DocumentType>>,
+    doc_type: Option<DocumentTypeList>,
     /// ## Document ID
     ///
     /// Either an absolute single Document ID or a range of
     /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
     #[oai(skip_serializing_if_is_none)]
-    id: Option<Vec<EqOrRangedIdDocumented>>,
+    id: Option<EqOrRangedIdDocumentedList>,
     /// ## Document Version
     ///
     /// Either an absolute single Document Version or a range of
     /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
     #[oai(skip_serializing_if_is_none)]
-    ver: Option<Vec<EqOrRangedVerDocumented>>,
+    ver: Option<EqOrRangedVerDocumentedList>,
     /// ## Document Reference
     ///
     /// A [reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#ref-document-reference)
@@ -50,7 +56,7 @@ pub(crate) struct DocumentIndexQueryFilterV2 {
     /// The kind of document that the reference refers to is defined by the
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
     #[oai(rename = "ref", skip_serializing_if_is_none)]
-    doc_ref: Option<Vec<IdAndVerRefDocumented>>,
+    doc_ref: Option<IdAndVerRefDocumentedList>,
     /// ## Document Template
     ///
     /// Documents that are created based on a template include the
@@ -65,7 +71,7 @@ pub(crate) struct DocumentIndexQueryFilterV2 {
     /// however, it will always be a template type document that matches the document
     /// itself.
     #[oai(skip_serializing_if_is_none)]
-    template: Option<Vec<IdAndVerRefDocumented>>,
+    template: Option<IdAndVerRefDocumentedList>,
     /// ## Document Reply
     ///
     /// This is a
@@ -80,7 +86,7 @@ pub(crate) struct DocumentIndexQueryFilterV2 {
     /// The kind of document that the reference refers to is defined by the
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
-    reply: Option<Vec<IdAndVerRefDocumented>>,
+    reply: Option<IdAndVerRefDocumentedList>,
     /// ## Brand
     ///
     /// This is a
@@ -94,7 +100,7 @@ pub(crate) struct DocumentIndexQueryFilterV2 {
     /// Whether a Document Type has a brand reference is defined by its
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
-    brand: Option<Vec<IdAndVerRefDocumented>>,
+    brand: Option<IdAndVerRefDocumentedList>,
     /// ## Campaign
     ///
     /// This is a
@@ -108,7 +114,7 @@ pub(crate) struct DocumentIndexQueryFilterV2 {
     /// Whether a Document Type has a campaign reference is defined by its
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
-    campaign: Option<Vec<IdAndVerRefDocumented>>,
+    campaign: Option<IdAndVerRefDocumentedList>,
     /// ## Category
     ///
     /// This is a
@@ -122,20 +128,89 @@ pub(crate) struct DocumentIndexQueryFilterV2 {
     /// Whether a Document Type has a category reference is defined by its
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
-    category: Option<Vec<IdAndVerRefDocumented>>,
+    category: Option<IdAndVerRefDocumentedList>,
 }
 
 impl Example for DocumentIndexQueryFilterV2 {
     fn example() -> Self {
         Self {
-            doc_type: Some(vec![DocumentType::example()]),
-            id: Some(vec![EqOrRangedIdDocumented::example()]),
-            ver: Some(vec![EqOrRangedVerDocumented::example()]),
-            doc_ref: Some(vec![IdAndVerRefDocumented::example_id_ref()]),
-            template: Some(vec![IdAndVerRefDocumented::example_id_and_ver_ref()]),
-            reply: Some(vec![IdAndVerRefDocumented::example()]),
+            doc_type: Some(Example::example()),
+            id: Some(Example::example()),
+            ver: Some(Example::example()),
+            doc_ref: Some(Example::example()),
+            template: Some(Example::example()),
+            reply: Some(Example::example()),
+            brand: Some(Example::example()),
             ..Default::default()
         }
+    }
+}
+
+impl_array_types!(
+    EqOrRangedIdDocumentedList,
+    EqOrRangedIdDocumented,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(10),
+        items: Some(Box::new(EqOrRangedIdDocumented::schema_ref())),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
+impl Example for EqOrRangedIdDocumentedList {
+    fn example() -> Self {
+        Self(vec![EqOrRangedIdDocumented::example()])
+    }
+}
+
+impl_array_types!(
+    DocumentTypeList,
+    DocumentType,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(10),
+        items: Some(Box::new(DocumentType::schema_ref())),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
+impl Example for DocumentTypeList {
+    fn example() -> Self {
+        Self(vec![DocumentType::example()])
+    }
+}
+
+impl_array_types!(
+    EqOrRangedVerDocumentedList,
+    EqOrRangedVerDocumented,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(10),
+        items: Some(Box::new(EqOrRangedVerDocumented::schema_ref())),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
+impl Example for EqOrRangedVerDocumentedList {
+    fn example() -> Self {
+        Self(vec![EqOrRangedVerDocumented::example()])
+    }
+}
+
+impl_array_types!(
+    IdAndVerRefDocumentedList,
+    IdAndVerRefDocumented,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(10),
+        items: Some(Box::new(IdAndVerRefDocumented::schema_ref())),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
+impl Example for IdAndVerRefDocumentedList {
+    fn example() -> Self {
+        Self(vec![IdAndVerRefDocumented::example()])
     }
 }
 
@@ -166,6 +241,7 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
         if let Some(doc_type) = value.doc_type {
             db_filter = db_filter.with_type(
                 doc_type
+                    .0
                     .into_iter()
                     .map(|doc_type| doc_type.parse())
                     .collect::<Result<Vec<_>, _>>()?,
@@ -173,6 +249,7 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
         }
         if let Some(ids) = value.id {
             let ids = ids
+                .0
                 .into_iter()
                 .map(TryInto::try_into)
                 .collect::<Result<Vec<_>, _>>()?;
@@ -183,6 +260,7 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
         }
         if let Some(versions) = value.ver {
             let versions = versions
+                .0
                 .into_iter()
                 .map(TryInto::try_into)
                 .collect::<Result<Vec<_>, _>>()?;
@@ -193,6 +271,7 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
         }
         if let Some(doc_refs) = value.doc_ref {
             let doc_refs = doc_refs
+                .0
                 .into_iter()
                 .map(TryInto::try_into)
                 .collect::<Result<Vec<_>, _>>()?;
@@ -203,6 +282,7 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
         }
         if let Some(templates) = value.template {
             let templates = templates
+                .0
                 .into_iter()
                 .map(TryInto::try_into)
                 .collect::<Result<Vec<_>, _>>()?;
@@ -213,6 +293,7 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
         }
         if let Some(replies) = value.reply {
             let replies = replies
+                .0
                 .into_iter()
                 .map(TryInto::try_into)
                 .collect::<Result<Vec<_>, _>>()?;
@@ -226,6 +307,7 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
             .flatten()
         {
             let params = params
+                .0
                 .into_iter()
                 .map(TryInto::try_into)
                 .collect::<Result<Vec<_>, _>>()?;

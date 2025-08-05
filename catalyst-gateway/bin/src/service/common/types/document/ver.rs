@@ -134,7 +134,7 @@ impl From<catalyst_signed_doc::UuidV7> for DocumentVer {
     }
 }
 
-#[derive(Object, Debug, PartialEq)]
+#[derive(Object, Debug, Clone, PartialEq)]
 #[oai(example = true)]
 /// Version Range
 ///
@@ -155,7 +155,7 @@ impl Example for VerRange {
     }
 }
 
-#[derive(Object, Debug, PartialEq)]
+#[derive(Object, Debug, Clone, PartialEq)]
 #[oai(example = true)]
 /// A single Document IDs.
 pub(crate) struct VerEq {
@@ -173,7 +173,7 @@ impl Example for VerEq {
 
 // Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
 // openapi docs on an object.
-#[derive(NewType, Debug, PartialEq)]
+#[derive(NewType, Debug, Clone, PartialEq)]
 #[oai(
     from_multipart = false,
     from_parameter = false,
@@ -194,7 +194,7 @@ impl Example for VerEqDocumented {
 
 // Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
 // openapi docs on an object.
-#[derive(NewType, Debug, PartialEq)]
+#[derive(NewType, Debug, Clone, PartialEq)]
 #[oai(
     from_multipart = false,
     from_parameter = false,
@@ -212,7 +212,7 @@ impl Example for VerRangeDocumented {
     }
 }
 
-#[derive(Union, Debug, PartialEq)]
+#[derive(Union, Debug, Clone, PartialEq)]
 #[oai(one_of)]
 /// Document or Range of Documents
 ///
@@ -246,7 +246,7 @@ impl TryFrom<EqOrRangedVer> for EqOrRangedUuid {
     }
 }
 
-#[derive(NewType, Debug, PartialEq)]
+#[derive(NewType, Debug, Clone, PartialEq)]
 #[oai(
     from_multipart = false,
     from_parameter = false,
