@@ -6,7 +6,7 @@ import 'package:equatable/equatable.dart';
 final class ProposalCubitCache extends Equatable {
   final CatalystId? activeAccountId;
   final DocumentRef? ref;
-  final ProposalData? proposal;
+  final ProposalDetailData? proposal;
   final CampaignCategory? category;
   final CommentTemplate? commentTemplate;
   final List<CommentWithReplies>? comments;
@@ -42,7 +42,7 @@ final class ProposalCubitCache extends Equatable {
   ProposalCubitCache copyWith({
     Optional<CatalystId>? activeAccountId,
     Optional<DocumentRef>? ref,
-    Optional<ProposalData>? proposal,
+    Optional<ProposalDetailData>? proposal,
     Optional<CampaignCategory>? category,
     Optional<CommentTemplate>? commentTemplate,
     Optional<List<CommentWithReplies>>? comments,

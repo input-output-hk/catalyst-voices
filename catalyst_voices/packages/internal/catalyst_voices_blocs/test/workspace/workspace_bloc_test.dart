@@ -1,9 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -56,6 +58,40 @@ void main() {
 
     blocTest<WorkspaceBloc, WorkspaceState>(
       'emit loading state and loaded state when watching proposals succeeds',
+      setUp: () async {
+        when(() => mockCampaignService.getCategory(any())).thenAnswer(
+          (_) async => CampaignCategory(
+            selfRef: const SignedDocumentRef(
+              id: 'test-category-id',
+              version: 'test-category-version',
+            ),
+            proposalTemplateRef: const SignedDocumentRef(
+              id: 'test-template-id',
+              version: 'test-template-version',
+            ),
+            campaignRef: const SignedDocumentRef(
+              id: 'test-campaign-id',
+              version: 'test-campaign-version',
+            ),
+            categoryName: 'Test Category',
+            categorySubname: 'Test Subname',
+            description: 'Test description',
+            shortDescription: 'Test short description',
+            proposalsCount: 0,
+            availableFunds: const Coin.fromWholeAda(1000),
+            imageUrl: '',
+            totalAsk: const Coin(0),
+            range: const ComparableRange(
+              min: Coin.fromWholeAda(10),
+              max: Coin.fromWholeAda(100),
+            ),
+            descriptions: const [],
+            dos: const [],
+            donts: const [],
+            submissionCloseDate: DateTime(2024, 12, 31),
+          ),
+        );
+      },
       build: () {
         when(() => mockProposalService.watchUserProposals()).thenAnswer(
           (_) => Stream.value(
@@ -73,6 +109,40 @@ void main() {
 
     blocTest<WorkspaceBloc, WorkspaceState>(
       'watch user proposals - success',
+      setUp: () async {
+        when(() => mockCampaignService.getCategory(any())).thenAnswer(
+          (_) async => CampaignCategory(
+            selfRef: const SignedDocumentRef(
+              id: 'test-category-id',
+              version: 'test-category-version',
+            ),
+            proposalTemplateRef: const SignedDocumentRef(
+              id: 'test-template-id',
+              version: 'test-template-version',
+            ),
+            campaignRef: const SignedDocumentRef(
+              id: 'test-campaign-id',
+              version: 'test-campaign-version',
+            ),
+            categoryName: 'Test Category',
+            categorySubname: 'Test Subname',
+            description: 'Test description',
+            shortDescription: 'Test short description',
+            proposalsCount: 0,
+            availableFunds: const Coin.fromWholeAda(1000),
+            imageUrl: '',
+            totalAsk: const Coin(0),
+            range: const ComparableRange(
+              min: Coin.fromWholeAda(10),
+              max: Coin.fromWholeAda(100),
+            ),
+            descriptions: const [],
+            dos: const [],
+            donts: const [],
+            submissionCloseDate: DateTime(2024, 12, 31),
+          ),
+        );
+      },
       build: () {
         when(() => mockProposalService.watchUserProposals()).thenAnswer(
           (_) => Stream.value([
@@ -80,6 +150,7 @@ void main() {
             ProposalWithVersionX.dummy(ProposalPublish.localDraft),
           ]),
         );
+
         return workspaceBloc;
       },
       act: (bloc) => bloc.add(const WatchUserProposalsEvent()),

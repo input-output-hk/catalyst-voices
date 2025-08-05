@@ -22,11 +22,12 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   final ProposalService _proposalService;
   final DocumentMapper _documentMapper;
   final DownloaderService _downloaderService;
+  Campaign? _cachedCampaign;
 
-  StreamSubscription<List<Proposal>>? _proposalsSub;
+  StreamSubscription<List<DetailProposal>>? _proposalsSub;
 
   // ignore: unused_field
-  final List<Proposal> _proposals = [];
+  final List<DetailProposal> _proposals = [];
 
   WorkspaceBloc(
     this._campaignService,
@@ -110,7 +111,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     try {
-      final docData = await _proposalService.getProposal(ref: event.ref);
+      final docData = await _proposalService.getProposalDetail(ref: event.ref);
 
       final docMetadata = _buildDocumentMetadata(docData.document);
       final documentContent = _buildDocumentContent(docData.document.document);
@@ -167,6 +168,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     if (campaign == null) {
       return emitError(const LocalizedUnknownException());
     }
+    _cachedCampaign = campaign;
 
     final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
 
@@ -207,11 +209,18 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     );
   }
 
-  List<UsersProposalOverview> _mapProposalToViewModel(
-    List<Proposal> proposals,
+  Future<List<UsersProposalOverview>> _mapProposalToViewModel(
+    List<DetailProposal> proposals,
     int fundNumber,
-  ) {
-    return proposals.map((e) => UsersProposalOverview.fromProposal(e, fundNumber)).toList();
+  ) async {
+    final futures = proposals.map((proposal) async {
+      _cachedCampaign ??= await _campaignService.getActiveCampaign();
+      final category =
+          _cachedCampaign?.categories.firstWhere((e) => e.selfRef.id == proposal.categoryRef.id);
+      return UsersProposalOverview.fromProposal(proposal, fundNumber, category?.categoryText ?? '');
+    }).toList();
+
+    return Future.wait(futures);
   }
 
   List<UsersProposalOverview> _removeProposal(
@@ -222,10 +231,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
   void _setupProposalsSubscription() {
     _proposalsSub = _proposalService.watchUserProposals().listen(
-      (proposals) {
+      (proposals) async {
         if (isClosed) return;
         _logger.info('Stream received ${proposals.length} proposals');
-        add(LoadProposalsEvent(_mapProposalToViewModel(proposals..sort(), state.fundNumber)));
+        final mappedProposals = await _mapProposalToViewModel(proposals, state.fundNumber);
+        add(LoadProposalsEvent(mappedProposals));
       },
       onError: (Object error, StackTrace stackTrace) {
         if (isClosed) return;
