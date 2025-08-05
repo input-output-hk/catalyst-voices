@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 class DateRange extends Equatable {
@@ -37,6 +38,16 @@ class DateRange extends Equatable {
     if (adjustedToWeekday < 0) adjustedToWeekday += 7;
 
     return adjustedFromWeekday == 0 && adjustedToWeekday == 6;
+  }
+
+  DateRange copyWith({
+    Optional<DateTime>? from,
+    Optional<DateTime>? to,
+  }) {
+    return DateRange(
+      from: from.dataOr(this.from),
+      to: to.dataOr(this.to),
+    );
   }
 
   bool isAfterRange(DateTime value) {

@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class VotingListCampaignPhaseData extends Equatable {
@@ -20,4 +21,16 @@ final class VotingListCampaignPhaseData extends Equatable {
         votingPhaseProgress,
         votingEndsIn,
       ];
+
+  VotingListCampaignPhaseData copyWith({
+    Optional<int>? activeFundNumber,
+    double? votingPhaseProgress,
+    Optional<Duration>? votingEndsIn,
+  }) {
+    return VotingListCampaignPhaseData(
+      activeFundNumber: activeFundNumber.dataOr(this.activeFundNumber),
+      votingPhaseProgress: votingPhaseProgress ?? this.votingPhaseProgress,
+      votingEndsIn: votingEndsIn.dataOr(this.votingEndsIn),
+    );
+  }
 }
