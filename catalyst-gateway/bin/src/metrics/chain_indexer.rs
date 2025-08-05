@@ -8,21 +8,27 @@ pub(crate) mod metrics_updater {
 
     use crate::{metrics::chain_indexer::reporter, settings::Settings};
 
-    /// Triggers to indicate that the Chain Indexer is starting or reaches tip.
-    pub(crate) fn reached_tip(reached: bool, immutable: bool) {
+    /// Triggers to indicate that the Chain Indexer is starting or reaches the live tip.
+    pub(crate) fn reached_live_tip(reached: bool) {
         let api_host_names = Settings::api_host_names().join(",");
         let service_id = Settings::service_id();
         let network = Settings::cardano_network().to_string();
 
-        if immutable {
-            reporter::IMMUTABLE_REACHED_TIP
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .set(i64::from(reached));
-        } else {
-            reporter::LIVE_REACHED_TIP
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .set(i64::from(reached));
-        }
+        reporter::LIVE_REACHED_TIP
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::from(reached));
+    }
+
+    /// Triggers to indicate that the Chain Indexer is starting or reaches the immutable
+    /// tip.
+    pub(crate) fn reached_immutable_tip(reached: bool) {
+        let api_host_names = Settings::api_host_names().join(",");
+        let service_id = Settings::service_id();
+        let network = Settings::cardano_network().to_string();
+
+        reporter::IMMUTABLE_REACHED_TIP
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::from(reached));
     }
 
     /// Triggers to update the number of current synchronization tasks.

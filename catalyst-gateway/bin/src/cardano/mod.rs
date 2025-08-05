@@ -301,7 +301,7 @@ fn sync_subchain(
                     }
 
                     if chain_update.tip && !set_follower_live_first_reached_tip() {
-                        metrics_updater::reached_tip(true, true);
+                        metrics_updater::reached_live_tip(true);
                     }
 
                     update_block_state(
@@ -504,17 +504,16 @@ impl SyncTask {
             Point::fuzzy(self.immutable_tip_slot),
             Point::TIP,
         ));
-        metrics_updater::reached_tip(false, false);
+        metrics_updater::reached_live_tip(false);
 
         self.start_immutable_followers();
         // IF there is only 1 chain follower spawn, then the immutable state already indexed and
         // filled in the db.
         if self.sync_tasks.len() == 1 {
             set_follower_immutable_first_reached_tip();
-            metrics_updater::reached_tip(true, true);
-        } else {
-            metrics_updater::reached_tip(false, true);
         }
+
+        metrics_updater::reached_immutable_tip(self.sync_tasks.len() == 1);
 
         // Wait Sync tasks to complete.  If they fail and have not completed, reschedule them.
         // If an immutable sync task ends OK, and we still have immutable data to sync then
@@ -552,7 +551,7 @@ impl SyncTask {
                             info!(chain=%self.cfg.chain, report=%finished, "Chain Indexer finished reaching TIP.");
 
                             self.start_immutable_followers();
-                            metrics_updater::reached_tip(false, true);
+                            metrics_updater::reached_immutable_tip(false);
                         } else {
                             error!(chain=%self.cfg.chain, report=%finished, "Chain Indexer finished without to reach TIP.");
                         }
@@ -611,7 +610,7 @@ impl SyncTask {
             // a parameter.
             if self.sync_tasks.len() == 1 {
                 set_follower_immutable_first_reached_tip();
-                metrics_updater::reached_tip(true, true);
+                metrics_updater::reached_immutable_tip(true);
                 caches::txo_assets_by_stake::drop();
                 caches::txo_by_stake::drop();
 
