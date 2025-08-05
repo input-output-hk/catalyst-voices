@@ -7,7 +7,7 @@ abstract interface class ActiveCampaignObserver {
 
   set campaign(Campaign? value);
 
-  Stream<Campaign> get watchCampaign;
+  Stream<Campaign?> get watchCampaign;
 
   Future<void> dispose();
 }
@@ -15,7 +15,7 @@ abstract interface class ActiveCampaignObserver {
 final class ActiveCampaignObserverImpl implements ActiveCampaignObserver {
   Campaign? _campaign;
 
-  final _campaignSC = StreamController<Campaign>.broadcast();
+  final _campaignSC = StreamController<Campaign?>.broadcast();
 
   ActiveCampaignObserverImpl();
 
@@ -24,14 +24,19 @@ final class ActiveCampaignObserverImpl implements ActiveCampaignObserver {
 
   @override
   set campaign(Campaign? value) {
-    if (_campaign != value) {
-      _campaignSC.add(value!);
+    if (_campaign == value) {
+      return;
     }
+
     _campaign = value;
+    _campaignSC.add(value);
   }
 
   @override
-  Stream<Campaign> get watchCampaign => _campaignSC.stream;
+  Stream<Campaign?> get watchCampaign async* {
+    yield _campaign;
+    yield* _campaignSC.stream;
+  }
 
   @override
   Future<void> dispose() async {
