@@ -13,13 +13,13 @@ final class ChangeCategoryProposalsSignal extends ProposalsSignal {
   List<Object?> get props => [to];
 }
 
-final class ChangeFilterTypeProposalsSignal extends ProposalsSignal {
-  final ProposalsFilterType type;
+final class ChangeTabProposalsSignal extends ProposalsSignal {
+  final ProposalsPageTab tab;
 
-  const ChangeFilterTypeProposalsSignal(this.type);
+  const ChangeTabProposalsSignal(this.tab);
 
   @override
-  List<Object?> get props => [type];
+  List<Object?> get props => [tab];
 }
 
 final class PageReadyProposalsSignal extends ProposalsSignal {

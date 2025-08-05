@@ -41,7 +41,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
         .distinct()
         .listen(_handleActiveAccountIdChange);
 
-    _favoritesProposalsIdsSub = _favoritesProposalsIdsSub = _proposalService
+    _favoritesProposalsIdsSub = _proposalService
         .watchFavoritesProposalsIds()
         .distinct(listEquals)
         .listen(_handleFavoriteProposalsIds);
@@ -180,7 +180,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
     emit(state.copyWith(favoritesIds: favoritesIds));
 
-    if (!isFavorite && _cache.filters.type == ProposalsFilterType.favorites) {
+    if (!isFavorite && _cache.filters.type.isFavorite) {
       final page = _cache.page;
       if (page != null) {
         final proposals = List.of(page.items).where((element) => element.selfRef != ref).toList();
