@@ -41,7 +41,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
         .distinct()
         .listen(_handleActiveAccountIdChange);
 
-    _favoritesProposalsIdsSub = _favoritesProposalsIdsSub = _proposalService
+    _favoritesProposalsIdsSub = _proposalService
         .watchFavoritesProposalsIds()
         .distinct(listEquals)
         .listen(_handleFavoriteProposalsIds);
