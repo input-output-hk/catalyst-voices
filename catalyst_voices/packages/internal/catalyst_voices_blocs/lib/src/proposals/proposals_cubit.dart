@@ -180,7 +180,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
     emit(state.copyWith(favoritesIds: favoritesIds));
 
-    if (!isFavorite && _cache.filters.type == ProposalsFilterType.favorites) {
+    if (!isFavorite && _cache.filters.type.isFavorite) {
       final page = _cache.page;
       if (page != null) {
         final proposals = List.of(page.items).where((element) => element.selfRef != ref).toList();

@@ -385,6 +385,8 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         return _includeFinalProposalsFilter();
       case ProposalsFilterType.favorites:
         return _includeFavoriteRefsExcludingHiddenProposalsFilter();
+      case ProposalsFilterType.favoritesFinals:
+        return _includeFinalFavoriteRefsProposalsFilter();
       case ProposalsFilterType.my:
         return _excludeHiddenProposalsFilter();
       case ProposalsFilterType.myFinals:
@@ -570,6 +572,17 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }).then(_IdsFilter.include);
   }
 
+  Future<_IdsFilter> _includeFinalFavoriteRefsProposalsFilter() {
+    return _getFavoritesRefs().then((favoriteRefs) {
+      return _getProposalsLatestAction().then((actions) async {
+        final finalProposalIds =
+            actions.where((e) => e.action.isFinal).map((e) => e.proposalRef.id);
+
+        return favoriteRefs.map((e) => e.id).where(finalProposalIds.contains).map(UuidHiLo.from);
+      });
+    }).then(_IdsFilter.include);
+  }
+
   Future<_IdsFilter> _includeFinalProposalsFilter() {
     return _getProposalsLatestAction().then(
       (value) {
@@ -646,6 +659,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       final total = notHidden;
       final finals = notHidden.where((ref) => finalsRefs.any((myRef) => myRef.id == ref.id));
       final favorites = notHidden.where((ref) => favoritesRefs.any((fav) => fav.id == ref.id));
+      final favoritesFinals = finals.where((ref) => favoritesRefs.any((fav) => fav.id == ref.id));
       final my = notHidden.where((ref) => myRefs.any((myRef) => myRef.id == ref.id));
       final myFinals = my.where((ref) => finalsRefs.any((myRef) => myRef.id == ref.id));
       final votedOn = notHidden.where((ref) => votedRefs.any((voted) => voted.id == ref.id));
@@ -655,6 +669,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         drafts: total.length - finals.length,
         finals: finals.length,
         favorites: favorites.length,
+        favoritesFinals: favoritesFinals.length,
         my: my.length,
         myFinals: myFinals.length,
         voted: votedOn.length,
