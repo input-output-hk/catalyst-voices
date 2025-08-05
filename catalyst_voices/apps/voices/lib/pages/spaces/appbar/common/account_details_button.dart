@@ -6,8 +6,8 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 /// Displays current session state.
-class SessionStateHeader extends StatelessWidget {
-  const SessionStateHeader({super.key});
+class AccountDetailsButton extends StatelessWidget {
+  const AccountDetailsButton({super.key});
 
   @override
   Widget build(BuildContext context) {

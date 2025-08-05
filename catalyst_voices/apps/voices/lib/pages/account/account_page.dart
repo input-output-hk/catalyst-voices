@@ -13,8 +13,8 @@ import 'package:catalyst_voices/pages/account/widgets/account_roles_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_status_banner.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_username_tile.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/common/account_details_button.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/common/session_action_button.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -39,8 +39,8 @@ class _AccountPageState extends State<AccountPage>
         appBar: const VoicesAppBar(
           automaticallyImplyLeading: false,
           actions: [
-            SessionActionHeader(),
-            SessionStateHeader(),
+            SessionActionButton(),
+            AccountDetailsButton(),
           ],
         ),
         endDrawer: const OpportunitiesDrawer(),
