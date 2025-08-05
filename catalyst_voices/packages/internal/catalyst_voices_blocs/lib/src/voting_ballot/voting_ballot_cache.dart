@@ -5,25 +5,30 @@ import 'package:equatable/equatable.dart';
 final class VotingBallotCache extends Equatable {
   final DateRange? votingTimeline;
   final TimezonePreferences? preferredTimezone;
+  final Map<DocumentRef, VoteProposal> votesProposals;
 
   const VotingBallotCache({
     this.votingTimeline,
     this.preferredTimezone,
+    this.votesProposals = const {},
   });
 
   @override
   List<Object?> get props => [
         votingTimeline,
         preferredTimezone,
+        votesProposals,
       ];
 
   VotingBallotCache copyWith({
     Optional<DateRange>? votingTimeline,
     Optional<TimezonePreferences>? preferredTimezone,
+    Map<DocumentRef, VoteProposal>? votesProposals,
   }) {
     return VotingBallotCache(
       votingTimeline: votingTimeline.dataOr(this.votingTimeline),
       preferredTimezone: preferredTimezone.dataOr(this.preferredTimezone),
+      votesProposals: votesProposals ?? this.votesProposals,
     );
   }
 }

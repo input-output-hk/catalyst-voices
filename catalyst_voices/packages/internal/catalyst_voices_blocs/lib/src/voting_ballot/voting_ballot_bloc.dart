@@ -7,6 +7,9 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
+
+typedef _VoteWithProposal = ({Vote vote, VoteProposal? proposal});
 
 final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> {
   final UserService _userService;
@@ -31,6 +34,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     on<UpdateFundNumberEvent>(_updateFundNumber, transformer: uniqueEvents());
     on<UpdateFooterFromBallotBuilderEvent>(_updateFooterFromBallot, transformer: uniqueEvents());
     on<UpdateLastCastedVoteEvent>(_updateLastCastedVote, transformer: uniqueEvents());
+    on<UpdateVoteTiles>(_updateTiles);
 
     _votingPowerSub = _userService.watchUser
         .map((user) {
@@ -77,6 +81,50 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     _phaseProgressTimer = null;
 
     return super.close();
+  }
+
+  List<VotingListTileData> _buildTiles(List<_VoteWithProposal> data) {
+    return data
+        .groupListsBy((element) => element.proposal?.category)
+        .entries
+        .map(
+          (entry) {
+            final category = entry.key;
+            if (category == null) {
+              return null;
+            }
+
+            final votesTiles = entry.value
+                .map(
+                  (votesWithProposal) {
+                    final (:vote, :proposal) = votesWithProposal;
+                    if (proposal == null) {
+                      return null;
+                    }
+
+                    return VotingListTileVoteData(
+                      proposal: proposal.ref,
+                      proposalTitle: proposal.title,
+                      authorName: proposal.authorName,
+                      vote: VoteButtonData.fromVotes(
+                        currentDraft: vote,
+                        lastCasted: proposal.lastCastedVote,
+                      ),
+                    );
+                  },
+                )
+                .nonNulls
+                .toList();
+
+            return VotingListTileData(
+              category: category.ref,
+              categoryText: category.name,
+              votes: votesTiles,
+            );
+          },
+        )
+        .nonNulls
+        .toList();
   }
 
   void _calculatePhaseProgress() {
@@ -156,6 +204,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     );
 
     add(event);
+    _rebuildTilesAndSendEvent();
   }
 
   void _handleCampaignChange(Campaign? campaign) {
@@ -185,6 +234,42 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     add(UpdateVotingPowerEvent(votingPower));
   }
 
+  List<_VoteWithProposal> _mapVotesWithProposals(
+    List<Vote> votes,
+    Map<DocumentRef, VoteProposal> proposals,
+  ) {
+    return votes.map<_VoteWithProposal>(
+      (vote) {
+        final proposal = proposals[vote.proposal];
+        return (vote: vote, proposal: proposal);
+      },
+    ).toList();
+  }
+
+  void _rebuildTilesAndSendEvent() {
+    final votes = _ballotBuilder.votes;
+    final proposals = _cache.votesProposals;
+
+    final tilesData = _mapVotesWithProposals(votes, proposals);
+    final tiles = _buildTiles(tilesData);
+
+    assert(
+      () {
+        final votesCount = votes.length;
+        final tilesVotesCount = tiles.fold(
+          0,
+          (previousValue, element) => previousValue + element.votes.length,
+        );
+
+        return votesCount == tilesVotesCount;
+      }(),
+      'Tiles have different votes count then votes itself. '
+      'Make sure to add VoteProposal for every vote',
+    );
+
+    add(UpdateVoteTiles(tiles));
+  }
+
   void _updateFooterFromBallot(
     UpdateFooterFromBallotBuilderEvent event,
     Emitter<VotingBallotState> emit,
@@ -212,6 +297,13 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     final footer = state.footer.copyWith(lastCastedVoteAt: Optional(event.votedAt));
 
     emit(state.copyWith(footer: footer));
+  }
+
+  void _updateTiles(
+    UpdateVoteTiles event,
+    Emitter<VotingBallotState> emit,
+  ) {
+    emit(state.copyWith(tiles: event.tiles));
   }
 
   void _updateVotingPhaseProgress(

@@ -92,6 +92,7 @@ export 'user/recovered_account.dart';
 export 'user/user.dart';
 export 'user/user_settings.dart';
 export 'voting/vote.dart';
+export 'voting/vote_proposal.dart';
 export 'voting/vote_type.dart';
 export 'voting/voting_ballot.dart';
 export 'voting/voting_ballot_builder.dart';

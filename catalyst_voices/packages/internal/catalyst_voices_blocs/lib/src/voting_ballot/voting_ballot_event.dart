@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class UpdateFooterFromBallotBuilderEvent extends VotingBallotEvent {
@@ -33,6 +34,15 @@ final class UpdateLastCastedVoteEvent extends VotingBallotEvent {
 
   @override
   List<Object?> get props => [votedAt];
+}
+
+final class UpdateVoteTiles extends VotingBallotEvent {
+  final List<VotingListTileData> tiles;
+
+  const UpdateVoteTiles(this.tiles);
+
+  @override
+  List<Object?> get props => [tiles];
 }
 
 final class UpdateVotingPhaseProgressEvent extends VotingBallotEvent {
