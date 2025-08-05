@@ -71,7 +71,10 @@ class _VotingListCampaignPhaseProgressEndsInText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      context.l10n.votingEndsIn(DurationFormatter.formatDurationDDhhmm(context.l10n, duration)),
+      duration > Duration.zero
+          ? context.l10n
+              .votingEndsIn(DurationFormatter.formatDurationDDhhmm(context.l10n, duration))
+          : context.l10n.ended,
     );
   }
 }

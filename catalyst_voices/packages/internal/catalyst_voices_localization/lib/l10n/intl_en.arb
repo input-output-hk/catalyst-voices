@@ -440,6 +440,10 @@
   "@votingEnded": {
     "description": "Label when the voting phase is closed."
   },
+  "ended": "Ended",
+  "@ended": {
+    "description": "General label describing cases like phase has ended"
+  },
   "votingEndsIn": "Ends in {duration}",
   "@votingEndsIn": {
     "description": "Label when voting phase ends after the duration.",
