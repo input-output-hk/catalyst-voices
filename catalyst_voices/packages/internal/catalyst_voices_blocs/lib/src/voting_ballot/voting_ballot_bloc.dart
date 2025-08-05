@@ -25,8 +25,12 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     this._userService,
     this._campaignService,
   ) : super(const VotingBallotState()) {
-    on<UpdateVotingPowerEvent>(_updateVotingPower);
-    on<UpdateVotingPhaseProgressEvent>(_updateVotingPhaseProgress);
+    on<UpdateVotingPowerEvent>(_updateVotingPower, transformer: uniqueEvents());
+    on<UpdateVotingPhaseProgressEvent>(_updateVotingPhaseProgress, transformer: uniqueEvents());
+    on<UpdateFundNumberEvent>(_updateFundNumber, transformer: uniqueEvents());
+    on<UpdateFundNumberEvent>(_updateFundNumber, transformer: uniqueEvents());
+    on<UpdateFooterFromBallotBuilderEvent>(_updateFooterFromBallot, transformer: uniqueEvents());
+    on<UpdateLastCastedVoteEvent>(_updateLastCastedVote, transformer: uniqueEvents());
 
     _votingPowerSub = _userService.watchUser
         .map((user) {
@@ -51,6 +55,11 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
         .listen(_handleUserTimezonePrefChange);
 
     _activeCampaignSub = _campaignService.watchActiveCampaign.listen(_handleCampaignChange);
+
+    // TODO(damian-molinski): watch service.
+    _handleLastCastedChange(null);
+
+    _handleBallotBuilderChange();
   }
 
   @override
@@ -137,7 +146,21 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     return progress.clamp(0.0, 1.0);
   }
 
+  void _handleBallotBuilderChange() {
+    final canCastVotes = _ballotBuilder.length > 0;
+    final showPendingVotesDisclaimer = _ballotBuilder.length > 0;
+
+    final event = UpdateFooterFromBallotBuilderEvent(
+      canCastVotes: canCastVotes,
+      showPendingVotesDisclaimer: showPendingVotesDisclaimer,
+    );
+
+    add(event);
+  }
+
   void _handleCampaignChange(Campaign? campaign) {
+    add(UpdateFundNumberEvent(campaign?.fundNumber));
+
     final votingPhase = campaign?.timeline.phase(CampaignPhaseType.communityVoting);
     final votingTimeline = votingPhase?.timeline;
 
@@ -145,6 +168,10 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
       _cache = _cache.copyWith(votingTimeline: Optional(votingTimeline));
       _updateVotingPhaseProgressTimer();
     }
+  }
+
+  void _handleLastCastedChange(Vote? vote) {
+    add(UpdateLastCastedVoteEvent(vote?.createdAt));
   }
 
   void _handleUserTimezonePrefChange(TimezonePreferences? value) {
@@ -156,6 +183,35 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
 
   void _handleVotingPowerChange(VotingPower? votingPower) {
     add(UpdateVotingPowerEvent(votingPower));
+  }
+
+  void _updateFooterFromBallot(
+    UpdateFooterFromBallotBuilderEvent event,
+    Emitter<VotingBallotState> emit,
+  ) {
+    final footer = state.footer.copyWith(
+      canCastVotes: event.canCastVotes,
+      showPendingVotesDisclaimer: event.showPendingVotesDisclaimer,
+    );
+
+    emit(state.copyWith(footer: footer));
+  }
+
+  void _updateFundNumber(
+    UpdateFundNumberEvent event,
+    Emitter<VotingBallotState> emit,
+  ) {
+    final votingProgress = state.votingProgress.copyWith(activeFundNumber: Optional(event.number));
+    emit(state.copyWith(votingProgress: votingProgress));
+  }
+
+  void _updateLastCastedVote(
+    UpdateLastCastedVoteEvent event,
+    Emitter<VotingBallotState> emit,
+  ) {
+    final footer = state.footer.copyWith(lastCastedVoteAt: Optional(event.votedAt));
+
+    emit(state.copyWith(footer: footer));
   }
 
   void _updateVotingPhaseProgress(
