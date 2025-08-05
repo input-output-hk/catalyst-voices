@@ -17,11 +17,11 @@ pub(crate) mod metrics_updater {
         if immutable {
             reporter::IMMUTABLE_REACHED_TIP
                 .with_label_values(&[&api_host_names, service_id, &network])
-                .set(if reached { 1 } else { 0 });
+                .set(i64::from(reached));
         } else {
             reporter::LIVE_REACHED_TIP
                 .with_label_values(&[&api_host_names, service_id, &network])
-                .set(if reached { 1 } else { 0 });
+                .set(i64::from(reached));
         }
     }
 
