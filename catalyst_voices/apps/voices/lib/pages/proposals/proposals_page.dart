@@ -15,12 +15,12 @@ import 'package:flutter/material.dart';
 
 class ProposalsPage extends StatefulWidget {
   final SignedDocumentRef? categoryId;
-  final ProposalsFilterType? type;
+  final ProposalsPageTab? tab;
 
   const ProposalsPage({
     super.key,
     this.categoryId,
-    this.type,
+    this.tab,
   });
 
   @override
@@ -52,18 +52,20 @@ class _ProposalsPageState extends State<ProposalsPage>
   void didUpdateWidget(ProposalsPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.categoryId != oldWidget.categoryId || widget.type != oldWidget.type) {
+    final tab = widget.tab ?? ProposalsPageTab.total;
+
+    if (widget.categoryId != oldWidget.categoryId || widget.tab != oldWidget.tab) {
       context.read<ProposalsCubit>().changeFilters(
-            onlyMy: Optional(widget.type?.isMy ?? false),
+            onlyMy: Optional(tab == ProposalsPageTab.my),
             category: Optional(widget.categoryId),
-            type: widget.type ?? ProposalsFilterType.total,
+            type: tab.filter,
           );
 
       _doResetPagination();
     }
 
-    if (widget.type != oldWidget.type) {
-      _tabController.animateTo(widget.type?.index ?? 0);
+    if (widget.tab != oldWidget.tab) {
+      _tabController.animateTo(tab.index);
     }
   }
 
@@ -79,8 +81,8 @@ class _ProposalsPageState extends State<ProposalsPage>
     switch (signal) {
       case ChangeCategoryProposalsSignal(:final to):
         _updateRoute(categoryId: Optional(to?.id));
-      case ChangeFilterTypeProposalsSignal(:final type):
-        _updateRoute(filterType: type);
+      case ChangeTabProposalsSignal(:final tab):
+        _updateRoute(tab: tab);
       case ResetPaginationProposalsSignal():
         _doResetPagination();
       case PageReadyProposalsSignal(:final page):
@@ -98,11 +100,11 @@ class _ProposalsPageState extends State<ProposalsPage>
   void initState() {
     super.initState();
 
-    final proposalsFilterType = _determineFilterType();
+    final tab = _determineTab();
 
     _tabController = TabController(
-      initialIndex: proposalsFilterType.index,
-      length: ProposalsFilterType.values.length,
+      initialIndex: tab.index,
+      length: ProposalsPageTab.values.length,
       vsync: this,
     );
 
@@ -112,9 +114,9 @@ class _ProposalsPageState extends State<ProposalsPage>
     );
 
     context.read<ProposalsCubit>().init(
-          onlyMyProposals: widget.type?.isMy ?? false,
+          onlyMyProposals: tab == ProposalsPageTab.my,
           category: widget.categoryId,
-          type: proposalsFilterType,
+          type: tab.filter,
           order: const Alphabetical(),
         );
 
@@ -123,15 +125,16 @@ class _ProposalsPageState extends State<ProposalsPage>
       ..notifyPageRequestListeners(0);
   }
 
-  ProposalsFilterType _determineFilterType() {
+  ProposalsPageTab _determineTab() {
     final isProposerUnlock = context.read<SessionCubit>().state.isProposerUnlock;
-    final requestedType = widget.type;
+    final requestedTab = widget.tab ?? ProposalsPageTab.total;
 
-    if (!isProposerUnlock && (requestedType?.isMy ?? false)) {
-      _updateRoute(filterType: ProposalsFilterType.total);
+    if (!isProposerUnlock && requestedTab == ProposalsPageTab.my) {
+      _updateRoute(tab: ProposalsPageTab.total);
+      return ProposalsPageTab.total;
     }
 
-    return requestedType ?? ProposalsFilterType.total;
+    return requestedTab;
   }
 
   void _doResetPagination() {
@@ -149,15 +152,15 @@ class _ProposalsPageState extends State<ProposalsPage>
 
   void _updateRoute({
     Optional<String>? categoryId,
-    ProposalsFilterType? filterType,
+    ProposalsPageTab? tab,
   }) {
     Router.neglect(context, () {
       final effectiveCategoryId = categoryId.dataOr(widget.categoryId?.id);
-      final effectiveType = filterType?.name ?? widget.type?.name;
+      final effectiveTab = tab?.name ?? widget.tab?.name;
 
       ProposalsRoute(
         categoryId: effectiveCategoryId,
-        type: effectiveType,
+        tab: effectiveTab,
       ).replace(context);
     });
   }

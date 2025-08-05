@@ -420,6 +420,10 @@
   "@categoryDetails": {
     "description": "Header text for category details section"
   },
+  "categoryProposals": "Category Proposals",
+  "@categoryProposals": {
+    "description": "Title for proposals filtered by a campaign category."
+  },
   "categoryRequirements": "Category Requirements:",
   "@categoryRequirements": {
     "description": "Header for category requirements section"
@@ -1867,7 +1871,7 @@
       }
     }
   },
-  "noOfDraft": "Draft proposals ({count})",
+  "noOfDraft": "Draft proposals · {count}",
   "@noOfDraft": {
     "description": "Tab label for draft proposals in voting space",
     "placeholders": {
@@ -1876,7 +1880,7 @@
       }
     }
   },
-  "noOfFavorites": "Favorites ({count})",
+  "noOfFavorites": "Favorites · {count}",
   "@noOfFavorites": {
     "description": "Tab label for draft proposals in voting space",
     "placeholders": {
@@ -1885,7 +1889,7 @@
       }
     }
   },
-  "noOfFinal": "Final proposals ({count})",
+  "noOfFinal": "Final proposals · {count}",
   "@noOfFinal": {
     "description": "Tab label for final proposals in voting space",
     "placeholders": {
@@ -1894,9 +1898,18 @@
       }
     }
   },
-  "noOfMyProposals": "My proposals ({count})",
+  "noOfMyProposals": "My proposals · {count}",
   "@noOfMyProposals": {
     "description": "Tab label for my proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOfVotedOn": "Voted On · {count}",
+  "@noOfVotedOn": {
+    "description": "Tab label for voted on proposals in voting space",
     "placeholders": {
       "count": {
         "type": "int"
