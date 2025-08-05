@@ -304,8 +304,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     _ballotBuilder.removeVoteOn(event.proposal);
     _cache = _cache.removeProposal(event.proposal);
 
-    final tiles = _buildTiles();
-    emit(state.copyWith(tiles: tiles));
+    _handleBallotBuilderChange();
   }
 
   void _updateFooterFromBallot(
@@ -384,9 +383,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
       _cache = _cache.addProposal(proposal);
     }
 
-    final tiles = _buildTiles();
-
-    emit(state.copyWith(tiles: tiles));
+    _handleBallotBuilderChange();
   }
 
   void _updateVotingPhaseProgress(
