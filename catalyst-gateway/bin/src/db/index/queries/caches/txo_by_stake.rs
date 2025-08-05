@@ -25,8 +25,16 @@ static ASSETS_CACHE: LazyLock<Cache<DbStakeAddress, Arc<Vec<GetTxoByStakeAddress
             .build()
     });
 
+/// Returns true if Cache is enabled.
+fn is_enabled() -> bool {
+    Settings::cardano_assets_cache().utxo_cache_size() > 0
+}
+
 /// Get TXO Assets entry from Cache.
 pub(crate) fn get(stake_address: &DbStakeAddress) -> Option<Arc<Vec<GetTxoByStakeAddressQuery>>> {
+    if !is_enabled() {
+        return None;
+    }
     ASSETS_CACHE
         .get(stake_address)
         .inspect(|_| txo_assets_hits_inc())
@@ -38,11 +46,17 @@ pub(crate) fn get(stake_address: &DbStakeAddress) -> Option<Arc<Vec<GetTxoByStak
 
 /// Insert TXO Assets entry in Cache.
 pub(crate) fn insert(stake_address: DbStakeAddress, rows: Arc<Vec<GetTxoByStakeAddressQuery>>) {
+    if !is_enabled() {
+        return;
+    }
     ASSETS_CACHE.insert(stake_address, rows);
 }
 
 /// Update spent TXO Assets in Cache.
 pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
+    if !is_enabled() {
+        return;
+    }
     for txo_update in params {
         let stake_address = &txo_update.stake_address;
         let update_key = &GetTxoByStakeAddressQueryKey {
@@ -96,16 +110,25 @@ pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
 
 /// Empty the TXO Assets cache.
 pub(crate) fn drop() {
+    if !is_enabled() {
+        return;
+    }
     ASSETS_CACHE.invalidate_all();
 }
 
 /// Size of TXO Assets cache.
 pub(crate) fn size() -> u64 {
+    if !is_enabled() {
+        return 0;
+    }
     ASSETS_CACHE.run_pending_tasks();
     ASSETS_CACHE.weighted_size()
 }
 /// Number of entries in TXO Assets cache.
 pub(crate) fn entry_count() -> u64 {
+    if !is_enabled() {
+        return 0;
+    }
     ASSETS_CACHE.run_pending_tasks();
     ASSETS_CACHE.entry_count()
 }
