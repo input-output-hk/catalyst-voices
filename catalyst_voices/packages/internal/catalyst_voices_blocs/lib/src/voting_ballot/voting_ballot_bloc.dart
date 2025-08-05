@@ -152,13 +152,12 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
         .toList();
   }
 
-  void _calculatePhaseProgress() {
+  ({double progress, Duration? endsIn}) _calculatePhaseProgress() {
     final votingTimeline = _cache.votingTimeline;
     final timezone = _cache.preferredTimezone ?? TimezonePreferences.local;
 
     if (votingTimeline == null) {
-      add(const UpdateVotingPhaseProgressEvent());
-      return;
+      return (progress: 0, endsIn: null);
     }
 
     final effectiveVotingTimeline = timezone.applyToRange(votingTimeline);
@@ -166,8 +165,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     final start = effectiveVotingTimeline.from;
     final end = effectiveVotingTimeline.to;
     if (start == null || end == null) {
-      add(const UpdateVotingPhaseProgressEvent());
-      return;
+      return (progress: 0, endsIn: null);
     }
 
     final now = DateTimeExt.now(utc: timezone == TimezonePreferences.utc);
@@ -175,7 +173,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     final progress = _calculatePhaseProgressValue(start: start, end: end, now: now);
     final endsIn = _calculatePhaseProgressEndsDuration(start: start, end: end, now: now);
 
-    add(UpdateVotingPhaseProgressEvent(votingPhaseProgress: progress, votingEndsIn: endsIn));
+    return (progress: progress, endsIn: endsIn);
   }
 
   Duration? _calculatePhaseProgressEndsDuration({
@@ -412,11 +410,25 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
       return;
     }
 
-    _calculatePhaseProgress();
+    final (:progress, :endsIn) = _calculatePhaseProgress();
+
+    add(UpdateVotingPhaseProgressEvent(votingPhaseProgress: progress, votingEndsIn: endsIn));
+
+    if (progress == 1.0) {
+      return;
+    }
 
     _phaseProgressTimer = Timer.periodic(
       const Duration(seconds: 1),
-      (_) => _calculatePhaseProgress(),
+      (timer) {
+        final (:progress, :endsIn) = _calculatePhaseProgress();
+
+        add(UpdateVotingPhaseProgressEvent(votingPhaseProgress: progress, votingEndsIn: endsIn));
+
+        if (progress == 1.0) {
+          timer.cancel();
+        }
+      },
     );
   }
 
