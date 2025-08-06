@@ -1,15 +1,16 @@
+import 'dart:async';
+
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:collection/collection.dart';
-import 'package:rxdart/rxdart.dart';
 
 final class VotingMockRepository implements VotingRepository {
-  final _votesStreamController = BehaviorSubject<List<ProposalVotes>>.seeded([]);
+  final _votesStreamController = StreamController<List<ProposalVotes>>.broadcast();
   final List<ProposalVotes> _cachedVotes = [];
 
   VotingMockRepository();
 
   @override
-  ValueStream<List<ProposalVotes>> get watchProposalVotes => _votesStreamController.stream;
+  Stream<List<ProposalVotes>> get watchProposalVotes => _votesStreamController.stream;
 
   @override
   Future<ProposalVotes?> getProposalVoteInfoFor(DocumentRef ref) async {
@@ -51,9 +52,8 @@ final class VotingMockRepository implements VotingRepository {
 abstract interface class VotingRepository {
   factory VotingRepository() => VotingMockRepository();
 
-  ValueStream<List<ProposalVotes>> get watchProposalVotes;
+  Stream<List<ProposalVotes>> get watchProposalVotes;
   Future<ProposalVotes?> getProposalVoteInfoFor(DocumentRef ref);
-
   Future<ProposalVotes?> setCurrentDraft(DocumentRef ref, VoteType? type);
 
   void setLastCasted(DocumentRef ref);
