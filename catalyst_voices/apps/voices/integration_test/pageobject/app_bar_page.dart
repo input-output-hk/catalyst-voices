@@ -14,7 +14,6 @@ class AppBarPage {
   final accountPopupBtn = const Key('AccountPopupButton');
   final lockBtn = const Key('LockButton');
   final unlockBtn = const Key('UnlockButton');
-  final visitorBtn = const Key('VisitorBtn');
   final sessionAccountPopupMenuAvatar = const Key('SessionAccountPopupMenuAvatar');
 
   Future<void> spacesDrawerButtonExists({bool? reverse = false}) async {
@@ -62,17 +61,11 @@ class AppBarPage {
     await $(unlockBtn).tap();
   }
 
-  Future<void> visitorBtnIsVisible() async {
-    expect($(visitorBtn), findsOneWidget);
-  }
-
   Future<void> looksAsExpectedForVisitor() async {
     await getStartedBtnIsVisible();
-    await visitorBtnIsVisible();
   }
 
   Future<void> looksAsExpectedForVisitorOnboardingInProgress() async {
     await finishAccountCreationBtnIsVisible();
-    await visitorBtnIsVisible();
   }
 }

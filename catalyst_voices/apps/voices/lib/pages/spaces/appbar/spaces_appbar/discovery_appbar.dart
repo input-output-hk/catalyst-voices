@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/pages/campaign_phase_aware/campaign_phase_aware.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/actions/account_settings_action.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/actions/session_cta_action.dart';
 import 'package:catalyst_voices/widgets/app_bar/voices_app_bar.dart';
 import 'package:catalyst_voices/widgets/buttons/create_proposal_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
@@ -30,8 +30,8 @@ class DiscoveryAppbar extends StatelessWidget implements PreferredSizeWidget {
         leading: isAppUnlock ? const DrawerToggleButton() : null,
         actions: [
           if (isProposer) const CreateProposalButton(),
-          const SessionActionHeader(),
-          const SessionStateHeader(),
+          const SessionCtaAction(),
+          const AccountSettingsAction(),
         ],
       ),
     );
