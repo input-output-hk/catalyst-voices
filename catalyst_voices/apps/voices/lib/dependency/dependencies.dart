@@ -187,6 +187,7 @@ final class Dependencies extends DependencyProvider {
         return VotingBallotBloc(
           get<UserService>(),
           get<CampaignService>(),
+          get<VotingBallotBuilder>(),
         );
       });
   }
@@ -448,5 +449,6 @@ final class Dependencies extends DependencyProvider {
       ActiveCampaignObserverImpl.new,
       dispose: (observer) async => observer.dispose(),
     );
+    registerLazySingleton<VotingBallotBuilder>(VotingBallotLocalBuilder.new);
   }
 }

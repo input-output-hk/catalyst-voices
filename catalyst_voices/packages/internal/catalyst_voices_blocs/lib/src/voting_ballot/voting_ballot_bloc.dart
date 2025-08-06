@@ -13,8 +13,8 @@ typedef _VoteWithProposal = ({Vote vote, VoteProposal? proposal});
 final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> {
   final UserService _userService;
   final CampaignService _campaignService;
+  final VotingBallotBuilder _ballotBuilder;
 
-  final _ballotBuilder = VotingBallotBuilder();
   var _cache = const VotingBallotCache();
 
   StreamSubscription<VotingPower?>? _votingPowerSub;
@@ -26,6 +26,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
   VotingBallotBloc(
     this._userService,
     this._campaignService,
+    this._ballotBuilder,
   ) : super(const VotingBallotState()) {
     on<UpdateVotingPowerEvent>(_updateVotingPower, transformer: uniqueEvents());
     on<UpdateVotingPhaseProgressEvent>(_updateVotingPhaseProgress, transformer: uniqueEvents());
@@ -61,14 +62,17 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
 
     _activeCampaignSub = _campaignService.watchActiveCampaign.listen(_handleCampaignChange);
 
-    // TODO(damian-molinski): watch service.
-    _handleLastCastedChange(null);
-
+    _ballotBuilder.addListener(_handleBallotBuilderChange);
     _handleBallotBuilderChange();
+
+    // TODO(damian-molinski): watch VotingService.
+    _handleLastCastedChange(null);
   }
 
   @override
   Future<void> close() {
+    _ballotBuilder.removeListener(_handleBallotBuilderChange);
+
     _votingPowerSub?.cancel();
     _votingPowerSub = null;
 
@@ -301,10 +305,8 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     RemoveVoteEvent event,
     Emitter<VotingBallotState> emit,
   ) {
-    _ballotBuilder.removeVoteOn(event.proposal);
     _cache = _cache.removeProposal(event.proposal);
-
-    _handleBallotBuilderChange();
+    _ballotBuilder.removeVoteOn(event.proposal);
   }
 
   void _updateFooterFromBallot(
@@ -348,19 +350,6 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     Emitter<VotingBallotState> emit,
   ) async {
     final proposalRef = event.proposal;
-
-    // If already has vote in ballot when we don't need to do anything
-    // because .voteOn will just update type with and keep it the same.
-    final voteId = _ballotBuilder.hasVotedOn(proposalRef)
-        ? null
-        : await _getLastCastedVoteOn(proposalRef).then((vote) => vote?.selfRef.id);
-
-    final vote = _ballotBuilder.voteOn(
-      proposal: proposalRef,
-      type: event.type,
-      voteId: voteId,
-    );
-
     final isProposalCached = _cache.votesProposals.containsKey(proposalRef);
 
     if (!isProposalCached) {
@@ -374,7 +363,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
         title: 'Dummy Proposal Title',
         authorName: 'XYZ',
         lastCastedVote: Vote(
-          selfRef: SignedDocumentRef.first(vote.selfRef.id),
+          selfRef: SignedDocumentRef.generateFirstRef(),
           proposal: proposalRef,
           type: VoteType.yes,
         ),
@@ -383,7 +372,17 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
       _cache = _cache.addProposal(proposal);
     }
 
-    _handleBallotBuilderChange();
+    // If already has vote in ballot when we don't need to do anything
+    // because .voteOn will just update type with and keep it the same.
+    final voteId = _ballotBuilder.hasVotedOn(proposalRef)
+        ? null
+        : await _getLastCastedVoteOn(proposalRef).then((vote) => vote?.selfRef.id);
+
+    _ballotBuilder.voteOn(
+      proposal: proposalRef,
+      type: event.type,
+      voteId: voteId,
+    );
   }
 
   void _updateVotingPhaseProgress(

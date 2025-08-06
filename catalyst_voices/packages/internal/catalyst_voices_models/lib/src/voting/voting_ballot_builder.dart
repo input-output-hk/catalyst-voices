@@ -1,61 +1,31 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 
 /// Builder utility for working with [Vote]s.
-final class VotingBallotBuilder {
-  /// A map of votes casted on ref.
-  final Map<DocumentRef, Vote> _votes;
-
-  factory VotingBallotBuilder({
-    List<Vote> votes = const [],
-  }) {
-    assert(votes.none((vote) => vote.isCasted), 'Can not add already casted votes');
-
-    final votesMap = Map.fromEntries(votes.map((vote) => MapEntry(vote.proposal, vote)));
-
-    return VotingBallotBuilder._(votesMap);
-  }
-
-  VotingBallotBuilder._(this._votes);
-
+abstract interface class VotingBallotBuilder implements Listenable {
   /// Numbers of votes in this ballot.
-  int get length => _votes.length;
+  int get length;
 
   /// Returns unmodifiable copy of votes made.
-  List<Vote> get votes => List.unmodifiable(_votes.values);
+  List<Vote> get votes;
 
   /// Adds [vote] to the list.
-  void addVote(Vote vote) {
-    assert(!vote.isCasted, 'Can not add already casted vote!');
-    assert(
-      () {
-        final id = vote.selfRef.id;
-        return _votes.values.every((vote) => vote.selfRef.id != id);
-      }(),
-      'Only one vote version is allowed',
-    );
-
-    _votes[vote.proposal] = vote;
-  }
+  void addVote(Vote vote);
 
   /// Builds [VotingBallot] with unmodifiable list of votes.
-  VotingBallot build() {
-    return VotingBallot(votes: votes);
-  }
+  VotingBallot build();
 
   /// Removes votes from this builder.
-  void clear() {
-    _votes.clear();
-  }
+  void clear();
 
   /// Returns [Vote] made on [proposal].
-  Vote? getVoteOn(DocumentRef proposal) => _votes[proposal];
+  Vote? getVoteOn(DocumentRef proposal);
 
   /// Lookup if has draft votes on [proposal].
-  bool hasVotedOn(DocumentRef proposal) => _votes.containsKey(proposal);
+  bool hasVotedOn(DocumentRef proposal);
 
   /// Removes [Vote] on [proposal].
-  Vote? removeVoteOn(DocumentRef proposal) => _votes.remove(proposal);
+  Vote? removeVoteOn(DocumentRef proposal);
 
   /// Updates vote made on [proposal] if already had any or adds new draft vote otherwise.
   ///
@@ -67,11 +37,5 @@ final class VotingBallotBuilder {
     required DocumentRef proposal,
     required VoteType type,
     String? voteId,
-  }) {
-    return _votes.update(
-      proposal,
-      (vote) => vote.copyWith(type: type),
-      ifAbsent: () => Vote.draft(id: voteId, proposal: proposal, type: type),
-    );
-  }
+  });
 }
