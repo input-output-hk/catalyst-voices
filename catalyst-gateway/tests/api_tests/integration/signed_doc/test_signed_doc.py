@@ -1,7 +1,6 @@
 import pytest
 from utils import uuid_v7
-from api import v1
-from api import v2
+from api import v1, v2
 from utils.rbac_chain import rbac_chain_factory, RoleID
 from utils.signed_doc import (
     proposal_templates,
