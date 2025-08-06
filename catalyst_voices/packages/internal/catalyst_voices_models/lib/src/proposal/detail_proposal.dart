@@ -33,7 +33,7 @@ class DetailProposal extends CoreProposal {
   }
 
   factory DetailProposal.fromData(ProposalData data, List<ProposalVersion> versions) {
-    return DetailProposal._(
+    return DetailProposal(
       selfRef: data.document.metadata.selfRef,
       categoryRef: data.document.metadata.categoryId,
       title: data.document.title ?? '',

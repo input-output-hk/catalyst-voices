@@ -165,10 +165,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     final campaign = await _campaignService.getActiveCampaign();
+    _cachedCampaign = campaign;
+    
     if (campaign == null) {
       return emitError(const LocalizedUnknownException());
     }
-    _cachedCampaign = campaign;
 
     final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
 
