@@ -23,7 +23,7 @@ final class ChangeTabVotingSignal extends VotingSignal {
 }
 
 final class PageReadyVotingSignal extends VotingSignal {
-  final Page<ProposalBrief> page;
+  final Page<ProposalBriefVoting> page;
 
   const PageReadyVotingSignal({required this.page});
 

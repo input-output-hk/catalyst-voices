@@ -31,4 +31,5 @@ export 'user/keychain/keychain_signer.dart' show KeychainSigner;
 export 'user/keychain/vault_keychain_provider.dart' show VaultKeychainProvider;
 export 'user/source/user_storage.dart';
 export 'user/user_repository.dart' show UserRepository;
+export 'voting/voting_repository.dart' show VotingRepository;
 export 'wallet/blockchain_repository.dart' show BlockchainRepository;

@@ -86,8 +86,9 @@ class _Category extends StatelessWidget {
 
 class _Description extends StatelessWidget {
   final String text;
+  final bool isTruncated;
 
-  const _Description({required this.text});
+  const _Description({required this.text, required this.isTruncated});
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +98,7 @@ class _Description extends StatelessWidget {
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colors.textOnPrimaryLevel0,
           ),
-      maxLines: 5,
+      maxLines: isTruncated ? 3 : 5,
       overflow: TextOverflow.ellipsis,
     );
   }
@@ -228,7 +229,10 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                   ),
                   const SizedBox(height: 12),
                   Expanded(
-                    child: _Description(text: widget.proposal.description),
+                    child: _Description(
+                      text: widget.proposal.description,
+                      isTruncated: voteData != null,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   _ProposalInfo(

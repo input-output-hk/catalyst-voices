@@ -33,7 +33,7 @@ class _VotingPageState extends State<VotingPage>
         ErrorHandlerStateMixin<VotingCubit, VotingPage>,
         SignalHandlerStateMixin<VotingCubit, VotingSignal, VotingPage> {
   late final TabController _tabController;
-  late final PagingController<ProposalBrief> _pagingController;
+  late final PagingController<ProposalBriefVoting> _pagingController;
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +158,7 @@ class _VotingPageState extends State<VotingPage>
   Future<void> _handleProposalsPageRequest(
     int pageKey,
     int pageSize,
-    ProposalBrief? lastProposalId,
+    ProposalBriefVoting? lastProposalId,
   ) async {
     final request = PageRequest(page: pageKey, size: pageSize);
     await context.read<VotingCubit>().getProposals(request);

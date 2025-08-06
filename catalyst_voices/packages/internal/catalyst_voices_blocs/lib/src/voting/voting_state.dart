@@ -11,6 +11,7 @@ class VotingState extends Equatable {
   final VotingPhaseProgressViewModel votingPhase;
   final bool hasSearchQuery;
   final List<String> favoritesIds;
+  final List<ProposalVotes> proposalVotes;
   final ProposalsCount count;
   final List<ProposalsCategorySelectorItem> categorySelectorItems;
 
@@ -21,6 +22,7 @@ class VotingState extends Equatable {
     this.votingPhase = const VotingPhaseProgressViewModel(),
     this.hasSearchQuery = false,
     this.favoritesIds = const [],
+    this.proposalVotes = const [],
     this.count = const ProposalsCount(),
     this.categorySelectorItems = const [],
   });
@@ -33,6 +35,7 @@ class VotingState extends Equatable {
         votingPhase,
         hasSearchQuery,
         favoritesIds,
+        proposalVotes,
         count,
         categorySelectorItems,
       ];
@@ -48,6 +51,7 @@ class VotingState extends Equatable {
     VotingPhaseProgressViewModel? votingPhase,
     bool? hasSearchQuery,
     List<String>? favoritesIds,
+    List<ProposalVotes>? proposalVotes,
     ProposalsCount? count,
     List<ProposalsCategorySelectorItem>? categorySelectorItems,
   }) {
@@ -58,12 +62,11 @@ class VotingState extends Equatable {
       votingPhase: votingPhase ?? this.votingPhase,
       hasSearchQuery: hasSearchQuery ?? this.hasSearchQuery,
       favoritesIds: favoritesIds ?? this.favoritesIds,
+      proposalVotes: proposalVotes ?? this.proposalVotes,
       count: count ?? this.count,
       categorySelectorItems: categorySelectorItems ?? this.categorySelectorItems,
     );
   }
-
-  bool isFavorite(String proposalId) => favoritesIds.contains(proposalId);
 }
 
 final class VotingStateOrderDropdown extends Equatable {

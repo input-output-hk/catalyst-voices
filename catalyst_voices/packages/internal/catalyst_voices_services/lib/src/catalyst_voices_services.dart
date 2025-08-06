@@ -28,3 +28,4 @@ export 'sync/sync_manager.dart' show SyncManager;
 export 'user/keychain_signer_service.dart' show KeychainSignerService;
 export 'user/signer_service.dart';
 export 'user/user_service.dart' show UserService;
+export 'voting/voting_service.dart' show VotingService;

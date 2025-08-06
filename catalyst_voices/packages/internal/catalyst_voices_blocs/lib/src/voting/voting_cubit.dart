@@ -17,17 +17,20 @@ final class VotingCubit extends Cubit<VotingState>
   final UserService _userService;
   final CampaignService _campaignService;
   final ProposalService _proposalService;
+  final VotingService _votingService;
 
   VotingCubitCache _cache = const VotingCubitCache();
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<List<String>>? _favoritesProposalsIdsSub;
   StreamSubscription<ProposalsCount>? _proposalsCountSub;
+  StreamSubscription<List<ProposalVotes>>? _proposalVotesSub;
 
   VotingCubit(
     this._userService,
     this._campaignService,
     this._proposalService,
+    this._votingService,
   ) : super(const VotingState()) {
     _resetCache();
 
@@ -40,6 +43,16 @@ final class VotingCubit extends Cubit<VotingState>
         .watchFavoritesProposalsIds()
         .distinct(listEquals)
         .listen(_handleFavoriteProposalsIds);
+
+    _proposalVotesSub =
+        _votingService.watchProposalVotes().distinct(listEquals).listen(_handleProposalVotes);
+  }
+
+  void changeDraftVote(SignedDocumentRef ref, VoteButtonAction action) {
+    return switch (action) {
+      VoteButtonActionRemoveDraft() => _votingService.setCurrentDraft(ref, null),
+      VoteButtonActionVote(:final type) => _votingService.setCurrentDraft(ref, type),
+    };
   }
 
   void changeFilters({
@@ -86,6 +99,9 @@ final class VotingCubit extends Cubit<VotingState>
 
     await _proposalsCountSub?.cancel();
     _proposalsCountSub = null;
+
+    await _proposalVotesSub?.cancel();
+    _proposalVotesSub = null;
 
     return super.close();
   }
@@ -208,16 +224,25 @@ final class VotingCubit extends Cubit<VotingState>
     final campaign = _cache.campaign;
     final page = _cache.page;
     final favoriteIds = _cache.favoriteIds ?? [];
+    final proposalVotes = _cache.proposalVotes ?? [];
 
     if (campaign == null || page == null) {
       return;
     }
 
     final mappedPage = page.map(
-      (proposal) => ProposalBrief.fromProposal(
-        proposal,
-        isFavorite: favoriteIds.contains(proposal.selfRef.id),
-      ),
+      (proposal) {
+        final voteData =
+            proposalVotes.firstWhereOrNull((element) => element.proposalRef == proposal.selfRef);
+        return ProposalBriefVoting.fromProposal(
+          proposal,
+          voteData,
+          categoryName: campaign.categories
+              .firstWhere((element) => element.selfRef == proposal.categoryRef)
+              .categoryText,
+          isFavorite: favoriteIds.contains(proposal.selfRef.id),
+        );
+      },
     );
     final signal = PageReadyVotingSignal(page: mappedPage);
 
@@ -236,6 +261,13 @@ final class VotingCubit extends Cubit<VotingState>
 
   void _handleProposalsCount(ProposalsCount count) {
     _cache = _cache.copyWith(count: count);
+    _dispatchState();
+  }
+
+  void _handleProposalVotes(List<ProposalVotes> votes) {
+    _logger.finer('Proposal votes[$votes]');
+    _cache = _cache.copyWith(proposalVotes: Optional(votes));
+    _emitCachedProposalsPage();
     _dispatchState();
   }
 
@@ -278,6 +310,7 @@ final class VotingCubit extends Cubit<VotingState>
     final selectedCategoryRef = _cache.filters.category;
     final filters = _cache.filters;
     final count = _cache.count;
+    final proposalVotes = _cache.proposalVotes ?? const [];
 
     final selectedCategory =
         campaign?.categories.firstWhereOrNull((e) => e.selfRef.id == selectedCategoryRef?.id);
@@ -299,6 +332,7 @@ final class VotingCubit extends Cubit<VotingState>
       votingPhase: votingPhaseViewModel,
       hasSearchQuery: hasSearchQuery,
       favoritesIds: favoriteIds,
+      proposalVotes: proposalVotes,
       count: count,
       categorySelectorItems: categorySelectorItems,
     );

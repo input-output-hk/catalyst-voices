@@ -1,6 +1,7 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 class ProposalBrief extends Equatable {
@@ -105,7 +106,8 @@ class ProposalBrief extends Equatable {
 }
 
 class ProposalBriefVoting extends ProposalBrief {
-  // TODO(LynxLynxx): Add voting specific fields
+  final VoteButtonData? voteData;
+
   const ProposalBriefVoting({
     required super.selfRef,
     required super.title,
@@ -119,10 +121,12 @@ class ProposalBriefVoting extends ProposalBrief {
     required super.commentsCount,
     super.isFavorite,
     super.author,
+    this.voteData,
   });
 
   factory ProposalBriefVoting.fromProposal(
-    Proposal proposal, {
+    Proposal proposal,
+    ProposalVotes? votes, {
     bool isFavorite = false,
     String categoryName = '',
   }) {
@@ -139,12 +143,17 @@ class ProposalBriefVoting extends ProposalBrief {
       updateDate: proposal.updateDate,
       commentsCount: proposal.commentsCount,
       isFavorite: isFavorite,
+      voteData: VoteButtonData.fromVotes(
+        currentDraft: votes?.currentDraft,
+        lastCasted: votes?.lastCasted,
+      ),
     );
   }
 
   @override
   List<Object?> get props => [
         ...super.props,
+        voteData,
       ];
 
   @override
@@ -161,6 +170,7 @@ class ProposalBriefVoting extends ProposalBrief {
     DateTime? updateDate,
     int? commentsCount,
     bool? isFavorite,
+    Optional<VoteButtonData>? voteData,
   }) {
     return ProposalBriefVoting(
       selfRef: selfRef ?? this.selfRef,
@@ -175,6 +185,20 @@ class ProposalBriefVoting extends ProposalBrief {
       updateDate: updateDate ?? this.updateDate,
       commentsCount: commentsCount ?? this.commentsCount,
       isFavorite: isFavorite ?? this.isFavorite,
+      voteData: voteData.dataOr(this.voteData),
+    );
+  }
+
+  ProposalBriefVoting copyWithVotes({
+    Vote? currentDraft,
+    Vote? lastCasted,
+  }) {
+    final voteData = VoteButtonData.fromVotes(
+      currentDraft: currentDraft,
+      lastCasted: lastCasted,
+    );
+    return copyWith(
+      voteData: Optional(voteData),
     );
   }
 }

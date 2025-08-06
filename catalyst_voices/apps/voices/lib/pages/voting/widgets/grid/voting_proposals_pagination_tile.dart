@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/cards/proposal/proposal_brief_card.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class VotingProposalsPaginationTile extends StatelessWidget {
-  final ProposalBrief proposal;
+  final ProposalBriefVoting proposal;
 
   const VotingProposalsPaginationTile({
     super.key,
@@ -30,9 +31,12 @@ class VotingProposalsPaginationTile extends StatelessWidget {
               isFavorite: isFavorite,
             );
       },
-      voteData: const VoteButtonData(),
+      voteData: proposal.voteData,
       onVoteAction: (action) {
-        // TODO(dt-iohk): handle the vote action when vote ballot is finished
+        context.read<VotingCubit>().changeDraftVote(
+              proposal.selfRef as SignedDocumentRef,
+              action,
+            );
       },
     );
   }
