@@ -56,10 +56,10 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     _resetCountTimer?.cancel();
     _resetCountTimer = null;
 
-    _syncStartsSub?.cancel();
+    unawaited(_syncStartsSub?.cancel());
     _syncStartsSub = null;
 
-    _documentsCountSub?.cancel();
+    unawaited(_documentsCountSub?.cancel());
     _documentsCountSub = null;
 
     return super.close();
