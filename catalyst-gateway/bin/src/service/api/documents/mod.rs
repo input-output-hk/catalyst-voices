@@ -7,7 +7,6 @@ use poem_openapi::{
     payload::Json,
     OpenApi,
 };
-use post_document_index_query::query_filter::DocumentIndexQueryFilterBody;
 use put_document::{
     unprocessable_content_request::PutDocumentUnprocessableContent, MAXIMUM_DOCUMENT_SIZE,
 };
@@ -111,13 +110,38 @@ impl DocumentApi {
         operation_id = "postDocument",
         transform = "schema_version_validation"
     )]
-    async fn post_document(
-        &self, /// The Query Filter Specification
-        query: Json<DocumentIndexQueryFilterBody>,
+    async fn post_document_v1(
+        &self,
+        /// The Query Filter Specification
+        query: Json<post_document_index_query::v1::request::DocumentIndexQueryFilterBody>,
         page: Query<Option<Page>>, limit: Query<Option<Limit>>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
-    ) -> post_document_index_query::AllResponses {
-        post_document_index_query::endpoint(query.0 .0, page.0, limit.0).await
+    ) -> post_document_index_query::v1::AllResponses {
+        post_document_index_query::v1::endpoint(query.0 .0, page.0, limit.0).await
+    }
+
+    /// Post A Signed Document Index Query for Newer Versions of v0.04.
+    ///
+    /// Produces a summary of signed documents that meet the criteria
+    /// defined in the request body for new signed document versions of v0.04.
+    ///
+    /// It does not return the actual documents, just an index of the document identifiers
+    /// which allows the documents to be retrieved by the `GET document` endpoint.
+    #[oai(
+        path = "/v2/document/index",
+        method = "post",
+        operation_id = "postDocumentV2",
+        transform = "schema_version_validation"
+    )]
+    async fn post_document_v2(
+        &self,
+        /// The Query Filter Specification
+        query: Json<post_document_index_query::v2::request::DocumentIndexQueryFilterBodyV2>,
+        page: Query<Option<Page>>, limit: Query<Option<Limit>>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
+    ) -> post_document_index_query::v2::AllResponses {
+        post_document_index_query::v2::endpoint(query.0 .0, page.0, limit.0).await
     }
 }

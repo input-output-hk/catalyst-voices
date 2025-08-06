@@ -1,4 +1,5 @@
-//! Catalyst Signed Document Endpoint Response Objects.
+//! Document Index Query V2 endpoint response objects.
+
 use derive_more::{From, Into};
 use poem_openapi::{
     types::{Example, ToJSON},
