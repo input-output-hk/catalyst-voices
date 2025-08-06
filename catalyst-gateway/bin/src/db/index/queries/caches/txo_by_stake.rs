@@ -73,7 +73,7 @@ pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
                 .iter()
                 .find(|tx| tx.key.as_ref() == update_key)
             {
-                // Avoid wrting if txo has already been spent,
+                // Avoid writing if txo has already been spent,
                 if txo.is_spent() {
                     debug!(
                         %stake_address,
