@@ -150,29 +150,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       documentData: documentData,
       templateData: documentTemplate,
     );
-    final documentVersions = await queryVersionsOfId(
-      id: ref.id,
-      includeLocalDrafts: true,
-    );
-    final proposalVersions = (await Future.wait(
-      documentVersions.map(
-        (e) async {
-          final proposalPublish = await getProposalPublishForRef(ref: e.metadata.selfRef);
-
-          if (proposalPublish == null) {
-            return null;
-          }
-          return ProposalData(document: e, publish: proposalPublish);
-        },
-      ).toList(),
-    ))
-        .whereType<ProposalData>()
-        .toList();
 
     return ProposalData(
       document: proposalDocument,
       commentsCount: commentsCount,
-      versions: proposalVersions,
       publish: proposalPublish,
     );
   }
@@ -421,12 +402,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       document: document,
       publish: publish,
       commentsCount: data.commentsCount,
-      // TODO(damian-molinski): remove it or use different model.
-      // ignore: avoid_redundant_argument_values
-      categoryName: '',
-      // TODO(damian-molinski): only Strings or use different model.
-      // ignore: avoid_redundant_argument_values
-      versions: const [],
     );
   }
 
