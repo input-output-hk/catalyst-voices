@@ -10,13 +10,13 @@ dependencies:
   catalyst_cardano_serialization: ^1.0.0
   catalyst_key_derivation:
     path: ../
-  convert: ^3.1.1
+  convert: ^3.1.2
   cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
 
 dev_dependencies:
-  analyzer: 7.3.0
+  analyzer: 7.4.0
   catalyst_analysis: ^3.0.0
   flutter_test:
     sdk: flutter

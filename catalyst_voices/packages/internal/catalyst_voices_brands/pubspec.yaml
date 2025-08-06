@@ -16,11 +16,10 @@ dependencies:
   google_fonts: ^6.2.1
 
 dev_dependencies:
-  analyzer: 7.3.0
+  analyzer: 7.4.0
   catalyst_analysis: ^3.0.0
   catalyst_voices_blocs:
     path: ../catalyst_voices_blocs
-  flutter_bloc: ^8.1.5
   flutter_test:
     sdk: flutter
-  test: ^1.24.9
+  test: ^1.25.15

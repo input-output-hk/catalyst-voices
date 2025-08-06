@@ -8,7 +8,7 @@ environment:
   flutter: ">=3.32.8"
 
 dependencies:
-  bloc_concurrency: ^0.2.2
+  bloc_concurrency: ^0.3.0
   catalyst_cardano: ^1.0.0
   catalyst_cardano_serialization: ^1.0.0
   catalyst_cardano_web: ^1.0.0
@@ -25,25 +25,25 @@ dependencies:
     path: ../catalyst_voices_shared
   catalyst_voices_view_models:
     path: ../catalyst_voices_view_models
-  collection: ^1.19.0
+  collection: ^1.19.1
   equatable: ^2.0.7
   flutter:
     sdk: flutter
-  flutter_bloc: ^8.1.5
-  flutter_secure_storage: ^9.2.2
-  formz: ^0.7.0
+  flutter_bloc: ^9.1.1
+  flutter_secure_storage: ^9.2.4
+  formz: ^0.8.0
   meta: ^1.16.0
-  result_type: ^0.2.0
-  rxdart: ^0.27.7
+  result_type: ^1.0.0
+  rxdart: ^0.28.0
   uuid_plus: ^0.1.0
 
 dev_dependencies:
-  analyzer: 7.3.0
-  bloc_test: ^9.1.4
+  analyzer: 7.4.0
+  bloc_test: ^10.0.0
   catalyst_analysis: ^3.0.0
   flutter_test:
     sdk: flutter
-  mocktail: ^1.0.1
+  mocktail: ^1.0.4
   plugin_platform_interface: ^2.1.8
   shared_preferences: ^2.3.3
   shared_preferences_platform_interface: ^2.4.1

@@ -13,10 +13,10 @@ dependencies:
     sdk: flutter
   flutter_driver:
     sdk: flutter
-  webdriver: ^3.0.3
+  webdriver: ^3.1.0
 
 dev_dependencies:
-  analyzer: 7.3.0
+  analyzer: 7.4.0
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0

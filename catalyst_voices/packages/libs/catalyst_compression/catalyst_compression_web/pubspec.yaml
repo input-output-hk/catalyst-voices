@@ -24,15 +24,15 @@ flutter:
 
 dependencies:
   catalyst_compression_platform_interface: ^1.0.0
-  convert: ^3.1.1
+  convert: ^3.1.2
   flutter:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-  web: ^1.1.0
+  web: ^1.1.1
 
 dev_dependencies:
-  analyzer: 7.3.0
+  analyzer: 7.4.0
   catalyst_analysis: ^3.0.0
   flutter_test:
     sdk: flutter
