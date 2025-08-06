@@ -68,11 +68,7 @@ pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
             slot_no: txo_update.slot_no,
         };
         if let Some(txo_rows) = cache.get(stake_address) {
-            if let Some(txo) = txo_rows
-                .clone()
-                .iter()
-                .find(|tx| tx.key.as_ref() == update_key)
-            {
+            if let Some(txo) = txo_rows.iter().find(|tx| tx.key.as_ref() == update_key) {
                 // Avoid writing if txo has already been spent,
                 if txo.is_spent() {
                     debug!(

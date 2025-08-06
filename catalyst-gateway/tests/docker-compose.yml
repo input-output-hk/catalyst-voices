@@ -21,21 +21,17 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
-    ports:
-      - "5432:5432"
 
   scylla-node:
     image: scylladb/scylla:latest
     container_name: scylla-node
     restart: unless-stopped
-    command: --smp 12 --memory 4G --overprovisioned 1 --api-address 0.0.0.0
+    command: --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0
     healthcheck:
       test: cqlsh -e "SHOW VERSION" || exit 1
       interval: 15s
       timeout: 30s
       retries: 10
-    ports:
-      - "9042:9042"
 
   cat-gateway:
     image: cat-gateway:latest
@@ -106,24 +102,3 @@ services:
     depends_on:
       cat-gateway:
         condition: service_healthy
-
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-
-  perses:
-    image: persesdev/perses
-    container_name: perses
-    ports:
-      - "11000:8080"
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: grafana
-    ports:
-      - "3000:3000"
-
