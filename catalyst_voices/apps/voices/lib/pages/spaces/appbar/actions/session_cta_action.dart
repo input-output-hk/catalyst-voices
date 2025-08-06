@@ -11,10 +11,8 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 /// Displays current session action and toggling to next when clicked.
-class SessionActionHeader extends StatelessWidget {
-  const SessionActionHeader({
-    super.key,
-  });
+class SessionCtaAction extends StatelessWidget {
+  const SessionCtaAction({super.key});
 
   @override
   Widget build(BuildContext context) {
