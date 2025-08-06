@@ -2,6 +2,7 @@
 import pytest
 from utils import uuid_v7
 from api import v1
+from api import v2
 import json
 from utils.rbac_chain import rbac_chain_factory, RoleID
 from utils.signed_doc import SignedDocumentV1, proposal_templates
@@ -471,6 +472,16 @@ def test_put_deprecated_documents(rbac_chain_factory):
         ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
         resp = v1.document.get(document_id=id)
+        assert (
+            resp.status_code == 200
+        ), f"Failed to get document: {resp.status_code} - {resp.text}"
+
+        resp = v1.document.post(filter={"id": {"eq": id}})
+        assert (
+            resp.status_code == 200
+        ), f"Failed to get document: {resp.status_code} - {resp.text}"
+
+        resp = v2.document.post(filter={"id": {"eq": id}})
         assert (
             resp.status_code == 200
         ), f"Failed to get document: {resp.status_code} - {resp.text}"

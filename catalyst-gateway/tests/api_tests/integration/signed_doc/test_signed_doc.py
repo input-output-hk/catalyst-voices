@@ -1,6 +1,7 @@
 import pytest
 from utils import uuid_v7
 from api import v1
+from api import v2
 from utils.rbac_chain import rbac_chain_factory, RoleID
 from utils.signed_doc import (
     proposal_templates,
@@ -37,6 +38,10 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
 
     # Post a signed document with filter ID
     resp = v1.document.post(filter={"id": {"eq": proposal_doc_id}})
+    assert (
+        resp.status_code == 404
+    ), f"Failed to post document: {resp.status_code} - {resp.text}"
+    resp = v2.document.post(filter={"id": {"eq": proposal_doc_id}})
     assert (
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
@@ -139,6 +144,10 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
     # Post a signed document with filter ID
     resp = v1.document.post(filter={"id": {"eq": comment_doc_id}})
     assert (
+        resp.status_code == 404
+    ), f"Failed to post document: {resp.status_code} - {resp.text}"
+    resp = v2.document.post(filter={"id": {"eq": comment_doc_id}})
+    assert (
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
 
@@ -218,6 +227,12 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
 
     # Post a signed document with filter ID
     resp = v1.document.post(
+        filter={"id": {"eq": submission_action_id}},
+    )
+    assert (
+        resp.status_code == 404
+    ), f"Failed to post document: {resp.status_code} - {resp.text}"
+    resp = v2.document.post(
         filter={"id": {"eq": submission_action_id}},
     )
     assert (
