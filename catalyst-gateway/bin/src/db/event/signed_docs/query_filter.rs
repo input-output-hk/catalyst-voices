@@ -9,19 +9,19 @@ use crate::db::event::common::eq_or_ranged_uuid::EqOrRangedUuid;
 /// If all fields would be `None` the query will search for all entries from the db.
 #[derive(Clone, Debug, Default)]
 pub(crate) struct DocsQueryFilter {
-    /// `type` field
+    /// `type` field. Empty list if unspecified.
     doc_type: Vec<uuid::Uuid>,
     /// `id` field
     id: Option<EqOrRangedUuid>,
     /// `ver` field
     ver: Option<EqOrRangedUuid>,
-    /// `metadata->'ref'` field
+    /// `metadata->'ref'` field. Empty list if unspecified.
     doc_ref: Vec<DocumentRef>,
-    /// `metadata->'template'` field
+    /// `metadata->'template'` field. Empty list if unspecified.
     template: Vec<DocumentRef>,
-    /// `metadata->'reply'` field
+    /// `metadata->'reply'` field. Empty list if unspecified.
     reply: Vec<DocumentRef>,
-    /// `metadata->'parameters'` field
+    /// `metadata->'parameters'` field. Empty list if unspecified.
     parameters: Vec<DocumentRef>,
 }
 
