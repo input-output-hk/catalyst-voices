@@ -31,7 +31,7 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
     proposal_doc_id = proposal_doc.metadata["id"]
 
     # Get the proposal document
-    resp = document_1.get(document_id=proposal_doc_id)
+    resp = document_v1.get(document_id=proposal_doc_id)
     assert (
         resp.status_code == 200
     ), f"Failed to get document: {resp.status_code} - {resp.text}"
@@ -41,7 +41,7 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
     assert (
         resp.status_code == 404
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
-    resp = document_v2.post(filter={"id": {"eq": proposal_doc_id}})
+    resp = document_v2.post(filter={"id": [{"eq": proposal_doc_id}]})
     assert (
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
@@ -146,7 +146,7 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
     assert (
         resp.status_code == 404
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
-    resp = document_v2.post(filter={"id": {"eq": comment_doc_id}})
+    resp = document_v2.post(filter={"id": [{"eq": comment_doc_id}]})
     assert (
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
@@ -233,7 +233,7 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
         resp.status_code == 404
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
     resp = document_v2.post(
-        filter={"id": {"eq": submission_action_id}},
+        filter={"id": [{"eq": submission_action_id}]},
     )
     assert (
         resp.status_code == 200
@@ -374,8 +374,8 @@ def test_document_index_endpoint(
 
         limit = 1
         page = 0
-        filter = {"id": {"eq": doc.metadata["id"]}}
-        resp = document_v1.post(
+        filter = {"id": [{"eq": doc.metadata["id"]}]}
+        resp = document_v2.post(
             limit=limit,
             page=page,
             filter=filter,
@@ -390,7 +390,7 @@ def test_document_index_endpoint(
         assert data["page"]["remaining"] == total_amount - 1 - page
 
         page += 1
-        resp = document_v1.post(
+        resp = document_v2.post(
             limit=limit,
             page=page,
             filter=filter,
@@ -403,7 +403,7 @@ def test_document_index_endpoint(
         assert data["page"]["page"] == page
         assert data["page"]["remaining"] == total_amount - 1 - page
 
-        resp = document_v1.post(
+        resp = document_v2.post(
             limit=total_amount,
             filter=filter,
         )
@@ -416,7 +416,7 @@ def test_document_index_endpoint(
         assert data["page"]["remaining"] == 0
 
         # Pagination out of range
-        resp = document_v1.post(
+        resp = document_v2.post(
             page=92233720368547759,
             filter={},
         )
