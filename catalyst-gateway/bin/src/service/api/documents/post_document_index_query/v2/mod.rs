@@ -34,7 +34,6 @@ use crate::{
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
-#[allow(dead_code)]
 pub(crate) enum Responses {
     /// ## OK
     ///
@@ -83,6 +82,7 @@ pub(crate) async fn endpoint(
     };
 
     match fetched_docs {
+        Ok((docs, _)) if docs.is_empty() => Responses::NotFound.into(),
         Ok((docs, doc_count)) => {
             let remaining = Remaining::calculate(page.into(), limit.into(), total, doc_count);
 
