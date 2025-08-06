@@ -26,3 +26,9 @@ package:
 
     ENTRYPOINT poetry run pytest -s -m preprod_indexing --junitxml=junit-report.xml --cov=integration --cov-report lcov
     SAVE IMAGE api-tests-runner:latest
+
+package-resilience:
+    FROM +builder
+
+    ENTRYPOINT poetry run pytest -s -m health_endpoint --junitxml=junit-report.xml --cov=integration --cov-report lcov
+    SAVE IMAGE resilience-tests-runner:latest
