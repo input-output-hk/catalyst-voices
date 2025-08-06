@@ -18,7 +18,6 @@ class VotingProposalsPaginationTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ProposalBriefCard(
       proposal: proposal,
-      isFavorite: proposal.isFavorite,
       onTap: () {
         final route = ProposalRoute.fromRef(ref: proposal.selfRef);
 
@@ -30,14 +29,8 @@ class VotingProposalsPaginationTile extends StatelessWidget {
               isFavorite: isFavorite,
             );
       },
-      voteData: proposal.voteData,
       onVoteAction: (action) {
-        unawaited(
-          context.read<VotingCubit>().changeDraftVote(
-                proposal.selfRef,
-                action,
-              ),
-        );
+        // TODO(dt-iohk): handle the vote action when vote ballot is finished
       },
     );
   }

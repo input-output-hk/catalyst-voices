@@ -17,7 +17,6 @@ final class VotingCubit extends Cubit<VotingState>
   final UserService _userService;
   final CampaignService _campaignService;
   final ProposalService _proposalService;
-  final VotingService _votingService;
 
   VotingCubitCache _cache = const VotingCubitCache();
 
@@ -30,7 +29,6 @@ final class VotingCubit extends Cubit<VotingState>
     this._userService,
     this._campaignService,
     this._proposalService,
-    this._votingService,
   ) : super(const VotingState()) {
     _resetCache();
 
@@ -43,20 +41,6 @@ final class VotingCubit extends Cubit<VotingState>
         .watchFavoritesProposalsIds()
         .distinct(listEquals)
         .listen(_handleFavoriteProposalsIds);
-
-    _proposalVotesSub =
-        _votingService.watchProposalVotes().distinct(listEquals).listen(_handleProposalVotes);
-  }
-
-  Future<void> changeDraftVote(DocumentRef ref, VoteButtonAction action) async {
-    switch (action) {
-      case VoteButtonActionRemoveDraft():
-        await _votingService.setCurrentDraft(ref, null);
-        break;
-      case VoteButtonActionVote():
-        await _votingService.setCurrentDraft(ref, action.type);
-        break;
-    }
   }
 
   void changeFilters({
@@ -143,7 +127,6 @@ final class VotingCubit extends Cubit<VotingState>
     unawaited(_loadCampaign());
     unawaited(_loadVotingPower());
     unawaited(_loadFavoriteProposals());
-    unawaited(_loadProposalVotes());
 
     changeFilters(
       onlyMy: Optional(onlyMyProposals),
@@ -269,13 +252,6 @@ final class VotingCubit extends Cubit<VotingState>
     _dispatchState();
   }
 
-  void _handleProposalVotes(List<ProposalVotes> votes) {
-    _logger.finer('Proposal votes[$votes]');
-    _cache = _cache.copyWith(proposalVotes: Optional(votes));
-    _emitCachedProposalsPage();
-    _dispatchState();
-  }
-
   Future<void> _loadCampaign() async {
     final campaign = await _campaignService.getActiveCampaign();
     _cache = _cache.copyWith(campaign: Optional(campaign));
@@ -289,13 +265,6 @@ final class VotingCubit extends Cubit<VotingState>
     final favorites = await _proposalService.getFavoritesProposalsIds();
     if (!isClosed) {
       _handleFavoriteProposalsIds(favorites);
-    }
-  }
-
-  Future<void> _loadProposalVotes() async {
-    final votes = await _votingService.getProposalVotes();
-    if (!isClosed) {
-      _handleProposalVotes(votes);
     }
   }
 

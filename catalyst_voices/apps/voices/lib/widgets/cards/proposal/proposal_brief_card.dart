@@ -13,19 +13,15 @@ import 'package:flutter/material.dart';
 /// Displays a proposal brief on a card.
 class ProposalBriefCard extends StatefulWidget {
   final ProposalBrief proposal;
-  final bool isFavorite;
   final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
-  final VoteButtonData? voteData;
   final ValueChanged<VoteButtonAction>? onVoteAction;
 
   const ProposalBriefCard({
     super.key,
     required this.proposal,
-    this.isFavorite = false,
     this.onTap,
     this.onFavoriteChanged,
-    this.voteData,
     this.onVoteAction,
   });
 
@@ -183,7 +179,10 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
 
   @override
   Widget build(BuildContext context) {
-    final voteData = widget.voteData;
+    final voteData = switch (widget.proposal) {
+      ProposalBriefVoting(:final voteData) => voteData,
+      _ => null,
+    };
     final onVoteAction = widget.onVoteAction;
 
     return ConstrainedBox(
@@ -211,7 +210,7 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                 children: [
                   _Topbar(
                     proposalRef: widget.proposal.selfRef,
-                    isFavorite: widget.isFavorite,
+                    isFavorite: widget.proposal.isFavorite,
                     onFavoriteChanged: widget.onFavoriteChanged,
                   ),
                   const SizedBox(height: 2),

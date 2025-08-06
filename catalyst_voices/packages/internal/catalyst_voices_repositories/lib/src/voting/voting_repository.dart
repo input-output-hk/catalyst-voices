@@ -1,66 +1,55 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:collection/collection.dart';
+import 'package:rxdart/rxdart.dart';
 
 final class VotingMockRepository implements VotingRepository {
-  final _votesStreamController = StreamController<List<ProposalVotes>>.broadcast();
-  final List<ProposalVotes> _cachedVotes = [];
+  // Using BehaviorSubject to get the last value of the stream after emission when someone subscribes to it
+  final _castedVotesSC = BehaviorSubject<List<Vote>>();
+  final _cachedCastedVotes = <Vote>[];
 
-  VotingMockRepository();
-
-  @override
-  Stream<List<ProposalVotes>> get watchProposalVotes => _votesStreamController.stream;
-
-  @override
-  Future<ProposalVotes?> getProposalVoteInfoFor(DocumentRef ref) async {
-    return _cachedVotes.firstWhereOrNull((proposal) => proposal.proposalRef == ref);
+  VotingMockRepository() {
+    unawaited(_loadCastedVotes());
   }
 
   @override
-  Future<List<ProposalVotes>> getProposalVotes() async {
-    return List.from(_cachedVotes);
-  }
+  ValueStream<List<Vote>> get watchedCastedVotes => _castedVotesSC;
 
   @override
-  Future<ProposalVotes?> setCurrentDraft(DocumentRef ref, VoteType? type) async {
-    final proposalVoteIndex = _cachedVotes.indexWhere((proposal) => proposal.proposalRef == ref);
-
-    if (type == null) {
-      _cachedVotes.removeWhere((proposal) => proposal.proposalRef == ref);
-      _votesStreamController.add(List.from(_cachedVotes));
-      return null;
+  Future<void> castVotes(List<Vote> draftVotes) async {
+    final castedVotes = <Vote>[];
+    for (final vote in draftVotes) {
+      castedVotes.add(vote.toCasted());
     }
 
-    final vote = Vote.draft(
-      proposal: ref,
-      type: type,
-    );
+    // TODO(LynxLynxx): Save casted votes to storage or remote source
 
-    if (proposalVoteIndex != -1) {
-      _cachedVotes[proposalVoteIndex] =
-          _cachedVotes[proposalVoteIndex].copyWith(currentDraft: Optional(vote));
-    } else {
-      _cachedVotes.add(ProposalVotes(proposalRef: ref, currentDraft: vote));
+    // Create a map for efficient lookup and updates
+    final votesMap = {for (final vote in _cachedCastedVotes) vote.proposal: vote};
+
+    // Update or add new votes
+    for (final newVote in castedVotes) {
+      votesMap[newVote.proposal] = newVote;
     }
 
-    _votesStreamController.add(List.from(_cachedVotes));
-    return _cachedVotes.firstWhereOrNull((proposal) => proposal.proposalRef == ref);
+    _cachedCastedVotes
+      ..clear()
+      ..addAll(votesMap.values);
+
+    _castedVotesSC.add(List.from(_cachedCastedVotes));
   }
 
-  @override
-  void setLastCasted(DocumentRef ref) {
-    // TODO(LynxLynxx): Implement it
+  Future<void> _loadCastedVotes() async {
+    // TODO(LynxLynxx): Load casted votes from storage or remote source
+
+    _castedVotesSC.add(List.from(_cachedCastedVotes));
   }
 }
 
 abstract interface class VotingRepository {
   factory VotingRepository() => VotingMockRepository();
 
-  Stream<List<ProposalVotes>> get watchProposalVotes;
-  Future<ProposalVotes?> getProposalVoteInfoFor(DocumentRef ref);
-  Future<List<ProposalVotes>> getProposalVotes();
-  Future<ProposalVotes?> setCurrentDraft(DocumentRef ref, VoteType? type);
+  ValueStream<List<Vote>> get watchedCastedVotes;
 
-  void setLastCasted(DocumentRef ref);
+  Future<void> castVotes(List<Vote> draftVotes);
 }

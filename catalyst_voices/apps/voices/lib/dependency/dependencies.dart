@@ -104,7 +104,6 @@ final class Dependencies extends DependencyProvider {
           get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
-          get<VotingService>(),
         ),
       )
       // TODO(LynxLynxx): add repository for campaign management
@@ -150,7 +149,6 @@ final class Dependencies extends DependencyProvider {
           get<CommentService>(),
           get<CampaignService>(),
           get<DocumentMapper>(),
-          get<VotingService>(),
         );
       })
       ..registerFactory<NewProposalCubit>(() {

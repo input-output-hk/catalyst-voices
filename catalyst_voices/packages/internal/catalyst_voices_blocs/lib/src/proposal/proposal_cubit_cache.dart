@@ -13,7 +13,6 @@ final class ProposalCubitCache extends Equatable {
   final bool? isFavorite;
   final bool? isVotingStage;
   final bool? readOnlyMode;
-  final ProposalVotes? votingData;
 
   const ProposalCubitCache({
     this.activeAccountId,
@@ -25,7 +24,6 @@ final class ProposalCubitCache extends Equatable {
     this.isFavorite,
     this.isVotingStage,
     this.readOnlyMode,
-    this.votingData,
   });
 
   @override
@@ -39,7 +37,6 @@ final class ProposalCubitCache extends Equatable {
         isFavorite,
         isVotingStage,
         readOnlyMode,
-        votingData,
       ];
 
   ProposalCubitCache copyWith({
@@ -64,7 +61,6 @@ final class ProposalCubitCache extends Equatable {
       isFavorite: isFavorite.dataOr(this.isFavorite),
       isVotingStage: isVotingStage.dataOr(this.isVotingStage),
       readOnlyMode: readOnlyMode.dataOr(this.readOnlyMode),
-      votingData: votingData.dataOr(this.votingData),
     );
   }
 }

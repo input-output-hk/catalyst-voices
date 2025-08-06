@@ -166,7 +166,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   ) async {
     final campaign = await _campaignService.getActiveCampaign();
     _cachedCampaign = campaign;
-    
+
     if (campaign == null) {
       return emitError(const LocalizedUnknownException());
     }

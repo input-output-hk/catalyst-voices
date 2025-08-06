@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:rxdart/rxdart.dart';
 
 final class VotingMockService implements VotingService {
   final VotingRepository _votingRepository;
@@ -7,38 +8,22 @@ final class VotingMockService implements VotingService {
   const VotingMockService(this._votingRepository);
 
   @override
-  Future<ProposalVotes?> getProposalVoteInfoFor(DocumentRef ref) {
-    return _votingRepository.getProposalVoteInfoFor(ref);
+  Future<void> castVotes(List<Vote> draftVotes) async {
+    await _votingRepository.castVotes(draftVotes);
   }
 
   @override
-  Future<List<ProposalVotes>> getProposalVotes() async {
-    return _votingRepository.getProposalVotes();
-  }
-
-  @override
-  Future<ProposalVotes?> setCurrentDraft(DocumentRef ref, VoteType? type) async {
-    return _votingRepository.setCurrentDraft(ref, type);
-  }
-
-  @override
-  void setLastCasted(DocumentRef ref) {
-    return _votingRepository.setLastCasted(ref);
-  }
-
-  @override
-  Stream<List<ProposalVotes>> watchProposalVotes() {
-    return _votingRepository.watchProposalVotes;
+  ValueStream<List<Vote>> watchedCastedVotes() {
+    return _votingRepository.watchedCastedVotes;
   }
 }
 
 abstract interface class VotingService {
-  const factory VotingService(VotingRepository votingRepository) = VotingMockService;
+  const factory VotingService(
+    VotingRepository votingRepository,
+  ) = VotingMockService;
 
-  Future<ProposalVotes?> getProposalVoteInfoFor(DocumentRef ref);
-  Future<List<ProposalVotes>> getProposalVotes();
-  Future<ProposalVotes?> setCurrentDraft(DocumentRef ref, VoteType? type);
-  void setLastCasted(DocumentRef ref);
+  Future<void> castVotes(List<Vote> draftVotes);
 
-  Stream<List<ProposalVotes>> watchProposalVotes();
+  ValueStream<List<Vote>> watchedCastedVotes();
 }
