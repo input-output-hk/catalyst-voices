@@ -105,11 +105,11 @@ jobs:
       - name: Running resilience tests
         if: always()
         run: |
-          sed -i '' 's/CHANGE_ME@event-db\//CHANGE_ME@haproxy:18080\//g' docker-compose.yml
-          sed -i '' 's/_URL=scylla-node:9042/_URL=haproxy:18090/' docker-compose.yml
+          sed -i '' 's/CHANGE_ME@event-db\//CHANGE_ME@haproxy:18080\//g' catalyst-gateway/tests/docker-compose.yml
+          sed -i '' 's/_URL=scylla-node:9042/_URL=haproxy:18090/' catalyst-gateway/tests/docker-compose.yml
           docker compose -f catalyst-gateway/tests/docker-compose.yml up haproxy
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up resilience-tests-runner --abort-on-container-exit --exit-code-from resilience-tests-runner
-          docker compose -f catalyst-gateway/tests/docker-compose.yml logs resilience-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-health-tests-runner --abort-on-container-exit --exit-code-from api-health-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-health-tests-runner
 
       - name: Running schemathesis tests
         if: always()

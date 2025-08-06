@@ -28,7 +28,7 @@ prepare-all-images:
     BUILD gateway+docker
     BUILD ../event-db+docker
     BUILD ./api_tests+package
-    BUILD ./api_tests+package-resilience
+    BUILD ./api_tests+package-health
     BUILD ./schemathesis_tests+package
     BUILD +package-postgres-runner
     BUILD +package-scylla-runner
