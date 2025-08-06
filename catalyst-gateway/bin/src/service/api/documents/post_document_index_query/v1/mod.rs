@@ -30,7 +30,6 @@ pub(crate) mod response;
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
-#[allow(dead_code)]
 pub(crate) enum Responses {
     /// ## OK
     ///
@@ -79,6 +78,7 @@ pub(crate) async fn endpoint(
     };
 
     match fetched_docs {
+        Ok((docs, _)) if docs.is_empty() => Responses::NotFound.into(),
         Ok((docs, doc_count)) => {
             let remaining = Remaining::calculate(page.into(), limit.into(), total, doc_count);
 
@@ -109,10 +109,12 @@ async fn fetch_docs(
             |(mut indexed_docs, mut total_fetched_doc_count), doc| {
                 async move {
                     let id = *doc.id();
-                    indexed_docs.entry(id).or_insert_with(Vec::new).push(doc);
-                    total_fetched_doc_count = total_fetched_doc_count
-                        .checked_add(1)
-                        .ok_or(anyhow::anyhow!("Fetched Signed Documents overflow"))?;
+                    if CatalystSignedDocument::try_from(doc.raw())?.is_deprecated()? {
+                        indexed_docs.entry(id).or_insert_with(Vec::new).push(doc);
+                        total_fetched_doc_count = total_fetched_doc_count
+                            .checked_add(1)
+                            .ok_or(anyhow::anyhow!("Fetched Signed Documents overflow"))?;
+                    }
                     Ok((indexed_docs, total_fetched_doc_count))
                 }
             },
