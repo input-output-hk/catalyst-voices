@@ -1042,6 +1042,10 @@
   "@endDate": {
     "description": "Label for campaign end date"
   },
+  "ended": "Ended",
+  "@ended": {
+    "description": "General label describing cases like phase has ended"
+  },
   "enterPassword": "Enter password",
   "@enterPassword": {
     "description": "Label for password input field"
@@ -3543,10 +3547,6 @@
   "votingEnded": "Voting ended",
   "@votingEnded": {
     "description": "Label when the voting phase is closed."
-  },
-  "ended": "Ended",
-  "@ended": {
-    "description": "General label describing cases like phase has ended"
   },
   "votingEndsIn": "Ends in {duration}",
   "@votingEndsIn": {
