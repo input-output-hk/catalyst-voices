@@ -33,7 +33,7 @@ class DetailProposal extends CoreProposal {
   }
 
   factory DetailProposal.fromData(ProposalData data, List<ProposalVersion> versions) {
-    return DetailProposal._(
+    return DetailProposal(
       selfRef: data.document.metadata.selfRef,
       categoryRef: data.document.metadata.categoryId,
       title: data.document.title ?? '',
@@ -70,12 +70,13 @@ class DetailProposal extends CoreProposal {
 }
 
 extension ProposalWithVersionX on DetailProposal {
-  static DetailProposal dummy(ProposalPublish publish) => DetailProposal(
+  static DetailProposal dummy(ProposalPublish publish, {SignedDocumentRef? categoryRef}) =>
+      DetailProposal(
         selfRef: const SignedDocumentRef(
           id: '019584be-f0ef-7b01-8d36-422a3d6a0533',
           version: '019584be-2321-7a1a-9b68-ad33a97a7e84',
         ),
-        categoryRef: SignedDocumentRef.generateFirstRef(),
+        categoryRef: categoryRef ?? SignedDocumentRef.generateFirstRef(),
         title: 'Dummy Proposal ver 2',
         description: 'Dummy description',
         fundsRequested: const Coin(100),
