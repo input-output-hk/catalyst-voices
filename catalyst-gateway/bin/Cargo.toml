@@ -15,15 +15,15 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
-cardano-chain-follower = { version = "0.0.8", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "test/adds-custom-network" }
-rbac-registration = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "test/adds-custom-network" }
-catalyst-types = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "test/adds-custom-network" }
-cardano-blockchain-types = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "test/adds-custom-network" }
-catalyst-signed-doc = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "test/adds-custom-network" }
+cardano-chain-follower = { version = "0.0.11", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "test/adds-custom-network" }
+rbac-registration = { version = "0.0.6", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "test/adds-custom-network" }
+catalyst-types = { version = "0.0.5", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "test/adds-custom-network" }
+cardano-blockchain-types = { version = "0.0.5", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "test/adds-custom-network" }
+catalyst-signed-doc = { version = "0.0.5", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "test/adds-custom-network" }
 c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "test/adds-custom-network" }
 
-pallas = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", branch = "test/testnet-genesis-values" }
-pallas-traverse = {version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", branch = "test/testnet-genesis-values" }
+pallas = { version = "0.33.0", git = "https://github.com/input-output-hk/catalyst-pallas.git", branch = "test/testnet-genesis-values" }
+pallas-traverse = {version = "0.33.0", git = "https://github.com/input-output-hk/catalyst-pallas.git", branch = "test/testnet-genesis-values" }
 
 clap = { version = "4.5.20", features = ["derive", "env"] }
 tracing = { version = "0.1.40", features = ["log"] }
