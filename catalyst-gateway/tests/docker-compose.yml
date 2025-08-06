@@ -57,8 +57,6 @@ services:
         condition: service_healthy
       scylla-node:
         condition: service_healthy
-      haproxy:
-        condition: service_healthy
 
   haproxy:
     image: haproxy-node:latest
