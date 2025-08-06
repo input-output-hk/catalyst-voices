@@ -23,7 +23,6 @@ final class VotingCubit extends Cubit<VotingState>
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<List<String>>? _favoritesProposalsIdsSub;
   StreamSubscription<ProposalsCount>? _proposalsCountSub;
-  StreamSubscription<List<ProposalVotes>>? _proposalVotesSub;
 
   VotingCubit(
     this._userService,
@@ -87,9 +86,6 @@ final class VotingCubit extends Cubit<VotingState>
 
     await _proposalsCountSub?.cancel();
     _proposalsCountSub = null;
-
-    await _proposalVotesSub?.cancel();
-    _proposalVotesSub = null;
 
     return super.close();
   }
@@ -212,7 +208,6 @@ final class VotingCubit extends Cubit<VotingState>
     final campaign = _cache.campaign;
     final page = _cache.page;
     final favoriteIds = _cache.favoriteIds ?? [];
-    final proposalVotes = _cache.proposalVotes ?? [];
 
     if (campaign == null || page == null) {
       return;
@@ -220,11 +215,11 @@ final class VotingCubit extends Cubit<VotingState>
 
     final mappedPage = page.map(
       (proposal) {
-        final voteData =
-            proposalVotes.firstWhereOrNull((element) => element.proposalRef == proposal.selfRef);
+      
         return ProposalBriefVoting.fromProposal(
           proposal,
-          voteData,
+          // TODO(LynxLynxx): Add votes from Bullet Builder
+          ProposalVotes(proposalRef: proposal.selfRef),
           categoryName: campaign.categories
               .firstWhere((element) => element.selfRef == proposal.categoryRef)
               .categoryText,
@@ -291,7 +286,6 @@ final class VotingCubit extends Cubit<VotingState>
     final selectedCategoryRef = _cache.filters.category;
     final filters = _cache.filters;
     final count = _cache.count;
-    final proposalVotes = _cache.proposalVotes ?? const [];
 
     final selectedCategory =
         campaign?.categories.firstWhereOrNull((e) => e.selfRef.id == selectedCategoryRef?.id);
@@ -313,7 +307,6 @@ final class VotingCubit extends Cubit<VotingState>
       votingPhase: votingPhaseViewModel,
       hasSearchQuery: hasSearchQuery,
       favoritesIds: favoriteIds,
-      proposalVotes: proposalVotes,
       count: count,
       categorySelectorItems: categorySelectorItems,
     );

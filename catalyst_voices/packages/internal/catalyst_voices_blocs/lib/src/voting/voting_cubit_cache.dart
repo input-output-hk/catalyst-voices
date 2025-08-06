@@ -8,7 +8,6 @@ final class VotingCubitCache extends Equatable {
   final ProposalsFilters filters;
   final ProposalsCount count;
   final List<String>? favoriteIds;
-  final List<ProposalVotes>? proposalVotes;
 
   const VotingCubitCache({
     this.campaign,
@@ -17,7 +16,6 @@ final class VotingCubitCache extends Equatable {
     this.filters = const ProposalsFilters(),
     this.count = const ProposalsCount(),
     this.favoriteIds,
-    this.proposalVotes,
   });
 
   @override
@@ -28,7 +26,6 @@ final class VotingCubitCache extends Equatable {
         filters,
         count,
         favoriteIds,
-        proposalVotes,
       ];
 
   VotingCubitCache copyWith({
@@ -38,7 +35,6 @@ final class VotingCubitCache extends Equatable {
     ProposalsFilters? filters,
     ProposalsCount? count,
     Optional<List<String>>? favoriteIds,
-    Optional<List<ProposalVotes>>? proposalVotes,
   }) {
     return VotingCubitCache(
       campaign: campaign.dataOr(this.campaign),
@@ -47,7 +43,6 @@ final class VotingCubitCache extends Equatable {
       filters: filters ?? this.filters,
       count: count ?? this.count,
       favoriteIds: favoriteIds.dataOr(this.favoriteIds),
-      proposalVotes: proposalVotes.dataOr(this.proposalVotes),
     );
   }
 }
