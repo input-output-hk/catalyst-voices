@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/pages/campaign_phase_aware/campaign_phase_aware.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/actions/account_settings_action.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/voting/vote_delegation_button.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/voting/vote_list_button.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/voting/voting_leading_button.dart';
@@ -28,7 +28,7 @@ class VotingAppbar extends StatelessWidget implements PreferredSizeWidget {
         actions: const [
           VoteListButton(),
           VoteDelegationButton(),
-          SessionActionHeader(),
+          AccountSettingsAction(),
         ],
       ),
     );

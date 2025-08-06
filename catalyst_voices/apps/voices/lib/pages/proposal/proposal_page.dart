@@ -10,8 +10,8 @@ import 'package:catalyst_voices/pages/proposal/snack_bar/viewing_older_version_s
 import 'package:catalyst_voices/pages/proposal/widget/proposal_header.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_navigation_panel.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_sidebars.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/actions/account_settings_action.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/actions/session_cta_action.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
@@ -60,11 +60,11 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         Offstage(
           offstage: readOnlyMode || CatalystPlatform.isMobileWeb,
-          child: const SessionActionHeader(),
+          child: const SessionCtaAction(),
         ),
         Offstage(
           offstage: readOnlyMode || CatalystPlatform.isMobileWeb,
-          child: const SessionStateHeader(),
+          child: const AccountSettingsAction(),
         ),
       ],
     );
