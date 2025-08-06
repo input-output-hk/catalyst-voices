@@ -18,7 +18,6 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
   var _cache = const VotingBallotCache();
 
   StreamSubscription<VotingPower?>? _votingPowerSub;
-  StreamSubscription<TimezonePreferences?>? _userTimezonePreferencesSub;
   StreamSubscription<Campaign?>? _activeCampaignSub;
 
   Timer? _phaseProgressTimer;
@@ -55,11 +54,6 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
         .distinct()
         .listen(_handleVotingPowerChange);
 
-    _userTimezonePreferencesSub = _userService.watchUser
-        .map((event) => event.settings.timezone)
-        .distinct()
-        .listen(_handleUserTimezonePrefChange);
-
     _activeCampaignSub = _campaignService.watchActiveCampaign.listen(_handleCampaignChange);
 
     _ballotBuilder.addListener(_handleBallotBuilderChange);
@@ -75,9 +69,6 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
 
     _votingPowerSub?.cancel();
     _votingPowerSub = null;
-
-    _userTimezonePreferencesSub?.cancel();
-    _userTimezonePreferencesSub = null;
 
     _activeCampaignSub?.cancel();
     _activeCampaignSub = null;
@@ -158,13 +149,12 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
 
   ({double progress, Duration? endsIn}) _calculatePhaseProgress() {
     final votingTimeline = _cache.votingTimeline;
-    final timezone = _cache.preferredTimezone ?? TimezonePreferences.local;
 
     if (votingTimeline == null) {
       return (progress: 0, endsIn: null);
     }
 
-    final effectiveVotingTimeline = timezone.applyToRange(votingTimeline);
+    final effectiveVotingTimeline = votingTimeline;
 
     final start = effectiveVotingTimeline.from;
     final end = effectiveVotingTimeline.to;
@@ -172,7 +162,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
       return (progress: 0, endsIn: null);
     }
 
-    final now = DateTimeExt.now(utc: timezone == TimezonePreferences.utc);
+    final now = DateTimeExt.now(utc: true);
 
     final progress = _calculatePhaseProgressValue(start: start, end: end, now: now);
     final endsIn = _calculatePhaseProgressEndsDuration(start: start, end: end, now: now);
@@ -270,13 +260,6 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
 
   void _handleLastCastedChange(Vote? vote) {
     add(UpdateLastCastedVoteEvent(vote?.createdAt));
-  }
-
-  void _handleUserTimezonePrefChange(TimezonePreferences? value) {
-    if (value != _cache.preferredTimezone) {
-      _cache = _cache.copyWith(preferredTimezone: Optional(value));
-      _updateVotingPhaseProgressTimer();
-    }
   }
 
   void _handleVotingPowerChange(VotingPower? votingPower) {
