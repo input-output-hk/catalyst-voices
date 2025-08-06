@@ -13,13 +13,13 @@ final class ChangeCategoryVotingSignal extends VotingSignal {
   List<Object?> get props => [to];
 }
 
-final class ChangeFilterTypeVotingSignal extends VotingSignal {
-  final ProposalsFilterType type;
+final class ChangeTabVotingSignal extends VotingSignal {
+  final VotingPageTab tab;
 
-  const ChangeFilterTypeVotingSignal(this.type);
+  const ChangeTabVotingSignal(this.tab);
 
   @override
-  List<Object?> get props => [type];
+  List<Object?> get props => [tab];
 }
 
 final class PageReadyVotingSignal extends VotingSignal {
@@ -31,13 +31,13 @@ final class PageReadyVotingSignal extends VotingSignal {
   List<Object?> get props => [page];
 }
 
-sealed class VotingSignal extends Equatable {
-  const VotingSignal();
-}
-
 final class ResetPaginationVotingSignal extends VotingSignal {
   const ResetPaginationVotingSignal();
 
   @override
   List<Object?> get props => [];
+}
+
+sealed class VotingSignal extends Equatable {
+  const VotingSignal();
 }
