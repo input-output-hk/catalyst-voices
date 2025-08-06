@@ -14,7 +14,7 @@ void main() {
     testWidgets('shows loading state when result is null', (WidgetTester tester) async {
       // Arrange: Provide a loading builder
       await tester.pumpApp(
-        ResultBuilder<String, String>(
+        ResultBuilder<String, Exception>(
           successBuilder: (context, data) => Text('Success: $data'),
           failureBuilder: (context, data) => Text('Failure: $data'),
           loadingBuilder: (context) => const CircularProgressIndicator(),
@@ -31,7 +31,7 @@ void main() {
     testWidgets('shows success state when result is Success', (WidgetTester tester) async {
       // Arrange: Provide a success result
       await tester.pumpApp(
-        ResultBuilder<String, String>(
+        ResultBuilder<String, Exception>(
           result: Success('Test Success'),
           successBuilder: (context, data) => Text('Success: $data'),
           failureBuilder: (context, data) => Text('Failure: $data'),
@@ -49,8 +49,8 @@ void main() {
     testWidgets('shows failure state when result is Failure', (WidgetTester tester) async {
       // Arrange: Provide a failure result
       await tester.pumpApp(
-        ResultBuilder<String, String>(
-          result: Failure('Test Failure'),
+        ResultBuilder<String, Exception>(
+          result: Failure(Exception('Test Failure')),
           successBuilder: (context, data) => Text('Success: $data'),
           failureBuilder: (context, data) => Text('Failure: $data'),
           loadingBuilder: (context) => const CircularProgressIndicator(),
@@ -68,7 +68,7 @@ void main() {
       // Arrange: Provide a delayed success result
 
       await tester.pumpApp(
-        ResultBuilder<String, String>(
+        ResultBuilder<String, Exception>(
           successBuilder: (context, data) => Text('Success: $data'),
           failureBuilder: (context, data) => Text('Failure: $data'),
           loadingBuilder: (context) => const CircularProgressIndicator(),
@@ -85,7 +85,7 @@ void main() {
       await tester.pump(minLoadingDuration); // Simulate passing of time
 
       await tester.pumpApp(
-        ResultBuilder<String, String>(
+        ResultBuilder<String, Exception>(
           result: Success('Test Success'),
           successBuilder: (context, data) => Text('Success: $data'),
           failureBuilder: (context, data) => Text('Failure: $data'),
@@ -101,13 +101,13 @@ void main() {
 
     testWidgets('does not update result before minLoadingDuration', (WidgetTester tester) async {
       // Arrange: Start with loading and transition to success
-      final completer = Completer<Result<String, String>>();
+      final completer = Completer<Result<String, Exception>>();
 
       await tester.pumpApp(
         FutureBuilder(
           future: completer.future,
           builder: (context, snapshot) {
-            return ResultBuilder<String, String>(
+            return ResultBuilder<String, Exception>(
               result: snapshot.data,
               successBuilder: (context, data) => Text('Success: $data'),
               failureBuilder: (context, data) => Text('Failure: $data'),
@@ -149,7 +149,7 @@ void main() {
       await tester.pumpApp(
         StatefulBuilder(
           builder: (context, setState) {
-            return ResultBuilder<String, String>(
+            return ResultBuilder<String, Exception>(
               successBuilder: (context, data) => Text('Success: $data', key: successWidgetKey),
               failureBuilder: (context, data) => Text('Failure: $data', key: failureWidgetKey),
               loadingBuilder: (context) => const CircularProgressIndicator(),
@@ -166,7 +166,7 @@ void main() {
 
       // Act: Update to success state
       await tester.pumpApp(
-        ResultBuilder<String, String>(
+        ResultBuilder<String, Exception>(
           result: Success('Test Success'),
           successBuilder: (context, data) => Text('Success: $data', key: successWidgetKey),
           failureBuilder: (context, data) => Text('Failure: $data', key: failureWidgetKey),
@@ -181,8 +181,8 @@ void main() {
 
       // Act: Update to failure state
       await tester.pumpApp(
-        ResultBuilder<String, String>(
-          result: Failure('Test Failure'),
+        ResultBuilder<String, Exception>(
+          result: Failure(Exception('Test Failure')),
           successBuilder: (context, data) => Text('Success: $data', key: successWidgetKey),
           failureBuilder: (context, data) => Text('Failure: $data', key: failureWidgetKey),
           loadingBuilder: (context) => const CircularProgressIndicator(),
