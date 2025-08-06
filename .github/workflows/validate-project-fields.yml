@@ -15,6 +15,5 @@ permissions:
   repository-projects: write
 
 jobs:
-  validate-own-fields:
+  validate-project-fields:
     uses: input-output-hk/catalyst-ci/.github/workflows/validate-project-fields.yml@master
-    secrets: inherit
