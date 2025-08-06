@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/cards/proposal/proposal_brief_card.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -33,10 +32,12 @@ class VotingProposalsPaginationTile extends StatelessWidget {
       },
       voteData: proposal.voteData,
       onVoteAction: (action) {
-        context.read<VotingCubit>().changeDraftVote(
-              proposal.selfRef as SignedDocumentRef,
-              action,
-            );
+        unawaited(
+          context.read<VotingCubit>().changeDraftVote(
+                proposal.selfRef,
+                action,
+              ),
+        );
       },
     );
   }

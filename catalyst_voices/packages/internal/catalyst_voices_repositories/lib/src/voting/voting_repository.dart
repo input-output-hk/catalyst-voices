@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
 
 final class VotingMockRepository implements VotingRepository {
@@ -11,13 +12,18 @@ final class VotingMockRepository implements VotingRepository {
   ValueStream<List<ProposalVotes>> get watchProposalVotes => _votesStreamController.stream;
 
   @override
-  void setCurrentDraft(SignedDocumentRef ref, VoteType? type) {
+  Future<ProposalVotes?> getProposalVoteInfoFor(DocumentRef ref) async {
+    return _cachedVotes.firstWhereOrNull((proposal) => proposal.proposalRef == ref);
+  }
+
+  @override
+  Future<ProposalVotes?> setCurrentDraft(DocumentRef ref, VoteType? type) async {
     final proposalVoteIndex = _cachedVotes.indexWhere((proposal) => proposal.proposalRef == ref);
 
     if (type == null) {
       _cachedVotes.removeWhere((proposal) => proposal.proposalRef == ref);
       _votesStreamController.add(List.from(_cachedVotes));
-      return;
+      return null;
     }
 
     final vote = Vote.draft(
@@ -33,10 +39,11 @@ final class VotingMockRepository implements VotingRepository {
     }
 
     _votesStreamController.add(List.from(_cachedVotes));
+    return _cachedVotes.firstWhereOrNull((proposal) => proposal.proposalRef == ref);
   }
 
   @override
-  void setLastCasted(SignedDocumentRef ref) {
+  void setLastCasted(DocumentRef ref) {
     // TODO(LynxLynxx): Implement it
   }
 }
@@ -45,7 +52,9 @@ abstract interface class VotingRepository {
   factory VotingRepository() => VotingMockRepository();
 
   ValueStream<List<ProposalVotes>> get watchProposalVotes;
-  void setCurrentDraft(SignedDocumentRef ref, VoteType? type);
+  Future<ProposalVotes?> getProposalVoteInfoFor(DocumentRef ref);
 
-  void setLastCasted(SignedDocumentRef ref);
+  Future<ProposalVotes?> setCurrentDraft(DocumentRef ref, VoteType? type);
+
+  void setLastCasted(DocumentRef ref);
 }

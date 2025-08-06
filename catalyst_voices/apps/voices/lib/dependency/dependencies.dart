@@ -150,6 +150,7 @@ final class Dependencies extends DependencyProvider {
           get<CommentService>(),
           get<CampaignService>(),
           get<DocumentMapper>(),
+          get<VotingService>(),
         );
       })
       ..registerFactory<NewProposalCubit>(() {

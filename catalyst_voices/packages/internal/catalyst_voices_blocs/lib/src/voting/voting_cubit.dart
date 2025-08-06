@@ -48,11 +48,15 @@ final class VotingCubit extends Cubit<VotingState>
         _votingService.watchProposalVotes().distinct(listEquals).listen(_handleProposalVotes);
   }
 
-  void changeDraftVote(SignedDocumentRef ref, VoteButtonAction action) {
-    return switch (action) {
-      VoteButtonActionRemoveDraft() => _votingService.setCurrentDraft(ref, null),
-      VoteButtonActionVote(:final type) => _votingService.setCurrentDraft(ref, type),
-    };
+  Future<void> changeDraftVote(DocumentRef ref, VoteButtonAction action) async {
+    switch (action) {
+      case VoteButtonActionRemoveDraft():
+        await _votingService.setCurrentDraft(ref, null);
+        break;
+      case VoteButtonActionVote():
+        await _votingService.setCurrentDraft(ref, action.type);
+        break;
+    }
   }
 
   void changeFilters({
