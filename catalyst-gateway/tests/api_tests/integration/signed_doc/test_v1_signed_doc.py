@@ -1,9 +1,7 @@
 # A collection of tests with the deprecated signed documents
 import pytest
-from api.v1 import document
-
 from utils import uuid_v7
-from api.v1 import document
+from api import v1
 import json
 from utils.rbac_chain import rbac_chain_factory, RoleID
 from utils.signed_doc import SignedDocumentV1, proposal_templates
@@ -192,7 +190,7 @@ def test_get_migrated_and_f14_documents():
     ]
 
     for doc_id, doc_cbor in migrated + fund_14:
-        resp = document.get(document_id=doc_id)
+        resp = v1.document.get(document_id=doc_id)
         assert (
             resp.status_code == 200
         ), f"Failed to get document: {resp.status_code} - {resp.text}"
@@ -356,7 +354,7 @@ def test_v1_index_migrated_documents():
     ]
 
     for filter_json, exp_json in values:
-        resp = document.post(filter=filter_json)
+        resp = v1.document.post(filter=filter_json)
         assert (
             resp.status_code == 200
         ), f"Failed to post document: {resp.status_code} - {resp.text}"
@@ -464,7 +462,7 @@ def test_put_deprecated_documents(rbac_chain_factory):
         (comment_cbor, comment_id),
         (proposal_submission_cbor, proposal_submission_id),
     ]:
-        resp = document.put(
+        resp = v1.document.put(
             data=cbor,
             token=rbac_chain.auth_token(),
         )
@@ -472,7 +470,7 @@ def test_put_deprecated_documents(rbac_chain_factory):
             resp.status_code == 201
         ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
-        resp = document.get(document_id=id)
+        resp = v1.document.get(document_id=id)
         assert (
             resp.status_code == 200
         ), f"Failed to get document: {resp.status_code} - {resp.text}"
