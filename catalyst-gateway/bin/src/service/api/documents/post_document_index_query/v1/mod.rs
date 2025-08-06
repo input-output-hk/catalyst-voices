@@ -126,7 +126,7 @@ async fn fetch_docs(
     let docs = indexed_docs
         .into_iter()
         .map(|(id, docs)| -> anyhow::Result<_> {
-            let ver = deprecated_docs
+            let ver = docs
                 .into_iter()
                 .map(TryInto::try_into)
                 .collect::<Result<Vec<_>, _>>()?
