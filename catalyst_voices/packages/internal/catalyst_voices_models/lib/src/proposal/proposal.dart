@@ -18,7 +18,6 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
   final int commentsCount;
   final String category;
   final SignedDocumentRef categoryId;
-  final Vote? lastCastedVote;
 
   factory Proposal({
     required DocumentRef selfRef,
@@ -35,7 +34,6 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
     required int commentsCount,
     required String category,
     required SignedDocumentRef categoryId,
-    Vote? lastCastedVote,
   }) {
     final sortedVersions = List<ProposalVersion>.from(versions)..sort();
 
@@ -54,7 +52,6 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
       author: author,
       versions: sortedVersions,
       categoryId: categoryId,
-      lastCastedVote: lastCastedVote,
     );
   }
 
@@ -78,7 +75,6 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
       categoryId: data.categoryId,
       category: data.categoryName,
       versions: versions,
-      lastCastedVote: data.lastCastedVote,
     );
   }
 
@@ -97,7 +93,6 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
     required this.commentsCount,
     required this.category,
     required this.categoryId,
-    this.lastCastedVote,
   }) : assert(
           selfRef.version != null,
           'SelfRef version always should have non null version',
@@ -118,7 +113,6 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
         commentsCount,
         versionCount,
         versions,
-        lastCastedVote,
       ];
 
   int get versionCount => versions.versionNumber(selfRef.version!);
@@ -148,7 +142,6 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
     List<ProposalVersion>? versions,
     String? category,
     SignedDocumentRef? categoryId,
-    Optional<Vote>? lastCastedVote,
   }) =>
       Proposal._(
         selfRef: selfRef ?? this.selfRef,
@@ -164,7 +157,6 @@ final class Proposal extends Equatable implements Comparable<Proposal> {
         versions: versions ?? this.versions,
         category: category ?? this.category,
         categoryId: categoryId ?? this.categoryId,
-        lastCastedVote: lastCastedVote.dataOr(this.lastCastedVote),
       );
 }
 

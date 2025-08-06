@@ -17,7 +17,6 @@ class ProposalBrief extends Equatable {
   final DateTime updateDate;
   final int commentsCount;
   final bool isFavorite;
-  final VoteButtonData? vote;
 
   const ProposalBrief({
     required this.selfRef,
@@ -32,14 +31,9 @@ class ProposalBrief extends Equatable {
     required this.updateDate,
     required this.commentsCount,
     this.isFavorite = false,
-    this.vote,
   });
 
-  factory ProposalBrief.fromProposal(
-    Proposal proposal, {
-    bool isFavorite = false,
-    Vote? draftVote,
-  }) {
+  factory ProposalBrief.fromProposal(Proposal proposal, {bool isFavorite = false}) {
     return ProposalBrief(
       selfRef: proposal.selfRef,
       title: proposal.title,
@@ -53,10 +47,6 @@ class ProposalBrief extends Equatable {
       updateDate: proposal.updateDate,
       commentsCount: proposal.commentsCount,
       isFavorite: isFavorite,
-      vote: VoteButtonData.fromVotes(
-        currentDraft: draftVote,
-        lastCasted: proposal.lastCastedVote,
-      ),
     );
   }
 
@@ -78,7 +68,6 @@ class ProposalBrief extends Equatable {
         updateDate,
         commentsCount,
         isFavorite,
-        vote,
       ];
 
   ProposalBrief copyWith({
@@ -94,7 +83,6 @@ class ProposalBrief extends Equatable {
     DateTime? updateDate,
     int? commentsCount,
     bool? isFavorite,
-    Optional<VoteButtonData>? vote,
   }) {
     return ProposalBrief(
       selfRef: selfRef ?? this.selfRef,
@@ -109,7 +97,91 @@ class ProposalBrief extends Equatable {
       updateDate: updateDate ?? this.updateDate,
       commentsCount: commentsCount ?? this.commentsCount,
       isFavorite: isFavorite ?? this.isFavorite,
-      vote: vote.dataOr(this.vote),
+    );
+  }
+}
+
+class ProposalBriefVoting extends ProposalBrief {
+  final VoteButtonData voteData;
+
+  const ProposalBriefVoting({
+    required super.selfRef,
+    required super.title,
+    required super.categoryName,
+    required super.fundsRequested,
+    required super.duration,
+    required super.publish,
+    required super.description,
+    required super.versionNumber,
+    required super.updateDate,
+    required super.commentsCount,
+    super.isFavorite,
+    super.author,
+    required this.voteData,
+  });
+
+  factory ProposalBriefVoting.fromProposal(
+    Proposal proposal, {
+    bool isFavorite = false,
+    Vote? draftVote,
+    Vote? lastCastedVote,
+  }) {
+    return ProposalBriefVoting(
+      selfRef: proposal.selfRef,
+      title: proposal.title,
+      categoryName: proposal.category,
+      author: proposal.author,
+      fundsRequested: proposal.fundsRequested,
+      duration: proposal.duration,
+      publish: proposal.publish,
+      description: proposal.description,
+      versionNumber: proposal.versionCount,
+      updateDate: proposal.updateDate,
+      commentsCount: proposal.commentsCount,
+      isFavorite: isFavorite,
+      voteData: VoteButtonData.fromVotes(
+        currentDraft: draftVote,
+        lastCasted: lastCastedVote,
+      ),
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+        ...super.props,
+        voteData,
+      ];
+
+  @override
+  ProposalBriefVoting copyWith({
+    DocumentRef? selfRef,
+    String? title,
+    String? categoryName,
+    Optional<String>? author,
+    Coin? fundsRequested,
+    int? duration,
+    ProposalPublish? publish,
+    String? description,
+    int? versionNumber,
+    DateTime? updateDate,
+    int? commentsCount,
+    bool? isFavorite,
+    VoteButtonData? voteData,
+  }) {
+    return ProposalBriefVoting(
+      selfRef: selfRef ?? this.selfRef,
+      title: title ?? this.title,
+      categoryName: categoryName ?? this.categoryName,
+      author: author.dataOr(this.author),
+      fundsRequested: fundsRequested ?? this.fundsRequested,
+      duration: duration ?? this.duration,
+      publish: publish ?? this.publish,
+      description: description ?? this.description,
+      versionNumber: versionNumber ?? this.versionNumber,
+      updateDate: updateDate ?? this.updateDate,
+      commentsCount: commentsCount ?? this.commentsCount,
+      isFavorite: isFavorite ?? this.isFavorite,
+      voteData: voteData ?? this.voteData,
     );
   }
 }

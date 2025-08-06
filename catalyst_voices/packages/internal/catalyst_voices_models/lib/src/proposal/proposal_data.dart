@@ -5,19 +5,16 @@ import 'package:uuid_plus/uuid_plus.dart';
 class BaseProposalData extends Equatable {
   final ProposalDocument document;
   final ProposalPublish publish;
-  final Vote? lastCastedVote;
 
   const BaseProposalData({
     required this.document,
     required this.publish,
-    this.lastCastedVote,
   });
 
   @override
   List<Object?> get props => [
         document,
         publish,
-        lastCastedVote,
       ];
 
   ProposalVersion toProposalVersion() {
