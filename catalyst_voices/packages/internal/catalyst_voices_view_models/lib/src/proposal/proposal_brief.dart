@@ -1,6 +1,7 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 class ProposalBrief extends Equatable {
@@ -16,6 +17,7 @@ class ProposalBrief extends Equatable {
   final DateTime updateDate;
   final int commentsCount;
   final bool isFavorite;
+  final VoteButtonData? vote;
 
   const ProposalBrief({
     required this.selfRef,
@@ -30,9 +32,14 @@ class ProposalBrief extends Equatable {
     required this.updateDate,
     required this.commentsCount,
     this.isFavorite = false,
+    this.vote,
   });
 
-  factory ProposalBrief.fromProposal(Proposal proposal, {bool isFavorite = false}) {
+  factory ProposalBrief.fromProposal(
+    Proposal proposal, {
+    bool isFavorite = false,
+    Vote? draftVote,
+  }) {
     return ProposalBrief(
       selfRef: proposal.selfRef,
       title: proposal.title,
@@ -46,6 +53,10 @@ class ProposalBrief extends Equatable {
       updateDate: proposal.updateDate,
       commentsCount: proposal.commentsCount,
       isFavorite: isFavorite,
+      vote: VoteButtonData.fromVotes(
+        currentDraft: draftVote,
+        lastCasted: proposal.lastCastedVote,
+      ),
     );
   }
 
@@ -67,6 +78,7 @@ class ProposalBrief extends Equatable {
         updateDate,
         commentsCount,
         isFavorite,
+        vote,
       ];
 
   ProposalBrief copyWith({
@@ -82,6 +94,7 @@ class ProposalBrief extends Equatable {
     DateTime? updateDate,
     int? commentsCount,
     bool? isFavorite,
+    Optional<VoteButtonData>? vote,
   }) {
     return ProposalBrief(
       selfRef: selfRef ?? this.selfRef,
@@ -96,77 +109,7 @@ class ProposalBrief extends Equatable {
       updateDate: updateDate ?? this.updateDate,
       commentsCount: commentsCount ?? this.commentsCount,
       isFavorite: isFavorite ?? this.isFavorite,
-    );
-  }
-}
-
-class ProposalBriefVoting extends ProposalBrief {
-  // TODO(LynxLynxx): Add voting specific fields
-  const ProposalBriefVoting({
-    required super.selfRef,
-    required super.title,
-    required super.categoryName,
-    required super.fundsRequested,
-    required super.duration,
-    required super.publish,
-    required super.description,
-    required super.versionNumber,
-    required super.updateDate,
-    required super.commentsCount,
-    super.isFavorite,
-    super.author,
-  });
-
-  factory ProposalBriefVoting.fromProposal(Proposal proposal, {bool isFavorite = false}) {
-    return ProposalBriefVoting(
-      selfRef: proposal.selfRef,
-      title: proposal.title,
-      categoryName: proposal.category,
-      author: proposal.author,
-      fundsRequested: proposal.fundsRequested,
-      duration: proposal.duration,
-      publish: proposal.publish,
-      description: proposal.description,
-      versionNumber: proposal.versionCount,
-      updateDate: proposal.updateDate,
-      commentsCount: proposal.commentsCount,
-      isFavorite: isFavorite,
-    );
-  }
-
-  @override
-  List<Object?> get props => [
-        ...super.props,
-      ];
-
-  @override
-  ProposalBriefVoting copyWith({
-    DocumentRef? selfRef,
-    String? title,
-    String? categoryName,
-    Optional<String>? author,
-    Coin? fundsRequested,
-    int? duration,
-    ProposalPublish? publish,
-    String? description,
-    int? versionNumber,
-    DateTime? updateDate,
-    int? commentsCount,
-    bool? isFavorite,
-  }) {
-    return ProposalBriefVoting(
-      selfRef: selfRef ?? this.selfRef,
-      title: title ?? this.title,
-      categoryName: categoryName ?? this.categoryName,
-      author: author.dataOr(this.author),
-      fundsRequested: fundsRequested ?? this.fundsRequested,
-      duration: duration ?? this.duration,
-      publish: publish ?? this.publish,
-      description: description ?? this.description,
-      versionNumber: versionNumber ?? this.versionNumber,
-      updateDate: updateDate ?? this.updateDate,
-      commentsCount: commentsCount ?? this.commentsCount,
-      isFavorite: isFavorite ?? this.isFavorite,
+      vote: vote.dataOr(this.vote),
     );
   }
 }

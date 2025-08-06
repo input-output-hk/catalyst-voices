@@ -16,7 +16,6 @@ class ProposalBriefCard extends StatefulWidget {
   final bool isFavorite;
   final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
-  final VoteButtonData? voteData;
   final ValueChanged<VoteButtonAction>? onVoteAction;
 
   const ProposalBriefCard({
@@ -25,7 +24,6 @@ class ProposalBriefCard extends StatefulWidget {
     this.isFavorite = false,
     this.onTap,
     this.onFavoriteChanged,
-    this.voteData,
     this.onVoteAction,
   });
 
@@ -182,7 +180,7 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
 
   @override
   Widget build(BuildContext context) {
-    final voteData = widget.voteData;
+    final vote = widget.proposal.vote;
     final onVoteAction = widget.onVoteAction;
 
     return ConstrainedBox(
@@ -237,10 +235,10 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                     updateDate: widget.proposal.updateDate,
                     commentsCount: widget.proposal.commentsCount,
                   ),
-                  if (voteData != null && onVoteAction != null) ...[
+                  if (vote != null && onVoteAction != null) ...[
                     const SizedBox(height: 12),
                     VoteButton(
-                      data: voteData,
+                      data: vote,
                       onSelected: onVoteAction,
                     ),
                   ],

@@ -30,7 +30,6 @@ class VotingProposalsPaginationTile extends StatelessWidget {
               isFavorite: isFavorite,
             );
       },
-      voteData: const VoteButtonData(),
       onVoteAction: (action) {
         final proposal = this.proposal.selfRef;
         final event = switch (action) {
