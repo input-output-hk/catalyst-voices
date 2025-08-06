@@ -109,6 +109,7 @@ async fn fetch_docs(
             |(mut indexed_docs, mut total_fetched_doc_count), doc| {
                 async move {
                     let id = *doc.id();
+                    // filter for only deprecated signed docs
                     if CatalystSignedDocument::try_from(doc.raw())?.is_deprecated()? {
                         indexed_docs.entry(id).or_insert_with(Vec::new).push(doc);
                         total_fetched_doc_count = total_fetched_doc_count
@@ -125,14 +126,6 @@ async fn fetch_docs(
     let docs = indexed_docs
         .into_iter()
         .map(|(id, docs)| -> anyhow::Result<_> {
-            // filter for only deprecated signed docs
-            let mut deprecated_docs = vec![];
-            for doc in docs {
-                if CatalystSignedDocument::try_from(doc.raw())?.is_deprecated()? {
-                    deprecated_docs.push(doc);
-                }
-            }
-
             let ver = deprecated_docs
                 .into_iter()
                 .map(TryInto::try_into)
