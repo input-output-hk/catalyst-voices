@@ -42,7 +42,6 @@ dependencies:
   webdriver: ^3.1.0
 
 dev_dependencies:
-  analyzer: 7.4.0
   catalyst_analysis: ^3.0.0
   catalyst_compression: ^1.0.0
   mocktail: ^1.0.4

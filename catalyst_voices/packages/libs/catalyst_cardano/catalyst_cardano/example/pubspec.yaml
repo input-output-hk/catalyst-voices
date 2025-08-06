@@ -19,7 +19,7 @@ dependencies:
     path: ../../../../internal/catalyst_voices_driver
   cbor: 6.3.7
   convert: ^3.1.2
-  cupertino_icons: ^1.0.6
+  cupertino_icons: ^1.0.8
   equatable: ^2.0.7
   flutter:
     sdk: flutter
@@ -31,7 +31,6 @@ dependencies:
   webdriver: ^3.1.0
 
 dev_dependencies:
-  analyzer: 7.4.0
   catalyst_analysis: ^3.0.0
 
 flutter:

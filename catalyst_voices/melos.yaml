@@ -97,6 +97,7 @@ command:
       chopper: ^8.3.0
       collection: ^1.19.1
       cryptography: ^2.7.0
+      cupertino_icons: ^1.0.8
       dotted_border: ^3.1.0
       ed25519_hd_key: ^2.3.0
       email_validator: ^3.0.0
@@ -160,10 +161,6 @@ command:
       web: ^1.1.1
       webdriver: ^3.1.0
     dev_dependencies:
-      # TODO(dt-iohk): locked version until the migration is possible:
-      # https://github.com/dart-lang/sdk/blob/main/pkg/analyzer/doc/element_model_migration_guide.md
-      # Currently many of the packages have not been migrated yet therefore we cannot use newer analyzer in our project.
-      # After the packages are migrated we can remove the direct dependency on analyzer and let it be a transitive dependency.
       test: ^1.25.15
       build_runner: ^2.5.4
       chopper_generator: ^8.2.0

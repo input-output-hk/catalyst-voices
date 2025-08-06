@@ -16,7 +16,6 @@ dependencies:
   plugin_platform_interface: ^2.1.8
 
 dev_dependencies:
-  analyzer: 7.4.0
   catalyst_analysis: ^3.0.0
   flutter_test:
     sdk: flutter

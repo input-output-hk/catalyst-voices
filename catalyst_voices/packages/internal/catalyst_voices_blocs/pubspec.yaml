@@ -38,7 +38,6 @@ dependencies:
   uuid_plus: ^0.1.0
 
 dev_dependencies:
-  analyzer: 7.4.0
   bloc_test: ^10.0.0
   catalyst_analysis: ^3.0.0
   flutter_test:

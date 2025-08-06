@@ -32,7 +32,6 @@ dependencies:
   web: ^1.1.1
 
 dev_dependencies:
-  analyzer: 7.4.0
   catalyst_analysis: ^3.0.0
   flutter_test:
     sdk: flutter

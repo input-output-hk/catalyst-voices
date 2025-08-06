@@ -15,5 +15,3 @@ dependencies:
 
 flutter:
   uses-material-design: true
-dev_dependencies:
-  analyzer: 7.4.0
