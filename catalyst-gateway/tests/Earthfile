@@ -1,4 +1,4 @@
-# cspell: words unittests
+# cspell: words unittests socat
 
 VERSION 0.8
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.5.2 AS spectral-ci
