@@ -18,7 +18,6 @@ class VotingProposalsPaginationTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ProposalBriefCard(
       proposal: proposal,
-      isFavorite: proposal.isFavorite,
       onTap: () {
         final route = ProposalRoute.fromRef(ref: proposal.selfRef);
 

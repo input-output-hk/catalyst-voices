@@ -221,10 +221,11 @@ final class VotingCubit extends Cubit<VotingState>
 
     final mappedPage = page.map(
       (proposal) {
-        return ProposalBrief.fromProposal(
+        return ProposalBriefVoting.fromProposal(
           proposal,
           isFavorite: favoriteIds.contains(proposal.selfRef.id),
           draftVote: _ballotBuilder.getVoteOn(proposal.selfRef),
+          lastCastedVote: null,
         );
       },
     );
