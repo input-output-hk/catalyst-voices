@@ -18,6 +18,11 @@ final class VotingMockRepository implements VotingRepository {
   }
 
   @override
+  Future<List<ProposalVotes>> getProposalVotes() async {
+    return List.from(_cachedVotes);
+  }
+
+  @override
   Future<ProposalVotes?> setCurrentDraft(DocumentRef ref, VoteType? type) async {
     final proposalVoteIndex = _cachedVotes.indexWhere((proposal) => proposal.proposalRef == ref);
 
@@ -54,6 +59,7 @@ abstract interface class VotingRepository {
 
   Stream<List<ProposalVotes>> get watchProposalVotes;
   Future<ProposalVotes?> getProposalVoteInfoFor(DocumentRef ref);
+  Future<List<ProposalVotes>> getProposalVotes();
   Future<ProposalVotes?> setCurrentDraft(DocumentRef ref, VoteType? type);
 
   void setLastCasted(DocumentRef ref);

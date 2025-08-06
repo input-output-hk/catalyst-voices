@@ -143,6 +143,7 @@ final class VotingCubit extends Cubit<VotingState>
     unawaited(_loadCampaign());
     unawaited(_loadVotingPower());
     unawaited(_loadFavoriteProposals());
+    unawaited(_loadProposalVotes());
 
     changeFilters(
       onlyMy: Optional(onlyMyProposals),
@@ -288,6 +289,13 @@ final class VotingCubit extends Cubit<VotingState>
     final favorites = await _proposalService.getFavoritesProposalsIds();
     if (!isClosed) {
       _handleFavoriteProposalsIds(favorites);
+    }
+  }
+
+  Future<void> _loadProposalVotes() async {
+    final votes = await _votingService.getProposalVotes();
+    if (!isClosed) {
+      _handleProposalVotes(votes);
     }
   }
 

@@ -12,13 +12,18 @@ final class VotingMockService implements VotingService {
   }
 
   @override
+  Future<List<ProposalVotes>> getProposalVotes() async {
+    return _votingRepository.getProposalVotes();
+  }
+
+  @override
   Future<ProposalVotes?> setCurrentDraft(DocumentRef ref, VoteType? type) async {
     return _votingRepository.setCurrentDraft(ref, type);
   }
 
   @override
   void setLastCasted(DocumentRef ref) {
-    _votingRepository.setLastCasted(ref);
+    return _votingRepository.setLastCasted(ref);
   }
 
   @override
@@ -31,6 +36,7 @@ abstract interface class VotingService {
   const factory VotingService(VotingRepository votingRepository) = VotingMockService;
 
   Future<ProposalVotes?> getProposalVoteInfoFor(DocumentRef ref);
+  Future<List<ProposalVotes>> getProposalVotes();
   Future<ProposalVotes?> setCurrentDraft(DocumentRef ref, VoteType? type);
   void setLastCasted(DocumentRef ref);
 
