@@ -11,9 +11,9 @@ use crate::db::event::common::eq_or_ranged_uuid::EqOrRangedUuid;
 pub(crate) struct DocsQueryFilter {
     /// `type` field. Empty list if unspecified.
     doc_type: Vec<uuid::Uuid>,
-    /// `id` field
+    /// `id` field. `None` if unspecified.
     id: Option<EqOrRangedUuid>,
-    /// `ver` field
+    /// `ver` field. `None` if unspecified.
     ver: Option<EqOrRangedUuid>,
     /// `metadata->'ref'` field. Empty list if unspecified.
     doc_ref: Vec<DocumentRef>,
