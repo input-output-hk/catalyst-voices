@@ -15,7 +15,7 @@ final class ProposalVersion extends Equatable implements Comparable<ProposalVers
     required this.publish,
   }) : assert(selfRef.version != null, 'SelfRef version cannot be null');
 
-  factory ProposalVersion.fromData(BaseProposalData data) {
+  factory ProposalVersion.fromData(ProposalData data) {
     final createdAt = data.document.metadata.selfRef.version!.dateTime;
     return ProposalVersion(
       selfRef: data.document.metadata.selfRef,

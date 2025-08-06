@@ -33,17 +33,21 @@ class ProposalBrief extends Equatable {
     this.isFavorite = false,
   });
 
-  factory ProposalBrief.fromProposal(Proposal proposal, {bool isFavorite = false}) {
+  factory ProposalBrief.fromProposal(
+    Proposal proposal, {
+    bool isFavorite = false,
+    String categoryName = '',
+  }) {
     return ProposalBrief(
       selfRef: proposal.selfRef,
       title: proposal.title,
-      categoryName: proposal.category,
+      categoryName: categoryName,
       author: proposal.author,
       fundsRequested: proposal.fundsRequested,
       duration: proposal.duration,
       publish: proposal.publish,
       description: proposal.description,
-      versionNumber: proposal.versionCount,
+      versionNumber: proposal.versionNumber,
       updateDate: proposal.updateDate,
       commentsCount: proposal.commentsCount,
       isFavorite: isFavorite,
@@ -123,19 +127,20 @@ class ProposalBriefVoting extends ProposalBrief {
   factory ProposalBriefVoting.fromProposal(
     Proposal proposal, {
     bool isFavorite = false,
+    String categoryName = '',
     Vote? draftVote,
     Vote? lastCastedVote,
   }) {
     return ProposalBriefVoting(
       selfRef: proposal.selfRef,
       title: proposal.title,
-      categoryName: proposal.category,
+      categoryName: categoryName,
       author: proposal.author,
       fundsRequested: proposal.fundsRequested,
       duration: proposal.duration,
       publish: proposal.publish,
       description: proposal.description,
-      versionNumber: proposal.versionCount,
+      versionNumber: proposal.versionNumber,
       updateDate: proposal.updateDate,
       commentsCount: proposal.commentsCount,
       isFavorite: isFavorite,

@@ -50,6 +50,17 @@ pub(crate) fn inc_index_sync() {
         .inc();
 }
 
+/// Increments the `INVALID_RBAC_REGISTRATION_COUNT` metric.
+pub(crate) fn inc_invalid_rbac_reg_count() {
+    let api_host_names = Settings::api_host_names().join(",");
+    let service_id = Settings::service_id();
+    let network = Settings::cardano_network().to_string();
+
+    reporter::INVALID_RBAC_REGISTRATION_COUNT
+        .with_label_values(&[&api_host_names, service_id, &network])
+        .inc();
+}
+
 /// All the related RBAC Registration Chain Caching reporting metrics to the Prometheus
 /// service are inside this module.
 pub(crate) mod reporter {
@@ -297,6 +308,18 @@ pub(crate) mod reporter {
             register_int_counter_vec!(
                 "indexing_synchronization_count",
                 "Number of RBAC indexing synchronizations",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// This counter increases every when we found invalid RBAC registration during
+    /// indexing.
+    pub(crate) static INVALID_RBAC_REGISTRATION_COUNT: LazyLock<IntCounterVec> =
+        LazyLock::new(|| {
+            register_int_counter_vec!(
+                "invalid_rbac_registration_count",
+                "Number of Invalid RBAC registrations found during indexing",
                 &METRIC_LABELS
             )
             .unwrap()

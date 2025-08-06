@@ -63,6 +63,8 @@ export 'logging/logging_settings.dart';
 export 'money/money.dart';
 export 'pagination/page.dart';
 export 'pagination/page_request.dart';
+export 'proposal/core_proposal.dart';
+export 'proposal/detail_proposal.dart';
 export 'proposal/exception/proposal_limit_reached_exception.dart';
 export 'proposal/proposal.dart';
 export 'proposal/proposal_creation_step.dart';
