@@ -1,4 +1,4 @@
-# cspell: words statusgossip
+# cspell: words statusgossip socat
 
 services:
   event-db:
