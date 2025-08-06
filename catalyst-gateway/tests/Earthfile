@@ -9,6 +9,19 @@ docker-compose:
     COPY ./docker-compose.yml .
     SAVE ARTIFACT ./docker-compose.yml
 
+package-haproxy:
+    FROM haproxy:alpine
+
+    USER root
+    RUN apk add --no-cache su-exec socat
+    COPY ./haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
+    COPY ./haproxy_entry.sh /app/entrypoint.sh
+
+    RUN chmod +x /app/entrypoint.sh
+
+    ENTRYPOINT ["/app/entrypoint.sh"]
+    SAVE IMAGE haproxy-node:latest
+
 # build all necessary docker images required to run `docker-compose.yml` services
 prepare-all-images:
     FROM scratch
@@ -18,6 +31,7 @@ prepare-all-images:
     BUILD ./schemathesis_tests+package
     BUILD +package-postgres-runner
     BUILD +package-scylla-runner
+    BUILD +package-haproxy
 
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.

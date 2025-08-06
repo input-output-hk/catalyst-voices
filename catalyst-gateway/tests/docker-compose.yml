@@ -44,9 +44,9 @@ services:
       # approximately a 25 minutes of waiting
       retries: 50
     environment:
-      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
-      - CASSANDRA_PERSISTENT_URL=scylla-node:9042
-      - CASSANDRA_VOLATILE_URL=scylla-node:9042
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@haproxy:18080/CatalystEventDev
+      - CASSANDRA_PERSISTENT_URL=haproxy:18090
+      - CASSANDRA_VOLATILE_URL=haproxy:18090
       - CHAIN_NETWORK=Preprod
       - SIGNED_DOC_SK=0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd
       - INTERNAL_API_KEY=123
@@ -57,6 +57,27 @@ services:
         condition: service_healthy
       scylla-node:
         condition: service_healthy
+      haproxy:
+        condition: service_healthy
+
+  haproxy:
+    image: haproxy-node:latest
+    container_name: haproxy
+    user: root
+    ports:
+      - "18080:18080"
+      - "18090:18090"
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - haproxy-socket:/var/run/haproxy
+    healthcheck:
+      test: [ "CMD", "sh", "-c", "echo 'show info' | socat /var/run/haproxy/haproxy.sock stdio | grep -q ^Name" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    depends_on:
+      - event-db
+      - scylla-node
 
   api-tests-runner:
     image: api-tests-runner:latest
@@ -74,7 +95,7 @@ services:
     image: postgres-runner:latest
     container_name: postgres-runner
     environment:
-      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@haproxy:18080/CatalystEventDev
     depends_on:
       event-db:
         condition: service_healthy
@@ -83,8 +104,8 @@ services:
     image: scylla-runner:latest
     container_name: scylla-runner
     environment:
-      - CASSANDRA_PERSISTENT_URL=scylla-node:9042
-      - CASSANDRA_VOLATILE_URL=scylla-node:9042
+      - CASSANDRA_PERSISTENT_URL=haproxy:18090
+      - CASSANDRA_VOLATILE_URL=haproxy:18090
     depends_on:
       scylla-node:
         condition: service_healthy
@@ -102,3 +123,6 @@ services:
     depends_on:
       cat-gateway:
         condition: service_healthy
+
+volumes:
+  haproxy-socket:
