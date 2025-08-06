@@ -18,14 +18,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class SessionAccountPopupMenu extends StatefulWidget {
-  const SessionAccountPopupMenu({
-    super.key,
-  });
+  const SessionAccountPopupMenu({super.key});
 
   @override
-  State<SessionAccountPopupMenu> createState() {
-    return _SessionAccountPopupMenuState();
-  }
+  State<SessionAccountPopupMenu> createState() => _SessionAccountPopupMenuState();
 }
 
 class _Account extends StatelessWidget {
