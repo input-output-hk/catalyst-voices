@@ -80,6 +80,9 @@ class _AppState extends State<App> {
       BlocProvider<CampaignPhaseAwareCubit>(
         create: (_) => Dependencies.instance.get<CampaignPhaseAwareCubit>(),
       ),
+      BlocProvider<VotingBallotBloc>(
+        create: (_) => Dependencies.instance.get<VotingBallotBloc>(),
+      ),
     ];
   }
 }

@@ -3,7 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
-class CoreProposal extends Equatable implements Comparable<CoreProposal> {
+base class CoreProposal extends Equatable implements Comparable<CoreProposal> {
   final DocumentRef selfRef;
   final SignedDocumentRef categoryRef;
   final String title;

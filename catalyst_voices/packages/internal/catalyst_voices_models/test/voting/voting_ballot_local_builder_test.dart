@@ -2,10 +2,10 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group(VotingBallotBuilder, () {
+  group(VotingBallotLocalBuilder, () {
     test('voting on same ref updates exiting vote', () {
       // Given
-      final builder = VotingBallotBuilder();
+      final builder = VotingBallotLocalBuilder();
 
       final proposalRef = SignedDocumentRef.generateFirstRef();
 
@@ -25,7 +25,7 @@ void main() {
 
     test('removing vote on ref works as expected', () {
       // Given
-      final builder = VotingBallotBuilder();
+      final builder = VotingBallotLocalBuilder();
 
       final refOne = SignedDocumentRef.generateFirstRef();
       final refTwo = SignedDocumentRef.generateFirstRef();
@@ -48,7 +48,7 @@ void main() {
 
     test('getVoteOn returns latest vote on ref', () {
       // Given
-      final builder = VotingBallotBuilder();
+      final builder = VotingBallotLocalBuilder();
 
       final ref = SignedDocumentRef.generateFirstRef();
 
@@ -67,7 +67,7 @@ void main() {
 
     test('votes is not modifiable', () {
       // Given
-      final builder = VotingBallotBuilder();
+      final builder = VotingBallotLocalBuilder();
 
       final refs = [
         SignedDocumentRef.generateFirstRef(),
@@ -91,7 +91,7 @@ void main() {
 
     test('throws error when adding second version of same vote', () {
       // Given
-      final builder = VotingBallotBuilder();
+      final builder = VotingBallotLocalBuilder();
       final proposal = SignedDocumentRef.generateFirstRef();
 
       // When

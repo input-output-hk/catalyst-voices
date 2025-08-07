@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -9,18 +10,12 @@ class VotingListCampaignPhaseProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(damian-molinski): use selector
-    const data = VotingListCampaignPhaseData(
-      activeFundNumber: 15,
-      votingPhaseProgress: 0.2,
-      votingEndsIn: Duration(
-        days: 20,
-        hours: 12,
-        minutes: 34,
-      ),
+    return BlocSelector<VotingBallotBloc, VotingBallotState, VotingListCampaignPhaseData>(
+      selector: (state) => state.votingProgress,
+      builder: (context, state) {
+        return _VotingListCampaignPhaseProgress(data: state);
+      },
     );
-
-    return const _VotingListCampaignPhaseProgress(data: data);
   }
 }
 
@@ -76,7 +71,10 @@ class _VotingListCampaignPhaseProgressEndsInText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      context.l10n.votingEndsIn(DurationFormatter.formatDurationDDhhmm(context.l10n, duration)),
+      duration > Duration.zero
+          ? context.l10n
+              .votingEndsIn(DurationFormatter.formatDurationDDhhmm(context.l10n, duration))
+          : context.l10n.ended,
     );
   }
 }

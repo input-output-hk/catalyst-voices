@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/voting/widgets/voting_power_status_chip.dart';
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -11,12 +12,12 @@ class VotingListUserSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(damian-molinski): use selector
-    const data = VotingListUserSummaryData(
-      amount: 10970,
-      status: VotingPowerStatus.confirmed,
+    return BlocSelector<VotingBallotBloc, VotingBallotState, VotingListUserSummaryData>(
+      selector: (state) => state.userSummary,
+      builder: (context, state) {
+        return _VotingListUserSummary(data: state);
+      },
     );
-    return const _VotingListUserSummary(data: data);
   }
 }
 

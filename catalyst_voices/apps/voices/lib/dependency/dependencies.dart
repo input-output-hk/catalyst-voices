@@ -104,6 +104,7 @@ final class Dependencies extends DependencyProvider {
           get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
+          get<VotingBallotBuilder>(),
         ),
       )
       // TODO(LynxLynxx): add repository for campaign management
@@ -181,6 +182,13 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<CampaignPhaseAwareCubit>(() {
         return CampaignPhaseAwareCubit(
           get<CampaignService>(),
+        );
+      })
+      ..registerFactory<VotingBallotBloc>(() {
+        return VotingBallotBloc(
+          get<UserService>(),
+          get<CampaignService>(),
+          get<VotingBallotBuilder>(),
         );
       });
   }
@@ -441,5 +449,6 @@ final class Dependencies extends DependencyProvider {
       ActiveCampaignObserverImpl.new,
       dispose: (observer) async => observer.dispose(),
     );
+    registerLazySingleton<VotingBallotBuilder>(VotingBallotLocalBuilder.new);
   }
 }

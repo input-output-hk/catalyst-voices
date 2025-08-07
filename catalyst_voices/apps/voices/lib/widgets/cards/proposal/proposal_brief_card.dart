@@ -13,19 +13,15 @@ import 'package:flutter/material.dart';
 /// Displays a proposal brief on a card.
 class ProposalBriefCard extends StatefulWidget {
   final ProposalBrief proposal;
-  final bool isFavorite;
   final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
-  final VoteButtonData? voteData;
   final ValueChanged<VoteButtonAction>? onVoteAction;
 
   const ProposalBriefCard({
     super.key,
     required this.proposal,
-    this.isFavorite = false,
     this.onTap,
     this.onFavoriteChanged,
-    this.voteData,
     this.onVoteAction,
   });
 
@@ -182,7 +178,9 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
 
   @override
   Widget build(BuildContext context) {
-    final voteData = widget.voteData;
+    final proposal = widget.proposal;
+
+    final voteData = proposal is ProposalBriefVoting ? proposal.voteData : null;
     final onVoteAction = widget.onVoteAction;
 
     return ConstrainedBox(
@@ -201,7 +199,7 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
           highlightColor: Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           child: ProposalBorder(
-            publish: widget.proposal.publish,
+            publish: proposal.publish,
             statesController: _statesController,
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -209,33 +207,33 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _Topbar(
-                    proposalRef: widget.proposal.selfRef,
-                    isFavorite: widget.isFavorite,
+                    proposalRef: proposal.selfRef,
+                    isFavorite: proposal.isFavorite,
                     onFavoriteChanged: widget.onFavoriteChanged,
                   ),
                   const SizedBox(height: 2),
                   _Category(
-                    category: widget.proposal.categoryName,
+                    category: proposal.categoryName,
                   ),
                   const SizedBox(height: 4),
                   Expanded(
-                    child: _Title(text: widget.proposal.title),
+                    child: _Title(text: proposal.title),
                   ),
-                  _Author(author: widget.proposal.author),
+                  _Author(author: proposal.author),
                   _FundsAndDuration(
-                    funds: widget.proposal.formattedFunds,
-                    duration: widget.proposal.duration,
+                    funds: proposal.formattedFunds,
+                    duration: proposal.duration,
                   ),
                   const SizedBox(height: 12),
                   Expanded(
-                    child: _Description(text: widget.proposal.description),
+                    child: _Description(text: proposal.description),
                   ),
                   const SizedBox(height: 12),
                   _ProposalInfo(
-                    publish: widget.proposal.publish,
-                    version: widget.proposal.versionNumber,
-                    updateDate: widget.proposal.updateDate,
-                    commentsCount: widget.proposal.commentsCount,
+                    publish: proposal.publish,
+                    version: proposal.versionNumber,
+                    updateDate: proposal.updateDate,
+                    commentsCount: proposal.commentsCount,
                   ),
                   if (voteData != null && onVoteAction != null) ...[
                     const SizedBox(height: 12),
