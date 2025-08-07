@@ -183,8 +183,8 @@ async fn filter_by_type(docs: &[FullSignedDoc], doc_type: uuid::Uuid) {
     }
 }
 
-/// Pre-seeded Fund 14 documents `V3__signed_documents.sql`
-const PRE_SEED_DATA: usize = 36;
+/// Pre-seeded Fund 14 documents `V3__signed_documents.sql` and `old_format_signed_doc.sql`
+const PRE_SEED_DATA: usize = 43;
 
 async fn filter_all(docs: &[FullSignedDoc]) {
     let filter = DocsQueryFilter::all();
