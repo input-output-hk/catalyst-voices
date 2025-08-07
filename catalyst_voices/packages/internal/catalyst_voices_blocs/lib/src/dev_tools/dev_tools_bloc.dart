@@ -52,14 +52,14 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
   }
 
   @override
-  Future<void> close() {
+  Future<void> close() async {
     _resetCountTimer?.cancel();
     _resetCountTimer = null;
 
-    unawaited(_syncStartsSub?.cancel());
+    await _syncStartsSub?.cancel();
     _syncStartsSub = null;
 
-    unawaited(_documentsCountSub?.cancel());
+    await _documentsCountSub?.cancel();
     _documentsCountSub = null;
 
     return super.close();
