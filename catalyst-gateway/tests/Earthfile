@@ -4,10 +4,16 @@ VERSION 0.8
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.5.2 AS spectral-ci
 IMPORT .. AS gateway
 
-docker-compose:
-    FROM scratch
-    COPY ./docker-compose.yml .
-    SAVE ARTIFACT ./docker-compose.yml
+# a special package for applying migrations only up to "V2_**" migrations
+package-event-db-v1:
+    FROM github.com/input-output-hk/catalyst-voices/catalyst-gateway/event-db:event-db-old-signed-doc+docker
+
+    ARG container="event-db"
+    ARG tag="v1"
+
+    COPY ./event_db_v1_seed_data ./seed
+
+    SAVE IMAGE ${container}:${tag}
 
 package-haproxy:
     FROM haproxy:alpine
@@ -30,8 +36,8 @@ prepare-all-images:
     BUILD ./api_tests+package
     BUILD ./api_tests+package-health
     BUILD ./schemathesis_tests+package
-    BUILD +package-postgres-runner
-    BUILD +package-scylla-runner
+    BUILD +package-rust-tests-runner
+    BUILD +package-event-db-v1
     BUILD +package-haproxy
 
 # test-lint-openapi - OpenAPI linting from an artifact
@@ -50,14 +56,8 @@ test-builder:
 
     RUN cargo nextest archive --release --archive-file cat-gateway-tests.tar.zst
 
-package-postgres-runner:
+package-rust-tests-runner:
     FROM +test-builder
 
-    ENTRYPOINT cargo nextest run --archive-file=cat-gateway-tests.tar.zst --run-ignored=only signed_docs --no-fail-fast
-    SAVE IMAGE postgres-runner:latest
-
-package-scylla-runner:
-    FROM +test-builder
-
-    ENTRYPOINT cargo nextest run --archive-file=cat-gateway-tests.tar.zst --run-ignored=only scylla_session scylla_queries scylla_purge rbac_index --no-fail-fast
-    SAVE IMAGE scylla-runner:latest
+    ENTRYPOINT cargo nextest run --archive-file=cat-gateway-tests.tar.zst --run-ignored=only signed_docs scylla_session scylla_queries scylla_purge rbac_index --no-fail-fast
+    SAVE IMAGE rust-tests-runner:latest

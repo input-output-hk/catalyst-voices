@@ -15,12 +15,52 @@ services:
       - DB_USER_PASSWORD=CHANGE_ME
 
       - INIT_AND_DROP_DB=true
-      - WITH_MIGRATIONS=true
+      - WITH_MIGRATIONS=false
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${DB_SUPERUSER} -d $${DB_SUPERUSER_PASSWORD}"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 10
+
+  # runs old migrations for the separate `postgres` service
+  # a special package for applying migrations only up to "V2_**" migrations
+  event-db-v1-migrations:
+    image: event-db:v1
+    container_name: event-db-v1-migrations
+    environment:
+      - DB_HOST=event-db
+      - DB_PORT=5432
+      - DB_NAME=CatalystEventDev
+      - DB_SUPERUSER=postgres
+      - DB_SUPERUSER_PASSWORD=postgres
+      - DB_USER=catalyst-event-dev
+      - DB_USER_PASSWORD=CHANGE_ME
+
+      - INIT_AND_DROP_DB=false
+      - WITH_SEED_DATA=.
+      - WITH_MIGRATIONS=true
+    depends_on:
+      event-db:
+        condition: service_healthy
+
+  # runs migrations for the separate `postgres` service
+  event-db-migrations:
+    image: event-db:latest
+    container_name: event-db-migrations
+    environment:
+      - DB_HOST=event-db
+      - DB_PORT=5432
+      - DB_NAME=CatalystEventDev
+      - DB_SUPERUSER=postgres
+      - DB_SUPERUSER_PASSWORD=postgres
+      - DB_USER=catalyst-event-dev
+      - DB_USER_PASSWORD=CHANGE_ME
+
+      - INIT_AND_DROP_DB=false
+      - WITH_MIGRATIONS=true
+    depends_on:
+      event-db-v1-migrations:
+        condition: service_started
 
   scylla-node:
     image: scylladb/scylla:latest
@@ -48,13 +88,25 @@ services:
       - CASSANDRA_PERSISTENT_URL=scylla-node:9042
       - CASSANDRA_VOLATILE_URL=scylla-node:9042
       - CHAIN_NETWORK=Preprod
-      - SIGNED_DOC_SK=0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd
       - INTERNAL_API_KEY=123
       # - LOG_LEVEL=error
       # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
     depends_on:
-      event-db:
+      event-db-migrations:
+        condition: service_started
+      scylla-node:
         condition: service_healthy
+
+  rust-tests-runner:
+    image: rust-tests-runner:latest
+    container_name: rust-tests-runner
+    environment:
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
+      - CASSANDRA_PERSISTENT_URL=scylla-node:9042
+      - CASSANDRA_VOLATILE_URL=scylla-node:9042
+    depends_on:
+      event-db-migrations:
+        condition: service_started
       scylla-node:
         condition: service_healthy
 
@@ -101,25 +153,6 @@ services:
       haproxy:
         condition: service_healthy
       cat-gateway:
-        condition: service_healthy
-
-  postgres-runner:
-    image: postgres-runner:latest
-    container_name: postgres-runner
-    environment:
-      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@haproxy:18080/CatalystEventDev
-    depends_on:
-      event-db:
-        condition: service_healthy
-
-  scylla-runner:
-    image: scylla-runner:latest
-    container_name: scylla-runner
-    environment:
-      - CASSANDRA_PERSISTENT_URL=haproxy:18090
-      - CASSANDRA_VOLATILE_URL=haproxy:18090
-    depends_on:
-      scylla-node:
         condition: service_healthy
 
   schemathesis-runner:
