@@ -36,8 +36,8 @@ final class CastedVotesObserverImpl implements CastedVotesObserver {
   }
 
   @override
-  Future<void> dispose() {
-    _votesSC.close();
+  Future<void> dispose() async {
+    await _votesSC.close();
     return Future.value();
   }
 }
