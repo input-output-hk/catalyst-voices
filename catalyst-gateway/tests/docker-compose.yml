@@ -101,9 +101,9 @@ services:
     image: rust-tests-runner:latest
     container_name: rust-tests-runner
     environment:
-      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@rust-event-db/CatalystEventDev
-      - CASSANDRA_PERSISTENT_URL=rust-scylla-node:9042
-      - CASSANDRA_VOLATILE_URL=rust-scylla-node:9042
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
+      - CASSANDRA_PERSISTENT_URL=scylla-node:9042
+      - CASSANDRA_VOLATILE_URL=scylla-node:9042
     depends_on:
       event-db:
         condition: service_started
