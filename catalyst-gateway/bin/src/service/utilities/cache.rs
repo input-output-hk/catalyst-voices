@@ -67,4 +67,9 @@ where
             .map(Cache::entry_count)
             .unwrap_or_default()
     }
+
+    /// Returns `true` if the cache is enabled.
+    pub(crate) fn is_enabled(&self) -> bool {
+        self.inner.is_some()
+    }
 }

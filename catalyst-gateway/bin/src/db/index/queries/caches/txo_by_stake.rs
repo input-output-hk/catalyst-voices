@@ -60,6 +60,10 @@ pub(crate) fn entry_count() -> u64 {
 
 /// Update spent TXO Assets in Cache.
 pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
+    // Exit if cache is not enabled.
+    if !ASSETS_CACHE.is_enabled() {
+        return;
+    }
     for txo_update in params {
         let stake_address = &txo_update.stake_address;
         let update_key = &GetTxoByStakeAddressQueryKey {
