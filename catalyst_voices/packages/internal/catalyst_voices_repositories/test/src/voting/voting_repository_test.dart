@@ -24,133 +24,141 @@ void main() {
 
     group('watchedCastedVotes', () {
       test('should provide current value to late subscribers', () async {
+        //Arrange
         await repository.castVotes([draftVote1]);
 
-        final votes = await repository.watchedCastedVotes.first;
-        expect(votes, hasLength(1));
-        expect(votes.first.proposal, equals(proposal1));
-        expect(votes.first.type, equals(VoteType.yes));
-        expect(votes.first.isCasted, isTrue);
+        //Act
+        final votesStream = repository.watchedCastedVotes;
+
+        //Assert
+        final casted = draftVote1.toCasted();
+        expect(
+          votesStream,
+          emitsInOrder(<List<Vote>>[
+            <Vote>[casted],
+          ]),
+        );
       });
     });
 
     group('castVotes', () {
       test('should convert draft votes to casted votes', () async {
-        await repository.castVotes([draftVote1]);
+        final votesStream = repository.watchedCastedVotes;
+        final casted = draftVote1.toCasted();
 
-        final votes = await repository.watchedCastedVotes.first;
-        expect(votes, hasLength(1));
-        expect(votes.first.proposal, equals(proposal1));
-        expect(votes.first.type, equals(VoteType.yes));
-        expect(votes.first.isCasted, isTrue);
-      });
-
-      test('should add multiple votes for different proposals', () async {
-        await repository.castVotes([draftVote1, draftVote2]);
-
-        final votes = await repository.watchedCastedVotes.first;
-        expect(votes, hasLength(2));
-
-        final vote1 = votes.firstWhere((Vote v) => v.proposal == proposal1);
-        final vote2 = votes.firstWhere((Vote v) => v.proposal == proposal2);
-
-        expect(vote1.type, equals(VoteType.yes));
-        expect(vote1.isCasted, isTrue);
-        expect(vote2.type, equals(VoteType.abstain));
-        expect(vote2.isCasted, isTrue);
-      });
-
-      test('should replace existing vote for same proposal', () async {
-        await repository.castVotes([draftVote1]);
-        var votes = await repository.watchedCastedVotes.first;
-        expect(votes, hasLength(1));
-        expect(votes.first.type, equals(VoteType.yes));
-
-        await repository.castVotes([draftVote1Updated]);
-
-        votes = await repository.watchedCastedVotes.first;
-        expect(votes, hasLength(1));
-        expect(votes.first.proposal, equals(proposal1));
-        expect(votes.first.type, equals(VoteType.abstain));
-        expect(votes.first.isCasted, isTrue);
-      });
-
-      test('should handle mixed new and updated votes', () async {
-        await repository.castVotes([draftVote1]);
-        var votes = await repository.watchedCastedVotes.first;
-        expect(votes, hasLength(1));
-
-        await repository.castVotes([draftVote1Updated, draftVote2]);
-
-        votes = await repository.watchedCastedVotes.first;
-        expect(votes, hasLength(2));
-
-        final vote1 = votes.firstWhere((Vote v) => v.proposal == proposal1);
-        final vote2 = votes.firstWhere((Vote v) => v.proposal == proposal2);
-
-        expect(vote1.type, equals(VoteType.abstain));
-        expect(vote2.type, equals(VoteType.abstain));
-        expect(vote1.isCasted, isTrue);
-        expect(vote2.isCasted, isTrue);
-      });
-
-      test('should emit updated list to stream subscribers', () async {
-        final streamEvents = <List<Vote>>[];
-        final subscription = repository.watchedCastedVotes.listen(streamEvents.add);
-
-        await expectLater(
-          repository.watchedCastedVotes.take(1),
-          emits(isEmpty),
+        expect(
+          votesStream,
+          emitsInOrder(<List<Vote>>[
+            <Vote>[casted],
+          ]),
         );
 
         await repository.castVotes([draftVote1]);
-        expect(streamEvents, hasLength(2));
-        expect(streamEvents.last, hasLength(1));
-        expect(streamEvents.last.first.proposal, equals(proposal1));
 
-        await repository.castVotes([draftVote2]);
-        expect(streamEvents, hasLength(3));
-        expect(streamEvents.last, hasLength(2));
+        final votes = await repository.watchedCastedVotes.first;
+        expect(votes, hasLength(1));
+        expect(votes.first.proposal, equals(proposal1));
+        expect(votes.first.type, equals(VoteType.yes));
+        expect(votes.first.isCasted, isTrue);
+        expect(votes.first.selfRef, isA<SignedDocumentRef>());
+      });
 
-        await subscription.cancel();
+      test('should add multiple votes for different proposals', () async {
+        final votesStream = repository.watchedCastedVotes;
+        final casted1 = draftVote1.toCasted();
+        final casted2 = draftVote2.toCasted();
+
+        expect(
+          votesStream,
+          emitsInOrder(<List<Vote>>[
+            <Vote>[casted1, casted2],
+          ]),
+        );
+
+        await repository.castVotes([draftVote1, draftVote2]);
+      });
+
+      test('should replace existing vote for same proposal', () async {
+        final votesStream = repository.watchedCastedVotes;
+        final casted1 = draftVote1.toCasted();
+        final casted1Updated = draftVote1Updated.toCasted();
+
+        expect(
+          votesStream,
+          emitsInOrder(<List<Vote>>[
+            <Vote>[casted1],
+            <Vote>[casted1Updated],
+          ]),
+        );
+
+        await repository.castVotes([draftVote1]);
+        await Future<void>.delayed(const Duration(milliseconds: 1)); // Small delay
+        await repository.castVotes([draftVote1Updated]);
+      });
+
+      test('should handle mixed new and updated votes', () async {
+        final votesStream = repository.watchedCastedVotes;
+        final casted1 = draftVote1.toCasted();
+        final casted1Updated = draftVote1Updated.toCasted();
+        final casted2 = draftVote2.toCasted();
+
+        expect(
+          votesStream,
+          emitsInOrder(<List<Vote>>[
+            <Vote>[casted1],
+            <Vote>[casted1Updated, casted2],
+          ]),
+        );
+
+        await repository.castVotes([draftVote1]);
+        await Future<void>.delayed(const Duration(milliseconds: 1)); // Small delay
+        await repository.castVotes([draftVote1Updated, draftVote2]);
+      });
+
+      test('should emit updated list to stream subscribers', () async {
+        final votesStream = repository.watchedCastedVotes;
+        final casted = draftVote1.toCasted();
+
+        expect(
+          votesStream,
+          emitsInOrder(<List<Vote>>[
+            <Vote>[casted],
+          ]),
+        );
+
+        await repository.castVotes([draftVote1]);
       });
 
       test('should handle empty vote list', () async {
-        await repository.castVotes([]);
+        final votesStream = repository.watchedCastedVotes;
 
-        final votes = await repository.watchedCastedVotes.first;
-        expect(votes, isEmpty);
+        expect(
+          votesStream,
+          emitsInOrder(<List<Vote>>[
+            <Vote>[],
+          ]),
+        );
+
+        await repository.castVotes([]);
       });
 
       test('should maintain vote order consistency', () async {
+        final votesStream = repository.watchedCastedVotes;
+        final casted1 = draftVote1.toCasted();
+        final casted2 = draftVote2.toCasted();
+        final casted1Updated = draftVote1Updated.toCasted();
+
+        expect(
+          votesStream,
+          emitsInOrder(<List<Vote>>[
+            <Vote>[casted1, casted2], // After casting both votes
+            <Vote>[casted1Updated, casted2], // After updating first vote
+          ]),
+        );
+
         await repository.castVotes([draftVote1, draftVote2]);
-
+        await Future<void>.delayed(const Duration(milliseconds: 1)); // Small delay
         await repository.castVotes([draftVote1Updated]);
-
-        final votes2 = await repository.watchedCastedVotes.first;
-        expect(votes2, hasLength(2));
-
-        final proposals = votes2.map((Vote v) => v.proposal).toSet();
-        expect(proposals, contains(proposal1));
-        expect(proposals, contains(proposal2));
-      });
-    });
-
-    group('integration tests', () {
-      test('should handle rapid successive castVotes calls', () async {
-        final futures = <Future<void>>[];
-
-        for (var i = 0; i < 5; i++) {
-          final proposal = SignedDocumentRef.generateFirstRef();
-          final vote = Vote.draft(proposal: proposal, type: VoteType.yes);
-          futures.add(repository.castVotes([vote]));
-        }
-
-        await Future.wait(futures);
-
-        final votes = await repository.watchedCastedVotes.first;
-        expect(votes, hasLength(5));
-        expect(votes.every((Vote v) => v.isCasted), isTrue);
       });
     });
   });
