@@ -226,7 +226,6 @@ final class VotingCubit extends Cubit<VotingState>
           proposal,
           isFavorite: favoriteIds.contains(proposal.selfRef.id),
           draftVote: _ballotBuilder.getVoteOn(proposal.selfRef),
-          lastCastedVote: null,
         );
       },
     );
