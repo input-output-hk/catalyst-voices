@@ -117,6 +117,10 @@ impl Display for SyncParams {
             write!(f, ", synced_blocks: {}", self.total_blocks_synced)?;
         }
 
+        if let Some(follower_roll_forward) = &self.follower_roll_forward {
+            write!(f, ", follower_roll_forward: {follower_roll_forward}")?;
+        }
+
         if self.result.is_some() {
             write!(f, ", last_sync: {}", self.last_blocks_synced)?;
         }
@@ -526,10 +530,6 @@ impl SyncTask {
 
             match completed {
                 Ok(finished) => {
-                    let tips = ChainFollower::get_tips(self.cfg.chain).await;
-                    let immutable_tip_slot = tips.0.slot_or_default();
-                    let live_tip_slot = tips.1.slot_or_default();
-                    info!(immutable_tip_slot=?immutable_tip_slot, live_tip_slot=?live_tip_slot, "Chain Indexer task finished");
                     // Sync task finished.  Check if it completed OK or had an error.
                     // If it failed, we need to reschedule it.
 
