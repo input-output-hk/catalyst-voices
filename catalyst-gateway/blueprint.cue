@@ -12,7 +12,7 @@ project: {
 		}
 
 		bundle: {
-			env:  string | *"dev"
+			env:  string | *"test"
 			_env: env
 			modules: main: {
 				name:    "app"
@@ -26,6 +26,12 @@ project: {
 								tag:  _ @forge(name="GIT_HASH_OR_TAG")
 							}
 							env: {
+								"CARDANO_UTXO_CACHE_SIZE": {
+									value: string | *"0"
+								}
+								"CARDANO_NATIVE_ASSETS_CACHE_SIZE": {
+									value: string | *"0"
+								}
 								"CHAIN_NETWORK": {
 									value: string | *"Preprod"
 								}
