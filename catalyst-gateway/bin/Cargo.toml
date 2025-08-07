@@ -17,10 +17,10 @@ workspace = true
 [dependencies]
 cardano-chain-follower = { version = "0.0.10", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower-v0.0.10" }
 rbac-registration = { version = "0.0.5", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower-v0.0.10" }
-catalyst-types = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250724-01" }
-cardano-blockchain-types = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250724-01" }
+catalyst-types = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "test/adds-custom-network-v2" }
+cardano-blockchain-types = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "test/adds-custom-network-v2" }
 catalyst-signed-doc = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower-v0.0.10" }
-c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250724-01" }
+c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "test/adds-custom-network-v2" }
 
 pallas = { version = "0.33.0", git = "https://github.com/input-output-hk/catalyst-pallas.git", branch = "test/testnet-genesis-values" }
 pallas-traverse = {version = "0.33.0", git = "https://github.com/input-output-hk/catalyst-pallas.git", branch = "test/testnet-genesis-values" }
