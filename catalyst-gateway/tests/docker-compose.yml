@@ -89,6 +89,20 @@ services:
       cat-gateway:
         condition: service_healthy
 
+  api-health-tests-runner:
+    image: api-health-tests-runner:latest
+    container_name: api-tests-runner
+    environment:
+      - CAT_GATEWAY_TEST_URL=http://cat-gateway:3030
+      - CAT_GATEWAY_INTERNAL_API_KEY=123
+      # for the current setup its not possible to provide a path to the cat-gateway binary, because its running under the container
+      - CAT_GATEWAY_EXECUTABLE_PATH=SOME_VALUE
+    depends_on:
+      haproxy:
+        condition: service_healthy
+      cat-gateway:
+        condition: service_healthy
+
   postgres-runner:
     image: postgres-runner:latest
     container_name: postgres-runner
