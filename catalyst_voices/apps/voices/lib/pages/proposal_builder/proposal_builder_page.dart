@@ -28,6 +28,7 @@ import 'package:catalyst_voices/widgets/modals/proposals/unlock_edit_proposal.da
 import 'package:catalyst_voices/widgets/snackbar/common_snackbars.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
+import 'package:catalyst_voices/widgets/tiles/specialized/document_builder_section_tile_controller.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -78,6 +79,7 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         SignalHandlerStateMixin<ProposalBuilderBloc, ProposalBuilderSignal, _ProposalBuilderBody> {
   late final SegmentsController _segmentsController;
   late final ItemScrollController _segmentsScrollController;
+  late final DocumentBuilderSectionTileController _sectionTileController;
 
   StreamSubscription<DocumentRef?>? _proposalRefSub;
   StreamSubscription<dynamic>? _segmentsSub;
@@ -107,7 +109,8 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
               leftRail: const ProposalBuilderNavigationPanel(),
               rightRail: const ProposalBuilderSetupPanel(),
               body: _ProposalBuilderContent(
-                controller: _segmentsScrollController,
+                itemScrollController: _segmentsScrollController,
+                sectionTileController: _sectionTileController,
                 onRetryTap: _loadProposal,
               ),
               bodyConstraints: const BoxConstraints.expand(),
@@ -130,6 +133,7 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
   @override
   void dispose() {
     _segmentsController.dispose();
+    _sectionTileController.dispose();
 
     unawaited(_proposalRefSub?.cancel());
     _proposalRefSub = null;
@@ -189,6 +193,7 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
 
     _segmentsController = SegmentsController();
     _segmentsScrollController = ItemScrollController();
+    _sectionTileController = DocumentBuilderSectionTileController();
 
     _segmentsController
       ..addListener(_handleSegmentsControllerChange)
@@ -418,21 +423,20 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
             segments: data,
             activeSectionId: activeSectionId,
           )
-        : state.copyWith(
-            segments: data,
-            activeSectionId: Optional(activeSectionId),
-          );
+        : state.updateSegments(data).copyWith(activeSectionId: Optional(activeSectionId));
 
     _segmentsController.value = newState;
   }
 }
 
 class _ProposalBuilderContent extends StatelessWidget {
-  final ItemScrollController controller;
+  final ItemScrollController itemScrollController;
+  final DocumentBuilderSectionTileController sectionTileController;
   final VoidCallback onRetryTap;
 
   const _ProposalBuilderContent({
-    required this.controller,
+    required this.itemScrollController,
+    required this.sectionTileController,
     required this.onRetryTap,
   });
 
@@ -443,7 +447,10 @@ class _ProposalBuilderContent extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           ProposalBuilderErrorSelector(onRetryTap: onRetryTap),
-          ProposalBuilderSegmentsSelector(itemScrollController: controller),
+          ProposalBuilderSegmentsSelector(
+            itemScrollController: itemScrollController,
+            sectionTileController: sectionTileController,
+          ),
           const ProposalBuilderLoadingSelector(),
         ],
       ),

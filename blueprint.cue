@@ -1,4 +1,3 @@
-version: "1.0"
 global: {
 	ci: {
 		local: [
@@ -10,6 +9,10 @@ global: {
 		registries: [
 			ci.providers.aws.ecr.registry,
 		]
+		release: docs: {
+			bucket: "docs.dev.projectcatalyst.io"
+			url:    "https://docs.dev.projectcatalyst.io/"
+		}
 		providers: {
 			aws: {
 				region: "eu-central-1"
@@ -28,20 +31,29 @@ global: {
 			}
 
 			earthly: {
-				credentials: {
+				satellite: credentials: {
 					provider: "aws"
-					path:     "global/ci/earthly"
+					path:     "global/ci/ci-tls"
 				}
-				org:       "Catalyst"
-				version:   "0.8.16"
+				version: "0.8.16"
 			}
 
 			github: registry: "ghcr.io"
 
-			kcl: {
-				install: true
-				version: "v0.11.0"
+			tailscale: {
+				credentials: {
+					provider: "aws"
+					path:     "global/ci/tailscale"
+				}
+				tags:    "tag:cat-github"
+				version: "latest"
 			}
+		}
+		retries: {
+			attempts: 2
+			filters: [
+				"buildkitd did not respond",
+			]
 		}
 		secrets: [
 			{

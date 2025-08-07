@@ -1,16 +1,16 @@
-//! Index RBAC Catalyst ID For Transaction ID Insert Query.
+//! Index RBAC Catalyst ID for transaction ID insert query.
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::TransactionId;
+use cardano_blockchain_types::{Slot, TransactionId};
 use catalyst_types::catalyst_id::CatalystId;
-use scylla::{SerializeRow, Session};
+use scylla::{client::session::Session, SerializeRow};
 use tracing::error;
 
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbCatalystId, DbTransactionId},
+        types::{DbCatalystId, DbSlot, DbTransactionId},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -25,6 +25,8 @@ pub(crate) struct Params {
     txn_id: DbTransactionId,
     /// A Catalyst short identifier.
     catalyst_id: DbCatalystId,
+    /// A block slot number.
+    slot_no: DbSlot,
 }
 
 impl Debug for Params {
@@ -32,16 +34,18 @@ impl Debug for Params {
         f.debug_struct("Params")
             .field("txn_id", &self.txn_id)
             .field("catalyst_id", &self.catalyst_id)
+            .field("slot_no", &self.slot_no)
             .finish()
     }
 }
 
 impl Params {
     /// Creates a new record for this transaction.
-    pub(crate) fn new(catalyst_id: CatalystId, txn_id: TransactionId) -> Self {
+    pub(crate) fn new(catalyst_id: CatalystId, txn_id: TransactionId, slot_no: Slot) -> Self {
         Params {
             txn_id: txn_id.into(),
             catalyst_id: catalyst_id.into(),
+            slot_no: slot_no.into(),
         }
     }
 

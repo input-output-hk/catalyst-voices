@@ -19,6 +19,11 @@ void _fixModelsMapping() {
   );
 }
 
+/// An interface for accessing Catalyst Voices API.
+///
+/// It provides access to the following services:
+/// - [CatGateway]
+/// - [CatReviews]
 final class ApiServices {
   final CatGateway gateway;
   final CatReviews reviews;

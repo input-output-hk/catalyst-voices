@@ -28,7 +28,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
 
   CatalystId? _accountId;
   Keychain? _keychain;
-  Transaction? _transaction;
+  BaseTransaction? _transaction;
 
   RegistrationCubit({
     required DownloaderService downloaderService,
@@ -240,8 +240,8 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
       );
 
       final accountId = _accountId;
-      final masterKey = await _keychain?.getMasterKey();
-      if (masterKey == null) {
+      final keychain = _keychain;
+      if (keychain == null) {
         emitError(const LocalizedRegistrationKeychainNotFoundException());
         return;
       }
@@ -272,13 +272,13 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
 
       final transaction = await _registrationService.prepareRegistration(
         wallet: wallet,
-        masterKey: masterKey,
+        keychain: keychain,
         roles: transactionRoles,
       );
 
       _transaction = transaction;
 
-      final fee = transaction.body.fee;
+      final fee = transaction.fee;
       final formattedFree = CryptocurrencyFormatter.formatAmount(fee);
 
       _onRegistrationStateDataChanged(

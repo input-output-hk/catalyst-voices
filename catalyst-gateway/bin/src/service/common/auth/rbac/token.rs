@@ -14,14 +14,10 @@ use cardano_blockchain_types::Network;
 use catalyst_types::catalyst_id::CatalystId;
 use chrono::{TimeDelta, Utc};
 use ed25519_dalek::{ed25519::signature::Signer, Signature, SigningKey, VerifyingKey};
-use futures::future::try_join;
 use rbac_registration::registration::cardano::RegistrationChain;
 use regex::Regex;
 
-use crate::db::index::{
-    queries::rbac::get_rbac_registrations::{build_reg_chain, indexed_registrations},
-    session::{CassandraSession, CassandraSessionError},
-};
+use crate::rbac::latest_rbac_chain;
 
 /// Captures just the digits after last slash
 /// This Regex should not fail
@@ -173,29 +169,16 @@ impl CatalystRBACTokenV1 {
     }
 
     /// Returns a network.
+    #[allow(dead_code)]
     pub(crate) fn network(&self) -> Network {
         self.network
     }
 
     /// Returns a corresponded registration chain if any registrations present.
     /// If it is a first call, fetch all data from the database and initialize it.
-    pub(crate) async fn reg_chain(&mut self) -> anyhow::Result<Option<RegistrationChain>> {
+    pub(crate) async fn reg_chain(&mut self) -> Result<Option<RegistrationChain>> {
         if self.reg_chain.is_none() {
-            let persistent_session =
-                CassandraSession::get(true).ok_or(CassandraSessionError::FailedAcquiringSession)?;
-            let volatile_session = CassandraSession::get(false)
-                .ok_or(CassandraSessionError::FailedAcquiringSession)?;
-            let (persistent_regs, volatile_regs) = try_join(
-                indexed_registrations(&persistent_session, self.catalyst_id()),
-                indexed_registrations(&volatile_session, self.catalyst_id()),
-            )
-            .await?;
-            // Combine persistent and volatile registrations.
-            let combined_regs = persistent_regs
-                .into_iter()
-                .map(|r| (true, r))
-                .chain(volatile_regs.into_iter().map(|r| (false, r)));
-            self.reg_chain = build_reg_chain(combined_regs, self.network(), |_, _, _| {}).await?;
+            self.reg_chain = latest_rbac_chain(&self.catalyst_id).await?.map(|i| i.chain);
         }
         Ok(self.reg_chain.clone())
     }
@@ -230,11 +213,10 @@ fn convert_network((network, subnet): &(String, Option<String>)) -> Result<Netwo
     }
 
     match subnet.as_deref() {
-        Some("mainnet") => Ok(Network::Mainnet),
+        None => Ok(Network::Mainnet),
         Some("preprod") => Ok(Network::Preprod),
         Some("preview") => Ok(Network::Preview),
-        Some(other) => Err(anyhow!("Unsupported subnet: {other}")),
-        None => Err(anyhow!("Missing subnet")),
+        Some(subnet) => Err(anyhow!("Unsupported host: {subnet}.{network}",)),
     }
 }
 
@@ -243,22 +225,23 @@ mod tests {
 
     use ed25519_dalek::SigningKey;
     use rand::rngs::OsRng;
+    use test_case::test_case;
 
     use super::*;
 
-    #[test]
-    fn roundtrip() {
+    #[test_case("cardano", None ; "mainnet cardano network")]
+    #[test_case("cardano", Some("preprod") ; "preprod.cardano network")]
+    #[test_case("cardano", Some("preview") ; "preview.cardano network")]
+    fn roundtrip(network: &'static str, subnet: Option<&'static str>) {
         let mut seed = OsRng;
         let signing_key: SigningKey = SigningKey::generate(&mut seed);
         let verifying_key = signing_key.verifying_key();
-        let token =
-            CatalystRBACTokenV1::new("cardano", Some("preprod"), verifying_key, &signing_key)
-                .unwrap();
+        let token = CatalystRBACTokenV1::new(network, subnet, verifying_key, &signing_key).unwrap();
         assert_eq!(token.catalyst_id().username(), None);
         assert!(token.catalyst_id().nonce().is_some());
         assert_eq!(
             token.catalyst_id().network(),
-            ("cardano".into(), Some("preprod".into()))
+            (network.to_string(), subnet.map(ToString::to_string))
         );
         assert!(!token.catalyst_id().is_encryption_key());
         assert!(token.catalyst_id().is_signature_key());
@@ -271,7 +254,7 @@ mod tests {
         assert!(parsed.catalyst_id().nonce().is_some());
         assert_eq!(
             parsed.catalyst_id().network(),
-            ("cardano".into(), Some("preprod".into()))
+            (network.to_string(), subnet.map(ToString::to_string))
         );
         assert!(!token.catalyst_id().is_encryption_key());
         assert!(token.catalyst_id().is_signature_key());

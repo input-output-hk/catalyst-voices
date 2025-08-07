@@ -1,8 +1,6 @@
 // Copyright 2021 Richard Easterling
 // SPDX-License-Identifier: Apache-2.0
 
-// ignore_for_file: avoid_equals_and_hash_code_on_mutable_classes
-
 import 'package:bip32_ed25519/bip32_ed25519.dart';
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';

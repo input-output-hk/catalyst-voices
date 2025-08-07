@@ -4,6 +4,7 @@ import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 
+/// Allows access to comment data.
 abstract interface class CommentRepository {
   const factory CommentRepository(
     SignedDocumentManager signedDocumentManager,
