@@ -217,6 +217,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     }
 
     final mappedPage = page.map(
+      // TODO(damian-molinski): refactor page to return ProposalWithContext instead.
       (e) => ProposalBrief.fromProposal(
         e,
         categoryName: campaign.categories

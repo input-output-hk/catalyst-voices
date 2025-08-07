@@ -17,6 +17,7 @@ final class VotingCubit extends Cubit<VotingState>
   final UserService _userService;
   final CampaignService _campaignService;
   final ProposalService _proposalService;
+  final VotingBallotBuilder _ballotBuilder;
 
   VotingCubitCache _cache = const VotingCubitCache();
 
@@ -28,6 +29,7 @@ final class VotingCubit extends Cubit<VotingState>
     this._userService,
     this._campaignService,
     this._proposalService,
+    this._ballotBuilder,
   ) : super(const VotingState()) {
     _resetCache();
 
@@ -40,6 +42,8 @@ final class VotingCubit extends Cubit<VotingState>
         .watchFavoritesProposalsIds()
         .distinct(listEquals)
         .listen(_handleFavoriteProposalsIds);
+
+    _ballotBuilder.addListener(_handleBallotBuilderChange);
   }
 
   void changeFilters({
@@ -86,6 +90,8 @@ final class VotingCubit extends Cubit<VotingState>
 
     await _proposalsCountSub?.cancel();
     _proposalsCountSub = null;
+
+    _ballotBuilder.removeListener(_handleBallotBuilderChange);
 
     return super.close();
   }
@@ -215,14 +221,11 @@ final class VotingCubit extends Cubit<VotingState>
 
     final mappedPage = page.map(
       (proposal) {
+        // TODO(damian-molinski): refactor page to return ProposalWithContext instead.
         return ProposalBriefVoting.fromProposal(
           proposal,
-          // TODO(LynxLynxx): Add votes from Bullet Builder
-          ProposalVotes(proposalRef: proposal.selfRef),
-          categoryName: campaign.categories
-              .firstWhere((element) => element.selfRef == proposal.categoryRef)
-              .categoryText,
           isFavorite: favoriteIds.contains(proposal.selfRef.id),
+          draftVote: _ballotBuilder.getVoteOn(proposal.selfRef),
         );
       },
     );
@@ -233,6 +236,10 @@ final class VotingCubit extends Cubit<VotingState>
 
   void _handleActiveAccountIdChange(CatalystId? id) {
     changeFilters(author: Optional(id), resetProposals: true);
+  }
+
+  void _handleBallotBuilderChange() {
+    _emitCachedProposalsPage();
   }
 
   void _handleFavoriteProposalsIds(List<String> ids) {

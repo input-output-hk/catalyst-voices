@@ -106,7 +106,7 @@ class ProposalBrief extends Equatable {
 }
 
 class ProposalBriefVoting extends ProposalBrief {
-  final VoteButtonData? voteData;
+  final VoteButtonData voteData;
 
   const ProposalBriefVoting({
     required super.selfRef,
@@ -121,7 +121,7 @@ class ProposalBriefVoting extends ProposalBrief {
     required super.commentsCount,
     super.isFavorite,
     super.author,
-    this.voteData,
+    required this.voteData,
   });
 
   factory ProposalBriefVoting.fromProposal(
@@ -129,6 +129,8 @@ class ProposalBriefVoting extends ProposalBrief {
     ProposalVotes? votes, {
     bool isFavorite = false,
     String categoryName = '',
+    Vote? draftVote,
+    Vote? lastCastedVote,
   }) {
     return ProposalBriefVoting(
       selfRef: proposal.selfRef,
@@ -144,8 +146,36 @@ class ProposalBriefVoting extends ProposalBrief {
       commentsCount: proposal.commentsCount,
       isFavorite: isFavorite,
       voteData: VoteButtonData.fromVotes(
-        currentDraft: votes?.currentDraft,
-        lastCasted: votes?.lastCasted,
+        currentDraft: draftVote,
+        lastCasted: lastCastedVote,
+      ),
+    );
+  }
+
+  factory ProposalBriefVoting.fromProposalWithContext(
+    ProposalWithContext data, {
+    Vote? draftVote,
+  }) {
+    final proposal = data.proposal;
+    final category = data.category;
+    final userContext = data.user;
+
+    return ProposalBriefVoting(
+      selfRef: proposal.selfRef,
+      title: proposal.title,
+      categoryName: category.categoryName,
+      author: proposal.author,
+      fundsRequested: proposal.fundsRequested,
+      duration: proposal.duration,
+      publish: proposal.publish,
+      description: proposal.description,
+      versionNumber: proposal.versionNumber,
+      updateDate: proposal.updateDate,
+      commentsCount: proposal.commentsCount,
+      isFavorite: userContext.isFavorite,
+      voteData: VoteButtonData.fromVotes(
+        currentDraft: draftVote,
+        lastCasted: userContext.lastCastedVote,
       ),
     );
   }
@@ -170,7 +200,7 @@ class ProposalBriefVoting extends ProposalBrief {
     DateTime? updateDate,
     int? commentsCount,
     bool? isFavorite,
-    Optional<VoteButtonData>? voteData,
+    VoteButtonData? voteData,
   }) {
     return ProposalBriefVoting(
       selfRef: selfRef ?? this.selfRef,
@@ -185,20 +215,7 @@ class ProposalBriefVoting extends ProposalBrief {
       updateDate: updateDate ?? this.updateDate,
       commentsCount: commentsCount ?? this.commentsCount,
       isFavorite: isFavorite ?? this.isFavorite,
-      voteData: voteData.dataOr(this.voteData),
-    );
-  }
-
-  ProposalBriefVoting copyWithVotes({
-    Vote? currentDraft,
-    Vote? lastCasted,
-  }) {
-    final voteData = VoteButtonData.fromVotes(
-      currentDraft: currentDraft,
-      lastCasted: lastCasted,
-    );
-    return copyWith(
-      voteData: Optional(voteData),
+      voteData: voteData ?? this.voteData,
     );
   }
 }

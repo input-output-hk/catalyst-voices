@@ -82,10 +82,7 @@ class TimezoneDateTimeText extends StatelessWidget {
 
     const states = <WidgetState>{};
 
-    final effectiveData = switch (timezone) {
-      TimezonePreferences.utc => data.toUtc(),
-      TimezonePreferences.local => data.toLocal(),
-    };
+    final effectiveData = timezone.applyTo(data);
     final string = formatter(context, effectiveData);
 
     final timestampTextStyle =

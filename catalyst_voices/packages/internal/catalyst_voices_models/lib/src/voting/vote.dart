@@ -19,9 +19,10 @@ final class Vote extends Equatable {
   }) : assert(selfRef.version != null, 'selfRef have to be exact!');
 
   Vote.draft({
+    String? id,
     required this.proposal,
     required this.type,
-  }) : selfRef = DraftRef.generateFirstRef();
+  }) : selfRef = id != null ? DraftRef.generateNextRefFor(id) : DraftRef.generateFirstRef();
 
   /// Extracts timestamp from [selfRef] version.
   DateTime get createdAt => selfRef.version!.dateTime;
