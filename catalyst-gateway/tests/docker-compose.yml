@@ -105,7 +105,7 @@ services:
       - CASSANDRA_PERSISTENT_URL=scylla-node:9042
       - CASSANDRA_VOLATILE_URL=scylla-node:9042
     depends_on:
-      event-db:
+      event-db-migrations:
         condition: service_started
       scylla-node:
         condition: service_healthy
