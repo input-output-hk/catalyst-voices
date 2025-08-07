@@ -26,3 +26,8 @@ docker compose up schemathesis-runner --abort-on-container-exit --exit-code-from
 ```shell
 docker compose up rust-tests-runner --abort-on-container-exit --exit-code-from rust-tests-runner
 ```
+
+### NOTE
+
+After running `rust-tests-runner` better always clean the state (with `docker compose down`),
+these tests could it mess up with the random data.
