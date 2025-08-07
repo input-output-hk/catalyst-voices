@@ -61,7 +61,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Assert: Verify that the failure widget is shown
-      expect(find.text('Failure: Test Failure'), findsOneWidget);
+      expect(find.text('Failure: Exception: Test Failure'), findsOneWidget);
     });
 
     testWidgets('shows loading state for the minimum duration', (WidgetTester tester) async {
@@ -192,7 +192,7 @@ void main() {
 
       // Verify that failure state is now shown
       expect(find.byKey(failureWidgetKey), findsOneWidget);
-      expect(find.text('Failure: Test Failure'), findsOneWidget);
+      expect(find.text('Failure: Exception: Test Failure'), findsOneWidget);
     });
   });
 }
