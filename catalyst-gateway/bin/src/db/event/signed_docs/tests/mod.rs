@@ -48,12 +48,10 @@ fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
                 vec!["Alex".to_string()],
                 Some(serde_json::json!(
                     {
-                        "ref": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "template": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "reply": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "brand_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "campaign_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "category_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "ref": [{ "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7(), "cid": "0x" }],
+                        "template": [{ "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7(), "cid": "0x" }],
+                        "reply": [{ "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7(), "cid": "0x" }],
+                        "parameters": [{ "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7(), "cid": "0x" }],
                     }
                 )),
             ),
@@ -68,12 +66,10 @@ fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
                 vec!["Steven".to_string()],
                 Some(serde_json::json!(
                     {
-                        "ref": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "template": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "reply": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "brand_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "campaign_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "category_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "ref": [{ "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7(), "cid": "0x" }],
+                        "template": [{ "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7(), "cid": "0x" }],
+                        "reply": [{ "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7(), "cid": "0x" }],
+                        "parameters": [{ "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7(), "cid": "0x" }],
                     }
                 )),
             ),
