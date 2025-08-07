@@ -237,6 +237,7 @@ netifas
 netkey
 nextest
 Nodetool
+noqa
 NuFi
 oapi
 OCSP

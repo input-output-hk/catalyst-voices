@@ -47,6 +47,7 @@ impl SignedDocBody {
     }
 
     /// Returns the document type.
+    #[allow(dead_code)]
     pub(crate) fn doc_type(&self) -> &uuid::Uuid {
         &self.doc_type
     }

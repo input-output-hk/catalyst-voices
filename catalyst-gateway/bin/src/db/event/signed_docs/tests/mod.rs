@@ -30,14 +30,12 @@ async fn queries_test() {
         filter_by_field::filter_by_field!(doc, "ref", with_ref);
         filter_by_field::filter_by_field!(doc, "template", with_template);
         filter_by_field::filter_by_field!(doc, "reply", with_reply);
-        filter_by_field::filter_by_field!(doc, "brand_id", with_brand_id);
-        filter_by_field::filter_by_field!(doc, "campaign_id", with_campaign_id);
-        filter_by_field::filter_by_field!(doc, "category_id", with_category_id);
+        filter_by_field::filter_by_field!(doc, "parameters", with_parameters);
     }
 
     filter_by_type(&docs, doc_type).await;
     filter_all(&docs).await;
-    filter_count(docs.len().try_into().unwrap()).await;
+    filter_count(&docs).await;
 }
 
 fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
@@ -50,12 +48,10 @@ fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
                 vec!["Alex".to_string()],
                 Some(serde_json::json!(
                     {
-                        "ref": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "template": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "reply": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "brand_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "campaign_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "category_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "ref": [{ "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7(), "cid": "0x" }],
+                        "template": [{ "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7(), "cid": "0x" }],
+                        "reply": [{ "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7(), "cid": "0x" }],
+                        "parameters": [{ "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7(), "cid": "0x" }],
                     }
                 )),
             ),
@@ -70,12 +66,10 @@ fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
                 vec!["Steven".to_string()],
                 Some(serde_json::json!(
                     {
-                        "ref": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "template": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "reply": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "brand_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "campaign_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
-                        "category_id": { "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7() },
+                        "ref": [{ "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7(), "cid": "0x" }],
+                        "template": [{ "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7(), "cid": "0x" }],
+                        "reply": [{ "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7(), "cid": "0x" }],
+                        "parameters": [{ "id": uuid::Uuid::now_v7(), "ver": uuid::Uuid::now_v7(), "cid": "0x" }],
                     }
                 )),
             ),
@@ -179,7 +173,7 @@ async fn filter_by_id_and_ver(doc: &FullSignedDoc) {
 }
 
 async fn filter_by_type(docs: &[FullSignedDoc], doc_type: uuid::Uuid) {
-    let filter = DocsQueryFilter::all().with_type(doc_type);
+    let filter = DocsQueryFilter::all().with_type(vec![doc_type]);
     let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
         .await
         .unwrap();
@@ -188,19 +182,26 @@ async fn filter_by_type(docs: &[FullSignedDoc], doc_type: uuid::Uuid) {
         assert_eq!(exp_doc.body(), &res_doc);
     }
 }
+
+/// Pre-seeded Fund 14 documents `V3__signed_documents.sql` and
+/// `old_format_signed_doc.sql`
+const PRE_SEED_DATA: usize = 43;
 
 async fn filter_all(docs: &[FullSignedDoc]) {
     let filter = DocsQueryFilter::all();
     let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
         .await
         .unwrap();
-    for exp_doc in docs.iter().rev() {
+    for exp_doc in docs.iter().skip(PRE_SEED_DATA).rev() {
         let res_doc = res_docs.try_next().await.unwrap().unwrap();
         assert_eq!(exp_doc.body(), &res_doc);
     }
 }
 
-async fn filter_count(len: i64) {
+async fn filter_count(docs: &[FullSignedDoc]) {
+    let len: i64 = (docs.len().saturating_add(PRE_SEED_DATA))
+        .try_into()
+        .unwrap();
     let filter = DocsQueryFilter::all();
     let count = SignedDocBody::retrieve_count(&filter).await.unwrap();
     assert_eq!(len, count);

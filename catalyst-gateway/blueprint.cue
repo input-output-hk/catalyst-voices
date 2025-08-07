@@ -116,12 +116,6 @@ project: {
 										key:  "api-key"
 									}
 								}
-								"SIGNED_DOC_SK": {
-									secret: {
-										name: "gateway"
-										key:  "signed-doc-secret-key"
-									}
-								}
 							}
 							ports: {
 								metrics: port: 3030
