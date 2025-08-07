@@ -42,6 +42,10 @@ final class ProposalVotingStatusSection extends ProposalVotingOverviewSection {
   });
 
   @override
+  @mustCallSuper
+  List<Object?> get props => [...super.props, data];
+
+  @override
   String resolveTitle(BuildContext context) {
     return context.l10n.votingStatus;
   }

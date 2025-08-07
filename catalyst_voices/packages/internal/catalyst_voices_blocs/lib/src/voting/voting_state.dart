@@ -62,8 +62,6 @@ class VotingState extends Equatable {
       categorySelectorItems: categorySelectorItems ?? this.categorySelectorItems,
     );
   }
-
-  bool isFavorite(String proposalId) => favoritesIds.contains(proposalId);
 }
 
 final class VotingStateOrderDropdown extends Equatable {

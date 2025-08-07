@@ -7,7 +7,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class VotingProposalsPaginationTile extends StatelessWidget {
-  final ProposalBrief proposal;
+  final ProposalBriefVoting proposal;
 
   const VotingProposalsPaginationTile({
     super.key,

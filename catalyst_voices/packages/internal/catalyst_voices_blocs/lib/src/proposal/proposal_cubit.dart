@@ -334,10 +334,10 @@ final class ProposalCubit extends Cubit<ProposalState>
       return null;
     }
 
-    // TODO(LynxLynxx): Fetch voting data
     return ProposalVotingOverviewSegment.build(
-      data: const ProposalViewVoting(
-        VoteButtonData(),
+      data: ProposalViewVoting(
+        // TODO(LynxLynxx): Add voting data from bullet builder
+        VoteButtonData.fromProposalVotes(ProposalVotes(proposalRef: proposalRef)),
       ),
     );
   }

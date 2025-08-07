@@ -49,6 +49,7 @@ final class ProposalCubitCache extends Equatable {
     Optional<bool>? isFavorite,
     Optional<bool>? isVotingStage,
     Optional<bool>? readOnlyMode,
+    Optional<ProposalVotes>? votingData,
   }) {
     return ProposalCubitCache(
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
