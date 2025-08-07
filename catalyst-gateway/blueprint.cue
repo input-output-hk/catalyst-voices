@@ -179,32 +179,32 @@ project: {
 
 					jobs:
 					{
-						"frontend-config": {
-							argo: {
-								hook: {
-									type: "PostSync"
-									deletePolicy: ["BeforeHookCreation"]
-								}
-							}
-							hashName: false
-							containers: main: {
-								image: {
-									name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/voices-frontend-config"
-									tag:  _ @forge(name="GIT_HASH_OR_TAG")
-								}
-								env: {
-									ENVIRONMENT: {
-										value: string | *_env
-									}
-									API_KEY: {
-										secret: {
-											name: "gateway"
-											key:  "api-key"
-										}
-									}
-								}
-							}
-						}
+						// "frontend-config": {
+						// 	argo: {
+						// 		hook: {
+						// 			type: "PostSync"
+						// 			deletePolicy: ["BeforeHookCreation"]
+						// 		}
+						// 	}
+						// 	hashName: false
+						// 	containers: main: {
+						// 		image: {
+						// 			name: "332405224602.dkr.ecr.eu-central-1.amazonaws.com/catalyst-voices/voices-frontend-config"
+						// 			tag:  _ @forge(name="GIT_HASH_OR_TAG")
+						// 		}
+						// 		env: {
+						// 			ENVIRONMENT: {
+						// 				value: string | *_env
+						// 			}
+						// 			API_KEY: {
+						// 				secret: {
+						// 					name: "gateway"
+						// 					key:  "api-key"
+						// 				}
+						// 			}
+						// 		}
+						// 	}
+						// }
 						migration: {
 							argo: {
 								hook: {
