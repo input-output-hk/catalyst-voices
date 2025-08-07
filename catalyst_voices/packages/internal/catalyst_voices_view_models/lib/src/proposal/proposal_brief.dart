@@ -151,6 +151,34 @@ class ProposalBriefVoting extends ProposalBrief {
     );
   }
 
+  factory ProposalBriefVoting.fromProposalWithContext(
+    ProposalWithContext data, {
+    Vote? draftVote,
+  }) {
+    final proposal = data.proposal;
+    final category = data.category;
+    final userContext = data.user;
+
+    return ProposalBriefVoting(
+      selfRef: proposal.selfRef,
+      title: proposal.title,
+      categoryName: category.categoryName,
+      author: proposal.author,
+      fundsRequested: proposal.fundsRequested,
+      duration: proposal.duration,
+      publish: proposal.publish,
+      description: proposal.description,
+      versionNumber: proposal.versionNumber,
+      updateDate: proposal.updateDate,
+      commentsCount: proposal.commentsCount,
+      isFavorite: userContext.isFavorite,
+      voteData: VoteButtonData.fromVotes(
+        currentDraft: draftVote,
+        lastCasted: userContext.lastCastedVote,
+      ),
+    );
+  }
+
   @override
   List<Object?> get props => [
         ...super.props,

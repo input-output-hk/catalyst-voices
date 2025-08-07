@@ -221,6 +221,7 @@ final class VotingCubit extends Cubit<VotingState>
 
     final mappedPage = page.map(
       (proposal) {
+        // TODO(damian-molinski): refactor page to return ProposalWithContext instead.
         return ProposalBriefVoting.fromProposal(
           proposal,
           isFavorite: favoriteIds.contains(proposal.selfRef.id),

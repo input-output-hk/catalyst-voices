@@ -72,6 +72,7 @@ export 'proposal/proposal_data.dart';
 export 'proposal/proposal_enums.dart';
 export 'proposal/proposal_forget_actions.dart';
 export 'proposal/proposal_version.dart';
+export 'proposal/proposal_with_context.dart';
 export 'proposals/proposals_count.dart';
 export 'proposals/proposals_count_filters.dart';
 export 'proposals/proposals_filters.dart';
