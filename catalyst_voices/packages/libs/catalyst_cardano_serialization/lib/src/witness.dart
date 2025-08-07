@@ -83,17 +83,26 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
   /// Serializes the type as cbor.
   @override
   CborValue toCbor({List<int> tags = const []}) {
+    final items = toCborValuesMap();
+
     return CborMap(
-      {
-        ..._generateCborPair(WitnessType.vkeyWitness, vkeyWitnesses),
-        ..._generateCborPair(WitnessType.nativeScript, nativeScripts),
-        ..._generateCborPair(WitnessType.plutusV1Script, plutusV1Scripts),
-        ..._generateCborPair(WitnessType.redeemers, redeemers),
-        ..._generateCborPair(WitnessType.plutusV2Script, plutusV2Scripts),
-        ..._generateCborPair(WitnessType.plutusV3Script, plutusV3Scripts),
-      },
+      items,
       tags: tags,
     );
+  }
+
+  /// Utility method for [toCbor]. It returns map of cbor values for this [TransactionWitnessSet].
+  ///
+  /// It is useful when implementing custom or tracking encoding.
+  Map<CborValue, CborValue> toCborValuesMap() {
+    return <CborValue, CborValue>{
+      ..._generateCborPair(WitnessType.vkeyWitness, vkeyWitnesses),
+      ..._generateCborPair(WitnessType.nativeScript, nativeScripts),
+      ..._generateCborPair(WitnessType.plutusV1Script, plutusV1Scripts),
+      ..._generateCborPair(WitnessType.redeemers, redeemers),
+      ..._generateCborPair(WitnessType.plutusV2Script, plutusV2Scripts),
+      ..._generateCborPair(WitnessType.plutusV3Script, plutusV3Scripts),
+    };
   }
 
   Map<CborValue, CborValue> _generateCborPair(

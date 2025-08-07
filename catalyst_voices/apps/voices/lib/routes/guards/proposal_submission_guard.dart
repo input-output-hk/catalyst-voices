@@ -7,6 +7,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
+/// Restricts access to screen based on current Campaign state.
 final class ProposalSubmissionGuard implements RouteGuard {
   const ProposalSubmissionGuard();
 
@@ -18,8 +19,7 @@ final class ProposalSubmissionGuard implements RouteGuard {
     return switch (campaignState) {
       AfterProposalSubmissionStage() when path != null && ProposalRoute.isPath(path) => null,
       AfterProposalSubmissionStage() => const CampaignStageRoute().location,
-      PreProposalSubmissionStage() when path != null && ProposalRoute.isPath(path) =>
-        const CampaignStageRoute().location,
+      PreProposalSubmissionStage() => const CampaignStageRoute().location,
       ProposalSubmissionStage() when state.matchedLocation == const CampaignStageRoute().location =>
         const DiscoveryRoute().location,
       _ => null,

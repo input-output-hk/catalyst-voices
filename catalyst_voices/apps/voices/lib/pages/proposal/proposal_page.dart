@@ -17,8 +17,10 @@ import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -47,17 +49,20 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
     final readOnlyMode = context.select<ProposalCubit, bool>((cubit) => cubit.state.readOnlyMode);
 
     return VoicesAppBar(
-      leading: NavigationBack(
-        isCompact: true,
-        onCanNotPop: (context, _) => const ProposalsRoute().go(context),
-      ),
+      leading: !(readOnlyMode || CatalystPlatform.isMobileWeb)
+          ? NavigationBack(
+              isCompact: true,
+              onCanNotPop: (context, _) => const ProposalsRoute().go(context),
+            )
+          : null,
+      enableBackHome: !(readOnlyMode || CatalystPlatform.isMobileWeb),
       actions: [
         Offstage(
-          offstage: readOnlyMode,
+          offstage: readOnlyMode || CatalystPlatform.isMobileWeb,
           child: const SessionActionHeader(),
         ),
         Offstage(
-          offstage: readOnlyMode,
+          offstage: readOnlyMode || CatalystPlatform.isMobileWeb,
           child: const SessionStateHeader(),
         ),
       ],
@@ -81,6 +86,8 @@ class _ProposalPageState extends State<ProposalPage>
       child: Scaffold(
         appBar: const _AppBar(),
         endDrawer: const OpportunitiesDrawer(),
+        floatingActionButton:
+            _ScrollToTopButton(segmentsScrollController: _segmentsScrollController),
         body: ProposalHeaderWrapper(
           child: ProposalSidebars(
             navPanel: const ProposalNavigationPanel(),
@@ -185,8 +192,77 @@ class _ProposalPageState extends State<ProposalPage>
 
     final newState = state.segments.isEmpty
         ? SegmentsControllerState.initial(segments: data)
-        : state.copyWith(segments: data);
+        : state.updateSegments(data);
 
     _segmentsController.value = newState;
+  }
+}
+
+class _ScrollToTopButton extends StatefulWidget {
+  final ItemScrollController segmentsScrollController;
+
+  const _ScrollToTopButton({
+    required this.segmentsScrollController,
+  });
+
+  @override
+  State<_ScrollToTopButton> createState() => _ScrollToTopButtonState();
+}
+
+class _ScrollToTopButtonState extends State<_ScrollToTopButton> {
+  ScrollNotificationObserverState? _scrollNotificationObserver;
+  bool _showButton = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Offstage(
+      offstage: !_showButton,
+      child: FloatingActionButton(
+        onPressed: _scrollToTop,
+        child: VoicesAssets.icons.arrowUp.buildIcon(),
+      ),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _scrollNotificationObserver?.removeListener(_handleScrollNotification);
+    _scrollNotificationObserver = ScrollNotificationObserver.maybeOf(context);
+    _scrollNotificationObserver?.addListener(_handleScrollNotification);
+  }
+
+  @override
+  void dispose() {
+    _scrollNotificationObserver?.removeListener(_handleScrollNotification);
+    _scrollNotificationObserver = null;
+    super.dispose();
+  }
+
+  void _handleScrollNotification(ScrollNotification notification) {
+    if (notification is ScrollUpdateNotification) {
+      final element = notification.context as Element?;
+
+      // Only react to content scroll from ProposalContent, not menu
+      if (element?.findAncestorWidgetOfExactType<ProposalContent>() != null) {
+        final oldShowButton = _showButton;
+        final metrics = notification.metrics;
+
+        _showButton = metrics.extentBefore > 50;
+
+        if (_showButton != oldShowButton) {
+          setState(() {});
+        }
+      }
+    }
+  }
+
+  Future<void> _scrollToTop() async {
+    await widget.segmentsScrollController.scrollTo(
+      index: 0,
+      duration: const Duration(milliseconds: 300),
+      alignment: 1.5,
+    );
   }
 }

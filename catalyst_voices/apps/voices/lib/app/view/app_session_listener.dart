@@ -51,7 +51,7 @@ class _GlobalSessionListenerState extends State<GlobalSessionListener> {
       message: context.l10n.lockSnackbarMessage,
     ).show(context);
 
-    final routerContext = AppRouter.rootNavigatorKey.currentContext;
+    final routerContext = AppRouterFactory.rootNavigatorKey.currentContext;
     if (routerContext != null) {
       _lastLocation = GoRouter.of(routerContext).state.uri.toString();
       routerContext.go(const DiscoveryRoute().location);
@@ -75,7 +75,7 @@ class _GlobalSessionListenerState extends State<GlobalSessionListener> {
       message: context.l10n.unlockSnackbarMessage,
     ).show(context);
 
-    final routerContext = AppRouter.rootNavigatorKey.currentContext;
+    final routerContext = AppRouterFactory.rootNavigatorKey.currentContext;
     if (_lastLocation != null && routerContext != null) {
       routerContext.go(_lastLocation!);
     }

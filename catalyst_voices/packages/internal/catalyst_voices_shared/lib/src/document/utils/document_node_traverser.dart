@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
+/// An algorithm that traverses document properties in opinionated way.
 final class DocumentNodeTraverser {
   /// Expands nested properties.
   static Iterable<DocumentProperty> findSectionsAndSubsections(

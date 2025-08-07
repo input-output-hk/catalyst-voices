@@ -1,13 +1,53 @@
+import 'dart:convert';
+
 import 'package:catalyst_cardano_serialization/src/builders/types.dart';
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
 import 'package:catalyst_cardano_serialization/src/utils/hex.dart';
 import 'package:cbor/cbor.dart';
-import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
+
+/// The name of a native asset.
+final class AssetName extends Equatable implements CborEncodable {
+  /// Maximum length of [AssetName.bytes].
+  static const maxLength = 32;
+
+  final List<int> _bytes;
+
+  /// utf8 name
+  AssetName(String name) : this._(utf8.encode(name));
+
+  /// Raw version of [AssetName].
+  const AssetName.bytes(List<int> bytes) : this._(bytes);
+
+  /// Deserializes the type from cbor.
+  factory AssetName.fromCbor(CborValue value) {
+    return AssetName._((value as CborBytes).bytes);
+  }
+
+  const AssetName._(this._bytes);
+
+  /// Original list of bytes for this [AssetName].
+  List<int> get bytes => List.unmodifiable(_bytes);
+
+  /// Returns true bytes value is too long.
+  bool get isTooLong => _bytes.length > AssetName.maxLength;
+
+  @override
+  List<Object?> get props => [_bytes];
+
+  /// Serializes the type as cbor.
+  @override
+  CborBytes toCbor({List<int> tags = const []}) {
+    return CborBytes(
+      _bytes,
+      tags: tags,
+    );
+  }
+}
 
 /// Represents the balance of the wallet in terms of [Coin].
 final class Balance extends Equatable implements CborEncodable {
-  /// The amount of [Coin] that the wallet holds.
+  /// The amount of Ada [Coin] that the wallet holds.
   final Coin coin;
 
   /// The amounts of native assets that the wallet holds.
@@ -361,31 +401,52 @@ enum NetworkId {
   }
 }
 
-/// The name of a native asset.
-extension type AssetName(String name) {
-  /// Deserializes the type from cbor.
-  factory AssetName.fromCbor(CborValue value) {
-    final bytes = (value as CborBytes).bytes;
-    // FIXME(ilap): Handle non ASCII/UTF-8 characters.
-    return AssetName(CborString.fromUtf8(bytes).toString(allowMalformed: true));
-  }
-
-  /// Serializes the type as cbor.
-  CborValue toCbor() => CborBytes(CborString(name).utf8Bytes);
-}
-
 /// The hash of policy ID that minted native assets.
-extension type PolicyId(String hash) {
+final class PolicyId extends Equatable implements CborEncodable, Comparable<PolicyId> {
   /// The fixed byte length of a policy ID hash.
   static const hashLength = 28;
 
+  final List<int> _bytes;
+
+  /// hex hash of [PolicyId].
+  PolicyId(String hash) : this._(hexDecode(hash));
+
   /// Deserializes the type from cbor.
   factory PolicyId.fromCbor(CborValue value) {
-    return PolicyId(hex.encode((value as CborBytes).bytes));
+    return PolicyId._((value as CborBytes).bytes);
+  }
+
+  const PolicyId._(this._bytes);
+
+  /// Original list of bytes for this [PolicyId].
+  List<int> get bytes => List.unmodifiable(_bytes);
+
+  @override
+  List<Object?> get props => [_bytes];
+
+  @override
+  int compareTo(PolicyId other) {
+    final minLength = _bytes.length < other._bytes.length ? _bytes.length : other._bytes.length;
+
+    for (var i = 0; i < minLength; i++) {
+      final comparison = _bytes[i].compareTo(other._bytes[i]);
+      if (comparison != 0) {
+        return comparison;
+      }
+    }
+
+    // If all elements are equal up to minLength, compare lengths
+    return _bytes.length.compareTo(other._bytes.length);
   }
 
   /// Serializes the type as cbor.
-  CborValue toCbor() => CborBytes(hexDecode(hash));
+  @override
+  CborBytes toCbor({List<int> tags = const []}) {
+    return CborBytes(
+      _bytes,
+      tags: tags,
+    );
+  }
 }
 
 /// A blockchain slot number.

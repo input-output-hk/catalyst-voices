@@ -15,14 +15,19 @@ class ProposalSidebars extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder<double>(
+      xs: 0,
       sm: 16,
       md: 32,
       other: 56,
       builder: (context, spacing) {
         return SidebarScaffold(
-          leftRail: Padding(
-            padding: EdgeInsets.symmetric(horizontal: spacing / 2),
-            child: navPanel,
+          // TODO(LynxLynxx): Remove when we support mobile web
+          leftRail: Offstage(
+            offstage: CatalystPlatform.isMobileWeb,
+            child: Padding(
+              padding: EdgeInsets.only(left: spacing / 2, right: spacing / 2, top: 40),
+              child: navPanel,
+            ),
           ),
           spacing: 0,
           body: Padding(

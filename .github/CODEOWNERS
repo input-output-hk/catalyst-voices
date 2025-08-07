@@ -4,6 +4,8 @@
 
 /catalyst-gateway/ @stevenj @Mr-Leshiy @cong-or @saibatizoku @bkioshn @stanislav-tkach
 
+/catalyst-gateway/bin/src/metrics @jmgilman
+
 /catalyst-gateway-crates/ @stevenj @Mr-Leshiy @cong-or @saibatizoku @bkioshn @stanislav-tkach
 
 /catalyst-gateway/tests/ @kukkok3

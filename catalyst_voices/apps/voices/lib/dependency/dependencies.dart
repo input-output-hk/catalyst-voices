@@ -272,11 +272,15 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<KeyDerivationService>(() {
       return KeyDerivationService(get<CatalystKeyDerivation>());
     });
+    registerLazySingleton<KeychainSigner>(() {
+      return KeychainSignerService(get<KeyDerivationService>());
+    });
     registerLazySingleton<KeychainProvider>(() {
       return VaultKeychainProvider(
         secureStorage: get<FlutterSecureStorage>(),
         sharedPreferences: get<SharedPreferencesAsync>(),
         cacheConfig: get<AppConfig>().cache,
+        keychainSigner: get<KeychainSigner>(),
       );
     });
     registerLazySingleton<AuthTokenGenerator>(() {
@@ -325,7 +329,6 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<SignerService>(() {
       return AccountSignerService(
         get<UserService>(),
-        get<KeyDerivationService>(),
       );
     });
     registerLazySingleton<AccessControl>(AccessControl.new);
@@ -434,9 +437,7 @@ final class Dependencies extends DependencyProvider {
       dispose: (observer) async => observer.dispose(),
     );
     registerLazySingleton<VideoManager>(
-      () {
-        return VideoManager();
-      },
+      VideoManager.new,
       dispose: (manager) => manager.dispose(),
     );
     registerLazySingleton<ShareManager>(() => DelegatingShareManager(get<ShareService>()));

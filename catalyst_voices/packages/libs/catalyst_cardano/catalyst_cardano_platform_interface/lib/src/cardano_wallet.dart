@@ -149,7 +149,7 @@ abstract interface class CardanoWalletApi {
   /// as a result of this call are returned to encourage dApps to verify the
   /// contents returned by this endpoint while building the final transaction.
   Future<TransactionWitnessSet> signTx({
-    required Transaction transaction,
+    required BaseTransaction transaction,
     bool partialSign = false,
   });
 
@@ -163,7 +163,7 @@ abstract interface class CardanoWalletApi {
   /// if they do not wish to send it, or Failure if there was an error
   /// in sending it (e.g. preliminary checks failed on signatures).
   Future<TransactionHash> submitTx({
-    required Transaction transaction,
+    required BaseTransaction transaction,
   });
 }
 

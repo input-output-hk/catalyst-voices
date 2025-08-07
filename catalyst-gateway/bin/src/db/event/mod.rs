@@ -14,7 +14,10 @@ use futures::{Stream, StreamExt, TryStreamExt};
 use tokio_postgres::{types::ToSql, NoTls, Row};
 use tracing::{debug, debug_span, error, Instrument};
 
-use crate::{service::utilities::health::set_event_db_liveness, settings::Settings};
+use crate::{
+    service::utilities::health::{event_db_is_live, set_event_db_liveness},
+    settings::Settings,
+};
 
 pub(crate) mod common;
 pub(crate) mod config;
@@ -57,10 +60,9 @@ impl EventDB {
         let pool = EVENT_DB_POOL
             .get()
             .ok_or(EventDBConnectionError::DbPoolUninitialized)?;
-        pool.get().await.map_err(|_| {
-            set_event_db_liveness(false);
-            EventDBConnectionError::PoolConnectionUnavailable
-        })
+        pool.get()
+            .await
+            .map_err(|_| EventDBConnectionError::PoolConnectionUnavailable)
     }
 
     /// Determine if deep query inspection is enabled.
@@ -174,7 +176,20 @@ impl EventDB {
 
     /// Checks that connection to `EventDB` is available.
     pub(crate) async fn connection_is_ok() -> bool {
-        Self::get_pool_connection().await.is_ok()
+        let event_db_liveness = event_db_is_live();
+        Self::get_pool_connection()
+            .await
+            .inspect(|_| {
+                if !event_db_liveness {
+                    set_event_db_liveness(true);
+                }
+            })
+            .inspect_err(|_| {
+                if event_db_liveness {
+                    set_event_db_liveness(false);
+                }
+            })
+            .is_ok()
     }
 
     /// Prepend `EXPLAIN ANALYZE` to the query, and rollback the transaction.

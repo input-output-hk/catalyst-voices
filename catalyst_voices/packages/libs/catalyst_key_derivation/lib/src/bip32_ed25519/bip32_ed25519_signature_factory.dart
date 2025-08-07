@@ -12,8 +12,6 @@ import 'package:cbor/cbor.dart';
 abstract class Bip32Ed25519XSignatureFactory {
   static Bip32Ed25519XSignatureFactory _instance = const DefaultBip32Ed25519XSignatureFactory();
 
-  const Bip32Ed25519XSignatureFactory();
-
   // ignore: unnecessary_getters_setters
   static Bip32Ed25519XSignatureFactory get instance => _instance;
 
@@ -21,8 +19,15 @@ abstract class Bip32Ed25519XSignatureFactory {
     _instance = factory;
   }
 
+  const Bip32Ed25519XSignatureFactory();
+
   /// Constructs a [Bip32Ed25519XSignature] from a list of [bytes].
   Bip32Ed25519XSignature fromBytes(List<int> bytes);
+
+  /// Deserializes the type from cbor.
+  Bip32Ed25519XSignature fromCbor(CborValue value) {
+    return fromBytes((value as CborBytes).bytes);
+  }
 
   /// Constructs a [Bip32Ed25519XSignature] from a hex-encoded list of bytes.
   Bip32Ed25519XSignature fromHex(String string) {
@@ -36,11 +41,6 @@ abstract class Bip32Ed25519XSignatureFactory {
   /// pattern, primarily for testing or experimentation purposes.
   Bip32Ed25519XSignature seeded(int byte) {
     return fromBytes(List.filled(rust.U8Array64.arraySize, byte));
-  }
-
-  /// Deserializes the type from cbor.
-  Bip32Ed25519XSignature fromCbor(CborValue value) {
-    return fromBytes((value as CborBytes).bytes);
   }
 }
 

@@ -29,6 +29,19 @@ final class LocalizedRecoverKeychainNotFoundException extends LocalizedRegistrat
   String message(BuildContext context) => context.l10n.registrationRecoverKeychainNotFound;
 }
 
+/// A localized version of [RegistrationAssetNameTooLongException].
+final class LocalizedRegistrationAssetNameTooLongException extends LocalizedRegistrationException {
+  final List<AssetName> assets;
+
+  const LocalizedRegistrationAssetNameTooLongException(this.assets);
+
+  @override
+  String message(BuildContext context) {
+    final names = assets.map((e) => '(${e.bytes.length}) -> ${e.bytes}').join(', ');
+    return context.l10n.registrationAssetNameTooLong(names);
+  }
+}
+
 /// A [LocalizedException] describing an error during a user registration.
 sealed class LocalizedRegistrationException extends LocalizedException {
   const LocalizedRegistrationException();
@@ -48,6 +61,8 @@ sealed class LocalizedRegistrationException extends LocalizedException {
         ),
       RegistrationRecoverKeychainNotFoundException() =>
         const LocalizedRegistrationKeychainNotFoundException(),
+      RegistrationAssetNameTooLongException(:final assets) =>
+        LocalizedRegistrationAssetNameTooLongException(assets),
     };
   }
 }

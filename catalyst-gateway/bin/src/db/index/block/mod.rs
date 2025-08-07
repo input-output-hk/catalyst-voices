@@ -8,19 +8,25 @@ pub(crate) mod roll_forward;
 pub(crate) mod txi;
 pub(crate) mod txo;
 
-use cardano_blockchain_types::MultiEraBlock;
+use std::collections::BTreeSet;
+
+use cardano_blockchain_types::{MultiEraBlock, Slot};
 use catalyst_types::hashes::Blake2b256Hash;
 use certs::CertInsertQuery;
 use cip36::Cip36InsertQuery;
 use rbac509::Rbac509InsertQuery;
+use tokio::sync::watch;
 use tracing::error;
 use txi::TxiInsertQuery;
 use txo::TxoInsertQuery;
 
 use super::{queries::FallibleQueryTasks, session::CassandraSession};
+use crate::rbac::RbacBlockIndexingContext;
 
 /// Add all data needed from the block into the indexes.
-pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
+pub(crate) async fn index_block(
+    block: &MultiEraBlock, pending_blocks: &mut watch::Receiver<BTreeSet<Slot>>, our_end: Slot,
+) -> anyhow::Result<()> {
     // Get the session.  This should never fail.
     let Some(session) = CassandraSession::get(block.is_immutable()) else {
         anyhow::bail!("Failed to get Index DB Session. Cannot index block.");
@@ -34,6 +40,8 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
     let mut txo_index = TxoInsertQuery::new();
 
     let slot_no = block.point().slot_or_default();
+
+    let mut rbac_context = RbacBlockIndexingContext::new();
 
     // We add all transactions in the block to their respective index data sets.
     for (index, txn) in block.enumerate_txs() {
@@ -55,7 +63,16 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
         txo_index.index(block.network(), &txn, slot_no, txn_id, index);
 
         // Index RBAC 509 inside the transaction.
-        rbac509_index.index(&session, txn_id, index, block).await;
+        // `Box::pin` is used here because of the future size (`clippy::large_futures` lint).
+        Box::pin(rbac509_index.index(
+            txn_id,
+            index,
+            block,
+            pending_blocks,
+            our_end,
+            &mut rbac_context,
+        ))
+        .await?;
     }
 
     // We then execute each batch of data from the block.

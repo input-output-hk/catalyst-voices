@@ -17,6 +17,7 @@ jobs:
       scopes: |
         cat-voices
         cat-gateway
+        config
         dart
         dart/catalyst_analysis
         dart/catalyst_cardano_serialization

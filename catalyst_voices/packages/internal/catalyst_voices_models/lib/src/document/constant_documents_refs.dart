@@ -69,6 +69,7 @@ const constantDocumentsRefs = <CategoryTemplatesRefs>[
   ),
 ];
 
+/// Groups related [proposal] and [comment] templates to given [category].
 final class CategoryTemplatesRefs extends Equatable {
   final SignedDocumentRef category;
   final SignedDocumentRef proposal;

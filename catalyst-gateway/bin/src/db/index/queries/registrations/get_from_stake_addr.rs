@@ -3,8 +3,9 @@
 use std::sync::Arc;
 
 use scylla::{
-    prepared_statement::PreparedStatement, transport::iterator::TypedRowStream, DeserializeRow,
-    SerializeRow, Session,
+    client::{pager::TypedRowStream, session::Session},
+    statement::prepared::PreparedStatement,
+    DeserializeRow, SerializeRow,
 };
 use tracing::error;
 

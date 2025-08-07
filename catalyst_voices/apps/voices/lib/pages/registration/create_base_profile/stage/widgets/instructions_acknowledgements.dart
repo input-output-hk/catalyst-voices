@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/registration/create_base_profile/stage/widgets/drep_approval_contingency_checkbox.dart';
 import 'package:catalyst_voices/pages/registration/create_base_profile/stage/widgets/registration_conditions_checkbox.dart';
 import 'package:catalyst_voices/pages/registration/create_base_profile/stage/widgets/tos_and_privacy_policy_checkbox.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -12,12 +13,12 @@ class InstructionsAcknowledgements extends StatelessWidget {
     return const Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 12,
       children: [
         _TitleText(),
-        SizedBox(height: 16),
         RegistrationConditionsCheckbox(),
-        SizedBox(height: 12),
         TosAndPrivacyPolicyCheckbox(),
+        DrepApprovalContingencyCheckbox(),
       ],
     );
   }

@@ -40,5 +40,33 @@ void main() {
         expect(envName, expectedEnv);
       });
     });
+
+    group('normalizedBaseUri', () {
+      test('removes path params', () {
+        // Given
+        const host = 'https://app.dev.projectcatalyst.io';
+        final base = Uri.parse('$host/discovery');
+        final expectedBase = Uri.parse(host);
+
+        // When
+        final normalizedBase = AppEnvironmentType.normalizedBaseUri(base);
+
+        // Then
+        expect(normalizedBase, expectedBase);
+      });
+
+      test('keeps original when no path provided', () {
+        // Given
+        const host = 'https://app.dev.projectcatalyst.io';
+        final base = Uri.parse(host);
+        final expectedBase = Uri.parse(host);
+
+        // When
+        final normalizedBase = AppEnvironmentType.normalizedBaseUri(base);
+
+        // Then
+        expect(normalizedBase, expectedBase);
+      });
+    });
   });
 }

@@ -23,6 +23,7 @@ void main() {
         endDate: DateTime.now().plusDays(2),
         proposalsCount: 0,
         publish: CampaignPublish.draft,
+        categoriesCount: 0,
       );
 
       campaignStage = CampaignStage.fromCampaign(

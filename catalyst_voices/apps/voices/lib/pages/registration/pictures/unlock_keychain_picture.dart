@@ -18,6 +18,9 @@ class UnlockKeychainPicture extends StatelessWidget {
               color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
               borderRadius: BorderRadius.circular(8),
             ),
+            child: const Center(
+              child: Text('* * * * * *'),
+            ),
           ),
         ),
       ),

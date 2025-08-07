@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
 
+/// Represents a document version. Allows tracking multiple versions of a document.
+///
 // Note. Later we may want to add status enum.
 final class DocumentVersion extends Equatable {
   static const int firstNumber = 1;

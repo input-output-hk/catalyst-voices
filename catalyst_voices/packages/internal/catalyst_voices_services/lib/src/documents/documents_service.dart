@@ -14,6 +14,7 @@ typedef _RefFailure = Failure<TypedDocumentRef, Exception>;
 
 typedef _RefSuccess = Success<TypedDocumentRef, Exception>;
 
+/// Manage documents stored locally.
 abstract interface class DocumentsService {
   const factory DocumentsService(
     DocumentRepository documentRepository,

@@ -9,7 +9,6 @@ use tokio::sync::OnceCell;
 
 use super::session::CassandraSession;
 
-mod rbac_index;
 mod scylla_purge;
 mod scylla_queries;
 mod scylla_session;
@@ -27,7 +26,7 @@ async fn setup_test_database() -> Result<(), String> {
         .await
         .map_err(|err| format!("{err}"))?;
 
-    if !CassandraSession::is_ready() {
+    if !CassandraSession::is_ready().await {
         return Err(String::from("Cassandra session is not ready"));
     }
 

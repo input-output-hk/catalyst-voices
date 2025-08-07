@@ -140,7 +140,9 @@ command:
       plugin_platform_interface: ^2.1.7
       bech32: ^0.2.2
       bip32_ed25519: ^0.6.0
-      cbor: ^6.2.0
+      # TODO(damian): un-pin version when cbor will expose EncodeSink, .encode, Arg.
+      # RawTransaction requires those internal classes.
+      cbor: 6.3.7
       convert: ^3.1.1
       path: ^1.9.1
       package_info_plus: ^8.3.0
@@ -153,6 +155,7 @@ command:
       shared_preferences_platform_interface: ^2.4.1
       skeletonizer: ^1.4.3
       synchronized: ^3.3.0+3
+      typed_data: ^1.4.0
       web: ^1.1.0
       webdriver: ^3.0.3
     dev_dependencies:
@@ -162,7 +165,7 @@ command:
       # After the packages are migrated we can remove the direct dependency on analyzer and let it be a transitive dependency.
       analyzer: 7.3.0
       test: ^1.24.9
-      build_runner: ^2.4.12
+      build_runner: ^2.5.4
       chopper_generator: ^8.0.4
       flutter_gen_runner: ^5.10.0
       mocktail: ^1.0.1
@@ -232,6 +235,24 @@ scripts:
     run: |
       melos exec -- lic_ck check-licenses -c $MELOS_ROOT_PATH/melos.yaml -i
     description: Run `lic_ck` checks for all packages.
+
+  license-list:
+    run: |
+      melos exec --ignore="catalyst_analysis" --ignore="example" -- \
+        'dart run $MELOS_ROOT_PATH/scripts/generate_licenses.dart $MELOS_PACKAGE_PATH $MELOS_ROOT_PATH/docs/licenses/$MELOS_PACKAGE_NAME.csv'
+      dart run $MELOS_ROOT_PATH/scripts/merge_csv_files.dart $MELOS_ROOT_PATH/docs/licenses/ $MELOS_ROOT_PATH/docs/licenses/licenses.csv
+      echo "✅ Output file: $MELOS_ROOT_PATH/docs/licenses/licenses.csv"
+    description: Generate license list for all packages in docs/licenses/licenses.csv file.
+
+  dependency-graph:
+    run: |
+      dart pub global activate pubviz
+      melos exec --scope "catalyst_voices" -- \
+        'pubviz print --direct-dependencies --production-dependencies --format dot > $MELOS_ROOT_PATH/docs/dependency_graph.dot'
+      echo "✅ Output file: $MELOS_ROOT_PATH/docs/dependency_graph.dot"
+    description: |
+      Generate license list for all packages in docs/dependency_graph.dot file.
+      The .dot file can be viewed using software available online such as graphviz.
 
   test:select:
     run: |
@@ -342,3 +363,33 @@ scripts:
       The test reports are saved in /test_reports folder.
       The coverages are saved in coverage/lcov.info file for each tested package.
       The combined coverage is saved in the /coverage/lcov.coverage.info file.
+
+  l10n-check:
+    run: |
+      cd packages/internal/catalyst_voices_localization && dart lib/src/manage_l10n.dart --check
+    description: |
+      Check for unused translation keys in .arb files without modifying them, and check if translation keys are sorted.
+
+  l10n-clean:
+    run: |
+      cd packages/internal/catalyst_voices_localization && dart lib/src/manage_l10n.dart --clean --sort
+    description: |
+      Clean up unused translation keys and sort them alphabetically in .arb files.
+
+  docs-generate:
+    run: |
+      dart pub global activate dartdoc 8.0.5
+      melos exec -c 1 --scope="*catalyst_voices*" --ignore="*example*" -- flutter analyze && 
+      melos exec -c 1 --scope="*catalyst_voices*" --ignore="*example*" -- dart doc --output=MELOS_ROOT_PATH/docs/dartdoc/MELOS_PACKAGE_NAME .
+    
+    description: |
+      Generate internal documentation and saves it to docs/dartdoc directory
+  
+  docs-view:
+    steps:
+     - dart pub global activate dhttpd
+     - dart pub global run dhttpd --path docs/dartdoc/
+
+    description: |
+      Documentation will be served at localhost:8080/<packageName>
+      For example catalyst_voices_repository is served at localhost:8080/catalyst_voices_repository

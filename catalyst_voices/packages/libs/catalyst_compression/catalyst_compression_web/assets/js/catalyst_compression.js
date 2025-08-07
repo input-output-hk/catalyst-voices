@@ -14,6 +14,7 @@ function generateId() {
     return thisId;
 }
 
+// Installs a service worker handler.
 function registerWorkerEventHandler(worker, handleMessage, handleError) {
     const wrappedHandleMessage = (event) => handleMessage(event, complete);
     const wrappedHandleError = (error) => handleError(error, complete);

@@ -3,6 +3,8 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 
+/// Manages the category detail.
+/// Allows to get the category detail and list of categories.
 class CategoryDetailCubit extends Cubit<CategoryDetailState> {
   final CampaignService _campaignService;
 

@@ -8,12 +8,8 @@ typedef RoleCredentialsCallback<T> = Future<T> Function(
 
 final class AccountSignerService implements SignerService {
   final UserService _userService;
-  final KeyDerivationService _keyDerivationService;
 
-  const AccountSignerService(
-    this._userService,
-    this._keyDerivationService,
-  );
+  const AccountSignerService(this._userService);
 
   @override
   Future<T> useProposerCredentials<T>(RoleCredentialsCallback<T> callback) {
@@ -40,16 +36,8 @@ final class AccountSignerService implements SignerService {
       rotation: Optional(rotation),
     );
 
-    return account.keychain.getMasterKey().use((masterKey) {
-      final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
-        masterKey: masterKey,
-        role: role,
-      );
-
-      return keyPair.use(
-        (keyPair) => callback(catalystId, keyPair.privateKey),
-      );
-    });
+    final keyPair = account.keychain.getRoleKeyPair(role: role);
+    return keyPair.use((keyPair) => callback(catalystId, keyPair.privateKey));
   }
 }
 

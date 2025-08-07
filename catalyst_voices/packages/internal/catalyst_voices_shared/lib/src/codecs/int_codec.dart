@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+/// A [Codec] that parser [int] from decimal [String].
 class IntCodec extends Codec<int, String> {
   const IntCodec();
 

@@ -31,8 +31,9 @@ impl<E: Endpoint> Endpoint for DatabaseConnectionImpl<E> {
 
         // TODO: find a better way to filter URI paths
         let is_health_endpoint = req_path.starts_with("/api/v1/health/");
+        let is_metrics_endpoint = req_path == "/metrics";
 
-        if !is_health_endpoint {
+        if !(is_health_endpoint || is_metrics_endpoint) {
             if !event_db_is_live() {
                 error!(endpoint_path = %req_path, "Event DB is not live");
                 return Err(StatusCode::SERVICE_UNAVAILABLE.into());

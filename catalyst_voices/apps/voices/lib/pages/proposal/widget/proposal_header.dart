@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
+import 'package:catalyst_voices/pages/proposal/widget/proposal_app_closed.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_favorite_button.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_share_button.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_version.dart';
@@ -44,6 +45,7 @@ class ProposalHeaderWrapper extends StatelessWidget {
     return Stack(
       children: [
         child,
+        const ProposalAppClosed(),
         const ProposalHeader(),
       ],
     );
@@ -55,14 +57,21 @@ class _ProposalControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
-      mainAxisSize: MainAxisSize.min,
-      spacing: 8,
-      children: [
-        ProposalVersion(),
-        ProposalShareButton(),
-        ProposalFavoriteButton(),
-      ],
+    // TODO(LynxLynxx): Remove when we support mobile web
+    return ResponsiveChild(
+      xs: (context) => const SizedBox(),
+      other: (context) => Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 8,
+        children: [
+          const ProposalVersion(),
+          const ProposalShareButton(),
+          Offstage(
+            offstage: context.select<ProposalCubit, bool>((cubit) => cubit.state.readOnlyMode),
+            child: const ProposalFavoriteButton(),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -1,15 +1,15 @@
 //! Catalyst RBAC Security Scheme
-use std::{env, error::Error, sync::LazyLock, time::Duration};
+use std::{env, error::Error, time::Duration};
 
 use catalyst_types::catalyst_id::role_index::RoleId;
-use moka::future::Cache;
 use poem::{error::ResponseError, http::StatusCode, IntoResponse, Request};
 use poem_openapi::{auth::Bearer, SecurityScheme};
-use tracing::debug;
+use tracing::{debug, error};
 
 use super::token::CatalystRBACTokenV1;
 use crate::{
     db::index::session::CassandraSessionError,
+    rbac::latest_rbac_chain,
     service::common::{
         auth::api_key::check_api_key,
         responses::{ErrorResponses, WithErrorResponses},
@@ -17,25 +17,8 @@ use crate::{
     },
 };
 
-/// Auth token in the form of catv1.
-pub type EncodedAuthToken = String;
-
 /// The header name that holds the authorization RBAC token
 pub(crate) const AUTHORIZATION_HEADER: &str = "Authorization";
-
-/// Cached auth tokens
-// TODO: Caching is currently disabled because we want to measure the performance without it. See
-// https://github.com/input-output-hk/catalyst-voices/issues/1940 for more details.
-#[allow(dead_code)]
-static CACHE: LazyLock<Cache<EncodedAuthToken, CatalystRBACTokenV1>> = LazyLock::new(|| {
-    Cache::builder()
-        // Time to live (TTL): 30 minutes
-        .time_to_live(Duration::from_secs(30 * 60))
-        // Time to idle (TTI):  5 minutes
-        .time_to_idle(Duration::from_secs(5 * 60))
-        // Create the cache.
-        .build()
-});
 
 /// Catalyst RBAC Access Token
 #[derive(SecurityScheme)]
@@ -143,7 +126,7 @@ async fn checker_api_catalyst_auth(
     const RBAC_OFF: &str = "RBAC_OFF";
 
     // Deserialize the token: this performs the 1-5 steps of the validation.
-    let mut token = CatalystRBACTokenV1::parse(&bearer.token).map_err(|e| {
+    let token = CatalystRBACTokenV1::parse(&bearer.token).map_err(|e| {
         debug!("Corrupt auth token: {e:?}");
         AuthTokenError::ParseRbacToken(e.to_string())
     })?;
@@ -153,22 +136,19 @@ async fn checker_api_catalyst_auth(
         return Ok(token);
     };
 
-    // Step 6: get and build latest registration chain from the db.
-    let reg_chain = match token.reg_chain().await {
-        Ok(Some(reg_chain)) => reg_chain,
+    // Step 6: get the registration chain
+    let reg_chain = match latest_rbac_chain(token.catalyst_id()).await {
+        Ok(Some(c)) => c.chain,
         Ok(None) => {
-            debug!(
-                "Unable to find registrations for {} Catalyst ID",
-                token.catalyst_id()
-            );
+            debug!(cat_id = %token.catalyst_id(), "Unable to find registrations for Catalyst ID");
             return Err(AuthTokenError::RegistrationNotFound.into());
         },
-        Err(err) if err.is::<CassandraSessionError>() => {
-            return Err(ServiceUnavailableError(err).into())
-        },
-        Err(err) => {
-            debug!("Unable to build a registration chain Catalyst ID: {err:?}");
-            return Err(AuthTokenError::BuildRegChain(err.to_string()).into());
+        Err(e) if e.is::<CassandraSessionError>() => return Err(ServiceUnavailableError(e).into()),
+        Err(e) => {
+            // This should never happen normally because we validate RBAC registration transactions
+            // before adding them to the database.
+            error!(cat_id = %token.catalyst_id(), err = ?e, "Unable to build a registration chain");
+            return Err(AuthTokenError::BuildRegChain(e.to_string()).into());
         },
     };
 
@@ -179,18 +159,6 @@ async fn checker_api_catalyst_auth(
         debug!("Auth token expired: {token}");
         Err(AuthTokenAccessViolation(vec!["EXPIRED".to_string()]))?;
     }
-
-    // TODO: Caching is currently disabled because we want to measure the performance without
-    // it.
-    // // Its valid and young enough, check if its in the auth cache.
-    // // This get() will extend the entry life for another 5 minutes.
-    // // Even though we keep calling get(), the entry will expire
-    // // after 30 minutes (TTL) from the origin insert().
-    // // This is an optimization which saves us constantly looking up registrations we have
-    // // already validated.
-    // if let Some(token) = CACHE.get(&bearer.token).await {
-    //     return Ok(token);
-    // }
 
     // Step 8: Get the latest stable signing certificate registered for Role 0.
     let (latest_pk, _) = reg_chain
@@ -215,11 +183,6 @@ async fn checker_api_catalyst_auth(
     //   - Get the latest unstable signing certificate registered for Role 0.
     //   - Verify the signature against the Role 0 Public Key and Algorithm identified by the
     //     certificate. If this fails, return 403.
-
-    // TODO: Caching is currently disabled because we want to measure the performance without
-    // it.
-    // // This entry will expire after 5 minutes (TTI) if there is no more ().
-    // CACHE.insert(bearer.token, token.clone()).await;
 
     // Step 11: Token is valid
     Ok(token)

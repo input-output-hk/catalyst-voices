@@ -18,6 +18,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _logger = Logger('ProposalBuilderBloc');
 
+/// Manages proposal builder.
+///
+/// Handles loading of proposal, editing of proposal and comments, publishing of proposal and comments,
+/// and other related actions.
 final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuilderState>
     with
         BlocErrorEmitterMixin,
@@ -310,10 +314,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     }
 
     final guidance = property.schema.guidance;
-
-    final sectionTitle = property.schema.nodeId.isChildOf(ProposalDocument.milestoneListChildNodeId)
-        ? ''
-        : property.schema.title;
+    final milestoneListWildcard = ProposalDocument.milestoneListChildNodeId;
+    final sectionTitle =
+        property.schema.nodeId.matchesPattern(milestoneListWildcard) ? '' : property.schema.title;
     if (guidance != null) {
       yield ProposalGuidanceItem(
         segmentTitle: segment.schema.title,

@@ -29,6 +29,21 @@ final class X509MetadataEnvelope<T> extends Equatable {
   /// the field size limitation.
   static const int metadataChunkSize = 64;
 
+  /// A cbor key for [X509MetadataEnvelope.envelopeKey].
+  static const envelopeKey = CborSmallInt(509);
+
+  /// A cbor key for [X509MetadataEnvelope.purpose].
+  static const purposeKey = CborSmallInt(0);
+
+  /// A cbor key for [X509MetadataEnvelope.txInputsHash].
+  static const txInputsHashKey = CborSmallInt(1);
+
+  /// A cbor key for [X509MetadataEnvelope.previousTransactionId].
+  static const previousTransactionIdKey = CborSmallInt(2);
+
+  /// A cbor key for [X509MetadataEnvelope.validationSignature].
+  static const validationSignatureKey = CborSmallInt(99);
+
   /// Purpose is defined by the consuming dApp. It allows a dApp to have
   /// their own privately named and managed namespace for certificates.
   /// The X509 specifications presented here do not define how certificates
@@ -161,12 +176,13 @@ final class X509MetadataEnvelope<T> extends Equatable {
         chunkedData != null ? await _serializeChunkedData(serializer(chunkedData)) : null;
 
     return CborMap({
-      const CborSmallInt(509): CborMap({
-        const CborSmallInt(0): purpose.toCbor(),
-        const CborSmallInt(1): txInputsHash.toCbor(),
-        if (previousTransactionId != null) const CborSmallInt(2): previousTransactionId!.toCbor(),
+      envelopeKey: CborMap({
+        purposeKey: purpose.toCbor(),
+        txInputsHashKey: txInputsHash.toCbor(),
+        if (previousTransactionId != null)
+          previousTransactionIdKey: previousTransactionId!.toCbor(),
         if (metadata != null) metadata.key: metadata.value,
-        const CborSmallInt(99): validationSignature.toCbor(),
+        validationSignatureKey: validationSignature.toCbor(),
       }),
     });
   }
@@ -210,12 +226,12 @@ final class X509MetadataEnvelope<T> extends Equatable {
     required ChunkedDataDeserializer<T> deserializer,
   }) async {
     final metadata = value as CborMap;
-    final envelope = metadata[const CborSmallInt(509)]! as CborMap;
-    final purpose = envelope[const CborSmallInt(0)]! as CborBytes;
-    final txInputsHash = envelope[const CborSmallInt(1)]!;
-    final previousTransactionId = envelope[const CborSmallInt(2)];
+    final envelope = metadata[envelopeKey]! as CborMap;
+    final purpose = envelope[purposeKey]! as CborBytes;
+    final txInputsHash = envelope[txInputsHashKey]!;
+    final previousTransactionId = envelope[previousTransactionIdKey];
     final chunkedData = await _deserializeChunkedData(envelope);
-    final validationSignature = envelope[const CborSmallInt(99)]!;
+    final validationSignature = envelope[validationSignatureKey]!;
 
     return X509MetadataEnvelope(
       purpose: UuidV4.fromCbor(purpose),

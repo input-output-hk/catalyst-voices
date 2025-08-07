@@ -1,26 +1,32 @@
 //! Index Role-Based Access Control (RBAC) Registration.
 
+pub(crate) mod insert_catalyst_id_for_public_key;
 pub(crate) mod insert_catalyst_id_for_stake_address;
 pub(crate) mod insert_catalyst_id_for_txn_id;
 pub(crate) mod insert_rbac509;
 pub(crate) mod insert_rbac509_invalid;
 
-use std::sync::Arc;
-
-use anyhow::{bail, Context};
-use cardano_blockchain_types::{
-    Cip0134Uri, MultiEraBlock, Slot, StakeAddress, TransactionId, TxnIndex,
+use std::{
+    collections::{BTreeSet, HashSet},
+    sync::Arc,
 };
-use catalyst_types::catalyst_id::CatalystId;
-use pallas::ledger::addresses::Address;
-use rbac_registration::cardano::cip509::{Cip509, Cip509RbacMetadata};
-use scylla::Session;
+
+use anyhow::{Context, Result};
+use cardano_blockchain_types::{MultiEraBlock, Slot, TransactionId, TxnIndex};
+use rbac_registration::cardano::cip509::Cip509;
+use scylla::client::session::Session;
+use tokio::sync::watch;
 use tracing::{debug, error};
 
 use crate::{
     db::index::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
+    },
+    metrics::{self, rbac::inc_index_sync},
+    rbac::{
+        validate_rbac_registration, RbacBlockIndexingContext, RbacValidationError,
+        RbacValidationSuccess,
     },
     settings::cassandra_db::EnvVars,
 };
@@ -33,9 +39,11 @@ pub(crate) struct Rbac509InsertQuery {
     /// An invalid RBAC registration data.
     pub(crate) invalid: Vec<insert_rbac509_invalid::Params>,
     /// A Catalyst ID for transaction ID Data captured during indexing.
-    pub(crate) catalyst_id_for_txn_id: Vec<insert_catalyst_id_for_txn_id::Params>,
+    catalyst_id_for_txn_id: Vec<insert_catalyst_id_for_txn_id::Params>,
     /// A Catalyst ID for stake address data captured during indexing.
-    pub(crate) catalyst_id_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
+    catalyst_id_for_stake_address: Vec<insert_catalyst_id_for_stake_address::Params>,
+    /// A Catalyst ID for public key data captured during indexing.
+    catalyst_id_for_public_key: Vec<insert_catalyst_id_for_public_key::Params>,
 }
 
 impl Rbac509InsertQuery {
@@ -46,32 +54,36 @@ impl Rbac509InsertQuery {
             invalid: Vec::new(),
             catalyst_id_for_txn_id: Vec::new(),
             catalyst_id_for_stake_address: Vec::new(),
+            catalyst_id_for_public_key: Vec::new(),
         }
     }
 
     /// Prepare Batch of Insert RBAC 509 Registration Data Queries
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &EnvVars,
-    ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch, SizedBatch)> {
+    ) -> Result<(SizedBatch, SizedBatch, SizedBatch, SizedBatch, SizedBatch)> {
         Ok((
             insert_rbac509::Params::prepare_batch(session, cfg).await?,
             insert_rbac509_invalid::Params::prepare_batch(session, cfg).await?,
             insert_catalyst_id_for_txn_id::Params::prepare_batch(session, cfg).await?,
             insert_catalyst_id_for_stake_address::Params::prepare_batch(session, cfg).await?,
+            insert_catalyst_id_for_public_key::Params::prepare_batch(session, cfg).await?,
         ))
     }
 
     /// Index the RBAC 509 registrations in a transaction.
+    #[allow(clippy::too_many_lines)]
     pub(crate) async fn index(
-        &mut self, session: &Arc<CassandraSession>, txn_hash: TransactionId, index: TxnIndex,
-        block: &MultiEraBlock,
-    ) {
+        &mut self, txn_hash: TransactionId, index: TxnIndex, block: &MultiEraBlock,
+        pending_blocks: &mut watch::Receiver<BTreeSet<Slot>>, our_end: Slot,
+        context: &mut RbacBlockIndexingContext,
+    ) -> Result<()> {
         let slot = block.slot();
         let cip509 = match Cip509::new(block, index, &[]) {
             Ok(Some(v)) => v,
             Ok(None) => {
                 // Nothing to index.
-                return;
+                return Ok(());
             },
             Err(e) => {
                 // This registration is either completely corrupted or someone else is using "our"
@@ -80,9 +92,10 @@ impl Rbac509InsertQuery {
                 debug!(
                     slot = ?slot,
                     index = ?index,
-                    "Invalid RBAC Registration Metadata in transaction: {e:?}"
+                    err = ?e,
+                    "Invalid RBAC Registration Metadata in transaction"
                 );
-                return;
+                return Ok(());
             },
         };
 
@@ -100,51 +113,90 @@ impl Rbac509InsertQuery {
             );
         }
 
-        let catalyst_id = match catalyst_id(
-            session,
-            &cip509,
-            txn_hash,
-            slot,
-            index,
-            block.is_immutable(),
-        )
-        .await
-        {
-            Ok(v) => v,
-            Err(e) => {
-                debug!("Unable to determine Catalyst id for registration: slot = {slot:?}, index = {index:?}, txn_hash = {txn_hash:?}: {e:?}");
-                return;
-            },
-        };
+        // To properly validate a new registration we need to index all the previous blocks, so
+        // here we are going to wait till the other tasks have indexed the blocks before this one.
+        wait_for_previous_blocks(pending_blocks, our_end, block.slot()).await?;
 
         let previous_transaction = cip509.previous_transaction();
-        let purpose = cip509.purpose();
-        match cip509.consume() {
-            Ok((purpose, metadata, _)) => {
-                self.registrations.push(insert_rbac509::Params::new(
-                    catalyst_id.clone(),
-                    txn_hash,
-                    slot,
-                    index,
-                    purpose,
-                    previous_transaction,
-                ));
+        // `Box::pin` is used here because of the future size (`clippy::large_futures` lint).
+        match Box::pin(validate_rbac_registration(
+            cip509,
+            block.is_immutable(),
+            context,
+        ))
+        .await
+        {
+            // Write updates to the database. There can be multiple updates in one registration
+            // because a new chain can take ownership of stake addresses of the existing chains and
+            // in that case we want to record changes to all those chains as well as the new one.
+            Ok(RbacValidationSuccess {
+                catalyst_id,
+                stake_addresses,
+                public_keys,
+                modified_chains,
+            }) => {
+                // Record the transaction identifier (hash) of a new registration.
                 self.catalyst_id_for_txn_id
                     .push(insert_catalyst_id_for_txn_id::Params::new(
                         catalyst_id.clone(),
                         txn_hash,
+                        slot,
                     ));
-                for address in stake_addresses(&metadata) {
+                // Record new stake addresses.
+                for address in stake_addresses {
                     self.catalyst_id_for_stake_address.push(
                         insert_catalyst_id_for_stake_address::Params::new(
                             address,
+                            slot,
+                            index,
+                            catalyst_id.clone(),
+                        ),
+                    );
+                }
+                // Record new public keys.
+                for key in public_keys {
+                    self.catalyst_id_for_public_key.push(
+                        insert_catalyst_id_for_public_key::Params::new(
+                            key,
                             slot,
                             catalyst_id.clone(),
                         ),
                     );
                 }
+                // Update the chain this registration belongs to.
+                self.registrations.push(insert_rbac509::Params::new(
+                    catalyst_id,
+                    txn_hash,
+                    slot,
+                    index,
+                    previous_transaction,
+                    // Addresses can only be removed from other chains, so this list is always
+                    // empty for the chain that is being updated.
+                    HashSet::new(),
+                ));
+
+                // Update other chains that were affected by this registration.
+                for (catalyst_id, removed_addresses) in modified_chains {
+                    self.registrations.push(insert_rbac509::Params::new(
+                        catalyst_id.clone(),
+                        txn_hash,
+                        slot,
+                        index,
+                        // In this case the addresses were removed by another chain, so it doesn't
+                        // make sense to include a previous transaction ID unrelated to the chain
+                        // that is being updated.
+                        None,
+                        removed_addresses,
+                    ));
+                }
             },
-            Err(report) => {
+            // Invalid registrations are being recorded in order to report failure.
+            Err(RbacValidationError::InvalidRegistration {
+                catalyst_id,
+                purpose,
+                report,
+            }) => {
+                metrics::rbac::inc_invalid_rbac_reg_count();
                 self.invalid.push(insert_rbac509_invalid::Params::new(
                     catalyst_id,
                     txn_hash,
@@ -155,7 +207,31 @@ impl Rbac509InsertQuery {
                     &report,
                 ));
             },
+            // This isn't a hard error because user input can contain invalid information. If there
+            // is no Catalyst ID, then we cannot record this registration as invalid and can only
+            // ignore (and log) it.
+            Err(RbacValidationError::UnknownCatalystId) => {
+                debug!(
+                    slot = ?slot,
+                    index = ?index,
+                    txn_hash = ?txn_hash,
+                    "Unable to determine Catalyst id for registration"
+                );
+            },
+            Err(RbacValidationError::Fatal(e)) => {
+                error!(
+                   slot = ?slot,
+                   index = ?index,
+                   txn_hash = ?txn_hash,
+                   err = ?e,
+                   "Error indexing RBAC registration"
+                );
+                // Propagate an error.
+                return Err(e);
+            },
         }
+
+        Ok(())
     }
 
     /// Execute the RBAC 509 Registration Indexing Queries.
@@ -206,82 +282,43 @@ impl Rbac509InsertQuery {
             }));
         }
 
+        if !self.catalyst_id_for_public_key.is_empty() {
+            let inner_session = session.clone();
+            query_handles.push(tokio::spawn(async move {
+                inner_session
+                    .execute_batch(
+                        PreparedQuery::CatalystIdForPublicKeyInsertQuery,
+                        self.catalyst_id_for_public_key,
+                    )
+                    .await
+            }));
+        }
+
         query_handles
     }
 }
 
-/// Returns a Catalyst ID of the given registration.
-async fn catalyst_id(
-    session: &Arc<CassandraSession>, cip509: &Cip509, txn_id: TransactionId, slot: Slot,
-    index: TxnIndex, is_immutable: bool,
-) -> anyhow::Result<CatalystId> {
-    use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::cache_for_transaction_id;
-
-    let id = match cip509.previous_transaction() {
-        Some(previous) => query_catalyst_id(session, previous, is_immutable).await?,
-        None => {
-            cip509
-                .catalyst_id()
-                .context("Empty Catalyst ID in root RBAC registration")?
-                .as_short_id()
-        },
-    };
-
-    cache_for_transaction_id(txn_id, id.clone(), slot, index);
-
-    Ok(id)
-}
-
-/// Queries a Catalyst ID from the database by the given transaction ID.
-async fn query_catalyst_id(
-    session: &Arc<CassandraSession>, txn_id: TransactionId, is_immutable: bool,
-) -> anyhow::Result<CatalystId> {
-    use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::Query;
-
-    if let Some(q) = Query::get_latest(session, txn_id.into())
-        .await
-        .context("Failed to query Catalyst ID from transaction ID")?
-    {
-        Ok(q.catalyst_id.into())
-    } else {
-        if is_immutable {
-            bail!("Unable to find Catalyst ID in the persistent DB");
+/// Waits till all previous blocks are indexed.
+///
+/// The given `our_end` is excluded from the list of unprocessed blocks.
+async fn wait_for_previous_blocks(
+    pending_blocks: &mut watch::Receiver<BTreeSet<Slot>>, our_end: Slot, current_slot: Slot,
+) -> Result<()> {
+    loop {
+        if pending_blocks
+            .borrow_and_update()
+            .iter()
+            .filter(|&&v| v == our_end)
+            .all(|&slot| slot > current_slot)
+        {
+            return Ok(());
         }
 
-        // If this block is a volatile/mutable one then try to look up a Catalyst ID in the
-        // persistent database.
-        let persistent_session =
-            CassandraSession::get(true).context("Failed to get persistent DB session")?;
-        Query::get_latest(&persistent_session, txn_id.into())
+        inc_index_sync();
+
+        pending_blocks
+            .changed()
             .await
-            .transpose()
-            .context("Unable to find Catalyst ID in the persistent DB")?
-            .map(|q| q.catalyst_id.into())
+            .context("Unprocessed blocks channel was closed unexpectedly")?;
     }
-}
-
-/// Returns stake addresses of the role 0.
-fn stake_addresses(metadata: &Cip509RbacMetadata) -> Vec<StakeAddress> {
-    let mut result = Vec::new();
-
-    if let Some(uris) = metadata.certificate_uris.x_uris().get(&0) {
-        result.extend(convert_stake_addresses(uris));
-    }
-    if let Some(uris) = metadata.certificate_uris.c_uris().get(&0) {
-        result.extend(convert_stake_addresses(uris));
-    }
-
-    result
-}
-
-/// Converts a list of `Cip0134Uri` to a list of stake addresses.
-fn convert_stake_addresses(uris: &[Cip0134Uri]) -> Vec<StakeAddress> {
-    uris.iter()
-        .filter_map(|uri| {
-            match uri.address() {
-                Address::Stake(a) => Some(a.clone().into()),
-                _ => None,
-            }
-        })
-        .collect()
 }

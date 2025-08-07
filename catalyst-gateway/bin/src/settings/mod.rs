@@ -25,6 +25,7 @@ pub(crate) mod cardano_assets_cache;
 pub(crate) mod cassandra_db;
 pub(crate) mod chain_follower;
 pub(crate) mod event_db;
+pub(crate) mod rbac;
 pub(crate) mod signed_doc;
 mod str_env_var;
 
@@ -126,6 +127,9 @@ struct EnvVars {
     /// The Catalyst Signed Documents configuration
     signed_doc: signed_doc::EnvVars,
 
+    /// RBAC configuration.
+    rbac: rbac::EnvVars,
+
     /// The Cardano assets caches configuration
     cardano_assets_cache: cardano_assets_cache::EnvVars,
 
@@ -208,6 +212,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         chain_follower: chain_follower::EnvVars::new(),
         event_db: event_db::EnvVars::new(),
         signed_doc: signed_doc::EnvVars::new(),
+        rbac: rbac::EnvVars::new(),
         cardano_assets_cache: cardano_assets_cache::EnvVars::new(),
         internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
         check_config_tick: StringEnvVar::new_as_duration(
@@ -326,6 +331,11 @@ impl Settings {
     /// Get the configuration of the Catalyst Signed Documents.
     pub(crate) fn signed_doc_cfg() -> signed_doc::EnvVars {
         ENV_VARS.signed_doc.clone()
+    }
+
+    /// Returns the RBAC configuration.
+    pub fn rbac_cfg() -> &'static rbac::EnvVars {
+        &ENV_VARS.rbac
     }
 
     /// Get the configuration of the Cardano assets cache.
