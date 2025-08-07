@@ -13,7 +13,7 @@ dependencies:
   equatable: ^2.0.7
   flutter:
     sdk: flutter
-  google_fonts: ^6.2.1
+  google_fonts: ^6.3.0
 
 dev_dependencies:
   catalyst_analysis: ^3.0.0

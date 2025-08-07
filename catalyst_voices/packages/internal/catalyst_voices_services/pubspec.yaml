@@ -39,7 +39,6 @@ dependencies:
   url_launcher: ^6.3.1
   uuid_plus: ^0.1.0
   web: ^1.1.1
-  webdriver: ^3.1.0
 
 dev_dependencies:
   catalyst_analysis: ^3.0.0

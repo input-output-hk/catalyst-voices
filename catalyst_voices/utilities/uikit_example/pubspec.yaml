@@ -25,7 +25,6 @@ dependencies:
   catalyst_voices_view_models:
     path: ../../packages/internal/catalyst_voices_view_models
   collection: ^1.19.1
-  cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1

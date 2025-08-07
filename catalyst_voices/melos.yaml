@@ -97,7 +97,6 @@ command:
       chopper: ^8.3.0
       collection: ^1.19.1
       cryptography: ^2.7.0
-      cupertino_icons: ^1.0.8
       dotted_border: ^3.1.0
       ed25519_hd_key: ^2.3.0
       email_validator: ^3.0.0
@@ -125,8 +124,11 @@ command:
       flutter_rust_bridge: 2.11.1
       flutter_secure_storage: ^9.2.4
       formz: ^0.8.0
+      google_fonts: ^6.3.0
       go_router: ^15.1.3
+      http: ^1.4.0
       intl: ^0.20.2
+      json_annotation: ^4.9.0
       logging: ^1.3.0
       lottie: ^3.3.1
       markdown: ^7.3.0
@@ -166,6 +168,7 @@ command:
       chopper_generator: ^8.2.0
       flutter_gen_runner: ^5.11.0
       go_router_builder: ^2.9.0
+      json_serializable: ^6.9.5
       mocktail: ^1.0.4
       sentry_dart_plugin: ^3.1.1
 

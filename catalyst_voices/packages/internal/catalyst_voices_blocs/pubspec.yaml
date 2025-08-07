@@ -31,8 +31,6 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.1
   flutter_secure_storage: ^9.2.4
-  formz: ^0.8.0
-  meta: ^1.16.0
   result_type: ^1.0.0
   rxdart: ^0.28.0
   uuid_plus: ^0.1.0

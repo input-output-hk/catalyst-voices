@@ -9,10 +9,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  http: ^1.2.1
+  http: ^1.4.0
   remote_widgets:
     path: ../
-  rfw: ^1.0.26
+  rfw: ^1.0.31
 
 dev_dependencies:
   catalyst_analysis: ^3.0.0

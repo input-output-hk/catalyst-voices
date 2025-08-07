@@ -30,5 +30,5 @@ dev_dependencies:
   catalyst_analysis: ^3.0.0
   flutter_test:
     sdk: flutter
-  json_serializable: ^6.9.0
+  json_serializable: ^6.9.5
   test: ^1.25.15
