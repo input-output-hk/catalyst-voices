@@ -1,13 +1,13 @@
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
-final class VotingListData extends Equatable {
+final class VotingBallotState extends Equatable {
   final VotingListCampaignPhaseData votingProgress;
   final VotingListUserSummaryData userSummary;
   final List<VotingListTileData> tiles;
   final VotingListFooterData footer;
 
-  const VotingListData({
+  const VotingBallotState({
     this.votingProgress = const VotingListCampaignPhaseData(),
     this.userSummary = const VotingListUserSummaryData(),
     this.tiles = const [],
@@ -21,4 +21,18 @@ final class VotingListData extends Equatable {
         tiles,
         footer,
       ];
+
+  VotingBallotState copyWith({
+    VotingListCampaignPhaseData? votingProgress,
+    VotingListUserSummaryData? userSummary,
+    List<VotingListTileData>? tiles,
+    VotingListFooterData? footer,
+  }) {
+    return VotingBallotState(
+      votingProgress: votingProgress ?? this.votingProgress,
+      userSummary: userSummary ?? this.userSummary,
+      tiles: tiles ?? this.tiles,
+      footer: footer ?? this.footer,
+    );
+  }
 }

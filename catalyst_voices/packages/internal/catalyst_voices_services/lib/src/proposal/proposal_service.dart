@@ -13,7 +13,6 @@ abstract interface class ProposalService {
     DocumentRepository documentRepository,
     UserService userService,
     SignerService signerService,
-    CampaignRepository campaignRepository,
   ) = ProposalServiceImpl;
 
   Future<void> addFavoriteProposal({
@@ -52,7 +51,11 @@ abstract interface class ProposalService {
 
   Future<DocumentRef> getLatestProposalVersion({required DocumentRef ref});
 
-  Future<ProposalData> getProposal({
+  Future<DetailProposal> getProposal({
+    required DocumentRef ref,
+  });
+
+  Future<ProposalDetailData> getProposalDetail({
     required DocumentRef ref,
   });
 
@@ -135,7 +138,7 @@ abstract interface class ProposalService {
     required ProposalsOrder order,
   });
 
-  Stream<List<Proposal>> watchUserProposals();
+  Stream<List<DetailProposal>> watchUserProposals();
 
   Stream<ProposalsCount> watchUserProposalsCount();
 }
@@ -145,14 +148,12 @@ final class ProposalServiceImpl implements ProposalService {
   final DocumentRepository _documentRepository;
   final UserService _userService;
   final SignerService _signerService;
-  final CampaignRepository _campaignRepository;
 
   const ProposalServiceImpl(
     this._proposalRepository,
     this._documentRepository,
     this._userService,
     this._signerService,
-    this._campaignRepository,
   );
 
   @override
@@ -247,10 +248,26 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<ProposalData> getProposal({
+  Future<DetailProposal> getProposal({
     required DocumentRef ref,
   }) async {
-    return _proposalRepository.getProposal(ref: ref);
+    final proposalData = await _proposalRepository.getProposal(ref: ref);
+    final versions = await _getDetailVersionsOfProposal(proposalData);
+
+    return DetailProposal.fromData(proposalData, versions);
+  }
+
+  @override
+  Future<ProposalDetailData> getProposalDetail({required DocumentRef ref}) async {
+    final proposalData = await _proposalRepository.getProposal(ref: ref);
+    final version = await _getDetailVersionsOfProposal(proposalData);
+
+    return ProposalDetailData(
+      document: proposalData.document,
+      publish: proposalData.publish,
+      commentsCount: proposalData.commentsCount,
+      versions: version,
+    );
   }
 
   @override
@@ -442,7 +459,7 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Stream<List<Proposal>> watchUserProposals() async* {
+  Stream<List<DetailProposal>> watchUserProposals() async* {
     yield* _userService.watchUser.distinct().switchMap((user) {
       final authorId = user.activeAccount?.catalystId;
       if (!_isProposer(user) || authorId == null) {
@@ -452,7 +469,7 @@ final class ProposalServiceImpl implements ProposalService {
       return _proposalRepository
           .watchUserProposals(authorId: authorId)
           .distinct()
-          .switchMap((documents) async* {
+          .switchMap<List<DetailProposal>>((documents) async* {
         if (documents.isEmpty) {
           yield [];
           return;
@@ -487,9 +504,12 @@ final class ProposalServiceImpl implements ProposalService {
                 .toList();
 
             final proposalsWithVersions = await Future.wait(
-              filteredProposalsData.map(_addVersionsToProposal),
+              filteredProposalsData.map((proposalData) async {
+                final versions = await _getDetailVersionsOfProposal(proposalData);
+                return DetailProposal.fromData(proposalData, versions);
+              }),
             );
-            return proposalsWithVersions.map(Proposal.fromData).toList();
+            return proposalsWithVersions;
           },
         ).switchMap(Stream.fromFuture);
       });
@@ -514,13 +534,37 @@ final class ProposalServiceImpl implements ProposalService {
     });
   }
 
+  Future<Stream<ProposalData?>> _createProposalDataStream(
+    ProposalDocument doc,
+  ) async {
+    final selfRef = doc.metadata.selfRef;
+
+    final commentsCountStream = _proposalRepository.watchCommentsCount(
+      refTo: selfRef,
+    );
+
+    return Rx.combineLatest2(
+      _proposalRepository.watchProposalPublish(refTo: selfRef),
+      commentsCountStream,
+      (ProposalPublish? publishState, int commentsCount) {
+        if (publishState == null) return null;
+
+        return ProposalData(
+          document: doc,
+          publish: publishState,
+          commentsCount: commentsCount,
+        );
+      },
+    );
+  }
+
   // Helper method to fetch versions for a proposal
-  Future<ProposalData> _addVersionsToProposal(ProposalData proposal) async {
+  Future<List<ProposalVersion>> _getDetailVersionsOfProposal(ProposalData proposal) async {
     final versions = await _proposalRepository.queryVersionsOfId(
       id: proposal.document.metadata.selfRef.id,
       includeLocalDrafts: true,
     );
-    final proposalDataVersion = (await Future.wait(
+    final versionsData = (await Future.wait(
       versions.map(
         (e) async {
           final selfRef = e.metadata.selfRef;
@@ -541,33 +585,7 @@ final class ProposalServiceImpl implements ProposalService {
         .whereType<ProposalData>()
         .toList();
 
-    return proposal.copyWith(versions: proposalDataVersion);
-  }
-
-  Future<Stream<ProposalData?>> _createProposalDataStream(
-    ProposalDocument doc,
-  ) async {
-    final selfRef = doc.metadata.selfRef;
-    final campaign = await _campaignRepository.getCategory(doc.metadata.categoryId);
-
-    final commentsCountStream = _proposalRepository.watchCommentsCount(
-      refTo: selfRef,
-    );
-
-    return Rx.combineLatest2(
-      _proposalRepository.watchProposalPublish(refTo: selfRef),
-      commentsCountStream,
-      (ProposalPublish? publishState, int commentsCount) {
-        if (publishState == null) return null;
-
-        return ProposalData(
-          document: doc,
-          categoryName: campaign.categoryText,
-          publish: publishState,
-          commentsCount: commentsCount,
-        );
-      },
-    );
+    return versionsData.map((e) => e.toProposalVersion()).toList();
   }
 
   CatalystId _getUserCatalystId() {
@@ -586,16 +604,18 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   Future<Page<Proposal>> _mapProposalDataPage(Page<ProposalData> page) async {
-    // TODO(damian-molinski): this most likely should happen in ProposalsCubit.
     final proposals = await page.items.map(
       (item) async {
-        final categoryId = item.categoryId;
-        final category = await _campaignRepository.getCategory(categoryId);
+        final versions = await _proposalRepository
+            .queryVersionsOfId(
+              id: item.document.metadata.selfRef.id,
+              includeLocalDrafts: true,
+            )
+            .then(
+              (value) => value.map((e) => e.metadata.selfRef.version!).whereType<String>().toList(),
+            );
 
-        final withCategory = item.copyWith(categoryName: category.categoryText);
-
-        // TODO(damian-molinski): It should be different model.
-        return Proposal.fromData(withCategory);
+        return Proposal.fromData(item, versions);
       },
     ).wait;
 

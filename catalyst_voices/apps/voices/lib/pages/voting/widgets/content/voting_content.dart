@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 
 class VotingContent extends StatelessWidget {
   final TabController tabController;
-  final PagingController<ProposalBrief> pagingController;
+  final PagingController<ProposalBriefVoting> pagingController;
 
   const VotingContent({
     super.key,

@@ -216,7 +216,15 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       return;
     }
 
-    final mappedPage = page.map(ProposalBrief.fromProposal);
+    final mappedPage = page.map(
+      // TODO(damian-molinski): refactor page to return ProposalWithContext instead.
+      (e) => ProposalBrief.fromProposal(
+        e,
+        categoryName: campaign.categories
+            .firstWhere((element) => element.selfRef == e.categoryRef)
+            .categoryText,
+      ),
+    );
 
     final signal = PageReadyProposalsSignal(page: mappedPage);
 

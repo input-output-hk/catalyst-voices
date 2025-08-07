@@ -13,6 +13,13 @@ final class VoteButtonData extends Equatable {
     this.casted,
   });
 
+  factory VoteButtonData.fromProposalVotes(ProposalVotes? votes) {
+    return VoteButtonData.fromVotes(
+      currentDraft: votes?.currentDraft,
+      lastCasted: votes?.lastCasted,
+    );
+  }
+
   factory VoteButtonData.fromVotes({
     Vote? currentDraft,
     Vote? lastCasted,

@@ -18,4 +18,5 @@ export 'proposals/proposals.dart';
 export 'registration/registration.dart';
 export 'session/session.dart';
 export 'voting/voting.dart';
+export 'voting_ballot/voting_ballot.dart';
 export 'workspace/workspace.dart';

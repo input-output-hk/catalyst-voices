@@ -15,7 +15,7 @@ abstract interface class CampaignService {
     ActiveCampaignObserver activeCampaignObserver,
   ) = CampaignServiceImpl;
 
-  Stream<Campaign> get watchActiveCampaign;
+  Stream<Campaign?> get watchActiveCampaign;
 
   Future<Campaign?> getActiveCampaign();
 
@@ -40,7 +40,7 @@ final class CampaignServiceImpl implements CampaignService {
   );
 
   @override
-  Stream<Campaign> get watchActiveCampaign => _activeCampaignObserver.watchCampaign;
+  Stream<Campaign?> get watchActiveCampaign => _activeCampaignObserver.watchCampaign;
 
   @override
   Future<Campaign?> getActiveCampaign() async {

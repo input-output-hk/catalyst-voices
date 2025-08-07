@@ -1,10 +1,11 @@
-import 'dart:math';
+import 'dart:async';
 
 import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_tile.dart';
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/empty_state/empty_state.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -15,33 +16,12 @@ class VotingListBallot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(damian-molinski): use selector
-    final items = List.generate(
-      5,
-      (index) {
-        return VotingListTileData(
-          category: SignedDocumentRef.generateFirstRef(),
-          categoryText: 'Category nr.${index + 1}',
-          votes: List.generate(
-            Random().nextInt(10),
-            (index) {
-              return VotingListTileVoteData(
-                proposal: SignedDocumentRef.generateFirstRef(),
-                proposalTitle: 'Proposal nr.${index + 1}',
-                authorName: 'Author nr.${index + 1}',
-                vote: VoteButtonData(
-                  draft: VoteTypeDataDraft(
-                    type: Random().nextBool() ? VoteType.yes : VoteType.abstain,
-                  ),
-                ),
-              );
-            },
-          ),
-        );
+    return BlocSelector<VotingBallotBloc, VotingBallotState, List<VotingListTileData>>(
+      selector: (state) => state.tiles,
+      builder: (context, state) {
+        return _VotingListBallot(items: state);
       },
     );
-
-    return _VotingListBallot(items: items);
   }
 }
 
@@ -67,10 +47,20 @@ class _VotingListBallot extends StatelessWidget {
         return VotingListTile(
           key: ValueKey('Category${index}TileKey'),
           data: item,
-          // TODO(damian-molinski): call VotingBallotBloc
-          onProposalTap: (value) {},
-          // TODO(damian-molinski): call VotingBallotBloc
-          onVoteChanged: (value) {},
+          onProposalTap: (value) {
+            final route = ProposalRoute.fromRef(ref: value);
+
+            unawaited(route.push(context));
+          },
+          onVoteChanged: (value) {
+            final proposal = value.proposal;
+            final event = switch (value.action) {
+              VoteButtonActionRemoveDraft() => RemoveVoteEvent(proposal: proposal),
+              VoteButtonActionVote(:final type) => UpdateVoteEvent(proposal: proposal, type: type),
+            };
+
+            context.read<VotingBallotBloc>().add(event);
+          },
         );
       },
       separatorBuilder: (_, __) => const SizedBox(height: 16),

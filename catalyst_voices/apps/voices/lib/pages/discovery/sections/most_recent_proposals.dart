@@ -139,7 +139,6 @@ class _LatestProposalsState extends State<MostRecentProposals> {
                               await bloc.removeFavorite(ref);
                             }
                           },
-                          isFavorite: proposal.isFavorite,
                         ),
                       );
                     },

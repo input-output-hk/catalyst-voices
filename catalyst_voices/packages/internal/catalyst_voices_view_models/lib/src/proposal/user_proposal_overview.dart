@@ -28,7 +28,11 @@ final class UsersProposalOverview extends Equatable {
     required this.fundNumber,
   });
 
-  factory UsersProposalOverview.fromProposal(Proposal proposal, int fundNumber) {
+  factory UsersProposalOverview.fromProposal(
+    DetailProposal proposal,
+    int fundNumber,
+    String categoryName,
+  ) {
     return UsersProposalOverview(
       selfRef: proposal.selfRef,
       title: proposal.title,
@@ -37,8 +41,8 @@ final class UsersProposalOverview extends Equatable {
       publish: proposal.publish,
       versions: proposal.versions.toViewModels(),
       commentsCount: proposal.commentsCount,
-      category: proposal.category,
-      categoryId: proposal.categoryId,
+      category: categoryName,
+      categoryId: proposal.categoryRef,
       fundNumber: fundNumber,
     );
   }

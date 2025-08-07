@@ -7,7 +7,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class VotingProposalsPagination extends StatelessWidget {
-  final PagingController<ProposalBrief> controller;
+  final PagingController<ProposalBriefVoting> controller;
 
   const VotingProposalsPagination({
     super.key,
@@ -16,9 +16,9 @@ class VotingProposalsPagination extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PaginatedGridView<ProposalBrief>(
+    return PaginatedGridView<ProposalBriefVoting>(
       pagingController: controller,
-      builderDelegate: PagedWrapChildBuilder<ProposalBrief>(
+      builderDelegate: PagedWrapChildBuilder<ProposalBriefVoting>(
         builder: (context, item) {
           return VotingProposalsPaginationTile(
             key: ValueKey(item.selfRef),

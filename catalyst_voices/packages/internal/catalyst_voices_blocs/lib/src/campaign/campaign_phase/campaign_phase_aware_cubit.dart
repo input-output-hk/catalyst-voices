@@ -10,7 +10,7 @@ final _logger = Logger('CampaignPhaseAwareCubit');
 
 final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
   final CampaignService _campaignService;
-  StreamSubscription<Campaign>? _campaignSubscription;
+  StreamSubscription<Campaign?>? _campaignSubscription;
   Campaign? _activeCampaign;
   Timer? _timer;
 
@@ -65,7 +65,7 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
   }
 
   // ignore: use_setters_to_change_properties
-  void _handleCampaignChange(Campaign campaign) {
+  void _handleCampaignChange(Campaign? campaign) {
     _activeCampaign = campaign;
   }
 

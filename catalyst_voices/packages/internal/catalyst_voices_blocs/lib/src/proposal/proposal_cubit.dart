@@ -68,10 +68,10 @@ final class ProposalCubit extends Cubit<ProposalState>
 
       emit(state.copyWith(isLoading: true));
 
-      final proposal = await _proposalService.getProposal(ref: ref);
-      final category = await _campaignService.getCategory(proposal.categoryId);
+      final proposal = await _proposalService.getProposalDetail(ref: ref);
+      final category = await _campaignService.getCategory(proposal.document.metadata.categoryId);
       final commentTemplate = await _commentService.getCommentTemplateFor(
-        category: proposal.categoryId,
+        category: proposal.document.metadata.categoryId,
       );
       final isFavorite = await _proposalService.watchIsFavoritesProposal(ref: ref).first;
 
@@ -259,7 +259,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   ProposalViewData _buildProposalViewData({
     required bool hasActiveAccount,
     required bool hasAccountUsername,
-    required ProposalData? proposal,
+    required ProposalDetailData? proposal,
     required CampaignCategory? category,
     required List<CommentWithReplies> comments,
     required DocumentSchema? commentSchema,
@@ -273,7 +273,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
     final proposalVersions = proposal?.versions ?? const [];
     final versions = proposalVersions.reversed.mapIndexed((index, version) {
-      final ver = version.document.metadata.selfRef.version;
+      final ver = version.selfRef.version;
 
       return DocumentVersion(
         id: ver ?? '',
@@ -334,16 +334,16 @@ final class ProposalCubit extends Cubit<ProposalState>
       return null;
     }
 
-    // TODO(LynxLynxx): Fetch voting data
     return ProposalVotingOverviewSegment.build(
-      data: const ProposalViewVoting(
-        VoteButtonData(),
+      data: ProposalViewVoting(
+        // TODO(LynxLynxx): Add voting data from bullet builder
+        VoteButtonData.fromProposalVotes(ProposalVotes(proposalRef: proposalRef)),
       ),
     );
   }
 
   List<Segment> _buildSegments({
-    required ProposalData proposal,
+    required ProposalDetailData proposal,
     required CampaignCategory? category,
     required DocumentVersion? version,
     required List<CommentWithReplies> comments,
