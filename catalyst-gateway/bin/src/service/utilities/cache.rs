@@ -3,7 +3,7 @@ use std::{collections::hash_map::RandomState, hash::Hash};
 
 use moka::{policy::EvictionPolicy, sync::Cache};
 
-/// Cache type.
+/// Cache type that is disabled if the maximum capacity is set to zero.
 pub(crate) struct CacheWrapper<K, V> {
     /// Optional `moka::sync::Cache`.
     inner: Option<Cache<K, V, RandomState>>,
@@ -29,24 +29,24 @@ where
         Self { inner }
     }
 
-    /// Get entry from Cache by key.
+    /// Get entry from the cache by key.
     pub(crate) fn get(&self, key: &K) -> Option<V> {
         self.inner.as_ref().and_then(|cache| cache.get(key))
     }
 
-    /// Insert entry into Cache
+    /// Insert entry into the cache.
     pub(crate) fn insert(&self, key: K, value: V) {
         self.inner
             .as_ref()
             .inspect(|cache| cache.insert(key, value));
     }
 
-    /// Empty the TXO Assets cache.
+    /// Clear entries in the cache.
     pub(crate) fn clear_cache(&self) {
         self.inner.as_ref().inspect(|cache| cache.invalidate_all());
     }
 
-    /// Size of TXO Assets cache.
+    /// Weighted-size of the cache.
     pub(crate) fn size(&self) -> u64 {
         self.inner
             .as_ref()
@@ -57,7 +57,7 @@ where
             .unwrap_or_default()
     }
 
-    /// Number of entries in TXO Assets cache.
+    /// Number of entries in the cache.
     pub(crate) fn entry_count(&self) -> u64 {
         self.inner
             .as_ref()
