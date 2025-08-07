@@ -15,11 +15,16 @@ class UnlockModalPage {
   final unlockRecoverButton = const Key('UnlockRecoverButton');
   final unlockContinueAsGuestButton = const Key('UnlockContinueAsGuestButton');
   final passwordTextField = const Key('PasswordTextField');
+  final closeButton = const Key('DialogCloseButton');
 
   Future<void> incorrectPasswordErrorShowsUp() async {
     expect(
       find.text((await t()).unlockDialogIncorrectPassword),
       findsOneWidget,
     );
+  }
+
+  Future<void> closeButtonClick() async {
+    await $(UnlockModalPage($).closeButton).tap();
   }
 }

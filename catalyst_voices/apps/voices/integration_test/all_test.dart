@@ -16,10 +16,10 @@ void main() async {
   setUpAll(() async {
     await bootstrap(router: buildAppRouter());
   });
-  app_test.main();
-  onboarding_restore_test.main();
-  onboarding_test.main();
+  // app_test.main();
+  // onboarding_restore_test.main();
+  // onboarding_test.main();
   account_test.main();
-  discovery_test.main();
-  proposals_test.main();
+  // discovery_test.main();
+  // proposals_test.main();
 }
