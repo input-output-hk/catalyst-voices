@@ -1,4 +1,4 @@
-# cspell: words hoverkraft
+# cspell: words hoverkraft lhotari upterm
 
 name: CI
 
@@ -96,13 +96,16 @@ jobs:
           docker compose -f catalyst-gateway/tests/docker-compose.yml up scylla-runner --abort-on-container-exit --exit-code-from scylla-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml logs scylla-runner
 
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
+
       - name: Running integration API tests
         if: always()
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
 
-      - name: Running resilience tests
+      - name: Running integration health tests
         if: always()
         run: |
           sed -i '' 's/CHANGE_ME@event-db\//CHANGE_ME@haproxy:18080\//g' ./catalyst-gateway/tests/docker-compose.yml
