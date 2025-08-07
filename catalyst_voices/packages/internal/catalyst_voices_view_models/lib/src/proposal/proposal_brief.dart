@@ -125,8 +125,7 @@ class ProposalBriefVoting extends ProposalBrief {
   });
 
   factory ProposalBriefVoting.fromProposal(
-    Proposal proposal,
-    ProposalVotes? votes, {
+    Proposal proposal, {
     bool isFavorite = false,
     String categoryName = '',
     Vote? draftVote,
