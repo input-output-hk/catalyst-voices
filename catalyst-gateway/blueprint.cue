@@ -7,8 +7,9 @@ project: {
 	}
 	deployment: {
 		on: {
-			merge: {}
-			tag: {}
+            always: {}
+			// merge: {}
+			// tag: {}
 		}
 
 		bundle: {
