@@ -14,11 +14,13 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
   final UserService _userService;
   final CampaignService _campaignService;
   final VotingBallotBuilder _ballotBuilder;
+  final VotingService _votingService;
 
   var _cache = const VotingBallotCache();
 
   StreamSubscription<VotingPower?>? _votingPowerSub;
   StreamSubscription<Campaign?>? _activeCampaignSub;
+  StreamSubscription<List<Vote>>? _watchedCastedVotesSub;
 
   Timer? _phaseProgressTimer;
 
@@ -26,6 +28,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     this._userService,
     this._campaignService,
     this._ballotBuilder,
+    this._votingService,
   ) : super(const VotingBallotState()) {
     on<UpdateVotingPowerEvent>(_updateVotingPower, transformer: uniqueEvents());
     on<UpdateVotingPhaseProgressEvent>(_updateVotingPhaseProgress, transformer: uniqueEvents());
@@ -59,7 +62,9 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     _ballotBuilder.addListener(_handleBallotBuilderChange);
     _handleBallotBuilderChange();
 
-    // TODO(damian-molinski): watch VotingService.
+    _watchedCastedVotesSub = _votingService.watchedCastedVotes().listen((votes) {
+      _handleLastCastedChange(votes.firstOrNull);
+    });
     _handleLastCastedChange(null);
   }
 
@@ -75,6 +80,9 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
 
     _phaseProgressTimer?.cancel();
     _phaseProgressTimer = null;
+
+    _watchedCastedVotesSub?.cancel();
+    _watchedCastedVotesSub = null;
 
     return super.close();
   }
@@ -215,22 +223,17 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     CastVotesEvent event,
     Emitter<VotingBallotState> emit,
   ) async {
+    await _votingService.castVotes(_ballotBuilder.votes);
+
     final _ = _ballotBuilder.build();
     _ballotBuilder.clear();
-
-    // TODO(damian-molinski): call voting service
 
     final tiles = _buildTiles();
     emit(state.copyWith(tiles: tiles));
   }
 
-  // TODO(damian-molinski): call voting service.
   Future<Vote?> _getLastCastedVoteOn(DocumentRef proposal) async {
-    return Vote(
-      selfRef: SignedDocumentRef.generateFirstRef(),
-      proposal: proposal,
-      type: VoteType.yes,
-    );
+    return _votingService.getProposalLastCastedVote(proposal);
   }
 
   void _handleBallotBuilderChange() {
@@ -336,26 +339,12 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     final isProposalCached = _cache.votesProposals.containsKey(proposalRef);
 
     if (!isProposalCached) {
-      // TODO(damian-molinski): call voting service and get
-      final proposal = VoteProposal(
-        ref: proposalRef,
-        category: VoteProposalCategory(
-          ref: SignedDocumentRef.generateFirstRef(),
-          name: 'Dummy Category Name',
-        ),
-        title: 'Dummy Proposal Title',
-        authorName: 'XYZ',
-        lastCastedVote: Vote(
-          selfRef: SignedDocumentRef.generateFirstRef(),
-          proposal: proposalRef,
-          type: VoteType.yes,
-        ),
-      );
+      final proposal = await _votingService.getVoteProposal(proposalRef);
 
       _cache = _cache.addProposal(proposal);
     }
 
-    // If already has vote in ballot when we don't need to do anything
+    // If it has already voted in the ballot, when we don't need to do anything
     // because .voteOn will just update type with and keep it the same.
     final voteId = _ballotBuilder.hasVotedOn(proposalRef)
         ? null

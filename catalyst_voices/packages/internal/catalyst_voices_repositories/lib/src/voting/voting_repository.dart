@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/voting/casted_votes_observer.dart';
+import 'package:collection/collection.dart';
 
 final class VotingMockRepository implements VotingRepository {
   final CastedVotesObserver _votesObserver;
@@ -25,6 +26,7 @@ final class VotingMockRepository implements VotingRepository {
   @override
   Future<void> castVotes(List<Vote> draftVotes) async {
     final castedVotes = <Vote>[];
+
     for (final vote in draftVotes) {
       castedVotes.add(vote.toCasted());
     }
@@ -38,7 +40,6 @@ final class VotingMockRepository implements VotingRepository {
     for (final newVote in castedVotes) {
       votesMap[newVote.proposal] = newVote;
     }
-
     votes = votesMap.values.toList();
   }
 
@@ -47,11 +48,25 @@ final class VotingMockRepository implements VotingRepository {
     await _votesObserver.dispose();
   }
 
+  @override
+  Future<Vote?> getProposalLastCastedVote(DocumentRef proposalRef) async {
+    return _votesObserver.votes.firstWhereOrNull((vote) => vote.proposal == proposalRef);
+  }
+
   Future<void> _loadCastedVotes() async {
     // TODO(LynxLynxx): Load casted votes from storage or remote source
 
     // Initialize with empty list if no votes are loaded
-    votes = <Vote>[];
+    votes = <Vote>[
+      // TODO(LynxLynxx): For testing
+      Vote.draft(
+        proposal: const SignedDocumentRef(
+          id: '01987a80-316f-7c5c-ac9a-5e17438222c9',
+          version: '01987ea2-e771-7353-9816-5c9e4864553d',
+        ),
+        type: VoteType.yes,
+      ).toCasted(),
+    ];
   }
 }
 
@@ -61,4 +76,6 @@ abstract interface class VotingRepository implements CastedVotesObserver {
   Stream<List<Vote>> get watchedCastedVotes;
 
   Future<void> castVotes(List<Vote> draftVotes);
+
+  Future<Vote?> getProposalLastCastedVote(DocumentRef proposalRef);
 }

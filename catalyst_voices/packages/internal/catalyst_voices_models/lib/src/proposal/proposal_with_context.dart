@@ -15,6 +15,16 @@ final class ProposalUserContext extends Equatable {
         isFavorite,
         lastCastedVote,
       ];
+
+  ProposalUserContext copyWith({
+    bool? isFavorite,
+    Optional<Vote>? lastCastedVote,
+  }) {
+    return ProposalUserContext(
+      isFavorite: isFavorite ?? this.isFavorite,
+      lastCastedVote: lastCastedVote.dataOr(this.lastCastedVote),
+    );
+  }
 }
 
 final class ProposalWithContext extends Equatable {
@@ -34,4 +44,16 @@ final class ProposalWithContext extends Equatable {
         category,
         user,
       ];
+
+  ProposalWithContext copyWith({
+    Proposal? proposal,
+    CampaignCategory? category,
+    ProposalUserContext? user,
+  }) {
+    return ProposalWithContext(
+      proposal: proposal ?? this.proposal,
+      category: category ?? this.category,
+      user: user ?? this.user,
+    );
+  }
 }

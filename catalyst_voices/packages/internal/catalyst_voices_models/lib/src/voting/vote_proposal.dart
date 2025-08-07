@@ -16,6 +16,21 @@ final class VoteProposal extends Equatable {
     this.lastCastedVote,
   });
 
+  factory VoteProposal.fromData({
+    required CoreProposal proposal,
+    required CampaignCategory category,
+    Vote? lastCastedVote,
+  }) {
+    final voteCategory = VoteProposalCategory.fromCampaignCategory(category);
+    return VoteProposal(
+      ref: proposal.selfRef,
+      category: voteCategory,
+      title: proposal.title,
+      authorName: proposal.author ?? '',
+      lastCastedVote: lastCastedVote,
+    );
+  }
+
   @override
   List<Object?> get props => [
         ref,
@@ -34,6 +49,13 @@ final class VoteProposalCategory extends Equatable {
     required this.ref,
     required this.name,
   });
+
+  factory VoteProposalCategory.fromCampaignCategory(CampaignCategory category) {
+    return VoteProposalCategory(
+      ref: category.selfRef,
+      name: category.categoryText,
+    );
+  }
 
   @override
   List<Object?> get props => [
