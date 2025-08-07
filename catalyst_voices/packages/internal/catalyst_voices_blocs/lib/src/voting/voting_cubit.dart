@@ -215,7 +215,6 @@ final class VotingCubit extends Cubit<VotingState>
 
     final mappedPage = page.map(
       (proposal) {
-      
         return ProposalBriefVoting.fromProposal(
           proposal,
           // TODO(LynxLynxx): Add votes from Bullet Builder

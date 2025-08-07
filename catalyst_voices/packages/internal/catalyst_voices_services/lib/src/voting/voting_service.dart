@@ -1,6 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:rxdart/rxdart.dart';
 
 final class VotingMockService implements VotingService {
   final VotingRepository _votingRepository;
@@ -13,8 +12,8 @@ final class VotingMockService implements VotingService {
   }
 
   @override
-  ValueStream<List<Vote>> watchedCastedVotes() {
-    return _votingRepository.watchedCastedVotes;
+  Stream<List<Vote>> watchedCastedVotes() {
+    return _votingRepository.watchCastedVotes;
   }
 }
 
@@ -25,5 +24,5 @@ abstract interface class VotingService {
 
   Future<void> castVotes(List<Vote> draftVotes);
 
-  ValueStream<List<Vote>> watchedCastedVotes();
+  Stream<List<Vote>> watchedCastedVotes();
 }

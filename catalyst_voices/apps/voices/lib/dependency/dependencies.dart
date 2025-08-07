@@ -261,7 +261,11 @@ final class Dependencies extends DependencyProvider {
           );
         },
       )
-      ..registerLazySingleton<VotingRepository>(VotingRepository.new);
+      ..registerLazySingleton<VotingRepository>(
+        () => VotingRepository(
+          get<CastedVotesObserver>(),
+        ),
+      );
   }
 
   void _registerServices() {
@@ -447,5 +451,6 @@ final class Dependencies extends DependencyProvider {
       ActiveCampaignObserverImpl.new,
       dispose: (observer) async => observer.dispose(),
     );
+    registerLazySingleton<CastedVotesObserver>(CastedVotesObserverImpl.new);
   }
 }
