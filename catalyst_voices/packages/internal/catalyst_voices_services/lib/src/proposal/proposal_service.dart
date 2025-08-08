@@ -13,6 +13,7 @@ abstract interface class ProposalService {
     DocumentRepository documentRepository,
     UserService userService,
     SignerService signerService,
+    ActiveCampaignObserver activeCampaignObserver,
   ) = ProposalServiceImpl;
 
   Future<void> addFavoriteProposal({
@@ -59,7 +60,7 @@ abstract interface class ProposalService {
     required DocumentRef ref,
   });
 
-  Future<Page<Proposal>> getProposalsPage({
+  Future<Page<ProposalWithContext>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
     required ProposalsOrder order,
@@ -148,12 +149,14 @@ final class ProposalServiceImpl implements ProposalService {
   final DocumentRepository _documentRepository;
   final UserService _userService;
   final SignerService _signerService;
+  final ActiveCampaignObserver _activeCampaignObserver;
 
   const ProposalServiceImpl(
     this._proposalRepository,
     this._documentRepository,
     this._userService,
     this._signerService,
+    this._activeCampaignObserver,
   );
 
   @override
@@ -271,14 +274,42 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<Page<Proposal>> getProposalsPage({
+  Future<Page<ProposalWithContext>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
     required ProposalsOrder order,
-  }) {
-    return _proposalRepository
+  }) async {
+    final proposalsPage = await _proposalRepository
         .getProposalsPage(request: request, filters: filters, order: order)
         .then(_mapProposalDataPage);
+    final proposals = proposalsPage.items;
+
+    final categoriesRefs = proposals.map((proposal) => proposal.categoryRef).toSet();
+
+    // If we are getting proposals then campaign needs to be active
+    // Getting whole campaign with list of categories saves time then calling to get each category separately
+    // for each proposal
+    final activeCampaign = _activeCampaignObserver.campaign;
+
+    final categories = Map<String, CampaignCategory>.fromEntries(
+      categoriesRefs.map((ref) {
+        final category =
+            activeCampaign!.categories.firstWhere((category) => category.selfRef == ref);
+        return MapEntry(ref.id, category);
+      }),
+    );
+
+    final proposalsWithContext = proposals
+        .map(
+          (proposal) => ProposalWithContext(
+            proposal: proposal,
+            category: categories[proposal.categoryRef.id]!,
+            user: const ProposalUserContext(),
+          ),
+        )
+        .toList();
+
+    return proposalsPage.copyWithItems(proposalsWithContext);
   }
 
   @override

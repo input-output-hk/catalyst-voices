@@ -17,6 +17,8 @@ final class VotingBallotCache extends Equatable {
         votesProposals,
       ];
 
+  int get votesCount => votesProposals.length;
+
   VotingBallotCache addProposal(VoteProposal proposal) {
     final votesProposals = Map.of(this.votesProposals);
 

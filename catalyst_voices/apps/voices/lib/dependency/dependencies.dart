@@ -105,6 +105,7 @@ final class Dependencies extends DependencyProvider {
           get<CampaignService>(),
           get<ProposalService>(),
           get<VotingBallotBuilder>(),
+          get<VotingService>(),
         ),
       )
       // TODO(LynxLynxx): add repository for campaign management
@@ -150,6 +151,8 @@ final class Dependencies extends DependencyProvider {
           get<CommentService>(),
           get<CampaignService>(),
           get<DocumentMapper>(),
+          get<VotingBallotBuilder>(),
+          get<VotingService>(),
         );
       })
       ..registerFactory<NewProposalCubit>(() {
@@ -189,6 +192,7 @@ final class Dependencies extends DependencyProvider {
           get<UserService>(),
           get<CampaignService>(),
           get<VotingBallotBuilder>(),
+          get<VotingService>(),
         );
       });
   }
@@ -354,6 +358,7 @@ final class Dependencies extends DependencyProvider {
         get<DocumentRepository>(),
         get<UserService>(),
         get<SignerService>(),
+        get<ActiveCampaignObserver>(),
       );
     });
     registerLazySingleton<CommentService>(() {
@@ -392,6 +397,8 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<VotingService>(() {
       return VotingService(
         get<VotingRepository>(),
+        get<ProposalService>(),
+        get<CampaignService>(),
       );
     });
   }

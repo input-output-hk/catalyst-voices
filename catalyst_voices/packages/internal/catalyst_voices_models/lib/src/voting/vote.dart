@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 /// Represents a vote on proposal.
@@ -56,4 +57,9 @@ final class Vote extends Equatable {
 
     return copyWith(selfRef: selfRef.toSignedDocumentRef());
   }
+}
+
+extension VoteListExt on List<Vote> {
+  Vote? forProposal(DocumentRef proposal) =>
+      firstWhereOrNull((element) => element.proposal == proposal);
 }
