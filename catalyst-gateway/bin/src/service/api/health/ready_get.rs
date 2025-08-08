@@ -131,14 +131,11 @@ pub(crate) async fn endpoint() -> AllResponses {
 
     // Check Index DB connection
     if !CassandraSession::is_ready().await {
-        // When check fails, attempt to re-connect
-        CassandraSession::init();
-        // Re-check connection to Indexing DB (internally updates the liveness flag)
-        let retry_success =
-            CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true)
-                .await
-                .is_ok();
-        debug!(retry_success, "Cassandra Session re-connect attempt.");
+        // Dont need to re-init the session, initialisation should be called only once,
+        // if it was disconnected it will try to reconnect automatically with the existing session
+        // instance.
+        // Re-check connection to Indexing DB (internally updates the liveness flag).
+        CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL).await;
     }
 
     // Otherwise, re-check, and return 204 response if all is good.

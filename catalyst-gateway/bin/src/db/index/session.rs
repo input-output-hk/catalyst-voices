@@ -61,24 +61,10 @@ pub(crate) enum TlsChoice {
 /// Represents errors that can occur while interacting with a Cassandra session.
 #[derive(Debug, Error)]
 pub(crate) enum CassandraSessionError {
-    /// Error when creating a session fails.
-    #[error("Creating session failed: {source}")]
-    CreatingSessionFailed {
-        /// The underlying error that caused the session creation to fail.
-        #[source]
-        source: anyhow::Error,
-    },
     /// Error when connecting to database.
     #[error("Database connection failed: {source}")]
     ConnectionUnavailable {
         /// The underlying error that caused the connection failure.
-        #[source]
-        source: anyhow::Error,
-    },
-    /// Error when schema migration fails.
-    #[error("Schema migration failed: {source}")]
-    SchemaMigrationFailed {
-        /// The underlying error that caused the schema migration to fail.
         #[source]
         source: anyhow::Error,
     },
@@ -89,16 +75,6 @@ pub(crate) enum CassandraSessionError {
         #[source]
         source: anyhow::Error,
     },
-    /// Error when preparing purge queries fails.
-    #[error("Preparing purge queries failed: {source}")]
-    PreparingPurgeQueriesFailed {
-        /// The underlying error that caused purge query preparation to fail.
-        #[source]
-        source: anyhow::Error,
-    },
-    /// Error indicating that the session has already been set.
-    #[error("Session already set")]
-    SessionAlreadySet,
     /// Should be used by the caller when it fails to acquire the initialized database
     /// session.
     #[error("Failed acquiring database session")]
@@ -120,9 +96,6 @@ pub(crate) struct CassandraSession {
     purge_queries: Arc<purge::PreparedQueries>,
 }
 
-/// Session error while initialization.
-static INIT_SESSION_ERROR: OnceLock<Arc<CassandraSessionError>> = OnceLock::new();
-
 /// Persistent DB Session.
 static PERSISTENT_SESSION: OnceLock<Arc<CassandraSession>> = OnceLock::new();
 
@@ -131,6 +104,7 @@ static VOLATILE_SESSION: OnceLock<Arc<CassandraSession>> = OnceLock::new();
 
 impl CassandraSession {
     /// Initialise the Cassandra Cluster Connections.
+    /// Should be called only once.
     pub(crate) fn init() {
         let (persistent, volatile) = Settings::cassandra_db_cfg();
         let network = Settings::cardano_network();
@@ -184,18 +158,10 @@ impl CassandraSession {
     }
 
     /// Wait for the Cassandra Indexing DB to be ready before continuing
-    pub(crate) async fn wait_until_ready(
-        interval: Duration, ignore_err: bool,
-    ) -> Result<(), Arc<CassandraSessionError>> {
+    pub(crate) async fn wait_until_ready(interval: Duration) {
         loop {
-            if !ignore_err {
-                if let Some(err) = INIT_SESSION_ERROR.get() {
-                    return Err(err.clone());
-                }
-            }
-
             if Self::is_ready().await {
-                return Ok(());
+                return;
             }
 
             tokio::time::sleep(interval).await;
@@ -412,9 +378,6 @@ async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bo
                     error = format!("{error:?}"),
                     "Failed to Create Cassandra DB Session"
                 );
-                drop(INIT_SESSION_ERROR.set(Arc::new(
-                    CassandraSessionError::CreatingSessionFailed { source: error },
-                )));
                 continue;
             },
         };
@@ -426,11 +389,6 @@ async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bo
                 network = %network,
                 error = format!("{error:?}"),
                 "Failed to Create Cassandra DB Schema"
-            );
-            drop(
-                INIT_SESSION_ERROR.set(Arc::new(CassandraSessionError::SchemaMigrationFailed {
-                    source: error,
-                })),
             );
             continue;
         }
@@ -444,9 +402,6 @@ async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bo
                     error = %error,
                     "Failed to Create Cassandra Prepared Queries"
                 );
-                drop(INIT_SESSION_ERROR.set(Arc::new(
-                    CassandraSessionError::PreparingQueriesFailed { source: error },
-                )));
                 continue;
             },
         };
@@ -461,9 +416,6 @@ async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bo
                     error = %error,
                     "Failed to Create Cassandra Prepared Purge Queries"
                 );
-                drop(INIT_SESSION_ERROR.set(Arc::new(
-                    CassandraSessionError::PreparingPurgeQueriesFailed { source: error },
-                )));
                 continue;
             },
         };
@@ -480,11 +432,9 @@ async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bo
         if persistent {
             if PERSISTENT_SESSION.set(Arc::new(cassandra_session)).is_err() {
                 error!("Persistent Session already set.  This should not happen.");
-                drop(INIT_SESSION_ERROR.set(Arc::new(CassandraSessionError::SessionAlreadySet)));
             };
         } else if VOLATILE_SESSION.set(Arc::new(cassandra_session)).is_err() {
             error!("Volatile Session already set.  This should not happen.");
-            drop(INIT_SESSION_ERROR.set(Arc::new(CassandraSessionError::SessionAlreadySet)));
         };
 
         // IF we get here, then everything seems to have worked, so finish init.
