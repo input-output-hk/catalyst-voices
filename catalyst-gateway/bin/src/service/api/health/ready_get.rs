@@ -131,7 +131,7 @@ pub(crate) async fn endpoint() -> AllResponses {
 
     // Check Index DB connection
     if !CassandraSession::is_ready().await {
-        // Dont need to re-init the session, initialisation should be called only onces,
+        // Dont need to re-init the session, initialisation should be called only once,
         // if it was disconnected it will try to reconnect automatically with the existing session
         // instance.
         // Re-check connection to Indexing DB (internally updates the liveness flag).
