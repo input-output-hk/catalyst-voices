@@ -21,14 +21,13 @@ docker compose up api-tests-runner --abort-on-container-exit --exit-code-from ap
 docker compose up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
 ```
 
-## Postgres
+## Rust integration tests (a rust unit tests, which requires `event-db` or `index-db` instances)
 
 ```shell
-docker compose up postgres-runner --abort-on-container-exit --exit-code-from postgres-runner
+docker compose up rust-tests-runner --abort-on-container-exit --exit-code-from rust-tests-runner
 ```
 
-## Scylla
+### NOTE
 
-```shell
-docker compose up scylla-runner --abort-on-container-exit --exit-code-from scylla-runner
-```
+After running `rust-tests-runner` better always clean the state (with `docker compose down`),
+these tests could it mess up with the random data.
