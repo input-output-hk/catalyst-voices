@@ -22,9 +22,7 @@ const SESSION_ERR_MSG: &str = "Failed to initialize or get a database session.";
 async fn setup_test_database() -> Result<(), String> {
     CassandraSession::init();
 
-    CassandraSession::wait_until_ready(core::time::Duration::from_secs(1), false)
-        .await
-        .map_err(|err| format!("{err}"))?;
+    CassandraSession::wait_until_ready(core::time::Duration::from_secs(1)).await;
 
     if !CassandraSession::is_ready().await {
         return Err(String::from("Cassandra session is not ready"));
