@@ -8,7 +8,7 @@ import 'package:rxdart/rxdart.dart';
 /// ProposalService provides proposal-related functionality like: creating and signing proposals,
 /// retrieving proposals data from local storage, which needs to be merged from different document types.
 abstract interface class ProposalService {
-  factory ProposalService(
+  const factory ProposalService(
     ProposalRepository proposalRepository,
     DocumentRepository documentRepository,
     UserService userService,
@@ -151,7 +151,7 @@ final class ProposalServiceImpl implements ProposalService {
   final SignerService _signerService;
   final ActiveCampaignObserver _activeCampaignObserver;
 
-  ProposalServiceImpl(
+  const ProposalServiceImpl(
     this._proposalRepository,
     this._documentRepository,
     this._userService,
