@@ -66,7 +66,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
 
     _watchedCastedVotesSub = _votingService
         .watchedCastedVotes()
-        .map((votes) => votes.firstOrNull)
+        .map((votes) => votes.lastOrNull)
         .listen(_handleLastCastedChange);
     _handleLastCastedChange(null);
   }

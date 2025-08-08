@@ -57,16 +57,7 @@ final class VotingMockRepository implements VotingRepository {
     // TODO(LynxLynxx): Load casted votes from storage or remote source
 
     // Initialize with empty list if no votes are loaded
-    votes = <Vote>[
-      // TODO(LynxLynxx): For testing
-      Vote.draft(
-        proposal: const SignedDocumentRef(
-          id: '01987a80-316f-7c5c-ac9a-5e17438222c9',
-          version: '01987ea2-e771-7353-9816-5c9e4864553d',
-        ),
-        type: VoteType.yes,
-      ).toCasted(),
-    ];
+    votes = <Vote>[];
   }
 }
 
