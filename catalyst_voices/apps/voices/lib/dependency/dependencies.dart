@@ -358,7 +358,7 @@ final class Dependencies extends DependencyProvider {
         get<DocumentRepository>(),
         get<UserService>(),
         get<SignerService>(),
-        get<CampaignService>(),
+        get<ActiveCampaignObserver>(),
       );
     });
     registerLazySingleton<CommentService>(() {

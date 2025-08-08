@@ -18,7 +18,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
   final VotingBallotBuilder _ballotBuilder;
   final VotingService _votingService;
 
-  var _cache = VotingBallotCache();
+  var _cache = const VotingBallotCache();
 
   StreamSubscription<VotingPower?>? _votingPowerSub;
   StreamSubscription<Campaign?>? _activeCampaignSub;

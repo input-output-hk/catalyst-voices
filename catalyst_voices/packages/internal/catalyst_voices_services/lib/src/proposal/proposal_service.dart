@@ -13,7 +13,7 @@ abstract interface class ProposalService {
     DocumentRepository documentRepository,
     UserService userService,
     SignerService signerService,
-    CampaignService campaignService,
+    ActiveCampaignObserver activeCampaignObserver,
   ) = ProposalServiceImpl;
 
   Future<void> addFavoriteProposal({
@@ -149,16 +149,14 @@ final class ProposalServiceImpl implements ProposalService {
   final DocumentRepository _documentRepository;
   final UserService _userService;
   final SignerService _signerService;
-  final CampaignService _campaignService;
-
-  Campaign? _cacheCampaign;
+  final ActiveCampaignObserver _activeCampaignObserver;
 
   ProposalServiceImpl(
     this._proposalRepository,
     this._documentRepository,
     this._userService,
     this._signerService,
-    this._campaignService,
+    this._activeCampaignObserver,
   );
 
   @override
@@ -289,14 +287,14 @@ final class ProposalServiceImpl implements ProposalService {
     final categoriesRefs = proposals.map((proposal) => proposal.categoryRef).toSet();
 
     // If we are getting proposals then campaign needs to be active
-    // Getting hole campaign with list of categories saves time then calling to get each category separately
+    // Getting whole campaign with list of categories saves time then calling to get each category separately
     // for each proposal
-    _cacheCampaign ??= await _campaignService.getActiveCampaign();
+    final activeCampaign = _activeCampaignObserver.campaign;
 
     final categories = Map<String, CampaignCategory>.fromEntries(
       categoriesRefs.map((ref) {
         final category =
-            _cacheCampaign!.categories.firstWhere((category) => category.selfRef == ref);
+            activeCampaign!.categories.firstWhere((category) => category.selfRef == ref);
         return MapEntry(ref.id, category);
       }),
     );

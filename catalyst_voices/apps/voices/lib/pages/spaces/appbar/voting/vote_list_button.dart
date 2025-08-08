@@ -13,14 +13,8 @@ class VoteListButton extends StatelessWidget {
     return VoicesOutlinedButton(
       leading: VoicesAssets.icons.vote.buildIcon(),
       child: BlocSelector<VotingBallotBloc, VotingBallotState, int>(
-        selector: (state) {
-          return state.votesCount;
-        },
-        builder: (context, votesCount) {
-          return Text(
-            _getText(context, votesCount),
-          );
-        },
+        selector: (state) => state.votesCount,
+        builder: (context, votesCount) => Text(_getText(context, votesCount)),
       ),
       onTap: () => VotingListDrawer.open(context),
     );

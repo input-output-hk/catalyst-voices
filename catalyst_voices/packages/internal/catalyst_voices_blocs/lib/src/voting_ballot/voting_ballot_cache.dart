@@ -5,19 +5,19 @@ import 'package:equatable/equatable.dart';
 final class VotingBallotCache extends Equatable {
   final DateRange? votingTimeline;
   final Map<DocumentRef, VoteProposal> votesProposals;
-  final int votesCount;
 
   const VotingBallotCache({
     this.votingTimeline,
     this.votesProposals = const {},
-  }) : votesCount = votesProposals.length;
+  });
 
   @override
   List<Object?> get props => [
         votingTimeline,
         votesProposals,
-        votesCount,
       ];
+
+  int get votesCount => votesProposals.length;
 
   VotingBallotCache addProposal(VoteProposal proposal) {
     final votesProposals = Map.of(this.votesProposals);

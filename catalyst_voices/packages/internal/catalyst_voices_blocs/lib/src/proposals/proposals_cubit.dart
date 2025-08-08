@@ -183,8 +183,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     if (!isFavorite && _cache.filters.type.isFavorite) {
       final page = _cache.page;
       if (page != null) {
-        final proposals =
-            List.of(page.items).where((element) => element.proposal.selfRef != ref).toList();
+        final proposals = page.items.where((element) => element.proposal.selfRef != ref).toList();
 
         final updatedPage = page.copyWithItems(proposals);
 
