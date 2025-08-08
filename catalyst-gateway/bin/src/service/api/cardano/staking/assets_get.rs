@@ -177,7 +177,7 @@ async fn get_txo(
         let query_value = row.value.read().unwrap_or_else(|err| {
             tracing::error!(
                     error = %err,
-                    "UTXO Assets Cache lock is poisoned, recovering lock.");
+                    "UTXO Assets Cache entry lock is poisoned, recovering lock.");
             row.value.clear_poison();
             err.into_inner()
         });
