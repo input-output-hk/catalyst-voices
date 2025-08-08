@@ -25,22 +25,6 @@ final class VotingMockService implements VotingService {
   }
 
   @override
-  Future<Page<ProposalWithContext>> getProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
-  }) async {
-    final proposalPage =
-        await _proposalService.getProposalsPage(request: request, filters: filters, order: order);
-
-    final proposalsWithContext = await Future.wait(
-      proposalPage.items.map(_getProposalContext),
-    );
-
-    return proposalPage.copyWithItems(proposalsWithContext);
-  }
-
-  @override
   Future<VoteProposal> getVoteProposal(DocumentRef proposalRef) async {
     final proposal = await _proposalService.getProposal(ref: proposalRef);
     final lastCastedVote = await getProposalLastCastedVote(proposalRef);
@@ -62,23 +46,6 @@ final class VotingMockService implements VotingService {
     return _votingRepository.watchCastedVotes;
   }
 
-  Future<ProposalWithContext> _getProposalContext(Proposal proposal) async {
-    if (_cacheCampaign == null) {
-      throw StateError('Campaign not loaded');
-    }
-    final category = _cacheCampaign!.categories.firstWhere(
-      (category) => category.selfRef == proposal.categoryRef,
-      orElse: () => throw StateError('Category not found'),
-    );
-    final lastCastedVote = await getProposalLastCastedVote(proposal.selfRef);
-    final user = ProposalUserContext(lastCastedVote: lastCastedVote);
-    return ProposalWithContext(
-      proposal: proposal,
-      category: category,
-      user: user,
-    );
-  }
-
   Future<void> _loadCampaign() async {
     final campaign = await _campaignService.getActiveCampaign();
     _cacheCampaign = campaign;
@@ -95,12 +62,6 @@ abstract interface class VotingService {
   Future<void> castVotes(List<Vote> draftVotes);
 
   Future<Vote?> getProposalLastCastedVote(DocumentRef proposalRef);
-
-  Future<Page<ProposalWithContext>> getProposalsPage({
-    required PageRequest request,
-    required ProposalsFilters filters,
-    required ProposalsOrder order,
-  });
 
   Future<VoteProposal> getVoteProposal(DocumentRef proposalRef);
 

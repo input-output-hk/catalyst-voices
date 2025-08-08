@@ -116,7 +116,7 @@ final class VotingCubit extends Cubit<VotingState>
 
       _logger.finer('Proposals request[$request], filters[$filters]');
 
-      final page = await _votingService.getProposalsPage(
+      final page = await _proposalService.getProposalsPage(
         request: request,
         filters: filters,
         order: const Alphabetical(),

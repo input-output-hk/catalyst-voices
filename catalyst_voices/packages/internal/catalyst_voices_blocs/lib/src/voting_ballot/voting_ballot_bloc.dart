@@ -8,19 +8,21 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 
+final _logger = Logger('VotingBallotBloc');
 typedef _VoteWithProposal = ({Vote vote, VoteProposal? proposal});
 
-final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> {
+final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
+    with BlocErrorEmitterMixin {
   final UserService _userService;
   final CampaignService _campaignService;
   final VotingBallotBuilder _ballotBuilder;
   final VotingService _votingService;
 
-  var _cache = const VotingBallotCache();
+  var _cache = VotingBallotCache();
 
   StreamSubscription<VotingPower?>? _votingPowerSub;
   StreamSubscription<Campaign?>? _activeCampaignSub;
-  StreamSubscription<List<Vote>>? _watchedCastedVotesSub;
+  StreamSubscription<Vote?>? _watchedCastedVotesSub;
 
   Timer? _phaseProgressTimer;
 
@@ -62,9 +64,10 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     _ballotBuilder.addListener(_handleBallotBuilderChange);
     _handleBallotBuilderChange();
 
-    _watchedCastedVotesSub = _votingService.watchedCastedVotes().listen((votes) {
-      _handleLastCastedChange(votes.firstOrNull);
-    });
+    _watchedCastedVotesSub = _votingService
+        .watchedCastedVotes()
+        .map((votes) => votes.firstOrNull)
+        .listen(_handleLastCastedChange);
     _handleLastCastedChange(null);
   }
 
@@ -223,13 +226,19 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     CastVotesEvent event,
     Emitter<VotingBallotState> emit,
   ) async {
-    await _votingService.castVotes(_ballotBuilder.votes);
+    try {
+      final votingBallot = _ballotBuilder.build();
+      // First cast votes then clear the ballot because when something fails in casting then we don't
+      // want to clear the ballot and let the user try again.
+      await _votingService.castVotes(votingBallot.votes);
+      _ballotBuilder.clear();
 
-    final _ = _ballotBuilder.build();
-    _ballotBuilder.clear();
-
-    final tiles = _buildTiles();
-    emit(state.copyWith(tiles: tiles));
+      final tiles = _buildTiles();
+      emit(state.copyWith(tiles: tiles));
+    } catch (e, st) {
+      _logger.severe('Error casting votes', e, st);
+      emitError(LocalizedException.create(e));
+    }
   }
 
   Future<Vote?> _getLastCastedVoteOn(DocumentRef proposal) async {
@@ -328,7 +337,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState> 
     UpdateVoteTiles event,
     Emitter<VotingBallotState> emit,
   ) {
-    emit(state.copyWith(tiles: event.tiles));
+    emit(state.copyWith(tiles: event.tiles, votesCount: _cache.votesCount));
   }
 
   Future<void> _updateVote(

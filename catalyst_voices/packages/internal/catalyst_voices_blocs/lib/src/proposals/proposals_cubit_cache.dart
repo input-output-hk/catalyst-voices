@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 
 final class ProposalsCubitCache extends Equatable {
   final Campaign? campaign;
-  final Page<Proposal>? page;
+  final Page<ProposalWithContext>? page;
   final ProposalsFilters filters;
   final ProposalsOrder? selectedOrder;
   final List<CampaignCategory>? categories;
@@ -30,7 +30,7 @@ final class ProposalsCubitCache extends Equatable {
 
   ProposalsCubitCache copyWith({
     Optional<Campaign>? campaign,
-    Optional<Page<Proposal>>? page,
+    Optional<Page<ProposalWithContext>>? page,
     ProposalsFilters? filters,
     Optional<ProposalsOrder>? selectedOrder,
     Optional<List<CampaignCategory>>? categories,

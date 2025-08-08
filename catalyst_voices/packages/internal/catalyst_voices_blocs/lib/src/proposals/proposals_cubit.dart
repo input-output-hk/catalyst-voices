@@ -183,7 +183,8 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     if (!isFavorite && _cache.filters.type.isFavorite) {
       final page = _cache.page;
       if (page != null) {
-        final proposals = List.of(page.items).where((element) => element.selfRef != ref).toList();
+        final proposals =
+            List.of(page.items).where((element) => element.proposal.selfRef != ref).toList();
 
         final updatedPage = page.copyWithItems(proposals);
 
@@ -219,9 +220,9 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     final mappedPage = page.map(
       // TODO(damian-molinski): refactor page to return ProposalWithContext instead.
       (e) => ProposalBrief.fromProposal(
-        e,
+        e.proposal,
         categoryName: campaign.categories
-            .firstWhere((element) => element.selfRef == e.categoryRef)
+            .firstWhere((element) => element.selfRef == e.proposal.categoryRef)
             .categoryText,
       ),
     );

@@ -151,6 +151,8 @@ final class Dependencies extends DependencyProvider {
           get<CommentService>(),
           get<CampaignService>(),
           get<DocumentMapper>(),
+          get<VotingBallotBuilder>(),
+          get<VotingService>(),
         );
       })
       ..registerFactory<NewProposalCubit>(() {
@@ -356,6 +358,7 @@ final class Dependencies extends DependencyProvider {
         get<DocumentRepository>(),
         get<UserService>(),
         get<SignerService>(),
+        get<CampaignService>(),
       );
     });
     registerLazySingleton<CommentService>(() {

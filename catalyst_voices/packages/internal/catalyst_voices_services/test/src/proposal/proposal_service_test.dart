@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 void main() {
+  late MockCampaignService mockCampaignService;
   late MockDocumentRepository mockDocumentRepository;
   late MockProposalRepository mockProposalRepository;
   late MockUserService mockUserService;
@@ -20,12 +21,14 @@ void main() {
     mockProposalRepository = MockProposalRepository();
     mockSignerService = MockSignerService();
     mockUserService = MockUserService();
+    mockCampaignService = MockCampaignService();
 
     proposalService = ProposalService(
       mockProposalRepository,
       mockDocumentRepository,
       mockUserService,
       mockSignerService,
+      mockCampaignService,
     );
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
@@ -74,6 +77,8 @@ void main() {
     });
   });
 }
+
+class MockCampaignService extends Mock implements CampaignService {}
 
 class MockDocumentRepository extends Mock implements DocumentRepository {}
 

@@ -8,11 +8,12 @@ import 'package:rxdart/rxdart.dart';
 /// ProposalService provides proposal-related functionality like: creating and signing proposals,
 /// retrieving proposals data from local storage, which needs to be merged from different document types.
 abstract interface class ProposalService {
-  const factory ProposalService(
+  factory ProposalService(
     ProposalRepository proposalRepository,
     DocumentRepository documentRepository,
     UserService userService,
     SignerService signerService,
+    CampaignService campaignService,
   ) = ProposalServiceImpl;
 
   Future<void> addFavoriteProposal({
@@ -59,7 +60,7 @@ abstract interface class ProposalService {
     required DocumentRef ref,
   });
 
-  Future<Page<Proposal>> getProposalsPage({
+  Future<Page<ProposalWithContext>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
     required ProposalsOrder order,
@@ -148,12 +149,16 @@ final class ProposalServiceImpl implements ProposalService {
   final DocumentRepository _documentRepository;
   final UserService _userService;
   final SignerService _signerService;
+  final CampaignService _campaignService;
 
-  const ProposalServiceImpl(
+  Campaign? _cacheCampaign;
+
+  ProposalServiceImpl(
     this._proposalRepository,
     this._documentRepository,
     this._userService,
     this._signerService,
+    this._campaignService,
   );
 
   @override
@@ -271,14 +276,42 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<Page<Proposal>> getProposalsPage({
+  Future<Page<ProposalWithContext>> getProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
     required ProposalsOrder order,
-  }) {
-    return _proposalRepository
+  }) async {
+    final proposalsPage = await _proposalRepository
         .getProposalsPage(request: request, filters: filters, order: order)
         .then(_mapProposalDataPage);
+    final proposals = proposalsPage.items;
+
+    final categoriesRefs = proposals.map((proposal) => proposal.categoryRef).toSet();
+
+    // If we are getting proposals then campaign needs to be active
+    // Getting hole campaign with list of categories saves time then calling to get each category separately
+    // for each proposal
+    _cacheCampaign ??= await _campaignService.getActiveCampaign();
+
+    final categories = Map<String, CampaignCategory>.fromEntries(
+      categoriesRefs.map((ref) {
+        final category =
+            _cacheCampaign!.categories.firstWhere((category) => category.selfRef == ref);
+        return MapEntry(ref.id, category);
+      }),
+    );
+
+    final proposalsWithContext = proposals
+        .map(
+          (proposal) => ProposalWithContext(
+            proposal: proposal,
+            category: categories[proposal.categoryRef.id]!,
+            user: const ProposalUserContext(),
+          ),
+        )
+        .toList();
+
+    return proposalsPage.copyWithItems(proposalsWithContext);
   }
 
   @override
