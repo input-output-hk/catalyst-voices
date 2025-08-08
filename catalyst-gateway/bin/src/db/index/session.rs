@@ -104,7 +104,7 @@ static VOLATILE_SESSION: OnceLock<Arc<CassandraSession>> = OnceLock::new();
 
 impl CassandraSession {
     /// Initialise the Cassandra Cluster Connections.
-    /// Should be called only ones.
+    /// Should be called only once.
     pub(crate) fn init() {
         let (persistent, volatile) = Settings::cassandra_db_cfg();
         let network = Settings::cardano_network();
