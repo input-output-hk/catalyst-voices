@@ -47,8 +47,8 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   @override
-  Future<void> close() {
-    _cancelProposalSubscriptions();
+  Future<void> close() async {
+    await _cancelProposalSubscriptions();
     return super.close();
   }
 

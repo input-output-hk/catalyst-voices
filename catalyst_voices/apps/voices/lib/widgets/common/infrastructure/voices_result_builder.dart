@@ -20,7 +20,7 @@ typedef ResultChildBuilder<T> = Widget Function(BuildContext context, T data);
 ///
 /// This prevents showing the loading state a split second before going
 /// to the next state.
-class ResultBuilder<S, F> extends StatefulWidget {
+class ResultBuilder<S, F extends Exception> extends StatefulWidget {
   final Result<S, F>? result;
   final ResultChildBuilder<S> successBuilder;
   final ResultChildBuilder<F> failureBuilder;
@@ -40,7 +40,7 @@ class ResultBuilder<S, F> extends StatefulWidget {
   State<ResultBuilder<S, F>> createState() => _ResultBuilderState<S, F>();
 }
 
-class _ResultBuilderState<S, F> extends State<ResultBuilder<S, F>> {
+class _ResultBuilderState<S, F extends Exception> extends State<ResultBuilder<S, F>> {
   Result<S, F>? _result;
   late DateTime _resultUpdatedAt;
   Timer? _updateResultTimer;
