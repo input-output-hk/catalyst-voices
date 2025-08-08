@@ -91,6 +91,12 @@ jobs:
           docker compose -f catalyst-gateway/tests/docker-compose.yml logs rust-tests-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml down
 
+      - name: Running integration API tests
+        if: always()
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
+
       - name: Running integration health tests
         if: always()
         run: |
@@ -104,12 +110,6 @@ jobs:
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml logs schemathesis-runner
-
-      - name: Running integration API tests
-        if: always()
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
-          docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
 
       - name: Collecting reports
         if: always()

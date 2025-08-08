@@ -143,7 +143,7 @@ services:
 
   api-health-tests-runner:
     image: api-health-tests-runner:latest
-    container_name: api-tests-runner
+    container_name: api-health-tests-runner
     environment:
       - CAT_GATEWAY_TEST_URL=http://cat-gateway:3030
       - CAT_GATEWAY_INTERNAL_API_KEY=123
