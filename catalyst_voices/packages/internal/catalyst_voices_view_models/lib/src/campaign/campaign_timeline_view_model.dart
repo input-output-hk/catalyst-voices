@@ -6,29 +6,34 @@ import 'package:equatable/equatable.dart';
 ///
 /// This view model is used to display the timeline of a campaign.
 class CampaignTimelineViewModel extends Equatable {
+  static const List<CampaignPhaseType> offstagePhases = [
+    CampaignPhaseType.reviewRegistration,
+  ];
+
   final String title;
   final String description;
   final DateRange timeline;
-  final CampaignTimelineStage stage;
+  final CampaignPhaseType type;
+
   final bool offstage;
 
   const CampaignTimelineViewModel({
     required this.title,
     required this.description,
     required this.timeline,
-    required this.stage,
+    required this.type,
     this.offstage = false,
   });
 
-  factory CampaignTimelineViewModel.fromModel(CampaignTimeline model) => CampaignTimelineViewModel(
+  factory CampaignTimelineViewModel.fromModel(CampaignPhase model) => CampaignTimelineViewModel(
         title: model.title,
         description: model.description,
         timeline: DateRange(
           from: model.timeline.from,
           to: model.timeline.to,
         ),
-        stage: model.stage,
-        offstage: model.offstage,
+        type: model.type,
+        offstage: offstagePhases.contains(model.type),
       );
 
   @override
@@ -36,7 +41,7 @@ class CampaignTimelineViewModel extends Equatable {
         title,
         description,
         timeline,
-        stage,
+        type,
         offstage,
       ];
 }

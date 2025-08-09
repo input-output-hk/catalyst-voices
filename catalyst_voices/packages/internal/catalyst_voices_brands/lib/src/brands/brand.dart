@@ -23,4 +23,13 @@ enum Brand {
       Brand.catalyst => VoicesAssets.images.catalystLogoIcon,
     };
   }
+
+  AssetGenImage votingBg(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+
+    return switch (this) {
+      Brand.catalyst when brightness == Brightness.dark => VoicesAssets.images.votingBgDark,
+      Brand.catalyst => VoicesAssets.images.votingBgLight,
+    };
+  }
 }

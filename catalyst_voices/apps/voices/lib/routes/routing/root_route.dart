@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,6 +13,12 @@ final class RootRoute extends GoRouteData {
   const RootRoute();
 
   @override
-  FutureOr<String?> redirect(BuildContext context, GoRouterState state) =>
-      const DiscoveryRoute().location;
+  Future<String?> redirect(BuildContext context, GoRouterState state) async {
+    final cubit = context.read<CampaignPhaseAwareCubit>();
+    final phase = await cubit.activeCampaignPhaseType();
+    return switch (phase) {
+      CampaignPhaseType.communityVoting => const VotingRoute().location,
+      _ => const DiscoveryRoute().location,
+    };
+  }
 }

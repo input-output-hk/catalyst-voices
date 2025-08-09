@@ -2,13 +2,11 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_controls.dart';
+import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
+import 'package:catalyst_voices/pages/proposals/widgets/proposals_content.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_header.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_pagination.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_sub_header.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_tabs.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_tabs_divider.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/widgets/layouts/header_and_content_layout.dart';
 import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -17,12 +15,12 @@ import 'package:flutter/material.dart';
 
 class ProposalsPage extends StatefulWidget {
   final SignedDocumentRef? categoryId;
-  final ProposalsFilterType? type;
+  final ProposalsPageTab? tab;
 
   const ProposalsPage({
     super.key,
     this.categoryId,
-    this.type,
+    this.tab,
   });
 
   @override
@@ -35,50 +33,18 @@ class _ProposalsPageState extends State<ProposalsPage>
         ErrorHandlerStateMixin<ProposalsCubit, ProposalsPage>,
         SignalHandlerStateMixin<ProposalsCubit, ProposalsSignal, ProposalsPage> {
   late final TabController _tabController;
-  late final PagingController<ProposalViewModel> _pagingController;
+  late final PagingController<ProposalBrief> _pagingController;
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverPadding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 32).add(const EdgeInsets.only(bottom: 32)),
-          sliver: SliverList(
-            delegate: SliverChildListDelegate(
-              [
-                const SizedBox(height: 16),
-                const ProposalsHeader(),
-                const SizedBox(height: 40),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: Wrap(
-                        alignment: WrapAlignment.spaceBetween,
-                        crossAxisAlignment: WrapCrossAlignment.end,
-                        runSpacing: 10,
-                        children: [
-                          ProposalsTabs(controller: _tabController),
-                          const ProposalsControls(),
-                        ],
-                      ),
-                    ),
-                    const ProposalsTabsDivider(),
-                    const SizedBox(height: 16),
-                    const ProposalsSubHeader(),
-                    const SizedBox(height: 16),
-                    ProposalsPagination(controller: _pagingController),
-                    const SizedBox(height: 12),
-                  ],
-                ),
-              ],
-            ),
-          ),
+    return ProposalSubmissionPhaseAware(
+      activeChild: HeaderAndContentLayout(
+        header: const ProposalsHeader(),
+        content: ProposalsContent(
+          tabController: _tabController,
+          pagingController: _pagingController,
         ),
-      ],
+      ),
     );
   }
 
@@ -86,18 +52,20 @@ class _ProposalsPageState extends State<ProposalsPage>
   void didUpdateWidget(ProposalsPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.categoryId != oldWidget.categoryId || widget.type != oldWidget.type) {
+    final tab = widget.tab ?? ProposalsPageTab.total;
+
+    if (widget.categoryId != oldWidget.categoryId || widget.tab != oldWidget.tab) {
       context.read<ProposalsCubit>().changeFilters(
-            onlyMy: Optional(widget.type?.isMy ?? false),
+            onlyMy: Optional(tab == ProposalsPageTab.my),
             category: Optional(widget.categoryId),
-            type: widget.type ?? ProposalsFilterType.total,
+            type: tab.filter,
           );
 
       _doResetPagination();
     }
 
-    if (widget.type != oldWidget.type) {
-      _tabController.animateTo(widget.type?.index ?? 0);
+    if (widget.tab != oldWidget.tab) {
+      _tabController.animateTo(tab.index);
     }
   }
 
@@ -111,13 +79,13 @@ class _ProposalsPageState extends State<ProposalsPage>
   @override
   void handleSignal(ProposalsSignal signal) {
     switch (signal) {
-      case ChangeCategorySignal(:final to):
+      case ChangeCategoryProposalsSignal(:final to):
         _updateRoute(categoryId: Optional(to?.id));
-      case ChangeFilterTypeSignal(:final type):
-        _updateRoute(filterType: type);
-      case ResetProposalsPaginationSignal():
+      case ChangeTabProposalsSignal(:final tab):
+        _updateRoute(tab: tab);
+      case ResetPaginationProposalsSignal():
         _doResetPagination();
-      case ProposalsPageReadySignal(:final page):
+      case PageReadyProposalsSignal(:final page):
         _pagingController.value = _pagingController.value.copyWith(
           currentPage: page.page,
           maxResults: page.total,
@@ -132,22 +100,23 @@ class _ProposalsPageState extends State<ProposalsPage>
   void initState() {
     super.initState();
 
-    final proposalsFilterType = _determineFilterType();
+    final tab = _determineTab();
 
     _tabController = TabController(
-      initialIndex: proposalsFilterType.index,
-      length: ProposalsFilterType.values.length,
+      initialIndex: tab.index,
+      length: ProposalsPageTab.values.length,
       vsync: this,
     );
+
     _pagingController = PagingController(
       initialPage: 0,
       initialMaxResults: 0,
     );
 
     context.read<ProposalsCubit>().init(
-          onlyMyProposals: widget.type?.isMy ?? false,
+          onlyMyProposals: tab == ProposalsPageTab.my,
           category: widget.categoryId,
-          type: proposalsFilterType,
+          type: tab.filter,
           order: const Alphabetical(),
         );
 
@@ -156,15 +125,16 @@ class _ProposalsPageState extends State<ProposalsPage>
       ..notifyPageRequestListeners(0);
   }
 
-  ProposalsFilterType _determineFilterType() {
+  ProposalsPageTab _determineTab() {
     final isProposerUnlock = context.read<SessionCubit>().state.isProposerUnlock;
-    final requestedType = widget.type;
+    final requestedTab = widget.tab ?? ProposalsPageTab.total;
 
-    if (!isProposerUnlock && (requestedType?.isMy ?? false)) {
-      _updateRoute(filterType: ProposalsFilterType.total);
+    if (!isProposerUnlock && requestedTab == ProposalsPageTab.my) {
+      _updateRoute(tab: ProposalsPageTab.total);
+      return ProposalsPageTab.total;
     }
 
-    return requestedType ?? ProposalsFilterType.total;
+    return requestedTab;
   }
 
   void _doResetPagination() {
@@ -174,7 +144,7 @@ class _ProposalsPageState extends State<ProposalsPage>
   Future<void> _handleProposalsPageRequest(
     int pageKey,
     int pageSize,
-    ProposalViewModel? lastProposalId,
+    ProposalBrief? lastProposalId,
   ) async {
     final request = PageRequest(page: pageKey, size: pageSize);
     await context.read<ProposalsCubit>().getProposals(request);
@@ -182,15 +152,15 @@ class _ProposalsPageState extends State<ProposalsPage>
 
   void _updateRoute({
     Optional<String>? categoryId,
-    ProposalsFilterType? filterType,
+    ProposalsPageTab? tab,
   }) {
     Router.neglect(context, () {
       final effectiveCategoryId = categoryId.dataOr(widget.categoryId?.id);
-      final effectiveType = filterType?.name ?? widget.type?.name;
+      final effectiveTab = tab?.name ?? widget.tab?.name;
 
       ProposalsRoute(
         categoryId: effectiveCategoryId,
-        type: effectiveType,
+        tab: effectiveTab,
       ).replace(context);
     });
   }

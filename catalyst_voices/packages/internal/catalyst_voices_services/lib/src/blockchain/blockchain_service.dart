@@ -3,7 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 
 /// BlockchainService provides blockchain-related functionality.
-// TODO(dtscalac): move most blockchain/wallet related code to here
+// TODO(dt-iohk): move most blockchain/wallet related code to here
 abstract interface class BlockchainService {
   const factory BlockchainService(
     BlockchainRepository blockchainRepository,

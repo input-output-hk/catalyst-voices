@@ -26,6 +26,8 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   final DateTime submissionCloseDate;
 
   const CampaignCategoryDetailsViewModel({
+    required super.id,
+    required super.name,
     required this.subname,
     required this.description,
     required this.shortDescription,
@@ -35,8 +37,6 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
     required this.totalAsk,
     required this.range,
     required this.descriptions,
-    required super.id,
-    required super.name,
     this.dos = const <String>[],
     this.donts = const <String>[],
     required this.submissionCloseDate,
@@ -64,6 +64,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   factory CampaignCategoryDetailsViewModel.fromModel(CampaignCategory model) {
     return CampaignCategoryDetailsViewModel(
       id: model.selfRef,
+      name: model.categoryName,
       subname: model.categorySubname,
       description: model.description,
       shortDescription: model.shortDescription,
@@ -76,7 +77,6 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
       dos: model.dos,
       donts: model.donts,
       submissionCloseDate: model.submissionCloseDate,
-      name: model.categoryName,
     );
   }
 
@@ -95,7 +95,13 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
         description,
         proposalsCount,
         availableFunds,
+        totalAsk,
+        range,
+        descriptions,
         image,
+        dos,
+        donts,
+        submissionCloseDate,
       ];
 }
 

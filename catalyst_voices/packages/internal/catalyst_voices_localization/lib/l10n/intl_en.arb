@@ -68,10 +68,6 @@
   "@accountInstructionsTitle": {
     "description": "Title for the account creation instructions screen"
   },
-  "accountMenuPopupTooltip": "Account menu",
-  "@accountMenuPopupTooltip": {
-    "description": "Tooltip text for account menu popup"
-  },
   "accountRoleDialogButton": "Continue Role setup",
   "@accountRoleDialogButton": {
     "description": "A label on account role dialog's button"
@@ -108,10 +104,6 @@
   "active": "Active",
   "@active": {
     "description": "Activated state"
-  },
-  "activeVotingRound": "Active voting round 14",
-  "@activeVotingRound": {
-    "description": "Title of the voting space."
   },
   "actor": "Actor",
   "@actor": {
@@ -265,9 +257,17 @@
   "@campaignIsLive": {
     "description": "Title of the campaign is live (published) space"
   },
-  "campaignManagement": "Campaign Management",
-  "@campaignManagement": {
-    "description": "Header text for campaign management section"
+  "campaignPhaseCountdownCommunityVoting": "Voting for Fund{fundNumber} opens {date}",
+  "@campaignPhaseCountdownCommunityVoting": {
+    "description": "Title for the community voting countdown",
+    "placeholders": {
+      "fundNumber": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
   },
   "campaignPreviewEventAfter": "After Campaign",
   "@campaignPreviewEventAfter": {
@@ -375,9 +375,14 @@
   "@catalystConditions": {
     "description": "Link to the Catalyst FC's Terms and Conditions"
   },
-  "catalystF14": "Catalyst Fund14",
-  "@catalystF14": {
-    "description": "Used in discovery page in hero section"
+  "catalystFundNo": "Catalyst Fund{fundNumber}",
+  "@catalystFundNo": {
+    "description": "Used in discovery page in hero section",
+    "placeholders": {
+      "fundNumber": {
+        "type": "int"
+      }
+    }
   },
   "catalystId": "Catalyst ID",
   "@catalystId": {
@@ -414,6 +419,10 @@
   "categoryDetails": "Category Details",
   "@categoryDetails": {
     "description": "Header text for category details section"
+  },
+  "categoryProposals": "Category Proposals",
+  "@categoryProposals": {
+    "description": "Title for proposals filtered by a campaign category."
   },
   "categoryRequirements": "Category Requirements:",
   "@categoryRequirements": {
@@ -521,6 +530,10 @@
   "confirmPassword": "Confirm password",
   "@confirmPassword": {
     "description": "Label for password confirmation input field"
+  },
+  "confirmed": "Confirmed",
+  "@confirmed": {
+    "description": "A label when something is final and not provisional."
   },
   "connectingStatusLabelText": "re-connecting",
   "@connectingStatusLabelText": {
@@ -807,6 +820,10 @@
   "@datePickerDaysInMonthError": {
     "description": "Error message for the date picker when the selected day is greater than the maximum days for the selected month."
   },
+  "dayAbbr": "d",
+  "@dayAbbr": {
+    "description": "A single letter abbreviation for day."
+  },
   "days": "{count, plural, =1{Day} other{Days}}",
   "@days": {
     "description": "To represent days",
@@ -819,6 +836,10 @@
   "defaultRole": "Default",
   "@defaultRole": {
     "description": "Related to account role"
+  },
+  "delegationButton": "Delegation",
+  "@delegationButton": {
+    "description": "The label for voting power delegation."
   },
   "delete": "Delete",
   "@delete": {
@@ -1020,6 +1041,10 @@
   "endDate": "End Date",
   "@endDate": {
     "description": "Label for campaign end date"
+  },
+  "ended": "Ended",
+  "@ended": {
+    "description": "General label describing cases like phase has ended"
   },
   "enterPassword": "Enter password",
   "@enterPassword": {
@@ -1334,10 +1359,6 @@
   "@finishes": {
     "description": "Label for the campaign stage finish date"
   },
-  "followed": "Followed",
-  "@followed": {
-    "description": "Refers to a list of followed items."
-  },
   "forgetProposal": "Forget proposal",
   "@forgetProposal": {
     "description": "A label for the forget proposal button. Used to make hide action on document."
@@ -1387,27 +1408,18 @@
       }
     }
   },
-  "fundedProjectSpace": "Funded project space",
-  "@fundedProjectSpace": {
-    "description": "Title of the funded project space"
-  },
-  "fundedProposal": "Funded proposal",
-  "@fundedProposal": {
-    "description": "Label shown on a proposal card indicating that the proposal is funded."
-  },
-  "fundedProposalDate": "Funded {date}",
-  "@fundedProposalDate": {
-    "description": "Indicates date of funding (a proposal).",
+  "fundX": "Fund{fundNumber}",
+  "@fundX": {
+    "description": "Generic text about nr. of fund / campaign",
     "placeholders": {
-      "date": {
-        "type": "DateTime",
-        "format": "yMMMMd"
+      "fundNumber": {
+        "type": "int"
       }
     }
   },
-  "fundingCategories": "Funding categories",
-  "@fundingCategories": {
-    "description": "Label for funding categories section"
+  "fundedProjectSpace": "Funded project space",
+  "@fundedProjectSpace": {
+    "description": "Title of the funded project space"
   },
   "fundsAvailable": "Funds Available",
   "@fundsAvailable": {
@@ -1420,6 +1432,10 @@
   "fundsRequested": "Funds requested",
   "@fundsRequested": {
     "description": "Indicates the amount of ADA requested in a fund on a proposal card."
+  },
+  "getReadyToVote": "Get ready to vote",
+  "@getReadyToVote": {
+    "description": "Label before the voting phase starts."
   },
   "getStarted": "Get Started",
   "@getStarted": {
@@ -1474,6 +1490,10 @@
   "hideAllIssues": "Hide all issues",
   "@hideAllIssues": {
     "description": "Action to hide the full list of issues."
+  },
+  "hourAbbr": "h",
+  "@hourAbbr": {
+    "description": "A single letter abbreviation for hour."
   },
   "hours": "{count, plural, =1{Hour} other{Hours}}",
   "@hours": {
@@ -1549,6 +1569,10 @@
   "inProgress": "In progress",
   "@inProgress": {
     "description": "Indicates to user that status is in progress"
+  },
+  "inVoteList": "In Vote List",
+  "@inVoteList": {
+    "description": "Text indicates that vote on proposal is added to the list but not casted yet"
   },
   "inXDays": "{x, plural, =1{In {x} day} other{In {x} days}}",
   "@inXDays": {
@@ -1639,15 +1663,6 @@
       }
     }
   },
-  "lastUpdateDate": "Last update: {date}.",
-  "@lastUpdateDate": {
-    "description": "Indicates a last update date.",
-    "placeholders": {
-      "date": {
-        "type": "String"
-      }
-    }
-  },
   "latestDocumentVersion": "Latest",
   "@latestDocumentVersion": {
     "description": "When showing different version of proposal we may add suffix indicating this is latest version"
@@ -1716,6 +1731,10 @@
   "minimumAsk": "Minimum Ask",
   "@minimumAsk": {
     "description": "Label for minimum funding request allowed"
+  },
+  "minuteAbbr": "m",
+  "@minuteAbbr": {
+    "description": "A single letter abbreviation for minute."
   },
   "minutes": "{count, plural, =1{Minute} other{Minutes}}",
   "@minutes": {
@@ -1801,6 +1820,10 @@
   "@no": {
     "description": "CTA to cancel something"
   },
+  "noActiveCampaignFound": "We can't find an active campaign.",
+  "@noActiveCampaignFound": {
+    "description": "Error message when no active campaign is found"
+  },
   "noConnectionBannerDescription": "Your internet is playing hide and seek. Check your internet connection, or try again in a moment.",
   "@noConnectionBannerDescription": {
     "description": "Text shown in the No Internet Connection Banner widget for the description below the title."
@@ -1852,7 +1875,7 @@
       }
     }
   },
-  "noOfDraft": "Draft proposals ({count})",
+  "noOfDraft": "Draft proposals · {count}",
   "@noOfDraft": {
     "description": "Tab label for draft proposals in voting space",
     "placeholders": {
@@ -1861,7 +1884,7 @@
       }
     }
   },
-  "noOfFavorites": "Favorites ({count})",
+  "noOfFavorites": "Favorites · {count}",
   "@noOfFavorites": {
     "description": "Tab label for draft proposals in voting space",
     "placeholders": {
@@ -1870,7 +1893,7 @@
       }
     }
   },
-  "noOfFinal": "Final proposals ({count})",
+  "noOfFinal": "Final proposals · {count}",
   "@noOfFinal": {
     "description": "Tab label for final proposals in voting space",
     "placeholders": {
@@ -1879,16 +1902,7 @@
       }
     }
   },
-  "noOfFundedProposals": "Funded proposals ({count})",
-  "@noOfFundedProposals": {
-    "description": "Tab label for funded proposals in funded projects space",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "noOfMyProposals": "My proposals ({count})",
+  "noOfMyProposals": "My proposals · {count}",
   "@noOfMyProposals": {
     "description": "Tab label for my proposals in voting space",
     "placeholders": {
@@ -1897,13 +1911,14 @@
       }
     }
   },
-  "noProposalStateDescription": "Discovery space will show draft proposals you can comment on, currently there are no draft proposals.",
-  "@noProposalStateDescription": {
-    "description": "Description shown when there are no proposals in the proposals tab"
-  },
-  "noProposalStateTitle": "No draft proposals yet",
-  "@noProposalStateTitle": {
-    "description": "Title shown when there are no proposals in the proposals tab"
+  "noOfVotedOn": "Voted On · {count}",
+  "@noOfVotedOn": {
+    "description": "Tab label for voted on proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   },
   "noProposalsToPublish": "You have no proposals to publish, start a new proposal, or create a new iteration of an existing proposal to be able to publish.",
   "@noProposalsToPublish": {
@@ -2292,18 +2307,20 @@
   "@proposalSubmissionClosedDescription": {
     "description": "Text used to gave user more information about proposal submission close stage and what to do next."
   },
-  "proposalSubmissionIsClosed": "Proposal submission  is closed for Fund14.",
+  "proposalSubmissionIsClosed": "Proposal submission is closed for Fund{fundNumber}.",
   "@proposalSubmissionIsClosed": {
-    "description": "Title text when proposal submission is closed."
+    "description": "Title text when proposal submission is closed.",
+    "placeholders": {
+      "fundNumber": {
+        "type": "int"
+      }
+    }
   },
-  "proposalSubmissionStageStartAt": "Proposal submission opens {date} at {time}",
+  "proposalSubmissionStageStartAt": "Proposal submission opens  at {date}",
   "@proposalSubmissionStageStartAt": {
     "description": "Description for the pre-submission stage",
     "placeholders": {
       "date": {
-        "type": "String"
-      },
-      "time": {
         "type": "String"
       }
     }
@@ -2432,6 +2449,10 @@
   "proposerVerboseName": "Main proposer",
   "@proposerVerboseName": {
     "description": "A verbose name for proposer"
+  },
+  "provisional": "Provisional",
+  "@provisional": {
+    "description": "A label when something is provisional / not confirmed."
   },
   "publishButtonText": "Publish",
   "@publishButtonText": {
@@ -2784,6 +2805,10 @@
   "@registrationWalletNotFound": {
     "description": "Error message shown when connect wallet but matching was not found"
   },
+  "removeFromVoteList": "Remove from Vote List",
+  "@removeFromVoteList": {
+    "description": "When vote is added but not casted yet it can be removed."
+  },
   "removeKeychain": "Remove Keychain",
   "@removeKeychain": {
     "description": "Action on Catalyst Keychain card"
@@ -2901,6 +2926,10 @@
   "searchResult": "Search Result",
   "@searchResult": {
     "description": "To show that displayed items comes from search result"
+  },
+  "secondAbbr": "s",
+  "@secondAbbr": {
+    "description": "A single letter abbreviation for second."
   },
   "seconds": "{count, plural, =1{Second} other{Seconds}}",
   "@seconds": {
@@ -3264,9 +3293,9 @@
   "@total": {
     "description": "Text representing total amount"
   },
-  "totalSubmitted": "Total submitted",
-  "@totalSubmitted": {
-    "description": "Label showing total number of submitted proposals"
+  "totalVotingPower": "Total Voting Power",
+  "@totalVotingPower": {
+    "description": "Label for user voting power number"
   },
   "treasuryCampaignBuilderSegments": "Segments",
   "@treasuryCampaignBuilderSegments": {
@@ -3331,6 +3360,10 @@
   "unlockSnackbarTitle": "Catalyst unlocked!",
   "@unlockSnackbarTitle": {
     "description": "The title shown in confirmation snackbar after unlocking the keychain."
+  },
+  "updated": "Updated",
+  "@updated": {
+    "description": "A label when something was last updated."
   },
   "upload": "Upload",
   "@upload": {
@@ -3471,6 +3504,10 @@
   "@viewingOlderDocumentVersion": {
     "description": "After changing document version warning"
   },
+  "viewingOlderDocumentVersionWhileVoting": "You are viewing an older version of this document while voting. Please view the latest version if you want to vote.",
+  "@viewingOlderDocumentVersionWhileVoting": {
+    "description": "Text shown when user is viewing an older version of a document while voting stage is active"
+  },
   "visitCatalystWalletDocumentationTextButton": "Visit Catalyst wallet documentation",
   "@visitCatalystWalletDocumentationTextButton": {
     "description": "Text button to visit catalyst wallet documentation"
@@ -3483,6 +3520,43 @@
   "@visitor": {
     "description": "Refers to user that created keychain but is locked"
   },
+  "voteAbstain": "Abstain",
+  "@voteAbstain": {
+    "description": "Vote abstain on proposal"
+  },
+  "voteList": "Vote List",
+  "@voteList": {
+    "description": "Name of place where user adds votes on proposals"
+  },
+  "voteListButton": "Vote List",
+  "@voteListButton": {
+    "description": "The label for the overview of votes."
+  },
+  "voteYes": "Yes",
+  "@voteYes": {
+    "description": "Vote yes on proposal"
+  },
+  "votedAbstain": "Abstained",
+  "@votedAbstain": {
+    "description": "Voted abstain on proposal"
+  },
+  "votedYes": "Voted Yes",
+  "@votedYes": {
+    "description": "Voted yes on proposal"
+  },
+  "votingEnded": "Voting ended",
+  "@votingEnded": {
+    "description": "Label when the voting phase is closed."
+  },
+  "votingEndsIn": "Ends in {duration}",
+  "@votingEndsIn": {
+    "description": "Label when voting phase ends after the duration.",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "votingForF14StartsIn": "Voting for Fund14 start {date}",
   "@votingForF14StartsIn": {
     "description": "Description for the voting for f14 card in stay involved section",
@@ -3492,6 +3566,56 @@
       }
     }
   },
+  "votingIsClosed": "Voting is closed!",
+  "@votingIsClosed": {
+    "description": "Label when the voting phase is closed."
+  },
+  "votingIsOpen": "Voting is open!",
+  "@votingIsOpen": {
+    "description": "Label when voting phase is active."
+  },
+  "votingListCastVotes": "Cast Votes",
+  "@votingListCastVotes": {
+    "description": "Button text which triggers casting votes"
+  },
+  "votingListLastVotedX": "Last voted: {x}",
+  "@votingListLastVotedX": {
+    "description": "For example when was last vote on proposal",
+    "placeholders": {
+      "x": {
+        "type": "String",
+        "example": "Not yet voted"
+      }
+    }
+  },
+  "votingListNoVotesAdded": "No votes added.",
+  "@votingListNoVotesAdded": {
+    "description": "Part of voting list empty state"
+  },
+  "votingListNoVotesAddedViewProposal": "View proposal details pages to cast votes",
+  "@votingListNoVotesAddedViewProposal": {
+    "description": "Part of voting list empty state"
+  },
+  "votingListNotYetVoted": "Not yet voted",
+  "@votingListNotYetVoted": {
+    "description": "no votes casted yet"
+  },
+  "votingListPendingVotes": "Pending votes not yet cast",
+  "@votingListPendingVotes": {
+    "description": "Disclaimer about proposal votes not casted yet"
+  },
+  "votingOverview": "Voting Overview",
+  "@votingOverview": {
+    "description": "Text shown in voting overview segment"
+  },
+  "votingPhase": "Voting Phase",
+  "@votingPhase": {
+    "description": "Label when the voting phase is active."
+  },
+  "votingPower": "Voting Power",
+  "@votingPower": {
+    "description": "Label for the user's voting power"
+  },
   "votingRegistration": "Voting Registration",
   "@votingRegistration": {
     "description": "Title for registration for voting"
@@ -3499,6 +3623,23 @@
   "votingRegistrationTimelineHeader": "Voting registration:",
   "@votingRegistrationTimelineHeader": {
     "description": "Header for the voting registration timeline"
+  },
+  "votingStarts": "Voting starts",
+  "@votingStarts": {
+    "description": "Label when the voting phase starts."
+  },
+  "votingStartsIn": "in {duration}",
+  "@votingStartsIn": {
+    "description": "Label when voting phase starts after the duration.",
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "votingStatus": "Voting Status",
+  "@votingStatus": {
+    "description": "Text shown in voting status section"
   },
   "votingTimelineHeader": "Voting:",
   "@votingTimelineHeader": {
@@ -3695,6 +3836,15 @@
   "@xCharactersMinimum": {
     "placeholders": {
       "number": {
+        "type": "int"
+      }
+    }
+  },
+  "xVotes": "{count} {count, plural, =0{Votes} =1{Vote} other{Votes}}",
+  "@xVotes": {
+    "description": "Generic text describing number of votes on made. In context of proposals.",
+    "placeholders": {
+      "count": {
         "type": "int"
       }
     }

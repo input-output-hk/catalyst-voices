@@ -91,6 +91,7 @@ class _GlobalPrecacheImagesState extends State<GlobalPrecacheImages> {
       ],
       assets: [
         VoicesAssets.images.bgBubbles,
+        theme.brandAssets.brand.votingBg(context),
       ],
     );
   }

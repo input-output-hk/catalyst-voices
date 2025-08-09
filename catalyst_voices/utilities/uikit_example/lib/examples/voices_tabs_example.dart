@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/common/tab_bar_stack_view.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 class VoicesTabsExample extends StatelessWidget {
@@ -14,11 +14,10 @@ class VoicesTabsExample extends StatelessWidget {
         length: 2,
         child: Column(
           children: [
-            const TabBar(
-              isScrollable: true,
+            const VoicesTabBar(
               tabs: [
-                Tab(text: 'Sections'),
-                Tab(text: 'Comments'),
+                VoicesTab(data: 'sections', child: VoicesTabText('Sections')),
+                VoicesTab(data: 'comments', child: VoicesTabText('Comments')),
               ],
             ),
             Expanded(

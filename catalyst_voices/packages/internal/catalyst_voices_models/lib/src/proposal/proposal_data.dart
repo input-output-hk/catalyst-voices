@@ -2,19 +2,22 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
-class BaseProposalData extends Equatable {
+class ProposalData extends Equatable {
   final ProposalDocument document;
   final ProposalPublish publish;
+  final int commentsCount;
 
-  const BaseProposalData({
+  const ProposalData({
     required this.document,
     required this.publish,
+    this.commentsCount = 0,
   });
 
   @override
   List<Object?> get props => [
         document,
         publish,
+        commentsCount,
       ];
 
   ProposalVersion toProposalVersion() {
@@ -29,46 +32,19 @@ class BaseProposalData extends Equatable {
   }
 }
 
-// TODO(damian-molinski): delete this class and refactor it. categoryName
-// does not make sense here
-class ProposalData extends BaseProposalData {
-  final List<BaseProposalData> versions;
-  final int commentsCount;
-  final String categoryName;
+class ProposalDetailData extends ProposalData {
+  final List<ProposalVersion> versions;
 
-  const ProposalData({
+  const ProposalDetailData({
     required super.document,
     required super.publish,
-    this.commentsCount = 0,
-    this.categoryName = '',
-    this.versions = const [],
+    required this.versions,
+    required super.commentsCount,
   });
-
-  SignedDocumentRef get categoryId => document.metadata.categoryId;
-
-  List<ProposalVersion> get proposalVersions => versions.map((v) => v.toProposalVersion()).toList();
 
   @override
   List<Object?> get props => [
         ...super.props,
-        commentsCount,
-        categoryName,
         versions,
       ];
-
-  SignedDocumentRef get templateRef => document.metadata.templateRef;
-
-  ProposalData copyWith({
-    int? commentsCount,
-    String? categoryName,
-    List<BaseProposalData>? versions,
-  }) {
-    return ProposalData(
-      document: document,
-      publish: publish,
-      commentsCount: commentsCount ?? this.commentsCount,
-      categoryName: categoryName ?? this.categoryName,
-      versions: versions ?? this.versions,
-    );
-  }
 }

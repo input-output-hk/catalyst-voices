@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/pages/treasury/sections/treasury_campaign_widgets.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';

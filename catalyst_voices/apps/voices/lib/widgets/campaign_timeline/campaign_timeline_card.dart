@@ -3,6 +3,7 @@ import 'package:catalyst_voices/widgets/text/campaign_stage_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -23,7 +24,7 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
 
   SvgGenImage get _expandedIcon =>
       _isExpanded ? VoicesAssets.icons.chevronDown : VoicesAssets.icons.chevronRight;
-  bool get _isOngoing => widget.timelineItem.timeline.isTodayInRange();
+  bool get _isOngoing => widget.timelineItem.timeline.isInRange(DateTimeExt.now());
 
   @override
   Widget build(BuildContext context) {
