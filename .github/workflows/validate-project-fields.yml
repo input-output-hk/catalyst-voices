@@ -1,0 +1,20 @@
+name: Validate Project Fields
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+  repository-projects: write
+
+jobs:
+  validate-project-fields:
+    uses: input-output-hk/catalyst-ci/.github/workflows/validate-project-fields.yml@master
+    secrets: inherit
