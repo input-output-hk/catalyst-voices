@@ -28,10 +28,10 @@ project: {
 							}
 							env: {
 								"CARDANO_UTXO_CACHE_SIZE": {
-									value: string | *"480"
+									value: string | *"800"
 								}
 								"CARDANO_NATIVE_ASSETS_CACHE_SIZE": {
-									value: string | *"480"
+									value: string | *"800"
 								}
 								"CHAIN_NETWORK": {
 									value: string | *"Preprod"
