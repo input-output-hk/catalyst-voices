@@ -1,8 +1,10 @@
 //! `FullSignedDoc` struct implementation.
 
+use futures::{Stream, StreamExt};
+
 use super::SignedDocBody;
 use crate::{
-    db::event::EventDB,
+    db::event::{common::query_limits::QueryLimits, signed_docs::DocsQueryFilter, EventDB},
     jinja::{get_template, JinjaTemplateSource},
 };
 
@@ -14,6 +16,13 @@ pub(crate) const SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = JinjaTemplat
     name: "select_signed_documents.jinja.template",
     source: include_str!("./sql/select_signed_documents.sql.jinja"),
 };
+
+/// Filtered select sql query jinja template
+pub(crate) const FILTERED_SELECT_FULL_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource =
+    JinjaTemplateSource {
+        name: "filtered_select_full_signed_documents.sql.jinja.template",
+        source: include_str!("./sql/filtered_select_full_signed_documents.sql.jinja"),
+    };
 
 /// `FullSignedDoc::store` method error.
 #[derive(thiserror::Error, Debug)]
@@ -127,6 +136,28 @@ impl FullSignedDoc {
         let row = EventDB::query_one(&query, &[]).await?;
 
         Self::from_row(id, ver, &row)
+    }
+
+    /// Loads a async stream of `FullSignedDoc` from the event db based on the given
+    /// `conditions`.
+    pub(crate) async fn retrieve_conditions(
+        conditions: &DocsQueryFilter, query_limits: &QueryLimits,
+    ) -> anyhow::Result<impl Stream<Item = anyhow::Result<Self>>> {
+        let query_template = get_template(&FILTERED_SELECT_FULL_SIGNED_DOCS_TEMPLATE)?;
+        let query = query_template.render(serde_json::json!({
+            "conditions": conditions.to_string(),
+            "query_limits": query_limits.to_string(),
+        }))?;
+        let rows = EventDB::query_stream(&query, &[]).await?;
+        let docs = rows.map(|res_row| {
+            res_row.and_then(|row| {
+                let id = row.try_get("id")?;
+                let ver = row.try_get("ver")?;
+
+                FullSignedDoc::from_row(&id, Some(&ver), &row)
+            })
+        });
+        Ok(docs)
     }
 
     /// Returns all signed document fields for the event db queries

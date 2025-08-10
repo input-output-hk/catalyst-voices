@@ -244,7 +244,7 @@ fn sync_subchain(
         params.backoff().await;
 
         // Wait for indexing DB to be ready before continuing.
-        drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
+        CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL).await;
         info!(chain=%params.chain, params=%params,"Starting Chain Indexing Task");
 
         let mut first_indexed_block = params.first_indexed_block.clone();
@@ -491,7 +491,7 @@ impl SyncTask {
         // want to wait do any work they already completed while we were fetching the blockchain.
         //
         // After waiting, we set the liveness flag to true if it is not already set.
-        drop(CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true).await);
+        CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL).await;
 
         info!(chain=%self.cfg.chain, "Indexing DB is ready - Getting recovery state for indexing");
         self.sync_status = get_sync_status().await;
