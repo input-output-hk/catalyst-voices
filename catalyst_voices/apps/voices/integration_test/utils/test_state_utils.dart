@@ -1,10 +1,5 @@
-import 'package:catalyst_voices/routes/routes.dart';
 import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
-
-import '../pageobject/account_dropdown_page.dart';
-import '../pageobject/app_bar_page.dart';
-import '../pageobject/profile_page.dart';
 
 /// Utilities for managing test state between tests
 class TestStateUtils {
@@ -15,7 +10,8 @@ class TestStateUtils {
     PatrolTester $,
     GoRouter router,
   ) async {
-    // Give app time to initialize and restore any previous session
+    throw UnimplementedError('Should use UserService instead');
+    /*// Give app time to initialize and restore any previous session
     await Future<void>.delayed(const Duration(milliseconds: 500));
 
     // Check if user is already logged in (sessionAccountPopupMenuAvatar visible)
@@ -53,6 +49,6 @@ class TestStateUtils {
       print('✅ Clean visitor state confirmed');
     } catch (e) {
       print('⚠️ Not in expected visitor state: $e');
-    }
+    }*/
   }
 }

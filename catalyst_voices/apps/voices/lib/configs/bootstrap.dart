@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/app.dart';
-import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
 import 'package:catalyst_voices/configs/app_bloc_observer.dart';
 import 'package:catalyst_voices/configs/sentry_service.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
@@ -43,22 +42,22 @@ Future<BootstrapArgs> bootstrap({
   environment ??= AppEnvironment.fromEnv();
 
   await _cleanupOldStorages();
-  await registerDependencies(environment: environment, loggingService: _loggingService);
+  await _registerDependencies(environment: environment, loggingService: _loggingService);
   await _initCryptoUtils();
 
   final configSource = ApiConfigSource(Dependencies.instance.get());
   final configService = ConfigService(ConfigRepository(configSource));
   final config = await configService.getAppConfig(env: environment.type);
 
-  registerConfig(config);
+  Dependencies.instance.registerConfig(config);
 
-  router ??= buildAppRouter();
+  router ??= _buildAppRouter();
 
   // Observer is very noisy on Logger. Enable it only if you want to debug
   // something
   Bloc.observer = AppBlocObserver(logOnChange: false);
 
-  Dependencies.instance.get<SyncManager>().start().ignore();
+  // Dependencies.instance.get<SyncManager>().start().ignore();
 
   return BootstrapArgs(
     routerConfig: router,
@@ -84,37 +83,12 @@ Future<void> bootstrapAndRun(
   );
 }
 
-// TODO(damian-molinski): Add Isolate.current.addErrorListener
-@visibleForTesting
-GoRouter buildAppRouter({
+GoRouter _buildAppRouter({
   String? initialLocation,
 }) {
   return AppRouterFactory.create(
     initialLocation: initialLocation,
   );
-}
-
-@visibleForTesting
-void registerConfig(AppConfig config) {
-  Dependencies.instance.registerConfig(config);
-}
-
-@visibleForTesting
-Future<void> registerDependencies({
-  AppEnvironment environment = const AppEnvironment.dev(),
-  LoggingService? loggingService,
-}) async {
-  if (!Dependencies.instance.isInitialized) {
-    await Dependencies.instance.init(
-      environment: environment,
-      loggingService: loggingService,
-    );
-  }
-}
-
-@visibleForTesting
-Future<void> restartDependencies() async {
-  await Dependencies.instance.reset;
 }
 
 Future<void> _cleanupOldStorages() async {
@@ -131,9 +105,10 @@ Future<void> _doBootstrapAndRun(
   AppEnvironment environment,
   BootstrapWidgetBuilder builder,
 ) async {
-  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  AppSplashScreenManager.preserveSplashScreen(widgetsBinding);
+  // final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  // AppSplashScreenManager.preserveSplashScreen(widgetsBinding);
 
+  // TODO(damian-molinski): Add Isolate.current.addErrorListener
   FlutterError.onError = _reportFlutterError;
   PlatformDispatcher.instance.onError = _reportPlatformDispatcherError;
 
@@ -149,6 +124,18 @@ Future<void> _initCryptoUtils() async {
   CatalystPrivateKey.factory = const Bip32Ed25519XCatalystPrivateKeyFactory();
   CatalystPublicKey.factory = const Bip32Ed25519XCatalystPublicKeyFactory();
   CatalystSignature.factory = const Bip32Ed25519XCatalystSignatureFactory();
+}
+
+Future<void> _registerDependencies({
+  AppEnvironment environment = const AppEnvironment.dev(),
+  LoggingService? loggingService,
+}) async {
+  if (!Dependencies.instance.isInitialized) {
+    await Dependencies.instance.init(
+      environment: environment,
+      loggingService: loggingService,
+    );
+  }
 }
 
 Future<void> _reportBootstrapError(Object error, StackTrace stack) async {
