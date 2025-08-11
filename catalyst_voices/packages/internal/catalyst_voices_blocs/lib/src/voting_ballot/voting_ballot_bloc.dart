@@ -84,7 +84,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     _phaseProgressTimer?.cancel();
     _phaseProgressTimer = null;
 
-    _watchedCastedVotesSub?.cancel();
+    await _watchedCastedVotesSub?.cancel();
     _watchedCastedVotesSub = null;
 
     return super.close();
