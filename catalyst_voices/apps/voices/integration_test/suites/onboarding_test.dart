@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/app/view/app.dart';
-import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart' as blocs;
 import 'package:flutter_test/flutter_test.dart';
@@ -24,25 +23,22 @@ import '../pageobject/onboarding/create_flow/step_9_writedown_seedphrase_info.da
 import '../pageobject/onboarding/onboarding_base_page.dart';
 import '../pageobject/onboarding/step_1_get_started.dart';
 import '../types/password_validation_states.dart';
-import '../utils/bootstrap_utils.dart';
 import '../utils/test_context.dart';
 
 void main() async {
   late final GoRouter router;
 
   setUpAll(() async {
-    router = buildAppRouter();
+    router = AppRouterFactory.create();
 
     blocs.alwaysAllowRegistration = true;
   });
 
   setUp(() async {
-    await registerForTests();
     router.go(const DiscoveryRoute().location);
   });
 
   tearDown(() async {
-    await restartForTests();
     TestContext.clearContext();
   });
 
