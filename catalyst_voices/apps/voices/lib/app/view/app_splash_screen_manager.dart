@@ -29,6 +29,7 @@ class AppSplashScreenManager extends StatefulWidget {
   }
 }
 
+// TODO(damian-molinski): await SyncManager completion
 class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     with SingleTickerProviderStateMixin {
   @override

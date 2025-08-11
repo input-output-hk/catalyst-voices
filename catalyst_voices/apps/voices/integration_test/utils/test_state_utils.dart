@@ -1,8 +1,17 @@
+import 'package:catalyst_voices/dependency/dependencies.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 /// Utilities for managing test state between tests
 class TestStateUtils {
+  static Future<void> clearAccounts() async {
+    final service = Dependencies.instance.get<UserService>();
+
+    await service.removeAllAccounts();
+  }
+
   /// Helper method to ensure we start from a clean visitor state
   /// This checks if user is logged in and logs them out if needed
   /// NOTE: App must already be pumped before calling this function
@@ -50,5 +59,11 @@ class TestStateUtils {
     } catch (e) {
       print('⚠️ Not in expected visitor state: $e');
     }*/
+  }
+
+  static Future<void> switchToAccount(Account account) async {
+    final service = Dependencies.instance.get<UserService>();
+
+    await service.useAccount(account);
   }
 }

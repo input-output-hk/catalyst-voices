@@ -214,7 +214,7 @@ void main() {
       final user = User.optional(accounts: [lastAccount]);
       await userRepository.saveUser(user);
 
-      await service.useLastAccount();
+      await service.useLocalUser();
 
       // Then
       expect(service.user.activeAccount, lastAccount);
@@ -224,7 +224,7 @@ void main() {
       // Given
 
       // When
-      await service.useLastAccount();
+      await service.useLocalUser();
 
       // Then
       expect(service.user.activeAccount, isNull);
@@ -245,7 +245,7 @@ void main() {
       final user = User.optional(accounts: [account]);
       await userRepository.saveUser(user);
 
-      await service.useLastAccount();
+      await service.useLocalUser();
 
       // Then
       expect(service.user.activeAccount, isNotNull);
@@ -271,7 +271,7 @@ void main() {
         // When
         await userRepository.saveUser(initialUser);
 
-        await service.useLastAccount();
+        await service.useLocalUser();
 
         await service.updateSettings(settings);
 
@@ -305,7 +305,7 @@ void main() {
         );
 
         // Then
-        await service.useLastAccount();
+        await service.useLocalUser();
 
         await service.updateSettings(settings);
 
@@ -378,7 +378,7 @@ void main() {
         when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
         when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
 
-        await service.useLastAccount();
+        await service.useLocalUser();
         await service.updateActiveAccountDetails();
 
         // Then
@@ -416,7 +416,7 @@ void main() {
           ),
         );
 
-        await service.useLastAccount();
+        await service.useLocalUser();
         await service.updateActiveAccountDetails();
 
         // Then
@@ -447,7 +447,7 @@ void main() {
         when(() => userRepository.getAccountPublicProfile())
             .thenAnswer((_) => Future.value(publicProfile));
 
-        await service.useLastAccount();
+        await service.useLocalUser();
         await service.updateActiveAccountDetails();
 
         // Then

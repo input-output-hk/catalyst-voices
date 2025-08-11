@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/app.dart';
+import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
 import 'package:catalyst_voices/configs/app_bloc_observer.dart';
 import 'package:catalyst_voices/configs/sentry_service.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
@@ -42,7 +43,7 @@ Future<BootstrapArgs> bootstrap({
   environment ??= AppEnvironment.fromEnv();
 
   await _cleanupOldStorages();
-  await _registerDependencies(environment: environment, loggingService: _loggingService);
+  await Dependencies.instance.init(environment: environment, loggingService: _loggingService);
   await _initCryptoUtils();
 
   final configSource = ApiConfigSource(Dependencies.instance.get());
@@ -57,7 +58,7 @@ Future<BootstrapArgs> bootstrap({
   // something
   Bloc.observer = AppBlocObserver(logOnChange: false);
 
-  // Dependencies.instance.get<SyncManager>().start().ignore();
+  Dependencies.instance.get<SyncManager>().start().ignore();
 
   return BootstrapArgs(
     routerConfig: router,
@@ -105,8 +106,8 @@ Future<void> _doBootstrapAndRun(
   AppEnvironment environment,
   BootstrapWidgetBuilder builder,
 ) async {
-  // final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  // AppSplashScreenManager.preserveSplashScreen(widgetsBinding);
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  AppSplashScreenManager.preserveSplashScreen(widgetsBinding);
 
   // TODO(damian-molinski): Add Isolate.current.addErrorListener
   FlutterError.onError = _reportFlutterError;
@@ -124,18 +125,6 @@ Future<void> _initCryptoUtils() async {
   CatalystPrivateKey.factory = const Bip32Ed25519XCatalystPrivateKeyFactory();
   CatalystPublicKey.factory = const Bip32Ed25519XCatalystPublicKeyFactory();
   CatalystSignature.factory = const Bip32Ed25519XCatalystSignatureFactory();
-}
-
-Future<void> _registerDependencies({
-  AppEnvironment environment = const AppEnvironment.dev(),
-  LoggingService? loggingService,
-}) async {
-  if (!Dependencies.instance.isInitialized) {
-    await Dependencies.instance.init(
-      environment: environment,
-      loggingService: loggingService,
-    );
-  }
 }
 
 Future<void> _reportBootstrapError(Object error, StackTrace stack) async {
