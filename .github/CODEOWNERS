@@ -2,6 +2,14 @@
 
 /catalyst_voices/ @dt-iohk @damian-molinski @LynxLynxx
 
+/catalyst_voices/packages/libs/catalyst_cardano/ @stevenj @neil-iohk @nathanbogale @damian-molinski 
+
+/catalyst_voices/packages/libs/catalyst_cardano_serialization/ @stevenj @neil-iohk @nathanbogale @damian-molinski 
+
+/catalyst_voices/packages/libs/catalyst_key_derivation/ @stevenj @neil-iohk @nathanbogale @damian-molinski 
+
+/catalyst_voices/packages/internal/catalyst_voices_services/lib/src/registration/ @stevenj @neil-iohk @nathanbogale @damian-molinski 
+
 /catalyst-gateway/ @stevenj @Mr-Leshiy @cong-or @saibatizoku @bkioshn @stanislav-tkach
 
 /catalyst-gateway/bin/src/metrics @jmgilman

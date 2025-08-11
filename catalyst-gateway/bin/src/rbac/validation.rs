@@ -84,7 +84,7 @@ async fn update_chain(
     let origin = reg.origin().to_owned();
 
     // Try to add a new registration to the chain.
-    let new_chain = chain.update(reg).map_err(|_| {
+    let new_chain = chain.update(reg).ok_or_else(|| {
         RbacValidationError::InvalidRegistration {
             catalyst_id: catalyst_id.clone(),
             purpose,
@@ -141,7 +141,7 @@ async fn start_new_chain(
     let report = reg.report().to_owned();
 
     // Try to start a new chain.
-    let new_chain = RegistrationChain::new(reg).map_err(|_| {
+    let new_chain = RegistrationChain::new(reg).ok_or_else(|| {
         if let Some(catalyst_id) = catalyst_id {
             RbacValidationError::InvalidRegistration {
                 catalyst_id,
