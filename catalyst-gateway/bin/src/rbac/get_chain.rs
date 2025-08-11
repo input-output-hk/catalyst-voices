@@ -114,7 +114,7 @@ pub async fn build_rbac_chain(
     )
     .await?;
 
-    let chain = RegistrationChain::new(root)?;
+    let chain = RegistrationChain::new(root).context("Failed to start registration chain")?;
     let chain = apply_regs(chain, regs).await?;
     Ok(Some(chain))
 }
@@ -132,7 +132,9 @@ pub async fn apply_regs(
             continue;
         }
         let reg = cip509(network, reg.slot_no.into(), reg.txn_index.into()).await?;
-        chain = chain.update(reg)?;
+        chain = chain
+            .update(reg)
+            .context("Failed to update registration chain")?;
     }
 
     Ok(chain)
