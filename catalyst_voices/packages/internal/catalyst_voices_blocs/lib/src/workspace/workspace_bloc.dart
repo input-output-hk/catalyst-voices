@@ -218,7 +218,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       _cachedCampaign ??= await _campaignService.getActiveCampaign();
       final category =
           _cachedCampaign?.categories.firstWhere((e) => e.selfRef.id == proposal.categoryRef.id);
-      return UsersProposalOverview.fromProposal(proposal, fundNumber, category?.formattedCategoryName ?? '');
+      return UsersProposalOverview.fromProposal(
+        proposal,
+        fundNumber,
+        category?.formattedCategoryName ?? '',
+      );
     }).toList();
 
     return Future.wait(futures);
