@@ -85,6 +85,20 @@ pub(crate) struct GetTxoByStakeAddressQuery {
     pub value: Arc<RwLock<GetTxoByStakeAddressQueryValue>>,
 }
 
+impl GetTxoByStakeAddressQuery {
+    /// Returns true if the UTXO has been already spent.
+    pub(crate) fn is_spent(&self) -> bool {
+        let query = self.value.read().unwrap_or_else(|error| {
+            error!(
+                %error,
+                "UTXO entry is poisoned, recovering.");
+            self.value.clear_poison();
+            error.into_inner()
+        });
+        query.spent_slot.is_some()
+    }
+}
+
 // Convert from flat result into result which doesn't need to clone all its data
 // everywhere.
 impl From<GetTxoByStakeAddressQueryInner> for GetTxoByStakeAddressQuery {
