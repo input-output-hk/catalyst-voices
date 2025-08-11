@@ -62,9 +62,9 @@ class _Captions extends StatelessWidget {
 
     return switch (progress.status) {
       CampaignPhaseStatus.upcoming =>
-        context.l10n.votingStartsIn(_formatDuration(context, progress.phaseEndsIn)),
+        context.l10n.votingStartsIn(_formatDuration(context, progress.currentPhaseEndsIn)),
       CampaignPhaseStatus.active =>
-        context.l10n.votingEndsIn(_formatDuration(context, progress.phaseEndsIn)),
+        context.l10n.votingEndsIn(_formatDuration(context, progress.currentPhaseEndsIn)),
       CampaignPhaseStatus.post => '--',
     };
   }
@@ -144,7 +144,7 @@ class _VotingPhaseProgressCard extends StatelessWidget {
           const SizedBox(height: 4),
           _DateRange(dateRange: votingPhase?.votingDateRange),
           const Spacer(),
-          _ProgressBar(value: votingPhase?.progressValue ?? 0),
+          _ProgressBar(value: votingPhase?.currentPhaseProgress ?? 0),
           const SizedBox(height: 6),
           _Captions(progress: votingPhase),
         ],
