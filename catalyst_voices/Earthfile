@@ -109,7 +109,6 @@ generate-internal-docs:
 # Run unit tests
 test-unit-native:
     FROM +code-generator
-    RUN apt-get install libsqlite3-0
     DO flutter-ci+UNIT_TESTS --PLATFORM=native --REPORT=true
 
 test-unit-web:
