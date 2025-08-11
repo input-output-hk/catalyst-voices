@@ -34,6 +34,7 @@ abstract interface class RegistrationService {
     ShelleyAddress? address,
     AccountPublicStatus? publicStatus,
     bool isActive,
+    bool unlocked,
   });
 
   /// Creates a dummy [Account] using [Account.dummySeedPhrase] and other
@@ -133,6 +134,7 @@ final class RegistrationServiceImpl implements RegistrationService {
     ShelleyAddress? address,
     AccountPublicStatus? publicStatus,
     bool isActive = false,
+    bool unlocked = true,
   }) async {
     keychainId ??= const Uuid().v4();
 
@@ -142,6 +144,10 @@ final class RegistrationServiceImpl implements RegistrationService {
     await keychain.setLock(lockFactor);
     await keychain.unlock(lockFactor);
     await keychain.setMasterKey(masterKey);
+
+    if (!unlocked) {
+      await keychain.lock();
+    }
 
     final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
       masterKey: masterKey,
