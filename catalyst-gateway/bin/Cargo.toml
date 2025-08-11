@@ -15,7 +15,7 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
-cardano-chain-follower = { version = "0.0.10", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower-v0.0.10" }
+cardano-chain-follower = { version = "0.0.10", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower/v0.0.10-f14.1" }
 rbac-registration = { version = "0.0.5", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower-v0.0.10" }
 catalyst-types = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250724-01" }
 cardano-blockchain-types = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250724-01" }
