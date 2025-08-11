@@ -5,16 +5,10 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_services/src/registration/registration_transaction_role.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/foundation.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
 final _logger = Logger('RegistrationService');
-
-/* cSpell:disable */
-final _testNetAddress = ShelleyAddress.fromBech32(
-  'addr_test1vzpwq95z3xyum8vqndgdd'
-  '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
-);
-/* cSpell:enable */
 
 // TODO(damian-molinski): Merge it with UserService
 abstract interface class RegistrationService {
@@ -27,6 +21,24 @@ abstract interface class RegistrationService {
     KeyDerivationService keyDerivationService,
     BlockchainConfig blockchainConfig,
   ) = RegistrationServiceImpl;
+
+  /// For testing only. Low level function with max control over [Account] creation.
+  @visibleForTesting
+  Future<Account> createAccount({
+    required SeedPhrase seedPhrase,
+    required LockFactor lockFactor,
+    String? email,
+    String? username,
+    String? keychainId,
+    Set<AccountRole>? roles,
+    ShelleyAddress? address,
+    AccountPublicStatus? publicStatus,
+    bool isActive,
+  });
+
+  /// Creates a dummy [Account] using [Account.dummySeedPhrase] and other
+  /// dummy properties.
+  Future<Account> createDummyAccount();
 
   /// Creates new unlocked [Keychain] and populates it with master key from
   /// [seedPhrase].
@@ -82,12 +94,6 @@ abstract interface class RegistrationService {
     required AccountSubmitFullData data,
   });
 
-  Future<Account> registerTestAccount({
-    required String keychainId,
-    required SeedPhrase seedPhrase,
-    required LockFactor lockFactor,
-  });
-
   /// Sends [unsignedTx] via [wallet] in to the blockchain.
   Future<WalletInfo> submitTransaction({
     required CardanoWallet wallet,
@@ -114,6 +120,64 @@ final class RegistrationServiceImpl implements RegistrationService {
     this._keyDerivationService,
     this._blockchainConfig,
   );
+
+  @override
+  @visibleForTesting
+  Future<Account> createAccount({
+    required SeedPhrase seedPhrase,
+    required LockFactor lockFactor,
+    String? email,
+    String? username,
+    String? keychainId,
+    Set<AccountRole>? roles,
+    ShelleyAddress? address,
+    AccountPublicStatus? publicStatus,
+    bool isActive = false,
+  }) async {
+    keychainId ??= const Uuid().v4();
+
+    final masterKey = await _keyDerivationService.deriveMasterKey(seedPhrase: seedPhrase);
+
+    final keychain = await _keychainProvider.create(keychainId);
+    await keychain.setLock(lockFactor);
+    await keychain.unlock(lockFactor);
+    await keychain.setMasterKey(masterKey);
+
+    final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
+      masterKey: masterKey,
+      role: AccountRole.root,
+    );
+
+    return keyPair.use((keyPair) {
+      final role0key = keyPair.publicKey;
+
+      final catalystId = CatalystId(
+        host: _blockchainConfig.host.host,
+        username: username,
+        role0Key: role0key.publicKeyBytes,
+      );
+
+      return Account(
+        catalystId: catalystId,
+        email: email,
+        keychain: keychain,
+        roles: roles ?? {AccountRole.voter, AccountRole.proposer},
+        address: address,
+        publicStatus: publicStatus ?? AccountPublicStatus.notSetup,
+        isActive: isActive,
+      );
+    });
+  }
+
+  @override
+  Future<Account> createDummyAccount() {
+    return createAccount(
+      seedPhrase: Account.dummySeedPhrase,
+      lockFactor: Account.dummyUnlockFactor,
+      keychainId: Account.dummyKeychainId,
+      address: Account.dummyTestNetAddress,
+    );
+  }
 
   @override
   Future<Keychain> createKeychain({
@@ -313,46 +377,6 @@ final class RegistrationServiceImpl implements RegistrationService {
       _logger.severe('RegistrationTransaction: ', error, stackTrace);
       throw const RegistrationTransactionException();
     }
-  }
-
-  @override
-  Future<Account> registerTestAccount({
-    required String keychainId,
-    required SeedPhrase seedPhrase,
-    required LockFactor lockFactor,
-  }) async {
-    final roles = {AccountRole.voter, AccountRole.proposer};
-    final masterKey = await _keyDerivationService.deriveMasterKey(
-      seedPhrase: seedPhrase,
-    );
-
-    final keychain = await _keychainProvider.create(keychainId);
-    await keychain.setLock(lockFactor);
-    await keychain.unlock(lockFactor);
-    await keychain.setMasterKey(masterKey);
-
-    final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
-      masterKey: masterKey,
-      role: AccountRole.root,
-    );
-
-    return keyPair.use((keyPair) {
-      final role0key = keyPair.publicKey;
-
-      final catalystId = CatalystId(
-        host: _blockchainConfig.host.host,
-        username: 'Dummy',
-        role0Key: role0key.publicKeyBytes,
-      );
-
-      return Account(
-        catalystId: catalystId,
-        keychain: keychain,
-        roles: roles,
-        address: _testNetAddress,
-        publicStatus: AccountPublicStatus.notSetup,
-      );
-    });
   }
 
   @override
