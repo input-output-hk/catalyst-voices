@@ -1,4 +1,5 @@
 //! `API` Utility operations
+pub(crate) mod cache;
 pub(crate) mod catch_panic;
 pub(crate) mod convert;
 pub(crate) mod health;
