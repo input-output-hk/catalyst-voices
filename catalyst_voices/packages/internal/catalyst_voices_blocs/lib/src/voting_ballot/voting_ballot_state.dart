@@ -6,12 +6,14 @@ final class VotingBallotState extends Equatable {
   final VotingListUserSummaryData userSummary;
   final List<VotingListTileData> tiles;
   final VotingListFooterData footer;
+  final int votesCount;
 
   const VotingBallotState({
     this.votingProgress = const VotingListCampaignPhaseData(),
     this.userSummary = const VotingListUserSummaryData(),
     this.tiles = const [],
     this.footer = const VotingListFooterData(),
+    this.votesCount = 0,
   });
 
   @override
@@ -20,6 +22,7 @@ final class VotingBallotState extends Equatable {
         userSummary,
         tiles,
         footer,
+        votesCount,
       ];
 
   VotingBallotState copyWith({
@@ -27,12 +30,14 @@ final class VotingBallotState extends Equatable {
     VotingListUserSummaryData? userSummary,
     List<VotingListTileData>? tiles,
     VotingListFooterData? footer,
+    int? votesCount,
   }) {
     return VotingBallotState(
       votingProgress: votingProgress ?? this.votingProgress,
       userSummary: userSummary ?? this.userSummary,
       tiles: tiles ?? this.tiles,
       footer: footer ?? this.footer,
+      votesCount: votesCount ?? this.votesCount,
     );
   }
 }

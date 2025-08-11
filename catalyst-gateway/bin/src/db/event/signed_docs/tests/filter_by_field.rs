@@ -6,8 +6,9 @@ macro_rules! filter_by_field {
     ($doc:expr, $field:expr, $with_method:ident) => {
         #[allow(clippy::indexing_slicing)]
         if let Some(meta) = $doc.metadata() {
-            let id = uuid::Uuid::from_str(meta[$field]["id"].clone().as_str().unwrap()).unwrap();
-            let ver = uuid::Uuid::from_str(meta[$field]["ver"].clone().as_str().unwrap()).unwrap();
+            let id = uuid::Uuid::from_str(meta[$field][0]["id"].clone().as_str().unwrap()).unwrap();
+            let ver =
+                uuid::Uuid::from_str(meta[$field][0]["ver"].clone().as_str().unwrap()).unwrap();
 
             // With id
             let filter = DocsQueryFilter::all().$with_method(DocumentRef {
