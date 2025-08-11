@@ -100,7 +100,9 @@ async fn reg_chain(
         .into_iter()
         .chain(invalid_volatile)
         .filter(|r| r.slot_no >= first_invalid_slot.into())
-        .sorted_by(|a, b| (a.slot_no, a.txn_index).cmp(&(b.slot_no, b.txn_index)))
+        // Note: the sort order is reversed here `|a, b| b.cmp(a)` because by default the ascending
+        // order is used, and we want the opposite (latest slots first).
+        .sorted_by(|a, b| (b.slot_no, b.txn_index).cmp(&(a.slot_no, a.txn_index)))
         .map(Into::into)
         .collect::<Vec<_>>()
         .into();
