@@ -1,7 +1,8 @@
 //! Cache for TXO Assets by Stake Address Queries
 use std::sync::{Arc, LazyLock};
 
-use moka::{ops::compute::Op, policy::EvictionPolicy, sync::Cache};
+use moka::policy::EvictionPolicy;
+use tracing::{debug, error};
 
 use crate::{
     db::{
@@ -12,17 +13,19 @@ use crate::{
         types::DbStakeAddress,
     },
     metrics::caches::txo_assets::{txo_assets_hits_inc, txo_assets_misses_inc},
+    service::utilities::cache::CacheWrapper,
     settings::Settings,
 };
 
 /// In memory cache of the most recent Cardano TXO assets by Stake Address.
-static ASSETS_CACHE: LazyLock<Cache<DbStakeAddress, Arc<Vec<GetTxoByStakeAddressQuery>>>> =
+static ASSETS_CACHE: LazyLock<CacheWrapper<DbStakeAddress, Arc<Vec<GetTxoByStakeAddressQuery>>>> =
     LazyLock::new(|| {
-        Cache::builder()
-            .name("Cardano TXO Assets")
-            .eviction_policy(EvictionPolicy::lru())
-            .max_capacity(Settings::cardano_assets_cache().utxo_cache_size())
-            .build()
+        let max_capacity = Settings::cardano_assets_cache().utxo_cache_size();
+        CacheWrapper::new(
+            "Cardano UTXO Assets Cache",
+            EvictionPolicy::lru(),
+            max_capacity,
+        )
     });
 
 /// Get TXO Assets entry from Cache.
@@ -41,8 +44,26 @@ pub(crate) fn insert(stake_address: DbStakeAddress, rows: Arc<Vec<GetTxoByStakeA
     ASSETS_CACHE.insert(stake_address, rows);
 }
 
+/// Empty the TXO Assets cache.
+pub(crate) fn drop() {
+    ASSETS_CACHE.clear_cache();
+}
+
+/// Size of TXO Assets cache.
+pub(crate) fn size() -> u64 {
+    ASSETS_CACHE.size()
+}
+/// Number of entries in TXO Assets cache.
+pub(crate) fn entry_count() -> u64 {
+    ASSETS_CACHE.entry_count()
+}
+
 /// Update spent TXO Assets in Cache.
 pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
+    // Exit if cache is not enabled.
+    if !ASSETS_CACHE.is_enabled() {
+        return;
+    }
     for txo_update in params {
         let stake_address = &txo_update.stake_address;
         let update_key = &GetTxoByStakeAddressQueryKey {
@@ -50,62 +71,53 @@ pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
             txo: txo_update.txo,
             slot_no: txo_update.slot_no,
         };
-        let _entry = ASSETS_CACHE
-            .entry(stake_address.clone())
-            .and_compute_with(|maybe_entry| {
-                maybe_entry.map_or_else(
-                    || {
-                        tracing::debug!(
-                        ?txo_update,
-                        %stake_address,
-                        "Stake Address not found in TXO Assets Cache, cannot update.");
-                    },
-                    |entry| {
-                        if let Some(txo) = entry
-                            .into_value()
-                            .iter()
-                            .find(|t| t.key.as_ref() == update_key)
-                        {
-                            let mut value = txo.value.write().unwrap_or_else(|error| {
-                                tracing::error!(
-                                ?txo_update,
-                                %stake_address,
-                                %error,
-                                cache_name = ?ASSETS_CACHE.name(),
-                                "RwLock for cache entry is poisoned, recovering.");
-                                txo.value.clear_poison();
-                                error.into_inner()
-                            });
-                            value.spent_slot = Some(txo_update.spent_slot);
-                            tracing::debug!(
-                            ?txo_update,
-                            %stake_address,
-                            "Updated TXO for Stake Address in Assets Cache");
-                        } else {
-                            tracing::debug!(
-                            ?txo_update,
-                            %stake_address,
-                            "TXOs not found for Stake Address in Assets Cache");
-                        }
-                    },
-                );
-                Op::Nop
-            });
+        let Some(txo_rows) = ASSETS_CACHE.get(stake_address) else {
+            debug!(
+                %stake_address,
+                txn_index = i16::from(txo_update.txn_index),
+                txo = i16::from(txo_update.txo),
+                slot_no = u64::from(txo_update.slot_no),
+                "Stake Address not found in TXO Assets Cache, cannot update.");
+            continue;
+        };
+        let Some(txo) = txo_rows.iter().find(|tx| tx.key.as_ref() == update_key) else {
+            debug!(
+                %stake_address,
+                txn_index = i16::from(update_key.txn_index),
+                txo = i16::from(update_key.txo),
+                slot_no = u64::from(update_key.slot_no),
+                "TXO for Stake Address does not exist, cannot update.");
+            continue;
+        };
+        // Avoid writing if txo has already been spent,
+        if txo.is_spent() {
+            debug!(
+                %stake_address,
+                txn_index = i16::from(update_key.txn_index),
+                txo = i16::from(update_key.txo),
+                slot_no = u64::from(update_key.slot_no),
+                "TXO for Stake Address was already spent!");
+            continue;
+        }
+
+        let mut value = txo.value.write().unwrap_or_else(|error| {
+            error!(
+                %stake_address,
+                txn_index = i16::from(update_key.txn_index),
+                txo = i16::from(update_key.txo),
+                slot_no = u64::from(update_key.slot_no),
+                %error,
+                "RwLock for cache entry is poisoned, recovering.");
+            txo.value.clear_poison();
+            error.into_inner()
+        });
+        // update spent_slot in cache
+        value.spent_slot.replace(txo_update.spent_slot);
+        debug!(
+            %stake_address,
+            txn_index = i16::from(update_key.txn_index),
+            txo = i16::from(update_key.txo),
+            slot_no = u64::from(update_key.slot_no),
+            "Updated TXO for Stake Address");
     }
-}
-
-/// Empty the TXO Assets cache.
-pub(crate) fn drop() {
-    ASSETS_CACHE.invalidate_all();
-}
-
-/// Size of TXO Assets cache.
-pub(crate) fn size() -> u64 {
-    ASSETS_CACHE.run_pending_tasks();
-    ASSETS_CACHE.weighted_size()
-}
-/// Number of entries in TXO Assets cache.
-pub(crate) fn entry_count() -> u64 {
-    ASSETS_CACHE.run_pending_tasks();
-    ASSETS_CACHE.entry_count()
 }
