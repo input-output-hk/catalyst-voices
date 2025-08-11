@@ -22,8 +22,7 @@ void main() {
       final actual = viewModel.progress(now);
       final expected = VotingPhaseProgressDetailsViewModel(
         status: CampaignPhaseStatus.upcoming,
-        start: DateTime.utc(2025, 6),
-        end: DateTime.utc(2025, 7, 10),
+        votingDateRange: viewModel.votingDateRange,
         phaseEndsIn: const Duration(hours: 720),
         progressValue: 0.23076,
       );
@@ -48,8 +47,7 @@ void main() {
       final actual = viewModel.progress(now);
       final expected = VotingPhaseProgressDetailsViewModel(
         status: CampaignPhaseStatus.active,
-        start: DateTime.utc(2025, 7, 10),
-        end: DateTime.utc(2025, 7, 21),
+        votingDateRange: viewModel.votingDateRange,
         phaseEndsIn: const Duration(hours: 144),
         progressValue: 0.45454,
       );
@@ -74,8 +72,7 @@ void main() {
       final actual = viewModel.progress(now);
       final expected = VotingPhaseProgressDetailsViewModel(
         status: CampaignPhaseStatus.post,
-        start: DateTime.utc(2025, 7, 10),
-        end: DateTime.utc(2025, 7, 21),
+        votingDateRange: viewModel.votingDateRange,
         phaseEndsIn: Duration.zero,
         progressValue: 1,
       );
@@ -91,8 +88,7 @@ void _expectActualEqualsExpected(
 ) {
   expect(actual, isNotNull);
   expect(actual!.status, equals(expected.status));
-  expect(actual.start, equals(expected.start));
-  expect(actual.end, equals(expected.end));
+  expect(actual.votingDateRange, equals(expected.votingDateRange));
   expect(actual.phaseEndsIn, equals(expected.phaseEndsIn));
   expect(actual.progressValue, closeTo(expected.progressValue, 0.001));
 }

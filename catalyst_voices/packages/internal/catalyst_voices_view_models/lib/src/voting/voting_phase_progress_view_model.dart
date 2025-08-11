@@ -4,21 +4,19 @@ import 'package:equatable/equatable.dart';
 
 final class VotingPhaseProgressDetailsViewModel extends Equatable {
   final CampaignPhaseStatus status;
-  final DateTime start;
-  final DateTime end;
+  final DateRange? votingDateRange;
   final Duration phaseEndsIn;
   final double progressValue;
 
   const VotingPhaseProgressDetailsViewModel({
     required this.status,
-    required this.start,
-    required this.end,
+    required this.votingDateRange,
     required this.phaseEndsIn,
     required this.progressValue,
   });
 
   @override
-  List<Object?> get props => [status, start, end, phaseEndsIn, progressValue];
+  List<Object?> get props => [status, votingDateRange, phaseEndsIn, progressValue];
 }
 
 final class VotingPhaseProgressViewModel extends Equatable {
@@ -70,16 +68,14 @@ final class VotingPhaseProgressViewModel extends Equatable {
     if (now.isBefore(start) || now.isAtSameMomentAs(start)) {
       return VotingPhaseProgressDetailsViewModel(
         status: status,
-        start: start,
-        end: end,
+        votingDateRange: votingDateRange,
         phaseEndsIn: Duration.zero,
         progressValue: 0,
       );
     } else if (now.isAfter(end) || now.isAtSameMomentAs(end)) {
       return VotingPhaseProgressDetailsViewModel(
         status: status,
-        start: start,
-        end: end,
+        votingDateRange: votingDateRange,
         phaseEndsIn: Duration.zero,
         progressValue: 1,
       );
@@ -91,8 +87,7 @@ final class VotingPhaseProgressViewModel extends Equatable {
 
       return VotingPhaseProgressDetailsViewModel(
         status: status,
-        start: start,
-        end: end,
+        votingDateRange: votingDateRange,
         phaseEndsIn: phaseEndsIn,
         progressValue: phaseValue,
       );

@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:catalyst_voices/widgets/indicators/voices_progress_indicator_weight.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -16,7 +14,7 @@ class VotingPhaseProgressCardSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<VotingCubit, VotingState, VotingPhaseProgressViewModel>(
+    return BlocSelector<VotingCubit, VotingState, VotingPhaseProgressDetailsViewModel?>(
       selector: (state) => state.votingPhase,
       builder: (context, votingPhase) => _VotingPhaseProgressCard(votingPhase: votingPhase),
     );
@@ -111,28 +109,19 @@ class _ProgressBar extends StatelessWidget {
   }
 }
 
-class _VotingPhaseProgressCard extends StatefulWidget {
-  final VotingPhaseProgressViewModel votingPhase;
+class _VotingPhaseProgressCard extends StatelessWidget {
+  static const _minWidth = 256.0;
+  static const _maxWidth = 570.0;
+
+  final VotingPhaseProgressDetailsViewModel? votingPhase;
 
   const _VotingPhaseProgressCard({
     required this.votingPhase,
   });
 
   @override
-  State<_VotingPhaseProgressCard> createState() => _VotingPhaseProgressCardState();
-}
-
-class _VotingPhaseProgressCardState extends State<_VotingPhaseProgressCard> {
-  static const _minWidth = 256.0;
-  static const _maxWidth = 570.0;
-
-  late Timer _timer;
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final now = DateTimeExt.now();
-    final progress = widget.votingPhase.progress(now);
 
     final width = (MediaQuery.sizeOf(context).width * 0.35).clamp(_minWidth, _maxWidth);
 
@@ -151,33 +140,15 @@ class _VotingPhaseProgressCardState extends State<_VotingPhaseProgressCard> {
             size: 24,
           ),
           const Spacer(),
-          _VotingStatus(status: progress?.status),
+          _VotingStatus(status: votingPhase?.status),
           const SizedBox(height: 4),
-          _DateRange(dateRange: widget.votingPhase.votingDateRange),
+          _DateRange(dateRange: votingPhase?.votingDateRange),
           const Spacer(),
-          _ProgressBar(value: progress?.progressValue ?? 0),
+          _ProgressBar(value: votingPhase?.progressValue ?? 0),
           const SizedBox(height: 6),
-          _Captions(progress: progress),
+          _Captions(progress: votingPhase),
         ],
       ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    // TODO(damian-molinski): move it to bloc and take user timezone pref into count
-    _timer = Timer.periodic(
-      const Duration(seconds: 1),
-      (_) => setState(() {}),
     );
   }
 }
