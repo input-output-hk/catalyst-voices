@@ -128,7 +128,7 @@ impl From<catalyst_signed_doc::UuidV7> for DocumentId {
     }
 }
 
-#[derive(Object, Debug, PartialEq)]
+#[derive(Object, Debug, Clone, PartialEq)]
 #[oai(example = true)]
 /// A range of Document IDs.
 pub(crate) struct IdRange {
@@ -147,7 +147,7 @@ impl Example for IdRange {
     }
 }
 
-#[derive(Object, Debug, PartialEq)]
+#[derive(Object, Debug, Clone, PartialEq)]
 #[oai(example = true)]
 /// A single Document IDs.
 pub(crate) struct IdEq {
@@ -165,7 +165,7 @@ impl Example for IdEq {
 
 // Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
 // openapi docs on an object.
-#[derive(NewType, Debug, PartialEq)]
+#[derive(NewType, Debug, Clone, PartialEq)]
 #[oai(
     from_multipart = false,
     from_parameter = false,
@@ -185,7 +185,7 @@ impl Example for IdEqDocumented {
 
 // Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
 // openapi docs on an object.
-#[derive(NewType, Debug, PartialEq)]
+#[derive(NewType, Debug, Clone, PartialEq)]
 #[oai(
     from_multipart = false,
     from_parameter = false,
@@ -203,7 +203,7 @@ impl Example for IdRangeDocumented {
     }
 }
 
-#[derive(Union, Debug, PartialEq)]
+#[derive(Union, Debug, Clone, PartialEq)]
 #[oai(one_of)]
 /// Either a Single Document ID, or a Range of Document IDs
 pub(crate) enum EqOrRangedId {
@@ -235,7 +235,7 @@ impl TryFrom<EqOrRangedId> for EqOrRangedUuid {
     }
 }
 
-#[derive(NewType, Debug, PartialEq)]
+#[derive(NewType, Debug, Clone, PartialEq)]
 #[oai(
     from_multipart = false,
     from_parameter = false,
