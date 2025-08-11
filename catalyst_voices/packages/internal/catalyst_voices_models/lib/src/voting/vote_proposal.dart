@@ -53,7 +53,7 @@ final class VoteProposalCategory extends Equatable {
   factory VoteProposalCategory.fromCampaignCategory(CampaignCategory category) {
     return VoteProposalCategory(
       ref: category.selfRef,
-      name: category.categoryText,
+      name: category.formattedCategoryName,
     );
   }
 

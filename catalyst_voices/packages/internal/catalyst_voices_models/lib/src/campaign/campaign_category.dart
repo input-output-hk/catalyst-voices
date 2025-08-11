@@ -386,7 +386,7 @@ class CampaignCategory extends Equatable {
     required this.submissionCloseDate,
   });
 
-  String get categoryText => '$categoryName $categorySubname';
+  String get formattedCategoryName => '$categoryName $categorySubname';
 
   @override
   List<Object?> get props => [

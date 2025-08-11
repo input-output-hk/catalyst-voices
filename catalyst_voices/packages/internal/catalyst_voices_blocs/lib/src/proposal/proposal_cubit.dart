@@ -400,7 +400,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     );
 
     final overviewSegment = ProposalOverviewSegment.build(
-      categoryName: category?.categoryText ?? '',
+      categoryName: category?.formattedCategoryName ?? '',
       proposalTitle: document.title ?? '',
       isVotingStage: (isVotingStage && isLatestVersion),
       data: ProposalViewMetadata(

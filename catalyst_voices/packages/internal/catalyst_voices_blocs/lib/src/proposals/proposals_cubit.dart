@@ -222,7 +222,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
         e.proposal,
         categoryName: campaign.categories
             .firstWhere((element) => element.selfRef == e.proposal.categoryRef)
-            .categoryText,
+            .formattedCategoryName,
       ),
     );
 
@@ -262,7 +262,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     final categorySelectorItems = categories.map((e) {
       return ProposalsCategorySelectorItem(
         ref: e.selfRef,
-        name: e.categoryText,
+        name: e.formattedCategoryName,
         isSelected: e.selfRef.id == selectedCategory?.id,
       );
     }).toList();

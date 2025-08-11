@@ -192,7 +192,7 @@ final class VotingCubit extends Cubit<VotingState>
     return categories.map((e) {
       return ProposalsCategorySelectorItem(
         ref: e.selfRef,
-        name: e.categoryText,
+        name: e.formattedCategoryName,
         isSelected: e.selfRef.id == selectedCategory?.id,
       );
     }).toList();

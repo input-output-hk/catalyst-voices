@@ -162,7 +162,7 @@ class ProposalBriefVoting extends ProposalBrief {
     return ProposalBriefVoting(
       selfRef: proposal.selfRef,
       title: proposal.title,
-      categoryName: category.categoryText,
+      categoryName: category.formattedCategoryName,
       author: proposal.author,
       fundsRequested: proposal.fundsRequested,
       duration: proposal.duration,
