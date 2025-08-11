@@ -3,8 +3,9 @@
 use poem_openapi::{param::Query, OpenApi};
 
 use crate::service::common::{
-    auth::none_or_rbac::NoneOrRBAC, tags::ApiTags,
-    types::cardano::query::cat_id_or_stake::CatIdOrStake,
+    auth::none_or_rbac::NoneOrRBAC,
+    tags::ApiTags,
+    types::{cardano::query::cat_id_or_stake::CatIdOrStake, generic::boolean::BooleanFlag},
 };
 
 mod registrations_get;
@@ -29,9 +30,13 @@ impl Api {
         Query(lookup): Query<Option<CatIdOrStake>>,
         /// No Authorization required, but Token permitted.
         auth: NoneOrRBAC,
+        /// If this parameter is set to `true`, then all the invalid registrations are
+        /// returned. Otherwise, only the invalid registrations after the last valid one
+        /// are shown.
+        Query(show_all_invalid): Query<Option<BooleanFlag>>,
     ) -> registrations_get::AllResponses {
         let token = auth.into();
         // `Box::pin` is used here because of the future size (`clippy::large_futures` lint).
-        Box::pin(registrations_get::endpoint(lookup, token)).await
+        Box::pin(registrations_get::endpoint(lookup, token, show_all_invalid)).await
     }
 }

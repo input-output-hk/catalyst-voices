@@ -3,6 +3,7 @@
 use anyhow::Context;
 use catalyst_types::catalyst_id::CatalystId;
 use futures::TryStreamExt;
+use itertools::Itertools;
 pub use response::AllResponses;
 
 mod binary_data;
@@ -38,7 +39,7 @@ use crate::{
         },
         common::{
             auth::rbac::token::CatalystRBACTokenV1,
-            types::cardano::query::cat_id_or_stake::CatIdOrStake,
+            types::{cardano::query::cat_id_or_stake::CatIdOrStake, generic::boolean::BooleanFlag},
         },
     },
 };
@@ -46,6 +47,7 @@ use crate::{
 /// Get RBAC registration endpoint.
 pub(crate) async fn endpoint(
     lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>,
+    show_all_invalid: Option<BooleanFlag>,
 ) -> AllResponses {
     if lookup.is_none() && token.is_none() {
         return Responses::UnprocessableContent(Json(RbacUnprocessableContent::new(
@@ -55,7 +57,13 @@ pub(crate) async fn endpoint(
     }
 
     // Box::pin is used here because of the future size (`clippy::large_futures` lint).
-    match Box::pin(reg_chain(lookup, token)).await {
+    match Box::pin(reg_chain(
+        lookup,
+        token,
+        show_all_invalid.unwrap_or_default().into(),
+    ))
+    .await
+    {
         Err(e) => AllResponses::handle_error(&e),
         Ok(Some(c)) => Responses::Ok(Json(Box::new(c))).into(),
         Ok(None) => Responses::NotFound.into(),
@@ -64,7 +72,7 @@ pub(crate) async fn endpoint(
 
 /// Returns a registration chain.
 async fn reg_chain(
-    lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>,
+    lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>, show_all_invalid: bool,
 ) -> anyhow::Result<Option<RbacRegistrationChain>> {
     let persistent_session =
         CassandraSession::get(true).context("Failed to get persistent Cassandra session")?;
@@ -80,9 +88,19 @@ async fn reg_chain(
         invalid_registrations(id.clone(), &persistent_session),
         invalid_registrations(id.clone(), &volatile_session),
     )?;
+    let first_invalid_slot = if show_all_invalid {
+        0.into()
+    } else {
+        info.as_ref()
+            .map(|i| i.chain.current_point().slot_or_default())
+            .unwrap_or_default()
+    };
+
     let invalid = invalid_persistent
         .into_iter()
         .chain(invalid_volatile)
+        .filter(|r| r.slot_no >= first_invalid_slot.into())
+        .sorted_by(|a, b| (a.slot_no, a.txn_index).cmp(&(b.slot_no, b.txn_index)))
         .map(Into::into)
         .collect::<Vec<_>>()
         .into();
