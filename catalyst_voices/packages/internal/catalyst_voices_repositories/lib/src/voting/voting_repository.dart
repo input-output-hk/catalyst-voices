@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/voting/casted_votes_observer.dart';
+import 'package:collection/collection.dart';
 
 final class VotingMockRepository implements VotingRepository {
   final CastedVotesObserver _votesObserver;
@@ -25,6 +26,7 @@ final class VotingMockRepository implements VotingRepository {
   @override
   Future<void> castVotes(List<Vote> draftVotes) async {
     final castedVotes = <Vote>[];
+
     for (final vote in draftVotes) {
       castedVotes.add(vote.toCasted());
     }
@@ -38,13 +40,17 @@ final class VotingMockRepository implements VotingRepository {
     for (final newVote in castedVotes) {
       votesMap[newVote.proposal] = newVote;
     }
-
     votes = votesMap.values.toList();
   }
 
   @override
   Future<void> dispose() async {
     await _votesObserver.dispose();
+  }
+
+  @override
+  Future<Vote?> getProposalLastCastedVote(DocumentRef proposalRef) async {
+    return _votesObserver.votes.firstWhereOrNull((vote) => vote.proposal == proposalRef);
   }
 
   Future<void> _loadCastedVotes() async {
@@ -61,4 +67,6 @@ abstract interface class VotingRepository implements CastedVotesObserver {
   Stream<List<Vote>> get watchedCastedVotes;
 
   Future<void> castVotes(List<Vote> draftVotes);
+
+  Future<Vote?> getProposalLastCastedVote(DocumentRef proposalRef);
 }
