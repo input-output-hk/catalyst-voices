@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT ../ AS repo-ci
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:chore/upgrade-flutter-3-32-8 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.5.5 AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
@@ -109,6 +109,7 @@ generate-internal-docs:
 # Run unit tests
 test-unit-native:
     FROM +code-generator
+    RUN apt-get install libsqlite3-0
     DO flutter-ci+UNIT_TESTS --PLATFORM=native --REPORT=true
 
 test-unit-web:
