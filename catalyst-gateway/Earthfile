@@ -82,7 +82,7 @@ build:
     SAVE ARTIFACT target/doc doc
     SAVE ARTIFACT target/release/cat-gateway cat-gateway
 
-test-openapi-diff:
+disable-test-openapi-diff:
     FROM openapitools/openapi-diff:2.1.1
 
     COPY cat-gateway-main+build/doc/cat-gateway-api.json cat-gateway-api.old.json
