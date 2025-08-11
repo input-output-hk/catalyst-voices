@@ -258,7 +258,10 @@ class VoicesBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesOutlinedButton(
       onTap: onTap,
-      child: Text(context.l10n.back),
+      child: Semantics(
+        identifier: 'BackButton',
+        child: Text(context.l10n.back),
+      ),
     );
   }
 }
@@ -397,7 +400,10 @@ class VoicesNextButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       onTap: onTap,
-      child: Text(context.l10n.next),
+      child: Semantics(
+        identifier: 'NextButton',
+        child: Text(context.l10n.next),
+      ),
     );
   }
 }

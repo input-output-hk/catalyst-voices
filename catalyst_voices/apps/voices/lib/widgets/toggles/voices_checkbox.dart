@@ -31,6 +31,13 @@ class VoicesCheckbox extends StatelessWidget {
   /// Whether the widget can accept the user input.
   final bool isEnabled;
 
+  /// Optional semantics identifier for Playwright testing.
+  ///
+  /// When provided, the checkbox will use '${semanticsIdentifier}_checkbox'
+  /// and the label will use '${semanticsIdentifier}_label' as semantics identifiers.
+  /// When null, defaults to 'VoicesCheckbox_checkbox' and 'VoicesCheckbox_label'.
+  final String? semanticsIdentifier;
+
   const VoicesCheckbox({
     super.key,
     required this.value,
@@ -39,33 +46,41 @@ class VoicesCheckbox extends StatelessWidget {
     this.label,
     this.note,
     this.isEnabled = true,
+    this.semanticsIdentifier,
   });
 
   @override
   Widget build(BuildContext context) {
     final onChanged = this.onChanged;
+    final baseIdentifier = semanticsIdentifier ?? 'VoicesCheckbox';
 
     return AbsorbPointer(
       absorbing: !isEnabled,
-      child: VoicesGestureDetector(
-        onTap: onChanged != null ? () => onChanged(!value) : null,
-        behavior: HitTestBehavior.opaque,
-        child: LabelDecorator(
-          label: label,
-          note: note,
-          spacings: const [12, 8],
-          child: Checkbox(
-            key: const Key('Checkbox'),
-            value: value,
-            // forcing null unwrapping because we're not allowing null value
-            onChanged: onChanged != null ? (value) => onChanged(value!) : null,
-            isError: isError,
-            side: isEnabled
-                ? null
-                : BorderSide(
-                    width: 2,
-                    color: Theme.of(context).colors.onSurfaceNeutral012,
-                  ),
+      child: Semantics(
+        identifier: baseIdentifier,
+        child: VoicesGestureDetector(
+          onTap: onChanged != null ? () => onChanged(!value) : null,
+          behavior: HitTestBehavior.opaque,
+          child: LabelDecorator(
+            label: label,
+            note: note,
+            spacings: const [12, 8],
+            child: Semantics(
+              identifier: '${baseIdentifier}_checkbox',
+              child: Checkbox(
+                key: const Key('Checkbox'),
+                value: value,
+                // forcing null unwrapping because we're not allowing null value
+                onChanged: onChanged != null ? (value) => onChanged(value!) : null,
+                isError: isError,
+                side: isEnabled
+                    ? null
+                    : BorderSide(
+                        width: 2,
+                        color: Theme.of(context).colors.onSurfaceNeutral012,
+                      ),
+              ),
+            ),
           ),
         ),
       ),

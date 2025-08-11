@@ -19,7 +19,10 @@ class SplashPanel extends StatelessWidget {
       ),
       footer: VoicesFilledButton(
         key: const Key('CreateKeychainButton'),
-        child: Text(context.l10n.accountCreationSplashNextButton),
+        child: Semantics(
+          identifier: 'CreateKeychainNowButton',
+          child: Text(context.l10n.accountCreationSplashNextButton),
+        ),
         onTap: () => RegistrationCubit.of(context).nextStep(),
       ),
     );

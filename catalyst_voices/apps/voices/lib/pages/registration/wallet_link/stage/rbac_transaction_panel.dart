@@ -42,7 +42,10 @@ class _BlocSubmitTxButton extends StatelessWidget {
                   child: VoicesCircularProgressIndicator(),
                 )
               : null,
-          child: Text(context.l10n.walletLinkTransactionSign),
+          child: Semantics(
+            identifier: 'SignTransactionButton',
+            child: Text(context.l10n.walletLinkTransactionSign),
+          ),
         );
       },
     );
@@ -152,7 +155,10 @@ class _SuccessNavigation extends StatelessWidget {
           onTap: () {
             RegistrationCubit.of(context).changeRoleSetup();
           },
-          child: Text(context.l10n.walletLinkTransactionChangeRoles),
+          child: Semantics(
+            identifier: 'TransactionReviewChangeRolesButton',
+            child: Text(context.l10n.walletLinkTransactionChangeRoles),
+          ),
         ),
       ],
     );

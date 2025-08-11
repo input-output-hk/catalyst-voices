@@ -61,7 +61,10 @@ class _GetStartedButton extends StatelessWidget {
         context,
         type: const FreshRegistration(),
       ),
-      child: Text(context.l10n.getStarted),
+      child: Semantics(
+        identifier: 'GetStartedButton',
+        child: Text(context.l10n.getStarted),
+      ),
     );
   }
 }

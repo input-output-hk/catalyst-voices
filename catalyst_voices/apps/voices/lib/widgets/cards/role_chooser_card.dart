@@ -131,12 +131,15 @@ class _DisplayingValueAsChips extends StatelessWidget {
       runSpacing: 5,
       children: [
         VoicesChip.round(
-          content: Text(
-            value ? context.l10n.yes : context.l10n.no,
-            style: TextStyle(
-              color: value
-                  ? Theme.of(context).colors.successContainer
-                  : Theme.of(context).colors.errorContainer,
+          content: Semantics(
+            identifier: 'YesNoChip',
+            child: Text(
+              value ? context.l10n.yes : context.l10n.no,
+              style: TextStyle(
+                color: value
+                    ? Theme.of(context).colors.successContainer
+                    : Theme.of(context).colors.errorContainer,
+              ),
             ),
           ),
           padding: const EdgeInsets.symmetric(
@@ -148,10 +151,13 @@ class _DisplayingValueAsChips extends StatelessWidget {
         ),
         if (isDefault)
           VoicesChip.round(
-            content: Text(
-              context.l10n.defaultRole,
-              style: TextStyle(
-                color: Theme.of(context).colors.iconsPrimary,
+            content: Semantics(
+              identifier: 'DefaultRoleChip',
+              child: Text(
+                context.l10n.defaultRole,
+                style: TextStyle(
+                  color: Theme.of(context).colors.iconsPrimary,
+                ),
               ),
             ),
             padding: const EdgeInsets.symmetric(

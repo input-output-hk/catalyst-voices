@@ -72,7 +72,10 @@ class _CreateKeychainButton extends StatelessWidget {
       key: const Key('CreateKeychainButton'),
       onTap: onTap,
       leading: VoicesAssets.icons.key.buildIcon(size: 18),
-      child: Text(context.l10n.accountCreationSplashTitle),
+      child: Semantics(
+        identifier: 'CreateKeychainButton',
+        child: Text(context.l10n.accountCreationSplashTitle),
+      ),
     );
   }
 }
@@ -90,7 +93,10 @@ class _LinkWalletAndRolesButton extends StatelessWidget {
       key: const Key('LinkWalletAndRolesButton'),
       onTap: onTap,
       leading: VoicesAssets.icons.wallet.buildIcon(size: 18),
-      child: Text(context.l10n.createKeychainLinkWalletAndRoles),
+      child: Semantics(
+        identifier: 'LinkWalletAndRolesButton',
+        child: Text(context.l10n.createKeychainLinkWalletAndRoles),
+      ),
     );
   }
 }
