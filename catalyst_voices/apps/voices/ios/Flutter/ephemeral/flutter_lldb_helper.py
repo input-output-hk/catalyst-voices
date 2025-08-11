@@ -1,6 +1,7 @@
 #
 # Generated file, do not edit.
 #
+# cspell:ignore IHELPED
 
 import lldb
 
