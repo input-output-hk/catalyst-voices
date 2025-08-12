@@ -11,18 +11,28 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_strategy/url_strategy.dart';
 
-final _bootstrapLogger = Logger('Bootstrap');
+var _bootstrapInitState = const _BootstrapState();
 
+final _bootstrapLogger = Logger('Bootstrap');
 final _flutterLogger = Logger('Flutter');
 final _loggingService = LoggingService();
 final _platformDispatcherLogger = Logger('PlatformDispatcher');
 final _uncaughtZoneLogger = Logger('UncaughtZone');
+
+@visibleForTesting
+AppConfig? get appConfig => _bootstrapInitState.appConfig;
+
+@visibleForTesting
+LoggingService get loggingService => _loggingService;
 
 /// Initializes the application before it can be run. Should setup all
 /// the things which are necessary before the actual app is run,
@@ -32,27 +42,35 @@ final _uncaughtZoneLogger = Logger('UncaughtZone');
 /// Initialization logic that is relevant for [runApp] scenario
 /// only should be added to [_doBootstrapAndRun], not here.
 Future<BootstrapArgs> bootstrap({
-  GoRouter? router,
   AppEnvironment? environment,
+  String? initialLocation,
 }) async {
   await _loggingService.init();
 
-  GoRouter.optionURLReflectsImperativeAPIs = true;
-  setPathUrlStrategy();
+  if (!_bootstrapInitState.didSetPathUrlStrategy) {
+    GoRouter.optionURLReflectsImperativeAPIs = true;
+    setPathUrlStrategy();
+    _bootstrapInitState = _bootstrapInitState.copyWith(didSetPathUrlStrategy: true);
+  }
 
   environment ??= AppEnvironment.fromEnv();
 
-  await _cleanupOldStorages();
+  await cleanUpStorages(onlyOld: true);
   await Dependencies.instance.init(environment: environment, loggingService: _loggingService);
-  await _initCryptoUtils();
+
+  if (!_bootstrapInitState.didInitializeCryptoUtils) {
+    await _initCryptoUtils();
+    _bootstrapInitState = _bootstrapInitState.copyWith(didInitializeCryptoUtils: true);
+  }
 
   final configSource = ApiConfigSource(Dependencies.instance.get());
   final configService = ConfigService(ConfigRepository(configSource));
   final config = await configService.getAppConfig(env: environment.type);
 
+  _bootstrapInitState = _bootstrapInitState.copyWith(appConfig: Optional(config));
   Dependencies.instance.registerConfig(config);
 
-  router ??= _buildAppRouter();
+  final router = AppRouterFactory.create(initialLocation: initialLocation);
 
   // Observer is very noisy on Logger. Enable it only if you want to debug
   // something
@@ -84,16 +102,30 @@ Future<void> bootstrapAndRun(
   );
 }
 
-GoRouter _buildAppRouter({
-  String? initialLocation,
-}) {
-  return AppRouterFactory.create(
-    initialLocation: initialLocation,
+@visibleForTesting
+Future<void> cleanUpStorages({
+  bool onlyOld = false,
+}) async {
+  await SecureUserStorage.clearPreviousVersions();
+  if (onlyOld) {
+    return;
+  }
+
+  assert(
+    Dependencies.instance.isInitialized,
+    'Dependencies not yet initialized!',
   );
+
+  await Dependencies.instance.get<FlutterSecureStorage>().deleteAll();
+  await Dependencies.instance.get<SharedPreferencesAsync>().clear();
 }
 
-Future<void> _cleanupOldStorages() async {
-  await SecureUserStorage.clearPreviousVersions();
+@visibleForTesting
+Future<void> cleanUpUserDataFromDatabase() async {
+  final db = Dependencies.instance.get<CatalystDatabase>();
+
+  await db.draftsDao.deleteWhere();
+  await db.favoritesDao.deleteAll();
 }
 
 Widget _defaultBuilder(BootstrapArgs args) {
@@ -185,4 +217,35 @@ final class BootstrapArgs {
     required this.routerConfig,
     required this.sentryConfig,
   });
+}
+
+class _BootstrapState extends Equatable {
+  final AppConfig? appConfig;
+  final bool didInitializeCryptoUtils;
+  final bool didSetPathUrlStrategy;
+
+  const _BootstrapState({
+    this.appConfig,
+    this.didInitializeCryptoUtils = false,
+    this.didSetPathUrlStrategy = false,
+  });
+
+  @override
+  List<Object?> get props => [
+        appConfig,
+        didInitializeCryptoUtils,
+        didSetPathUrlStrategy,
+      ];
+
+  _BootstrapState copyWith({
+    Optional<AppConfig>? appConfig,
+    bool? didInitializeCryptoUtils,
+    bool? didSetPathUrlStrategy,
+  }) {
+    return _BootstrapState(
+      appConfig: appConfig.dataOr(this.appConfig),
+      didInitializeCryptoUtils: didInitializeCryptoUtils ?? this.didInitializeCryptoUtils,
+      didSetPathUrlStrategy: didSetPathUrlStrategy ?? this.didSetPathUrlStrategy,
+    );
+  }
 }
