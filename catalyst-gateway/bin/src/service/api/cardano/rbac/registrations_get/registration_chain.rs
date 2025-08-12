@@ -37,6 +37,10 @@ pub struct RbacRegistrationChain {
     #[oai(skip_serializing_if_is_empty)]
     purpose: PurposeList,
     /// A map of role number to role data.
+    ///
+    /// The key of the map is a role identifier (`RoleId`) and the value is lists of
+    /// signing keys, encryption keys and payment addresses along with extended data map
+    /// (`RbacRoleData`).
     #[oai(skip_serializing_if_is_empty)]
     roles: RoleMap,
     /// A list of invalid registrations.
