@@ -111,6 +111,13 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     await _cache.clear();
   }
 
+  /// Verifies if given [factor] matches the current lock.
+  @override
+  Future<bool> confirmPassword(LockFactor factor) async {
+    final lock = await _requireLock;
+    return _cryptoService.verifyKey(factor.seed, key: lock);
+  }
+
   @override
   Future<bool> contains({required String key}) async {
     await _initializationCompleter.future;
