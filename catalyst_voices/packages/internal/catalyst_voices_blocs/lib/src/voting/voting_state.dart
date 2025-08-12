@@ -8,7 +8,7 @@ class VotingState extends Equatable {
   final CampaignCategoryDetailsViewModel? selectedCategory;
   final int? fundNumber;
   final VotingPowerViewModel votingPower;
-  final VotingPhaseProgressViewModel votingPhase;
+  final VotingPhaseProgressDetailsViewModel? votingPhase;
   final bool hasSearchQuery;
   final List<String> favoritesIds;
   final ProposalsCount count;
@@ -18,7 +18,7 @@ class VotingState extends Equatable {
     this.selectedCategory,
     this.fundNumber,
     this.votingPower = const VotingPowerViewModel(),
-    this.votingPhase = const VotingPhaseProgressViewModel(),
+    this.votingPhase,
     this.hasSearchQuery = false,
     this.favoritesIds = const [],
     this.count = const ProposalsCount(),
@@ -45,7 +45,7 @@ class VotingState extends Equatable {
     Optional<CampaignCategoryDetailsViewModel>? selectedCategory,
     Optional<int>? fundNumber,
     VotingPowerViewModel? votingPower,
-    VotingPhaseProgressViewModel? votingPhase,
+    Optional<VotingPhaseProgressDetailsViewModel>? votingPhase,
     bool? hasSearchQuery,
     List<String>? favoritesIds,
     ProposalsCount? count,
@@ -55,7 +55,7 @@ class VotingState extends Equatable {
       selectedCategory: selectedCategory.dataOr(this.selectedCategory),
       fundNumber: fundNumber.dataOr(this.fundNumber),
       votingPower: votingPower ?? this.votingPower,
-      votingPhase: votingPhase ?? this.votingPhase,
+      votingPhase: votingPhase.dataOr(this.votingPhase),
       hasSearchQuery: hasSearchQuery ?? this.hasSearchQuery,
       favoritesIds: favoritesIds ?? this.favoritesIds,
       count: count ?? this.count,
