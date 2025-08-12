@@ -123,7 +123,9 @@ class _VotingListFooter extends StatelessWidget {
             child: _CastVotesButton(
               onTap: data.canCastVotes
                   ? () {
-                      context.read<VotingBallotBloc>().add(const CastVotesEvent());
+                      if (context.mounted) {
+                        context.read<VotingBallotBloc>().add(const ConfirmCastingVotesEvent());
+                      }
                     }
                   : null,
             ),

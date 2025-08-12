@@ -3864,5 +3864,21 @@
   "yourNextStep": "Your next step",
   "@yourNextStep": {
     "description": "Generic header for next step instructions"
+  },
+  "confirmYourVoteSubmission": "Confirm your vote submission",
+  "@confirmYourVoteSubmission": {
+    "description": "Title for confirm vote submission"
+  },
+  "voteSubmissionDescription": "You can submit more votes or update your choices at any time during the voting phase.",
+  "@voteSubmissionDescription": {
+    "description": "Description for confirm vote submission"
+  },
+  "labelEnterYourUnlockPassword": "Enter your unlock password to confirm",
+  "@labelEnterYourUnlockPassword": {
+    "description": "Label for unlock password field"
+  },
+  "viewCastVotes": "View Cast Votes",
+  "@viewCastVotes": {
+    "description": "CTA to view cast votes"
   }
 }

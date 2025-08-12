@@ -9,7 +9,7 @@ const Duration _animDuration = Duration(milliseconds: 200);
 /// To add a sticky bottom menu item provide [footer] widget.
 ///
 /// The [VoicesDrawer] is indented to be used as the [Scaffold.drawer].
-class VoicesDrawer extends StatelessWidget {
+class VoicesDrawer extends StatefulWidget {
   final double width;
 
   /// This widget is main "body" of [VoicesDrawer].
@@ -32,9 +32,38 @@ class VoicesDrawer extends StatelessWidget {
   });
 
   @override
+  State<VoicesDrawer> createState() => VoicesDrawerState();
+
+  /// Returns the [VoicesDrawerState] for the nearest [VoicesDrawer] ancestor,
+  /// or null if none is found.
+  static VoicesDrawerState? maybeOf(BuildContext context) {
+    return context.findAncestorStateOfType<VoicesDrawerState>();
+  }
+
+  /// Returns the [VoicesDrawerState] for the nearest [VoicesDrawer] ancestor.
+  ///
+  /// Throws a [FlutterError] if no [VoicesDrawer] is found in the widget tree.
+  static VoicesDrawerState of(BuildContext context) {
+    final state = maybeOf(context);
+    if (state != null) {
+      return state;
+    }
+    throw FlutterError(
+      'VoicesDrawer.of() called with a context that does not contain a VoicesDrawer.\n'
+      'No VoicesDrawer ancestor could be found starting from the context that was passed to VoicesDrawer.of().',
+    );
+  }
+}
+
+class VoicesDrawerState extends State<VoicesDrawer> {
+  bool _isBottomSheetOpen = false;
+
+  bool get isBottomSheetOpen => _isBottomSheetOpen;
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bottomSheet = this.bottomSheet;
+    final externalBottomSheet = widget.bottomSheet;
 
     return Theme(
       data: theme.copyWith(
@@ -58,20 +87,11 @@ class VoicesDrawer extends StatelessWidget {
             children: [
               Drawer(
                 key: const Key('Drawer'),
-                width: width,
+                width: widget.width,
                 child: Column(
                   children: [
-                    Expanded(child: child),
-                    if (footer != null)
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          top: 24,
-                          left: 12,
-                          right: 12,
-                          bottom: 18,
-                        ),
-                        child: footer,
-                      ),
+                    Expanded(child: widget.child),
+                    if (widget.footer != null) widget.footer!,
                   ],
                 ),
               ),
@@ -79,7 +99,9 @@ class VoicesDrawer extends StatelessWidget {
                 key: const Key('BottomSheetOverlay'),
                 child: AnimatedSwitcher(
                   duration: _animDuration,
-                  child: bottomSheet != null ? const _BottomSheetOverlay() : null,
+                  child: (externalBottomSheet != null && _isBottomSheetOpen)
+                      ? const _BottomSheetOverlay()
+                      : null,
                 ),
               ),
               Positioned(
@@ -89,7 +111,10 @@ class VoicesDrawer extends StatelessWidget {
                 right: 0,
                 child: AnimatedSwitcher(
                   duration: _animDuration,
-                  child: bottomSheet,
+                  child: Offstage(
+                    offstage: !_isBottomSheetOpen,
+                    child: externalBottomSheet,
+                  ),
                 ),
               ),
             ],
@@ -97,6 +122,18 @@ class VoicesDrawer extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void hideBottomSheet() {
+    setState(() {
+      _isBottomSheetOpen = false;
+    });
+  }
+
+  void showBottomSheet() {
+    setState(() {
+      _isBottomSheetOpen = true;
+    });
   }
 }
 

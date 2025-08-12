@@ -12,7 +12,7 @@ final _logger = Logger('VotingBallotBloc');
 typedef _VoteWithProposal = ({Vote vote, VoteProposal? proposal});
 
 final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
-    with BlocErrorEmitterMixin {
+    with BlocErrorEmitterMixin, BlocSignalEmitterMixin<VotingBallotSignal, VotingBallotState> {
   final UserService _userService;
   final CampaignService _campaignService;
   final VotingBallotBuilder _ballotBuilder;
@@ -41,6 +41,9 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     on<UpdateVoteEvent>(_updateVote);
     on<RemoveVoteEvent>(_removeVote);
     on<CastVotesEvent>(_castVotes);
+    on<ConfirmCastingVotesEvent>(_confirmCastingVotes);
+    on<CancelCastingVotesEvent>(_cancelCastingVotes);
+    on<CheckPasswordEvent>(_checkPassword);
 
     _votingPowerSub = _userService.watchUser
         .map((user) {
@@ -222,6 +225,12 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     return progress.clamp(0.0, 1.0);
   }
 
+  void _cancelCastingVotes(CancelCastingVotesEvent event, Emitter<VotingBallotState> emit) {
+    final footer = state.footer.copyWith(castingStep: const PreCastVotesStep());
+    emit(state.copyWith(footer: footer));
+    emitSignal(const HideBottomSheetSignal());
+  }
+
   Future<void> _castVotes(
     CastVotesEvent event,
     Emitter<VotingBallotState> emit,
@@ -234,11 +243,43 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
       _ballotBuilder.clear();
 
       final tiles = _buildTiles();
-      emit(state.copyWith(tiles: tiles));
+      final footer = state.footer.copyWith(castingStep: const SuccessfullyCastVotesStep());
+      emit(state.copyWith(tiles: tiles, footer: footer));
     } catch (e, st) {
       _logger.severe('Error casting votes', e, st);
+      final footer = state.footer.copyWith(castingStep: const FailedToCastVotesStep());
+      emit(state.copyWith(footer: footer));
       emitError(LocalizedException.create(e));
     }
+  }
+
+  Future<void> _checkPassword(CheckPasswordEvent event, Emitter<VotingBallotState> emit) async {
+    const confirmPasswordStep = ConfirmPasswordStep(isLoading: true);
+    const confirmPasswordFailed =
+        ConfirmPasswordStep(exception: LocalizedUnlockPasswordException());
+    final newFooter = state.footer.copyWith(castingStep: confirmPasswordStep);
+    emit(state.copyWith(footer: newFooter));
+
+    final keychain = _userService.user.activeAccount?.keychain;
+    if (keychain == null) {
+      emit(state.copyWith(footer: newFooter.copyWith(castingStep: confirmPasswordFailed)));
+      return;
+    }
+    final unlock = await keychain.confirmPassword(event.factor);
+    if (!unlock) {
+      emit(state.copyWith(footer: newFooter.copyWith(castingStep: confirmPasswordFailed)));
+      return;
+    }
+    add(const CastVotesEvent());
+  }
+
+  void _confirmCastingVotes(
+    ConfirmCastingVotesEvent event,
+    Emitter<VotingBallotState> emit,
+  ) {
+    final newFooter = state.footer.copyWith(castingStep: const ConfirmPasswordStep());
+    emitSignal(const ShowBottomSheetSignal());
+    emit(state.copyWith(footer: newFooter));
   }
 
   Future<Vote?> _getLastCastedVoteOn(DocumentRef proposal) async {

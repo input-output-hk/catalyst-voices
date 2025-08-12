@@ -54,7 +54,12 @@ class VoicesDrawerChooser<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.only(
+        top: 24,
+        left: 12,
+        right: 12,
+        bottom: 18,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
