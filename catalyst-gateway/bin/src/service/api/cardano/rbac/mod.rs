@@ -32,7 +32,7 @@ impl Api {
         auth: NoneOrRBAC,
         /// If this parameter is set to `true`, then all the invalid registrations are
         /// returned. Otherwise, only the invalid registrations after the last valid one
-        /// are shown.
+        /// are shown.  Defaults to `false` if not present.
         Query(show_all_invalid): Query<Option<BooleanFlag>>,
     ) -> registrations_get::AllResponses {
         let token = auth.into();
