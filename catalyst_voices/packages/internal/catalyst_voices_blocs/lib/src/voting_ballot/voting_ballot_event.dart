@@ -100,16 +100,14 @@ final class UpdateVoteTiles extends VotingBallotEvent {
 }
 
 final class UpdateVotingPhaseProgressEvent extends VotingBallotEvent {
-  final double votingPhaseProgress;
-  final Duration? votingEndsIn;
+  final VotingPhaseProgressDetailsViewModel? votingPhase;
 
   const UpdateVotingPhaseProgressEvent({
-    this.votingPhaseProgress = 0,
-    this.votingEndsIn,
+    this.votingPhase,
   });
 
   @override
-  List<Object?> get props => [votingPhaseProgress, votingEndsIn];
+  List<Object?> get props => [votingPhase];
 }
 
 final class UpdateVotingPowerEvent extends VotingBallotEvent {

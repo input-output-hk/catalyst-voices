@@ -4,21 +4,35 @@ import 'package:equatable/equatable.dart';
 
 final class VotingPhaseProgressDetailsViewModel extends Equatable {
   final CampaignPhaseStatus status;
-  final DateTime start;
-  final DateTime end;
-  final Duration phaseEndsIn;
-  final double progressValue;
+  final DateRange? votingDateRange;
+  final Duration currentPhaseEndsIn;
+  final double currentPhaseProgress;
 
   const VotingPhaseProgressDetailsViewModel({
     required this.status,
-    required this.start,
-    required this.end,
-    required this.phaseEndsIn,
-    required this.progressValue,
+    required this.votingDateRange,
+    required this.currentPhaseEndsIn,
+    required this.currentPhaseProgress,
   });
 
   @override
-  List<Object?> get props => [status, start, end, phaseEndsIn, progressValue];
+  List<Object?> get props => [status, votingDateRange, currentPhaseEndsIn, currentPhaseProgress];
+
+  Duration? get votingPhaseEndsIn {
+    return switch (status) {
+      CampaignPhaseStatus.upcoming => null,
+      CampaignPhaseStatus.active => currentPhaseEndsIn,
+      CampaignPhaseStatus.post => Duration.zero,
+    };
+  }
+
+  double get votingPhaseProgress {
+    return switch (status) {
+      CampaignPhaseStatus.upcoming => 0,
+      CampaignPhaseStatus.active => currentPhaseProgress,
+      CampaignPhaseStatus.post => 1,
+    };
+  }
 }
 
 final class VotingPhaseProgressViewModel extends Equatable {
@@ -70,18 +84,16 @@ final class VotingPhaseProgressViewModel extends Equatable {
     if (now.isBefore(start) || now.isAtSameMomentAs(start)) {
       return VotingPhaseProgressDetailsViewModel(
         status: status,
-        start: start,
-        end: end,
-        phaseEndsIn: Duration.zero,
-        progressValue: 0,
+        votingDateRange: votingDateRange,
+        currentPhaseEndsIn: Duration.zero,
+        currentPhaseProgress: 0,
       );
     } else if (now.isAfter(end) || now.isAtSameMomentAs(end)) {
       return VotingPhaseProgressDetailsViewModel(
         status: status,
-        start: start,
-        end: end,
-        phaseEndsIn: Duration.zero,
-        progressValue: 1,
+        votingDateRange: votingDateRange,
+        currentPhaseEndsIn: Duration.zero,
+        currentPhaseProgress: 1,
       );
     } else {
       final phaseDuration = end.difference(start);
@@ -91,10 +103,9 @@ final class VotingPhaseProgressViewModel extends Equatable {
 
       return VotingPhaseProgressDetailsViewModel(
         status: status,
-        start: start,
-        end: end,
-        phaseEndsIn: phaseEndsIn,
-        progressValue: phaseValue,
+        votingDateRange: votingDateRange,
+        currentPhaseEndsIn: phaseEndsIn,
+        currentPhaseProgress: phaseValue,
       );
     }
   }
