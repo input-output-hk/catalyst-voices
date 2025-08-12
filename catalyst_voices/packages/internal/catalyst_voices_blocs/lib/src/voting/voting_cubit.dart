@@ -21,6 +21,7 @@ final class VotingCubit extends Cubit<VotingState>
   final VotingService _votingService;
 
   VotingCubitCache _cache = const VotingCubitCache();
+  late Timer _countdownTimer;
 
   StreamSubscription<CatalystId?>? _activeAccountIdSub;
   StreamSubscription<List<String>>? _favoritesProposalsIdsSub;
@@ -50,6 +51,11 @@ final class VotingCubit extends Cubit<VotingState>
         _votingService.watchedCastedVotes().distinct(listEquals).listen(_handleLastCastedChange);
 
     _ballotBuilder.addListener(_handleBallotBuilderChange);
+
+    _countdownTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => _dispatchState(),
+    );
   }
 
   void changeFilters({
@@ -101,6 +107,7 @@ final class VotingCubit extends Cubit<VotingState>
     _watchedCastedVotesSub = null;
 
     _ballotBuilder.removeListener(_handleBallotBuilderChange);
+    _countdownTimer.cancel();
 
     return super.close();
   }
@@ -196,6 +203,12 @@ final class VotingCubit extends Cubit<VotingState>
         isSelected: e.selfRef.id == selectedCategory?.id,
       );
     }).toList();
+  }
+
+  VotingPhaseProgressDetailsViewModel? _buildVotingPhaseDetails(Campaign? campaign) {
+    final votingPhase = _buildVotingPhase(campaign);
+    final now = DateTimeExt.now();
+    return votingPhase?.progress(now);
   }
 
   VotingPhaseProgressViewModel? _buildVotingPhase(Campaign? campaign) {
@@ -320,7 +333,7 @@ final class VotingCubit extends Cubit<VotingState>
     final votingPowerViewModel = votingPower != null
         ? VotingPowerViewModel.fromModel(votingPower)
         : const VotingPowerViewModel();
-    final votingPhaseViewModel = _buildVotingPhase(campaign);
+    final votingPhaseViewModel = _buildVotingPhaseDetails(campaign);
     final hasSearchQuery = filters.searchQuery != null;
     final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategoryRef);
 
@@ -328,7 +341,7 @@ final class VotingCubit extends Cubit<VotingState>
       selectedCategory: Optional(selectedCategoryViewModel),
       fundNumber: Optional(fundNumber),
       votingPower: votingPowerViewModel,
-      votingPhase: votingPhaseViewModel,
+      votingPhase: Optional(votingPhaseViewModel),
       hasSearchQuery: hasSearchQuery,
       favoritesIds: favoriteIds,
       count: count,

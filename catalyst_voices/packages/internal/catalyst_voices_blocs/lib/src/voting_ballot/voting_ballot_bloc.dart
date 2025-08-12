@@ -158,68 +158,24 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
         .toList();
   }
 
-  ({double progress, Duration? endsIn}) _calculatePhaseProgress() {
-    final votingTimeline = _cache.votingTimeline;
+  VotingPhaseProgressViewModel? _buildVotingPhase(Campaign? campaign) {
+    final campaignVotingPhase = campaign?.phaseStateTo(CampaignPhaseType.communityVoting);
+    final campaignStartDate = campaign?.startDate;
 
-    if (votingTimeline == null) {
-      return (progress: 0, endsIn: null);
-    }
-
-    final effectiveVotingTimeline = votingTimeline;
-
-    final start = effectiveVotingTimeline.from;
-    final end = effectiveVotingTimeline.to;
-    if (start == null || end == null) {
-      return (progress: 0, endsIn: null);
-    }
-
-    final now = DateTimeExt.now(utc: true);
-
-    final progress = _calculatePhaseProgressValue(start: start, end: end, now: now);
-    final endsIn = _calculatePhaseProgressEndsDuration(start: start, end: end, now: now);
-
-    return (progress: progress, endsIn: endsIn);
-  }
-
-  Duration? _calculatePhaseProgressEndsDuration({
-    required DateTime start,
-    required DateTime end,
-    required DateTime now,
-  }) {
-    if (end.isBefore(start) || now.isBefore(start)) {
+    if (campaignVotingPhase != null && campaignStartDate != null) {
+      return VotingPhaseProgressViewModel.fromModel(
+        state: campaignVotingPhase,
+        campaignStartDate: campaignStartDate,
+      );
+    } else {
       return null;
     }
-
-    if (now.isAfter(end)) {
-      return Duration.zero;
-    }
-
-    return end.difference(now);
   }
 
-  double _calculatePhaseProgressValue({
-    required DateTime start,
-    required DateTime end,
-    required DateTime now,
-  }) {
-    if (end.isBefore(start) || now.isBefore(start)) {
-      return 0;
-    }
-
-    if (now.isAfter(end)) {
-      return 1;
-    }
-
-    final totalDuration = end.difference(start).inMilliseconds;
-
-    // Handle the case where start and end are the same time.
-    if (totalDuration == 0) {
-      return 1;
-    }
-
-    final elapsedDuration = now.difference(start).inMilliseconds;
-    final progress = elapsedDuration / totalDuration;
-    return progress.clamp(0.0, 1.0);
+  VotingPhaseProgressDetailsViewModel? _buildVotingPhaseDetails(Campaign? campaign) {
+    final votingPhase = _buildVotingPhase(campaign);
+    final now = DateTimeExt.now();
+    return votingPhase?.progress(now);
   }
 
   Future<void> _castVotes(
@@ -261,11 +217,8 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
   void _handleCampaignChange(Campaign? campaign) {
     add(UpdateFundNumberEvent(campaign?.fundNumber));
 
-    final votingPhase = campaign?.timeline.phase(CampaignPhaseType.communityVoting);
-    final votingTimeline = votingPhase?.timeline;
-
-    if (votingTimeline != _cache.votingTimeline) {
-      _cache = _cache.copyWith(votingTimeline: Optional(votingTimeline));
+    if (campaign != _cache.campaign) {
+      _cache = _cache.copyWith(campaign: Optional(campaign));
       _updateVotingPhaseProgressTimer();
     }
   }
@@ -370,9 +323,10 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     UpdateVotingPhaseProgressEvent event,
     Emitter<VotingBallotState> emit,
   ) {
+    final votingPhase = event.votingPhase;
     final votingProgress = state.votingProgress.copyWith(
-      votingPhaseProgress: event.votingPhaseProgress,
-      votingEndsIn: Optional(event.votingEndsIn),
+      votingPhaseProgress: votingPhase?.votingPhaseProgress ?? 0,
+      votingEndsIn: Optional(votingPhase?.votingPhaseEndsIn),
     );
 
     emit(state.copyWith(votingProgress: votingProgress));
@@ -382,27 +336,22 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     _phaseProgressTimer?.cancel();
     _phaseProgressTimer = null;
 
-    if (_cache.votingTimeline == null) {
-      add(const UpdateVotingPhaseProgressEvent());
-      return;
-    }
+    final campaign = _cache.campaign;
+    final votingPhase = _buildVotingPhaseDetails(campaign);
+    add(UpdateVotingPhaseProgressEvent(votingPhase: votingPhase));
 
-    final (:progress, :endsIn) = _calculatePhaseProgress();
-
-    add(UpdateVotingPhaseProgressEvent(votingPhaseProgress: progress, votingEndsIn: endsIn));
-
-    if (progress == 1.0) {
+    if (votingPhase == null || votingPhase.status == CampaignPhaseStatus.post) {
       return;
     }
 
     _phaseProgressTimer = Timer.periodic(
       const Duration(seconds: 1),
       (timer) {
-        final (:progress, :endsIn) = _calculatePhaseProgress();
+        final updatedVotingPhase = _buildVotingPhaseDetails(campaign);
 
-        add(UpdateVotingPhaseProgressEvent(votingPhaseProgress: progress, votingEndsIn: endsIn));
+        add(UpdateVotingPhaseProgressEvent(votingPhase: updatedVotingPhase));
 
-        if (progress == 1.0) {
+        if (updatedVotingPhase?.status == CampaignPhaseStatus.post) {
           timer.cancel();
         }
       },
