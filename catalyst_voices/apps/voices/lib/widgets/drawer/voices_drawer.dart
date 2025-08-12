@@ -63,7 +63,7 @@ class VoicesDrawerState extends State<VoicesDrawer> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final externalBottomSheet = widget.bottomSheet;
+    final bottomSheet = widget.bottomSheet;
 
     return Theme(
       data: theme.copyWith(
@@ -99,7 +99,7 @@ class VoicesDrawerState extends State<VoicesDrawer> {
                 key: const Key('BottomSheetOverlay'),
                 child: AnimatedSwitcher(
                   duration: _animDuration,
-                  child: (externalBottomSheet != null && _isBottomSheetOpen)
+                  child: (bottomSheet != null && _isBottomSheetOpen)
                       ? const _BottomSheetOverlay()
                       : null,
                 ),
@@ -113,7 +113,7 @@ class VoicesDrawerState extends State<VoicesDrawer> {
                   duration: _animDuration,
                   child: Offstage(
                     offstage: !_isBottomSheetOpen,
-                    child: externalBottomSheet,
+                    child: bottomSheet,
                   ),
                 ),
               ),
