@@ -36,7 +36,13 @@ class VotingListBottomSheetActions extends StatelessWidget {
           child: VoicesFilledButton(
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             onTap: nextAction,
-            child: isLoading ? const CircularProgressIndicator() : Text(nextActionText),
+            child: isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(),
+                  )
+                : Text(nextActionText),
           ),
         ),
       ],

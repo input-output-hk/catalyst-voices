@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/voting_ballot/voting_ballot_cache.dart';
@@ -12,7 +13,7 @@ final _logger = Logger('VotingBallotBloc');
 typedef _VoteWithProposal = ({Vote vote, VoteProposal? proposal});
 
 final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
-    with BlocErrorEmitterMixin, BlocSignalEmitterMixin<VotingBallotSignal, VotingBallotState> {
+    with BlocSignalEmitterMixin<VotingBallotSignal, VotingBallotState> {
   final UserService _userService;
   final CampaignService _campaignService;
   final VotingBallotBuilder _ballotBuilder;
@@ -95,6 +96,11 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
 
   List<VotingListTileData> _buildTiles() {
     final votes = _ballotBuilder.votes;
+
+    if (votes.isEmpty) {
+      // Clear cache when ballot is empty
+      _cache = _cache.copyWith(votesProposals: {});
+    }
     final proposals = _cache.votesProposals;
 
     final tilesData = _mapVotesWithProposals(votes, proposals);
@@ -240,16 +246,27 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
       // First cast votes then clear the ballot because when something fails in casting then we don't
       // want to clear the ballot and let the user try again.
       await _votingService.castVotes(votingBallot.votes);
-      _ballotBuilder.clear();
 
       final tiles = _buildTiles();
       final footer = state.footer.copyWith(castingStep: const SuccessfullyCastVotesStep());
-      emit(state.copyWith(tiles: tiles, footer: footer));
+      // TODO(LynxxLynx): Remove this when integration with backend is fixed.
+      // Move clear ballot below castVotes from service
+      final randomBool = Random().nextBool();
+      if (randomBool) {
+        _ballotBuilder.clear();
+        emit(state.copyWith(tiles: tiles, footer: footer));
+      } else {
+        emit(
+          state.copyWith(
+            tiles: tiles,
+            footer: footer.copyWith(castingStep: const FailedToCastVotesStep()),
+          ),
+        );
+      }
     } catch (e, st) {
       _logger.severe('Error casting votes', e, st);
       final footer = state.footer.copyWith(castingStep: const FailedToCastVotesStep());
       emit(state.copyWith(footer: footer));
-      emitError(LocalizedException.create(e));
     }
   }
 
@@ -270,6 +287,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
       emit(state.copyWith(footer: newFooter.copyWith(castingStep: confirmPasswordFailed)));
       return;
     }
+
     add(const CastVotesEvent());
   }
 
