@@ -7,7 +7,6 @@ project: {
 	}
 	deployment: {
 		on: {
-			merge: {}
 			tag: {}
 		}
 
