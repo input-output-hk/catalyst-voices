@@ -7,6 +7,7 @@ import '../utils/translations_utils.dart';
 
 class AppBarPage {
   AppBarPage(this.$);
+
   late PatrolTester $;
   final spacesDrawerButton = const Key('DrawerButton');
   final getStartedBtn = const Key('GetStartedButton');
@@ -18,8 +19,8 @@ class AppBarPage {
   final sessionAccountPopupMenuAvatar = const Key('SessionAccountPopupMenuAvatar');
   final createProposalBtn = const Key('CreateProposalButton');
 
-  Future<void> spacesDrawerButtonExists({bool? reverse = false}) async {
-    expect($(spacesDrawerButton).exists, !reverse!);
+  Future<void> spacesDrawerButtonExists({bool reverse = false}) async {
+    expect($(spacesDrawerButton).exists, !reverse);
   }
 
   Future<void> spacesDrawerButtonClick() async {

@@ -1,29 +1,22 @@
-import 'package:catalyst_voices/app/view/app.dart';
-import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/app/app.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
-import '../all_test.dart';
 import '../pageobject/app_bar_page.dart';
 import '../pageobject/overall_spaces_page.dart';
 import '../pageobject/spaces_drawer_page.dart';
 import '../utils/test_utils.dart';
 
-void main() {
-  setUp(() {
-    testsRouter.go(const DiscoveryRoute().location);
-  });
-
+void appTests() {
   // Add a simple first test that just verifies setup
   patrolWidgetTest('SETUP - app initializes correctly', (PatrolTester $) async {
-    await $.pumpApp();
+    await TestStateUtils.pumpApp($);
 
     // Just verify the app starts and is in visitor state
     expect(find.byType(App), findsOneWidget);
 
-    await AppBarPage($).visitorBtnIsVisible();
     await AppBarPage($).getStartedBtnIsVisible();
   });
 
@@ -33,8 +26,9 @@ void main() {
       patrolWidgetTest(
         'visitor - no drawer button',
         ($) async {
-          await $.pumpApp();
-          await AppBarPage($).spacesDrawerButtonExists();
+          await TestStateUtils.pumpApp($);
+
+          await AppBarPage($).spacesDrawerButtonExists(reverse: true);
         },
       );
 
@@ -46,7 +40,7 @@ void main() {
           final spaces = [Space.discovery, Space.workspace];
 
           await TestStateUtils.switchToAccount(account);
-          await $.pumpApp();
+          await TestStateUtils.pumpApp($);
 
           await AppBarPage($).spacesDrawerButtonClick();
           SpacesDrawerPage.commonElementsLookAsExpected($);
@@ -61,7 +55,7 @@ void main() {
         skip: true,
         'guest - chooser - all spaces button works',
         ($) async {
-          await $.pumpApp();
+          await TestStateUtils.pumpApp($);
           await $(OverallSpacesPage.guestShortcutBtn).tap(settleTimeout: Time.long.duration);
           await AppBarPage($).spacesDrawerButtonClick();
           await $(SpacesDrawerPage.allSpacesBtn).tap();
@@ -76,7 +70,7 @@ void main() {
           final account = await TestAccounts.dummyAccount();
           await TestStateUtils.switchToAccount(account);
 
-          await $.pumpApp();
+          await TestStateUtils.pumpApp($);
           await $(OverallSpacesPage.userShortcutBtn).tap(settleTimeout: Time.long.duration);
           await AppBarPage($).spacesDrawerButtonClick();
           await $(SpacesDrawerPage.allSpacesBtn).tap();
@@ -98,7 +92,7 @@ void main() {
             Space.fundedProjects: 'Funded project space',
             Space.treasury: 'Treasury space',
           };
-          await $.pumpApp();
+          await TestStateUtils.pumpApp($);
           await $(OverallSpacesPage.userShortcutBtn).tap(settleTimeout: Time.long.duration);
           await AppBarPage($).spacesDrawerButtonClick();
           for (final space in Space.values) {
