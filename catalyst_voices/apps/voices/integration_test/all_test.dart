@@ -27,6 +27,10 @@ void main() {
 
   tearDown(() async {
     debugPrint('AllTest -> TearDown');
+
+    // await any pending database queries
+    await Future<void>.delayed(const Duration(seconds: 1));
+
     await cleanUpStorages();
     await cleanUpUserDataFromDatabase();
     await Dependencies.instance.reset;
@@ -38,4 +42,5 @@ void main() {
   });
 
   group('App -', appTests);
+  group('Account -', accountTests);
 }

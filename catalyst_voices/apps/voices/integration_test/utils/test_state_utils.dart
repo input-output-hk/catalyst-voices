@@ -113,6 +113,16 @@ class TestStateUtils {
     if (debugLogs) logWidgets();
   }
 
+  static Future<void> removeAccounts() async {
+    final service = Dependencies.instance.get<UserService>();
+
+    final user = await service.getUser();
+
+    for (final account in user.accounts.reversed) {
+      await service.removeAccount(account);
+    }
+  }
+
   static Future<void> switchToAccount(Account account) async {
     final service = Dependencies.instance.get<UserService>();
 

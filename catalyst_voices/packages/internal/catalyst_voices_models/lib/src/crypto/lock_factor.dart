@@ -20,11 +20,14 @@ final class PasswordLockFactor implements LockFactor {
 
   const PasswordLockFactor(this._data);
 
-  @override
-  Uint8List get seed => utf8.encode(_data);
+  @visibleForTesting
+  String get data => _data;
 
   @override
-  String toString() => 'PasswordLockFactor(${_data.hashCode})';
+  int get hashCode => _data.hashCode;
+
+  @override
+  Uint8List get seed => utf8.encode(_data);
 
   // Note. normal equals hash implementation because don't want to expose
   // password data.
@@ -34,5 +37,5 @@ final class PasswordLockFactor implements LockFactor {
       other is PasswordLockFactor && runtimeType == other.runtimeType && _data == other._data;
 
   @override
-  int get hashCode => _data.hashCode;
+  String toString() => 'PasswordLockFactor(${_data.hashCode})';
 }

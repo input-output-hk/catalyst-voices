@@ -1,4 +1,4 @@
-// export 'account_test.dart';
+export 'account_test.dart';
 export 'app_test.dart';
 
 // export 'discovery_test.dart';

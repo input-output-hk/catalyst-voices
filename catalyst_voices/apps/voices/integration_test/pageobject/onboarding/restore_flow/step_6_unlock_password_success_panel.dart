@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -18,7 +19,10 @@ class UnlockPasswordSuccessPanel extends OnboardingPageBase {
   @override
   Future<void> goto() async {
     await UnlockPasswordInputPanel($).goto();
-    await UnlockPasswordInputPanel($).enterPassword('Test1234', 'Test1234');
+    await UnlockPasswordInputPanel($).enterPassword(
+      Account.dummyUnlockFactor.data,
+      Account.dummyUnlockFactor.data,
+    );
     await UnlockPasswordInputPanel($).clickNext();
   }
 
