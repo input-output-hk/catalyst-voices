@@ -341,7 +341,7 @@ final class VotingCubit extends Cubit<VotingState>
       selectedCategory: Optional(selectedCategoryViewModel),
       fundNumber: Optional(fundNumber),
       votingPower: votingPowerViewModel,
-      votingPhase: votingPhaseViewModel,
+      votingPhase: Optional(votingPhaseViewModel),
       hasSearchQuery: hasSearchQuery,
       favoritesIds: favoriteIds,
       count: count,
