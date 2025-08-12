@@ -37,6 +37,11 @@ impl Api {
     ) -> registrations_get::AllResponses {
         let token = auth.into();
         // `Box::pin` is used here because of the future size (`clippy::large_futures` lint).
-        Box::pin(registrations_get::endpoint(lookup, token, show_all_invalid)).await
+        Box::pin(registrations_get::endpoint(
+            lookup,
+            token,
+            show_all_invalid.is_some_and(Into::into),
+        ))
+        .await
     }
 }

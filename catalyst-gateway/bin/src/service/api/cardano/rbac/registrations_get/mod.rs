@@ -39,15 +39,14 @@ use crate::{
         },
         common::{
             auth::rbac::token::CatalystRBACTokenV1,
-            types::{cardano::query::cat_id_or_stake::CatIdOrStake, generic::boolean::BooleanFlag},
+            types::cardano::query::cat_id_or_stake::CatIdOrStake,
         },
     },
 };
 
 /// Get RBAC registration endpoint.
 pub(crate) async fn endpoint(
-    lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>,
-    show_all_invalid: Option<BooleanFlag>,
+    lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>, show_all_invalid: bool,
 ) -> AllResponses {
     if lookup.is_none() && token.is_none() {
         return Responses::UnprocessableContent(Json(RbacUnprocessableContent::new(
@@ -57,13 +56,7 @@ pub(crate) async fn endpoint(
     }
 
     // Box::pin is used here because of the future size (`clippy::large_futures` lint).
-    match Box::pin(reg_chain(
-        lookup,
-        token,
-        show_all_invalid.unwrap_or_default().into(),
-    ))
-    .await
-    {
+    match Box::pin(reg_chain(lookup, token, show_all_invalid)).await {
         Err(e) => AllResponses::handle_error(&e),
         Ok(Some(c)) => Responses::Ok(Json(Box::new(c))).into(),
         Ok(None) => Responses::NotFound.into(),
