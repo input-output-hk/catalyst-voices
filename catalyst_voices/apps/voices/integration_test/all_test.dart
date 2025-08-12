@@ -2,7 +2,6 @@ import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
@@ -16,8 +15,6 @@ void main() {
   });
 
   setUp(() async {
-    debugPrint('AllTest -> SetUp');
-
     await bootstrap();
 
     await loggingService.updateSettings(printToConsole: const Optional(false));
@@ -26,8 +23,6 @@ void main() {
   });
 
   tearDown(() async {
-    debugPrint('AllTest -> TearDown');
-
     // await any pending database queries
     await Future<void>.delayed(const Duration(seconds: 1));
 
@@ -37,7 +32,6 @@ void main() {
   });
 
   tearDownAll(() {
-    debugPrint('AllTest -> TearDownAll');
     binding.testTextInput.unregister();
   });
 
