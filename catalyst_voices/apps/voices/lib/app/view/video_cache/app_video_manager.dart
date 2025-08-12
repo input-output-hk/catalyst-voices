@@ -9,11 +9,11 @@ import 'package:video_player/video_player.dart';
 /// Caches [VideoPlayerController] so it can be initialized and reused in different parts
 /// of app.
 class VideoManager extends ValueNotifier<VideoManagerState> {
-  bool _isInitialized = false;
+  var _isInitialized = Completer<bool>();
 
   VideoManager() : super(const VideoManagerState(controllers: {}));
 
-  bool get isInitialized => _isInitialized;
+  Future<bool> get isInitialized => _isInitialized.future;
 
   Future<VideoPlayerController> createOrReinitializeController(
     VideoCacheKey asset,
@@ -40,7 +40,7 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
 
   @override
   void dispose() {
-    unawaited(_disposeControllers());
+    _disposeControllers();
     super.dispose();
   }
 
@@ -48,7 +48,7 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
     BuildContext context, {
     required VideoPrecacheAssets videoAssets,
   }) async {
-    if (_isInitialized) return;
+    if (_isInitialized.isCompleted) return;
 
     final newControllers = Map.of(value.controllers);
 
@@ -63,14 +63,17 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
     );
 
     value = value.copyWith(controllers: newControllers);
-    _isInitialized = true;
+    _isInitialized.complete(true);
   }
 
   Future<void> resetCacheIfNeeded(ThemeData theme) async {
     if (value.brightness != theme.brightness) {
-      _isInitialized = false;
-      await _disposeControllers();
-      value = value.copyWith(brightness: Optional(theme.brightness));
+      _isInitialized = Completer();
+      _disposeControllers();
+      value = value.copyWith(
+        controllers: {},
+        brightness: Optional(theme.brightness),
+      );
     }
   }
 
@@ -78,11 +81,11 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
     return '$asset${package != null ? "_$package" : "_unknown"}';
   }
 
-  Future<void> _disposeControllers() async {
-    for (final controller in value.controllers.values) {
-      await controller.dispose();
+  void _disposeControllers() {
+    final controllers = List.of(value.controllers.values);
+    for (final controller in controllers) {
+      unawaited(controller.dispose());
     }
-    value = value.copyWith(controllers: {});
   }
 
   Future<VideoPlayerController> _initializeController(
