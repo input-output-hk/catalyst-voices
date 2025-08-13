@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
+import 'package:synchronized/synchronized.dart';
 
 class GlobalPrecacheImages extends StatefulWidget {
   final Widget child;
@@ -22,6 +23,8 @@ class ImagePrecacheService {
   final Set<SvgGenImage> _svgs = {};
   final Set<AssetGenImage> _assets = {};
 
+  final _lock = Lock();
+
   Brightness? _lastThemeMode;
 
   ImagePrecacheService._();
@@ -32,22 +35,30 @@ class ImagePrecacheService {
     BuildContext context, {
     List<SvgGenImage> svgs = const [],
     List<AssetGenImage> assets = const [],
-  }) async {
-    if (_isInitialized.isCompleted) return;
+  }) {
+    return _lock.synchronized<void>(
+      () async {
+        if (_isInitialized.isCompleted) return;
 
-    _svgs.addAll(svgs);
-    _assets.addAll(assets);
+        _svgs.addAll(svgs);
+        _assets.addAll(assets);
 
-    await Future.wait([
-      ..._svgs.map((e) => e.cache(context: context)),
-      ..._assets.map((e) => e.cache(context: context)),
-    ]);
+        await Future.wait([
+          ..._svgs.map((e) => e.cache(context: context)),
+          ..._assets.map((e) => e.cache(context: context)),
+        ]);
 
-    _isInitialized.complete(true);
+        if (!_isInitialized.isCompleted) _isInitialized.complete(true);
+      },
+    );
   }
 
   void resetCacheIfNeeded(ThemeData theme) {
     if (_lastThemeMode != theme.brightness) {
+      // Handle case when caching is in progress and someone awaits completion.
+      // For such case we're completing _isInitialized early.
+      if (!_isInitialized.isCompleted && _lock.inLock) _isInitialized.complete(false);
+
       _isInitialized = Completer<bool>();
       _lastThemeMode = theme.brightness;
     }
