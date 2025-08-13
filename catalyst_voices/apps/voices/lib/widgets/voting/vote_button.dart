@@ -19,12 +19,14 @@ class VoteButton extends StatelessWidget {
   final VoteButtonData data;
   final ValueChanged<VoteButtonAction> onSelected;
   final bool isCompact;
+  final bool readOnly;
 
   const VoteButton({
     super.key,
     this.data = const VoteButtonData(),
     required this.onSelected,
     this.isCompact = false,
+    this.readOnly = false,
   });
 
   @override
@@ -42,20 +44,26 @@ class VoteButton extends StatelessWidget {
     final textStyle = (textTheme.labelLarge ?? const TextStyle()).copyWith(color: foregroundColor);
     final iconStyle = IconThemeData(size: 18, color: foregroundColor);
 
-    return ConstrainedBox(
-      constraints: const BoxConstraints.tightFor(height: 32),
-      child: Material(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(8),
-        child: DefaultTextStyle(
-          style: textStyle,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          child: IconTheme(
-            data: iconStyle,
-            child: isCompact
-                ? _VoteButtonCompact(data, onSelected: onSelected)
-                : _VoteButtonExpanded(data, onSelected: onSelected),
+    return AbsorbPointer(
+      absorbing: readOnly,
+      child: Visibility(
+        visible: data.hasVoted || !readOnly,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints.tightFor(height: 32),
+          child: Material(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(8),
+            child: DefaultTextStyle(
+              style: textStyle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              child: IconTheme(
+                data: iconStyle,
+                child: isCompact
+                    ? _VoteButtonCompact(data, onSelected: onSelected)
+                    : _VoteButtonExpanded(data, onSelected: onSelected, readOnly: readOnly),
+              ),
+            ),
           ),
         ),
       ),
