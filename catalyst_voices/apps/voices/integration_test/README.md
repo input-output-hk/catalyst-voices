@@ -74,12 +74,15 @@ To run the integration tests via the command line, use the following command:
 
 ```bash
 flutter drive \
+  --dart-define=ENV_NAME=dev \
   --web-header Cross-Origin-Opener-Policy=same-origin \
   --web-header Cross-Origin-Embedder-Policy=require-corp \
   --driver=test_driver/integration_tests.dart \
   --target=integration_test/all_test.dart \
   -d chrome
 ```
+
+Where `ENV_NAME` can be `dev`|`preprod`|`prod`|`relative`.
 
 ### Via Visual Studio Code
 

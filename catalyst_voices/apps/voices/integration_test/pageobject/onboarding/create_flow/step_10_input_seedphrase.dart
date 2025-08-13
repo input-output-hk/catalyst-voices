@@ -12,6 +12,7 @@ class InputSeedphrasePanel extends OnboardingPageBase {
   static const seedPhrasesPicker = Key('SeedPhrasesPicker');
   final resetButton = const Key('ResetButton');
 
+  @override
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }

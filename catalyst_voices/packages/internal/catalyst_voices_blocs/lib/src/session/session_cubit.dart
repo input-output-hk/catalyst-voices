@@ -222,12 +222,7 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
   Future<Account> _getDummyAccount() async {
     final dummyAccount = _userService.user.accounts.firstWhereOrNull((e) => e.isDummy);
 
-    return dummyAccount ??
-        await _registrationService.registerTestAccount(
-          keychainId: Account.dummyKeychainId,
-          seedPhrase: Account.dummySeedPhrase,
-          lockFactor: Account.dummyUnlockFactor,
-        );
+    return dummyAccount ?? await _registrationService.createDummyAccount();
   }
 
   void _handleUserSettings(UserSettings settings) {

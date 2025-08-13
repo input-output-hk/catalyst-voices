@@ -8,6 +8,7 @@ import 'step_8_writedown_seedphrase.dart';
 class WritedownSeedphraseInfoPanel extends OnboardingPageBase {
   WritedownSeedphraseInfoPanel(super.$);
 
+  @override
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }

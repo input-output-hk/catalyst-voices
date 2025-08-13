@@ -7,6 +7,7 @@ import '../utils/translations_utils.dart';
 
 class AppBarPage {
   AppBarPage(this.$);
+
   late PatrolTester $;
   final spacesDrawerButton = const Key('DrawerButton');
   final getStartedBtn = const Key('GetStartedButton');
@@ -16,13 +17,22 @@ class AppBarPage {
   final unlockBtn = const Key('UnlockButton');
   final visitorBtn = const Key('VisitorBtn');
   final sessionAccountPopupMenuAvatar = const Key('SessionAccountPopupMenuAvatar');
+  final createProposalBtn = const Key('CreateProposalButton');
 
-  Future<void> spacesDrawerButtonExists({bool? reverse = false}) async {
-    expect($(spacesDrawerButton).exists, !reverse!);
+  Future<void> spacesDrawerButtonExists({bool reverse = false}) async {
+    expect($(spacesDrawerButton).exists, !reverse);
   }
 
   Future<void> spacesDrawerButtonClick() async {
     await $(spacesDrawerButton).waitUntilVisible().tap();
+  }
+
+  Future<void> createProposalBtnIsVisible() async {
+    expect($(createProposalBtn), findsOneWidget);
+  }
+
+  Future<void> createProposalBtnIsNotVisible() async {
+    expect($(createProposalBtn), findsNothing);
   }
 
   Future<void> getStartedBtnClick() async {
@@ -32,6 +42,10 @@ class AppBarPage {
   Future<void> getStartedBtnIsVisible() async {
     expect($(getStartedBtn), findsOneWidget);
     expect($(getStartedBtn).$(Text).text, (await t()).getStarted);
+  }
+
+  Future<bool> getStartedBtnExists() async {
+    return $(getStartedBtn).exists;
   }
 
   Future<void> finishAccountCreationBtnIsVisible() async {

@@ -45,7 +45,6 @@ class AccountDropdownPage {
   Future<void> accountDropdownLooksAsExpected() async {
     expect($(profileAndKeychainText), findsOneWidget);
     expect($(segmentedButton), findsWidgets);
-    expect($(setupRolesMenuItem), findsOneWidget);
     expect($(lockAccountButton), findsOneWidget);
   }
 

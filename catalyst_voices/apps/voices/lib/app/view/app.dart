@@ -33,7 +33,7 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-    unawaited(Dependencies.instance.get<UserService>().useLastAccount());
+    unawaited(Dependencies.instance.get<UserService>().useLocalUser());
   }
 
   List<BlocProvider> _multiBlocProviders() {

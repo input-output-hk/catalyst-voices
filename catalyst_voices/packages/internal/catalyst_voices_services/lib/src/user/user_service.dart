@@ -5,6 +5,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 
 /// [UserService] allows to manage user accounts.
 /// [watchUser] returns a stream of user changes which allows to react to user changes.
@@ -26,8 +27,10 @@ abstract interface class UserService implements ActiveAware {
   /// The method returns the last known transaction ID.
   Future<TransactionHash> getPreviousRegistrationTransactionId();
 
+  /// Simple [User] getter.
   Future<User> getUser();
 
+  /// Checks if active account is verified in reviews API.
   Future<bool> isActiveAccountPubliclyVerified();
 
   /// Fetches info about recovered account.
@@ -51,7 +54,12 @@ abstract interface class UserService implements ActiveAware {
   /// the [EmailAlreadyUsedException] thrown in case of non-unique email.
   Future<void> registerAccount(Account account);
 
+  /// Removes [account] from current [User] (if such account found).
   Future<void> removeAccount(Account account);
+
+  /// Removes all accounts from current [User].
+  @visibleForTesting
+  Future<void> removeAllAccounts();
 
   /// Throws [EmailAlreadyUsedException] if email already taken.
   Future<void> resendActiveAccountVerificationEmail();
@@ -66,17 +74,19 @@ abstract interface class UserService implements ActiveAware {
     Set<AccountRole>? roles,
   });
 
+  /// At the moments checks active account verification status in reviews API.
   Future<void> updateActiveAccountDetails();
 
+  /// Updates [User]'s settings.
   Future<void> updateSettings(UserSettings newValue);
 
   /// Make the [account] active one. If it doesn't exist then it'll be created.
   Future<void> useAccount(Account account);
 
-  Future<void> useLastAccount();
+  /// Tries to lookup user locally and stores it in [UserObserver].
+  Future<void> useLocalUser();
 }
 
-// TODO(damian-molinski): Refactor to move most logic to UserRepository
 final class UserServiceImpl implements UserService {
   final UserRepository _userRepository;
   final UserObserver _userObserver;
@@ -199,6 +209,19 @@ final class UserServiceImpl implements UserService {
     await _updateUser(user);
 
     await account.keychain.erase();
+  }
+
+  @override
+  Future<void> removeAllAccounts() async {
+    var user = await getUser();
+
+    for (final account in user.accounts) {
+      await account.keychain.erase();
+    }
+
+    user = user.copyWith(accounts: []);
+
+    await _updateUser(user);
   }
 
   @override
@@ -339,7 +362,7 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
-  Future<void> useLastAccount() async {
+  Future<void> useLocalUser() async {
     final user = await _userRepository.getUser();
 
     await _updateUser(user);

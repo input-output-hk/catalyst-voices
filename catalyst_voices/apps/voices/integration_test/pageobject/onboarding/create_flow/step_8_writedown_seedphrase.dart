@@ -21,6 +21,7 @@ class WriteDownSeedphrasePanel extends OnboardingPageBase {
     await CatalystKeychainSuccessPanel($).clickNext();
   }
 
+  @override
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }

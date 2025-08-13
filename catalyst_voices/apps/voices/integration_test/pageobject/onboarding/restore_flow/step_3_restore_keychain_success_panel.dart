@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../../utils/translations_utils.dart';
 import '../../common_page.dart';
 import '../onboarding_base_page.dart';
-import 'step_4_restore_keychain_input_panel.dart';
+import 'step_2_seedphrase_instructions_panel.dart';
 
 class RestoreKeychainSuccessPanel extends OnboardingPageBase {
   RestoreKeychainSuccessPanel(super.$);
@@ -25,23 +25,24 @@ class RestoreKeychainSuccessPanel extends OnboardingPageBase {
 
   @override
   Future<void> goto() async {
+    // TODO(emiride): rethink how to setup tests accounts in different environments for gateway.
     final seedPhrase = [
-      'broken',
-      'member',
-      'repeat',
-      'liquid',
-      'barely',
-      'electric',
-      'theory',
-      'paddle',
-      'coyote',
-      'behind',
-      'unique',
-      'member',
+      'flock',
+      'please',
+      'gather',
+      'sign',
+      'adult',
+      'clog',
+      'board',
+      'sentence',
+      'toward',
+      'mistake',
+      'tonight',
+      'forest',
     ];
     await RestoreKeychainInputPanel($).goto();
     await RestoreKeychainInputPanel($).enterSeedPhrase(seedPhrase);
-    await RestoreKeychainInputPanel($).clickNext();
+    await clickNext();
     await _ensureWalletIsRecovered();
   }
 

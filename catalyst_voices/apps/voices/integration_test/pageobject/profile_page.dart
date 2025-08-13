@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
+
 import '../utils/translations_utils.dart';
 import 'common_page.dart';
 
 class ProfilePage {
   ProfilePage(this.$);
+
   late PatrolTester $;
   final displayNameTile = const Key('AccountDisplayNameTile');
   final accountEmailTile = const Key('AccountEmailTile');
@@ -25,20 +27,34 @@ class ProfilePage {
   final appBarProfileAvatar = const Key('ProfileAvatar');
   final profileAndKeychainText = const Key('ProfileAndKeychainText');
   final accountEmailTextField = const Key('AccountEmailTextField');
-  final emailTileSaveBtn = const Key('EmailTileSaveButton');
+  final tileSaveBtn = const Key('EditableTileSaveButton');
   final deleteKeychainContinueButton = const Key('DeleteKeychainContinueButton');
   final deleteKeychainTextField = const Key('DeleteKeychainTextField');
   final keychainDeletedDialogCloseButton = const Key('KeychainDeletedDialogCloseButton');
+  final verificationEmailOkButton = const Key('VerificationEmailOkButton');
+
   Future<void> clickDisplayNameEdit() async {
     await $(displayNameTile).$(editBtn).tap();
+  }
+
+  Future<void> clickDisplayNameSave() async {
+    await $(displayNameTile).$(tileSaveBtn).tap();
   }
 
   Future<void> clickEmailAddressEdit() async {
     await $(accountEmailTile).$(editBtn).tap();
   }
 
+  Future<void> clickEmailAddressSave() async {
+    await $(accountEmailTile).$(tileSaveBtn).tap();
+  }
+
   Future<void> addRoleClick() async {
     await $(accountRolesTile).$(addRole).tap();
+  }
+
+  Future<void> clickBackButton() async {
+    await $(navigationBackBtn).tap();
   }
 
   Future<void> removeKeychainClick() async {
@@ -76,10 +92,6 @@ class ProfilePage {
     );
     expect(
       $(accountKeychainTile),
-      findsOneWidget,
-    );
-    expect(
-      $(startProposalBtn),
       findsOneWidget,
     );
     expect(

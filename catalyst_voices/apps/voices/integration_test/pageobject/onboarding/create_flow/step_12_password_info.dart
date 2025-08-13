@@ -8,7 +8,10 @@ import 'step_11_seedphrase_success.dart';
 
 class PasswordInfoPanel extends OnboardingPageBase {
   PasswordInfoPanel(super.$);
+
   final lockedPictureConstrainedBox = const Key('LockedPictureConstrainedBox');
+
+  @override
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }
