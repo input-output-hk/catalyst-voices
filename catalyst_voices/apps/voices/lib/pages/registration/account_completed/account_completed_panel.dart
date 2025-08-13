@@ -87,15 +87,16 @@ class _NextStep extends StatelessWidget {
 class _OpenDiscoveryButton extends StatelessWidget {
   final VoidCallback onTap;
 
-  const _OpenDiscoveryButton({
-    required this.onTap,
-  });
+  const _OpenDiscoveryButton({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       onTap: onTap,
-      child: Text(context.l10n.registrationCompletedDiscoveryButton),
+      child: Semantics(
+        identifier: 'OpenDiscoveryButton',
+        child: Text(context.l10n.registrationCompletedDiscoveryButton),
+      ),
     );
   }
 }
@@ -103,15 +104,16 @@ class _OpenDiscoveryButton extends StatelessWidget {
 class _ReviewMyAccountButton extends StatelessWidget {
   final VoidCallback onTap;
 
-  const _ReviewMyAccountButton({
-    required this.onTap,
-  });
+  const _ReviewMyAccountButton({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return VoicesTextButton(
       onTap: onTap,
-      child: Text(context.l10n.registrationCompletedAccountButton),
+      child: Semantics(
+        identifier: 'ReviewMyAccountButton',
+        child: Text(context.l10n.registrationCompletedAccountButton),
+      ),
     );
   }
 }
@@ -130,27 +132,19 @@ class _RolesFooter extends StatelessWidget {
         ...roles.map(
           (role) => Row(
             children: [
-              Text(
-                '1x',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
+              Text('1x', style: Theme.of(context).textTheme.bodySmall),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4),
                 child: VoicesChip(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 1,
-                    horizontal: 6,
-                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 6),
                   content: Text(
                     role.getName(context),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colors.successContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      color: Theme.of(context).colors.successContainer,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(6),
-                  ),
+                  borderRadius: const BorderRadius.all(Radius.circular(6)),
                   backgroundColor: Theme.of(context).colors.success,
                 ),
               ),
@@ -161,11 +155,7 @@ class _RolesFooter extends StatelessWidget {
             ],
           ),
         ),
-      ]
-          .separatedBy(
-            const SizedBox(height: 6),
-          )
-          .toList(),
+      ].separatedBy(const SizedBox(height: 6)).toList(),
     );
   }
 }
@@ -173,9 +163,7 @@ class _RolesFooter extends StatelessWidget {
 class _RolesSelectedCard extends StatelessWidget {
   final Set<AccountRole> roles;
 
-  const _RolesSelectedCard({
-    required this.roles,
-  });
+  const _RolesSelectedCard({required this.roles});
 
   @override
   Widget build(BuildContext context) {
@@ -222,20 +210,14 @@ class _TitleText extends StatelessWidget {
 class _WalletConnectedCard extends StatelessWidget {
   final String walletName;
 
-  const _WalletConnectedCard({
-    required this.walletName,
-  });
+  const _WalletConnectedCard({required this.walletName});
 
   @override
   Widget build(BuildContext context) {
     return ActionCard(
       icon: VoicesAssets.icons.wallet.buildIcon(),
-      title: Text(
-        context.l10n.registrationCompletedWalletTitle(walletName),
-      ),
-      desc: Text(
-        context.l10n.registrationCompletedWalletInfo(walletName),
-      ),
+      title: Text(context.l10n.registrationCompletedWalletTitle(walletName)),
+      desc: Text(context.l10n.registrationCompletedWalletInfo(walletName)),
       statusIcon: VoicesAssets.icons.check.buildIcon(),
     );
   }
