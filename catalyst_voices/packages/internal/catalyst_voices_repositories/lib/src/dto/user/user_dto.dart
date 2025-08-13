@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/account_dto.dart';
 import 'package:catalyst_voices_repositories/src/user/keychain/keychain_provider.dart';
-import 'package:catalyst_voices_repositories/src/utils/json_converters.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user_dto.g.dart';
