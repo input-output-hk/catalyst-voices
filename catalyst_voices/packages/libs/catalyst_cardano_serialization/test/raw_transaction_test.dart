@@ -5,7 +5,7 @@ import 'package:catalyst_cardano_serialization/src/raw_transaction_aspect.dart';
 import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart' as kd;
 import 'package:cbor/cbor.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 void main() {
