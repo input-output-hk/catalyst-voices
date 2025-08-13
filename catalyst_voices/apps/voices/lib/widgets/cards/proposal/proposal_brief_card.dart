@@ -16,6 +16,8 @@ class ProposalBriefCard extends StatefulWidget {
   final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
   final ValueChanged<VoteButtonAction>? onVoteAction;
+  // TODO(LynxxLynx): This should come from campaign settings
+  final bool readOnly;
 
   const ProposalBriefCard({
     super.key,
@@ -23,6 +25,7 @@ class ProposalBriefCard extends StatefulWidget {
     this.onTap,
     this.onFavoriteChanged,
     this.onVoteAction,
+    this.readOnly = false,
   });
 
   @override
@@ -39,7 +42,7 @@ class _Author extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         spacing: 8,
@@ -92,8 +95,8 @@ class _Description extends StatelessWidget {
       key: const Key('Description'),
       text,
       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: Theme.of(context).colors.textOnPrimaryLevel0,
-          ),
+        color: Theme.of(context).colors.textOnPrimaryLevel0,
+      ),
       maxLines: isTruncated ? 3 : 5,
       overflow: TextOverflow.ellipsis,
     );
@@ -217,9 +220,7 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                     category: proposal.categoryName,
                   ),
                   const SizedBox(height: 4),
-                  Expanded(
-                    child: _Title(text: proposal.title),
-                  ),
+                  _Title(text: proposal.title),
                   _Author(author: proposal.author),
                   _FundsAndDuration(
                     funds: proposal.formattedFunds,
@@ -229,7 +230,7 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                   Expanded(
                     child: _Description(
                       text: proposal.description,
-                      isTruncated: voteData != null,
+                      isTruncated: voteData?.hasVoted ?? false,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -239,13 +240,13 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                     updateDate: proposal.updateDate,
                     commentsCount: proposal.commentsCount,
                   ),
-                  if (voteData != null && onVoteAction != null) ...[
-                    const SizedBox(height: 12),
+                  if (voteData?.hasVoted ?? false) const SizedBox(height: 12),
+                  if (voteData != null && onVoteAction != null)
                     VoteButton(
                       data: voteData,
                       onSelected: onVoteAction,
+                      readOnly: widget.readOnly,
                     ),
-                  ],
                 ],
               ),
             ),
@@ -326,12 +327,15 @@ class _Title extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      key: const Key('Title'),
-      text,
-      style: Theme.of(context).textTheme.titleLarge,
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
+    return ConstrainedBox(
+      constraints: const BoxConstraints.tightFor(height: 88),
+      child: Text(
+        key: const Key('Title'),
+        text,
+        style: Theme.of(context).textTheme.titleLarge,
+        maxLines: 3,
+        overflow: TextOverflow.ellipsis,
+      ),
     );
   }
 }
