@@ -199,7 +199,7 @@ void main() {
       },
     );
 
-    test('use last account restores previously stored', () async {
+    test('use local user restores previously stored', () async {
       // Given
       final keychainId = const Uuid().v4();
 
@@ -220,7 +220,7 @@ void main() {
       expect(service.user.activeAccount, lastAccount);
     });
 
-    test('use last account does nothing on clear instance', () async {
+    test('use local user does nothing on clear instance', () async {
       // Given
 
       // When
