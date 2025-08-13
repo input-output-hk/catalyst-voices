@@ -84,33 +84,22 @@ class TestStateUtils {
     }
 
     if (debugLogs) debugPrint('Pumping app');
-
     await $.pumpWidgetAndSettle(App(routerConfig: router));
-
     if (debugLogs) debugPrint('Awaiting VideoManager to initialize');
-
     await Dependencies.instance.get<VideoManager>().isInitialized;
-
     await $.pump();
-
     if (debugLogs) debugPrint('awaiting precache to initialize');
-
     await ImagePrecacheService.instance.isInitialized;
-
     if (debugLogs) {
       logWidgets();
       debugPrint('1st pump and try settle');
     }
-
     await $.pumpAndTrySettle();
-
     if (debugLogs) {
       logWidgets();
       debugPrint('2nd pump and try settle');
     }
-
     await $.pumpAndTrySettle();
-
     if (debugLogs) logWidgets();
   }
 
