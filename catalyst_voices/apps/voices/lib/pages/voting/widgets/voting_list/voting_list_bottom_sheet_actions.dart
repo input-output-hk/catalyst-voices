@@ -33,16 +33,19 @@ class VotingListBottomSheetActions extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: VoicesFilledButton(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            onTap: nextAction,
-            child: isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(),
-                  )
-                : Text(nextActionText),
+          child: AbsorbPointer(
+            absorbing: isLoading,
+            child: VoicesFilledButton(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              onTap: nextAction,
+              child: isLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(),
+                    )
+                  : Text(nextActionText),
+            ),
           ),
         ),
       ],

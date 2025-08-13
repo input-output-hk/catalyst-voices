@@ -41,9 +41,7 @@ class _VotingListBottomSheetConfirmPasswordState
                 context.textTheme.titleMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
           ),
           const SizedBox(height: 12),
-          Text(
-            context.l10n.voteSubmissionDescription,
-          ),
+          Text(context.l10n.voteSubmissionDescription),
           const SizedBox(height: 32),
           VoicesPasswordTextField(
             autofocus: true,

@@ -18,8 +18,6 @@ class VotingListBottomSheet extends StatefulWidget {
 }
 
 class VotingListBottomSheetContent extends StatelessWidget {
-  static const double _borderRadius = 16;
-
   final VoidCallback nextAction;
   final String nextActionText;
   final bool isLoading;
@@ -39,9 +37,8 @@ class VotingListBottomSheetContent extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
       decoration: BoxDecoration(
         color: context.colors.elevationsOnSurfaceNeutralLv0,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(_borderRadius),
-          topRight: Radius.circular(_borderRadius),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(16),
         ),
       ),
       child: Column(

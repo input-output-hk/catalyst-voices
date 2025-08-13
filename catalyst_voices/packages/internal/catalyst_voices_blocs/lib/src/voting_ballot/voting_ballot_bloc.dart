@@ -97,10 +97,6 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
   List<VotingListTileData> _buildTiles() {
     final votes = _ballotBuilder.votes;
 
-    if (votes.isEmpty) {
-      // Clear cache when ballot is empty
-      _cache = _cache.copyWith(votesProposals: {});
-    }
     final proposals = _cache.votesProposals;
 
     final tilesData = _mapVotesWithProposals(votes, proposals);
@@ -203,18 +199,18 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
       // want to clear the ballot and let the user try again.
       await _votingService.castVotes(votingBallot.votes);
 
-      final tiles = _buildTiles();
       final footer = state.footer.copyWith(castingStep: const SuccessfullyCastVotesStep());
       // TODO(LynxxLynx): Remove this when integration with backend is fixed.
       // Move clear ballot below castVotes from service
       final randomBool = Random().nextBool();
       if (randomBool) {
         _ballotBuilder.clear();
+        _cache = _cache.copyWith(votesProposals: {});
+        final tiles = _buildTiles();
         emit(state.copyWith(tiles: tiles, footer: footer));
       } else {
         emit(
           state.copyWith(
-            tiles: tiles,
             footer: footer.copyWith(castingStep: const FailedToCastVotesStep()),
           ),
         );
@@ -238,7 +234,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
       emit(state.copyWith(footer: newFooter.copyWith(castingStep: confirmPasswordFailed)));
       return;
     }
-    final unlock = await keychain.confirmPassword(event.factor);
+    final unlock = await keychain.unlock(event.factor, dryRun: true);
     if (!unlock) {
       emit(state.copyWith(footer: newFooter.copyWith(castingStep: confirmPasswordFailed)));
       return;

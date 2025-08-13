@@ -11,8 +11,6 @@ abstract interface class Lockable {
   /// Emits current value on when starts and any updates.
   Stream<bool> get watchIsUnlocked;
 
-  Future<bool> confirmPassword(LockFactor factor);
-
   /// Deletes unlockFactor if have any.
   Future<void> lock();
 
@@ -22,5 +20,9 @@ abstract interface class Lockable {
 
   /// Changes [isUnlocked] when [unlock] can unlock [LockFactor]
   /// from [setLock].
-  Future<bool> unlock(LockFactor unlock);
+  ///
+  /// When [dryRun] is true then it will not change [isUnlocked] and will
+  /// act as verification if [LockFactor] is valid. Use case would be to verify if
+  /// user can unlock [Lockable].
+  Future<bool> unlock(LockFactor unlock, {bool dryRun = false});
 }

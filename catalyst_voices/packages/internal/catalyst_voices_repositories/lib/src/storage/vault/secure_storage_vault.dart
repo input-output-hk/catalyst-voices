@@ -111,13 +111,6 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     await _cache.clear();
   }
 
-  /// Verifies if given [factor] matches the current lock.
-  @override
-  Future<bool> confirmPassword(LockFactor factor) async {
-    final lock = await _requireLock;
-    return _cryptoService.verifyKey(factor.seed, key: lock);
-  }
-
   @override
   Future<bool> contains({required String key}) async {
     await _initializationCompleter.future;
@@ -155,7 +148,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   }
 
   @override
-  Future<bool> unlock(LockFactor unlock) async {
+  Future<bool> unlock(LockFactor unlock, {bool dryRun = false}) async {
     await _initializationCompleter.future;
 
     if (!await _hasLock) {
@@ -166,6 +159,10 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     final lock = await _requireLock;
 
     final isVerified = await _cryptoService.verifyKey(seed, key: lock);
+    if (dryRun) {
+      return isVerified;
+    }
+
     await _updateUnlocked(isVerified);
 
     _erase(lock);
