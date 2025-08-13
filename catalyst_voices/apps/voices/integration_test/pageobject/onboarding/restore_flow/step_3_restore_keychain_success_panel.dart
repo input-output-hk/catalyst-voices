@@ -25,6 +25,7 @@ class RestoreKeychainSuccessPanel extends OnboardingPageBase {
 
   @override
   Future<void> goto() async {
+    // TODO(emiride): rethink how to setup tests accounts in different environments for gateway.
     final seedPhrase = [
       'flock',
       'please',
