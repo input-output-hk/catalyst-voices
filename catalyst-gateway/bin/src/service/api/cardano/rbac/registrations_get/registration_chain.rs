@@ -1,8 +1,5 @@
 //! RBAC registration chain.
 
-use std::collections::HashMap;
-
-use catalyst_types::catalyst_id::role_index::RoleId;
 use poem_openapi::{types::Example, Object};
 
 use crate::{
@@ -10,7 +7,7 @@ use crate::{
     service::{
         api::cardano::rbac::registrations_get::{
             invalid_registration_list::InvalidRegistrationList, purpose_list::PurposeList,
-            role_data::RbacRoleData, role_map::RoleMap,
+            role_data::RbacRoleData, role_list::RbacRoleList,
         },
         common::types::{
             cardano::{catalyst_id::CatalystId, transaction_id::TxnId},
@@ -36,13 +33,9 @@ pub struct RbacRegistrationChain {
     /// A list of registration purposes.
     #[oai(skip_serializing_if_is_empty)]
     purpose: PurposeList,
-    /// A map of role number to role data.
-    ///
-    /// The key of the map is a role identifier (`RoleId`) and the value is lists of
-    /// signing keys, encryption keys and payment addresses along with extended data map
-    /// (`RbacRoleData`).
+    /// A list of role data.
     #[oai(skip_serializing_if_is_empty)]
-    roles: RoleMap,
+    roles: RbacRoleList,
     /// A list of invalid registrations.
     #[oai(skip_serializing_if_is_empty)]
     invalid: InvalidRegistrationList,
@@ -55,7 +48,7 @@ impl Example for RbacRegistrationChain {
             purpose: PurposeList::example(),
             last_persistent_txn: Some(TxnId::example()),
             last_volatile_txn: Some(TxnId::example()),
-            roles: RoleMap::example(),
+            roles: RbacRoleList::example(),
             invalid: InvalidRegistrationList::example(),
         }
     }
@@ -73,7 +66,7 @@ impl RbacRegistrationChain {
         let mut last_persistent_txn = None;
         let mut last_volatile_txn = None;
         let mut purpose = Vec::new().into();
-        let mut roles = HashMap::new().into();
+        let mut roles = Vec::new().into();
         if let Some(info) = info {
             last_persistent_txn = info.last_persistent_txn.map(Into::into);
             last_volatile_txn = info.last_volatile_txn.map(Into::into);
@@ -100,12 +93,10 @@ impl RbacRegistrationChain {
 }
 
 /// Gets and converts a role data from the given chain info.
-fn role_data(info: &ChainInfo) -> anyhow::Result<HashMap<RoleId, RbacRoleData>> {
+fn role_data(info: &ChainInfo) -> anyhow::Result<Vec<RbacRoleData>> {
     info.chain
         .role_data_history()
         .iter()
-        .map(|(&role, data)| {
-            RbacRoleData::new(data, info.last_persistent_slot, &info.chain).map(|rbac| (role, rbac))
-        })
+        .map(|(&role, data)| RbacRoleData::new(role, data, info.last_persistent_slot, &info.chain))
         .collect()
 }

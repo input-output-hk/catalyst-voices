@@ -19,7 +19,7 @@ mod purpose_list;
 mod registration_chain;
 mod response;
 mod role_data;
-mod role_map;
+mod role_list;
 mod unprocessable_content;
 
 use futures::TryFutureExt;
