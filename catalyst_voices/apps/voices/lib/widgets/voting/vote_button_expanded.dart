@@ -103,10 +103,7 @@ class _VoteButtonHasVotedButton extends StatelessWidget {
               ),
             if (inVoteList) const _VoteInVoteListText(),
           ].separatedBy(const Text('·')),
-          Offstage(
-            offstage: readOnly,
-            child: VoicesAssets.icons.chevronDown.buildIcon(),
-          ),
+          if (!readOnly) VoicesAssets.icons.chevronDown.buildIcon(),
         ],
       ),
     );
