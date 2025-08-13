@@ -16,6 +16,8 @@ class PasswordInputPanel extends OnboardingPageBase {
   final passwordStrengthLabel = const Key('PasswordStrengthLabel');
   final enterPasswordText = const Key('EnterPasswordText');
   final voicesTextField = const Key('VoicesTextField');
+
+  @override
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }

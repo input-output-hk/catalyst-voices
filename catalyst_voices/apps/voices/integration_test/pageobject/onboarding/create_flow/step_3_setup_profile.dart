@@ -20,6 +20,7 @@ class SetupProfilePanel extends OnboardingPageBase {
 
   PatrolFinder get infoCardTitleLocator => $(emailInfoCard).$(#InfoCardTitle);
 
+  @override
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }

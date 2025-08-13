@@ -42,15 +42,9 @@ void accountTests() {
           await $.pumpAndTrySettle();
 
           await AccountDropdownPage($).clickProfileAndKeychain();
-
-          await $.pumpAndTrySettle();
-
           await ProfilePage($).removeKeychainClick();
           await $(ProfilePage($).deleteKeychainTextField).enterText('Remove Keychain');
           await $(ProfilePage($).deleteKeychainContinueButton).tap();
-
-          await $.pumpAndTrySettle();
-
           await AppBarPage($).getStartedBtnIsVisible();
         },
       );
@@ -62,13 +56,7 @@ void accountTests() {
           await TestStateUtils.pumpApp($);
 
           await AppBarPage($).lockBtnClick();
-
-          await $.pumpAndTrySettle();
-
           await AppBarPage($).unlockBtnClick();
-
-          await $.pumpAndTrySettle();
-
           await $(UnlockModalPage($).unlockPasswordTextField).enterText(unlockFactor.data);
           await $(UnlockModalPage($).unlockConfirmPasswordButton).tap();
         },
@@ -81,36 +69,20 @@ void accountTests() {
           await TestStateUtils.pumpApp($);
 
           await AppBarPage($).unlockBtnClick();
-
-          await $.pumpAndTrySettle();
-
           await $(UnlockModalPage($).unlockPasswordTextField).enterText('admin_admin');
           await $(UnlockModalPage($).unlockConfirmPasswordButton).tap();
-
-          await $.pumpAndTrySettle();
-
           await UnlockModalPage($).incorrectPasswordErrorShowsUp();
         },
       );
 
       patrolWidgetTest(
         'user - clicking back button from account page',
-        skip: true,
         (PatrolTester $) async {
           await TestStateUtils.pumpApp($);
 
           await AppBarPage($).accountPopupBtnClick();
-
-          await $.pumpAndTrySettle();
-
           await AccountDropdownPage($).clickProfileAndKeychain();
-
-          await $.pumpAndTrySettle();
-
           await ProfilePage($).clickBackButton();
-
-          await $.pumpAndTrySettle();
-
           expect(find.byType(DiscoveryPage), findsOneWidget);
         },
       );
@@ -178,12 +150,10 @@ void accountTests() {
         tags: 'issues_1715',
         'user - Account dropdown button opens account dropdown',
         (PatrolTester $) async {
-          print('\n\nuser - Account dropdown button opens account dropdown');
           await TestStateUtils.pumpApp($);
 
           await AppBarPage($).accountPopupBtnClick();
           await AccountDropdownPage($).accountDropdownLooksAsExpected();
-          print('user - Account dropdown button opens account dropdown\n\n');
         },
       );
 

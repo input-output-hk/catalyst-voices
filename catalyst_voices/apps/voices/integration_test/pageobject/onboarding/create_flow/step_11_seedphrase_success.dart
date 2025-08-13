@@ -11,6 +11,7 @@ class SeedphraseSuccessPanel extends OnboardingPageBase {
 
   final nextStepBody = const Key('NextStepBody');
 
+  @override
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }
