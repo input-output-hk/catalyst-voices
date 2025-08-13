@@ -69,7 +69,7 @@ extension CampaignTimelineX on CampaignTimeline {
           '''Proposers submit initial ideas to solve challenges. Each proposal includes the problem, solution, requested ADA budget, and a clear implementation plan.''',
       timeline: DateRange(
         from: DateTime.utc(2025, 07, 25, 10),
-        to: DateTime.utc(2025, 10, 30, 18),
+        to: DateTime.utc(2025, 07, 30, 18),
       ),
       stage: CampaignTimelineStage.proposalSubmission,
     ),
