@@ -136,42 +136,40 @@ final class RegistrationServiceImpl implements RegistrationService {
     bool isActive = false,
     bool unlocked = true,
   }) async {
-    keychainId ??= const Uuid().v4();
+    return _keyDerivationService.deriveMasterKey(seedPhrase: seedPhrase).use((masterKey) async {
+      final keychain = await _keychainProvider.create(keychainId ?? const Uuid().v4());
+      await keychain.setLock(lockFactor);
+      await keychain.unlock(lockFactor);
+      await keychain.setMasterKey(masterKey);
 
-    final masterKey = await _keyDerivationService.deriveMasterKey(seedPhrase: seedPhrase);
+      if (!unlocked) {
+        await keychain.lock();
+      }
 
-    final keychain = await _keychainProvider.create(keychainId);
-    await keychain.setLock(lockFactor);
-    await keychain.unlock(lockFactor);
-    await keychain.setMasterKey(masterKey);
-
-    if (!unlocked) {
-      await keychain.lock();
-    }
-
-    final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
-      masterKey: masterKey,
-      role: AccountRole.root,
-    );
-
-    return keyPair.use((keyPair) {
-      final role0key = keyPair.publicKey;
-
-      final catalystId = CatalystId(
-        host: _blockchainConfig.host.host,
-        username: username,
-        role0Key: role0key.publicKeyBytes,
+      final keyPair = _keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: masterKey,
+        role: AccountRole.root,
       );
 
-      return Account(
-        catalystId: catalystId,
-        email: email,
-        keychain: keychain,
-        roles: roles ?? {AccountRole.voter, AccountRole.proposer},
-        address: address,
-        publicStatus: publicStatus ?? AccountPublicStatus.notSetup,
-        isActive: isActive,
-      );
+      return keyPair.use((keyPair) {
+        final role0key = keyPair.publicKey;
+
+        final catalystId = CatalystId(
+          host: _blockchainConfig.host.host,
+          username: username,
+          role0Key: role0key.publicKeyBytes,
+        );
+
+        return Account(
+          catalystId: catalystId,
+          email: email,
+          keychain: keychain,
+          roles: roles ?? {AccountRole.voter, AccountRole.proposer},
+          address: address,
+          publicStatus: publicStatus ?? AccountPublicStatus.notSetup,
+          isActive: isActive,
+        );
+      });
     });
   }
 
