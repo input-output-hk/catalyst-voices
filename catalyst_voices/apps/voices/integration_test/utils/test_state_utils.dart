@@ -20,6 +20,7 @@ class TestStateUtils {
     PatrolTester $,
     GoRouter router,
   ) async {
+    // TODO(damian-molinski): remove this function once all tests are migrated.
     throw UnimplementedError('Should use UserService instead');
     /*// Give app time to initialize and restore any previous session
     await Future<void>.delayed(const Duration(milliseconds: 500));
