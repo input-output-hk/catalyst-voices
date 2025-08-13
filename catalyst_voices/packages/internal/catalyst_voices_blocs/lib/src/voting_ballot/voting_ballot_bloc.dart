@@ -72,19 +72,19 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
   }
 
   @override
-  Future<void> close() {
+  Future<void> close() async {
     _ballotBuilder.removeListener(_handleBallotBuilderChange);
 
-    _votingPowerSub?.cancel();
+    await _votingPowerSub?.cancel();
     _votingPowerSub = null;
 
-    _activeCampaignSub?.cancel();
+    await _activeCampaignSub?.cancel();
     _activeCampaignSub = null;
 
     _phaseProgressTimer?.cancel();
     _phaseProgressTimer = null;
 
-    _watchedCastedVotesSub?.cancel();
+    await _watchedCastedVotesSub?.cancel();
     _watchedCastedVotesSub = null;
 
     return super.close();
