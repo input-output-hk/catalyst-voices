@@ -36,21 +36,19 @@ class ImagePrecacheService {
     List<SvgGenImage> svgs = const [],
     List<AssetGenImage> assets = const [],
   }) {
-    return _lock.synchronized<void>(
-      () async {
-        if (_isInitialized.isCompleted) return;
+    return _lock.synchronized<void>(() async {
+      if (_isInitialized.isCompleted) return;
 
-        _svgs.addAll(svgs);
-        _assets.addAll(assets);
+      _svgs.addAll(svgs);
+      _assets.addAll(assets);
 
-        await Future.wait([
-          ..._svgs.map((e) => e.cache(context: context)),
-          ..._assets.map((e) => e.cache(context: context)),
-        ]);
+      await Future.wait([
+        ..._svgs.map((e) => e.cache(context: context)),
+        ..._assets.map((e) => e.cache(context: context)),
+      ]);
 
-        if (!_isInitialized.isCompleted) _isInitialized.complete(true);
-      },
-    );
+      if (!_isInitialized.isCompleted) _isInitialized.complete(true);
+    });
   }
 
   void resetCacheIfNeeded(ThemeData theme) {
