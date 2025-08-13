@@ -25,9 +25,9 @@ class VotingProposalsPaginationTile extends StatelessWidget {
       },
       onFavoriteChanged: (isFavorite) {
         context.read<VotingCubit>().onChangeFavoriteProposal(
-              proposal.selfRef,
-              isFavorite: isFavorite,
-            );
+          proposal.selfRef,
+          isFavorite: isFavorite,
+        );
       },
       onVoteAction: (action) {
         final proposal = this.proposal.selfRef;
@@ -38,6 +38,7 @@ class VotingProposalsPaginationTile extends StatelessWidget {
 
         context.read<VotingBallotBloc>().add(event);
       },
+      readOnly: true,
     );
   }
 }

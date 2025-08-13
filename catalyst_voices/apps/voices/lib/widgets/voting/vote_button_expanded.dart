@@ -3,10 +3,12 @@ part of 'vote_button.dart';
 class _VoteButtonExpanded extends StatelessWidget {
   final VoteButtonData data;
   final ValueChanged<VoteButtonAction> onSelected;
+  final bool readOnly;
 
   const _VoteButtonExpanded(
     this.data, {
     required this.onSelected,
+    this.readOnly = false,
   });
 
   @override
@@ -18,6 +20,7 @@ class _VoteButtonExpanded extends StatelessWidget {
               latestVote: data.votes.first,
               casted: data.casted,
               onChanged: onSelected,
+              readOnly: readOnly,
             )
           : _VoteButtonNoVote(onSelected: (value) => onSelected(VoteButtonActionVote(value))),
     );
@@ -28,11 +31,13 @@ class _VoteButtonHasVoted extends StatelessWidget {
   final VoteTypeData? latestVote;
   final VoteTypeDataCasted? casted;
   final ValueChanged<VoteButtonAction> onChanged;
+  final bool readOnly;
 
   const _VoteButtonHasVoted({
     this.latestVote,
     this.casted,
     required this.onChanged,
+    this.readOnly = false,
   });
 
   @override
@@ -44,6 +49,7 @@ class _VoteButtonHasVoted extends StatelessWidget {
           voteType: latestVote?.type,
           votedAt: latestVote?.castedAt,
           inVoteList: latestVote?.isDraft ?? false,
+          readOnly: readOnly,
         );
       },
       menuBuilder: (context) {
@@ -64,12 +70,14 @@ class _VoteButtonHasVotedButton extends StatelessWidget {
   final VoteType? voteType;
   final DateTime? votedAt;
   final bool inVoteList;
+  final bool readOnly;
 
   const _VoteButtonHasVotedButton({
     this.onTap,
     this.voteType,
     this.votedAt,
     this.inVoteList = false,
+    this.readOnly = false,
   });
 
   @override
@@ -95,7 +103,10 @@ class _VoteButtonHasVotedButton extends StatelessWidget {
               ),
             if (inVoteList) const _VoteInVoteListText(),
           ].separatedBy(const Text('·')),
-          VoicesAssets.icons.chevronDown.buildIcon(),
+          Offstage(
+            offstage: readOnly,
+            child: VoicesAssets.icons.chevronDown.buildIcon(),
+          ),
         ],
       ),
     );
