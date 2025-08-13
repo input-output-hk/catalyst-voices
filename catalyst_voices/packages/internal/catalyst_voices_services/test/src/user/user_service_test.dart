@@ -15,8 +15,8 @@ import 'package:uuid_plus/uuid_plus.dart';
 void main() {
   group(UserService, () {
     late final KeychainProvider keychainProvider;
-    late final UserObserver userObserver;
     late UserRepository userRepository;
+    late final UserObserver userObserver;
     late UserService service;
 
     setUpAll(() {
@@ -90,8 +90,7 @@ void main() {
       expect(currentAccount?.isActive, isTrue);
     });
 
-    test(
-        'when using a new account with the same catalystId '
+    test('when using a new account with the same catalystId '
         'the getter returns updated account', () async {
       // Given
       final oldKeychainId = const Uuid().v4();
@@ -349,7 +348,7 @@ void main() {
       });
     });
 
-    group('updateActiveAccountDetails', () {
+    group('refreshActiveAccountProfile', () {
       setUp(() {
         userRepository = _MockUserRepository();
         service = UserService(userRepository, userObserver);
@@ -379,7 +378,7 @@ void main() {
         when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
 
         await service.useLastAccount();
-        await service.updateActiveAccountDetails();
+        await service.refreshActiveAccountProfile();
 
         // Then
         verifyNever(() => userRepository.getAccountPublicProfile());
@@ -394,14 +393,15 @@ void main() {
         const publicStatus = AccountPublicStatus.verifying;
 
         final keychain = await keychainProvider.create(keychainId);
-        final account = Account.dummy(
-          catalystId: DummyCatalystIdFactory.create(),
-          keychain: keychain,
-          isActive: true,
-        ).copyWith(
-          email: const Optional('dev@iohk.com'),
-          publicStatus: publicStatus,
-        );
+        final account =
+            Account.dummy(
+              catalystId: DummyCatalystIdFactory.create(),
+              keychain: keychain,
+              isActive: true,
+            ).copyWith(
+              email: const Optional('dev@iohk.com'),
+              publicStatus: publicStatus,
+            );
         final user = User.optional(accounts: [account]);
 
         // When
@@ -417,7 +417,7 @@ void main() {
         );
 
         await service.useLastAccount();
-        await service.updateActiveAccountDetails();
+        await service.refreshActiveAccountProfile();
 
         // Then
         verify(() => userRepository.getAccountPublicProfile()).called(1);
@@ -431,27 +431,73 @@ void main() {
         const publicProfile = AccountPublicProfile(email: '', status: updatedPublicStatus);
 
         final keychain = await keychainProvider.create(keychainId);
-        final account = Account.dummy(
-          catalystId: DummyCatalystIdFactory.create(),
-          keychain: keychain,
-          isActive: true,
-        ).copyWith(
-          email: const Optional('dev@iohk.com'),
-          publicStatus: publicStatus,
-        );
+        final account =
+            Account.dummy(
+              catalystId: DummyCatalystIdFactory.create(),
+              keychain: keychain,
+              isActive: true,
+            ).copyWith(
+              email: const Optional('dev@iohk.com'),
+              publicStatus: publicStatus,
+            );
         final user = User.optional(accounts: [account]);
 
         // When
         when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
         when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
-        when(() => userRepository.getAccountPublicProfile())
-            .thenAnswer((_) => Future.value(publicProfile));
+        when(
+          () => userRepository.getAccountPublicProfile(),
+        ).thenAnswer((_) => Future.value(publicProfile));
 
         await service.useLastAccount();
-        await service.updateActiveAccountDetails();
+        await service.refreshActiveAccountProfile();
 
         // Then
         expect(service.user.activeAccount?.publicStatus, updatedPublicStatus);
+      });
+    });
+
+    group('refreshActiveAccountProfile', () {
+      setUp(() {
+        userRepository = _MockUserRepository();
+        service = UserService(userRepository, userObserver);
+
+        registerFallbackValue(const User.empty());
+      });
+
+      tearDown(() {
+        reset(userRepository);
+      });
+
+      test('user account is updated when voting power changes', () async {
+        // Given
+        final keychainId = const Uuid().v4();
+        final votingPower = VotingPower.dummy();
+        final updatedVotingPower = votingPower.copyWith();
+
+        final keychain = await keychainProvider.create(keychainId);
+        final account =
+            Account.dummy(
+              catalystId: DummyCatalystIdFactory.create(),
+              keychain: keychain,
+              isActive: true,
+            ).copyWith(
+              votingPower: Optional(votingPower),
+            );
+        final user = User.optional(accounts: [account]);
+
+        // When
+        when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
+        when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
+        when(
+          () => userRepository.getVotingPower(),
+        ).thenAnswer((_) => Future.value(updatedVotingPower));
+
+        await service.useLastAccount();
+        await service.refreshActiveAccountVotingPower();
+
+        // Then
+        expect(service.user.activeAccount?.votingPower, updatedVotingPower);
       });
     });
 
@@ -475,14 +521,15 @@ void main() {
         final catalystId = DummyCatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         final keychain = await keychainProvider.create(keychainId);
-        final account = Account.dummy(
-          catalystId: catalystId,
-          keychain: keychain,
-          isActive: true,
-        ).copyWith(
-          email: const Optional(currentEmail),
-          publicStatus: AccountPublicStatus.verified,
-        );
+        final account =
+            Account.dummy(
+              catalystId: catalystId,
+              keychain: keychain,
+              isActive: true,
+            ).copyWith(
+              email: const Optional(currentEmail),
+              publicStatus: AccountPublicStatus.verified,
+            );
         final user = User.optional(accounts: [account]);
 
         // When
@@ -502,14 +549,15 @@ void main() {
         final catalystId = DummyCatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         final keychain = await keychainProvider.create(keychainId);
-        final account = Account.dummy(
-          catalystId: catalystId,
-          keychain: keychain,
-          isActive: true,
-        ).copyWith(
-          email: const Optional(currentEmail),
-          publicStatus: AccountPublicStatus.verified,
-        );
+        final account =
+            Account.dummy(
+              catalystId: catalystId,
+              keychain: keychain,
+              isActive: true,
+            ).copyWith(
+              email: const Optional(currentEmail),
+              publicStatus: AccountPublicStatus.verified,
+            );
         final user = User.optional(accounts: [account]);
 
         // When
@@ -536,14 +584,15 @@ void main() {
         final catalystId = DummyCatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         final keychain = await keychainProvider.create(keychainId);
-        final account = Account.dummy(
-          catalystId: catalystId,
-          keychain: keychain,
-          isActive: true,
-        ).copyWith(
-          email: const Optional(currentEmail),
-          publicStatus: AccountPublicStatus.verified,
-        );
+        final account =
+            Account.dummy(
+              catalystId: catalystId,
+              keychain: keychain,
+              isActive: true,
+            ).copyWith(
+              email: const Optional(currentEmail),
+              publicStatus: AccountPublicStatus.verified,
+            );
         final user = User.optional(accounts: [account]);
 
         const expectedResult = AccountUpdateResult();
@@ -566,14 +615,15 @@ void main() {
         final catalystId = DummyCatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         final keychain = await keychainProvider.create(keychainId);
-        final account = Account.dummy(
-          catalystId: catalystId,
-          keychain: keychain,
-          isActive: true,
-        ).copyWith(
-          email: const Optional(currentEmail),
-          publicStatus: AccountPublicStatus.verified,
-        );
+        final account =
+            Account.dummy(
+              catalystId: catalystId,
+              keychain: keychain,
+              isActive: true,
+            ).copyWith(
+              email: const Optional(currentEmail),
+              publicStatus: AccountPublicStatus.verified,
+            );
         final user = User.optional(accounts: [account]);
         const publicProfile = AccountPublicProfile(email: '', status: AccountPublicStatus.verified);
 
@@ -597,8 +647,7 @@ void main() {
         expect(didUpdateAccount, expectedResult);
       });
 
-      test(
-          'returns has pending email change when '
+      test('returns has pending email change when '
           'public profile effective email did not change', () async {
         // Given
         const currentEmail = 'dev@iohk.com';
@@ -607,14 +656,15 @@ void main() {
         final catalystId = DummyCatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         final keychain = await keychainProvider.create(keychainId);
-        final account = Account.dummy(
-          catalystId: catalystId,
-          keychain: keychain,
-          isActive: true,
-        ).copyWith(
-          email: const Optional(currentEmail),
-          publicStatus: AccountPublicStatus.verified,
-        );
+        final account =
+            Account.dummy(
+              catalystId: catalystId,
+              keychain: keychain,
+              isActive: true,
+            ).copyWith(
+              email: const Optional(currentEmail),
+              publicStatus: AccountPublicStatus.verified,
+            );
         final user = User.optional(accounts: [account]);
         const publicProfile = AccountPublicProfile(
           email: currentEmail,
@@ -641,8 +691,7 @@ void main() {
         expect(didUpdateAccount, expectedResult);
       });
 
-      test(
-          'returns has pending email change when '
+      test('returns has pending email change when '
           'public profile status downgraded', () async {
         // Given
         const currentEmail = 'dev@iohk.com';
@@ -651,14 +700,15 @@ void main() {
         final catalystId = DummyCatalystIdFactory.create();
         final keychainId = const Uuid().v4();
         final keychain = await keychainProvider.create(keychainId);
-        final account = Account.dummy(
-          catalystId: catalystId,
-          keychain: keychain,
-          isActive: true,
-        ).copyWith(
-          email: const Optional(currentEmail),
-          publicStatus: AccountPublicStatus.verified,
-        );
+        final account =
+            Account.dummy(
+              catalystId: catalystId,
+              keychain: keychain,
+              isActive: true,
+            ).copyWith(
+              email: const Optional(currentEmail),
+              publicStatus: AccountPublicStatus.verified,
+            );
         final user = User.optional(accounts: [account]);
         const publicProfile = AccountPublicProfile(
           email: updateEmail,

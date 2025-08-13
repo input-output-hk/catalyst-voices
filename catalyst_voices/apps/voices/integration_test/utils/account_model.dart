@@ -5,7 +5,7 @@ class Account {
   final List<String> seedPhrase;
   final String role;
 
-  Account({
+  const Account({
     required this.displayName,
     required this.emailAddress,
     required this.password,

@@ -265,6 +265,7 @@ final class RegistrationServiceImpl implements RegistrationService {
           roles: recovered.roles,
           address: recovered.stakeAddress,
           publicStatus: recovered.publicStatus,
+          votingPower: recovered.votingPower,
         );
       });
     });
@@ -302,8 +303,10 @@ final class RegistrationServiceImpl implements RegistrationService {
             keychain: keychain,
             roles: data.roles,
             address: walletInfo.address,
-            publicStatus:
-                data.email != null ? AccountPublicStatus.verifying : AccountPublicStatus.notSetup,
+            publicStatus: data.email != null
+                ? AccountPublicStatus.verifying
+                : AccountPublicStatus.notSetup,
+            votingPower: VotingPower.dummy(),
           );
         });
       });
@@ -351,6 +354,7 @@ final class RegistrationServiceImpl implements RegistrationService {
         roles: roles,
         address: _testNetAddress,
         publicStatus: AccountPublicStatus.notSetup,
+        votingPower: VotingPower.dummy(),
       );
     });
   }
