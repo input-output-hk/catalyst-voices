@@ -2,6 +2,7 @@
 //!
 //! This provides only the primary entrypoint to the service.
 
+use cardano_blockchain_types::Network;
 use poem::{
     listener::TcpListener,
     middleware::{CatchPanic, Compression, Cors, SensitiveHeader},
@@ -18,7 +19,7 @@ use crate::{
         api::mk_api,
         docs::{docs, favicon},
         utilities::{
-            catch_panic::{set_panic_hook, ServicePanicHandler},
+            catch_panic::{panic_endpoint, set_panic_hook, ServicePanicHandler},
             middleware::{metrics_updater::MetricsUpdaterMiddleware, tracing_mw::Tracing},
         },
     },
@@ -41,6 +42,7 @@ fn mk_app(base_route: Option<Route>) -> impl Endpoint {
         .nest("/docs", docs)
         .nest("/metrics", MetricsUpdaterMiddleware::new())
         .nest("/favicon.ico", favicon())
+        .nest("/panic", panic_endpoint)
         .with(Cors::new())
         .with(Compression::new().with_quality(CompressionLevel::Fastest))
         .with(CatchPanic::new().with_handler(ServicePanicHandler))
