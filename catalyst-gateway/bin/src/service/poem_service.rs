@@ -2,6 +2,7 @@
 //!
 //! This provides only the primary entrypoint to the service.
 
+use cardano_blockchain_types::Network;
 use poem::{
     listener::TcpListener,
     middleware::{CatchPanic, Compression, Cors, SensitiveHeader},
@@ -28,7 +29,7 @@ use crate::{
 /// This exists to allow us to add extra routes to the service for testing purposes.
 fn mk_app(base_route: Option<Route>) -> impl Endpoint {
     // Get the base route if defined, or a new route if not.
-    let base_route = match base_route {
+    let mut base_route = match base_route {
         Some(route) => route,
         None => Route::new(),
     };
@@ -36,12 +37,15 @@ fn mk_app(base_route: Option<Route>) -> impl Endpoint {
     let api_service = mk_api();
     let docs = docs(&api_service);
 
+    if Settings::cardano_network() != Network::Mainnet {
+        base_route = base_route.nest("/panic", panic_endpoint);
+    }
+
     base_route
         .nest(Settings::api_url_prefix(), api_service)
         .nest("/docs", docs)
         .nest("/metrics", MetricsUpdaterMiddleware::new())
         .nest("/favicon.ico", favicon())
-        .nest("/panic", panic_endpoint)
         .with(Cors::new())
         .with(Compression::new().with_quality(CompressionLevel::Fastest))
         .with(CatchPanic::new().with_handler(ServicePanicHandler))
