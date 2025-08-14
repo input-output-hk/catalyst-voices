@@ -32,4 +32,24 @@ enum Brand {
       Brand.catalyst => VoicesAssets.images.votingBgLight,
     };
   }
+
+  AssetGenImage votingFailedCastVotes(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+
+    return switch (this) {
+      Brand.catalyst when brightness == Brightness.dark =>
+        VoicesAssets.images.failedCastingVotesDark,
+      Brand.catalyst => VoicesAssets.images.failedCastingVotesLight,
+    };
+  }
+
+  AssetGenImage votingSuccessCastVotes(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+
+    return switch (this) {
+      Brand.catalyst when brightness == Brightness.dark =>
+        VoicesAssets.images.successCastingVotesDark,
+      Brand.catalyst => VoicesAssets.images.successCastingVotesLight,
+    };
+  }
 }

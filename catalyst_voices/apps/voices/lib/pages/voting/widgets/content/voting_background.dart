@@ -21,16 +21,16 @@ class VotingBackground extends StatelessWidget {
               Colors.transparent,
               Colors.white,
             ],
-            stops: [0.0, 0.15],
+            stops: [-0.5, 0.25],
           ).createShader(bounds);
         },
         blendMode: BlendMode.dstIn,
         child: CatalystImage.asset(
           context.theme.brandAssets.brand.votingBg(context).path,
           width: double.infinity,
-          height: (MediaQuery.sizeOf(context).height * 0.55).clamp(620, 1200),
+          height: (MediaQuery.sizeOf(context).height * 0.75).clamp(620, 1200),
           fit: BoxFit.fitWidth,
-          alignment: Alignment.topCenter,
+          alignment: Alignment.bottomCenter,
         ),
       ),
     );
