@@ -2,8 +2,31 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
+final class CancelCastingVotesEvent extends VotingBallotEvent {
+  const CancelCastingVotesEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
 final class CastVotesEvent extends VotingBallotEvent {
   const CastVotesEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
+final class CheckPasswordEvent extends VotingBallotEvent {
+  final LockFactor factor;
+
+  const CheckPasswordEvent(this.factor);
+
+  @override
+  List<Object?> get props => [factor];
+}
+
+final class ConfirmCastingVotesEvent extends VotingBallotEvent {
+  const ConfirmCastingVotesEvent();
 
   @override
   List<Object?> get props => [];

@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/pages/spaces/spaces.dart';
 import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_ballot.dart';
+import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_bottom_sheet.dart';
 import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_campaign_phase_progress.dart';
 import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_footer.dart';
 import 'package:catalyst_voices/pages/voting/widgets/voting_list/voting_list_header.dart';
@@ -30,7 +31,6 @@ class VotingList extends StatelessWidget {
             ),
           ),
         ),
-        VotingListFooter(),
       ],
     );
   }
@@ -43,8 +43,14 @@ class VotingListDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return const VoicesDrawer(
       width: 500,
+      bottomSheet: VotingListBottomSheet(),
+      footer: VotingListFooter(),
       child: VotingList(),
     );
+  }
+
+  static void close(BuildContext context) {
+    Scaffold.of(context).closeEndDrawer();
   }
 
   /// This method is meant to be used inside [SpacesShellPage].

@@ -531,6 +531,10 @@
   "@confirmPassword": {
     "description": "Label for password confirmation input field"
   },
+  "confirmYourVoteSubmission": "Confirm your vote submission",
+  "@confirmYourVoteSubmission": {
+    "description": "Title for confirm vote submission"
+  },
   "confirmed": "Confirmed",
   "@confirmed": {
     "description": "A label when something is final and not provisional."
@@ -1331,6 +1335,14 @@
   "@failedAuthenticationTitle": {
     "description": "Title for failed authentication reason to not find wallet"
   },
+  "failedToCastVotesDescription": "There was an error submitting your votes. Please check your connection and try casting again.",
+  "@failedToCastVotesDescription": {
+    "description": "Description for failed to cast votes error"
+  },
+  "failedToCastVotesTitle": "Error: Votes Not Submitted",
+  "@failedToCastVotesTitle": {
+    "description": "Title for failed to cast votes error"
+  },
   "favorites": "Favorites",
   "@favorites": {
     "description": "Refers to a list of favorites."
@@ -1649,6 +1661,10 @@
   "knowledgeBase": "knowledge base",
   "@knowledgeBase": {
     "description": "Text for the knowledge base link"
+  },
+  "labelEnterYourUnlockPassword": "Enter your unlock password to confirm",
+  "@labelEnterYourUnlockPassword": {
+    "description": "Label for unlock password field"
   },
   "laceWallet": "Lace Wallet",
   "@laceWallet": {
@@ -3240,6 +3256,14 @@
   "@successProposalForgotDescription": {
     "description": "Description of success message when public draft/final proposal is forgotten"
   },
+  "successToCastVotesDescription": "Thank you for voting on Catalyst proposals. You can review or update your submitted votes at any time during the voting phase.",
+  "@successToCastVotesDescription": {
+    "description": "Description for success to cast votes"
+  },
+  "successToCastVotesTitle": "Your Votes Have Been Submitted",
+  "@successToCastVotesTitle": {
+    "description": "Title for success to cast votes"
+  },
   "theme": "Theme",
   "@theme": {
     "description": "Label for theme/appearance settings"
@@ -3476,6 +3500,10 @@
   "@viewAllProposals": {
     "description": "Button text to show all available proposals"
   },
+  "viewCastVotes": "View Cast Votes",
+  "@viewCastVotes": {
+    "description": "CTA to view cast votes"
+  },
   "viewCommentsSection": "View comments",
   "@viewCommentsSection": {
     "description": "Viewing proposal navigation section"
@@ -3531,6 +3559,10 @@
   "voteListButton": "Vote List",
   "@voteListButton": {
     "description": "The label for the overview of votes."
+  },
+  "voteSubmissionDescription": "You can submit more votes or update your choices at any time during the voting phase.",
+  "@voteSubmissionDescription": {
+    "description": "Description for confirm vote submission"
   },
   "voteYes": "Yes",
   "@voteYes": {
