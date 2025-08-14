@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 /// Allows access to campaign data, categories, and timeline.
 abstract interface class CampaignRepository {
@@ -24,7 +25,7 @@ final class CampaignRepositoryImpl implements CampaignRepository {
   Future<Campaign> getCampaign({
     required String id,
   }) async {
-    final now = DateTime.now();
+    final now = DateTimeExt.now();
 
     return Campaign(
       id: id,
@@ -47,7 +48,7 @@ final class CampaignRepositoryImpl implements CampaignRepository {
 
   @override
   Future<List<CampaignTimeline>> getCampaignTimeline() async {
-    return CampaignTimelineX.staticContent;
+    return CurrentCampaignX.staticContent.timeline;
   }
 
   @override

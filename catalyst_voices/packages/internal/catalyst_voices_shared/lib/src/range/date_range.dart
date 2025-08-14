@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 /// A [from] - [to] date range, inclusive on both sides.
@@ -66,11 +67,11 @@ class DateRange extends Equatable {
   }
 
   bool isTodayInRange() {
-    return isInRange(DateTime.now());
+    return isInRange(DateTimeExt.now());
   }
 
   DateRangeStatus rangeStatusNow() {
-    final now = DateTime.now();
+    final now = DateTimeExt.now();
     if (isInRange(now)) {
       return DateRangeStatus.inRange;
     } else if (isBeforeRange(now)) {

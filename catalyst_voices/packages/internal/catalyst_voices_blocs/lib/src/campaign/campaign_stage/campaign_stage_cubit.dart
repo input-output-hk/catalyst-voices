@@ -62,7 +62,7 @@ class CampaignStageCubit extends Cubit<CampaignStageState> {
     }
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      final now = DateTime.now();
+      final now = DateTimeExt.now();
       if (now.isAfter(endTime)) {
         timer.cancel();
         emit(const AfterProposalSubmissionStage());

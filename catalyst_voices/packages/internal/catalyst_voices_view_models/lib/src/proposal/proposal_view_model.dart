@@ -121,7 +121,7 @@ final class PendingProposal extends ProposalViewModel {
       campaignName: 'F14',
       category: 'Cardano Use Cases: Concept',
       title: 'Proposal Title that rocks the world',
-      lastUpdateDate: DateTime.now().minusDays(2),
+      lastUpdateDate: DateTimeExt.now().minusDays(2),
       fundsRequested: const Coin(55000),
       commentsCount: 0,
       description: """
