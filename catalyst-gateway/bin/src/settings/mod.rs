@@ -112,6 +112,11 @@ struct EnvVars {
     /// The base path the API is served at.
     api_url_prefix: StringEnvVar,
 
+    /// Flag by enabling `/panic` endpoint if its set
+    /// Enabled is `YES_I_REALLY_WANT_TO_PANIC` env var is set
+    /// and equals to `"panic attack"`
+    is_panic_endpoint_enabled: bool,
+
     /// The Config of the Persistent Cassandra DB.
     cassandra_persistent_db: cassandra_db::EnvVars,
 
@@ -200,6 +205,8 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
                 .unwrap_or_default(),
         ),
         api_url_prefix: StringEnvVar::new("API_URL_PREFIX", API_URL_PREFIX_DEFAULT.into()),
+        is_panic_endpoint_enabled: StringEnvVar::new_optional("YES_I_REALLY_WANT_TO_PANIC", false)
+            .is_some_and(|v| v.as_str() == "panic attack"),
 
         cassandra_persistent_db: cassandra_db::EnvVars::new(
             cassandra_db::PERSISTENT_URL_DEFAULT,
@@ -384,6 +391,11 @@ impl Settings {
     /// Get the server name to be used in the `Server` object of the `OpenAPI` Document.
     pub(crate) fn server_name() -> Option<&'static str> {
         ENV_VARS.server_name.as_ref().map(StringEnvVar::as_str)
+    }
+
+    /// Get the flag is the `/panic` should be enabled or not
+    pub(crate) fn is_panic_endpoint_enabled() -> bool {
+        ENV_VARS.is_panic_endpoint_enabled
     }
 
     /// Generate a github issue url with a given title
