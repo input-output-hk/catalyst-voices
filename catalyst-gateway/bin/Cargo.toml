@@ -15,17 +15,13 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
-cardano-chain-follower = { version = "0.0.12", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "feat/chain-follower-with-devnet" }
-rbac-registration = { version = "0.0.7", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "feat/chain-follower-with-devnet" }
-catalyst-signed-doc = { version = "0.0.5", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc-v0.0.5" }
+cardano-chain-follower = { version = "0.0.13", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "wasm/cardano-chain-follower" }
+rbac-registration = { version = "0.0.8", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "rbac-registration/v0.0.8" }
+catalyst-signed-doc = { version = "0.0.6", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc/v0.0.6" }
 catalyst-signed-doc-v1 = { package = "catalyst-signed-doc", version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc/v.0.0.4" }
-cardano-blockchain-types = { version = "0.0.5", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "feat/chain-follower-with-devnet" }
+cardano-blockchain-types = { version = "0.0.6", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-blockchain-types/v0.0.6" }
 c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "c509-certificate-v0.0.3" }
-catalyst-types = { version = "0.0.5", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-types-v0.0.5" }
-
-
-pallas = { version = "0.33.0" }
-pallas-traverse = { version = "0.33.0" }
+catalyst-types = { version = "0.0.6", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-types/v0.0.6" }
 
 clap = { version = "4.5.20", features = ["derive", "env"] }
 tracing = { version = "0.1.40", features = ["log"] }
