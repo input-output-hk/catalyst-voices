@@ -8,10 +8,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 void main() {
+  late MockActiveCampaignObserver mockActiveCampaignObserver;
   late MockDocumentRepository mockDocumentRepository;
   late MockProposalRepository mockProposalRepository;
   late MockUserService mockUserService;
-  late MockCampaignRepository mockCampaignRepository;
   late MockSignerService mockSignerService;
 
   late ProposalService proposalService;
@@ -20,15 +20,15 @@ void main() {
     mockDocumentRepository = MockDocumentRepository();
     mockProposalRepository = MockProposalRepository();
     mockSignerService = MockSignerService();
-    mockCampaignRepository = MockCampaignRepository();
     mockUserService = MockUserService();
+    mockActiveCampaignObserver = MockActiveCampaignObserver();
 
     proposalService = ProposalService(
       mockProposalRepository,
       mockDocumentRepository,
       mockUserService,
       mockSignerService,
-      mockCampaignRepository,
+      mockActiveCampaignObserver,
     );
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
@@ -78,7 +78,7 @@ void main() {
   });
 }
 
-class MockCampaignRepository extends Mock implements CampaignRepository {}
+class MockActiveCampaignObserver extends Mock implements ActiveCampaignObserver {}
 
 class MockDocumentRepository extends Mock implements DocumentRepository {}
 

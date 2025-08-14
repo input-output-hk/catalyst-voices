@@ -47,8 +47,8 @@ class _AppState extends State<App> {
       BlocProvider<ProposalsCubit>(
         create: (_) => Dependencies.instance.get<ProposalsCubit>(),
       ),
-      BlocProvider<CampaignInfoCubit>(
-        create: (_) => Dependencies.instance.get<CampaignInfoCubit>(),
+      BlocProvider<VotingCubit>(
+        create: (_) => Dependencies.instance.get<VotingCubit>(),
       ),
       BlocProvider<CampaignBuilderCubit>(
         create: (_) => Dependencies.instance.get<CampaignBuilderCubit>(),
@@ -71,15 +71,17 @@ class _AppState extends State<App> {
       BlocProvider<NewProposalCubit>(
         create: (_) => Dependencies.instance.get<NewProposalCubit>(),
       ),
-      BlocProvider<CampaignStageCubit>(
-        lazy: false,
-        create: (_) => Dependencies.instance.get<CampaignStageCubit>(),
-      ),
       BlocProvider<DevToolsBloc>(
         create: (_) => Dependencies.instance.get<DevToolsBloc>(),
       ),
       BlocProvider<PublicProfileEmailStatusCubit>(
         create: (_) => Dependencies.instance.get<PublicProfileEmailStatusCubit>(),
+      ),
+      BlocProvider<CampaignPhaseAwareCubit>(
+        create: (_) => Dependencies.instance.get<CampaignPhaseAwareCubit>(),
+      ),
+      BlocProvider<VotingBallotBloc>(
+        create: (_) => Dependencies.instance.get<VotingBallotBloc>(),
       ),
     ];
   }

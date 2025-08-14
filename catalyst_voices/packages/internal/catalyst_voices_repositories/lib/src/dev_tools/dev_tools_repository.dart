@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dev_tools/dev_tools_storage.dart';
 import 'package:catalyst_voices_repositories/src/dto/dev_tools/dev_tools_config_dto.dart';
+import 'package:flutter/foundation.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 /// Repository for reading and writing data for DevTools.
@@ -38,7 +39,7 @@ final class DevToolsRepositoryImpl implements DevToolsRepository {
   @override
   Future<DevToolsConfig> readConfig() async {
     final dto = await _storage.read();
-    return dto?.toModel() ?? const DevToolsConfig();
+    return dto?.toModel() ?? const DevToolsConfig(isDeveloper: kDebugMode);
   }
 
   @override

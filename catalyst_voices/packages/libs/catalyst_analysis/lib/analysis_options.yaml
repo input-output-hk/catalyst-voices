@@ -10,6 +10,7 @@ analyzer:
 
 formatter:
   page_width: 100
+  trailing_commas: preserve
 
 # The full list of lints: https://dart.dev/tools/linter-rules
 linter:

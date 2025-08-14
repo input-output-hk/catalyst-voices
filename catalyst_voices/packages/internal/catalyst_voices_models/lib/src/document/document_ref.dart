@@ -116,6 +116,13 @@ final class DraftRef extends DocumentRef {
     return DraftRef.first(id);
   }
 
+  factory DraftRef.generateNextRefFor(String id) {
+    return DraftRef(
+      id: id,
+      version: const Uuid().v7(),
+    );
+  }
+
   @override
   DraftRef copyWith({
     String? id,

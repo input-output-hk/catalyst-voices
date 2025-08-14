@@ -79,7 +79,7 @@ class _CampaignCategoriesError extends StatelessWidget {
               child: VoicesErrorIndicator(
                 message: errorMessage ?? context.l10n.somethingWentWrong,
                 onRetry: () async {
-                  await context.read<DiscoveryCubit>().getCampaignCategories();
+                  await context.read<DiscoveryCubit>().getCurrentCampaign();
                 },
               ),
             ),

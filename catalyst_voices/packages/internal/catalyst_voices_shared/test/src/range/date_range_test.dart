@@ -127,7 +127,7 @@ void main() {
       expect(isInRange, isTrue);
     });
 
-    test('rangeStatusNow returns inRange when current date is within range', () {
+    test('rangeStatus returns inRange when current date is within range', () {
       // Given
       final range = DateRange(
         from: now.subtract(const Duration(days: 1)),
@@ -135,13 +135,13 @@ void main() {
       );
 
       // When
-      final status = range.rangeStatusNow();
+      final status = range.rangeStatus(now);
 
       // Then
       expect(status, equals(DateRangeStatus.inRange));
     });
 
-    test('rangeStatusNow returns before when current date is before range', () {
+    test('rangeStatus returns before when current date is before range', () {
       // Given
       final range = DateRange(
         from: now.add(const Duration(days: 1)),
@@ -149,13 +149,13 @@ void main() {
       );
 
       // When
-      final status = range.rangeStatusNow();
+      final status = range.rangeStatus(now);
 
       // Then
       expect(status, equals(DateRangeStatus.before));
     });
 
-    test('rangeStatusNow returns after when current date is after range', () {
+    test('rangeStatus returns after when current date is after range', () {
       // Given
       final range = DateRange(
         from: now.subtract(const Duration(days: 3)),
@@ -163,13 +163,13 @@ void main() {
       );
 
       // When
-      final status = range.rangeStatusNow();
+      final status = range.rangeStatus(now);
 
       // Then
       expect(status, equals(DateRangeStatus.after));
     });
 
-    test('rangeStatusNow returns inRange when current date equals from date', () {
+    test('rangeStatus returns inRange when current date equals from date', () {
       // Given
       final range = DateRange(
         from: now,
@@ -177,13 +177,13 @@ void main() {
       );
 
       // When
-      final status = range.rangeStatusNow();
+      final status = range.rangeStatus(now);
 
       // Then
       expect(status, equals(DateRangeStatus.inRange));
     });
 
-    test('rangeStatusNow returns inRange when from is null and current date is before to', () {
+    test('rangeStatus returns inRange when from is null and current date is before to', () {
       // Given
       final range = DateRange(
         from: null,
@@ -191,13 +191,13 @@ void main() {
       );
 
       // When
-      final status = range.rangeStatusNow();
+      final status = range.rangeStatus(now);
 
       // Then
       expect(status, equals(DateRangeStatus.inRange));
     });
 
-    test('rangeStatusNow returns inRange when to is null and current date is after from', () {
+    test('rangeStatus returns inRange when to is null and current date is after from', () {
       // Given
       final range = DateRange(
         from: DateTime(2025, 1, 20),
@@ -205,13 +205,13 @@ void main() {
       );
 
       // When
-      final status = range.rangeStatusNow();
+      final status = range.rangeStatus(now);
 
       // Then
       expect(status, equals(DateRangeStatus.inRange));
     });
 
-    test('rangeStatusNow returns inRange when both from and to are null', () {
+    test('rangeStatus returns inRange when both from and to are null', () {
       // Given
       const range = DateRange(
         from: null,
@@ -219,7 +219,7 @@ void main() {
       );
 
       // When
-      final status = range.rangeStatusNow();
+      final status = range.rangeStatus(now);
 
       // Then
       expect(status, equals(DateRangeStatus.inRange));

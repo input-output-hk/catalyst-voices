@@ -1,8 +1,6 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_voices/widgets/widgets.dart' show ProposalCard;
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices/widgets/widgets.dart' show ProposalBriefCard;
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -29,34 +27,18 @@ class VoicesProposalCardExample extends StatelessWidget {
           spacing: 16,
           runSpacing: 16,
           children: [
-            ProposalCard(
-              image: VoicesAssets.images.proposalBackground1,
-              proposal: FundedProposal(
-                ref: SignedDocumentRef.generateFirstRef(),
-                campaignName: 'F14',
-                category: 'Cardano Use Cases / MVP',
+            ProposalBriefCard(
+              proposal: ProposalBrief(
+                selfRef: SignedDocumentRef.generateFirstRef(),
+                categoryName: 'Cardano Use Cases / MVP',
                 title: 'Proposal Title that rocks the world',
-                fundedDate: DateTime(2025, 1, 28),
                 fundsRequested: const Coin.fromWholeAda(100000),
                 commentsCount: 0,
-                description: _description,
-              ),
-            ),
-            ProposalCard(
-              image: VoicesAssets.images.proposalBackground2,
-              proposal: PendingProposal(
-                ref: SignedDocumentRef.generateFirstRef(),
-                campaignName: 'F14',
-                category: 'Cardano Use Cases / MVP',
-                title: 'Proposal Title that rocks the world',
-                lastUpdateDate: DateTime.now().minusDays(2),
-                fundsRequested: const Coin.fromWholeAda(100000),
-                commentsCount: 0,
-                description: _description,
-                publishStage: ProposalPublish.publishedDraft,
-                version: 1,
+                publish: ProposalPublish.publishedDraft,
+                versionNumber: 1,
                 duration: 6,
-                author: 'Alex Wells',
+                updateDate: DateTime.now(),
+                description: _description,
               ),
             ),
           ],

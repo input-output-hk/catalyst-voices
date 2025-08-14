@@ -6,11 +6,14 @@ import 'package:equatable/equatable.dart';
 final class ProposalCubitCache extends Equatable {
   final CatalystId? activeAccountId;
   final DocumentRef? ref;
-  final ProposalData? proposal;
+  final ProposalDetailData? proposal;
   final CampaignCategory? category;
   final CommentTemplate? commentTemplate;
   final List<CommentWithReplies>? comments;
   final bool? isFavorite;
+  final bool? isVotingStage;
+  final bool? readOnlyMode;
+  final Vote? lastCastedVote;
 
   const ProposalCubitCache({
     this.activeAccountId,
@@ -20,6 +23,9 @@ final class ProposalCubitCache extends Equatable {
     this.commentTemplate,
     this.comments,
     this.isFavorite,
+    this.isVotingStage,
+    this.readOnlyMode,
+    this.lastCastedVote,
   });
 
   @override
@@ -31,16 +37,22 @@ final class ProposalCubitCache extends Equatable {
         commentTemplate,
         comments,
         isFavorite,
+        isVotingStage,
+        readOnlyMode,
+        lastCastedVote,
       ];
 
   ProposalCubitCache copyWith({
     Optional<CatalystId>? activeAccountId,
     Optional<DocumentRef>? ref,
-    Optional<ProposalData>? proposal,
+    Optional<ProposalDetailData>? proposal,
     Optional<CampaignCategory>? category,
     Optional<CommentTemplate>? commentTemplate,
     Optional<List<CommentWithReplies>>? comments,
     Optional<bool>? isFavorite,
+    Optional<bool>? isVotingStage,
+    Optional<bool>? readOnlyMode,
+    Optional<Vote>? lastCastedVote,
   }) {
     return ProposalCubitCache(
       activeAccountId: activeAccountId.dataOr(this.activeAccountId),
@@ -50,6 +62,9 @@ final class ProposalCubitCache extends Equatable {
       commentTemplate: commentTemplate.dataOr(this.commentTemplate),
       comments: comments.dataOr(this.comments),
       isFavorite: isFavorite.dataOr(this.isFavorite),
+      isVotingStage: isVotingStage.dataOr(this.isVotingStage),
+      readOnlyMode: readOnlyMode.dataOr(this.readOnlyMode),
+      lastCastedVote: lastCastedVote.dataOr(this.lastCastedVote),
     );
   }
 }

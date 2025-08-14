@@ -10,6 +10,7 @@ final class RecoveredAccount extends Equatable {
   final Set<AccountRole> roles;
   final ShelleyAddress stakeAddress;
   final AccountPublicStatus publicStatus;
+  final VotingPower? votingPower;
 
   const RecoveredAccount({
     required this.username,
@@ -17,14 +18,16 @@ final class RecoveredAccount extends Equatable {
     required this.roles,
     required this.stakeAddress,
     required this.publicStatus,
+    required this.votingPower,
   });
 
   @override
   List<Object?> get props => [
-        username,
-        email,
-        roles,
-        stakeAddress,
-        publicStatus,
-      ];
+    username,
+    email,
+    roles,
+    stakeAddress,
+    publicStatus,
+    votingPower,
+  ];
 }

@@ -86,7 +86,6 @@ void main() async {
         await $(ProfilePage($).deleteKeychainTextField).enterText('Remove Keychain');
         await $(ProfilePage($).deleteKeychainContinueButton).tap();
         await $(ProfilePage($).keychainDeletedDialogCloseButton).tap();
-        await AppBarPage($).visitorBtnIsVisible();
         await AppBarPage($).getStartedBtnIsVisible();
       });
     },
