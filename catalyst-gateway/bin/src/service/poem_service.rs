@@ -2,7 +2,6 @@
 //!
 //! This provides only the primary entrypoint to the service.
 
-use cardano_blockchain_types::Network;
 use poem::{
     listener::TcpListener,
     middleware::{CatchPanic, Compression, Cors, SensitiveHeader},
