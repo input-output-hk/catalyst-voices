@@ -8,7 +8,7 @@ use std::{
 use catalyst_types::catalyst_id::role_index::RoleId;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
-    types::{Example, ParseError, ParseFromJSON, ParseResult, ToJSON, Type},
+    types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
 
 /// A schema.
@@ -87,17 +87,14 @@ impl ParseFromJSON for CatalystRoleId {
     }
 }
 
+impl ParseFromParameter for CatalystRoleId {
+    fn parse_from_parameter(value: &str) -> ParseResult<Self> {
+        Ok(Self(value.parse()?))
+    }
+}
+
 impl ToJSON for CatalystRoleId {
     fn to_json(&self) -> Option<serde_json::Value> {
         Some(self.0.into())
     }
 }
-
-// TODO: FIXME:
-// //////////////////////////////
-//
-// impl ParseFromParameter for CatalystRoleId {
-//     fn parse_from_parameter(value: &str) -> ParseResult<Self> {
-//         Ok(Self(value.parse()?))
-//     }
-// }
