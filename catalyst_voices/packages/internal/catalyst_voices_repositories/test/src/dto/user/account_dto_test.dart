@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/user/account_dto.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -20,7 +20,8 @@ void main() {
                 'name': 'Eternl',
               },
               'balance': 0,
-              'address': 'addr_test1vzpwq95z3xyum8vqn'
+              'address':
+                  'addr_test1vzpwq95z3xyum8vqn'
                   'dgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
             },
             'isProvisional': true,
@@ -43,7 +44,8 @@ void main() {
             'keychainId': 'uuid',
             'email': email,
             'roles': ['voter'],
-            'address': 'addr_test1vzpwq95z3xyum8vqn'
+            'address':
+                'addr_test1vzpwq95z3xyum8vqn'
                 'dgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
             'isProvisional': true,
           };
@@ -69,7 +71,8 @@ void main() {
             'keychainId': 'uuid',
             'email': email,
             'roles': ['voter'],
-            'address': 'addr_test1vzpwq95z3xyum8vqn'
+            'address':
+                'addr_test1vzpwq95z3xyum8vqn'
                 'dgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
             'isProvisional': true,
             'publicStatus': status.name,

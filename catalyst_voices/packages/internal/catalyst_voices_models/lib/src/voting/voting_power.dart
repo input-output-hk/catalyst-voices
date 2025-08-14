@@ -11,8 +11,28 @@ final class VotingPower extends Equatable {
     required this.updatedAt,
   });
 
+  factory VotingPower.dummy() {
+    return VotingPower(
+      amount: 1520,
+      status: VotingPowerStatus.provisional,
+      updatedAt: DateTime.utc(2025, 8, 13, 10, 15),
+    );
+  }
+
   @override
   List<Object?> get props => [amount, status, updatedAt];
+
+  VotingPower copyWith({
+    int? amount,
+    VotingPowerStatus? status,
+    DateTime? updatedAt,
+  }) {
+    return VotingPower(
+      amount: amount ?? this.amount,
+      status: status ?? this.status,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }
 
 enum VotingPowerStatus {

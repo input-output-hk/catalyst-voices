@@ -23,7 +23,7 @@ final class VotingCubit extends Cubit<VotingState>
   VotingCubitCache _cache = const VotingCubitCache();
   late Timer _countdownTimer;
 
-  StreamSubscription<CatalystId?>? _activeAccountIdSub;
+  StreamSubscription<Account?>? _activeAccountSub;
   StreamSubscription<List<String>>? _favoritesProposalsIdsSub;
   StreamSubscription<ProposalsCount>? _proposalsCountSub;
   StreamSubscription<List<Vote>>? _watchedCastedVotesSub;
@@ -37,10 +37,10 @@ final class VotingCubit extends Cubit<VotingState>
   ) : super(const VotingState()) {
     _resetCache();
 
-    _activeAccountIdSub = _userService.watchUser
-        .map((event) => event.activeAccount?.catalystId)
+    _activeAccountSub = _userService.watchUser
+        .map((event) => event.activeAccount)
         .distinct()
-        .listen(_handleActiveAccountIdChange);
+        .listen(_handleActiveAccountChange);
 
     _favoritesProposalsIdsSub = _proposalService
         .watchFavoritesProposalsIds()
@@ -94,8 +94,8 @@ final class VotingCubit extends Cubit<VotingState>
 
   @override
   Future<void> close() async {
-    await _activeAccountIdSub?.cancel();
-    _activeAccountIdSub = null;
+    await _activeAccountSub?.cancel();
+    _activeAccountSub = null;
 
     await _favoritesProposalsIdsSub?.cancel();
     _favoritesProposalsIdsSub = null;
@@ -205,12 +205,6 @@ final class VotingCubit extends Cubit<VotingState>
     }).toList();
   }
 
-  VotingPhaseProgressDetailsViewModel? _buildVotingPhaseDetails(Campaign? campaign) {
-    final votingPhase = _buildVotingPhase(campaign);
-    final now = DateTimeExt.now();
-    return votingPhase?.progress(now);
-  }
-
   VotingPhaseProgressViewModel? _buildVotingPhase(Campaign? campaign) {
     final campaignVotingPhase = campaign?.phaseStateTo(CampaignPhaseType.communityVoting);
     final campaignStartDate = campaign?.startDate;
@@ -223,6 +217,12 @@ final class VotingCubit extends Cubit<VotingState>
     } else {
       return null;
     }
+  }
+
+  VotingPhaseProgressDetailsViewModel? _buildVotingPhaseDetails(Campaign? campaign) {
+    final votingPhase = _buildVotingPhase(campaign);
+    final now = DateTimeExt.now();
+    return votingPhase?.progress(now);
   }
 
   void _dispatchState() {
@@ -261,8 +261,15 @@ final class VotingCubit extends Cubit<VotingState>
     emitSignal(signal);
   }
 
-  void _handleActiveAccountIdChange(CatalystId? id) {
-    changeFilters(author: Optional(id), resetProposals: true);
+  void _handleActiveAccountChange(Account? account) {
+    if (account?.catalystId != _cache.filters.author) {
+      changeFilters(author: Optional(account?.catalystId), resetProposals: true);
+    }
+
+    if (_cache.votingPower != account?.votingPower) {
+      _cache = _cache.copyWith(votingPower: Optional(account?.votingPower));
+      _dispatchState();
+    }
   }
 
   void _handleBallotBuilderChange() {
@@ -301,18 +308,7 @@ final class VotingCubit extends Cubit<VotingState>
   }
 
   Future<void> _loadVotingPower() async {
-    // TODO(dt-iohk): fetch voting power from service
-    final votingPower = VotingPower(
-      amount: 1520,
-      status: VotingPowerStatus.confirmed,
-      updatedAt: DateTime(2025, 5, 1, 13, 45),
-    );
-
-    _cache = _cache.copyWith(votingPower: Optional(votingPower));
-
-    if (!isClosed) {
-      _dispatchState();
-    }
+    await _userService.refreshActiveAccountVotingPower();
   }
 
   VotingState _rebuildState() {
@@ -324,8 +320,9 @@ final class VotingCubit extends Cubit<VotingState>
     final filters = _cache.filters;
     final count = _cache.count;
 
-    final selectedCategory =
-        campaign?.categories.firstWhereOrNull((e) => e.selfRef.id == selectedCategoryRef?.id);
+    final selectedCategory = campaign?.categories.firstWhereOrNull(
+      (e) => e.selfRef.id == selectedCategoryRef?.id,
+    );
     final selectedCategoryViewModel = selectedCategory != null
         ? CampaignCategoryDetailsViewModel.fromModel(selectedCategory)
         : null;
@@ -352,7 +349,11 @@ final class VotingCubit extends Cubit<VotingState>
   void _resetCache() {
     final activeAccount = _userService.user.activeAccount;
     final filters = ProposalsFilters(author: activeAccount?.catalystId);
-    _cache = VotingCubitCache(filters: filters);
+
+    _cache = VotingCubitCache(
+      filters: filters,
+      votingPower: activeAccount?.votingPower,
+    );
   }
 
   Future<void> _updateFavoriteProposal(

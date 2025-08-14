@@ -47,19 +47,7 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     on<CheckPasswordEvent>(_checkPassword);
 
     _votingPowerSub = _userService.watchUser
-        .map((user) {
-          final activeAccount = user.activeAccount;
-          if (activeAccount == null) {
-            return null;
-          }
-
-          // TODO(damian-molinski): update using Account.
-          return VotingPower(
-            amount: 1000,
-            status: VotingPowerStatus.confirmed,
-            updatedAt: DateTime.now(),
-          );
-        })
+        .map((user) => user.activeAccount?.votingPower)
         .distinct()
         .listen(_handleVotingPowerChange);
 
