@@ -457,7 +457,7 @@ void main() {
       });
     });
 
-    group('refreshActiveAccountProfile', () {
+    group('refreshActiveAccountVotingPower', () {
       setUp(() {
         userRepository = _MockUserRepository();
         service = UserService(userRepository, userObserver);

@@ -47,10 +47,8 @@ final class VotingCubit extends Cubit<VotingState>
         .distinct(listEquals)
         .listen(_handleFavoriteProposalsIds);
 
-    _watchedCastedVotesSub = _votingService
-        .watchedCastedVotes()
-        .distinct(listEquals)
-        .listen(_handleLastCastedChange);
+    _watchedCastedVotesSub =
+        _votingService.watchedCastedVotes().distinct(listEquals).listen(_handleLastCastedChange);
 
     _ballotBuilder.addListener(_handleBallotBuilderChange);
 
@@ -264,9 +262,14 @@ final class VotingCubit extends Cubit<VotingState>
   }
 
   void _handleActiveAccountChange(Account? account) {
-    _cache = _cache.copyWith(votingPower: Optional(account?.votingPower));
-    changeFilters(author: Optional(account?.catalystId), resetProposals: true);
-    _dispatchState();
+    if (account?.catalystId != _cache.filters.author) {
+      changeFilters(author: Optional(account?.catalystId), resetProposals: true);
+    }
+
+    if (_cache.votingPower != account?.votingPower) {
+      _cache = _cache.copyWith(votingPower: Optional(account?.votingPower));
+      _dispatchState();
+    }
   }
 
   void _handleBallotBuilderChange() {
@@ -346,7 +349,7 @@ final class VotingCubit extends Cubit<VotingState>
   void _resetCache() {
     final activeAccount = _userService.user.activeAccount;
     final filters = ProposalsFilters(author: activeAccount?.catalystId);
-    
+
     _cache = VotingCubitCache(
       filters: filters,
       votingPower: activeAccount?.votingPower,

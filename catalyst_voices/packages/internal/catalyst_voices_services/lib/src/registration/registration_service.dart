@@ -306,7 +306,7 @@ final class RegistrationServiceImpl implements RegistrationService {
             publicStatus: data.email != null
                 ? AccountPublicStatus.verifying
                 : AccountPublicStatus.notSetup,
-            votingPower: VotingPower.dummy(),
+            votingPower: null,
           );
         });
       });
