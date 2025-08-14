@@ -14,7 +14,7 @@ use rbac_registration::{
 use crate::{
     service::api::cardano::rbac::registrations_get::{
         extended_data::ExtendedData, key_data::KeyData, key_data_list::KeyDataList,
-        payment_data::PaymentData, payment_data_list::PaymentDataList,
+        payment_data::PaymentData, payment_data_list::PaymentDataList, role_id::CatalystRoleId,
     },
     settings::Settings,
 };
@@ -24,7 +24,7 @@ use crate::{
 #[oai(example)]
 pub struct RbacRoleData {
     /// A Catalyst user role identifier.
-    role_id: u8,
+    role_id: CatalystRoleId,
     /// A list of role signing keys.
     #[oai(skip_serializing_if_is_empty)]
     signing_keys: KeyDataList,
@@ -92,7 +92,7 @@ impl RbacRoleData {
 impl Example for RbacRoleData {
     fn example() -> Self {
         Self {
-            role_id: 0,
+            role_id: CatalystRoleId::example(),
             signing_keys: KeyDataList::example(),
             encryption_keys: KeyDataList::example(),
             payment_addresses: PaymentDataList::example(),

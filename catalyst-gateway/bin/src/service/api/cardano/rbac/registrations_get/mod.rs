@@ -19,6 +19,7 @@ mod purpose_list;
 mod registration_chain;
 mod response;
 mod role_data;
+mod role_id;
 mod role_list;
 mod unprocessable_content;
 
