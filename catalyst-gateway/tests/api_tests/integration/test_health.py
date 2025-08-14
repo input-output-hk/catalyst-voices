@@ -21,6 +21,7 @@ def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory)
     # Not registered stake address
     # Cardano test data CIP0019
     # <https://github.com/cardano-foundation/CIPs/blob/master/CIP-0019/README.md>
+    # cspell:disable-next-line
     stake_address_not_registered = "stake_test17rphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcljw6kf"
 
     health.is_ready() #assertion
@@ -62,6 +63,7 @@ def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory)
     # Not registered stake address
     # Cardano test data CIP0019
     # <https://github.com/cardano-foundation/CIPs/blob/master/CIP-0019/README.md>
+    # cspell:disable-next-line
     stake_address_not_registered = "stake_test17rphkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gtcljw6kf"
 
     health.is_ready() #assertion
