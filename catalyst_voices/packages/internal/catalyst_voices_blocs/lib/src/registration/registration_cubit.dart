@@ -37,21 +37,21 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
     required KeyDerivationService keyDerivationService,
     required RegistrationProgressNotifier progressNotifier,
     required BlockchainConfig blockchainConfig,
-  }) : _userService = userService,
-       _registrationService = registrationService,
-       _progressNotifier = progressNotifier,
-       _baseProfileCubit = BaseProfileCubit(),
-       _keychainCreationCubit = KeychainCreationCubit(downloaderService: downloaderService),
-       _walletLinkCubit = WalletLinkCubit(
-         registrationService: registrationService,
-         blockchainConfig: blockchainConfig,
-       ),
-       _recoverCubit = RecoverCubit(
-         userService: userService,
-         registrationService: registrationService,
-         keyDerivationService: keyDerivationService,
-       ),
-       super(const RegistrationState()) {
+  })  : _userService = userService,
+        _registrationService = registrationService,
+        _progressNotifier = progressNotifier,
+        _baseProfileCubit = BaseProfileCubit(),
+        _keychainCreationCubit = KeychainCreationCubit(downloaderService: downloaderService),
+        _walletLinkCubit = WalletLinkCubit(
+          registrationService: registrationService,
+          blockchainConfig: blockchainConfig,
+        ),
+        _recoverCubit = RecoverCubit(
+          userService: userService,
+          registrationService: registrationService,
+          keyDerivationService: keyDerivationService,
+        ),
+        super(const RegistrationState()) {
     _baseProfileCubit.stream.listen(_onBaseProfileStateDataChanged);
     _keychainCreationCubit.stream.listen(_onKeychainStateDataChanged);
     _walletLinkCubit.stream.listen(_onWalletLinkStateDataChanged);
