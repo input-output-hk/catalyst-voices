@@ -7,19 +7,13 @@ import '../../common_page.dart';
 import '../onboarding_base_page.dart';
 import 'step_7_catalyst_keychain_success.dart';
 
-class WriteDownSeedphrasePanel extends OnboardingPageBase {
-  WriteDownSeedphrasePanel(super.$);
-
+final class WriteDownSeedphrasePanel extends OnboardingPageBase {
   static const seedPhraseStoredCheckbox = Key('SeedPhraseStoredCheckbox');
   static const seedPhraseWord = Key('SeedPhraseWord');
   static const seedPhraseNumber = Key('SeedPhraseNumber');
   static const downloadSeedPhraseButton = Key('DownloadSeedPhraseButton');
 
-  @override
-  Future<void> goto() async {
-    await CatalystKeychainSuccessPanel($).goto();
-    await CatalystKeychainSuccessPanel($).clickNext();
-  }
+  WriteDownSeedphrasePanel(super.$);
 
   @override
   Future<void> clickNext() async {
@@ -30,14 +24,10 @@ class WriteDownSeedphrasePanel extends OnboardingPageBase {
     await $(seedPhraseStoredCheckbox).tap();
   }
 
-  Future<String> writedownSeedPhraseWord(int index) async {
-    final rawWord = $(Key('SeedPhrase${index}CellKey')).$(const Key('SeedPhraseWord')).text;
-    return rawWord!;
-  }
-
-  Future<int> writedownSeedPhraseNumber(int index) async {
-    final rawNumber = $(Key('SeedPhrase${index}CellKey')).$(seedPhraseNumber).text;
-    return int.parse(rawNumber!.split('.').first);
+  @override
+  Future<void> goto() async {
+    await CatalystKeychainSuccessPanel($).goto();
+    await CatalystKeychainSuccessPanel($).clickNext();
   }
 
   Future<void> storeSeedPhraseWords() async {
@@ -47,27 +37,6 @@ class WriteDownSeedphrasePanel extends OnboardingPageBase {
         TestContext.save(key: 'word$i', value: v1);
       }
     }
-  }
-
-  @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
-  }
-
-  Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
-    expect(
-      await infoPartHeaderSubtitleText(),
-      (await t()).createKeychainSeedPhraseSubtitle,
-    );
-    expect(
-      await infoPartHeaderBodyText(),
-      (await t()).createKeychainSeedPhraseBody,
-    );
-    expect(infoPartTaskPicture(), findsOneWidget);
-    expect($(progressBar), findsOneWidget);
-    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
   }
 
   Future<void> verifyDetailsPanel() async {
@@ -86,10 +55,41 @@ class WriteDownSeedphrasePanel extends OnboardingPageBase {
     expect($(nextButton), findsOneWidget);
   }
 
+  Future<void> verifyInfoPanel() async {
+    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
+    expect(
+      await infoPartHeaderSubtitleText(),
+      (await t()).createKeychainSeedPhraseSubtitle,
+    );
+    expect(
+      await infoPartHeaderBodyText(),
+      (await t()).createKeychainSeedPhraseBody,
+    );
+    expect(infoPartTaskPicture(), findsOneWidget);
+    expect($(progressBar), findsOneWidget);
+    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
+  }
+
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
+  }
+
+  Future<int> writedownSeedPhraseNumber(int index) async {
+    final rawNumber = $(Key('SeedPhrase${index}CellKey')).$(seedPhraseNumber).text;
+    return int.parse(rawNumber!.split('.').first);
+  }
+
   Future<void> writedownSeedPhrasesAreDisplayed() async {
     for (var i = 0; i < 12; i++) {
       expect(await writedownSeedPhraseNumber(i), i + 1);
       expect(await writedownSeedPhraseWord(i), isNotEmpty);
     }
+  }
+
+  Future<String> writedownSeedPhraseWord(int index) async {
+    final rawWord = $(Key('SeedPhrase${index}CellKey')).$(const Key('SeedPhraseWord')).text;
+    return rawWord!;
   }
 }

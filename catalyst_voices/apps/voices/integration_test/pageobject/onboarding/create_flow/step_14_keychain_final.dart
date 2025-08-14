@@ -6,15 +6,16 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_13_password_input.dart';
 
-class KeychainFinalPanel extends OnboardingPageBase {
-  KeychainFinalPanel(super.$);
-
+final class KeychainFinalPanel extends OnboardingPageBase {
   static const linkWalletAndRolesButton = Key('LinkWalletAndRolesButton');
   final keyLockedIcon = const Key('LockedPictureConstrainedBox');
   final checkedIcon = const Key('CheckedIcon');
   final stepTwoContainer = const Key('StepTwoContainer');
   final iconContainer = const Key('IconContainer');
   final lockedPictureConstrainedBox = const Key('LockedPictureConstrainedBox');
+
+  KeychainFinalPanel(super.$);
+
   Future<void> clickLinkWalletAndRoles() async {
     await $(linkWalletAndRolesButton).tap();
   }
@@ -24,12 +25,6 @@ class KeychainFinalPanel extends OnboardingPageBase {
     await PasswordInputPanel($).goto();
     await PasswordInputPanel($).enterPassword('Test1234', 'Test1234');
     await PasswordInputPanel($).clickNext();
-  }
-
-  @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
   }
 
   Future<void> verifyDetailsPanel() async {
@@ -81,5 +76,11 @@ class KeychainFinalPanel extends OnboardingPageBase {
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
     expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
+  }
+
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }

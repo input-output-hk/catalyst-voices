@@ -6,7 +6,7 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_2_profile_info.dart';
 
-class SetupProfilePanel extends OnboardingPageBase {
+final class SetupProfilePanel extends OnboardingPageBase {
   final profileDetailsPanel = const Key('ProfileDetailsPanel');
   final titleText = const Key('TitleText');
   final displayNameTextField = const Key('DisplayNameTextField');

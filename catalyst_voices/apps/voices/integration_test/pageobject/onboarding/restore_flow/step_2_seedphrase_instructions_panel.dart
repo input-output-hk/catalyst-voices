@@ -6,24 +6,12 @@ import '../../common_page.dart';
 import '../onboarding_base_page.dart';
 import '../step_1_get_started.dart';
 
-class RestoreKeychainInputPanel extends OnboardingPageBase {
-  RestoreKeychainInputPanel(super.$);
-
+final class RestoreKeychainInputPanel extends OnboardingPageBase {
   final seedPhraseInstructionsTitleKey = const Key('SeedPhraseInstructionsTitle');
   final seedPhraseInstructionsSubtitleKey = const Key('SeedPhraseInstructionsSubtitleKey');
   final resetButton = const Key('ResetButton');
 
-  @override
-  Future<void> goto() async {
-    await GetStartedPanel($).goto();
-    await GetStartedPanel($).clickRecoverKeychain();
-  }
-
-  @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
-  }
+  RestoreKeychainInputPanel(super.$);
 
   Future<void> enterSeedPhrase(List<String> seedPhrase) async {
     await $(resetButton).tap();
@@ -34,13 +22,10 @@ class RestoreKeychainInputPanel extends OnboardingPageBase {
     }
   }
 
-  Future<void> verifyInfoPanel() async {
-    expect(
-      await infoPartHeaderTitleText(),
-      (await t()).recoverCatalystKeychain,
-    );
-    expect(infoPartTaskPicture(), findsOneWidget);
-    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
+  @override
+  Future<void> goto() async {
+    await GetStartedPanel($).goto();
+    await GetStartedPanel($).clickRecoverKeychain();
   }
 
   Future<void> verifyDetailsPanel() async {
@@ -54,5 +39,20 @@ class RestoreKeychainInputPanel extends OnboardingPageBase {
     );
     expect($(backButton), findsOneWidget);
     expect($(nextButton), findsOneWidget);
+  }
+
+  Future<void> verifyInfoPanel() async {
+    expect(
+      await infoPartHeaderTitleText(),
+      (await t()).recoverCatalystKeychain,
+    );
+    expect(infoPartTaskPicture(), findsOneWidget);
+    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
+  }
+
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }

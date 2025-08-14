@@ -6,10 +6,10 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_11_seedphrase_success.dart';
 
-class PasswordInfoPanel extends OnboardingPageBase {
-  PasswordInfoPanel(super.$);
-
+final class PasswordInfoPanel extends OnboardingPageBase {
   final lockedPictureConstrainedBox = const Key('LockedPictureConstrainedBox');
+
+  PasswordInfoPanel(super.$);
 
   @override
   Future<void> clickNext() async {
@@ -20,12 +20,6 @@ class PasswordInfoPanel extends OnboardingPageBase {
   Future<void> goto() async {
     await SeedphraseSuccessPanel($).goto();
     await SeedphraseSuccessPanel($).clickNext();
-  }
-
-  @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
   }
 
   Future<void> verifyDetailsPanel() async {
@@ -56,5 +50,11 @@ class PasswordInfoPanel extends OnboardingPageBase {
     expect($(progressBar), findsOneWidget);
     expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
     expect(await closeButton(), findsOneWidget);
+  }
+
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }

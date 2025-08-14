@@ -8,7 +8,7 @@ import '../../utils/translations_utils.dart';
 import '../discovery_page.dart';
 
 class CurrentCampaignSection {
-  late PatrolTester $;
+  final PatrolTester $;
 
   final currentCampaignRoot = const Key('CurrentCampaignRoot');
   final title = const Key('CurrentCampaignTitle');
@@ -26,6 +26,7 @@ class CurrentCampaignSection {
   final timelineCardTitle = const Key('TimelineCardTitle');
   final timelineCardDate = const Key('TimelineCardDate');
   final currentCampaignLoadingError = const Key('CurrentCampaignError');
+
   CurrentCampaignSection(this.$);
 
   Future<void> campaignDetailsAreRenderedCorrectly() async {

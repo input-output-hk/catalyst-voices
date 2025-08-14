@@ -6,7 +6,7 @@ import '../../common_page.dart';
 import '../create_flow/step_13_password_input.dart';
 import 'step_4_unlock_password_info_panel.dart';
 
-class UnlockPasswordInputPanel extends PasswordInputPanel {
+final class UnlockPasswordInputPanel extends PasswordInputPanel {
   UnlockPasswordInputPanel(super.$);
 
   @override
@@ -16,9 +16,16 @@ class UnlockPasswordInputPanel extends PasswordInputPanel {
   }
 
   @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
+  Future<void> verifyDetailsPanel() async {
+    expect($(passwordInputField).$(voicesTextField), findsOneWidget);
+    expect($(enterPasswordText).text, (await t()).enterPassword);
+    expect(
+      $(passwordConfirmInputField).$(enterPasswordText).text,
+      (await t()).confirmPassword,
+    );
+    expect($(passwordConfirmInputField).$(voicesTextField), findsOneWidget);
+    expect($(backButton), findsOneWidget);
+    expect($(nextButton), findsOneWidget);
   }
 
   @override
@@ -36,15 +43,8 @@ class UnlockPasswordInputPanel extends PasswordInputPanel {
   }
 
   @override
-  Future<void> verifyDetailsPanel() async {
-    expect($(passwordInputField).$(voicesTextField), findsOneWidget);
-    expect($(enterPasswordText).text, (await t()).enterPassword);
-    expect(
-      $(passwordConfirmInputField).$(enterPasswordText).text,
-      (await t()).confirmPassword,
-    );
-    expect($(passwordConfirmInputField).$(voicesTextField), findsOneWidget);
-    expect($(backButton), findsOneWidget);
-    expect($(nextButton), findsOneWidget);
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }

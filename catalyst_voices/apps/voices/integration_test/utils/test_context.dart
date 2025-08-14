@@ -1,7 +1,28 @@
 class TestContext {
-  TestContext._privateConstructor();
   static final TestContext instance = TestContext._privateConstructor();
-  Map<String, String> context = {};
+
+  final Map<String, String> context = {};
+
+  TestContext._privateConstructor();
+
+  static void clearContext() {
+    TestContext.instance.context.clear();
+  }
+
+  static void delete({required String key}) {
+    if (has(key: key)) {
+      TestContext.instance.context.remove(key);
+    }
+  }
+
+  static String get(String key) {
+    if (has(key: key)) {
+      return TestContext.instance.context[key]!;
+    }
+    throw Exception(
+      'You tried to access $key property, but it does not exist.',
+    );
+  }
 
   static bool has({required String key}) {
     return TestContext.instance.context.containsKey(key);
@@ -14,29 +35,10 @@ class TestContext {
     TestContext.instance.context[key] = value;
   }
 
-  static void delete({required String key}) {
-    if (has(key: key)) {
-      TestContext.instance.context.remove(key);
-    }
-  }
-
   static void saveWithOverride({required String key, required String value}) {
     if (has(key: key)) {
       delete(key: key);
     }
     TestContext.instance.context[key] = value;
-  }
-
-  static String get(String key) {
-    if (has(key: key)) {
-      return TestContext.instance.context[key]!;
-    }
-    throw Exception(
-      'You tried to access $key property, but it does not exist.',
-    );
-  }
-
-  static void clearContext() {
-    TestContext.instance.context.clear();
   }
 }

@@ -5,7 +5,7 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import '../step_1_get_started.dart';
 
-class ProfileInfoPanel extends OnboardingPageBase {
+final class ProfileInfoPanel extends OnboardingPageBase {
   final createProfileButton = const Key('CreateProfileNext');
   final profileExplanationText = const Key('ProfileExplanationTest');
   final emailRequestTitle = const Key('EmailRequestTitle');

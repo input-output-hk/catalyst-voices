@@ -4,6 +4,22 @@ import 'package:patrol_finders/patrol_finders.dart';
 import 'mock_url_launcher_platform.dart';
 
 class SelectorUtils {
+  static Future<void> checkOpeningLinkByMocking(
+    PatrolTester $,
+    String elementText,
+    String urlPart,
+  ) async {
+    final mockUrlLauncherPlatform = MockUrlLauncherPlatform();
+    await $.tester.tapOnText(find.textRange.ofSubstring(elementText));
+    expect(
+      mockUrlLauncherPlatform.capturedUrl.contains(urlPart),
+      true,
+      reason: 'Link URL does not match: \nexpected $urlPart'
+          '\ngot ${mockUrlLauncherPlatform.capturedUrl}',
+    );
+    mockUrlLauncherPlatform.tearDownMock();
+  }
+
   static void isDisabled(
     PatrolTester $,
     PatrolFinder widget, {
@@ -20,21 +36,5 @@ class SelectorUtils {
 
   static void isEnabled(PatrolTester $, PatrolFinder widget) {
     isDisabled($, widget, reverse: true);
-  }
-
-  static Future<void> checkOpeningLinkByMocking(
-    PatrolTester $,
-    String elementText,
-    String urlPart,
-  ) async {
-    final mockUrlLauncherPlatform = MockUrlLauncherPlatform();
-    await $.tester.tapOnText(find.textRange.ofSubstring(elementText));
-    expect(
-      mockUrlLauncherPlatform.capturedUrl.contains(urlPart),
-      true,
-      reason: 'Link URL does not match: \nexpected $urlPart'
-          '\ngot ${mockUrlLauncherPlatform.capturedUrl}',
-    );
-    mockUrlLauncherPlatform.tearDownMock();
   }
 }
