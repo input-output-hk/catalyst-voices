@@ -10,8 +10,7 @@ pub(crate) mod txo;
 
 use std::collections::BTreeSet;
 
-use cardano_blockchain_types::{MultiEraBlock, Slot};
-use catalyst_types::hashes::Blake2b256Hash;
+use cardano_blockchain_types::{hashes::Blake2b256Hash, MultiEraBlock, Slot};
 use certs::CertInsertQuery;
 use cip36::Cip36InsertQuery;
 use rbac509::Rbac509InsertQuery;

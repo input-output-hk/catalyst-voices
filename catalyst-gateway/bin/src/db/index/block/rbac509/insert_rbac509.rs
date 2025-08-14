@@ -2,7 +2,7 @@
 
 use std::{collections::HashSet, fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
+use cardano_blockchain_types::{hashes::TransactionId, Slot, StakeAddress, TxnIndex};
 use catalyst_types::catalyst_id::CatalystId;
 use scylla::{client::session::Session, value::MaybeUnset, SerializeRow};
 use tracing::error;

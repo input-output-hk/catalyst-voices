@@ -4,9 +4,11 @@
 
 use std::sync::LazyLock;
 
-use catalyst_types::hashes::BLAKE_2B224_SIZE;
+use cardano_blockchain_types::{
+    hashes::BLAKE_2B224_SIZE,
+    pallas_addresses::{Address, ShelleyAddress},
+};
 use const_format::concatcp;
-use pallas::ledger::addresses::{Address, ShelleyAddress};
 use poem_openapi::{
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},

@@ -5,7 +5,7 @@ use std::{
     sync::Arc,
 };
 
-use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
+use cardano_blockchain_types::{hashes::TransactionId, Slot, StakeAddress, TxnIndex};
 use futures::TryStreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
 
