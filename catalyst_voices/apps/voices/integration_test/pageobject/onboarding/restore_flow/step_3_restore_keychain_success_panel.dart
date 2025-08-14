@@ -6,9 +6,7 @@ import '../../common_page.dart';
 import '../onboarding_base_page.dart';
 import 'step_2_seedphrase_instructions_panel.dart';
 
-class RestoreKeychainSuccessPanel extends OnboardingPageBase {
-  RestoreKeychainSuccessPanel(super.$);
-
+final class RestoreKeychainSuccessPanel extends OnboardingPageBase {
   final recoveryAccountTitle = const Key('RecoveryAccountTitle');
   final walletNameText = const Key('WalletNameText');
   final recoveryAccountSuccessTitle = const Key('RecoveryAccountSuccessTitle');
@@ -22,6 +20,16 @@ class RestoreKeychainSuccessPanel extends OnboardingPageBase {
   final setUnlockPasswordButton = const Key('SetUnlockPasswordButton');
   final recoverDifferentKeychainButton = const Key('RecoverDifferentKeychainButton');
   final recoveryAccountError = const Key('RecoveryAccountError');
+
+  RestoreKeychainSuccessPanel(super.$);
+
+  Future<void> clickRecoverDifferentKeychain() async {
+    await $(recoverDifferentKeychainButton).tap();
+  }
+
+  Future<void> clickSetUnlockPassword() async {
+    await $(setUnlockPasswordButton).tap();
+  }
 
   @override
   Future<void> goto() async {
@@ -44,20 +52,6 @@ class RestoreKeychainSuccessPanel extends OnboardingPageBase {
     await RestoreKeychainInputPanel($).enterSeedPhrase(seedPhrase);
     await clickNext();
     await _ensureWalletIsRecovered();
-  }
-
-  Future<void> clickSetUnlockPassword() async {
-    await $(setUnlockPasswordButton).tap();
-  }
-
-  Future<void> clickRecoverDifferentKeychain() async {
-    await $(recoverDifferentKeychainButton).tap();
-  }
-
-  @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
   }
 
   Future<void> verifyDetailsPanel() async {
@@ -89,6 +83,12 @@ class RestoreKeychainSuccessPanel extends OnboardingPageBase {
       $(registrationInfoPanel).$(CommonPage($).decorData).$(Text).text,
       (await t()).learnMore,
     );
+  }
+
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 
   Future<void> _ensureWalletIsRecovered() async {

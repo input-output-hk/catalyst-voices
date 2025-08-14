@@ -6,15 +6,19 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_9_writedown_seedphrase_info.dart';
 
-class InputSeedphrasePanel extends OnboardingPageBase {
-  InputSeedphrasePanel(super.$);
-
+final class InputSeedphrasePanel extends OnboardingPageBase {
   static const seedPhrasesPicker = Key('SeedPhrasesPicker');
   final resetButton = const Key('ResetButton');
+
+  InputSeedphrasePanel(super.$);
 
   @override
   Future<void> clickNext() async {
     await $(nextButton).tap();
+  }
+
+  Future<void> clickResetButton() async {
+    await $(resetButton).tap();
   }
 
   @override
@@ -32,15 +36,18 @@ class InputSeedphrasePanel extends OnboardingPageBase {
     }
   }
 
-  @override
-  Future<void> verifyPageElements() async {
-    await clickResetButton();
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
-  }
-
-  Future<void> clickResetButton() async {
-    await $(resetButton).tap();
+  Future<void> verifyDetailsPanel() async {
+    for (var i = 0; i < 12; i++) {
+      expect(find.text('Slot ${i + 1}'), findsOneWidget);
+    }
+    for (var i = 0; i < 12; i++) {
+      expect(
+        $(seedPhrasesPicker).$(find.text(TestContext.get('word$i'))),
+        findsWidgets,
+      );
+    }
+    expect($(backButton), findsOneWidget);
+    expect($(nextButton), findsOneWidget);
   }
 
   Future<void> verifyInfoPanel() async {
@@ -66,17 +73,10 @@ class InputSeedphrasePanel extends OnboardingPageBase {
     expect(await closeButton(), findsOneWidget);
   }
 
-  Future<void> verifyDetailsPanel() async {
-    for (var i = 0; i < 12; i++) {
-      expect(find.text('Slot ${i + 1}'), findsOneWidget);
-    }
-    for (var i = 0; i < 12; i++) {
-      expect(
-        $(seedPhrasesPicker).$(find.text(TestContext.get('word$i'))),
-        findsWidgets,
-      );
-    }
-    expect($(backButton), findsOneWidget);
-    expect($(nextButton), findsOneWidget);
+  @override
+  Future<void> verifyPageElements() async {
+    await clickResetButton();
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }
