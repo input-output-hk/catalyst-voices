@@ -173,7 +173,7 @@ class ProposalsPage {
 
   Future<void> currentCampaignDetailsLooksAsExpected() async {
     expect(
-      $(currentCampaignTitle).text?.startsWith('Catalyst Fund '),
+      $(currentCampaignTitle).text?.startsWith('Catalyst Fund'),
       true,
     );
     expect($(currentCampaignDescription).text, isNotEmpty);
