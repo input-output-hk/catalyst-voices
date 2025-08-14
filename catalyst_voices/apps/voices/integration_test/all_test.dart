@@ -36,4 +36,5 @@ void main() {
 
   group('App -', appTests);
   group('Account -', accountTests);
+  group('Discovery space -', discoverySpaceTests);
 }
