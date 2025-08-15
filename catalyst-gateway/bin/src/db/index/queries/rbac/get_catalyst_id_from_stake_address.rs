@@ -6,7 +6,7 @@ use anyhow::{Context, Result};
 use cardano_chain_follower::StakeAddress;
 use catalyst_types::catalyst_id::CatalystId;
 use futures::{StreamExt, TryStreamExt};
-use moka::{policy::EvictionPolicy, sync::Cache};
+use moka::policy::EvictionPolicy;
 use scylla::{
     client::{pager::TypedRowStream, session::Session},
     statement::{prepared::PreparedStatement, Consistency},
@@ -26,26 +26,36 @@ use crate::{
         PERSISTENT_STAKE_ADDRESSES_CACHE_HIT, PERSISTENT_STAKE_ADDRESSES_CACHE_MISS,
         VOLATILE_STAKE_ADDRESSES_CACHE_HIT, VOLATILE_STAKE_ADDRESSES_CACHE_MISS,
     },
+    service::utilities::cache::CacheWrapper,
     settings::Settings,
 };
 
 /// Get Catalyst ID by stake address query string.
 const QUERY: &str = include_str!("../cql/get_catalyst_id_for_stake_address.cql");
 
+/// Function to determine cache entry weighted size.
+fn weigher_fn(_: &StakeAddress, _: &CatalystId) -> u32 {
+    1u32
+}
+
 /// A persistent cache instance.
-static PERSISTENT_CACHE: LazyLock<Cache<StakeAddress, CatalystId>> = LazyLock::new(|| {
-    Cache::builder()
-        .eviction_policy(EvictionPolicy::lru())
-        .max_capacity(Settings::rbac_cfg().persistent_pub_keys_cache_size)
-        .build()
+static PERSISTENT_CACHE: LazyLock<CacheWrapper<StakeAddress, CatalystId>> = LazyLock::new(|| {
+    CacheWrapper::new(
+        "Persistent RBAC Stake Address Cache",
+        EvictionPolicy::lru(),
+        Settings::rbac_cfg().persistent_pub_keys_cache_size,
+        weigher_fn,
+    )
 });
 
 /// A volatile cache instance.
-static VOLATILE_CACHE: LazyLock<Cache<StakeAddress, CatalystId>> = LazyLock::new(|| {
-    Cache::builder()
-        .eviction_policy(EvictionPolicy::lru())
-        .max_capacity(Settings::rbac_cfg().volatile_pub_keys_cache_size)
-        .build()
+static VOLATILE_CACHE: LazyLock<CacheWrapper<StakeAddress, CatalystId>> = LazyLock::new(|| {
+    CacheWrapper::new(
+        "Volatile RBAC Stake Address Cache",
+        EvictionPolicy::lru(),
+        Settings::rbac_cfg().volatile_pub_keys_cache_size,
+        weigher_fn,
+    )
 });
 
 /// Get Catalyst ID by stake address query params.
@@ -125,7 +135,7 @@ pub fn cache_stake_address(
 /// Removes all cached values.
 pub fn invalidate_stake_addresses_cache(is_persistent: bool) {
     let cache = cache(is_persistent);
-    cache.invalidate_all();
+    cache.clear_cache();
 }
 
 /// Returns an approximate number of entries in the stake addresses cache.
@@ -135,7 +145,7 @@ pub fn stake_addresses_cache_size(is_persistent: bool) -> u64 {
 }
 
 /// Returns a persistent or a volatile cache instance depending on the parameter value.
-fn cache(is_persistent: bool) -> &'static Cache<StakeAddress, CatalystId> {
+fn cache(is_persistent: bool) -> &'static CacheWrapper<StakeAddress, CatalystId> {
     if is_persistent {
         &PERSISTENT_CACHE
     } else {

@@ -6,7 +6,7 @@ use anyhow::{Context, Result};
 use cardano_chain_follower::hashes::TransactionId;
 use catalyst_types::catalyst_id::CatalystId;
 use futures::{StreamExt, TryStreamExt};
-use moka::{policy::EvictionPolicy, sync::Cache};
+use moka::policy::EvictionPolicy;
 use scylla::{
     client::session::Session,
     statement::{prepared::PreparedStatement, Consistency},
@@ -26,26 +26,36 @@ use crate::{
         PERSISTENT_TRANSACTION_IDS_CACHE_HIT, PERSISTENT_TRANSACTION_IDS_CACHE_MISS,
         VOLATILE_TRANSACTION_IDS_CACHE_HIT, VOLATILE_TRANSACTION_IDS_CACHE_MISS,
     },
+    service::utilities::cache::CacheWrapper,
     settings::Settings,
 };
 
 /// A query string.
 const QUERY: &str = include_str!("../cql/get_catalyst_id_for_transaction_id.cql");
 
+/// Function to determine cache entry weighted size.
+fn weigher_fn(_: &TransactionId, _: &CatalystId) -> u32 {
+    1u32
+}
+
 /// A persistent cache instance.
-static PERSISTENT_CACHE: LazyLock<Cache<TransactionId, CatalystId>> = LazyLock::new(|| {
-    Cache::builder()
-        .eviction_policy(EvictionPolicy::lru())
-        .max_capacity(Settings::rbac_cfg().persistent_pub_keys_cache_size)
-        .build()
+static PERSISTENT_CACHE: LazyLock<CacheWrapper<TransactionId, CatalystId>> = LazyLock::new(|| {
+    CacheWrapper::new(
+        "Persistent RBAC Transaction ID Cache",
+        EvictionPolicy::lru(),
+        Settings::rbac_cfg().persistent_pub_keys_cache_size,
+        weigher_fn,
+    )
 });
 
 /// A volatile cache instance.
-static VOLATILE_CACHE: LazyLock<Cache<TransactionId, CatalystId>> = LazyLock::new(|| {
-    Cache::builder()
-        .eviction_policy(EvictionPolicy::lru())
-        .max_capacity(Settings::rbac_cfg().volatile_pub_keys_cache_size)
-        .build()
+static VOLATILE_CACHE: LazyLock<CacheWrapper<TransactionId, CatalystId>> = LazyLock::new(|| {
+    CacheWrapper::new(
+        "Volatile RBAC Transaction ID Cache",
+        EvictionPolicy::lru(),
+        Settings::rbac_cfg().volatile_pub_keys_cache_size,
+        weigher_fn,
+    )
 });
 
 /// Get Catalyst ID by transaction ID query parameters.
@@ -109,7 +119,7 @@ impl Query {
 /// Removes all cached values.
 pub fn invalidate_transactions_ids_cache(is_persistent: bool) {
     let cache = cache(is_persistent);
-    cache.invalidate_all();
+    cache.clear_cache();
 }
 
 /// Returns an approximate number of entries in the transaction IDs cache.
@@ -119,7 +129,7 @@ pub fn transaction_ids_cache_size(is_persistent: bool) -> u64 {
 }
 
 /// Returns a persistent or a volatile cache instance depending on the parameter value.
-fn cache(is_persistent: bool) -> &'static Cache<TransactionId, CatalystId> {
+fn cache(is_persistent: bool) -> &'static CacheWrapper<TransactionId, CatalystId> {
     if is_persistent {
         &PERSISTENT_CACHE
     } else {
