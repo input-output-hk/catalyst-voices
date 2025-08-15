@@ -4,7 +4,9 @@
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex, TxnOutputOffset};
+use cardano_blockchain_types::{
+    hashes::TransactionId, Slot, StakeAddress, TxnIndex, TxnOutputOffset,
+};
 use scylla::{client::session::Session, SerializeRow};
 use tracing::error;
 

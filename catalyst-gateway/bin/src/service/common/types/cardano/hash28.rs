@@ -5,7 +5,7 @@
 use std::sync::LazyLock;
 
 use anyhow::bail;
-use catalyst_types::hashes::BLAKE_2B224_SIZE;
+use cardano_blockchain_types::hashes::BLAKE_2B224_SIZE;
 use const_format::concatcp;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},

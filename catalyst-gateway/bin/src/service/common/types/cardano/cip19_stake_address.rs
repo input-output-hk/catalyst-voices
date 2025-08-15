@@ -5,9 +5,8 @@
 use std::sync::LazyLock;
 
 use anyhow::bail;
-use cardano_blockchain_types::StakeAddress;
+use cardano_blockchain_types::{pallas_addresses::Address, StakeAddress};
 use const_format::concatcp;
-use pallas::ledger::addresses::Address;
 use poem_openapi::{
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
