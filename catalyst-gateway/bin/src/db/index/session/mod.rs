@@ -1,4 +1,5 @@
 //! Session creation and storage
+mod cache_manager;
 
 use std::{
     fmt::Debug,
@@ -94,6 +95,8 @@ pub(crate) struct CassandraSession {
     queries: Arc<PreparedQueries>,
     /// All prepared purge queries we can use on this session.
     purge_queries: Arc<purge::PreparedQueries>,
+    /// Manager for all caches used in this session.
+    caches: Arc<cache_manager::Caches>,
 }
 
 /// Persistent DB Session.
@@ -270,6 +273,11 @@ impl CassandraSession {
     pub fn is_persistent(&self) -> bool {
         self.persistent
     }
+
+    /// Get a handle to the session Cache manager.
+    pub fn caches(&self) -> Arc<cache_manager::Caches> {
+        self.caches.clone()
+    }
 }
 
 /// Create a new execution profile based on the given configuration.
@@ -426,6 +434,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bo
             session,
             queries,
             purge_queries,
+            caches: Arc::new(cache_manager::Caches::new()),
         };
 
         // Save the session so we can execute queries on the DB
