@@ -6,7 +6,7 @@ use anyhow::{Context, Result};
 use catalyst_types::catalyst_id::CatalystId;
 use ed25519_dalek::VerifyingKey;
 use futures::{StreamExt, TryStreamExt};
-use moka::{policy::EvictionPolicy, sync::Cache};
+use moka::policy::EvictionPolicy;
 use scylla::{
     client::session::Session,
     statement::{prepared::PreparedStatement, Consistency},
@@ -26,26 +26,36 @@ use crate::{
         PERSISTENT_PUBLIC_KEYS_CACHE_HIT, PERSISTENT_PUBLIC_KEYS_CACHE_MISS,
         VOLATILE_PUBLIC_KEYS_CACHE_HIT, VOLATILE_PUBLIC_KEYS_CACHE_MISS,
     },
+    service::utilities::cache::CacheWrapper,
     settings::Settings,
 };
 
 /// A query string.
 const QUERY: &str = include_str!("../cql/get_catalyst_id_for_public_key.cql");
 
+/// Function to determine cache entry weighted size.
+fn weigher_fn(_: &VerifyingKey, _: &CatalystId) -> u32 {
+    1u32
+}
+
 /// A persistent cache instance.
-static PERSISTENT_CACHE: LazyLock<Cache<VerifyingKey, CatalystId>> = LazyLock::new(|| {
-    Cache::builder()
-        .eviction_policy(EvictionPolicy::lru())
-        .max_capacity(Settings::rbac_cfg().persistent_pub_keys_cache_size)
-        .build()
+static PERSISTENT_CACHE: LazyLock<CacheWrapper<VerifyingKey, CatalystId>> = LazyLock::new(|| {
+    CacheWrapper::new(
+        "Persistent RBAC Public Keys Cache",
+        EvictionPolicy::lru(),
+        Settings::rbac_cfg().persistent_pub_keys_cache_size,
+        weigher_fn,
+    )
 });
 
 /// A volatile cache instance.
-static VOLATILE_CACHE: LazyLock<Cache<VerifyingKey, CatalystId>> = LazyLock::new(|| {
-    Cache::builder()
-        .eviction_policy(EvictionPolicy::lru())
-        .max_capacity(Settings::rbac_cfg().volatile_pub_keys_cache_size)
-        .build()
+static VOLATILE_CACHE: LazyLock<CacheWrapper<VerifyingKey, CatalystId>> = LazyLock::new(|| {
+    CacheWrapper::new(
+        "",
+        EvictionPolicy::lru(),
+        Settings::rbac_cfg().volatile_pub_keys_cache_size,
+        weigher_fn,
+    )
 });
 
 /// Get Catalyst ID by public key query parameters.
@@ -106,7 +116,7 @@ impl Query {
 /// Removes all cached values.
 pub fn invalidate_public_keys_cache(is_persistent: bool) {
     let cache = cache(is_persistent);
-    cache.invalidate_all();
+    cache.clear_cache();
 }
 
 /// Returns an approximate number of entries in the public keys cache.
@@ -116,7 +126,7 @@ pub fn public_keys_cache_size(is_persistent: bool) -> u64 {
 }
 
 /// Returns a persistent or a volatile cache instance depending on the parameter value.
-fn cache(is_persistent: bool) -> &'static Cache<VerifyingKey, CatalystId> {
+fn cache(is_persistent: bool) -> &'static CacheWrapper<VerifyingKey, CatalystId> {
     if is_persistent {
         &PERSISTENT_CACHE
     } else {
