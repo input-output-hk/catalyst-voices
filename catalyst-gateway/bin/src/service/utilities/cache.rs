@@ -15,7 +15,10 @@ where
     V: Clone + Send + Sync + 'static,
 {
     /// Constructs a new `CacheWrapper`.
-    pub(crate) fn new(name: &str, eviction_policy: EvictionPolicy, max_capacity: u64) -> Self {
+    pub(crate) fn new(
+        name: &str, eviction_policy: EvictionPolicy, max_capacity: u64,
+        weigher_fn: impl Fn(&K, &V) -> u32 + Send + Sync + 'static,
+    ) -> Self {
         let inner = if max_capacity < 1 {
             None
         } else {
@@ -23,8 +26,8 @@ where
                 .name(name)
                 .eviction_policy(eviction_policy)
                 .max_capacity(max_capacity)
-                .build();
-            Some(cache)
+                .weigher(weigher_fn);
+            Some(cache.build())
         };
         Self { inner }
     }
