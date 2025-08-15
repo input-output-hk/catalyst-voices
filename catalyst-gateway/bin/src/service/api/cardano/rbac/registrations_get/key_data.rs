@@ -74,7 +74,7 @@ impl Example for KeyData {
         Self {
             is_persistent: BooleanFlag::example(),
             time: ServiceDateTime::example(),
-            key_type: KeyType::X509,
+            key_type: KeyType::example(),
             key_value: Some(HexEncodedBinaryData::example()),
         }
     }
