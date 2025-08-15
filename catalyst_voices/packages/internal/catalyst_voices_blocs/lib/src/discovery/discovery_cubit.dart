@@ -20,10 +20,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   StreamSubscription<List<Proposal>>? _proposalsSub;
   StreamSubscription<List<String>>? _favoritesProposalsIdsSub;
 
-  DiscoveryCubit(
-    this._campaignService,
-    this._proposalService,
-  ) : super(const DiscoveryState());
+  DiscoveryCubit(this._campaignService, this._proposalService) : super(const DiscoveryState());
 
   Future<void> addFavorite(DocumentRef ref) async {
     try {
@@ -35,30 +32,22 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   }
 
   @override
-  Future<void> close() {
-    _proposalsSub?.cancel();
+  Future<void> close() async {
+    await _proposalsSub?.cancel();
     _proposalsSub = null;
 
-    _favoritesProposalsIdsSub?.cancel();
+    await _favoritesProposalsIdsSub?.cancel();
     _favoritesProposalsIdsSub = null;
 
     return super.close();
   }
 
   Future<void> getAllData() async {
-    await Future.wait([
-      getCurrentCampaign(),
-      getCampaignCategories(),
-      getMostRecentProposals(),
-    ]);
+    await Future.wait([getCurrentCampaign(), getCampaignCategories(), getMostRecentProposals()]);
   }
 
   Future<void> getCampaignCategories() async {
-    emit(
-      state.copyWith(
-        categories: const DiscoveryCampaignCategoriesState(),
-      ),
-    );
+    emit(state.copyWith(categories: const DiscoveryCampaignCategoriesState()));
 
     final categories = await _campaignService.getCampaignCategories();
     final categoriesModel = categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
@@ -78,11 +67,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   }
 
   Future<void> getCurrentCampaign() async {
-    emit(
-      state.copyWith(
-        campaign: const DiscoveryCurrentCampaignState(),
-      ),
-    );
+    emit(state.copyWith(campaign: const DiscoveryCurrentCampaignState()));
     final campaign = await _campaignService.getCurrentCampaign();
     final campaignTimeline = await _campaignService.getCampaignTimeline();
     final currentCampaign = CurrentCampaignInfoViewModel.fromModel(campaign);
@@ -101,11 +86,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   }
 
   Future<void> getMostRecentProposals() async {
-    emit(
-      state.copyWith(
-        proposals: const DiscoveryMostRecentProposalsState(),
-      ),
-    );
+    emit(state.copyWith(proposals: const DiscoveryMostRecentProposalsState()));
 
     unawaited(_proposalsSub?.cancel());
     _proposalsSub = _buildProposalsSub();
@@ -114,11 +95,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     _favoritesProposalsIdsSub = _buildFavoritesProposalsIdsSub();
 
     final mostRecentState = state.proposals;
-    emit(
-      state.copyWith(
-        proposals: mostRecentState.copyWith(isLoading: false),
-      ),
-    );
+    emit(state.copyWith(proposals: mostRecentState.copyWith(isLoading: false)));
   }
 
   Future<void> removeFavorite(DocumentRef ref) async {
@@ -133,10 +110,10 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   StreamSubscription<List<String>> _buildFavoritesProposalsIdsSub() {
     _logger.info('Building favorites proposals ids subscription');
 
-    return _proposalService.watchFavoritesProposalsIds().distinct(listEquals).listen(
-          _emitFavoritesIds,
-          onError: _emitMostRecentError,
-        );
+    return _proposalService
+        .watchFavoritesProposalsIds()
+        .distinct(listEquals)
+        .listen(_emitFavoritesIds, onError: _emitMostRecentError);
   }
 
   StreamSubscription<List<Proposal>> _buildProposalsSub() {
@@ -150,16 +127,11 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
         )
         .map((event) => event.items)
         .distinct(listEquals)
-        .listen(
-          _handleProposals,
-          onError: _emitMostRecentError,
-        );
+        .listen(_handleProposals, onError: _emitMostRecentError);
   }
 
   void _emitFavoritesIds(List<String> ids) {
-    emit(
-      state.copyWith(proposals: state.proposals.updateFavorites(ids)),
-    );
+    emit(state.copyWith(proposals: state.proposals.updateFavorites(ids)));
   }
 
   void _emitMostRecentError(Object error, StackTrace stackTrace) {
@@ -189,10 +161,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
 
     emit(
       state.copyWith(
-        proposals: state.proposals.copyWith(
-          isLoading: false,
-          proposals: proposalList,
-        ),
+        proposals: state.proposals.copyWith(isLoading: false, proposals: proposalList),
       ),
     );
   }

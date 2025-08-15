@@ -16,30 +16,15 @@ class AccountRoleDialog extends StatelessWidget {
     super.key,
   });
 
-  static Future<void> show(
-    BuildContext context, {
-    required AccountRole role,
-  }) async {
-    return VoicesDialog.show<void>(
-      context: context,
-      routeSettings: const RouteSettings(name: '/account-role'),
-      builder: (context) {
-        return AccountRoleDialog(
-          role: role,
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return VoicesSinglePaneDialog(
       backgroundColor: Theme.of(context).colors.iconsBackground,
       constraints: const BoxConstraints(maxHeight: 460, maxWidth: 750),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: SingleChildScrollView(
+      child: SingleChildScrollView(
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
               const SizedBox(height: 16),
@@ -113,14 +98,29 @@ class AccountRoleDialog extends StatelessWidget {
       ),
     );
   }
+
+  static Future<void> show(
+    BuildContext context, {
+    required AccountRole role,
+  }) async {
+    return VoicesDialog.show<void>(
+      context: context,
+      routeSettings: const RouteSettings(name: '/account-role'),
+      builder: (context) {
+        return AccountRoleDialog(
+          role: role,
+        );
+      },
+    );
+  }
 }
 
 class _InfoContainer extends StatelessWidget {
+  final Widget child;
+
   const _InfoContainer({
     required this.child,
   });
-
-  final Widget child;
 
   @override
   Widget build(BuildContext context) {
