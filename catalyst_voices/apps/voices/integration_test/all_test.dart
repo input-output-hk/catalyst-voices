@@ -38,6 +38,10 @@ void main() {
 
   tearDown(() async {
     await Dependencies.instance.get<CatalystDatabase>().pendingOperations;
+    // TODO(damian-molinski): sometimes tests are flaky because of pending db queries
+    // do not have time to finish. pendingOperations is not implemented correctly
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+
     await cleanUpStorages();
     await cleanUpUserDataFromDatabase();
     await Dependencies.instance.reset;
@@ -50,5 +54,6 @@ void main() {
   group('App -', appTests);
   group('Account -', accountTests);
   group('Discovery space -', discoverySpaceTests);
+  group('Onboarding -', onboardingTests);
   group('Proposals space -', proposalsTests);
 }
