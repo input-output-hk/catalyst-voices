@@ -35,11 +35,11 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   }
 
   @override
-  Future<void> close() {
-    _proposalsSub?.cancel();
+  Future<void> close() async {
+    await _proposalsSub?.cancel();
     _proposalsSub = null;
 
-    _favoritesProposalsIdsSub?.cancel();
+    await _favoritesProposalsIdsSub?.cancel();
     _favoritesProposalsIdsSub = null;
 
     return super.close();

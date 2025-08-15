@@ -30,45 +30,45 @@ class WalletSummary extends StatelessWidget {
     final showExpectedNetworkId = this.showExpectedNetworkId;
 
     return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          width: 1.5,
-          color: Theme.of(context).colors.outlineBorderVariant,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            width: 1.5,
+            color: Theme.of(context).colors.outlineBorderVariant,
+          ),
         ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            key: const Key('WalletDetectionSummary'),
-            context.l10n.walletDetectionSummary,
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const SizedBox(height: 12),
-          _WalletSummaryName(
-            walletName: walletName,
-          ),
-          const SizedBox(height: 12),
-          _WalletSummaryBalance(
-            balance: balance,
-            showLowBalance: showLowBalance,
-          ),
-          const SizedBox(height: 12),
-          _WalletSummaryAddress(
-            address: address,
-            clipboardAddress: clipboardAddress,
-          ),
-          if (showExpectedNetworkId != null) ...[
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              key: const Key('WalletDetectionSummary'),
+              context.l10n.walletDetectionSummary,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
             const SizedBox(height: 12),
-            _NetworkIdMismatchError(networkId: showExpectedNetworkId),
+            _WalletSummaryName(
+              walletName: walletName,
+            ),
+            const SizedBox(height: 12),
+            _WalletSummaryBalance(
+              balance: balance,
+              showLowBalance: showLowBalance,
+            ),
+            const SizedBox(height: 12),
+            _WalletSummaryAddress(
+              address: address,
+              clipboardAddress: clipboardAddress,
+            ),
+            if (showExpectedNetworkId != null) ...[
+              const SizedBox(height: 12),
+              _NetworkIdMismatchError(networkId: showExpectedNetworkId),
+            ],
+            const SizedBox(height: 12),
+            const _WalletBalanceNotice(),
           ],
-          const SizedBox(height: 12),
-          const _WalletBalanceNotice(),
-        ],
-      ),
+        ),
     );
   }
 }
@@ -144,6 +144,7 @@ class _WalletSummaryAddress extends StatelessWidget {
           VoicesClipboardIconButton(clipboardData: clipboardAddress),
         ],
       ),
+      semanticsIdentifier: 'WalletAddress',
     );
   }
 }
@@ -183,6 +184,7 @@ class _WalletSummaryBalance extends StatelessWidget {
           ],
         ],
       ),
+      semanticsIdentifier: 'WalletBalance',
     );
   }
 }
@@ -190,14 +192,18 @@ class _WalletSummaryBalance extends StatelessWidget {
 class _WalletSummaryItem extends StatelessWidget {
   final Widget label;
   final Widget value;
+  final String? semanticsIdentifier;
 
   const _WalletSummaryItem({
     required this.label,
     required this.value,
+    this.semanticsIdentifier,
   });
 
   @override
   Widget build(BuildContext context) {
+    final baseIdentifier = semanticsIdentifier ?? 'WalletSummaryItem';
+
     return Row(
       children: [
         Expanded(
@@ -234,6 +240,7 @@ class _WalletSummaryName extends StatelessWidget {
         walletName.capitalize(),
         key: const Key('NameOfWalletValue'),
       ),
+      semanticsIdentifier: 'NameOfWallet',
     );
   }
 }

@@ -30,6 +30,7 @@ class _DrepApprovalContingencyCheckbox extends StatelessWidget {
       onChanged: (value) {
         RegistrationCubit.of(context).baseProfile.updateDrepApprovalContingency(accepted: value);
       },
+      semanticsIdentifier: 'drepApprovalContingencyCheckbox',
     );
   }
 }

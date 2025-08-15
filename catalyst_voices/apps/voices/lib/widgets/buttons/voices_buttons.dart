@@ -258,7 +258,7 @@ class VoicesBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesOutlinedButton(
       onTap: onTap,
-      child: Text(context.l10n.back),
+      child: Text(context.l10n.back, semanticsIdentifier: 'BackButton'),
     );
   }
 }
@@ -351,7 +351,7 @@ class VoicesLearnMoreFilledButton extends StatelessWidget {
       key: const Key('LearnMoreButton'),
       trailing: VoicesAssets.icons.externalLink.buildIcon(),
       onTap: onTap,
-      child: Text(context.l10n.learnMore),
+      child: Text(context.l10n.learnMore, semanticsIdentifier: 'LearnMoreButton'),
     );
   }
 }
@@ -396,8 +396,9 @@ class VoicesNextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
+      key: const Key('NextButton'),
       onTap: onTap,
-      child: Text(context.l10n.next),
+      child: Text(context.l10n.next, semanticsIdentifier: 'NextButton'),
     );
   }
 }

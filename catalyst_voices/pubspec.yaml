@@ -7,4 +7,4 @@ dependencies:
   dart_pubspec_licenses: ^3.0.4
 
 dev_dependencies:
-  melos: ^6.1.0
+  melos: ^6.3.3

@@ -59,6 +59,7 @@ class _UnlockPasswordTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesPasswordTextField(
       key: const Key('PasswordInputField'),
+      semanticsIdentifier: 'PasswordInputField',
       controller: controller,
       textInputAction: TextInputAction.next,
       decoration: VoicesTextFieldDecoration(
@@ -85,6 +86,7 @@ class _ConfirmUnlockPasswordTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesPasswordTextField(
       key: const Key('PasswordConfirmInputField'),
+      semanticsIdentifier: 'PasswordConfirmInputField',
       controller: controller,
       decoration: VoicesTextFieldDecoration(
         labelText: context.l10n.confirmPassword,

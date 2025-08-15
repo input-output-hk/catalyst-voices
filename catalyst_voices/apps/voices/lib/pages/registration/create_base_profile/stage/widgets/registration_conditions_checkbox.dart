@@ -31,6 +31,7 @@ class _RegistrationConditionsCheckbox extends StatelessWidget {
       onChanged: (value) {
         RegistrationCubit.of(context).baseProfile.updateConditions(accepted: value);
       },
+      semanticsIdentifier: 'RegistrationConditionsCheckbox',
     );
   }
 }
