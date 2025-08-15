@@ -135,7 +135,7 @@ final class UserServiceImpl implements UserService {
     }
 
     // If already verified just return true.
-    if (activeAccount.publicStatus.isVerified) {
+    if (activeAccount.publicStatus.isVerified || activeAccount.isDummy) {
       return true;
     }
 
@@ -281,10 +281,16 @@ final class UserServiceImpl implements UserService {
       final wasVerified = account.publicStatus.isVerified;
 
       if (currentEmail != null) {
-        final publicProfile = await _userRepository.publishUserProfile(
-          catalystId: updatedAccount.catalystId,
-          email: currentEmail,
-        );
+        final publicProfile = account.isDummy
+            ? AccountPublicProfile(
+                email: currentEmail,
+                username: updatedAccount.username,
+                status: AccountPublicStatus.verified,
+              )
+            : await _userRepository.publishUserProfile(
+                catalystId: updatedAccount.catalystId,
+                email: currentEmail,
+              );
 
         final isVerified = publicProfile.status.isVerified;
         final didEffectiveChangeEmail = account.email != publicProfile.email;
