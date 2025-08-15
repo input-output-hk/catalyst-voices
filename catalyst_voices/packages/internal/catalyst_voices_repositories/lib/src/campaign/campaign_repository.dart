@@ -1,8 +1,19 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/foundation.dart';
 
 /// Allows access to campaign data, categories, and timeline.
 abstract interface class CampaignRepository {
+  static CurrentCampaign? _currentCampaign;
+
+  /// Overrides the current campaign returned by [getCurrentCampaign].
+  /// Only for unit testing.
+  @visibleForTesting
+  //ignore: avoid_setters_without_getters
+  static set currentCampaign(CurrentCampaign? currentCampaign) {
+    _currentCampaign = currentCampaign;
+  }
+
   const factory CampaignRepository() = CampaignRepositoryImpl;
 
   Future<Campaign> getCampaign({
@@ -47,8 +58,8 @@ final class CampaignRepositoryImpl implements CampaignRepository {
   }
 
   @override
-  Future<List<CampaignTimeline>> getCampaignTimeline() async {
-    return CurrentCampaignX.staticContent.timeline;
+  Future<List<CampaignTimeline>> getCampaignTimeline() {
+    return getCurrentCampaign().then((value) => value.timeline);
   }
 
   @override
@@ -63,6 +74,6 @@ final class CampaignRepositoryImpl implements CampaignRepository {
 
   @override
   Future<CurrentCampaign> getCurrentCampaign() async {
-    return CurrentCampaignX.staticContent;
+    return CampaignRepository._currentCampaign ?? CurrentCampaignX.staticContent;
   }
 }

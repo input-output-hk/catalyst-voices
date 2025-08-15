@@ -3,6 +3,7 @@ import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
@@ -13,6 +14,18 @@ void main() {
 
   setUpAll(() async {
     binding.testTextInput.register();
+
+    // F14
+    final f14Campaign = CurrentCampaignX.staticContent;
+    CampaignRepository.currentCampaign = f14Campaign;
+
+    final proposalSubmissionTimeline = CurrentCampaignX.staticContent.timeline
+        .firstWhere((element) => element.stage == CampaignTimelineStage.proposalSubmission)
+        .timeline;
+
+    final middle = proposalSubmissionTimeline.middle();
+
+    DateTimeExt.mockedDateTime = middle;
   });
 
   setUp(() async {

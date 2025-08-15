@@ -70,6 +70,15 @@ class DateRange extends Equatable {
     return isInRange(DateTimeExt.now());
   }
 
+  DateTime middle() {
+    final min = from?.millisecondsSinceEpoch ?? 0;
+    final max = to?.millisecondsSinceEpoch ?? DateTime(2099).millisecondsSinceEpoch;
+
+    final duration = max - min;
+    final valueMillis = min + (duration / 2).round();
+    return DateTime.fromMillisecondsSinceEpoch(valueMillis);
+  }
+
   DateRangeStatus rangeStatusNow() {
     final now = DateTimeExt.now();
     if (isInRange(now)) {
