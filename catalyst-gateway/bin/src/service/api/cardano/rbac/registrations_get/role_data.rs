@@ -4,6 +4,7 @@ use std::collections::HashMap;
 
 use anyhow::Context;
 use cardano_blockchain_types::Slot;
+use catalyst_types::catalyst_id::role_index::RoleId;
 use poem_openapi::{types::Example, Object};
 use rbac_registration::{
     cardano::cip509::{PointData, RoleData},
@@ -13,7 +14,7 @@ use rbac_registration::{
 use crate::{
     service::api::cardano::rbac::registrations_get::{
         extended_data::ExtendedData, key_data::KeyData, key_data_list::KeyDataList,
-        payment_data::PaymentData, payment_data_list::PaymentDataList,
+        payment_data::PaymentData, payment_data_list::PaymentDataList, role_id::CatalystRoleId,
     },
     settings::Settings,
 };
@@ -22,6 +23,8 @@ use crate::{
 #[derive(Object, Debug, Clone)]
 #[oai(example)]
 pub struct RbacRoleData {
+    /// A Catalyst user role identifier.
+    role_id: CatalystRoleId,
     /// A list of role signing keys.
     #[oai(skip_serializing_if_is_empty)]
     signing_keys: KeyDataList,
@@ -41,7 +44,8 @@ pub struct RbacRoleData {
 impl RbacRoleData {
     /// Creates a new `RbacRoleData` instance.
     pub fn new(
-        point_data: &[PointData<RoleData>], last_persistent_slot: Slot, chain: &RegistrationChain,
+        role: RoleId, point_data: &[PointData<RoleData>], last_persistent_slot: Slot,
+        chain: &RegistrationChain,
     ) -> anyhow::Result<Self> {
         let network = Settings::cardano_network();
 
@@ -76,6 +80,7 @@ impl RbacRoleData {
         }
 
         Ok(Self {
+            role_id: role.into(),
             signing_keys: signing_keys.into(),
             encryption_keys: encryption_keys.into(),
             payment_addresses: payment_addresses.into(),
@@ -87,6 +92,7 @@ impl RbacRoleData {
 impl Example for RbacRoleData {
     fn example() -> Self {
         Self {
+            role_id: CatalystRoleId::example(),
             signing_keys: KeyDataList::example(),
             encryption_keys: KeyDataList::example(),
             payment_addresses: PaymentDataList::example(),

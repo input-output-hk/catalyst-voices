@@ -1,6 +1,6 @@
 //! A key type for role data.
 
-use poem_openapi::Enum;
+use poem_openapi::{types::Example, Enum};
 
 /// A key type for role data.
 #[derive(Debug, Clone, Copy, Enum)]
@@ -12,4 +12,10 @@ pub enum KeyType {
     X509,
     /// A C509 certificate.
     C509,
+}
+
+impl Example for KeyType {
+    fn example() -> Self {
+        KeyType::X509
+    }
 }

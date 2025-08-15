@@ -1,7 +1,7 @@
 //! Utilities for obtaining a RBAC registration chain (`RegistrationChain`).
 
 use anyhow::{bail, Context, Result};
-use cardano_blockchain_types::{Network, Point, Slot, StakeAddress, TxnIndex};
+use cardano_blockchain_types::{Network, Point, Slot, TxnIndex};
 use cardano_chain_follower::ChainFollower;
 use catalyst_types::catalyst_id::CatalystId;
 use futures::{future::try_join, TryFutureExt, TryStreamExt};
@@ -9,9 +9,8 @@ use rbac_registration::{cardano::cip509::Cip509, registration::cardano::Registra
 
 use crate::{
     db::index::{
-        queries::rbac::{
-            get_catalyst_id_from_stake_address::Query as CatalystIdQuery,
-            get_rbac_registrations::{Query as RbacQuery, QueryParams as RbacQueryParams},
+        queries::rbac::get_rbac_registrations::{
+            Query as RbacQuery, QueryParams as RbacQueryParams,
         },
         session::CassandraSession,
     },
@@ -67,28 +66,6 @@ pub async fn latest_rbac_chain(id: &CatalystId) -> Result<Option<ChainInfo>> {
             last_persistent_slot,
         }
     }))
-}
-
-/// Returns the latest (including the volatile part) registration chain by the given stake
-/// address.
-pub async fn latest_rbac_chain_by_address(address: &StakeAddress) -> Result<Option<ChainInfo>> {
-    let persistent_session =
-        CassandraSession::get(true).context("Failed to get persistent Cassandra session")?;
-    let volatile_session =
-        CassandraSession::get(false).context("Failed to get volatile Cassandra session")?;
-
-    // We always check the latest (volatile) data first.
-    let id = match CatalystIdQuery::latest(&volatile_session, address).await? {
-        Some(id) => id,
-        None => {
-            match CatalystIdQuery::latest(&persistent_session, address).await? {
-                Some(id) => id,
-                None => return Ok(None),
-            }
-        },
-    };
-
-    latest_rbac_chain(&id).await
 }
 
 /// Returns only the persistent part of a registration chain by the given Catalyst ID.

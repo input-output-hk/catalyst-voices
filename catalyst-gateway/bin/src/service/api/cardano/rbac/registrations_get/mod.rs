@@ -1,10 +1,15 @@
 //! Implementation of the GET `/rbac/registrations` endpoint.
 
 use anyhow::Context;
+use catalyst_types::catalyst_id::CatalystId;
+use futures::TryStreamExt;
+use itertools::Itertools;
 pub use response::AllResponses;
 
 mod binary_data;
 mod extended_data;
+mod invalid_registration;
+mod invalid_registration_list;
 mod key_data;
 mod key_data_list;
 mod key_type;
@@ -14,13 +19,20 @@ mod purpose_list;
 mod registration_chain;
 mod response;
 mod role_data;
-mod role_map;
+mod role_id;
+mod role_list;
 mod unprocessable_content;
 
+use futures::TryFutureExt;
 use poem_openapi::payload::Json;
+use tokio::try_join;
 
 use crate::{
-    rbac::{latest_rbac_chain, latest_rbac_chain_by_address, ChainInfo},
+    db::index::{
+        queries::rbac::get_rbac_invalid_registrations::Query as RbacInvalidQuery,
+        session::CassandraSession,
+    },
+    rbac::latest_rbac_chain,
     service::{
         api::cardano::rbac::registrations_get::{
             registration_chain::RbacRegistrationChain, response::Responses,
@@ -35,7 +47,7 @@ use crate::{
 
 /// Get RBAC registration endpoint.
 pub(crate) async fn endpoint(
-    lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>,
+    lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>, show_all_invalid: bool,
 ) -> AllResponses {
     if lookup.is_none() && token.is_none() {
         return Responses::UnprocessableContent(Json(RbacUnprocessableContent::new(
@@ -44,33 +56,94 @@ pub(crate) async fn endpoint(
         .into();
     }
 
-    // `Box::pin` is used here because of the future size (`clippy::large_futures` lint).
-    match Box::pin(chain_info(lookup, token)).await {
+    // Box::pin is used here because of the future size (`clippy::large_futures` lint).
+    match Box::pin(reg_chain(lookup, token, show_all_invalid)).await {
         Err(e) => AllResponses::handle_error(&e),
-        Ok(Some(info)) => {
-            match RbacRegistrationChain::new(&info) {
-                Ok(c) => Responses::Ok(Json(Box::new(c))).into(),
-                Err(e) => AllResponses::handle_error(&e),
-            }
-        },
+        Ok(Some(c)) => Responses::Ok(Json(Box::new(c))).into(),
         Ok(None) => Responses::NotFound.into(),
     }
 }
 
-/// Returns a `ChainInfo` object using either a Catalyst ID or a stake address.
-async fn chain_info(
+/// Returns a registration chain.
+async fn reg_chain(
+    lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>, show_all_invalid: bool,
+) -> anyhow::Result<Option<RbacRegistrationChain>> {
+    let persistent_session =
+        CassandraSession::get(true).context("Failed to get persistent Cassandra session")?;
+    let volatile_session =
+        CassandraSession::get(false).context("Failed to get volatile Cassandra session")?;
+
+    let Some(id) = catalyst_id(lookup, token, &persistent_session, &volatile_session).await? else {
+        return Ok(None);
+    };
+
+    let (info, invalid_persistent, invalid_volatile) = try_join!(
+        latest_rbac_chain(&id),
+        invalid_registrations(id.clone(), &persistent_session),
+        invalid_registrations(id.clone(), &volatile_session),
+    )?;
+    let first_invalid_slot = if show_all_invalid {
+        0.into()
+    } else {
+        info.as_ref()
+            .map(|i| i.chain.current_point().slot_or_default())
+            .unwrap_or_default()
+    };
+
+    let invalid = invalid_persistent
+        .into_iter()
+        .chain(invalid_volatile)
+        .filter(|r| r.slot_no >= first_invalid_slot.into())
+        // Note: the sort order is reversed here `|a, b| b.cmp(a)` because by default the ascending
+        // order is used, and we want the opposite (latest slots first).
+        .sorted_by(|a, b| (b.slot_no, b.txn_index).cmp(&(a.slot_no, a.txn_index)))
+        .map(Into::into)
+        .collect::<Vec<_>>()
+        .into();
+
+    RbacRegistrationChain::new(id.into(), info.as_ref(), invalid)
+}
+
+/// Returns a Catalyst ID corresponding to the given stake address.
+async fn catalyst_id(
     lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>,
-) -> anyhow::Result<Option<ChainInfo>> {
-    match lookup {
-        Some(CatIdOrStake::CatId(id)) => latest_rbac_chain(&id.into()).await,
+    persistent_session: &CassandraSession, volatile_session: &CassandraSession,
+) -> anyhow::Result<Option<CatalystId>> {
+    use crate::db::index::queries::rbac::get_catalyst_id_from_stake_address::Query;
+
+    Ok(Some(match lookup {
+        Some(CatIdOrStake::CatId(id)) => id.into(),
         Some(CatIdOrStake::Address(address)) => {
             let address = address.try_into().context("Invalid stake address")?;
-            latest_rbac_chain_by_address(&address).await
+            match Query::latest(volatile_session, &address).await? {
+                Some(id) => id,
+                None => {
+                    match Query::latest(persistent_session, &address).await? {
+                        Some(id) => id,
+                        None => return Ok(None),
+                    }
+                },
+            }
         },
         None => {
             // This error is properly handled above and shouldn't occur here.
-            let token = token.context("Either lookup parameter or token must be provided")?;
-            latest_rbac_chain(token.catalyst_id()).await
+            token
+                .context("Either lookup parameter or token must be provided")?
+                .catalyst_id()
+                .to_owned()
         },
-    }
+    }))
+}
+
+/// Returns a list of invalid registrations.
+async fn invalid_registrations(
+    id: CatalystId, session: &CassandraSession,
+) -> anyhow::Result<Vec<RbacInvalidQuery>> {
+    use crate::db::index::queries::rbac::get_rbac_invalid_registrations::{Query, QueryParams};
+
+    Query::execute(session, QueryParams {
+        catalyst_id: id.into(),
+    })
+    .and_then(|r| r.try_collect().map_err(Into::into))
+    .await
 }
