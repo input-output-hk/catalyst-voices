@@ -40,7 +40,7 @@ class MostRecentSection {
   }
 
   Future<void> proposalCardLooksAsExpected(
-    Key parentContainer,
+    dynamic parentContainer,
     int cardIndex,
   ) async {
     expect(

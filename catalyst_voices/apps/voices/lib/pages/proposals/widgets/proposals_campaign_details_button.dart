@@ -32,9 +32,9 @@ class _ProposalsCampaignDetailsButton extends StatelessWidget {
     return Offstage(
       offstage: campaignId == null,
       child: Padding(
-        key: const Key('CampaignDetailsButton'),
         padding: const EdgeInsets.only(top: 32),
         child: OutlinedButton.icon(
+          key: const Key('CampaignDetailsButton'),
           onPressed: () {
             unawaited(
               CampaignDetailsDialog.show(context, id: campaignId!),

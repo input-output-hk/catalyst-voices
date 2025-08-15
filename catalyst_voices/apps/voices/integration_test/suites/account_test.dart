@@ -126,9 +126,6 @@ void accountTests() {
           await AccountDropdownPage($).clickProfileAndKeychain();
           await ProfilePage($).clickEmailAddressEdit();
           await $(ProfilePage($).accountEmailTextField).enterText('bera@gmail.com');
-
-          await $.pump();
-
           await ProfilePage($).clickEmailAddressSave();
           await ProfilePage($).emailIsAsExpected('bera@gmail.com');
 

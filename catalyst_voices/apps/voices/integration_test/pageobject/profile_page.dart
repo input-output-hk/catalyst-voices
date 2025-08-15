@@ -69,8 +69,9 @@ class ProfilePage {
   }
 
   Future<void> emailIsAsExpected(String expectedEmail) async {
-    final textField =
-        $(accountEmailTile).$(CommonPage($).voicesTextField).evaluate().first.widget as TextField;
+    final finder = $(accountEmailTile).$(CommonPage($).voicesTextField);
+    final evaluate = finder.evaluate();
+    final textField = evaluate.first.widget as TextField;
 
     expect(textField.controller!.text, expectedEmail);
   }

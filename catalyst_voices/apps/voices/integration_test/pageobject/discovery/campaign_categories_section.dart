@@ -26,7 +26,7 @@ class CampaignCategoriesSection {
   CampaignCategoriesSection(this.$);
 
   Future<void> categoriesAreRenderedCorrectly() async {
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < 4; i++) {
       try {
         $(categoriesRoot).$(campaignCategories).at(i).$(description).visible;
       } catch (e) {

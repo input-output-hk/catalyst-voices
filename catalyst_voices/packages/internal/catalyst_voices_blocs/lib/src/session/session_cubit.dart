@@ -77,7 +77,7 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
       _updateState();
     }
 
-    return _hasWallets;
+    return _alwaysAllowRegistration || _hasWallets;
   }
 
   @override

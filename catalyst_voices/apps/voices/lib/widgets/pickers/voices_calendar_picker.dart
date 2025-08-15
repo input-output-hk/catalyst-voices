@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class VoicesCalendarDatePicker extends StatefulWidget {
@@ -18,7 +19,7 @@ class VoicesCalendarDatePicker extends StatefulWidget {
     DateTime? firstDate,
     DateTime? lastDate,
   }) {
-    final now = DateTime.now();
+    final now = DateTimeExt.now();
     return VoicesCalendarDatePicker._(
       key: key,
       onDateSelected: onDateSelected,
@@ -43,7 +44,7 @@ class VoicesCalendarDatePicker extends StatefulWidget {
 }
 
 class _VoicesCalendarDatePickerState extends State<VoicesCalendarDatePicker> {
-  DateTime selectedDate = DateTime.now();
+  DateTime selectedDate = DateTimeExt.now();
 
   @override
   Widget build(BuildContext context) {

@@ -6,15 +6,17 @@ import '../onboarding_base_page.dart';
 import '../step_1_get_started.dart';
 
 final class ProfileInfoPanel extends OnboardingPageBase {
-  final createProfileButton = const Key('CreateProfileNext');
   final profileExplanationText = const Key('ProfileExplanationTest');
   final emailRequestTitle = const Key('EmailRequestTitle');
   final emailRequestList = const Key('EmailRequestList');
 
   ProfileInfoPanel(super.$);
 
+  @override
+  Key get nextButton => const Key('CreateBaseProfileNext');
+
   Future<void> clickCreateProfile() async {
-    await $(createProfileButton).tap();
+    await $(nextButton).tap();
   }
 
   @override
@@ -36,7 +38,7 @@ final class ProfileInfoPanel extends OnboardingPageBase {
       $(emailRequestTitle).text,
       (await t()).createProfileInstructionsEmailRequest,
     );
-    expect($(createProfileButton).visible, true);
+    expect($(nextButton).visible, true);
     expect(await closeButton(), findsOneWidget);
   }
 

@@ -26,6 +26,9 @@ const _testWords = [
 
 final _logger = Logger('RecoverCubit');
 
+@visibleForTesting
+List<SeedPhraseWord> get recoverTestWords => List.unmodifiable(_testWords);
+
 /// Manages the recovery process.
 ///
 /// Allows to recover an account from the seed phrase.

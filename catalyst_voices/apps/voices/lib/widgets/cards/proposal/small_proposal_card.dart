@@ -9,6 +9,7 @@ import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class SmallProposalCard extends StatelessWidget {
@@ -153,9 +154,7 @@ class _NewIterationDetails extends StatelessWidget {
                   child: Text(
                     context.l10n.newIterationTitle(
                       iteration,
-                      DateFormatter.formatDayMonthTime(
-                        datetime ?? DateTime.now(),
-                      ),
+                      DateFormatter.formatDayMonthTime(datetime ?? DateTimeExt.now()),
                       title,
                     ),
                     style: context.textTheme.bodySmall?.copyWith(

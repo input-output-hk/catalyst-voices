@@ -18,7 +18,6 @@ base class OnboardingPageBase {
   final headerSubtitle = const Key('HeaderSubtitle');
   final headerBody = const Key('HeaderBody');
   final backButton = const Key('BackButton');
-  final nextButton = const Key('NextButton');
   final registrationInfoPictureContainer = const Key('PictureContainer');
   final progressBar = const Key('ProgressBar');
   final registrationDetailsTitle = const Key('RegistrationDetailsTitle');
@@ -37,6 +36,8 @@ base class OnboardingPageBase {
   final recoveryExitDialogContent = const Key('RecoveryExitDialogContent');
 
   OnboardingPageBase(this.$);
+
+  Key get nextButton => const Key('NextButton');
 
   Future<void> clickBack() async {
     await $(backButton).waitUntilVisible().tap();
@@ -58,13 +59,13 @@ base class OnboardingPageBase {
   Future<void> incompleteDialogCheckKeychainPhase() async {
     expect(
       $(voicesAlertDialogTitleRow).$(registrationDialogTitle).text,
-      (await t()).warning,
+      (await t()).warning.toUpperCase(),
     );
     expect($(voicesAlertDialogTitleRow).$(VoicesIconButton), findsExactly(2));
     expect($(voicesAlertDialog).$(warningIcon), findsOneWidget);
     expect(
       $(voicesAlertDialog).$(voicesAlertDialogSubtitle).$(Text).text,
-      (await t()).registrationExitConfirmDialogSubtitle,
+      ((await t()).registrationExitConfirmDialogSubtitle).toUpperCase(),
     );
     expect(
       $(voicesAlertDialog).$(registrationExitDialogContent).text,
@@ -91,13 +92,13 @@ base class OnboardingPageBase {
   Future<void> incompleteDialogCheckRestorationPhase() async {
     expect(
       $(voicesAlertDialogTitleRow).$(registrationDialogTitle).text,
-      (await t()).warning,
+      (await t()).warning.toUpperCase(),
     );
     expect($(voicesAlertDialogTitleRow).$(VoicesIconButton), findsExactly(2));
     expect($(voicesAlertDialog).$(warningIcon), findsOneWidget);
     expect(
       $(voicesAlertDialog).$(voicesAlertDialogSubtitle).$(Text).text,
-      (await t()).recoveryExitConfirmDialogSubtitle,
+      (await t()).recoveryExitConfirmDialogSubtitle.toUpperCase(),
     );
     expect(
       $(voicesAlertDialog).$(recoveryExitDialogContent).text,

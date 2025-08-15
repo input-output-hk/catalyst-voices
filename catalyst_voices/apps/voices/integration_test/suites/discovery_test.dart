@@ -1,48 +1,45 @@
-import 'package:catalyst_voices/app/view/app.dart';
-import 'package:catalyst_voices/routes/routes.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 import '../pageobject/discovery/current_campaign_selector_page.dart';
 import '../pageobject/discovery_page.dart';
 import '../pageobject/proposals_page.dart';
+import '../utils/test_utils.dart';
 
-void main() async {
-  late final GoRouter router;
+void discoverySpaceTests() {
+  patrolWidgetTest(
+    'visitor - page is rendered correctly',
+    (PatrolTester $) async {
+      await TestStateUtils.pumpApp($);
 
-  setUpAll(() async {
-    router = AppRouterFactory.create();
-  });
+      await Future<void>.delayed(const Duration(seconds: 1));
+      await $.pumpAndTrySettle();
 
-  setUp(() async {
-    router.go(const DiscoveryRoute().location);
-  });
+      await DiscoveryPage($).looksAsExpectedForVisitor();
+    },
+  );
 
-  group('Discovery space -', () {
-    patrolWidgetTest(
-      'visitor - page is rendered correctly',
-      (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await DiscoveryPage($).looksAsExpectedForVisitor();
-      },
-    );
+  patrolWidgetTest(
+    'visitor - view proposals button works',
+    (PatrolTester $) async {
+      await TestStateUtils.pumpApp($);
 
-    patrolWidgetTest(
-      'visitor - view proposals button works',
-      (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await DiscoveryPage($).viewProposalsBtnClick();
-        await ProposalsPage($).currentCampaignDetailsLooksAsExpected();
-      },
-    );
+      await Future<void>.delayed(const Duration(seconds: 1));
+      await $.pumpAndTrySettle();
 
-    patrolWidgetTest(
-      'visitor - timeline cards data is rendered',
-      (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await CurrentCampaignSection($).timelineCardsDataIsRendered();
-      },
-    );
-  });
+      await DiscoveryPage($).viewProposalsBtnClick();
+      await ProposalsPage($).currentCampaignDetailsLooksAsExpected();
+    },
+  );
+
+  patrolWidgetTest(
+    'visitor - timeline cards data is rendered',
+    (PatrolTester $) async {
+      await TestStateUtils.pumpApp($);
+
+      await Future<void>.delayed(const Duration(seconds: 1));
+      await $.pumpAndTrySettle();
+
+      await CurrentCampaignSection($).timelineCardsDataIsRendered();
+    },
+  );
 }

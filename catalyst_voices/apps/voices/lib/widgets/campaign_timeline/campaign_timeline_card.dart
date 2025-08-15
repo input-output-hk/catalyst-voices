@@ -23,6 +23,7 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
 
   SvgGenImage get _expandedIcon =>
       _isExpanded ? VoicesAssets.icons.chevronDown : VoicesAssets.icons.chevronRight;
+
   bool get _isOngoing => widget.timelineItem.timeline.isTodayInRange();
 
   @override
