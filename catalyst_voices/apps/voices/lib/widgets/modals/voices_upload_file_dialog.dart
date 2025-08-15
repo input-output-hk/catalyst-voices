@@ -209,10 +209,11 @@ class _UploadContainerState extends State<_UploadContainer> {
       child: Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: DottedBorder(
-          borderType: BorderType.RRect,
-          radius: const Radius.circular(12),
-          dashPattern: const [8, 6],
-          color: Theme.of(context).colors.iconsPrimary,
+          options: RoundedRectDottedBorderOptions(
+            radius: const Radius.circular(12),
+            dashPattern: const [8, 6],
+            color: Theme.of(context).colors.iconsPrimary,
+          ),
           child: Stack(
             children: [
               // We allow drag&drop only on web

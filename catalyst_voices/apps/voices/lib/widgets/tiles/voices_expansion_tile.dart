@@ -63,7 +63,7 @@ class _ThemeOverride extends StatelessWidget {
 }
 
 class _VoicesExpansionTileState extends State<VoicesExpansionTile> {
-  final _controller = ExpansionTileController();
+  final _controller = ExpansibleController();
 
   bool _isExpanded = false;
 
