@@ -60,6 +60,7 @@ void main() {
       };
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = X509DerCertificate.fromBytes(bytes: List.filled(32, 0));

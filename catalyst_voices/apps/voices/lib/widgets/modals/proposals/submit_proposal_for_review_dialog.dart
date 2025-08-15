@@ -163,38 +163,40 @@ class _SubmitProposalForReviewDialogState extends State<SubmitProposalForReviewD
         minHeight: 256,
       ),
       showClose: false,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 24),
-          ProposalPublishDialogHeader(
-            title: context.l10n.publishProposalForReviewDialogTitle,
-            subtitle: context.l10n.publishProposalForReviewDialogSubtitle,
-          ),
-          const SizedBox(height: 16),
-          const Divider(),
-          const SizedBox(height: 28),
-          _VersionUpdateSection(
-            proposalTitle: widget.proposalTitle,
-            currentVersion: widget.currentVersion,
-            nextVersion: widget.nextVersion,
-          ),
-          const SizedBox(height: 28),
-          const Divider(),
-          const SizedBox(height: 8),
-          const _ListItems(),
-          const SizedBox(height: 16),
-          const Divider(),
-          const SizedBox(height: 20),
-          _AgreementConfirmation(
-            value: _agreementConfirmed,
-            onChanged: _onAgreementConfirmationChanged,
-          ),
-          const SizedBox(height: 16),
-          _Buttons(submitEnabled: _agreementConfirmed),
-          const SizedBox(height: 24),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const SizedBox(height: 24),
+            ProposalPublishDialogHeader(
+              title: context.l10n.publishProposalForReviewDialogTitle,
+              subtitle: context.l10n.publishProposalForReviewDialogSubtitle,
+            ),
+            const SizedBox(height: 16),
+            const Divider(),
+            const SizedBox(height: 28),
+            _VersionUpdateSection(
+              proposalTitle: widget.proposalTitle,
+              currentVersion: widget.currentVersion,
+              nextVersion: widget.nextVersion,
+            ),
+            const SizedBox(height: 28),
+            const Divider(),
+            const SizedBox(height: 8),
+            const _ListItems(),
+            const SizedBox(height: 16),
+            const Divider(),
+            const SizedBox(height: 20),
+            _AgreementConfirmation(
+              value: _agreementConfirmed,
+              onChanged: _onAgreementConfirmationChanged,
+            ),
+            const SizedBox(height: 16),
+            _Buttons(submitEnabled: _agreementConfirmed),
+            const SizedBox(height: 24),
+          ],
+        ),
       ),
     );
   }
