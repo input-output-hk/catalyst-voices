@@ -47,8 +47,10 @@ final class VotingCubit extends Cubit<VotingState>
         .distinct(listEquals)
         .listen(_handleFavoriteProposalsIds);
 
-    _watchedCastedVotesSub =
-        _votingService.watchedCastedVotes().distinct(listEquals).listen(_handleLastCastedChange);
+    _watchedCastedVotesSub = _votingService
+        .watchedCastedVotes()
+        .distinct(listEquals)
+        .listen(_handleLastCastedChange);
 
     _ballotBuilder.addListener(_handleBallotBuilderChange);
 
@@ -145,6 +147,7 @@ final class VotingCubit extends Cubit<VotingState>
     unawaited(_loadCampaign());
     unawaited(_loadVotingPower());
     unawaited(_loadFavoriteProposals());
+    unawaited(_loadLastCastedVotes());
 
     changeFilters(
       onlyMy: Optional(onlyMyProposals),
@@ -304,6 +307,13 @@ final class VotingCubit extends Cubit<VotingState>
     final favorites = await _proposalService.getFavoritesProposalsIds();
     if (!isClosed) {
       _handleFavoriteProposalsIds(favorites);
+    }
+  }
+
+  Future<void> _loadLastCastedVotes() async {
+    final lastCastedVotes = await _votingService.watchedCastedVotes().first;
+    if (!isClosed) {
+      _handleLastCastedChange(lastCastedVotes);
     }
   }
 
