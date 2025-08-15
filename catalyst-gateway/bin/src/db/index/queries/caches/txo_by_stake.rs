@@ -17,6 +17,12 @@ use crate::{
     settings::Settings,
 };
 
+/// Function that returns the number of ADA asset TXOs associated with a Stake Address as
+/// the weighted size of a cache entry.
+fn weigher_fn(_k: &DbStakeAddress, v: &Arc<Vec<GetTxoByStakeAddressQuery>>) -> u32 {
+    v.len().try_into().unwrap_or(u32::MAX)
+}
+
 /// In memory cache of the most recent Cardano TXO assets by Stake Address.
 static ASSETS_CACHE: LazyLock<CacheWrapper<DbStakeAddress, Arc<Vec<GetTxoByStakeAddressQuery>>>> =
     LazyLock::new(|| {
@@ -25,6 +31,7 @@ static ASSETS_CACHE: LazyLock<CacheWrapper<DbStakeAddress, Arc<Vec<GetTxoByStake
             "Cardano UTXO Assets Cache",
             EvictionPolicy::lru(),
             max_capacity,
+            weigher_fn,
         )
     });
 
