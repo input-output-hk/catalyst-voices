@@ -93,10 +93,12 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
 
   @override
   Future<void> close() async {
-    await _baseProfileCubit.close();
-    await _keychainCreationCubit.close();
-    await _walletLinkCubit.close();
-    await _recoverCubit.close();
+    await [
+      _baseProfileCubit.close(),
+      _keychainCreationCubit.close(),
+      _walletLinkCubit.close(),
+      _recoverCubit.close(),
+    ].wait;
     return super.close();
   }
 
