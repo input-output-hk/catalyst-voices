@@ -55,5 +55,7 @@ void main() {
   group('Account -', accountTests);
   group('Discovery space -', discoverySpaceTests);
   group('Onboarding -', onboardingTests);
+  // TODO(emiride): rethink how to setup tests accounts in different environments for gateway.
+  group('Onboarding Restore Flow -', onboardingRestoreTests, skip: true);
   group('Proposals space -', proposalsTests);
 }
