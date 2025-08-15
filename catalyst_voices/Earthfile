@@ -85,7 +85,7 @@ code-generator:
     WORKDIR /frontend
 
 # Runs code formatting checks.
-disable-check-code-formatting:
+check-code-formatting:
     FROM +builder
     DO flutter-ci+FORMAT
 
