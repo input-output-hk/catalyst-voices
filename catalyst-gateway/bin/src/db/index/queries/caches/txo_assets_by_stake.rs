@@ -33,6 +33,10 @@ static ASSETS_CACHE: LazyLock<
 pub(crate) fn get(
     stake_address: &DbStakeAddress,
 ) -> Option<Arc<Vec<GetAssetsByStakeAddressQuery>>> {
+    // Exit if cache is not enabled to avoid metric updates.
+    if !ASSETS_CACHE.is_enabled() {
+        return None;
+    }
     ASSETS_CACHE
         .get(stake_address)
         .inspect(|_| native_assets_hits_inc())

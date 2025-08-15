@@ -37,6 +37,10 @@ static ASSETS_CACHE: LazyLock<CacheWrapper<DbStakeAddress, Arc<Vec<GetTxoByStake
 
 /// Get TXO Assets entry from Cache.
 pub(crate) fn get(stake_address: &DbStakeAddress) -> Option<Arc<Vec<GetTxoByStakeAddressQuery>>> {
+    // Exit if cache is not enabled to avoid metric updates.
+    if !ASSETS_CACHE.is_enabled() {
+        return None;
+    }
     ASSETS_CACHE
         .get(stake_address)
         .inspect(|_| txo_assets_hits_inc())
@@ -67,7 +71,7 @@ pub(crate) fn entry_count() -> u64 {
 
 /// Update spent TXO Assets in Cache.
 pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
-    // Exit if cache is not enabled.
+    // Exit if cache is not enabled to avoid processing params.
     if !ASSETS_CACHE.is_enabled() {
         return;
     }
