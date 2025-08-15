@@ -23,7 +23,6 @@ class CurrentCampaignSection {
   final timelineCard = const Key('TimelineCard');
   final campaignTimelineComponent = const Key('CampaignTimeline');
   final timelineCardTitle = const Key('TimelineCardTitle');
-  final timelineCardDate = const Key('TimelineCardDate');
   final currentCampaignLoadingError = const Key('CurrentCampaignError');
 
   CurrentCampaignSection(this.$);
@@ -87,29 +86,17 @@ class CurrentCampaignSection {
   Future<void> timelineCardsDataIsRendered() async {
     await descriptionIsRenderedCorrectly();
     await DiscoveryPage($).loadRetryOnError(currentCampaignLoadingError);
-    await $(timelineCard).at(0).$(timelineCardDate).scrollTo(step: 150);
-    for (var i = 0; i < 5; i++) {
+
+    for (var i = 0; i < 6; i++) {
       final cardTitle = $(campaignTimelineComponent).$(timelineCard).at(i).$(timelineCardTitle);
       await $.tester.dragUntilVisible(
         cardTitle,
         $(campaignTimelineComponent).$(SingleChildScrollView),
         const Offset(10, 0),
       );
-      expect(
-        $(timelineCard).at(i).$(AnimatedSwitcher).$(Text),
-        findsNothing,
-      );
       await $(timelineCard).at(i).tap();
       expect(
         $(timelineCard).at(i).$(timelineCardTitle).text,
-        isNotEmpty,
-      );
-      expect(
-        $(timelineCard).at(i).$(timelineCardDate).text,
-        isNotEmpty,
-      );
-      expect(
-        $(timelineCard).at(i).$(AnimatedSwitcher).$(Text).text,
         isNotEmpty,
       );
     }

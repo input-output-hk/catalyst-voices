@@ -1,6 +1,8 @@
 import 'package:patrol_finders/patrol_finders.dart';
 
+import '../pageobject/discovery/current_campaign_selector_page.dart';
 import '../pageobject/discovery_page.dart';
+import '../pageobject/proposals_page.dart';
 import '../utils/test_utils.dart';
 
 void discoverySpaceTests() {
@@ -16,10 +18,13 @@ void discoverySpaceTests() {
     },
   );
 
-  /*patrolWidgetTest(
+  patrolWidgetTest(
     'visitor - view proposals button works',
     (PatrolTester $) async {
       await TestStateUtils.pumpApp($);
+
+      await Future<void>.delayed(const Duration(seconds: 1));
+      await $.pumpAndTrySettle();
 
       await DiscoveryPage($).viewProposalsBtnClick();
       await ProposalsPage($).currentCampaignDetailsLooksAsExpected();
@@ -31,7 +36,10 @@ void discoverySpaceTests() {
     (PatrolTester $) async {
       await TestStateUtils.pumpApp($);
 
+      await Future<void>.delayed(const Duration(seconds: 1));
+      await $.pumpAndTrySettle();
+
       await CurrentCampaignSection($).timelineCardsDataIsRendered();
     },
-  );*/
+  );
 }

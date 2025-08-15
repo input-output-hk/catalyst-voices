@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 import 'app_bar_page.dart';
+import 'discovery/campaign_categories_section.dart';
 import 'discovery/campaign_hero_section_page.dart';
 import 'discovery/current_campaign_selector_page.dart';
 import 'discovery/how_it_works_section_page.dart';
@@ -50,7 +51,9 @@ class DiscoveryPage {
     await CampaignHeroSection($).looksAsExpectedForVisitor();
     await HowItWorksSection($).looksAsExpectedForVisitor();
     await CurrentCampaignSection($).looksAsExpectedForVisitor();
-    // await CampaignCategoriesSection($).looksAsExpectedForVisitor();
+    await CampaignCategoriesSection($).looksAsExpectedForVisitor();
+    // TODO(emiride): most recent is based on proposals and they are dynamic, coming from backend
+    //  or not
     // await MostRecentSection($).looksAsExpectedForVisitor();
   }
 

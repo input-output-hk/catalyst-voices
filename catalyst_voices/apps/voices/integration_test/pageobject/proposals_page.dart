@@ -177,7 +177,8 @@ class ProposalsPage {
       true,
     );
     expect($(currentCampaignDescription).text, isNotEmpty);
-    expect($(campaignDetailsButton).$(Text).text, (await t()).campaignDetails);
+    // TODO(emiride): bring it back after voting_as_individual is merged.
+    // expect($(campaignDetailsButton).$(Text).text, (await t()).campaignDetails);
   }
 
   Future<int> getProposalsCountFromTab(String tab) async {
