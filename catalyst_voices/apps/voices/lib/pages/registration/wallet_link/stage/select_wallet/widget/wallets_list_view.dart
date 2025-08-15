@@ -51,13 +51,11 @@ class _WalletsListView extends StatelessWidget {
       itemBuilder: (context, index) {
         final wallet = wallets[index];
 
-        return Semantics(
-          identifier: 'Wallet${wallet.name}ListTile',
-          child: WalletListTile(
+        return WalletListTile(
             key: ValueKey('Wallet${wallet.name}ListTile'),
+            semanticsIdentifier: 'Wallet${wallet.name}ListTile',
             wallet: wallet,
             onSelectWallet: onSelectWallet,
-          ),
         );
       },
     );

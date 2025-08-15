@@ -35,20 +35,14 @@ class RolesSummaryPanel extends StatelessWidget {
             onTap: () {
               RegistrationCubit.of(context).nextStep();
             },
-            child: Semantics(
-              identifier: 'RolesSummaryReviewTransaction',
-              child: Text(context.l10n.reviewRegistrationTransaction),
-            ),
+            child: Text(context.l10n.reviewRegistrationTransaction, semanticsIdentifier: 'RolesSummaryReviewTransaction'),
           ),
           const SizedBox(height: 10),
           VoicesTextButton(
             onTap: () {
               RegistrationCubit.of(context).changeRoleSetup();
             },
-            child: Semantics(
-              identifier: 'RolesSummaryChangeRoles',
-              child: Text(context.l10n.walletLinkTransactionChangeRoles),
-            ),
+            child: Text(context.l10n.walletLinkTransactionChangeRoles, semanticsIdentifier: 'RolesSummaryChangeRoles'),
           ),
         ],
       ),

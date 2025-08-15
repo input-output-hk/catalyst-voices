@@ -13,11 +13,14 @@ import 'package:flutter/material.dart';
 class AccountCreateProgressPanel extends StatelessWidget {
   final List<AccountCreateStepType> completedSteps;
 
-  const AccountCreateProgressPanel({super.key, required this.completedSteps});
+  const AccountCreateProgressPanel({
+    super.key,
+    required this.completedSteps,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final lastCompletedStep = completedSteps.lastOrNull;
+    final lastCompletedStep = completedSteps.lastOrNull; 
 
     final title = lastCompletedStep?._title(context);
 
@@ -35,7 +38,9 @@ class AccountCreateProgressPanel extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (nextStepText != null) ...[NextStep(nextStepText, key: const Key('NextStep'))],
+          if (nextStepText != null) ...[
+            NextStep(nextStepText, key: const Key('NextStep')),
+          ],
           if (nextStep == AccountCreateStepType.keychain) ...[
             const SizedBox(height: 10),
             _CreateKeychainButton(onTap: () => _goToNextStep(context)),
@@ -57,7 +62,9 @@ class AccountCreateProgressPanel extends StatelessWidget {
 class _CreateKeychainButton extends StatelessWidget {
   final VoidCallback onTap;
 
-  const _CreateKeychainButton({required this.onTap});
+  const _CreateKeychainButton({
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -65,10 +72,7 @@ class _CreateKeychainButton extends StatelessWidget {
       key: const Key('CreateKeychainButton'),
       onTap: onTap,
       leading: VoicesAssets.icons.key.buildIcon(size: 18),
-      child: Text(
-        context.l10n.accountCreationSplashTitle,
-        semanticsIdentifier: 'CreateKeychainButton',
-      ),
+      child: Text(context.l10n.accountCreationSplashTitle, semanticsIdentifier: 'CreateKeychainButton'),
     );
   }
 }
@@ -76,7 +80,9 @@ class _CreateKeychainButton extends StatelessWidget {
 class _LinkWalletAndRolesButton extends StatelessWidget {
   final VoidCallback onTap;
 
-  const _LinkWalletAndRolesButton({required this.onTap});
+  const _LinkWalletAndRolesButton({
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -84,10 +90,7 @@ class _LinkWalletAndRolesButton extends StatelessWidget {
       key: const Key('LinkWalletAndRolesButton'),
       onTap: onTap,
       leading: VoicesAssets.icons.wallet.buildIcon(size: 18),
-      child: Semantics(
-        identifier: 'LinkWalletAndRolesButton',
-        child: Text(context.l10n.createKeychainLinkWalletAndRoles),
-      ),
+      child: Text(context.l10n.createKeychainLinkWalletAndRoles, semanticsIdentifier: 'LinkWalletAndRolesButton'),
     );
   }
 }
@@ -102,7 +105,10 @@ class _TitleText extends StatelessWidget {
     final theme = Theme.of(context);
     final color = theme.colors.textOnPrimaryLevel1;
 
-    return Text(data, style: theme.textTheme.titleMedium?.copyWith(color: color));
+    return Text(
+      data,
+      style: theme.textTheme.titleMedium?.copyWith(color: color),
+    );
   }
 }
 

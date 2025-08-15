@@ -5,8 +5,7 @@ import nodeFetch from "node-fetch";
 import * as os from "os";
 import path from "path";
 import { pipeline } from "stream/promises";
-import { BrowserExtensionName } from "../models/browserExtensionModel";
-import { getBrowserExtension } from "../data/browserExtensionConfigs";
+import { BrowserExtensionName, getBrowserExtension } from "./extensions";
 
 interface PlatformInfo {
   os: string;
@@ -70,7 +69,7 @@ export class ExtensionDownloader {
 
     // Fetch the extension
     const res = await nodeFetch(url);
-    if (!res.ok) {
+    if (!res.body) {
       throw new Error(`Failed to download extension: ${res.statusText}`);
     }
 
@@ -112,7 +111,7 @@ export class ExtensionDownloader {
 
     // Fetch the extension
     const res = await nodeFetch(url);
-    if (!res.ok) {
+    if (!res.body) {
       throw new Error(`Failed to download extension: ${res.statusText}`);
     }
 

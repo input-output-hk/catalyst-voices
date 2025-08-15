@@ -8,4 +8,7 @@ export class DiscoveryPage {
     this.page = page;
     this.getStartedButton = page.getByTestId("GetStartedButton");
   }
+  async getStartedButtonClick() {
+    await this.getStartedButton.click();
+  }
 }

@@ -29,10 +29,7 @@ class WalletSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     final showExpectedNetworkId = this.showExpectedNetworkId;
 
-    return Semantics(
-      identifier: 'WalletSummary',
-      explicitChildNodes: true,
-      child: Container(
+    return Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
@@ -72,7 +69,6 @@ class WalletSummary extends StatelessWidget {
             const _WalletBalanceNotice(),
           ],
         ),
-      ),
     );
   }
 }
@@ -215,19 +211,13 @@ class _WalletSummaryItem extends StatelessWidget {
             style: Theme.of(context).textTheme.labelMedium!.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
-            child: Semantics(
-              identifier: '${baseIdentifier}_label',
-              child: label,
-            ),
+            child: label,
           ),
         ),
         Expanded(
           child: DefaultTextStyle(
             style: Theme.of(context).textTheme.labelMedium!,
-            child: Semantics(
-              identifier: '${baseIdentifier}_value',
-              child: value,
-            ),
+            child: value,
           ),
         ),
       ],

@@ -6,6 +6,7 @@ class RegistrationTile extends StatelessWidget {
   final String title;
   final String? subtitle;
   final VoidCallback? onTap;
+  final String? semanticsIdentifier;
 
   const RegistrationTile({
     super.key,
@@ -13,6 +14,7 @@ class RegistrationTile extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.onTap,
+    this.semanticsIdentifier,
   });
 
   @override
@@ -49,20 +51,21 @@ class RegistrationTile extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        key: const Key('RegistrationTileTitle'),
-                        title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleSmall?.copyWith(color: foregroundColor),
-                      ),
+                          semanticsIdentifier: semanticsIdentifier,
+                          key: const Key('RegistrationTileTitle'),
+                          title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleSmall?.copyWith(color: foregroundColor),
+                        ),
                       if (subtitle != null)
                         Text(
-                          key: const Key('RegistrationTileSubtitle'),
-                          subtitle,
-                          maxLines: 1,
-                          overflow: TextOverflow.clip,
-                          style: theme.textTheme.bodySmall?.copyWith(color: foregroundColor),
-                        ),
+                            key: const Key('RegistrationTileSubtitle'),
+                            subtitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.clip,
+                            style: theme.textTheme.bodySmall?.copyWith(color: foregroundColor),
+                          ),
                     ],
                   ),
                 ),

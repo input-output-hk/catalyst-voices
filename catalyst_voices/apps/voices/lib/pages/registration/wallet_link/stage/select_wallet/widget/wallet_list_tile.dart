@@ -7,11 +7,12 @@ import 'package:flutter/material.dart';
 class WalletListTile extends StatefulWidget {
   final WalletMetadata wallet;
   final AsyncValueSetter<WalletMetadata> onSelectWallet;
-
+  final String? semanticsIdentifier;
   const WalletListTile({
     super.key,
     required this.wallet,
     required this.onSelectWallet,
+    this.semanticsIdentifier,
   });
 
   @override

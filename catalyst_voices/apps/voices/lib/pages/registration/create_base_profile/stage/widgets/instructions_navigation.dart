@@ -27,10 +27,7 @@ class _InstructionsNavigation extends StatelessWidget {
     return VoicesFilledButton(
       key: const Key('CreateBaseProfileNext'),
       onTap: isEnabled ? () => RegistrationCubit.of(context).nextStep() : null,
-      child: Semantics(
-        identifier: 'createProfileInstructionsNext',
-        child: Text(context.l10n.createProfileInstructionsNext),
-      ),
+      child: Text(context.l10n.createProfileInstructionsNext, semanticsIdentifier: 'createProfileInstructionsNext'),
     );
   }
 }

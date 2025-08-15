@@ -117,15 +117,13 @@ class _DisplayingValueAsChips extends StatelessWidget {
       runSpacing: 5,
       children: [
         VoicesChip.round(
-          content: Semantics(
-            identifier: 'YesNoChip',
-            child: Text(
-              value ? context.l10n.yes : context.l10n.no,
-              style: TextStyle(
-                color: value
-                    ? Theme.of(context).colors.successContainer
-                    : Theme.of(context).colors.errorContainer,
-              ),
+          content: Text(
+            value ? context.l10n.yes : context.l10n.no,
+            semanticsIdentifier: 'YesNoChip',
+            style: TextStyle(
+              color: value
+                  ? Theme.of(context).colors.successContainer
+                  : Theme.of(context).colors.errorContainer,
             ),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -135,12 +133,10 @@ class _DisplayingValueAsChips extends StatelessWidget {
         ),
         if (isDefault)
           VoicesChip.round(
-            content: Semantics(
-              identifier: 'DefaultRoleChip',
-              child: Text(
-                context.l10n.defaultRole,
-                style: TextStyle(color: Theme.of(context).colors.iconsPrimary),
-              ),
+            content: Text(
+              context.l10n.defaultRole,
+              semanticsIdentifier: 'DefaultRoleChip',
+              style: TextStyle(color: Theme.of(context).colors.iconsPrimary),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
             backgroundColor: Theme.of(context).colors.iconsBackgroundVariant,
@@ -183,12 +179,12 @@ class _DisplayingValueAsSegmentedButton extends StatelessWidget {
             : [
                 ButtonSegment(
                   value: true,
-                  label: Semantics(identifier: 'RoleYesButton', child: Text(context.l10n.yes)),
+                  label: Text(context.l10n.yes, semanticsIdentifier: 'RoleYesButton'),
                   icon: value ? const Icon(Icons.check) : null,
                 ),
                 ButtonSegment(
                   value: false,
-                  label: Semantics(identifier: 'RoleNoButton', child: Text(context.l10n.no)),
+                  label: Text(context.l10n.no, semanticsIdentifier: 'RoleNoButton'),
                   icon: !value ? const Icon(Icons.block) : null,
                 ),
               ],

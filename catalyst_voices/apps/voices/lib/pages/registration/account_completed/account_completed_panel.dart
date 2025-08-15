@@ -93,10 +93,7 @@ class _OpenDiscoveryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       onTap: onTap,
-      child: Semantics(
-        identifier: 'OpenDiscoveryButton',
-        child: Text(context.l10n.registrationCompletedDiscoveryButton),
-      ),
+      child: Text(context.l10n.registrationCompletedDiscoveryButton, semanticsIdentifier: 'OpenDiscoveryButton'),
     );
   }
 }
@@ -110,10 +107,7 @@ class _ReviewMyAccountButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesTextButton(
       onTap: onTap,
-      child: Semantics(
-        identifier: 'ReviewMyAccountButton',
-        child: Text(context.l10n.registrationCompletedAccountButton),
-      ),
+      child: Text(context.l10n.registrationCompletedAccountButton, semanticsIdentifier: 'ReviewMyAccountButton'),
     );
   }
 }

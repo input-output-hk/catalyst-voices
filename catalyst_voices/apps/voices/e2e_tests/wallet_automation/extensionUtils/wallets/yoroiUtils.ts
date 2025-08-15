@@ -1,9 +1,9 @@
 import { Page } from "playwright";
-import { WalletConfigModel } from "../../models/walletConfigModel";
+import { WalletConfig } from "./walletUtils";
 
 export const onboardYoroiWallet = async (
   page: Page,
-  walletConfig: WalletConfigModel
+  walletConfig: WalletConfig
 ): Promise<void> => {
   /* cspell: disable */
   await page.locator("#initialPage-tosAgreement-checkbox").check();

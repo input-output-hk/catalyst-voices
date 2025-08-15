@@ -1,16 +1,14 @@
 import { BrowserContext, Locator, Page } from "@playwright/test";
-import {
-  BrowserExtensionModel,
-  BrowserExtensionName,
-} from "../../models/browserExtensionModel";
-import { onboardEternlWallet, signEternlData } from "./eternlActions";
-import { onboardLaceWallet, signLaceData } from "./laceActions";
-import { onboardNufiWallet, signNufiData } from "./nufiActions";
-import { onboardYoroiWallet, signYoroiData } from "./yoroiActions";
+import { BrowserExtension, BrowserExtensionName } from "../extensions";
+import { onboardEternlWallet, signEternlData } from "./eternlUtils";
+import { onboardLaceWallet, signLaceData } from "./laceUtils";
+import { onboardNufiWallet, signNufiData } from "./nufiUtils";
+import { onboardTyphonWallet, signTyphonData } from "./typhonUtils";
+import { onboardYoroiWallet, signYoroiData } from "./yoroiUtils";
 
 export interface WalletConfig {
   id: string;
-  extension: BrowserExtensionModel;
+  extension: BrowserExtension;
   seed: string[];
   username: string;
   password: string;
@@ -22,8 +20,12 @@ export const onboardWallet = async (
   walletConfig: WalletConfig
 ): Promise<void> => {
   switch (walletConfig.extension.Name) {
+    case BrowserExtensionName.Typhon:
+      await onboardTyphonWallet(page, walletConfig);
+      break;
     case BrowserExtensionName.Lace:
       await onboardLaceWallet(page, walletConfig);
+     
       break;
     case BrowserExtensionName.Eternl:
       await onboardEternlWallet(page, walletConfig);
@@ -98,6 +100,9 @@ export const signWalletPopup = async (
 ): Promise<void> => {
   const page = await getWalletPopup(browser, locatorTrigger);
   switch (walletConfig.extension.Name) {
+    case BrowserExtensionName.Typhon:
+      await signTyphonData(page, walletConfig.password, isCorrectPassword);
+      break;
     case BrowserExtensionName.Lace:
       await signLaceData(page, walletConfig.password, isCorrectPassword);
       break;

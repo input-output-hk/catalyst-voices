@@ -1,9 +1,9 @@
 import { Page } from "playwright";
-import { WalletConfigModel } from "../../models/walletConfigModel";
+import { WalletConfig } from "./walletUtils";
 
 export const onboardNufiWallet = async (
   page: Page,
-  walletConfig: WalletConfigModel
+  walletConfig: WalletConfig
 ): Promise<void> => {
   await page.locator("//*[@data-testid='RestorePageIcon']").click();
   const seedPhrase = walletConfig.seed;
