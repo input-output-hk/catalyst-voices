@@ -37,6 +37,8 @@ class VoicesGestureDetector extends StatelessWidget {
 
   final Widget? child;
 
+  final String? semanticsIdentifier;
+
   const VoicesGestureDetector({
     super.key,
     this.behavior,
@@ -51,6 +53,7 @@ class VoicesGestureDetector extends StatelessWidget {
     this.cursor = SystemMouseCursors.click,
     this.excludeFromSemantics = false,
     this.child,
+    this.semanticsIdentifier,
   });
 
   List<Object?> get _callbacks => [

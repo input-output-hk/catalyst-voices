@@ -84,10 +84,7 @@ class _LinkWalletAndRolesButton extends StatelessWidget {
       key: const Key('LinkWalletAndRolesButton'),
       onTap: onTap,
       leading: VoicesAssets.icons.wallet.buildIcon(size: 18),
-      child: Semantics(
-        identifier: 'LinkWalletAndRolesButton',
-        child: Text(context.l10n.createKeychainLinkWalletAndRoles),
-      ),
+      child: Text(context.l10n.createKeychainLinkWalletAndRoles, semanticsIdentifier: 'LinkWalletAndRolesButton'),
     );
   }
 }

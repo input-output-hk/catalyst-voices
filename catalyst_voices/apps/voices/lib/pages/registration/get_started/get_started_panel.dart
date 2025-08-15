@@ -41,13 +41,12 @@ class GetStartedPanel extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: CreateAccountType.values
                 .map<Widget>((type) {
-                  return Semantics(
-                    identifier: type.toString(),
-                    child: RegistrationTile(
+                  return RegistrationTile(
                       key: Key(type.toString()),
                       icon: type._icon,
                       title: type._getTitle(context.l10n),
                       subtitle: type._getSubtitle(context.l10n),
+                      semanticsIdentifier: type.toString(),
                       onTap: () async {
                         switch (type) {
                           case CreateAccountType.createNew:
@@ -56,7 +55,6 @@ class GetStartedPanel extends StatelessWidget {
                             RegistrationCubit.of(context).recoverKeychain();
                         }
                       },
-                    ),
                   );
                 })
                 .separatedBy(const SizedBox(height: 12))

@@ -19,20 +19,14 @@ class SeedPhraseActions extends StatelessWidget {
         VoicesTextButton(
           key: const Key('UploadKeyButton'),
           onTap: onImportKeyTap,
-          child: Semantics(
-            identifier: 'UploadKeyButton',
-            child: Text(context.l10n.importCatalystKey),
-          ),
+          child: Text(context.l10n.importCatalystKey, semanticsIdentifier: 'UploadKeyButton'),
         ),
         const Spacer(),
         if (onResetTap != null)
           VoicesTextButton(
             key: const Key('ResetButton'),
             onTap: onResetTap,
-            child: Semantics(
-              identifier: 'ResetButton',
-              child: Text(context.l10n.reset),
-            ),
+            child: Text(context.l10n.reset, semanticsIdentifier: 'ResetButton'),
           ),
       ],
     );

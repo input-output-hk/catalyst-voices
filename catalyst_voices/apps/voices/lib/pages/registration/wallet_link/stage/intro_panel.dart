@@ -24,10 +24,7 @@ class IntroPanel extends StatelessWidget {
         onTap: () {
           RegistrationCubit.of(context).nextStep();
         },
-        child: Semantics(
-          identifier: 'ChooseCardanoWalletButton',
-          child: Text(context.l10n.chooseCardanoWallet),
-        ),
+        child: Text(context.l10n.chooseCardanoWallet, semanticsIdentifier: 'ChooseCardanoWalletButton'),
       ),
     );
   }
