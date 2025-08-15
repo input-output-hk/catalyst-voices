@@ -80,7 +80,7 @@ impl From<NetworkFromStr> for Network {
                 genesis_key: "5b33322c3235332c3138362c3230312c3137372c31312c3131372c3133352c3138372c3136372c3138312c3138382c32322c35392c3230362c3130352c3233312c3135302c3231352c33302c37382c3231322c37362c31362c3235322c3138302c37322c3133342c3133372c3234372c3136312c36385d",
                 magic: 42,
                 network_id: 0,
-                byron_epoch_length: 100_000, 
+                byron_epoch_length: 100_000,
                 byron_slot_length: 1000,
                 byron_known_slot: 0,
                 byron_known_time: 1_564_010_416,
