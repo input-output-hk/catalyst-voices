@@ -13,6 +13,7 @@ void main() {
   late MockProposalRepository mockProposalRepository;
   late MockUserService mockUserService;
   late MockSignerService mockSignerService;
+  late MockCastedVotesObserver mockCastedVotesObserver;
 
   late ProposalService proposalService;
 
@@ -22,6 +23,7 @@ void main() {
     mockSignerService = MockSignerService();
     mockUserService = MockUserService();
     mockActiveCampaignObserver = MockActiveCampaignObserver();
+    mockCastedVotesObserver = MockCastedVotesObserver();
 
     proposalService = ProposalService(
       mockProposalRepository,
@@ -29,6 +31,7 @@ void main() {
       mockUserService,
       mockSignerService,
       mockActiveCampaignObserver,
+      mockCastedVotesObserver,
     );
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
@@ -43,8 +46,7 @@ void main() {
   });
 
   group(ProposalService, () {
-    test(
-        'submitProposalForReview throws '
+    test('submitProposalForReview throws '
         '$ProposalLimitReachedException when over limit', () async {
       final proposalRef = SignedDocumentRef.generateFirstRef();
       final categoryId = SignedDocumentRef.generateFirstRef();
@@ -79,6 +81,8 @@ void main() {
 }
 
 class MockActiveCampaignObserver extends Mock implements ActiveCampaignObserver {}
+
+class MockCastedVotesObserver extends Mock implements CastedVotesObserver {}
 
 class MockDocumentRepository extends Mock implements DocumentRepository {}
 

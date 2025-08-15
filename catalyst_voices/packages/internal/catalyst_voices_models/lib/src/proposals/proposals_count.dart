@@ -24,15 +24,37 @@ final class ProposalsCount extends Equatable {
 
   @override
   List<Object?> get props => [
-        total,
-        drafts,
-        finals,
-        favorites,
-        favoritesFinals,
-        my,
-        myFinals,
-        voted,
-      ];
+    total,
+    drafts,
+    finals,
+    favorites,
+    favoritesFinals,
+    my,
+    myFinals,
+    voted,
+  ];
+
+  ProposalsCount copyWith({
+    int? total,
+    int? drafts,
+    int? finals,
+    int? favorites,
+    int? favoritesFinals,
+    int? my,
+    int? myFinals,
+    int? voted,
+  }) {
+    return ProposalsCount(
+      total: total ?? this.total,
+      drafts: drafts ?? this.drafts,
+      finals: finals ?? this.finals,
+      favorites: favorites ?? this.favorites,
+      favoritesFinals: favoritesFinals ?? this.favoritesFinals,
+      my: my ?? this.my,
+      myFinals: myFinals ?? this.myFinals,
+      voted: voted ?? this.voted,
+    );
+  }
 
   int ofType(ProposalsFilterType type) {
     return switch (type) {

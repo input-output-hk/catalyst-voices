@@ -14,6 +14,7 @@ abstract interface class ProposalService {
     UserService userService,
     SignerService signerService,
     ActiveCampaignObserver activeCampaignObserver,
+    CastedVotesObserver castedVotesObserver,
   ) = ProposalServiceImpl;
 
   Future<void> addFavoriteProposal({
@@ -150,6 +151,7 @@ final class ProposalServiceImpl implements ProposalService {
   final UserService _userService;
   final SignerService _signerService;
   final ActiveCampaignObserver _activeCampaignObserver;
+  final CastedVotesObserver _castedVotesObserver;
 
   const ProposalServiceImpl(
     this._proposalRepository,
@@ -157,6 +159,7 @@ final class ProposalServiceImpl implements ProposalService {
     this._userService,
     this._signerService,
     this._activeCampaignObserver,
+    this._castedVotesObserver,
   );
 
   @override
@@ -279,10 +282,25 @@ final class ProposalServiceImpl implements ProposalService {
     required ProposalsFilters filters,
     required ProposalsOrder order,
   }) async {
+    // TODO(LynxxLynx): Only for mocking! Remove this when we start supporting writing votes to the database
+    final originalFilters = filters;
+    if (filters.type == ProposalsFilterType.voted) {
+      filters = filters.copyWith(type: ProposalsFilterType.total);
+    }
+
     final proposalsPage = await _proposalRepository
         .getProposalsPage(request: request, filters: filters, order: order)
         .then(_mapProposalDataPage);
-    final proposals = proposalsPage.items;
+    var proposals = proposalsPage.items;
+
+    // TODO(LynxxLynx): Only for mocking! Remove this when we start supporting writing votes to the database
+    if (originalFilters.type == ProposalsFilterType.voted) {
+      final votedProposals = _castedVotesObserver.votes;
+      final votedProposalIds = votedProposals.map((vote) => vote.proposal).toSet();
+      proposals = proposals
+          .where((proposal) => votedProposalIds.contains(proposal.selfRef))
+          .toList();
+    }
 
     final categoriesRefs = proposals.map((proposal) => proposal.categoryRef).toSet();
 
@@ -293,8 +311,9 @@ final class ProposalServiceImpl implements ProposalService {
 
     final categories = Map<String, CampaignCategory>.fromEntries(
       categoriesRefs.map((ref) {
-        final category =
-            activeCampaign!.categories.firstWhere((category) => category.selfRef == ref);
+        final category = activeCampaign!.categories.firstWhere(
+          (category) => category.selfRef == ref,
+        );
         return MapEntry(ref.id, category);
       }),
     );
@@ -475,7 +494,16 @@ final class ProposalServiceImpl implements ProposalService {
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
   }) {
-    return _proposalRepository.watchProposalsCount(filters: filters);
+    final proposalsCount = _proposalRepository.watchProposalsCount(filters: filters);
+
+    // TODO(LynxxLynx): Remove this when we start supporting writing votes to the database
+    return proposalsCount.switchMap((count) {
+      return _castedVotesObserver.watchCastedVotes.map((votedProposals) {
+        return count.copyWith(
+          voted: votedProposals.length,
+        );
+      });
+    });
   }
 
   @override
@@ -501,49 +529,49 @@ final class ProposalServiceImpl implements ProposalService {
           .watchUserProposals(authorId: authorId)
           .distinct()
           .switchMap<List<DetailProposal>>((documents) async* {
-        if (documents.isEmpty) {
-          yield [];
-          return;
-        }
-        final proposalsDataStreams = await Future.wait(
-          documents.map(_createProposalDataStream).toList(),
-        );
-
-        yield* Rx.combineLatest(
-          proposalsDataStreams,
-          (List<ProposalData?> proposalsData) async {
-            // Note. one is null and two versions of same id.
-            final validProposalsData = proposalsData.whereType<ProposalData>().toList();
-
-            final groupedProposals = groupBy(
-              validProposalsData,
-              (data) => data.document.metadata.selfRef.id,
+            if (documents.isEmpty) {
+              yield [];
+              return;
+            }
+            final proposalsDataStreams = await Future.wait(
+              documents.map(_createProposalDataStream).toList(),
             );
 
-            final filteredProposalsData = groupedProposals.values
-                .map((group) {
-                  if (group.any(
-                    (p) => p.publish != ProposalPublish.localDraft,
-                  )) {
-                    return group.where(
-                      (p) => p.publish != ProposalPublish.localDraft,
-                    );
-                  }
-                  return group;
-                })
-                .expand((group) => group)
-                .toList();
+            yield* Rx.combineLatest(
+              proposalsDataStreams,
+              (List<ProposalData?> proposalsData) async {
+                // Note. one is null and two versions of same id.
+                final validProposalsData = proposalsData.whereType<ProposalData>().toList();
 
-            final proposalsWithVersions = await Future.wait(
-              filteredProposalsData.map((proposalData) async {
-                final versions = await _getDetailVersionsOfProposal(proposalData);
-                return DetailProposal.fromData(proposalData, versions);
-              }),
-            );
-            return proposalsWithVersions;
-          },
-        ).switchMap(Stream.fromFuture);
-      });
+                final groupedProposals = groupBy(
+                  validProposalsData,
+                  (data) => data.document.metadata.selfRef.id,
+                );
+
+                final filteredProposalsData = groupedProposals.values
+                    .map((group) {
+                      if (group.any(
+                        (p) => p.publish != ProposalPublish.localDraft,
+                      )) {
+                        return group.where(
+                          (p) => p.publish != ProposalPublish.localDraft,
+                        );
+                      }
+                      return group;
+                    })
+                    .expand((group) => group)
+                    .toList();
+
+                final proposalsWithVersions = await Future.wait(
+                  filteredProposalsData.map((proposalData) async {
+                    final versions = await _getDetailVersionsOfProposal(proposalData);
+                    return DetailProposal.fromData(proposalData, versions);
+                  }),
+                );
+                return proposalsWithVersions;
+              },
+            ).switchMap(Stream.fromFuture);
+          });
     });
   }
 
@@ -612,9 +640,7 @@ final class ProposalServiceImpl implements ProposalService {
           );
         },
       ).toList(),
-    ))
-        .whereType<ProposalData>()
-        .toList();
+    )).whereType<ProposalData>().toList();
 
     return versionsData.map((e) => e.toProposalVersion()).toList();
   }
