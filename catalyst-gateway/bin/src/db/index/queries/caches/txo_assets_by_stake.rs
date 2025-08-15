@@ -10,6 +10,12 @@ use crate::{
     settings::Settings,
 };
 
+/// Function that returns the number of native asset TXOs associated with a Stake Address
+/// as the weighted size of a cache entry.
+fn weigher_fn(_k: &DbStakeAddress, v: &Arc<Vec<GetAssetsByStakeAddressQuery>>) -> u32 {
+    v.len().try_into().unwrap_or(u32::MAX)
+}
+
 /// In memory cache of the Cardano Native assets data
 static ASSETS_CACHE: LazyLock<
     CacheWrapper<DbStakeAddress, Arc<Vec<GetAssetsByStakeAddressQuery>>>,
@@ -19,6 +25,7 @@ static ASSETS_CACHE: LazyLock<
         "Cardano Native Assets Cache",
         EvictionPolicy::lru(),
         max_capacity,
+        weigher_fn,
     )
 });
 
