@@ -43,7 +43,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   const _AppBar();
 
   @override
-  Size get preferredSize => const VoicesAppBar().preferredSize;
+  Size get preferredSize => VoicesAppBar.size;
 
   @override
   Widget build(BuildContext context) {
@@ -87,21 +87,26 @@ class _ProposalPageState extends State<ProposalPage>
       child: Scaffold(
         appBar: const _AppBar(),
         endDrawer: const OpportunitiesDrawer(),
-        floatingActionButton:
-            _ScrollToTopButton(segmentsScrollController: _segmentsScrollController),
-        body: ProposalHeaderWrapper(
-          child: ProposalSidebars(
-            navPanel: const ProposalNavigationPanel(),
-            body: Stack(
-              children: [
-                ProposalContent(
-                  scrollController: _segmentsScrollController,
+        floatingActionButton: _ScrollToTopButton(
+          segmentsScrollController: _segmentsScrollController,
+        ),
+        body: Stack(
+          children: [
+            ProposalHeaderWrapper(
+              child: ProposalSidebars(
+                navPanel: const ProposalNavigationPanel(),
+                body: Stack(
+                  children: [
+                    ProposalContent(
+                      scrollController: _segmentsScrollController,
+                    ),
+                    const ProposalError(),
+                  ],
                 ),
-                const ProposalLoading(),
-                const ProposalError(),
-              ],
+              ),
             ),
-          ),
+            const ProposalLoading(),
+          ],
         ),
       ),
     );
