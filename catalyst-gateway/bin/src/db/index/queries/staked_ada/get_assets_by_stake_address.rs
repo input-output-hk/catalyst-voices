@@ -129,14 +129,13 @@ impl GetAssetsByStakeAddressQuery {
             }
         }
 
-        // let res: Arc<Vec<GetAssetsByStakeAddressQuery>> = Arc::new(
-        let res: Vec<GetAssetsByStakeAddressQueryInner> = // Arc::new(
-            session
-                .execute_iter(PreparedSelectQuery::AssetsByStakeAddress, &params)
-                .await?
-                .rows_stream::<GetAssetsByStakeAddressQueryInner>()?
-                .map_err(Into::<anyhow::Error>::into)
-                .try_collect().await?;
+        let res: Vec<GetAssetsByStakeAddressQueryInner> = session
+            .execute_iter(PreparedSelectQuery::AssetsByStakeAddress, &params)
+            .await?
+            .rows_stream::<GetAssetsByStakeAddressQueryInner>()?
+            .map_err(Into::<anyhow::Error>::into)
+            .try_collect()
+            .await?;
         let res: Arc<Vec<GetAssetsByStakeAddressQuery>> = Arc::new(
             res.into_iter()
                 .map(Into::<GetAssetsByStakeAddressQuery>::into)
