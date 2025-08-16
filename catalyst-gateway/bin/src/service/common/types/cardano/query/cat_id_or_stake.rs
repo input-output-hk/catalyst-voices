@@ -23,7 +23,7 @@ use crate::service::common::types::cardano::{
 /// identifier. Defining these are mutually exclusive, as a single parameter is required
 /// to be used.
 #[derive(Clone)]
-#[allow(clippy::large_enum_variant, dead_code)]
+#[allow(clippy::large_enum_variant)]
 pub(crate) enum CatIdOrStake {
     /// A CIP-19 stake address
     Address(Cip19StakeAddress),

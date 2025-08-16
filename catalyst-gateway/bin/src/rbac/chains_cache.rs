@@ -3,20 +3,28 @@
 use std::sync::LazyLock;
 
 use catalyst_types::catalyst_id::CatalystId;
-use moka::{policy::EvictionPolicy, sync::Cache};
+use moka::policy::EvictionPolicy;
 use rbac_registration::registration::cardano::RegistrationChain;
 
 use crate::{
     metrics::rbac::reporter::{PERSISTENT_CHAINS_CACHE_HIT, PERSISTENT_CHAINS_CACHE_MISS},
+    service::utilities::cache::Cache,
     settings::Settings,
 };
 
+/// Function to determine cache entry weighted size.
+fn weigher_fn(_: &CatalystId, _: &RegistrationChain) -> u32 {
+    1u32
+}
+
 /// A cache of persistent RBAC chains.
 static PERSISTENT_CHAINS: LazyLock<Cache<CatalystId, RegistrationChain>> = LazyLock::new(|| {
-    Cache::builder()
-        .eviction_policy(EvictionPolicy::lru())
-        .max_capacity(Settings::rbac_cfg().persistent_chains_cache_size)
-        .build()
+    Cache::new(
+        "Persistent RBAC Chains Cache",
+        EvictionPolicy::lru(),
+        Settings::rbac_cfg().persistent_chains_cache_size,
+        weigher_fn,
+    )
 });
 
 /// Add (or update) a persistent chain to the cache.

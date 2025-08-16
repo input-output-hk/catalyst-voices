@@ -39,7 +39,6 @@ impl EnvVars {
     }
 
     /// Returns the maximum size of the Cardano UTXO cache
-    #[allow(dead_code)]
     pub(crate) fn utxo_cache_size(&self) -> u64 {
         self.utxo_cache_size
     }

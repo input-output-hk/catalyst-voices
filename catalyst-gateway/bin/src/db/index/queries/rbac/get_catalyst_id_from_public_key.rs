@@ -1,12 +1,15 @@
 //! Get Catalyst ID by public key.
 
-use std::sync::{Arc, LazyLock};
+use std::{
+    mem::size_of,
+    sync::{Arc, LazyLock},
+};
 
 use anyhow::{Context, Result};
 use catalyst_types::catalyst_id::CatalystId;
 use ed25519_dalek::VerifyingKey;
 use futures::{StreamExt, TryStreamExt};
-use moka::{policy::EvictionPolicy, sync::Cache};
+use moka::policy::EvictionPolicy;
 use scylla::{
     client::session::Session,
     statement::{prepared::PreparedStatement, Consistency},
@@ -26,26 +29,39 @@ use crate::{
         PERSISTENT_PUBLIC_KEYS_CACHE_HIT, PERSISTENT_PUBLIC_KEYS_CACHE_MISS,
         VOLATILE_PUBLIC_KEYS_CACHE_HIT, VOLATILE_PUBLIC_KEYS_CACHE_MISS,
     },
+    service::utilities::cache::Cache,
     settings::Settings,
 };
 
 /// A query string.
 const QUERY: &str = include_str!("../cql/get_catalyst_id_for_public_key.cql");
 
+/// Function to determine cache entry weighted size.
+fn weigher_fn(_: &VerifyingKey, _: &CatalystId) -> u32 {
+    size_of::<VerifyingKey>()
+        .saturating_add(size_of::<CatalystId>())
+        .try_into()
+        .unwrap_or(u32::MAX)
+}
+
 /// A persistent cache instance.
 static PERSISTENT_CACHE: LazyLock<Cache<VerifyingKey, CatalystId>> = LazyLock::new(|| {
-    Cache::builder()
-        .eviction_policy(EvictionPolicy::lru())
-        .max_capacity(Settings::rbac_cfg().persistent_pub_keys_cache_size)
-        .build()
+    Cache::new(
+        "Persistent RBAC Public Keys Cache",
+        EvictionPolicy::lru(),
+        Settings::rbac_cfg().persistent_pub_keys_cache_size,
+        weigher_fn,
+    )
 });
 
 /// A volatile cache instance.
 static VOLATILE_CACHE: LazyLock<Cache<VerifyingKey, CatalystId>> = LazyLock::new(|| {
-    Cache::builder()
-        .eviction_policy(EvictionPolicy::lru())
-        .max_capacity(Settings::rbac_cfg().volatile_pub_keys_cache_size)
-        .build()
+    Cache::new(
+        "",
+        EvictionPolicy::lru(),
+        Settings::rbac_cfg().volatile_pub_keys_cache_size,
+        weigher_fn,
+    )
 });
 
 /// Get Catalyst ID by public key query parameters.
@@ -106,7 +122,7 @@ impl Query {
 /// Removes all cached values.
 pub fn invalidate_public_keys_cache(is_persistent: bool) {
     let cache = cache(is_persistent);
-    cache.invalidate_all();
+    cache.clear_cache();
 }
 
 /// Returns an approximate number of entries in the public keys cache.

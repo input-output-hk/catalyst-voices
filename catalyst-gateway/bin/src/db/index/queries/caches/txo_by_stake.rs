@@ -13,23 +13,34 @@ use crate::{
         types::DbStakeAddress,
     },
     metrics::caches::txo_assets::{txo_assets_hits_inc, txo_assets_misses_inc},
-    service::utilities::cache::CacheWrapper,
+    service::utilities::cache::Cache,
     settings::Settings,
 };
 
+/// Function that returns the number of ADA asset TXOs associated with a Stake Address as
+/// the weighted size of a cache entry.
+fn weigher_fn(_k: &DbStakeAddress, v: &Arc<Vec<GetTxoByStakeAddressQuery>>) -> u32 {
+    v.len().try_into().unwrap_or(u32::MAX)
+}
+
 /// In memory cache of the most recent Cardano TXO assets by Stake Address.
-static ASSETS_CACHE: LazyLock<CacheWrapper<DbStakeAddress, Arc<Vec<GetTxoByStakeAddressQuery>>>> =
+static ASSETS_CACHE: LazyLock<Cache<DbStakeAddress, Arc<Vec<GetTxoByStakeAddressQuery>>>> =
     LazyLock::new(|| {
         let max_capacity = Settings::cardano_assets_cache().utxo_cache_size();
-        CacheWrapper::new(
+        Cache::new(
             "Cardano UTXO Assets Cache",
             EvictionPolicy::lru(),
             max_capacity,
+            weigher_fn,
         )
     });
 
 /// Get TXO Assets entry from Cache.
 pub(crate) fn get(stake_address: &DbStakeAddress) -> Option<Arc<Vec<GetTxoByStakeAddressQuery>>> {
+    // Exit if cache is not enabled to avoid metric updates.
+    if !ASSETS_CACHE.is_enabled() {
+        return None;
+    }
     ASSETS_CACHE
         .get(stake_address)
         .inspect(|_| txo_assets_hits_inc())
@@ -51,7 +62,7 @@ pub(crate) fn drop() {
 
 /// Size of TXO Assets cache.
 pub(crate) fn size() -> u64 {
-    ASSETS_CACHE.size()
+    ASSETS_CACHE.weighted_size()
 }
 /// Number of entries in TXO Assets cache.
 pub(crate) fn entry_count() -> u64 {
@@ -60,7 +71,7 @@ pub(crate) fn entry_count() -> u64 {
 
 /// Update spent TXO Assets in Cache.
 pub(crate) fn update(params: Vec<UpdateTxoSpentQueryParams>) {
-    // Exit if cache is not enabled.
+    // Exit if cache is not enabled to avoid processing params.
     if !ASSETS_CACHE.is_enabled() {
         return;
     }
