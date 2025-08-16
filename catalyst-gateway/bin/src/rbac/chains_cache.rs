@@ -8,7 +8,7 @@ use rbac_registration::registration::cardano::RegistrationChain;
 
 use crate::{
     metrics::rbac::reporter::{PERSISTENT_CHAINS_CACHE_HIT, PERSISTENT_CHAINS_CACHE_MISS},
-    service::utilities::cache::CacheWrapper,
+    service::utilities::cache::Cache,
     settings::Settings,
 };
 
@@ -18,15 +18,14 @@ fn weigher_fn(_: &CatalystId, _: &RegistrationChain) -> u32 {
 }
 
 /// A cache of persistent RBAC chains.
-static PERSISTENT_CHAINS: LazyLock<CacheWrapper<CatalystId, RegistrationChain>> =
-    LazyLock::new(|| {
-        CacheWrapper::new(
-            "Persistent RBAC Chains Cache",
-            EvictionPolicy::lru(),
-            Settings::rbac_cfg().persistent_chains_cache_size,
-            weigher_fn,
-        )
-    });
+static PERSISTENT_CHAINS: LazyLock<Cache<CatalystId, RegistrationChain>> = LazyLock::new(|| {
+    Cache::new(
+        "Persistent RBAC Chains Cache",
+        EvictionPolicy::lru(),
+        Settings::rbac_cfg().persistent_chains_cache_size,
+        weigher_fn,
+    )
+});
 
 /// Add (or update) a persistent chain to the cache.
 pub fn cache_persistent_rbac_chain(id: CatalystId, chain: RegistrationChain) {

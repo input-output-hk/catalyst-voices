@@ -1,6 +1,9 @@
 //! Get Catalyst ID by public key.
 
-use std::sync::{Arc, LazyLock};
+use std::{
+    mem::size_of,
+    sync::{Arc, LazyLock},
+};
 
 use anyhow::{Context, Result};
 use catalyst_types::catalyst_id::CatalystId;
@@ -26,7 +29,7 @@ use crate::{
         PERSISTENT_PUBLIC_KEYS_CACHE_HIT, PERSISTENT_PUBLIC_KEYS_CACHE_MISS,
         VOLATILE_PUBLIC_KEYS_CACHE_HIT, VOLATILE_PUBLIC_KEYS_CACHE_MISS,
     },
-    service::utilities::cache::CacheWrapper,
+    service::utilities::cache::Cache,
     settings::Settings,
 };
 
@@ -35,12 +38,15 @@ const QUERY: &str = include_str!("../cql/get_catalyst_id_for_public_key.cql");
 
 /// Function to determine cache entry weighted size.
 fn weigher_fn(_: &VerifyingKey, _: &CatalystId) -> u32 {
-    1u32
+    size_of::<VerifyingKey>()
+        .saturating_add(size_of::<CatalystId>())
+        .try_into()
+        .unwrap_or(u32::MAX)
 }
 
 /// A persistent cache instance.
-static PERSISTENT_CACHE: LazyLock<CacheWrapper<VerifyingKey, CatalystId>> = LazyLock::new(|| {
-    CacheWrapper::new(
+static PERSISTENT_CACHE: LazyLock<Cache<VerifyingKey, CatalystId>> = LazyLock::new(|| {
+    Cache::new(
         "Persistent RBAC Public Keys Cache",
         EvictionPolicy::lru(),
         Settings::rbac_cfg().persistent_pub_keys_cache_size,
@@ -49,8 +55,8 @@ static PERSISTENT_CACHE: LazyLock<CacheWrapper<VerifyingKey, CatalystId>> = Lazy
 });
 
 /// A volatile cache instance.
-static VOLATILE_CACHE: LazyLock<CacheWrapper<VerifyingKey, CatalystId>> = LazyLock::new(|| {
-    CacheWrapper::new(
+static VOLATILE_CACHE: LazyLock<Cache<VerifyingKey, CatalystId>> = LazyLock::new(|| {
+    Cache::new(
         "",
         EvictionPolicy::lru(),
         Settings::rbac_cfg().volatile_pub_keys_cache_size,
@@ -126,7 +132,7 @@ pub fn public_keys_cache_size(is_persistent: bool) -> u64 {
 }
 
 /// Returns a persistent or a volatile cache instance depending on the parameter value.
-fn cache(is_persistent: bool) -> &'static CacheWrapper<VerifyingKey, CatalystId> {
+fn cache(is_persistent: bool) -> &'static Cache<VerifyingKey, CatalystId> {
     if is_persistent {
         &PERSISTENT_CACHE
     } else {
