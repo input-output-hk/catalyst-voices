@@ -11,7 +11,7 @@ use tracing::error;
 use crate::db::{
     index::{
         queries::{
-            caches::txo_by_stake::{get as cache_get, insert as cache_insert},
+            caches::assets::ada::{get as cache_get, insert as cache_insert},
             PreparedQueries, PreparedSelectQuery,
         },
         session::CassandraSession,

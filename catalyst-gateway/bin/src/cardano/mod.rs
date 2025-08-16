@@ -610,8 +610,8 @@ impl SyncTask {
             if self.sync_tasks.len() == 1 {
                 set_follower_immutable_first_reached_tip();
                 metrics_updater::reached_immutable_tip(true);
-                caches::txo_assets_by_stake::drop();
-                caches::txo_by_stake::drop();
+                caches::assets::native::drop();
+                caches::assets::ada::drop();
 
                 // Purge data up to this slot
                 // Slots arithmetic has saturating semantic, so this is ok.

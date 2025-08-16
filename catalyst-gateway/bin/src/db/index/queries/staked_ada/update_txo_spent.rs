@@ -9,8 +9,8 @@ use crate::{
     db::{
         index::{
             queries::{
-                caches::txo_by_stake::update as cache_update, FallibleQueryResults,
-                PreparedQueries, PreparedQuery, SizedBatch,
+                caches::assets::ada::update as cache_update, FallibleQueryResults, PreparedQueries,
+                PreparedQuery, SizedBatch,
             },
             session::CassandraSession,
         },

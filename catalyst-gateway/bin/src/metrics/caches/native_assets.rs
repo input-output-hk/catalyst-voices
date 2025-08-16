@@ -1,7 +1,7 @@
 //! Cache metrics for Native Assets.
 
 use crate::{
-    db::index::queries::caches::txo_assets_by_stake::{entry_count, size as cache_size},
+    db::index::queries::caches::assets::native::{entry_count, size as cache_size},
     settings::Settings,
 };
 

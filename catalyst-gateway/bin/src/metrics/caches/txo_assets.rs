@@ -1,7 +1,7 @@
 //! Metrics for the TXO Assets Cache
 
 use crate::{
-    db::index::queries::caches::txo_by_stake::{entry_count, size as cache_size},
+    db::index::queries::caches::assets::ada::{entry_count, size as cache_size},
     settings::Settings,
 };
 
