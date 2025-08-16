@@ -26,7 +26,7 @@ use crate::{
         PERSISTENT_TRANSACTION_IDS_CACHE_HIT, PERSISTENT_TRANSACTION_IDS_CACHE_MISS,
         VOLATILE_TRANSACTION_IDS_CACHE_HIT, VOLATILE_TRANSACTION_IDS_CACHE_MISS,
     },
-    service::utilities::cache::CacheWrapper,
+    service::utilities::cache::Cache,
     settings::Settings,
 };
 
@@ -39,8 +39,8 @@ fn weigher_fn(_: &TransactionId, _: &CatalystId) -> u32 {
 }
 
 /// A persistent cache instance.
-static PERSISTENT_CACHE: LazyLock<CacheWrapper<TransactionId, CatalystId>> = LazyLock::new(|| {
-    CacheWrapper::new(
+static PERSISTENT_CACHE: LazyLock<Cache<TransactionId, CatalystId>> = LazyLock::new(|| {
+    Cache::new(
         "Persistent RBAC Transaction ID Cache",
         EvictionPolicy::lru(),
         Settings::rbac_cfg().persistent_pub_keys_cache_size,
@@ -49,8 +49,8 @@ static PERSISTENT_CACHE: LazyLock<CacheWrapper<TransactionId, CatalystId>> = Laz
 });
 
 /// A volatile cache instance.
-static VOLATILE_CACHE: LazyLock<CacheWrapper<TransactionId, CatalystId>> = LazyLock::new(|| {
-    CacheWrapper::new(
+static VOLATILE_CACHE: LazyLock<Cache<TransactionId, CatalystId>> = LazyLock::new(|| {
+    Cache::new(
         "Volatile RBAC Transaction ID Cache",
         EvictionPolicy::lru(),
         Settings::rbac_cfg().volatile_pub_keys_cache_size,
@@ -129,7 +129,7 @@ pub fn transaction_ids_cache_size(is_persistent: bool) -> u64 {
 }
 
 /// Returns a persistent or a volatile cache instance depending on the parameter value.
-fn cache(is_persistent: bool) -> &'static CacheWrapper<TransactionId, CatalystId> {
+fn cache(is_persistent: bool) -> &'static Cache<TransactionId, CatalystId> {
     if is_persistent {
         &PERSISTENT_CACHE
     } else {

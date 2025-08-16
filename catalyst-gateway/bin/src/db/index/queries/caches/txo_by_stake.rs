@@ -13,7 +13,7 @@ use crate::{
         types::DbStakeAddress,
     },
     metrics::caches::txo_assets::{txo_assets_hits_inc, txo_assets_misses_inc},
-    service::utilities::cache::CacheWrapper,
+    service::utilities::cache::Cache,
     settings::Settings,
 };
 
@@ -24,10 +24,10 @@ fn weigher_fn(_k: &DbStakeAddress, v: &Arc<Vec<GetTxoByStakeAddressQuery>>) -> u
 }
 
 /// In memory cache of the most recent Cardano TXO assets by Stake Address.
-static ASSETS_CACHE: LazyLock<CacheWrapper<DbStakeAddress, Arc<Vec<GetTxoByStakeAddressQuery>>>> =
+static ASSETS_CACHE: LazyLock<Cache<DbStakeAddress, Arc<Vec<GetTxoByStakeAddressQuery>>>> =
     LazyLock::new(|| {
         let max_capacity = Settings::cardano_assets_cache().utxo_cache_size();
-        CacheWrapper::new(
+        Cache::new(
             "Cardano UTXO Assets Cache",
             EvictionPolicy::lru(),
             max_capacity,
@@ -62,7 +62,7 @@ pub(crate) fn drop() {
 
 /// Size of TXO Assets cache.
 pub(crate) fn size() -> u64 {
-    ASSETS_CACHE.size()
+    ASSETS_CACHE.weighted_size()
 }
 /// Number of entries in TXO Assets cache.
 pub(crate) fn entry_count() -> u64 {

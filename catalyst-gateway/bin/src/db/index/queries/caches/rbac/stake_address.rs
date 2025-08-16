@@ -4,12 +4,12 @@ use cardano_blockchain_types::StakeAddress;
 use catalyst_types::catalyst_id::CatalystId;
 use moka::policy::EvictionPolicy;
 
-use crate::{service::utilities::cache::CacheWrapper, settings::Settings};
+use crate::{service::utilities::cache::Cache, settings::Settings};
 
 /// RBAC Stake Address Cache.
 pub(crate) struct StakeAddressCache {
     /// Interior cache type.
-    inner: CacheWrapper<StakeAddress, CatalystId>,
+    inner: Cache<StakeAddress, CatalystId>,
 }
 
 impl StakeAddressCache {
@@ -24,7 +24,7 @@ impl StakeAddressCache {
     /// New Stake Address Cache instance.
     pub(crate) fn new() -> Self {
         Self {
-            inner: CacheWrapper::new(
+            inner: Cache::new(
                 Self::CACHE_NAME,
                 EvictionPolicy::lru(),
                 Settings::rbac_cfg().persistent_pub_keys_cache_size,
