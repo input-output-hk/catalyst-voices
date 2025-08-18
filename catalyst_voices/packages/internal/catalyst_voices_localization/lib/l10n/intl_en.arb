@@ -2729,6 +2729,10 @@
   "@registrationLinkWalletStepGroup": {
     "description": "Progress indicator for wallet and roles linking step"
   },
+  "registrationMissingRequiredSignersFromOutputs": "Missing required signers from outputs",
+  "@registrationMissingRequiredSignersFromOutputs": {
+    "description": "When transaction does not include required signers from outputs"
+  },
   "registrationNetworkIdMismatch": "It seems like you're trying to use a wallet on the wrong network.\nPlease switch to {network} to continue.",
   "@registrationNetworkIdMismatch": {
     "description": "An error when user attempts to use a wallet on the wrong network, i.e. using preprod wallet on production environment.",
