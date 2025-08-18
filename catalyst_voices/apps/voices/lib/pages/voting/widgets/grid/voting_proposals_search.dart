@@ -23,12 +23,13 @@ class _VotingProposalsSearchState extends State<VotingProposalsSearch> {
         hintText: context.l10n.searchProposals,
         showClearButton: true,
         debouncer: _debouncer,
-        onSearch: ({
-          required searchValue,
-          required isSubmitted,
-        }) {
-          context.read<VotingCubit>().updateSearchQuery(searchValue);
-        },
+        onSearch:
+            ({
+              required searchValue,
+              required isSubmitted,
+            }) {
+              context.read<VotingCubit>().updateSearchQuery(searchValue);
+            },
       ),
     );
   }

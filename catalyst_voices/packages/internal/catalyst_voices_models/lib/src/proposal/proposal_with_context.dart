@@ -12,9 +12,9 @@ final class ProposalUserContext extends Equatable {
 
   @override
   List<Object?> get props => [
-        isFavorite,
-        lastCastedVote,
-      ];
+    isFavorite,
+    lastCastedVote,
+  ];
 
   ProposalUserContext copyWith({
     bool? isFavorite,
@@ -40,10 +40,10 @@ final class ProposalWithContext extends Equatable {
 
   @override
   List<Object?> get props => [
-        proposal,
-        category,
-        user,
-      ];
+    proposal,
+    category,
+    user,
+  ];
 
   ProposalWithContext copyWith({
     Proposal? proposal,

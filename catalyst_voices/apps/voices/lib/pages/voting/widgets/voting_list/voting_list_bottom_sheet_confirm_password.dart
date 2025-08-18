@@ -37,8 +37,9 @@ class _VotingListBottomSheetConfirmPasswordState
         children: [
           Text(
             context.l10n.confirmYourVoteSubmission,
-            style:
-                context.textTheme.titleMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
+            style: context.textTheme.titleMedium?.copyWith(
+              color: context.colors.textOnPrimaryLevel1,
+            ),
           ),
           const SizedBox(height: 12),
           Text(context.l10n.voteSubmissionDescription),

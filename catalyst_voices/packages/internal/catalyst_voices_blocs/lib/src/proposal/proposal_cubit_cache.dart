@@ -30,17 +30,17 @@ final class ProposalCubitCache extends Equatable {
 
   @override
   List<Object?> get props => [
-        activeAccountId,
-        ref,
-        proposal,
-        category,
-        commentTemplate,
-        comments,
-        isFavorite,
-        isVotingStage,
-        readOnlyMode,
-        lastCastedVote,
-      ];
+    activeAccountId,
+    ref,
+    proposal,
+    category,
+    commentTemplate,
+    comments,
+    isFavorite,
+    isVotingStage,
+    readOnlyMode,
+    lastCastedVote,
+  ];
 
   ProposalCubitCache copyWith({
     Optional<CatalystId>? activeAccountId,

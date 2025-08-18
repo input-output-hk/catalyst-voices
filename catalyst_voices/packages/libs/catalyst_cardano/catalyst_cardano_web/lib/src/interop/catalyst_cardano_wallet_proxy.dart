@@ -114,10 +114,9 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   @override
   Future<ShelleyAddress> getChangeAddress() async {
     try {
-      return await _delegate
-          .getChangeAddress()
-          .toDart
-          .then((e) => ShelleyAddress(hexDecode(e.toDart)));
+      return await _delegate.getChangeAddress().toDart.then(
+        (e) => ShelleyAddress(hexDecode(e.toDart)),
+      );
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
     }
@@ -127,8 +126,8 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   Future<List<CipExtension>> getExtensions() async {
     try {
       return await _delegate.getExtensions().toDart.then(
-            (array) => array.toDart.map((item) => item.toDart).toList(),
-          );
+        (array) => array.toDart.map((item) => item.toDart).toList(),
+      );
     } catch (ex) {
       if (ex.toString().contains(_noSuchMethodError)) {
         return _fallbackExtensions;
@@ -152,8 +151,8 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   Future<List<ShelleyAddress>> getRewardAddresses() async {
     try {
       return await _delegate.getRewardAddresses().toDart.then(
-            (array) => array.toDart.map((item) => ShelleyAddress(hexDecode(item.toDart))).toList(),
-          );
+        (array) => array.toDart.map((item) => ShelleyAddress(hexDecode(item.toDart))).toList(),
+      );
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
     }
@@ -163,8 +162,8 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   Future<List<ShelleyAddress>> getUnusedAddresses() async {
     try {
       return await _delegate.getUnusedAddresses().toDart.then(
-            (array) => array.toDart.map((item) => ShelleyAddress(hexDecode(item.toDart))).toList(),
-          );
+        (array) => array.toDart.map((item) => ShelleyAddress(hexDecode(item.toDart))).toList(),
+      );
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
     }
@@ -175,7 +174,10 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
     try {
       final jsPaginate = paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined();
 
-      return await _delegate.getUsedAddresses(jsPaginate).toDart.then(
+      return await _delegate
+          .getUsedAddresses(jsPaginate)
+          .toDart
+          .then(
             (array) => array.toDart.map((item) => ShelleyAddress(hexDecode(item.toDart))).toList(),
           );
     } catch (ex) {
@@ -237,7 +239,10 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
       final bytes = transaction.bytes;
       final hexString = hex.encode(bytes);
 
-      return await _delegate.signTx(hexString.toJS, partialSign.toJS).toDart.then(
+      return await _delegate
+          .signTx(hexString.toJS, partialSign.toJS)
+          .toDart
+          .then(
             (e) => TransactionWitnessSet.fromCbor(
               cbor.decode(hexDecode(e.toDart)),
             ),
@@ -281,8 +286,8 @@ class JSCardanoWalletCip95ApiProxy implements CardanoWalletCip95Api {
   Future<List<PubStakeKey>> getRegisteredPubStakeKeys() async {
     try {
       return await _delegate.getRegisteredPubStakeKeys().toDart.then(
-            (jsArray) => jsArray.toDart.map((key) => PubStakeKey(key.toDart)).toList(),
-          );
+        (jsArray) => jsArray.toDart.map((key) => PubStakeKey(key.toDart)).toList(),
+      );
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
     }
@@ -292,8 +297,8 @@ class JSCardanoWalletCip95ApiProxy implements CardanoWalletCip95Api {
   Future<List<PubStakeKey>> getUnregisteredPubStakeKeys() async {
     try {
       return await _delegate.getUnregisteredPubStakeKeys().toDart.then(
-            (jsArray) => jsArray.toDart.map((key) => PubStakeKey(key.toDart)).toList(),
-          );
+        (jsArray) => jsArray.toDart.map((key) => PubStakeKey(key.toDart)).toList(),
+      );
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
     }

@@ -128,9 +128,9 @@ enum AppEnvironmentType {
       AppEnvironmentType.dev || AppEnvironmentType.preprod => _getBaseUrl('reviews', envName: name),
       AppEnvironmentType.prod => _getBaseUrl('reviews'),
       AppEnvironmentType.relative => _getBaseUrl(
-          'reviews',
-          envName: tryUriBaseEnvName(from: normalizedBaseUri().toString()),
-        ),
+        'reviews',
+        envName: tryUriBaseEnvName(from: normalizedBaseUri().toString()),
+      ),
     };
   }
 

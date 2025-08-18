@@ -55,9 +55,9 @@ sealed class MyAccountStatusNotification extends Equatable {
 
 final class None extends MyAccountStatusNotification {
   const None()
-      : super(
-          type: MyAccountStatusNotificationType.offstage,
-        );
+    : super(
+        type: MyAccountStatusNotificationType.offstage,
+      );
 
   @override
   SvgGenImage get icon => VoicesAssets.icons.check;
@@ -74,9 +74,9 @@ final class None extends MyAccountStatusNotification {
 
 final class AccountFinalized extends MyAccountStatusNotification {
   const AccountFinalized()
-      : super(
-          type: MyAccountStatusNotificationType.success,
-        );
+    : super(
+        type: MyAccountStatusNotificationType.success,
+      );
 
   @override
   SvgGenImage get icon => VoicesAssets.icons.check;

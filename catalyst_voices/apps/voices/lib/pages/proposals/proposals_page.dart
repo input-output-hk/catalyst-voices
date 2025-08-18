@@ -56,10 +56,10 @@ class _ProposalsPageState extends State<ProposalsPage>
 
     if (widget.categoryId != oldWidget.categoryId || widget.tab != oldWidget.tab) {
       context.read<ProposalsCubit>().changeFilters(
-            onlyMy: Optional(tab == ProposalsPageTab.my),
-            category: Optional(widget.categoryId),
-            type: tab.filter,
-          );
+        onlyMy: Optional(tab == ProposalsPageTab.my),
+        category: Optional(widget.categoryId),
+        type: tab.filter,
+      );
 
       _doResetPagination();
     }
@@ -114,11 +114,11 @@ class _ProposalsPageState extends State<ProposalsPage>
     );
 
     context.read<ProposalsCubit>().init(
-          onlyMyProposals: tab == ProposalsPageTab.my,
-          category: widget.categoryId,
-          type: tab.filter,
-          order: const Alphabetical(),
-        );
+      onlyMyProposals: tab == ProposalsPageTab.my,
+      category: widget.categoryId,
+      type: tab.filter,
+      order: const Alphabetical(),
+    );
 
     _pagingController
       ..addPageRequestListener(_handleProposalsPageRequest)

@@ -142,9 +142,9 @@ final class DraftRef extends DocumentRef {
 
   @override
   SignedDocumentRef toSignedDocumentRef() => SignedDocumentRef(
-        id: id,
-        version: version,
-      );
+    id: id,
+    version: version,
+  );
 
   @override
   String toString() => isExact ? 'ExactDraftRef($id.v$version)' : 'LooseDraftRef($id)';

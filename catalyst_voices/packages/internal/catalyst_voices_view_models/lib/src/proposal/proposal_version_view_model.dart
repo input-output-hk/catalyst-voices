@@ -39,14 +39,14 @@ final class ProposalVersionViewModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        title,
-        selfRef,
-        createdAt,
-        publish,
-        isLatest,
-        isLatestLocal,
-        versionNumber,
-      ];
+    title,
+    selfRef,
+    createdAt,
+    publish,
+    isLatest,
+    isLatestLocal,
+    versionNumber,
+  ];
 
   ProposalVersionViewModel copyWith({
     String? title,

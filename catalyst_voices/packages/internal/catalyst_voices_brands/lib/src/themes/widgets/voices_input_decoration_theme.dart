@@ -7,21 +7,21 @@ class VoicesInputDecorationTheme extends InputDecorationTheme {
     required ColorScheme colorsScheme,
     required VoicesColorScheme colors,
   }) : super(
-          labelStyle: textTheme.titleSmall,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 12,
-          ),
-          filled: true,
-          fillColor: colors.onSurfaceNeutralOpaqueLv1,
-          border: WidgetStateInputBorder.resolveWith(
-            (states) => _border(
-              states: states,
-              colorsScheme: colorsScheme,
-              colors: colors,
-            ),
-          ),
-        );
+         labelStyle: textTheme.titleSmall,
+         contentPadding: const EdgeInsets.symmetric(
+           horizontal: 16,
+           vertical: 12,
+         ),
+         filled: true,
+         fillColor: colors.onSurfaceNeutralOpaqueLv1,
+         border: WidgetStateInputBorder.resolveWith(
+           (states) => _border(
+             states: states,
+             colorsScheme: colorsScheme,
+             colors: colors,
+           ),
+         ),
+       );
 
   static InputBorder _border({
     required Set<WidgetState> states,

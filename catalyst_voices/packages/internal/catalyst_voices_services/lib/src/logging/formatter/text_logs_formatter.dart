@@ -12,7 +12,8 @@ final class TextLogsFormatter implements LogsFormatter {
 
     for (final log in sortedLogs) {
       // [SyncManager] Synchronization took 0:00:00.864125
-      final row = '${log.time.toUtc().toIso8601String()} '
+      final row =
+          '${log.time.toUtc().toIso8601String()} '
           '[${log.level.name}][${log.loggerName}] '
           '${log.message}';
 

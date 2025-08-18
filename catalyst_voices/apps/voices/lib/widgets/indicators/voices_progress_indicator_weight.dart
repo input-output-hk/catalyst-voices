@@ -3,7 +3,7 @@ enum VoicesProgressIndicatorWeight {
   heavy;
 
   double get minHeight => switch (this) {
-        VoicesProgressIndicatorWeight.medium => 5,
-        VoicesProgressIndicatorWeight.heavy => 10,
-      };
+    VoicesProgressIndicatorWeight.medium => 5,
+    VoicesProgressIndicatorWeight.heavy => 10,
+  };
 }

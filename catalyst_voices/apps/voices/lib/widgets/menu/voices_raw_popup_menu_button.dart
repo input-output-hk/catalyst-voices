@@ -4,11 +4,12 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 /// Usually builds button.
-typedef VoicesRawPopupBuilder = Widget Function(
-  BuildContext context,
-  VoidCallback onTapCallback, {
-  required bool isMenuOpen,
-});
+typedef VoicesRawPopupBuilder =
+    Widget Function(
+      BuildContext context,
+      VoidCallback onTapCallback, {
+      required bool isMenuOpen,
+    });
 
 class VoicesRawPopupMenuButton<T> extends StatefulWidget {
   final VoicesRawPopupBuilder buttonBuilder;
@@ -47,8 +48,10 @@ class VoicesRawPopupMenuButtonState<T> extends State<VoicesRawPopupMenuButton<T>
   void hideMenu() {
     if (!_isMenuOpen) return;
 
-    Navigator.of(context, rootNavigator: true)
-        .popUntil((route) => route.settings != widget.routeSettings);
+    Navigator.of(
+      context,
+      rootNavigator: true,
+    ).popUntil((route) => route.settings != widget.routeSettings);
 
     setState(() {
       _isMenuOpen = false;
@@ -77,17 +80,20 @@ class VoicesRawPopupMenuButtonState<T> extends State<VoicesRawPopupMenuButton<T>
     );
 
     unawaited(
-      navigator.push(route).then((value) {
-        if (mounted && value != null) {
-          widget.onSelected(value);
-        }
-      }).whenComplete(() {
-        if (mounted) {
-          setState(() {
-            _isMenuOpen = false;
-          });
-        }
-      }),
+      navigator
+          .push(route)
+          .then((value) {
+            if (mounted && value != null) {
+              widget.onSelected(value);
+            }
+          })
+          .whenComplete(() {
+            if (mounted) {
+              setState(() {
+                _isMenuOpen = false;
+              });
+            }
+          }),
     );
   }
 }
@@ -248,7 +254,8 @@ class _VoicesRawPopupMenuStateRoutePageLayout extends SingleChildLayoutDelegate 
 
   Offset _findWantedPosition(Size size, Size childSize) {
     var x = buttonPosition.left + offset.dx;
-    var y = switch (menuPosition) {
+    var y =
+        switch (menuPosition) {
           VoicesRawPopupMenuPosition.over => buttonPosition.top,
           VoicesRawPopupMenuPosition.under => buttonPosition.bottom,
         } +

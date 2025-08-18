@@ -3,15 +3,17 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 
-typedef PageRequestListener<PageKeyType, ItemType> = void Function(
-  PageKeyType pageKey,
-  int pageSize,
-  ItemType? lastProposalId,
-);
+typedef PageRequestListener<PageKeyType, ItemType> =
+    void Function(
+      PageKeyType pageKey,
+      int pageSize,
+      ItemType? lastProposalId,
+    );
 
-typedef PagingStateListener<ItemType> = void Function(
-  PagingState<ItemType> status,
-);
+typedef PagingStateListener<ItemType> =
+    void Function(
+      PagingState<ItemType> status,
+    );
 
 /// A controller that manages pagination state
 /// and notifies listeners of changes.
@@ -52,14 +54,14 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
     required this.initialMaxResults,
     this.itemsPerPage = 24,
   }) : super(
-          PagingState(
-            currentPage: initialPage,
-            maxResults: initialMaxResults,
-            itemsPerPage: itemsPerPage,
-            isLoading: true,
-            itemList: const [],
-          ),
-        );
+         PagingState(
+           currentPage: initialPage,
+           maxResults: initialMaxResults,
+           itemsPerPage: itemsPerPage,
+           isLoading: true,
+           itemList: const [],
+         ),
+       );
 
   ObserverList<PageRequestListener<int, ItemType>>? _pageRequestListeners =
       ObserverList<PageRequestListener<int, ItemType>>();

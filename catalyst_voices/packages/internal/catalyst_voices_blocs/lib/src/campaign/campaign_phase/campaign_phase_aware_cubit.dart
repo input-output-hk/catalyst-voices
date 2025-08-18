@@ -15,8 +15,9 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
   Timer? _timer;
 
   CampaignPhaseAwareCubit(this._campaignService) : super(const LoadingCampaignPhaseAwareState()) {
-    _campaignSubscription =
-        _campaignService.watchActiveCampaign.distinct().listen(_handleCampaignChange);
+    _campaignSubscription = _campaignService.watchActiveCampaign.distinct().listen(
+      _handleCampaignChange,
+    );
     unawaited(getActiveCampaign());
     _timer = Timer.periodic(const Duration(seconds: 1), _handleTimerTick);
   }

@@ -93,14 +93,14 @@ class VoicesTextButton extends StatelessWidget {
       /// Default theme configuration corresponds with this variant
       _Variant.primary => null,
       _Variant.neutral => TextButton.styleFrom(
-          foregroundColor: Theme.of(context).colors.textPrimary,
-        ),
+        foregroundColor: Theme.of(context).colors.textPrimary,
+      ),
       _Variant.secondary => TextButton.styleFrom(
-          foregroundColor: Theme.of(context).colorScheme.secondary,
-        ),
+        foregroundColor: Theme.of(context).colorScheme.secondary,
+      ),
       _Variant.danger => TextButton.styleFrom(
-          foregroundColor: Theme.of(context).colors.iconsError,
-        ),
+        foregroundColor: Theme.of(context).colors.iconsError,
+      ),
       _Variant.custom => null,
     };
   }

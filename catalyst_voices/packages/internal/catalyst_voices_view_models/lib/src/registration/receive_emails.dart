@@ -21,7 +21,7 @@ final class ReceiveEmails extends Equatable {
 
   @override
   List<Object?> get props => [
-        isAccepted,
-        isEnabled,
-      ];
+    isAccepted,
+    isEnabled,
+  ];
 }

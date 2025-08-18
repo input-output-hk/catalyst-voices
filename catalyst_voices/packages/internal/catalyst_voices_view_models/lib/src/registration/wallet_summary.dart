@@ -25,11 +25,11 @@ final class WalletSummaryData extends Equatable {
 
   @override
   List<Object?> get props => [
-        walletName,
-        balance,
-        address,
-        clipboardAddress,
-        showLowBalance,
-        showExpectedNetworkId,
-      ];
+    walletName,
+    balance,
+    address,
+    clipboardAddress,
+    showLowBalance,
+    showExpectedNetworkId,
+  ];
 }

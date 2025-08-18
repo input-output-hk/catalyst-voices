@@ -70,13 +70,13 @@ class AffixDecorator extends StatelessWidget {
 
     final child = switch (mainAxisSize) {
       MainAxisSize.min => Flexible(
-          key: const Key('DecoratorData'),
-          child: this.child,
-        ),
+        key: const Key('DecoratorData'),
+        child: this.child,
+      ),
       MainAxisSize.max => Expanded(
-          key: const Key('DecoratorData'),
-          child: this.child,
-        ),
+        key: const Key('DecoratorData'),
+        child: this.child,
+      ),
     };
 
     return Flex(

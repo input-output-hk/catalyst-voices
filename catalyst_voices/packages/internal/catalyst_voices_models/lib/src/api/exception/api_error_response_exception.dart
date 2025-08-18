@@ -16,7 +16,7 @@ final class ApiErrorResponseException extends ApiException {
   });
 
   const ApiErrorResponseException.notFound([this.error])
-      : statusCode = ApiResponseStatusCode.notFound;
+    : statusCode = ApiResponseStatusCode.notFound;
 
   @override
   List<Object?> get props => [statusCode, error];

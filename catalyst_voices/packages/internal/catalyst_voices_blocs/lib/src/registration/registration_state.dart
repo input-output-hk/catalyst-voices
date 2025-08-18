@@ -81,11 +81,11 @@ final class RegistrationState extends Equatable {
 
   @override
   List<Object?> get props => [
-        step,
-        baseProfileStateData,
-        keychainStateData,
-        walletLinkStateData,
-        registrationStateData,
-        recoverStateData,
-      ];
+    step,
+    baseProfileStateData,
+    keychainStateData,
+    walletLinkStateData,
+    registrationStateData,
+    recoverStateData,
+  ];
 }

@@ -5,11 +5,12 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-typedef CampaignPhaseAwareBuilder = Widget Function(
-  BuildContext context,
-  CampaignPhase phase,
-  int fundNumber,
-);
+typedef CampaignPhaseAwareBuilder =
+    Widget Function(
+      BuildContext context,
+      CampaignPhase phase,
+      int fundNumber,
+    );
 
 class CampaignPhaseAware extends StatelessWidget {
   final CampaignPhaseType phase;
@@ -114,8 +115,8 @@ class _CampaignPhaseAwareBuilder extends StatelessWidget {
       CampaignPhaseStatus.post when post != null => post!(context, phase, fundNumber),
       _ when orElse != null => orElse!(context, phase, fundNumber),
       _ => throw ArgumentError(
-          'No builder provided for phase type $phase',
-        ),
+        'No builder provided for phase type $phase',
+      ),
     };
   }
 }
@@ -137,8 +138,11 @@ class _DataCampaignPhaseAwareSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<CampaignPhaseAwareCubit, CampaignPhaseAwareState,
-        (bool, CampaignPhaseState?, int)>(
+    return BlocSelector<
+      CampaignPhaseAwareCubit,
+      CampaignPhaseAwareState,
+      (bool, CampaignPhaseState?, int)
+    >(
       selector: (state) {
         if (state is DataCampaignPhaseAwareState) {
           return (true, state.getPhaseStatus(phase), state.fundNumber);
@@ -166,11 +170,14 @@ class _ErrorCampaignPhaseAwareSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<CampaignPhaseAwareCubit, CampaignPhaseAwareState,
-        (bool, LocalizedException?)>(
+    return BlocSelector<
+      CampaignPhaseAwareCubit,
+      CampaignPhaseAwareState,
+      (bool, LocalizedException?)
+    >(
       selector: (state) => switch (state) {
         ErrorCampaignPhaseAwareState(:final error) => (true, error),
-        _ => (false, null)
+        _ => (false, null),
       },
       builder: (context, state) {
         return Offstage(

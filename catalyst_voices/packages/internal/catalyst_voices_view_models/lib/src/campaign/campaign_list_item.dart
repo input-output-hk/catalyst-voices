@@ -20,12 +20,12 @@ final class CampaignDetailsListItem extends CampaignListItem {
 
   @override
   List<Object?> get props => [
-        description,
-        startDate,
-        endDate,
-        proposalsCount,
-        categoriesCount,
-      ];
+    description,
+    startDate,
+    endDate,
+    proposalsCount,
+    categoriesCount,
+  ];
 }
 
 final class CampaignCategoriesListItem extends CampaignListItem {
@@ -37,6 +37,6 @@ final class CampaignCategoriesListItem extends CampaignListItem {
 
   @override
   List<Object?> get props => [
-        sections,
-      ];
+    sections,
+  ];
 }

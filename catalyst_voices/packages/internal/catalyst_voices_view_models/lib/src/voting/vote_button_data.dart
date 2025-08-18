@@ -45,9 +45,9 @@ final class VoteButtonData extends Equatable {
   List<Object?> get props => [draft, casted];
 
   List<VoteTypeData> get votes => [
-        if (draft case final VoteTypeDataDraft draft) draft,
-        if (casted case final VoteTypeDataCasted casted) casted,
-      ];
+    if (draft case final VoteTypeDataDraft draft) draft,
+    if (casted case final VoteTypeDataCasted casted) casted,
+  ];
 
   SceneColors colors(BuildContext context) {
     final theme = Theme.of(context);

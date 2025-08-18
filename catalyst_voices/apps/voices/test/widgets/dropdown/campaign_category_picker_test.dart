@@ -33,16 +33,17 @@ void main() {
             onSelected: (value) {
               selectedValue = value.ref;
             },
-            buttonBuilder: (
-              context,
-              onTapCallback, {
-              required isMenuOpen,
-            }) {
-              return VoicesGestureDetector(
-                onTap: onTapCallback,
-                child: const Text('Dropdown'),
-              );
-            },
+            buttonBuilder:
+                (
+                  context,
+                  onTapCallback, {
+                  required isMenuOpen,
+                }) {
+                  return VoicesGestureDetector(
+                    onTap: onTapCallback,
+                    child: const Text('Dropdown'),
+                  );
+                },
           ),
         ),
       );
@@ -69,16 +70,17 @@ void main() {
         Scaffold(
           body: CampaignCategoryPicker(
             items: items,
-            buttonBuilder: (
-              context,
-              onTapCallback, {
-              required isMenuOpen,
-            }) {
-              return VoicesGestureDetector(
-                onTap: onTapCallback,
-                child: const Text('Dropdown'),
-              );
-            },
+            buttonBuilder:
+                (
+                  context,
+                  onTapCallback, {
+                  required isMenuOpen,
+                }) {
+                  return VoicesGestureDetector(
+                    onTap: onTapCallback,
+                    child: const Text('Dropdown'),
+                  );
+                },
             onSelected: (value) {},
           ),
         ),

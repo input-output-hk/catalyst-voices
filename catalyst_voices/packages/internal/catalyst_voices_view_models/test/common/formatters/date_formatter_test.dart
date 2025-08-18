@@ -68,8 +68,7 @@ void main() {
       expect(resultMonday, 'Jan 20 - Jan 26');
     });
 
-    test(
-        'Dates are not formatted as in the same week for Local '
+    test('Dates are not formatted as in the same week for Local '
         'when Sunday is first day of week but formatting is disabled', () {
       // Set Sunday as first day of week
       mockLocalizations.firstDayOfWeekIndex = 0;

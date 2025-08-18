@@ -10,6 +10,6 @@ final class VotingBallot extends Equatable {
 
   @override
   List<Object?> get props => [
-        votes,
-      ];
+    votes,
+  ];
 }

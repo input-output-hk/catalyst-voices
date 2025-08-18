@@ -690,8 +690,10 @@ void main() {
           expect(page.items.length, 2);
           expect(page.items.length, page.total);
 
-          final proposalsRefs =
-              page.items.map((e) => e.proposal).map((entity) => entity.ref).toList();
+          final proposalsRefs = page.items
+              .map((e) => e.proposal)
+              .map((entity) => entity.ref)
+              .toList();
 
           expect(
             proposalsRefs,
@@ -787,8 +789,10 @@ void main() {
             ),
           ];
 
-          final expectedRefs =
-              proposals.sublist(0, 3).map((proposal) => proposal.document.ref).toList();
+          final expectedRefs = proposals
+              .sublist(0, 3)
+              .map((proposal) => proposal.document.ref)
+              .toList();
 
           final filters = ProposalsFilters(category: categoryId);
           const order = UpdateDate(isAscending: true);
@@ -1361,8 +1365,9 @@ void main() {
 
           expect(page.page, 0);
 
-          final proposalsBudgets =
-              page.items.map((e) => e.proposal.content.requestedFunds).toList();
+          final proposalsBudgets = page.items
+              .map((e) => e.proposal.content.requestedFunds)
+              .toList();
 
           expect(proposalsBudgets, containsAllInOrder(budgets));
         },
@@ -1416,8 +1421,9 @@ void main() {
 
           expect(page.page, 0);
 
-          final proposalsBudgets =
-              page.items.map((e) => e.proposal.content.requestedFunds).toList();
+          final proposalsBudgets = page.items
+              .map((e) => e.proposal.content.requestedFunds)
+              .toList();
 
           expect(proposalsBudgets, containsAllInOrder(budgets));
         },
@@ -1592,8 +1598,9 @@ void main() {
 
           expect(page.page, 0);
 
-          final proposalsBudgets =
-              page.items.map((e) => e.proposal.content.requestedFunds).toList();
+          final proposalsBudgets = page.items
+              .map((e) => e.proposal.content.requestedFunds)
+              .toList();
 
           expect(proposalsBudgets, containsAllInOrder(expectedBudgets));
         },
@@ -1776,10 +1783,12 @@ void main() {
 
           final baseTime = DateTime(2025, 4);
           final proposalRef1 = _buildRefAt(baseTime);
-          final proposalRef2 =
-              _buildRefAt(baseTime.add(const Duration(days: 1))).copyWith(id: proposalRef1.id);
-          final proposalRef3 =
-              _buildRefAt(baseTime.add(const Duration(days: 2))).copyWith(id: proposalRef1.id);
+          final proposalRef2 = _buildRefAt(
+            baseTime.add(const Duration(days: 1)),
+          ).copyWith(id: proposalRef1.id);
+          final proposalRef3 = _buildRefAt(
+            baseTime.add(const Duration(days: 2)),
+          ).copyWith(id: proposalRef1.id);
 
           final proposals = [
             _buildProposal(

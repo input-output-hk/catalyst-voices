@@ -56,7 +56,7 @@ class ProposalOverviewTile extends StatelessWidget {
               Offstage(
                 offstage:
                     context.select<ProposalCubit, bool>((cubit) => cubit.state.readOnlyMode) ||
-                        CatalystPlatform.isMobileWeb,
+                    CatalystPlatform.isMobileWeb,
                 child: const ProposalFavoriteButton(),
               ),
             ],

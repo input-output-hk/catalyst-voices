@@ -187,7 +187,7 @@ extension _SignedDocumentContentTypeExt on SignedDocumentContentType {
       case IntValue():
         return switch (contentType.value) {
           CoseValues.jsonContentType => SignedDocumentContentType.json,
-          _ => SignedDocumentContentType.unknown
+          _ => SignedDocumentContentType.unknown,
         };
       case StringValue():
       case null:
@@ -257,9 +257,9 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
 
 extension _SignedDocumentMetadataRefExt on SignedDocumentMetadataRef {
   ReferenceUuid get asCose => ReferenceUuid(
-        id: id.asUuid,
-        ver: ver?.asUuid,
-      );
+    id: id.asUuid,
+    ver: ver?.asUuid,
+  );
 
   static SignedDocumentMetadataRef fromCose(ReferenceUuid ref) {
     return SignedDocumentMetadataRef(
@@ -271,9 +271,9 @@ extension _SignedDocumentMetadataRefExt on SignedDocumentMetadataRef {
 
 extension _SignedDocumentMetadataRefHashExt on SignedDocumentMetadataRefHash {
   ReferenceUuidHash get asCose => ReferenceUuidHash(
-        ref: ref.asCose,
-        hash: hash,
-      );
+    ref: ref.asCose,
+    hash: hash,
+  );
 
   static SignedDocumentMetadataRefHash fromCose(ReferenceUuidHash ref) {
     return SignedDocumentMetadataRefHash(

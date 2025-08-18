@@ -82,13 +82,16 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       accountPublicStatus: Optional(activeAccount?.publicStatus),
     );
 
-    _activeAccountSub =
-        _userService.watchUser.map((event) => event.activeAccount).distinct().listen(
-              (value) => add(RebuildActiveAccountProposalEvent(account: value)),
-            );
+    _activeAccountSub = _userService.watchUser
+        .map((event) => event.activeAccount)
+        .distinct()
+        .listen(
+          (value) => add(RebuildActiveAccountProposalEvent(account: value)),
+        );
 
-    _isMaxProposalsLimitReachedSub =
-        _proposalService.watchMaxProposalsLimitReached().listen((event) {
+    _isMaxProposalsLimitReachedSub = _proposalService.watchMaxProposalsLimitReached().listen((
+      event,
+    ) {
       add(MaxProposalsLimitChangedEvent(isLimitReached: event));
     });
   }
@@ -315,8 +318,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     final guidance = property.schema.guidance;
     final milestoneListWildcard = ProposalDocument.milestoneListChildNodeId;
-    final sectionTitle =
-        property.schema.nodeId.matchesPattern(milestoneListWildcard) ? '' : property.schema.title;
+    final sectionTitle = property.schema.nodeId.matchesPattern(milestoneListWildcard)
+        ? ''
+        : property.schema.title;
     if (guidance != null) {
       yield ProposalGuidanceItem(
         segmentTitle: segment.schema.title,
@@ -499,8 +503,10 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       final proposalData = await _proposalService.getProposalDetail(
         ref: proposalRef,
       );
-      final versionsIds =
-          proposalData.versions.map((e) => e.selfRef.version).whereType<String>().toList();
+      final versionsIds = proposalData.versions
+          .map((e) => e.selfRef.version)
+          .whereType<String>()
+          .toList();
       final proposal = Proposal.fromData(proposalData, versionsIds);
 
       if (proposalData.publish.isPublished) {
@@ -893,8 +899,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
       // if it's local draft and the first version then
       // it should be shown as local which corresponds to null
-      final currentIteration =
-          _isLocal(state.metadata.publish, nextIteration) ? null : nextIteration - 1;
+      final currentIteration = _isLocal(state.metadata.publish, nextIteration)
+          ? null
+          : nextIteration - 1;
 
       emitSignal(
         ShowPublishConfirmationSignal(

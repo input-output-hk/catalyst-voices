@@ -22,7 +22,7 @@ final class KeychainStateData extends Equatable {
 
   @override
   List<Object?> get props => [
-        seedPhraseStateData,
-        unlockPasswordState,
-      ];
+    seedPhraseStateData,
+    unlockPasswordState,
+  ];
 }

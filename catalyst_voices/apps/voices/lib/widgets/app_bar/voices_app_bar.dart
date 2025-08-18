@@ -82,7 +82,8 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
     final canImplyPopButton =
         automaticallyImplyLeading && (Navigator.maybeOf(context)?.canPop() ?? false);
 
-    final child = leading ??
+    final child =
+        leading ??
         (canImplyDrawerToggleButton ? const DrawerToggleButton() : null) ??
         (canImplyPopButton ? const NavigationBack(isCompact: true) : null);
 
@@ -199,7 +200,7 @@ class _Title extends StatelessWidget {
           widgets: [
             _BrandPicture(enableBackHome: enableBackHome),
           ],
-          itemGap: 8
+          itemGap: 8,
         ),
         sm: (
           widgets: [
@@ -209,7 +210,7 @@ class _Title extends StatelessWidget {
                 onPressed: () {},
               ),
           ],
-          itemGap: 16
+          itemGap: 16,
         ),
         other: (
           widgets: [
@@ -219,7 +220,7 @@ class _Title extends StatelessWidget {
                 onPressed: () {},
               ),
           ],
-          itemGap: 24
+          itemGap: 24,
         ),
       ),
     );

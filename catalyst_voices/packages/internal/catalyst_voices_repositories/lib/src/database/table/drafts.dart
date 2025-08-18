@@ -21,9 +21,9 @@ class Drafts extends Table with IdHiLoTableMixin, VerHiLoTableMixin, DocumentTab
 
   @override
   Set<Column<Object>>? get primaryKey => {
-        idHi,
-        idLo,
-        verHi,
-        verLo,
-      };
+    idHi,
+    idLo,
+    verHi,
+    verLo,
+  };
 }

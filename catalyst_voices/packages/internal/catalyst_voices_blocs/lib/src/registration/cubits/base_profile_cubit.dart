@@ -8,18 +8,18 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
     with BlocErrorEmitterMixin
     implements BaseProfileManager {
   BaseProfileCubit()
-      : super(
-          kDebugMode
-              ? const BaseProfileStateData(
-                  email: Email.dirty('dev@iokh.com'),
-                  receiveEmails: ReceiveEmails(isAccepted: true, isEnabled: true),
-                  username: Username.dirty('Dev'),
-                  conditionsAccepted: true,
-                  tosAndPrivacyPolicyAccepted: true,
-                  drepApprovalContingencyAccepted: true,
-                )
-              : const BaseProfileStateData(),
-        );
+    : super(
+        kDebugMode
+            ? const BaseProfileStateData(
+                email: Email.dirty('dev@iokh.com'),
+                receiveEmails: ReceiveEmails(isAccepted: true, isEnabled: true),
+                username: Username.dirty('Dev'),
+                conditionsAccepted: true,
+                tosAndPrivacyPolicyAccepted: true,
+                drepApprovalContingencyAccepted: true,
+              )
+            : const BaseProfileStateData(),
+      );
 
   BaseProfileProgress createRecoverProgress() {
     return BaseProfileProgress(

@@ -27,15 +27,15 @@ class VotingState extends Equatable {
 
   @override
   List<Object?> get props => [
-        selectedCategory,
-        fundNumber,
-        votingPower,
-        votingPhase,
-        hasSearchQuery,
-        favoritesIds,
-        count,
-        categorySelectorItems,
-      ];
+    selectedCategory,
+    fundNumber,
+    votingPower,
+    votingPhase,
+    hasSearchQuery,
+    favoritesIds,
+    count,
+    categorySelectorItems,
+  ];
 
   SignedDocumentRef? get selectedCategoryId {
     return categorySelectorItems.singleWhereOrNull((element) => element.isSelected)?.ref;

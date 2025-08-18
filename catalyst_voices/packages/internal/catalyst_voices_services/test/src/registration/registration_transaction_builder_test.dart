@@ -22,8 +22,9 @@ void main() {
     setUp(() async {
       keychain = _MockKeychain();
 
-      when(() => keychain.getRoleKeyPair(role: AccountRole.voter))
-          .thenAnswer((_) async => _voterKeyPair);
+      when(
+        () => keychain.getRoleKeyPair(role: AccountRole.voter),
+      ).thenAnswer((_) async => _voterKeyPair);
     });
 
     test('txInputsHash is calculated from selected utxos, not from all utxos', () async {
@@ -276,8 +277,7 @@ class _FakeBip32Ed25519XPrivateKey extends Fake implements kd.Bip32Ed25519XPriva
   @override
   Future<R> use<R>(
     Future<R> Function(kd.Bip32Ed25519XPrivateKey privateKey) callback,
-  ) =>
-      callback(this);
+  ) => callback(this);
 
   @override
   Future<bool> verify(List<int> message, {required kd.Bip32Ed25519XSignature signature}) async {
@@ -300,8 +300,8 @@ class _FakeBip32Ed25519XPublicKey extends Fake implements kd.Bip32Ed25519XPublic
 
   @override
   kd.Ed25519PublicKey toPublicKey() => kd.Ed25519PublicKey.fromBytes(
-        bytes.take(kd.Ed25519PrivateKey.length).toList(),
-      );
+    bytes.take(kd.Ed25519PrivateKey.length).toList(),
+  );
 }
 
 class _FakeBip32Ed25519XPublicKeyFactory extends kd.Bip32Ed25519XPublicKeyFactory {

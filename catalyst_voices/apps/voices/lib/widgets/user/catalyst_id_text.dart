@@ -198,8 +198,9 @@ class _Chip extends StatelessWidget {
     final foregroundColor = colors.textOnPrimaryLevel1;
     final overlayColor = colors.onSurfaceNeutralOpaqueLv2;
 
-    final textStyle =
-        (textTheme.bodyMedium ?? const TextStyle()).merge(style).copyWith(color: foregroundColor);
+    final textStyle = (textTheme.bodyMedium ?? const TextStyle())
+        .merge(style)
+        .copyWith(color: foregroundColor);
 
     return Material(
       color: backgroundColor,

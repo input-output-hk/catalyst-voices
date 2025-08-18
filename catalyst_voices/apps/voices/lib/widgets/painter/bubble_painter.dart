@@ -28,14 +28,14 @@ class BubbleConfig extends Equatable {
 
   @override
   List<Object?> get props => [
-        position,
-        radius,
-        gradientColors,
-        gradientStops,
-        shadowBlur,
-        shadowOffset,
-        shadowColor,
-      ];
+    position,
+    radius,
+    gradientColors,
+    gradientStops,
+    shadowBlur,
+    shadowOffset,
+    shadowColor,
+  ];
 }
 
 class BubblePainter extends CustomPainter {

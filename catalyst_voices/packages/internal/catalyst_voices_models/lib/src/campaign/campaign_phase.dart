@@ -16,11 +16,11 @@ final class CampaignPhase extends Equatable {
 
   @override
   List<Object?> get props => [
-        title,
-        description,
-        timeline,
-        type,
-      ];
+    title,
+    description,
+    timeline,
+    type,
+  ];
 
   CampaignPhase copyWith({
     String? title,

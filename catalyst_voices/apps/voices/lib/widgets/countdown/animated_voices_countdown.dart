@@ -14,35 +14,35 @@ class AnimatedVoicesCountdown extends StatelessWidget {
     return VoicesCountdown(
       dateTime: dateTime,
       onCountdownEnd: onCountdownEnd,
-      builder: (
-        context, {
-        required days,
-        required hours,
-        required minutes,
-        required seconds,
-      }) =>
-          Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CountDownValueCard(
-            value: days,
-            unit: context.l10n.days(days),
+      builder:
+          (
+            context, {
+            required days,
+            required hours,
+            required minutes,
+            required seconds,
+          }) => Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CountDownValueCard(
+                value: days,
+                unit: context.l10n.days(days),
+              ),
+              CountDownValueCard(
+                value: hours,
+                unit: context.l10n.hours(hours),
+              ),
+              CountDownValueCard(
+                value: minutes,
+                unit: context.l10n.minutes(minutes),
+              ),
+              CountDownValueCard(
+                value: seconds,
+                unit: context.l10n.seconds(seconds),
+              ),
+            ],
           ),
-          CountDownValueCard(
-            value: hours,
-            unit: context.l10n.hours(hours),
-          ),
-          CountDownValueCard(
-            value: minutes,
-            unit: context.l10n.minutes(minutes),
-          ),
-          CountDownValueCard(
-            value: seconds,
-            unit: context.l10n.seconds(seconds),
-          ),
-        ],
-      ),
     );
   }
 }

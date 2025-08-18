@@ -39,10 +39,10 @@ class CurrentCampaignInfoViewModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        allFunds,
-        totalAsk,
-        timeline,
-      ];
+    allFunds,
+    totalAsk,
+    timeline,
+  ];
 }
 
 class NullCurrentCampaignInfoViewModel extends CurrentCampaignInfoViewModel {

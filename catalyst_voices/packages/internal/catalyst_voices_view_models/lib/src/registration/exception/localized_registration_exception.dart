@@ -93,8 +93,8 @@ final class LocalizedRegistrationNetworkIdMismatchException extends LocalizedReg
 
   @override
   String message(BuildContext context) => context.l10n.registrationNetworkIdMismatch(
-        targetNetworkId.localizedName(context),
-      );
+    targetNetworkId.localizedName(context),
+  );
 }
 
 /// Localized exception thrown when attempting to execute register operation

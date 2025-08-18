@@ -93,11 +93,9 @@ class ProfilePage {
   }
 
   Future<void> displayNameIsAsExpected(String expectedDisplayName) async {
-    final textField = $(accDisplayNameTxtField)
-        .$(CommonPage($).voicesTextField)
-        .evaluate()
-        .first
-        .widget as TextField;
+    final textField =
+        $(accDisplayNameTxtField).$(CommonPage($).voicesTextField).evaluate().first.widget
+            as TextField;
 
     expect(textField.controller!.text, expectedDisplayName);
   }
@@ -110,11 +108,9 @@ class ProfilePage {
   }
 
   Future<void> keychainIsAsExpected(String expectedKeychain) async {
-    final textField = $(accountKeychainTxtField)
-        .$(CommonPage($).voicesTextField)
-        .evaluate()
-        .first
-        .widget as TextField;
+    final textField =
+        $(accountKeychainTxtField).$(CommonPage($).voicesTextField).evaluate().first.widget
+            as TextField;
 
     expect(textField.controller!.text, expectedKeychain);
   }

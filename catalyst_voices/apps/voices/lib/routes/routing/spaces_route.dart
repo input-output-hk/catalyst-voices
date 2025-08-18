@@ -54,9 +54,9 @@ final class FundedProjectsRoute extends GoRouteData
 
   @override
   List<RouteGuard> get routeGuards => const [
-        SessionUnlockedGuard(),
-        UserAccessGuard(),
-      ];
+    SessionUnlockedGuard(),
+    UserAccessGuard(),
+  ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -154,9 +154,9 @@ final class TreasuryRoute extends GoRouteData
 
   @override
   List<RouteGuard> get routeGuards => const [
-        SessionUnlockedGuard(),
-        AdminAccessGuard(),
-      ];
+    SessionUnlockedGuard(),
+    AdminAccessGuard(),
+  ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -175,9 +175,9 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin, Compos
 
   @override
   List<RouteGuard> get routeGuards => const [
-        SessionUnlockedGuard(),
-        UserAccessGuard(),
-      ];
+    SessionUnlockedGuard(),
+    UserAccessGuard(),
+  ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -199,9 +199,9 @@ final class WorkspaceRoute extends GoRouteData
 
   @override
   List<RouteGuard> get routeGuards => const [
-        SessionUnlockedGuard(),
-        UserAccessGuard(),
-      ];
+    SessionUnlockedGuard(),
+    UserAccessGuard(),
+  ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {

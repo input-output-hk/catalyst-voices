@@ -24,8 +24,8 @@ base class BasicMenuItem extends Equatable implements MenuItem {
 
   @override
   List<Object?> get props => [
-        id,
-        label,
-        isEnabled,
-      ];
+    id,
+    label,
+    isEnabled,
+  ];
 }

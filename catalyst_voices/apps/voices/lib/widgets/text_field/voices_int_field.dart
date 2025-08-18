@@ -21,14 +21,14 @@ class VoicesIntField extends VoicesNumField<int> {
     super.readOnly,
     super.ignorePointers,
   }) : super(
-          codec: const IntCodec(),
-          keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            // Note. int.parse returns incorrect values for bigger Strings.
-            // If more is required use BigInt
-            if (kIsWeb) LengthLimitingTextInputFormatter(16),
-            ...?inputFormatters,
-          ],
-        );
+         codec: const IntCodec(),
+         keyboardType: TextInputType.number,
+         inputFormatters: [
+           FilteringTextInputFormatter.digitsOnly,
+           // Note. int.parse returns incorrect values for bigger Strings.
+           // If more is required use BigInt
+           if (kIsWeb) LengthLimitingTextInputFormatter(16),
+           ...?inputFormatters,
+         ],
+       );
 }

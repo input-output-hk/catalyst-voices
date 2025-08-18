@@ -49,44 +49,45 @@ class _CategorySelector extends StatelessWidget {
       },
       menuConstraints: const BoxConstraints(maxWidth: 320),
       menuWithIcons: false,
-      buttonBuilder: (
-        context,
-        onTapCallback, {
-        required isMenuOpen,
-      }) {
-        return VoicesGestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: onTapCallback,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-            decoration: BoxDecoration(
-              color: context.colors.elevationsOnSurfaceNeutralLv1White,
-              border: Border.all(color: context.colors.outlineBorderVariant),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  key: const Key('CategorySelectorLabel'),
-                  context.l10n.category,
-                  style: context.textTheme.bodyMedium?.copyWith(
-                    color: context.colors.textDisabled,
-                  ),
+      buttonBuilder:
+          (
+            context,
+            onTapCallback, {
+            required isMenuOpen,
+          }) {
+            return VoicesGestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onTapCallback,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                decoration: BoxDecoration(
+                  color: context.colors.elevationsOnSurfaceNeutralLv1White,
+                  border: Border.all(color: context.colors.outlineBorderVariant),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                const SizedBox(width: 4),
-                Text(
-                  key: const Key('CategorySelectorValue'),
-                  items.firstWhereOrNull((e) => e.isSelected)?.name ?? context.l10n.showAll,
-                  style: context.textTheme.bodyMedium,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      key: const Key('CategorySelectorLabel'),
+                      context.l10n.category,
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: context.colors.textDisabled,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      key: const Key('CategorySelectorValue'),
+                      items.firstWhereOrNull((e) => e.isSelected)?.name ?? context.l10n.showAll,
+                      style: context.textTheme.bodyMedium,
+                    ),
+                    const SizedBox(width: 8),
+                    VoicesAssets.icons.chevronDown.buildIcon(),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                VoicesAssets.icons.chevronDown.buildIcon(),
-              ],
-            ),
-          ),
-        );
-      },
+              ),
+            );
+          },
     );
   }
 }

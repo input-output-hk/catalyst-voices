@@ -53,7 +53,8 @@ class _ErrorProposalSelector extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(top: 60),
             child: VoicesErrorIndicator(
-              message: state.data?.message(context) ??
+              message:
+                  state.data?.message(context) ??
                   const LocalizedUnknownException().message(context),
               onRetry: () => context.read<WorkspaceBloc>().add(const WatchUserProposalsEvent()),
             ),

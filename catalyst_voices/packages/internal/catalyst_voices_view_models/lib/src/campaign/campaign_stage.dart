@@ -32,9 +32,9 @@ enum CampaignStage {
   bool get isDraft => this == CampaignStage.draft;
 
   String localizedName(VoicesLocalizations l10n) => switch (this) {
-        CampaignStage.draft => l10n.campaignStartingSoon,
-        CampaignStage.scheduled => l10n.campaignStartingSoon,
-        CampaignStage.live => l10n.campaignIsLive,
-        CampaignStage.completed => l10n.campaignConcluded,
-      };
+    CampaignStage.draft => l10n.campaignStartingSoon,
+    CampaignStage.scheduled => l10n.campaignStartingSoon,
+    CampaignStage.live => l10n.campaignIsLive,
+    CampaignStage.completed => l10n.campaignConcluded,
+  };
 }

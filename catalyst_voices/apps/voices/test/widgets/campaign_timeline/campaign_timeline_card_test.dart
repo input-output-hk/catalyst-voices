@@ -118,15 +118,17 @@ void main() {
         final ongoingText = tester.widget<Text>(ongoingTextWidget);
         expect(ongoingText.style?.color, Colors.white);
 
-        final offstage = find
-            .ancestor(
-              of: ongoingTextWidget,
-              matching: find.byType(Offstage),
-              matchRoot: true,
-            )
-            .evaluate()
-            .first
-            .widget as Offstage;
+        final offstage =
+            find
+                    .ancestor(
+                      of: ongoingTextWidget,
+                      matching: find.byType(Offstage),
+                      matchRoot: true,
+                    )
+                    .evaluate()
+                    .first
+                    .widget
+                as Offstage;
 
         expect(offstage.offstage, isFalse);
       },

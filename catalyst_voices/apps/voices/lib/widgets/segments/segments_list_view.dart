@@ -10,15 +10,17 @@ Widget _defaultSegmentHeaderBuilder(BuildContext context, Segment data) {
   );
 }
 
-typedef SectionWidgetBuilder<T extends Section> = Widget Function(
-  BuildContext context,
-  T data,
-);
+typedef SectionWidgetBuilder<T extends Section> =
+    Widget Function(
+      BuildContext context,
+      T data,
+    );
 
-typedef SegmentHeaderWidgetBuilder<T extends Segment> = Widget Function(
-  BuildContext context,
-  T data,
-);
+typedef SegmentHeaderWidgetBuilder<T extends Segment> =
+    Widget Function(
+      BuildContext context,
+      T data,
+    );
 
 class BasicSegmentsListView extends StatelessWidget {
   final List<SegmentsListViewItem> items;
@@ -68,37 +70,37 @@ class SegmentsListView<T1 extends Segment, T2 extends Section> extends BasicSegm
     super.padding,
     super.itemScrollController,
   }) : super(
-          itemBuilder: (context, index) {
-            final item = items[index];
+         itemBuilder: (context, index) {
+           final item = items[index];
 
-            if (item is T1) {
-              return KeyedSubtree(
-                key: ValueKey(item.id),
-                child: segmentBuilder(context, item),
-              );
-            }
+           if (item is T1) {
+             return KeyedSubtree(
+               key: ValueKey(item.id),
+               child: segmentBuilder(context, item),
+             );
+           }
 
-            if (item is T2) {
-              return KeyedSubtree(
-                key: ValueKey(item.id),
-                child: sectionBuilder(context, item),
-              );
-            }
+           if (item is T2) {
+             return KeyedSubtree(
+               key: ValueKey(item.id),
+               child: sectionBuilder(context, item),
+             );
+           }
 
-            throw ArgumentError('Unknown item type[${item.runtimeType}]');
-          },
-          separatorBuilder: (context, index) {
-            final item = items[index];
+           throw ArgumentError('Unknown item type[${item.runtimeType}]');
+         },
+         separatorBuilder: (context, index) {
+           final item = items[index];
 
-            if (item is T1) {
-              return const SizedBox(height: 12);
-            }
+           if (item is T1) {
+             return const SizedBox(height: 12);
+           }
 
-            if (item is T2) {
-              return const SizedBox(height: 12);
-            }
+           if (item is T2) {
+             return const SizedBox(height: 12);
+           }
 
-            throw ArgumentError('Unknown item type[${item.runtimeType}]');
-          },
-        );
+           throw ArgumentError('Unknown item type[${item.runtimeType}]');
+         },
+       );
 }

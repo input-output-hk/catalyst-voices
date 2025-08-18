@@ -367,9 +367,9 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
     query.orderBy([
       (t) => OrderingTerm(
-            expression: t.verHi,
-            mode: OrderingMode.desc,
-          ),
+        expression: t.verHi,
+        mode: OrderingMode.desc,
+      ),
     ]);
 
     if (unique) {
@@ -447,9 +447,9 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
       )
       ..orderBy([
         (t) => OrderingTerm(
-              expression: t.verHi,
-              mode: OrderingMode.desc,
-            ),
+          expression: t.verHi,
+          mode: OrderingMode.desc,
+        ),
       ]);
 
     return query.watch().map((event) => event.firstOrNull).distinct(_entitiesEquals);

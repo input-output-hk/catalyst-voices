@@ -13,8 +13,9 @@ class VotingProposalsSubHeader extends StatelessWidget {
       builder: (context, hasCategory) {
         return Text(
           hasCategory ? context.l10n.categoryProposals : context.l10n.proposals,
-          style:
-              context.textTheme.headlineSmall?.copyWith(color: context.colors.textOnPrimaryLevel0),
+          style: context.textTheme.headlineSmall?.copyWith(
+            color: context.colors.textOnPrimaryLevel0,
+          ),
         );
       },
     );

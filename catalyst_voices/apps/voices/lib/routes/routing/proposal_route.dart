@@ -19,11 +19,11 @@ final class ProposalRoute extends GoRouteData with FadePageTransitionMixin {
   });
 
   ProposalRoute.fromRef({required DocumentRef ref})
-      : this(
-          proposalId: ref.id,
-          version: ref.version,
-          local: ref is DraftRef,
-        );
+    : this(
+        proposalId: ref.id,
+        version: ref.version,
+        local: ref is DraftRef,
+      );
   @override
   Widget build(BuildContext context, GoRouterState state) {
     final ref = DocumentRef.build(

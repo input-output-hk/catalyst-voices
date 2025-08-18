@@ -239,8 +239,9 @@ class _UploadContainerState extends State<_UploadContainer> {
                 onTap: () async {
                   final result = await FilePicker.platform.pickFiles(
                     type: (widget.allowedExtensions != null) ? FileType.custom : FileType.any,
-                    allowedExtensions:
-                        (widget.allowedExtensions != null) ? widget.allowedExtensions! : null,
+                    allowedExtensions: (widget.allowedExtensions != null)
+                        ? widget.allowedExtensions!
+                        : null,
                   );
                   final file = result?.files.first;
                   final name = file?.name;
@@ -262,48 +263,49 @@ class _UploadContainerState extends State<_UploadContainer> {
                   child: Wrap(
                     direction: Axis.vertical,
                     crossAxisAlignment: WrapCrossAlignment.center,
-                    children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Theme.of(context).colors.iconsPrimary,
-                            width: 3,
-                          ),
-                        ),
-                        child: VoicesAssets.icons.upload.buildIcon(
-                          color: Theme.of(context).colors.iconsPrimary,
-                        ),
-                      ),
-                      RichText(
-                        text: TextSpan(
-                          text: context.l10n.uploadDropInfo(widget.itemNameToUpload),
-                          style: Theme.of(context).textTheme.titleSmall,
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: context.l10n.browse,
-                              style: TextStyle(
-                                color: Theme.of(context).colors.iconsPrimary,
+                    children:
+                        [
+                              Container(
+                                width: 80,
+                                height: 80,
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Theme.of(context).colors.iconsPrimary,
+                                    width: 3,
+                                  ),
+                                ),
+                                child: VoicesAssets.icons.upload.buildIcon(
+                                  color: Theme.of(context).colors.iconsPrimary,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (widget.info != null)
-                        Text(
-                          widget.info!,
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                    ]
-                        .separatedBy(
-                          const SizedBox(
-                            height: 12,
-                          ),
-                        )
-                        .toList(),
+                              RichText(
+                                text: TextSpan(
+                                  text: context.l10n.uploadDropInfo(widget.itemNameToUpload),
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      text: context.l10n.browse,
+                                      style: TextStyle(
+                                        color: Theme.of(context).colors.iconsPrimary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (widget.info != null)
+                                Text(
+                                  widget.info!,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                            ]
+                            .separatedBy(
+                              const SizedBox(
+                                height: 12,
+                              ),
+                            )
+                            .toList(),
                   ),
                 ),
               ),

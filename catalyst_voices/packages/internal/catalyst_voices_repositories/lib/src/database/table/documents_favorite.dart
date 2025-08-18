@@ -10,9 +10,9 @@ class DocumentsFavorites extends Table with IdHiLoTableMixin {
 
   @override
   Set<Column> get primaryKey => {
-        idHi,
-        idLo,
-      };
+    idHi,
+    idLo,
+  };
 
   TextColumn get type => text().map(DocumentConverters.type)();
 }

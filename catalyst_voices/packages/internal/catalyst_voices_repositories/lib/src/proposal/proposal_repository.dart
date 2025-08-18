@@ -315,14 +315,14 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }) {
     return _documentRepository
         .watchRefToDocumentData(
-      refTo: refTo,
-      type: DocumentType.proposalActionDocument,
-    )
+          refTo: refTo,
+          type: DocumentType.proposalActionDocument,
+        )
         .map((data) {
-      final action = _buildProposalActionData(data);
+          final action = _buildProposalActionData(data);
 
-      return _getProposalPublish(ref: refTo, action: action);
-    });
+          return _getProposalPublish(ref: refTo, action: action);
+        });
   }
 
   @override
@@ -387,10 +387,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
       ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
       ProposalSubmissionAction.hide => throw ArgumentError(
-          'Proposal(${data.proposal.metadata.selfRef}) is '
-          'unsupported ${ProposalSubmissionAction.hide}. Make sure to filter '
-          'out hidden proposals before this code is reached.',
-        ),
+        'Proposal(${data.proposal.metadata.selfRef}) is '
+        'unsupported ${ProposalSubmissionAction.hide}. Make sure to filter '
+        'out hidden proposals before this code is reached.',
+      ),
     };
 
     final document = _buildProposalDocument(

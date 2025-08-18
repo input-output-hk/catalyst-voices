@@ -19,10 +19,10 @@ base class LocalTllCache extends LocalStorage implements TtlCache<String, String
     Set<String>? allowList,
     required super.sharedPreferences,
     Duration defaultTtl = const Duration(minutes: 1),
-  })  : _defaultTtl = defaultTtl,
-        super(
-          allowList: allowList != null ? _extendAllowList(allowList) : null,
-        );
+  }) : _defaultTtl = defaultTtl,
+       super(
+         allowList: allowList != null ? _extendAllowList(allowList) : null,
+       );
 
   @override
   Future<void> extendExpiration({

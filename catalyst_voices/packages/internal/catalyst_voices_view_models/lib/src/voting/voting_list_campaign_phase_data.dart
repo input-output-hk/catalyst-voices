@@ -11,16 +11,16 @@ final class VotingListCampaignPhaseData extends Equatable {
     this.votingPhaseProgress = 0,
     this.votingEndsIn,
   }) : assert(
-          votingPhaseProgress >= 0 && votingPhaseProgress <= 1,
-          'votingPhaseProgress is not in 0:1 range',
-        );
+         votingPhaseProgress >= 0 && votingPhaseProgress <= 1,
+         'votingPhaseProgress is not in 0:1 range',
+       );
 
   @override
   List<Object?> get props => [
-        activeFundNumber,
-        votingPhaseProgress,
-        votingEndsIn,
-      ];
+    activeFundNumber,
+    votingPhaseProgress,
+    votingEndsIn,
+  ];
 
   VotingListCampaignPhaseData copyWith({
     Optional<int>? activeFundNumber,

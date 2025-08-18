@@ -16,9 +16,9 @@ final class AccountPublicProfile extends Equatable {
 
   @override
   List<Object?> get props => [
-        email,
-        username,
-        status,
-        rbacRegStatus,
-      ];
+    email,
+    username,
+    status,
+    rbacRegStatus,
+  ];
 }

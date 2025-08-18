@@ -260,16 +260,18 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     WatchDocumentsEvent event,
     Emitter<DevToolsState> emit,
   ) async {
-    _documentsCountSub =
-        _documentsService.watchCount().listen((event) => add(DocumentsCountChangedEvent(event)));
+    _documentsCountSub = _documentsService.watchCount().listen(
+      (event) => add(DocumentsCountChangedEvent(event)),
+    );
   }
 
   Future<void> _handleWatchSystemInfoEvent(
     WatchSystemInfoEvent event,
     Emitter<DevToolsState> emit,
   ) async {
-    _syncStartsSub =
-        _devToolsService.watchStats().listen((event) => add(SyncStatsChangedEvent(event)));
+    _syncStartsSub = _devToolsService.watchStats().listen(
+      (event) => add(SyncStatsChangedEvent(event)),
+    );
   }
 
   void _updateDocumentsCount(

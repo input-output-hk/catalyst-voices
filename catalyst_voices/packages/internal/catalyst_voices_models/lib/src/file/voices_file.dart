@@ -13,7 +13,7 @@ class VoicesFile extends Equatable {
 
   @override
   List<Object?> get props => [
-        name,
-        bytes,
-      ];
+    name,
+    bytes,
+  ];
 }

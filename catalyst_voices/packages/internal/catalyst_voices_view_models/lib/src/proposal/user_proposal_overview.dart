@@ -60,17 +60,17 @@ final class UsersProposalOverview extends Equatable {
 
   @override
   List<Object?> get props => [
-        selfRef,
-        title,
-        updateDate,
-        fundsRequested,
-        publish,
-        versions,
-        commentsCount,
-        category,
-        categoryId,
-        fundNumber,
-      ];
+    selfRef,
+    title,
+    updateDate,
+    fundsRequested,
+    publish,
+    versions,
+    commentsCount,
+    category,
+    categoryId,
+    fundNumber,
+  ];
 
   UsersProposalOverview copyWith({
     DocumentRef? selfRef,

@@ -481,8 +481,9 @@ void main() {
         requiredSigners: requiredSigners,
       );
       final decodedTx = Transaction.fromCbor(cbor.decode(rawTx.bytes));
-      final chunkedData = (decodedTx.auxiliaryData!.map[X509MetadataEnvelope.envelopeKey]!
-          as CborMap)[const CborSmallInt(10)];
+      final chunkedData =
+          (decodedTx.auxiliaryData!.map[X509MetadataEnvelope.envelopeKey]!
+              as CborMap)[const CborSmallInt(10)];
 
       expect(chunkedData, isA<CborList>());
       expect(
@@ -724,8 +725,7 @@ class _FakeBip32Ed25519XPrivateKey extends Fake implements kd.Bip32Ed25519XPriva
   @override
   Future<R> use<R>(
     Future<R> Function(kd.Bip32Ed25519XPrivateKey privateKey) callback,
-  ) =>
-      callback(this);
+  ) => callback(this);
 
   @override
   Future<bool> verify(List<int> message, {required kd.Bip32Ed25519XSignature signature}) async {
@@ -748,8 +748,8 @@ class _FakeBip32Ed25519XPublicKey extends Fake implements kd.Bip32Ed25519XPublic
 
   @override
   kd.Ed25519PublicKey toPublicKey() => kd.Ed25519PublicKey.fromBytes(
-        bytes.take(kd.Ed25519PrivateKey.length).toList(),
-      );
+    bytes.take(kd.Ed25519PrivateKey.length).toList(),
+  );
 }
 
 class _FakeBip32Ed25519XPublicKeyFactory extends kd.Bip32Ed25519XPublicKeyFactory {

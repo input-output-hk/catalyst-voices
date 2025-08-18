@@ -91,8 +91,7 @@ enum FundsDetailCardType {
     return switch (this) {
       FundsDetailCardType.fund => l10n.campaignTreasuryDescription,
       FundsDetailCardType.category ||
-      FundsDetailCardType.categoryCompact =>
-        l10n.fundsAvailableForCategory,
+      FundsDetailCardType.categoryCompact => l10n.fundsAvailableForCategory,
     };
   }
 

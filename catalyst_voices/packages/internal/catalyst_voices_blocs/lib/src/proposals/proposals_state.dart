@@ -38,15 +38,15 @@ class ProposalsState extends Equatable {
 
   @override
   List<Object?> get props => [
-        hasSearchQuery,
-        favoritesIds,
-        count,
-        categorySelectorItems,
-        recentProposalsMaxAge,
-        isRecentProposalsEnabled,
-        orderItems,
-        isOrderEnabled,
-      ];
+    hasSearchQuery,
+    favoritesIds,
+    count,
+    categorySelectorItems,
+    recentProposalsMaxAge,
+    isRecentProposalsEnabled,
+    orderItems,
+    isOrderEnabled,
+  ];
 
   SignedDocumentRef? get selectedCategoryId {
     return categorySelectorItems.singleWhereOrNull((element) => element.isSelected)?.ref;

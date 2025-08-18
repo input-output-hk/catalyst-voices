@@ -101,8 +101,9 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
       onChanged: onChanged != null ? (value) => onChanged(_convertTextToDate(value)) : null,
       validator: _validator,
       hintText: _pattern.toUpperCase(),
-      onFieldSubmitted:
-          onFieldSubmitted != null ? (value) => onFieldSubmitted(_convertTextToDate(value)) : null,
+      onFieldSubmitted: onFieldSubmitted != null
+          ? (value) => onFieldSubmitted(_convertTextToDate(value))
+          : null,
       suffixIcon: ExcludeFocus(
         child: VoicesIconButton(
           onTap: widget.onCalendarTap,

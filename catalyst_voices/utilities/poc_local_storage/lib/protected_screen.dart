@@ -56,32 +56,32 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _certificates.isEmpty
-                      ? const Center(child: Text('No certificates stored yet.'))
-                      : ListView.builder(
-                          itemCount: _certificates.length,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              title: Text(_certificates[index]),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.info),
-                                    onPressed: () async => _showCertificateDetails(
-                                      _certificates[index],
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: () async => _deleteCertificate(
-                                      _certificates[index],
-                                    ),
-                                  ),
-                                ],
+                  ? const Center(child: Text('No certificates stored yet.'))
+                  : ListView.builder(
+                      itemCount: _certificates.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(_certificates[index]),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.info),
+                                onPressed: () async => _showCertificateDetails(
+                                  _certificates[index],
+                                ),
                               ),
-                            );
-                          },
-                        ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () async => _deleteCertificate(
+                                  _certificates[index],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),

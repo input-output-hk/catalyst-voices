@@ -72,21 +72,22 @@ class VoicesIconButton extends StatelessWidget {
       /// Default themeData configuration corresponds with this variant.
       _Variant.standard => null,
       _Variant.primary => IconButton.styleFrom(
-          foregroundColor: colors.iconsPrimary,
-        ),
+        foregroundColor: colors.iconsPrimary,
+      ),
       _Variant.filled => IconButton.styleFrom(
-          foregroundColor: colors.iconsBackground,
-          backgroundColor: colorScheme.primary,
-          disabledForegroundColor: colors.iconsDisabled,
-          disabledBackgroundColor: colors.onSurfaceNeutral012,
-        ),
+        foregroundColor: colors.iconsBackground,
+        backgroundColor: colorScheme.primary,
+        disabledForegroundColor: colors.iconsDisabled,
+        disabledBackgroundColor: colors.onSurfaceNeutral012,
+      ),
       _Variant.tonal => IconButton.styleFrom(
-          foregroundColor: colors.iconsForeground,
-          backgroundColor: colors.onSurfacePrimary012,
-          disabledForegroundColor: colors.iconsDisabled,
-          disabledBackgroundColor: colors.onSurfaceNeutral012,
-        ),
-      _Variant.outlined => IconButton.styleFrom(
+        foregroundColor: colors.iconsForeground,
+        backgroundColor: colors.onSurfacePrimary012,
+        disabledForegroundColor: colors.iconsDisabled,
+        disabledBackgroundColor: colors.onSurfaceNeutral012,
+      ),
+      _Variant.outlined =>
+        IconButton.styleFrom(
           foregroundColor: colors.iconsForeground,
           backgroundColor: Colors.transparent,
         ).copyWith(

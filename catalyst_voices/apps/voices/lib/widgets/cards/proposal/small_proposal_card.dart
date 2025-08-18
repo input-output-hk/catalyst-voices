@@ -187,8 +187,10 @@ class _WarningNewIteration extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AffixDecorator(
-      prefix:
-          VoicesAssets.icons.exclamation.buildIcon(size: 12, color: context.colors.iconsWarning),
+      prefix: VoicesAssets.icons.exclamation.buildIcon(
+        size: 12,
+        color: context.colors.iconsWarning,
+      ),
       child: Text(
         'Consider publishing this newer iteration!',
         style: context.textTheme.labelMedium?.copyWith(

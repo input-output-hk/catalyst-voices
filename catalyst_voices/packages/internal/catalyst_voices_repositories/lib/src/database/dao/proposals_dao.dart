@@ -25,7 +25,6 @@ import 'package:rxdart/rxdart.dart';
     DocumentsFavorites,
   ],
 )
-
 /// Exposes only public operation on proposals, and related tables.
 /// This is a wrapper around [DocumentsDao] and [DraftsDao] to provide a single interface for proposals.
 /// Since proposals are composed of multiple documents (template, action, comments, etc.) we need to
@@ -58,24 +57,25 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
     final verSubquery = Subquery(latestProposalsQuery, 'latestProposalRef');
 
-    final mainQuery = select(proposal).join([
-      innerJoin(
-        verSubquery,
-        Expression.and([
-          verSubquery.ref(maxVerHi).equalsExp(proposal.verHi),
-          verSubquery.ref(latestProposalRef.verLo).equalsExp(proposal.verLo),
-        ]),
-        useColumns: false,
-      ),
-    ])
-      ..where(
-        Expression.and([
-          proposal.type.equalsValue(DocumentType.proposalDocument),
-          proposal.metadata.jsonExtract(r'$.template').isNotNull(),
-          proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
-        ]),
-      )
-      ..orderBy([OrderingTerm.asc(proposal.verHi)]);
+    final mainQuery =
+        select(proposal).join([
+            innerJoin(
+              verSubquery,
+              Expression.and([
+                verSubquery.ref(maxVerHi).equalsExp(proposal.verHi),
+                verSubquery.ref(latestProposalRef.verLo).equalsExp(proposal.verLo),
+              ]),
+              useColumns: false,
+            ),
+          ])
+          ..where(
+            Expression.and([
+              proposal.type.equalsValue(DocumentType.proposalDocument),
+              proposal.metadata.jsonExtract(r'$.template').isNotNull(),
+              proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+            ]),
+          )
+          ..orderBy([OrderingTerm.asc(proposal.verHi)]);
 
     if (categoryRef != null) {
       mainQuery.where(proposal.metadata.isCategory(categoryRef));
@@ -141,26 +141,27 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
     final verSubquery = Subquery(latestProposalsQuery, 'latestProposalRef');
 
-    final mainQuery = select(proposal).join([
-      innerJoin(
-        verSubquery,
-        Expression.and([
-          verSubquery.ref(maxVerHi).equalsExp(proposal.verHi),
-          verSubquery.ref(latestProposalRef.verLo).equalsExp(proposal.verLo),
-        ]),
-        useColumns: false,
-      ),
-    ])
-      ..where(
-        Expression.and([
-          proposal.type.equalsValue(DocumentType.proposalDocument),
-          // Safe check for invalid proposals
-          proposal.metadata.jsonExtract(r'$.template').isNotNull(),
-          proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
-        ]),
-      )
-      ..orderBy(order.terms(proposal))
-      ..limit(request.size, offset: request.page * request.size);
+    final mainQuery =
+        select(proposal).join([
+            innerJoin(
+              verSubquery,
+              Expression.and([
+                verSubquery.ref(maxVerHi).equalsExp(proposal.verHi),
+                verSubquery.ref(latestProposalRef.verLo).equalsExp(proposal.verLo),
+              ]),
+              useColumns: false,
+            ),
+          ])
+          ..where(
+            Expression.and([
+              proposal.type.equalsValue(DocumentType.proposalDocument),
+              // Safe check for invalid proposals
+              proposal.metadata.jsonExtract(r'$.template').isNotNull(),
+              proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+            ]),
+          )
+          ..orderBy(order.terms(proposal))
+          ..limit(request.size, offset: request.page * request.size);
 
     final ids = await _getFilterTypeIds(filters.type);
 
@@ -225,9 +226,9 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         .get()
         .then((entities) => entities.map(_buildJoinedProposal).wait);
 
-    final total = await watchCount(filters: filters.toCountFilters())
-        .first
-        .then((count) => count.ofType(filters.type));
+    final total = await watchCount(
+      filters: filters.toCountFilters(),
+    ).first.then((count) => count.ofType(filters.type));
 
     return Page(
       page: request.page,
@@ -258,8 +259,8 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         .updatesForSync(TableUpdateQuery.onAllTables([documents, documentsFavorites]))
         .debounceTime(const Duration(milliseconds: 10))
         .asyncMap((event) {
-      return queryProposalsPage(request: request, filters: filters, order: order);
-    });
+          return queryProposalsPage(request: request, filters: filters, order: order);
+        });
   }
 
   // TODO(damian-molinski): Make this more specialized per case.
@@ -274,8 +275,9 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
     var proposalRef = proposal.metadata.selfRef;
 
-    final latestAction = await _getProposalsLatestAction(proposalId: proposalRef.id)
-        .then((value) => value.singleOrNull);
+    final latestAction = await _getProposalsLatestAction(
+      proposalId: proposalRef.id,
+    ).then((value) => value.singleOrNull);
 
     var effectiveProposal = proposal;
 
@@ -292,8 +294,12 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     final commentsCountFuture = _getProposalCommentsCount(proposalRef);
     final versionsFuture = _getProposalVersions(proposalRef.id);
 
-    final (template, action, commentsCount, versions) =
-        await (templateFuture, actionFuture, commentsCountFuture, versionsFuture).wait;
+    final (template, action, commentsCount, versions) = await (
+      templateFuture,
+      actionFuture,
+      commentsCountFuture,
+      versionsFuture,
+    ).wait;
 
     return JoinedProposalEntity(
       proposal: effectiveProposal,
@@ -305,20 +311,27 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   Future<_IdsFilter> _excludeHiddenProposalsFilter() {
-    return _getProposalsLatestAction().then((value) {
-      return value.where((e) => e.action.isHidden).map((e) => e.proposalRef.id).map(UuidHiLo.from);
-    }).then(_IdsFilter.exclude);
+    return _getProposalsLatestAction()
+        .then((value) {
+          return value
+              .where((e) => e.action.isHidden)
+              .map((e) => e.proposalRef.id)
+              .map(UuidHiLo.from);
+        })
+        .then(_IdsFilter.exclude);
   }
 
   Future<_IdsFilter> _excludeNotDraftProposalsFilter() {
-    return _getProposalsLatestAction().then(
-      (value) {
-        return value
-            .where((element) => !element.action.isDraft)
-            .map((e) => e.proposalRef.id)
-            .map(UuidHiLo.from);
-      },
-    ).then(_IdsFilter.exclude);
+    return _getProposalsLatestAction()
+        .then(
+          (value) {
+            return value
+                .where((element) => !element.action.isDraft)
+                .map((e) => e.proposalRef.id)
+                .map(UuidHiLo.from);
+          },
+        )
+        .then(_IdsFilter.exclude);
   }
 
   Future<List<SignedDocumentRef>> _getAuthorProposalsLooseRefs({
@@ -455,8 +468,9 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
           final content = row.readWithConverter(documents.content);
           final rawAction = content?.data['action'];
-          final actionDto =
-              rawAction is String ? ProposalSubmissionActionDto.fromJson(rawAction) : null;
+          final actionDto = rawAction is String
+              ? ProposalSubmissionActionDto.fromJson(rawAction)
+              : null;
           final action = actionDto?.toModel();
 
           return _ProposalActions(
@@ -559,50 +573,67 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   Future<_IdsFilter> _includeFavoriteRefsExcludingHiddenProposalsFilter() {
-    return _getFavoritesRefs().then((favoriteRefs) {
-      return _getProposalsLatestAction().then((actions) async {
-        final hiddenProposalsIds =
-            actions.where((e) => e.action.isHidden).map((e) => e.proposalRef.id);
+    return _getFavoritesRefs()
+        .then((favoriteRefs) {
+          return _getProposalsLatestAction().then((actions) async {
+            final hiddenProposalsIds = actions
+                .where((e) => e.action.isHidden)
+                .map((e) => e.proposalRef.id);
 
-        return favoriteRefs
-            .map((e) => e.id)
-            .whereNot(hiddenProposalsIds.contains)
-            .map(UuidHiLo.from);
-      });
-    }).then(_IdsFilter.include);
+            return favoriteRefs
+                .map((e) => e.id)
+                .whereNot(hiddenProposalsIds.contains)
+                .map(UuidHiLo.from);
+          });
+        })
+        .then(_IdsFilter.include);
   }
 
   Future<_IdsFilter> _includeFinalFavoriteRefsProposalsFilter() {
-    return _getFavoritesRefs().then((favoriteRefs) {
-      return _getProposalsLatestAction().then((actions) async {
-        final finalProposalIds =
-            actions.where((e) => e.action.isFinal).map((e) => e.proposalRef.id);
+    return _getFavoritesRefs()
+        .then((favoriteRefs) {
+          return _getProposalsLatestAction().then((actions) async {
+            final finalProposalIds = actions
+                .where((e) => e.action.isFinal)
+                .map((e) => e.proposalRef.id);
 
-        return favoriteRefs.map((e) => e.id).where(finalProposalIds.contains).map(UuidHiLo.from);
-      });
-    }).then(_IdsFilter.include);
+            return favoriteRefs
+                .map((e) => e.id)
+                .where(finalProposalIds.contains)
+                .map(UuidHiLo.from);
+          });
+        })
+        .then(_IdsFilter.include);
   }
 
   Future<_IdsFilter> _includeFinalProposalsFilter() {
-    return _getProposalsLatestAction().then(
-      (value) {
-        return value
-            .where((element) => element.action.isFinal)
-            .map((e) => e.proposalRef.id)
-            .map(UuidHiLo.from);
-      },
-    ).then(_IdsFilter.include);
+    return _getProposalsLatestAction()
+        .then(
+          (value) {
+            return value
+                .where((element) => element.action.isFinal)
+                .map((e) => e.proposalRef.id)
+                .map(UuidHiLo.from);
+          },
+        )
+        .then(_IdsFilter.include);
   }
 
   Future<_IdsFilter> _includeVotedRefsExcludingHiddenProposalsFilter() {
-    return _getVotedRefs().then((votedRefs) {
-      return _getProposalsLatestAction().then((actions) async {
-        final hiddenProposalsIds =
-            actions.where((e) => e.action.isHidden).map((e) => e.proposalRef.id);
+    return _getVotedRefs()
+        .then((votedRefs) {
+          return _getProposalsLatestAction().then((actions) async {
+            final hiddenProposalsIds = actions
+                .where((e) => e.action.isHidden)
+                .map((e) => e.proposalRef.id);
 
-        return votedRefs.map((e) => e.id).whereNot(hiddenProposalsIds.contains).map(UuidHiLo.from);
-      });
-    }).then(_IdsFilter.include);
+            return votedRefs
+                .map((e) => e.id)
+                .whereNot(hiddenProposalsIds.contains)
+                .map(UuidHiLo.from);
+          });
+        })
+        .then(_IdsFilter.include);
   }
 
   Future<List<SignedDocumentRef>> _maybeGetAuthorProposalsLooseRefs({
@@ -645,10 +676,12 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }) async* {
     await for (final allRefs in source) {
       final latestActions = await _getProposalsLatestAction();
-      final hiddenRefs =
-          latestActions.where((element) => element.action.isHidden).map((e) => e.proposalRef);
-      final finalsRefs =
-          latestActions.where((element) => element.action.isFinal).map((e) => e.proposalRef);
+      final hiddenRefs = latestActions
+          .where((element) => element.action.isHidden)
+          .map((e) => e.proposalRef);
+      final finalsRefs = latestActions
+          .where((element) => element.action.isFinal)
+          .map((e) => e.proposalRef);
 
       final favoritesRefs = await _getFavoritesRefs();
       final votedRefs = await _getVotedRefs();
@@ -755,23 +788,23 @@ extension on ProposalsOrder {
   List<OrderingTerm> terms($DocumentsTable table) {
     return switch (this) {
       Alphabetical() => [
-          OrderingTerm.asc(table.content.title.collate(Collate.noCase), nulls: NullsOrder.last),
-          OrderingTerm.desc(table.verHi),
-        ],
+        OrderingTerm.asc(table.content.title.collate(Collate.noCase), nulls: NullsOrder.last),
+        OrderingTerm.desc(table.verHi),
+      ],
       Budget(:final isAscending) => [
-          OrderingTerm(
-            expression: table.content.requestedFunds,
-            mode: isAscending ? OrderingMode.asc : OrderingMode.desc,
-            nulls: NullsOrder.last,
-          ),
-          OrderingTerm.desc(table.verHi),
-        ],
+        OrderingTerm(
+          expression: table.content.requestedFunds,
+          mode: isAscending ? OrderingMode.asc : OrderingMode.desc,
+          nulls: NullsOrder.last,
+        ),
+        OrderingTerm.desc(table.verHi),
+      ],
       UpdateDate(:final isAscending) => [
-          OrderingTerm(
-            expression: table.verHi,
-            mode: isAscending ? OrderingMode.asc : OrderingMode.desc,
-          ),
-        ],
+        OrderingTerm(
+          expression: table.verHi,
+          mode: isAscending ? OrderingMode.asc : OrderingMode.desc,
+        ),
+      ],
     };
   }
 }

@@ -76,16 +76,16 @@ Project Catalyst turns economic power into innovation power by using the Cardano
 
   @override
   List<Object?> get props => [
-        selfRef,
-        name,
-        description,
-        allFunds,
-        totalAsk,
-        fundNumber,
-        timeline,
-        publish,
-        categories,
-      ];
+    selfRef,
+    name,
+    description,
+    allFunds,
+    totalAsk,
+    fundNumber,
+    timeline,
+    publish,
+    categories,
+  ];
 
   DateTime? get startDate {
     final dates = timeline.phases.map((e) => e.timeline.from).nonNulls.toList()..sort();

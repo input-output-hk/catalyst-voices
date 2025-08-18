@@ -59,7 +59,8 @@ class _GlobalPrecacheImagesState extends State<GlobalPrecacheImages> {
     return FutureBuilder<void>(
       future: _precacheFuture,
       builder: (context, snapshot) {
-        final offstage = snapshot.connectionState == ConnectionState.waiting &&
+        final offstage =
+            snapshot.connectionState == ConnectionState.waiting &&
             !ImagePrecacheService.instance.isInitialized;
 
         if (offstage) {

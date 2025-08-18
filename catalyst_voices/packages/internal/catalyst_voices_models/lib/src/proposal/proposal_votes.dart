@@ -14,10 +14,10 @@ class ProposalVotes extends Equatable {
 
   @override
   List<Object?> get props => [
-        proposalRef,
-        currentDraft,
-        lastCasted,
-      ];
+    proposalRef,
+    currentDraft,
+    lastCasted,
+  ];
 
   ProposalVotes copyWith({
     DocumentRef? proposalRef,

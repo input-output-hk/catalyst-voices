@@ -10,12 +10,10 @@ class VotingCategoryPickerSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<
-        VotingCubit,
-        VotingState,
-        ({
-          int? fundNumber,
-          List<ProposalsCategorySelectorItem> items,
-        })>(
+      VotingCubit,
+      VotingState,
+      ({int? fundNumber, List<ProposalsCategorySelectorItem> items})
+    >(
       selector: (state) => (
         fundNumber: state.fundNumber,
         items: state.categorySelectorItems,

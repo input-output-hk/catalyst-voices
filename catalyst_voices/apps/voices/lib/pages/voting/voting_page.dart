@@ -71,10 +71,10 @@ class _VotingPageState extends State<VotingPage>
 
     if (widget.categoryId != oldWidget.categoryId || widget.tab != oldWidget.tab) {
       context.read<VotingCubit>().changeFilters(
-            onlyMy: Optional(tab == VotingPageTab.my),
-            category: Optional(widget.categoryId),
-            type: tab.filter,
-          );
+        onlyMy: Optional(tab == VotingPageTab.my),
+        category: Optional(widget.categoryId),
+        type: tab.filter,
+      );
 
       _doResetPagination();
     }
@@ -129,10 +129,10 @@ class _VotingPageState extends State<VotingPage>
     );
 
     context.read<VotingCubit>().init(
-          onlyMyProposals: tab == VotingPageTab.my,
-          category: widget.categoryId,
-          type: tab.filter,
-        );
+      onlyMyProposals: tab == VotingPageTab.my,
+      category: widget.categoryId,
+      type: tab.filter,
+    );
 
     _pagingController
       ..addPageRequestListener(_handleProposalsPageRequest)

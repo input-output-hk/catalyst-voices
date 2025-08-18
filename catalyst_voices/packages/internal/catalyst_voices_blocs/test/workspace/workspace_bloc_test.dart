@@ -84,8 +84,10 @@ void main() {
                 availableFunds: const Coin.fromWholeAda(1000),
                 imageUrl: '',
                 totalAsk: const Coin(0),
-                range:
-                    const ComparableRange(min: Coin.fromWholeAda(10), max: Coin.fromWholeAda(100)),
+                range: const ComparableRange(
+                  min: Coin.fromWholeAda(10),
+                  max: Coin.fromWholeAda(100),
+                ),
                 descriptions: const [],
                 dos: const [],
                 donts: const [],
@@ -136,8 +138,10 @@ void main() {
                 availableFunds: const Coin.fromWholeAda(1000),
                 imageUrl: '',
                 totalAsk: const Coin(0),
-                range:
-                    const ComparableRange(min: Coin.fromWholeAda(10), max: Coin.fromWholeAda(100)),
+                range: const ComparableRange(
+                  min: Coin.fromWholeAda(10),
+                  max: Coin.fromWholeAda(100),
+                ),
                 descriptions: const [],
                 dos: const [],
                 donts: const [],
@@ -169,8 +173,9 @@ void main() {
     blocTest<WorkspaceBloc, WorkspaceState>(
       'watch user proposals - failure',
       build: () {
-        when(() => mockProposalService.watchUserProposals())
-            .thenAnswer((_) => Stream.error(Exception('Failed to load')));
+        when(
+          () => mockProposalService.watchUserProposals(),
+        ).thenAnswer((_) => Stream.error(Exception('Failed to load')));
         return workspaceBloc;
       },
       act: (bloc) => bloc.add(const WatchUserProposalsEvent()),

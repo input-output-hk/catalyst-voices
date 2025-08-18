@@ -15,10 +15,10 @@ final class VotingListTileData extends Equatable {
 
   @override
   List<Object?> get props => [
-        category,
-        categoryText,
-        votes,
-      ];
+    category,
+    categoryText,
+    votes,
+  ];
 
   int get votesCount => votes.length;
 }
@@ -38,9 +38,9 @@ final class VotingListTileVoteData extends Equatable {
 
   @override
   List<Object?> get props => [
-        proposal,
-        proposalTitle,
-        authorName,
-        vote,
-      ];
+    proposal,
+    proposalTitle,
+    authorName,
+    vote,
+  ];
 }

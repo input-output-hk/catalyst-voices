@@ -114,8 +114,10 @@ class _Content extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16)
-          .add(const EdgeInsets.only(top: 8)),
+      padding: const EdgeInsets.symmetric(
+        vertical: 4,
+        horizontal: 16,
+      ).add(const EdgeInsets.only(top: 8)),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

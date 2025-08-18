@@ -89,7 +89,9 @@ class AccountRoleDialog extends StatelessWidget {
                             ),
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
-                          ...role.getSummary(context).map(
+                          ...role
+                              .getSummary(context)
+                              .map(
                                 _SummaryItem.new,
                               ),
                         ],

@@ -60,19 +60,19 @@ class ProposalBrief extends Equatable {
 
   @override
   List<Object?> get props => [
-        selfRef,
-        title,
-        categoryName,
-        author,
-        fundsRequested,
-        duration,
-        publish,
-        description,
-        versionNumber,
-        updateDate,
-        commentsCount,
-        isFavorite,
-      ];
+    selfRef,
+    title,
+    categoryName,
+    author,
+    fundsRequested,
+    duration,
+    publish,
+    description,
+    versionNumber,
+    updateDate,
+    commentsCount,
+    isFavorite,
+  ];
 
   ProposalBrief copyWith({
     DocumentRef? selfRef,
@@ -181,9 +181,9 @@ class ProposalBriefVoting extends ProposalBrief {
 
   @override
   List<Object?> get props => [
-        ...super.props,
-        voteData,
-      ];
+    ...super.props,
+    voteData,
+  ];
 
   @override
   ProposalBriefVoting copyWith({
