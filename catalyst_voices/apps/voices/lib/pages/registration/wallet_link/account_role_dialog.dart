@@ -21,10 +21,10 @@ class AccountRoleDialog extends StatelessWidget {
     return VoicesSinglePaneDialog(
       backgroundColor: Theme.of(context).colors.iconsBackground,
       constraints: const BoxConstraints(maxHeight: 460, maxWidth: 750),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: SingleChildScrollView(
+      child: SingleChildScrollView(
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
               const SizedBox(height: 16),
