@@ -144,11 +144,11 @@ services:
     ports:
       - "18080:18080"
       - "18090:18090"
+      - "9999:9999"
     volumes:
       - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
-      - haproxy-socket:/var/run/haproxy
     healthcheck:
-      test: [ "CMD", "sh", "-c", "echo 'show info' | socat /var/run/haproxy/haproxy.sock stdio | grep -q ^Name" ]
+      test: [ "CMD", "sh", "-c", "echo 'show info' | socat tcp:localhost:9999 stdio | grep -q ^Name" ]
       interval: 10s
       timeout: 3s
       retries: 3
