@@ -91,26 +91,31 @@ jobs:
           docker compose -f catalyst-gateway/tests/docker-compose.yml logs rust-tests-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml down
 
-      - name: Running integration API tests
-        if: false
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
-          docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
-
       - name: Running integration health tests
         if: always()
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-health-tests-runner --abort-on-container-exit --exit-code-from api-health-tests-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-health-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml down
+
+      - name: Running integration API tests
+        if: always()
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
+          docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
+          docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
+          docker compose -f catalyst-gateway/tests/docker-compose.yml down
 
       - name: Running schemathesis tests
-        if: false
+        if: always()
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml logs schemathesis-runner
+          docker cp schemathesis-runner:/results/junit-report.xml ./schemathesis${{ env.REPORT_EXT }}
 
       - name: Collecting reports
-        if: always()
+        if: false
         run: |
           docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
           docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}

@@ -22,7 +22,7 @@ class TestProxy:
     def _exec_haproxy_cmd(self, haproxy_cmd):
         """Run a HAProxy command"""
         cmd = f"echo \"{haproxy_cmd}\" | socat tcp:{self._get_host_env()}:9999 stdio"
-        result = subprocess.run(cmd, capture_output=True, text=True, shell=True, check=True)
+        result = subprocess.run(cmd, capture_output=True, text=True, shell=True, check=True, timeout=5)
         return result.stdout.strip()
 
     def enable(self):
@@ -43,5 +43,5 @@ class TestProxy:
             f"awk -v be=\"{self.backend}\" -v srv=\"{self.server}\" "
             f"'$2==be {{print $6}}'"
         )
-        result_extract_state = subprocess.run(extract_state, capture_output=True, text=True, shell=True, check=True)
+        result_extract_state = subprocess.run(extract_state, capture_output=True, text=True, shell=True, check=True, timeout=5)
         return result_extract_state.stdout.strip() == "2"
