@@ -16,21 +16,6 @@ class AccountRoleDialog extends StatelessWidget {
     super.key,
   });
 
-  static Future<void> show(
-    BuildContext context, {
-    required AccountRole role,
-  }) async {
-    return VoicesDialog.show<void>(
-      context: context,
-      routeSettings: const RouteSettings(name: '/account-role'),
-      builder: (context) {
-        return AccountRoleDialog(
-          role: role,
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return VoicesSinglePaneDialog(
@@ -115,14 +100,29 @@ class AccountRoleDialog extends StatelessWidget {
       ),
     );
   }
+
+  static Future<void> show(
+    BuildContext context, {
+    required AccountRole role,
+  }) async {
+    return VoicesDialog.show<void>(
+      context: context,
+      routeSettings: const RouteSettings(name: '/account-role'),
+      builder: (context) {
+        return AccountRoleDialog(
+          role: role,
+        );
+      },
+    );
+  }
 }
 
 class _InfoContainer extends StatelessWidget {
+  final Widget child;
+
   const _InfoContainer({
     required this.child,
   });
-
-  final Widget child;
 
   @override
   Widget build(BuildContext context) {

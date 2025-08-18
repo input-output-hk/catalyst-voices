@@ -25,6 +25,8 @@ final class ProposalBuilderBlocCache extends Equatable {
     this.isMaxProposalsLimitReached,
   });
 
+  bool get isEmailVerified => accountPublicStatus?.isVerified ?? false;
+
   @override
   List<Object?> get props => [
     activeAccountId,
@@ -37,8 +39,6 @@ final class ProposalBuilderBlocCache extends Equatable {
     accountPublicStatus,
     isMaxProposalsLimitReached,
   ];
-
-  bool get isEmailVerified => accountPublicStatus?.isVerified ?? false;
 
   ProposalBuilderBlocCache copyWith({
     Optional<CatalystId>? activeAccountId,

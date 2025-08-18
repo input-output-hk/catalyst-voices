@@ -15,12 +15,60 @@ import 'precompile_binaries.dart';
 import 'rustup.dart';
 import 'target.dart';
 
+final _log = Logger('artifacts_provider');
+
+AritifactType artifactTypeForTarget(Target target) {
+  if (target.darwinPlatform != null) {
+    return AritifactType.staticlib;
+  } else {
+    return AritifactType.dylib;
+  }
+}
+
+List<String> getArtifactNames({
+  required Target target,
+  required String libraryName,
+  required bool remote,
+  AritifactType? aritifactType,
+}) {
+  aritifactType ??= artifactTypeForTarget(target);
+  if (target.darwinArch != null) {
+    if (aritifactType == AritifactType.staticlib) {
+      return ['lib$libraryName.a'];
+    } else {
+      return ['lib$libraryName.dylib'];
+    }
+  } else if (target.rust.contains('-windows-')) {
+    if (aritifactType == AritifactType.staticlib) {
+      return ['$libraryName.lib'];
+    } else {
+      return [
+        '$libraryName.dll',
+        '$libraryName.dll.lib',
+        if (!remote) '$libraryName.pdb',
+      ];
+    }
+  } else if (target.rust.contains('-linux-')) {
+    if (aritifactType == AritifactType.staticlib) {
+      return ['lib$libraryName.a'];
+    } else {
+      return ['lib$libraryName.so'];
+    }
+  } else {
+    throw Exception("Unsupported target: ${target.rust}");
+  }
+}
+
+enum AritifactType { staticlib, dylib }
+
 class Artifact {
   /// File system location of the artifact.
   final String path;
 
   /// Actual file name that the artifact should have in destination folder.
   final String finalFileName;
+
+  Artifact({required this.path, required this.finalFileName});
 
   AritifactType get type {
     if (finalFileName.endsWith('.dll') ||
@@ -35,17 +83,13 @@ class Artifact {
       throw Exception('Unknown artifact type for $finalFileName');
     }
   }
-
-  Artifact({required this.path, required this.finalFileName});
 }
 
-final _log = Logger('artifacts_provider');
-
 class ArtifactProvider {
-  ArtifactProvider({required this.environment, required this.userOptions});
-
   final BuildEnvironment environment;
+
   final CargokitUserOptions userOptions;
+  ArtifactProvider({required this.environment, required this.userOptions});
 
   Future<Map<Target, List<Artifact>>> getArtifacts(List<Target> targets) async {
     final result = await _getPrecompiledArtifacts(targets);
@@ -164,28 +208,6 @@ class ArtifactProvider {
     return res;
   }
 
-  static Future<Response> _get(Uri url, {Map<String, String>? headers}) async {
-    int attempt = 0;
-    const maxAttempts = 10;
-    while (true) {
-      try {
-        return await get(url, headers: headers);
-      } on SocketException catch (e) {
-        // Try to detect reset by peer error and retry.
-        if (attempt++ < maxAttempts &&
-            (e.osError?.errorCode == 54 || e.osError?.errorCode == 10054)) {
-          _log.severe(
-            'Failed to download $url: $e, attempt $attempt of $maxAttempts, will retry...',
-          );
-          await Future.delayed(Duration(seconds: 1));
-          continue;
-        } else {
-          rethrow;
-        }
-      }
-    }
-  }
-
   Future<void> _tryDownloadArtifacts({
     required String crateHash,
     required String fileName,
@@ -226,48 +248,26 @@ class ArtifactProvider {
       _log.shout('Signature verification failed! Ignoring binary.');
     }
   }
-}
 
-enum AritifactType { staticlib, dylib }
-
-AritifactType artifactTypeForTarget(Target target) {
-  if (target.darwinPlatform != null) {
-    return AritifactType.staticlib;
-  } else {
-    return AritifactType.dylib;
-  }
-}
-
-List<String> getArtifactNames({
-  required Target target,
-  required String libraryName,
-  required bool remote,
-  AritifactType? aritifactType,
-}) {
-  aritifactType ??= artifactTypeForTarget(target);
-  if (target.darwinArch != null) {
-    if (aritifactType == AritifactType.staticlib) {
-      return ['lib$libraryName.a'];
-    } else {
-      return ['lib$libraryName.dylib'];
+  static Future<Response> _get(Uri url, {Map<String, String>? headers}) async {
+    int attempt = 0;
+    const maxAttempts = 10;
+    while (true) {
+      try {
+        return await get(url, headers: headers);
+      } on SocketException catch (e) {
+        // Try to detect reset by peer error and retry.
+        if (attempt++ < maxAttempts &&
+            (e.osError?.errorCode == 54 || e.osError?.errorCode == 10054)) {
+          _log.severe(
+            'Failed to download $url: $e, attempt $attempt of $maxAttempts, will retry...',
+          );
+          await Future.delayed(Duration(seconds: 1));
+          continue;
+        } else {
+          rethrow;
+        }
+      }
     }
-  } else if (target.rust.contains('-windows-')) {
-    if (aritifactType == AritifactType.staticlib) {
-      return ['$libraryName.lib'];
-    } else {
-      return [
-        '$libraryName.dll',
-        '$libraryName.dll.lib',
-        if (!remote) '$libraryName.pdb',
-      ];
-    }
-  } else if (target.rust.contains('-linux-')) {
-    if (aritifactType == AritifactType.staticlib) {
-      return ['lib$libraryName.a'];
-    } else {
-      return ['lib$libraryName.so'];
-    }
-  } else {
-    throw Exception("Unsupported target: ${target.rust}");
   }
 }

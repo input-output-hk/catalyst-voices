@@ -30,6 +30,16 @@ class _PlaceholderRichTextState extends State<PlaceholderRichText> {
   List<InlineSpan> _spans = [];
 
   @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      key: const Key('PlaceholderRichText'),
+      TextSpan(children: _spans),
+      textAlign: widget.textAlign,
+      style: widget.style,
+    );
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
@@ -44,16 +54,6 @@ class _PlaceholderRichTextState extends State<PlaceholderRichText> {
     if (widget.text != oldWidget.text) {
       _spans = _calculateSpans();
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Text.rich(
-      key: const Key('PlaceholderRichText'),
-      TextSpan(children: _spans),
-      textAlign: widget.textAlign,
-      style: widget.style,
-    );
   }
 
   List<InlineSpan> _calculateSpans() {

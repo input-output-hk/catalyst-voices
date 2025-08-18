@@ -9,6 +9,12 @@ final class ReceiveEmails extends Equatable {
     this.isEnabled = false,
   });
 
+  @override
+  List<Object?> get props => [
+    isAccepted,
+    isEnabled,
+  ];
+
   ReceiveEmails copyWith({
     bool? isAccepted,
     bool? isEnabled,
@@ -18,10 +24,4 @@ final class ReceiveEmails extends Equatable {
       isEnabled: isEnabled ?? this.isEnabled,
     );
   }
-
-  @override
-  List<Object?> get props => [
-    isAccepted,
-    isEnabled,
-  ];
 }

@@ -10,6 +10,12 @@ final class KeychainStateData extends Equatable {
     this.unlockPasswordState = const UnlockPasswordState(),
   });
 
+  @override
+  List<Object?> get props => [
+    seedPhraseStateData,
+    unlockPasswordState,
+  ];
+
   KeychainStateData copyWith({
     SeedPhraseStateData? seedPhraseStateData,
     UnlockPasswordState? unlockPasswordState,
@@ -19,10 +25,4 @@ final class KeychainStateData extends Equatable {
       unlockPasswordState: unlockPasswordState ?? this.unlockPasswordState,
     );
   }
-
-  @override
-  List<Object?> get props => [
-    seedPhraseStateData,
-    unlockPasswordState,
-  ];
 }

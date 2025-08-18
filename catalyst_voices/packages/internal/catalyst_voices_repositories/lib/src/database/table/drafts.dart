@@ -16,9 +16,6 @@ import 'package:drift/drift.dart';
 @TableIndex(name: 'idx_draft_type', columns: {#type})
 @DataClassName('DocumentDraftEntity')
 class Drafts extends Table with IdHiLoTableMixin, VerHiLoTableMixin, DocumentTableMixin {
-  /// not encrypted title for search
-  TextColumn get title => text()();
-
   @override
   Set<Column<Object>>? get primaryKey => {
     idHi,
@@ -26,4 +23,7 @@ class Drafts extends Table with IdHiLoTableMixin, VerHiLoTableMixin, DocumentTab
     verHi,
     verLo,
   };
+
+  /// not encrypted title for search
+  TextColumn get title => text()();
 }

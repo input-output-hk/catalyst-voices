@@ -10,22 +10,13 @@ import 'discovery/how_it_works_section_page.dart';
 import 'discovery/most_recent_section.dart';
 
 class DiscoveryPage {
-  DiscoveryPage(this.$);
   late PatrolTester $;
-
   final errorRetryBtn = const Key('ErrorRetryBtn');
 
-  Future<void> looksAsExpectedForVisitor() async {
-    await AppBarPage($).looksAsExpectedForVisitor();
-    await CampaignHeroSection($).looksAsExpectedForVisitor();
-    await HowItWorksSection($).looksAsExpectedForVisitor();
-    await CurrentCampaignSection($).looksAsExpectedForVisitor();
-    await CampaignCategoriesSection($).looksAsExpectedForVisitor();
-    await MostRecentSection($).looksAsExpectedForVisitor();
-  }
+  DiscoveryPage(this.$);
 
-  Future<void> viewProposalsBtnClick() async {
-    await $(CampaignHeroSection($).viewProposalsButton).tap();
+  Future<void> loadingErrorClick(Key errorSelector) async {
+    await $(errorSelector).$(errorRetryBtn).tap();
   }
 
   Future<bool> loadingErrorIsVisible(Key errorSelector) async {
@@ -38,10 +29,6 @@ class DiscoveryPage {
     } catch (e) {
       return false;
     }
-  }
-
-  Future<void> loadingErrorClick(Key errorSelector) async {
-    await $(errorSelector).$(errorRetryBtn).tap();
   }
 
   Future<void> loadRetryOnError(Key errorSelector) async {
@@ -57,5 +44,18 @@ class DiscoveryPage {
         }
       }
     }
+  }
+
+  Future<void> looksAsExpectedForVisitor() async {
+    await AppBarPage($).looksAsExpectedForVisitor();
+    await CampaignHeroSection($).looksAsExpectedForVisitor();
+    await HowItWorksSection($).looksAsExpectedForVisitor();
+    await CurrentCampaignSection($).looksAsExpectedForVisitor();
+    await CampaignCategoriesSection($).looksAsExpectedForVisitor();
+    await MostRecentSection($).looksAsExpectedForVisitor();
+  }
+
+  Future<void> viewProposalsBtnClick() async {
+    await $(CampaignHeroSection($).viewProposalsButton).tap();
   }
 }

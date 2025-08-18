@@ -1,7 +1,18 @@
 import 'package:catalyst_voices_view_models/src/campaign/campaign_category_section.dart';
 import 'package:equatable/equatable.dart';
 
-sealed class CampaignListItem extends Equatable {}
+final class CampaignCategoriesListItem extends CampaignListItem {
+  final List<CampaignCategorySection> sections;
+
+  CampaignCategoriesListItem({
+    required this.sections,
+  });
+
+  @override
+  List<Object?> get props => [
+    sections,
+  ];
+}
 
 final class CampaignDetailsListItem extends CampaignListItem {
   final String description;
@@ -28,15 +39,4 @@ final class CampaignDetailsListItem extends CampaignListItem {
   ];
 }
 
-final class CampaignCategoriesListItem extends CampaignListItem {
-  final List<CampaignCategorySection> sections;
-
-  CampaignCategoriesListItem({
-    required this.sections,
-  });
-
-  @override
-  List<Object?> get props => [
-    sections,
-  ];
-}
+sealed class CampaignListItem extends Equatable {}

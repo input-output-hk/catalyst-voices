@@ -7,10 +7,6 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
-final class VoicesDateFieldController extends ValueNotifier<DateTime?> {
-  VoicesDateFieldController([super._value]);
-}
-
 class VoicesDateField extends StatefulWidget {
   final VoicesDateFieldController? controller;
   final ValueChanged<DateTime?>? onChanged;
@@ -33,6 +29,10 @@ class VoicesDateField extends StatefulWidget {
   State<VoicesDateField> createState() => _VoicesDateFieldState();
 }
 
+final class VoicesDateFieldController extends ValueNotifier<DateTime?> {
+  VoicesDateFieldController([super._value]);
+}
+
 class _VoicesDateFieldState extends State<VoicesDateField> {
   late final TextEditingController _textEditingController;
   late final MaskTextInputFormatter dateFormatter;
@@ -44,52 +44,6 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
   }
 
   String get _pattern => 'dd/MM/yyyy';
-
-  @override
-  void initState() {
-    final initialDate = _effectiveController.value;
-    final initialText = _convertDateToText(initialDate);
-    final textValue = TextEditingValueExt.collapsedAtEndOf(initialText);
-
-    _textEditingController = TextEditingController.fromValue(textValue)
-      ..addListener(_handleTextChanged);
-
-    _effectiveController.addListener(_handleDateChanged);
-
-    dateFormatter = MaskTextInputFormatter(
-      mask: _pattern,
-      filter: {
-        'd': RegExp('[0-9]'),
-        'M': RegExp('[0-9]'),
-        'y': RegExp('[0-9]'),
-      },
-      type: MaskAutoCompletionType.eager,
-    );
-
-    super.initState();
-  }
-
-  @override
-  void didUpdateWidget(VoicesDateField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.controller != oldWidget.controller) {
-      (oldWidget.controller ?? _controller)?.removeListener(_handleDateChanged);
-      (widget.controller ?? _controller)?.addListener(_handleDateChanged);
-
-      final date = _effectiveController.value;
-      _textEditingController.textWithSelection = _convertDateToText(date);
-    }
-  }
-
-  @override
-  void dispose() {
-    _textEditingController.dispose();
-
-    _controller?.dispose();
-    _controller = null;
-
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,18 +70,50 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
     );
   }
 
-  void _handleTextChanged() {
-    final date = _convertTextToDate(_textEditingController.text);
-    if (_effectiveController.value != date) {
-      _effectiveController.value = date;
+  @override
+  void didUpdateWidget(VoicesDateField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.controller != oldWidget.controller) {
+      (oldWidget.controller ?? _controller)?.removeListener(_handleDateChanged);
+      (widget.controller ?? _controller)?.addListener(_handleDateChanged);
+
+      final date = _effectiveController.value;
+      _textEditingController.textWithSelection = _convertDateToText(date);
     }
   }
 
-  void _handleDateChanged() {
-    final text = _convertDateToText(_effectiveController.value);
-    if (_textEditingController.text != text) {
-      _textEditingController.textWithSelection = text;
-    }
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+
+    _controller?.dispose();
+    _controller = null;
+
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    final initialDate = _effectiveController.value;
+    final initialText = _convertDateToText(initialDate);
+    final textValue = TextEditingValueExt.collapsedAtEndOf(initialText);
+
+    _textEditingController = TextEditingController.fromValue(textValue)
+      ..addListener(_handleTextChanged);
+
+    _effectiveController.addListener(_handleDateChanged);
+
+    dateFormatter = MaskTextInputFormatter(
+      mask: _pattern,
+      filter: {
+        'd': RegExp('[0-9]'),
+        'M': RegExp('[0-9]'),
+        'y': RegExp('[0-9]'),
+      },
+      type: MaskAutoCompletionType.eager,
+    );
+
+    super.initState();
   }
 
   String _convertDateToText(DateTime? value) {
@@ -159,6 +145,20 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
       return formatDt;
     } catch (e) {
       return null;
+    }
+  }
+
+  void _handleDateChanged() {
+    final text = _convertDateToText(_effectiveController.value);
+    if (_textEditingController.text != text) {
+      _textEditingController.textWithSelection = text;
+    }
+  }
+
+  void _handleTextChanged() {
+    final date = _convertTextToDate(_textEditingController.text);
+    if (_effectiveController.value != date) {
+      _effectiveController.value = date;
     }
   }
 

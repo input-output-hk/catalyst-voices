@@ -14,9 +14,9 @@ import 'precompile_binaries.dart';
 import 'target.dart';
 
 class VerifyBinaries {
-  VerifyBinaries({required this.manifestDir});
-
   final String manifestDir;
+
+  VerifyBinaries({required this.manifestDir});
 
   Future<void> run() async {
     final crateInfo = CrateInfo.load(manifestDir);

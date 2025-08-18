@@ -104,6 +104,15 @@ class CatalystSvgIcon extends StatelessWidget {
          theme: theme,
        );
 
+  ColorFilter? get _colorFilter {
+    return colorFilter ?? _colorFilterFromColor;
+  }
+
+  ColorFilter? get _colorFilterFromColor {
+    final color = this.color;
+    return color == null ? null : ColorFilter.mode(color, BlendMode.srcIn);
+  }
+
   @override
   Widget build(BuildContext context) {
     final effectiveSize = allowSize ? size ?? IconTheme.of(context).size : null;
@@ -125,15 +134,6 @@ class CatalystSvgIcon extends StatelessWidget {
       excludeFromSemantics: excludeFromSemantics,
       clipBehavior: clipBehavior,
     );
-  }
-
-  ColorFilter? get _colorFilter {
-    return colorFilter ?? _colorFilterFromColor;
-  }
-
-  ColorFilter? get _colorFilterFromColor {
-    final color = this.color;
-    return color == null ? null : ColorFilter.mode(color, BlendMode.srcIn);
   }
 }
 

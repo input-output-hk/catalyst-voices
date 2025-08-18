@@ -21,6 +21,17 @@ final class UnlockPasswordState extends Equatable {
     this.isNextEnabled = false,
   });
 
+  @override
+  List<Object?> get props => [
+    password,
+    confirmPassword,
+    passwordStrength,
+    showPasswordStrength,
+    minPasswordLength,
+    showPasswordMisMatch,
+    isNextEnabled,
+  ];
+
   UnlockPasswordState copyWith({
     UnlockPassword? password,
     UnlockPassword? confirmPassword,
@@ -40,15 +51,4 @@ final class UnlockPasswordState extends Equatable {
       isNextEnabled: isNextEnabled ?? this.isNextEnabled,
     );
   }
-
-  @override
-  List<Object?> get props => [
-    password,
-    confirmPassword,
-    passwordStrength,
-    showPasswordStrength,
-    minPasswordLength,
-    showPasswordMisMatch,
-    isNextEnabled,
-  ];
 }

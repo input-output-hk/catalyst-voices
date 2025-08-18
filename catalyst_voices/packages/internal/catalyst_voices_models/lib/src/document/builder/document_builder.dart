@@ -23,6 +23,14 @@ final class DocumentBuilder {
   }) : _schema = schema,
        _properties = properties;
 
+  /// Creates a [DocumentBuilder] from existing [document].
+  factory DocumentBuilder.fromDocument(Document document) {
+    return DocumentBuilder(
+      schema: document.schema,
+      properties: document.properties.map(DocumentPropertyBuilder.fromProperty).toList(),
+    );
+  }
+
   /// Creates an empty [DocumentBuilder] from a [schema].
   factory DocumentBuilder.fromSchema({
     required DocumentSchema schema,
@@ -33,12 +41,10 @@ final class DocumentBuilder {
     );
   }
 
-  /// Creates a [DocumentBuilder] from existing [document].
-  factory DocumentBuilder.fromDocument(Document document) {
-    return DocumentBuilder(
-      schema: document.schema,
-      properties: document.properties.map(DocumentPropertyBuilder.fromProperty).toList(),
-    );
+  /// Applies a [change] on this instance of the builder
+  /// without creating a copy.
+  void addChange(DocumentChange change) {
+    _properties.findTargetFor(change).addChange(change);
   }
 
   /// Applies [changes] in FIFO manner on this builder.
@@ -46,12 +52,6 @@ final class DocumentBuilder {
     for (final change in changes) {
       addChange(change);
     }
-  }
-
-  /// Applies a [change] on this instance of the builder
-  /// without creating a copy.
-  void addChange(DocumentChange change) {
-    _properties.findTargetFor(change).addChange(change);
   }
 
   /// Builds an immutable [Document].
@@ -63,50 +63,6 @@ final class DocumentBuilder {
       properties: List.unmodifiable(mappedProperties),
     );
   }
-}
-
-/// A builder for a single [DocumentProperty].
-sealed class DocumentPropertyBuilder implements DocumentNode {
-  /// The default constructor for the [DocumentPropertyBuilder].
-  const DocumentPropertyBuilder();
-
-  /// Creates a [DocumentPropertyBuilder] from a [schema].
-  factory DocumentPropertyBuilder.fromSchema(
-    DocumentPropertySchema schema,
-  ) {
-    switch (schema) {
-      case DocumentListSchema():
-        return DocumentListPropertyBuilder.fromSchema(schema);
-      case DocumentObjectSchema():
-        return DocumentObjectPropertyBuilder.fromSchema(schema);
-      case DocumentValueSchema():
-        return DocumentValuePropertyBuilder.fromSchema(schema);
-    }
-  }
-
-  /// Creates a [DocumentPropertyBuilder] from a [property].
-  factory DocumentPropertyBuilder.fromProperty(DocumentProperty property) {
-    switch (property) {
-      case DocumentListProperty():
-        return DocumentListPropertyBuilder.fromProperty(property);
-      case DocumentObjectProperty():
-        return DocumentObjectPropertyBuilder.fromProperty(property);
-      case DocumentValueProperty():
-        return DocumentValuePropertyBuilder.fromProperty(property);
-    }
-  }
-
-  /// Returns the schema assigned to this property.
-  DocumentPropertySchema get schema;
-
-  /// Updates the property schema.
-  set schema(DocumentPropertySchema schema);
-
-  /// Applies a change on this builder or any child builder.
-  void addChange(DocumentChange change);
-
-  /// Builds an immutable [DocumentProperty].
-  DocumentProperty build();
 }
 
 /// A [DocumentProperty] builder suited to work with [DocumentListProperty].
@@ -124,16 +80,6 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
   }) : _schema = schema,
        _properties = properties;
 
-  /// Creates a [DocumentListPropertyBuilder] from a [schema].
-  factory DocumentListPropertyBuilder.fromSchema(
-    DocumentListSchema schema,
-  ) {
-    return DocumentListPropertyBuilder(
-      schema: schema,
-      properties: [],
-    );
-  }
-
   /// Creates a [DocumentListPropertyBuilder] from existing [property].
   factory DocumentListPropertyBuilder.fromProperty(
     DocumentListProperty property,
@@ -141,6 +87,16 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
     return DocumentListPropertyBuilder(
       schema: property.schema,
       properties: property.properties.map(DocumentPropertyBuilder.fromProperty).toList(),
+    );
+  }
+
+  /// Creates a [DocumentListPropertyBuilder] from a [schema].
+  factory DocumentListPropertyBuilder.fromSchema(
+    DocumentListSchema schema,
+  ) {
+    return DocumentListPropertyBuilder(
+      schema: schema,
+      properties: [],
     );
   }
 
@@ -175,10 +131,6 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
     return _schema.buildProperty(
       properties: List.unmodifiable(mappedProperties),
     );
-  }
-
-  void _handleValueChange(DocumentValueChange change) {
-    _properties.findTargetFor(change).addChange(change);
   }
 
   void _handleAddListItemChange(DocumentAddListItemChange change) {
@@ -218,6 +170,10 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
     _properties.findTargetFor(change).addChange(change);
   }
 
+  void _handleValueChange(DocumentValueChange change) {
+    _properties.findTargetFor(change).addChange(change);
+  }
+
   /// Children in a list have titles that are built
   /// from [DocumentListSchema.itemsSchema] title.
   ///
@@ -254,6 +210,16 @@ final class DocumentObjectPropertyBuilder extends DocumentPropertyBuilder {
   }) : _schema = schema,
        _properties = properties;
 
+  /// Creates a [DocumentObjectPropertyBuilder] from existing [property].
+  factory DocumentObjectPropertyBuilder.fromProperty(
+    DocumentObjectProperty property,
+  ) {
+    return DocumentObjectPropertyBuilder(
+      schema: property.schema,
+      properties: property.properties.map(DocumentPropertyBuilder.fromProperty).toList(),
+    );
+  }
+
   /// Creates a [DocumentObjectPropertyBuilder] from a [schema].
   factory DocumentObjectPropertyBuilder.fromSchema(
     DocumentObjectSchema schema,
@@ -262,16 +228,6 @@ final class DocumentObjectPropertyBuilder extends DocumentPropertyBuilder {
     return DocumentObjectPropertyBuilder(
       schema: schema,
       properties: properties.map(DocumentPropertyBuilder.fromSchema).toList(),
-    );
-  }
-
-  /// Creates a [DocumentObjectPropertyBuilder] from existing [property].
-  factory DocumentObjectPropertyBuilder.fromProperty(
-    DocumentObjectProperty property,
-  ) {
-    return DocumentObjectPropertyBuilder(
-      schema: property.schema,
-      properties: property.properties.map(DocumentPropertyBuilder.fromProperty).toList(),
     );
   }
 
@@ -302,6 +258,50 @@ final class DocumentObjectPropertyBuilder extends DocumentPropertyBuilder {
   }
 }
 
+/// A builder for a single [DocumentProperty].
+sealed class DocumentPropertyBuilder implements DocumentNode {
+  /// The default constructor for the [DocumentPropertyBuilder].
+  const DocumentPropertyBuilder();
+
+  /// Creates a [DocumentPropertyBuilder] from a [property].
+  factory DocumentPropertyBuilder.fromProperty(DocumentProperty property) {
+    switch (property) {
+      case DocumentListProperty():
+        return DocumentListPropertyBuilder.fromProperty(property);
+      case DocumentObjectProperty():
+        return DocumentObjectPropertyBuilder.fromProperty(property);
+      case DocumentValueProperty():
+        return DocumentValuePropertyBuilder.fromProperty(property);
+    }
+  }
+
+  /// Creates a [DocumentPropertyBuilder] from a [schema].
+  factory DocumentPropertyBuilder.fromSchema(
+    DocumentPropertySchema schema,
+  ) {
+    switch (schema) {
+      case DocumentListSchema():
+        return DocumentListPropertyBuilder.fromSchema(schema);
+      case DocumentObjectSchema():
+        return DocumentObjectPropertyBuilder.fromSchema(schema);
+      case DocumentValueSchema():
+        return DocumentValuePropertyBuilder.fromSchema(schema);
+    }
+  }
+
+  /// Returns the schema assigned to this property.
+  DocumentPropertySchema get schema;
+
+  /// Updates the property schema.
+  set schema(DocumentPropertySchema schema);
+
+  /// Applies a change on this builder or any child builder.
+  void addChange(DocumentChange change);
+
+  /// Builds an immutable [DocumentProperty].
+  DocumentProperty build();
+}
+
 /// A [DocumentProperty] builder suited to work with [DocumentValueProperty].
 final class DocumentValuePropertyBuilder<T extends Object> extends DocumentPropertyBuilder {
   /// The schema of the document property.
@@ -317,16 +317,6 @@ final class DocumentValuePropertyBuilder<T extends Object> extends DocumentPrope
   }) : _schema = schema,
        _value = value;
 
-  /// Creates a [DocumentValuePropertyBuilder] from a [schema].
-  factory DocumentValuePropertyBuilder.fromSchema(
-    DocumentValueSchema<T> schema,
-  ) {
-    return DocumentValuePropertyBuilder(
-      schema: schema,
-      value: schema.defaultValue,
-    );
-  }
-
   /// Creates a [DocumentValuePropertyBuilder] from existing [property].
   factory DocumentValuePropertyBuilder.fromProperty(
     DocumentValueProperty<T> property,
@@ -334,6 +324,16 @@ final class DocumentValuePropertyBuilder<T extends Object> extends DocumentPrope
     return DocumentValuePropertyBuilder(
       schema: property.schema,
       value: property.value,
+    );
+  }
+
+  /// Creates a [DocumentValuePropertyBuilder] from a [schema].
+  factory DocumentValuePropertyBuilder.fromSchema(
+    DocumentValueSchema<T> schema,
+  ) {
+    return DocumentValuePropertyBuilder(
+      schema: schema,
+      value: schema.defaultValue,
     );
   }
 

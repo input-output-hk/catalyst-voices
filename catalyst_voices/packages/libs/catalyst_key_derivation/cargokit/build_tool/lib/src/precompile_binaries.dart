@@ -19,6 +19,16 @@ import 'target.dart';
 final _log = Logger('precompile_binaries');
 
 class PrecompileBinaries {
+  final PrivateKey privateKey;
+
+  final String githubToken;
+  final RepositorySlug repositorySlug;
+  final String manifestDir;
+  final List<Target> targets;
+  final String? androidSdkLocation;
+  final String? androidNdkVersion;
+  final int? androidMinSdkVersion;
+  final String? tempDir;
   PrecompileBinaries({
     required this.privateKey,
     required this.githubToken,
@@ -30,24 +40,6 @@ class PrecompileBinaries {
     this.androidMinSdkVersion,
     this.tempDir,
   });
-
-  final PrivateKey privateKey;
-  final String githubToken;
-  final RepositorySlug repositorySlug;
-  final String manifestDir;
-  final List<Target> targets;
-  final String? androidSdkLocation;
-  final String? androidNdkVersion;
-  final int? androidMinSdkVersion;
-  final String? tempDir;
-
-  static String fileName(Target target, String name) {
-    return '${target.rust}_$name';
-  }
-
-  static String signatureFileName(Target target, String name) {
-    return '${target.rust}_$name.sig';
-  }
 
   Future<void> run() async {
     final crateInfo = CrateInfo.load(manifestDir);
@@ -201,5 +193,13 @@ class PrecompileBinaries {
       );
     }
     return release;
+  }
+
+  static String fileName(Target target, String name) {
+    return '${target.rust}_$name';
+  }
+
+  static String signatureFileName(Target target, String name) {
+    return '${target.rust}_$name.sig';
   }
 }

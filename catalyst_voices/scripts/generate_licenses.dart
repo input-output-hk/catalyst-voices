@@ -31,7 +31,8 @@ Future<void> main(List<String> args) async {
     final license = _replaceSpecialCharacters(entry.license ?? '');
     final description = _replaceSpecialCharacters(entry.description);
     final authors = _replaceSpecialCharacters(entry.authors.join(' | '));
-    outputSink.writeln('\n${name}${_sep}${description}${_sep}${authors}${_sep}${license}');
+    outputSink.writeln(
+        '\n${name}${_sep}${description}${_sep}${authors}${_sep}${license}');
   }
 
   await outputSink.flush();

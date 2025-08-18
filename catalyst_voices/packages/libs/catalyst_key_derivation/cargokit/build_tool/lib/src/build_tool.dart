@@ -22,9 +22,60 @@ import 'verify_binaries.dart';
 
 final log = Logger('build_tool');
 
-abstract class BuildCommand extends Command {
-  Future<void> runBuildCommand(CargokitUserOptions options);
+Future<void> runMain(List<String> args) async {
+  try {
+    // Init logging before options are loaded
+    initLogging();
 
+    if (Platform.environment['_CARGOKIT_NDK_LINK_TARGET'] != null) {
+      return AndroidEnvironment.clangLinkerWrapper(args);
+    }
+
+    final runner = CommandRunner('build_tool', 'Cargokit built_tool')
+      ..addCommand(BuildPodCommand())
+      ..addCommand(BuildGradleCommand())
+      ..addCommand(BuildCMakeCommand())
+      ..addCommand(GenKeyCommand())
+      ..addCommand(PrecompileBinariesCommand())
+      ..addCommand(VerifyBinariesCommand());
+
+    await runner.run(args);
+  } on ArgumentError catch (e) {
+    stderr.writeln(e.toString());
+    exit(1);
+  } catch (e, s) {
+    log.severe(kDoubleSeparator);
+    log.severe('Cargokit BuildTool failed with error:');
+    log.severe(kSeparator);
+    log.severe(e);
+    // This tells user to install Rust, there's no need to pollute the log with
+    // stack trace.
+    if (e is! RustupNotFoundException) {
+      log.severe(kSeparator);
+      log.severe(s);
+      log.severe(kSeparator);
+      log.severe('BuildTool arguments: $args');
+    }
+    log.severe(kDoubleSeparator);
+    exit(1);
+  }
+}
+
+class BuildCMakeCommand extends BuildCommand {
+  @override
+  final name = 'build-cmake';
+
+  @override
+  final description = 'Build CMake library';
+
+  @override
+  Future<void> runBuildCommand(CargokitUserOptions options) async {
+    final build = BuildCMake(userOptions: options);
+    await build.build();
+  }
+}
+
+abstract class BuildCommand extends Command {
   @override
   Future<void> run() async {
     final options = CargokitUserOptions.load();
@@ -36,20 +87,8 @@ abstract class BuildCommand extends Command {
 
     await runBuildCommand(options);
   }
-}
 
-class BuildPodCommand extends BuildCommand {
-  @override
-  final name = 'build-pod';
-
-  @override
-  final description = 'Build cocoa pod library';
-
-  @override
-  Future<void> runBuildCommand(CargokitUserOptions options) async {
-    final build = BuildPod(userOptions: options);
-    await build.build();
-  }
+  Future<void> runBuildCommand(CargokitUserOptions options);
 }
 
 class BuildGradleCommand extends BuildCommand {
@@ -66,16 +105,16 @@ class BuildGradleCommand extends BuildCommand {
   }
 }
 
-class BuildCMakeCommand extends BuildCommand {
+class BuildPodCommand extends BuildCommand {
   @override
-  final name = 'build-cmake';
+  final name = 'build-pod';
 
   @override
-  final description = 'Build CMake library';
+  final description = 'Build cocoa pod library';
 
   @override
   Future<void> runBuildCommand(CargokitUserOptions options) async {
-    final build = BuildCMake(userOptions: options);
+    final build = BuildPod(userOptions: options);
     await build.build();
   }
 }
@@ -98,6 +137,16 @@ class GenKeyCommand extends Command {
 }
 
 class PrecompileBinariesCommand extends Command {
+  @override
+  final name = 'precompile-binaries';
+
+  @override
+  final description =
+      'Prebuild and upload binaries\n'
+      'Private key must be passed through PRIVATE_KEY environment variable. '
+      'Use gen_key through generate priave key.\n'
+      'Github token must be passed as GITHUB_TOKEN environment variable.\n';
+
   PrecompileBinariesCommand() {
     argParser
       ..addOption(
@@ -140,16 +189,6 @@ class PrecompileBinariesCommand extends Command {
         help: "Enable verbose logging",
       );
   }
-
-  @override
-  final name = 'precompile-binaries';
-
-  @override
-  final description =
-      'Prebuild and upload binaries\n'
-      'Private key must be passed through PRIVATE_KEY environment variable. '
-      'Use gen_key through generate priave key.\n'
-      'Github token must be passed as GITHUB_TOKEN environment variable.\n';
 
   @override
   Future<void> run() async {
@@ -212,14 +251,6 @@ class PrecompileBinariesCommand extends Command {
 }
 
 class VerifyBinariesCommand extends Command {
-  VerifyBinariesCommand() {
-    argParser.addOption(
-      'manifest-dir',
-      mandatory: true,
-      help: 'Directory containing Cargo.toml',
-    );
-  }
-
   @override
   final name = "verify-binaries";
 
@@ -229,49 +260,18 @@ class VerifyBinariesCommand extends Command {
       'Checks whether there is a binary published for each targets\n'
       'and checks the signature.';
 
+  VerifyBinariesCommand() {
+    argParser.addOption(
+      'manifest-dir',
+      mandatory: true,
+      help: 'Directory containing Cargo.toml',
+    );
+  }
+
   @override
   Future<void> run() async {
     final manifestDir = argResults!['manifest-dir'] as String;
     final verifyBinaries = VerifyBinaries(manifestDir: manifestDir);
     await verifyBinaries.run();
-  }
-}
-
-Future<void> runMain(List<String> args) async {
-  try {
-    // Init logging before options are loaded
-    initLogging();
-
-    if (Platform.environment['_CARGOKIT_NDK_LINK_TARGET'] != null) {
-      return AndroidEnvironment.clangLinkerWrapper(args);
-    }
-
-    final runner = CommandRunner('build_tool', 'Cargokit built_tool')
-      ..addCommand(BuildPodCommand())
-      ..addCommand(BuildGradleCommand())
-      ..addCommand(BuildCMakeCommand())
-      ..addCommand(GenKeyCommand())
-      ..addCommand(PrecompileBinariesCommand())
-      ..addCommand(VerifyBinariesCommand());
-
-    await runner.run(args);
-  } on ArgumentError catch (e) {
-    stderr.writeln(e.toString());
-    exit(1);
-  } catch (e, s) {
-    log.severe(kDoubleSeparator);
-    log.severe('Cargokit BuildTool failed with error:');
-    log.severe(kSeparator);
-    log.severe(e);
-    // This tells user to install Rust, there's no need to pollute the log with
-    // stack trace.
-    if (e is! RustupNotFoundException) {
-      log.severe(kSeparator);
-      log.severe(s);
-      log.severe(kSeparator);
-      log.severe('BuildTool arguments: $args');
-    }
-    log.severe(kDoubleSeparator);
-    exit(1);
   }
 }

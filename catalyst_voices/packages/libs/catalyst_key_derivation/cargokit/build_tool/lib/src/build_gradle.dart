@@ -15,9 +15,9 @@ import 'target.dart';
 final log = Logger('build_gradle');
 
 class BuildGradle {
-  BuildGradle({required this.userOptions});
-
   final CargokitUserOptions userOptions;
+
+  BuildGradle({required this.userOptions});
 
   Future<void> build() async {
     final targets = Environment.targetPlatforms.map((arch) {

@@ -39,79 +39,6 @@ class VoicesModalMenu extends StatelessWidget {
   }
 }
 
-class _VoicesModalMenuItemTile extends StatefulWidget {
-  final String label;
-  final bool isSelected;
-  final bool isEnabled;
-  final VoidCallback? onTap;
-
-  const _VoicesModalMenuItemTile({
-    required super.key,
-    required this.label,
-    required this.isSelected,
-    required this.isEnabled,
-    this.onTap,
-  });
-
-  @override
-  State<_VoicesModalMenuItemTile> createState() {
-    return _VoicesModalMenuItemTileState();
-  }
-}
-
-class _VoicesModalMenuItemTileState extends State<_VoicesModalMenuItemTile> {
-  late _BackgroundColor _backgroundColor;
-  late _ForegroundColor _foregroundColor;
-  late _LabelTextStyle _labelTextStyle;
-  late _BorderColor _border;
-
-  Set<WidgetState> get _states => {
-    if (!widget.isEnabled) WidgetState.disabled,
-    if (widget.isSelected) WidgetState.selected,
-  };
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    final theme = Theme.of(context);
-
-    _backgroundColor = _BackgroundColor(theme.colorScheme.brightness);
-    _foregroundColor = _ForegroundColor(theme.colors);
-    _labelTextStyle = _LabelTextStyle(theme.textTheme);
-    _border = _BorderColor(theme.colorScheme.brightness);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: widget.isEnabled ? widget.onTap : null,
-      borderRadius: BorderRadius.circular(8),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        constraints: const BoxConstraints(minWidth: 320),
-        decoration: BoxDecoration(
-          color: _backgroundColor.resolve(_states),
-          border: _border.resolve(_states),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        padding: const EdgeInsets.symmetric(
-          vertical: 12,
-          horizontal: 16,
-        ).add(const EdgeInsets.only(bottom: 2)),
-        child: Text(
-          widget.label,
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
-          style: _labelTextStyle
-              .resolve(_states)
-              .copyWith(color: _foregroundColor.resolve(_states)),
-        ),
-      ),
-    );
-  }
-}
-
 class _BackgroundColor extends WidgetStateProperty<Color?> {
   final Brightness _brightness;
 
@@ -130,6 +57,23 @@ class _BackgroundColor extends WidgetStateProperty<Color?> {
     }
 
     return null;
+  }
+}
+
+class _BorderColor extends WidgetStateProperty<BoxBorder> {
+  final Brightness _brightness;
+
+  _BorderColor(this._brightness);
+
+  @override
+  BoxBorder resolve(Set<WidgetState> states) {
+    // TODO(damian-molinski): Those colors are not using properties.
+    // TODO(damian-molinski): Elevations/On surface/Neutral/Transparent/on surface N10 08
+    // TODO(damian-molinski): Elevations/On surface/Neutral/Transparent/on surface N10 08
+    return switch (_brightness) {
+      Brightness.dark => Border.all(color: const Color(0x1fbfc8d9)),
+      Brightness.light => Border.all(color: const Color(0x14212a3d)),
+    };
   }
 }
 
@@ -163,19 +107,75 @@ class _LabelTextStyle extends WidgetStateProperty<TextStyle> {
   }
 }
 
-class _BorderColor extends WidgetStateProperty<BoxBorder> {
-  final Brightness _brightness;
+class _VoicesModalMenuItemTile extends StatefulWidget {
+  final String label;
+  final bool isSelected;
+  final bool isEnabled;
+  final VoidCallback? onTap;
 
-  _BorderColor(this._brightness);
+  const _VoicesModalMenuItemTile({
+    required super.key,
+    required this.label,
+    required this.isSelected,
+    required this.isEnabled,
+    this.onTap,
+  });
 
   @override
-  BoxBorder resolve(Set<WidgetState> states) {
-    // TODO(damian-molinski): Those colors are not using properties.
-    // TODO(damian-molinski): Elevations/On surface/Neutral/Transparent/on surface N10 08
-    // TODO(damian-molinski): Elevations/On surface/Neutral/Transparent/on surface N10 08
-    return switch (_brightness) {
-      Brightness.dark => Border.all(color: const Color(0x1fbfc8d9)),
-      Brightness.light => Border.all(color: const Color(0x14212a3d)),
-    };
+  State<_VoicesModalMenuItemTile> createState() {
+    return _VoicesModalMenuItemTileState();
+  }
+}
+
+class _VoicesModalMenuItemTileState extends State<_VoicesModalMenuItemTile> {
+  late _BackgroundColor _backgroundColor;
+  late _ForegroundColor _foregroundColor;
+  late _LabelTextStyle _labelTextStyle;
+  late _BorderColor _border;
+
+  Set<WidgetState> get _states => {
+    if (!widget.isEnabled) WidgetState.disabled,
+    if (widget.isSelected) WidgetState.selected,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: widget.isEnabled ? widget.onTap : null,
+      borderRadius: BorderRadius.circular(8),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        constraints: const BoxConstraints(minWidth: 320),
+        decoration: BoxDecoration(
+          color: _backgroundColor.resolve(_states),
+          border: _border.resolve(_states),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        padding: const EdgeInsets.symmetric(
+          vertical: 12,
+          horizontal: 16,
+        ).add(const EdgeInsets.only(bottom: 2)),
+        child: Text(
+          widget.label,
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+          style: _labelTextStyle
+              .resolve(_states)
+              .copyWith(color: _foregroundColor.resolve(_states)),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final theme = Theme.of(context);
+
+    _backgroundColor = _BackgroundColor(theme.colorScheme.brightness);
+    _foregroundColor = _ForegroundColor(theme.colors);
+    _labelTextStyle = _LabelTextStyle(theme.textTheme);
+    _border = _BorderColor(theme.colorScheme.brightness);
   }
 }

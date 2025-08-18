@@ -20,6 +20,12 @@ class Bip32Ed25519XPublicKey extends Equatable {
         xpubBytes: rust.U8Array64(Uint8List.fromList(bytes)),
       );
 
+  /// Returns the bytes of the public key.
+  List<int> get bytes => _bytes.inner;
+
+  @override
+  List<Object?> get props => [_bytes];
+
   /// Serializes the type as cbor.
   CborValue toCbor({List<int> tags = const []}) {
     return CborBytes(bytes, tags: tags);
@@ -27,9 +33,6 @@ class Bip32Ed25519XPublicKey extends Equatable {
 
   /// Returns a hex representation of the [Bip32Ed25519XPublicKey].
   String toHex() => hex.encode(bytes);
-
-  /// Returns the bytes of the public key.
-  List<int> get bytes => _bytes.inner;
 
   /// Extracts the public key bytes from the extended public key.
   Ed25519PublicKey toPublicKey() => Ed25519PublicKey.fromBytes(_bytes.publicKey);
@@ -52,7 +55,4 @@ class Bip32Ed25519XPublicKey extends Equatable {
       ),
     );
   }
-
-  @override
-  List<Object?> get props => [_bytes];
 }

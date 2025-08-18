@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
+
 import '../utils/translations_utils.dart';
 import 'common_page.dart';
 
 class ProfilePage {
-  ProfilePage(this.$);
   late PatrolTester $;
   final displayNameTile = const Key('AccountDisplayNameTile');
   final accountEmailTile = const Key('AccountEmailTile');
@@ -29,6 +29,11 @@ class ProfilePage {
   final deleteKeychainContinueButton = const Key('DeleteKeychainContinueButton');
   final deleteKeychainTextField = const Key('DeleteKeychainTextField');
   final keychainDeletedDialogCloseButton = const Key('KeychainDeletedDialogCloseButton');
+  ProfilePage(this.$);
+  Future<void> addRoleClick() async {
+    await $(accountRolesTile).$(addRole).tap();
+  }
+
   Future<void> clickDisplayNameEdit() async {
     await $(displayNameTile).$(editBtn).tap();
   }
@@ -37,8 +42,27 @@ class ProfilePage {
     await $(accountEmailTile).$(editBtn).tap();
   }
 
-  Future<void> addRoleClick() async {
-    await $(accountRolesTile).$(addRole).tap();
+  Future<void> displayNameIsAsExpected(String expectedDisplayName) async {
+    final textField =
+        $(accDisplayNameTxtField).$(CommonPage($).voicesTextField).evaluate().first.widget
+            as TextField;
+
+    expect(textField.controller!.text, expectedDisplayName);
+  }
+
+  Future<void> emailIsAsExpected(String expectedEmail) async {
+    final textField =
+        $(accountEmailTile).$(CommonPage($).voicesTextField).evaluate().first.widget as TextField;
+
+    expect(textField.controller!.text, expectedEmail);
+  }
+
+  Future<void> keychainIsAsExpected(String expectedKeychain) async {
+    final textField =
+        $(accountKeychainTxtField).$(CommonPage($).voicesTextField).evaluate().first.widget
+            as TextField;
+
+    expect(textField.controller!.text, expectedKeychain);
   }
 
   Future<void> removeKeychainClick() async {
@@ -90,28 +114,5 @@ class ProfilePage {
       $(appBarProfileAvatar),
       findsOneWidget,
     );
-  }
-
-  Future<void> displayNameIsAsExpected(String expectedDisplayName) async {
-    final textField =
-        $(accDisplayNameTxtField).$(CommonPage($).voicesTextField).evaluate().first.widget
-            as TextField;
-
-    expect(textField.controller!.text, expectedDisplayName);
-  }
-
-  Future<void> emailIsAsExpected(String expectedEmail) async {
-    final textField =
-        $(accountEmailTile).$(CommonPage($).voicesTextField).evaluate().first.widget as TextField;
-
-    expect(textField.controller!.text, expectedEmail);
-  }
-
-  Future<void> keychainIsAsExpected(String expectedKeychain) async {
-    final textField =
-        $(accountKeychainTxtField).$(CommonPage($).voicesTextField).evaluate().first.widget
-            as TextField;
-
-    expect(textField.controller!.text, expectedKeychain);
   }
 }
