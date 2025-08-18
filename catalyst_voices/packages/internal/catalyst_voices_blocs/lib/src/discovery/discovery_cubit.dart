@@ -20,10 +20,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   StreamSubscription<List<Proposal>>? _proposalsSub;
   StreamSubscription<List<String>>? _favoritesProposalsIdsSub;
 
-  DiscoveryCubit(
-    this._campaignService,
-    this._proposalService,
-  ) : super(const DiscoveryState());
+  DiscoveryCubit(this._campaignService, this._proposalService) : super(const DiscoveryState());
 
   Future<void> addFavorite(DocumentRef ref) async {
     try {
@@ -94,11 +91,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   }
 
   Future<void> getMostRecentProposals() async {
-    emit(
-      state.copyWith(
-        proposals: const DiscoveryMostRecentProposalsState(),
-      ),
-    );
+    emit(state.copyWith(proposals: const DiscoveryMostRecentProposalsState()));
 
     unawaited(_proposalsSub?.cancel());
     _proposalsSub = _buildProposalsSub();
@@ -107,11 +100,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     _favoritesProposalsIdsSub = _buildFavoritesProposalsIdsSub();
 
     final mostRecentState = state.proposals;
-    emit(
-      state.copyWith(
-        proposals: mostRecentState.copyWith(isLoading: false),
-      ),
-    );
+    emit(state.copyWith(proposals: mostRecentState.copyWith(isLoading: false)));
   }
 
   Future<void> removeFavorite(DocumentRef ref) async {
@@ -146,16 +135,11 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
         )
         .map((event) => event.items)
         .distinct(listEquals)
-        .listen(
-          _handleProposals,
-          onError: _emitMostRecentError,
-        );
+        .listen(_handleProposals, onError: _emitMostRecentError);
   }
 
   void _emitFavoritesIds(List<String> ids) {
-    emit(
-      state.copyWith(proposals: state.proposals.updateFavorites(ids)),
-    );
+    emit(state.copyWith(proposals: state.proposals.updateFavorites(ids)));
   }
 
   void _emitMostRecentError(Object error, StackTrace stackTrace) {
@@ -184,10 +168,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
 
     emit(
       state.copyWith(
-        proposals: state.proposals.copyWith(
-          isLoading: false,
-          proposals: proposalList,
-        ),
+        proposals: state.proposals.copyWith(isLoading: false, proposals: proposalList),
       ),
     );
   }

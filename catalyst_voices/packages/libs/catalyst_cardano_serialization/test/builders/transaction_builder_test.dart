@@ -324,6 +324,79 @@ void main() {
       );
     });
 
+    test('transaction with one utxo below min ada required '
+        'for change output will throw exception '
+        'when change output strategy enforces change outputs', () {
+      final changeAddress = SelectionUtils.randomAddress();
+      const ada = Coin(969750);
+
+      final utxo = TransactionUnspentOutput(
+        input: TransactionInput(
+          transactionId: testTransactionHash,
+          index: 1,
+        ),
+        output: PreBabbageTransactionOutput(
+          address: changeAddress,
+          amount: const Balance(coin: ada),
+        ),
+      );
+
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(),
+        inputs: {utxo},
+        networkId: NetworkId.testnet,
+        changeAddress: changeAddress,
+      );
+
+      expect(
+        () => txBuilder
+            .applySelection(
+              changeOutputStrategy: ChangeOutputAdaStrategy.mustInclude,
+            )
+            .buildBody(),
+        throwsA(isA<InsufficientUtxoBalanceException>()),
+      );
+    });
+
+    test('transaction with one utxo exactly enough to cover the fee '
+        'will throw exception when change output strategy enforces change outputs', () {
+      final changeAddress = SelectionUtils.randomAddress();
+      const ada = Coin(162245);
+
+      final utxo = TransactionUnspentOutput(
+        input: TransactionInput(
+          transactionId: testTransactionHash,
+          index: 1,
+        ),
+        output: PreBabbageTransactionOutput(
+          address: changeAddress,
+          amount: const Balance(coin: ada),
+        ),
+      );
+
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(),
+        inputs: {utxo},
+        networkId: NetworkId.testnet,
+        changeAddress: changeAddress,
+      );
+
+      expect(
+        ada,
+        equals(txBuilder.minFee()),
+        reason: 'Ada in UTXO must be equal the fee',
+      );
+
+      expect(
+        () => txBuilder
+            .applySelection(
+              changeOutputStrategy: ChangeOutputAdaStrategy.mustInclude,
+            )
+            .buildBody(),
+        throwsA(isA<InsufficientUtxoBalanceException>()),
+      );
+    });
+
     test('transaction with native assets has correctly calculated fee', () {
       final changeAddress = SelectionUtils.randomAddress();
 

@@ -69,7 +69,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     );
 
     final (selectedUtxos, changes, totalFee) = txBuilder.selectInputs(
-      changeOutputStrategy: ChangeOutputAdaStrategy.noBurn,
+      changeOutputStrategy: ChangeOutputAdaStrategy.mustInclude,
     );
 
     final txBody = txBuilder
@@ -124,6 +124,8 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     _validateRawTxStructure(rawTx);
     _validateTransactionSize(rawTx, expectedSize: txSizeBeforePatching);
     _validateAuxiliaryDataSize(rawTx, expectedSize: auxiliaryDataSizeBeforePatching);
+    _validateTransactionHasChangeOutputs(rawTx);
+    _validateRequiredSigners(rawTx);
 
     return rawTx;
   }
@@ -187,7 +189,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     final actualSize = rawTx.auxiliaryData.length;
 
     if (actualSize != expectedSize) {
-      throw RawTransactionSizeChanged(
+      throw RawTransactionSizeChangedException(
         expectedSize: expectedSize,
         actualSize: actualSize,
         aspect: 'AuxiliaryData',
@@ -226,7 +228,42 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
       final cborValue = cbor.decode(bytes);
       Transaction.fromCbor(cborValue);
     } on FormatException catch (_) {
-      throw const RawTransactionMalformed();
+      throw const RawTransactionMalformedException();
+    }
+  }
+
+  void _validateRequiredSigners(RawTransaction rawTx) {
+    final outputsPublicKeysHashes = (cborDecode(rawTx.outputs) as CborList)
+        .map(TransactionOutput.fromCbor)
+        .map((e) => e.address.publicKeyHash)
+        .toSet();
+
+    final requiredSigners = (cborDecode(rawTx.requiredSigners) as CborList)
+        .map(Ed25519PublicKeyHash.fromCbor)
+        .toSet();
+
+    final missingSigners = <Ed25519PublicKeyHash>[];
+
+    for (final outputPublicKeyHash in outputsPublicKeysHashes) {
+      if (!requiredSigners.contains(outputPublicKeyHash)) {
+        missingSigners.add(outputPublicKeyHash);
+      }
+    }
+
+    if (missingSigners.isNotEmpty) {
+      throw OutputPublicKeyHashNotInRequiredSignerException(
+        outputsPublicKeysHashes: outputsPublicKeysHashes,
+        requiredSigners: requiredSigners,
+      );
+    }
+  }
+
+  void _validateTransactionHasChangeOutputs(RawTransaction rawTx) {
+    final outputs = (cborDecode(rawTx.outputs) as CborList).map(TransactionOutput.fromCbor).toSet();
+
+    final hasChangeOutputs = outputs.any((e) => e.address == changeAddress);
+    if (!hasChangeOutputs) {
+      throw const TransactionMissingChangeOutputsException();
     }
   }
 
@@ -237,7 +274,7 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
     final actualSize = rawTx.bytes.length;
 
     if (actualSize != expectedSize) {
-      throw RawTransactionSizeChanged(
+      throw RawTransactionSizeChangedException(
         expectedSize: expectedSize,
         actualSize: actualSize,
         aspect: 'Transaction',

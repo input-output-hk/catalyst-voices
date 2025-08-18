@@ -78,10 +78,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     if (!isClosed) emit(state.copyWith(collectLogs: settings.effectiveCollectLogs));
   }
 
-  Future<void> _handleChangeLogLevel(
-    ChangeLogLevelEvent event,
-    Emitter<DevToolsState> emit,
-  ) async {
+  Future<void> _handleChangeLogLevel(ChangeLogLevelEvent event, Emitter<DevToolsState> emit) async {
     assert(_loggingService != null, 'Changing log level while LoggingService not available');
 
     final level = event.level;
@@ -91,10 +88,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     if (!isClosed) emit(state.copyWith(logsLevel: Optional(settings.effectiveLevel)));
   }
 
-  Future<void> _handleClearDocuments(
-    ClearDocumentsEvent event,
-    Emitter<DevToolsState> emit,
-  ) async {
+  Future<void> _handleClearDocuments(ClearDocumentsEvent event, Emitter<DevToolsState> emit) async {
     try {
       final deleteRows = await _documentsService.clear();
 
@@ -156,10 +150,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     }
   }
 
-  Future<void> _handleRecoverData(
-    RecoverDataEvent event,
-    Emitter<DevToolsState> emit,
-  ) async {
+  Future<void> _handleRecoverData(RecoverDataEvent event, Emitter<DevToolsState> emit) async {
     final isDeveloper = await _devToolsService.isDeveloper();
     final syncStats = await _devToolsService.getStats();
     final areLogsOptionsAvailable = _loggingService != null;
@@ -194,10 +185,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     _syncStartsSub = null;
   }
 
-  Future<void> _handleSyncDocuments(
-    SyncDocumentsEvent event,
-    Emitter<DevToolsState> emit,
-  ) async {
+  Future<void> _handleSyncDocuments(SyncDocumentsEvent event, Emitter<DevToolsState> emit) async {
     try {
       await _syncManager.start();
     } catch (error, stack) {
@@ -205,27 +193,18 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     }
   }
 
-  void _handleSyncStatsChanged(
-    SyncStatsChangedEvent event,
-    Emitter<DevToolsState> emit,
-  ) {
+  void _handleSyncStatsChanged(SyncStatsChangedEvent event, Emitter<DevToolsState> emit) {
     emit(state.copyWith(syncStats: Optional(event.stats)));
   }
 
-  void _handleTapCountReset(
-    DevToolsEnablerTapResetEvent event,
-    Emitter<DevToolsState> emit,
-  ) {
+  void _handleTapCountReset(DevToolsEnablerTapResetEvent event, Emitter<DevToolsState> emit) {
     _resetCountTimer?.cancel();
     _resetCountTimer = null;
 
     emit(state.copyWith(enableTapCount: 0));
   }
 
-  Future<void> _handleUpdateAll(
-    UpdateAllEvent event,
-    Emitter<DevToolsState> emit,
-  ) async {
+  Future<void> _handleUpdateAll(UpdateAllEvent event, Emitter<DevToolsState> emit) async {
     try {
       final systemInfo = await _devToolsService.getSystemInfo();
       final syncStats = await _devToolsService.getStats();
@@ -274,10 +253,7 @@ final class DevToolsBloc extends Bloc<DevToolsEvent, DevToolsState>
     );
   }
 
-  void _updateDocumentsCount(
-    DocumentsCountChangedEvent event,
-    Emitter<DevToolsState> emit,
-  ) {
+  void _updateDocumentsCount(DocumentsCountChangedEvent event, Emitter<DevToolsState> emit) {
     emit(state.copyWith(documentsCount: Optional(event.count)));
   }
 }
