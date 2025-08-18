@@ -85,7 +85,6 @@ code-generator:
     WORKDIR /frontend
 
 # Runs code formatting checks.
-# TODO(dt-iohk): reformat code in the entire project and then enable this check
 check-code-formatting:
     FROM +builder
     DO flutter-ci+FORMAT
