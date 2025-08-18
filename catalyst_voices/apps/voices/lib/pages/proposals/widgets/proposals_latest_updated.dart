@@ -35,9 +35,10 @@ class _ProposalsLatestUpdated extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesGestureDetector(
       onTap: () {
-        context
-            .read<ProposalsCubit>()
-            .changeFilters(isRecentEnabled: !isEnabled, resetProposals: true);
+        context.read<ProposalsCubit>().changeFilters(
+          isRecentEnabled: !isEnabled,
+          resetProposals: true,
+        );
       },
       child: AffixDecorator(
         suffix: Text(
@@ -47,9 +48,10 @@ class _ProposalsLatestUpdated extends StatelessWidget {
         child: VoicesCheckbox(
           value: isEnabled,
           onChanged: (value) {
-            context
-                .read<ProposalsCubit>()
-                .changeFilters(isRecentEnabled: value, resetProposals: true);
+            context.read<ProposalsCubit>().changeFilters(
+              isRecentEnabled: value,
+              resetProposals: true,
+            );
           },
         ),
       ),

@@ -112,20 +112,20 @@ final class SignedDocumentMetadata extends Equatable {
 
   @override
   List<Object?> get props => [
-        contentType,
-        documentType,
-        id,
-        ver,
-        ref,
-        refHash,
-        template,
-        reply,
-        collabs,
-        brandId,
-        campaignId,
-        electionId,
-        categoryId,
-      ];
+    contentType,
+    documentType,
+    id,
+    ver,
+    ref,
+    refHash,
+    template,
+    reply,
+    collabs,
+    brandId,
+    campaignId,
+    electionId,
+    categoryId,
+  ];
 }
 
 /// A reference to an entity represented by the [id].

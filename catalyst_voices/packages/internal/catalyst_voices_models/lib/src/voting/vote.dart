@@ -33,10 +33,10 @@ final class Vote extends Equatable {
 
   @override
   List<Object?> get props => [
-        selfRef,
-        proposal,
-        type,
-      ];
+    selfRef,
+    proposal,
+    type,
+  ];
 
   Vote copyWith({
     DocumentRef? selfRef,

@@ -68,8 +68,8 @@ class ProcessProgressIndicator<T extends Object> extends StatelessWidget {
           final status = isCompleted
               ? _StepIndicatorStatus.completed
               : isCurrent
-                  ? _StepIndicatorStatus.current
-                  : _StepIndicatorStatus.upcoming;
+              ? _StepIndicatorStatus.current
+              : _StepIndicatorStatus.upcoming;
 
           return _StepRow(
             key: ValueKey('Step${step.value}RowKey'),
@@ -173,22 +173,23 @@ class _StepNameTextContainer extends StatelessWidget {
       padding: !neighborhood.previous
           ? const EdgeInsets.only(top: 14)
           : !neighborhood.next
-              ? const EdgeInsets.only(bottom: 10)
-              : null,
+          ? const EdgeInsets.only(bottom: 10)
+          : null,
       alignment: !neighborhood.previous
           ? Alignment.topCenter
           : !neighborhood.next
-              ? Alignment.bottomCenter
-              : Alignment.center,
+          ? Alignment.bottomCenter
+          : Alignment.center,
       child: Text(
         data,
         style: switch (status) {
-          _StepIndicatorStatus.current =>
-            textTheme.titleSmall?.copyWith(color: colors.textOnPrimary),
-          _StepIndicatorStatus.completed when type.doesCompletes =>
-            textTheme.titleSmall?.copyWith(color: colors.success),
-          _StepIndicatorStatus.completed ||
-          _StepIndicatorStatus.upcoming =>
+          _StepIndicatorStatus.current => textTheme.titleSmall?.copyWith(
+            color: colors.textOnPrimary,
+          ),
+          _StepIndicatorStatus.completed when type.doesCompletes => textTheme.titleSmall?.copyWith(
+            color: colors.success,
+          ),
+          _StepIndicatorStatus.completed || _StepIndicatorStatus.upcoming =>
             textTheme.bodyMedium?.copyWith(color: colors.textOnPrimary),
         },
       ),
@@ -281,12 +282,12 @@ class _StepStatusIndicator extends StatelessWidget {
 
     return switch (type) {
       _StepIndicatorType.standard => Border.all(
-          color: Theme.of(context).colorScheme.onSurface,
-        ),
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
       _StepIndicatorType.completes => Border.all(
-          color: Theme.of(context).colorScheme.onSurface,
-          width: status.isCurrent ? 2 : 1,
-        ),
+        color: Theme.of(context).colorScheme.onSurface,
+        width: status.isCurrent ? 2 : 1,
+      ),
     };
   }
 }

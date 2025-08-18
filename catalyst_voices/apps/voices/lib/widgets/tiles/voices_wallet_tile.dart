@@ -77,13 +77,13 @@ class VoicesWalletTileIcon extends StatelessWidget {
     final image = switch (iconSrc) {
       null => const _IconPlaceholder(),
       final src when src.contains('image/svg') => VoicesSvgImageWebview(
-          src: src,
-          errorBuilder: _errorBuilder,
-        ),
+        src: src,
+        errorBuilder: _errorBuilder,
+      ),
       final src => Image.network(
-          src,
-          errorBuilder: _errorBuilder,
-        ),
+        src,
+        errorBuilder: _errorBuilder,
+      ),
     };
 
     return SizedBox(

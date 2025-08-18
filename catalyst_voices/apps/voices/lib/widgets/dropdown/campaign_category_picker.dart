@@ -32,7 +32,8 @@ class CampaignCategoryPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesRawPopupMenuButton<ProposalsCategoryFilter>(
       key: menuKey,
-      buttonBuilder: buttonBuilder ??
+      buttonBuilder:
+          buttonBuilder ??
           (
             context,
             onTapCallback, {

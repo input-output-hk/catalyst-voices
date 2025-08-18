@@ -72,9 +72,9 @@ class _DateRangeState extends State<_DateRange> {
               child: Text(context.l10n.saveButtonText),
               onTap: () {
                 context.read<CampaignBuilderCubit>().updateCampaignDates(
-                      startDate: _startDateController.value,
-                      endDate: _endDateController.value,
-                    );
+                  startDate: _startDateController.value,
+                  endDate: _endDateController.value,
+                );
 
                 SegmentsControllerScope.of(context).editSection(
                   widget.data.id,

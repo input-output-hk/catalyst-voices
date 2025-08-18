@@ -61,8 +61,9 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
       final campaign = await _campaignService.getCampaign(id: Campaign.f14Ref.id);
       final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
       final currentCampaign = CurrentCampaignInfoViewModel.fromModel(campaign);
-      final categoriesModel =
-          campaign.categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
+      final categoriesModel = campaign.categories
+          .map(CampaignCategoryDetailsViewModel.fromModel)
+          .toList();
       if (!isClosed) {
         emit(
           state.copyWith(
@@ -117,7 +118,10 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     return _proposalService
         .watchFavoritesProposalsIds()
         .distinct(listEquals)
-        .listen(_emitFavoritesIds, onError: _emitMostRecentError);
+        .listen(
+          _emitFavoritesIds,
+          onError: _emitMostRecentError,
+        );
   }
 
   StreamSubscription<List<Proposal>> _buildProposalsSub() {

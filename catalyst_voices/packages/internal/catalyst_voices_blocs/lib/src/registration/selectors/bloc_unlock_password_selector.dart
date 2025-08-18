@@ -8,8 +8,8 @@ class BlocUnlockPasswordSelector<T> extends BlocSelector<RegistrationCubit, Regi
     required super.builder,
     super.bloc,
   }) : super(
-          selector: (state) {
-            return selector(stateSelector(state));
-          },
-        );
+         selector: (state) {
+           return selector(stateSelector(state));
+         },
+       );
 }

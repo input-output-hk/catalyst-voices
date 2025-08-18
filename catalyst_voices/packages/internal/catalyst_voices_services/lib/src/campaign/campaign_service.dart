@@ -61,8 +61,11 @@ final class CampaignServiceImpl implements CampaignService {
     final campaignProposals = await _proposalRepository.getProposals(
       type: ProposalsFilterType.finals,
     );
-    final proposalSubmissionTime =
-        campaign.phaseStateTo(CampaignPhaseType.proposalSubmission).phase.timeline.to;
+    final proposalSubmissionTime = campaign
+        .phaseStateTo(CampaignPhaseType.proposalSubmission)
+        .phase
+        .timeline
+        .to;
     final totalAsk = _calculateTotalAsk(campaignProposals);
     final updatedCategories = await _updateCategories(
       campaign.categories,
@@ -96,8 +99,9 @@ final class CampaignServiceImpl implements CampaignService {
       type: ProposalsFilterType.finals,
       categoryRef: ref,
     );
-    final proposalSubmissionStage =
-        await getCampaignPhaseTimeline(CampaignPhaseType.proposalSubmission);
+    final proposalSubmissionStage = await getCampaignPhaseTimeline(
+      CampaignPhaseType.proposalSubmission,
+    );
     final totalAsk = _calculateTotalAsk(categoryProposals);
 
     return category.copyWith(

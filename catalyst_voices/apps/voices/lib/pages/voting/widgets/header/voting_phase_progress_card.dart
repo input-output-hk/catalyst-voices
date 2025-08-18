@@ -61,10 +61,12 @@ class _Captions extends StatelessWidget {
     if (progress == null) return '--';
 
     return switch (progress.status) {
-      CampaignPhaseStatus.upcoming =>
-        context.l10n.votingStartsIn(_formatDuration(context, progress.currentPhaseEndsIn)),
-      CampaignPhaseStatus.active =>
-        context.l10n.votingEndsIn(_formatDuration(context, progress.currentPhaseEndsIn)),
+      CampaignPhaseStatus.upcoming => context.l10n.votingStartsIn(
+        _formatDuration(context, progress.currentPhaseEndsIn),
+      ),
+      CampaignPhaseStatus.active => context.l10n.votingEndsIn(
+        _formatDuration(context, progress.currentPhaseEndsIn),
+      ),
       CampaignPhaseStatus.post => '--',
     };
   }

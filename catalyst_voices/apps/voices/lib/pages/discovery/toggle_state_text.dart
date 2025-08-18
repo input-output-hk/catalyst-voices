@@ -36,9 +36,9 @@ class _ToggleStateTextState extends State<ToggleStateText> {
     _tapActiveUser.onTap = () async {
       final sessionBloc = context.read<SessionCubit>();
 
-      await sessionBloc
-          .switchToDummyAccount()
-          .then((_) => sessionBloc.unlock(Account.dummyUnlockFactor));
+      await sessionBloc.switchToDummyAccount().then(
+        (_) => sessionBloc.unlock(Account.dummyUnlockFactor),
+      );
     };
   }
 

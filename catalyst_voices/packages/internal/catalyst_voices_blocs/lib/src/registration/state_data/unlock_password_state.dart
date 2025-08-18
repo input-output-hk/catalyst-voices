@@ -43,12 +43,12 @@ final class UnlockPasswordState extends Equatable {
 
   @override
   List<Object?> get props => [
-        password,
-        confirmPassword,
-        passwordStrength,
-        showPasswordStrength,
-        minPasswordLength,
-        showPasswordMisMatch,
-        isNextEnabled,
-      ];
+    password,
+    confirmPassword,
+    passwordStrength,
+    showPasswordStrength,
+    minPasswordLength,
+    showPasswordMisMatch,
+    isNextEnabled,
+  ];
 }

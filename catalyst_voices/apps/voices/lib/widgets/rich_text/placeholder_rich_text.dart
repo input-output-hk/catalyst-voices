@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 final _kPlaceholderRegExp = RegExp(r'{(\w*)}');
 
-typedef PlaceholderSpanBuilder = InlineSpan Function(
-  BuildContext context,
-  String placeholder,
-);
+typedef PlaceholderSpanBuilder =
+    InlineSpan Function(
+      BuildContext context,
+      String placeholder,
+    );
 
 class PlaceholderRichText extends StatefulWidget {
   final String text;

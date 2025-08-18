@@ -17,11 +17,11 @@ final class VotingListFooterData extends Equatable {
 
   @override
   List<Object?> get props => [
-        canCastVotes,
-        showPendingVotesDisclaimer,
-        lastCastedVoteAt,
-        castingStep,
-      ];
+    canCastVotes,
+    showPendingVotesDisclaimer,
+    lastCastedVoteAt,
+    castingStep,
+  ];
 
   VotingListFooterData copyWith({
     bool? canCastVotes,

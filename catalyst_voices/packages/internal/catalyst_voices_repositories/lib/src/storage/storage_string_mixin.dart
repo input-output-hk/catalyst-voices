@@ -41,8 +41,8 @@ mixin StorageAsStringMixin implements Storage {
   }) {
     final asInt = value != null
         ? value
-            ? 1
-            : 0
+              ? 1
+              : 0
         : null;
 
     return writeInt(asInt, key: key);

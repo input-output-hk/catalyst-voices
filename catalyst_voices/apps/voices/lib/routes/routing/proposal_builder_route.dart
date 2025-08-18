@@ -29,9 +29,9 @@ final class ProposalBuilderDraftRoute extends GoRouteData
 
   @override
   List<RouteGuard> get routeGuards => [
-        const SessionUnlockedGuard(),
-        const UserAccessGuard(),
-      ];
+    const SessionUnlockedGuard(),
+    const UserAccessGuard(),
+  ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -68,9 +68,9 @@ final class ProposalBuilderRoute extends GoRouteData
 
   @override
   List<RouteGuard> get routeGuards => [
-        const SessionUnlockedGuard(),
-        const UserAccessGuard(),
-      ];
+    const SessionUnlockedGuard(),
+    const UserAccessGuard(),
+  ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {

@@ -55,13 +55,10 @@ class _BlocSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<
-        RegistrationCubit,
-        RegistrationState,
-        ({
-          Set<AccountRole> roles,
-          WalletInfo selectedWallet,
-          String transactionFee,
-        })?>(
+      RegistrationCubit,
+      RegistrationState,
+      ({Set<AccountRole> roles, WalletInfo selectedWallet, String transactionFee})?
+    >(
       selector: (state) {
         final selectedWallet = state.walletLinkStateData.selectedWallet;
         final transactionFee = state.registrationStateData.transactionFee;
@@ -121,9 +118,9 @@ class _BlocTxSubmitError extends StatelessWidget {
       builder: (context, result) {
         return switch (result) {
           Failure(:final value) => _Error(
-              error: value,
-              onRetry: () => _onRetry(context),
-            ),
+            error: value,
+            onRetry: () => _onRetry(context),
+          ),
           _ => const Offstage(),
         };
       },
@@ -308,8 +305,9 @@ class _Summary extends StatelessWidget {
             children: [
               Text(
                 context.l10n.total,
-                style:
-                    Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
               Text(
                 transactionFee,

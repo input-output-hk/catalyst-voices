@@ -11,9 +11,9 @@ final class SecureUserStorage extends SecureStorage implements UserStorage {
   SecureUserStorage({
     super.secureStorage,
   }) : super(
-          key: _key,
-          version: _version,
-        );
+         key: _key,
+         version: _version,
+       );
 
   SecureUserStorage._versioned({
     super.version,

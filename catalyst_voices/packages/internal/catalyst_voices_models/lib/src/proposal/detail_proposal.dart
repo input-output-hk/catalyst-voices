@@ -62,9 +62,9 @@ final class DetailProposal extends CoreProposal {
 
   @override
   List<Object?> get props => [
-        ...super.props,
-        versions,
-      ];
+    ...super.props,
+    versions,
+  ];
 
   int get versionNumber => versions.versionNumber(selfRef.version!);
 }

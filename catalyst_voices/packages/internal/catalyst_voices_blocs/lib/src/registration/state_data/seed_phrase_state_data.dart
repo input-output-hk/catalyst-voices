@@ -38,10 +38,10 @@ final class SeedPhraseStateData extends Equatable {
 
   @override
   List<Object?> get props => [
-        seedPhraseWords,
-        shuffledWords,
-        userWords,
-        isStoredConfirmed,
-        areUserWordsCorrect,
-      ];
+    seedPhraseWords,
+    shuffledWords,
+    userWords,
+    isStoredConfirmed,
+    areUserWordsCorrect,
+  ];
 }

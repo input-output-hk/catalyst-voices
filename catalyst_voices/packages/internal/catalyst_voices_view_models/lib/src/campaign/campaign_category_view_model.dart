@@ -43,23 +43,23 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   });
 
   factory CampaignCategoryDetailsViewModel.dummy({String? id}) => CampaignCategoryDetailsViewModel(
-        id: SignedDocumentRef(id: id ?? '1)'),
-        name: 'Cardano Open:',
-        subname: 'Developers',
-        description:
-            '''Supports development of open source technology, centered around improving the Cardano developer experience and creating developer-friendly tooling that streamlines an integrated development environment.''',
-        shortDescription: '',
-        proposalsCount: 263,
-        availableFunds: const Coin(8000000),
-        totalAsk: const Coin(400000),
-        range: const ComparableRange(
-          min: Coin.fromWholeAda(15000),
-          max: Coin.fromWholeAda(100000),
-        ),
-        descriptions: List.filled(3, CategoryDescriptionViewModel.dummy()),
-        image: CategoryImageUrl.image('1'),
-        submissionCloseDate: DateTime.now(),
-      );
+    id: SignedDocumentRef(id: id ?? '1)'),
+    name: 'Cardano Open:',
+    subname: 'Developers',
+    description:
+        '''Supports development of open source technology, centered around improving the Cardano developer experience and creating developer-friendly tooling that streamlines an integrated development environment.''',
+    shortDescription: '',
+    proposalsCount: 263,
+    availableFunds: const Coin(8000000),
+    totalAsk: const Coin(400000),
+    range: const ComparableRange(
+      min: Coin.fromWholeAda(15000),
+      max: Coin.fromWholeAda(100000),
+    ),
+    descriptions: List.filled(3, CategoryDescriptionViewModel.dummy()),
+    image: CategoryImageUrl.image('1'),
+    submissionCloseDate: DateTime.now(),
+  );
 
   factory CampaignCategoryDetailsViewModel.fromModel(CampaignCategory model) {
     return CampaignCategoryDetailsViewModel(
@@ -90,19 +90,19 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
 
   @override
   List<Object?> get props => [
-        ...super.props,
-        subname,
-        description,
-        proposalsCount,
-        availableFunds,
-        totalAsk,
-        range,
-        descriptions,
-        image,
-        dos,
-        donts,
-        submissionCloseDate,
-      ];
+    ...super.props,
+    subname,
+    description,
+    proposalsCount,
+    availableFunds,
+    totalAsk,
+    range,
+    descriptions,
+    image,
+    dos,
+    donts,
+    submissionCloseDate,
+  ];
 }
 
 final class CampaignCategoryViewModel extends Equatable {

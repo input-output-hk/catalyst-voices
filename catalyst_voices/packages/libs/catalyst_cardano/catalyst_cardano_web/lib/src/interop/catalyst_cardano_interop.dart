@@ -187,7 +187,7 @@ extension type JSDataSignature._(JSObject _) implements JSObject {
 
   /// Converts JS representation to pure dart representation.
   DataSignature get toDart => DataSignature(
-        key: key.toDart,
-        signature: signature.toDart,
-      );
+    key: key.toDart,
+    signature: signature.toDart,
+  );
 }

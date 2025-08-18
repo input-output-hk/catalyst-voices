@@ -27,11 +27,11 @@ final class ProposalVersion extends Equatable implements Comparable<ProposalVers
 
   @override
   List<Object?> get props => [
-        selfRef,
-        title,
-        createdAt,
-        publish,
-      ];
+    selfRef,
+    title,
+    createdAt,
+    publish,
+  ];
 
   @override
   int compareTo(ProposalVersion other) {

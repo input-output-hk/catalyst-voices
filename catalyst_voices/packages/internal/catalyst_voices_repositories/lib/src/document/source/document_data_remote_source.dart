@@ -135,46 +135,48 @@ extension on DocumentIndexList {
         .map(DocumentIndexListDto.fromJson)
         .map((ref) {
           return <TypedDocumentRef>[
-            ...ref.ver.map((ver) {
-              final documentType = DocumentType.fromJson(ver.type);
+            ...ref.ver
+                .map((ver) {
+                  final documentType = DocumentType.fromJson(ver.type);
 
-              return <TypedDocumentRef>[
-                TypedDocumentRef(
-                  ref: SignedDocumentRef(id: ref.id, version: ver.ver),
-                  type: documentType,
-                ),
-                if (ver.ref != null)
-                  TypedDocumentRef(
-                    ref: ver.ref!.toRef(),
-                    type: DocumentType.unknown,
-                  ),
-                if (ver.reply != null)
-                  TypedDocumentRef(
-                    ref: ver.reply!.toRef(),
-                    type: DocumentType.unknown,
-                  ),
-                if (ver.template != null)
-                  TypedDocumentRef(
-                    ref: ver.template!.toRef(),
-                    type: documentType.template ?? DocumentType.unknown,
-                  ),
-                if (ver.brand != null)
-                  TypedDocumentRef(
-                    ref: ver.brand!.toRef(),
-                    type: DocumentType.brandParametersDocument,
-                  ),
-                if (ver.campaign != null)
-                  TypedDocumentRef(
-                    ref: ver.campaign!.toRef(),
-                    type: DocumentType.campaignParametersDocument,
-                  ),
-                if (ver.category != null)
-                  TypedDocumentRef(
-                    ref: ver.category!.toRef(),
-                    type: DocumentType.categoryParametersDocument,
-                  ),
-              ];
-            }).expand((element) => element),
+                  return <TypedDocumentRef>[
+                    TypedDocumentRef(
+                      ref: SignedDocumentRef(id: ref.id, version: ver.ver),
+                      type: documentType,
+                    ),
+                    if (ver.ref != null)
+                      TypedDocumentRef(
+                        ref: ver.ref!.toRef(),
+                        type: DocumentType.unknown,
+                      ),
+                    if (ver.reply != null)
+                      TypedDocumentRef(
+                        ref: ver.reply!.toRef(),
+                        type: DocumentType.unknown,
+                      ),
+                    if (ver.template != null)
+                      TypedDocumentRef(
+                        ref: ver.template!.toRef(),
+                        type: documentType.template ?? DocumentType.unknown,
+                      ),
+                    if (ver.brand != null)
+                      TypedDocumentRef(
+                        ref: ver.brand!.toRef(),
+                        type: DocumentType.brandParametersDocument,
+                      ),
+                    if (ver.campaign != null)
+                      TypedDocumentRef(
+                        ref: ver.campaign!.toRef(),
+                        type: DocumentType.campaignParametersDocument,
+                      ),
+                    if (ver.category != null)
+                      TypedDocumentRef(
+                        ref: ver.category!.toRef(),
+                        type: DocumentType.categoryParametersDocument,
+                      ),
+                  ];
+                })
+                .expand((element) => element),
           ];
         })
         .expand((element) => element)

@@ -18,120 +18,121 @@ class VoicesIndicatorsExample extends StatelessWidget {
       appBar: AppBar(title: const Text('Voices Indicators')),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 42, vertical: 24),
-        children: [
-          const Text('Status Indicator'),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: VoicesStatusIndicator(
-                  status: AffixDecorator(
-                    prefix: Icon(Icons.check),
-                    child: Text('QR VERIFIED'),
+        children:
+            [
+              const Text('Status Indicator'),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: VoicesStatusIndicator(
+                      status: AffixDecorator(
+                        prefix: Icon(Icons.check),
+                        child: Text('QR VERIFIED'),
+                      ),
+                      title: Text('Your QR code verified successfully'),
+                      body: Text(
+                        'You can now use your QR-code to login into Catalyst.',
+                      ),
+                      type: VoicesStatusIndicatorType.success,
+                    ),
                   ),
-                  title: Text('Your QR code verified successfully'),
-                  body: Text(
-                    'You can now use your QR-code to login into Catalyst.',
+                  SizedBox(width: 50),
+                  Expanded(
+                    child: VoicesStatusIndicator(
+                      status: AffixDecorator(
+                        prefix: Icon(Icons.close),
+                        child: Text('QR FAILED'),
+                      ),
+                      title: Text('Upload failed or QR code not recognized!'),
+                      body: Text(
+                        'Are you sure your upload didn’t get interrupted or that '
+                        'you provided a Catalyst QR code? '
+                        'Please try again.',
+                      ),
+                      type: VoicesStatusIndicatorType.error,
+                    ),
                   ),
-                  type: VoicesStatusIndicatorType.success,
+                ],
+              ),
+              const Text('Process Stepper Indicator'),
+              const _Steps(),
+              const Text('Linear - Indeterminate'),
+              const VoicesLinearProgressIndicator(),
+              const VoicesLinearProgressIndicator(showTrack: false),
+              const Text('Linear - Heavy - Indeterminate'),
+              const VoicesLinearProgressIndicator(weight: VoicesProgressIndicatorWeight.heavy),
+              const VoicesLinearProgressIndicator(
+                weight: VoicesProgressIndicatorWeight.heavy,
+                showTrack: false,
+              ),
+              const Text('Linear - Fixed'),
+              const VoicesLinearProgressIndicator(value: 0.25),
+              const VoicesLinearProgressIndicator(value: 0.25, showTrack: false),
+              const Text('Linear - Heavy - Fixed'),
+              const VoicesLinearProgressIndicator(
+                value: 0.25,
+                weight: VoicesProgressIndicatorWeight.heavy,
+              ),
+              const VoicesLinearProgressIndicator(
+                value: 0.25,
+                showTrack: false,
+                weight: VoicesProgressIndicatorWeight.heavy,
+              ),
+              const Text('Circular - Indeterminate'),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  VoicesCircularProgressIndicator(),
+                  SizedBox(width: 16),
+                  VoicesCircularProgressIndicator(showTrack: false),
+                ],
+              ),
+              const Text('Circular - Fixed'),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  VoicesCircularProgressIndicator(value: 0.75),
+                  SizedBox(width: 16),
+                  VoicesCircularProgressIndicator(value: 0.75, showTrack: false),
+                ],
+              ),
+              const Text('Generic error indicator'),
+              Row(
+                children: [
+                  VoicesErrorIndicator(
+                    message: 'Something went wrong',
+                    onRetry: () {},
+                  ),
+                  const SizedBox(width: 16),
+                  const VoicesErrorIndicator(
+                    message: 'Something went wrong',
+                  ),
+                ],
+              ),
+              const Text('No Internet Connection Banner'),
+              const NoInternetConnectionBanner(),
+              const Text('Password strength indicator'),
+              for (final passwordStrength in PasswordStrength.values)
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: SizedBox(
+                    width: 400,
+                    child: VoicesPasswordStrengthIndicator(
+                      passwordStrength: passwordStrength,
+                    ),
+                  ),
                 ),
-              ),
-              SizedBox(width: 50),
-              Expanded(
-                child: VoicesStatusIndicator(
-                  status: AffixDecorator(
-                    prefix: Icon(Icons.close),
-                    child: Text('QR FAILED'),
-                  ),
-                  title: Text('Upload failed or QR code not recognized!'),
-                  body: Text(
-                    'Are you sure your upload didn’t get interrupted or that '
-                    'you provided a Catalyst QR code? '
-                    'Please try again.',
-                  ),
-                  type: VoicesStatusIndicatorType.error,
-                ),
-              ),
-            ],
-          ),
-          const Text('Process Stepper Indicator'),
-          const _Steps(),
-          const Text('Linear - Indeterminate'),
-          const VoicesLinearProgressIndicator(),
-          const VoicesLinearProgressIndicator(showTrack: false),
-          const Text('Linear - Heavy - Indeterminate'),
-          const VoicesLinearProgressIndicator(weight: VoicesProgressIndicatorWeight.heavy),
-          const VoicesLinearProgressIndicator(
-            weight: VoicesProgressIndicatorWeight.heavy,
-            showTrack: false,
-          ),
-          const Text('Linear - Fixed'),
-          const VoicesLinearProgressIndicator(value: 0.25),
-          const VoicesLinearProgressIndicator(value: 0.25, showTrack: false),
-          const Text('Linear - Heavy - Fixed'),
-          const VoicesLinearProgressIndicator(
-            value: 0.25,
-            weight: VoicesProgressIndicatorWeight.heavy,
-          ),
-          const VoicesLinearProgressIndicator(
-            value: 0.25,
-            showTrack: false,
-            weight: VoicesProgressIndicatorWeight.heavy,
-          ),
-          const Text('Circular - Indeterminate'),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              VoicesCircularProgressIndicator(),
-              SizedBox(width: 16),
-              VoicesCircularProgressIndicator(showTrack: false),
-            ],
-          ),
-          const Text('Circular - Fixed'),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              VoicesCircularProgressIndicator(value: 0.75),
-              SizedBox(width: 16),
-              VoicesCircularProgressIndicator(value: 0.75, showTrack: false),
-            ],
-          ),
-          const Text('Generic error indicator'),
-          Row(
-            children: [
-              VoicesErrorIndicator(
-                message: 'Something went wrong',
-                onRetry: () {},
-              ),
-              const SizedBox(width: 16),
-              const VoicesErrorIndicator(
-                message: 'Something went wrong',
-              ),
-            ],
-          ),
-          const Text('No Internet Connection Banner'),
-          const NoInternetConnectionBanner(),
-          const Text('Password strength indicator'),
-          for (final passwordStrength in PasswordStrength.values)
-            Align(
-              alignment: Alignment.topLeft,
-              child: SizedBox(
-                width: 400,
-                child: VoicesPasswordStrengthIndicator(
-                  passwordStrength: passwordStrength,
-                ),
-              ),
-            ),
-        ].separatedByIndexed(
-          (index, value) {
-            return switch (value.runtimeType) {
-              Text => const SizedBox(height: 8),
-              VoicesLinearProgressIndicator => const SizedBox(height: 16),
-              _ => const SizedBox(height: 22),
-            };
-          },
-        ).toList(),
+            ].separatedByIndexed(
+              (index, value) {
+                return switch (value.runtimeType) {
+                  Text => const SizedBox(height: 8),
+                  VoicesLinearProgressIndicator => const SizedBox(height: 16),
+                  _ => const SizedBox(height: 22),
+                };
+              },
+            ).toList(),
       ),
     );
   }

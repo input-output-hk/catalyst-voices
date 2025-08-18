@@ -15,10 +15,10 @@ class ProposalData extends Equatable {
 
   @override
   List<Object?> get props => [
-        document,
-        publish,
-        commentsCount,
-      ];
+    document,
+    publish,
+    commentsCount,
+  ];
 
   ProposalVersion toProposalVersion() {
     return ProposalVersion(
@@ -44,7 +44,7 @@ class ProposalDetailData extends ProposalData {
 
   @override
   List<Object?> get props => [
-        ...super.props,
-        versions,
-      ];
+    ...super.props,
+    versions,
+  ];
 }

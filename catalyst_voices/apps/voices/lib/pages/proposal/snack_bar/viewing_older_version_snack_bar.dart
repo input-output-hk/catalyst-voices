@@ -30,9 +30,9 @@ final class ViewingOlderVersionSnackBar extends VoicesSnackBar {
     super.title,
     required Widget action,
   }) : super(
-          type: VoicesSnackBarType.warning,
-          icon: VoicesAssets.icons.reply.buildIcon(),
-          actions: [action],
-          duration: const Duration(seconds: 6),
-        );
+         type: VoicesSnackBarType.warning,
+         icon: VoicesAssets.icons.reply.buildIcon(),
+         actions: [action],
+         duration: const Duration(seconds: 6),
+       );
 }

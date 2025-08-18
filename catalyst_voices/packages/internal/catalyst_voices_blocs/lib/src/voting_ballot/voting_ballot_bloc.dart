@@ -212,8 +212,9 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
 
   Future<void> _checkPassword(CheckPasswordEvent event, Emitter<VotingBallotState> emit) async {
     const confirmPasswordStep = ConfirmPasswordStep(isLoading: true);
-    const confirmPasswordFailed =
-        ConfirmPasswordStep(exception: LocalizedUnlockPasswordException());
+    const confirmPasswordFailed = ConfirmPasswordStep(
+      exception: LocalizedUnlockPasswordException(),
+    );
     final newFooter = state.footer.copyWith(castingStep: confirmPasswordStep);
     emit(state.copyWith(footer: newFooter));
 

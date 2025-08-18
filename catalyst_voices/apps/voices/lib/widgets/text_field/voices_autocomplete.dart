@@ -45,23 +45,24 @@ class VoicesAutocomplete<T extends Object> extends StatelessWidget {
       displayStringForOption: displayStringForOption,
       textEditingController: textEditingController,
       focusNode: focusNode,
-      fieldViewBuilder: (
-        context,
-        textEditingController,
-        focusNode,
-        onFieldSubmitted,
-      ) {
-        return VoicesTextField(
-          controller: textEditingController,
-          focusNode: focusNode,
-          onFieldSubmitted: (value) {
-            onFieldSubmitted();
+      fieldViewBuilder:
+          (
+            context,
+            textEditingController,
+            focusNode,
+            onFieldSubmitted,
+          ) {
+            return VoicesTextField(
+              controller: textEditingController,
+              focusNode: focusNode,
+              onFieldSubmitted: (value) {
+                onFieldSubmitted();
+              },
+              autovalidateMode: autovalidateMode,
+              textValidator: textValidator,
+              showValidationStatusIcon: showValidationStatusIcon,
+            );
           },
-          autovalidateMode: autovalidateMode,
-          textValidator: textValidator,
-          showValidationStatusIcon: showValidationStatusIcon,
-        );
-      },
       optionsViewBuilder: (context, onSelected, options) {
         return _VoicesAutocompletionOptions<T>(
           options: options,

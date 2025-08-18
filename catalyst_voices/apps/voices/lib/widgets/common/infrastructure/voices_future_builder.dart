@@ -11,21 +11,23 @@ typedef VoicesFutureProvider<T extends Object> = Future<T> Function();
 ///
 /// Call [onRetry] if your data state contains
 /// the retry button, it will reload the widget.
-typedef VoicesFutureDataBuilder<T> = Widget Function(
-  BuildContext context,
-  T value,
-  VoidCallback onRetry,
-);
+typedef VoicesFutureDataBuilder<T> =
+    Widget Function(
+      BuildContext context,
+      T value,
+      VoidCallback onRetry,
+    );
 
 /// A callback that builds a widget in an error state.
 ///
 /// Call [onRetry] if your error state contains
 /// the retry button, it will reload the widget.
-typedef VoicesFutureErrorBuilder = Widget Function(
-  BuildContext context,
-  Object? error,
-  VoidCallback onRetry,
-);
+typedef VoicesFutureErrorBuilder =
+    Widget Function(
+      BuildContext context,
+      Object? error,
+      VoidCallback onRetry,
+    );
 
 /// A [FutureBuilder] which simplifies handling a [Future] gently.
 class VoicesFutureBuilder<T extends Object> extends StatefulWidget {

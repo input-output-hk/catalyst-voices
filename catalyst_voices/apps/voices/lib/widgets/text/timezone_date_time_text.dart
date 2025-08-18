@@ -5,10 +5,11 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
-typedef TimezoneDateTimeTextFormatter = String Function(
-  BuildContext context,
-  DateTime dateTime,
-);
+typedef TimezoneDateTimeTextFormatter =
+    String Function(
+      BuildContext context,
+      DateTime dateTime,
+    );
 
 /// Text widget aware of [TimezonePreferences] which will update automatically
 /// whenever [UserSettings] changes.
@@ -98,10 +99,12 @@ class TimezoneDateTimeText extends StatelessWidget {
     final effectiveBackgroundColor = backgroundColor.resolve(states);
     final effectiveForegroundColor = foregroundColor.resolve(states);
 
-    final timestampStyle = (timestampTextStyle.resolve(states) ?? const TextStyle())
-        .copyWith(color: effectiveForegroundColor);
-    final timezoneStyle = (timezoneTextStyle.resolve(states) ?? const TextStyle())
-        .copyWith(color: effectiveForegroundColor);
+    final timestampStyle = (timestampTextStyle.resolve(states) ?? const TextStyle()).copyWith(
+      color: effectiveForegroundColor,
+    );
+    final timezoneStyle = (timezoneTextStyle.resolve(states) ?? const TextStyle()).copyWith(
+      color: effectiveForegroundColor,
+    );
 
     return AffixDecorator(
       gap: showTimezone ? 6 : 0,

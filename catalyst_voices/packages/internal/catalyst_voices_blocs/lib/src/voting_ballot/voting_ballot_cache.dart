@@ -12,9 +12,9 @@ final class VotingBallotCache extends Equatable {
 
   @override
   List<Object?> get props => [
-        campaign,
-        votesProposals,
-      ];
+    campaign,
+    votesProposals,
+  ];
 
   int get votesCount => votesProposals.length;
 

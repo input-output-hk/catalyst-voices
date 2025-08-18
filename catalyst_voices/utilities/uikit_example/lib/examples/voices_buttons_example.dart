@@ -13,7 +13,7 @@ enum _ButtonType {
   iconPrimary,
   iconFilled,
   iconTonal,
-  iconOutlined;
+  iconOutlined,
 }
 
 enum _ButtonState { normal, disabled }
@@ -108,8 +108,8 @@ class _ButtonRow extends StatelessWidget {
               trailing: addTrailingIcon
                   ? const Icon(Icons.add)
                   : addTrailingText
-                      ? const Text(r'$4.44')
-                      : null,
+                  ? const Text(r'$4.44')
+                  : null,
             );
           })
           .separatedBy(const SizedBox(width: 16))
@@ -125,55 +125,55 @@ class _ButtonRow extends StatelessWidget {
   }) {
     return switch (type) {
       _ButtonType.filled => VoicesFilledButton(
-          onTap: state == _ButtonState.disabled ? null : () {},
-          leading: leading,
-          trailing: trailing,
-          child: const Text('Label'),
-        ),
+        onTap: state == _ButtonState.disabled ? null : () {},
+        leading: leading,
+        trailing: trailing,
+        child: const Text('Label'),
+      ),
       _ButtonType.outlined => VoicesOutlinedButton(
-          onTap: state == _ButtonState.disabled ? null : () {},
-          leading: leading,
-          trailing: trailing,
-          child: const Text('Label'),
-        ),
+        onTap: state == _ButtonState.disabled ? null : () {},
+        leading: leading,
+        trailing: trailing,
+        child: const Text('Label'),
+      ),
       _ButtonType.text => VoicesTextButton(
-          onTap: state == _ButtonState.disabled ? null : () {},
-          leading: leading,
-          trailing: trailing,
-          child: const Text('Label'),
-        ),
+        onTap: state == _ButtonState.disabled ? null : () {},
+        leading: leading,
+        trailing: trailing,
+        child: const Text('Label'),
+      ),
       _ButtonType.textNeutral => VoicesTextButton.neutral(
-          onTap: state == _ButtonState.disabled ? null : () {},
-          leading: leading,
-          trailing: trailing,
-          child: const Text('Label'),
-        ),
+        onTap: state == _ButtonState.disabled ? null : () {},
+        leading: leading,
+        trailing: trailing,
+        child: const Text('Label'),
+      ),
       _ButtonType.textSecondary => VoicesTextButton.secondary(
-          onTap: state == _ButtonState.disabled ? null : () {},
-          leading: leading,
-          trailing: trailing,
-          child: const Text('Label'),
-        ),
+        onTap: state == _ButtonState.disabled ? null : () {},
+        leading: leading,
+        trailing: trailing,
+        child: const Text('Label'),
+      ),
       _ButtonType.icon => VoicesIconButton(
-          onTap: state == _ButtonState.disabled ? null : () {},
-          child: const Icon(Icons.close),
-        ),
+        onTap: state == _ButtonState.disabled ? null : () {},
+        child: const Icon(Icons.close),
+      ),
       _ButtonType.iconPrimary => VoicesIconButton.primary(
-          onTap: state == _ButtonState.disabled ? null : () {},
-          child: const Icon(Icons.close),
-        ),
+        onTap: state == _ButtonState.disabled ? null : () {},
+        child: const Icon(Icons.close),
+      ),
       _ButtonType.iconFilled => VoicesIconButton.filled(
-          onTap: state == _ButtonState.disabled ? null : () {},
-          child: const Icon(Icons.close),
-        ),
+        onTap: state == _ButtonState.disabled ? null : () {},
+        child: const Icon(Icons.close),
+      ),
       _ButtonType.iconTonal => VoicesIconButton.tonal(
-          onTap: state == _ButtonState.disabled ? null : () {},
-          child: const Icon(Icons.close),
-        ),
+        onTap: state == _ButtonState.disabled ? null : () {},
+        child: const Icon(Icons.close),
+      ),
       _ButtonType.iconOutlined => VoicesIconButton.outlined(
-          onTap: state == _ButtonState.disabled ? null : () {},
-          child: const Icon(Icons.close),
-        ),
+        onTap: state == _ButtonState.disabled ? null : () {},
+        child: const Icon(Icons.close),
+      ),
     };
   }
 }

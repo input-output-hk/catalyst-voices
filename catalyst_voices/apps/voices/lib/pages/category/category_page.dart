@@ -154,7 +154,7 @@ class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
       selector: (state) {
         return (
           show: state.isLoading,
-          data: state.category ?? CampaignCategoryDetailsViewModel.dummy()
+          data: state.category ?? CampaignCategoryDetailsViewModel.dummy(),
         );
       },
       builder: (context, state) {

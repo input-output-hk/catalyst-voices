@@ -68,8 +68,8 @@ final class StructuredBytes<T> {
   const StructuredBytes(
     List<int> bytes, {
     required Map<T, CborValueByteRange> context,
-  })  : _bytes = bytes,
-        _context = context;
+  }) : _bytes = bytes,
+       _context = context;
 
   /// Returns bytes as unmodifiable list.
   List<int> get bytes => List.unmodifiable(_bytes);

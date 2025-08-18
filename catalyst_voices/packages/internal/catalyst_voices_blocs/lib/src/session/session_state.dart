@@ -44,29 +44,29 @@ final class SessionState extends Equatable {
     required bool canCreateAccount,
     SessionSettings settings = const SessionSettings.fallback(),
   }) : this(
-          status: SessionStatus.guest,
-          canCreateAccount: canCreateAccount,
-          spaces: const [Space.discovery],
-          settings: settings,
-        );
+         status: SessionStatus.guest,
+         canCreateAccount: canCreateAccount,
+         spaces: const [Space.discovery],
+         settings: settings,
+       );
 
   const SessionState.initial()
-      : this(
-          status: SessionStatus.visitor,
-          spaces: const [Space.discovery],
-        );
+    : this(
+        status: SessionStatus.visitor,
+        spaces: const [Space.discovery],
+      );
 
   const SessionState.visitor({
     required bool canCreateAccount,
     required bool isRegistrationInProgress,
     SessionSettings settings = const SessionSettings.fallback(),
   }) : this(
-          status: SessionStatus.visitor,
-          canCreateAccount: canCreateAccount,
-          isRegistrationInProgress: isRegistrationInProgress,
-          spaces: const [Space.discovery],
-          settings: settings,
-        );
+         status: SessionStatus.visitor,
+         canCreateAccount: canCreateAccount,
+         isRegistrationInProgress: isRegistrationInProgress,
+         spaces: const [Space.discovery],
+         settings: settings,
+       );
 
   bool get isActive => status == SessionStatus.actor;
 
@@ -78,13 +78,13 @@ final class SessionState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        account,
-        isRegistrationInProgress,
-        spaces,
-        overallSpaces,
-        spacesShortcuts,
-        canCreateAccount,
-        settings,
-      ];
+    status,
+    account,
+    isRegistrationInProgress,
+    spaces,
+    overallSpaces,
+    spacesShortcuts,
+    canCreateAccount,
+    settings,
+  ];
 }

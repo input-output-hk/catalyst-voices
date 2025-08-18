@@ -32,7 +32,8 @@ class SelectorUtils {
     expect(
       mockUrlLauncherPlatform.capturedUrl.contains(urlPart),
       true,
-      reason: 'Link URL does not match: \nexpected $urlPart'
+      reason:
+          'Link URL does not match: \nexpected $urlPart'
           '\ngot ${mockUrlLauncherPlatform.capturedUrl}',
     );
     mockUrlLauncherPlatform.tearDownMock();

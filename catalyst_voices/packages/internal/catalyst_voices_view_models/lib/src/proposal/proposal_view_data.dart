@@ -16,10 +16,10 @@ final class ProposalViewData extends Equatable {
 
   @override
   List<Object?> get props => [
-        isCurrentVersionLatest,
-        header,
-        segments,
-      ];
+    isCurrentVersionLatest,
+    header,
+    segments,
+  ];
 
   ProposalViewData copyWith({
     Optional<bool>? isCurrentVersionLatest,

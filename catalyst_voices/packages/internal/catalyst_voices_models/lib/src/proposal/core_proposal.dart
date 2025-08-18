@@ -28,16 +28,16 @@ base class CoreProposal extends Equatable implements Comparable<CoreProposal> {
 
   @override
   List<Object?> get props => [
-        selfRef,
-        categoryRef,
-        title,
-        description,
-        fundsRequested,
-        publish,
-        duration,
-        author,
-        commentsCount,
-      ];
+    selfRef,
+    categoryRef,
+    title,
+    description,
+    fundsRequested,
+    publish,
+    duration,
+    author,
+    commentsCount,
+  ];
 
   DateTime get updateDate => selfRef.version!.dateTime;
 

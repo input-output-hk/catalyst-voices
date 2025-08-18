@@ -22,10 +22,10 @@ class NewProposalCubit extends Cubit<NewProposalState>
     this._proposalService,
     this._documentMapper,
   ) : super(
-          const NewProposalState(
-            title: ProposalTitle.pure(),
-          ),
-        );
+        const NewProposalState(
+          title: ProposalTitle.pure(),
+        ),
+      );
 
   Future<DraftRef?> createDraft() async {
     try {
@@ -92,12 +92,14 @@ class NewProposalCubit extends Cubit<NewProposalState>
             .proposalTemplateRef,
       );
 
-      final titlePropertySchema = templateRef.schema
-          .getPropertySchema(ProposalDocument.titleNodeId)! as DocumentStringSchema;
+      final titlePropertySchema =
+          templateRef.schema.getPropertySchema(ProposalDocument.titleNodeId)!
+              as DocumentStringSchema;
       final titleRange = titlePropertySchema.strLengthRange;
 
-      final categories =
-          campaign.categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
+      final categories = campaign.categories
+          .map(CampaignCategoryDetailsViewModel.fromModel)
+          .toList();
       final newState = state.copyWith(
         isLoading: false,
         step: step,

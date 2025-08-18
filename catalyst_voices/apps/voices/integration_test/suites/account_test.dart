@@ -30,8 +30,9 @@ void main() async {
   group(
     'Account page -',
     () {
-      patrolWidgetTest(tags: 'issues_1715', skip: true, 'user - locking account',
-          (PatrolTester $) async {
+      patrolWidgetTest(tags: 'issues_1715', skip: true, 'user - locking account', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordSuccessPanel($).goto();
         await UnlockPasswordSuccessPanel($).clickGoToDashboard();
@@ -61,8 +62,9 @@ void main() async {
         await UnlockModalPage($).incorrectPasswordErrorShowsUp();
       });
 
-      patrolWidgetTest(tags: 'issues_1597', skip: true, 'user changing email works',
-          (PatrolTester $) async {
+      patrolWidgetTest(tags: 'issues_1597', skip: true, 'user changing email works', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await UnlockPasswordSuccessPanel($).goto();
         await UnlockPasswordSuccessPanel($).clickGoToDashboard();

@@ -14,8 +14,11 @@ class ChangeCategoryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<CategoryDetailCubit, CategoryDetailState,
-        List<DropdownMenuViewModel<ProposalsCategoryFilter>>>(
+    return BlocSelector<
+      CategoryDetailCubit,
+      CategoryDetailState,
+      List<DropdownMenuViewModel<ProposalsCategoryFilter>>
+    >(
       selector: (state) {
         final selectedCategory = state.category?.id ?? '';
         return state.categories
@@ -32,25 +35,26 @@ class ChangeCategoryButton extends StatelessWidget {
         return CampaignCategoryPicker(
           onSelected: (value) => unawaited(_changeCategory(context, value)),
           items: state,
-          buttonBuilder: (
-            context,
-            onTapCallback, {
-            required isMenuOpen,
-          }) {
-            return VoicesOutlinedButton(
-              onTap: onTapCallback,
-              trailing: VoicesAssets.icons.chevronDown.buildIcon(),
-              style: OutlinedButton.styleFrom(
-                backgroundColor: isMenuOpen ? context.colors.onSurfacePrimary08 : null,
-              ),
-              child: Text(
-                context.l10n.exploreCategories,
-                style: context.textTheme.labelLarge?.copyWith(
-                  color: context.colorScheme.primary,
-                ),
-              ),
-            );
-          },
+          buttonBuilder:
+              (
+                context,
+                onTapCallback, {
+                required isMenuOpen,
+              }) {
+                return VoicesOutlinedButton(
+                  onTap: onTapCallback,
+                  trailing: VoicesAssets.icons.chevronDown.buildIcon(),
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: isMenuOpen ? context.colors.onSurfacePrimary08 : null,
+                  ),
+                  child: Text(
+                    context.l10n.exploreCategories,
+                    style: context.textTheme.labelLarge?.copyWith(
+                      color: context.colorScheme.primary,
+                    ),
+                  ),
+                );
+              },
         );
       },
     );

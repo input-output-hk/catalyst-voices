@@ -66,9 +66,9 @@ class _VoicesModalMenuItemTileState extends State<_VoicesModalMenuItemTile> {
   late _BorderColor _border;
 
   Set<WidgetState> get _states => {
-        if (!widget.isEnabled) WidgetState.disabled,
-        if (widget.isSelected) WidgetState.selected,
-      };
+    if (!widget.isEnabled) WidgetState.disabled,
+    if (widget.isSelected) WidgetState.selected,
+  };
 
   @override
   void didChangeDependencies() {
@@ -95,14 +95,17 @@ class _VoicesModalMenuItemTileState extends State<_VoicesModalMenuItemTile> {
           border: _border.resolve(_states),
           borderRadius: BorderRadius.circular(8),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16)
-            .add(const EdgeInsets.only(bottom: 2)),
+        padding: const EdgeInsets.symmetric(
+          vertical: 12,
+          horizontal: 16,
+        ).add(const EdgeInsets.only(bottom: 2)),
         child: Text(
           widget.label,
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
-          style:
-              _labelTextStyle.resolve(_states).copyWith(color: _foregroundColor.resolve(_states)),
+          style: _labelTextStyle
+              .resolve(_states)
+              .copyWith(color: _foregroundColor.resolve(_states)),
         ),
       ),
     );

@@ -20,13 +20,13 @@ final class ProposalsFilters extends Equatable {
 
   @override
   List<Object?> get props => [
-        type,
-        author,
-        onlyAuthor,
-        category,
-        searchQuery,
-        maxAge,
-      ];
+    type,
+    author,
+    onlyAuthor,
+    category,
+    searchQuery,
+    maxAge,
+  ];
 
   ProposalsFilters copyWith({
     ProposalsFilterType? type,
@@ -57,7 +57,8 @@ final class ProposalsFilters extends Equatable {
   }
 
   @override
-  String toString() => 'ProposalsFilters('
+  String toString() =>
+      'ProposalsFilters('
       'type[${type.name}], '
       'author[$author], '
       'onlyAuthor[$onlyAuthor], '

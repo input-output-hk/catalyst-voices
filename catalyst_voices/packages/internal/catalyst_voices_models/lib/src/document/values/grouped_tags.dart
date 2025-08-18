@@ -39,9 +39,9 @@ final class GroupedTagsSelection extends Equatable {
 
   @override
   List<Object?> get props => [
-        group,
-        tag,
-      ];
+    group,
+    tag,
+  ];
 }
 
 final class GroupedTags extends Equatable {
@@ -57,48 +57,53 @@ final class GroupedTags extends Equatable {
     List<DocumentSchemaLogicalGroup> groups, {
     Logger? logger,
   }) {
-    return groups.where((element) {
-      final conditions = element.conditions;
-      if (conditions.length != 2) {
-        logger?.warning('$element has invalid conditions length (!=2)');
-        return false;
-      }
+    return groups
+        .where((element) {
+          final conditions = element.conditions;
+          if (conditions.length != 2) {
+            logger?.warning('$element has invalid conditions length (!=2)');
+            return false;
+          }
 
-      final group = conditions.firstWhereOrNull((e) => e.schema is DocumentTagGroupSchema);
-      final selection = conditions.firstWhereOrNull((e) => e.schema is DocumentTagSelectionSchema);
+          final group = conditions.firstWhereOrNull((e) => e.schema is DocumentTagGroupSchema);
+          final selection = conditions.firstWhereOrNull(
+            (e) => e.schema is DocumentTagSelectionSchema,
+          );
 
-      if (group == null) {
-        logger?.warning('Group[$group] definition is not group');
-        return false;
-      }
+          if (group == null) {
+            logger?.warning('Group[$group] definition is not group');
+            return false;
+          }
 
-      if (group.constValue is! String) {
-        logger?.warning('Group[$group] does not have String value');
-        return false;
-      }
+          if (group.constValue is! String) {
+            logger?.warning('Group[$group] does not have String value');
+            return false;
+          }
 
-      if (selection == null) {
-        logger?.warning('Group[$selection] definition is not selection');
-        return false;
-      }
+          if (selection == null) {
+            logger?.warning('Group[$selection] definition is not selection');
+            return false;
+          }
 
-      if (selection.enumValues == null) {
-        logger?.warning('Group[$selection] does not have enum values');
-        return false;
-      }
+          if (selection.enumValues == null) {
+            logger?.warning('Group[$selection] does not have enum values');
+            return false;
+          }
 
-      return true;
-    }).map(
-      (e) {
-        final group = e.conditions[0].constValue! as String;
-        final values = e.conditions[1].enumValues!.cast<String>();
+          return true;
+        })
+        .map(
+          (e) {
+            final group = e.conditions[0].constValue! as String;
+            final values = e.conditions[1].enumValues!.cast<String>();
 
-        return GroupedTags(
-          group: group,
-          tags: values,
-        );
-      },
-    ).toList();
+            return GroupedTags(
+              group: group,
+              tags: values,
+            );
+          },
+        )
+        .toList();
   }
 
   @override
@@ -106,7 +111,7 @@ final class GroupedTags extends Equatable {
 
   @override
   List<Object?> get props => [
-        group,
-        tags,
-      ];
+    group,
+    tags,
+  ];
 }

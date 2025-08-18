@@ -25,8 +25,8 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
 
   KeychainCreationCubit({
     required DownloaderService downloaderService,
-  })  : _downloaderService = downloaderService,
-        super(const KeychainStateData());
+  }) : _downloaderService = downloaderService,
+       super(const KeychainStateData());
 
   SeedPhrase? get seedPhrase => _seedPhrase;
 

@@ -47,9 +47,9 @@ class _ProposalsPaginationTile extends StatelessWidget {
       },
       onFavoriteChanged: (isFavorite) {
         context.read<ProposalsCubit>().onChangeFavoriteProposal(
-              proposal.selfRef,
-              isFavorite: isFavorite,
-            );
+          proposal.selfRef,
+          isFavorite: isFavorite,
+        );
       },
     );
   }

@@ -285,8 +285,9 @@ class _SpaceItem extends StatelessWidget {
     return VoicesAvatar(
       icon: space.icon.buildIcon(),
       backgroundColor: isActive ? space.backgroundColor(context) : Colors.transparent,
-      foregroundColor:
-          isActive ? space.foregroundColor(context) : Theme.of(context).colors.iconsForeground,
+      foregroundColor: isActive
+          ? space.foregroundColor(context)
+          : Theme.of(context).colors.iconsForeground,
       onTap: onTap,
     );
   }

@@ -22,14 +22,14 @@ final class VotingCubitCache extends Equatable {
 
   @override
   List<Object?> get props => [
-        campaign,
-        votingPower,
-        page,
-        filters,
-        count,
-        favoriteIds,
-        lastCastedVote,
-      ];
+    campaign,
+    votingPower,
+    page,
+    filters,
+    count,
+    favoriteIds,
+    lastCastedVote,
+  ];
 
   VotingCubitCache copyWith({
     Optional<Campaign>? campaign,

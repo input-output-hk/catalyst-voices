@@ -38,9 +38,10 @@ class _VoteButtonMenu extends StatelessWidget {
           ),
           // Additional options. Depends
           ...[
-            if (canRemoveLatestVote) _VoteButtonMenuRemoveFromVoteList(onTap: _removeLatest),
-            if (casted case final VoteTypeDataCasted casted) _VoteButtonMenuCasted(data: casted),
-          ]
+                if (canRemoveLatestVote) _VoteButtonMenuRemoveFromVoteList(onTap: _removeLatest),
+                if (casted case final VoteTypeDataCasted casted)
+                  _VoteButtonMenuCasted(data: casted),
+              ]
               // Separate only available options (no divider if empty or 1 element).
               .separatedBy(const _VoteButtonMenuDivider())
               // Insert spacing before first element.
@@ -231,8 +232,9 @@ class _VoteButtonMenuTypesRowButtonState extends State<_VoteButtonMenuTypesRowBu
         final effectiveBackgroundColor = backgroundColor.resolve(_statesController.value);
         final effectiveForegroundColor = foregroundColor.resolve(_statesController.value);
 
-        final textStyle = (context.textTheme.labelLarge ?? const TextStyle())
-            .copyWith(color: effectiveForegroundColor);
+        final textStyle = (context.textTheme.labelLarge ?? const TextStyle()).copyWith(
+          color: effectiveForegroundColor,
+        );
         final iconStyle = IconThemeData(size: 24, color: effectiveForegroundColor);
 
         return Material(

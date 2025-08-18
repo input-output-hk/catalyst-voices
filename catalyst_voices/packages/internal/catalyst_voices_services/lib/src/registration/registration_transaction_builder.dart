@@ -2,7 +2,8 @@ import 'dart:math';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
     hide Ed25519PublicKey;
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart' as cs
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
+    as cs
     show Ed25519PublicKey;
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -64,10 +65,10 @@ final class RegistrationTransactionBuilder {
     required this.utxos,
     required this.previousTransactionId,
   }) : assert(
-          roles.isFirstRegistration || previousTransactionId != null,
-          "When it's not a first registration then "
-          'previousTransactionId must be provided',
-        );
+         roles.isFirstRegistration || previousTransactionId != null,
+         "When it's not a first registration then "
+         'previousTransactionId must be provided',
+       );
 
   ShelleyAddress get _stakeAddress => rewardAddresses.first;
 

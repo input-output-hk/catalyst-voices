@@ -30,12 +30,12 @@ final class WorkspaceState extends Equatable {
 
   @override
   List<Object?> get props => [
-        isLoading,
-        error,
-        userProposals,
-        timelineItems,
-        fundNumber,
-      ];
+    isLoading,
+    error,
+    userProposals,
+    timelineItems,
+    fundNumber,
+  ];
 
   List<UsersProposalOverview> get published =>
       userProposals.where((e) => (e.publish.isPublished || e.publish.isDraft)).toList();

@@ -24,14 +24,16 @@ final class CommentWithReplies extends Equatable {
     required List<CommentDocument> comments,
     int depth = 1,
   }) {
-    final replies =
-        comments.where((element) => element.metadata.reply == comment.metadata.selfRef).map((e) {
-      return CommentWithReplies.build(
-        e,
-        comments: comments,
-        depth: depth + 1,
-      );
-    }).toList();
+    final replies = comments
+        .where((element) => element.metadata.reply == comment.metadata.selfRef)
+        .map((e) {
+          return CommentWithReplies.build(
+            e,
+            comments: comments,
+            depth: depth + 1,
+          );
+        })
+        .toList();
 
     return CommentWithReplies(
       comment: comment,
@@ -40,16 +42,14 @@ final class CommentWithReplies extends Equatable {
     );
   }
 
-  const CommentWithReplies.direct(this.comment)
-      : replies = const [],
-        depth = 1;
+  const CommentWithReplies.direct(this.comment) : replies = const [], depth = 1;
 
   @override
   List<Object?> get props => [
-        comment,
-        replies,
-        depth,
-      ];
+    comment,
+    replies,
+    depth,
+  ];
 
   SignedDocumentRef get ref => comment.metadata.selfRef;
 

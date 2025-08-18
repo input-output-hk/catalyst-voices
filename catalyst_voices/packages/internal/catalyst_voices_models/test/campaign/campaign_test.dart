@@ -136,8 +136,9 @@ void main() {
 
       // Assert
       expect(
-        result.activePhases
-            .any((state) => state.phase.type == CampaignPhaseType.proposalSubmission),
+        result.activePhases.any(
+          (state) => state.phase.type == CampaignPhaseType.proposalSubmission,
+        ),
         isTrue,
       );
 

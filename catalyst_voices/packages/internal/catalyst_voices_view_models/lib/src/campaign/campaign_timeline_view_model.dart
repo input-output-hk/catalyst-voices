@@ -26,22 +26,22 @@ class CampaignTimelineViewModel extends Equatable {
   });
 
   factory CampaignTimelineViewModel.fromModel(CampaignPhase model) => CampaignTimelineViewModel(
-        title: model.title,
-        description: model.description,
-        timeline: DateRange(
-          from: model.timeline.from,
-          to: model.timeline.to,
-        ),
-        type: model.type,
-        offstage: offstagePhases.contains(model.type),
-      );
+    title: model.title,
+    description: model.description,
+    timeline: DateRange(
+      from: model.timeline.from,
+      to: model.timeline.to,
+    ),
+    type: model.type,
+    offstage: offstagePhases.contains(model.type),
+  );
 
   @override
   List<Object?> get props => [
-        title,
-        description,
-        timeline,
-        type,
-        offstage,
-      ];
+    title,
+    description,
+    timeline,
+    type,
+    offstage,
+  ];
 }

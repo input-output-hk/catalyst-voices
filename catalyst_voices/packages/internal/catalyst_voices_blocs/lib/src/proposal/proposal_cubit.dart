@@ -44,8 +44,9 @@ final class ProposalCubit extends Cubit<ProposalState>
     this._ballotBuilder,
     this._votingService,
   ) : super(const ProposalState()) {
-    _cache =
-        _cache.copyWith(activeAccountId: Optional(_userService.user.activeAccount?.catalystId));
+    _cache = _cache.copyWith(
+      activeAccountId: Optional(_userService.user.activeAccount?.catalystId),
+    );
     _activeAccountIdSub = _userService.watchUser
         .map((event) => event.activeAccount?.catalystId)
         .distinct()

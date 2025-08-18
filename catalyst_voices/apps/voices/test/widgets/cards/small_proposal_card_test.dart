@@ -103,8 +103,7 @@ void main() {
       expect(find.text('2'), findsOneWidget);
     });
 
-    testWidgets(
-        'shows new iteration details when showLatestLocal '
+    testWidgets('shows new iteration details when showLatestLocal '
         'is true and has latest local draft', (tester) async {
       await pumpCard(tester, showLatestLocal: true);
       await tester.pumpAndSettle();

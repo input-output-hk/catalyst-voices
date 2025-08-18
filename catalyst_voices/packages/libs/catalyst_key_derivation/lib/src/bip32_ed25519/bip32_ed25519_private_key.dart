@@ -18,9 +18,9 @@ class Bip32Ed25519XPrivateKey extends Equatable {
 
   /// Constructs [Bip32Ed25519XPrivateKey] from a byte list.
   Bip32Ed25519XPrivateKey.fromBytes(List<int> bytes)
-      : _bytes = rust.Bip32Ed25519XPrivateKey(
-          xprvBytes: rust.U8Array96(Uint8List.fromList(bytes)),
-        );
+    : _bytes = rust.Bip32Ed25519XPrivateKey(
+        xprvBytes: rust.U8Array96(Uint8List.fromList(bytes)),
+      );
 
   /// Serializes the type as cbor.
   CborValue toCbor() => CborBytes(bytes);

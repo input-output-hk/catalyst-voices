@@ -47,8 +47,9 @@ class _CampaignAdminToolsEventsTabState extends State<CampaignAdminToolsEventsTa
             _EventTimelapseControls(
               nextStageTransitionAt: _stageTransitionAt,
               stageTransitionDelay: _stageTransitionDelay,
-              onPreviousStage:
-                  _canSelectPreviousStage(stage) ? () => _onPreviousStage(stage) : null,
+              onPreviousStage: _canSelectPreviousStage(stage)
+                  ? () => _onPreviousStage(stage)
+                  : null,
               onNextStage: _canSelectNextStage(stage) ? () => _onNextStage(stage) : null,
               onTransitionDelayChanged: _onTransitionDelayChanged,
             ),
@@ -151,8 +152,9 @@ class _EventItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color =
-        isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).colors.textOnPrimary;
+    final color = isActive
+        ? Theme.of(context).colorScheme.primary
+        : Theme.of(context).colors.textOnPrimary;
 
     return InkWell(
       onTap: onTap,
@@ -169,18 +171,18 @@ class _EventItem extends StatelessWidget {
               child: Text(
                 _text(context.l10n),
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: color,
-                    ),
+                  color: color,
+                ),
               ),
             ),
             if (isActive)
               Text(
                 context.l10n.active.toUpperCase(),
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 11,
-                      color: color,
-                    ),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 11,
+                  color: color,
+                ),
               ),
           ],
         ),
@@ -189,18 +191,18 @@ class _EventItem extends StatelessWidget {
   }
 
   SvgGenImage get _icon => switch (stage) {
-        CampaignStage.draft => VoicesAssets.icons.clock,
-        CampaignStage.scheduled => VoicesAssets.icons.clock,
-        CampaignStage.live => VoicesAssets.icons.flag,
-        CampaignStage.completed => VoicesAssets.icons.calendar,
-      };
+    CampaignStage.draft => VoicesAssets.icons.clock,
+    CampaignStage.scheduled => VoicesAssets.icons.clock,
+    CampaignStage.live => VoicesAssets.icons.flag,
+    CampaignStage.completed => VoicesAssets.icons.calendar,
+  };
 
   String _text(VoicesLocalizations l10n) => switch (stage) {
-        CampaignStage.draft => l10n.campaignPreviewEventBefore,
-        CampaignStage.scheduled => l10n.campaignPreviewEventBefore,
-        CampaignStage.live => l10n.campaignPreviewEventDuring,
-        CampaignStage.completed => l10n.campaignPreviewEventAfter,
-      };
+    CampaignStage.draft => l10n.campaignPreviewEventBefore,
+    CampaignStage.scheduled => l10n.campaignPreviewEventBefore,
+    CampaignStage.live => l10n.campaignPreviewEventDuring,
+    CampaignStage.completed => l10n.campaignPreviewEventAfter,
+  };
 }
 
 class _EventTimelapseControls extends StatefulWidget {

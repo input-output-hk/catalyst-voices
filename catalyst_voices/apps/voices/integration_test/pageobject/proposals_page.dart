@@ -354,11 +354,9 @@ class ProposalsPage {
   }
 
   Future<void> shareModalCloseButtonWorks() async {
-    await $(proposalsContainer)
-        .$(MostRecentSection($).proposalCard)
-        .at(0)
-        .$(MostRecentSection($).shareButton)
-        .tap();
+    await $(
+      proposalsContainer,
+    ).$(MostRecentSection($).proposalCard).at(0).$(MostRecentSection($).shareButton).tap();
     expect($(shareProposalDialog).$(closeButton), findsOneWidget);
     await $(shareProposalDialog).$(closeButton).tap();
     expect($(shareProposalDialog).$(closeButton), findsNothing);

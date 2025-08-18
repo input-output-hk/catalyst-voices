@@ -338,7 +338,8 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
   }
 
   Future<void> _showPublishConfirmationDialog(ShowPublishConfirmationSignal signal) async {
-    final shouldPublish = await PublishProposalIterationDialog.show(
+    final shouldPublish =
+        await PublishProposalIterationDialog.show(
           context: context,
           proposalTitle: signal.proposalTitle ?? context.l10n.proposalEditorStatusDropdownViewTitle,
           currentIteration: signal.currentIteration,
@@ -373,7 +374,8 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
   }
 
   Future<void> _showSubmitConfirmationDialog(ShowSubmitConfirmationSignal signal) async {
-    final shouldSubmit = await SubmitProposalForReviewDialog.show(
+    final shouldSubmit =
+        await SubmitProposalForReviewDialog.show(
           context: context,
           proposalTitle: signal.proposalTitle ?? context.l10n.proposalEditorStatusDropdownViewTitle,
           currentIteration: signal.currentIteration,
@@ -396,7 +398,8 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
   Future<void> _showUnlockProposalDialog(UnlockProposalSignal signal) async {
     if (!_isAboutToExit) {
       final bloc = context.read<ProposalBuilderBloc>();
-      final unlock = await UnlockEditProposalDialog.show(
+      final unlock =
+          await UnlockEditProposalDialog.show(
             context: context,
             title: signal.title,
             version: signal.version,

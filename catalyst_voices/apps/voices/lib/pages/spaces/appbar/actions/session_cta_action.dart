@@ -19,9 +19,10 @@ class SessionCtaAction extends StatelessWidget {
     return BlocBuilder<SessionCubit, SessionState>(
       builder: (context, state) {
         return switch (state.status) {
-          SessionStatus.visitor => state.isRegistrationInProgress
-              ? const _FinishRegistrationButton()
-              : const _GetStartedButton(),
+          SessionStatus.visitor =>
+            state.isRegistrationInProgress
+                ? const _FinishRegistrationButton()
+                : const _GetStartedButton(),
           SessionStatus.guest => const SessionUnlockButton(),
           SessionStatus.actor => const SessionLockButton(),
         };

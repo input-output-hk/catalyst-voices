@@ -46,14 +46,14 @@ final class ProposalOverviewSegment extends BaseSegment<ProposalOverviewSection>
     required this.isVotingStage,
     required ProposalViewMetadata data,
   }) : super(
-          id: const NodeId('overview'),
-          sections: [
-            ProposalMetadataSection(
-              id: const NodeId('overview.metadata'),
-              data: data,
-            ),
-          ],
-        );
+         id: const NodeId('overview'),
+         sections: [
+           ProposalMetadataSection(
+             id: const NodeId('overview.metadata'),
+             data: data,
+           ),
+         ],
+       );
 
   @override
   SvgGenImage get icon => VoicesAssets.icons.lightningBolt;

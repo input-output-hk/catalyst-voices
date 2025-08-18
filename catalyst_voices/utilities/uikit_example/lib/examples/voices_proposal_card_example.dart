@@ -4,13 +4,14 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-final _description = """
+final _description =
+    """
 Zanzibar is becoming one of the hotspots for DID's through
 World Mobile and PRISM, but its potential is only barely exploited.
 Zanzibar is becoming one of the hotspots for DID's through World Mobile
 and PRISM, but its potential is only barely exploited.
 """
-    .replaceAll('\n', ' ');
+        .replaceAll('\n', ' ');
 
 class VoicesProposalCardExample extends StatelessWidget {
   static const String route = '/proposal-card-example';

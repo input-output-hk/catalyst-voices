@@ -19,13 +19,13 @@ final class VoicesUuidTextField extends VoicesTextField {
     super.textValidator,
     super.autovalidateMode,
   }) : super(
-          keyboardType: TextInputType.url,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-          ),
-          inputFormatters: [
-            FilteringTextInputFormatter.singleLineFormatter,
-            NoWhitespacesFormatter(),
-          ],
-        );
+         keyboardType: TextInputType.url,
+         style: const TextStyle(
+           fontWeight: FontWeight.w500,
+         ),
+         inputFormatters: [
+           FilteringTextInputFormatter.singleLineFormatter,
+           NoWhitespacesFormatter(),
+         ],
+       );
 }

@@ -18,12 +18,12 @@ final class VotingBallotState extends Equatable {
 
   @override
   List<Object?> get props => [
-        votingProgress,
-        userSummary,
-        tiles,
-        footer,
-        votesCount,
-      ];
+    votingProgress,
+    userSummary,
+    tiles,
+    footer,
+    votesCount,
+  ];
 
   VotingBallotState copyWith({
     VotingListCampaignPhaseData? votingProgress,

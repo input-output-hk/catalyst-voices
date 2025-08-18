@@ -188,15 +188,16 @@ class _SpaceSidePanelState extends State<SpaceSidePanel> with SingleTickerProvid
       vsync: this,
     );
 
-    _offsetAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: widget.isLeft ? const Offset(-1, 0) : const Offset(1, 0),
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOut,
-      ),
-    );
+    _offsetAnimation =
+        Tween<Offset>(
+          begin: Offset.zero,
+          end: widget.isLeft ? const Offset(-1, 0) : const Offset(1, 0),
+        ).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: Curves.easeInOut,
+          ),
+        );
   }
 }
 

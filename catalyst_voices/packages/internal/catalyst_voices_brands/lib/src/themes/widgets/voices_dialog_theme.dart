@@ -5,12 +5,12 @@ class VoicesDialogTheme extends DialogThemeData {
   VoicesDialogTheme({
     required VoicesColorScheme colors,
   }) : super(
-          barrierColor: colors.overlay,
-          shadowColor: colors.dropShadow,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          clipBehavior: Clip.hardEdge,
-          backgroundColor: colors.elevationsOnSurfaceNeutralLv1White,
-        );
+         barrierColor: colors.overlay,
+         shadowColor: colors.dropShadow,
+         shape: RoundedRectangleBorder(
+           borderRadius: BorderRadius.circular(12),
+         ),
+         clipBehavior: Clip.hardEdge,
+         backgroundColor: colors.elevationsOnSurfaceNeutralLv1White,
+       );
 }

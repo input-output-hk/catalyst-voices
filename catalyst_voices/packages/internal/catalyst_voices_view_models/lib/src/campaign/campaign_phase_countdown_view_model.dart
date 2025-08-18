@@ -35,8 +35,10 @@ class CampaignPhaseCountdownViewModel extends Equatable {
 
   String title(VoicesLocalizations l10n, String formattedDate) {
     return switch (type) {
-      CampaignPhaseType.communityVoting =>
-        l10n.campaignPhaseCountdownCommunityVoting(fundNumber, formattedDate),
+      CampaignPhaseType.communityVoting => l10n.campaignPhaseCountdownCommunityVoting(
+        fundNumber,
+        formattedDate,
+      ),
       CampaignPhaseType.proposalSubmission => l10n.proposalSubmissionStageStartAt(formattedDate),
       _ => '',
     };

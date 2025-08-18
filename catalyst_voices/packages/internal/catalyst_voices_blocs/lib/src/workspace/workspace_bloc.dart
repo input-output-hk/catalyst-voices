@@ -190,8 +190,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   ) async {
     final futures = proposals.map((proposal) async {
       _cachedCampaign ??= await _campaignService.getActiveCampaign();
-      final category =
-          _cachedCampaign?.categories.firstWhere((e) => e.selfRef.id == proposal.categoryRef.id);
+      final category = _cachedCampaign?.categories.firstWhere(
+        (e) => e.selfRef.id == proposal.categoryRef.id,
+      );
       return UsersProposalOverview.fromProposal(
         proposal,
         fundNumber,

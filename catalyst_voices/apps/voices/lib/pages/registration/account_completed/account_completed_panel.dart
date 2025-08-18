@@ -126,46 +126,47 @@ class _RolesFooter extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        ...roles.map(
-          (role) => Row(
-            children: [
-              Text(
-                '1x',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: VoicesChip(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 1,
-                    horizontal: 6,
-                  ),
-                  content: Text(
-                    role.getName(context),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colors.successContainer,
-                          fontWeight: FontWeight.bold,
+      children:
+          <Widget>[
+                ...roles.map(
+                  (role) => Row(
+                    children: [
+                      Text(
+                        '1x',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: VoicesChip(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 1,
+                            horizontal: 6,
+                          ),
+                          content: Text(
+                            role.getName(context),
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colors.successContainer,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(6),
+                          ),
+                          backgroundColor: Theme.of(context).colors.success,
                         ),
+                      ),
+                      Text(
+                        context.l10n.registrationCompletedRoleRegistration,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
                   ),
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(6),
-                  ),
-                  backgroundColor: Theme.of(context).colors.success,
                 ),
-              ),
-              Text(
-                context.l10n.registrationCompletedRoleRegistration,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-        ),
-      ]
-          .separatedBy(
-            const SizedBox(height: 6),
-          )
-          .toList(),
+              ]
+              .separatedBy(
+                const SizedBox(height: 6),
+              )
+              .toList(),
     );
   }
 }

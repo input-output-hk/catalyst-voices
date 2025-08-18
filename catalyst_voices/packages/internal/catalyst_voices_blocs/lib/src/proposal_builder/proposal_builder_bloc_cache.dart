@@ -27,16 +27,16 @@ final class ProposalBuilderBlocCache extends Equatable {
 
   @override
   List<Object?> get props => [
-        activeAccountId,
-        proposalBuilder,
-        proposalDocument,
-        proposalMetadata,
-        category,
-        commentTemplate,
-        comments,
-        accountPublicStatus,
-        isMaxProposalsLimitReached,
-      ];
+    activeAccountId,
+    proposalBuilder,
+    proposalDocument,
+    proposalMetadata,
+    category,
+    commentTemplate,
+    comments,
+    accountPublicStatus,
+    isMaxProposalsLimitReached,
+  ];
 
   bool get isEmailVerified => accountPublicStatus?.isVerified ?? false;
 
@@ -60,8 +60,9 @@ final class ProposalBuilderBlocCache extends Equatable {
       commentTemplate: commentTemplate.dataOr(this.commentTemplate),
       comments: comments.dataOr(this.comments),
       accountPublicStatus: accountPublicStatus.dataOr(this.accountPublicStatus),
-      isMaxProposalsLimitReached:
-          isMaxProposalsLimitReached.dataOr(this.isMaxProposalsLimitReached),
+      isMaxProposalsLimitReached: isMaxProposalsLimitReached.dataOr(
+        this.isMaxProposalsLimitReached,
+      ),
     );
   }
 }

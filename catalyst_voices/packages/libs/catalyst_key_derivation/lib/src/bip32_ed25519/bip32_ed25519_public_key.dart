@@ -16,9 +16,9 @@ class Bip32Ed25519XPublicKey extends Equatable {
 
   /// Constructs [Bip32Ed25519XPublicKey] from a byte list.
   Bip32Ed25519XPublicKey.fromBytes(List<int> bytes)
-      : _bytes = rust.Bip32Ed25519XPublicKey(
-          xpubBytes: rust.U8Array64(Uint8List.fromList(bytes)),
-        );
+    : _bytes = rust.Bip32Ed25519XPublicKey(
+        xpubBytes: rust.U8Array64(Uint8List.fromList(bytes)),
+      );
 
   /// Serializes the type as cbor.
   CborValue toCbor({List<int> tags = const []}) {

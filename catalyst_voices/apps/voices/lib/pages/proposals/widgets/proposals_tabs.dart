@@ -39,8 +39,9 @@ class _ProposalsTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isProposerUnlock =
-        context.select<SessionCubit, bool>((cubit) => cubit.state.isProposerUnlock);
+    final isProposerUnlock = context.select<SessionCubit, bool>(
+      (cubit) => cubit.state.isProposerUnlock,
+    );
 
     return VoicesTabBar(
       dividerHeight: 0,

@@ -27,8 +27,9 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
       );
     }
 
-    final categoriesModels =
-        campaign.categories.map(CampaignCategoryDetailsViewModel.fromModel).toList();
+    final categoriesModels = campaign.categories
+        .map(CampaignCategoryDetailsViewModel.fromModel)
+        .toList();
 
     emit(
       state.copyWith(

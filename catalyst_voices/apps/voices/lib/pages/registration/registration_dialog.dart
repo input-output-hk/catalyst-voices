@@ -59,7 +59,8 @@ class _RegistrationDialogState extends State<RegistrationDialog> {
               child: BlocSelector<RegistrationCubit, RegistrationState, bool>(
                 selector: (state) {
                   final isAccountCompleted = state.step is AccountCompletedStep;
-                  final isRecovered = state.step ==
+                  final isRecovered =
+                      state.step ==
                       const RecoverWithSeedPhraseStep(
                         stage: RecoverWithSeedPhraseStage.success,
                       );

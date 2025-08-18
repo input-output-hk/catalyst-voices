@@ -59,11 +59,11 @@ final class CoseSign extends Equatable {
 
   @override
   List<Object?> get props => [
-        protectedHeaders,
-        unprotectedHeaders,
-        payload,
-        signatures,
-      ];
+    protectedHeaders,
+    unprotectedHeaders,
+    payload,
+    signatures,
+  ];
 
   /// Serializes the type as cbor.
   CborValue toCbor({bool tagged = true}) {
@@ -90,8 +90,10 @@ final class CoseSign extends Equatable {
     required CatalystCoseVerifier verifier,
   }) async {
     for (final signature in signatures) {
-      if (const DeepCollectionEquality()
-          .equals(signature.protectedHeaders.kid, await verifier.kid)) {
+      if (const DeepCollectionEquality().equals(
+        signature.protectedHeaders.kid,
+        await verifier.kid,
+      )) {
         final toBeSigned = _createCoseSignSigStructureBytes(
           bodyProtectedHeaders: protectedHeaders,
           signatureProtectedHeaders: signature.protectedHeaders,
@@ -245,10 +247,10 @@ final class CoseSignature extends Equatable {
 
   @override
   List<Object?> get props => [
-        protectedHeaders,
-        unprotectedHeaders,
-        signature,
-      ];
+    protectedHeaders,
+    unprotectedHeaders,
+    signature,
+  ];
 
   /// Serializes the type as cbor.
   CborValue toCbor() {

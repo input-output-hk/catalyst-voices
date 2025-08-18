@@ -20,8 +20,9 @@ class HeaderAndContentLayout extends StatelessWidget {
         CustomScrollView(
           slivers: [
             SliverPadding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 32).add(const EdgeInsets.only(bottom: 32)),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 32,
+              ).add(const EdgeInsets.only(bottom: 32)),
               sliver: SliverList(
                 delegate: SliverChildListDelegate(
                   [

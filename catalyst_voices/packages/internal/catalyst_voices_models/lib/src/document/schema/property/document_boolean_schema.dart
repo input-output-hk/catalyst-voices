@@ -14,8 +14,8 @@ sealed class DocumentBooleanSchema extends DocumentValueSchema<bool> {
     required super.constValue,
     required super.enumValues,
   }) : super(
-          type: DocumentPropertyType.boolean,
-        );
+         type: DocumentPropertyType.boolean,
+       );
 
   @override
   DocumentBooleanSchema copyWith({DocumentNodeId? nodeId, String? title});

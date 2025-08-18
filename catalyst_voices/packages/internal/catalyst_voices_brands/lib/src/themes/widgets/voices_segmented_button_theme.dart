@@ -7,20 +7,21 @@ class VoicesSegmentedButtonTheme extends SegmentedButtonThemeData {
     required VoicesColorScheme voicesColors,
     required TextTheme textTheme,
   }) : super(
-          selectedIcon: const Icon(Icons.check),
-          style: SegmentedButton.styleFrom(
-            foregroundColor: voicesColors.textOnPrimary,
-            backgroundColor: Colors.transparent,
-            selectedForegroundColor: colors.onPrimary,
-            selectedBackgroundColor: colors.primary,
-            disabledForegroundColor: voicesColors.iconsDisabled,
-            disabledBackgroundColor: Colors.transparent,
-            textStyle: textTheme.labelLarge,
-          ).copyWith(
-            side: _Side(colors: voicesColors),
-            iconColor: _IconColor(colors: voicesColors),
-          ),
-        );
+         selectedIcon: const Icon(Icons.check),
+         style:
+             SegmentedButton.styleFrom(
+               foregroundColor: voicesColors.textOnPrimary,
+               backgroundColor: Colors.transparent,
+               selectedForegroundColor: colors.onPrimary,
+               selectedBackgroundColor: colors.primary,
+               disabledForegroundColor: voicesColors.iconsDisabled,
+               disabledBackgroundColor: Colors.transparent,
+               textStyle: textTheme.labelLarge,
+             ).copyWith(
+               side: _Side(colors: voicesColors),
+               iconColor: _IconColor(colors: voicesColors),
+             ),
+       );
 }
 
 class _Side extends WidgetStateBorderSide {
@@ -46,8 +47,8 @@ class _IconColor extends WidgetStateColor {
   _IconColor({
     required this.colors,
   }) : super(
-          colors.iconsForeground.toARGB32(),
-        );
+         colors.iconsForeground.toARGB32(),
+       );
 
   @override
   Color resolve(Set<WidgetState> states) {

@@ -35,7 +35,8 @@ extension type UuidV4._(List<int> bytes) {
   String toUuidString() {
     // Insert dashes to format as UUID v4
     final hexString = hex.encode(bytes);
-    final formattedUuid = '${hexString.substring(0, 8)}$separator'
+    final formattedUuid =
+        '${hexString.substring(0, 8)}$separator'
         '${hexString.substring(8, 12)}$separator'
         '${hexString.substring(12, 16)}$separator'
         '${hexString.substring(16, 20)}$separator'

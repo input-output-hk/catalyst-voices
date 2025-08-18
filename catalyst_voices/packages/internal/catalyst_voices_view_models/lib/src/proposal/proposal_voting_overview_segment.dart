@@ -18,14 +18,14 @@ final class ProposalVotingOverviewSegment extends BaseSegment<ProposalVotingOver
   ProposalVotingOverviewSegment.build({
     required ProposalViewVoting data,
   }) : super(
-          id: const NodeId('voting_overview'),
-          sections: [
-            ProposalVotingStatusSection(
-              id: const NodeId('voting_overview.status'),
-              data: data,
-            ),
-          ],
-        );
+         id: const NodeId('voting_overview'),
+         sections: [
+           ProposalVotingStatusSection(
+             id: const NodeId('voting_overview.status'),
+             data: data,
+           ),
+         ],
+       );
 
   @override
   String resolveTitle(BuildContext context) {

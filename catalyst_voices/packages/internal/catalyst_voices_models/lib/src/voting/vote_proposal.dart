@@ -33,12 +33,12 @@ final class VoteProposal extends Equatable {
 
   @override
   List<Object?> get props => [
-        ref,
-        category,
-        title,
-        authorName,
-        lastCastedVote,
-      ];
+    ref,
+    category,
+    title,
+    authorName,
+    lastCastedVote,
+  ];
 }
 
 final class VoteProposalCategory extends Equatable {
@@ -59,7 +59,7 @@ final class VoteProposalCategory extends Equatable {
 
   @override
   List<Object?> get props => [
-        ref,
-        name,
-      ];
+    ref,
+    name,
+  ];
 }

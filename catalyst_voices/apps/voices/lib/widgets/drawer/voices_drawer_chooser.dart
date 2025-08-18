@@ -8,11 +8,12 @@ import 'package:flutter/material.dart';
 /// The builder might provide a completely different widget
 /// based on [isSelected] field, which will be true if the [item]
 /// is currently selected in the [VoicesDrawerChooser].
-typedef VoicesDrawerChooserBuilder<T> = Widget Function({
-  required BuildContext context,
-  required T item,
-  required bool isSelected,
-});
+typedef VoicesDrawerChooserBuilder<T> =
+    Widget Function({
+      required BuildContext context,
+      required T item,
+      required bool isSelected,
+    });
 
 /// Displays a horizontal list of [items] built by [itemBuilder]
 /// with left and right chevrons that select previous/next items.

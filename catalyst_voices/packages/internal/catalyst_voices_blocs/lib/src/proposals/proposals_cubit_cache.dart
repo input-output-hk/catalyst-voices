@@ -20,13 +20,13 @@ final class ProposalsCubitCache extends Equatable {
 
   @override
   List<Object?> get props => [
-        campaign,
-        page,
-        filters,
-        selectedOrder,
-        categories,
-        count,
-      ];
+    campaign,
+    page,
+    filters,
+    selectedOrder,
+    categories,
+    count,
+  ];
 
   ProposalsCubitCache copyWith({
     Optional<Campaign>? campaign,

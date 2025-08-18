@@ -238,16 +238,17 @@ class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> with 
   @override
   Widget build(BuildContext context) {
     return VoicesRawPopupMenuButton<_MenuItemEvent>(
-      buttonBuilder: (
-        context,
-        onTapCallback, {
-        required isMenuOpen,
-      }) {
-        return SessionAccountAvatar(
-          key: const Key('SessionAccountPopupMenuAvatar'),
-          onTap: onTapCallback,
-        );
-      },
+      buttonBuilder:
+          (
+            context,
+            onTapCallback, {
+            required isMenuOpen,
+          }) {
+            return SessionAccountAvatar(
+              key: const Key('SessionAccountPopupMenuAvatar'),
+              onTap: onTapCallback,
+            );
+          },
       menuBuilder: (context) => const _PopupMenu(),
       onSelected: _handleEvent,
       routeSettings: const RouteSettings(name: '/account_menu'),

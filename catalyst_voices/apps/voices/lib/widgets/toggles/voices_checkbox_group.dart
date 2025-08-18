@@ -31,9 +31,9 @@ final class VoicesCheckboxGroupElement<T> {
     this.note,
     this.isError = false,
   }) : assert(
-          label != null || note != null,
-          'Should have at least label or note',
-        );
+         label != null || note != null,
+         'Should have at least label or note',
+       );
 }
 
 /// A widget that groups a list of checkboxes in a column with a name
@@ -101,8 +101,9 @@ class VoicesCheckboxGroup<T extends Object> extends StatelessWidget {
                       value: selected.contains(element.value),
                       label: element.label,
                       note: element.note,
-                      onChanged:
-                          _isGroupEnabled ? (value) => _updateElement(element.value, value) : null,
+                      onChanged: _isGroupEnabled
+                          ? (value) => _updateElement(element.value, value)
+                          : null,
                       isError: element.isError,
                     );
                   },

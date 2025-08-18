@@ -36,8 +36,9 @@ class _AccountVotingPowerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final labelStyle = theme.textTheme.labelMedium!
-        .copyWith(color: theme.colors.textOnPrimaryLevel1.withValues(alpha: 0.7));
+    final labelStyle = theme.textTheme.labelMedium!.copyWith(
+      color: theme.colors.textOnPrimaryLevel1.withValues(alpha: 0.7),
+    );
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),

@@ -390,23 +390,23 @@ class CampaignCategory extends Equatable {
 
   @override
   List<Object?> get props => [
-        selfRef,
-        proposalTemplateRef,
-        campaignRef,
-        categoryName,
-        categorySubname,
-        description,
-        shortDescription,
-        proposalsCount,
-        availableFunds,
-        imageUrl,
-        totalAsk,
-        range,
-        descriptions,
-        dos,
-        donts,
-        submissionCloseDate,
-      ];
+    selfRef,
+    proposalTemplateRef,
+    campaignRef,
+    categoryName,
+    categorySubname,
+    description,
+    shortDescription,
+    proposalsCount,
+    availableFunds,
+    imageUrl,
+    totalAsk,
+    range,
+    descriptions,
+    dos,
+    donts,
+    submissionCloseDate,
+  ];
 
   CampaignCategory copyWith({
     SignedDocumentRef? selfRef,

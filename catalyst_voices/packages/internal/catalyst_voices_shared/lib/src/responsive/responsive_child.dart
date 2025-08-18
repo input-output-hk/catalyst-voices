@@ -43,12 +43,12 @@ class ResponsiveChild extends StatelessWidget {
     WidgetBuilder? lg,
     required WidgetBuilder other,
   }) : _widgets = {
-          if (xs != null) ResponsiveBreakpointKey.xs: xs,
-          if (sm != null) ResponsiveBreakpointKey.sm: sm,
-          if (md != null) ResponsiveBreakpointKey.md: md,
-          if (lg != null) ResponsiveBreakpointKey.lg: lg,
-          ResponsiveBreakpointKey.other: other,
-        };
+         if (xs != null) ResponsiveBreakpointKey.xs: xs,
+         if (sm != null) ResponsiveBreakpointKey.sm: sm,
+         if (md != null) ResponsiveBreakpointKey.md: md,
+         if (lg != null) ResponsiveBreakpointKey.lg: lg,
+         ResponsiveBreakpointKey.other: other,
+       };
 
   @override
   Widget build(BuildContext context) {

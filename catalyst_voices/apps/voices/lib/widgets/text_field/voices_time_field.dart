@@ -104,8 +104,9 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
       onChanged: onChanged != null ? (value) => onChanged(_convertTextToTime(value)) : null,
       validator: _validator,
       hintText: '${_pattern.toUpperCase()} $timeZone',
-      onFieldSubmitted:
-          onFieldSubmitted != null ? (value) => onFieldSubmitted(_convertTextToTime(value)) : null,
+      onFieldSubmitted: onFieldSubmitted != null
+          ? (value) => onFieldSubmitted(_convertTextToTime(value))
+          : null,
       suffixIcon: ExcludeFocus(
         child: VoicesIconButton(
           onTap: widget.onClockTap,

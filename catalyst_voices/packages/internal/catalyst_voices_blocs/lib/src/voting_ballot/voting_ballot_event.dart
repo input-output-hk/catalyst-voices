@@ -54,9 +54,9 @@ final class UpdateFooterFromBallotBuilderEvent extends VotingBallotEvent {
 
   @override
   List<Object?> get props => [
-        canCastVotes,
-        showPendingVotesDisclaimer,
-      ];
+    canCastVotes,
+    showPendingVotesDisclaimer,
+  ];
 }
 
 final class UpdateFundNumberEvent extends VotingBallotEvent {

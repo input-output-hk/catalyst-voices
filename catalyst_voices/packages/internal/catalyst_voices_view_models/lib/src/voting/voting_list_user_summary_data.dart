@@ -12,7 +12,7 @@ final class VotingListUserSummaryData extends Equatable {
 
   @override
   List<Object?> get props => [
-        amount,
-        status,
-      ];
+    amount,
+    status,
+  ];
 }

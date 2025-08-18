@@ -20,8 +20,8 @@ final class DocumentBuilder {
   DocumentBuilder({
     required DocumentSchema schema,
     required List<DocumentPropertyBuilder> properties,
-  })  : _schema = schema,
-        _properties = properties;
+  }) : _schema = schema,
+       _properties = properties;
 
   /// Creates an empty [DocumentBuilder] from a [schema].
   factory DocumentBuilder.fromSchema({
@@ -121,8 +121,8 @@ final class DocumentListPropertyBuilder extends DocumentPropertyBuilder {
   DocumentListPropertyBuilder({
     required DocumentListSchema schema,
     required List<DocumentPropertyBuilder> properties,
-  })  : _schema = schema,
-        _properties = properties;
+  }) : _schema = schema,
+       _properties = properties;
 
   /// Creates a [DocumentListPropertyBuilder] from a [schema].
   factory DocumentListPropertyBuilder.fromSchema(
@@ -251,8 +251,8 @@ final class DocumentObjectPropertyBuilder extends DocumentPropertyBuilder {
   DocumentObjectPropertyBuilder({
     required DocumentObjectSchema schema,
     required List<DocumentPropertyBuilder> properties,
-  })  : _schema = schema,
-        _properties = properties;
+  }) : _schema = schema,
+       _properties = properties;
 
   /// Creates a [DocumentObjectPropertyBuilder] from a [schema].
   factory DocumentObjectPropertyBuilder.fromSchema(
@@ -314,8 +314,8 @@ final class DocumentValuePropertyBuilder<T extends Object> extends DocumentPrope
   DocumentValuePropertyBuilder({
     required DocumentValueSchema<T> schema,
     required T? value,
-  })  : _schema = schema,
-        _value = value;
+  }) : _schema = schema,
+       _value = value;
 
   /// Creates a [DocumentValuePropertyBuilder] from a [schema].
   factory DocumentValuePropertyBuilder.fromSchema(

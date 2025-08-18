@@ -110,9 +110,9 @@ class CampaignTimelineCardState extends State<CampaignTimelineCard> {
   BorderSide _getBorder(BuildContext context) {
     return switch (_isOngoing) {
       true => BorderSide(
-          color: context.colorScheme.primary,
-          width: 2,
-        ),
+        color: context.colorScheme.primary,
+        width: 2,
+      ),
       false => BorderSide.none,
     };
   }
