@@ -1,4 +1,4 @@
-//! RBAC registration chain.
+//! RBAC registration V2 chain.
 
 use poem_openapi::{types::Example, Object};
 
@@ -6,8 +6,9 @@ use crate::{
     rbac::ChainInfo,
     service::{
         api::cardano::rbac::registrations_get::{
-            invalid_registration_list::InvalidRegistrationList, purpose_list::PurposeList,
-            role_data::RbacRoleData, role_list::RbacRoleList,
+            invalid_registration_list::InvalidRegistrationList,
+            purpose_list::PurposeList,
+            v2::{role_data::RbacRoleData, role_list::RbacRoleList},
         },
         common::types::{
             cardano::{catalyst_id::CatalystId, transaction_id::TxnId},
@@ -21,7 +22,7 @@ use crate::{
 /// A unified data of multiple RBAC registrations.
 #[derive(Object, Debug, Clone)]
 #[oai(example)]
-pub struct RbacRegistrationChain {
+pub struct RbacRegistrationChainV2 {
     /// A Catalyst ID.
     catalyst_id: CatalystId,
     /// An ID of the last persistent transaction.
@@ -41,7 +42,7 @@ pub struct RbacRegistrationChain {
     invalid: InvalidRegistrationList,
 }
 
-impl Example for RbacRegistrationChain {
+impl Example for RbacRegistrationChainV2 {
     fn example() -> Self {
         Self {
             catalyst_id: CatalystId::example(),
@@ -54,7 +55,7 @@ impl Example for RbacRegistrationChain {
     }
 }
 
-impl RbacRegistrationChain {
+impl RbacRegistrationChainV2 {
     /// Creates a new registration chain instance.
     pub(crate) fn new(
         catalyst_id: CatalystId, info: Option<&ChainInfo>, invalid: InvalidRegistrationList,
