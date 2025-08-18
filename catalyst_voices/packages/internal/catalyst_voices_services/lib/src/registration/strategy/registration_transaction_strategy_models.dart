@@ -56,7 +56,7 @@ final class RegistrationTransactionStrategyModels implements RegistrationTransac
     );
 
     final (selectedUtxos, changes, totalFee) = txBuilder.selectInputs(
-      changeOutputStrategy: ChangeOutputAdaStrategy.noBurn,
+      changeOutputStrategy: ChangeOutputAdaStrategy.mustInclude,
     );
 
     final realTxInputHash = TransactionInputsHash.fromTransactionInputs(selectedUtxos);

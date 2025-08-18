@@ -7,6 +7,9 @@ enum RawTransactionAspect {
   /// See [TransactionBody.inputs].
   inputs,
 
+  /// See [TransactionBody.outputs].
+  outputs,
+
   /// See [TransactionBody.fee].
   fee,
 
@@ -18,6 +21,9 @@ enum RawTransactionAspect {
 
   /// See [TransactionBody.auxiliaryDataHash].
   auxiliaryDataHash,
+
+  /// See [TransactionBody.requiredSigners].
+  requiredSigners,
 
   /// See [TransactionBody.networkId].
   networkId,
