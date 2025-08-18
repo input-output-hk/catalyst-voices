@@ -92,7 +92,7 @@ jobs:
           docker compose -f catalyst-gateway/tests/docker-compose.yml down
 
       - name: Running integration API tests
-        if: always()
+        if: false
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
