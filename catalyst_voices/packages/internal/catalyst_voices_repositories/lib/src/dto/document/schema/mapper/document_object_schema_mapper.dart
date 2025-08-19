@@ -3,29 +3,6 @@ import 'package:catalyst_voices_repositories/src/dto/document/schema/document_de
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_property_schema_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
-enum _DocumentObjectDefinition {
-  segment('segment'),
-  section('section'),
-  nestedQuestions('nestedQuestions'),
-  singleGroupedTagSelector('singleGroupedTagSelector'),
-  borderGroup('borderGroup'),
-  unknown('unknown');
-
-  final String def;
-
-  const _DocumentObjectDefinition(this.def);
-
-  factory _DocumentObjectDefinition.fromDef(String? def) {
-    for (final value in values) {
-      if (value.def.equalsIgnoreCase(def)) {
-        return value;
-      }
-    }
-
-    return _DocumentObjectDefinition.unknown;
-  }
-}
-
 final class DocumentObjectSchemaMapper {
   static DocumentObjectSchema toModel({
     required DocumentDefinitionsDto definitions,
@@ -157,5 +134,28 @@ final class DocumentObjectSchemaMapper {
           order: mappedOrder,
         );
     }
+  }
+}
+
+enum _DocumentObjectDefinition {
+  segment('segment'),
+  section('section'),
+  nestedQuestions('nestedQuestions'),
+  singleGroupedTagSelector('singleGroupedTagSelector'),
+  borderGroup('borderGroup'),
+  unknown('unknown');
+
+  final String def;
+
+  const _DocumentObjectDefinition(this.def);
+
+  factory _DocumentObjectDefinition.fromDef(String? def) {
+    for (final value in values) {
+      if (value.def.equalsIgnoreCase(def)) {
+        return value;
+      }
+    }
+
+    return _DocumentObjectDefinition.unknown;
   }
 }

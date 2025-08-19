@@ -3,47 +3,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
-final class GroupedTagsSelection extends Equatable {
-  final String? group;
-  final String? tag;
-
-  const GroupedTagsSelection({
-    this.group,
-    this.tag,
-  });
-
-  bool get isValid => group != null && tag != null;
-
-  GroupedTagsSelection copyWith({
-    Optional<String>? group,
-    Optional<String>? tag,
-  }) {
-    return GroupedTagsSelection(
-      group: group.dataOr(this.group),
-      tag: tag.dataOr(this.tag),
-    );
-  }
-
-  bool selects(GroupedTags groupedTag) {
-    final group = this.group;
-    final tag = this.tag;
-
-    final groupMatches = group == groupedTag.group;
-    final tagFoundOrNull = tag == null || groupedTag.tags.contains(tag);
-
-    return groupMatches && tagFoundOrNull;
-  }
-
-  @override
-  String toString() => '$group: $tag';
-
-  @override
-  List<Object?> get props => [
-    group,
-    tag,
-  ];
-}
-
 final class GroupedTags extends Equatable {
   final String group;
   final List<String> tags;
@@ -52,6 +11,15 @@ final class GroupedTags extends Equatable {
     required this.group,
     required this.tags,
   });
+
+  @override
+  List<Object?> get props => [
+    group,
+    tags,
+  ];
+
+  @override
+  String toString() => '$group: $tags';
 
   static List<GroupedTags> fromLogicalGroups(
     List<DocumentSchemaLogicalGroup> groups, {
@@ -105,13 +73,45 @@ final class GroupedTags extends Equatable {
         )
         .toList();
   }
+}
 
-  @override
-  String toString() => '$group: $tags';
+final class GroupedTagsSelection extends Equatable {
+  final String? group;
+  final String? tag;
+
+  const GroupedTagsSelection({
+    this.group,
+    this.tag,
+  });
+
+  bool get isValid => group != null && tag != null;
 
   @override
   List<Object?> get props => [
     group,
-    tags,
+    tag,
   ];
+
+  GroupedTagsSelection copyWith({
+    Optional<String>? group,
+    Optional<String>? tag,
+  }) {
+    return GroupedTagsSelection(
+      group: group.dataOr(this.group),
+      tag: tag.dataOr(this.tag),
+    );
+  }
+
+  bool selects(GroupedTags groupedTag) {
+    final group = this.group;
+    final tag = this.tag;
+
+    final groupMatches = group == groupedTag.group;
+    final tagFoundOrNull = tag == null || groupedTag.tags.contains(tag);
+
+    return groupMatches && tagFoundOrNull;
+  }
+
+  @override
+  String toString() => '$group: $tag';
 }

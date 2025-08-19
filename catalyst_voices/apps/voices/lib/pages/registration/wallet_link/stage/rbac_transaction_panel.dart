@@ -132,34 +132,6 @@ class _BlocTxSubmitError extends StatelessWidget {
   }
 }
 
-class _SuccessNavigation extends StatelessWidget {
-  const _SuccessNavigation();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _BlocSubmitTxButton(
-          onSubmit: () => _submitRegistration(context),
-        ),
-        const SizedBox(height: 10),
-        VoicesTextButton(
-          leading: VoicesAssets.icons.wallet.buildIcon(),
-          onTap: () {
-            RegistrationCubit.of(context).changeRoleSetup();
-          },
-          child: Text(context.l10n.walletLinkTransactionChangeRoles),
-        ),
-      ],
-    );
-  }
-
-  void _submitRegistration(BuildContext context) {
-    unawaited(RegistrationCubit.of(context).finishRegistration());
-  }
-}
-
 class _Error extends StatelessWidget {
   final LocalizedException error;
   final VoidCallback onRetry;
@@ -253,6 +225,34 @@ class _RbacTransactionPanelState extends State<RbacTransactionPanel> {
 
   void _onRefresh() {
     unawaited(RegistrationCubit.of(context).prepareRegistration());
+  }
+}
+
+class _SuccessNavigation extends StatelessWidget {
+  const _SuccessNavigation();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _BlocSubmitTxButton(
+          onSubmit: () => _submitRegistration(context),
+        ),
+        const SizedBox(height: 10),
+        VoicesTextButton(
+          leading: VoicesAssets.icons.wallet.buildIcon(),
+          onTap: () {
+            RegistrationCubit.of(context).changeRoleSetup();
+          },
+          child: Text(context.l10n.walletLinkTransactionChangeRoles),
+        ),
+      ],
+    );
+  }
+
+  void _submitRegistration(BuildContext context) {
+    unawaited(RegistrationCubit.of(context).finishRegistration());
   }
 }
 

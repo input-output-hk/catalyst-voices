@@ -2,7 +2,32 @@ import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/foundation.dart';
 
-final derCertHex = '''
+Future<void> main() async {
+  final rawBytes = hex.decode(derCertHex);
+
+  // brotli
+  final brotli = CatalystCompression.instance.brotli;
+  final brotliCompressed = await brotli.compress(rawBytes);
+  final brotliDecompressed = await brotli.decompress(brotliCompressed);
+
+  assert(
+    listEquals(rawBytes, brotliDecompressed),
+    'Original and decompressed bytes must be the same!',
+  );
+
+  // zstd
+  final zstd = CatalystCompression.instance.zstd;
+  final zstdCompressed = await zstd.compress(rawBytes);
+  final zstdDecompressed = await zstd.decompress(zstdCompressed);
+
+  assert(
+    listEquals(rawBytes, zstdDecompressed),
+    'Original and decompressed bytes must be the same!',
+  );
+}
+
+final derCertHex =
+    '''
 308202343082019DA00302010202145A
 FC371DAF301793CF0B1835A118C2F903
 63D5D9300D06092A864886F70D01010B
@@ -40,28 +65,4 @@ F366A8B930443CA6B69B12DD9DEBEE9C
 E61E8EE7D77E9F7F9804E03EBC31B458
 1313C955A667658B
 '''
-    .replaceAll('\n', '');
-
-Future<void> main() async {
-  final rawBytes = hex.decode(derCertHex);
-
-  // brotli
-  final brotli = CatalystCompression.instance.brotli;
-  final brotliCompressed = await brotli.compress(rawBytes);
-  final brotliDecompressed = await brotli.decompress(brotliCompressed);
-
-  assert(
-    listEquals(rawBytes, brotliDecompressed),
-    'Original and decompressed bytes must be the same!',
-  );
-
-  // zstd
-  final zstd = CatalystCompression.instance.zstd;
-  final zstdCompressed = await zstd.compress(rawBytes);
-  final zstdDecompressed = await zstd.decompress(zstdCompressed);
-
-  assert(
-    listEquals(rawBytes, zstdDecompressed),
-    'Original and decompressed bytes must be the same!',
-  );
-}
+        .replaceAll('\n', '');

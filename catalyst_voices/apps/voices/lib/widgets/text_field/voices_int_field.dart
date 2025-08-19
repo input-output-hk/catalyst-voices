@@ -3,10 +3,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-class VoicesIntFieldController extends VoicesNumFieldController<int> {
-  VoicesIntFieldController([super.value]);
-}
-
 class VoicesIntField extends VoicesNumField<int> {
   VoicesIntField({
     super.key,
@@ -31,4 +27,8 @@ class VoicesIntField extends VoicesNumField<int> {
            ...?inputFormatters,
          ],
        );
+}
+
+class VoicesIntFieldController extends VoicesNumFieldController<int> {
+  VoicesIntFieldController([super.value]);
 }

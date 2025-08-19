@@ -29,27 +29,6 @@ final class VoicesPasswordStrengthIndicator extends StatelessWidget {
   }
 }
 
-class _Label extends StatelessWidget {
-  final PasswordStrength passwordStrength;
-
-  const _Label({required this.passwordStrength});
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      key: const Key('PasswordStrengthLabel'),
-      switch (passwordStrength) {
-        PasswordStrength.weak => context.l10n.weakPasswordStrength,
-        PasswordStrength.normal => context.l10n.normalPasswordStrength,
-        PasswordStrength.strong => context.l10n.goodPasswordStrength,
-      },
-      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-        fontWeight: FontWeight.w700,
-      ),
-    );
-  }
-}
-
 class _Indicator extends StatelessWidget {
   static const double _backgroundTrackHeight = 4;
   static const double _foregroundTrackHeight = 6;
@@ -92,6 +71,27 @@ class _Indicator extends StatelessWidget {
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _Label extends StatelessWidget {
+  final PasswordStrength passwordStrength;
+
+  const _Label({required this.passwordStrength});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      key: const Key('PasswordStrengthLabel'),
+      switch (passwordStrength) {
+        PasswordStrength.weak => context.l10n.weakPasswordStrength,
+        PasswordStrength.normal => context.l10n.normalPasswordStrength,
+        PasswordStrength.strong => context.l10n.goodPasswordStrength,
+      },
+      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+        fontWeight: FontWeight.w700,
       ),
     );
   }

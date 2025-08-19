@@ -3,16 +3,6 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-final class VoicesRichTooltipActionData {
-  final String name;
-  final VoidCallback onTap;
-
-  VoicesRichTooltipActionData({
-    required this.name,
-    required this.onTap,
-  });
-}
-
 /// A tooltip widget with a rich text message (title and message) and
 /// optional actions displayed at the bottom.
 ///
@@ -100,6 +90,45 @@ class VoicesRichTooltip extends StatelessWidget {
   }
 }
 
+final class VoicesRichTooltipActionData {
+  final String name;
+  final VoidCallback onTap;
+
+  VoicesRichTooltipActionData({
+    required this.name,
+    required this.onTap,
+  });
+}
+
+class _ActionsRow extends StatelessWidget {
+  final List<VoicesRichTooltipActionData> actions;
+
+  const _ActionsRow(this.actions);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Row(
+        children: actions
+            .map<Widget>(
+              (action) {
+                return VoicesTextButton(
+                  onTap: () {
+                    Tooltip.dismissAllToolTips();
+                    action.onTap();
+                  },
+                  child: Text(action.name),
+                );
+              },
+            )
+            .separatedBy(const SizedBox(width: 8))
+            .toList(),
+      ),
+    );
+  }
+}
+
 class _Content extends StatelessWidget {
   final String title;
   final String message;
@@ -138,35 +167,6 @@ class _Content extends StatelessWidget {
             textAlign: TextAlign.start,
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ActionsRow extends StatelessWidget {
-  const _ActionsRow(this.actions);
-
-  final List<VoicesRichTooltipActionData> actions;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Row(
-        children: actions
-            .map<Widget>(
-              (action) {
-                return VoicesTextButton(
-                  onTap: () {
-                    Tooltip.dismissAllToolTips();
-                    action.onTap();
-                  },
-                  child: Text(action.name),
-                );
-              },
-            )
-            .separatedBy(const SizedBox(width: 8))
-            .toList(),
       ),
     );
   }

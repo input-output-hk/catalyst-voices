@@ -13,9 +13,9 @@ import 'target.dart';
 import 'util.dart';
 
 class BuildPod {
-  BuildPod({required this.userOptions});
-
   final CargokitUserOptions userOptions;
+
+  BuildPod({required this.userOptions});
 
   Future<void> build() async {
     final targets = Environment.darwinArchs.map((arch) {

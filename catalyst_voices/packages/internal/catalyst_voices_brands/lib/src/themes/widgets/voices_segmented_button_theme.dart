@@ -24,23 +24,6 @@ class VoicesSegmentedButtonTheme extends SegmentedButtonThemeData {
        );
 }
 
-class _Side extends WidgetStateBorderSide {
-  final VoicesColorScheme colors;
-
-  const _Side({
-    required this.colors,
-  });
-
-  @override
-  BorderSide? resolve(Set<WidgetState> states) {
-    if (states.contains(WidgetState.disabled)) {
-      return BorderSide(color: colors.iconsDisabled);
-    }
-
-    return BorderSide(color: colors.outlineBorder);
-  }
-}
-
 class _IconColor extends WidgetStateColor {
   final VoicesColorScheme colors;
 
@@ -56,5 +39,22 @@ class _IconColor extends WidgetStateColor {
       return colors.iconsForeground;
     }
     return colors.iconsBackground;
+  }
+}
+
+class _Side extends WidgetStateBorderSide {
+  final VoicesColorScheme colors;
+
+  const _Side({
+    required this.colors,
+  });
+
+  @override
+  BorderSide? resolve(Set<WidgetState> states) {
+    if (states.contains(WidgetState.disabled)) {
+      return BorderSide(color: colors.iconsDisabled);
+    }
+
+    return BorderSide(color: colors.outlineBorder);
   }
 }

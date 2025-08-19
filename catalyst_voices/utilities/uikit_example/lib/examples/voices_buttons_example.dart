@@ -3,21 +3,6 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-enum _ButtonType {
-  filled,
-  outlined,
-  text,
-  textNeutral,
-  textSecondary,
-  icon,
-  iconPrimary,
-  iconFilled,
-  iconTonal,
-  iconOutlined,
-}
-
-enum _ButtonState { normal, disabled }
-
 class VoicesButtonsExample extends StatelessWidget {
   static const String route = '/buttons-example';
 
@@ -62,39 +47,18 @@ class VoicesButtonsExample extends StatelessWidget {
   }
 }
 
-class _SectionText extends StatelessWidget {
-  const _SectionText(
-    this.data, {
-    super.key,
-  });
-
-  final String data;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Text(
-      data,
-      style: theme.textTheme.titleMedium?.copyWith(
-        color: theme.colors.textPrimary,
-      ),
-      textAlign: TextAlign.start,
-    );
-  }
-}
-
 class _ButtonRow extends StatelessWidget {
+  final _ButtonType type;
+
+  final bool addLeadingIcon;
+  final bool addTrailingIcon;
+  final bool addTrailingText;
   const _ButtonRow({
     required this.type,
     this.addLeadingIcon = false,
     this.addTrailingIcon = false,
     this.addTrailingText = false,
   });
-
-  final _ButtonType type;
-  final bool addLeadingIcon;
-  final bool addTrailingIcon;
-  final bool addTrailingText;
 
   @override
   Widget build(BuildContext context) {
@@ -175,5 +139,41 @@ class _ButtonRow extends StatelessWidget {
         child: const Icon(Icons.close),
       ),
     };
+  }
+}
+
+enum _ButtonState { normal, disabled }
+
+enum _ButtonType {
+  filled,
+  outlined,
+  text,
+  textNeutral,
+  textSecondary,
+  icon,
+  iconPrimary,
+  iconFilled,
+  iconTonal,
+  iconOutlined,
+}
+
+class _SectionText extends StatelessWidget {
+  final String data;
+
+  const _SectionText(
+    this.data, {
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Text(
+      data,
+      style: theme.textTheme.titleMedium?.copyWith(
+        color: theme.colors.textPrimary,
+      ),
+      textAlign: TextAlign.start,
+    );
   }
 }

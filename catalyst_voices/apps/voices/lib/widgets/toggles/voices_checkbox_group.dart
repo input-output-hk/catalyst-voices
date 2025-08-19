@@ -1,41 +1,6 @@
 import 'package:catalyst_voices/widgets/toggles/voices_checkbox.dart';
 import 'package:flutter/material.dart';
 
-/// Data describing a single checkbox element within a [VoicesCheckboxGroup].
-///
-/// This class holds information for a single checkbox element displayed
-/// within a [VoicesCheckboxGroup].
-///
-/// Type Parameters:
-///
-/// * T: The type of the value associated with the checkbox element.
-final class VoicesCheckboxGroupElement<T> {
-  /// The value associated with the checkbox element.
-  final T value;
-
-  /// A widget to display the text label for the checkbox.
-  final Widget? label;
-
-  /// An optional widget to display additional information below the label.
-  final Widget? note;
-
-  /// A flag indicating if the checkbox represents an error state.
-  final bool isError;
-
-  /// Default constructor for [VoicesCheckboxGroupElement].
-  ///
-  /// Should have at least [label] or [note].
-  const VoicesCheckboxGroupElement({
-    required this.value,
-    this.label,
-    this.note,
-    this.isError = false,
-  }) : assert(
-         label != null || note != null,
-         'Should have at least label or note',
-       );
-}
-
 /// A widget that groups a list of checkboxes in a column with a name
 /// and the ability to toggle all elements at once.
 ///
@@ -65,10 +30,6 @@ class VoicesCheckboxGroup<T extends Object> extends StatelessWidget {
   /// Defaults to [CrossAxisAlignment.start].
   final CrossAxisAlignment crossAxisAlignment;
 
-  bool get _isGroupEnabled => onChanged != null;
-
-  bool get _isGroupSelected => elements.every((element) => selected.contains(element.value));
-
   const VoicesCheckboxGroup({
     super.key,
     required this.name,
@@ -77,6 +38,10 @@ class VoicesCheckboxGroup<T extends Object> extends StatelessWidget {
     this.onChanged,
     this.crossAxisAlignment = CrossAxisAlignment.start,
   }) : assert(elements.length > 0, 'Elements have to be non empty');
+
+  bool get _isGroupEnabled => onChanged != null;
+
+  bool get _isGroupSelected => elements.every((element) => selected.contains(element.value));
 
   @override
   Widget build(BuildContext context) {
@@ -147,4 +112,39 @@ class VoicesCheckboxGroup<T extends Object> extends StatelessWidget {
 
     onChanged!(updatedSelection);
   }
+}
+
+/// Data describing a single checkbox element within a [VoicesCheckboxGroup].
+///
+/// This class holds information for a single checkbox element displayed
+/// within a [VoicesCheckboxGroup].
+///
+/// Type Parameters:
+///
+/// * T: The type of the value associated with the checkbox element.
+final class VoicesCheckboxGroupElement<T> {
+  /// The value associated with the checkbox element.
+  final T value;
+
+  /// A widget to display the text label for the checkbox.
+  final Widget? label;
+
+  /// An optional widget to display additional information below the label.
+  final Widget? note;
+
+  /// A flag indicating if the checkbox represents an error state.
+  final bool isError;
+
+  /// Default constructor for [VoicesCheckboxGroupElement].
+  ///
+  /// Should have at least [label] or [note].
+  const VoicesCheckboxGroupElement({
+    required this.value,
+    this.label,
+    this.note,
+    this.isError = false,
+  }) : assert(
+         label != null || note != null,
+         'Should have at least label or note',
+       );
 }

@@ -26,17 +26,6 @@ import 'package:catalyst_key_derivation/src/rust/frb_generated.dart' show RustLi
 class CatalystKeyDerivation {
   const CatalystKeyDerivation();
 
-  /// Initializes the `catalyst_key_derivation` package.
-  ///
-  /// This method should be called once at the start of your application
-  /// to initialize the underlying Rust library that powers the key derivation
-  /// functions. It is necessary to call this before attempting to derive
-  /// any keys, as it ensures that the native Rust dependencies
-  /// are properly set up.
-  static Future<void> init() async {
-    await RustLib.init();
-  }
-
   /// Derives a master private key from a BIP-39 [mnemonic] phrase.
   ///
   /// This method takes a mnemonic phrase as input, validates it, and derives a
@@ -53,5 +42,16 @@ class CatalystKeyDerivation {
   }) async {
     final key = await rust.mnemonicToXprv(mnemonic: mnemonic);
     return Bip32Ed25519XPrivateKey(key);
+  }
+
+  /// Initializes the `catalyst_key_derivation` package.
+  ///
+  /// This method should be called once at the start of your application
+  /// to initialize the underlying Rust library that powers the key derivation
+  /// functions. It is necessary to call this before attempting to derive
+  /// any keys, as it ensures that the native Rust dependencies
+  /// are properly set up.
+  static Future<void> init() async {
+    await RustLib.init();
   }
 }

@@ -24,36 +24,6 @@ class AgreementConfirmationWidget extends StatefulWidget {
   State<AgreementConfirmationWidget> createState() => _AgreementConfirmationWidgetState();
 }
 
-class _AgreementConfirmationWidgetState extends State<AgreementConfirmationWidget> {
-  bool? get _value => widget.property.value ?? widget.schema.defaultValue;
-
-  @override
-  Widget build(BuildContext context) {
-    return _AgreementConfirmationFormField(
-      value: _value,
-      onChanged: _onChanged,
-      validator: _validator,
-      enabled: widget.isEditMode,
-      description: widget.schema.description ?? MarkdownData.empty,
-    );
-  }
-
-  void _onChanged(bool? value) {
-    final change = DocumentValueChange(
-      nodeId: widget.schema.nodeId,
-      value: value,
-    );
-
-    widget.onChanged([change]);
-  }
-
-  String? _validator(bool? value) {
-    final result = widget.schema.validate(value);
-
-    return LocalizedDocumentValidationResult.from(result).message(context);
-  }
-}
-
 class _AgreementConfirmationFormField extends VoicesFormField<bool> {
   _AgreementConfirmationFormField({
     required super.value,
@@ -103,4 +73,34 @@ class _AgreementConfirmationFormField extends VoicesFormField<bool> {
            );
          },
        );
+}
+
+class _AgreementConfirmationWidgetState extends State<AgreementConfirmationWidget> {
+  bool? get _value => widget.property.value ?? widget.schema.defaultValue;
+
+  @override
+  Widget build(BuildContext context) {
+    return _AgreementConfirmationFormField(
+      value: _value,
+      onChanged: _onChanged,
+      validator: _validator,
+      enabled: widget.isEditMode,
+      description: widget.schema.description ?? MarkdownData.empty,
+    );
+  }
+
+  void _onChanged(bool? value) {
+    final change = DocumentValueChange(
+      nodeId: widget.schema.nodeId,
+      value: value,
+    );
+
+    widget.onChanged([change]);
+  }
+
+  String? _validator(bool? value) {
+    final result = widget.schema.validate(value);
+
+    return LocalizedDocumentValidationResult.from(result).message(context);
+  }
 }

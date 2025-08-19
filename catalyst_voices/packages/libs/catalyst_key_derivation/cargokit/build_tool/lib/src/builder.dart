@@ -17,26 +17,6 @@ final _log = Logger('builder');
 
 enum BuildConfiguration { debug, release, profile }
 
-extension on BuildConfiguration {
-  bool get isDebug => this == BuildConfiguration.debug;
-  String get rustName => switch (this) {
-    BuildConfiguration.debug => 'debug',
-    BuildConfiguration.release => 'release',
-    BuildConfiguration.profile => 'release',
-  };
-}
-
-class BuildException implements Exception {
-  final String message;
-
-  BuildException(this.message);
-
-  @override
-  String toString() {
-    return 'BuildException: $message';
-  }
-}
-
 class BuildEnvironment {
   final BuildConfiguration configuration;
   final CargokitCrateOptions crateOptions;
@@ -63,19 +43,6 @@ class BuildEnvironment {
     this.javaHome,
   });
 
-  static BuildConfiguration parseBuildConfiguration(String value) {
-    // XCode configuration adds the flavor to configuration name.
-    final firstSegment = value.split('-').first;
-    final buildConfiguration = BuildConfiguration.values.firstWhereOrNull(
-      (e) => e.name == firstSegment,
-    );
-    if (buildConfiguration == null) {
-      _log.warning('Unknown build configuraiton $value, will assume release');
-      return BuildConfiguration.release;
-    }
-    return buildConfiguration;
-  }
-
   static BuildEnvironment fromEnvironment({required bool isAndroid}) {
     final buildConfiguration = parseBuildConfiguration(
       Environment.configuration,
@@ -98,6 +65,30 @@ class BuildEnvironment {
       javaHome: isAndroid ? Environment.javaHome : null,
     );
   }
+
+  static BuildConfiguration parseBuildConfiguration(String value) {
+    // XCode configuration adds the flavor to configuration name.
+    final firstSegment = value.split('-').first;
+    final buildConfiguration = BuildConfiguration.values.firstWhereOrNull(
+      (e) => e.name == firstSegment,
+    );
+    if (buildConfiguration == null) {
+      _log.warning('Unknown build configuraiton $value, will assume release');
+      return BuildConfiguration.release;
+    }
+    return buildConfiguration;
+  }
+}
+
+class BuildException implements Exception {
+  final String message;
+
+  BuildException(this.message);
+
+  @override
+  String toString() {
+    return 'BuildException: $message';
+  }
 }
 
 class RustBuilder {
@@ -105,19 +96,6 @@ class RustBuilder {
   final BuildEnvironment environment;
 
   RustBuilder({required this.target, required this.environment});
-
-  void prepare(Rustup rustup) {
-    final toolchain = _toolchain;
-    if (rustup.installedTargets(toolchain) == null) {
-      rustup.installToolchain(toolchain);
-    }
-    if (toolchain == 'nightly') {
-      rustup.installRustSrcForNightly();
-    }
-    if (!rustup.installedTargets(toolchain)!.contains(target.rust)) {
-      rustup.installTarget(target.rust, toolchain: toolchain);
-    }
-  }
 
   CargoBuildOptions? get _buildOptions =>
       environment.crateOptions.cargo[environment.configuration];
@@ -151,6 +129,19 @@ class RustBuilder {
     );
   }
 
+  void prepare(Rustup rustup) {
+    final toolchain = _toolchain;
+    if (rustup.installedTargets(toolchain) == null) {
+      rustup.installToolchain(toolchain);
+    }
+    if (toolchain == 'nightly') {
+      rustup.installRustSrcForNightly();
+    }
+    if (!rustup.installedTargets(toolchain)!.contains(target.rust)) {
+      rustup.installTarget(target.rust, toolchain: toolchain);
+    }
+  }
+
   Future<Map<String, String>> _buildEnvironment() async {
     if (target.android == null) {
       return {};
@@ -180,4 +171,13 @@ class RustBuilder {
       return env.buildEnvironment();
     }
   }
+}
+
+extension on BuildConfiguration {
+  bool get isDebug => this == BuildConfiguration.debug;
+  String get rustName => switch (this) {
+    BuildConfiguration.debug => 'debug',
+    BuildConfiguration.release => 'release',
+    BuildConfiguration.profile => 'release',
+  };
 }

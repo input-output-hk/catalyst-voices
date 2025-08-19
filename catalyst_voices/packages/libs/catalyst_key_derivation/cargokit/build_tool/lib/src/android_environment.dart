@@ -13,31 +13,6 @@ import 'target.dart';
 import 'util.dart';
 
 class AndroidEnvironment {
-  AndroidEnvironment({
-    required this.sdkPath,
-    required this.ndkVersion,
-    required this.minSdkVersion,
-    required this.targetTempDir,
-    required this.target,
-  });
-
-  static void clangLinkerWrapper(List<String> args) {
-    final clang = Platform.environment['_CARGOKIT_NDK_LINK_CLANG'];
-    if (clang == null) {
-      throw Exception(
-        "cargo-ndk rustc linker: didn't find _CARGOKIT_NDK_LINK_CLANG env var",
-      );
-    }
-    final target = Platform.environment['_CARGOKIT_NDK_LINK_TARGET'];
-    if (target == null) {
-      throw Exception(
-        "cargo-ndk rustc linker: didn't find _CARGOKIT_NDK_LINK_TARGET env var",
-      );
-    }
-
-    runCommand(clang, [target, ...args]);
-  }
-
   /// Full path to Android SDK.
   final String sdkPath;
 
@@ -53,29 +28,13 @@ class AndroidEnvironment {
   /// Target being built.
   final Target target;
 
-  bool ndkIsInstalled() {
-    final ndkPath = path.join(sdkPath, 'ndk', ndkVersion);
-    final ndkPackageXml = File(path.join(ndkPath, 'package.xml'));
-    return ndkPackageXml.existsSync();
-  }
-
-  void installNdk({required String javaHome}) {
-    final sdkManagerExtension = Platform.isWindows ? '.bat' : '';
-    final sdkManager = path.join(
-      sdkPath,
-      'cmdline-tools',
-      'latest',
-      'bin',
-      'sdkmanager$sdkManagerExtension',
-    );
-
-    log.info('Installing NDK $ndkVersion');
-    runCommand(
-      sdkManager,
-      ['--install', 'ndk;$ndkVersion'],
-      environment: {'JAVA_HOME': javaHome},
-    );
-  }
+  AndroidEnvironment({
+    required this.sdkPath,
+    required this.ndkVersion,
+    required this.minSdkVersion,
+    required this.targetTempDir,
+    required this.target,
+  });
 
   Future<Map<String, String>> buildEnvironment() async {
     final hostArch = Platform.isMacOS
@@ -161,6 +120,30 @@ class AndroidEnvironment {
     };
   }
 
+  void installNdk({required String javaHome}) {
+    final sdkManagerExtension = Platform.isWindows ? '.bat' : '';
+    final sdkManager = path.join(
+      sdkPath,
+      'cmdline-tools',
+      'latest',
+      'bin',
+      'sdkmanager$sdkManagerExtension',
+    );
+
+    log.info('Installing NDK $ndkVersion');
+    runCommand(
+      sdkManager,
+      ['--install', 'ndk;$ndkVersion'],
+      environment: {'JAVA_HOME': javaHome},
+    );
+  }
+
+  bool ndkIsInstalled() {
+    final ndkPath = path.join(sdkPath, 'ndk', ndkVersion);
+    final ndkPackageXml = File(path.join(ndkPath, 'package.xml'));
+    return ndkPackageXml.existsSync();
+  }
+
   // Workaround for libgcc missing in NDK23, inspired by cargo-ndk
   String _libGccWorkaround(String buildDir, Version ndkVersion) {
     final workaroundDir = path.join(
@@ -188,5 +171,22 @@ class AndroidEnvironment {
     }
     rustFlags = '$rustFlags-L\x1f$workaroundDir';
     return rustFlags;
+  }
+
+  static void clangLinkerWrapper(List<String> args) {
+    final clang = Platform.environment['_CARGOKIT_NDK_LINK_CLANG'];
+    if (clang == null) {
+      throw Exception(
+        "cargo-ndk rustc linker: didn't find _CARGOKIT_NDK_LINK_CLANG env var",
+      );
+    }
+    final target = Platform.environment['_CARGOKIT_NDK_LINK_TARGET'];
+    if (target == null) {
+      throw Exception(
+        "cargo-ndk rustc linker: didn't find _CARGOKIT_NDK_LINK_TARGET env var",
+      );
+    }
+
+    runCommand(clang, [target, ...args]);
   }
 }
