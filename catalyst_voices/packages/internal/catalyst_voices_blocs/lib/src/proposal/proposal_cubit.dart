@@ -67,6 +67,11 @@ final class ProposalCubit extends Cubit<ProposalState>
     return super.close();
   }
 
+  void clear() {
+    _cache = _cache.copyWithoutProposal();
+    emit(const ProposalState());
+  }
+
   Future<void> load({required DocumentRef ref}) async {
     try {
       final isReadOnlyMode = await _isReadOnlyMode();
@@ -125,14 +130,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     } catch (error, stack) {
       _logger.severe('Loading $ref failed', error, stack);
 
-      _cache = _cache.copyWith(
-        proposal: const Optional.empty(),
-        commentTemplate: const Optional.empty(),
-        comments: const Optional.empty(),
-        isFavorite: const Optional.empty(),
-        isVotingStage: const Optional.empty(),
-        readOnlyMode: const Optional.empty(),
-      );
+      _cache = _cache.copyWithoutProposal();
 
       emit(ProposalState(error: LocalizedException.create(error)));
     } finally {
