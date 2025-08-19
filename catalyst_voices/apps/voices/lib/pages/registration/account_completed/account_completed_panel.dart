@@ -2,7 +2,6 @@ import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/pages/registration/widgets/next_step.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/routes/routing/account_route.dart';
-import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -11,6 +10,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AccountCompletedPanel extends StatelessWidget {
   const AccountCompletedPanel({super.key});
@@ -42,10 +42,12 @@ class AccountCompletedPanel extends StatelessWidget {
         children: [
           const _NextStep(),
           const SizedBox(height: 10),
-          _OpenDiscoveryButton(
+          _OpenSpaceButton(
             onTap: () {
               Navigator.pop(context);
-              const DiscoveryRoute().go(context);
+
+              final goRouter = GoRouter.of(context);
+              goRouter.go(goRouter.state.uri.toString());
             },
           ),
           const SizedBox(height: 10),
@@ -84,10 +86,10 @@ class _NextStep extends StatelessWidget {
   }
 }
 
-class _OpenDiscoveryButton extends StatelessWidget {
+class _OpenSpaceButton extends StatelessWidget {
   final VoidCallback onTap;
 
-  const _OpenDiscoveryButton({
+  const _OpenSpaceButton({
     required this.onTap,
   });
 
@@ -95,7 +97,7 @@ class _OpenDiscoveryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       onTap: onTap,
-      child: Text(context.l10n.registrationCompletedDiscoveryButton),
+      child: Text(context.l10n.registrationCompletedButton),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class RestoredPanel extends StatelessWidget {
   const RestoredPanel({super.key});
@@ -58,7 +59,9 @@ class RestoredPanel extends StatelessWidget {
 
   void _redirectToDashboard(BuildContext context) {
     Navigator.of(context).pop();
-    const DiscoveryRoute().go(context);
+
+    final goRouter = GoRouter.of(context);
+    goRouter.go(goRouter.state.uri.toString());
   }
 
   void _redirectToMyAccount(BuildContext context) {

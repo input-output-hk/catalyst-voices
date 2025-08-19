@@ -167,10 +167,12 @@ final class TreasuryRoute extends GoRouteData
 final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
   final String? categoryId;
   final String? tab;
+  final bool? $extra;
 
   const VotingRoute({
     this.categoryId,
     this.tab,
+    this.$extra,
   });
 
   @override
@@ -183,6 +185,7 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
     return VotingPage(
       categoryId: categoryRef,
       tab: tab,
+      keychainDeleted: $extra ?? false,
     );
   }
 }
