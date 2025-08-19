@@ -136,9 +136,8 @@ impl TxoInsertQuery {
 
     /// Index the transaction Inputs.
     pub(crate) fn index(
-        &mut self, network: Network,
-        txn: &cardano_chain_follower::pallas_traverse::MultiEraTx<'_>, slot_no: Slot,
-        txn_hash: TransactionId, index: TxnIndex,
+        &mut self, network: Network, txn: &cardano_chain_follower::pallas_traverse::MultiEraTx<'_>,
+        slot_no: Slot, txn_hash: TransactionId, index: TxnIndex,
     ) {
         let txn_id = txn_hash.to_string();
 
