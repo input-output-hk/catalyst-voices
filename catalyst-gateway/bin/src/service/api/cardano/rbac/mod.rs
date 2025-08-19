@@ -39,7 +39,7 @@ impl Api {
     #[oai(
         path = "/v2/rbac/registration",
         method = "get",
-        operation_id = "rbacRegistrations"
+        operation_id = "rbacRegistrationsV2"
     )]
     /// Get RBAC registrations
     ///
