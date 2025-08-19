@@ -16,7 +16,10 @@ use rbac_registration::{
 use x509_cert::{certificate::Certificate as X509Certificate, der::Encode as _};
 
 use crate::service::{
-    api::cardano::rbac::registrations_get::{binary_data::HexEncodedBinaryData, key_type::KeyType},
+    api::cardano::rbac::registrations_get::{
+        binary_data::HexEncodedBinaryData,
+        key_type::{KeyType, KeyTypeWrapper},
+    },
     common::types::generic::{
         boolean::BooleanFlag, date_time::DateTime as ServiceDateTime,
         ed25519_public_key::Ed25519HexEncodedPublicKey,
@@ -32,7 +35,7 @@ pub struct KeyData {
     /// A time when the data was added.
     time: ServiceDateTime,
     /// A type of the key.
-    key_type: KeyType,
+    key_type: KeyTypeWrapper,
     /// A value of the key.
     key_value: Option<HexEncodedBinaryData>,
 }
@@ -45,7 +48,7 @@ impl KeyData {
     ) -> anyhow::Result<Self> {
         let key_value;
 
-        let key_type = match key_ref.local_ref {
+        let key_type = KeyTypeWrapper(match key_ref.local_ref {
             LocalRefInt::X509Certs => {
                 key_value = encode_x509(chain.x509_certs(), key_ref.key_offset, point)?;
                 KeyType::X509
@@ -58,7 +61,7 @@ impl KeyData {
                 key_value = convert_pub_key(chain.simple_keys(), key_ref.key_offset, point)?;
                 KeyType::Pubkey
             },
-        };
+        });
 
         Ok(Self {
             is_persistent: is_persistent.into(),
@@ -74,7 +77,7 @@ impl Example for KeyData {
         Self {
             is_persistent: BooleanFlag::example(),
             time: ServiceDateTime::example(),
-            key_type: KeyType::example(),
+            key_type: KeyTypeWrapper::example(),
             key_value: Some(HexEncodedBinaryData::example()),
         }
     }
