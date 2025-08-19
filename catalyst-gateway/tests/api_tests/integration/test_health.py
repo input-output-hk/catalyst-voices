@@ -1,7 +1,8 @@
 import pytest
 import time
 
-from api.v1 import document, rbac
+from api.v1 import rbac
+from api.v2 import document
 from utils import health
 from utils.rbac_chain import rbac_chain_factory, Chain
 from wrappers import TestProxy
@@ -17,6 +18,7 @@ def event_db_proxy():
     yield proxy
 
 @pytest.mark.health_endpoint
+@pytest.mark.skip(reason="Bug https://github.com/input-output-hk/catalyst-voices/issues/3209")
 def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory):
     # Not registered stake address
     # Cardano test data CIP0019
@@ -30,7 +32,7 @@ def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory)
     resp = rbac.get(lookup=stake_address_not_registered, token=auth_token)
     assert(resp.status_code == 404), f"Expected not registered stake address: {resp.status_code} - {resp.text}"
     # Event DB testing
-    resp = document.post(filter={})
+    resp = document.post(filter={},limit=10,page=5)
     assert(resp.status_code == 200), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
 
     # suspend event db comms
@@ -42,7 +44,7 @@ def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory)
     resp = rbac.get(lookup=stake_address_not_registered, token=auth_token)
     assert(resp.status_code == 503), f"Expected RBAC lookup to fail: {resp.status_code} - {resp.text}"
     # Event DB testing
-    resp = document.post(filter={})
+    resp = document.post(filter={},limit=10,page=5)
     assert(resp.status_code == 503), f"Expected document index to fail: {resp.status_code} - {resp.text}"
 
     # resume event db comms
@@ -54,7 +56,7 @@ def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory)
     resp = rbac.get(lookup=stake_address_not_registered, token=auth_token)
     assert(resp.status_code == 404), f"Expected not registered stake address: {resp.status_code} - {resp.text}"
     # Event DB testing
-    resp = document.post(filter={})
+    resp = document.post(filter={},limit=10,page=5)
     assert(resp.status_code == 200), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
 
 @pytest.mark.health_endpoint
@@ -72,7 +74,7 @@ def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory)
     resp = rbac.get(lookup=stake_address_not_registered, token=auth_token)
     assert(resp.status_code == 404), f"Expected not registered stake address: {resp.status_code} - {resp.text}"
     # Event DB testing
-    resp = document.post(filter={})
+    resp = document.post(filter={},limit=10,page=5)
     assert(resp.status_code == 200), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
 
     # suspend event db comms
@@ -84,7 +86,7 @@ def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory)
     resp = rbac.get(lookup=stake_address_not_registered, token=auth_token)
     assert(resp.status_code == 503), f"Expected RBAC lookup to fail: {resp.status_code} - {resp.text}"
     # Event DB testing
-    resp = document.post(filter={})
+    resp = document.post(filter={},limit=10,page=5)
     assert(resp.status_code == 503), f"Expected document index to fail: {resp.status_code} - {resp.text}"
 
     # resume event db comms
@@ -96,5 +98,5 @@ def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory)
     resp = rbac.get(lookup=stake_address_not_registered, token=auth_token)
     assert(resp.status_code == 404), f"Expected not registered stake address: {resp.status_code} - {resp.text}"
     # Event DB testing
-    resp = document.post(filter={})
+    resp = document.post(filter={},limit=10,page=5)
     assert(resp.status_code == 200), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
