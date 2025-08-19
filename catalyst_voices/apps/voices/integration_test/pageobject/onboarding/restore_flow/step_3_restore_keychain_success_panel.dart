@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -33,21 +34,7 @@ final class RestoreKeychainSuccessPanel extends OnboardingPageBase {
 
   @override
   Future<void> goto() async {
-    // TODO(emiride): rethink how to setup tests accounts in different environments for gateway.
-    final seedPhrase = [
-      'flock',
-      'please',
-      'gather',
-      'sign',
-      'adult',
-      'clog',
-      'board',
-      'sentence',
-      'toward',
-      'mistake',
-      'tonight',
-      'forest',
-    ];
+    final seedPhrase = recoverTestWords.map((e) => e.data).toList();
     await RestoreKeychainInputPanel($).goto();
     await RestoreKeychainInputPanel($).enterSeedPhrase(seedPhrase);
     await clickNext();

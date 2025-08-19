@@ -174,7 +174,7 @@ extension ProposalWithVersionX on Proposal {
         categoryId: SignedDocumentRef.generateFirstRef(),
         title: 'Dummy Proposal ver 2',
         description: 'Dummy description',
-        updateDate: DateTime.now(),
+        updateDate: DateTimeExt.now(),
         fundsRequested: const Coin(100),
         status: ProposalStatus.draft,
         publish: publish,
@@ -190,7 +190,7 @@ extension ProposalWithVersionX on Proposal {
               version: '019584be-2314-7aaa-8b21-0f902ff817d4',
             ),
             title: 'Title ver 1',
-            createdAt: DateTime.now(),
+            createdAt: DateTimeExt.now(),
           ),
           ProposalVersion(
             publish: ProposalPublish.submittedProposal,
@@ -199,7 +199,7 @@ extension ProposalWithVersionX on Proposal {
               version: '019584be-2321-7a1a-9b68-ad33a97a7e84',
             ),
             title: 'Dummy Proposal ver 2',
-            createdAt: DateTime.now(),
+            createdAt: DateTimeExt.now(),
           ),
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
@@ -208,7 +208,7 @@ extension ProposalWithVersionX on Proposal {
               version: '019584be-232d-729b-950d-ce9fb79513ed',
             ),
             title: 'Title ver 3',
-            createdAt: DateTime.now(),
+            createdAt: DateTimeExt.now(),
           ),
         ],
       );
