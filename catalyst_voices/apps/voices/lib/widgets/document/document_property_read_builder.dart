@@ -172,7 +172,18 @@ class _DocumentPropertyReadBuilderState extends State<DocumentPropertyReadBuilde
           yield* _calculateItemsFrom(property);
         }
       case DocumentObjectProperty():
+        // TODO(damian-molinski): remove it when categories will become a documents.
+        if (property.nodeId == ProposalDocument.categoryDetailsNodeId) {
+          yield DocumentTextListItem(
+            id: ProposalDocument.categoryDetailsNameNodeId,
+            title: property.schema.title,
+            // Value is null because category details are injected dynamically. They are not
+            // documents at the moment.
+            value: null,
+          );
+        }
         final schema = property.schema;
+
         switch (schema) {
           case DocumentSingleGroupedTagSelectorSchema():
             final value = schema.groupedTagsSelection(property);
