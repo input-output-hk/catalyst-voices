@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::hashes::TransactionId;
+use cardano_chain_follower::hashes::TransactionId;
 use scylla::{
     client::{pager::TypedRowStream, session::Session},
     statement::prepared::PreparedStatement,

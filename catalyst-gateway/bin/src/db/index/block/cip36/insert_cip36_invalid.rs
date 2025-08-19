@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{pallas_addresses::Address, Cip36, Slot, TxnIndex, VotingPubKey};
+use cardano_chain_follower::{pallas_addresses::Address, Cip36, Slot, TxnIndex, VotingPubKey};
 use scylla::{client::session::Session, value::MaybeUnset, SerializeRow};
 use tracing::error;
 

@@ -1,6 +1,6 @@
 //! Metrics related to Chain Follower analytics.
 
-use cardano_blockchain_types::Network;
+use cardano_chain_follower::Network;
 use cardano_chain_follower::Statistics;
 
 use crate::settings::Settings;

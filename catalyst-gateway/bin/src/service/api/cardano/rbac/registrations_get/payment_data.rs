@@ -1,6 +1,6 @@
 //! A role payment address information.
 
-use cardano_blockchain_types::pallas_addresses::ShelleyAddress;
+use cardano_chain_follower::pallas_addresses::ShelleyAddress;
 use chrono::{DateTime, Utc};
 use poem_openapi::{types::Example, Object};
 

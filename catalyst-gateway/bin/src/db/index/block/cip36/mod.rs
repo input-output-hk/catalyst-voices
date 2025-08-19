@@ -6,7 +6,7 @@ pub(crate) mod insert_cip36_invalid;
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{
+use cardano_chain_follower::{
     hashes::Blake2b224Hash, Cip36, MultiEraBlock, Slot, StakeAddress, TxnIndex,
 };
 use scylla::client::session::Session;

@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{
+use cardano_chain_follower::{
     hashes::{Blake2b256Hash, TransactionId},
     Slot, TxnOutputOffset,
 };
@@ -78,7 +78,7 @@ impl TxiInsertQuery {
 
     /// Index the transaction Inputs.
     pub(crate) fn index(
-        &mut self, txs: &cardano_blockchain_types::pallas_traverse::MultiEraTx<'_>, slot_no: Slot,
+        &mut self, txs: &cardano_chain_follower::pallas_traverse::MultiEraTx<'_>, slot_no: Slot,
     ) {
         // Index the TXI's.
         for txi in txs.inputs() {

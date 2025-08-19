@@ -1,7 +1,7 @@
 //! Utilities for obtaining a RBAC registration chain (`RegistrationChain`).
 
 use anyhow::{bail, Context, Result};
-use cardano_blockchain_types::{Network, Point, Slot, StakeAddress, TxnIndex};
+use cardano_chain_follower::{Network, Point, Slot, StakeAddress, TxnIndex};
 use cardano_chain_follower::ChainFollower;
 use catalyst_types::catalyst_id::CatalystId;
 use futures::{future::try_join, TryFutureExt, TryStreamExt};

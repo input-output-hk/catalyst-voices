@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{
+use cardano_chain_follower::{
     pallas_primitives::{alonzo, conway},
     pallas_traverse::{MultiEraCert, MultiEraTx},
     MultiEraBlock, Slot, StakeAddress, TxnIndex, VKeyHash,

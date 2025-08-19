@@ -4,7 +4,7 @@
 
 use std::sync::LazyLock;
 
-use cardano_blockchain_types::{
+use cardano_chain_follower::{
     hashes::BLAKE_2B224_SIZE,
     pallas_addresses::{Address, ShelleyAddress},
 };

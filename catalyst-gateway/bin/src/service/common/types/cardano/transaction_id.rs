@@ -2,7 +2,7 @@
 
 use std::sync::LazyLock;
 
-use cardano_blockchain_types::hashes::{TransactionId, BLAKE_2B256_SIZE};
+use cardano_chain_follower::hashes::{TransactionId, BLAKE_2B256_SIZE};
 use const_format::concatcp;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
