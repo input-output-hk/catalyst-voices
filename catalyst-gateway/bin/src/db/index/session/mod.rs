@@ -434,7 +434,7 @@ async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bo
             session,
             queries,
             purge_queries,
-            caches: Arc::new(cache_manager::Caches::new()),
+            caches: Arc::new(cache_manager::Caches::new(persistent)),
         };
 
         // Save the session so we can execute queries on the DB

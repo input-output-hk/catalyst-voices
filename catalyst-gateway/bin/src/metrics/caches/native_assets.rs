@@ -1,9 +1,6 @@
 //! Cache metrics for Native Assets.
 
-use crate::{
-    db::index::queries::caches::assets::native::{entry_count, size as cache_size},
-    settings::Settings,
-};
+use crate::{db::index::session::CassandraSession, settings::Settings};
 
 mod reporter {
     //! Prometheus reporter metrics.
@@ -66,13 +63,16 @@ pub(crate) fn update() {
     let service_id = Settings::service_id();
     let network = Settings::cardano_network().to_string();
 
-    reporter::NATIVE_ASSETS_CACHE_SIZE
-        .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(cache_size()).unwrap_or(-1));
+    CassandraSession::get(true).inspect(|session| {
+        let cache = session.caches().assets_native();
+        reporter::NATIVE_ASSETS_CACHE_SIZE
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(cache.weighted_size()).unwrap_or(-1));
 
-    reporter::NATIVE_ASSETS_CACHE_ENTRIES_COUNT
-        .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(entry_count()).unwrap_or(-1));
+        reporter::NATIVE_ASSETS_CACHE_ENTRIES_COUNT
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(cache.entry_count()).unwrap_or(-1));
+    });
 }
 
 /// Increment the Native Assets Cache hits count.

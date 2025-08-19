@@ -10,10 +10,7 @@ use tracing::error;
 
 use crate::db::{
     index::{
-        queries::{
-            caches::assets::ada::{get as cache_get, insert as cache_insert},
-            PreparedQueries, PreparedSelectQuery,
-        },
+        queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
     types::{DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
@@ -137,7 +134,7 @@ impl GetTxoByStakeAddressQuery {
         session: &CassandraSession, params: GetTxoByStakeAddressQueryParams,
     ) -> anyhow::Result<Arc<Vec<GetTxoByStakeAddressQuery>>> {
         if session.is_persistent() {
-            if let Some(rows) = cache_get(&params.stake_address) {
+            if let Some(rows) = session.caches().assets_ada().get(&params.stake_address) {
                 return Ok(rows);
             }
         }
@@ -157,7 +154,10 @@ impl GetTxoByStakeAddressQuery {
 
         // update cache
         if session.is_persistent() {
-            cache_insert(params.stake_address, rows.clone());
+            session
+                .caches()
+                .assets_ada()
+                .insert(params.stake_address, rows.clone());
         }
 
         Ok(rows)

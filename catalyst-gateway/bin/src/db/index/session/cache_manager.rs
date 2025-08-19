@@ -1,20 +1,39 @@
 //! Manager for the different Caches used by the Cassandra Session.
 use std::sync::Arc;
 
-use crate::db::index::queries::caches::rbac::stake_address::StakeAddressCache;
+use crate::db::index::queries::caches::{
+    assets::{ada::AssetsAdaCache, native::AssetsNativeCache},
+    rbac::stake_address::StakeAddressCache,
+};
 
 /// Manager for the different Caches used by the Cassandra Session.
 pub(crate) struct Caches {
-    /// RBAC Stake Address Caches
+    /// Cache for TXO ADA Assets by Stake Address (disabled for Volatile Sessions)
+    assets_ada: Arc<AssetsAdaCache>,
+    /// Cache for TXO Native Assets by Stake Address (disabled for Volatile Sessions)
+    assets_native: Arc<AssetsNativeCache>,
+    ///  Cache for RBAC Catalyst IDs by Stake Address
     rbac_stake_address: Arc<StakeAddressCache>,
 }
 
 impl Caches {
     /// Initialize Session Caches
-    pub(crate) fn new() -> Self {
+    pub(crate) fn new(is_persistent: bool) -> Self {
         Self {
+            assets_ada: Arc::new(AssetsAdaCache::new(is_persistent)),
+            assets_native: Arc::new(AssetsNativeCache::new(is_persistent)),
             rbac_stake_address: Arc::new(StakeAddressCache::new()),
         }
+    }
+
+    /// UTXO Native Assets Cache
+    pub(crate) fn assets_native(&self) -> Arc<AssetsNativeCache> {
+        self.assets_native.clone()
+    }
+
+    /// UTXO ADA Assets Cache
+    pub(crate) fn assets_ada(&self) -> Arc<AssetsAdaCache> {
+        self.assets_ada.clone()
     }
 
     /// RBAC Stake Address Cache
