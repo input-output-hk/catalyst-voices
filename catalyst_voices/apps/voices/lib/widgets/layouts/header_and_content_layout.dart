@@ -4,12 +4,14 @@ class HeaderAndContentLayout extends StatelessWidget {
   final Widget header;
   final Widget content;
   final Widget? background;
+  final bool separateHeaderAndContent;
 
   const HeaderAndContentLayout({
     super.key,
     required this.header,
     required this.content,
     this.background,
+    this.separateHeaderAndContent = true,
   });
 
   @override
@@ -20,19 +22,15 @@ class HeaderAndContentLayout extends StatelessWidget {
         CustomScrollView(
           slivers: [
             SliverPadding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 32,
-              ).add(const EdgeInsets.only(bottom: 32)),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    header,
-                    const SizedBox(height: 40),
-                    content,
-                  ],
-                ),
-              ),
+              padding: const EdgeInsetsGeometry.symmetric(horizontal: 32),
+              sliver: SliverToBoxAdapter(child: header),
             ),
+            if (separateHeaderAndContent) const SliverToBoxAdapter(child: SizedBox(height: 40)),
+            SliverPadding(
+              padding: const EdgeInsetsGeometry.symmetric(horizontal: 32),
+              sliver: SliverFillRemaining(hasScrollBody: false, child: content),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 32)),
           ],
         ),
       ],

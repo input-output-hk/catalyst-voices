@@ -44,6 +44,7 @@ class _VotingPageState extends State<VotingPage>
           header: const VotingHeader(),
           content: PreVotingContent(phase: phase, fundNumber: fundNumber),
           background: const VotingBackground(),
+          separateHeaderAndContent: false,
         ),
         active: (_, __, ___) => HeaderAndContentLayout(
           header: const VotingHeader(),
