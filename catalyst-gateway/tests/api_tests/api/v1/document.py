@@ -1,7 +1,7 @@
 import requests
 from api import cat_gateway_endpoint_url
 
-URL = cat_gateway_endpoint_url("api/gateway/v1/document")
+URL = cat_gateway_endpoint_url("api/v1/document")
 
 
 # Signed document GET
