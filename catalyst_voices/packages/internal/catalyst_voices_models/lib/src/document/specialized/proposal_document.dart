@@ -26,6 +26,9 @@ final class ProposalDocument extends Equatable {
   static final categoryDetailsNodeId = DocumentNodeId.fromString(
     'campaign_category.category_details',
   );
+  static final categoryDetailsNameNodeId = DocumentNodeId.fromString(
+    'campaign_category.category_details.details',
+  );
   static final milestonesNodeId = DocumentNodeId.fromString('milestones.milestones');
   static final milestoneListNodeId = DocumentNodeId.fromString(
     'milestones.milestones.milestone_list',
@@ -50,6 +53,7 @@ final class ProposalDocument extends Equatable {
     authorNameNodeId,
     categoryNodeId,
     categoryDetailsNodeId,
+    categoryDetailsNameNodeId,
     milestonesNodeId,
     milestoneListNodeId,
     tagNodeId,
