@@ -31,7 +31,7 @@ def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory)
     assert(resp.status_code == 404), f"Expected not registered stake address: {resp.status_code} - {resp.text}"
     # Event DB testing
     resp = document.post(filter={})
-    assert(resp.status_code == 404), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
+    assert(resp.status_code == 200), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
 
     # suspend event db comms
     event_db_proxy.disable()
@@ -55,7 +55,7 @@ def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory)
     assert(resp.status_code == 404), f"Expected not registered stake address: {resp.status_code} - {resp.text}"
     # Event DB testing
     resp = document.post(filter={})
-    assert(resp.status_code == 404), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
+    assert(resp.status_code == 200), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
 
 @pytest.mark.health_endpoint
 @pytest.mark.skip(reason="Bug https://github.com/input-output-hk/catalyst-voices/issues/3209")
@@ -73,7 +73,7 @@ def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory)
     assert(resp.status_code == 404), f"Expected not registered stake address: {resp.status_code} - {resp.text}"
     # Event DB testing
     resp = document.post(filter={})
-    assert(resp.status_code == 404), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
+    assert(resp.status_code == 200), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
 
     # suspend event db comms
     index_db_proxy.disable()
@@ -97,4 +97,4 @@ def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory)
     assert(resp.status_code == 404), f"Expected not registered stake address: {resp.status_code} - {resp.text}"
     # Event DB testing
     resp = document.post(filter={})
-    assert(resp.status_code == 404), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
+    assert(resp.status_code == 200), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
