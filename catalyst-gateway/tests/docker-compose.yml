@@ -97,7 +97,6 @@ services:
         condition: service_started
       scylla-node:
         condition: service_healthy
-
   cat-gateway-thru-proxy:
     image: cat-gateway:latest
     container_name: cat-gateway-thru-proxy
@@ -193,6 +192,3 @@ services:
     depends_on:
       cat-gateway:
         condition: service_healthy
-
-volumes:
-  haproxy-socket:
