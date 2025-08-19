@@ -6,7 +6,7 @@ use poem_openapi_derive::ApiResponse;
 use crate::service::{
     api::cardano::rbac::registrations_get::{
         unprocessable_content::RbacUnprocessableContent,
-        v1::registration_chain::RbacRegistrationChainV1,
+        v1::registration_chain::RbacRegistrationChain,
     },
     common::responses::WithErrorResponses,
 };
@@ -18,7 +18,7 @@ pub enum ResponsesV1 {
     ///
     /// Success returns a list of registration transaction ids.
     #[oai(status = 200)]
-    Ok(Json<Box<RbacRegistrationChainV1>>),
+    Ok(Json<Box<RbacRegistrationChain>>),
 
     /// No valid registration.
     #[oai(status = 404)]

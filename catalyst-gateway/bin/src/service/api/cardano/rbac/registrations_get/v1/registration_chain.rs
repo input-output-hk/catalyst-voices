@@ -24,7 +24,7 @@ use crate::{
 /// A unified data of multiple RBAC registrations.
 #[derive(Object, Debug, Clone)]
 #[oai(example)]
-pub struct RbacRegistrationChainV1 {
+pub struct RbacRegistrationChain {
     /// A Catalyst ID.
     catalyst_id: CatalystId,
     /// An ID of the last persistent transaction.
@@ -42,7 +42,7 @@ pub struct RbacRegistrationChainV1 {
     roles: RoleMap,
 }
 
-impl Example for RbacRegistrationChainV1 {
+impl Example for RbacRegistrationChain {
     fn example() -> Self {
         Self {
             catalyst_id: CatalystId::example(),
@@ -54,7 +54,7 @@ impl Example for RbacRegistrationChainV1 {
     }
 }
 
-impl RbacRegistrationChainV1 {
+impl RbacRegistrationChain {
     /// Creates a new registration chain instance.
     pub fn new(info: &ChainInfo) -> anyhow::Result<Self> {
         let catalyst_id = info.chain.catalyst_id().clone().into();

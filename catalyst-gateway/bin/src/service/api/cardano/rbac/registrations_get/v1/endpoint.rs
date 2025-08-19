@@ -10,7 +10,7 @@ use crate::{
         api::cardano::rbac::registrations_get::{
             unprocessable_content::RbacUnprocessableContent,
             v1::{
-                registration_chain::RbacRegistrationChainV1,
+                registration_chain::RbacRegistrationChain,
                 response::{AllResponsesV1, ResponsesV1},
             },
         },
@@ -36,7 +36,7 @@ pub async fn endpoint_v1(
     match Box::pin(chain_info(lookup, token)).await {
         Err(e) => AllResponsesV1::handle_error(&e),
         Ok(Some(info)) => {
-            match RbacRegistrationChainV1::new(&info) {
+            match RbacRegistrationChain::new(&info) {
                 Ok(c) => ResponsesV1::Ok(Json(Box::new(c))).into(),
                 Err(e) => AllResponsesV1::handle_error(&e),
             }
