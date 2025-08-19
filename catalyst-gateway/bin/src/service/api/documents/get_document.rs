@@ -28,13 +28,8 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/document`
 pub(crate) async fn endpoint(document_id: uuid::Uuid, version: Option<uuid::Uuid>) -> AllResponses {
-    match common::get_document(&document_id, version.as_ref()).await {
-        Ok(doc) => {
-            match doc.try_into() {
-                Ok(doc_cbor_bytes) => Responses::Ok(Cbor(doc_cbor_bytes)).into(),
-                Err(err) => AllResponses::handle_error(&err),
-            }
-        },
+    match common::get_document_cbor_bytes(&document_id, version.as_ref()).await {
+        Ok(doc_cbor_bytes) => Responses::Ok(Cbor(doc_cbor_bytes)).into(),
         Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
         Err(err) => AllResponses::handle_error(&err),
     }

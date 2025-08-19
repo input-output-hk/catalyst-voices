@@ -56,6 +56,7 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # PUT `/document`
+#[allow(clippy::too_many_lines)]
 pub(crate) async fn endpoint(doc_bytes: Vec<u8>, mut token: CatalystRBACTokenV1) -> AllResponses {
     let Ok(doc): Result<catalyst_signed_doc::CatalystSignedDocument, _> =
         doc_bytes.as_slice().try_into()
@@ -67,20 +68,48 @@ pub(crate) async fn endpoint(doc_bytes: Vec<u8>, mut token: CatalystRBACTokenV1)
         .into();
     };
 
-    // validate document integrity
-    match catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
-        Ok(true) => (),
+    match doc.is_deprecated() {
+        // apply older validation rule
+        Ok(true) => {
+            let doc = match doc_bytes.as_slice().try_into() {
+                Ok(doc) => doc,
+                Err(err) => return AllResponses::handle_error(&err),
+            };
+
+            match catalyst_signed_doc_v1::validator::validate(&doc, &DocProvider).await {
+                Ok(true) => (),
+                Ok(false) => {
+                    return Responses::UnprocessableContent(Json(
+                        PutDocumentUnprocessableContent::new(
+                            "Failed validating document integrity",
+                            serde_json::to_value(doc.problem_report()).ok(),
+                        ),
+                    ))
+                    .into();
+                },
+                Err(err) => return AllResponses::handle_error(&err),
+            }
+        },
+        // apply newest validation rules
         Ok(false) => {
-            return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-                "Failed validating document integrity",
-                serde_json::to_value(doc.problem_report()).ok(),
-            )))
-            .into();
+            match catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
+                Ok(true) => (),
+                Ok(false) => {
+                    return Responses::UnprocessableContent(Json(
+                        PutDocumentUnprocessableContent::new(
+                            "Failed validating document integrity",
+                            serde_json::to_value(doc.problem_report()).ok(),
+                        ),
+                    ))
+                    .into();
+                },
+                Err(err) => {
+                    // means that something happened inside the `DocProvider`, some db error.
+                    return AllResponses::handle_error(&err);
+                },
+            }
         },
-        Err(err) => {
-            // means that something happened inside the `DocProvider`, some db error.
-            return AllResponses::handle_error(&err);
-        },
+        Err(err) => return AllResponses::handle_error(&err),
     }
 
     // validate document signatures
@@ -171,18 +200,13 @@ async fn store_document_in_db(
 ) -> anyhow::Result<bool> {
     let authors = doc.authors().iter().map(ToString::to_string).collect();
 
-    let doc_meta_json = match serde_json::to_value(doc.doc_meta()) {
-        Ok(json) => json,
-        Err(e) => {
-            anyhow::bail!("Cannot decode document metadata into JSON, err: {e}");
-        },
-    };
+    let doc_meta_json = doc.doc_meta().to_json()?;
 
     let payload = if matches!(
         doc.doc_content_type()?,
         catalyst_signed_doc::ContentType::Json
     ) {
-        match serde_json::from_slice(doc.doc_content().decoded_bytes()?) {
+        match serde_json::from_slice(doc.decoded_content()?.as_slice()) {
             Ok(payload) => Some(payload),
             Err(e) => {
                 anyhow::bail!("Invalid Document Content, not Json encoded: {e}");
@@ -195,7 +219,7 @@ async fn store_document_in_db(
     let doc_body = SignedDocBody::new(
         doc.doc_id()?.into(),
         doc.doc_ver()?.into(),
-        doc.doc_type()?.into(),
+        doc.doc_type()?.uuid(),
         authors,
         Some(doc_meta_json),
     );

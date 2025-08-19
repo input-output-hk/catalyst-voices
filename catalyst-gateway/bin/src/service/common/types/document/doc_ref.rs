@@ -3,15 +3,20 @@
 //! A Reference is used by the `ref` metadata, and any other reference to another
 //! document.
 
-use poem_openapi::{types::Example, NewType, Object, Union};
+use poem_openapi::{
+    types::{Example, ToJSON},
+    NewType, Object, Union,
+};
 
 use super::{
     id::{DocumentId, EqOrRangedIdDocumented},
     ver::{DocumentVer, EqOrRangedVerDocumented},
 };
-use crate::db::event::signed_docs::DocumentRef;
+use crate::{
+    db::event::signed_docs::DocumentRef, service::common::types::array_types::impl_array_types,
+};
 
-#[derive(Object, Debug, PartialEq)]
+#[derive(Object, Debug, Clone, PartialEq)]
 #[oai(example = true)]
 /// A Reference to a Document ID/s and their version/s.
 pub(crate) struct IdRefOnly {
@@ -29,7 +34,7 @@ impl Example for IdRefOnly {
 
 // Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
 // openapi docs on an object.
-#[derive(NewType, Debug, PartialEq)]
+#[derive(NewType, Debug, Clone, PartialEq)]
 #[oai(
     from_multipart = false,
     from_parameter = false,
@@ -50,7 +55,7 @@ impl Example for IdRefOnlyDocumented {
     }
 }
 
-#[derive(Object, Debug, PartialEq)]
+#[derive(Object, Debug, Clone, PartialEq)]
 /// A Reference to a Document ID/s and their version/s.
 pub(crate) struct VerRefWithOptionalId {
     /// Document ID, or range of Document IDs
@@ -81,7 +86,7 @@ impl VerRefWithOptionalId {
 
 // Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
 // openapi docs on an object.
-#[derive(NewType, Debug, PartialEq)]
+#[derive(NewType, Debug, Clone, PartialEq)]
 #[oai(
     from_multipart = false,
     from_parameter = false,
@@ -111,7 +116,7 @@ impl VerRefWithOptionalIdDocumented {
     }
 }
 
-#[derive(Union, Debug, PartialEq)]
+#[derive(Union, Debug, Clone, PartialEq)]
 /// Either a Single Document ID, or a Range of Document IDs
 pub(crate) enum IdAndVerRef {
     /// Document ID Reference ONLY
@@ -140,7 +145,7 @@ impl IdAndVerRef {
 
 // Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
 // openapi docs on an object.
-#[derive(NewType, Debug, PartialEq)]
+#[derive(NewType, Debug, Clone, PartialEq)]
 #[oai(
     from_multipart = false,
     from_parameter = false,
@@ -219,8 +224,38 @@ impl Example for DocumentReference {
 impl From<catalyst_signed_doc::DocumentRef> for DocumentReference {
     fn from(value: catalyst_signed_doc::DocumentRef) -> Self {
         Self {
-            doc_id: value.id.into(),
-            ver: value.ver.into(),
+            doc_id: (*value.id()).into(),
+            ver: (*value.ver()).into(),
         }
+    }
+}
+
+impl_array_types!(
+    DocumentReferenceList,
+    DocumentReference,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(10),
+        items: Some(Box::new(DocumentReference::schema_ref())),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
+impl Example for DocumentReferenceList {
+    fn example() -> Self {
+        Self(vec![DocumentReference::example()])
+    }
+}
+
+impl From<catalyst_signed_doc::DocumentRefs> for DocumentReferenceList {
+    fn from(value: catalyst_signed_doc::DocumentRefs) -> Self {
+        let doc_refs = value
+            .doc_refs()
+            .iter()
+            .cloned()
+            .map(DocumentReference::from)
+            .collect();
+
+        Self(doc_refs)
     }
 }

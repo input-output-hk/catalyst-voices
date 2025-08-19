@@ -7,7 +7,6 @@ project: {
 	}
 	deployment: {
 		on: {
-			merge: {}
 			tag: {}
 		}
 
@@ -114,12 +113,6 @@ project: {
 									secret: {
 										name: "gateway"
 										key:  "api-key"
-									}
-								}
-								"SIGNED_DOC_SK": {
-									secret: {
-										name: "gateway"
-										key:  "signed-doc-secret-key"
 									}
 								}
 							}
