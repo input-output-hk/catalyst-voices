@@ -48,6 +48,7 @@ final class ProposalDocument extends Equatable {
     authorNameNodeId,
     categoryNodeId,
     categoryDetailsNodeId,
+    categoryDetailsNameNodeId,
     milestonesNodeId,
     milestoneListNodeId,
     tagNodeId,
