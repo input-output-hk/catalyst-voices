@@ -155,11 +155,12 @@ class _Footer extends StatelessWidget {
         Visibility.maintain(
           visible: showSaveButton,
           child: VoicesFilledButton(
-            key: const Key('EmailTileSaveButton'),
+            key: const Key('EditableTileSaveButton'),
             onTap: isSaveEnabled ? onSave : null,
             leading: saveButtonLeading,
             child: Text(
               saveText ?? context.l10n.saveButtonText.toUpperCase(),
+              semanticsIdentifier: 'EditableTileSaveButton',
               style: Theme.of(context).textTheme.labelMedium!.copyWith(
                     color: Theme.of(context).colorScheme.onPrimary,
                   ),

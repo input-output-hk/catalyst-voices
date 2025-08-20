@@ -57,28 +57,31 @@ class VoicesCheckbox extends StatelessWidget {
     return AbsorbPointer(
       absorbing: !isEnabled,
       child: VoicesGestureDetector(
-          onTap: onChanged != null ? () => onChanged(!value) : null,
-          behavior: HitTestBehavior.opaque,
-          child: LabelDecorator(
-            label: label,
-            note: note,
-            spacings: const [12, 8],
+        onTap: onChanged != null ? () => onChanged(!value) : null,
+        behavior: HitTestBehavior.opaque,
+        child: LabelDecorator(
+          label: label,
+          note: note,
+          spacings: const [12, 8],
+          child: Semantics(
+            identifier: '${baseIdentifier}_checkbox',
+
             child: Checkbox(
-                semanticsIdentifier: '${baseIdentifier}_checkbox',
-                key: const Key('Checkbox'),
-                value: value,
-                // forcing null unwrapping because we're not allowing null value
-                onChanged: onChanged != null ? (value) => onChanged(value!) : null,
-                isError: isError,
-                side: isEnabled
-                    ? null
-                    : BorderSide(
-                        width: 2,
-                        color: Theme.of(context).colors.onSurfaceNeutral012,
-                      ),
+              key: const Key('Checkbox'),
+              value: value,
+              // forcing null unwrapping because we're not allowing null value
+              onChanged: onChanged != null ? (value) => onChanged(value!) : null,
+              isError: isError,
+              side: isEnabled
+                  ? null
+                  : BorderSide(
+                      width: 2,
+                      color: Theme.of(context).colors.onSurfaceNeutral012,
+                    ),
             ),
           ),
         ),
+      ),
     );
   }
 }

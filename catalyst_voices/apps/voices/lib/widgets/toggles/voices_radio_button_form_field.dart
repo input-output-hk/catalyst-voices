@@ -6,16 +6,14 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class VoicesRadioButtonFormField extends VoicesFormField<String> {
-  final List<String> items;
-
   VoicesRadioButtonFormField({
     super.key,
-    required this.items,
     required super.value,
     required super.onChanged,
     super.enabled,
     super.validator,
     super.autovalidateMode = AutovalidateMode.onUserInteraction,
+    required List<String> items,
   }) : super(
           builder: (field) {
             void onChangedHandler(String? value) {
