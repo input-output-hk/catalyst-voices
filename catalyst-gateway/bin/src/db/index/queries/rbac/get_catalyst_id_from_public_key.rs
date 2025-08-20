@@ -92,12 +92,14 @@ impl Query {
     pub(crate) async fn get(
         session: &CassandraSession, public_key: VerifyingKey,
     ) -> Result<Option<CatalystId>> {
-        let cache = cache(session.is_persistent());
+        let cache = session.caches().rbac_public_key();
 
-        let res = cache.get(&public_key);
-        update_cache_metrics(session.is_persistent(), res.is_some());
-        if let Some(res) = res {
-            return Ok(Some(res));
+        if cache.is_enabled() {
+            let res = cache.get(&public_key);
+            update_cache_metrics(session.is_persistent(), res.is_some());
+            if let Some(res) = res {
+                return Ok(Some(res));
+            }
         }
 
         session
