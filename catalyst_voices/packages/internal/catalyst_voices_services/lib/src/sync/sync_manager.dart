@@ -94,14 +94,14 @@ final class SyncManagerImpl implements SyncManager {
       );
 
       _logger.fine('Synchronization completed. NewRefs[${newRefs.length}]');
+      _isSynchronizationCompleter.complete(true);
     } catch (error, stack) {
       stopwatch.stop();
 
       _logger.severe('Synchronization failed after ${stopwatch.elapsed}', error, stack);
+      _isSynchronizationCompleter.complete(false);
 
       rethrow;
-    } finally {
-      _isSynchronizationCompleter.complete(true);
     }
   }
 

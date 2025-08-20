@@ -72,10 +72,10 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
 
   Future<void> _handleDocumentsSync() async {
     final syncManager = Dependencies.instance.get<SyncManager>();
-    final isSynced = await syncManager.isSynchronization;
+    await syncManager.isSynchronization;
 
     setState(() {
-      _areDocumentsSynced = isSynced;
+      _areDocumentsSynced = true;
     });
   }
 
