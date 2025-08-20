@@ -1,5 +1,20 @@
 project: {
 	name: "voices"
+	ci: targets: {
+		"build-web": {
+			secrets: [
+				{
+					provider: "aws"
+					path:     "global/sentry/api"
+					maps: {
+						"token":   "SENTRY_AUTH_TOKEN"
+						"org":     "SENTRY_ORG"
+						"project": "SENTRY_PROJECT"
+					}
+				},
+			]
+		}
+	}
 	deployment: {
 		on: {
 			merge: {}
