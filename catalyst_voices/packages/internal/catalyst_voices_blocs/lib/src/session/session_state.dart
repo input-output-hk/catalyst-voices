@@ -46,14 +46,14 @@ final class SessionState extends Equatable {
   }) : this(
          status: SessionStatus.guest,
          canCreateAccount: canCreateAccount,
-         spaces: const [Space.discovery, Space.voting],
+         spaces: AccessControl.defaultSpacesAccess,
          settings: settings,
        );
 
   const SessionState.initial()
     : this(
         status: SessionStatus.visitor,
-        spaces: const [Space.discovery, Space.voting],
+        spaces: AccessControl.defaultSpacesAccess,
       );
 
   const SessionState.visitor({
@@ -64,7 +64,7 @@ final class SessionState extends Equatable {
          status: SessionStatus.visitor,
          canCreateAccount: canCreateAccount,
          isRegistrationInProgress: isRegistrationInProgress,
-         spaces: const [Space.discovery, Space.voting],
+         spaces: AccessControl.defaultSpacesAccess,
          settings: settings,
        );
 
