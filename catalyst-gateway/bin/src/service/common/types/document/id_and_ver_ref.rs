@@ -1,3 +1,5 @@
+//! Signed Document ID and Version Reference Objects
+
 use poem_openapi::{types::Example, NewType, Object, Union};
 
 use super::{id::EqOrRangedIdDocumented, ver::EqOrRangedVerDocumented};
