@@ -369,7 +369,7 @@ ThemeData _buildThemeData(
       space: 16,
       thickness: 1,
     ),
-    tabBarTheme: TabBarTheme(
+    tabBarTheme: TabBarThemeData(
       tabAlignment: TabAlignment.start,
       labelStyle: const TextStyle(
         fontWeight: FontWeight.w500,

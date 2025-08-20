@@ -56,18 +56,12 @@ class RoleChooserCard extends StatelessWidget {
       decoration: isViewOnly
           ? null
           : BoxDecoration(
-              border: Border.all(
-                color: Theme.of(context).colors.outlineBorderVariant,
-              ),
+              border: Border.all(color: Theme.of(context).colors.outlineBorderVariant),
               borderRadius: BorderRadius.circular(8),
             ),
       child: Row(
         children: [
-          Column(
-            children: [
-              icon,
-            ],
-          ),
+          Column(children: [icon]),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -83,9 +77,7 @@ class RoleChooserCard extends StatelessWidget {
                     ),
                     if (!isLearnMoreHidden) ...[
                       const SizedBox(width: 10),
-                      _LearnMoreText(
-                        onTap: onLearnMore,
-                      ),
+                      _LearnMoreText(onTap: onLearnMore),
                     ],
                   ],
                 ),
@@ -93,10 +85,7 @@ class RoleChooserCard extends StatelessWidget {
                 Row(
                   children: [
                     if (isViewOnly)
-                      _DisplayingValueAsChips(
-                        value: value,
-                        isDefault: isDefault,
-                      )
+                      _DisplayingValueAsChips(value: value, isDefault: isDefault)
                     else
                       _DisplayingValueAsSegmentedButton(
                         value: value,
@@ -119,10 +108,7 @@ class _DisplayingValueAsChips extends StatelessWidget {
   final bool value;
   final bool isDefault;
 
-  const _DisplayingValueAsChips({
-    required this.value,
-    required this.isDefault,
-  });
+  const _DisplayingValueAsChips({required this.value, required this.isDefault});
 
   @override
   Widget build(BuildContext context) {
@@ -133,31 +119,26 @@ class _DisplayingValueAsChips extends StatelessWidget {
         VoicesChip.round(
           content: Text(
             value ? context.l10n.yes : context.l10n.no,
+            semanticsIdentifier: 'YesNoChip',
             style: TextStyle(
               color: value
                   ? Theme.of(context).colors.successContainer
                   : Theme.of(context).colors.errorContainer,
             ),
           ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 4,
-          ),
-          backgroundColor:
-              value ? Theme.of(context).colors.success : Theme.of(context).colors.iconsError,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          backgroundColor: value
+              ? Theme.of(context).colors.success
+              : Theme.of(context).colors.iconsError,
         ),
         if (isDefault)
           VoicesChip.round(
             content: Text(
               context.l10n.defaultRole,
-              style: TextStyle(
-                color: Theme.of(context).colors.iconsPrimary,
-              ),
+              semanticsIdentifier: 'DefaultRoleChip',
+              style: TextStyle(color: Theme.of(context).colors.iconsPrimary),
             ),
-            padding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 4,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
             backgroundColor: Theme.of(context).colors.iconsBackgroundVariant,
           ),
       ],
@@ -192,20 +173,18 @@ class _DisplayingValueAsSegmentedButton extends StatelessWidget {
                       if (isDefault) '(${context.l10n.defaultRole})',
                     ].join(' '),
                   ),
-                  icon: Icon(
-                    value ? Icons.check : Icons.block,
-                  ),
+                  icon: Icon(value ? Icons.check : Icons.block),
                 ),
               ]
             : [
                 ButtonSegment(
                   value: true,
-                  label: Text(context.l10n.yes),
+                  label: Text(context.l10n.yes, semanticsIdentifier: 'RoleYesButton'),
                   icon: value ? const Icon(Icons.check) : null,
                 ),
                 ButtonSegment(
                   value: false,
-                  label: Text(context.l10n.no),
+                  label: Text(context.l10n.no, semanticsIdentifier: 'RoleNoButton'),
                   icon: !value ? const Icon(Icons.block) : null,
                 ),
               ],
@@ -215,8 +194,9 @@ class _DisplayingValueAsSegmentedButton extends StatelessWidget {
           selectedForegroundColor: value
               ? Theme.of(context).colors.successContainer
               : Theme.of(context).colors.errorContainer,
-          selectedBackgroundColor:
-              value ? Theme.of(context).colors.success : Theme.of(context).colors.iconsError,
+          selectedBackgroundColor: value
+              ? Theme.of(context).colors.success
+              : Theme.of(context).colors.iconsError,
           iconColor: value ? Theme.of(context).colors.successContainer : Colors.transparent,
         ),
         showSelectedIcon: false,
@@ -230,9 +210,7 @@ class _DisplayingValueAsSegmentedButton extends StatelessWidget {
 class _LearnMoreText extends StatelessWidget {
   final VoidCallback? onTap;
 
-  const _LearnMoreText({
-    this.onTap,
-  });
+  const _LearnMoreText({this.onTap});
 
   @override
   Widget build(BuildContext context) {

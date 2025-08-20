@@ -149,6 +149,7 @@ class _VoicesDesktopDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO(dtscalac): remove SelectionArea when https://github.com/flutter/flutter/pull/167275
     // is released and we're using this flutter version
+    // Note: fix scheduled for 3.34.x / 3.35.x flutter version
     return SelectionArea(
       child: Dialog(
         shape: showBorder

@@ -42,18 +42,19 @@ class GetStartedPanel extends StatelessWidget {
             children: CreateAccountType.values
                 .map<Widget>((type) {
                   return RegistrationTile(
-                    key: Key(type.toString()),
-                    icon: type._icon,
-                    title: type._getTitle(context.l10n),
-                    subtitle: type._getSubtitle(context.l10n),
-                    onTap: () async {
-                      switch (type) {
-                        case CreateAccountType.createNew:
-                          await _handleCreateNewAccount(context);
-                        case CreateAccountType.recover:
-                          RegistrationCubit.of(context).recoverKeychain();
-                      }
-                    },
+                      key: Key(type.toString()),
+                      icon: type._icon,
+                      title: type._getTitle(context.l10n),
+                      subtitle: type._getSubtitle(context.l10n),
+                      semanticsIdentifier: type.toString(),
+                      onTap: () async {
+                        switch (type) {
+                          case CreateAccountType.createNew:
+                            await _handleCreateNewAccount(context);
+                          case CreateAccountType.recover:
+                            RegistrationCubit.of(context).recoverKeychain();
+                        }
+                      },
                   );
                 })
                 .separatedBy(const SizedBox(height: 12))
@@ -67,7 +68,7 @@ class GetStartedPanel extends StatelessWidget {
   Future<void> _handleCreateNewAccount(BuildContext context) async {
     final hasWallets = await context.read<SessionCubit>().checkAvailableWallets();
 
-    if (hasWallets && context.mounted) {
+    if (context.mounted) {
       RegistrationCubit.of(context).createNewAccount();
       return;
     }
