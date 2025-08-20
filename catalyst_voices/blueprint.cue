@@ -5,7 +5,7 @@ project: {
 			secrets: [
 				{
 					provider: "aws"
-					path:     "global/sentry/api"
+					path:     "global/ci/sentry"
 					maps: {
 						"token":   "SENTRY_AUTH_TOKEN"
 						"org":     "SENTRY_ORG"
