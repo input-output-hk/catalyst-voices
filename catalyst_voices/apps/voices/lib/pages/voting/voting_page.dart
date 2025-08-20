@@ -142,6 +142,8 @@ class _VotingPageState extends State<VotingPage>
       ..addPageRequestListener(_handleProposalsPageRequest)
       ..notifyPageRequestListeners(0);
 
+    // TODO(damian-molinski): same behavior already exists in DiscoveryPage because
+    // of way confirmation dialog is shown. Refactor it.
     if (widget.keychainDeleted) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await _showKeychainDeletedDialog(context);
