@@ -7,11 +7,13 @@ final class ProposalViewData extends Equatable {
   final bool? isCurrentVersionLatest;
   final ProposalViewHeader header;
   final List<Segment> segments;
+  final String? categoryText;
 
   const ProposalViewData({
     this.isCurrentVersionLatest,
     this.header = const ProposalViewHeader(),
     this.segments = const [],
+    this.categoryText,
   });
 
   @override
@@ -19,12 +21,14 @@ final class ProposalViewData extends Equatable {
     isCurrentVersionLatest,
     header,
     segments,
+    categoryText,
   ];
 
   ProposalViewData copyWith({
     Optional<bool>? isCurrentVersionLatest,
     ProposalViewHeader? header,
     List<Segment>? segments,
+    Optional<String>? categoryText,
   }) {
     return ProposalViewData(
       isCurrentVersionLatest: isCurrentVersionLatest.dataOr(
@@ -32,6 +36,7 @@ final class ProposalViewData extends Equatable {
       ),
       header: header ?? this.header,
       segments: segments ?? this.segments,
+      categoryText: categoryText.dataOr(this.categoryText),
     );
   }
 }
