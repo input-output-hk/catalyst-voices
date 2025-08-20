@@ -69,6 +69,7 @@ dependencies:
       ref: a523a6128e6b2677739ac5d68d1d9c65a2af8b98
   mask_text_input_formatter: ^2.9.0
   result_type: ^1.0.0
+  rxdart: ^0.28.0
   scrollable_positioned_list: ^0.3.8
   sentry_flutter: ^9.6.0
   shared_preferences: ^2.5.3

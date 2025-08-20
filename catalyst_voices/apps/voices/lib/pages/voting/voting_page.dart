@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
@@ -9,10 +11,13 @@ import 'package:catalyst_voices/pages/voting/widgets/header/voting_header.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/layouts/header_and_content_layout.dart';
 import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab_controller.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 
 class VotingPage extends StatefulWidget {
   final SignedDocumentRef? categoryId;
@@ -32,11 +37,12 @@ class VotingPage extends StatefulWidget {
 
 class _VotingPageState extends State<VotingPage>
     with
-        SingleTickerProviderStateMixin,
+        TickerProviderStateMixin,
         ErrorHandlerStateMixin<VotingCubit, VotingPage>,
         SignalHandlerStateMixin<VotingCubit, VotingSignal, VotingPage> {
-  late final TabController _tabController;
+  late VoicesTabController<VotingPageTab> _tabController;
   late final PagingController<ProposalBriefVoting> _pagingController;
+  late final StreamSubscription<List<VotingPageTab>> _tabsSubscription;
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +90,7 @@ class _VotingPageState extends State<VotingPage>
     }
 
     if (widget.tab != oldWidget.tab) {
-      _tabController.animateTo(tab.index);
+      _tabController.animateToTab(tab);
     }
   }
 
@@ -92,6 +98,7 @@ class _VotingPageState extends State<VotingPage>
   void dispose() {
     _tabController.dispose();
     _pagingController.dispose();
+    unawaited(_tabsSubscription.cancel());
     super.dispose();
   }
 
@@ -119,11 +126,14 @@ class _VotingPageState extends State<VotingPage>
   void initState() {
     super.initState();
 
-    final tab = _determineTab();
+    final votingCubit = context.read<VotingCubit>();
+    final sessionCubit = context.read<SessionCubit>();
+    final supportedTabs = _determineTabs(sessionCubit.state.isProposerUnlock, votingCubit.state);
+    final selectedTab = _determineTab(supportedTabs, widget.tab);
 
-    _tabController = TabController(
-      initialIndex: tab.index,
-      length: VotingPageTab.values.length,
+    _tabController = VoicesTabController(
+      initialTab: selectedTab,
+      tabs: supportedTabs,
       vsync: this,
     );
 
@@ -132,10 +142,16 @@ class _VotingPageState extends State<VotingPage>
       initialMaxResults: 0,
     );
 
-    context.read<VotingCubit>().init(
-      onlyMyProposals: tab == VotingPageTab.my,
+    _tabsSubscription = Rx.combineLatest2(
+      sessionCubit.watchState().map((e) => e.isProposerUnlock),
+      votingCubit.watchState(),
+      _determineTabs,
+    ).distinct().listen(_updateTabsIfNeeded);
+
+    votingCubit.init(
+      onlyMyProposals: selectedTab == VotingPageTab.my,
       category: widget.categoryId,
-      type: tab.filter,
+      type: selectedTab.filter,
     );
 
     _pagingController
@@ -149,16 +165,22 @@ class _VotingPageState extends State<VotingPage>
     }
   }
 
-  VotingPageTab _determineTab() {
-    final isProposerUnlock = context.read<SessionCubit>().state.isProposerUnlock;
-    final requestedTab = widget.tab ?? VotingPageTab.total;
-
-    if (!isProposerUnlock && requestedTab == VotingPageTab.my) {
-      _updateRoute(tab: VotingPageTab.total);
-      return VotingPageTab.total;
+  VotingPageTab _determineTab(
+    List<VotingPageTab> supportedTabs,
+    VotingPageTab? initialTab,
+  ) {
+    final requestedTab = initialTab ?? widget.tab ?? supportedTabs.first;
+    if (!supportedTabs.contains(requestedTab)) {
+      final supportedTab = supportedTabs.first;
+      _updateRoute(tab: supportedTab);
+      return supportedTab;
     }
 
     return requestedTab;
+  }
+
+  List<VotingPageTab> _determineTabs(bool isProposerUnlock, VotingState state) {
+    return state.tabs(isProposerUnlock: isProposerUnlock);
   }
 
   void _doResetPagination() {
@@ -191,5 +213,18 @@ class _VotingPageState extends State<VotingPage>
         tab: effectiveTab,
       ).replace(context);
     });
+  }
+
+  void _updateTabsIfNeeded(List<VotingPageTab> tabs) {
+    if (!listEquals(tabs, _tabController.tabs)) {
+      setState(() {
+        _tabController.dispose();
+        _tabController = VoicesTabController(
+          vsync: this,
+          tabs: tabs,
+          initialTab: _determineTab(tabs, _tabController.tab),
+        );
+      });
+    }
   }
 }

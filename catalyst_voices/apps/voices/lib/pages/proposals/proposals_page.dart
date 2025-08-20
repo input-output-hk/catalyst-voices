@@ -8,10 +8,13 @@ import 'package:catalyst_voices/pages/proposals/widgets/proposals_header.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/layouts/header_and_content_layout.dart';
 import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab_controller.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 
 class ProposalsPage extends StatefulWidget {
   final SignedDocumentRef? categoryId;
@@ -29,11 +32,12 @@ class ProposalsPage extends StatefulWidget {
 
 class _ProposalsPageState extends State<ProposalsPage>
     with
-        SingleTickerProviderStateMixin,
+        TickerProviderStateMixin,
         ErrorHandlerStateMixin<ProposalsCubit, ProposalsPage>,
         SignalHandlerStateMixin<ProposalsCubit, ProposalsSignal, ProposalsPage> {
-  late final TabController _tabController;
+  late VoicesTabController<ProposalsPageTab> _tabController;
   late final PagingController<ProposalBrief> _pagingController;
+  late final StreamSubscription<List<ProposalsPageTab>> _tabsSubscription;
 
   @override
   Widget build(BuildContext context) {
@@ -65,7 +69,7 @@ class _ProposalsPageState extends State<ProposalsPage>
     }
 
     if (widget.tab != oldWidget.tab) {
-      _tabController.animateTo(tab.index);
+      _tabController.animateToTab(tab);
     }
   }
 
@@ -73,6 +77,7 @@ class _ProposalsPageState extends State<ProposalsPage>
   void dispose() {
     _tabController.dispose();
     _pagingController.dispose();
+    unawaited(_tabsSubscription.cancel());
     super.dispose();
   }
 
@@ -100,11 +105,14 @@ class _ProposalsPageState extends State<ProposalsPage>
   void initState() {
     super.initState();
 
-    final tab = _determineTab();
+    final proposalsCubit = context.read<ProposalsCubit>();
+    final sessionCubit = context.read<SessionCubit>();
+    final supportedTabs = _determineTabs(sessionCubit.state.isProposerUnlock, proposalsCubit.state);
+    final selectedTab = _determineTab(supportedTabs, widget.tab);
 
-    _tabController = TabController(
-      initialIndex: tab.index,
-      length: ProposalsPageTab.values.length,
+    _tabController = VoicesTabController(
+      initialTab: selectedTab,
+      tabs: supportedTabs,
       vsync: this,
     );
 
@@ -113,10 +121,16 @@ class _ProposalsPageState extends State<ProposalsPage>
       initialMaxResults: 0,
     );
 
-    context.read<ProposalsCubit>().init(
-      onlyMyProposals: tab == ProposalsPageTab.my,
+    _tabsSubscription = Rx.combineLatest2(
+      sessionCubit.watchState().map((e) => e.isProposerUnlock),
+      proposalsCubit.watchState(),
+      _determineTabs,
+    ).distinct().listen(_updateTabsIfNeeded);
+
+    proposalsCubit.init(
+      onlyMyProposals: selectedTab == ProposalsPageTab.my,
       category: widget.categoryId,
-      type: tab.filter,
+      type: selectedTab.filter,
       order: const Alphabetical(),
     );
 
@@ -125,16 +139,22 @@ class _ProposalsPageState extends State<ProposalsPage>
       ..notifyPageRequestListeners(0);
   }
 
-  ProposalsPageTab _determineTab() {
-    final isProposerUnlock = context.read<SessionCubit>().state.isProposerUnlock;
-    final requestedTab = widget.tab ?? ProposalsPageTab.total;
-
-    if (!isProposerUnlock && requestedTab == ProposalsPageTab.my) {
-      _updateRoute(tab: ProposalsPageTab.total);
-      return ProposalsPageTab.total;
+  ProposalsPageTab _determineTab(
+    List<ProposalsPageTab> supportedTabs,
+    ProposalsPageTab? initialTab,
+  ) {
+    final requestedTab = initialTab ?? widget.tab ?? supportedTabs.first;
+    if (!supportedTabs.contains(requestedTab)) {
+      final supportedTab = supportedTabs.first;
+      _updateRoute(tab: supportedTab);
+      return supportedTab;
     }
 
     return requestedTab;
+  }
+
+  List<ProposalsPageTab> _determineTabs(bool isProposerUnlock, ProposalsState state) {
+    return state.tabs(isProposerUnlock: isProposerUnlock);
   }
 
   void _doResetPagination() {
@@ -163,5 +183,18 @@ class _ProposalsPageState extends State<ProposalsPage>
         tab: effectiveTab,
       ).replace(context);
     });
+  }
+
+  void _updateTabsIfNeeded(List<ProposalsPageTab> tabs) {
+    if (!listEquals(tabs, _tabController.tabs)) {
+      setState(() {
+        _tabController.dispose();
+        _tabController = VoicesTabController(
+          vsync: this,
+          tabs: tabs,
+          initialTab: _determineTab(tabs, _tabController.tab),
+        );
+      });
+    }
   }
 }

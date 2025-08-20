@@ -7,6 +7,7 @@ export 'campaign/campaign_phase/campaign_phase_aware.dart';
 export 'category/category_detail.dart';
 export 'common/bloc_error_emitter_mixin.dart';
 export 'common/bloc_event_transformers.dart';
+export 'common/bloc_extensions.dart';
 export 'common/bloc_signal_emitter_mixin.dart';
 export 'dev_tools/dev_tools.dart';
 export 'dev_tools/document_lookup/document_lookup.dart';

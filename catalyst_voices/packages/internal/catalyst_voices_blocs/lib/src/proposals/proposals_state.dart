@@ -75,6 +75,12 @@ class ProposalsState extends Equatable {
   }
 
   bool isFavorite(String proposalId) => favoritesIds.contains(proposalId);
+
+  List<ProposalsPageTab> tabs({required bool isProposerUnlock}) {
+    return ProposalsPageTab.values
+        .where((tab) => tab != ProposalsPageTab.my || isProposerUnlock)
+        .toList();
+  }
 }
 
 final class ProposalsStateLatestUpdateCheckbox extends Equatable {

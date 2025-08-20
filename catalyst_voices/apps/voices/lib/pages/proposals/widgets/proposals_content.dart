@@ -4,11 +4,12 @@ import 'package:catalyst_voices/pages/proposals/widgets/proposals_sub_header.dar
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_tabs.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_tabs_divider.dart';
 import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab_controller.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class ProposalsContent extends StatelessWidget {
-  final TabController tabController;
+  final VoicesTabController<ProposalsPageTab> tabController;
   final PagingController<ProposalBrief> pagingController;
 
   const ProposalsContent({

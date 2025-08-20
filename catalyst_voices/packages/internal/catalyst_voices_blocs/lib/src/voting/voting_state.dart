@@ -3,6 +3,19 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
+final class VotingHeaderData extends Equatable {
+  final bool showCategoryPicker;
+  final CampaignCategoryDetailsViewModel? category;
+
+  const VotingHeaderData({
+    this.showCategoryPicker = false,
+    this.category,
+  });
+
+  @override
+  List<Object?> get props => [showCategoryPicker, category];
+}
+
 /// The state of available proposals in the voting page.
 class VotingState extends Equatable {
   final CampaignCategoryDetailsViewModel? selectedCategory;
@@ -25,6 +38,13 @@ class VotingState extends Equatable {
     this.categorySelectorItems = const [],
   });
 
+  VotingHeaderData get header {
+    return VotingHeaderData(
+      showCategoryPicker: votingPhase?.status.isActive ?? false,
+      category: selectedCategory,
+    );
+  }
+
   @override
   List<Object?> get props => [
     selectedCategory,
@@ -36,13 +56,6 @@ class VotingState extends Equatable {
     count,
     categorySelectorItems,
   ];
-
-  VotingHeaderData get header {
-    return VotingHeaderData(
-      showCategoryPicker: votingPhase?.status.isActive ?? false,
-      category: selectedCategory,
-    );
-  }
 
   SignedDocumentRef? get selectedCategoryId {
     return categorySelectorItems.singleWhereOrNull((element) => element.isSelected)?.ref;
@@ -69,6 +82,12 @@ class VotingState extends Equatable {
       categorySelectorItems: categorySelectorItems ?? this.categorySelectorItems,
     );
   }
+
+  List<VotingPageTab> tabs({required bool isProposerUnlock}) {
+    return VotingPageTab.values
+        .where((tab) => tab != VotingPageTab.my || isProposerUnlock)
+        .toList();
+  }
 }
 
 final class VotingStateOrderDropdown extends Equatable {
@@ -86,17 +105,4 @@ final class VotingStateOrderDropdown extends Equatable {
   ProposalsOrder? get selectedOrder {
     return items.singleWhereOrNull((element) => element.isSelected)?.value;
   }
-}
-
-final class VotingHeaderData extends Equatable {
-  final bool showCategoryPicker;
-  final CampaignCategoryDetailsViewModel? category;
-
-  const VotingHeaderData({
-    this.showCategoryPicker = false,
-    this.category,
-  });
-
-  @override
-  List<Object?> get props => [showCategoryPicker, category];
 }

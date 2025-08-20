@@ -31,11 +31,10 @@ class VoicesTabBar<T extends Object> extends StatelessWidget {
       onTap: onTap != null ? _onTap : null,
       tabs: [
         for (final tab in tabs)
-          if (!tab.isOffstage)
-            Tab(
-              key: tab.key ?? ValueKey(tab.data),
-              child: tab.child,
-            ),
+          Tab(
+            key: tab.key ?? ValueKey(tab.data),
+            child: tab.child,
+          ),
       ],
     );
   }
