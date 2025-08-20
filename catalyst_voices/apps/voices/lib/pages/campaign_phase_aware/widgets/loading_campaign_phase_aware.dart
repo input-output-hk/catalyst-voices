@@ -14,9 +14,10 @@ class LoadingCampaignPhaseAware extends StatelessWidget {
         ),
         Align(
           child: VoicesAssets.lottie.voicesLoader.buildLottie(
-            width: 220,
-            height: 220,
+            width: 300,
+            height: 300,
             repeat: true,
+            fit: BoxFit.contain,
           ),
         ),
       ],
