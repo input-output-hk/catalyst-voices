@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/tabbar/voices_tab.dart';
 import 'package:catalyst_voices/widgets/tabbar/voices_tab_bar.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab_controller.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -7,7 +8,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class ProposalsTabs extends StatelessWidget {
-  final TabController controller;
+  final VoicesTabController<ProposalsPageTab> controller;
 
   const ProposalsTabs({
     super.key,
@@ -30,7 +31,7 @@ class ProposalsTabs extends StatelessWidget {
 
 class _ProposalsTabs extends StatelessWidget {
   final ProposalsCount data;
-  final TabController controller;
+  final VoicesTabController<ProposalsPageTab> controller;
 
   const _ProposalsTabs({
     required this.data,
@@ -39,10 +40,6 @@ class _ProposalsTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isProposerUnlock = context.select<SessionCubit, bool>(
-      (cubit) => cubit.state.isProposerUnlock,
-    );
-
     return VoicesTabBar(
       dividerHeight: 0,
       controller: controller,
@@ -50,11 +47,10 @@ class _ProposalsTabs extends StatelessWidget {
         context.read<ProposalsCubit>().emitSignal(ChangeTabProposalsSignal(tab.data));
       },
       tabs: [
-        for (final tab in ProposalsPageTab.values)
+        for (final tab in controller.tabs)
           VoicesTab(
             data: tab,
             key: tab.tabKey(),
-            isOffstage: !isProposerUnlock && tab == ProposalsPageTab.my,
             child: VoicesTabText(tab.noOf(context, count: data.ofType(tab.filter))),
           ),
       ],

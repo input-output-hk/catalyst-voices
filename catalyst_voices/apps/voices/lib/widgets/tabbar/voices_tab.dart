@@ -10,24 +10,17 @@ final class VoicesTab<T extends Object> extends Equatable {
   /// A custom widget key. If not provided a [ValueKey] is created from [data].
   final Key? key;
 
-  // TODO(dt-iohk): remove this flag and replace it with filtering implementation.
-  /// Whether the tab should be hidden.
-  ///
-  /// When the tab is hidden it's still possible to programmatically navigate to it.
-  final bool isOffstage;
-
   /// The child for the tab.
   final Widget child;
 
   const VoicesTab({
     required this.data,
     this.key,
-    this.isOffstage = false,
     required this.child,
   });
 
   @override
-  List<Object?> get props => [data, key, isOffstage, child];
+  List<Object?> get props => [data, key, child];
 }
 
 /// A default widget to be used as [VoicesTab.child].
