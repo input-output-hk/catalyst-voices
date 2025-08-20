@@ -43,6 +43,8 @@ class _VotingProposalsTabs extends StatelessWidget {
       (cubit) => cubit.state.isProposerUnlock,
     );
 
+    final tabs = VotingPageTab.values.where((tab) => tab != VotingPageTab.my || isProposerUnlock);
+
     return VoicesTabBar(
       dividerHeight: 0,
       controller: controller,
@@ -50,11 +52,10 @@ class _VotingProposalsTabs extends StatelessWidget {
         context.read<VotingCubit>().emitSignal(ChangeTabVotingSignal(tab.data));
       },
       tabs: [
-        for (final tab in VotingPageTab.values)
+        for (final tab in tabs)
           VoicesTab(
             data: tab,
             key: tab.tabKey(),
-            isOffstage: !isProposerUnlock && tab == VotingPageTab.my,
             child: VoicesTabText(tab.noOf(context, count: data.ofType(tab.filter))),
           ),
       ],

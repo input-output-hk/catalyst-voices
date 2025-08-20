@@ -67,4 +67,18 @@ final class ProposalCubitCache extends Equatable {
       lastCastedVote: lastCastedVote.dataOr(this.lastCastedVote),
     );
   }
+
+  ProposalCubitCache copyWithoutProposal() {
+    return copyWith(
+      proposal: const Optional.empty(),
+      commentTemplate: const Optional.empty(),
+      comments: const Optional.empty(),
+      isFavorite: const Optional.empty(),
+      isVotingStage: const Optional.empty(),
+      readOnlyMode: const Optional.empty(),
+      category: const Optional.empty(),
+      lastCastedVote: const Optional.empty(),
+      ref: const Optional.empty(),
+    );
+  }
 }

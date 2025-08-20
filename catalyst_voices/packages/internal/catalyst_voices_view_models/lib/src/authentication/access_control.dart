@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 final class AccessControl {
   /// Default spaces access.
   /// For example, spaces that are used in the main drawer of the app.
-  static const defaultSpacesAccess = [Space.discovery];
+  static const defaultSpacesAccess = [Space.discovery, Space.voting];
 
   /// Contributor spaces access.
   /// For example, spaces that are used in the main drawer of the app.
@@ -68,13 +68,13 @@ final class AccessControl {
     Account? account,
   ) {
     if (account == null) {
-      return allSpacesShortcutsActivators.useKeys([Space.discovery]);
+      return allSpacesShortcutsActivators.useKeys([Space.discovery, Space.voting]);
     }
     if (account.isAdmin) return allSpacesShortcutsActivators;
     if (_hasProposerOrDrepRole(account)) {
       return allSpacesShortcutsActivators.useKeys(_proposalAccess);
     }
-    return allSpacesShortcutsActivators.useKeys([Space.discovery]);
+    return allSpacesShortcutsActivators.useKeys([Space.discovery, Space.voting]);
   }
 
   static bool _hasProposerOrDrepRole(Account account) {

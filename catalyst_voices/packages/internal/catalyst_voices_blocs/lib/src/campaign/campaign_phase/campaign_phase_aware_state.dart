@@ -5,11 +5,14 @@ import 'package:equatable/equatable.dart';
 sealed class CampaignPhaseAwareState extends Equatable {
   const CampaignPhaseAwareState();
 
+  CampaignPhaseType? get activeCampaignPhaseType => null;
+
   @override
   List<Object?> get props => [];
 }
 
 final class DataCampaignPhaseAwareState extends CampaignPhaseAwareState {
+  @override
   final CampaignPhaseType? activeCampaignPhaseType;
   final List<CampaignPhaseState> phasesStates;
   final int fundNumber;
