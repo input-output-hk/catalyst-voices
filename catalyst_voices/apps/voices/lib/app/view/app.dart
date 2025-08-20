@@ -78,6 +78,8 @@ class _AppState extends State<App> {
         create: (_) => Dependencies.instance.get<PublicProfileEmailStatusCubit>(),
       ),
       BlocProvider<CampaignPhaseAwareCubit>(
+        // Making it not lazy to not show two loading screens in a row (one for app splash screen and one for campaign phase aware)
+        lazy: false,
         create: (_) => Dependencies.instance.get<CampaignPhaseAwareCubit>(),
       ),
       BlocProvider<VotingBallotBloc>(
