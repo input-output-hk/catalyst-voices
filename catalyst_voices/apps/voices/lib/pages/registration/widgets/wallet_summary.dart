@@ -202,8 +202,6 @@ class _WalletSummaryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final baseIdentifier = semanticsIdentifier ?? 'WalletSummaryItem';
-
     return Row(
       children: [
         Expanded(
