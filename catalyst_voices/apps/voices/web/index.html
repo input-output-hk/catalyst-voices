@@ -1,5 +1,8 @@
-<!DOCTYPE html><html><head>
-    <!--
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!--
       If you are serving your web app in a path other than the root, change the
       href value below to reflect the base path you are serving from.
 
@@ -12,39 +15,33 @@
       This is a placeholder for base href that will be replaced by the value of
       the `--base-href` argument provided to `flutter build`.
     -->
-    <base href="$FLUTTER_BASE_HREF">
+  <base href="$FLUTTER_BASE_HREF">
 
-    <meta charset="UTF-8">
-    <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-    <meta content="Catalyst App" name="description">
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta content="Catalyst App" name="description">
 
-    <!-- iOS meta tags & icons -->
-    <meta content="yes" name="mobile-web-app-capable">
-    <meta content="black" name="apple-mobile-web-app-status-bar-style">
-    <meta content="Catalyst App" name="apple-mobile-web-app-title">
-    <link href="icons/favicon-192.png" rel="apple-touch-icon">
+  <!-- iOS meta tags & icons -->
+  <meta content="yes" name="mobile-web-app-capable">
+  <meta content="black" name="apple-mobile-web-app-status-bar-style">
+  <meta content="Catalyst App" name="apple-mobile-web-app-title">
+  <link href="icons/favicon-192.png" rel="apple-touch-icon">
 
-    <!-- Light mode favicon -->
-    <link rel="icon" href="icons/favicon_light.png" media="(prefers-color-scheme: light)">
+  <!-- Light mode favicon -->
+  <link rel="icon" href="icons/favicon_light.png" media="(prefers-color-scheme: light)"/>
 
-    <!-- Dark mode favicon -->
-    <link rel="icon" href="icons/favicon_dark.png" media="(prefers-color-scheme: dark)">
+  <!-- Dark mode favicon -->
+  <link rel="icon" href="icons/favicon_dark.png" media="(prefers-color-scheme: dark)"/>
 
-    <title>Catalyst</title>
-    <link href="manifest.json" rel="manifest">
-    <script src="/assets/packages/catalyst_cardano_web/assets/js/catalyst_cardano.js" type="module"></script>
-    <script src="/assets/packages/catalyst_compression_web/assets/js/catalyst_compression.js" type="module"></script>
-    <script defer="" src="/assets/packages/flutter_inappwebview_web/assets/web/web_support.js" type="application/javascript"></script>
+  <title>Catalyst</title>
+  <link href="manifest.json" rel="manifest">
+  <script src="/assets/packages/catalyst_cardano_web/assets/js/catalyst_cardano.js" type="module"></script>
+  <script src="/assets/packages/catalyst_compression_web/assets/js/catalyst_compression.js" type="module"></script>
+  <script defer="" src="/assets/packages/flutter_inappwebview_web/assets/web/web_support.js"
+    type="application/javascript"></script>
 
-    
-    
-  
-  
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
-  
-  
-  
-  
+
   <style id="splash-screen-style">
     html {
       height: 100%
@@ -68,19 +65,22 @@
     }
 
     .contain {
-      display:block;
-      width:100%; height:100%;
+      display: block;
+      width: 100%;
+      height: 100%;
       object-fit: contain;
     }
 
     .stretch {
-      display:block;
-      width:100%; height:100%;
+      display: block;
+      width: 100%;
+      height: 100%;
     }
 
     .cover {
-      display:block;
-      width:100%; height:100%;
+      display: block;
+      width: 100%;
+      height: 100%;
       object-fit: cover;
     }
 
@@ -115,17 +115,16 @@
 
 <body>
   <picture id="splash">
-      <source srcset="splash/img/light-1x.gif 1x, splash/img/light-2x.gif 2x, splash/img/light-3x.gif 3x, splash/img/light-4x.gif 4x" media="(prefers-color-scheme: light)">
-      <source srcset="splash/img/dark-1x.gif 1x, splash/img/dark-2x.gif 2x, splash/img/dark-3x.gif 3x, splash/img/dark-4x.gif 4x" media="(prefers-color-scheme: dark)">
-      <img class="center" aria-hidden="true" src="splash/img/light-1x.gif" alt="">
+    <source
+      srcset="splash/img/light-1x.gif 1x, splash/img/light-2x.gif 2x, splash/img/light-3x.gif 3x, splash/img/light-4x.gif 4x"
+      media="(prefers-color-scheme: light)">
+    <source
+      srcset="splash/img/dark-1x.gif 1x, splash/img/dark-2x.gif 2x, splash/img/dark-3x.gif 3x, splash/img/dark-4x.gif 4x"
+      media="(prefers-color-scheme: dark)">
+    <img class="center" aria-hidden="true" src="splash/img/light-1x.gif" alt="">
   </picture>
-  
-  
-  
 
+  <script async="" src="flutter_bootstrap.js"></script>
+</body>
 
-<script async="" src="flutter_bootstrap.js"></script>
-
-
-
-</body></html>
+</html>

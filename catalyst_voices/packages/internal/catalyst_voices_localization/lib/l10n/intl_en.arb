@@ -1699,11 +1699,11 @@
   "@live": {
     "description": "Indicates to user that status is in live mode"
   },
-  "loadingAssets": "Loading Video and Image Assets...",
+  "loadingAssets": "Loading Video and Image Assets…",
   "@loadingAssets": {
     "description": "Text informing user that assets are being loaded"
   },
-  "loadingSyncingDocuments": "Loading documents...",
+  "loadingSyncingDocuments": "Loading documents…",
   "@loadingSyncingDocuments": {
     "description": "Text informing user that documents are being loaded"
   },
