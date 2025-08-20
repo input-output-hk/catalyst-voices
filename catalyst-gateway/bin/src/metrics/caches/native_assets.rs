@@ -14,7 +14,7 @@ mod reporter {
     const METRIC_LABELS: [&str; 3] = ["api_host_names", "service_id", "network"];
 
     /// Size of the Native Assets cache.
-    pub(crate) static NATIVE_ASSETS_CACHE_SIZE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+    pub(super) static NATIVE_ASSETS_CACHE_SIZE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
             "cache_native_assets_size",
             "Returns the total weighted size of Native Assets entries in this cache",
@@ -24,7 +24,7 @@ mod reporter {
     });
 
     /// Number of entries in the Native Assets cache.
-    pub(crate) static NATIVE_ASSETS_CACHE_ENTRIES_COUNT: LazyLock<IntGaugeVec> =
+    pub(super) static NATIVE_ASSETS_CACHE_ENTRIES_COUNT: LazyLock<IntGaugeVec> =
         LazyLock::new(|| {
             register_int_gauge_vec!(
                 "cache_native_assets_entries_count",
@@ -35,7 +35,7 @@ mod reporter {
         });
 
     /// Number of hits in the Native Assets cache.
-    pub(crate) static NATIVE_ASSETS_CACHE_HIT_COUNT: LazyLock<IntCounterVec> =
+    pub(super) static NATIVE_ASSETS_CACHE_HIT_COUNT: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "cache_native_assets_hits_count",
@@ -46,7 +46,7 @@ mod reporter {
         });
 
     /// Number of misses in the Native Assets cache.
-    pub(crate) static NATIVE_ASSETS_CACHE_MISSES_COUNT: LazyLock<IntCounterVec> =
+    pub(super) static NATIVE_ASSETS_CACHE_MISSES_COUNT: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "cache_native_assets_misses_count",

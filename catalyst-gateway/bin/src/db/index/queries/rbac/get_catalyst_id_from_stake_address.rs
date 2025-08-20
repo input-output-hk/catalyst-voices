@@ -21,11 +21,10 @@ use crate::{
         },
         types::{DbCatalystId, DbStakeAddress},
     },
-    metrics::rbac::reporter::{
-        PERSISTENT_STAKE_ADDRESSES_CACHE_HIT, PERSISTENT_STAKE_ADDRESSES_CACHE_MISS,
-        VOLATILE_STAKE_ADDRESSES_CACHE_HIT, VOLATILE_STAKE_ADDRESSES_CACHE_MISS,
+    metrics::rbac::{
+        rbac_persistent_stake_address_cache_hits_inc, rbac_persistent_stake_address_cache_miss_inc,
+        rbac_volatile_stake_address_cache_hits_inc, rbac_volatile_stake_address_cache_miss_inc,
     },
-    settings::Settings,
 };
 
 /// Get Catalyst ID by stake address query string.
@@ -126,30 +125,18 @@ pub fn stake_addresses_cache_size(is_persistent: bool) -> u64 {
 
 /// Updates metrics of the cache.
 fn update_cache_metrics(is_persistent: bool, is_found: bool) {
-    let api_host_names = Settings::api_host_names().join(",");
-    let service_id = Settings::service_id();
-    let network = Settings::cardano_network().to_string();
-
     match (is_persistent, is_found) {
         (true, true) => {
-            PERSISTENT_STAKE_ADDRESSES_CACHE_HIT
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
+            rbac_persistent_stake_address_cache_hits_inc();
         },
         (true, false) => {
-            PERSISTENT_STAKE_ADDRESSES_CACHE_MISS
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
+            rbac_persistent_stake_address_cache_miss_inc();
         },
         (false, true) => {
-            VOLATILE_STAKE_ADDRESSES_CACHE_HIT
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
+            rbac_volatile_stake_address_cache_hits_inc();
         },
         (false, false) => {
-            VOLATILE_STAKE_ADDRESSES_CACHE_MISS
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
+            rbac_volatile_stake_address_cache_miss_inc();
         },
     }
 }

@@ -39,26 +39,97 @@ pub(crate) fn update() {
         .set(i64::try_from(persistent_rbac_chains_cache_size()).unwrap_or(-1));
 }
 
+/// Increment a metric value by one.
+macro_rules! cache_metric_inc {
+    ($cache:ident) => {
+        let api_host_names = Settings::api_host_names().join(",");
+        let service_id = Settings::service_id();
+        let network = Settings::cardano_network().to_string();
+
+        reporter::$cache
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .inc();
+    };
+}
+
+/// Increments the `VOLATILE_STAKE_ADDRESSES_CACHE_HIT` metric.
+pub(crate) fn rbac_volatile_stake_address_cache_hits_inc() {
+    cache_metric_inc!(VOLATILE_STAKE_ADDRESSES_CACHE_HIT);
+}
+
+/// Increments the `VOLATILE_STAKE_ADDRESSES_CACHE_HIT` metric.
+pub(crate) fn rbac_volatile_stake_address_cache_miss_inc() {
+    cache_metric_inc!(VOLATILE_STAKE_ADDRESSES_CACHE_MISS);
+}
+
+/// Increments the `PERSISTENT_STAKE_ADDRESSES_CACHE_HIT` metric.
+pub(crate) fn rbac_persistent_stake_address_cache_hits_inc() {
+    cache_metric_inc!(PERSISTENT_STAKE_ADDRESSES_CACHE_HIT);
+}
+
+/// Increments the `PERSISTENT_STAKE_ADDRESSES_CACHE_HIT` metric.
+pub(crate) fn rbac_persistent_stake_address_cache_miss_inc() {
+    cache_metric_inc!(PERSISTENT_STAKE_ADDRESSES_CACHE_MISS);
+}
+
+/// Increments the `PERSISTENT_PUBLIC_KEYS_CACHE_HIT` metric.
+pub(crate) fn rbac_persistent_public_key_cache_hits_inc() {
+    cache_metric_inc!(PERSISTENT_PUBLIC_KEYS_CACHE_HIT);
+}
+
+/// Increments the `PERSISTENT_PUBLIC_KEY_CACHE_MISS` metric.
+pub(crate) fn rbac_persistent_public_key_cache_miss_inc() {
+    cache_metric_inc!(PERSISTENT_PUBLIC_KEYS_CACHE_MISS);
+}
+
+/// Increments the `VOLATILE_PUBLIC_KEYS_CACHE_HIT` metric.
+pub(crate) fn rbac_volatile_public_key_cache_hits_inc() {
+    cache_metric_inc!(VOLATILE_PUBLIC_KEYS_CACHE_HIT);
+}
+
+/// Increments the `VOLATILE_PUBLIC_KEY_CACHE_MISS` metric.
+pub(crate) fn rbac_volatile_public_key_cache_miss_inc() {
+    cache_metric_inc!(VOLATILE_PUBLIC_KEYS_CACHE_MISS);
+}
+
+/// Increments the `PERSISTENT_TRANSACTION_IDS_CACHE_HIT` metric.
+pub(crate) fn rbac_persistent_transaction_id_cache_hits_inc() {
+    cache_metric_inc!(PERSISTENT_TRANSACTION_IDS_CACHE_HIT);
+}
+
+/// Increments the `PERSISTENT_TRANSACTION_IDS_CACHE_MISS` metric.
+pub(crate) fn rbac_persistent_transaction_id_cache_miss_inc() {
+    cache_metric_inc!(PERSISTENT_TRANSACTION_IDS_CACHE_MISS);
+}
+
+/// Increments the `VOLATILE_TRANSACTION_IDS_CACHE_HIT` metric.
+pub(crate) fn rbac_volatile_transaction_id_cache_hits_inc() {
+    cache_metric_inc!(VOLATILE_TRANSACTION_IDS_CACHE_HIT);
+}
+
+/// Increments the `VOLATILE_TRANSACTION_IDS_CACHE_MISS` metric.
+pub(crate) fn rbac_volatile_transaction_id_cache_miss_inc() {
+    cache_metric_inc!(VOLATILE_TRANSACTION_IDS_CACHE_MISS);
+}
+
+/// Increments the `PERSISTENT_CHAINS_CACHE_HIT` metric.
+pub(crate) fn rbac_persistent_chains_cache_hits_inc() {
+    cache_metric_inc!(PERSISTENT_CHAINS_CACHE_HIT);
+}
+
+/// Increments the `PERSISTENT_CHAINS_CACHE_MISS` metric.
+pub(crate) fn rbac_persistent_chains_cache_miss_inc() {
+    cache_metric_inc!(PERSISTENT_CHAINS_CACHE_MISS);
+}
+
 /// Increments the `INDEXING_SYNCHRONIZATION_COUNT` metric.
 pub(crate) fn inc_index_sync() {
-    let api_host_names = Settings::api_host_names().join(",");
-    let service_id = Settings::service_id();
-    let network = Settings::cardano_network().to_string();
-
-    reporter::INDEXING_SYNCHRONIZATION_COUNT
-        .with_label_values(&[&api_host_names, service_id, &network])
-        .inc();
+    cache_metric_inc!(INDEXING_SYNCHRONIZATION_COUNT);
 }
 
 /// Increments the `INVALID_RBAC_REGISTRATION_COUNT` metric.
 pub(crate) fn inc_invalid_rbac_reg_count() {
-    let api_host_names = Settings::api_host_names().join(",");
-    let service_id = Settings::service_id();
-    let network = Settings::cardano_network().to_string();
-
-    reporter::INVALID_RBAC_REGISTRATION_COUNT
-        .with_label_values(&[&api_host_names, service_id, &network])
-        .inc();
+    cache_metric_inc!(INVALID_RBAC_REGISTRATION_COUNT);
 }
 
 /// All the related RBAC Registration Chain Caching reporting metrics to the Prometheus
@@ -74,7 +145,7 @@ pub(crate) mod reporter {
     const METRIC_LABELS: [&str; 3] = ["api_host_names", "service_id", "network"];
 
     /// A total count of the persistent public keys cache hits.
-    pub(crate) static PERSISTENT_PUBLIC_KEYS_CACHE_HIT: LazyLock<IntCounterVec> =
+    pub(super) static PERSISTENT_PUBLIC_KEYS_CACHE_HIT: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "rbac_persistent_public_keys_cache_hit",
@@ -85,7 +156,7 @@ pub(crate) mod reporter {
         });
 
     /// A total count of the persistent public keys cache misses.
-    pub(crate) static PERSISTENT_PUBLIC_KEYS_CACHE_MISS: LazyLock<IntCounterVec> =
+    pub(super) static PERSISTENT_PUBLIC_KEYS_CACHE_MISS: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "rbac_persistent_public_keys_cache_miss",
@@ -96,7 +167,7 @@ pub(crate) mod reporter {
         });
 
     /// An estimated size of the persistent public keys cache.
-    pub(crate) static PERSISTENT_PUBLIC_KEYS_CACHE_SIZE: LazyLock<IntGaugeVec> =
+    pub(super) static PERSISTENT_PUBLIC_KEYS_CACHE_SIZE: LazyLock<IntGaugeVec> =
         LazyLock::new(|| {
             register_int_gauge_vec!(
                 "rbac_persistent_public_keys_cache_size",
@@ -107,7 +178,7 @@ pub(crate) mod reporter {
         });
 
     /// A total count of the volatile public keys cache hits.
-    pub(crate) static VOLATILE_PUBLIC_KEYS_CACHE_HIT: LazyLock<IntCounterVec> =
+    pub(super) static VOLATILE_PUBLIC_KEYS_CACHE_HIT: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "rbac_volatile_public_keys_cache_hit",
@@ -118,7 +189,7 @@ pub(crate) mod reporter {
         });
 
     /// A total count of the volatile public keys cache misses.
-    pub(crate) static VOLATILE_PUBLIC_KEYS_CACHE_MISS: LazyLock<IntCounterVec> =
+    pub(super) static VOLATILE_PUBLIC_KEYS_CACHE_MISS: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "rbac_volatile_public_keys_cache_miss",
@@ -129,7 +200,7 @@ pub(crate) mod reporter {
         });
 
     /// An estimated size of the volatile public keys cache.
-    pub(crate) static VOLATILE_PUBLIC_KEYS_CACHE_SIZE: LazyLock<IntGaugeVec> =
+    pub(super) static VOLATILE_PUBLIC_KEYS_CACHE_SIZE: LazyLock<IntGaugeVec> =
         LazyLock::new(|| {
             register_int_gauge_vec!(
                 "rbac_volatile_public_keys_cache_size",
@@ -140,7 +211,7 @@ pub(crate) mod reporter {
         });
 
     /// A total count of the persistent stake addresses cache hits.
-    pub(crate) static PERSISTENT_STAKE_ADDRESSES_CACHE_HIT: LazyLock<IntCounterVec> =
+    pub(super) static PERSISTENT_STAKE_ADDRESSES_CACHE_HIT: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "rbac_persistent_stake_addresses_cache_hit",
@@ -151,7 +222,7 @@ pub(crate) mod reporter {
         });
 
     /// A total count of the persistent stake addresses cache misses.
-    pub(crate) static PERSISTENT_STAKE_ADDRESSES_CACHE_MISS: LazyLock<IntCounterVec> =
+    pub(super) static PERSISTENT_STAKE_ADDRESSES_CACHE_MISS: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "rbac_persistent_stake_addresses_cache_miss",
@@ -162,7 +233,7 @@ pub(crate) mod reporter {
         });
 
     /// An estimated size of the persistent stake addresses cache.
-    pub(crate) static PERSISTENT_STAKE_ADDRESSES_CACHE_SIZE: LazyLock<IntGaugeVec> =
+    pub(super) static PERSISTENT_STAKE_ADDRESSES_CACHE_SIZE: LazyLock<IntGaugeVec> =
         LazyLock::new(|| {
             register_int_gauge_vec!(
                 "rbac_persistent_stake_addresses_cache_size",
@@ -173,7 +244,7 @@ pub(crate) mod reporter {
         });
 
     /// A total count of the volatile stake addresses cache hits.
-    pub(crate) static VOLATILE_STAKE_ADDRESSES_CACHE_HIT: LazyLock<IntCounterVec> =
+    pub(super) static VOLATILE_STAKE_ADDRESSES_CACHE_HIT: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "rbac_volatile_stake_addresses_cache_hit",
@@ -184,7 +255,7 @@ pub(crate) mod reporter {
         });
 
     /// A total count of the volatile stake addresses cache misses.
-    pub(crate) static VOLATILE_STAKE_ADDRESSES_CACHE_MISS: LazyLock<IntCounterVec> =
+    pub(super) static VOLATILE_STAKE_ADDRESSES_CACHE_MISS: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "rbac_volatile_stake_addresses_cache_miss",
@@ -195,7 +266,7 @@ pub(crate) mod reporter {
         });
 
     /// An estimated size of the volatile stake addresses cache.
-    pub(crate) static VOLATILE_STAKE_ADDRESSES_CACHE_SIZE: LazyLock<IntGaugeVec> =
+    pub(super) static VOLATILE_STAKE_ADDRESSES_CACHE_SIZE: LazyLock<IntGaugeVec> =
         LazyLock::new(|| {
             register_int_gauge_vec!(
                 "rbac_volatile_stake_addresses_cache_size",
@@ -206,7 +277,7 @@ pub(crate) mod reporter {
         });
 
     /// A total count of the persistent transaction IDs cache hits.
-    pub(crate) static PERSISTENT_TRANSACTION_IDS_CACHE_HIT: LazyLock<IntCounterVec> =
+    pub(super) static PERSISTENT_TRANSACTION_IDS_CACHE_HIT: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "rbac_persistent_transaction_ids_cache_hit",
@@ -217,7 +288,7 @@ pub(crate) mod reporter {
         });
 
     /// A total count of the persistent transaction IDs cache misses.
-    pub(crate) static PERSISTENT_TRANSACTION_IDS_CACHE_MISS: LazyLock<IntCounterVec> =
+    pub(super) static PERSISTENT_TRANSACTION_IDS_CACHE_MISS: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "rbac_persistent_transaction_ids_cache_miss",
@@ -228,7 +299,7 @@ pub(crate) mod reporter {
         });
 
     /// An estimated size of the persistent transaction IDs cache.
-    pub(crate) static PERSISTENT_TRANSACTION_IDS_CACHE_SIZE: LazyLock<IntGaugeVec> =
+    pub(super) static PERSISTENT_TRANSACTION_IDS_CACHE_SIZE: LazyLock<IntGaugeVec> =
         LazyLock::new(|| {
             register_int_gauge_vec!(
                 "rbac_persistent_transaction_ids_cache_size",
@@ -239,7 +310,7 @@ pub(crate) mod reporter {
         });
 
     /// A total count of the volatile transaction IDs cache hits.
-    pub(crate) static VOLATILE_TRANSACTION_IDS_CACHE_HIT: LazyLock<IntCounterVec> =
+    pub(super) static VOLATILE_TRANSACTION_IDS_CACHE_HIT: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "rbac_volatile_transaction_ids_cache_hit",
@@ -250,7 +321,7 @@ pub(crate) mod reporter {
         });
 
     /// A total count of the volatile transaction IDs cache misses.
-    pub(crate) static VOLATILE_TRANSACTION_IDS_CACHE_MISS: LazyLock<IntCounterVec> =
+    pub(super) static VOLATILE_TRANSACTION_IDS_CACHE_MISS: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "rbac_volatile_transaction_ids_cache_miss",
@@ -261,7 +332,7 @@ pub(crate) mod reporter {
         });
 
     /// An estimated size of the volatile transaction IDs cache.
-    pub(crate) static VOLATILE_TRANSACTION_IDS_CACHE_SIZE: LazyLock<IntGaugeVec> =
+    pub(super) static VOLATILE_TRANSACTION_IDS_CACHE_SIZE: LazyLock<IntGaugeVec> =
         LazyLock::new(|| {
             register_int_gauge_vec!(
                 "rbac_volatile_transaction_ids_cache_size",
@@ -272,7 +343,7 @@ pub(crate) mod reporter {
         });
 
     /// A total count of the persistent RBAC chains cache hits.
-    pub(crate) static PERSISTENT_CHAINS_CACHE_HIT: LazyLock<IntCounterVec> = LazyLock::new(|| {
+    pub(super) static PERSISTENT_CHAINS_CACHE_HIT: LazyLock<IntCounterVec> = LazyLock::new(|| {
         register_int_counter_vec!(
             "rbac_persistent_chains_cache_hit",
             "A total count of the persistent RBAC chains cache hits",
@@ -292,7 +363,7 @@ pub(crate) mod reporter {
     });
 
     /// An estimated size of the persistent RBAC chains cache.
-    pub(crate) static PERSISTENT_CHAINS_CACHE_SIZE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+    pub(super) static PERSISTENT_CHAINS_CACHE_SIZE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
             "rbac_persistent_chains_cache_size",
             "An estimated size of the persistent RBAC chains cache",
@@ -303,7 +374,7 @@ pub(crate) mod reporter {
 
     /// This counter increases every time we need to synchronize RBAC indexing by waiting
     /// for other tasks to finish before processing a new registration.
-    pub(crate) static INDEXING_SYNCHRONIZATION_COUNT: LazyLock<IntCounterVec> =
+    pub(super) static INDEXING_SYNCHRONIZATION_COUNT: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "indexing_synchronization_count",
@@ -315,7 +386,7 @@ pub(crate) mod reporter {
 
     /// This counter increases every when we found invalid RBAC registration during
     /// indexing.
-    pub(crate) static INVALID_RBAC_REGISTRATION_COUNT: LazyLock<IntCounterVec> =
+    pub(super) static INVALID_RBAC_REGISTRATION_COUNT: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "invalid_rbac_registration_count",

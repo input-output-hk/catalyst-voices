@@ -14,7 +14,7 @@ mod reporter {
     const METRIC_LABELS: [&str; 3] = ["api_host_names", "service_id", "network"];
 
     /// Size of the TXO Assets cache.
-    pub(crate) static TXO_ASSETS_CACHE_SIZE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+    pub(super) static TXO_ASSETS_CACHE_SIZE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
             "cache_txo_assets_size",
             "Returns the total weighted size of TXO Assets entries in this cache",
@@ -24,7 +24,7 @@ mod reporter {
     });
 
     /// Number of entries in the TXO Assets cache.
-    pub(crate) static TXO_ASSETS_CACHE_ENTRIES_COUNT: LazyLock<IntGaugeVec> = LazyLock::new(|| {
+    pub(super) static TXO_ASSETS_CACHE_ENTRIES_COUNT: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
             "cache_txo_assets_entries_count",
             "Returns the number of TXO Assets entries in this cache",
@@ -34,7 +34,7 @@ mod reporter {
     });
 
     /// Number of hits in the TXO Assets cache.
-    pub(crate) static TXO_ASSETS_CACHE_HIT_COUNT: LazyLock<IntCounterVec> = LazyLock::new(|| {
+    pub(super) static TXO_ASSETS_CACHE_HIT_COUNT: LazyLock<IntCounterVec> = LazyLock::new(|| {
         register_int_counter_vec!(
             "cache_txo_assets_hits_count",
             "Returns the number of hits (entries found) in the TXO Assets cache",
@@ -44,7 +44,7 @@ mod reporter {
     });
 
     /// Number of misses in the TXO Assets cache.
-    pub(crate) static TXO_ASSETS_CACHE_MISSES_COUNT: LazyLock<IntCounterVec> =
+    pub(super) static TXO_ASSETS_CACHE_MISSES_COUNT: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
             register_int_counter_vec!(
                 "cache_txo_assets_misses_count",

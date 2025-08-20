@@ -7,7 +7,7 @@ use moka::policy::EvictionPolicy;
 use rbac_registration::registration::cardano::RegistrationChain;
 
 use crate::{
-    metrics::rbac::reporter::{PERSISTENT_CHAINS_CACHE_HIT, PERSISTENT_CHAINS_CACHE_MISS},
+    metrics::rbac::{rbac_persistent_chains_cache_hits_inc, rbac_persistent_chains_cache_miss_inc},
     service::utilities::cache::Cache,
     settings::Settings,
 };
@@ -34,19 +34,11 @@ pub fn cache_persistent_rbac_chain(id: CatalystId, chain: RegistrationChain) {
 
 /// Returns a cached persistent chain by the given Catalyst ID.
 pub fn cached_persistent_rbac_chain(id: &CatalystId) -> Option<RegistrationChain> {
-    let api_host_names = Settings::api_host_names().join(",");
-    let service_id = Settings::service_id();
-    let network = Settings::cardano_network().to_string();
-
     let res = PERSISTENT_CHAINS.get(id);
     if res.is_some() {
-        PERSISTENT_CHAINS_CACHE_HIT
-            .with_label_values(&[&api_host_names, service_id, &network])
-            .inc();
+        rbac_persistent_chains_cache_hits_inc();
     } else {
-        PERSISTENT_CHAINS_CACHE_MISS
-            .with_label_values(&[&api_host_names, service_id, &network])
-            .inc();
+        rbac_persistent_chains_cache_miss_inc();
     }
     res
 }

@@ -25,9 +25,9 @@ use crate::{
         },
         types::{DbCatalystId, DbPublicKey},
     },
-    metrics::rbac::reporter::{
-        PERSISTENT_PUBLIC_KEYS_CACHE_HIT, PERSISTENT_PUBLIC_KEYS_CACHE_MISS,
-        VOLATILE_PUBLIC_KEYS_CACHE_HIT, VOLATILE_PUBLIC_KEYS_CACHE_MISS,
+    metrics::rbac::{
+        rbac_persistent_public_key_cache_hits_inc, rbac_persistent_public_key_cache_miss_inc,
+        rbac_volatile_public_key_cache_hits_inc, rbac_volatile_public_key_cache_miss_inc,
     },
     service::utilities::cache::Cache,
     settings::Settings,
@@ -142,30 +142,18 @@ fn cache(is_persistent: bool) -> &'static Cache<VerifyingKey, CatalystId> {
 
 /// Updates metrics of the cache.
 fn update_cache_metrics(is_persistent: bool, is_found: bool) {
-    let api_host_names = Settings::api_host_names().join(",");
-    let service_id = Settings::service_id();
-    let network = Settings::cardano_network().to_string();
-
     match (is_persistent, is_found) {
         (true, true) => {
-            PERSISTENT_PUBLIC_KEYS_CACHE_HIT
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
+            rbac_persistent_public_key_cache_hits_inc();
         },
         (true, false) => {
-            PERSISTENT_PUBLIC_KEYS_CACHE_MISS
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
+            rbac_persistent_public_key_cache_miss_inc();
         },
         (false, true) => {
-            VOLATILE_PUBLIC_KEYS_CACHE_HIT
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
+            rbac_volatile_public_key_cache_hits_inc();
         },
         (false, false) => {
-            VOLATILE_PUBLIC_KEYS_CACHE_MISS
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
+            rbac_volatile_public_key_cache_miss_inc();
         },
     }
 }
