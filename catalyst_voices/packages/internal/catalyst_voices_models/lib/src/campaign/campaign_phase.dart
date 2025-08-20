@@ -92,8 +92,8 @@ extension CampaignPhaseX on CampaignPhase {
       title: 'Community Voting',
       description: '''Community members cast their votes using the Catalyst Voting app.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 07, 16, 12),
-        to: DateTime.utc(2025, 08, 18, 9),
+        from: DateTime.utc(2025, 8, 22, 12),
+        to: DateTime.utc(2025, 12, 30, 18),
       ),
       type: CampaignPhaseType.communityVoting,
     ),
