@@ -94,7 +94,7 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
   }
 
   void _disposeControllers() {
-    final controllers = List.of(value.controllers.values);
+    final controllers = value.controllers.values;
     for (final controller in controllers) {
       unawaited(controller.dispose());
     }

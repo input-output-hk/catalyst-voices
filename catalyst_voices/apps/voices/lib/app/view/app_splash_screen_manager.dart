@@ -4,7 +4,7 @@ import 'package:catalyst_voices/app/view/app_precache_image_assets.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_manager.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/widgets/bubble_campaign_phase_aware_background.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices/widgets/indicators/voices_loading_indicator.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:flutter/material.dart';
@@ -74,9 +74,11 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     final syncManager = Dependencies.instance.get<SyncManager>();
     await syncManager.isSynchronization;
 
-    setState(() {
-      _areDocumentsSynced = true;
-    });
+    if (mounted) {
+      setState(() {
+        _areDocumentsSynced = true;
+      });
+    }
   }
 
   Future<void> _handleImageAndVideoPrecache() async {
@@ -88,9 +90,11 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
       videoPrecacheService.isInitialized,
     ]);
 
-    setState(() {
-      _areImagesAndVideosCached = isInitialized.every((e) => e);
-    });
+    if (mounted) {
+      setState(() {
+        _areImagesAndVideosCached = isInitialized.every((e) => e);
+      });
+    }
   }
 }
 
@@ -113,12 +117,7 @@ class _InAppLoading extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                VoicesAssets.lottie.voicesLoader.buildLottie(
-                  width: 300,
-                  height: 300,
-                  repeat: true,
-                  fit: BoxFit.contain,
-                ),
+                const VoicesLoadingIndicator(),
                 Text(
                   message,
                   style: const TextStyle(
