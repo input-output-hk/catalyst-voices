@@ -3,14 +3,14 @@
 use std::{collections::HashSet, fmt::Debug, sync::Arc};
 
 use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
-use catalyst_types::catalyst_id::CatalystId;
+use catalyst_types::{catalyst_id::CatalystId, uuid::UuidV4};
 use scylla::{client::session::Session, value::MaybeUnset, SerializeRow};
 use tracing::error;
 
 use crate::{
     db::{
         index::queries::{PreparedQueries, SizedBatch},
-        types::{DbCatalystId, DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex},
+        types::{DbCatalystId, DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex, DbUuidV4},
     },
     settings::cassandra_db::EnvVars,
 };
@@ -33,6 +33,11 @@ pub(crate) struct Params {
     prv_txn_id: MaybeUnset<DbTransactionId>,
     /// A set of removed stake addresses.
     removed_stake_addresses: HashSet<DbStakeAddress>,
+    /// A registration purpose.
+    ///
+    /// The value of purpose is `None` if the chain is modified by the registration
+    /// belonging to another chain (a stake address has been removed).
+    purpose: MaybeUnset<DbUuidV4>,
 }
 
 impl Debug for Params {
@@ -48,6 +53,7 @@ impl Debug for Params {
             .field("txn_index", &self.txn_index)
             .field("prv_txn_id", &prv_txn_id)
             .field("removed_stake_addresses", &self.removed_stake_addresses)
+            .field("purpose", &self.purpose)
             .finish()
     }
 }
@@ -57,12 +63,14 @@ impl Params {
     pub(crate) fn new(
         catalyst_id: CatalystId, txn_id: TransactionId, slot_no: Slot, txn_index: TxnIndex,
         prv_txn_id: Option<TransactionId>, removed_stake_addresses: HashSet<StakeAddress>,
+        purpose: Option<UuidV4>,
     ) -> Self {
         let prv_txn_id = prv_txn_id.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
         let removed_stake_addresses = removed_stake_addresses
             .into_iter()
             .map(Into::into)
             .collect();
+        let purpose = purpose.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
 
         Self {
             catalyst_id: catalyst_id.into(),
@@ -71,6 +79,7 @@ impl Params {
             txn_index: txn_index.into(),
             prv_txn_id,
             removed_stake_addresses,
+            purpose,
         }
     }
 
