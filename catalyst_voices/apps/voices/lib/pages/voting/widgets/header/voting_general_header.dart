@@ -7,7 +7,12 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class VotingGeneralHeader extends StatelessWidget {
-  const VotingGeneralHeader({super.key});
+  final bool showCategoryPicker;
+
+  const VotingGeneralHeader({
+    super.key,
+    this.showCategoryPicker = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,17 +28,18 @@ class VotingGeneralHeader extends StatelessWidget {
             color: theme.colors.textOnPrimaryLevel1,
           ),
         ),
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Padding(
+            const Padding(
               padding: EdgeInsets.only(top: 4),
               child: _CatalystFund(),
             ),
-            Padding(
-              padding: EdgeInsets.only(top: 7, right: 32),
-              child: VotingCategoryPickerSelector(),
-            ),
+            if (showCategoryPicker)
+              const Padding(
+                padding: EdgeInsets.only(top: 7, right: 32),
+                child: VotingCategoryPickerSelector(),
+              ),
           ],
         ),
         const SizedBox(height: 32),

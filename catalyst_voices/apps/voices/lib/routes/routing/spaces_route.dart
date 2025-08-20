@@ -164,20 +164,16 @@ final class TreasuryRoute extends GoRouteData
   }
 }
 
-final class VotingRoute extends GoRouteData with FadePageTransitionMixin, CompositeRouteGuardMixin {
+final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
   final String? categoryId;
   final String? tab;
+  final bool? $extra;
 
   const VotingRoute({
     this.categoryId,
     this.tab,
+    this.$extra,
   });
-
-  @override
-  List<RouteGuard> get routeGuards => const [
-    SessionUnlockedGuard(),
-    UserAccessGuard(),
-  ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -189,6 +185,7 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin, Compos
     return VotingPage(
       categoryId: categoryRef,
       tab: tab,
+      keychainDeleted: $extra ?? false,
     );
   }
 }

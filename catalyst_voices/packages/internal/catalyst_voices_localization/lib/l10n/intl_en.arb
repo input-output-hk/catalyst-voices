@@ -2637,9 +2637,9 @@
   "@recoverySuccessGoAccount": {
     "description": "Button text to view account details after recovery"
   },
-  "recoverySuccessGoToDashboard": "Jump into the Discovery Space",
+  "recoverySuccessGoToDashboard": "Start exploring Spaces",
   "@recoverySuccessGoToDashboard": {
-    "description": "Button text to navigate to Discovery Space after recovery"
+    "description": "Button text to navigate to Spaces after recovery"
   },
   "recoverySuccessSubtitle": "You have successfully restored your Catalyst Keychain, and unlocked Catalyst App on this device.",
   "@recoverySuccessSubtitle": {
@@ -2686,9 +2686,9 @@
   "@registrationCompletedAccountButton": {
     "description": "Button text to review account details"
   },
-  "registrationCompletedDiscoveryButton": "Open Discovery Space",
-  "@registrationCompletedDiscoveryButton": {
-    "description": "Button text to navigate to Discovery Space"
+  "registrationCompletedButton": "Start exploring Spaces",
+  "@registrationCompletedButton": {
+    "description": "Button text to navigate to Spaces"
   },
   "registrationCompletedKeychainInfo": "You created a Catalyst Keychain, backed up its seed phrase and set an unlock password.",
   "@registrationCompletedKeychainInfo": {

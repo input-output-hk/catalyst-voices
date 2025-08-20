@@ -10,6 +10,7 @@ final class VoicesTab<T extends Object> extends Equatable {
   /// A custom widget key. If not provided a [ValueKey] is created from [data].
   final Key? key;
 
+  // TODO(dt-iohk): remove this flag and replace it with filtering implementation.
   /// Whether the tab should be hidden.
   ///
   /// When the tab is hidden it's still possible to programmatically navigate to it.

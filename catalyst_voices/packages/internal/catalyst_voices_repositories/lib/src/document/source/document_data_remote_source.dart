@@ -80,14 +80,27 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     var remaining = 0;
 
     do {
-      final response = await _getDocumentIndexList(
-        page: page,
-        limit: maxPerPage,
-      );
+      final response =
+          await _getDocumentIndexList(
+            page: page,
+            limit: maxPerPage,
+          )
+          // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
+          // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
+          .onError<NotFoundException>(
+            (_, _) {
+              return DocumentIndexList(
+                docs: [],
+                page: CurrentPage(page: page, limit: maxPerPage, remaining: 0),
+              );
+            },
+          );
 
       allRefs.addAll(response.refs);
 
-      remaining = response.page.remaining;
+      // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
+      // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
+      remaining = response.docs.length < maxPerPage ? 0 : response.page.remaining;
       page = response.page.page + 1;
     } while (remaining > 0);
 

@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/pages/voting/widgets/header/voting_category_header.dart';
 import 'package:catalyst_voices/pages/voting/widgets/header/voting_general_header.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class VotingHeader extends StatelessWidget {
@@ -9,13 +8,13 @@ class VotingHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<VotingCubit, VotingState, CampaignCategoryDetailsViewModel?>(
-      selector: (state) => state.selectedCategory,
-      builder: (context, category) {
-        if (category == null) {
-          return const VotingGeneralHeader();
+    return BlocSelector<VotingCubit, VotingState, VotingHeaderData>(
+      selector: (state) => state.header,
+      builder: (context, header) {
+        if (header.category == null) {
+          return VotingGeneralHeader(showCategoryPicker: header.showCategoryPicker);
         } else {
-          return VotingCategoryHeader(category: category);
+          return VotingCategoryHeader(category: header.category!);
         }
       },
     );

@@ -12,7 +12,6 @@ import 'package:catalyst_voices/pages/account/widgets/account_page_title.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_roles_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_status_banner.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_username_tile.dart';
-import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/actions/account_settings_action.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/actions/session_cta_action.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
@@ -34,68 +33,66 @@ class _AccountPageState extends State<AccountPage>
         SignalHandlerStateMixin<AccountCubit, AccountSignal, AccountPage> {
   @override
   Widget build(BuildContext context) {
-    return ProposalSubmissionPhaseAware(
-      activeChild: Scaffold(
-        appBar: const VoicesAppBar(
-          automaticallyImplyLeading: false,
-          actions: [
-            SessionCtaAction(),
-            AccountSettingsAction(),
-          ],
-        ),
-        endDrawer: const OpportunitiesDrawer(),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const AccountStatusBanner(),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.all(24),
-                children: [
-                  const AccountPageTitle(
-                    key: Key('AccountPageTitle'),
-                  ),
-                  const SizedBox(height: 42),
-                  const Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(child: AccountHeaderTile()),
-                      SizedBox(width: 28),
-                      Expanded(child: AccountActionTile()),
-                    ],
-                  ),
-                  const SizedBox(height: 40),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const <Widget>[
-                            AccountUsernameTile(),
-                            AccountEmailTile(),
-                          ].separatedBy(const SizedBox(height: 20)).toList(),
-                        ),
+    return Scaffold(
+      appBar: const VoicesAppBar(
+        automaticallyImplyLeading: false,
+        actions: [
+          SessionCtaAction(),
+          AccountSettingsAction(),
+        ],
+      ),
+      endDrawer: const OpportunitiesDrawer(),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const AccountStatusBanner(),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(24),
+              children: [
+                const AccountPageTitle(
+                  key: Key('AccountPageTitle'),
+                ),
+                const SizedBox(height: 42),
+                const Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: AccountHeaderTile()),
+                    SizedBox(width: 28),
+                    Expanded(child: AccountActionTile()),
+                  ],
+                ),
+                const SizedBox(height: 40),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const <Widget>[
+                          AccountUsernameTile(),
+                          AccountEmailTile(),
+                        ].separatedBy(const SizedBox(height: 20)).toList(),
                       ),
-                      const SizedBox(width: 28),
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: const <Widget>[
-                            AccountRolesTile(),
-                            AccountKeychainTile(
-                              key: Key('AccountKeychainTile'),
-                            ),
-                          ].separatedBy(const SizedBox(height: 20)).toList(),
-                        ),
+                    ),
+                    const SizedBox(width: 28),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: const <Widget>[
+                          AccountRolesTile(),
+                          AccountKeychainTile(
+                            key: Key('AccountKeychainTile'),
+                          ),
+                        ].separatedBy(const SizedBox(height: 20)).toList(),
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

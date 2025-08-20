@@ -178,6 +178,8 @@ class _ProposalPageState extends State<ProposalPage>
         .distinct(listEquals)
         .listen(_updateSegments);
 
+    // TODO(damian-molinski): ProposalCubit should be scoped to this screen.
+    bloc.clear();
     unawaited(bloc.load(ref: widget.ref));
   }
 

@@ -62,11 +62,14 @@ class VoicesLinearProgressIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LinearProgressIndicator(
-      value: value,
+    return ClipRRect(
       borderRadius: BorderRadius.circular(5),
-      minHeight: weight.minHeight,
-      backgroundColor: showTrack ? null : Colors.transparent,
+      child: LinearProgressIndicator(
+        value: value,
+        borderRadius: BorderRadius.circular(5),
+        minHeight: weight.minHeight,
+        backgroundColor: showTrack ? null : Colors.transparent,
+      ),
     );
   }
 }
