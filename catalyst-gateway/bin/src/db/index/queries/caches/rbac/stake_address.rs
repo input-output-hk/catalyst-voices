@@ -1,4 +1,4 @@
-//! RBAC Stake Address Cache.
+//! RBAC Catalyst ID by Stake Address Cache.
 
 use cardano_blockchain_types::StakeAddress;
 use catalyst_types::catalyst_id::CatalystId;
@@ -27,7 +27,7 @@ impl StakeAddressCache {
             inner: Cache::new(
                 Self::CACHE_NAME,
                 EvictionPolicy::lru(),
-                Settings::rbac_cfg().persistent_pub_keys_cache_size,
+                Settings::rbac_cfg().persistent_stake_addresses_cache_size,
                 Self::weigher_fn,
             ),
         }
@@ -46,6 +46,12 @@ impl StakeAddressCache {
     /// Clear (invalidates) the cache entries.
     pub(crate) fn clear_cache(&self) {
         self.inner.clear_cache();
+    }
+
+    /// Weighted-size of the cache.
+    #[allow(dead_code)]
+    pub(crate) fn weighted_size(&self) -> u64 {
+        self.inner.weighted_size()
     }
 
     /// Number of entries in the cache.
