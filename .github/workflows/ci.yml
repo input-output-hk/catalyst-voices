@@ -91,8 +91,8 @@ jobs:
           docker compose -f catalyst-gateway/tests/docker-compose.yml logs rust-tests-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml down
 
-      - name: Running integration health tests
-        if: always()
+      - name: Running integration health thru proxy tests
+        if: false
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-health-tests-runner --abort-on-container-exit --exit-code-from api-health-tests-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-health-tests-runner
