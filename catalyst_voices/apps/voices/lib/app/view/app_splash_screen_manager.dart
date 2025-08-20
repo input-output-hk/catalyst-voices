@@ -52,7 +52,7 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     if (!_areImagesAndVideosCached) {
       return _InAppLoading(message: context.l10n.loadingAssets);
     }
-    
+
     return widget.child;
   }
 
@@ -65,7 +65,6 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
         AppSplashScreenManager.hideSplashScreen();
       }
     });
-
     unawaited(_handleDocumentsSync());
     unawaited(_handleImageAndVideoPrecache());
   }
@@ -73,7 +72,6 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
   Future<void> _handleDocumentsSync() async {
     final syncManager = Dependencies.instance.get<SyncManager>();
     await syncManager.waitForSync;
-
     if (mounted) {
       setState(() {
         _areDocumentsSynced = true;
