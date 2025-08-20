@@ -10,7 +10,6 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class AccountCompletedPanel extends StatelessWidget {
   const AccountCompletedPanel({super.key});
@@ -42,14 +41,7 @@ class AccountCompletedPanel extends StatelessWidget {
         children: [
           const _NextStep(),
           const SizedBox(height: 10),
-          _OpenSpaceButton(
-            onTap: () {
-              Navigator.pop(context);
-
-              final goRouter = GoRouter.of(context);
-              goRouter.go(goRouter.state.uri.toString());
-            },
-          ),
+          _OpenSpaceButton(onTap: () => Navigator.pop(context)),
           const SizedBox(height: 10),
           _ReviewMyAccountButton(
             onTap: () {
