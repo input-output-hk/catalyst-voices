@@ -15,7 +15,7 @@ final class RootRoute extends GoRouteData {
   @override
   Future<String?> redirect(BuildContext context, GoRouterState state) async {
     final cubit = context.read<CampaignPhaseAwareCubit>();
-    final phase = await cubit.activeCampaignPhaseType();
+    final phase = cubit.activeCampaignPhaseType();
     return switch (phase) {
       CampaignPhaseType.communityVoting => const VotingRoute().location,
       _ => const DiscoveryRoute().location,

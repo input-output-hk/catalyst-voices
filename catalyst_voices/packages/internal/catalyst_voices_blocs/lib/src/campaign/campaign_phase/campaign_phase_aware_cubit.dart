@@ -10,11 +10,14 @@ final _logger = Logger('CampaignPhaseAwareCubit');
 
 final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
   final CampaignService _campaignService;
+  final SyncManager _syncManager;
   StreamSubscription<Campaign?>? _campaignSubscription;
   Campaign? _activeCampaign;
   Timer? _timer;
+  var _synchronizationCompleter = Completer<bool>();
 
-  CampaignPhaseAwareCubit(this._campaignService) : super(const LoadingCampaignPhaseAwareState()) {
+  CampaignPhaseAwareCubit(this._campaignService, this._syncManager)
+    : super(const LoadingCampaignPhaseAwareState()) {
     _campaignSubscription = _campaignService.watchActiveCampaign.distinct().listen(
       _handleCampaignChange,
     );
@@ -22,16 +25,10 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
     _timer = Timer.periodic(const Duration(seconds: 1), _handleTimerTick);
   }
 
-  Future<CampaignPhaseType?> activeCampaignPhaseType() async {
-    await for (final currentState in stream) {
-      if (currentState is DataCampaignPhaseAwareState) {
-        return currentState.activeCampaignPhaseType;
-      } else if (currentState is ErrorCampaignPhaseAwareState) {
-        return null;
-      }
-    }
+  Future<bool> get awaitForInitialize => _synchronizationCompleter.future;
 
-    return null;
+  CampaignPhaseType? activeCampaignPhaseType() {
+    return state.activeCampaignPhaseType;
   }
 
   @override
@@ -44,19 +41,33 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
   }
 
   Future<void> getActiveCampaign() async {
+    if (_synchronizationCompleter.isCompleted) {
+      _synchronizationCompleter = Completer();
+    }
+
     emit(const LoadingCampaignPhaseAwareState());
+    await _syncManager.waitForSync;
+
     try {
       final campaign = await _campaignService.getActiveCampaign();
 
-      if (isClosed) return;
+      if (isClosed) {
+        _synchronizationCompleter.complete(true);
+        return;
+      }
 
       if (campaign == null) {
+        _synchronizationCompleter.complete(true);
         return emit(const NoActiveCampaignPhaseAwareState());
       }
+
       _handleCampaignChange(campaign);
+      _synchronizationCompleter.complete(true);
+      _emitState();
     } catch (error, stackTrace) {
       _logger.severe('Error getting active campaign', error, stackTrace);
       emit(ErrorCampaignPhaseAwareState(error: LocalizedException.create(error)));
+      _synchronizationCompleter.complete(false);
     }
   }
 
@@ -65,12 +76,7 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
     return _activeCampaign!.state.activePhases.firstOrNull?.phase.type;
   }
 
-  // ignore: use_setters_to_change_properties
-  void _handleCampaignChange(Campaign? campaign) {
-    _activeCampaign = campaign;
-  }
-
-  void _handleTimerTick(Timer timer) {
+  void _emitState() {
     if (_activeCampaign == null) return;
     final phasesStates = <CampaignPhaseState>[];
 
@@ -92,5 +98,14 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
         fundNumber: _activeCampaign!.fundNumber,
       ),
     );
+  }
+
+  // ignore: use_setters_to_change_properties
+  void _handleCampaignChange(Campaign? campaign) {
+    _activeCampaign = campaign;
+  }
+
+  void _handleTimerTick(Timer timer) {
+    _emitState();
   }
 }
