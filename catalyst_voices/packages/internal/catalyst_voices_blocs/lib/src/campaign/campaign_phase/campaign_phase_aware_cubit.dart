@@ -58,6 +58,7 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
       }
 
       _handleCampaignChange(campaign);
+      _emitState();
       _synchronizationCompleter.complete(true);
     } catch (error, stackTrace) {
       _logger.severe('Error getting active campaign', error, stackTrace);
@@ -71,12 +72,7 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
     return _activeCampaign!.state.activePhases.firstOrNull?.phase.type;
   }
 
-  // ignore: use_setters_to_change_properties
-  void _handleCampaignChange(Campaign? campaign) {
-    _activeCampaign = campaign;
-  }
-
-  void _handleTimerTick(Timer timer) {
+  void _emitState() {
     if (_activeCampaign == null) return;
     final phasesStates = <CampaignPhaseState>[];
 
@@ -98,5 +94,14 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
         fundNumber: _activeCampaign!.fundNumber,
       ),
     );
+  }
+
+  // ignore: use_setters_to_change_properties
+  void _handleCampaignChange(Campaign? campaign) {
+    _activeCampaign = campaign;
+  }
+
+  void _handleTimerTick(Timer timer) {
+    _emitState();
   }
 }

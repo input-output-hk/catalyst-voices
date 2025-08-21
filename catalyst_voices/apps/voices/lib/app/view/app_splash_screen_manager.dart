@@ -73,8 +73,15 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
   Future<void> _handleDocumentsSync() async {
     final syncManager = Dependencies.instance.get<SyncManager>();
     final campaignPhaseAwareCubit = context.read<CampaignPhaseAwareCubit>();
-    await syncManager.waitForSync;
-    await campaignPhaseAwareCubit.awaitForInitialize;
+
+    await Future.wait([
+      Future(() async {
+        await syncManager.waitForSync;
+        await campaignPhaseAwareCubit.awaitForInitialize;
+      }),
+      Future.delayed(const Duration(seconds: 3), () {}),
+    ]);
+
     if (mounted) {
       setState(() {
         _areDocumentsSynced = true;
