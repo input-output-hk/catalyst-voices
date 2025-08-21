@@ -29,20 +29,10 @@ package:
     ENV MK_SIGNED_DOC_PATH="./mk_signed_doc"
     ENV DEP_MK_SIGNED_DOC_PATH="./dep_mk_signed_doc"
 
-    ENTRYPOINT ["poetry", "run", "pytest", "-m", "preprod_indexing or unmarked", "-s", "--junitxml", "junit-report.xml", "--cov", "integration", "--cov-report", "lcov" ]
-    SAVE IMAGE api-tests-runner:latest
-
-package-health:
-    FROM +builder
-
-    ENV ASSETS_DATA_PATH="./cardano-asset-preprod.json"
-    ENV MK_SIGNED_DOC_PATH="./mk_signed_doc"
-    ENV DEP_MK_SIGNED_DOC_PATH="./dep_mk_signed_doc"
-
     # Install socat
     RUN apt-get update \
         && apt-get install -y --no-install-recommends socat \
         && rm -rf /var/lib/apt/lists/*
 
-    ENTRYPOINT poetry run pytest -s -m health_endpoint --junitxml=junit-report.xml --cov=integration --cov-report lcov
-    SAVE IMAGE api-health-tests-runner:latest
+    ENTRYPOINT ["/bin/sh", "-c"]
+    SAVE IMAGE api-tests-runner:latest

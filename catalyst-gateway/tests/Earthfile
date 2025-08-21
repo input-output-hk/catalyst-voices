@@ -34,7 +34,6 @@ prepare-all-images:
     BUILD gateway+docker
     BUILD ../event-db+docker
     BUILD ./api_tests+package
-    BUILD ./api_tests+package-health
     BUILD ./schemathesis_tests+package
     BUILD +package-rust-tests-runner
     BUILD +package-event-db-v1

@@ -84,41 +84,62 @@ jobs:
           command: run
           args: ./catalyst-gateway/tests/+prepare-all-images
 
-      - name: Running Rust integration tests
+      - name: Rust integration tests - running
         if: always()
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up rust-tests-runner --abort-on-container-exit --exit-code-from rust-tests-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml logs rust-tests-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml down
 
-      - name: Running integration health thru proxy tests
-        if: false
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-health-tests-runner --abort-on-container-exit --exit-code-from api-health-tests-runner
-          docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-health-tests-runner
-          docker compose -f catalyst-gateway/tests/docker-compose.yml down
-
-      - name: Running integration API tests
+      - name: Integration API tests - running
         if: always()
+        env:
+          API_TEST_CMD: 'poetry run pytest -m "preprod_indexing or unmarked" -s --junitxml junit-report.xml --cov integration --cov-report lcov'
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+
+      - name: Integration API tests - janitoring
+        if: always()
+        run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
           docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
           docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
-          docker compose -f catalyst-gateway/tests/docker-compose.yml down
+          docker stop cat-gateway
 
-      - name: Running schemathesis tests
+      - name: Integration health tests - running
+        if: always()
+        env:
+          API_TEST_CMD: 'poetry run pytest -m "health_endpoint" -s --junitxml junit-report.xml --cov integration --cov-report lcov'
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+
+      - name: Integration health tests - janitoring
+        if: always()
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
+          docker stop cat-gateway
+
+      - name: Integration health thru proxy tests - running
+        if: always()
+        env:
+          API_TEST_CMD: 'poetry run pytest -m "health_with_proxy_endpoint" -s --junitxml junit-report.xml --cov integration --cov-report lcov'
+          EVENT_DB_URL: "haproxy:18080"
+          INDEX_DB_URL: "haproxy:18090"
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up haproxy --detach
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+
+      - name: Integration health thru proxy tests - janitoring
+        if: always()
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
+          docker stop haproxy cat-gateway
+
+      - name: Schemathesis tests - running
         if: always()
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml logs schemathesis-runner
-          docker cp schemathesis-runner:/results/junit-report.xml ./schemathesis${{ env.REPORT_EXT }}
-
-      - name: Collecting reports
-        if: false
-        run: |
-          docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
-          docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
           docker cp schemathesis-runner:/results/junit-report.xml ./schemathesis${{ env.REPORT_EXT }}
 
       - name: Collect and upload test reports

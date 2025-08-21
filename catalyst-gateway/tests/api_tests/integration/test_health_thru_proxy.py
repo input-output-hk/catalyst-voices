@@ -17,7 +17,7 @@ def event_db_proxy():
     proxy = TestProxy("haproxy", "event_db", "pg1")
     yield proxy
 
-@pytest.mark.health_endpoint
+@pytest.mark.health_with_proxy_endpoint
 @pytest.mark.skip(reason="Bug https://github.com/input-output-hk/catalyst-voices/issues/3209")
 def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory):
     # Not registered stake address
@@ -59,7 +59,7 @@ def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory)
     resp = document.post(filter={},limit=10,page=5)
     assert(resp.status_code == 200), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
 
-@pytest.mark.health_endpoint
+@pytest.mark.health_with_proxy_endpoint
 @pytest.mark.skip(reason="Bug https://github.com/input-output-hk/catalyst-voices/issues/3209")
 def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory):
     # Not registered stake address
