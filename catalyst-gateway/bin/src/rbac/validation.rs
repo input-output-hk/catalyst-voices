@@ -129,6 +129,7 @@ async fn update_chain(
         // Only new chains can take ownership of stake addresses of existing chains, so in this case
         // other chains aren't affected.
         modified_chains: Vec::new(),
+        purpose,
     })
 }
 
@@ -239,6 +240,7 @@ async fn start_new_chain(
         stake_addresses: new_addresses,
         public_keys,
         modified_chains: updated_chains.into_iter().collect(),
+        purpose,
     })
 }
 

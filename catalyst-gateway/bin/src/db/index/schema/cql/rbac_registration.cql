@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS rbac_registration (
     prv_txn_id                 blob,         -- 32 Bytes from Previous Transaction Hash.
     removed_stake_addresses    set<blob>,    -- A set of stake addresses that were removed by other chain.
                                              -- The set is empty for all registrations of this chain.
+    purpose                    uuid,         -- 16 Bytes of UUIDv4 Purpose.
 
     PRIMARY KEY (catalyst_id, slot_no, txn_index)
 )
