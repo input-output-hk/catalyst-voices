@@ -1,6 +1,6 @@
 //! Get Sync Status query
 
-use cardano_blockchain_types::Slot;
+use cardano_chain_follower::Slot;
 use futures::stream::StreamExt;
 use tracing::{debug, warn};
 

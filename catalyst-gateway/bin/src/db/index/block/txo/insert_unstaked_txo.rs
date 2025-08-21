@@ -1,7 +1,7 @@
 //! Insert Unstaked TXOs into the DB.
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Slot, TransactionId, TxnIndex, TxnOutputOffset};
+use cardano_chain_follower::{hashes::TransactionId, Slot, TxnIndex, TxnOutputOffset};
 use scylla::{client::session::Session, SerializeRow};
 use tracing::error;
 

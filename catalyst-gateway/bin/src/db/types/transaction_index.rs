@@ -1,6 +1,6 @@
 //! A `TxnIndex` wrapper that can be stored to and load from a database.
 
-use cardano_blockchain_types::TxnIndex;
+use cardano_chain_follower::TxnIndex;
 use scylla::_macro_internal::{
     CellWriter, ColumnType, DeserializationError, DeserializeValue, FrameSlice, SerializationError,
     SerializeValue, TypeCheckError, WrittenCellProof,
