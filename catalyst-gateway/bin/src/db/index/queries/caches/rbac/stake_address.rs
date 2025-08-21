@@ -1,6 +1,6 @@
 //! RBAC Catalyst ID by Stake Address Cache.
 
-use cardano_blockchain_types::StakeAddress;
+use cardano_chain_follower::StakeAddress;
 use catalyst_types::catalyst_id::CatalystId;
 use get_size2::GetSize;
 use moka::policy::EvictionPolicy;

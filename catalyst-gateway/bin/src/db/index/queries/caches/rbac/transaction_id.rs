@@ -1,6 +1,6 @@
 //! RBAC Catalyst ID by Transaction ID Cache.
 
-use cardano_blockchain_types::TransactionId;
+use cardano_chain_follower::hashes::TransactionId;
 use catalyst_types::catalyst_id::CatalystId;
 use get_size2::GetSize;
 use moka::policy::EvictionPolicy;
