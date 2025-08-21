@@ -24,7 +24,7 @@ class MarkdownText extends StatelessWidget with LaunchUrlMixin {
     return Semantics(
       identifier: 'MarkdownText',
       container: true,
-      // TODO(dt-iohk): unformat markdown to select clear-text without formatting characters
+      // TODO(dt-iohk): clean markdown to select clear-text without formatting characters
       label: markdownData.data,
       child: ExcludeSemantics(
         child: MarkdownBody(
