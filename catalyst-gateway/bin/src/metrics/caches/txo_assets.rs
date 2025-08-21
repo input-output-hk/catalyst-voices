@@ -61,7 +61,7 @@ pub(crate) fn update() {
     let service_id = Settings::service_id();
     let network = Settings::cardano_network().to_string();
 
-    // Onle update persistent session cache size metrics.
+    // Only update persistent session cache size metrics.
     CassandraSession::get(true).inspect(|session| {
         let cache = session.caches().assets_ada();
         reporter::TXO_ASSETS_CACHE_SIZE
