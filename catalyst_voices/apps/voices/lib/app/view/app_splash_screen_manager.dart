@@ -43,18 +43,19 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     with SingleTickerProviderStateMixin {
   bool _areDocumentsSynced = false;
   bool _areImagesAndVideosCached = false;
+  bool _messageShownEnoughTime = true;
 
   @override
   Widget build(BuildContext context) {
-    if (!_areDocumentsSynced) {
-      return _InAppLoading(message: context.l10n.loadingSyncingDocuments);
+    if (_areDocumentsSynced && _areImagesAndVideosCached && _messageShownEnoughTime) {
+      return widget.child;
     }
 
-    if (!_areImagesAndVideosCached) {
-      return _InAppLoading(message: context.l10n.loadingAssets);
-    }
-
-    return widget.child;
+    return _InAppLoading(
+      key: const Key('AppLoadingScreen'),
+      message: context.l10n.settingThingsAppInSplashScreen,
+      messageShownEnoughTime: _handleMessageShownEnoughTime,
+    );
   }
 
   @override
@@ -74,13 +75,8 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     final syncManager = Dependencies.instance.get<SyncManager>();
     final campaignPhaseAwareCubit = context.read<CampaignPhaseAwareCubit>();
 
-    await Future.wait([
-      Future(() async {
-        await syncManager.waitForSync;
-        await campaignPhaseAwareCubit.awaitForInitialize;
-      }),
-      Future.delayed(const Duration(seconds: 3), () {}),
-    ]);
+    await syncManager.waitForSync;
+    await campaignPhaseAwareCubit.awaitForInitialize;
 
     if (mounted) {
       setState(() {
@@ -104,14 +100,34 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
       });
     }
   }
+
+  void _handleMessageShownEnoughTime(bool value) {
+    if (mounted) {
+      setState(() {
+        _messageShownEnoughTime = value;
+      });
+    }
+  }
 }
 
-class _InAppLoading extends StatelessWidget {
+class _InAppLoading extends StatefulWidget {
   final String message;
+  final ValueChanged<bool> messageShownEnoughTime;
 
   const _InAppLoading({
+    super.key,
     required this.message,
+    required this.messageShownEnoughTime,
   });
+
+  @override
+  State<_InAppLoading> createState() => _InAppLoadingState();
+}
+
+class _InAppLoadingState extends State<_InAppLoading> {
+  bool _showMessage = false;
+  Timer? _messageTimer;
+  Timer? _minimumLoadingTimer;
 
   @override
   Widget build(BuildContext context) {
@@ -126,12 +142,18 @@ class _InAppLoading extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 18),
-                const VoicesLoadingIndicator(),
-                Text(
-                  message,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
+                const VoicesLoadingIndicator(
+                  key: Key('PersistentLoadingIndicator'),
+                ),
+                AnimatedOpacity(
+                  opacity: _showMessage ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 300),
+                  child: Text(
+                    widget.message,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ],
@@ -140,5 +162,34 @@ class _InAppLoading extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _messageTimer?.cancel();
+    _messageTimer = null;
+
+    _minimumLoadingTimer?.cancel();
+    _minimumLoadingTimer = null;
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _messageTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _showMessage = true;
+        });
+
+        _minimumLoadingTimer = Timer(const Duration(seconds: 2), () {
+          if (mounted) {
+            widget.messageShownEnoughTime(true);
+          }
+        });
+      }
+    });
   }
 }
