@@ -26,6 +26,8 @@ pub struct RbacValidationSuccess {
     ///
     /// A new RBAC registration can take ownership of stake addresses of other chains.
     pub modified_chains: Vec<(CatalystId, HashSet<StakeAddress>)>,
+    /// A registration purpose.
+    pub purpose: Option<UuidV4>,
 }
 
 /// An error returned from the `validate_rbac_registration` method.
