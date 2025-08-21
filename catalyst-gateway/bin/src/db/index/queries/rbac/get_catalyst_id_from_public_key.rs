@@ -1,15 +1,11 @@
 //! Get Catalyst ID by public key.
 
-use std::{
-    mem::size_of,
-    sync::{Arc, LazyLock},
-};
+use std::sync::Arc;
 
 use anyhow::{Context, Result};
 use catalyst_types::catalyst_id::CatalystId;
 use ed25519_dalek::VerifyingKey;
 use futures::{StreamExt, TryStreamExt};
-use moka::policy::EvictionPolicy;
 use scylla::{
     client::session::Session,
     statement::{prepared::PreparedStatement, Consistency},
@@ -29,40 +25,10 @@ use crate::{
         rbac_persistent_public_key_cache_hits_inc, rbac_persistent_public_key_cache_miss_inc,
         rbac_volatile_public_key_cache_hits_inc, rbac_volatile_public_key_cache_miss_inc,
     },
-    service::utilities::cache::Cache,
-    settings::Settings,
 };
 
 /// A query string.
 const QUERY: &str = include_str!("../cql/get_catalyst_id_for_public_key.cql");
-
-/// Function to determine cache entry weighted size.
-fn weigher_fn(_: &VerifyingKey, _: &CatalystId) -> u32 {
-    size_of::<VerifyingKey>()
-        .saturating_add(size_of::<CatalystId>())
-        .try_into()
-        .unwrap_or(u32::MAX)
-}
-
-/// A persistent cache instance.
-static PERSISTENT_CACHE: LazyLock<Cache<VerifyingKey, CatalystId>> = LazyLock::new(|| {
-    Cache::new(
-        "Persistent RBAC Public Keys Cache",
-        EvictionPolicy::lru(),
-        Settings::rbac_cfg().persistent_pub_keys_cache_size,
-        weigher_fn,
-    )
-});
-
-/// A volatile cache instance.
-static VOLATILE_CACHE: LazyLock<Cache<VerifyingKey, CatalystId>> = LazyLock::new(|| {
-    Cache::new(
-        "",
-        EvictionPolicy::lru(),
-        Settings::rbac_cfg().volatile_pub_keys_cache_size,
-        weigher_fn,
-    )
-});
 
 /// Get Catalyst ID by public key query parameters.
 #[derive(SerializeRow)]
@@ -95,10 +61,30 @@ impl Query {
         let cache = session.caches().rbac_public_key();
 
         if cache.is_enabled() {
-            let res = cache.get(&public_key);
-            update_cache_metrics(session.is_persistent(), res.is_some());
-            if let Some(res) = res {
-                return Ok(Some(res));
+            let entry_opt = cache.get(&public_key);
+
+            let entry_opt = if session.is_persistent() {
+                entry_opt
+                    .inspect(|_| {
+                        rbac_persistent_public_key_cache_hits_inc();
+                    })
+                    .or_else(|| {
+                        rbac_persistent_public_key_cache_miss_inc();
+                        None
+                    })
+            } else {
+                entry_opt
+                    .inspect(|_| {
+                        rbac_volatile_public_key_cache_hits_inc();
+                    })
+                    .or_else(|| {
+                        rbac_volatile_public_key_cache_miss_inc();
+                        None
+                    })
+            };
+
+            if entry_opt.is_some() {
+                return Ok(entry_opt);
             }
         }
 
@@ -123,39 +109,14 @@ impl Query {
 
 /// Removes all cached values.
 pub fn invalidate_public_keys_cache(is_persistent: bool) {
-    let cache = cache(is_persistent);
-    cache.clear_cache();
+    CassandraSession::get(is_persistent).inspect(|session| {
+        session.caches().rbac_public_key().clear_cache();
+    });
 }
 
 /// Returns an approximate number of entries in the public keys cache.
 pub fn public_keys_cache_size(is_persistent: bool) -> u64 {
-    let cache = cache(is_persistent);
-    cache.entry_count()
-}
-
-/// Returns a persistent or a volatile cache instance depending on the parameter value.
-fn cache(is_persistent: bool) -> &'static Cache<VerifyingKey, CatalystId> {
-    if is_persistent {
-        &PERSISTENT_CACHE
-    } else {
-        &VOLATILE_CACHE
-    }
-}
-
-/// Updates metrics of the cache.
-fn update_cache_metrics(is_persistent: bool, is_found: bool) {
-    match (is_persistent, is_found) {
-        (true, true) => {
-            rbac_persistent_public_key_cache_hits_inc();
-        },
-        (true, false) => {
-            rbac_persistent_public_key_cache_miss_inc();
-        },
-        (false, true) => {
-            rbac_volatile_public_key_cache_hits_inc();
-        },
-        (false, false) => {
-            rbac_volatile_public_key_cache_miss_inc();
-        },
-    }
+    CassandraSession::get(is_persistent)
+        .map(|session| session.caches().rbac_public_key().entry_count())
+        .unwrap_or_default()
 }
