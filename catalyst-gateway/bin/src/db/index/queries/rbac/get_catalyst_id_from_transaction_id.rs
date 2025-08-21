@@ -1,12 +1,11 @@
 //! Get Catalyst ID by transaction ID.
 
-use std::sync::{Arc, LazyLock};
+use std::sync::Arc;
 
 use anyhow::{Context, Result};
 use cardano_chain_follower::hashes::TransactionId;
 use catalyst_types::catalyst_id::CatalystId;
 use futures::{StreamExt, TryStreamExt};
-use moka::policy::EvictionPolicy;
 use scylla::{
     client::session::Session,
     statement::{prepared::PreparedStatement, Consistency},
@@ -27,37 +26,10 @@ use crate::{
         rbac_persistent_transaction_id_cache_miss_inc, rbac_volatile_transaction_id_cache_hits_inc,
         rbac_volatile_transaction_id_cache_miss_inc,
     },
-    service::utilities::cache::Cache,
-    settings::Settings,
 };
 
 /// A query string.
 const QUERY: &str = include_str!("../cql/get_catalyst_id_for_transaction_id.cql");
-
-/// Function to determine cache entry weighted size.
-fn weigher_fn(_: &TransactionId, _: &CatalystId) -> u32 {
-    1u32
-}
-
-/// A persistent cache instance.
-static PERSISTENT_CACHE: LazyLock<Cache<TransactionId, CatalystId>> = LazyLock::new(|| {
-    Cache::new(
-        "Persistent RBAC Transaction ID Cache",
-        EvictionPolicy::lru(),
-        Settings::rbac_cfg().persistent_pub_keys_cache_size,
-        weigher_fn,
-    )
-});
-
-/// A volatile cache instance.
-static VOLATILE_CACHE: LazyLock<Cache<TransactionId, CatalystId>> = LazyLock::new(|| {
-    Cache::new(
-        "Volatile RBAC Transaction ID Cache",
-        EvictionPolicy::lru(),
-        Settings::rbac_cfg().volatile_pub_keys_cache_size,
-        weigher_fn,
-    )
-});
 
 /// Get Catalyst ID by transaction ID query parameters.
 #[derive(SerializeRow)]
@@ -87,12 +59,28 @@ impl Query {
     pub(crate) async fn get(
         session: &CassandraSession, txn_id: TransactionId,
     ) -> Result<Option<CatalystId>> {
-        let cache = cache(session.is_persistent());
+        let cache = session.caches().rbac_transaction_id();
 
-        let res = cache.get(&txn_id);
-        update_cache_metrics(session.is_persistent(), res.is_some());
-        if let Some(res) = res {
-            return Ok(Some(res));
+        if cache.is_enabled() {
+            let entry_opt = cache.get(&txn_id);
+            let entry_opt = if session.is_persistent() {
+                entry_opt
+                    .inspect(|_| rbac_persistent_transaction_id_cache_hits_inc())
+                    .or_else(|| {
+                        rbac_persistent_transaction_id_cache_miss_inc();
+                        None
+                    })
+            } else {
+                entry_opt
+                    .inspect(|_| rbac_volatile_transaction_id_cache_hits_inc())
+                    .or_else(|| {
+                        rbac_volatile_transaction_id_cache_miss_inc();
+                        None
+                    })
+            };
+            if entry_opt.is_some() {
+                return Ok(entry_opt);
+            }
         }
 
         session
@@ -119,39 +107,14 @@ impl Query {
 
 /// Removes all cached values.
 pub fn invalidate_transactions_ids_cache(is_persistent: bool) {
-    let cache = cache(is_persistent);
-    cache.clear_cache();
+    CassandraSession::get(is_persistent).inspect(|session| {
+        session.caches().rbac_transaction_id().clear_cache();
+    });
 }
 
 /// Returns an approximate number of entries in the transaction IDs cache.
 pub fn transaction_ids_cache_size(is_persistent: bool) -> u64 {
-    let cache = cache(is_persistent);
-    cache.entry_count()
-}
-
-/// Returns a persistent or a volatile cache instance depending on the parameter value.
-fn cache(is_persistent: bool) -> &'static Cache<TransactionId, CatalystId> {
-    if is_persistent {
-        &PERSISTENT_CACHE
-    } else {
-        &VOLATILE_CACHE
-    }
-}
-
-/// Updates metrics of the cache.
-fn update_cache_metrics(is_persistent: bool, is_found: bool) {
-    match (is_persistent, is_found) {
-        (true, true) => {
-            rbac_persistent_transaction_id_cache_hits_inc();
-        },
-        (true, false) => {
-            rbac_persistent_transaction_id_cache_miss_inc();
-        },
-        (false, true) => {
-            rbac_volatile_transaction_id_cache_hits_inc();
-        },
-        (false, false) => {
-            rbac_volatile_transaction_id_cache_miss_inc();
-        },
-    }
+    CassandraSession::get(is_persistent)
+        .map(|session| session.caches().rbac_transaction_id().entry_count())
+        .unwrap_or_default()
 }

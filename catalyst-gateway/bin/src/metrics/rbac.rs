@@ -10,38 +10,40 @@ use crate::{
     settings::Settings,
 };
 
+/// Represents a persistent session.
+const PERSISTENT: bool = true;
+/// Represents a volatile session.
+const VOLATILE: bool = false;
+
 /// Updates memory metrics to current values.
 pub(crate) fn update() {
     let api_host_names = Settings::api_host_names().join(",");
     let service_id = Settings::service_id();
     let network = Settings::cardano_network().to_string();
 
-    let persistent = true;
-    let volatile = false;
-
     reporter::PERSISTENT_PUBLIC_KEYS_CACHE_SIZE
         .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(public_keys_cache_size(persistent)).unwrap_or(-1));
+        .set(i64::try_from(public_keys_cache_size(PERSISTENT)).unwrap_or(-1));
 
     reporter::VOLATILE_PUBLIC_KEYS_CACHE_SIZE
         .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(public_keys_cache_size(volatile)).unwrap_or(-1));
+        .set(i64::try_from(public_keys_cache_size(VOLATILE)).unwrap_or(-1));
 
     reporter::PERSISTENT_STAKE_ADDRESSES_CACHE_SIZE
         .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(stake_addresses_cache_size(persistent)).unwrap_or(-1));
+        .set(i64::try_from(stake_addresses_cache_size(PERSISTENT)).unwrap_or(-1));
 
     reporter::VOLATILE_STAKE_ADDRESSES_CACHE_SIZE
         .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(stake_addresses_cache_size(volatile)).unwrap_or(-1));
+        .set(i64::try_from(stake_addresses_cache_size(VOLATILE)).unwrap_or(-1));
 
     reporter::PERSISTENT_TRANSACTION_IDS_CACHE_SIZE
         .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(transaction_ids_cache_size(persistent)).unwrap_or(-1));
+        .set(i64::try_from(transaction_ids_cache_size(PERSISTENT)).unwrap_or(-1));
 
     reporter::VOLATILE_TRANSACTION_IDS_CACHE_SIZE
         .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(transaction_ids_cache_size(volatile)).unwrap_or(-1));
+        .set(i64::try_from(transaction_ids_cache_size(VOLATILE)).unwrap_or(-1));
 
     reporter::PERSISTENT_CHAINS_CACHE_SIZE
         .with_label_values(&[&api_host_names, service_id, &network])
