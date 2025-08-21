@@ -2,6 +2,7 @@
 
 use cardano_blockchain_types::StakeAddress;
 use catalyst_types::catalyst_id::CatalystId;
+use get_size2::GetSize;
 use moka::policy::EvictionPolicy;
 
 use crate::{service::utilities::cache::Cache, settings::Settings};
@@ -17,17 +18,24 @@ impl StakeAddressCache {
     const CACHE_NAME: &str = "RBAC Stake Address Cache";
 
     /// Function to determine cache entry weighted size.
-    fn weigher_fn(_: &StakeAddress, _: &CatalystId) -> u32 {
-        1u32
+    fn weigher_fn(k: &StakeAddress, v: &CatalystId) -> u32 {
+        let k_size = GetSize::get_size(&k);
+        let v_size = GetSize::get_size(&v);
+        k_size.saturating_add(v_size).try_into().unwrap_or(u32::MAX)
     }
 
     /// New Stake Address Cache instance.
-    pub(crate) fn new() -> Self {
+    pub(crate) fn new(is_persistent: bool) -> Self {
+        let max_capacity = if is_persistent {
+            Settings::rbac_cfg().persistent_stake_addresses_cache_size
+        } else {
+            Settings::rbac_cfg().volatile_stake_addresses_cache_size
+        };
         Self {
             inner: Cache::new(
                 Self::CACHE_NAME,
                 EvictionPolicy::lru(),
-                Settings::rbac_cfg().persistent_stake_addresses_cache_size,
+                max_capacity,
                 Self::weigher_fn,
             ),
         }
@@ -57,5 +65,10 @@ impl StakeAddressCache {
     /// Number of entries in the cache.
     pub(crate) fn entry_count(&self) -> u64 {
         self.inner.entry_count()
+    }
+
+    /// Returns `true` if the cache is enabled.
+    pub(crate) fn is_enabled(&self) -> bool {
+        self.inner.is_enabled()
     }
 }

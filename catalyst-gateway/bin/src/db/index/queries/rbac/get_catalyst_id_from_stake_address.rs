@@ -71,13 +71,34 @@ impl Query {
     pub(crate) async fn latest(
         session: &CassandraSession, stake_address: &StakeAddress,
     ) -> Result<Option<CatalystId>> {
-        let is_persistent = session.is_persistent();
         let cache = session.caches().rbac_stake_address();
 
-        let res = cache.get(stake_address);
-        update_cache_metrics(is_persistent, res.is_some());
-        if let Some(res) = res {
-            return Ok(Some(res));
+        if cache.is_enabled() {
+            let entry_opt = cache.get(stake_address);
+
+            let entry_opt = if session.is_persistent() {
+                entry_opt
+                    .inspect(|_| {
+                        rbac_persistent_stake_address_cache_hits_inc();
+                    })
+                    .or_else(|| {
+                        rbac_persistent_stake_address_cache_miss_inc();
+                        None
+                    })
+            } else {
+                entry_opt
+                    .inspect(|_| {
+                        rbac_volatile_stake_address_cache_hits_inc();
+                    })
+                    .or_else(|| {
+                        rbac_volatile_stake_address_cache_miss_inc();
+                        None
+                    })
+            };
+
+            if entry_opt.is_some() {
+                return Ok(entry_opt);
+            }
         }
 
         Self::execute(session, QueryParams {
@@ -121,22 +142,4 @@ pub fn stake_addresses_cache_size(is_persistent: bool) -> u64 {
     CassandraSession::get(is_persistent)
         .map(|session| session.caches().rbac_stake_address().entry_count())
         .unwrap_or_default()
-}
-
-/// Updates metrics of the cache.
-fn update_cache_metrics(is_persistent: bool, is_found: bool) {
-    match (is_persistent, is_found) {
-        (true, true) => {
-            rbac_persistent_stake_address_cache_hits_inc();
-        },
-        (true, false) => {
-            rbac_persistent_stake_address_cache_miss_inc();
-        },
-        (false, true) => {
-            rbac_volatile_stake_address_cache_hits_inc();
-        },
-        (false, false) => {
-            rbac_volatile_stake_address_cache_miss_inc();
-        },
-    }
 }

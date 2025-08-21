@@ -1,6 +1,7 @@
 //! Cache for Native Assets by Stake Address Queries
 use std::sync::Arc;
 
+use get_size2::GetSize;
 use moka::policy::EvictionPolicy;
 
 use crate::{
@@ -23,8 +24,10 @@ impl AssetsNativeCache {
     /// Function to determine the weighted size of cache entries.
     ///
     /// Returns the number of TXOs associated with a Stake Address.
-    fn weigher_fn(_k: &DbStakeAddress, v: &Arc<Vec<GetAssetsByStakeAddressQuery>>) -> u32 {
-        v.len().try_into().unwrap_or(u32::MAX)
+    fn weigher_fn(k: &DbStakeAddress, v: &Arc<Vec<GetAssetsByStakeAddressQuery>>) -> u32 {
+        let k_size = GetSize::get_size(&k);
+        let v_size = GetSize::get_size(&v);
+        k_size.saturating_add(v_size).try_into().unwrap_or(u32::MAX)
     }
 
     /// New Native Assets Cache instance.
