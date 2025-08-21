@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/proposal/widget/proposal_category_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,12 @@ class ProposalDocumentSectionTile extends StatelessWidget {
         children: [
           _SectionTitleText(property.schema.title),
           const SizedBox(height: 16),
-          DocumentPropertyReadBuilder(property: property),
+          DocumentPropertyReadBuilder(
+            property: property,
+            overrides: {
+              ProposalDocument.categoryDetailsNameNodeId: (_, __) => const ProposalCategoryText(),
+            },
+          ),
         ],
       ),
     );

@@ -259,6 +259,7 @@ async fn rbac509_registration() {
             0.into(),
             None,
             HashSet::new(),
+            None,
         ),
         rbac509::insert_rbac509::Params::new(
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
@@ -277,6 +278,7 @@ async fn rbac509_registration() {
             )]
             .into_iter()
             .collect(),
+            Some(UuidV4::new()),
         ),
     ];
     let data_len = data.len();

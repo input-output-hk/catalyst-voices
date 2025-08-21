@@ -134,6 +134,7 @@ impl Rbac509InsertQuery {
                 stake_addresses,
                 public_keys,
                 modified_chains,
+                purpose,
             }) => {
                 // Record the transaction identifier (hash) of a new registration.
                 self.catalyst_id_for_txn_id
@@ -173,6 +174,7 @@ impl Rbac509InsertQuery {
                     // Addresses can only be removed from other chains, so this list is always
                     // empty for the chain that is being updated.
                     HashSet::new(),
+                    purpose,
                 ));
 
                 // Update other chains that were affected by this registration.
@@ -187,6 +189,7 @@ impl Rbac509InsertQuery {
                         // that is being updated.
                         None,
                         removed_addresses,
+                        None,
                     ));
                 }
             },

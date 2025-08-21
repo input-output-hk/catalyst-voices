@@ -305,6 +305,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       isCurrentVersionLatest: currentVersion?.isLatest,
       header: header,
       segments: segments,
+      categoryText: category?.categoryText,
     );
   }
 
@@ -339,12 +340,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       ),
     );
 
-    final proposalSegments = mapDocumentToSegments(
-      document.document,
-      filterOut: [
-        ProposalDocument.categoryNodeId,
-      ],
-    );
+    final proposalSegments = mapDocumentToSegments(document.document);
 
     final isNotLocalAndHasActiveAccount = !isDraftProposal && hasActiveAccount;
     final canReply = isNotLocalAndHasActiveAccount && hasAccountUsername;
