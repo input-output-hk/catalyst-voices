@@ -1,6 +1,7 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 
 const _defaultTransactionBuilderConfig = TransactionBuilderConfig(
   feeAlgo: TieredFee(
@@ -54,7 +55,7 @@ final class AppConfig extends Equatable {
           enableAutoSessionTracking: true,
           attachScreenshot: true,
           attachViewHierarchy: true,
-          debug: true,
+          debug: kDebugMode,
           diagnosticLevel: 'debug',
         ),
         blockchain: BlockchainConfig(
@@ -91,9 +92,9 @@ final class AppConfig extends Equatable {
           tracesSampleRate: 0.2,
           profilesSampleRate: 0.2,
           enableAutoSessionTracking: true,
-          attachScreenshot: true,
+          attachScreenshot: false,
           attachViewHierarchy: true,
-          debug: false,
+          debug: kDebugMode,
           diagnosticLevel: 'warning',
         ),
         blockchain: BlockchainConfig(
@@ -123,7 +124,7 @@ final class AppConfig extends Equatable {
           enableAutoSessionTracking: true,
           attachScreenshot: false,
           attachViewHierarchy: false,
-          debug: false,
+          debug: kDebugMode,
           diagnosticLevel: 'error',
         ),
         blockchain: BlockchainConfig(
@@ -299,9 +300,7 @@ final class SentryConfig extends Equatable {
     double? tracesSampleRate,
     double? profilesSampleRate,
     bool? enableAutoSessionTracking,
-    bool? attachScreenshot,
     bool? attachViewHierarchy,
-    bool? debug,
     String? diagnosticLevel,
   }) {
     return SentryConfig(
@@ -311,9 +310,9 @@ final class SentryConfig extends Equatable {
       tracesSampleRate: tracesSampleRate ?? this.tracesSampleRate,
       profilesSampleRate: profilesSampleRate ?? this.profilesSampleRate,
       enableAutoSessionTracking: enableAutoSessionTracking ?? this.enableAutoSessionTracking,
-      attachScreenshot: attachScreenshot ?? this.attachScreenshot,
+      attachScreenshot: attachScreenshot,
       attachViewHierarchy: attachViewHierarchy ?? this.attachViewHierarchy,
-      debug: debug ?? this.debug,
+      debug: debug,
       diagnosticLevel: diagnosticLevel ?? this.diagnosticLevel,
     );
   }
