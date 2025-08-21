@@ -15,8 +15,11 @@ const EVENT_DB_MAX_LIFETIME: u32 = 30;
 const EVENT_DB_MIN_IDLE: u32 = 0;
 
 /// Sets the connection timeout used by the pool.
-/// Defaults to 300 seconds.
-const EVENT_DB_CONN_TIMEOUT: u32 = 300;
+/// Defaults to 10 seconds.
+const EVENT_DB_CONN_TIMEOUT: u32 = 10;
+
+/// Sets the maximum connection timeout used by the pool to 30 seconds.
+const EVENT_DB_MAX_CONN_TIMEOUT: u32 = 30;
 
 /// Default Event DB URL.
 const EVENT_DB_URL_DEFAULT: &str =
@@ -75,7 +78,7 @@ impl EnvVars {
                 "EVENT_DB_CONN_TIMEOUT",
                 EVENT_DB_CONN_TIMEOUT,
                 0,
-                u32::MAX,
+                EVENT_DB_MAX_CONN_TIMEOUT,
             ),
         }
     }
