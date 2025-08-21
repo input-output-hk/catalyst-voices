@@ -2,7 +2,7 @@
 
 use std::collections::HashSet;
 
-use cardano_blockchain_types::StakeAddress;
+use cardano_chain_follower::StakeAddress;
 use catalyst_types::{catalyst_id::CatalystId, problem_report::ProblemReport, uuid::UuidV4};
 use ed25519_dalek::VerifyingKey;
 
@@ -26,6 +26,8 @@ pub struct RbacValidationSuccess {
     ///
     /// A new RBAC registration can take ownership of stake addresses of other chains.
     pub modified_chains: Vec<(CatalystId, HashSet<StakeAddress>)>,
+    /// A registration purpose.
+    pub purpose: Option<UuidV4>,
 }
 
 /// An error returned from the `validate_rbac_registration` method.

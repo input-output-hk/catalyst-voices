@@ -5,12 +5,14 @@ INSERT INTO rbac_registration (
     txn_index,
     txn_id,
     prv_txn_id,
-    removed_stake_addresses
+    removed_stake_addresses,
+    purpose
 ) VALUES (
     :catalyst_id,
     :slot_no,
     :txn_index,
     :txn_id,
     :prv_txn_id,
-    :removed_stake_addresses
+    :removed_stake_addresses,
+    :purpose
 );

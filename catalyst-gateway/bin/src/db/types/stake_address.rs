@@ -3,7 +3,7 @@
 
 use std::fmt::{Debug, Display, Formatter};
 
-use cardano_blockchain_types::StakeAddress;
+use cardano_chain_follower::StakeAddress;
 use scylla::{
     deserialize::{value::DeserializeValue, DeserializationError, FrameSlice, TypeCheckError},
     frame::response::result::ColumnType,

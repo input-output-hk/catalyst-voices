@@ -4,7 +4,7 @@
 pub(crate) mod metrics_updater {
     use std::ops::Sub;
 
-    use cardano_blockchain_types::Slot;
+    use cardano_chain_follower::Slot;
 
     use crate::{metrics::chain_indexer::reporter, settings::Settings};
 
