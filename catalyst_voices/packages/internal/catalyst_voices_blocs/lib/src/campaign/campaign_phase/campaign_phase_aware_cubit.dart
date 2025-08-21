@@ -51,15 +51,19 @@ final class CampaignPhaseAwareCubit extends Cubit<CampaignPhaseAwareState> {
     try {
       final campaign = await _campaignService.getActiveCampaign();
 
-      if (isClosed) return;
+      if (isClosed) {
+        _synchronizationCompleter.complete(true);
+        return;
+      }
 
       if (campaign == null) {
+        _synchronizationCompleter.complete(true);
         return emit(const NoActiveCampaignPhaseAwareState());
       }
 
       _handleCampaignChange(campaign);
-      _emitState();
       _synchronizationCompleter.complete(true);
+      _emitState();
     } catch (error, stackTrace) {
       _logger.severe('Error getting active campaign', error, stackTrace);
       emit(ErrorCampaignPhaseAwareState(error: LocalizedException.create(error)));
