@@ -12,7 +12,7 @@ use std::{
 };
 
 use anyhow::{Context, Result};
-use cardano_blockchain_types::{MultiEraBlock, Slot, TransactionId, TxnIndex};
+use cardano_chain_follower::{hashes::TransactionId, MultiEraBlock, Slot, TxnIndex};
 use rbac_registration::cardano::cip509::Cip509;
 use scylla::client::session::Session;
 use tokio::sync::watch;
