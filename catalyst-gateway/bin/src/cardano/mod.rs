@@ -2,8 +2,7 @@
 
 use std::{collections::BTreeSet, fmt::Display, sync::Arc, time::Duration};
 
-use cardano_blockchain_types::{MultiEraBlock, Network, Point, Slot};
-use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
+use cardano_chain_follower::{ChainFollower, ChainSyncConfig, MultiEraBlock, Network, Point, Slot};
 use duration_string::DurationString;
 use futures::{stream::FuturesUnordered, StreamExt};
 use rand::{Rng, SeedableRng};

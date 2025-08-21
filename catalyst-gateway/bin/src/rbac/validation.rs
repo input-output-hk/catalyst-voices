@@ -3,7 +3,7 @@
 use std::collections::{HashMap, HashSet};
 
 use anyhow::{Context, Result};
-use cardano_blockchain_types::{StakeAddress, TransactionId};
+use cardano_chain_follower::{hashes::TransactionId, StakeAddress};
 use catalyst_types::{
     catalyst_id::{role_index::RoleId, CatalystId},
     problem_report::ProblemReport,
