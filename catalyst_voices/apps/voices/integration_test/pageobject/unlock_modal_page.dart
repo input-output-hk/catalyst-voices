@@ -5,8 +5,7 @@ import 'package:patrol_finders/patrol_finders.dart';
 import '../utils/translations_utils.dart';
 
 class UnlockModalPage {
-  UnlockModalPage(this.$);
-  late PatrolTester $;
+  final PatrolTester $;
 
   final unlockKeychainDialog = const Key('UnlockKeychainDialog');
   final unlockKeychainInfoPanel = const Key('UnlockKeychainInfoPanel');
@@ -15,6 +14,13 @@ class UnlockModalPage {
   final unlockRecoverButton = const Key('UnlockRecoverButton');
   final unlockContinueAsGuestButton = const Key('UnlockContinueAsGuestButton');
   final passwordTextField = const Key('PasswordTextField');
+  final closeButton = const Key('DialogCloseButton');
+
+  UnlockModalPage(this.$);
+
+  Future<void> closeButtonClick() async {
+    await $(UnlockModalPage($).closeButton).tap();
+  }
 
   Future<void> incorrectPasswordErrorShowsUp() async {
     expect(

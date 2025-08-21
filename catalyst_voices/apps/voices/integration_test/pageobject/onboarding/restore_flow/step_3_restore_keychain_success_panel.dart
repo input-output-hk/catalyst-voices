@@ -1,14 +1,13 @@
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../utils/translations_utils.dart';
 import '../../common_page.dart';
 import '../onboarding_base_page.dart';
-import 'step_4_restore_keychain_input_panel.dart';
+import 'step_2_seedphrase_instructions_panel.dart';
 
-class RestoreKeychainSuccessPanel extends OnboardingPageBase {
-  RestoreKeychainSuccessPanel(super.$);
-
+final class RestoreKeychainSuccessPanel extends OnboardingPageBase {
   final recoveryAccountTitle = const Key('RecoveryAccountTitle');
   final walletNameText = const Key('WalletNameText');
   final recoveryAccountSuccessTitle = const Key('RecoveryAccountSuccessTitle');
@@ -23,40 +22,23 @@ class RestoreKeychainSuccessPanel extends OnboardingPageBase {
   final recoverDifferentKeychainButton = const Key('RecoverDifferentKeychainButton');
   final recoveryAccountError = const Key('RecoveryAccountError');
 
-  @override
-  Future<void> goto() async {
-    final seedPhrase = [
-      'broken',
-      'member',
-      'repeat',
-      'liquid',
-      'barely',
-      'electric',
-      'theory',
-      'paddle',
-      'coyote',
-      'behind',
-      'unique',
-      'member',
-    ];
-    await RestoreKeychainInputPanel($).goto();
-    await RestoreKeychainInputPanel($).enterSeedPhrase(seedPhrase);
-    await RestoreKeychainInputPanel($).clickNext();
-    await _ensureWalletIsRecovered();
+  RestoreKeychainSuccessPanel(super.$);
+
+  Future<void> clickRecoverDifferentKeychain() async {
+    await $(recoverDifferentKeychainButton).tap();
   }
 
   Future<void> clickSetUnlockPassword() async {
     await $(setUnlockPasswordButton).tap();
   }
 
-  Future<void> clickRecoverDifferentKeychain() async {
-    await $(recoverDifferentKeychainButton).tap();
-  }
-
   @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
+  Future<void> goto() async {
+    final seedPhrase = recoverTestWords.map((e) => e.data).toList();
+    await RestoreKeychainInputPanel($).goto();
+    await RestoreKeychainInputPanel($).enterSeedPhrase(seedPhrase);
+    await clickNext();
+    await _ensureWalletIsRecovered();
   }
 
   Future<void> verifyDetailsPanel() async {
@@ -88,6 +70,12 @@ class RestoreKeychainSuccessPanel extends OnboardingPageBase {
       $(registrationInfoPanel).$(CommonPage($).decorData).$(Text).text,
       (await t()).learnMore,
     );
+  }
+
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 
   Future<void> _ensureWalletIsRecovered() async {

@@ -70,7 +70,7 @@ class _VoicesCountdownState extends State<VoicesCountdown> {
   }
 
   void _startCountdown() {
-    final initialTimeLeft = widget.dateTime.difference(DateTime.now());
+    final initialTimeLeft = widget.dateTime.difference(DateTimeExt.now());
 
     if (initialTimeLeft.isNegative || _hasStarted) {
       widget.onCountdownStart?.call(false);

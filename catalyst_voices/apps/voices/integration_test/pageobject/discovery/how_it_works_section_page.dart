@@ -5,9 +5,8 @@ import 'package:patrol_finders/patrol_finders.dart';
 import '../../utils/translations_utils.dart';
 
 class HowItWorksSection {
-  HowItWorksSection(this.$);
+  final PatrolTester $;
 
-  late PatrolTester $;
   final title = const Key('HowItWorksTitle');
   final collaborateAvatar = const Key('collaborateAvatar');
   final collaborateTitle = const Key('collaborateTitle');
@@ -21,16 +20,10 @@ class HowItWorksSection {
   final loadingError = const Key('ErrorIndicator');
   final howItWorksRoot = const Key('HowItWorks');
 
-  Future<void> titleIsRenderedCorrectly() async {
-    expect($(title).text, (await t()).howItWorks);
-  }
+  HowItWorksSection(this.$);
 
   Future<void> collaborateAvatarIsRenderedCorrectly() async {
     expect($(collaborateAvatar), findsOneWidget);
-  }
-
-  Future<void> collaborateTitleIsRenderedCorrectly() async {
-    expect($(collaborateTitle).text, (await t()).howItWorksCollaborate);
   }
 
   Future<void> collaborateDescriptionIsRenderedCorrectly() async {
@@ -40,28 +33,20 @@ class HowItWorksSection {
     );
   }
 
-  Future<void> voteAvatarIsRenderedCorrectly() async {
-    expect($(voteAvatar), findsOneWidget);
-  }
-
-  Future<void> voteTitleIsRenderedCorrectly() async {
-    expect($(voteTitle).text, (await t()).howItWorksVote);
-  }
-
-  Future<void> voteDescriptionIsRenderedCorrectly() async {
-    expect($(voteDescription).text, (await t()).howItWorksVoteDescription);
+  Future<void> collaborateTitleIsRenderedCorrectly() async {
+    expect($(collaborateTitle).text, (await t()).howItWorksCollaborate);
   }
 
   Future<void> followAvatarIsRenderedCorrectly() async {
     expect($(followAvatar), findsOneWidget);
   }
 
-  Future<void> followTitleIsRenderedCorrectly() async {
-    expect($(followTitle).text, (await t()).howItWorksFollow);
-  }
-
   Future<void> followDescriptionIsRenderedCorrectly() async {
     expect($(followDescription).text, (await t()).howItWorksFollowDescription);
+  }
+
+  Future<void> followTitleIsRenderedCorrectly() async {
+    expect($(followTitle).text, (await t()).howItWorksFollow);
   }
 
   Future<void> loadingErrorIsVisible() async {
@@ -79,5 +64,21 @@ class HowItWorksSection {
     await followAvatarIsRenderedCorrectly();
     await followTitleIsRenderedCorrectly();
     await followDescriptionIsRenderedCorrectly();
+  }
+
+  Future<void> titleIsRenderedCorrectly() async {
+    expect($(title).text, (await t()).howItWorks);
+  }
+
+  Future<void> voteAvatarIsRenderedCorrectly() async {
+    expect($(voteAvatar), findsOneWidget);
+  }
+
+  Future<void> voteDescriptionIsRenderedCorrectly() async {
+    expect($(voteDescription).text, (await t()).howItWorksVoteDescription);
+  }
+
+  Future<void> voteTitleIsRenderedCorrectly() async {
+    expect($(voteTitle).text, (await t()).howItWorksVote);
   }
 }

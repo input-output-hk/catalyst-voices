@@ -6,10 +6,10 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_14_keychain_final.dart';
 
-class LinkWalletInfoPanel extends OnboardingPageBase {
-  LinkWalletInfoPanel(super.$);
-
+final class LinkWalletInfoPanel extends OnboardingPageBase {
   static const chooseCardanoWalletButton = Key('ChooseCardanoWalletButton');
+
+  LinkWalletInfoPanel(super.$);
 
   Future<void> clickChooseCardanoWallet() async {
     await $(chooseCardanoWalletButton).tap();
@@ -19,12 +19,6 @@ class LinkWalletInfoPanel extends OnboardingPageBase {
   Future<void> goto() async {
     await KeychainFinalPanel($).goto();
     await KeychainFinalPanel($).clickLinkWalletAndRoles();
-  }
-
-  @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
   }
 
   Future<void> verifyDetailsPanel() async {
@@ -61,5 +55,11 @@ class LinkWalletInfoPanel extends OnboardingPageBase {
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(progressBar), findsOneWidget);
     expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
+  }
+
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }

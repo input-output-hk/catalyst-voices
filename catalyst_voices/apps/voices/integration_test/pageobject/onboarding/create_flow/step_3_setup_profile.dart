@@ -6,8 +6,8 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_2_profile_info.dart';
 
-class SetupProfilePanel extends OnboardingPageBase {
-  final profileDetailsPanel = const Key('ProfileDetailsPanel');
+final class SetupProfilePanel extends OnboardingPageBase {
+  final profileDetailsPanel = const Key('BaseProfileDetailsPanel');
   final titleText = const Key('TitleText');
   final displayNameTextField = const Key('DisplayNameTextField');
   final emailTextField = const Key('EmailTextField');
@@ -20,6 +20,7 @@ class SetupProfilePanel extends OnboardingPageBase {
 
   PatrolFinder get infoCardTitleLocator => $(emailInfoCard).$(#InfoCardTitle);
 
+  @override
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }
@@ -43,7 +44,7 @@ class SetupProfilePanel extends OnboardingPageBase {
     expect($(emailTextField), findsOneWidget);
     expect(
       $(emailTextField).$(Text).text,
-      '*${(await t()).createProfileSetupEmailLabel}',
+      (await t()).createProfileSetupEmailLabel,
     );
     expect($(backButton), findsOneWidget);
     expect($(nextButton), findsOneWidget);

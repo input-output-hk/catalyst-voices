@@ -1,4 +1,5 @@
 export 'cubits/keychain_creation_cubit.dart' show KeychainCreationManager;
+export 'cubits/recover_cubit.dart' show recoverTestWords;
 export 'cubits/wallet_link_cubit.dart' show WalletLinkManager;
 export 'registration_cubit.dart';
 export 'registration_state.dart';

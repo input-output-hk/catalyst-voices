@@ -13,6 +13,10 @@ final class Account extends Equatable {
     'few loyal swift champion rug peace dinosaur '
     'erase bacon tone install universe',
   );
+  static final dummyTestNetAddress = ShelleyAddress.fromBech32(
+    'addr_test1vzpwq95z3xyum8vqndgdd'
+    '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
+  );
 
   /* cSpell:enable */
 
