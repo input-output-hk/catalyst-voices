@@ -19,10 +19,11 @@ typedef DocumentPropertyActionOverrides = Map<DocumentNodeId, Widget>;
 typedef DocumentPropertyBuilderOverrides = Map<DocumentNodeId, DocumentPropertyWidgetBuilder>;
 
 /// A callback that builds a widget for given document [property].
-typedef DocumentPropertyWidgetBuilder = Widget Function(
-  BuildContext context,
-  DocumentProperty property,
-);
+typedef DocumentPropertyWidgetBuilder =
+    Widget Function(
+      BuildContext context,
+      DocumentProperty property,
+    );
 
 class DocumentPropertyBuilder extends StatelessWidget {
   final DocumentProperty property;
@@ -40,6 +41,14 @@ class DocumentPropertyBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Semantics(
+      identifier: 'DocumentPropertyBuilder[${property.nodeId}]',
+      container: true,
+      child: _buildChild(context),
+    );
+  }
+
+  Widget _buildChild(BuildContext context) {
     final property = this.property;
     final overrideBuilder = _getOverrideBuilder(property.nodeId);
     if (overrideBuilder != null) {

@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
+import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart';
 import 'package:catalyst_voices/widgets/common/tab_bar_stack_view.dart';
 import 'package:catalyst_voices/widgets/widgets.dart' show SidebarScaffold;
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -104,69 +105,67 @@ class _SpaceSidePanelState extends State<SpaceSidePanel> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return FocusTraversalGroup(
-      child: Stack(
-        children: [
-          if (widget.isLeft)
+      child: Semantics(
+        identifier: 'SpaceSidePanel',
+        container: true,
+        child: Stack(
+          children: [
             Positioned(
               top: 24,
-              left: 16,
-              child: VoicesIconButton(
-                child: VoicesAssets.icons.leftRailToggle.buildIcon(),
-                onTap: () {
-                  _controller.reverse();
-                },
-              ),
-            )
-          else
-            Positioned(
-              top: 24,
-              right: 16,
-              child: VoicesIconButton(
-                child: VoicesAssets.icons.rightRailToggle.buildIcon(),
-                onTap: () {
-                  _controller.reverse();
-                },
-              ),
-            ),
-          SlideTransition(
-            position: _offsetAnimation,
-            child: _Container(
-              margin: widget.margin,
-              borderRadius: widget.isLeft
-                  ? const BorderRadius.horizontal(right: Radius.circular(16))
-                  : const BorderRadius.horizontal(left: Radius.circular(16)),
-              child: DefaultTabController(
-                length: widget.tabs.length,
-                child: Column(
-                  children: [
-                    _Header(
-                      onCollapseTap: () {
-                        _controller.forward();
-                        widget.onCollapseTap?.call();
-                      },
-                      isLeft: widget.isLeft,
-                    ),
-                    _Tabs(
-                      widget.tabs,
-                      controller: widget.tabController,
-                    ),
-                    const SizedBox(height: 12),
-                    Flexible(
-                      child: SingleChildScrollView(
-                        controller: widget.scrollController,
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: TabBarStackView(
-                          controller: widget.tabController,
-                          children: widget.tabs.map((e) => e.body).toList(),
-                        ),
-                      ),
-                    ),
-                  ],
+              right: widget.isLeft ? null : 16,
+              left: widget.isLeft ? 16 : null,
+              child: CombineSemantics(
+                identifier: 'SpaceSidePanelToggleButton',
+                child: VoicesIconButton(
+                  child: widget.isLeft
+                      ? VoicesAssets.icons.leftRailToggle.buildIcon()
+                      : VoicesAssets.icons.rightRailToggle.buildIcon(),
+                  onTap: () {
+                    _controller.reverse();
+                  },
                 ),
               ),
             ),
-          ),
-        ],
+            SlideTransition(
+              position: _offsetAnimation,
+              child: _Container(
+                margin: widget.margin,
+                borderRadius: widget.isLeft
+                    ? const BorderRadius.horizontal(right: Radius.circular(16))
+                    : const BorderRadius.horizontal(left: Radius.circular(16)),
+                child: DefaultTabController(
+                  length: widget.tabs.length,
+                  child: Column(
+                    children: [
+                      _Header(
+                        onCollapseTap: () {
+                          _controller.forward();
+                          widget.onCollapseTap?.call();
+                        },
+                        isLeft: widget.isLeft,
+                      ),
+                      _Tabs(
+                        widget.tabs,
+                        controller: widget.tabController,
+                      ),
+                      const SizedBox(height: 12),
+                      Flexible(
+                        child: SingleChildScrollView(
+                          controller: widget.scrollController,
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: TabBarStackView(
+                            controller: widget.tabController,
+                            children: widget.tabs.map((e) => e.body).toList(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -186,15 +185,16 @@ class _SpaceSidePanelState extends State<SpaceSidePanel> with SingleTickerProvid
       vsync: this,
     );
 
-    _offsetAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: widget.isLeft ? const Offset(-1, 0) : const Offset(1, 0),
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOut,
-      ),
-    );
+    _offsetAnimation =
+        Tween<Offset>(
+          begin: Offset.zero,
+          end: widget.isLeft ? const Offset(-1, 0) : const Offset(1, 0),
+        ).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: Curves.easeInOut,
+          ),
+        );
   }
 }
 

@@ -21,17 +21,27 @@ class MarkdownText extends StatelessWidget with LaunchUrlMixin {
   Widget build(BuildContext context) {
     final pColor = this.pColor;
 
-    return MarkdownBody(
-      data: markdownData.data,
-      selectable: selectable,
-      styleSheet: MarkdownStyleSheet(
-        p: pStyle?.copyWith(color: pColor) ?? (pColor != null ? TextStyle(color: pColor) : null),
+    return Semantics(
+      identifier: 'MarkdownText',
+      container: true,
+      // TODO(dt-iohk): unformat markdown to select clear-text without formatting characters
+      label: markdownData.data,
+      child: ExcludeSemantics(
+        child: MarkdownBody(
+          data: markdownData.data,
+          selectable: selectable,
+          styleSheet: MarkdownStyleSheet(
+            p:
+                pStyle?.copyWith(color: pColor) ??
+                (pColor != null ? TextStyle(color: pColor) : null),
+          ),
+          onTapLink: (text, href, title) async {
+            if (href != null) {
+              await launchUri(href.getUri());
+            }
+          },
+        ),
       ),
-      onTapLink: (text, href, title) async {
-        if (href != null) {
-          await launchUri(href.getUri());
-        }
-      },
     );
   }
 }

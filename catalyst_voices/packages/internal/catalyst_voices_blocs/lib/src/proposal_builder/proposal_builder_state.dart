@@ -37,13 +37,13 @@ final class ProposalBuilderMetadata extends Equatable {
 
   @override
   List<Object?> get props => [
-        publish,
-        documentRef,
-        originalDocumentRef,
-        templateRef,
-        categoryId,
-        versions,
-      ];
+    publish,
+    documentRef,
+    originalDocumentRef,
+    templateRef,
+    categoryId,
+    versions,
+  ];
 
   ProposalBuilderMetadata copyWith({
     ProposalPublish? publish,
@@ -98,9 +98,9 @@ final class ProposalBuilderState extends Equatable {
   });
 
   List<Segment> get allSegments => [
-        ...documentSegments,
-        ...commentSegments,
-      ];
+    ...documentSegments,
+    ...commentSegments,
+  ];
 
   String? get proposalTitle {
     final property =
@@ -111,21 +111,21 @@ final class ProposalBuilderState extends Equatable {
 
   @override
   List<Object?> get props => [
-        isLoading,
-        isChanging,
-        error,
-        document,
-        metadata,
-        documentSegments,
-        commentSegments,
-        comments,
-        guidance,
-        category,
-        activeNodeId,
-        validationErrors,
-        canPublish,
-        isMaxProposalsLimitReached,
-      ];
+    isLoading,
+    isChanging,
+    error,
+    document,
+    metadata,
+    documentSegments,
+    commentSegments,
+    comments,
+    guidance,
+    category,
+    activeNodeId,
+    validationErrors,
+    canPublish,
+    isMaxProposalsLimitReached,
+  ];
 
   bool get showError => !isLoading && error != null;
 
@@ -272,9 +272,9 @@ final class ProposalGuidance extends Equatable {
 
   @override
   List<Object?> get props => [
-        isNoneSelected,
-        guidanceList,
-      ];
+    isNoneSelected,
+    guidanceList,
+  ];
 
   bool get showEmptyState => !isNoneSelected && guidanceList.isEmpty;
 }
@@ -283,17 +283,20 @@ final class ProposalGuidanceItem extends Equatable {
   final String segmentTitle;
   final String sectionTitle;
   final MarkdownData description;
+  final DocumentNodeId nodeId;
 
   const ProposalGuidanceItem({
     required this.segmentTitle,
     required this.sectionTitle,
     required this.description,
+    required this.nodeId,
   });
 
   @override
   List<Object?> get props => [
-        segmentTitle,
-        sectionTitle,
-        description,
-      ];
+    segmentTitle,
+    sectionTitle,
+    description,
+    nodeId,
+  ];
 }

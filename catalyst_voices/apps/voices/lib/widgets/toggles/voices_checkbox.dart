@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/common/label_decorator.dart';
+import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
@@ -63,9 +64,9 @@ class VoicesCheckbox extends StatelessWidget {
           label: label,
           note: note,
           spacings: const [12, 8],
-          child: Semantics(
+          child: CombineSemantics(
             identifier: '${baseIdentifier}_checkbox',
-
+            container: true,
             child: Checkbox(
               key: const Key('Checkbox'),
               value: value,

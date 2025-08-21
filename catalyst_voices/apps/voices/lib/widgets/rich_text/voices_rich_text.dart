@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/codecs/markdown_codec.dart';
+import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices/widgets/rich_text/insert_image_error.dart';
 import 'package:catalyst_voices/widgets/rich_text/insert_new_image_dialog.dart';
@@ -41,58 +42,58 @@ class VoicesRichText extends VoicesFormField<MarkdownData> {
     this.minHeight,
     this.placeholder,
   }) : super(
-          value: controller.markdownData,
-          builder: (field) {
-            void onChangedHandler(MarkdownData? value) {
-              field.didChange(value);
-              onChanged?.call(value);
-            }
+         value: controller.markdownData,
+         builder: (field) {
+           void onChangedHandler(MarkdownData? value) {
+             field.didChange(value);
+             onChanged?.call(value);
+           }
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _EditorDecoration(
-                  isEditMode: enabled,
-                  isInvalid: field.hasError,
-                  focusNode: focusNode,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Offstage(
-                        offstage: !enabled,
-                        child: Padding(
-                          padding: const EdgeInsets.all(2),
-                          child: _Toolbar(
-                            controller: controller,
-                          ),
-                        ),
-                      ),
-                      _Editor(
-                        controller: controller,
-                        focusNode: focusNode,
-                        scrollController: scrollController,
-                        minHeight: minHeight,
-                        onChanged: onChangedHandler,
-                        placeholder: placeholder,
-                      ),
-                    ],
-                  ),
-                ),
-                Offstage(
-                  offstage: charsLimit == null && field.errorText == null,
-                  child: VoicesRichTextLimit(
-                    controller: controller,
-                    enabled: enabled,
-                    charsLimit: charsLimit,
-                    errorMessage: field.errorText,
-                  ),
-                ),
-              ],
-            );
-          },
-        );
+           return Column(
+             crossAxisAlignment: CrossAxisAlignment.start,
+             mainAxisSize: MainAxisSize.min,
+             children: [
+               _EditorDecoration(
+                 isEditMode: enabled,
+                 isInvalid: field.hasError,
+                 focusNode: focusNode,
+                 child: Column(
+                   mainAxisSize: MainAxisSize.min,
+                   crossAxisAlignment: CrossAxisAlignment.stretch,
+                   children: [
+                     Offstage(
+                       offstage: !enabled,
+                       child: Padding(
+                         padding: const EdgeInsets.all(2),
+                         child: _Toolbar(
+                           controller: controller,
+                         ),
+                       ),
+                     ),
+                     _Editor(
+                       controller: controller,
+                       focusNode: focusNode,
+                       scrollController: scrollController,
+                       minHeight: minHeight,
+                       onChanged: onChangedHandler,
+                       placeholder: placeholder,
+                     ),
+                   ],
+                 ),
+               ),
+               Offstage(
+                 offstage: charsLimit == null && field.errorText == null,
+                 child: VoicesRichTextLimit(
+                   controller: controller,
+                   enabled: enabled,
+                   charsLimit: charsLimit,
+                   errorMessage: field.errorText,
+                 ),
+               ),
+             ],
+           );
+         },
+       );
 }
 
 final class VoicesRichTextController extends quill.QuillController {
@@ -261,38 +262,42 @@ class _EditorState extends State<_Editor> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    return KeyboardListener(
-      focusNode: _keyboardListenerFocus,
-      onKeyEvent: _onKeyEvent,
-      child: quill.QuillEditor(
-        controller: widget.controller,
-        focusNode: widget.focusNode,
-        scrollController: widget.scrollController,
-        config: quill.QuillEditorConfig(
-          minHeight: widget.minHeight,
-          padding: const EdgeInsets.all(16),
-          placeholder: widget.placeholder ?? context.l10n.placeholderRichText,
-          characterShortcutEvents: quill.standardCharactersShortcutEvents,
-          /* cSpell:disable */
-          spaceShortcutEvents: quill.standardSpaceShorcutEvents,
-          /* cSpell:enable */
-          customStyles: quill.DefaultStyles(
-            placeHolder: quill.DefaultTextBlockStyle(
-              textTheme.bodyLarge?.copyWith(color: theme.colors.textOnPrimaryLevel1) ??
-                  DefaultTextStyle.of(context).style,
-              quill.HorizontalSpacing.zero,
-              quill.VerticalSpacing.zero,
-              quill.VerticalSpacing.zero,
-              null,
+    return CombineSemantics(
+      identifier: 'VoicesRichTextEditor',
+      container: true,
+      child: KeyboardListener(
+        focusNode: _keyboardListenerFocus,
+        onKeyEvent: _onKeyEvent,
+        child: quill.QuillEditor(
+          controller: widget.controller,
+          focusNode: widget.focusNode,
+          scrollController: widget.scrollController,
+          config: quill.QuillEditorConfig(
+            minHeight: widget.minHeight,
+            padding: const EdgeInsets.all(16),
+            placeholder: widget.placeholder ?? context.l10n.placeholderRichText,
+            characterShortcutEvents: quill.standardCharactersShortcutEvents,
+            /* cSpell:disable */
+            spaceShortcutEvents: quill.standardSpaceShorcutEvents,
+            /* cSpell:enable */
+            customStyles: quill.DefaultStyles(
+              placeHolder: quill.DefaultTextBlockStyle(
+                textTheme.bodyLarge?.copyWith(color: theme.colors.textOnPrimaryLevel1) ??
+                    DefaultTextStyle.of(context).style,
+                quill.HorizontalSpacing.zero,
+                quill.VerticalSpacing.zero,
+                quill.VerticalSpacing.zero,
+                null,
+              ),
             ),
+            embedBuilders: CatalystPlatform.isWeb
+                ? quill_ext.FlutterQuillEmbeds.editorWebBuilders(
+                    imageEmbedConfig: const QuillEditorImageEmbedConfig(
+                      errorWidget: InsertImageError(),
+                    ),
+                  )
+                : quill_ext.FlutterQuillEmbeds.editorBuilders(),
           ),
-          embedBuilders: CatalystPlatform.isWeb
-              ? quill_ext.FlutterQuillEmbeds.editorWebBuilders(
-                  imageEmbedConfig: const QuillEditorImageEmbedConfig(
-                    errorWidget: InsertImageError(),
-                  ),
-                )
-              : quill_ext.FlutterQuillEmbeds.editorBuilders(),
         ),
       ),
     );
@@ -362,44 +367,54 @@ class _Toolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv2,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-      ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Wrap(
-          children: [
-            _ToolbarAttributeIconButton(
-              controller: controller,
-              icon: VoicesAssets.icons.rtHeading,
-              attribute: quill.Attribute.h1,
-            ),
-            _ToolbarAttributeIconButton(
-              controller: controller,
-              icon: VoicesAssets.icons.rtBold,
-              attribute: quill.Attribute.bold,
-            ),
-            _ToolbarAttributeIconButton(
-              controller: controller,
-              icon: VoicesAssets.icons.rtItalic,
-              attribute: quill.Attribute.italic,
-            ),
-            _ToolbarAttributeIconButton(
-              controller: controller,
-              icon: VoicesAssets.icons.rtOrderedList,
-              attribute: quill.Attribute.ol,
-            ),
-            _ToolbarAttributeIconButton(
-              controller: controller,
-              icon: VoicesAssets.icons.rtUnorderedList,
-              attribute: quill.Attribute.ul,
-            ),
-            _ToolbarImageOptionButton(
-              controller: controller,
-            ),
-          ],
+    return Semantics(
+      identifier: 'VoicesRichTextToolbar',
+      container: true,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv2,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+        ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Wrap(
+            children: [
+              _ToolbarAttributeIconButton(
+                controller: controller,
+                icon: VoicesAssets.icons.rtHeading,
+                attribute: quill.Attribute.h1,
+                semanticsIdentifier: 'VoicesRichTextToolbarH1',
+              ),
+              _ToolbarAttributeIconButton(
+                controller: controller,
+                icon: VoicesAssets.icons.rtBold,
+                attribute: quill.Attribute.bold,
+                semanticsIdentifier: 'VoicesRichTextToolbarBold',
+              ),
+              _ToolbarAttributeIconButton(
+                controller: controller,
+                icon: VoicesAssets.icons.rtItalic,
+                attribute: quill.Attribute.italic,
+                semanticsIdentifier: 'VoicesRichTextToolbarItalic',
+              ),
+              _ToolbarAttributeIconButton(
+                controller: controller,
+                icon: VoicesAssets.icons.rtOrderedList,
+                attribute: quill.Attribute.ol,
+                semanticsIdentifier: 'VoicesRichTextToolbarOL',
+              ),
+              _ToolbarAttributeIconButton(
+                controller: controller,
+                icon: VoicesAssets.icons.rtUnorderedList,
+                attribute: quill.Attribute.ul,
+                semanticsIdentifier: 'VoicesRichTextToolbarUL',
+              ),
+              _ToolbarImageOptionButton(
+                controller: controller,
+                semanticsIdentifier: 'VoicesRichTextToolbarImage',
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -410,30 +425,36 @@ class _ToolbarAttributeIconButton extends StatelessWidget {
   final quill.QuillController controller;
   final quill.Attribute<dynamic> attribute;
   final SvgGenImage icon;
+  final String semanticsIdentifier;
 
   const _ToolbarAttributeIconButton({
     required this.controller,
     required this.attribute,
     required this.icon,
+    required this.semanticsIdentifier,
   });
 
   @override
   Widget build(BuildContext context) {
-    return quill.QuillToolbarToggleStyleButton(
-      controller: controller,
-      attribute: attribute,
-      options: quill.QuillToolbarToggleStyleButtonOptions(
-        // TODO(minikin): We need to use dynamic here because
-        // of the bug in the quill package.
-        // https://github.com/singerdmx/flutter-quill/issues/2511
-        childBuilder: (dynamic options, dynamic extraOptions) {
-          return _ToolbarIconButton(
-            icon: icon,
-            tooltip: options.tooltip as String?,
-            isToggled: extraOptions.isToggled as bool,
-            onPressed: extraOptions.onPressed as VoidCallback?,
-          );
-        },
+    return CombineSemantics(
+      identifier: semanticsIdentifier,
+      container: true,
+      child: quill.QuillToolbarToggleStyleButton(
+        controller: controller,
+        attribute: attribute,
+        options: quill.QuillToolbarToggleStyleButtonOptions(
+          // TODO(minikin): We need to use dynamic here because
+          // of the bug in the quill package.
+          // https://github.com/singerdmx/flutter-quill/issues/2511
+          childBuilder: (dynamic options, dynamic extraOptions) {
+            return _ToolbarIconButton(
+              icon: icon,
+              tooltip: options.tooltip as String?,
+              isToggled: extraOptions.isToggled as bool,
+              onPressed: extraOptions.onPressed as VoidCallback?,
+            );
+          },
+        ),
       ),
     );
   }
@@ -465,27 +486,35 @@ class _ToolbarIconButton extends StatelessWidget {
 
 class _ToolbarImageOptionButton extends StatelessWidget {
   final quill.QuillController controller;
+  final String semanticsIdentifier;
 
-  const _ToolbarImageOptionButton({required this.controller});
+  const _ToolbarImageOptionButton({
+    required this.controller,
+    required this.semanticsIdentifier,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return quill_ext.QuillToolbarImageButton(
-      controller: controller,
-      options: quill_ext.QuillToolbarImageButtonOptions(
-        // TODO(minikin): We need to use dynamic here because
-        // of the bug in the quill package.
-        // https://github.com/singerdmx/flutter-quill/issues/2511
-        childBuilder: (dynamic options, dynamic extraOptions) {
-          return _ToolbarIconButton(
-            icon: VoicesAssets.icons.photograph,
-            tooltip: options.tooltip as String?,
-            isToggled: false,
-            onPressed: extraOptions.onPressed as VoidCallback?,
-          );
-        },
-        imageButtonConfig: quill_ext.QuillToolbarImageConfig(
-          insertImageUrlDialogBuilder: (context) => const InsertNewImageDialog(),
+    return CombineSemantics(
+      identifier: semanticsIdentifier,
+      container: true,
+      child: quill_ext.QuillToolbarImageButton(
+        controller: controller,
+        options: quill_ext.QuillToolbarImageButtonOptions(
+          // TODO(minikin): We need to use dynamic here because
+          // of the bug in the quill package.
+          // https://github.com/singerdmx/flutter-quill/issues/2511
+          childBuilder: (dynamic options, dynamic extraOptions) {
+            return _ToolbarIconButton(
+              icon: VoicesAssets.icons.photograph,
+              tooltip: options.tooltip as String?,
+              isToggled: false,
+              onPressed: extraOptions.onPressed as VoidCallback?,
+            );
+          },
+          imageButtonConfig: quill_ext.QuillToolbarImageConfig(
+            insertImageUrlDialogBuilder: (context) => const InsertNewImageDialog(),
+          ),
         ),
       ),
     );

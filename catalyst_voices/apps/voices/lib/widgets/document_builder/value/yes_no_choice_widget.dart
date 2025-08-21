@@ -32,53 +32,53 @@ class _YesNoChoiceSegmentButton extends VoicesFormField<bool?> {
     super.enabled,
     super.validator,
   }) : super(
-          builder: (field) {
-            final state = field as VoicesFormFieldState<bool?>;
-            final value = state.value;
+         builder: (field) {
+           final state = field as VoicesFormFieldState<bool?>;
+           final value = state.value;
 
-            void onChangedHandler(Set<bool> selected) {
-              final newValue = selected.isEmpty ? null : selected.first;
-              field.didChange(newValue);
-              onChanged?.call(newValue);
-            }
+           void onChangedHandler(Set<bool> selected) {
+             final newValue = selected.isEmpty ? null : selected.first;
+             field.didChange(newValue);
+             onChanged?.call(newValue);
+           }
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IgnorePointer(
-                  ignoring: !enabled,
-                  child: VoicesSegmentedButton<bool>(
-                    key: key,
-                    segments: [
-                      ButtonSegment(
-                        value: true,
-                        label: Text(field.context.l10n.yes),
-                      ),
-                      ButtonSegment(
-                        value: false,
-                        label: Text(field.context.l10n.no),
-                      ),
-                    ],
-                    selected: {
-                      if (value != null) value,
-                    },
-                    onChanged: onChangedHandler,
-                    emptySelectionAllowed: true,
-                    style: _getButtonStyle(field),
-                  ),
-                ),
-                if (field.hasError) ...[
-                  const SizedBox(height: 4),
-                  DocumentErrorText(
-                    text: field.errorText,
-                    enabled: enabled,
-                  ),
-                ],
-              ],
-            );
-          },
-        );
+           return Column(
+             crossAxisAlignment: CrossAxisAlignment.start,
+             mainAxisSize: MainAxisSize.min,
+             children: [
+               IgnorePointer(
+                 ignoring: !enabled,
+                 child: VoicesSegmentedButton<bool>(
+                   key: key,
+                   segments: [
+                     ButtonSegment(
+                       value: true,
+                       label: Text(field.context.l10n.yes),
+                     ),
+                     ButtonSegment(
+                       value: false,
+                       label: Text(field.context.l10n.no),
+                     ),
+                   ],
+                   selected: {
+                     if (value != null) value,
+                   },
+                   onChanged: onChangedHandler,
+                   emptySelectionAllowed: true,
+                   style: _getButtonStyle(field),
+                 ),
+               ),
+               if (field.hasError) ...[
+                 const SizedBox(height: 4),
+                 DocumentErrorText(
+                   text: field.errorText,
+                   enabled: enabled,
+                 ),
+               ],
+             ],
+           );
+         },
+       );
 
   static ButtonStyle? _getButtonStyle(FormFieldState<bool?> field) {
     if (field.errorText == null) return null;

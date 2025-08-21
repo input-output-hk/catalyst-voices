@@ -1,13 +1,11 @@
+import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-typedef EditableTileChange = ({
-  bool isEditMode,
-  EditableTileChangeSource source,
-});
+typedef EditableTileChange = ({bool isEditMode, EditableTileChangeSource source});
 
 class EditableTile extends StatelessWidget {
   final String title;
@@ -49,15 +47,19 @@ class EditableTile extends StatelessWidget {
     return PropertyTile(
       title: title,
       statesController: statesController,
-      action: overrideAction ??
+      action:
+          overrideAction ??
           Offstage(
             offstage: !isEditEnabled,
-            child: VoicesEditCancelButton(
-              key: const Key('EditableTileEditCancelButton'),
-              style: editCancelButtonStyle,
-              onTap: _toggleEditMode,
-              isEditing: isEditMode,
-              hasError: errorText != null,
+            child: CombineSemantics(
+              identifier: 'EditableTileEditCancelButton',
+              child: VoicesEditCancelButton(
+                key: const Key('EditableTileEditCancelButton'),
+                style: editCancelButtonStyle,
+                onTap: _toggleEditMode,
+                isEditing: isEditMode,
+                hasError: errorText != null,
+              ),
             ),
           ),
       footer: showFooter
@@ -154,16 +156,18 @@ class _Footer extends StatelessWidget {
         if (errorText != null) Expanded(child: _ErrorText(text: errorText)) else const Spacer(),
         Visibility.maintain(
           visible: showSaveButton,
-          child: VoicesFilledButton(
-            key: const Key('EditableTileSaveButton'),
-            onTap: isSaveEnabled ? onSave : null,
-            leading: saveButtonLeading,
-            child: Text(
-              saveText ?? context.l10n.saveButtonText.toUpperCase(),
-              semanticsIdentifier: 'EditableTileSaveButton',
-              style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimary,
-                  ),
+          child: CombineSemantics(
+            identifier: 'EditableTileSaveButton',
+            child: VoicesFilledButton(
+              key: const Key('EditableTileSaveButton'),
+              onTap: isSaveEnabled ? onSave : null,
+              leading: saveButtonLeading,
+              child: Text(
+                saveText ?? context.l10n.saveButtonText.toUpperCase(),
+                style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                ),
+              ),
             ),
           ),
         ),

@@ -16,13 +16,17 @@ class DocumentPropertyBuilderTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      title.starred(isEnabled: isRequired),
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-            color: color ?? Theme.of(context).colors.textOnPrimaryLevel1,
-          ),
+    return Semantics(
+      identifier: 'DocumentPropertyBuilderTitle',
+      container: true,
+      child: Text(
+        title.starred(isEnabled: isRequired),
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+          color: color ?? Theme.of(context).colors.textOnPrimaryLevel1,
+        ),
+      ),
     );
   }
 }
