@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use anyhow::Context;
-use cardano_blockchain_types::Slot;
+use cardano_chain_follower::Slot;
 use catalyst_types::catalyst_id::role_index::RoleId;
 use poem_openapi::{types::Example, Object};
 use rbac_registration::{
