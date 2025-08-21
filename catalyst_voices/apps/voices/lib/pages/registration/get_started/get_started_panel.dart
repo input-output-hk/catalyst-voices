@@ -42,19 +42,19 @@ class GetStartedPanel extends StatelessWidget {
             children: CreateAccountType.values
                 .map<Widget>((type) {
                   return RegistrationTile(
-                      key: Key(type.toString()),
-                      icon: type._icon,
-                      title: type._getTitle(context.l10n),
-                      subtitle: type._getSubtitle(context.l10n),
-                      semanticsIdentifier: type.toString(),
-                      onTap: () async {
-                        switch (type) {
-                          case CreateAccountType.createNew:
-                            await _handleCreateNewAccount(context);
-                          case CreateAccountType.recover:
-                            RegistrationCubit.of(context).recoverKeychain();
-                        }
-                      },
+                    key: Key(type.toString()),
+                    icon: type._icon,
+                    title: type._getTitle(context.l10n),
+                    subtitle: type._getSubtitle(context.l10n),
+                    semanticsIdentifier: type.toString(),
+                    onTap: () async {
+                      switch (type) {
+                        case CreateAccountType.createNew:
+                          await _handleCreateNewAccount(context);
+                        case CreateAccountType.recover:
+                          RegistrationCubit.of(context).recoverKeychain();
+                      }
+                    },
                   );
                 })
                 .separatedBy(const SizedBox(height: 12))
@@ -68,7 +68,7 @@ class GetStartedPanel extends StatelessWidget {
   Future<void> _handleCreateNewAccount(BuildContext context) async {
     final hasWallets = await context.read<SessionCubit>().checkAvailableWallets();
 
-    if (context.mounted) {
+    if (hasWallets && context.mounted) {
       RegistrationCubit.of(context).createNewAccount();
       return;
     }
@@ -84,16 +84,16 @@ class GetStartedPanel extends StatelessWidget {
 
 extension _CreateAccountTypeExt on CreateAccountType {
   SvgGenImage get _icon => switch (this) {
-        CreateAccountType.createNew => VoicesAssets.icons.colorSwatch,
-        CreateAccountType.recover => VoicesAssets.icons.download,
-      };
+    CreateAccountType.createNew => VoicesAssets.icons.colorSwatch,
+    CreateAccountType.recover => VoicesAssets.icons.download,
+  };
 
   String _getSubtitle(VoicesLocalizations l10n) {
     return l10n.accountCreationOnThisDevice;
   }
 
   String _getTitle(VoicesLocalizations l10n) => switch (this) {
-        CreateAccountType.createNew => l10n.accountCreationCreate,
-        CreateAccountType.recover => l10n.accountCreationRecover,
-      };
+    CreateAccountType.createNew => l10n.accountCreationCreate,
+    CreateAccountType.recover => l10n.accountCreationRecover,
+  };
 }
