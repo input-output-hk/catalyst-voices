@@ -3,7 +3,10 @@ use std::sync::Arc;
 
 use crate::db::index::queries::caches::{
     assets::{ada::AssetsAdaCache, native::AssetsNativeCache},
-    rbac::{public_key::PublicKeyCache, stake_address::StakeAddressCache},
+    rbac::{
+        chains::ChainsCache, public_key::PublicKeyCache, stake_address::StakeAddressCache,
+        transaction_id::TransactionIdCache,
+    },
 };
 
 /// Manager for the different Caches used by the Cassandra Session.
@@ -16,6 +19,10 @@ pub(crate) struct Caches {
     rbac_public_key: Arc<PublicKeyCache>,
     ///  Cache for RBAC Catalyst IDs by Stake Address
     rbac_stake_address: Arc<StakeAddressCache>,
+    ///  Cache for RBAC Catalyst IDs by Transaction ID
+    rbac_transaction_id: Arc<TransactionIdCache>,
+    ///  Cache for RBAC Persistent Chains
+    rbac_persistent_chains: Arc<ChainsCache>,
 }
 
 impl Caches {
@@ -24,8 +31,10 @@ impl Caches {
         Self {
             assets_ada: Arc::new(AssetsAdaCache::new(is_persistent)),
             assets_native: Arc::new(AssetsNativeCache::new(is_persistent)),
-            rbac_public_key: Arc::new(PublicKeyCache::new()),
-            rbac_stake_address: Arc::new(StakeAddressCache::new()),
+            rbac_public_key: Arc::new(PublicKeyCache::new(is_persistent)),
+            rbac_stake_address: Arc::new(StakeAddressCache::new(is_persistent)),
+            rbac_transaction_id: Arc::new(TransactionIdCache::new(is_persistent)),
+            rbac_persistent_chains: Arc::new(ChainsCache::new(is_persistent)),
         }
     }
 
@@ -47,5 +56,15 @@ impl Caches {
     /// RBAC Stake Address Cache
     pub(crate) fn rbac_stake_address(&self) -> Arc<StakeAddressCache> {
         self.rbac_stake_address.clone()
+    }
+
+    /// RBAC Transaction Id Cache
+    pub(crate) fn rbac_transaction_id(&self) -> Arc<TransactionIdCache> {
+        self.rbac_transaction_id.clone()
+    }
+
+    /// RBAC Chains Cache
+    pub(crate) fn rbac_persistent_chains(&self) -> Arc<ChainsCache> {
+        self.rbac_persistent_chains.clone()
     }
 }
