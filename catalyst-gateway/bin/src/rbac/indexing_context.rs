@@ -2,7 +2,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
+use cardano_chain_follower::{hashes::TransactionId, Slot, StakeAddress, TxnIndex};
 use catalyst_types::catalyst_id::CatalystId;
 use ed25519_dalek::VerifyingKey;
 

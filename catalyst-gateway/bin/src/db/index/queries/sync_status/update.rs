@@ -2,7 +2,7 @@
 
 use std::{sync::Arc, time::SystemTime};
 
-use cardano_blockchain_types::Slot;
+use cardano_chain_follower::Slot;
 use row::SyncStatusQueryParams;
 use scylla::{
     client::session::Session, statement::prepared::PreparedStatement, value::CqlTimestamp,

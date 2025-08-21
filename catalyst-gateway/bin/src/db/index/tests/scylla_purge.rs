@@ -6,7 +6,7 @@
 
 use std::collections::HashSet;
 
-use cardano_blockchain_types::{Network, StakeAddress, TransactionId, VotingPubKey};
+use cardano_chain_follower::{hashes::TransactionId, Network, StakeAddress, VotingPubKey};
 use catalyst_types::{problem_report::ProblemReport, uuid::UuidV4};
 use ed25519_dalek::VerifyingKey;
 use futures::StreamExt;
@@ -259,6 +259,7 @@ async fn rbac509_registration() {
             0.into(),
             None,
             HashSet::new(),
+            None,
         ),
         rbac509::insert_rbac509::Params::new(
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
@@ -277,6 +278,7 @@ async fn rbac509_registration() {
             )]
             .into_iter()
             .collect(),
+            Some(UuidV4::new()),
         ),
     ];
     let data_len = data.len();

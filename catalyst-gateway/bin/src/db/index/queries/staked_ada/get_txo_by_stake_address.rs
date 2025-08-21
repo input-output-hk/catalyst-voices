@@ -1,7 +1,7 @@
 //! Get the TXO by Stake Address
 use std::sync::{Arc, RwLock};
 
-use cardano_blockchain_types::StakeAddress;
+use cardano_chain_follower::StakeAddress;
 use futures::TryStreamExt;
 use scylla::{
     client::session::Session, statement::prepared::PreparedStatement, DeserializeRow, SerializeRow,

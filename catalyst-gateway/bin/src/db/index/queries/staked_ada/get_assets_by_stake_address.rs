@@ -1,7 +1,7 @@
 //! Get assets by stake address.
 use std::sync::Arc;
 
-use cardano_blockchain_types::StakeAddress;
+use cardano_chain_follower::StakeAddress;
 use futures::TryStreamExt;
 use scylla::{
     client::session::Session, statement::prepared::PreparedStatement, DeserializeRow, SerializeRow,

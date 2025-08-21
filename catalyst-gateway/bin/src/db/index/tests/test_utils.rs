@@ -1,6 +1,6 @@
 //! Utilities to use in the tests.
 
-use cardano_blockchain_types::{Cip36, MultiEraBlock, Network, Point, StakeAddress};
+use cardano_chain_follower::{Cip36, MultiEraBlock, Network, Point, StakeAddress};
 
 /// Returns a stake address value for testing.
 pub fn stake_address_1() -> StakeAddress {

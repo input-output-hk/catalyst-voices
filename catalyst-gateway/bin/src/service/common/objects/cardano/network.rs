@@ -15,7 +15,7 @@ pub(crate) enum Network {
     Preview,
 }
 
-impl From<Network> for cardano_blockchain_types::Network {
+impl From<Network> for cardano_chain_follower::Network {
     fn from(value: Network) -> Self {
         match value {
             Network::Mainnet => Self::Mainnet,

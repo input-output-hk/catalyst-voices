@@ -13,7 +13,7 @@ use std::{
 };
 
 use anyhow::{bail, Result};
-use cardano_blockchain_types::Slot;
+use cardano_chain_follower::Slot;
 use chrono::DateTime;
 use const_format::concatcp;
 use poem_openapi::{

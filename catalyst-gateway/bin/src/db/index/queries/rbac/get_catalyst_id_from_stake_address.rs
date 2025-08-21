@@ -3,7 +3,7 @@
 use std::sync::{Arc, LazyLock};
 
 use anyhow::{Context, Result};
-use cardano_blockchain_types::StakeAddress;
+use cardano_chain_follower::StakeAddress;
 use catalyst_types::catalyst_id::CatalystId;
 use futures::{StreamExt, TryStreamExt};
 use moka::{policy::EvictionPolicy, sync::Cache};

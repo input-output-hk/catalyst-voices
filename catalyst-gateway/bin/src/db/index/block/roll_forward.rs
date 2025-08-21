@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::Slot;
+use cardano_chain_follower::Slot;
 use futures::StreamExt;
 
 use crate::db::index::{

@@ -9,8 +9,8 @@ pub(crate) mod insert_unstaked_txo_asset;
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{
-    Network, Slot, StakeAddress, TransactionId, TxnIndex, TxnOutputOffset,
+use cardano_chain_follower::{
+    hashes::TransactionId, Network, Slot, StakeAddress, TxnIndex, TxnOutputOffset,
 };
 use scylla::client::session::Session;
 use tracing::{error, warn};
@@ -76,17 +76,17 @@ impl TxoInsertQuery {
     /// stake address, and still have a primary key on the table. Otherwise return the
     /// header and the stake key hash as a vec of 29 bytes.
     fn extract_stake_address(
-        network: Network, txo: &pallas::ledger::traverse::MultiEraOutput<'_>, slot_no: Slot,
-        txn_id: &str,
+        network: Network, txo: &cardano_chain_follower::pallas_traverse::MultiEraOutput<'_>,
+        slot_no: Slot, txn_id: &str,
     ) -> Option<(Option<StakeAddress>, String)> {
         let stake_address = match txo.address() {
             Ok(address) => {
                 match address {
                     // Byron addresses do not have stake addresses and are not supported.
-                    pallas::ledger::addresses::Address::Byron(_) => {
+                    cardano_chain_follower::pallas_addresses::Address::Byron(_) => {
                         return None;
                     },
-                    pallas::ledger::addresses::Address::Shelley(address) => {
+                    cardano_chain_follower::pallas_addresses::Address::Shelley(address) => {
                         let address_string = match address.to_bech32() {
                             Ok(address) => address,
                             Err(error) => {
@@ -97,22 +97,22 @@ impl TxoInsertQuery {
                         };
 
                         let address = match address.delegation() {
-                            pallas::ledger::addresses::ShelleyDelegationPart::Script(hash) => {
+                            cardano_chain_follower::pallas_addresses::ShelleyDelegationPart::Script(hash) => {
                                 Some(StakeAddress::new(network, true, (*hash).into()))
                             },
-                            pallas::ledger::addresses::ShelleyDelegationPart::Key(hash) => {
+                            cardano_chain_follower::pallas_addresses::ShelleyDelegationPart::Key(hash) => {
                                 Some(StakeAddress::new(network, false, (*hash).into()))
                             },
-                            pallas::ledger::addresses::ShelleyDelegationPart::Pointer(_pointer) => {
+                            cardano_chain_follower::pallas_addresses::ShelleyDelegationPart::Pointer(_pointer) => {
                                 // These are not supported from Conway, so we don't support them
                                 // either.
                                 None
                             },
-                            pallas::ledger::addresses::ShelleyDelegationPart::Null => None,
+                            cardano_chain_follower::pallas_addresses::ShelleyDelegationPart::Null => None,
                         };
                         (address, address_string)
                     },
-                    pallas::ledger::addresses::Address::Stake(_) => {
+                    cardano_chain_follower::pallas_addresses::Address::Stake(_) => {
                         // This should NOT appear in a TXO, so report if it does. But don't index it
                         // as a stake address.
                         warn!(
@@ -136,8 +136,8 @@ impl TxoInsertQuery {
 
     /// Index the transaction Inputs.
     pub(crate) fn index(
-        &mut self, network: Network, txn: &pallas::ledger::traverse::MultiEraTx<'_>, slot_no: Slot,
-        txn_hash: TransactionId, index: TxnIndex,
+        &mut self, network: Network, txn: &cardano_chain_follower::pallas_traverse::MultiEraTx<'_>,
+        slot_no: Slot, txn_hash: TransactionId, index: TxnIndex,
     ) {
         let txn_id = txn_hash.to_string();
 

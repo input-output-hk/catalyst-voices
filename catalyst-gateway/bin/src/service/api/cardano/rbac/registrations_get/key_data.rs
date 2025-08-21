@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use anyhow::Context;
 use c509_certificate::c509::C509;
-use cardano_blockchain_types::Point;
+use cardano_chain_follower::Point;
 use chrono::{DateTime, Utc};
 use ed25519_dalek::VerifyingKey;
 use minicbor::{encode::Encode, Encoder};

@@ -1,6 +1,6 @@
 //! A `TxnOutputOffset` wrapper that can be stored to and load from a database.
 
-use cardano_blockchain_types::TxnOutputOffset;
+use cardano_chain_follower::TxnOutputOffset;
 use scylla::_macro_internal::{
     CellWriter, ColumnType, DeserializationError, DeserializeValue, FrameSlice, SerializationError,
     SerializeValue, TypeCheckError, WrittenCellProof,

@@ -7,7 +7,7 @@ use std::{
     time::Duration,
 };
 
-use cardano_blockchain_types::Network;
+use cardano_chain_follower::Network;
 use openssl::ssl::{SslContextBuilder, SslFiletype, SslMethod, SslVerifyMode};
 use scylla::{
     client::{

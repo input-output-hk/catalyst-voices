@@ -7,7 +7,7 @@ use std::{
 };
 
 use anyhow::anyhow;
-use cardano_blockchain_types::{Network, Slot};
+use cardano_chain_follower::{Network, Slot};
 use clap::Args;
 use dotenvy::dotenv;
 use str_env_var::StringEnvVar;

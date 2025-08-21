@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::StakeAddress;
+use cardano_chain_follower::StakeAddress;
 use scylla::{
     client::{pager::TypedRowStream, session::Session},
     statement::prepared::PreparedStatement,

@@ -2,7 +2,7 @@
 
 use std::{cmp::Reverse, sync::Arc};
 
-use cardano_blockchain_types::StakeAddress;
+use cardano_chain_follower::StakeAddress;
 use dashmap::DashMap;
 use futures::{future, StreamExt};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};

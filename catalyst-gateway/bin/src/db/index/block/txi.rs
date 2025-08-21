@@ -2,8 +2,10 @@
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Slot, TransactionId, TxnOutputOffset};
-use catalyst_types::hashes::Blake2b256Hash;
+use cardano_chain_follower::{
+    hashes::{Blake2b256Hash, TransactionId},
+    Slot, TxnOutputOffset,
+};
 use scylla::{client::session::Session, SerializeRow};
 use tracing::error;
 
@@ -75,7 +77,9 @@ impl TxiInsertQuery {
     }
 
     /// Index the transaction Inputs.
-    pub(crate) fn index(&mut self, txs: &pallas_traverse::MultiEraTx<'_>, slot_no: Slot) {
+    pub(crate) fn index(
+        &mut self, txs: &cardano_chain_follower::pallas_traverse::MultiEraTx<'_>, slot_no: Slot,
+    ) {
         // Index the TXI's.
         for txi in txs.inputs() {
             let txn_id = Blake2b256Hash::from(*txi.hash()).into();

@@ -3,7 +3,7 @@
 use std::sync::Arc;
 
 use anyhow::Context;
-use cardano_blockchain_types::Network;
+use cardano_chain_follower::Network;
 use handlebars::Handlebars;
 use scylla::client::session::Session;
 use serde_json::json;
@@ -265,7 +265,7 @@ mod tests {
     /// This constant is ONLY used by Unit tests to identify when the schema version will
     /// change accidentally, and is NOT to be used directly to set the schema version of
     /// the table namespaces.
-    const SCHEMA_VERSION: &str = "141f7b75-6a5f-8fe4-91cb-596e3584fd7d";
+    const SCHEMA_VERSION: &str = "69e28bc1-be89-8407-83dc-9c4cc408d3a9";
 
     #[test]
     /// This test is designed to fail if the schema version has changed.
