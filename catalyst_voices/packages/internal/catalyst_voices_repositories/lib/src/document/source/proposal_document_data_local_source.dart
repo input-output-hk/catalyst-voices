@@ -20,13 +20,13 @@ abstract interface class ProposalDocumentDataLocalSource {
     required ProposalsOrder order,
   });
 
+  Stream<ProposalsCount> watchProposalsCount({
+    required ProposalsCountFilters filters,
+  });
+
   Stream<Page<ProposalDocumentData>> watchProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
     required ProposalsOrder order,
-  });
-
-  Stream<ProposalsCount> watchProposalsCount({
-    required ProposalsCountFilters filters,
   });
 }

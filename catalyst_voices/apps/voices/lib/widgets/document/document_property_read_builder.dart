@@ -8,10 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 
 /// A callback that builds a widget for given [listItem].
-typedef DocumentPropertyReadListItemBuilder = Widget Function(
-  BuildContext context,
-  DocumentPropertyValueListItem<Object> listItem,
-);
+typedef DocumentPropertyReadListItemBuilder =
+    Widget Function(
+      BuildContext context,
+      DocumentPropertyValueListItem<Object> listItem,
+    );
 
 /// A map defining overrides for [DocumentPropertyReadBuilder].
 typedef DocumentPropertyReadOverrides = Map<DocumentNodeId, DocumentPropertyReadListItemBuilder>;
@@ -102,17 +103,17 @@ class _DocumentPropertyReadBuilderListTileBuilder extends StatelessWidget {
 
     return switch (item) {
       DocumentLinkReadItem(:final title, :final value) => _DocumentPropertyReadBuilderListTile(
-          key: ValueKey('DocumentProperty[${item.id}]ReadTile'),
-          title: title,
-          isMultiline: true,
-          child: value != null ? LinkText(value) : const Text('-'),
-        ),
+        key: ValueKey('DocumentProperty[${item.id}]ReadTile'),
+        title: title,
+        isMultiline: true,
+        child: value != null ? LinkText(value) : const Text('-'),
+      ),
       DocumentMarkdownListItem(:final title, :final value) => _DocumentPropertyReadBuilderListTile(
-          key: ValueKey('DocumentProperty[${item.id}]ReadTile'),
-          title: title,
-          isMultiline: true,
-          child: MarkdownText(value ?? const MarkdownData('-')),
-        ),
+        key: ValueKey('DocumentProperty[${item.id}]ReadTile'),
+        title: title,
+        isMultiline: true,
+        child: MarkdownText(value ?? const MarkdownData('-')),
+      ),
       DocumentTextListItem(:final title, :final value, :final isMultiline) =>
         _DocumentPropertyReadBuilderListTile(
           key: ValueKey('DocumentProperty[${item.id}]ReadTile'),
@@ -167,8 +168,9 @@ class _DocumentPropertyReadBuilderState extends State<DocumentPropertyReadBuilde
   ) sync* {
     switch (property) {
       case DocumentListProperty():
-        for (final property
-            in property.properties.whereNot((element) => element.schema.isSectionOrSubsection)) {
+        for (final property in property.properties.whereNot(
+          (element) => element.schema.isSectionOrSubsection,
+        )) {
           yield* _calculateItemsFrom(property);
         }
       case DocumentObjectProperty():
@@ -198,8 +200,9 @@ class _DocumentPropertyReadBuilderState extends State<DocumentPropertyReadBuilde
           case DocumentNestedQuestionsSchema():
           case DocumentBorderGroupSchema():
           case DocumentGenericObjectSchema():
-            for (final property in property.properties
-                .whereNot((element) => element.schema.isSectionOrSubsection)) {
+            for (final property in property.properties.whereNot(
+              (element) => element.schema.isSectionOrSubsection,
+            )) {
               yield* _calculateItemsFrom(property);
             }
         }
@@ -221,8 +224,8 @@ class _DocumentPropertyReadBuilderState extends State<DocumentPropertyReadBuilde
         final answer = value is bool ? value : null;
         final text = answer != null
             ? answer
-                ? context.l10n.yes
-                : context.l10n.no
+                  ? context.l10n.yes
+                  : context.l10n.no
             : null;
 
         return DocumentTextListItem(

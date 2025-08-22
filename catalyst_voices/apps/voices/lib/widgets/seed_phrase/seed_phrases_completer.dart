@@ -58,8 +58,9 @@ class SeedPhrasesCompleter extends StatelessWidget {
         crossAxisSpacing: crossAxisSpacing,
         children: slots.mapIndexed((index, element) {
           final isCurrent = index == currentIndex;
-          final isPrevious =
-              currentIndex != null ? currentIndex == index + 1 : index == slotsCount - 1;
+          final isPrevious = currentIndex != null
+              ? currentIndex == index + 1
+              : index == slotsCount - 1;
 
           final canDelete = element != null && isPrevious;
 
@@ -105,11 +106,11 @@ class _WordSlotCell extends StatelessWidget {
   });
 
   Set<WidgetState> get states => {
-        if (data != null) WidgetState.selected,
-        if (isActive) WidgetState.focused,
-        if (data == null && !isActive) WidgetState.disabled,
-        if (showDelete) WidgetState.hovered,
-      };
+    if (data != null) WidgetState.selected,
+    if (isActive) WidgetState.focused,
+    if (data == null && !isActive) WidgetState.disabled,
+    if (showDelete) WidgetState.hovered,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -138,8 +139,9 @@ class _WordSlotCell extends StatelessWidget {
       ),
       child: Material(
         type: MaterialType.transparency,
-        textStyle: (theme.textTheme.labelLarge ?? const TextStyle())
-            .copyWith(color: foregroundColor.resolve(states)),
+        textStyle: (theme.textTheme.labelLarge ?? const TextStyle()).copyWith(
+          color: foregroundColor.resolve(states),
+        ),
         child: InkWell(
           borderRadius: BorderRadius.circular(8),
           onTap: onTap,

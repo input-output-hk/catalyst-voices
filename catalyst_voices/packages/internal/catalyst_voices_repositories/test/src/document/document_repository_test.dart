@@ -67,10 +67,12 @@ void main() {
           content: DocumentDataContent(proposalData),
         );
 
-        when(() => remoteDocuments.get(ref: template.ref))
-            .thenAnswer((_) => Future.value(template));
-        when(() => remoteDocuments.get(ref: proposal.ref))
-            .thenAnswer((_) => Future.value(proposal));
+        when(
+          () => remoteDocuments.get(ref: template.ref),
+        ).thenAnswer((_) => Future.value(template));
+        when(
+          () => remoteDocuments.get(ref: proposal.ref),
+        ).thenAnswer((_) => Future.value(proposal));
 
         // When
         final ref = proposal.ref;
@@ -161,8 +163,9 @@ void main() {
 
           when(() => remoteDocuments.getLatestVersion(id)).thenAnswer((_) => Future.value(version));
 
-          when(() => remoteDocuments.get(ref: exactRef))
-              .thenAnswer((_) => Future.value(documentData));
+          when(
+            () => remoteDocuments.get(ref: exactRef),
+          ).thenAnswer((_) => Future.value(documentData));
 
           // When
           await repository.getDocumentData(ref: ref);
@@ -187,10 +190,12 @@ void main() {
           );
           final proposal = DocumentDataFactory.build(template: templateRef);
 
-          when(() => remoteDocuments.get(ref: template.ref))
-              .thenAnswer((_) => Future.value(template));
-          when(() => remoteDocuments.get(ref: proposal.ref))
-              .thenAnswer((_) => Future.value(proposal));
+          when(
+            () => remoteDocuments.get(ref: template.ref),
+          ).thenAnswer((_) => Future.value(template));
+          when(
+            () => remoteDocuments.get(ref: proposal.ref),
+          ).thenAnswer((_) => Future.value(proposal));
 
           // When
           final proposalStream = repository.watchDocumentWithRef(
@@ -229,12 +234,15 @@ void main() {
           final proposal1 = DocumentDataFactory.build(template: templateRef);
           final proposal2 = DocumentDataFactory.build(template: templateRef);
 
-          when(() => remoteDocuments.get(ref: template.ref))
-              .thenAnswer((_) => Future.value(template));
-          when(() => remoteDocuments.get(ref: proposal1.ref))
-              .thenAnswer((_) => Future.value(proposal1));
-          when(() => remoteDocuments.get(ref: proposal2.ref))
-              .thenAnswer((_) => Future.value(proposal2));
+          when(
+            () => remoteDocuments.get(ref: template.ref),
+          ).thenAnswer((_) => Future.value(template));
+          when(
+            () => remoteDocuments.get(ref: proposal1.ref),
+          ).thenAnswer((_) => Future.value(proposal1));
+          when(
+            () => remoteDocuments.get(ref: proposal2.ref),
+          ).thenAnswer((_) => Future.value(proposal2));
 
           // When
           final proposal1Future = repository
@@ -350,15 +358,17 @@ void main() {
           );
           final looseRefs = List.generate(
             10,
-            (_) => SignedDocumentRef.loose(id: DocumentRefFactory.randomUuidV7())
-                .toTyped(DocumentType.proposalDocument),
+            (_) => SignedDocumentRef.loose(
+              id: DocumentRefFactory.randomUuidV7(),
+            ).toTyped(DocumentType.proposalDocument),
           );
           final refs = [...exactRefs, ...looseRefs];
 
           // When
           when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(refs));
-          when(() => remoteDocuments.getLatestVersion(any()))
-              .thenAnswer((_) => Future(DocumentRefFactory.randomUuidV7));
+          when(
+            () => remoteDocuments.getLatestVersion(any()),
+          ).thenAnswer((_) => Future(DocumentRefFactory.randomUuidV7));
 
           final allRefs = await repository.getAllDocumentsRefs();
 
@@ -386,8 +396,9 @@ void main() {
             10,
             (_) => DocumentRefFactory.signedDocumentRef().toTyped(DocumentType.proposalDocument),
           );
-          final looseTemplatesRefs =
-              constTemplatesRefs.map((e) => e.copyWith(ref: e.ref.toLoose()));
+          final looseTemplatesRefs = constTemplatesRefs.map(
+            (e) => e.copyWith(ref: e.ref.toLoose()),
+          );
           final refs = [
             ...docsRefs,
             ...looseTemplatesRefs,

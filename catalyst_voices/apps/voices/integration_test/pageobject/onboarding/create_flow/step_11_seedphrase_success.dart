@@ -7,9 +7,9 @@ import '../onboarding_base_page.dart';
 import 'step_10_input_seedphrase.dart';
 
 class SeedphraseSuccessPanel extends OnboardingPageBase {
-  SeedphraseSuccessPanel(super.$);
-
   final nextStepBody = const Key('NextStepBody');
+
+  SeedphraseSuccessPanel(super.$);
 
   Future<void> clickNext() async {
     await $(nextButton).tap();
@@ -20,12 +20,6 @@ class SeedphraseSuccessPanel extends OnboardingPageBase {
     await InputSeedphrasePanel($).goto();
     await InputSeedphrasePanel($).inputSeedPhraseWords();
     await InputSeedphrasePanel($).clickNext();
-  }
-
-  @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
   }
 
   Future<void> verifyDetailsPanel() async {
@@ -61,5 +55,11 @@ class SeedphraseSuccessPanel extends OnboardingPageBase {
       (await t()).createKeychainSeedPhraseCheckSuccessNextStep,
     );
     expect(await closeButton(), findsOneWidget);
+  }
+
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }

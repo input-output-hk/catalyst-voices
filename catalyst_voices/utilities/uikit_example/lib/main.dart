@@ -77,7 +77,8 @@ class _UIKitExampleAppState extends State<UIKitExampleApp> {
   }
 
   Route<dynamic> _onGenerateRoute(RouteSettings settings) {
-    final page = ExamplesListPage.examples
+    final page =
+        ExamplesListPage.examples
             .where((e) => e.route == settings.name)
             .map((e) => e.page)
             .firstOrNull ??

@@ -16,12 +16,12 @@ final class VoicesUsernameTextField extends VoicesTextField {
     super.readOnly = false,
     super.maxLength,
   }) : super(
-          keyboardType: TextInputType.emailAddress,
-          style: const TextStyle(
-            fontWeight: FontWeight.w500,
-          ),
-          inputFormatters: [
-            FilteringTextInputFormatter.singleLineFormatter,
-          ],
-        );
+         keyboardType: TextInputType.emailAddress,
+         style: const TextStyle(
+           fontWeight: FontWeight.w500,
+         ),
+         inputFormatters: [
+           FilteringTextInputFormatter.singleLineFormatter,
+         ],
+       );
 }

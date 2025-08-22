@@ -64,27 +64,27 @@ final class DocumentDataMetadata extends Equatable {
     this.categoryId,
     this.authors,
   }) : assert(
-          selfRef.isExact,
-          'selfRef have to be exact. Make sure version is not null',
-        );
+         selfRef.isExact,
+         'selfRef have to be exact. Make sure version is not null',
+       );
 
   String get id => selfRef.id;
 
   @override
   List<Object?> get props => [
-        type,
-        selfRef,
-        ref,
-        refHash,
-        template,
-        reply,
-        section,
-        brandId,
-        campaignId,
-        electionId,
-        categoryId,
-        authors,
-      ];
+    type,
+    selfRef,
+    ref,
+    refHash,
+    template,
+    reply,
+    section,
+    brandId,
+    campaignId,
+    electionId,
+    categoryId,
+    authors,
+  ];
 
   String get version => selfRef.version!;
 

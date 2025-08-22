@@ -37,21 +37,23 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
     required KeyDerivationService keyDerivationService,
     required RegistrationProgressNotifier progressNotifier,
     required BlockchainConfig blockchainConfig,
-  })  : _userService = userService,
-        _registrationService = registrationService,
-        _progressNotifier = progressNotifier,
-        _baseProfileCubit = BaseProfileCubit(),
-        _keychainCreationCubit = KeychainCreationCubit(downloaderService: downloaderService),
-        _walletLinkCubit = WalletLinkCubit(
-          registrationService: registrationService,
-          blockchainConfig: blockchainConfig,
-        ),
-        _recoverCubit = RecoverCubit(
-          userService: userService,
-          registrationService: registrationService,
-          keyDerivationService: keyDerivationService,
-        ),
-        super(const RegistrationState()) {
+  }) : _userService = userService,
+       _registrationService = registrationService,
+       _progressNotifier = progressNotifier,
+       _baseProfileCubit = BaseProfileCubit(),
+       _keychainCreationCubit = KeychainCreationCubit(
+         downloaderService: downloaderService,
+       ),
+       _walletLinkCubit = WalletLinkCubit(
+         registrationService: registrationService,
+         blockchainConfig: blockchainConfig,
+       ),
+       _recoverCubit = RecoverCubit(
+         userService: userService,
+         registrationService: registrationService,
+         keyDerivationService: keyDerivationService,
+       ),
+       super(const RegistrationState()) {
     _baseProfileCubit.stream.listen(_onBaseProfileStateDataChanged);
     _keychainCreationCubit.stream.listen(_onKeychainStateDataChanged);
     _walletLinkCubit.stream.listen(_onWalletLinkStateDataChanged);
@@ -93,10 +95,12 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
 
   @override
   Future<void> close() async {
-    await _baseProfileCubit.close();
-    await _keychainCreationCubit.close();
-    await _walletLinkCubit.close();
-    await _recoverCubit.close();
+    await [
+      _baseProfileCubit.close(),
+      _keychainCreationCubit.close(),
+      _walletLinkCubit.close(),
+      _recoverCubit.close(),
+    ].wait;
     return super.close();
   }
 
@@ -144,7 +148,11 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
 
           await _userService.registerAccount(account);
 
-        case AccountSubmitUpdateData(:final metadata, :final accountId, :final roles):
+        case AccountSubmitUpdateData(
+          :final metadata,
+          :final accountId,
+          :final roles,
+        ):
           await _registrationService.submitTransaction(
             wallet: metadata.wallet,
             unsignedTx: metadata.transaction,

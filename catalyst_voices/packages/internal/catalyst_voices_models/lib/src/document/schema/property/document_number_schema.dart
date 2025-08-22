@@ -70,8 +70,8 @@ sealed class DocumentNumberSchema extends DocumentValueSchema<double> {
     required super.enumValues,
     required this.numRange,
   }) : super(
-          type: DocumentPropertyType.number,
-        );
+         type: DocumentPropertyType.number,
+       );
 
   @override
   @mustCallSuper

@@ -12,9 +12,9 @@ final class BaseProfileProgress extends Equatable {
 
   @override
   List<Object?> get props => [
-        username,
-        email,
-      ];
+    username,
+    email,
+  ];
 }
 
 final class KeychainProgress extends Equatable {
@@ -30,10 +30,10 @@ final class KeychainProgress extends Equatable {
 
   @override
   List<Object?> get props => [
-        keychainId,
-        seedPhrase,
-        password,
-      ];
+    keychainId,
+    seedPhrase,
+    password,
+  ];
 }
 
 final class RegistrationProgress extends Equatable {
@@ -49,9 +49,9 @@ final class RegistrationProgress extends Equatable {
 
   @override
   List<Object?> get props => [
-        baseProfileProgress,
-        keychainProgress,
-      ];
+    baseProfileProgress,
+    keychainProgress,
+  ];
 
   RegistrationProgress copyWith({
     Optional<BaseProfileProgress>? baseProfileProgress,

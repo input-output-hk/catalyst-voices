@@ -7,9 +7,9 @@ import '../onboarding_base_page.dart';
 import 'step_5_profile_final.dart';
 
 class CatalystKeychainInfoPanel extends OnboardingPageBase {
-  CatalystKeychainInfoPanel(super.$);
-
   static const createKeychainButton = Key('CreateKeychainButton');
+
+  CatalystKeychainInfoPanel(super.$);
   Future<void> clickCreateKeychain() async {
     await $(createKeychainButton).tap();
   }
@@ -20,10 +20,16 @@ class CatalystKeychainInfoPanel extends OnboardingPageBase {
     await ProfileFinalPanel($).clickCreateKeychain();
   }
 
-  @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
+  Future<void> verifyDetailsPanel() async {
+    expect(
+      $(registrationDetailsTitle).$(Text).text,
+      (await t()).accountCreationSplashTitle,
+    );
+    expect(
+      $(registrationDetailsBody).$(Text).text,
+      (await t()).accountCreationSplashMessage,
+    );
+    expect($(createKeychainButton), findsOneWidget);
   }
 
   Future<void> verifyInfoPanel() async {
@@ -44,15 +50,9 @@ class CatalystKeychainInfoPanel extends OnboardingPageBase {
     );
   }
 
-  Future<void> verifyDetailsPanel() async {
-    expect(
-      $(registrationDetailsTitle).$(Text).text,
-      (await t()).accountCreationSplashTitle,
-    );
-    expect(
-      $(registrationDetailsBody).$(Text).text,
-      (await t()).accountCreationSplashMessage,
-    );
-    expect($(createKeychainButton), findsOneWidget);
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }

@@ -11,12 +11,13 @@ final class DummyCatalystIdFactory {
 
   static CatalystId create({
     CatalystIdHost host = CatalystIdHost.cardano,
+    Uint8List? role0KeyBytes,
     String? username = 'Dummy',
     AccountRole? role,
     int? nonce,
   }) {
     /* cSpell:disable */
-    final role0KeyBytes = base64UrlNoPadDecode('FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE');
+    role0KeyBytes ??= base64UrlNoPadDecode('FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE');
     /* cSpell:enable */
 
     final role0Key = _DummyCatalystPublicKeyFactory().create(role0KeyBytes);

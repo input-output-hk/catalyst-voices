@@ -2,13 +2,6 @@ import 'package:flutter/widgets.dart';
 
 /// A widget that calls [listener] when the given [Listenable] changes value.
 class ListenableListener extends StatefulWidget {
-  const ListenableListener({
-    required this.listenable,
-    required this.child,
-    this.listener,
-    super.key,
-  });
-
   /// The [Listenable] to which this widget is listening.
   ///
   /// Commonly an [Animation] or a [ChangeNotifier].
@@ -20,6 +13,13 @@ class ListenableListener extends StatefulWidget {
   /// The widget below this widget in the tree.
   final Widget child;
 
+  const ListenableListener({
+    required this.listenable,
+    required this.child,
+    this.listener,
+    super.key,
+  });
+
   @override
   State<ListenableListener> createState() => _ListenableListenerState();
 }
@@ -28,13 +28,7 @@ class _ListenableListenerState extends State<ListenableListener> {
   Listenable get _listenable => widget.listenable;
 
   @override
-  void initState() {
-    super.initState();
-    if (widget.listener != null) {
-      _listenable.addListener(_handleChange);
-      _handleChange();
-    }
-  }
+  Widget build(BuildContext context) => widget.child;
 
   @override
   void didUpdateWidget(ListenableListener oldWidget) {
@@ -53,10 +47,16 @@ class _ListenableListenerState extends State<ListenableListener> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    if (widget.listener != null) {
+      _listenable.addListener(_handleChange);
+      _handleChange();
+    }
+  }
+
   void _handleChange() {
     widget.listener?.call();
   }
-
-  @override
-  Widget build(BuildContext context) => widget.child;
 }

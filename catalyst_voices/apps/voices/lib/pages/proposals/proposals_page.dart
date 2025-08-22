@@ -2,27 +2,28 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_controls.dart';
+import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
+import 'package:catalyst_voices/pages/proposals/widgets/proposals_content.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_header.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_pagination.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_sub_header.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_tabs.dart';
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_tabs_divider.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/widgets/layouts/header_and_content_layout.dart';
 import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab_controller.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 
 class ProposalsPage extends StatefulWidget {
   final SignedDocumentRef? categoryId;
-  final ProposalsFilterType? type;
+  final ProposalsPageTab? tab;
 
   const ProposalsPage({
     super.key,
     this.categoryId,
-    this.type,
+    this.tab,
   });
 
   @override
@@ -31,54 +32,23 @@ class ProposalsPage extends StatefulWidget {
 
 class _ProposalsPageState extends State<ProposalsPage>
     with
-        SingleTickerProviderStateMixin,
+        TickerProviderStateMixin,
         ErrorHandlerStateMixin<ProposalsCubit, ProposalsPage>,
         SignalHandlerStateMixin<ProposalsCubit, ProposalsSignal, ProposalsPage> {
-  late final TabController _tabController;
-  late final PagingController<ProposalViewModel> _pagingController;
+  late VoicesTabController<ProposalsPageTab> _tabController;
+  late final PagingController<ProposalBrief> _pagingController;
+  late final StreamSubscription<List<ProposalsPageTab>> _tabsSubscription;
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverPadding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 32).add(const EdgeInsets.only(bottom: 32)),
-          sliver: SliverList(
-            delegate: SliverChildListDelegate(
-              [
-                const SizedBox(height: 16),
-                const ProposalsHeader(),
-                const SizedBox(height: 40),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: double.infinity,
-                      child: Wrap(
-                        alignment: WrapAlignment.spaceBetween,
-                        crossAxisAlignment: WrapCrossAlignment.end,
-                        runSpacing: 10,
-                        children: [
-                          ProposalsTabs(controller: _tabController),
-                          const ProposalsControls(),
-                        ],
-                      ),
-                    ),
-                    const ProposalsTabsDivider(),
-                    const SizedBox(height: 16),
-                    const ProposalsSubHeader(),
-                    const SizedBox(height: 16),
-                    ProposalsPagination(controller: _pagingController),
-                    const SizedBox(height: 12),
-                  ],
-                ),
-              ],
-            ),
-          ),
+    return ProposalSubmissionPhaseAware(
+      activeChild: HeaderAndContentLayout(
+        header: const ProposalsHeader(),
+        content: ProposalsContent(
+          tabController: _tabController,
+          pagingController: _pagingController,
         ),
-      ],
+      ),
     );
   }
 
@@ -86,18 +56,20 @@ class _ProposalsPageState extends State<ProposalsPage>
   void didUpdateWidget(ProposalsPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.categoryId != oldWidget.categoryId || widget.type != oldWidget.type) {
+    final tab = widget.tab ?? ProposalsPageTab.total;
+
+    if (widget.categoryId != oldWidget.categoryId || widget.tab != oldWidget.tab) {
       context.read<ProposalsCubit>().changeFilters(
-            onlyMy: Optional(widget.type?.isMy ?? false),
-            category: Optional(widget.categoryId),
-            type: widget.type ?? ProposalsFilterType.total,
-          );
+        onlyMy: Optional(tab == ProposalsPageTab.my),
+        category: Optional(widget.categoryId),
+        type: tab.filter,
+      );
 
       _doResetPagination();
     }
 
-    if (widget.type != oldWidget.type) {
-      _tabController.animateTo(widget.type?.index ?? 0);
+    if (widget.tab != oldWidget.tab) {
+      _tabController.animateToTab(tab);
     }
   }
 
@@ -105,19 +77,20 @@ class _ProposalsPageState extends State<ProposalsPage>
   void dispose() {
     _tabController.dispose();
     _pagingController.dispose();
+    unawaited(_tabsSubscription.cancel());
     super.dispose();
   }
 
   @override
   void handleSignal(ProposalsSignal signal) {
     switch (signal) {
-      case ChangeCategorySignal(:final to):
+      case ChangeCategoryProposalsSignal(:final to):
         _updateRoute(categoryId: Optional(to?.id));
-      case ChangeFilterTypeSignal(:final type):
-        _updateRoute(filterType: type);
-      case ResetProposalsPaginationSignal():
+      case ChangeTabProposalsSignal(:final tab):
+        _updateRoute(tab: tab);
+      case ResetPaginationProposalsSignal():
         _doResetPagination();
-      case ProposalsPageReadySignal(:final page):
+      case PageReadyProposalsSignal(:final page):
         _pagingController.value = _pagingController.value.copyWith(
           currentPage: page.page,
           maxResults: page.total,
@@ -132,39 +105,56 @@ class _ProposalsPageState extends State<ProposalsPage>
   void initState() {
     super.initState();
 
-    final proposalsFilterType = _determineFilterType();
+    final proposalsCubit = context.read<ProposalsCubit>();
+    final sessionCubit = context.read<SessionCubit>();
+    final supportedTabs = _determineTabs(sessionCubit.state.isProposerUnlock, proposalsCubit.state);
+    final selectedTab = _determineTab(supportedTabs, widget.tab);
 
-    _tabController = TabController(
-      initialIndex: proposalsFilterType.index,
-      length: ProposalsFilterType.values.length,
+    _tabController = VoicesTabController(
+      initialTab: selectedTab,
+      tabs: supportedTabs,
       vsync: this,
     );
+
     _pagingController = PagingController(
       initialPage: 0,
       initialMaxResults: 0,
     );
 
-    context.read<ProposalsCubit>().init(
-          onlyMyProposals: widget.type?.isMy ?? false,
-          category: widget.categoryId,
-          type: proposalsFilterType,
-          order: const Alphabetical(),
-        );
+    _tabsSubscription = Rx.combineLatest2(
+      sessionCubit.watchState().map((e) => e.isProposerUnlock),
+      proposalsCubit.watchState(),
+      _determineTabs,
+    ).distinct().listen(_updateTabsIfNeeded);
+
+    proposalsCubit.init(
+      onlyMyProposals: selectedTab == ProposalsPageTab.my,
+      category: widget.categoryId,
+      type: selectedTab.filter,
+      order: const Alphabetical(),
+    );
 
     _pagingController
       ..addPageRequestListener(_handleProposalsPageRequest)
       ..notifyPageRequestListeners(0);
   }
 
-  ProposalsFilterType _determineFilterType() {
-    final isProposerUnlock = context.read<SessionCubit>().state.isProposerUnlock;
-    final requestedType = widget.type;
-
-    if (!isProposerUnlock && (requestedType?.isMy ?? false)) {
-      _updateRoute(filterType: ProposalsFilterType.total);
+  ProposalsPageTab _determineTab(
+    List<ProposalsPageTab> supportedTabs,
+    ProposalsPageTab? initialTab,
+  ) {
+    final requestedTab = initialTab ?? widget.tab ?? supportedTabs.first;
+    if (!supportedTabs.contains(requestedTab)) {
+      final supportedTab = supportedTabs.first;
+      _updateRoute(tab: supportedTab);
+      return supportedTab;
     }
 
-    return requestedType ?? ProposalsFilterType.total;
+    return requestedTab;
+  }
+
+  List<ProposalsPageTab> _determineTabs(bool isProposerUnlock, ProposalsState state) {
+    return state.tabs(isProposerUnlock: isProposerUnlock);
   }
 
   void _doResetPagination() {
@@ -174,7 +164,7 @@ class _ProposalsPageState extends State<ProposalsPage>
   Future<void> _handleProposalsPageRequest(
     int pageKey,
     int pageSize,
-    ProposalViewModel? lastProposalId,
+    ProposalBrief? lastProposalId,
   ) async {
     final request = PageRequest(page: pageKey, size: pageSize);
     await context.read<ProposalsCubit>().getProposals(request);
@@ -182,16 +172,29 @@ class _ProposalsPageState extends State<ProposalsPage>
 
   void _updateRoute({
     Optional<String>? categoryId,
-    ProposalsFilterType? filterType,
+    ProposalsPageTab? tab,
   }) {
     Router.neglect(context, () {
       final effectiveCategoryId = categoryId.dataOr(widget.categoryId?.id);
-      final effectiveType = filterType?.name ?? widget.type?.name;
+      final effectiveTab = tab?.name ?? widget.tab?.name;
 
       ProposalsRoute(
         categoryId: effectiveCategoryId,
-        type: effectiveType,
+        tab: effectiveTab,
       ).replace(context);
     });
+  }
+
+  void _updateTabsIfNeeded(List<ProposalsPageTab> tabs) {
+    if (!listEquals(tabs, _tabController.tabs)) {
+      setState(() {
+        _tabController.dispose();
+        _tabController = VoicesTabController(
+          vsync: this,
+          tabs: tabs,
+          initialTab: _determineTab(tabs, _tabController.tab),
+        );
+      });
+    }
   }
 }

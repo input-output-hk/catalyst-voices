@@ -179,8 +179,9 @@ void main() {
       );
     });
 
-    testWidgets('SingleSelectDropdown should display hint and allow item selection',
-        (WidgetTester tester) async {
+    testWidgets('SingleSelectDropdown should display hint and allow item selection', (
+      WidgetTester tester,
+    ) async {
       // Sample data
       final items = [
         const DropdownMenuEntry<String>(value: 'item1', label: 'Item 1'),

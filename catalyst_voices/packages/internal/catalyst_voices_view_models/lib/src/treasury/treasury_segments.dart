@@ -2,29 +2,15 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
 
-final class TreasurySegment extends BaseSegment<TreasurySection> {
-  const TreasurySegment({
+final class SetupCampaignCategories extends TreasurySection {
+  const SetupCampaignCategories({
     required super.id,
-    required super.sections,
   });
 
   @override
   String resolveTitle(BuildContext context) {
-    return context.l10n.treasuryCreateCampaign;
+    return context.l10n.setupCategories;
   }
-}
-
-sealed class TreasurySection extends BaseSection {
-  const TreasurySection({
-    required super.id,
-    super.isEnabled,
-    super.isEditable,
-  });
-
-  @override
-  String resolveTitle(BuildContext context);
-
-  String? resolveDesc(BuildContext context) => null;
 }
 
 final class SetupCampaignDetails extends TreasurySection {
@@ -55,23 +41,37 @@ final class SetupProposalTemplate extends TreasurySection {
   });
 
   @override
-  String resolveTitle(BuildContext context) {
-    return context.l10n.setupBaseProposalTemplate;
-  }
-
-  @override
   String resolveDesc(BuildContext context) {
     return context.l10n.setupBaseQuestions;
   }
+
+  @override
+  String resolveTitle(BuildContext context) {
+    return context.l10n.setupBaseProposalTemplate;
+  }
 }
 
-final class SetupCampaignCategories extends TreasurySection {
-  const SetupCampaignCategories({
+sealed class TreasurySection extends BaseSection {
+  const TreasurySection({
     required super.id,
+    super.isEnabled,
+    super.isEditable,
+  });
+
+  String? resolveDesc(BuildContext context) => null;
+
+  @override
+  String resolveTitle(BuildContext context);
+}
+
+final class TreasurySegment extends BaseSegment<TreasurySection> {
+  const TreasurySegment({
+    required super.id,
+    required super.sections,
   });
 
   @override
   String resolveTitle(BuildContext context) {
-    return context.l10n.setupCategories;
+    return context.l10n.treasuryCreateCampaign;
   }
 }

@@ -12,9 +12,7 @@
     "tracesSampleRate": 1.0,
     "profilesSampleRate": 1.0,
     "enableAutoSessionTracking": true,
-    "attachScreenshot": true,
     "attachViewHierarchy": true,
-    "debug": true,
     "diagnosticLevel": "debug"
   },
   "blockchain": {

@@ -19,38 +19,6 @@ class _ToggleStateTextState extends State<ToggleStateText> {
   final _tapActiveUser = TapGestureRecognizer();
 
   @override
-  void initState() {
-    super.initState();
-    _tapVisitor.onTap = () async {
-      await context.read<SessionCubit>().removeKeychain();
-    };
-    _tapGuest.onTap = () async {
-      final sessionBloc = context.read<SessionCubit>();
-
-      if (sessionBloc.state.isActive) {
-        await sessionBloc.lock();
-      } else if (sessionBloc.state.isVisitor) {
-        await sessionBloc.switchToDummyAccount().then((_) => sessionBloc.lock());
-      }
-    };
-    _tapActiveUser.onTap = () async {
-      final sessionBloc = context.read<SessionCubit>();
-
-      await sessionBloc
-          .switchToDummyAccount()
-          .then((_) => sessionBloc.unlock(Account.dummyUnlockFactor));
-    };
-  }
-
-  @override
-  void dispose() {
-    _tapVisitor.dispose();
-    _tapGuest.dispose();
-    _tapActiveUser.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Row(
       children: [
@@ -91,5 +59,37 @@ class _ToggleStateTextState extends State<ToggleStateText> {
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _tapVisitor.dispose();
+    _tapGuest.dispose();
+    _tapActiveUser.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _tapVisitor.onTap = () async {
+      await context.read<SessionCubit>().removeKeychain();
+    };
+    _tapGuest.onTap = () async {
+      final sessionBloc = context.read<SessionCubit>();
+
+      if (sessionBloc.state.isActive) {
+        await sessionBloc.lock();
+      } else if (sessionBloc.state.isVisitor) {
+        await sessionBloc.switchToDummyAccount().then((_) => sessionBloc.lock());
+      }
+    };
+    _tapActiveUser.onTap = () async {
+      final sessionBloc = context.read<SessionCubit>();
+
+      await sessionBloc.switchToDummyAccount().then(
+        (_) => sessionBloc.unlock(Account.dummyUnlockFactor),
+      );
+    };
   }
 }

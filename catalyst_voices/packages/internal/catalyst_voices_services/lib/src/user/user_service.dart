@@ -39,6 +39,12 @@ abstract interface class UserService implements ActiveAware {
     required RbacToken rbacToken,
   });
 
+  /// Refreshes the active account with the latest profile from the server.
+  Future<void> refreshActiveAccountProfile();
+
+  /// Refreshes the active account with the voting power from the server.
+  Future<void> refreshActiveAccountVotingPower();
+
   /// Registers a new [account] and makes it active.
   ///
   /// It can invoke some one-time registration logic,
@@ -65,8 +71,6 @@ abstract interface class UserService implements ActiveAware {
     String? email,
     Set<AccountRole>? roles,
   });
-
-  Future<void> updateActiveAccountDetails();
 
   Future<void> updateSettings(UserSettings newValue);
 
@@ -153,6 +157,43 @@ final class UserServiceImpl implements UserService {
       catalystId: catalystId,
       rbacToken: rbacToken,
     );
+  }
+
+  @override
+  Future<void> refreshActiveAccountProfile() async {
+    final user = await getUser();
+    final activeAccount = user.activeAccount;
+    if (activeAccount == null) {
+      return;
+    }
+
+    if (!activeAccount.publicStatus.isNotSetup) {
+      final publicProfile = await _userRepository.getAccountPublicProfile();
+      final publicProfileStatus = publicProfile?.status ?? AccountPublicStatus.unknown;
+      final updatedAccount = activeAccount.copyWith(
+        email: Optional(publicProfile?.email),
+        publicStatus: publicProfileStatus,
+      );
+      final updatedUser = user.updateAccount(updatedAccount);
+
+      await _updateUser(updatedUser);
+    }
+  }
+
+  @override
+  Future<void> refreshActiveAccountVotingPower() async {
+    final user = await getUser();
+    final activeAccount = user.activeAccount;
+    if (activeAccount == null) {
+      return;
+    }
+
+    final votingPower = await _userRepository.getVotingPower();
+    if (votingPower != activeAccount.votingPower) {
+      final updatedAccount = activeAccount.copyWith(votingPower: Optional(votingPower));
+      final updatedUser = user.updateAccount(updatedAccount);
+      await _updateUser(updatedUser);
+    }
   }
 
   @override
@@ -291,27 +332,6 @@ final class UserServiceImpl implements UserService {
       didChanged: didChanged,
       hasPendingEmailChange: hasPendingEmailChange,
     );
-  }
-
-  @override
-  Future<void> updateActiveAccountDetails() async {
-    final user = await getUser();
-    final activeAccount = user.activeAccount;
-    if (activeAccount == null) {
-      return;
-    }
-
-    if (!activeAccount.publicStatus.isNotSetup) {
-      final publicProfile = await _userRepository.getAccountPublicProfile();
-      final publicProfileStatus = publicProfile?.status ?? AccountPublicStatus.unknown;
-      final updatedAccount = activeAccount.copyWith(
-        email: Optional(publicProfile?.email),
-        publicStatus: publicProfileStatus,
-      );
-      final updatedUser = user.updateAccount(updatedAccount);
-
-      await _updateUser(updatedUser);
-    }
   }
 
   @override

@@ -47,8 +47,9 @@ void main() {
       // When
       when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
-      when(() => documentRepository.cacheDocument(ref: any(named: 'ref')))
-          .thenAnswer((_) => Future.error(const HttpException('Unknown ref')));
+      when(
+        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
+      ).thenAnswer((_) => Future.error(const HttpException('Unknown ref')));
 
       // Then
       expect(

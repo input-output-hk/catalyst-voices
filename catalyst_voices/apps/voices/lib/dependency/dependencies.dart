@@ -99,17 +99,15 @@ final class Dependencies extends DependencyProvider {
           get<ProposalService>(),
         ),
       )
-      ..registerFactory<CampaignDetailsBloc>(() {
-        return CampaignDetailsBloc(
+      ..registerLazySingleton<VotingCubit>(
+        () => VotingCubit(
+          get<UserService>(),
           get<CampaignService>(),
-        );
-      })
-      ..registerLazySingleton<CampaignInfoCubit>(() {
-        return CampaignInfoCubit(
-          get<CampaignService>(),
-          get<AdminTools>(),
-        );
-      })
+          get<ProposalService>(),
+          get<VotingBallotBuilder>(),
+          get<VotingService>(),
+        ),
+      )
       // TODO(LynxLynxx): add repository for campaign management
       ..registerLazySingleton<CampaignBuilderCubit>(
         CampaignBuilderCubit.new,
@@ -153,6 +151,8 @@ final class Dependencies extends DependencyProvider {
           get<CommentService>(),
           get<CampaignService>(),
           get<DocumentMapper>(),
+          get<VotingBallotBuilder>(),
+          get<VotingService>(),
         );
       })
       ..registerFactory<NewProposalCubit>(() {
@@ -160,11 +160,6 @@ final class Dependencies extends DependencyProvider {
           get<CampaignService>(),
           get<ProposalService>(),
           get<DocumentMapper>(),
-        );
-      })
-      ..registerFactory<CampaignStageCubit>(() {
-        return CampaignStageCubit(
-          get<CampaignService>(),
         );
       })
       ..registerFactory<DevToolsBloc>(() {
@@ -185,6 +180,20 @@ final class Dependencies extends DependencyProvider {
         return DocumentLookupBloc(
           get<DocumentsService>(),
           get<DocumentMapper>(),
+        );
+      })
+      ..registerFactory<CampaignPhaseAwareCubit>(() {
+        return CampaignPhaseAwareCubit(
+          get<CampaignService>(),
+          get<SyncManager>(),
+        );
+      })
+      ..registerFactory<VotingBallotBloc>(() {
+        return VotingBallotBloc(
+          get<UserService>(),
+          get<CampaignService>(),
+          get<VotingBallotBuilder>(),
+          get<VotingService>(),
         );
       });
   }
@@ -264,6 +273,11 @@ final class Dependencies extends DependencyProvider {
             get<DevToolsStorage>(),
           );
         },
+      )
+      ..registerLazySingleton<VotingRepository>(
+        () => VotingRepository(
+          get<CastedVotesObserver>(),
+        ),
       );
   }
 
@@ -336,6 +350,7 @@ final class Dependencies extends DependencyProvider {
       return CampaignService(
         get<CampaignRepository>(),
         get<ProposalRepository>(),
+        get<ActiveCampaignObserver>(),
       );
     });
     registerLazySingleton<ProposalService>(() {
@@ -344,7 +359,8 @@ final class Dependencies extends DependencyProvider {
         get<DocumentRepository>(),
         get<UserService>(),
         get<SignerService>(),
-        get<CampaignRepository>(),
+        get<ActiveCampaignObserver>(),
+        get<CastedVotesObserver>(),
       );
     });
     registerLazySingleton<CommentService>(() {
@@ -378,6 +394,13 @@ final class Dependencies extends DependencyProvider {
       return ShareService(
         get<ResourceUrlResolver>(),
         get<ResourceUrlResolver>(),
+      );
+    });
+    registerLazySingleton<VotingService>(() {
+      return VotingService(
+        get<VotingRepository>(),
+        get<ProposalService>(),
+        get<CampaignService>(),
       );
     });
   }
@@ -441,5 +464,11 @@ final class Dependencies extends DependencyProvider {
       dispose: (manager) => manager.dispose(),
     );
     registerLazySingleton<ShareManager>(() => DelegatingShareManager(get<ShareService>()));
+    registerLazySingleton<ActiveCampaignObserver>(
+      ActiveCampaignObserverImpl.new,
+      dispose: (observer) async => observer.dispose(),
+    );
+    registerLazySingleton<CastedVotesObserver>(CastedVotesObserverImpl.new);
+    registerLazySingleton<VotingBallotBuilder>(VotingBallotLocalBuilder.new);
   }
 }

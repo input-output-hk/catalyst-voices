@@ -7,20 +7,39 @@ class VoicesSegmentedButtonTheme extends SegmentedButtonThemeData {
     required VoicesColorScheme voicesColors,
     required TextTheme textTheme,
   }) : super(
-          selectedIcon: const Icon(Icons.check),
-          style: SegmentedButton.styleFrom(
-            foregroundColor: voicesColors.textOnPrimary,
-            backgroundColor: Colors.transparent,
-            selectedForegroundColor: colors.onPrimary,
-            selectedBackgroundColor: colors.primary,
-            disabledForegroundColor: voicesColors.iconsDisabled,
-            disabledBackgroundColor: Colors.transparent,
-            textStyle: textTheme.labelLarge,
-          ).copyWith(
-            side: _Side(colors: voicesColors),
-            iconColor: _IconColor(colors: voicesColors),
-          ),
-        );
+         selectedIcon: const Icon(Icons.check),
+         style:
+             SegmentedButton.styleFrom(
+               foregroundColor: voicesColors.textOnPrimary,
+               backgroundColor: Colors.transparent,
+               selectedForegroundColor: colors.onPrimary,
+               selectedBackgroundColor: colors.primary,
+               disabledForegroundColor: voicesColors.iconsDisabled,
+               disabledBackgroundColor: Colors.transparent,
+               textStyle: textTheme.labelLarge,
+             ).copyWith(
+               side: _Side(colors: voicesColors),
+               iconColor: _IconColor(colors: voicesColors),
+             ),
+       );
+}
+
+class _IconColor extends WidgetStateColor {
+  final VoicesColorScheme colors;
+
+  _IconColor({
+    required this.colors,
+  }) : super(
+         colors.iconsForeground.toARGB32(),
+       );
+
+  @override
+  Color resolve(Set<WidgetState> states) {
+    if (!states.contains(WidgetState.selected)) {
+      return colors.iconsForeground;
+    }
+    return colors.iconsBackground;
+  }
 }
 
 class _Side extends WidgetStateBorderSide {
@@ -37,23 +56,5 @@ class _Side extends WidgetStateBorderSide {
     }
 
     return BorderSide(color: colors.outlineBorder);
-  }
-}
-
-class _IconColor extends WidgetStateColor {
-  final VoicesColorScheme colors;
-
-  _IconColor({
-    required this.colors,
-  }) : super(
-          colors.iconsForeground.toARGB32(),
-        );
-
-  @override
-  Color resolve(Set<WidgetState> states) {
-    if (!states.contains(WidgetState.selected)) {
-      return colors.iconsForeground;
-    }
-    return colors.iconsBackground;
   }
 }

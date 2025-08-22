@@ -15,6 +15,8 @@ abstract interface class SyncManager {
     DocumentsService documentsService,
   ) = SyncManagerImpl;
 
+  Future<bool> get waitForSync;
+
   Future<void> dispose();
 
   Future<void> start();
@@ -27,6 +29,7 @@ final class SyncManagerImpl implements SyncManager {
   final _lock = Lock();
 
   Timer? _syncTimer;
+  var _synchronizationCompleter = Completer<bool>();
 
   SyncManagerImpl(
     this._statsStorage,
@@ -34,9 +37,16 @@ final class SyncManagerImpl implements SyncManager {
   );
 
   @override
+  Future<bool> get waitForSync => _synchronizationCompleter.future;
+
+  @override
   Future<void> dispose() async {
     _syncTimer?.cancel();
     _syncTimer = null;
+
+    if (!_synchronizationCompleter.isCompleted) {
+      _synchronizationCompleter.complete(false);
+    }
   }
 
   @override
@@ -59,6 +69,10 @@ final class SyncManagerImpl implements SyncManager {
   }
 
   Future<void> _startSynchronization() async {
+    if (_synchronizationCompleter.isCompleted) {
+      _synchronizationCompleter = Completer();
+    }
+
     final stopwatch = Stopwatch()..start();
 
     try {
@@ -80,10 +94,13 @@ final class SyncManagerImpl implements SyncManager {
       );
 
       _logger.fine('Synchronization completed. NewRefs[${newRefs.length}]');
+      _synchronizationCompleter.complete(true);
     } catch (error, stack) {
       stopwatch.stop();
 
       _logger.severe('Synchronization failed after ${stopwatch.elapsed}', error, stack);
+      _synchronizationCompleter.complete(false);
+
       rethrow;
     }
   }

@@ -1,67 +1,39 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/src/campaign/campaign_stage.dart';
 import 'package:test/test.dart';
 
 void main() {
   group(CampaignStage, () {
-    final date = DateTime(2024, 12, 3, 12);
     final campaign = Campaign(
-      id: 'id',
+      selfRef: SignedDocumentRef.generateFirstRef(),
       name: 'name',
       description: 'description',
-      startDate: date,
-      endDate: date,
-      proposalsCount: 0,
       publish: CampaignPublish.draft,
-      categoriesCount: 0,
+      allFunds: const Coin(0),
+      totalAsk: const Coin(0),
+      fundNumber: 1,
+      timeline: const CampaignTimeline(phases: []),
+      categories: const [],
     );
 
     test('draft campaign resolves to draft stage', () {
       final draftCampaign = campaign.copyWith(publish: CampaignPublish.draft);
 
       expect(
-        CampaignStage.fromCampaign(draftCampaign, date),
+        CampaignStage.fromCampaign(draftCampaign),
         equals(CampaignStage.draft),
-      );
-    });
-
-    test('scheduled campaign resolves to scheduled stage', () {
-      final scheduledCampaign = campaign.copyWith(
-        publish: CampaignPublish.published,
-        startDate: date.plusDays(1),
-        endDate: date.plusDays(2),
-      );
-
-      expect(
-        CampaignStage.fromCampaign(scheduledCampaign, date),
-        equals(CampaignStage.scheduled),
       );
     });
 
     test('live campaign resolves to live stage', () {
       final liveCampaign = campaign.copyWith(
         publish: CampaignPublish.published,
-        startDate: date.minusDays(1),
-        endDate: date.plusDays(2),
       );
 
       expect(
-        CampaignStage.fromCampaign(liveCampaign, date),
+        CampaignStage.fromCampaign(liveCampaign),
         equals(CampaignStage.live),
-      );
-    });
-
-    test('completed campaign resolves to completed stage', () {
-      final liveCampaign = campaign.copyWith(
-        publish: CampaignPublish.published,
-        startDate: date.minusDays(2),
-        endDate: date.minusDays(1),
-      );
-
-      expect(
-        CampaignStage.fromCampaign(liveCampaign, date),
-        equals(CampaignStage.completed),
       );
     });
   });

@@ -17,19 +17,14 @@ enum CampaignStage {
   live,
   completed;
 
-  /// Calculates the [campaign] stage at given [date].
-  factory CampaignStage.fromCampaign(Campaign campaign, DateTime date) {
+  // TODO(LynxLynxx): Return correct stage based on campaign phase and status when requirements
+  // are clear
+  factory CampaignStage.fromCampaign(Campaign campaign) {
     switch (campaign.publish) {
       case CampaignPublish.draft:
         return CampaignStage.draft;
       case CampaignPublish.published:
-        if (date.isBefore(campaign.startDate)) {
-          return CampaignStage.scheduled;
-        } else if (date.isAfter(campaign.endDate)) {
-          return CampaignStage.completed;
-        } else {
-          return CampaignStage.live;
-        }
+        return CampaignStage.live;
     }
   }
 
@@ -37,9 +32,9 @@ enum CampaignStage {
   bool get isDraft => this == CampaignStage.draft;
 
   String localizedName(VoicesLocalizations l10n) => switch (this) {
-        CampaignStage.draft => l10n.campaignStartingSoon,
-        CampaignStage.scheduled => l10n.campaignStartingSoon,
-        CampaignStage.live => l10n.campaignIsLive,
-        CampaignStage.completed => l10n.campaignConcluded,
-      };
+    CampaignStage.draft => l10n.campaignStartingSoon,
+    CampaignStage.scheduled => l10n.campaignStartingSoon,
+    CampaignStage.live => l10n.campaignIsLive,
+    CampaignStage.completed => l10n.campaignConcluded,
+  };
 }

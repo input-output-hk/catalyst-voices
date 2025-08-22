@@ -75,24 +75,24 @@ class _Countdown extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesCountdown(
       dateTime: date,
-      builder: (
-        context, {
-        required days,
-        required hours,
-        required minutes,
-        required seconds,
-      }) =>
-          Text(
-        context.l10n.catalystAppClosesIn(
-          days,
-          hours,
-          minutes,
-          seconds,
-        ),
-        style: context.textTheme.titleMedium?.copyWith(
-          color: context.colorScheme.primary,
-        ),
-      ),
+      builder:
+          (
+            context, {
+            required days,
+            required hours,
+            required minutes,
+            required seconds,
+          }) => Text(
+            context.l10n.catalystAppClosesIn(
+              days,
+              hours,
+              minutes,
+              seconds,
+            ),
+            style: context.textTheme.titleMedium?.copyWith(
+              color: context.colorScheme.primary,
+            ),
+          ),
     );
   }
 }
@@ -153,11 +153,11 @@ class _LeftSideState extends State<_LeftSide> {
           left: 20,
           child: CheckboxTheme(
             data: Theme.of(context).checkboxTheme.copyWith(
-                  side: BorderSide(
-                    color: context.colorScheme.primary,
-                    width: 2,
-                  ),
-                ),
+              side: BorderSide(
+                color: context.colorScheme.primary,
+                width: 2,
+              ),
+            ),
             child: VoicesCheckbox(
               value: isChecked,
               onChanged: _handleCheckboxChange,

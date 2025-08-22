@@ -7,8 +7,8 @@ class BlocRecoverSelector<T> extends BlocSelector<RegistrationCubit, Registratio
     required super.builder,
     super.bloc,
   }) : super(
-          selector: (state) {
-            return selector(state.recoverStateData);
-          },
-        );
+         selector: (state) {
+           return selector(state.recoverStateData);
+         },
+       );
 }

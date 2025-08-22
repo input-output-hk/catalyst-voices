@@ -25,20 +25,20 @@ final class ProposalBuilderBlocCache extends Equatable {
     this.isMaxProposalsLimitReached,
   });
 
+  bool get isEmailVerified => accountPublicStatus?.isVerified ?? false;
+
   @override
   List<Object?> get props => [
-        activeAccountId,
-        proposalBuilder,
-        proposalDocument,
-        proposalMetadata,
-        category,
-        commentTemplate,
-        comments,
-        accountPublicStatus,
-        isMaxProposalsLimitReached,
-      ];
-
-  bool get isEmailVerified => accountPublicStatus?.isVerified ?? false;
+    activeAccountId,
+    proposalBuilder,
+    proposalDocument,
+    proposalMetadata,
+    category,
+    commentTemplate,
+    comments,
+    accountPublicStatus,
+    isMaxProposalsLimitReached,
+  ];
 
   ProposalBuilderBlocCache copyWith({
     Optional<CatalystId>? activeAccountId,
@@ -60,8 +60,9 @@ final class ProposalBuilderBlocCache extends Equatable {
       commentTemplate: commentTemplate.dataOr(this.commentTemplate),
       comments: comments.dataOr(this.comments),
       accountPublicStatus: accountPublicStatus.dataOr(this.accountPublicStatus),
-      isMaxProposalsLimitReached:
-          isMaxProposalsLimitReached.dataOr(this.isMaxProposalsLimitReached),
+      isMaxProposalsLimitReached: isMaxProposalsLimitReached.dataOr(
+        this.isMaxProposalsLimitReached,
+      ),
     );
   }
 }
