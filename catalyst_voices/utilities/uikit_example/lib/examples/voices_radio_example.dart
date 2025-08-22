@@ -30,16 +30,18 @@ enum _Type {
 
 class _TypeRadio extends StatelessWidget {
   final _Type type;
-
   final _Type? groupValue;
   final bool toggleable;
   final ValueChanged<_Type?>? onChanged;
+  final bool enabled;
+
   const _TypeRadio(
     this.type, {
     super.key,
     this.groupValue,
     this.toggleable = false,
     this.onChanged,
+    this.enabled = true,
   });
 
   @override
@@ -48,14 +50,24 @@ class _TypeRadio extends StatelessWidget {
     final label = labelNote.label;
     final note = labelNote.note;
 
-    return VoicesRadio<_Type>(
-      value: type,
-      label: label != null ? Text(label) : null,
-      note: note != null ? Text(note) : null,
+    return RadioGroup<_Type>(
+      onChanged: _changeGroupValue,
       groupValue: groupValue,
-      toggleable: toggleable,
-      onChanged: onChanged,
+      child: VoicesRadio<_Type>(
+        value: type,
+        label: label != null ? Text(label) : null,
+        note: note != null ? Text(note) : null,
+        toggleable: toggleable,
+        enabled: enabled,
+      ),
     );
+  }
+
+  void _changeGroupValue(_Type? value) {
+    final onChanged = this.onChanged;
+    if (groupValue != value) {
+      onChanged?.call(value);
+    }
   }
 }
 
@@ -76,7 +88,8 @@ class _VoicesRadioExampleState extends State<VoicesRadioExample> {
             key: ObjectKey(type),
             groupValue: _current,
             toggleable: type == _Type.three,
-            onChanged: type != _Type.values.last ? _updateGroupSelection : null,
+            onChanged: _updateGroupSelection,
+            enabled: type != _Type.values.last,
           );
         },
         separatorBuilder: (context, index) => const SizedBox(height: 8),

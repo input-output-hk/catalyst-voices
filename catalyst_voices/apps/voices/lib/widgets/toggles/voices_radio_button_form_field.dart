@@ -18,9 +18,9 @@ class VoicesRadioButtonFormField extends VoicesFormField<String> {
     super.autovalidateMode = AutovalidateMode.onUserInteraction,
   }) : super(
          builder: (field) {
-           void onChangedHandler(String? value) {
-             field.didChange(value);
-             onChanged?.call(value);
+           void onChangedHandler(String? groupValue) {
+             field.didChange(groupValue);
+             onChanged?.call(groupValue);
            }
 
            return Column(
@@ -31,7 +31,7 @@ class VoicesRadioButtonFormField extends VoicesFormField<String> {
                  enabled: enabled,
                  items: items,
                  onChanged: onChangedHandler,
-                 value: field.value,
+                 groupValue: field.value,
                ),
                if (field.hasError) ...[
                  const SizedBox(height: 4),
@@ -50,19 +50,20 @@ class _RadioButtonList extends StatelessWidget {
   final bool enabled;
   final List<String> items;
   final ValueChanged<String?>? onChanged;
-  final String? value;
+  final String? groupValue;
 
   const _RadioButtonList({
     required this.enabled,
     required this.items,
     this.onChanged,
-    required this.value,
+    required this.groupValue,
   });
 
   @override
   Widget build(BuildContext context) {
-    return IgnorePointer(
-      ignoring: !enabled,
+    return RadioGroup<String>(
+      onChanged: _changeGroupValue,
+      groupValue: groupValue,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,13 +71,12 @@ class _RadioButtonList extends StatelessWidget {
             .map<Widget>(
               (e) => VoicesRadio<String>(
                 key: ValueKey(e),
-                value: e,
                 label: Text(
                   e,
                   style: getStyle(context, e),
                 ),
-                groupValue: value,
-                onChanged: onChanged,
+                value: e,
+                enabled: enabled,
               ),
             )
             .separatedBy(const SizedBox(height: 10))
@@ -87,11 +87,19 @@ class _RadioButtonList extends StatelessWidget {
 
   TextStyle? getStyle(BuildContext context, String? itemValue) {
     final textStyle = context.textTheme.bodyLarge;
-    if (enabled || value == itemValue) {
+    if (enabled || groupValue == itemValue) {
       return textStyle;
     }
     return textStyle?.copyWith(
       color: context.colors.textOnPrimaryLevel1,
     );
+  }
+
+  void _changeGroupValue(String? value) {
+    final onChanged = this.onChanged;
+
+    if (groupValue != value) {
+      onChanged?.call(value);
+    }
   }
 }

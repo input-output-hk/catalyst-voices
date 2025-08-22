@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class VoicesInputDecorationTheme extends InputDecorationTheme {
   VoicesInputDecorationTheme({
+    super.key,
     required TextTheme textTheme,
     required ColorScheme colorsScheme,
     required VoicesColorScheme colors,
