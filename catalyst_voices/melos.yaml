@@ -86,8 +86,8 @@ command:
   bootstrap:
     runPubGetInParallel: true
     environment:
-      sdk: ">=3.8.0 <4.0.0"
-      flutter: ">=3.32.8"
+      sdk: ">=3.9.0 <4.0.0"
+      flutter: ">=3.35.1"
     dependencies:
       auto_size_text: ^3.0.0
       async: ^2.13.0
