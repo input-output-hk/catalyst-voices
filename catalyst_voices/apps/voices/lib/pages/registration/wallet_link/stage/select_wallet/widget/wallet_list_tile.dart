@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/widgets/menu/voices_wallet_tile.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';

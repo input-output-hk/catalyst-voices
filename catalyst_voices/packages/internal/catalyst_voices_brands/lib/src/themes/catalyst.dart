@@ -110,6 +110,16 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
     Color(0xFF5A7AE5),
     Color(0xFFA55DCE),
   ],
+  votingPositivePrimary: Color(0xFF85E093),
+  votingPositiveHover: Color(0xFF5CD66F),
+  votingPositiveVoted: Color(0xFF29A33C),
+  votingAbstainPrimary: Color(0xFFBFC8D9),
+  votingAbstainHover: Color(0xFFD9DEE8),
+  votingAbstainVoted: Color(0xFF9FACC6),
+  votingNegativePrimary: Color(0xFFFF9999),
+  votingNegativeHover: Color(0xFFFF6666),
+  votingNegativeVoted: Color(0xFFFF6666),
+  votingOverlay: Color(0xA6000000),
 );
 
 const BrandAssets lightBrandAssets = BrandAssets(
@@ -211,6 +221,16 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
     Color(0xFFC0D5FB),
     Color(0xFFF9A5E0),
   ],
+  votingPositivePrimary: Color(0xFF1D722A),
+  votingPositiveHover: Color(0xFF218230),
+  votingPositiveVoted: Color(0xFF33C74A),
+  votingAbstainPrimary: Color(0xFF2D3953),
+  votingAbstainHover: Color(0xFF506288),
+  votingAbstainVoted: Color(0xFF7F90B3),
+  votingNegativePrimary: Color(0xFFCC0000),
+  votingNegativeHover: Color(0xFFF50000),
+  votingNegativeVoted: Color(0xFFFF6666),
+  votingOverlay: Color(0x33000000),
 );
 
 /// [ThemeData] for the `catalyst` brand.
@@ -383,7 +403,7 @@ ThemeData _buildThemeData(
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(
       color: colorScheme.primary,
-      linearTrackColor: colorScheme.secondaryContainer,
+      linearTrackColor: voicesColorScheme.onSurfaceNeutralOpaqueLv2,
       circularTrackColor: colorScheme.secondaryContainer,
       refreshBackgroundColor: colorScheme.secondaryContainer,
     ),

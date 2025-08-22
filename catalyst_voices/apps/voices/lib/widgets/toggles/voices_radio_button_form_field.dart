@@ -15,33 +15,33 @@ class VoicesRadioButtonFormField extends VoicesFormField<String> {
     super.autovalidateMode = AutovalidateMode.onUserInteraction,
     required List<String> items,
   }) : super(
-          builder: (field) {
-            void onChangedHandler(String? value) {
-              field.didChange(value);
-              onChanged?.call(value);
-            }
+         builder: (field) {
+           void onChangedHandler(String? value) {
+             field.didChange(value);
+             onChanged?.call(value);
+           }
 
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _RadioButtonList(
-                  enabled: enabled,
-                  items: items,
-                  onChanged: onChangedHandler,
-                  value: field.value,
-                ),
-                if (field.hasError) ...[
-                  const SizedBox(height: 4),
-                  DocumentErrorText(
-                    text: field.errorText,
-                    enabled: enabled,
-                  ),
-                ],
-              ],
-            );
-          },
-        );
+           return Column(
+             mainAxisSize: MainAxisSize.min,
+             crossAxisAlignment: CrossAxisAlignment.start,
+             children: [
+               _RadioButtonList(
+                 enabled: enabled,
+                 items: items,
+                 onChanged: onChangedHandler,
+                 value: field.value,
+               ),
+               if (field.hasError) ...[
+                 const SizedBox(height: 4),
+                 DocumentErrorText(
+                   text: field.errorText,
+                   enabled: enabled,
+                 ),
+               ],
+             ],
+           );
+         },
+       );
 }
 
 class _RadioButtonList extends StatelessWidget {

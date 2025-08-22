@@ -56,7 +56,8 @@ Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
   required Set<TransactionUnspentOutput> utxos,
   required ShelleyAddress rewardAddress,
 }) async {
-  const mnemonic = 'minute cause soda tilt taste cabin'
+  const mnemonic =
+      'minute cause soda tilt taste cabin'
       ' father body mixture box gym awkward';
 
   const keyDerivation = CatalystKeyDerivation();

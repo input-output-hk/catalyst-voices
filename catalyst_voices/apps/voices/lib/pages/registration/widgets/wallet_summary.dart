@@ -30,45 +30,45 @@ class WalletSummary extends StatelessWidget {
     final showExpectedNetworkId = this.showExpectedNetworkId;
 
     return Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            width: 1.5,
-            color: Theme.of(context).colors.outlineBorderVariant,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          width: 1.5,
+          color: Theme.of(context).colors.outlineBorderVariant,
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            key: const Key('WalletDetectionSummary'),
+            context.l10n.walletDetectionSummary,
+            style: Theme.of(context).textTheme.titleSmall,
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              key: const Key('WalletDetectionSummary'),
-              context.l10n.walletDetectionSummary,
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
+          const SizedBox(height: 12),
+          _WalletSummaryName(
+            walletName: walletName,
+          ),
+          const SizedBox(height: 12),
+          _WalletSummaryBalance(
+            balance: balance,
+            showLowBalance: showLowBalance,
+          ),
+          const SizedBox(height: 12),
+          _WalletSummaryAddress(
+            address: address,
+            clipboardAddress: clipboardAddress,
+          ),
+          if (showExpectedNetworkId != null) ...[
             const SizedBox(height: 12),
-            _WalletSummaryName(
-              walletName: walletName,
-            ),
-            const SizedBox(height: 12),
-            _WalletSummaryBalance(
-              balance: balance,
-              showLowBalance: showLowBalance,
-            ),
-            const SizedBox(height: 12),
-            _WalletSummaryAddress(
-              address: address,
-              clipboardAddress: clipboardAddress,
-            ),
-            if (showExpectedNetworkId != null) ...[
-              const SizedBox(height: 12),
-              _NetworkIdMismatchError(networkId: showExpectedNetworkId),
-            ],
-            const SizedBox(height: 12),
-            const _WalletBalanceNotice(),
+            _NetworkIdMismatchError(networkId: showExpectedNetworkId),
           ],
-        ),
+          const SizedBox(height: 12),
+          const _WalletBalanceNotice(),
+        ],
+      ),
     );
   }
 }
@@ -87,8 +87,8 @@ class _NetworkIdMismatchError extends StatelessWidget {
         networkId.localizedName(context),
       ),
       style: Theme.of(context).textTheme.labelSmall!.copyWith(
-            color: Theme.of(context).colors.iconsError,
-          ),
+        color: Theme.of(context).colors.iconsError,
+      ),
     );
   }
 }
@@ -106,8 +106,8 @@ class _WalletBalanceNotice extends StatelessWidget {
         Text(
           context.l10n.notice,
           style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
+            fontWeight: FontWeight.w800,
+          ),
         ),
         Text(
           context.l10n.walletLinkWalletDetailsNotice,
@@ -202,23 +202,29 @@ class _WalletSummaryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: DefaultTextStyle(
-            style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-            child: label,
+    final baseIdentifier = semanticsIdentifier ?? 'WalletSummaryItem';
+
+    return Semantics(
+      identifier: baseIdentifier,
+      container: true,
+      child: Row(
+        children: [
+          Expanded(
+            child: DefaultTextStyle(
+              style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+              child: label,
+            ),
           ),
-        ),
-        Expanded(
-          child: DefaultTextStyle(
-            style: Theme.of(context).textTheme.labelMedium!,
-            child: value,
+          Expanded(
+            child: DefaultTextStyle(
+              style: Theme.of(context).textTheme.labelMedium!,
+              child: value,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

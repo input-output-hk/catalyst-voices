@@ -11,15 +11,15 @@ final class CatalystCompressionWeb extends CatalystCompressionPlatform {
   /// plugin.
   CatalystCompressionWeb();
 
-  /// Registers this class as the default instance of
-  /// [CatalystCompressionPlatform].
-  static void registerWith(Registrar registrar) {
-    CatalystCompressionPlatform.instance = CatalystCompressionWeb();
-  }
-
   @override
   CatalystCompressor get brotli => const JSBrotliCompressor();
 
   @override
   CatalystCompressor get zstd => const JSZstdCompressor();
+
+  /// Registers this class as the default instance of
+  /// [CatalystCompressionPlatform].
+  static void registerWith(Registrar registrar) {
+    CatalystCompressionPlatform.instance = CatalystCompressionWeb();
+  }
 }

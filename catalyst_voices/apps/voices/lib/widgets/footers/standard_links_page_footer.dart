@@ -27,8 +27,9 @@ class StandardLinksPageFooter extends StatelessWidget {
         LinkText(
           'Documentation',
           onTap: () {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(const SnackBar(content: Text('Documentation')));
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Documentation')));
           },
         ),
         LinkText(

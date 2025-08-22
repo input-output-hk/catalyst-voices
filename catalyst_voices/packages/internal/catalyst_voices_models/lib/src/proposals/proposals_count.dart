@@ -6,24 +6,55 @@ final class ProposalsCount extends Equatable {
   final int drafts;
   final int finals;
   final int favorites;
+  final int favoritesFinals;
   final int my;
+  final int myFinals;
+  final int voted;
 
   const ProposalsCount({
     this.total = 0,
     this.drafts = 0,
     this.finals = 0,
     this.favorites = 0,
+    this.favoritesFinals = 0,
     this.my = 0,
+    this.myFinals = 0,
+    this.voted = 0,
   });
 
   @override
   List<Object?> get props => [
-        total,
-        drafts,
-        finals,
-        favorites,
-        my,
-      ];
+    total,
+    drafts,
+    finals,
+    favorites,
+    favoritesFinals,
+    my,
+    myFinals,
+    voted,
+  ];
+
+  ProposalsCount copyWith({
+    int? total,
+    int? drafts,
+    int? finals,
+    int? favorites,
+    int? favoritesFinals,
+    int? my,
+    int? myFinals,
+    int? voted,
+  }) {
+    return ProposalsCount(
+      total: total ?? this.total,
+      drafts: drafts ?? this.drafts,
+      finals: finals ?? this.finals,
+      favorites: favorites ?? this.favorites,
+      favoritesFinals: favoritesFinals ?? this.favoritesFinals,
+      my: my ?? this.my,
+      myFinals: myFinals ?? this.myFinals,
+      voted: voted ?? this.voted,
+    );
+  }
 
   int ofType(ProposalsFilterType type) {
     return switch (type) {
@@ -31,7 +62,10 @@ final class ProposalsCount extends Equatable {
       ProposalsFilterType.drafts => drafts,
       ProposalsFilterType.finals => finals,
       ProposalsFilterType.favorites => favorites,
+      ProposalsFilterType.favoritesFinals => favoritesFinals,
       ProposalsFilterType.my => my,
+      ProposalsFilterType.myFinals => myFinals,
+      ProposalsFilterType.voted => voted,
     };
   }
 
@@ -42,7 +76,10 @@ final class ProposalsCount extends Equatable {
         'drafts[$drafts], '
         'finals[$finals], '
         'favorites[$favorites], '
-        'my[$my]'
+        'favoritesFinals[$favoritesFinals], '
+        'my[$my], '
+        'myFinals[$myFinals], '
+        'voted[$voted]'
         ')';
   }
 }

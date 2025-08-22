@@ -11,21 +11,23 @@ mixin DocumentToSegmentMixin {
   }) {
     final result = <DocumentSegment>[];
 
-    final effectiveSegments =
-        document.segments.where((element) => !filterOut.contains(element.nodeId)).toList();
+    final effectiveSegments = document.segments
+        .where((element) => !filterOut.contains(element.nodeId))
+        .toList();
 
     for (final segment in effectiveSegments) {
       final sections = segment.sections
           .expand(DocumentNodeTraverser.findSectionsAndSubsections)
           .where((element) => !filterOut.contains(element.nodeId))
           .map((section) {
-        return DocumentSection(
-          id: section.schema.nodeId,
-          property: section,
-          schema: section.schema,
-          hasError: showValidationErrors && !section.isValidExcludingSubsections,
-        );
-      }).toList();
+            return DocumentSection(
+              id: section.schema.nodeId,
+              property: section,
+              schema: section.schema,
+              hasError: showValidationErrors && !section.isValidExcludingSubsections,
+            );
+          })
+          .toList();
 
       final documentSegment = DocumentSegment(
         id: segment.schema.nodeId,

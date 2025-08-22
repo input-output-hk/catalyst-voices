@@ -18,8 +18,7 @@ void main() {
     });
 
     group('Property-based tests for coin selection', () {
-      transactionPropertyTest(
-          'Coin selection should maintain accounting properties for '
+      transactionPropertyTest('Coin selection should maintain accounting properties for '
           'various UTxO and output combinations', (data) {
         final builder = data.builder;
 

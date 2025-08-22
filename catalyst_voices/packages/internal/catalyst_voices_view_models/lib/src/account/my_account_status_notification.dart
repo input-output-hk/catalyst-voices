@@ -4,6 +4,55 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
+final class AccountFinalized extends MyAccountStatusNotification {
+  const AccountFinalized()
+    : super(
+        type: MyAccountStatusNotificationType.success,
+      );
+
+  @override
+  SvgGenImage get icon => VoicesAssets.icons.check;
+
+  @override
+  String message(BuildContext context) {
+    return context.l10n.accountFinishedNotificationMessage;
+  }
+
+  @override
+  String title(BuildContext context) {
+    return context.l10n.accountFinishedNotificationTitle;
+  }
+
+  @override
+  String titleDesc(BuildContext context) {
+    return context.l10n.accountFinishedNotificationTitleDesc;
+  }
+}
+
+/// Base class that represents current user's account status.
+///
+/// This class is used to display a notification to the user about the status of their account.
+/// It contains the [type] of the notification and provides a localized title, description, and message.
+sealed class MyAccountStatusNotification extends Equatable {
+  final MyAccountStatusNotificationType type;
+
+  const MyAccountStatusNotification({
+    required this.type,
+  });
+
+  SvgGenImage get icon;
+
+  @override
+  @mustCallSuper
+  List<Object?> get props => [type];
+
+  String message(BuildContext context);
+
+  String title(BuildContext context);
+
+  String titleDesc(BuildContext context);
+}
+
 enum MyAccountStatusNotificationType {
   offstage,
   warning,
@@ -29,70 +78,21 @@ enum MyAccountStatusNotificationType {
   }
 }
 
-/// Base class that represents current user's account status.
-///
-/// This class is used to display a notification to the user about the status of their account.
-/// It contains the [type] of the notification and provides a localized title, description, and message.
-sealed class MyAccountStatusNotification extends Equatable {
-  final MyAccountStatusNotificationType type;
-
-  const MyAccountStatusNotification({
-    required this.type,
-  });
-
-  SvgGenImage get icon;
-
-  String title(BuildContext context);
-
-  String titleDesc(BuildContext context);
-
-  String message(BuildContext context);
-
-  @override
-  @mustCallSuper
-  List<Object?> get props => [type];
-}
-
 final class None extends MyAccountStatusNotification {
   const None()
-      : super(
-          type: MyAccountStatusNotificationType.offstage,
-        );
+    : super(
+        type: MyAccountStatusNotificationType.offstage,
+      );
 
   @override
   SvgGenImage get icon => VoicesAssets.icons.check;
+
+  @override
+  String message(BuildContext context) => '';
 
   @override
   String title(BuildContext context) => '';
 
   @override
   String titleDesc(BuildContext context) => '';
-
-  @override
-  String message(BuildContext context) => '';
-}
-
-final class AccountFinalized extends MyAccountStatusNotification {
-  const AccountFinalized()
-      : super(
-          type: MyAccountStatusNotificationType.success,
-        );
-
-  @override
-  SvgGenImage get icon => VoicesAssets.icons.check;
-
-  @override
-  String title(BuildContext context) {
-    return context.l10n.accountFinishedNotificationTitle;
-  }
-
-  @override
-  String titleDesc(BuildContext context) {
-    return context.l10n.accountFinishedNotificationTitleDesc;
-  }
-
-  @override
-  String message(BuildContext context) {
-    return context.l10n.accountFinishedNotificationMessage;
-  }
 }

@@ -24,14 +24,14 @@ final class ProposalViewHeader extends Equatable {
 
   @override
   List<Object?> get props => [
-        proposalRef,
-        title,
-        authorName,
-        createdAt,
-        commentsCount,
-        versions,
-        isFavorite,
-      ];
+    proposalRef,
+    title,
+    authorName,
+    createdAt,
+    commentsCount,
+    versions,
+    isFavorite,
+  ];
 
   ProposalViewHeader copyWith({
     Optional<DocumentRef>? proposalRef,

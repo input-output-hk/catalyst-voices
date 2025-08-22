@@ -6,22 +6,22 @@ final class RegistrationTransactionRole extends Equatable {
   final RegistrationTransactionRoleAction action;
 
   const RegistrationTransactionRole.set(AccountRole type)
-      : this._(
-          type,
-          RegistrationTransactionRoleAction.set,
-        );
+    : this._(
+        type,
+        RegistrationTransactionRoleAction.set,
+      );
 
   const RegistrationTransactionRole.undefined(AccountRole type)
-      : this._(
-          type,
-          RegistrationTransactionRoleAction.undefined,
-        );
+    : this._(
+        type,
+        RegistrationTransactionRoleAction.undefined,
+      );
 
   const RegistrationTransactionRole.unset(AccountRole type)
-      : this._(
-          type,
-          RegistrationTransactionRoleAction.unset,
-        );
+    : this._(
+        type,
+        RegistrationTransactionRoleAction.unset,
+      );
 
   const RegistrationTransactionRole._(this.type, this.action);
 

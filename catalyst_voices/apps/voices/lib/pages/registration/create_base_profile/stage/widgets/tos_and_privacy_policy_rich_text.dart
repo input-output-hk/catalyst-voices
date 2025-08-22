@@ -29,15 +29,15 @@ class _TosAndPrivacyPolicyRichTextState extends State<TosAndPrivacyPolicyRichTex
       placeholderSpanBuilder: (context, placeholder) {
         return switch (placeholder) {
           'tos' => TextSpan(
-              text: context.l10n.catalystTos,
-              recognizer: _tosRecognizer,
-              style: const TextStyle(decoration: TextDecoration.underline),
-            ),
+            text: context.l10n.catalystTos,
+            recognizer: _tosRecognizer,
+            style: const TextStyle(decoration: TextDecoration.underline),
+          ),
           'privacy_policy' => TextSpan(
-              text: context.l10n.catalystPrivacyPolicy,
-              recognizer: _privacyPolicyRecognizer,
-              style: const TextStyle(decoration: TextDecoration.underline),
-            ),
+            text: context.l10n.catalystPrivacyPolicy,
+            recognizer: _privacyPolicyRecognizer,
+            style: const TextStyle(decoration: TextDecoration.underline),
+          ),
           _ => throw ArgumentError('Unknown placeholder', placeholder),
         };
       },

@@ -58,7 +58,6 @@ class RestoredPanel extends StatelessWidget {
 
   void _redirectToDashboard(BuildContext context) {
     Navigator.of(context).pop();
-    const DiscoveryRoute().go(context);
   }
 
   void _redirectToMyAccount(BuildContext context) {

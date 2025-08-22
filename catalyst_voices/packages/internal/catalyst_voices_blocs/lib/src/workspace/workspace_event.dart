@@ -55,7 +55,7 @@ final class ImportProposalEvent extends WorkspaceEvent {
 }
 
 final class LoadProposalsEvent extends WorkspaceEvent {
-  final List<Proposal> proposals;
+  final List<UsersProposalOverview> proposals;
 
   const LoadProposalsEvent(this.proposals);
 

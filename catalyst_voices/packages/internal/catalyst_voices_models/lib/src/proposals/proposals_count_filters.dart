@@ -18,10 +18,10 @@ final class ProposalsCountFilters extends Equatable {
 
   @override
   List<Object?> get props => [
-        author,
-        onlyAuthor,
-        category,
-        searchQuery,
-        maxAge,
-      ];
+    author,
+    onlyAuthor,
+    category,
+    searchQuery,
+    maxAge,
+  ];
 }

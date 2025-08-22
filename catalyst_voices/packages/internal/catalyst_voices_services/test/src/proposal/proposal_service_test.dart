@@ -8,11 +8,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 void main() {
+  late MockActiveCampaignObserver mockActiveCampaignObserver;
   late MockDocumentRepository mockDocumentRepository;
   late MockProposalRepository mockProposalRepository;
   late MockUserService mockUserService;
-  late MockCampaignRepository mockCampaignRepository;
   late MockSignerService mockSignerService;
+  late MockCastedVotesObserver mockCastedVotesObserver;
 
   late ProposalService proposalService;
 
@@ -20,15 +21,17 @@ void main() {
     mockDocumentRepository = MockDocumentRepository();
     mockProposalRepository = MockProposalRepository();
     mockSignerService = MockSignerService();
-    mockCampaignRepository = MockCampaignRepository();
     mockUserService = MockUserService();
+    mockActiveCampaignObserver = MockActiveCampaignObserver();
+    mockCastedVotesObserver = MockCastedVotesObserver();
 
     proposalService = ProposalService(
       mockProposalRepository,
       mockDocumentRepository,
       mockUserService,
       mockSignerService,
-      mockCampaignRepository,
+      mockActiveCampaignObserver,
+      mockCastedVotesObserver,
     );
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
@@ -43,8 +46,7 @@ void main() {
   });
 
   group(ProposalService, () {
-    test(
-        'submitProposalForReview throws '
+    test('submitProposalForReview throws '
         '$ProposalLimitReachedException when over limit', () async {
       final proposalRef = SignedDocumentRef.generateFirstRef();
       final categoryId = SignedDocumentRef.generateFirstRef();
@@ -78,7 +80,9 @@ void main() {
   });
 }
 
-class MockCampaignRepository extends Mock implements CampaignRepository {}
+class MockActiveCampaignObserver extends Mock implements ActiveCampaignObserver {}
+
+class MockCastedVotesObserver extends Mock implements CastedVotesObserver {}
 
 class MockDocumentRepository extends Mock implements DocumentRepository {}
 

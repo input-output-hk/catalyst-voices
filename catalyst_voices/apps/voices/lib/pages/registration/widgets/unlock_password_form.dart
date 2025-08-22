@@ -48,27 +48,6 @@ class UnlockPasswordForm extends StatelessWidget {
   }
 }
 
-class _UnlockPasswordTextField extends StatelessWidget {
-  final TextEditingController controller;
-
-  const _UnlockPasswordTextField({
-    required this.controller,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesPasswordTextField(
-      key: const Key('PasswordInputField'),
-      semanticsIdentifier: 'PasswordInputField',
-      controller: controller,
-      textInputAction: TextInputAction.next,
-      decoration: VoicesTextFieldDecoration(
-        labelText: context.l10n.enterPassword,
-      ),
-    );
-  }
-}
-
 class _ConfirmUnlockPasswordTextField extends StatelessWidget {
   final TextEditingController controller;
   final bool showError;
@@ -113,6 +92,27 @@ class _PasswordStrength extends StatelessWidget {
       offstage: !visible,
       child: VoicesPasswordStrengthIndicator(
         passwordStrength: strength,
+      ),
+    );
+  }
+}
+
+class _UnlockPasswordTextField extends StatelessWidget {
+  final TextEditingController controller;
+
+  const _UnlockPasswordTextField({
+    required this.controller,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesPasswordTextField(
+      key: const Key('PasswordInputField'),
+      semanticsIdentifier: 'PasswordInputField',
+      controller: controller,
+      textInputAction: TextInputAction.next,
+      decoration: VoicesTextFieldDecoration(
+        labelText: context.l10n.enterPassword,
       ),
     );
   }

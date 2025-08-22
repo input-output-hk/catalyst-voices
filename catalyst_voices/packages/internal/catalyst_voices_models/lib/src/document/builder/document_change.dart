@@ -2,6 +2,22 @@ import 'package:catalyst_voices_models/src/document/document.dart';
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
 import 'package:equatable/equatable.dart';
 
+/// Describes an intent to add a new (empty) item in a [DocumentListProperty].
+final class DocumentAddListItemChange extends DocumentChange {
+  /// The [DocumentNodeId] of the [DocumentListProperty]
+  /// where the new item will be added.
+  @override
+  final DocumentNodeId nodeId;
+
+  /// The default constructor for the [DocumentAddListItemChange].
+  const DocumentAddListItemChange({
+    required this.nodeId,
+  });
+
+  @override
+  List<Object?> get props => [nodeId];
+}
+
 /// Describes an intent to change a document.
 ///
 /// This allows to enqueue changes coming
@@ -18,6 +34,22 @@ sealed class DocumentChange extends Equatable {
     final targetedNodeId = nodeId;
     return targetedNodeId == node.nodeId || targetedNodeId.isChildOf(node.nodeId);
   }
+}
+
+/// Describes an intent to remove an item from the [DocumentListProperty].
+final class DocumentRemoveListItemChange extends DocumentChange {
+  /// The [DocumentNodeId] of the child in [DocumentListProperty]
+  /// which is going to be removed.
+  @override
+  final DocumentNodeId nodeId;
+
+  /// The default constructor for the [DocumentRemoveListItemChange].
+  const DocumentRemoveListItemChange({
+    required this.nodeId,
+  });
+
+  @override
+  List<Object?> get props => [nodeId];
 }
 
 /// Describes an intent to change a property value in the document.
@@ -37,36 +69,4 @@ final class DocumentValueChange<T extends Object> extends DocumentChange {
 
   @override
   List<Object?> get props => [nodeId, value];
-}
-
-/// Describes an intent to add a new (empty) item in a [DocumentListProperty].
-final class DocumentAddListItemChange extends DocumentChange {
-  /// The [DocumentNodeId] of the [DocumentListProperty]
-  /// where the new item will be added.
-  @override
-  final DocumentNodeId nodeId;
-
-  /// The default constructor for the [DocumentAddListItemChange].
-  const DocumentAddListItemChange({
-    required this.nodeId,
-  });
-
-  @override
-  List<Object?> get props => [nodeId];
-}
-
-/// Describes an intent to remove an item from the [DocumentListProperty].
-final class DocumentRemoveListItemChange extends DocumentChange {
-  /// The [DocumentNodeId] of the child in [DocumentListProperty]
-  /// which is going to be removed.
-  @override
-  final DocumentNodeId nodeId;
-
-  /// The default constructor for the [DocumentRemoveListItemChange].
-  const DocumentRemoveListItemChange({
-    required this.nodeId,
-  });
-
-  @override
-  List<Object?> get props => [nodeId];
 }

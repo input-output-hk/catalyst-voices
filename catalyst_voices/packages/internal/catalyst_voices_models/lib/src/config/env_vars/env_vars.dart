@@ -9,8 +9,8 @@ final class EnvVars extends Equatable {
 
   @override
   List<Object?> get props => [
-        envName,
-      ];
+    envName,
+  ];
 
   EnvVars copyWith({
     String? envName,

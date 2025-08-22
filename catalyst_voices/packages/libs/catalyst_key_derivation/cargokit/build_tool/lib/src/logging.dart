@@ -5,10 +5,26 @@ import 'dart:io';
 
 import 'package:logging/logging.dart';
 
-const String kSeparator = "--";
 const String kDoubleSeparator = "==";
+const String kSeparator = "--";
 
 bool _lastMessageWasSeparator = false;
+
+void enableVerboseLogging() {
+  Logger.root.level = Level.ALL;
+}
+
+void initLogging() {
+  Logger.root.level = Level.INFO;
+  Logger.root.onRecord.listen((LogRecord rec) {
+    final lines = rec.message.split('\n');
+    for (final line in lines) {
+      if (line.isNotEmpty || lines.length == 1 || line != lines.last) {
+        _log(LogRecord(rec.level, line, rec.loggerName));
+      }
+    }
+  });
+}
 
 void _log(LogRecord rec) {
   final prefix = '${rec.level.name}: ';
@@ -29,24 +45,4 @@ void _log(LogRecord rec) {
   out.write(prefix);
   out.writeln(rec.message);
   _lastMessageWasSeparator = false;
-}
-
-void initLogging() {
-  Logger.root.level = Level.INFO;
-  Logger.root.onRecord.listen((LogRecord rec) {
-    final lines = rec.message.split('\n');
-    for (final line in lines) {
-      if (line.isNotEmpty || lines.length == 1 || line != lines.last) {
-        _log(LogRecord(
-          rec.level,
-          line,
-          rec.loggerName,
-        ));
-      }
-    }
-  });
-}
-
-void enableVerboseLogging() {
-  Logger.root.level = Level.ALL;
 }

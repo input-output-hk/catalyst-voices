@@ -6,6 +6,7 @@ import 'package:catalyst_voices/pages/proposal/tiles/proposal_document_section_t
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_document_segment_title.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_metadata_tile.dart';
 import 'package:catalyst_voices/pages/proposal/tiles/proposal_overview_tile.dart';
+import 'package:catalyst_voices/pages/proposal/tiles/proposal_voting_overview.dart';
 import 'package:catalyst_voices/widgets/comment/proposal_add_comment_tile.dart';
 import 'package:catalyst_voices/widgets/comment/proposal_comments_header_tile.dart';
 import 'package:catalyst_voices/widgets/tiles/specialized/proposal_tile_decoration.dart';
@@ -109,6 +110,7 @@ class _SegmentsListView extends StatelessWidget {
         final isNextSectionOrComment = nextItem is Section || isNextComment;
         final isCommentsSegment = item is ProposalCommentsSegment;
         final isNotEmptyCommentsSegment = isCommentsSegment && item.hasComments;
+        final isVotingStatusSection = item is ProposalVotingStatusSection;
 
         return ProposalTileDecoration(
           key: ValueKey('Proposal.${item.id.value}.Tile'),
@@ -118,7 +120,8 @@ class _SegmentsListView extends StatelessWidget {
           ),
           verticalPadding: (
             isFirst: isSegment,
-            isLast: !isNextSectionOrComment || isNotEmptyCommentsSegment,
+            isLast:
+                (!isNextSectionOrComment && !isVotingStatusSection) || isNotEmptyCommentsSegment,
           ),
           child: _buildItem(context, item, readOnlyModeOrMobile),
         );
@@ -143,7 +146,7 @@ class _SegmentsListView extends StatelessWidget {
           return const SizedBox(height: 32);
         }
 
-        if (nextItem is Segment) {
+        if (nextItem is Segment && item is! ProposalVotingStatusSection) {
           return const VoicesDivider.expanded(height: 1);
         }
 
@@ -154,62 +157,66 @@ class _SegmentsListView extends StatelessWidget {
 
   Widget _buildItem(BuildContext context, SegmentsListViewItem item, bool readOnlyModeOrMobile) {
     return switch (item) {
+      ProposalVotingOverviewSegment() => const SizedBox.shrink(),
+      ProposalVotingOverviewSection() => switch (item) {
+        ProposalVotingStatusSection(:final data) => ProposalVotingOverview(data),
+      },
       ProposalOverviewSegment(
         :final categoryName,
         :final proposalTitle,
+        :final isVotingStage,
       ) =>
         ProposalOverviewTile(
           categoryName: categoryName,
           proposalTitle: proposalTitle,
+          isVotingStage: isVotingStage,
         ),
       ProposalOverviewSection() => switch (item) {
-          ProposalMetadataSection(:final data) => ProposalMetadataTile(
-              author: data.author,
-              description: data.description,
-              status: data.status,
-              createdAt: data.createdAt,
-              warningCreatedAt: data.warningCreatedAt,
-              tag: data.tag,
-              commentsCount: data.commentsCount,
-              fundsRequested: data.fundsRequested,
-              projectDuration: data.projectDuration,
-              milestoneCount: data.milestoneCount,
-            ),
-        },
+        ProposalMetadataSection(:final data) => ProposalMetadataTile(
+          author: data.author,
+          description: data.description,
+          status: data.status,
+          createdAt: data.createdAt,
+          warningCreatedAt: data.warningCreatedAt,
+          tag: data.tag,
+          commentsCount: data.commentsCount,
+          fundsRequested: data.fundsRequested,
+          projectDuration: data.projectDuration,
+          milestoneCount: data.milestoneCount,
+        ),
+      },
       DocumentSegment() => ProposalDocumentSegmentTitle(
-          title: item.resolveTitle(context),
-        ),
+        title: item.resolveTitle(context),
+      ),
       DocumentSection(:final property) => ProposalDocumentSectionTile(
-          property: property,
-        ),
+        property: property,
+      ),
       ProposalCommentsSegment(:final sort) => ProposalCommentsHeaderTile(
-          sort: sort,
-          showSort: item.hasComments,
-          onChanged: (value) {
-            context.read<ProposalCubit>().updateCommentsSort(sort: value);
-          },
-        ),
-      ProposalCommentsSection() => switch (item) {
-          ProposalViewCommentsSection() => const SizedBox.shrink(),
-          ProposalAddCommentSection(
-            :final schema,
-            :final showUsernameRequired,
-          )
-              when !readOnlyModeOrMobile =>
-            ProposalAddCommentTile(
-              schema: schema,
-              showUsernameRequired: showUsernameRequired,
-              onSubmit: ({required document, reply}) async {
-                return context
-                    .read<ProposalCubit>()
-                    .submitComment(document: document, reply: reply);
-              },
-              onUsernamePicked: (value) {
-                unawaited(context.read<ProposalCubit>().updateUsername(value));
-              },
-            ),
-          _ => const SizedBox.shrink(),
+        sort: sort,
+        showSort: item.hasComments,
+        onChanged: (value) {
+          context.read<ProposalCubit>().updateCommentsSort(sort: value);
         },
+      ),
+      ProposalCommentsSection() => switch (item) {
+        ProposalViewCommentsSection() => const SizedBox.shrink(),
+        ProposalAddCommentSection(
+          :final schema,
+          :final showUsernameRequired,
+        )
+            when !readOnlyModeOrMobile =>
+          ProposalAddCommentTile(
+            schema: schema,
+            showUsernameRequired: showUsernameRequired,
+            onSubmit: ({required document, reply}) async {
+              return context.read<ProposalCubit>().submitComment(document: document, reply: reply);
+            },
+            onUsernamePicked: (value) {
+              unawaited(context.read<ProposalCubit>().updateUsername(value));
+            },
+          ),
+        _ => const SizedBox.shrink(),
+      },
       ProposalCommentListItem(
         :final comment,
         :final canReply,

@@ -20,11 +20,11 @@ final class SyncStatsDto {
   }
 
   SyncStatsDto.fromModel(SyncStats data)
-      : this(
-          lastSuccessfulSyncAt: data.lastSuccessfulSyncAt,
-          lastAddedRefsCount: data.lastAddedRefsCount,
-          lastSyncDuration: data.lastSyncDuration,
-        );
+    : this(
+        lastSuccessfulSyncAt: data.lastSuccessfulSyncAt,
+        lastAddedRefsCount: data.lastAddedRefsCount,
+        lastSyncDuration: data.lastSyncDuration,
+      );
 
   Map<String, dynamic> toJson() => _$SyncStatsDtoToJson(this);
 

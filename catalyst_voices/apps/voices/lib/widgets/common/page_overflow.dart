@@ -50,8 +50,8 @@ class RenderPageOverflow extends RenderAligningShiftedBox {
     required super.alignment,
     required TextDirection super.textDirection,
     super.child,
-  })  : _width = width,
-        _height = height;
+  }) : _width = width,
+       _height = height;
 
   double? get height => _height;
 

@@ -135,15 +135,15 @@ final class DatabaseDocumentsDataSource
   }) {
     return _database.documentsDao
         .watchAll(
-      limit: limit,
-      unique: unique,
-      type: type,
-      authorId: authorId,
-      refTo: refTo,
-    )
+          limit: limit,
+          unique: unique,
+          type: type,
+          authorId: authorId,
+          refTo: refTo,
+        )
         .map((entities) {
-      return List<DocumentData>.from(entities.map((e) => e.toModel()));
-    });
+          return List<DocumentData>.from(entities.map((e) => e.toModel()));
+        });
   }
 
   @override

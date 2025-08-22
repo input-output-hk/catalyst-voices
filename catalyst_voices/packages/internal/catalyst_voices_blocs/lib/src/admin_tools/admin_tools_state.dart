@@ -13,6 +13,9 @@ final class AdminToolsState extends Equatable {
     this.sessionStatus = SessionStatus.actor,
   });
 
+  @override
+  List<Object?> get props => [enabled, campaignStage, sessionStatus];
+
   AdminToolsState copyWith({
     bool? enabled,
     CampaignStage? campaignStage,
@@ -24,7 +27,4 @@ final class AdminToolsState extends Equatable {
       sessionStatus: sessionStatus ?? this.sessionStatus,
     );
   }
-
-  @override
-  List<Object?> get props => [enabled, campaignStage, sessionStatus];
 }

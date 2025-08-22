@@ -20,7 +20,7 @@ void main() {
       title: 'Test Title',
       description: 'Test Description',
       timeline: timeline,
-      stage: CampaignTimelineStage.proposalSubmission,
+      type: CampaignPhaseType.proposalSubmission,
     );
 
     testWidgets(
@@ -96,7 +96,7 @@ void main() {
             from: DateTime.now().subtract(const Duration(days: 1)),
             to: DateTime.now().add(const Duration(days: 1)),
           ),
-          stage: CampaignTimelineStage.proposalSubmission,
+          type: CampaignPhaseType.proposalSubmission,
         );
 
         final widget = CampaignTimelineCard(
@@ -118,15 +118,17 @@ void main() {
         final ongoingText = tester.widget<Text>(ongoingTextWidget);
         expect(ongoingText.style?.color, Colors.white);
 
-        final offstage = find
-            .ancestor(
-              of: ongoingTextWidget,
-              matching: find.byType(Offstage),
-              matchRoot: true,
-            )
-            .evaluate()
-            .first
-            .widget as Offstage;
+        final offstage =
+            find
+                    .ancestor(
+                      of: ongoingTextWidget,
+                      matching: find.byType(Offstage),
+                      matchRoot: true,
+                    )
+                    .evaluate()
+                    .first
+                    .widget
+                as Offstage;
 
         expect(offstage.offstage, isFalse);
       },

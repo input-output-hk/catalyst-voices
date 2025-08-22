@@ -20,8 +20,11 @@ class ProposalBuilderValidationSnackbarOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
-        ProposalBuilderValidationErrors?>(
+    return BlocSelector<
+      ProposalBuilderBloc,
+      ProposalBuilderState,
+      ProposalBuilderValidationErrors?
+    >(
       selector: (state) => state.validationErrors,
       builder: (context, state) {
         return Stack(
@@ -35,7 +38,8 @@ class ProposalBuilderValidationSnackbarOverlay extends StatelessWidget {
                 child: Center(
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
-                      maxWidth: VoicesSnackBar.calculateSnackBarWidth(
+                      maxWidth:
+                          VoicesSnackBar.calculateSnackBarWidth(
                             behavior: SnackBarBehavior.floating,
                             screenWidth: MediaQuery.sizeOf(context).width,
                           ) ??
@@ -70,7 +74,7 @@ class _ClearedSnackbar extends StatelessWidget {
       },
       buttonText: switch (origin) {
         ProposalBuilderValidationOrigin.shareDraft => context.l10n.shareNewDraft,
-        ProposalBuilderValidationOrigin.submitForReview => context.l10n.submitForReview
+        ProposalBuilderValidationOrigin.submitForReview => context.l10n.submitForReview,
       },
       buttonAction: () {
         final event = switch (origin) {
@@ -191,11 +195,11 @@ class _PendingSnackbar extends StatelessWidget {
       buttonAction: () {
         final event = switch (showAll) {
           true => const UpdateProposalBuilderValidationStatusEvent(
-              status: ProposalBuilderValidationStatus.pendingHideAll,
-            ),
+            status: ProposalBuilderValidationStatus.pendingHideAll,
+          ),
           false => const UpdateProposalBuilderValidationStatusEvent(
-              status: ProposalBuilderValidationStatus.pendingShowAll,
-            ),
+            status: ProposalBuilderValidationStatus.pendingShowAll,
+          ),
         };
 
         context.read<ProposalBuilderBloc>().add(event);

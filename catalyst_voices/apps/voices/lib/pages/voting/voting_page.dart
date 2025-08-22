@@ -1,246 +1,232 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_voices/widgets/cards/proposal/pending_proposal_card.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'dart:async';
+
+import 'package:catalyst_voices/common/error_handler.dart';
+import 'package:catalyst_voices/common/signal_handler.dart';
+import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
+import 'package:catalyst_voices/pages/campaign_phase_aware/campaign_phase_aware.dart';
+import 'package:catalyst_voices/pages/voting/widgets/content/pre_voting_content.dart';
+import 'package:catalyst_voices/pages/voting/widgets/content/voting_background.dart';
+import 'package:catalyst_voices/pages/voting/widgets/content/voting_content.dart';
+import 'package:catalyst_voices/pages/voting/widgets/header/voting_header.dart';
+import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/widgets/layouts/header_and_content_layout.dart';
+import 'package:catalyst_voices/widgets/pagination/paging_controller.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab_controller.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 
-final _favoriteProposals = ValueNotifier<List<PendingProposal>>([]);
+class VotingPage extends StatefulWidget {
+  final SignedDocumentRef? categoryId;
+  final VotingPageTab? tab;
+  final bool keychainDeleted;
 
-final _proposalDescription = """
-Zanzibar is becoming one of the hotspots for DID's through
-World Mobile and PRISM, but its potential is only barely exploited.
-Zanzibar is becoming one of the hotspots for DID's through World Mobile
-and PRISM, but its potential is only barely exploited.
-"""
-    .replaceAll('\n', ' ');
+  const VotingPage({
+    super.key,
+    this.categoryId,
+    this.tab,
+    this.keychainDeleted = false,
+  });
 
-final _proposals = [
-  PendingProposal(
-    ref: SignedDocumentRef.generateFirstRef(),
-    campaignName: 'F14',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    lastUpdateDate: DateTime.now().minusDays(2),
-    fundsRequested: const Coin.fromWholeAda(100000),
-    commentsCount: 0,
-    description: _proposalDescription,
-    publishStage: ProposalPublish.publishedDraft,
-    version: 1,
-    duration: 6,
-    author: 'Alex Wells',
-  ),
-  PendingProposal(
-    ref: SignedDocumentRef.generateFirstRef(),
-    campaignName: 'F14',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    lastUpdateDate: DateTime.now().minusDays(2),
-    fundsRequested: const Coin.fromWholeAda(100000),
-    commentsCount: 0,
-    description: _proposalDescription,
-    publishStage: ProposalPublish.submittedProposal,
-    version: 1,
-    duration: 6,
-    author: 'Alex Wells',
-  ),
-  PendingProposal(
-    ref: SignedDocumentRef.generateFirstRef(),
-    campaignName: 'F14',
-    category: 'Cardano Use Cases / MVP',
-    title: 'Proposal Title that rocks the world',
-    lastUpdateDate: DateTime.now().minusDays(2),
-    fundsRequested: const Coin.fromWholeAda(100000),
-    commentsCount: 0,
-    description: _proposalDescription,
-    publishStage: ProposalPublish.publishedDraft,
-    version: 1,
-    duration: 6,
-    author: 'Alex Wells',
-  ),
-];
-
-void _onFavoriteChanged(PendingProposal proposal, bool isFavorite) {
-  final proposals = Set.of(_favoriteProposals.value);
-  if (isFavorite) {
-    proposals.add(proposal);
-  } else {
-    proposals.remove(proposal);
-  }
-  _favoriteProposals.value = proposals.toList();
+  @override
+  State<VotingPage> createState() => _VotingPageState();
 }
 
-class VotingPage extends StatelessWidget {
-  const VotingPage({super.key});
+class _VotingPageState extends State<VotingPage>
+    with
+        TickerProviderStateMixin,
+        ErrorHandlerStateMixin<VotingCubit, VotingPage>,
+        SignalHandlerStateMixin<VotingCubit, VotingSignal, VotingPage> {
+  late VoicesTabController<VotingPageTab> _tabController;
+  late final PagingController<ProposalBriefVoting> _pagingController;
+  late final StreamSubscription<List<VotingPageTab>> _tabsSubscription;
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
-      children: const [
-        SizedBox(height: 44),
-        _Header(),
-        SizedBox(height: 44),
-        _Tabs(),
-      ],
-    );
-  }
-}
-
-class _AllProposals extends StatelessWidget {
-  const _AllProposals();
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<List<PendingProposal>>(
-      valueListenable: _favoriteProposals,
-      builder: (context, favoriteProposals, child) {
-        return Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: [
-            for (final proposal in _proposals)
-              PendingProposalCard(
-                proposal: proposal,
-                isFavorite: favoriteProposals.contains(proposal),
-                onFavoriteChanged: (isFavorite) => _onFavoriteChanged(proposal, isFavorite),
-              ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _FavoriteProposals extends StatelessWidget {
-  const _FavoriteProposals();
-
-  @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<List<PendingProposal>>(
-      valueListenable: _favoriteProposals,
-      builder: (context, favoriteProposals, child) {
-        return Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          children: [
-            for (final proposal in favoriteProposals)
-              PendingProposalCard(
-                proposal: proposal,
-                isFavorite: true,
-                onFavoriteChanged: (isFavorite) => _onFavoriteChanged(proposal, isFavorite),
-              ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocBuilder<SessionCubit, SessionState>(
-      builder: (context, state) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              context.l10n.activeVotingRound,
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-            if (state.isActive) const _UnlockedHeaderActions(),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _Tabs extends StatelessWidget {
-  const _Tabs();
-
-  @override
-  Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TabBar(
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
-            tabs: [
-              Tab(
-                text: context.l10n.noOfAll(_proposals.length),
-              ),
-              Tab(
-                child: Row(
-                  children: [
-                    VoicesAssets.icons.starOutlined.buildIcon(),
-                    const SizedBox(width: 8),
-                    Text(context.l10n.favorites),
-                  ],
-                ),
-              ),
-            ],
+    return SelectionArea(
+      child: CampaignPhaseAware.when(
+        phase: CampaignPhaseType.communityVoting,
+        upcoming: (_, phase, fundNumber) => HeaderAndContentLayout(
+          header: const VotingHeader(),
+          content: PreVotingContent(phase: phase, fundNumber: fundNumber),
+          background: const VotingBackground(),
+          separateHeaderAndContent: false,
+        ),
+        active: (_, __, ___) => HeaderAndContentLayout(
+          header: const VotingHeader(),
+          content: VotingContent(
+            tabController: _tabController,
+            pagingController: _pagingController,
           ),
-          const SizedBox(height: 24),
-          const TabBarStackView(
-            children: [
-              _AllProposals(),
-              _FavoriteProposals(),
-            ],
+        ),
+        post: (_, __, ___) => HeaderAndContentLayout(
+          header: const VotingHeader(),
+          content: VotingContent(
+            tabController: _tabController,
+            pagingController: _pagingController,
           ),
-          const SizedBox(height: 12),
-        ],
+        ),
       ),
     );
   }
-}
-
-class _UnlockedHeaderActions extends StatelessWidget {
-  const _UnlockedHeaderActions();
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        SizedBox(
-          width: 256,
-          child: VoicesTextField(
-            decoration: VoicesTextFieldDecoration(
-              labelText: 'Show',
-              hintText: 'Fund 14',
-              suffixIcon: VoicesAssets.icons.arrowTriangleDown.buildIcon(size: 16),
-            ),
-            onFieldSubmitted: (value) {},
-          ),
-        ),
-        const SizedBox(width: 16),
-        SizedBox(
-          width: 256,
-          child: VoicesTextField(
-            decoration: VoicesTextFieldDecoration(
-              labelText: 'Field label',
-              hintText: 'Search proposals',
-              prefixIcon: VoicesAssets.icons.search.buildIcon(),
-            ),
-            onFieldSubmitted: (value) {},
-          ),
-        ),
-        IconButton(
-          onPressed: () {},
-          icon: VoicesAssets.icons.filter.buildIcon(),
-        ),
-      ],
+  void didUpdateWidget(VotingPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final tab = widget.tab ?? VotingPageTab.total;
+
+    if (widget.categoryId != oldWidget.categoryId || widget.tab != oldWidget.tab) {
+      context.read<VotingCubit>().changeFilters(
+        onlyMy: Optional(tab == VotingPageTab.my),
+        category: Optional(widget.categoryId),
+        type: tab.filter,
+      );
+
+      _doResetPagination();
+    }
+
+    if (widget.tab != oldWidget.tab) {
+      _tabController.animateToTab(tab);
+    }
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _pagingController.dispose();
+    unawaited(_tabsSubscription.cancel());
+    super.dispose();
+  }
+
+  @override
+  void handleSignal(VotingSignal signal) {
+    switch (signal) {
+      case ChangeCategoryVotingSignal(:final to):
+        _updateRoute(categoryId: Optional(to?.id));
+      case ChangeTabVotingSignal(:final tab):
+        _updateRoute(tab: tab);
+      case ResetPaginationVotingSignal():
+        _doResetPagination();
+      case PageReadyVotingSignal(:final page):
+        _pagingController.value = _pagingController.value.copyWith(
+          currentPage: page.page,
+          maxResults: page.total,
+          itemList: page.items,
+          error: const Optional.empty(),
+          isLoading: false,
+        );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final votingCubit = context.read<VotingCubit>();
+    final sessionCubit = context.read<SessionCubit>();
+    final supportedTabs = _determineTabs(sessionCubit.state.isProposerUnlock, votingCubit.state);
+    final selectedTab = _determineTab(supportedTabs, widget.tab);
+
+    _tabController = VoicesTabController(
+      initialTab: selectedTab,
+      tabs: supportedTabs,
+      vsync: this,
     );
+
+    _pagingController = PagingController(
+      initialPage: 0,
+      initialMaxResults: 0,
+    );
+
+    _tabsSubscription = Rx.combineLatest2(
+      sessionCubit.watchState().map((e) => e.isProposerUnlock),
+      votingCubit.watchState(),
+      _determineTabs,
+    ).distinct().listen(_updateTabsIfNeeded);
+
+    votingCubit.init(
+      onlyMyProposals: selectedTab == VotingPageTab.my,
+      category: widget.categoryId,
+      type: selectedTab.filter,
+    );
+
+    _pagingController
+      ..addPageRequestListener(_handleProposalsPageRequest)
+      ..notifyPageRequestListeners(0);
+
+    // TODO(damian-molinski): same behavior already exists in DiscoveryPage because
+    // of way confirmation dialog is shown. Refactor it.
+    if (widget.keychainDeleted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await _showKeychainDeletedDialog(context);
+      });
+    }
+  }
+
+  VotingPageTab _determineTab(
+    List<VotingPageTab> supportedTabs,
+    VotingPageTab? initialTab,
+  ) {
+    final requestedTab = initialTab ?? widget.tab ?? supportedTabs.first;
+    if (!supportedTabs.contains(requestedTab)) {
+      final supportedTab = supportedTabs.first;
+      _updateRoute(tab: supportedTab);
+      return supportedTab;
+    }
+
+    return requestedTab;
+  }
+
+  List<VotingPageTab> _determineTabs(bool isProposerUnlock, VotingState state) {
+    return state.tabs(isProposerUnlock: isProposerUnlock);
+  }
+
+  void _doResetPagination() {
+    _pagingController.notifyPageRequestListeners(0);
+  }
+
+  Future<void> _handleProposalsPageRequest(
+    int pageKey,
+    int pageSize,
+    ProposalBriefVoting? lastProposalId,
+  ) async {
+    final request = PageRequest(page: pageKey, size: pageSize);
+    await context.read<VotingCubit>().getProposals(request);
+  }
+
+  Future<void> _showKeychainDeletedDialog(BuildContext context) async {
+    await KeychainDeletedDialog.show(context);
+  }
+
+  void _updateRoute({
+    Optional<String>? categoryId,
+    VotingPageTab? tab,
+  }) {
+    Router.neglect(context, () {
+      final effectiveCategoryId = categoryId.dataOr(widget.categoryId?.id);
+      final effectiveTab = tab?.name ?? widget.tab?.name;
+
+      VotingRoute(
+        categoryId: effectiveCategoryId,
+        tab: effectiveTab,
+      ).replace(context);
+    });
+  }
+
+  void _updateTabsIfNeeded(List<VotingPageTab> tabs) {
+    if (!listEquals(tabs, _tabController.tabs)) {
+      setState(() {
+        _tabController.dispose();
+        _tabController = VoicesTabController(
+          vsync: this,
+          tabs: tabs,
+          initialTab: _determineTab(tabs, _tabController.tab),
+        );
+      });
+    }
   }
 }

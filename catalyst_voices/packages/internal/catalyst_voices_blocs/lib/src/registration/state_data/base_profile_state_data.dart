@@ -37,13 +37,13 @@ final class BaseProfileStateData extends Equatable {
 
   @override
   List<Object?> get props => [
-        email,
-        username,
-        receiveEmails,
-        conditionsAccepted,
-        tosAndPrivacyPolicyAccepted,
-        drepApprovalContingencyAccepted,
-      ];
+    email,
+    username,
+    receiveEmails,
+    conditionsAccepted,
+    tosAndPrivacyPolicyAccepted,
+    drepApprovalContingencyAccepted,
+  ];
 
   BaseProfileStateData copyWith({
     Email? email,
