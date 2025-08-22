@@ -76,8 +76,9 @@ class ProposalCommentsChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesChip.rectangular(
-      backgroundColor:
-          useInternalBackground ? context.colors.elevationsOnSurfaceNeutralLv1Grey : null,
+      backgroundColor: useInternalBackground
+          ? context.colors.elevationsOnSurfaceNeutralLv1Grey
+          : null,
       leading: VoicesAssets.icons.chatAlt2.buildIcon(
         color: useInternalBackground ? null : context.colors.iconsBackground,
       ),
@@ -169,10 +170,10 @@ class ProposalVersionChip extends StatelessWidget {
             version,
             key: const Key('Version'),
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: useInternalBackground
-                      ? Theme.of(context).colors.textOnPrimaryLevel1
-                      : context.colors.iconsBackground,
-                ),
+              color: useInternalBackground
+                  ? Theme.of(context).colors.textOnPrimaryLevel1
+                  : context.colors.iconsBackground,
+            ),
           ),
         ],
       ),

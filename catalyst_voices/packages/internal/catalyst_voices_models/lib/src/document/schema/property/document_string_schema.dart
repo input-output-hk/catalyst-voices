@@ -399,8 +399,8 @@ sealed class DocumentStringSchema extends DocumentValueSchema<String> {
     required this.strLengthRange,
     required this.pattern,
   }) : super(
-          type: DocumentPropertyType.string,
-        );
+         type: DocumentPropertyType.string,
+       );
 
   @override
   @mustCallSuper

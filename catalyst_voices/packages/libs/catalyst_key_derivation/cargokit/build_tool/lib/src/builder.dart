@@ -15,31 +15,7 @@ import 'util.dart';
 
 final _log = Logger('builder');
 
-enum BuildConfiguration {
-  debug,
-  release,
-  profile,
-}
-
-extension on BuildConfiguration {
-  bool get isDebug => this == BuildConfiguration.debug;
-  String get rustName => switch (this) {
-        BuildConfiguration.debug => 'debug',
-        BuildConfiguration.release => 'release',
-        BuildConfiguration.profile => 'release',
-      };
-}
-
-class BuildException implements Exception {
-  final String message;
-
-  BuildException(this.message);
-
-  @override
-  String toString() {
-    return 'BuildException: $message';
-  }
-}
+enum BuildConfiguration { debug, release, profile }
 
 class BuildEnvironment {
   final BuildConfiguration configuration;
@@ -67,6 +43,29 @@ class BuildEnvironment {
     this.javaHome,
   });
 
+  static BuildEnvironment fromEnvironment({required bool isAndroid}) {
+    final buildConfiguration = parseBuildConfiguration(
+      Environment.configuration,
+    );
+    final manifestDir = Environment.manifestDir;
+    final crateOptions = CargokitCrateOptions.load(manifestDir: manifestDir);
+    final crateInfo = CrateInfo.load(manifestDir);
+    return BuildEnvironment(
+      configuration: buildConfiguration,
+      crateOptions: crateOptions,
+      targetTempDir: Environment.targetTempDir,
+      manifestDir: manifestDir,
+      crateInfo: crateInfo,
+      isAndroid: isAndroid,
+      androidSdkPath: isAndroid ? Environment.sdkPath : null,
+      androidNdkVersion: isAndroid ? Environment.ndkVersion : null,
+      androidMinSdkVersion: isAndroid
+          ? int.parse(Environment.minSdkVersion)
+          : null,
+      javaHome: isAndroid ? Environment.javaHome : null,
+    );
+  }
+
   static BuildConfiguration parseBuildConfiguration(String value) {
     // XCode configuration adds the flavor to configuration name.
     final firstSegment = value.split('-').first;
@@ -79,30 +78,16 @@ class BuildEnvironment {
     }
     return buildConfiguration;
   }
+}
 
-  static BuildEnvironment fromEnvironment({
-    required bool isAndroid,
-  }) {
-    final buildConfiguration =
-        parseBuildConfiguration(Environment.configuration);
-    final manifestDir = Environment.manifestDir;
-    final crateOptions = CargokitCrateOptions.load(
-      manifestDir: manifestDir,
-    );
-    final crateInfo = CrateInfo.load(manifestDir);
-    return BuildEnvironment(
-      configuration: buildConfiguration,
-      crateOptions: crateOptions,
-      targetTempDir: Environment.targetTempDir,
-      manifestDir: manifestDir,
-      crateInfo: crateInfo,
-      isAndroid: isAndroid,
-      androidSdkPath: isAndroid ? Environment.sdkPath : null,
-      androidNdkVersion: isAndroid ? Environment.ndkVersion : null,
-      androidMinSdkVersion:
-          isAndroid ? int.parse(Environment.minSdkVersion) : null,
-      javaHome: isAndroid ? Environment.javaHome : null,
-    );
+class BuildException implements Exception {
+  final String message;
+
+  BuildException(this.message);
+
+  @override
+  String toString() {
+    return 'BuildException: $message';
   }
 }
 
@@ -110,25 +95,7 @@ class RustBuilder {
   final Target target;
   final BuildEnvironment environment;
 
-  RustBuilder({
-    required this.target,
-    required this.environment,
-  });
-
-  void prepare(
-    Rustup rustup,
-  ) {
-    final toolchain = _toolchain;
-    if (rustup.installedTargets(toolchain) == null) {
-      rustup.installToolchain(toolchain);
-    }
-    if (toolchain == 'nightly') {
-      rustup.installRustSrcForNightly();
-    }
-    if (!rustup.installedTargets(toolchain)!.contains(target.rust)) {
-      rustup.installTarget(target.rust, toolchain: toolchain);
-    }
-  }
+  RustBuilder({required this.target, required this.environment});
 
   CargoBuildOptions? get _buildOptions =>
       environment.crateOptions.cargo[environment.configuration];
@@ -139,31 +106,40 @@ class RustBuilder {
   Future<String> build() async {
     final extraArgs = _buildOptions?.flags ?? [];
     final manifestPath = path.join(environment.manifestDir, 'Cargo.toml');
-    runCommand(
-      'rustup',
-      [
-        'run',
-        _toolchain,
-        'cargo',
-        'build',
-        ...extraArgs,
-        '--manifest-path',
-        manifestPath,
-        '-p',
-        environment.crateInfo.packageName,
-        if (!environment.configuration.isDebug) '--release',
-        '--target',
-        target.rust,
-        '--target-dir',
-        environment.targetTempDir,
-      ],
-      environment: await _buildEnvironment(),
-    );
+    runCommand('rustup', [
+      'run',
+      _toolchain,
+      'cargo',
+      'build',
+      ...extraArgs,
+      '--manifest-path',
+      manifestPath,
+      '-p',
+      environment.crateInfo.packageName,
+      if (!environment.configuration.isDebug) '--release',
+      '--target',
+      target.rust,
+      '--target-dir',
+      environment.targetTempDir,
+    ], environment: await _buildEnvironment());
     return path.join(
       environment.targetTempDir,
       target.rust,
       environment.configuration.rustName,
     );
+  }
+
+  void prepare(Rustup rustup) {
+    final toolchain = _toolchain;
+    if (rustup.installedTargets(toolchain) == null) {
+      rustup.installToolchain(toolchain);
+    }
+    if (toolchain == 'nightly') {
+      rustup.installRustSrcForNightly();
+    }
+    if (!rustup.installedTargets(toolchain)!.contains(target.rust)) {
+      rustup.installTarget(target.rust, toolchain: toolchain);
+    }
   }
 
   Future<Map<String, String>> _buildEnvironment() async {
@@ -195,4 +171,13 @@ class RustBuilder {
       return env.buildEnvironment();
     }
   }
+}
+
+extension on BuildConfiguration {
+  bool get isDebug => this == BuildConfiguration.debug;
+  String get rustName => switch (this) {
+    BuildConfiguration.debug => 'debug',
+    BuildConfiguration.release => 'release',
+    BuildConfiguration.profile => 'release',
+  };
 }

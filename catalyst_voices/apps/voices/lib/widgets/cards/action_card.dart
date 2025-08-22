@@ -26,11 +26,13 @@ class ActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final titleTextStyle = (theme.textTheme.titleSmall ?? const TextStyle())
-        .copyWith(color: theme.colors.textOnPrimaryLevel1);
+    final titleTextStyle = (theme.textTheme.titleSmall ?? const TextStyle()).copyWith(
+      color: theme.colors.textOnPrimaryLevel1,
+    );
 
-    final descTextStyle = (theme.textTheme.bodySmall ?? const TextStyle())
-        .copyWith(color: theme.colors.textOnPrimaryLevel1);
+    final descTextStyle = (theme.textTheme.bodySmall ?? const TextStyle()).copyWith(
+      color: theme.colors.textOnPrimaryLevel1,
+    );
 
     final title = this.title;
     final statusIcon = this.statusIcon;

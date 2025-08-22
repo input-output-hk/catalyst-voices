@@ -16,11 +16,11 @@ final class SystemInfo extends Equatable {
 
   @override
   List<Object?> get props => [
-        app,
-        gateway,
-        config,
-        environment,
-      ];
+    app,
+    gateway,
+    config,
+    environment,
+  ];
 
   SystemInfo copyWith({
     Optional<AppInfo>? app,

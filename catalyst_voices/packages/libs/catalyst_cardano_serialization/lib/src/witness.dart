@@ -72,13 +72,13 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
 
   @override
   List<Object?> get props => [
-        vkeyWitnesses,
-        nativeScripts,
-        plutusV1Scripts,
-        redeemers,
-        plutusV2Scripts,
-        plutusV3Scripts,
-      ];
+    vkeyWitnesses,
+    nativeScripts,
+    plutusV1Scripts,
+    redeemers,
+    plutusV2Scripts,
+    plutusV3Scripts,
+  ];
 
   /// Serializes the type as cbor.
   @override

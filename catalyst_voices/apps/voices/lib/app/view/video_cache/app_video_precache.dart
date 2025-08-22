@@ -28,8 +28,7 @@ class _AppVideoPrecacheState extends State<AppVideoPrecache> {
     return FutureBuilder<void>(
       future: _precacheFuture,
       builder: (context, snapshot) {
-        final offstage = snapshot.connectionState == ConnectionState.waiting &&
-            !(_manager?.isInitialized ?? false);
+        final offstage = snapshot.connectionState != ConnectionState.done;
 
         if (offstage) {
           return const Offstage();

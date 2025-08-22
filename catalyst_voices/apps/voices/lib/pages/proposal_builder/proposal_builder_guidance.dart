@@ -11,8 +11,11 @@ class ProposalBuilderGuidanceSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
-        ({bool isLoading, ProposalGuidance guidance})>(
+    return BlocSelector<
+      ProposalBuilderBloc,
+      ProposalBuilderState,
+      ({bool isLoading, ProposalGuidance guidance})
+    >(
       selector: (state) => (isLoading: state.isLoading, guidance: state.guidance),
       builder: (context, state) {
         if (state.isLoading) {

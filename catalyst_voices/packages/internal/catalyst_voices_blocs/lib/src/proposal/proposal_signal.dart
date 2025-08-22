@@ -30,3 +30,7 @@ final class UsernameUpdatedSignal extends ProposalSignal {
 final class ViewingOlderVersionSignal extends ProposalSignal {
   const ViewingOlderVersionSignal();
 }
+
+final class ViewingOlderVersionWhileVotingSignal extends ProposalSignal {
+  const ViewingOlderVersionWhileVotingSignal();
+}

@@ -35,6 +35,85 @@ Future<void> main() async {
   SemanticsBinding.instance.ensureSemantics();
 }
 
+String _formatAddresses(List<ShelleyAddress>? addresses) {
+  if (addresses == null) {
+    return '---';
+  }
+
+  return addresses.map((e) => e.toBech32()).join('\n');
+}
+
+String _formatBalance(Balance? balance) {
+  if (balance == null) {
+    return '---';
+  }
+
+  final buffer = StringBuffer('Ada (lovelaces): ${balance.coin.value}');
+
+  final multiAsset = balance.multiAsset;
+  if (multiAsset != null) {
+    for (final policy in multiAsset.bundle.entries) {
+      for (final asset in policy.value.entries) {
+        buffer.write(', ${asset.key}: ${asset.value}');
+      }
+    }
+  }
+
+  return buffer.toString();
+}
+
+String _formatExtensions(List<CipExtension>? extensions) {
+  if (extensions == null) {
+    return '---';
+  }
+
+  return extensions.map((e) => 'cip-${e.cip}').join(', ');
+}
+
+String _formatPubStakeKeys(List<PubStakeKey>? keys) {
+  if (keys == null) {
+    return '---';
+  }
+
+  return keys.map((e) => e.value).join(', ');
+}
+
+String _formatUtxo(TransactionUnspentOutput utxo) {
+  return 'Tx: ${utxo.input.transactionId}'
+      '\nIndex: ${utxo.input.index}'
+      '\nAmount: ${_formatBalance(utxo.output.amount)}\n';
+}
+
+String _formatUtxos(Set<TransactionUnspentOutput>? utxos) {
+  if (utxos == null) {
+    return '---';
+  }
+
+  return utxos.map(_formatUtxo).join('\n');
+}
+
+Future<void> _showDialog({
+  required BuildContext context,
+  required String title,
+  required String message,
+}) async {
+  await showDialog<void>(
+    context: context,
+    builder: (context) => SelectionArea(
+      child: AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -58,18 +137,48 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
+class _EmptyWallets extends StatelessWidget {
+  const _EmptyWallets();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text(
+        'There are no active wallet extensions',
+      ),
+    );
+  }
+}
+
+class _Error extends StatelessWidget {
+  final Object? error;
+
+  const _Error({required this.error});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(error.toString()),
+    );
+  }
+}
+
+class _Loader extends StatelessWidget {
+  const _Loader();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+}
+
 class _MyHomePageState extends State<MyHomePage> {
   bool _isLoading = true;
   Object? _error;
   List<CardanoWallet>? _wallets;
   CardanoWalletApi? _api;
-
-  @override
-  void initState() {
-    super.initState();
-
-    unawaited(_loadWallets());
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,6 +209,13 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    unawaited(_loadWallets());
   }
 
   Future<void> _loadWallets() async {
@@ -134,43 +250,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-class _Error extends StatelessWidget {
-  final Object? error;
-
-  const _Error({required this.error});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(error.toString()),
-    );
-  }
-}
-
-class _Loader extends StatelessWidget {
-  const _Loader();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: CircularProgressIndicator(),
-    );
-  }
-}
-
-class _EmptyWallets extends StatelessWidget {
-  const _EmptyWallets();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'There are no active wallet extensions',
-      ),
-    );
-  }
-}
-
 class _WalletChooser extends StatelessWidget {
   final List<CardanoWallet> wallets;
   final ValueChanged<CardanoWallet> onEnable;
@@ -197,48 +276,6 @@ class _WalletChooser extends StatelessWidget {
   }
 }
 
-class _WalletItem extends StatelessWidget {
-  final CardanoWallet wallet;
-  final VoidCallback onEnable;
-
-  const _WalletItem({
-    required this.wallet,
-    required this.onEnable,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.network(
-              wallet.icon,
-              width: 64,
-              height: 64,
-            ),
-            Text('Name: ${wallet.name}'),
-            Text('Api version: ${wallet.apiVersion}'),
-            Text(
-              'Supported extensions: '
-              '${_formatExtensions(wallet.supportedExtensions)}',
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              key: Key('enableWallet-${wallet.name}'),
-              onPressed: onEnable,
-              child: const Text('Enable wallet'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _WalletDetails extends StatefulWidget {
   final CardanoWalletApi api;
 
@@ -260,68 +297,6 @@ class _WalletDetailsState extends State<_WalletDetails> {
   PubDRepKey? _pubDRepKey;
   List<PubStakeKey>? _registeredPubStakeKeys;
   List<PubStakeKey>? _unregisteredPubStakeKeys;
-
-  @override
-  void initState() {
-    super.initState();
-    unawaited(_loadData());
-  }
-
-  @override
-  void didUpdateWidget(_WalletDetails oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.api != widget.api) {
-      unawaited(_loadData());
-    }
-  }
-
-  Future<void> _loadData() async {
-    try {
-      final balance = await widget.api.getBalance();
-      final extensions = await widget.api.getExtensions();
-      final networkId = await widget.api.getNetworkId();
-      final changeAddress = await widget.api.getChangeAddress();
-      final rewardAddresses = await widget.api.getRewardAddresses();
-      final unusedAddresses = await widget.api.getUnusedAddresses();
-      final usedAddresses = await widget.api.getUsedAddresses();
-      final utxos = await widget.api.getUtxos();
-
-      if (mounted) {
-        setState(() {
-          _balance = balance;
-          _extensions = extensions;
-          _networkId = networkId;
-          _changeAddress = changeAddress;
-          _rewardAddresses = rewardAddresses;
-          _unusedAddresses = unusedAddresses;
-          _usedAddresses = usedAddresses;
-          _utxos = utxos;
-        });
-      }
-
-      if (extensions.contains(const CipExtension(cip: 95))) {
-        final pubDRepKey = await widget.api.cip95.getPubDRepKey();
-        final registeredPubStakeKeys = await widget.api.cip95.getRegisteredPubStakeKeys();
-        final unregisteredPubStakeKeys = await widget.api.cip95.getUnregisteredPubStakeKeys();
-
-        if (mounted) {
-          setState(() {
-            _pubDRepKey = pubDRepKey;
-            _registeredPubStakeKeys = registeredPubStakeKeys;
-            _unregisteredPubStakeKeys = unregisteredPubStakeKeys;
-          });
-        }
-      }
-    } catch (error) {
-      if (mounted) {
-        await _showDialog(
-          context: context,
-          title: 'Load data',
-          message: 'Error: $error',
-        );
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -399,83 +374,108 @@ class _WalletDetailsState extends State<_WalletDetails> {
       ),
     );
   }
-}
 
-Future<void> _showDialog({
-  required BuildContext context,
-  required String title,
-  required String message,
-}) async {
-  await showDialog<void>(
-    context: context,
-    builder: (context) => SelectionArea(
-      child: AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-String _formatExtensions(List<CipExtension>? extensions) {
-  if (extensions == null) {
-    return '---';
-  }
-
-  return extensions.map((e) => 'cip-${e.cip}').join(', ');
-}
-
-String _formatAddresses(List<ShelleyAddress>? addresses) {
-  if (addresses == null) {
-    return '---';
-  }
-
-  return addresses.map((e) => e.toBech32()).join('\n');
-}
-
-String _formatPubStakeKeys(List<PubStakeKey>? keys) {
-  if (keys == null) {
-    return '---';
-  }
-
-  return keys.map((e) => e.value).join(', ');
-}
-
-String _formatBalance(Balance? balance) {
-  if (balance == null) {
-    return '---';
-  }
-
-  final buffer = StringBuffer('Ada (lovelaces): ${balance.coin.value}');
-
-  final multiAsset = balance.multiAsset;
-  if (multiAsset != null) {
-    for (final policy in multiAsset.bundle.entries) {
-      for (final asset in policy.value.entries) {
-        buffer.write(', ${asset.key}: ${asset.value}');
-      }
+  @override
+  void didUpdateWidget(_WalletDetails oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.api != widget.api) {
+      unawaited(_loadData());
     }
   }
 
-  return buffer.toString();
-}
-
-String _formatUtxos(Set<TransactionUnspentOutput>? utxos) {
-  if (utxos == null) {
-    return '---';
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_loadData());
   }
 
-  return utxos.map(_formatUtxo).join('\n');
+  Future<void> _loadData() async {
+    try {
+      final balance = await widget.api.getBalance();
+      final extensions = await widget.api.getExtensions();
+      final networkId = await widget.api.getNetworkId();
+      final changeAddress = await widget.api.getChangeAddress();
+      final rewardAddresses = await widget.api.getRewardAddresses();
+      final unusedAddresses = await widget.api.getUnusedAddresses();
+      final usedAddresses = await widget.api.getUsedAddresses();
+      final utxos = await widget.api.getUtxos();
+
+      if (mounted) {
+        setState(() {
+          _balance = balance;
+          _extensions = extensions;
+          _networkId = networkId;
+          _changeAddress = changeAddress;
+          _rewardAddresses = rewardAddresses;
+          _unusedAddresses = unusedAddresses;
+          _usedAddresses = usedAddresses;
+          _utxos = utxos;
+        });
+      }
+
+      if (extensions.contains(const CipExtension(cip: 95))) {
+        final pubDRepKey = await widget.api.cip95.getPubDRepKey();
+        final registeredPubStakeKeys = await widget.api.cip95.getRegisteredPubStakeKeys();
+        final unregisteredPubStakeKeys = await widget.api.cip95.getUnregisteredPubStakeKeys();
+
+        if (mounted) {
+          setState(() {
+            _pubDRepKey = pubDRepKey;
+            _registeredPubStakeKeys = registeredPubStakeKeys;
+            _unregisteredPubStakeKeys = unregisteredPubStakeKeys;
+          });
+        }
+      }
+    } catch (error) {
+      if (mounted) {
+        await _showDialog(
+          context: context,
+          title: 'Load data',
+          message: 'Error: $error',
+        );
+      }
+    }
+  }
 }
 
-String _formatUtxo(TransactionUnspentOutput utxo) {
-  return 'Tx: ${utxo.input.transactionId}'
-      '\nIndex: ${utxo.input.index}'
-      '\nAmount: ${_formatBalance(utxo.output.amount)}\n';
+class _WalletItem extends StatelessWidget {
+  final CardanoWallet wallet;
+  final VoidCallback onEnable;
+
+  const _WalletItem({
+    required this.wallet,
+    required this.onEnable,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.network(
+              wallet.icon,
+              width: 64,
+              height: 64,
+            ),
+            Text('Name: ${wallet.name}'),
+            Text('Api version: ${wallet.apiVersion}'),
+            Text(
+              'Supported extensions: '
+              '${_formatExtensions(wallet.supportedExtensions)}',
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              key: Key('enableWallet-${wallet.name}'),
+              onPressed: onEnable,
+              child: const Text('Enable wallet'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

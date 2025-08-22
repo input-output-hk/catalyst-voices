@@ -20,8 +20,8 @@ class SegmentHeader extends StatelessWidget {
   });
 
   Set<WidgetState> get _states => {
-        if (isSelected) WidgetState.selected,
-      };
+    if (isSelected) WidgetState.selected,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +39,9 @@ class SegmentHeader extends StatelessWidget {
       foregroundColor: foregroundColor,
     );
 
-    final textStyle = (theme.textTheme.titleMedium ?? const TextStyle())
-        .copyWith(color: foregroundColor.resolve(_states));
+    final textStyle = (theme.textTheme.titleMedium ?? const TextStyle()).copyWith(
+      color: foregroundColor.resolve(_states),
+    );
 
     return IconButtonTheme(
       data: IconButtonThemeData(style: iconButtonStyle),

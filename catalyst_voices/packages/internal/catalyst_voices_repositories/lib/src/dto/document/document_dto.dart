@@ -139,10 +139,10 @@ final class DocumentPropertyListDto extends DocumentPropertyDto {
 
   @override
   Map<String, dynamic> toJson() => {
-        schema.id: [
-          for (final property in properties) ...property.toJson().values,
-        ],
-      };
+    schema.id: [
+      for (final property in properties) ...property.toJson().values,
+    ],
+  };
 
   @override
   DocumentListProperty toModel() {
