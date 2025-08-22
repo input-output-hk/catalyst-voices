@@ -113,15 +113,16 @@ command:
       flutter_markdown: ^0.7.7+1
       flutter_native_splash: ^2.4.6
       # TODO(minikin): We use our forks as a temporary workaround for F14.
+      # TODO(LynxLynxx): Go back to using IOHK version when PR with update is merged
       flutter_quill:
         git:
-          url: https://github.com/input-output-hk/flutter-quill
-          ref: 532172254c3cee957bbdbb08be922f2c870b7fff
+          url: https://github.com/LynxLynxx/flutter-quill
+          ref: c837e4dfa3b03f04da14dc9d7b14ac69b276e8ad
       flutter_quill_extensions:
         git:
-          url: https://github.com/input-output-hk/flutter-quill
+          url: https://github.com/LynxLynxx/flutter-quill
           path: flutter_quill_extensions
-          ref: 532172254c3cee957bbdbb08be922f2c870b7fff
+          ref: c837e4dfa3b03f04da14dc9d7b14ac69b276e8ad
       flutter_rust_bridge: 2.11.1
       flutter_secure_storage: ^9.2.4
       formz: ^0.8.0
@@ -134,10 +135,11 @@ command:
       lottie: ^3.3.1
       markdown: ^7.3.0
       # TODO(minikin): We use our forks as a temporary workaround for F14.
+      # TODO(LynxLynxx): Go back to using IOHK version when PR with update is merged
       markdown_quill:
         git:
-          url: https://github.com/input-output-hk/markdown_quill
-          ref: a523a6128e6b2677739ac5d68d1d9c65a2af8b98
+          url: https://github.com/LynxLynxx/markdown_quill
+          ref: 7ac7c575cc663a97b2bd7f73785d906b92fc89cc
       meta: ^1.16.0
       result_type: ^1.0.0
       rxdart: ^0.28.0

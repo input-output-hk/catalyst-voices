@@ -46,13 +46,13 @@ dependencies:
   # TODO(minikin): We use our forks as a temporary workaround for F14.
   flutter_quill:
     git:
-      url: https://github.com/input-output-hk/flutter-quill
-      ref: 532172254c3cee957bbdbb08be922f2c870b7fff
+      url: https://github.com/LynxLynxx/flutter-quill
+      ref: c837e4dfa3b03f04da14dc9d7b14ac69b276e8ad
   flutter_quill_extensions:
     git:
-      url: https://github.com/input-output-hk/flutter-quill
+      url: https://github.com/LynxLynxx/flutter-quill
+      ref: c837e4dfa3b03f04da14dc9d7b14ac69b276e8ad
       path: flutter_quill_extensions
-      ref: 532172254c3cee957bbdbb08be922f2c870b7fff
   flutter_secure_storage: ^9.2.4
   flutter_web_plugins:
     sdk: flutter
@@ -65,8 +65,8 @@ dependencies:
   # TODO(minikin): We use our forks as a temporary workaround for F14.
   markdown_quill:
     git:
-      url: https://github.com/input-output-hk/markdown_quill
-      ref: a523a6128e6b2677739ac5d68d1d9c65a2af8b98
+      url: https://github.com/LynxLynxx/markdown_quill
+      ref: 7ac7c575cc663a97b2bd7f73785d906b92fc89cc
   mask_text_input_formatter: ^2.9.0
   result_type: ^1.0.0
   rxdart: ^0.28.0
