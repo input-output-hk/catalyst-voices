@@ -81,12 +81,15 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
       }
     } catch (e, st) {
       _logger.severe('Error getting current campaign', e, st);
-      emit(
-        state.copyWith(
-          categories: DiscoveryCampaignCategoriesState(error: LocalizedException.create(e)),
-          campaign: DiscoveryCurrentCampaignState(error: LocalizedException.create(e)),
-        ),
-      );
+
+      if (!isClosed) {
+        emit(
+          state.copyWith(
+            categories: DiscoveryCampaignCategoriesState(error: LocalizedException.create(e)),
+            campaign: DiscoveryCurrentCampaignState(error: LocalizedException.create(e)),
+          ),
+        );
+      }
     }
   }
 
@@ -97,25 +100,29 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
 
       emit(state.copyWith(proposals: const DiscoveryMostRecentProposalsState()));
       final campaign = await _campaignService.getActiveCampaign();
+      if (!isClosed) {
+        _proposalsSub = _buildProposalsSub();
+        _favoritesProposalsIdsSub = _buildFavoritesProposalsIdsSub();
 
-      _proposalsSub = _buildProposalsSub();
-      _favoritesProposalsIdsSub = _buildFavoritesProposalsIdsSub();
-
-      emit(
-        state.copyWith(
-          proposals: state.proposals.copyWith(
-            isLoading: false,
-            showComments: campaign?.supportsComments ?? false,
+        emit(
+          state.copyWith(
+            proposals: state.proposals.copyWith(
+              isLoading: false,
+              showComments: campaign?.supportsComments ?? false,
+            ),
           ),
-        ),
-      );
+        );
+      }
     } catch (e, st) {
       _logger.severe('Error getting most recent proposals', e, st);
-      emit(
-        state.copyWith(
-          proposals: DiscoveryMostRecentProposalsState(error: LocalizedException.create(e)),
-        ),
-      );
+
+      if (!isClosed) {
+        emit(
+          state.copyWith(
+            proposals: DiscoveryMostRecentProposalsState(error: LocalizedException.create(e)),
+          ),
+        );
+      }
     }
   }
 
