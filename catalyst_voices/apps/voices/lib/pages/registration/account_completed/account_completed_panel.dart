@@ -81,14 +81,16 @@ class _NextStep extends StatelessWidget {
 class _OpenSpaceButton extends StatelessWidget {
   final VoidCallback onTap;
 
-  const _OpenSpaceButton({required this.onTap});
+  const _OpenSpaceButton({
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       onTap: onTap,
       child: Text(
-        context.l10n.registrationCompletedDiscoveryButton,
+        context.l10n.registrationCompletedButton,
         semanticsIdentifier: 'OpenSpaceButton',
       ),
     );
