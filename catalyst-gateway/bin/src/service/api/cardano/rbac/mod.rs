@@ -20,7 +20,7 @@ impl Api {
         method = "get",
         operation_id = "rbacRegistrations"
     )]
-    /// Get RBAC registrations
+    /// Get RBAC registrations.
     ///
     /// This endpoint returns RBAC registrations by provided auth Catalyst Id credentials
     /// or by the `lookup` argument if provided.
@@ -41,7 +41,7 @@ impl Api {
         method = "get",
         operation_id = "rbacRegistrationsV2"
     )]
-    /// Get RBAC registrations
+    /// Get RBAC registrations V2.
     ///
     /// This endpoint returns RBAC registrations by provided auth Catalyst Id credentials
     /// or by the `lookup` argument if provided.
