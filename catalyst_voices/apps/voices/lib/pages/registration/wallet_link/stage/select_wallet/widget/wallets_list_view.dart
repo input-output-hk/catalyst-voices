@@ -52,11 +52,11 @@ class _WalletsListView extends StatelessWidget {
         final wallet = wallets[index];
 
         return WalletListTile(
-            key: ValueKey('Wallet${wallet.name}ListTile'),
-            wallet: wallet,
-            semanticsIdentifier: 'Wallet${wallet.name}ListTile',
-            onSelectWallet: onSelectWallet,
-          );
+          key: ValueKey('Wallet${wallet.name}ListTile'),
+          wallet: wallet,
+          semanticsIdentifier: 'Wallet${wallet.name}ListTile',
+          onSelectWallet: onSelectWallet,
+        );
       },
     );
   }

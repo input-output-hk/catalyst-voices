@@ -129,7 +129,10 @@ class _SeedPhraseWords extends StatelessWidget {
           VoicesTextButton(
             key: const Key('DownloadSeedPhraseButton'),
             onTap: () => unawaited(_exportSeedPhrase(context)),
-            child: Text(context.l10n.createKeychainSeedPhraseExport, semanticsIdentifier: 'DownloadSeedPhraseButton'),
+            child: Text(
+              context.l10n.createKeychainSeedPhraseExport,
+              semanticsIdentifier: 'DownloadSeedPhraseButton',
+            ),
           ),
         ],
       ),
