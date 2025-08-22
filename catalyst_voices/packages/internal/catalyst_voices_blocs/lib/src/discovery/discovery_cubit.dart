@@ -57,13 +57,13 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
           categories: const DiscoveryCampaignCategoriesState(),
         ),
       );
-      // TODO(LynxLynxx): remove this when we have a better way to get the active campaign
-      final campaign = await _campaignService.getCampaign(id: Campaign.f14Ref.id);
+      final campaign = (await _campaignService.getActiveCampaign())!;
       final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
       final currentCampaign = CurrentCampaignInfoViewModel.fromModel(campaign);
       final categoriesModel = campaign.categories
           .map(CampaignCategoryDetailsViewModel.fromModel)
           .toList();
+
       if (!isClosed) {
         emit(
           state.copyWith(
@@ -91,16 +91,32 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   }
 
   Future<void> getMostRecentProposals() async {
-    emit(state.copyWith(proposals: const DiscoveryMostRecentProposalsState()));
+    try {
+      unawaited(_proposalsSub?.cancel());
+      unawaited(_favoritesProposalsIdsSub?.cancel());
 
-    unawaited(_proposalsSub?.cancel());
-    _proposalsSub = _buildProposalsSub();
+      emit(state.copyWith(proposals: const DiscoveryMostRecentProposalsState()));
+      final campaign = await _campaignService.getActiveCampaign();
 
-    unawaited(_favoritesProposalsIdsSub?.cancel());
-    _favoritesProposalsIdsSub = _buildFavoritesProposalsIdsSub();
+      _proposalsSub = _buildProposalsSub();
+      _favoritesProposalsIdsSub = _buildFavoritesProposalsIdsSub();
 
-    final mostRecentState = state.proposals;
-    emit(state.copyWith(proposals: mostRecentState.copyWith(isLoading: false)));
+      emit(
+        state.copyWith(
+          proposals: state.proposals.copyWith(
+            isLoading: false,
+            showComments: campaign?.supportsComments ?? false,
+          ),
+        ),
+      );
+    } catch (e, st) {
+      _logger.severe('Error getting most recent proposals', e, st);
+      emit(
+        state.copyWith(
+          proposals: DiscoveryMostRecentProposalsState(error: LocalizedException.create(e)),
+        ),
+      );
+    }
   }
 
   Future<void> removeFavorite(DocumentRef ref) async {
@@ -162,13 +178,17 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
           (e) => ProposalBrief.fromProposal(
             e,
             isFavorite: state.proposals.favoritesIds.contains(e.selfRef.id),
+            showComments: state.proposals.showComments,
           ),
         )
         .toList();
 
     emit(
       state.copyWith(
-        proposals: state.proposals.copyWith(isLoading: false, proposals: proposalList),
+        proposals: state.proposals.copyWith(
+          isLoading: false,
+          proposals: proposalList,
+        ),
       ),
     );
   }

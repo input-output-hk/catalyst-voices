@@ -53,6 +53,11 @@ final class ProposalCubit extends Cubit<ProposalState>
         .listen(_handleActiveAccountIdChanged);
   }
 
+  void clear() {
+    _cache = _cache.copyWithoutProposal();
+    emit(const ProposalState());
+  }
+
   @override
   Future<void> close() async {
     await _activeAccountIdSub?.cancel();
@@ -67,15 +72,12 @@ final class ProposalCubit extends Cubit<ProposalState>
     return super.close();
   }
 
-  void clear() {
-    _cache = _cache.copyWithoutProposal();
-    emit(const ProposalState());
-  }
-
   Future<void> load({required DocumentRef ref}) async {
     try {
       final isReadOnlyMode = await _isReadOnlyMode();
-      final isVotingStage = await _isVotingStage();
+      final campaign = await _campaignService.getActiveCampaign();
+      final isVotingStage = _isVotingStage(campaign);
+      final showComments = campaign?.supportsComments ?? false;
       _logger.info('Loading $ref');
 
       _cache = _cache.copyWith(ref: Optional.of(ref));
@@ -96,6 +98,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         comments: const Optional([]),
         isFavorite: Optional(isFavorite),
         isVotingStage: Optional(isVotingStage),
+        showComments: Optional(showComments),
         readOnlyMode: Optional(isReadOnlyMode),
       );
 
@@ -281,6 +284,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     required ProposalCommentsSort commentsSort,
     required bool isFavorite,
     required bool isVotingStage,
+    required bool showComments,
     required bool readOnlyMode,
     required Vote? lastCastedVote,
     required Vote? draftVote,
@@ -300,10 +304,9 @@ final class ProposalCubit extends Cubit<ProposalState>
       );
     }).toList();
     final currentVersion = versions.singleWhereOrNull((e) => e.isCurrent);
-    final commentsCount = comments.fold(
-      0,
-      (previousValue, element) => previousValue + 1 + element.repliesCount,
-    );
+    final commentsCount = showComments
+        ? comments.fold(0, (prev, next) => prev + 1 + next.repliesCount)
+        : null;
 
     final segments = proposal != null
         ? _buildSegments(
@@ -317,6 +320,7 @@ final class ProposalCubit extends Cubit<ProposalState>
             hasAccountUsername: hasAccountUsername,
             commentsCount: commentsCount,
             isVotingStage: isVotingStage,
+            showComments: showComments,
             readOnlyMode: readOnlyMode,
             lastCastedVote: lastCastedVote,
             draftVote: draftVote,
@@ -379,8 +383,9 @@ final class ProposalCubit extends Cubit<ProposalState>
     required ProposalCommentsSort commentsSort,
     required bool hasActiveAccount,
     required bool hasAccountUsername,
-    required int commentsCount,
+    required int? commentsCount,
     required bool isVotingStage,
+    required bool showComments,
     required bool readOnlyMode,
     required Vote? lastCastedVote,
     required Vote? draftVote,
@@ -446,7 +451,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       if (votingSegment != null) votingSegment,
       overviewSegment,
       ...proposalSegments,
-      if ((canComment || comments.isNotEmpty) && !isVotingStage) commentsSegment,
+      if ((canComment || comments.isNotEmpty) && showComments) commentsSegment,
     ];
   }
 
@@ -485,10 +490,8 @@ final class ProposalCubit extends Cubit<ProposalState>
     };
   }
 
-  Future<bool> _isVotingStage() async {
-    final activeCampaign = await _campaignService.getActiveCampaign();
-    final votingState = activeCampaign?.phaseStateTo(CampaignPhaseType.communityVoting);
-
+  bool _isVotingStage(Campaign? campaign) {
+    final votingState = campaign?.phaseStateTo(CampaignPhaseType.communityVoting);
     return votingState?.status.isActive ?? false;
   }
 
@@ -500,6 +503,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     final commentsSort = state.comments.commentsSort;
     final isFavorite = _cache.isFavorite ?? false;
     final isVotingStage = _cache.isVotingStage ?? false;
+    final showComments = _cache.showComments ?? false;
     final readOnlyMode = _cache.readOnlyMode ?? false;
     final activeAccountId = _cache.activeAccountId;
     final ref = _cache.ref;
@@ -519,6 +523,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       isFavorite: isFavorite,
       readOnlyMode: readOnlyMode,
       isVotingStage: isVotingStage,
+      showComments: showComments,
       lastCastedVote: lastCastedVote,
       draftVote: draftVote,
     );
