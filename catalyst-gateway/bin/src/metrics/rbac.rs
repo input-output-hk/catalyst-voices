@@ -1,14 +1,6 @@
 //! Metrics related to RBAC Registration Chain Caching analytics.
 
-use crate::{
-    db::index::queries::rbac::{
-        get_catalyst_id_from_public_key::public_keys_cache_size,
-        get_catalyst_id_from_stake_address::stake_addresses_cache_size,
-        get_catalyst_id_from_transaction_id::transaction_ids_cache_size,
-    },
-    rbac::persistent_rbac_chains_cache_size,
-    settings::Settings,
-};
+use crate::{db::index::session::CassandraSession, settings::Settings};
 
 /// Represents a persistent session.
 const PERSISTENT: bool = true;
@@ -21,33 +13,69 @@ pub(crate) fn update() {
     let service_id = Settings::service_id();
     let network = Settings::cardano_network().to_string();
 
-    reporter::PERSISTENT_PUBLIC_KEYS_CACHE_SIZE
-        .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(public_keys_cache_size(PERSISTENT)).unwrap_or(-1));
+    CassandraSession::get(PERSISTENT).inspect(|session| {
+        let caches = session.caches();
 
-    reporter::VOLATILE_PUBLIC_KEYS_CACHE_SIZE
-        .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(public_keys_cache_size(VOLATILE)).unwrap_or(-1));
+        reporter::PERSISTENT_PUBLIC_KEYS_CACHE_SIZE
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(caches.rbac_public_key().weighted_size()).unwrap_or(-1));
 
-    reporter::PERSISTENT_STAKE_ADDRESSES_CACHE_SIZE
-        .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(stake_addresses_cache_size(PERSISTENT)).unwrap_or(-1));
+        reporter::PERSISTENT_STAKE_ADDRESSES_CACHE_SIZE
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(caches.rbac_stake_address().weighted_size()).unwrap_or(-1));
 
-    reporter::VOLATILE_STAKE_ADDRESSES_CACHE_SIZE
-        .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(stake_addresses_cache_size(VOLATILE)).unwrap_or(-1));
+        reporter::PERSISTENT_TRANSACTION_IDS_CACHE_SIZE
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(caches.rbac_transaction_id().weighted_size()).unwrap_or(-1));
 
-    reporter::PERSISTENT_TRANSACTION_IDS_CACHE_SIZE
-        .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(transaction_ids_cache_size(PERSISTENT)).unwrap_or(-1));
+        reporter::PERSISTENT_CHAINS_CACHE_SIZE
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(caches.rbac_persistent_chains().weighted_size()).unwrap_or(-1));
 
-    reporter::VOLATILE_TRANSACTION_IDS_CACHE_SIZE
-        .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(transaction_ids_cache_size(VOLATILE)).unwrap_or(-1));
+        reporter::PERSISTENT_PUBLIC_KEYS_CACHE_ENTRY_COUNT
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(caches.rbac_public_key().entry_count()).unwrap_or(-1));
 
-    reporter::PERSISTENT_CHAINS_CACHE_SIZE
-        .with_label_values(&[&api_host_names, service_id, &network])
-        .set(i64::try_from(persistent_rbac_chains_cache_size()).unwrap_or(-1));
+        reporter::PERSISTENT_STAKE_ADDRESSES_CACHE_ENTRY_COUNT
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(caches.rbac_stake_address().entry_count()).unwrap_or(-1));
+
+        reporter::PERSISTENT_TRANSACTION_IDS_CACHE_ENTRY_COUNT
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(caches.rbac_transaction_id().entry_count()).unwrap_or(-1));
+
+        reporter::PERSISTENT_CHAINS_CACHE_ENTRY_COUNT
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(caches.rbac_persistent_chains().entry_count()).unwrap_or(-1));
+    });
+
+    CassandraSession::get(VOLATILE).inspect(|session| {
+        let caches = session.caches();
+
+        reporter::VOLATILE_PUBLIC_KEYS_CACHE_SIZE
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(caches.rbac_public_key().weighted_size()).unwrap_or(-1));
+
+        reporter::VOLATILE_STAKE_ADDRESSES_CACHE_SIZE
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(caches.rbac_stake_address().weighted_size()).unwrap_or(-1));
+
+        reporter::VOLATILE_TRANSACTION_IDS_CACHE_SIZE
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(caches.rbac_transaction_id().weighted_size()).unwrap_or(-1));
+
+        reporter::VOLATILE_PUBLIC_KEYS_CACHE_ENTRY_COUNT
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(caches.rbac_public_key().entry_count()).unwrap_or(-1));
+
+        reporter::VOLATILE_STAKE_ADDRESSES_CACHE_ENTRY_COUNT
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(caches.rbac_stake_address().entry_count()).unwrap_or(-1));
+
+        reporter::VOLATILE_TRANSACTION_IDS_CACHE_ENTRY_COUNT
+            .with_label_values(&[&api_host_names, service_id, &network])
+            .set(i64::try_from(caches.rbac_transaction_id().entry_count()).unwrap_or(-1));
+    });
 }
 
 /// Increment a metric value by one.
@@ -177,12 +205,23 @@ pub(crate) mod reporter {
             .unwrap()
         });
 
-    /// An estimated size of the persistent public keys cache.
+    /// Size in memory allocated bytes of the persistent public keys cache.
     pub(super) static PERSISTENT_PUBLIC_KEYS_CACHE_SIZE: LazyLock<IntGaugeVec> =
         LazyLock::new(|| {
             register_int_gauge_vec!(
                 "rbac_persistent_public_keys_cache_size",
-                "An estimated size of the persistent public keys cache",
+                "Size in memory allocated bytes of the persistent public keys cache",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// Number of entries in the persistent public keys cache.
+    pub(super) static PERSISTENT_PUBLIC_KEYS_CACHE_ENTRY_COUNT: LazyLock<IntGaugeVec> =
+        LazyLock::new(|| {
+            register_int_gauge_vec!(
+                "rbac_persistent_public_keys_cache_entry_count",
+                "Number of entries in the persistent public keys cache",
                 &METRIC_LABELS
             )
             .unwrap()
@@ -210,12 +249,23 @@ pub(crate) mod reporter {
             .unwrap()
         });
 
-    /// An estimated size of the volatile public keys cache.
+    /// Size in memory allocated bytes of the volatile public keys cache.
     pub(super) static VOLATILE_PUBLIC_KEYS_CACHE_SIZE: LazyLock<IntGaugeVec> =
         LazyLock::new(|| {
             register_int_gauge_vec!(
                 "rbac_volatile_public_keys_cache_size",
-                "An estimated size of the volatile public keys cache",
+                "Size in memory allocated bytes of the volatile public keys cache",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// Number of entries in the volatile public keys cache.
+    pub(super) static VOLATILE_PUBLIC_KEYS_CACHE_ENTRY_COUNT: LazyLock<IntGaugeVec> =
+        LazyLock::new(|| {
+            register_int_gauge_vec!(
+                "rbac_volatile_public_keys_cache_entry_count",
+                "Number of entries in the volatile public keys cache",
                 &METRIC_LABELS
             )
             .unwrap()
@@ -243,12 +293,23 @@ pub(crate) mod reporter {
             .unwrap()
         });
 
-    /// An estimated size of the persistent stake addresses cache.
+    /// Size in memory allocated bytes of the persistent stake addresses cache.
     pub(super) static PERSISTENT_STAKE_ADDRESSES_CACHE_SIZE: LazyLock<IntGaugeVec> =
         LazyLock::new(|| {
             register_int_gauge_vec!(
                 "rbac_persistent_stake_addresses_cache_size",
-                "An estimated size of the persistent stake addresses cache",
+                "Size in memory allocated bytes of the persistent stake addresses cache",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// Number of entries in the persistent stake addresses cache.
+    pub(super) static PERSISTENT_STAKE_ADDRESSES_CACHE_ENTRY_COUNT: LazyLock<IntGaugeVec> =
+        LazyLock::new(|| {
+            register_int_gauge_vec!(
+                "rbac_persistent_stake_addresses_cache_entry_count",
+                "Number of entries in the persistent stake addresses cache",
                 &METRIC_LABELS
             )
             .unwrap()
@@ -276,12 +337,23 @@ pub(crate) mod reporter {
             .unwrap()
         });
 
-    /// An estimated size of the volatile stake addresses cache.
+    /// Size in memory allocated bytes of the volatile stake addresses cache.
     pub(super) static VOLATILE_STAKE_ADDRESSES_CACHE_SIZE: LazyLock<IntGaugeVec> =
         LazyLock::new(|| {
             register_int_gauge_vec!(
                 "rbac_volatile_stake_addresses_cache_size",
-                "An estimated size of the volatile stake addresses cache",
+                "Size in memory allocated bytes of the volatile stake addresses cache",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// Number of entries in the volatile stake addresses cache.
+    pub(super) static VOLATILE_STAKE_ADDRESSES_CACHE_ENTRY_COUNT: LazyLock<IntGaugeVec> =
+        LazyLock::new(|| {
+            register_int_gauge_vec!(
+                "rbac_volatile_stake_addresses_cache_entry_count",
+                "Number of entries in the volatile stake addresses cache",
                 &METRIC_LABELS
             )
             .unwrap()
@@ -309,12 +381,23 @@ pub(crate) mod reporter {
             .unwrap()
         });
 
-    /// An estimated size of the persistent transaction IDs cache.
+    /// Size in memory allocated bytes of the persistent transaction IDs cache.
     pub(super) static PERSISTENT_TRANSACTION_IDS_CACHE_SIZE: LazyLock<IntGaugeVec> =
         LazyLock::new(|| {
             register_int_gauge_vec!(
                 "rbac_persistent_transaction_ids_cache_size",
-                "An estimated size of the persistent transaction IDs cache",
+                "Size in memory allocated bytes of the persistent transaction IDs cache",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// Number of entries in the persistent transaction IDs cache.
+    pub(super) static PERSISTENT_TRANSACTION_IDS_CACHE_ENTRY_COUNT: LazyLock<IntGaugeVec> =
+        LazyLock::new(|| {
+            register_int_gauge_vec!(
+                "rbac_persistent_transaction_ids_cache_entry_count",
+                "Number of entries in the persistent transaction IDs cache",
                 &METRIC_LABELS
             )
             .unwrap()
@@ -342,12 +425,23 @@ pub(crate) mod reporter {
             .unwrap()
         });
 
-    /// An estimated size of the volatile transaction IDs cache.
+    /// Size in memory allocated bytes of the volatile transaction IDs cache.
     pub(super) static VOLATILE_TRANSACTION_IDS_CACHE_SIZE: LazyLock<IntGaugeVec> =
         LazyLock::new(|| {
             register_int_gauge_vec!(
                 "rbac_volatile_transaction_ids_cache_size",
-                "An estimated size of the volatile transaction IDs cache",
+                "Size in memory allocated bytes of the volatile transaction IDs cache",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
+
+    /// Number of entries in the volatile transaction IDs cache.
+    pub(super) static VOLATILE_TRANSACTION_IDS_CACHE_ENTRY_COUNT: LazyLock<IntGaugeVec> =
+        LazyLock::new(|| {
+            register_int_gauge_vec!(
+                "rbac_volatile_transaction_ids_cache_entry_count",
+                "Number of entries in the volatile transaction IDs cache",
                 &METRIC_LABELS
             )
             .unwrap()
@@ -373,15 +467,26 @@ pub(crate) mod reporter {
         .unwrap()
     });
 
-    /// An estimated size of the persistent RBAC chains cache.
+    /// Size in memory allocated bytes of the persistent RBAC chains cache.
     pub(super) static PERSISTENT_CHAINS_CACHE_SIZE: LazyLock<IntGaugeVec> = LazyLock::new(|| {
         register_int_gauge_vec!(
             "rbac_persistent_chains_cache_size",
-            "An estimated size of the persistent RBAC chains cache",
+            "Size in memory allocated bytes of the persistent RBAC chains cache",
             &METRIC_LABELS
         )
         .unwrap()
     });
+
+    /// Number of entries in the persistent RBAC chains cache.
+    pub(super) static PERSISTENT_CHAINS_CACHE_ENTRY_COUNT: LazyLock<IntGaugeVec> =
+        LazyLock::new(|| {
+            register_int_gauge_vec!(
+                "rbac_persistent_transaction_ids_cache_entry_count",
+                "Number of entries in the persistent RBAC chains cache",
+                &METRIC_LABELS
+            )
+            .unwrap()
+        });
 
     /// This counter increases every time we need to synchronize RBAC indexing by waiting
     /// for other tasks to finish before processing a new registration.

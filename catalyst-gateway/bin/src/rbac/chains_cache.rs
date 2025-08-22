@@ -33,10 +33,3 @@ pub fn cached_persistent_rbac_chain(
             None
         })
 }
-
-/// Returns an approximate number of entries in the `PERSISTENT_CHAINS` cache.
-pub fn persistent_rbac_chains_cache_size() -> u64 {
-    CassandraSession::get(true)
-        .map(|session| session.caches().rbac_persistent_chains().entry_count())
-        .unwrap_or_default()
-}

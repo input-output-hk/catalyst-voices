@@ -111,10 +111,3 @@ pub fn invalidate_transactions_ids_cache(is_persistent: bool) {
         session.caches().rbac_transaction_id().clear_cache();
     });
 }
-
-/// Returns an approximate number of entries in the transaction IDs cache.
-pub fn transaction_ids_cache_size(is_persistent: bool) -> u64 {
-    CassandraSession::get(is_persistent)
-        .map(|session| session.caches().rbac_transaction_id().entry_count())
-        .unwrap_or_default()
-}

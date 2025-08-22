@@ -113,10 +113,3 @@ pub fn invalidate_public_keys_cache(is_persistent: bool) {
         session.caches().rbac_public_key().clear_cache();
     });
 }
-
-/// Returns an approximate number of entries in the public keys cache.
-pub fn public_keys_cache_size(is_persistent: bool) -> u64 {
-    CassandraSession::get(is_persistent)
-        .map(|session| session.caches().rbac_public_key().entry_count())
-        .unwrap_or_default()
-}

@@ -57,7 +57,6 @@ impl TransactionIdCache {
     }
 
     /// Weighted-size of the cache.
-    #[allow(dead_code)]
     pub(crate) fn weighted_size(&self) -> u64 {
         self.inner.weighted_size()
     }

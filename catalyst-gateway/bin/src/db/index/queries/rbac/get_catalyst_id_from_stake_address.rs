@@ -136,10 +136,3 @@ pub fn invalidate_stake_addresses_cache(is_persistent: bool) {
         session.caches().rbac_stake_address().clear_cache();
     });
 }
-
-/// Returns an approximate number of entries in the stake addresses cache.
-pub fn stake_addresses_cache_size(is_persistent: bool) -> u64 {
-    CassandraSession::get(is_persistent)
-        .map(|session| session.caches().rbac_stake_address().entry_count())
-        .unwrap_or_default()
-}

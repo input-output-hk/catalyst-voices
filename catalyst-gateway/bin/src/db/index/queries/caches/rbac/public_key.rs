@@ -52,19 +52,16 @@ impl PublicKeyCache {
     }
 
     /// Clear (invalidates) the cache entries.
-    #[allow(dead_code)]
     pub(crate) fn clear_cache(&self) {
         self.inner.clear_cache();
     }
 
     /// Weighted-size of the cache.
-    #[allow(dead_code)]
     pub(crate) fn weighted_size(&self) -> u64 {
         self.inner.weighted_size()
     }
 
     /// Number of entries in the cache.
-    #[allow(dead_code)]
     pub(crate) fn entry_count(&self) -> u64 {
         self.inner.entry_count()
     }

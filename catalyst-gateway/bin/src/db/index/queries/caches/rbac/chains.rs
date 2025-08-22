@@ -56,6 +56,11 @@ impl ChainsCache {
         self.inner.insert(key, value);
     }
 
+    /// Weighted-size of the cache.
+    pub(crate) fn weighted_size(&self) -> u64 {
+        self.inner.weighted_size()
+    }
+
     /// Number of entries in the cache.
     pub(crate) fn entry_count(&self) -> u64 {
         self.inner.entry_count()
