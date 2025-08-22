@@ -21,10 +21,10 @@ pub(crate) fn init_prometheus() -> Registry {
 }
 
 /// Updates metrics to current values.
-pub(crate) async fn metrics_updater_fn() {
+pub(crate) fn metrics_updater_fn() {
     chain_follower::update();
     memory::update();
-    health::update().await;
+    health::update();
     caches::update();
     rbac::update();
 }

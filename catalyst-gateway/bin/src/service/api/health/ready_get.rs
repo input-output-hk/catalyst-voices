@@ -74,13 +74,18 @@
 //! This endpoint complements the initialization and readiness monitoring endpoints by
 //! providing ongoing connectivity checks and recovery attempts for the service's
 //! databases.
+
 use poem_openapi::ApiResponse;
 
 use crate::{
     db::{event::EventDB, index::session::CassandraSession},
     service::{
         common::{responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption},
-        utilities::health::condition_for_started,
+        utilities::health::{
+            condition_for_started, event_db_is_live, event_db_probe_is_running,
+            event_db_probe_start, event_db_probe_stop, index_db_is_live, index_db_probe_is_running,
+            index_db_probe_start, index_db_probe_stop,
+        },
     },
 };
 
@@ -114,17 +119,28 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// and is not able to properly service requests while it is occurring.
 /// This would let the load balancer shift traffic to other instances of this
 /// service that are ready.
-pub(crate) async fn endpoint() -> AllResponses {
-    if EventDB::connection_is_ok().await
-        && CassandraSession::is_ready().await
-        && condition_for_started()
-    {
+pub(crate) fn endpoint() -> AllResponses {
+    // Dont need to re-init any of the DB sessions, initialisation should be called only once,
+    // if it was disconnected it will try to reconnect automatically with the existing
+    // session instance.
+
+    if !event_db_is_live() && !event_db_probe_is_running() {
+        tokio::spawn(async {
+            event_db_probe_start();
+            let _ = EventDB::connection_is_ok().await;
+            event_db_probe_stop();
+        });
+    }
+    if !index_db_is_live() && !index_db_probe_is_running() {
+        tokio::spawn(async {
+            index_db_probe_start();
+            let _ = CassandraSession::is_ready().await;
+            index_db_probe_stop();
+        });
+    }
+    if condition_for_started() {
         Responses::NoContent.into()
     } else {
-        // Dont need to re-init any of the DB sessions, initialisation should be called only once,
-        // if it was disconnected it will try to reconnect automatically with the existing
-        // session instance.
-
         // return 503 response.
         AllResponses::service_unavailable_with_msg(
             "Service is not ready, do not send other requests.".to_string(),
