@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/indicators/voices_progress_indicator_weight.dart';
 import 'package:flutter/material.dart';
 
 /// Animated version of [VoicesLinearProgressIndicator].
@@ -8,10 +9,14 @@ class AnimatedVoicesLinearProgressIndicator extends StatelessWidget {
   /// Whether to show the progress indicator's track.
   final bool showTrack;
 
+  /// The weight of the progress indicator.
+  final VoicesProgressIndicatorWeight weight;
+
   const AnimatedVoicesLinearProgressIndicator({
     super.key,
     required this.value,
     this.showTrack = true,
+    this.weight = VoicesProgressIndicatorWeight.medium,
   });
 
   @override
@@ -24,6 +29,7 @@ class AnimatedVoicesLinearProgressIndicator extends StatelessWidget {
         return VoicesLinearProgressIndicator(
           value: value,
           showTrack: showTrack,
+          weight: weight,
         );
       },
     );
@@ -43,19 +49,27 @@ class VoicesLinearProgressIndicator extends StatelessWidget {
   /// Whether to show the progress indicator's track.
   final bool showTrack;
 
+  /// The weight of the progress indicator.
+  final VoicesProgressIndicatorWeight weight;
+
   /// Creates a [VoicesLinearProgressIndicator] widget.
   const VoicesLinearProgressIndicator({
     super.key,
     this.value,
     this.showTrack = true,
+    this.weight = VoicesProgressIndicatorWeight.medium,
   });
 
   @override
   Widget build(BuildContext context) {
-    return LinearProgressIndicator(
-      value: value,
-      borderRadius: BorderRadius.circular(4),
-      backgroundColor: showTrack ? null : Colors.transparent,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(5),
+      child: LinearProgressIndicator(
+        value: value,
+        borderRadius: BorderRadius.circular(5),
+        minHeight: weight.minHeight,
+        backgroundColor: showTrack ? null : Colors.transparent,
+      ),
     );
   }
 }

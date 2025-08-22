@@ -12,8 +12,6 @@ import 'package:cbor/cbor.dart';
 abstract class Bip32Ed25519XPublicKeyFactory {
   static Bip32Ed25519XPublicKeyFactory _instance = const DefaultBip32Ed25519XPublicKeyFactory();
 
-  const Bip32Ed25519XPublicKeyFactory();
-
   // ignore: unnecessary_getters_setters
   static Bip32Ed25519XPublicKeyFactory get instance => _instance;
 
@@ -21,8 +19,15 @@ abstract class Bip32Ed25519XPublicKeyFactory {
     _instance = factory;
   }
 
+  const Bip32Ed25519XPublicKeyFactory();
+
   /// Constructs a [Bip32Ed25519XPublicKey] from a list of [bytes].
   Bip32Ed25519XPublicKey fromBytes(List<int> bytes);
+
+  /// Deserializes the type from cbor.
+  Bip32Ed25519XPublicKey fromCbor(CborValue value) {
+    return fromBytes((value as CborBytes).bytes);
+  }
 
   /// Constructs a [Bip32Ed25519XPublicKey] from a hex-encoded list of bytes.
   Bip32Ed25519XPublicKey fromHex(String string) {
@@ -36,11 +41,6 @@ abstract class Bip32Ed25519XPublicKeyFactory {
   /// pattern, primarily for testing or experimentation purposes.
   Bip32Ed25519XPublicKey seeded(int byte) {
     return fromBytes(List.filled(rust.U8Array64.arraySize, byte));
-  }
-
-  /// Deserializes the type from cbor.
-  Bip32Ed25519XPublicKey fromCbor(CborValue value) {
-    return fromBytes((value as CborBytes).bytes);
   }
 }
 

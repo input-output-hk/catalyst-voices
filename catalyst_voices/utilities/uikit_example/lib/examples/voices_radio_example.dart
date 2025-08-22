@@ -1,6 +1,15 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
+class VoicesRadioExample extends StatefulWidget {
+  static const String route = '/radio-example';
+
+  const VoicesRadioExample({super.key});
+
+  @override
+  State<VoicesRadioExample> createState() => _VoicesRadioExampleState();
+}
+
 enum _Type {
   one,
   two,
@@ -19,13 +28,35 @@ enum _Type {
   }
 }
 
-class VoicesRadioExample extends StatefulWidget {
-  static const String route = '/radio-example';
+class _TypeRadio extends StatelessWidget {
+  final _Type type;
 
-  const VoicesRadioExample({super.key});
+  final _Type? groupValue;
+  final bool toggleable;
+  final ValueChanged<_Type?>? onChanged;
+  const _TypeRadio(
+    this.type, {
+    super.key,
+    this.groupValue,
+    this.toggleable = false,
+    this.onChanged,
+  });
 
   @override
-  State<VoicesRadioExample> createState() => _VoicesRadioExampleState();
+  Widget build(BuildContext context) {
+    final labelNote = type.labelNote;
+    final label = labelNote.label;
+    final note = labelNote.note;
+
+    return VoicesRadio<_Type>(
+      value: type,
+      label: label != null ? Text(label) : null,
+      note: note != null ? Text(note) : null,
+      groupValue: groupValue,
+      toggleable: toggleable,
+      onChanged: onChanged,
+    );
+  }
 }
 
 class _VoicesRadioExampleState extends State<VoicesRadioExample> {
@@ -58,36 +89,5 @@ class _VoicesRadioExampleState extends State<VoicesRadioExample> {
     setState(() {
       _current = value;
     });
-  }
-}
-
-class _TypeRadio extends StatelessWidget {
-  const _TypeRadio(
-    this.type, {
-    super.key,
-    this.groupValue,
-    this.toggleable = false,
-    this.onChanged,
-  });
-
-  final _Type type;
-  final _Type? groupValue;
-  final bool toggleable;
-  final ValueChanged<_Type?>? onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final labelNote = type.labelNote;
-    final label = labelNote.label;
-    final note = labelNote.note;
-
-    return VoicesRadio<_Type>(
-      value: type,
-      label: label != null ? Text(label) : null,
-      note: note != null ? Text(note) : null,
-      groupValue: groupValue,
-      toggleable: toggleable,
-      onChanged: onChanged,
-    );
   }
 }

@@ -87,8 +87,8 @@ class _NetworkIdMismatchError extends StatelessWidget {
         networkId.localizedName(context),
       ),
       style: Theme.of(context).textTheme.labelSmall!.copyWith(
-            color: Theme.of(context).colors.iconsError,
-          ),
+        color: Theme.of(context).colors.iconsError,
+      ),
     );
   }
 }
@@ -106,8 +106,8 @@ class _WalletBalanceNotice extends StatelessWidget {
         Text(
           context.l10n.notice,
           style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                fontWeight: FontWeight.w800,
-              ),
+            fontWeight: FontWeight.w800,
+          ),
         ),
         Text(
           context.l10n.walletLinkWalletDetailsNotice,
@@ -209,8 +209,8 @@ class _WalletSummaryItem extends StatelessWidget {
         Expanded(
           child: DefaultTextStyle(
             style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+              fontWeight: FontWeight.w800,
+            ),
             child: label,
           ),
         ),

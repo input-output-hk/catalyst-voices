@@ -126,7 +126,10 @@ class _DisplayingValueAsChips extends StatelessWidget {
                   : Theme.of(context).colors.errorContainer,
             ),
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 4,
+          ),
           backgroundColor: value
               ? Theme.of(context).colors.success
               : Theme.of(context).colors.iconsError,

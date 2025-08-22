@@ -26,39 +26,45 @@ extension ButtonsThemeExt on ThemeData {
   ThemeData copyWithButtonsTheme() {
     return copyWith(
       filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          foregroundColor: colorScheme.onPrimary,
-          backgroundColor: colorScheme.primary,
-          disabledForegroundColor: colors.textDisabled,
-          disabledBackgroundColor: colors.onSurfaceNeutral012,
-        ).merge(_buildBaseButtonStyle(textTheme)).copyWith(
-              overlayColor: WidgetStateProperty.fromMap({
-                WidgetState.pressed | WidgetState.focused: colors.primaryOverlay,
-                WidgetState.hovered: colors.primaryOverlay.withValues(alpha: 0.4),
-              }),
-            ),
+        style:
+            FilledButton.styleFrom(
+                  foregroundColor: colorScheme.onPrimary,
+                  backgroundColor: colorScheme.primary,
+                  disabledForegroundColor: colors.textDisabled,
+                  disabledBackgroundColor: colors.onSurfaceNeutral012,
+                )
+                .merge(_buildBaseButtonStyle(textTheme))
+                .copyWith(
+                  overlayColor: WidgetStateProperty.fromMap({
+                    WidgetState.pressed | WidgetState.focused: colors.primaryOverlay,
+                    WidgetState.hovered: colors.primaryOverlay.withValues(alpha: 0.4),
+                  }),
+                ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(
-          foregroundColor: colorScheme.primary,
-          backgroundColor: Colors.transparent,
-          disabledForegroundColor: colors.textDisabled,
-          disabledBackgroundColor: Colors.transparent,
-        ).copyWith(
-          side: WidgetStateProperty.resolveWith(
-            (states) {
-              if (states.contains(WidgetState.disabled)) {
-                return BorderSide(color: colors.onSurfaceNeutral012);
-              }
+        style:
+            OutlinedButton.styleFrom(
+                  foregroundColor: colorScheme.primary,
+                  backgroundColor: Colors.transparent,
+                  disabledForegroundColor: colors.textDisabled,
+                  disabledBackgroundColor: Colors.transparent,
+                )
+                .copyWith(
+                  side: WidgetStateProperty.resolveWith(
+                    (states) {
+                      if (states.contains(WidgetState.disabled)) {
+                        return BorderSide(color: colors.onSurfaceNeutral012);
+                      }
 
-              if (states.contains(WidgetState.focused)) {
-                return BorderSide(color: colorScheme.primary);
-              }
+                      if (states.contains(WidgetState.focused)) {
+                        return BorderSide(color: colorScheme.primary);
+                      }
 
-              return BorderSide(color: colors.outlineBorder);
-            },
-          ),
-        ).merge(_buildBaseButtonStyle(textTheme)),
+                      return BorderSide(color: colors.outlineBorder);
+                    },
+                  ),
+                )
+                .merge(_buildBaseButtonStyle(textTheme)),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(

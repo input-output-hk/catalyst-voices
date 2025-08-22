@@ -1,9 +1,10 @@
 import 'dart:math';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
-    hide Ed25519PublicKey;
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart' as cs
+    as cs
     show Ed25519PublicKey;
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
+    hide Ed25519PublicKey;
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/registration/registration_transaction_role.dart';
@@ -64,10 +65,10 @@ final class RegistrationTransactionBuilder {
     required this.utxos,
     required this.previousTransactionId,
   }) : assert(
-          roles.isFirstRegistration || previousTransactionId != null,
-          "When it's not a first registration then "
-          'previousTransactionId must be provided',
-        );
+         roles.isFirstRegistration || previousTransactionId != null,
+         "When it's not a first registration then "
+         'previousTransactionId must be provided',
+       );
 
   ShelleyAddress get _stakeAddress => rewardAddresses.first;
 
@@ -86,6 +87,8 @@ final class RegistrationTransactionBuilder {
       throw const RegistrationInsufficientBalanceException();
     } on AssetNameTooLongException catch (e) {
       throw RegistrationAssetNameTooLongException(assets: e.assets);
+    } on OutputPublicKeyHashNotInRequiredSignerException catch (e) {
+      throw RegistrationMissingRequiredSignerException(missingRequiredSigners: e.missing);
     }
   }
 
@@ -116,6 +119,7 @@ final class RegistrationTransactionBuilder {
 
     final requiredSigners = {
       _stakeAddress.publicKeyHash,
+      changeAddress.publicKeyHash,
     };
 
     final strategy = _pickStrategy(RegistrationTransactionStrategyType.bytes);

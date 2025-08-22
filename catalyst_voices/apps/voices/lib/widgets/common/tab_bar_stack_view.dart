@@ -38,6 +38,14 @@ class _TabBarStackViewState extends State<TabBarStackView> {
   bool get _controllerIsValid => _controller?.animation != null;
 
   @override
+  Widget build(BuildContext context) {
+    return _TabsBodyContainer(
+      currentIndex: _currentIndex,
+      children: widget.children,
+    );
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _updateTabController();
@@ -63,12 +71,16 @@ class _TabBarStackViewState extends State<TabBarStackView> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return _TabsBodyContainer(
-      currentIndex: _currentIndex,
-      children: widget.children,
-    );
+  void _handleTabControllerAnimationTick() {
+    if (!_controller!.indexIsChanging) {
+      return;
+    }
+
+    if (_controller!.index != _currentIndex) {
+      setState(() {
+        _currentIndex = _controller!.index;
+      });
+    }
   }
 
   void _updateTabController() {
@@ -99,18 +111,6 @@ class _TabBarStackViewState extends State<TabBarStackView> {
 
     if (newController != null) {
       newController.animation!.addListener(_handleTabControllerAnimationTick);
-    }
-  }
-
-  void _handleTabControllerAnimationTick() {
-    if (!_controller!.indexIsChanging) {
-      return;
-    }
-
-    if (_controller!.index != _currentIndex) {
-      setState(() {
-        _currentIndex = _controller!.index;
-      });
     }
   }
 }

@@ -7,29 +7,23 @@ import '../onboarding_base_page.dart';
 import '../step_1_get_started.dart';
 
 class RestoreKeychainChoicePanel extends OnboardingPageBase {
-  RestoreKeychainChoicePanel(super.$);
-
   final recoverKeychainMethodsTitle = const Key('RecoverKeychainMethodsTitle');
+
   final onDeviceKeychainsWidget = const Key('BlocOnDeviceKeychains');
   final keychainNotFoundIndicator = const Key('KeychainNotFoundIndicator');
   final recoverKeychainMethodsSubtitleKey = const Key('RecoverKeychainMethodsSubtitle');
   final recoverKeychainMethodsListTitleKey = const Key('RecoverKeychainMethodsListTitle');
   final registrationTileKey = const ValueKey(RegistrationRecoverMethod.seedPhrase);
-
-  @override
-  Future<void> goto() async {
-    await GetStartedPanel($).goto();
-    await GetStartedPanel($).clickRecoverKeychain();
-  }
+  RestoreKeychainChoicePanel(super.$);
 
   Future<void> clickRestoreSeedPhrase() async {
     await $(registrationTileKey).tap();
   }
 
   @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
+  Future<void> goto() async {
+    await GetStartedPanel($).goto();
+    await GetStartedPanel($).clickRecoverKeychain();
   }
 
   Future<void> verifyDetailsPanel() async {
@@ -62,5 +56,11 @@ class RestoreKeychainChoicePanel extends OnboardingPageBase {
     );
     expect(infoPartTaskPicture(), findsOneWidget);
     expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
+  }
+
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }

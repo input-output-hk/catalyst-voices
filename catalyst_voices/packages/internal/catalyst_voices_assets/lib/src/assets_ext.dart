@@ -179,7 +179,8 @@ extension SvgGenImageExt on SvgGenImage {
       placeholderBuilder: placeholderBuilder,
       clipBehavior: clipBehavior,
       theme: theme,
-      colorFilter: colorFilter ??
+      colorFilter:
+          colorFilter ??
           (color != null
               ? ColorFilter.mode(
                   color,

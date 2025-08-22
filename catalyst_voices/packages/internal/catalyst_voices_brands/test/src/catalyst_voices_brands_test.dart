@@ -9,45 +9,44 @@ void main() {
 
   Widget buildApp({
     ThemeMode themeMode = ThemeMode.light,
-  }) =>
-      BlocProvider(
-        create: (context) => BrandBloc(),
-        child: BlocBuilder<BrandBloc, BrandState>(
-          builder: (context, state) {
-            return MaterialApp(
-              themeMode: themeMode,
-              home: Builder(
-                builder: (context) => Scaffold(
-                  body: Row(
-                    children: [
-                      CatalystSvgPicture.asset(
-                        Theme.of(context).brandAssets.brand.logo(context).path,
-                      ),
-                      MaterialButton(
-                        key: catalystKey,
-                        color: Theme.of(context).primaryColor,
-                        onPressed: () {
-                          context.read<BrandBloc>().add(
-                                const BrandChangedEvent(Brand.catalyst),
-                              );
-                        },
-                        child: const Text('Catalyst'),
-                      ),
-                    ],
+  }) => BlocProvider(
+    create: (context) => BrandBloc(),
+    child: BlocBuilder<BrandBloc, BrandState>(
+      builder: (context, state) {
+        return MaterialApp(
+          themeMode: themeMode,
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: Row(
+                children: [
+                  CatalystSvgPicture.asset(
+                    Theme.of(context).brandAssets.brand.logo(context).path,
                   ),
-                ),
+                  MaterialButton(
+                    key: catalystKey,
+                    color: Theme.of(context).primaryColor,
+                    onPressed: () {
+                      context.read<BrandBloc>().add(
+                        const BrandChangedEvent(Brand.catalyst),
+                      );
+                    },
+                    child: const Text('Catalyst'),
+                  ),
+                ],
               ),
-              theme: ThemeBuilder.buildTheme(
-                brand: state.brand,
-              ),
-              darkTheme: ThemeBuilder.buildTheme(
-                brand: state.brand,
-                brightness: Brightness.dark,
-              ),
-            );
-          },
-        ),
-      );
+            ),
+          ),
+          theme: ThemeBuilder.buildTheme(
+            brand: state.brand,
+          ),
+          darkTheme: ThemeBuilder.buildTheme(
+            brand: state.brand,
+            brightness: Brightness.dark,
+          ),
+        );
+      },
+    ),
+  );
 
   group('Test brands', () {
     // Colors used in the Brand themes as primary. They are used for

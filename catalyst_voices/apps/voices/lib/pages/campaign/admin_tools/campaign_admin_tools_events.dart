@@ -26,12 +26,6 @@ class _CampaignAdminToolsEventsTabState extends State<CampaignAdminToolsEventsTa
   Duration _stageTransitionDelay = _defaultStageTransitionDelay;
 
   @override
-  void dispose() {
-    _stageTimer?.cancel();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return BlocSelector<AdminToolsCubit, AdminToolsState, CampaignStage>(
       selector: (state) => state.campaignStage,
@@ -47,8 +41,9 @@ class _CampaignAdminToolsEventsTabState extends State<CampaignAdminToolsEventsTa
             _EventTimelapseControls(
               nextStageTransitionAt: _stageTransitionAt,
               stageTransitionDelay: _stageTransitionDelay,
-              onPreviousStage:
-                  _canSelectPreviousStage(stage) ? () => _onPreviousStage(stage) : null,
+              onPreviousStage: _canSelectPreviousStage(stage)
+                  ? () => _onPreviousStage(stage)
+                  : null,
               onNextStage: _canSelectNextStage(stage) ? () => _onNextStage(stage) : null,
               onTransitionDelayChanged: _onTransitionDelayChanged,
             ),
@@ -56,6 +51,36 @@ class _CampaignAdminToolsEventsTabState extends State<CampaignAdminToolsEventsTa
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _stageTimer?.cancel();
+    super.dispose();
+  }
+
+  bool _canSelectNextStage(CampaignStage currentStage) {
+    final nextIndex = currentStage.index + 1;
+    return nextIndex < CampaignStage.values.length;
+  }
+
+  bool _canSelectPreviousStage(CampaignStage currentStage) {
+    // draft stage is not supported
+
+    final previousIndex = currentStage.index - 1;
+    return previousIndex > CampaignStage.draft.index;
+  }
+
+  void _onNextStage(CampaignStage currentStage) {
+    if (!_canSelectNextStage(currentStage)) return;
+
+    _onStageSelected(CampaignStage.values[currentStage.index + 1]);
+  }
+
+  void _onPreviousStage(CampaignStage currentStage) {
+    if (!_canSelectPreviousStage(currentStage)) return;
+
+    _onStageSelected(CampaignStage.values[currentStage.index - 1]);
   }
 
   void _onStageSelected(CampaignStage stage) {
@@ -69,28 +94,10 @@ class _CampaignAdminToolsEventsTabState extends State<CampaignAdminToolsEventsTa
     });
   }
 
-  bool _canSelectPreviousStage(CampaignStage currentStage) {
-    // draft stage is not supported
-
-    final previousIndex = currentStage.index - 1;
-    return previousIndex > CampaignStage.draft.index;
-  }
-
-  bool _canSelectNextStage(CampaignStage currentStage) {
-    final nextIndex = currentStage.index + 1;
-    return nextIndex < CampaignStage.values.length;
-  }
-
-  void _onPreviousStage(CampaignStage currentStage) {
-    if (!_canSelectPreviousStage(currentStage)) return;
-
-    _onStageSelected(CampaignStage.values[currentStage.index - 1]);
-  }
-
-  void _onNextStage(CampaignStage currentStage) {
-    if (!_canSelectNextStage(currentStage)) return;
-
-    _onStageSelected(CampaignStage.values[currentStage.index + 1]);
+  void _onTransitionDelayChanged(Duration delay) {
+    setState(() {
+      _stageTransitionDelay = delay;
+    });
   }
 
   void _updateStage(CampaignStage stage) {
@@ -98,12 +105,6 @@ class _CampaignAdminToolsEventsTabState extends State<CampaignAdminToolsEventsTa
 
     setState(() {
       _stageTransitionAt = null;
-    });
-  }
-
-  void _onTransitionDelayChanged(Duration delay) {
-    setState(() {
-      _stageTransitionDelay = delay;
     });
   }
 }
@@ -149,10 +150,18 @@ class _EventItem extends StatelessWidget {
     required this.onTap,
   });
 
+  SvgGenImage get _icon => switch (stage) {
+    CampaignStage.draft => VoicesAssets.icons.clock,
+    CampaignStage.scheduled => VoicesAssets.icons.clock,
+    CampaignStage.live => VoicesAssets.icons.flag,
+    CampaignStage.completed => VoicesAssets.icons.calendar,
+  };
+
   @override
   Widget build(BuildContext context) {
-    final color =
-        isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).colors.textOnPrimary;
+    final color = isActive
+        ? Theme.of(context).colorScheme.primary
+        : Theme.of(context).colors.textOnPrimary;
 
     return InkWell(
       onTap: onTap,
@@ -169,18 +178,18 @@ class _EventItem extends StatelessWidget {
               child: Text(
                 _text(context.l10n),
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: color,
-                    ),
+                  color: color,
+                ),
               ),
             ),
             if (isActive)
               Text(
                 context.l10n.active.toUpperCase(),
                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 11,
-                      color: color,
-                    ),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 11,
+                  color: color,
+                ),
               ),
           ],
         ),
@@ -188,19 +197,12 @@ class _EventItem extends StatelessWidget {
     );
   }
 
-  SvgGenImage get _icon => switch (stage) {
-        CampaignStage.draft => VoicesAssets.icons.clock,
-        CampaignStage.scheduled => VoicesAssets.icons.clock,
-        CampaignStage.live => VoicesAssets.icons.flag,
-        CampaignStage.completed => VoicesAssets.icons.calendar,
-      };
-
   String _text(VoicesLocalizations l10n) => switch (stage) {
-        CampaignStage.draft => l10n.campaignPreviewEventBefore,
-        CampaignStage.scheduled => l10n.campaignPreviewEventBefore,
-        CampaignStage.live => l10n.campaignPreviewEventDuring,
-        CampaignStage.completed => l10n.campaignPreviewEventAfter,
-      };
+    CampaignStage.draft => l10n.campaignPreviewEventBefore,
+    CampaignStage.scheduled => l10n.campaignPreviewEventBefore,
+    CampaignStage.live => l10n.campaignPreviewEventDuring,
+    CampaignStage.completed => l10n.campaignPreviewEventAfter,
+  };
 }
 
 class _EventTimelapseControls extends StatefulWidget {
@@ -227,26 +229,10 @@ class _EventTimelapseControlsState extends State<_EventTimelapseControls> {
   Timer? _refreshTimer;
   bool _enabled = true;
 
-  @override
-  void initState() {
-    super.initState();
-
-    _refresh();
-    _restartRefreshTimer();
-  }
-
-  @override
-  void didUpdateWidget(_EventTimelapseControls oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _refresh();
-    _restartRefreshTimer();
-  }
-
-  @override
-  void dispose() {
-    _timerController.dispose();
-    _refreshTimer?.cancel();
-    super.dispose();
+  Duration? get _stageTransitionDelay {
+    final cleanedString = _timerController.text.replaceAll('s', '').replaceAll(' ', '');
+    final seconds = int.tryParse(cleanedString);
+    return seconds != null ? Duration(seconds: seconds) : null;
   }
 
   @override
@@ -291,12 +277,33 @@ class _EventTimelapseControlsState extends State<_EventTimelapseControls> {
     );
   }
 
-  void _restartRefreshTimer() {
+  @override
+  void didUpdateWidget(_EventTimelapseControls oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _refresh();
+    _restartRefreshTimer();
+  }
+
+  @override
+  void dispose() {
+    _timerController.dispose();
     _refreshTimer?.cancel();
-    _refreshTimer = Timer.periodic(
-      const Duration(seconds: 1),
-      (_) => _refresh(),
-    );
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _refresh();
+    _restartRefreshTimer();
+  }
+
+  void _onTransitionDelayChanged() {
+    final duration = _stageTransitionDelay;
+    if (duration != null && duration != widget.stageTransitionDelay) {
+      widget.onTransitionDelayChanged(duration);
+    }
   }
 
   void _refresh() {
@@ -309,6 +316,14 @@ class _EventTimelapseControlsState extends State<_EventTimelapseControls> {
     } else {
       _updateTimerController(widget.stageTransitionDelay, enabled: true);
     }
+  }
+
+  void _restartRefreshTimer() {
+    _refreshTimer?.cancel();
+    _refreshTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) => _refresh(),
+    );
   }
 
   void _updateTimerController(Duration duration, {required bool enabled}) {
@@ -328,18 +343,5 @@ class _EventTimelapseControlsState extends State<_EventTimelapseControls> {
         _enabled = enabled;
       });
     }
-  }
-
-  void _onTransitionDelayChanged() {
-    final duration = _stageTransitionDelay;
-    if (duration != null && duration != widget.stageTransitionDelay) {
-      widget.onTransitionDelayChanged(duration);
-    }
-  }
-
-  Duration? get _stageTransitionDelay {
-    final cleanedString = _timerController.text.replaceAll('s', '').replaceAll(' ', '');
-    final seconds = int.tryParse(cleanedString);
-    return seconds != null ? Duration(seconds: seconds) : null;
   }
 }

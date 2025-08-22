@@ -10,18 +10,7 @@ import 'package:flutter/foundation.dart';
 /// interface. Every method is has its mapping to [readString]/[writeString].
 mixin StorageAsStringMixin implements Storage {
   @override
-  FutureOr<int?> readInt({required String key}) async {
-    final value = await readString(key: key);
-    return value != null ? int.parse(value) : null;
-  }
-
-  @override
-  FutureOr<void> writeInt(
-    int? value, {
-    required String key,
-  }) {
-    return writeString(value?.toString(), key: key);
-  }
+  FutureOr<void> delete({required String key}) => writeString(null, key: key);
 
   @override
   FutureOr<bool?> readBool({required String key}) async {
@@ -35,25 +24,31 @@ mixin StorageAsStringMixin implements Storage {
   }
 
   @override
+  FutureOr<Uint8List?> readBytes({required String key}) async {
+    final base64String = await readString(key: key);
+    final bytes = base64String != null ? Uint8List.fromList(base64Decode(base64String)) : null;
+
+    return bytes;
+  }
+
+  @override
+  FutureOr<int?> readInt({required String key}) async {
+    final value = await readString(key: key);
+    return value != null ? int.parse(value) : null;
+  }
+
+  @override
   FutureOr<void> writeBool(
     bool? value, {
     required String key,
   }) {
     final asInt = value != null
         ? value
-            ? 1
-            : 0
+              ? 1
+              : 0
         : null;
 
     return writeInt(asInt, key: key);
-  }
-
-  @override
-  FutureOr<Uint8List?> readBytes({required String key}) async {
-    final base64String = await readString(key: key);
-    final bytes = base64String != null ? Uint8List.fromList(base64Decode(base64String)) : null;
-
-    return bytes;
   }
 
   @override
@@ -67,5 +62,10 @@ mixin StorageAsStringMixin implements Storage {
   }
 
   @override
-  FutureOr<void> delete({required String key}) => writeString(null, key: key);
+  FutureOr<void> writeInt(
+    int? value, {
+    required String key,
+  }) {
+    return writeString(value?.toString(), key: key);
+  }
 }

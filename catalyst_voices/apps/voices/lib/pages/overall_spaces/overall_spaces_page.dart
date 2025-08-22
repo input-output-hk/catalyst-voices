@@ -12,8 +12,9 @@ class OverallSpacesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16)
-            .add(const EdgeInsets.only(bottom: 12, left: 16)),
+        padding: const EdgeInsets.symmetric(
+          vertical: 16,
+        ).add(const EdgeInsets.only(bottom: 12, left: 16)),
         child: const Row(
           children: [
             _Navigation(),

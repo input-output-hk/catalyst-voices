@@ -31,12 +31,12 @@ class CreateNewProposalActionButtons extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
       child: switch (step) {
         CreateProposalWithPreselectedCategoryStep() => const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _AgreementCheckboxes(),
-              _StartProposalButton(),
-            ],
-          ),
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _AgreementCheckboxes(),
+            _StartProposalButton(),
+          ],
+        ),
         CreateProposalWithoutPreselectedCategoryStep(:final stage)
             when stage == CreateProposalStage.selectCategory =>
           const Row(
@@ -49,11 +49,11 @@ class CreateNewProposalActionButtons extends StatelessWidget {
             ],
           ),
         CreateProposalWithoutPreselectedCategoryStep() => const Row(
-            children: [
-              Spacer(),
-              _SelectCategoryButton(),
-            ],
-          ),
+          children: [
+            Spacer(),
+            _SelectCategoryButton(),
+          ],
+        ),
       },
     );
   }
@@ -69,8 +69,9 @@ class _AgreementCheckboxes extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         VoicesCheckbox(
-          value: context
-              .select<NewProposalCubit, bool>((cubit) => cubit.state.isAgreeToCategoryCriteria),
+          value: context.select<NewProposalCubit, bool>(
+            (cubit) => cubit.state.isAgreeToCategoryCriteria,
+          ),
           onChanged: (value) {
             context.read<NewProposalCubit>().updateAgreeToCategoryCriteria(value: value);
           },

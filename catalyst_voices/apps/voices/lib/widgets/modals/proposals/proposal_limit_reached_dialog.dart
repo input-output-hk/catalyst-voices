@@ -65,24 +65,24 @@ class _Countdown extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesCountdown(
       dateTime: date,
-      builder: (
-        context, {
-        required days,
-        required hours,
-        required minutes,
-        required seconds,
-      }) =>
-          Text(
-        context.l10n.catalystAppClosesIn(
-          days,
-          hours,
-          minutes,
-          seconds,
-        ),
-        style: context.textTheme.titleMedium?.copyWith(
-          color: context.colorScheme.primary,
-        ),
-      ),
+      builder:
+          (
+            context, {
+            required days,
+            required hours,
+            required minutes,
+            required seconds,
+          }) => Text(
+            context.l10n.catalystAppClosesIn(
+              days,
+              hours,
+              minutes,
+              seconds,
+            ),
+            style: context.textTheme.titleMedium?.copyWith(
+              color: context.colorScheme.primary,
+            ),
+          ),
     );
   }
 }
@@ -189,9 +189,9 @@ class _Subheader extends StatelessWidget {
     return Text(
       context.l10n.proposalsLimitReachedSubtitle(currentSubmissions),
       style: Theme.of(context).textTheme.titleLarge!.copyWith(
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).colors.textOnPrimaryLevel1,
-          ),
+        fontWeight: FontWeight.bold,
+        color: Theme.of(context).colors.textOnPrimaryLevel1,
+      ),
     );
   }
 }

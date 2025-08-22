@@ -42,6 +42,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -77,6 +78,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -112,6 +114,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -149,6 +152,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -182,6 +186,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -221,6 +226,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -260,6 +266,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -297,6 +304,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -335,6 +343,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -375,6 +384,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -408,7 +418,7 @@ void main() {
 
       expect(
         buildTx,
-        throwsA(isA<RawTransactionMalformed>()),
+        throwsA(isA<RawTransactionMalformedException>()),
         reason: 'Errors thrown; no corruption',
       );
     });
@@ -418,6 +428,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -458,6 +469,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert(size: 2000);
@@ -481,8 +493,9 @@ void main() {
         requiredSigners: requiredSigners,
       );
       final decodedTx = Transaction.fromCbor(cbor.decode(rawTx.bytes));
-      final chunkedData = (decodedTx.auxiliaryData!.map[X509MetadataEnvelope.envelopeKey]!
-          as CborMap)[const CborSmallInt(10)];
+      final chunkedData =
+          (decodedTx.auxiliaryData!.map[X509MetadataEnvelope.envelopeKey]!
+              as CborMap)[const CborSmallInt(10)];
 
       expect(chunkedData, isA<CborList>());
       expect(
@@ -497,6 +510,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -543,6 +557,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -576,6 +591,7 @@ void main() {
       final utxos = _buildUtxos();
       final requiredSigners = {
         _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
       };
 
       final derCert = _buildCert();
@@ -613,6 +629,130 @@ void main() {
       }
 
       expect(buildTx, throwsA(isA<RegistrationTxCertValidationException>()));
+    });
+
+    test(
+      'Validate transaction throws exception when it does not contain any change outputs',
+      () async {
+        // Given
+        final utxos = {
+          TransactionUnspentOutput(
+            input: TransactionInput(
+              transactionId: _buildDummyTransactionId(0),
+              index: 0,
+            ),
+            output: TransactionOutput(
+              address: _changeAddress,
+              amount: const Balance(coin: Coin(100000)),
+            ),
+          ),
+        };
+
+        final requiredSigners = {
+          _rewardAddress.publicKeyHash,
+          _changeAddress.publicKeyHash,
+        };
+
+        final derCert = _buildCert();
+        final strategy = _buildStrategy(utxos: utxos);
+
+        // When
+        final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+          masterKey: _masterKey,
+          role: AccountRole.voter,
+        );
+        final publicKeys = <RbacField<Ed25519PublicKey>>[
+          RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+        ];
+
+        // Then
+        Future<RawTransaction> buildTx() {
+          return strategy.build(
+            purpose: _purpose,
+            rootKeyPair: rootKeyPair,
+            derCert: derCert,
+            publicKeys: publicKeys,
+            requiredSigners: requiredSigners,
+          );
+        }
+
+        expect(
+          buildTx,
+          throwsA(
+            anyOf(
+              isA<InsufficientUtxoBalanceException>(),
+              isA<TransactionMissingChangeOutputsException>(),
+            ),
+          ),
+        );
+      },
+    );
+
+    test('Validate requiredSigners throws exception when output address not in', () async {
+      // Given
+      final utxos = _buildUtxos(address: _changeAddress);
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+      };
+
+      final derCert = _buildCert();
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+      ];
+
+      // Then
+      Future<RawTransaction> buildTx() async {
+        return strategy.build(
+          purpose: _purpose,
+          rootKeyPair: rootKeyPair,
+          derCert: derCert,
+          publicKeys: publicKeys,
+          requiredSigners: requiredSigners,
+        );
+      }
+
+      expect(buildTx, throwsA(isA<OutputPublicKeyHashNotInRequiredSignerException>()));
+    });
+
+    test('Validate requiredSigners returns normally when outputs address is required', () async {
+      // Given
+      final utxos = _buildUtxos(address: _changeAddress);
+      final requiredSigners = {
+        _rewardAddress.publicKeyHash,
+        _changeAddress.publicKeyHash,
+      };
+
+      final derCert = _buildCert();
+      final strategy = _buildStrategy(utxos: utxos);
+
+      // When
+      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+        masterKey: _masterKey,
+        role: AccountRole.voter,
+      );
+      final publicKeys = <RbacField<Ed25519PublicKey>>[
+        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+      ];
+
+      // Then
+      Future<RawTransaction> buildTx() async {
+        return strategy.build(
+          purpose: _purpose,
+          rootKeyPair: rootKeyPair,
+          derCert: derCert,
+          publicKeys: publicKeys,
+          requiredSigners: requiredSigners,
+        );
+      }
+
+      expect(buildTx, returnsNormally);
     });
   });
 }
@@ -682,7 +822,9 @@ RegistrationTransactionStrategyBytes _buildStrategy({
   );
 }
 
-Set<TransactionUnspentOutput> _buildUtxos() {
+Set<TransactionUnspentOutput> _buildUtxos({
+  ShelleyAddress? address,
+}) {
   return {
     TransactionUnspentOutput(
       input: TransactionInput(
@@ -690,7 +832,7 @@ Set<TransactionUnspentOutput> _buildUtxos() {
         index: 0,
       ),
       output: TransactionOutput(
-        address: _changeAddress,
+        address: address ?? _changeAddress,
         amount: Balance(coin: Coin.fromAda(1.2)),
       ),
     ),
@@ -700,7 +842,7 @@ Set<TransactionUnspentOutput> _buildUtxos() {
         index: 1,
       ),
       output: TransactionOutput(
-        address: _changeAddress,
+        address: address ?? _changeAddress,
         amount: Balance(coin: Coin.fromAda(1.2)),
       ),
     ),
@@ -724,8 +866,7 @@ class _FakeBip32Ed25519XPrivateKey extends Fake implements kd.Bip32Ed25519XPriva
   @override
   Future<R> use<R>(
     Future<R> Function(kd.Bip32Ed25519XPrivateKey privateKey) callback,
-  ) =>
-      callback(this);
+  ) => callback(this);
 
   @override
   Future<bool> verify(List<int> message, {required kd.Bip32Ed25519XSignature signature}) async {
@@ -748,8 +889,8 @@ class _FakeBip32Ed25519XPublicKey extends Fake implements kd.Bip32Ed25519XPublic
 
   @override
   kd.Ed25519PublicKey toPublicKey() => kd.Ed25519PublicKey.fromBytes(
-        bytes.take(kd.Ed25519PrivateKey.length).toList(),
-      );
+    bytes.take(kd.Ed25519PrivateKey.length).toList(),
+  );
 }
 
 class _FakeBip32Ed25519XPublicKeyFactory extends kd.Bip32Ed25519XPublicKeyFactory {

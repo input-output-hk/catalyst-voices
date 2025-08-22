@@ -55,41 +55,43 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
     );
 
     return VoicesSinglePaneDialog(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 83),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 36),
-            IconTheme(
-              data: iconThemeData,
-              child: icon,
-            ),
-            const SizedBox(height: 8),
-            DefaultTextStyle(
-              style: titleStyle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              child: title,
-            ),
-            const SizedBox(height: 24),
-            DefaultTextStyle(
-              style: messageStyle,
-              textAlign: TextAlign.center,
-              child: message,
-            ),
-            if (subMessage != null) ...[
-              const SizedBox(height: 15),
-              DefaultTextStyle(
-                style: subMessageStyle,
-                textAlign: TextAlign.center,
-                child: subMessage,
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 83),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 36),
+              IconTheme(
+                data: iconThemeData,
+                child: icon,
               ),
+              const SizedBox(height: 8),
+              DefaultTextStyle(
+                style: titleStyle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                child: title,
+              ),
+              const SizedBox(height: 24),
+              DefaultTextStyle(
+                style: messageStyle,
+                textAlign: TextAlign.center,
+                child: message,
+              ),
+              if (subMessage != null) ...[
+                const SizedBox(height: 15),
+                DefaultTextStyle(
+                  style: subMessageStyle,
+                  textAlign: TextAlign.center,
+                  child: subMessage,
+                ),
+              ],
+              const SizedBox(height: 24),
+              action,
+              const SizedBox(height: 20),
             ],
-            const SizedBox(height: 24),
-            action,
-            const SizedBox(height: 20),
-          ],
+          ),
         ),
       ),
     );

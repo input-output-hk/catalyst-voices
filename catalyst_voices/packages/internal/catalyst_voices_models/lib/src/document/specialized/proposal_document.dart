@@ -23,15 +23,22 @@ final class ProposalDocument extends Equatable {
   static final durationNodeId = DocumentNodeId.fromString('summary.time.duration');
   static final authorNameNodeId = DocumentNodeId.fromString('setup.proposer.applicant');
   static final categoryNodeId = DocumentNodeId.fromString('campaign_category');
-  static final categoryDetailsNodeId =
-      DocumentNodeId.fromString('campaign_category.category_details');
+  static final categoryDetailsNodeId = DocumentNodeId.fromString(
+    'campaign_category.category_details',
+  );
+  static final categoryDetailsNameNodeId = DocumentNodeId.fromString(
+    'campaign_category.category_details.details',
+  );
   static final milestonesNodeId = DocumentNodeId.fromString('milestones.milestones');
-  static final milestoneListNodeId =
-      DocumentNodeId.fromString('milestones.milestones.milestone_list');
-  static final milestoneListChildNodeId =
-      DocumentNodeId.fromString('milestones.milestones.milestone_list.*');
-  static final milestoneCostNodeId =
-      DocumentNodeId.fromString('milestones.milestones.milestone_list.*.cost');
+  static final milestoneListNodeId = DocumentNodeId.fromString(
+    'milestones.milestones.milestone_list',
+  );
+  static final milestoneListChildNodeId = DocumentNodeId.fromString(
+    'milestones.milestones.milestone_list.*',
+  );
+  static final milestoneCostNodeId = DocumentNodeId.fromString(
+    'milestones.milestones.milestone_list.*.cost',
+  );
   static final tagNodeId = DocumentNodeId.fromString('theme.theme.grouped_tag');
 
   /// A list of all [DocumentNodeId] that are expected to appear
@@ -46,6 +53,7 @@ final class ProposalDocument extends Equatable {
     authorNameNodeId,
     categoryNodeId,
     categoryDetailsNodeId,
+    categoryDetailsNameNodeId,
     milestonesNodeId,
     milestoneListNodeId,
     tagNodeId,
@@ -104,16 +112,16 @@ final class ProposalDocument extends Equatable {
       return null;
     }
 
-    return DocumentNodeTraverser.findSectionsAndSubsections(property)
-        .where((element) => element.nodeId.isChildOf(milestoneListNodeId))
-        .length;
+    return DocumentNodeTraverser.findSectionsAndSubsections(
+      property,
+    ).where((element) => element.nodeId.isChildOf(milestoneListNodeId)).length;
   }
 
   @override
   List<Object?> get props => [
-        metadata,
-        document,
-      ];
+    metadata,
+    document,
+  ];
 
   String? get tag {
     final property = document.getProperty(tagNodeId);

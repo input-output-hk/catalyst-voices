@@ -1,5 +1,24 @@
 import 'package:equatable/equatable.dart';
 
+/* cSpell:disable */
+//For now use full path to extension
+List<Extension> extensions = [
+  const Extension(
+    name: 'Eternl',
+    id: 'kmhcihpebfmpgmihbkipmjlmmioameka',
+    browser: Browser.chrome,
+    extensionPath:
+        '/Users/ryszardschossler/Developer/H2B/catalyst-voices/catalyst_voices/packages/internal/catalyst_voices_driver/lib/src/browser_extensions/eternl',
+  ),
+  const Extension(
+    name: 'Typhon',
+    id: 'kfdniefadaanbjodldohaedphafoffoh',
+    browser: Browser.chrome,
+    extensionPath:
+        '/Users/ryszardschossler/Developer/H2B/catalyst-voices/catalyst_voices/packages/internal/catalyst_voices_driver/lib/src/browser_extensions/typhon',
+  ),
+];
+
 enum Browser {
   chrome,
   brave,
@@ -34,22 +53,4 @@ class Extension extends Equatable {
   List<Object?> get props => [name, id, browser, extensionPath];
 }
 
-/* cSpell:disable */
-//For now use full path to extension
-List<Extension> extensions = [
-  const Extension(
-    name: 'Eternl',
-    id: 'kmhcihpebfmpgmihbkipmjlmmioameka',
-    browser: Browser.chrome,
-    extensionPath:
-        '/Users/ryszardschossler/Developer/H2B/catalyst-voices/catalyst_voices/packages/internal/catalyst_voices_driver/lib/src/browser_extensions/eternl',
-  ),
-  const Extension(
-    name: 'Typhon',
-    id: 'kfdniefadaanbjodldohaedphafoffoh',
-    browser: Browser.chrome,
-    extensionPath:
-        '/Users/ryszardschossler/Developer/H2B/catalyst-voices/catalyst_voices/packages/internal/catalyst_voices_driver/lib/src/browser_extensions/typhon',
-  ),
-];
 /* cSpell:enable */

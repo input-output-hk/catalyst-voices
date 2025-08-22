@@ -25,41 +25,45 @@ class _PickUsernameDialogState extends State<PickUsernameDialog> {
   @override
   Widget build(BuildContext context) {
     return VoicesSinglePaneDialog(
-      child: FractionallySizedBox(
-        widthFactor: 0.65,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 44),
-            Text(
-              context.l10n.commentPickUsername,
-              style:
-                  context.textTheme.titleLarge?.copyWith(color: context.colors.textOnPrimaryLevel0),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              context.l10n.commentPickUsernameLabel,
-              style:
-                  context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel0),
-            ),
-            const SizedBox(height: 24),
-            VoicesUsernameTextField(
-              onFieldSubmitted: _trySubmitValue,
-              onChanged: _updateAndValidate,
-              decoration: VoicesTextFieldDecoration(
-                labelText: context.l10n.commentPickUsername,
-                hintText: context.l10n.commentPickUsernameHint,
-                errorText: _username.displayError?.message(context),
+      child: SingleChildScrollView(
+        child: FractionallySizedBox(
+          widthFactor: 0.65,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 44),
+              Text(
+                context.l10n.commentPickUsername,
+                style: context.textTheme.titleLarge?.copyWith(
+                  color: context.colors.textOnPrimaryLevel0,
+                ),
               ),
-              maxLength: Username.lengthRange.max,
-            ),
-            const SizedBox(height: 24),
-            VoicesFilledButton(
-              onTap: _username.isValid ? _submit : null,
-              child: Text(context.l10n.confirm),
-            ),
-            const SizedBox(height: 32),
-          ],
+              const SizedBox(height: 24),
+              Text(
+                context.l10n.commentPickUsernameLabel,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: context.colors.textOnPrimaryLevel0,
+                ),
+              ),
+              const SizedBox(height: 24),
+              VoicesUsernameTextField(
+                onFieldSubmitted: _trySubmitValue,
+                onChanged: _updateAndValidate,
+                decoration: VoicesTextFieldDecoration(
+                  labelText: context.l10n.commentPickUsername,
+                  hintText: context.l10n.commentPickUsernameHint,
+                  errorText: _username.displayError?.message(context),
+                ),
+                maxLength: Username.lengthRange.max,
+              ),
+              const SizedBox(height: 24),
+              VoicesFilledButton(
+                onTap: _username.isValid ? _submit : null,
+                child: Text(context.l10n.confirm),
+              ),
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       ),
     );

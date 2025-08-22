@@ -57,13 +57,13 @@ class VoicesGestureDetector extends StatelessWidget {
   });
 
   List<Object?> get _callbacks => [
-        onTapDown,
-        onTap,
-        onSecondaryTap,
-        onLongPress,
-        onHorizontalDragUpdate,
-        onPanUpdate,
-      ];
+    onTapDown,
+    onTap,
+    onSecondaryTap,
+    onLongPress,
+    onHorizontalDragUpdate,
+    onPanUpdate,
+  ];
 
   @override
   Widget build(BuildContext context) {

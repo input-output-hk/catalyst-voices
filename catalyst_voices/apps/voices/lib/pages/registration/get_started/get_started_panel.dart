@@ -84,16 +84,16 @@ class GetStartedPanel extends StatelessWidget {
 
 extension _CreateAccountTypeExt on CreateAccountType {
   SvgGenImage get _icon => switch (this) {
-        CreateAccountType.createNew => VoicesAssets.icons.colorSwatch,
-        CreateAccountType.recover => VoicesAssets.icons.download,
-      };
+    CreateAccountType.createNew => VoicesAssets.icons.colorSwatch,
+    CreateAccountType.recover => VoicesAssets.icons.download,
+  };
 
   String _getSubtitle(VoicesLocalizations l10n) {
     return l10n.accountCreationOnThisDevice;
   }
 
   String _getTitle(VoicesLocalizations l10n) => switch (this) {
-        CreateAccountType.createNew => l10n.accountCreationCreate,
-        CreateAccountType.recover => l10n.accountCreationRecover,
-      };
+    CreateAccountType.createNew => l10n.accountCreationCreate,
+    CreateAccountType.recover => l10n.accountCreationRecover,
+  };
 }
