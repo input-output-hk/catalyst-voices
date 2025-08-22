@@ -296,6 +296,7 @@ pub async fn establish_connection_pool() {
         .max_lifetime(Some(Settings::event_db_settings().max_lifetime()))
         .min_idle(Settings::event_db_settings().min_idle())
         .connection_timeout(Settings::event_db_settings().connection_timeout())
+        .retry_connection(Settings::event_db_settings().retry_connection())
         .build(pg_mgr)
         .await
     {

@@ -51,6 +51,11 @@ pub(crate) struct EnvVars {
     /// Sets the connection timeout used by the pool.
     /// Defaults to 30 seconds.
     connection_timeout: Duration,
+
+    /// Instructs Event DB pool to automatically retry connection creation if it fails,
+    /// until the `connection_timeout` has expired.
+    /// Default false.
+    retry_connection: bool,
 }
 
 impl EnvVars {
@@ -75,6 +80,8 @@ impl EnvVars {
                 "EVENT_DB_CONN_TIMEOUT",
                 EVENT_DB_CONN_TIMEOUT,
             ),
+            retry_connection: StringEnvVar::new_optional("EVENT_DB_RETRY_CONNECTION", false)
+                .is_some(),
         }
     }
 
@@ -111,5 +118,10 @@ impl EnvVars {
     /// Returns Event DB `connection_timeout` setting
     pub(crate) fn connection_timeout(&self) -> Duration {
         self.connection_timeout
+    }
+
+    /// Returns Event DB `retry_connection` setting
+    pub(crate) fn retry_connection(&self) -> bool {
+        self.retry_connection
     }
 }
