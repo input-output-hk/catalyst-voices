@@ -9,8 +9,8 @@ final class MemoryCollectLogStrategy implements CollectLogStrategy {
 
   MemoryCollectLogStrategy({
     int maxHistorySize = 500,
-  })  : assert(maxHistorySize > 0, 'Have to be positive'),
-        _maxHistorySize = maxHistorySize;
+  }) : assert(maxHistorySize > 0, 'Have to be positive'),
+       _maxHistorySize = maxHistorySize;
 
   @override
   Future<void> clear() async {

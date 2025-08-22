@@ -12,16 +12,16 @@ final class Currency extends Equatable {
   });
 
   const Currency.ada()
-      : this(
-          name: 'ADA',
-          symbol: '₳',
-        );
+    : this(
+        name: 'ADA',
+        symbol: '₳',
+      );
 
   @override
   List<Object?> get props => [
-        name,
-        symbol,
-      ];
+    name,
+    symbol,
+  ];
 
   /// Returns formatted [money] with prefix of this [Currency][symbol].
   String format(num money) {

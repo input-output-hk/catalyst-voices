@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:patrol_finders/patrol_finders.dart';
 
 class CommonPage {
-  CommonPage(this.$);
-
   late PatrolTester $;
+
   final decorData = const Key('DecoratorData');
   final decorIconBefore = const Key('DecoratorIconBefore');
   final decorIconAfter = const Key('DecoratorIconAfter');
@@ -17,4 +16,5 @@ class CommonPage {
   final errorRetryBtn = const Key('ErrorRetryBtn');
   final buttonFilledType = const Key('ButtonFilled');
   final buttonTextType = const Key('ButtonText');
+  CommonPage(this.$);
 }

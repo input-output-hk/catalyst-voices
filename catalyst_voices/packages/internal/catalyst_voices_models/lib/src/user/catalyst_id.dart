@@ -57,11 +57,11 @@ final class CatalystId extends Equatable {
     this.rotation,
     this.encrypt = false,
   }) : assert(
-          role0Key.length == 32,
-          'Role0Key must be 32 bytes long. '
-          'Make sure to use plain public key, '
-          'not the extended public key.',
-        );
+         role0Key.length == 32,
+         'Role0Key must be 32 bytes long. '
+         'Make sure to use plain public key, '
+         'not the extended public key.',
+       );
 
   /// Parses the [CatalystId] from [Uri].
   factory CatalystId.fromUri(Uri uri) {
@@ -81,14 +81,14 @@ final class CatalystId extends Equatable {
 
   @override
   List<Object?> get props => [
-        host,
-        username,
-        nonce,
-        role0Key,
-        role,
-        rotation,
-        encrypt,
-      ];
+    host,
+    username,
+    nonce,
+    role0Key,
+    role,
+    rotation,
+    encrypt,
+  ];
 
   CatalystId copyWith({
     String? host,
@@ -160,11 +160,7 @@ final class CatalystId extends Equatable {
   /// Parses the data from [Uri.path].
   ///
   /// Format: role0Key[/roleNumber][/rotation]
-  static (
-    Uint8List role0Key,
-    AccountRole? role,
-    int? rotation,
-  ) _parsePath(String path) {
+  static (Uint8List role0Key, AccountRole? role, int? rotation) _parsePath(String path) {
     final sanitizedPath = _sanitizePath(Uri.decodeComponent(path));
     final parts = sanitizedPath.split('/');
 

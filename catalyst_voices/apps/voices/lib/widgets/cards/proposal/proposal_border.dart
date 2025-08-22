@@ -4,13 +4,13 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class ProposalBorder extends StatelessWidget {
-  final ProposalPublish publishStage;
+  final ProposalPublish publish;
   final WidgetStatesController statesController;
   final Widget child;
 
   const ProposalBorder({
     super.key,
-    required this.publishStage,
+    required this.publish,
     required this.statesController,
     required this.child,
   });
@@ -18,7 +18,7 @@ class ProposalBorder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _Color(
-      publishStage: publishStage,
+      publish: publish,
       colors: context.colors,
       colorScheme: context.colorScheme,
     );
@@ -44,12 +44,12 @@ class ProposalBorder extends StatelessWidget {
 }
 
 final class _Color extends WidgetStateProperty<Color> {
-  final ProposalPublish publishStage;
+  final ProposalPublish publish;
   final VoicesColorScheme colors;
   final ColorScheme colorScheme;
 
   _Color({
-    required this.publishStage,
+    required this.publish,
     required this.colors,
     required this.colorScheme,
   });
@@ -57,7 +57,7 @@ final class _Color extends WidgetStateProperty<Color> {
   @override
   Color resolve(Set<WidgetState> states) {
     if (const [WidgetState.hovered, WidgetState.focused].any(states.contains)) {
-      return switch (publishStage) {
+      return switch (publish) {
         ProposalPublish.localDraft || ProposalPublish.publishedDraft => colorScheme.secondary,
         ProposalPublish.submittedProposal => colorScheme.primary,
       };

@@ -63,10 +63,10 @@ final class SecuredDocumentRefDto {
   }
 
   SecuredDocumentRefDto.fromModel(SecuredDocumentRef data)
-      : this(
-          ref: DocumentRefDto.fromModel(data.ref),
-          hash: hex.encode(data.hash),
-        );
+    : this(
+        ref: DocumentRefDto.fromModel(data.ref),
+        hash: hex.encode(data.hash),
+      );
 
   Map<String, dynamic> toJson() => _$SecuredDocumentRefDtoToJson(this);
 

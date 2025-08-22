@@ -6,7 +6,7 @@
 
 use std::collections::HashSet;
 
-use cardano_blockchain_types::{Network, StakeAddress, TransactionId, VotingPubKey};
+use cardano_chain_follower::{hashes::TransactionId, Network, StakeAddress, VotingPubKey};
 use catalyst_types::{problem_report::ProblemReport, uuid::UuidV4};
 use ed25519_dalek::VerifyingKey;
 use futures::StreamExt;

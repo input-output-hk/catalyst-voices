@@ -4,9 +4,9 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 extension ProposalPublishExt on ProposalPublish {
   SvgGenImage get workspaceIcon => switch (this) {
-        ProposalPublish.submittedProposal => VoicesAssets.icons.lockClosed,
-        _ => VoicesAssets.icons.documentText,
-      };
+    ProposalPublish.submittedProposal => VoicesAssets.icons.lockClosed,
+    _ => VoicesAssets.icons.documentText,
+  };
 
   String localizedWorkspaceName(VoicesLocalizations l10n) {
     return switch (this) {

@@ -7,6 +7,7 @@ import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_manager_scope.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_precache.dart';
 import 'package:catalyst_voices/common/ext/preferences_ext.dart';
+import 'package:catalyst_voices/pages/campaign_phase_aware/widgets/bubble_campaign_phase_aware_background.dart';
 import 'package:catalyst_voices/share/share_manager.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -85,7 +86,10 @@ final class _AppContent extends StatelessWidget {
                       child: AppMobileAccessRestriction(
                         routerConfig: routerConfig,
                         child: DefaultShareManager(
-                          child: child ?? const SizedBox.shrink(),
+                          child: _AppContentBackground(
+                            key: const Key('AppContentBackground'),
+                            child: child,
+                          ),
                         ),
                       ),
                     ),
@@ -96,6 +100,27 @@ final class _AppContent extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _AppContentBackground extends StatelessWidget {
+  final Widget? child;
+
+  const _AppContentBackground({
+    super.key,
+    this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        const Positioned.fill(
+          child: BubbleCampaignPhaseAwareBackground(),
+        ),
+        child ?? const SizedBox.shrink(),
+      ],
     );
   }
 }

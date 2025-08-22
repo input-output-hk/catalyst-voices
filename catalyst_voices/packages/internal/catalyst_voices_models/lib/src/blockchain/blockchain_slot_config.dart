@@ -43,10 +43,10 @@ final class BlockchainSlotNumberConfig extends Equatable {
 
   @override
   List<Object?> get props => [
-        systemStartTimestamp,
-        systemStartSlot,
-        slotLength,
-      ];
+    systemStartTimestamp,
+    systemStartSlot,
+    slotLength,
+  ];
 
   BlockchainSlotNumberConfig copyWith({
     DateTime? systemStartTimestamp,

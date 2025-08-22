@@ -1,5 +1,7 @@
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/common/tab_bar_stack_view.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab_bar.dart';
 import 'package:catalyst_voices/widgets/widgets.dart' show SidebarScaffold;
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -186,15 +188,16 @@ class _SpaceSidePanelState extends State<SpaceSidePanel> with SingleTickerProvid
       vsync: this,
     );
 
-    _offsetAnimation = Tween<Offset>(
-      begin: Offset.zero,
-      end: widget.isLeft ? const Offset(-1, 0) : const Offset(1, 0),
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOut,
-      ),
-    );
+    _offsetAnimation =
+        Tween<Offset>(
+          begin: Offset.zero,
+          end: widget.isLeft ? const Offset(-1, 0) : const Offset(1, 0),
+        ).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: Curves.easeInOut,
+          ),
+        );
   }
 }
 
@@ -209,11 +212,9 @@ class _Tabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TabBar(
+    return VoicesTabBar(
       controller: controller,
-      isScrollable: true,
-      tabAlignment: TabAlignment.start,
-      tabs: tabs.map((e) => Tab(text: e.name)).toList(),
+      tabs: tabs.map((e) => VoicesTab(data: e, child: VoicesTabText(e.name))).toList(),
     );
   }
 }

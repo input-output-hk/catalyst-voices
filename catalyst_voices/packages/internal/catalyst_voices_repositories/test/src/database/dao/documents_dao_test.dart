@@ -277,25 +277,26 @@ void main() {
           // Given
           final documentsWithMetadata = _generateDocumentEntitiesWithMetadata(20);
 
-          final expectedDocuments = documentsWithMetadata
-              .map((e) => e.document)
-              .groupListsBy((doc) => '${doc.idHi}-${doc.idLo}')
-              .values
-              .map(
-                (versions) => versions.reduce((a, b) {
-                  // Compare versions (higher version wins)
+          final expectedDocuments =
+              documentsWithMetadata
+                  .map((e) => e.document)
+                  .groupListsBy((doc) => '${doc.idHi}-${doc.idLo}')
+                  .values
+                  .map(
+                    (versions) => versions.reduce((a, b) {
+                      // Compare versions (higher version wins)
+                      final compareHi = b.verHi.compareTo(a.verHi);
+                      if (compareHi != 0) return compareHi > 0 ? b : a;
+                      return b.verLo.compareTo(a.verLo) > 0 ? b : a;
+                    }),
+                  )
+                  .toList()
+                ..sort((a, b) {
+                  // Sort by version descending
                   final compareHi = b.verHi.compareTo(a.verHi);
-                  if (compareHi != 0) return compareHi > 0 ? b : a;
-                  return b.verLo.compareTo(a.verLo) > 0 ? b : a;
-                }),
-              )
-              .toList()
-            ..sort((a, b) {
-              // Sort by version descending
-              final compareHi = b.verHi.compareTo(a.verHi);
-              if (compareHi != 0) return compareHi;
-              return b.verLo.compareTo(a.verLo);
-            });
+                  if (compareHi != 0) return compareHi;
+                  return b.verLo.compareTo(a.verLo);
+                });
 
           final limitedExpectedDocuments = expectedDocuments.take(7).toList();
 
@@ -399,8 +400,9 @@ void main() {
           );
 
           // When
-          final documentsStream =
-              database.documentsDao.watchAll(limit: 7, unique: true).asBroadcastStream();
+          final documentsStream = database.documentsDao
+              .watchAll(limit: 7, unique: true)
+              .asBroadcastStream();
 
           // Save first version and wait for emission
           await database.documentsDao.saveAll([documentsWithMetadata]);
@@ -450,8 +452,9 @@ void main() {
           );
 
           // When
-          final documentsStream =
-              database.documentsDao.watchAll(limit: 1, unique: true).asBroadcastStream();
+          final documentsStream = database.documentsDao
+              .watchAll(limit: 1, unique: true)
+              .asBroadcastStream();
 
           await database.documentsDao.saveAll([document1]);
           final firstEmission = await documentsStream.first;
@@ -691,11 +694,11 @@ void main() {
             // When: query for documents with milestone_list.*.title == 'Milestone 2'
             final results = await (database.documentsDao as DriftDocumentsDao)
                 .queryDocumentsByMatchedDocumentNodeIdValue(
-              nodeId: DocumentNodeId.fromString('milestones.milestones.milestone_list.*.title'),
-              value: 'Milestone 2',
-              type: DocumentType.proposalDocument,
-              content: 'content',
-            );
+                  nodeId: DocumentNodeId.fromString('milestones.milestones.milestone_list.*.title'),
+                  value: 'Milestone 2',
+                  type: DocumentType.proposalDocument,
+                  content: 'content',
+                );
 
             // Then: only doc1 should be returned
             final refs = results.map((e) => e.metadata.selfRef).toList();
@@ -752,11 +755,11 @@ void main() {
 
             final results = await (database.documentsDao as DriftDocumentsDao)
                 .queryDocumentsByMatchedDocumentNodeIdValue(
-              nodeId: ProposalDocument.authorNameNodeId,
-              value: 'John Doe',
-              type: DocumentType.proposalDocument,
-              content: 'content',
-            );
+                  nodeId: ProposalDocument.authorNameNodeId,
+                  value: 'John Doe',
+                  type: DocumentType.proposalDocument,
+                  content: 'content',
+                );
 
             final refs = results.map((e) => e.metadata.selfRef).toList();
             expect(refs, contains(ref1));
@@ -844,11 +847,11 @@ void main() {
             // When: query for documents with milestone_list.*.title == 'Milestone 2'
             final results = await (database.documentsDao as DriftDocumentsDao)
                 .queryDocumentsByMatchedDocumentNodeIdValue(
-              nodeId: DocumentNodeId.fromString('*.subtitle'),
-              value: 'Subtitle',
-              type: DocumentType.proposalDocument,
-              content: 'content',
-            );
+                  nodeId: DocumentNodeId.fromString('*.subtitle'),
+                  value: 'Subtitle',
+                  type: DocumentType.proposalDocument,
+                  content: 'content',
+                );
 
             // Then: only doc1 should be returned
             final refs = results.map((e) => e.metadata.selfRef).toList();

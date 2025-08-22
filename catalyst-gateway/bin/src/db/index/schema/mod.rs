@@ -3,7 +3,7 @@
 use std::sync::Arc;
 
 use anyhow::Context;
-use cardano_blockchain_types::Network;
+use cardano_chain_follower::Network;
 use handlebars::Handlebars;
 use scylla::client::session::Session;
 use serde_json::json;

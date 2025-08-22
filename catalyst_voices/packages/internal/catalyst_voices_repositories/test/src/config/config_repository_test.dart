@@ -38,8 +38,7 @@ void main() {
       expect(config.blockchain.host.name, changedHost);
     });
 
-    test(
-        'partial remote config is using '
+    test('partial remote config is using '
         'fallback values when missing', () async {
       // Given
       final configJson = jsonDecode(Configs.noChain) as Map<String, dynamic>;

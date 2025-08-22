@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 /// A [from] - [to] date range, inclusive on both sides.
@@ -43,6 +44,16 @@ class DateRange extends Equatable {
     return adjustedFromWeekday == 0 && adjustedToWeekday == 6;
   }
 
+  DateRange copyWith({
+    Optional<DateTime>? from,
+    Optional<DateTime>? to,
+  }) {
+    return DateRange(
+      from: from.dataOr(this.from),
+      to: to.dataOr(this.to),
+    );
+  }
+
   bool isAfterRange(DateTime value) {
     final max = to?.millisecondsSinceEpoch ?? DateTime(2099).millisecondsSinceEpoch;
     final valueMillis = value.millisecondsSinceEpoch;
@@ -65,12 +76,7 @@ class DateRange extends Equatable {
     return min <= valueMillis && valueMillis <= max;
   }
 
-  bool isTodayInRange() {
-    return isInRange(DateTime.now());
-  }
-
-  DateRangeStatus rangeStatusNow() {
-    final now = DateTime.now();
+  DateRangeStatus rangeStatus(DateTime now) {
     if (isInRange(now)) {
       return DateRangeStatus.inRange;
     } else if (isBeforeRange(now)) {

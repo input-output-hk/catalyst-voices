@@ -7,8 +7,8 @@ class BlocWalletLinkSelector<T> extends BlocSelector<RegistrationCubit, Registra
     required super.builder,
     super.bloc,
   }) : super(
-          selector: (state) {
-            return selector(state.walletLinkStateData);
-          },
-        );
+         selector: (state) {
+           return selector(state.walletLinkStateData);
+         },
+       );
 }

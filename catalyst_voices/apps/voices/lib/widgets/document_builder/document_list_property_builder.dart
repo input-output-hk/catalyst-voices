@@ -65,44 +65,45 @@ class _FormField extends VoicesFormField<DocumentListProperty> {
     required ValueChanged<List<DocumentChange>> onDocumentChanged,
     required DocumentPropertyBuilderOverrides? overrides,
   }) : super(
-          enabled: isEditMode,
-          builder: (field) {
-            final property = field.value!;
-            final properties =
-                property.properties.whereNot((child) => child.schema.isSectionOrSubsection);
+         enabled: isEditMode,
+         builder: (field) {
+           final property = field.value!;
+           final properties = property.properties.whereNot(
+             (child) => child.schema.isSectionOrSubsection,
+           );
 
-            final error = field.errorText;
+           final error = field.errorText;
 
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ...[
-                  ListLengthPickerWidget(
-                    key: ValueKey(property.nodeId),
-                    list: property,
-                    isEditMode: isEditMode,
-                    onChanged: onDocumentChanged,
-                  ),
-                  ...properties.map<Widget>((child) {
-                    return DocumentPropertyBuilder(
-                      key: ValueKey(child.nodeId),
-                      property: child,
-                      isEditMode: isEditMode,
-                      onChanged: onDocumentChanged,
-                      overrides: overrides,
-                    );
-                  }),
-                ].separatedBy(const SizedBox(height: 24)),
-                if (error != null) ...[
-                  const SizedBox(height: 4),
-                  DocumentErrorText(
-                    text: error,
-                    enabled: isEditMode,
-                  ),
-                ],
-              ],
-            );
-          },
-        );
+           return Column(
+             mainAxisSize: MainAxisSize.min,
+             crossAxisAlignment: CrossAxisAlignment.start,
+             children: [
+               ...[
+                 ListLengthPickerWidget(
+                   key: ValueKey(property.nodeId),
+                   list: property,
+                   isEditMode: isEditMode,
+                   onChanged: onDocumentChanged,
+                 ),
+                 ...properties.map<Widget>((child) {
+                   return DocumentPropertyBuilder(
+                     key: ValueKey(child.nodeId),
+                     property: child,
+                     isEditMode: isEditMode,
+                     onChanged: onDocumentChanged,
+                     overrides: overrides,
+                   );
+                 }),
+               ].separatedBy(const SizedBox(height: 24)),
+               if (error != null) ...[
+                 const SizedBox(height: 4),
+                 DocumentErrorText(
+                   text: error,
+                   enabled: isEditMode,
+                 ),
+               ],
+             ],
+           );
+         },
+       );
 }

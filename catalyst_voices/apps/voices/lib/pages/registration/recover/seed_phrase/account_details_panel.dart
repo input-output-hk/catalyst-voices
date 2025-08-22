@@ -120,10 +120,12 @@ class _BlocAccountSummery extends StatelessWidget {
       selector: (state) => state.accountDetails,
       builder: (context, state) {
         return switch (state) {
-          Success<AccountSummaryData, LocalizedException>(:final value) =>
-            _RecoveredAccountSummary(account: value),
-          Failure<AccountSummaryData, LocalizedException>(:final value) =>
-            _RecoverAccountFailure(exception: value),
+          Success<AccountSummaryData, LocalizedException>(:final value) => _RecoveredAccountSummary(
+            account: value,
+          ),
+          Failure<AccountSummaryData, LocalizedException>(:final value) => _RecoverAccountFailure(
+            exception: value,
+          ),
           _ => const Center(child: VoicesCircularProgressIndicator()),
         };
       },
@@ -165,9 +167,9 @@ class _CheckOnCardanoScanButton extends StatelessWidget with LaunchUrlMixin {
         child: Text(
           context.l10n.checkOnCardanoScan,
           style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                color: Theme.of(context).colorScheme.primary,
-                fontWeight: FontWeight.w500,
-              ),
+            color: Theme.of(context).colorScheme.primary,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         onTap: () => _showOnCardanoScan(address),
       ),

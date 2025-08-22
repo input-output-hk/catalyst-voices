@@ -61,6 +61,16 @@ final class RegistrationState extends Equatable {
     };
   }
 
+  @override
+  List<Object?> get props => [
+    step,
+    baseProfileStateData,
+    keychainStateData,
+    walletLinkStateData,
+    registrationStateData,
+    recoverStateData,
+  ];
+
   RegistrationState copyWith({
     RegistrationStep? step,
     BaseProfileStateData? baseProfileStateData,
@@ -78,14 +88,4 @@ final class RegistrationState extends Equatable {
       recoverStateData: recoverStateData ?? this.recoverStateData,
     );
   }
-
-  @override
-  List<Object?> get props => [
-        step,
-        baseProfileStateData,
-        keychainStateData,
-        walletLinkStateData,
-        registrationStateData,
-        recoverStateData,
-      ];
 }

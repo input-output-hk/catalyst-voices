@@ -3,26 +3,6 @@ import 'package:catalyst_voices_repositories/src/dto/document/schema/document_de
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_property_schema_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
-enum _DocumentBooleanDefinition {
-  yesNoChoice('yesNoChoice'),
-  agreementConfirmation('agreementConfirmation'),
-  unknown('unknown');
-
-  final String def;
-
-  const _DocumentBooleanDefinition(this.def);
-
-  factory _DocumentBooleanDefinition.fromDef(String? def) {
-    for (final value in values) {
-      if (value.def.equalsIgnoreCase(def)) {
-        return value;
-      }
-    }
-
-    return _DocumentBooleanDefinition.unknown;
-  }
-}
-
 final class DocumentBooleanSchemaMapper {
   static DocumentBooleanSchema toModel({
     required DocumentDefinitionsDto definitions,
@@ -87,5 +67,25 @@ final class DocumentBooleanSchemaMapper {
           enumValues: enumValues,
         );
     }
+  }
+}
+
+enum _DocumentBooleanDefinition {
+  yesNoChoice('yesNoChoice'),
+  agreementConfirmation('agreementConfirmation'),
+  unknown('unknown');
+
+  final String def;
+
+  const _DocumentBooleanDefinition(this.def);
+
+  factory _DocumentBooleanDefinition.fromDef(String? def) {
+    for (final value in values) {
+      if (value.def.equalsIgnoreCase(def)) {
+        return value;
+      }
+    }
+
+    return _DocumentBooleanDefinition.unknown;
   }
 }

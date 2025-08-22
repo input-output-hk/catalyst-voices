@@ -26,6 +26,8 @@ abstract interface class UserRepository {
 
   Future<User> getUser();
 
+  Future<VotingPower> getVotingPower();
+
   /// Throws [EmailAlreadyUsedException] if [email] already taken.
   Future<AccountPublicProfile> publishUserProfile({
     required CatalystId catalystId,
@@ -83,6 +85,11 @@ final class UserRepositoryImpl implements UserRepository {
   }
 
   @override
+  Future<VotingPower> getVotingPower() {
+    return _getVotingPower();
+  }
+
+  @override
   Future<AccountPublicProfile> publishUserProfile({
     required CatalystId catalystId,
     required String email,
@@ -112,10 +119,9 @@ final class UserRepositoryImpl implements UserRepository {
         .successBodyOrThrow();
 
     final publicProfile = await _getAccountPublicProfile(token: rbacToken);
-    final username = publicProfile?.username ??
-        await _lookupUsernameFromDocuments(
-          catalystId: catalystId,
-        );
+    final username =
+        publicProfile?.username ?? await _lookupUsernameFromDocuments(catalystId: catalystId);
+    final votingPower = await _getVotingPower(token: rbacToken);
 
     return RecoveredAccount(
       username: username,
@@ -123,6 +129,7 @@ final class UserRepositoryImpl implements UserRepository {
       roles: rbacRegistration.accountRoles,
       stakeAddress: rbacRegistration.stakeAddress,
       publicStatus: publicProfile?.status ?? AccountPublicStatus.notSetup,
+      votingPower: votingPower,
     );
   }
 
@@ -135,9 +142,7 @@ final class UserRepositoryImpl implements UserRepository {
 
   /// Looks up reviews module and receives status for active
   /// account if [token] is not specified.
-  Future<AccountPublicProfile?> _getAccountPublicProfile({
-    RbacToken? token,
-  }) async {
+  Future<AccountPublicProfile?> _getAccountPublicProfile({RbacToken? token}) async {
     return _apiServices.reviews
         .apiCatalystIdsMeGet(authorization: token?.authHeader())
         .successBodyOrThrow()
@@ -148,6 +153,12 @@ final class UserRepositoryImpl implements UserRepository {
         .then((value) => value?.toModel());
   }
 
+  // TODO(dt-iohk): fetch voting power from backend using token
+  // ignore: unused_element_parameter
+  Future<VotingPower> _getVotingPower({RbacToken? token}) async {
+    return VotingPower.dummy();
+  }
+
   Future<String?> _lookupUsernameFromDocuments({
     required CatalystId catalystId,
   }) {
@@ -156,9 +167,10 @@ final class UserRepositoryImpl implements UserRepository {
         .getLatestDocument(authorId: significantId)
         .then((value) => value?.metadata.authors ?? <CatalystId>[])
         .then(
-      (authors) {
-        return authors.firstWhereOrNull((id) => id.toSignificant() == significantId);
-      },
-    ).then((value) => value?.username);
+          (authors) {
+            return authors.firstWhereOrNull((id) => id.toSignificant() == significantId);
+          },
+        )
+        .then((value) => value?.username);
   }
 }

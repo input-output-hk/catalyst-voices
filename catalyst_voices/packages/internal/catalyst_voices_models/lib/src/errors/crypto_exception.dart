@@ -1,10 +1,18 @@
 import 'package:equatable/equatable.dart';
 
-sealed class CryptoException extends Equatable implements Exception {
-  const CryptoException();
+final class CryptoAlgorithmUnsupported extends CryptoException {
+  final String? message;
+
+  const CryptoAlgorithmUnsupported([this.message]);
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [message];
+
+  @override
+  String toString() {
+    if (message != null) return 'CryptoAlgorithmUnsupported: $message';
+    return 'CryptoAlgorithmUnsupported';
+  }
 }
 
 /// Usually thrown when trying to decrypt with invalid key
@@ -22,13 +30,20 @@ final class CryptoDataMalformed extends CryptoException {
   const CryptoDataMalformed([this.message]);
 
   @override
+  List<Object?> get props => [message];
+
+  @override
   String toString() {
     if (message != null) return 'CryptoDataMalformed: $message';
     return 'CryptoDataMalformed';
   }
+}
+
+sealed class CryptoException extends Equatable implements Exception {
+  const CryptoException();
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [];
 }
 
 final class CryptoVersionUnsupported extends CryptoException {
@@ -37,26 +52,11 @@ final class CryptoVersionUnsupported extends CryptoException {
   const CryptoVersionUnsupported([this.message]);
 
   @override
+  List<Object?> get props => [message];
+
+  @override
   String toString() {
     if (message != null) return 'CryptoVersionUnsupported: $message';
     return 'CryptoVersionUnsupported';
   }
-
-  @override
-  List<Object?> get props => [message];
-}
-
-final class CryptoAlgorithmUnsupported extends CryptoException {
-  final String? message;
-
-  const CryptoAlgorithmUnsupported([this.message]);
-
-  @override
-  String toString() {
-    if (message != null) return 'CryptoAlgorithmUnsupported: $message';
-    return 'CryptoAlgorithmUnsupported';
-  }
-
-  @override
-  List<Object?> get props => [message];
 }

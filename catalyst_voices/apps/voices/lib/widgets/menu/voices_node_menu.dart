@@ -26,9 +26,9 @@ class VoicesNodeMenu extends StatelessWidget {
     this.isExpandable = true,
     this.isExpanded = false,
   }) : assert(
-          !isExpanded || isExpandable,
-          'Can not be expanded and not expandable at same time',
-        );
+         !isExpanded || isExpandable,
+         'Can not be expanded and not expandable at same time',
+       );
 
   @override
   Widget build(BuildContext context) {
@@ -96,9 +96,9 @@ final class VoicesNodeMenuItem extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        label,
-        isEnabled,
-        hasError,
-      ];
+    id,
+    label,
+    isEnabled,
+    hasError,
+  ];
 }

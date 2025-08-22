@@ -7,8 +7,8 @@ class BlocSeedPhraseSelector<T> extends BlocSelector<RegistrationCubit, Registra
     required super.builder,
     super.bloc,
   }) : super(
-          selector: (state) {
-            return selector(state.keychainStateData.seedPhraseStateData);
-          },
-        );
+         selector: (state) {
+           return selector(state.keychainStateData.seedPhraseStateData);
+         },
+       );
 }
