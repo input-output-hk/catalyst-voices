@@ -108,8 +108,8 @@ sealed class DocumentIntegerSchema extends DocumentValueSchema<int> {
     required super.enumValues,
     required this.numRange,
   }) : super(
-          type: DocumentPropertyType.integer,
-        );
+         type: DocumentPropertyType.integer,
+       );
 
   @override
   @mustCallSuper

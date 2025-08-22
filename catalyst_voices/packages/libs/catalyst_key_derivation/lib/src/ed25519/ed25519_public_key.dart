@@ -19,6 +19,11 @@ extension type Ed25519PublicKey._(List<int> bytes) {
     }
   }
 
+  /// Deserializes the type from cbor.
+  factory Ed25519PublicKey.fromCbor(CborValue value) {
+    return Ed25519PublicKey.fromBytes((value as CborBytes).bytes);
+  }
+
   /// Constructs [Ed25519PublicKey] from a hex [string].
   factory Ed25519PublicKey.fromHex(String string) {
     return Ed25519PublicKey.fromBytes(hexDecode(string));
@@ -28,11 +33,6 @@ extension type Ed25519PublicKey._(List<int> bytes) {
   /// used to reserve size to calculate the final transaction bytes size.
   factory Ed25519PublicKey.seeded(int byte) =>
       Ed25519PublicKey.fromBytes(List.filled(length, byte));
-
-  /// Deserializes the type from cbor.
-  factory Ed25519PublicKey.fromCbor(CborValue value) {
-    return Ed25519PublicKey.fromBytes((value as CborBytes).bytes);
-  }
 
   /// Serializes the type as cbor.
   CborValue toCbor({List<int> tags = const []}) {

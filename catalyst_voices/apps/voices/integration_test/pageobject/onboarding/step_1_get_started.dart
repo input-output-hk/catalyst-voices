@@ -6,16 +6,11 @@ import '../app_bar_page.dart';
 import 'onboarding_base_page.dart';
 
 class GetStartedPanel extends OnboardingPageBase {
-  GetStartedPanel(super.$);
   final getStartedMessage = const Key('GetStartedMessage');
   final getStartedQuestion = const Key('GetStartedQuestion');
   final createNewKeychain = const Key('CreateAccountType.createNew');
   final recoverKeychain = const Key('CreateAccountType.recover');
-
-  @override
-  Future<void> goto() async {
-    await AppBarPage($).getStartedBtnClick();
-  }
+  GetStartedPanel(super.$);
 
   Future<void> clickCreateNewKeychain() async {
     await $(createNewKeychain).tap();
@@ -26,22 +21,8 @@ class GetStartedPanel extends OnboardingPageBase {
   }
 
   @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
-  }
-
-  Future<void> verifyInfoPanel() async {
-    expect(
-      $(registrationInfoPanel).$(headerTitle).text,
-      (await t()).getStarted,
-    );
-    expect($(pictureContainer).$(IconTheme), findsOneWidget);
-    expect(
-      $(learnMoreButton).$(Text).text,
-      (await t()).learnMore,
-    );
-    expect(await closeButton(), findsOneWidget);
+  Future<void> goto() async {
+    await AppBarPage($).getStartedBtnClick();
   }
 
   Future<void> verifyDetailsPanel() async {
@@ -73,5 +54,24 @@ class GetStartedPanel extends OnboardingPageBase {
       $(recoverKeychain).$(registrationTileSubtitle).text,
       (await t()).accountCreationOnThisDevice,
     );
+  }
+
+  Future<void> verifyInfoPanel() async {
+    expect(
+      $(registrationInfoPanel).$(headerTitle).text,
+      (await t()).getStarted,
+    );
+    expect($(pictureContainer).$(IconTheme), findsOneWidget);
+    expect(
+      $(learnMoreButton).$(Text).text,
+      (await t()).learnMore,
+    );
+    expect(await closeButton(), findsOneWidget);
+  }
+
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }

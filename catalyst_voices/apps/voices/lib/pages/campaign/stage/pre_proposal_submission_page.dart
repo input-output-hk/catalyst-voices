@@ -1,21 +1,19 @@
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/campaign/stage/campaign_background.dart';
-import 'package:catalyst_voices/routes/routing/spaces_route.dart';
-import 'package:catalyst_voices/widgets/cards/countdown_value_card.dart';
-import 'package:catalyst_voices/widgets/countdown/voices_countdown.dart';
-import 'package:catalyst_voices/widgets/text/proposal_submission_start_text.dart';
+import 'package:catalyst_voices/widgets/countdown/campaign_phase_countdown.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class PreProposalSubmissionPage extends StatelessWidget {
-  final DateTime? startDate;
+  final CampaignPhaseCountdownViewModel phaseCountdown;
+  final ValueChanged<bool>? onCountdownEnd;
 
-  const PreProposalSubmissionPage({super.key, this.startDate});
+  const PreProposalSubmissionPage({super.key, required this.phaseCountdown, this.onCountdownEnd});
 
   @override
   Widget build(BuildContext context) {
@@ -26,45 +24,9 @@ class PreProposalSubmissionPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const _Header(),
-            if (startDate != null) ...[
-              const SizedBox(height: 32),
-              ProposalSubmissionStartText(startDate: startDate!),
-              const SizedBox(height: 32),
-              VoicesCountdown(
-                dateTime: startDate!,
-                onCountdownEnd: (value) => _onCountdownEnd(value, context),
-                builder: (
-                  context, {
-                  required days,
-                  required hours,
-                  required minutes,
-                  required seconds,
-                }) =>
-                    Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CountDownValueCard(
-                      value: days,
-                      unit: context.l10n.days(days),
-                    ),
-                    CountDownValueCard(
-                      value: hours,
-                      unit: context.l10n.hours(hours),
-                    ),
-                    CountDownValueCard(
-                      value: minutes,
-                      unit: context.l10n.minutes(minutes),
-                    ),
-                    CountDownValueCard(
-                      value: seconds,
-                      unit: context.l10n.seconds(seconds),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            _Header(phaseCountdown.fundNumber),
+            const SizedBox(height: 12),
+            CampaignPhaseCountdown(phaseCountdown: phaseCountdown),
             const SizedBox(height: 48),
             const _Description(),
             const SizedBox(height: 24),
@@ -73,13 +35,6 @@ class PreProposalSubmissionPage extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void _onCountdownEnd(bool isEnd, BuildContext context) {
-    if (isEnd) {
-      context.read<CampaignStageCubit>().proposalSubmissionStarted();
-      const DiscoveryRoute().pushReplacement(context);
-    }
   }
 }
 
@@ -111,12 +66,14 @@ class _Description extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header();
+  final int fundNumber;
+
+  const _Header(this.fundNumber);
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      context.l10n.catalystF14,
+      context.l10n.catalystFundNo(fundNumber),
       style: context.textTheme.displaySmall?.copyWith(
         color: context.colorScheme.primary,
       ),

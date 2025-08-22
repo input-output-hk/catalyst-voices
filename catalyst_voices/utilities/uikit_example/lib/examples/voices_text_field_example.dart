@@ -15,12 +15,6 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
   final _controller = TextEditingController();
 
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Voices Text Field')),
@@ -246,5 +240,11 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }

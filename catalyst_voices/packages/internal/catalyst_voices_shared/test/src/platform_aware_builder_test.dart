@@ -4,13 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   Widget buildApp() => MaterialApp(
-        home: Scaffold(
-          body: PlatformAwareBuilder<String>(
-            other: 'other',
-            builder: (context, platformData) => Text(platformData!),
-          ),
-        ),
-      );
+    home: Scaffold(
+      body: PlatformAwareBuilder<String>(
+        other: 'other',
+        builder: (context, platformData) => Text(platformData!),
+      ),
+    ),
+  );
 
   group('Test platform detection', () {
     testWidgets('PlatformWidgetBuilder fallbacks to other', (tester) async {

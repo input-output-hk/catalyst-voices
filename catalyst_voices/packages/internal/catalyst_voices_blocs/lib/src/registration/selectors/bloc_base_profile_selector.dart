@@ -7,8 +7,8 @@ class BlocBaseProfileSelector<T> extends BlocSelector<RegistrationCubit, Registr
     required super.builder,
     super.bloc,
   }) : super(
-          selector: (state) {
-            return selector(state.baseProfileStateData);
-          },
-        );
+         selector: (state) {
+           return selector(state.baseProfileStateData);
+         },
+       );
 }

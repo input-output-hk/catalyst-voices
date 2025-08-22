@@ -30,15 +30,15 @@ final class ProposalViewMetadata extends Equatable {
 
   @override
   List<Object?> get props => [
-        author,
-        description,
-        status,
-        createdAt,
-        warningCreatedAt,
-        tag,
-        commentsCount,
-        fundsRequested,
-        projectDuration,
-        milestoneCount,
-      ];
+    author,
+    description,
+    status,
+    createdAt,
+    warningCreatedAt,
+    tag,
+    commentsCount,
+    fundsRequested,
+    projectDuration,
+    milestoneCount,
+  ];
 }

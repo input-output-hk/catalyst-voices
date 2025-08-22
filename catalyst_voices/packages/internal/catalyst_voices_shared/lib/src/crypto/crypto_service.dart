@@ -5,37 +5,6 @@ import 'package:flutter/foundation.dart';
 // TODO(damian-molinski): Expose KeyDerivation interface and have it
 //  delegate implementation
 abstract interface class CryptoService {
-  /// Derives a cryptographic key from a given seed, with an optional salt.
-  ///
-  /// The derived key is generated based on the provided [seed], which serves
-  /// as the primary input. Optionally, a [salt] can be used to further
-  /// randomize the key derivation process, increasing security.
-  ///
-  /// - [seed]: The main input data used for key derivation.
-  /// - [salt]: Optional salt value to randomize the derived key (can be null).
-  ///
-  /// Returns a [Future] that completes with the derived key as a [Uint8List].
-  Future<Uint8List> deriveKey(
-    Uint8List seed, {
-    Uint8List? salt,
-  });
-
-  /// Verifies if a given cryptographic key is correctly derived from a seed.
-  ///
-  /// This method checks whether the provided [key] matches the key that would
-  /// be derived from the given [seed]. This can be useful to verify integrity
-  /// or correctness of the key derivation process.
-  ///
-  /// - [seed]: The input data used for key derivation.
-  /// - [key]: The derived key that needs to be verified.
-  ///
-  /// Returns a [Future] that completes with `true` if the [key] is valid and
-  /// correctly derived from the [seed], or `false` otherwise.
-  Future<bool> verifyKey(
-    Uint8List seed, {
-    required Uint8List key,
-  });
-
   /// Decrypts the provided [data] using the specified cryptographic [key],
   /// usually build using [deriveKey].
   ///
@@ -53,6 +22,21 @@ abstract interface class CryptoService {
     required Uint8List key,
   });
 
+  /// Derives a cryptographic key from a given seed, with an optional salt.
+  ///
+  /// The derived key is generated based on the provided [seed], which serves
+  /// as the primary input. Optionally, a [salt] can be used to further
+  /// randomize the key derivation process, increasing security.
+  ///
+  /// - [seed]: The main input data used for key derivation.
+  /// - [salt]: Optional salt value to randomize the derived key (can be null).
+  ///
+  /// Returns a [Future] that completes with the derived key as a [Uint8List].
+  Future<Uint8List> deriveKey(
+    Uint8List seed, {
+    Uint8List? salt,
+  });
+
   /// Encrypts the provided [data] using the specified cryptographic [key],
   /// usually build using [deriveKey].
   ///
@@ -67,6 +51,22 @@ abstract interface class CryptoService {
   /// [Uint8List].
   Future<Uint8List> encrypt(
     Uint8List data, {
+    required Uint8List key,
+  });
+
+  /// Verifies if a given cryptographic key is correctly derived from a seed.
+  ///
+  /// This method checks whether the provided [key] matches the key that would
+  /// be derived from the given [seed]. This can be useful to verify integrity
+  /// or correctness of the key derivation process.
+  ///
+  /// - [seed]: The input data used for key derivation.
+  /// - [key]: The derived key that needs to be verified.
+  ///
+  /// Returns a [Future] that completes with `true` if the [key] is valid and
+  /// correctly derived from the [seed], or `false` otherwise.
+  Future<bool> verifyKey(
+    Uint8List seed, {
     required Uint8List key,
   });
 }

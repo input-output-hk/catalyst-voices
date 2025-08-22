@@ -43,8 +43,9 @@ class CborOrJsonDelegateConverter implements Converter {
   }
 
   bool _isCborContentType(Map<String, String> headers) {
-    final lowercaseHeaders =
-        headers.map((key, value) => MapEntry(key.toLowerCase(), value.toLowerCase()));
+    final lowercaseHeaders = headers.map(
+      (key, value) => MapEntry(key.toLowerCase(), value.toLowerCase()),
+    );
     final contentType = lowercaseHeaders[HttpHeaders.contentType.toLowerCase()];
     return contentType != null && contentType.contains(ContentTypes.applicationCbor.toLowerCase());
   }

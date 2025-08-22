@@ -183,25 +183,25 @@ final class CoseHeaders extends Equatable {
 
   @override
   List<Object?> get props => [
-        alg,
-        kid,
-        contentType,
-        contentEncoding,
-        type,
-        id,
-        ver,
-        ref,
-        refHash,
-        template,
-        reply,
-        section,
-        collabs,
-        brandId,
-        campaignId,
-        electionId,
-        categoryId,
-        encodeAsBytes,
-      ];
+    alg,
+    kid,
+    contentType,
+    contentEncoding,
+    type,
+    id,
+    ver,
+    ref,
+    refHash,
+    template,
+    reply,
+    section,
+    collabs,
+    brandId,
+    campaignId,
+    electionId,
+    categoryId,
+    encodeAsBytes,
+  ];
 
   /// Returns a copy of the [CoseHeaders] with overwritten properties.
   CoseHeaders copyWith({

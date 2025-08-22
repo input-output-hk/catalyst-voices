@@ -60,59 +60,62 @@ class _FormField extends VoicesFormField<DocumentObjectProperty> {
     required ValueChanged<List<DocumentChange>> onDocumentChanged,
     required DocumentPropertyBuilderOverrides? overrides,
   }) : super(
-          enabled: isEditMode,
-          builder: (field) {
-            final context = field.context;
-            final property = field.value!;
-            final schema = property.schema;
-            final title = schema.title;
-            final properties =
-                property.properties.whereNot((child) => child.schema.isSectionOrSubsection);
+         enabled: isEditMode,
+         builder: (field) {
+           final context = field.context;
+           final property = field.value!;
+           final schema = property.schema;
+           final title = schema.title;
+           final properties = property.properties.whereNot(
+             (child) => child.schema.isSectionOrSubsection,
+           );
 
-            final showBorder = schema is DocumentBorderGroupSchema;
-            final error = field.errorText;
+           final showBorder = schema is DocumentBorderGroupSchema;
+           final error = field.errorText;
 
-            return Container(
-              width: double.infinity,
-              padding: showBorder ? const EdgeInsets.all(16) : null,
-              decoration: showBorder
-                  ? BoxDecoration(
-                      border: Border.all(color: Theme.of(context).dividerColor),
-                      borderRadius: BorderRadius.circular(8),
-                    )
-                  : null,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (title.isNotEmpty && !schema.isSectionOrSubsection) ...[
-                    DocumentPropertyBuilderTitle(
-                      title: title,
-                      isRequired: false,
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                  ...properties.map<Widget>((child) {
-                    return DocumentPropertyBuilder(
-                      key: ValueKey(child.nodeId),
-                      property: child,
-                      isEditMode: isEditMode,
-                      onChanged: onDocumentChanged,
-                      overrides: overrides,
-                    );
-                  }).separatedBy(const SizedBox(height: 24)),
-                  if (error != null) ...[
-                    if (properties.isNotEmpty) const SizedBox(height: 4),
-                    DocumentErrorText(
-                      text: error,
-                      enabled: isEditMode,
-                    ),
-                  ],
-                ],
-              ),
-            );
-          },
-        );
+           return Container(
+             width: double.infinity,
+             padding: showBorder ? const EdgeInsets.all(16) : null,
+             decoration: showBorder
+                 ? BoxDecoration(
+                     border: Border.all(color: Theme.of(context).dividerColor),
+                     borderRadius: BorderRadius.circular(8),
+                   )
+                 : null,
+             child: Column(
+               mainAxisSize: MainAxisSize.min,
+               crossAxisAlignment: CrossAxisAlignment.start,
+               children: [
+                 if (title.isNotEmpty && !schema.isSectionOrSubsection) ...[
+                   DocumentPropertyBuilderTitle(
+                     title: title,
+                     isRequired: false,
+                   ),
+                   const SizedBox(height: 8),
+                 ],
+                 ...properties
+                     .map<Widget>((child) {
+                       return DocumentPropertyBuilder(
+                         key: ValueKey(child.nodeId),
+                         property: child,
+                         isEditMode: isEditMode,
+                         onChanged: onDocumentChanged,
+                         overrides: overrides,
+                       );
+                     })
+                     .separatedBy(const SizedBox(height: 24)),
+                 if (error != null) ...[
+                   if (properties.isNotEmpty) const SizedBox(height: 4),
+                   DocumentErrorText(
+                     text: error,
+                     enabled: isEditMode,
+                   ),
+                 ],
+               ],
+             ),
+           );
+         },
+       );
 }
 
 class _GenericDocumentObjectPropertyBuilder extends StatefulWidget {

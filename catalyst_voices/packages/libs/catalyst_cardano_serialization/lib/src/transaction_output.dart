@@ -35,8 +35,9 @@ final class PreBabbageTransactionOutput extends ShelleyMultiAssetTransactionOutp
   factory PreBabbageTransactionOutput._fromCborList(CborList list) {
     final address = ShelleyAddress.fromCbor(list[0]);
     final amount = Balance.fromCbor(list[1]);
-    final datumHash =
-        list.length > 2 ? DatumHash(Uint8List.fromList((list[2] as CborBytes).bytes)) : null;
+    final datumHash = list.length > 2
+        ? DatumHash(Uint8List.fromList((list[2] as CborBytes).bytes))
+        : null;
 
     return PreBabbageTransactionOutput(
       address: address,
@@ -159,8 +160,9 @@ final class TransactionOutput extends ShelleyMultiAssetTransactionOutput {
     final datumOption = map[const CborSmallInt(2)] != null
         ? DatumOption.fromCbor(map[const CborSmallInt(2)]!)
         : null;
-    final scriptRef =
-        map[const CborSmallInt(3)] != null ? ScriptRef.fromCbor(map[const CborSmallInt(3)]!) : null;
+    final scriptRef = map[const CborSmallInt(3)] != null
+        ? ScriptRef.fromCbor(map[const CborSmallInt(3)]!)
+        : null;
 
     return TransactionOutput(
       address: address,

@@ -25,9 +25,9 @@ enum ProposalMenuItemAction {
   }) {
     return switch (this) {
       ProposalMenuItemAction.view => _formatProposalDescription(
-          context,
-          currentIteration: currentIteration,
-        ),
+        context,
+        currentIteration: currentIteration,
+      ),
       ProposalMenuItemAction.publish => context.l10n.proposalEditorStatusDropdownPublishDescription,
       ProposalMenuItemAction.submit => context.l10n.proposalEditorStatusDropdownSubmitDescription,
       _ => null,
@@ -61,13 +61,16 @@ enum ProposalMenuItemAction {
     int currentIteration,
   ) {
     return switch (this) {
-      ProposalMenuItemAction.view => (proposalTitle != null && proposalTitle.isNotBlank)
-          ? proposalTitle
-          : context.l10n.proposalEditorStatusDropdownViewTitle,
-      ProposalMenuItemAction.publish =>
-        context.l10n.proposalEditorStatusDropdownPublishTitle(currentIteration),
-      ProposalMenuItemAction.submit =>
-        context.l10n.proposalEditorStatusDropdownSubmitTitle(currentIteration),
+      ProposalMenuItemAction.view =>
+        (proposalTitle != null && proposalTitle.isNotBlank)
+            ? proposalTitle
+            : context.l10n.proposalEditorStatusDropdownViewTitle,
+      ProposalMenuItemAction.publish => context.l10n.proposalEditorStatusDropdownPublishTitle(
+        currentIteration,
+      ),
+      ProposalMenuItemAction.submit => context.l10n.proposalEditorStatusDropdownSubmitTitle(
+        currentIteration,
+      ),
       ProposalMenuItemAction.forget => context.l10n.forgetProposal,
       ProposalMenuItemAction.export => context.l10n.proposalEditorStatusDropdownExportTitle,
       ProposalMenuItemAction.delete => context.l10n.proposalEditorStatusDropdownDeleteTitle,
@@ -120,12 +123,12 @@ enum ProposalMenuItemAction {
     return switch (proposalPublish) {
       ProposalPublish.localDraft => [edit, export, delete],
       _ => [
-          edit,
-          view,
-          share,
-          forget,
-          export,
-        ],
+        edit,
+        view,
+        share,
+        forget,
+        export,
+      ],
     };
   }
 }

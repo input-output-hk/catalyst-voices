@@ -146,29 +146,31 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
   }
 
   String _prettyBatch(BatchedStatements statements) {
-    return statements.statements.mapIndexed(
-      (index, statement) {
-        final args = statements.arguments
-            .firstWhereOrNull((args) => args.statementIndex == index)
-            ?.arguments;
+    return statements.statements
+        .mapIndexed(
+          (index, statement) {
+            final args = statements.arguments
+                .firstWhereOrNull((args) => args.statementIndex == index)
+                ?.arguments;
 
-        return _prettyFormat(statement, args ?? []);
-      },
-    ).join(', ');
+            return _prettyFormat(statement, args ?? []);
+          },
+        )
+        .join(', ');
   }
 
   String _prettyFormat(String statement, List<Object?> args) {
     var formatted = statement
         // Insert args
         .replaceAllMappedIndexed(
-      '?',
-      (match, index) {
-        final arg = args.elementAtOrNull(index);
-        final formattedArg = arg is Uint8List ? '*bytes*' : arg;
+          '?',
+          (match, index) {
+            final arg = args.elementAtOrNull(index);
+            final formattedArg = arg is Uint8List ? '*bytes*' : arg;
 
-        return formattedArg.toString();
-      },
-    )
+            return formattedArg.toString();
+          },
+        )
         // Normalize spacing
         .replaceAll(RegExp(r'\s+'), ' ');
 

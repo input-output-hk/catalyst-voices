@@ -6,12 +6,20 @@ import '../onboarding_base_page.dart';
 import 'step_7_unlock_password_input_panel.dart';
 
 class UnlockPasswordSuccessPanel extends OnboardingPageBase {
-  UnlockPasswordSuccessPanel(super.$);
-
   final recoverySuccessTitle = const Key('RecoverySuccessTitle');
+
   final recoverySuccessSubtitle = const Key('RecoverySuccessSubtitle');
   final recoverySuccessGoToDashboardButton = const Key('RecoverySuccessGoToDashboardButton');
   final recoverySuccessGoAccountButton = const Key('RecoverySuccessGoAccountButton');
+  UnlockPasswordSuccessPanel(super.$);
+
+  Future<void> clickGoToAccount() async {
+    await $(recoverySuccessGoAccountButton).tap();
+  }
+
+  Future<void> clickGoToDashboard() async {
+    await $(recoverySuccessGoToDashboardButton).tap();
+  }
 
   @override
   Future<void> goto() async {
@@ -20,18 +28,13 @@ class UnlockPasswordSuccessPanel extends OnboardingPageBase {
     await UnlockPasswordInputPanel($).clickNext();
   }
 
-  Future<void> clickGoToDashboard() async {
-    await $(recoverySuccessGoToDashboardButton).tap();
-  }
-
-  Future<void> clickGoToAccount() async {
-    await $(recoverySuccessGoAccountButton).tap();
-  }
-
-  @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
+  Future<void> verifyDetailsPanel() async {
+    expect($(recoverySuccessTitle).text, (await t()).recoverySuccessTitle);
+    expect(
+      $(recoverySuccessSubtitle).text,
+      (await t()).recoverySuccessSubtitle,
+    );
+    expect($(recoverySuccessGoToDashboardButton), findsOneWidget);
   }
 
   Future<void> verifyInfoPanel() async {
@@ -44,12 +47,9 @@ class UnlockPasswordSuccessPanel extends OnboardingPageBase {
     expect(infoPartLearnMoreText(), (await t()).learnMore);
   }
 
-  Future<void> verifyDetailsPanel() async {
-    expect($(recoverySuccessTitle).text, (await t()).recoverySuccessTitle);
-    expect(
-      $(recoverySuccessSubtitle).text,
-      (await t()).recoverySuccessSubtitle,
-    );
-    expect($(recoverySuccessGoToDashboardButton), findsOneWidget);
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }

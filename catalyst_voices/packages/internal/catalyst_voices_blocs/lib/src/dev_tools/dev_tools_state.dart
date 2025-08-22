@@ -25,15 +25,15 @@ final class DevToolsState extends Equatable {
 
   @override
   List<Object?> get props => [
-        enableTapCount,
-        isDeveloper,
-        systemInfo,
-        syncStats,
-        documentsCount,
-        areLogsOptionsAvailable,
-        logsLevel,
-        collectLogs,
-      ];
+    enableTapCount,
+    isDeveloper,
+    systemInfo,
+    syncStats,
+    documentsCount,
+    areLogsOptionsAvailable,
+    logsLevel,
+    collectLogs,
+  ];
 
   DevToolsState copyWith({
     int? enableTapCount,

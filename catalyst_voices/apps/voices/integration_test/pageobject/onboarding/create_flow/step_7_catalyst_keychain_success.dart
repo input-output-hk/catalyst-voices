@@ -19,11 +19,17 @@ class CatalystKeychainSuccessPanel extends OnboardingPageBase {
     await CatalystKeychainInfoPanel($).clickCreateKeychain();
   }
 
-  @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
-    expect(await closeButton(), findsOneWidget);
+  Future<void> verifyDetailsPanel() async {
+    expect(
+      $(registrationDetailsTitle).$(Text).text,
+      (await t()).accountInstructionsTitle,
+    );
+    expect(
+      $(registrationDetailsBody).$(Text).text,
+      (await t()).accountInstructionsMessage,
+    );
+    expect($(backButton), findsOneWidget);
+    expect($(nextButton), findsOneWidget);
   }
 
   Future<void> verifyInfoPanel() async {
@@ -44,16 +50,10 @@ class CatalystKeychainSuccessPanel extends OnboardingPageBase {
     );
   }
 
-  Future<void> verifyDetailsPanel() async {
-    expect(
-      $(registrationDetailsTitle).$(Text).text,
-      (await t()).accountInstructionsTitle,
-    );
-    expect(
-      $(registrationDetailsBody).$(Text).text,
-      (await t()).accountInstructionsMessage,
-    );
-    expect($(backButton), findsOneWidget);
-    expect($(nextButton), findsOneWidget);
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
+    expect(await closeButton(), findsOneWidget);
   }
 }

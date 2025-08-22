@@ -38,14 +38,14 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     required SharedPreferencesAsync sharedPreferences,
     Duration unlockTtl = const Duration(hours: 1),
     CryptoService? cryptoService,
-  })  : _key = key,
-        _secureStorage = secureStorage,
-        _cache = SecureStorageVaultTtlCache(
-          key: '$key.$id.Cache',
-          sharedPreferences: sharedPreferences,
-          defaultTtl: unlockTtl,
-        ),
-        _cryptoService = cryptoService ?? LocalCryptoService() {
+  }) : _key = key,
+       _secureStorage = secureStorage,
+       _cache = SecureStorageVaultTtlCache(
+         key: '$key.$id.Cache',
+         sharedPreferences: sharedPreferences,
+         defaultTtl: unlockTtl,
+       ),
+       _cryptoService = cryptoService ?? LocalCryptoService() {
     unawaited(_initialize());
   }
 
@@ -148,7 +148,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   }
 
   @override
-  Future<bool> unlock(LockFactor unlock) async {
+  Future<bool> unlock(LockFactor unlock, {bool dryRun = false}) async {
     await _initializationCompleter.future;
 
     if (!await _hasLock) {
@@ -159,36 +159,29 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     final lock = await _requireLock;
 
     final isVerified = await _cryptoService.verifyKey(seed, key: lock);
-    await _updateUnlocked(isVerified);
+    if (!dryRun) {
+      await _updateUnlocked(isVerified);
+    }
 
     _erase(lock);
 
-    return isUnlocked;
+    return dryRun ? isVerified : _isUnlocked;
   }
 
   @override
-  Future<void> writeString(
-    String? value, {
-    required String key,
-  }) {
+  Future<void> writeString(String? value, {required String key}) {
     return _guardedWrite(value, key: key);
   }
 
   String _buildKey(String key) => '$_instanceKey.$key';
 
-  Future<String> _decrypt(
-    String data, {
-    required Uint8List key,
-  }) async {
+  Future<String> _decrypt(String data, {required Uint8List key}) async {
     final decodedData = base64.decode(data);
     final decryptedData = await _cryptoService.decrypt(decodedData, key: key);
     return base64.encode(decryptedData);
   }
 
-  Future<String> _encrypt(
-    String data, {
-    required Uint8List key,
-  }) async {
+  Future<String> _encrypt(String data, {required Uint8List key}) async {
     final decodedData = base64.decode(data);
     final encryptedData = await _cryptoService.encrypt(decodedData, key: key);
     return base64.encode(encryptedData);
@@ -228,9 +221,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   /// Allows operation only when [isUnlocked] it true, otherwise returns null.
   ///
   /// Returns value assigned to [key]. May return null if not found for [key].
-  Future<String?> _guardedRead({
-    required String key,
-  }) async {
+  Future<String?> _guardedRead({required String key}) async {
     await _initializationCompleter.future;
     await _ensureUnlocked();
 
@@ -252,10 +243,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   ///
   ///   * When [value] is non null writes it to [key].
   ///   * When [value] is null then [key] value is deleted.
-  Future<void> _guardedWrite(
-    String? value, {
-    required String key,
-  }) async {
+  Future<void> _guardedWrite(String? value, {required String key}) async {
     await _initializationCompleter.future;
     await _ensureUnlocked();
 
@@ -302,10 +290,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   ///
   /// See [isStorageKey] to make sure key is valid before
   /// calling [getStorageId].
-  static String getStorageId(
-    String value, {
-    String key = defaultKey,
-  }) {
+  static String getStorageId(String value, {String key = defaultKey}) {
     final parts = value.split('.');
     if (parts.length != 3) {
       throw ArgumentError('Key sections count is invalid');
@@ -322,10 +307,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   }
 
   /// Check if given [value] belongs to any [SecureStorageVault].
-  static bool isStorageKey(
-    String value, {
-    String key = defaultKey,
-  }) {
+  static bool isStorageKey(String value, {String key = defaultKey}) {
     try {
       getStorageId(value, key: key);
       return true;

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
+import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
 import 'package:catalyst_voices/pages/discovery/sections/campaign_hero.dart';
 import 'package:catalyst_voices/pages/discovery/sections/how_it_works.dart';
 import 'package:catalyst_voices/pages/discovery/sections/stay_involved.dart';
@@ -55,16 +56,18 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     with ErrorHandlerStateMixin<DiscoveryCubit, DiscoveryPage> {
   @override
   Widget build(BuildContext context) {
-    return const SelectionArea(
-      child: Stack(
-        children: [
-          CustomScrollView(
-            slivers: [
-              _Body(),
-            ],
-          ),
-          EmailNeedVerificationBanner(),
-        ],
+    return const ProposalSubmissionPhaseAware(
+      activeChild: SelectionArea(
+        child: Stack(
+          children: [
+            CustomScrollView(
+              slivers: [
+                _Body(),
+              ],
+            ),
+            EmailNeedVerificationBanner(),
+          ],
+        ),
       ),
     );
   }

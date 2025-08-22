@@ -41,9 +41,9 @@ class TokenField extends StatelessWidget {
     this.ignorePointers,
     this.helperWidget,
   }) : assert(
-          currency == const Currency.ada(),
-          'Only supports ADA at the moment',
-        );
+         currency == const Currency.ada(),
+         'Only supports ADA at the moment',
+       );
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +57,8 @@ class TokenField extends StatelessWidget {
         errorText: errorText,
         prefixText: currency.symbol,
         hintText: range != null && range.min != null ? '${range.min}' : null,
-        helper: helperWidget ??
+        helper:
+            helperWidget ??
             (showHelper
                 ? _Helper(
                     currency: currency,
