@@ -101,4 +101,4 @@ flutter:
 sentry:
   upload_source_maps: true
   upload_sources: true
-  log_level: info
+  commits: false
