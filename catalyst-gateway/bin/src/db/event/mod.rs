@@ -273,30 +273,29 @@ impl EventDB {
 ///
 /// If connection to the pool is `OK`, the `LIVE_EVENT_DB` atomic flag is set to `true`.
 pub async fn establish_connection_pool() {
-    let (url, user, pass, max_connections, max_lifetime, min_idle, connection_timeout) =
-        Settings::event_db_settings();
     debug!("Establishing connection with Event DB pool");
 
     // This was pre-validated and can't fail, but provide default in the impossible case it
     // does.
+    let url = Settings::event_db_settings().url();
     let mut config = tokio_postgres::config::Config::from_str(url).unwrap_or_else(|_| {
         error!(url = url, "Postgres URL Pre Validation has failed.");
         tokio_postgres::config::Config::default()
     });
-    if let Some(user) = user {
+    if let Some(user) = Settings::event_db_settings().username() {
         config.user(user);
     }
-    if let Some(pass) = pass {
+    if let Some(pass) = Settings::event_db_settings().password() {
         config.password(pass);
     }
 
     let pg_mgr = PostgresConnectionManager::new(config, tokio_postgres::NoTls);
 
     match Pool::builder()
-        .max_size(max_connections)
-        .max_lifetime(Some(core::time::Duration::from_secs(max_lifetime.into())))
-        .min_idle(min_idle)
-        .connection_timeout(core::time::Duration::from_secs(connection_timeout.into()))
+        .max_size(Settings::event_db_settings().max_connections())
+        .max_lifetime(Some(Settings::event_db_settings().max_lifetime()))
+        .min_idle(Settings::event_db_settings().min_idle())
+        .connection_timeout(Settings::event_db_settings().connection_timeout())
         .build(pg_mgr)
         .await
     {
