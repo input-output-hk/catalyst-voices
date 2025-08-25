@@ -29,7 +29,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace "io.projectcatalyst.catalyst_voices"
+    namespace "io.projectcatalyst.catalyst"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -48,7 +48,7 @@ android {
 
     defaultConfig {
         applicationId "io.projectcatalyst.catalyst"
-        minSdkVersion 23 // required by super_native_extensions
+        minSdkVersion flutter.minSdkVersion // required by super_native_extensions
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
