@@ -8,7 +8,7 @@ use poem_openapi::{
     types::{Example, ParseError, ParseFromJSON, ParseResult, ToJSON, Type},
 };
 
-use crate::service::api::cardano::rbac::registrations_get::role_data::RbacRoleData;
+use crate::service::api::cardano::rbac::registrations_get::v1::role_data::RbacRoleData;
 
 /// A title.
 const TITLE: &str = "RBAC role data map";

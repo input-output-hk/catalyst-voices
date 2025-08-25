@@ -34,9 +34,8 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
     }
 });
 
-/// Slot number
+/// ADA coins value on the blockchain.
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy, PartialOrd, Ord, Default)]
-
 pub(crate) struct AdaValue(u64);
 
 impl Display for AdaValue {
