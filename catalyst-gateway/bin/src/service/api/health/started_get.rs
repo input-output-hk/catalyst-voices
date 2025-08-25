@@ -125,8 +125,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// into memory or processed in some way before the API can return valid
 /// responses.  In that scenario this endpoint would return 503 until that
 /// startup processing was fully completed.
-#[allow(clippy::unused_async)]
-pub(crate) async fn endpoint() -> AllResponses {
+pub(crate) fn endpoint() -> AllResponses {
     if service_has_started() {
         Responses::NoContent.into()
     } else {
