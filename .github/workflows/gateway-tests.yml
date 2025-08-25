@@ -58,7 +58,7 @@ jobs:
       - name: Integration API tests
         if: always()
         env:
-          API_TEST_CMD: 'poetry run pytest -m "preprod_indexing or unmarked" -s --junitxml junit-report.xml --cov integration --cov-report lcov'
+          API_TEST_MARKS: "preprod_indexing or unmarked"
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
           docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
@@ -67,7 +67,7 @@ jobs:
       - name: Integration health tests
         if: always()
         env:
-          API_TEST_CMD: 'poetry run pytest -m "health_endpoint" -s --junitxml junit-report.xml --cov integration --cov-report lcov'
+          API_TEST_MARKS: "health_endpoint"
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
 
@@ -75,7 +75,7 @@ jobs:
       - name: Integration health thru proxy tests
         if: false
         env:
-          API_TEST_CMD: 'poetry run pytest -m "health_with_proxy_endpoint" -s --junitxml junit-report.xml --cov integration --cov-report lcov'
+          API_TEST_MARKS: "health_with_proxy_endpoint"
           EVENT_DB_URL: "haproxy:18080"
           INDEX_DB_URL: "haproxy:18090"
         run: |

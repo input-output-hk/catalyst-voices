@@ -138,7 +138,7 @@ services:
     environment:
       - CAT_GATEWAY_TEST_URL=http://cat-gateway:3030
       - CAT_GATEWAY_INTERNAL_API_KEY=123
-    command: ["${API_TEST_CMD}"]
+    command: ["sh", "-c", "poetry run pytest -m \"$API_TEST_MARKS\" -s --junitxml junit-report.xml --cov integration --cov-report lcov"]
     depends_on:
       cat-gateway:
         condition: service_healthy
