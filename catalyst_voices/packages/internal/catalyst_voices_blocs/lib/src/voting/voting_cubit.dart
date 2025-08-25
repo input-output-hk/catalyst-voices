@@ -240,6 +240,7 @@ final class VotingCubit extends Cubit<VotingState>
     final page = _cache.page;
     final favoriteIds = _cache.favoriteIds ?? [];
     final lastCastedVote = _cache.lastCastedVote ?? [];
+    final showComments = campaign?.supportsComments ?? false;
 
     if (campaign == null || page == null) {
       return;
@@ -257,6 +258,7 @@ final class VotingCubit extends Cubit<VotingState>
         return ProposalBriefVoting.fromProposalWithContext(
           proposalWithContext,
           draftVote: _ballotBuilder.getVoteOn(proposal.selfRef),
+          showComments: showComments,
         );
       },
     );
