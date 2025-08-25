@@ -228,12 +228,12 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
   Future<void> _clearCache() async {
     final activeAccount = _userService.user.activeAccount;
-    // final isMaxProposalsLimitReached = await _proposalService.isMaxProposalsLimitReached();
+    final isMaxProposalsLimitReached = await _proposalService.isMaxProposalsLimitReached();
 
     _cache = ProposalBuilderBlocCache(
       activeAccountId: activeAccount?.catalystId,
       accountPublicStatus: activeAccount?.publicStatus,
-      isMaxProposalsLimitReached: false,
+      isMaxProposalsLimitReached: isMaxProposalsLimitReached,
     );
   }
 
