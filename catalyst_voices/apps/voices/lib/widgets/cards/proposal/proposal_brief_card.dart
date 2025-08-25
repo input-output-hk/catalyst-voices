@@ -273,7 +273,7 @@ class _ProposalInfo extends StatelessWidget {
   final ProposalPublish publish;
   final int version;
   final DateTime updateDate;
-  final int commentsCount;
+  final int? commentsCount;
 
   const _ProposalInfo({
     required this.publish,
@@ -298,9 +298,10 @@ class _ProposalInfo extends StatelessWidget {
           ),
         ),
         const Spacer(),
-        ProposalCommentsChip(
-          commentsCount: commentsCount,
-        ),
+        if (commentsCount case final commentsCount?)
+          ProposalCommentsChip(
+            commentsCount: commentsCount,
+          ),
       ],
     );
   }
