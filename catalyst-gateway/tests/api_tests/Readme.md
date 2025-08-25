@@ -75,11 +75,14 @@ poetry run pytest -s -m <marker>
 * Additional steps for tests requiring proxy:
 
   * build and run haproxy
+
     ```shell
     earthly +package-haproxy
     docker compose up haproxy --detach
     ```
+    
   * set cat-gateway DB urls to point to haproxy and start it
+
     ```shell
     EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@haproxy:18080/CatalystEventDev
     CASSANDRA_PERSISTENT_URL=haproxy:18090
