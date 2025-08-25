@@ -76,15 +76,15 @@ poetry run pytest -s -m <marker>
 
   * build and run haproxy
 
-    ```shell
+```shell
     earthly +package-haproxy
     docker compose up haproxy --detach
-    ```
+```
     
   * set cat-gateway DB urls to point to haproxy and start it
 
-    ```shell
+```shell
     EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@haproxy:18080/CatalystEventDev
     CASSANDRA_PERSISTENT_URL=haproxy:18090
     CASSANDRA_VOLATILE_URL=haproxy:18090
-    ```
+```
