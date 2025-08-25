@@ -106,11 +106,13 @@ impl EnvVars {
     }
 
     /// Returns Event DB `max_lifetime` setting
+    #[allow(dead_code)]
     pub(crate) fn max_lifetime(&self) -> Duration {
         self.max_lifetime
     }
 
     /// Returns Event DB `min_idle` setting
+    #[allow(dead_code)]
     pub(crate) fn min_idle(&self) -> u32 {
         self.min_idle
     }
@@ -121,6 +123,7 @@ impl EnvVars {
     }
 
     /// Returns Event DB `retry_connection` setting
+    #[allow(dead_code)]
     pub(crate) fn retry_connection(&self) -> bool {
         self.retry_connection
     }

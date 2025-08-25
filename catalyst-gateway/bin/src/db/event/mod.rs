@@ -7,11 +7,9 @@ use std::{
     },
 };
 
-use bb8::{Pool, PooledConnection};
-use bb8_postgres::PostgresConnectionManager;
 use error::NotFoundError;
 use futures::{Stream, StreamExt, TryStreamExt};
-use tokio_postgres::{types::ToSql, NoTls, Row};
+use tokio_postgres::{types::ToSql, Row};
 use tracing::{debug, debug_span, error, Instrument};
 
 use crate::{
@@ -30,7 +28,7 @@ pub(crate) mod signed_docs;
 pub(crate) const DATABASE_SCHEMA_VERSION: i32 = 4;
 
 /// Postgres Connection Manager DB Pool
-type SqlDbPool = Arc<Pool<PostgresConnectionManager<NoTls>>>;
+type SqlDbPool = Arc<deadpool::managed::Pool<deadpool_postgres::Manager>>;
 
 /// Postgres Connection Manager DB Pool Instance
 static EVENT_DB_POOL: OnceLock<SqlDbPool> = OnceLock::new();
@@ -54,15 +52,16 @@ pub(crate) enum EventDBConnectionError {
 
 impl EventDB {
     /// Get a connection from the pool.
-    async fn get_pool_connection<'a>(
-    ) -> Result<PooledConnection<'a, PostgresConnectionManager<NoTls>>, EventDBConnectionError>
-    {
+    async fn get_pool_connection(
+    ) -> Result<deadpool::managed::Object<deadpool_postgres::Manager>, EventDBConnectionError> {
         let pool = EVENT_DB_POOL
             .get()
             .ok_or(EventDBConnectionError::DbPoolUninitialized)?;
-        pool.get()
+        let res = pool
+            .get()
             .await
-            .map_err(|_| EventDBConnectionError::PoolConnectionUnavailable)
+            .map_err(|_| EventDBConnectionError::PoolConnectionUnavailable)?;
+        Ok(res)
     }
 
     /// Determine if deep query inspection is enabled.
@@ -289,16 +288,16 @@ pub async fn establish_connection_pool() {
         config.password(pass);
     }
 
-    let pg_mgr = PostgresConnectionManager::new(config, tokio_postgres::NoTls);
+    let pg_mgr = deadpool_postgres::Manager::new(config, tokio_postgres::NoTls);
 
-    match Pool::builder()
-        .max_size(Settings::event_db_settings().max_connections())
-        .max_lifetime(Some(Settings::event_db_settings().max_lifetime()))
-        .min_idle(Settings::event_db_settings().min_idle())
-        .connection_timeout(Settings::event_db_settings().connection_timeout())
-        .retry_connection(Settings::event_db_settings().retry_connection())
-        .build(pg_mgr)
-        .await
+    match deadpool::managed::Pool::builder(pg_mgr)
+        .max_size(Settings::event_db_settings().max_connections() as usize)
+        .create_timeout(Some(Settings::event_db_settings().connection_timeout()))
+        // .max_lifetime(Some(Settings::event_db_settings().max_lifetime()))
+        // .min_idle(Settings::event_db_settings().min_idle())
+        // .connection_timeout(Settings::event_db_settings().connection_timeout())
+        // .retry_connection(Settings::event_db_settings().retry_connection())
+        .build()
     {
         Ok(pool) => {
             debug!("Event DB pool configured.");
