@@ -12,6 +12,7 @@ final class ProposalCubitCache extends Equatable {
   final List<CommentWithReplies>? comments;
   final bool? isFavorite;
   final bool? isVotingStage;
+  final bool? showComments;
   final bool? readOnlyMode;
   final Vote? lastCastedVote;
 
@@ -24,6 +25,7 @@ final class ProposalCubitCache extends Equatable {
     this.comments,
     this.isFavorite,
     this.isVotingStage,
+    this.showComments,
     this.readOnlyMode,
     this.lastCastedVote,
   });
@@ -38,6 +40,7 @@ final class ProposalCubitCache extends Equatable {
     comments,
     isFavorite,
     isVotingStage,
+    showComments,
     readOnlyMode,
     lastCastedVote,
   ];
@@ -51,6 +54,7 @@ final class ProposalCubitCache extends Equatable {
     Optional<List<CommentWithReplies>>? comments,
     Optional<bool>? isFavorite,
     Optional<bool>? isVotingStage,
+    Optional<bool>? showComments,
     Optional<bool>? readOnlyMode,
     Optional<Vote>? lastCastedVote,
   }) {
@@ -63,6 +67,7 @@ final class ProposalCubitCache extends Equatable {
       comments: comments.dataOr(this.comments),
       isFavorite: isFavorite.dataOr(this.isFavorite),
       isVotingStage: isVotingStage.dataOr(this.isVotingStage),
+      showComments: showComments.dataOr(this.showComments),
       readOnlyMode: readOnlyMode.dataOr(this.readOnlyMode),
       lastCastedVote: lastCastedVote.dataOr(this.lastCastedVote),
     );
@@ -75,6 +80,7 @@ final class ProposalCubitCache extends Equatable {
       comments: const Optional.empty(),
       isFavorite: const Optional.empty(),
       isVotingStage: const Optional.empty(),
+      showComments: const Optional.empty(),
       readOnlyMode: const Optional.empty(),
       category: const Optional.empty(),
       lastCastedVote: const Optional.empty(),

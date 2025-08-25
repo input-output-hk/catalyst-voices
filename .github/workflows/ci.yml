@@ -1,5 +1,3 @@
-# cspell: words hoverkraft janitoring
-
 name: CI
 
 on:
@@ -17,10 +15,6 @@ permissions:
   contents: write
   packages: write
   pull-requests: write
-
-env:
-  REPORT_EXT: .junit-report.xml
-  COVERAGE_EXT: .coverage.info
 
 jobs:
   reject:
@@ -52,117 +46,7 @@ jobs:
   tests:
     needs: ci
     name: Cat-Gateway integration tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@main
-        with:
-          # this might remove tools that are actually needed,
-          # if set to "true" but frees about 6 GB
-          tool-cache: false
-          # all of these default to true, but feel free to set to
-          # "false" if necessary for your workflow
-          android: true
-          dotnet: false
-          haskell: false
-          large-packages: false
-          docker-images: false
-          swap-storage: true
-
-      - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
-        with:
-          enable_caching: "true"
-          version: 0.21.0
-      - name: Setup
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
-      - name: Prepare artifacts
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
-        with:
-          command: run
-          args: ./catalyst-gateway/tests/+prepare-all-images
-
-      - name: Rust integration tests - running
-        if: always()
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up rust-tests-runner --abort-on-container-exit --exit-code-from rust-tests-runner
-          docker compose -f catalyst-gateway/tests/docker-compose.yml logs rust-tests-runner
-          docker compose -f catalyst-gateway/tests/docker-compose.yml down
-
-      - name: Integration API tests - running
-        if: always()
-        env:
-          API_TEST_CMD: 'poetry run pytest -m "preprod_indexing or unmarked" -s --junitxml junit-report.xml --cov integration --cov-report lcov'
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
-
-      - name: Integration API tests - janitoring
-        if: always()
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
-          docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
-          docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
-          docker stop cat-gateway
-
-      - name: Integration health tests - running
-        if: always()
-        env:
-          API_TEST_CMD: 'poetry run pytest -m "health_endpoint" -s --junitxml junit-report.xml --cov integration --cov-report lcov'
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
-
-      - name: Integration health tests - janitoring
-        if: always()
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
-          docker stop cat-gateway
-
-      - name: Integration health thru proxy tests - running
-        if: always()
-        env:
-          API_TEST_CMD: 'poetry run pytest -m "health_with_proxy_endpoint" -s --junitxml junit-report.xml --cov integration --cov-report lcov'
-          EVENT_DB_URL: "haproxy:18080"
-          INDEX_DB_URL: "haproxy:18090"
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up haproxy --detach
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
-
-      - name: Integration health thru proxy tests - janitoring
-        if: always()
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
-          docker stop haproxy cat-gateway
-
-      - name: Schemathesis tests - running
-        if: always()
-        run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
-          docker compose -f catalyst-gateway/tests/docker-compose.yml logs schemathesis-runner
-          docker cp schemathesis-runner:/results/junit-report.xml ./schemathesis${{ env.REPORT_EXT }}
-
-      - name: Collect and upload test reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-reports-gateway
-          path: "**/*${{ env.REPORT_EXT }}"
-          if-no-files-found: error
-          retention-days: 1
-
-      - name: Collect and upload test coverage
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: coverage-reports-gateway
-          path: "**/*${{ env.COVERAGE_EXT }}"
-          if-no-files-found: error
-          retention-days: 1
-
-      - name: Shutting down all services
-        if: always()
-        run: docker compose -f catalyst-gateway/tests/docker-compose.yml down
+    uses: ./.github/workflows/gateway-tests.yml
 
   test_reporting:
     if: ${{ !github.event.pull_request.draft && always() }}

@@ -1,8 +1,8 @@
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-class VoicesSegmentedButtonTheme extends SegmentedButtonThemeData {
-  VoicesSegmentedButtonTheme({
+class VoicesSegmentedButtonThemeData extends SegmentedButtonThemeData {
+  VoicesSegmentedButtonThemeData({
     required ColorScheme colors,
     required VoicesColorScheme voicesColors,
     required TextTheme textTheme,
