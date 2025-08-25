@@ -41,10 +41,8 @@ abstract class Bip32Ed25519Signature implements RustOpaqueInterface {
   U8Array64 get inner;
 
   /// Create a new `Bip32Ed25519Signature` from the given bytes.
-  factory Bip32Ed25519Signature({required U8Array64 sigBytes}) => RustLib
-      .instance
-      .api
-      .crateApiKeyDerivationBip32Ed25519SignatureNew(sigBytes: sigBytes);
+  factory Bip32Ed25519Signature({required U8Array64 sigBytes}) =>
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519SignatureNew(sigBytes: sigBytes);
 
   /// Convert to a hex string.
   String toHex();
@@ -93,10 +91,8 @@ abstract class Bip32Ed25519XPrivateKey implements RustOpaqueInterface {
   U8Array96 get inner;
 
   /// Create a new `Bip32Ed25519XPrivateKey` from the given bytes.
-  factory Bip32Ed25519XPrivateKey({required U8Array96 xprvBytes}) => RustLib
-      .instance
-      .api
-      .crateApiKeyDerivationBip32Ed25519XPrivateKeyNew(xprvBytes: xprvBytes);
+  factory Bip32Ed25519XPrivateKey({required U8Array96 xprvBytes}) =>
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519XPrivateKeyNew(xprvBytes: xprvBytes);
 
   /// Sign the given data with the given extended private key.
   ///
@@ -169,10 +165,8 @@ abstract class Bip32Ed25519XPublicKey implements RustOpaqueInterface {
   U8Array32 get publicKey;
 
   /// Create a new `Bip32Ed25519XPublicKey` from the given bytes.
-  factory Bip32Ed25519XPublicKey({required U8Array64 xpubBytes}) => RustLib
-      .instance
-      .api
-      .crateApiKeyDerivationBip32Ed25519XPublicKeyNew(xpubBytes: xpubBytes);
+  factory Bip32Ed25519XPublicKey({required U8Array64 xpubBytes}) =>
+      RustLib.instance.api.crateApiKeyDerivationBip32Ed25519XPublicKeyNew(xpubBytes: xpubBytes);
 
   /// Convert to a hex string.
   String toHex();
