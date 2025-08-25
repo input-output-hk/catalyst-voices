@@ -192,20 +192,19 @@ class _WalletSummaryBalance extends StatelessWidget {
 class _WalletSummaryItem extends StatelessWidget {
   final Widget label;
   final Widget value;
-  final String? semanticsIdentifier;
+  final String semanticsIdentifier;
 
   const _WalletSummaryItem({
     required this.label,
     required this.value,
-    this.semanticsIdentifier,
+    this.semanticsIdentifier = 'WalletSummaryItem',
   });
 
   @override
   Widget build(BuildContext context) {
-    final baseIdentifier = semanticsIdentifier ?? 'WalletSummaryItem';
 
     return Semantics(
-      identifier: baseIdentifier,
+      identifier: semanticsIdentifier,
       container: true,
       child: Row(
         children: [

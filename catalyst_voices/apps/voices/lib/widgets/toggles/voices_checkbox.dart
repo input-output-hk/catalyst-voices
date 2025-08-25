@@ -36,7 +36,7 @@ class VoicesCheckbox extends StatelessWidget {
   /// When provided, the checkbox will use '${semanticsIdentifier}_checkbox'
   /// and the label will use '${semanticsIdentifier}_label' as semantics identifiers.
   /// When null, defaults to 'VoicesCheckbox_checkbox' and 'VoicesCheckbox_label'.
-  final String? semanticsIdentifier;
+  final String semanticsIdentifier;
 
   const VoicesCheckbox({
     super.key,
@@ -46,13 +46,12 @@ class VoicesCheckbox extends StatelessWidget {
     this.label,
     this.note,
     this.isEnabled = true,
-    this.semanticsIdentifier,
+    this.semanticsIdentifier = 'VoicesCheckbox',
   });
 
   @override
   Widget build(BuildContext context) {
     final onChanged = this.onChanged;
-    final baseIdentifier = semanticsIdentifier ?? 'VoicesCheckbox';
 
     return AbsorbPointer(
       absorbing: !isEnabled,
@@ -64,7 +63,7 @@ class VoicesCheckbox extends StatelessWidget {
           note: note,
           spacings: const [12, 8],
           child: Semantics(
-            identifier: '${baseIdentifier}_checkbox',
+            identifier: '${semanticsIdentifier}_checkbox',
             child: Checkbox(
               key: const Key('Checkbox'),
               value: value,
