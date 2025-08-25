@@ -184,11 +184,8 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       final page = _cache.page;
       if (page != null) {
         final proposals = page.items.where((element) => element.proposal.selfRef != ref).toList();
-
         final updatedPage = page.copyWithItems(proposals);
-
         _cache = _cache.copyWith(page: Optional(updatedPage));
-
         _emitCachedProposalsPage();
       }
     }
@@ -211,6 +208,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   void _emitCachedProposalsPage() {
     final campaign = _cache.campaign;
     final page = _cache.page;
+    final showComments = campaign?.supportsComments ?? false;
 
     if (campaign == null || page == null) {
       return;
@@ -220,9 +218,11 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       // TODO(damian-molinski): refactor page to return ProposalWithContext instead.
       (e) => ProposalBrief.fromProposal(
         e.proposal,
+        isFavorite: state.favoritesIds.contains(e.proposal.selfRef.id),
         categoryName: campaign.categories
             .firstWhere((element) => element.selfRef == e.proposal.categoryRef)
             .formattedCategoryName,
+        showComments: showComments,
       ),
     );
 
@@ -237,6 +237,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
   void _handleFavoriteProposalsIds(List<String> ids) {
     emit(state.copyWith(favoritesIds: ids));
+    _emitCachedProposalsPage();
   }
 
   void _handleProposalsCount(ProposalsCount count) {
