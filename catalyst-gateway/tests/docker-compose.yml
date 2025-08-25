@@ -90,6 +90,8 @@ services:
       - CHAIN_NETWORK=${ENV_TARGET:-Preprod}
       - INTERNAL_API_KEY=123
       - YES_I_REALLY_WANT_TO_PANIC=panic attack
+      - SERVICE_LIVE_COUNTER_THRESHOLD=100
+      - SERVICE_LIVE_TIMEOUT_INTERVAL=30
       # - LOG_LEVEL=error
       # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
     depends_on:

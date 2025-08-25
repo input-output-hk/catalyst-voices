@@ -19,7 +19,7 @@ package-haproxy:
     FROM haproxy:alpine
 
     USER root
-    RUN apk add --no-cache su-exec socat
+    RUN apk add su-exec socat
     COPY ./haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
     COPY ./haproxy_entry.sh /app/entrypoint.sh
 
