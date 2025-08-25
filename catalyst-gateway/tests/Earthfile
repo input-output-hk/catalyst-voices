@@ -20,8 +20,8 @@ package-haproxy:
 
     USER root
     RUN apk add su-exec socat
-    COPY ./haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
-    COPY ./haproxy_entry.sh /app/entrypoint.sh
+    COPY ./api_tests/utils/proxy/haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
+    COPY ./api_tests/utils/proxy/haproxy_entry.sh /app/entrypoint.sh
 
     RUN chmod +x /app/entrypoint.sh
 

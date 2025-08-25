@@ -121,8 +121,6 @@ services:
       - "18080:18080"
       - "18090:18090"
       - "9999:9999"
-    volumes:
-      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
     healthcheck:
       test: [ "CMD", "sh", "-c", "echo 'show info' | socat tcp:localhost:9999 stdio | grep -q ^Name" ]
       interval: 10s

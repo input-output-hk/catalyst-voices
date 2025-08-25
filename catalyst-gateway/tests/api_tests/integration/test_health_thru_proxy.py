@@ -5,7 +5,7 @@ from api.v1 import rbac
 from api.v2 import document
 from utils import health
 from utils.rbac_chain import rbac_chain_factory, Chain
-from wrappers import TestProxy
+from utils import TestProxy
 
 @pytest.fixture
 def index_db_proxy():

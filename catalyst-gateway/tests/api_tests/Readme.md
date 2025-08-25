@@ -65,8 +65,23 @@ export CAT_GATEWAY_TEST_URL="http://127.0.0.1:3030"
   * ci (marks tests to be run in ci),
   * nightly (marks tests to be run nightly),
   * preprod_indexing (marks test which requires indexing of the cardano preprod network),
-  * health_endpoint (marks tests with requires a proxy for testing)
+  * health_endpoint (marks tests for health endpoint)
+  * health_with_proxy_endpoint (marks tests for health endpoint which requires a proxy for testing)
 
 ```shell
 poetry run pytest -s -m <marker>
 ```
+
+* Additional steps for tests requiring proxy:
+
+  * build and run haproxy
+    ```shell
+    earthly +package-haproxy
+    docker compose up haproxy --detach
+    ```
+  * set cat-gateway DB urls to point to haproxy and start it
+    ```shell
+    EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@haproxy:18080/CatalystEventDev
+    CASSANDRA_PERSISTENT_URL=haproxy:18090
+    CASSANDRA_VOLATILE_URL=haproxy:18090
+    ```
