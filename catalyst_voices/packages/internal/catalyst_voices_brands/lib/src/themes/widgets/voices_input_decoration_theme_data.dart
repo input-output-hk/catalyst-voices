@@ -1,9 +1,8 @@
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-class VoicesInputDecorationTheme extends InputDecorationTheme {
-  VoicesInputDecorationTheme({
-    super.key,
+class VoicesInputDecorationThemeData extends InputDecorationThemeData {
+  VoicesInputDecorationThemeData({
     required TextTheme textTheme,
     required ColorScheme colorsScheme,
     required VoicesColorScheme colors,

@@ -6,9 +6,9 @@ import 'package:catalyst_voices_brands/src/themes/widgets/buttons_theme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/slider_theme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/toggles_theme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/voices_dialog_theme.dart';
-import 'package:catalyst_voices_brands/src/themes/widgets/voices_input_decoration_theme.dart';
-import 'package:catalyst_voices_brands/src/themes/widgets/voices_popup_menu_theme.dart';
-import 'package:catalyst_voices_brands/src/themes/widgets/voices_segmented_button_theme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/voices_input_decoration_theme_data.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/voices_popup_menu_theme_data.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/voices_segmented_button_theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -364,7 +364,7 @@ ThemeData _buildThemeData(
 
   return ThemeData(
     visualDensity: VisualDensity.standard,
-    appBarTheme: AppBarTheme(
+    appBarTheme: AppBarThemeData(
       backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv1,
       scrolledUnderElevation: 0,
     ),
@@ -372,8 +372,8 @@ ThemeData _buildThemeData(
       backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv1White,
     ),
     popupMenuTheme: VoicesPopupMenuThemeData(colors: voicesColorScheme),
-    dialogTheme: VoicesDialogTheme(colors: voicesColorScheme),
-    segmentedButtonTheme: VoicesSegmentedButtonTheme(
+    dialogTheme: VoicesDialogThemeData(colors: voicesColorScheme),
+    segmentedButtonTheme: VoicesSegmentedButtonThemeData(
       colors: colorScheme,
       voicesColors: voicesColorScheme,
       textTheme: textTheme,
@@ -424,7 +424,7 @@ ThemeData _buildThemeData(
     textSelectionTheme: TextSelectionThemeData(
       cursorColor: voicesColorScheme.textPrimary,
     ),
-    inputDecorationTheme: VoicesInputDecorationTheme(
+    inputDecorationTheme: VoicesInputDecorationThemeData(
       textTheme: textTheme,
       colorsScheme: colorScheme,
       colors: voicesColorScheme,
