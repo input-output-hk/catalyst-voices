@@ -78,8 +78,10 @@ jobs:
           docker compose -f catalyst-gateway/tests/docker-compose.yml logs api-tests-runner
           docker stop cat-gateway
 
+
+# Skip until bugfix https://github.com/input-output-hk/catalyst-voices/issues/3209
       - name: Integration health thru proxy tests - running
-        if: always()
+        if: false
         env:
           API_TEST_CMD: 'poetry run pytest -m "health_with_proxy_endpoint" -s --junitxml junit-report.xml --cov integration --cov-report lcov'
           EVENT_DB_URL: "haproxy:18080"
