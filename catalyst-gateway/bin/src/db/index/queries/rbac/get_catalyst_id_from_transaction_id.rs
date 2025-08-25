@@ -21,7 +21,7 @@ use crate::{
         },
         types::{DbCatalystId, DbTransactionId},
     },
-    metrics::rbac::{
+    metrics::caches::rbac::{
         rbac_persistent_transaction_id_cache_hits_inc,
         rbac_persistent_transaction_id_cache_miss_inc, rbac_volatile_transaction_id_cache_hits_inc,
         rbac_volatile_transaction_id_cache_miss_inc,

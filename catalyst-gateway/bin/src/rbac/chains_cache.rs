@@ -5,7 +5,9 @@ use rbac_registration::registration::cardano::RegistrationChain;
 
 use crate::{
     db::index::session::CassandraSession,
-    metrics::rbac::{rbac_persistent_chains_cache_hits_inc, rbac_persistent_chains_cache_miss_inc},
+    metrics::caches::rbac::{
+        rbac_persistent_chains_cache_hits_inc, rbac_persistent_chains_cache_miss_inc,
+    },
 };
 
 /// Add (or update) a persistent chain to the cache.

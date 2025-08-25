@@ -1,5 +1,6 @@
 //! Metrics related to RBAC Registration Chain Caching analytics.
 
+use super::cache_metric_inc;
 use crate::{db::index::session::CassandraSession, settings::Settings};
 
 /// Represents a persistent session.
@@ -76,19 +77,6 @@ pub(crate) fn update() {
             .with_label_values(&[&api_host_names, service_id, &network])
             .set(i64::try_from(caches.rbac_transaction_id().entry_count()).unwrap_or(-1));
     });
-}
-
-/// Increment a metric value by one.
-macro_rules! cache_metric_inc {
-    ($cache:ident) => {
-        let api_host_names = Settings::api_host_names().join(",");
-        let service_id = Settings::service_id();
-        let network = Settings::cardano_network().to_string();
-
-        reporter::$cache
-            .with_label_values(&[&api_host_names, service_id, &network])
-            .inc();
-    };
 }
 
 /// Increments the `VOLATILE_STAKE_ADDRESSES_CACHE_HIT` metric.

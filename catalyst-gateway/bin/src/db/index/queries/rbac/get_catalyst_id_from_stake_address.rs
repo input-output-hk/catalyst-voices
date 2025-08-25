@@ -21,7 +21,7 @@ use crate::{
         },
         types::{DbCatalystId, DbStakeAddress},
     },
-    metrics::rbac::{
+    metrics::caches::rbac::{
         rbac_persistent_stake_address_cache_hits_inc, rbac_persistent_stake_address_cache_miss_inc,
         rbac_volatile_stake_address_cache_hits_inc, rbac_volatile_stake_address_cache_miss_inc,
     },
