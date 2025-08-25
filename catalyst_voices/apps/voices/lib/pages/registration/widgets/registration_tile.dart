@@ -6,7 +6,7 @@ class RegistrationTile extends StatelessWidget {
   final String title;
   final String? subtitle;
   final VoidCallback? onTap;
-  final String? semanticsIdentifier;
+  final String semanticsIdentifier;
 
   const RegistrationTile({
     super.key,
@@ -14,7 +14,7 @@ class RegistrationTile extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.onTap,
-    this.semanticsIdentifier,
+    this.semanticsIdentifier = 'RegistrationTile',
   });
 
   @override
@@ -52,7 +52,7 @@ class RegistrationTile extends StatelessWidget {
                     children: [
                       Text(
                         key: const Key('RegistrationTileTitle'),
-                        semanticsIdentifier: semanticsIdentifier,
+                        semanticsIdentifier: '${semanticsIdentifier}Title',
                         title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -61,7 +61,7 @@ class RegistrationTile extends StatelessWidget {
                       if (subtitle != null)
                         Text(
                           key: const Key('RegistrationTileSubtitle'),
-                          semanticsIdentifier: semanticsIdentifier,
+                          semanticsIdentifier: '${semanticsIdentifier}Subtitle',
                           subtitle,
                           maxLines: 1,
                           overflow: TextOverflow.clip,

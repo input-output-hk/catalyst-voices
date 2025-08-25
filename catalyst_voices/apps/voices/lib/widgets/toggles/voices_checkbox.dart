@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/widgets/common/label_decorator.dart';
-import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +36,7 @@ class VoicesCheckbox extends StatelessWidget {
   /// When provided, the checkbox will use '${semanticsIdentifier}_checkbox'
   /// and the label will use '${semanticsIdentifier}_label' as semantics identifiers.
   /// When null, defaults to 'VoicesCheckbox_checkbox' and 'VoicesCheckbox_label'.
-  final String? semanticsIdentifier;
+  final String semanticsIdentifier;
 
   const VoicesCheckbox({
     super.key,
@@ -47,13 +46,12 @@ class VoicesCheckbox extends StatelessWidget {
     this.label,
     this.note,
     this.isEnabled = true,
-    this.semanticsIdentifier,
+    this.semanticsIdentifier = 'VoicesCheckbox',
   });
 
   @override
   Widget build(BuildContext context) {
     final onChanged = this.onChanged;
-    final baseIdentifier = semanticsIdentifier ?? 'VoicesCheckbox';
 
     return AbsorbPointer(
       absorbing: !isEnabled,
@@ -64,9 +62,8 @@ class VoicesCheckbox extends StatelessWidget {
           label: label,
           note: note,
           spacings: const [12, 8],
-          child: CombineSemantics(
-            identifier: '${baseIdentifier}_checkbox',
-            container: true,
+          child: Semantics(
+            identifier: '${semanticsIdentifier}_checkbox',
             child: Checkbox(
               key: const Key('Checkbox'),
               value: value,
