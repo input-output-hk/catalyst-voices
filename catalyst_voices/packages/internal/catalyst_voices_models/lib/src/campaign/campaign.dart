@@ -123,6 +123,7 @@ Project Catalyst turns economic power into innovation power by using the Cardano
 
   /// Whether the campaign at current phase supports adding / displaying comments.
   bool get supportsComments {
+    // TODO(damian-molinski): consider how to handle campaign with multiple active phases.
     final votingState = phaseStateTo(CampaignPhaseType.communityVoting);
     return !votingState.status.isActive;
   }
