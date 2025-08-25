@@ -30,16 +30,14 @@ enum _Type {
 
 class _TypeRadio extends StatelessWidget {
   final _Type type;
-
-  final _Type? groupValue;
   final bool toggleable;
-  final ValueChanged<_Type?>? onChanged;
+  final bool enabled;
+
   const _TypeRadio(
     this.type, {
     super.key,
-    this.groupValue,
     this.toggleable = false,
-    this.onChanged,
+    this.enabled = true,
   });
 
   @override
@@ -52,9 +50,8 @@ class _TypeRadio extends StatelessWidget {
       value: type,
       label: label != null ? Text(label) : null,
       note: note != null ? Text(note) : null,
-      groupValue: groupValue,
       toggleable: toggleable,
-      onChanged: onChanged,
+      enabled: enabled,
     );
   }
 }
@@ -66,21 +63,24 @@ class _VoicesRadioExampleState extends State<VoicesRadioExample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Voices Radio')),
-      body: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        itemBuilder: (context, index) {
-          final type = _Type.values[index];
+      body: RadioGroup<_Type>(
+        onChanged: _updateGroupSelection,
+        groupValue: _current,
+        child: ListView.separated(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          itemBuilder: (context, index) {
+            final type = _Type.values[index];
 
-          return _TypeRadio(
-            type,
-            key: ObjectKey(type),
-            groupValue: _current,
-            toggleable: type == _Type.three,
-            onChanged: type != _Type.values.last ? _updateGroupSelection : null,
-          );
-        },
-        separatorBuilder: (context, index) => const SizedBox(height: 8),
-        itemCount: _Type.values.length,
+            return _TypeRadio(
+              type,
+              key: ObjectKey(type),
+              toggleable: type == _Type.three,
+              enabled: type != _Type.values.last,
+            );
+          },
+          separatorBuilder: (context, index) => const SizedBox(height: 8),
+          itemCount: _Type.values.length,
+        ),
       ),
     );
   }

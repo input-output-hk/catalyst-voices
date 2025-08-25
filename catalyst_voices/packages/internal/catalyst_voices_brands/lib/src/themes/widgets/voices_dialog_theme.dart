@@ -1,8 +1,8 @@
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-class VoicesDialogTheme extends DialogThemeData {
-  VoicesDialogTheme({
+class VoicesDialogThemeData extends DialogThemeData {
+  VoicesDialogThemeData({
     required VoicesColorScheme colors,
   }) : super(
          barrierColor: colors.overlay,
