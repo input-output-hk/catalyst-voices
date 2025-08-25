@@ -202,7 +202,6 @@ class _WalletSummaryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Semantics(
       identifier: semanticsIdentifier,
       container: true,
