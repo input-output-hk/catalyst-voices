@@ -66,7 +66,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final radioWithItem2 = find.byKey(const Key('radio_Item 2'));
-      
+
       await tester.tap(radioWithItem2);
       await tester.pump();
 
