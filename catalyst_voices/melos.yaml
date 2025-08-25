@@ -86,8 +86,8 @@ command:
   bootstrap:
     runPubGetInParallel: true
     environment:
-      sdk: ">=3.8.0 <4.0.0"
-      flutter: ">=3.32.8"
+      sdk: ">=3.9.0 <4.0.0"
+      flutter: ">=3.35.1"
     dependencies:
       auto_size_text: ^3.0.0
       async: ^2.13.0
@@ -116,12 +116,12 @@ command:
       flutter_quill:
         git:
           url: https://github.com/input-output-hk/flutter-quill
-          ref: 532172254c3cee957bbdbb08be922f2c870b7fff
+          ref: 10be2c8d1fb0d7728183fc883e133b5b48251d62
       flutter_quill_extensions:
         git:
           url: https://github.com/input-output-hk/flutter-quill
           path: flutter_quill_extensions
-          ref: 532172254c3cee957bbdbb08be922f2c870b7fff
+          ref: 10be2c8d1fb0d7728183fc883e133b5b48251d62
       flutter_rust_bridge: 2.11.1
       flutter_secure_storage: ^9.2.4
       formz: ^0.8.0
@@ -137,7 +137,7 @@ command:
       markdown_quill:
         git:
           url: https://github.com/input-output-hk/markdown_quill
-          ref: a523a6128e6b2677739ac5d68d1d9c65a2af8b98
+          ref: 63058a25ed9b42e1e183edb84bb613ac235c1306
       meta: ^1.16.0
       result_type: ^1.0.0
       rxdart: ^0.28.0
