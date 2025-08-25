@@ -6,9 +6,9 @@ from api import cat_gateway_endpoint_url
 NUM_OF_REQUESTS = 100 + 1
 
 
-async def hit_panic_endpoint():
+async def hit_panic_endpoint(hits=NUM_OF_REQUESTS):
     async with httpx.AsyncClient() as client:
-        for _ in range(NUM_OF_REQUESTS):
+        for _ in range(hits):
             await client.get(cat_gateway_endpoint_url("panic"))
 
 

@@ -1,87 +1,50 @@
 # Proxy wrapper used for integration testing
-import asyncio
-import signal
 import subprocess
-import time
+import os
+from loguru import logger
+
+
+def _get_host_env():
+    """Return the HAProxy host to use depending on environment."""
+    #Check if running inside Docker
+    if os.path.exists("/.dockerenv"):
+        # inside container: assume container name is reachable via Docker network
+        return "haproxy"
+    else:
+        # running on host: localhost
+        return "localhost"
+
+
+def _exec_haproxy_cmd(haproxy_cmd):
+    """Run a HAProxy command"""
+    cmd = f"echo \"{haproxy_cmd}\" | socat tcp:{_get_host_env()}:9999 stdio"
+    result = subprocess.run(cmd, capture_output=True, text=True, shell=True, check=True, timeout=5)
+    return result.stdout.strip()
+
 
 class TestProxy:
-    """Proxy wrapper used for integration testing."""
+    def __init__(self, container_name:str, backend:str, server:str):
+        self.container_name = container_name
+        self.backend = backend
+        self.server = server
 
-    # Skip pytest collection
-    __test__ = False
+    def enable(self):
+        _exec_haproxy_cmd(f"enable server {self.backend}/{self.server}")
+        assert self.is_running()
+        logger.info(f"Enabled {self.backend}/{self.server} on {self.container_name}")
 
-    proxy_name: str
-    proxy_port: int
-    db_port: int
-    process: subprocess.Popen | None = None
+    def disable(self):
+        _exec_haproxy_cmd(f"disable server {self.backend}/{self.server}")
+        assert not self.is_running()
+        logger.info(f"Disabled {self.backend}/{self.server} on {self.container_name}")
 
-    def __init__(self, proxy_name:str, proxy_port: int, db_port: int):
-        """Initialize Test Proxy"""
-        self.proxy_name = proxy_name
-        self.proxy_port = proxy_port
-        self.db_port = db_port
-        print(f"{proxy_name} Proxy at port {proxy_port}!")
-
-    def start(self):
-        """Start the Test Proxy"""
-        if self.process:
-            print("The process is already running. Stop it first.")
-        else:
-            cmd = ["mitmdump", "--listen-port", f"{self.proxy_port}", "--tcp-hosts", "127.0.0.1", "--mode", f"reverse:tcp://localhost:{self.db_port}"]
-            p = subprocess.Popen(cmd, stdout=subprocess.DEVNULL)
-            self.process = p
-            print(f"Running {self.proxy_name} Proxy!")
-
-    def has_started(self) -> bool:
-        return self.process is not None
-
-    def stop(self) -> bool:
-        if self.process:
-            self.process.kill()
-            self.process = None
-            stopped = True
-            print(f"Stopped {self.proxy_name} Proxy!")
-        else:
-            print("The process must be running for it to be stopped.")
-            stopped = False
-        return stopped
-
-    def resume(self):
-        if self.process:
-            print(f"Resuming {self.proxy_name}")
-            self.process.send_signal(signal.SIGCONT)
-        else:
-            print("No process to resume.")
-
-    def suspend(self):
-        if self.process:
-            print(f"Suspending {self.proxy_name}")
-            self.process.send_signal(signal.SIGSTOP)
-        else:
-            print("No process to suspend.")
-
-async def run_test_proxy(name: str, port: int, db_port: int):
-    p = TestProxy(name, port, db_port)
-    p.start()
-    print(f"> {p.proxy_name} started at {time.strftime('%X')}")
-    #print("Waiting 10 seconds")
-    #await asyncio.sleep(10.0)
-    #print(f"> {p.name} finished at {time.strftime('%X')}")
-    #p.stop()
-
-
-async def run_proxies():
-
-    async with asyncio.TaskGroup() as tg:
-        task1 = tg.create_task(run_test_proxy("Event DB", 18080, 5432))
-        task2 = tg.create_task(run_test_proxy("Index DB", 18090, 9042))
-
-        print(f"started at {time.strftime('%X')}")
-        await task1
-        await task2
-        print(f"finished at {time.strftime('%X')}")
-
-
-if __name__ == "__main__":
-    print("Running Proxy!")
-    asyncio.run(run_proxies())
+    def is_running(self):
+        """Check if server is operational (state = 2)."""
+        result = _exec_haproxy_cmd("show servers state")
+        extract_state = (
+            f"echo \"{result}\" | "
+            f"awk -v be=\"{self.backend}\" -v srv=\"{self.server}\" "
+            f"'$2==be {{print $6}}'"
+        )
+        result_extract_state = subprocess.run(extract_state, capture_output=True, text=True, shell=True, check=True, timeout=5)
+        return result_extract_state.stdout.strip() == "2"
