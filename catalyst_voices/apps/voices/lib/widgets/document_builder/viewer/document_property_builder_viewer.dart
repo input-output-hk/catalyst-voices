@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart';
 import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -114,7 +115,11 @@ class _DocumentPropertyBuilderViewerState extends State<DocumentPropertyBuilderV
       case DocumentObjectProperty():
         yield* _buildObjectProperty(property);
       case DocumentValueProperty<Object>():
-        yield _buildValueProperty(property);
+        yield Semantics(
+          identifier: 'DocumentPropertyBuilderViewer[${property.nodeId}]',
+          container: true,
+          child: _buildValueProperty(property),
+        );
     }
   }
 
@@ -266,13 +271,17 @@ class _ListItem extends StatelessWidget {
           ),
           const SizedBox(height: 8),
         ],
-        DefaultTextStyle(
-          style: (textTheme.bodyMedium ?? const TextStyle()).copyWith(
-            color: isAnswered ? colors.textOnPrimaryLevel0 : colors.textOnPrimaryLevel1,
+        CombineSemantics(
+          identifier: 'DocumentPropertyBuilderViewerListItem',
+          container: true,
+          child: DefaultTextStyle(
+            style: (textTheme.bodyMedium ?? const TextStyle()).copyWith(
+              color: isAnswered ? colors.textOnPrimaryLevel0 : colors.textOnPrimaryLevel1,
+            ),
+            maxLines: !isMultiline ? 1 : null,
+            overflow: !isMultiline ? TextOverflow.ellipsis : TextOverflow.clip,
+            child: child,
           ),
-          maxLines: !isMultiline ? 1 : null,
-          overflow: !isMultiline ? TextOverflow.ellipsis : TextOverflow.clip,
-          child: child,
         ),
       ],
     );

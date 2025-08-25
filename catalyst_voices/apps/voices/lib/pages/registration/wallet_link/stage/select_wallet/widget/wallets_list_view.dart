@@ -54,7 +54,6 @@ class _WalletsListView extends StatelessWidget {
         return WalletListTile(
           key: ValueKey('Wallet${wallet.name}ListTile'),
           wallet: wallet,
-          semanticsIdentifier: 'Wallet${wallet.name}ListTile',
           onSelectWallet: onSelectWallet,
         );
       },

@@ -283,11 +283,13 @@ final class ProposalGuidanceItem extends Equatable {
   final String segmentTitle;
   final String sectionTitle;
   final MarkdownData description;
+  final DocumentNodeId nodeId;
 
   const ProposalGuidanceItem({
     required this.segmentTitle,
     required this.sectionTitle,
     required this.description,
+    required this.nodeId,
   });
 
   @override
@@ -295,5 +297,6 @@ final class ProposalGuidanceItem extends Equatable {
     segmentTitle,
     sectionTitle,
     description,
+    nodeId,
   ];
 }
