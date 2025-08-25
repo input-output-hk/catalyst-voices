@@ -1,6 +1,7 @@
 //! Cache wrapper type
 use std::{collections::hash_map::RandomState, hash::Hash};
 
+use get_size2::GetSize;
 use moka::{policy::EvictionPolicy, sync::Cache as BaseCache};
 
 /// Cache type that is disabled if the maximum capacity is set to zero.
@@ -15,11 +16,15 @@ where
     K: Hash + Eq + Send + Sync + 'static,
     V: Clone + Send + Sync + 'static,
 {
+    /// Function to determine cache entry weighted size.
+    fn weigher_fn(k: &K, v: &V) -> u32 {
+        let k_size = GetSize::get_size(&k);
+        let v_size = GetSize::get_size(&v);
+        k_size.saturating_add(v_size).try_into().unwrap_or(u32::MAX)
+    }
+
     /// Constructs a new `Cache`.
-    pub(crate) fn new(
-        name: &str, eviction_policy: EvictionPolicy, max_capacity: u64,
-        weigher_fn: impl Fn(&K, &V) -> u32 + Send + Sync + 'static,
-    ) -> Self {
+    pub(crate) fn new(name: &str, eviction_policy: EvictionPolicy, max_capacity: u64) -> Self {
         let inner = if max_capacity < 1 {
             None
         } else {
@@ -27,7 +32,7 @@ where
                 .name(name)
                 .eviction_policy(eviction_policy)
                 .max_capacity(max_capacity)
-                .weigher(weigher_fn);
+                .weigher(Self::weigher_fn);
             Some(cache.build())
         };
         Self { inner }

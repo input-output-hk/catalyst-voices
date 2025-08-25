@@ -1,7 +1,6 @@
 //! RBAC Persistent Chains Cache.
 
 use catalyst_types::catalyst_id::CatalystId;
-use get_size2::GetSize;
 use moka::policy::EvictionPolicy;
 use rbac_registration::registration::cardano::RegistrationChain;
 
@@ -17,13 +16,6 @@ impl ChainsCache {
     /// Name for cache
     const CACHE_NAME: &str = "RBAC Persistent Chains Cache";
 
-    /// Function to determine cache entry weighted size.
-    fn weigher_fn(k: &CatalystId, v: &RegistrationChain) -> u32 {
-        let k_size = GetSize::get_size(&k);
-        let v_size = GetSize::get_size(&v);
-        k_size.saturating_add(v_size).try_into().unwrap_or(u32::MAX)
-    }
-
     /// New Chains Cache instance.
     ///
     /// # Arguments
@@ -37,12 +29,7 @@ impl ChainsCache {
             0
         };
         Self {
-            inner: Cache::new(
-                Self::CACHE_NAME,
-                EvictionPolicy::lru(),
-                max_capacity,
-                Self::weigher_fn,
-            ),
+            inner: Cache::new(Self::CACHE_NAME, EvictionPolicy::lru(), max_capacity),
         }
     }
 

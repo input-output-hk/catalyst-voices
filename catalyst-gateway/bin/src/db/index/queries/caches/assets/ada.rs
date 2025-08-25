@@ -1,7 +1,6 @@
 //! Cache for TXO ADA Assets by Stake Address Queries
 use std::sync::Arc;
 
-use get_size2::GetSize;
 use moka::policy::EvictionPolicy;
 use tracing::{debug, error};
 
@@ -28,15 +27,6 @@ impl AssetsAdaCache {
     /// Name for cache
     const CACHE_NAME: &str = "Cardano UTXO ADA Assets Cache";
 
-    /// Function to determine the weighted size of cache entries.
-    ///
-    /// Returns the number of TXOs associated with a Stake Address.
-    fn weigher_fn(k: &DbStakeAddress, v: &Arc<Vec<GetTxoByStakeAddressQuery>>) -> u32 {
-        let k_size = GetSize::get_size(&k);
-        let v_size = GetSize::get_size(&v);
-        k_size.saturating_add(v_size).try_into().unwrap_or(u32::MAX)
-    }
-
     /// New ADA Assets Cache instance.
     ///
     /// # Arguments
@@ -50,12 +40,7 @@ impl AssetsAdaCache {
             0
         };
         Self {
-            inner: Cache::new(
-                Self::CACHE_NAME,
-                EvictionPolicy::lru(),
-                max_capacity,
-                Self::weigher_fn,
-            ),
+            inner: Cache::new(Self::CACHE_NAME, EvictionPolicy::lru(), max_capacity),
         }
     }
 
