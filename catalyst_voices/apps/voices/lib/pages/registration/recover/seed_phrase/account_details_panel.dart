@@ -176,7 +176,10 @@ class _Navigation extends StatelessWidget {
         VoicesFilledButton(
           key: const Key('SetUnlockPasswordButton'),
           onTap: isNextEnabled ? () => RegistrationCubit.of(context).nextStep() : null,
-          child: Text(context.l10n.recoveryAccountDetailsAction, semanticsIdentifier: 'recoveryAccountDetailsAction'),
+          child: Text(
+            context.l10n.recoveryAccountDetailsAction,
+            semanticsIdentifier: 'recoveryAccountDetailsAction',
+          ),
         ),
         const SizedBox(height: 10),
         VoicesTextButton(
