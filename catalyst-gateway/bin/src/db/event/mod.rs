@@ -247,23 +247,13 @@ impl EventDB {
     }
 }
 
-/// Establish a connection to the database, and check the schema is up-to-date.
+/// Establish a connection pool to the database.
 ///
 /// # Parameters
 ///
 /// * `url` set to the postgres connection string needed to connect to the database.  IF
 ///   it is None, then the env var "`DATABASE_URL`" will be used for this connection
 ///   string. eg: "`postgres://catalyst-dev:CHANGE_ME@localhost/CatalystDev`"
-/// * `do_schema_check` boolean flag to decide whether to verify the schema version or
-///   not. If it is `true`, a query is made to verify the DB schema version.
-///
-/// # Errors
-///
-/// This function will return an error if:
-/// * `url` is None and the environment variable "`DATABASE_URL`" isn't set.
-/// * There is any error communicating the the database to check its schema.
-/// * The database schema in the DB does not 100% match the schema supported by this
-///   library.
 ///
 /// # Notes
 ///
@@ -271,7 +261,7 @@ impl EventDB {
 /// `.env` file.
 ///
 /// If connection to the pool is `OK`, the `LIVE_EVENT_DB` atomic flag is set to `true`.
-pub async fn establish_connection_pool() {
+pub fn establish_connection_pool() {
     debug!("Establishing connection with Event DB pool");
 
     // This was pre-validated and can't fail, but provide default in the impossible case it
@@ -292,11 +282,10 @@ pub async fn establish_connection_pool() {
 
     match deadpool::managed::Pool::builder(pg_mgr)
         .max_size(Settings::event_db_settings().max_connections() as usize)
-        .create_timeout(Some(Settings::event_db_settings().connection_timeout()))
-        // .max_lifetime(Some(Settings::event_db_settings().max_lifetime()))
-        // .min_idle(Settings::event_db_settings().min_idle())
-        // .connection_timeout(Settings::event_db_settings().connection_timeout())
-        // .retry_connection(Settings::event_db_settings().retry_connection())
+        .create_timeout(Settings::event_db_settings().connection_timeout())
+        .wait_timeout(Settings::event_db_settings().slot_wait_timeout())
+        .recycle_timeout(Settings::event_db_settings().connection_recycle_timeout())
+        .runtime(deadpool::Runtime::Tokio1)
         .build()
     {
         Ok(pool) => {

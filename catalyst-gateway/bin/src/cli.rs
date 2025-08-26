@@ -55,7 +55,7 @@ impl Cli {
                 CassandraSession::init();
 
                 // Initialize Event DB connection pool
-                db::event::establish_connection_pool().await;
+                db::event::establish_connection_pool();
                 // Test that connection is available
                 if EventDB::connection_is_ok().await {
                     debug!("Event DB is connected. Liveness set to true");

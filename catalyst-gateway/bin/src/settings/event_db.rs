@@ -8,18 +8,6 @@ use super::str_env_var::StringEnvVar;
 /// Defaults to 100.
 const EVENT_DB_MAX_CONNECTIONS: u32 = 100;
 
-/// Sets the maximum lifetime of connections in the pool.
-/// Defaults to 30 minutes.
-const EVENT_DB_MAX_LIFETIME: Duration = Duration::from_secs(30 * 60);
-
-/// Sets the minimum idle connection count maintained by the pool.
-/// Defaults to 0.
-const EVENT_DB_MIN_IDLE: u32 = 0;
-
-/// Sets the connection timeout used by the pool.
-/// Defaults to 30 seconds.
-const EVENT_DB_CONN_TIMEOUT: Duration = Duration::from_secs(30);
-
 /// Default Event DB URL.
 const EVENT_DB_URL_DEFAULT: &str =
     "postgresql://postgres:postgres@localhost/catalyst_events?sslmode=disable";
@@ -40,22 +28,14 @@ pub(crate) struct EnvVars {
     /// Defaults to 10.
     max_connections: u32,
 
-    /// Sets the maximum lifetime of connections in the pool.
-    /// Defaults to 30 minutes.
-    max_lifetime: Duration,
-
-    /// Sets the minimum idle connection count maintained by the pool.
-    /// Defaults to None.
-    min_idle: u32,
-
     /// Sets the connection timeout used by the pool.
-    /// Defaults to 30 seconds.
-    connection_timeout: Duration,
+    connection_timeout: Option<Duration>,
 
-    /// Instructs Event DB pool to automatically retry connection creation if it fails,
-    /// until the `connection_timeout` has expired.
-    /// Default false.
-    retry_connection: bool,
+    /// Sets the timeout for waiting for a slot to become available.
+    slot_wait_timeout: Option<Duration>,
+
+    /// Sets the timeout when for recycling an object.
+    connection_recycle_timeout: Option<Duration>,
 }
 
 impl EnvVars {
@@ -71,17 +51,11 @@ impl EnvVars {
                 0,
                 u32::MAX,
             ),
-            max_lifetime: StringEnvVar::new_as_duration(
-                "EVENT_DB_MAX_LIFETIME",
-                EVENT_DB_MAX_LIFETIME,
+            connection_timeout: StringEnvVar::new_as_duration_optional("EVENT_DB_CONN_TIMEOUT"),
+            slot_wait_timeout: StringEnvVar::new_as_duration_optional("EVENT_DB_SLOT_WAIT_TIMEOUT"),
+            connection_recycle_timeout: StringEnvVar::new_as_duration_optional(
+                "EVENT_DB_CONN_RECYCLE_TIMEOUT",
             ),
-            min_idle: StringEnvVar::new_as_int("EVENT_DB_MIN_IDLE", EVENT_DB_MIN_IDLE, 0, u32::MAX),
-            connection_timeout: StringEnvVar::new_as_duration(
-                "EVENT_DB_CONN_TIMEOUT",
-                EVENT_DB_CONN_TIMEOUT,
-            ),
-            retry_connection: StringEnvVar::new_optional("EVENT_DB_RETRY_CONNECTION", false)
-                .is_some(),
         }
     }
 
@@ -105,26 +79,18 @@ impl EnvVars {
         self.max_connections
     }
 
-    /// Returns Event DB `max_lifetime` setting
-    #[allow(dead_code)]
-    pub(crate) fn max_lifetime(&self) -> Duration {
-        self.max_lifetime
-    }
-
-    /// Returns Event DB `min_idle` setting
-    #[allow(dead_code)]
-    pub(crate) fn min_idle(&self) -> u32 {
-        self.min_idle
-    }
-
     /// Returns Event DB `connection_timeout` setting
-    pub(crate) fn connection_timeout(&self) -> Duration {
+    pub(crate) fn connection_timeout(&self) -> Option<Duration> {
         self.connection_timeout
     }
 
-    /// Returns Event DB `retry_connection` setting
-    #[allow(dead_code)]
-    pub(crate) fn retry_connection(&self) -> bool {
-        self.retry_connection
+    /// Returns Event DB `slot_wait_timeout` setting
+    pub(crate) fn slot_wait_timeout(&self) -> Option<Duration> {
+        self.slot_wait_timeout
+    }
+
+    /// Returns Event DB `connection_recycle_timeout` setting
+    pub(crate) fn connection_recycle_timeout(&self) -> Option<Duration> {
+        self.connection_recycle_timeout
     }
 }
