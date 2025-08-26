@@ -4,7 +4,6 @@ import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/app.dart';
 import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
 import 'package:catalyst_voices/configs/app_bloc_observer.dart';
-import 'package:catalyst_voices/configs/sentry_service.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -182,7 +181,10 @@ Future<void> _runApp(
   required SentryConfig sentryConfig,
 }) async {
   if (kReleaseMode) {
-    await SentryService.init(app, config: sentryConfig);
+    final reporting = Dependencies.instance.get<ReportingService>();
+    await reporting.init(config: sentryConfig, appRunner: () => runApp(app));
+
+    Dependencies.instance.get<ReportingServiceMediator>().init();
   } else {
     runApp(app);
   }

@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 abstract interface class ReportingService {
   Future<void> init({
     required ReportingServiceConfig config,
-    required AsyncValueGetter<void> appRunner,
+    required ValueGetter<FutureOr<void>> appRunner,
   });
 
   Future<void> reportingAs(Account? account);

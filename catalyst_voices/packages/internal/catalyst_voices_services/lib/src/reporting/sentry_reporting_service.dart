@@ -11,7 +11,7 @@ final class SentryReportingService implements ReportingService {
   @override
   Future<void> init({
     required ReportingServiceConfig config,
-    required AsyncValueGetter<void> appRunner,
+    required ValueGetter<FutureOr<void>> appRunner,
   }) async {
     await SentryFlutter.init(
       (options) {

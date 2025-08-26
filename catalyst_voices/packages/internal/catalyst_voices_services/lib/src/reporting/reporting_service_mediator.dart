@@ -2,9 +2,13 @@ import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
-import 'package:catalyst_voices_services/src/reporting/reporting_service.dart';
 
 abstract interface class ReportingServiceMediator {
+  factory ReportingServiceMediator(
+    ReportingService reportingService,
+    UserService userService,
+  ) = ReportingServiceMediatorImpl;
+
   FutureOr<void> dispose();
 
   FutureOr<void> init();
