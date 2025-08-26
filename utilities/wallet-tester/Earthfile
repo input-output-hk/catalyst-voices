@@ -1,8 +1,10 @@
 VERSION 0.8
 
+ARG REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
+
 # builder - Installs node packages.
 builder:
-  FROM node:20-alpine
+  FROM ${REGISTRY}/node:20-alpine
   WORKDIR /app
   COPY package.json package-lock.json .
   COPY index.html postcss.config.js tailwind.config.js tsconfig* vite.config.ts .eslintrc.yaml .prettierrc.yaml .
@@ -26,7 +28,7 @@ build:
 
 # local - Makes a docker image that can serve the app for development purposes.
 local:
-  FROM nginx:1.25-alpine
+  FROM ${REGISTRY}/nginx:1.25-alpine
 
   COPY +build/dist /usr/share/nginx/html
 

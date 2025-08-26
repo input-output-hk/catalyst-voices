@@ -4,7 +4,8 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.5.8 AS mdlint-ci
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.5.8 AS cspell-ci
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.5.8 AS postgresql-ci
 
-FROM debian:stable-slim
+ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
+FROM ${REGISTRY}/debian:stable-slim
 
 # cspell: words livedocs sitedocs
 
