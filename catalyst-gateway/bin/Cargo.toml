@@ -99,6 +99,7 @@ rayon = "1.10"
 x509-cert = "0.2.5"
 minicbor = { version = "0.25.1", features = ["alloc"] }
 itertools = "0.14.0"
+get-size2 = { version = "0.6.2", features = ["derive"] }
 
 # Its a transitive dependency of the "poem-openapi" crate,
 # but its breaks API after version "5.1.8".

@@ -69,13 +69,13 @@ pub async fn latest_rbac_chain(id: &CatalystId) -> Result<Option<ChainInfo>> {
 
 /// Returns only the persistent part of a registration chain by the given Catalyst ID.
 pub async fn persistent_rbac_chain(id: &CatalystId) -> Result<Option<RegistrationChain>> {
+    let session = CassandraSession::get(true).context("Failed to get Cassandra session")?;
+
     let id = id.as_short_id();
 
-    if let Some(chain) = cached_persistent_rbac_chain(&id) {
+    if let Some(chain) = cached_persistent_rbac_chain(&session, &id) {
         return Ok(Some(chain));
     }
-
-    let session = CassandraSession::get(true).context("Failed to get Cassandra session")?;
 
     let regs = indexed_regs(&session, &id).await?;
     let chain = build_rbac_chain(regs).await?.inspect(|c| {
