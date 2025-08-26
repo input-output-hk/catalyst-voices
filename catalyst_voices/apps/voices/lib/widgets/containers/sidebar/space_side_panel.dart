@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/common/tab_bar_stack_view.dart';
 import 'package:catalyst_voices/widgets/tabbar/voices_tab.dart';
@@ -115,7 +117,7 @@ class _SpaceSidePanelState extends State<SpaceSidePanel> with SingleTickerProvid
               child: VoicesIconButton(
                 child: VoicesAssets.icons.leftRailToggle.buildIcon(),
                 onTap: () {
-                  _controller.reverse();
+                  unawaited(_controller.reverse());
                 },
               ),
             )
@@ -126,7 +128,7 @@ class _SpaceSidePanelState extends State<SpaceSidePanel> with SingleTickerProvid
               child: VoicesIconButton(
                 child: VoicesAssets.icons.rightRailToggle.buildIcon(),
                 onTap: () {
-                  _controller.reverse();
+                  unawaited(_controller.reverse());
                 },
               ),
             ),
@@ -143,7 +145,7 @@ class _SpaceSidePanelState extends State<SpaceSidePanel> with SingleTickerProvid
                   children: [
                     _Header(
                       onCollapseTap: () {
-                        _controller.forward();
+                        unawaited(_controller.forward());
                         widget.onCollapseTap?.call();
                       },
                       isLeft: widget.isLeft,

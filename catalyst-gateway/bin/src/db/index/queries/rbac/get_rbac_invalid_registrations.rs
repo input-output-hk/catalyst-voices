@@ -21,7 +21,6 @@ use crate::db::{
 const QUERY: &str = include_str!("../cql/get_rbac_invalid_registrations_catalyst_id.cql");
 
 /// Get invalid registrations by Catalyst ID query params.
-#[allow(dead_code)]
 #[derive(SerializeRow)]
 pub(crate) struct QueryParams {
     /// A Catalyst ID.

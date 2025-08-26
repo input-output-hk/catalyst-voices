@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
@@ -207,7 +208,7 @@ class _DigitWidgetState extends State<_DigitWidget> with SingleTickerProviderSta
     super.didUpdateWidget(oldWidget);
     if (oldWidget.digit != widget.digit) {
       _previousDigit = oldWidget.digit;
-      _animationController.forward(from: 0);
+      unawaited(_animationController.forward(from: 0));
     }
   }
 

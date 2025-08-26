@@ -391,15 +391,15 @@ pub async fn is_chain_known(
         return Ok(true);
     }
 
+    let session =
+        CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
+
     // We only cache persistent chains, so it is ok to check the cache regardless of the
     // `is_persistent` parameter value.
-    if cached_persistent_rbac_chain(id).is_some() {
+    if cached_persistent_rbac_chain(&session, id).is_some() {
         return Ok(true);
     }
 
-    // Then try to find in the persistent database.
-    let session =
-        CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
     if is_cat_id_known(&session, id).await? {
         return Ok(true);
     }

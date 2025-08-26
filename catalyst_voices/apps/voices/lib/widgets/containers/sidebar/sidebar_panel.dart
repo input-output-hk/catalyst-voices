@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -66,9 +68,9 @@ class _SidebarPanelState extends State<SidebarPanel> with SingleTickerProviderSt
     super.didUpdateWidget(oldWidget);
     if (widget.isCollapsed != oldWidget.isCollapsed) {
       if (widget.isCollapsed) {
-        _controller.forward();
+        unawaited(_controller.forward());
       } else {
-        _controller.reverse();
+        unawaited(_controller.reverse());
       }
     }
   }
