@@ -108,7 +108,7 @@ class _ProposalMetadata extends StatelessWidget {
   final String title;
   final String? author;
   final DateTime? createdAt;
-  final int commentsCount;
+  final int? commentsCount;
 
   const _ProposalMetadata({
     required this.title,
@@ -144,8 +144,9 @@ class _ProposalMetadata extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               UsernameText(author),
-              if (createdAt != null) TimestampText(createdAt!),
-              Text(context.l10n.noOfComments(commentsCount)),
+              if (createdAt case final createdAt?) TimestampText(createdAt),
+              if (commentsCount case final commentsCount?)
+                Text(context.l10n.noOfComments(commentsCount)),
             ].separatedBy(const DotSeparator()).toList(),
           ),
         ),

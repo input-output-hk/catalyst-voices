@@ -16,7 +16,7 @@ class ProposalMetadataTile extends StatelessWidget {
   final DateTime? createdAt;
   final bool warningCreatedAt;
   final String? tag;
-  final int commentsCount;
+  final int? commentsCount;
   final Coin? fundsRequested;
   final int? projectDuration;
   final int? milestoneCount;
@@ -64,8 +64,10 @@ class ProposalMetadataTile extends StatelessWidget {
               const SizedBox(width: 16),
               DocumentTagChip(name: tag),
             ],
-            const SizedBox(width: 8),
-            DocumentCommentsChip(count: commentsCount),
+            if (commentsCount case final commentsCount?) ...[
+              const SizedBox(width: 8),
+              DocumentCommentsChip(count: commentsCount),
+            ],
           ],
         ),
         if (description != null)

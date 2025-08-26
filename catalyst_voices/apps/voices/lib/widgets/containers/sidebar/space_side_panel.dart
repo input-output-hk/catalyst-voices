@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart';
 import 'package:catalyst_voices/widgets/common/tab_bar_stack_view.dart';
@@ -123,7 +125,7 @@ class _SpaceSidePanelState extends State<SpaceSidePanel> with SingleTickerProvid
                       ? VoicesAssets.icons.leftRailToggle.buildIcon()
                       : VoicesAssets.icons.rightRailToggle.buildIcon(),
                   onTap: () {
-                    _controller.reverse();
+                    unawaited(_controller.reverse());
                   },
                 ),
               ),

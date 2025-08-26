@@ -10,7 +10,7 @@ final class ProposalViewMetadata extends Equatable {
   final DateTime? createdAt;
   final bool warningCreatedAt;
   final String? tag;
-  final int commentsCount;
+  final int? commentsCount;
   final Coin? fundsRequested;
   final int? projectDuration;
   final int? milestoneCount;

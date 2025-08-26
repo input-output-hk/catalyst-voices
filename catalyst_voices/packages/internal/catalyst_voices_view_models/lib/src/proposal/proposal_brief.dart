@@ -15,7 +15,7 @@ class ProposalBrief extends Equatable {
   final String description;
   final int versionNumber;
   final DateTime updateDate;
-  final int commentsCount;
+  final int? commentsCount;
   final bool isFavorite;
 
   const ProposalBrief({
@@ -29,13 +29,14 @@ class ProposalBrief extends Equatable {
     required this.description,
     required this.versionNumber,
     required this.updateDate,
-    required this.commentsCount,
+    this.commentsCount,
     this.isFavorite = false,
   });
 
   factory ProposalBrief.fromProposal(
     Proposal proposal, {
     bool isFavorite = false,
+    bool showComments = true,
     String categoryName = '',
   }) {
     return ProposalBrief(
@@ -49,7 +50,7 @@ class ProposalBrief extends Equatable {
       description: proposal.description,
       versionNumber: proposal.versionNumber,
       updateDate: proposal.updateDate,
-      commentsCount: proposal.commentsCount,
+      commentsCount: showComments ? proposal.commentsCount : null,
       isFavorite: isFavorite,
     );
   }
@@ -85,7 +86,7 @@ class ProposalBrief extends Equatable {
     String? description,
     int? versionNumber,
     DateTime? updateDate,
-    int? commentsCount,
+    Optional<int>? commentsCount,
     bool? isFavorite,
   }) {
     return ProposalBrief(
@@ -99,7 +100,7 @@ class ProposalBrief extends Equatable {
       description: description ?? this.description,
       versionNumber: versionNumber ?? this.versionNumber,
       updateDate: updateDate ?? this.updateDate,
-      commentsCount: commentsCount ?? this.commentsCount,
+      commentsCount: commentsCount.dataOr(this.commentsCount),
       isFavorite: isFavorite ?? this.isFavorite,
     );
   }
@@ -118,7 +119,7 @@ class ProposalBriefVoting extends ProposalBrief {
     required super.description,
     required super.versionNumber,
     required super.updateDate,
-    required super.commentsCount,
+    super.commentsCount,
     super.isFavorite,
     super.author,
     required this.voteData,
@@ -127,6 +128,7 @@ class ProposalBriefVoting extends ProposalBrief {
   factory ProposalBriefVoting.fromProposal(
     Proposal proposal, {
     bool isFavorite = false,
+    bool showComments = true,
     String categoryName = '',
     Vote? draftVote,
     Vote? lastCastedVote,
@@ -142,7 +144,7 @@ class ProposalBriefVoting extends ProposalBrief {
       description: proposal.description,
       versionNumber: proposal.versionNumber,
       updateDate: proposal.updateDate,
-      commentsCount: proposal.commentsCount,
+      commentsCount: showComments ? proposal.commentsCount : null,
       isFavorite: isFavorite,
       voteData: VoteButtonData.fromVotes(
         currentDraft: draftVote,
@@ -154,6 +156,7 @@ class ProposalBriefVoting extends ProposalBrief {
   factory ProposalBriefVoting.fromProposalWithContext(
     ProposalWithContext data, {
     Vote? draftVote,
+    bool showComments = true,
   }) {
     final proposal = data.proposal;
     final category = data.category;
@@ -170,7 +173,7 @@ class ProposalBriefVoting extends ProposalBrief {
       description: proposal.description,
       versionNumber: proposal.versionNumber,
       updateDate: proposal.updateDate,
-      commentsCount: proposal.commentsCount,
+      commentsCount: showComments ? proposal.commentsCount : null,
       isFavorite: userContext.isFavorite,
       voteData: VoteButtonData.fromVotes(
         currentDraft: draftVote,
@@ -197,7 +200,7 @@ class ProposalBriefVoting extends ProposalBrief {
     String? description,
     int? versionNumber,
     DateTime? updateDate,
-    int? commentsCount,
+    Optional<int>? commentsCount,
     bool? isFavorite,
     VoteButtonData? voteData,
   }) {
@@ -212,7 +215,7 @@ class ProposalBriefVoting extends ProposalBrief {
       description: description ?? this.description,
       versionNumber: versionNumber ?? this.versionNumber,
       updateDate: updateDate ?? this.updateDate,
-      commentsCount: commentsCount ?? this.commentsCount,
+      commentsCount: commentsCount.dataOr(this.commentsCount),
       isFavorite: isFavorite ?? this.isFavorite,
       voteData: voteData ?? this.voteData,
     );
