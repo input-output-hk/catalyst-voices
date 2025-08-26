@@ -36,8 +36,12 @@ type SqlDbPool = Arc<deadpool::managed::Pool<deadpool_postgres::Manager>>;
 static EVENT_DB_POOL: OnceLock<SqlDbPool> = OnceLock::new();
 
 /// Background Event DB probe check
-static EVENT_DB_PROBE_TASK: LazyLock<Mutex<JoinHandle<()>>> =
-    LazyLock::new(|| Mutex::new(tokio::spawn(async {})));
+static EVENT_DB_PROBE_TASK: LazyLock<Mutex<JoinHandle<()>>> = LazyLock::new(|| {
+    let interval = Settings::event_db_settings().probe_check_interval();
+    Mutex::new(tokio::spawn(async move {
+        EventDB::wait_until_ready(interval).await;
+    }))
+});
 
 /// Is Deep Query Analysis enabled or not?
 static DEEP_QUERY_INSPECT: AtomicBool = AtomicBool::new(false);
