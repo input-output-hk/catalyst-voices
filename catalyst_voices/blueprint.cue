@@ -1,15 +1,15 @@
 project: {
 	name: "voices"
 	ci: targets: {
-		"build-web": {
+		"package": {
 			secrets: [
 				{
 					provider: "aws"
 					path:     "global/ci/sentry"
 					maps: {
 						"token":   "SENTRY_AUTH_TOKEN"
-						"org":     "SENTRY_ORG"
-						"project": "SENTRY_PROJECT"
+//						"org":     "SENTRY_ORG"
+//						"project": "SENTRY_PROJECT"
 					}
 				},
 			]
