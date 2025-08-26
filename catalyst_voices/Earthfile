@@ -123,7 +123,7 @@ build-static-analysis:
 build-web:
     FROM +code-generator
     ARG WORKDIR=/frontend/apps/voices
-    ARG UPLOAD_DEBUG_SYMBOLS=false
+    ARG UPLOAD_DEBUG_SYMBOLS=true
 
     DO flutter-ci+BUILD_WEB \
         --WORKDIR=$WORKDIR \
@@ -140,7 +140,7 @@ package:
     FROM caddy:2.10
     ARG tag='latest'
 
-    COPY --keep-ts (+build-web/web --UPLOAD_DEBUG_SYMBOLS=true) /app
+    COPY --keep-ts +build-web/web /app
 
     # Note this is only used for local development, a different Caddyfile is
     # used during deployment. See the blueprint.cue file.
