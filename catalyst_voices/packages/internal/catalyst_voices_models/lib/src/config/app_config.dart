@@ -254,7 +254,7 @@ final class ExpiryDuration extends Equatable {
   }
 }
 
-final class SentryConfig extends Equatable {
+final class SentryConfig extends ReportingServiceConfig {
   final String dsn;
   final String environment;
   final String release;
