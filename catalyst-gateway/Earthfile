@@ -85,7 +85,7 @@ build:
     SAVE ARTIFACT target/release/cat-gateway cat-gateway
 
 test-openapi-diff:
-    FROM ${REGISTRY}/library/openapitools/openapi-diff:2.1.1
+    FROM ${REGISTRY}/openapitools/openapi-diff:2.1.1
 
     COPY cat-gateway-main+build/doc/cat-gateway-api.json cat-gateway-api.old.json
     COPY +build/doc/cat-gateway-api.json cat-gateway-api.new.json
