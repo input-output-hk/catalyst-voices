@@ -123,6 +123,9 @@ build-static-analysis:
 build-web:
     FROM +code-generator
     ARG WORKDIR=/frontend/apps/voices
+    # TODO(damian-molinski): try to disable it by default.
+    # at the moment it fails to pass down
+    #     COPY --keep-ts (+build-web/web --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN --UPLOAD_DEBUG_SYMBOLS=true) /app
     ARG UPLOAD_DEBUG_SYMBOLS=false
 
     DO flutter-ci+BUILD_WEB \
@@ -140,7 +143,8 @@ package:
     FROM caddy:2.10
     ARG tag='latest'
 
-    COPY --keep-ts (+build-web/web --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN --UPLOAD_DEBUG_SYMBOLS=true) /app
+#    COPY --keep-ts +build-web/web /app
+    COPY --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN --keep-ts (+build-web/web --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN --UPLOAD_DEBUG_SYMBOLS=true) /app
 
     # Note this is only used for local development, a different Caddyfile is
     # used during deployment. See the blueprint.cue file.
