@@ -36,12 +36,8 @@ type SqlDbPool = Arc<deadpool::managed::Pool<deadpool_postgres::Manager>>;
 static EVENT_DB_POOL: OnceLock<SqlDbPool> = OnceLock::new();
 
 /// Background Event DB probe check
-static EVENT_DB_PROBE_TASK: LazyLock<Mutex<JoinHandle<()>>> = LazyLock::new(|| {
-    let interval = Settings::event_db_settings().probe_check_interval();
-    Mutex::new(tokio::spawn(async move {
-        EventDB::wait_until_ready(interval).await;
-    }))
-});
+static EVENT_DB_PROBE_TASK: LazyLock<Mutex<Option<JoinHandle<()>>>> =
+    LazyLock::new(|| Mutex::new(None));
 
 /// Is Deep Query Analysis enabled or not?
 static DEEP_QUERY_INSPECT: AtomicBool = AtomicBool::new(false);
@@ -275,13 +271,14 @@ impl EventDB {
             let mut task = EVENT_DB_PROBE_TASK
                 .lock()
                 .map_err(|e| anyhow::anyhow!("{e}"))?;
-            if task.is_finished() {
+
+            if task.as_ref().is_none_or(JoinHandle::is_finished) {
                 let interval = Settings::event_db_settings().probe_check_interval();
 
-                *task = tokio::spawn(async move {
+                *task = Some(tokio::spawn(async move {
                     Self::wait_until_ready(interval).await;
                     info!("Event DB is ready");
-                });
+                }));
             }
             Ok(())
         };
