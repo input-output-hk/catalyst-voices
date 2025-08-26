@@ -61,7 +61,6 @@ final class AppConfigFactory {
       sentry: defaultEnvConfig.sentry.copyWith(
         dsn: remote.sentry?.dsn,
         environment: remote.sentry?.environment,
-        release: remote.sentry?.release,
         tracesSampleRate: remote.sentry?.tracesSampleRate,
         profilesSampleRate: remote.sentry?.profilesSampleRate,
         enableAutoSessionTracking: remote.sentry?.enableAutoSessionTracking,

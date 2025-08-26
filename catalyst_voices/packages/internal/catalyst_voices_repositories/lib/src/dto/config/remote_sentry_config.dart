@@ -6,7 +6,6 @@ part 'remote_sentry_config.g.dart';
 final class RemoteSentryConfig {
   final String? dsn;
   final String? environment;
-  final String? release;
   final double? tracesSampleRate;
   final double? profilesSampleRate;
   final bool? enableAutoSessionTracking;
@@ -16,7 +15,6 @@ final class RemoteSentryConfig {
   const RemoteSentryConfig({
     this.dsn,
     this.environment,
-    this.release,
     this.tracesSampleRate,
     this.profilesSampleRate,
     this.enableAutoSessionTracking,
