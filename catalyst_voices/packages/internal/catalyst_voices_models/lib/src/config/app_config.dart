@@ -296,7 +296,6 @@ final class SentryConfig extends Equatable {
   SentryConfig copyWith({
     String? dsn,
     String? environment,
-    String? release,
     double? tracesSampleRate,
     double? profilesSampleRate,
     bool? enableAutoSessionTracking,
