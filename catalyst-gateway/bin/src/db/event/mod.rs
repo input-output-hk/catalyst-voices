@@ -12,7 +12,7 @@ use error::NotFoundError;
 use futures::{Stream, StreamExt, TryStreamExt};
 use tokio::task::JoinHandle;
 use tokio_postgres::{types::ToSql, Row};
-use tracing::{debug, debug_span, error, Instrument};
+use tracing::{debug, debug_span, error, info, Instrument};
 
 use crate::{
     service::utilities::health::{event_db_is_live, set_event_db_liveness},
@@ -280,6 +280,7 @@ impl EventDB {
 
                 *task = tokio::spawn(async move {
                     Self::wait_until_ready(interval).await;
+                    info!("Event DB is ready");
                 });
             }
             Ok(())
