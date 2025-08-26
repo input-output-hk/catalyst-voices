@@ -73,6 +73,7 @@ poetry run pytest -s -m <marker>
 ```
 
 Additional steps for tests requiring proxy:
+
 * build and run haproxy
 
 ```shell
