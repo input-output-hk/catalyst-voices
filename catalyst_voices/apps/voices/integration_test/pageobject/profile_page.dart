@@ -25,7 +25,7 @@ class ProfilePage {
   final appBarProfileAvatar = const Key('ProfileAvatar');
   final profileAndKeychainText = const Key('ProfileAndKeychainText');
   final accountEmailTextField = const Key('AccountEmailTextField');
-  final emailTileSaveBtn = const Key('EmailTileSaveButton');
+  final emailTileSaveBtn = const Key('EditableTileSaveButton');
   final deleteKeychainContinueButton = const Key('DeleteKeychainContinueButton');
   final deleteKeychainTextField = const Key('DeleteKeychainTextField');
   final keychainDeletedDialogCloseButton = const Key('KeychainDeletedDialogCloseButton');
