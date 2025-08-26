@@ -2,7 +2,7 @@
 use std::{io::Write, path::PathBuf, time::Duration};
 
 use clap::Parser;
-use tracing::{debug, error, info};
+use tracing::{error, info};
 
 use crate::{
     cardano::start_followers,
@@ -57,11 +57,7 @@ impl Cli {
                 // Initialize Event DB connection pool
                 db::event::establish_connection_pool();
                 // Test that connection is available
-                if EventDB::connection_is_ok().await {
-                    debug!("Event DB is connected. Liveness set to true");
-                } else {
-                    error!("Event DB connection failed");
-                }
+                EventDB::spawn_ready_probe();
 
                 // Start the chain indexing follower.
                 start_followers().await?;

@@ -8,6 +8,9 @@ use super::str_env_var::StringEnvVar;
 /// Defaults to 100.
 const EVENT_DB_MAX_CONNECTIONS: u32 = 100;
 
+/// Default value for the `probe_check_interval`
+const EVENT_DB_PROBE_CHECK_INTERVAL_DEFAULT: Duration = Duration::from_secs(1);
+
 /// Default Event DB URL.
 const EVENT_DB_URL_DEFAULT: &str =
     "postgresql://postgres:postgres@localhost/catalyst_events?sslmode=disable";
@@ -28,14 +31,18 @@ pub(crate) struct EnvVars {
     /// Defaults to 10.
     max_connections: u32,
 
-    /// Sets the connection timeout used by the pool.
-    connection_timeout: Option<Duration>,
+    /// Sets the timeout when creating a new connection.
+    connection_creation_timeout: Option<Duration>,
 
     /// Sets the timeout for waiting for a slot to become available.
     slot_wait_timeout: Option<Duration>,
 
-    /// Sets the timeout when for recycling an object.
+    /// Sets the timeout when for recycling a connection.
     connection_recycle_timeout: Option<Duration>,
+
+    /// Sets the interval value for the background task for the `Self::spawn_ready_probe`.
+    /// Defaults to 1s.
+    probe_check_interval: Duration,
 }
 
 impl EnvVars {
@@ -51,10 +58,16 @@ impl EnvVars {
                 0,
                 u32::MAX,
             ),
-            connection_timeout: StringEnvVar::new_as_duration_optional("EVENT_DB_CONN_TIMEOUT"),
+            connection_creation_timeout: StringEnvVar::new_as_duration_optional(
+                "EVENT_DB_CONN_TIMEOUT",
+            ),
             slot_wait_timeout: StringEnvVar::new_as_duration_optional("EVENT_DB_SLOT_WAIT_TIMEOUT"),
             connection_recycle_timeout: StringEnvVar::new_as_duration_optional(
                 "EVENT_DB_CONN_RECYCLE_TIMEOUT",
+            ),
+            probe_check_interval: StringEnvVar::new_as_duration(
+                "EVENT_DB_PROBE_CHECK_INTERVAL",
+                EVENT_DB_PROBE_CHECK_INTERVAL_DEFAULT,
             ),
         }
     }
@@ -79,9 +92,9 @@ impl EnvVars {
         self.max_connections
     }
 
-    /// Returns Event DB `connection_timeout` setting
-    pub(crate) fn connection_timeout(&self) -> Option<Duration> {
-        self.connection_timeout
+    /// Returns Event DB `connection_creation_timeout` setting
+    pub(crate) fn connection_creation_timeout(&self) -> Option<Duration> {
+        self.connection_creation_timeout
     }
 
     /// Returns Event DB `slot_wait_timeout` setting
@@ -92,5 +105,10 @@ impl EnvVars {
     /// Returns Event DB `connection_recycle_timeout` setting
     pub(crate) fn connection_recycle_timeout(&self) -> Option<Duration> {
         self.connection_recycle_timeout
+    }
+
+    /// Returns Event DB `probe_check_interval` setting
+    pub(crate) fn probe_check_interval(&self) -> Duration {
+        self.probe_check_interval
     }
 }

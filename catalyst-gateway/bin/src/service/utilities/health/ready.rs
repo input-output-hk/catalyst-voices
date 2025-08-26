@@ -5,26 +5,8 @@ use std::sync::atomic::{
     Ordering::{Acquire, Release},
 };
 
-/// Flag to determine if the Event DB background task running or not
-static EVENT_DB_PROBE_RUNNING: AtomicBool = AtomicBool::new(false);
-
 /// Flag to determine if the Index DB background task running or not
 static INDEX_DB_PROBE_RUNNING: AtomicBool = AtomicBool::new(false);
-
-/// Get the `EVENT_DB_PROBE_RUNNING` flag.
-pub(crate) fn event_db_probe_is_running() -> bool {
-    EVENT_DB_PROBE_RUNNING.load(Acquire)
-}
-
-/// Set the `EVENT_DB_PROBE_RUNNING` flag to `true`.
-pub(crate) fn event_db_probe_start() {
-    EVENT_DB_PROBE_RUNNING.store(true, Release);
-}
-
-/// Set the `EVENT_DB_PROBE_RUNNING` flag to `false`.
-pub(crate) fn event_db_probe_stop() {
-    EVENT_DB_PROBE_RUNNING.store(false, Release);
-}
 
 /// Get the `INDEX_DB_PROBE_RUNNING` flag.
 pub(crate) fn index_db_probe_is_running() -> bool {

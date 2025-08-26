@@ -82,8 +82,7 @@ use crate::{
     service::{
         common::{responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption},
         utilities::health::{
-            condition_for_started, event_db_is_live, event_db_probe_is_running,
-            event_db_probe_start, event_db_probe_stop, index_db_is_live, index_db_probe_is_running,
+            condition_for_started, event_db_is_live, index_db_is_live, index_db_probe_is_running,
             index_db_probe_start, index_db_probe_stop,
         },
     },
@@ -124,12 +123,8 @@ pub(crate) fn endpoint() -> AllResponses {
     // if it was disconnected it will try to reconnect automatically with the existing
     // session instance.
 
-    if !event_db_is_live() && !event_db_probe_is_running() {
-        tokio::spawn(async {
-            event_db_probe_start();
-            let _ = EventDB::connection_is_ok().await;
-            event_db_probe_stop();
-        });
+    if !event_db_is_live() {
+        EventDB::spawn_ready_probe();
     }
     if !index_db_is_live() && !index_db_probe_is_running() {
         tokio::spawn(async {

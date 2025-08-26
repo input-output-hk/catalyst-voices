@@ -3,12 +3,14 @@ use std::{
     str::FromStr,
     sync::{
         atomic::{AtomicBool, Ordering},
-        Arc, OnceLock,
+        Arc, LazyLock, OnceLock, RwLock,
     },
+    time::Duration,
 };
 
 use error::NotFoundError;
 use futures::{Stream, StreamExt, TryStreamExt};
+use tokio::task::JoinHandle;
 use tokio_postgres::{types::ToSql, Row};
 use tracing::{debug, debug_span, error, Instrument};
 
@@ -32,6 +34,10 @@ type SqlDbPool = Arc<deadpool::managed::Pool<deadpool_postgres::Manager>>;
 
 /// Postgres Connection Manager DB Pool Instance
 static EVENT_DB_POOL: OnceLock<SqlDbPool> = OnceLock::new();
+
+/// Background Event DB probe check
+static EVENT_DB_PROBE_TASK: LazyLock<RwLock<JoinHandle<()>>> =
+    LazyLock::new(|| RwLock::new(tokio::spawn(async {})));
 
 /// Is Deep Query Analysis enabled or not?
 static DEEP_QUERY_INSPECT: AtomicBool = AtomicBool::new(false);
@@ -245,6 +251,46 @@ impl EventDB {
         .instrument(span)
         .await
     }
+
+    /// Wait for the Event DB to be ready before continuing
+    pub(crate) async fn wait_until_ready(interval: Duration) {
+        loop {
+            if Self::connection_is_ok().await {
+                return;
+            }
+
+            tokio::time::sleep(interval).await;
+        }
+    }
+
+    /// Spawns a background task checking for the Event DB to be
+    /// ready.
+    /// Could spawn only one background task at a time
+    pub(crate) fn spawn_ready_probe() {
+        let spawning = || -> anyhow::Result<()> {
+            let task = EVENT_DB_PROBE_TASK
+                .read()
+                .map_err(|e| anyhow::anyhow!("{e}"))?;
+            if task.is_finished() {
+                let interval = Settings::event_db_settings().probe_check_interval();
+
+                let mut task = EVENT_DB_PROBE_TASK
+                    .write()
+                    .map_err(|e| anyhow::anyhow!("{e}"))?;
+                if task.is_finished() {
+                    *task = tokio::spawn(async move {
+                        Self::wait_until_ready(interval).await;
+                    });
+                }
+            }
+            Ok(())
+        };
+
+        while let Err(e) = spawning() {
+            error!(error = ?e, "EVENT_DB_PROBE_TASK is poisoned, should never happen");
+            EVENT_DB_PROBE_TASK.clear_poison();
+        }
+    }
 }
 
 /// Establish a connection pool to the database.
@@ -282,7 +328,7 @@ pub fn establish_connection_pool() {
 
     match deadpool::managed::Pool::builder(pg_mgr)
         .max_size(Settings::event_db_settings().max_connections() as usize)
-        .create_timeout(Settings::event_db_settings().connection_timeout())
+        .create_timeout(Settings::event_db_settings().connection_creation_timeout())
         .wait_timeout(Settings::event_db_settings().slot_wait_timeout())
         .recycle_timeout(Settings::event_db_settings().connection_recycle_timeout())
         .runtime(deadpool::Runtime::Tokio1)
