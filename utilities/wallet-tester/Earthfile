@@ -1,6 +1,6 @@
 VERSION 0.8
 
-ARG REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
+ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
 
 # builder - Installs node packages.
 builder:
