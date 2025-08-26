@@ -352,7 +352,7 @@ final class ProposalServiceImpl implements ProposalService {
   Future<bool> isMaxProposalsLimitReached() async {
     // By default return true to prevent creating proposals
     // if we couldn't determine the state due to an error.
-    return watchMaxProposalsLimitReached().first.catchError((_) => true);
+    return watchMaxProposalsLimitReached().asBroadcastStream().first.catchError((_) => true);
   }
 
   @override
