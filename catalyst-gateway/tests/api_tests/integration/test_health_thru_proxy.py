@@ -37,6 +37,7 @@ def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory)
 
     # suspend event db comms
     event_db_proxy.disable()
+    # ToDo create a polling function instead of plain sleep
     time.sleep(35) # wait for cat-gateway API to report not ready
     health.is_not_ready() #assertion
 
@@ -49,6 +50,7 @@ def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory)
 
     # resume event db comms
     event_db_proxy.enable()
+    # ToDo create a polling function instead of plain sleep
     time.sleep(5) # wait for cat-gateway API to recover
     health.is_ready() #assertion
 
@@ -79,6 +81,7 @@ def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory)
 
     # suspend event db comms
     index_db_proxy.disable()
+    # ToDo create a polling function instead of plain sleep
     time.sleep(35) # wait for cat-gateway API to report not ready
     health.is_not_ready() #assertion
 
@@ -91,6 +94,7 @@ def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory)
 
     # resume event db comms
     index_db_proxy.enable()
+    # ToDo create a polling function instead of plain sleep
     time.sleep(5) # wait for cat-gateway API to recover
     health.is_ready() #assertion
 
