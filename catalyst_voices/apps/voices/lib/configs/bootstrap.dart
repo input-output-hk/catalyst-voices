@@ -15,6 +15,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
 
 final _bootstrapLogger = Logger('Bootstrap');
@@ -78,10 +79,18 @@ Future<void> bootstrapAndRun(
   AppEnvironment environment, [
   BootstrapWidgetBuilder builder = _defaultBuilder,
 ]) async {
-  await runZonedGuarded(
-    () => _safeBootstrapAndRun(environment, builder),
-    _reportUncaughtZoneError,
-  );
+  if (SentryService.shouldEnable) {
+    await Sentry.runZonedGuarded(
+      () => _safeBootstrapAndRun(environment, builder),
+      // not severe because Sentry will log it automatically.
+      (error, stack) => _reportUncaughtZoneError(error, stack, severe: false),
+    );
+  } else {
+    await runZonedGuarded(
+      () => _safeBootstrapAndRun(environment, builder),
+      _reportUncaughtZoneError,
+    );
+  }
 }
 
 // TODO(damian-molinski): Add Isolate.current.addErrorListener
@@ -173,15 +182,23 @@ bool _reportPlatformDispatcherError(Object error, StackTrace stack) {
 }
 
 /// Uncaught Errors reporting
-void _reportUncaughtZoneError(Object error, StackTrace stack) {
-  _uncaughtZoneLogger.severe('Uncaught Error', error, stack);
+void _reportUncaughtZoneError(
+  Object error,
+  StackTrace stack, {
+  bool severe = true,
+}) {
+  if (severe) {
+    _uncaughtZoneLogger.severe('Uncaught Error', error, stack);
+  } else {
+    _uncaughtZoneLogger.finer('Uncaught Error', error, stack);
+  }
 }
 
 Future<void> _runApp(
   Widget app, {
   required SentryConfig sentryConfig,
 }) async {
-  if (kReleaseMode) {
+  if (SentryService.shouldEnable) {
     await SentryService.init(app, config: sentryConfig);
   } else {
     runApp(app);
