@@ -3,7 +3,7 @@ use std::{
     str::FromStr,
     sync::{
         atomic::{AtomicBool, Ordering},
-        Arc, LazyLock, OnceLock, RwLock,
+        Arc, LazyLock, Mutex, OnceLock,
     },
     time::Duration,
 };
@@ -36,8 +36,8 @@ type SqlDbPool = Arc<deadpool::managed::Pool<deadpool_postgres::Manager>>;
 static EVENT_DB_POOL: OnceLock<SqlDbPool> = OnceLock::new();
 
 /// Background Event DB probe check
-static EVENT_DB_PROBE_TASK: LazyLock<RwLock<JoinHandle<()>>> =
-    LazyLock::new(|| RwLock::new(tokio::spawn(async {})));
+static EVENT_DB_PROBE_TASK: LazyLock<Mutex<JoinHandle<()>>> =
+    LazyLock::new(|| Mutex::new(tokio::spawn(async {})));
 
 /// Is Deep Query Analysis enabled or not?
 static DEEP_QUERY_INSPECT: AtomicBool = AtomicBool::new(false);
@@ -268,20 +268,15 @@ impl EventDB {
     /// Could spawn only one background task at a time
     pub(crate) fn spawn_ready_probe() {
         let spawning = || -> anyhow::Result<()> {
-            let task = EVENT_DB_PROBE_TASK
-                .read()
+            let mut task = EVENT_DB_PROBE_TASK
+                .lock()
                 .map_err(|e| anyhow::anyhow!("{e}"))?;
             if task.is_finished() {
                 let interval = Settings::event_db_settings().probe_check_interval();
 
-                let mut task = EVENT_DB_PROBE_TASK
-                    .write()
-                    .map_err(|e| anyhow::anyhow!("{e}"))?;
-                if task.is_finished() {
-                    *task = tokio::spawn(async move {
-                        Self::wait_until_ready(interval).await;
-                    });
-                }
+                *task = tokio::spawn(async move {
+                    Self::wait_until_ready(interval).await;
+                });
             }
             Ok(())
         };
