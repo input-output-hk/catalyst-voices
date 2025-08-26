@@ -24,11 +24,14 @@ final class SentryReportingService implements ReportingService {
           ..environment = config.environment
           ..tracesSampleRate = config.tracesSampleRate
           ..profilesSampleRate = config.profilesSampleRate
+          ..enableAutoSessionTracking = config.enableAutoSessionTracking
           ..attachScreenshot = config.attachScreenshot
-          ..screenshotQuality = SentryScreenshotQuality.low
           ..attachViewHierarchy = config.attachViewHierarchy
+          ..screenshotQuality = SentryScreenshotQuality.low
           ..debug = config.debug
-          ..diagnosticLevel = SentryLevel.fromName(config.diagnosticLevel);
+          ..diagnosticLevel = SentryLevel.fromName(config.diagnosticLevel)
+          ..release = config.release
+          ..dist = config.dist;
       },
       appRunner: appRunner,
     );

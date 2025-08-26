@@ -99,5 +99,9 @@ flutter:
   generate: true
 
 sentry:
-  upload_source_maps: true
+  commits: false
   upload_sources: true
+  upload_source_maps: true
+  upload_debug_symbols: true
+  upload_source_context: true
+  log_level: info
