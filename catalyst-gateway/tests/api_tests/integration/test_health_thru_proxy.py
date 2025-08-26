@@ -5,16 +5,16 @@ from api.v1 import rbac
 from api.v2 import document
 from utils import health
 from utils.rbac_chain import rbac_chain_factory, Chain
-from utils import TestProxy
+from utils import ProxyHelper
 
 @pytest.fixture
 def index_db_proxy():
-    proxy = TestProxy("haproxy", "scylla_node", "scylla1")
+    proxy = ProxyHelper("haproxy", "scylla_node", "scylla1")
     yield proxy
 
 @pytest.fixture
 def event_db_proxy():
-    proxy = TestProxy("haproxy", "event_db", "pg1")
+    proxy = ProxyHelper("haproxy", "event_db", "pg1")
     yield proxy
 
 @pytest.mark.health_with_proxy_endpoint

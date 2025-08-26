@@ -1674,14 +1674,14 @@ files = [
 
 [[package]]
 name = "ogmios"
-version = "1.3.0"
+version = "1.4.2"
 description = "Ogmios is a lightweight bridge interface for cardano-node. It offers a WebSockets API that enables local clients to speak Ouroboros' mini-protocols via JSON/RPC. ogmios-python is an Ogmios client written in Python designed for ease of use."
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "ogmios-1.3.0-py3-none-any.whl", hash = "sha256:c30aa88028a8cd7208f87002dc35262673425fbb2285845013d0162b9db7aec1"},
-    {file = "ogmios-1.3.0.tar.gz", hash = "sha256:6f92f527d96a1c4426970eda96fe479e95ccd20a44dba70691d744287e5c494d"},
+    {file = "ogmios-1.4.2-py3-none-any.whl", hash = "sha256:b66f9187ceb8d7c22f8eff40eb4470ecd1e7b4abaf6f49fc41d6912219d39676"},
+    {file = "ogmios-1.4.2.tar.gz", hash = "sha256:2fe041b9685c4219c4f5ff9bf3ad38d3558a4d4705c5fec48638b530708daa3a"},
 ]
 
 [package.dependencies]
@@ -1690,7 +1690,7 @@ cardano-tools = "*"
 coloredlogs = "*"
 orjson = "*"
 pydantic = ">=2.0"
-setuptools = ">=69.5.1"
+setuptools = ">=75.3.2"
 websockets = "*"
 
 [package.extras]
@@ -1920,14 +1920,14 @@ pyasn1 = ">=0.6.1,<0.7.0"
 
 [[package]]
 name = "pycardano"
-version = "0.13.2"
+version = "0.15.0"
 description = "A Cardano library in Python"
 optional = false
-python-versions = "<4.0.0,>=3.8.1"
+python-versions = "<4.0.0,>=3.9.1"
 groups = ["main"]
 files = [
-    {file = "pycardano-0.13.2-py3-none-any.whl", hash = "sha256:f6eb6241fcaeabd2552c55ac3b9ab6a5e86f085302d0f6c96882bd768b678f70"},
-    {file = "pycardano-0.13.2.tar.gz", hash = "sha256:20a08abd1dec22f42e59f2d704016b580f11a37533d1878c6ac6c689b27f24a8"},
+    {file = "pycardano-0.15.0-py3-none-any.whl", hash = "sha256:f3b1b3e46f00240fa084e39aa676177ff11a679c075d930fb08b9f74bf8f2e6f"},
+    {file = "pycardano-0.15.0.tar.gz", hash = "sha256:2849ebdc842f1fcdf4d9f16755a4db47639fc3d2ab6902305064f23d227d706e"},
 ]
 
 [package.dependencies]
@@ -1940,7 +1940,7 @@ ECPy = ">=1.2.5,<2.0.0"
 frozendict = ">=2.3.8,<3.0.0"
 frozenlist = ">=1.3.3,<2.0.0"
 mnemonic = ">=0.21,<0.22"
-ogmios = "1.3.0"
+ogmios = ">=1.4.2,<2.0.0"
 pprintpp = ">=0.4.0,<0.5.0"
 PyNaCl = ">=1.5.0,<2.0.0"
 requests = ">=2.32.3,<3.0.0"
@@ -2988,4 +2988,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "931ef359d6a351fc69ca55c4159c53a1cb8a3d4b879067117883d50c0514aeb6"
+content-hash = "b8a8a8933f17957afe5c9c8b1b2f728037f7103e29dad98b0c4d187516cccebf"

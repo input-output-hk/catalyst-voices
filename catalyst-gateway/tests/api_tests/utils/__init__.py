@@ -22,7 +22,7 @@ def _exec_haproxy_cmd(haproxy_cmd):
     return result.stdout.strip()
 
 
-class TestProxy:
+class ProxyHelper:
     def __init__(self, container_name:str, backend:str, server:str):
         self.container_name = container_name
         self.backend = backend
