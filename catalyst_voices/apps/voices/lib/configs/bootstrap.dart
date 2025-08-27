@@ -23,7 +23,6 @@ final _bootstrapLogger = Logger('Bootstrap');
 final _flutterLogger = Logger('Flutter');
 final _loggingService = LoggingService();
 final _platformDispatcherLogger = Logger('PlatformDispatcher');
-
 final _uncaughtZoneLogger = Logger('UncaughtZone');
 
 /// Initializes the application before it can be run. Should setup all
@@ -54,7 +53,8 @@ Future<BootstrapArgs> bootstrap({
 
   registerConfig(config);
 
-  router ??= buildAppRouter();
+  //ignore: avoid_redundant_argument_values
+  router ??= buildAppRouter(enableReporting: _shouldEnableReporting);
 
   // Observer is very noisy on Logger. Enable it only if you want to debug
   // something
@@ -98,9 +98,19 @@ Future<void> bootstrapAndRun(
 @visibleForTesting
 GoRouter buildAppRouter({
   String? initialLocation,
+  bool enableReporting = false,
 }) {
+  final observers = <NavigatorObserver>[];
+
+  if (enableReporting) {
+    final reportingService = Dependencies.instance.get<ReportingService>();
+    final observer = reportingService.buildNavigatorObserver();
+    observers.add(observer);
+  }
+
   return AppRouterFactory.create(
     initialLocation: initialLocation,
+    observers: observers.isNotEmpty ? observers : null,
   );
 }
 
