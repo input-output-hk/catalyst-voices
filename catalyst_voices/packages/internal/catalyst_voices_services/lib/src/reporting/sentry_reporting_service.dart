@@ -22,7 +22,6 @@ final class SentryReportingService implements ReportingService {
   @override
   Future<void> init({
     required ReportingServiceConfig config,
-    required ValueGetter<FutureOr<void>> appRunner,
   }) async {
     if (config is! SentryConfig) {
       throw ArgumentError('SentryReportingService supports only SentryConfig', 'config');
@@ -45,7 +44,6 @@ final class SentryReportingService implements ReportingService {
           ..release = config.release
           ..dist = config.dist;
       },
-      appRunner: appRunner,
     );
   }
 
@@ -65,5 +63,22 @@ final class SentryReportingService implements ReportingService {
           : null;
       return scope.setUser(user);
     });
+  }
+
+  @override
+  R? runZonedGuarded<R>(
+    ValueGetter<R> body,
+    void Function(Object error, StackTrace stack) onError, {
+    Map<Object?, Object?>? zoneValues,
+    ZoneSpecification? zoneSpecification,
+  }) {
+    final result = Sentry.runZonedGuarded(
+      body,
+      onError,
+      zoneValues: zoneValues,
+      zoneSpecification: zoneSpecification,
+    );
+
+    return result is R ? result : null;
   }
 }

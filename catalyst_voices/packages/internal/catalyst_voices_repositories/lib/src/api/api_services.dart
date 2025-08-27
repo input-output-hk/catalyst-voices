@@ -32,7 +32,7 @@ final class ApiServices {
   factory ApiServices({
     required AppEnvironmentType env,
     AuthTokenProvider? authTokenProvider,
-    ValueGetter<http.Client>? httpClient,
+    ValueGetter<http.Client?>? httpClient,
   }) {
     _fixModelsMapping();
 

@@ -5,14 +5,20 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 abstract interface class ReportingService {
-  http.Client buildHttpClient();
+  http.Client? buildHttpClient();
 
-  NavigatorObserver buildNavigatorObserver();
+  NavigatorObserver? buildNavigatorObserver();
 
   Future<void> init({
     required ReportingServiceConfig config,
-    required ValueGetter<FutureOr<void>> appRunner,
   });
 
   Future<void> reportingAs(Account? account);
+
+  R? runZonedGuarded<R>(
+    ValueGetter<R> body,
+    void Function(Object error, StackTrace stack) onError, {
+    Map<Object?, Object?>? zoneValues,
+    ZoneSpecification? zoneSpecification,
+  });
 }
