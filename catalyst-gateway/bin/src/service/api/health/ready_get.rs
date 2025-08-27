@@ -81,10 +81,7 @@ use crate::{
     db::{event::EventDB, index::session::CassandraSession},
     service::{
         common::{responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption},
-        utilities::health::{
-            condition_for_started, event_db_is_live, index_db_is_live, index_db_probe_is_running,
-            index_db_probe_start, index_db_probe_stop,
-        },
+        utilities::health::{condition_for_started, event_db_is_live, index_db_is_live},
     },
 };
 
@@ -126,12 +123,8 @@ pub(crate) fn endpoint() -> AllResponses {
     if !event_db_is_live() {
         EventDB::spawn_ready_probe();
     }
-    if !index_db_is_live() && !index_db_probe_is_running() {
-        tokio::spawn(async {
-            index_db_probe_start();
-            let _ = CassandraSession::is_ready().await;
-            index_db_probe_stop();
-        });
+    if !index_db_is_live() {
+        CassandraSession::spawn_ready_probe();
     }
     if condition_for_started() {
         Responses::NoContent.into()

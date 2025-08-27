@@ -273,10 +273,11 @@ impl EventDB {
                 .map_err(|e| anyhow::anyhow!("{e}"))?;
 
             if task.as_ref().is_none_or(JoinHandle::is_finished) {
-                let interval = Settings::event_db_settings().probe_check_interval();
+                /// Event DB probe check wait interval
+                const INTERVAL: Duration = Duration::from_secs(1);
 
                 *task = Some(tokio::spawn(async move {
-                    Self::wait_until_ready(interval).await;
+                    Self::wait_until_ready(INTERVAL).await;
                     info!("Event DB is ready");
                 }));
             }

@@ -3,7 +3,7 @@
 use std::{
     fmt::Debug,
     path::PathBuf,
-    sync::{Arc, OnceLock},
+    sync::{Arc, LazyLock, Mutex, OnceLock},
     time::Duration,
 };
 
@@ -18,7 +18,7 @@ use scylla::{
     serialize::row::SerializeRow,
 };
 use thiserror::Error;
-use tokio::fs;
+use tokio::{fs, task::JoinHandle};
 use tracing::{debug, error, info};
 
 use super::{
@@ -102,6 +102,10 @@ static PERSISTENT_SESSION: OnceLock<Arc<CassandraSession>> = OnceLock::new();
 /// Volatile DB Session.
 static VOLATILE_SESSION: OnceLock<Arc<CassandraSession>> = OnceLock::new();
 
+/// Background Index DB probe check
+static INDEX_DB_PROBE_TASK: LazyLock<Mutex<Option<JoinHandle<()>>>> =
+    LazyLock::new(|| Mutex::new(None));
+
 impl CassandraSession {
     /// Initialise the Cassandra Cluster Connections.
     /// Should be called only once.
@@ -165,6 +169,33 @@ impl CassandraSession {
             }
 
             tokio::time::sleep(interval).await;
+        }
+    }
+
+    /// Spawns a background task checking for the Index DB to be
+    /// ready.
+    /// Could spawn only one background task at a time
+    pub(crate) fn spawn_ready_probe() {
+        let spawning = || -> anyhow::Result<()> {
+            let mut task = INDEX_DB_PROBE_TASK
+                .lock()
+                .map_err(|e| anyhow::anyhow!("{e}"))?;
+
+            if task.as_ref().is_none_or(JoinHandle::is_finished) {
+                /// Index DB probe check wait interval
+                const INTERVAL: Duration = Duration::from_secs(1);
+
+                *task = Some(tokio::spawn(async move {
+                    Self::wait_until_ready(INTERVAL).await;
+                    info!("Index DB is ready");
+                }));
+            }
+            Ok(())
+        };
+
+        while let Err(e) = spawning() {
+            error!(error = ?e, "INDEX_DB_PROBE_TASK is poisoned, should never happen");
+            INDEX_DB_PROBE_TASK.clear_poison();
         }
     }
 
