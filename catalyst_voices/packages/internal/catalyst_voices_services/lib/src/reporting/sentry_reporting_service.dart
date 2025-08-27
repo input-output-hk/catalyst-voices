@@ -13,12 +13,12 @@ final class SentryReportingService implements ReportingService {
     required ReportingServiceConfig config,
     required ValueGetter<FutureOr<void>> appRunner,
   }) async {
+    if (config is! SentryConfig) {
+      throw ArgumentError('SentryReportingService supports only SentryConfig', 'config');
+    }
+
     await SentryFlutter.init(
       (options) {
-        if (config is! SentryConfig) {
-          return;
-        }
-
         options
           ..dsn = config.dsn
           ..environment = config.environment
