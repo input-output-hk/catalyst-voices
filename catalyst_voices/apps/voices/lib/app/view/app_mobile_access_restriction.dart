@@ -41,7 +41,7 @@ class AppMobileAccessRestriction extends StatelessWidget {
         final isProposalRoute = currentPath.contains('/proposal/');
 
         if (isProposalRoute) {
-          // proposal route is unres
+          // proposal route is unrestricted
           return child;
         }
 
@@ -86,10 +86,10 @@ class _Actions extends StatelessWidget with LaunchUrlMixin {
 }
 
 class _Background extends StatelessWidget {
-  final bool isMobile;
+  final bool isSmallScreen;
 
   const _Background({
-    required this.isMobile,
+    required this.isSmallScreen,
   });
 
   @override
@@ -108,10 +108,10 @@ class _Background extends StatelessWidget {
     return [
       BubbleConfig(
         position: (size) => Offset(
-          isMobile ? 0 - 70 : 0 - 90,
+          isSmallScreen ? 0 - 70 : 0 - 90,
           size.height * 0.25,
         ),
-        radius: isMobile ? 110 : 200,
+        radius: isSmallScreen ? 110 : 200,
         gradientColors: const [Color(0xFFE5F6FF), Color(0xCCE5F6FF)],
         gradientStops: const [0.0, 1.0],
         shadowBlur: 62.46,
@@ -120,10 +120,10 @@ class _Background extends StatelessWidget {
       ),
       BubbleConfig(
         position: (size) => Offset(
-          isMobile ? size.width + 70 : size.width + 140,
-          isMobile ? size.height : size.height + 140,
+          isSmallScreen ? size.width + 70 : size.width + 140,
+          isSmallScreen ? size.height : size.height + 140,
         ),
-        radius: isMobile ? 140 : 430,
+        radius: isSmallScreen ? 140 : 430,
         gradientColors: const [Color(0xFFE5F6FF), Color(0xCCE5F6FF)],
         gradientStops: const [0.0, 1.0],
         shadowBlur: 62.46,
@@ -152,12 +152,12 @@ class _Background extends StatelessWidget {
         controlPointsCalculator: (Size size) => [
           Point(size.width * .75, 0),
           Point(
-            isMobile ? size.width * .8 : size.width * .7,
-            isMobile ? size.height * .15 : size.height * .3,
+            isSmallScreen ? size.width * .8 : size.width * .7,
+            isSmallScreen ? size.height * .15 : size.height * .3,
           ),
           Point(
             size.width,
-            isMobile ? size.height * .25 : size.height * .4,
+            isSmallScreen ? size.height * .25 : size.height * .4,
           ),
           Point(size.width, 0),
         ],
@@ -283,7 +283,7 @@ class _MobileSplashScreen extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        _Background(isMobile: data.isMobile),
+        _Background(isSmallScreen: data.isMobile),
         _Foreground(data: data),
       ],
     );
