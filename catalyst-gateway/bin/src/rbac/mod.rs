@@ -4,6 +4,7 @@ mod chain_info;
 mod chains_cache;
 mod get_chain;
 mod indexing_context;
+mod stake_address_info;
 mod validation;
 mod validation_result;
 

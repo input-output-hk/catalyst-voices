@@ -149,6 +149,7 @@ pub async fn apply_regs(
 
     for reg in regs {
         if !reg.removed_stake_addresses.is_empty() {
+            // TODO: FIXME:
             // TODO: This should be handled as a part of the
             // https://github.com/input-output-hk/catalyst-voices/issues/2599 task.
             continue;
