@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.4.7 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:ci-building-time-experiments AS python-ci
 IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-types/v0.0.6 AS cat-libs-rust
 IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v0.0.4-earthly-arm-fix AS dep-cat-libs-rust
 IMPORT github.com/input-output-hk/catalyst-storage AS cat-storage
@@ -19,6 +19,7 @@ builder:
     COPY dep-cat-libs-rust+build/mk_signed_doc ./dep_mk_signed_doc
     COPY cat-storage+cardano-asset-preprod/cardano-asset-preprod.json .
     DO python-ci+BUILDER
+#    SAVE IMAGE builder-tmp
 
 # Creates a package of the python integration test runner
 package:
