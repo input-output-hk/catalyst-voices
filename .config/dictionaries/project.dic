@@ -91,6 +91,7 @@ delegators
 devnet
 devs
 DIND
+dockerenv
 dockerhub
 domcontentloaded
 Dominik
@@ -319,6 +320,7 @@ serviceworker
 skeletonizer
 slotno
 snackbars
+socat
 sqlfluff
 SRCROOT
 sslmode
