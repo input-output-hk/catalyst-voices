@@ -403,6 +403,16 @@ final class Dependencies extends DependencyProvider {
         get<CampaignService>(),
       );
     });
+    registerLazySingleton<ReportingService>(SentryReportingService.new);
+    registerLazySingleton<ReportingServiceMediator>(
+      () {
+        return ReportingServiceMediator(
+          get<ReportingService>(),
+          get<UserService>(),
+        );
+      },
+      dispose: (mediator) => mediator.dispose(),
+    );
   }
 
   void _registerStorages() {

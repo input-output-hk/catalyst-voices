@@ -4,7 +4,6 @@ import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/app.dart';
 import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
 import 'package:catalyst_voices/configs/app_bloc_observer.dart';
-import 'package:catalyst_voices/configs/sentry_service.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -18,11 +17,13 @@ import 'package:go_router/go_router.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
 
-final _bootstrapLogger = Logger('Bootstrap');
+const _shouldEnableReporting = kReleaseMode || kProfileMode;
 
+final _bootstrapLogger = Logger('Bootstrap');
 final _flutterLogger = Logger('Flutter');
 final _loggingService = LoggingService();
 final _platformDispatcherLogger = Logger('PlatformDispatcher');
+
 final _uncaughtZoneLogger = Logger('UncaughtZone');
 
 /// Initializes the application before it can be run. Should setup all
@@ -79,7 +80,7 @@ Future<void> bootstrapAndRun(
   AppEnvironment environment, [
   BootstrapWidgetBuilder builder = _defaultBuilder,
 ]) async {
-  if (SentryService.shouldEnable) {
+  if (_shouldEnableReporting) {
     await Sentry.runZonedGuarded(
       () => _safeBootstrapAndRun(environment, builder),
       // not severe because Sentry will log it automatically.
@@ -198,8 +199,11 @@ Future<void> _runApp(
   Widget app, {
   required SentryConfig sentryConfig,
 }) async {
-  if (SentryService.shouldEnable) {
-    await SentryService.init(app, config: sentryConfig);
+  if (_shouldEnableReporting) {
+    final reporting = Dependencies.instance.get<ReportingService>();
+    await reporting.init(config: sentryConfig, appRunner: () => runApp(app));
+
+    Dependencies.instance.get<ReportingServiceMediator>().init();
   } else {
     runApp(app);
   }
