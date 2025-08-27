@@ -81,4 +81,7 @@ final class SentryReportingService implements ReportingService {
 
     return result is R ? result : null;
   }
+
+  @override
+  Widget wrapApp(Widget app) => SentryWidget(child: app);
 }

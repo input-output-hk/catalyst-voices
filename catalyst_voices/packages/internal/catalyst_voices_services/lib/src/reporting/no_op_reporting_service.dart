@@ -35,4 +35,7 @@ final class NoOpReportingService implements ReportingService {
       zoneSpecification: zoneSpecification,
     );
   }
+
+  @override
+  Widget wrapApp(Widget app) => app;
 }

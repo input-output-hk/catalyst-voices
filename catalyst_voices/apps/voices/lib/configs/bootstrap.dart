@@ -14,7 +14,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
 
 const ReportingService _reportingService = _shouldUseSentry
@@ -165,9 +164,7 @@ Future<void> _doBootstrapAndRun(
   final args = await bootstrap(environment: environment);
   var app = await builder(args);
 
-  if (_shouldUseSentry) {
-    app = SentryWidget(child: app);
-  }
+  app = _reportingService.wrapApp(app);
 
   runApp(app);
 }

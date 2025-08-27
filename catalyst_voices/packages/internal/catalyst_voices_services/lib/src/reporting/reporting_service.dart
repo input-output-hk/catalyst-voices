@@ -21,4 +21,6 @@ abstract interface class ReportingService {
     Map<Object?, Object?>? zoneValues,
     ZoneSpecification? zoneSpecification,
   });
+
+  Widget wrapApp(Widget app);
 }
