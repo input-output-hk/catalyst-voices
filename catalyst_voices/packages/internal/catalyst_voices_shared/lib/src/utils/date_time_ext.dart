@@ -10,26 +10,13 @@ extension DateTimeExt on DateTime {
     _mockedDateTime = customTime;
   }
 
-  /// Testable [DateTime] factory method which returns:
-  /// - mocked value, if not null, set with [mockedDateTime]
-  /// - if[utc] current utc [DateTime.timestamp]
-  /// - else current local [DateTime.now]
-  static DateTime now({bool utc = false}) {
-    DateTime? getMockedDateTime() {
-      return utc ? _mockedDateTime?.toUtc() : _mockedDateTime;
-    }
-
-    DateTime getDateTime() {
-      return utc ? DateTime.timestamp() : DateTime.now();
-    }
-
-    return getMockedDateTime() ?? getDateTime();
-  }
-
   /// Returns whether two date times have the same year, month and day.
   bool isSameDateAs(DateTime other) {
     return year == other.year && month == other.month && day == other.day;
   }
+
+  /// Subtracts [days] from the datetime, being aware of the DST.
+  DateTime minusDays(int days) => plusDays(-days);
 
   /// A method that correctly adds / subtracts days from the dateTime.
   ///
@@ -63,6 +50,19 @@ extension DateTimeExt on DateTime {
     );
   }
 
-  /// Subtracts [days] from the datetime, being aware of the DST.
-  DateTime minusDays(int days) => plusDays(-days);
+  /// Testable [DateTime] factory method which returns:
+  /// - mocked value, if not null, set with [mockedDateTime]
+  /// - if[utc] current utc [DateTime.timestamp]
+  /// - else current local [DateTime.now]
+  static DateTime now({bool utc = false}) {
+    DateTime? getMockedDateTime() {
+      return utc ? _mockedDateTime?.toUtc() : _mockedDateTime;
+    }
+
+    DateTime getDateTime() {
+      return utc ? DateTime.timestamp() : DateTime.now();
+    }
+
+    return getMockedDateTime() ?? getDateTime();
+  }
 }

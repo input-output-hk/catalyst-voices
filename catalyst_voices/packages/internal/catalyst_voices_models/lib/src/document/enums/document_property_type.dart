@@ -18,5 +18,5 @@ enum DocumentPropertyType {
   number,
 
   /// A [boolean] property type without children.
-  boolean;
+  boolean,
 }

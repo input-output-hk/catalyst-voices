@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
 import 'package:catalyst_voices/pages/category/category_detail_view.dart';
 import 'package:catalyst_voices/widgets/cards/category_proposals_details_card.dart';
 import 'package:catalyst_voices/widgets/cards/create_proposal_card.dart';
@@ -153,7 +154,7 @@ class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
       selector: (state) {
         return (
           show: state.isLoading,
-          data: state.category ?? CampaignCategoryDetailsViewModel.dummy()
+          data: state.category ?? CampaignCategoryDetailsViewModel.dummy(),
         );
       },
       builder: (context, state) {
@@ -169,19 +170,21 @@ class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
 class _CategoryPageState extends State<CategoryPage> {
   @override
   Widget build(BuildContext context) {
-    return ResponsivePadding(
-      xs: const EdgeInsets.symmetric(horizontal: 12),
-      sm: const EdgeInsets.symmetric(horizontal: 20),
-      md: const EdgeInsets.symmetric(horizontal: 120),
-      lg: const EdgeInsets.symmetric(horizontal: 120),
-      other: const EdgeInsets.symmetric(horizontal: 120),
-      child: Stack(
-        children: [
-          const _CategoryDetailLoadingOrDataSelector(),
-          _CategoryDetailErrorSelector(
-            categoryId: widget.categoryId,
-          ),
-        ].constrainedDelegate(maxWidth: 1200),
+    return ProposalSubmissionPhaseAware(
+      activeChild: ResponsivePadding(
+        xs: const EdgeInsets.symmetric(horizontal: 12),
+        sm: const EdgeInsets.symmetric(horizontal: 20),
+        md: const EdgeInsets.symmetric(horizontal: 120),
+        lg: const EdgeInsets.symmetric(horizontal: 120),
+        other: const EdgeInsets.symmetric(horizontal: 120),
+        child: Stack(
+          children: [
+            const _CategoryDetailLoadingOrDataSelector(),
+            _CategoryDetailErrorSelector(
+              categoryId: widget.categoryId,
+            ),
+          ].constrainedDelegate(maxWidth: 1200),
+        ),
       ),
     );
   }

@@ -15,12 +15,60 @@ import 'precompile_binaries.dart';
 import 'rustup.dart';
 import 'target.dart';
 
+final _log = Logger('artifacts_provider');
+
+AritifactType artifactTypeForTarget(Target target) {
+  if (target.darwinPlatform != null) {
+    return AritifactType.staticlib;
+  } else {
+    return AritifactType.dylib;
+  }
+}
+
+List<String> getArtifactNames({
+  required Target target,
+  required String libraryName,
+  required bool remote,
+  AritifactType? aritifactType,
+}) {
+  aritifactType ??= artifactTypeForTarget(target);
+  if (target.darwinArch != null) {
+    if (aritifactType == AritifactType.staticlib) {
+      return ['lib$libraryName.a'];
+    } else {
+      return ['lib$libraryName.dylib'];
+    }
+  } else if (target.rust.contains('-windows-')) {
+    if (aritifactType == AritifactType.staticlib) {
+      return ['$libraryName.lib'];
+    } else {
+      return [
+        '$libraryName.dll',
+        '$libraryName.dll.lib',
+        if (!remote) '$libraryName.pdb',
+      ];
+    }
+  } else if (target.rust.contains('-linux-')) {
+    if (aritifactType == AritifactType.staticlib) {
+      return ['lib$libraryName.a'];
+    } else {
+      return ['lib$libraryName.so'];
+    }
+  } else {
+    throw Exception("Unsupported target: ${target.rust}");
+  }
+}
+
+enum AritifactType { staticlib, dylib }
+
 class Artifact {
   /// File system location of the artifact.
   final String path;
 
   /// Actual file name that the artifact should have in destination folder.
   final String finalFileName;
+
+  Artifact({required this.path, required this.finalFileName});
 
   AritifactType get type {
     if (finalFileName.endsWith('.dll') ||
@@ -35,23 +83,13 @@ class Artifact {
       throw Exception('Unknown artifact type for $finalFileName');
     }
   }
-
-  Artifact({
-    required this.path,
-    required this.finalFileName,
-  });
 }
 
-final _log = Logger('artifacts_provider');
-
 class ArtifactProvider {
-  ArtifactProvider({
-    required this.environment,
-    required this.userOptions,
-  });
-
   final BuildEnvironment environment;
+
   final CargokitUserOptions userOptions;
+  ArtifactProvider({required this.environment, required this.userOptions});
 
   Future<Map<Target, List<Artifact>>> getArtifacts(List<Target> targets) async {
     final result = await _getPrecompiledArtifacts(targets);
@@ -82,13 +120,15 @@ class ArtifactProvider {
           libraryName: environment.crateInfo.packageName,
           aritifactType: AritifactType.staticlib,
           remote: false,
-        )
+        ),
       };
       final artifacts = artifactNames
-          .map((artifactName) => Artifact(
-                path: path.join(targetDir, artifactName),
-                finalFileName: artifactName,
-              ))
+          .map(
+            (artifactName) => Artifact(
+              path: path.join(targetDir, artifactName),
+              finalFileName: artifactName,
+            ),
+          )
           .where((element) => File(element.path).existsSync())
           .toList();
       result[target] = artifacts;
@@ -97,7 +137,8 @@ class ArtifactProvider {
   }
 
   Future<Map<Target, List<Artifact>>> _getPrecompiledArtifacts(
-      List<Target> targets) async {
+    List<Target> targets,
+  ) async {
     if (userOptions.usePrecompiledBinaries == false) {
       _log.info('Precompiled binaries are disabled');
       return {};
@@ -108,13 +149,19 @@ class ArtifactProvider {
     }
 
     final start = Stopwatch()..start();
-    final crateHash = CrateHash.compute(environment.manifestDir,
-        tempStorage: environment.targetTempDir);
+    final crateHash = CrateHash.compute(
+      environment.manifestDir,
+      tempStorage: environment.targetTempDir,
+    );
     _log.fine(
-        'Computed crate hash $crateHash in ${start.elapsedMilliseconds}ms');
+      'Computed crate hash $crateHash in ${start.elapsedMilliseconds}ms',
+    );
 
-    final downloadedArtifactsDir =
-        path.join(environment.targetTempDir, 'precompiled', crateHash);
+    final downloadedArtifactsDir = path.join(
+      environment.targetTempDir,
+      'precompiled',
+      crateHash,
+    );
     Directory(downloadedArtifactsDir).createSync(recursive: true);
 
     final res = <Target, List<Artifact>>{};
@@ -131,8 +178,10 @@ class ArtifactProvider {
         final fileName = PrecompileBinaries.fileName(target, artifact);
         final downloadedPath = path.join(downloadedArtifactsDir, fileName);
         if (!File(downloadedPath).existsSync()) {
-          final signatureFileName =
-              PrecompileBinaries.signatureFileName(target, artifact);
+          final signatureFileName = PrecompileBinaries.signatureFileName(
+            target,
+            artifact,
+          );
           await _tryDownloadArtifacts(
             crateHash: crateHash,
             fileName: fileName,
@@ -141,10 +190,9 @@ class ArtifactProvider {
           );
         }
         if (File(downloadedPath).existsSync()) {
-          artifactsForTarget.add(Artifact(
-            path: downloadedPath,
-            finalFileName: artifact,
-          ));
+          artifactsForTarget.add(
+            Artifact(path: downloadedPath, finalFileName: artifact),
+          );
         } else {
           break;
         }
@@ -158,27 +206,6 @@ class ArtifactProvider {
     }
 
     return res;
-  }
-
-  static Future<Response> _get(Uri url, {Map<String, String>? headers}) async {
-    int attempt = 0;
-    const maxAttempts = 10;
-    while (true) {
-      try {
-        return await get(url, headers: headers);
-      } on SocketException catch (e) {
-        // Try to detect reset by peer error and retry.
-        if (attempt++ < maxAttempts &&
-            (e.osError?.errorCode == 54 || e.osError?.errorCode == 10054)) {
-          _log.severe(
-              'Failed to download $url: $e, attempt $attempt of $maxAttempts, will retry...');
-          await Future.delayed(Duration(seconds: 1));
-          continue;
-        } else {
-          rethrow;
-        }
-      }
-    }
   }
 
   Future<void> _tryDownloadArtifacts({
@@ -195,12 +222,14 @@ class ArtifactProvider {
     final signature = await _get(signatureUrl);
     if (signature.statusCode == 404) {
       _log.warning(
-          'Precompiled binaries not available for crate hash $crateHash ($fileName)');
+        'Precompiled binaries not available for crate hash $crateHash ($fileName)',
+      );
       return;
     }
     if (signature.statusCode != 200) {
       _log.severe(
-          'Failed to download signature $signatureUrl: status ${signature.statusCode}');
+        'Failed to download signature $signatureUrl: status ${signature.statusCode}',
+      );
       return;
     }
     _log.fine('Downloading binary from $url');
@@ -210,57 +239,35 @@ class ArtifactProvider {
       return;
     }
     if (verify(
-        precompiledBinaries.publicKey, res.bodyBytes, signature.bodyBytes)) {
+      precompiledBinaries.publicKey,
+      res.bodyBytes,
+      signature.bodyBytes,
+    )) {
       File(finalPath).writeAsBytesSync(res.bodyBytes);
     } else {
       _log.shout('Signature verification failed! Ignoring binary.');
     }
   }
-}
 
-enum AritifactType {
-  staticlib,
-  dylib,
-}
-
-AritifactType artifactTypeForTarget(Target target) {
-  if (target.darwinPlatform != null) {
-    return AritifactType.staticlib;
-  } else {
-    return AritifactType.dylib;
-  }
-}
-
-List<String> getArtifactNames({
-  required Target target,
-  required String libraryName,
-  required bool remote,
-  AritifactType? aritifactType,
-}) {
-  aritifactType ??= artifactTypeForTarget(target);
-  if (target.darwinArch != null) {
-    if (aritifactType == AritifactType.staticlib) {
-      return ['lib$libraryName.a'];
-    } else {
-      return ['lib$libraryName.dylib'];
+  static Future<Response> _get(Uri url, {Map<String, String>? headers}) async {
+    int attempt = 0;
+    const maxAttempts = 10;
+    while (true) {
+      try {
+        return await get(url, headers: headers);
+      } on SocketException catch (e) {
+        // Try to detect reset by peer error and retry.
+        if (attempt++ < maxAttempts &&
+            (e.osError?.errorCode == 54 || e.osError?.errorCode == 10054)) {
+          _log.severe(
+            'Failed to download $url: $e, attempt $attempt of $maxAttempts, will retry...',
+          );
+          await Future.delayed(Duration(seconds: 1));
+          continue;
+        } else {
+          rethrow;
+        }
+      }
     }
-  } else if (target.rust.contains('-windows-')) {
-    if (aritifactType == AritifactType.staticlib) {
-      return ['$libraryName.lib'];
-    } else {
-      return [
-        '$libraryName.dll',
-        '$libraryName.dll.lib',
-        if (!remote) '$libraryName.pdb'
-      ];
-    }
-  } else if (target.rust.contains('-linux-')) {
-    if (aritifactType == AritifactType.staticlib) {
-      return ['lib$libraryName.a'];
-    } else {
-      return ['lib$libraryName.so'];
-    }
-  } else {
-    throw Exception("Unsupported target: ${target.rust}");
   }
 }

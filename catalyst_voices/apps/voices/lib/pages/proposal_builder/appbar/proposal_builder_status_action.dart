@@ -19,14 +19,17 @@ class ProposalBuilderStatusAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
-        ({bool offstage, List<ProposalMenuItemAction> items})>(
+    return BlocSelector<
+      ProposalBuilderBloc,
+      ProposalBuilderState,
+      ({bool offstage, List<ProposalMenuItemAction> items})
+    >(
       selector: (state) {
         return (
           offstage: state.isLoading || state.error != null,
           items: ProposalMenuItemAction.proposalBuilderAvailableOptions(
             state.metadata.publish,
-          )
+          ),
         );
       },
       builder: (context, state) {
@@ -96,14 +99,18 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
               value: item.index,
               enabled: item.clickable,
               padding: EdgeInsets.zero,
-              child: BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
-                  ProposalBuilderMenuItemData>(
-                bloc: bloc,
-                selector: (state) => state.buildMenuItem(action: item),
-                builder: (context, itemData) {
-                  return ProposalBuilderMenuItem(data: itemData);
-                },
-              ),
+              child:
+                  BlocSelector<
+                    ProposalBuilderBloc,
+                    ProposalBuilderState,
+                    ProposalBuilderMenuItemData
+                  >(
+                    bloc: bloc,
+                    selector: (state) => state.buildMenuItem(action: item),
+                    builder: (context, itemData) {
+                      return ProposalBuilderMenuItem(data: itemData);
+                    },
+                  ),
             ),
         ].separatedBy(const PopupMenuDivider(height: 0)).toList();
       },

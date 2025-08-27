@@ -8,7 +8,6 @@ mod validation;
 mod validation_result;
 
 pub use chain_info::ChainInfo;
-pub use chains_cache::persistent_rbac_chains_cache_size;
 pub use get_chain::{latest_rbac_chain, latest_rbac_chain_by_address};
 pub use indexing_context::RbacBlockIndexingContext;
 pub use validation::validate_rbac_registration;

@@ -11,11 +11,11 @@ final class LoggingSettingsLocalStorage extends LocalStorage implements LoggingS
   LoggingSettingsLocalStorage({
     required super.sharedPreferences,
   }) : super(
-          key: _key,
-          allowList: {
-            _settingsKey,
-          },
-        );
+         key: _key,
+         allowList: {
+           _settingsKey,
+         },
+       );
 
   @override
   Future<LoggingSettings> read() async {

@@ -94,23 +94,23 @@ final class DocumentsCommentRepository implements CommentRepository {
   }) {
     return _documentRepository
         .watchDocuments(
-      type: DocumentType.commentDocument,
-      refGetter: (data) => data.metadata.template!,
-      refTo: ref,
-    )
+          type: DocumentType.commentDocument,
+          refGetter: (data) => data.metadata.template!,
+          refTo: ref,
+        )
         .map(
-      (documents) {
-        return documents.map((documentWithRef) {
-          final commentData = documentWithRef.data;
-          final templateData = documentWithRef.refData;
+          (documents) {
+            return documents.map((documentWithRef) {
+              final commentData = documentWithRef.data;
+              final templateData = documentWithRef.refData;
 
-          return _buildCommentDocument(
-            documentData: commentData,
-            templateData: templateData,
-          );
-        }).toList();
-      },
-    );
+              return _buildCommentDocument(
+                documentData: commentData,
+                templateData: templateData,
+              );
+            }).toList();
+          },
+        );
   }
 
   CommentDocument _buildCommentDocument({

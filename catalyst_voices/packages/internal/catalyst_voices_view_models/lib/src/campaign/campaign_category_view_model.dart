@@ -26,6 +26,8 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   final DateTime submissionCloseDate;
 
   const CampaignCategoryDetailsViewModel({
+    required super.id,
+    required super.name,
     required this.subname,
     required this.description,
     required this.shortDescription,
@@ -35,35 +37,34 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
     required this.totalAsk,
     required this.range,
     required this.descriptions,
-    required super.id,
-    required super.name,
     this.dos = const <String>[],
     this.donts = const <String>[],
     required this.submissionCloseDate,
   });
 
   factory CampaignCategoryDetailsViewModel.dummy({String? id}) => CampaignCategoryDetailsViewModel(
-        id: SignedDocumentRef(id: id ?? '1)'),
-        name: 'Cardano Open:',
-        subname: 'Developers',
-        description:
-            '''Supports development of open source technology, centered around improving the Cardano developer experience and creating developer-friendly tooling that streamlines an integrated development environment.''',
-        shortDescription: '',
-        proposalsCount: 263,
-        availableFunds: const Coin(8000000),
-        totalAsk: const Coin(400000),
-        range: const ComparableRange(
-          min: Coin.fromWholeAda(15000),
-          max: Coin.fromWholeAda(100000),
-        ),
-        descriptions: List.filled(3, CategoryDescriptionViewModel.dummy()),
-        image: CategoryImageUrl.image('1'),
-        submissionCloseDate: DateTime.now(),
-      );
+    id: SignedDocumentRef(id: id ?? '1)'),
+    name: 'Cardano Open:',
+    subname: 'Developers',
+    description:
+        '''Supports development of open source technology, centered around improving the Cardano developer experience and creating developer-friendly tooling that streamlines an integrated development environment.''',
+    shortDescription: '',
+    proposalsCount: 263,
+    availableFunds: const Coin(8000000),
+    totalAsk: const Coin(400000),
+    range: const ComparableRange(
+      min: Coin.fromWholeAda(15000),
+      max: Coin.fromWholeAda(100000),
+    ),
+    descriptions: List.filled(3, CategoryDescriptionViewModel.dummy()),
+    image: CategoryImageUrl.image('1'),
+    submissionCloseDate: DateTime.now(),
+  );
 
   factory CampaignCategoryDetailsViewModel.fromModel(CampaignCategory model) {
     return CampaignCategoryDetailsViewModel(
       id: model.selfRef,
+      name: model.categoryName,
       subname: model.categorySubname,
       description: model.description,
       shortDescription: model.shortDescription,
@@ -76,7 +77,6 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
       dos: model.dos,
       donts: model.donts,
       submissionCloseDate: model.submissionCloseDate,
-      name: model.categoryName,
     );
   }
 
@@ -90,13 +90,19 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
 
   @override
   List<Object?> get props => [
-        ...super.props,
-        subname,
-        description,
-        proposalsCount,
-        availableFunds,
-        image,
-      ];
+    ...super.props,
+    subname,
+    description,
+    proposalsCount,
+    availableFunds,
+    totalAsk,
+    range,
+    descriptions,
+    image,
+    dos,
+    donts,
+    submissionCloseDate,
+  ];
 }
 
 final class CampaignCategoryViewModel extends Equatable {

@@ -16,10 +16,10 @@ final class DiscoveryCampaignCategoriesState extends Equatable {
 
   @override
   List<Object?> get props => [
-        isLoading,
-        error,
-        categories,
-      ];
+    isLoading,
+    error,
+    categories,
+  ];
 
   bool get showCategories => !isLoading && categories.isNotEmpty && error == null;
 
@@ -30,7 +30,7 @@ final class DiscoveryCurrentCampaignState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
   final CurrentCampaignInfoViewModel currentCampaign;
-  final List<CampaignTimeline> campaignTimeline;
+  final List<CampaignTimelineViewModel> campaignTimeline;
 
   const DiscoveryCurrentCampaignState({
     this.isLoading = true,
@@ -41,22 +41,20 @@ final class DiscoveryCurrentCampaignState extends Equatable {
 
   @override
   List<Object?> get props => [
-        isLoading,
-        error,
-        currentCampaign,
-        campaignTimeline,
-      ];
+    isLoading,
+    error,
+    currentCampaign,
+    campaignTimeline,
+  ];
 
   DateRange? get reviewRegistrationStartsAt {
     return campaignTimeline
-        .firstWhere((e) => e.stage == CampaignTimelineStage.reviewRegistration)
+        .firstWhere((e) => e.type == CampaignPhaseType.reviewRegistration)
         .timeline;
   }
 
   DateRange? get reviewStartsAt {
-    return campaignTimeline
-        .firstWhere((e) => e.stage == CampaignTimelineStage.communityReview)
-        .timeline;
+    return campaignTimeline.firstWhere((e) => e.type == CampaignPhaseType.communityReview).timeline;
   }
 
   bool get showCurrentCampaign =>
@@ -66,37 +64,38 @@ final class DiscoveryCurrentCampaignState extends Equatable {
 
   DateRange? get votingRegistrationStartsAt {
     return campaignTimeline
-        .firstWhere((e) => e.stage == CampaignTimelineStage.votingRegistration)
+        .firstWhere((e) => e.type == CampaignPhaseType.votingRegistration)
         .timeline;
   }
 
   DateRange? get votingStartsAt {
-    return campaignTimeline
-        .firstWhere((e) => e.stage == CampaignTimelineStage.communityVoting)
-        .timeline;
+    return campaignTimeline.firstWhere((e) => e.type == CampaignPhaseType.communityVoting).timeline;
   }
 }
 
 final class DiscoveryMostRecentProposalsState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
-  final List<PendingProposal> proposals;
+  final List<ProposalBrief> proposals;
   final List<String> favoritesIds;
+  final bool showComments;
 
   const DiscoveryMostRecentProposalsState({
     this.isLoading = true,
     this.error,
     this.proposals = const [],
     this.favoritesIds = const [],
+    this.showComments = false,
   });
 
   @override
   List<Object?> get props => [
-        isLoading,
-        error,
-        proposals,
-        favoritesIds,
-      ];
+    isLoading,
+    error,
+    proposals,
+    favoritesIds,
+    showComments,
+  ];
 
   bool get showError => !isLoading && error != null;
 
@@ -105,21 +104,28 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
   DiscoveryMostRecentProposalsState copyWith({
     bool? isLoading,
     LocalizedException? error,
-    List<PendingProposal>? proposals,
+    List<ProposalBrief>? proposals,
     List<String>? favoritesIds,
+    bool? showComments,
   }) {
     return DiscoveryMostRecentProposalsState(
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
       proposals: proposals ?? this.proposals,
       favoritesIds: favoritesIds ?? this.favoritesIds,
+      showComments: showComments ?? this.showComments,
     );
   }
 
   DiscoveryMostRecentProposalsState updateFavorites(List<String> ids) {
-    final updatedProposals =
-        [...proposals].map((e) => e.copyWith(isFavorite: ids.contains(e.ref.id))).toList();
-    return copyWith(proposals: updatedProposals, favoritesIds: ids);
+    final updatedProposals = [
+      ...proposals,
+    ].map((e) => e.copyWith(isFavorite: ids.contains(e.selfRef.id))).toList();
+
+    return copyWith(
+      proposals: updatedProposals,
+      favoritesIds: ids,
+    );
   }
 }
 
@@ -136,10 +142,10 @@ final class DiscoveryState extends Equatable {
 
   @override
   List<Object?> get props => [
-        campaign,
-        categories,
-        proposals,
-      ];
+    campaign,
+    categories,
+    proposals,
+  ];
 
   DiscoveryState copyWith({
     DiscoveryCurrentCampaignState? campaign,

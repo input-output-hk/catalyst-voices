@@ -14,10 +14,10 @@ final class SyncStats extends Equatable {
 
   @override
   List<Object?> get props => [
-        lastSuccessfulSyncAt,
-        lastAddedRefsCount,
-        lastSyncDuration,
-      ];
+    lastSuccessfulSyncAt,
+    lastAddedRefsCount,
+    lastSyncDuration,
+  ];
 
   SyncStats copyWith({
     Optional<DateTime>? lastSuccessfulSyncAt,

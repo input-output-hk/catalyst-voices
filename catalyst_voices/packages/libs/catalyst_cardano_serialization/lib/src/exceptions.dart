@@ -77,7 +77,8 @@ final class InsufficientAdaForChangeOutputException extends Equatable implements
   List<Object?> get props => [actualAmount, requiredAmount];
 
   @override
-  String toString() => 'InsufficientAdaForChangeOutputException('
+  String toString() =>
+      'InsufficientAdaForChangeOutputException('
       'actualAmount:$actualAmount'
       ', requiredAmount:$requiredAmount'
       ')';
@@ -101,7 +102,8 @@ final class InsufficientUtxoBalanceException extends Equatable implements Except
   List<Object?> get props => [actualAmount, requiredAmount];
 
   @override
-  String toString() => 'InsufficientUtxoBalanceException('
+  String toString() =>
+      'InsufficientUtxoBalanceException('
       'actualAmount:$actualAmount'
       ', requiredAmount:$requiredAmount'
       ')';
@@ -177,7 +179,8 @@ final class MaxTxSizeExceededException extends Equatable implements Exception {
   List<Object?> get props => [maxTxSize, actualTxSize];
 
   @override
-  String toString() => 'MaxTxSizeExceededException('
+  String toString() =>
+      'MaxTxSizeExceededException('
       'maxTxSize:$maxTxSize'
       ', actualTxSize:$actualTxSize'
       ')';
@@ -204,9 +207,9 @@ final class OutputPublicKeyHashNotInRequiredSignerException extends Equatable im
 
   @override
   List<Object?> get props => [
-        outputsPublicKeysHashes,
-        requiredSigners,
-      ];
+    outputsPublicKeysHashes,
+    requiredSigners,
+  ];
 
   @override
   String toString() {
@@ -269,7 +272,8 @@ final class ReferenceScriptSizeLimitExceededException extends Equatable implemen
   List<Object?> get props => [maxRefScriptSize];
 
   @override
-  String toString() => 'Total size of reference scripts exceeds the limit of $maxRefScriptSize '
+  String toString() =>
+      'Total size of reference scripts exceeds the limit of $maxRefScriptSize '
       'bytes';
 }
 
@@ -339,7 +343,8 @@ final class TxBalanceMismatchException extends Equatable implements Exception {
   List<Object?> get props => [inputs, outputs, fee];
 
   @override
-  String toString() => 'TxBalanceMismatchException('
+  String toString() =>
+      'TxBalanceMismatchException('
       'inputs:$inputs'
       ', outputs:$outputs'
       ', fee:$fee'
@@ -376,7 +381,8 @@ final class TxFeeTooSmallException extends Equatable implements Exception {
   List<Object?> get props => [actualFee, minFee];
 
   @override
-  String toString() => 'TxFeeTooSmallException('
+  String toString() =>
+      'TxFeeTooSmallException('
       'actualFee=$actualFee'
       ', minFee=$minFee'
       ')';
@@ -401,7 +407,8 @@ final class TxMaxAssetsPerOutputExceededException extends Equatable implements E
   List<Object?> get props => [actualCount, maxCount];
 
   @override
-  String toString() => 'TxMaxAssetsPerOutputExceededException('
+  String toString() =>
+      'TxMaxAssetsPerOutputExceededException('
       'actualCount:$actualCount'
       ', maxCount:$maxCount'
       ')';
@@ -426,7 +433,8 @@ final class TxValueBelowMinUtxoValueException extends Equatable implements Excep
   List<Object?> get props => [actualAmount, requiredAmount];
 
   @override
-  String toString() => 'TxValueBelowMinUtxoValueException('
+  String toString() =>
+      'TxValueBelowMinUtxoValueException('
       'actualAmount:$actualAmount'
       ', requiredAmount:$requiredAmount'
       ')';
@@ -451,7 +459,8 @@ final class TxValueSizeExceededException extends Equatable implements Exception 
   List<Object?> get props => [actualValueSize, maxValueSize];
 
   @override
-  String toString() => 'TxValueSizeExceededException('
+  String toString() =>
+      'TxValueSizeExceededException('
       'actualValueSize:$actualValueSize'
       ', maxValueSize:$maxValueSize'
       ')';

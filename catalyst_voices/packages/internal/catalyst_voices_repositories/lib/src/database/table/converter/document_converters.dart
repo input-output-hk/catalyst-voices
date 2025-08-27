@@ -4,8 +4,8 @@ import 'package:drift/drift.dart';
 
 typedef DocumentContentJsonBConverter = JsonTypeConverter2<DocumentDataContent, Uint8List, Object?>;
 
-typedef DocumentMetadataJsonBConverter
-    = JsonTypeConverter2<DocumentDataMetadata, Uint8List, Object?>;
+typedef DocumentMetadataJsonBConverter =
+    JsonTypeConverter2<DocumentDataMetadata, Uint8List, Object?>;
 
 abstract final class DocumentConverters {
   /// Converts [DocumentType] to String for text column.

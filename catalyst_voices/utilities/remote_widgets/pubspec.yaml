@@ -4,17 +4,16 @@ version: 0.1.0+1
 publish_to: none
 
 environment:
-  sdk: ">=3.6.0 <4.0.0"
-  flutter: ">=3.29.3"
+  sdk: ">=3.9.0 <4.0.0"
+  flutter: ">=3.35.1"
 
 dependencies:
   flutter:
     sdk: flutter
   path: ^1.9.1
-  rfw: ^1.0.26
+  rfw: ^1.0.31
 
 dev_dependencies:
-  analyzer: 7.3.0
   catalyst_analysis: ^3.0.0
 
 flutter:

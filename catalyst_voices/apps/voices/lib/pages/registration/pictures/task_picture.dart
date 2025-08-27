@@ -1,42 +1,12 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
-enum TaskPictureType {
-  normal,
-  success,
-  error;
-
-  // TODO(damian-molinski): Color should come from colors scheme
-  Color foregroundColor(
-    ThemeData theme, {
-    bool isHighlight = false,
-  }) {
-    return switch (this) {
-      TaskPictureType.normal when isHighlight => const Color(0xFF728EF3),
-      TaskPictureType.normal => const Color(0xFF0C288D),
-      TaskPictureType.success when isHighlight => const Color(0xFFF2F4F8),
-      TaskPictureType.success => const Color(0xFF1D722A),
-      TaskPictureType.error when isHighlight => const Color(0xFFF2F4F8),
-      TaskPictureType.error => const Color(0xFFAD0000),
-    };
-  }
-
-  // TODO(damian-molinski): Color should come from colors scheme
-  Color _backgroundColor(ThemeData theme) {
-    return switch (this) {
-      TaskPictureType.normal => const Color(0xFFCCE2FF),
-      TaskPictureType.success => const Color(0xFFBAEDC2),
-      TaskPictureType.error => const Color(0xFFFF9999),
-    };
-  }
-}
-
 class TaskPicture extends StatelessWidget {
-  final Size preferredSize;
-  final Widget child;
-
   // Original size is 125 but we want to have it scale with overall picture
   static const _childSizeFactor = 125 / 354;
+  final Size preferredSize;
+
+  final Widget child;
 
   const TaskPicture({
     super.key,
@@ -106,5 +76,35 @@ class TaskPictureIconBox extends StatelessWidget {
         child: child,
       ),
     );
+  }
+}
+
+enum TaskPictureType {
+  normal,
+  success,
+  error;
+
+  // TODO(damian-molinski): Color should come from colors scheme
+  Color foregroundColor(
+    ThemeData theme, {
+    bool isHighlight = false,
+  }) {
+    return switch (this) {
+      TaskPictureType.normal when isHighlight => const Color(0xFF728EF3),
+      TaskPictureType.normal => const Color(0xFF0C288D),
+      TaskPictureType.success when isHighlight => const Color(0xFFF2F4F8),
+      TaskPictureType.success => const Color(0xFF1D722A),
+      TaskPictureType.error when isHighlight => const Color(0xFFF2F4F8),
+      TaskPictureType.error => const Color(0xFFAD0000),
+    };
+  }
+
+  // TODO(damian-molinski): Color should come from colors scheme
+  Color _backgroundColor(ThemeData theme) {
+    return switch (this) {
+      TaskPictureType.normal => const Color(0xFFCCE2FF),
+      TaskPictureType.success => const Color(0xFFBAEDC2),
+      TaskPictureType.error => const Color(0xFFFF9999),
+    };
   }
 }

@@ -114,7 +114,7 @@ final class _CatalystVerifier implements CatalystCoseVerifier {
 
   @override
   Future<bool> verify(Uint8List data, Uint8List signature) async {
-    // TODO(dtscalac): obtain the public key corresponding
+    // TODO(dt-iohk): obtain the public key corresponding
     // to the private key which generated the signature and use
     // it for verification, most likely the role0Key is not the correct one.
     final catalystSignature = CatalystSignature.factory.create(signature);
@@ -187,7 +187,7 @@ extension _SignedDocumentContentTypeExt on SignedDocumentContentType {
       case IntValue():
         return switch (contentType.value) {
           CoseValues.jsonContentType => SignedDocumentContentType.json,
-          _ => SignedDocumentContentType.unknown
+          _ => SignedDocumentContentType.unknown,
         };
       case StringValue():
       case null:
@@ -257,9 +257,9 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
 
 extension _SignedDocumentMetadataRefExt on SignedDocumentMetadataRef {
   ReferenceUuid get asCose => ReferenceUuid(
-        id: id.asUuid,
-        ver: ver?.asUuid,
-      );
+    id: id.asUuid,
+    ver: ver?.asUuid,
+  );
 
   static SignedDocumentMetadataRef fromCose(ReferenceUuid ref) {
     return SignedDocumentMetadataRef(
@@ -271,9 +271,9 @@ extension _SignedDocumentMetadataRefExt on SignedDocumentMetadataRef {
 
 extension _SignedDocumentMetadataRefHashExt on SignedDocumentMetadataRefHash {
   ReferenceUuidHash get asCose => ReferenceUuidHash(
-        ref: ref.asCose,
-        hash: hash,
-      );
+    ref: ref.asCose,
+    hash: hash,
+  );
 
   static SignedDocumentMetadataRefHash fromCose(ReferenceUuidHash ref) {
     return SignedDocumentMetadataRefHash(

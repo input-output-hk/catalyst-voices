@@ -4,20 +4,19 @@ version: 0.1.0+1
 publish_to: none
 
 environment:
-  sdk: ">=3.6.0 <4.0.0"
-  flutter: ">=3.29.3"
+  sdk: ">=3.9.0 <4.0.0"
+  flutter: ">=3.35.1"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_svg: ^2.0.10+1
+  flutter_svg: ^2.2.0
   lottie: ^3.3.1
 
 dev_dependencies:
-  analyzer: 7.3.0
   build_runner: ^2.5.4
   catalyst_analysis: ^3.0.0
-  flutter_gen_runner: ^5.10.0
+  flutter_gen_runner: ^5.11.0
   flutter_test:
     sdk: flutter
 

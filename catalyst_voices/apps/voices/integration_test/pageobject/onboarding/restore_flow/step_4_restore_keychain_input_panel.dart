@@ -7,19 +7,13 @@ import '../onboarding_base_page.dart';
 import 'step_3_seedphrase_instructions_panel.dart';
 
 class RestoreKeychainInputPanel extends OnboardingPageBase {
-  RestoreKeychainInputPanel(super.$);
-
   final recoverySeedPhraseInputTitle = const Key('RecoverySeedPhraseInputTitle');
+
   final recoverySeedPhraseInputSubtitle = const Key('RecoverySeedPhraseInputSubtitle');
   final resetButton = const Key('ResetButton');
   final importCatalystKey = const Key('UploadKeyButton');
   final uploadKeyButton = const Key('UploadKeyButton');
-
-  @override
-  Future<void> goto() async {
-    await SeedPhraseInstructionsPanel($).goto();
-    await SeedPhraseInstructionsPanel($).clickNext();
-  }
+  RestoreKeychainInputPanel(super.$);
 
   Future<void> clickNext() async {
     await $(nextButton).tap();
@@ -35,19 +29,9 @@ class RestoreKeychainInputPanel extends OnboardingPageBase {
   }
 
   @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
-  }
-
-  Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
-    expect(infoPartTaskPicture(), findsOneWidget);
-    expect($(progressBar), findsOneWidget);
-    expect(
-      $(learnMoreButton).$(Text).text,
-      (await t()).learnMore,
-    );
+  Future<void> goto() async {
+    await SeedPhraseInstructionsPanel($).goto();
+    await SeedPhraseInstructionsPanel($).clickNext();
   }
 
   Future<void> verifyDetailsPanel() async {
@@ -69,5 +53,21 @@ class RestoreKeychainInputPanel extends OnboardingPageBase {
       expect($(backButton), findsOneWidget);
       expect($(nextButton), findsOneWidget);
     }
+  }
+
+  Future<void> verifyInfoPanel() async {
+    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
+    expect(infoPartTaskPicture(), findsOneWidget);
+    expect($(progressBar), findsOneWidget);
+    expect(
+      $(learnMoreButton).$(Text).text,
+      (await t()).learnMore,
+    );
+  }
+
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }

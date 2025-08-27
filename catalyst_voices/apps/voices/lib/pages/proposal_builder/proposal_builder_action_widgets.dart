@@ -5,8 +5,11 @@ class _CategoryDetailsAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
-        CampaignCategoryDetailsViewModel?>(
+    return BlocSelector<
+      ProposalBuilderBloc,
+      ProposalBuilderState,
+      CampaignCategoryDetailsViewModel?
+    >(
       selector: (state) => state.category,
       builder: (context, category) {
         if (category == null) {

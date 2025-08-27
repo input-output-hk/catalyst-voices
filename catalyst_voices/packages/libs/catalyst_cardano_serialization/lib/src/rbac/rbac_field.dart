@@ -13,8 +13,8 @@ final class AbsentRbacField<T extends CborEncodable> extends RbacField<T> {
 
   @override
   CborValue toCbor({List<int> tags = const []}) => const CborUndefined(
-        tags: [CborCustomTags.absent],
-      );
+    tags: [CborCustomTags.absent],
+  );
 }
 
 /// The field is defined, meaning it should be updated to the [value].

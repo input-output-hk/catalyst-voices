@@ -8,10 +8,7 @@ use tracing::error;
 use crate::{
     db::{
         index::{
-            queries::{
-                caches::txo_by_stake::update as cache_update, FallibleQueryResults,
-                PreparedQueries, PreparedQuery, SizedBatch,
-            },
+            queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, SizedBatch},
             session::CassandraSession,
         },
         types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
@@ -66,7 +63,7 @@ impl UpdateTxoSpentQuery {
             .execute_batch(PreparedQuery::TxoSpentUpdateQuery, params.clone())
             .await?;
 
-        cache_update(params);
+        session.caches().assets_ada().update(params);
 
         Ok(results)
     }

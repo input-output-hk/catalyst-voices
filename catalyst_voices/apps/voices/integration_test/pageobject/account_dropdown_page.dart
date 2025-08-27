@@ -6,9 +6,8 @@ import '../utils/translations_utils.dart';
 
 class AccountDropdownPage {
   PatrolTester $;
-  AccountDropdownPage(this.$);
-
   final profileAndKeychainText = const Key('ProfileAndKeychain');
+
   final popUpMenuAccountHeader = const Key('PopUpMenuAccountHeader');
   final popUpMenuMyAccount = const Key('PopUpMenuMyAccount');
   final popUpMenuProfileAndKeychain = const Key('PopUpMenuProfileAndKeychain');
@@ -19,6 +18,7 @@ class AccountDropdownPage {
   final redirectToDocsMenuItem = const Key('CatalystKnowledgeBase');
   final segmentedButtonContainer = const Key('segmentedButtonContainer');
   final lockAccountButton = const Key('LockAccountButton');
+  AccountDropdownPage(this.$);
 
   Future<void> accountDropdownContainsSpecificData() async {
     expect(
@@ -49,10 +49,6 @@ class AccountDropdownPage {
     expect($(lockAccountButton), findsOneWidget);
   }
 
-  Future<void> clickProfileAndKeychain() async {
-    await $(profileAndKeychainText).tap();
-  }
-
   Future<void> clickDarkTheme() async {
     await $(segmentedButton).$('Dark').tap();
   }
@@ -61,23 +57,27 @@ class AccountDropdownPage {
     await $(segmentedButton).$('Light').tap();
   }
 
-  Future<void> clickUTC() async {
-    await $(segmentedButton).$('UTC').tap();
-  }
-
   Future<void> clickLocal() async {
     await $(segmentedButton).$('Local').tap();
   }
 
-  Future<void> clickSetupRoles() async {
-    await $(setupRolesMenuItem).tap();
+  Future<void> clickProfileAndKeychain() async {
+    await $(profileAndKeychainText).tap();
+  }
+
+  Future<void> clickRedirectToDocs() async {
+    await $(redirectToDocsMenuItem).tap();
   }
 
   Future<void> clickRedirectToSupport() async {
     await $(redirectToSupportMenuItem).tap();
   }
 
-  Future<void> clickRedirectToDocs() async {
-    await $(redirectToDocsMenuItem).tap();
+  Future<void> clickSetupRoles() async {
+    await $(setupRolesMenuItem).tap();
+  }
+
+  Future<void> clickUTC() async {
+    await $(segmentedButton).$('UTC').tap();
   }
 }

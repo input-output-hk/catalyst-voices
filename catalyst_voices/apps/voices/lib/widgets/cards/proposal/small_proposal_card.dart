@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/routes/routing/routing.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
@@ -9,10 +8,11 @@ import 'package:catalyst_voices/widgets/text/day_month_time_text.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class SmallProposalCard extends StatelessWidget {
-  final Proposal proposal;
+  final UsersProposalOverview proposal;
   final bool showLatestLocal;
 
   const SmallProposalCard({
@@ -60,13 +60,12 @@ class SmallProposalCard extends StatelessWidget {
               ),
             ),
             Offstage(
-              offstage: !proposal.versions.hasLatestLocalDraft(proposal.selfRef.version) ||
-                  !showLatestLocal,
+              offstage: !proposal.hasNewerLocalIteration || !showLatestLocal,
               child: _NewIterationDetails(
-                title: proposal.title,
-                iteration: proposal.versionCount,
-                datetime: proposal.updateDate,
-                ref: proposal.selfRef,
+                title: proposal.versions.latest.title,
+                iteration: proposal.versions.latest.versionNumber,
+                datetime: proposal.versions.latest.createdAt,
+                ref: proposal.versions.latest.selfRef,
               ),
             ),
             const SizedBox(height: 12),
@@ -79,7 +78,7 @@ class SmallProposalCard extends StatelessWidget {
 }
 
 class _Details extends StatelessWidget {
-  final Proposal proposal;
+  final UsersProposalOverview proposal;
 
   const _Details({
     required this.proposal,
@@ -97,7 +96,7 @@ class _Details extends StatelessWidget {
           ProposalPublish.localDraft => const PrivateProposalChip(),
         },
         ProposalVersionChip(
-          version: proposal.versionCount.toString(),
+          version: proposal.iteration.toString(),
           useInternalBackground: !isPublished,
         ),
         DayMonthTimeTextWithTooltip(
@@ -188,8 +187,10 @@ class _WarningNewIteration extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AffixDecorator(
-      prefix:
-          VoicesAssets.icons.exclamation.buildIcon(size: 12, color: context.colors.iconsWarning),
+      prefix: VoicesAssets.icons.exclamation.buildIcon(
+        size: 12,
+        color: context.colors.iconsWarning,
+      ),
       child: Text(
         'Consider publishing this newer iteration!',
         style: context.textTheme.labelMedium?.copyWith(

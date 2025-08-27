@@ -91,6 +91,7 @@ delegators
 devnet
 devs
 DIND
+dockerenv
 dockerhub
 domcontentloaded
 Dominik
@@ -102,6 +103,7 @@ dhttpd
 drep
 dreps
 dtscalac
+dt-iohk
 earthfile
 earthlyignore
 Easterling
@@ -282,6 +284,7 @@ qrcode
 rapidoc
 ratelimit
 redoc
+Relayout
 reloadable
 Replayability
 repr
@@ -317,6 +320,7 @@ serviceworker
 skeletonizer
 slotno
 snackbars
+socat
 sqlfluff
 SRCROOT
 sslmode

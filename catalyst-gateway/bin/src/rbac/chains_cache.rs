@@ -1,49 +1,37 @@
 //! A cache of RBAC chains.
 
-use std::sync::LazyLock;
-
 use catalyst_types::catalyst_id::CatalystId;
-use moka::{policy::EvictionPolicy, sync::Cache};
 use rbac_registration::registration::cardano::RegistrationChain;
 
 use crate::{
-    metrics::rbac::reporter::{PERSISTENT_CHAINS_CACHE_HIT, PERSISTENT_CHAINS_CACHE_MISS},
-    settings::Settings,
+    db::index::session::CassandraSession,
+    metrics::caches::rbac::{
+        rbac_persistent_chains_cache_hits_inc, rbac_persistent_chains_cache_miss_inc,
+    },
 };
-
-/// A cache of persistent RBAC chains.
-static PERSISTENT_CHAINS: LazyLock<Cache<CatalystId, RegistrationChain>> = LazyLock::new(|| {
-    Cache::builder()
-        .eviction_policy(EvictionPolicy::lru())
-        .max_capacity(Settings::rbac_cfg().persistent_chains_cache_size)
-        .build()
-});
 
 /// Add (or update) a persistent chain to the cache.
 pub fn cache_persistent_rbac_chain(id: CatalystId, chain: RegistrationChain) {
-    PERSISTENT_CHAINS.insert(id, chain);
+    CassandraSession::get(true).inspect(|session| {
+        session.caches().rbac_persistent_chains().insert(id, chain);
+    });
 }
 
 /// Returns a cached persistent chain by the given Catalyst ID.
-pub fn cached_persistent_rbac_chain(id: &CatalystId) -> Option<RegistrationChain> {
-    let api_host_names = Settings::api_host_names().join(",");
-    let service_id = Settings::service_id();
-    let network = Settings::cardano_network().to_string();
-
-    let res = PERSISTENT_CHAINS.get(id);
-    if res.is_some() {
-        PERSISTENT_CHAINS_CACHE_HIT
-            .with_label_values(&[&api_host_names, service_id, &network])
-            .inc();
-    } else {
-        PERSISTENT_CHAINS_CACHE_MISS
-            .with_label_values(&[&api_host_names, service_id, &network])
-            .inc();
+pub fn cached_persistent_rbac_chain(
+    session: &CassandraSession, id: &CatalystId,
+) -> Option<RegistrationChain> {
+    let cache = session.caches().rbac_persistent_chains();
+    if !cache.is_enabled() {
+        return None;
     }
-    res
-}
-
-/// Returns an approximate number of entries in the `PERSISTENT_CHAINS` cache.
-pub fn persistent_rbac_chains_cache_size() -> u64 {
-    PERSISTENT_CHAINS.entry_count()
+    cache
+        .get(id)
+        .inspect(|_| {
+            rbac_persistent_chains_cache_hits_inc();
+        })
+        .or_else(|| {
+            rbac_persistent_chains_cache_miss_inc();
+            None
+        })
 }

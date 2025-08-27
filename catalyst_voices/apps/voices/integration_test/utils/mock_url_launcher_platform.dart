@@ -13,10 +13,9 @@ class MockUrlLauncherPlatform extends Mock
     UrlLauncherPlatform.instance = this;
   }
 
-  void tearDownMock() {
-    UrlLauncherPlatform.instance = originalPlatform;
-    reset(this);
-    capturedUrl = '';
+  @override
+  Future<bool> canLaunch(String url) async {
+    return true;
   }
 
   @override
@@ -25,8 +24,9 @@ class MockUrlLauncherPlatform extends Mock
     return true;
   }
 
-  @override
-  Future<bool> canLaunch(String url) async {
-    return true;
+  void tearDownMock() {
+    UrlLauncherPlatform.instance = originalPlatform;
+    reset(this);
+    capturedUrl = '';
   }
 }

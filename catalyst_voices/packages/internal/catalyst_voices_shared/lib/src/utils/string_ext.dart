@@ -20,7 +20,7 @@ extension StringExt on String {
     return toLowerCase() == other?.toLowerCase();
   }
 
-  // TODO(dtscalac): temporary solution to format dynamic strings as plural,
+  // TODO(dt-iohk): temporary solution to format dynamic strings as plural,
   // after F14 the document schema must be altered to support
   // other languages than English.
   //

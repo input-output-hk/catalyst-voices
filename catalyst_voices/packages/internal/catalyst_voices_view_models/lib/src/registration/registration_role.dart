@@ -22,10 +22,10 @@ final class RegistrationRole extends Equatable {
 
   @override
   List<Object?> get props => [
-        type,
-        isSelected,
-        isLocked,
-      ];
+    type,
+    isSelected,
+    isLocked,
+  ];
 
   RegistrationRole copyWith({
     AccountRole? type,
