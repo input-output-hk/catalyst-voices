@@ -31,7 +31,7 @@ final class ApiServices {
 
   factory ApiServices({
     required AppEnvironmentType env,
-    required AuthTokenProvider authTokenProvider,
+    AuthTokenProvider? authTokenProvider,
     ValueGetter<http.Client>? httpClient,
   }) {
     _fixModelsMapping();
@@ -45,7 +45,7 @@ final class ApiServices {
           jsonConverter: $JsonSerializableConverter(),
         ),
         interceptors: [
-          RbacAuthInterceptor(authTokenProvider),
+          if (authTokenProvider != null) RbacAuthInterceptor(authTokenProvider),
           if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
         ],
       ),
@@ -54,7 +54,7 @@ final class ApiServices {
         baseUrl: env.app.replace(path: '/api/reviews'),
         interceptors: [
           PathTrimInterceptor(),
-          RbacAuthInterceptor(authTokenProvider),
+          if (authTokenProvider != null) RbacAuthInterceptor(authTokenProvider),
           if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
         ],
       ),
@@ -66,4 +66,9 @@ final class ApiServices {
     required this.gateway,
     required this.reviews,
   });
+
+  Future<void> dispose() async {
+    gateway.client.dispose();
+    reviews.client.dispose();
+  }
 }
