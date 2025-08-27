@@ -90,7 +90,7 @@ Future<void> bootstrapAndRun(
     (error, stack) {
       // not severe because Sentry will log it automatically.
       // ignore: prefer_const_declarations
-      final isNotSentryReporting = _reportingService is SentryReportingService;
+      final isNotSentryReporting = _reportingService is! SentryReportingService;
       _reportUncaughtZoneError(error, stack, severe: isNotSentryReporting);
     },
   );
