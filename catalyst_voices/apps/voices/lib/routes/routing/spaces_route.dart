@@ -15,6 +15,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'spaces_route.g.dart';
 
@@ -44,7 +45,7 @@ final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return DiscoveryPage(keychainDeleted: $extra ?? false);
+    return SentryDisplayWidget(child: DiscoveryPage(keychainDeleted: $extra ?? false));
   }
 }
 
