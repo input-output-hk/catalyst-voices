@@ -211,7 +211,10 @@ Future<void> _runApp(
 }) async {
   if (_shouldEnableReporting) {
     final reporting = Dependencies.instance.get<ReportingService>();
-    await reporting.init(config: sentryConfig, appRunner: () => runApp(app));
+    await reporting.init(
+      config: sentryConfig,
+      appRunner: () => runApp(SentryWidget(child: app)),
+    );
 
     Dependencies.instance.get<ReportingServiceMediator>().init();
   } else {
