@@ -99,19 +99,34 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
   routes: <TypedRoute<RouteData>>[
     TypedGoRoute<DiscoveryRoute>(
       path: '/discovery',
+      name: 'discovery',
       routes: [
         TypedGoRoute<ProposalsRoute>(
           path: 'proposals',
+          name: 'proposals',
         ),
         TypedGoRoute<CategoryDetailRoute>(
           path: 'category/:categoryId',
+          name: 'category_details',
         ),
       ],
     ),
-    TypedGoRoute<WorkspaceRoute>(path: '/workspace'),
-    TypedGoRoute<VotingRoute>(path: '/voting'),
-    TypedGoRoute<FundedProjectsRoute>(path: '/funded_projects'),
-    TypedGoRoute<TreasuryRoute>(path: '/treasury'),
+    TypedGoRoute<WorkspaceRoute>(
+      path: '/workspace',
+      name: 'workspace',
+    ),
+    TypedGoRoute<VotingRoute>(
+      path: '/voting',
+      name: 'voting',
+    ),
+    TypedGoRoute<FundedProjectsRoute>(
+      path: '/funded_projects',
+      name: 'funded_projects',
+    ),
+    TypedGoRoute<TreasuryRoute>(
+      path: '/treasury',
+      name: 'treasury',
+    ),
   ],
 )
 final class SpacesShellRouteData extends ShellRouteData {

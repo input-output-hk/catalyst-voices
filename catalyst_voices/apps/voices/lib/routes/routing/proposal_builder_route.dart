@@ -12,6 +12,7 @@ part 'proposal_builder_route.g.dart';
 
 @TypedGoRoute<ProposalBuilderDraftRoute>(
   path: '/workspace/proposal_builder/draft',
+  name: 'proposal_builder_draft',
 )
 final class ProposalBuilderDraftRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
@@ -43,6 +44,7 @@ final class ProposalBuilderDraftRoute extends GoRouteData
 
 @TypedGoRoute<ProposalBuilderRoute>(
   path: '/workspace/proposal_builder/:proposalId',
+  name: 'proposal_builder_edit',
 )
 final class ProposalBuilderRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
