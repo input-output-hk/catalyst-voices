@@ -46,8 +46,8 @@ android {
 
     defaultConfig {
         applicationId = "io.projectcatalyst.catalyst"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = 24
+        targetSdk = 36
         versionCode = flutterVersionCode
         versionName = flutterVersionName
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
