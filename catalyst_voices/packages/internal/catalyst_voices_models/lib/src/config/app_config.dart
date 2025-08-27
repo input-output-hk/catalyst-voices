@@ -52,6 +52,7 @@ final class AppConfig extends Equatable {
           tracesSampleRate: 1,
           profilesSampleRate: 1,
           enableAutoSessionTracking: true,
+          enableTimeToFullDisplayTracing: true,
           attachScreenshot: true,
           attachViewHierarchy: true,
           diagnosticLevel: 'debug',
@@ -89,6 +90,7 @@ final class AppConfig extends Equatable {
           tracesSampleRate: 0.2,
           profilesSampleRate: 0.2,
           enableAutoSessionTracking: true,
+          enableTimeToFullDisplayTracing: true,
           attachScreenshot: false,
           attachViewHierarchy: true,
           diagnosticLevel: 'warning',
@@ -117,6 +119,7 @@ final class AppConfig extends Equatable {
           tracesSampleRate: 0.1,
           profilesSampleRate: 0.1,
           enableAutoSessionTracking: true,
+          enableTimeToFullDisplayTracing: true,
           attachScreenshot: false,
           attachViewHierarchy: false,
           diagnosticLevel: 'error',
@@ -254,6 +257,7 @@ final class SentryConfig extends ReportingServiceConfig {
   final double tracesSampleRate;
   final double profilesSampleRate;
   final bool enableAutoSessionTracking;
+  final bool enableTimeToFullDisplayTracing;
   final bool attachScreenshot;
   final bool attachViewHierarchy;
   final String diagnosticLevel;
@@ -264,6 +268,7 @@ final class SentryConfig extends ReportingServiceConfig {
     required this.tracesSampleRate,
     required this.profilesSampleRate,
     required this.enableAutoSessionTracking,
+    required this.enableTimeToFullDisplayTracing,
     required this.attachScreenshot,
     required this.attachViewHierarchy,
     required this.diagnosticLevel,
@@ -283,6 +288,7 @@ final class SentryConfig extends ReportingServiceConfig {
     tracesSampleRate,
     profilesSampleRate,
     enableAutoSessionTracking,
+    enableTimeToFullDisplayTracing,
     attachScreenshot,
     attachViewHierarchy,
     diagnosticLevel,
@@ -299,6 +305,7 @@ final class SentryConfig extends ReportingServiceConfig {
     double? tracesSampleRate,
     double? profilesSampleRate,
     bool? enableAutoSessionTracking,
+    bool? enableTimeToFullDisplayTracing,
     bool? attachViewHierarchy,
     String? diagnosticLevel,
   }) {
@@ -308,6 +315,8 @@ final class SentryConfig extends ReportingServiceConfig {
       tracesSampleRate: tracesSampleRate ?? this.tracesSampleRate,
       profilesSampleRate: profilesSampleRate ?? this.profilesSampleRate,
       enableAutoSessionTracking: enableAutoSessionTracking ?? this.enableAutoSessionTracking,
+      enableTimeToFullDisplayTracing:
+          enableTimeToFullDisplayTracing ?? this.enableTimeToFullDisplayTracing,
       attachScreenshot: attachScreenshot,
       attachViewHierarchy: attachViewHierarchy ?? this.attachViewHierarchy,
       diagnosticLevel: diagnosticLevel ?? this.diagnosticLevel,

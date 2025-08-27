@@ -54,7 +54,8 @@ Future<BootstrapArgs> bootstrap({
 
   registerConfig(config);
 
-  router ??= buildAppRouter();
+  //ignore: avoid_redundant_argument_values
+  router ??= buildAppRouter(enableReporting: _shouldEnableReporting);
 
   // Observer is very noisy on Logger. Enable it only if you want to debug
   // something
@@ -98,9 +99,19 @@ Future<void> bootstrapAndRun(
 @visibleForTesting
 GoRouter buildAppRouter({
   String? initialLocation,
+  bool enableReporting = false,
 }) {
+  final observers = <NavigatorObserver>[];
+
+  if (enableReporting) {
+    final reportingService = Dependencies.instance.get<ReportingService>();
+    final observer = reportingService.buildNavigatorObserver();
+    observers.add(observer);
+  }
+
   return AppRouterFactory.create(
     initialLocation: initialLocation,
+    observers: observers.isNotEmpty ? observers : null,
   );
 }
 
@@ -201,7 +212,10 @@ Future<void> _runApp(
 }) async {
   if (_shouldEnableReporting) {
     final reporting = Dependencies.instance.get<ReportingService>();
-    await reporting.init(config: sentryConfig, appRunner: () => runApp(app));
+    await reporting.init(
+      config: sentryConfig,
+      appRunner: () => runApp(SentryWidget(child: app)),
+    );
 
     Dependencies.instance.get<ReportingServiceMediator>().init();
   } else {

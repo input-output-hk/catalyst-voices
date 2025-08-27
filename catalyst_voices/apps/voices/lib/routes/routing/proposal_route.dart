@@ -6,7 +6,10 @@ import 'package:go_router/go_router.dart';
 
 part 'proposal_route.g.dart';
 
-@TypedGoRoute<ProposalRoute>(path: '/proposal/:proposalId')
+@TypedGoRoute<ProposalRoute>(
+  path: '/proposal/:proposalId',
+  name: 'proposal_viewer',
+)
 final class ProposalRoute extends GoRouteData with FadePageTransitionMixin {
   final String proposalId;
   final String? version;
@@ -24,6 +27,7 @@ final class ProposalRoute extends GoRouteData with FadePageTransitionMixin {
         version: ref.version,
         local: ref is DraftRef,
       );
+
   @override
   Widget build(BuildContext context, GoRouterState state) {
     final ref = DocumentRef.build(

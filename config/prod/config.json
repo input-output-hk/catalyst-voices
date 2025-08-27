@@ -11,6 +11,7 @@
     "tracesSampleRate": 0.1,
     "profilesSampleRate": 0.1,
     "enableAutoSessionTracking": true,
+    "enableTimeToFullDisplayTracing": true,
     "attachViewHierarchy": false,
     "diagnosticLevel": "error"
   },
