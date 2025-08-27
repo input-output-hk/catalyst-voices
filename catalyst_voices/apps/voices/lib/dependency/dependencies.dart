@@ -203,6 +203,7 @@ final class Dependencies extends DependencyProvider {
       return ApiServices(
         env: get<AppEnvironment>().type,
         authTokenProvider: get<AuthTokenProvider>(),
+        httpClient: () => get<ReportingService>().buildHttpClient(),
       );
     });
   }

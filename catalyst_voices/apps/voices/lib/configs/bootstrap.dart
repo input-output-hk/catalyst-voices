@@ -45,7 +45,10 @@ Future<BootstrapArgs> bootstrap({
   environment ??= AppEnvironment.fromEnv();
 
   await _cleanupOldStorages();
-  await registerDependencies(environment: environment, loggingService: _loggingService);
+  await registerDependencies(
+    environment: environment,
+    loggingService: _loggingService,
+  );
   await _initCryptoUtils();
 
   final configSource = ApiConfigSource(Dependencies.instance.get());

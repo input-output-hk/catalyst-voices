@@ -9,6 +9,7 @@ import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_inte
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
 import 'package:chopper/chopper.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 
 // swagger_dart_code_generator does not add this model to mapping list.
 // TODO(damian-molinski): investigate if this can be removed.
@@ -31,11 +32,13 @@ final class ApiServices {
   factory ApiServices({
     required AppEnvironmentType env,
     required AuthTokenProvider authTokenProvider,
+    ValueGetter<http.Client>? httpClient,
   }) {
     _fixModelsMapping();
 
     return ApiServices.internal(
       gateway: CatGateway.create(
+        httpClient: httpClient?.call(),
         baseUrl: env.app,
         converter: CborOrJsonDelegateConverter(
           cborConverter: CborSerializableConverter(),
@@ -47,6 +50,7 @@ final class ApiServices {
         ],
       ),
       reviews: CatReviews.create(
+        httpClient: httpClient?.call(),
         baseUrl: env.app.replace(path: '/api/reviews'),
         interceptors: [
           PathTrimInterceptor(),

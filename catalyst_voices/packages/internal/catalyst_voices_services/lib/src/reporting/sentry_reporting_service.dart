@@ -3,10 +3,16 @@ import 'dart:async';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/reporting/reporting_service.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 final class SentryReportingService implements ReportingService {
   const SentryReportingService();
+
+  @override
+  http.Client buildHttpClient() {
+    return SentryHttpClient();
+  }
 
   @override
   Future<void> init({
