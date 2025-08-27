@@ -25,7 +25,7 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "io.projectcatalyst.catalyst"
+    namespace = "io.catalyst.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -45,7 +45,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "io.projectcatalyst.catalyst"
+        applicationId = "io.catalyst.app"
         minSdk = 24
         targetSdk = 36
         versionCode = flutterVersionCode

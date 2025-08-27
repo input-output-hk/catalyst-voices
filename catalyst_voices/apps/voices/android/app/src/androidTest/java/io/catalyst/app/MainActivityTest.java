@@ -1,4 +1,4 @@
-package io.projectcatalyst.catalyst;
+package io.catalyst.app;
 
 import androidx.test.rule.ActivityTestRule;
 import dev.flutter.plugins.integration_test.FlutterTestRunner;
