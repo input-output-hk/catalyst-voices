@@ -24,7 +24,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
                 .to_json()
                 .expect("Unable to convert CatalystRoleId example to JSON"),
         ),
-        maximum: Some(0.),
+        maximum: Some(255.),
         minimum: Some(0.),
         ..MetaSchema::ANY
     }
