@@ -30,6 +30,7 @@ final class SentryReportingService implements ReportingService {
           ..tracesSampleRate = config.tracesSampleRate
           ..profilesSampleRate = config.profilesSampleRate
           ..enableAutoSessionTracking = config.enableAutoSessionTracking
+          ..enableTimeToFullDisplayTracing = config.enableTimeToFullDisplayTracing
           ..attachScreenshot = config.attachScreenshot
           ..attachViewHierarchy = config.attachViewHierarchy
           ..screenshotQuality = SentryScreenshotQuality.low

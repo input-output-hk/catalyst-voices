@@ -9,6 +9,7 @@ final class RemoteSentryConfig {
   final double? tracesSampleRate;
   final double? profilesSampleRate;
   final bool? enableAutoSessionTracking;
+  final bool? enableTimeToFullDisplayTracing;
   final bool? attachViewHierarchy;
   final String? diagnosticLevel;
 
@@ -18,6 +19,7 @@ final class RemoteSentryConfig {
     this.tracesSampleRate,
     this.profilesSampleRate,
     this.enableAutoSessionTracking,
+    this.enableTimeToFullDisplayTracing,
     this.attachViewHierarchy,
     this.diagnosticLevel,
   });
