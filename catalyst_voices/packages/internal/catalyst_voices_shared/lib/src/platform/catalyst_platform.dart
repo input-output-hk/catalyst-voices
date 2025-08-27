@@ -1,5 +1,11 @@
-library catalyst_platform;
+import 'package:catalyst_voices_shared/src/platform/form_factor/form_factor.dart';
+import 'package:catalyst_voices_shared/src/platform/operating_system/operating_system.dart';
+import 'package:flutter/foundation.dart';
 
-export 'stub_platform.dart'
-    if (dart.library.io) 'io_platform.dart'
-    if (dart.library.html) 'web_platform.dart';
+/// A set of utils related to host target platform.
+///
+/// See also [CatalystOperatingSystem].
+/// See also [CatalystFormFactor].
+final class CatalystPlatform {
+  static bool get isWeb => kIsWeb;
+}

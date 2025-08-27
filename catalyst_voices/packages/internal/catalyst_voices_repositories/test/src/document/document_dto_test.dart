@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
-import 'package:flutter/foundation.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../fixture/voices_document_templates.dart';
@@ -18,7 +18,7 @@ void main() {
       var documentJson = <String, dynamic>{};
 
       setUpAll(() async {
-        if (!kIsWeb) {
+        if (!CatalystPlatform.isWeb) {
           schemaJson = await VoicesDocumentsTemplates.proposalF14Schema;
           documentJson = await VoicesDocumentsTemplates.proposalF14Document;
         }
@@ -67,6 +67,6 @@ void main() {
     },
     // Skip on web as there is no way to access local files required for
     // those tests to run against template.
-    skip: kIsWeb,
+    skip: CatalystPlatform.isWeb,
   );
 }

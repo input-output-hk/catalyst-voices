@@ -1,11 +1,7 @@
 import 'package:catalyst_voices_models/src/config/env_vars/dart_define_env_vars.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-
-/// Fallback environment type used when an environment cannot be determined.
-/// Defaults to [AppEnvironmentType.relative] on web and [AppEnvironmentType.dev]
-/// on other platforms.
-const _fallbackEnvType = kIsWeb ? AppEnvironmentType.relative : AppEnvironmentType.dev;
 
 /// The base domain for the Project Catalyst services.
 const _projectCatalyst = 'projectcatalyst.io';
@@ -13,6 +9,13 @@ const _projectCatalyst = 'projectcatalyst.io';
 /// A regular expression to parse the environment name from a hostname.
 /// e.g., "app.dev.projectcatalyst.io" -> "dev"
 final _envRegExp = RegExp(r'app\.([a-z]+)\.projectcatalyst\.io', caseSensitive: false);
+
+/// Fallback environment type used when an environment cannot be determined.
+/// Defaults to [AppEnvironmentType.relative] on web and [AppEnvironmentType.dev]
+/// on other platforms.
+final _fallbackEnvType = CatalystPlatform.isWeb
+    ? AppEnvironmentType.relative
+    : AppEnvironmentType.dev;
 
 /// Represents the application's current runtime environment.
 ///

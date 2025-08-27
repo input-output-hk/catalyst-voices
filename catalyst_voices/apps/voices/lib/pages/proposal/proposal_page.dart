@@ -50,20 +50,20 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
     final readOnlyMode = context.select<ProposalCubit, bool>((cubit) => cubit.state.readOnlyMode);
 
     return VoicesAppBar(
-      leading: !(readOnlyMode || CatalystPlatform.isMobileWeb)
+      leading: !(readOnlyMode || CatalystFormFactor.isMobile)
           ? NavigationBack(
               isCompact: true,
               onCanNotPop: (context, _) => const ProposalsRoute().go(context),
             )
           : null,
-      enableBackHome: !(readOnlyMode || CatalystPlatform.isMobileWeb),
+      enableBackHome: !(readOnlyMode || CatalystFormFactor.isMobile),
       actions: [
         Offstage(
-          offstage: readOnlyMode || CatalystPlatform.isMobileWeb,
+          offstage: readOnlyMode || CatalystFormFactor.isMobile,
           child: const SessionCtaAction(),
         ),
         Offstage(
-          offstage: readOnlyMode || CatalystPlatform.isMobileWeb,
+          offstage: readOnlyMode || CatalystFormFactor.isMobile,
           child: const AccountSettingsAction(),
         ),
       ],

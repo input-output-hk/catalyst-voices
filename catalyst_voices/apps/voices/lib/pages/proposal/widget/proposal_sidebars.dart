@@ -23,7 +23,7 @@ class ProposalSidebars extends StatelessWidget {
         return SidebarScaffold(
           // TODO(LynxLynxx): Remove when we support mobile web
           leftRail: Offstage(
-            offstage: CatalystPlatform.isMobileWeb,
+            offstage: CatalystFormFactor.isMobile,
             child: Padding(
               padding: EdgeInsets.only(left: spacing / 2, right: spacing / 2, top: 40),
               child: navPanel,

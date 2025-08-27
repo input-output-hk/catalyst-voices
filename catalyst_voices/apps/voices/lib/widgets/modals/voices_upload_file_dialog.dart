@@ -10,7 +10,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 
@@ -217,7 +216,7 @@ class _UploadContainerState extends State<_UploadContainer> {
           child: Stack(
             children: [
               // We allow drag&drop only on web
-              if (kIsWeb)
+              if (CatalystPlatform.isWeb)
                 DropzoneView(
                   operation: DragOperation.copy,
                   cursor: CursorType.grab,

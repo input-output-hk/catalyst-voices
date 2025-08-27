@@ -40,32 +40,14 @@ class AppMobileAccessRestriction extends StatelessWidget {
         final currentPath = provider.value.uri.path;
         final isProposalRoute = currentPath.contains('/proposal/');
 
-        return PlatformAwareBuilder<Widget>(
-          enabled: !isProposalRoute,
-          mobileWeb: ResponsiveBuilder<_LayoutData>(
-            xs: (
-              titleStyle: context.textTheme.displayMedium?.copyWith(
-                color: context.colorScheme.primary,
-              ),
-              subtitleStyle: context.textTheme.titleSmall,
-              descriptionStyle: context.textTheme.bodyMedium,
-              isMobile: true,
-            ),
-            other: (
-              titleStyle: context.textTheme.displayMedium?.copyWith(
-                color: context.colorScheme.primary,
-                fontSize: 78,
-                height: 1.15,
-              ),
-              subtitleStyle: context.textTheme.titleMedium,
-              descriptionStyle: context.textTheme.bodyLarge,
-              isMobile: false,
-            ),
-            builder: (context, data) => _MobileSplashScreen(
-              data: data,
-            ),
-          ),
-          other: child,
+        if (isProposalRoute) {
+          // proposal route is unres
+          return child;
+        }
+
+        return FormFactorBuilder<Widget>(
+          mobile: CatalystPlatform.isWeb ? const _MobileWebPlaceholder() : null,
+          fallback: child,
           builder: (context, child) => child!,
         );
       },
@@ -256,6 +238,35 @@ class _Foreground extends StatelessWidget {
           const _Actions(),
         ],
       ),
+    );
+  }
+}
+
+class _MobileWebPlaceholder extends StatelessWidget {
+  const _MobileWebPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return ResponsiveBuilder<_LayoutData>(
+      xs: (
+        titleStyle: context.textTheme.displayMedium?.copyWith(
+          color: context.colorScheme.primary,
+        ),
+        subtitleStyle: context.textTheme.titleSmall,
+        descriptionStyle: context.textTheme.bodyMedium,
+        isMobile: true,
+      ),
+      other: (
+        titleStyle: context.textTheme.displayMedium?.copyWith(
+          color: context.colorScheme.primary,
+          fontSize: 78,
+          height: 1.15,
+        ),
+        subtitleStyle: context.textTheme.titleMedium,
+        descriptionStyle: context.textTheme.bodyLarge,
+        isMobile: false,
+      ),
+      builder: (context, data) => _MobileSplashScreen(data: data),
     );
   }
 }

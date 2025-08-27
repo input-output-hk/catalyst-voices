@@ -286,7 +286,7 @@ class _EditorState extends State<_Editor> {
               null,
             ),
           ),
-          embedBuilders: CatalystPlatform.isWeb
+          embedBuilders: CatalystFormFactor.isDesktop && CatalystPlatform.isWeb
               ? quill_ext.FlutterQuillEmbeds.editorWebBuilders(
                   imageEmbedConfig: const QuillEditorImageEmbedConfig(
                     errorWidget: InsertImageError(),
