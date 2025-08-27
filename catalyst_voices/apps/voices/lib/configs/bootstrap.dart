@@ -23,6 +23,7 @@ final _bootstrapLogger = Logger('Bootstrap');
 final _flutterLogger = Logger('Flutter');
 final _loggingService = LoggingService();
 final _platformDispatcherLogger = Logger('PlatformDispatcher');
+
 final _uncaughtZoneLogger = Logger('UncaughtZone');
 
 /// Initializes the application before it can be run. Should setup all
