@@ -1,4 +1,3 @@
-# cspell: words janitoring
 name: Cat Gateway integration tests
 
 on:
@@ -47,7 +46,28 @@ jobs:
         if: always()
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up rust-tests-runner --abort-on-container-exit --exit-code-from rust-tests-runner
-          docker compose -f catalyst-gateway/tests/docker-compose.yml down
+
+      - name: Spin up catalyst-gateway
+        if: always()
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway -d
+
+      - name: Wait for cat-gateway to become healthy
+        run: |
+          echo "Waiting for container to be healthy..."
+          for i in {1..500}; do
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
+            echo "Health status: $STATUS"
+            if [ "$STATUS" == "healthy" ]; then
+              echo "Container is healthy!"
+              break
+            fi
+            if [ "$STATUS" == "unhealthy" ]; then
+              echo "Container became unhealthy."
+              exit 1
+            fi
+            sleep 5
+          done
 
       - name: Schemathesis tests
         if: always()
