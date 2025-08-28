@@ -427,6 +427,7 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<CatalystDatabase>(
       () {
         final config = get<AppConfig>().database;
+        final reporting = get<ReportingService>();
 
         return CatalystDatabase.drift(
           config: CatalystDriftDatabaseConfig(
@@ -436,6 +437,7 @@ final class Dependencies extends DependencyProvider {
               driftWorker: Uri.parse(config.webDriftWorker),
             ),
           ),
+          interceptor: reporting.buildDbInterceptor(databaseName: config.name),
         );
       },
       dispose: (database) async => database.close(),

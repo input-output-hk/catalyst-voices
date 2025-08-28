@@ -3,11 +3,18 @@ import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_services/src/reporting/database_logging_interceptor.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 final class NoOpReportingService implements ReportingService {
   const NoOpReportingService();
+
+  @override
+  QueryInterceptor? buildDbInterceptor({required String databaseName}) {
+    return DatabaseLoggingInterceptor(databaseName: databaseName);
+  }
 
   @override
   http.Client? buildHttpClient() => null;
