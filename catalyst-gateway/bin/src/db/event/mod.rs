@@ -284,6 +284,7 @@ impl EventDB {
             Ok(())
         };
 
+        debug!("Waiting for the Event DB background probe check task to be spawned");
         while let Err(e) = spawning() {
             error!(error = ?e, "EVENT_DB_PROBE_TASK is poisoned, should never happen");
             EVENT_DB_PROBE_TASK.clear_poison();
@@ -292,6 +293,8 @@ impl EventDB {
 }
 
 /// Establish a connection pool to the database.
+/// After sucessfull initialisation of the connection pool, spawns a background ready
+/// probe task.
 ///
 /// # Parameters
 ///
@@ -337,6 +340,7 @@ pub fn establish_connection_pool() {
             if EVENT_DB_POOL.set(Arc::new(pool)).is_err() {
                 error!("Failed to set EVENT_DB_POOL. Already set?");
             }
+            EventDB::spawn_ready_probe();
         },
         Err(err) => {
             error!(error = %err, "Failed to establish connection with EventDB pool");

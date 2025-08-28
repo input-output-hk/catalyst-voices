@@ -56,8 +56,6 @@ impl Cli {
 
                 // Initialize Event DB connection pool
                 db::event::establish_connection_pool();
-                // Test that connection is available
-                EventDB::spawn_ready_probe();
 
                 // Start the chain indexing follower.
                 start_followers().await?;

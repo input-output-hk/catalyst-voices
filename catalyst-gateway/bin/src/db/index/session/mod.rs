@@ -196,6 +196,7 @@ impl CassandraSession {
             Ok(())
         };
 
+        debug!("Waiting for the Index DB background probe check task to be spawned");
         while let Err(e) = spawning() {
             error!(error = ?e, "INDEX_DB_PROBE_TASK is poisoned, should never happen");
             INDEX_DB_PROBE_TASK.clear_poison();
