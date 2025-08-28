@@ -14,14 +14,12 @@ void main() {
   group(
     DocumentDto,
     () {
-      var schemaJson = <String, dynamic>{};
-      var documentJson = <String, dynamic>{};
+      late Map<String, dynamic> schemaJson;
+      late Map<String, dynamic> documentJson;
 
       setUpAll(() async {
-        if (!CatalystPlatform.isWeb) {
-          schemaJson = await VoicesDocumentsTemplates.proposalF14Schema;
-          documentJson = await VoicesDocumentsTemplates.proposalF14Document;
-        }
+        schemaJson = await VoicesDocumentsTemplates.proposalF14Schema;
+        documentJson = await VoicesDocumentsTemplates.proposalF14Document;
       });
 
       test(
