@@ -2,6 +2,8 @@
 //!
 //! Reference: https://docs.ipfs.tech/concepts/content-addressing
 
+// cspell: words cidv
+
 use std::sync::LazyLock;
 
 use poem_openapi::{
@@ -17,6 +19,7 @@ use crate::service::common::types::string_types::impl_string_types;
 const TITLE: &str = "Signed Document Locator";
 /// Description.
 const DESCRIPTION: &str = "Document Locator in the IPFS CID formats";
+// cspell: disable
 /// Example for CIDv1 Base32.
 const EXAMPLE_CID_V1_B32: &str = "bafybeihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku";
 /// Example for CIDv1 Base36.
@@ -25,6 +28,7 @@ const EXAMPLE_CID_V1_B36: &str = "k2k4r8jl0yz8qjgqbmc2cdu5hkqek5rj6flgnlkyywynci
 /// Example for CIDv0.
 #[allow(dead_code)]
 const EXAMPLE_CID_V0: &str = "QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR";
+// cspell: enable
 /// Validation Regex Pattern
 const PATTERN: &str = r"^(Qm[1-9A-HJ-NP-Za-km-z]{44})|(b[a-z2-7]{58})|([kK][0-9a-zA-Z]+)$";
 
