@@ -9,13 +9,13 @@ import '../onboarding_base_page.dart';
 import 'step_12_password_info.dart';
 
 class PasswordInputPanel extends OnboardingPageBase {
-  PasswordInputPanel(super.$);
-
   final passwordInputField = const Key('PasswordInputField');
+
   final passwordConfirmInputField = const Key('PasswordConfirmInputField');
   final passwordStrengthLabel = const Key('PasswordStrengthLabel');
   final enterPasswordText = const Key('EnterPasswordText');
   final voicesTextField = const Key('VoicesTextField');
+  PasswordInputPanel(super.$);
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }
@@ -31,6 +31,34 @@ class PasswordInputPanel extends OnboardingPageBase {
   Future<void> goto() async {
     await PasswordInfoPanel($).goto();
     await PasswordInfoPanel($).clickNext();
+  }
+
+  Future<void> verifyDetailsPanel() async {
+    expect($(enterPasswordText), (await t()).enterPassword);
+    expect($(passwordInputField), findsOneWidget);
+    expect($(passwordConfirmInputField), findsOneWidget);
+    expect($(passwordConfirmInputField).$(voicesTextField), findsOneWidget);
+  }
+
+  Future<void> verifyInfoPanel() async {
+    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
+    expect(
+      await infoPartHeaderSubtitleText(),
+      (await t()).createKeychainUnlockPasswordIntoSubtitle,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CatalystSvgPicture &&
+            (widget.bytesLoader as dynamic).assetName == 'assets/icons/lock-closed.svg',
+      ),
+      findsOneWidget,
+    );
+    expect(
+      await infoPartHeaderBodyText(),
+      (await t()).createKeychainUnlockPasswordIntoBody,
+    );
+    expect(await closeButton(), findsOneWidget);
   }
 
   @override
@@ -71,33 +99,5 @@ class PasswordInputPanel extends OnboardingPageBase {
         expect($(passwordStrengthLabel).text, (await t()).goodPasswordStrength);
         break;
     }
-  }
-
-  Future<void> verifyDetailsPanel() async {
-    expect($(enterPasswordText), (await t()).enterPassword);
-    expect($(passwordInputField), findsOneWidget);
-    expect($(passwordConfirmInputField), findsOneWidget);
-    expect($(passwordConfirmInputField).$(voicesTextField), findsOneWidget);
-  }
-
-  Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), (await t()).catalystKeychain);
-    expect(
-      await infoPartHeaderSubtitleText(),
-      (await t()).createKeychainUnlockPasswordIntoSubtitle,
-    );
-    expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is CatalystSvgPicture &&
-            (widget.bytesLoader as dynamic).assetName == 'assets/icons/lock-closed.svg',
-      ),
-      findsOneWidget,
-    );
-    expect(
-      await infoPartHeaderBodyText(),
-      (await t()).createKeychainUnlockPasswordIntoBody,
-    );
-    expect(await closeButton(), findsOneWidget);
   }
 }

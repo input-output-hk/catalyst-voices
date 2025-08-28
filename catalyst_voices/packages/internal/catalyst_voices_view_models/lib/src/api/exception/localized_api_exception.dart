@@ -40,9 +40,9 @@ sealed class LocalizedApiException extends LocalizedException {
   factory LocalizedApiException.from(ApiException source) {
     return switch (source) {
       ApiErrorResponseException(:final statusCode, :final error) => ErrorResponseException(
-          statusCode: statusCode,
-          error: error,
-        ),
+        statusCode: statusCode,
+        error: error,
+      ),
       ApiMalformedBodyException() => const MalformedBodyApiException(),
     };
   }

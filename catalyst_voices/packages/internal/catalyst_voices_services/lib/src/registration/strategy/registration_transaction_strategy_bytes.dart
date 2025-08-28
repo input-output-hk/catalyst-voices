@@ -1,4 +1,5 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart' as cs
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
+    as cs
     show Ed25519PublicKey;
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
@@ -237,8 +238,9 @@ final class RegistrationTransactionStrategyBytes implements RegistrationTransact
         .map((e) => e.address.publicKeyHash)
         .toSet();
 
-    final requiredSigners =
-        (cborDecode(rawTx.requiredSigners) as CborList).map(Ed25519PublicKeyHash.fromCbor).toSet();
+    final requiredSigners = (cborDecode(rawTx.requiredSigners) as CborList)
+        .map(Ed25519PublicKeyHash.fromCbor)
+        .toSet();
 
     final missingSigners = <Ed25519PublicKeyHash>[];
 

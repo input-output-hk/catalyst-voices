@@ -3,10 +3,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-class VoicesIntFieldController extends VoicesNumFieldController<int> {
-  VoicesIntFieldController([super.value]);
-}
-
 class VoicesIntField extends VoicesNumField<int> {
   VoicesIntField({
     super.key,
@@ -21,14 +17,18 @@ class VoicesIntField extends VoicesNumField<int> {
     super.readOnly,
     super.ignorePointers,
   }) : super(
-          codec: const IntCodec(),
-          keyboardType: TextInputType.number,
-          inputFormatters: [
-            FilteringTextInputFormatter.digitsOnly,
-            // Note. int.parse returns incorrect values for bigger Strings.
-            // If more is required use BigInt
-            if (kIsWeb) LengthLimitingTextInputFormatter(16),
-            ...?inputFormatters,
-          ],
-        );
+         codec: const IntCodec(),
+         keyboardType: TextInputType.number,
+         inputFormatters: [
+           FilteringTextInputFormatter.digitsOnly,
+           // Note. int.parse returns incorrect values for bigger Strings.
+           // If more is required use BigInt
+           if (kIsWeb) LengthLimitingTextInputFormatter(16),
+           ...?inputFormatters,
+         ],
+       );
+}
+
+class VoicesIntFieldController extends VoicesNumFieldController<int> {
+  VoicesIntFieldController([super.value]);
 }

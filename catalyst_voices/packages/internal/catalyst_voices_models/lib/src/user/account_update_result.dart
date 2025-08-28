@@ -14,7 +14,7 @@ final class AccountUpdateResult extends Equatable {
 
   @override
   List<Object?> get props => [
-        didChanged,
-        hasPendingEmailChange,
-      ];
+    didChanged,
+    hasPendingEmailChange,
+  ];
 }

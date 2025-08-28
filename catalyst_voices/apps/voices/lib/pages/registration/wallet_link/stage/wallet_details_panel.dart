@@ -178,8 +178,8 @@ class _WalletBalanceHeadsUp extends StatelessWidget {
               CardanoWalletDetails.minAdaForRegistration.ada,
             ),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context).colors.textOnPrimaryLevel1,
-                ),
+              color: Theme.of(context).colors.textOnPrimaryLevel1,
+            ),
           ),
         ),
       ],

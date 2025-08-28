@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 
 final _kPlaceholderRegExp = RegExp(r'{(\w*)}');
 
-typedef PlaceholderSpanBuilder = InlineSpan Function(
-  BuildContext context,
-  String placeholder,
-);
+typedef PlaceholderSpanBuilder =
+    InlineSpan Function(
+      BuildContext context,
+      String placeholder,
+    );
 
 class PlaceholderRichText extends StatefulWidget {
   final String text;
@@ -29,6 +30,16 @@ class _PlaceholderRichTextState extends State<PlaceholderRichText> {
   List<InlineSpan> _spans = [];
 
   @override
+  Widget build(BuildContext context) {
+    return Text.rich(
+      key: const Key('PlaceholderRichText'),
+      TextSpan(children: _spans),
+      textAlign: widget.textAlign,
+      style: widget.style,
+    );
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
@@ -43,16 +54,6 @@ class _PlaceholderRichTextState extends State<PlaceholderRichText> {
     if (widget.text != oldWidget.text) {
       _spans = _calculateSpans();
     }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Text.rich(
-      key: const Key('PlaceholderRichText'),
-      TextSpan(children: _spans),
-      textAlign: widget.textAlign,
-      style: widget.style,
-    );
   }
 
   List<InlineSpan> _calculateSpans() {

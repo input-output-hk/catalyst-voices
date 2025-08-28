@@ -150,29 +150,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       documentData: documentData,
       templateData: documentTemplate,
     );
-    final documentVersions = await queryVersionsOfId(
-      id: ref.id,
-      includeLocalDrafts: true,
-    );
-    final proposalVersions = (await Future.wait(
-      documentVersions.map(
-        (e) async {
-          final proposalPublish = await getProposalPublishForRef(ref: e.metadata.selfRef);
-
-          if (proposalPublish == null) {
-            return null;
-          }
-          return ProposalData(document: e, publish: proposalPublish);
-        },
-      ).toList(),
-    ))
-        .whereType<ProposalData>()
-        .toList();
 
     return ProposalData(
       document: proposalDocument,
       commentsCount: commentsCount,
-      versions: proposalVersions,
       publish: proposalPublish,
     );
   }
@@ -334,14 +315,14 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }) {
     return _documentRepository
         .watchRefToDocumentData(
-      refTo: refTo,
-      type: DocumentType.proposalActionDocument,
-    )
+          refTo: refTo,
+          type: DocumentType.proposalActionDocument,
+        )
         .map((data) {
-      final action = _buildProposalActionData(data);
+          final action = _buildProposalActionData(data);
 
-      return _getProposalPublish(ref: refTo, action: action);
-    });
+          return _getProposalPublish(ref: refTo, action: action);
+        });
   }
 
   @override
@@ -406,10 +387,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       ProposalSubmissionAction.aFinal => ProposalPublish.submittedProposal,
       ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
       ProposalSubmissionAction.hide => throw ArgumentError(
-          'Proposal(${data.proposal.metadata.selfRef}) is '
-          'unsupported ${ProposalSubmissionAction.hide}. Make sure to filter '
-          'out hidden proposals before this code is reached.',
-        ),
+        'Proposal(${data.proposal.metadata.selfRef}) is '
+        'unsupported ${ProposalSubmissionAction.hide}. Make sure to filter '
+        'out hidden proposals before this code is reached.',
+      ),
     };
 
     final document = _buildProposalDocument(
@@ -421,12 +402,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       document: document,
       publish: publish,
       commentsCount: data.commentsCount,
-      // TODO(damian-molinski): remove it or use different model.
-      // ignore: avoid_redundant_argument_values
-      categoryName: '',
-      // TODO(damian-molinski): only Strings or use different model.
-      // ignore: avoid_redundant_argument_values
-      versions: const [],
     );
   }
 

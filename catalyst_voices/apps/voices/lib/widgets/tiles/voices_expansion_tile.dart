@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +9,7 @@ class VoicesExpansionTile extends StatefulWidget {
   final Color? backgroundColor;
   final EdgeInsets? childrenPadding;
   final EdgeInsets? tilePadding;
+  final ShapeBorder? shape;
 
   const VoicesExpansionTile({
     super.key,
@@ -18,6 +19,7 @@ class VoicesExpansionTile extends StatefulWidget {
     this.backgroundColor,
     this.childrenPadding,
     this.tilePadding,
+    this.shape = const RoundedRectangleBorder(),
   });
 
   @override
@@ -27,11 +29,13 @@ class VoicesExpansionTile extends StatefulWidget {
 class _ThemeOverride extends StatelessWidget {
   final EdgeInsets? childrenPadding;
   final EdgeInsets? tilePadding;
+  final ShapeBorder? shape;
   final Widget child;
 
   const _ThemeOverride({
     this.childrenPadding,
     this.tilePadding,
+    this.shape,
     required this.child,
   });
 
@@ -39,12 +43,13 @@ class _ThemeOverride extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Theme(
-      data: theme.copyWith(
-        // listTileTheme is required here because ExpansionTile does not let
-        // us set shape or ripple used internally by ListTile.
-        listTileTheme: const ListTileThemeData(shape: RoundedRectangleBorder()),
-        expansionTileTheme: ExpansionTileThemeData(
+    // ListTileTheme is required here because ExpansionTile does not let
+    // us set shape or ripple used internally by ListTile.
+    return ListTileTheme.merge(
+      shape: shape,
+      minVerticalPadding: 0,
+      child: ExpansionTileTheme(
+        data: ExpansionTileThemeData(
           backgroundColor: theme.colors.elevationsOnSurfaceNeutralLv0,
           collapsedBackgroundColor: theme.colors.elevationsOnSurfaceNeutralLv0,
           tilePadding: tilePadding ?? const EdgeInsets.fromLTRB(24, 8, 12, 8),
@@ -53,17 +58,20 @@ class _ThemeOverride extends StatelessWidget {
           collapsedTextColor: theme.colors.textOnPrimaryLevel1,
           iconColor: theme.colors.iconsForeground,
           collapsedIconColor: theme.colors.iconsForeground,
-          shape: const RoundedRectangleBorder(),
-          collapsedShape: const RoundedRectangleBorder(),
+          shape: shape,
+          collapsedShape: shape,
+        ),
+        child: IconTheme.merge(
+          data: const IconThemeData(size: 24),
+          child: child,
         ),
       ),
-      child: child,
     );
   }
 }
 
 class _VoicesExpansionTileState extends State<VoicesExpansionTile> {
-  final _controller = ExpansionTileController();
+  final _controller = ExpansibleController();
 
   bool _isExpanded = false;
 
@@ -72,6 +80,7 @@ class _VoicesExpansionTileState extends State<VoicesExpansionTile> {
     return _ThemeOverride(
       childrenPadding: widget.childrenPadding,
       tilePadding: widget.tilePadding,
+      shape: widget.shape,
       child: Builder(
         builder: (context) {
           final theme = Theme.of(context);

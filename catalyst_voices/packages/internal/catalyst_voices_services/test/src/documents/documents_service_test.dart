@@ -22,8 +22,7 @@ void main() {
   });
 
   group(DocumentsService, () {
-    test(
-        'calls cache documents exactly number '
+    test('calls cache documents exactly number '
         'of times are all refs count', () async {
       // Given
       final allRefs = List.generate(
@@ -35,8 +34,9 @@ void main() {
       // When
       when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
-      when(() => documentRepository.cacheDocument(ref: any(named: 'ref')))
-          .thenAnswer((_) => Future(() {}));
+      when(
+        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
+      ).thenAnswer((_) => Future(() {}));
 
       await service.sync();
 
@@ -56,8 +56,9 @@ void main() {
       // When
       when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
-      when(() => documentRepository.cacheDocument(ref: any(named: 'ref')))
-          .thenAnswer((_) => Future(() {}));
+      when(
+        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
+      ).thenAnswer((_) => Future(() {}));
 
       await service.sync();
 
@@ -71,7 +72,8 @@ void main() {
         10,
         (_) => SignedDocumentRef.first(const Uuid().v7()).toTyped(DocumentType.proposalDocument),
       );
-      final cachedRefs = allRefs +
+      final cachedRefs =
+          allRefs +
           List.generate(
             5,
             (_) =>
@@ -81,8 +83,9 @@ void main() {
       // When
       when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
-      when(() => documentRepository.cacheDocument(ref: any(named: 'ref')))
-          .thenAnswer((_) => Future(() {}));
+      when(
+        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
+      ).thenAnswer((_) => Future(() {}));
 
       await service.sync();
 
@@ -104,8 +107,9 @@ void main() {
       // When
       when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
-      when(() => documentRepository.cacheDocument(ref: any(named: 'ref')))
-          .thenAnswer((_) => Future(() {}));
+      when(
+        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
+      ).thenAnswer((_) => Future(() {}));
 
       // Then
       await service.sync(
@@ -129,8 +133,9 @@ void main() {
       // When
       when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
-      when(() => documentRepository.cacheDocument(ref: any(named: 'ref')))
-          .thenAnswer((_) => Future(() {}));
+      when(
+        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
+      ).thenAnswer((_) => Future(() {}));
 
       // Then
       final newRefs = await service.sync();

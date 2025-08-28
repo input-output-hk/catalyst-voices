@@ -22,10 +22,10 @@ final class VoicesQuestionActionItem extends Equatable {
 
   @override
   List<Object?> get props => [
-        name,
-        isPositive,
-        type,
-      ];
+    name,
+    isPositive,
+    type,
+  ];
 }
 
 enum VoicesQuestionActionType { filled, text }

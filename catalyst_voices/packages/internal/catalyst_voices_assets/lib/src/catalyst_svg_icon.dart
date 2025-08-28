@@ -70,9 +70,9 @@ class CatalystSvgIcon extends StatelessWidget {
     this.clipBehavior = Clip.hardEdge,
     this.allowColorFilter = true,
   }) : assert(
-          color == null || colorFilter == null,
-          'Either color or colorFilter is supported but not both',
-        );
+         color == null || colorFilter == null,
+         'Either color or colorFilter is supported but not both',
+       );
 
   CatalystSvgIcon.asset(
     String assetName, {
@@ -93,22 +93,32 @@ class CatalystSvgIcon extends StatelessWidget {
     this.excludeFromSemantics = false,
     this.clipBehavior = Clip.hardEdge,
     this.allowColorFilter = true,
-  })  : assert(
-          color == null || colorFilter == null,
-          'Either color or colorFilter is supported but not both',
-        ),
-        bytesLoader = SvgAssetLoader(
-          assetName,
-          packageName: package,
-          assetBundle: bundle,
-          theme: theme,
-        );
+  }) : assert(
+         color == null || colorFilter == null,
+         'Either color or colorFilter is supported but not both',
+       ),
+       bytesLoader = SvgAssetLoader(
+         assetName,
+         packageName: package,
+         assetBundle: bundle,
+         theme: theme,
+       );
+
+  ColorFilter? get _colorFilter {
+    return colorFilter ?? _colorFilterFromColor;
+  }
+
+  ColorFilter? get _colorFilterFromColor {
+    final color = this.color;
+    return color == null ? null : ColorFilter.mode(color, BlendMode.srcIn);
+  }
 
   @override
   Widget build(BuildContext context) {
     final effectiveSize = allowSize ? size ?? IconTheme.of(context).size : null;
-    final effectiveColorFilter =
-        allowColorFilter ? _colorFilter ?? IconTheme.of(context).asColorFilter() : null;
+    final effectiveColorFilter = allowColorFilter
+        ? _colorFilter ?? IconTheme.of(context).asColorFilter()
+        : null;
 
     return CatalystSvgPicture(
       bytesLoader,
@@ -124,15 +134,6 @@ class CatalystSvgIcon extends StatelessWidget {
       excludeFromSemantics: excludeFromSemantics,
       clipBehavior: clipBehavior,
     );
-  }
-
-  ColorFilter? get _colorFilter {
-    return colorFilter ?? _colorFilterFromColor;
-  }
-
-  ColorFilter? get _colorFilterFromColor {
-    final color = this.color;
-    return color == null ? null : ColorFilter.mode(color, BlendMode.srcIn);
   }
 }
 

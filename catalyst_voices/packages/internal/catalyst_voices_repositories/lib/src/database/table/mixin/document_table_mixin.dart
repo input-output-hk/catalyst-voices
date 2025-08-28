@@ -3,9 +3,6 @@ import 'package:catalyst_voices_repositories/src/database/table/converter/docume
 import 'package:drift/drift.dart';
 
 mixin DocumentTableMixin on Table {
-  /// Refers to [DocumentType] uuid.
-  TextColumn get type => text().map(DocumentConverters.type)();
-
   /// Encoded version of [DocumentData.content]
   ///
   /// Uses jsonb
@@ -15,4 +12,7 @@ mixin DocumentTableMixin on Table {
   ///
   /// Uses jsonb
   BlobColumn get metadata => blob().map(DocumentConverters.metadata)();
+
+  /// Refers to [DocumentType] uuid.
+  TextColumn get type => text().map(DocumentConverters.type)();
 }

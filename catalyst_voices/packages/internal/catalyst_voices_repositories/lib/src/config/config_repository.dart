@@ -27,8 +27,9 @@ final class ConfigRepositoryImpl implements ConfigRepository {
   Future<AppConfig> getConfig({
     required AppEnvironmentType env,
   }) async {
-    final remoteConfig =
-        await remoteSource.get().onError((error, stackTrace) => const RemoteConfig());
+    final remoteConfig = await remoteSource.get().onError(
+      (error, stackTrace) => const RemoteConfig(),
+    );
 
     return AppConfigFactory.build(remoteConfig, env: env);
   }

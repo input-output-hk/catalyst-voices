@@ -93,8 +93,9 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
         address: WalletAddressFormatter.formatShort(walletInfo.address),
         clipboardAddress: walletInfo.address.toBech32(),
         showLowBalance: walletInfo.balance < CardanoWalletDetails.minAdaForRegistration,
-        showExpectedNetworkId:
-            blockchainConfig.networkId != walletInfo.networkId ? blockchainConfig.networkId : null,
+        showExpectedNetworkId: blockchainConfig.networkId != walletInfo.networkId
+            ? blockchainConfig.networkId
+            : null,
       );
 
       final newState = state.copyWith(

@@ -1,68 +1,5 @@
 part of 'document_property_schema.dart';
 
-sealed class DocumentBooleanSchema extends DocumentValueSchema<bool> {
-  const DocumentBooleanSchema({
-    required super.nodeId,
-    required super.format,
-    required super.title,
-    required super.description,
-    required super.placeholder,
-    required super.guidance,
-    required super.isSubsection,
-    required super.isRequired,
-    required super.defaultValue,
-    required super.constValue,
-    required super.enumValues,
-  }) : super(
-          type: DocumentPropertyType.boolean,
-        );
-
-  @override
-  DocumentBooleanSchema copyWith({DocumentNodeId? nodeId, String? title});
-
-  @override
-  DocumentValidationResult validate(bool? value) {
-    return DocumentValidationResult.merge([
-      DocumentValidator.validateIfRequired(this, value),
-      DocumentValidator.validateConstValue(this, value),
-      DocumentValidator.validateEnumValues(this, value),
-    ]);
-  }
-}
-
-final class DocumentYesNoChoiceSchema extends DocumentBooleanSchema {
-  const DocumentYesNoChoiceSchema({
-    required super.nodeId,
-    required super.format,
-    required super.title,
-    required super.description,
-    required super.placeholder,
-    required super.guidance,
-    required super.isSubsection,
-    required super.isRequired,
-    required super.defaultValue,
-    required super.constValue,
-    required super.enumValues,
-  });
-
-  @override
-  DocumentYesNoChoiceSchema copyWith({DocumentNodeId? nodeId, String? title}) {
-    return DocumentYesNoChoiceSchema(
-      nodeId: nodeId ?? this.nodeId,
-      format: format,
-      title: title ?? this.title,
-      description: description,
-      placeholder: placeholder,
-      guidance: guidance,
-      isSubsection: isSubsection,
-      isRequired: isRequired,
-      defaultValue: defaultValue,
-      constValue: constValue,
-      enumValues: enumValues,
-    );
-  }
-}
-
 final class DocumentAgreementConfirmationSchema extends DocumentBooleanSchema {
   const DocumentAgreementConfirmationSchema({
     required super.nodeId,
@@ -96,6 +33,36 @@ final class DocumentAgreementConfirmationSchema extends DocumentBooleanSchema {
       constValue: constValue,
       enumValues: enumValues,
     );
+  }
+}
+
+sealed class DocumentBooleanSchema extends DocumentValueSchema<bool> {
+  const DocumentBooleanSchema({
+    required super.nodeId,
+    required super.format,
+    required super.title,
+    required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
+    required super.isRequired,
+    required super.defaultValue,
+    required super.constValue,
+    required super.enumValues,
+  }) : super(
+         type: DocumentPropertyType.boolean,
+       );
+
+  @override
+  DocumentBooleanSchema copyWith({DocumentNodeId? nodeId, String? title});
+
+  @override
+  DocumentValidationResult validate(bool? value) {
+    return DocumentValidationResult.merge([
+      DocumentValidator.validateIfRequired(this, value),
+      DocumentValidator.validateConstValue(this, value),
+      DocumentValidator.validateEnumValues(this, value),
+    ]);
   }
 }
 
@@ -134,6 +101,39 @@ final class DocumentGenericBooleanSchema extends DocumentBooleanSchema {
     String? title,
   }) {
     return DocumentGenericBooleanSchema(
+      nodeId: nodeId ?? this.nodeId,
+      format: format,
+      title: title ?? this.title,
+      description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
+      isRequired: isRequired,
+      defaultValue: defaultValue,
+      constValue: constValue,
+      enumValues: enumValues,
+    );
+  }
+}
+
+final class DocumentYesNoChoiceSchema extends DocumentBooleanSchema {
+  const DocumentYesNoChoiceSchema({
+    required super.nodeId,
+    required super.format,
+    required super.title,
+    required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
+    required super.isRequired,
+    required super.defaultValue,
+    required super.constValue,
+    required super.enumValues,
+  });
+
+  @override
+  DocumentYesNoChoiceSchema copyWith({DocumentNodeId? nodeId, String? title}) {
+    return DocumentYesNoChoiceSchema(
       nodeId: nodeId ?? this.nodeId,
       format: format,
       title: title ?? this.title,

@@ -15,12 +15,9 @@ use crate::{
             index_block,
             roll_forward::{self, PurgeCondition},
         },
-        queries::{
-            caches,
-            sync_status::{
-                get::{get_sync_status, SyncStatus},
-                update::update_sync_status,
-            },
+        queries::sync_status::{
+            get::{get_sync_status, SyncStatus},
+            update::update_sync_status,
         },
         session::CassandraSession,
     },
@@ -610,8 +607,13 @@ impl SyncTask {
             if self.sync_tasks.len() == 1 {
                 set_follower_immutable_first_reached_tip();
                 metrics_updater::reached_immutable_tip(true);
-                caches::txo_assets_by_stake::drop();
-                caches::txo_by_stake::drop();
+
+                // Clear asset caches from the persistent Index DB session (volatile asset caches
+                // are disabled)
+                CassandraSession::get(true).inspect(|session| {
+                    session.caches().assets_ada().clear_cache();
+                    session.caches().assets_native().clear_cache();
+                });
 
                 // Purge data up to this slot
                 // Slots arithmetic has saturating semantic, so this is ok.

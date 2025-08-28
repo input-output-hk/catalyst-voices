@@ -7,10 +7,11 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-typedef SearchCallback = void Function({
-  required String searchValue,
-  required bool isSubmitted,
-});
+typedef SearchCallback =
+    void Function({
+      required String searchValue,
+      required bool isSubmitted,
+    });
 
 class SearchTextField extends StatefulWidget {
   final String hintText;

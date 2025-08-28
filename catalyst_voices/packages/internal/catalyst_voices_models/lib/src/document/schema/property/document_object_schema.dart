@@ -149,8 +149,8 @@ sealed class DocumentObjectSchema extends DocumentPropertySchema {
     required this.oneOf,
     required this.order,
   }) : super(
-          type: DocumentPropertyType.object,
-        );
+         type: DocumentPropertyType.object,
+       );
 
   @override
   @mustCallSuper
@@ -384,11 +384,13 @@ final class DocumentSingleGroupedTagSelectorSchema extends DocumentObjectSchema 
       'the schema to which the property belongs',
     );
 
-    final groupProperty = property.getPropertyWithSchemaType<DocumentTagGroupSchema>()
-        as DocumentValueProperty<String>?;
+    final groupProperty =
+        property.getPropertyWithSchemaType<DocumentTagGroupSchema>()
+            as DocumentValueProperty<String>?;
 
-    final tagProperty = property.getPropertyWithSchemaType<DocumentTagSelectionSchema>()
-        as DocumentValueProperty<String>?;
+    final tagProperty =
+        property.getPropertyWithSchemaType<DocumentTagSelectionSchema>()
+            as DocumentValueProperty<String>?;
 
     final group = groupProperty?.value;
     final tag = tagProperty?.value;
@@ -405,11 +407,13 @@ final class DocumentSingleGroupedTagSelectorSchema extends DocumentObjectSchema 
 
   @override
   DocumentValidationResult validate(List<DocumentProperty> properties) {
-    final groupProperty = properties.firstWhereOrNull((e) => e.schema is DocumentTagGroupSchema)
-        as DocumentValueProperty<String>?;
+    final groupProperty =
+        properties.firstWhereOrNull((e) => e.schema is DocumentTagGroupSchema)
+            as DocumentValueProperty<String>?;
 
-    final tagProperty = properties.firstWhereOrNull((e) => e.schema is DocumentTagSelectionSchema)
-        as DocumentValueProperty<String>?;
+    final tagProperty =
+        properties.firstWhereOrNull((e) => e.schema is DocumentTagSelectionSchema)
+            as DocumentValueProperty<String>?;
 
     return validateGroupedTagsSelection(
       GroupedTagsSelection(

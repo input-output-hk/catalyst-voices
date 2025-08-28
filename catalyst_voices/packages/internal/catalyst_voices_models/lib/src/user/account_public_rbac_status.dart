@@ -1,7 +1,1 @@
-enum AccountPublicRbacStatus {
-  initialized,
-  notFound,
-  volatile,
-  persistent,
-  unknown;
-}
+enum AccountPublicRbacStatus { initialized, notFound, volatile, persistent, unknown }

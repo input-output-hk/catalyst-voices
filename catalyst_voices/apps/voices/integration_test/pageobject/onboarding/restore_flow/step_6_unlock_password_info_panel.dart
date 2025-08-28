@@ -6,25 +6,19 @@ import '../onboarding_base_page.dart';
 import 'step_5_restore_keychain_success_panel.dart';
 
 class UnlockPasswordInfoPanel extends OnboardingPageBase {
-  UnlockPasswordInfoPanel(super.$);
-
   final unlockPasswordInfoTitle = const Key('UnlockPasswordInfoTitle');
-  final unlockPasswordInfoSubtitle = const Key('UnlockPasswordInfoSubtitle');
 
-  @override
-  Future<void> goto() async {
-    await RestoreKeychainSuccessPanel($).goto();
-    await RestoreKeychainSuccessPanel($).clickSetUnlockPassword();
-  }
+  final unlockPasswordInfoSubtitle = const Key('UnlockPasswordInfoSubtitle');
+  UnlockPasswordInfoPanel(super.$);
 
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }
 
   @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
+  Future<void> goto() async {
+    await RestoreKeychainSuccessPanel($).goto();
+    await RestoreKeychainSuccessPanel($).clickSetUnlockPassword();
   }
 
   Future<void> verifyDetailsPanel() async {
@@ -45,5 +39,11 @@ class UnlockPasswordInfoPanel extends OnboardingPageBase {
     );
     expect($(pictureContainer).$(IconTheme), findsOneWidget);
     expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
+  }
+
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }

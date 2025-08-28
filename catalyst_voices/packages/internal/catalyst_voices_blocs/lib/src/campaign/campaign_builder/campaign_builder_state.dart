@@ -13,6 +13,9 @@ final class CampaignBuilderState extends Equatable {
     this.endDate,
   });
 
+  @override
+  List<Object?> get props => [isLoading, publish, startDate, endDate];
+
   CampaignBuilderState copyWith({
     bool? isLoading,
     Optional<CampaignPublish>? publish,
@@ -26,7 +29,4 @@ final class CampaignBuilderState extends Equatable {
       endDate: endDate.dataOr(this.endDate),
     );
   }
-
-  @override
-  List<Object?> get props => [isLoading, publish, startDate, endDate];
 }

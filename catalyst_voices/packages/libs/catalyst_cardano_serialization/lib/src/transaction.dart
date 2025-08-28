@@ -289,21 +289,21 @@ final class TransactionBody extends Equatable implements CborEncodable {
 
   @override
   List<Object?> get props => [
-        inputs,
-        outputs,
-        fee,
-        ttl,
-        auxiliaryDataHash,
-        validityStart,
-        mint,
-        scriptDataHash,
-        collateralInputs,
-        requiredSigners,
-        networkId,
-        collateralReturn,
-        totalCollateral,
-        referenceInputs,
-      ];
+    inputs,
+    outputs,
+    fee,
+    ttl,
+    auxiliaryDataHash,
+    validityStart,
+    mint,
+    scriptDataHash,
+    collateralInputs,
+    requiredSigners,
+    networkId,
+    collateralReturn,
+    totalCollateral,
+    referenceInputs,
+  ];
 
   /// Serializes the type as cbor.
   @override

@@ -85,8 +85,8 @@ class _WordCell extends StatelessWidget {
   });
 
   Set<WidgetState> get states => {
-        if (isSelected) WidgetState.selected,
-      };
+    if (isSelected) WidgetState.selected,
+  };
 
   @override
   Widget build(BuildContext context) {

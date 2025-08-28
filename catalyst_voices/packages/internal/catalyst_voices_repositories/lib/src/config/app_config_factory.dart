@@ -65,9 +65,7 @@ final class AppConfigFactory {
         tracesSampleRate: remote.sentry?.tracesSampleRate,
         profilesSampleRate: remote.sentry?.profilesSampleRate,
         enableAutoSessionTracking: remote.sentry?.enableAutoSessionTracking,
-        attachScreenshot: remote.sentry?.attachScreenshot,
         attachViewHierarchy: remote.sentry?.attachViewHierarchy,
-        debug: remote.sentry?.debug,
         diagnosticLevel: remote.sentry?.diagnosticLevel,
       ),
       blockchain: defaultEnvConfig.blockchain.copyWith(

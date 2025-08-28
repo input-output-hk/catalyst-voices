@@ -2,8 +2,6 @@ import 'package:catalyst_voices_repositories/src/storage/secure_storage.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-const _key = 'Testing';
-
 void main() {
   late final FlutterSecureStorage flutterSecureStorage;
   late final SecureStorage secureStorage;
@@ -82,6 +80,8 @@ void main() {
     expect(values, everyElement(isNull));
   });
 }
+
+const _key = 'Testing';
 
 final class _TestSecureStorage extends SecureStorage {
   _TestSecureStorage({

@@ -13,9 +13,9 @@ final class ProposalTemplate extends Equatable {
 
   @override
   List<Object?> get props => [
-        metadata,
-        schema,
-      ];
+    metadata,
+    schema,
+  ];
 }
 
 final class ProposalTemplateMetadata extends DocumentMetadata {

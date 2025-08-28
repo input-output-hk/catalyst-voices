@@ -67,13 +67,13 @@ final class TieredFee extends Equatable {
 
   @override
   List<Object?> get props => [
-        constant,
-        coefficient,
-        multiplier,
-        sizeIncrement,
-        refScriptByteCost,
-        maxRefScriptSize,
-      ];
+    constant,
+    coefficient,
+    multiplier,
+    sizeIncrement,
+    refScriptByteCost,
+    maxRefScriptSize,
+  ];
 
   /// Creates copy of this config with updated parameters.
   TieredFee copyWith({

@@ -20,6 +20,15 @@ final class SeedPhraseStateData extends Equatable {
 
   bool get isResetWordsEnabled => userWords.isNotEmpty;
 
+  @override
+  List<Object?> get props => [
+    seedPhraseWords,
+    shuffledWords,
+    userWords,
+    isStoredConfirmed,
+    areUserWordsCorrect,
+  ];
+
   SeedPhraseStateData copyWith({
     List<SeedPhraseWord>? seedPhraseWords,
     List<SeedPhraseWord>? shuffledWords,
@@ -35,13 +44,4 @@ final class SeedPhraseStateData extends Equatable {
       areUserWordsCorrect: areUserWordsCorrect ?? this.areUserWordsCorrect,
     );
   }
-
-  @override
-  List<Object?> get props => [
-        seedPhraseWords,
-        shuffledWords,
-        userWords,
-        isStoredConfirmed,
-        areUserWordsCorrect,
-      ];
 }

@@ -17,8 +17,8 @@ final class WalletConnectionData extends Equatable {
 
   @override
   List<Object?> get props => [
-        name,
-        icon,
-        isConnected,
-      ];
+    name,
+    icon,
+    isConnected,
+  ];
 }

@@ -12,7 +12,7 @@ final class PageRequest extends Equatable {
 
   @override
   List<Object?> get props => [
-        page,
-        size,
-      ];
+    page,
+    size,
+  ];
 }

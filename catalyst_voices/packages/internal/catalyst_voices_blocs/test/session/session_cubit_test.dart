@@ -141,8 +141,7 @@ void main() {
       );
     });
 
-    test(
-        'when no keychain is found but there is a registration progress '
+    test('when no keychain is found but there is a registration progress '
         'session is in Visitor state with correct flag', () async {
       // Given
       final keychainProgress = KeychainProgress(

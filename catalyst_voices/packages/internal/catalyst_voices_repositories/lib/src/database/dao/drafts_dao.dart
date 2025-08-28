@@ -240,9 +240,9 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
     query.orderBy([
       (t) => OrderingTerm(
-            expression: t.verHi,
-            mode: OrderingMode.desc,
-          ),
+        expression: t.verHi,
+        mode: OrderingMode.desc,
+      ),
     ]);
 
     if (limit != null) {

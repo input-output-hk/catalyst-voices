@@ -34,9 +34,10 @@ final class ProposalsDropdownOrderItem extends Equatable {
       Alphabetical() => context.l10n.orderProposalsAlphabetical,
       Budget(:final isAscending) =>
         isAscending ? context.l10n.orderProposalsBudgetAsc : context.l10n.orderProposalsBudgetDesc,
-      UpdateDate(:final isAscending) => isAscending
-          ? context.l10n.orderProposalsUpdateDateAsc
-          : context.l10n.orderProposalsUpdateDateDesc,
+      UpdateDate(:final isAscending) =>
+        isAscending
+            ? context.l10n.orderProposalsUpdateDateAsc
+            : context.l10n.orderProposalsUpdateDateDesc,
     };
   }
 }

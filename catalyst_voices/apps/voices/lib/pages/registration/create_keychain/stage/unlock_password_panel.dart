@@ -56,11 +56,8 @@ class _BlocUnlockPasswordForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocUnlockPasswordSelector<
-        ({
-          bool showError,
-          PasswordStrength passwordStrength,
-          bool showPasswordStrength,
-        })>(
+      ({bool showError, PasswordStrength passwordStrength, bool showPasswordStrength})
+    >(
       stateSelector: (state) => state.keychainStateData.unlockPasswordState,
       selector: (state) {
         return (
@@ -123,8 +120,9 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
   void initState() {
     super.initState();
 
-    final unlockPasswordState =
-        RegistrationCubit.of(context).state.keychainStateData.unlockPasswordState;
+    final unlockPasswordState = RegistrationCubit.of(
+      context,
+    ).state.keychainStateData.unlockPasswordState;
 
     final password = unlockPasswordState.password.value;
     final confirmPassword = unlockPasswordState.confirmPassword.value;

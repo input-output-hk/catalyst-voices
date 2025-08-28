@@ -2,7 +2,6 @@ import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/pages/registration/widgets/next_step.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_details_panel_scaffold.dart';
 import 'package:catalyst_voices/routes/routing/account_route.dart';
-import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -42,12 +41,7 @@ class AccountCompletedPanel extends StatelessWidget {
         children: [
           const _NextStep(),
           const SizedBox(height: 10),
-          _OpenDiscoveryButton(
-            onTap: () {
-              Navigator.pop(context);
-              const DiscoveryRoute().go(context);
-            },
-          ),
+          _OpenSpaceButton(onTap: () => Navigator.pop(context)),
           const SizedBox(height: 10),
           _ReviewMyAccountButton(
             onTap: () {
@@ -84,10 +78,10 @@ class _NextStep extends StatelessWidget {
   }
 }
 
-class _OpenDiscoveryButton extends StatelessWidget {
+class _OpenSpaceButton extends StatelessWidget {
   final VoidCallback onTap;
 
-  const _OpenDiscoveryButton({
+  const _OpenSpaceButton({
     required this.onTap,
   });
 
@@ -95,7 +89,7 @@ class _OpenDiscoveryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       onTap: onTap,
-      child: Text(context.l10n.registrationCompletedDiscoveryButton),
+      child: Text(context.l10n.registrationCompletedButton),
     );
   }
 }
@@ -126,46 +120,47 @@ class _RolesFooter extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        ...roles.map(
-          (role) => Row(
-            children: [
-              Text(
-                '1x',
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: VoicesChip(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 1,
-                    horizontal: 6,
-                  ),
-                  content: Text(
-                    role.getName(context),
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colors.successContainer,
-                          fontWeight: FontWeight.bold,
+      children:
+          <Widget>[
+                ...roles.map(
+                  (role) => Row(
+                    children: [
+                      Text(
+                        '1x',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: VoicesChip(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 1,
+                            horizontal: 6,
+                          ),
+                          content: Text(
+                            role.getName(context),
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colors.successContainer,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(6),
+                          ),
+                          backgroundColor: Theme.of(context).colors.success,
                         ),
+                      ),
+                      Text(
+                        context.l10n.registrationCompletedRoleRegistration,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
                   ),
-                  borderRadius: const BorderRadius.all(
-                    Radius.circular(6),
-                  ),
-                  backgroundColor: Theme.of(context).colors.success,
                 ),
-              ),
-              Text(
-                context.l10n.registrationCompletedRoleRegistration,
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            ],
-          ),
-        ),
-      ]
-          .separatedBy(
-            const SizedBox(height: 6),
-          )
-          .toList(),
+              ]
+              .separatedBy(
+                const SizedBox(height: 6),
+              )
+              .toList(),
     );
   }
 }

@@ -14,11 +14,11 @@ final class SyncStatsLocalStorage extends LocalStorage implements SyncStatsStora
   SyncStatsLocalStorage({
     required super.sharedPreferences,
   }) : super(
-          key: _key,
-          allowList: {
-            _dataKey,
-          },
-        );
+         key: _key,
+         allowList: {
+           _dataKey,
+         },
+       );
 
   @override
   Future<void> dispose() async {

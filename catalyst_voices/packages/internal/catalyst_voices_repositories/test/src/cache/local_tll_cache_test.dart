@@ -77,8 +77,7 @@ void main() {
       expect(cachedValue, '$value');
     });
 
-    test(
-        'is about to expire returns true when is still valid '
+    test('is about to expire returns true when is still valid '
         'but in tolerance duration', () async {
       // Given
       final cache = LocalTllCache(sharedPreferences: sharedPreferences);

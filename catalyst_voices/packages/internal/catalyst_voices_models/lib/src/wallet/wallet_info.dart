@@ -24,8 +24,8 @@ final class WalletInfo extends Equatable {
 
   @override
   List<Object?> get props => [
-        metadata,
-        balance.value,
-        address,
-      ];
+    metadata,
+    balance.value,
+    address,
+  ];
 }

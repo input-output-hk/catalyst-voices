@@ -108,7 +108,7 @@ class _ProposalMetadata extends StatelessWidget {
   final String title;
   final String? author;
   final DateTime? createdAt;
-  final int commentsCount;
+  final int? commentsCount;
 
   const _ProposalMetadata({
     required this.title,
@@ -122,10 +122,12 @@ class _ProposalMetadata extends StatelessWidget {
     final textTheme = context.textTheme;
     final colors = context.colors;
 
-    final titleTextStyle =
-        (textTheme.titleMedium ?? const TextStyle()).copyWith(color: colors.textOnPrimaryLevel0);
-    final subtitleTextStyle =
-        (textTheme.bodyMedium ?? const TextStyle()).copyWith(color: colors.textOnPrimaryLevel1);
+    final titleTextStyle = (textTheme.titleMedium ?? const TextStyle()).copyWith(
+      color: colors.textOnPrimaryLevel0,
+    );
+    final subtitleTextStyle = (textTheme.bodyMedium ?? const TextStyle()).copyWith(
+      color: colors.textOnPrimaryLevel1,
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -142,8 +144,9 @@ class _ProposalMetadata extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               UsernameText(author),
-              if (createdAt != null) TimestampText(createdAt!),
-              Text(context.l10n.noOfComments(commentsCount)),
+              if (createdAt case final createdAt?) TimestampText(createdAt),
+              if (commentsCount case final commentsCount?)
+                Text(context.l10n.noOfComments(commentsCount)),
             ].separatedBy(const DotSeparator()).toList(),
           ),
         ),

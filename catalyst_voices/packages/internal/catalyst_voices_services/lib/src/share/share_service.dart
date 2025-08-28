@@ -49,8 +49,7 @@ final class ShareServiceImpl implements ShareService {
       ShareChannel.xTwitter ||
       ShareChannel.linkedin ||
       ShareChannel.facebook ||
-      ShareChannel.reddit when kIsWeb =>
-        const LaunchShareStrategy(),
+      ShareChannel.reddit when kIsWeb => const LaunchShareStrategy(),
       _ => throw UnimplementedError('Platform share is not implemented'),
     };
   }

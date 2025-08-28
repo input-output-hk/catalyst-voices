@@ -12,18 +12,18 @@ import 'package:equatable/equatable.dart';
 /// and call [enable] after the user decides with which wallet they want
 /// to interact.
 abstract interface class CardanoWallet {
-  /// A name for the wallet which can be used inside of the dApp
-  /// for the purpose of asking the user which wallet they would like
-  /// to connect with.
-  String get name;
+  /// The version number of the API that the wallet supports.
+  String? get apiVersion;
 
   /// A URI image (e.g. data URI base64 or other) for img src for the wallet
   /// which can be used inside of the dApp for the purpose of asking the user
   /// which wallet they would like to connect with.
   String get icon;
 
-  /// The version number of the API that the wallet supports.
-  String? get apiVersion;
+  /// A name for the wallet which can be used inside of the dApp
+  /// for the purpose of asking the user which wallet they would like
+  /// to connect with.
+  String get name;
 
   /// A list of extensions supported by the wallet.
   ///
@@ -33,15 +33,6 @@ abstract interface class CardanoWallet {
   /// Yet it informs on what extensions are known and can be
   /// requested by dApps if needed.
   List<CipExtension> get supportedExtensions;
-
-  /// Returns true if the dApp is already connected to the user's wallet,
-  /// or if requesting access would return true without user confirmation
-  /// (e.g. the dApp is whitelisted), and false otherwise.
-  ///
-  /// If this function returns true, then any subsequent calls to
-  /// wallet.enable() during the current session should succeed
-  /// and return the API object.
-  Future<bool> isEnabled();
 
   /// This is the entrypoint to start communication with the user's wallet.
   ///
@@ -54,6 +45,15 @@ abstract interface class CardanoWallet {
   /// this function should not request access a second time, and instead just
   /// return the API object.
   Future<CardanoWalletApi> enable({List<CipExtension>? extensions});
+
+  /// Returns true if the dApp is already connected to the user's wallet,
+  /// or if requesting access would return true without user confirmation
+  /// (e.g. the dApp is whitelisted), and false otherwise.
+  ///
+  /// If this function returns true, then any subsequent calls to
+  /// wallet.enable() during the current session should succeed
+  /// and return the API object.
+  Future<bool> isEnabled();
 }
 
 /// The full API of enabled wallet extension.
@@ -72,6 +72,13 @@ abstract interface class CardanoWalletApi {
   /// in the API as well.
   Future<Balance> getBalance();
 
+  /// Returns an address owned by the wallet that should be used
+  /// as a change address to return leftover assets during transaction
+  /// creation back to the connected wallet.
+  ///
+  /// This can be used as a generic receive address as well.
+  Future<ShelleyAddress> getChangeAddress();
+
   /// Retrieves the list of extensions enabled by the wallet.
   ///
   /// This may be influenced by the set of extensions requested
@@ -86,13 +93,6 @@ abstract interface class CardanoWalletApi {
   /// Those other network ID values are not governed by this document.
   /// This result will stay the same unless the connected account has changed.
   Future<NetworkId> getNetworkId();
-
-  /// Returns an address owned by the wallet that should be used
-  /// as a change address to return leftover assets during transaction
-  /// creation back to the connected wallet.
-  ///
-  /// This can be used as a generic receive address as well.
-  Future<ShelleyAddress> getChangeAddress();
 
   /// Returns the reward addresses owned by the wallet.
   ///
@@ -221,6 +221,24 @@ final class CipExtension extends Equatable {
   List<Object?> get props => [cip];
 }
 
+/// The data signature as returned by CIP-30 signData.
+final class DataSignature extends Equatable {
+  /// The public key.
+  final String key;
+
+  /// The signature.
+  final String signature;
+
+  /// The default constructor for [DataSignature].
+  const DataSignature({
+    required this.key,
+    required this.signature,
+  });
+
+  @override
+  List<Object?> get props => [key, signature];
+}
+
 /// Defines the pagination constraints when querying data.
 ///
 /// Instead of fetching the whole data-set at once,
@@ -242,22 +260,4 @@ final class Paginate extends Equatable {
 
   @override
   List<Object?> get props => [page, limit];
-}
-
-/// The data signature as returned by CIP-30 signData.
-final class DataSignature extends Equatable {
-  /// The public key.
-  final String key;
-
-  /// The signature.
-  final String signature;
-
-  /// The default constructor for [DataSignature].
-  const DataSignature({
-    required this.key,
-    required this.signature,
-  });
-
-  @override
-  List<Object?> get props => [key, signature];
 }

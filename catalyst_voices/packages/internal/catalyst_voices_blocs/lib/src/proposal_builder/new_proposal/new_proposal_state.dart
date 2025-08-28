@@ -38,16 +38,16 @@ class NewProposalState extends Equatable {
 
   @override
   List<Object?> get props => [
-        isLoading,
-        isCreatingProposal,
-        isAgreeToCategoryCriteria,
-        isAgreeToNoFurtherCategoryChange,
-        step,
-        title,
-        titleLengthRange,
-        categoryRef,
-        categories,
-      ];
+    isLoading,
+    isCreatingProposal,
+    isAgreeToCategoryCriteria,
+    isAgreeToNoFurtherCategoryChange,
+    step,
+    title,
+    titleLengthRange,
+    categoryRef,
+    categories,
+  ];
   String? get selectedCategoryName =>
       categories.firstWhereOrNull((e) => e.id == categoryRef)?.formattedName;
 

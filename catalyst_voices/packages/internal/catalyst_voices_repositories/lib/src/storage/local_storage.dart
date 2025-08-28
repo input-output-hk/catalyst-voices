@@ -19,7 +19,8 @@ base class LocalStorage with StorageAsStringMixin implements Storage {
 
   @override
   Future<void> clear() async {
-    final keysToRemove = allowList?.map(_effectiveKey).toSet() ??
+    final keysToRemove =
+        allowList?.map(_effectiveKey).toSet() ??
         await () async {
           final keys = await _sharedPreferences.getKeys();
           return keys.where((element) => element.startsWith(key)).toSet();

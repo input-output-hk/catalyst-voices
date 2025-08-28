@@ -13,8 +13,8 @@ final class Profile extends Equatable {
 
   @override
   List<Object?> get props => [
-        catalystId,
-      ];
+    catalystId,
+  ];
 
   String? get username => catalystId.username;
 }

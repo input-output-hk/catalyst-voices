@@ -1,10 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 
-typedef RoleCredentialsCallback<T> = Future<T> Function(
-  CatalystId catalystId,
-  CatalystPrivateKey privateKey,
-);
+typedef RoleCredentialsCallback<T> =
+    Future<T> Function(
+      CatalystId catalystId,
+      CatalystPrivateKey privateKey,
+    );
 
 final class AccountSignerService implements SignerService {
   final UserService _userService;

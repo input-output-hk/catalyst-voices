@@ -14,10 +14,10 @@ final class User extends Equatable {
   });
 
   const User.empty()
-      : this(
-          accounts: const [],
-          settings: const UserSettings(),
-        );
+    : this(
+        accounts: const [],
+        settings: const UserSettings(),
+      );
 
   @visibleForTesting
   const User.optional({
@@ -31,9 +31,9 @@ final class User extends Equatable {
 
   @override
   List<Object?> get props => [
-        accounts,
-        settings,
-      ];
+    accounts,
+    settings,
+  ];
 
   User addAccount(Account account) {
     final accounts = [...this.accounts, account];
@@ -96,9 +96,9 @@ final class User extends Equatable {
       throw ArgumentError('Account[$id] is not on the list');
     }
 
-    final accounts = [...this.accounts]
-        .map((account) => account.copyWith(isActive: id.isReferringTo(account)))
-        .toList();
+    final accounts = [
+      ...this.accounts,
+    ].map((account) => account.copyWith(isActive: id.isReferringTo(account))).toList();
 
     return copyWith(accounts: accounts);
   }

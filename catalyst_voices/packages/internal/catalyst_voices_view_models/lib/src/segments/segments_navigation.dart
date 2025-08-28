@@ -23,11 +23,11 @@ abstract base class BaseSection extends Equatable implements Section {
   @override
   @mustCallSuper
   List<Object?> get props => [
-        id,
-        isEnabled,
-        isEditable,
-        hasError,
-      ];
+    id,
+    isEnabled,
+    isEditable,
+    hasError,
+  ];
 }
 
 abstract base class BaseSegment<T extends Section> extends Equatable implements Segment {

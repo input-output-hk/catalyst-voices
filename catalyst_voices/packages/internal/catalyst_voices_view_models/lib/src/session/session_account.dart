@@ -38,11 +38,11 @@ final class SessionAccount extends Equatable {
 
   @override
   List<Object?> get props => [
-        catalystId,
-        isAdmin,
-        isProposer,
-        isDrep,
-      ];
+    catalystId,
+    isAdmin,
+    isProposer,
+    isDrep,
+  ];
 
   String? get username => catalystId?.username;
 }

@@ -71,16 +71,15 @@ enum DocumentType {
 
   /// Finds biggest [baseTypes] priority or 0.
   int get priority => baseTypes.fold(
-        0,
-        (previousValue, element) => math.max(previousValue, element.priority),
-      );
+    0,
+    (previousValue, element) => math.max(previousValue, element.priority),
+  );
 
   DocumentType? get template {
     return switch (this) {
       // proposal
       DocumentType.proposalDocument ||
-      DocumentType.proposalTemplate =>
-        DocumentType.proposalTemplate,
+      DocumentType.proposalTemplate => DocumentType.proposalTemplate,
 
       // comment
       DocumentType.commentDocument || DocumentType.commentTemplate => DocumentType.commentTemplate,
@@ -90,18 +89,15 @@ enum DocumentType {
 
       // category
       DocumentType.categoryParametersDocument ||
-      DocumentType.categoryParametersTemplate =>
-        DocumentType.categoryParametersTemplate,
+      DocumentType.categoryParametersTemplate => DocumentType.categoryParametersTemplate,
 
       // campaign
       DocumentType.campaignParametersDocument ||
-      DocumentType.campaignParametersTemplate =>
-        DocumentType.campaignParametersTemplate,
+      DocumentType.campaignParametersTemplate => DocumentType.campaignParametersTemplate,
 
       // brand
       DocumentType.brandParametersDocument ||
-      DocumentType.brandParametersTemplate =>
-        DocumentType.brandParametersTemplate,
+      DocumentType.brandParametersTemplate => DocumentType.brandParametersTemplate,
 
       // other
       DocumentType.proposalActionDocument || DocumentType.unknown => null,

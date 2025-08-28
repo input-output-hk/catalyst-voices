@@ -11,9 +11,9 @@ final class AppInfo extends Equatable {
 
   @override
   List<Object?> get props => [
-        version,
-        buildNumber,
-      ];
+    version,
+    buildNumber,
+  ];
 
   AppInfo copyWith({
     String? version,

@@ -8,15 +8,6 @@ import 'package:collection/collection.dart';
 import 'util.dart';
 
 class Target {
-  Target({
-    required this.rust,
-    this.flutter,
-    this.android,
-    this.androidMinSdkVersion,
-    this.darwinPlatform,
-    this.darwinArch,
-  });
-
   static final all = [
     Target(
       rust: 'armv7-linux-androideabi',
@@ -42,18 +33,9 @@ class Target {
       android: 'x86_64',
       androidMinSdkVersion: 21,
     ),
-    Target(
-      rust: 'x86_64-pc-windows-msvc',
-      flutter: 'windows-x64',
-    ),
-    Target(
-      rust: 'x86_64-unknown-linux-gnu',
-      flutter: 'linux-x64',
-    ),
-    Target(
-      rust: 'aarch64-unknown-linux-gnu',
-      flutter: 'linux-arm64',
-    ),
+    Target(rust: 'x86_64-pc-windows-msvc', flutter: 'windows-x64'),
+    Target(rust: 'x86_64-unknown-linux-gnu', flutter: 'linux-x64'),
+    Target(rust: 'aarch64-unknown-linux-gnu', flutter: 'linux-arm64'),
     Target(
       rust: 'x86_64-apple-darwin',
       darwinPlatform: 'macosx',
@@ -81,21 +63,30 @@ class Target {
     ),
   ];
 
-  static Target? forFlutterName(String flutterName) {
-    return all.firstWhereOrNull((element) => element.flutter == flutterName);
-  }
+  final String? flutter;
 
-  static Target? forDarwin({
-    required String platformName,
-    required String darwinAarch,
-  }) {
-    return all.firstWhereOrNull((element) => //
-        element.darwinPlatform == platformName &&
-        element.darwinArch == darwinAarch);
-  }
+  final String rust;
 
-  static Target? forRustTriple(String triple) {
-    return all.firstWhereOrNull((element) => element.rust == triple);
+  final String? android;
+
+  final int? androidMinSdkVersion;
+
+  final String? darwinPlatform;
+
+  final String? darwinArch;
+
+  Target({
+    required this.rust,
+    this.flutter,
+    this.android,
+    this.androidMinSdkVersion,
+    this.darwinPlatform,
+    this.darwinArch,
+  });
+
+  @override
+  String toString() {
+    return rust;
   }
 
   static List<Target> androidTargets() {
@@ -116,25 +107,34 @@ class Target {
         return [Target.forRustTriple('x86_64-unknown-linux-gnu')!];
       }
     }
-    return all.where((target) {
-      if (Platform.isWindows) {
-        return target.rust.contains('-windows-');
-      } else if (Platform.isMacOS) {
-        return target.darwinPlatform != null;
-      }
-      return false;
-    }).toList(growable: false);
+    return all
+        .where((target) {
+          if (Platform.isWindows) {
+            return target.rust.contains('-windows-');
+          } else if (Platform.isMacOS) {
+            return target.darwinPlatform != null;
+          }
+          return false;
+        })
+        .toList(growable: false);
   }
 
-  @override
-  String toString() {
-    return rust;
+  static Target? forDarwin({
+    required String platformName,
+    required String darwinAarch,
+  }) {
+    return all.firstWhereOrNull(
+      (element) => //
+          element.darwinPlatform == platformName &&
+          element.darwinArch == darwinAarch,
+    );
   }
 
-  final String? flutter;
-  final String rust;
-  final String? android;
-  final int? androidMinSdkVersion;
-  final String? darwinPlatform;
-  final String? darwinArch;
+  static Target? forFlutterName(String flutterName) {
+    return all.firstWhereOrNull((element) => element.flutter == flutterName);
+  }
+
+  static Target? forRustTriple(String triple) {
+    return all.firstWhereOrNull((element) => element.rust == triple);
+  }
 }

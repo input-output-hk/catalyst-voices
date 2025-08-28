@@ -18,19 +18,6 @@ class CampaignBuilderCubit extends Cubit<CampaignBuilderState> {
     );
   }
 
-  void updateCampaignPublish(CampaignPublish publish) {
-    emit(state.copyWith(isLoading: true));
-
-    // TODO(LynxLynxx): call backend to update campaign status
-
-    emit(
-      state.copyWith(
-        isLoading: false,
-        publish: Optional(publish),
-      ),
-    );
-  }
-
   void updateCampaignDates({
     required DateTime? startDate,
     required DateTime? endDate,
@@ -44,6 +31,19 @@ class CampaignBuilderCubit extends Cubit<CampaignBuilderState> {
         isLoading: false,
         startDate: Optional(startDate),
         endDate: Optional(endDate),
+      ),
+    );
+  }
+
+  void updateCampaignPublish(CampaignPublish publish) {
+    emit(state.copyWith(isLoading: true));
+
+    // TODO(LynxLynxx): call backend to update campaign status
+
+    emit(
+      state.copyWith(
+        isLoading: false,
+        publish: Optional(publish),
       ),
     );
   }

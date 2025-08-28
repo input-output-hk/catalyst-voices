@@ -82,13 +82,16 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       accountPublicStatus: Optional(activeAccount?.publicStatus),
     );
 
-    _activeAccountSub =
-        _userService.watchUser.map((event) => event.activeAccount).distinct().listen(
-              (value) => add(RebuildActiveAccountProposalEvent(account: value)),
-            );
+    _activeAccountSub = _userService.watchUser
+        .map((event) => event.activeAccount)
+        .distinct()
+        .listen(
+          (value) => add(RebuildActiveAccountProposalEvent(account: value)),
+        );
 
-    _isMaxProposalsLimitReachedSub =
-        _proposalService.watchMaxProposalsLimitReached().listen((event) {
+    _isMaxProposalsLimitReachedSub = _proposalService.watchMaxProposalsLimitReached().listen((
+      event,
+    ) {
       add(MaxProposalsLimitChangedEvent(isLimitReached: event));
     });
   }
@@ -315,8 +318,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     final guidance = property.schema.guidance;
     final milestoneListWildcard = ProposalDocument.milestoneListChildNodeId;
-    final sectionTitle =
-        property.schema.nodeId.matchesPattern(milestoneListWildcard) ? '' : property.schema.title;
+    final sectionTitle = property.schema.nodeId.matchesPattern(milestoneListWildcard)
+        ? ''
+        : property.schema.title;
     if (guidance != null) {
       yield ProposalGuidanceItem(
         segmentTitle: segment.schema.title,
@@ -386,10 +390,13 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   }
 
   Future<DateTime?> _getProposalSubmissionCloseDate() async {
-    final timeline = await _campaignService.getCampaignTimeline();
-    return timeline
+    final campaign = await _campaignService.getActiveCampaign();
+    if (campaign == null) {
+      return null;
+    }
+    return campaign.timeline.phases
         .firstWhereOrNull(
-          (e) => e.stage == CampaignTimelineStage.proposalSubmission,
+          (e) => e.type == CampaignPhaseType.proposalSubmission,
         )
         ?.timeline
         .to;
@@ -454,8 +461,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     _logger.info('Loading default proposal category');
 
     await _loadState(emit, () async {
-      final categories = await _campaignService.getCampaignCategories();
-      final category = categories.first;
+      final campaign = await _campaignService.getActiveCampaign();
+      if (campaign == null) {
+        throw StateError('Cannot load proposal, active campaign not found');
+      }
+      final category = campaign.categories.first;
       final templateRef = category.proposalTemplateRef;
 
       final proposalTemplate = await _proposalService.getProposalTemplate(
@@ -490,23 +500,26 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     }
 
     await _loadState(emit, () async {
-      final proposalData = await _proposalService.getProposal(
+      final proposalData = await _proposalService.getProposalDetail(
         ref: proposalRef,
       );
-
-      final proposal = Proposal.fromData(proposalData);
+      final versionsIds = proposalData.versions
+          .map((e) => e.selfRef.version)
+          .whereType<String>()
+          .toList();
+      final proposal = Proposal.fromData(proposalData, versionsIds);
 
       if (proposalData.publish.isPublished) {
         emitSignal(
           UnlockProposalSignal(
             title: proposal.title,
-            version: proposal.versionCount,
+            version: proposal.versionNumber,
           ),
         );
       }
 
       final versions = proposalData.versions.mapIndexed((index, version) {
-        final versionRef = version.document.metadata.selfRef;
+        final versionRef = version.selfRef;
         final versionId = versionRef.version ?? versionRef.id;
         return DocumentVersion(
           id: versionId,
@@ -522,8 +535,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       if (firstVersion && proposalData.publish.isLocal && notVerifiedAccount) {
         emitSignal(const NewProposalAndEmailNotVerifiedSignal());
       }
-      final categoryId = proposalData.categoryId;
-      final category = await _campaignService.getCategory(categoryId);
+      final categoryRef = proposal.categoryRef;
+      final category = await _campaignService.getCategory(categoryRef);
 
       return _cacheAndCreateState(
         proposalDocument: proposalData.document.document,
@@ -532,8 +545,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           publish: proposal.publish,
           documentRef: proposal.selfRef,
           originalDocumentRef: proposal.selfRef,
-          templateRef: proposalData.templateRef,
-          categoryId: categoryId,
+          templateRef: proposalData.document.metadata.templateRef,
+          categoryId: categoryRef,
           versions: versions,
         ),
         category: category,
@@ -886,8 +899,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
       // if it's local draft and the first version then
       // it should be shown as local which corresponds to null
-      final currentIteration =
-          _isLocal(state.metadata.publish, nextIteration) ? null : nextIteration - 1;
+      final currentIteration = _isLocal(state.metadata.publish, nextIteration)
+          ? null
+          : nextIteration - 1;
 
       emitSignal(
         ShowPublishConfirmationSignal(

@@ -1,9 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:bloc_test/bloc_test.dart';
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -17,12 +19,14 @@ void main() {
     late WorkspaceBloc workspaceBloc;
 
     final proposalRef = SignedDocumentRef.generateFirstRef();
+    final categoryRef = SignedDocumentRef.generateFirstRef();
+
     final documentData = DocumentData(
       metadata: DocumentDataMetadata(
         type: DocumentType.proposalDocument,
         selfRef: proposalRef,
         template: SignedDocumentRef.generateFirstRef(),
-        categoryId: SignedDocumentRef.generateFirstRef(),
+        categoryId: categoryRef,
       ),
       content: const DocumentDataContent({}),
     );
@@ -56,10 +60,47 @@ void main() {
 
     blocTest<WorkspaceBloc, WorkspaceState>(
       'emit loading state and loaded state when watching proposals succeeds',
+      setUp: () async {
+        when(() => mockCampaignService.getActiveCampaign()).thenAnswer(
+          (_) async => Campaign(
+            selfRef: SignedDocumentRef.generateFirstRef(),
+            name: 'Catalyst Fund14',
+            description: 'Description',
+            allFunds: const Coin.fromWholeAda(20000000),
+            totalAsk: const Coin.fromWholeAda(0),
+            fundNumber: 14,
+            timeline: const CampaignTimeline(phases: []),
+            publish: CampaignPublish.published,
+            categories: [
+              CampaignCategory(
+                selfRef: categoryRef,
+                proposalTemplateRef: SignedDocumentRef.generateFirstRef(),
+                campaignRef: SignedDocumentRef.generateFirstRef(),
+                categoryName: 'Test Category',
+                categorySubname: 'Test Subname',
+                description: 'Test description',
+                shortDescription: 'Test short description',
+                proposalsCount: 0,
+                availableFunds: const Coin.fromWholeAda(1000),
+                imageUrl: '',
+                totalAsk: const Coin(0),
+                range: const ComparableRange(
+                  min: Coin.fromWholeAda(10),
+                  max: Coin.fromWholeAda(100),
+                ),
+                descriptions: const [],
+                dos: const [],
+                donts: const [],
+                submissionCloseDate: DateTime(2024, 12, 31),
+              ),
+            ],
+          ),
+        );
+      },
       build: () {
         when(() => mockProposalService.watchUserProposals()).thenAnswer(
           (_) => Stream.value(
-            [ProposalWithVersionX.dummy(ProposalPublish.localDraft)],
+            [ProposalWithVersionX.dummy(ProposalPublish.localDraft, categoryRef: categoryRef)],
           ),
         );
         return workspaceBloc;
@@ -73,13 +114,51 @@ void main() {
 
     blocTest<WorkspaceBloc, WorkspaceState>(
       'watch user proposals - success',
+      setUp: () async {
+        when(() => mockCampaignService.getActiveCampaign()).thenAnswer(
+          (_) async => Campaign(
+            selfRef: SignedDocumentRef.generateFirstRef(),
+            name: 'Catalyst Fund14',
+            description: 'Description',
+            allFunds: const Coin.fromWholeAda(20000000),
+            totalAsk: const Coin.fromWholeAda(0),
+            fundNumber: 14,
+            timeline: const CampaignTimeline(phases: []),
+            publish: CampaignPublish.published,
+            categories: [
+              CampaignCategory(
+                selfRef: categoryRef,
+                proposalTemplateRef: SignedDocumentRef.generateFirstRef(),
+                campaignRef: SignedDocumentRef.generateFirstRef(),
+                categoryName: 'Test Category',
+                categorySubname: 'Test Subname',
+                description: 'Test description',
+                shortDescription: 'Test short description',
+                proposalsCount: 0,
+                availableFunds: const Coin.fromWholeAda(1000),
+                imageUrl: '',
+                totalAsk: const Coin(0),
+                range: const ComparableRange(
+                  min: Coin.fromWholeAda(10),
+                  max: Coin.fromWholeAda(100),
+                ),
+                descriptions: const [],
+                dos: const [],
+                donts: const [],
+                submissionCloseDate: DateTime(2024, 12, 31),
+              ),
+            ],
+          ),
+        );
+      },
       build: () {
         when(() => mockProposalService.watchUserProposals()).thenAnswer(
           (_) => Stream.value([
-            ProposalWithVersionX.dummy(ProposalPublish.localDraft),
-            ProposalWithVersionX.dummy(ProposalPublish.localDraft),
+            ProposalWithVersionX.dummy(ProposalPublish.localDraft, categoryRef: categoryRef),
+            ProposalWithVersionX.dummy(ProposalPublish.localDraft, categoryRef: categoryRef),
           ]),
         );
+
         return workspaceBloc;
       },
       act: (bloc) => bloc.add(const WatchUserProposalsEvent()),
@@ -94,8 +173,9 @@ void main() {
     blocTest<WorkspaceBloc, WorkspaceState>(
       'watch user proposals - failure',
       build: () {
-        when(() => mockProposalService.watchUserProposals())
-            .thenAnswer((_) => Stream.error(Exception('Failed to load')));
+        when(
+          () => mockProposalService.watchUserProposals(),
+        ).thenAnswer((_) => Stream.error(Exception('Failed to load')));
         return workspaceBloc;
       },
       act: (bloc) => bloc.add(const WatchUserProposalsEvent()),

@@ -19,10 +19,10 @@ final class LevelDto {
   }
 
   LevelDto.fromModel(Level data)
-      : this(
-          name: data.name,
-          value: data.value,
-        );
+    : this(
+        name: data.name,
+        value: data.value,
+      );
 
   Map<String, dynamic> toJson() => _$LevelDtoToJson(this);
 
@@ -46,11 +46,11 @@ final class LoggingSettingsDto {
   }
 
   LoggingSettingsDto.fromModel(LoggingSettings data)
-      : this(
-          printToConsole: data.printToConsole,
-          level: data.level != null ? LevelDto.fromModel(data.level!) : null,
-          collectLogs: data.collectLogs,
-        );
+    : this(
+        printToConsole: data.printToConsole,
+        level: data.level != null ? LevelDto.fromModel(data.level!) : null,
+        collectLogs: data.collectLogs,
+      );
 
   Map<String, dynamic> toJson() => _$LoggingSettingsDtoToJson(this);
 

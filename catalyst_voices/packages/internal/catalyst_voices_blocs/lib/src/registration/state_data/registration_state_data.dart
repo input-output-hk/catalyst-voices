@@ -16,10 +16,10 @@ final class RegistrationStateData extends Equatable {
 
   @override
   List<Object?> get props => [
-        canSubmitTx,
-        transactionFee,
-        isSubmittingTx,
-      ];
+    canSubmitTx,
+    transactionFee,
+    isSubmittingTx,
+  ];
 
   RegistrationStateData copyWith({
     Optional<Result<bool, LocalizedException>>? canSubmitTx,

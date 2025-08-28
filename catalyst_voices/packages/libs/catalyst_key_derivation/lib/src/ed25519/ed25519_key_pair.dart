@@ -17,6 +17,9 @@ final class Ed25519KeyPair extends Equatable {
     required this.privateKey,
   });
 
+  @override
+  List<Object?> get props => [publicKey, privateKey];
+
   /// Generates a [Ed25519KeyPair] from given private key [seed].
   static Future<Ed25519KeyPair> fromSeed(List<int> seed) async {
     if (seed.length != Ed25519PrivateKey.length) {
@@ -35,7 +38,4 @@ final class Ed25519KeyPair extends Equatable {
       privateKey: Ed25519PrivateKey.fromBytes(privateKey),
     );
   }
-
-  @override
-  List<Object?> get props => [publicKey, privateKey];
 }

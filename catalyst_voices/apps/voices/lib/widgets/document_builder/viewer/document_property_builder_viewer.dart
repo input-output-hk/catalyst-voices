@@ -67,8 +67,9 @@ class _DocumentPropertyBuilderViewerState extends State<DocumentPropertyBuilderV
       value: schema.itemsSchema.title.formatAsPlural(property.properties.length),
     );
 
-    for (final property
-        in property.properties.whereNot((element) => element.schema.isSectionOrSubsection)) {
+    for (final property in property.properties.whereNot(
+      (element) => element.schema.isSectionOrSubsection,
+    )) {
       yield* _buildProperty(property);
     }
   }
@@ -92,8 +93,9 @@ class _DocumentPropertyBuilderViewerState extends State<DocumentPropertyBuilderV
       case DocumentNestedQuestionsSchema():
       case DocumentBorderGroupSchema():
       case DocumentGenericObjectSchema():
-        for (final property
-            in property.properties.whereNot((element) => element.schema.isSectionOrSubsection)) {
+        for (final property in property.properties.whereNot(
+          (element) => element.schema.isSectionOrSubsection,
+        )) {
           yield* _buildProperty(property);
         }
     }
@@ -127,8 +129,8 @@ class _DocumentPropertyBuilderViewerState extends State<DocumentPropertyBuilderV
         final answer = value is bool ? value : null;
         final text = answer != null
             ? answer
-                ? context.l10n.yes
-                : context.l10n.no
+                  ? context.l10n.yes
+                  : context.l10n.no
             : null;
 
         return _TextListItem(

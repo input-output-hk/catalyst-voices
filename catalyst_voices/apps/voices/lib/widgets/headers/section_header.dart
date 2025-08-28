@@ -29,8 +29,9 @@ class SectionHeader extends StatelessWidget {
       fixedSize: WidgetStatePropertyAll(Size.square(48)),
     );
 
-    final textStyle = (theme.textTheme.titleSmall ?? const TextStyle())
-        .copyWith(color: theme.colors.textOnPrimary);
+    final textStyle = (theme.textTheme.titleSmall ?? const TextStyle()).copyWith(
+      color: theme.colors.textOnPrimary,
+    );
 
     return IconButtonTheme(
       data: const IconButtonThemeData(style: iconButtonStyle),

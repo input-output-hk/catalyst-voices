@@ -20,7 +20,7 @@ typedef ResultChildBuilder<T> = Widget Function(BuildContext context, T data);
 ///
 /// This prevents showing the loading state a split second before going
 /// to the next state.
-class ResultBuilder<S, F> extends StatefulWidget {
+class ResultBuilder<S, F extends Exception> extends StatefulWidget {
   final Result<S, F>? result;
   final ResultChildBuilder<S> successBuilder;
   final ResultChildBuilder<F> failureBuilder;
@@ -40,16 +40,18 @@ class ResultBuilder<S, F> extends StatefulWidget {
   State<ResultBuilder<S, F>> createState() => _ResultBuilderState<S, F>();
 }
 
-class _ResultBuilderState<S, F> extends State<ResultBuilder<S, F>> {
+class _ResultBuilderState<S, F extends Exception> extends State<ResultBuilder<S, F>> {
   Result<S, F>? _result;
   late DateTime _resultUpdatedAt;
   Timer? _updateResultTimer;
 
   @override
-  void initState() {
-    super.initState();
-
-    _updateResult(widget.result);
+  Widget build(BuildContext context) {
+    return switch (_result) {
+      Success(:final value) => widget.successBuilder(context, value),
+      Failure(:final value) => widget.failureBuilder(context, value),
+      _ => widget.loadingBuilder(context),
+    };
   }
 
   @override
@@ -76,18 +78,15 @@ class _ResultBuilderState<S, F> extends State<ResultBuilder<S, F>> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return switch (_result) {
-      Success(:final value) => widget.successBuilder(context, value),
-      Failure(:final value) => widget.failureBuilder(context, value),
-      _ => widget.loadingBuilder(context),
-    };
+  void initState() {
+    super.initState();
+
+    _updateResult(widget.result);
   }
 
-  bool _wasLoadingShownLongEnough() {
-    final now = DateTimeExt.now();
-    final duration = now.difference(_resultUpdatedAt);
-    return duration >= widget.minLoadingDuration;
+  void _cancelResultUpdate() {
+    _updateResultTimer?.cancel();
+    _updateResultTimer = null;
   }
 
   void _scheduleResultUpdate() {
@@ -104,13 +103,14 @@ class _ResultBuilderState<S, F> extends State<ResultBuilder<S, F>> {
     }
   }
 
-  void _cancelResultUpdate() {
-    _updateResultTimer?.cancel();
-    _updateResultTimer = null;
-  }
-
   void _updateResult(Result<S, F>? result) {
     _result = result;
     _resultUpdatedAt = DateTimeExt.now();
+  }
+
+  bool _wasLoadingShownLongEnough() {
+    final now = DateTimeExt.now();
+    final duration = now.difference(_resultUpdatedAt);
+    return duration >= widget.minLoadingDuration;
   }
 }

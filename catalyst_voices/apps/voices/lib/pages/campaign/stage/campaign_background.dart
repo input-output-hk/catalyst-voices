@@ -131,7 +131,9 @@ class _Logo extends StatelessWidget {
     return Positioned(
       left: 60,
       top: 40,
-      child: Theme.of(context).brandAssets.brand.logo(context).buildPicture(
+      child: Theme.of(context).brandAssets.brand
+          .logo(context)
+          .buildPicture(
             height: 35,
           ),
     );

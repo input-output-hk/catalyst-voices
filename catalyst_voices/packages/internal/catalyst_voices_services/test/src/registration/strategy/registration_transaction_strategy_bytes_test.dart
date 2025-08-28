@@ -493,8 +493,9 @@ void main() {
         requiredSigners: requiredSigners,
       );
       final decodedTx = Transaction.fromCbor(cbor.decode(rawTx.bytes));
-      final chunkedData = (decodedTx.auxiliaryData!.map[X509MetadataEnvelope.envelopeKey]!
-          as CborMap)[const CborSmallInt(10)];
+      final chunkedData =
+          (decodedTx.auxiliaryData!.map[X509MetadataEnvelope.envelopeKey]!
+              as CborMap)[const CborSmallInt(10)];
 
       expect(chunkedData, isA<CborList>());
       expect(
@@ -630,60 +631,62 @@ void main() {
       expect(buildTx, throwsA(isA<RegistrationTxCertValidationException>()));
     });
 
-    test('Validate transaction throws exception when it does not contain any change outputs',
-        () async {
-      // Given
-      final utxos = {
-        TransactionUnspentOutput(
-          input: TransactionInput(
-            transactionId: _buildDummyTransactionId(0),
-            index: 0,
+    test(
+      'Validate transaction throws exception when it does not contain any change outputs',
+      () async {
+        // Given
+        final utxos = {
+          TransactionUnspentOutput(
+            input: TransactionInput(
+              transactionId: _buildDummyTransactionId(0),
+              index: 0,
+            ),
+            output: TransactionOutput(
+              address: _changeAddress,
+              amount: const Balance(coin: Coin(100000)),
+            ),
           ),
-          output: TransactionOutput(
-            address: _changeAddress,
-            amount: const Balance(coin: Coin(100000)),
-          ),
-        ),
-      };
+        };
 
-      final requiredSigners = {
-        _rewardAddress.publicKeyHash,
-        _changeAddress.publicKeyHash,
-      };
+        final requiredSigners = {
+          _rewardAddress.publicKeyHash,
+          _changeAddress.publicKeyHash,
+        };
 
-      final derCert = _buildCert();
-      final strategy = _buildStrategy(utxos: utxos);
+        final derCert = _buildCert();
+        final strategy = _buildStrategy(utxos: utxos);
 
-      // When
-      final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
-        masterKey: _masterKey,
-        role: AccountRole.voter,
-      );
-      final publicKeys = <RbacField<Ed25519PublicKey>>[
-        RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
-      ];
-
-      // Then
-      Future<RawTransaction> buildTx() {
-        return strategy.build(
-          purpose: _purpose,
-          rootKeyPair: rootKeyPair,
-          derCert: derCert,
-          publicKeys: publicKeys,
-          requiredSigners: requiredSigners,
+        // When
+        final rootKeyPair = await keyDerivationService.deriveAccountRoleKeyPair(
+          masterKey: _masterKey,
+          role: AccountRole.voter,
         );
-      }
+        final publicKeys = <RbacField<Ed25519PublicKey>>[
+          RbacField.set(Ed25519PublicKey.fromBytes(List.filled(Ed25519PublicKey.length, 0))),
+        ];
 
-      expect(
-        buildTx,
-        throwsA(
-          anyOf(
-            isA<InsufficientUtxoBalanceException>(),
-            isA<TransactionMissingChangeOutputsException>(),
+        // Then
+        Future<RawTransaction> buildTx() {
+          return strategy.build(
+            purpose: _purpose,
+            rootKeyPair: rootKeyPair,
+            derCert: derCert,
+            publicKeys: publicKeys,
+            requiredSigners: requiredSigners,
+          );
+        }
+
+        expect(
+          buildTx,
+          throwsA(
+            anyOf(
+              isA<InsufficientUtxoBalanceException>(),
+              isA<TransactionMissingChangeOutputsException>(),
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
 
     test('Validate requiredSigners throws exception when output address not in', () async {
       // Given
@@ -863,8 +866,7 @@ class _FakeBip32Ed25519XPrivateKey extends Fake implements kd.Bip32Ed25519XPriva
   @override
   Future<R> use<R>(
     Future<R> Function(kd.Bip32Ed25519XPrivateKey privateKey) callback,
-  ) =>
-      callback(this);
+  ) => callback(this);
 
   @override
   Future<bool> verify(List<int> message, {required kd.Bip32Ed25519XSignature signature}) async {
@@ -887,8 +889,8 @@ class _FakeBip32Ed25519XPublicKey extends Fake implements kd.Bip32Ed25519XPublic
 
   @override
   kd.Ed25519PublicKey toPublicKey() => kd.Ed25519PublicKey.fromBytes(
-        bytes.take(kd.Ed25519PrivateKey.length).toList(),
-      );
+    bytes.take(kd.Ed25519PrivateKey.length).toList(),
+  );
 }
 
 class _FakeBip32Ed25519XPublicKeyFactory extends kd.Bip32Ed25519XPublicKeyFactory {

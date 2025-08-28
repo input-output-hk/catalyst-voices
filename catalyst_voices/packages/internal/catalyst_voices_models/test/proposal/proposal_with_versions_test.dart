@@ -4,7 +4,7 @@ import 'package:test/test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
-  group(Proposal, () {
+  group(DetailProposal, () {
     test('check if versions are sorted from latest to oldest', () async {
       final proposalId = const Uuid().v7();
       final versionId1 = const Uuid().v7();
@@ -13,23 +13,20 @@ void main() {
       await Future.delayed(const Duration(milliseconds: 1), () {});
       final versionId3 = const Uuid().v7();
 
-      final proposalWithVersions = Proposal(
+      final proposalWithVersions = DetailProposal(
         selfRef: DocumentRef.build(
           id: proposalId,
           isDraft: true,
           version: versionId2,
         ),
-        categoryId: SignedDocumentRef.generateFirstRef(),
+        categoryRef: SignedDocumentRef.generateFirstRef(),
         title: 'Title ver 1',
         description: 'Description ver 1',
-        updateDate: DateTime.now(),
         fundsRequested: const Coin(100),
-        status: ProposalStatus.draft,
         publish: ProposalPublish.localDraft,
         duration: 6,
         author: 'Alex Wells',
         commentsCount: 0,
-        category: 'Cardano Use Cases / MVP',
         versions: [
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
@@ -83,23 +80,20 @@ void main() {
       await Future.delayed(const Duration(milliseconds: 1), () {});
       final versionId2 = const Uuid().v7();
 
-      final proposalWithVersions = Proposal(
+      final proposalWithVersions = DetailProposal(
         selfRef: DocumentRef.build(
           id: proposalId,
           isDraft: true,
           version: versionId1,
         ),
-        categoryId: SignedDocumentRef.generateFirstRef(),
+        categoryRef: SignedDocumentRef.generateFirstRef(),
         title: 'Title ver 1',
         description: 'Description ver 1',
-        updateDate: DateTime.now(),
         fundsRequested: const Coin(100),
-        status: ProposalStatus.draft,
         publish: ProposalPublish.localDraft,
         duration: 6,
         author: 'Alex Wells',
         commentsCount: 0,
-        category: 'Cardano Use Cases / MVP',
         versions: [
           ProposalVersion(
             publish: ProposalPublish.publishedDraft,
@@ -123,16 +117,12 @@ void main() {
             publish: ProposalPublish.publishedDraft,
             selfRef: DraftRef(
               id: proposalId,
+              version: proposalId,
             ),
             title: 'Title ver 3',
             createdAt: DateTime.now(),
           ),
         ],
-      );
-
-      expect(
-        proposalWithVersions.versions.last.selfRef.version,
-        isNull,
       );
 
       expect(

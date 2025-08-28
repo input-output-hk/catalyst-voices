@@ -6,9 +6,8 @@ import '../../utils/translations_utils.dart';
 import '../discovery_page.dart';
 
 class CampaignCategoriesSection {
-  CampaignCategoriesSection(this.$);
-
   late PatrolTester $;
+
   final categoriesRoot = const Key('CampaignCategoriesStateSelector');
   final categoriesTitle = const Key('CampaignCategoriesTitle');
   final campaignCategories = const Key('CampaignCategories');
@@ -23,11 +22,7 @@ class CampaignCategoriesSection {
   final categoryDetailsButton = const Key('CategoryDetailsBtn');
   final viewProposalsButton = const Key('ViewProposalsBtn');
   final categoriesLoadingError = const Key('CampaignCategoriesError');
-
-  Future<void> titleIsRenderedCorrectly() async {
-    await $(categoriesTitle).scrollTo(step: 90);
-    expect($(categoriesTitle).text, (await t()).campaignCategories);
-  }
+  CampaignCategoriesSection(this.$);
 
   Future<void> categoriesAreRenderedCorrectly() async {
     for (var i = 0; i < 6; i++) {
@@ -79,5 +74,10 @@ class CampaignCategoriesSection {
     await titleIsRenderedCorrectly();
     await DiscoveryPage($).loadRetryOnError(categoriesLoadingError);
     await categoriesAreRenderedCorrectly();
+  }
+
+  Future<void> titleIsRenderedCorrectly() async {
+    await $(categoriesTitle).scrollTo(step: 90);
+    expect($(categoriesTitle).text, (await t()).campaignCategories);
   }
 }

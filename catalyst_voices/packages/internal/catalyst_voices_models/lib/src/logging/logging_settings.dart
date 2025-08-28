@@ -26,10 +26,10 @@ final class LoggingSettings extends Equatable {
 
   @override
   List<Object?> get props => [
-        printToConsole,
-        level,
-        collectLogs,
-      ];
+    printToConsole,
+    level,
+    collectLogs,
+  ];
 
   LoggingSettings copyWith({
     Optional<bool>? printToConsole,

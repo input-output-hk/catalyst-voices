@@ -28,10 +28,10 @@ class ProfileAvatar extends StatelessWidget {
 
     final child = switch (true) {
       _ when hasUsername => _Username(
-          username,
-          style: textStyle,
-          size: size,
-        ),
+        username,
+        style: textStyle,
+        size: size,
+      ),
       _ => _Placeholder(size: size),
     };
 

@@ -19,9 +19,9 @@ class Bip32Ed25519XSignature extends Equatable {
 
   /// Constructs [Bip32Ed25519XSignature] from a byte list.
   Bip32Ed25519XSignature.fromBytes(List<int> bytes)
-      : _bytes = rust.Bip32Ed25519Signature(
-          sigBytes: rust.U8Array64(Uint8List.fromList(bytes)),
-        );
+    : _bytes = rust.Bip32Ed25519Signature(
+        sigBytes: rust.U8Array64(Uint8List.fromList(bytes)),
+      );
 
   /// Returns the bytes of the signature.
   List<int> get bytes => _bytes.inner;

@@ -10,9 +10,8 @@ import 'common_page.dart';
 import 'discovery/most_recent_section.dart';
 
 class ProposalsPage {
-  ProposalsPage(this.$);
-
   late PatrolTester $;
+
   final currentCampaignTitle = const Key('CurrentCampaignTitle');
   final currentCampaignDescription = const Key('CurrentCampaignDescription');
   final campaignDetailsButton = const Key('CampaignDetailsButton');
@@ -55,104 +54,18 @@ class ProposalsPage {
   final itemIcon = const Key('ItemIcon');
   final itemTitle = const Key('ItemTitle');
   final itemDescription = const Key('ItemDescription');
-
-  Future<void> looksAsExpectedForVisitor() async {
-    await AppBarPage($).looksAsExpectedForVisitor();
-    await navigationBackButtonIsVisible();
-    await currentCampaignDetailsLooksAsExpected();
-    await proposalsTabsLookAsExpected();
-    await changeCategoriesBtnLooksAsExpected();
-    await searchFieldLooksAsExpected();
-    await proposalCardsLookAsExpected();
-    await paginationInfoLooksAsExpected();
-  }
-
-  Future<void> navigationBackButtonIsVisible() async {
-    expect($(CommonPage($).navigationBackBtn).$(Text).text, (await t()).back);
-  }
-
-  Future<void> clickBackButton() async {
-    await $(CommonPage($).navigationBackBtn).tap();
-  }
-
-  Future<void> currentCampaignDetailsLooksAsExpected() async {
-    expect(
-      $(currentCampaignTitle).text?.startsWith('Catalyst Fund '),
-      true,
-    );
-    expect($(currentCampaignDescription).text, isNotEmpty);
-    expect($(campaignDetailsButton).$(Text).text, (await t()).campaignDetails);
-  }
-
-  Future<void> proposalsTabsLookAsExpected() async {
-    expect(
-      $(allProposalsTab).$(Text).text?.startsWith((await t()).noOfAll(0).split('(')[0]),
-      true,
-    );
-    expect(
-      $(draftProposalsTab).$(Text).text?.startsWith((await t()).noOfDraft(0).split('(')[0]),
-      true,
-    );
-    expect(
-      $(finalProposalsTab).$(Text).text?.startsWith((await t()).noOfFinal(0).split('(')[0]),
-      true,
-    );
-    expect(
-      $(favoriteProposalsTab).$(Text).text?.startsWith((await t()).noOfFavorites(0).split('(')[0]),
-      true,
-    );
-    expect(
-      $(myProposalsTab).$(Text).text?.startsWith((await t()).noOfMyProposals(0).split('(')[0]),
-      true,
-    );
-  }
-
-  Future<void> changeCategoriesBtnLooksAsExpected() async {
-    expect($(categorySelectorLabel).text, (await t()).category);
-    expect($(categorySelectorValue).text, (await t()).showAll);
-  }
-
-  Future<void> searchFieldLooksAsExpected() async {
-    final searchHintText = $.tester.widget<SearchTextField>($(searchProposalsField)).hintText;
-    expect(searchHintText, (await t()).searchProposals);
-  }
-
-  Future<void> proposalCardsLookAsExpected() async {
-    final proposalsCount = $.tester
-        .widgetList<Material>(
-          $(proposalsContainer).$(MostRecentSection($).proposalCard),
-        )
-        .length;
-    for (var cardIndex = 0; cardIndex < proposalsCount; cardIndex++) {
-      await $(proposalsContainer).$(MostRecentSection($).proposalCard).at(cardIndex).scrollTo();
-      await MostRecentSection($).proposalCardLooksAsExpected(proposalsContainer, cardIndex);
-    }
-  }
-
-  Future<void> paginationInfoLooksAsExpected() async {
-    await $(CommonPage($).paginationText).scrollTo(step: 500);
-    final paginationText = $(CommonPage($).paginationText).text;
-    final proposalsDisplayedCount = paginationText?.split(' ')[0].split('-')[1];
-    final proposalsCount = $.tester
-        .widgetList<Material>(
-          $(proposalsContainer).$(MostRecentSection($).proposalCard),
-        )
-        .length;
-    expect(proposalsCount, int.parse(proposalsDisplayedCount!));
-    expect(
-      // TODO(oldgreg): Fix this with translations after #2027 is done
-      paginationText?.indexOf('proposals'),
-      greaterThanOrEqualTo(1),
-    );
-    expect(proposalsDisplayedCount, proposalsCount.toString());
-
-    expect($(CommonPage($).prevPageBtn).visible, true);
-    expect($(CommonPage($).nextPageBtn).visible, true);
-  }
+  ProposalsPage(this.$);
 
   Future<void> campaignDetailsButtonWorks() async {
     await $(campaignDetailsButton).tap();
     expect($(titleLabelText), findsOneWidget);
+  }
+
+  Future<void> campaignDetailsCloseButtonWorks() async {
+    await $(campaignDetailsButton).tap();
+    expect($(titleLabelText), findsOneWidget);
+    await $(campaignDetailsCloseButton).tap();
+    expect($(titleLabelText), findsNothing);
   }
 
   Future<void> campaignDetailsScreenLooksAsExpected() async {
@@ -213,19 +126,21 @@ class ProposalsPage {
     }
   }
 
-  Future<void> campaignDetailsCloseButtonWorks() async {
-    await $(campaignDetailsButton).tap();
-    expect($(titleLabelText), findsOneWidget);
-    await $(campaignDetailsCloseButton).tap();
-    expect($(titleLabelText), findsNothing);
+  Future<void> changeCategoriesBtnLooksAsExpected() async {
+    expect($(categorySelectorLabel).text, (await t()).category);
+    expect($(categorySelectorValue).text, (await t()).showAll);
   }
 
-  Future<void> clickDraftTab() async {
-    await $(draftProposalsTab).tap();
-  }
-
-  Future<void> clickFinalTab() async {
-    await $(finalProposalsTab).tap();
+  Future<void> checkOpeningLinkByMocking(int proposalNumber) async {
+    final linkTitleText = $(shareProposalDialog).$(shareItem).at(proposalNumber).$(itemTitle).text;
+    if (linkTitleText!.contains((await t()).copyLink) == false) {
+      final linkPartialTextToMatch = 'https://${linkTitleText.split(' ').last.toLowerCase()}.com';
+      await SelectorUtils.checkOpeningLinkByMocking(
+        $,
+        linkTitleText,
+        linkPartialTextToMatch,
+      );
+    }
   }
 
   Future<void> checkProposalsStageMatch(String expectedStage) async {
@@ -241,6 +156,74 @@ class ProposalsPage {
         expectedStage,
       );
     }
+  }
+
+  Future<void> clickBackButton() async {
+    await $(CommonPage($).navigationBackBtn).tap();
+  }
+
+  Future<void> clickDraftTab() async {
+    await $(draftProposalsTab).tap();
+  }
+
+  Future<void> clickFinalTab() async {
+    await $(finalProposalsTab).tap();
+  }
+
+  Future<void> currentCampaignDetailsLooksAsExpected() async {
+    expect(
+      $(currentCampaignTitle).text?.startsWith('Catalyst Fund '),
+      true,
+    );
+    expect($(currentCampaignDescription).text, isNotEmpty);
+    expect($(campaignDetailsButton).$(Text).text, (await t()).campaignDetails);
+  }
+
+  Future<int> getProposalsCountFromTab(String tab) async {
+    const allowedStrings = ['All', 'Draft', 'Final', 'Favorite', 'My'];
+    if (allowedStrings.contains(tab)) {
+      return int.parse(
+        $(Key('${tab}ProposalsTab')).$(Text).text!.split('(')[1].split(')')[0],
+      );
+    } else {
+      throw ArgumentError('Invalid tab name: $tab');
+    }
+  }
+
+  Future<void> looksAsExpectedForVisitor() async {
+    await AppBarPage($).looksAsExpectedForVisitor();
+    await navigationBackButtonIsVisible();
+    await currentCampaignDetailsLooksAsExpected();
+    await proposalsTabsLookAsExpected();
+    await changeCategoriesBtnLooksAsExpected();
+    await searchFieldLooksAsExpected();
+    await proposalCardsLookAsExpected();
+    await paginationInfoLooksAsExpected();
+  }
+
+  Future<void> navigationBackButtonIsVisible() async {
+    expect($(CommonPage($).navigationBackBtn).$(Text).text, (await t()).back);
+  }
+
+  Future<void> paginationInfoLooksAsExpected() async {
+    await $(CommonPage($).paginationText).scrollTo(step: 500);
+    final paginationText = $(CommonPage($).paginationText).text;
+    final proposalsDisplayedCount = paginationText?.split(' ')[0].split('-')[1];
+    final proposalsCount = $.tester
+        .widgetList<Material>(
+          $(proposalsContainer).$(MostRecentSection($).proposalCard),
+        )
+        .length;
+    expect(proposalsCount, int.parse(proposalsDisplayedCount!));
+    expect(
+      // TODO(oldgreg): Fix this with translations after #2027 is done
+      paginationText?.indexOf('proposals'),
+      greaterThanOrEqualTo(1),
+    );
+    expect(proposalsDisplayedCount, proposalsCount.toString());
+
+    expect($(CommonPage($).prevPageBtn).visible, true);
+    expect($(CommonPage($).nextPageBtn).visible, true);
   }
 
   Future<void> paginationWorks() async {
@@ -281,30 +264,15 @@ class ProposalsPage {
     }
   }
 
-  Future<int> getProposalsCountFromTab(String tab) async {
-    const allowedStrings = ['All', 'Draft', 'Final', 'Favorite', 'My'];
-    if (allowedStrings.contains(tab)) {
-      return int.parse(
-        $(Key('${tab}ProposalsTab')).$(Text).text!.split('(')[1].split(')')[0],
-      );
-    } else {
-      throw ArgumentError('Invalid tab name: $tab');
-    }
-  }
-
-  Future<void> proposalsCountIs(String tab, int count) async {
-    final proposalsCountFromTab = await getProposalsCountFromTab(tab);
-    expect(proposalsCountFromTab, count);
-    await $(Key('${tab}ProposalsTab')).tap();
-    if (count == 0) {
-      expect($(emptyProposals), findsOneWidget);
-    } else {
-      final proposalsCount = $.tester
-          .widgetList<Material>(
-            $(proposalsContainer).$(MostRecentSection($).proposalCard),
-          )
-          .length;
-      expect(proposalsCount, count);
+  Future<void> proposalCardsLookAsExpected() async {
+    final proposalsCount = $.tester
+        .widgetList<Material>(
+          $(proposalsContainer).$(MostRecentSection($).proposalCard),
+        )
+        .length;
+    for (var cardIndex = 0; cardIndex < proposalsCount; cardIndex++) {
+      await $(proposalsContainer).$(MostRecentSection($).proposalCard).at(cardIndex).scrollTo();
+      await MostRecentSection($).proposalCardLooksAsExpected(proposalsContainer, cardIndex);
     }
   }
 
@@ -341,24 +309,54 @@ class ProposalsPage {
     }
   }
 
-  Future<void> checkOpeningLinkByMocking(int proposalNumber) async {
-    final linkTitleText = $(shareProposalDialog).$(shareItem).at(proposalNumber).$(itemTitle).text;
-    if (linkTitleText!.contains((await t()).copyLink) == false) {
-      final linkPartialTextToMatch = 'https://${linkTitleText.split(' ').last.toLowerCase()}.com';
-      await SelectorUtils.checkOpeningLinkByMocking(
-        $,
-        linkTitleText,
-        linkPartialTextToMatch,
-      );
+  Future<void> proposalsCountIs(String tab, int count) async {
+    final proposalsCountFromTab = await getProposalsCountFromTab(tab);
+    expect(proposalsCountFromTab, count);
+    await $(Key('${tab}ProposalsTab')).tap();
+    if (count == 0) {
+      expect($(emptyProposals), findsOneWidget);
+    } else {
+      final proposalsCount = $.tester
+          .widgetList<Material>(
+            $(proposalsContainer).$(MostRecentSection($).proposalCard),
+          )
+          .length;
+      expect(proposalsCount, count);
     }
   }
 
+  Future<void> proposalsTabsLookAsExpected() async {
+    expect(
+      $(allProposalsTab).$(Text).text?.startsWith((await t()).noOfAll(0).split('·')[0]),
+      true,
+    );
+    expect(
+      $(draftProposalsTab).$(Text).text?.startsWith((await t()).noOfDraft(0).split('·')[0]),
+      true,
+    );
+    expect(
+      $(finalProposalsTab).$(Text).text?.startsWith((await t()).noOfFinal(0).split('·')[0]),
+      true,
+    );
+    expect(
+      $(favoriteProposalsTab).$(Text).text?.startsWith((await t()).noOfFavorites(0).split('·')[0]),
+      true,
+    );
+    expect(
+      $(myProposalsTab).$(Text).text?.startsWith((await t()).noOfMyProposals(0).split('·')[0]),
+      true,
+    );
+  }
+
+  Future<void> searchFieldLooksAsExpected() async {
+    final searchHintText = $.tester.widget<SearchTextField>($(searchProposalsField)).hintText;
+    expect(searchHintText, (await t()).searchProposals);
+  }
+
   Future<void> shareModalCloseButtonWorks() async {
-    await $(proposalsContainer)
-        .$(MostRecentSection($).proposalCard)
-        .at(0)
-        .$(MostRecentSection($).shareButton)
-        .tap();
+    await $(
+      proposalsContainer,
+    ).$(MostRecentSection($).proposalCard).at(0).$(MostRecentSection($).shareButton).tap();
     expect($(shareProposalDialog).$(closeButton), findsOneWidget);
     await $(shareProposalDialog).$(closeButton).tap();
     expect($(shareProposalDialog).$(closeButton), findsNothing);

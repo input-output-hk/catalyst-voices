@@ -10,8 +10,8 @@ import 'package:catalyst_voices/pages/proposal/snack_bar/viewing_older_version_s
 import 'package:catalyst_voices/pages/proposal/widget/proposal_header.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_navigation_panel.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_sidebars.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/session_action_header.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/actions/account_settings_action.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/actions/session_cta_action.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/modals/comment/submit_comment_error_dialog.dart';
@@ -19,6 +19,7 @@ import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -42,7 +43,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
   const _AppBar();
 
   @override
-  Size get preferredSize => const VoicesAppBar().preferredSize;
+  Size get preferredSize => VoicesAppBar.size;
 
   @override
   Widget build(BuildContext context) {
@@ -59,11 +60,11 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         Offstage(
           offstage: readOnlyMode || CatalystPlatform.isMobileWeb,
-          child: const SessionActionHeader(),
+          child: const SessionCtaAction(),
         ),
         Offstage(
           offstage: readOnlyMode || CatalystPlatform.isMobileWeb,
-          child: const SessionStateHeader(),
+          child: const AccountSettingsAction(),
         ),
       ],
     );
@@ -86,21 +87,26 @@ class _ProposalPageState extends State<ProposalPage>
       child: Scaffold(
         appBar: const _AppBar(),
         endDrawer: const OpportunitiesDrawer(),
-        floatingActionButton:
-            _ScrollToTopButton(segmentsScrollController: _segmentsScrollController),
-        body: ProposalHeaderWrapper(
-          child: ProposalSidebars(
-            navPanel: const ProposalNavigationPanel(),
-            body: Stack(
-              children: [
-                ProposalContent(
-                  scrollController: _segmentsScrollController,
+        floatingActionButton: _ScrollToTopButton(
+          segmentsScrollController: _segmentsScrollController,
+        ),
+        body: Stack(
+          children: [
+            ProposalHeaderWrapper(
+              child: ProposalSidebars(
+                navPanel: const ProposalNavigationPanel(),
+                body: Stack(
+                  children: [
+                    ProposalContent(
+                      scrollController: _segmentsScrollController,
+                    ),
+                    const ProposalError(),
+                  ],
                 ),
-                const ProposalLoading(),
-                const ProposalError(),
-              ],
+              ),
             ),
-          ),
+            const ProposalLoading(),
+          ],
         ),
       ),
     );
@@ -140,6 +146,12 @@ class _ProposalPageState extends State<ProposalPage>
       case ViewingOlderVersionSignal():
         VoicesSnackBar.hideCurrent(context);
         ViewingOlderVersionSnackBar(context).show(context);
+      case ViewingOlderVersionWhileVotingSignal():
+        VoicesSnackBar.hideCurrent(context);
+        ViewingOlderVersionSnackBar(
+          context,
+          message: context.l10n.viewingOlderDocumentVersionWhileVoting,
+        ).show(context);
       case ChangeVersionSignal():
         _changeVersion(signal.to);
       case UsernameUpdatedSignal():
@@ -166,6 +178,8 @@ class _ProposalPageState extends State<ProposalPage>
         .distinct(listEquals)
         .listen(_updateSegments);
 
+    // TODO(damian-molinski): ProposalCubit should be scoped to this screen.
+    bloc.clear();
     unawaited(bloc.load(ref: widget.ref));
   }
 

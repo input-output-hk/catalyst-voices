@@ -92,9 +92,9 @@ class _TagChip extends StatelessWidget {
   });
 
   Set<WidgetState> get states => {
-        if (isSelected) WidgetState.selected,
-        if (!isEnabled) WidgetState.disabled,
-      };
+    if (isSelected) WidgetState.selected,
+    if (!isEnabled) WidgetState.disabled,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -282,39 +282,39 @@ class _TagWidget extends VoicesFormField<GroupedTagsSelection> {
     required bool isRequired,
     required String title,
   }) : super(
-          builder: (field) {
-            final selection = field.value ?? const GroupedTagsSelection();
+         builder: (field) {
+           final selection = field.value ?? const GroupedTagsSelection();
 
-            void onSelectionChanged(GroupedTagsSelection? value) {
-              field.didChange(value);
-              onChanged?.call(value);
-            }
+           void onSelectionChanged(GroupedTagsSelection? value) {
+             field.didChange(value);
+             onChanged?.call(value);
+           }
 
-            void onGroupChanged(GroupedTags? groupedTags) {
-              final groupChanged = selection.group != groupedTags?.group;
+           void onGroupChanged(GroupedTags? groupedTags) {
+             final groupChanged = selection.group != groupedTags?.group;
 
-              final newSelection = selection.copyWith(
-                group: Optional(groupedTags?.group),
-                tag: groupChanged ? const Optional<String>.empty() : null,
-              );
+             final newSelection = selection.copyWith(
+               group: Optional(groupedTags?.group),
+               tag: groupChanged ? const Optional<String>.empty() : null,
+             );
 
-              onSelectionChanged(newSelection);
-            }
+             onSelectionChanged(newSelection);
+           }
 
-            if (enabled) {
-              return _TagSelector(
-                groupedTags: groupedTags,
-                selection: selection,
-                onGroupChanged: onGroupChanged,
-                onSelectionChanged: onSelectionChanged,
-                hintText: hintText,
-                title: title,
-                errorText: field.errorText,
-                isRequired: isRequired,
-              );
-            } else {
-              return _GroupedTagChip(selection);
-            }
-          },
-        );
+           if (enabled) {
+             return _TagSelector(
+               groupedTags: groupedTags,
+               selection: selection,
+               onGroupChanged: onGroupChanged,
+               onSelectionChanged: onSelectionChanged,
+               hintText: hintText,
+               title: title,
+               errorText: field.errorText,
+               isRequired: isRequired,
+             );
+           } else {
+             return _GroupedTagChip(selection);
+           }
+         },
+       );
 }

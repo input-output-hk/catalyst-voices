@@ -107,7 +107,8 @@ void main() {
   });
 }
 
-const _bigInt64Reason = 'BigInt value exceeds the range of 64 bits. '
+const _bigInt64Reason =
+    'BigInt value exceeds the range of 64 bits. '
     'SQLite BigInt has 64 bit limit';
 final _bigIntMaxValue64 = BigInt.parse('9223372036854775807');
 

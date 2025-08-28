@@ -64,8 +64,9 @@ extension RbacRegistrationChainExt on RbacRegistrationChain {
       throw ArgumentError.notNull('subjectAltName');
     }
 
-    final stakeAddressUri =
-        subjectAltName.map((e) => e.value).firstWhereOrNull(CardanoAddressUri.isCardanoAddressUri);
+    final stakeAddressUri = subjectAltName
+        .map((e) => e.value)
+        .firstWhereOrNull(CardanoAddressUri.isCardanoAddressUri);
 
     if (stakeAddressUri == null) {
       throw ArgumentError.notNull('stakeAddressUri');

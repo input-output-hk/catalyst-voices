@@ -55,9 +55,9 @@ final class CommentMetadata extends DocumentMetadata {
     this.reply,
     required this.authorId,
   }) : assert(
-          ref.isExact,
-          'Comments can refer only exact documents',
-        );
+         ref.isExact,
+         'Comments can refer only exact documents',
+       );
 
   @override
   List<Object?> get props => super.props + [ref, template, reply, authorId];

@@ -44,22 +44,22 @@ enum HowItWorksItem {
   follow;
 
   SvgGenImage get icon => switch (this) {
-        HowItWorksItem.collaborate => VoicesAssets.icons.userGroup,
-        HowItWorksItem.vote => VoicesAssets.icons.vote,
-        HowItWorksItem.follow => VoicesAssets.icons.speakerphone,
-      };
+    HowItWorksItem.collaborate => VoicesAssets.icons.userGroup,
+    HowItWorksItem.vote => VoicesAssets.icons.vote,
+    HowItWorksItem.follow => VoicesAssets.icons.speakerphone,
+  };
 
   String description(VoicesLocalizations l10n) => switch (this) {
-        HowItWorksItem.collaborate => l10n.howItWorksCollaborateDescription,
-        HowItWorksItem.vote => l10n.howItWorksVoteDescription,
-        HowItWorksItem.follow => l10n.howItWorksFollowDescription,
-      };
+    HowItWorksItem.collaborate => l10n.howItWorksCollaborateDescription,
+    HowItWorksItem.vote => l10n.howItWorksVoteDescription,
+    HowItWorksItem.follow => l10n.howItWorksFollowDescription,
+  };
 
   String title(VoicesLocalizations l10n) => switch (this) {
-        HowItWorksItem.collaborate => l10n.howItWorksCollaborate,
-        HowItWorksItem.vote => l10n.howItWorksVote,
-        HowItWorksItem.follow => l10n.howItWorksFollow,
-      };
+    HowItWorksItem.collaborate => l10n.howItWorksCollaborate,
+    HowItWorksItem.vote => l10n.howItWorksVote,
+    HowItWorksItem.follow => l10n.howItWorksFollow,
+  };
 }
 
 class _Item extends StatelessWidget {

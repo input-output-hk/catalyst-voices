@@ -16,7 +16,7 @@ final class UsernameUpdatedSnackBar extends VoicesSnackBar {
     required super.title,
     required super.message,
   }) : super(
-          type: VoicesSnackBarType.success,
-          icon: VoicesAssets.icons.check.buildIcon(),
-        );
+         type: VoicesSnackBarType.success,
+         icon: VoicesAssets.icons.check.buildIcon(),
+       );
 }

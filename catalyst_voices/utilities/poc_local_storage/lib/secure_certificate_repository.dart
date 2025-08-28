@@ -18,9 +18,9 @@ class SecureCertificateRepository {
     SecureStorageService? storageService,
     FilePickerService? filePickerService,
     CryptoService? cryptoService,
-  })  : _storageService = storageService ?? SecureStorageService(),
-        _filePickerService = filePickerService ?? FilePickerService(),
-        _cryptoService = cryptoService ?? CryptoService();
+  }) : _storageService = storageService ?? SecureStorageService(),
+       _filePickerService = filePickerService ?? FilePickerService(),
+       _cryptoService = cryptoService ?? CryptoService();
 
   Future<bool> get hasPassword async => _storageService.hasPassword;
 

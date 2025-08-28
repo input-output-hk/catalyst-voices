@@ -20,11 +20,13 @@ class ShelleyAddress extends Equatable implements CborEncodable {
   static const String testnetHrpSuffix = '_test';
 
   static const Bech32Encoder _mainNetEncoder = Bech32Encoder(hrp: defaultAddrHrp);
-  static const Bech32Encoder _testNetEncoder =
-      Bech32Encoder(hrp: defaultAddrHrp + testnetHrpSuffix);
+  static const Bech32Encoder _testNetEncoder = Bech32Encoder(
+    hrp: defaultAddrHrp + testnetHrpSuffix,
+  );
   static const Bech32Encoder _mainNetRewardEncoder = Bech32Encoder(hrp: defaultRewardHrp);
-  static const Bech32Encoder _testNetRewardEncoder =
-      Bech32Encoder(hrp: defaultRewardHrp + testnetHrpSuffix);
+  static const Bech32Encoder _testNetRewardEncoder = Bech32Encoder(
+    hrp: defaultRewardHrp + testnetHrpSuffix,
+  );
 
   /// Length of a Cardano base address (1 byte + 28 bytes + 28 bytes).
   static const int baseAddrLength = 57;
@@ -40,9 +42,7 @@ class ShelleyAddress extends Equatable implements CborEncodable {
   final String hrp;
 
   /// The constructor for [ShelleyAddress] from raw [bytes] and [hrp].
-  ShelleyAddress(List<int> bytes)
-      : bytes = Uint8List.fromList(bytes),
-        hrp = _extractHrp(bytes) {
+  ShelleyAddress(List<int> bytes) : bytes = Uint8List.fromList(bytes), hrp = _extractHrp(bytes) {
     if (bytes.length != entAddrLength && bytes.length != baseAddrLength) {
       throw ArgumentError(
         'Bytes length (${bytes.length}) must be either $entAddrLength'

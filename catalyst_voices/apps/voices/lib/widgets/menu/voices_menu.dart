@@ -1,6 +1,37 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
+/// Model representing Menu Item
+class MenuItem {
+  final int id;
+  final String label;
+  final Widget? icon;
+  final bool showDivider;
+  final bool enabled;
+
+  MenuItem({
+    required this.id,
+    required this.label,
+    this.icon,
+    this.showDivider = false,
+    this.enabled = true,
+  });
+}
+
+/// Model representing Submenu Item
+/// and extending from MenuItem
+class SubMenuItem extends MenuItem {
+  List<MenuItem> children;
+
+  SubMenuItem({
+    required super.id,
+    required super.label,
+    required this.children,
+    super.icon,
+    super.showDivider,
+  });
+}
+
 /// A menu of the app that
 /// can be also us as a cascade.
 class VoicesMenu extends StatelessWidget {
@@ -130,35 +161,4 @@ class _MenuButton extends StatelessWidget {
       ],
     );
   }
-}
-
-/// Model representing Menu Item
-class MenuItem {
-  final int id;
-  final String label;
-  final Widget? icon;
-  final bool showDivider;
-  final bool enabled;
-
-  MenuItem({
-    required this.id,
-    required this.label,
-    this.icon,
-    this.showDivider = false,
-    this.enabled = true,
-  });
-}
-
-/// Model representing Submenu Item
-/// and extending from MenuItem
-class SubMenuItem extends MenuItem {
-  List<MenuItem> children;
-
-  SubMenuItem({
-    required super.id,
-    required super.label,
-    required this.children,
-    super.icon,
-    super.showDivider,
-  });
 }

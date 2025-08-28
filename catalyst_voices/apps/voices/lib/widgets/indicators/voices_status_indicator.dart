@@ -2,12 +2,6 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-/// Enum representing the two possible types of status indicators:
-/// success or error.
-///
-/// Type will result in different status colors.
-enum VoicesStatusIndicatorType { success, error }
-
 /// A widget that displays a visual indicator of a status along with a
 /// title and body text.
 ///
@@ -61,6 +55,33 @@ class VoicesStatusIndicator extends StatelessWidget {
           _BodyContainer(child: body),
         ].separatedBy(const SizedBox(height: 16)).toList(),
       ),
+    );
+  }
+}
+
+/// Enum representing the two possible types of status indicators:
+/// success or error.
+///
+/// Type will result in different status colors.
+enum VoicesStatusIndicatorType { success, error }
+
+class _BodyContainer extends StatelessWidget {
+  final Widget child;
+
+  const _BodyContainer({
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return DefaultTextStyle(
+      style: (theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
+        color: theme.colors.textOnPrimary,
+      ),
+      textAlign: TextAlign.center,
+      child: child,
     );
   }
 }
@@ -122,27 +143,6 @@ class _TitleContainer extends StatelessWidget {
 
     return DefaultTextStyle(
       style: (theme.textTheme.titleMedium ?? const TextStyle()).copyWith(
-        color: theme.colors.textOnPrimary,
-      ),
-      textAlign: TextAlign.center,
-      child: child,
-    );
-  }
-}
-
-class _BodyContainer extends StatelessWidget {
-  final Widget child;
-
-  const _BodyContainer({
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return DefaultTextStyle(
-      style: (theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
         color: theme.colors.textOnPrimary,
       ),
       textAlign: TextAlign.center,

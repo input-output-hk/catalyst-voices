@@ -80,14 +80,27 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     var remaining = 0;
 
     do {
-      final response = await _getDocumentIndexList(
-        page: page,
-        limit: maxPerPage,
-      );
+      final response =
+          await _getDocumentIndexList(
+            page: page,
+            limit: maxPerPage,
+          )
+          // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
+          // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
+          .onError<NotFoundException>(
+            (_, _) {
+              return DocumentIndexList(
+                docs: [],
+                page: CurrentPage(page: page, limit: maxPerPage, remaining: 0),
+              );
+            },
+          );
 
       allRefs.addAll(response.refs);
 
-      remaining = response.page.remaining;
+      // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
+      // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
+      remaining = response.docs.length < maxPerPage ? 0 : response.page.remaining;
       page = response.page.page + 1;
     } while (remaining > 0);
 
@@ -135,46 +148,48 @@ extension on DocumentIndexList {
         .map(DocumentIndexListDto.fromJson)
         .map((ref) {
           return <TypedDocumentRef>[
-            ...ref.ver.map((ver) {
-              final documentType = DocumentType.fromJson(ver.type);
+            ...ref.ver
+                .map((ver) {
+                  final documentType = DocumentType.fromJson(ver.type);
 
-              return <TypedDocumentRef>[
-                TypedDocumentRef(
-                  ref: SignedDocumentRef(id: ref.id, version: ver.ver),
-                  type: documentType,
-                ),
-                if (ver.ref != null)
-                  TypedDocumentRef(
-                    ref: ver.ref!.toRef(),
-                    type: DocumentType.unknown,
-                  ),
-                if (ver.reply != null)
-                  TypedDocumentRef(
-                    ref: ver.reply!.toRef(),
-                    type: DocumentType.unknown,
-                  ),
-                if (ver.template != null)
-                  TypedDocumentRef(
-                    ref: ver.template!.toRef(),
-                    type: documentType.template ?? DocumentType.unknown,
-                  ),
-                if (ver.brand != null)
-                  TypedDocumentRef(
-                    ref: ver.brand!.toRef(),
-                    type: DocumentType.brandParametersDocument,
-                  ),
-                if (ver.campaign != null)
-                  TypedDocumentRef(
-                    ref: ver.campaign!.toRef(),
-                    type: DocumentType.campaignParametersDocument,
-                  ),
-                if (ver.category != null)
-                  TypedDocumentRef(
-                    ref: ver.category!.toRef(),
-                    type: DocumentType.categoryParametersDocument,
-                  ),
-              ];
-            }).expand((element) => element),
+                  return <TypedDocumentRef>[
+                    TypedDocumentRef(
+                      ref: SignedDocumentRef(id: ref.id, version: ver.ver),
+                      type: documentType,
+                    ),
+                    if (ver.ref != null)
+                      TypedDocumentRef(
+                        ref: ver.ref!.toRef(),
+                        type: DocumentType.unknown,
+                      ),
+                    if (ver.reply != null)
+                      TypedDocumentRef(
+                        ref: ver.reply!.toRef(),
+                        type: DocumentType.unknown,
+                      ),
+                    if (ver.template != null)
+                      TypedDocumentRef(
+                        ref: ver.template!.toRef(),
+                        type: documentType.template ?? DocumentType.unknown,
+                      ),
+                    if (ver.brand != null)
+                      TypedDocumentRef(
+                        ref: ver.brand!.toRef(),
+                        type: DocumentType.brandParametersDocument,
+                      ),
+                    if (ver.campaign != null)
+                      TypedDocumentRef(
+                        ref: ver.campaign!.toRef(),
+                        type: DocumentType.campaignParametersDocument,
+                      ),
+                    if (ver.category != null)
+                      TypedDocumentRef(
+                        ref: ver.category!.toRef(),
+                        type: DocumentType.categoryParametersDocument,
+                      ),
+                  ];
+                })
+                .expand((element) => element),
           ];
         })
         .expand((element) => element)

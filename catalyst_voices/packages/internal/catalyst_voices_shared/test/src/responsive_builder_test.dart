@@ -6,15 +6,14 @@ void main() {
   Widget buildApp(
     Size size,
     Widget child,
-  ) =>
-      MediaQuery(
-        data: MediaQueryData(size: size),
-        child: MaterialApp(
-          home: Scaffold(
-            body: child,
-          ),
-        ),
-      );
+  ) => MediaQuery(
+    data: MediaQueryData(size: size),
+    child: MaterialApp(
+      home: Scaffold(
+        body: child,
+      ),
+    ),
+  );
 
   group('Test screen sizes with Text child', () {
     final sizesToTest = {

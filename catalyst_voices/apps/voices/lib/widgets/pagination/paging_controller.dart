@@ -3,15 +3,17 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 
-typedef PageRequestListener<PageKeyType, ItemType> = void Function(
-  PageKeyType pageKey,
-  int pageSize,
-  ItemType? lastProposalId,
-);
+typedef PageRequestListener<PageKeyType, ItemType> =
+    void Function(
+      PageKeyType pageKey,
+      int pageSize,
+      ItemType? lastProposalId,
+    );
 
-typedef PagingStateListener<ItemType> = void Function(
-  PagingState<ItemType> status,
-);
+typedef PagingStateListener<ItemType> =
+    void Function(
+      PagingState<ItemType> status,
+    );
 
 /// A controller that manages pagination state
 /// and notifies listeners of changes.
@@ -47,30 +49,30 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
   final int initialPage;
   final int initialMaxResults;
 
-  PagingController({
-    required this.initialPage,
-    required this.initialMaxResults,
-    this.itemsPerPage = 24,
-  }) : super(
-          PagingState(
-            currentPage: initialPage,
-            maxResults: initialMaxResults,
-            itemsPerPage: itemsPerPage,
-            isLoading: true,
-            itemList: const [],
-          ),
-        );
-
   ObserverList<PageRequestListener<int, ItemType>>? _pageRequestListeners =
       ObserverList<PageRequestListener<int, ItemType>>();
 
   ObserverList<PagingStateListener<ItemType>>? _statusListeners =
       ObserverList<PagingStateListener<ItemType>>();
 
-  List<ItemType> get itemList => value.itemList;
+  PagingController({
+    required this.initialPage,
+    required this.initialMaxResults,
+    this.itemsPerPage = 24,
+  }) : super(
+         PagingState(
+           currentPage: initialPage,
+           maxResults: initialMaxResults,
+           itemsPerPage: itemsPerPage,
+           isLoading: true,
+           itemList: const [],
+         ),
+       );
 
-  set itemList(List<ItemType> newItemList) {
-    value = value.copyWith(itemList: newItemList);
+  int get currentPage => value.currentPage;
+
+  set currentPage(int newPage) {
+    value = value.copyWith(currentPage: newPage);
   }
 
   LocalizedException? get error => value.error;
@@ -79,17 +81,17 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
     value = value.copyWith(error: Optional(newError));
   }
 
-  int get currentPage => value.currentPage;
-
-  set currentPage(int newPage) {
-    value = value.copyWith(currentPage: newPage);
-  }
+  bool get isLoading => value.isLoading;
 
   set isLoading(bool newValue) {
     value = value.copyWith(isLoading: newValue);
   }
 
-  bool get isLoading => value.isLoading;
+  List<ItemType> get itemList => value.itemList;
+
+  set itemList(List<ItemType> newItemList) {
+    value = value.copyWith(itemList: newItemList);
+  }
 
   int get maxResults => value.maxResults;
 
@@ -99,12 +101,14 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
 
   int get nextPageValue => currentPage + 1;
 
-  void nextPage() {
-    currentPage = nextPageValue;
+  void addPageRequestListener(PageRequestListener<int, ItemType> listener) {
+    _debugAssertNotDisposed();
+    _pageRequestListeners?.add(listener);
   }
 
-  void prevPage() {
-    currentPage = currentPage - 1;
+  void addStatusListener(PagingStateListener<ItemType> listener) {
+    _debugAssertNotDisposed();
+    _statusListeners?.add(listener);
   }
 
   void appendPage(List<ItemType> newItems, int nextPage) {
@@ -115,6 +119,13 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
     );
   }
 
+  @override
+  void dispose() {
+    _pageRequestListeners = null;
+    _statusListeners = null;
+    super.dispose();
+  }
+
   void empty() {
     value = value.copyWith(
       itemList: [],
@@ -122,14 +133,8 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
     );
   }
 
-  void addPageRequestListener(PageRequestListener<int, ItemType> listener) {
-    _debugAssertNotDisposed();
-    _pageRequestListeners?.add(listener);
-  }
-
-  void removePageRequestListener(PageRequestListener<int, ItemType> listener) {
-    _debugAssertNotDisposed();
-    _pageRequestListeners?.remove(listener);
+  void nextPage() {
+    currentPage = nextPageValue;
   }
 
   void notifyPageRequestListeners(int pageKey) {
@@ -156,16 +161,6 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
     }
   }
 
-  void addStatusListener(PagingStateListener<ItemType> listener) {
-    _debugAssertNotDisposed();
-    _statusListeners?.add(listener);
-  }
-
-  void removeStatusListener(PagingStateListener<ItemType> listener) {
-    _debugAssertNotDisposed();
-    _statusListeners?.remove(listener);
-  }
-
   void notifyStateListeners(PagingState<ItemType> state) {
     _debugAssertNotDisposed();
     if (_statusListeners?.isEmpty ?? true) {
@@ -178,6 +173,20 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
         listener(state);
       }
     }
+  }
+
+  void prevPage() {
+    currentPage = currentPage - 1;
+  }
+
+  void removePageRequestListener(PageRequestListener<int, ItemType> listener) {
+    _debugAssertNotDisposed();
+    _pageRequestListeners?.remove(listener);
+  }
+
+  void removeStatusListener(PagingStateListener<ItemType> listener) {
+    _debugAssertNotDisposed();
+    _statusListeners?.remove(listener);
   }
 
   bool _debugAssertNotDisposed() {
@@ -197,12 +206,5 @@ class PagingController<ItemType> extends ValueNotifier<PagingState<ItemType>> {
       'A PagingController was used after being disposed.',
     );
     return true;
-  }
-
-  @override
-  void dispose() {
-    _pageRequestListeners = null;
-    _statusListeners = null;
-    super.dispose();
   }
 }

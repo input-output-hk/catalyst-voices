@@ -10,7 +10,6 @@ import 'package:drift/drift.dart';
     DocumentsFavorites,
   ],
 )
-
 /// Exposes only public operations on favorites documents. It saves only document id and type.
 class DriftFavoritesDao extends DatabaseAccessor<DriftCatalystDatabase>
     with $DriftFavoritesDaoMixin

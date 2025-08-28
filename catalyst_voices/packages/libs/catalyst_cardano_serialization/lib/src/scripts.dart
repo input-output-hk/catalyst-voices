@@ -31,12 +31,12 @@ class InvalidAfter extends NativeScript {
   /// Converts the [InvalidAfter] to its CBOR format.
   @override
   CborValue toCbor({List<int> tags = const []}) => CborList(
-        [
-          CborSmallInt(NativeScriptType.invalidAfter.value),
-          CborSmallInt(timestamp),
-        ],
-        tags: tags,
-      );
+    [
+      CborSmallInt(NativeScriptType.invalidAfter.value),
+      CborSmallInt(timestamp),
+    ],
+    tags: tags,
+  );
 }
 
 /// Class representing an "invalid before" native script (time-locked).
@@ -60,12 +60,12 @@ class InvalidBefore extends NativeScript {
   /// Converts the [InvalidBefore] to its CBOR format.
   @override
   CborValue toCbor({List<int> tags = const []}) => CborList(
-        [
-          CborSmallInt(NativeScriptType.invalidBefore.value),
-          CborSmallInt(timestamp),
-        ],
-        tags: tags,
-      );
+    [
+      CborSmallInt(NativeScriptType.invalidBefore.value),
+      CborSmallInt(timestamp),
+    ],
+    tags: tags,
+  );
 }
 
 /// Abstract base class for native scripts, extending [Script].
@@ -139,18 +139,18 @@ sealed class NativeScript extends Script {
     return switch (json['type']) {
       'sig' => ScriptPubkey(Ed25519PublicKeyHash.fromHex(json['keyHash'] as String)),
       'all' => ScriptAll(
-          (json['scripts'] as List<Map<String, dynamic>>).map<NativeScript>(fromJSON).toList(),
-        ),
+        (json['scripts'] as List<Map<String, dynamic>>).map<NativeScript>(fromJSON).toList(),
+      ),
       'any' => ScriptAny(
-          (json['scripts'] as List<Map<String, dynamic>>).map<NativeScript>(fromJSON).toList(),
-        ),
+        (json['scripts'] as List<Map<String, dynamic>>).map<NativeScript>(fromJSON).toList(),
+      ),
       'atLeast' => ScriptNOfK(
-          json['required'] as int,
-          (json['scripts'] as List<Map<String, dynamic>>).map<NativeScript>(fromJSON).toList(),
-        ),
+        json['required'] as int,
+        (json['scripts'] as List<Map<String, dynamic>>).map<NativeScript>(fromJSON).toList(),
+      ),
       'before' => InvalidAfter(json['slot'] as int),
       'after' => InvalidBefore(json['slot'] as int),
-      _ => throw ArgumentError('Unknown script type: ${json['type']}')
+      _ => throw ArgumentError('Unknown script type: ${json['type']}'),
     };
   }
 
@@ -349,16 +349,16 @@ sealed class Script extends Equatable implements CborEncodable {
   /// Returns:
   /// - An integer representing the script type tag.
   int get tag => switch (this) {
-        NativeScript _ => 0,
-        PlutusV1Script _ => 1,
-        PlutusV2Script _ => 2,
-        PlutusV3Script _ => 3,
-        _ => throw ArgumentError.value(
-            this,
-            'script',
-            'Invalid script type to hash.',
-          ),
-      };
+    NativeScript _ => 0,
+    PlutusV1Script _ => 1,
+    PlutusV2Script _ => 2,
+    PlutusV3Script _ => 3,
+    _ => throw ArgumentError.value(
+      this,
+      'script',
+      'Invalid script type to hash.',
+    ),
+  };
 
   static CborValue _handleDoubleEncodedCbor(CborValue cborValue) {
     if (cborValue is CborBytes) {
@@ -381,8 +381,9 @@ class ScriptAll extends NativeScript {
   /// Factory constructor to create a [ScriptAll] from a CBOR list.
   factory ScriptAll.fromCbor(CborList value) {
     NativeScript._checkListNativeScriptValidity(value);
-    final scripts =
-        (value[1] as CborList).map((e) => NativeScript.fromCbor(e as CborList)).toList();
+    final scripts = (value[1] as CborList)
+        .map((e) => NativeScript.fromCbor(e as CborList))
+        .toList();
     return ScriptAll(scripts);
   }
 
@@ -393,12 +394,12 @@ class ScriptAll extends NativeScript {
   /// Converts the [ScriptAll] to its CBOR format.
   @override
   CborValue toCbor({List<int> tags = const []}) => CborList(
-        [
-          CborSmallInt(NativeScriptType.all.value),
-          CborList(nativeScripts.map((s) => s.toCbor()).toList()),
-        ],
-        tags: tags,
-      );
+    [
+      CborSmallInt(NativeScriptType.all.value),
+      CborList(nativeScripts.map((s) => s.toCbor()).toList()),
+    ],
+    tags: tags,
+  );
 }
 
 /// Class representing an "any" native script (OR operation).
@@ -425,12 +426,12 @@ class ScriptAny extends NativeScript {
   /// Converts the [ScriptAny] to its CBOR format.
   @override
   CborValue toCbor({List<int> tags = const []}) => CborList(
-        [
-          CborSmallInt(NativeScriptType.any.value),
-          CborList(nativeScripts.map((s) => s.toCbor()).toList()),
-        ],
-        tags: tags,
-      );
+    [
+      CborSmallInt(NativeScriptType.any.value),
+      CborList(nativeScripts.map((s) => s.toCbor()).toList()),
+    ],
+    tags: tags,
+  );
 }
 
 /// Class representing an "n of k" native script (M of N operation).
@@ -453,8 +454,9 @@ class ScriptNOfK extends NativeScript {
       throw ArgumentError.value(value, 'value', 'Invalid ScriptNOfK');
     }
     final n = (value[1] as CborSmallInt).value;
-    final scripts =
-        (value[2] as CborList).map((e) => NativeScript.fromCbor(e as CborList)).toList();
+    final scripts = (value[2] as CborList)
+        .map((e) => NativeScript.fromCbor(e as CborList))
+        .toList();
     return ScriptNOfK(n, scripts);
   }
 
@@ -465,13 +467,13 @@ class ScriptNOfK extends NativeScript {
   /// Converts the [ScriptNOfK] to its CBOR format.
   @override
   CborValue toCbor({List<int> tags = const []}) => CborList(
-        [
-          CborSmallInt(NativeScriptType.nOfK.value),
-          CborSmallInt(n),
-          CborList(nativeScripts.map((s) => s.toCbor()).toList()),
-        ],
-        tags: tags,
-      );
+    [
+      CborSmallInt(NativeScriptType.nOfK.value),
+      CborSmallInt(n),
+      CborList(nativeScripts.map((s) => s.toCbor()).toList()),
+    ],
+    tags: tags,
+  );
 }
 
 /// Class representing a public key based native script.
@@ -496,12 +498,12 @@ class ScriptPubkey extends NativeScript {
   /// Converts the [ScriptPubkey] to its CBOR format.
   @override
   CborValue toCbor({List<int> tags = const []}) => CborList(
-        [
-          CborSmallInt(NativeScriptType.pubkey.value),
-          CborBytes(addrKeyHash.bytes),
-        ],
-        tags: tags,
-      );
+    [
+      CborSmallInt(NativeScriptType.pubkey.value),
+      CborBytes(addrKeyHash.bytes),
+    ],
+    tags: tags,
+  );
 }
 
 /// Class representing a reference script in an transaction output.
@@ -548,10 +550,10 @@ class ScriptRef extends Script {
       PlutusV2Script _ => RefScriptType.plutusV2,
       PlutusV3Script _ => RefScriptType.plutusV3,
       _ => throw ArgumentError.value(
-          script,
-          'script',
-          'Invalid script reference type',
-        ),
+        script,
+        'script',
+        'Invalid script reference type',
+      ),
     };
     return CborList(
       [CborSmallInt(index.value), script.toCbor()],

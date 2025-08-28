@@ -68,11 +68,8 @@ class _BlocSeedPhraseWords extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSeedPhraseSelector<
-        ({
-          List<SeedPhraseWord> shuffledWords,
-          List<SeedPhraseWord> words,
-          bool isResetWordsEnabled,
-        })>(
+      ({List<SeedPhraseWord> shuffledWords, List<SeedPhraseWord> words, bool isResetWordsEnabled})
+    >(
       selector: (state) => (
         shuffledWords: state.shuffledWords,
         words: state.userWords,
@@ -114,12 +111,9 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> with Upload
   }
 
   Future<void> _importSeedPhrase() async {
-    final hasWords = RegistrationCubit.of(context)
-        .state
-        .keychainStateData
-        .seedPhraseStateData
-        .userWords
-        .isNotEmpty;
+    final hasWords = RegistrationCubit.of(
+      context,
+    ).state.keychainStateData.seedPhraseStateData.userWords.isNotEmpty;
 
     final words = await importSeedPhraseWords(requireConfirmation: hasWords);
     if (words == null || !mounted) {

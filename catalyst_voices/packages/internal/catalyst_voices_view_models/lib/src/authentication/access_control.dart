@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 final class AccessControl {
   /// Default spaces access.
   /// For example, spaces that are used in the main drawer of the app.
-  static const defaultSpacesAccess = [Space.discovery];
+  static const defaultSpacesAccess = [Space.discovery, Space.voting];
 
   /// Contributor spaces access.
   /// For example, spaces that are used in the main drawer of the app.
@@ -58,31 +58,23 @@ final class AccessControl {
     if (account == null) return defaultSpacesAccess;
     if (account.isAdmin) return Space.values;
     if (_hasProposerOrDrepRole(account)) {
-      // TODO(LynxLynxx): After F14 use _proposalAccess
-      return [Space.discovery, Space.workspace];
+      return _proposalAccess;
     }
 
-    // TODO(LynxLynxx): After F14 use _contributorAccess
-    return defaultSpacesAccess;
+    return _contributorAccess;
   }
 
   Map<Space, ShortcutActivator> spacesShortcutsActivators(
     Account? account,
   ) {
     if (account == null) {
-      return allSpacesShortcutsActivators.useKeys([Space.discovery]);
+      return allSpacesShortcutsActivators.useKeys([Space.discovery, Space.voting]);
     }
     if (account.isAdmin) return allSpacesShortcutsActivators;
     if (_hasProposerOrDrepRole(account)) {
-      return allSpacesShortcutsActivators.useKeys([
-        Space.discovery,
-        Space.workspace,
-        // TODO(LynxLynxx): After F14 add
-        // Space.voting and Space.fundedProjects
-        // OR use values from _proposalAccess
-      ]);
+      return allSpacesShortcutsActivators.useKeys(_proposalAccess);
     }
-    return allSpacesShortcutsActivators.useKeys([Space.discovery]);
+    return allSpacesShortcutsActivators.useKeys([Space.discovery, Space.voting]);
   }
 
   static bool _hasProposerOrDrepRole(Account account) {

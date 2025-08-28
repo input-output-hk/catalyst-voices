@@ -116,20 +116,20 @@ final class DocumentDataMetadataDto {
   }
 
   DocumentDataMetadataDto.fromModel(DocumentDataMetadata data)
-      : this(
-          type: data.type,
-          selfRef: data.selfRef.toDto(),
-          ref: data.ref?.toDto(),
-          refHash: data.refHash?.toDto(),
-          template: data.template?.toDto(),
-          reply: data.reply?.toDto(),
-          section: data.section,
-          brandId: data.brandId?.toDto(),
-          campaignId: data.campaignId?.toDto(),
-          electionId: data.electionId,
-          categoryId: data.categoryId?.toDto(),
-          authors: data.authors?.map((e) => e.toString()).toList(),
-        );
+    : this(
+        type: data.type,
+        selfRef: data.selfRef.toDto(),
+        ref: data.ref?.toDto(),
+        refHash: data.refHash?.toDto(),
+        template: data.template?.toDto(),
+        reply: data.reply?.toDto(),
+        section: data.section,
+        brandId: data.brandId?.toDto(),
+        campaignId: data.campaignId?.toDto(),
+        electionId: data.electionId,
+        categoryId: data.categoryId?.toDto(),
+        authors: data.authors?.map((e) => e.toString()).toList(),
+      );
 
   Map<String, dynamic> toJson() => _$DocumentDataMetadataDtoToJson(this);
 

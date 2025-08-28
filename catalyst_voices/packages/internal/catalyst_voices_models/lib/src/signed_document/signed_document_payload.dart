@@ -40,7 +40,7 @@ sealed class SignedDocumentPayload extends Equatable {
   }) {
     return switch (contentType) {
       SignedDocumentContentType.json => SignedDocumentJsonPayload.fromBytes(bytes),
-      SignedDocumentContentType.unknown => SignedDocumentUnknownPayload(bytes)
+      SignedDocumentContentType.unknown => SignedDocumentUnknownPayload(bytes),
     };
   }
 

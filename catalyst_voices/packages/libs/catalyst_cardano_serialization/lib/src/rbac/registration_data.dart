@@ -86,7 +86,7 @@ final class RegistrationData extends Equatable implements CborEncodable {
   /// Un-ordered List of CBOR encoded C509 certificates
   /// (or metadatum references).
   //
-  // TODO(dtscalac): support C509CertInMetadatumReference
+  // TODO(dt-iohk): support C509CertInMetadatumReference
   final List<RbacField<C509Certificate>>? cborCerts;
 
   /// Ordered list of simple public keys that are registered.
@@ -131,9 +131,9 @@ final class RegistrationData extends Equatable implements CborEncodable {
   /// Serializes the type as cbor.
   @override
   CborValue toCbor({List<int> tags = const []}) => CborMap(
-        _buildCborMap(),
-        tags: tags,
-      );
+    _buildCborMap(),
+    tags: tags,
+  );
 
   /// Builds a CborMap from the class properties.
   Map<CborSmallInt, CborValue> _buildCborMap() {
@@ -306,8 +306,9 @@ class RoleData extends Equatable implements CborEncodable {
     return RoleData(
       roleNumber: roleNumber.value,
       roleSigningKey: roleSigningKey != null ? LocalKeyReference.fromCbor(roleSigningKey) : null,
-      roleEncryptionKey:
-          roleEncryptionKey != null ? LocalKeyReference.fromCbor(roleEncryptionKey) : null,
+      roleEncryptionKey: roleEncryptionKey != null
+          ? LocalKeyReference.fromCbor(roleEncryptionKey)
+          : null,
       paymentKey: paymentKey?.value,
       roleSpecificData: roleSpecificData.isNotEmpty
           ? roleSpecificData.map((key, value) => MapEntry((key as CborSmallInt).value, value))
@@ -317,12 +318,12 @@ class RoleData extends Equatable implements CborEncodable {
 
   @override
   List<Object?> get props => [
-        roleNumber,
-        roleSigningKey,
-        roleEncryptionKey,
-        paymentKey,
-        roleSpecificData,
-      ];
+    roleNumber,
+    roleSigningKey,
+    roleEncryptionKey,
+    paymentKey,
+    roleSpecificData,
+  ];
 
   /// Serializes the type as cbor.
   @override

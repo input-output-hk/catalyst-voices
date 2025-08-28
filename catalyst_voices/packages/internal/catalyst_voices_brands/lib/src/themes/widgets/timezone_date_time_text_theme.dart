@@ -40,9 +40,9 @@ final class TimezoneDateTimeTextThemeData extends Equatable {
 
   @override
   List<Object?> get props => [
-        timestampTextStyle,
-        timezoneTextStyle,
-        backgroundColor,
-        foregroundColor,
-      ];
+    timestampTextStyle,
+    timezoneTextStyle,
+    backgroundColor,
+    foregroundColor,
+  ];
 }

@@ -1,11 +1,12 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart' as cs
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart'
+    as cs
     show Ed25519PublicKey;
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_cardano_serialization/src/raw_transaction_aspect.dart';
 import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart' as kd;
 import 'package:cbor/cbor.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -21,7 +22,10 @@ void main() {
       TransactionInput(transactionId: _buildDummyTransactionId(1), index: 1),
     };
     final outputs = [
-      TransactionOutput(address: address, amount: Balance(coin: Coin.fromAda(1.2))),
+      TransactionOutput(
+        address: address,
+        amount: Balance(coin: Coin.fromAda(1.2)),
+      ),
     ];
     final fee = Coin.fromAda(0.19);
     final purpose = UuidV4.fromString('ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c');
@@ -413,8 +417,9 @@ void main() {
       // Then
       expect(() => cbor.decode(rawTx.bytes), returnsNormally, reason: 'CBOR remains valid');
 
-      final chunkedData = ((cbor.decode(rawTx.auxiliaryData)
-          as CborMap)[X509MetadataEnvelope.envelopeKey]! as CborMap)[const CborSmallInt(10)];
+      final chunkedData =
+          ((cbor.decode(rawTx.auxiliaryData) as CborMap)[X509MetadataEnvelope.envelopeKey]!
+              as CborMap)[const CborSmallInt(10)];
 
       expect(
         chunkedData,

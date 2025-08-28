@@ -36,10 +36,10 @@ final class DocumentNodeId extends NodeId {
 
   /// Utility constructor which ensure that value always has correct format.
   DocumentNodeId._fromPaths(List<String> paths)
-      : this._(
-          paths.join('.'),
-          paths: paths,
-        );
+    : this._(
+        paths.join('.'),
+        paths: paths,
+      );
 
   /// The most nested path id.
   ///

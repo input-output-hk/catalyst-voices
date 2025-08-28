@@ -51,7 +51,8 @@ class MyApp extends StatelessWidget {
     const keyDerivation = CatalystKeyDerivation();
 
     final xprv = await keyDerivation.deriveMasterKey(
-      mnemonic: 'prevent company field green slot measure chief'
+      mnemonic:
+          'prevent company field green slot measure chief'
           ' hero apple task eagle sunset endorse dress seed',
     );
     print('Master xprv ${xprv.toHex()}');

@@ -54,15 +54,15 @@ final class WalletLinkStateData extends Equatable {
 
   @override
   List<Object?> get props => [
-        wallets,
-        selectedWallet,
-        hasEnoughBalance,
-        isNetworkIdMatching,
-        walletConnection,
-        walletSummary,
-        roles,
-        accountRoles,
-      ];
+    wallets,
+    selectedWallet,
+    hasEnoughBalance,
+    isNetworkIdMatching,
+    walletConnection,
+    walletSummary,
+    roles,
+    accountRoles,
+  ];
 
   Set<AccountRole> get selectedRoleTypes {
     return roles.where((role) => role.isSelected).map((e) => e.type).toSet();

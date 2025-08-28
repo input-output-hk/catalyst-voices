@@ -2,10 +2,7 @@ import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_segmented_button.dart';
 import 'package:flutter/material.dart';
 
-typedef MenuSegmentsButtons<T extends Object> = ({
-  ButtonSegment<T> first,
-  ButtonSegment<T> second,
-});
+typedef MenuSegmentsButtons<T extends Object> = ({ButtonSegment<T> first, ButtonSegment<T> second});
 
 class MenuSegmentsItemTile<T extends Object> extends StatelessWidget {
   final Widget title;

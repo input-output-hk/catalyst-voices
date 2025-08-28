@@ -1,8 +1,6 @@
 import 'package:catalyst_voices/widgets/buttons/voices_segmented_button.dart';
 import 'package:flutter/material.dart';
 
-enum _Size { xs, s, m, l, xl, xxl }
-
 class VoicesSegmentedButtonExample extends StatefulWidget {
   static const String route = '/segmented-button-example';
 
@@ -13,6 +11,8 @@ class VoicesSegmentedButtonExample extends StatefulWidget {
     return _VoicesSegmentedButtonExampleState();
   }
 }
+
+enum _Size { xs, s, m, l, xl, xxl }
 
 class _VoicesSegmentedButtonExampleState extends State<VoicesSegmentedButtonExample> {
   Set<_Size> _labelsSelection = const {_Size.m};

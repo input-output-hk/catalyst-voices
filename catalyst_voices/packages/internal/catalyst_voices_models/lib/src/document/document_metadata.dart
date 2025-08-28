@@ -17,6 +17,6 @@ abstract base class DocumentMetadata extends Equatable {
   @override
   @mustCallSuper
   List<Object?> get props => [
-        selfRef,
-      ];
+    selfRef,
+  ];
 }

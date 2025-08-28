@@ -18,14 +18,15 @@ import 'package:convert/convert.dart';
 final class SelectionUtils {
   static final _kRandom = Random(1748425502827);
 
-  static const String _chars = 'abcdefghijklmnopqrstuvwxyz'
+  static const String _chars =
+      'abcdefghijklmnopqrstuvwxyz'
       'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
       '0123456789';
 
   List<Ed25519PrivateKey> generateMockPrivateKeys(int count) => List<Ed25519PrivateKey>.generate(
-        count,
-        (int index) => Ed25519PrivateKey.seeded(count),
-      );
+    count,
+    (int index) => Ed25519PrivateKey.seeded(count),
+  );
 
   /// Generates a random amount of a balance between minPercentage and
   /// maxPercentage.
@@ -67,8 +68,9 @@ final class SelectionUtils {
     );
 
     final addressCount = count >= 2 ? (count / 2).floor() : 1;
-    final addresses =
-        isSeeded ? mockAddresses(count: addressCount) : randomAddresses(count: addressCount);
+    final addresses = isSeeded
+        ? mockAddresses(count: addressCount)
+        : randomAddresses(count: addressCount);
 
     final utxos = List.generate(
       count,
@@ -163,8 +165,9 @@ final class SelectionUtils {
         final pub = prv.publicKey;
         final hrp = _getMockAddressHrp(isBase: isBase, networkId: networkId);
 
-        final addrBytes =
-            isBase ? <int>[...pub.prefix, ...List<int>.filled(28, count)] : pub.prefix.toList();
+        final addrBytes = isBase
+            ? <int>[...pub.prefix, ...List<int>.filled(28, count)]
+            : pub.prefix.toList();
         final addr = ShelleyAddress([hrp, ...addrBytes]);
 
         return addr;
@@ -298,15 +301,14 @@ final class SelectionUtils {
   static ShelleyAddress randomAddress({
     bool isBase = true,
     NetworkId networkId = NetworkId.testnet,
-  }) =>
-      ShelleyAddress(
-        [
-          _getMockAddressHrp(isBase: isBase, networkId: networkId),
-          ...randomBytes(
-            isBase ? ShelleyAddress.baseAddrLength - 1 : ShelleyAddress.entAddrLength - 1,
-          ),
-        ],
-      );
+  }) => ShelleyAddress(
+    [
+      _getMockAddressHrp(isBase: isBase, networkId: networkId),
+      ...randomBytes(
+        isBase ? ShelleyAddress.baseAddrLength - 1 : ShelleyAddress.entAddrLength - 1,
+      ),
+    ],
+  );
 
   /// Generates a list of random Shelley addresses.
   ///
@@ -321,11 +323,10 @@ final class SelectionUtils {
     required int count,
     bool isBase = true,
     NetworkId networkId = NetworkId.testnet,
-  }) =>
-      List<ShelleyAddress>.generate(
-        count,
-        (_) => randomAddress(isBase: isBase, networkId: networkId),
-      );
+  }) => List<ShelleyAddress>.generate(
+    count,
+    (_) => randomAddress(isBase: isBase, networkId: networkId),
+  );
 
   /// Generates a random ASCII string of the specified length.
   ///
@@ -465,6 +466,5 @@ final class SelectionUtils {
   static int _getMockAddressHrp({
     bool isBase = true,
     NetworkId networkId = NetworkId.testnet,
-  }) =>
-      0 | (isBase ? 0x00 : 0x20) | networkId.id;
+  }) => 0 | (isBase ? 0x00 : 0x20) | networkId.id;
 }

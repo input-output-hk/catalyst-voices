@@ -11,9 +11,9 @@ class LinksPageFooter extends StatelessWidget {
     required this.upperChildren,
     required this.lowerChildren,
   }) : assert(
-          upperChildren.length > 0 || lowerChildren.length > 0,
-          'Make sure links page footer is not empty!',
-        );
+         upperChildren.length > 0 || lowerChildren.length > 0,
+         'Make sure links page footer is not empty!',
+       );
 
   @override
   Widget build(BuildContext context) {

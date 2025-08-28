@@ -82,9 +82,7 @@ final class Balance extends Equatable implements CborEncodable {
   }
 
   /// Returns a zero [Balance] with no [coin] or [multiAsset].
-  const Balance.zero()
-      : coin = const Coin(0),
-        multiAsset = null;
+  const Balance.zero() : coin = const Coin(0), multiAsset = null;
 
   /// Returns true if
   bool get isZero => coin == const Coin(0) && !hasMultiAssets();

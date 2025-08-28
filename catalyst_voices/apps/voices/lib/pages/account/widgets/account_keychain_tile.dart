@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
+import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class AccountKeychainTile extends StatefulWidget {
@@ -77,8 +79,24 @@ class _AccountKeychainTileState extends State<AccountKeychainTile> {
       await context.read<AccountCubit>().deleteActiveKeychain();
     }
 
+    if (mounted) unawaited(KeychainDeletedDialog.show(context));
+
     if (mounted) {
-      const DiscoveryRoute($extra: true).go(context);
+      // TODO(damian-molinski): refactor it. Should be inside AccountCubit and emit signals to page.
+      final phaseType = context.read<CampaignPhaseAwareCubit>().state.activeCampaignPhaseType;
+
+      switch (phaseType) {
+        case CampaignPhaseType.communityReview:
+        case CampaignPhaseType.communityVoting:
+          const VotingRoute($extra: true).go(context);
+        case null:
+        case CampaignPhaseType.proposalSubmission:
+        case CampaignPhaseType.votingRegistration:
+        case CampaignPhaseType.reviewRegistration:
+        case CampaignPhaseType.votingResults:
+        case CampaignPhaseType.projectOnboarding:
+          const DiscoveryRoute($extra: true).go(context);
+      }
     }
   }
 }

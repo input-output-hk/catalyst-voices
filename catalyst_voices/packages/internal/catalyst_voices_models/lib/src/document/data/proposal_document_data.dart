@@ -19,10 +19,10 @@ final class ProposalDocumentData extends Equatable {
 
   @override
   List<Object?> get props => [
-        proposal,
-        template,
-        action,
-        commentsCount,
-        versions,
-      ];
+    proposal,
+    template,
+    action,
+    commentsCount,
+    versions,
+  ];
 }

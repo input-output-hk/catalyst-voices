@@ -12,14 +12,14 @@ final class WalletMetadata extends Equatable {
   });
 
   WalletMetadata.fromCardanoWallet(CardanoWallet wallet)
-      : this(
-          name: wallet.name,
-          icon: wallet.icon,
-        );
+    : this(
+        name: wallet.name,
+        icon: wallet.icon,
+      );
 
   @override
   List<Object?> get props => [
-        name,
-        icon,
-      ];
+    name,
+    icon,
+  ];
 }

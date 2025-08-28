@@ -31,7 +31,8 @@ class VoicesTooltipsExample extends StatelessWidget {
           ),
           Center(
             child: VoicesPlainTooltip(
-              message: 'This is very long supporting text. '
+              message:
+                  'This is very long supporting text. '
                   'This is very long supporting text. '
                   'This is very long supporting text. '
                   'This is very long supporting text.',

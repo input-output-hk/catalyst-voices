@@ -15,10 +15,10 @@ final class UserSettings extends Equatable {
 
   @override
   List<Object?> get props => [
-        timezone,
-        theme,
-        showSubmissionClosingWarning,
-      ];
+    timezone,
+    theme,
+    showSubmissionClosingWarning,
+  ];
 
   UserSettings copyWith({
     Optional<TimezonePreferences>? timezone,
@@ -28,8 +28,9 @@ final class UserSettings extends Equatable {
     return UserSettings(
       timezone: timezone.dataOr(this.timezone),
       theme: theme.dataOr(this.theme),
-      showSubmissionClosingWarning:
-          showSubmissionClosingWarning.dataOr(this.showSubmissionClosingWarning),
+      showSubmissionClosingWarning: showSubmissionClosingWarning.dataOr(
+        this.showSubmissionClosingWarning,
+      ),
     );
   }
 }

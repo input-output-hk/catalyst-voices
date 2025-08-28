@@ -51,7 +51,8 @@ void main() {
           expect(
             property,
             isNotNull,
-            reason: 'Expected property {$nodeId} did not '
+            reason:
+                'Expected property {$nodeId} did not '
                 'appear in the document template. '
                 'Make sure to include it.',
           );
@@ -63,7 +64,8 @@ void main() {
         expect(
           document.authorName,
           isNotEmpty,
-          reason: 'Make sure the ${ProposalDocument.authorNameNodeId} '
+          reason:
+              'Make sure the ${ProposalDocument.authorNameNodeId} '
               'property exists.',
         );
       });
@@ -73,7 +75,8 @@ void main() {
         expect(
           document.description,
           isNotEmpty,
-          reason: 'Make sure the ${ProposalDocument.descriptionNodeId} '
+          reason:
+              'Make sure the ${ProposalDocument.descriptionNodeId} '
               'property exists.',
         );
       });
@@ -83,7 +86,8 @@ void main() {
         expect(
           document.duration,
           isNotNull,
-          reason: 'Make sure the ${ProposalDocument.durationNodeId} '
+          reason:
+              'Make sure the ${ProposalDocument.durationNodeId} '
               'property exists.',
         );
       });
@@ -93,7 +97,8 @@ void main() {
         expect(
           document.fundsRequested,
           isNotNull,
-          reason: 'Make sure the ${ProposalDocument.requestedFundsNodeId} '
+          reason:
+              'Make sure the ${ProposalDocument.requestedFundsNodeId} '
               'property exists.',
         );
       });
@@ -103,7 +108,8 @@ void main() {
         expect(
           document.milestoneCount,
           isNotNull,
-          reason: 'Make sure the ${ProposalDocument.milestoneListNodeId} '
+          reason:
+              'Make sure the ${ProposalDocument.milestoneListNodeId} '
               'property exists.',
         );
       });
@@ -113,7 +119,8 @@ void main() {
         expect(
           document.tag,
           isNotEmpty,
-          reason: 'Make sure the ${ProposalDocument.tagNodeId} '
+          reason:
+              'Make sure the ${ProposalDocument.tagNodeId} '
               'property exists.',
         );
       });
@@ -123,7 +130,8 @@ void main() {
         expect(
           document.title,
           isNotEmpty,
-          reason: 'Make sure the ${ProposalDocument.titleNodeId} '
+          reason:
+              'Make sure the ${ProposalDocument.titleNodeId} '
               'property exists.',
         );
       });

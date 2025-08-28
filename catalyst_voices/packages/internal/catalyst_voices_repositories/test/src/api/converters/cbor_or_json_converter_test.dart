@@ -68,8 +68,9 @@ void main() {
 
       final baseResponse = MockBaseResponse();
       final response = MockResponse<void>();
-      when(() => response.headers)
-          .thenReturn({HttpHeaders.contentType: ContentTypes.applicationCbor});
+      when(
+        () => response.headers,
+      ).thenReturn({HttpHeaders.contentType: ContentTypes.applicationCbor});
       when(() => response.base).thenReturn(baseResponse);
       when(() => baseResponse.request).thenReturn(request);
       when(() => cborConverter.convertResponse<void, void>(response)).thenReturn(response);
@@ -89,8 +90,9 @@ void main() {
 
       final baseResponse = MockBaseResponse();
       final response = MockResponse<void>();
-      when(() => response.headers)
-          .thenReturn({HttpHeaders.contentType: ContentTypes.applicationJson});
+      when(
+        () => response.headers,
+      ).thenReturn({HttpHeaders.contentType: ContentTypes.applicationJson});
       when(() => response.base).thenReturn(baseResponse);
       when(() => baseResponse.request).thenReturn(request);
       when(() => jsonConverter.convertResponse<void, void>(response)).thenReturn(response);

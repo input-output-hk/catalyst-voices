@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 ///
 /// This function takes a [VoicesColorScheme] as input and returns an optional
 /// [Color].
-typedef ColorResolver = Color? Function(
-  VoicesColorScheme voicesColors,
-  ColorScheme colorScheme,
-);
+typedef ColorResolver =
+    Color? Function(
+      VoicesColorScheme voicesColors,
+      ColorScheme colorScheme,
+    );

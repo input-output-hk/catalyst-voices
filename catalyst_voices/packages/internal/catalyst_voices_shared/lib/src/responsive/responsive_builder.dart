@@ -66,12 +66,12 @@ class ResponsiveBuilder<T extends Object> extends StatelessWidget {
     T? lg,
     required T other,
   }) : _responsiveData = {
-          if (xs != null) ResponsiveBreakpointKey.xs: xs,
-          if (sm != null) ResponsiveBreakpointKey.sm: sm,
-          if (md != null) ResponsiveBreakpointKey.md: md,
-          if (lg != null) ResponsiveBreakpointKey.lg: lg,
-          ResponsiveBreakpointKey.other: other,
-        };
+         if (xs != null) ResponsiveBreakpointKey.xs: xs,
+         if (sm != null) ResponsiveBreakpointKey.sm: sm,
+         if (md != null) ResponsiveBreakpointKey.md: md,
+         if (lg != null) ResponsiveBreakpointKey.lg: lg,
+         ResponsiveBreakpointKey.other: other,
+       };
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +81,8 @@ class ResponsiveBuilder<T extends Object> extends StatelessWidget {
   T _getResponsiveBreakpoint(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
 
-    final breakpointKey = _breakpoints.entries
+    final breakpointKey =
+        _breakpoints.entries
             .where((entry) => _responsiveData.containsKey(entry.key))
             .firstWhereOrNull((entry) => entry.value.contains(screenWidth))
             ?.key ??

@@ -121,11 +121,11 @@ abstract final class DocumentWithMetadataFactory {
     final documentMetadata = DocumentMetadataFieldKey.values.map((fieldKey) {
       return switch (fieldKey) {
         DocumentMetadataFieldKey.title => DocumentMetadataFactory.build(
-            ver: document.metadata.version,
-            fieldKey: fieldKey,
-            // This should come from document.metadata
-            fieldValue: 'Document[${document.metadata.version}] title',
-          ),
+          ver: document.metadata.version,
+          fieldKey: fieldKey,
+          // This should come from document.metadata
+          fieldValue: 'Document[${document.metadata.version}] title',
+        ),
       };
     }).toList();
 

@@ -39,10 +39,10 @@ final class MaxProposalsLimitReachedSignal extends ProposalBuilderSignal {
 
   @override
   List<Object?> get props => [
-        proposalSubmissionCloseDate,
-        currentSubmissions,
-        maxSubmissions,
-      ];
+    proposalSubmissionCloseDate,
+    currentSubmissions,
+    maxSubmissions,
+  ];
 }
 
 /// Signal emitted by [ProposalBuilderBloc]. Tells the UI that the proposal has been successfully forgot.
@@ -91,10 +91,10 @@ final class ShowPublishConfirmationSignal extends ProposalBuilderSignal {
 
   @override
   List<Object?> get props => [
-        proposalTitle,
-        currentIteration,
-        nextIteration,
-      ];
+    proposalTitle,
+    currentIteration,
+    nextIteration,
+  ];
 }
 
 /// Signal emitted by [ProposalBuilderBloc]. Tells the UI that the user wants to submit the proposal.
@@ -111,10 +111,10 @@ final class ShowSubmitConfirmationSignal extends ProposalBuilderSignal {
 
   @override
   List<Object?> get props => [
-        proposalTitle,
-        currentIteration,
-        nextIteration,
-      ];
+    proposalTitle,
+    currentIteration,
+    nextIteration,
+  ];
 }
 
 /// Signal emitted by [ProposalBuilderBloc]. Tells the UI that the proposal was successfully submitted.

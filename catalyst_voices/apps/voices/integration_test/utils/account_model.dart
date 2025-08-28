@@ -5,24 +5,13 @@ class Account {
   final List<String> seedPhrase;
   final String role;
 
-  Account({
+  const Account({
     required this.displayName,
     required this.emailAddress,
     required this.password,
     required this.seedPhrase,
     this.role = 'voter', // Default role is 'voter'
   });
-
-  // Convert the account to a JSON map
-  Map<String, dynamic> toJson() {
-    return {
-      'displayName': displayName,
-      'emailAddress': emailAddress,
-      'password': password,
-      'seedPhrase': seedPhrase,
-      'role': role,
-    };
-  }
 
   // Create an account from a JSON map
   factory Account.fromJson(Map<String, dynamic> json) {
@@ -33,5 +22,16 @@ class Account {
       seedPhrase: (json['seedPhrase'] as List<dynamic>).cast<String>(),
       role: json['role'] as String? ?? 'voter',
     );
+  }
+
+  // Convert the account to a JSON map
+  Map<String, dynamic> toJson() {
+    return {
+      'displayName': displayName,
+      'emailAddress': emailAddress,
+      'password': password,
+      'seedPhrase': seedPhrase,
+      'role': role,
+    };
   }
 }

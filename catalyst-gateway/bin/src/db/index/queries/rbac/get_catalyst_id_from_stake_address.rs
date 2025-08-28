@@ -1,12 +1,11 @@
 //! Get Catalyst ID by stake address.
 
-use std::sync::{Arc, LazyLock};
+use std::sync::Arc;
 
 use anyhow::{Context, Result};
 use cardano_chain_follower::StakeAddress;
 use catalyst_types::catalyst_id::CatalystId;
 use futures::{StreamExt, TryStreamExt};
-use moka::{policy::EvictionPolicy, sync::Cache};
 use scylla::{
     client::{pager::TypedRowStream, session::Session},
     statement::{prepared::PreparedStatement, Consistency},
@@ -22,31 +21,14 @@ use crate::{
         },
         types::{DbCatalystId, DbStakeAddress},
     },
-    metrics::rbac::reporter::{
-        PERSISTENT_STAKE_ADDRESSES_CACHE_HIT, PERSISTENT_STAKE_ADDRESSES_CACHE_MISS,
-        VOLATILE_STAKE_ADDRESSES_CACHE_HIT, VOLATILE_STAKE_ADDRESSES_CACHE_MISS,
+    metrics::caches::rbac::{
+        rbac_persistent_stake_address_cache_hits_inc, rbac_persistent_stake_address_cache_miss_inc,
+        rbac_volatile_stake_address_cache_hits_inc, rbac_volatile_stake_address_cache_miss_inc,
     },
-    settings::Settings,
 };
 
 /// Get Catalyst ID by stake address query string.
 const QUERY: &str = include_str!("../cql/get_catalyst_id_for_stake_address.cql");
-
-/// A persistent cache instance.
-static PERSISTENT_CACHE: LazyLock<Cache<StakeAddress, CatalystId>> = LazyLock::new(|| {
-    Cache::builder()
-        .eviction_policy(EvictionPolicy::lru())
-        .max_capacity(Settings::rbac_cfg().persistent_pub_keys_cache_size)
-        .build()
-});
-
-/// A volatile cache instance.
-static VOLATILE_CACHE: LazyLock<Cache<StakeAddress, CatalystId>> = LazyLock::new(|| {
-    Cache::builder()
-        .eviction_policy(EvictionPolicy::lru())
-        .max_capacity(Settings::rbac_cfg().volatile_pub_keys_cache_size)
-        .build()
-});
 
 /// Get Catalyst ID by stake address query params.
 #[derive(SerializeRow)]
@@ -89,12 +71,34 @@ impl Query {
     pub(crate) async fn latest(
         session: &CassandraSession, stake_address: &StakeAddress,
     ) -> Result<Option<CatalystId>> {
-        let cache = cache(session.is_persistent());
+        let cache = session.caches().rbac_stake_address();
 
-        let res = cache.get(stake_address);
-        update_cache_metrics(session.is_persistent(), res.is_some());
-        if let Some(res) = res {
-            return Ok(Some(res));
+        if cache.is_enabled() {
+            let entry_opt = cache.get(stake_address);
+
+            let entry_opt = if session.is_persistent() {
+                entry_opt
+                    .inspect(|_| {
+                        rbac_persistent_stake_address_cache_hits_inc();
+                    })
+                    .or_else(|| {
+                        rbac_persistent_stake_address_cache_miss_inc();
+                        None
+                    })
+            } else {
+                entry_opt
+                    .inspect(|_| {
+                        rbac_volatile_stake_address_cache_hits_inc();
+                    })
+                    .or_else(|| {
+                        rbac_volatile_stake_address_cache_miss_inc();
+                        None
+                    })
+            };
+
+            if entry_opt.is_some() {
+                return Ok(entry_opt);
+            }
         }
 
         Self::execute(session, QueryParams {
@@ -118,57 +122,17 @@ impl Query {
 pub fn cache_stake_address(
     is_persistent: bool, stake_address: StakeAddress, catalyst_id: CatalystId,
 ) {
-    let cache = cache(is_persistent);
-    cache.insert(stake_address, catalyst_id);
+    CassandraSession::get(is_persistent).inspect(|session| {
+        session
+            .caches()
+            .rbac_stake_address()
+            .insert(stake_address, catalyst_id);
+    });
 }
 
 /// Removes all cached values.
 pub fn invalidate_stake_addresses_cache(is_persistent: bool) {
-    let cache = cache(is_persistent);
-    cache.invalidate_all();
-}
-
-/// Returns an approximate number of entries in the stake addresses cache.
-pub fn stake_addresses_cache_size(is_persistent: bool) -> u64 {
-    let cache = cache(is_persistent);
-    cache.entry_count()
-}
-
-/// Returns a persistent or a volatile cache instance depending on the parameter value.
-fn cache(is_persistent: bool) -> &'static Cache<StakeAddress, CatalystId> {
-    if is_persistent {
-        &PERSISTENT_CACHE
-    } else {
-        &VOLATILE_CACHE
-    }
-}
-
-/// Updates metrics of the cache.
-fn update_cache_metrics(is_persistent: bool, is_found: bool) {
-    let api_host_names = Settings::api_host_names().join(",");
-    let service_id = Settings::service_id();
-    let network = Settings::cardano_network().to_string();
-
-    match (is_persistent, is_found) {
-        (true, true) => {
-            PERSISTENT_STAKE_ADDRESSES_CACHE_HIT
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
-        },
-        (true, false) => {
-            PERSISTENT_STAKE_ADDRESSES_CACHE_MISS
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
-        },
-        (false, true) => {
-            VOLATILE_STAKE_ADDRESSES_CACHE_HIT
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
-        },
-        (false, false) => {
-            VOLATILE_STAKE_ADDRESSES_CACHE_MISS
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
-        },
-    }
+    CassandraSession::get(is_persistent).inspect(|session| {
+        session.caches().rbac_stake_address().clear_cache();
+    });
 }

@@ -27,20 +27,45 @@ class VoicesHttpsTextField extends StatefulWidget {
   State<VoicesHttpsTextField> createState() => _VoicesHttpsTextFieldState();
 }
 
+class _AdditionalSuffixIcons extends StatelessWidget {
+  final bool enabled;
+  final bool canClear;
+  final VoidCallback onLinkTap;
+  final VoidCallback onClearTap;
+
+  const _AdditionalSuffixIcons({
+    required this.enabled,
+    required this.canClear,
+    required this.onLinkTap,
+    required this.onClearTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (!enabled) {
+      return VoicesIconButton(
+        onTap: onLinkTap,
+        child: VoicesAssets.icons.externalLink.buildIcon(
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      );
+    }
+    return Offstage(
+      offstage: !canClear,
+      child: TextButton(
+        onPressed: onClearTap,
+        child: Text(context.l10n.clear),
+      ),
+    );
+  }
+}
+
 class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField> with LaunchUrlMixin {
   final _textFieldKey = GlobalKey<VoicesTextFieldState>();
 
   TextEditingController? _controller;
   TextEditingController get _effectiveController {
     return widget.controller ?? (_controller ??= TextEditingController());
-  }
-
-  @override
-  void dispose() {
-    _controller?.dispose();
-    _controller = null;
-
-    super.dispose();
   }
 
   @override
@@ -89,6 +114,14 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField> with Launch
     );
   }
 
+  @override
+  void dispose() {
+    _controller?.dispose();
+    _controller = null;
+
+    super.dispose();
+  }
+
   TextStyle? _getTextStyle(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
@@ -113,38 +146,5 @@ class _VoicesHttpsTextFieldState extends State<VoicesHttpsTextField> with Launch
 
   void _onClearTap() {
     _textFieldKey.currentState?.clear();
-  }
-}
-
-class _AdditionalSuffixIcons extends StatelessWidget {
-  final bool enabled;
-  final bool canClear;
-  final VoidCallback onLinkTap;
-  final VoidCallback onClearTap;
-
-  const _AdditionalSuffixIcons({
-    required this.enabled,
-    required this.canClear,
-    required this.onLinkTap,
-    required this.onClearTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (!enabled) {
-      return VoicesIconButton(
-        onTap: onLinkTap,
-        child: VoicesAssets.icons.externalLink.buildIcon(
-          color: Theme.of(context).colorScheme.primary,
-        ),
-      );
-    }
-    return Offstage(
-      offstage: !canClear,
-      child: TextButton(
-        onPressed: onClearTap,
-        child: Text(context.l10n.clear),
-      ),
-    );
   }
 }

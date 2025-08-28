@@ -19,6 +19,16 @@ import 'target.dart';
 final _log = Logger('precompile_binaries');
 
 class PrecompileBinaries {
+  final PrivateKey privateKey;
+
+  final String githubToken;
+  final RepositorySlug repositorySlug;
+  final String manifestDir;
+  final List<Target> targets;
+  final String? androidSdkLocation;
+  final String? androidNdkVersion;
+  final int? androidMinSdkVersion;
+  final String? tempDir;
   PrecompileBinaries({
     required this.privateKey,
     required this.githubToken,
@@ -30,24 +40,6 @@ class PrecompileBinaries {
     this.androidMinSdkVersion,
     this.tempDir,
   });
-
-  final PrivateKey privateKey;
-  final String githubToken;
-  final RepositorySlug repositorySlug;
-  final String manifestDir;
-  final List<Target> targets;
-  final String? androidSdkLocation;
-  final String? androidNdkVersion;
-  final int? androidMinSdkVersion;
-  final String? tempDir;
-
-  static String fileName(Target target, String name) {
-    return '${target.rust}_$name';
-  }
-
-  static String signatureFileName(Target target, String name) {
-    return '${target.rust}_$name.sig';
-  }
 
   Future<void> run() async {
     final crateInfo = CrateInfo.load(manifestDir);
@@ -82,9 +74,7 @@ class PrecompileBinaries {
 
     tempDir.createSync(recursive: true);
 
-    final crateOptions = CargokitCrateOptions.load(
-      manifestDir: manifestDir,
-    );
+    final crateOptions = CargokitCrateOptions.load(manifestDir: manifestDir);
 
     final buildEnvironment = BuildEnvironment(
       configuration: BuildConfiguration.release,
@@ -117,8 +107,10 @@ class PrecompileBinaries {
 
       _log.info('Building for $target');
 
-      final builder =
-          RustBuilder(target: target, environment: buildEnvironment);
+      final builder = RustBuilder(
+        target: target,
+        environment: buildEnvironment,
+      );
       builder.prepare(rustup);
       final res = await builder.build();
 
@@ -162,7 +154,8 @@ class PrecompileBinaries {
             }
             ++retryCount;
             _log.shout(
-                'Upload failed (attempt $retryCount, will retry): ${e.toString()}');
+              'Upload failed (attempt $retryCount, will retry): ${e.toString()}',
+            );
             await Future.delayed(Duration(seconds: 2));
           }
         }
@@ -186,17 +179,27 @@ class PrecompileBinaries {
     } on ReleaseNotFound {
       _log.info('Release not found - creating release $tagName');
       release = await repo.createRelease(
-          repositorySlug,
-          CreateRelease.from(
-            tagName: tagName,
-            name: 'Precompiled binaries ${hash.substring(0, 8)}',
-            targetCommitish: null,
-            isDraft: false,
-            isPrerelease: false,
-            body: 'Precompiled binaries for crate $packageName, '
-                'crate hash $hash.',
-          ));
+        repositorySlug,
+        CreateRelease.from(
+          tagName: tagName,
+          name: 'Precompiled binaries ${hash.substring(0, 8)}',
+          targetCommitish: null,
+          isDraft: false,
+          isPrerelease: false,
+          body:
+              'Precompiled binaries for crate $packageName, '
+              'crate hash $hash.',
+        ),
+      );
     }
     return release;
+  }
+
+  static String fileName(Target target, String name) {
+    return '${target.rust}_$name';
+  }
+
+  static String signatureFileName(Target target, String name) {
+    return '${target.rust}_$name.sig';
   }
 }

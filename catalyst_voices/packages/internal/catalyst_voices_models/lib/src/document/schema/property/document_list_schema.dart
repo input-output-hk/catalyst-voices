@@ -71,8 +71,8 @@ sealed class DocumentListSchema extends DocumentPropertySchema {
     required this.itemsRange,
     required this.uniqueItems,
   }) : super(
-          type: DocumentPropertyType.list,
-        );
+         type: DocumentPropertyType.list,
+       );
 
   @override
   @mustCallSuper

@@ -12,9 +12,7 @@ final class EqOrRangedIdDto extends EqOrRangedId {
   final String? min;
   final String? max;
 
-  const EqOrRangedIdDto.eq(this.eq)
-      : min = null,
-        max = null;
+  const EqOrRangedIdDto.eq(this.eq) : min = null, max = null;
 
   const EqOrRangedIdDto.range({
     required this.min,

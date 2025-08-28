@@ -8,10 +8,6 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
-final class VoicesTimeFieldController extends ValueNotifier<TimeOfDay?> {
-  VoicesTimeFieldController([super._value]);
-}
-
 class VoicesTimeField extends StatefulWidget {
   final VoicesTimeFieldController? controller;
   final ValueChanged<TimeOfDay?>? onChanged;
@@ -36,40 +32,47 @@ class VoicesTimeField extends StatefulWidget {
   State<VoicesTimeField> createState() => _VoicesTimeFieldState();
 }
 
+final class VoicesTimeFieldController extends ValueNotifier<TimeOfDay?> {
+  VoicesTimeFieldController([super._value]);
+}
+
 class _VoicesTimeFieldState extends State<VoicesTimeField> {
   late final TextEditingController _textEditingController;
   late final MaskTextInputFormatter timeFormatter;
 
   VoicesTimeFieldController? _controller;
 
+  String get timeZone => widget.timeZone ?? '';
+
   VoicesTimeFieldController get _effectiveController {
     return widget.controller ?? (_controller ??= VoicesTimeFieldController());
   }
 
   String get _pattern => 'HH:MM';
-  String get timeZone => widget.timeZone ?? '';
 
   @override
-  void initState() {
-    final initialTime = _effectiveController.value;
-    final initialText = _convertTimeToText(initialTime);
-    final textValue = TextEditingValueExt.collapsedAtEndOf(initialText);
+  Widget build(BuildContext context) {
+    final onChanged = widget.onChanged;
+    final onFieldSubmitted = widget.onFieldSubmitted;
 
-    _textEditingController = TextEditingController.fromValue(textValue)
-      ..addListener(_handleTextChanged);
-
-    _effectiveController.addListener(_handleDateChanged);
-
-    timeFormatter = MaskTextInputFormatter(
-      mask: _pattern,
-      filter: {
-        'H': RegExp('[0-9]'),
-        'M': RegExp('[0-9]'),
-      },
-      type: MaskAutoCompletionType.eager,
+    return VoicesDateTimeTextField(
+      controller: _textEditingController,
+      onChanged: onChanged != null ? (value) => onChanged(_convertTextToTime(value)) : null,
+      validator: _validator,
+      hintText: '${_pattern.toUpperCase()} $timeZone',
+      onFieldSubmitted: onFieldSubmitted != null
+          ? (value) => onFieldSubmitted(_convertTextToTime(value))
+          : null,
+      suffixIcon: ExcludeFocus(
+        child: VoicesIconButton(
+          onTap: widget.onClockTap,
+          child: VoicesAssets.icons.clock.buildIcon(),
+        ),
+      ),
+      dimBorder: widget.dimBorder,
+      borderRadius: widget.borderRadius,
+      inputFormatters: [timeFormatter],
     );
-
-    super.initState();
   }
 
   @override
@@ -95,47 +98,26 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final onChanged = widget.onChanged;
-    final onFieldSubmitted = widget.onFieldSubmitted;
+  void initState() {
+    final initialTime = _effectiveController.value;
+    final initialText = _convertTimeToText(initialTime);
+    final textValue = TextEditingValueExt.collapsedAtEndOf(initialText);
 
-    return VoicesDateTimeTextField(
-      controller: _textEditingController,
-      onChanged: onChanged != null ? (value) => onChanged(_convertTextToTime(value)) : null,
-      validator: _validator,
-      hintText: '${_pattern.toUpperCase()} $timeZone',
-      onFieldSubmitted:
-          onFieldSubmitted != null ? (value) => onFieldSubmitted(_convertTextToTime(value)) : null,
-      suffixIcon: ExcludeFocus(
-        child: VoicesIconButton(
-          onTap: widget.onClockTap,
-          child: VoicesAssets.icons.clock.buildIcon(),
-        ),
-      ),
-      dimBorder: widget.dimBorder,
-      borderRadius: widget.borderRadius,
-      inputFormatters: [timeFormatter],
+    _textEditingController = TextEditingController.fromValue(textValue)
+      ..addListener(_handleTextChanged);
+
+    _effectiveController.addListener(_handleDateChanged);
+
+    timeFormatter = MaskTextInputFormatter(
+      mask: _pattern,
+      filter: {
+        'H': RegExp('[0-9]'),
+        'M': RegExp('[0-9]'),
+      },
+      type: MaskAutoCompletionType.eager,
     );
-  }
 
-  void _handleTextChanged() {
-    final text = _textEditingController.text;
-    final time = _convertTextToTime(text);
-    if (_effectiveController.value != time) {
-      _effectiveController.value = time;
-    }
-  }
-
-  void _handleDateChanged() {
-    final time = _effectiveController.value;
-    final text = _convertTimeToText(time);
-    if (_textEditingController.text != text) {
-      _textEditingController.textWithSelection = text;
-    }
-  }
-
-  String _convertTimeToText(TimeOfDay? value) {
-    return value?.formatted ?? '';
+    super.initState();
   }
 
   TimeOfDay? _convertTextToTime(String value) {
@@ -155,6 +137,26 @@ class _VoicesTimeFieldState extends State<VoicesTimeField> {
       return TimeOfDay(hour: hour, minute: minute);
     } catch (e) {
       return null;
+    }
+  }
+
+  String _convertTimeToText(TimeOfDay? value) {
+    return value?.formatted ?? '';
+  }
+
+  void _handleDateChanged() {
+    final time = _effectiveController.value;
+    final text = _convertTimeToText(time);
+    if (_textEditingController.text != text) {
+      _textEditingController.textWithSelection = text;
+    }
+  }
+
+  void _handleTextChanged() {
+    final text = _textEditingController.text;
+    final time = _convertTextToTime(text);
+    if (_effectiveController.value != time) {
+      _effectiveController.value = time;
     }
   }
 

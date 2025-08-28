@@ -7,7 +7,8 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group(CatalystKeyDerivation, () {
-    const mnemonic = 'prevent company field green slot measure chief'
+    const mnemonic =
+        'prevent company field green slot measure chief'
         ' hero apple task eagle sunset endorse dress seed';
     const keyDerivation = CatalystKeyDerivation();
     var initializedSuccessfully = false;

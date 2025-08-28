@@ -9,6 +9,11 @@ base class MemoryStorage with StorageAsStringMixin implements Storage {
   MemoryStorage();
 
   @override
+  FutureOr<void> clear() {
+    _data.clear();
+  }
+
+  @override
   Future<bool> contains({required String key}) async {
     return _data.containsKey(key);
   }
@@ -28,10 +33,5 @@ base class MemoryStorage with StorageAsStringMixin implements Storage {
     } else {
       _data.remove(key);
     }
-  }
-
-  @override
-  FutureOr<void> clear() {
-    _data.clear();
   }
 }

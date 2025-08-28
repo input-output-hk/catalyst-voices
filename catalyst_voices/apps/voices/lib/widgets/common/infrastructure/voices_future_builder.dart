@@ -4,28 +4,42 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-/// A callback that generates a new [Future] of type [T].
-typedef VoicesFutureProvider<T extends Object> = Future<T> Function();
+Widget _defaultErrorBuilder(
+  BuildContext context,
+  Object? error,
+  VoidCallback onRetry,
+) {
+  return _Error(onRetry: onRetry);
+}
+
+Widget _defaultLoaderBuilder(BuildContext context) {
+  return const _Loader();
+}
 
 /// A callback that builds a widget from a [T] value.
 ///
 /// Call [onRetry] if your data state contains
 /// the retry button, it will reload the widget.
-typedef VoicesFutureDataBuilder<T> = Widget Function(
-  BuildContext context,
-  T value,
-  VoidCallback onRetry,
-);
+typedef VoicesFutureDataBuilder<T> =
+    Widget Function(
+      BuildContext context,
+      T value,
+      VoidCallback onRetry,
+    );
 
 /// A callback that builds a widget in an error state.
 ///
 /// Call [onRetry] if your error state contains
 /// the retry button, it will reload the widget.
-typedef VoicesFutureErrorBuilder = Widget Function(
-  BuildContext context,
-  Object? error,
-  VoidCallback onRetry,
-);
+typedef VoicesFutureErrorBuilder =
+    Widget Function(
+      BuildContext context,
+      Object? error,
+      VoidCallback onRetry,
+    );
+
+/// A callback that generates a new [Future] of type [T].
+typedef VoicesFutureProvider<T extends Object> = Future<T> Function();
 
 /// A [FutureBuilder] which simplifies handling a [Future] gently.
 class VoicesFutureBuilder<T extends Object> extends StatefulWidget {
@@ -73,76 +87,6 @@ class VoicesFutureBuilder<T extends Object> extends StatefulWidget {
   State<VoicesFutureBuilder> createState() => _VoicesFutureBuilderState<T>();
 }
 
-class _VoicesFutureBuilderState<T extends Object> extends State<VoicesFutureBuilder<T>> {
-  Future<T>? _future;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // ignore: discarded_futures
-    _future = _makeDelayedFuture();
-  }
-
-  @override
-  void dispose() {
-    _future = null;
-    super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(VoicesFutureBuilder<T> oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (widget.future != oldWidget.future) {
-      // ignore: discarded_futures
-      _future = _makeDelayedFuture();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<T>(
-      future: _future,
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return widget.errorBuilder(context, snapshot.error, _onRetry);
-        }
-
-        final data = snapshot.data;
-        if (data == null) {
-          return widget.loaderBuilder(context);
-        }
-
-        return widget.dataBuilder(context, data, _onRetry);
-      },
-    );
-  }
-
-  void _onRetry() {
-    setState(() {
-      // ignore: discarded_futures
-      _future = _makeDelayedFuture();
-    });
-  }
-
-  Future<T> _makeDelayedFuture() async {
-    return widget.future().withMinimumDelay(widget.minimumDelay);
-  }
-}
-
-Widget _defaultErrorBuilder(
-  BuildContext context,
-  Object? error,
-  VoidCallback onRetry,
-) {
-  return _Error(onRetry: onRetry);
-}
-
-Widget _defaultLoaderBuilder(BuildContext context) {
-  return const _Loader();
-}
-
 class _Error extends StatelessWidget {
   final VoidCallback onRetry;
 
@@ -163,5 +107,63 @@ class _Loader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Center(child: VoicesCircularProgressIndicator());
+  }
+}
+
+class _VoicesFutureBuilderState<T extends Object> extends State<VoicesFutureBuilder<T>> {
+  Future<T>? _future;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<T>(
+      future: _future,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return widget.errorBuilder(context, snapshot.error, _onRetry);
+        }
+
+        final data = snapshot.data;
+        if (data == null) {
+          return widget.loaderBuilder(context);
+        }
+
+        return widget.dataBuilder(context, data, _onRetry);
+      },
+    );
+  }
+
+  @override
+  void didUpdateWidget(VoicesFutureBuilder<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.future != oldWidget.future) {
+      // ignore: discarded_futures
+      _future = _makeDelayedFuture();
+    }
+  }
+
+  @override
+  void dispose() {
+    _future = null;
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // ignore: discarded_futures
+    _future = _makeDelayedFuture();
+  }
+
+  Future<T> _makeDelayedFuture() async {
+    return widget.future().withMinimumDelay(widget.minimumDelay);
+  }
+
+  void _onRetry() {
+    setState(() {
+      // ignore: discarded_futures
+      _future = _makeDelayedFuture();
+    });
   }
 }

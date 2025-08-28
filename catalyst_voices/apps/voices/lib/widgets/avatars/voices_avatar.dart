@@ -47,11 +47,11 @@ class VoicesAvatar extends StatelessWidget {
     );
 
     final textStyle = Theme.of(context).textTheme.bodyLarge!.copyWith(
-          fontWeight: FontWeight.w700,
-          fontSize: 18,
-          height: 1,
-          color: foregroundColor ?? Theme.of(context).colorScheme.primary,
-        );
+      fontWeight: FontWeight.w700,
+      fontSize: 18,
+      height: 1,
+      color: foregroundColor ?? Theme.of(context).colorScheme.primary,
+    );
 
     return Container(
       width: radius * 2,

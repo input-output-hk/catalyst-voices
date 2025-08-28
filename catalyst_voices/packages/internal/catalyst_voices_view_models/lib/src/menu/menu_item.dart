@@ -1,13 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-abstract interface class MenuItem {
-  String get id;
-
-  String get label;
-
-  bool get isEnabled;
-}
-
 base class BasicMenuItem extends Equatable implements MenuItem {
   @override
   final String id;
@@ -24,8 +16,16 @@ base class BasicMenuItem extends Equatable implements MenuItem {
 
   @override
   List<Object?> get props => [
-        id,
-        label,
-        isEnabled,
-      ];
+    id,
+    label,
+    isEnabled,
+  ];
+}
+
+abstract interface class MenuItem {
+  String get id;
+
+  bool get isEnabled;
+
+  String get label;
 }

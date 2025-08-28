@@ -28,10 +28,10 @@ class _RegistrationConditionsRichTextState extends State<RegistrationConditionsR
       placeholderSpanBuilder: (context, placeholder) {
         return switch (placeholder) {
           'conditions' => TextSpan(
-              text: context.l10n.catalystConditions,
-              recognizer: _recognizer,
-              style: const TextStyle(decoration: TextDecoration.underline),
-            ),
+            text: context.l10n.catalystConditions,
+            recognizer: _recognizer,
+            style: const TextStyle(decoration: TextDecoration.underline),
+          ),
           _ => throw ArgumentError('Unknown placeholder', placeholder),
         };
       },

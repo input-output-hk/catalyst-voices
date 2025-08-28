@@ -6,16 +6,6 @@ import 'package:flutter/material.dart';
 class EditRolesDialog extends StatelessWidget {
   const EditRolesDialog._();
 
-  static Future<bool> show(BuildContext context) async {
-    final result = await VoicesDialog.show<bool>(
-      context: context,
-      routeSettings: const RouteSettings(name: '/edit-roles'),
-      builder: (context) => const EditRolesDialog._(),
-    );
-
-    return result ?? false;
-  }
-
   @override
   Widget build(BuildContext context) {
     return VoicesDesktopInfoDialog(
@@ -27,5 +17,15 @@ class EditRolesDialog extends StatelessWidget {
         child: Text(context.l10n.continueText),
       ),
     );
+  }
+
+  static Future<bool> show(BuildContext context) async {
+    final result = await VoicesDialog.show<bool>(
+      context: context,
+      routeSettings: const RouteSettings(name: '/edit-roles'),
+      builder: (context) => const EditRolesDialog._(),
+    );
+
+    return result ?? false;
   }
 }

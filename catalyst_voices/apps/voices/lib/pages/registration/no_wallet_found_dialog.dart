@@ -245,13 +245,15 @@ class _NoWalletErrorReason extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: context.textTheme.titleMedium
-                      ?.copyWith(color: context.colors.textOnPrimaryLevel1),
+                  style: context.textTheme.titleMedium?.copyWith(
+                    color: context.colors.textOnPrimaryLevel1,
+                  ),
                 ),
                 Text(
                   description,
-                  style: context.textTheme.bodyMedium
-                      ?.copyWith(color: context.colors.textOnPrimaryLevel1),
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: context.colors.textOnPrimaryLevel1,
+                  ),
                 ),
               ],
             ),
@@ -293,8 +295,9 @@ class _RightSide extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         Expanded(
-          child:
-              CatalystBrowser.isSafari ? const _SafariNotSupported() : const _NoExtensionsFound(),
+          child: CatalystBrowser.isSafari
+              ? const _SafariNotSupported()
+              : const _NoExtensionsFound(),
         ),
       ],
     );

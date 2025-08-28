@@ -14,10 +14,10 @@ class DropdownMenuViewModel<T extends Object> extends Equatable {
 
   @override
   List<Object?> get props => [
-        value,
-        name,
-        isSelected,
-      ];
+    value,
+    name,
+    isSelected,
+  ];
 }
 
 extension ListDropdownMenuViewModelExt on List<DropdownMenuViewModel> {

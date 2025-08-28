@@ -95,14 +95,14 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }) {
     return _database.draftsDao
         .watchAll(
-      limit: limit,
-      type: type,
-      authorId: authorId,
-    )
+          limit: limit,
+          type: type,
+          authorId: authorId,
+        )
         .map((event) {
-      final list = List<DocumentData>.from(event.map((e) => e.toModel()));
-      return list;
-    });
+          final list = List<DocumentData>.from(event.map((e) => e.toModel()));
+          return list;
+        });
   }
 }
 

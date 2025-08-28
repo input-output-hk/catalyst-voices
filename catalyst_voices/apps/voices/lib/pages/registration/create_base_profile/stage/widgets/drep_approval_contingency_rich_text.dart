@@ -28,10 +28,10 @@ class _DrepApprovalContingencyRichTextState extends State<DrepApprovalContingenc
       placeholderSpanBuilder: (context, placeholder) {
         return switch (placeholder) {
           'fund14ProposalSubmissionNotice' => TextSpan(
-              text: context.l10n.fund14ProposalSubmissionNotice,
-              recognizer: _f14ProposalSubmissionNoticeRecognizer,
-              style: const TextStyle(decoration: TextDecoration.underline),
-            ),
+            text: context.l10n.fund14ProposalSubmissionNotice,
+            recognizer: _f14ProposalSubmissionNoticeRecognizer,
+            style: const TextStyle(decoration: TextDecoration.underline),
+          ),
           _ => throw ArgumentError('Unknown placeholder', placeholder),
         };
       },

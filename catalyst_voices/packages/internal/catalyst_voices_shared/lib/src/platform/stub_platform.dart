@@ -3,6 +3,10 @@ import 'package:catalyst_voices_shared/src/platform/platform_key.dart';
 /// A set of utils related to detecting the platform (OS, form factor)
 /// of the device where the application is running.
 final class CatalystPlatform {
+  static Map<PlatformKey, bool> get identifiers {
+    throw UnimplementedError('Stub CatalystPlatform');
+  }
+
   static bool get isAndroid {
     throw UnimplementedError('Stub CatalystPlatform');
   }
@@ -44,10 +48,6 @@ final class CatalystPlatform {
   }
 
   static bool get isWindows {
-    throw UnimplementedError('Stub CatalystPlatform');
-  }
-
-  static Map<PlatformKey, bool> get identifiers {
     throw UnimplementedError('Stub CatalystPlatform');
   }
 

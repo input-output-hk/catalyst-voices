@@ -60,8 +60,9 @@ class _CopyCatalystIdTipText extends StatelessWidget {
               context.l10n.tipCopyCatalystIdForReviewTool(
                 ShareManager.of(context).becomeReviewer().decoded(),
               ),
-              style:
-                  context.textTheme.bodyMedium?.copyWith(color: context.colors.textOnPrimaryLevel1),
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: context.colors.textOnPrimaryLevel1,
+              ),
             ),
           ),
         );

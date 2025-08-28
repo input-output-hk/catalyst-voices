@@ -36,14 +36,14 @@ final class AccountState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        catalystId,
-        username,
-        email,
-        roles,
-        walletConnected,
-        accountPublicStatus,
-      ];
+    status,
+    catalystId,
+    username,
+    email,
+    roles,
+    walletConnected,
+    accountPublicStatus,
+  ];
 
   AccountState copyWith({
     MyAccountStatusNotification? status,

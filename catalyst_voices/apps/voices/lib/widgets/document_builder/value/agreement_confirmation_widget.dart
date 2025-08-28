@@ -24,6 +24,57 @@ class AgreementConfirmationWidget extends StatefulWidget {
   State<AgreementConfirmationWidget> createState() => _AgreementConfirmationWidgetState();
 }
 
+class _AgreementConfirmationFormField extends VoicesFormField<bool> {
+  _AgreementConfirmationFormField({
+    required super.value,
+    required super.onChanged,
+    super.enabled,
+    super.validator,
+    required MarkdownData description,
+  }) : super(
+         builder: (field) {
+           final context = field.context;
+           final value = field.value ?? false;
+
+           // ignore: avoid_positional_boolean_parameters
+           void onChangedHandler(bool? value) {
+             field.didChange(value);
+             onChanged?.call(value);
+           }
+
+           return Column(
+             mainAxisSize: MainAxisSize.min,
+             crossAxisAlignment: CrossAxisAlignment.start,
+             children: [
+               if (description.data.isNotEmpty) ...[
+                 MarkdownText(description),
+                 const SizedBox(height: 22),
+               ],
+               VoicesCheckbox(
+                 value: value,
+                 onChanged: onChangedHandler,
+                 isEnabled: enabled,
+                 isError: field.hasError,
+                 label: Text(
+                   context.l10n.agree,
+                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                     color: !enabled && !value ? Theme.of(context).colors.textDisabled : null,
+                   ),
+                 ),
+               ),
+               if (field.hasError) ...[
+                 const SizedBox(height: 4),
+                 DocumentErrorText(
+                   text: field.errorText,
+                   enabled: enabled,
+                 ),
+               ],
+             ],
+           );
+         },
+       );
+}
+
 class _AgreementConfirmationWidgetState extends State<AgreementConfirmationWidget> {
   bool? get _value => widget.property.value ?? widget.schema.defaultValue;
 
@@ -52,55 +103,4 @@ class _AgreementConfirmationWidgetState extends State<AgreementConfirmationWidge
 
     return LocalizedDocumentValidationResult.from(result).message(context);
   }
-}
-
-class _AgreementConfirmationFormField extends VoicesFormField<bool> {
-  _AgreementConfirmationFormField({
-    required super.value,
-    required super.onChanged,
-    super.enabled,
-    super.validator,
-    required MarkdownData description,
-  }) : super(
-          builder: (field) {
-            final context = field.context;
-            final value = field.value ?? false;
-
-            // ignore: avoid_positional_boolean_parameters
-            void onChangedHandler(bool? value) {
-              field.didChange(value);
-              onChanged?.call(value);
-            }
-
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (description.data.isNotEmpty) ...[
-                  MarkdownText(description),
-                  const SizedBox(height: 22),
-                ],
-                VoicesCheckbox(
-                  value: value,
-                  onChanged: onChangedHandler,
-                  isEnabled: enabled,
-                  isError: field.hasError,
-                  label: Text(
-                    context.l10n.agree,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: !enabled && !value ? Theme.of(context).colors.textDisabled : null,
-                        ),
-                  ),
-                ),
-                if (field.hasError) ...[
-                  const SizedBox(height: 4),
-                  DocumentErrorText(
-                    text: field.errorText,
-                    enabled: enabled,
-                  ),
-                ],
-              ],
-            );
-          },
-        );
 }

@@ -73,8 +73,9 @@ void main() async {
         await SetupProfilePanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - keychain create Catalyst Keychain looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - keychain create Catalyst Keychain looks OK', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await ProfileFinalPanel($).goto();
         await ProfileFinalPanel($).verifyPageElements();
@@ -86,38 +87,41 @@ void main() async {
         await CatalystKeychainInfoPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - keychain created screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - keychain created screen looks OK', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await CatalystKeychainSuccessPanel($).goto();
         await CatalystKeychainSuccessPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - keychain created screen back button works',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - keychain created screen back button works', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await CatalystKeychainSuccessPanel($).goto();
         await CatalystKeychainSuccessPanel($).clickBack();
         await CatalystKeychainInfoPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - mnemonic writedown screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - mnemonic writedown screen looks OK', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WriteDownSeedphrasePanel($).goto();
         await WriteDownSeedphrasePanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - mnemonic writedown screen back button works',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - mnemonic writedown screen back button works', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WriteDownSeedphrasePanel($).goto();
         await WriteDownSeedphrasePanel($).clickBack();
         await CatalystKeychainSuccessPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest(
-          'visitor - create - mnemonic writedown '
+      patrolWidgetTest('visitor - create - mnemonic writedown '
           'screen next button is disabled', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WriteDownSeedphrasePanel($).goto();
@@ -125,15 +129,17 @@ void main() async {
         await WriteDownSeedphrasePanel($).verifyNextButtonIsDisabled();
       });
 
-      patrolWidgetTest('visitor - create - mnemonic input info screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - mnemonic input info screen looks OK', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WritedownSeedphraseInfoPanel($).goto();
         await WritedownSeedphraseInfoPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - mnemonic input info screen back button works',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - mnemonic input info screen back button works', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WritedownSeedphraseInfoPanel($).goto();
         await WritedownSeedphraseInfoPanel($).clickBack();
@@ -146,16 +152,16 @@ void main() async {
         await InputSeedphrasePanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - mnemonic input screen back button works',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - mnemonic input screen back button works', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await InputSeedphrasePanel($).goto();
         await InputSeedphrasePanel($).clickBack();
         await WritedownSeedphraseInfoPanel($).verifyInfoPanel();
       });
 
-      patrolWidgetTest(
-          'visitor - create - mnemonic input - '
+      patrolWidgetTest('visitor - create - mnemonic input - '
           'correct words unlock next button', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await InputSeedphrasePanel($).goto();
@@ -163,15 +169,17 @@ void main() async {
         await InputSeedphrasePanel($).verifyNextButtonIsEnabled();
       });
 
-      patrolWidgetTest('visitor - create - mnemonic input verified screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - mnemonic input verified screen looks OK', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await SeedphraseSuccessPanel($).goto();
         await SeedphraseSuccessPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - mnemonic input verified screen back button works',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - mnemonic input verified screen back button works', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await SeedphraseSuccessPanel($).goto();
         await SeedphraseSuccessPanel($).clickBack();
@@ -184,8 +192,9 @@ void main() async {
         await PasswordInfoPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - password info screen back button works',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - password info screen back button works', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInfoPanel($).goto();
         await PasswordInfoPanel($).clickBack();
@@ -198,16 +207,18 @@ void main() async {
         await PasswordInputPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - password input screen back button works',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - password input screen back button works', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
         await PasswordInputPanel($).clickBack();
         await PasswordInfoPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - password input - valid minimum length password',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - password input - valid minimum length password', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
         await PasswordInputPanel($).enterPassword('Test1234', 'Test1234');
@@ -218,8 +229,9 @@ void main() async {
         await PasswordInputPanel($).verifyNextButtonIsEnabled();
       });
 
-      patrolWidgetTest('visitor - create - password input - valid long password',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - password input - valid long password', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
         await PasswordInputPanel($).enterPassword(
@@ -233,8 +245,9 @@ void main() async {
         await PasswordInputPanel($).verifyNextButtonIsEnabled();
       });
 
-      patrolWidgetTest('visitor - create - password input - too short password',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - password input - too short password', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
         await PasswordInputPanel($).enterPassword('Test123', '');
@@ -243,8 +256,9 @@ void main() async {
         await PasswordInputPanel($).verifyNextButtonIsDisabled();
       });
 
-      patrolWidgetTest('visitor - create - password input - valid password, no confirmation',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - password input - valid password, no confirmation', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
         await PasswordInputPanel($).enterPassword('Test1234', '');
@@ -253,8 +267,9 @@ void main() async {
         await PasswordInputPanel($).verifyNextButtonIsDisabled();
       });
 
-      patrolWidgetTest('visitor - create - password input - not matching confirmation',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - password input - not matching confirmation', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInputPanel($).goto();
         await PasswordInputPanel($).enterPassword('Test1234', 'Test123');
@@ -263,29 +278,33 @@ void main() async {
         await PasswordInputPanel($).verifyNextButtonIsDisabled();
       });
 
-      patrolWidgetTest('visitor - create - keychain created success screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - keychain created success screen looks OK', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await KeychainFinalPanel($).goto();
         await KeychainFinalPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - link wallet info screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - link wallet info screen looks OK', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await LinkWalletInfoPanel($).goto();
         await LinkWalletInfoPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - link wallet select screen looks OK',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - link wallet select screen looks OK', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WalletListPanel($).goto();
         await WalletListPanel($).verifyPageElements();
       });
 
-      patrolWidgetTest('visitor - create - link wallet select screen back button works',
-          (PatrolTester $) async {
+      patrolWidgetTest('visitor - create - link wallet select screen back button works', (
+        PatrolTester $,
+      ) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WalletListPanel($).goto();
         await WalletListPanel($).clickBack();
@@ -316,8 +335,7 @@ void main() async {
         await OnboardingPageBase($).closeButton().tap();
         expect($(OnboardingPageBase($).registrationDialog), findsNothing);
       });
-      patrolWidgetTest(
-          'visitor - create - profile setup screen close button - '
+      patrolWidgetTest('visitor - create - profile setup screen close button - '
           'dialog check', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await SetupProfilePanel($).goto();
@@ -325,8 +343,7 @@ void main() async {
         await OnboardingPageBase($).incompleteDialogCheckKeychainPhase();
       });
 
-      patrolWidgetTest(
-          'visitor - create - profile setup screen close button - '
+      patrolWidgetTest('visitor - create - profile setup screen close button - '
           'dialog continue', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await SetupProfilePanel($).goto();
@@ -335,8 +352,7 @@ void main() async {
         await SetupProfilePanel($).verifyDetailsPanel();
       });
 
-      patrolWidgetTest(
-          'visitor - create - profile setup screen close button - '
+      patrolWidgetTest('visitor - create - profile setup screen close button - '
           'dialog cancel', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await SetupProfilePanel($).goto();
@@ -346,19 +362,20 @@ void main() async {
       });
 
       patrolWidgetTest(
-          tags: 'issues_1998',
-          skip: true,
-          'visitor - create - profile setup screen close button - '
-          'dialog close', (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await SetupProfilePanel($).goto();
-        await OnboardingPageBase($).closeButton().tap();
-        await OnboardingPageBase($).incompleteDialogClickClose();
-        await SetupProfilePanel($).verifyDetailsPanel();
-      });
+        tags: 'issues_1998',
+        skip: true,
+        'visitor - create - profile setup screen close button - '
+        'dialog close',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await SetupProfilePanel($).goto();
+          await OnboardingPageBase($).closeButton().tap();
+          await OnboardingPageBase($).incompleteDialogClickClose();
+          await SetupProfilePanel($).verifyDetailsPanel();
+        },
+      );
 
-      patrolWidgetTest(
-          'visitor - create - mnemonic writedown screen close button - '
+      patrolWidgetTest('visitor - create - mnemonic writedown screen close button - '
           'dialog check', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WriteDownSeedphrasePanel($).goto();
@@ -366,8 +383,7 @@ void main() async {
         await OnboardingPageBase($).incompleteDialogCheckKeychainPhase();
       });
 
-      patrolWidgetTest(
-          'visitor - create - mnemonic writedown screen close button - '
+      patrolWidgetTest('visitor - create - mnemonic writedown screen close button - '
           'dialog continue', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WriteDownSeedphrasePanel($).goto();
@@ -376,8 +392,7 @@ void main() async {
         await WriteDownSeedphrasePanel($).verifyDetailsPanel();
       });
 
-      patrolWidgetTest(
-          'visitor - create - mnemonic writedown screen close button - '
+      patrolWidgetTest('visitor - create - mnemonic writedown screen close button - '
           'dialog cancel', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WriteDownSeedphrasePanel($).goto();
@@ -387,19 +402,20 @@ void main() async {
       });
 
       patrolWidgetTest(
-          tags: 'issues_1998',
-          skip: true,
-          'visitor - create - mnemonic writedown screen close button - '
-          'dialog close', (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await WriteDownSeedphrasePanel($).goto();
-        await OnboardingPageBase($).closeButton().tap();
-        await OnboardingPageBase($).incompleteDialogClickClose();
-        await WriteDownSeedphrasePanel($).verifyDetailsPanel();
-      });
+        tags: 'issues_1998',
+        skip: true,
+        'visitor - create - mnemonic writedown screen close button - '
+        'dialog close',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await WriteDownSeedphrasePanel($).goto();
+          await OnboardingPageBase($).closeButton().tap();
+          await OnboardingPageBase($).incompleteDialogClickClose();
+          await WriteDownSeedphrasePanel($).verifyDetailsPanel();
+        },
+      );
 
-      patrolWidgetTest(
-          'visitor - create - mnemonic input screen close button - '
+      patrolWidgetTest('visitor - create - mnemonic input screen close button - '
           'dialog check', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await InputSeedphrasePanel($).goto();
@@ -407,8 +423,7 @@ void main() async {
         await OnboardingPageBase($).incompleteDialogCheckKeychainPhase();
       });
 
-      patrolWidgetTest(
-          'visitor - create - mnemonic input screen close button - '
+      patrolWidgetTest('visitor - create - mnemonic input screen close button - '
           'dialog continue', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await InputSeedphrasePanel($).goto();
@@ -417,8 +432,7 @@ void main() async {
         await InputSeedphrasePanel($).verifyInfoPanel();
       });
 
-      patrolWidgetTest(
-          'visitor - create - mnemonic input screen close button - '
+      patrolWidgetTest('visitor - create - mnemonic input screen close button - '
           'dialog cancel', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await InputSeedphrasePanel($).goto();
@@ -428,19 +442,20 @@ void main() async {
       });
 
       patrolWidgetTest(
-          tags: 'issues_1998',
-          skip: true,
-          'visitor - create - mnemonic input screen close button - '
-          'dialog close', (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await InputSeedphrasePanel($).goto();
-        await OnboardingPageBase($).closeButton().tap();
-        await OnboardingPageBase($).incompleteDialogClickClose();
-        await InputSeedphrasePanel($).verifyInfoPanel();
-      });
+        tags: 'issues_1998',
+        skip: true,
+        'visitor - create - mnemonic input screen close button - '
+        'dialog close',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await InputSeedphrasePanel($).goto();
+          await OnboardingPageBase($).closeButton().tap();
+          await OnboardingPageBase($).incompleteDialogClickClose();
+          await InputSeedphrasePanel($).verifyInfoPanel();
+        },
+      );
 
-      patrolWidgetTest(
-          'visitor - create - password info screen screen close button - '
+      patrolWidgetTest('visitor - create - password info screen screen close button - '
           'dialog check', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInfoPanel($).goto();
@@ -448,8 +463,7 @@ void main() async {
         await OnboardingPageBase($).incompleteDialogCheckKeychainPhase();
       });
 
-      patrolWidgetTest(
-          'visitor - create - password info screen close button - '
+      patrolWidgetTest('visitor - create - password info screen close button - '
           'dialog continue', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInfoPanel($).goto();
@@ -458,8 +472,7 @@ void main() async {
         await PasswordInfoPanel($).verifyDetailsPanel();
       });
 
-      patrolWidgetTest(
-          'visitor - create - password info screen close button - '
+      patrolWidgetTest('visitor - create - password info screen close button - '
           'dialog cancel', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await PasswordInfoPanel($).goto();
@@ -469,124 +482,143 @@ void main() async {
       });
 
       patrolWidgetTest(
-          tags: 'issues_1998',
-          skip: true,
-          'visitor - create - password info screen close button - '
-          'dialog close', (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await PasswordInfoPanel($).goto();
-        await OnboardingPageBase($).closeButton().tap();
-        await OnboardingPageBase($).incompleteDialogClickClose();
-        await PasswordInfoPanel($).verifyDetailsPanel();
-      });
+        tags: 'issues_1998',
+        skip: true,
+        'visitor - create - password info screen close button - '
+        'dialog close',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await PasswordInfoPanel($).goto();
+          await OnboardingPageBase($).closeButton().tap();
+          await OnboardingPageBase($).incompleteDialogClickClose();
+          await PasswordInfoPanel($).verifyDetailsPanel();
+        },
+      );
 
       patrolWidgetTest(
-          tags: 'issues_2004',
-          skip: true,
-          'visitor - create - keychain created success screen close button - '
-          'dialog check', (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await KeychainFinalPanel($).goto();
-        await OnboardingPageBase($).closeButton().tap();
-        await OnboardingPageBase($).incompleteDialogCheckWalletLinkPhase();
-      });
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - keychain created success screen close button - '
+        'dialog check',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await KeychainFinalPanel($).goto();
+          await OnboardingPageBase($).closeButton().tap();
+          await OnboardingPageBase($).incompleteDialogCheckWalletLinkPhase();
+        },
+      );
 
       patrolWidgetTest(
-          tags: 'issues_2004',
-          skip: true,
-          'visitor - create - keychain created success screen close button - '
-          'dialog continue', (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await KeychainFinalPanel($).goto();
-        await OnboardingPageBase($).closeButton().tap();
-        await OnboardingPageBase($).incompleteDialogClickContinue();
-        await PasswordInfoPanel($).verifyDetailsPanel();
-      });
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - keychain created success screen close button - '
+        'dialog continue',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await KeychainFinalPanel($).goto();
+          await OnboardingPageBase($).closeButton().tap();
+          await OnboardingPageBase($).incompleteDialogClickContinue();
+          await PasswordInfoPanel($).verifyDetailsPanel();
+        },
+      );
 
       patrolWidgetTest(
-          tags: 'issues_2004',
-          skip: true,
-          'visitor - create - keychain created success screen close button - '
-          'dialog cancel', (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await KeychainFinalPanel($).goto();
-        await OnboardingPageBase($).closeButton().tap();
-        await OnboardingPageBase($).incompleteDialogClickCancel();
-        await AppBarPage($).looksAsExpectedForVisitorOnboardingInProgress();
-      });
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - keychain created success screen close button - '
+        'dialog cancel',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await KeychainFinalPanel($).goto();
+          await OnboardingPageBase($).closeButton().tap();
+          await OnboardingPageBase($).incompleteDialogClickCancel();
+          await AppBarPage($).looksAsExpectedForVisitorOnboardingInProgress();
+        },
+      );
 
       patrolWidgetTest(
-          tags: 'issues_2004',
-          skip: true,
-          'visitor - create - keychain created success screen close button - '
-          'dialog close', (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await KeychainFinalPanel($).goto();
-        await OnboardingPageBase($).closeButton().tap();
-        await OnboardingPageBase($).incompleteDialogClickClose();
-        await PasswordInfoPanel($).verifyDetailsPanel();
-      });
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - keychain created success screen close button - '
+        'dialog close',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await KeychainFinalPanel($).goto();
+          await OnboardingPageBase($).closeButton().tap();
+          await OnboardingPageBase($).incompleteDialogClickClose();
+          await PasswordInfoPanel($).verifyDetailsPanel();
+        },
+      );
 
       patrolWidgetTest(
-          tags: 'issues_2004',
-          skip: true,
-          'visitor - create - link wallet info screen close button - '
-          'dialog check', (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await LinkWalletInfoPanel($).goto();
-        await OnboardingPageBase($).closeButton().tap();
-        await OnboardingPageBase($).incompleteDialogCheckWalletLinkPhase();
-      });
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - link wallet info screen close button - '
+        'dialog check',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await LinkWalletInfoPanel($).goto();
+          await OnboardingPageBase($).closeButton().tap();
+          await OnboardingPageBase($).incompleteDialogCheckWalletLinkPhase();
+        },
+      );
 
       patrolWidgetTest(
-          tags: 'issues_2004',
-          skip: true,
-          'visitor - create - link wallet info screen close button - '
-          'dialog continue', (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await LinkWalletInfoPanel($).goto();
-        await OnboardingPageBase($).closeButton().tap();
-        await OnboardingPageBase($).incompleteDialogClickContinue();
-        await LinkWalletInfoPanel($).verifyDetailsPanel();
-      });
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - link wallet info screen close button - '
+        'dialog continue',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await LinkWalletInfoPanel($).goto();
+          await OnboardingPageBase($).closeButton().tap();
+          await OnboardingPageBase($).incompleteDialogClickContinue();
+          await LinkWalletInfoPanel($).verifyDetailsPanel();
+        },
+      );
 
       patrolWidgetTest(
-          tags: 'issues_2004',
-          skip: true,
-          'visitor - create - link wallet info screen close button - '
-          'dialog cancel', (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await LinkWalletInfoPanel($).goto();
-        await OnboardingPageBase($).closeButton().tap();
-        await OnboardingPageBase($).incompleteDialogClickCancel();
-        await AppBarPage($).looksAsExpectedForVisitorOnboardingInProgress();
-      });
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - link wallet info screen close button - '
+        'dialog cancel',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await LinkWalletInfoPanel($).goto();
+          await OnboardingPageBase($).closeButton().tap();
+          await OnboardingPageBase($).incompleteDialogClickCancel();
+          await AppBarPage($).looksAsExpectedForVisitorOnboardingInProgress();
+        },
+      );
 
       patrolWidgetTest(
-          tags: 'issues_2004',
-          skip: true,
-          'visitor - create - link wallet info screen close button - '
-          'dialog close', (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await LinkWalletInfoPanel($).goto();
-        await OnboardingPageBase($).closeButton().tap();
-        await OnboardingPageBase($).incompleteDialogClickClose();
-        await LinkWalletInfoPanel($).verifyDetailsPanel();
-      });
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - link wallet info screen close button - '
+        'dialog close',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await LinkWalletInfoPanel($).goto();
+          await OnboardingPageBase($).closeButton().tap();
+          await OnboardingPageBase($).incompleteDialogClickClose();
+          await LinkWalletInfoPanel($).verifyDetailsPanel();
+        },
+      );
 
       patrolWidgetTest(
-          tags: 'issues_2004',
-          skip: true,
-          'visitor - create - link wallet select screen close button - '
-          'dialog check', (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await WalletListPanel($).goto();
-        await OnboardingPageBase($).closeButton().tap();
-        await OnboardingPageBase($).incompleteDialogCheckWalletLinkPhase();
-      });
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - link wallet select screen close button - '
+        'dialog check',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await WalletListPanel($).goto();
+          await OnboardingPageBase($).closeButton().tap();
+          await OnboardingPageBase($).incompleteDialogCheckWalletLinkPhase();
+        },
+      );
 
-      patrolWidgetTest(
-          'visitor - create - link wallet select screen close button - '
+      patrolWidgetTest('visitor - create - link wallet select screen close button - '
           'dialog continue', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WalletListPanel($).goto();
@@ -595,8 +627,7 @@ void main() async {
         await WalletListPanel($).verifyDetailsPanel();
       });
 
-      patrolWidgetTest(
-          'visitor - create - link wallet select screen close button - '
+      patrolWidgetTest('visitor - create - link wallet select screen close button - '
           'dialog cancel', (PatrolTester $) async {
         await $.pumpWidgetAndSettle(App(routerConfig: router));
         await WalletListPanel($).goto();
@@ -606,16 +637,18 @@ void main() async {
       });
 
       patrolWidgetTest(
-          tags: 'issues_2004',
-          skip: true,
-          'visitor - create - link wallet select screen close button - '
-          'dialog close', (PatrolTester $) async {
-        await $.pumpWidgetAndSettle(App(routerConfig: router));
-        await WalletListPanel($).goto();
-        await OnboardingPageBase($).closeButton().tap();
-        await OnboardingPageBase($).incompleteDialogClickClose();
-        await WalletListPanel($).verifyDetailsPanel();
-      });
+        tags: 'issues_2004',
+        skip: true,
+        'visitor - create - link wallet select screen close button - '
+        'dialog close',
+        (PatrolTester $) async {
+          await $.pumpWidgetAndSettle(App(routerConfig: router));
+          await WalletListPanel($).goto();
+          await OnboardingPageBase($).closeButton().tap();
+          await OnboardingPageBase($).incompleteDialogClickClose();
+          await WalletListPanel($).verifyDetailsPanel();
+        },
+      );
     },
     skip: true,
   );

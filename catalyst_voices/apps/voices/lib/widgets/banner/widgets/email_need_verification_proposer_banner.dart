@@ -46,12 +46,12 @@ class _EmailNeedVerificationProposerBannerState extends State<EmailNeedVerificat
                   placeholderSpanBuilder: (context, placeholder) {
                     return switch (placeholder) {
                       'destination' => TextSpan(
-                          text: context.l10n.myAccount,
-                          recognizer: _recognizer,
-                          style: context.textTheme.labelLarge?.copyWith(
-                            decoration: TextDecoration.underline,
-                          ),
+                        text: context.l10n.myAccount,
+                        recognizer: _recognizer,
+                        style: context.textTheme.labelLarge?.copyWith(
+                          decoration: TextDecoration.underline,
                         ),
+                      ),
                       _ => throw ArgumentError('Unknown placeholder[$placeholder]'),
                     };
                   },

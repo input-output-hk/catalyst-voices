@@ -41,58 +41,58 @@ class VoicesRichText extends VoicesFormField<MarkdownData> {
     this.minHeight,
     this.placeholder,
   }) : super(
-          value: controller.markdownData,
-          builder: (field) {
-            void onChangedHandler(MarkdownData? value) {
-              field.didChange(value);
-              onChanged?.call(value);
-            }
+         value: controller.markdownData,
+         builder: (field) {
+           void onChangedHandler(MarkdownData? value) {
+             field.didChange(value);
+             onChanged?.call(value);
+           }
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _EditorDecoration(
-                  isEditMode: enabled,
-                  isInvalid: field.hasError,
-                  focusNode: focusNode,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Offstage(
-                        offstage: !enabled,
-                        child: Padding(
-                          padding: const EdgeInsets.all(2),
-                          child: _Toolbar(
-                            controller: controller,
-                          ),
-                        ),
-                      ),
-                      _Editor(
-                        controller: controller,
-                        focusNode: focusNode,
-                        scrollController: scrollController,
-                        minHeight: minHeight,
-                        onChanged: onChangedHandler,
-                        placeholder: placeholder,
-                      ),
-                    ],
-                  ),
-                ),
-                Offstage(
-                  offstage: charsLimit == null && field.errorText == null,
-                  child: VoicesRichTextLimit(
-                    controller: controller,
-                    enabled: enabled,
-                    charsLimit: charsLimit,
-                    errorMessage: field.errorText,
-                  ),
-                ),
-              ],
-            );
-          },
-        );
+           return Column(
+             crossAxisAlignment: CrossAxisAlignment.start,
+             mainAxisSize: MainAxisSize.min,
+             children: [
+               _EditorDecoration(
+                 isEditMode: enabled,
+                 isInvalid: field.hasError,
+                 focusNode: focusNode,
+                 child: Column(
+                   mainAxisSize: MainAxisSize.min,
+                   crossAxisAlignment: CrossAxisAlignment.stretch,
+                   children: [
+                     Offstage(
+                       offstage: !enabled,
+                       child: Padding(
+                         padding: const EdgeInsets.all(2),
+                         child: _Toolbar(
+                           controller: controller,
+                         ),
+                       ),
+                     ),
+                     _Editor(
+                       controller: controller,
+                       focusNode: focusNode,
+                       scrollController: scrollController,
+                       minHeight: minHeight,
+                       onChanged: onChangedHandler,
+                       placeholder: placeholder,
+                     ),
+                   ],
+                 ),
+               ),
+               Offstage(
+                 offstage: charsLimit == null && field.errorText == null,
+                 child: VoicesRichTextLimit(
+                   controller: controller,
+                   enabled: enabled,
+                   charsLimit: charsLimit,
+                   errorMessage: field.errorText,
+                 ),
+               ),
+             ],
+           );
+         },
+       );
 }
 
 final class VoicesRichTextController extends quill.QuillController {

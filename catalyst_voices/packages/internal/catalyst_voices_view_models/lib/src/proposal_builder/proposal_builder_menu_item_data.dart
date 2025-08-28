@@ -27,11 +27,11 @@ final class ProposalBuilderMenuItemData extends Equatable {
 
   @override
   List<Object?> get props => [
-        action,
-        proposalTitle,
-        currentIteration,
-        canPublish,
-      ];
+    action,
+    proposalTitle,
+    currentIteration,
+    canPublish,
+  ];
 
   String? description(BuildContext context) {
     return action.description(context, currentIteration: currentIteration);

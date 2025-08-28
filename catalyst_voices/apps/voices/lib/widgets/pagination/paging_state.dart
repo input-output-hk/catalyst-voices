@@ -65,14 +65,14 @@ class PagingState<ItemType> extends Equatable {
 
   @override
   List<Object?> get props => [
-        currentPage,
-        itemsPerPage,
-        maxResults,
-        itemList,
-        error,
-        isLoading,
-        status,
-      ];
+    currentPage,
+    itemsPerPage,
+    maxResults,
+    itemList,
+    error,
+    isLoading,
+    status,
+  ];
 
   PagingStatus get status {
     if (itemList.isEmpty && !isLoading && error == null) {

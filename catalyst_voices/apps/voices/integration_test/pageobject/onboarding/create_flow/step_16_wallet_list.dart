@@ -9,39 +9,14 @@ import '../onboarding_base_page.dart';
 import 'step_15_link_wallet_info.dart';
 
 class WalletListPanel extends OnboardingPageBase {
-  WalletListPanel(super.$);
-
   static const seeAllSupportedWalletsBtn = Key('SeeAllSupportedWalletsButton');
+
+  WalletListPanel(super.$);
 
   @override
   Future<void> goto() async {
     await LinkWalletInfoPanel($).goto();
     await LinkWalletInfoPanel($).clickChooseCardanoWallet();
-  }
-
-  @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
-  }
-
-  Future<void> verifyInfoPanel() async {
-    expect(await infoPartHeaderTitleText(), (await t()).walletLinkHeader);
-    expect(
-      await infoPartHeaderSubtitleText(),
-      (await t()).walletLinkWalletSubheader,
-    );
-    expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is CatalystSvgPicture &&
-            (widget.bytesLoader as dynamic).assetName == 'assets/images/keychain.svg',
-      ),
-      findsOneWidget,
-    );
-    expect(infoPartTaskPicture(), findsOneWidget);
-    expect($(progressBar), findsOneWidget);
-    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
   }
 
   Future<void> verifyDetailsPanel() async {
@@ -63,5 +38,30 @@ class WalletListPanel extends OnboardingPageBase {
       seeAllSupportedWalletsCopy,
       Urls.supportedWallets,
     );
+  }
+
+  Future<void> verifyInfoPanel() async {
+    expect(await infoPartHeaderTitleText(), (await t()).walletLinkHeader);
+    expect(
+      await infoPartHeaderSubtitleText(),
+      (await t()).walletLinkWalletSubheader,
+    );
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is CatalystSvgPicture &&
+            (widget.bytesLoader as dynamic).assetName == 'assets/images/keychain.svg',
+      ),
+      findsOneWidget,
+    );
+    expect(infoPartTaskPicture(), findsOneWidget);
+    expect($(progressBar), findsOneWidget);
+    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
+  }
+
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }

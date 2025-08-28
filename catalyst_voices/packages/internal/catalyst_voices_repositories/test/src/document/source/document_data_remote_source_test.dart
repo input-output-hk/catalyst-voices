@@ -36,8 +36,7 @@ void main() {
 
   group(CatGatewayDocumentDataSource, () {
     group('index', () {
-      test(
-          'loops thru all pages until there is no remaining refs '
+      test('loops thru all pages until there is no remaining refs '
           'and exacts refs from them', () async {
         // Given
         final pageZero = DocumentIndexList(

@@ -29,8 +29,9 @@ class _TitleText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = (context.textTheme.titleSmall ?? const TextStyle())
-        .copyWith(color: context.colors.textOnPrimaryLevel1);
+    final textStyle = (context.textTheme.titleSmall ?? const TextStyle()).copyWith(
+      color: context.colors.textOnPrimaryLevel1,
+    );
 
     return Text(
       context.l10n.createProfileAcknowledgementsTitle,

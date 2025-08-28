@@ -86,8 +86,7 @@ void main() {
       expect(decoded, equals(data));
     });
 
-    test(
-        'encrypted and later decrypted data with '
+    test('encrypted and later decrypted data with '
         'different key gives throws exception', () async {
       // Given
       const lockFactor = PasswordLockFactor('admin');

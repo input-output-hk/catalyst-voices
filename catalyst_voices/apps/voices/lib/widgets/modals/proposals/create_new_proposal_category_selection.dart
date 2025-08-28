@@ -65,8 +65,9 @@ class _CategoryCard extends StatelessWidget {
               Text(
                 name,
                 style: context.textTheme.titleSmall?.copyWith(
-                  color:
-                      isSelected ? context.colorScheme.primary : context.colors.textOnPrimaryLevel0,
+                  color: isSelected
+                      ? context.colorScheme.primary
+                      : context.colors.textOnPrimaryLevel0,
                 ),
               ),
               Text(

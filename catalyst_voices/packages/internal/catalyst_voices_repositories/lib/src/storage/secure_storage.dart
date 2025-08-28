@@ -16,6 +16,18 @@ abstract base class SecureStorage with StorageAsStringMixin implements Storage {
   }) : _secureStorage = secureStorage;
 
   @override
+  Future<void> clear() async {
+    final prefix = _buildVersionedPrefix(version);
+
+    final all = await _secureStorage.readAll();
+    final vaultKeys = List.of(all.keys).where((e) => e.startsWith(prefix));
+
+    for (final key in vaultKeys) {
+      await _secureStorage.delete(key: key);
+    }
+  }
+
+  @override
   Future<bool> contains({required String key}) async {
     return await readString(key: key) != null;
   }
@@ -41,22 +53,6 @@ abstract base class SecureStorage with StorageAsStringMixin implements Storage {
     }
   }
 
-  @override
-  Future<void> clear() async {
-    final prefix = _buildVersionedPrefix(version);
-
-    final all = await _secureStorage.readAll();
-    final vaultKeys = List.of(all.keys).where((e) => e.startsWith(prefix));
-
-    for (final key in vaultKeys) {
-      await _secureStorage.delete(key: key);
-    }
-  }
-
-  String _effectiveKey(String value) {
-    return _buildVersionedKey(value, version: version);
-  }
-
   String _buildVersionedKey(
     String value, {
     required int version,
@@ -67,4 +63,8 @@ abstract base class SecureStorage with StorageAsStringMixin implements Storage {
   }
 
   String _buildVersionedPrefix(int version) => '$key.v$version';
+
+  String _effectiveKey(String value) {
+    return _buildVersionedKey(value, version: version);
+  }
 }

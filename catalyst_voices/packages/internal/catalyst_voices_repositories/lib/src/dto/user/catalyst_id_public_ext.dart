@@ -39,8 +39,7 @@ extension on CatalystRBACRegistrationStatus? {
   AccountPublicRbacStatus toModel() {
     return switch (this) {
       null ||
-      CatalystRBACRegistrationStatus.swaggerGeneratedUnknown =>
-        AccountPublicRbacStatus.unknown,
+      CatalystRBACRegistrationStatus.swaggerGeneratedUnknown => AccountPublicRbacStatus.unknown,
       CatalystRBACRegistrationStatus.value_0 => AccountPublicRbacStatus.initialized,
       CatalystRBACRegistrationStatus.value_1 => AccountPublicRbacStatus.notFound,
       CatalystRBACRegistrationStatus.value_2 => AccountPublicRbacStatus.volatile,

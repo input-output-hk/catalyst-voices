@@ -65,7 +65,8 @@ class VoicesChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final iconTheme = IconTheme.of(context).copyWith(size: 18);
 
-    final padding = this.padding ??
+    final padding =
+        this.padding ??
         () {
           EdgeInsetsGeometry padding = const EdgeInsets.symmetric(
             vertical: 8,

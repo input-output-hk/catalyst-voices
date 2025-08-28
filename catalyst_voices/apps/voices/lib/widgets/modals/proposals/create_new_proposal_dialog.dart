@@ -59,19 +59,19 @@ class _Content extends StatelessWidget {
             builder: (context, step) {
               return switch (step) {
                 CreateProposalWithPreselectedCategoryStep() => _ContentView(
+                  step: step,
+                  child: const _ProposalTitle(),
+                ),
+                CreateProposalWithoutPreselectedCategoryStep(:final stage) => switch (stage) {
+                  CreateProposalStage.setTitle => _ContentView(
                     step: step,
                     child: const _ProposalTitle(),
                   ),
-                CreateProposalWithoutPreselectedCategoryStep(:final stage) => switch (stage) {
-                    CreateProposalStage.setTitle => _ContentView(
-                        step: step,
-                        child: const _ProposalTitle(),
-                      ),
-                    CreateProposalStage.selectCategory => _ContentView(
-                        step: step,
-                        child: const _ProposalCategory(),
-                      ),
-                  },
+                  CreateProposalStage.selectCategory => _ContentView(
+                    step: step,
+                    child: const _ProposalCategory(),
+                  ),
+                },
               };
             },
           );
@@ -129,8 +129,9 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog>
   }
 
   String _getTitle() {
-    final categoryName =
-        context.select<NewProposalCubit, String?>((cubit) => cubit.state.selectedCategoryName);
+    final categoryName = context.select<NewProposalCubit, String?>(
+      (cubit) => cubit.state.selectedCategoryName,
+    );
 
     if (categoryName == null) {
       return context.l10n.createProposal;

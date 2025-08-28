@@ -16,9 +16,9 @@ class DevToolsConfigDto {
   }
 
   DevToolsConfigDto.fromModel(DevToolsConfig data)
-      : this(
-          isDeveloper: data.isDeveloper,
-        );
+    : this(
+        isDeveloper: data.isDeveloper,
+      );
 
   Map<String, dynamic> toJson() => _$DevToolsConfigDtoToJson(this);
 

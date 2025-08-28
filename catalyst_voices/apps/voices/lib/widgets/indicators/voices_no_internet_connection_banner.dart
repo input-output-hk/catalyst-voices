@@ -63,18 +63,18 @@ class NoInternetConnectionBanner extends StatelessWidget {
                         Expanded(
                           child: Text(
                             context.l10n.noConnectionBannerTitle,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
-                                ?.copyWith(color: foregroundColor),
+                            style: Theme.of(
+                              context,
+                            ).textTheme.titleLarge?.copyWith(color: foregroundColor),
                           ),
                         ),
                       ],
                     ),
                     Text(
                       context.l10n.noConnectionBannerDescription,
-                      style:
-                          Theme.of(context).textTheme.bodySmall?.copyWith(color: foregroundColor),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(color: foregroundColor),
                       softWrap: true,
                     ),
                   ],
@@ -87,8 +87,8 @@ class NoInternetConnectionBanner extends StatelessWidget {
                   child: Text(
                     context.l10n.noConnectionBannerRefreshButtonText,
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: Theme.of(context).colors.onErrorVariant,
-                        ),
+                      color: Theme.of(context).colors.onErrorVariant,
+                    ),
                   ),
                 ),
               ],

@@ -19,8 +19,8 @@ final class SecureStorageService {
   factory SecureStorageService() => _instance;
 
   SecureStorageService._()
-      : _secureStorage = const FlutterSecureStorage(),
-        _cryptoService = CryptoService();
+    : _secureStorage = const FlutterSecureStorage(),
+      _cryptoService = CryptoService();
 
   Future<void> get deleteAll async {
     await _secureStorage.deleteAll();

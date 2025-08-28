@@ -15,7 +15,8 @@ import 'package:cbor/cbor.dart';
 
 /// Reference scripts that exist on the Preview network, with sizes verified.
 const refInputScriptsSizes = [2470, 6296, 1579];
-final c509CertHex = '''
+final c509CertHex =
+    '''
 8B004301F50D6B524643207465737420
 43411A63B0CD001A6955B90047010123
 456789AB01582102B1216AB96E5B3B33
@@ -26,8 +27,9 @@ B1019C2DFD3838AB010058406FC90301
 81B2F53073C5F101A5AC2A92886583B6
 A2679B6E682D2A26945ED0B2
 '''
-    .replaceAll('\n', '');
-final derCertHex = '''
+        .replaceAll('\n', '');
+final derCertHex =
+    '''
 308202343082019DA00302010202145A
 FC371DAF301793CF0B1835A118C2F903
 63D5D9300D06092A864886F70D01010B
@@ -65,7 +67,7 @@ F366A8B930443CA6B69B12DD9DEBEE9C
 E61E8EE7D77E9F7F9804E03EBC31B458
 1313C955A667658B
 '''
-    .replaceAll('\n', '');
+        .replaceAll('\n', '');
 /* cSpell:disable */
 final mainnetAddr = ShelleyAddress.fromBech32(
   'addr1qx2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3n0d3vllmyqws'

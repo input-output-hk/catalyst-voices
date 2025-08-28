@@ -43,8 +43,10 @@ class ArbManager {
   }
 
   void process() {
-    final arbFiles =
-        _rootDir.listSync(recursive: true).whereType<File>().where((f) => f.path.endsWith('.arb'));
+    final arbFiles = _rootDir
+        .listSync(recursive: true)
+        .whereType<File>()
+        .where((f) => f.path.endsWith('.arb'));
 
     var allClean = true;
     var allSorted = true;
@@ -79,8 +81,9 @@ class ArbManager {
   bool _checkIfClean(File arbFile) {
     final original = json.decode(arbFile.readAsStringSync()) as Map<String, dynamic>;
     final usedKeys = _getUsedKeys(original);
-    final originalTranslationKeys =
-        original.keys.where((k) => !k.contains('@') && !k.contains('.'));
+    final originalTranslationKeys = original.keys.where(
+      (k) => !k.contains('@') && !k.contains('.'),
+    );
 
     final unusedKeys = originalTranslationKeys.where((key) => !usedKeys.contains(key)).toList();
 
@@ -185,8 +188,9 @@ class ArbManager {
   }
 
   void _printStats(Set<String> usedKeys, Map<String, dynamic> original) {
-    final originalTranslationKeys =
-        original.keys.where((k) => !k.contains('@') && !k.contains('.'));
+    final originalTranslationKeys = original.keys.where(
+      (k) => !k.contains('@') && !k.contains('.'),
+    );
     final percentage = (usedKeys.length / originalTranslationKeys.length) * 100;
     print(
       '🔑 Number of used keys: ${usedKeys.length}/${originalTranslationKeys.length}. Percentage: ${percentage.toStringAsFixed(2)}%',

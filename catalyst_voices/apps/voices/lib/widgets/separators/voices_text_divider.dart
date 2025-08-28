@@ -48,8 +48,9 @@ class VoicesTextDivider extends StatelessWidget {
           SizedBox(width: nameGap),
           DefaultTextStyle(
             key: const Key('NextStepTitle'),
-            style: (theme.textTheme.bodyLarge ?? const TextStyle())
-                .copyWith(color: theme.colors.textOnPrimary),
+            style: (theme.textTheme.bodyLarge ?? const TextStyle()).copyWith(
+              color: theme.colors.textOnPrimary,
+            ),
             child: child,
           ),
           SizedBox(width: nameGap),

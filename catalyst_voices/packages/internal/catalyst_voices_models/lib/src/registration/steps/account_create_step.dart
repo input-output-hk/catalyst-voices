@@ -44,8 +44,8 @@ final class CreateBaseProfileStep extends AccountCreateStep {
   const CreateBaseProfileStep({
     this.stage = CreateBaseProfileStage.instructions,
   }) : super(
-          type: AccountCreateStepType.baseProfile,
-        );
+         type: AccountCreateStepType.baseProfile,
+       );
 
   @override
   List<Object?> get props => [...super.props, stage];
@@ -57,8 +57,8 @@ final class CreateKeychainStep extends AccountCreateStep {
   const CreateKeychainStep({
     this.stage = CreateKeychainStage.splash,
   }) : super(
-          type: AccountCreateStepType.keychain,
-        );
+         type: AccountCreateStepType.keychain,
+       );
 
   @override
   List<Object?> get props => [...super.props, stage];
@@ -70,8 +70,8 @@ final class WalletLinkStep extends AccountCreateStep {
   const WalletLinkStep({
     this.stage = WalletLinkStage.intro,
   }) : super(
-          type: AccountCreateStepType.walletLink,
-        );
+         type: AccountCreateStepType.walletLink,
+       );
 
   @override
   List<Object?> get props => [...super.props, stage];

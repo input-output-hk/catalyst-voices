@@ -23,12 +23,10 @@ class RegistrationInfoPanel extends StatelessWidget with LaunchUrlMixin {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<
-        RegistrationCubit,
-        RegistrationState,
-        ({
-          RegistrationStep step,
-          double? progress,
-        })>(
+      RegistrationCubit,
+      RegistrationState,
+      ({RegistrationStep step, double? progress})
+    >(
       selector: (state) => (
         step: state.step,
         progress: state.progress,
@@ -59,31 +57,30 @@ class RegistrationInfoPanel extends StatelessWidget with LaunchUrlMixin {
     _HeaderStrings buildKeychainStageHeader(CreateKeychainStage stage) {
       return switch (stage) {
         CreateKeychainStage.splash || CreateKeychainStage.instructions => _HeaderStrings(
-            title: context.l10n.catalystKeychain,
-          ),
+          title: context.l10n.catalystKeychain,
+        ),
         CreateKeychainStage.seedPhrase => _HeaderStrings(
-            title: context.l10n.catalystKeychain,
-            subtitle: context.l10n.createKeychainSeedPhraseSubtitle,
-            body: context.l10n.createKeychainSeedPhraseBody,
-          ),
+          title: context.l10n.catalystKeychain,
+          subtitle: context.l10n.createKeychainSeedPhraseSubtitle,
+          body: context.l10n.createKeychainSeedPhraseBody,
+        ),
         CreateKeychainStage.checkSeedPhraseInstructions => _HeaderStrings(
-            title: context.l10n.catalystKeychain,
-          ),
+          title: context.l10n.catalystKeychain,
+        ),
         CreateKeychainStage.checkSeedPhrase => _HeaderStrings(
-            title: context.l10n.catalystKeychain,
-            subtitle: context.l10n.createKeychainSeedPhraseCheckSubtitle,
-            body: context.l10n.createKeychainSeedPhraseCheckBody,
-          ),
+          title: context.l10n.catalystKeychain,
+          subtitle: context.l10n.createKeychainSeedPhraseCheckSubtitle,
+          body: context.l10n.createKeychainSeedPhraseCheckBody,
+        ),
         CreateKeychainStage.checkSeedPhraseResult ||
-        CreateKeychainStage.unlockPasswordInstructions =>
-          _HeaderStrings(
-            title: context.l10n.catalystKeychain,
-          ),
+        CreateKeychainStage.unlockPasswordInstructions => _HeaderStrings(
+          title: context.l10n.catalystKeychain,
+        ),
         CreateKeychainStage.unlockPasswordCreate => _HeaderStrings(
-            title: context.l10n.catalystKeychain,
-            subtitle: context.l10n.createKeychainUnlockPasswordIntoSubtitle,
-            body: context.l10n.createKeychainUnlockPasswordIntoBody,
-          ),
+          title: context.l10n.catalystKeychain,
+          subtitle: context.l10n.createKeychainUnlockPasswordIntoSubtitle,
+          body: context.l10n.createKeychainUnlockPasswordIntoBody,
+        ),
       };
     }
 
@@ -91,42 +88,41 @@ class RegistrationInfoPanel extends StatelessWidget with LaunchUrlMixin {
       return switch (stage) {
         WalletLinkStage.intro ||
         WalletLinkStage.selectWallet ||
-        WalletLinkStage.walletDetails =>
-          _HeaderStrings(
-            title: context.l10n.walletLinkHeader,
-            subtitle: context.l10n.walletLinkWalletSubheader,
-          ),
+        WalletLinkStage.walletDetails => _HeaderStrings(
+          title: context.l10n.walletLinkHeader,
+          subtitle: context.l10n.walletLinkWalletSubheader,
+        ),
         WalletLinkStage.rolesChooser || WalletLinkStage.rolesSummary => _HeaderStrings(
-            title: context.l10n.walletLinkHeader,
-            subtitle: context.l10n.walletLinkRolesSubheader,
-          ),
+          title: context.l10n.walletLinkHeader,
+          subtitle: context.l10n.walletLinkRolesSubheader,
+        ),
         WalletLinkStage.rbacTransaction => _HeaderStrings(
-            title: context.l10n.walletLinkHeader,
-            subtitle: context.l10n.walletLinkTransactionSubheader,
-          ),
+          title: context.l10n.walletLinkHeader,
+          subtitle: context.l10n.walletLinkTransactionSubheader,
+        ),
       };
     }
 
     return switch (step) {
       GetStartedStep() => _HeaderStrings(title: context.l10n.getStarted),
       AccountCreateProgressStep() => _HeaderStrings(
-          title: context.l10n.catalystKeychain,
-        ),
+        title: context.l10n.catalystKeychain,
+      ),
       RecoverMethodStep() => _HeaderStrings(
-          title: context.l10n.recoverCatalystKeychain,
-        ),
+        title: context.l10n.recoverCatalystKeychain,
+      ),
       RecoverWithSeedPhraseStep() => _HeaderStrings(
-          title: context.l10n.recoverCatalystKeychain,
-        ),
+        title: context.l10n.recoverCatalystKeychain,
+      ),
       CreateBaseProfileStep() => _HeaderStrings(
-          title: context.l10n.accountCreationGetStartedTitle,
-        ),
+        title: context.l10n.accountCreationGetStartedTitle,
+      ),
       CreateKeychainStep(:final stage) => buildKeychainStageHeader(stage),
       WalletLinkStep(:final stage) => buildWalletLinkStageHeader(stage),
       AccountCompletedStep() => _HeaderStrings(
-          title: context.l10n.registrationCompletedTitle,
-          subtitle: context.l10n.registrationCompletedSubtitle,
-        ),
+        title: context.l10n.registrationCompletedTitle,
+        subtitle: context.l10n.registrationCompletedSubtitle,
+      ),
     };
   }
 
@@ -135,13 +131,12 @@ class RegistrationInfoPanel extends StatelessWidget with LaunchUrlMixin {
       CreateBaseProfileStep() => VoicesConstants.setupBaseProfileUrl,
       CreateKeychainStep() => VoicesConstants.createCatalystKeychainUrl,
       WalletLinkStep(:final stage) => switch (stage) {
-          WalletLinkStage.selectWallet => VoicesConstants.officiallySupportedWalletsUrl,
-          WalletLinkStage.rolesChooser ||
-          WalletLinkStage.rolesSummary =>
-            VoicesConstants.selectRolesUrl,
-          WalletLinkStage.rbacTransaction => VoicesConstants.submitRegistrationTransactionUrl,
-          _ => VoicesConstants.linkCardanoWalletUrl,
-        },
+        WalletLinkStage.selectWallet => VoicesConstants.officiallySupportedWalletsUrl,
+        WalletLinkStage.rolesChooser ||
+        WalletLinkStage.rolesSummary => VoicesConstants.selectRolesUrl,
+        WalletLinkStage.rbacTransaction => VoicesConstants.submitRegistrationTransactionUrl,
+        _ => VoicesConstants.linkCardanoWalletUrl,
+      },
       RecoverWithSeedPhraseStep() || RecoverMethodStep() => VoicesConstants.restoreKeychainUrl,
       _ => VoicesConstants.getStartedUrl,
     };
@@ -220,12 +215,10 @@ class _RegistrationPicture extends StatelessWidget {
         CreateKeychainStage.splash || CreateKeychainStage.instructions => const KeychainPicture(),
         CreateKeychainStage.seedPhrase => const SeedPhrasePicture(),
         CreateKeychainStage.checkSeedPhraseInstructions ||
-        CreateKeychainStage.checkSeedPhrase =>
-          const SeedPhrasePicture(indicateSelection: true),
+        CreateKeychainStage.checkSeedPhrase => const SeedPhrasePicture(indicateSelection: true),
         CreateKeychainStage.checkSeedPhraseResult => const _BlocSeedPhraseResultPicture(),
         CreateKeychainStage.unlockPasswordInstructions ||
-        CreateKeychainStage.unlockPasswordCreate =>
-          const _BlocCreationPasswordPicture(),
+        CreateKeychainStage.unlockPasswordCreate => const _BlocCreationPasswordPicture(),
       };
     }
 
@@ -236,19 +229,16 @@ class _RegistrationPicture extends StatelessWidget {
         WalletLinkStage.walletDetails ||
         WalletLinkStage.rolesChooser ||
         WalletLinkStage.rolesSummary ||
-        WalletLinkStage.rbacTransaction =>
-          const KeychainPicture(),
+        WalletLinkStage.rbacTransaction => const KeychainPicture(),
       };
     }
 
     Widget buildRecoverSeedPhrase(RecoverWithSeedPhraseStage stage) {
       return switch (stage) {
         RecoverWithSeedPhraseStage.seedPhrase ||
-        RecoverWithSeedPhraseStage.accountDetails =>
-          const KeychainPicture(),
+        RecoverWithSeedPhraseStage.accountDetails => const KeychainPicture(),
         RecoverWithSeedPhraseStage.unlockPasswordInstructions ||
-        RecoverWithSeedPhraseStage.unlockPassword =>
-          const _BlocRecoveryPasswordPicture(),
+        RecoverWithSeedPhraseStage.unlockPassword => const _BlocRecoveryPasswordPicture(),
         RecoverWithSeedPhraseStage.success => const KeychainWithPasswordPicture(),
       };
     }

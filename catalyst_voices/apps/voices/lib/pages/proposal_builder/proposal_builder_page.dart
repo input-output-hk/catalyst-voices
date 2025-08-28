@@ -13,7 +13,7 @@ import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigati
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_validation_snackbar.dart';
-import 'package:catalyst_voices/pages/spaces/appbar/session_state_header.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/actions/account_settings_action.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
 import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialog.dart';
 import 'package:catalyst_voices/routes/routes.dart';
@@ -99,7 +99,7 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
             actions: [
               ProposalBuilderBackAction(),
               ProposalBuilderStatusAction(),
-              SessionStateHeader(),
+              AccountSettingsAction(),
             ],
           ),
           endDrawer: const OpportunitiesDrawer(),
@@ -338,7 +338,8 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
   }
 
   Future<void> _showPublishConfirmationDialog(ShowPublishConfirmationSignal signal) async {
-    final shouldPublish = await PublishProposalIterationDialog.show(
+    final shouldPublish =
+        await PublishProposalIterationDialog.show(
           context: context,
           proposalTitle: signal.proposalTitle ?? context.l10n.proposalEditorStatusDropdownViewTitle,
           currentIteration: signal.currentIteration,
@@ -373,7 +374,8 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
   }
 
   Future<void> _showSubmitConfirmationDialog(ShowSubmitConfirmationSignal signal) async {
-    final shouldSubmit = await SubmitProposalForReviewDialog.show(
+    final shouldSubmit =
+        await SubmitProposalForReviewDialog.show(
           context: context,
           proposalTitle: signal.proposalTitle ?? context.l10n.proposalEditorStatusDropdownViewTitle,
           currentIteration: signal.currentIteration,
@@ -396,7 +398,8 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
   Future<void> _showUnlockProposalDialog(UnlockProposalSignal signal) async {
     if (!_isAboutToExit) {
       final bloc = context.read<ProposalBuilderBloc>();
-      final unlock = await UnlockEditProposalDialog.show(
+      final unlock =
+          await UnlockEditProposalDialog.show(
             context: context,
             title: signal.title,
             version: signal.version,

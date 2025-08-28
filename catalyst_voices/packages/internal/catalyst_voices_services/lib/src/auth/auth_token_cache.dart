@@ -16,8 +16,8 @@ final class LocalAuthTokenCache extends LocalTllCache implements AuthTokenCache 
   LocalAuthTokenCache({
     required super.sharedPreferences,
   }) : super(
-          key: 'LocalAuthCache',
-        );
+         key: 'LocalAuthCache',
+       );
 
   @override
   Future<String?> getRbac({required CatalystId id}) async {

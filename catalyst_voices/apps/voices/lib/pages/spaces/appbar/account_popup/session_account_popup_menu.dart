@@ -8,6 +8,7 @@ import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_accoun
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_theme_menu_tile.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_timezone_menu_tile.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/widgets/menu/voices_raw_popup_menu.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -17,14 +18,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class SessionAccountPopupMenu extends StatefulWidget {
-  const SessionAccountPopupMenu({
-    super.key,
-  });
+  const SessionAccountPopupMenu({super.key});
 
   @override
-  State<SessionAccountPopupMenu> createState() {
-    return _SessionAccountPopupMenuState();
-  }
+  State<SessionAccountPopupMenu> createState() => _SessionAccountPopupMenuState();
 }
 
 class _Account extends StatelessWidget {
@@ -144,43 +141,29 @@ class _PopupMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = PopupMenuTheme.of(context);
-    return DecoratedBox(
-      decoration: ShapeDecoration(
-        color: theme.color,
-        shape: theme.shape ?? const RoundedRectangleBorder(),
-      ),
-      child: const Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _AccountHeader(),
-          VoicesDivider.expanded(),
-          _Opportunities(),
-          VoicesDivider.expanded(),
-          _Account(),
-          _Settings(),
-          VoicesDivider.expanded(height: 17),
-          _Links(),
-          VoicesDivider.expanded(height: 17),
-          _Session(),
-          SizedBox(height: 8),
-        ],
+    return VoicesRawPopupMenu(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints.tightFor(width: 320),
+        child: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _AccountHeader(),
+            VoicesDivider.expanded(),
+            _Opportunities(),
+            VoicesDivider.expanded(),
+            _Account(),
+            _Settings(),
+            VoicesDivider.expanded(height: 17),
+            _Links(),
+            VoicesDivider.expanded(height: 17),
+            _Session(),
+            SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }
-}
-
-class _PopupMenuItem extends PopupMenuItem<_MenuItemEvent> {
-  const _PopupMenuItem()
-      : super(
-          // disabled because PopupMenuItem always adds InkWell
-          // and ripple which we don't want.
-          enabled: false,
-          padding: EdgeInsets.zero,
-          value: null,
-          child: const _PopupMenu(),
-        );
 }
 
 final class _RedirectToDocs extends _MenuItemEvent {
@@ -252,36 +235,25 @@ class _Session extends StatelessWidget {
 }
 
 class _SessionAccountPopupMenuState extends State<SessionAccountPopupMenu> with LaunchUrlMixin {
-  final _popupMenuButtonKey = GlobalKey<PopupMenuButtonState<_MenuItemEvent>>();
-
   @override
   Widget build(BuildContext context) {
-    // TODO(damian-molinski): replace `PopupMenuButton` by `showMenu`.
-    // Consider to replace all usages of PopupMenuButton
-    // by creating a custom replacement.
-    //
-    // Reason (when navigating away from a page that opened a PopupMenuButton):
-    // To safely refer to a widget's ancestor in its dispose() method, save
-    // a reference to the ancestor by calling
-    // dependOnInheritedWidgetOfExactType() in the widget's
-    // didChangeDependencies() method.
-    return PopupMenuButton<_MenuItemEvent>(
-      key: _popupMenuButtonKey,
+    return VoicesRawPopupMenuButton<_MenuItemEvent>(
+      buttonBuilder:
+          (
+            context,
+            onTapCallback, {
+            required isMenuOpen,
+          }) {
+            return SessionAccountAvatar(
+              key: const Key('SessionAccountPopupMenuAvatar'),
+              onTap: onTapCallback,
+            );
+          },
+      menuBuilder: (context) => const _PopupMenu(),
       onSelected: _handleEvent,
-      itemBuilder: (context) => const [_PopupMenuItem()],
-      tooltip: context.l10n.accountMenuPopupTooltip,
-      constraints: const BoxConstraints(maxWidth: 320),
       routeSettings: const RouteSettings(name: '/account_menu'),
-      color: PopupMenuTheme.of(context).color,
-      // disable because PopupMenuButton internally always wraps child in
-      // InkWell which adds unwanted background over color.
-      enabled: false,
-      child: SessionAccountAvatar(
-        key: const Key('SessionAccountPopupMenuAvatar'),
-        onTap: () {
-          _popupMenuButtonKey.currentState?.showButtonMenu();
-        },
-      ),
+      position: VoicesRawPopupMenuPosition.over,
+      menuOffset: Offset.zero,
     );
   }
 

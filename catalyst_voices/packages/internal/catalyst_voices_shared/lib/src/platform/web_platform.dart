@@ -4,18 +4,18 @@ import 'package:web/web.dart';
 
 final class CatalystPlatform {
   static Map<PlatformKey, bool> get identifiers => {
-        PlatformKey.android: isAndroid,
-        PlatformKey.desktop: isDesktop,
-        PlatformKey.fuchsia: isFuchsia,
-        PlatformKey.iOS: isIOS,
-        PlatformKey.linux: isLinux,
-        PlatformKey.macOS: isMacOS,
-        PlatformKey.mobile: isMobile,
-        PlatformKey.mobileWeb: isMobileWeb,
-        PlatformKey.web: isWeb,
-        PlatformKey.webDesktop: isWebDesktop,
-        PlatformKey.windows: isWindows,
-      };
+    PlatformKey.android: isAndroid,
+    PlatformKey.desktop: isDesktop,
+    PlatformKey.fuchsia: isFuchsia,
+    PlatformKey.iOS: isIOS,
+    PlatformKey.linux: isLinux,
+    PlatformKey.macOS: isMacOS,
+    PlatformKey.mobile: isMobile,
+    PlatformKey.mobileWeb: isMobileWeb,
+    PlatformKey.web: isWeb,
+    PlatformKey.webDesktop: isWebDesktop,
+    PlatformKey.windows: isWindows,
+  };
 
   static bool get isAndroid => false;
 
@@ -54,7 +54,8 @@ final class CatalystPlatform {
     }
 
     //Check for iPad specifically with desktop mode enabled (common case)
-    final isIpadWithDesktopAgent = userAgent.contains('macintosh') &&
+    final isIpadWithDesktopAgent =
+        userAgent.contains('macintosh') &&
         window.navigator.maxTouchPoints > 0 &&
         !userAgent.contains('windows');
     if (isIpadWithDesktopAgent) {

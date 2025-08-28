@@ -1,7 +1,7 @@
-# cspell: words unittests
+# cspell: words unittests socat
 
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.5.2 AS spectral-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.5.8 AS spectral-ci
 IMPORT .. AS gateway
 
 # a special package for applying migrations only up to "V2_**" migrations
@@ -15,6 +15,19 @@ package-event-db-v1:
 
     SAVE IMAGE ${container}:${tag}
 
+package-haproxy:
+    FROM haproxy:alpine
+
+    USER root
+    RUN apk add su-exec socat
+    COPY ./api_tests/utils/proxy/haproxy.cfg /usr/local/etc/haproxy/haproxy.cfg
+    COPY ./api_tests/utils/proxy/haproxy_entry.sh /app/entrypoint.sh
+
+    RUN chmod +x /app/entrypoint.sh
+
+    ENTRYPOINT ["/app/entrypoint.sh"]
+    SAVE IMAGE haproxy-node:latest
+
 # build all necessary docker images required to run `docker-compose.yml` services
 prepare-all-images:
     FROM scratch
@@ -24,6 +37,7 @@ prepare-all-images:
     BUILD ./schemathesis_tests+package
     BUILD +package-rust-tests-runner
     BUILD +package-event-db-v1
+    BUILD +package-haproxy
 
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.

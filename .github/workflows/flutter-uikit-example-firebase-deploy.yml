@@ -1,8 +1,9 @@
 name: UIKit Flutter Example Firebase Hosting Deploy
 
-on:
-  push:
-    branches: "main"
+# TODO(dt-iohk): the job is not maintained, disabled automatic deployment in favor of manual one
+on: workflow_dispatch
+  # push:
+  #   branches: "main"
 
 permissions:
   contents: write

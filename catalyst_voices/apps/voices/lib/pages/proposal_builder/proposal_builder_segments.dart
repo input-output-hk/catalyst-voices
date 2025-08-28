@@ -91,8 +91,9 @@ class _DocumentSection extends StatelessWidget {
             section: property,
             isSelected: isSelected,
             isEditable: _isEditable,
-            autovalidateMode:
-                showValidationErrors ? AutovalidateMode.always : AutovalidateMode.disabled,
+            autovalidateMode: showValidationErrors
+                ? AutovalidateMode.always
+                : AutovalidateMode.disabled,
             onChanged: (value) {
               final event = SectionChangedEvent(changes: value);
               context.read<ProposalBuilderBloc>().add(event);
@@ -187,17 +188,17 @@ class _ProposalBuilderSegments extends StatelessWidget {
   }) {
     return switch (item) {
       ProposalViewCommentsSection(:final sort) => ProposalCommentsHeaderTile(
-          sort: sort,
-          showSort: item.comments.isNotEmpty,
-          onChanged: (value) {
-            context.read<ProposalBuilderBloc>().add(UpdateCommentsSortEvent(sort: value));
-          },
-        ),
+        sort: sort,
+        showSort: item.comments.isNotEmpty,
+        onChanged: (value) {
+          context.read<ProposalBuilderBloc>().add(UpdateCommentsSortEvent(sort: value));
+        },
+      ),
       ProposalCommentListItem(:final comment, :final canReply) => ProposalBuilderCommentTile(
-          key: ValueKey(comment.comment.metadata.selfRef),
-          comment: comment,
-          canReply: canReply,
-        ),
+        key: ValueKey(comment.comment.metadata.selfRef),
+        comment: comment,
+        canReply: canReply,
+      ),
       ProposalAddCommentSection(
         :final schema,
         :final showUsernameRequired,
@@ -254,23 +255,23 @@ class _ProposalBuilderSegments extends StatelessWidget {
   }) {
     return switch (item) {
       DocumentSegment() => SegmentHeaderTile(
-          id: item.id,
-          name: item.resolveTitle(context),
-        ),
+        id: item.id,
+        name: item.resolveTitle(context),
+      ),
       ProposalCommentsSegment() => SegmentHeaderTile(
-          id: item.id,
-          name: item.resolveTitle(context),
-        ),
+        id: item.id,
+        name: item.resolveTitle(context),
+      ),
       DocumentSection() => _DocumentSection(
-          property: item.property,
-          isSelected: item.property.nodeId == selectedNodeId,
-        ),
+        property: item.property,
+        isSelected: item.property.nodeId == selectedNodeId,
+      ),
       _ => _buildDecoratedCommentSection(
-          context: context,
-          item: item,
-          previousItem: previousItem,
-          nextItem: nextItem,
-        ),
+        context: context,
+        item: item,
+        previousItem: previousItem,
+        nextItem: nextItem,
+      ),
     };
   }
 }

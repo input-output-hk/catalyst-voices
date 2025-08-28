@@ -7,8 +7,8 @@ class BlocRegistrationSelector<T> extends BlocSelector<RegistrationCubit, Regist
     required super.builder,
     super.bloc,
   }) : super(
-          selector: (state) {
-            return selector(state.registrationStateData);
-          },
-        );
+         selector: (state) {
+           return selector(state.registrationStateData);
+         },
+       );
 }

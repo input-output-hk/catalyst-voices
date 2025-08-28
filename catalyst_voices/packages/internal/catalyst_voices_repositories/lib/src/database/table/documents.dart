@@ -16,9 +16,9 @@ class Documents extends Table with IdHiLoTableMixin, VerHiLoTableMixin, Document
 
   @override
   Set<Column<Object>>? get primaryKey => {
-        idHi,
-        idLo,
-        verHi,
-        verLo,
-      };
+    idHi,
+    idLo,
+    verHi,
+    verLo,
+  };
 }

@@ -24,10 +24,10 @@ final class CampaignCategorySection extends Equatable implements MenuItem {
 
   @override
   List<Object?> get props => [
-        id,
-        category,
-        title,
-        body,
-        isEnabled,
-      ];
+    id,
+    category,
+    title,
+    body,
+    isEnabled,
+  ];
 }

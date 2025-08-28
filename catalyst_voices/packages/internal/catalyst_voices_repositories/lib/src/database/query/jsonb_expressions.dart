@@ -34,40 +34,40 @@ final class ContainsAuthorId extends BaseJsonQueryExpression {
   ContainsAuthorId({
     required CatalystId id,
   }) : super(
-          searchValue: id.toSignificant().toUri().toStringWithoutScheme(),
-          nodeId: ProposalMetadata.authorsNode,
-          jsonContent: 'metadata',
-        );
+         searchValue: id.toSignificant().toUri().toStringWithoutScheme(),
+         nodeId: ProposalMetadata.authorsNode,
+         jsonContent: 'metadata',
+       );
 }
 
 final class ContainsContentAuthorName extends BaseJsonQueryExpression {
   ContainsContentAuthorName({
     required String query,
   }) : super(
-          searchValue: query,
-          nodeId: ProposalDocument.authorNameNodeId,
-          jsonContent: 'content',
-        );
+         searchValue: query,
+         nodeId: ProposalDocument.authorNameNodeId,
+         jsonContent: 'content',
+       );
 }
 
 final class ContainsMetadataAuthorName extends BaseJsonQueryExpression {
   ContainsMetadataAuthorName({
     required String query,
   }) : super(
-          searchValue: query,
-          nodeId: ProposalMetadata.authorsNode,
-          jsonContent: 'metadata',
-        );
+         searchValue: query,
+         nodeId: ProposalMetadata.authorsNode,
+         jsonContent: 'metadata',
+       );
 }
 
 final class ContainsTitle extends BaseJsonQueryExpression {
   ContainsTitle({
     required String query,
   }) : super(
-          searchValue: query,
-          nodeId: ProposalDocument.titleNodeId,
-          jsonContent: 'content',
-        );
+         searchValue: query,
+         nodeId: ProposalDocument.titleNodeId,
+         jsonContent: 'content',
+       );
 }
 
 class JsonBExpressions {

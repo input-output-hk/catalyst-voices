@@ -46,10 +46,10 @@ final class ProposalCommentListItem extends Equatable implements SegmentsListVie
 
   @override
   List<Object?> get props => [
-        id,
-        comment,
-        canReply,
-      ];
+    id,
+    comment,
+    canReply,
+  ];
 }
 
 /// Section for comments in a proposal
@@ -69,9 +69,9 @@ final class ProposalCommentsSegment extends BaseSegment<ProposalCommentsSection>
     required super.sections,
   });
 
-  bool get hasComments => sections
-      .whereType<ProposalViewCommentsSection>()
-      .any((element) => element.comments.isNotEmpty);
+  bool get hasComments => sections.whereType<ProposalViewCommentsSection>().any(
+    (element) => element.comments.isNotEmpty,
+  );
 
   @override
   SvgGenImage get icon => VoicesAssets.icons.chatAlt2;
@@ -86,8 +86,8 @@ final class ProposalCommentsSegment extends BaseSegment<ProposalCommentsSection>
       return switch (section) {
         ProposalAddCommentSection() => section,
         ProposalViewCommentsSection() => section.copyWith(
-            comments: sort.applyTo(section.comments),
-          ),
+          comments: sort.applyTo(section.comments),
+        ),
       };
     }).toList();
 

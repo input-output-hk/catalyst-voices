@@ -16,6 +16,11 @@ extension type Ed25519Signature._(List<int> bytes) {
     }
   }
 
+  /// Deserializes the type from cbor.
+  factory Ed25519Signature.fromCbor(CborValue value) {
+    return Ed25519Signature.fromBytes((value as CborBytes).bytes);
+  }
+
   /// Constructs [Ed25519Signature] from a hex [string].
   factory Ed25519Signature.fromHex(String string) {
     return Ed25519Signature.fromBytes(hexDecode(string));
@@ -25,11 +30,6 @@ extension type Ed25519Signature._(List<int> bytes) {
   /// that can be used to reserve size.
   factory Ed25519Signature.seeded(int byte) =>
       Ed25519Signature.fromBytes(List.filled(length, byte));
-
-  /// Deserializes the type from cbor.
-  factory Ed25519Signature.fromCbor(CborValue value) {
-    return Ed25519Signature.fromBytes((value as CborBytes).bytes);
-  }
 
   /// Serializes the type as cbor.
   CborValue toCbor() => CborBytes(bytes);

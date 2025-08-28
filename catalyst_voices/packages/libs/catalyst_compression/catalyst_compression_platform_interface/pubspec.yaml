@@ -6,17 +6,16 @@ topics: [compression, codec]
 version: 1.0.0
 
 environment:
-  sdk: ">=3.6.0 <4.0.0"
-  flutter: ">=3.29.3"
+  sdk: ">=3.9.0 <4.0.0"
+  flutter: ">=3.35.1"
 
 dependencies:
   equatable: ^2.0.7
   flutter:
     sdk: flutter
-  plugin_platform_interface: ^2.1.7
+  plugin_platform_interface: ^2.1.8
 
 dev_dependencies:
-  analyzer: 7.3.0
   catalyst_analysis: ^3.0.0
   flutter_test:
     sdk: flutter

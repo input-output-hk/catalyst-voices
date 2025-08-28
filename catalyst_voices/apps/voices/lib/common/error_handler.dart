@@ -21,11 +21,11 @@ mixin ErrorHandlerStateMixin<E extends ErrorEmitter, T extends StatefulWidget> o
     implements ErrorHandler {
   StreamSubscription<Object>? _errorSub;
 
-  @override
-  void initState() {
-    super.initState();
-    _errorSub = errorEmitter.errorStream.listen(handleError);
-  }
+  /// A method that can be overridden to provide a custom error emitter.
+  ///
+  /// If this method is not overriden then the emitter of type [E]
+  /// must be provided in a widget tree so that context.read can find it.
+  E get errorEmitter => context.read<E>();
 
   @override
   void dispose() {
@@ -33,12 +33,6 @@ mixin ErrorHandlerStateMixin<E extends ErrorEmitter, T extends StatefulWidget> o
     _errorSub = null;
     super.dispose();
   }
-
-  /// A method that can be overridden to provide a custom error emitter.
-  ///
-  /// If this method is not overriden then the emitter of type [E]
-  /// must be provided in a widget tree so that context.read can find it.
-  E get errorEmitter => context.read<E>();
 
   @override
   void handleError(Object error) {
@@ -52,5 +46,11 @@ mixin ErrorHandlerStateMixin<E extends ErrorEmitter, T extends StatefulWidget> o
       type: VoicesSnackBarType.error,
       message: exception.message(context),
     ).show(context);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _errorSub = errorEmitter.errorStream.listen(handleError);
   }
 }

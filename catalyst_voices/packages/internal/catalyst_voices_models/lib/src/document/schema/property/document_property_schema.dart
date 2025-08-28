@@ -67,16 +67,16 @@ sealed class DocumentPropertySchema extends Equatable implements DocumentNode {
   @override
   @mustCallSuper
   List<Object?> get props => [
-        nodeId,
-        type,
-        format,
-        title,
-        description,
-        placeholder,
-        guidance,
-        isSubsection,
-        isRequired,
-      ];
+    nodeId,
+    type,
+    format,
+    title,
+    description,
+    placeholder,
+    guidance,
+    isSubsection,
+    isRequired,
+  ];
 
   /// Creates a new copy of the schema.
   ///

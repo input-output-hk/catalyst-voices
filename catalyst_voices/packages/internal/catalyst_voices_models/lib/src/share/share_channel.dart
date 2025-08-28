@@ -12,12 +12,12 @@ enum ShareChannel {
   const ShareChannel(this.name);
 
   Uri buildShareUri(ShareData data) => switch (this) {
-        ShareChannel.clipboard => data.uri,
-        ShareChannel.xTwitter => _adaptForTwitter(data),
-        ShareChannel.linkedin => _adaptForLinkedin(data),
-        ShareChannel.facebook => _adaptForFacebook(data),
-        ShareChannel.reddit => _adaptForReddit(data),
-      };
+    ShareChannel.clipboard => data.uri,
+    ShareChannel.xTwitter => _adaptForTwitter(data),
+    ShareChannel.linkedin => _adaptForLinkedin(data),
+    ShareChannel.facebook => _adaptForFacebook(data),
+    ShareChannel.reddit => _adaptForReddit(data),
+  };
 
   Uri _adaptForFacebook(ShareData data) {
     return Uri.https(

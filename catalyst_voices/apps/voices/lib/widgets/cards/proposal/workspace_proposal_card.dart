@@ -4,12 +4,12 @@ import 'package:catalyst_voices/widgets/cards/proposal/proposal_card_widgets.dar
 import 'package:catalyst_voices/widgets/cards/proposal_iteration_history_card.dart';
 import 'package:catalyst_voices/widgets/text/last_edit_date.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class WorkspaceProposalCard extends StatelessWidget {
-  final Proposal proposal;
+  final UsersProposalOverview proposal;
 
   const WorkspaceProposalCard({
     super.key,
@@ -54,7 +54,7 @@ class WorkspaceProposalCard extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  final Proposal proposal;
+  final UsersProposalOverview proposal;
 
   const _Body(this.proposal);
 
@@ -82,9 +82,7 @@ class _Body extends StatelessWidget {
                     ),
                     ProposalIterationStageChip(
                       status: proposal.publish,
-                      versionNumber: proposal.versions.versionNumber(
-                        proposal.selfRef.version ?? '',
-                      ),
+                      versionNumber: proposal.iteration,
                       useInternalBackground: !isSubmitted,
                     ),
                   ],
@@ -99,7 +97,7 @@ class _Body extends StatelessWidget {
                       width: 300,
                       child: _CampaignData(
                         leadValue: proposal.category,
-                        subValue: context.l10n.fundNoCategory(14),
+                        subValue: context.l10n.fundNoCategory(proposal.fundNumber),
                       ),
                     ),
                     _CampaignData(
@@ -122,7 +120,7 @@ class _Body extends StatelessWidget {
           ref: proposal.selfRef,
           proposalPublish: proposal.publish,
           title: proposal.title,
-          version: proposal.versions.versionNumber(proposal.selfRef.version!),
+          version: proposal.iteration,
           hasNewerLocalIteration: proposal.hasNewerLocalIteration,
         ),
       ],

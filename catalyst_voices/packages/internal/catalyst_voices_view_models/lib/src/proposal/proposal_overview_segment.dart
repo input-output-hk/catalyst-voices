@@ -30,27 +30,30 @@ sealed class ProposalOverviewSection extends BaseSection {
 final class ProposalOverviewSegment extends BaseSegment<ProposalOverviewSection> {
   final String categoryName;
   final String proposalTitle;
+  final bool isVotingStage;
 
   const ProposalOverviewSegment({
     required super.id,
     required this.categoryName,
     required this.proposalTitle,
+    required this.isVotingStage,
     required super.sections,
   });
 
   ProposalOverviewSegment.build({
     required this.categoryName,
     required this.proposalTitle,
+    required this.isVotingStage,
     required ProposalViewMetadata data,
   }) : super(
-          id: const NodeId('overview'),
-          sections: [
-            ProposalMetadataSection(
-              id: const NodeId('overview.metadata'),
-              data: data,
-            ),
-          ],
-        );
+         id: const NodeId('overview'),
+         sections: [
+           ProposalMetadataSection(
+             id: const NodeId('overview.metadata'),
+             data: data,
+           ),
+         ],
+       );
 
   @override
   SvgGenImage get icon => VoicesAssets.icons.lightningBolt;

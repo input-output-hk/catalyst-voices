@@ -306,17 +306,17 @@ class VoicesEditCancelButton extends StatelessWidget {
 
     return switch (style) {
       VoicesEditCancelButtonStyle.text => VoicesTextButton(
-          onTap: onTap,
-          child: Text(text, style: textStyle),
-        ),
+        onTap: onTap,
+        child: Text(text, style: textStyle),
+      ),
       VoicesEditCancelButtonStyle.outlinedWithIcon => VoicesOutlinedButton(
-          onTap: onTap,
-          leading: VoicesAssets.icons.pencilAlt.buildIcon(),
-          child: Text(
-            text,
-            style: textStyle.copyWith(color: theme.colorScheme.primary),
-          ),
+        onTap: onTap,
+        leading: VoicesAssets.icons.pencilAlt.buildIcon(),
+        child: Text(
+          text,
+          style: textStyle.copyWith(color: theme.colorScheme.primary),
         ),
+      ),
     };
   }
 }

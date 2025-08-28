@@ -60,6 +60,28 @@ class _Background extends StatelessWidget {
   }
 }
 
+class _CloseButton extends StatelessWidget {
+  const _CloseButton();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colors;
+
+    final style = IconButton.styleFrom(
+      backgroundColor: colors.iconsBackground,
+      foregroundColor: colors.iconsForeground,
+    );
+
+    return IconButtonTheme(
+      data: IconButtonThemeData(style: style),
+      child: XButton(
+        key: const Key('CloseButton'),
+        onTap: () async => Navigator.of(context).maybePop(),
+      ),
+    );
+  }
+}
+
 class _Foreground extends StatelessWidget {
   final String titleLabel;
   final String title;
@@ -137,28 +159,6 @@ class _TitleText extends StatelessWidget {
       // TODO(damian-molinski): Always using white colors without token.
       // Colors/sys color neutral md ref/N100
       style: textTheme.displayMedium?.copyWith(color: Colors.white),
-    );
-  }
-}
-
-class _CloseButton extends StatelessWidget {
-  const _CloseButton();
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colors;
-
-    final style = IconButton.styleFrom(
-      backgroundColor: colors.iconsBackground,
-      foregroundColor: colors.iconsForeground,
-    );
-
-    return IconButtonTheme(
-      data: IconButtonThemeData(style: style),
-      child: XButton(
-        key: const Key('CloseButton'),
-        onTap: () async => Navigator.of(context).maybePop(),
-      ),
     );
   }
 }

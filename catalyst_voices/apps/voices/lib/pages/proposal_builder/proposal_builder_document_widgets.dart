@@ -7,8 +7,11 @@ class _CategoryDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalBuilderBloc, ProposalBuilderState,
-        CampaignCategoryDetailsViewModel?>(
+    return BlocSelector<
+      ProposalBuilderBloc,
+      ProposalBuilderState,
+      CampaignCategoryDetailsViewModel?
+    >(
       selector: (state) => state.category,
       builder: (context, category) {
         if (category == null) {
@@ -96,17 +99,15 @@ class _StatsItem extends StatelessWidget {
       children: [
         Text(
           CryptocurrencyFormatter.formatAmount(value),
-          style: Theme.of(context)
-              .textTheme
-              .titleLarge
-              ?.copyWith(color: context.colors.textOnPrimaryLevel1),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(color: context.colors.textOnPrimaryLevel1),
         ),
         Text(
           label,
-          style: Theme.of(context)
-              .textTheme
-              .bodySmall
-              ?.copyWith(color: context.colors.textOnPrimaryLevel1),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: context.colors.textOnPrimaryLevel1),
         ),
       ],
     );

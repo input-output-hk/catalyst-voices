@@ -55,13 +55,10 @@ class _BlocSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<
-        RegistrationCubit,
-        RegistrationState,
-        ({
-          Set<AccountRole> roles,
-          WalletInfo selectedWallet,
-          String transactionFee,
-        })?>(
+      RegistrationCubit,
+      RegistrationState,
+      ({Set<AccountRole> roles, WalletInfo selectedWallet, String transactionFee})?
+    >(
       selector: (state) {
         final selectedWallet = state.walletLinkStateData.selectedWallet;
         final transactionFee = state.registrationStateData.transactionFee;
@@ -121,9 +118,9 @@ class _BlocTxSubmitError extends StatelessWidget {
       builder: (context, result) {
         return switch (result) {
           Failure(:final value) => _Error(
-              error: value,
-              onRetry: () => _onRetry(context),
-            ),
+            error: value,
+            onRetry: () => _onRetry(context),
+          ),
           _ => const Offstage(),
         };
       },
@@ -131,34 +128,6 @@ class _BlocTxSubmitError extends StatelessWidget {
   }
 
   void _onRetry(BuildContext context) {
-    unawaited(RegistrationCubit.of(context).finishRegistration());
-  }
-}
-
-class _SuccessNavigation extends StatelessWidget {
-  const _SuccessNavigation();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _BlocSubmitTxButton(
-          onSubmit: () => _submitRegistration(context),
-        ),
-        const SizedBox(height: 10),
-        VoicesTextButton(
-          leading: VoicesAssets.icons.wallet.buildIcon(),
-          onTap: () {
-            RegistrationCubit.of(context).changeRoleSetup();
-          },
-          child: Text(context.l10n.walletLinkTransactionChangeRoles),
-        ),
-      ],
-    );
-  }
-
-  void _submitRegistration(BuildContext context) {
     unawaited(RegistrationCubit.of(context).finishRegistration());
   }
 }
@@ -259,6 +228,34 @@ class _RbacTransactionPanelState extends State<RbacTransactionPanel> {
   }
 }
 
+class _SuccessNavigation extends StatelessWidget {
+  const _SuccessNavigation();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _BlocSubmitTxButton(
+          onSubmit: () => _submitRegistration(context),
+        ),
+        const SizedBox(height: 10),
+        VoicesTextButton(
+          leading: VoicesAssets.icons.wallet.buildIcon(),
+          onTap: () {
+            RegistrationCubit.of(context).changeRoleSetup();
+          },
+          child: Text(context.l10n.walletLinkTransactionChangeRoles),
+        ),
+      ],
+    );
+  }
+
+  void _submitRegistration(BuildContext context) {
+    unawaited(RegistrationCubit.of(context).finishRegistration());
+  }
+}
+
 class _Summary extends StatelessWidget {
   final Set<AccountRole> roles;
   final WalletInfo walletInfo;
@@ -308,8 +305,9 @@ class _Summary extends StatelessWidget {
             children: [
               Text(
                 context.l10n.total,
-                style:
-                    Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
               Text(
                 transactionFee,

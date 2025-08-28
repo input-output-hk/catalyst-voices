@@ -64,19 +64,19 @@ class PlatformAwareBuilder<T> extends StatelessWidget {
     this.enabled = true,
     required T other,
   }) : _platformData = {
-          PlatformKey.android: android,
-          PlatformKey.desktop: desktop,
-          PlatformKey.fuchsia: fuchsia,
-          PlatformKey.iOS: iOS,
-          PlatformKey.linux: linux,
-          PlatformKey.macOS: macOS,
-          PlatformKey.mobile: mobile,
-          PlatformKey.mobileWeb: mobileWeb,
-          PlatformKey.web: web,
-          PlatformKey.webDesktop: webDesktop,
-          PlatformKey.windows: windows,
-          PlatformKey.other: other,
-        };
+         PlatformKey.android: android,
+         PlatformKey.desktop: desktop,
+         PlatformKey.fuchsia: fuchsia,
+         PlatformKey.iOS: iOS,
+         PlatformKey.linux: linux,
+         PlatformKey.macOS: macOS,
+         PlatformKey.mobile: mobile,
+         PlatformKey.mobileWeb: mobileWeb,
+         PlatformKey.web: web,
+         PlatformKey.webDesktop: webDesktop,
+         PlatformKey.windows: windows,
+         PlatformKey.other: other,
+       };
 
   @override
   Widget build(BuildContext context) {

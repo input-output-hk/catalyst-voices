@@ -41,14 +41,14 @@ class _ExportCatalystKeyConfirmDialogState extends State<ExportCatalystKeyConfir
         placeholderSpanBuilder: (context, placeholder) {
           return switch (placeholder) {
             'link' => TextSpan(
-                text: l10n.bestPracticesFAQ,
-                recognizer: _recognizer,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                  decoration: TextDecoration.underline,
-                ),
+              text: l10n.bestPracticesFAQ,
+              recognizer: _recognizer,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+                decoration: TextDecoration.underline,
               ),
-            _ => throw ArgumentError()
+            ),
+            _ => throw ArgumentError(),
           };
         },
       ),

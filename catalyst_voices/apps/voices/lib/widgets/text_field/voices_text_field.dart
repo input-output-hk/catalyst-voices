@@ -15,9 +15,10 @@ import 'package:flutter/services.dart';
 /// both the message to be shown where the [VoicesTextFieldDecoration.errorText]
 /// is traditionally shown and as well the status which might decorate
 /// the text field with success checkmark or error icon depending on the status.
-typedef VoicesTextFieldValidator = VoicesTextFieldValidationResult Function(
-  String value,
-);
+typedef VoicesTextFieldValidator =
+    VoicesTextFieldValidationResult Function(
+      String value,
+    );
 
 /// A replacement for [TextField] and [TextFormField]
 /// that is pre-configured to use Project Catalyst theming.
@@ -137,80 +138,80 @@ class VoicesTextField extends VoicesFormField<String> {
     this.mouseCursor,
     this.showValidationStatusIcon = true,
   }) : super(
-          value: controller?.text ?? initialText,
-          validator: (value) {
-            final errorText = decoration?.errorText;
-            if (errorText != null) {
-              return errorText;
-            } else {
-              final result = textValidator?.call(value ?? '');
-              return result?.errorMessage;
-            }
-          },
-          builder: (field) {
-            final state = field as VoicesTextFieldState;
+         value: controller?.text ?? initialText,
+         validator: (value) {
+           final errorText = decoration?.errorText;
+           if (errorText != null) {
+             return errorText;
+           } else {
+             final result = textValidator?.call(value ?? '');
+             return result?.errorMessage;
+           }
+         },
+         builder: (field) {
+           final state = field as VoicesTextFieldState;
 
-            final labelText = decoration?.labelText ?? '';
-            final subLabelText = decoration?.subLabelText ?? '';
+           final labelText = decoration?.labelText ?? '';
+           final subLabelText = decoration?.subLabelText ?? '';
 
-            final resizableVertically = state._isResizableVertically;
-            final resizableHorizontally = state._isResizableHorizontally;
+           final resizableVertically = state._isResizableVertically;
+           final resizableHorizontally = state._isResizableHorizontally;
 
-            void onChangedHandler(String? value) {
-              field.didChange(value);
-              onChanged?.call(value);
-            }
+           void onChangedHandler(String? value) {
+             field.didChange(value);
+             onChanged?.call(value);
+           }
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 4,
-              children: [
-                if (labelText.isNotEmpty || subLabelText.isNotEmpty) ...[
-                  _TextFieldLabel(
-                    text: labelText,
-                    subText: subLabelText,
-                    textStyle: decoration?.labelStyle,
-                    subTextStyle: decoration?.subLabelStyle,
-                    isEnabled: enabled,
-                  ),
-                ],
-                ResizableBoxParent(
-                  resizableHorizontally: resizableHorizontally,
-                  resizableVertically: resizableVertically,
-                  minHeight: maxLines == null ? 65 : 48,
-                  iconBottomSpacing: maxLines == null ? 18 : 0,
-                  child: TextField(
-                    key: const Key('VoicesTextField'),
-                    textAlignVertical: TextAlignVertical.top,
-                    autofocus: autofocus,
-                    expands: resizableVertically,
-                    controller: state._obtainController(),
-                    statesController: statesController,
-                    focusNode: focusNode,
-                    onSubmitted: onFieldSubmitted,
-                    onEditingComplete: onEditingComplete,
-                    inputFormatters: inputFormatters,
-                    decoration: state._buildDecoration(),
-                    keyboardType: keyboardType,
-                    textInputAction: textInputAction,
-                    textCapitalization: textCapitalization,
-                    style: style,
-                    obscureText: obscureText,
-                    maxLines: maxLines,
-                    minLines: minLines,
-                    maxLength: maxLength,
-                    maxLengthEnforcement: maxLengthEnforcement,
-                    enabled: enabled,
-                    readOnly: readOnly,
-                    ignorePointers: ignorePointers,
-                    onChanged: onChangedHandler,
-                    mouseCursor: mouseCursor,
-                  ),
-                ),
-              ],
-            );
-          },
-        );
+           return Column(
+             crossAxisAlignment: CrossAxisAlignment.start,
+             spacing: 4,
+             children: [
+               if (labelText.isNotEmpty || subLabelText.isNotEmpty) ...[
+                 _TextFieldLabel(
+                   text: labelText,
+                   subText: subLabelText,
+                   textStyle: decoration?.labelStyle,
+                   subTextStyle: decoration?.subLabelStyle,
+                   isEnabled: enabled,
+                 ),
+               ],
+               ResizableBoxParent(
+                 resizableHorizontally: resizableHorizontally,
+                 resizableVertically: resizableVertically,
+                 minHeight: maxLines == null ? 65 : 48,
+                 iconBottomSpacing: maxLines == null ? 18 : 0,
+                 child: TextField(
+                   key: const Key('VoicesTextField'),
+                   textAlignVertical: TextAlignVertical.top,
+                   autofocus: autofocus,
+                   expands: resizableVertically,
+                   controller: state._obtainController(),
+                   statesController: statesController,
+                   focusNode: focusNode,
+                   onSubmitted: onFieldSubmitted,
+                   onEditingComplete: onEditingComplete,
+                   inputFormatters: inputFormatters,
+                   decoration: state._buildDecoration(),
+                   keyboardType: keyboardType,
+                   textInputAction: textInputAction,
+                   textCapitalization: textCapitalization,
+                   style: style,
+                   obscureText: obscureText,
+                   maxLines: maxLines,
+                   minLines: minLines,
+                   maxLength: maxLength,
+                   maxLengthEnforcement: maxLengthEnforcement,
+                   enabled: enabled,
+                   readOnly: readOnly,
+                   ignorePointers: ignorePointers,
+                   onChanged: onChangedHandler,
+                   mouseCursor: mouseCursor,
+                 ),
+               ),
+             ],
+           );
+         },
+       );
 
   @override
   VoicesFormFieldState<String> createState() => VoicesTextFieldState();
@@ -492,7 +493,8 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
         horizontal: 16,
         vertical: 12,
       ),
-      border: widget.decoration?.border ??
+      border:
+          widget.decoration?.border ??
           _getBorder(
             orDefault: OutlineInputBorder(
               borderRadius: borderRadius ?? BorderRadius.zero,
@@ -501,7 +503,8 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
               ),
             ),
           ),
-      enabledBorder: widget.decoration?.enabledBorder ??
+      enabledBorder:
+          widget.decoration?.enabledBorder ??
           _getBorder(
             orDefault: OutlineInputBorder(
               borderRadius: borderRadius ?? BorderRadius.zero,
@@ -510,14 +513,16 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
               ),
             ),
           ),
-      disabledBorder: widget.decoration?.disabledBorder ??
+      disabledBorder:
+          widget.decoration?.disabledBorder ??
           OutlineInputBorder(
             borderRadius: borderRadius ?? BorderRadius.zero,
             borderSide: BorderSide(
               color: colorScheme.outline,
             ),
           ),
-      errorBorder: widget.decoration?.errorBorder ??
+      errorBorder:
+          widget.decoration?.errorBorder ??
           OutlineInputBorder(
             borderRadius: borderRadius ?? BorderRadius.zero,
             borderSide: BorderSide(
@@ -527,7 +532,8 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
               ),
             ),
           ),
-      focusedBorder: widget.decoration?.focusedBorder ??
+      focusedBorder:
+          widget.decoration?.focusedBorder ??
           _getBorder(
             orDefault: OutlineInputBorder(
               borderRadius: borderRadius ?? BorderRadius.zero,
@@ -537,7 +543,8 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
               ),
             ),
           ),
-      focusedErrorBorder: widget.decoration?.focusedErrorBorder ??
+      focusedErrorBorder:
+          widget.decoration?.focusedErrorBorder ??
           _getBorder(
             orDefault: OutlineInputBorder(
               borderRadius: borderRadius ?? BorderRadius.zero,
@@ -630,8 +637,7 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
     TextTheme textTheme,
     ThemeData theme, {
     TextStyle? orDefault,
-  }) =>
-      widget.decoration?.hintStyle ?? orDefault;
+  }) => widget.decoration?.hintStyle ?? orDefault;
 
   Color _getStatusColor({required Color orDefault}) {
     switch (_validation.status) {
@@ -789,10 +795,10 @@ class VoicesTextFieldValidationResult with EquatableMixin {
     required this.status,
     this.errorMessage,
   }) : assert(
-          (status == VoicesTextFieldStatus.warning || status == VoicesTextFieldStatus.error) ||
-              errorMessage == null,
-          'errorMessage can be only used for warning or error status',
-        );
+         (status == VoicesTextFieldStatus.warning || status == VoicesTextFieldStatus.error) ||
+             errorMessage == null,
+         'errorMessage can be only used for warning or error status',
+       );
 
   /// Returns an error validation result.
   ///
@@ -808,15 +814,15 @@ class VoicesTextFieldValidationResult with EquatableMixin {
   /// in cases where the text field state is known in advance
   /// and dynamic validation is not needed.
   const VoicesTextFieldValidationResult.error([String? message])
-      : this(
-          status: VoicesTextFieldStatus.error,
-          errorMessage: message,
-        );
+    : this(
+        status: VoicesTextFieldStatus.error,
+        errorMessage: message,
+      );
 
   const VoicesTextFieldValidationResult.none()
-      : this(
-          status: VoicesTextFieldStatus.none,
-        );
+    : this(
+        status: VoicesTextFieldStatus.none,
+      );
 
   /// Returns a successful validation result.
   ///
@@ -832,9 +838,9 @@ class VoicesTextFieldValidationResult with EquatableMixin {
   /// in cases where the text field state is known in advance
   /// and dynamic validation is not needed.
   const VoicesTextFieldValidationResult.success()
-      : this(
-          status: VoicesTextFieldStatus.success,
-        );
+    : this(
+        status: VoicesTextFieldStatus.success,
+      );
 
   /// Returns a warning validation result.
   ///
@@ -850,10 +856,10 @@ class VoicesTextFieldValidationResult with EquatableMixin {
   /// in cases where the text field state is known in advance
   /// and dynamic validation is not needed.
   const VoicesTextFieldValidationResult.warning([String? message])
-      : this(
-          status: VoicesTextFieldStatus.warning,
-          errorMessage: message,
-        );
+    : this(
+        status: VoicesTextFieldStatus.warning,
+        errorMessage: message,
+      );
 
   @override
   List<Object?> get props => [status, errorMessage];
@@ -878,14 +884,14 @@ class _TextFieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     final textColor = isEnabled ? context.colors.textOnPrimaryLevel0 : context.colors.textDisabled;
 
-    final effectiveTextStyle =
-        (textStyle ?? context.textTheme.titleSmall ?? const TextStyle()).copyWith(
-      color: textColor,
-    );
+    final effectiveTextStyle = (textStyle ?? context.textTheme.titleSmall ?? const TextStyle())
+        .copyWith(
+          color: textColor,
+        );
     final effectiveSubTextStyle =
         (subTextStyle ?? context.textTheme.bodyMedium ?? const TextStyle()).copyWith(
-      color: textColor,
-    );
+          color: textColor,
+        );
 
     return Column(
       mainAxisSize: MainAxisSize.min,

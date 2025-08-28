@@ -20,17 +20,17 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
   WidgetBuilder get _errorIndicatorBuilder =>
       builderDelegate.errorIndicatorBuilder ??
       (context) => VoicesErrorIndicator(
-            message: context.l10n.somethingWentWrong,
-          );
+        message: context.l10n.somethingWentWrong,
+      );
 
   ItemWidgetBuilder<ItemType> get _itemBuilder => builderDelegate.builder;
 
   WidgetBuilder get _loadingIndicatorBuilder =>
       builderDelegate.loadingIndicatorBuilder ??
       (_) => const Padding(
-            padding: EdgeInsets.all(16),
-            child: Center(child: VoicesCircularProgressIndicator()),
-          );
+        padding: EdgeInsets.all(16),
+        child: Center(child: VoicesCircularProgressIndicator()),
+      );
 
   PagingController<ItemType> get _pagingController => pagingController;
 
@@ -78,7 +78,8 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
           children: [
             child,
             Offstage(
-              offstage: pagingState.itemList.isEmpty ||
+              offstage:
+                  pagingState.itemList.isEmpty ||
                   (pagingState.isFirstPage && pagingState.isLastPage),
               child: _Controls(
                 fromNumber: pagingState.fromValue,

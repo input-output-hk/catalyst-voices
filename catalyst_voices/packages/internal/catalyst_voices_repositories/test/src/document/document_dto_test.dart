@@ -44,8 +44,7 @@ void main() {
         },
       );
 
-      test(
-          'Roundtrip from json to model and reverse '
+      test('Roundtrip from json to model and reverse '
           'should result in the same document', () {
         final schema = DocumentSchemaDto.fromJson(schemaJson).toModel();
 

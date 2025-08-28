@@ -40,8 +40,7 @@ void main() {
       reset(chain);
     });
 
-    test(
-        'when active account keychain is '
+    test('when active account keychain is '
         'unlocked auth header is added', () async {
       // Given
       final request = Request('GET', Uri(), Uri());
@@ -84,8 +83,7 @@ void main() {
       );
     });
 
-    test(
-        'when active account keychain is '
+    test('when active account keychain is '
         'locked auth header is not added', () async {
       // Given
       final request = Request('GET', Uri(), Uri());
@@ -136,8 +134,9 @@ void main() {
       }).thenAnswer((_) => originalResponse);
 
       // Refreshed token
-      when(() => authTokenProvider.createRbacToken(forceRefresh: true))
-          .thenAnswer((_) => Future.value(refreshedToken));
+      when(
+        () => authTokenProvider.createRbacToken(forceRefresh: true),
+      ).thenAnswer((_) => Future.value(refreshedToken));
       when(() {
         return chain.proceed(
           any(
@@ -204,8 +203,9 @@ void main() {
       }).thenAnswer((_) => originalResponse);
 
       // Refreshed token
-      when(() => authTokenProvider.createRbacToken(forceRefresh: true))
-          .thenAnswer((_) => Future.value(refreshedToken));
+      when(
+        () => authTokenProvider.createRbacToken(forceRefresh: true),
+      ).thenAnswer((_) => Future.value(refreshedToken));
       when(() {
         return chain.proceed(
           any(

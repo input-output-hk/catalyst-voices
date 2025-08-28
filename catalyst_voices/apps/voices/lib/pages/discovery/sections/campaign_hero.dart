@@ -51,16 +51,16 @@ class _CampaignBrief extends StatelessWidget {
           key: const Key('CampaignBriefTitle'),
           context.l10n.heroSectionTitle,
           style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: ThemeBuilder.buildTheme().colorScheme.primary,
-              ),
+            color: ThemeBuilder.buildTheme().colorScheme.primary,
+          ),
         ),
         const SizedBox(height: 32),
         Text(
           key: const Key('CampaignBriefDescription'),
           context.l10n.projectCatalystDescription,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                color: ThemeBuilder.buildTheme().colors.textOnPrimaryLevel0,
-              ),
+            color: ThemeBuilder.buildTheme().colors.textOnPrimaryLevel0,
+          ),
         ),
         const SizedBox(height: 32),
         Row(

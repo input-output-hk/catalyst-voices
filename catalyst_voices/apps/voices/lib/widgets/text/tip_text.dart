@@ -21,12 +21,12 @@ class TipText extends StatelessWidget {
       placeholderSpanBuilder: (context, placeholder) {
         return switch (placeholder) {
           'content' => WidgetSpan(
-              alignment: PlaceholderAlignment.middle,
-              child: MarkdownText(
-                MarkdownData(data),
-                pStyle: style,
-              ),
+            alignment: PlaceholderAlignment.middle,
+            child: MarkdownText(
+              MarkdownData(data),
+              pStyle: style,
             ),
+          ),
           _ => throw ArgumentError('Unknown placeholder[$placeholder]'),
         };
       },

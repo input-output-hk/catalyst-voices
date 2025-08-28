@@ -145,14 +145,14 @@ final class TransactionPropertyBuilderInputs extends Equatable {
 
   @override
   List<Object?> get props => [
-        inputs,
-        outputs,
-        ttl,
-        auxiliaryData,
-        networkId,
-        requiredSigners,
-        changeAddress,
-      ];
+    inputs,
+    outputs,
+    ttl,
+    auxiliaryData,
+    networkId,
+    requiredSigners,
+    changeAddress,
+  ];
 }
 
 /// The test data with which the [transactionPropertyTest] runs.
@@ -167,7 +167,7 @@ final class TransactionPropertyTestData extends Equatable {
 
   @override
   List<Object?> get props => [
-        builder,
-        inputs,
-      ];
+    builder,
+    inputs,
+  ];
 }

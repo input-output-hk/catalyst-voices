@@ -285,8 +285,9 @@ class _SpaceItem extends StatelessWidget {
     return VoicesAvatar(
       icon: space.icon.buildIcon(),
       backgroundColor: isActive ? space.backgroundColor(context) : Colors.transparent,
-      foregroundColor:
-          isActive ? space.foregroundColor(context) : Theme.of(context).colors.iconsForeground,
+      foregroundColor: isActive
+          ? space.foregroundColor(context)
+          : Theme.of(context).colors.iconsForeground,
       onTap: onTap,
     );
   }
@@ -297,15 +298,16 @@ class _TabBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TabBar(
-      tabAlignment: TabAlignment.fill,
+    return VoicesTabBar(
       indicatorSize: TabBarIndicatorSize.tab,
       tabs: [
-        Tab(
-          text: context.l10n.campaignPreviewEvents,
+        VoicesTab(
+          data: 'events',
+          child: VoicesTabText(context.l10n.campaignPreviewEvents),
         ),
-        Tab(
-          text: context.l10n.campaignPreviewViews,
+        VoicesTab(
+          data: 'views',
+          child: VoicesTabText(context.l10n.campaignPreviewViews),
         ),
       ],
     );

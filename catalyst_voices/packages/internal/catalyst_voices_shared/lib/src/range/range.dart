@@ -69,8 +69,10 @@ class NumRange<T extends num> extends Equatable {
     } else if (max != null) {
       return max.compareTo(value) >= 0;
     } else {
-      throw UnsupportedError('All possible combinations were checked, '
-          'this line should never be executed');
+      throw UnsupportedError(
+        'All possible combinations were checked, '
+        'this line should never be executed',
+      );
     }
   }
 

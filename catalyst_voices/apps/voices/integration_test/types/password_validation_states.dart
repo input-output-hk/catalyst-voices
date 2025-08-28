@@ -1,5 +1,1 @@
-enum PasswordValidationStatus {
-  weak,
-  normal,
-  good;
-}
+enum PasswordValidationStatus { weak, normal, good }

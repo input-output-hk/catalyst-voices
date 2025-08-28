@@ -190,14 +190,14 @@ class _RecoverMethodsColumn extends StatelessWidget {
 
 extension _RegistrationRecoverMethodExt on RegistrationRecoverMethod {
   SvgGenImage get _icon => switch (this) {
-        RegistrationRecoverMethod.seedPhrase => VoicesAssets.icons.colorSwatch,
-      };
+    RegistrationRecoverMethod.seedPhrase => VoicesAssets.icons.colorSwatch,
+  };
 
   String? _getSubtitle(VoicesLocalizations l10n) => switch (this) {
-        RegistrationRecoverMethod.seedPhrase => null,
-      };
+    RegistrationRecoverMethod.seedPhrase => null,
+  };
 
   String _getTitle(VoicesLocalizations l10n) => switch (this) {
-        RegistrationRecoverMethod.seedPhrase => l10n.recoverWithSeedPhrase12Words,
-      };
+    RegistrationRecoverMethod.seedPhrase => l10n.recoverWithSeedPhrase12Words,
+  };
 }

@@ -4,28 +4,28 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   Widget buildApp(Size size) => MediaQuery(
-        data: MediaQueryData(size: size),
-        child: MaterialApp(
-          home: Scaffold(
-            body: ResponsiveChild(
-              xs: (context) => const Text('Simple text for extra small screens.'),
-              sm: (context) => const Padding(
-                padding: EdgeInsets.all(50),
-                child: Text('Text with padding for small screens.'),
-              ),
-              md: (context) => const Column(
-                children: [
-                  Text('This is'),
-                  Text('a set'),
-                  Text('of Texts'),
-                  Text('for medium screens.'),
-                ],
-              ),
-              other: (context) => const Text('The fallback widget.'),
-            ),
+    data: MediaQueryData(size: size),
+    child: MaterialApp(
+      home: Scaffold(
+        body: ResponsiveChild(
+          xs: (context) => const Text('Simple text for extra small screens.'),
+          sm: (context) => const Padding(
+            padding: EdgeInsets.all(50),
+            child: Text('Text with padding for small screens.'),
           ),
+          md: (context) => const Column(
+            children: [
+              Text('This is'),
+              Text('a set'),
+              Text('of Texts'),
+              Text('for medium screens.'),
+            ],
+          ),
+          other: (context) => const Text('The fallback widget.'),
         ),
-      );
+      ),
+    ),
+  );
 
   group('Test screen sizes', () {
     testWidgets('ResponsiveChild outputs a text for extra-small screens', (tester) async {

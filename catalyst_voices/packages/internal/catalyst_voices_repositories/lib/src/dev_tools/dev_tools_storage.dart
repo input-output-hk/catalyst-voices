@@ -16,11 +16,11 @@ final class DevToolsStorageLocal extends LocalStorage implements DevToolsStorage
   DevToolsStorageLocal({
     required super.sharedPreferences,
   }) : super(
-          key: _key,
-          allowList: {
-            _configKey,
-          },
-        );
+         key: _key,
+         allowList: {
+           _configKey,
+         },
+       );
 
   @override
   Future<DevToolsConfigDto?> read() async {

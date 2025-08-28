@@ -20,16 +20,16 @@ final class AuxiliaryDataHash extends BaseHash {
 
   /// Creates a blake2b hash from [bytes].
   AuxiliaryDataHash.blake2b(List<int> bytes)
-      : super.fromBytes(
-          bytes: Hash.blake2b(
-            Uint8List.fromList(bytes),
-            digestSize: hashLength,
-          ),
-        );
+    : super.fromBytes(
+        bytes: Hash.blake2b(
+          Uint8List.fromList(bytes),
+          digestSize: hashLength,
+        ),
+      );
 
   /// Constructs the [AuxiliaryDataHash] from a [AuxiliaryData].
   AuxiliaryDataHash.fromAuxiliaryData(AuxiliaryData data)
-      : this.blake2b(cbor.encode(data.toCbor()));
+    : this.blake2b(cbor.encode(data.toCbor()));
 
   /// Constructs the [AuxiliaryDataHash] from raw [bytes].
   AuxiliaryDataHash.fromBytes({required super.bytes}) : super.fromBytes();
@@ -92,12 +92,12 @@ final class CertificateHash extends BaseHash {
 
   /// Constructs the [CertificateHash] from a [C509Certificate].
   CertificateHash.fromC509Certificate(C509Certificate certificate)
-      : super.fromBytes(
-          bytes: Hash.blake2b(
-            Uint8List.fromList(certificate.bytes),
-            digestSize: hashLength,
-          ),
-        );
+    : super.fromBytes(
+        bytes: Hash.blake2b(
+          Uint8List.fromList(certificate.bytes),
+          digestSize: hashLength,
+        ),
+      );
 
   /// Deserializes the type from cbor.
   CertificateHash.fromCbor(super.value) : super.fromCbor();
@@ -108,12 +108,12 @@ final class CertificateHash extends BaseHash {
 
   /// Constructs the [CertificateHash] from a [X509DerCertificate].
   CertificateHash.fromX509DerCertificate(X509DerCertificate certificate)
-      : super.fromBytes(
-          bytes: Hash.blake2b(
-            Uint8List.fromList(certificate.bytes),
-            digestSize: hashLength,
-          ),
-        );
+    : super.fromBytes(
+        bytes: Hash.blake2b(
+          Uint8List.fromList(certificate.bytes),
+          digestSize: hashLength,
+        ),
+      );
 
   @override
   int get length => hashLength;
@@ -136,12 +136,12 @@ final class Ed25519PublicKeyHash extends BaseHash {
 
   /// Constructs the [Ed25519PublicKeyHash] from a [Ed25519PublicKey].
   Ed25519PublicKeyHash.fromPublicKey(Ed25519PublicKey key)
-      : super.fromBytes(
-          bytes: Hash.blake2b(
-            Uint8List.fromList(key.bytes),
-            digestSize: hashLength,
-          ),
-        );
+    : super.fromBytes(
+        bytes: Hash.blake2b(
+          Uint8List.fromList(key.bytes),
+          digestSize: hashLength,
+        ),
+      );
 
   @override
   int get length => hashLength;
@@ -165,12 +165,12 @@ final class ScriptDataHash extends BaseHash {
 
   /// Constructs the [ScriptDataHash] from a [ScriptData].
   ScriptDataHash.fromScriptData(ScriptData data)
-      : super.fromBytes(
-          bytes: Hash.blake2b(
-            Uint8List.fromList(cbor.encode(data.toCbor())),
-            digestSize: hashLength,
-          ),
-        );
+    : super.fromBytes(
+        bytes: Hash.blake2b(
+          Uint8List.fromList(cbor.encode(data.toCbor())),
+          digestSize: hashLength,
+        ),
+      );
 
   @override
   int get length => hashLength;
@@ -194,12 +194,12 @@ final class TransactionHash extends BaseHash {
 
   /// Constructs the [TransactionHash] from a [TransactionBody].
   TransactionHash.fromTransactionBody(TransactionBody body)
-      : super.fromBytes(
-          bytes: Hash.blake2b(
-            Uint8List.fromList(cbor.encode(body.toCbor())),
-            digestSize: hashLength,
-          ),
-        );
+    : super.fromBytes(
+        bytes: Hash.blake2b(
+          Uint8List.fromList(cbor.encode(body.toCbor())),
+          digestSize: hashLength,
+        ),
+      );
 
   @override
   int get length => hashLength;
@@ -214,12 +214,12 @@ final class TransactionInputsHash extends BaseHash {
 
   /// Creates a blake2b hash from [bytes].
   TransactionInputsHash.blake2b(List<int> bytes)
-      : super.fromBytes(
-          bytes: Hash.blake2b(
-            Uint8List.fromList(bytes),
-            digestSize: hashLength,
-          ),
-        );
+    : super.fromBytes(
+        bytes: Hash.blake2b(
+          Uint8List.fromList(bytes),
+          digestSize: hashLength,
+        ),
+      );
 
   /// Constructs the [TransactionInputsHash] from raw [bytes].
   TransactionInputsHash.fromBytes({required super.bytes}) : super.fromBytes();
@@ -235,12 +235,12 @@ final class TransactionInputsHash extends BaseHash {
   TransactionInputsHash.fromTransactionInputs(
     Set<TransactionUnspentOutput> utxos,
   ) : this.blake2b(
-          cbor.encode(
-            CborList([
-              for (final utxo in utxos) utxo.input.toCbor(),
-            ]),
-          ),
-        );
+        cbor.encode(
+          CborList([
+            for (final utxo in utxos) utxo.input.toCbor(),
+          ]),
+        ),
+      );
 
   @override
   int get length => hashLength;

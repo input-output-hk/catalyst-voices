@@ -19,11 +19,11 @@ final class DocumentDefinitionsDto {
     return DocumentDefinitionsDto(map);
   }
 
-  Map<String, dynamic> toJson() {
-    return _definitions.map((key, value) => MapEntry(key, value.toJson()));
-  }
-
   DocumentPropertySchemaDto? getDefinition(String? def) {
     return _definitions.entries.firstWhereOrNull((e) => e.key == def)?.value;
+  }
+
+  Map<String, dynamic> toJson() {
+    return _definitions.map((key, value) => MapEntry(key, value.toJson()));
   }
 }

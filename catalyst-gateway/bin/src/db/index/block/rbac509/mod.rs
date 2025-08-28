@@ -23,7 +23,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    metrics::{self, rbac::inc_index_sync},
+    metrics::caches::rbac::{inc_index_sync, inc_invalid_rbac_reg_count},
     rbac::{
         validate_rbac_registration, RbacBlockIndexingContext, RbacValidationError,
         RbacValidationSuccess,
@@ -199,7 +199,7 @@ impl Rbac509InsertQuery {
                 purpose,
                 report,
             }) => {
-                metrics::rbac::inc_invalid_rbac_reg_count();
+                inc_invalid_rbac_reg_count();
                 self.invalid.push(insert_rbac509_invalid::Params::new(
                     catalyst_id,
                     txn_hash,

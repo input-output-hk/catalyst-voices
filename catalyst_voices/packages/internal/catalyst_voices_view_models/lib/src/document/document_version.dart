@@ -20,11 +20,11 @@ final class DocumentVersion extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        number,
-        isCurrent,
-        isLatest,
-      ];
+    id,
+    number,
+    isCurrent,
+    isLatest,
+  ];
 
   DocumentVersion copyWith({
     String? id,

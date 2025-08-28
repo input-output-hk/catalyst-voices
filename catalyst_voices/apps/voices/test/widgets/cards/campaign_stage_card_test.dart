@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/widgets/cards/campaign_stage_card.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,7 +12,7 @@ void main() {
   late VoicesColorScheme voicesColors;
 
   final draftCampaignTest = CampaignInfo(
-    id: 'campaign_draft',
+    selfRef: SignedDocumentRef.generateFirstRef(),
     stage: CampaignStage.draft,
     startDate: DateTime(2024, 11, 19, 13),
     endDate: DateTime(2024, 11, 20, 13),
@@ -19,7 +20,7 @@ void main() {
   );
 
   final scheduledCampaignTest = CampaignInfo(
-    id: 'campaign_scheduled',
+    selfRef: SignedDocumentRef.generateFirstRef(),
     stage: CampaignStage.scheduled,
     startDate: DateTime(2024, 11, 19, 13),
     endDate: DateTime(2024, 11, 20, 13),
@@ -27,7 +28,7 @@ void main() {
   );
 
   final liveCampaignTest = CampaignInfo(
-    id: 'campaign_live',
+    selfRef: SignedDocumentRef.generateFirstRef(),
     stage: CampaignStage.live,
     startDate: DateTime(2024, 11, 19, 13),
     endDate: DateTime(2024, 11, 20, 13),
@@ -35,7 +36,7 @@ void main() {
   );
 
   final completedCampaignText = CampaignInfo(
-    id: 'campaign_completed',
+    selfRef: SignedDocumentRef.generateFirstRef(),
     stage: CampaignStage.completed,
     startDate: DateTime(2024, 11, 19, 13),
     endDate: DateTime(2024, 11, 20, 13),

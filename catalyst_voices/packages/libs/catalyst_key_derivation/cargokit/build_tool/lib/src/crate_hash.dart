@@ -11,23 +11,32 @@ import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as path;
 
 class CrateHash {
-  /// Computes a hash uniquely identifying crate content. This takes into account
-  /// content all all .rs files inside the src directory, as well as Cargo.toml,
-  /// Cargo.lock, build.rs and cargokit.yaml.
-  ///
-  /// If [tempStorage] is provided, computed hash is stored in a file in that directory
-  /// and reused on subsequent calls if the crate content hasn't changed.
-  static String compute(String manifestDir, {String? tempStorage}) {
-    return CrateHash._(
-      manifestDir: manifestDir,
-      tempStorage: tempStorage,
-    )._compute();
-  }
+  final String manifestDir;
 
-  CrateHash._({
-    required this.manifestDir,
-    required this.tempStorage,
-  });
+  final String? tempStorage;
+
+  CrateHash._({required this.manifestDir, required this.tempStorage});
+
+  List<File> getFiles() {
+    final src = Directory(path.join(manifestDir, 'src'));
+    final files = src
+        .listSync(recursive: true, followLinks: false)
+        .whereType<File>()
+        .toList();
+    files.sortBy((element) => element.path);
+    void addFile(String relative) {
+      final file = File(path.join(manifestDir, relative));
+      if (file.existsSync()) {
+        files.add(file);
+      }
+    }
+
+    addFile('Cargo.toml');
+    addFile('Cargo.lock');
+    addFile('build.rs');
+    addFile('cargokit.yaml');
+    return files;
+  }
 
   String _compute() {
     final files = getFiles();
@@ -46,27 +55,6 @@ class CrateHash {
     } else {
       return _computeHash(files);
     }
-  }
-
-  /// Computes a quick hash based on files stat (without reading contents). This
-  /// is used to cache the real hash, which is slower to compute since it involves
-  /// reading every single file.
-  String _computeQuickHash(List<File> files) {
-    final output = AccumulatorSink<Digest>();
-    final input = sha256.startChunkedConversion(output);
-
-    final data = ByteData(8);
-    for (final file in files) {
-      input.add(utf8.encode(file.path));
-      final stat = file.statSync();
-      data.setUint64(0, stat.size);
-      input.add(data.buffer.asUint8List());
-      data.setUint64(0, stat.modified.millisecondsSinceEpoch);
-      input.add(data.buffer.asUint8List());
-    }
-
-    input.close();
-    return base64Url.encode(output.events.single.bytes);
   }
 
   String _computeHash(List<File> files) {
@@ -98,27 +86,37 @@ class CrateHash {
     return hex.encode(hash);
   }
 
-  List<File> getFiles() {
-    final src = Directory(path.join(manifestDir, 'src'));
-    final files = src
-        .listSync(recursive: true, followLinks: false)
-        .whereType<File>()
-        .toList();
-    files.sortBy((element) => element.path);
-    void addFile(String relative) {
-      final file = File(path.join(manifestDir, relative));
-      if (file.existsSync()) {
-        files.add(file);
-      }
+  /// Computes a quick hash based on files stat (without reading contents). This
+  /// is used to cache the real hash, which is slower to compute since it involves
+  /// reading every single file.
+  String _computeQuickHash(List<File> files) {
+    final output = AccumulatorSink<Digest>();
+    final input = sha256.startChunkedConversion(output);
+
+    final data = ByteData(8);
+    for (final file in files) {
+      input.add(utf8.encode(file.path));
+      final stat = file.statSync();
+      data.setUint64(0, stat.size);
+      input.add(data.buffer.asUint8List());
+      data.setUint64(0, stat.modified.millisecondsSinceEpoch);
+      input.add(data.buffer.asUint8List());
     }
 
-    addFile('Cargo.toml');
-    addFile('Cargo.lock');
-    addFile('build.rs');
-    addFile('cargokit.yaml');
-    return files;
+    input.close();
+    return base64Url.encode(output.events.single.bytes);
   }
 
-  final String manifestDir;
-  final String? tempStorage;
+  /// Computes a hash uniquely identifying crate content. This takes into account
+  /// content all all .rs files inside the src directory, as well as Cargo.toml,
+  /// Cargo.lock, build.rs and cargokit.yaml.
+  ///
+  /// If [tempStorage] is provided, computed hash is stored in a file in that directory
+  /// and reused on subsequent calls if the crate content hasn't changed.
+  static String compute(String manifestDir, {String? tempStorage}) {
+    return CrateHash._(
+      manifestDir: manifestDir,
+      tempStorage: tempStorage,
+    )._compute();
+  }
 }

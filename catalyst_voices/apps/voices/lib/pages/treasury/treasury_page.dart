@@ -31,24 +31,6 @@ class _TreasuryPageState extends State<TreasuryPage> {
   late final ItemScrollController _bodyItemScrollController;
 
   @override
-  void initState() {
-    super.initState();
-
-    _segmentsController = SegmentsController();
-    _bodyItemScrollController = ItemScrollController();
-
-    _segmentsController.attachItemsScrollController(_bodyItemScrollController);
-
-    _populateSections();
-  }
-
-  @override
-  void dispose() {
-    _segmentsController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return SegmentsControllerScope(
       controller: _segmentsController,
@@ -60,6 +42,24 @@ class _TreasuryPageState extends State<TreasuryPage> {
         rightRail: const TreasuryDetailsPanel(),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _segmentsController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _segmentsController = SegmentsController();
+    _bodyItemScrollController = ItemScrollController();
+
+    _segmentsController.attachItemsScrollController(_bodyItemScrollController);
+
+    _populateSections();
   }
 
   void _populateSections() {

@@ -23,10 +23,10 @@ final class VaultKeychainProvider implements KeychainProvider {
     required SharedPreferencesAsync sharedPreferences,
     required CacheConfig cacheConfig,
     required KeychainSigner keychainSigner,
-  })  : _secureStorage = secureStorage,
-        _sharedPreferences = sharedPreferences,
-        _cacheConfig = cacheConfig,
-        _keychainSigner = keychainSigner;
+  }) : _secureStorage = secureStorage,
+       _sharedPreferences = sharedPreferences,
+       _cacheConfig = cacheConfig,
+       _keychainSigner = keychainSigner;
 
   @override
   Future<Keychain> create(String id) async {

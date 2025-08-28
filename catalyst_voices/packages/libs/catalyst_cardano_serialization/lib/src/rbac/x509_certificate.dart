@@ -135,8 +135,9 @@ class X509CertificateExtensions with EquatableMixin {
 
     final subjectAltNameOctetString = subjectAltNameSequence.elements[1].asOctetString;
 
-    final subjectAltNameElementsSequence =
-        ASN1Sequence.fromBytes(subjectAltNameOctetString.valueBytes());
+    final subjectAltNameElementsSequence = ASN1Sequence.fromBytes(
+      subjectAltNameOctetString.valueBytes(),
+    );
 
     final subjectAltName = <X509String>[];
     for (final element in subjectAltNameElementsSequence.elements) {
@@ -230,13 +231,13 @@ class X509DistinguishedName with EquatableMixin {
 
   @override
   List<Object?> get props => [
-        countryName,
-        stateOrProvinceName,
-        localityName,
-        organizationName,
-        organizationalUnitName,
-        commonName,
-      ];
+    countryName,
+    stateOrProvinceName,
+    localityName,
+    organizationName,
+    organizationalUnitName,
+    commonName,
+  ];
 
   /// Encodes the data in ASN1 format.
   ASN1Object toASN1() {
@@ -278,57 +279,51 @@ class X509DistinguishedName with EquatableMixin {
   }
 
   ASN1Object _createCommonName(String commonName) {
-    return ASN1Set()
-      ..add(
-        ASN1Sequence()
-          ..add(ASN1ObjectIdentifier.fromName('cn'))
-          ..add(ASN1PrintableString(commonName)),
-      );
+    return ASN1Set()..add(
+      ASN1Sequence()
+        ..add(ASN1ObjectIdentifier.fromName('cn'))
+        ..add(ASN1PrintableString(commonName)),
+    );
   }
 
   ASN1Object _createCountryName(String countryName) {
-    return ASN1Set()
-      ..add(
-        ASN1Sequence()
-          ..add(ASN1ObjectIdentifier.fromName('c'))
-          ..add(ASN1PrintableString(countryName)),
-      );
+    return ASN1Set()..add(
+      ASN1Sequence()
+        ..add(ASN1ObjectIdentifier.fromName('c'))
+        ..add(ASN1PrintableString(countryName)),
+    );
   }
 
   ASN1Object _createLocalityName(String localityName) {
-    return ASN1Set()
-      ..add(
-        ASN1Sequence()
-          ..add(ASN1ObjectIdentifier.fromName('l'))
-          ..add(ASN1PrintableString(localityName)),
-      );
+    return ASN1Set()..add(
+      ASN1Sequence()
+        ..add(ASN1ObjectIdentifier.fromName('l'))
+        ..add(ASN1PrintableString(localityName)),
+    );
   }
 
   ASN1Object _createOrganizationalUnitName(String organizationalUnitName) {
-    return ASN1Set()
-      ..add(
-        ASN1Sequence()
-          ..add(ASN1ObjectIdentifier.fromName('ou'))
-          ..add(ASN1PrintableString(organizationalUnitName)),
-      );
+    return ASN1Set()..add(
+      ASN1Sequence()
+        ..add(ASN1ObjectIdentifier.fromName('ou'))
+        ..add(ASN1PrintableString(organizationalUnitName)),
+    );
   }
 
   ASN1Object _createOrganizationName(String organizationName) {
-    return ASN1Set()
-      ..add(
-        ASN1Sequence()
-          ..add(ASN1ObjectIdentifier.fromName('o'))
-          ..add(ASN1PrintableString(organizationName)),
-      );
+    return ASN1Set()..add(
+      ASN1Sequence()
+        ..add(ASN1ObjectIdentifier.fromName('o'))
+        ..add(ASN1PrintableString(organizationName)),
+    );
   }
 
   ASN1Object _createStateOrProvinceName(String stateOrProvinceName) {
-    return ASN1Set()
-      ..add(
-        ASN1Sequence()
-          ..add(ASN1ObjectIdentifier.fromName('st'))
-          ..add(ASN1PrintableString(stateOrProvinceName)),
-      );
+    return ASN1Set()..add(
+      ASN1Sequence()
+        ..add(ASN1ObjectIdentifier.fromName('st'))
+        ..add(ASN1PrintableString(stateOrProvinceName)),
+    );
   }
 
   static String? _findString(ASN1Sequence sequence, String name) {
@@ -468,22 +463,23 @@ class X509TBSCertificate with EquatableMixin {
       validityNotAfter: validityNotAfterASN1.asDateTime,
       subject: X509DistinguishedName.fromASN1(subjectASN1),
       subjectPublicKey: _readSubjectPublicKeyInfo(subjectPublicKeyASN1),
-      extensions:
-          extensionsASN1 != null ? X509CertificateExtensions.fromASN1(extensionsASN1) : null,
+      extensions: extensionsASN1 != null
+          ? X509CertificateExtensions.fromASN1(extensionsASN1)
+          : null,
     );
   }
 
   @override
   List<Object?> get props => [
-        version,
-        serialNumber,
-        subjectPublicKey,
-        issuer,
-        validityNotBefore,
-        validityNotAfter,
-        subject,
-        extensions,
-      ];
+    version,
+    serialNumber,
+    subjectPublicKey,
+    issuer,
+    validityNotBefore,
+    validityNotAfter,
+    subject,
+    extensions,
+  ];
 
   /// Encodes the data in ASN1 format.
   ASN1Object toASN1() {
@@ -524,10 +520,9 @@ class X509TBSCertificate with EquatableMixin {
   ASN1Object _createSubjectPublicKeyInfo() {
     return ASN1Sequence()
       ..add(
-        ASN1Sequence()
-          ..add(
-            ASN1ObjectIdentifier.fromName('Ed25519'),
-          ),
+        ASN1Sequence()..add(
+          ASN1ObjectIdentifier.fromName('Ed25519'),
+        ),
       )
       ..add(ASN1BitString(subjectPublicKey.bytes));
   }

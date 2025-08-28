@@ -22,9 +22,9 @@ final class DocumentData extends Equatable implements Comparable<DocumentData> {
 
   @override
   List<Object?> get props => [
-        metadata,
-        content,
-      ];
+    metadata,
+    content,
+  ];
 
   /// Syntax sugar. Should use [DocumentDataMetadata.selfRef].
   DocumentRef get ref => metadata.selfRef;

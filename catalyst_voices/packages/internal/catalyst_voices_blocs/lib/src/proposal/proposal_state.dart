@@ -20,12 +20,12 @@ final class ProposalState extends Equatable {
 
   @override
   List<Object?> get props => [
-        isLoading,
-        data,
-        comments,
-        error,
-        readOnlyMode,
-      ];
+    isLoading,
+    data,
+    comments,
+    error,
+    readOnlyMode,
+  ];
 
   bool get showData => !showError;
 

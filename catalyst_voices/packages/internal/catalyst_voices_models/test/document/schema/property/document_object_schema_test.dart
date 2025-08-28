@@ -121,8 +121,7 @@ void main() {
         expect(result, isA<DocumentEnumValueMismatch>());
       });
 
-      test(
-          'validate correct group and selection '
+      test('validate correct group and selection '
           ' returns $DocumentEnumValueMismatch', () {
         final result = tagGroupSchema.validate([
           DocumentValueProperty<String>(

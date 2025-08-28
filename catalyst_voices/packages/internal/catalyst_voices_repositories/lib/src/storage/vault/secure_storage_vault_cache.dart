@@ -24,8 +24,8 @@ final class SecureStorageVaultTtlCache extends LocalTllCache implements SecureSt
     required super.sharedPreferences,
     super.defaultTtl = const Duration(hours: 1),
   }) : super(
-          allowList: {_isUnlockedKey},
-        );
+         allowList: {_isUnlockedKey},
+       );
 
   @override
   Future<bool> containsIsUnlocked() async => contains(key: _isUnlockedKey);

@@ -38,12 +38,12 @@ class ResponsivePadding extends StatelessWidget {
     EdgeInsets lg = const EdgeInsets.all(16),
     EdgeInsets other = const EdgeInsets.all(8),
   }) : _paddings = {
-          ResponsiveBreakpointKey.xs: xs,
-          ResponsiveBreakpointKey.sm: sm,
-          ResponsiveBreakpointKey.md: md,
-          ResponsiveBreakpointKey.lg: lg,
-          ResponsiveBreakpointKey.other: other,
-        };
+         ResponsiveBreakpointKey.xs: xs,
+         ResponsiveBreakpointKey.sm: sm,
+         ResponsiveBreakpointKey.md: md,
+         ResponsiveBreakpointKey.lg: lg,
+         ResponsiveBreakpointKey.other: other,
+       };
 
   @override
   Widget build(BuildContext context) {

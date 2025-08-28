@@ -42,18 +42,18 @@ class _SpacesListViewState extends State<SpacesListView> {
                 Space.discovery => DiscoveryOverview(key: Key('SpaceOverview.${space.name}')),
                 Space.workspace => WorkspaceOverview(key: Key('SpaceOverview.${space.name}')),
                 Space.voting => GreyOutContainer(
-                    child: VotingOverview(
-                      key: Key('SpaceOverview.${space.name}'),
-                    ),
-                  ),
-                Space.fundedProjects => GreyOutContainer(
-                    child: FundedProjectsOverview(
-                      key: Key('SpaceOverview.${space.name}'),
-                    ),
-                  ),
-                Space.treasury => TreasuryOverview(
+                  child: VotingOverview(
                     key: Key('SpaceOverview.${space.name}'),
                   ),
+                ),
+                Space.fundedProjects => GreyOutContainer(
+                  child: FundedProjectsOverview(
+                    key: Key('SpaceOverview.${space.name}'),
+                  ),
+                ),
+                Space.treasury => TreasuryOverview(
+                  key: Key('SpaceOverview.${space.name}'),
+                ),
               };
             },
             separatorBuilder: (context, index) => const SizedBox(width: 16),

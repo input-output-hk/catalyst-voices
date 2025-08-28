@@ -22,10 +22,10 @@ class NewProposalCubit extends Cubit<NewProposalState>
     this._proposalService,
     this._documentMapper,
   ) : super(
-          const NewProposalState(
-            title: ProposalTitle.pure(),
-          ),
-        );
+        const NewProposalState(
+          title: ProposalTitle.pure(),
+        ),
+      );
 
   Future<DraftRef?> createDraft() async {
     try {
@@ -75,22 +75,31 @@ class NewProposalCubit extends Cubit<NewProposalState>
       final step = categoryRef == null
           ? const CreateProposalWithoutPreselectedCategoryStep()
           : const CreateProposalWithPreselectedCategoryStep();
-      final categoriesModels = await _campaignService.getCampaignCategories();
+      final campaign = await _campaignService.getActiveCampaign();
+      if (campaign == null) {
+        throw StateError('Cannot load proposal, active campaign not found');
+      }
       final templateRef = await _proposalService.getProposalTemplate(
         // TODO(LynxLynxx): when we have separate proposal template for generic questions use it here
         // right now user can start creating proposal without selecting category.
         // Right now every category have the same requirements for title so we can do a fallback for
         // first category from the list.
-        ref: categoriesModels
-            .firstWhere((e) => e.selfRef == categoryRef, orElse: () => categoriesModels.first)
+        ref: campaign.categories
+            .firstWhere(
+              (e) => e.selfRef == categoryRef,
+              orElse: () => campaign.categories.first,
+            )
             .proposalTemplateRef,
       );
 
-      final titlePropertySchema = templateRef.schema
-          .getPropertySchema(ProposalDocument.titleNodeId)! as DocumentStringSchema;
+      final titlePropertySchema =
+          templateRef.schema.getPropertySchema(ProposalDocument.titleNodeId)!
+              as DocumentStringSchema;
       final titleRange = titlePropertySchema.strLengthRange;
 
-      final categories = categoriesModels.map(CampaignCategoryDetailsViewModel.fromModel).toList();
+      final categories = campaign.categories
+          .map(CampaignCategoryDetailsViewModel.fromModel)
+          .toList();
       final newState = state.copyWith(
         isLoading: false,
         step: step,
@@ -103,7 +112,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
     } catch (error, stackTrace) {
       _logger.severe('Load', error, stackTrace);
 
-      // TODO(dtscalac): handle error state as dialog content,
+      // TODO(dt-iohk): handle error state as dialog content,
       // don't emit the error
       emitError(LocalizedException.create(error));
     }

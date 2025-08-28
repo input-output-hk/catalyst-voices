@@ -144,12 +144,12 @@ final class X509MetadataEnvelope<T> extends Equatable {
 
   @override
   List<Object?> get props => [
-        purpose,
-        txInputsHash,
-        previousTransactionId,
-        chunkedData,
-        validationSignature,
-      ];
+    purpose,
+    txInputsHash,
+    previousTransactionId,
+    chunkedData,
+    validationSignature,
+  ];
 
   /// Serializes the envelope into bytes, signs it with the [privateKey]
   /// and returns a copy of the [X509MetadataEnvelope]
@@ -172,8 +172,9 @@ final class X509MetadataEnvelope<T> extends Equatable {
     required ChunkedDataSerializer<T> serializer,
   }) async {
     final chunkedData = this.chunkedData;
-    final metadata =
-        chunkedData != null ? await _serializeChunkedData(serializer(chunkedData)) : null;
+    final metadata = chunkedData != null
+        ? await _serializeChunkedData(serializer(chunkedData))
+        : null;
 
     return CborMap({
       envelopeKey: CborMap({
@@ -236,8 +237,9 @@ final class X509MetadataEnvelope<T> extends Equatable {
     return X509MetadataEnvelope(
       purpose: UuidV4.fromCbor(purpose),
       txInputsHash: TransactionInputsHash.fromCbor(txInputsHash),
-      previousTransactionId:
-          previousTransactionId != null ? TransactionHash.fromCbor(previousTransactionId) : null,
+      previousTransactionId: previousTransactionId != null
+          ? TransactionHash.fromCbor(previousTransactionId)
+          : null,
       chunkedData: chunkedData != null ? deserializer(chunkedData) : null,
       validationSignature: Bip32Ed25519XSignatureFactory.instance.fromCbor(validationSignature),
     );
@@ -307,8 +309,7 @@ final class X509MetadataEnvelope<T> extends Equatable {
       10: rawBytes,
       if (brotliBytes != null) 11: brotliBytes,
       if (zstdBytes != null) 12: zstdBytes,
-    }.entries.toList()
-      ..sort((a, b) => a.value.length - b.value.length);
+    }.entries.toList()..sort((a, b) => a.value.length - b.value.length);
 
     final smallestBytes = bytesByKey.first;
     final chunkedBytes = _chunkCborBytes(smallestBytes.value);

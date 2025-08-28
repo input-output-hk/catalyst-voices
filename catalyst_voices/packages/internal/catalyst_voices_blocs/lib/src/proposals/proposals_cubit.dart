@@ -41,7 +41,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
         .distinct()
         .listen(_handleActiveAccountIdChange);
 
-    _favoritesProposalsIdsSub = _favoritesProposalsIdsSub = _proposalService
+    _favoritesProposalsIdsSub = _proposalService
         .watchFavoritesProposalsIds()
         .distinct(listEquals)
         .listen(_handleFavoriteProposalsIds);
@@ -86,7 +86,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     _watchProposalsCount(filters: filters.toCountFilters());
 
     if (resetProposals) {
-      emitSignal(const ResetProposalsPaginationSignal());
+      emitSignal(const ResetPaginationProposalsSignal());
     }
   }
 
@@ -103,12 +103,12 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     _rebuildOrder();
 
     if (resetProposals) {
-      emitSignal(const ResetProposalsPaginationSignal());
+      emitSignal(const ResetPaginationProposalsSignal());
     }
   }
 
   void changeSelectedCategory(SignedDocumentRef? categoryId) {
-    emitSignal(ChangeCategorySignal(to: categoryId));
+    emitSignal(ChangeCategoryProposalsSignal(to: categoryId));
   }
 
   @override
@@ -180,15 +180,12 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
     emit(state.copyWith(favoritesIds: favoritesIds));
 
-    if (!isFavorite && _cache.filters.type == ProposalsFilterType.favorites) {
+    if (!isFavorite && _cache.filters.type.isFavorite) {
       final page = _cache.page;
       if (page != null) {
-        final proposals = List.of(page.items).where((element) => element.selfRef != ref).toList();
-
+        final proposals = page.items.where((element) => element.proposal.selfRef != ref).toList();
         final updatedPage = page.copyWithItems(proposals);
-
         _cache = _cache.copyWith(page: Optional(updatedPage));
-
         _emitCachedProposalsPage();
       }
     }
@@ -211,27 +208,25 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   void _emitCachedProposalsPage() {
     final campaign = _cache.campaign;
     final page = _cache.page;
+    final showComments = campaign?.supportsComments ?? false;
 
     if (campaign == null || page == null) {
       return;
     }
 
-    final campaignStage = CampaignStage.fromCampaign(
-      campaign,
-      DateTimeExt.now(),
-    );
-
     final mappedPage = page.map(
-      (proposal) {
-        return ProposalViewModel.fromProposalAtStage(
-          proposal: proposal,
-          campaignName: campaign.name,
-          campaignStage: campaignStage,
-        );
-      },
+      // TODO(damian-molinski): refactor page to return ProposalWithContext instead.
+      (e) => ProposalBrief.fromProposal(
+        e.proposal,
+        isFavorite: state.favoritesIds.contains(e.proposal.selfRef.id),
+        categoryName: campaign.categories
+            .firstWhere((element) => element.selfRef == e.proposal.categoryRef)
+            .formattedCategoryName,
+        showComments: showComments,
+      ),
     );
 
-    final signal = ProposalsPageReadySignal(page: mappedPage);
+    final signal = PageReadyProposalsSignal(page: mappedPage);
 
     emitSignal(signal);
   }
@@ -242,6 +237,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
   void _handleFavoriteProposalsIds(List<String> ids) {
     emit(state.copyWith(favoritesIds: ids));
+    _emitCachedProposalsPage();
   }
 
   void _handleProposalsCount(ProposalsCount count) {
@@ -251,9 +247,9 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   }
 
   Future<void> _loadCampaignCategories() async {
-    final categories = await _campaignService.getCampaignCategories();
+    final campaign = await _campaignService.getActiveCampaign();
 
-    _cache = _cache.copyWith(categories: Optional(categories));
+    _cache = _cache.copyWith(categories: Optional(campaign?.categories));
 
     if (!isClosed) {
       _rebuildCategories();
@@ -267,7 +263,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     final categorySelectorItems = categories.map((e) {
       return ProposalsCategorySelectorItem(
         ref: e.selfRef,
-        name: e.categoryText,
+        name: e.formattedCategoryName,
         isSelected: e.selfRef.id == selectedCategory?.id,
       );
     }).toList();

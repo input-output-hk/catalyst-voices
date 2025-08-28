@@ -20,6 +20,9 @@ import 'package:go_router/go_router.dart';
 ///
 /// A set of possible actions widget are available in the actions subfolder.
 class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
+  /// The [PreferredSizeWidget.preferredSize] constant.
+  static const size = Size.fromHeight(64);
+
   final Widget? leading;
   final List<Widget> actions;
   final bool showSearch;
@@ -38,7 +41,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
-  Size get preferredSize => const Size.fromHeight(64);
+  Size get preferredSize => size;
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +82,8 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
     final canImplyPopButton =
         automaticallyImplyLeading && (Navigator.maybeOf(context)?.canPop() ?? false);
 
-    final child = leading ??
+    final child =
+        leading ??
         (canImplyDrawerToggleButton ? const DrawerToggleButton() : null) ??
         (canImplyPopButton ? const NavigationBack(isCompact: true) : null);
 
@@ -196,7 +200,7 @@ class _Title extends StatelessWidget {
           widgets: [
             _BrandPicture(enableBackHome: enableBackHome),
           ],
-          itemGap: 8
+          itemGap: 8,
         ),
         sm: (
           widgets: [
@@ -206,7 +210,7 @@ class _Title extends StatelessWidget {
                 onPressed: () {},
               ),
           ],
-          itemGap: 16
+          itemGap: 16,
         ),
         other: (
           widgets: [
@@ -216,7 +220,7 @@ class _Title extends StatelessWidget {
                 onPressed: () {},
               ),
           ],
-          itemGap: 24
+          itemGap: 24,
         ),
       ),
     );

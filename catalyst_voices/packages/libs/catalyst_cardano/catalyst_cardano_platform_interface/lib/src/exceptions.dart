@@ -1,22 +1,73 @@
 import 'package:catalyst_cardano_platform_interface/catalyst_cardano_platform_interface.dart';
 
-/// Defines a set of possible exceptions that might occur when
-/// interacting with the wallet extension api.
-final class WalletApiException implements Exception {
+/// A specific error code related to the [TxSendException].
+enum TxSendErrorCode {
+  /// Wallet refuses to send the tx (could be rate limiting).
+  refused(tag: 1),
+
+  /// Wallet could not send the tx.
+  failure(tag: 2);
+
+  /// The error code number.
+  final int tag;
+
+  const TxSendErrorCode({required this.tag});
+}
+
+/// Exception thrown when submitting the transaction fails.
+final class TxSendException implements Exception {
   /// A more specific failure reason.
-  final WalletApiErrorCode code;
+  final TxSendErrorCode code;
 
   /// The human readable info about the exception.
   final String info;
 
-  /// The default constructor for [WalletApiException].
-  const WalletApiException({
+  /// The default constructor for [TxSendException].
+  const TxSendException({
     required this.code,
     required this.info,
   });
 
   @override
-  String toString() => 'WalletApiException(code=$code,info=$info)';
+  String toString() => 'TxSendException(code=$code,info=$info)';
+}
+
+/// A specific error code related to the [TxSignException].
+enum TxSignErrorCode {
+  ///  User has accepted the transaction sign,
+  /// but the wallet was unable to sign the transaction
+  /// (e.g. not having some of the private keys).
+  proofGeneration(tag: 1),
+
+  /// User declined to sign the transaction.
+  userDeclined(tag: 2),
+
+  /// Returned regardless of user consent
+  /// if the transaction contains a depreciated certificate.
+  depreciatedCertificate(tag: 3);
+
+  /// The error code number.
+  final int tag;
+
+  const TxSignErrorCode({required this.tag});
+}
+
+/// Exception thrown when signing the transaction fails.
+final class TxSignException implements Exception {
+  /// A more specific failure reason.
+  final TxSignErrorCode code;
+
+  /// The human readable info about the exception.
+  final String info;
+
+  /// The default constructor for [TxSignException].
+  const TxSignException({
+    required this.code,
+    required this.info,
+  });
+
+  @override
+  String toString() => 'TxSignException(code=$code,info=$info)';
 }
 
 /// A specific error code related to the [WalletApiException].
@@ -43,22 +94,22 @@ enum WalletApiErrorCode {
 }
 
 /// Defines a set of possible exceptions that might occur when
-/// calling the [CardanoWalletApi.signData] method.
-final class WalletDataSignException implements Exception {
+/// interacting with the wallet extension api.
+final class WalletApiException implements Exception {
   /// A more specific failure reason.
-  final WalletDataSignErrorCode code;
+  final WalletApiErrorCode code;
 
   /// The human readable info about the exception.
   final String info;
 
-  /// The default constructor for [WalletDataSignException].
-  const WalletDataSignException({
+  /// The default constructor for [WalletApiException].
+  const WalletApiException({
     required this.code,
     required this.info,
   });
 
   @override
-  String toString() => 'WalletDataSignException(code=$code,info=$info)';
+  String toString() => 'WalletApiException(code=$code,info=$info)';
 }
 
 /// A specific error code related to the [WalletDataSignException].
@@ -79,6 +130,25 @@ enum WalletDataSignErrorCode {
   const WalletDataSignErrorCode({required this.tag});
 }
 
+/// Defines a set of possible exceptions that might occur when
+/// calling the [CardanoWalletApi.signData] method.
+final class WalletDataSignException implements Exception {
+  /// A more specific failure reason.
+  final WalletDataSignErrorCode code;
+
+  /// The human readable info about the exception.
+  final String info;
+
+  /// The default constructor for [WalletDataSignException].
+  const WalletDataSignException({
+    required this.code,
+    required this.info,
+  });
+
+  @override
+  String toString() => 'WalletDataSignException(code=$code,info=$info)';
+}
+
 /// [maxSize] is the maximum size for pagination and if the dApp
 /// tries to request pages outside of this boundary this error is thrown.
 final class WalletPaginateException implements Exception {
@@ -90,74 +160,4 @@ final class WalletPaginateException implements Exception {
 
   @override
   String toString() => 'WalletPaginateException(maxSize=$maxSize)';
-}
-
-/// Exception thrown when signing the transaction fails.
-final class TxSignException implements Exception {
-  /// A more specific failure reason.
-  final TxSignErrorCode code;
-
-  /// The human readable info about the exception.
-  final String info;
-
-  /// The default constructor for [TxSignException].
-  const TxSignException({
-    required this.code,
-    required this.info,
-  });
-
-  @override
-  String toString() => 'TxSignException(code=$code,info=$info)';
-}
-
-/// A specific error code related to the [TxSignException].
-enum TxSignErrorCode {
-  ///  User has accepted the transaction sign,
-  /// but the wallet was unable to sign the transaction
-  /// (e.g. not having some of the private keys).
-  proofGeneration(tag: 1),
-
-  /// User declined to sign the transaction.
-  userDeclined(tag: 2),
-
-  /// Returned regardless of user consent
-  /// if the transaction contains a depreciated certificate.
-  depreciatedCertificate(tag: 3);
-
-  /// The error code number.
-  final int tag;
-
-  const TxSignErrorCode({required this.tag});
-}
-
-/// Exception thrown when submitting the transaction fails.
-final class TxSendException implements Exception {
-  /// A more specific failure reason.
-  final TxSendErrorCode code;
-
-  /// The human readable info about the exception.
-  final String info;
-
-  /// The default constructor for [TxSendException].
-  const TxSendException({
-    required this.code,
-    required this.info,
-  });
-
-  @override
-  String toString() => 'TxSendException(code=$code,info=$info)';
-}
-
-/// A specific error code related to the [TxSendException].
-enum TxSendErrorCode {
-  /// Wallet refuses to send the tx (could be rate limiting).
-  refused(tag: 1),
-
-  /// Wallet could not send the tx.
-  failure(tag: 2);
-
-  /// The error code number.
-  final int tag;
-
-  const TxSendErrorCode({required this.tag});
 }

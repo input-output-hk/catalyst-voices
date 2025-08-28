@@ -76,7 +76,7 @@ flutter_native_splash:
   #image_dark_android: assets/splash-invert-android.png
   # image_ios: splash/assets/image_ios.png
   #image_dark_ios: assets/splash-invert-ios.png
-  #image_web: assets/splash-web.gif
+  image_web: splash/assets/image_web.gif
   #image_dark_web: assets/splash-invert-web.gif
   #background_image_android: "assets/background-android.png"
   #background_image_dark_android: "assets/dark-background-android.png"

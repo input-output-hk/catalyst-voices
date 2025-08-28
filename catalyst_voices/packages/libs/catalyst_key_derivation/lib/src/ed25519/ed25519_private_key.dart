@@ -21,6 +21,11 @@ extension type Ed25519PrivateKey._(List<int> bytes) {
     }
   }
 
+  /// Deserializes the type from cbor.
+  factory Ed25519PrivateKey.fromCbor(CborValue value) {
+    return Ed25519PrivateKey.fromBytes((value as CborBytes).bytes);
+  }
+
   /// Constructs [Ed25519PrivateKey] from a hex [string].
   factory Ed25519PrivateKey.fromHex(String string) {
     return Ed25519PrivateKey.fromBytes(hexDecode(string));
@@ -31,16 +36,13 @@ extension type Ed25519PrivateKey._(List<int> bytes) {
   factory Ed25519PrivateKey.seeded(int byte) =>
       Ed25519PrivateKey.fromBytes(List.filled(length, byte));
 
-  /// Deserializes the type from cbor.
-  factory Ed25519PrivateKey.fromCbor(CborValue value) {
-    return Ed25519PrivateKey.fromBytes((value as CborBytes).bytes);
+  /// Returns a [Ed25519PublicKey] derived from this private key.
+  Future<Ed25519PublicKey> derivePublicKey() async {
+    final algorithm = Ed25519();
+    final keyPair = await algorithm.newKeyPairFromSeed(bytes);
+    final publicKey = await keyPair.extractPublicKey();
+    return Ed25519PublicKey.fromBytes(publicKey.bytes);
   }
-
-  /// Serializes the type as cbor.
-  CborValue toCbor() => CborBytes(bytes);
-
-  /// Returns a hex representation of the [Ed25519PrivateKey].
-  String toHex() => hex.encode(bytes);
 
   /// Signs the [message] with the private key and returns the signature.
   Future<Ed25519Signature> sign(List<int> message) async {
@@ -50,11 +52,9 @@ extension type Ed25519PrivateKey._(List<int> bytes) {
     return Ed25519Signature.fromBytes(signature.bytes);
   }
 
-  /// Returns a [Ed25519PublicKey] derived from this private key.
-  Future<Ed25519PublicKey> derivePublicKey() async {
-    final algorithm = Ed25519();
-    final keyPair = await algorithm.newKeyPairFromSeed(bytes);
-    final publicKey = await keyPair.extractPublicKey();
-    return Ed25519PublicKey.fromBytes(publicKey.bytes);
-  }
+  /// Serializes the type as cbor.
+  CborValue toCbor() => CborBytes(bytes);
+
+  /// Returns a hex representation of the [Ed25519PrivateKey].
+  String toHex() => hex.encode(bytes);
 }

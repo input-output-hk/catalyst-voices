@@ -44,8 +44,7 @@ extension on AccountPublicStatus {
       AccountPublicStatus.verifying ||
       AccountPublicStatus.banned ||
       AccountPublicStatus.notSetup ||
-      AccountPublicStatus.unknown =>
-        context.colorScheme.error,
+      AccountPublicStatus.unknown => context.colorScheme.error,
     };
   }
 
@@ -55,8 +54,7 @@ extension on AccountPublicStatus {
       AccountPublicStatus.verifying ||
       AccountPublicStatus.banned ||
       AccountPublicStatus.notSetup ||
-      AccountPublicStatus.unknown =>
-        context.colors.textOnPrimaryWhite,
+      AccountPublicStatus.unknown => context.colors.textOnPrimaryWhite,
     };
   }
 
@@ -66,8 +64,7 @@ extension on AccountPublicStatus {
       AccountPublicStatus.verifying => context.l10n.verificationPending,
       AccountPublicStatus.banned ||
       AccountPublicStatus.notSetup ||
-      AccountPublicStatus.unknown =>
-        context.l10n.notVerified,
+      AccountPublicStatus.unknown => context.l10n.notVerified,
     };
   }
 }

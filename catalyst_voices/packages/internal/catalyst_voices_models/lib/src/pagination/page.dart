@@ -15,20 +15,20 @@ base class Page<E> extends Equatable {
   });
 
   const Page.empty()
-      : this(
-          page: 0,
-          maxPerPage: 0,
-          total: 0,
-          items: const [],
-        );
+    : this(
+        page: 0,
+        maxPerPage: 0,
+        total: 0,
+        items: const [],
+      );
 
   @override
   List<Object?> get props => [
-        page,
-        maxPerPage,
-        total,
-        items,
-      ];
+    page,
+    maxPerPage,
+    total,
+    items,
+  ];
 
   Page<T> copyWithItems<T>(List<T> items) {
     return Page<T>(

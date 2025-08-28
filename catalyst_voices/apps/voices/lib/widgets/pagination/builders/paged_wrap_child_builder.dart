@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-typedef ItemWidgetBuilder<ItemType> = Widget Function(
-  BuildContext context,
-  ItemType item,
-);
+typedef ItemWidgetBuilder<ItemType> =
+    Widget Function(
+      BuildContext context,
+      ItemType item,
+    );
 
 class PagedWrapChildBuilder<ItemType> {
   final ItemWidgetBuilder<ItemType> builder;

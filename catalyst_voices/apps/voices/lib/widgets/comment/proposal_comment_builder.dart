@@ -7,10 +7,11 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide DocumentPropertyBuilder;
 import 'package:flutter/material.dart';
 
-typedef OnSubmitProposalComment = Future<void> Function({
-  required Document document,
-  SignedDocumentRef? reply,
-});
+typedef OnSubmitProposalComment =
+    Future<void> Function({
+      required Document document,
+      SignedDocumentRef? reply,
+    });
 
 class ProposalCommentBuilder extends StatefulWidget {
   final DocumentSchema schema;

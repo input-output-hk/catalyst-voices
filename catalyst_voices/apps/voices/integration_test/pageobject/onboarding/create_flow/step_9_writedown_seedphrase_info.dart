@@ -20,20 +20,6 @@ class WritedownSeedphraseInfoPanel extends OnboardingPageBase {
     await WriteDownSeedphrasePanel($).clickNext();
   }
 
-  @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
-  }
-
-  Future<void> verifyInfoPanel() async {
-    expect($(headerTitle).text, (await t()).catalystKeychain);
-    expect(infoPartTaskPicture(), findsOneWidget);
-    expect($(progressBar), findsOneWidget);
-    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
-    expect(await closeButton(), findsOneWidget);
-  }
-
   Future<void> verifyDetailsPanel() async {
     expect(
       $(registrationDetailsTitle).$(Text).text,
@@ -45,5 +31,19 @@ class WritedownSeedphraseInfoPanel extends OnboardingPageBase {
     );
     expect($(nextButton), findsOneWidget);
     expect($(backButton), findsOneWidget);
+  }
+
+  Future<void> verifyInfoPanel() async {
+    expect($(headerTitle).text, (await t()).catalystKeychain);
+    expect(infoPartTaskPicture(), findsOneWidget);
+    expect($(progressBar), findsOneWidget);
+    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
+    expect(await closeButton(), findsOneWidget);
+  }
+
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }
