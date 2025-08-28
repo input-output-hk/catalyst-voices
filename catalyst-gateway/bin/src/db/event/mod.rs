@@ -293,7 +293,7 @@ impl EventDB {
 }
 
 /// Establish a connection pool to the database.
-/// After sucessfull initialisation of the connection pool, spawns a background ready
+/// After successful initialisation of the connection pool, spawns a background ready
 /// probe task.
 ///
 /// # Parameters
