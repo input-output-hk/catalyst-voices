@@ -2,14 +2,25 @@ import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 abstract interface class ReportingService {
-  NavigatorObserver buildNavigatorObserver();
+  http.Client? buildHttpClient();
+
+  NavigatorObserver? buildNavigatorObserver();
 
   Future<void> init({
     required ReportingServiceConfig config,
-    required ValueGetter<FutureOr<void>> appRunner,
   });
 
   Future<void> reportingAs(Account? account);
+
+  R? runZonedGuarded<R>(
+    ValueGetter<R> body,
+    void Function(Object error, StackTrace stack) onError, {
+    Map<Object?, Object?>? zoneValues,
+    ZoneSpecification? zoneSpecification,
+  });
+
+  Widget wrapApp(Widget app);
 }

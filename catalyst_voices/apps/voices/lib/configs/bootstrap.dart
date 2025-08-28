@@ -14,16 +14,18 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
 
-const _shouldEnableReporting = kReleaseMode || kProfileMode;
+const ReportingService _reportingService = _shouldUseSentry
+    ? SentryReportingService()
+    : NoOpReportingService();
+
+const _shouldUseSentry = kReleaseMode || kProfileMode;
 
 final _bootstrapLogger = Logger('Bootstrap');
 final _flutterLogger = Logger('Flutter');
 final _loggingService = LoggingService();
 final _platformDispatcherLogger = Logger('PlatformDispatcher');
-
 final _uncaughtZoneLogger = Logger('UncaughtZone');
 
 /// Initializes the application before it can be run. Should setup all
@@ -43,24 +45,26 @@ Future<BootstrapArgs> bootstrap({
   setPathUrlStrategy();
 
   environment ??= AppEnvironment.fromEnv();
+  final config = await _getAppConfig(env: environment.type);
 
   await _cleanupOldStorages();
-  await registerDependencies(environment: environment, loggingService: _loggingService);
   await _initCryptoUtils();
+  await _reportingService.init(config: config.sentry);
 
-  final configSource = ApiConfigSource(Dependencies.instance.get());
-  final configService = ConfigService(ConfigRepository(configSource));
-  final config = await configService.getAppConfig(env: environment.type);
+  await Dependencies.instance.init(
+    config: config,
+    environment: environment,
+    loggingService: _loggingService,
+    reportingService: _reportingService,
+  );
 
-  registerConfig(config);
-
-  //ignore: avoid_redundant_argument_values
-  router ??= buildAppRouter(enableReporting: _shouldEnableReporting);
+  router ??= buildAppRouter();
 
   // Observer is very noisy on Logger. Enable it only if you want to debug
   // something
   Bloc.observer = AppBlocObserver(logOnChange: false);
 
+  Dependencies.instance.get<ReportingServiceMediator>().init();
   Dependencies.instance.get<SyncManager>().start().ignore();
 
   return BootstrapArgs(
@@ -81,33 +85,27 @@ Future<void> bootstrapAndRun(
   AppEnvironment environment, [
   BootstrapWidgetBuilder builder = _defaultBuilder,
 ]) async {
-  if (_shouldEnableReporting) {
-    await Sentry.runZonedGuarded(
-      () => _safeBootstrapAndRun(environment, builder),
+  await _reportingService.runZonedGuarded(
+    () => _safeBootstrapAndRun(environment, builder),
+    (error, stack) {
       // not severe because Sentry will log it automatically.
-      (error, stack) => _reportUncaughtZoneError(error, stack, severe: false),
-    );
-  } else {
-    await runZonedGuarded(
-      () => _safeBootstrapAndRun(environment, builder),
-      _reportUncaughtZoneError,
-    );
-  }
+      // ignore: prefer_const_declarations
+      final isNotSentryReporting = _reportingService is! SentryReportingService;
+      _reportUncaughtZoneError(error, stack, severe: isNotSentryReporting);
+    },
+  );
 }
 
 // TODO(damian-molinski): Add Isolate.current.addErrorListener
 @visibleForTesting
 GoRouter buildAppRouter({
   String? initialLocation,
-  bool enableReporting = false,
 }) {
   final observers = <NavigatorObserver>[];
 
-  if (enableReporting) {
-    final reportingService = Dependencies.instance.get<ReportingService>();
-    final observer = reportingService.buildNavigatorObserver();
-    observers.add(observer);
-  }
+  final reportingService = Dependencies.instance.get<ReportingService>();
+  final observer = reportingService.buildNavigatorObserver();
+  if (observer != null) observers.add(observer);
 
   return AppRouterFactory.create(
     initialLocation: initialLocation,
@@ -117,20 +115,21 @@ GoRouter buildAppRouter({
 
 @visibleForTesting
 void registerConfig(AppConfig config) {
-  Dependencies.instance.registerConfig(config);
+  Dependencies.instance.register(config);
 }
 
 @visibleForTesting
 Future<void> registerDependencies({
   AppEnvironment environment = const AppEnvironment.dev(),
   LoggingService? loggingService,
+  ReportingService reportingService = const NoOpReportingService(),
 }) async {
-  if (!Dependencies.instance.isInitialized) {
-    await Dependencies.instance.init(
-      environment: environment,
-      loggingService: loggingService,
-    );
-  }
+  await Dependencies.instance.init(
+    config: AppConfig.env(environment.type),
+    environment: environment,
+    loggingService: loggingService ?? NoOpLoggingService(),
+    reportingService: reportingService,
+  );
 }
 
 @visibleForTesting
@@ -159,8 +158,20 @@ Future<void> _doBootstrapAndRun(
   PlatformDispatcher.instance.onError = _reportPlatformDispatcherError;
 
   final args = await bootstrap(environment: environment);
-  final app = await builder(args);
-  await _runApp(app, sentryConfig: args.sentryConfig);
+  var app = await builder(args);
+
+  app = _reportingService.wrapApp(app);
+
+  runApp(app);
+}
+
+Future<AppConfig> _getAppConfig({
+  required AppEnvironmentType env,
+}) async {
+  final api = ApiServices(env: env);
+  final source = ApiConfigSource(api);
+  final service = ConfigService(ConfigRepository(source));
+  return service.getAppConfig(env: env);
 }
 
 Future<void> _initCryptoUtils() async {
@@ -203,23 +214,6 @@ void _reportUncaughtZoneError(
     _uncaughtZoneLogger.severe('Uncaught Error', error, stack);
   } else {
     _uncaughtZoneLogger.finer('Uncaught Error', error, stack);
-  }
-}
-
-Future<void> _runApp(
-  Widget app, {
-  required SentryConfig sentryConfig,
-}) async {
-  if (_shouldEnableReporting) {
-    final reporting = Dependencies.instance.get<ReportingService>();
-    await reporting.init(
-      config: sentryConfig,
-      appRunner: () => runApp(SentryWidget(child: app)),
-    );
-
-    Dependencies.instance.get<ReportingServiceMediator>().init();
-  } else {
-    runApp(app);
   }
 }
 

@@ -3,10 +3,16 @@ import 'dart:async';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/reporting/reporting_service.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 final class SentryReportingService implements ReportingService {
   const SentryReportingService();
+
+  @override
+  http.Client buildHttpClient() {
+    return SentryHttpClient();
+  }
 
   @override
   NavigatorObserver buildNavigatorObserver() {
@@ -16,7 +22,6 @@ final class SentryReportingService implements ReportingService {
   @override
   Future<void> init({
     required ReportingServiceConfig config,
-    required ValueGetter<FutureOr<void>> appRunner,
   }) async {
     if (config is! SentryConfig) {
       throw ArgumentError('SentryReportingService supports only SentryConfig', 'config');
@@ -39,7 +44,6 @@ final class SentryReportingService implements ReportingService {
           ..release = config.release
           ..dist = config.dist;
       },
-      appRunner: appRunner,
     );
   }
 
@@ -60,4 +64,24 @@ final class SentryReportingService implements ReportingService {
       return scope.setUser(user);
     });
   }
+
+  @override
+  R? runZonedGuarded<R>(
+    ValueGetter<R> body,
+    void Function(Object error, StackTrace stack) onError, {
+    Map<Object?, Object?>? zoneValues,
+    ZoneSpecification? zoneSpecification,
+  }) {
+    final result = Sentry.runZonedGuarded(
+      body,
+      onError,
+      zoneValues: zoneValues,
+      zoneSpecification: zoneSpecification,
+    );
+
+    return result is R ? result : null;
+  }
+
+  @override
+  Widget wrapApp(Widget app) => SentryWidget(child: app);
 }

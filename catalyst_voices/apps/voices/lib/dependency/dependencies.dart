@@ -32,15 +32,17 @@ final class Dependencies extends DependencyProvider {
   }
 
   Future<void> init({
+    required AppConfig config,
     required AppEnvironment environment,
-    LoggingService? loggingService,
+    required LoggingService loggingService,
+    required ReportingService reportingService,
   }) async {
     DependencyProvider.instance = this;
 
+    registerSingleton<AppConfig>(config);
     registerSingleton<AppEnvironment>(environment);
-    if (loggingService != null) {
-      registerSingleton<LoggingService>(loggingService);
-    }
+    registerSingleton<LoggingService>(loggingService);
+    registerSingleton<ReportingService>(reportingService);
 
     _registerStorages();
     _registerUtils();
@@ -52,13 +54,13 @@ final class Dependencies extends DependencyProvider {
     _isInitialized = true;
   }
 
-  void registerConfig(AppConfig config) {
-    if (isRegistered<AppConfig>()) {
+  void register<T extends Object>(T instance) {
+    if (isRegistered<T>()) {
       if (kDebugMode) {
-        print('AppConfig already registered!');
+        print('${T.runtimeType} already registered!');
       }
     }
-    registerSingleton<AppConfig>(config);
+    registerSingleton<T>(instance);
   }
 
   void _registerBlocsWithDependencies() {
@@ -199,12 +201,16 @@ final class Dependencies extends DependencyProvider {
   }
 
   void _registerNetwork() {
-    registerLazySingleton<ApiServices>(() {
-      return ApiServices(
-        env: get<AppEnvironment>().type,
-        authTokenProvider: get<AuthTokenProvider>(),
-      );
-    });
+    registerLazySingleton<ApiServices>(
+      () {
+        return ApiServices(
+          env: get<AppEnvironment>().type,
+          authTokenProvider: get<AuthTokenProvider>(),
+          httpClient: () => get<ReportingService>().buildHttpClient(),
+        );
+      },
+      dispose: (api) => api.dispose(),
+    );
   }
 
   void _registerRepositories() {
@@ -403,7 +409,6 @@ final class Dependencies extends DependencyProvider {
         get<CampaignService>(),
       );
     });
-    registerLazySingleton<ReportingService>(SentryReportingService.new);
     registerLazySingleton<ReportingServiceMediator>(
       () {
         return ReportingServiceMediator(
