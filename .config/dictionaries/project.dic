@@ -6,6 +6,7 @@ addrof
 addrr
 adminer
 afinet
+allprojects
 androidx
 anypolicy
 apirequest
@@ -67,6 +68,7 @@ codepoints
 collabs
 commitlog
 concatcp
+configureondemand
 coproposers
 COSE
 coti
@@ -265,6 +267,7 @@ postcss
 Pozhylenkov
 Precache
 Precertificate
+proguard
 preprod
 projectcatalyst
 Prokhorenko
@@ -331,6 +334,7 @@ stevenj
 stringzilla
 subchain
 Subkey
+subprojects
 submiting
 subosito
 svgs
