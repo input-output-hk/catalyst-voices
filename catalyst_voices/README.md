@@ -71,8 +71,8 @@ just bootstrap
 Environment is used to define the environment type is used on Web target.
 Flavor is used to define the environment type that is used on other targets (mobile, desktop).
 
-So when you are running the app on the Web target, be sure to use `ENV_NAME` dart define to define the environment type.
-In other cases, use `flavor` to define the environment type.
+So when you are running the app on the Web target, be sure to use `ENV_NAME` dart define to define
+the environment type. In other cases, use `flavor` to define the environment type.
 
 ### Environment types
 
@@ -83,8 +83,8 @@ This project contains four env types:
 * prod
 * relative
 
-To run the desired environment, either use the launch configuration in VSCode/Android Studio or use the
-following commands:
+To run the desired environment, either use the launch configuration in VSCode/Android Studio
+or use the following commands:
 
 ```sh
 # Development
@@ -108,7 +108,8 @@ flutter run --target lib/configs/main.dart --dart-define=ENV_NAME=prod -d chrome
 
 ### Flavor types
 
-You should use flavor types instead of environment variables when running the app on mobile or desktop targets.
+You should use flavor types instead of environment variables when running the app on mobile
+or desktop targets.
 
 This project contains 3 flavor types:
 
@@ -116,8 +117,8 @@ This project contains 3 flavor types:
 * preprod
 * prod
 
-To run the desired environment, either use the launch configuration in VSCode/Android Studio or use the
-following commands:
+To run the desired environment, either use the launch configuration in VSCode/Android Studio
+or use the following commands:
 
 ```sh
 # Development
@@ -139,8 +140,8 @@ flutter run --flavor prod --target lib/configs/main.dart
 
 ### Environment variables
 
-We use [dart defines](https://dart.dev/guides/language/language-tour#using-variables) as flavor run parameter for Web,
-and `flavor` for mobile and desktop targets.
+We use [dart defines](https://dart.dev/guides/language/language-tour#using-variables) as
+flavor run parameter for Web, and `flavor` for mobile and desktop targets.
 
 All of env variable are optional and you can define only what you want, where you want.
 
@@ -151,7 +152,8 @@ Priority looks as follow:
 
 If none of above is defined app will fallback to **relative** type for web or **dev** in other cases.
 
-Using following command below will resolve in **relative** env type for web  and **dev** for mobile and desktop because **ENV_NAME** nor **flavor** is defined.
+Using following command below will resolve in **relative** env type for web  and **dev** for mobile
+and desktop because **ENV_NAME** nor **flavor** is defined.
 
 ```sh
 flutter build web --target apps/voices/lib/configs/main_web.dart
@@ -159,7 +161,8 @@ flutter build web --target apps/voices/lib/configs/main_web.dart
 
 #### Environment config
 
-Configuration is downloaded dynamically from **gateway** backend where **gateway** base url depends on used env type.
+Configuration is downloaded dynamically from **gateway** backend where **gateway** base url depends
+on used env type.
 
 ### Code Generation
 
