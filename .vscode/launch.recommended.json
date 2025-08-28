@@ -170,7 +170,7 @@
       ]
     },
     {
-      "name": "Catalyst [Flavor][DEV][debug]",
+      "name": "Catalyst [DEV][debug]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
@@ -183,7 +183,7 @@
       ]
     },
     {
-      "name": "Catalyst [Flavor][DEV][profile]",
+      "name": "Catalyst [DEV][profile]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
@@ -196,7 +196,7 @@
       ]
     },
     {
-      "name": "Catalyst [Flavor][DEV][release]",
+      "name": "Catalyst [DEV][release]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
@@ -209,7 +209,7 @@
       ]
     },
     {
-      "name": "Catalyst [Flavor][PREPROD][debug]",
+      "name": "Catalyst [PREPROD][debug]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
@@ -222,7 +222,7 @@
       ]
     },
     {
-      "name": "Catalyst [Flavor][PREPROD][profile]",
+      "name": "Catalyst [PREPROD][profile]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
@@ -235,7 +235,7 @@
       ]
     },
     {
-      "name": "Catalyst [Flavor][PREPROD][release]",
+      "name": "Catalyst [PREPROD][release]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
@@ -248,7 +248,7 @@
       ]
     },
     {
-      "name": "Catalyst [Flavor][PROD][debug]",
+      "name": "Catalyst [PROD][debug]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
@@ -261,7 +261,7 @@
       ]
     },
     {
-      "name": "Catalyst [Flavor][PROD][profile]",
+      "name": "Catalyst [PROD][profile]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
@@ -274,7 +274,7 @@
       ]
     },
     {
-      "name": "Catalyst [Flavor][PROD][release]",
+      "name": "Catalyst [PROD][release]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
