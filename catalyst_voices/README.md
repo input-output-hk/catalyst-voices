@@ -72,7 +72,8 @@ Environment is used to define the environment type is used on Web target.
 Flavor is used to define the environment type that is used on other targets (mobile, desktop).
 
 So when you are running the app on the Web target, be sure to use `ENV_NAME` dart define to define
-the environment type. In other cases, use `flavor` to define the environment type.
+the environment type.
+In other cases, use `flavor` to define the environment type.
 
 ### Environment types
 
@@ -89,18 +90,22 @@ or use the following commands:
 ```sh
 # Development
 cd apps/voices
-flutter run --target lib/configs/main_dev.dart -d chrome --web-header "Cross-Origin-Opener-Policy=same-origin" --web-header "Cross-Origin-Embedder-Policy=require-corp"
+flutter run --target lib/configs/main_dev.dart -d chrome --web-header \
+"Cross-Origin-Opener-Policy=same-origin" --web-header "Cross-Origin-Embedder-Policy=require-corp"
 
 # Pre-Production
 cd apps/voices
-flutter run --target lib/configs/main_preprod.dart -d chrome --web-header "Cross-Origin-Opener-Policy=same-origin" --web-header "Cross-Origin-Embedder-Policy=require-corp"
+flutter run --target lib/configs/main_preprod.dart -d chrome --web-header \
+"Cross-Origin-Opener-Policy=same-origin" --web-header "Cross-Origin-Embedder-Policy=require-corp"
 
 # Production
 cd apps/voices
-flutter run --target lib/configs/main_prod.dart -d chrome --web-header "Cross-Origin-Opener-Policy=same-origin" --web-header "Cross-Origin-Embedder-Policy=require-corp"
+flutter run --target lib/configs/main_prod.dart -d chrome --web-header \
+"Cross-Origin-Opener-Policy=same-origin" --web-header "Cross-Origin-Embedder-Policy=require-corp"
 
 # Or
-flutter run --target lib/configs/main.dart --dart-define=ENV_NAME=prod -d chrome --web-header "Cross-Origin-Opener-Policy=same-origin" --web-header "Cross-Origin-Embedder-Policy=require-corp"
+flutter run --target lib/configs/main.dart --dart-define=ENV_NAME=prod -d chrome --web-header \
+"Cross-Origin-Opener-Policy=same-origin" --web-header "Cross-Origin-Embedder-Policy=require-corp"
 ```
 
 > Catalyst Voices works on the Web only.
