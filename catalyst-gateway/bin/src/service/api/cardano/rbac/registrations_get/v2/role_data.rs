@@ -13,8 +13,12 @@ use rbac_registration::{
 
 use crate::{
     service::api::cardano::rbac::registrations_get::{
-        extended_data::ExtendedData, key_data::KeyData, key_data_list::KeyDataList,
-        payment_data::PaymentData, payment_data_list::PaymentDataList, role_id::CatalystRoleId,
+        extended_data::ExtendedData,
+        role_id::CatalystRoleId,
+        v2::{
+            key_data::KeyData, key_data_list::KeyDataList, payment_data::PaymentData,
+            payment_data_list::PaymentDataList,
+        },
     },
     settings::Settings,
 };
@@ -56,25 +60,48 @@ impl RbacRoleData {
 
         for point in point_data {
             let slot = point.point().slot_or_default();
+            let txn_index = point.txn_index();
             let is_persistent = slot <= last_persistent_slot;
             let time = network.slot_to_time(slot);
             let data = point.data();
 
             if let Some(signing_key) = data.signing_key() {
                 signing_keys.push(
-                    KeyData::new(is_persistent, time, signing_key, point.point(), chain)
-                        .context("Invalid signing key")?,
+                    KeyData::new(
+                        is_persistent,
+                        time.into(),
+                        slot.into(),
+                        txn_index.into(),
+                        signing_key,
+                        point.point(),
+                        chain,
+                    )
+                    .context("Invalid signing key")?,
                 );
             }
             if let Some(encryption_key) = data.encryption_key() {
                 encryption_keys.push(
-                    KeyData::new(is_persistent, time, encryption_key, point.point(), chain)
-                        .context("Invalid encryption key")?,
+                    KeyData::new(
+                        is_persistent,
+                        time.into(),
+                        slot.into(),
+                        txn_index.into(),
+                        encryption_key,
+                        point.point(),
+                        chain,
+                    )
+                    .context("Invalid encryption key")?,
                 );
             }
             payment_addresses.push(
-                PaymentData::new(is_persistent, time, data.payment_key().cloned())
-                    .context("Invalid payment address")?,
+                PaymentData::new(
+                    is_persistent,
+                    time.into(),
+                    slot.into(),
+                    txn_index.into(),
+                    data.payment_key().cloned(),
+                )
+                .context("Invalid payment address")?,
             );
             extended_data.extend(data.extended_data().clone().into_iter());
         }

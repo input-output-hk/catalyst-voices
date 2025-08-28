@@ -12,8 +12,11 @@ use rbac_registration::{
 
 use crate::{
     service::api::cardano::rbac::registrations_get::{
-        extended_data::ExtendedData, key_data::KeyData, key_data_list::KeyDataList,
-        payment_data::PaymentData, payment_data_list::PaymentDataList,
+        extended_data::ExtendedData,
+        v1::{
+            key_data::KeyData, key_data_list::KeyDataList, payment_data::PaymentData,
+            payment_data_list::PaymentDataList,
+        },
     },
     settings::Settings,
 };

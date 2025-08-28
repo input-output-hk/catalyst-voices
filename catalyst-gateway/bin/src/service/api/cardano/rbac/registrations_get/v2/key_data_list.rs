@@ -6,7 +6,7 @@ use poem_openapi::{
 };
 
 use crate::service::{
-    api::cardano::rbac::registrations_get::key_data::KeyData,
+    api::cardano::rbac::registrations_get::v2::key_data::KeyData,
     common::types::array_types::impl_array_types,
 };
 
