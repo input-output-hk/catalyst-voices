@@ -12,7 +12,10 @@ use rbac_registration::{
     cardano::cip509::{KeyLocalRef, LocalRefInt, PointData},
     registration::cardano::RegistrationChain,
 };
-use x509_cert::{certificate::Certificate as X509Certificate, der::Encode as _};
+use x509_cert::{
+    certificate::Certificate as X509Certificate,
+    der::{pem::LineEnding, EncodePem},
+};
 
 use crate::service::{
     api::cardano::rbac::registrations_get::{
@@ -106,8 +109,8 @@ fn encode_x509(
         .data()
         .as_ref()
         .map(|cert| {
-            cert.to_der()
-                .context("Failed to encode X509 certificate")
+            cert.to_pem(LineEnding::LF)
+                .context("Failed to encode X509 certificate as PEM")
                 .map(Into::into)
         })
         .transpose()
