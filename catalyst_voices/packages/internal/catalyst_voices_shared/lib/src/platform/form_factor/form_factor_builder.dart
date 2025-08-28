@@ -3,16 +3,14 @@ import 'package:flutter/material.dart';
 
 /// A builder which allows to build different widgets per [CatalystFormFactor.current].
 class FormFactorBuilder<T> extends StatelessWidget {
-  final Widget Function(BuildContext context, T? data) builder;
+  final Widget Function(BuildContext context, T data) builder;
   final Map<CatalystFormFactor, T?> _data;
-  final T? fallback;
 
   FormFactorBuilder({
     super.key,
     required this.builder,
-    T? mobile,
-    T? desktop,
-    required this.fallback,
+    required T mobile,
+    required T desktop,
   }) : _data = {
          CatalystFormFactor.mobile: mobile,
          CatalystFormFactor.desktop: desktop,
@@ -23,7 +21,7 @@ class FormFactorBuilder<T> extends StatelessWidget {
     return builder(context, _getData());
   }
 
-  T? _getData() {
-    return _data[CatalystFormFactor.current] ?? fallback;
+  T _getData() {
+    return _data[CatalystFormFactor.current]!;
   }
 }

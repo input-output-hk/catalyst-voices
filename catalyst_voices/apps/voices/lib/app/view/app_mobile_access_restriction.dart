@@ -45,10 +45,10 @@ class AppMobileAccessRestriction extends StatelessWidget {
           return child;
         }
 
-        return FormFactorBuilder<Widget>(
-          mobile: CatalystPlatform.isWeb ? const _MobileWebPlaceholder() : null,
-          fallback: child,
-          builder: (context, child) => child!,
+        return FormFactorBuilder<bool>(
+          mobile: CatalystPlatform.isWeb,
+          desktop: false,
+          builder: (context, isRestricted) => isRestricted ? const _MobileWebPlaceholder() : child,
         );
       },
     );
@@ -242,6 +242,25 @@ class _Foreground extends StatelessWidget {
   }
 }
 
+class _MobileSplashScreen extends StatelessWidget {
+  final _LayoutData data;
+
+  const _MobileSplashScreen({
+    required this.data,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        _Background(isSmallScreen: data.isMobile),
+        _Foreground(data: data),
+      ],
+    );
+  }
+}
+
 class _MobileWebPlaceholder extends StatelessWidget {
   const _MobileWebPlaceholder();
 
@@ -267,25 +286,6 @@ class _MobileWebPlaceholder extends StatelessWidget {
         isMobile: false,
       ),
       builder: (context, data) => _MobileSplashScreen(data: data),
-    );
-  }
-}
-
-class _MobileSplashScreen extends StatelessWidget {
-  final _LayoutData data;
-
-  const _MobileSplashScreen({
-    required this.data,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        _Background(isSmallScreen: data.isMobile),
-        _Foreground(data: data),
-      ],
     );
   }
 }

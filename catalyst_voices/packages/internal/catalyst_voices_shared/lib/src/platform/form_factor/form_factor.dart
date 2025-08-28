@@ -13,6 +13,7 @@ enum CatalystFormFactor {
   /// The app executes on a desktop-like device.
   desktop;
 
+  /// The breakpoint below which a screen is considered "mobile".
   static const double mobileScreenSizeBreakpoint = 640;
 
   /// The form factor the application is running on currently.
