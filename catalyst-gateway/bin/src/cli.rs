@@ -6,7 +6,7 @@ use tracing::{error, info};
 
 use crate::{
     cardano::start_followers,
-    db::{self, event::EventDB, index::session::CassandraSession},
+    db::{self, index::session::CassandraSession},
     service::{
         self,
         utilities::health::{
