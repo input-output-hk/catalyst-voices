@@ -1,6 +1,6 @@
-//! Signed Document Locator for CIDv0, Base32 CIDv1, and Base36 CIDv1
+//! Signed Document Locator for `CIDv0`, Base32 `CIDv1`, and Base36 `CIDv1`
 //!
-//! Reference: https://docs.ipfs.tech/concepts/content-addressing
+//! Reference: <https://docs.ipfs.tech/concepts/content-addressing>
 
 // cspell: words cidv
 
@@ -20,12 +20,12 @@ const TITLE: &str = "Signed Document Locator";
 /// Description.
 const DESCRIPTION: &str = "Document Locator in the IPFS CID formats";
 // cspell: disable
-/// Example for CIDv1 Base32.
+/// Example for `CIDv1` Base32.
 const EXAMPLE_CID_V1_B32: &str = "bafybeihdwdcefgh4dqkjv67uzcmw7ojee6xedzdetojuzjevtenxquvyku";
-/// Example for CIDv1 Base36.
+/// Example for `CIDv1` Base36.
 #[allow(dead_code)]
 const EXAMPLE_CID_V1_B36: &str = "k2k4r8jl0yz8qjgqbmc2cdu5hkqek5rj6flgnlkyywynci20j0iuyfuj";
-/// Example for CIDv0.
+/// Example for `CIDv0`.
 #[allow(dead_code)]
 const EXAMPLE_CID_V0: &str = "QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR";
 // cspell: enable
@@ -33,6 +33,7 @@ const EXAMPLE_CID_V0: &str = "QmbWqxBEKC3P8tqsKc98xmWNzrzDtRLMiMPL8wBuTGsMnR";
 const PATTERN: &str = r"^(Qm[1-9A-HJ-NP-Za-km-z]{44})|(b[a-z2-7]{58})|([kK][0-9a-zA-Z]+)$";
 
 /// Regular expression to validate cidv0, cidv1b32, and cidv1b36.
+#[allow(clippy::unwrap_used)]
 static REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
 
 /// Because ALL the constraints are defined above, we do not ever need to define them in
