@@ -68,7 +68,7 @@ package-rust-tests-runner:
     WORKDIR $HOME/build
     RUN rm -rf *
     COPY ../+build/cat-gateway .
-    DO +COPY_SRC
+    DO ../+COPY_SRC
     WORKDIR $HOME
     COPY +test-builder/cat-gateway-tests.tar.zst cat-gateway-tests.tar.zst
     ENTRYPOINT cargo-nextest nextest run --archive-file=cat-gateway-tests.tar.zst --workspace-remap=$HOME/build --run-ignored=only signed_docs scylla_session scylla_queries scylla_purge rbac_index --no-fail-fast
