@@ -1,4 +1,3 @@
-# cspell: words janitoring
 name: Cat Gateway integration tests
 
 on:
@@ -48,6 +47,11 @@ jobs:
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up rust-tests-runner --abort-on-container-exit --exit-code-from rust-tests-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml down
+
+      - name: Spin up catalyst-gateway
+        if: always()
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway --wait
 
       - name: Schemathesis tests
         if: always()
