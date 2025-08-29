@@ -67,7 +67,8 @@ package-rust-tests-runner:
     RUN curl -sL https://get.nexte.st/latest/linux | tar -xz -C /bin
     WORKDIR $HOME/build
     RUN rm -rf *
-    DO ../+COPY_SRC
+    COPY ../+build/cat-gateway .
+    DO +COPY_SRC
     WORKDIR $HOME
     COPY +test-builder/cat-gateway-tests.tar.zst cat-gateway-tests.tar.zst
     ENTRYPOINT cargo-nextest nextest run --archive-file=cat-gateway-tests.tar.zst --workspace-remap=$HOME/build --run-ignored=only signed_docs scylla_session scylla_queries scylla_purge rbac_index --no-fail-fast
