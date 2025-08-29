@@ -4,7 +4,7 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:fix/wasm-c-base AS ru
 IMPORT ../ AS repo-ci
 IMPORT github.com/input-output-hk/catalyst-voices/catalyst-gateway:main AS cat-gateway-main
 
-#cspell: words rustfmt toolsets USERARCH stdcfgs openapitools
+#cspell: words rustfmt toolsets USERARCH stdcfgs openapitools trixie
 
 # COPY_SRC:
 #   Copies the source code into the builder.
