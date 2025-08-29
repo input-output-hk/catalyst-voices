@@ -91,7 +91,7 @@ class _SegmentsListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final readOnlyMode = context.select<ProposalCubit, bool>((cubit) => cubit.state.readOnlyMode);
-    final readOnlyModeOrMobile = readOnlyMode || CatalystPlatform.isMobileWeb;
+    final readOnlyModeOrMobile = readOnlyMode || CatalystFormFactor.current.isMobile;
 
     return BasicSegmentsListView(
       key: const ValueKey('ProposalSegmentsListView'),
