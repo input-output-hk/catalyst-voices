@@ -1,4 +1,6 @@
 VERSION 0.8
+
+ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
 # cspell: words NATIVEPLATFORM
 
 # start-cluster : starts the local development cluster
@@ -30,7 +32,7 @@ cluster-test:
 
 # kubernetes-base : base container with tooling set up for local access
 kubernetes-base:
-    FROM alpine:3.20.3
+    FROM ${REGISTRY}/alpine:3.20.3
     
     # Install kubectl
     RUN apk update && \
