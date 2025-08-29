@@ -2,6 +2,7 @@ import 'package:catalyst_voices_models/src/config/env_vars/dart_define_env_vars.
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 /// The base domain for the Project Catalyst services.
 const _projectCatalyst = 'projectcatalyst.io';
@@ -43,8 +44,17 @@ final class AppEnvironment extends Equatable {
   /// It looks for an 'envName' variable and maps it to an [AppEnvironmentType].
   /// If the variable is not found or is unsupported, it falls back to [_fallbackEnvType].
   factory AppEnvironment.fromEnv() {
-    final envVars = getDartEnvVars();
-    final envName = envVars.envName;
+    String? envName;
+
+    // TODO(LynxLynxx): Change to CatalystPlatform when its refactored
+    if (kIsWeb) {
+      final envVars = getDartEnvVars();
+      envName = envVars.envName;
+    }
+    // For mobile and desktop we use the app flavor
+    else {
+      envName = appFlavor;
+    }
     final type = AppEnvironmentType.values.asNameMap()[envName];
 
     if (type == null && envName != null) {

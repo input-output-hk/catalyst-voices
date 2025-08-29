@@ -33,3 +33,6 @@
 # Rust related
 
 **/target
+
+# iOS related
+**/Podfile.lock
