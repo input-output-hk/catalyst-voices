@@ -1,9 +1,8 @@
-import 'dart:io';
-
 import 'package:catalyst_voices_models/src/permissions/android_permission_strategy.dart';
 import 'package:catalyst_voices_models/src/permissions/default_permission_strategy.dart';
 import 'package:catalyst_voices_models/src/permissions/ios_permission_strategy.dart';
 import 'package:catalyst_voices_models/src/permissions/permission_strategy.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -54,12 +53,13 @@ final class PermissionStrategyFactory {
 
   static Future<PermissionStrategy> create(DeviceInfoPlugin deviceInfo) async {
     // TODO(LynxLynxx): change to CatalystPlatform
-    if (Platform.isAndroid) {
+
+    if (CatalystOperatingSystem.current.isAndroid) {
       final androidInfo = await deviceInfo.androidInfo;
       return androidInfo.version.sdkInt >= _safPermissionSDK
           ? AndroidModernPermissionStrategy()
           : AndroidLegacyPermissionStrategy();
-    } else if (Platform.isIOS) {
+    } else if (CatalystOperatingSystem.current.isIOS) {
       return IOSPermissionStrategy();
     } else {
       return DefaultPermissionStrategy();
