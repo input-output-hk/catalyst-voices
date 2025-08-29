@@ -7,7 +7,7 @@ class BubbleCampaignPhaseAwareBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (CatalystPlatform.isMobile) {
+    if (CatalystFormFactor.current.isMobile) {
       return const _MobileBubbleCampaignPhaseAwareBackground();
     }
     return CatalystImage.asset(
