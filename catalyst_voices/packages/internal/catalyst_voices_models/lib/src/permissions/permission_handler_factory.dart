@@ -52,8 +52,6 @@ final class PermissionStrategyFactory {
   static const int _safPermissionSDK = 33;
 
   static Future<PermissionStrategy> create(DeviceInfoPlugin deviceInfo) async {
-    // TODO(LynxLynxx): change to CatalystPlatform
-
     if (CatalystOperatingSystem.current.isAndroid) {
       final androidInfo = await deviceInfo.androidInfo;
       return androidInfo.version.sdkInt >= _safPermissionSDK
