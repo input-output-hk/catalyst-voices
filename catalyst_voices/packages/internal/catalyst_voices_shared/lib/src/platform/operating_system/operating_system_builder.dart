@@ -1,9 +1,10 @@
 import 'package:catalyst_voices_shared/src/platform/operating_system/operating_system.dart';
+import 'package:catalyst_voices_shared/src/utils/typedefs.dart';
 import 'package:flutter/material.dart';
 
 /// A builder which allows to build different widgets per [CatalystOperatingSystem.current].
 class OperatingSystemBuilder<T> extends StatelessWidget {
-  final Widget Function(BuildContext context, T? data) builder;
+  final DataWidgetBuilder<T?> builder;
   final Map<CatalystOperatingSystem, T?> _data;
   final T? fallback;
 
