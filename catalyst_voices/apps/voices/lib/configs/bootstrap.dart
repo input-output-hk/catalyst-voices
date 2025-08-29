@@ -14,20 +14,31 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
 
+const CatalystProfiler profiler = _shouldUseSentry
+    ? CatalystSentryProfiler()
+    : CatalystNoopProfiler();
 const ReportingService _reportingService = _shouldUseSentry
     ? SentryReportingService()
     : NoopReportingService();
 
 const _shouldUseSentry = kReleaseMode || kProfileMode;
 
-final _bootstrapLogger = Logger('Bootstrap');
-final _flutterLogger = Logger('Flutter');
+final _loggerBootstrap = Logger('Bootstrap');
+final _loggerFlutter = Logger('Flutter');
+final _loggerPlatformDispatcher = Logger('PlatformDispatcher');
+final _loggerUncaughtZone = Logger('UncaughtZone');
 final _loggingService = LoggingService();
-final _platformDispatcherLogger = Logger('PlatformDispatcher');
-final _uncaughtZoneLogger = Logger('UncaughtZone');
+
+CatalystProfilerTimeline? _profilerStartupTimeline;
+
+CatalystProfilerTimeline get profilerStartupTimeline {
+  return _profilerStartupTimeline ??= profiler.startTransaction(
+    'startup',
+    arguments: CatalystProfilerTimelineArguments(operation: '', description: ''),
+  );
+}
 
 /// Initializes the application before it can be run. Should setup all
 /// the things which are necessary before the actual app is run,
@@ -128,7 +139,7 @@ Future<void> registerDependencies({
   await Dependencies.instance.init(
     config: AppConfig.env(environment.type),
     environment: environment,
-    loggingService: loggingService ?? NoOpLoggingService(),
+    loggingService: loggingService ?? NoopLoggingService(),
     reportingService: reportingService,
   );
 }
@@ -185,12 +196,12 @@ Future<void> _initCryptoUtils() async {
 }
 
 Future<void> _reportBootstrapError(Object error, StackTrace stack) async {
-  _bootstrapLogger.severe('Error while bootstrapping', error, stack);
+  _loggerBootstrap.severe('Error while bootstrapping', error, stack);
 }
 
 /// Flutter-specific assertion failures and contract violations.
 Future<void> _reportFlutterError(FlutterErrorDetails details) async {
-  _flutterLogger.severe(
+  _loggerFlutter.severe(
     details.context?.toStringDeep(),
     details.exception,
     details.stack,
@@ -199,7 +210,7 @@ Future<void> _reportFlutterError(FlutterErrorDetails details) async {
 
 /// Platform Dispatcher Errors reporting
 bool _reportPlatformDispatcherError(Object error, StackTrace stack) {
-  _platformDispatcherLogger.severe('Platform Error', error, stack);
+  _loggerPlatformDispatcher.severe('Platform Error', error, stack);
 
   // return true to prevent default error handling
   return true;
@@ -212,9 +223,9 @@ void _reportUncaughtZoneError(
   bool severe = true,
 }) {
   if (severe) {
-    _uncaughtZoneLogger.severe('Uncaught Error', error, stack);
+    _loggerUncaughtZone.severe('Uncaught Error', error, stack);
   } else {
-    _uncaughtZoneLogger.finer('Uncaught Error', error, stack);
+    _loggerUncaughtZone.finer('Uncaught Error', error, stack);
   }
 }
 
