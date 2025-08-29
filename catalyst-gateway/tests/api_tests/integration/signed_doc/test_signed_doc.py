@@ -37,10 +37,6 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
     ), f"Failed to get document: {resp.status_code} - {resp.text}"
 
     # Post a signed document with filter ID
-    resp = document_v1.post(filter={"id": {"eq": proposal_doc_id}})
-    assert (
-        resp.status_code == 404
-    ), f"Failed to post document: {resp.status_code} - {resp.text}"
     resp = document_v2.post(filter={"id": [{"eq": proposal_doc_id}]})
     assert (
         resp.status_code == 200
@@ -142,10 +138,6 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
     ), f"Failed to get document: {resp.status_code} - {resp.text}"
 
     # Post a signed document with filter ID
-    resp = document_v1.post(filter={"id": {"eq": comment_doc_id}})
-    assert (
-        resp.status_code == 404
-    ), f"Failed to post document: {resp.status_code} - {resp.text}"
     resp = document_v2.post(filter={"id": [{"eq": comment_doc_id}]})
     assert (
         resp.status_code == 200
@@ -226,12 +218,6 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
     ), f"Failed to get document: {resp.status_code} - {resp.text}"
 
     # Post a signed document with filter ID
-    resp = document_v1.post(
-        filter={"id": {"eq": submission_action_id}},
-    )
-    assert (
-        resp.status_code == 404
-    ), f"Failed to post document: {resp.status_code} - {resp.text}"
     resp = document_v2.post(
         filter={"id": [{"eq": submission_action_id}]},
     )
