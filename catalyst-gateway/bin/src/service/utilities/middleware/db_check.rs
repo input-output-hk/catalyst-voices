@@ -12,7 +12,10 @@ pub(crate) struct DatabaseConnectionCheck;
 impl<E: Endpoint> Middleware<E> for DatabaseConnectionCheck {
     type Output = DatabaseConnectionImpl<E>;
 
-    fn transform(&self, ep: E) -> Self::Output {
+    fn transform(
+        &self,
+        ep: E,
+    ) -> Self::Output {
         DatabaseConnectionImpl { ep }
     }
 }
@@ -26,7 +29,10 @@ pub(crate) struct DatabaseConnectionImpl<E> {
 impl<E: Endpoint> Endpoint for DatabaseConnectionImpl<E> {
     type Output = E::Output;
 
-    async fn call(&self, req: Request) -> Result<Self::Output> {
+    async fn call(
+        &self,
+        req: Request,
+    ) -> Result<Self::Output> {
         let req_path = req.uri().path();
 
         // TODO: find a better way to filter URI paths

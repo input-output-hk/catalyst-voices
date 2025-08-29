@@ -57,7 +57,10 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # PUT `/document`
 #[allow(clippy::too_many_lines)]
-pub(crate) async fn endpoint(doc_bytes: Vec<u8>, mut token: CatalystRBACTokenV1) -> AllResponses {
+pub(crate) async fn endpoint(
+    doc_bytes: Vec<u8>,
+    mut token: CatalystRBACTokenV1,
+) -> AllResponses {
     let Ok(doc): Result<catalyst_signed_doc::CatalystSignedDocument, _> =
         doc_bytes.as_slice().try_into()
     else {
@@ -196,7 +199,8 @@ async fn validate_against_original_doc(doc: &CatalystSignedDocument) -> anyhow::
 /// Returns `true` if its a new document.
 /// Returns `false` if the same document already exists.
 async fn store_document_in_db(
-    doc: &catalyst_signed_doc::CatalystSignedDocument, doc_bytes: Vec<u8>,
+    doc: &catalyst_signed_doc::CatalystSignedDocument,
+    doc_bytes: Vec<u8>,
 ) -> anyhow::Result<bool> {
     let authors = doc.authors().iter().map(ToString::to_string).collect();
 

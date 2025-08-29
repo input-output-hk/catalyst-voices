@@ -13,7 +13,10 @@ pub(crate) struct DocumentRef {
 
 impl DocumentRef {
     /// Return a sql conditional statement by the provided `table_field`
-    pub(crate) fn conditional_stmt(&self, table_field: &str) -> String {
+    pub(crate) fn conditional_stmt(
+        &self,
+        table_field: &str,
+    ) -> String {
         let mut stmt = "TRUE".to_string();
         if let Some(id) = &self.id {
             stmt.push_str(&format!(

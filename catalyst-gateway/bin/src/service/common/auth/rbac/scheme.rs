@@ -120,7 +120,8 @@ const MAX_TOKEN_SKEW: Duration = Duration::from_secs(5 * 60); // 5 minutes
 ///
 /// [here]: https://github.com/input-output-hk/catalyst-voices/blob/main/docs/src/catalyst-standards/permissionless-auth/auth-header.md#backend-processing-of-the-token
 async fn checker_api_catalyst_auth(
-    req: &Request, bearer: Bearer,
+    req: &Request,
+    bearer: Bearer,
 ) -> poem::Result<CatalystRBACTokenV1> {
     /// Temporary: Conditional RBAC for testing
     const RBAC_OFF: &str = "RBAC_OFF";

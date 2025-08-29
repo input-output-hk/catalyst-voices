@@ -43,7 +43,10 @@ pub(crate) mod metrics_updater {
     }
 
     /// Triggers to update the tip for both live and immutable slots.
-    pub(crate) fn current_tip_slot(live_slot: Slot, immutable_slot: Slot) {
+    pub(crate) fn current_tip_slot(
+        live_slot: Slot,
+        immutable_slot: Slot,
+    ) {
         let api_host_names = Settings::api_host_names().join(",");
         let service_id = Settings::service_id();
         let network = Settings::cardano_network().to_string();

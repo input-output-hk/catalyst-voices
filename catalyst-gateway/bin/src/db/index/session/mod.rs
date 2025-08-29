@@ -217,9 +217,13 @@ impl CassandraSession {
     /// Returns an iterator that iterates over all the result pages that the query
     /// returns.
     pub(crate) async fn execute_iter<P>(
-        &self, select_query: PreparedSelectQuery, params: P,
+        &self,
+        select_query: PreparedSelectQuery,
+        params: P,
     ) -> anyhow::Result<QueryPager>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let session = self.session.clone();
         let queries = self.queries.clone();
 
@@ -234,7 +238,9 @@ impl CassandraSession {
     /// This will divide the batch into optimal sized chunks and execute them until all
     /// values have been executed or the first error is encountered.
     pub(crate) async fn execute_batch<T: SerializeRow + Debug>(
-        &self, query: PreparedQuery, values: Vec<T>,
+        &self,
+        query: PreparedQuery,
+        values: Vec<T>,
     ) -> FallibleQueryResults {
         let session = self.session.clone();
         let cfg = self.cfg.clone();
@@ -246,7 +252,9 @@ impl CassandraSession {
     /// Execute a query which returns no results, except an error if it fails.
     /// Can not be batched, takes a single set of parameters.
     pub(crate) async fn execute_upsert<T: SerializeRow + Debug>(
-        &self, query: PreparedUpsertQuery, value: T,
+        &self,
+        query: PreparedUpsertQuery,
+        value: T,
     ) -> anyhow::Result<()> {
         let session = self.session.clone();
         let queries = self.queries.clone();
@@ -264,7 +272,9 @@ impl CassandraSession {
     ///
     /// NOTE: This is currently only used to purge volatile data.
     pub(crate) async fn purge_execute_batch<T: SerializeRow + Debug>(
-        &self, query: PreparedDeleteQuery, values: Vec<T>,
+        &self,
+        query: PreparedDeleteQuery,
+        values: Vec<T>,
     ) -> FallibleQueryResults {
         // Only execute purge queries on the volatile session
         let persistent = false;
@@ -281,7 +291,8 @@ impl CassandraSession {
 
     /// Execute a select query to gather primary keys for purging.
     pub(crate) async fn purge_execute_iter(
-        &self, query: purge::PreparedSelectQuery,
+        &self,
+        query: purge::PreparedSelectQuery,
     ) -> anyhow::Result<QueryPager> {
         // Only execute purge queries on the volatile session
         let persistent = false;
@@ -386,7 +397,11 @@ async fn make_session(cfg: &cassandra_db::EnvVars) -> anyhow::Result<Arc<Session
 /// Continuously try and init the DB, if it fails, backoff.
 ///
 /// Display reasonable logs to help diagnose DB connection issues.
-async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bool) {
+async fn retry_init(
+    cfg: cassandra_db::EnvVars,
+    network: Network,
+    persistent: bool,
+) {
     let mut retry_delay = Duration::from_secs(0);
     let db_type = if persistent { "Persistent" } else { "Volatile" };
 

@@ -35,7 +35,9 @@ use crate::{
 /// Get registration given a stake key hash, it can be time specific based on asat param,
 /// or the latest registration returned if no asat given.
 pub(crate) async fn get_registration_given_stake_key_hash(
-    stake_address: StakeAddress, session: Arc<CassandraSession>, asat: Option<SlotNo>,
+    stake_address: StakeAddress,
+    session: Arc<CassandraSession>,
+    asat: Option<SlotNo>,
 ) -> AllRegistration {
     // Get stake addr associated with given stake hash.
     let mut stake_addr_iter =
@@ -78,8 +80,10 @@ pub(crate) async fn get_registration_given_stake_key_hash(
 
 /// Get registration from stake addr
 pub async fn get_registration_from_stake_addr(
-    stake_pub_key: Ed25519HexEncodedPublicKey, asat: Option<SlotNo>,
-    session: Arc<CassandraSession>, vote_key: Option<Ed25519HexEncodedPublicKey>,
+    stake_pub_key: Ed25519HexEncodedPublicKey,
+    asat: Option<SlotNo>,
+    session: Arc<CassandraSession>,
+    vote_key: Option<Ed25519HexEncodedPublicKey>,
 ) -> AllRegistration {
     // Get all registrations from given stake pub key.
     let mut registrations =
@@ -165,7 +169,8 @@ pub async fn get_registration_from_stake_addr(
 /// Stake addresses need to be individually checked to make sure they are still actively
 /// associated with the voting key, and have not been registered to another voting key.
 fn check_stake_addr_voting_key_association(
-    registrations: Vec<Cip36Details>, associated_voting_key: &Ed25519HexEncodedPublicKey,
+    registrations: Vec<Cip36Details>,
+    associated_voting_key: &Ed25519HexEncodedPublicKey,
 ) -> Vec<Cip36Details> {
     registrations
         .into_par_iter()
@@ -175,7 +180,8 @@ fn check_stake_addr_voting_key_association(
 
 /// Check associated voting key matches registration voting key
 fn cross_reference_key(
-    associated_voting_key: &Ed25519HexEncodedPublicKey, r: &Cip36Details,
+    associated_voting_key: &Ed25519HexEncodedPublicKey,
+    r: &Cip36Details,
 ) -> bool {
     r.vote_pub_key
         .clone()
@@ -185,7 +191,8 @@ fn cross_reference_key(
 
 /// Get all cip36 registrations for a given stake address.
 async fn get_all_registrations_from_stake_pub_key(
-    session: &Arc<CassandraSession>, stake_pub_key: Ed25519HexEncodedPublicKey,
+    session: &Arc<CassandraSession>,
+    stake_pub_key: Ed25519HexEncodedPublicKey,
 ) -> Result<Vec<Cip36Details>, anyhow::Error> {
     let mut registrations_iter = GetRegistrationQuery::execute(session, GetRegistrationParams {
         stake_public_key: stake_pub_key.clone().try_into()?,
@@ -265,7 +272,8 @@ fn sort_latest_registration(mut registrations: Vec<Cip36Details>) -> anyhow::Res
 
 /// Get registration given slot#
 fn get_registration_given_slot_no(
-    registrations: Vec<Cip36Details>, slot_no: SlotNo,
+    registrations: Vec<Cip36Details>,
+    slot_no: SlotNo,
 ) -> anyhow::Result<Cip36Details> {
     registrations
         .into_par_iter()
@@ -275,7 +283,8 @@ fn get_registration_given_slot_no(
 
 /// Get invalid registrations for stake addr after given slot#
 async fn get_invalid_registrations(
-    stake_pub_key: Ed25519HexEncodedPublicKey, slot_no: Option<SlotNo>,
+    stake_pub_key: Ed25519HexEncodedPublicKey,
+    slot_no: Option<SlotNo>,
     session: Arc<CassandraSession>,
 ) -> anyhow::Result<Vec<Cip36Details>> {
     // include any erroneous registrations which occur AFTER the slot# of the last valid
@@ -316,7 +325,9 @@ async fn get_invalid_registrations(
 /// Get registration given a vote key, time specific based on asat param,
 /// or latest registration returned if no asat given.
 pub(crate) async fn get_registration_given_vote_key(
-    vote_key: Ed25519HexEncodedPublicKey, session: Arc<CassandraSession>, asat: Option<SlotNo>,
+    vote_key: Ed25519HexEncodedPublicKey,
+    session: Arc<CassandraSession>,
+    asat: Option<SlotNo>,
 ) -> AllRegistration {
     let voting_key: Vec<u8> = match vote_key.clone().try_into() {
         Ok(vote_key) => vote_key,
@@ -373,7 +384,10 @@ pub(crate) async fn get_registration_given_vote_key(
 
 /// ALL
 /// Get all registrations or constrain if slot# given.
-pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -> AllRegistration {
+pub async fn snapshot(
+    session: Arc<CassandraSession>,
+    slot_no: Option<SlotNo>,
+) -> AllRegistration {
     let valid_invalid_queries = future::join(
         get_all_registrations(session.clone()),
         get_all_invalid_registrations(session.clone()),
@@ -464,7 +478,7 @@ pub async fn snapshot(session: Arc<CassandraSession>, slot_no: Option<SlotNo>) -
 
 /// Get all cip36 registrations.
 pub async fn get_all_registrations(
-    session: Arc<CassandraSession>,
+    session: Arc<CassandraSession>
 ) -> Result<DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>>, anyhow::Error> {
     let mut registrations_iter =
         GetAllRegistrationsQuery::execute(&session, GetAllRegistrationsParams {}).await?;
@@ -559,7 +573,7 @@ pub async fn get_all_registrations(
 
 /// Get all invalid registrations
 async fn get_all_invalid_registrations(
-    session: Arc<CassandraSession>,
+    session: Arc<CassandraSession>
 ) -> Result<DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>>, anyhow::Error> {
     let invalids_map: DashMap<Ed25519HexEncodedPublicKey, Vec<Cip36Details>> = DashMap::new();
 
@@ -613,7 +627,10 @@ async fn get_all_invalid_registrations(
 }
 
 /// Filter out any registrations that occurred after this Slot no
-fn slot_filter(registrations: Vec<Cip36Details>, slot_no: SlotNo) -> Vec<Cip36Details> {
+fn slot_filter(
+    registrations: Vec<Cip36Details>,
+    slot_no: SlotNo,
+) -> Vec<Cip36Details> {
     registrations
         .into_par_iter()
         .filter(|registration| registration.slot_no < slot_no)
@@ -623,7 +640,7 @@ fn slot_filter(registrations: Vec<Cip36Details>, slot_no: SlotNo) -> Vec<Cip36De
 /// Stake addr may have multiple registrations and multiple vote key associations, filter
 /// out latest vote key.
 fn latest_vote_key(
-    mut registrations: Vec<Cip36Details>,
+    mut registrations: Vec<Cip36Details>
 ) -> anyhow::Result<Ed25519HexEncodedPublicKey> {
     registrations.sort_by_key(|registration| Reverse(registration.slot_no));
     for registration in registrations {
@@ -638,7 +655,10 @@ fn latest_vote_key(
 }
 
 /// Filter out any invalid registrations that occurred before this Slot no
-fn invalid_filter(registrations: Vec<Cip36Details>, slot_no: SlotNo) -> Vec<Cip36Details> {
+fn invalid_filter(
+    registrations: Vec<Cip36Details>,
+    slot_no: SlotNo,
+) -> Vec<Cip36Details> {
     registrations
         .into_par_iter()
         .filter(|registration| registration.slot_no > slot_no)

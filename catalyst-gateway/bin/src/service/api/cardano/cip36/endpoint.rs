@@ -20,7 +20,8 @@ use crate::{
 
 /// Process the endpoint operation
 pub(crate) async fn cip36_registrations(
-    lookup: Option<StakeOrVoter>, asat: Option<SlotNo>,
+    lookup: Option<StakeOrVoter>,
+    asat: Option<SlotNo>,
     _page: common::types::generic::query::pagination::Page,
     _limit: common::types::generic::query::pagination::Limit,
 ) -> AllRegistration {

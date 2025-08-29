@@ -44,7 +44,10 @@ pub(crate) mod row {
 
 impl SyncStatusQueryParams {
     /// Create a new instance of [`SyncStatusQueryParams`]
-    pub(crate) fn new(end_slot: Slot, start_slot: Slot) -> Self {
+    pub(crate) fn new(
+        end_slot: Slot,
+        start_slot: Slot,
+    ) -> Self {
         let sync_time = match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
             Ok(now) => now.as_millis(),
             Err(_) => 0, // Shouldn't actually happen.
@@ -80,7 +83,8 @@ impl SyncStatusInsertQuery {
 
     /// Executes a sync status insert query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: SyncStatusQueryParams,
+        session: &CassandraSession,
+        params: SyncStatusQueryParams,
     ) -> anyhow::Result<()> {
         session
             .execute_upsert(PreparedUpsertQuery::SyncStatusInsert, params)
@@ -96,7 +100,10 @@ impl SyncStatusInsertQuery {
 /// Failures of this function to record status, fail safely.
 /// This data is only used to recover sync
 /// There fore this function is both fire and forget, and returns no status.
-pub(crate) fn update_sync_status(end_slot: Slot, start_slot: Slot) {
+pub(crate) fn update_sync_status(
+    end_slot: Slot,
+    start_slot: Slot,
+) {
     task::spawn(async move {
         let Some(session) = CassandraSession::get(true) else {
             warn!(

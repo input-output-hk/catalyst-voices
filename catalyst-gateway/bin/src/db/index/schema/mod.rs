@@ -163,7 +163,10 @@ fn generate_cql_schema_version() -> String {
 }
 
 /// Get the namespace for a particular db configuration
-pub(crate) fn namespace(persistent: bool, network: Network) -> String {
+pub(crate) fn namespace(
+    persistent: bool,
+    network: Network,
+) -> String {
     // Build and set the Keyspace to use.
     let namespace = if persistent { "p" } else { "v" };
     format!(
@@ -175,7 +178,10 @@ pub(crate) fn namespace(persistent: bool, network: Network) -> String {
 /// Create the namespace we will use for this session
 /// Ok to run this if the namespace already exists.
 async fn create_namespace(
-    session: &mut Arc<Session>, cfg: &cassandra_db::EnvVars, persistent: bool, network: Network,
+    session: &mut Arc<Session>,
+    cfg: &cassandra_db::EnvVars,
+    persistent: bool,
+    network: Network,
 ) -> anyhow::Result<()> {
     let keyspace = namespace(persistent, network);
 
@@ -213,7 +219,10 @@ async fn create_namespace(
 
 /// Create the Schema on the connected Cassandra DB
 pub(crate) async fn create_schema(
-    session: &mut Arc<Session>, cfg: &cassandra_db::EnvVars, persistent: bool, network: Network,
+    session: &mut Arc<Session>,
+    cfg: &cassandra_db::EnvVars,
+    persistent: bool,
+    network: Network,
 ) -> anyhow::Result<()> {
     create_namespace(session, cfg, persistent, network)
         .await
