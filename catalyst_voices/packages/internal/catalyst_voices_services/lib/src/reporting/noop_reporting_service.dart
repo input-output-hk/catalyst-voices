@@ -8,8 +8,8 @@ import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-final class NoOpReportingService implements ReportingService {
-  const NoOpReportingService();
+final class NoopReportingService implements ReportingService {
+  const NoopReportingService();
 
   @override
   QueryInterceptor? buildDbInterceptor({required String databaseName}) {

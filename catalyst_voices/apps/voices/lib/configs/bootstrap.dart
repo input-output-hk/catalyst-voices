@@ -14,11 +14,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
 
 const ReportingService _reportingService = _shouldUseSentry
     ? SentryReportingService()
-    : NoOpReportingService();
+    : NoopReportingService();
 
 const _shouldUseSentry = kReleaseMode || kProfileMode;
 
@@ -47,9 +48,9 @@ Future<BootstrapArgs> bootstrap({
   environment ??= AppEnvironment.fromEnv();
   final config = await _getAppConfig(env: environment.type);
 
+  await _reportingService.init(config: config.sentry);
   await _cleanupOldStorages();
   await _initCryptoUtils();
-  await _reportingService.init(config: config.sentry);
 
   await Dependencies.instance.init(
     config: config,
@@ -122,7 +123,7 @@ void registerConfig(AppConfig config) {
 Future<void> registerDependencies({
   AppEnvironment environment = const AppEnvironment.dev(),
   LoggingService? loggingService,
-  ReportingService reportingService = const NoOpReportingService(),
+  ReportingService reportingService = const NoopReportingService(),
 }) async {
   await Dependencies.instance.init(
     config: AppConfig.env(environment.type),
