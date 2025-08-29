@@ -21,7 +21,7 @@ enum CatalystFormFactor {
     return isMobileFormFactor ? CatalystFormFactor.mobile : CatalystFormFactor.desktop;
   }
 
-  static bool get isDesktop => current == CatalystFormFactor.desktop;
+  bool get isDesktop => this == CatalystFormFactor.desktop;
 
-  static bool get isMobile => current == CatalystFormFactor.mobile;
+  bool get isMobile => this == CatalystFormFactor.mobile;
 }

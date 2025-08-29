@@ -23,15 +23,15 @@ enum CatalystOperatingSystem {
     };
   }
 
-  static bool get isAndroid => current == CatalystOperatingSystem.android;
+  bool get isAndroid => this == CatalystOperatingSystem.android;
 
-  static bool get isFuchsia => current == CatalystOperatingSystem.fuchsia;
+  bool get isFuchsia => this == CatalystOperatingSystem.fuchsia;
 
-  static bool get isIOS => current == CatalystOperatingSystem.iOS;
+  bool get isIOS => this == CatalystOperatingSystem.iOS;
 
-  static bool get isLinux => current == CatalystOperatingSystem.linux;
+  bool get isLinux => this == CatalystOperatingSystem.linux;
 
-  static bool get isMacOS => current == CatalystOperatingSystem.macOS;
+  bool get isMacOS => this == CatalystOperatingSystem.macOS;
 
-  static bool get isWindows => current == CatalystOperatingSystem.windows;
+  bool get isWindows => this == CatalystOperatingSystem.windows;
 }
