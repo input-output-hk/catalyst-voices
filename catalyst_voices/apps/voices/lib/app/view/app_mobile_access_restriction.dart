@@ -40,13 +40,8 @@ class AppMobileAccessRestriction extends StatelessWidget {
         final currentPath = provider.value.uri.path;
         final isProposalRoute = currentPath.contains('/proposal/');
 
-        if (isProposalRoute) {
-          // proposal route is unrestricted
-          return child;
-        }
-
         return FormFactorBuilder<bool>(
-          mobile: CatalystPlatform.isWeb,
+          mobile: CatalystPlatform.isWeb && !isProposalRoute,
           desktop: false,
           builder: (context, isRestricted) => isRestricted ? const _MobileWebPlaceholder() : child,
         );
