@@ -124,7 +124,7 @@ impl Type for AsAt {
     }
 
     fn raw_element_iter<'a>(
-        &'a self,
+        &'a self
     ) -> Box<dyn Iterator<Item = &'a Self::RawElementValueType> + 'a> {
         Box::new(self.as_raw_value().into_iter())
     }
@@ -164,7 +164,10 @@ impl From<AsAt> for SlotNo {
 }
 
 impl Display for AsAt {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter<'_>,
+    ) -> fmt::Result {
         write!(f, "{}:{}", self.0 .0, self.0 .1)
     }
 }

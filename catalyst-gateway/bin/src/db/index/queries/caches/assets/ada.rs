@@ -45,7 +45,10 @@ impl AssetsAdaCache {
     }
 
     /// Get an entry from the cache
-    pub(crate) fn get(&self, key: &DbStakeAddress) -> Option<Arc<Vec<GetTxoByStakeAddressQuery>>> {
+    pub(crate) fn get(
+        &self,
+        key: &DbStakeAddress,
+    ) -> Option<Arc<Vec<GetTxoByStakeAddressQuery>>> {
         // Exit if cache is not enabled to avoid metric updates.
         if !self.inner.is_enabled() {
             return None;
@@ -60,7 +63,11 @@ impl AssetsAdaCache {
     }
 
     /// Get an entry from the cache
-    pub(crate) fn insert(&self, key: DbStakeAddress, value: Arc<Vec<GetTxoByStakeAddressQuery>>) {
+    pub(crate) fn insert(
+        &self,
+        key: DbStakeAddress,
+        value: Arc<Vec<GetTxoByStakeAddressQuery>>,
+    ) {
         self.inner.insert(key, value);
     }
 
@@ -80,7 +87,10 @@ impl AssetsAdaCache {
     }
 
     /// Update spent TXO Assets in Cache.
-    pub(crate) fn update(&self, params: Vec<UpdateTxoSpentQueryParams>) {
+    pub(crate) fn update(
+        &self,
+        params: Vec<UpdateTxoSpentQueryParams>,
+    ) {
         // Exit if cache is not enabled to avoid processing params.
         if !self.inner.is_enabled() {
             return;

@@ -1,5 +1,7 @@
 //! Metrics related to endpoint analytics.
 
+#![allow(clippy::unwrap_used)]
+
 use std::sync::LazyLock;
 
 use prometheus::{

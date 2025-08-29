@@ -50,7 +50,8 @@ impl TxoInsertQuery {
 
     /// Prepare Batch of Insert TXI Index Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+        session: &Arc<Session>,
+        cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch, SizedBatch)> {
         let txo_staked_insert_batch = insert_txo::Params::prepare_batch(session, cfg).await;
         let txo_unstaked_insert_batch =
@@ -76,8 +77,10 @@ impl TxoInsertQuery {
     /// stake address, and still have a primary key on the table. Otherwise return the
     /// header and the stake key hash as a vec of 29 bytes.
     fn extract_stake_address(
-        network: Network, txo: &cardano_chain_follower::pallas_traverse::MultiEraOutput<'_>,
-        slot_no: Slot, txn_id: &str,
+        network: Network,
+        txo: &cardano_chain_follower::pallas_traverse::MultiEraOutput<'_>,
+        slot_no: Slot,
+        txn_id: &str,
     ) -> Option<(Option<StakeAddress>, String)> {
         let stake_address = match txo.address() {
             Ok(address) => {
@@ -136,8 +139,12 @@ impl TxoInsertQuery {
 
     /// Index the transaction Inputs.
     pub(crate) fn index(
-        &mut self, network: Network, txn: &cardano_chain_follower::pallas_traverse::MultiEraTx<'_>,
-        slot_no: Slot, txn_hash: TransactionId, index: TxnIndex,
+        &mut self,
+        network: Network,
+        txn: &cardano_chain_follower::pallas_traverse::MultiEraTx<'_>,
+        slot_no: Slot,
+        txn_hash: TransactionId,
+        index: TxnIndex,
     ) {
         let txn_id = txn_hash.to_string();
 
@@ -209,7 +216,10 @@ impl TxoInsertQuery {
     /// Index the transaction Inputs.
     ///
     /// Consumes `self` and returns a vector of futures.
-    pub(crate) fn execute(self, session: &Arc<CassandraSession>) -> FallibleQueryTasks {
+    pub(crate) fn execute(
+        self,
+        session: &Arc<CassandraSession>,
+    ) -> FallibleQueryTasks {
         let mut query_handles: FallibleQueryTasks = Vec::new();
 
         if !self.staked_txo.is_empty() {

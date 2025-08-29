@@ -22,7 +22,10 @@ pub(crate) struct SchemaVersionValidation;
 impl<E: Endpoint> Middleware<E> for SchemaVersionValidation {
     type Output = SchemaVersionValidationImpl<E>;
 
-    fn transform(&self, ep: E) -> Self::Output {
+    fn transform(
+        &self,
+        ep: E,
+    ) -> Self::Output {
         SchemaVersionValidationImpl { ep }
     }
 }
@@ -36,7 +39,10 @@ pub(crate) struct SchemaVersionValidationImpl<E> {
 impl<E: Endpoint> Endpoint for SchemaVersionValidationImpl<E> {
     type Output = E::Output;
 
-    async fn call(&self, req: Request) -> Result<Self::Output> {
+    async fn call(
+        &self,
+        req: Request,
+    ) -> Result<Self::Output> {
         // Check if the inner schema version status is set to `Mismatch`,
         // if so, return the `StatusCode::SERVICE_UNAVAILABLE` code.
         if let Err(e) = EventDB::schema_version_check().await {

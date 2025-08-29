@@ -162,6 +162,8 @@ pub(crate) fn inc_invalid_rbac_reg_count() {
 /// All the related RBAC Registration Chain Caching reporting metrics to the Prometheus
 /// service are inside this module.
 pub(crate) mod reporter {
+    #![allow(clippy::unwrap_used)]
+
     use std::sync::LazyLock;
 
     use prometheus::{

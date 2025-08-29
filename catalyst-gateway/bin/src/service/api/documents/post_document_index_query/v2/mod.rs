@@ -52,7 +52,9 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # POST `/v2/document/index`
 pub(crate) async fn endpoint(
-    filter: DocumentIndexQueryFilterV2, page: Option<Page>, limit: Option<Limit>,
+    filter: DocumentIndexQueryFilterV2,
+    page: Option<Page>,
+    limit: Option<Limit>,
 ) -> AllResponses {
     let query_limits = QueryLimits::new(limit, page);
     let conditions = match filter.try_into() {
@@ -103,7 +105,8 @@ pub(crate) async fn endpoint(
 
 /// Fetch documents from the event db
 async fn fetch_docs(
-    conditions: &DocsQueryFilter, query_limits: &QueryLimits,
+    conditions: &DocsQueryFilter,
+    query_limits: &QueryLimits,
 ) -> anyhow::Result<(Vec<IndexedDocumentDocumentedV2>, u32)> {
     let docs_stream = SignedDocBody::retrieve(conditions, query_limits).await?;
 

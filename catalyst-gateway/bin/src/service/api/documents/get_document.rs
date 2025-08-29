@@ -27,7 +27,10 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/document`
-pub(crate) async fn endpoint(document_id: uuid::Uuid, version: Option<uuid::Uuid>) -> AllResponses {
+pub(crate) async fn endpoint(
+    document_id: uuid::Uuid,
+    version: Option<uuid::Uuid>,
+) -> AllResponses {
     match common::get_document_cbor_bytes(&document_id, version.as_ref()).await {
         Ok(doc_cbor_bytes) => Responses::Ok(Cbor(doc_cbor_bytes)).into(),
         Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),

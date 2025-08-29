@@ -52,7 +52,7 @@ impl Type for Hash256 {
     }
 
     fn raw_element_iter<'a>(
-        &'a self,
+        &'a self
     ) -> Box<dyn Iterator<Item = &'a Self::RawElementValueType> + 'a> {
         Box::new(self.as_raw_value().into_iter())
     }
@@ -121,7 +121,10 @@ impl ToJSON for Hash256 {
 }
 
 impl fmt::Display for Hash256 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter<'_>,
+    ) -> fmt::Result {
         as_hex_string(&self.0).fmt(f)
     }
 }
@@ -168,7 +171,7 @@ impl Type for Hash128 {
     }
 
     fn raw_element_iter<'a>(
-        &'a self,
+        &'a self
     ) -> Box<dyn Iterator<Item = &'a Self::RawElementValueType> + 'a> {
         Box::new(self.as_raw_value().into_iter())
     }
@@ -236,7 +239,10 @@ impl ToJSON for Hash128 {
 }
 
 impl fmt::Display for Hash128 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter<'_>,
+    ) -> fmt::Result {
         as_hex_string(&self.0).fmt(f)
     }
 }

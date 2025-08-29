@@ -61,7 +61,8 @@ impl GetAllRegistrationsQuery {
 
     /// Executes get all registrations for snapshot
     pub(crate) async fn execute(
-        session: &CassandraSession, params: GetAllRegistrationsParams,
+        session: &CassandraSession,
+        params: GetAllRegistrationsParams,
     ) -> anyhow::Result<TypedRowStream<GetAllRegistrationsQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::GetAllRegistrations, params)

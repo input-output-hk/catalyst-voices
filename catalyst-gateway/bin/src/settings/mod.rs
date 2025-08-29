@@ -30,7 +30,7 @@ pub(crate) mod signed_doc;
 mod str_env_var;
 
 /// Default address to start service on, '0.0.0.0:3030'.
-const ADDRESS_DEFAULT: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), 3030);
+const ADDRESS_DEFAULT: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::UNSPECIFIED), 3030);
 
 /// Default Github repo owner
 const GITHUB_REPO_OWNER_DEFAULT: &str = "input-output-hk";

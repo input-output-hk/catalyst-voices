@@ -25,7 +25,9 @@ impl From<DbUuidV4> for UuidV4 {
 
 impl SerializeValue for DbUuidV4 {
     fn serialize<'b>(
-        &self, typ: &ColumnType, writer: CellWriter<'b>,
+        &self,
+        typ: &ColumnType,
+        writer: CellWriter<'b>,
     ) -> Result<WrittenCellProof<'b>, SerializationError> {
         self.0.uuid().serialize(typ, writer)
     }
@@ -37,7 +39,8 @@ impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbUuidV4 {
     }
 
     fn deserialize(
-        typ: &'metadata ColumnType<'metadata>, v: Option<FrameSlice<'frame>>,
+        typ: &'metadata ColumnType<'metadata>,
+        v: Option<FrameSlice<'frame>>,
     ) -> Result<Self, DeserializationError> {
         let value = <Uuid>::deserialize(typ, v)?;
         let value = UuidV4::try_from(value).map_err(DeserializationError::new)?;

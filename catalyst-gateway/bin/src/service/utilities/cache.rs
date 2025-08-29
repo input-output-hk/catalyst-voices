@@ -17,14 +17,21 @@ where
     V: Clone + Send + Sync + 'static,
 {
     /// Function to determine cache entry weighted size.
-    fn weigher_fn(k: &K, v: &V) -> u32 {
+    fn weigher_fn(
+        k: &K,
+        v: &V,
+    ) -> u32 {
         let k_size = GetSize::get_size(&k);
         let v_size = GetSize::get_size(&v);
         k_size.saturating_add(v_size).try_into().unwrap_or(u32::MAX)
     }
 
     /// Constructs a new `Cache`.
-    pub(crate) fn new(name: &str, eviction_policy: EvictionPolicy, max_capacity: u64) -> Self {
+    pub(crate) fn new(
+        name: &str,
+        eviction_policy: EvictionPolicy,
+        max_capacity: u64,
+    ) -> Self {
         let inner = if max_capacity < 1 {
             None
         } else {
@@ -39,12 +46,19 @@ where
     }
 
     /// Get entry from the cache by key.
-    pub(crate) fn get(&self, key: &K) -> Option<V> {
+    pub(crate) fn get(
+        &self,
+        key: &K,
+    ) -> Option<V> {
         self.inner.as_ref().and_then(|cache| cache.get(key))
     }
 
     /// Insert entry into the cache.
-    pub(crate) fn insert(&self, key: K, value: V) {
+    pub(crate) fn insert(
+        &self,
+        key: K,
+        value: V,
+    ) {
         self.inner
             .as_ref()
             .inspect(|cache| cache.insert(key, value));

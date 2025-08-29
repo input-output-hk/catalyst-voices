@@ -37,7 +37,10 @@ pub(crate) enum RetryAfterOption {
 }
 
 impl Display for RetryAfterHeader {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
         match self {
             RetryAfterHeader::Date(date_time) => {
                 let http_date = date_time.format("%a, %d %b %Y %T GMT").to_string();
@@ -90,7 +93,7 @@ See: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
     }
 
     fn raw_element_iter<'a>(
-        &'a self,
+        &'a self
     ) -> Box<dyn Iterator<Item = &'a Self::RawElementValueType> + 'a> {
         Box::new(self.as_raw_value().into_iter())
     }

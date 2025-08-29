@@ -43,7 +43,9 @@ pub(crate) struct FullSignedDoc {
 impl FullSignedDoc {
     /// Creates a  `FullSignedDoc` instance.
     pub(crate) fn new(
-        body: SignedDocBody, payload: Option<serde_json::Value>, raw: Vec<u8>,
+        body: SignedDocBody,
+        payload: Option<serde_json::Value>,
+        raw: Vec<u8>,
     ) -> Self {
         Self { body, payload, raw }
     }
@@ -124,7 +126,8 @@ impl FullSignedDoc {
     ///  - `id` is a UUID v7
     ///  - `ver` is a UUID v7
     pub(crate) async fn retrieve(
-        id: &uuid::Uuid, ver: Option<&uuid::Uuid>,
+        id: &uuid::Uuid,
+        ver: Option<&uuid::Uuid>,
     ) -> anyhow::Result<Self> {
         let query_template = get_template(&SELECT_SIGNED_DOCS_TEMPLATE)?;
         let query = query_template.render(serde_json::json!({
@@ -139,7 +142,8 @@ impl FullSignedDoc {
     /// Loads a async stream of `FullSignedDoc` from the event db based on the given
     /// `conditions`.
     pub(crate) async fn retrieve_conditions(
-        conditions: &DocsQueryFilter, query_limits: &QueryLimits,
+        conditions: &DocsQueryFilter,
+        query_limits: &QueryLimits,
     ) -> anyhow::Result<impl Stream<Item = anyhow::Result<Self>>> {
         let query_template = get_template(&FILTERED_SELECT_FULL_SIGNED_DOCS_TEMPLATE)?;
         let query = query_template.render(serde_json::json!({
@@ -174,7 +178,9 @@ impl FullSignedDoc {
 
     /// Creates a  `FullSignedDoc` from postgresql row object.
     fn from_row(
-        id: &uuid::Uuid, ver: Option<&uuid::Uuid>, row: &tokio_postgres::Row,
+        id: &uuid::Uuid,
+        ver: Option<&uuid::Uuid>,
+        row: &tokio_postgres::Row,
     ) -> anyhow::Result<Self> {
         let ver = if let Some(ver) = ver {
             *ver

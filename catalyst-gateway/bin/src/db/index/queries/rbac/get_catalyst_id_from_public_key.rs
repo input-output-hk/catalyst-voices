@@ -56,7 +56,8 @@ impl Query {
 
     /// Executes the query and returns a result for the given public key.
     pub(crate) async fn get(
-        session: &CassandraSession, public_key: VerifyingKey,
+        session: &CassandraSession,
+        public_key: VerifyingKey,
     ) -> Result<Option<CatalystId>> {
         let cache = session.caches().rbac_public_key();
 

@@ -58,7 +58,8 @@ impl Query {
     ///
     /// Use `Query::latest` if you only need the latest value.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: QueryParams,
+        session: &CassandraSession,
+        params: QueryParams,
     ) -> Result<TypedRowStream<Query>> {
         session
             .execute_iter(PreparedSelectQuery::CatalystIdByStakeAddress, params)
@@ -69,7 +70,8 @@ impl Query {
 
     /// Returns the latest Catalyst ID for the given stake address.
     pub(crate) async fn latest(
-        session: &CassandraSession, stake_address: &StakeAddress,
+        session: &CassandraSession,
+        stake_address: &StakeAddress,
     ) -> Result<Option<CatalystId>> {
         let cache = session.caches().rbac_stake_address();
 
@@ -120,7 +122,9 @@ impl Query {
 
 /// Adds the given value to the cache.
 pub fn cache_stake_address(
-    is_persistent: bool, stake_address: StakeAddress, catalyst_id: CatalystId,
+    is_persistent: bool,
+    stake_address: StakeAddress,
+    catalyst_id: CatalystId,
 ) {
     CassandraSession::get(is_persistent).inspect(|session| {
         session

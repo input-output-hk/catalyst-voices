@@ -85,7 +85,7 @@ impl Type for Page {
     }
 
     fn raw_element_iter<'a>(
-        &'a self,
+        &'a self
     ) -> Box<dyn Iterator<Item = &'a Self::RawElementValueType> + 'a> {
         Box::new(self.as_raw_value().into_iter())
     }
@@ -225,7 +225,7 @@ impl Type for Limit {
     }
 
     fn raw_element_iter<'a>(
-        &'a self,
+        &'a self
     ) -> Box<dyn Iterator<Item = &'a Self::RawElementValueType> + 'a> {
         Box::new(self.as_raw_value().into_iter())
     }
@@ -350,7 +350,7 @@ impl Type for Remaining {
     }
 
     fn raw_element_iter<'a>(
-        &'a self,
+        &'a self
     ) -> Box<dyn Iterator<Item = &'a Self::RawElementValueType> + 'a> {
         Box::new(self.as_raw_value().into_iter())
     }
@@ -395,7 +395,12 @@ impl TryFrom<u32> for Remaining {
 impl Remaining {
     /// Calculate remaining from total, page, limit, and the number of items returned.
     /// remaining = total - (page * limit) - items
-    pub(crate) fn calculate(page: u32, limit: u32, total: u32, items: u32) -> Self {
+    pub(crate) fn calculate(
+        page: u32,
+        limit: u32,
+        total: u32,
+        items: u32,
+    ) -> Self {
         let remaining: u32 = total
             .saturating_sub(page.saturating_mul(limit))
             .saturating_sub(items);

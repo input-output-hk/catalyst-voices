@@ -40,7 +40,8 @@ pub(crate) struct UpdateTxoSpentQuery;
 impl UpdateTxoSpentQuery {
     /// Prepare a batch of update TXO spent queries.
     pub(crate) async fn prepare_batch(
-        session: Arc<Session>, cfg: &cassandra_db::EnvVars,
+        session: Arc<Session>,
+        cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),
@@ -57,7 +58,8 @@ impl UpdateTxoSpentQuery {
 
     /// Executes a update txo spent query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: Vec<UpdateTxoSpentQueryParams>,
+        session: &CassandraSession,
+        params: Vec<UpdateTxoSpentQueryParams>,
     ) -> FallibleQueryResults {
         let results = session
             .execute_batch(PreparedQuery::TxoSpentUpdateQuery, params.clone())

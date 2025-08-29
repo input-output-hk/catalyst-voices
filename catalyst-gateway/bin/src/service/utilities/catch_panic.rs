@@ -63,7 +63,10 @@ impl PanicHandler for ServicePanicHandler {
 
     /// Handle a panic.
     /// Log the panic and respond with a 500 with appropriate data.
-    fn get_response(&self, err: Box<dyn Any + Send + 'static>) -> Self::Response {
+    fn get_response(
+        &self,
+        err: Box<dyn Any + Send + 'static>,
+    ) -> Self::Response {
         // Increment the counter used for liveness checks.
         inc_live_counter();
 

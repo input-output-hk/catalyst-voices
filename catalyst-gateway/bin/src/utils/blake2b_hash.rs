@@ -11,7 +11,10 @@ use blake2b_simd::Params;
 ///
 /// # Returns
 /// A UUID string generated from the `BLAKE2b` hash of the concatenated data with the key.
-pub(crate) fn generate_uuid_string_from_data(key: &str, data: &[String]) -> String {
+pub(crate) fn generate_uuid_string_from_data(
+    key: &str,
+    data: &[String],
+) -> String {
     // Where we will actually store the bytes we derive the UUID from.
     let mut bytes: uuid::Bytes = uuid::Bytes::default();
 

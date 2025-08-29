@@ -90,7 +90,10 @@ impl Bip32Ed25519XPrivateKey {
     /// Returns an error if the derivation path is invalid.
     // &str is not supported in flutter_rust_bridge
     #[allow(clippy::needless_pass_by_value)]
-    pub async fn derive_xprv(&self, path: String) -> anyhow::Result<Self> {
+    pub async fn derive_xprv(
+        &self,
+        path: String,
+    ) -> anyhow::Result<Self> {
         let xprv = XPrv::from_bytes_verified(self.0)?;
 
         let derive_xprv = spawn_blocking_with(
@@ -136,7 +139,10 @@ impl Bip32Ed25519XPrivateKey {
     /// # Errors
     ///
     /// Returns an error if the extended private key is invalid.
-    pub async fn sign_data(&self, data: Vec<u8>) -> anyhow::Result<Bip32Ed25519Signature> {
+    pub async fn sign_data(
+        &self,
+        data: Vec<u8>,
+    ) -> anyhow::Result<Bip32Ed25519Signature> {
         let xprv = XPrv::from_bytes_verified(self.0)?;
 
         let signature = spawn_blocking_with(
@@ -163,7 +169,9 @@ impl Bip32Ed25519XPrivateKey {
     ///
     /// Returns an error if the extended private key or signature is invalid.
     pub async fn verify_signature(
-        &self, data: Vec<u8>, signature: &Bip32Ed25519Signature,
+        &self,
+        data: Vec<u8>,
+        signature: &Bip32Ed25519Signature,
     ) -> anyhow::Result<bool> {
         let xprv = XPrv::from_bytes_verified(self.0)?;
         let verified_sig = Signature::from_slice(&signature.0)
@@ -260,7 +268,9 @@ impl Bip32Ed25519XPublicKey {
     ///
     /// Returns an error if the extended public key or signature is invalid.
     pub async fn verify_signature(
-        &self, data: Vec<u8>, signature: &Bip32Ed25519Signature,
+        &self,
+        data: Vec<u8>,
+        signature: &Bip32Ed25519Signature,
     ) -> anyhow::Result<bool> {
         let xpub = XPub::from_bytes(self.0);
         let verified_sig = Signature::from_slice(&signature.0)
@@ -319,7 +329,8 @@ impl Bip32Ed25519Signature {
 ///
 /// Returns an error if the mnemonic is invalid.
 pub async fn mnemonic_to_xprv(
-    mnemonic: String, passphrase: Option<String>,
+    mnemonic: String,
+    passphrase: Option<String>,
 ) -> anyhow::Result<Bip32Ed25519XPrivateKey> {
     let xprv = spawn_blocking_with(
         move || mnemonic_to_xprv_helper(mnemonic, passphrase),
@@ -347,7 +358,10 @@ pub async fn mnemonic_to_xprv(
 ///     - kR where S\[32:64\]
 ///     - Result in (kL, kR) as the root extended private key and c := S\[64:96\] as the
 ///       root chain code.
-fn mnemonic_to_xprv_helper(mnemonic: String, passphrase: Option<String>) -> anyhow::Result<XPrv> {
+fn mnemonic_to_xprv_helper(
+    mnemonic: String,
+    passphrase: Option<String>,
+) -> anyhow::Result<XPrv> {
     /// 4096 is the number of iterations for PBKDF2.
     const ITER: u32 = 4096;
 
@@ -370,7 +384,10 @@ fn mnemonic_to_xprv_helper(mnemonic: String, passphrase: Option<String>) -> anyh
 }
 
 /// Helper function for `derive_xprv`.
-fn derive_xprv_helper(xprv: XPrv, path: &str) -> anyhow::Result<XPrv> {
+fn derive_xprv_helper(
+    xprv: XPrv,
+    path: &str,
+) -> anyhow::Result<XPrv> {
     let Ok(derivation_path) = path.parse::<DerivationPath>() else {
         return Err(anyhow::anyhow!("Invalid derivation path: {path}"));
     };
@@ -395,20 +412,27 @@ fn xpublic_key_helper(xprv: &XPrv) -> XPub {
 }
 
 /// Helper function for `sign_data`.
-fn sign_data_helper(xprv: &XPrv, data: &[u8]) -> Signature<Bip32Ed25519Signature> {
+fn sign_data_helper(
+    xprv: &XPrv,
+    data: &[u8],
+) -> Signature<Bip32Ed25519Signature> {
     xprv.sign(data)
 }
 
 /// Helper function for `Bip32Ed25519XPrivateKey` `verify_signature`.
 fn verify_signature_xprv_helper(
-    xprv: &XPrv, data: &[u8], signature: &Signature<Bip32Ed25519Signature>,
+    xprv: &XPrv,
+    data: &[u8],
+    signature: &Signature<Bip32Ed25519Signature>,
 ) -> bool {
     xprv.verify(data, signature)
 }
 
 /// Helper function for `Bip32Ed25519XPublicKey` `verify_signature`.
 fn verify_signature_xpub_helper(
-    xpub: &XPub, data: &[u8], signature: &Signature<Bip32Ed25519Signature>,
+    xpub: &XPub,
+    data: &[u8],
+    signature: &Signature<Bip32Ed25519Signature>,
 ) -> bool {
     xpub.verify(data, signature)
 }

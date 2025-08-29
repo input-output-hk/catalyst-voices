@@ -1,10 +1,10 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.4.4 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.5.12 AS rust-ci
 IMPORT ../ AS repo-ci
 IMPORT github.com/input-output-hk/catalyst-voices/catalyst-gateway:main AS cat-gateway-main
 
-#cspell: words rustfmt toolsets USERARCH stdcfgs openapitools
+#cspell: words rustfmt toolsets USERARCH stdcfgs openapitools trixie
 
 # COPY_SRC:
 #   Copies the source code into the builder.
@@ -97,7 +97,7 @@ all-hosts-build:
 
 # package : Create a deployable container for catalyst-gateway
 package:
-    FROM debian:12.7-slim
+    FROM debian:trixie-slim
 
     WORKDIR /app
     RUN apt-get update && apt-get install -y curl python3 python3-pip

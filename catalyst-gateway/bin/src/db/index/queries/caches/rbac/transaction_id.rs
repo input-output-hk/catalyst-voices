@@ -29,12 +29,19 @@ impl TransactionIdCache {
     }
 
     /// Get an entry from the cache
-    pub(crate) fn get(&self, key: &TransactionId) -> Option<CatalystId> {
+    pub(crate) fn get(
+        &self,
+        key: &TransactionId,
+    ) -> Option<CatalystId> {
         self.inner.get(key)
     }
 
     /// Get an entry from the cache
-    pub(crate) fn insert(&self, key: TransactionId, value: CatalystId) {
+    pub(crate) fn insert(
+        &self,
+        key: TransactionId,
+        value: CatalystId,
+    ) {
         self.inner.insert(key, value);
     }
 

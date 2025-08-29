@@ -35,7 +35,8 @@ use crate::{
 
 /// Get RBAC registration endpoint.
 pub(crate) async fn endpoint(
-    lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>,
+    lookup: Option<CatIdOrStake>,
+    token: Option<CatalystRBACTokenV1>,
 ) -> AllResponses {
     if lookup.is_none() && token.is_none() {
         return Responses::UnprocessableContent(Json(RbacUnprocessableContent::new(
@@ -59,7 +60,8 @@ pub(crate) async fn endpoint(
 
 /// Returns a `ChainInfo` object using either a Catalyst ID or a stake address.
 async fn chain_info(
-    lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>,
+    lookup: Option<CatIdOrStake>,
+    token: Option<CatalystRBACTokenV1>,
 ) -> anyhow::Result<Option<ChainInfo>> {
     match lookup {
         Some(CatIdOrStake::CatId(id)) => latest_rbac_chain(&id.into()).await,

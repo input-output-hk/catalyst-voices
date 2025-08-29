@@ -29,12 +29,19 @@ impl PublicKeyCache {
     }
 
     /// Get an entry from the cache
-    pub(crate) fn get(&self, key: &VerifyingKey) -> Option<CatalystId> {
+    pub(crate) fn get(
+        &self,
+        key: &VerifyingKey,
+    ) -> Option<CatalystId> {
         self.inner.get(key)
     }
 
     /// Get an entry from the cache
-    pub(crate) fn insert(&self, key: VerifyingKey, value: CatalystId) {
+    pub(crate) fn insert(
+        &self,
+        key: VerifyingKey,
+        value: CatalystId,
+    ) {
         self.inner.insert(key, value);
     }
 

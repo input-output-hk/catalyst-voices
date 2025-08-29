@@ -37,7 +37,10 @@ impl Config {
     ///
     /// - A `BasicOutput` of the validation result, which can be valid or invalid.
     /// - Error if the query fails.
-    pub(crate) async fn set(id: ConfigKey, value: Value) -> anyhow::Result<()> {
+    pub(crate) async fn set(
+        id: ConfigKey,
+        value: Value,
+    ) -> anyhow::Result<()> {
         let (id1, id2, id3) = id.to_id();
         EventDB::query(UPSERT_CONFIG, &[&id1, &id2, &id3, &value]).await?;
         Ok(())

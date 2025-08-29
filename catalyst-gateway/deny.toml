@@ -23,7 +23,7 @@ multiple-versions = "warn"
 wildcards = 'deny'
 deny = [
     # Scylla DB Drivers currently require OpenSSL.  Its unavoidable.
-    # However, there is movement to enable support for Rustls.
+    # However, there is movement to enable support for Rustls. 
     # So, for now, allow open-ssl but it needs to be disabled as soon as Scylla DB enables Rustls.
     #{ crate = "openssl", use-instead = "rustls" },
     #{ crate = "openssl-sys", use-instead = "rustls" },
@@ -58,6 +58,8 @@ allow-git = [
     "https://github.com/txpipe/kes",
     "https://github.com/txpipe/curve25519-dalek",
     "https://github.com/input-output-hk/mithril",
+    # Maintained fork of an archived crates-io version.
+    "https://github.com/dariusc93/rust-ipfs",
 ]
 
 [licenses]
@@ -81,6 +83,7 @@ allow = [
     "Zlib",
     "MIT-0",
     "CDLA-Permissive-2.0",
+    "OpenSSL",
 ]
 exceptions = [
     #{ allow = ["Zlib"], crate = "tinyvec" },
@@ -102,7 +105,6 @@ license-files = [{ path = "ext/hdf5/COPYING", hash = 0xf13e3591 }]
 crate = "ring"
 expression = "MIT"
 license-files = [{ path = "LICENSE", hash = 0xbd0eed23 }]
-
 
 # SPDX considers OpenSSL to encompass both the OpenSSL and SSLeay licenses
 # https://spdx.org/licenses/OpenSSL.html

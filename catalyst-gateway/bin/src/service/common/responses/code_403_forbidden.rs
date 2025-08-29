@@ -27,7 +27,10 @@ pub(crate) struct Forbidden {
 
 impl Forbidden {
     /// Create a new Server Error Response Payload.
-    pub(crate) fn new(msg: Option<String>, roles: Option<Vec<String>>) -> Self {
+    pub(crate) fn new(
+        msg: Option<String>,
+        roles: Option<Vec<String>>,
+    ) -> Self {
         let msg = msg.unwrap_or(
             "Your request was not successful because your authentication credentials do not have the required roles for the requested resource.".to_string(),
         );

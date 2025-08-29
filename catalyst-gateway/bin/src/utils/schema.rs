@@ -31,7 +31,10 @@ pub(crate) fn extract_json_schema_for(schema_name: &str) -> Value {
 }
 
 /// Function to resolve a `$ref` in the JSON schema
-pub(crate) fn update_refs(example: &Value, base: &Value) -> Value {
+pub(crate) fn update_refs(
+    example: &Value,
+    base: &Value,
+) -> Value {
     /// Return the new JSON with modified $refs.
     /// and the original values of the $refs
     fn traverse_and_update(example: &Value) -> (Value, Vec<String>) {
@@ -111,7 +114,10 @@ pub(crate) fn update_refs(example: &Value, base: &Value) -> Value {
 }
 
 /// Merge 2 JSON objects.
-fn merge_json(json1: &Value, json2: &Value) -> Value {
+fn merge_json(
+    json1: &Value,
+    json2: &Value,
+) -> Value {
     let mut merged = json1.as_object().cloned().unwrap_or_default();
 
     if let Some(obj2) = json2.as_object() {
@@ -125,7 +131,10 @@ fn merge_json(json1: &Value, json2: &Value) -> Value {
 }
 
 /// Get the nested value from a JSON object.
-fn get_nested_value(base: &Value, path: &[String]) -> Option<Value> {
+fn get_nested_value(
+    base: &Value,
+    path: &[String],
+) -> Option<Value> {
     let mut current_value = base;
 
     for segment in path {

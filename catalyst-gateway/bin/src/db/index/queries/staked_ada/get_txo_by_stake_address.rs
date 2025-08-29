@@ -131,7 +131,8 @@ impl GetTxoByStakeAddressQuery {
 
     /// Executes a get txo by stake address query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: GetTxoByStakeAddressQueryParams,
+        session: &CassandraSession,
+        params: GetTxoByStakeAddressQueryParams,
     ) -> anyhow::Result<Arc<Vec<GetTxoByStakeAddressQuery>>> {
         if session.is_persistent() {
             if let Some(rows) = session.caches().assets_ada().get(&params.stake_address) {

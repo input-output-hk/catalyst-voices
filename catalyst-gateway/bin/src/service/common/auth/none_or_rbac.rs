@@ -39,7 +39,9 @@ impl<'a> ApiExtractor<'a> for NoneOrRBAC {
     }
 
     async fn from_request(
-        req: &'a Request, body: &mut RequestBody, param_opts: ExtractParamOptions<Self::ParamType>,
+        req: &'a Request,
+        body: &mut RequestBody,
+        param_opts: ExtractParamOptions<Self::ParamType>,
     ) -> poem::Result<Self> {
         if req.headers().typed_get::<Authorization<Bearer>>().is_some() {
             let auth = CatalystRBACSecurityScheme::from_request(req, body, param_opts).await?;

@@ -25,7 +25,9 @@ impl From<DbCatalystId> for CatalystId {
 
 impl SerializeValue for DbCatalystId {
     fn serialize<'b>(
-        &self, typ: &ColumnType, writer: CellWriter<'b>,
+        &self,
+        typ: &ColumnType,
+        writer: CellWriter<'b>,
     ) -> Result<WrittenCellProof<'b>, SerializationError> {
         self.0.as_short_id().to_string().serialize(typ, writer)
     }
@@ -37,7 +39,8 @@ impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbCatalystId {
     }
 
     fn deserialize(
-        typ: &'metadata ColumnType<'metadata>, v: Option<FrameSlice<'frame>>,
+        typ: &'metadata ColumnType<'metadata>,
+        v: Option<FrameSlice<'frame>>,
     ) -> Result<Self, DeserializationError> {
         let id = String::deserialize(typ, v)?;
         let id: CatalystId = id.parse().map_err(DeserializationError::new)?;

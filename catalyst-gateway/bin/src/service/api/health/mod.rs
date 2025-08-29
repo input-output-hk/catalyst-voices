@@ -31,7 +31,10 @@ impl HealthApi {
         operation_id = "healthStarted"
     )]
     #[allow(clippy::unused_async)]
-    async fn started_get(&self, _auth: NoAuthorization) -> started_get::AllResponses {
+    async fn started_get(
+        &self,
+        _auth: NoAuthorization,
+    ) -> started_get::AllResponses {
         started_get::endpoint()
     }
 
@@ -50,7 +53,10 @@ impl HealthApi {
         operation_id = "healthReady"
     )]
     #[allow(clippy::unused_async)]
-    async fn ready_get(&self, _auth: NoAuthorization) -> ready_get::AllResponses {
+    async fn ready_get(
+        &self,
+        _auth: NoAuthorization,
+    ) -> ready_get::AllResponses {
         ready_get::endpoint()
     }
 
@@ -64,7 +70,10 @@ impl HealthApi {
     /// It may not be exposed publicly. Refer to []*
     #[oai(path = "/v1/health/live", method = "get", operation_id = "healthLive")]
     #[allow(clippy::unused_async)]
-    async fn live_get(&self, _auth: NoAuthorization) -> live_get::AllResponses {
+    async fn live_get(
+        &self,
+        _auth: NoAuthorization,
+    ) -> live_get::AllResponses {
         live_get::endpoint()
     }
 

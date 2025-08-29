@@ -71,7 +71,8 @@ impl GetRegistrationQuery {
 
     /// Executes get registration info for given stake addr query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: GetRegistrationParams,
+        session: &CassandraSession,
+        params: GetRegistrationParams,
     ) -> anyhow::Result<TypedRowStream<GetRegistrationQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::RegistrationFromStakeAddr, params)
