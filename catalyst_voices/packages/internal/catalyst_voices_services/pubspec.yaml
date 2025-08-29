@@ -37,6 +37,7 @@ dependencies:
   rxdart: ^0.28.0
   sentry_drift: ^9.6.0
   sentry_flutter: ^9.6.0
+  sentry_logging: ^9.6.0
   shared_preferences: ^2.5.3
   synchronized: ^3.4.0
   url_launcher: ^6.3.1

@@ -65,6 +65,7 @@ final class AppConfigFactory {
         profilesSampleRate: remote.sentry?.profilesSampleRate,
         enableAutoSessionTracking: remote.sentry?.enableAutoSessionTracking,
         enableTimeToFullDisplayTracing: remote.sentry?.enableTimeToFullDisplayTracing,
+        enableLogs: remote.sentry?.enableLogs,
         attachViewHierarchy: remote.sentry?.attachViewHierarchy,
         diagnosticLevel: remote.sentry?.diagnosticLevel,
       ),

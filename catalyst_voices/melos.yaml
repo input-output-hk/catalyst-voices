@@ -156,6 +156,7 @@ command:
       uuid_plus: ^0.1.0
       sentry_drift: ^9.6.0
       sentry_flutter: ^9.6.0
+      sentry_logging: ^9.6.0
       scrollable_positioned_list: ^0.3.8
       shared_preferences: ^2.5.3
       shared_preferences_platform_interface: ^2.4.1
