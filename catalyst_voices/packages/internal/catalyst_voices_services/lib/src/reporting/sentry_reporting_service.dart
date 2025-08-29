@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:sentry_drift/sentry_drift.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:sentry_logging/sentry_logging.dart';
 
 final class SentryReportingService implements ReportingService {
   const SentryReportingService();
@@ -43,6 +44,7 @@ final class SentryReportingService implements ReportingService {
           ..profilesSampleRate = config.profilesSampleRate
           ..enableAutoSessionTracking = config.enableAutoSessionTracking
           ..enableTimeToFullDisplayTracing = config.enableTimeToFullDisplayTracing
+          ..enableLogs = config.enableLogs
           ..attachScreenshot = config.attachScreenshot
           ..attachViewHierarchy = config.attachViewHierarchy
           ..screenshotQuality = SentryScreenshotQuality.low
@@ -50,6 +52,10 @@ final class SentryReportingService implements ReportingService {
           ..diagnosticLevel = SentryLevel.fromName(config.diagnosticLevel)
           ..release = config.release
           ..dist = config.dist;
+
+        if (config.enableLogs) {
+          options.addIntegration(LoggingIntegration());
+        }
       },
     );
   }
