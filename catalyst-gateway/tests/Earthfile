@@ -1,7 +1,7 @@
 # cspell: words unittests socat
 
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.5.11 AS spectral-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:fix/wasm-c-base AS spectral-ci
 IMPORT .. AS gateway
 
 # a special package for applying migrations only up to "V2_**" migrations
