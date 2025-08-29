@@ -8,17 +8,17 @@ export const browserExtensions: BrowserExtensionModel[] = [
   {
     Name: BrowserExtensionName.Lace,
     Id: "gafhhkghbfjjkeiendhlofajokpaflmk",
-    HomeUrl: "app.html#/setup",
+    HomeUrl: "/app.html#/setup",
   },
   {
     Name: BrowserExtensionName.Eternl,
     Id: "kmhcihpebfmpgmihbkipmjlmmioameka",
-    HomeUrl: "index.html#/app/preprod/welcome",
+    HomeUrl: "/index.html#/app/preprod/welcome",
   },
   {
     Name: BrowserExtensionName.Yoroi,
     Id: "poonlenmfdfbjfeeballhiibknlknepo",
-    HomeUrl: "main_window.html#",
+    HomeUrl: "/main_window.html#",
   },
   {
     Name: BrowserExtensionName.Nufi,

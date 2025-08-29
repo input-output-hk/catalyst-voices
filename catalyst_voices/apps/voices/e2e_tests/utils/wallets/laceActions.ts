@@ -53,7 +53,9 @@ const clickRestoreWalletButton = async (page: Page): Promise<void> => {
  * and sometimes leads to a page where the user has to click on the recovery phrase button to get to the recovery phrase page
  */
 const handleNextPage = async (page: Page): Promise<void> => {
-  const title = await page.getByTestId("wallet-setup-step-title").textContent();
+  const title = await page
+    .locator('//*[@data-testid="wallet-setup-step-title"]')
+    .textContent();
   if (title === "Choose recovery method") {
     await page.locator('[data-testid="wallet-setup-step-btn-next"]').click();
   } else {
@@ -65,37 +67,36 @@ export const onboardLaceWallet = async (
   page: Page,
   walletConfig: WalletConfigModel
 ): Promise<void> => {
-  await page.locator('[data-testid="analytics-accept-button"]').click();
-  await clickRestoreWalletButton(page);
+  await page.locator('[data-testid="restore-wallet-button"]').click();
   await handleNextPage(page);
-  await page.getByTestId("recovery-phrase-15").click();
-  const seedPhrase = walletConfig.seed;
-  for (let i = 0; i < seedPhrase.length; i++) {
-    const ftSeedPhraseSelector = `//*[@id="mnemonic-word-${i + 1}"]`;
-    await page.locator(ftSeedPhraseSelector).fill(seedPhrase[i]);
+  await page.locator('//span[@data-testid="recovery-phrase-15"]').click();
+  for (let i = 0; i < walletConfig.seed.length; i++) {
+    const seedPhraseSelector = `//*[@id="mnemonic-word-${i + 1}"]`;
+    await page.locator(seedPhraseSelector).fill(walletConfig.seed[i]);
   }
-  await page.getByRole("button", { name: "Next" }).click();
-  await page.getByTestId("wallet-name-input").fill(walletConfig.username);
+  await page.locator('[data-testid="wallet-setup-step-btn-next"]').click();
   await page
-    .getByTestId("wallet-password-verification-input")
+    .locator('[data-testid="wallet-name-input"]')
+    .fill(walletConfig.username);
+  await page
+    .locator('[data-testid="wallet-password-verification-input"]')
     .fill(walletConfig.password);
   await page
-    .getByTestId("wallet-password-confirmation-input")
+    .locator('[data-testid="wallet-password-confirmation-input"]')
     .fill(walletConfig.password);
-  await page.getByRole("button", { name: "Open wallet" }).click();
-  //Lace is very slow at loading
+  await page.locator('[data-testid="wallet-setup-step-btn-next"]').click();
+  await page.locator('[data-testid="wallet-setup-step-btn-next"]').click();
   await page
-    .getByTestId("profile-dropdown-trigger-menu")
+    .locator('//*[@data-testid="profile-dropdown-trigger-menu"]')
     .click({ timeout: 300000 });
   await page
-    .getByTestId("header-menu")
-    .getByTestId("header-menu-network-choice-container")
+    .locator('//*[@data-testid="header-menu"]')
+    .locator('//*[@data-testid="header-menu-network-choice-container"]')
     .click();
   await page
-    .getByTestId("header-menu")
-    .getByTestId("network-preprod-radio-button")
+    .locator('//*[@data-testid="header-menu"]')
+    .locator('//*[@data-testid="network-preprod-radio-button"]')
     .click();
-  await page.waitForTimeout(4000);
 };
 
 export const signLaceData = async (

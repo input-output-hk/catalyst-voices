@@ -131,3 +131,6 @@ browser_extensions/
 
 # Secrets
 .env
+
+# Playwright
+/browser-profiles/
