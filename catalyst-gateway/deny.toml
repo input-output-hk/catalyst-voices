@@ -82,6 +82,7 @@ allow = [
     "Zlib",
     "MIT-0",
     "CDLA-Permissive-2.0",
+    "OpenSSL",
 ]
 exceptions = [
     #{ allow = ["Zlib"], crate = "tinyvec" },
