@@ -71,7 +71,7 @@ pub(crate) async fn cip36_registrations(
                 return snapshot(session, asat).await
             },
         };
-    };
+    }
 
     // If _for is not defined, use the stake addresses defined for Role0 in the _auth
     // parameter. _auth not yet implemented, so put placeholder for that, and return not

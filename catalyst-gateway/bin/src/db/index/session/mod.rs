@@ -488,10 +488,10 @@ async fn retry_init(
         if persistent {
             if PERSISTENT_SESSION.set(Arc::new(cassandra_session)).is_err() {
                 error!("Persistent Session already set.  This should not happen.");
-            };
+            }
         } else if VOLATILE_SESSION.set(Arc::new(cassandra_session)).is_err() {
             error!("Volatile Session already set.  This should not happen.");
-        };
+        }
 
         // IF we get here, then everything seems to have worked, so finish init.
         break;

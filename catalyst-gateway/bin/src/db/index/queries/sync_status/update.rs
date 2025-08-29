@@ -126,7 +126,7 @@ pub(crate) fn update_sync_status(
                 end_slot = ?end_slot,
                 "Failed to store Sync Status"
             );
-        };
+        }
         debug!(start_slot = ?start_slot, end_slot = ?end_slot, "Sync Status updated");
     });
 }

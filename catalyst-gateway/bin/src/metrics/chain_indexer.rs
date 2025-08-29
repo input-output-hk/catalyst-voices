@@ -106,6 +106,8 @@ pub(crate) mod metrics_updater {
 /// All the related Chain Indexer reporting metrics to the Prometheus service are inside
 /// this module.
 pub(crate) mod reporter {
+    #![allow(clippy::unwrap_used)]
+
     use std::sync::LazyLock;
 
     use prometheus::{

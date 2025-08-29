@@ -53,6 +53,8 @@ pub(crate) fn update() {
 /// All the related health endpoints reporting metrics to the Prometheus service are
 /// inside this module.
 pub(crate) mod reporter {
+    #![allow(clippy::unwrap_used)]
+
     use std::sync::LazyLock;
 
     use prometheus::{register_int_gauge_vec, IntGaugeVec};

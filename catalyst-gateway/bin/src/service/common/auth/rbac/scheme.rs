@@ -135,7 +135,7 @@ async fn checker_api_catalyst_auth(
     // If env var explicitly set by SRE, switch off full verification
     if env::var(RBAC_OFF).is_ok() {
         return Ok(token);
-    };
+    }
 
     // Step 6: get the registration chain
     let reg_chain = match latest_rbac_chain(token.catalyst_id()).await {

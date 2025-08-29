@@ -141,7 +141,7 @@ pub(crate) async fn endpoint(
         Err(err) => {
             return AllResponses::handle_error(&err);
         },
-    };
+    }
 
     if doc.problem_report().is_problematic() {
         return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
@@ -160,7 +160,7 @@ pub(crate) async fn endpoint(
             .into();
         },
         Err(err) => return AllResponses::handle_error(&err),
-    };
+    }
 
     // update the document storing in the db
     match store_document_in_db(&doc, doc_bytes).await {

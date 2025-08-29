@@ -128,7 +128,7 @@ impl Display for SyncParams {
             match result {
                 Ok(()) => write!(f, ", Success")?,
                 Err(error) => write!(f, ", {error}")?,
-            };
+            }
         }
 
         f.write_str(" }")

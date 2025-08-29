@@ -268,7 +268,7 @@ async fn catalyst_id_from_txn_id(
         CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
     if let Some(id) = Query::get(&session, txn_id).await? {
         return Ok(Some(id));
-    };
+    }
 
     // Conditionally check the volatile database.
     if !is_persistent {
@@ -323,7 +323,7 @@ async fn catalyst_id_from_stake_address(
         CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
     if let Some(id) = Query::latest(&session, address).await? {
         return Ok(Some(id));
-    };
+    }
 
     // Conditionally check the volatile database.
     if !is_persistent {
@@ -384,7 +384,7 @@ async fn catalyst_id_from_public_key(
         CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
     if let Some(id) = Query::get(&session, key).await? {
         return Ok(Some(id));
-    };
+    }
 
     // Conditionally check the volatile database.
     if !is_persistent {

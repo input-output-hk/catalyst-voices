@@ -560,7 +560,7 @@ pub async fn get_all_registrations(
         )?) {
             v.push(cip36);
             continue;
-        };
+        }
 
         registrations_map.insert(
             Ed25519HexEncodedPublicKey::try_from(row.stake_public_key)?,
@@ -615,7 +615,7 @@ async fn get_all_invalid_registrations(
         )?) {
             v.push(invalid);
             continue;
-        };
+        }
 
         invalids_map.insert(
             Ed25519HexEncodedPublicKey::try_from(row.stake_public_key)?,

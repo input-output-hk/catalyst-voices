@@ -1,5 +1,7 @@
 //! Document Reference filtering object.
 
+use std::fmt::Write;
+
 use crate::db::event::common::eq_or_ranged_uuid::EqOrRangedUuid;
 
 /// Document Reference filtering struct.
@@ -19,16 +21,18 @@ impl DocumentRef {
     ) -> String {
         let mut stmt = "TRUE".to_string();
         if let Some(id) = &self.id {
-            stmt.push_str(&format!(
+            let _ = write!(
+                stmt,
                 " AND {}",
                 id.conditional_stmt("(doc_ref->>'id')::uuid")
-            ));
+            );
         }
         if let Some(ver) = &self.ver {
-            stmt.push_str(&format!(
+            let _ = write!(
+                stmt,
                 " AND {}",
                 ver.conditional_stmt("(doc_ref->>'ver')::uuid")
-            ));
+            );
         }
 
         format!(

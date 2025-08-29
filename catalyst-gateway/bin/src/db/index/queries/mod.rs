@@ -517,7 +517,7 @@ async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
                     set_index_db_liveness(false);
                     error!(error=%err, query=query_str, chunk=chunk_str, "Index DB connection failed. Liveness set to false.");
                     bail!(CassandraSessionError::ConnectionUnavailable { source: err.into() })
-                };
+                }
                 error!(%error, query=query_str, chunk=chunk_str, "Query Execution Failed");
                 errors.push(error);
                 // Defer failure until all batches have been processed.
