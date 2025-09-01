@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
@@ -36,19 +37,23 @@ class ImagePrecacheService {
     List<SvgGenImage> svgs = const [],
     List<AssetGenImage> assets = const [],
   }) {
-    return _lock.synchronized<void>(() async {
-      if (_isInitialized.isCompleted) return;
+    final task = startupTimeline.startTask('image_assets_precache');
 
-      _svgs.addAll(svgs);
-      _assets.addAll(assets);
+    return _lock
+        .synchronized<void>(() async {
+          if (_isInitialized.isCompleted) return;
 
-      await Future.wait([
-        ..._svgs.map((e) => e.cache(context: context)),
-        ..._assets.map((e) => e.cache(context: context)),
-      ]);
+          _svgs.addAll(svgs);
+          _assets.addAll(assets);
 
-      if (!_isInitialized.isCompleted) _isInitialized.complete(true);
-    });
+          await Future.wait([
+            ..._svgs.map((e) => e.cache(context: context)),
+            ..._assets.map((e) => e.cache(context: context)),
+          ]);
+
+          if (!_isInitialized.isCompleted) _isInitialized.complete(true);
+        })
+        .whenComplete(task.finish);
   }
 
   void resetCacheIfNeeded(ThemeData theme) {

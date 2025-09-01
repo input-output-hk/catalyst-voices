@@ -40,6 +40,9 @@ final class _NoopTask implements CatalystProfilerTimelineTask {
 
 final class _NoopTimeline implements CatalystProfilerTimeline {
   @override
+  bool get finished => false;
+
+  @override
   FutureOr<void> finish({CatalystProfilerTimelineFinishArguments? arguments}) {
     // noop
   }

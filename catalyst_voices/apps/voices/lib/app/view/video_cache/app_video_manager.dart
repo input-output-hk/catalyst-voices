@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
@@ -51,25 +52,29 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
     BuildContext context, {
     required VideoPrecacheAssets videoAssets,
   }) {
-    return _lock.synchronized<void>(() async {
-      if (_isInitialized.isCompleted) return;
+    final task = startupTimeline.startTask('video_precache');
 
-      final newControllers = Map.of(value.controllers);
+    return _lock
+        .synchronized<void>(() async {
+          if (_isInitialized.isCompleted) return;
 
-      await Future.wait(
-        videoAssets.assets.map((asset) async {
-          final key = _createKey(asset, videoAssets.package);
-          if (value.controllers.containsKey(key)) return;
+          final newControllers = Map.of(value.controllers);
 
-          final controller = await _initializeController(asset, package: videoAssets.package);
-          newControllers[key] = controller;
-        }),
-      );
+          await Future.wait(
+            videoAssets.assets.map((asset) async {
+              final key = _createKey(asset, videoAssets.package);
+              if (value.controllers.containsKey(key)) return;
 
-      value = value.copyWith(controllers: newControllers);
+              final controller = await _initializeController(asset, package: videoAssets.package);
+              newControllers[key] = controller;
+            }),
+          );
 
-      if (!_isInitialized.isCompleted) _isInitialized.complete(true);
-    });
+          value = value.copyWith(controllers: newControllers);
+
+          if (!_isInitialized.isCompleted) _isInitialized.complete(true);
+        })
+        .whenComplete(task.finish);
   }
 
   Future<void> resetCacheIfNeeded(ThemeData theme) async {

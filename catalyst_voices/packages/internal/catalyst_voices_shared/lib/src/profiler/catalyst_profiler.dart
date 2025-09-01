@@ -16,6 +16,8 @@ abstract interface class CatalystProfiler {
 }
 
 abstract interface class CatalystProfilerTimeline {
+  bool get finished;
+
   FutureOr<void> finish({
     CatalystProfilerTimelineFinishArguments? arguments,
   });

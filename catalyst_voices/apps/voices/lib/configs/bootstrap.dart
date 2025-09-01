@@ -31,13 +31,11 @@ final _loggerPlatformDispatcher = Logger('PlatformDispatcher');
 final _loggerUncaughtZone = Logger('UncaughtZone');
 final _loggingService = LoggingService();
 
-CatalystProfilerTimeline? _profilerStartupTimeline;
+CatalystProfilerTimeline? _startupTimeline;
 
-CatalystProfilerTimeline get profilerStartupTimeline {
-  return _profilerStartupTimeline ??= profiler.startTransaction(
-    'startup',
-    arguments: CatalystProfilerTimelineArguments(operation: '', description: ''),
-  );
+CatalystProfilerTimeline get startupTimeline {
+  assert(_startupTimeline != null, 'startupTimeline not initialized yet!');
+  return _startupTimeline!;
 }
 
 /// Initializes the application before it can be run. Should setup all
@@ -51,17 +49,43 @@ Future<BootstrapArgs> bootstrap({
   GoRouter? router,
   AppEnvironment? environment,
 }) async {
+  final bootstrapStartTimestamp = DateTimeExt.now(utc: true);
+
   await _loggingService.init();
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
 
+  final startConfigTimestamp = DateTimeExt.now(utc: true);
   environment ??= AppEnvironment.fromEnv();
   final config = await _getAppConfig(env: environment.type);
+  final endConfigTimestamp = DateTimeExt.now(utc: true);
 
   await _reportingService.init(config: config.sentry);
   await _cleanupOldStorages();
   await _initCryptoUtils();
+
+  _startupTimeline = profiler.startTransaction(
+    'Startup',
+    arguments: CatalystProfilerTimelineArguments(
+      operation: 'initialisation',
+      description:
+          'Measuring how long it takes from flutter code '
+          'execution to Application widget beaning ready.',
+      startTimestamp: bootstrapStartTimestamp,
+    ),
+  );
+  startupTimeline
+      .startTask(
+        'config',
+        arguments: CatalystProfilerTimelineTaskArguments(
+          description: 'How long it takes for app config resolve',
+          startTimestamp: startConfigTimestamp,
+        ),
+      )
+      .finish(
+        arguments: CatalystProfilerTimelineTaskFinishArguments(endTimestamp: endConfigTimestamp),
+      );
 
   await Dependencies.instance.init(
     config: config,
@@ -77,7 +101,7 @@ Future<BootstrapArgs> bootstrap({
   Bloc.observer = AppBlocObserver(logOnChange: false);
 
   Dependencies.instance.get<ReportingServiceMediator>().init();
-  Dependencies.instance.get<SyncManager>().start().ignore();
+  _startSyncManager().ignore();
 
   return BootstrapArgs(
     routerConfig: router,
@@ -237,6 +261,20 @@ Future<void> _safeBootstrapAndRun(
     await _doBootstrapAndRun(environment, builder);
   } catch (error, stack) {
     await _reportBootstrapError(error, stack);
+  }
+}
+
+Future<void> _startSyncManager() async {
+  final task = startupTimeline.startTask('documents_sync');
+  final args = CatalystProfilerTimelineTaskFinishArguments();
+
+  try {
+    await Dependencies.instance.get<SyncManager>().start();
+    args.status = 'completed';
+  } catch (_, _) {
+    args.status = 'failed';
+  } finally {
+    task.finish();
   }
 }
 

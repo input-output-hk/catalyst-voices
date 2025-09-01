@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/app/view/app_precache_image_assets.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_manager.dart';
+import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/widgets/bubble_campaign_phase_aware_background.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_loading_indicator.dart';
@@ -45,9 +46,11 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
   bool _areImagesAndVideosCached = false;
   bool _messageShownEnoughTime = true;
 
+  bool get _isReady => _areDocumentsSynced && _areImagesAndVideosCached && _messageShownEnoughTime;
+
   @override
   Widget build(BuildContext context) {
-    if (_areDocumentsSynced && _areImagesAndVideosCached && _messageShownEnoughTime) {
+    if (_isReady) {
       return widget.child;
     }
 
@@ -81,6 +84,9 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     if (mounted) {
       setState(() {
         _areDocumentsSynced = true;
+        if (_isReady && !startupTimeline.finished) {
+          unawaited(_markStartupAsFinished());
+        }
       });
     }
   }
@@ -97,6 +103,9 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     if (mounted) {
       setState(() {
         _areImagesAndVideosCached = isInitialized.every((e) => e);
+        if (_isReady && !startupTimeline.finished) {
+          unawaited(_markStartupAsFinished());
+        }
       });
     }
   }
@@ -105,8 +114,15 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     if (mounted) {
       setState(() {
         _messageShownEnoughTime = value;
+        if (_isReady && !startupTimeline.finished) {
+          unawaited(_markStartupAsFinished());
+        }
       });
     }
+  }
+
+  Future<void> _markStartupAsFinished() async {
+    await startupTimeline.finish();
   }
 }
 

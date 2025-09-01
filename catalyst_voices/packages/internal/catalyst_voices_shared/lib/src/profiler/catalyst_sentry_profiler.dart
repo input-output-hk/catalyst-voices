@@ -82,6 +82,9 @@ final class _SentryTimeline implements CatalystProfilerTimeline {
   _SentryTimeline(this._span);
 
   @override
+  bool get finished => _span.finished;
+
+  @override
   FutureOr<void> finish({CatalystProfilerTimelineFinishArguments? arguments}) {
     if (arguments?.took case final value?) {
       _span.setMeasurement(
