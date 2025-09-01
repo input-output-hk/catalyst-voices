@@ -67,5 +67,5 @@ package-rust-tests-runner:
     COPY +test-builder/build-src-dir .
     COPY +test-builder/cat-gateway-tests.tar.zst .
     COPY +test-builder/cargo-nextest .
-    RUN cargo-nextest nextest run --archive-file=cat-gateway-tests.tar.zst --run-ignored=only signed_docs scylla_session scylla_queries scylla_purge rbac_index --no-fail-fast
+    RUN ./cargo-nextest nextest run --archive-file=cat-gateway-tests.tar.zst --run-ignored=only signed_docs scylla_session scylla_queries scylla_purge rbac_index --no-fail-fast
     SAVE IMAGE package-rust-tests-runner-tmp:latest
