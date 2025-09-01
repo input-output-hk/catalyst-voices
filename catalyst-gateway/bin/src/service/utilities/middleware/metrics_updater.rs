@@ -35,7 +35,7 @@ impl Endpoint for MetricsUpdaterMiddleware {
             return Ok(StatusCode::METHOD_NOT_ALLOWED.into());
         }
 
-        metrics_updater_fn().await;
+        metrics_updater_fn();
 
         let encoder = TextEncoder::new();
         let metric_families = self.registry.gather();

@@ -197,6 +197,25 @@ impl StringEnvVar {
             .into()
     }
 
+    /// Convert an Envvar into the required Duration type.
+    pub(crate) fn new_as_duration_optional(var_name: &str) -> Option<Duration> {
+        let choices = "A value in the format of `[0-9]+(ns|us|ms|[smhdwy])`";
+
+        let raw_value = Self::new_optional(var_name, false)?.as_string();
+
+        DurationString::try_from(raw_value.clone())
+            .inspect_err(|err| {
+                error!(
+                    error = ?err,
+                    choices=choices,
+                    duration_str = raw_value,
+                    "Invalid Duration string. Defaulting to None",
+                );
+            })
+            .map(Into::into)
+            .ok()
+    }
+
     /// Convert an Envvar into an integer in the bounded range.
     pub(super) fn new_as_int<T>(var_name: &str, default: T, min: T, max: T) -> T
     where
