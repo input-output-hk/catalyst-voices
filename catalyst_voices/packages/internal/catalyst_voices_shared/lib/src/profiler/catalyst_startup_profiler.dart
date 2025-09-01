@@ -32,17 +32,7 @@ class CatalystStartupProfiler {
   }) async {
     assert(ongoing, 'Startup profiler already finished');
 
-    final task = _timeline!.startTask('documents_sync');
-    final args = CatalystProfilerTimelineTaskFinishArguments();
-
-    try {
-      await body();
-      args.status = 'completed';
-    } catch (_, _) {
-      args.status = 'failed';
-    } finally {
-      unawaited(task.finish());
-    }
+    return _timeline!.time('documents_sync', body);
   }
 
   void finish() {
@@ -53,20 +43,10 @@ class CatalystStartupProfiler {
 
   Future<void> imagesCache({
     required AsyncValueGetter<void> body,
-  }) async {
+  }) {
     assert(ongoing, 'Startup profiler already finished');
 
-    final task = _timeline!.startTask('image_assets_precache');
-    final args = CatalystProfilerTimelineTaskFinishArguments();
-
-    try {
-      await body();
-      args.status = 'completed';
-    } catch (_, _) {
-      args.status = 'failed';
-    } finally {
-      unawaited(task.finish());
-    }
+    return _timeline!.time('image_assets_precache', body);
   }
 
   void start({
@@ -91,16 +71,6 @@ class CatalystStartupProfiler {
   }) async {
     assert(ongoing, 'Startup profiler already finished');
 
-    final task = _timeline!.startTask('video_precache');
-    final args = CatalystProfilerTimelineTaskFinishArguments();
-
-    try {
-      await body();
-      args.status = 'completed';
-    } catch (_, _) {
-      args.status = 'failed';
-    } finally {
-      unawaited(task.finish());
-    }
+    return _timeline!.time('video_precache', body);
   }
 }

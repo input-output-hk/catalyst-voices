@@ -34,12 +34,15 @@ final class CatalystSentryProfiler implements CatalystProfiler {
     try {
       clock.start();
       await body();
+      finishArgs.status = 'completed';
     } catch (error) {
-      finishArgs.throwable = error;
+      finishArgs
+        ..throwable = error
+        ..status = 'failed';
     } finally {
       finishArgs.took = clock.elapsed;
 
-      transaction.finish(arguments: finishArgs);
+      unawaited(transaction.finish(arguments: finishArgs));
     }
   }
 }
@@ -53,6 +56,16 @@ final class _SentryTask implements CatalystProfilerTimelineTask {
   Future<void> finish({CatalystProfilerTimelineTaskFinishArguments? arguments}) {
     final status = arguments?.status;
     final hint = arguments?.hint;
+
+    if (arguments?.took case final value?) {
+      _span.setMeasurement(
+        'took',
+        value.inMilliseconds,
+        unit: DurationSentryMeasurementUnit.milliSecond,
+      );
+    }
+
+    _span.throwable = arguments?.throwable;
 
     return _span.finish(
       status: status != null ? SpanStatus.fromString(status) : null,
@@ -118,5 +131,30 @@ final class _SentryTimeline implements CatalystProfilerTimeline {
     );
 
     return _SentryTask(taskSpan);
+  }
+
+  @override
+  Future<void> time(
+    String name,
+    AsyncOrValueGetter<void> body, {
+    CatalystProfilerTimelineTaskArguments? arguments,
+  }) async {
+    final task = startTask(name, arguments: arguments);
+    final clock = Stopwatch();
+    final finishArgs = CatalystProfilerTimelineTaskFinishArguments();
+
+    try {
+      clock.start();
+      await body();
+      finishArgs.status = 'completed';
+    } catch (error) {
+      finishArgs
+        ..throwable = error
+        ..status = 'failed';
+    } finally {
+      finishArgs.took = clock.elapsed;
+
+      unawaited(task.finish(arguments: finishArgs));
+    }
   }
 }

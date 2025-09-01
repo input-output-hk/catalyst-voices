@@ -65,11 +65,15 @@ final class CatalystProfilerTimelineTaskFinishArguments {
   String? status;
   DateTime? endTimestamp;
   Object? hint;
+  Duration? took;
+  Object? throwable;
 
   CatalystProfilerTimelineTaskFinishArguments({
     this.status,
     this.endTimestamp,
     this.hint,
+    this.took,
+    this.throwable,
   });
 
   Map<String, dynamic> toMap() {
@@ -77,6 +81,8 @@ final class CatalystProfilerTimelineTaskFinishArguments {
       if (status case final value?) 'status': value,
       if (endTimestamp case final value?) 'endTimestamp': value.toIso8601String(),
       if (hint case final value?) 'hint': value,
+      if (took case final value?) 'took': value,
+      if (throwable case final value?) 'throwable': value,
     };
   }
 }

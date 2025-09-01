@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_shared/src/profiler/profiler.dart';
+import 'package:catalyst_voices_shared/src/utils/typedefs.dart';
 
 final class CatalystNoopProfiler implements CatalystProfiler {
   const CatalystNoopProfiler();
@@ -53,5 +54,14 @@ final class _NoopTimeline implements CatalystProfilerTimeline {
     CatalystProfilerTimelineTaskArguments? arguments,
   }) {
     return _NoopTask();
+  }
+
+  @override
+  Future<void> time(
+    String name,
+    AsyncOrValueGetter<void> body, {
+    CatalystProfilerTimelineTaskArguments? arguments,
+  }) async {
+    return body();
   }
 }

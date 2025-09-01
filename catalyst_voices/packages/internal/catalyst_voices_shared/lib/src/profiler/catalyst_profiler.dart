@@ -26,6 +26,12 @@ abstract interface class CatalystProfilerTimeline {
     String name, {
     CatalystProfilerTimelineTaskArguments? arguments,
   });
+
+  Future<void> time(
+    String name,
+    AsyncOrValueGetter<void> body, {
+    CatalystProfilerTimelineTaskArguments? arguments,
+  });
 }
 
 abstract interface class CatalystProfilerTimelineTask {
