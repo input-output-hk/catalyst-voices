@@ -60,7 +60,7 @@ final class AccountCubit extends Cubit<AccountState>
 
   Future<void> updateAccountDetails() async {
     try {
-      await _userService.updateActiveAccountDetails();
+      await _userService.refreshActiveAccountProfile();
     } catch (error, stackTrace) {
       _logger.severe('Updating active account failed', error, stackTrace);
       if (!isClosed) emitError(LocalizedException.create(error));
@@ -134,8 +134,8 @@ final class AccountCubit extends Cubit<AccountState>
     final emailValue = email?.value;
     final usernameValue = username != null
         ? username.value.isNotEmpty
-            ? Optional(username.value)
-            : const Optional<String>.empty()
+              ? Optional(username.value)
+              : const Optional<String>.empty()
         : null;
 
     return _userService.updateAccount(

@@ -1,6 +1,6 @@
 //! A `Slot` wrapper that can be stored to and load from a database.
 
-use cardano_blockchain_types::Slot;
+use cardano_chain_follower::Slot;
 use num_bigint::BigInt;
 use scylla::_macro_internal::{
     CellWriter, ColumnType, DeserializationError, DeserializeValue, FrameSlice, SerializationError,

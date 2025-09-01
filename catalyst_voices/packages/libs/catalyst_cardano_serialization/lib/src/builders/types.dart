@@ -34,6 +34,10 @@ enum ChangeOutputAdaStrategy {
   /// (i.e. Ada not enough to satisfy the minimum Ada requirement for the UTXO)
   /// then do not burn the remaining Ada as fee and throw [InsufficientAdaForChangeOutputException].
   noBurn,
+
+  /// A change output must be included, otherwise an [InsufficientAdaForChangeOutputException]
+  /// is thrown when the remaining Ada is not enough to create one.
+  mustInclude,
 }
 
 /// Interface for coin selection strategies applied to asset maps.

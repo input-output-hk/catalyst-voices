@@ -56,11 +56,11 @@ final class CoseSign1 extends Equatable {
 
   @override
   List<Object?> get props => [
-        protectedHeaders,
-        unprotectedHeaders,
-        payload,
-        signature,
-      ];
+    protectedHeaders,
+    unprotectedHeaders,
+    payload,
+    signature,
+  ];
 
   /// Serializes the type as cbor.
   CborValue toCbor({bool tagged = true}) {

@@ -60,12 +60,12 @@ class LinkText extends StatelessWidget with LaunchUrlMixin {
       child: VoicesGestureDetector(
         onTap: enabled
             ? onTap ??
-                () {
-                  final uri = this.uri ?? Uri.tryParse(data);
-                  if (uri != null) {
-                    unawaited(launchUri(uri));
+                  () {
+                    final uri = this.uri ?? Uri.tryParse(data);
+                    if (uri != null) {
+                      unawaited(launchUri(uri));
+                    }
                   }
-                }
             : null,
         child: DefaultTextStyle.merge(
           style: style,

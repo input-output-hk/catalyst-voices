@@ -59,28 +59,25 @@ class ProfilePage {
   }
 
   Future<void> displayNameIsAsExpected(String expectedDisplayName) async {
-    final textField = $(accDisplayNameTxtField)
-        .$(CommonPage($).voicesTextField)
-        .evaluate()
-        .first
-        .widget as TextField;
+    final textField =
+        $(accDisplayNameTxtField).$(CommonPage($).voicesTextField).evaluate().first.widget
+            as TextField;
 
     expect(textField.controller!.text, expectedDisplayName);
   }
 
   Future<void> emailIsAsExpected(String expectedEmail) async {
-    final textField =
-        $(accountEmailTile).$(CommonPage($).voicesTextField).evaluate().first.widget as TextField;
+    final finder = $(accountEmailTile).$(CommonPage($).voicesTextField);
+    final evaluate = finder.evaluate();
+    final textField = evaluate.first.widget as TextField;
 
     expect(textField.controller!.text, expectedEmail);
   }
 
   Future<void> keychainIsAsExpected(String expectedKeychain) async {
-    final textField = $(accountKeychainTxtField)
-        .$(CommonPage($).voicesTextField)
-        .evaluate()
-        .first
-        .widget as TextField;
+    final textField =
+        $(accountKeychainTxtField).$(CommonPage($).voicesTextField).evaluate().first.widget
+            as TextField;
 
     expect(textField.controller!.text, expectedKeychain);
   }

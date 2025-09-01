@@ -7,7 +7,6 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -95,7 +94,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
 
     if (widget.data != oldWidget.data || widget.isCompact != oldWidget.isCompact) {
       final id = widget.data;
-      _fullDataAsString = id.toSignificant().toUri().toStringWithoutScheme();
+      _fullDataAsString = id.withoutUsername().toUri().toString();
       _effectiveData = _buildTextData();
       _tooltipVisible = _isTooltipVisible();
     }
@@ -114,7 +113,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
     super.initState();
 
     final id = widget.data;
-    _fullDataAsString = id.toSignificant().toUri().toStringWithoutScheme();
+    _fullDataAsString = id.withoutUsername().toString();
     _effectiveData = _buildTextData();
     _tooltipVisible = _isTooltipVisible();
   }
@@ -198,8 +197,9 @@ class _Chip extends StatelessWidget {
     final foregroundColor = colors.textOnPrimaryLevel1;
     final overlayColor = colors.onSurfaceNeutralOpaqueLv2;
 
-    final textStyle =
-        (textTheme.bodyMedium ?? const TextStyle()).merge(style).copyWith(color: foregroundColor);
+    final textStyle = (textTheme.bodyMedium ?? const TextStyle())
+        .merge(style)
+        .copyWith(color: foregroundColor);
 
     return Material(
       color: backgroundColor,

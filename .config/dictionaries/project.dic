@@ -85,12 +85,14 @@ dashmap
 dbeaver
 dbschema
 dbsync
+deadpool
 Debouncer
 Deleg
 delegators
 devnet
 devs
 DIND
+dockerenv
 dockerhub
 domcontentloaded
 Dominik
@@ -102,6 +104,7 @@ dhttpd
 drep
 dreps
 dtscalac
+dt-iohk
 earthfile
 earthlyignore
 Easterling
@@ -140,6 +143,7 @@ headlessui
 healthz
 HIDPI
 hotspots
+httpx
 icudtl
 ideascale
 idents
@@ -237,6 +241,7 @@ netifas
 netkey
 nextest
 Nodetool
+noqa
 NuFi
 oapi
 OCSP
@@ -280,6 +285,7 @@ qrcode
 rapidoc
 ratelimit
 redoc
+Relayout
 reloadable
 Replayability
 repr
@@ -315,6 +321,7 @@ serviceworker
 skeletonizer
 slotno
 snackbars
+socat
 sqlfluff
 SRCROOT
 sslmode

@@ -22,11 +22,12 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   final ProposalService _proposalService;
   final DocumentMapper _documentMapper;
   final DownloaderService _downloaderService;
+  Campaign? _cachedCampaign;
 
-  StreamSubscription<List<Proposal>>? _proposalsSub;
+  StreamSubscription<List<DetailProposal>>? _proposalsSub;
 
   // ignore: unused_field
-  final List<Proposal> _proposals = [];
+  final List<DetailProposal> _proposals = [];
 
   WorkspaceBloc(
     this._campaignService,
@@ -46,8 +47,8 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   @override
-  Future<void> close() {
-    _cancelProposalSubscriptions();
+  Future<void> close() async {
+    await _cancelProposalSubscriptions();
     return super.close();
   }
 
@@ -73,10 +74,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     _proposalsSub = null;
   }
 
-  Future<void> _deleteProposal(
-    DeleteDraftProposalEvent event,
-    Emitter<WorkspaceState> emit,
-  ) async {
+  Future<void> _deleteProposal(DeleteDraftProposalEvent event, Emitter<WorkspaceState> emit) async {
     try {
       emit(state.copyWith(isLoading: true));
       await _proposalService.deleteDraftProposal(event.ref);
@@ -95,50 +93,33 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     _logger.info('Error loading proposals');
-    emit(
-      state.copyWith(
-        error: Optional(event.error),
-        isLoading: false,
-      ),
-    );
+    emit(state.copyWith(error: Optional(event.error), isLoading: false));
 
     await _cancelProposalSubscriptions();
   }
 
-  Future<void> _exportProposal(
-    ExportProposal event,
-    Emitter<WorkspaceState> emit,
-  ) async {
+  Future<void> _exportProposal(ExportProposal event, Emitter<WorkspaceState> emit) async {
     try {
-      final docData = await _proposalService.getProposal(ref: event.ref);
+      final docData = await _proposalService.getProposalDetail(ref: event.ref);
 
       final docMetadata = _buildDocumentMetadata(docData.document);
       final documentContent = _buildDocumentContent(docData.document.document);
 
       final encodedProposal = await _proposalService.encodeProposalForExport(
-        document: DocumentData(
-          metadata: docMetadata,
-          content: documentContent,
-        ),
+        document: DocumentData(metadata: docMetadata, content: documentContent),
       );
 
       final filename = '${event.prefix}_${event.ref.id}';
       const extension = ProposalDocument.exportFileExt;
 
-      await _downloaderService.download(
-        data: encodedProposal,
-        filename: '$filename.$extension',
-      );
+      await _downloaderService.download(data: encodedProposal, filename: '$filename.$extension');
     } catch (error, stackTrace) {
       _logger.severe('Exporting proposal failed', error, stackTrace);
       emitError(LocalizedException.create(error));
     }
   }
 
-  Future<void> _forgetProposal(
-    ForgetProposalEvent event,
-    Emitter<WorkspaceState> emit,
-  ) async {
+  Future<void> _forgetProposal(ForgetProposalEvent event, Emitter<WorkspaceState> emit) async {
     final proposal = state.userProposals.firstWhereOrNull((e) => e.selfRef == event.ref);
     if (proposal == null || proposal.selfRef is! SignedDocumentRef) {
       return emitError(const LocalizedUnknownException());
@@ -163,17 +144,20 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     GetTimelineItemsEvent event,
     Emitter<WorkspaceState> emit,
   ) async {
-    final timelineItems = await _campaignService.getCampaignTimeline();
-    final timeline = timelineItems.map(CampaignTimelineViewModel.fromModel).toList();
+    final campaign = await _campaignService.getActiveCampaign();
+    _cachedCampaign = campaign;
 
-    emit(state.copyWith(timelineItems: timeline));
+    if (campaign == null) {
+      return emitError(const LocalizedUnknownException());
+    }
+
+    final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
+
+    emit(state.copyWith(timelineItems: timeline, fundNumber: campaign.fundNumber));
     emitSignal(SubmissionCloseDate(date: state.submissionCloseDate));
   }
 
-  Future<void> _importProposal(
-    ImportProposalEvent event,
-    Emitter<WorkspaceState> emit,
-  ) async {
+  Future<void> _importProposal(ImportProposalEvent event, Emitter<WorkspaceState> emit) async {
     try {
       emit(state.copyWith(isLoading: true));
       final ref = await _proposalService.importProposal(event.proposalData);
@@ -190,10 +174,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     // in the stream subscription.
   }
 
-  Future<void> _loadProposals(
-    LoadProposalsEvent event,
-    Emitter<WorkspaceState> emit,
-  ) async {
+  Future<void> _loadProposals(LoadProposalsEvent event, Emitter<WorkspaceState> emit) async {
     emit(
       state.copyWith(
         isLoading: false,
@@ -203,7 +184,26 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     );
   }
 
-  List<Proposal> _removeProposal(
+  Future<List<UsersProposalOverview>> _mapProposalToViewModel(
+    List<DetailProposal> proposals,
+    int fundNumber,
+  ) async {
+    final futures = proposals.map((proposal) async {
+      _cachedCampaign ??= await _campaignService.getActiveCampaign();
+      final category = _cachedCampaign?.categories.firstWhere(
+        (e) => e.selfRef.id == proposal.categoryRef.id,
+      );
+      return UsersProposalOverview.fromProposal(
+        proposal,
+        fundNumber,
+        category?.formattedCategoryName ?? '',
+      );
+    }).toList();
+
+    return Future.wait(futures);
+  }
+
+  List<UsersProposalOverview> _removeProposal(
     DocumentRef proposalRef,
   ) {
     return [...state.userProposals]..removeWhere((e) => e.selfRef.id == proposalRef.id);
@@ -211,10 +211,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
   void _setupProposalsSubscription() {
     _proposalsSub = _proposalService.watchUserProposals().listen(
-      (proposals) {
+      (proposals) async {
         if (isClosed) return;
         _logger.info('Stream received ${proposals.length} proposals');
-        add(LoadProposalsEvent(proposals));
+        final mappedProposals = await _mapProposalToViewModel(proposals, state.fundNumber);
+        add(LoadProposalsEvent(mappedProposals));
       },
       onError: (Object error, StackTrace stackTrace) {
         if (isClosed) return;
@@ -224,10 +225,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     );
   }
 
-  Future<void> _unlockProposal(
-    UnlockProposalEvent event,
-    Emitter<WorkspaceState> emit,
-  ) async {
+  Future<void> _unlockProposal(UnlockProposalEvent event, Emitter<WorkspaceState> emit) async {
     final proposal = state.userProposals.firstWhereOrNull((e) => e.selfRef == event.ref);
     if (proposal == null || proposal.selfRef is! SignedDocumentRef) {
       return emitError(const LocalizedUnknownException());
@@ -250,12 +248,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
     _logger.info('Setup user proposals subscription');
 
-    emit(
-      state.copyWith(
-        isLoading: true,
-        error: const Optional.empty(),
-      ),
-    );
+    emit(state.copyWith(isLoading: true, error: const Optional.empty()));
 
     _logger.info('$state and ${state.showProposals}');
 

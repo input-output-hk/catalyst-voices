@@ -1,7 +1,8 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.5.2 AS python-ci
-IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v.0.0.4 AS cat-libs-rust
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.4.7 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-types/v0.0.6 AS cat-libs-rust
+IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v0.0.4-earthly-arm-fix AS dep-cat-libs-rust
 IMPORT github.com/input-output-hk/catalyst-storage AS cat-storage
 
 builder:
@@ -13,8 +14,9 @@ builder:
     COPY --dir ./scripts .
     COPY --dir ./test_data .
     COPY --dir ./utils .
-    COPY --dir ./wrappers .
     COPY cat-libs-rust+build/mk_signed_doc .
+    # mk_signed_doc cli tool for building deprecated version of documents
+    COPY dep-cat-libs-rust+build/mk_signed_doc ./dep_mk_signed_doc
     COPY cat-storage+cardano-asset-preprod/cardano-asset-preprod.json .
     DO python-ci+BUILDER
 
@@ -23,6 +25,12 @@ package:
     FROM +builder
 
     ENV ASSETS_DATA_PATH="./cardano-asset-preprod.json"
+    ENV MK_SIGNED_DOC_PATH="./mk_signed_doc"
+    ENV DEP_MK_SIGNED_DOC_PATH="./dep_mk_signed_doc"
 
-    ENTRYPOINT poetry run pytest -s -m preprod_indexing --junitxml=junit-report.xml --cov=integration --cov-report lcov
+    # Install socat
+    RUN apt-get update \
+        && apt-get install -y --no-install-recommends socat \
+        && rm -rf /var/lib/apt/lists/*
+
     SAVE IMAGE api-tests-runner:latest

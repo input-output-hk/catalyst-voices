@@ -86,7 +86,7 @@ final class RegistrationData extends Equatable implements CborEncodable {
   /// Un-ordered List of CBOR encoded C509 certificates
   /// (or metadatum references).
   //
-  // TODO(dtscalac): support C509CertInMetadatumReference
+  // TODO(dt-iohk): support C509CertInMetadatumReference
   final List<RbacField<C509Certificate>>? cborCerts;
 
   /// Ordered list of simple public keys that are registered.
@@ -131,9 +131,9 @@ final class RegistrationData extends Equatable implements CborEncodable {
   /// Serializes the type as cbor.
   @override
   CborValue toCbor({List<int> tags = const []}) => CborMap(
-        _buildCborMap(),
-        tags: tags,
-      );
+    _buildCborMap(),
+    tags: tags,
+  );
 
   /// Builds a CborMap from the class properties.
   Map<CborSmallInt, CborValue> _buildCborMap() {
@@ -239,18 +239,34 @@ class RoleData extends Equatable implements CborEncodable {
   /// the registration is invalid.
   final LocalKeyReference? roleEncryptionKey;
 
-  /// Reference to a transaction input/output as the payment key to use for a role.
-  /// Payment key (n) >= 0 = Use Transaction Input Key offset (n)
-  /// as the payment key.
-  /// Payment key (n) < 0 = Use Transaction Output Key offset -(n+1)
-  /// as the payment key.
+  /// A Payment key reference in this CIP solves this problem by only allowing a reference
+  /// to transaction output. The reference is a simple unsigned integer.
+  /// The integer represent the index of the transaction outputs. For example,
+  /// integer 0 refers to index 0 of the transaction outputs.
   ///
-  /// If a transaction output payment key is defined the payment address must
-  /// also be in the required_signers of the transaction to ensure the payment
-  /// address is owned and controlled by the entity posting the registration.
+  /// For the payment key to be validated, it must be witnessed in the transaction,
+  /// this can be achieved by either:
   ///
-  /// If the referenced payment key does not exist in the transaction,
-  /// or is not witnessed the entire registration is to be considered invalid.
+  /// - Using the same payment key from an input to the transaction as an output.
+  ///
+  /// - If the payment key is not an input to the transaction, including it in the
+  ///   Required Signers field of the transaction. Payment keys which are not witnessed are invalid,
+  ///   as they can not be proven to both be:
+  ///
+  ///   - Owned and controlled by the wallet signing the transaction and posting the registration.
+  ///   - Spendable. Ensuring this validity reduces the risk of invalid payments,
+  ///     or paying the wrong individuals, and eliminates the need to make "trial" payments
+  ///     to validate an address is payable.
+  ///
+  /// If the transaction output address IS also an input to the transaction,
+  /// then the same proof has already been attached to the transaction.
+  /// However, if the transaction output is not also an input, the transaction MUST include
+  /// the output address in the required signers field, and the transaction must carry a witness
+  /// proving the payment key is owned.
+  ///
+  /// This provides guarantees that the entity posting the registration has posted
+  /// a valid payment address, and that they control it. If a payment address is not able
+  /// to be validated, then the entire registration metadata is invalid.
   final int? paymentKey;
 
   /// Each dApp can declare that roles can have either mandatory or optional
@@ -290,8 +306,9 @@ class RoleData extends Equatable implements CborEncodable {
     return RoleData(
       roleNumber: roleNumber.value,
       roleSigningKey: roleSigningKey != null ? LocalKeyReference.fromCbor(roleSigningKey) : null,
-      roleEncryptionKey:
-          roleEncryptionKey != null ? LocalKeyReference.fromCbor(roleEncryptionKey) : null,
+      roleEncryptionKey: roleEncryptionKey != null
+          ? LocalKeyReference.fromCbor(roleEncryptionKey)
+          : null,
       paymentKey: paymentKey?.value,
       roleSpecificData: roleSpecificData.isNotEmpty
           ? roleSpecificData.map((key, value) => MapEntry((key as CborSmallInt).value, value))
@@ -301,12 +318,12 @@ class RoleData extends Equatable implements CborEncodable {
 
   @override
   List<Object?> get props => [
-        roleNumber,
-        roleSigningKey,
-        roleEncryptionKey,
-        paymentKey,
-        roleSpecificData,
-      ];
+    roleNumber,
+    roleSigningKey,
+    roleEncryptionKey,
+    paymentKey,
+    roleSpecificData,
+  ];
 
   /// Serializes the type as cbor.
   @override

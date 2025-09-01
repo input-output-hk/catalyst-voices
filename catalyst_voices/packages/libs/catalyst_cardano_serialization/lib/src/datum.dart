@@ -5,20 +5,31 @@ import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 import 'package:pinenacl/api.dart';
 
-/// Enum representing the type of a datum option in Cardano.
-/// A DatumOption can either be a datum hash or inline Plutus data.
-enum DatumOptionType {
-  /// [datumHash]: Represents a hash of the datum, typically used to refer to
-  /// data that exists off-chain.
-  datumHash(0),
+/// Class representing data in a Cardano transaction output.
+/// The [Data] class is a type of [Datum] that contains actual data stored
+/// on-chain.
+///
+/// This is useful when you want to include data directly in the transaction
+/// output.
+final class Data extends Datum {
+  // TODO(ilap): Requires a proper plutus data type implementation.
+  /// CBOR-encoded data associated with this [Data] object.
+  final CborValue data;
 
-  /// [data]: Represents actual inline datum stored on-chain.
-  data(1);
+  /// Constructor for the [Data] class, which requires CBOR-encoded data.
+  const Data(this.data);
 
-  /// The value of the enum.
-  final int value;
+  /// Factory constructor to create a [Data] from a CBOR-encoded value.
+  factory Data.fromCbor(CborValue value) => Data(value);
 
-  const DatumOptionType(this.value);
+  /// Override of the [Equatable] properties for value comparison.
+  /// This allows comparing [Data] instances based on their [data] values.
+  @override
+  List<Object?> get props => [data];
+
+  /// The CBOR value represents the actual data.
+  @override
+  CborValue toCbor({List<int> tags = const []}) => data;
 }
 
 /// Abstract base class representing a datum in a Cardano transaction output.
@@ -28,6 +39,38 @@ enum DatumOptionType {
 /// a CBOR.
 sealed class Datum extends Equatable implements CborEncodable {
   const Datum();
+}
+
+/// Class representing a datum hash in Cardano.
+/// A [DatumHash] is a type of [Datum] that contains a cryptographic hash, which
+/// refers to data stored off-chain.
+///
+/// This is useful when you need to reference data without including the actual
+/// data in the transaction output.
+final class DatumHash extends Datum {
+  // TODO(ilap): Add length constraint and/or implement proper hash type.
+  /// Byte array representing the cryptographic hash.
+  final Uint8List hash;
+
+  /// Constructor for the [DatumHash] class, which requires a hash.
+  const DatumHash(this.hash);
+
+  /// Factory constructor to create a [DatumHash] from a CBOR-encoded value.
+  /// The CBOR value is expected to be a byte string.
+  factory DatumHash.fromCbor(CborValue value) {
+    if (value is CborBytes) {
+      return DatumHash(Uint8List.fromList(value.bytes));
+    }
+    throw ArgumentError.value(value, 'value', 'Expected valid CborBytes');
+  }
+
+  @override
+  List<Object?> get props => [hash];
+
+  /// Converts the [DatumHash] to a CBOR-encoded value.
+  /// The CBOR value is a byte string representing the hash.
+  @override
+  CborValue toCbor({List<int> tags = const []}) => CborBytes(hash, tags: tags);
 }
 
 /// Class representing an optional datum in a Cardano transaction output.
@@ -64,6 +107,9 @@ final class DatumOption extends Datum {
     }
   }
 
+  @override
+  List<Object?> get props => [datum];
+
   /// Converts the [DatumOption] to a CBOR-encoded value.
   /// The CBOR list contains an index indicating the type and the encoded datum.
   @override
@@ -78,66 +124,20 @@ final class DatumOption extends Datum {
       tags: tags,
     );
   }
-
-  @override
-  List<Object?> get props => [datum];
 }
 
-/// Class representing a datum hash in Cardano.
-/// A [DatumHash] is a type of [Datum] that contains a cryptographic hash, which
-/// refers to data stored off-chain.
-///
-/// This is useful when you need to reference data without including the actual
-/// data in the transaction output.
-final class DatumHash extends Datum {
-  // TODO(ilap): Add length constraint and/or implement proper hash type.
-  /// Byte array representing the cryptographic hash.
-  final Uint8List hash;
+/// Enum representing the type of a datum option in Cardano.
+/// A DatumOption can either be a datum hash or inline Plutus data.
+enum DatumOptionType {
+  /// [datumHash]: Represents a hash of the datum, typically used to refer to
+  /// data that exists off-chain.
+  datumHash(0),
 
-  /// Constructor for the [DatumHash] class, which requires a hash.
-  const DatumHash(this.hash);
+  /// [data]: Represents actual inline datum stored on-chain.
+  data(1);
 
-  /// Factory constructor to create a [DatumHash] from a CBOR-encoded value.
-  /// The CBOR value is expected to be a byte string.
-  factory DatumHash.fromCbor(CborValue value) {
-    if (value is CborBytes) {
-      return DatumHash(Uint8List.fromList(value.bytes));
-    }
-    throw ArgumentError.value(value, 'value', 'Expected valid CborBytes');
-  }
+  /// The value of the enum.
+  final int value;
 
-  /// Converts the [DatumHash] to a CBOR-encoded value.
-  /// The CBOR value is a byte string representing the hash.
-  @override
-  CborValue toCbor({List<int> tags = const []}) => CborBytes(hash, tags: tags);
-
-  @override
-  List<Object?> get props => [hash];
-}
-
-/// Class representing data in a Cardano transaction output.
-/// The [Data] class is a type of [Datum] that contains actual data stored
-/// on-chain.
-///
-/// This is useful when you want to include data directly in the transaction
-/// output.
-final class Data extends Datum {
-  // TODO(ilap): Requires a proper plutus data type implementation.
-  /// CBOR-encoded data associated with this [Data] object.
-  final CborValue data;
-
-  /// Constructor for the [Data] class, which requires CBOR-encoded data.
-  const Data(this.data);
-
-  /// Factory constructor to create a [Data] from a CBOR-encoded value.
-  factory Data.fromCbor(CborValue value) => Data(value);
-
-  /// The CBOR value represents the actual data.
-  @override
-  CborValue toCbor({List<int> tags = const []}) => data;
-
-  /// Override of the [Equatable] properties for value comparison.
-  /// This allows comparing [Data] instances based on their [data] values.
-  @override
-  List<Object?> get props => [data];
+  const DatumOptionType(this.value);
 }

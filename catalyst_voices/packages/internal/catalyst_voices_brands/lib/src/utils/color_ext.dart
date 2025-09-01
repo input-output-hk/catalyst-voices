@@ -1,5 +1,9 @@
 import 'dart:ui';
 
+int _floatToInt8(double x) {
+  return (x * 255.0).round() & 0xff;
+}
+
 extension ColorExt on Color {
   // TODO(damian-molinski): WidgetStateColor still uses argb32 int color.
   //  Delete this once its migrated by flutter team.
@@ -17,8 +21,4 @@ extension ColorExt on Color {
         _floatToInt8(g) << 8 |
         _floatToInt8(b) << 0;
   }
-}
-
-int _floatToInt8(double x) {
-  return (x * 255.0).round() & 0xff;
 }

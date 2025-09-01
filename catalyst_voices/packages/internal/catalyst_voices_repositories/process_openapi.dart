@@ -18,16 +18,18 @@ void main() {
     processedDir.createSync(recursive: true);
   }
 
-  final oldProcessedFiles =
-      processedDir.listSync().whereType<File>().where((element) => element.path.endsWith('.json'));
+  final oldProcessedFiles = processedDir.listSync().whereType<File>().where(
+    (element) => element.path.endsWith('.json'),
+  );
 
   // Delete any .json files from processedDir
   for (final file in oldProcessedFiles) {
     file.deleteSync();
   }
 
-  final sourceFiles =
-      sourceDir.listSync().whereType<File>().where((element) => element.path.endsWith('.json'));
+  final sourceFiles = sourceDir.listSync().whereType<File>().where(
+    (element) => element.path.endsWith('.json'),
+  );
 
   // Decode each source file, process and save processed version.
   for (final source in sourceFiles) {

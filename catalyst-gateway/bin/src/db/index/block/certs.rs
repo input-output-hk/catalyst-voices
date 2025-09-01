@@ -2,9 +2,12 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{MultiEraBlock, Slot, StakeAddress, TxnIndex, VKeyHash};
+use cardano_chain_follower::{
+    pallas_primitives::{alonzo, conway},
+    pallas_traverse::{MultiEraCert, MultiEraTx},
+    MultiEraBlock, Slot, StakeAddress, TxnIndex, VKeyHash,
+};
 use ed25519_dalek::VerifyingKey;
-use pallas::ledger::primitives::{alonzo, conway};
 use scylla::{client::session::Session, value::MaybeUnset, SerializeRow};
 use tracing::error;
 
@@ -264,17 +267,16 @@ impl CertInsertQuery {
 
     /// Index the certificates in a transaction.
     pub(crate) fn index(
-        &mut self, txs: &pallas::ledger::traverse::MultiEraTx<'_>, slot: Slot, index: TxnIndex,
-        block: &MultiEraBlock,
+        &mut self, txs: &MultiEraTx<'_>, slot: Slot, index: TxnIndex, block: &MultiEraBlock,
     ) {
         #[allow(clippy::match_same_arms)]
         txs.certs().iter().for_each(|cert| {
             match cert {
-                pallas::ledger::traverse::MultiEraCert::NotApplicable => {},
-                pallas::ledger::traverse::MultiEraCert::AlonzoCompatible(cert) => {
+                MultiEraCert::NotApplicable => {},
+                MultiEraCert::AlonzoCompatible(cert) => {
                     self.index_alonzo_cert(cert, slot, index, block);
                 },
-                pallas::ledger::traverse::MultiEraCert::Conway(cert) => {
+                MultiEraCert::Conway(cert) => {
                     self.index_conway_cert(cert, slot, index, block);
                 },
                 _ => {},

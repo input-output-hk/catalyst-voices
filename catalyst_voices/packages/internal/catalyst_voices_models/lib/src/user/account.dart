@@ -34,6 +34,9 @@ final class Account extends Equatable {
   /// can be changed by attaching [email] to account.
   final AccountPublicStatus publicStatus;
 
+  /// The actual amount of voting power this account holds.
+  final VotingPower? votingPower;
+
   /// Whether this account is being used.
   final bool isActive;
 
@@ -44,12 +47,13 @@ final class Account extends Equatable {
     required this.roles,
     required this.address,
     required this.publicStatus,
+    this.votingPower,
     this.isActive = false,
   }) : assert(
-          (email == null && publicStatus == AccountPublicStatus.notSetup) ||
-              (email != null && publicStatus != AccountPublicStatus.notSetup),
-          'Account publicStatus have to be notSetup only when email is not set',
-        );
+         (email == null && publicStatus == AccountPublicStatus.notSetup) ||
+             (email != null && publicStatus != AccountPublicStatus.notSetup),
+         'Account publicStatus have to be notSetup only when email is not set',
+       );
 
   factory Account.dummy({
     required CatalystId catalystId,
@@ -70,6 +74,7 @@ final class Account extends Equatable {
       ),
       /* cSpell:enable */
       publicStatus: AccountPublicStatus.notSetup,
+      votingPower: VotingPower.dummy(),
       isActive: isActive,
     );
   }
@@ -87,14 +92,15 @@ final class Account extends Equatable {
 
   @override
   List<Object?> get props => [
-        catalystId,
-        email,
-        keychain.id,
-        roles,
-        address,
-        publicStatus,
-        isActive,
-      ];
+    catalystId,
+    email,
+    keychain.id,
+    roles,
+    address,
+    publicStatus,
+    votingPower,
+    isActive,
+  ];
 
   String? get username => catalystId.username;
 
@@ -105,6 +111,7 @@ final class Account extends Equatable {
     Set<AccountRole>? roles,
     ShelleyAddress? address,
     AccountPublicStatus? publicStatus,
+    Optional<VotingPower>? votingPower,
     bool? isActive,
   }) {
     return Account(
@@ -114,6 +121,7 @@ final class Account extends Equatable {
       roles: roles ?? this.roles,
       address: address ?? this.address,
       publicStatus: publicStatus ?? this.publicStatus,
+      votingPower: votingPower.dataOr(this.votingPower),
       isActive: isActive ?? this.isActive,
     );
   }

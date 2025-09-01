@@ -7,7 +7,7 @@ use std::{
 };
 
 use anyhow::anyhow;
-use cardano_blockchain_types::{Network, Slot};
+use cardano_chain_follower::{Network, Slot};
 use clap::Args;
 use dotenvy::dotenv;
 use str_env_var::StringEnvVar;
@@ -112,6 +112,11 @@ struct EnvVars {
     /// The base path the API is served at.
     api_url_prefix: StringEnvVar,
 
+    /// Flag by enabling `/panic` endpoint if its set
+    /// Enabled is `YES_I_REALLY_WANT_TO_PANIC` env var is set
+    /// and equals to `"panic attack"`
+    is_panic_endpoint_enabled: bool,
+
     /// The Config of the Persistent Cassandra DB.
     cassandra_persistent_db: cassandra_db::EnvVars,
 
@@ -200,6 +205,8 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
                 .unwrap_or_default(),
         ),
         api_url_prefix: StringEnvVar::new("API_URL_PREFIX", API_URL_PREFIX_DEFAULT.into()),
+        is_panic_endpoint_enabled: StringEnvVar::new_optional("YES_I_REALLY_WANT_TO_PANIC", false)
+            .is_some_and(|v| v.as_str() == "panic attack"),
 
         cassandra_persistent_db: cassandra_db::EnvVars::new(
             cassandra_db::PERSISTENT_URL_DEFAULT,
@@ -239,7 +246,7 @@ impl EnvVars {
     pub(crate) fn validate() -> anyhow::Result<()> {
         let mut status = Ok(());
 
-        let url = ENV_VARS.event_db.url.as_str();
+        let url = ENV_VARS.event_db.url();
         if let Err(error) = tokio_postgres::config::Config::from_str(url) {
             error!(error=%error, url=url, "Invalid Postgres DB URL.");
             status = Err(anyhow!("Environment Variable Validation Error."));
@@ -275,44 +282,8 @@ impl Settings {
     }
 
     /// Get the current Event DB settings for this service.
-    pub(crate) fn event_db_settings() -> (
-        &'static str,
-        Option<&'static str>,
-        Option<&'static str>,
-        u32,
-        u32,
-        u32,
-        u32,
-    ) {
-        let url = ENV_VARS.event_db.url.as_str();
-        let user = ENV_VARS
-            .event_db
-            .username
-            .as_ref()
-            .map(StringEnvVar::as_str);
-        let pass = ENV_VARS
-            .event_db
-            .password
-            .as_ref()
-            .map(StringEnvVar::as_str);
-
-        let max_connections = ENV_VARS.event_db.max_connections;
-
-        let max_lifetime = ENV_VARS.event_db.max_lifetime;
-
-        let min_idle = ENV_VARS.event_db.min_idle;
-
-        let connection_timeout = ENV_VARS.event_db.connection_timeout;
-
-        (
-            url,
-            user,
-            pass,
-            max_connections,
-            max_lifetime,
-            min_idle,
-            connection_timeout,
-        )
+    pub(crate) fn event_db_settings() -> &'static event_db::EnvVars {
+        &ENV_VARS.event_db
     }
 
     /// Get the Persistent & Volatile Cassandra DB config for this service.
@@ -384,6 +355,11 @@ impl Settings {
     /// Get the server name to be used in the `Server` object of the `OpenAPI` Document.
     pub(crate) fn server_name() -> Option<&'static str> {
         ENV_VARS.server_name.as_ref().map(StringEnvVar::as_str)
+    }
+
+    /// Get the flag is the `/panic` should be enabled or not
+    pub(crate) fn is_panic_endpoint_enabled() -> bool {
+        ENV_VARS.is_panic_endpoint_enabled
     }
 
     /// Generate a github issue url with a given title

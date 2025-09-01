@@ -22,6 +22,7 @@ permittedLicenses:
   - BlueOak-1.0.0
   - Apache-2.0 WITH LLVM-exception
   - CC0-1.0
+  - MPL-2.0
 
 packageLicenseOverride:
   fuchsia_remote_debug_protocol: BSD-3-Clause
@@ -85,91 +86,92 @@ command:
   bootstrap:
     runPubGetInParallel: true
     environment:
-      sdk: ">=3.6.0 <4.0.0"
-      flutter: ">=3.29.3"
+      sdk: ">=3.9.0 <4.0.0"
+      flutter: ">=3.35.1"
     dependencies:
       auto_size_text: ^3.0.0
-      async: ^2.11.0
+      async: ^2.13.0
       asn1lib: ^1.6.5
       bip39: ^1.0.6
-      bloc_concurrency: ^0.2.2
-      chopper: ^8.0.3
-      collection: ^1.19.0
+      bloc_concurrency: ^0.3.0
+      bloc_test: ^10.0.0
+      chopper: ^8.3.0
+      collection: ^1.19.1
       cryptography: ^2.7.0
-      dotted_border: ^2.1.0
+      dotted_border: ^3.1.0
       ed25519_hd_key: ^2.3.0
       email_validator: ^3.0.0
       equatable: ^2.0.7
-      fake_async: ^1.3.1
-      ffi: ^2.1.0
-      ffigen: ^11.0.0
-      file_picker: ^8.0.7
-      flutter_bloc: ^8.1.5
+      fake_async: ^1.3.3
+      ffi: ^2.1.4
+      ffigen: ^19.1.0
+      file_picker: ^10.2.1
+      flutter_bloc: ^9.1.1
       flutter_dropzone: ^4.2.1
       flutter_inappwebview: ^6.1.5
       flutter_localized_locales: ^2.0.5
-      flutter_markdown: ^0.7.4+3
+      flutter_markdown: ^0.7.7+1
       flutter_native_splash: ^2.4.6
       # TODO(minikin): We use our forks as a temporary workaround for F14.
       flutter_quill:
         git:
           url: https://github.com/input-output-hk/flutter-quill
-          ref: 532172254c3cee957bbdbb08be922f2c870b7fff
+          ref: 10be2c8d1fb0d7728183fc883e133b5b48251d62
       flutter_quill_extensions:
         git:
           url: https://github.com/input-output-hk/flutter-quill
           path: flutter_quill_extensions
-          ref: 532172254c3cee957bbdbb08be922f2c870b7fff
-      flutter_rust_bridge: 2.5.1
-      flutter_secure_storage: ^9.2.2
-      formz: ^0.7.0
-      go_router: ^14.8.0
-      intl: ^0.19.0
+          ref: 10be2c8d1fb0d7728183fc883e133b5b48251d62
+      flutter_rust_bridge: 2.11.1
+      flutter_secure_storage: ^9.2.4
+      formz: ^0.8.0
+      google_fonts: ^6.3.0
+      go_router: ^15.1.3
+      http: ^1.4.0
+      intl: ^0.20.2
+      json_annotation: ^4.9.0
       logging: ^1.3.0
       lottie: ^3.3.1
-      markdown: ^7.2.2
+      markdown: ^7.3.0
       # TODO(minikin): We use our forks as a temporary workaround for F14.
       markdown_quill:
         git:
           url: https://github.com/input-output-hk/markdown_quill
-          ref: a523a6128e6b2677739ac5d68d1d9c65a2af8b98
+          ref: 63058a25ed9b42e1e183edb84bb613ac235c1306
       meta: ^1.16.0
-      result_type: ^0.2.0
-      rxdart: ^0.27.7
+      result_type: ^1.0.0
+      rxdart: ^0.28.0
       password_strength: ^0.2.0
-      plugin_platform_interface: ^2.1.7
+      plugin_platform_interface: ^2.1.8
       bech32: ^0.2.2
-      bip32_ed25519: ^0.6.0
+      bip32_ed25519: ^0.6.2
       # TODO(damian): un-pin version when cbor will expose EncodeSink, .encode, Arg.
       # RawTransaction requires those internal classes.
       cbor: 6.3.7
-      convert: ^3.1.1
+      convert: ^3.1.2
       path: ^1.9.1
       package_info_plus: ^8.3.0
       pinenacl: ^0.6.0
       pool: ^1.5.1
       uuid_plus: ^0.1.0
-      sentry_flutter: ^9.0.0
+      sentry_flutter: ^9.6.0
       scrollable_positioned_list: ^0.3.8
-      shared_preferences: ^2.3.3
+      shared_preferences: ^2.5.3
       shared_preferences_platform_interface: ^2.4.1
-      skeletonizer: ^1.4.3
-      synchronized: ^3.3.0+3
+      skeletonizer: ^2.1.0+1
+      synchronized: ^3.4.0
       typed_data: ^1.4.0
-      web: ^1.1.0
-      webdriver: ^3.0.3
+      web: ^1.1.1
+      webdriver: ^3.1.0
     dev_dependencies:
-      # TODO(dtscalac): locked version until the migration is possible:
-      # https://github.com/dart-lang/sdk/blob/main/pkg/analyzer/doc/element_model_migration_guide.md
-      # Currently many of the packages have not been migrated yet therefore we cannot use newer analyzer in our project.
-      # After the packages are migrated we can remove the direct dependency on analyzer and let it be a transitive dependency.
-      analyzer: 7.3.0
-      test: ^1.24.9
+      test: ^1.25.15
       build_runner: ^2.5.4
-      chopper_generator: ^8.0.4
-      flutter_gen_runner: ^5.10.0
-      mocktail: ^1.0.1
-      sentry_dart_plugin: ^2.4.1
+      chopper_generator: ^8.2.0
+      flutter_gen_runner: ^5.11.0
+      go_router_builder: ^2.9.0
+      json_serializable: ^6.9.5
+      mocktail: ^1.0.4
+      sentry_dart_plugin: ^3.1.1
 
 scripts:
   l10n:
@@ -238,7 +240,7 @@ scripts:
 
   license-list:
     run: |
-      melos exec --ignore="catalyst_analysis" --ignore="example" -- \
+      melos exec --ignore="catalyst_analysis" --ignore="*example*" -- \
         'dart run $MELOS_ROOT_PATH/scripts/generate_licenses.dart $MELOS_PACKAGE_PATH $MELOS_ROOT_PATH/docs/licenses/$MELOS_PACKAGE_NAME.csv'
       dart run $MELOS_ROOT_PATH/scripts/merge_csv_files.dart $MELOS_ROOT_PATH/docs/licenses/ $MELOS_ROOT_PATH/docs/licenses/licenses.csv
       echo "✅ Output file: $MELOS_ROOT_PATH/docs/licenses/licenses.csv"
@@ -378,17 +380,18 @@ scripts:
 
   docs-generate:
     run: |
-      dart pub global activate dartdoc 8.0.5
+      dart pub global deactivate dartdoc # uninstall previous version
+      dart pub global activate dartdoc 8.3.4
       melos exec -c 1 --scope="*catalyst_voices*" --ignore="*example*" -- flutter analyze && 
       melos exec -c 1 --scope="*catalyst_voices*" --ignore="*example*" -- dart doc --output=MELOS_ROOT_PATH/docs/dartdoc/MELOS_PACKAGE_NAME .
-    
+
     description: |
       Generate internal documentation and saves it to docs/dartdoc directory
-  
+
   docs-view:
     steps:
-     - dart pub global activate dhttpd
-     - dart pub global run dhttpd --path docs/dartdoc/
+      - dart pub global activate dhttpd
+      - dart pub global run dhttpd --path docs/dartdoc/
 
     description: |
       Documentation will be served at localhost:8080/<packageName>

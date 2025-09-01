@@ -6,9 +6,9 @@ import 'package:catalyst_voices_brands/src/themes/widgets/buttons_theme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/slider_theme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/toggles_theme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/voices_dialog_theme.dart';
-import 'package:catalyst_voices_brands/src/themes/widgets/voices_input_decoration_theme.dart';
-import 'package:catalyst_voices_brands/src/themes/widgets/voices_popup_menu_theme.dart';
-import 'package:catalyst_voices_brands/src/themes/widgets/voices_segmented_button_theme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/voices_input_decoration_theme_data.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/voices_popup_menu_theme_data.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/voices_segmented_button_theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -110,6 +110,16 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
     Color(0xFF5A7AE5),
     Color(0xFFA55DCE),
   ],
+  votingPositivePrimary: Color(0xFF85E093),
+  votingPositiveHover: Color(0xFF5CD66F),
+  votingPositiveVoted: Color(0xFF29A33C),
+  votingAbstainPrimary: Color(0xFFBFC8D9),
+  votingAbstainHover: Color(0xFFD9DEE8),
+  votingAbstainVoted: Color(0xFF9FACC6),
+  votingNegativePrimary: Color(0xFFFF9999),
+  votingNegativeHover: Color(0xFFFF6666),
+  votingNegativeVoted: Color(0xFFFF6666),
+  votingOverlay: Color(0xA6000000),
 );
 
 const BrandAssets lightBrandAssets = BrandAssets(
@@ -211,6 +221,16 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
     Color(0xFFC0D5FB),
     Color(0xFFF9A5E0),
   ],
+  votingPositivePrimary: Color(0xFF1D722A),
+  votingPositiveHover: Color(0xFF218230),
+  votingPositiveVoted: Color(0xFF33C74A),
+  votingAbstainPrimary: Color(0xFF2D3953),
+  votingAbstainHover: Color(0xFF506288),
+  votingAbstainVoted: Color(0xFF7F90B3),
+  votingNegativePrimary: Color(0xFFCC0000),
+  votingNegativeHover: Color(0xFFF50000),
+  votingNegativeVoted: Color(0xFFFF6666),
+  votingOverlay: Color(0x33000000),
 );
 
 /// [ThemeData] for the `catalyst` brand.
@@ -344,7 +364,7 @@ ThemeData _buildThemeData(
 
   return ThemeData(
     visualDensity: VisualDensity.standard,
-    appBarTheme: AppBarTheme(
+    appBarTheme: AppBarThemeData(
       backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv1,
       scrolledUnderElevation: 0,
     ),
@@ -352,8 +372,8 @@ ThemeData _buildThemeData(
       backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv1White,
     ),
     popupMenuTheme: VoicesPopupMenuThemeData(colors: voicesColorScheme),
-    dialogTheme: VoicesDialogTheme(colors: voicesColorScheme),
-    segmentedButtonTheme: VoicesSegmentedButtonTheme(
+    dialogTheme: VoicesDialogThemeData(colors: voicesColorScheme),
+    segmentedButtonTheme: VoicesSegmentedButtonThemeData(
       colors: colorScheme,
       voicesColors: voicesColorScheme,
       textTheme: textTheme,
@@ -369,7 +389,7 @@ ThemeData _buildThemeData(
       space: 16,
       thickness: 1,
     ),
-    tabBarTheme: TabBarTheme(
+    tabBarTheme: TabBarThemeData(
       tabAlignment: TabAlignment.start,
       labelStyle: const TextStyle(
         fontWeight: FontWeight.w500,
@@ -383,7 +403,7 @@ ThemeData _buildThemeData(
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(
       color: colorScheme.primary,
-      linearTrackColor: colorScheme.secondaryContainer,
+      linearTrackColor: voicesColorScheme.onSurfaceNeutralOpaqueLv2,
       circularTrackColor: colorScheme.secondaryContainer,
       refreshBackgroundColor: colorScheme.secondaryContainer,
     ),
@@ -404,7 +424,7 @@ ThemeData _buildThemeData(
     textSelectionTheme: TextSelectionThemeData(
       cursorColor: voicesColorScheme.textPrimary,
     ),
-    inputDecorationTheme: VoicesInputDecorationTheme(
+    inputDecorationTheme: VoicesInputDecorationThemeData(
       textTheme: textTheme,
       colorsScheme: colorScheme,
       colors: voicesColorScheme,

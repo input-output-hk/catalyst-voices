@@ -20,10 +20,16 @@ class _DelayedWidgetState extends State<DelayedWidget> {
   Future<void>? _future;
 
   @override
-  void initState() {
-    super.initState();
-
-    _future = Future.delayed(widget.delay);
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _future,
+      builder: (context, snapshot) {
+        return Offstage(
+          offstage: snapshot.connectionState != ConnectionState.done,
+          child: widget.child,
+        );
+      },
+    );
   }
 
   @override
@@ -41,15 +47,9 @@ class _DelayedWidgetState extends State<DelayedWidget> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _future,
-      builder: (context, snapshot) {
-        return Offstage(
-          offstage: snapshot.connectionState != ConnectionState.done,
-          child: widget.child,
-        );
-      },
-    );
+  void initState() {
+    super.initState();
+
+    _future = Future.delayed(widget.delay);
   }
 }

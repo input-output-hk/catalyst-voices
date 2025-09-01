@@ -3,7 +3,7 @@
 use std::sync::LazyLock;
 
 use anyhow::bail;
-use cardano_blockchain_types::Slot;
+use cardano_chain_follower::Slot;
 use num_bigint::BigInt;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},

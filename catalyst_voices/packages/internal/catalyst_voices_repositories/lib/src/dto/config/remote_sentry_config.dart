@@ -10,9 +10,7 @@ final class RemoteSentryConfig {
   final double? tracesSampleRate;
   final double? profilesSampleRate;
   final bool? enableAutoSessionTracking;
-  final bool? attachScreenshot;
   final bool? attachViewHierarchy;
-  final bool? debug;
   final String? diagnosticLevel;
 
   const RemoteSentryConfig({
@@ -22,9 +20,7 @@ final class RemoteSentryConfig {
     this.tracesSampleRate,
     this.profilesSampleRate,
     this.enableAutoSessionTracking,
-    this.attachScreenshot,
     this.attachViewHierarchy,
-    this.debug,
     this.diagnosticLevel,
   });
 

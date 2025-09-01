@@ -8,6 +8,7 @@ import 'step_13_password_input.dart';
 
 final class KeychainFinalPanel extends OnboardingPageBase {
   static const linkWalletAndRolesButton = Key('LinkWalletAndRolesButton');
+
   final keyLockedIcon = const Key('LockedPictureConstrainedBox');
   final checkedIcon = const Key('CheckedIcon');
   final stepTwoContainer = const Key('StepTwoContainer');

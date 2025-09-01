@@ -1,6 +1,6 @@
 //! Command line and environment variable settings for the service
 
-use cardano_blockchain_types::Network;
+use cardano_chain_follower::Network;
 use tracing::info;
 
 use super::str_env_var::StringEnvVar;

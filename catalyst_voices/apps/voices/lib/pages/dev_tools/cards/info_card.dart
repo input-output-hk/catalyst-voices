@@ -48,8 +48,9 @@ class _Title extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTextStyle(
-      style: (context.textTheme.titleLarge ?? const TextStyle())
-          .copyWith(color: context.colors.textPrimary),
+      style: (context.textTheme.titleLarge ?? const TextStyle()).copyWith(
+        color: context.colors.textPrimary,
+      ),
       child: child,
     );
   }

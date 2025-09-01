@@ -1,7 +1,7 @@
 //! Get the TXO by Stake Address
 use std::sync::{Arc, RwLock};
 
-use cardano_blockchain_types::StakeAddress;
+use cardano_chain_follower::StakeAddress;
 use futures::TryStreamExt;
 use scylla::{
     client::session::Session, statement::prepared::PreparedStatement, DeserializeRow, SerializeRow,
@@ -10,10 +10,7 @@ use tracing::error;
 
 use crate::db::{
     index::{
-        queries::{
-            caches::txo_by_stake::{get as cache_get, insert as cache_insert},
-            PreparedQueries, PreparedSelectQuery,
-        },
+        queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
     types::{DbSlot, DbStakeAddress, DbTransactionId, DbTxnIndex, DbTxnOutputOffset},
@@ -85,6 +82,20 @@ pub(crate) struct GetTxoByStakeAddressQuery {
     pub value: Arc<RwLock<GetTxoByStakeAddressQueryValue>>,
 }
 
+impl GetTxoByStakeAddressQuery {
+    /// Returns true if the UTXO has been already spent.
+    pub(crate) fn is_spent(&self) -> bool {
+        let query = self.value.read().unwrap_or_else(|error| {
+            error!(
+                %error,
+                "UTXO entry is poisoned, recovering.");
+            self.value.clear_poison();
+            error.into_inner()
+        });
+        query.spent_slot.is_some()
+    }
+}
+
 // Convert from flat result into result which doesn't need to clone all its data
 // everywhere.
 impl From<GetTxoByStakeAddressQueryInner> for GetTxoByStakeAddressQuery {
@@ -123,7 +134,7 @@ impl GetTxoByStakeAddressQuery {
         session: &CassandraSession, params: GetTxoByStakeAddressQueryParams,
     ) -> anyhow::Result<Arc<Vec<GetTxoByStakeAddressQuery>>> {
         if session.is_persistent() {
-            if let Some(rows) = cache_get(&params.stake_address) {
+            if let Some(rows) = session.caches().assets_ada().get(&params.stake_address) {
                 return Ok(rows);
             }
         }
@@ -143,7 +154,10 @@ impl GetTxoByStakeAddressQuery {
 
         // update cache
         if session.is_persistent() {
-            cache_insert(params.stake_address, rows.clone());
+            session
+                .caches()
+                .assets_ada()
+                .insert(params.stake_address, rows.clone());
         }
 
         Ok(rows)

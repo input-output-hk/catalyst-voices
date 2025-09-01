@@ -3,7 +3,7 @@
 use std::collections::{HashMap, HashSet};
 
 use anyhow::{Context, Result};
-use cardano_blockchain_types::{StakeAddress, TransactionId};
+use cardano_chain_follower::{hashes::TransactionId, StakeAddress};
 use catalyst_types::{
     catalyst_id::{role_index::RoleId, CatalystId},
     problem_report::ProblemReport,
@@ -84,7 +84,7 @@ async fn update_chain(
     let origin = reg.origin().to_owned();
 
     // Try to add a new registration to the chain.
-    let new_chain = chain.update(reg).map_err(|_| {
+    let new_chain = chain.update(reg).ok_or_else(|| {
         RbacValidationError::InvalidRegistration {
             catalyst_id: catalyst_id.clone(),
             purpose,
@@ -129,6 +129,7 @@ async fn update_chain(
         // Only new chains can take ownership of stake addresses of existing chains, so in this case
         // other chains aren't affected.
         modified_chains: Vec::new(),
+        purpose,
     })
 }
 
@@ -141,7 +142,7 @@ async fn start_new_chain(
     let report = reg.report().to_owned();
 
     // Try to start a new chain.
-    let new_chain = RegistrationChain::new(reg).map_err(|_| {
+    let new_chain = RegistrationChain::new(reg).ok_or_else(|| {
         if let Some(catalyst_id) = catalyst_id {
             RbacValidationError::InvalidRegistration {
                 catalyst_id,
@@ -239,6 +240,7 @@ async fn start_new_chain(
         stake_addresses: new_addresses,
         public_keys,
         modified_chains: updated_chains.into_iter().collect(),
+        purpose,
     })
 }
 
@@ -389,15 +391,15 @@ pub async fn is_chain_known(
         return Ok(true);
     }
 
+    let session =
+        CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
+
     // We only cache persistent chains, so it is ok to check the cache regardless of the
     // `is_persistent` parameter value.
-    if cached_persistent_rbac_chain(id).is_some() {
+    if cached_persistent_rbac_chain(&session, id).is_some() {
         return Ok(true);
     }
 
-    // Then try to find in the persistent database.
-    let session =
-        CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
     if is_cat_id_known(&session, id).await? {
         return Ok(true);
     }

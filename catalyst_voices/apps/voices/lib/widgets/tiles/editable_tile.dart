@@ -4,10 +4,7 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-typedef EditableTileChange = ({
-  bool isEditMode,
-  EditableTileChangeSource source,
-});
+typedef EditableTileChange = ({bool isEditMode, EditableTileChangeSource source});
 
 class EditableTile extends StatelessWidget {
   final String title;
@@ -49,7 +46,8 @@ class EditableTile extends StatelessWidget {
     return PropertyTile(
       title: title,
       statesController: statesController,
-      action: overrideAction ??
+      action:
+          overrideAction ??
           Offstage(
             offstage: !isEditEnabled,
             child: VoicesEditCancelButton(
@@ -161,8 +159,8 @@ class _Footer extends StatelessWidget {
             child: Text(
               saveText ?? context.l10n.saveButtonText.toUpperCase(),
               style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                    color: Theme.of(context).colorScheme.onPrimary,
-                  ),
+                color: Theme.of(context).colorScheme.onPrimary,
+              ),
             ),
           ),
         ),

@@ -9,6 +9,7 @@ import 'step_7_catalyst_keychain_success.dart';
 
 final class WriteDownSeedphrasePanel extends OnboardingPageBase {
   static const seedPhraseStoredCheckbox = Key('SeedPhraseStoredCheckbox');
+
   static const seedPhraseWord = Key('SeedPhraseWord');
   static const seedPhraseNumber = Key('SeedPhraseNumber');
   static const downloadSeedPhraseButton = Key('DownloadSeedPhraseButton');

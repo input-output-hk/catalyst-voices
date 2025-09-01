@@ -6,8 +6,8 @@ import '../utils/translations_utils.dart';
 
 class AccountDropdownPage {
   final PatrolTester $;
-
   final profileAndKeychainText = const Key('ProfileAndKeychain');
+
   final popUpMenuAccountHeader = const Key('PopUpMenuAccountHeader');
   final popUpMenuMyAccount = const Key('PopUpMenuMyAccount');
   final popUpMenuProfileAndKeychain = const Key('PopUpMenuProfileAndKeychain');

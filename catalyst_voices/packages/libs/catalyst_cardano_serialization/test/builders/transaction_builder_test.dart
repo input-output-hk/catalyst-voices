@@ -7,8 +7,7 @@ import '../test_utils/test_data.dart';
 
 void main() {
   group(TransactionBuilder, () {
-    test(
-        'transaction with outputs with too little '
+    test('transaction with outputs with too little '
         ' ada throws $TxValueBelowMinUtxoValueException', () {
       final txOutput = PreBabbageTransactionOutput(
         address: testnetAddr,
@@ -69,8 +68,7 @@ void main() {
       );
     });
 
-    test(
-        'transaction with mismatch between inputs and outputs'
+    test('transaction with mismatch between inputs and outputs'
         ' throws $TxBalanceMismatchException', () {
       final utxo = TransactionUnspentOutput(
         input: TransactionInput(
@@ -167,8 +165,7 @@ void main() {
       );
     });
 
-    test(
-        'transaction output with too many assets '
+    test('transaction output with too many assets '
         'throws $TxMaxAssetsPerOutputExceededException', () {
       final changeAddress = SelectionUtils.randomAddress();
       final policyId = PolicyId(SelectionUtils.randomHexString(PolicyId.hashLength));
@@ -225,8 +222,7 @@ void main() {
       );
     });
 
-    test(
-        'transaction with utxos each below min ada required '
+    test('transaction with utxos each below min ada required '
         'for change output will prefer selecting two utxos '
         'over burning remaining Ada as fee', () {
       final changeAddress = SelectionUtils.randomAddress();
@@ -259,8 +255,7 @@ void main() {
       expect(txBody.fee, lessThan(ada));
     });
 
-    test(
-        'transaction with one utxo below min ada required '
+    test('transaction with one utxo below min ada required '
         'for change output will burn remaining ada as fee '
         'when change output strategy allows to burn ada', () {
       final changeAddress = SelectionUtils.randomAddress();
@@ -295,8 +290,7 @@ void main() {
       expect(txBody.fee, equals(ada));
     });
 
-    test(
-        'transaction with one utxo below min ada required '
+    test('transaction with one utxo below min ada required '
         'for change output will throw exception '
         'when change output strategy does not allow to burn ada', () {
       final changeAddress = SelectionUtils.randomAddress();
@@ -324,6 +318,79 @@ void main() {
         () => txBuilder
             .applySelection(
               changeOutputStrategy: ChangeOutputAdaStrategy.noBurn,
+            )
+            .buildBody(),
+        throwsA(isA<InsufficientUtxoBalanceException>()),
+      );
+    });
+
+    test('transaction with one utxo below min ada required '
+        'for change output will throw exception '
+        'when change output strategy enforces change outputs', () {
+      final changeAddress = SelectionUtils.randomAddress();
+      const ada = Coin(969750);
+
+      final utxo = TransactionUnspentOutput(
+        input: TransactionInput(
+          transactionId: testTransactionHash,
+          index: 1,
+        ),
+        output: PreBabbageTransactionOutput(
+          address: changeAddress,
+          amount: const Balance(coin: ada),
+        ),
+      );
+
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(),
+        inputs: {utxo},
+        networkId: NetworkId.testnet,
+        changeAddress: changeAddress,
+      );
+
+      expect(
+        () => txBuilder
+            .applySelection(
+              changeOutputStrategy: ChangeOutputAdaStrategy.mustInclude,
+            )
+            .buildBody(),
+        throwsA(isA<InsufficientUtxoBalanceException>()),
+      );
+    });
+
+    test('transaction with one utxo exactly enough to cover the fee '
+        'will throw exception when change output strategy enforces change outputs', () {
+      final changeAddress = SelectionUtils.randomAddress();
+      const ada = Coin(162245);
+
+      final utxo = TransactionUnspentOutput(
+        input: TransactionInput(
+          transactionId: testTransactionHash,
+          index: 1,
+        ),
+        output: PreBabbageTransactionOutput(
+          address: changeAddress,
+          amount: const Balance(coin: ada),
+        ),
+      );
+
+      final txBuilder = TransactionBuilder(
+        config: transactionBuilderConfig(),
+        inputs: {utxo},
+        networkId: NetworkId.testnet,
+        changeAddress: changeAddress,
+      );
+
+      expect(
+        ada,
+        equals(txBuilder.minFee()),
+        reason: 'Ada in UTXO must be equal the fee',
+      );
+
+      expect(
+        () => txBuilder
+            .applySelection(
+              changeOutputStrategy: ChangeOutputAdaStrategy.mustInclude,
             )
             .buildBody(),
         throwsA(isA<InsufficientUtxoBalanceException>()),
@@ -375,8 +442,7 @@ void main() {
       expect(txBody.fee, equals(const Coin(170605)));
     });
 
-    test(
-        'transaction with maximum allowed native tokens in '
+    test('transaction with maximum allowed native tokens in '
         'a single output should create a single output', () {
       const maxNativeAssetsFittingInSingleOutput = 1011;
       final changeAddress = SelectionUtils.randomAddress();
@@ -424,8 +490,7 @@ void main() {
       expect(txBody.outputs, hasLength(1));
     });
 
-    test(
-        'transaction with one over the maximum allowed native tokens '
+    test('transaction with one over the maximum allowed native tokens '
         'in a single output should create two outputs', () {
       const maxNativeAssetsFittingInSingleOutput = 1011;
       final changeAddress = SelectionUtils.randomAddress();

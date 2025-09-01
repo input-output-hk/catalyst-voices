@@ -1,8 +1,7 @@
 //! Utilities for obtaining a RBAC registration chain (`RegistrationChain`).
 
 use anyhow::{bail, Context, Result};
-use cardano_blockchain_types::{Network, Point, Slot, StakeAddress, TxnIndex};
-use cardano_chain_follower::ChainFollower;
+use cardano_chain_follower::{ChainFollower, Network, Point, Slot, StakeAddress, TxnIndex};
 use catalyst_types::catalyst_id::CatalystId;
 use futures::{future::try_join, TryFutureExt, TryStreamExt};
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
@@ -93,13 +92,13 @@ pub async fn latest_rbac_chain_by_address(address: &StakeAddress) -> Result<Opti
 
 /// Returns only the persistent part of a registration chain by the given Catalyst ID.
 pub async fn persistent_rbac_chain(id: &CatalystId) -> Result<Option<RegistrationChain>> {
+    let session = CassandraSession::get(true).context("Failed to get Cassandra session")?;
+
     let id = id.as_short_id();
 
-    if let Some(chain) = cached_persistent_rbac_chain(&id) {
+    if let Some(chain) = cached_persistent_rbac_chain(&session, &id) {
         return Ok(Some(chain));
     }
-
-    let session = CassandraSession::get(true).context("Failed to get Cassandra session")?;
 
     let regs = indexed_regs(&session, &id).await?;
     let chain = build_rbac_chain(regs).await?.inspect(|c| {
@@ -137,7 +136,7 @@ pub async fn build_rbac_chain(
     )
     .await?;
 
-    let chain = RegistrationChain::new(root)?;
+    let chain = RegistrationChain::new(root).context("Failed to start registration chain")?;
     let chain = apply_regs(chain, regs).await?;
     Ok(Some(chain))
 }
@@ -155,7 +154,9 @@ pub async fn apply_regs(
             continue;
         }
         let reg = cip509(network, reg.slot_no.into(), reg.txn_index.into()).await?;
-        chain = chain.update(reg)?;
+        chain = chain
+            .update(reg)
+            .context("Failed to update registration chain")?;
     }
 
     Ok(chain)

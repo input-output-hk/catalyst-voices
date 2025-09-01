@@ -64,8 +64,8 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
   bool get _isSubmitted => widget.proposalPublish.isPublished;
 
   List<ProposalMenuItemAction> get _items => ProposalMenuItemAction.workspaceAvailableOptions(
-        widget.proposalPublish,
-      );
+    widget.proposalPublish,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +122,8 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
 
   Future<void> _editProposal() async {
     if (widget.proposalPublish.isPublished) {
-      final edit = await UnlockEditProposalDialog.show(
+      final edit =
+          await UnlockEditProposalDialog.show(
             context: context,
             title: widget.title,
             version: widget.version,

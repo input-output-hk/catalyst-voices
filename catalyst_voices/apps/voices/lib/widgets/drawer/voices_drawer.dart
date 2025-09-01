@@ -1,49 +1,70 @@
-import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-/// A builder that builds menu items for the [VoicesDrawerChooser].
-///
-/// The builder might provide a completely different widget
-/// based on [isSelected] field, which will be true if the [item]
-/// is currently selected in the [VoicesDrawerChooser].
-typedef VoicesDrawerChooserBuilder<T> = Widget Function({
-  required BuildContext context,
-  required T item,
-  required bool isSelected,
-});
+const Duration _animDuration = Duration(milliseconds: 200);
 
 /// A custom [Drawer] component that implements the Voices style
 /// navigation drawer.
 ///
-/// To add a sticky bottom menu item provide [bottom] widget.
+/// To add a sticky bottom menu item provide [footer] widget.
 ///
 /// The [VoicesDrawer] is indented to be used as the [Scaffold.drawer].
-/// Menu items should primarily be constructed as [VoicesListTile]s.
-class VoicesDrawer extends StatelessWidget {
-  /// The sticky menu item at the bottom.
-  final Widget? bottom;
+class VoicesDrawer extends StatefulWidget {
+  final double width;
 
   /// This widget is main "body" of [VoicesDrawer].
   final Widget child;
 
-  final ShapeBorder shape;
+  /// The sticky item at the bottom.
+  final Widget? footer;
 
-  final double width;
+  /// The widget which overlays the [VoicesDrawer]
+  /// and appears as a bottom sheet bundled into the drawer.
+  final Widget? bottomSheet;
 
   /// The default constructor for the [VoicesDrawer].
   const VoicesDrawer({
     super.key,
-    this.bottom,
-    required this.child,
-    this.shape = const RoundedRectangleBorder(),
     this.width = 360,
+    required this.child,
+    this.footer,
+    this.bottomSheet,
   });
+
+  @override
+  State<VoicesDrawer> createState() => VoicesDrawerState();
+
+  /// Returns the [VoicesDrawerState] for the nearest [VoicesDrawer] ancestor,
+  /// or null if none is found.
+  static VoicesDrawerState? maybeOf(BuildContext context) {
+    return context.findAncestorStateOfType<VoicesDrawerState>();
+  }
+
+  /// Returns the [VoicesDrawerState] for the nearest [VoicesDrawer] ancestor.
+  ///
+  /// Throws a [FlutterError] if no [VoicesDrawer] is found in the widget tree.
+  static VoicesDrawerState of(BuildContext context) {
+    final state = maybeOf(context);
+    if (state != null) {
+      return state;
+    }
+    throw FlutterError(
+      'VoicesDrawer.of() called with a context that does not contain a VoicesDrawer.\n'
+      'No VoicesDrawer ancestor could be found starting from the context that was passed to VoicesDrawer.of().',
+    );
+  }
+}
+
+class VoicesDrawerState extends State<VoicesDrawer> {
+  bool _isBottomSheetOpen = false;
+
+  bool get isBottomSheetOpen => _isBottomSheetOpen;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final bottomSheet = widget.bottomSheet;
+
     return Theme(
       data: theme.copyWith(
         dividerTheme: theme.dividerTheme.copyWith(
@@ -55,165 +76,74 @@ class VoicesDrawer extends StatelessWidget {
           size: 22,
         ),
       ),
-      child: Drawer(
-        width: width,
-        shape: shape,
-        child: Column(
-          children: [
-            Expanded(child: child),
-            if (bottom != null)
-              Padding(
-                padding: const EdgeInsets.only(
-                  top: 24,
-                  left: 12,
-                  right: 12,
-                  bottom: 18,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Container(
+          clipBehavior: Clip.antiAlias,
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
+          ),
+          child: Stack(
+            children: [
+              Drawer(
+                key: const Key('Drawer'),
+                width: widget.width,
+                child: Column(
+                  children: [
+                    Expanded(child: widget.child),
+                    if (widget.footer != null) widget.footer!,
+                  ],
                 ),
-                child: bottom,
               ),
-          ],
+              Positioned.fill(
+                key: const Key('BottomSheetOverlay'),
+                child: AnimatedSwitcher(
+                  duration: _animDuration,
+                  child: (bottomSheet != null && _isBottomSheetOpen)
+                      ? const _BottomSheetOverlay()
+                      : null,
+                ),
+              ),
+              Positioned(
+                key: const Key('BottomSheet'),
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: AnimatedSwitcher(
+                  duration: _animDuration,
+                  child: Offstage(
+                    offstage: !_isBottomSheetOpen,
+                    child: bottomSheet,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-}
 
-/// Displays a horizontal list of [items] built by [itemBuilder]
-/// with left and right chevrons that select previous/next items.
-///
-/// The [VoicesDrawerChooser] is intended to be primarily
-/// used as [VoicesDrawer.bottom].
-class VoicesDrawerChooser<T> extends StatelessWidget {
-  /// The list of selectable items.
-  /// In most cases it should be an enum that would
-  /// help to distinguish between different items.
-  final List<T> items;
-
-  /// The currently selected item.
-  final T selectedItem;
-
-  /// A callback called when an item gets selected.
-  final ValueChanged<T> onSelected;
-
-  /// Builds the widget for the abstract item of type [T].
-  final VoicesDrawerChooserBuilder<T> itemBuilder;
-
-  /// The leading widget instead as the first element in a horizontal list.
-  ///
-  /// Intended to be an extra action that is located next to [items].
-  final Widget? leading;
-
-  /// The default constructor for the [VoicesDrawerChooser].
-  const VoicesDrawerChooser({
-    super.key,
-    required this.items,
-    required this.selectedItem,
-    required this.onSelected,
-    required this.itemBuilder,
-    this.leading,
-  });
-
-  int get _selectedIndex => items.indexOf(selectedItem);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          if (leading != null) leading!,
-          IconButton(
-            key: const ValueKey('DrawerChooserPreviousButton'),
-            onPressed: _selectedIndex > 0 ? _onSelectPrevious : null,
-            icon: VoicesAssets.icons.chevronLeft.buildIcon(size: 20),
-          ),
-          for (final item in items)
-            VoicesGestureDetector(
-              key: ValueKey('DrawerChooser$item'),
-              behavior: HitTestBehavior.opaque,
-              onTap: () => onSelected(item),
-              child: itemBuilder(
-                context: context,
-                item: item,
-                isSelected: selectedItem == item,
-              ),
-            ),
-          IconButton(
-            key: const ValueKey('DrawerChooserNextButton'),
-            onPressed: _selectedIndex < (items.length - 1) ? _onSelectNext : null,
-            icon: VoicesAssets.icons.chevronRight.buildIcon(size: 20),
-          ),
-        ],
-      ),
-    );
+  void hideBottomSheet() {
+    setState(() {
+      _isBottomSheetOpen = false;
+    });
   }
 
-  void _onSelectNext() {
-    final next = _selectedIndex + 1;
-    onSelected(items[next]);
-  }
-
-  void _onSelectPrevious() {
-    final previous = _selectedIndex - 1;
-    onSelected(items[previous]);
+  void showBottomSheet() {
+    setState(() {
+      _isBottomSheetOpen = true;
+    });
   }
 }
 
-/// A menu item widget for the [VoicesDrawerChooser].
-///
-/// Displays an [icon] of [foregroundColor]
-/// with a circular background of [backgroundColor].
-class VoicesDrawerChooserItem extends StatelessWidget {
-  /// The icon for the widget.
-  final IconData icon;
-
-  /// The tint color for the [icon].
-  final Color foregroundColor;
-
-  /// The color for the circular background.
-  final Color backgroundColor;
-
-  /// The default constructor for the [VoicesDrawerChooserItem].
-  const VoicesDrawerChooserItem({
-    super.key,
-    required this.icon,
-    required this.foregroundColor,
-    required this.backgroundColor,
-  });
+class _BottomSheetOverlay extends StatelessWidget {
+  const _BottomSheetOverlay();
 
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: 20,
-      backgroundColor: backgroundColor,
-      foregroundColor: foregroundColor,
-      child: Icon(icon, size: 23),
-    );
-  }
-}
-
-/// A placeholder to be used instead of [VoicesDrawerChooserItem].
-///
-/// Most common use case would be to return [VoicesDrawerChooserItemPlaceholder]
-/// instead of [VoicesDrawerChooserItem] inside the [VoicesDrawerChooserBuilder]
-/// if the isSelected param is false.
-class VoicesDrawerChooserItemPlaceholder extends StatelessWidget {
-  const VoicesDrawerChooserItemPlaceholder({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Container(
-        width: 12,
-        height: 12,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Theme.of(context).colors.iconsDisabled,
-        ),
-      ),
+    return Container(
+      color: Theme.of(context).colors.onSurfaceNeutral016.withAlpha(50),
     );
   }
 }

@@ -5,14 +5,11 @@ import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class VoicesNumFieldController<T extends num> extends ValueNotifier<T?> {
-  VoicesNumFieldController([super.value]);
-}
-
-typedef VoicesNumFieldValidator<T extends num> = VoicesTextFieldValidationResult Function(
-  T? value,
-  String text,
-);
+typedef VoicesNumFieldValidator<T extends num> =
+    VoicesTextFieldValidationResult Function(
+      T? value,
+      String text,
+    );
 
 class VoicesNumField<T extends num> extends StatefulWidget {
   final Codec<T, String> codec;
@@ -52,6 +49,10 @@ class VoicesNumField<T extends num> extends StatefulWidget {
   State<VoicesNumField<T>> createState() => _VoicesNumFieldState<T>();
 }
 
+class VoicesNumFieldController<T extends num> extends ValueNotifier<T?> {
+  VoicesNumFieldController([super.value]);
+}
+
 class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
   late final TextEditingController _textEditingController;
 
@@ -62,18 +63,30 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
   }
 
   @override
-  void initState() {
-    super.initState();
+  Widget build(BuildContext context) {
+    final onChanged = widget.onChanged;
+    final validator = widget.validator;
+    final onFieldSubmitted = widget.onFieldSubmitted;
 
-    final num = _effectiveController.value;
-    final text = _toText(num);
-
-    final textValue = TextEditingValueExt.collapsedAtEndOf(text ?? '');
-
-    _textEditingController = TextEditingController.fromValue(textValue)
-      ..addListener(_handleTextChange);
-
-    _effectiveController.addListener(_handleNumChange);
+    return VoicesTextField(
+      controller: _textEditingController,
+      statesController: widget.statesController,
+      focusNode: widget.focusNode,
+      maxLength: widget.maxLength,
+      decoration: widget.decoration,
+      keyboardType: widget.keyboardType,
+      inputFormatters: [
+        ...?widget.inputFormatters,
+      ],
+      onChanged: onChanged != null ? (value) => onChanged(_toNum(value ?? '')) : null,
+      textValidator: validator != null ? (value) => validator(_toNum(value), value) : null,
+      onFieldSubmitted: onFieldSubmitted != null
+          ? (value) => onFieldSubmitted(_toNum(value))
+          : null,
+      enabled: widget.enabled,
+      readOnly: widget.readOnly,
+      ignorePointers: widget.ignorePointers,
+    );
   }
 
   @override
@@ -106,29 +119,18 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final onChanged = widget.onChanged;
-    final validator = widget.validator;
-    final onFieldSubmitted = widget.onFieldSubmitted;
+  void initState() {
+    super.initState();
 
-    return VoicesTextField(
-      controller: _textEditingController,
-      statesController: widget.statesController,
-      focusNode: widget.focusNode,
-      maxLength: widget.maxLength,
-      decoration: widget.decoration,
-      keyboardType: widget.keyboardType,
-      inputFormatters: [
-        ...?widget.inputFormatters,
-      ],
-      onChanged: onChanged != null ? (value) => onChanged(_toNum(value ?? '')) : null,
-      textValidator: validator != null ? (value) => validator(_toNum(value), value) : null,
-      onFieldSubmitted:
-          onFieldSubmitted != null ? (value) => onFieldSubmitted(_toNum(value)) : null,
-      enabled: widget.enabled,
-      readOnly: widget.readOnly,
-      ignorePointers: widget.ignorePointers,
-    );
+    final num = _effectiveController.value;
+    final text = _toText(num);
+
+    final textValue = TextEditingValueExt.collapsedAtEndOf(text ?? '');
+
+    _textEditingController = TextEditingController.fromValue(textValue)
+      ..addListener(_handleTextChange);
+
+    _effectiveController.addListener(_handleNumChange);
   }
 
   void _handleNumChange() {
@@ -149,17 +151,17 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
     }
   }
 
-  String? _toText(T? num) {
+  T? _toNum(String text) {
     try {
-      return num != null ? widget.codec.encode(num) : '';
+      return widget.codec.decode(text);
     } on FormatException {
       return null;
     }
   }
 
-  T? _toNum(String text) {
+  String? _toText(T? num) {
     try {
-      return widget.codec.decode(text);
+      return num != null ? widget.codec.encode(num) : '';
     } on FormatException {
       return null;
     }

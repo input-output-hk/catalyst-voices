@@ -37,23 +37,23 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
     required KeyDerivationService keyDerivationService,
     required RegistrationProgressNotifier progressNotifier,
     required BlockchainConfig blockchainConfig,
-  })  : _userService = userService,
-        _registrationService = registrationService,
-        _progressNotifier = progressNotifier,
-        _baseProfileCubit = BaseProfileCubit(),
-        _keychainCreationCubit = KeychainCreationCubit(
-          downloaderService: downloaderService,
-        ),
-        _walletLinkCubit = WalletLinkCubit(
-          registrationService: registrationService,
-          blockchainConfig: blockchainConfig,
-        ),
-        _recoverCubit = RecoverCubit(
-          userService: userService,
-          registrationService: registrationService,
-          keyDerivationService: keyDerivationService,
-        ),
-        super(const RegistrationState()) {
+  }) : _userService = userService,
+       _registrationService = registrationService,
+       _progressNotifier = progressNotifier,
+       _baseProfileCubit = BaseProfileCubit(),
+       _keychainCreationCubit = KeychainCreationCubit(
+         downloaderService: downloaderService,
+       ),
+       _walletLinkCubit = WalletLinkCubit(
+         registrationService: registrationService,
+         blockchainConfig: blockchainConfig,
+       ),
+       _recoverCubit = RecoverCubit(
+         userService: userService,
+         registrationService: registrationService,
+         keyDerivationService: keyDerivationService,
+       ),
+       super(const RegistrationState()) {
     _baseProfileCubit.stream.listen(_onBaseProfileStateDataChanged);
     _keychainCreationCubit.stream.listen(_onKeychainStateDataChanged);
     _walletLinkCubit.stream.listen(_onWalletLinkStateDataChanged);
@@ -94,11 +94,13 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
   }
 
   @override
-  Future<void> close() {
-    _baseProfileCubit.close();
-    _keychainCreationCubit.close();
-    _walletLinkCubit.close();
-    _recoverCubit.close();
+  Future<void> close() async {
+    await [
+      _baseProfileCubit.close(),
+      _keychainCreationCubit.close(),
+      _walletLinkCubit.close(),
+      _recoverCubit.close(),
+    ].wait;
     return super.close();
   }
 
@@ -136,11 +138,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
 
   Future<void> finishRegistration() async {
     try {
-      _onRegistrationStateDataChanged(
-        _registrationState.copyWith(
-          isSubmittingTx: true,
-        ),
-      );
+      _onRegistrationStateDataChanged(_registrationState.copyWith(isSubmittingTx: true));
 
       final submitData = _buildAccountSubmitData();
 
@@ -151,10 +149,10 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
           await _userService.registerAccount(account);
 
         case AccountSubmitUpdateData(
-            :final metadata,
-            :final accountId,
-            :final roles,
-          ):
+          :final metadata,
+          :final accountId,
+          :final roles,
+        ):
           await _registrationService.submitTransaction(
             wallet: metadata.wallet,
             unsignedTx: metadata.transaction,
@@ -163,11 +161,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
           await _userService.updateAccount(id: accountId, roles: roles);
       }
 
-      _onRegistrationStateDataChanged(
-        _registrationState.copyWith(
-          isSubmittingTx: false,
-        ),
-      );
+      _onRegistrationStateDataChanged(_registrationState.copyWith(isSubmittingTx: false));
 
       _progressNotifier.clear();
       nextStep();
@@ -187,11 +181,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
 
       emitError(const LocalizedRegistrationEmailAlreadyUsedException());
 
-      _onRegistrationStateDataChanged(
-        _registrationState.copyWith(
-          isSubmittingTx: false,
-        ),
-      );
+      _onRegistrationStateDataChanged(_registrationState.copyWith(isSubmittingTx: false));
 
       _progressNotifier.clear();
 
@@ -374,9 +364,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
     }
   }
 
-  Future<void> startAccountUpdate({
-    required CatalystId id,
-  }) async {
+  Future<void> startAccountUpdate({required CatalystId id}) async {
     final user = _userService.user;
     if (!user.hasAccount(id: id)) {
       return;
@@ -397,20 +385,13 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
     final wallet = _walletLinkCubit.selectedWallet!;
     final transaction = _transaction!;
 
-    final metadata = AccountSubmitMetadata(
-      wallet: wallet,
-      transaction: transaction,
-    );
+    final metadata = AccountSubmitMetadata(wallet: wallet, transaction: transaction);
 
     final roles = _walletLinkCubit.roles;
 
     final accountId = _accountId;
     if (accountId != null) {
-      return AccountSubmitUpdateData(
-        metadata: metadata,
-        accountId: accountId,
-        roles: roles,
-      );
+      return AccountSubmitUpdateData(metadata: metadata, accountId: accountId, roles: roles);
     }
 
     final username = _baseProfileCubit.state.username.value;
@@ -444,11 +425,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
       final nextStage = step.stage.next;
       return nextStage != null
           ? CreateBaseProfileStep(stage: nextStage)
-          : const AccountCreateProgressStep(
-              completedSteps: [
-                AccountCreateStepType.baseProfile,
-              ],
-            );
+          : const AccountCreateProgressStep(completedSteps: [AccountCreateStepType.baseProfile]);
     }
 
     RegistrationStep nextKeychainStep() {
@@ -464,10 +441,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
       return nextStage != null
           ? CreateKeychainStep(stage: nextStage)
           : const AccountCreateProgressStep(
-              completedSteps: [
-                AccountCreateStepType.baseProfile,
-                AccountCreateStepType.keychain,
-              ],
+              completedSteps: [AccountCreateStepType.baseProfile, AccountCreateStepType.keychain],
             );
     }
 
@@ -497,9 +471,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
       return nextStage != null ? RecoverWithSeedPhraseStep(stage: nextStage) : null;
     }
 
-    RegistrationStep? nextRegistrationStep(
-      List<AccountCreateStepType> completedSteps,
-    ) {
+    RegistrationStep? nextRegistrationStep(List<AccountCreateStepType> completedSteps) {
       if (!completedSteps.contains(AccountCreateStepType.baseProfile)) {
         return const CreateBaseProfileStep();
       }
@@ -569,11 +541,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
 
       return previousStep != null
           ? CreateKeychainStep(stage: previousStep)
-          : const AccountCreateProgressStep(
-              completedSteps: [
-                AccountCreateStepType.baseProfile,
-              ],
-            );
+          : const AccountCreateProgressStep(completedSteps: [AccountCreateStepType.baseProfile]);
     }
 
     /// Nested function. Responsible only for wallet link steps logic.
@@ -585,10 +553,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
       return previousStep != null
           ? WalletLinkStep(stage: previousStep)
           : const AccountCreateProgressStep(
-              completedSteps: [
-                AccountCreateStepType.baseProfile,
-                AccountCreateStepType.keychain,
-              ],
+              completedSteps: [AccountCreateStepType.baseProfile, AccountCreateStepType.keychain],
             );
     }
 

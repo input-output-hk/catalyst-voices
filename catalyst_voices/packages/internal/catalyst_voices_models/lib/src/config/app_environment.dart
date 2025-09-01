@@ -128,9 +128,9 @@ enum AppEnvironmentType {
       AppEnvironmentType.dev || AppEnvironmentType.preprod => _getBaseUrl('reviews', envName: name),
       AppEnvironmentType.prod => _getBaseUrl('reviews'),
       AppEnvironmentType.relative => _getBaseUrl(
-          'reviews',
-          envName: tryUriBaseEnvName(from: normalizedBaseUri().toString()),
-        ),
+        'reviews',
+        envName: tryUriBaseEnvName(from: normalizedBaseUri().toString()),
+      ),
     };
   }
 
@@ -152,6 +152,17 @@ enum AppEnvironmentType {
     return Uri.https(authority);
   }
 
+  @visibleForTesting
+  static Uri normalizedBaseUri([Uri? base]) {
+    base ??= Uri.base;
+
+    return Uri(
+      scheme: base.scheme,
+      host: base.host,
+      port: base.port,
+    );
+  }
+
   /// Tries to extract the environment name from a given URI string.
   ///
   /// It uses [_envRegExp] to find a match (e.g., 'dev', 'preprod') and
@@ -168,16 +179,5 @@ enum AppEnvironmentType {
     }
 
     return null;
-  }
-
-  @visibleForTesting
-  static Uri normalizedBaseUri([Uri? base]) {
-    base ??= Uri.base;
-
-    return Uri(
-      scheme: base.scheme,
-      host: base.host,
-      port: base.port,
-    );
   }
 }

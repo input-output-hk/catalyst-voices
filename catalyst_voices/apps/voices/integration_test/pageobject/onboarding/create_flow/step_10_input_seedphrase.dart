@@ -8,6 +8,7 @@ import 'step_9_writedown_seedphrase_info.dart';
 
 final class InputSeedphrasePanel extends OnboardingPageBase {
   static const seedPhrasesPicker = Key('SeedPhrasesPicker');
+
   final resetButton = const Key('ResetButton');
 
   InputSeedphrasePanel(super.$);

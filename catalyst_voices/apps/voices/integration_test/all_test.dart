@@ -20,7 +20,7 @@ void main() {
 
     await loggingService.updateSettings(printToConsole: const Optional(false));
 
-    await Dependencies.instance.get<SyncManager>().isSynchronization;
+    await Dependencies.instance.get<SyncManager>().waitForSync;
   });
 
   tearDown(() async {

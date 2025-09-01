@@ -1,4 +1,4 @@
-import 'package:catalyst_cardano_serialization/src/types.dart';
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:equatable/equatable.dart';
 
 /// Exception thrown when a native asset that is required
@@ -77,7 +77,8 @@ final class InsufficientAdaForChangeOutputException extends Equatable implements
   List<Object?> get props => [actualAmount, requiredAmount];
 
   @override
-  String toString() => 'InsufficientAdaForChangeOutputException('
+  String toString() =>
+      'InsufficientAdaForChangeOutputException('
       'actualAmount:$actualAmount'
       ', requiredAmount:$requiredAmount'
       ')';
@@ -101,7 +102,8 @@ final class InsufficientUtxoBalanceException extends Equatable implements Except
   List<Object?> get props => [actualAmount, requiredAmount];
 
   @override
-  String toString() => 'InsufficientUtxoBalanceException('
+  String toString() =>
+      'InsufficientUtxoBalanceException('
       'actualAmount:$actualAmount'
       ', requiredAmount:$requiredAmount'
       ')';
@@ -177,19 +179,51 @@ final class MaxTxSizeExceededException extends Equatable implements Exception {
   List<Object?> get props => [maxTxSize, actualTxSize];
 
   @override
-  String toString() => 'MaxTxSizeExceededException('
+  String toString() =>
+      'MaxTxSizeExceededException('
       'maxTxSize:$maxTxSize'
       ', actualTxSize:$actualTxSize'
       ')';
 }
 
+/// Exception thrown when the transaction requiredSigners does not include output address publicKeyHash.
+final class OutputPublicKeyHashNotInRequiredSignerException extends Equatable implements Exception {
+  /// List of outputs public keys hashes
+  final Set<Ed25519PublicKeyHash> outputsPublicKeysHashes;
+
+  /// List of required signers.
+  final Set<Ed25519PublicKeyHash> requiredSigners;
+
+  /// The default constructor for [OutputPublicKeyHashNotInRequiredSignerException].
+  const OutputPublicKeyHashNotInRequiredSignerException({
+    required this.outputsPublicKeysHashes,
+    required this.requiredSigners,
+  });
+
+  /// Set of missing keys hashes.
+  Set<Ed25519PublicKeyHash> get missing {
+    return outputsPublicKeysHashes.where((element) => !requiredSigners.contains(element)).toSet();
+  }
+
+  @override
+  List<Object?> get props => [
+    outputsPublicKeysHashes,
+    requiredSigners,
+  ];
+
+  @override
+  String toString() {
+    return 'OutputPublicKeyHashNotInRequiredSigner(requiredSigners: $requiredSigners, outputsPublicKeysHashes: $outputsPublicKeysHashes)';
+  }
+}
+
 /// Exception thrown when validating integrity of transaction bytes.
-final class RawTransactionMalformed extends Equatable implements Exception {
+final class RawTransactionMalformedException extends Equatable implements Exception {
   /// List of reasons for malformed transaction.
   final List<String> reasons;
 
-  /// The default constructor for [RawTransactionMalformed].
-  const RawTransactionMalformed({this.reasons = const []});
+  /// The default constructor for [RawTransactionMalformedException].
+  const RawTransactionMalformedException({this.reasons = const []});
 
   @override
   List<Object?> get props => [reasons];
@@ -201,7 +235,7 @@ final class RawTransactionMalformed extends Equatable implements Exception {
 }
 
 /// Exception thrown when validating size of transaction.
-final class RawTransactionSizeChanged extends Equatable implements Exception {
+final class RawTransactionSizeChangedException extends Equatable implements Exception {
   /// Bytes size expected.
   final int expectedSize;
 
@@ -211,8 +245,8 @@ final class RawTransactionSizeChanged extends Equatable implements Exception {
   /// Provides more details about size miss match.
   final String aspect;
 
-  /// The default constructor for [RawTransactionSizeChanged].
-  const RawTransactionSizeChanged({
+  /// The default constructor for [RawTransactionSizeChangedException].
+  const RawTransactionSizeChangedException({
     required this.expectedSize,
     required this.actualSize,
     required this.aspect,
@@ -238,7 +272,8 @@ final class ReferenceScriptSizeLimitExceededException extends Equatable implemen
   List<Object?> get props => [maxRefScriptSize];
 
   @override
-  String toString() => 'Total size of reference scripts exceeds the limit of $maxRefScriptSize '
+  String toString() =>
+      'Total size of reference scripts exceeds the limit of $maxRefScriptSize '
       'bytes';
 }
 
@@ -269,6 +304,23 @@ final class SignatureNotVerifiedException extends Equatable implements Exception
   String toString() => 'SignatureNotVerifiedException';
 }
 
+/// Exception thrown when the transaction doesn't have required change outputs.
+///
+/// In some scenarios such as RBAC registration the transaction must have
+/// change outputs because the [RegistrationData] references them.
+final class TransactionMissingChangeOutputsException extends Equatable implements Exception {
+  /// The default constructor for [TransactionMissingChangeOutputsException].
+  const TransactionMissingChangeOutputsException();
+
+  @override
+  List<Object?> get props => [];
+
+  @override
+  String toString() {
+    return 'TransactionMissingChangeOutputsException';
+  }
+}
+
 /// Exception thrown when transaction inputs are not equal to outputs + fee.
 final class TxBalanceMismatchException extends Equatable implements Exception {
   /// The total balance of inputs.
@@ -291,7 +343,8 @@ final class TxBalanceMismatchException extends Equatable implements Exception {
   List<Object?> get props => [inputs, outputs, fee];
 
   @override
-  String toString() => 'TxBalanceMismatchException('
+  String toString() =>
+      'TxBalanceMismatchException('
       'inputs:$inputs'
       ', outputs:$outputs'
       ', fee:$fee'
@@ -328,7 +381,8 @@ final class TxFeeTooSmallException extends Equatable implements Exception {
   List<Object?> get props => [actualFee, minFee];
 
   @override
-  String toString() => 'TxFeeTooSmallException('
+  String toString() =>
+      'TxFeeTooSmallException('
       'actualFee=$actualFee'
       ', minFee=$minFee'
       ')';
@@ -353,7 +407,8 @@ final class TxMaxAssetsPerOutputExceededException extends Equatable implements E
   List<Object?> get props => [actualCount, maxCount];
 
   @override
-  String toString() => 'TxMaxAssetsPerOutputExceededException('
+  String toString() =>
+      'TxMaxAssetsPerOutputExceededException('
       'actualCount:$actualCount'
       ', maxCount:$maxCount'
       ')';
@@ -378,7 +433,8 @@ final class TxValueBelowMinUtxoValueException extends Equatable implements Excep
   List<Object?> get props => [actualAmount, requiredAmount];
 
   @override
-  String toString() => 'TxValueBelowMinUtxoValueException('
+  String toString() =>
+      'TxValueBelowMinUtxoValueException('
       'actualAmount:$actualAmount'
       ', requiredAmount:$requiredAmount'
       ')';
@@ -403,7 +459,8 @@ final class TxValueSizeExceededException extends Equatable implements Exception 
   List<Object?> get props => [actualValueSize, maxValueSize];
 
   @override
-  String toString() => 'TxValueSizeExceededException('
+  String toString() =>
+      'TxValueSizeExceededException('
       'actualValueSize:$actualValueSize'
       ', maxValueSize:$maxValueSize'
       ')';

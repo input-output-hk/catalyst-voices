@@ -38,15 +38,15 @@ class ProposalsState extends Equatable {
 
   @override
   List<Object?> get props => [
-        hasSearchQuery,
-        favoritesIds,
-        count,
-        categorySelectorItems,
-        recentProposalsMaxAge,
-        isRecentProposalsEnabled,
-        orderItems,
-        isOrderEnabled,
-      ];
+    hasSearchQuery,
+    favoritesIds,
+    count,
+    categorySelectorItems,
+    recentProposalsMaxAge,
+    isRecentProposalsEnabled,
+    orderItems,
+    isOrderEnabled,
+  ];
 
   SignedDocumentRef? get selectedCategoryId {
     return categorySelectorItems.singleWhereOrNull((element) => element.isSelected)?.ref;
@@ -75,6 +75,12 @@ class ProposalsState extends Equatable {
   }
 
   bool isFavorite(String proposalId) => favoritesIds.contains(proposalId);
+
+  List<ProposalsPageTab> tabs({required bool isProposerUnlock}) {
+    return ProposalsPageTab.values
+        .where((tab) => tab != ProposalsPageTab.my || isProposerUnlock)
+        .toList();
+  }
 }
 
 final class ProposalsStateLatestUpdateCheckbox extends Equatable {

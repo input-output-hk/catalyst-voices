@@ -13,33 +13,6 @@ Future<void> main() async {
   await _coseSign();
 }
 
-Future<void> _coseSign1() async {
-  final algorithm = Ed25519();
-  final keyPair = await algorithm.newKeyPairFromSeed(List.filled(32, 0));
-  final signerVerifier = _SignerVerifier(algorithm, keyPair);
-
-  final coseSign1 = await CoseSign1.sign(
-    protectedHeaders: const CoseHeaders.protected(),
-    unprotectedHeaders: const CoseHeaders.unprotected(),
-    signer: signerVerifier,
-    payload: utf8.encode('This is the content.'),
-  );
-
-  final verified = await coseSign1.verify(
-    verifier: signerVerifier,
-  );
-
-  print('COSE_SIGN1:');
-  print(hex.encode(cbor.encode(coseSign1.toCbor())));
-  print('verified: $verified');
-
-  assert(
-    verified,
-    'The signature proves that given COSE_SIGN1 structure has been '
-    'signed by the owner of the given public key',
-  );
-}
-
 Future<void> _coseSign() async {
   final algorithm = Ed25519();
   final keyPair = await algorithm.newKeyPairFromSeed(List.filled(32, 0));
@@ -63,6 +36,33 @@ Future<void> _coseSign() async {
   assert(
     verified,
     'The signature proves that given COSE_SIGN structure has been '
+    'signed by the owner of the given public key',
+  );
+}
+
+Future<void> _coseSign1() async {
+  final algorithm = Ed25519();
+  final keyPair = await algorithm.newKeyPairFromSeed(List.filled(32, 0));
+  final signerVerifier = _SignerVerifier(algorithm, keyPair);
+
+  final coseSign1 = await CoseSign1.sign(
+    protectedHeaders: const CoseHeaders.protected(),
+    unprotectedHeaders: const CoseHeaders.unprotected(),
+    signer: signerVerifier,
+    payload: utf8.encode('This is the content.'),
+  );
+
+  final verified = await coseSign1.verify(
+    verifier: signerVerifier,
+  );
+
+  print('COSE_SIGN1:');
+  print(hex.encode(cbor.encode(coseSign1.toCbor())));
+  print('verified: $verified');
+
+  assert(
+    verified,
+    'The signature proves that given COSE_SIGN1 structure has been '
     'signed by the owner of the given public key',
   );
 }

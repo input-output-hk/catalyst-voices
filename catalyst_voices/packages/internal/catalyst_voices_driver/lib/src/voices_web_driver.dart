@@ -53,6 +53,10 @@ class VoicesWebDriver extends WebFlutterDriver {
     );
   }
 
+  static String _createPathExtension(List<String?> extensions) {
+    return extensions.where((e) => e != null).join(',');
+  }
+
   static Map<String, dynamic> _driverCapabilites(List<String?> extensionsPath) {
     final extensionPathString = _createPathExtension(extensionsPath);
     final driverCapabilities =
@@ -88,9 +92,5 @@ class VoicesWebDriver extends WebFlutterDriver {
     };
 
     return updatedDriverCapabilities;
-  }
-
-  static String _createPathExtension(List<String?> extensions) {
-    return extensions.where((e) => e != null).join(',');
   }
 }
