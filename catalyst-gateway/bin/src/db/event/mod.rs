@@ -326,12 +326,15 @@ pub fn establish_connection_pool() {
     }
 
     let pg_mgr = deadpool_postgres::Manager::new(config, tokio_postgres::NoTls);
-
     match deadpool::managed::Pool::builder(pg_mgr)
         .max_size(Settings::event_db_settings().max_connections() as usize)
-        .create_timeout(Settings::event_db_settings().connection_creation_timeout())
-        .wait_timeout(Settings::event_db_settings().slot_wait_timeout())
-        .recycle_timeout(Settings::event_db_settings().connection_recycle_timeout())
+        .create_timeout(Some(
+            Settings::event_db_settings().connection_creation_timeout(),
+        ))
+        .wait_timeout(Some(Settings::event_db_settings().slot_wait_timeout()))
+        .recycle_timeout(Some(
+            Settings::event_db_settings().connection_recycle_timeout(),
+        ))
         .runtime(deadpool::Runtime::Tokio1)
         .build()
     {
