@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:collection';
+
 import 'package:catalyst_voices_models/src/permissions/android_permission_strategy.dart';
 import 'package:catalyst_voices_models/src/permissions/default_permission_strategy.dart';
 import 'package:catalyst_voices_models/src/permissions/exceptions/permission_need_explanation_exception.dart'
@@ -5,6 +8,7 @@ import 'package:catalyst_voices_models/src/permissions/exceptions/permission_nee
 import 'package:catalyst_voices_models/src/permissions/exceptions/permission_need_rationale_exception.dart'
     show PermissionNeedsRationaleException;
 import 'package:catalyst_voices_models/src/permissions/ios_permission_strategy.dart';
+import 'package:catalyst_voices_models/src/permissions/permission_request.dart';
 import 'package:catalyst_voices_models/src/permissions/permission_strategy.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -26,6 +30,8 @@ final class PermissionHandlerImpl implements PermissionHandler {
   final DeviceInfoPlugin _deviceInfo;
   PermissionStrategy? _cachedStrategy;
   final Set<Permission> _deniedPermissions = {};
+  final Queue<PermissionRequest> _requestQueue = Queue<PermissionRequest>();
+  bool _isProcessingQueue = false;
 
   PermissionHandlerImpl(this._deviceInfo);
 
@@ -38,11 +44,36 @@ final class PermissionHandlerImpl implements PermissionHandler {
 
   @override
   Future<PermissionResult> requestPermission(Permission permission) async {
-    _cachedStrategy ??= await PermissionStrategyFactory.create(_deviceInfo);
-    return _cachedStrategy!.requestPermission(
-      permission,
-      _deniedPermissions,
-    );
+    final completer = Completer<PermissionResult>();
+
+    _requestQueue.add(PermissionRequest(permission, completer));
+
+    if (!_isProcessingQueue) {
+      unawaited(_processQueue());
+    }
+
+    return completer.future;
+  }
+
+  Future<void> _processQueue() async {
+    _isProcessingQueue = true;
+
+    while (_requestQueue.isNotEmpty) {
+      final request = _requestQueue.removeFirst();
+
+      try {
+        _cachedStrategy ??= await PermissionStrategyFactory.create(_deviceInfo);
+        final result = await _cachedStrategy!.requestPermission(
+          request.permission,
+          _deniedPermissions,
+        );
+        request.completer.complete(result);
+      } catch (error) {
+        request.completer.completeError(error);
+      }
+    }
+
+    _isProcessingQueue = false;
   }
 }
 
