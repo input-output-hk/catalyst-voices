@@ -19,7 +19,6 @@ builder:
     COPY dep-cat-libs-rust+build/mk_signed_doc ./dep_mk_signed_doc
     COPY cat-storage+cardano-asset-preprod/cardano-asset-preprod.json .
     DO python-ci+BUILDER
-#    SAVE IMAGE builder-tmp
 
 # Creates a package of the python integration test runner
 package:
