@@ -477,7 +477,11 @@ final class Dependencies extends DependencyProvider {
       dispose: (observer) async => observer.dispose(),
     );
     registerLazySingleton<VideoManager>(
-      VideoManager.new,
+      () {
+        return VideoManager(
+          get<CatalystStartupProfiler>(),
+        );
+      },
       dispose: (manager) => manager.dispose(),
     );
     registerLazySingleton<ShareManager>(() => DelegatingShareManager(get<ShareService>()));

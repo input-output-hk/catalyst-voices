@@ -50,7 +50,7 @@ final class _SentryTask implements CatalystProfilerTimelineTask {
   _SentryTask(this._span);
 
   @override
-  FutureOr<void> finish({CatalystProfilerTimelineTaskFinishArguments? arguments}) {
+  Future<void> finish({CatalystProfilerTimelineTaskFinishArguments? arguments}) {
     final status = arguments?.status;
     final hint = arguments?.hint;
 
@@ -85,7 +85,7 @@ final class _SentryTimeline implements CatalystProfilerTimeline {
   bool get finished => _span.finished;
 
   @override
-  FutureOr<void> finish({CatalystProfilerTimelineFinishArguments? arguments}) {
+  Future<void> finish({CatalystProfilerTimelineFinishArguments? arguments}) {
     if (arguments?.took case final value?) {
       _span.setMeasurement(
         'took',

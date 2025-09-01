@@ -25,7 +25,7 @@ final class CatalystNoopProfiler implements CatalystProfiler {
 
 final class _NoopTask implements CatalystProfilerTimelineTask {
   @override
-  FutureOr<void> finish({CatalystProfilerTimelineTaskFinishArguments? arguments}) {
+  Future<void> finish({CatalystProfilerTimelineTaskFinishArguments? arguments}) async {
     // noop
   }
 
@@ -43,7 +43,7 @@ final class _NoopTimeline implements CatalystProfilerTimeline {
   bool get finished => false;
 
   @override
-  FutureOr<void> finish({CatalystProfilerTimelineFinishArguments? arguments}) {
+  Future<void> finish({CatalystProfilerTimelineFinishArguments? arguments}) async {
     // noop
   }
 

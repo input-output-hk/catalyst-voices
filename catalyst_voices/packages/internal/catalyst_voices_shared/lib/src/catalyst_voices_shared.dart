@@ -11,6 +11,7 @@ export 'formatter/wallet_address_formatter.dart';
 export 'logging/logger.dart';
 export 'platform/catalyst_platform.dart';
 export 'platform_aware_builder/platform_aware_builder.dart';
+export 'profiler/catalyst_startup_profiler.dart';
 export 'profiler/profiler.dart';
 export 'range/date_range.dart';
 export 'range/paging_range.dart';

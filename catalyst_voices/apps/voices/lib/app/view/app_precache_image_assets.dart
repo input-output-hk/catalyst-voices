@@ -1,8 +1,9 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/configs/bootstrap.dart';
+import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 
@@ -37,23 +38,14 @@ class ImagePrecacheService {
     List<SvgGenImage> svgs = const [],
     List<AssetGenImage> assets = const [],
   }) {
-    final task = startupTimeline.startTask('image_assets_precache');
+    final profiler = Dependencies.instance.get<CatalystStartupProfiler>();
+    if (!profiler.ongoing) {
+      return _precacheAssets(context, svgs: svgs, assets: assets);
+    }
 
-    return _lock
-        .synchronized<void>(() async {
-          if (_isInitialized.isCompleted) return;
-
-          _svgs.addAll(svgs);
-          _assets.addAll(assets);
-
-          await Future.wait([
-            ..._svgs.map((e) => e.cache(context: context)),
-            ..._assets.map((e) => e.cache(context: context)),
-          ]);
-
-          if (!_isInitialized.isCompleted) _isInitialized.complete(true);
-        })
-        .whenComplete(task.finish);
+    return profiler.imagesCache(
+      body: () => _precacheAssets(context, svgs: svgs, assets: assets),
+    );
   }
 
   void resetCacheIfNeeded(ThemeData theme) {
@@ -65,6 +57,26 @@ class ImagePrecacheService {
       _isInitialized = Completer<bool>();
       _lastThemeMode = theme.brightness;
     }
+  }
+
+  Future<void> _precacheAssets(
+    BuildContext context, {
+    List<SvgGenImage> svgs = const [],
+    List<AssetGenImage> assets = const [],
+  }) {
+    return _lock.synchronized<void>(() async {
+      if (_isInitialized.isCompleted) return;
+
+      _svgs.addAll(svgs);
+      _assets.addAll(assets);
+
+      await Future.wait([
+        ..._svgs.map((e) => e.cache(context: context)),
+        ..._assets.map((e) => e.cache(context: context)),
+      ]);
+
+      if (!_isInitialized.isCompleted) _isInitialized.complete(true);
+    });
   }
 }
 

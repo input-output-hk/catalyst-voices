@@ -10,7 +10,7 @@ abstract interface class CatalystProfiler {
 
   Future<void> time(
     String name,
-    FutureOr<void> Function() body, {
+    AsyncOrValueGetter<void> body, {
     CatalystProfilerTimelineArguments? arguments,
   });
 }
@@ -18,7 +18,7 @@ abstract interface class CatalystProfiler {
 abstract interface class CatalystProfilerTimeline {
   bool get finished;
 
-  FutureOr<void> finish({
+  Future<void> finish({
     CatalystProfilerTimelineFinishArguments? arguments,
   });
 
@@ -29,7 +29,7 @@ abstract interface class CatalystProfilerTimeline {
 }
 
 abstract interface class CatalystProfilerTimelineTask {
-  FutureOr<void> finish({
+  Future<void> finish({
     CatalystProfilerTimelineTaskFinishArguments? arguments,
   });
 

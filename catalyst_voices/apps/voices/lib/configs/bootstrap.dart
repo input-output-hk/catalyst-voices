@@ -16,7 +16,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_strategy/url_strategy.dart';
 
-const CatalystProfiler profiler = _shouldUseSentry
+const CatalystProfiler _profiler = _shouldUseSentry
     ? CatalystSentryProfiler()
     : CatalystNoopProfiler();
 const ReportingService _reportingService = _shouldUseSentry
@@ -30,13 +30,6 @@ final _loggerFlutter = Logger('Flutter');
 final _loggerPlatformDispatcher = Logger('PlatformDispatcher');
 final _loggerUncaughtZone = Logger('UncaughtZone');
 final _loggingService = LoggingService();
-
-CatalystProfilerTimeline? _startupTimeline;
-
-CatalystProfilerTimeline get startupTimeline {
-  assert(_startupTimeline != null, 'startupTimeline not initialized yet!');
-  return _startupTimeline!;
-}
 
 /// Initializes the application before it can be run. Should setup all
 /// the things which are necessary before the actual app is run,
@@ -56,6 +49,7 @@ Future<BootstrapArgs> bootstrap({
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
 
+  // app config
   final startConfigTimestamp = DateTimeExt.now(utc: true);
   environment ??= AppEnvironment.fromEnv();
   final config = await _getAppConfig(env: environment.type);
@@ -65,27 +59,12 @@ Future<BootstrapArgs> bootstrap({
   await _cleanupOldStorages();
   await _initCryptoUtils();
 
-  _startupTimeline = profiler.startTransaction(
-    'Startup',
-    arguments: CatalystProfilerTimelineArguments(
-      operation: 'initialisation',
-      description:
-          'Measuring how long it takes from flutter code '
-          'execution to Application widget beaning ready.',
-      startTimestamp: bootstrapStartTimestamp,
-    ),
-  );
-  startupTimeline
-      .startTask(
-        'config',
-        arguments: CatalystProfilerTimelineTaskArguments(
-          description: 'How long it takes for app config resolve',
-          startTimestamp: startConfigTimestamp,
-        ),
-      )
-      .finish(
-        arguments: CatalystProfilerTimelineTaskFinishArguments(endTimestamp: endConfigTimestamp),
-      );
+  // profilers
+  final startupProfiler = CatalystStartupProfiler(_profiler)
+    ..start(at: bootstrapStartTimestamp)
+    ..appConfig(
+      fromTo: DateRange(from: startConfigTimestamp, to: endConfigTimestamp),
+    );
 
   await Dependencies.instance.init(
     config: config,
@@ -94,6 +73,10 @@ Future<BootstrapArgs> bootstrap({
     reportingService: _reportingService,
   );
 
+  Dependencies.instance
+    ..register<CatalystProfiler>(_profiler)
+    ..register<CatalystStartupProfiler>(startupProfiler);
+
   router ??= buildAppRouter();
 
   // Observer is very noisy on Logger. Enable it only if you want to debug
@@ -101,7 +84,9 @@ Future<BootstrapArgs> bootstrap({
   Bloc.observer = AppBlocObserver(logOnChange: false);
 
   Dependencies.instance.get<ReportingServiceMediator>().init();
-  _startSyncManager().ignore();
+  unawaited(
+    startupProfiler.documentsSync(body: () => Dependencies.instance.get<SyncManager>().start()),
+  );
 
   return BootstrapArgs(
     routerConfig: router,
@@ -261,20 +246,6 @@ Future<void> _safeBootstrapAndRun(
     await _doBootstrapAndRun(environment, builder);
   } catch (error, stack) {
     await _reportBootstrapError(error, stack);
-  }
-}
-
-Future<void> _startSyncManager() async {
-  final task = startupTimeline.startTask('documents_sync');
-  final args = CatalystProfilerTimelineTaskFinishArguments();
-
-  try {
-    await Dependencies.instance.get<SyncManager>().start();
-    args.status = 'completed';
-  } catch (_, _) {
-    args.status = 'failed';
-  } finally {
-    task.finish();
   }
 }
 
