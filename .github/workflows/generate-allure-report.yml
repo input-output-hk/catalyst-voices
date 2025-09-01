@@ -23,7 +23,7 @@ jobs:
     name: Generate test reports
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
@@ -75,7 +75,7 @@ jobs:
     needs: generate-test-reports
     if: false && needs.generate-test-reports.result == 'success'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
@@ -105,7 +105,7 @@ jobs:
           ls ${{ env.ALLURE_REPORT_FOLDER }}
 
       - name: Checkout gh-pages
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: gh-pages
           path: gh-pages-dir
@@ -138,7 +138,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: generate-test-reports
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions/download-artifact@v4
         with:

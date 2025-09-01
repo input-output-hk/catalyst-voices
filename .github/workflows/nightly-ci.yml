@@ -34,7 +34,7 @@ jobs:
     if: always()
     needs: ci_nightly
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
@@ -67,7 +67,7 @@ jobs:
     needs: generate-test-reports
     if: always() && needs.generate-test-reports.result == 'success'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: actions/download-artifact@v4
 
@@ -79,7 +79,7 @@ jobs:
           ls ${{ env.ALLURE_REPORT_FOLDER }}
 
       - name: Checkout gh-pages
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: gh-pages
           path: gh-pages-dir
