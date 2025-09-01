@@ -10,7 +10,7 @@ type EndpointFixtures = {
 export const test = base.extend<EndpointFixtures>({
   appBaseURL: async ({}, use) => {
     const baseURL =
-      process.env.APP_URL || "https://app.dev.projectcatalyst.io/";
+      process.env.APP_URL || "localhost:5555";
     await use(baseURL);
   },
 });

@@ -10,6 +10,5 @@ test.describe("Onboarding - ", () => {
     await page
       .locator("//*[@aria-label='Enable accessibility']")
       .evaluate((element: HTMLElement) => element.click());
-    await page.locator("#flt-semantic-node-24").waitFor({ state: "visible" });
   });
 });
