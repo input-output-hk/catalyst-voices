@@ -1,5 +1,9 @@
 import 'package:catalyst_voices_models/src/permissions/android_permission_strategy.dart';
 import 'package:catalyst_voices_models/src/permissions/default_permission_strategy.dart';
+import 'package:catalyst_voices_models/src/permissions/exceptions/permission_need_explanation_exception.dart'
+    show PermissionNeedsExplanationException;
+import 'package:catalyst_voices_models/src/permissions/exceptions/permission_need_rationale_exception.dart'
+    show PermissionNeedsRationaleException;
 import 'package:catalyst_voices_models/src/permissions/ios_permission_strategy.dart';
 import 'package:catalyst_voices_models/src/permissions/permission_strategy.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -11,10 +15,10 @@ abstract interface class PermissionHandler {
     DeviceInfoPlugin deviceInfo,
   ) = PermissionHandlerImpl;
 
-  // Note. For notification return type should be [PermissionResult]
-  Future<bool> get waitForStoragePermission async =>
-      (await requestPermission(Permission.storage)).isGranted;
+  /// Does not request permission, just checks its status
+  Future<PermissionStatus> permissionStatus(Permission permission);
 
+  /// Throws [PermissionNeedsRationaleException], [PermissionNeedsExplanationException] when needed etc.
   Future<PermissionResult> requestPermission(Permission permission);
 }
 
@@ -26,13 +30,19 @@ final class PermissionHandlerImpl implements PermissionHandler {
   PermissionHandlerImpl(this._deviceInfo);
 
   @override
-  Future<bool> get waitForStoragePermission async =>
-      (await requestPermission(Permission.storage)).isGranted;
+  Future<PermissionStatus> permissionStatus(Permission permission) async {
+    _cachedStrategy ??= await PermissionStrategyFactory.create(_deviceInfo);
+    final actualPermission = _cachedStrategy!.getActualPermission(permission);
+    return actualPermission.status;
+  }
 
   @override
   Future<PermissionResult> requestPermission(Permission permission) async {
     _cachedStrategy ??= await PermissionStrategyFactory.create(_deviceInfo);
-    return _cachedStrategy!.requestPermission(permission, _deniedPermissions);
+    return _cachedStrategy!.requestPermission(
+      permission,
+      _deniedPermissions,
+    );
   }
 }
 
