@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.4.7 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.5.13 AS python-ci
 IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-types-v0.0.5 AS cat-libs-rust
 IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v.0.0.4 AS dep-cat-libs-rust
 IMPORT github.com/input-output-hk/catalyst-storage AS cat-storage
