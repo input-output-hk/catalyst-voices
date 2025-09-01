@@ -673,8 +673,8 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   Stream<ProposalsCount> _transformRefsStreamToCount(
     Stream<List<SignedDocumentRef>> source, {
     CatalystId? author,
-  }) async* {
-    await for (final allRefs in source) {
+  }) {
+    return source.asyncMap((allRefs) async {
       final latestActions = await _getProposalsLatestAction();
       final hiddenRefs = latestActions
           .where((element) => element.action.isHidden)
@@ -697,7 +697,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       final myFinals = my.where((ref) => finalsRefs.any((myRef) => myRef.id == ref.id));
       final votedOn = notHidden.where((ref) => votedRefs.any((voted) => voted.id == ref.id));
 
-      yield ProposalsCount(
+      return ProposalsCount(
         total: total.length,
         drafts: total.length - finals.length,
         finals: finals.length,
@@ -707,7 +707,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         myFinals: myFinals.length,
         voted: votedOn.length,
       );
-    }
+    });
   }
 }
 
