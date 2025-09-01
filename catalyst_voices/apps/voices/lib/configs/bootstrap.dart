@@ -10,6 +10,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -43,6 +44,8 @@ Future<BootstrapArgs> bootstrap({
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
+
+  EquatableConfig.stringify = kDebugMode;
 
   environment ??= AppEnvironment.fromEnv();
   final config = await _getAppConfig(env: environment.type);
