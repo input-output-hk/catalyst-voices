@@ -97,30 +97,6 @@ impl DocumentApi {
         }
     }
 
-    /// Post A Signed Document Index Query.
-    ///
-    /// This endpoint produces a summary of signed documents that meet the criteria
-    /// defined in the request body.
-    ///
-    /// It does not return the actual documents, just an index of the document identifiers
-    /// which allows the documents to be retrieved by the `GET document` endpoint.
-    #[oai(
-        path = "/v1/document/index",
-        method = "post",
-        operation_id = "postDocument",
-        transform = "schema_version_validation"
-    )]
-    async fn post_document_v1(
-        &self,
-        /// The Query Filter Specification
-        query: Json<post_document_index_query::v1::request::DocumentIndexQueryFilterBody>,
-        page: Query<Option<Page>>, limit: Query<Option<Limit>>,
-        /// No Authorization required, but Token permitted.
-        _auth: NoneOrRBAC,
-    ) -> post_document_index_query::v1::AllResponses {
-        post_document_index_query::v1::endpoint(query.0 .0, page.0, limit.0).await
-    }
-
     /// Post A Signed Document Index Query for Newer Versions of v0.04.
     ///
     /// Produces a summary of signed documents that meet the criteria
