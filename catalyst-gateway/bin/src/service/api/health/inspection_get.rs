@@ -66,7 +66,8 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// Inspection settings endpoint.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(
-    log_level: Option<LogLevel>, query_inspection: Option<DeepQueryInspectionFlag>,
+    log_level: Option<LogLevel>,
+    query_inspection: Option<DeepQueryInspectionFlag>,
 ) -> AllResponses {
     if let Some(level) = log_level {
         logger::modify_logger_level(level.into());
