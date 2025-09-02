@@ -12,7 +12,10 @@ pub(crate) enum ConfigKey {
 }
 
 impl Display for ConfigKey {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
         match self {
             ConfigKey::Frontend => write!(f, "config_key_frontend"),
             ConfigKey::FrontendForIp(_) => write!(f, "config_key_frontend_ip"),

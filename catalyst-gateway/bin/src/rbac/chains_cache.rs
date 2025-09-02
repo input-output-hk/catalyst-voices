@@ -11,7 +11,10 @@ use crate::{
 };
 
 /// Add (or update) a persistent chain to the cache.
-pub fn cache_persistent_rbac_chain(id: CatalystId, chain: RegistrationChain) {
+pub fn cache_persistent_rbac_chain(
+    id: CatalystId,
+    chain: RegistrationChain,
+) {
     CassandraSession::get(true).inspect(|session| {
         session.caches().rbac_persistent_chains().insert(id, chain);
     });
@@ -19,7 +22,8 @@ pub fn cache_persistent_rbac_chain(id: CatalystId, chain: RegistrationChain) {
 
 /// Returns a cached persistent chain by the given Catalyst ID.
 pub fn cached_persistent_rbac_chain(
-    session: &CassandraSession, id: &CatalystId,
+    session: &CassandraSession,
+    id: &CatalystId,
 ) -> Option<RegistrationChain> {
     let cache = session.caches().rbac_persistent_chains();
     if !cache.is_enabled() {
