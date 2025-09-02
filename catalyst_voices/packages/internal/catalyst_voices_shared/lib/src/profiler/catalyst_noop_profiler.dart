@@ -11,7 +11,7 @@ final class CatalystNoopProfiler implements CatalystProfiler {
     String name, {
     CatalystProfilerTimelineArguments? arguments,
   }) {
-    return _NoopTimeline();
+    return const _NoopTimeline();
   }
 
   @override
@@ -25,6 +25,8 @@ final class CatalystNoopProfiler implements CatalystProfiler {
 }
 
 final class _NoopTask implements CatalystProfilerTimelineTask {
+  const _NoopTask();
+
   @override
   Future<void> finish({CatalystProfilerTimelineTaskFinishArguments? arguments}) async {
     // noop
@@ -35,11 +37,13 @@ final class _NoopTask implements CatalystProfilerTimelineTask {
     String name, {
     CatalystProfilerTimelineTaskArguments? arguments,
   }) {
-    return _NoopTask();
+    return const _NoopTask();
   }
 }
 
 final class _NoopTimeline implements CatalystProfilerTimeline {
+  const _NoopTimeline();
+
   @override
   bool get finished => false;
 
@@ -53,7 +57,7 @@ final class _NoopTimeline implements CatalystProfilerTimeline {
     String name, {
     CatalystProfilerTimelineTaskArguments? arguments,
   }) {
-    return _NoopTask();
+    return const _NoopTask();
   }
 
   @override
