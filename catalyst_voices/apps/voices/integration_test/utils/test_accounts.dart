@@ -23,15 +23,15 @@ abstract final class TestAccounts {
     );
 
     return Dependencies.instance.get<RegistrationService>().createAccount(
-          seedPhrase: seedPhrase,
-          lockFactor: lockFactor,
-          email: email,
-          username: username,
-          keychainId: keychainId,
-          roles: roles,
-          address: address,
-          publicStatus: publicStatus,
-        );
+      seedPhrase: seedPhrase,
+      lockFactor: lockFactor,
+      email: email,
+      username: username,
+      keychainId: keychainId,
+      roles: roles,
+      address: address,
+      publicStatus: publicStatus,
+    );
   }
 
   static Future<Account> dummyAccount() {

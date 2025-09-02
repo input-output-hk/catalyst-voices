@@ -232,10 +232,10 @@ class _BootstrapState extends Equatable {
 
   @override
   List<Object?> get props => [
-        appConfig,
-        didInitializeCryptoUtils,
-        didSetPathUrlStrategy,
-      ];
+    appConfig,
+    didInitializeCryptoUtils,
+    didSetPathUrlStrategy,
+  ];
 
   _BootstrapState copyWith({
     Optional<AppConfig>? appConfig,
