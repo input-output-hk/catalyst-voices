@@ -1,6 +1,7 @@
 //! Types and methods related to the `/rbac/registrations` V1 endpoint.
 
 mod endpoint;
+mod extended_data;
 mod key_data;
 mod key_data_list;
 mod key_type;

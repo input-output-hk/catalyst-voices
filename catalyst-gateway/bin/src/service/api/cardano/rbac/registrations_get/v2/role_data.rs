@@ -1,7 +1,5 @@
 //! A role data.
 
-use std::collections::HashMap;
-
 use anyhow::Context;
 use cardano_chain_follower::Slot;
 use catalyst_types::catalyst_id::role_index::RoleId;
@@ -13,10 +11,10 @@ use rbac_registration::{
 
 use crate::{
     service::api::cardano::rbac::registrations_get::{
-        extended_data::ExtendedData,
         role_id::CatalystRoleId,
         v2::{
-            key_data::KeyData, key_data_list::KeyDataList, payment_data::PaymentData,
+            extended_data::ExtendedData, extended_data_list::ExtendedDataList, key_data::KeyData,
+            key_data_list::KeyDataList, payment_data::PaymentData,
             payment_data_list::PaymentDataList,
         },
     },
@@ -42,13 +40,15 @@ pub struct RbacRoleData {
     ///
     /// Unlike other fields, we don't track history for this data.
     #[oai(skip_serializing_if_is_empty)]
-    extended_data: ExtendedData,
+    extended_data: ExtendedDataList,
 }
 
 impl RbacRoleData {
     /// Creates a new `RbacRoleData` instance.
     pub fn new(
-        role: RoleId, point_data: &[PointData<RoleData>], last_persistent_slot: Slot,
+        role: RoleId,
+        point_data: &[PointData<RoleData>],
+        last_persistent_slot: Slot,
         chain: &RegistrationChain,
     ) -> anyhow::Result<Self> {
         let network = Settings::cardano_network();
@@ -56,7 +56,7 @@ impl RbacRoleData {
         let mut signing_keys = Vec::new();
         let mut encryption_keys = Vec::new();
         let mut payment_addresses = Vec::new();
-        let mut extended_data = HashMap::new();
+        let mut extended_data = Vec::new();
 
         for point in point_data {
             let slot = point.point().slot_or_default();
@@ -103,7 +103,11 @@ impl RbacRoleData {
                 )
                 .context("Invalid payment address")?,
             );
-            extended_data.extend(data.extended_data().clone().into_iter());
+            extended_data.extend(
+                data.extended_data()
+                    .iter()
+                    .map(|(key, value)| ExtendedData::new(*key, value.clone())),
+            );
         }
 
         Ok(Self {
@@ -123,7 +127,7 @@ impl Example for RbacRoleData {
             signing_keys: KeyDataList::example(),
             encryption_keys: KeyDataList::example(),
             payment_addresses: PaymentDataList::example(),
-            extended_data: ExtendedData::example(),
+            extended_data: ExtendedDataList::example(),
         }
     }
 }

@@ -6,7 +6,6 @@ pub use self::{
 };
 
 mod binary_data;
-mod extended_data;
 mod invalid_registration;
 mod invalid_registration_list;
 mod pem;
