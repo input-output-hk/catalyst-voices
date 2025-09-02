@@ -75,7 +75,10 @@ impl SignedDocBody {
 
     /// Creates a  `SignedDocBody` instance.
     pub(crate) fn new(
-        id: uuid::Uuid, ver: uuid::Uuid, doc_type: uuid::Uuid, authors: Vec<String>,
+        id: uuid::Uuid,
+        ver: uuid::Uuid,
+        doc_type: uuid::Uuid,
+        authors: Vec<String>,
         metadata: Option<serde_json::Value>,
     ) -> Self {
         Self {
@@ -89,7 +92,8 @@ impl SignedDocBody {
 
     /// Loads a async stream of `SignedDocBody` from the event db.
     pub(crate) async fn retrieve(
-        conditions: &DocsQueryFilter, query_limits: &QueryLimits,
+        conditions: &DocsQueryFilter,
+        query_limits: &QueryLimits,
     ) -> anyhow::Result<impl Stream<Item = anyhow::Result<Self>>> {
         let query_template = get_template(&FILTERED_SELECT_SIGNED_DOCS_TEMPLATE)?;
         let query = query_template.render(serde_json::json!({
