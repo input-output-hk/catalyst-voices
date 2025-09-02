@@ -74,11 +74,9 @@ Future<BootstrapArgs> bootstrap({
     environment: environment,
     loggingService: _loggingService,
     reportingService: _reportingService,
+    profiler: _profiler,
+    startupProfiler: startupProfiler,
   );
-
-  Dependencies.instance
-    ..register<CatalystProfiler>(_profiler)
-    ..register<CatalystStartupProfiler>(startupProfiler);
 
   router ??= buildAppRouter();
 
