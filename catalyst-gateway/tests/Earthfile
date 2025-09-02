@@ -61,6 +61,7 @@ rust-tests-builder:
 package-rust-tests-runner:
     FROM debian:stable-slim
 
+    WORKDIR $HOME/build
     COPY +rust-tests-builder/build-src-dir .
     COPY +rust-tests-builder/cat-gateway-tests.tar.zst .
     COPY +rust-tests-builder/cargo-nextest .
