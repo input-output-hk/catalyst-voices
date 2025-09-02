@@ -58,7 +58,9 @@ impl Example for RbacRegistrationChainV2 {
 impl RbacRegistrationChainV2 {
     /// Creates a new registration chain instance.
     pub(crate) fn new(
-        catalyst_id: CatalystId, info: Option<&ChainInfo>, invalid: InvalidRegistrationList,
+        catalyst_id: CatalystId,
+        info: Option<&ChainInfo>,
+        invalid: InvalidRegistrationList,
     ) -> anyhow::Result<Option<Self>> {
         if info.is_none() && invalid.is_empty() {
             return Ok(None);

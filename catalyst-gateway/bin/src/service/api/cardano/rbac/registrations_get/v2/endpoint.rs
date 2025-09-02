@@ -30,7 +30,9 @@ use crate::{
 
 /// Get RBAC registration V2 endpoint.
 pub async fn endpoint_v2(
-    lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>, show_all_invalid: bool,
+    lookup: Option<CatIdOrStake>,
+    token: Option<CatalystRBACTokenV1>,
+    show_all_invalid: bool,
 ) -> AllResponsesV2 {
     if lookup.is_none() && token.is_none() {
         return ResponsesV2::UnprocessableContent(Json(RbacUnprocessableContent::new(
@@ -49,7 +51,9 @@ pub async fn endpoint_v2(
 
 /// Returns a registration chain.
 async fn reg_chain(
-    lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>, show_all_invalid: bool,
+    lookup: Option<CatIdOrStake>,
+    token: Option<CatalystRBACTokenV1>,
+    show_all_invalid: bool,
 ) -> anyhow::Result<Option<RbacRegistrationChainV2>> {
     let persistent_session =
         CassandraSession::get(true).context("Failed to get persistent Cassandra session")?;
@@ -89,8 +93,10 @@ async fn reg_chain(
 
 /// Returns a Catalyst ID corresponding to the given stake address.
 async fn catalyst_id(
-    lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>,
-    persistent_session: &CassandraSession, volatile_session: &CassandraSession,
+    lookup: Option<CatIdOrStake>,
+    token: Option<CatalystRBACTokenV1>,
+    persistent_session: &CassandraSession,
+    volatile_session: &CassandraSession,
 ) -> anyhow::Result<Option<CatalystId>> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_stake_address::Query;
 
@@ -120,7 +126,8 @@ async fn catalyst_id(
 
 /// Returns a list of invalid registrations.
 async fn invalid_registrations(
-    id: CatalystId, session: &CassandraSession,
+    id: CatalystId,
+    session: &CassandraSession,
 ) -> anyhow::Result<Vec<RbacInvalidQuery>> {
     use crate::db::index::queries::rbac::get_rbac_invalid_registrations::{Query, QueryParams};
 
