@@ -85,7 +85,10 @@ pub async fn persistent_rbac_chain(id: &CatalystId) -> Result<Option<Registratio
 }
 
 /// Queries indexed RBAC registrations from the database.
-async fn indexed_regs(session: &CassandraSession, id: &CatalystId) -> Result<Vec<RbacQuery>> {
+async fn indexed_regs(
+    session: &CassandraSession,
+    id: &CatalystId,
+) -> Result<Vec<RbacQuery>> {
     RbacQuery::execute(session, RbacQueryParams {
         catalyst_id: id.clone().into(),
     })
@@ -95,7 +98,7 @@ async fn indexed_regs(session: &CassandraSession, id: &CatalystId) -> Result<Vec
 
 /// Builds a chain from the given registrations.
 pub async fn build_rbac_chain(
-    regs: impl IntoIterator<Item = RbacQuery>,
+    regs: impl IntoIterator<Item = RbacQuery>
 ) -> Result<Option<RegistrationChain>> {
     let mut regs = regs.into_iter();
     let Some(root) = regs.next() else {
@@ -120,7 +123,8 @@ pub async fn build_rbac_chain(
 
 /// Applies the given registration to the given chain.
 pub async fn apply_regs(
-    mut chain: RegistrationChain, regs: impl IntoIterator<Item = RbacQuery>,
+    mut chain: RegistrationChain,
+    regs: impl IntoIterator<Item = RbacQuery>,
 ) -> Result<RegistrationChain> {
     let network = Settings::cardano_network();
 
@@ -140,7 +144,11 @@ pub async fn apply_regs(
 }
 
 /// Loads and parses a `Cip509` registration from a block using chain follower.
-async fn cip509(network: Network, slot: Slot, txn_index: TxnIndex) -> Result<Cip509> {
+async fn cip509(
+    network: Network,
+    slot: Slot,
+    txn_index: TxnIndex,
+) -> Result<Cip509> {
     let point = Point::fuzzy(slot);
     let block = ChainFollower::get_block(network, point)
         .await

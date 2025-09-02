@@ -60,7 +60,8 @@ impl Rbac509InsertQuery {
 
     /// Prepare Batch of Insert RBAC 509 Registration Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &EnvVars,
+        session: &Arc<Session>,
+        cfg: &EnvVars,
     ) -> Result<(SizedBatch, SizedBatch, SizedBatch, SizedBatch, SizedBatch)> {
         Ok((
             insert_rbac509::Params::prepare_batch(session, cfg).await?,
@@ -74,8 +75,12 @@ impl Rbac509InsertQuery {
     /// Index the RBAC 509 registrations in a transaction.
     #[allow(clippy::too_many_lines)]
     pub(crate) async fn index(
-        &mut self, txn_hash: TransactionId, index: TxnIndex, block: &MultiEraBlock,
-        pending_blocks: &mut watch::Receiver<BTreeSet<Slot>>, our_end: Slot,
+        &mut self,
+        txn_hash: TransactionId,
+        index: TxnIndex,
+        block: &MultiEraBlock,
+        pending_blocks: &mut watch::Receiver<BTreeSet<Slot>>,
+        our_end: Slot,
         context: &mut RbacBlockIndexingContext,
     ) -> Result<()> {
         let slot = block.slot();
@@ -240,7 +245,10 @@ impl Rbac509InsertQuery {
     /// Execute the RBAC 509 Registration Indexing Queries.
     ///
     /// Consumes the `self` and returns a vector of futures.
-    pub(crate) fn execute(self, session: &Arc<CassandraSession>) -> FallibleQueryTasks {
+    pub(crate) fn execute(
+        self,
+        session: &Arc<CassandraSession>,
+    ) -> FallibleQueryTasks {
         let mut query_handles: FallibleQueryTasks = Vec::new();
 
         if !self.registrations.is_empty() {
@@ -305,7 +313,9 @@ impl Rbac509InsertQuery {
 ///
 /// The given `our_end` is excluded from the list of unprocessed blocks.
 async fn wait_for_previous_blocks(
-    pending_blocks: &mut watch::Receiver<BTreeSet<Slot>>, our_end: Slot, current_slot: Slot,
+    pending_blocks: &mut watch::Receiver<BTreeSet<Slot>>,
+    our_end: Slot,
+    current_slot: Slot,
 ) -> Result<()> {
     loop {
         if pending_blocks

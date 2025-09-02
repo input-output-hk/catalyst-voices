@@ -39,7 +39,8 @@ impl AssetsNativeCache {
 
     /// Get Native Assets entry from Cache.
     pub(crate) fn get(
-        &self, stake_address: &DbStakeAddress,
+        &self,
+        stake_address: &DbStakeAddress,
     ) -> Option<Arc<Vec<GetAssetsByStakeAddressQuery>>> {
         // Exit if cache is not enabled to avoid metric updates.
         if !self.inner.is_enabled() {
@@ -56,7 +57,9 @@ impl AssetsNativeCache {
 
     /// Insert Native Assets entry in Cache.
     pub(crate) fn insert(
-        &self, stake_address: DbStakeAddress, rows: Arc<Vec<GetAssetsByStakeAddressQuery>>,
+        &self,
+        stake_address: DbStakeAddress,
+        rows: Arc<Vec<GetAssetsByStakeAddressQuery>>,
     ) {
         self.inner.insert(stake_address, rows);
     }

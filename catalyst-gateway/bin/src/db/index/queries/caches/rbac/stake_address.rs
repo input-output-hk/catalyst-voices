@@ -29,12 +29,19 @@ impl StakeAddressCache {
     }
 
     /// Get an entry from the cache
-    pub(crate) fn get(&self, key: &StakeAddress) -> Option<CatalystId> {
+    pub(crate) fn get(
+        &self,
+        key: &StakeAddress,
+    ) -> Option<CatalystId> {
         self.inner.get(key)
     }
 
     /// Get an entry from the cache
-    pub(crate) fn insert(&self, key: StakeAddress, value: CatalystId) {
+    pub(crate) fn insert(
+        &self,
+        key: StakeAddress,
+        value: CatalystId,
+    ) {
         self.inner.insert(key, value);
     }
 
