@@ -44,8 +44,13 @@ impl Params {
     /// values.
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn new(
-        stake_address: StakeAddress, slot_no: Slot, txn_index: TxnIndex, txo: TxnOutputOffset,
-        policy_id: &[u8], asset_name: &[u8], value: i128,
+        stake_address: StakeAddress,
+        slot_no: Slot,
+        txn_index: TxnIndex,
+        txo: TxnOutputOffset,
+        policy_id: &[u8],
+        asset_name: &[u8],
+        value: i128,
     ) -> Self {
         Self {
             stake_address: stake_address.into(),
@@ -60,7 +65,8 @@ impl Params {
 
     /// Prepare Batch of Staked Insert TXO Asset Index Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+        session: &Arc<Session>,
+        cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),

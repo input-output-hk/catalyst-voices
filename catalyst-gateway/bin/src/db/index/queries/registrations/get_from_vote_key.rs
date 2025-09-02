@@ -55,7 +55,8 @@ impl GetStakeAddrFromVoteKeyQuery {
 
     /// Executes a get txi by transaction hashes query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: GetStakeAddrFromVoteKeyParams,
+        session: &CassandraSession,
+        params: GetStakeAddrFromVoteKeyParams,
     ) -> anyhow::Result<TypedRowStream<GetStakeAddrFromVoteKeyQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::StakeAddrFromVoteKey, params)

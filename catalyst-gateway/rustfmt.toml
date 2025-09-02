@@ -35,7 +35,7 @@ match_block_trailing_comma = true
 max_width = 100
 
 # Comments:
-normalize_comments = true
+normalize_comments = false
 normalize_doc_attributes = false
 wrap_comments = true
 comment_width = 90      # small excess is okay but prefer 80
@@ -51,7 +51,7 @@ imports_granularity = "Crate"
 
 # Arguments:
 use_small_heuristics = "Default"
-fn_params_layout = "Compressed"
+fn_params_layout = "Vertical"
 overflow_delimited_expr = true
 where_single_line = true
 

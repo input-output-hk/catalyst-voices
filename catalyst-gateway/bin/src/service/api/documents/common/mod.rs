@@ -13,7 +13,8 @@ use crate::{
 
 /// Get document cbor bytes from the database
 pub(crate) async fn get_document_cbor_bytes(
-    document_id: &uuid::Uuid, version: Option<&uuid::Uuid>,
+    document_id: &uuid::Uuid,
+    version: Option<&uuid::Uuid>,
 ) -> anyhow::Result<Vec<u8>> {
     // If doesn't exist in the static templates, try to find it in the database
     let db_doc = FullSignedDoc::retrieve(document_id, version).await?;
@@ -26,7 +27,8 @@ pub(crate) struct DocProvider;
 
 impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvider {
     async fn try_get_doc(
-        &self, doc_ref: &catalyst_signed_doc::DocumentRef,
+        &self,
+        doc_ref: &catalyst_signed_doc::DocumentRef,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         let id = doc_ref.id().uuid();
         let ver = doc_ref.ver().uuid();
@@ -50,7 +52,8 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
 
 impl catalyst_signed_doc_v1::providers::CatalystSignedDocumentProvider for DocProvider {
     async fn try_get_doc(
-        &self, doc_ref: &catalyst_signed_doc_v1::DocumentRef,
+        &self,
+        doc_ref: &catalyst_signed_doc_v1::DocumentRef,
     ) -> anyhow::Result<Option<catalyst_signed_doc_v1::CatalystSignedDocument>> {
         let id = doc_ref.id.uuid();
         let ver = doc_ref.ver.uuid();
@@ -83,7 +86,8 @@ pub(crate) struct VerifyingKeyProvider(
 
 impl catalyst_signed_doc::providers::VerifyingKeyProvider for VerifyingKeyProvider {
     async fn try_get_key(
-        &self, kid: &catalyst_signed_doc::CatalystId,
+        &self,
+        kid: &catalyst_signed_doc::CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
         Ok(self.0.get(kid).copied())
     }
@@ -115,7 +119,8 @@ impl VerifyingKeyProvider {
     /// - The latest signing key for a required role cannot be found.
     /// - The KID is not using the latest rotation.
     pub(crate) async fn try_from_kids(
-        token: &mut CatalystRBACTokenV1, kids: &[catalyst_signed_doc::CatalystId],
+        token: &mut CatalystRBACTokenV1,
+        kids: &[catalyst_signed_doc::CatalystId],
     ) -> anyhow::Result<Self> {
         if kids.len() > 1 {
             anyhow::bail!("Multi-signature document is currently unsupported");
