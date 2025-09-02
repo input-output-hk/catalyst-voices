@@ -26,7 +26,10 @@ pub(crate) struct DocsQueryFilter {
 }
 
 impl Display for DocsQueryFilter {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
         use std::fmt::Write;
         let mut query = "TRUE".to_string();
 
@@ -82,12 +85,18 @@ impl DocsQueryFilter {
     }
 
     /// Set the `type` field filter condition
-    pub fn with_type(self, doc_type: Vec<uuid::Uuid>) -> Self {
+    pub fn with_type(
+        self,
+        doc_type: Vec<uuid::Uuid>,
+    ) -> Self {
         DocsQueryFilter { doc_type, ..self }
     }
 
     /// Set the `id` field filter condition
-    pub fn with_id(self, id: EqOrRangedUuid) -> Self {
+    pub fn with_id(
+        self,
+        id: EqOrRangedUuid,
+    ) -> Self {
         DocsQueryFilter {
             id: Some(id),
             ..self
@@ -95,7 +104,10 @@ impl DocsQueryFilter {
     }
 
     /// Set the `ver` field filter condition
-    pub fn with_ver(self, ver: EqOrRangedUuid) -> Self {
+    pub fn with_ver(
+        self,
+        ver: EqOrRangedUuid,
+    ) -> Self {
         DocsQueryFilter {
             ver: Some(ver),
             ..self
@@ -103,7 +115,10 @@ impl DocsQueryFilter {
     }
 
     /// Set the `metadata->'ref'` field filter condition
-    pub fn with_ref(self, arg: DocumentRef) -> Self {
+    pub fn with_ref(
+        self,
+        arg: DocumentRef,
+    ) -> Self {
         let mut doc_ref = self.doc_ref;
         doc_ref.push(arg);
 
@@ -111,7 +126,10 @@ impl DocsQueryFilter {
     }
 
     /// Set the `metadata->'template'` field filter condition
-    pub fn with_template(self, arg: DocumentRef) -> Self {
+    pub fn with_template(
+        self,
+        arg: DocumentRef,
+    ) -> Self {
         let mut template = self.template;
         template.push(arg);
 
@@ -119,7 +137,10 @@ impl DocsQueryFilter {
     }
 
     /// Set the `metadata->'reply'` field filter condition
-    pub fn with_reply(self, arg: DocumentRef) -> Self {
+    pub fn with_reply(
+        self,
+        arg: DocumentRef,
+    ) -> Self {
         let mut reply = self.reply;
         reply.push(arg);
 
@@ -127,7 +148,10 @@ impl DocsQueryFilter {
     }
 
     /// Set the `metadata->'parameters'` field filter condition
-    pub fn with_parameters(self, arg: DocumentRef) -> Self {
+    pub fn with_parameters(
+        self,
+        arg: DocumentRef,
+    ) -> Self {
         let mut parameters = self.parameters;
         parameters.push(arg);
 

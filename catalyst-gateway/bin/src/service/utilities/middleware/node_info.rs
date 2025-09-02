@@ -19,7 +19,10 @@ pub(crate) struct CatGatewayInfo;
 impl<E: Endpoint> Middleware<E> for CatGatewayInfo {
     type Output = CatGatewayInfoImpl<E>;
 
-    fn transform(&self, ep: E) -> Self::Output {
+    fn transform(
+        &self,
+        ep: E,
+    ) -> Self::Output {
         CatGatewayInfoImpl { ep }
     }
 }
@@ -33,7 +36,10 @@ pub(crate) struct CatGatewayInfoImpl<E> {
 impl<E: Endpoint> Endpoint for CatGatewayInfoImpl<E> {
     type Output = Response;
 
-    async fn call(&self, req: Request) -> Result<Self::Output> {
+    async fn call(
+        &self,
+        req: Request,
+    ) -> Result<Self::Output> {
         let resp = self.ep.call(req).await?.into_response();
 
         Ok(resp
@@ -75,7 +81,6 @@ mod tests {
     use super::*;
 
     #[test]
-    #[ignore]
     fn server_info_test() {
         println!("{}", server_info());
     }

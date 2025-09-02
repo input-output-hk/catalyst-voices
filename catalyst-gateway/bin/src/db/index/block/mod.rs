@@ -24,7 +24,9 @@ use crate::rbac::RbacBlockIndexingContext;
 
 /// Add all data needed from the block into the indexes.
 pub(crate) async fn index_block(
-    block: &MultiEraBlock, pending_blocks: &mut watch::Receiver<BTreeSet<Slot>>, our_end: Slot,
+    block: &MultiEraBlock,
+    pending_blocks: &mut watch::Receiver<BTreeSet<Slot>>,
+    our_end: Slot,
 ) -> anyhow::Result<()> {
     // Get the session.  This should never fail.
     let Some(session) = CassandraSession::get(block.is_immutable()) else {

@@ -4,7 +4,7 @@ mod cache_manager;
 use std::{
     fmt::Debug,
     path::PathBuf,
-    sync::{Arc, OnceLock},
+    sync::{Arc, LazyLock, Mutex, OnceLock},
     time::Duration,
 };
 
@@ -19,7 +19,7 @@ use scylla::{
     serialize::row::SerializeRow,
 };
 use thiserror::Error;
-use tokio::fs;
+use tokio::{fs, task::JoinHandle};
 use tracing::{debug, error, info};
 
 use super::{
@@ -105,6 +105,10 @@ static PERSISTENT_SESSION: OnceLock<Arc<CassandraSession>> = OnceLock::new();
 /// Volatile DB Session.
 static VOLATILE_SESSION: OnceLock<Arc<CassandraSession>> = OnceLock::new();
 
+/// Background Index DB probe check
+static INDEX_DB_PROBE_TASK: LazyLock<Mutex<Option<JoinHandle<()>>>> =
+    LazyLock::new(|| Mutex::new(None));
+
 impl CassandraSession {
     /// Initialise the Cassandra Cluster Connections.
     /// Should be called only once.
@@ -171,6 +175,34 @@ impl CassandraSession {
         }
     }
 
+    /// Spawns a background task checking for the Index DB to be
+    /// ready.
+    /// Could spawn only one background task at a time
+    pub(crate) fn spawn_ready_probe() {
+        let spawning = || -> anyhow::Result<()> {
+            let mut task = INDEX_DB_PROBE_TASK
+                .lock()
+                .map_err(|e| anyhow::anyhow!("{e}"))?;
+
+            if task.as_ref().is_none_or(JoinHandle::is_finished) {
+                /// Index DB probe check wait interval
+                const INTERVAL: Duration = Duration::from_secs(1);
+
+                *task = Some(tokio::spawn(async move {
+                    Self::wait_until_ready(INTERVAL).await;
+                    info!("Index DB is ready");
+                }));
+            }
+            Ok(())
+        };
+
+        debug!("Waiting for the Index DB background probe check task to be spawned");
+        while let Err(e) = spawning() {
+            error!(error = ?e, "INDEX_DB_PROBE_TASK is poisoned, should never happen");
+            INDEX_DB_PROBE_TASK.clear_poison();
+        }
+    }
+
     /// Get the session needed to perform a query.
     pub(crate) fn get(persistent: bool) -> Option<Arc<CassandraSession>> {
         if persistent {
@@ -185,9 +217,13 @@ impl CassandraSession {
     /// Returns an iterator that iterates over all the result pages that the query
     /// returns.
     pub(crate) async fn execute_iter<P>(
-        &self, select_query: PreparedSelectQuery, params: P,
+        &self,
+        select_query: PreparedSelectQuery,
+        params: P,
     ) -> anyhow::Result<QueryPager>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let session = self.session.clone();
         let queries = self.queries.clone();
 
@@ -202,7 +238,9 @@ impl CassandraSession {
     /// This will divide the batch into optimal sized chunks and execute them until all
     /// values have been executed or the first error is encountered.
     pub(crate) async fn execute_batch<T: SerializeRow + Debug>(
-        &self, query: PreparedQuery, values: Vec<T>,
+        &self,
+        query: PreparedQuery,
+        values: Vec<T>,
     ) -> FallibleQueryResults {
         let session = self.session.clone();
         let cfg = self.cfg.clone();
@@ -214,7 +252,9 @@ impl CassandraSession {
     /// Execute a query which returns no results, except an error if it fails.
     /// Can not be batched, takes a single set of parameters.
     pub(crate) async fn execute_upsert<T: SerializeRow + Debug>(
-        &self, query: PreparedUpsertQuery, value: T,
+        &self,
+        query: PreparedUpsertQuery,
+        value: T,
     ) -> anyhow::Result<()> {
         let session = self.session.clone();
         let queries = self.queries.clone();
@@ -232,7 +272,9 @@ impl CassandraSession {
     ///
     /// NOTE: This is currently only used to purge volatile data.
     pub(crate) async fn purge_execute_batch<T: SerializeRow + Debug>(
-        &self, query: PreparedDeleteQuery, values: Vec<T>,
+        &self,
+        query: PreparedDeleteQuery,
+        values: Vec<T>,
     ) -> FallibleQueryResults {
         // Only execute purge queries on the volatile session
         let persistent = false;
@@ -249,7 +291,8 @@ impl CassandraSession {
 
     /// Execute a select query to gather primary keys for purging.
     pub(crate) async fn purge_execute_iter(
-        &self, query: purge::PreparedSelectQuery,
+        &self,
+        query: purge::PreparedSelectQuery,
     ) -> anyhow::Result<QueryPager> {
         // Only execute purge queries on the volatile session
         let persistent = false;
@@ -354,7 +397,11 @@ async fn make_session(cfg: &cassandra_db::EnvVars) -> anyhow::Result<Arc<Session
 /// Continuously try and init the DB, if it fails, backoff.
 ///
 /// Display reasonable logs to help diagnose DB connection issues.
-async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bool) {
+async fn retry_init(
+    cfg: cassandra_db::EnvVars,
+    network: Network,
+    persistent: bool,
+) {
     let mut retry_delay = Duration::from_secs(0);
     let db_type = if persistent { "Persistent" } else { "Volatile" };
 
@@ -441,10 +488,10 @@ async fn retry_init(cfg: cassandra_db::EnvVars, network: Network, persistent: bo
         if persistent {
             if PERSISTENT_SESSION.set(Arc::new(cassandra_session)).is_err() {
                 error!("Persistent Session already set.  This should not happen.");
-            };
+            }
         } else if VOLATILE_SESSION.set(Arc::new(cassandra_session)).is_err() {
             error!("Volatile Session already set.  This should not happen.");
-        };
+        }
 
         // IF we get here, then everything seems to have worked, so finish init.
         break;

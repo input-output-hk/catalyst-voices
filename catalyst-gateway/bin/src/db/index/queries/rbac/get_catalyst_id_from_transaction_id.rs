@@ -57,7 +57,8 @@ impl Query {
 
     /// Executes the query and returns a result for the given transaction ID.
     pub(crate) async fn get(
-        session: &CassandraSession, txn_id: TransactionId,
+        session: &CassandraSession,
+        txn_id: TransactionId,
     ) -> Result<Option<CatalystId>> {
         let cache = session.caches().rbac_transaction_id();
 
