@@ -50,10 +50,9 @@ test-lint-openapi:
     # Scan the doc directory where type of file is JSON.
     DO spectral-ci+LINT --dir=./doc
 
-test-builder:
+rust-tests-builder:
     FROM gateway+builder-src
 
-    WORKDIR $HOME/build
     RUN cargo nextest archive --release --archive-file cat-gateway-tests.tar.zst
     SAVE ARTIFACT . build-src-dir
     SAVE ARTIFACT cat-gateway-tests.tar.zst cat-gateway-tests.tar.zst
@@ -62,9 +61,8 @@ test-builder:
 package-rust-tests-runner:
     FROM debian:stable-slim
 
-    WORKDIR $HOME/build
-    COPY +test-builder/build-src-dir .
-    COPY +test-builder/cat-gateway-tests.tar.zst .
-    COPY +test-builder/cargo-nextest .
+    COPY +rust-tests-builder/build-src-dir .
+    COPY +rust-tests-builder/cat-gateway-tests.tar.zst .
+    COPY +rust-tests-builder/cargo-nextest .
     ENTRYPOINT ./cargo-nextest nextest run --archive-file=cat-gateway-tests.tar.zst --run-ignored=only signed_docs scylla_session scylla_queries scylla_purge rbac_index --no-fail-fast
     SAVE IMAGE rust-tests-runner:latest
