@@ -56,7 +56,8 @@ impl Query {
 
     /// Executes a get registrations by Catalyst ID query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: QueryParams,
+        session: &CassandraSession,
+        params: QueryParams,
     ) -> anyhow::Result<TypedRowStream<Query>> {
         session
             .execute_iter(PreparedSelectQuery::RbacRegistrationsByCatalystId, params)
