@@ -36,6 +36,8 @@ final class Dependencies extends DependencyProvider {
     required AppEnvironment environment,
     required LoggingService loggingService,
     required ReportingService reportingService,
+    CatalystProfiler? profiler,
+    CatalystStartupProfiler? startupProfiler,
   }) async {
     DependencyProvider.instance = this;
 
@@ -43,6 +45,12 @@ final class Dependencies extends DependencyProvider {
     registerSingleton<AppEnvironment>(environment);
     registerSingleton<LoggingService>(loggingService);
     registerSingleton<ReportingService>(reportingService);
+    if (profiler != null) {
+      registerSingleton<CatalystProfiler>(profiler);
+    }
+    if (startupProfiler != null) {
+      registerSingleton(startupProfiler);
+    }
 
     _registerStorages();
     _registerUtils();
@@ -477,7 +485,11 @@ final class Dependencies extends DependencyProvider {
       dispose: (observer) async => observer.dispose(),
     );
     registerLazySingleton<VideoManager>(
-      VideoManager.new,
+      () {
+        return VideoManager(
+          get<CatalystStartupProfiler>(),
+        );
+      },
       dispose: (manager) => manager.dispose(),
     );
     registerLazySingleton<ShareManager>(() => DelegatingShareManager(get<ShareService>()));
