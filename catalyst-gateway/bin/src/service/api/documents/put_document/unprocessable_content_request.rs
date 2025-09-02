@@ -17,7 +17,10 @@ pub(crate) struct PutDocumentUnprocessableContent {
 
 impl PutDocumentUnprocessableContent {
     /// Create a new instance of `ConfigBadRequest`.
-    pub(crate) fn new(error: &(impl ToString + ?Sized), report: Option<serde_json::Value>) -> Self {
+    pub(crate) fn new(
+        error: &(impl ToString + ?Sized),
+        report: Option<serde_json::Value>,
+    ) -> Self {
         Self {
             error: error.to_string().into(),
             report: report.map(Into::into),
