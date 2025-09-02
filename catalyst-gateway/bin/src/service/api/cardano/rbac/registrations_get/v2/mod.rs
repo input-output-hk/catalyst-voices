@@ -3,6 +3,7 @@
 mod endpoint;
 mod key_data;
 mod key_data_list;
+mod key_value;
 mod payment_data;
 mod payment_data_list;
 mod registration_chain;

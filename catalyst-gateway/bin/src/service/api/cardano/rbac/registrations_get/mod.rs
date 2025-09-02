@@ -9,7 +9,7 @@ mod binary_data;
 mod extended_data;
 mod invalid_registration;
 mod invalid_registration_list;
-mod key_type;
+mod pem;
 mod purpose_list;
 mod role_id;
 mod unprocessable_content;
