@@ -41,7 +41,10 @@ pub(crate) struct Params {
 }
 
 impl Debug for Params {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
         let prv_txn_id = match self.prv_txn_id {
             MaybeUnset::Unset => "UNSET".to_owned(),
             MaybeUnset::Set(ref v) => format!("{v:?}"),
@@ -61,8 +64,12 @@ impl Debug for Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        catalyst_id: CatalystId, txn_id: TransactionId, slot_no: Slot, txn_index: TxnIndex,
-        prv_txn_id: Option<TransactionId>, removed_stake_addresses: HashSet<StakeAddress>,
+        catalyst_id: CatalystId,
+        txn_id: TransactionId,
+        slot_no: Slot,
+        txn_index: TxnIndex,
+        prv_txn_id: Option<TransactionId>,
+        removed_stake_addresses: HashSet<StakeAddress>,
         purpose: Option<UuidV4>,
     ) -> Self {
         let prv_txn_id = prv_txn_id.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
@@ -85,7 +92,8 @@ impl Params {
 
     /// Prepare Batch of RBAC Registration Index Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &EnvVars,
+        session: &Arc<Session>,
+        cfg: &EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),
