@@ -143,7 +143,7 @@ class _SpaceSidePanelState extends State<SpaceSidePanel> with SingleTickerProvid
                     children: [
                       _Header(
                         onCollapseTap: () {
-                          _controller.forward();
+                          unawaited(_controller.forward());
                           widget.onCollapseTap?.call();
                         },
                         isLeft: widget.isLeft,
