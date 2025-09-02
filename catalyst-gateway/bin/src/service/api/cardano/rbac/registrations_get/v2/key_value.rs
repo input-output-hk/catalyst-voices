@@ -9,6 +9,7 @@ use crate::service::api::cardano::rbac::registrations_get::{
 
 /// A key value for role data.
 #[derive(Union, Debug, Clone)]
+#[oai(one_of)]
 pub enum KeyValue {
     /// A public key.
     Pubkey(Option<HexEncodedBinaryData>),
