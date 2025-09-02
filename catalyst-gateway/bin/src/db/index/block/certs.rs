@@ -46,7 +46,10 @@ pub(crate) struct StakeRegistrationInsertQuery {
 }
 
 impl Debug for StakeRegistrationInsertQuery {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> Result<(), std::fmt::Error> {
         let stake_public_key = hex::encode(self.stake_public_key.as_ref());
         let register = match self.register {
             MaybeUnset::Unset => "UNSET",
@@ -86,9 +89,15 @@ impl StakeRegistrationInsertQuery {
     /// Create a new Insert Query.
     #[allow(clippy::too_many_arguments, clippy::fn_params_excessive_bools)]
     pub fn new(
-        stake_address: StakeAddress, slot_no: Slot, txn_index: TxnIndex,
-        stake_public_key: VerifyingKey, script: bool, register: bool, deregister: bool,
-        cip36: bool, pool_delegation: Option<Vec<u8>>,
+        stake_address: StakeAddress,
+        slot_no: Slot,
+        txn_index: TxnIndex,
+        stake_public_key: VerifyingKey,
+        script: bool,
+        register: bool,
+        deregister: bool,
+        cip36: bool,
+        pool_delegation: Option<Vec<u8>>,
     ) -> Self {
         StakeRegistrationInsertQuery {
             stake_address: stake_address.into(),
@@ -121,7 +130,8 @@ impl StakeRegistrationInsertQuery {
 
     /// Prepare Batch of Insert stake registration.
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+        session: &Arc<Session>,
+        cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),
@@ -155,7 +165,8 @@ impl CertInsertQuery {
 
     /// Prepare Batch of Insert TXI Index Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+        session: &Arc<Session>,
+        cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         // Note: for now we have one query, but there are many certs, and later we may have more
         // to add here.
@@ -165,8 +176,14 @@ impl CertInsertQuery {
     /// Get the stake address for a hash, return an empty address if one can not be found.
     #[allow(clippy::too_many_arguments)]
     fn stake_address(
-        &mut self, cred: &alonzo::StakeCredential, slot_no: Slot, txn: TxnIndex, register: bool,
-        deregister: bool, delegation: Option<Vec<u8>>, block: &MultiEraBlock,
+        &mut self,
+        cred: &alonzo::StakeCredential,
+        slot_no: Slot,
+        txn: TxnIndex,
+        register: bool,
+        deregister: bool,
+        delegation: Option<Vec<u8>>,
+        block: &MultiEraBlock,
     ) {
         let (stake_address, pubkey, script) = match *cred {
             conway::StakeCredential::AddrKeyhash(cred) => {
@@ -211,7 +228,11 @@ impl CertInsertQuery {
 
     /// Index an Alonzo Era certificate into the database.
     fn index_alonzo_cert(
-        &mut self, cert: &alonzo::Certificate, slot: Slot, index: TxnIndex, block: &MultiEraBlock,
+        &mut self,
+        cert: &alonzo::Certificate,
+        slot: Slot,
+        index: TxnIndex,
+        block: &MultiEraBlock,
     ) {
         #[allow(clippy::match_same_arms)]
         match cert {
@@ -234,7 +255,11 @@ impl CertInsertQuery {
 
     /// Index a certificate from a conway transaction.
     fn index_conway_cert(
-        &mut self, cert: &conway::Certificate, slot_no: Slot, txn: TxnIndex, block: &MultiEraBlock,
+        &mut self,
+        cert: &conway::Certificate,
+        slot_no: Slot,
+        txn: TxnIndex,
+        block: &MultiEraBlock,
     ) {
         #[allow(clippy::match_same_arms)]
         match cert {
@@ -267,7 +292,11 @@ impl CertInsertQuery {
 
     /// Index the certificates in a transaction.
     pub(crate) fn index(
-        &mut self, txs: &MultiEraTx<'_>, slot: Slot, index: TxnIndex, block: &MultiEraBlock,
+        &mut self,
+        txs: &MultiEraTx<'_>,
+        slot: Slot,
+        index: TxnIndex,
+        block: &MultiEraBlock,
     ) {
         #[allow(clippy::match_same_arms)]
         txs.certs().iter().for_each(|cert| {
@@ -287,7 +316,10 @@ impl CertInsertQuery {
     /// Execute the Certificate Indexing Queries.
     ///
     /// Consumes the `self` and returns a vector of futures.
-    pub(crate) fn execute(self, session: &Arc<CassandraSession>) -> FallibleQueryTasks {
+    pub(crate) fn execute(
+        self,
+        session: &Arc<CassandraSession>,
+    ) -> FallibleQueryTasks {
         let mut query_handles: FallibleQueryTasks = Vec::new();
 
         let inner_session = session.clone();

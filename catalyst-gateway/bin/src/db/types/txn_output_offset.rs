@@ -37,7 +37,9 @@ impl From<DbTxnOutputOffset> for i16 {
 
 impl SerializeValue for DbTxnOutputOffset {
     fn serialize<'b>(
-        &self, typ: &ColumnType, writer: CellWriter<'b>,
+        &self,
+        typ: &ColumnType,
+        writer: CellWriter<'b>,
     ) -> Result<WrittenCellProof<'b>, SerializationError> {
         self.0.serialize(typ, writer)
     }
@@ -49,7 +51,8 @@ impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbTxnOutputOffse
     }
 
     fn deserialize(
-        typ: &'metadata ColumnType<'metadata>, v: Option<FrameSlice<'frame>>,
+        typ: &'metadata ColumnType<'metadata>,
+        v: Option<FrameSlice<'frame>>,
     ) -> Result<Self, DeserializationError> {
         let value = <i16>::deserialize(typ, v)?;
         Ok(Self(value))
