@@ -37,6 +37,8 @@ pub(crate) fn txo_assets_misses_inc() {
 
 mod reporter {
     //! Prometheus reporter metrics.
+    #![allow(clippy::unwrap_used)]
+
     use std::sync::LazyLock;
 
     use prometheus::{

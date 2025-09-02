@@ -26,7 +26,10 @@ pub(crate) struct InternalApiKeyAuthorization(String);
 
 /// Check the provided API Key matches the API Key defined by for the deployment.
 #[allow(clippy::unused_async)]
-async fn api_checker(_req: &Request, api_key: ApiKey) -> Option<String> {
+async fn api_checker(
+    _req: &Request,
+    api_key: ApiKey,
+) -> Option<String> {
     if Settings::check_internal_api_key(&api_key.key) {
         Some(api_key.key)
     } else {

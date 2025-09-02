@@ -43,7 +43,10 @@ pub(crate) struct Params {
 }
 
 impl Debug for Params {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
         f.debug_struct("Params")
             .field("txn_id", &self.txn_id.to_string())
             .finish()
@@ -77,7 +80,7 @@ impl PrimaryKeyQuery {
 
     /// Executes a query to get all Catalyst ID For TX ID registration primary keys.
     pub(crate) async fn execute(
-        session: &CassandraSession,
+        session: &CassandraSession
     ) -> anyhow::Result<TypedRowStream<result::PrimaryKey>> {
         let iter = session
             .purge_execute_iter(PreparedSelectQuery::CatalystIdForTxnId)
@@ -97,7 +100,8 @@ pub(crate) struct DeleteQuery;
 impl DeleteQuery {
     /// Prepare Batch of Delete Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+        session: &Arc<Session>,
+        cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),
@@ -116,7 +120,8 @@ impl DeleteQuery {
 
     /// Executes a DELETE Query
     pub(crate) async fn execute(
-        session: &CassandraSession, params: Vec<Params>,
+        session: &CassandraSession,
+        params: Vec<Params>,
     ) -> FallibleQueryResults {
         let results = session
             .purge_execute_batch(PreparedDeleteQuery::CatalystIdForTxnId, params)
