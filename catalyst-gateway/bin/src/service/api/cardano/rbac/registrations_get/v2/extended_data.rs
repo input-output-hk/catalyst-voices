@@ -13,6 +13,7 @@ pub struct ExtendedData {
 }
 
 impl ExtendedData {
+    /// Creates a new instance of extended data.
     pub fn new(
         key: u8,
         value: Vec<u8>,
