@@ -51,11 +51,13 @@ void main() {
     binding.testTextInput.unregister();
   });
 
-  group('App -', appTests);
-  group('Account -', accountTests);
-  group('Discovery space -', discoverySpaceTests);
-  group('Onboarding -', onboardingTests);
+  group('App -', appTests, skip: _skipE2EReason);
+  group('Account -', accountTests, skip: _skipE2EReason);
+  group('Discovery space -', discoverySpaceTests, skip: _skipE2EReason);
+  group('Onboarding -', onboardingTests, skip: _skipE2EReason);
   // TODO(emiride): rethink how to setup tests accounts in different environments for gateway.
-  group('Onboarding Restore Flow -', onboardingRestoreTests, skip: true);
-  group('Proposals space -', proposalsTests);
+  group('Onboarding Restore Flow -', onboardingRestoreTests, skip: _skipE2EReason);
+  group('Proposals space -', proposalsTests, skip: _skipE2EReason);
 }
+
+const _skipE2EReason = 'No maintained. Playwright implementation in progress';
