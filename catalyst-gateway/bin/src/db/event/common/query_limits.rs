@@ -18,7 +18,10 @@ enum QueryLimitsInner {
 }
 
 impl Display for QueryLimits {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
         match self.0 {
             QueryLimitsInner::All => write!(f, ""),
             QueryLimitsInner::Limit(limit) => write!(f, "LIMIT {limit}"),
@@ -38,7 +41,10 @@ impl QueryLimits {
     pub(crate) const ONE: QueryLimits = Self(QueryLimitsInner::Limit(1));
 
     /// Create a `QueryLimits` object from the service `Limit` and `Page` values.
-    pub(crate) fn new(limit: Option<Limit>, page: Option<Page>) -> Self {
+    pub(crate) fn new(
+        limit: Option<Limit>,
+        page: Option<Page>,
+    ) -> Self {
         match (limit, page) {
             (Some(limit), Some(page)) => {
                 Self(QueryLimitsInner::LimitAndOffset(
@@ -72,6 +78,9 @@ impl QueryLimits {
 
 /// Calculate the offset value from page and limit.
 /// offset = limit * page
-fn cal_offset(page: u32, limit: u32) -> u32 {
+fn cal_offset(
+    page: u32,
+    limit: u32,
+) -> u32 {
     limit.saturating_mul(page)
 }
