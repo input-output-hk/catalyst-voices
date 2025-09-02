@@ -44,8 +44,13 @@ pub(crate) struct Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        stake_address: StakeAddress, slot_no: Slot, txn_index: TxnIndex, txo: TxnOutputOffset,
-        address: &str, value: u64, txn_hash: TransactionId,
+        stake_address: StakeAddress,
+        slot_no: Slot,
+        txn_index: TxnIndex,
+        txo: TxnOutputOffset,
+        address: &str,
+        value: u64,
+        txn_hash: TransactionId,
     ) -> Self {
         Self {
             stake_address: stake_address.into(),
@@ -60,7 +65,8 @@ impl Params {
 
     /// Prepare Batch of Staked Insert TXO Asset Index Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+        session: &Arc<Session>,
+        cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),

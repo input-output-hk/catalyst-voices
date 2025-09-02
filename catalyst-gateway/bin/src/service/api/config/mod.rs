@@ -59,7 +59,11 @@ impl ConfigApi {
         method = "get",
         operation_id = "get_config_frontend"
     )]
-    async fn get_frontend(&self, ip_address: RealIp, _auth: NoneOrRBAC) -> GetConfigAllResponses {
+    async fn get_frontend(
+        &self,
+        ip_address: RealIp,
+        _auth: NoneOrRBAC,
+    ) -> GetConfigAllResponses {
         let general_config: JsonObject = match Config::get(ConfigKey::Frontend)
             .await
             .and_then(TryInto::try_into)
@@ -115,7 +119,8 @@ impl ConfigApi {
         /// *OPTIONAL* The IP Address to set the configuration for.
         #[oai(name = "IP")]
         Query(ip_address): Query<Option<IpAddr>>,
-        Json(json_config): Json<JsonObject>, _auth: InternalApiKeyAuthorization,
+        Json(json_config): Json<JsonObject>,
+        _auth: InternalApiKeyAuthorization,
     ) -> SetConfigAllResponses {
         if let Some(ip) = ip_address {
             set(ConfigKey::FrontendForIp(ip.into()), json_config.into()).await
@@ -126,7 +131,10 @@ impl ConfigApi {
 }
 
 /// Helper function to merge two JSON values.
-fn merge_configs(general: JsonObject, ip_specific: JsonObject) -> JsonObject {
+fn merge_configs(
+    general: JsonObject,
+    ip_specific: JsonObject,
+) -> JsonObject {
     let mut merged = general;
 
     for (key, value) in Map::<String, Value>::from(ip_specific) {
@@ -141,7 +149,10 @@ fn merge_configs(general: JsonObject, ip_specific: JsonObject) -> JsonObject {
 }
 
 /// Helper function to handle set.
-async fn set(key: ConfigKey, value: Value) -> SetConfigAllResponses {
+async fn set(
+    key: ConfigKey,
+    value: Value,
+) -> SetConfigAllResponses {
     match Config::set(key, value).await {
         Ok(()) => SetConfigResponse::Ok.into(),
         Err(err) => {
