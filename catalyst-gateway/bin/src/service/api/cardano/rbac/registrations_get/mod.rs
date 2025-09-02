@@ -15,5 +15,3 @@ mod role_id;
 mod unprocessable_content;
 mod v1;
 mod v2;
-    token: Option<CatalystRBACTokenV1>,
-    token: Option<CatalystRBACTokenV1>,

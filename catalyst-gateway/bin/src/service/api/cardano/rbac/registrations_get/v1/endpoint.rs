@@ -23,7 +23,8 @@ use crate::{
 
 /// Get RBAC registration V1 endpoint.
 pub async fn endpoint_v1(
-    lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>,
+    lookup: Option<CatIdOrStake>,
+    token: Option<CatalystRBACTokenV1>,
 ) -> AllResponsesV1 {
     if lookup.is_none() && token.is_none() {
         return ResponsesV1::UnprocessableContent(Json(RbacUnprocessableContent::new(
@@ -47,7 +48,8 @@ pub async fn endpoint_v1(
 
 /// Returns a `ChainInfo` object using either a Catalyst ID or a stake address.
 async fn chain_info(
-    lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>,
+    lookup: Option<CatIdOrStake>,
+    token: Option<CatalystRBACTokenV1>,
 ) -> anyhow::Result<Option<ChainInfo>> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_stake_address::Query;
 
