@@ -1,6 +1,8 @@
 //! All the related Chain Follower reporting metrics to the Prometheus service are inside
 //! this module.
 
+#![allow(clippy::unwrap_used)]
+
 use std::sync::LazyLock;
 
 use prometheus::{register_int_gauge_vec, IntGaugeVec};
