@@ -9,7 +9,7 @@ packages:
 
 ignore:
   # ignore flutter_rust_bridge packages that are non-conformant with melos
-  - packages/libs/catalyst_key_derivation/example/**
+  - packages/libs/**/cargokit/**
   # ignore temporary packages that are non-conformant with melos
   - apps/voices/build/**
 
@@ -42,7 +42,7 @@ packageLicenseOverride:
   catalyst_cardano_platform_interface: Apache-2.0
   catalyst_compression: Apache-2.0
   catalyst_compression_web: Apache-2.0
-  catalyst_cardano_web: Apache-2.0
+  catalyst_compression_native: Apache-2.0
   catalyst_compression_platform_interface: Apache-2.0
   catalyst_key_derivation: Apache-2.0
   catalyst_key_derivation_web: Apache-2.0
@@ -51,6 +51,7 @@ packageLicenseOverride:
   catalyst_voices_assets_example: Apache-2.0
   catalyst_cardano: Apache-2.0
   catalyst_cardano_example: Apache-2.0
+  catalyst_cardano_web: Apache-2.0
   catalyst_voices_localization: Apache-2.0
   catalyst_voices_models: Apache-2.0
   example: Apache-2.0

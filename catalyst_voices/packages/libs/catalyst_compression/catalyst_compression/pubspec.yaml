@@ -12,10 +12,21 @@ environment:
 flutter:
   plugin:
     platforms:
+      android:
+        default_package: catalyst_compression_native
+      ios:
+        default_package: catalyst_compression_native
+      linux:
+        default_package: catalyst_compression_native
+      macos:
+        default_package: catalyst_compression_native
       web:
         default_package: catalyst_compression_web
+      windows:
+        default_package: catalyst_compression_native
 
 dependencies:
+  catalyst_compression_native: ^1.0.0
   catalyst_compression_platform_interface: ^1.0.0
   catalyst_compression_web: ^1.0.0
   convert: ^3.1.2
