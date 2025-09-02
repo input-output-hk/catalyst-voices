@@ -54,8 +54,7 @@ impl Type for Pem {
     }
 
     fn schema_ref() -> MetaSchemaRef {
-        let schema_ref =
-            MetaSchemaRef::Inline(Box::new(MetaSchema::new_with_format("Pem", "string")));
+        let schema_ref = MetaSchemaRef::Inline(Box::new(MetaSchema::new("string")));
         schema_ref.merge(SCHEMA.clone())
     }
 
