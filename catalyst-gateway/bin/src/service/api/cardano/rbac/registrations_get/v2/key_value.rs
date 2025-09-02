@@ -26,7 +26,13 @@ impl Example for KeyValue {
 
 /// A key value for role data.
 #[derive(NewType, Debug, Clone)]
-pub struct KeyValueWrapper(KeyValue);
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+pub struct KeyValueWrapper(pub KeyValue);
 
 impl Example for KeyValueWrapper {
     fn example() -> Self {

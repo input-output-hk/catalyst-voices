@@ -16,7 +16,9 @@ use x509_cert::certificate::Certificate as X509Certificate;
 
 use crate::service::{
     api::cardano::rbac::registrations_get::{
-        binary_data::HexEncodedBinaryData, pem::Pem, v2::key_value::KeyValue,
+        binary_data::HexEncodedBinaryData,
+        pem::Pem,
+        v2::key_value::{KeyValue, KeyValueWrapper},
     },
     common::types::{
         cardano::{slot_no::SlotNo, txn_index::TxnIndex},
@@ -40,7 +42,7 @@ pub struct KeyData {
     /// A transaction index.
     txn_index: TxnIndex,
     /// A value of the key.
-    key_value: KeyValue,
+    key_value: KeyValueWrapper,
 }
 
 impl KeyData {
@@ -54,7 +56,7 @@ impl KeyData {
         point: &Point,
         chain: &RegistrationChain,
     ) -> anyhow::Result<Self> {
-        let key_value = match key_ref.local_ref {
+        let key_value = KeyValueWrapper(match key_ref.local_ref {
             LocalRefInt::X509Certs => {
                 KeyValue::X509(encode_x509(chain.x509_certs(), key_ref.key_offset, point)?)
             },
@@ -68,7 +70,7 @@ impl KeyData {
                     point,
                 )?)
             },
-        };
+        });
 
         Ok(Self {
             is_persistent: is_persistent.into(),
@@ -87,7 +89,7 @@ impl Example for KeyData {
             time: DateTime::example(),
             slot: SlotNo::example(),
             txn_index: TxnIndex::example(),
-            key_value: KeyValue::Pubkey(Some(HexEncodedBinaryData::example())),
+            key_value: KeyValueWrapper::example(),
         }
     }
 }
