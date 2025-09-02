@@ -34,12 +34,19 @@ impl ChainsCache {
     }
 
     /// Get an entry from the cache
-    pub(crate) fn get(&self, key: &CatalystId) -> Option<RegistrationChain> {
+    pub(crate) fn get(
+        &self,
+        key: &CatalystId,
+    ) -> Option<RegistrationChain> {
         self.inner.get(key)
     }
 
     /// Get an entry from the cache
-    pub(crate) fn insert(&self, key: CatalystId, value: RegistrationChain) {
+    pub(crate) fn insert(
+        &self,
+        key: CatalystId,
+        value: RegistrationChain,
+    ) {
         self.inner.insert(key, value);
     }
 
