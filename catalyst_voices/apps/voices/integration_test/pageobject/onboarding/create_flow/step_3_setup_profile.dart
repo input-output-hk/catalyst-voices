@@ -7,7 +7,7 @@ import '../onboarding_base_page.dart';
 import 'step_2_profile_info.dart';
 
 final class SetupProfilePanel extends OnboardingPageBase {
-  final profileDetailsPanel = const Key('ProfileDetailsPanel');
+  final profileDetailsPanel = const Key('BaseProfileDetailsPanel');
   final titleText = const Key('TitleText');
   final displayNameTextField = const Key('DisplayNameTextField');
   final emailTextField = const Key('EmailTextField');
@@ -44,7 +44,7 @@ final class SetupProfilePanel extends OnboardingPageBase {
     expect($(emailTextField), findsOneWidget);
     expect(
       $(emailTextField).$(Text).text,
-      '*${(await t()).createProfileSetupEmailLabel}',
+      (await t()).createProfileSetupEmailLabel,
     );
     expect($(backButton), findsOneWidget);
     expect($(nextButton), findsOneWidget);
