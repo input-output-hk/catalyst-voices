@@ -1,3 +1,4 @@
+import 'package:catalyst_compression_native/src/rust/api/compression.dart';
 import 'package:catalyst_compression_native/src/rust/frb_generated.dart';
 import 'package:catalyst_compression_platform_interface/catalyst_compression_platform_interface.dart';
 
@@ -9,19 +10,13 @@ class RustBrotliCompressor implements CatalystCompressor {
   @override
   Future<List<int>> compress(List<int> bytes) async {
     await _RustInitializer.ensureInitialized();
-    // final data = await brotliCompress(hex.encode(bytes).toJS).toDart;
-    // return hex.decode(data.toDart);
-    // TODO(dt-iohk): implement
-    return bytes;
+    return brotliCompress(bytes: bytes);
   }
 
   @override
   Future<List<int>> decompress(List<int> bytes) async {
     await _RustInitializer.ensureInitialized();
-    // final data = await brotliDecompress(hex.encode(bytes).toJS).toDart;
-    // return hex.decode(data.toDart);
-    // TODO(dt-iohk): implement
-    return bytes;
+    return brotliDecompress(bytes: bytes);
   }
 }
 
@@ -33,19 +28,13 @@ class RustZstdCompressor implements CatalystCompressor {
   @override
   Future<List<int>> compress(List<int> bytes) async {
     await _RustInitializer.ensureInitialized();
-    // final data = await brotliCompress(hex.encode(bytes).toJS).toDart;
-    // return hex.decode(data.toDart);
-    // TODO(dt-iohk): implement
-    return bytes;
+    return zstdCompress(bytes: bytes);
   }
 
   @override
   Future<List<int>> decompress(List<int> bytes) async {
     await _RustInitializer.ensureInitialized();
-    // final data = await brotliDecompress(hex.encode(bytes).toJS).toDart;
-    // return hex.decode(data.toDart);
-    // TODO(dt-iohk): implement
-    return bytes;
+    return zstdDecompress(bytes: bytes);
   }
 }
 

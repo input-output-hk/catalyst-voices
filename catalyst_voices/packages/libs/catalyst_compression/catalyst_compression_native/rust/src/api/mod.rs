@@ -1,1 +1,3 @@
-pub mod simple;
+//! Module for the Catalyst compression library.
+
+pub mod compression;

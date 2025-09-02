@@ -33,6 +33,8 @@ flutter:
         ffiPlugin: true
         pluginClass: CatalystCompressionNative
         fileName: catalyst_compression_native.dart
+  assets:
+    - assets/js/
 
 dependencies:
   catalyst_compression_platform_interface: ^1.0.0

@@ -11,7 +11,7 @@ builder:
 code-generator:
     ARG local = false
     FROM +builder
-    DO flutter_rust_bridge+CODE_GENERATOR_WEB --WEB_PREFIX=/assets/packages/catalyst_key_derivation/assets/js/
+    DO flutter_rust_bridge+CODE_GENERATOR_WEB --WEB_PREFIX=/assets/packages/catalyst_compression_native/assets/js/
 
     IF [ $local = true ]
         SAVE ARTIFACT ./assets/js AS LOCAL ./assets/js
@@ -45,7 +45,7 @@ integration-test-web:
     RUN ($driver --port=$driver_port > $driver.log &) && \
         sleep 5 && \
         flutter drive --driver=test_driver/integration_tests.dart \
-            --target=integration_test/catalyst_key_derivation_test.dart \
+            --target=integration_test/catalyst_compression_native_test.dart \
             -d web-server --browser-name=$browser --driver-port=$driver_port \
             # https://github.com/flutter/flutter/issues/154727
             --web-browser-flag=--disable-web-security \

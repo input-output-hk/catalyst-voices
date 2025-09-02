@@ -1,0 +1,15 @@
+{
+  "name": "catalyst_compression_native",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/input-output-hk/catalyst-voices"
+  },
+  "files": [
+    "catalyst_compression_native_bg.wasm",
+    "catalyst_compression_native.js"
+  ],
+  "browser": "catalyst_compression_native.js",
+  "homepage": "https://input-output-hk.github.io/catalyst-voices"
+}
