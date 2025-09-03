@@ -20,10 +20,8 @@ final class IODownloader implements Downloader {
   }) async {
     final strategy = _strategy ?? FileSaveStrategyFactory.getDefaultStrategy();
 
-    // Extract the filename from the path
     final filename = p.basename(path.path);
 
-    // Save the file using the strategy
     final savedFile = await strategy.saveFile(
       data: data,
       filename: filename,
