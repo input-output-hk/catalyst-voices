@@ -16,9 +16,12 @@ use x509_cert::certificate::Certificate as X509Certificate;
 
 use crate::service::{
     api::cardano::rbac::registrations_get::{
-        binary_data::HexEncodedBinaryData,
+        key_type::{KeyType, KeyTypeWrapper},
         pem::Pem,
-        v2::key_value::{KeyValue, KeyValueWrapper},
+        v2::{
+            c509::HexEncodedC509,
+            key_value::{KeyValue, KeyValueWrapper},
+        },
     },
     common::types::{
         cardano::{slot_no::SlotNo, txn_index::TxnIndex},
@@ -41,7 +44,11 @@ pub struct KeyData {
     slot: SlotNo,
     /// A transaction index.
     txn_index: TxnIndex,
+    /// A type of the key.
+    key_type: KeyTypeWrapper,
     /// A value of the key.
+    ///
+    /// The key was deleted if this field is absent or nil.
     key_value: Option<KeyValueWrapper>,
 }
 
@@ -56,14 +63,18 @@ impl KeyData {
         point: &Point,
         chain: &RegistrationChain,
     ) -> anyhow::Result<Self> {
+        let key_type;
         let key_value = match key_ref.local_ref {
             LocalRefInt::X509Certs => {
+                key_type = KeyTypeWrapper(KeyType::X509);
                 encode_x509(chain.x509_certs(), key_ref.key_offset, point)?.map(KeyValue::X509)
             },
             LocalRefInt::C509Certs => {
+                key_type = KeyTypeWrapper(KeyType::C509);
                 encode_c509(chain.c509_certs(), key_ref.key_offset, point)?.map(KeyValue::C509)
             },
             LocalRefInt::PubKeys => {
+                key_type = KeyTypeWrapper(KeyType::Pubkey);
                 convert_pub_key(chain.simple_keys(), key_ref.key_offset, point)?
                     .map(KeyValue::Pubkey)
             },
@@ -75,6 +86,7 @@ impl KeyData {
             time,
             slot,
             txn_index,
+            key_type,
             key_value,
         })
     }
@@ -87,6 +99,7 @@ impl Example for KeyData {
             time: DateTime::example(),
             slot: SlotNo::example(),
             txn_index: TxnIndex::example(),
+            key_type: KeyTypeWrapper::example(),
             key_value: Some(KeyValueWrapper::example()),
         }
     }
@@ -115,7 +128,7 @@ fn encode_c509(
     certs: &HashMap<usize, Vec<PointData<Option<C509>>>>,
     offset: usize,
     point: &Point,
-) -> anyhow::Result<Option<HexEncodedBinaryData>> {
+) -> anyhow::Result<Option<HexEncodedC509>> {
     certs
         .get(&offset)
         .with_context(|| format!("Invalid C509 certificate offset: {offset:?}"))?

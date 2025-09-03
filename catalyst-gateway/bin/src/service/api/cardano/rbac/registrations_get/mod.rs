@@ -5,9 +5,9 @@ pub use self::{
     v2::{endpoint_v2, AllResponsesV2},
 };
 
-mod binary_data;
 mod invalid_registration;
 mod invalid_registration_list;
+mod key_type;
 mod pem;
 mod purpose_list;
 mod role_id;

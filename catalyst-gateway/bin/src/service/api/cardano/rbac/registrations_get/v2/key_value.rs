@@ -7,7 +7,7 @@ use poem_openapi::{
 use poem_openapi_derive::Union;
 
 use crate::service::{
-    api::cardano::rbac::registrations_get::{binary_data::HexEncodedBinaryData, pem::Pem},
+    api::cardano::rbac::registrations_get::{pem::Pem, v2::c509::HexEncodedC509},
     common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey,
 };
 
@@ -20,7 +20,7 @@ pub enum KeyValue {
     /// A X509 certificate.
     X509(Pem),
     /// A C509 certificate.
-    C509(HexEncodedBinaryData),
+    C509(HexEncodedC509),
 }
 
 /// A key value for role data.

@@ -1,10 +1,10 @@
 //! Types and methods related to the `/rbac/registrations` V1 endpoint.
 
+mod binary_data;
 mod endpoint;
 mod extended_data;
 mod key_data;
 mod key_data_list;
-mod key_type;
 mod payment_data;
 mod payment_data_list;
 mod registration_chain;

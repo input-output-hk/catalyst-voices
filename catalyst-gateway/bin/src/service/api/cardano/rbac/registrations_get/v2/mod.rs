@@ -1,5 +1,6 @@
 //! Types and methods related to the `/rbac/registrations` V2 endpoint.
 
+mod c509;
 mod endpoint;
 mod extended_data;
 mod extended_data_list;

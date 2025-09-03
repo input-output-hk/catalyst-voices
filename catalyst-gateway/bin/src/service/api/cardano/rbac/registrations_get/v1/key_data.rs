@@ -17,8 +17,8 @@ use x509_cert::{certificate::Certificate as X509Certificate, der::Encode as _};
 
 use crate::service::{
     api::cardano::rbac::registrations_get::{
-        binary_data::HexEncodedBinaryData,
-        v1::key_type::{KeyType, KeyTypeWrapper},
+        key_type::{KeyType, KeyTypeWrapper},
+        v1::binary_data::HexEncodedBinaryData,
     },
     common::types::generic::{
         boolean::BooleanFlag, date_time::DateTime as ServiceDateTime,
