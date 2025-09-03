@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices/permissions/permission_handler_factory.dart';
 import 'package:equatable/equatable.dart';
 import 'package:permission_handler/permission_handler.dart';
 

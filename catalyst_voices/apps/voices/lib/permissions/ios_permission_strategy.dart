@@ -1,6 +1,7 @@
-import 'package:catalyst_voices_models/src/permissions/permission_strategy.dart';
+import 'package:catalyst_voices/permissions/permission_strategy.dart';
 
 // Concrete Strategy - iOS
 final class IOSPermissionStrategy extends BasePermissionStrategy {
+  const IOSPermissionStrategy();
   // iOS uses permissions as-is, no mapping needed
 }

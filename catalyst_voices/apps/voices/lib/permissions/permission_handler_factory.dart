@@ -1,15 +1,12 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:catalyst_voices_models/src/permissions/android_permission_strategy.dart';
-import 'package:catalyst_voices_models/src/permissions/default_permission_strategy.dart';
-import 'package:catalyst_voices_models/src/permissions/exceptions/permission_need_explanation_exception.dart'
-    show PermissionNeedsExplanationException;
-import 'package:catalyst_voices_models/src/permissions/exceptions/permission_need_rationale_exception.dart'
-    show PermissionNeedsRationaleException;
-import 'package:catalyst_voices_models/src/permissions/ios_permission_strategy.dart';
-import 'package:catalyst_voices_models/src/permissions/permission_request.dart';
-import 'package:catalyst_voices_models/src/permissions/permission_strategy.dart';
+import 'package:catalyst_voices/permissions/android_permission_strategy.dart';
+import 'package:catalyst_voices/permissions/default_permission_strategy.dart';
+import 'package:catalyst_voices/permissions/ios_permission_strategy.dart';
+import 'package:catalyst_voices/permissions/permission_request.dart';
+import 'package:catalyst_voices/permissions/permission_strategy.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -28,17 +25,23 @@ abstract interface class PermissionHandler {
 
 final class PermissionHandlerImpl implements PermissionHandler {
   final DeviceInfoPlugin _deviceInfo;
-  PermissionStrategy? _cachedStrategy;
+
   final Set<Permission> _deniedPermissions = {};
   final Queue<PermissionRequest> _requestQueue = Queue<PermissionRequest>();
   bool _isProcessingQueue = false;
 
+  PermissionStrategy? _cachedStrategy;
+
   PermissionHandlerImpl(this._deviceInfo);
+
+  Future<PermissionStrategy> get _strategy async {
+    return _cachedStrategy ??= await PermissionStrategyFactory.create(_deviceInfo);
+  }
 
   @override
   Future<PermissionStatus> permissionStatus(Permission permission) async {
-    _cachedStrategy ??= await PermissionStrategyFactory.create(_deviceInfo);
-    final actualPermission = _cachedStrategy!.getActualPermission(permission);
+    final strategy = await _strategy;
+    final actualPermission = strategy.getActualPermission(permission);
     return actualPermission.status;
   }
 
@@ -97,11 +100,11 @@ final class PermissionStrategyFactory {
       final androidInfo = await deviceInfo.androidInfo;
       return androidInfo.version.sdkInt >= _safPermissionSDK
           ? AndroidModernPermissionStrategy()
-          : AndroidLegacyPermissionStrategy();
+          : const AndroidLegacyPermissionStrategy();
     } else if (CatalystOperatingSystem.current.isIOS) {
-      return IOSPermissionStrategy();
+      return const IOSPermissionStrategy();
     } else {
-      return DefaultPermissionStrategy();
+      return const DefaultPermissionStrategy();
     }
   }
 }

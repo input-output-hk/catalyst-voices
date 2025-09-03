@@ -1,10 +1,11 @@
 // ignore: one_member_abstracts
-import 'package:catalyst_voices_models/src/permissions/exceptions/permission_need_explanation_exception.dart';
-import 'package:catalyst_voices_models/src/permissions/exceptions/permission_need_rationale_exception.dart';
-import 'package:catalyst_voices_models/src/permissions/permission_handler_factory.dart';
+import 'package:catalyst_voices/permissions/permission_handler_factory.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 abstract base class BasePermissionStrategy implements PermissionStrategy {
+  const BasePermissionStrategy();
+
   @override
   Permission getActualPermission(Permission requestedPermission) => requestedPermission;
 
@@ -50,6 +51,8 @@ abstract base class BasePermissionStrategy implements PermissionStrategy {
 }
 
 abstract interface class PermissionStrategy {
+  const PermissionStrategy();
+
   Permission getActualPermission(Permission requestedPermission);
 
   Future<PermissionResult> requestPermission(

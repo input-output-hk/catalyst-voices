@@ -1,3 +1,5 @@
+import 'package:catalyst_voices/dependency/dependencies.dart';
+import 'package:catalyst_voices/permissions/permission_handler_factory.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
@@ -5,6 +7,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -12,69 +15,94 @@ final _logger = Logger('PermissionMixin');
 
 mixin PermissionsMixin<T extends StatefulWidget> on State<T> {
   Future<PermissionResult> getPermission(
-    PermissionHandler permissionHandler,
-    Permission permission,
-  ) async {
+    Permission permission, {
+    PermissionHandler? permissionHandler,
+  }) async {
     try {
+      permissionHandler ??= Dependencies.instance.get<PermissionHandler>();
       return await permissionHandler.requestPermission(permission);
     } on PermissionNeedsRationaleException catch (e) {
       final rationale = LocalizedPermissionNeedRationaleException(e.permission);
-      _showPermissionRationaleDialog(context, rationale);
+      showPermissionRationaleDialog(context, rationale);
       return PermissionResult.denied;
     } on PermissionNeedsExplanationException catch (_) {
       const explanation = LocalizedPermissionNeedExplanationException();
-      _showPermissionExplanationDialog(context, explanation);
+      showPermissionExplanationDialog(context, explanation);
       return PermissionResult.denied;
     } catch (e) {
       _logger.severe('Failed to get permission', e);
-      _showUnknownExceptionSnackbar(context);
+      showUnknownExceptionSnackbar(context);
       return PermissionResult.denied;
     }
   }
 
-  void _showPermissionExplanationDialog(
+  @visibleForOverriding
+  void showPermissionExplanationDialog(
     BuildContext context,
-    LocalizedPermissionNeedExplanationException explanation,
-  ) {
+    LocalizedPermissionNeedExplanationException explanation, {
+    VoicesSnackBarType type = VoicesSnackBarType.warning,
+    SnackBarBehavior behavior = SnackBarBehavior.floating,
+    String? title,
+    List<Widget>? actions,
+  }) {
     VoicesSnackBar(
-      type: VoicesSnackBarType.warning,
-      behavior: SnackBarBehavior.floating,
-      title: context.l10n.permissionNeededTitle,
+      type: type,
+      behavior: behavior,
+      title: title ?? context.l10n.permissionNeededTitle,
       message: explanation.message(context),
-      actions: [
-        VoicesTextButton(
-          onTap: openAppSettings,
-          child: Text(
-            context.l10n.openAppSettings,
-          ),
-        ),
-      ],
+      actions:
+          actions ??
+          [
+            VoicesTextButton(
+              onTap: openAppSettings,
+              child: Text(
+                context.l10n.openAppSettings,
+              ),
+            ),
+          ],
     ).show(context);
   }
 
-  void _showPermissionRationaleDialog(
+  @visibleForOverriding
+  void showPermissionRationaleDialog(
     BuildContext context,
-    LocalizedPermissionNeedRationaleException rationale,
-  ) {
+    LocalizedPermissionNeedRationaleException rationale, {
+    VoicesSnackBarType type = VoicesSnackBarType.warning,
+    SnackBarBehavior behavior = SnackBarBehavior.floating,
+    String? title,
+    List<Widget> actions = const [],
+  }) {
     VoicesSnackBar(
-      type: VoicesSnackBarType.warning,
-      behavior: SnackBarBehavior.floating,
-      title: context.l10n.permissionNeededTitle,
+      type: type,
+      behavior: behavior,
+      title: title ?? context.l10n.permissionNeededTitle,
       message: rationale.message(context),
+      actions: actions,
     ).show(context);
   }
 
-  void _showUnknownExceptionSnackbar(BuildContext context) {
+  @visibleForOverriding
+  void showUnknownExceptionSnackbar(
+    BuildContext context, {
+    VoicesSnackBarType type = VoicesSnackBarType.warning,
+    SnackBarBehavior behavior = SnackBarBehavior.floating,
+    String? title,
+    String? message,
+    List<Widget> actions = const [],
+  }) {
     VoicesSnackBar(
-      type: VoicesSnackBarType.error,
-      behavior: SnackBarBehavior.floating,
-      title: context.l10n.somethingWentWrong,
-      message: context.l10n.errorProposalDeletedDescription,
-    );
+      type: type,
+      behavior: behavior,
+      title: title ?? context.l10n.somethingWentWrong,
+      message: message ?? context.l10n.errorProposalDeletedDescription,
+      actions: actions,
+    ).show(context);
   }
 }
 
 mixin StoragePermissionMixin<T extends StatefulWidget> on PermissionsMixin<T> {
-  Future<bool> getStoragePermission(PermissionHandler permissionHandler) async =>
-      getPermission(permissionHandler, Permission.storage).then((value) => value.isGranted);
+  Future<bool> getStoragePermission([PermissionHandler? permissionHandler]) async => getPermission(
+    Permission.storage,
+    permissionHandler: permissionHandler,
+  ).then((value) => value.isGranted);
 }

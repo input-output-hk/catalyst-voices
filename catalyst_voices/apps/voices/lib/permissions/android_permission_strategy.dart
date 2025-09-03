@@ -1,8 +1,10 @@
-import 'package:catalyst_voices_models/src/permissions/permission_strategy.dart';
+import 'package:catalyst_voices/permissions/permission_strategy.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 // Concrete Strategy - Android Legacy (API < 33)
 final class AndroidLegacyPermissionStrategy extends BasePermissionStrategy {
+  const AndroidLegacyPermissionStrategy();
+
   @override
   Permission getActualPermission(Permission requestedPermission) {
     switch (requestedPermission) {
