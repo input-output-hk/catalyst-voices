@@ -51,7 +51,7 @@ jobs:
       - name: Spin up catalyst-gateway
         if: always()
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway --wait
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up -d cat-gateway --wait
           docker compose ps && docker compose logs cat-gateway
 
 
