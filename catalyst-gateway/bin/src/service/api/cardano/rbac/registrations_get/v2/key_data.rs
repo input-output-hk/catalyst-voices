@@ -18,10 +18,7 @@ use crate::service::{
     api::cardano::rbac::registrations_get::{
         key_type::{KeyType, KeyTypeWrapper},
         pem::Pem,
-        v2::{
-            c509::HexEncodedC509,
-            key_value::{KeyValue, KeyValueWrapper},
-        },
+        v2::{c509::HexEncodedC509, key_value::KeyValue},
     },
     common::types::{
         cardano::{slot_no::SlotNo, txn_index::TxnIndex},
@@ -49,7 +46,7 @@ pub struct KeyData {
     /// A value of the key.
     ///
     /// The key was deleted if this field is absent or nil.
-    key_value: Option<KeyValueWrapper>,
+    key_value: Option<KeyValue>,
 }
 
 impl KeyData {
@@ -67,19 +64,17 @@ impl KeyData {
         let key_value = match key_ref.local_ref {
             LocalRefInt::X509Certs => {
                 key_type = KeyTypeWrapper(KeyType::X509);
-                encode_x509(chain.x509_certs(), key_ref.key_offset, point)?.map(KeyValue::X509)
+                encode_x509(chain.x509_certs(), key_ref.key_offset, point)?.map(Into::into)
             },
             LocalRefInt::C509Certs => {
                 key_type = KeyTypeWrapper(KeyType::C509);
-                encode_c509(chain.c509_certs(), key_ref.key_offset, point)?.map(KeyValue::C509)
+                encode_c509(chain.c509_certs(), key_ref.key_offset, point)?.map(Into::into)
             },
             LocalRefInt::PubKeys => {
                 key_type = KeyTypeWrapper(KeyType::Pubkey);
-                convert_pub_key(chain.simple_keys(), key_ref.key_offset, point)?
-                    .map(KeyValue::Pubkey)
+                convert_pub_key(chain.simple_keys(), key_ref.key_offset, point)?.map(Into::into)
             },
-        }
-        .map(KeyValueWrapper);
+        };
 
         Ok(Self {
             is_persistent: is_persistent.into(),
@@ -100,7 +95,7 @@ impl Example for KeyData {
             slot: SlotNo::example(),
             txn_index: TxnIndex::example(),
             key_type: KeyTypeWrapper::example(),
-            key_value: Some(KeyValueWrapper::example()),
+            key_value: Some(KeyValue::example()),
         }
     }
 }
