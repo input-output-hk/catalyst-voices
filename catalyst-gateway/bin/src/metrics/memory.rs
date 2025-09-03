@@ -56,6 +56,8 @@ pub(crate) fn update() {
 /// All the related memory reporting metrics to the Prometheus service are inside this
 /// module.
 mod reporter {
+    #![allow(clippy::unwrap_used)]
+
     use std::sync::LazyLock;
 
     use prometheus::{register_int_gauge_vec, IntGaugeVec};
