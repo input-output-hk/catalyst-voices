@@ -15,24 +15,19 @@ flutter:
     platforms:
       android:
         ffiPlugin: true
-        pluginClass: CatalystCompressionNative
-        fileName: catalyst_compression_native.dart
+        dartPluginClass: CatalystCompressionNative
       ios:
         ffiPlugin: true
-        pluginClass: CatalystCompressionNative
-        fileName: catalyst_compression_native.dart
+        dartPluginClass: CatalystCompressionNative
       linux:
         ffiPlugin: true
-        pluginClass: CatalystCompressionNative
-        fileName: catalyst_compression_native.dart
+        dartPluginClass: CatalystCompressionNative
       macos:
         ffiPlugin: true
-        pluginClass: CatalystCompressionNative
-        fileName: catalyst_compression_native.dart
+        dartPluginClass: CatalystCompressionNative
       windows:
         ffiPlugin: true
-        pluginClass: CatalystCompressionNative
-        fileName: catalyst_compression_native.dart
+        dartPluginClass: CatalystCompressionNative
   assets:
     - assets/js/
 

@@ -13,6 +13,7 @@ crate-type = ["cdylib", "staticlib", "rlib"]
 flutter_rust_bridge = "=2.11.1"
 anyhow = "1.0.91"
 brotli = "7.0.0"
+zstd = "0.13.2"
 
 [lints.rust]
 warnings = "deny"

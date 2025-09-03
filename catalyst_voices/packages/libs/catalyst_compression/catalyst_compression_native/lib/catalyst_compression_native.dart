@@ -19,6 +19,7 @@ final class CatalystCompressionNative extends CatalystCompressionPlatform {
   /// Registers this class as the default instance of
   /// [CatalystCompressionPlatform].
   static void registerWith() {
+    print('Register native compression impl');
     CatalystCompressionPlatform.instance = CatalystCompressionNative();
   }
 }
