@@ -3,7 +3,9 @@
 mod c509;
 mod endpoint;
 mod extended_data;
+mod extended_data_key;
 mod extended_data_list;
+mod extended_data_value;
 mod key_data;
 mod key_data_list;
 mod key_value;

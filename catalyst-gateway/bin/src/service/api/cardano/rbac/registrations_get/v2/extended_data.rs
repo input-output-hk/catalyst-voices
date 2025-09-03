@@ -3,13 +3,17 @@
 use poem_openapi::types::Example;
 use poem_openapi_derive::Object;
 
+use crate::service::api::cardano::rbac::registrations_get::v2::{
+    extended_data_key::ExtendedDataKey, extended_data_value::ExtendedDataValue,
+};
+
 /// A role extended data.
-#[derive(Object, Debug, Eq, PartialEq, Clone)]
+#[derive(Object, Debug, Clone)]
 pub struct ExtendedData {
     /// A key of the data.
-    key: u8,
+    key: ExtendedDataKey,
     /// A value of the data.
-    value: Vec<u8>,
+    value: ExtendedDataValue,
 }
 
 impl ExtendedData {
@@ -18,15 +22,18 @@ impl ExtendedData {
         key: u8,
         value: Vec<u8>,
     ) -> Self {
-        Self { key, value }
+        Self {
+            key: key.into(),
+            value: value.into(),
+        }
     }
 }
 
 impl Example for ExtendedData {
     fn example() -> Self {
         Self {
-            key: 1,
-            value: vec![1, 2, 3],
+            key: ExtendedDataKey::example(),
+            value: ExtendedDataValue::example(),
         }
     }
 }
