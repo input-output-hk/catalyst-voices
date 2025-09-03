@@ -46,8 +46,7 @@ final class AppEnvironment extends Equatable {
   factory AppEnvironment.fromEnv() {
     String? envName;
 
-    // TODO(LynxLynxx): Change to CatalystPlatform when its refactored
-    if (kIsWeb) {
+    if (CatalystPlatform.isWeb) {
       final envVars = getDartEnvVars();
       envName = envVars.envName;
     }

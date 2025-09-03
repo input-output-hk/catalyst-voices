@@ -12,7 +12,8 @@ abstract interface class Downloader {
   factory Downloader() => getDownloader();
 
   /// Saves the file represented by the [data] bytes under specified [path].
-  Future<void> download(
+  /// It might returns String with path where file was saved.
+  Future<String?> download(
     Uint8List data, {
     required Uri path,
     String mimeType = DownloaderService.bytesMimeType,

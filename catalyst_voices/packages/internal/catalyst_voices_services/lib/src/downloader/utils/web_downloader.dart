@@ -14,7 +14,7 @@ final class WebDownloader implements Downloader {
   /// [download] method only takes filename from [path] and ignores other
   /// data.
   @override
-  Future<void> download(
+  Future<String?> download(
     Uint8List data, {
     required Uri path,
     String mimeType = DownloaderService.bytesMimeType,
@@ -33,5 +33,6 @@ final class WebDownloader implements Downloader {
     web.document.body!.appendChild(anchor);
     anchor.click();
     web.document.body!.removeChild(anchor);
+    return null;
   }
 }
