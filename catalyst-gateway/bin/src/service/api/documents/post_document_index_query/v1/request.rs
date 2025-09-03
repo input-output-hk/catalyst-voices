@@ -71,7 +71,7 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// This is a
     /// [reply reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#reply-reply-reference)
     /// which links one document to another, when acting as a reply to it.
-    /// Replies typically reference the same kind of document.  
+    /// Replies typically reference the same kind of document.
     /// This fields can match any reply reference that matches the defined
     /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
     /// and/or
