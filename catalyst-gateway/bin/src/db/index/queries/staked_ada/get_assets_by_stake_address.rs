@@ -118,7 +118,8 @@ impl GetAssetsByStakeAddressQuery {
 
     /// Executes a get assets by stake address query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: GetAssetsByStakeAddressParams,
+        session: &CassandraSession,
+        params: GetAssetsByStakeAddressParams,
     ) -> anyhow::Result<Arc<Vec<GetAssetsByStakeAddressQuery>>> {
         if session.is_persistent() {
             if let Some(res) = session.caches().assets_native().get(&params.stake_address) {

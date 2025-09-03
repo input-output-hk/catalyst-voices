@@ -11,7 +11,7 @@ pub(crate) fn from_saturating<
         + std::cmp::PartialOrd<T>
         + num_traits::identities::Zero,
 >(
-    value: T,
+    value: T
 ) -> R {
     match value.try_into() {
         Ok(value) => value,

@@ -43,7 +43,8 @@ impl Api {
         hidden = true
     )]
     async fn get_registration(
-        &self, lookup: Query<Option<cardano::query::stake_or_voter::StakeOrVoter>>,
+        &self,
+        lookup: Query<Option<cardano::query::stake_or_voter::StakeOrVoter>>,
         asat: Query<Option<cardano::query::AsAt>>,
         page: Query<Option<common::types::generic::query::pagination::Page>>,
         limit: Query<Option<common::types::generic::query::pagination::Limit>>,

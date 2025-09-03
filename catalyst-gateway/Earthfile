@@ -6,7 +6,7 @@ IMPORT github.com/input-output-hk/catalyst-voices/catalyst-gateway:main AS cat-g
 
 ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub"
 
-#cspell: words rustfmt toolsets USERARCH stdcfgs openapitools
+#cspell: words rustfmt toolsets USERARCH stdcfgs openapitools trixie
 
 # COPY_SRC:
 #   Copies the source code into the builder.
@@ -99,7 +99,7 @@ all-hosts-build:
 
 # package : Create a deployable container for catalyst-gateway
 package:
-    FROM ${REGISTRY}/debian:12.7-slim
+    FROM ${REGISTRY}/debian:trixie-slim
 
     WORKDIR /app
     RUN apt-get update && apt-get install -y curl python3 python3-pip

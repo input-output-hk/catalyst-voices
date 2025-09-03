@@ -33,7 +33,8 @@ impl<'a> poem_openapi::ApiExtractor<'a> for NoAuthorization {
     }
 
     async fn from_request(
-        _req: &'a poem::Request, _body: &mut poem::RequestBody,
+        _req: &'a poem::Request,
+        _body: &mut poem::RequestBody,
         _param_opts: poem_openapi::ExtractParamOptions<Self::ParamType>,
     ) -> poem::Result<Self> {
         Ok(Self)
