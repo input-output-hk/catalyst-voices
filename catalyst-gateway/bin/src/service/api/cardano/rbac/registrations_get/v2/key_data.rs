@@ -42,7 +42,7 @@ pub struct KeyData {
     /// A transaction index.
     txn_index: TxnIndex,
     /// A value of the key.
-    key_value: KeyValueWrapper,
+    key_value: Option<KeyValueWrapper>,
 }
 
 impl KeyData {
@@ -56,21 +56,19 @@ impl KeyData {
         point: &Point,
         chain: &RegistrationChain,
     ) -> anyhow::Result<Self> {
-        let key_value = KeyValueWrapper(match key_ref.local_ref {
+        let key_value = match key_ref.local_ref {
             LocalRefInt::X509Certs => {
-                KeyValue::X509(encode_x509(chain.x509_certs(), key_ref.key_offset, point)?)
+                encode_x509(chain.x509_certs(), key_ref.key_offset, point)?.map(KeyValue::X509)
             },
             LocalRefInt::C509Certs => {
-                KeyValue::C509(encode_c509(chain.c509_certs(), key_ref.key_offset, point)?)
+                encode_c509(chain.c509_certs(), key_ref.key_offset, point)?.map(KeyValue::C509)
             },
             LocalRefInt::PubKeys => {
-                KeyValue::Pubkey(convert_pub_key(
-                    chain.simple_keys(),
-                    key_ref.key_offset,
-                    point,
-                )?)
+                convert_pub_key(chain.simple_keys(), key_ref.key_offset, point)?
+                    .map(KeyValue::Pubkey)
             },
-        });
+        }
+        .map(KeyValueWrapper);
 
         Ok(Self {
             is_persistent: is_persistent.into(),
@@ -89,7 +87,7 @@ impl Example for KeyData {
             time: DateTime::example(),
             slot: SlotNo::example(),
             txn_index: TxnIndex::example(),
-            key_value: KeyValueWrapper::example(),
+            key_value: Some(KeyValueWrapper::example()),
         }
     }
 }
