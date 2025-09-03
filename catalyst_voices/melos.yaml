@@ -12,6 +12,7 @@ ignore:
   - packages/libs/**/cargokit/**
   # ignore temporary packages that are non-conformant with melos
   - apps/voices/build/**
+  - packages/libs/**/build**
 
 permittedLicenses:
   - MIT
@@ -41,8 +42,6 @@ packageLicenseOverride:
   catalyst_cardano_serialization: Apache-2.0
   catalyst_cardano_platform_interface: Apache-2.0
   catalyst_compression: Apache-2.0
-  catalyst_compression_web: Apache-2.0
-  catalyst_compression_native: Apache-2.0
   catalyst_compression_platform_interface: Apache-2.0
   catalyst_key_derivation: Apache-2.0
   catalyst_key_derivation_web: Apache-2.0

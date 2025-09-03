@@ -1,1 +1,0 @@
-# catalyst_compression_native

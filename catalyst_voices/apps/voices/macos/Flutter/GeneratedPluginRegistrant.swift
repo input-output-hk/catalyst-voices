@@ -5,7 +5,6 @@
 import FlutterMacOS
 import Foundation
 
-import catalyst_compression_native
 import file_picker
 import file_selector_macos
 import flutter_inappwebview_macos
@@ -21,7 +20,6 @@ import video_player_avfoundation
 import webview_flutter_wkwebview
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
-  CatalystCompressionNative.register(with: registry.registrar(forPlugin: "CatalystCompressionNative"))
   FilePickerPlugin.register(with: registry.registrar(forPlugin: "FilePickerPlugin"))
   FileSelectorPlugin.register(with: registry.registrar(forPlugin: "FileSelectorPlugin"))
   InAppWebViewFlutterPlugin.register(with: registry.registrar(forPlugin: "InAppWebViewFlutterPlugin"))

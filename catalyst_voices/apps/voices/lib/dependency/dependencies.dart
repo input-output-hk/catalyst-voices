@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_cardano/catalyst_cardano.dart';
+import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_manager.dart';
 import 'package:catalyst_voices/share/resource_url_resolver.dart';
@@ -221,7 +222,10 @@ final class Dependencies extends DependencyProvider {
         return BlockchainRepository(get<ApiServices>());
       })
       ..registerLazySingleton<SignedDocumentManager>(() {
-        return const SignedDocumentManager();
+        return const SignedDocumentManager(
+          brotli: CatalystBrotliCompressor(),
+          zstd: CatalystZstdCompressor(),
+        );
       })
       ..registerLazySingleton<DatabaseDraftsDataSource>(() {
         return DatabaseDraftsDataSource(
