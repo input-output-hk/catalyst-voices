@@ -58,7 +58,8 @@ impl GetAllInvalidRegistrationsQuery {
 
     /// Executes get all registrations for snapshot
     pub(crate) async fn execute(
-        session: &CassandraSession, params: GetAllInvalidRegistrationsParams,
+        session: &CassandraSession,
+        params: GetAllInvalidRegistrationsParams,
     ) -> anyhow::Result<TypedRowStream<GetAllInvalidRegistrationsQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::GetAllInvalidRegistrations, params)
