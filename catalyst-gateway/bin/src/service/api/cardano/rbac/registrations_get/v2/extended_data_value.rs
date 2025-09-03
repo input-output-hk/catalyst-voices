@@ -16,6 +16,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
         description: Some("An extended data key"),
         example: ExtendedDataValue::example().to_json(),
         max_items: Some(32_768),
+        items: Some(Box::new(MetaSchemaRef::Reference("integer".into()))),
         ..MetaSchema::ANY
     }
 });
