@@ -239,9 +239,25 @@ let wasm_bindgen;
     /**
      * @param {number} ptr
      */
+    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey = function(ptr) {
+        _assertNum(ptr);
+        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(ptr);
+    };
+
+    /**
+     * @param {number} ptr
+     */
     __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey = function(ptr) {
         _assertNum(ptr);
         wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(ptr);
+    };
+
+    /**
+     * @param {number} ptr
+     */
+    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey = function(ptr) {
+        _assertNum(ptr);
+        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(ptr);
     };
 
     /**
@@ -276,17 +292,9 @@ let wasm_bindgen;
     /**
      * @param {number} ptr
      */
-    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey = function(ptr) {
+    __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey = function(ptr) {
         _assertNum(ptr);
-        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(ptr);
-    };
-
-    /**
-     * @param {number} ptr
-     */
-    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey = function(ptr) {
-        _assertNum(ptr);
-        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(ptr);
+        wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(ptr);
     };
 
     /**
@@ -301,14 +309,6 @@ let wasm_bindgen;
         _assertNum(rust_vec_len_);
         _assertNum(data_len_);
         wasm.frb_pde_ffi_dispatcher_primary(func_id, port_, ptr_, rust_vec_len_, data_len_);
-    };
-
-    /**
-     * @param {number} ptr
-     */
-    __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey = function(ptr) {
-        _assertNum(ptr);
-        wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(ptr);
     };
 
     /**
@@ -404,13 +404,13 @@ let wasm_bindgen;
     function __wbg_adapter_39(arg0, arg1, arg2) {
         _assertNum(arg0);
         _assertNum(arg1);
-        wasm.closure163_externref_shim(arg0, arg1, arg2);
+        wasm.closure167_externref_shim(arg0, arg1, arg2);
     }
 
     function __wbg_adapter_42(arg0, arg1, arg2) {
         _assertNum(arg0);
         _assertNum(arg1);
-        wasm.closure167_externref_shim(arg0, arg1, arg2);
+        wasm.closure164_externref_shim(arg0, arg1, arg2);
     }
 
     function __wbg_adapter_119(arg0, arg1, arg2, arg3) {
@@ -798,11 +798,11 @@ let wasm_bindgen;
             return ret;
         }, arguments) };
         imports.wbg.__wbindgen_closure_wrapper629 = function() { return logError(function (arg0, arg1, arg2) {
-            const ret = makeMutClosure(arg0, arg1, 164, __wbg_adapter_39);
+            const ret = makeMutClosure(arg0, arg1, 168, __wbg_adapter_39);
             return ret;
         }, arguments) };
-        imports.wbg.__wbindgen_closure_wrapper633 = function() { return logError(function (arg0, arg1, arg2) {
-            const ret = makeMutClosure(arg0, arg1, 168, __wbg_adapter_42);
+        imports.wbg.__wbindgen_closure_wrapper632 = function() { return logError(function (arg0, arg1, arg2) {
+            const ret = makeMutClosure(arg0, arg1, 165, __wbg_adapter_42);
             return ret;
         }, arguments) };
         imports.wbg.__wbindgen_debug_string = function(arg0, arg1) {

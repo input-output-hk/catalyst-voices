@@ -3,7 +3,7 @@
 
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
-import '../frb_generated.dart';
+import 'frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `brotli_compress_helper`, `brotli_decompress_helper`, `zstd_compress_helper`, `zstd_decompress_helper`
@@ -19,7 +19,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 ///
 /// Returns compressed bytes as a `Result`.
 Future<Uint8List> brotliCompress({required List<int> bytes}) =>
-    RustLib.instance.api.crateApiCompressionBrotliCompress(bytes: bytes);
+    RustLib.instance.api.crateCompressionBrotliCompress(bytes: bytes);
 
 /// Decompress the bytes with brotli compression algorithm.
 /// Runs the computation by a shared thread poll to avoid blocking the main thread.
@@ -32,7 +32,7 @@ Future<Uint8List> brotliCompress({required List<int> bytes}) =>
 ///
 /// Returns uncompressed bytes as `Result`.
 Future<Uint8List> brotliDecompress({required List<int> bytes}) =>
-    RustLib.instance.api.crateApiCompressionBrotliDecompress(bytes: bytes);
+    RustLib.instance.api.crateCompressionBrotliDecompress(bytes: bytes);
 
 /// Compress the bytes with zstd compression algorithm.
 /// Runs the computation by a shared thread poll to avoid blocking the main thread.
@@ -45,7 +45,7 @@ Future<Uint8List> brotliDecompress({required List<int> bytes}) =>
 ///
 /// Returns compressed bytes as a `Result`.
 Future<Uint8List> zstdCompress({required List<int> bytes}) =>
-    RustLib.instance.api.crateApiCompressionZstdCompress(bytes: bytes);
+    RustLib.instance.api.crateCompressionZstdCompress(bytes: bytes);
 
 /// Decompress the bytes with zstd compression algorithm.
 /// Runs the computation by a shared thread poll to avoid blocking the main thread.
@@ -58,4 +58,4 @@ Future<Uint8List> zstdCompress({required List<int> bytes}) =>
 ///
 /// Returns uncompressed bytes as `Result`.
 Future<Uint8List> zstdDecompress({required List<int> bytes}) =>
-    RustLib.instance.api.crateApiCompressionZstdDecompress(bytes: bytes);
+    RustLib.instance.api.crateCompressionZstdDecompress(bytes: bytes);

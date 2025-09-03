@@ -123,6 +123,7 @@ final class DocumentsServiceImpl implements DocumentsService {
             }
             outcomes.add(_RefSuccess(ref));
           } catch (error, stackTrace) {
+            // TODO: remove
             FlutterError.presentError(FlutterErrorDetails(exception: error, stack: stackTrace));
             final exception = RefSyncException(
               ref.ref,

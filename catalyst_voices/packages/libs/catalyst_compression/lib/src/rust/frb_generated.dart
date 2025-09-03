@@ -3,7 +3,7 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
-import 'api/compression.dart';
+import 'compression.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -64,7 +64,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => 1714321816;
+  int get rustContentHash => 1685125612;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -75,19 +75,15 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<Uint8List> crateApiCompressionBrotliCompress({
+  Future<Uint8List> crateCompressionBrotliCompress({required List<int> bytes});
+
+  Future<Uint8List> crateCompressionBrotliDecompress({
     required List<int> bytes,
   });
 
-  Future<Uint8List> crateApiCompressionBrotliDecompress({
-    required List<int> bytes,
-  });
+  Future<Uint8List> crateCompressionZstdCompress({required List<int> bytes});
 
-  Future<Uint8List> crateApiCompressionZstdCompress({required List<int> bytes});
-
-  Future<Uint8List> crateApiCompressionZstdDecompress({
-    required List<int> bytes,
-  });
+  Future<Uint8List> crateCompressionZstdDecompress({required List<int> bytes});
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -99,9 +95,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<Uint8List> crateApiCompressionBrotliCompress({
-    required List<int> bytes,
-  }) {
+  Future<Uint8List> crateCompressionBrotliCompress({required List<int> bytes}) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -118,18 +112,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
           decodeErrorData: sse_decode_AnyhowException,
         ),
-        constMeta: kCrateApiCompressionBrotliCompressConstMeta,
+        constMeta: kCrateCompressionBrotliCompressConstMeta,
         argValues: [bytes],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiCompressionBrotliCompressConstMeta =>
+  TaskConstMeta get kCrateCompressionBrotliCompressConstMeta =>
       const TaskConstMeta(debugName: "brotli_compress", argNames: ["bytes"]);
 
   @override
-  Future<Uint8List> crateApiCompressionBrotliDecompress({
+  Future<Uint8List> crateCompressionBrotliDecompress({
     required List<int> bytes,
   }) {
     return handler.executeNormal(
@@ -148,20 +142,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
           decodeErrorData: sse_decode_AnyhowException,
         ),
-        constMeta: kCrateApiCompressionBrotliDecompressConstMeta,
+        constMeta: kCrateCompressionBrotliDecompressConstMeta,
         argValues: [bytes],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiCompressionBrotliDecompressConstMeta =>
+  TaskConstMeta get kCrateCompressionBrotliDecompressConstMeta =>
       const TaskConstMeta(debugName: "brotli_decompress", argNames: ["bytes"]);
 
   @override
-  Future<Uint8List> crateApiCompressionZstdCompress({
-    required List<int> bytes,
-  }) {
+  Future<Uint8List> crateCompressionZstdCompress({required List<int> bytes}) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -178,20 +170,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
           decodeErrorData: sse_decode_AnyhowException,
         ),
-        constMeta: kCrateApiCompressionZstdCompressConstMeta,
+        constMeta: kCrateCompressionZstdCompressConstMeta,
         argValues: [bytes],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiCompressionZstdCompressConstMeta =>
+  TaskConstMeta get kCrateCompressionZstdCompressConstMeta =>
       const TaskConstMeta(debugName: "zstd_compress", argNames: ["bytes"]);
 
   @override
-  Future<Uint8List> crateApiCompressionZstdDecompress({
-    required List<int> bytes,
-  }) {
+  Future<Uint8List> crateCompressionZstdDecompress({required List<int> bytes}) {
     return handler.executeNormal(
       NormalTask(
         callFfi: (port_) {
@@ -208,14 +198,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_list_prim_u_8_strict,
           decodeErrorData: sse_decode_AnyhowException,
         ),
-        constMeta: kCrateApiCompressionZstdDecompressConstMeta,
+        constMeta: kCrateCompressionZstdDecompressConstMeta,
         argValues: [bytes],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta get kCrateApiCompressionZstdDecompressConstMeta =>
+  TaskConstMeta get kCrateCompressionZstdDecompressConstMeta =>
       const TaskConstMeta(debugName: "zstd_decompress", argNames: ["bytes"]);
 
   @protected

@@ -1,5 +1,5 @@
 import 'package:catalyst_compression/src/catalyst_compressor.dart';
-import 'package:catalyst_compression/src/rust/api/compression.dart';
+import 'package:catalyst_compression/src/rust/compression.dart' as rust;
 import 'package:catalyst_compression/src/rust_initializer.dart';
 
 /// The rust (native) implementation of zstd compressor.
@@ -10,12 +10,12 @@ class CatalystZstdCompressor implements CatalystCompressor {
   @override
   Future<List<int>> compress(List<int> bytes) async {
     await RustInitializer.ensureInitialized();
-    return zstdCompress(bytes: bytes);
+    return rust.zstdCompress(bytes: bytes);
   }
 
   @override
   Future<List<int>> decompress(List<int> bytes) async {
     await RustInitializer.ensureInitialized();
-    return zstdDecompress(bytes: bytes);
+    return rust.zstdDecompress(bytes: bytes);
   }
 }

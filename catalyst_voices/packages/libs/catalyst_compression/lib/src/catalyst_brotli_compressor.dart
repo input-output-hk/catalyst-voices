@@ -1,5 +1,5 @@
 import 'package:catalyst_compression/src/catalyst_compressor.dart';
-import 'package:catalyst_compression/src/rust/api/compression.dart';
+import 'package:catalyst_compression/src/rust/compression.dart' as rust;
 import 'package:catalyst_compression/src/rust_initializer.dart';
 
 class CatalystBrotliCompressor implements CatalystCompressor {
@@ -9,12 +9,12 @@ class CatalystBrotliCompressor implements CatalystCompressor {
   @override
   Future<List<int>> compress(List<int> bytes) async {
     await RustInitializer.ensureInitialized();
-    return brotliCompress(bytes: bytes);
+    return rust.brotliCompress(bytes: bytes);
   }
 
   @override
   Future<List<int>> decompress(List<int> bytes) async {
     await RustInitializer.ensureInitialized();
-    return brotliDecompress(bytes: bytes);
+    return rust.brotliDecompress(bytes: bytes);
   }
 }
