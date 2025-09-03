@@ -12,6 +12,8 @@ final _loggerDownloadsDirectory = Logger('DownloadsDirectorySaveStrategy');
 final _loggerFilePicker = Logger('FilePickerSaveStrategy');
 
 final class DownloadsDirectorySaveStrategy implements FileSaveStrategy {
+  const DownloadsDirectorySaveStrategy();
+
   @override
   bool get isSupported => !CatalystPlatform.isWeb;
 
@@ -54,6 +56,8 @@ final class DownloadsDirectorySaveStrategy implements FileSaveStrategy {
 }
 
 final class FilePickerSaveStrategy implements FileSaveStrategy {
+  const FilePickerSaveStrategy();
+
   @override
   bool get isSupported => true; // FilePicker should work on all platforms
 
@@ -86,6 +90,8 @@ final class FilePickerSaveStrategy implements FileSaveStrategy {
 
 /// Abstract interface for file saving strategies
 abstract interface class FileSaveStrategy {
+  const FileSaveStrategy();
+
   /// Whether this strategy is supported on the current platform
   bool get isSupported;
 
@@ -100,6 +106,8 @@ abstract interface class FileSaveStrategy {
 
 /// Factory to get the appropriate file save strategy based on platform or preference
 class FileSaveStrategyFactory {
+  const FileSaveStrategyFactory();
+
   /// Returns the default strategy for the current platform
   static FileSaveStrategy getDefaultStrategy() {
     if (CatalystOperatingSystem.current.isIOS) {
@@ -111,8 +119,8 @@ class FileSaveStrategyFactory {
 
   static FileSaveStrategy getStrategy({required FileSaveStrategyType type}) {
     return switch (type) {
-      FileSaveStrategyType.filePicker => FilePickerSaveStrategy(),
-      FileSaveStrategyType.downloadsDirectory => DownloadsDirectorySaveStrategy(),
+      FileSaveStrategyType.filePicker => const FilePickerSaveStrategy(),
+      FileSaveStrategyType.downloadsDirectory => const DownloadsDirectorySaveStrategy(),
     };
   }
 }
