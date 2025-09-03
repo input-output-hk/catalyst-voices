@@ -140,7 +140,7 @@ fn convert_pub_key(
     keys: &HashMap<usize, Vec<PointData<Option<VerifyingKey>>>>,
     offset: usize,
     point: &Point,
-) -> anyhow::Result<Option<HexEncodedBinaryData>> {
+) -> anyhow::Result<Option<Ed25519HexEncodedPublicKey>> {
     Ok(keys
         .get(&offset)
         .with_context(|| format!("Invalid pub key offset: {offset}"))?
@@ -148,5 +148,5 @@ fn convert_pub_key(
         .find(|d| d.point() == point)
         .with_context(|| format!("Unable to find pub key for the given point {point}"))?
         .data()
-        .map(|k| Ed25519HexEncodedPublicKey::from(k).into()))
+        .map(Into::into))
 }

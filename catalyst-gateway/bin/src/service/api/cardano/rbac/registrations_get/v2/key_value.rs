@@ -6,8 +6,9 @@ use poem_openapi::{
 };
 use poem_openapi_derive::Union;
 
-use crate::service::api::cardano::rbac::registrations_get::{
-    binary_data::HexEncodedBinaryData, pem::Pem,
+use crate::service::{
+    api::cardano::rbac::registrations_get::{binary_data::HexEncodedBinaryData, pem::Pem},
+    common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey,
 };
 
 /// A key value for role data.
@@ -15,7 +16,7 @@ use crate::service::api::cardano::rbac::registrations_get::{
 #[oai(one_of)]
 pub enum KeyValue {
     /// A public key.
-    Pubkey(HexEncodedBinaryData),
+    Pubkey(Ed25519HexEncodedPublicKey),
     /// A X509 certificate.
     X509(Pem),
     /// A C509 certificate.
@@ -91,6 +92,6 @@ impl ToJSON for KeyValueWrapper {
 
 impl Example for KeyValueWrapper {
     fn example() -> Self {
-        Self(KeyValue::Pubkey(HexEncodedBinaryData::example()))
+        Self(KeyValue::Pubkey(Ed25519HexEncodedPublicKey::example()))
     }
 }
