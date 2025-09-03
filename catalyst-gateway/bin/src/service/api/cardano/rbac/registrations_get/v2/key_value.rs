@@ -1,7 +1,7 @@
 //! A key value for role data.
 
 use poem_openapi::types::Example;
-use poem_openapi_derive::{Object, Union};
+use poem_openapi_derive::{NewType, Object, Union};
 
 use crate::service::{
     api::cardano::rbac::registrations_get::{pem::Pem, v2::c509::HexEncodedC509},
@@ -71,4 +71,21 @@ pub struct X509Pem {
 pub struct C509Hex {
     /// A hex encoded C509 certificate.
     c509: HexEncodedC509,
+}
+
+// Note: this wrapper is needed for poem to properly generate example.
+/// A key value for role data.
+#[derive(Debug, Clone, NewType)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+pub struct KeyValueWrapper(pub KeyValue);
+
+impl Example for KeyValueWrapper {
+    fn example() -> Self {
+        Self(KeyValue::example())
+    }
 }
