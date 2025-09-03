@@ -173,7 +173,10 @@ impl<T> WithErrorResponses<T> {
     /// error, though its no need to log the id of this response.
     ///
     /// Returns a 503 Service unavailable Error response.
-    pub(crate) fn service_unavailable_with_msg(msg: String, retry: RetryAfterOption) -> Self {
+    pub(crate) fn service_unavailable_with_msg(
+        msg: String,
+        retry: RetryAfterOption,
+    ) -> Self {
         let error = ServiceUnavailable::new(Some(msg));
         let retry = match retry {
             RetryAfterOption::Default => Some(RetryAfterHeader::default()),
@@ -186,7 +189,10 @@ impl<T> WithErrorResponses<T> {
     /// Handle a 503 service unavailable error response.
     ///
     /// Returns a 503 Service unavailable Error response.
-    pub(crate) fn service_unavailable(err: &anyhow::Error, retry: RetryAfterOption) -> Self {
+    pub(crate) fn service_unavailable(
+        err: &anyhow::Error,
+        retry: RetryAfterOption,
+    ) -> Self {
         let error = ServiceUnavailable::new(None);
         error!(id=%error.id(), error=?err, retry_after=?retry);
         let retry = match retry {
@@ -342,13 +348,19 @@ impl<T: IntoResponse + Send> IntoResponse for WithErrorResponses<T> {
 /// code.
 struct FilteredByStatusCodeResponse(MetaResponse);
 impl PartialEq for FilteredByStatusCodeResponse {
-    fn eq(&self, other: &Self) -> bool {
+    fn eq(
+        &self,
+        other: &Self,
+    ) -> bool {
         self.0.status.eq(&other.0.status)
     }
 }
 impl Eq for FilteredByStatusCodeResponse {}
 impl Hash for FilteredByStatusCodeResponse {
-    fn hash<H: Hasher>(&self, state: &mut H) {
+    fn hash<H: Hasher>(
+        &self,
+        state: &mut H,
+    ) {
         self.0.status.hash(state);
     }
 }

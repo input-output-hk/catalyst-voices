@@ -41,14 +41,20 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
 pub(crate) struct AssetValue(i128);
 
 impl Display for AssetValue {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
         write!(f, "{}", self.0)
     }
 }
 
 impl AssetValue {
     /// Performs saturating addition.
-    pub(crate) fn saturating_add(&self, v: &Self) -> Self {
+    pub(crate) fn saturating_add(
+        &self,
+        v: &Self,
+    ) -> Self {
         self.0.checked_add(v.0).map_or_else(
             || {
                 tracing::error!("Asset value overflow: {self} + {v}",);
@@ -85,7 +91,7 @@ impl Type for AssetValue {
     }
 
     fn raw_element_iter<'a>(
-        &'a self,
+        &'a self
     ) -> Box<dyn Iterator<Item = &'a Self::RawElementValueType> + 'a> {
         Box::new(self.as_raw_value().into_iter())
     }
