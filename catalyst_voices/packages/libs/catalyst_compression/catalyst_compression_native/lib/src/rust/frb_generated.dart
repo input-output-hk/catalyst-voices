@@ -35,8 +35,12 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 
   /// Initialize flutter_rust_bridge in mock mode.
   /// No libraries for FFI are loaded.
-  static void initMock({required RustLibApi api}) {
-    instance.initMockImpl(api: api);
+  static void initMock({
+    required RustLibApi api,
+  }) {
+    instance.initMockImpl(
+      api: api,
+    );
   }
 
   /// Dispose flutter_rust_bridge
@@ -126,7 +130,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiCompressionBrotliCompressConstMeta =>
-      const TaskConstMeta(debugName: "brotli_compress", argNames: ["bytes"]);
+      const TaskConstMeta(
+        debugName: "brotli_compress",
+        argNames: ["bytes"],
+      );
 
   @override
   Future<Uint8List> crateApiCompressionBrotliDecompress({
@@ -156,7 +163,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiCompressionBrotliDecompressConstMeta =>
-      const TaskConstMeta(debugName: "brotli_decompress", argNames: ["bytes"]);
+      const TaskConstMeta(
+        debugName: "brotli_decompress",
+        argNames: ["bytes"],
+      );
 
   @override
   Future<Uint8List> crateApiCompressionZstdCompress({
@@ -186,7 +196,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiCompressionZstdCompressConstMeta =>
-      const TaskConstMeta(debugName: "zstd_compress", argNames: ["bytes"]);
+      const TaskConstMeta(
+        debugName: "zstd_compress",
+        argNames: ["bytes"],
+      );
 
   @override
   Future<Uint8List> crateApiCompressionZstdDecompress({
@@ -216,7 +229,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateApiCompressionZstdDecompressConstMeta =>
-      const TaskConstMeta(debugName: "zstd_decompress", argNames: ["bytes"]);
+      const TaskConstMeta(
+        debugName: "zstd_decompress",
+        argNames: ["bytes"],
+      );
 
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw) {
