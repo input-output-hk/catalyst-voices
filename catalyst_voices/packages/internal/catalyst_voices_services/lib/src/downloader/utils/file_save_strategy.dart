@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
@@ -10,7 +9,7 @@ import 'package:path/path.dart' as p;
 final _loggerDownloadsDirectory = Logger('DownloadsDirectorySaveStrategy');
 final _loggerFilePicker = Logger('FilePickerSaveStrategy');
 
-final class DownloadsDirectorySaveStrategy with FileNamingMixin implements FileSaveStrategy {
+final class DownloadsDirectorySaveStrategy implements FileSaveStrategy {
   const DownloadsDirectorySaveStrategy();
 
   @override
@@ -47,24 +46,7 @@ final class DownloadsDirectorySaveStrategy with FileNamingMixin implements FileS
   }
 }
 
-mixin FileNamingMixin {
-  AppEnvironmentType get envType => AppEnvironment.fromEnv().type;
-
-  bool get isIOS => CatalystOperatingSystem.current.isIOS;
-
-  String flavorfileUri(String fileUri) {
-    if (envType != AppEnvironmentType.prod) {
-      return '${parsefileUriWithoutExt(fileUri)}_${envType.name}${parseExtension(fileUri)}';
-    }
-    return fileUri;
-  }
-
-  String parseExtension(String fileUri) => p.extension(fileUri);
-
-  String parsefileUriWithoutExt(String fileUri) => p.basenameWithoutExtension(fileUri);
-}
-
-final class FilePickerSaveStrategy with FileNamingMixin implements FileSaveStrategy {
+final class FilePickerSaveStrategy implements FileSaveStrategy {
   const FilePickerSaveStrategy();
 
   @override
