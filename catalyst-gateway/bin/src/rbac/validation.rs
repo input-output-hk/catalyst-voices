@@ -65,8 +65,8 @@ async fn update_chain(
         .context("{catalyst_id} is present in 'catalyst_id_for_txn_id' table, but not in 'rbac_registration'")?;
 
     // Check that addresses from the new registration aren't used in other chains.
-    let previous_addresses = chain.role_0_stake_addresses();
-    let reg_addresses = reg.role_0_stake_addresses();
+    let previous_addresses = chain.stake_addresses();
+    let reg_addresses = cip509_stake_addresses(&reg);
     let new_addresses: Vec<_> = reg_addresses.difference(&previous_addresses).collect();
     for address in &new_addresses {
         match catalyst_id_from_stake_address(address, is_persistent, context).await? {
@@ -84,7 +84,7 @@ async fn update_chain(
 
     // Store values before consuming the registration.
     let txn_id = reg.txn_hash();
-    let stake_addresses = reg.role_0_stake_addresses();
+    let stake_addresses = cip509_stake_addresses(&reg);
     let origin = reg.origin().to_owned();
 
     // Try to add a new registration to the chain.
@@ -175,7 +175,7 @@ async fn start_new_chain(
     }
 
     // Validate stake addresses.
-    let new_addresses = new_chain.role_0_stake_addresses();
+    let new_addresses = new_chain.stake_addresses();
     let mut updated_chains: HashMap<_, HashSet<StakeAddress>> = HashMap::new();
     for address in &new_addresses {
         if let Some(id) = catalyst_id_from_stake_address(address, is_persistent, context).await? {
@@ -448,4 +448,12 @@ async fn is_cat_id_known(
     .next()
     .await
     .is_some())
+}
+
+/// Returns a set of stake addresses in the given registration.
+fn cip509_stake_addresses(cip509: &Cip509) -> HashSet<StakeAddress> {
+    cip509
+        .metadata()
+        .map(|m| m.certificate_uris.stake_addresses())
+        .unwrap_or_default()
 }
