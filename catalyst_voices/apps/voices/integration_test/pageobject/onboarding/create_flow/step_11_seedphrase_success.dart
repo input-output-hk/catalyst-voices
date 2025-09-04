@@ -6,11 +6,12 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_10_input_seedphrase.dart';
 
-class SeedphraseSuccessPanel extends OnboardingPageBase {
+final class SeedphraseSuccessPanel extends OnboardingPageBase {
   final nextStepBody = const Key('NextStepBody');
 
   SeedphraseSuccessPanel(super.$);
 
+  @override
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }

@@ -6,7 +6,7 @@ import '../../utils/translations_utils.dart';
 import '../discovery_page.dart';
 
 class MostRecentSection {
-  late PatrolTester $;
+  final PatrolTester $;
 
   final mostRecentProposals = const Key('MostRecentProposals');
   final mostRecentProposalsTitle = const Key('MostRecentProposalsTitle');
@@ -29,6 +29,7 @@ class MostRecentSection {
   final mostRecentProposalsSlider = const Key('MostRecentProposalsSlider');
   final commentsCount = const Key('CommentsCount');
   final mostRecentLoadingError = const Key('MostRecentError');
+
   MostRecentSection(this.$);
 
   Future<void> looksAsExpectedForVisitor() async {
@@ -39,7 +40,7 @@ class MostRecentSection {
   }
 
   Future<void> proposalCardLooksAsExpected(
-    Key parentContainer,
+    dynamic parentContainer,
     int cardIndex,
   ) async {
     expect(

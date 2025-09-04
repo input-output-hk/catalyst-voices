@@ -2,6 +2,17 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/campaign/active_campaign_observer.dart';
+import 'package:flutter/foundation.dart';
+
+Campaign? _mockedActiveCampaign;
+
+/// Overrides the current campaign returned by [CampaignService.getActiveCampaign].
+/// Only for unit testing.
+@visibleForTesting
+//ignore: avoid_setters_without_getters
+set mockedActiveCampaign(Campaign? campaign) {
+  _mockedActiveCampaign = campaign;
+}
 
 /// CampaignService provides campaign-related functionality.
 ///
@@ -48,7 +59,7 @@ final class CampaignServiceImpl implements CampaignService {
       return _activeCampaignObserver.campaign;
     }
     // TODO(LynxLynxx): Call backend to get latest active campaign
-    final campaign = await getCampaign(id: Campaign.f14Ref.id);
+    final campaign = _mockedActiveCampaign ?? await getCampaign(id: Campaign.f14Ref.id);
     _activeCampaignObserver.campaign = campaign;
     return campaign;
   }

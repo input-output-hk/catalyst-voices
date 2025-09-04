@@ -2,23 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../utils/translations_utils.dart';
+import '../../common_page.dart';
 import '../onboarding_base_page.dart';
-import 'step_2_restore_keychain_choice_panel.dart';
+import '../step_1_get_started.dart';
 
-class SeedPhraseInstructionsPanel extends OnboardingPageBase {
+final class RestoreKeychainInputPanel extends OnboardingPageBase {
   final seedPhraseInstructionsTitleKey = const Key('SeedPhraseInstructionsTitle');
-
   final seedPhraseInstructionsSubtitleKey = const Key('SeedPhraseInstructionsSubtitleKey');
-  SeedPhraseInstructionsPanel(super.$);
+  final resetButton = const Key('ResetButton');
 
-  Future<void> clickNext() async {
-    await $(nextButton).tap();
+  RestoreKeychainInputPanel(super.$);
+
+  Future<void> enterSeedPhrase(List<String> seedPhrase) async {
+    await $(resetButton).tap();
+    for (final word in seedPhrase) {
+      await $(CommonPage($).voicesTextField).enterText(word);
+      await $.tester.testTextInput.receiveAction(TextInputAction.done);
+      await $.tester.pumpAndSettle();
+    }
   }
 
   @override
   Future<void> goto() async {
-    await RestoreKeychainChoicePanel($).goto();
-    await RestoreKeychainChoicePanel($).clickRestoreSeedPhrase();
+    await GetStartedPanel($).goto();
+    await GetStartedPanel($).clickRecoverKeychain();
   }
 
   Future<void> verifyDetailsPanel() async {
