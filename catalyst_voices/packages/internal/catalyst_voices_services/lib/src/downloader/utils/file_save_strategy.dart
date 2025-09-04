@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:downloadsfolder/downloadsfolder.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
@@ -18,24 +17,24 @@ final class DownloadsDirectorySaveStrategy with FileNamingMixin implements FileS
   bool get isSupported => !CatalystPlatform.isWeb;
 
   @override
+  FileSaveStrategyType get type => FileSaveStrategyType.downloadsDirectory;
+
+  @override
   Future<String?> saveFile({
     required Uint8List data,
-    required String filename,
-    String? mimeType,
+    required Uri fileUri,
   }) async {
     try {
-      final downloadDirectory = await getDownloadDirectory();
-
-      final flavorName = isIOS ? '' : '_${envType.name}';
-      var uniqueFilename = isIOS ? filename : flavorFileName(filename);
-      var file = File('${downloadDirectory.path}/$uniqueFilename');
+      var file = File.fromUri(fileUri);
 
       // If file exists, add numbers like web browsers do
       var counter = 1;
       while (file.existsSync()) {
-        uniqueFilename =
-            '${parseFilenameWithoutExt(filename)}$flavorName($counter)${parseExtension(filename)}';
-        file = File('${downloadDirectory.path}/$uniqueFilename');
+        final pathWithoutExt = p.withoutExtension(fileUri.path);
+        final extension = p.extension(fileUri.path);
+        final newPath = '$pathWithoutExt ($counter)$extension';
+        final newUri = Uri.file(newPath, windows: false);
+        file = File.fromUri(newUri);
         counter++;
       }
 
@@ -53,16 +52,16 @@ mixin FileNamingMixin {
 
   bool get isIOS => CatalystOperatingSystem.current.isIOS;
 
-  String flavorFileName(String filename) {
+  String flavorfileUri(String fileUri) {
     if (envType != AppEnvironmentType.prod) {
-      return '${parseFilenameWithoutExt(filename)}_${envType.name}${parseExtension(filename)}';
+      return '${parsefileUriWithoutExt(fileUri)}_${envType.name}${parseExtension(fileUri)}';
     }
-    return filename;
+    return fileUri;
   }
 
-  String parseExtension(String filename) => p.extension(filename);
+  String parseExtension(String fileUri) => p.extension(fileUri);
 
-  String parseFilenameWithoutExt(String filename) => p.basenameWithoutExtension(filename);
+  String parsefileUriWithoutExt(String fileUri) => p.basenameWithoutExtension(fileUri);
 }
 
 final class FilePickerSaveStrategy with FileNamingMixin implements FileSaveStrategy {
@@ -72,14 +71,18 @@ final class FilePickerSaveStrategy with FileNamingMixin implements FileSaveStrat
   bool get isSupported => true; // FilePicker should work on all platforms
 
   @override
+  FileSaveStrategyType get type => FileSaveStrategyType.filePicker;
+
+  @override
   Future<String?> saveFile({
     required Uint8List data,
-    required String filename,
-    String? mimeType,
+    required Uri fileUri,
   }) async {
     try {
+      final fileName = fileUri.path;
+
       await FilePicker.platform.saveFile(
-        fileName: flavorFileName(filename),
+        fileName: fileName,
         bytes: data,
       );
       return null;
@@ -97,12 +100,13 @@ abstract interface class FileSaveStrategy {
   /// Whether this strategy is supported on the current platform
   bool get isSupported;
 
-  /// Saves the file represented by the [data] bytes with the given [filename].
+  FileSaveStrategyType get type;
+
+  /// Saves the file represented by the [data] bytes with the given [fileUri].
   /// Returns the path where the file was saved.
   Future<String?> saveFile({
     required Uint8List data,
-    required String filename,
-    String? mimeType,
+    required Uri fileUri,
   });
 }
 
@@ -112,11 +116,13 @@ class FileSaveStrategyFactory {
 
   /// Returns the default strategy for the current platform
   static FileSaveStrategy getDefaultStrategy() {
-    if (CatalystOperatingSystem.current.isIOS) {
+    if (CatalystPlatform.isWeb) {
       return getStrategy(type: FileSaveStrategyType.filePicker);
-    } else {
-      return getStrategy(type: FileSaveStrategyType.downloadsDirectory);
     }
+    return switch (CatalystOperatingSystem.current) {
+      CatalystOperatingSystem.iOS => getStrategy(type: FileSaveStrategyType.filePicker),
+      _ => getStrategy(type: FileSaveStrategyType.downloadsDirectory),
+    };
   }
 
   static FileSaveStrategy getStrategy({required FileSaveStrategyType type}) {
