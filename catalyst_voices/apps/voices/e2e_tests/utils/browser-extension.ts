@@ -21,18 +21,15 @@ export const getDynamicUrlInChrome = async (
 };
 
 export const connectToBrowser = async (
-  extensionName: BrowserExtensionName,
-  chromePath: string
+  chromePath: string,
+  extensionName?: BrowserExtensionName
 ): Promise<BrowserContext> => {
-  // Download the extension
-  const extensionPath = await new ExtensionDownloader().getExtension(
-    extensionName
-  );
-
-  const chromeProcess = await launchChromeWithExtension(
-    chromePath,
-    extensionPath
-  );
+  let chromeProcess: ChildProcess;
+  if (extensionName) {
+    chromeProcess = await launchChrome(chromePath, extensionName);
+  } else {
+    chromeProcess = await launchChrome(chromePath);
+  }
 
   await new Promise((resolve) => setTimeout(resolve, 3000));
 
@@ -45,7 +42,9 @@ export const connectToBrowser = async (
   return browserContext;
 };
 
-const cleanupChromeProfile = async (profilePath: string): Promise<void> => {
+export const cleanupChromeProfile = async (
+  profilePath: string
+): Promise<void> => {
   if (fs.existsSync(profilePath)) {
     try {
       await fs.promises.rm(profilePath, { recursive: true, force: true });
@@ -56,9 +55,9 @@ const cleanupChromeProfile = async (profilePath: string): Promise<void> => {
   }
 };
 
-const launchChromeWithExtension = async (
+const launchChrome = async (
   chromePath: string,
-  extensionPath: string
+  extensionName?: BrowserExtensionName
 ): Promise<ChildProcess> => {
   // Create a unique profile directory for this test run in the browser-profiles folder
   const profilesDir = path.join(process.cwd(), "browser-profiles");
@@ -80,10 +79,17 @@ const launchChromeWithExtension = async (
     "--remote-debugging-port=9222",
     "--no-first-run",
     "--no-default-browser-check",
-    `--disable-extensions-except=${extensionPath}`,
-    `--load-extension=${extensionPath}`,
     `--user-data-dir=${profilePath}`,
+    "--enable-features=ClipboardContentSetting,ClipboardReadWrite",
   ];
+
+  if (extensionName) {
+    const extensionPath = await new ExtensionDownloader().getExtension(
+      extensionName
+    );
+    chromeArgs.push(`--disable-extensions-except=${extensionPath}`);
+    chromeArgs.push(`--load-extension=${extensionPath}`);
+  }
 
   const chromeProcess = spawn(chromePath, chromeArgs, {
     detached: false,
@@ -138,26 +144,4 @@ export const closeBrowserWithExtension = async (
   if (profilePath) {
     await cleanupChromeProfile(profilePath);
   }
-};
-
-export const launchBrowserWith = async (
-  extensionName: BrowserExtensionName
-): Promise<BrowserContext> => {
-  const extensionPath = await new ExtensionDownloader().getExtension(
-    extensionName
-  );
-  const browser = await chromium.launchPersistentContext("", {
-    viewport: { width: 1920, height: 1080 },
-    headless: false,
-    ignoreHTTPSErrors: true,
-    channel: "chrome",
-    permissions: ["clipboard-read", "clipboard-write"],
-    args: [
-      `--disable-extensions-except=${extensionPath}`,
-      `--load-extension=${extensionPath}`,
-    ],
-  });
-  let [background] = browser.serviceWorkers();
-  if (!background) background = await browser.waitForEvent("serviceworker");
-  return browser;
 };

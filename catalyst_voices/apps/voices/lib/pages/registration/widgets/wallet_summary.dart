@@ -141,7 +141,10 @@ class _WalletSummaryAddress extends StatelessWidget {
             key: const Key('WalletAddressValue'),
           ),
           const SizedBox(width: 4),
-          VoicesClipboardIconButton(clipboardData: clipboardAddress),
+          VoicesClipboardIconButton(
+            clipboardData: clipboardAddress,
+            semanticsIdentifier: 'WalletAddressClipboardIcon',
+          ),
         ],
       ),
       semanticsIdentifier: 'WalletAddress',
@@ -218,7 +221,11 @@ class _WalletSummaryItem extends StatelessWidget {
           Expanded(
             child: DefaultTextStyle(
               style: Theme.of(context).textTheme.labelMedium!,
-              child: value,
+              child: Semantics(
+                container: true,
+                identifier: '${semanticsIdentifier}Value',
+                child: value,
+              ),
             ),
           ),
         ],

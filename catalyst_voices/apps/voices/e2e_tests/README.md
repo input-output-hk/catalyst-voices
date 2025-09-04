@@ -10,7 +10,7 @@ These tests cover browser-based end-to-end workflows for the Catalyst Voices app
 
 * **Cardano wallet integration testing** (Lace, Eternl, Yoroi, Nufi)
 * **User authentication and account management**
-* **Cross-environment testing** (dev, staging, prod)
+* **Cross-environment testing** (dev, preprod, prod)
 * **Browser extension interaction**
 * **Application title and basic navigation**
 
@@ -20,8 +20,11 @@ These tests cover browser-based end-to-end workflows for the Catalyst Voices app
 
 * **Node.js** (v18 or higher)
 * **npm** package manager
-* **Chrome for testing** ([Download manually](https://googlechromelabs.github.io/chrome-for-testing/))
+* **Chrome for testing** ([Download manually](https://googlechromelabs.github.io/chrome-for-testing/)
+   or download using [puppeteer](https://pptr.dev/browsers-api))
 * Ability to run the app locally (Check `catalyst_voices/README.md` for instructions)
+* Check `catalyst_voices/apps/voices/e2e_tests/.env.example` for the environment variables
+   (for testing on localhost, use `localhost:5555`)
 
 ### Installation
 
@@ -31,7 +34,7 @@ These tests cover browser-based end-to-end workflows for the Catalyst Voices app
 
    ```bash
    cd catalyst_voices/apps/voices && 
-   flutter run --flavor preprod --web-port 5555
+   flutter run --dart-define=ENV_NAME=preprod --web-port 5555
    --web-header "Cross-Origin-Opener-Policy=same-origin"
    --web-header "Cross-Origin-Embedder-Policy=require-corp"
    -d web-server lib/configs/main.dart
@@ -54,3 +57,28 @@ These tests cover browser-based end-to-end workflows for the Catalyst Voices app
    ```bash
    npx playwright test
    ```
+
+### Account and Wallet data
+
+For our testing effort we use predefined wallet and account data.
+It's located in the `catalyst_voices/apps/voices/e2e_tests/data/accountConfigs.ts` and
+`catalyst_voices/apps/voices/e2e_tests/data/walletConfigs.ts` files.
+
+These files have some helper methods to more easily get the account that you need.
+Most of the time you will want to use the `getAccountModel` and `getWalletConfigByName` functions.
+
+example:
+
+```ts
+const accountModel = getAccountModel('DummyForTesting');
+const walletConfig = getWalletConfigByName('Lace');
+```
+
+In the tests you will be able to use the `testModel` fixture to get the account and wallet config.
+
+```ts
+test('test', async ({ testModel }) => {
+  const accountModel = testModel.accountModel;
+  const walletConfig = testModel.walletConfig;
+});
+```
