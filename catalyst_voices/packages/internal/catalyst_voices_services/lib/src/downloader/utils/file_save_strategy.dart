@@ -11,7 +11,7 @@ import 'package:path/path.dart' as p;
 final _loggerDownloadsDirectory = Logger('DownloadsDirectorySaveStrategy');
 final _loggerFilePicker = Logger('FilePickerSaveStrategy');
 
-final class DownloadsDirectorySaveStrategy implements FileSaveStrategy {
+final class DownloadsDirectorySaveStrategy with FileNamingMixin implements FileSaveStrategy {
   const DownloadsDirectorySaveStrategy();
 
   @override
@@ -26,22 +26,15 @@ final class DownloadsDirectorySaveStrategy implements FileSaveStrategy {
     try {
       final downloadDirectory = await getDownloadDirectory();
 
-      final filenameWithoutExt = p.basenameWithoutExtension(filename);
-      final extension = p.extension(filename);
-
-      final flavor = AppEnvironment.fromEnv().type;
-      var flavorName = '';
-      if (!CatalystOperatingSystem.current.isIOS) {
-        flavorName = flavor == AppEnvironmentType.prod ? '' : '_${flavor.name}';
-      }
-
-      var uniqueFilename = '$filenameWithoutExt$flavorName$extension';
+      final flavorName = isIOS ? '' : '_${envType.name}';
+      var uniqueFilename = isIOS ? filename : flavorFileName(filename);
       var file = File('${downloadDirectory.path}/$uniqueFilename');
 
       // If file exists, add numbers like web browsers do
       var counter = 1;
       while (file.existsSync()) {
-        uniqueFilename = '$filenameWithoutExt$flavorName ($counter)$extension';
+        uniqueFilename =
+            '${parseFilenameWithoutExt(filename)}$flavorName($counter)${parseExtension(filename)}';
         file = File('${downloadDirectory.path}/$uniqueFilename');
         counter++;
       }
@@ -55,7 +48,24 @@ final class DownloadsDirectorySaveStrategy implements FileSaveStrategy {
   }
 }
 
-final class FilePickerSaveStrategy implements FileSaveStrategy {
+mixin FileNamingMixin {
+  AppEnvironmentType get envType => AppEnvironment.fromEnv().type;
+
+  bool get isIOS => CatalystOperatingSystem.current.isIOS;
+
+  String flavorFileName(String filename) {
+    if (envType != AppEnvironmentType.prod) {
+      return '${parseFilenameWithoutExt(filename)}_${envType.name}${parseExtension(filename)}';
+    }
+    return filename;
+  }
+
+  String parseExtension(String filename) => p.extension(filename);
+
+  String parseFilenameWithoutExt(String filename) => p.basenameWithoutExtension(filename);
+}
+
+final class FilePickerSaveStrategy with FileNamingMixin implements FileSaveStrategy {
   const FilePickerSaveStrategy();
 
   @override
@@ -68,16 +78,8 @@ final class FilePickerSaveStrategy implements FileSaveStrategy {
     String? mimeType,
   }) async {
     try {
-      final flavor = AppEnvironment.fromEnv();
-      final filenameWithoutExt = p.basenameWithoutExtension(filename);
-      final extension = p.extension(filename);
-      String? flavorFileName;
-      if (flavor.type != AppEnvironmentType.prod) {
-        flavorFileName = '${filenameWithoutExt}_${flavor.type.name}$extension';
-      }
-
       await FilePicker.platform.saveFile(
-        fileName: flavorFileName ?? filename,
+        fileName: flavorFileName(filename),
         bytes: data,
       );
       return null;
