@@ -25,7 +25,7 @@
 
 // Section: imports
 
-use crate::api::key_derivation::*;
+use crate::key_derivation::*;
 use flutter_rust_bridge::for_generated::byteorder::{NativeEndian, ReadBytesExt, WriteBytesExt};
 use flutter_rust_bridge::for_generated::{transform_result_dco, Lifetimeable, Lockable};
 use flutter_rust_bridge::{Handler, IntoIntoDart};
@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1976079523;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1596077969;
 
 // Section: executor
 
@@ -46,8 +46,9 @@ flutter_rust_bridge::frb_generated_default_handler!();
 
 // Section: wire_funcs
 
-fn wire__crate__api__key_derivation__Bip32Ed25519Signature_get_inner_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+fn wire__crate__key_derivation__Bip32Ed25519Signature_get_inner_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
@@ -86,15 +87,16 @@ fn wire__crate__api__key_derivation__Bip32Ed25519Signature_get_inner_impl(
                 }
                 let api_that_guard = api_that_guard.unwrap();
                 let output_ok = Result::<_, ()>::Ok(
-                    crate::api::key_derivation::Bip32Ed25519Signature::get_inner(&*api_that_guard),
+                    crate::key_derivation::Bip32Ed25519Signature::get_inner(&*api_that_guard),
                 )?;
                 Ok(output_ok)
             })())
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519Signature_new_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+fn wire__crate__key_derivation__Bip32Ed25519Signature_new_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
@@ -117,15 +119,16 @@ fn wire__crate__api__key_derivation__Bip32Ed25519Signature_new_impl(
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let output_ok = Result::<_, ()>::Ok(
-                    crate::api::key_derivation::Bip32Ed25519Signature::new(api_sig_bytes),
+                    crate::key_derivation::Bip32Ed25519Signature::new(api_sig_bytes),
                 )?;
                 Ok(output_ok)
             })())
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519Signature_to_hex_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+fn wire__crate__key_derivation__Bip32Ed25519Signature_to_hex_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
@@ -164,16 +167,17 @@ fn wire__crate__api__key_derivation__Bip32Ed25519Signature_to_hex_impl(
                 }
                 let api_that_guard = api_that_guard.unwrap();
                 let output_ok = Result::<_, ()>::Ok(
-                    crate::api::key_derivation::Bip32Ed25519Signature::to_hex(&*api_that_guard),
+                    crate::key_derivation::Bip32Ed25519Signature::to_hex(&*api_that_guard),
                 )?;
                 Ok(output_ok)
             })())
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_derive_xprv_impl(
+fn wire__crate__key_derivation__Bip32Ed25519XPrivateKey_derive_xprv_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
@@ -218,7 +222,7 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_derive_xprv_impl(
                         }
                         let api_that_guard = api_that_guard.unwrap();
                         let output_ok =
-                            crate::api::key_derivation::Bip32Ed25519XPrivateKey::derive_xprv(
+                            crate::key_derivation::Bip32Ed25519XPrivateKey::derive_xprv(
                                 &*api_that_guard,
                                 api_path,
                             )
@@ -231,8 +235,9 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_derive_xprv_impl(
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_drop_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+fn wire__crate__key_derivation__Bip32Ed25519XPrivateKey_drop_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
@@ -271,15 +276,16 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_drop_impl(
                 }
                 let mut api_that_guard = api_that_guard.unwrap();
                 let output_ok = Result::<_, ()>::Ok({
-                    crate::api::key_derivation::Bip32Ed25519XPrivateKey::drop(&mut *api_that_guard);
+                    crate::key_derivation::Bip32Ed25519XPrivateKey::drop(&mut *api_that_guard);
                 })?;
                 Ok(output_ok)
             })())
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_get_chain_code_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+fn wire__crate__key_derivation__Bip32Ed25519XPrivateKey_get_chain_code_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
@@ -318,7 +324,7 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_get_chain_code_impl
                 }
                 let api_that_guard = api_that_guard.unwrap();
                 let output_ok = Result::<_, ()>::Ok(
-                    crate::api::key_derivation::Bip32Ed25519XPrivateKey::get_chain_code(
+                    crate::key_derivation::Bip32Ed25519XPrivateKey::get_chain_code(
                         &*api_that_guard,
                     ),
                 )?;
@@ -327,8 +333,9 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_get_chain_code_impl
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_get_extended_secret_key_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+fn wire__crate__key_derivation__Bip32Ed25519XPrivateKey_get_extended_secret_key_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
@@ -368,7 +375,7 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_get_extended_secret
                 }
                 let api_that_guard = api_that_guard.unwrap();
                 let output_ok = Result::<_, ()>::Ok(
-                    crate::api::key_derivation::Bip32Ed25519XPrivateKey::get_extended_secret_key(
+                    crate::key_derivation::Bip32Ed25519XPrivateKey::get_extended_secret_key(
                         &*api_that_guard,
                     ),
                 )?;
@@ -377,8 +384,9 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_get_extended_secret
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_get_inner_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+fn wire__crate__key_derivation__Bip32Ed25519XPrivateKey_get_inner_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
@@ -417,17 +425,16 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_get_inner_impl(
                 }
                 let api_that_guard = api_that_guard.unwrap();
                 let output_ok = Result::<_, ()>::Ok(
-                    crate::api::key_derivation::Bip32Ed25519XPrivateKey::get_inner(
-                        &*api_that_guard,
-                    ),
+                    crate::key_derivation::Bip32Ed25519XPrivateKey::get_inner(&*api_that_guard),
                 )?;
                 Ok(output_ok)
             })())
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_new_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+fn wire__crate__key_derivation__Bip32Ed25519XPrivateKey_new_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
@@ -450,16 +457,17 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_new_impl(
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let output_ok = Result::<_, ()>::Ok(
-                    crate::api::key_derivation::Bip32Ed25519XPrivateKey::new(api_xprv_bytes),
+                    crate::key_derivation::Bip32Ed25519XPrivateKey::new(api_xprv_bytes),
                 )?;
                 Ok(output_ok)
             })())
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_sign_data_impl(
+fn wire__crate__key_derivation__Bip32Ed25519XPrivateKey_sign_data_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
@@ -503,12 +511,11 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_sign_data_impl(
                             }
                         }
                         let api_that_guard = api_that_guard.unwrap();
-                        let output_ok =
-                            crate::api::key_derivation::Bip32Ed25519XPrivateKey::sign_data(
-                                &*api_that_guard,
-                                api_data,
-                            )
-                            .await?;
+                        let output_ok = crate::key_derivation::Bip32Ed25519XPrivateKey::sign_data(
+                            &*api_that_guard,
+                            api_data,
+                        )
+                        .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -517,8 +524,9 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_sign_data_impl(
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_to_hex_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+fn wire__crate__key_derivation__Bip32Ed25519XPrivateKey_to_hex_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
@@ -557,16 +565,17 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_to_hex_impl(
                 }
                 let api_that_guard = api_that_guard.unwrap();
                 let output_ok = Result::<_, ()>::Ok(
-                    crate::api::key_derivation::Bip32Ed25519XPrivateKey::to_hex(&*api_that_guard),
+                    crate::key_derivation::Bip32Ed25519XPrivateKey::to_hex(&*api_that_guard),
                 )?;
                 Ok(output_ok)
             })())
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_verify_signature_impl(
+fn wire__crate__key_derivation__Bip32Ed25519XPrivateKey_verify_signature_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
@@ -627,7 +636,7 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_verify_signature_im
                         let api_that_guard = api_that_guard.unwrap();
                         let api_signature_guard = api_signature_guard.unwrap();
                         let output_ok =
-                            crate::api::key_derivation::Bip32Ed25519XPrivateKey::verify_signature(
+                            crate::key_derivation::Bip32Ed25519XPrivateKey::verify_signature(
                                 &*api_that_guard,
                                 api_data,
                                 &*api_signature_guard,
@@ -641,9 +650,10 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_verify_signature_im
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_xpublic_key_impl(
+fn wire__crate__key_derivation__Bip32Ed25519XPrivateKey_xpublic_key_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
@@ -687,7 +697,7 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_xpublic_key_impl(
                         }
                         let api_that_guard = api_that_guard.unwrap();
                         let output_ok =
-                            crate::api::key_derivation::Bip32Ed25519XPrivateKey::xpublic_key(
+                            crate::key_derivation::Bip32Ed25519XPrivateKey::xpublic_key(
                                 &*api_that_guard,
                             )
                             .await?;
@@ -699,8 +709,9 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_xpublic_key_impl(
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_get_chain_code_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+fn wire__crate__key_derivation__Bip32Ed25519XPublicKey_get_chain_code_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
@@ -739,17 +750,16 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_get_chain_code_impl(
                 }
                 let api_that_guard = api_that_guard.unwrap();
                 let output_ok = Result::<_, ()>::Ok(
-                    crate::api::key_derivation::Bip32Ed25519XPublicKey::get_chain_code(
-                        &*api_that_guard,
-                    ),
+                    crate::key_derivation::Bip32Ed25519XPublicKey::get_chain_code(&*api_that_guard),
                 )?;
                 Ok(output_ok)
             })())
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_get_inner_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+fn wire__crate__key_derivation__Bip32Ed25519XPublicKey_get_inner_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
@@ -788,15 +798,16 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_get_inner_impl(
                 }
                 let api_that_guard = api_that_guard.unwrap();
                 let output_ok = Result::<_, ()>::Ok(
-                    crate::api::key_derivation::Bip32Ed25519XPublicKey::get_inner(&*api_that_guard),
+                    crate::key_derivation::Bip32Ed25519XPublicKey::get_inner(&*api_that_guard),
                 )?;
                 Ok(output_ok)
             })())
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_get_public_key_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+fn wire__crate__key_derivation__Bip32Ed25519XPublicKey_get_public_key_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
@@ -835,17 +846,16 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_get_public_key_impl(
                 }
                 let api_that_guard = api_that_guard.unwrap();
                 let output_ok = Result::<_, ()>::Ok(
-                    crate::api::key_derivation::Bip32Ed25519XPublicKey::get_public_key(
-                        &*api_that_guard,
-                    ),
+                    crate::key_derivation::Bip32Ed25519XPublicKey::get_public_key(&*api_that_guard),
                 )?;
                 Ok(output_ok)
             })())
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_new_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+fn wire__crate__key_derivation__Bip32Ed25519XPublicKey_new_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
@@ -868,15 +878,16 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_new_impl(
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let output_ok = Result::<_, ()>::Ok(
-                    crate::api::key_derivation::Bip32Ed25519XPublicKey::new(api_xpub_bytes),
+                    crate::key_derivation::Bip32Ed25519XPublicKey::new(api_xpub_bytes),
                 )?;
                 Ok(output_ok)
             })())
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_to_hex_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+fn wire__crate__key_derivation__Bip32Ed25519XPublicKey_to_hex_impl(
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
@@ -915,16 +926,17 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_to_hex_impl(
                 }
                 let api_that_guard = api_that_guard.unwrap();
                 let output_ok = Result::<_, ()>::Ok(
-                    crate::api::key_derivation::Bip32Ed25519XPublicKey::to_hex(&*api_that_guard),
+                    crate::key_derivation::Bip32Ed25519XPublicKey::to_hex(&*api_that_guard),
                 )?;
                 Ok(output_ok)
             })())
         },
     )
 }
-fn wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_verify_signature_impl(
+fn wire__crate__key_derivation__Bip32Ed25519XPublicKey_verify_signature_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
@@ -985,7 +997,7 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_verify_signature_imp
                         let api_that_guard = api_that_guard.unwrap();
                         let api_signature_guard = api_signature_guard.unwrap();
                         let output_ok =
-                            crate::api::key_derivation::Bip32Ed25519XPublicKey::verify_signature(
+                            crate::key_derivation::Bip32Ed25519XPublicKey::verify_signature(
                                 &*api_that_guard,
                                 api_data,
                                 &*api_signature_guard,
@@ -999,9 +1011,10 @@ fn wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_verify_signature_imp
         },
     )
 }
-fn wire__crate__api__key_derivation__mnemonic_to_xprv_impl(
+fn wire__crate__key_derivation__mnemonic_to_xprv_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len_: i32,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
     data_len_: i32,
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
@@ -1026,11 +1039,9 @@ fn wire__crate__api__key_derivation__mnemonic_to_xprv_impl(
             move |context| async move {
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || async move {
-                        let output_ok = crate::api::key_derivation::mnemonic_to_xprv(
-                            api_mnemonic,
-                            api_passphrase,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::key_derivation::mnemonic_to_xprv(api_mnemonic, api_passphrase)
+                                .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -1217,126 +1228,121 @@ impl SseDecode for i32 {
 }
 
 fn pde_ffi_dispatcher_primary_impl(
-    func_id: i32, port: flutter_rust_bridge::for_generated::MessagePort,
-    ptr: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr, rust_vec_len: i32,
+    func_id: i32,
+    port: flutter_rust_bridge::for_generated::MessagePort,
+    ptr: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len: i32,
     data_len: i32,
 ) {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        4 => wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_derive_xprv_impl(
+        4 => wire__crate__key_derivation__Bip32Ed25519XPrivateKey_derive_xprv_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        10 => wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_sign_data_impl(
+        10 => wire__crate__key_derivation__Bip32Ed25519XPrivateKey_sign_data_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        12 => wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_verify_signature_impl(
+        12 => wire__crate__key_derivation__Bip32Ed25519XPrivateKey_verify_signature_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        13 => wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_xpublic_key_impl(
+        13 => wire__crate__key_derivation__Bip32Ed25519XPrivateKey_xpublic_key_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        19 => wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_verify_signature_impl(
+        19 => wire__crate__key_derivation__Bip32Ed25519XPublicKey_verify_signature_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        20 => wire__crate__api__key_derivation__mnemonic_to_xprv_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
+        20 => wire__crate__key_derivation__mnemonic_to_xprv_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
 
 fn pde_ffi_dispatcher_sync_impl(
-    func_id: i32, ptr: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len: i32, data_len: i32,
+    func_id: i32,
+    ptr: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len: i32,
+    data_len: i32,
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        1 => wire__crate__api__key_derivation__Bip32Ed25519Signature_get_inner_impl(
+        1 => wire__crate__key_derivation__Bip32Ed25519Signature_get_inner_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        2 => wire__crate__api__key_derivation__Bip32Ed25519Signature_new_impl(
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        3 => wire__crate__api__key_derivation__Bip32Ed25519Signature_to_hex_impl(
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        5 => wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_drop_impl(
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        6 => wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_get_chain_code_impl(
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        7 => {
-            wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_get_extended_secret_key_impl(
-                ptr,
-                rust_vec_len,
-                data_len,
-            )
+        2 => {
+            wire__crate__key_derivation__Bip32Ed25519Signature_new_impl(ptr, rust_vec_len, data_len)
         },
-        8 => wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_get_inner_impl(
+        3 => wire__crate__key_derivation__Bip32Ed25519Signature_to_hex_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        9 => wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_new_impl(
+        5 => wire__crate__key_derivation__Bip32Ed25519XPrivateKey_drop_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        11 => wire__crate__api__key_derivation__Bip32Ed25519XPrivateKey_to_hex_impl(
+        6 => wire__crate__key_derivation__Bip32Ed25519XPrivateKey_get_chain_code_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        14 => wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_get_chain_code_impl(
+        7 => wire__crate__key_derivation__Bip32Ed25519XPrivateKey_get_extended_secret_key_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        15 => wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_get_inner_impl(
+        8 => wire__crate__key_derivation__Bip32Ed25519XPrivateKey_get_inner_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        16 => wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_get_public_key_impl(
+        9 => wire__crate__key_derivation__Bip32Ed25519XPrivateKey_new_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        17 => wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_new_impl(
+        11 => wire__crate__key_derivation__Bip32Ed25519XPrivateKey_to_hex_impl(
             ptr,
             rust_vec_len,
             data_len,
         ),
-        18 => wire__crate__api__key_derivation__Bip32Ed25519XPublicKey_to_hex_impl(
+        14 => wire__crate__key_derivation__Bip32Ed25519XPublicKey_get_chain_code_impl(
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        15 => wire__crate__key_derivation__Bip32Ed25519XPublicKey_get_inner_impl(
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        16 => wire__crate__key_derivation__Bip32Ed25519XPublicKey_get_public_key_impl(
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        17 => wire__crate__key_derivation__Bip32Ed25519XPublicKey_new_impl(
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        18 => wire__crate__key_derivation__Bip32Ed25519XPublicKey_to_hex_impl(
             ptr,
             rust_vec_len,
             data_len,
@@ -1409,14 +1415,20 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<Bip32Ed25519XPublicKey>>
 
 impl SseEncode for flutter_rust_bridge::for_generated::anyhow::Error {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         <String>::sse_encode(format!("{:?}", self), serializer);
     }
 }
 
 impl SseEncode for Bip32Ed25519Signature {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         <RustOpaqueMoi<
             flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519Signature>,
         >>::sse_encode(
@@ -1428,7 +1440,10 @@ impl SseEncode for Bip32Ed25519Signature {
 
 impl SseEncode for Bip32Ed25519XPrivateKey {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         <RustOpaqueMoi<
             flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519XPrivateKey>,
         >>::sse_encode(
@@ -1440,7 +1455,10 @@ impl SseEncode for Bip32Ed25519XPrivateKey {
 
 impl SseEncode for Bip32Ed25519XPublicKey {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         <RustOpaqueMoi<
             flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519XPublicKey>,
         >>::sse_encode(
@@ -1456,7 +1474,10 @@ impl SseEncode
     >
 {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         let (ptr, size) = self.sse_encode_raw();
         <usize>::sse_encode(ptr, serializer);
         <i32>::sse_encode(size, serializer);
@@ -1469,7 +1490,10 @@ impl SseEncode
     >
 {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         let (ptr, size) = self.sse_encode_raw();
         <usize>::sse_encode(ptr, serializer);
         <i32>::sse_encode(size, serializer);
@@ -1482,7 +1506,10 @@ impl SseEncode
     >
 {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         let (ptr, size) = self.sse_encode_raw();
         <usize>::sse_encode(ptr, serializer);
         <i32>::sse_encode(size, serializer);
@@ -1491,21 +1518,30 @@ impl SseEncode
 
 impl SseEncode for String {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         <Vec<u8>>::sse_encode(self.into_bytes(), serializer);
     }
 }
 
 impl SseEncode for bool {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         serializer.cursor.write_u8(self as _).unwrap();
     }
 }
 
 impl SseEncode for Vec<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <u8>::sse_encode(item, serializer);
@@ -1515,7 +1551,10 @@ impl SseEncode for Vec<u8> {
 
 impl SseEncode for Option<String> {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <String>::sse_encode(value, serializer);
@@ -1525,14 +1564,20 @@ impl SseEncode for Option<String> {
 
 impl SseEncode for u8 {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         serializer.cursor.write_u8(self).unwrap();
     }
 }
 
 impl SseEncode for [u8; 32] {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         <Vec<u8>>::sse_encode(
             {
                 let boxed: Box<[_]> = Box::new(self);
@@ -1545,7 +1590,10 @@ impl SseEncode for [u8; 32] {
 
 impl SseEncode for [u8; 64] {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         <Vec<u8>>::sse_encode(
             {
                 let boxed: Box<[_]> = Box::new(self);
@@ -1558,7 +1606,10 @@ impl SseEncode for [u8; 64] {
 
 impl SseEncode for [u8; 96] {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         <Vec<u8>>::sse_encode(
             {
                 let boxed: Box<[_]> = Box::new(self);
@@ -1571,12 +1622,19 @@ impl SseEncode for [u8; 96] {
 
 impl SseEncode for () {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {}
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
+    }
 }
 
 impl SseEncode for usize {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         serializer
             .cursor
             .write_u64::<NativeEndian>(self as _)
@@ -1586,7 +1644,10 @@ impl SseEncode for usize {
 
 impl SseEncode for i32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+    fn sse_encode(
+        self,
+        serializer: &mut flutter_rust_bridge::for_generated::SseSerializer,
+    ) {
         serializer.cursor.write_i32::<NativeEndian>(self).unwrap();
     }
 }
@@ -1599,7 +1660,7 @@ mod io {
     // Section: imports
 
     use super::*;
-    use crate::api::key_derivation::*;
+    use crate::key_derivation::*;
     use flutter_rust_bridge::for_generated::byteorder::{
         NativeEndian, ReadBytesExt, WriteBytesExt,
     };
@@ -1612,42 +1673,42 @@ mod io {
 
     #[unsafe(no_mangle)]
     pub extern "C" fn frbgen_catalyst_key_derivation_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
-        ptr: *const std::ffi::c_void,
+        ptr: *const std::ffi::c_void
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519Signature>>::increment_strong_count(ptr as _);
     }
 
     #[unsafe(no_mangle)]
     pub extern "C" fn frbgen_catalyst_key_derivation_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
-        ptr: *const std::ffi::c_void,
+        ptr: *const std::ffi::c_void
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519Signature>>::decrement_strong_count(ptr as _);
     }
 
     #[unsafe(no_mangle)]
     pub extern "C" fn frbgen_catalyst_key_derivation_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
-        ptr: *const std::ffi::c_void,
+        ptr: *const std::ffi::c_void
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519XPrivateKey>>::increment_strong_count(ptr as _);
     }
 
     #[unsafe(no_mangle)]
     pub extern "C" fn frbgen_catalyst_key_derivation_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
-        ptr: *const std::ffi::c_void,
+        ptr: *const std::ffi::c_void
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519XPrivateKey>>::decrement_strong_count(ptr as _);
     }
 
     #[unsafe(no_mangle)]
     pub extern "C" fn frbgen_catalyst_key_derivation_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
-        ptr: *const std::ffi::c_void,
+        ptr: *const std::ffi::c_void
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519XPublicKey>>::increment_strong_count(ptr as _);
     }
 
     #[unsafe(no_mangle)]
     pub extern "C" fn frbgen_catalyst_key_derivation_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
-        ptr: *const std::ffi::c_void,
+        ptr: *const std::ffi::c_void
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519XPublicKey>>::decrement_strong_count(ptr as _);
     }
@@ -1664,7 +1725,7 @@ mod web {
     // Section: imports
 
     use super::*;
-    use crate::api::key_derivation::*;
+    use crate::key_derivation::*;
     use flutter_rust_bridge::for_generated::byteorder::{
         NativeEndian, ReadBytesExt, WriteBytesExt,
     };
@@ -1679,42 +1740,42 @@ mod web {
 
     #[wasm_bindgen]
     pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
-        ptr: *const std::ffi::c_void,
+        ptr: *const std::ffi::c_void
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519Signature>>::increment_strong_count(ptr as _);
     }
 
     #[wasm_bindgen]
     pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(
-        ptr: *const std::ffi::c_void,
+        ptr: *const std::ffi::c_void
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519Signature>>::decrement_strong_count(ptr as _);
     }
 
     #[wasm_bindgen]
     pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
-        ptr: *const std::ffi::c_void,
+        ptr: *const std::ffi::c_void
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519XPrivateKey>>::increment_strong_count(ptr as _);
     }
 
     #[wasm_bindgen]
     pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(
-        ptr: *const std::ffi::c_void,
+        ptr: *const std::ffi::c_void
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519XPrivateKey>>::decrement_strong_count(ptr as _);
     }
 
     #[wasm_bindgen]
     pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
-        ptr: *const std::ffi::c_void,
+        ptr: *const std::ffi::c_void
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519XPublicKey>>::increment_strong_count(ptr as _);
     }
 
     #[wasm_bindgen]
     pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(
-        ptr: *const std::ffi::c_void,
+        ptr: *const std::ffi::c_void
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Bip32Ed25519XPublicKey>>::decrement_strong_count(ptr as _);
     }

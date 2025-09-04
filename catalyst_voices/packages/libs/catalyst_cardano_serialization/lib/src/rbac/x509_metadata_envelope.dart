@@ -260,7 +260,7 @@ final class X509MetadataEnvelope<T> extends Equatable {
 
   static Future<List<int>?> _compressBrotli(List<int> bytes) async {
     try {
-      return await CatalystCompression.instance.brotli.compress(bytes);
+      return await CatalystCompression.brotli.compress(bytes);
     } on CompressionNotSupportedException {
       return null;
     }
@@ -268,7 +268,7 @@ final class X509MetadataEnvelope<T> extends Equatable {
 
   static Future<List<int>?> _compressZstd(List<int> bytes) async {
     try {
-      return await CatalystCompression.instance.zstd.compress(bytes);
+      return await CatalystCompression.zstd.compress(bytes);
     } on CompressionNotSupportedException {
       return null;
     }
@@ -284,14 +284,14 @@ final class X509MetadataEnvelope<T> extends Equatable {
     final brotliCbor = map[const CborSmallInt(11)] as CborList?;
     if (brotliCbor != null) {
       final bytes = _unchunkCborBytes(brotliCbor);
-      final uncompressedBytes = await CatalystCompression.instance.brotli.decompress(bytes);
+      final uncompressedBytes = await CatalystCompression.brotli.decompress(bytes);
       return cbor.decode(uncompressedBytes);
     }
 
     final zstdCbor = map[const CborSmallInt(12)] as CborList?;
     if (zstdCbor != null) {
       final bytes = _unchunkCborBytes(zstdCbor);
-      final uncompressedBytes = await CatalystCompression.instance.zstd.decompress(bytes);
+      final uncompressedBytes = await CatalystCompression.zstd.decompress(bytes);
       return cbor.decode(uncompressedBytes);
     }
 

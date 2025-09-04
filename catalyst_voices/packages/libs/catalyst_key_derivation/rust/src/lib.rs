@@ -2,7 +2,7 @@
 
 // cspell: words uninlined
 
-pub mod api;
+pub mod key_derivation;
 #[allow(
     clippy::missing_docs_in_private_items,
     clippy::unwrap_used,

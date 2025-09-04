@@ -12,6 +12,7 @@ dependencies:
   catalyst_cardano: ^1.0.0
   catalyst_cardano_serialization: ^1.0.0
   catalyst_cardano_web: ^1.0.0
+  catalyst_compression: ^1.0.0
   catalyst_key_derivation: ^1.0.0
   catalyst_voices_assets:
     path: ../../packages/internal/catalyst_voices_assets

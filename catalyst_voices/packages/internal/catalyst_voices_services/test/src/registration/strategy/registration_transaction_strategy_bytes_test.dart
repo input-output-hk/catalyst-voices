@@ -18,7 +18,8 @@ void main() {
       kd.Bip32Ed25519XPublicKeyFactory.instance = _FakeBip32Ed25519XPublicKeyFactory();
       kd.Bip32Ed25519XPrivateKeyFactory.instance = _FakeBip32Ed25519XPrivateKeyFactory();
       kd.Bip32Ed25519XSignatureFactory.instance = _FakeBip32Ed25519XSignatureFactory();
-      CatalystCompressionPlatform.instance = _FakeCatalystCompressionPlatform();
+      CatalystCompression.overrideBrotli(const _FakeCompressor());
+      CatalystCompression.overrideZstd(const _FakeCompressor());
     });
 
     setUp(() async {
@@ -915,14 +916,6 @@ class _FakeBip32Ed25519XSignatureFactory extends kd.Bip32Ed25519XSignatureFactor
   kd.Bip32Ed25519XSignature fromBytes(List<int> bytes) {
     return _FakeBip32Ed25519XSignature(bytes);
   }
-}
-
-class _FakeCatalystCompressionPlatform extends CatalystCompressionPlatform {
-  @override
-  CatalystCompressor get brotli => const _FakeCompressor();
-
-  @override
-  CatalystCompressor get zstd => const _FakeCompressor();
 }
 
 class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {

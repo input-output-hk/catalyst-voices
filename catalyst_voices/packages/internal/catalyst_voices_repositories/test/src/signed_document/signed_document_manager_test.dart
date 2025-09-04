@@ -6,12 +6,14 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group(SignedDocumentManager, () {
-    const documentManager = SignedDocumentManager();
+    const documentManager = SignedDocumentManager(
+      brotli: _FakeCompressor(),
+      zstd: _FakeCompressor(),
+    );
 
     setUpAll(() {
       CatalystPublicKey.factory = _FakeCatalystPublicKeyFactory();
       CatalystSignature.factory = _FakeCatalystSignatureFactory();
-      CatalystCompressionPlatform.instance = _FakeCatalystCompressionPlatform();
     });
 
     test('signDocument creates a signed document '
@@ -57,11 +59,6 @@ final _publicKey = _FakeCatalystPublicKey(bytes: _publicKeyBytes);
 final _publicKeyBytes = Uint8List.fromList(List.filled(32, 1));
 final _signature = _FakeCatalystSignature(bytes: _signatureBytes);
 final _signatureBytes = Uint8List.fromList(List.filled(32, 2));
-
-class _FakeCatalystCompressionPlatform extends CatalystCompressionPlatform {
-  @override
-  CatalystCompressor get brotli => const _FakeCompressor();
-}
 
 class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   @override

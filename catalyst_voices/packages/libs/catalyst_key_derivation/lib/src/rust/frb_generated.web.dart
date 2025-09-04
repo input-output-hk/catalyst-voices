@@ -6,10 +6,10 @@
 // Static analysis wrongly picks the IO variant, thus ignore this
 // ignore_for_file: argument_type_not_assignable
 
-import 'api/key_derivation.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
+import 'key_derivation.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
@@ -20,13 +20,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     required super.portManager,
   });
 
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_Bip32Ed25519SignaturePtr => wire
+  CrossPlatformFinalizerArg
+  get rust_arc_decrement_strong_count_Bip32Ed25519SignaturePtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature;
 
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_Bip32Ed25519XPrivateKeyPtr => wire
+  CrossPlatformFinalizerArg
+  get rust_arc_decrement_strong_count_Bip32Ed25519XPrivateKeyPtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey;
 
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_Bip32Ed25519XPublicKeyPtr => wire
+  CrossPlatformFinalizerArg
+  get rust_arc_decrement_strong_count_Bip32Ed25519XPublicKeyPtr => wire
       .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey;
 
   @protected
