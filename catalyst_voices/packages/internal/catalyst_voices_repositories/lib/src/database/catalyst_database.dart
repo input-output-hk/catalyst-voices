@@ -89,10 +89,10 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase implements CatalystDa
              sqlite3Wasm: config.web.sqlite3Wasm,
              driftWorker: config.web.driftWorker,
            ),
-
-           // TODO(damian-molinski): Native not supported yet
-           // ignore: avoid_redundant_argument_values
-           native: null,
+           native: DriftNativeOptions(
+             databaseDirectory: config.native.dbDir,
+             tempDirectoryPath: config.native.dbTempDir,
+           ),
          ).interceptWith(
            DatabaseLoggingInterceptor(
              // ignore: avoid_redundant_argument_values

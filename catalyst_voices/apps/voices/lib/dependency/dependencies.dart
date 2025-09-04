@@ -15,6 +15,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:path_provider/path_provider.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 
 final class Dependencies extends DependencyProvider {
@@ -421,6 +422,10 @@ final class Dependencies extends DependencyProvider {
             web: CatalystDriftDatabaseWebConfig(
               sqlite3Wasm: Uri.parse(config.webSqlite3Wasm),
               driftWorker: Uri.parse(config.webDriftWorker),
+            ),
+            native: CatalystDriftDatabaseNativeConfig(
+              dbDir: () => path.getApplicationDocumentsDirectory().then((dir) => dir.path),
+              dbTempDir: () => path.getTemporaryDirectory().then((dir) => dir.path),
             ),
           ),
         );

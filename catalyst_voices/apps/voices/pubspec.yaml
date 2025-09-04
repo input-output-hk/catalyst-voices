@@ -69,6 +69,7 @@ dependencies:
       url: https://github.com/input-output-hk/markdown_quill
       ref: 63058a25ed9b42e1e183edb84bb613ac235c1306
   mask_text_input_formatter: ^2.9.0
+  path_provider: ^2.1.5
   permission_handler: ^12.0.1
   result_type: ^1.0.0
   rxdart: ^0.28.0
