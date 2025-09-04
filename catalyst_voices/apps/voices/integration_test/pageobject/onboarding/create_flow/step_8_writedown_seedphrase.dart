@@ -7,14 +7,16 @@ import '../../common_page.dart';
 import '../onboarding_base_page.dart';
 import 'step_7_catalyst_keychain_success.dart';
 
-class WriteDownSeedphrasePanel extends OnboardingPageBase {
+final class WriteDownSeedphrasePanel extends OnboardingPageBase {
   static const seedPhraseStoredCheckbox = Key('SeedPhraseStoredCheckbox');
 
   static const seedPhraseWord = Key('SeedPhraseWord');
   static const seedPhraseNumber = Key('SeedPhraseNumber');
   static const downloadSeedPhraseButton = Key('DownloadSeedPhraseButton');
+
   WriteDownSeedphrasePanel(super.$);
 
+  @override
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }

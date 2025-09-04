@@ -5,7 +5,8 @@ import 'package:patrol_finders/patrol_finders.dart';
 import '../../utils/translations_utils.dart';
 
 class CampaignHeroSection {
-  late PatrolTester $;
+  final PatrolTester $;
+
   final heroBackgroundVideo = const Key('HeroBackgroundVideo');
   final campaignBriefTitle = const Key('CampaignBriefTitle');
   final campaignBriefDescription = const Key('CampaignBriefDescription');
@@ -13,6 +14,7 @@ class CampaignHeroSection {
   final unlockBtn = const Key('UnlockButton');
   final loadingError = const Key('ErrorIndicator');
   final campaignHeroSectionRoot = const Key('CampaignHeroSection');
+
   CampaignHeroSection(this.$);
 
   Future<void> campaignBriefDescriptionIsRenderedCorrectly() async {

@@ -6,7 +6,7 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_13_password_input.dart';
 
-class KeychainFinalPanel extends OnboardingPageBase {
+final class KeychainFinalPanel extends OnboardingPageBase {
   static const linkWalletAndRolesButton = Key('LinkWalletAndRolesButton');
 
   final keyLockedIcon = const Key('LockedPictureConstrainedBox');
@@ -14,7 +14,9 @@ class KeychainFinalPanel extends OnboardingPageBase {
   final stepTwoContainer = const Key('StepTwoContainer');
   final iconContainer = const Key('IconContainer');
   final lockedPictureConstrainedBox = const Key('LockedPictureConstrainedBox');
+
   KeychainFinalPanel(super.$);
+
   Future<void> clickLinkWalletAndRoles() async {
     await $(linkWalletAndRolesButton).tap();
   }

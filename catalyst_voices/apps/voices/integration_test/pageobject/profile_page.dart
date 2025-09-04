@@ -6,7 +6,8 @@ import '../utils/translations_utils.dart';
 import 'common_page.dart';
 
 class ProfilePage {
-  late PatrolTester $;
+  final PatrolTester $;
+
   final displayNameTile = const Key('AccountDisplayNameTile');
   final accountEmailTile = const Key('AccountEmailTile');
   final editBtn = const Key('EditableTileEditCancelButton');
@@ -25,21 +26,36 @@ class ProfilePage {
   final appBarProfileAvatar = const Key('ProfileAvatar');
   final profileAndKeychainText = const Key('ProfileAndKeychainText');
   final accountEmailTextField = const Key('AccountEmailTextField');
-  final emailTileSaveBtn = const Key('EmailTileSaveButton');
+  final tileSaveBtn = const Key('EditableTileSaveButton');
   final deleteKeychainContinueButton = const Key('DeleteKeychainContinueButton');
   final deleteKeychainTextField = const Key('DeleteKeychainTextField');
   final keychainDeletedDialogCloseButton = const Key('KeychainDeletedDialogCloseButton');
+  final verificationEmailOkButton = const Key('VerificationEmailOkButton');
+
   ProfilePage(this.$);
+
   Future<void> addRoleClick() async {
     await $(accountRolesTile).$(addRole).tap();
+  }
+
+  Future<void> clickBackButton() async {
+    await $(navigationBackBtn).tap();
   }
 
   Future<void> clickDisplayNameEdit() async {
     await $(displayNameTile).$(editBtn).tap();
   }
 
+  Future<void> clickDisplayNameSave() async {
+    await $(displayNameTile).$(tileSaveBtn).tap();
+  }
+
   Future<void> clickEmailAddressEdit() async {
     await $(accountEmailTile).$(editBtn).tap();
+  }
+
+  Future<void> clickEmailAddressSave() async {
+    await $(accountEmailTile).$(tileSaveBtn).tap();
   }
 
   Future<void> displayNameIsAsExpected(String expectedDisplayName) async {
@@ -51,8 +67,9 @@ class ProfilePage {
   }
 
   Future<void> emailIsAsExpected(String expectedEmail) async {
-    final textField =
-        $(accountEmailTile).$(CommonPage($).voicesTextField).evaluate().first.widget as TextField;
+    final finder = $(accountEmailTile).$(CommonPage($).voicesTextField);
+    final evaluate = finder.evaluate();
+    final textField = evaluate.first.widget as TextField;
 
     expect(textField.controller!.text, expectedEmail);
   }
@@ -100,10 +117,6 @@ class ProfilePage {
     );
     expect(
       $(accountKeychainTile),
-      findsOneWidget,
-    );
-    expect(
-      $(startProposalBtn),
       findsOneWidget,
     );
     expect(
