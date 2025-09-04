@@ -15,6 +15,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:path_provider/path_provider.dart' as path;
 import 'package:shared_preferences/shared_preferences.dart';
 
 final class Dependencies extends DependencyProvider {
@@ -34,14 +35,24 @@ final class Dependencies extends DependencyProvider {
   }
 
   Future<void> init({
+    required AppConfig config,
     required AppEnvironment environment,
-    LoggingService? loggingService,
+    required LoggingService loggingService,
+    required ReportingService reportingService,
+    CatalystProfiler? profiler,
+    CatalystStartupProfiler? startupProfiler,
   }) async {
     DependencyProvider.instance = this;
 
+    registerSingleton<AppConfig>(config);
     registerSingleton<AppEnvironment>(environment);
-    if (loggingService != null) {
-      registerSingleton<LoggingService>(loggingService);
+    registerSingleton<LoggingService>(loggingService);
+    registerSingleton<ReportingService>(reportingService);
+    if (profiler != null) {
+      registerSingleton<CatalystProfiler>(profiler);
+    }
+    if (startupProfiler != null) {
+      registerSingleton(startupProfiler);
     }
 
     _registerStorages();
@@ -54,13 +65,13 @@ final class Dependencies extends DependencyProvider {
     _isInitialized = true;
   }
 
-  void registerConfig(AppConfig config) {
-    if (isRegistered<AppConfig>()) {
+  void register<T extends Object>(T instance) {
+    if (isRegistered<T>()) {
       if (kDebugMode) {
-        print('AppConfig already registered!');
+        print('${T.runtimeType} already registered!');
       }
     }
-    registerSingleton<AppConfig>(config);
+    registerSingleton<T>(instance);
   }
 
   void _registerBlocsWithDependencies() {
@@ -201,12 +212,16 @@ final class Dependencies extends DependencyProvider {
   }
 
   void _registerNetwork() {
-    registerLazySingleton<ApiServices>(() {
-      return ApiServices(
-        env: get<AppEnvironment>().type,
-        authTokenProvider: get<AuthTokenProvider>(),
-      );
-    });
+    registerLazySingleton<ApiServices>(
+      () {
+        return ApiServices(
+          env: get<AppEnvironment>().type,
+          authTokenProvider: get<AuthTokenProvider>(),
+          httpClient: () => get<ReportingService>().buildHttpClient(),
+        );
+      },
+      dispose: (api) => api.dispose(),
+    );
   }
 
   void _registerRepositories() {
@@ -405,6 +420,15 @@ final class Dependencies extends DependencyProvider {
         get<CampaignService>(),
       );
     });
+    registerLazySingleton<ReportingServiceMediator>(
+      () {
+        return ReportingServiceMediator(
+          get<ReportingService>(),
+          get<UserService>(),
+        );
+      },
+      dispose: (mediator) => mediator.dispose(),
+    );
   }
 
   void _registerStorages() {
@@ -414,6 +438,7 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<CatalystDatabase>(
       () {
         final config = get<AppConfig>().database;
+        final reporting = get<ReportingService>();
 
         return CatalystDatabase.drift(
           config: CatalystDriftDatabaseConfig(
@@ -422,7 +447,12 @@ final class Dependencies extends DependencyProvider {
               sqlite3Wasm: Uri.parse(config.webSqlite3Wasm),
               driftWorker: Uri.parse(config.webDriftWorker),
             ),
+            native: CatalystDriftDatabaseNativeConfig(
+              dbDir: () => path.getApplicationDocumentsDirectory().then((dir) => dir.path),
+              dbTempDir: () => path.getTemporaryDirectory().then((dir) => dir.path),
+            ),
           ),
+          interceptor: reporting.buildDbInterceptor(databaseName: config.name),
         );
       },
       dispose: (database) async => database.close(),
@@ -462,7 +492,11 @@ final class Dependencies extends DependencyProvider {
       dispose: (observer) async => observer.dispose(),
     );
     registerLazySingleton<VideoManager>(
-      VideoManager.new,
+      () {
+        return VideoManager(
+          get<CatalystStartupProfiler>(),
+        );
+      },
       dispose: (manager) => manager.dispose(),
     );
     registerLazySingleton<ShareManager>(() => DelegatingShareManager(get<ShareService>()));
