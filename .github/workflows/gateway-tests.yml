@@ -52,8 +52,6 @@ jobs:
         if: always()
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up -d cat-gateway --wait
-          docker compose ps && docker compose logs cat-gateway
-
 
       - name: Schemathesis tests
         if: always()

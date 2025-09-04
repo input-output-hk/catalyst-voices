@@ -39,6 +39,7 @@ services:
       - INIT_AND_DROP_DB=false
       - WITH_SEED_DATA=.
       - WITH_MIGRATIONS=true
+    restart: "no"
     depends_on:
       event-db:
         condition: service_healthy
