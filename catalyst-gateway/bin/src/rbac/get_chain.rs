@@ -58,11 +58,15 @@ pub async fn latest_rbac_chain(id: &CatalystId) -> Result<Option<ChainInfo>> {
             last_txn
         };
 
+        // TODO: FIXME:
+        let stake_addresses = Vec::new();
+
         ChainInfo {
             chain,
             last_persistent_txn,
             last_volatile_txn,
             last_persistent_slot,
+            stake_addresses,
         }
     }))
 }

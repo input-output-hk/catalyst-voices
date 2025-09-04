@@ -8,7 +8,10 @@ use crate::{
         api::cardano::rbac::registrations_get::{
             invalid_registration_list::InvalidRegistrationList,
             purpose_list::PurposeList,
-            v2::{role_data::RbacRoleData, role_list::RbacRoleList},
+            v2::{
+                role_data::RbacRoleData, role_list::RbacRoleList,
+                stake_address_info_list::StakeAddressInfoList,
+            },
         },
         common::types::{
             cardano::{catalyst_id::CatalystId, transaction_id::TxnId},
@@ -40,6 +43,8 @@ pub struct RbacRegistrationChainV2 {
     /// A list of invalid registrations.
     #[oai(skip_serializing_if_is_empty)]
     invalid: InvalidRegistrationList,
+    /// A list of stake addresses of the chain.
+    stake_addresses: StakeAddressInfoList,
 }
 
 impl Example for RbacRegistrationChainV2 {
@@ -51,6 +56,7 @@ impl Example for RbacRegistrationChainV2 {
             last_volatile_txn: Some(TxnId::example()),
             roles: RbacRoleList::example(),
             invalid: InvalidRegistrationList::example(),
+            stake_addresses: StakeAddressInfoList::example(),
         }
     }
 }
@@ -70,6 +76,7 @@ impl RbacRegistrationChainV2 {
         let mut last_volatile_txn = None;
         let mut purpose = Vec::new().into();
         let mut roles = Vec::new().into();
+        let mut stake_addresses = Vec::new().into();
         if let Some(info) = info {
             last_persistent_txn = info.last_persistent_txn.map(Into::into);
             last_volatile_txn = info.last_volatile_txn.map(Into::into);
@@ -82,6 +89,13 @@ impl RbacRegistrationChainV2 {
                 .collect::<Vec<_>>()
                 .into();
             roles = role_data(info)?.into();
+            stake_addresses = info
+                .stake_addresses
+                .iter()
+                .cloned()
+                .map(Into::into)
+                .collect::<Vec<_>>()
+                .into();
         }
 
         Ok(Some(Self {
@@ -91,6 +105,7 @@ impl RbacRegistrationChainV2 {
             purpose,
             roles,
             invalid,
+            stake_addresses,
         }))
     }
 }

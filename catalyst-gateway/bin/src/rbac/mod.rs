@@ -11,5 +11,6 @@ mod validation_result;
 pub use chain_info::ChainInfo;
 pub use get_chain::latest_rbac_chain;
 pub use indexing_context::RbacBlockIndexingContext;
+pub use stake_address_info::StakeAddressInfo;
 pub use validation::validate_rbac_registration;
 pub use validation_result::{RbacValidationError, RbacValidationResult, RbacValidationSuccess};

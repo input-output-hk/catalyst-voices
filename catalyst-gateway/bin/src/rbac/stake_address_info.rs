@@ -3,6 +3,7 @@
 use cardano_chain_follower::{Slot, StakeAddress};
 
 /// The information about a stake address used in RBAC registration chain.
+#[derive(Debug, Clone)]
 pub struct StakeAddressInfo {
     /// A stake address.
     pub stake: StakeAddress,
