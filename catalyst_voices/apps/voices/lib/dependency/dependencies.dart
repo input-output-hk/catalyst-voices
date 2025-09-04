@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_manager.dart';
+import 'package:catalyst_voices/permissions/permission_handler_factory.dart';
 import 'package:catalyst_voices/share/resource_url_resolver.dart';
 import 'package:catalyst_voices/share/share_manager.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -11,6 +12,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:path_provider/path_provider.dart' as path;
@@ -475,5 +477,11 @@ final class Dependencies extends DependencyProvider {
     );
     registerLazySingleton<CastedVotesObserver>(CastedVotesObserverImpl.new);
     registerLazySingleton<VotingBallotBuilder>(VotingBallotLocalBuilder.new);
+    registerLazySingleton<DeviceInfoPlugin>(DeviceInfoPlugin.new);
+    registerLazySingleton<PermissionHandler>(
+      () => PermissionHandlerImpl(
+        get<DeviceInfoPlugin>(),
+      ),
+    );
   }
 }
