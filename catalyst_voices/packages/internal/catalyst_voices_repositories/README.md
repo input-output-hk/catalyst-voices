@@ -33,8 +33,9 @@ what should be committed.
 
 ## Database
 
-**CatalystDatabase** depends on jsonb queries, which was introduced in sqlite 3.45.0, read more
-[here](https://sqlite.org/jsonb.html). This means we need to ensure minimum version.
+**CatalystDatabase** depends on jsonb queries, which was introduced in sqlite 3.45.0.
+Read more [here](https://sqlite.org/jsonb.html).
+This means we need to ensure minimum version.
 
 ### Drift
 
