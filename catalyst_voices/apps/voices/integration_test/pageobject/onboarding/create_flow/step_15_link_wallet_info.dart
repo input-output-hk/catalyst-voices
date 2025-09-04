@@ -6,7 +6,7 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_14_keychain_final.dart';
 
-class LinkWalletInfoPanel extends OnboardingPageBase {
+final class LinkWalletInfoPanel extends OnboardingPageBase {
   static const chooseCardanoWalletButton = Key('ChooseCardanoWalletButton');
 
   LinkWalletInfoPanel(super.$);

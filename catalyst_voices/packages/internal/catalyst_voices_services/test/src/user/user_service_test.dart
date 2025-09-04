@@ -198,7 +198,7 @@ void main() {
       },
     );
 
-    test('use last account restores previously stored', () async {
+    test('use local user restores previously stored', () async {
       // Given
       final keychainId = const Uuid().v4();
 
@@ -213,17 +213,17 @@ void main() {
       final user = User.optional(accounts: [lastAccount]);
       await userRepository.saveUser(user);
 
-      await service.useLastAccount();
+      await service.useLocalUser();
 
       // Then
       expect(service.user.activeAccount, lastAccount);
     });
 
-    test('use last account does nothing on clear instance', () async {
+    test('use local user does nothing on clear instance', () async {
       // Given
 
       // When
-      await service.useLastAccount();
+      await service.useLocalUser();
 
       // Then
       expect(service.user.activeAccount, isNull);
@@ -244,7 +244,7 @@ void main() {
       final user = User.optional(accounts: [account]);
       await userRepository.saveUser(user);
 
-      await service.useLastAccount();
+      await service.useLocalUser();
 
       // Then
       expect(service.user.activeAccount, isNotNull);
@@ -270,7 +270,7 @@ void main() {
         // When
         await userRepository.saveUser(initialUser);
 
-        await service.useLastAccount();
+        await service.useLocalUser();
 
         await service.updateSettings(settings);
 
@@ -304,7 +304,7 @@ void main() {
         );
 
         // Then
-        await service.useLastAccount();
+        await service.useLocalUser();
 
         await service.updateSettings(settings);
 
@@ -377,7 +377,7 @@ void main() {
         when(() => userRepository.getUser()).thenAnswer((_) => Future.value(user));
         when(() => userRepository.saveUser(any())).thenAnswer((_) => Future(() {}));
 
-        await service.useLastAccount();
+        await service.useLocalUser();
         await service.refreshActiveAccountProfile();
 
         // Then
@@ -416,7 +416,7 @@ void main() {
           ),
         );
 
-        await service.useLastAccount();
+        await service.useLocalUser();
         await service.refreshActiveAccountProfile();
 
         // Then
@@ -449,7 +449,7 @@ void main() {
           () => userRepository.getAccountPublicProfile(),
         ).thenAnswer((_) => Future.value(publicProfile));
 
-        await service.useLastAccount();
+        await service.useLocalUser();
         await service.refreshActiveAccountProfile();
 
         // Then
@@ -493,7 +493,7 @@ void main() {
           () => userRepository.getVotingPower(),
         ).thenAnswer((_) => Future.value(updatedVotingPower));
 
-        await service.useLastAccount();
+        await service.useLocalUser();
         await service.refreshActiveAccountVotingPower();
 
         // Then

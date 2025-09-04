@@ -7,9 +7,6 @@ import 'package:catalyst_voices_services/src/logging/collect/collect_log_strateg
 import 'package:catalyst_voices_services/src/logging/collect/memory_collect_log_strategy.dart';
 import 'package:catalyst_voices_services/src/logging/print/console_log_print_strategy.dart';
 import 'package:catalyst_voices_services/src/logging/print/log_print_strategy.dart';
-import 'package:catalyst_voices_services/src/logging/reporting/log_reporting_strategy.dart';
-import 'package:catalyst_voices_services/src/logging/reporting/sentry_errors_reporting_strategy.dart';
-import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -55,7 +52,6 @@ final class _LoggingServiceImpl implements LoggingService {
 
   LogPrintStrategy? _printStrategy;
   CollectLogStrategy? _collectStrategy;
-  LogReportingStrategy? _reportingStrategy;
 
   _LoggingServiceImpl({
     required this.root,
@@ -83,7 +79,6 @@ final class _LoggingServiceImpl implements LoggingService {
     _chooseLogLevel(settings.effectiveLevel);
     _choosePrintStrategy(printToConsole: settings.effectivePrintToConsole);
     _chooseCollectStrategy(collect: settings.effectiveCollectLogs);
-    _chooseReportStrategy();
 
     await _recordsSub?.cancel();
     _recordsSub = root.onRecord.listen(_onLogRecord);
@@ -149,13 +144,8 @@ final class _LoggingServiceImpl implements LoggingService {
     };
   }
 
-  void _chooseReportStrategy() {
-    _reportingStrategy = kReleaseMode ? const SentryErrorsReportingStrategy() : null;
-  }
-
   void _onLogRecord(LogRecord log) {
     if (log.level >= _printLevel && log.level <= Level.OFF) _printStrategy?.print(log);
     _collectStrategy?.collect(log);
-    if (log.level >= Level.WARNING && log.level <= Level.OFF) _reportingStrategy?.report(log);
   }
 }

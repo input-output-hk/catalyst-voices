@@ -1,5 +1,11 @@
+import 'dart:async';
+
 import 'package:catalyst_voices_shared/src/responsive/responsive_builder.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+
+/// Very similar to [AsyncValueGetter] but returns [FutureOr] instead of [Future].
+typedef AsyncOrValueGetter<T> = FutureOr<T> Function();
 
 /// Builds a [Widget] when given a concrete value of a [ResponsiveBuilder].
 ///
