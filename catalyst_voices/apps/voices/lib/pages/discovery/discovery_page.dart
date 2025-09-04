@@ -13,6 +13,7 @@ import 'package:catalyst_voices/widgets/banner/widgets/email_need_verification_b
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_wide_screen_constrained.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class DiscoveryPage extends StatefulWidget {
   final bool keychainDeleted;
@@ -76,11 +77,20 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   void initState() {
     super.initState();
 
-    unawaited(context.read<DiscoveryCubit>().getAllData());
+    unawaited(_loadData());
+
     if (widget.keychainDeleted) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await _showKeychainDeletedDialog(context);
       });
+    }
+  }
+
+  Future<void> _loadData() async {
+    try {
+      await context.read<DiscoveryCubit>().getAllData();
+    } finally {
+      if (mounted) unawaited(SentryDisplayWidget.of(context).reportFullyDisplayed());
     }
   }
 

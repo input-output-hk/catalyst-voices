@@ -4,9 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../../utils/translations_utils.dart';
 import '../../common_page.dart';
 import '../create_flow/step_13_password_input.dart';
-import 'step_6_unlock_password_info_panel.dart';
+import 'step_4_unlock_password_info_panel.dart';
 
-class UnlockPasswordInputPanel extends PasswordInputPanel {
+final class UnlockPasswordInputPanel extends PasswordInputPanel {
   UnlockPasswordInputPanel(super.$);
 
   @override

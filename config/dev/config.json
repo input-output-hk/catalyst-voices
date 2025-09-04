@@ -8,10 +8,11 @@
   "sentry": {
     "dsn": "https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600",
     "environment": "dev",
-    "release": "catalyst-voices@dev",
     "tracesSampleRate": 1.0,
     "profilesSampleRate": 1.0,
     "enableAutoSessionTracking": true,
+    "enableTimeToFullDisplayTracing": true,
+    "enableLogs": true,
     "attachViewHierarchy": true,
     "diagnosticLevel": "debug"
   },

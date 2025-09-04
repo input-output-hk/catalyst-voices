@@ -36,7 +36,10 @@ fn get_api_contact() -> ContactObject {
 /// A long description of the API. Markdown is supported
 const API_DESCRIPTION: &str = "# Catalyst Gateway API.
 
-The Catalyst Gateway API provides realtime data for all prior, current and future Catalyst Voices voting events.";
+The Catalyst Gateway API provides realtime data for all prior, current and future Catalyst Voices voting events.
+
+⚠️ Warning: This API is currently unstable and may change at any time without prior notice. Backwards compatibility is not guaranteed, and future versions may introduce breaking changes. It is intended for experimental or internal use only. Use at your own risk.
+";
 
 /// Get the license details for the API
 fn get_api_license() -> LicenseObject {

@@ -6,7 +6,7 @@ import '../../utils/translations_utils.dart';
 import '../discovery_page.dart';
 
 class CampaignCategoriesSection {
-  late PatrolTester $;
+  final PatrolTester $;
 
   final categoriesRoot = const Key('CampaignCategoriesStateSelector');
   final categoriesTitle = const Key('CampaignCategoriesTitle');
@@ -22,10 +22,11 @@ class CampaignCategoriesSection {
   final categoryDetailsButton = const Key('CategoryDetailsBtn');
   final viewProposalsButton = const Key('ViewProposalsBtn');
   final categoriesLoadingError = const Key('CampaignCategoriesError');
+
   CampaignCategoriesSection(this.$);
 
   Future<void> categoriesAreRenderedCorrectly() async {
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < 4; i++) {
       try {
         $(categoriesRoot).$(campaignCategories).at(i).$(description).visible;
       } catch (e) {
