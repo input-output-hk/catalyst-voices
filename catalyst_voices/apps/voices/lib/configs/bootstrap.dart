@@ -14,7 +14,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_strategy/url_strategy.dart';
 
 const ReportingService _reportingService = _shouldUseSentry
@@ -23,11 +25,19 @@ const ReportingService _reportingService = _shouldUseSentry
 
 const _shouldUseSentry = kReleaseMode || kProfileMode;
 
+var _bootstrapInitState = const _BootstrapState();
+
 final _bootstrapLogger = Logger('Bootstrap');
 final _flutterLogger = Logger('Flutter');
 final _loggingService = LoggingService();
 final _platformDispatcherLogger = Logger('PlatformDispatcher');
 final _uncaughtZoneLogger = Logger('UncaughtZone');
+
+@visibleForTesting
+AppConfig? get appConfig => _bootstrapInitState.appConfig;
+
+@visibleForTesting
+LoggingService get loggingService => _loggingService;
 
 /// Initializes the application before it can be run. Should setup all
 /// the things which are necessary before the actual app is run,
@@ -37,21 +47,29 @@ final _uncaughtZoneLogger = Logger('UncaughtZone');
 /// Initialization logic that is relevant for [runApp] scenario
 /// only should be added to [_doBootstrapAndRun], not here.
 Future<BootstrapArgs> bootstrap({
-  GoRouter? router,
   AppEnvironment? environment,
+  String? initialLocation,
 }) async {
   await _loggingService.init();
 
-  GoRouter.optionURLReflectsImperativeAPIs = true;
-  setPathUrlStrategy();
+  if (!_bootstrapInitState.didSetPathUrlStrategy) {
+    GoRouter.optionURLReflectsImperativeAPIs = true;
+    setPathUrlStrategy();
+    _bootstrapInitState = _bootstrapInitState.copyWith(didSetPathUrlStrategy: true);
+  }
 
   EquatableConfig.stringify = kDebugMode;
 
   environment ??= AppEnvironment.fromEnv();
   final config = await _getAppConfig(env: environment.type);
+  _bootstrapInitState = _bootstrapInitState.copyWith(appConfig: Optional(config));
 
-  await _cleanupOldStorages();
-  await _initCryptoUtils();
+  if (!_bootstrapInitState.didInitializeCryptoUtils) {
+    await _initCryptoUtils();
+    _bootstrapInitState = _bootstrapInitState.copyWith(didInitializeCryptoUtils: true);
+  }
+
+  await cleanUpStorages(onlyOld: true);
   await _reportingService.init(config: config.sentry);
 
   await Dependencies.instance.init(
@@ -61,7 +79,7 @@ Future<BootstrapArgs> bootstrap({
     reportingService: _reportingService,
   );
 
-  router ??= buildAppRouter();
+  final router = buildAppRouter(initialLocation: initialLocation);
 
   // Observer is very noisy on Logger. Enable it only if you want to debug
   // something
@@ -99,7 +117,6 @@ Future<void> bootstrapAndRun(
   );
 }
 
-// TODO(damian-molinski): Add Isolate.current.addErrorListener
 @visibleForTesting
 GoRouter buildAppRouter({
   String? initialLocation,
@@ -114,6 +131,32 @@ GoRouter buildAppRouter({
     initialLocation: initialLocation,
     observers: observers.isNotEmpty ? observers : null,
   );
+}
+
+@visibleForTesting
+Future<void> cleanUpStorages({
+  bool onlyOld = false,
+}) async {
+  await SecureUserStorage.clearPreviousVersions();
+  if (onlyOld) {
+    return;
+  }
+
+  assert(
+    Dependencies.instance.isInitialized,
+    'Dependencies not yet initialized!',
+  );
+
+  await Dependencies.instance.get<FlutterSecureStorage>().deleteAll();
+  await Dependencies.instance.get<SharedPreferencesAsync>().clear();
+}
+
+@visibleForTesting
+Future<void> cleanUpUserDataFromDatabase() async {
+  final db = Dependencies.instance.get<CatalystDatabase>();
+
+  await db.draftsDao.deleteWhere();
+  await db.favoritesDao.deleteAll();
 }
 
 @visibleForTesting
@@ -135,15 +178,6 @@ Future<void> registerDependencies({
   );
 }
 
-@visibleForTesting
-Future<void> restartDependencies() async {
-  await Dependencies.instance.reset;
-}
-
-Future<void> _cleanupOldStorages() async {
-  await SecureUserStorage.clearPreviousVersions();
-}
-
 Widget _defaultBuilder(BootstrapArgs args) {
   return App(
     routerConfig: args.routerConfig,
@@ -157,6 +191,7 @@ Future<void> _doBootstrapAndRun(
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   AppSplashScreenManager.preserveSplashScreen(widgetsBinding);
 
+  // TODO(damian-molinski): Add Isolate.current.addErrorListener
   FlutterError.onError = _reportFlutterError;
   PlatformDispatcher.instance.onError = _reportPlatformDispatcherError;
 
@@ -241,4 +276,35 @@ final class BootstrapArgs {
     required this.routerConfig,
     required this.sentryConfig,
   });
+}
+
+class _BootstrapState extends Equatable {
+  final AppConfig? appConfig;
+  final bool didInitializeCryptoUtils;
+  final bool didSetPathUrlStrategy;
+
+  const _BootstrapState({
+    this.appConfig,
+    this.didInitializeCryptoUtils = false,
+    this.didSetPathUrlStrategy = false,
+  });
+
+  @override
+  List<Object?> get props => [
+    appConfig,
+    didInitializeCryptoUtils,
+    didSetPathUrlStrategy,
+  ];
+
+  _BootstrapState copyWith({
+    Optional<AppConfig>? appConfig,
+    bool? didInitializeCryptoUtils,
+    bool? didSetPathUrlStrategy,
+  }) {
+    return _BootstrapState(
+      appConfig: appConfig.dataOr(this.appConfig),
+      didInitializeCryptoUtils: didInitializeCryptoUtils ?? this.didInitializeCryptoUtils,
+      didSetPathUrlStrategy: didSetPathUrlStrategy ?? this.didSetPathUrlStrategy,
+    );
+  }
 }

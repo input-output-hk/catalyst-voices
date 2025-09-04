@@ -5,9 +5,10 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_8_writedown_seedphrase.dart';
 
-class WritedownSeedphraseInfoPanel extends OnboardingPageBase {
+final class WritedownSeedphraseInfoPanel extends OnboardingPageBase {
   WritedownSeedphraseInfoPanel(super.$);
 
+  @override
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }

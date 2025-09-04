@@ -39,6 +39,12 @@ abstract interface class CatalystDatabase {
   /// Contains all operations related to fav status of documents.
   FavoritesDao get favoritesDao;
 
+  /// Allows to await completion of pending operations.
+  ///
+  /// Useful when tearing down integration tests.
+  @visibleForTesting
+  Future<void> get pendingOperations;
+
   /// Specialized version of [DocumentsDao].
   ProposalsDao get proposalsDao;
 
@@ -112,6 +118,12 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase implements CatalystDa
       database: this,
       destructiveFallback: destructiveFallback,
     );
+  }
+
+  @override
+  Future<void> get pendingOperations async {
+    // Operations are queued so this will be executed after previous stack is cleared.
+    await customSelect('select 1').get();
   }
 
   @override

@@ -8,14 +8,16 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_12_password_info.dart';
 
-class PasswordInputPanel extends OnboardingPageBase {
+base class PasswordInputPanel extends OnboardingPageBase {
   final passwordInputField = const Key('PasswordInputField');
-
   final passwordConfirmInputField = const Key('PasswordConfirmInputField');
   final passwordStrengthLabel = const Key('PasswordStrengthLabel');
   final enterPasswordText = const Key('EnterPasswordText');
   final voicesTextField = const Key('VoicesTextField');
+
   PasswordInputPanel(super.$);
+
+  @override
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }
