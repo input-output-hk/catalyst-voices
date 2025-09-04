@@ -33,8 +33,8 @@ final class DatabaseLoggingInterceptor extends QueryInterceptor {
   DatabaseLoggingInterceptor({
     this.isEnabled = true,
     this.onlyErrors = true,
-    required String dbName,
-  }) : logger = Logger(dbName);
+    required String databaseName,
+  }) : logger = Logger(databaseName);
 
   @override
   Future<void> commitTransaction(TransactionExecutor inner) {
