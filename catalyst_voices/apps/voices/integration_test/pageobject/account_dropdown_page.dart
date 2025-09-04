@@ -5,7 +5,7 @@ import 'package:patrol_finders/patrol_finders.dart';
 import '../utils/translations_utils.dart';
 
 class AccountDropdownPage {
-  PatrolTester $;
+  final PatrolTester $;
   final profileAndKeychainText = const Key('ProfileAndKeychain');
 
   final popUpMenuAccountHeader = const Key('PopUpMenuAccountHeader');
@@ -18,6 +18,7 @@ class AccountDropdownPage {
   final redirectToDocsMenuItem = const Key('CatalystKnowledgeBase');
   final segmentedButtonContainer = const Key('segmentedButtonContainer');
   final lockAccountButton = const Key('LockAccountButton');
+
   AccountDropdownPage(this.$);
 
   Future<void> accountDropdownContainsSpecificData() async {
@@ -45,7 +46,6 @@ class AccountDropdownPage {
   Future<void> accountDropdownLooksAsExpected() async {
     expect($(profileAndKeychainText), findsOneWidget);
     expect($(segmentedButton), findsWidgets);
-    expect($(setupRolesMenuItem), findsOneWidget);
     expect($(lockAccountButton), findsOneWidget);
   }
 

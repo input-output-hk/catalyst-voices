@@ -5,7 +5,7 @@ import 'package:patrol_finders/patrol_finders.dart';
 import '../../utils/translations_utils.dart';
 
 class HowItWorksSection {
-  late PatrolTester $;
+  final PatrolTester $;
 
   final title = const Key('HowItWorksTitle');
   final collaborateAvatar = const Key('collaborateAvatar');
@@ -19,6 +19,7 @@ class HowItWorksSection {
   final followDescription = const Key('followDescription');
   final loadingError = const Key('ErrorIndicator');
   final howItWorksRoot = const Key('HowItWorks');
+
   HowItWorksSection(this.$);
 
   Future<void> collaborateAvatarIsRenderedCorrectly() async {

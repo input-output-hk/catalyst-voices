@@ -20,6 +20,7 @@ class CreateProposalButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
+      key: const Key('CreateProposalButton'),
       onTap: () {
         unawaited(CreateNewProposalDialog.show(context, categoryRef: categoryRef));
       },

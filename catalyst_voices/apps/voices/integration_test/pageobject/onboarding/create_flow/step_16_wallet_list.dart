@@ -1,14 +1,14 @@
+import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../../utils/constants.dart';
 import '../../../utils/selector_utils.dart';
 import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_15_link_wallet_info.dart';
 
-class WalletListPanel extends OnboardingPageBase {
+final class WalletListPanel extends OnboardingPageBase {
   static const seeAllSupportedWalletsBtn = Key('SeeAllSupportedWalletsButton');
 
   WalletListPanel(super.$);
@@ -36,7 +36,7 @@ class WalletListPanel extends OnboardingPageBase {
     await SelectorUtils.checkOpeningLinkByMocking(
       $,
       seeAllSupportedWalletsCopy,
-      Urls.supportedWallets,
+      VoicesConstants.officiallySupportedWalletsUrl,
     );
   }
 

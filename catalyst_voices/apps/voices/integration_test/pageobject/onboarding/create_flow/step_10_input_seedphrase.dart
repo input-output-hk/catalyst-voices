@@ -6,12 +6,14 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_9_writedown_seedphrase_info.dart';
 
-class InputSeedphrasePanel extends OnboardingPageBase {
+final class InputSeedphrasePanel extends OnboardingPageBase {
   static const seedPhrasesPicker = Key('SeedPhrasesPicker');
 
   final resetButton = const Key('ResetButton');
+
   InputSeedphrasePanel(super.$);
 
+  @override
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }
