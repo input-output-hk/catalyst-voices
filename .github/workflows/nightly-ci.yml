@@ -14,10 +14,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
-env:
-  REPORT_EXT: .junit-report.xml
-  ALLURE_REPORT_FOLDER: nightly-allure-report
-
 jobs:
   ci_nightly:
     uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.10.0
@@ -25,16 +21,27 @@ jobs:
       forge_version: 0.21.0
       skip_deploy: true
       skip_release: true
-      tags: |
-        nightly
 
-  generate-test-reports:
-    name: Generate test reports
+  tests:
+    name: Nightly tests
     runs-on: ubuntu-latest
-    if: always()
-    needs: ci_nightly
     steps:
       - uses: actions/checkout@v4
+
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: false
+          haskell: false
+          large-packages: false
+          docker-images: false
+          swap-storage: true
 
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
@@ -42,70 +49,28 @@ jobs:
           enable_caching: "true"
           version: 0.21.0
 
-      - name: Setup CI
+      - name: Setup
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
 
-      - name: Get python api test report
+      - name: Prepare artifacts
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
-        if: always()
-        continue-on-error: true
         with:
           command: run
-          args: ./catalyst-gateway/tests/api_tests+nightly-test
+          args: ./catalyst-gateway/tests/+all-nightly-images
 
-      - name: Collect and upload test reports
-        uses: actions/upload-artifact@v4
+      - name: Schemathesis tests
         if: always()
-        with:
-          path: "**/*${{ env.REPORT_EXT }}"
-          if-no-files-found: error
-          retention-days: 1
-
-  generate-allure-report:
-    name: Generate allure report
-    runs-on: ubuntu-latest
-    needs: generate-test-reports
-    if: always() && needs.generate-test-reports.result == 'success'
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@v4
-
-      - name: Setup Allure report
         run: |
-          mkdir -p ${{ env.ALLURE_REPORT_FOLDER }}
-          shopt -s globstar
-          cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_REPORT_FOLDER }}
-          ls ${{ env.ALLURE_REPORT_FOLDER }}
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
 
-      - name: Checkout gh-pages
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages-dir
-
-      - name: Build Allure report
-        uses: mgrybyk/allure-report-branch-action@v1
-        id: allure
-        with:
-          report_id: "nightly-test-report"
-          gh_pages: "gh-pages-dir"
-          report_dir: ${{ env.ALLURE_REPORT_FOLDER }}
-
-      - name: Git push to gh-pages
-        uses: mgrybyk/git-commit-pull-push-action@v1
-        with:
-          repository: gh-pages-dir
-          branch: gh-pages
-          pull_args: --rebase -X ours
-
-      - name: Send Slack notification
-        if: ${{ always() && steps.allure.outputs.report_url }}
+  slack:
+        needs: tests
+        if: needs.tests != 'success'
         uses: slackapi/slack-github-action@v2.1.1
         with:
           payload: |
             {
-              "text": ":rocket: *Test Report*\n<${{ steps.allure.outputs.report_url }}|Click here to view the Allure report>\n*Passed:* ${{ steps.allure.outputs.test_result_passed }}/ ${{ steps.allure.outputs.test_result_total }}\n*Failed:* ${{ steps.allure.outputs.test_result_failed }}/ ${{ steps.allure.outputs.test_result_total }}"
+              "text": ":rocket: *Nightly Tests Failed*"
             }
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           webhook-type: webhook-trigger
