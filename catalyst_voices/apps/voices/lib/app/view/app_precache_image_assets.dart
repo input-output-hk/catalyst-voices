@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:synchronized/synchronized.dart';
 
@@ -36,6 +38,32 @@ class ImagePrecacheService {
     List<SvgGenImage> svgs = const [],
     List<AssetGenImage> assets = const [],
   }) {
+    final profiler = Dependencies.instance.get<CatalystStartupProfiler>();
+    if (!profiler.ongoing) {
+      return _precacheAssets(context, svgs: svgs, assets: assets);
+    }
+
+    return profiler.imagesCache(
+      body: () => _precacheAssets(context, svgs: svgs, assets: assets),
+    );
+  }
+
+  void resetCacheIfNeeded(ThemeData theme) {
+    if (_lastThemeMode != theme.brightness) {
+      // Handle case when caching is in progress and someone awaits completion.
+      // For such case we're completing _isInitialized early.
+      if (!_isInitialized.isCompleted && _lock.inLock) _isInitialized.complete(false);
+
+      _isInitialized = Completer<bool>();
+      _lastThemeMode = theme.brightness;
+    }
+  }
+
+  Future<void> _precacheAssets(
+    BuildContext context, {
+    List<SvgGenImage> svgs = const [],
+    List<AssetGenImage> assets = const [],
+  }) {
     return _lock.synchronized<void>(() async {
       if (_isInitialized.isCompleted) return;
 
@@ -49,17 +77,6 @@ class ImagePrecacheService {
 
       if (!_isInitialized.isCompleted) _isInitialized.complete(true);
     });
-  }
-
-  void resetCacheIfNeeded(ThemeData theme) {
-    if (_lastThemeMode != theme.brightness) {
-      // Handle case when caching is in progress and someone awaits completion.
-      // For such case we're completing _isInitialized early.
-      if (!_isInitialized.isCompleted && _lock.inLock) _isInitialized.complete(false);
-
-      _isInitialized = Completer<bool>();
-      _lastThemeMode = theme.brightness;
-    }
   }
 }
 
