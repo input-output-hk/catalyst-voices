@@ -1,3 +1,4 @@
 rust_input: crate::compression
 rust_root: rust/
 dart_output: lib/src/rust
+default_external_library_loader_web_prefix: /assets/packages/catalyst_compression/assets/js/

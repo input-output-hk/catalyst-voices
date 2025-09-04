@@ -11,7 +11,7 @@ builder:
 code-generator:
     ARG local = false
     FROM +builder
-    DO flutter_rust_bridge+CODE_GENERATOR_WEB --WEB_PREFIX=/assets/packages/catalyst_compression/assets/js/
+    DO flutter_rust_bridge+CODE_GENERATOR_WEB
 
     IF [ $local = true ]
         SAVE ARTIFACT ./assets/js AS LOCAL ./assets/js
