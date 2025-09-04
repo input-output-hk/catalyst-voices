@@ -1,4 +1,4 @@
-//! Catalyst Compression Native
+//! Catalyst Compression
 
 // cspell: words uninlined
 
