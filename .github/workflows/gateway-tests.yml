@@ -51,7 +51,9 @@ jobs:
       - name: Spin up catalyst-gateway
         if: always()
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up -d cat-gateway --wait
+              docker compose -f catalyst-gateway/tests/docker-compose.yml run --rm event-db-v1-migrations \
+              && docker compose -f catalyst-gateway/tests/docker-compose.yml run --rm event-db-migrations \
+              && docker compose -f catalyst-gateway/tests/docker-compose.yml up -d --wait cat-gateway
 
       - name: Schemathesis tests
         if: always()
