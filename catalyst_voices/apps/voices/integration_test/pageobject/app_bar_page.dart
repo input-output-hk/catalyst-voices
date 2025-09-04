@@ -6,18 +6,30 @@ import '../utils/constants.dart';
 import '../utils/translations_utils.dart';
 
 class AppBarPage {
-  late PatrolTester $;
+  final PatrolTester $;
+
   final spacesDrawerButton = const Key('DrawerButton');
   final getStartedBtn = const Key('GetStartedButton');
   final finishRegistrationBtn = const Key('FinishRegistrationButton');
   final accountPopupBtn = const Key('AccountPopupButton');
   final lockBtn = const Key('LockButton');
   final unlockBtn = const Key('UnlockButton');
+  final visitorBtn = const Key('VisitorBtn');
   final sessionAccountPopupMenuAvatar = const Key('SessionAccountPopupMenuAvatar');
+  final createProposalBtn = const Key('CreateProposalButton');
+
   AppBarPage(this.$);
 
   Future<void> accountPopupBtnClick() async {
     await $(sessionAccountPopupMenuAvatar).tap();
+  }
+
+  Future<void> createProposalBtnIsNotVisible() async {
+    expect($(createProposalBtn), findsNothing);
+  }
+
+  Future<void> createProposalBtnIsVisible() async {
+    expect($(createProposalBtn), findsOneWidget);
   }
 
   Future<void> finishAccountCreationBtnIsVisible() async {
@@ -32,6 +44,10 @@ class AppBarPage {
     await $(getStartedBtn).tap(settleTimeout: Time.short.duration);
   }
 
+  Future<bool> getStartedBtnExists() async {
+    return $(getStartedBtn).exists;
+  }
+
   Future<void> getStartedBtnIsVisible() async {
     expect($(getStartedBtn), findsOneWidget);
     expect($(getStartedBtn).$(Text).text, (await t()).getStarted);
@@ -43,10 +59,12 @@ class AppBarPage {
 
   Future<void> looksAsExpectedForVisitor() async {
     await getStartedBtnIsVisible();
+    await visitorBtnIsVisible();
   }
 
   Future<void> looksAsExpectedForVisitorOnboardingInProgress() async {
     await finishAccountCreationBtnIsVisible();
+    await visitorBtnIsVisible();
   }
 
   Future<void> sessionAccountPopupMenuAvatarIsVisible() async {
@@ -57,8 +75,8 @@ class AppBarPage {
     await $(spacesDrawerButton).waitUntilVisible().tap();
   }
 
-  Future<void> spacesDrawerButtonExists({bool? reverse = false}) async {
-    expect($(spacesDrawerButton).exists, !reverse!);
+  Future<void> spacesDrawerButtonExists({bool reverse = false}) async {
+    expect($(spacesDrawerButton).exists, !reverse);
   }
 
   Future<void> unlockBtnClick() async {
@@ -67,5 +85,9 @@ class AppBarPage {
 
   Future<void> unlockBtnIsVisible() async {
     expect($(unlockBtn), findsOneWidget);
+  }
+
+  Future<void> visitorBtnIsVisible() async {
+    expect($(visitorBtn), findsOneWidget);
   }
 }

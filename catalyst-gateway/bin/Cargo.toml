@@ -35,8 +35,8 @@ tracing-subscriber = { version = "0.3.18", features = [
 serde_json = { version = "1.0.132", features = ["arbitrary_precision"] }
 thiserror = "1.0.68"
 chrono = "0.4.38"
-bb8 = "0.8.6"
-bb8-postgres = "0.8.1"
+deadpool = "0.12.2"
+deadpool-postgres = "0.14.1"
 tokio-postgres = { version = "0.7.12", features = [
     "with-chrono-0_4",
     "with-serde_json-1",
@@ -98,6 +98,7 @@ derive_more = { version = "2.0.1", default-features = false, features = [
 rayon = "1.10"
 x509-cert = "0.2.5"
 minicbor = { version = "0.25.1", features = ["alloc"] }
+itertools = "0.14.0"
 get-size2 = { version = "0.6.2", features = ["derive"] }
 
 # Its a transitive dependency of the "poem-openapi" crate,

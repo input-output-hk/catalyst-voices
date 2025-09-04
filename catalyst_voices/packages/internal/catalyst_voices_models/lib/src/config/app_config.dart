@@ -49,13 +49,13 @@ final class AppConfig extends Equatable {
           dsn:
               'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
           environment: 'dev',
-          release: 'catalyst-voices@dev',
           tracesSampleRate: 1,
           profilesSampleRate: 1,
           enableAutoSessionTracking: true,
+          enableTimeToFullDisplayTracing: true,
+          enableLogs: true,
           attachScreenshot: true,
           attachViewHierarchy: true,
-          debug: kDebugMode,
           diagnosticLevel: 'debug',
         ),
         blockchain: BlockchainConfig(
@@ -88,13 +88,13 @@ final class AppConfig extends Equatable {
           dsn:
               'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
           environment: 'preprod',
-          release: 'catalyst-voices@preprod',
           tracesSampleRate: 0.2,
           profilesSampleRate: 0.2,
           enableAutoSessionTracking: true,
+          enableTimeToFullDisplayTracing: true,
+          enableLogs: true,
           attachScreenshot: false,
           attachViewHierarchy: true,
-          debug: kDebugMode,
           diagnosticLevel: 'warning',
         ),
         blockchain: BlockchainConfig(
@@ -118,13 +118,13 @@ final class AppConfig extends Equatable {
           dsn:
               'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
           environment: 'prod',
-          release: 'catalyst-voices@prod',
           tracesSampleRate: 0.1,
           profilesSampleRate: 0.1,
           enableAutoSessionTracking: true,
+          enableTimeToFullDisplayTracing: true,
+          enableLogs: false,
           attachScreenshot: false,
           attachViewHierarchy: false,
-          debug: kDebugMode,
           diagnosticLevel: 'error',
         ),
         blockchain: BlockchainConfig(
@@ -254,65 +254,79 @@ final class ExpiryDuration extends Equatable {
   }
 }
 
-final class SentryConfig extends Equatable {
+final class SentryConfig extends ReportingServiceConfig {
   final String dsn;
   final String environment;
-  final String release;
   final double tracesSampleRate;
   final double profilesSampleRate;
   final bool enableAutoSessionTracking;
+  final bool enableTimeToFullDisplayTracing;
+  final bool enableLogs;
   final bool attachScreenshot;
   final bool attachViewHierarchy;
-  final bool debug;
   final String diagnosticLevel;
 
   const SentryConfig({
     required this.dsn,
     required this.environment,
-    required this.release,
     required this.tracesSampleRate,
     required this.profilesSampleRate,
     required this.enableAutoSessionTracking,
+    required this.enableTimeToFullDisplayTracing,
+    required this.enableLogs,
     required this.attachScreenshot,
     required this.attachViewHierarchy,
-    required this.debug,
     required this.diagnosticLevel,
   });
+
+  bool get debug => kDebugMode;
+
+  String? get dist {
+    const key = 'SENTRY_DIST';
+    return const bool.hasEnvironment(key) ? const String.fromEnvironment(key) : null;
+  }
 
   @override
   List<Object?> get props => [
     dsn,
     environment,
-    release,
     tracesSampleRate,
     profilesSampleRate,
     enableAutoSessionTracking,
+    enableTimeToFullDisplayTracing,
+    enableLogs,
     attachScreenshot,
     attachViewHierarchy,
-    debug,
     diagnosticLevel,
   ];
+
+  String? get release {
+    const key = 'SENTRY_RELEASE';
+    return const bool.hasEnvironment(key) ? const String.fromEnvironment(key) : null;
+  }
 
   SentryConfig copyWith({
     String? dsn,
     String? environment,
-    String? release,
     double? tracesSampleRate,
     double? profilesSampleRate,
     bool? enableAutoSessionTracking,
+    bool? enableTimeToFullDisplayTracing,
+    bool? enableLogs,
     bool? attachViewHierarchy,
     String? diagnosticLevel,
   }) {
     return SentryConfig(
       dsn: dsn ?? this.dsn,
       environment: environment ?? this.environment,
-      release: release ?? this.release,
       tracesSampleRate: tracesSampleRate ?? this.tracesSampleRate,
       profilesSampleRate: profilesSampleRate ?? this.profilesSampleRate,
       enableAutoSessionTracking: enableAutoSessionTracking ?? this.enableAutoSessionTracking,
+      enableTimeToFullDisplayTracing:
+          enableTimeToFullDisplayTracing ?? this.enableTimeToFullDisplayTracing,
+      enableLogs: enableLogs ?? this.enableLogs,
       attachScreenshot: attachScreenshot,
       attachViewHierarchy: attachViewHierarchy ?? this.attachViewHierarchy,
-      debug: debug,
       diagnosticLevel: diagnosticLevel ?? this.diagnosticLevel,
     );
   }

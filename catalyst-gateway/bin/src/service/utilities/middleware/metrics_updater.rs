@@ -30,12 +30,15 @@ impl MetricsUpdaterMiddleware {
 impl Endpoint for MetricsUpdaterMiddleware {
     type Output = Response;
 
-    async fn call(&self, req: Request) -> Result<Self::Output> {
+    async fn call(
+        &self,
+        req: Request,
+    ) -> Result<Self::Output> {
         if req.method() != Method::GET {
             return Ok(StatusCode::METHOD_NOT_ALLOWED.into());
         }
 
-        metrics_updater_fn().await;
+        metrics_updater_fn();
 
         let encoder = TextEncoder::new();
         let metric_families = self.registry.gather();

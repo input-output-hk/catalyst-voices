@@ -30,8 +30,12 @@ impl HealthApi {
         method = "get",
         operation_id = "healthStarted"
     )]
-    async fn started_get(&self, _auth: NoAuthorization) -> started_get::AllResponses {
-        started_get::endpoint().await
+    #[allow(clippy::unused_async)]
+    async fn started_get(
+        &self,
+        _auth: NoAuthorization,
+    ) -> started_get::AllResponses {
+        started_get::endpoint()
     }
 
     /// Service Ready
@@ -48,8 +52,12 @@ impl HealthApi {
         method = "get",
         operation_id = "healthReady"
     )]
-    async fn ready_get(&self, _auth: NoAuthorization) -> ready_get::AllResponses {
-        ready_get::endpoint().await
+    #[allow(clippy::unused_async)]
+    async fn ready_get(
+        &self,
+        _auth: NoAuthorization,
+    ) -> ready_get::AllResponses {
+        ready_get::endpoint()
     }
 
     /// Service Live
@@ -61,8 +69,12 @@ impl HealthApi {
     /// *This endpoint is for internal use of the service deployment infrastructure.
     /// It may not be exposed publicly. Refer to []*
     #[oai(path = "/v1/health/live", method = "get", operation_id = "healthLive")]
-    async fn live_get(&self, _auth: NoAuthorization) -> live_get::AllResponses {
-        live_get::endpoint().await
+    #[allow(clippy::unused_async)]
+    async fn live_get(
+        &self,
+        _auth: NoAuthorization,
+    ) -> live_get::AllResponses {
+        live_get::endpoint()
     }
 
     /// Service Inspection Control.

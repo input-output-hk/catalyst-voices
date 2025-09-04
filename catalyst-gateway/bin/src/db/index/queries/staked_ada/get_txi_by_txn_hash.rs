@@ -63,7 +63,8 @@ impl GetTxiByTxnHashesQuery {
 
     /// Executes a get txi by transaction hashes query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: GetTxiByTxnHashesQueryParams,
+        session: &CassandraSession,
+        params: GetTxiByTxnHashesQueryParams,
     ) -> anyhow::Result<TypedRowStream<GetTxiByTxnHashesQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::TxiByTransactionHash, params)
