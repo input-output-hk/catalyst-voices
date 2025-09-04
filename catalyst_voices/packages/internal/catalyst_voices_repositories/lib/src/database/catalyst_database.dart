@@ -4,7 +4,6 @@ import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.dart
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/favorites_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_dao.dart';
-import 'package:catalyst_voices_repositories/src/database/database_logging_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/database/migration/drift_migration_strategy.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
@@ -26,6 +25,7 @@ abstract interface class CatalystDatabase {
   /// itself is not public.
   factory CatalystDatabase.drift({
     required CatalystDriftDatabaseConfig config,
+    QueryInterceptor? interceptor,
   }) = DriftCatalystDatabase.withConfig;
 
   /// Contains all operations related to [DocumentEntity] which is db specific.
@@ -80,27 +80,28 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase implements CatalystDa
   @visibleForTesting
   DriftCatalystDatabase(super.connection);
 
-  DriftCatalystDatabase.withConfig({
+  factory DriftCatalystDatabase.withConfig({
     required CatalystDriftDatabaseConfig config,
-  }) : this(
-         driftDatabase(
-           name: config.name,
-           web: DriftWebOptions(
-             sqlite3Wasm: config.web.sqlite3Wasm,
-             driftWorker: config.web.driftWorker,
-           ),
+    QueryInterceptor? interceptor,
+  }) {
+    var connection = driftDatabase(
+      name: config.name,
+      web: DriftWebOptions(
+        sqlite3Wasm: config.web.sqlite3Wasm,
+        driftWorker: config.web.driftWorker,
+      ),
 
-           // TODO(damian-molinski): Native not supported yet
-           // ignore: avoid_redundant_argument_values
-           native: null,
-         ).interceptWith(
-           DatabaseLoggingInterceptor(
-             // ignore: avoid_redundant_argument_values
-             isEnabled: kDebugMode,
-             dbName: config.name,
-           ),
-         ),
-       );
+      // TODO(damian-molinski): Native not supported yet
+      // ignore: avoid_redundant_argument_values
+      native: null,
+    );
+
+    if (interceptor != null) {
+      connection = connection.interceptWith(interceptor);
+    }
+
+    return DriftCatalystDatabase(connection);
+  }
 
   @override
   DocumentsDao get documentsDao => driftDocumentsDao;
