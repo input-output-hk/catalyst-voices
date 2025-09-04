@@ -3,17 +3,13 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
-import 'step_5_restore_keychain_success_panel.dart';
+import 'step_3_restore_keychain_success_panel.dart';
 
-class UnlockPasswordInfoPanel extends OnboardingPageBase {
+final class UnlockPasswordInfoPanel extends OnboardingPageBase {
   final unlockPasswordInfoTitle = const Key('UnlockPasswordInfoTitle');
-
   final unlockPasswordInfoSubtitle = const Key('UnlockPasswordInfoSubtitle');
-  UnlockPasswordInfoPanel(super.$);
 
-  Future<void> clickNext() async {
-    await $(nextButton).tap();
-  }
+  UnlockPasswordInfoPanel(super.$);
 
   @override
   Future<void> goto() async {

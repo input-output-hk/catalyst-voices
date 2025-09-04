@@ -1,14 +1,14 @@
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../utils/translations_utils.dart';
 import '../../common_page.dart';
 import '../onboarding_base_page.dart';
-import 'step_4_restore_keychain_input_panel.dart';
+import 'step_2_seedphrase_instructions_panel.dart';
 
-class RestoreKeychainSuccessPanel extends OnboardingPageBase {
+final class RestoreKeychainSuccessPanel extends OnboardingPageBase {
   final recoveryAccountTitle = const Key('RecoveryAccountTitle');
-
   final walletNameText = const Key('WalletNameText');
   final recoveryAccountSuccessTitle = const Key('RecoveryAccountSuccessTitle');
   final walletDetectionSummaryText = const Key('WalletDetectionSummary');
@@ -21,6 +21,7 @@ class RestoreKeychainSuccessPanel extends OnboardingPageBase {
   final setUnlockPasswordButton = const Key('SetUnlockPasswordButton');
   final recoverDifferentKeychainButton = const Key('RecoverDifferentKeychainButton');
   final recoveryAccountError = const Key('RecoveryAccountError');
+
   RestoreKeychainSuccessPanel(super.$);
 
   Future<void> clickRecoverDifferentKeychain() async {
@@ -33,23 +34,10 @@ class RestoreKeychainSuccessPanel extends OnboardingPageBase {
 
   @override
   Future<void> goto() async {
-    final seedPhrase = [
-      'broken',
-      'member',
-      'repeat',
-      'liquid',
-      'barely',
-      'electric',
-      'theory',
-      'paddle',
-      'coyote',
-      'behind',
-      'unique',
-      'member',
-    ];
+    final seedPhrase = recoverTestWords.map((e) => e.data).toList();
     await RestoreKeychainInputPanel($).goto();
     await RestoreKeychainInputPanel($).enterSeedPhrase(seedPhrase);
-    await RestoreKeychainInputPanel($).clickNext();
+    await clickNext();
     await _ensureWalletIsRecovered();
   }
 

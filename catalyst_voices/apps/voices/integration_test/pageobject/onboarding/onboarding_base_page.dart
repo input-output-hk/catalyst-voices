@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol_finders/patrol_finders.dart';
@@ -7,8 +8,9 @@ import '../../utils/selector_utils.dart';
 import '../../utils/translations_utils.dart';
 import '../common_page.dart';
 
-class OnboardingPageBase {
-  PatrolTester $;
+base class OnboardingPageBase {
+  final PatrolTester $;
+
   final registrationDialog = const Key('RegistrationDialog');
   final registrationInfoPanel = const Key('RegistrationInfoPanel');
   final registrationDetailsPanel = const Key('RegistrationDetailsPanel');
@@ -16,7 +18,6 @@ class OnboardingPageBase {
   final headerSubtitle = const Key('HeaderSubtitle');
   final headerBody = const Key('HeaderBody');
   final backButton = const Key('BackButton');
-  final nextButton = const Key('NextButton');
   final registrationInfoPictureContainer = const Key('PictureContainer');
   final progressBar = const Key('ProgressBar');
   final registrationDetailsTitle = const Key('RegistrationDetailsTitle');
@@ -33,30 +34,38 @@ class OnboardingPageBase {
   final voicesAlertDialogSubtitle = const Key('VoicesAlertDialogSubtitle');
   final registrationExitDialogContent = const Key('RegistrationExitDialogContent');
   final recoveryExitDialogContent = const Key('RecoveryExitDialogContent');
+
   OnboardingPageBase(this.$);
+
+  Key get nextButton => const Key('NextButton');
 
   Future<void> clickBack() async {
     await $(backButton).waitUntilVisible().tap();
+  }
+
+  Future<void> clickNext() async {
+    await $(nextButton).waitUntilVisible().tap();
   }
 
   Future<PatrolFinder> closeButton() async {
     return $(registrationDialog).$(CommonPage($).dialogCloseButton).waitUntilVisible();
   }
 
+  @visibleForOverriding
   Future<void> goto() async {
-    throw UnimplementedError('goto() must be overridden in subclasses');
+    // no-op.
   }
 
   Future<void> incompleteDialogCheckKeychainPhase() async {
     expect(
       $(voicesAlertDialogTitleRow).$(registrationDialogTitle).text,
-      (await t()).warning,
+      (await t()).warning.toUpperCase(),
     );
     expect($(voicesAlertDialogTitleRow).$(VoicesIconButton), findsExactly(2));
     expect($(voicesAlertDialog).$(warningIcon), findsOneWidget);
     expect(
       $(voicesAlertDialog).$(voicesAlertDialogSubtitle).$(Text).text,
-      (await t()).registrationExitConfirmDialogSubtitle,
+      ((await t()).registrationExitConfirmDialogSubtitle).toUpperCase(),
     );
     expect(
       $(voicesAlertDialog).$(registrationExitDialogContent).text,
@@ -83,13 +92,13 @@ class OnboardingPageBase {
   Future<void> incompleteDialogCheckRestorationPhase() async {
     expect(
       $(voicesAlertDialogTitleRow).$(registrationDialogTitle).text,
-      (await t()).warning,
+      (await t()).warning.toUpperCase(),
     );
     expect($(voicesAlertDialogTitleRow).$(VoicesIconButton), findsExactly(2));
     expect($(voicesAlertDialog).$(warningIcon), findsOneWidget);
     expect(
       $(voicesAlertDialog).$(voicesAlertDialogSubtitle).$(Text).text,
-      (await t()).recoveryExitConfirmDialogSubtitle,
+      (await t()).recoveryExitConfirmDialogSubtitle.toUpperCase(),
     );
     expect(
       $(voicesAlertDialog).$(recoveryExitDialogContent).text,

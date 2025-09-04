@@ -6,9 +6,10 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_6_catalyst_keychain_info.dart';
 
-class CatalystKeychainSuccessPanel extends OnboardingPageBase {
+final class CatalystKeychainSuccessPanel extends OnboardingPageBase {
   CatalystKeychainSuccessPanel(super.$);
 
+  @override
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }

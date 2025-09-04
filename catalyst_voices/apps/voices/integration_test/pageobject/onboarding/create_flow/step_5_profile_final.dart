@@ -5,7 +5,7 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_3_setup_profile.dart';
 
-class ProfileFinalPanel extends OnboardingPageBase {
+final class ProfileFinalPanel extends OnboardingPageBase {
   static const createKeychainButton = Key('CreateKeychainButton');
 
   final nextStepBody = const Key('NextStepBody');
