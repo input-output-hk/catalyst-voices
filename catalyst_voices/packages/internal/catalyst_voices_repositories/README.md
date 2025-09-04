@@ -85,7 +85,9 @@ Read more [here](https://drift.simonbinder.eu/platforms/web/#prerequisites).
 
 We're using [Native Drift](https://drift.simonbinder.eu/Platforms/vm/) for android and iOS.
 
-Ensuring minimum version of sqlite by shipping with [sqlite3_flutter_libs](https://pub.dev/packages/sqlite3_flutter_libs) which is linking compiled version of sqlite3.dart.
+Ensuring minimum version of sqlite by shipping with
+[sqlite3_flutter_libs](https://pub.dev/packages/sqlite3_flutter_libs)
+which is linking compiled version of sqlite3.dart.
 
-* for android in build.gradle [here](https://github.com/simolus3/sqlite3.dart/blob/main/sqlite3_flutter_libs/android/build.gradle#L40).
-* for darwin (iOS) in sqlite3_flutter_libs.podspec [here](https://github.com/simolus3/sqlite3.dart/blob/main/sqlite3_flutter_libs/darwin/sqlite3_flutter_libs.podspec#L23).
+* for android in build.gradle (**/android/build.gradle**).
+* for darwin (iOS) in sqlite3_flutter_libs.podspec (**/darwin/sqlite3_flutter_libs.podspec**).
