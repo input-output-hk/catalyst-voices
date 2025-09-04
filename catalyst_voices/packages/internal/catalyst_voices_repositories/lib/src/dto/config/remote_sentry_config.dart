@@ -6,20 +6,22 @@ part 'remote_sentry_config.g.dart';
 final class RemoteSentryConfig {
   final String? dsn;
   final String? environment;
-  final String? release;
   final double? tracesSampleRate;
   final double? profilesSampleRate;
   final bool? enableAutoSessionTracking;
+  final bool? enableTimeToFullDisplayTracing;
+  final bool? enableLogs;
   final bool? attachViewHierarchy;
   final String? diagnosticLevel;
 
   const RemoteSentryConfig({
     this.dsn,
     this.environment,
-    this.release,
     this.tracesSampleRate,
     this.profilesSampleRate,
     this.enableAutoSessionTracking,
+    this.enableTimeToFullDisplayTracing,
+    this.enableLogs,
     this.attachViewHierarchy,
     this.diagnosticLevel,
   });
