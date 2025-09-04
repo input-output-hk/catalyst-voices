@@ -9,7 +9,6 @@ import 'package:path/path.dart' as p;
 
 // ignore: one_member_abstracts
 abstract interface class DownloaderService {
-
   const factory DownloaderService() = DownloaderServiceImpl;
 
   Future<String?> download({
