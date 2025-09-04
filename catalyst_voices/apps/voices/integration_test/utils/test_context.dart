@@ -1,6 +1,8 @@
 class TestContext {
   static final TestContext instance = TestContext._privateConstructor();
-  Map<String, String> context = {};
+
+  final Map<String, String> context = {};
+
   TestContext._privateConstructor();
 
   static void clearContext() {

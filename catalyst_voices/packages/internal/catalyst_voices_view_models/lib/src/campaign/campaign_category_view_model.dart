@@ -58,7 +58,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
     ),
     descriptions: List.filled(3, CategoryDescriptionViewModel.dummy()),
     image: CategoryImageUrl.image('1'),
-    submissionCloseDate: DateTime.now(),
+    submissionCloseDate: DateTimeExt.now(),
   );
 
   factory CampaignCategoryDetailsViewModel.fromModel(CampaignCategory model) {

@@ -5,11 +5,12 @@ import '../../utils/translations_utils.dart';
 import '../app_bar_page.dart';
 import 'onboarding_base_page.dart';
 
-class GetStartedPanel extends OnboardingPageBase {
+final class GetStartedPanel extends OnboardingPageBase {
   final getStartedMessage = const Key('GetStartedMessage');
   final getStartedQuestion = const Key('GetStartedQuestion');
   final createNewKeychain = const Key('CreateAccountType.createNew');
   final recoverKeychain = const Key('CreateAccountType.recover');
+
   GetStartedPanel(super.$);
 
   Future<void> clickCreateNewKeychain() async {
