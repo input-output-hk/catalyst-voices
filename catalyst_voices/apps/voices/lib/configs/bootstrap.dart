@@ -19,19 +19,22 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_strategy/url_strategy.dart';
 
+const CatalystProfiler _profiler = _shouldUseSentry
+    ? CatalystSentryProfiler()
+    : CatalystNoopProfiler();
 const ReportingService _reportingService = _shouldUseSentry
     ? SentryReportingService()
-    : NoOpReportingService();
+    : NoopReportingService();
 
 const _shouldUseSentry = kReleaseMode || kProfileMode;
 
 var _bootstrapInitState = const _BootstrapState();
 
-final _bootstrapLogger = Logger('Bootstrap');
-final _flutterLogger = Logger('Flutter');
+final _loggerBootstrap = Logger('Bootstrap');
+final _loggerFlutter = Logger('Flutter');
+final _loggerPlatformDispatcher = Logger('PlatformDispatcher');
+final _loggerUncaughtZone = Logger('UncaughtZone');
 final _loggingService = LoggingService();
-final _platformDispatcherLogger = Logger('PlatformDispatcher');
-final _uncaughtZoneLogger = Logger('UncaughtZone');
 
 @visibleForTesting
 AppConfig? get appConfig => _bootstrapInitState.appConfig;
@@ -50,6 +53,8 @@ Future<BootstrapArgs> bootstrap({
   AppEnvironment? environment,
   String? initialLocation,
 }) async {
+  final bootstrapStartTimestamp = DateTimeExt.now(utc: true);
+
   await _loggingService.init();
 
   if (!_bootstrapInitState.didSetPathUrlStrategy) {
@@ -60,23 +65,35 @@ Future<BootstrapArgs> bootstrap({
 
   EquatableConfig.stringify = kDebugMode;
 
+  // app config
+  final startConfigTimestamp = DateTimeExt.now(utc: true);
   environment ??= AppEnvironment.fromEnv();
   final config = await _getAppConfig(env: environment.type);
   _bootstrapInitState = _bootstrapInitState.copyWith(appConfig: Optional(config));
 
+  final endConfigTimestamp = DateTimeExt.now(utc: true);
+
+  await _reportingService.init(config: config.sentry);
+  await cleanUpStorages(onlyOld: true);
   if (!_bootstrapInitState.didInitializeCryptoUtils) {
     await _initCryptoUtils();
     _bootstrapInitState = _bootstrapInitState.copyWith(didInitializeCryptoUtils: true);
   }
 
-  await cleanUpStorages(onlyOld: true);
-  await _reportingService.init(config: config.sentry);
+  // profilers
+  final startupProfiler = CatalystStartupProfiler(_profiler)
+    ..start(at: bootstrapStartTimestamp)
+    ..appConfig(
+      fromTo: DateRange(from: startConfigTimestamp, to: endConfigTimestamp),
+    );
 
   await Dependencies.instance.init(
     config: config,
     environment: environment,
     loggingService: _loggingService,
     reportingService: _reportingService,
+    profiler: _profiler,
+    startupProfiler: startupProfiler,
   );
 
   final router = buildAppRouter(initialLocation: initialLocation);
@@ -86,7 +103,9 @@ Future<BootstrapArgs> bootstrap({
   Bloc.observer = AppBlocObserver(logOnChange: false);
 
   Dependencies.instance.get<ReportingServiceMediator>().init();
-  Dependencies.instance.get<SyncManager>().start().ignore();
+  unawaited(
+    startupProfiler.documentsSync(body: () => Dependencies.instance.get<SyncManager>().start()),
+  );
 
   return BootstrapArgs(
     routerConfig: router,
@@ -168,12 +187,12 @@ void registerConfig(AppConfig config) {
 Future<void> registerDependencies({
   AppEnvironment environment = const AppEnvironment.dev(),
   LoggingService? loggingService,
-  ReportingService reportingService = const NoOpReportingService(),
+  ReportingService reportingService = const NoopReportingService(),
 }) async {
   await Dependencies.instance.init(
     config: AppConfig.env(environment.type),
     environment: environment,
-    loggingService: loggingService ?? NoOpLoggingService(),
+    loggingService: loggingService ?? NoopLoggingService(),
     reportingService: reportingService,
   );
 }
@@ -222,12 +241,12 @@ Future<void> _initCryptoUtils() async {
 }
 
 Future<void> _reportBootstrapError(Object error, StackTrace stack) async {
-  _bootstrapLogger.severe('Error while bootstrapping', error, stack);
+  _loggerBootstrap.severe('Error while bootstrapping', error, stack);
 }
 
 /// Flutter-specific assertion failures and contract violations.
 Future<void> _reportFlutterError(FlutterErrorDetails details) async {
-  _flutterLogger.severe(
+  _loggerFlutter.severe(
     details.context?.toStringDeep(),
     details.exception,
     details.stack,
@@ -236,7 +255,7 @@ Future<void> _reportFlutterError(FlutterErrorDetails details) async {
 
 /// Platform Dispatcher Errors reporting
 bool _reportPlatformDispatcherError(Object error, StackTrace stack) {
-  _platformDispatcherLogger.severe('Platform Error', error, stack);
+  _loggerPlatformDispatcher.severe('Platform Error', error, stack);
 
   // return true to prevent default error handling
   return true;
@@ -249,9 +268,9 @@ void _reportUncaughtZoneError(
   bool severe = true,
 }) {
   if (severe) {
-    _uncaughtZoneLogger.severe('Uncaught Error', error, stack);
+    _loggerUncaughtZone.severe('Uncaught Error', error, stack);
   } else {
-    _uncaughtZoneLogger.finer('Uncaught Error', error, stack);
+    _loggerUncaughtZone.finer('Uncaught Error', error, stack);
   }
 }
 
