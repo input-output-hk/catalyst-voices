@@ -43,6 +43,8 @@ builder-src:
     # Generate Checksums of the source
     DO rust-ci+FINGERPRINT_SRC
     SAVE ARTIFACT ../src_fingerprint.txt
+    SAVE ARTIFACT . build-src-dir
+    SAVE ARTIFACT /usr/local/cargo/bin/cargo-nextest cargo-nextest
 
 ## -----------------------------------------------------------------------------
 ##
