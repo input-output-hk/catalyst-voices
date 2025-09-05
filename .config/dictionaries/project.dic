@@ -81,8 +81,8 @@ dalek
 damian-molinski
 daos
 DAPPLICATION
-dartify
 dartdoc
+dartify
 dashmap
 dbeaver
 dbschema
@@ -93,6 +93,7 @@ Deleg
 delegators
 devnet
 devs
+dhttpd
 DIND
 dockerenv
 dockerhub
@@ -102,11 +103,10 @@ donts
 dotenv
 dotenvy
 dotglob
-dhttpd
 drep
 dreps
-dtscalac
 dt-iohk
+dtscalac
 earthfile
 earthlyignore
 Easterling
