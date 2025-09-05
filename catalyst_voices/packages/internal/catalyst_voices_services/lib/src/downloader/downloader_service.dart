@@ -26,9 +26,10 @@ final class DownloaderServiceImpl implements DownloaderService {
     required String filename,
   }) async {
     final envType = AppEnvironment.fromEnv().type;
-    final strategy = FileSaveStrategyFactory.getDefaultStrategy();
+    final strategyType = FileSaveStrategyFactory.getDefaultStrategyType();
+    final strategy = FileSaveStrategyFactory.getStrategy(type: strategyType);
 
-    final fileUri = await _buildSaveUri(filename, strategy, envType);
+    final fileUri = await _buildSaveUri(filename, strategyType, envType);
 
     return strategy.saveFile(
       data: data,
@@ -38,14 +39,14 @@ final class DownloaderServiceImpl implements DownloaderService {
 
   Future<Uri> _buildSaveUri(
     String filename,
-    FileSaveStrategy strategy,
+    FileSaveStrategyType strategyType,
     AppEnvironmentType envType,
   ) async {
-    final flavorName = _getFlavorName(strategy, envType);
+    final flavorName = _getFlavorName(strategyType, envType);
     final fileWithoutExtension = p.withoutExtension(filename);
     final extensionName = p.extension(filename);
 
-    final downloadPath = await _getDownloadPathIfNeeded(strategy);
+    final downloadPath = await _getDownloadPathIfNeeded(strategyType);
     final uniqueFilename = '$fileWithoutExtension$flavorName$extensionName';
 
     return Uri.file(
@@ -54,16 +55,16 @@ final class DownloaderServiceImpl implements DownloaderService {
     );
   }
 
-  Future<String?> _getDownloadPathIfNeeded(FileSaveStrategy strategy) async {
-    if (strategy.type == FileSaveStrategyType.downloadsDirectory) {
+  Future<String?> _getDownloadPathIfNeeded(FileSaveStrategyType strategyType) async {
+    if (strategyType == FileSaveStrategyType.downloadsDirectory) {
       final downloadDir = await getDownloadDirectory();
       return downloadDir.path;
     }
     return null;
   }
 
-  String _getFlavorName(FileSaveStrategy strategy, AppEnvironmentType envType) {
-    if (strategy.type == FileSaveStrategyType.filePicker) {
+  String _getFlavorName(FileSaveStrategyType strategyType, AppEnvironmentType envType) {
+    if (strategyType == FileSaveStrategyType.filePicker) {
       return envType.fileFlavorName;
     } else {
       // For downloads directory, skip flavor on iOS

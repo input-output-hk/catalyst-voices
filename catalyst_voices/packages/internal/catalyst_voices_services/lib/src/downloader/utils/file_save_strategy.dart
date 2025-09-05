@@ -13,12 +13,6 @@ final class DownloadsDirectorySaveStrategy implements FileSaveStrategy {
   const DownloadsDirectorySaveStrategy();
 
   @override
-  bool get isSupported => !CatalystPlatform.isWeb;
-
-  @override
-  FileSaveStrategyType get type => FileSaveStrategyType.downloadsDirectory;
-
-  @override
   Future<String?> saveFile({
     required Uint8List data,
     required Uri fileUri,
@@ -50,12 +44,6 @@ final class FilePickerSaveStrategy implements FileSaveStrategy {
   const FilePickerSaveStrategy();
 
   @override
-  bool get isSupported => true; // FilePicker should work on all platforms
-
-  @override
-  FileSaveStrategyType get type => FileSaveStrategyType.filePicker;
-
-  @override
   Future<String?> saveFile({
     required Uint8List data,
     required Uri fileUri,
@@ -76,13 +64,9 @@ final class FilePickerSaveStrategy implements FileSaveStrategy {
 }
 
 /// Abstract interface for file saving strategies
+// ignore: one_member_abstracts
 abstract interface class FileSaveStrategy {
   const FileSaveStrategy();
-
-  /// Whether this strategy is supported on the current platform
-  bool get isSupported;
-
-  FileSaveStrategyType get type;
 
   /// Saves the file represented by the [data] bytes with the given [fileUri].
   /// Returns the path where the file was saved.
@@ -97,12 +81,11 @@ class FileSaveStrategyFactory {
   const FileSaveStrategyFactory();
 
   /// Returns the default strategy for the current platform
-  static FileSaveStrategy getDefaultStrategy() {
+  static FileSaveStrategyType getDefaultStrategyType() {
     return switch (CatalystOperatingSystem.current) {
-      _ when CatalystPlatform.isWeb || CatalystOperatingSystem.current.isIOS => getStrategy(
-        type: FileSaveStrategyType.filePicker,
-      ),
-      _ => getStrategy(type: FileSaveStrategyType.filePicker),
+      _ when CatalystPlatform.isWeb || CatalystOperatingSystem.current.isIOS =>
+        FileSaveStrategyType.filePicker,
+      _ => FileSaveStrategyType.downloadsDirectory,
     };
   }
 
