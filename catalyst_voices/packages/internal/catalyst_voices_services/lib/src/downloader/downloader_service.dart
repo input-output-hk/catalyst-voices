@@ -72,7 +72,7 @@ final class DownloaderServiceImpl implements DownloaderService {
   }
 }
 
-extension AppEnvironmentTypeName on AppEnvironmentType {
+extension on AppEnvironmentType {
   String get fileFlavorName => switch (this) {
     AppEnvironmentType.dev => '_dev',
     AppEnvironmentType.preprod => '_preprod',

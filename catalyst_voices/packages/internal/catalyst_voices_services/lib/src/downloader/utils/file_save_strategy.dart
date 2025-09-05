@@ -98,12 +98,11 @@ class FileSaveStrategyFactory {
 
   /// Returns the default strategy for the current platform
   static FileSaveStrategy getDefaultStrategy() {
-    if (CatalystPlatform.isWeb) {
-      return getStrategy(type: FileSaveStrategyType.filePicker);
-    }
     return switch (CatalystOperatingSystem.current) {
-      CatalystOperatingSystem.iOS => getStrategy(type: FileSaveStrategyType.filePicker),
-      _ => getStrategy(type: FileSaveStrategyType.downloadsDirectory),
+      _ when CatalystPlatform.isWeb || CatalystOperatingSystem.current.isIOS => getStrategy(
+        type: FileSaveStrategyType.filePicker,
+      ),
+      _ => getStrategy(type: FileSaveStrategyType.filePicker),
     };
   }
 
