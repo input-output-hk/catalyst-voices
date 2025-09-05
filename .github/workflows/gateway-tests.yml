@@ -51,9 +51,24 @@ jobs:
       - name: Spin up catalyst-gateway
         if: always()
         run: |
-              docker compose -f catalyst-gateway/tests/docker-compose.yml run --rm event-db-v1-migrations \
-              && docker compose -f catalyst-gateway/tests/docker-compose.yml run --rm event-db-migrations \
-              && docker compose -f catalyst-gateway/tests/docker-compose.yml up -d --wait cat-gateway
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway -d
+
+      - name: Wait for cat-gateway to become healthy
+        run: |
+              echo "Waiting for container to be healthy..."
+              for i in {1..500}; do
+                STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
+                echo "Health status: $STATUS"
+                if [ "$STATUS" == "healthy" ]; then
+                  echo "Container is healthy!"
+                  break
+                fi
+                if [ "$STATUS" == "unhealthy" ]; then
+                  echo "Container became unhealthy."
+                  exit 1
+                fi
+                sleep 5
+              done
 
       - name: Schemathesis tests
         if: always()
