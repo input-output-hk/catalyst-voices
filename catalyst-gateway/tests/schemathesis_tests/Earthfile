@@ -4,12 +4,7 @@ package:
     FROM python:3.12-alpine3.20
 
     ARG version=3.39.16
-    ARG API_SPEC=http://cat-gateway:3030/docs/cat-gateway.json
-    ARG WAIT_FOR_SCHEMA=500
-    ARG MAX_RESPONSE_TIME=5000
-    ARG HYPOTHESIS_MAX_EXAMPLES=1000
-     # place a seed value to reproduce some specific schemathesis test scenario
-    ARG SEED
+
     RUN apk add --no-cache gcc musl-dev
     RUN python -m pip install schemathesis==$version
     RUN python -m pip install cbor2
