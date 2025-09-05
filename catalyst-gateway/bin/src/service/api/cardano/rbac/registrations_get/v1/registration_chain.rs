@@ -1,4 +1,4 @@
-//! RBAC registration chain.
+//! RBAC registration V1 chain.
 
 use std::collections::HashMap;
 
@@ -9,7 +9,8 @@ use crate::{
     rbac::ChainInfo,
     service::{
         api::cardano::rbac::registrations_get::{
-            purpose_list::PurposeList, role_data::RbacRoleData, role_map::RoleMap,
+            purpose_list::PurposeList,
+            v1::{role_data::RbacRoleData, role_map::RoleMap},
         },
         common::types::{
             cardano::{catalyst_id::CatalystId, transaction_id::TxnId},
@@ -57,6 +58,7 @@ impl RbacRegistrationChain {
     /// Creates a new registration chain instance.
     pub fn new(info: &ChainInfo) -> anyhow::Result<Self> {
         let catalyst_id = info.chain.catalyst_id().clone().into();
+
         let last_persistent_txn = info.last_persistent_txn.map(Into::into);
         let last_volatile_txn = info.last_volatile_txn.map(Into::into);
         let purpose = info
