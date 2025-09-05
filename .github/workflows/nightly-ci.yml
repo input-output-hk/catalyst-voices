@@ -67,13 +67,15 @@ jobs:
 
   slack:
     name: slack notification
+    needs: tests
     runs-on: ubuntu-latest
+    if: success()
     steps:
       - uses: slackapi/slack-github-action@v2.1.1
         with:
           payload: |
               {
-                "text": ":rocket: *Nightly Tests Failed*"
+                "text": ":😭: *Nightly Tests Failed*"
               }
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           webhook-type: webhook-trigger
