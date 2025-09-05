@@ -11,8 +11,8 @@ use catalyst_types::{
 use ed25519_dalek::VerifyingKey;
 use futures::StreamExt;
 use rbac_registration::{
-    cardano::cip509::{Cip509, Cip0134UriSet},
-    registration::cardano::RegistrationChain
+    cardano::cip509::{Cip0134UriSet, Cip509},
+    registration::cardano::RegistrationChain,
 };
 
 use crate::{
