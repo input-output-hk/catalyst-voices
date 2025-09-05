@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_linear_progress_indicator.dart';
@@ -7,9 +8,9 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 
@@ -236,23 +237,12 @@ class _UploadContainerState extends State<_UploadContainer> {
                 ),
               InkWell(
                 onTap: () async {
-                  final result = await FilePicker.platform.pickFiles(
-                    type: (widget.allowedExtensions != null) ? FileType.custom : FileType.any,
-                    allowedExtensions: (widget.allowedExtensions != null)
-                        ? widget.allowedExtensions!
-                        : null,
+                  final service = Dependencies.instance.get<UploaderService>();
+                  final pickedFile = await service.uploadFile(
+                    allowedExtensions: widget.allowedExtensions,
                   );
-                  final file = result?.files.first;
-                  final name = file?.name;
-                  final bytes = file?.bytes;
-
-                  if (name != null && bytes != null) {
-                    widget.onFileSelected?.call(
-                      VoicesFile(
-                        name: name,
-                        bytes: bytes,
-                      ),
-                    );
+                  if (pickedFile != null) {
+                    widget.onFileSelected?.call(pickedFile);
                   }
                 },
                 child: Container(
