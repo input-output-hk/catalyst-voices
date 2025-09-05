@@ -15,13 +15,6 @@ all-images:
     BUILD +package-event-db-v1
     BUILD +package-haproxy
 
-# build all necessary docker images required to run `docker-compose.yml` services
-all-nightly-images:
-    FROM scratch
-    BUILD gateway+docker
-    BUILD ../event-db+docker
-    BUILD ./schemathesis_tests+package
-
 # a special package for applying migrations only up to "V2_**" migrations
 package-event-db-v1:
     FROM github.com/input-output-hk/catalyst-voices/catalyst-gateway/event-db:event-db-old-signed-doc+docker

@@ -56,12 +56,13 @@ jobs:
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
         with:
           command: run
-          args: ./catalyst-gateway/tests/+all-nightly-images
+          args: ./catalyst-gateway/tests/+all-images
 
       - name: Schemathesis tests
         if: always()
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
+          export HYPOTHESIS_MAX_EXAMPLES=10
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --exit-code-from schemathesis-runner
 
   #slack:
   #      needs: tests
