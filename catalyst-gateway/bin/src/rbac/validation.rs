@@ -453,7 +453,7 @@ async fn is_cat_id_known(
 /// Returns a set of stake addresses in the given registration.
 fn cip509_stake_addresses(cip509: &Cip509) -> HashSet<StakeAddress> {
     cip509
-        .metadata()
-        .map(|m| m.certificate_uris.stake_addresses())
+        .certificate_uris()
+        .map(|u| u.stake_addresses())
         .unwrap_or_default()
 }
