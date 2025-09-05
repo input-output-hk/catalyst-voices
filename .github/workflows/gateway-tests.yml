@@ -3,6 +3,10 @@ name: Cat Gateway integration tests
 on:
   workflow_call:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+  
 env:
   REPORT_EXT: .junit-report.xml
   COVERAGE_EXT: .coverage.info
