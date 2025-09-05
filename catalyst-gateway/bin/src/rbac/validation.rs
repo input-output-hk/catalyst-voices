@@ -10,7 +10,7 @@ use catalyst_types::{
 };
 use ed25519_dalek::VerifyingKey;
 use futures::StreamExt;
-use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
+use rbac_registration::{cardano::cip509::{Cip509, Cip0134UriSet}, registration::cardano::RegistrationChain};
 
 use crate::{
     db::index::{
@@ -454,6 +454,6 @@ async fn is_cat_id_known(
 fn cip509_stake_addresses(cip509: &Cip509) -> HashSet<StakeAddress> {
     cip509
         .certificate_uris()
-        .map(|u| u.stake_addresses())
+        .map(Cip0134UriSet::stake_addresses)
         .unwrap_or_default()
 }
