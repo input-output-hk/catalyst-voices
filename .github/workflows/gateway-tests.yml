@@ -45,13 +45,13 @@ jobs:
       - name: Rust integration tests
         if: always()
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up rust-tests-runner --abort-on-container-exit --exit-code-from rust-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up rust-tests-runner  --exit-code-from rust-tests-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml down
 
       - name: Spin up catalyst-gateway
         if: always()
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway -d
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway -detach
 
       - name: Wait for cat-gateway to become healthy
         run: |
@@ -73,7 +73,7 @@ jobs:
       - name: Schemathesis tests
         if: always()
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner  --exit-code-from schemathesis-runner
           docker cp schemathesis-runner:/results/junit-report.xml ./schemathesis${{ env.REPORT_EXT }}
 
       - name: Integration API tests
@@ -81,7 +81,7 @@ jobs:
         env:
           API_TEST_MARKS: "preprod_indexing or unmarked"
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner  --exit-code-from api-tests-runner
           docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
           docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
 
@@ -90,7 +90,7 @@ jobs:
         env:
           API_TEST_MARKS: "health_endpoint"
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner  --exit-code-from api-tests-runner
 
 # Skip until bugfix https://github.com/input-output-hk/catalyst-voices/issues/3209
       - name: Integration health thru proxy tests
@@ -102,7 +102,7 @@ jobs:
         run: |
           docker stop cat-gateway || true
           docker compose -f catalyst-gateway/tests/docker-compose.yml up haproxy --detach
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner  --exit-code-from api-tests-runner
 
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
