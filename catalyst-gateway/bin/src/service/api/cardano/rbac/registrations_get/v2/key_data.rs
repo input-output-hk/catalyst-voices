@@ -5,7 +5,6 @@ use std::collections::HashMap;
 use anyhow::Context;
 use c509_certificate::c509::C509;
 use cardano_chain_follower::Point;
-use chrono::{DateTime, Utc};
 use ed25519_dalek::VerifyingKey;
 use minicbor::{encode::Encode, Encoder};
 use poem_openapi::{types::Example, Object};
@@ -13,13 +12,20 @@ use rbac_registration::{
     cardano::cip509::{KeyLocalRef, LocalRefInt, PointData},
     registration::cardano::RegistrationChain,
 };
-use x509_cert::{certificate::Certificate as X509Certificate, der::Encode as _};
+use x509_cert::certificate::Certificate as X509Certificate;
 
 use crate::service::{
-    api::cardano::rbac::registrations_get::{binary_data::HexEncodedBinaryData, key_type::KeyType},
-    common::types::generic::{
-        boolean::BooleanFlag, date_time::DateTime as ServiceDateTime,
-        ed25519_public_key::Ed25519HexEncodedPublicKey,
+    api::cardano::rbac::registrations_get::{
+        key_type::{KeyType, KeyTypeWrapper},
+        pem::Pem,
+        v2::{c509::HexEncodedC509, key_value::KeyValueWrapper},
+    },
+    common::types::{
+        cardano::{slot_no::SlotNo, txn_index::TxnIndex},
+        generic::{
+            boolean::BooleanFlag, date_time::DateTime,
+            ed25519_public_key::Ed25519HexEncodedPublicKey,
+        },
     },
 };
 
@@ -30,42 +36,52 @@ pub struct KeyData {
     /// Indicates if the data is persistent or volatile.
     is_persistent: BooleanFlag,
     /// A time when the data was added.
-    time: ServiceDateTime,
+    time: DateTime,
+    /// A block slot number.
+    slot: SlotNo,
+    /// A transaction index.
+    txn_index: TxnIndex,
     /// A type of the key.
-    key_type: KeyType,
+    key_type: KeyTypeWrapper,
     /// A value of the key.
-    key_value: Option<HexEncodedBinaryData>,
+    ///
+    /// The key was deleted if this field is absent or nil.
+    key_value: Option<KeyValueWrapper>,
 }
 
 impl KeyData {
     /// Creates a new `KeyData` instance.
     pub fn new(
         is_persistent: bool,
-        time: DateTime<Utc>,
+        time: DateTime,
+        slot: SlotNo,
+        txn_index: TxnIndex,
         key_ref: &KeyLocalRef,
         point: &Point,
         chain: &RegistrationChain,
     ) -> anyhow::Result<Self> {
-        let key_value;
-
-        let key_type = match key_ref.local_ref {
+        let key_type;
+        let key_value = match key_ref.local_ref {
             LocalRefInt::X509Certs => {
-                key_value = encode_x509(chain.x509_certs(), key_ref.key_offset, point)?;
-                KeyType::X509
+                key_type = KeyTypeWrapper(KeyType::X509);
+                encode_x509(chain.x509_certs(), key_ref.key_offset, point)?.map(Into::into)
             },
             LocalRefInt::C509Certs => {
-                key_value = encode_c509(chain.c509_certs(), key_ref.key_offset, point)?;
-                KeyType::C509
+                key_type = KeyTypeWrapper(KeyType::C509);
+                encode_c509(chain.c509_certs(), key_ref.key_offset, point)?.map(Into::into)
             },
             LocalRefInt::PubKeys => {
-                key_value = convert_pub_key(chain.simple_keys(), key_ref.key_offset, point)?;
-                KeyType::Pubkey
+                key_type = KeyTypeWrapper(KeyType::Pubkey);
+                convert_pub_key(chain.simple_keys(), key_ref.key_offset, point)?.map(Into::into)
             },
-        };
+        }
+        .map(KeyValueWrapper);
 
         Ok(Self {
             is_persistent: is_persistent.into(),
-            time: time.into(),
+            time,
+            slot,
+            txn_index,
             key_type,
             key_value,
         })
@@ -76,9 +92,11 @@ impl Example for KeyData {
     fn example() -> Self {
         Self {
             is_persistent: BooleanFlag::example(),
-            time: ServiceDateTime::example(),
-            key_type: KeyType::X509,
-            key_value: Some(HexEncodedBinaryData::example()),
+            time: DateTime::example(),
+            slot: SlotNo::example(),
+            txn_index: TxnIndex::example(),
+            key_type: KeyTypeWrapper::example(),
+            key_value: Some(KeyValueWrapper::example()),
         }
     }
 }
@@ -88,7 +106,7 @@ fn encode_x509(
     certs: &HashMap<usize, Vec<PointData<Option<X509Certificate>>>>,
     offset: usize,
     point: &Point,
-) -> anyhow::Result<Option<HexEncodedBinaryData>> {
+) -> anyhow::Result<Option<Pem>> {
     certs
         .get(&offset)
         .with_context(|| format!("Invalid X509 certificate offset: {offset:?}"))?
@@ -97,11 +115,7 @@ fn encode_x509(
         .with_context(|| format!("Unable to find X509 certificate for the given point {point}"))?
         .data()
         .as_ref()
-        .map(|cert| {
-            cert.to_der()
-                .context("Failed to encode X509 certificate")
-                .map(Into::into)
-        })
+        .map(TryInto::try_into)
         .transpose()
 }
 
@@ -110,7 +124,7 @@ fn encode_c509(
     certs: &HashMap<usize, Vec<PointData<Option<C509>>>>,
     offset: usize,
     point: &Point,
-) -> anyhow::Result<Option<HexEncodedBinaryData>> {
+) -> anyhow::Result<Option<HexEncodedC509>> {
     certs
         .get(&offset)
         .with_context(|| format!("Invalid C509 certificate offset: {offset:?}"))?
@@ -135,7 +149,7 @@ fn convert_pub_key(
     keys: &HashMap<usize, Vec<PointData<Option<VerifyingKey>>>>,
     offset: usize,
     point: &Point,
-) -> anyhow::Result<Option<HexEncodedBinaryData>> {
+) -> anyhow::Result<Option<Ed25519HexEncodedPublicKey>> {
     Ok(keys
         .get(&offset)
         .with_context(|| format!("Invalid pub key offset: {offset}"))?
@@ -143,5 +157,5 @@ fn convert_pub_key(
         .find(|d| d.point() == point)
         .with_context(|| format!("Unable to find pub key for the given point {point}"))?
         .data()
-        .map(|k| Ed25519HexEncodedPublicKey::from(k).into()))
+        .map(Into::into))
 }
