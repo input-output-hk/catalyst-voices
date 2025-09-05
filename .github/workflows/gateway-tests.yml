@@ -1,9 +1,12 @@
-# cspell: words janitoring
 name: Cat Gateway integration tests
 
 on:
   workflow_call:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+  
 env:
   REPORT_EXT: .junit-report.xml
   COVERAGE_EXT: .coverage.info
@@ -37,39 +40,66 @@ jobs:
           version: 0.21.0
       - name: Setup
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
+
       - name: Prepare artifacts
+        id : images
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
         with:
           command: run
           args: ./catalyst-gateway/tests/+all-images
 
       - name: Rust integration tests
-        if: always()
+        if: ${{ steps.images.conclusion == 'success' }}
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up rust-tests-runner --abort-on-container-exit --exit-code-from rust-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up rust-tests-runner --exit-code-from rust-tests-runner
           docker compose -f catalyst-gateway/tests/docker-compose.yml down
 
-      - name: Schemathesis tests
-        if: always()
+      - name: Spin up catalyst-gateway
+        id: gateway-started
+        if: ${{ steps.images.conclusion == 'success' }}
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --abort-on-container-exit --exit-code-from schemathesis-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway --detach
+
+      - name: Wait for cat-gateway to become healthy
+        id: gateway-healthy
+        if: ${{ steps.gateway-started.conclusion == 'success' }}
+        run: |
+              echo "Waiting for container to be healthy..."
+              for i in {1..500}; do
+                STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
+                echo "Health status: $STATUS"
+                if [ "$STATUS" == "healthy" ]; then
+                  echo "Container is healthy!"
+                  break
+                fi
+                if [ "$STATUS" == "unhealthy" ]; then
+                  echo "Container became unhealthy."
+                  exit 1
+                fi
+                sleep 5
+              done
+
+      - name: Schemathesis tests
+        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --exit-code-from schemathesis-runner
           docker cp schemathesis-runner:/results/junit-report.xml ./schemathesis${{ env.REPORT_EXT }}
 
       - name: Integration API tests
-        if: always()
+        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
         env:
           API_TEST_MARKS: "preprod_indexing or unmarked"
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
           docker cp api-tests-runner:/poetry/junit-report.xml ./api-tests${{ env.REPORT_EXT }}
           docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
 
       - name: Integration health tests
-        if: always()
+        if: ${{ steps.gateway-healthy.conclusion == 'success' }})
         env:
           API_TEST_MARKS: "health_endpoint"
         run: |
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
 
 # Skip until bugfix https://github.com/input-output-hk/catalyst-voices/issues/3209
       - name: Integration health thru proxy tests
@@ -81,11 +111,11 @@ jobs:
         run: |
           docker stop cat-gateway || true
           docker compose -f catalyst-gateway/tests/docker-compose.yml up haproxy --detach
-          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --abort-on-container-exit --exit-code-from api-tests-runner
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
 
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
-        if: always()
+        if: success() || failure()
         with:
           name: test-reports-gateway
           path: "**/*${{ env.REPORT_EXT }}"
@@ -94,7 +124,7 @@ jobs:
 
       - name: Collect and upload test coverage
         uses: actions/upload-artifact@v4
-        if: always()
+        if: success() || failure()
         with:
           name: coverage-reports-gateway
           path: "**/*${{ env.COVERAGE_EXT }}"
