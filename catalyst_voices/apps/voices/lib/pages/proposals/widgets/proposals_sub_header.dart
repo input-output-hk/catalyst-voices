@@ -14,8 +14,14 @@ class ProposalsSubHeader extends StatelessWidget {
       children: [
         _TitleText(),
         Spacer(),
-        ProposalsLatestUpdated(),
-        ProposalsOrderDropdown(),
+        Wrap(
+          spacing: 10,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            ProposalsLatestUpdated(),
+            ProposalsOrderDropdown(),
+          ],
+        ),
       ],
     );
   }
