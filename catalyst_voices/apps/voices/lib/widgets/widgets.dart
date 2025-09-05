@@ -38,6 +38,8 @@ export 'document/document_version_selector.dart';
 export 'document_builder/document_property_builder.dart';
 export 'drawer/voices_drawer.dart';
 export 'drawer/voices_drawer_space_chooser.dart';
+export 'dropdown/campaign_category_picker.dart';
+export 'dropdown/single_select_dropdown.dart';
 export 'footers/links_page_footer.dart';
 export 'footers/standard_links_page_footer.dart';
 export 'form/voices_form_field.dart';

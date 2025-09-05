@@ -2073,6 +2073,10 @@
   "@orderProposalsUpdateDateDesc": {
     "description": "Order proposals by update date option"
   },
+  "defaultProposalsOrder": "Default",
+  "@defaultProposalsOrder": {
+    "description": "Ordering options for proposals"
+  },
   "paginationProposalsCounter": "{from}-{to} of {max} {max, plural, =0{proposals} =1{proposal} other{proposals}}",
   "@paginationProposalsCounter": {
     "description": "Below pagination list, next to page switch controls",

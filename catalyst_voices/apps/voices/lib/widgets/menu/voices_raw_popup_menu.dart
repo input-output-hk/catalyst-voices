@@ -4,11 +4,15 @@ import 'package:flutter/material.dart';
 /// Opinionated widget to be used in [VoicesRawPopupMenuButton.menuBuilder].
 class VoicesRawPopupMenu extends StatelessWidget {
   final ShapeBorder? shape;
+  final EdgeInsetsGeometry? padding;
+  final BoxConstraints? constraints;
   final Widget child;
 
   const VoicesRawPopupMenu({
     super.key,
     this.shape,
+    this.padding,
+    this.constraints,
     required this.child,
   });
 
@@ -25,6 +29,8 @@ class VoicesRawPopupMenu extends StatelessWidget {
           BoxShadow(offset: Offset(0, 2), blurRadius: 6, spreadRadius: 2, color: Colors.black12),
         ],
       ),
+      padding: padding,
+      constraints: constraints,
       child: Material(
         type: MaterialType.transparency,
         child: child,
