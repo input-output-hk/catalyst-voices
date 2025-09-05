@@ -23,7 +23,7 @@ jobs:
       skip_release: true
 
   tests:
-    name: Nightly tests
+    name: nightly tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -53,25 +53,27 @@ jobs:
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
 
       - name: Prepare artifacts
+        id : images
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
         with:
           command: run
           args: ./catalyst-gateway/tests/+all-images
 
       - name: Schemathesis tests
-        if: always()
+        if: ${{ steps.images.conclusion == 'success' }}
         run: |
-          export HYPOTHESIS_MAX_EXAMPLES=10
+          export HYPOTHESIS_MAX_EXAMPLES=5000
           docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --exit-code-from schemathesis-runner
 
-  #slack:
-  #      needs: tests
-  #      if: needs.tests != 'success'
-  #      uses: slackapi/slack-github-action@v2.1.1
-  #      with:
-  #        payload: |
-  #          {
-  #            "text": ":rocket: *Nightly Tests Failed*"
-  #          }
-  #        webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-  #        webhook-type: webhook-trigger
+  slack:
+    name: slack notification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: slackapi/slack-github-action@v2.1.1
+        with:
+          payload: |
+              {
+                "text": ":rocket: *Nightly Tests Failed*"
+              }
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: webhook-trigger
