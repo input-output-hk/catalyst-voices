@@ -10,7 +10,7 @@ export 'formatter/cryptocurrency_formatter.dart';
 export 'formatter/wallet_address_formatter.dart';
 export 'logging/logger.dart';
 export 'platform/catalyst_platform.dart';
-export 'platform_aware_builder/platform_aware_builder.dart';
+export 'platform/platform.dart';
 export 'profiler/catalyst_startup_profiler.dart';
 export 'profiler/profiler.dart';
 export 'range/date_range.dart';
