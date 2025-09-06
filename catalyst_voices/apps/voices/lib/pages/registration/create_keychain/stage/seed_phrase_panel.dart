@@ -129,7 +129,10 @@ class _SeedPhraseWords extends StatelessWidget {
           VoicesTextButton(
             key: const Key('DownloadSeedPhraseButton'),
             onTap: () => unawaited(_exportSeedPhrase(context)),
-            child: Text(context.l10n.createKeychainSeedPhraseExport),
+            child: Text(
+              context.l10n.createKeychainSeedPhraseExport,
+              semanticsIdentifier: 'DownloadSeedPhraseButton',
+            ),
           ),
         ],
       ),
@@ -161,6 +164,7 @@ class _StoredCheckbox extends StatelessWidget {
       onChanged: (value) {
         RegistrationCubit.of(context).keychainCreation.setSeedPhraseStored(value);
       },
+      semanticsIdentifier: 'SeedPhraseStoredCheckbox',
     );
   }
 }

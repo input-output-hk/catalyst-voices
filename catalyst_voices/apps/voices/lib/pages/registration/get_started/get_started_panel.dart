@@ -46,6 +46,7 @@ class GetStartedPanel extends StatelessWidget {
                     icon: type._icon,
                     title: type._getTitle(context.l10n),
                     subtitle: type._getSubtitle(context.l10n),
+                    semanticsIdentifier: type.toString(),
                     onTap: () async {
                       switch (type) {
                         case CreateAccountType.createNew:

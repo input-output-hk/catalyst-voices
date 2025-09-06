@@ -33,6 +33,7 @@ class _ReceiveEmailsCheckbox extends StatelessWidget {
         RegistrationCubit.of(context).baseProfile.updateReceiveEmails(isAccepted: value);
       },
       isEnabled: data.isEnabled,
+      semanticsIdentifier: 'ReceiveEmailsCheckbox',
     );
   }
 }

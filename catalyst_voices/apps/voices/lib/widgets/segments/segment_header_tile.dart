@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -22,20 +23,24 @@ class SegmentHeaderTile extends StatelessWidget {
         final isOpened = value.openedSegments.contains(id);
         final hasSelectedStep = value.activeSectionId?.isChildOf(id) ?? false;
 
-        return SegmentHeader(
-          leading: ChevronExpandButton(
-            onTap: () => controller.toggleSegment(id),
-            isExpanded: isOpened,
-          ),
-          name: name,
-          isSelected: isOpened && hasSelectedStep,
-          onTap: () {
-            controller.toggleSegment(id);
+        return CombineSemantics(
+          identifier: 'SegmentHeaderTile[$id]',
+          container: true,
+          child: SegmentHeader(
+            leading: ChevronExpandButton(
+              onTap: () => controller.toggleSegment(id),
+              isExpanded: isOpened,
+            ),
+            name: name,
+            isSelected: isOpened && hasSelectedStep,
+            onTap: () {
+              controller.toggleSegment(id);
 
-            if (controller.value.openedSegments.contains(id)) {
-              controller.focusSection(id);
-            }
-          },
+              if (controller.value.openedSegments.contains(id)) {
+                controller.focusSection(id);
+              }
+            },
+          ),
         );
       },
     );

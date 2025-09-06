@@ -89,7 +89,10 @@ class _OpenSpaceButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       onTap: onTap,
-      child: Text(context.l10n.registrationCompletedButton),
+      child: Text(
+        context.l10n.registrationCompletedButton,
+        semanticsIdentifier: 'OpenSpaceButton',
+      ),
     );
   }
 }
@@ -97,15 +100,16 @@ class _OpenSpaceButton extends StatelessWidget {
 class _ReviewMyAccountButton extends StatelessWidget {
   final VoidCallback onTap;
 
-  const _ReviewMyAccountButton({
-    required this.onTap,
-  });
+  const _ReviewMyAccountButton({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return VoicesTextButton(
       onTap: onTap,
-      child: Text(context.l10n.registrationCompletedAccountButton),
+      child: Text(
+        context.l10n.registrationCompletedAccountButton,
+        semanticsIdentifier: 'ReviewMyAccountButton',
+      ),
     );
   }
 }
@@ -168,9 +172,7 @@ class _RolesFooter extends StatelessWidget {
 class _RolesSelectedCard extends StatelessWidget {
   final Set<AccountRole> roles;
 
-  const _RolesSelectedCard({
-    required this.roles,
-  });
+  const _RolesSelectedCard({required this.roles});
 
   @override
   Widget build(BuildContext context) {
@@ -217,20 +219,14 @@ class _TitleText extends StatelessWidget {
 class _WalletConnectedCard extends StatelessWidget {
   final String walletName;
 
-  const _WalletConnectedCard({
-    required this.walletName,
-  });
+  const _WalletConnectedCard({required this.walletName});
 
   @override
   Widget build(BuildContext context) {
     return ActionCard(
       icon: VoicesAssets.icons.wallet.buildIcon(),
-      title: Text(
-        context.l10n.registrationCompletedWalletTitle(walletName),
-      ),
-      desc: Text(
-        context.l10n.registrationCompletedWalletInfo(walletName),
-      ),
+      title: Text(context.l10n.registrationCompletedWalletTitle(walletName)),
+      desc: Text(context.l10n.registrationCompletedWalletInfo(walletName)),
       statusIcon: VoicesAssets.icons.check.buildIcon(),
     );
   }

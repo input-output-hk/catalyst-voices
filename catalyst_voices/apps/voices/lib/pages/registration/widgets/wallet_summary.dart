@@ -141,9 +141,13 @@ class _WalletSummaryAddress extends StatelessWidget {
             key: const Key('WalletAddressValue'),
           ),
           const SizedBox(width: 4),
-          VoicesClipboardIconButton(clipboardData: clipboardAddress),
+          VoicesClipboardIconButton(
+            clipboardData: clipboardAddress,
+            semanticsIdentifier: 'WalletAddressClipboardIcon',
+          ),
         ],
       ),
+      semanticsIdentifier: 'WalletAddress',
     );
   }
 }
@@ -183,6 +187,7 @@ class _WalletSummaryBalance extends StatelessWidget {
           ],
         ],
       ),
+      semanticsIdentifier: 'WalletBalance',
     );
   }
 }
@@ -190,31 +195,41 @@ class _WalletSummaryBalance extends StatelessWidget {
 class _WalletSummaryItem extends StatelessWidget {
   final Widget label;
   final Widget value;
+  final String semanticsIdentifier;
 
   const _WalletSummaryItem({
     required this.label,
     required this.value,
+    this.semanticsIdentifier = 'WalletSummaryItem',
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: DefaultTextStyle(
-            style: Theme.of(context).textTheme.labelMedium!.copyWith(
-              fontWeight: FontWeight.w800,
+    return Semantics(
+      identifier: semanticsIdentifier,
+      container: true,
+      child: Row(
+        children: [
+          Expanded(
+            child: DefaultTextStyle(
+              style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+              child: label,
             ),
-            child: label,
           ),
-        ),
-        Expanded(
-          child: DefaultTextStyle(
-            style: Theme.of(context).textTheme.labelMedium!,
-            child: value,
+          Expanded(
+            child: DefaultTextStyle(
+              style: Theme.of(context).textTheme.labelMedium!,
+              child: Semantics(
+                container: true,
+                identifier: '${semanticsIdentifier}Value',
+                child: value,
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -234,6 +249,7 @@ class _WalletSummaryName extends StatelessWidget {
         walletName.capitalize(),
         key: const Key('NameOfWalletValue'),
       ),
+      semanticsIdentifier: 'NameOfWallet',
     );
   }
 }

@@ -9,4 +9,6 @@ export enum BrowserExtensionName {
   Eternl = "Eternl",
   Yoroi = "Yoroi",
   Nufi = "Nufi",
+  Vespr = "Vespr",
+  NoExtension = "NoExtension",
 }

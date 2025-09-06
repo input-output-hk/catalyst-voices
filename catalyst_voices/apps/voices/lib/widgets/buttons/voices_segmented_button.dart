@@ -71,15 +71,19 @@ class VoicesSegmentedButton<T extends Object> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SegmentedButton(
-      key: const Key('SegmentedButton'),
-      segments: segments,
-      selected: selected,
-      onSelectionChanged: onChanged,
-      multiSelectionEnabled: multiSelectionEnabled,
-      emptySelectionAllowed: emptySelectionAllowed,
-      showSelectedIcon: showSelectedIcon,
-      style: style,
+    return Semantics(
+      identifier: 'VoicesSegmentedButton',
+      container: true,
+      child: SegmentedButton(
+        key: const Key('SegmentedButton'),
+        segments: segments,
+        selected: selected,
+        onSelectionChanged: onChanged,
+        multiSelectionEnabled: multiSelectionEnabled,
+        emptySelectionAllowed: emptySelectionAllowed,
+        showSelectedIcon: showSelectedIcon,
+        style: style,
+      ),
     );
   }
 }

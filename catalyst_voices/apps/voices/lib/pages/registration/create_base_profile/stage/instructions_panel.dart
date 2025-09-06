@@ -34,7 +34,10 @@ class _PanelMainMessage extends StatelessWidget {
     final l10n = context.l10n;
 
     return RegistrationStageMessage(
-      title: Text(l10n.createProfileInstructionsTitle),
+      title: Text(
+        l10n.createProfileInstructionsTitle,
+        semanticsIdentifier: 'createProfileInstructionsTitle',
+      ),
       spacing: 12,
       subtitle: Column(
         mainAxisSize: MainAxisSize.min,
@@ -43,6 +46,7 @@ class _PanelMainMessage extends StatelessWidget {
         children: [
           Text(
             l10n.createProfileInstructionsMessage(CardanoWalletDetails.minAdaForRegistration.ada),
+            semanticsIdentifier: 'createProfileInstructionsMessage',
           ),
         ],
       ),

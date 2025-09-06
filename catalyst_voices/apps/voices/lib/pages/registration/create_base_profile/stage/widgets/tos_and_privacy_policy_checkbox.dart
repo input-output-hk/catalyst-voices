@@ -30,6 +30,7 @@ class _TosAndPrivacyPolicyCheckbox extends StatelessWidget {
       onChanged: (value) {
         RegistrationCubit.of(context).baseProfile.updateTosAndPrivacyPolicy(accepted: value);
       },
+      semanticsIdentifier: 'tosAndPrivacyPolicyCheckbox',
     );
   }
 }

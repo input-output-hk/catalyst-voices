@@ -95,9 +95,7 @@ class _YesNoChoiceSegmentButton extends VoicesFormField<bool?> {
 
 class _YesNoChoiceWidgetState extends State<YesNoChoiceWidget> {
   bool get _isRequired => widget.schema.isRequired;
-
   String get _title => widget.schema.title;
-
   bool? get _value => widget.property.value ?? widget.schema.defaultValue;
 
   @override
