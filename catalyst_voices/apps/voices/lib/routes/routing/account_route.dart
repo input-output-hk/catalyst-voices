@@ -10,7 +10,10 @@ import 'package:go_router/go_router.dart';
 
 part 'account_route.g.dart';
 
-@TypedGoRoute<AccountRoute>(path: '/account')
+@TypedGoRoute<AccountRoute>(
+  path: '/account',
+  name: 'account',
+)
 final class AccountRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   const AccountRoute();

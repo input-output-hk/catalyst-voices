@@ -8,6 +8,7 @@ import 'package:catalyst_voices/widgets/indicators/voices_loading_indicator.dart
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
@@ -45,9 +46,11 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
   bool _areImagesAndVideosCached = false;
   bool _messageShownEnoughTime = true;
 
+  bool get _isReady => _areDocumentsSynced && _areImagesAndVideosCached && _messageShownEnoughTime;
+
   @override
   Widget build(BuildContext context) {
-    if (_areDocumentsSynced && _areImagesAndVideosCached && _messageShownEnoughTime) {
+    if (_isReady) {
       return widget.child;
     }
 
@@ -71,6 +74,19 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     unawaited(_handleImageAndVideoPrecache());
   }
 
+  void _finishStartupProfilerIfReady() {
+    if (!_isReady) {
+      return;
+    }
+
+    final profiler = Dependencies.instance.get<CatalystStartupProfiler>();
+    if (!profiler.ongoing) {
+      return;
+    }
+
+    profiler.finish();
+  }
+
   Future<void> _handleDocumentsSync() async {
     final syncManager = Dependencies.instance.get<SyncManager>();
     final campaignPhaseAwareCubit = context.read<CampaignPhaseAwareCubit>();
@@ -81,6 +97,7 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     if (mounted) {
       setState(() {
         _areDocumentsSynced = true;
+        _finishStartupProfilerIfReady();
       });
     }
   }
@@ -97,6 +114,7 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     if (mounted) {
       setState(() {
         _areImagesAndVideosCached = isInitialized.every((e) => e);
+        _finishStartupProfilerIfReady();
       });
     }
   }
@@ -105,6 +123,7 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     if (mounted) {
       setState(() {
         _messageShownEnoughTime = value;
+        _finishStartupProfilerIfReady();
       });
     }
   }

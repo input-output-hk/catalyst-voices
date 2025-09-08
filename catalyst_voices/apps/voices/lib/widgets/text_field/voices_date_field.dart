@@ -4,6 +4,7 @@ import 'package:catalyst_voices/widgets/text_field/voices_date_time_text_field.d
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
@@ -163,7 +164,7 @@ class _VoicesDateFieldState extends State<VoicesDateField> {
   }
 
   VoicesTextFieldValidationResult _validator(String value) {
-    final today = DateTime.now();
+    final today = DateTimeExt.now();
     final maxDate = DateTime(today.year + 1, today.month, today.day);
 
     if (value.isEmpty) {

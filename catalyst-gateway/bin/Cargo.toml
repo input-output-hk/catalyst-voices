@@ -16,7 +16,7 @@ workspace = true
 
 [dependencies]
 cardano-chain-follower = { version = "0.0.13", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower/v0.0.13" }
-rbac-registration = { version = "0.0.8", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "rbac-registration/v0.0.8" }
+rbac-registration = { version = "0.0.9", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "rbac-registration/v0.0.9" }
 catalyst-signed-doc = { version = "0.0.6", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc/v0.0.6" }
 catalyst-signed-doc-v1 = { package = "catalyst-signed-doc", version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc/v.0.0.4" }
 c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "c509-certificate-v0.0.3" }
@@ -98,6 +98,7 @@ derive_more = { version = "2.0.1", default-features = false, features = [
 rayon = "1.10"
 x509-cert = "0.2.5"
 minicbor = { version = "0.25.1", features = ["alloc"] }
+itertools = "0.14.0"
 get-size2 = { version = "0.6.2", features = ["derive"] }
 
 # Its a transitive dependency of the "poem-openapi" crate,

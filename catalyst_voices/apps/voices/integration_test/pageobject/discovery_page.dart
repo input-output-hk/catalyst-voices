@@ -7,10 +7,10 @@ import 'discovery/campaign_categories_section.dart';
 import 'discovery/campaign_hero_section_page.dart';
 import 'discovery/current_campaign_selector_page.dart';
 import 'discovery/how_it_works_section_page.dart';
-import 'discovery/most_recent_section.dart';
 
 class DiscoveryPage {
-  late PatrolTester $;
+  final PatrolTester $;
+
   final errorRetryBtn = const Key('ErrorRetryBtn');
 
   DiscoveryPage(this.$);
@@ -52,7 +52,9 @@ class DiscoveryPage {
     await HowItWorksSection($).looksAsExpectedForVisitor();
     await CurrentCampaignSection($).looksAsExpectedForVisitor();
     await CampaignCategoriesSection($).looksAsExpectedForVisitor();
-    await MostRecentSection($).looksAsExpectedForVisitor();
+    // TODO(emiride): most recent is based on proposals and they are dynamic, coming from backend
+    //  or not
+    // await MostRecentSection($).looksAsExpectedForVisitor();
   }
 
   Future<void> viewProposalsBtnClick() async {

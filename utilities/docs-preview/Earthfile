@@ -2,7 +2,6 @@ VERSION 0.8
 
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/docs:feat/catalyst-compression-setup AS docs-ci
 
-
 # update-docs-dev-script: get the latest docs dev script from CI.
 update-docs-dev-script:
     DO docs-ci+SYNC_LOCAL_DOCS
