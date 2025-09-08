@@ -17,6 +17,19 @@ permissions:
   pull-requests: write
 
 jobs:
+  paths-filter:
+    runs-on: ubuntu-latest
+    outputs:
+      catalyst-gateway: ${{ steps.filter.outputs.changes.catalyst-gateway }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            catalyst-gateway:
+              - 'catalyst-gateway/**'
+
   reject:
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
@@ -43,12 +56,13 @@ jobs:
       forge_version: 0.21.0
       release_only: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
 
-  tests:
-    needs: ci
+  gateway-tests:
+    needs: [ci, paths-filter]
+    if: ${{ needs.paths-filter.outputs.catalyst-gateway == 'true' || github.ref == 'refs/heads/main' }}
     name: Cat-Gateway integration tests
     uses: ./.github/workflows/gateway-tests.yml
 
   test_reporting:
     if: ${{ !github.event.pull_request.draft && always() }}
-    needs: tests
+    needs: gateway-tests
     uses: ./.github/workflows/generate-allure-report.yml
