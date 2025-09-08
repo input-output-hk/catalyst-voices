@@ -21,7 +21,7 @@ dependencies:
   flutter_rust_bridge:
     git:
       url: https://github.com/dt-iohk/flutter_rust_bridge
-      ref: b146b96890613b8ba739a652314cd290fdea634f
+      ref: 3c4cf8a57af57b7e83c57a50548a6f37cc2de760
       path: frb_dart/
   plugin_platform_interface: ^2.1.8
 
