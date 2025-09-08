@@ -703,15 +703,15 @@ let compression_wasm_bindgen;
             const ret = false;
             return ret;
         };
-        imports.wbg.__wbindgen_closure_wrapper5868 = function(arg0, arg1, arg2) {
+        imports.wbg.__wbindgen_closure_wrapper5869 = function(arg0, arg1, arg2) {
             const ret = makeMutClosure(arg0, arg1, 184, __wbg_adapter_36);
             return ret;
         };
-        imports.wbg.__wbindgen_closure_wrapper6561 = function(arg0, arg1, arg2) {
+        imports.wbg.__wbindgen_closure_wrapper6562 = function(arg0, arg1, arg2) {
             const ret = makeMutClosure(arg0, arg1, 204, __wbg_adapter_39);
             return ret;
         };
-        imports.wbg.__wbindgen_closure_wrapper6563 = function(arg0, arg1, arg2) {
+        imports.wbg.__wbindgen_closure_wrapper6564 = function(arg0, arg1, arg2) {
             const ret = makeMutClosure(arg0, arg1, 206, __wbg_adapter_42);
             return ret;
         };

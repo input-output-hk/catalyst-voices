@@ -1,8 +1,6 @@
 //! Rust implementation Catalyst Compression exposing brotli and zstd codecs.
 
-use flutter_rust_bridge::spawn_blocking_with;
-use flutter_rust_bridge::DefaultHandler;
-use flutter_rust_bridge::SimpleThreadPool;
+use flutter_rust_bridge::{spawn_blocking_with, DefaultHandler, SimpleThreadPool};
 use std::default::Default;
 
 /// Compress the bytes with brotli compression algorithm.
@@ -117,7 +115,8 @@ flutter_rust_bridge::for_generated::lazy_static! {
 
 #[cfg(target_family = "wasm")]
 thread_local! {
-    static THREAD_POOL: SimpleThreadPool = Default::default();
+    static THREAD_POOL: SimpleThreadPool = SimpleThreadPool::new(None, None, Some("compression_wasm_bindgen".to_string()).into(), None)
+        .expect("failed to create ThreadPool");
 }
 
 #[cfg(target_family = "wasm")]

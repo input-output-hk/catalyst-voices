@@ -6,12 +6,10 @@
 use bip32::DerivationPath;
 use bip39::Mnemonic;
 pub use ed25519_bip32::{DerivationIndex, DerivationScheme, Signature, XPrv, XPub};
-use flutter_rust_bridge::{frb, spawn_blocking_with};
+use flutter_rust_bridge::{frb, spawn_blocking_with, DefaultHandler, SimpleThreadPool};
 use hmac::Hmac;
 use pbkdf2::pbkdf2;
 use sha2::Sha512;
-
-use crate::frb_generated::FLUTTER_RUST_BRIDGE_HANDLER;
 
 /// BIP32-Ed25519 extended private key bytes type.
 /// Compose of:
@@ -98,7 +96,7 @@ impl Bip32Ed25519XPrivateKey {
 
         let derive_xprv = spawn_blocking_with(
             move || derive_xprv_helper(xprv, &path),
-            FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
+            CUSTOM_HANDLER.thread_pool(),
         )
         .await??;
 
@@ -120,7 +118,7 @@ impl Bip32Ed25519XPrivateKey {
 
         let xpub = spawn_blocking_with(
             move || xpublic_key_helper(&xprv),
-            FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
+            CUSTOM_HANDLER.thread_pool(),
         )
         .await?;
 
@@ -147,7 +145,7 @@ impl Bip32Ed25519XPrivateKey {
 
         let signature = spawn_blocking_with(
             move || sign_data_helper(&xprv, &data),
-            FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
+            CUSTOM_HANDLER.thread_pool(),
         )
         .await?;
 
@@ -179,7 +177,7 @@ impl Bip32Ed25519XPrivateKey {
 
         let result = spawn_blocking_with(
             move || verify_signature_xprv_helper(&xprv, &data, &verified_sig),
-            FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
+            CUSTOM_HANDLER.thread_pool(),
         )
         .await?;
 
@@ -278,7 +276,7 @@ impl Bip32Ed25519XPublicKey {
 
         let result = spawn_blocking_with(
             move || verify_signature_xpub_helper(&xpub, &data, &verified_sig),
-            FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
+            CUSTOM_HANDLER.thread_pool(),
         )
         .await?;
 
@@ -334,7 +332,7 @@ pub async fn mnemonic_to_xprv(
 ) -> anyhow::Result<Bip32Ed25519XPrivateKey> {
     let xprv = spawn_blocking_with(
         move || mnemonic_to_xprv_helper(mnemonic, passphrase),
-        FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
+        CUSTOM_HANDLER.thread_pool(),
     )
     .await??;
 
@@ -435,6 +433,24 @@ fn verify_signature_xpub_helper(
     signature: &Signature<Bip32Ed25519Signature>,
 ) -> bool {
     xpub.verify(data, signature)
+}
+
+#[cfg(not(target_family = "wasm"))]
+flutter_rust_bridge::for_generated::lazy_static! {
+    static ref CUSTOM_HANDLER: DefaultHandler<SimpleThreadPool> =
+        DefaultHandler::new_simple(Default::default());
+}
+
+#[cfg(target_family = "wasm")]
+thread_local! {
+    static THREAD_POOL: SimpleThreadPool = SimpleThreadPool::new(None, None, Some("key_derivation_wasm_bindgen".to_string()).into(), None)
+        .expect("failed to create ThreadPool");
+}
+
+#[cfg(target_family = "wasm")]
+flutter_rust_bridge::for_generated::lazy_static! {
+    static ref CUSTOM_HANDLER: DefaultHandler<&'static std::thread::LocalKey<SimpleThreadPool>> =
+        DefaultHandler::new_simple(&THREAD_POOL);
 }
 
 #[cfg(test)]
