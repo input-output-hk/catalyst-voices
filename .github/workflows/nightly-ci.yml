@@ -1,8 +1,8 @@
 name: CI nightly
 
 on:
-  #schedule:
-  #- cron: '0 0 * * *' # Runs every day at 00:00
+  schedule:
+  - cron: '0 0 * * *' # Runs every day at 00:00
   workflow_dispatch:
 
 permissions:
