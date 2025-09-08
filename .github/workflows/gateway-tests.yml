@@ -13,7 +13,7 @@ env:
 
 jobs:
   tests:
-    name: Cat-gateway integration tests
+    name: cat-gateway integration tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
