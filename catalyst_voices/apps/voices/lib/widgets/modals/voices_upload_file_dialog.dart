@@ -7,14 +7,14 @@ import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 
-typedef OnVoicesFileUploaded = Future<void> Function(VoicesFile value);
+typedef OnVoicesFileUploaded = Future<void> Function(XFile value);
 
 class VoicesUploadFileDialog extends StatefulWidget {
   final String title;
@@ -35,7 +35,7 @@ class VoicesUploadFileDialog extends StatefulWidget {
   @override
   State<VoicesUploadFileDialog> createState() => _VoicesUploadFileDialogState();
 
-  static Future<VoicesFile?> show(
+  static Future<XFile?> show(
     BuildContext context, {
     required RouteSettings routeSettings,
     required String title,
@@ -44,7 +44,7 @@ class VoicesUploadFileDialog extends StatefulWidget {
     List<String>? allowedExtensions,
     OnVoicesFileUploaded? onUpload,
   }) {
-    return VoicesDialog.show<VoicesFile?>(
+    return VoicesDialog.show<XFile?>(
       context: context,
       routeSettings: routeSettings,
       builder: (context) {
@@ -61,7 +61,7 @@ class VoicesUploadFileDialog extends StatefulWidget {
 }
 
 class _Buttons extends StatefulWidget {
-  final VoicesFile? selectedFile;
+  final XFile? selectedFile;
   final OnVoicesFileUploaded? onUpload;
 
   const _Buttons({
@@ -187,7 +187,7 @@ class _UploadContainer extends StatefulWidget {
   final String itemNameToUpload;
   final String? info;
   final List<String>? allowedExtensions;
-  final ValueChanged<VoicesFile>? onFileSelected;
+  final ValueChanged<XFile>? onFileSelected;
 
   const _UploadContainer({
     required this.itemNameToUpload,
@@ -228,9 +228,9 @@ class _UploadContainerState extends State<_UploadContainer> {
                     final bytes = await _dropzoneController.getFileData(ev);
                     final name = await _dropzoneController.getFilename(ev);
                     widget.onFileSelected?.call(
-                      VoicesFile(
+                      XFile.fromData(
+                        bytes,
                         name: name,
-                        bytes: bytes,
                       ),
                     );
                   },
@@ -307,7 +307,7 @@ class _UploadContainerState extends State<_UploadContainer> {
 }
 
 class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
-  VoicesFile? _selectedFile;
+  XFile? _selectedFile;
   bool _isUploading = false;
 
   @override

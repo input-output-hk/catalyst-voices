@@ -56,7 +56,6 @@ export 'document/validation/document_validator.dart';
 export 'document/values/grouped_tags.dart';
 export 'errors/errors.dart';
 export 'errors/sync_exception.dart';
-export 'file/voices_file.dart';
 export 'info/app_info.dart';
 export 'info/gateway_info.dart';
 export 'info/system_info.dart';

@@ -23,7 +23,7 @@ abstract final class UploadSeedPhraseDialog {
       return null;
     }
 
-    final bytes = file.bytes;
+    final bytes = await file.readAsBytes();
     final decodedText = utf8.decode(bytes);
     final words = decodedText
         .split(' ')
