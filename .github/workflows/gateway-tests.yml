@@ -1,4 +1,4 @@
-name: Cat Gateway integration tests
+name: Catalyst Gateway integration tests
 
 on:
   workflow_call:
@@ -6,14 +6,14 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
-  
+
 env:
   REPORT_EXT: .junit-report.xml
   COVERAGE_EXT: .coverage.info
 
 jobs:
   tests:
-    name: Cat-Gateway integration tests
+    name: Cat-gateway integration tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
