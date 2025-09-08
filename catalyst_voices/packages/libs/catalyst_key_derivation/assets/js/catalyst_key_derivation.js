@@ -210,68 +210,10 @@ let key_derivation_wasm_bindgen;
         return className;
     }
     /**
-     * @returns {number}
-     */
-    __exports.frb_get_rust_content_hash = function() {
-        const ret = wasm.frb_get_rust_content_hash();
-        return ret;
-    };
-
-    /**
-     * @param {number} call_id
-     * @param {any} ptr_
-     * @param {number} rust_vec_len_
-     * @param {number} data_len_
-     */
-    __exports.frb_dart_fn_deliver_output = function(call_id, ptr_, rust_vec_len_, data_len_) {
-        wasm.frb_dart_fn_deliver_output(call_id, ptr_, rust_vec_len_, data_len_);
-    };
-
-    /**
      * @param {number} ptr
      */
-    __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey = function(ptr) {
-        wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(ptr);
-    };
-
-    /**
-     * @param {number} func_id
-     * @param {any} ptr_
-     * @param {number} rust_vec_len_
-     * @param {number} data_len_
-     * @returns {any}
-     */
-    __exports.frb_pde_ffi_dispatcher_sync = function(func_id, ptr_, rust_vec_len_, data_len_) {
-        const ret = wasm.frb_pde_ffi_dispatcher_sync(func_id, ptr_, rust_vec_len_, data_len_);
-        return ret;
-    };
-
-    /**
-     * @param {number} ptr
-     */
-    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey = function(ptr) {
-        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(ptr);
-    };
-
-    /**
-     * @param {number} ptr
-     */
-    __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey = function(ptr) {
-        wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(ptr);
-    };
-
-    /**
-     * @param {number} ptr
-     */
-    __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature = function(ptr) {
-        wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(ptr);
-    };
-
-    /**
-     * @param {number} ptr
-     */
-    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature = function(ptr) {
-        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(ptr);
+    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey = function(ptr) {
+        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(ptr);
     };
 
     /**
@@ -288,8 +230,66 @@ let key_derivation_wasm_bindgen;
     /**
      * @param {number} ptr
      */
-    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey = function(ptr) {
-        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(ptr);
+    __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature = function(ptr) {
+        wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(ptr);
+    };
+
+    /**
+     * @param {number} ptr
+     */
+    __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey = function(ptr) {
+        wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(ptr);
+    };
+
+    /**
+     * @param {number} ptr
+     */
+    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey = function(ptr) {
+        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(ptr);
+    };
+
+    /**
+     * @param {number} func_id
+     * @param {any} ptr_
+     * @param {number} rust_vec_len_
+     * @param {number} data_len_
+     * @returns {any}
+     */
+    __exports.frb_pde_ffi_dispatcher_sync = function(func_id, ptr_, rust_vec_len_, data_len_) {
+        const ret = wasm.frb_pde_ffi_dispatcher_sync(func_id, ptr_, rust_vec_len_, data_len_);
+        return ret;
+    };
+
+    /**
+     * @param {number} call_id
+     * @param {any} ptr_
+     * @param {number} rust_vec_len_
+     * @param {number} data_len_
+     */
+    __exports.frb_dart_fn_deliver_output = function(call_id, ptr_, rust_vec_len_, data_len_) {
+        wasm.frb_dart_fn_deliver_output(call_id, ptr_, rust_vec_len_, data_len_);
+    };
+
+    /**
+     * @returns {number}
+     */
+    __exports.frb_get_rust_content_hash = function() {
+        const ret = wasm.frb_get_rust_content_hash();
+        return ret;
+    };
+
+    /**
+     * @param {number} ptr
+     */
+    __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey = function(ptr) {
+        wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(ptr);
+    };
+
+    /**
+     * @param {number} ptr
+     */
+    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature = function(ptr) {
+        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(ptr);
     };
 
     function takeFromExternrefTable0(idx) {
@@ -402,15 +402,18 @@ let key_derivation_wasm_bindgen;
         /**
          * @param {number | null} [initial]
          * @param {string | null} [script_src]
+         * @param {string | null} [wasm_bindgen_name]
          * @param {string | null} [worker_js_preamble]
          * @returns {WorkerPool}
          */
-        static new(initial, script_src, worker_js_preamble) {
+        static new(initial, script_src, wasm_bindgen_name, worker_js_preamble) {
             var ptr0 = isLikeNone(script_src) ? 0 : passStringToWasm0(script_src, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
             var len0 = WASM_VECTOR_LEN;
-            var ptr1 = isLikeNone(worker_js_preamble) ? 0 : passStringToWasm0(worker_js_preamble, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            var ptr1 = isLikeNone(wasm_bindgen_name) ? 0 : passStringToWasm0(wasm_bindgen_name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
             var len1 = WASM_VECTOR_LEN;
-            const ret = wasm.workerpool_new(isLikeNone(initial) ? 0x100000001 : (initial) >>> 0, ptr0, len0, ptr1, len1);
+            var ptr2 = isLikeNone(worker_js_preamble) ? 0 : passStringToWasm0(worker_js_preamble, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            var len2 = WASM_VECTOR_LEN;
+            const ret = wasm.workerpool_new(isLikeNone(initial) ? 0x100000001 : (initial) >>> 0, ptr0, len0, ptr1, len1, ptr2, len2);
             if (ret[2]) {
                 throw takeFromExternrefTable0(ret[1]);
             }
@@ -429,14 +432,17 @@ let key_derivation_wasm_bindgen;
          * message is sent to it.
          * @param {number} initial
          * @param {string} script_src
+         * @param {string} wasm_bindgen_name
          * @param {string} worker_js_preamble
          */
-        constructor(initial, script_src, worker_js_preamble) {
+        constructor(initial, script_src, wasm_bindgen_name, worker_js_preamble) {
             const ptr0 = passStringToWasm0(script_src, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
             const len0 = WASM_VECTOR_LEN;
-            const ptr1 = passStringToWasm0(worker_js_preamble, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            const ptr1 = passStringToWasm0(wasm_bindgen_name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
             const len1 = WASM_VECTOR_LEN;
-            const ret = wasm.workerpool_new_raw(initial, ptr0, len0, ptr1, len1);
+            const ptr2 = passStringToWasm0(worker_js_preamble, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            const len2 = WASM_VECTOR_LEN;
+            const ret = wasm.workerpool_new_raw(initial, ptr0, len0, ptr1, len1, ptr2, len2);
             if (ret[2]) {
                 throw takeFromExternrefTable0(ret[1]);
             }
@@ -739,15 +745,15 @@ let key_derivation_wasm_bindgen;
             const ret = false;
             return ret;
         };
-        imports.wbg.__wbindgen_closure_wrapper495 = function(arg0, arg1, arg2) {
+        imports.wbg.__wbindgen_closure_wrapper497 = function(arg0, arg1, arg2) {
             const ret = makeMutClosure(arg0, arg1, 129, __wbg_adapter_36);
             return ret;
         };
-        imports.wbg.__wbindgen_closure_wrapper627 = function(arg0, arg1, arg2) {
+        imports.wbg.__wbindgen_closure_wrapper629 = function(arg0, arg1, arg2) {
             const ret = makeMutClosure(arg0, arg1, 162, __wbg_adapter_39);
             return ret;
         };
-        imports.wbg.__wbindgen_closure_wrapper629 = function(arg0, arg1, arg2) {
+        imports.wbg.__wbindgen_closure_wrapper631 = function(arg0, arg1, arg2) {
             const ret = makeMutClosure(arg0, arg1, 160, __wbg_adapter_42);
             return ret;
         };

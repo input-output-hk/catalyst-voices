@@ -1,7 +1,9 @@
 //! Rust implementation Catalyst Compression exposing brotli and zstd codecs.
 
 use flutter_rust_bridge::spawn_blocking_with;
-use crate::frb_generated::FLUTTER_RUST_BRIDGE_HANDLER;
+use flutter_rust_bridge::DefaultHandler;
+use flutter_rust_bridge::SimpleThreadPool;
+use std::default::Default;
 
 /// Compress the bytes with brotli compression algorithm.
 /// Runs the computation by a shared thread poll to avoid blocking the main thread.
@@ -16,7 +18,7 @@ use crate::frb_generated::FLUTTER_RUST_BRIDGE_HANDLER;
 pub async fn brotli_compress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
    let result = spawn_blocking_with(
         move || brotli_compress_helper(bytes),
-        FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
+        CUSTOM_HANDLER.thread_pool(),
     )
     .await??;
 
@@ -43,7 +45,7 @@ fn brotli_compress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
 pub async fn brotli_decompress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let result = spawn_blocking_with(
         move || brotli_decompress_helper(bytes),
-        FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
+        CUSTOM_HANDLER.thread_pool(),
     )
     .await??;
 
@@ -69,7 +71,7 @@ fn brotli_decompress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
 pub async fn zstd_compress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let result = spawn_blocking_with(
         move || zstd_compress_helper(bytes),
-        FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
+        CUSTOM_HANDLER.thread_pool(),
     )
     .await??;
 
@@ -94,7 +96,7 @@ fn zstd_compress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
 pub async fn zstd_decompress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let result = spawn_blocking_with(
         move || zstd_decompress_helper(bytes),
-        FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
+        CUSTOM_HANDLER.thread_pool(),
     )
     .await??;
 
@@ -105,4 +107,21 @@ fn zstd_decompress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let mut buffer = vec![];
     zstd::stream::copy_decode(bytes.as_slice(), &mut buffer)?;
     Ok(buffer)
+}
+
+#[cfg(not(target_family = "wasm"))]
+flutter_rust_bridge::for_generated::lazy_static! {
+    static ref CUSTOM_HANDLER: DefaultHandler<SimpleThreadPool> =
+        DefaultHandler::new_simple(Default::default());
+}
+
+#[cfg(target_family = "wasm")]
+thread_local! {
+    static THREAD_POOL: SimpleThreadPool = Default::default();
+}
+
+#[cfg(target_family = "wasm")]
+flutter_rust_bridge::for_generated::lazy_static! {
+    static ref CUSTOM_HANDLER: DefaultHandler<&'static std::thread::LocalKey<SimpleThreadPool>> =
+        DefaultHandler::new_simple(&THREAD_POOL);
 }

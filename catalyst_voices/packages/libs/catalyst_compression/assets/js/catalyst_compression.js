@@ -222,14 +222,6 @@ let compression_wasm_bindgen;
     };
 
     /**
-     * @returns {number}
-     */
-    __exports.frb_get_rust_content_hash = function() {
-        const ret = wasm.frb_get_rust_content_hash();
-        return ret;
-    };
-
-    /**
      * @param {number} call_id
      * @param {any} ptr_
      * @param {number} rust_vec_len_
@@ -251,10 +243,22 @@ let compression_wasm_bindgen;
     };
 
     /**
+     * @returns {number}
+     */
+    __exports.frb_get_rust_content_hash = function() {
+        const ret = wasm.frb_get_rust_content_hash();
+        return ret;
+    };
+
+    /**
      * @param {number} ptr
      */
     __exports.frb_dart_opaque_drop_thread_box_persistent_handle = function(ptr) {
         wasm.frb_dart_opaque_drop_thread_box_persistent_handle(ptr);
+    };
+
+    __exports.wasm_start_callback = function() {
+        wasm.wasm_start_callback();
     };
 
     /**
@@ -279,16 +283,6 @@ let compression_wasm_bindgen;
         return ret;
     };
 
-    __exports.wasm_start_callback = function() {
-        wasm.wasm_start_callback();
-    };
-
-    function takeFromExternrefTable0(idx) {
-        const value = wasm.__wbindgen_export_2.get(idx);
-        wasm.__externref_table_dealloc(idx);
-        return value;
-    }
-
     function passArrayJsValueToWasm0(array, malloc) {
         const ptr = malloc(array.length * 4, 4) >>> 0;
         for (let i = 0; i < array.length; i++) {
@@ -297,6 +291,12 @@ let compression_wasm_bindgen;
         }
         WASM_VECTOR_LEN = array.length;
         return ptr;
+    }
+
+    function takeFromExternrefTable0(idx) {
+        const value = wasm.__wbindgen_export_2.get(idx);
+        wasm.__externref_table_dealloc(idx);
+        return value;
     }
     /**
      * ## Safety
@@ -317,19 +317,19 @@ let compression_wasm_bindgen;
     };
 
     function __wbg_adapter_36(arg0, arg1, arg2) {
-        wasm.closure167_externref_shim(arg0, arg1, arg2);
+        wasm.closure186_externref_shim(arg0, arg1, arg2);
     }
 
     function __wbg_adapter_39(arg0, arg1, arg2) {
-        wasm.closure204_externref_shim(arg0, arg1, arg2);
+        wasm.closure207_externref_shim(arg0, arg1, arg2);
     }
 
     function __wbg_adapter_42(arg0, arg1, arg2) {
-        wasm.closure205_externref_shim(arg0, arg1, arg2);
+        wasm.closure208_externref_shim(arg0, arg1, arg2);
     }
 
     function __wbg_adapter_110(arg0, arg1, arg2, arg3) {
-        wasm.closure247_externref_shim(arg0, arg1, arg2, arg3);
+        wasm.closure250_externref_shim(arg0, arg1, arg2, arg3);
     }
 
     const WorkerPoolFinalization = (typeof FinalizationRegistry === 'undefined')
@@ -360,15 +360,18 @@ let compression_wasm_bindgen;
         /**
          * @param {number | null} [initial]
          * @param {string | null} [script_src]
+         * @param {string | null} [wasm_bindgen_name]
          * @param {string | null} [worker_js_preamble]
          * @returns {WorkerPool}
          */
-        static new(initial, script_src, worker_js_preamble) {
+        static new(initial, script_src, wasm_bindgen_name, worker_js_preamble) {
             var ptr0 = isLikeNone(script_src) ? 0 : passStringToWasm0(script_src, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
             var len0 = WASM_VECTOR_LEN;
-            var ptr1 = isLikeNone(worker_js_preamble) ? 0 : passStringToWasm0(worker_js_preamble, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            var ptr1 = isLikeNone(wasm_bindgen_name) ? 0 : passStringToWasm0(wasm_bindgen_name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
             var len1 = WASM_VECTOR_LEN;
-            const ret = wasm.workerpool_new(isLikeNone(initial) ? 0x100000001 : (initial) >>> 0, ptr0, len0, ptr1, len1);
+            var ptr2 = isLikeNone(worker_js_preamble) ? 0 : passStringToWasm0(worker_js_preamble, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            var len2 = WASM_VECTOR_LEN;
+            const ret = wasm.workerpool_new(isLikeNone(initial) ? 0x100000001 : (initial) >>> 0, ptr0, len0, ptr1, len1, ptr2, len2);
             if (ret[2]) {
                 throw takeFromExternrefTable0(ret[1]);
             }
@@ -387,14 +390,17 @@ let compression_wasm_bindgen;
          * message is sent to it.
          * @param {number} initial
          * @param {string} script_src
+         * @param {string} wasm_bindgen_name
          * @param {string} worker_js_preamble
          */
-        constructor(initial, script_src, worker_js_preamble) {
+        constructor(initial, script_src, wasm_bindgen_name, worker_js_preamble) {
             const ptr0 = passStringToWasm0(script_src, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
             const len0 = WASM_VECTOR_LEN;
-            const ptr1 = passStringToWasm0(worker_js_preamble, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            const ptr1 = passStringToWasm0(wasm_bindgen_name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
             const len1 = WASM_VECTOR_LEN;
-            const ret = wasm.workerpool_new_raw(initial, ptr0, len0, ptr1, len1);
+            const ptr2 = passStringToWasm0(worker_js_preamble, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+            const len2 = WASM_VECTOR_LEN;
+            const ret = wasm.workerpool_new_raw(initial, ptr0, len0, ptr1, len1, ptr2, len2);
             if (ret[2]) {
                 throw takeFromExternrefTable0(ret[1]);
             }
@@ -697,16 +703,16 @@ let compression_wasm_bindgen;
             const ret = false;
             return ret;
         };
-        imports.wbg.__wbindgen_closure_wrapper5570 = function(arg0, arg1, arg2) {
-            const ret = makeMutClosure(arg0, arg1, 166, __wbg_adapter_36);
+        imports.wbg.__wbindgen_closure_wrapper5868 = function(arg0, arg1, arg2) {
+            const ret = makeMutClosure(arg0, arg1, 184, __wbg_adapter_36);
             return ret;
         };
-        imports.wbg.__wbindgen_closure_wrapper6541 = function(arg0, arg1, arg2) {
-            const ret = makeMutClosure(arg0, arg1, 201, __wbg_adapter_39);
+        imports.wbg.__wbindgen_closure_wrapper6561 = function(arg0, arg1, arg2) {
+            const ret = makeMutClosure(arg0, arg1, 204, __wbg_adapter_39);
             return ret;
         };
-        imports.wbg.__wbindgen_closure_wrapper6543 = function(arg0, arg1, arg2) {
-            const ret = makeMutClosure(arg0, arg1, 203, __wbg_adapter_42);
+        imports.wbg.__wbindgen_closure_wrapper6563 = function(arg0, arg1, arg2) {
+            const ret = makeMutClosure(arg0, arg1, 206, __wbg_adapter_42);
             return ret;
         };
         imports.wbg.__wbindgen_debug_string = function(arg0, arg1) {
