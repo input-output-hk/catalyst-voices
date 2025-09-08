@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_services/src/common/file_path_helper_mixin.dart';
 import 'package:catalyst_voices_services/src/downloader/utils/file_save_strategy.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:downloadsfolder/downloadsfolder.dart';
 import 'package:path/path.dart' as p;
 
 // ignore: one_member_abstracts
@@ -17,7 +17,7 @@ abstract interface class DownloaderService {
   });
 }
 
-final class DownloaderServiceImpl implements DownloaderService {
+final class DownloaderServiceImpl with FilePathHelperMixin implements DownloaderService {
   const DownloaderServiceImpl();
 
   @override
@@ -46,21 +46,13 @@ final class DownloaderServiceImpl implements DownloaderService {
     final fileWithoutExtension = p.withoutExtension(filename);
     final extensionName = p.extension(filename);
 
-    final downloadPath = await _getDownloadPathIfNeeded(strategyType);
+    final downloadPath = await getDownloadPathIfNeeded(strategyType);
     final uniqueFilename = '$fileWithoutExtension$flavorName$extensionName';
 
     return Uri.file(
       downloadPath != null ? '$downloadPath/$uniqueFilename' : uniqueFilename,
       windows: false,
     );
-  }
-
-  Future<String?> _getDownloadPathIfNeeded(FileSaveStrategyType strategyType) async {
-    if (strategyType == FileSaveStrategyType.downloadsDirectory) {
-      final downloadDir = await getDownloadDirectory();
-      return downloadDir.path;
-    }
-    return null;
   }
 
   String _getFlavorName(FileSaveStrategyType strategyType, AppEnvironmentType envType) {
