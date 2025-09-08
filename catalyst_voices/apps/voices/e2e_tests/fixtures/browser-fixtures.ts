@@ -9,7 +9,7 @@ import { test as base, BrowserContext } from "@playwright/test";
 import {
   connectToBrowser,
   getDynamicUrlInChrome,
-  cleanupChromeProfile,
+  closeBrowserWithExtension,
 } from "../utils/browser-extension";
 import { createWalletActions } from "../utils/wallets/wallet-actions-factory";
 import { BrowserExtensionName } from "../models/browserExtensionModel";
@@ -32,6 +32,7 @@ export const test = base.extend<BrowserFixtures>({
     { option: true },
   ],
   launchBrowser: async ({ testModel }, use) => {
+    
     const chromePath = process.env.CHROME_PATH;
     if (!chromePath) {
       throw new Error("CHROME_PATH is not set");
@@ -49,8 +50,7 @@ export const test = base.extend<BrowserFixtures>({
     }
     browser.grantPermissions(["clipboard-read", "clipboard-write"]);
     await use(browser);
-    await browser.close();
-    await cleanupChromeProfile(chromePath);
+    await closeBrowserWithExtension(browser);
   },
 
   restoreWallet: async ({ launchBrowser, testModel }, use) => {
