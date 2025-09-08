@@ -52,6 +52,7 @@ impl FullSignedDoc {
     }
 
     /// Returns the document metadata.
+    #[allow(dead_code)]
     pub(crate) fn metadata(&self) -> Option<&serde_json::Value> {
         self.body.metadata()
     }
