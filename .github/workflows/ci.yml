@@ -58,7 +58,7 @@ jobs:
 
   gateway-tests:
     needs: [ci, paths-filter]
-    if: ${{ needs.paths-filter.outputs.catalyst-gateway == 'true' || github.ref == 'refs/heads/main' }}
+    if: ${{ needs.paths-filter.outputs.catalyst-gateway == 'true' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
     name: Cat-Gateway integration tests
     uses: ./.github/workflows/gateway-tests.yml
 
