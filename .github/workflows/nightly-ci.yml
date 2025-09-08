@@ -63,6 +63,7 @@ jobs:
         if: ${{ steps.images.conclusion == 'success' }}
         run: |
           export HYPOTHESIS_MAX_EXAMPLES=5000
+          export MAX_RESPONSE_TIME=20000
           docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --exit-code-from schemathesis-runner
 
   slack:
