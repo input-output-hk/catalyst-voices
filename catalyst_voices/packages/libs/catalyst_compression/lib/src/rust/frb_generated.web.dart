@@ -90,7 +90,7 @@ class RustLibWire implements BaseWire {
   RustLibWire.fromExternalLibrary(ExternalLibrary lib);
 }
 
-@JS('wasm_bindgen')
+@JS('compression_wasm_bindgen')
 external RustLibWasmModule get wasmModule;
 
 @JS()
