@@ -141,8 +141,7 @@ void main() {
       );
     });
 
-    test(
-        'when no keychain is found but there is a registration progress '
+    test('when no keychain is found but there is a registration progress '
         'session is in Visitor state with correct flag', () async {
       // Given
       final keychainProgress = KeychainProgress(
@@ -343,24 +342,22 @@ class _MockRegistrationService extends Mock implements RegistrationService {
   );
 
   @override
-  Future<List<CardanoWallet>> getCardanoWallets() {
-    return Future.value(cardanoWallets);
+  Future<Account> createDummyAccount() async {
+    final catalystId = DummyCatalystIdFactory.create();
+
+    final keychain = await keychainProvider.create(Account.dummyKeychainId);
+
+    await keychain.setLock(Account.dummyUnlockFactor);
+    await keychain.unlock(Account.dummyUnlockFactor);
+
+    return Account.dummy(
+      catalystId: catalystId,
+      keychain: keychain,
+    );
   }
 
   @override
-  Future<Account> registerTestAccount({
-    required String keychainId,
-    required SeedPhrase seedPhrase,
-    required LockFactor lockFactor,
-  }) async {
-    final keychain = await keychainProvider.create(keychainId);
-
-    await keychain.setLock(lockFactor);
-    await keychain.unlock(lockFactor);
-
-    return Account.dummy(
-      catalystId: DummyCatalystIdFactory.create(),
-      keychain: keychain,
-    );
+  Future<List<CardanoWallet>> getCardanoWallets() {
+    return Future.value(cardanoWallets);
   }
 }

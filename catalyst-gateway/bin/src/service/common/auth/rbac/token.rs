@@ -10,7 +10,7 @@ use std::{
 
 use anyhow::{anyhow, Context, Result};
 use base64::{prelude::BASE64_URL_SAFE_NO_PAD, Engine};
-use cardano_blockchain_types::Network;
+use cardano_chain_follower::Network;
 use catalyst_types::catalyst_id::CatalystId;
 use chrono::{TimeDelta, Utc};
 use ed25519_dalek::{ed25519::signature::Signer, Signature, SigningKey, VerifyingKey};
@@ -55,7 +55,10 @@ impl CatalystRBACTokenV1 {
     // TODO: Remove the attribute when the function is used.
     #[allow(dead_code)]
     pub(crate) fn new(
-        network: &str, subnet: Option<&str>, role0_pk: VerifyingKey, sk: &SigningKey,
+        network: &str,
+        subnet: Option<&str>,
+        role0_pk: VerifyingKey,
+        sk: &SigningKey,
     ) -> Result<Self> {
         let catalyst_id = CatalystId::new(network, subnet, role0_pk)
             .with_nonce()
@@ -129,7 +132,10 @@ impl CatalystRBACTokenV1 {
     }
 
     /// Given the `PublicKey`, verifies the token was correctly signed.
-    pub(crate) fn verify(&self, public_key: &VerifyingKey) -> Result<()> {
+    pub(crate) fn verify(
+        &self,
+        public_key: &VerifyingKey,
+    ) -> Result<()> {
         public_key
             .verify_strict(&self.raw, &self.signature)
             .context("Token signature verification failed")
@@ -138,7 +144,11 @@ impl CatalystRBACTokenV1 {
     /// Checks that the token timestamp is valid.
     ///
     /// The timestamp is valid if it isn't too old or too skewed.
-    pub(crate) fn is_young(&self, max_age: Duration, max_skew: Duration) -> bool {
+    pub(crate) fn is_young(
+        &self,
+        max_age: Duration,
+        max_skew: Duration,
+    ) -> bool {
         let Some(token_age) = self.catalyst_id.nonce() else {
             return false;
         };
@@ -185,7 +195,10 @@ impl CatalystRBACTokenV1 {
 }
 
 impl Display for CatalystRBACTokenV1 {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut Formatter<'_>,
+    ) -> std::fmt::Result {
         write!(
             f,
             "{}{}.{}",
@@ -232,7 +245,10 @@ mod tests {
     #[test_case("cardano", None ; "mainnet cardano network")]
     #[test_case("cardano", Some("preprod") ; "preprod.cardano network")]
     #[test_case("cardano", Some("preview") ; "preview.cardano network")]
-    fn roundtrip(network: &'static str, subnet: Option<&'static str>) {
+    fn roundtrip(
+        network: &'static str,
+        subnet: Option<&'static str>,
+    ) {
         let mut seed = OsRng;
         let signing_key: SigningKey = SigningKey::generate(&mut seed);
         let verifying_key = signing_key.verifying_key();

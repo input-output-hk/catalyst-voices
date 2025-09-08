@@ -55,7 +55,10 @@ pub(crate) struct Tracing;
 impl<E: Endpoint> Middleware<E> for Tracing {
     type Output = TracingEndpoint<E>;
 
-    fn transform(&self, ep: E) -> Self::Output {
+    fn transform(
+        &self,
+        ep: E,
+    ) -> Self::Output {
         TracingEndpoint { inner: ep }
     }
 }
@@ -106,7 +109,11 @@ impl ResponseData {
     /// Create a new `ResponseData` set from the response.
     /// In the process add relevant data to the span from the response.
     fn new(
-        duration: f64, cpu_time: f64, resp: &Response, panic: Option<Uuid>, span: &Span,
+        duration: f64,
+        cpu_time: f64,
+        resp: &Response,
+        panic: Option<Uuid>,
+        span: &Span,
     ) -> Self {
         // The OpenAPI Operation ID of this request.
         let oid = resp
@@ -149,7 +156,11 @@ impl ResponseData {
 
 /// Add all interesting headers to the correct fields in a span.
 /// This logic is the same for both requests and responses.
-fn add_interesting_headers_to_span(span: &Span, prefix: &str, headers: &HeaderMap) {
+fn add_interesting_headers_to_span(
+    span: &Span,
+    prefix: &str,
+    headers: &HeaderMap,
+) {
     let size_field = prefix.to_string() + "_size";
     let content_type_field = prefix.to_string() + "_content_type";
     let encoding_field = prefix.to_string() + "_encoding";
@@ -234,7 +245,10 @@ async fn mk_request_span(req: &Request) -> (Span, String, String, String) {
 impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
     type Output = Response;
 
-    async fn call(&self, req: Request) -> Result<Self::Output> {
+    async fn call(
+        &self,
+        req: Request,
+    ) -> Result<Self::Output> {
         // Construct the span from the request.
         let (span, uri_path, method, client_id) = mk_request_span(&req).await;
 

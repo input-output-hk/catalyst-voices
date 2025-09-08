@@ -20,5 +20,5 @@ enum RegistrationState {
   rolesConfirm,
   rolesSummary,
   keychainTransactionPending,
-  accountCreationSuccess;
+  accountCreationSuccess,
 }

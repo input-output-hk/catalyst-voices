@@ -8,13 +8,12 @@
   "sentry": {
     "dsn": "https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600",
     "environment": "prod",
-    "release": "catalyst-voices@prod",
     "tracesSampleRate": 0.1,
     "profilesSampleRate": 0.1,
     "enableAutoSessionTracking": true,
-    "attachScreenshot": false,
+    "enableTimeToFullDisplayTracing": true,
+    "enableLogs": false,
     "attachViewHierarchy": false,
-    "debug": false,
     "diagnosticLevel": "error"
   },
   "blockchain": {

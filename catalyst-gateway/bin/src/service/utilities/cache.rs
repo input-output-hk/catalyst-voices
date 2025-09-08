@@ -1,41 +1,64 @@
 //! Cache wrapper type
 use std::{collections::hash_map::RandomState, hash::Hash};
 
-use moka::{policy::EvictionPolicy, sync::Cache};
+use get_size2::GetSize;
+use moka::{policy::EvictionPolicy, sync::Cache as BaseCache};
 
 /// Cache type that is disabled if the maximum capacity is set to zero.
-pub(crate) struct CacheWrapper<K, V> {
+#[derive(Clone)]
+pub(crate) struct Cache<K, V> {
     /// Optional `moka::sync::Cache`.
-    inner: Option<Cache<K, V, RandomState>>,
+    inner: Option<BaseCache<K, V, RandomState>>,
 }
 
-impl<K, V> CacheWrapper<K, V>
+impl<K, V> Cache<K, V>
 where
     K: Hash + Eq + Send + Sync + 'static,
     V: Clone + Send + Sync + 'static,
 {
-    /// Constructs a new `CacheWrapper`.
-    pub(crate) fn new(name: &str, eviction_policy: EvictionPolicy, max_capacity: u64) -> Self {
+    /// Function to determine cache entry weighted size.
+    fn weigher_fn(
+        k: &K,
+        v: &V,
+    ) -> u32 {
+        let k_size = GetSize::get_size(&k);
+        let v_size = GetSize::get_size(&v);
+        k_size.saturating_add(v_size).try_into().unwrap_or(u32::MAX)
+    }
+
+    /// Constructs a new `Cache`.
+    pub(crate) fn new(
+        name: &str,
+        eviction_policy: EvictionPolicy,
+        max_capacity: u64,
+    ) -> Self {
         let inner = if max_capacity < 1 {
             None
         } else {
-            let cache = Cache::builder()
+            let cache = BaseCache::builder()
                 .name(name)
                 .eviction_policy(eviction_policy)
                 .max_capacity(max_capacity)
-                .build();
-            Some(cache)
+                .weigher(Self::weigher_fn);
+            Some(cache.build())
         };
         Self { inner }
     }
 
     /// Get entry from the cache by key.
-    pub(crate) fn get(&self, key: &K) -> Option<V> {
+    pub(crate) fn get(
+        &self,
+        key: &K,
+    ) -> Option<V> {
         self.inner.as_ref().and_then(|cache| cache.get(key))
     }
 
     /// Insert entry into the cache.
-    pub(crate) fn insert(&self, key: K, value: V) {
+    pub(crate) fn insert(
+        &self,
+        key: K,
+        value: V,
+    ) {
         self.inner
             .as_ref()
             .inspect(|cache| cache.insert(key, value));
@@ -47,13 +70,13 @@ where
     }
 
     /// Weighted-size of the cache.
-    pub(crate) fn size(&self) -> u64 {
+    pub(crate) fn weighted_size(&self) -> u64 {
         self.inner
             .as_ref()
             .inspect(|cache| {
                 cache.run_pending_tasks();
             })
-            .map(Cache::weighted_size)
+            .map(BaseCache::weighted_size)
             .unwrap_or_default()
     }
 
@@ -64,7 +87,7 @@ where
             .inspect(|cache| {
                 cache.run_pending_tasks();
             })
-            .map(Cache::entry_count)
+            .map(BaseCache::entry_count)
             .unwrap_or_default()
     }
 

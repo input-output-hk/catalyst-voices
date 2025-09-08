@@ -1,7 +1,6 @@
 //! Metrics related to Chain Follower analytics.
 
-use cardano_blockchain_types::Network;
-use cardano_chain_follower::Statistics;
+use cardano_chain_follower::{Network, Statistics};
 
 use crate::settings::Settings;
 
@@ -21,7 +20,12 @@ pub(crate) fn update() {
 
 /// Performs reporting Chain Follower's Mithril information to Prometheus.
 #[allow(clippy::indexing_slicing)]
-fn report_mithril(stats: &Statistics, api_host_names: &str, service_id: &str, network: Network) {
+fn report_mithril(
+    stats: &Statistics,
+    api_host_names: &str,
+    service_id: &str,
+    network: Network,
+) {
     let stats = &stats.mithril;
     let network = network.to_string();
 
@@ -101,7 +105,12 @@ fn report_mithril(stats: &Statistics, api_host_names: &str, service_id: &str, ne
 
 /// Performs reporting Chain Follower's Live information to Prometheus.
 #[allow(clippy::indexing_slicing)]
-fn report_live(stats: &Statistics, api_host_names: &str, service_id: &str, network: Network) {
+fn report_live(
+    stats: &Statistics,
+    api_host_names: &str,
+    service_id: &str,
+    network: Network,
+) {
     let stats = &stats.live;
     let network = network.to_string();
 

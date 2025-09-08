@@ -3,7 +3,7 @@
 use std::sync::LazyLock;
 
 use anyhow::bail;
-use cardano_blockchain_types::Slot;
+use cardano_chain_follower::Slot;
 use num_bigint::BigInt;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
@@ -80,7 +80,7 @@ impl Type for SlotNo {
     }
 
     fn raw_element_iter<'a>(
-        &'a self,
+        &'a self
     ) -> Box<dyn Iterator<Item = &'a Self::RawElementValueType> + 'a> {
         Box::new(self.as_raw_value().into_iter())
     }

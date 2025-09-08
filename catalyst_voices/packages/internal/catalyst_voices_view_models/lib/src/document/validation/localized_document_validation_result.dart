@@ -124,7 +124,7 @@ final class LocalizedDocumentPatternMismatch extends LocalizedDocumentValidation
   String? message(BuildContext context) {
     return switch (patternType) {
       DocumentPatternType.generic => context.l10n.errorValidationPatternMismatch,
-      DocumentPatternType.https => context.l10n.errorValidationHttpsPatternMismatch
+      DocumentPatternType.https => context.l10n.errorValidationHttpsPatternMismatch,
     };
   }
 }
@@ -172,15 +172,19 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
       MissingRequiredDocumentValue() => const LocalizedMissingRequiredDocumentValue(),
       DocumentNumOutOfRange() => LocalizedDocumentNumOutOfRange(range: result.expectedRange),
       DocumentStringOutOfRange() => LocalizedDocumentStringOutOfRange(range: result.expectedRange),
-      DocumentItemsOutOfRange() =>
-        LocalizedDocumentListItemsOutOfRange(range: result.expectedRange),
+      DocumentItemsOutOfRange() => LocalizedDocumentListItemsOutOfRange(
+        range: result.expectedRange,
+      ),
       DocumentItemsNotUnique() => const LocalizedDocumentListItemsNotUnique(),
-      DocumentConstValueMismatch() =>
-        LocalizedDocumentConstValueMismatch(constValue: result.constValue),
-      DocumentEnumValueMismatch() =>
-        LocalizedDocumentEnumValuesMismatch(enumValues: result.enumValues),
-      DocumentPatternMismatch(:final patternType) =>
-        LocalizedDocumentPatternMismatch(patternType: patternType),
+      DocumentConstValueMismatch() => LocalizedDocumentConstValueMismatch(
+        constValue: result.constValue,
+      ),
+      DocumentEnumValueMismatch() => LocalizedDocumentEnumValuesMismatch(
+        enumValues: result.enumValues,
+      ),
+      DocumentPatternMismatch(:final patternType) => LocalizedDocumentPatternMismatch(
+        patternType: patternType,
+      ),
     };
   }
 

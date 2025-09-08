@@ -3,7 +3,7 @@
 
 use std::fmt::{Debug, Display, Formatter};
 
-use cardano_blockchain_types::StakeAddress;
+use cardano_chain_follower::StakeAddress;
 use scylla::{
     deserialize::{value::DeserializeValue, DeserializationError, FrameSlice, TypeCheckError},
     frame::response::result::ColumnType,
@@ -27,14 +27,19 @@ impl From<StakeAddress> for DbStakeAddress {
 }
 
 impl Display for DbStakeAddress {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut Formatter<'_>,
+    ) -> std::fmt::Result {
         write!(f, "{}", self.0)
     }
 }
 
 impl SerializeValue for DbStakeAddress {
     fn serialize<'b>(
-        &self, typ: &ColumnType, writer: CellWriter<'b>,
+        &self,
+        typ: &ColumnType,
+        writer: CellWriter<'b>,
     ) -> Result<WrittenCellProof<'b>, SerializationError> {
         let bytes: Vec<_> = self.0.clone().into();
         bytes.serialize(typ, writer)
@@ -47,7 +52,8 @@ impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbStakeAddress {
     }
 
     fn deserialize(
-        typ: &'metadata ColumnType<'metadata>, v: Option<FrameSlice<'frame>>,
+        typ: &'metadata ColumnType<'metadata>,
+        v: Option<FrameSlice<'frame>>,
     ) -> Result<Self, DeserializationError> {
         let bytes = <Vec<u8>>::deserialize(typ, v)?;
         let address = bytes
@@ -66,7 +72,10 @@ struct DeserializeError {
 }
 
 impl Display for DeserializeError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut Formatter<'_>,
+    ) -> std::fmt::Result {
         write!(
             f,
             "Unexpected to deserialize StakeAddress: {:?}",

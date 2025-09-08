@@ -43,10 +43,12 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
     this._registrationProgressNotifier,
     this._accessControl,
     this._adminTools,
-  )   : _adminToolsState = _adminTools.state,
-        super(const SessionState.initial()) {
-    _userSettingsSub =
-        _userService.watchUser.map((user) => user.settings).distinct().listen(_handleUserSettings);
+  ) : _adminToolsState = _adminTools.state,
+      super(const SessionState.initial()) {
+    _userSettingsSub = _userService.watchUser
+        .map((user) => user.settings)
+        .distinct()
+        .listen(_handleUserSettings);
 
     _keychainUnlockedSub = _userService.watchUser
         .map((user) => user.activeAccount)
@@ -58,8 +60,9 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
 
     _registrationProgressNotifier.addListener(_onRegistrationProgressChanged);
 
-    _accountSub =
-        _userService.watchUser.map((user) => user.activeAccount).listen(_onActiveAccountChanged);
+    _accountSub = _userService.watchUser
+        .map((user) => user.activeAccount)
+        .listen(_onActiveAccountChanged);
 
     _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
 
@@ -77,7 +80,7 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
       _updateState();
     }
 
-    return _hasWallets;
+    return _alwaysAllowRegistration || _hasWallets;
   }
 
   @override
@@ -222,12 +225,7 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
   Future<Account> _getDummyAccount() async {
     final dummyAccount = _userService.user.accounts.firstWhereOrNull((e) => e.isDummy);
 
-    return dummyAccount ??
-        await _registrationService.registerTestAccount(
-          keychainId: Account.dummyKeychainId,
-          seedPhrase: Account.dummySeedPhrase,
-          lockFactor: Account.dummyUnlockFactor,
-        );
+    return dummyAccount ?? await _registrationService.createDummyAccount();
   }
 
   void _handleUserSettings(UserSettings settings) {

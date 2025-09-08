@@ -10,8 +10,7 @@ pub(crate) mod txo;
 
 use std::collections::BTreeSet;
 
-use cardano_blockchain_types::{MultiEraBlock, Slot};
-use catalyst_types::hashes::Blake2b256Hash;
+use cardano_chain_follower::{hashes::Blake2b256Hash, MultiEraBlock, Slot};
 use certs::CertInsertQuery;
 use cip36::Cip36InsertQuery;
 use rbac509::Rbac509InsertQuery;
@@ -25,7 +24,9 @@ use crate::rbac::RbacBlockIndexingContext;
 
 /// Add all data needed from the block into the indexes.
 pub(crate) async fn index_block(
-    block: &MultiEraBlock, pending_blocks: &mut watch::Receiver<BTreeSet<Slot>>, our_end: Slot,
+    block: &MultiEraBlock,
+    pending_blocks: &mut watch::Receiver<BTreeSet<Slot>>,
+    our_end: Slot,
 ) -> anyhow::Result<()> {
     // Get the session.  This should never fail.
     let Some(session) = CassandraSession::get(block.is_immutable()) else {

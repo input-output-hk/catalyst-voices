@@ -124,7 +124,7 @@ class _VoicesLoadingOverlayState extends State<VoicesLoadingOverlay>
     setState(() {
       _timer?.cancel();
       _showingSince = null;
-      _fadeInAnimController.reverse();
+      unawaited(_fadeInAnimController.reverse());
     });
   }
 
@@ -149,7 +149,7 @@ class _VoicesLoadingOverlayState extends State<VoicesLoadingOverlay>
     setState(() {
       _timer?.cancel();
       _showingSince = DateTimeExt.now();
-      _fadeInAnimController.forward();
+      unawaited(_fadeInAnimController.forward());
     });
   }
 }

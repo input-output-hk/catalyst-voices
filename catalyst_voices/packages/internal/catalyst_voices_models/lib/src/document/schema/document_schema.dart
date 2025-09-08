@@ -41,13 +41,13 @@ final class DocumentSchema extends Equatable implements DocumentNode {
 
   @override
   List<Object?> get props => [
-        parentSchemaUrl,
-        schemaSelfUrl,
-        title,
-        description,
-        properties,
-        order,
-      ];
+    parentSchemaUrl,
+    schemaSelfUrl,
+    title,
+    description,
+    properties,
+    order,
+  ];
 
   List<DocumentSegmentSchema> get segments =>
       properties.whereType<DocumentSegmentSchema>().toList();
@@ -76,10 +76,10 @@ final class DocumentSchemaLogicalCondition extends Equatable {
 
   @override
   List<Object?> get props => [
-        schema,
-        constValue,
-        enumValues,
-      ];
+    schema,
+    constValue,
+    enumValues,
+  ];
 }
 
 final class DocumentSchemaLogicalGroup extends Equatable {
@@ -91,6 +91,6 @@ final class DocumentSchemaLogicalGroup extends Equatable {
 
   @override
   List<Object?> get props => [
-        conditions,
-      ];
+    conditions,
+  ];
 }

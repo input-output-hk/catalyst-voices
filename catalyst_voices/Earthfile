@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT ../ AS repo-ci
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.5.2 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.5.15 AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
@@ -123,15 +123,24 @@ build-static-analysis:
 build-web:
     FROM +code-generator
     ARG WORKDIR=/frontend/apps/voices
+    ARG UPLOAD_DEBUG_SYMBOLS=false
 
-    DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --BUILD_MODE='--release' --TARGET=lib/configs/main_web.dart
+    DO flutter-ci+BUILD_WEB \
+        --WORKDIR=$WORKDIR \
+        --BUILD_MODE='--release' \
+        --BUILD_NAME='0.1.0' \
+        --BUILD_NUMBER=$(date +%s) \
+        --TARGET=lib/configs/main_web.dart \
+        --UPLOAD_DEBUG_SYMBOLS=$UPLOAD_DEBUG_SYMBOLS \
+        --SENTRY_ORG='iohk-j4' \
+        --SENTRY_PROJECT='catalyst-voices'
     SAVE ARTIFACT --keep-ts web
 
 package:
-    FROM caddy:2.10
+    FROM harbor.shared-services.projectcatalyst.io/dockerhub/caddy:2.10
     ARG tag='latest'
 
-    COPY --keep-ts +build-web/web /app
+    COPY --keep-ts (+build-web/web --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN --UPLOAD_DEBUG_SYMBOLS=true) /app
 
     # Note this is only used for local development, a different Caddyfile is
     # used during deployment. See the blueprint.cue file.

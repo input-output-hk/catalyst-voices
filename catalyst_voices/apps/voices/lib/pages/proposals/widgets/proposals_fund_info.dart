@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/pages/proposals/widgets/proposals_campaign_details_button.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -15,7 +14,7 @@ class ProposalsFundInfo extends StatelessWidget {
         children: [
           Text(
             key: const Key('CurrentCampaignTitle'),
-            context.l10n.catalystF14,
+            context.l10n.catalystFundNo(14),
             style: Theme.of(context).textTheme.displayMedium,
           ),
           const SizedBox(height: 16),
@@ -24,7 +23,6 @@ class ProposalsFundInfo extends StatelessWidget {
             context.l10n.currentCampaignDescription,
             style: Theme.of(context).textTheme.bodyLarge,
           ),
-          const ProposalsCampaignDetailsButton(),
         ],
       ),
     );

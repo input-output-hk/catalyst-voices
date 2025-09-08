@@ -6,9 +6,8 @@ import '../../utils/translations_utils.dart';
 import '../discovery_page.dart';
 
 class MostRecentSection {
-  MostRecentSection(this.$);
+  final PatrolTester $;
 
-  late PatrolTester $;
   final mostRecentProposals = const Key('MostRecentProposals');
   final mostRecentProposalsTitle = const Key('MostRecentProposalsTitle');
   final proposalCard = const Key('ProposalCard');
@@ -31,36 +30,17 @@ class MostRecentSection {
   final commentsCount = const Key('CommentsCount');
   final mostRecentLoadingError = const Key('MostRecentError');
 
-  Future<void> titleIsRenderedCorrectly() async {
-    await $(mostRecentProposalsTitle).scrollTo();
-    expect($(mostRecentProposalsTitle).text, (await t()).mostRecent);
-  }
+  MostRecentSection(this.$);
 
-  Future<void> recentProposalsAreRenderedCorrectly() async {
-    await $(mostRecentProposals).$(proposalCard).at(0).$(commentsCount).scrollTo(step: 90);
-
-    // TODO(oldgreg): there are only 3 cards indexed(rendered) always,need to
-    // find a way to check cards past 3rd after horizontal scroll
-    for (var cardIndex = 0; cardIndex < 3; cardIndex++) {
-      await $(mostRecentProposals)
-          .$(proposalCard)
-          .at(cardIndex)
-          .$(favoriteButton)
-          .scrollTo(scrollDirection: AxisDirection.right);
-      await proposalCardLooksAsExpected(mostRecentProposals, cardIndex);
-    }
-    expect(
-      $(mostRecentProposals).$(mostRecentProposalsSlider).visible,
-      true,
-    );
-    expect(
-      $(mostRecentProposals).$(viewAllProposalsButton).text,
-      (await t()).viewAllProposals,
-    );
+  Future<void> looksAsExpectedForVisitor() async {
+    await tryToScrollToRetryError();
+    await DiscoveryPage($).loadRetryOnError(mostRecentLoadingError);
+    await titleIsRenderedCorrectly();
+    await recentProposalsAreRenderedCorrectly();
   }
 
   Future<void> proposalCardLooksAsExpected(
-    Key parentContainer,
+    dynamic parentContainer,
     int cardIndex,
   ) async {
     expect(
@@ -125,18 +105,39 @@ class MostRecentSection {
     );
   }
 
+  Future<void> recentProposalsAreRenderedCorrectly() async {
+    await $(mostRecentProposals).$(proposalCard).at(0).$(commentsCount).scrollTo(step: 90);
+
+    // TODO(oldgreg): there are only 3 cards indexed(rendered) always,need to
+    // find a way to check cards past 3rd after horizontal scroll
+    for (var cardIndex = 0; cardIndex < 3; cardIndex++) {
+      await $(mostRecentProposals)
+          .$(proposalCard)
+          .at(cardIndex)
+          .$(favoriteButton)
+          .scrollTo(scrollDirection: AxisDirection.right);
+      await proposalCardLooksAsExpected(mostRecentProposals, cardIndex);
+    }
+    expect(
+      $(mostRecentProposals).$(mostRecentProposalsSlider).visible,
+      true,
+    );
+    expect(
+      $(mostRecentProposals).$(viewAllProposalsButton).text,
+      (await t()).viewAllProposals,
+    );
+  }
+
+  Future<void> titleIsRenderedCorrectly() async {
+    await $(mostRecentProposalsTitle).scrollTo();
+    expect($(mostRecentProposalsTitle).text, (await t()).mostRecent);
+  }
+
   Future<void> tryToScrollToRetryError() async {
     try {
       await $(mostRecentLoadingError).$(#ErrorRetryBtn).scrollTo(step: 300, maxScrolls: 5);
     } catch (e) {
       return;
     }
-  }
-
-  Future<void> looksAsExpectedForVisitor() async {
-    await tryToScrollToRetryError();
-    await DiscoveryPage($).loadRetryOnError(mostRecentLoadingError);
-    await titleIsRenderedCorrectly();
-    await recentProposalsAreRenderedCorrectly();
   }
 }

@@ -1,7 +1,7 @@
 //! Get assets by stake address.
 use std::sync::Arc;
 
-use cardano_blockchain_types::StakeAddress;
+use cardano_chain_follower::StakeAddress;
 use futures::TryStreamExt;
 use scylla::{
     client::session::Session, statement::prepared::PreparedStatement, DeserializeRow, SerializeRow,
@@ -10,10 +10,7 @@ use tracing::error;
 
 use crate::db::{
     index::{
-        queries::{
-            caches::txo_assets_by_stake::{get as cache_get, insert as cache_insert},
-            PreparedQueries, PreparedSelectQuery,
-        },
+        queries::{PreparedQueries, PreparedSelectQuery},
         session::CassandraSession,
     },
     types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
@@ -121,22 +118,22 @@ impl GetAssetsByStakeAddressQuery {
 
     /// Executes a get assets by stake address query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: GetAssetsByStakeAddressParams,
+        session: &CassandraSession,
+        params: GetAssetsByStakeAddressParams,
     ) -> anyhow::Result<Arc<Vec<GetAssetsByStakeAddressQuery>>> {
         if session.is_persistent() {
-            if let Some(res) = cache_get(&params.stake_address) {
+            if let Some(res) = session.caches().assets_native().get(&params.stake_address) {
                 return Ok(res);
             }
         }
 
-        // let res: Arc<Vec<GetAssetsByStakeAddressQuery>> = Arc::new(
-        let res: Vec<GetAssetsByStakeAddressQueryInner> = // Arc::new(
-            session
-                .execute_iter(PreparedSelectQuery::AssetsByStakeAddress, &params)
-                .await?
-                .rows_stream::<GetAssetsByStakeAddressQueryInner>()?
-                .map_err(Into::<anyhow::Error>::into)
-                .try_collect().await?;
+        let res: Vec<GetAssetsByStakeAddressQueryInner> = session
+            .execute_iter(PreparedSelectQuery::AssetsByStakeAddress, &params)
+            .await?
+            .rows_stream::<GetAssetsByStakeAddressQueryInner>()?
+            .map_err(Into::<anyhow::Error>::into)
+            .try_collect()
+            .await?;
         let res: Arc<Vec<GetAssetsByStakeAddressQuery>> = Arc::new(
             res.into_iter()
                 .map(Into::<GetAssetsByStakeAddressQuery>::into)
@@ -145,7 +142,10 @@ impl GetAssetsByStakeAddressQuery {
 
         // update cache
         if session.is_persistent() {
-            cache_insert(params.stake_address, res.clone());
+            session
+                .caches()
+                .assets_native()
+                .insert(params.stake_address, res.clone());
         }
         Ok(res)
     }

@@ -4,7 +4,7 @@
 pub(crate) mod metrics_updater {
     use std::ops::Sub;
 
-    use cardano_blockchain_types::Slot;
+    use cardano_chain_follower::Slot;
 
     use crate::{metrics::chain_indexer::reporter, settings::Settings};
 
@@ -43,7 +43,10 @@ pub(crate) mod metrics_updater {
     }
 
     /// Triggers to update the tip for both live and immutable slots.
-    pub(crate) fn current_tip_slot(live_slot: Slot, immutable_slot: Slot) {
+    pub(crate) fn current_tip_slot(
+        live_slot: Slot,
+        immutable_slot: Slot,
+    ) {
         let api_host_names = Settings::api_host_names().join(",");
         let service_id = Settings::service_id();
         let network = Settings::cardano_network().to_string();
@@ -103,6 +106,8 @@ pub(crate) mod metrics_updater {
 /// All the related Chain Indexer reporting metrics to the Prometheus service are inside
 /// this module.
 pub(crate) mod reporter {
+    #![allow(clippy::unwrap_used)]
+
     use std::sync::LazyLock;
 
     use prometheus::{

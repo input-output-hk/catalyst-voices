@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_page.dart';
 import 'package:catalyst_voices/routes/guards/composite_route_guard_mixin.dart';
-import 'package:catalyst_voices/routes/guards/proposal_submission_guard.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/guards/session_unlocked_guard.dart';
 import 'package:catalyst_voices/routes/guards/user_access_guard.dart';
@@ -13,6 +12,7 @@ part 'proposal_builder_route.g.dart';
 
 @TypedGoRoute<ProposalBuilderDraftRoute>(
   path: '/workspace/proposal_builder/draft',
+  name: 'proposal_builder_draft',
 )
 final class ProposalBuilderDraftRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
@@ -29,11 +29,10 @@ final class ProposalBuilderDraftRoute extends GoRouteData
   }
 
   @override
-  List<RouteGuard> get routeGuards => const [
-        SessionUnlockedGuard(),
-        UserAccessGuard(),
-        ProposalSubmissionGuard(),
-      ];
+  List<RouteGuard> get routeGuards => [
+    const SessionUnlockedGuard(),
+    const UserAccessGuard(),
+  ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
@@ -45,6 +44,7 @@ final class ProposalBuilderDraftRoute extends GoRouteData
 
 @TypedGoRoute<ProposalBuilderRoute>(
   path: '/workspace/proposal_builder/:proposalId',
+  name: 'proposal_builder_edit',
 )
 final class ProposalBuilderRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
@@ -69,11 +69,10 @@ final class ProposalBuilderRoute extends GoRouteData
   }
 
   @override
-  List<RouteGuard> get routeGuards => const [
-        SessionUnlockedGuard(),
-        UserAccessGuard(),
-        ProposalSubmissionGuard(),
-      ];
+  List<RouteGuard> get routeGuards => [
+    const SessionUnlockedGuard(),
+    const UserAccessGuard(),
+  ];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {

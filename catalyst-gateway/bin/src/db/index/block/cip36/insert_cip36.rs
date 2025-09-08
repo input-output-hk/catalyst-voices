@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::{Cip36, Slot, TxnIndex, VotingPubKey};
+use cardano_chain_follower::{Cip36, Slot, TxnIndex, VotingPubKey};
 use scylla::{client::session::Session, value::MaybeUnset, SerializeRow};
 use tracing::error;
 
@@ -41,7 +41,10 @@ pub(crate) struct Params {
 }
 
 impl Debug for Params {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
         let payment_address = match self.payment_address {
             MaybeUnset::Unset => "UNSET",
             MaybeUnset::Set(ref v) => &hex::encode(v),
@@ -62,7 +65,12 @@ impl Debug for Params {
 
 impl Params {
     /// Create a new Insert Query.
-    pub fn new(vote_key: &VotingPubKey, slot_no: Slot, txn_index: TxnIndex, cip36: &Cip36) -> Self {
+    pub fn new(
+        vote_key: &VotingPubKey,
+        slot_no: Slot,
+        txn_index: TxnIndex,
+        cip36: &Cip36,
+    ) -> Self {
         let stake_public_key = cip36
             .stake_pk()
             .map_or_else(Vec::new, |s| s.to_bytes().to_vec());
@@ -88,7 +96,8 @@ impl Params {
 
     /// Prepare Batch of Insert CIP-36 Registration Index Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+        session: &Arc<Session>,
+        cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),

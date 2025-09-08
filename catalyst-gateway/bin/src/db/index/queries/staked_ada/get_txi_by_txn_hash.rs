@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::TransactionId;
+use cardano_chain_follower::hashes::TransactionId;
 use scylla::{
     client::{pager::TypedRowStream, session::Session},
     statement::prepared::PreparedStatement,
@@ -63,7 +63,8 @@ impl GetTxiByTxnHashesQuery {
 
     /// Executes a get txi by transaction hashes query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: GetTxiByTxnHashesQueryParams,
+        session: &CassandraSession,
+        params: GetTxiByTxnHashesQueryParams,
     ) -> anyhow::Result<TypedRowStream<GetTxiByTxnHashesQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::TxiByTransactionHash, params)

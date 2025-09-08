@@ -147,17 +147,21 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
                       color: context.colors.onSurfaceNeutralOpaqueLv0.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: BlocSelector<WorkspaceBloc, WorkspaceState,
-                        List<CampaignTimelineViewModel>>(
-                      selector: (state) {
-                        return state.timelineItems;
-                      },
-                      builder: (context, timelineItems) {
-                        return CampaignTimeline(
-                          timelineItems: timelineItems,
-                        );
-                      },
-                    ),
+                    child:
+                        BlocSelector<
+                          WorkspaceBloc,
+                          WorkspaceState,
+                          List<CampaignTimelineViewModel>
+                        >(
+                          selector: (state) {
+                            return state.timelineItems;
+                          },
+                          builder: (context, timelineItems) {
+                            return CampaignTimeline(
+                              timelineItems: timelineItems,
+                            );
+                          },
+                        ),
                   ),
                 ),
               ],

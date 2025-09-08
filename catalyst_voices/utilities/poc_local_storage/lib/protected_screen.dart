@@ -56,32 +56,32 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _certificates.isEmpty
-                      ? const Center(child: Text('No certificates stored yet.'))
-                      : ListView.builder(
-                          itemCount: _certificates.length,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              title: Text(_certificates[index]),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.info),
-                                    onPressed: () async => _showCertificateDetails(
-                                      _certificates[index],
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: () async => _deleteCertificate(
-                                      _certificates[index],
-                                    ),
-                                  ),
-                                ],
+                  ? const Center(child: Text('No certificates stored yet.'))
+                  : ListView.builder(
+                      itemCount: _certificates.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(_certificates[index]),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.info),
+                                onPressed: () async => _showCertificateDetails(
+                                  _certificates[index],
+                                ),
                               ),
-                            );
-                          },
-                        ),
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () async => _deleteCertificate(
+                                  _certificates[index],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -181,8 +181,9 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
     return showDialog<String>(
       context: context,
       builder: (context) {
-        // TODO(dtscalac): remove SelectionArea when https://github.com/flutter/flutter/pull/167275
+        // TODO(dt-iohk): remove SelectionArea when https://github.com/flutter/flutter/pull/167275
         // is released and we're using this flutter version
+        // Note: fix scheduled for 3.34.x / 3.35.x flutter version
         return SelectionArea(
           child: AlertDialog(
             title: Text(message),

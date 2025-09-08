@@ -73,9 +73,9 @@ class _BrandsNavigationTile extends StatelessWidget {
   });
 
   Set<WidgetState> get _states => {
-        if (onTap == null) WidgetState.disabled,
-        if (isSelected) WidgetState.selected,
-      };
+    if (onTap == null) WidgetState.disabled,
+    if (isSelected) WidgetState.selected,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -84,8 +84,9 @@ class _BrandsNavigationTile extends StatelessWidget {
     final backgroundColor = _BackgroundColor(theme.colors);
     final foregroundColor = _ForegroundColor(theme.colors);
 
-    final textStyle = (theme.textTheme.bodyLarge ?? const TextStyle())
-        .copyWith(color: foregroundColor.resolve(_states));
+    final textStyle = (theme.textTheme.bodyLarge ?? const TextStyle()).copyWith(
+      color: foregroundColor.resolve(_states),
+    );
 
     final iconTheme = IconThemeData(
       size: 24,

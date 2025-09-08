@@ -1,12 +1,11 @@
 //! Get Catalyst ID by public key.
 
-use std::sync::{Arc, LazyLock};
+use std::sync::Arc;
 
 use anyhow::{Context, Result};
 use catalyst_types::catalyst_id::CatalystId;
 use ed25519_dalek::VerifyingKey;
 use futures::{StreamExt, TryStreamExt};
-use moka::{policy::EvictionPolicy, sync::Cache};
 use scylla::{
     client::session::Session,
     statement::{prepared::PreparedStatement, Consistency},
@@ -22,31 +21,14 @@ use crate::{
         },
         types::{DbCatalystId, DbPublicKey},
     },
-    metrics::rbac::reporter::{
-        PERSISTENT_PUBLIC_KEYS_CACHE_HIT, PERSISTENT_PUBLIC_KEYS_CACHE_MISS,
-        VOLATILE_PUBLIC_KEYS_CACHE_HIT, VOLATILE_PUBLIC_KEYS_CACHE_MISS,
+    metrics::caches::rbac::{
+        rbac_persistent_public_key_cache_hits_inc, rbac_persistent_public_key_cache_miss_inc,
+        rbac_volatile_public_key_cache_hits_inc, rbac_volatile_public_key_cache_miss_inc,
     },
-    settings::Settings,
 };
 
 /// A query string.
 const QUERY: &str = include_str!("../cql/get_catalyst_id_for_public_key.cql");
-
-/// A persistent cache instance.
-static PERSISTENT_CACHE: LazyLock<Cache<VerifyingKey, CatalystId>> = LazyLock::new(|| {
-    Cache::builder()
-        .eviction_policy(EvictionPolicy::lru())
-        .max_capacity(Settings::rbac_cfg().persistent_pub_keys_cache_size)
-        .build()
-});
-
-/// A volatile cache instance.
-static VOLATILE_CACHE: LazyLock<Cache<VerifyingKey, CatalystId>> = LazyLock::new(|| {
-    Cache::builder()
-        .eviction_policy(EvictionPolicy::lru())
-        .max_capacity(Settings::rbac_cfg().volatile_pub_keys_cache_size)
-        .build()
-});
 
 /// Get Catalyst ID by public key query parameters.
 #[derive(SerializeRow)]
@@ -74,14 +56,37 @@ impl Query {
 
     /// Executes the query and returns a result for the given public key.
     pub(crate) async fn get(
-        session: &CassandraSession, public_key: VerifyingKey,
+        session: &CassandraSession,
+        public_key: VerifyingKey,
     ) -> Result<Option<CatalystId>> {
-        let cache = cache(session.is_persistent());
+        let cache = session.caches().rbac_public_key();
 
-        let res = cache.get(&public_key);
-        update_cache_metrics(session.is_persistent(), res.is_some());
-        if let Some(res) = res {
-            return Ok(Some(res));
+        if cache.is_enabled() {
+            let entry_opt = cache.get(&public_key);
+
+            let entry_opt = if session.is_persistent() {
+                entry_opt
+                    .inspect(|_| {
+                        rbac_persistent_public_key_cache_hits_inc();
+                    })
+                    .or_else(|| {
+                        rbac_persistent_public_key_cache_miss_inc();
+                        None
+                    })
+            } else {
+                entry_opt
+                    .inspect(|_| {
+                        rbac_volatile_public_key_cache_hits_inc();
+                    })
+                    .or_else(|| {
+                        rbac_volatile_public_key_cache_miss_inc();
+                        None
+                    })
+            };
+
+            if entry_opt.is_some() {
+                return Ok(entry_opt);
+            }
         }
 
         session
@@ -105,51 +110,7 @@ impl Query {
 
 /// Removes all cached values.
 pub fn invalidate_public_keys_cache(is_persistent: bool) {
-    let cache = cache(is_persistent);
-    cache.invalidate_all();
-}
-
-/// Returns an approximate number of entries in the public keys cache.
-pub fn public_keys_cache_size(is_persistent: bool) -> u64 {
-    let cache = cache(is_persistent);
-    cache.entry_count()
-}
-
-/// Returns a persistent or a volatile cache instance depending on the parameter value.
-fn cache(is_persistent: bool) -> &'static Cache<VerifyingKey, CatalystId> {
-    if is_persistent {
-        &PERSISTENT_CACHE
-    } else {
-        &VOLATILE_CACHE
-    }
-}
-
-/// Updates metrics of the cache.
-fn update_cache_metrics(is_persistent: bool, is_found: bool) {
-    let api_host_names = Settings::api_host_names().join(",");
-    let service_id = Settings::service_id();
-    let network = Settings::cardano_network().to_string();
-
-    match (is_persistent, is_found) {
-        (true, true) => {
-            PERSISTENT_PUBLIC_KEYS_CACHE_HIT
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
-        },
-        (true, false) => {
-            PERSISTENT_PUBLIC_KEYS_CACHE_MISS
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
-        },
-        (false, true) => {
-            VOLATILE_PUBLIC_KEYS_CACHE_HIT
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
-        },
-        (false, false) => {
-            VOLATILE_PUBLIC_KEYS_CACHE_MISS
-                .with_label_values(&[&api_host_names, service_id, &network])
-                .inc();
-        },
-    }
+    CassandraSession::get(is_persistent).inspect(|session| {
+        session.caches().rbac_public_key().clear_cache();
+    });
 }

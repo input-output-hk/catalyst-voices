@@ -48,22 +48,22 @@ final class AccountCubit extends Cubit<AccountState>
     try {
       await _userService.resendActiveAccountVerificationEmail();
 
-      emitSignal(const AccountVerificationEmailSendSignal());
+      if (!isClosed) emitSignal(const AccountVerificationEmailSendSignal());
     } on EmailAlreadyUsedException catch (error, stackTrace) {
       _logger.severe('Re-send verification email - already used', error, stackTrace);
-      emitError(const LocalizedEmailAlreadyUsedException());
+      if (!isClosed) emitError(const LocalizedEmailAlreadyUsedException());
     } catch (error, stackTrace) {
       _logger.severe('Re-send verification email', error, stackTrace);
-      emitError(LocalizedException.create(error));
+      if (!isClosed) emitError(LocalizedException.create(error));
     }
   }
 
   Future<void> updateAccountDetails() async {
     try {
-      await _userService.updateActiveAccountDetails();
+      await _userService.refreshActiveAccountProfile();
     } catch (error, stackTrace) {
       _logger.severe('Updating active account failed', error, stackTrace);
-      emitError(LocalizedException.create(error));
+      if (!isClosed) emitError(LocalizedException.create(error));
     }
   }
 
@@ -71,6 +71,7 @@ final class AccountCubit extends Cubit<AccountState>
   Future<bool> updateEmail(Email email) async {
     try {
       final result = await _updateActiveAccount(email: email);
+      if (isClosed) return result.didChanged;
 
       if (result.didChanged) {
         emit(state.copyWith(email: email));
@@ -87,11 +88,11 @@ final class AccountCubit extends Cubit<AccountState>
       return result.didChanged;
     } on EmailAlreadyUsedException {
       _logger.info('Email already used');
-      emitError(const LocalizedEmailAlreadyUsedException());
+      if (!isClosed) emitError(const LocalizedEmailAlreadyUsedException());
       return false;
     } catch (error, stackTrace) {
       _logger.severe('Update email', error, stackTrace);
-      emitError(LocalizedException.create(error));
+      if (!isClosed) emitError(LocalizedException.create(error));
       return false;
     }
   }
@@ -100,6 +101,7 @@ final class AccountCubit extends Cubit<AccountState>
   Future<bool> updateUsername(Username username) async {
     try {
       final result = await _updateActiveAccount(username: username);
+      if (isClosed) return result.didChanged;
 
       if (result.didChanged) {
         emit(state.copyWith(username: username));
@@ -108,7 +110,7 @@ final class AccountCubit extends Cubit<AccountState>
       return result.didChanged;
     } catch (error, stackTrace) {
       _logger.severe('Update username', error, stackTrace);
-      emitError(LocalizedException.create(error));
+      if (!isClosed) emitError(LocalizedException.create(error));
       return false;
     }
   }
@@ -132,8 +134,8 @@ final class AccountCubit extends Cubit<AccountState>
     final emailValue = email?.value;
     final usernameValue = username != null
         ? username.value.isNotEmpty
-            ? Optional(username.value)
-            : const Optional<String>.empty()
+              ? Optional(username.value)
+              : const Optional<String>.empty()
         : null;
 
     return _userService.updateAccount(

@@ -1,6 +1,6 @@
 //! Command line and environment variable settings for the service
 
-use cardano_blockchain_types::Network;
+use cardano_chain_follower::Network;
 use tracing::info;
 
 use super::str_env_var::StringEnvVar;
@@ -64,7 +64,10 @@ pub(crate) struct EnvVars {
 
 impl EnvVars {
     /// Create a config for a cassandra cluster, identified by a default namespace.
-    pub(super) fn new(url: &str, namespace: &str) -> Self {
+    pub(super) fn new(
+        url: &str,
+        namespace: &str,
+    ) -> Self {
         let name = namespace.to_uppercase();
 
         let tls =
@@ -96,7 +99,11 @@ impl EnvVars {
     }
 
     /// Log the configuration of this Cassandra DB
-    pub(crate) fn log(&self, persistent: bool, network: Network) {
+    pub(crate) fn log(
+        &self,
+        persistent: bool,
+        network: Network,
+    ) {
         let db_type = if persistent { "Persistent" } else { "Volatile" };
 
         let auth = match (&self.username, &self.password) {

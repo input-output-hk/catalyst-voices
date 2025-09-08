@@ -179,7 +179,8 @@ void main() {
     });
 
     test('username with spaces is decoded correctly', () {
-      const rawUri = 'id.catalyst://'
+      const rawUri =
+          'id.catalyst://'
           'damian%20m@cardano/'
           'FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE';
       final id = CatalystId.fromUri(Uri.parse(rawUri));

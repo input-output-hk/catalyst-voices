@@ -113,23 +113,23 @@ final class TransactionBuilder extends Equatable {
 
   @override
   List<Object?> get props => [
-        config,
-        inputs,
-        outputs,
-        fee,
-        ttl,
-        auxiliaryData,
-        validityStart,
-        mint,
-        scriptData,
-        collateralInputs,
-        requiredSigners,
-        networkId,
-        collateralReturn,
-        totalCollateral,
-        referenceInputs,
-        witnessBuilder,
-      ];
+    config,
+    inputs,
+    outputs,
+    fee,
+    ttl,
+    auxiliaryData,
+    validityStart,
+    mint,
+    scriptData,
+    collateralInputs,
+    requiredSigners,
+    networkId,
+    collateralReturn,
+    totalCollateral,
+    referenceInputs,
+    witnessBuilder,
+  ];
 
   /// Applies coin selection to the transaction and updates its state.
   ///
@@ -430,8 +430,9 @@ final class TransactionBuilder extends Equatable {
       outputs: outputs,
       fee: fee,
       ttl: ttl,
-      auxiliaryDataHash:
-          auxiliaryData != null ? AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData!) : null,
+      auxiliaryDataHash: auxiliaryData != null
+          ? AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData!)
+          : null,
       validityStart: validityStart,
       mint: mint,
       scriptDataHash: scriptData != null ? ScriptDataHash.fromScriptData(scriptData!) : null,
@@ -835,13 +836,13 @@ final class TransactionBuilderConfig extends Equatable {
 
   @override
   List<Object?> get props => [
-        feeAlgo,
-        maxTxSize,
-        maxValueSize,
-        maxAssetsPerOutput,
-        coinsPerUtxoByte,
-        selectionStrategy,
-      ];
+    feeAlgo,
+    maxTxSize,
+    maxValueSize,
+    maxAssetsPerOutput,
+    coinsPerUtxoByte,
+    selectionStrategy,
+  ];
 
   /// Creates copy of this config with updated parameters.
   TransactionBuilderConfig copyWith({
@@ -883,10 +884,9 @@ final class TransactionOutputBuilder {
   static Coin feeForOutput(
     TransactionBuilderConfig config,
     ShelleyMultiAssetTransactionOutput output,
-  ) =>
-      Coin(
-        cbor.encode(output.toCbor()).length * config.feeAlgo.coefficient,
-      );
+  ) => Coin(
+    cbor.encode(output.toCbor()).length * config.feeAlgo.coefficient,
+  );
 
   /// Validates the size of a transaction output against protocol parameters.
   ///
@@ -899,8 +899,7 @@ final class TransactionOutputBuilder {
   static bool isOutputSizeValid(
     ShelleyMultiAssetTransactionOutput output,
     int maxValueSize,
-  ) =>
-      cbor.encode(output.amount.toCbor()).length <= maxValueSize;
+  ) => cbor.encode(output.amount.toCbor()).length <= maxValueSize;
 
   /// Validates the value of a transaction output.
   ///

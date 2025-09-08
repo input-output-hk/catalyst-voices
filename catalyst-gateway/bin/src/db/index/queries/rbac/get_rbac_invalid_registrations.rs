@@ -21,7 +21,6 @@ use crate::db::{
 const QUERY: &str = include_str!("../cql/get_rbac_invalid_registrations_catalyst_id.cql");
 
 /// Get invalid registrations by Catalyst ID query params.
-#[allow(dead_code)]
 #[derive(SerializeRow)]
 pub(crate) struct QueryParams {
     /// A Catalyst ID.
@@ -29,7 +28,6 @@ pub(crate) struct QueryParams {
 }
 
 /// Get invalid registrations by Catalyst ID query.
-#[allow(dead_code)]
 #[derive(DeserializeRow)]
 pub(crate) struct Query {
     /// Registration transaction id.
@@ -57,10 +55,9 @@ impl Query {
     }
 
     /// Executes a get invalid registrations by Catalyst ID query.
-    // TODO: Remove the `dead_code` annotation when the query is used.
-    #[allow(dead_code)]
     pub(crate) async fn execute(
-        session: &CassandraSession, params: QueryParams,
+        session: &CassandraSession,
+        params: QueryParams,
     ) -> anyhow::Result<TypedRowStream<Query>> {
         session
             .execute_iter(

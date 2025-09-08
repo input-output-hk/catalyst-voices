@@ -1,17 +1,15 @@
 //! Utilities for obtaining a RBAC registration chain (`RegistrationChain`).
 
 use anyhow::{bail, Context, Result};
-use cardano_blockchain_types::{Network, Point, Slot, StakeAddress, TxnIndex};
-use cardano_chain_follower::ChainFollower;
+use cardano_chain_follower::{ChainFollower, Network, Point, Slot, TxnIndex};
 use catalyst_types::catalyst_id::CatalystId;
 use futures::{future::try_join, TryFutureExt, TryStreamExt};
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
 
 use crate::{
     db::index::{
-        queries::rbac::{
-            get_catalyst_id_from_stake_address::Query as CatalystIdQuery,
-            get_rbac_registrations::{Query as RbacQuery, QueryParams as RbacQueryParams},
+        queries::rbac::get_rbac_registrations::{
+            Query as RbacQuery, QueryParams as RbacQueryParams,
         },
         session::CassandraSession,
     },
@@ -69,37 +67,15 @@ pub async fn latest_rbac_chain(id: &CatalystId) -> Result<Option<ChainInfo>> {
     }))
 }
 
-/// Returns the latest (including the volatile part) registration chain by the given stake
-/// address.
-pub async fn latest_rbac_chain_by_address(address: &StakeAddress) -> Result<Option<ChainInfo>> {
-    let persistent_session =
-        CassandraSession::get(true).context("Failed to get persistent Cassandra session")?;
-    let volatile_session =
-        CassandraSession::get(false).context("Failed to get volatile Cassandra session")?;
-
-    // We always check the latest (volatile) data first.
-    let id = match CatalystIdQuery::latest(&volatile_session, address).await? {
-        Some(id) => id,
-        None => {
-            match CatalystIdQuery::latest(&persistent_session, address).await? {
-                Some(id) => id,
-                None => return Ok(None),
-            }
-        },
-    };
-
-    latest_rbac_chain(&id).await
-}
-
 /// Returns only the persistent part of a registration chain by the given Catalyst ID.
 pub async fn persistent_rbac_chain(id: &CatalystId) -> Result<Option<RegistrationChain>> {
+    let session = CassandraSession::get(true).context("Failed to get Cassandra session")?;
+
     let id = id.as_short_id();
 
-    if let Some(chain) = cached_persistent_rbac_chain(&id) {
+    if let Some(chain) = cached_persistent_rbac_chain(&session, &id) {
         return Ok(Some(chain));
     }
-
-    let session = CassandraSession::get(true).context("Failed to get Cassandra session")?;
 
     let regs = indexed_regs(&session, &id).await?;
     let chain = build_rbac_chain(regs).await?.inspect(|c| {
@@ -109,7 +85,10 @@ pub async fn persistent_rbac_chain(id: &CatalystId) -> Result<Option<Registratio
 }
 
 /// Queries indexed RBAC registrations from the database.
-async fn indexed_regs(session: &CassandraSession, id: &CatalystId) -> Result<Vec<RbacQuery>> {
+async fn indexed_regs(
+    session: &CassandraSession,
+    id: &CatalystId,
+) -> Result<Vec<RbacQuery>> {
     RbacQuery::execute(session, RbacQueryParams {
         catalyst_id: id.clone().into(),
     })
@@ -119,7 +98,7 @@ async fn indexed_regs(session: &CassandraSession, id: &CatalystId) -> Result<Vec
 
 /// Builds a chain from the given registrations.
 pub async fn build_rbac_chain(
-    regs: impl IntoIterator<Item = RbacQuery>,
+    regs: impl IntoIterator<Item = RbacQuery>
 ) -> Result<Option<RegistrationChain>> {
     let mut regs = regs.into_iter();
     let Some(root) = regs.next() else {
@@ -144,7 +123,8 @@ pub async fn build_rbac_chain(
 
 /// Applies the given registration to the given chain.
 pub async fn apply_regs(
-    mut chain: RegistrationChain, regs: impl IntoIterator<Item = RbacQuery>,
+    mut chain: RegistrationChain,
+    regs: impl IntoIterator<Item = RbacQuery>,
 ) -> Result<RegistrationChain> {
     let network = Settings::cardano_network();
 
@@ -164,7 +144,11 @@ pub async fn apply_regs(
 }
 
 /// Loads and parses a `Cip509` registration from a block using chain follower.
-async fn cip509(network: Network, slot: Slot, txn_index: TxnIndex) -> Result<Cip509> {
+async fn cip509(
+    network: Network,
+    slot: Slot,
+    txn_index: TxnIndex,
+) -> Result<Cip509> {
     let point = Point::fuzzy(slot);
     let block = ChainFollower::get_block(network, point)
         .await

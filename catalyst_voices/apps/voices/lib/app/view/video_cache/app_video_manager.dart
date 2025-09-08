@@ -1,19 +1,24 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:synchronized/synchronized.dart';
 import 'package:video_player/video_player.dart';
 
 /// Caches [VideoPlayerController] so it can be initialized and reused in different parts
 /// of app.
 class VideoManager extends ValueNotifier<VideoManagerState> {
-  bool _isInitialized = false;
+  var _isInitialized = Completer<bool>();
 
-  VideoManager() : super(const VideoManagerState(controllers: {}));
+  final CatalystStartupProfiler _profiler;
+  final _lock = Lock();
 
-  bool get isInitialized => _isInitialized;
+  VideoManager(this._profiler) : super(const VideoManagerState(controllers: {}));
+
+  Future<bool> get isInitialized => _isInitialized.future;
 
   Future<VideoPlayerController> createOrReinitializeController(
     VideoCacheKey asset,
@@ -40,37 +45,35 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
 
   @override
   void dispose() {
-    unawaited(_disposeControllers());
+    _disposeControllers();
     super.dispose();
   }
 
   Future<void> precacheVideos(
     BuildContext context, {
     required VideoPrecacheAssets videoAssets,
-  }) async {
-    if (_isInitialized) return;
+  }) {
+    if (!_profiler.ongoing) {
+      return _precacheVideos(context, videoAssets: videoAssets);
+    }
 
-    final newControllers = Map.of(value.controllers);
-
-    await Future.wait(
-      videoAssets.assets.map((asset) async {
-        final key = _createKey(asset, videoAssets.package);
-        if (value.controllers.containsKey(key)) return;
-
-        final controller = await _initializeController(asset, package: videoAssets.package);
-        newControllers[key] = controller;
-      }),
-    );
-
-    value = value.copyWith(controllers: newControllers);
-    _isInitialized = true;
+    return _profiler.videoCache(body: () => _precacheVideos(context, videoAssets: videoAssets));
   }
 
   Future<void> resetCacheIfNeeded(ThemeData theme) async {
     if (value.brightness != theme.brightness) {
-      _isInitialized = false;
-      await _disposeControllers();
-      value = value.copyWith(brightness: Optional(theme.brightness));
+      // Handle case when caching is in progress and someone awaits completion.
+      // For such case we're completing _isInitialized early.
+      if (!_isInitialized.isCompleted && _lock.inLock) _isInitialized.complete(false);
+
+      _isInitialized = Completer();
+
+      _disposeControllers();
+
+      value = value.copyWith(
+        controllers: {},
+        brightness: Optional(theme.brightness),
+      );
     }
   }
 
@@ -78,11 +81,11 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
     return '$asset${package != null ? "_$package" : "_unknown"}';
   }
 
-  Future<void> _disposeControllers() async {
-    for (final controller in value.controllers.values) {
-      await controller.dispose();
+  void _disposeControllers() {
+    final controllers = value.controllers.values;
+    for (final controller in controllers) {
+      unawaited(controller.dispose());
     }
-    value = value.copyWith(controllers: {});
   }
 
   Future<VideoPlayerController> _initializeController(
@@ -102,6 +105,31 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
     await controller.play();
 
     return controller;
+  }
+
+  Future<void> _precacheVideos(
+    BuildContext context, {
+    required VideoPrecacheAssets videoAssets,
+  }) async {
+    return _lock.synchronized<void>(() async {
+      if (_isInitialized.isCompleted) return;
+
+      final newControllers = Map.of(value.controllers);
+
+      await Future.wait(
+        videoAssets.assets.map((asset) async {
+          final key = _createKey(asset, videoAssets.package);
+          if (value.controllers.containsKey(key)) return;
+
+          final controller = await _initializeController(asset, package: videoAssets.package);
+          newControllers[key] = controller;
+        }),
+      );
+
+      value = value.copyWith(controllers: newControllers);
+
+      if (!_isInitialized.isCompleted) _isInitialized.complete(true);
+    });
   }
 }
 

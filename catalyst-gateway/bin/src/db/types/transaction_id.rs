@@ -2,7 +2,7 @@
 
 use std::fmt::{Display, Formatter};
 
-use cardano_blockchain_types::TransactionId;
+use cardano_chain_follower::hashes::TransactionId;
 use scylla::{
     deserialize::{value::DeserializeValue, DeserializationError, FrameSlice, TypeCheckError},
     frame::response::result::ColumnType,
@@ -19,7 +19,10 @@ use scylla::{
 pub struct DbTransactionId(TransactionId);
 
 impl Display for DbTransactionId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut Formatter<'_>,
+    ) -> std::fmt::Result {
         f.write_str(&format!("{}", self.0))
     }
 }
@@ -38,7 +41,9 @@ impl From<DbTransactionId> for TransactionId {
 
 impl SerializeValue for DbTransactionId {
     fn serialize<'b>(
-        &self, typ: &ColumnType, writer: CellWriter<'b>,
+        &self,
+        typ: &ColumnType,
+        writer: CellWriter<'b>,
     ) -> Result<WrittenCellProof<'b>, SerializationError> {
         let bytes: Vec<u8> = self.0.into();
         bytes.serialize(typ, writer)
@@ -51,7 +56,8 @@ impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbTransactionId 
     }
 
     fn deserialize(
-        typ: &'metadata ColumnType<'metadata>, v: Option<FrameSlice<'frame>>,
+        typ: &'metadata ColumnType<'metadata>,
+        v: Option<FrameSlice<'frame>>,
     ) -> Result<Self, DeserializationError> {
         let bytes = <Vec<u8>>::deserialize(typ, v)?;
         let hash = TransactionId::try_from(bytes).map_err(DeserializationError::new)?;

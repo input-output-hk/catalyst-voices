@@ -10,7 +10,7 @@ license = "Apache-2.0"
 crate-type = ["cdylib", "staticlib", "rlib"]
 
 [dependencies]
-flutter_rust_bridge = "=2.5.1"
+flutter_rust_bridge = "=2.11.1"
 ed25519-bip32 = "0.4.1"
 hmac = "0.12.1"
 pbkdf2 = "0.12.2"
@@ -49,7 +49,6 @@ exit = "deny"
 get_unwrap = "deny"
 index_refutable_slice = "deny"
 indexing_slicing = "deny"
-match_on_vec_items = "deny"
 match_wild_err_arm = "deny"
 missing_panics_doc = "deny"
 panic = "deny"

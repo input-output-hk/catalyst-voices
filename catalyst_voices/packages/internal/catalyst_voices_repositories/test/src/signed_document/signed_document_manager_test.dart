@@ -14,8 +14,7 @@ void main() {
       CatalystCompressionPlatform.instance = _FakeCatalystCompressionPlatform();
     });
 
-    test(
-        'signDocument creates a signed document '
+    test('signDocument creates a signed document '
         'that can be converted from/to bytes', () async {
       const document = SignedDocumentJsonPayload({'title': 'hey'});
 

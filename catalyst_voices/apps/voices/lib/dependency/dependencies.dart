@@ -32,14 +32,24 @@ final class Dependencies extends DependencyProvider {
   }
 
   Future<void> init({
+    required AppConfig config,
     required AppEnvironment environment,
-    LoggingService? loggingService,
+    required LoggingService loggingService,
+    required ReportingService reportingService,
+    CatalystProfiler? profiler,
+    CatalystStartupProfiler? startupProfiler,
   }) async {
     DependencyProvider.instance = this;
 
+    registerSingleton<AppConfig>(config);
     registerSingleton<AppEnvironment>(environment);
-    if (loggingService != null) {
-      registerSingleton<LoggingService>(loggingService);
+    registerSingleton<LoggingService>(loggingService);
+    registerSingleton<ReportingService>(reportingService);
+    if (profiler != null) {
+      registerSingleton<CatalystProfiler>(profiler);
+    }
+    if (startupProfiler != null) {
+      registerSingleton(startupProfiler);
     }
 
     _registerStorages();
@@ -52,13 +62,13 @@ final class Dependencies extends DependencyProvider {
     _isInitialized = true;
   }
 
-  void registerConfig(AppConfig config) {
-    if (isRegistered<AppConfig>()) {
+  void register<T extends Object>(T instance) {
+    if (isRegistered<T>()) {
       if (kDebugMode) {
-        print('AppConfig already registered!');
+        print('${T.runtimeType} already registered!');
       }
     }
-    registerSingleton<AppConfig>(config);
+    registerSingleton<T>(instance);
   }
 
   void _registerBlocsWithDependencies() {
@@ -99,17 +109,15 @@ final class Dependencies extends DependencyProvider {
           get<ProposalService>(),
         ),
       )
-      ..registerFactory<CampaignDetailsBloc>(() {
-        return CampaignDetailsBloc(
+      ..registerLazySingleton<VotingCubit>(
+        () => VotingCubit(
+          get<UserService>(),
           get<CampaignService>(),
-        );
-      })
-      ..registerLazySingleton<CampaignInfoCubit>(() {
-        return CampaignInfoCubit(
-          get<CampaignService>(),
-          get<AdminTools>(),
-        );
-      })
+          get<ProposalService>(),
+          get<VotingBallotBuilder>(),
+          get<VotingService>(),
+        ),
+      )
       // TODO(LynxLynxx): add repository for campaign management
       ..registerLazySingleton<CampaignBuilderCubit>(
         CampaignBuilderCubit.new,
@@ -153,6 +161,8 @@ final class Dependencies extends DependencyProvider {
           get<CommentService>(),
           get<CampaignService>(),
           get<DocumentMapper>(),
+          get<VotingBallotBuilder>(),
+          get<VotingService>(),
         );
       })
       ..registerFactory<NewProposalCubit>(() {
@@ -160,11 +170,6 @@ final class Dependencies extends DependencyProvider {
           get<CampaignService>(),
           get<ProposalService>(),
           get<DocumentMapper>(),
-        );
-      })
-      ..registerFactory<CampaignStageCubit>(() {
-        return CampaignStageCubit(
-          get<CampaignService>(),
         );
       })
       ..registerFactory<DevToolsBloc>(() {
@@ -186,16 +191,34 @@ final class Dependencies extends DependencyProvider {
           get<DocumentsService>(),
           get<DocumentMapper>(),
         );
+      })
+      ..registerFactory<CampaignPhaseAwareCubit>(() {
+        return CampaignPhaseAwareCubit(
+          get<CampaignService>(),
+          get<SyncManager>(),
+        );
+      })
+      ..registerFactory<VotingBallotBloc>(() {
+        return VotingBallotBloc(
+          get<UserService>(),
+          get<CampaignService>(),
+          get<VotingBallotBuilder>(),
+          get<VotingService>(),
+        );
       });
   }
 
   void _registerNetwork() {
-    registerLazySingleton<ApiServices>(() {
-      return ApiServices(
-        env: get<AppEnvironment>().type,
-        authTokenProvider: get<AuthTokenProvider>(),
-      );
-    });
+    registerLazySingleton<ApiServices>(
+      () {
+        return ApiServices(
+          env: get<AppEnvironment>().type,
+          authTokenProvider: get<AuthTokenProvider>(),
+          httpClient: () => get<ReportingService>().buildHttpClient(),
+        );
+      },
+      dispose: (api) => api.dispose(),
+    );
   }
 
   void _registerRepositories() {
@@ -264,6 +287,11 @@ final class Dependencies extends DependencyProvider {
             get<DevToolsStorage>(),
           );
         },
+      )
+      ..registerLazySingleton<VotingRepository>(
+        () => VotingRepository(
+          get<CastedVotesObserver>(),
+        ),
       );
   }
 
@@ -336,6 +364,7 @@ final class Dependencies extends DependencyProvider {
       return CampaignService(
         get<CampaignRepository>(),
         get<ProposalRepository>(),
+        get<ActiveCampaignObserver>(),
       );
     });
     registerLazySingleton<ProposalService>(() {
@@ -344,7 +373,8 @@ final class Dependencies extends DependencyProvider {
         get<DocumentRepository>(),
         get<UserService>(),
         get<SignerService>(),
-        get<CampaignRepository>(),
+        get<ActiveCampaignObserver>(),
+        get<CastedVotesObserver>(),
       );
     });
     registerLazySingleton<CommentService>(() {
@@ -380,6 +410,22 @@ final class Dependencies extends DependencyProvider {
         get<ResourceUrlResolver>(),
       );
     });
+    registerLazySingleton<VotingService>(() {
+      return VotingService(
+        get<VotingRepository>(),
+        get<ProposalService>(),
+        get<CampaignService>(),
+      );
+    });
+    registerLazySingleton<ReportingServiceMediator>(
+      () {
+        return ReportingServiceMediator(
+          get<ReportingService>(),
+          get<UserService>(),
+        );
+      },
+      dispose: (mediator) => mediator.dispose(),
+    );
   }
 
   void _registerStorages() {
@@ -389,6 +435,7 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<CatalystDatabase>(
       () {
         final config = get<AppConfig>().database;
+        final reporting = get<ReportingService>();
 
         return CatalystDatabase.drift(
           config: CatalystDriftDatabaseConfig(
@@ -398,6 +445,7 @@ final class Dependencies extends DependencyProvider {
               driftWorker: Uri.parse(config.webDriftWorker),
             ),
           ),
+          interceptor: reporting.buildDbInterceptor(databaseName: config.name),
         );
       },
       dispose: (database) async => database.close(),
@@ -437,9 +485,19 @@ final class Dependencies extends DependencyProvider {
       dispose: (observer) async => observer.dispose(),
     );
     registerLazySingleton<VideoManager>(
-      VideoManager.new,
+      () {
+        return VideoManager(
+          get<CatalystStartupProfiler>(),
+        );
+      },
       dispose: (manager) => manager.dispose(),
     );
     registerLazySingleton<ShareManager>(() => DelegatingShareManager(get<ShareService>()));
+    registerLazySingleton<ActiveCampaignObserver>(
+      ActiveCampaignObserverImpl.new,
+      dispose: (observer) async => observer.dispose(),
+    );
+    registerLazySingleton<CastedVotesObserver>(CastedVotesObserverImpl.new);
+    registerLazySingleton<VotingBallotBuilder>(VotingBallotLocalBuilder.new);
   }
 }

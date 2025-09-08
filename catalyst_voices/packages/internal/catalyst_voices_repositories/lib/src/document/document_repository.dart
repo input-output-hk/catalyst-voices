@@ -249,8 +249,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final all = switch (ref) {
       DraftRef() => await _drafts.getAll(ref: ref),
       SignedDocumentRef() => await _localDocuments.getAll(ref: ref),
-    }
-      ..sort();
+    }..sort();
 
     return all;
   }
@@ -260,8 +259,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final allRefs = await _remoteDocuments.index().then(_uniqueTypedRefs);
     final allConstRefs = constantDocumentsRefs.expand((element) => element.all);
 
-    final nonConstRefs =
-        allRefs.where((ref) => allConstRefs.none((e) => e.id == ref.ref.id)).toList();
+    final nonConstRefs = allRefs
+        .where((ref) => allConstRefs.none((e) => e.id == ref.ref.id))
+        .toList();
 
     final exactRefs = nonConstRefs.where((ref) => ref.ref.isExact).toList();
     final looseRefs = nonConstRefs.where((ref) => !ref.ref.isExact).toList();
@@ -479,15 +479,19 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         );
 
     // Combine streams
-    return Rx.combineLatest2<List<DocumentsDataWithRefData>, List<DocumentsDataWithRefData>,
-        List<DocumentsDataWithRefData>>(
-      localDocs,
-      localDrafts,
-      (docs, drafts) {
-        final combined = {...docs, ...drafts};
-        return combined.toList();
-      },
-    ).distinct(listEquals);
+    return Rx.combineLatest2<
+          List<DocumentsDataWithRefData>,
+          List<DocumentsDataWithRefData>,
+          List<DocumentsDataWithRefData>
+        >(
+          localDocs,
+          localDrafts,
+          (docs, drafts) {
+            final combined = {...docs, ...drafts};
+            return combined.toList();
+          },
+        )
+        .distinct(listEquals);
   }
 
   @override
@@ -683,9 +687,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }) {
     return switch (ref) {
       SignedDocumentRef() => _watchSignedDocumentData(
-          ref: ref,
-          synchronizedUpdate: synchronizedUpdate,
-        ),
+        ref: ref,
+        synchronizedUpdate: synchronizedUpdate,
+      ),
       DraftRef() => _watchDraftDocumentData(ref: ref),
     };
   }

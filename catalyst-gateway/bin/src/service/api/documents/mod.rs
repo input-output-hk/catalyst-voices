@@ -47,7 +47,8 @@ impl DocumentApi {
         transform = "schema_version_validation"
     )]
     async fn get_document(
-        &self, /// UUIDv7 Document ID to retrieve
+        &self,
+        /// UUIDv7 Document ID to retrieve
         document_id: Path<UUIDv7>,
         /// UUIDv7 Version of the Document to retrieve, if omitted, returns the latest
         /// version.
@@ -77,7 +78,8 @@ impl DocumentApi {
         transform = "schema_version_validation"
     )]
     async fn put_document(
-        &self, /// The document to PUT
+        &self,
+        /// The document to PUT
         document: Cbor<Body>,
         /// Authorization required.
         auth: CatalystRBACSecurityScheme,
@@ -114,7 +116,8 @@ impl DocumentApi {
         &self,
         /// The Query Filter Specification
         query: Json<post_document_index_query::v2::request::DocumentIndexQueryFilterBodyV2>,
-        page: Query<Option<Page>>, limit: Query<Option<Limit>>,
+        page: Query<Option<Page>>,
+        limit: Query<Option<Limit>>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> post_document_index_query::v2::AllResponses {

@@ -12,7 +12,7 @@ use std::{
 };
 
 use anyhow::{Context, Result};
-use cardano_blockchain_types::{MultiEraBlock, Slot, TransactionId, TxnIndex};
+use cardano_chain_follower::{hashes::TransactionId, MultiEraBlock, Slot, TxnIndex};
 use rbac_registration::cardano::cip509::Cip509;
 use scylla::client::session::Session;
 use tokio::sync::watch;
@@ -23,7 +23,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    metrics::{self, rbac::inc_index_sync},
+    metrics::caches::rbac::{inc_index_sync, inc_invalid_rbac_reg_count},
     rbac::{
         validate_rbac_registration, RbacBlockIndexingContext, RbacValidationError,
         RbacValidationSuccess,
@@ -60,7 +60,8 @@ impl Rbac509InsertQuery {
 
     /// Prepare Batch of Insert RBAC 509 Registration Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &EnvVars,
+        session: &Arc<Session>,
+        cfg: &EnvVars,
     ) -> Result<(SizedBatch, SizedBatch, SizedBatch, SizedBatch, SizedBatch)> {
         Ok((
             insert_rbac509::Params::prepare_batch(session, cfg).await?,
@@ -74,8 +75,12 @@ impl Rbac509InsertQuery {
     /// Index the RBAC 509 registrations in a transaction.
     #[allow(clippy::too_many_lines)]
     pub(crate) async fn index(
-        &mut self, txn_hash: TransactionId, index: TxnIndex, block: &MultiEraBlock,
-        pending_blocks: &mut watch::Receiver<BTreeSet<Slot>>, our_end: Slot,
+        &mut self,
+        txn_hash: TransactionId,
+        index: TxnIndex,
+        block: &MultiEraBlock,
+        pending_blocks: &mut watch::Receiver<BTreeSet<Slot>>,
+        our_end: Slot,
         context: &mut RbacBlockIndexingContext,
     ) -> Result<()> {
         let slot = block.slot();
@@ -134,6 +139,7 @@ impl Rbac509InsertQuery {
                 stake_addresses,
                 public_keys,
                 modified_chains,
+                purpose,
             }) => {
                 // Record the transaction identifier (hash) of a new registration.
                 self.catalyst_id_for_txn_id
@@ -173,6 +179,7 @@ impl Rbac509InsertQuery {
                     // Addresses can only be removed from other chains, so this list is always
                     // empty for the chain that is being updated.
                     HashSet::new(),
+                    purpose,
                 ));
 
                 // Update other chains that were affected by this registration.
@@ -187,6 +194,7 @@ impl Rbac509InsertQuery {
                         // that is being updated.
                         None,
                         removed_addresses,
+                        None,
                     ));
                 }
             },
@@ -196,7 +204,7 @@ impl Rbac509InsertQuery {
                 purpose,
                 report,
             }) => {
-                metrics::rbac::inc_invalid_rbac_reg_count();
+                inc_invalid_rbac_reg_count();
                 self.invalid.push(insert_rbac509_invalid::Params::new(
                     catalyst_id,
                     txn_hash,
@@ -237,7 +245,10 @@ impl Rbac509InsertQuery {
     /// Execute the RBAC 509 Registration Indexing Queries.
     ///
     /// Consumes the `self` and returns a vector of futures.
-    pub(crate) fn execute(self, session: &Arc<CassandraSession>) -> FallibleQueryTasks {
+    pub(crate) fn execute(
+        self,
+        session: &Arc<CassandraSession>,
+    ) -> FallibleQueryTasks {
         let mut query_handles: FallibleQueryTasks = Vec::new();
 
         if !self.registrations.is_empty() {
@@ -302,7 +313,9 @@ impl Rbac509InsertQuery {
 ///
 /// The given `our_end` is excluded from the list of unprocessed blocks.
 async fn wait_for_previous_blocks(
-    pending_blocks: &mut watch::Receiver<BTreeSet<Slot>>, our_end: Slot, current_slot: Slot,
+    pending_blocks: &mut watch::Receiver<BTreeSet<Slot>>,
+    our_end: Slot,
+    current_slot: Slot,
 ) -> Result<()> {
     loop {
         if pending_blocks

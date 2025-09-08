@@ -5,9 +5,10 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_8_writedown_seedphrase.dart';
 
-class WritedownSeedphraseInfoPanel extends OnboardingPageBase {
+final class WritedownSeedphraseInfoPanel extends OnboardingPageBase {
   WritedownSeedphraseInfoPanel(super.$);
 
+  @override
   Future<void> clickNext() async {
     await $(nextButton).tap();
   }
@@ -18,20 +19,6 @@ class WritedownSeedphraseInfoPanel extends OnboardingPageBase {
     await WriteDownSeedphrasePanel($).storeSeedPhraseWords();
     await WriteDownSeedphrasePanel($).clickSeedPhraseStoredCheckbox();
     await WriteDownSeedphrasePanel($).clickNext();
-  }
-
-  @override
-  Future<void> verifyPageElements() async {
-    await verifyInfoPanel();
-    await verifyDetailsPanel();
-  }
-
-  Future<void> verifyInfoPanel() async {
-    expect($(headerTitle).text, (await t()).catalystKeychain);
-    expect(infoPartTaskPicture(), findsOneWidget);
-    expect($(progressBar), findsOneWidget);
-    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
-    expect(await closeButton(), findsOneWidget);
   }
 
   Future<void> verifyDetailsPanel() async {
@@ -45,5 +32,19 @@ class WritedownSeedphraseInfoPanel extends OnboardingPageBase {
     );
     expect($(nextButton), findsOneWidget);
     expect($(backButton), findsOneWidget);
+  }
+
+  Future<void> verifyInfoPanel() async {
+    expect($(headerTitle).text, (await t()).catalystKeychain);
+    expect(infoPartTaskPicture(), findsOneWidget);
+    expect($(progressBar), findsOneWidget);
+    expect($(learnMoreButton).$(Text).text, (await t()).learnMore);
+    expect(await closeButton(), findsOneWidget);
+  }
+
+  @override
+  Future<void> verifyPageElements() async {
+    await verifyInfoPanel();
+    await verifyDetailsPanel();
   }
 }

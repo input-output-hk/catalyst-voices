@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
+import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
 import 'package:catalyst_voices/pages/discovery/sections/campaign_hero.dart';
 import 'package:catalyst_voices/pages/discovery/sections/how_it_works.dart';
 import 'package:catalyst_voices/pages/discovery/sections/stay_involved.dart';
@@ -12,6 +13,7 @@ import 'package:catalyst_voices/widgets/banner/widgets/email_need_verification_b
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_wide_screen_constrained.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class DiscoveryPage extends StatefulWidget {
   final bool keychainDeleted;
@@ -55,16 +57,18 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     with ErrorHandlerStateMixin<DiscoveryCubit, DiscoveryPage> {
   @override
   Widget build(BuildContext context) {
-    return const SelectionArea(
-      child: Stack(
-        children: [
-          CustomScrollView(
-            slivers: [
-              _Body(),
-            ],
-          ),
-          EmailNeedVerificationBanner(),
-        ],
+    return const ProposalSubmissionPhaseAware(
+      activeChild: SelectionArea(
+        child: Stack(
+          children: [
+            CustomScrollView(
+              slivers: [
+                _Body(),
+              ],
+            ),
+            EmailNeedVerificationBanner(),
+          ],
+        ),
       ),
     );
   }
@@ -73,11 +77,20 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   void initState() {
     super.initState();
 
-    unawaited(context.read<DiscoveryCubit>().getAllData());
+    unawaited(_loadData());
+
     if (widget.keychainDeleted) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await _showKeychainDeletedDialog(context);
       });
+    }
+  }
+
+  Future<void> _loadData() async {
+    try {
+      await context.read<DiscoveryCubit>().getAllData();
+    } finally {
+      if (mounted) unawaited(SentryDisplayWidget.of(context).reportFullyDisplayed());
     }
   }
 

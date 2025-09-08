@@ -1,6 +1,7 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 
 const _defaultTransactionBuilderConfig = TransactionBuilderConfig(
   feeAlgo: TieredFee(
@@ -36,34 +37,34 @@ final class AppConfig extends Equatable {
   });
 
   AppConfig.dev()
-      : this(
-          version: '0.0.1',
-          cache: const CacheConfig(
-            expiryDuration: ExpiryDuration(
-              keychainUnlock: Duration(hours: 1),
-            ),
+    : this(
+        version: '0.0.1',
+        cache: const CacheConfig(
+          expiryDuration: ExpiryDuration(
+            keychainUnlock: Duration(hours: 1),
           ),
-          database: const DatabaseConfig(),
-          sentry: const SentryConfig(
-            dsn:
-                'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
-            environment: 'dev',
-            release: 'catalyst-voices@dev',
-            tracesSampleRate: 1,
-            profilesSampleRate: 1,
-            enableAutoSessionTracking: true,
-            attachScreenshot: true,
-            attachViewHierarchy: true,
-            debug: true,
-            diagnosticLevel: 'debug',
-          ),
-          blockchain: BlockchainConfig(
-            networkId: NetworkId.testnet,
-            host: CatalystIdHost.cardanoPreprod,
-            transactionBuilderConfig: _defaultTransactionBuilderConfig,
-            slotNumberConfig: BlockchainSlotNumberConfig.testnet(),
-          ),
-        );
+        ),
+        database: const DatabaseConfig(),
+        sentry: const SentryConfig(
+          dsn:
+              'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
+          environment: 'dev',
+          tracesSampleRate: 1,
+          profilesSampleRate: 1,
+          enableAutoSessionTracking: true,
+          enableTimeToFullDisplayTracing: true,
+          enableLogs: true,
+          attachScreenshot: true,
+          attachViewHierarchy: true,
+          diagnosticLevel: 'debug',
+        ),
+        blockchain: BlockchainConfig(
+          networkId: NetworkId.testnet,
+          host: CatalystIdHost.cardanoPreprod,
+          transactionBuilderConfig: _defaultTransactionBuilderConfig,
+          slotNumberConfig: BlockchainSlotNumberConfig.testnet(),
+        ),
+      );
 
   factory AppConfig.env(AppEnvironmentType env) {
     return switch (env) {
@@ -75,73 +76,73 @@ final class AppConfig extends Equatable {
   }
 
   AppConfig.preprod()
-      : this(
-          version: '0.0.1',
-          cache: const CacheConfig(
-            expiryDuration: ExpiryDuration(
-              keychainUnlock: Duration(hours: 1),
-            ),
+    : this(
+        version: '0.0.1',
+        cache: const CacheConfig(
+          expiryDuration: ExpiryDuration(
+            keychainUnlock: Duration(hours: 1),
           ),
-          database: const DatabaseConfig(),
-          sentry: const SentryConfig(
-            dsn:
-                'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
-            environment: 'preprod',
-            release: 'catalyst-voices@preprod',
-            tracesSampleRate: 0.2,
-            profilesSampleRate: 0.2,
-            enableAutoSessionTracking: true,
-            attachScreenshot: true,
-            attachViewHierarchy: true,
-            debug: false,
-            diagnosticLevel: 'warning',
-          ),
-          blockchain: BlockchainConfig(
-            networkId: NetworkId.testnet,
-            host: CatalystIdHost.cardanoPreprod,
-            transactionBuilderConfig: _defaultTransactionBuilderConfig,
-            slotNumberConfig: BlockchainSlotNumberConfig.testnet(),
-          ),
-        );
+        ),
+        database: const DatabaseConfig(),
+        sentry: const SentryConfig(
+          dsn:
+              'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
+          environment: 'preprod',
+          tracesSampleRate: 0.2,
+          profilesSampleRate: 0.2,
+          enableAutoSessionTracking: true,
+          enableTimeToFullDisplayTracing: true,
+          enableLogs: true,
+          attachScreenshot: false,
+          attachViewHierarchy: true,
+          diagnosticLevel: 'warning',
+        ),
+        blockchain: BlockchainConfig(
+          networkId: NetworkId.testnet,
+          host: CatalystIdHost.cardanoPreprod,
+          transactionBuilderConfig: _defaultTransactionBuilderConfig,
+          slotNumberConfig: BlockchainSlotNumberConfig.testnet(),
+        ),
+      );
 
   AppConfig.prod()
-      : this(
-          version: '0.0.1',
-          cache: const CacheConfig(
-            expiryDuration: ExpiryDuration(
-              keychainUnlock: Duration(hours: 1),
-            ),
+    : this(
+        version: '0.0.1',
+        cache: const CacheConfig(
+          expiryDuration: ExpiryDuration(
+            keychainUnlock: Duration(hours: 1),
           ),
-          database: const DatabaseConfig(),
-          sentry: const SentryConfig(
-            dsn:
-                'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
-            environment: 'prod',
-            release: 'catalyst-voices@prod',
-            tracesSampleRate: 0.1,
-            profilesSampleRate: 0.1,
-            enableAutoSessionTracking: true,
-            attachScreenshot: false,
-            attachViewHierarchy: false,
-            debug: false,
-            diagnosticLevel: 'error',
-          ),
-          blockchain: BlockchainConfig(
-            networkId: NetworkId.mainnet,
-            host: CatalystIdHost.cardano,
-            transactionBuilderConfig: _defaultTransactionBuilderConfig,
-            slotNumberConfig: BlockchainSlotNumberConfig.mainnet(),
-          ),
-        );
+        ),
+        database: const DatabaseConfig(),
+        sentry: const SentryConfig(
+          dsn:
+              'https://8e333ddbed1e096c70e4ed006892c355@o622089.ingest.us.sentry.io/4507113601433600',
+          environment: 'prod',
+          tracesSampleRate: 0.1,
+          profilesSampleRate: 0.1,
+          enableAutoSessionTracking: true,
+          enableTimeToFullDisplayTracing: true,
+          enableLogs: false,
+          attachScreenshot: false,
+          attachViewHierarchy: false,
+          diagnosticLevel: 'error',
+        ),
+        blockchain: BlockchainConfig(
+          networkId: NetworkId.mainnet,
+          host: CatalystIdHost.cardano,
+          transactionBuilderConfig: _defaultTransactionBuilderConfig,
+          slotNumberConfig: BlockchainSlotNumberConfig.mainnet(),
+        ),
+      );
 
   @override
   List<Object?> get props => [
-        version,
-        cache,
-        database,
-        sentry,
-        blockchain,
-      ];
+    version,
+    cache,
+    database,
+    sentry,
+    blockchain,
+  ];
 
   AppConfig copyWith({
     String? version,
@@ -175,11 +176,11 @@ final class BlockchainConfig extends Equatable {
 
   @override
   List<Object?> get props => [
-        networkId,
-        host,
-        transactionBuilderConfig,
-        slotNumberConfig,
-      ];
+    networkId,
+    host,
+    transactionBuilderConfig,
+    slotNumberConfig,
+  ];
 
   BlockchainConfig copyWith({
     NetworkId? networkId,
@@ -228,10 +229,10 @@ final class DatabaseConfig extends Equatable {
 
   @override
   List<Object?> get props => [
-        name,
-        webSqlite3Wasm,
-        webDriftWorker,
-      ];
+    name,
+    webSqlite3Wasm,
+    webDriftWorker,
+  ];
 }
 
 final class ExpiryDuration extends Equatable {
@@ -253,67 +254,79 @@ final class ExpiryDuration extends Equatable {
   }
 }
 
-final class SentryConfig extends Equatable {
+final class SentryConfig extends ReportingServiceConfig {
   final String dsn;
   final String environment;
-  final String release;
   final double tracesSampleRate;
   final double profilesSampleRate;
   final bool enableAutoSessionTracking;
+  final bool enableTimeToFullDisplayTracing;
+  final bool enableLogs;
   final bool attachScreenshot;
   final bool attachViewHierarchy;
-  final bool debug;
   final String diagnosticLevel;
 
   const SentryConfig({
     required this.dsn,
     required this.environment,
-    required this.release,
     required this.tracesSampleRate,
     required this.profilesSampleRate,
     required this.enableAutoSessionTracking,
+    required this.enableTimeToFullDisplayTracing,
+    required this.enableLogs,
     required this.attachScreenshot,
     required this.attachViewHierarchy,
-    required this.debug,
     required this.diagnosticLevel,
   });
 
+  bool get debug => kDebugMode;
+
+  String? get dist {
+    const key = 'SENTRY_DIST';
+    return const bool.hasEnvironment(key) ? const String.fromEnvironment(key) : null;
+  }
+
   @override
   List<Object?> get props => [
-        dsn,
-        environment,
-        release,
-        tracesSampleRate,
-        profilesSampleRate,
-        enableAutoSessionTracking,
-        attachScreenshot,
-        attachViewHierarchy,
-        debug,
-        diagnosticLevel,
-      ];
+    dsn,
+    environment,
+    tracesSampleRate,
+    profilesSampleRate,
+    enableAutoSessionTracking,
+    enableTimeToFullDisplayTracing,
+    enableLogs,
+    attachScreenshot,
+    attachViewHierarchy,
+    diagnosticLevel,
+  ];
+
+  String? get release {
+    const key = 'SENTRY_RELEASE';
+    return const bool.hasEnvironment(key) ? const String.fromEnvironment(key) : null;
+  }
 
   SentryConfig copyWith({
     String? dsn,
     String? environment,
-    String? release,
     double? tracesSampleRate,
     double? profilesSampleRate,
     bool? enableAutoSessionTracking,
-    bool? attachScreenshot,
+    bool? enableTimeToFullDisplayTracing,
+    bool? enableLogs,
     bool? attachViewHierarchy,
-    bool? debug,
     String? diagnosticLevel,
   }) {
     return SentryConfig(
       dsn: dsn ?? this.dsn,
       environment: environment ?? this.environment,
-      release: release ?? this.release,
       tracesSampleRate: tracesSampleRate ?? this.tracesSampleRate,
       profilesSampleRate: profilesSampleRate ?? this.profilesSampleRate,
       enableAutoSessionTracking: enableAutoSessionTracking ?? this.enableAutoSessionTracking,
-      attachScreenshot: attachScreenshot ?? this.attachScreenshot,
+      enableTimeToFullDisplayTracing:
+          enableTimeToFullDisplayTracing ?? this.enableTimeToFullDisplayTracing,
+      enableLogs: enableLogs ?? this.enableLogs,
+      attachScreenshot: attachScreenshot,
       attachViewHierarchy: attachViewHierarchy ?? this.attachViewHierarchy,
-      debug: debug ?? this.debug,
       diagnosticLevel: diagnosticLevel ?? this.diagnosticLevel,
     );
   }

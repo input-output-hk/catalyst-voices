@@ -8,14 +8,14 @@ final class ProposalVersion extends Equatable implements Comparable<ProposalVers
   final DateTime createdAt;
   final ProposalPublish publish;
 
-  const ProposalVersion({
+  ProposalVersion({
     required this.selfRef,
     required this.title,
     required this.createdAt,
     required this.publish,
-  });
+  }) : assert(selfRef.version != null, 'SelfRef version cannot be null');
 
-  factory ProposalVersion.fromData(BaseProposalData data) {
+  factory ProposalVersion.fromData(ProposalData data) {
     final createdAt = data.document.metadata.selfRef.version!.dateTime;
     return ProposalVersion(
       selfRef: data.document.metadata.selfRef,
@@ -27,11 +27,11 @@ final class ProposalVersion extends Equatable implements Comparable<ProposalVers
 
   @override
   List<Object?> get props => [
-        selfRef,
-        title,
-        createdAt,
-        publish,
-      ];
+    selfRef,
+    title,
+    createdAt,
+    publish,
+  ];
 
   @override
   int compareTo(ProposalVersion other) {
@@ -39,23 +39,10 @@ final class ProposalVersion extends Equatable implements Comparable<ProposalVers
     final versionB = other.selfRef.version ?? '';
     return versionB.compareTo(versionA);
   }
-
-  /// Checks if this versions is the latest version
-  /// compared to the given [version].
-  bool isLatestVersion(String version) {
-    final thisVersion = selfRef.version ?? '';
-    return thisVersion.compareTo(version) > 0;
-  }
 }
 
 extension ProposalVersionsList on List<ProposalVersion> {
-  bool hasLatestLocalDraft(String? version) {
-    if (isEmpty) return false;
-    final latestVersion = first;
-    return latestVersion.isLatestVersion(
-      version ?? '',
-    );
-  }
+  ProposalVersion get latest => first;
 
   int versionNumber(String version) {
     return length - indexWhere((element) => element.selfRef.version == version);

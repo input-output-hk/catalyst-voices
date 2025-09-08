@@ -6,12 +6,12 @@ use crate::{
 };
 
 /// Updates health endpoints values.
-pub(crate) async fn update() {
+pub(crate) fn update() {
     let api_host_names = Settings::api_host_names().join(",");
     let service_id = Settings::service_id();
 
     if matches!(
-        live_get::endpoint().await,
+        live_get::endpoint(),
         live_get::AllResponses::With(live_get::Responses::NoContent)
     ) {
         reporter::LIVE_INDICATOR
@@ -24,7 +24,7 @@ pub(crate) async fn update() {
     }
 
     if matches!(
-        ready_get::endpoint().await,
+        ready_get::endpoint(),
         ready_get::AllResponses::With(ready_get::Responses::NoContent)
     ) {
         reporter::READY_INDICATOR
@@ -37,7 +37,7 @@ pub(crate) async fn update() {
     }
 
     if matches!(
-        started_get::endpoint().await,
+        started_get::endpoint(),
         started_get::AllResponses::With(started_get::Responses::NoContent)
     ) {
         reporter::STARTED_INDICATOR
@@ -53,6 +53,8 @@ pub(crate) async fn update() {
 /// All the related health endpoints reporting metrics to the Prometheus service are
 /// inside this module.
 pub(crate) mod reporter {
+    #![allow(clippy::unwrap_used)]
+
     use std::sync::LazyLock;
 
     use prometheus::{register_int_gauge_vec, IntGaugeVec};

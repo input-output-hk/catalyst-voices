@@ -3,7 +3,7 @@
 use std::sync::Arc;
 
 use anyhow::Context;
-use cardano_blockchain_types::Network;
+use cardano_chain_follower::Network;
 use handlebars::Handlebars;
 use scylla::client::session::Session;
 use serde_json::json;
@@ -163,7 +163,10 @@ fn generate_cql_schema_version() -> String {
 }
 
 /// Get the namespace for a particular db configuration
-pub(crate) fn namespace(persistent: bool, network: Network) -> String {
+pub(crate) fn namespace(
+    persistent: bool,
+    network: Network,
+) -> String {
     // Build and set the Keyspace to use.
     let namespace = if persistent { "p" } else { "v" };
     format!(
@@ -175,7 +178,10 @@ pub(crate) fn namespace(persistent: bool, network: Network) -> String {
 /// Create the namespace we will use for this session
 /// Ok to run this if the namespace already exists.
 async fn create_namespace(
-    session: &mut Arc<Session>, cfg: &cassandra_db::EnvVars, persistent: bool, network: Network,
+    session: &mut Arc<Session>,
+    cfg: &cassandra_db::EnvVars,
+    persistent: bool,
+    network: Network,
 ) -> anyhow::Result<()> {
     let keyspace = namespace(persistent, network);
 
@@ -213,7 +219,10 @@ async fn create_namespace(
 
 /// Create the Schema on the connected Cassandra DB
 pub(crate) async fn create_schema(
-    session: &mut Arc<Session>, cfg: &cassandra_db::EnvVars, persistent: bool, network: Network,
+    session: &mut Arc<Session>,
+    cfg: &cassandra_db::EnvVars,
+    persistent: bool,
+    network: Network,
 ) -> anyhow::Result<()> {
     create_namespace(session, cfg, persistent, network)
         .await
@@ -265,7 +274,7 @@ mod tests {
     /// This constant is ONLY used by Unit tests to identify when the schema version will
     /// change accidentally, and is NOT to be used directly to set the schema version of
     /// the table namespaces.
-    const SCHEMA_VERSION: &str = "141f7b75-6a5f-8fe4-91cb-596e3584fd7d";
+    const SCHEMA_VERSION: &str = "69e28bc1-be89-8407-83dc-9c4cc408d3a9";
 
     #[test]
     /// This test is designed to fail if the schema version has changed.

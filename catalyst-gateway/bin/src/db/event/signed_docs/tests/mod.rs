@@ -15,7 +15,7 @@ mod filter_by_field;
 #[ignore = "An integration test which requires a running EventDB instance, disabled from `testunit` CI run"]
 #[tokio::test]
 async fn queries_test() {
-    establish_connection_pool().await;
+    establish_connection_pool();
 
     let doc_type = uuid::Uuid::new_v4();
     let docs = test_docs(doc_type);
@@ -90,7 +90,10 @@ fn test_docs(doc_type: uuid::Uuid) -> Vec<FullSignedDoc> {
     ]
 }
 
-async fn store_full_signed_doc(doc: &FullSignedDoc, doc_type: uuid::Uuid) {
+async fn store_full_signed_doc(
+    doc: &FullSignedDoc,
+    doc_type: uuid::Uuid,
+) {
     assert!(doc.store().await.unwrap());
     // try to insert the same data again
     assert!(!doc.store().await.unwrap());
@@ -172,7 +175,10 @@ async fn filter_by_id_and_ver(doc: &FullSignedDoc) {
     assert!(res_docs.try_next().await.unwrap().is_none());
 }
 
-async fn filter_by_type(docs: &[FullSignedDoc], doc_type: uuid::Uuid) {
+async fn filter_by_type(
+    docs: &[FullSignedDoc],
+    doc_type: uuid::Uuid,
+) {
     let filter = DocsQueryFilter::all().with_type(vec![doc_type]);
     let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
         .await

@@ -5,7 +5,7 @@ use std::{
     sync::Arc,
 };
 
-use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
+use cardano_chain_follower::{hashes::TransactionId, Slot, StakeAddress, TxnIndex};
 use futures::TryStreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
 
@@ -58,7 +58,9 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/staked_ada`
 pub(crate) async fn endpoint(
-    stake_address: Cip19StakeAddress, provided_network: Option<Network>, slot_num: Option<SlotNo>,
+    stake_address: Cip19StakeAddress,
+    provided_network: Option<Network>,
+    slot_num: Option<SlotNo>,
 ) -> AllResponses {
     match build_full_stake_info_response(stake_address, provided_network, slot_num).await {
         Ok(None) => Responses::NotFound.into(),
@@ -84,11 +86,12 @@ struct TxoInfo {
 
 /// Building a full stake info response from the provided arguments.
 async fn build_full_stake_info_response(
-    stake_address: Cip19StakeAddress, provided_network: Option<Network>, slot_num: Option<SlotNo>,
+    stake_address: Cip19StakeAddress,
+    provided_network: Option<Network>,
+    slot_num: Option<SlotNo>,
 ) -> anyhow::Result<Option<FullStakeInfo>> {
     if let Some(provided_network) = provided_network {
-        if cardano_blockchain_types::Network::from(provided_network) != Settings::cardano_network()
-        {
+        if cardano_chain_follower::Network::from(provided_network) != Settings::cardano_network() {
             return Ok(None);
         }
     }
@@ -130,7 +133,8 @@ async fn build_full_stake_info_response(
 /// This function also updates the spent column if it detects that a TXO was spent
 /// between lookups.
 async fn calculate_assets_state(
-    session: Arc<CassandraSession>, stake_address: Cip19StakeAddress,
+    session: Arc<CassandraSession>,
+    stake_address: Cip19StakeAddress,
     mut txo_base_state: TxoAssetsState,
 ) -> anyhow::Result<TxoAssetsState> {
     let address: StakeAddress = stake_address.try_into()?;
@@ -165,7 +169,8 @@ type TxoMap = HashMap<(TransactionId, i16), TxoInfo>;
 
 /// Returns a map of TXO infos for the given stake address.
 async fn get_txo(
-    session: &CassandraSession, stake_address: &StakeAddress,
+    session: &CassandraSession,
+    stake_address: &StakeAddress,
 ) -> anyhow::Result<TxoMap> {
     let txos_stream = GetTxoByStakeAddressQuery::execute(
         session,
@@ -217,7 +222,8 @@ impl TxoAssetsState {
 
 /// Returns a map of txo asset infos for the given stake address.
 async fn get_txo_assets(
-    session: &CassandraSession, stake_address: &StakeAddress,
+    session: &CassandraSession,
+    stake_address: &StakeAddress,
 ) -> anyhow::Result<TxoAssetsMap> {
     let assets_txos_stream = GetAssetsByStakeAddressQuery::execute(
         session,
@@ -249,7 +255,9 @@ async fn get_txo_assets(
 /// have a txo which is spent inside the volatile, so to not incorrectly mix up records
 /// from these two tables, inserting some rows from persistent to volatile section).
 async fn update_spent(
-    session: &CassandraSession, stake_address: &StakeAddress, base_txos: &mut TxoMap,
+    session: &CassandraSession,
+    stake_address: &StakeAddress,
+    base_txos: &mut TxoMap,
     txos: &mut TxoMap,
 ) -> anyhow::Result<Vec<UpdateTxoSpentQueryParams>> {
     let txn_hashes = txos
@@ -293,7 +301,10 @@ async fn update_spent(
 }
 
 /// Builds an instance of [`StakeInfo`] based on the TXOs given.
-fn build_stake_info(mut txo_state: TxoAssetsState, slot_num: SlotNo) -> anyhow::Result<StakeInfo> {
+fn build_stake_info(
+    mut txo_state: TxoAssetsState,
+    slot_num: SlotNo,
+) -> anyhow::Result<StakeInfo> {
     let slot_num = slot_num.into();
     let mut total_ada_amount = AdaValue::default();
     let mut last_slot_num = SlotNo::default();

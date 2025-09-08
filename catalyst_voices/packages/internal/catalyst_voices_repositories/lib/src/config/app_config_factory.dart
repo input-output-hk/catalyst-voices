@@ -61,13 +61,12 @@ final class AppConfigFactory {
       sentry: defaultEnvConfig.sentry.copyWith(
         dsn: remote.sentry?.dsn,
         environment: remote.sentry?.environment,
-        release: remote.sentry?.release,
         tracesSampleRate: remote.sentry?.tracesSampleRate,
         profilesSampleRate: remote.sentry?.profilesSampleRate,
         enableAutoSessionTracking: remote.sentry?.enableAutoSessionTracking,
-        attachScreenshot: remote.sentry?.attachScreenshot,
+        enableTimeToFullDisplayTracing: remote.sentry?.enableTimeToFullDisplayTracing,
+        enableLogs: remote.sentry?.enableLogs,
         attachViewHierarchy: remote.sentry?.attachViewHierarchy,
-        debug: remote.sentry?.debug,
         diagnosticLevel: remote.sentry?.diagnosticLevel,
       ),
       blockchain: defaultEnvConfig.blockchain.copyWith(

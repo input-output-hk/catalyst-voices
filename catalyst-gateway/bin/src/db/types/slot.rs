@@ -1,6 +1,6 @@
 //! A `Slot` wrapper that can be stored to and load from a database.
 
-use cardano_blockchain_types::Slot;
+use cardano_chain_follower::Slot;
 use num_bigint::BigInt;
 use scylla::_macro_internal::{
     CellWriter, ColumnType, DeserializationError, DeserializeValue, FrameSlice, SerializationError,
@@ -52,7 +52,9 @@ impl From<SlotNo> for DbSlot {
 
 impl SerializeValue for DbSlot {
     fn serialize<'b>(
-        &self, typ: &ColumnType, writer: CellWriter<'b>,
+        &self,
+        typ: &ColumnType,
+        writer: CellWriter<'b>,
     ) -> Result<WrittenCellProof<'b>, SerializationError> {
         BigInt::from(self.0).serialize(typ, writer)
     }
@@ -64,7 +66,8 @@ impl<'frame, 'metadata> DeserializeValue<'frame, 'metadata> for DbSlot {
     }
 
     fn deserialize(
-        typ: &'metadata ColumnType<'metadata>, v: Option<FrameSlice<'frame>>,
+        typ: &'metadata ColumnType<'metadata>,
+        v: Option<FrameSlice<'frame>>,
     ) -> Result<Self, DeserializationError> {
         let value = <BigInt>::deserialize(typ, v)?;
         let value = u64::try_from(value).map_err(DeserializationError::new)?;

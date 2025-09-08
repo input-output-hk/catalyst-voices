@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routes.dart';
-import 'package:catalyst_voices/widgets/cards/proposal/pending_proposal_card.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_slider.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -14,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class MostRecentProposals extends StatefulWidget {
-  final List<PendingProposal> proposals;
+  final List<ProposalBrief> proposals;
   final bool isLoading;
 
   const MostRecentProposals({
@@ -118,10 +117,10 @@ class _LatestProposalsState extends State<MostRecentProposals> {
                     itemCount: widget.proposals.length,
                     itemBuilder: (context, index) {
                       final proposal = widget.proposals[index];
-                      final ref = proposal.ref;
+                      final ref = proposal.selfRef;
                       return Skeletonizer(
                         enabled: widget.isLoading,
-                        child: PendingProposalCard(
+                        child: ProposalBriefCard(
                           key: Key('PendingProposalCard_$ref'),
                           proposal: proposal,
                           onTap: () {
@@ -140,7 +139,6 @@ class _LatestProposalsState extends State<MostRecentProposals> {
                               await bloc.removeFavorite(ref);
                             }
                           },
-                          isFavorite: proposal.isFavorite,
                         ),
                       );
                     },

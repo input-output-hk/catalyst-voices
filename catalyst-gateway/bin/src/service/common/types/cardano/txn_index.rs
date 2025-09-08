@@ -67,7 +67,7 @@ impl Type for TxnIndex {
     }
 
     fn raw_element_iter<'a>(
-        &'a self,
+        &'a self
     ) -> Box<dyn Iterator<Item = &'a Self::RawElementValueType> + 'a> {
         Box::new(self.as_raw_value().into_iter())
     }
@@ -111,8 +111,8 @@ impl From<DbTxnIndex> for TxnIndex {
     }
 }
 
-impl From<cardano_blockchain_types::TxnIndex> for TxnIndex {
-    fn from(value: cardano_blockchain_types::TxnIndex) -> Self {
+impl From<cardano_chain_follower::TxnIndex> for TxnIndex {
+    fn from(value: cardano_chain_follower::TxnIndex) -> Self {
         Self(value.into())
     }
 }

@@ -2,8 +2,10 @@
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Slot, TransactionId, TxnOutputOffset};
-use catalyst_types::hashes::Blake2b256Hash;
+use cardano_chain_follower::{
+    hashes::{Blake2b256Hash, TransactionId},
+    Slot, TxnOutputOffset,
+};
 use scylla::{client::session::Session, SerializeRow};
 use tracing::error;
 
@@ -31,7 +33,11 @@ pub(crate) struct TxiInsertParams {
 
 impl TxiInsertParams {
     /// Create a new record for this transaction.
-    pub fn new(txn_id: TransactionId, txo: TxnOutputOffset, slot: Slot) -> Self {
+    pub fn new(
+        txn_id: TransactionId,
+        txo: TxnOutputOffset,
+        slot: Slot,
+    ) -> Self {
         Self {
             txn_id: txn_id.into(),
             txo: txo.into(),
@@ -59,7 +65,8 @@ impl TxiInsertQuery {
 
     /// Prepare Batch of Insert TXI Index Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+        session: &Arc<Session>,
+        cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),
@@ -75,7 +82,11 @@ impl TxiInsertQuery {
     }
 
     /// Index the transaction Inputs.
-    pub(crate) fn index(&mut self, txs: &pallas_traverse::MultiEraTx<'_>, slot_no: Slot) {
+    pub(crate) fn index(
+        &mut self,
+        txs: &cardano_chain_follower::pallas_traverse::MultiEraTx<'_>,
+        slot_no: Slot,
+    ) {
         // Index the TXI's.
         for txi in txs.inputs() {
             let txn_id = Blake2b256Hash::from(*txi.hash()).into();
@@ -89,7 +100,10 @@ impl TxiInsertQuery {
     /// Execute the Certificate Indexing Queries.
     ///
     /// Consumes the `self` and returns a vector of futures.
-    pub(crate) fn execute(self, session: &Arc<CassandraSession>) -> FallibleQueryTasks {
+    pub(crate) fn execute(
+        self,
+        session: &Arc<CassandraSession>,
+    ) -> FallibleQueryTasks {
         let mut query_handles: FallibleQueryTasks = Vec::new();
 
         let inner_session = session.clone();

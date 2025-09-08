@@ -109,7 +109,6 @@ pub(crate) enum PreparedSelectQuery {
     /// Get RBAC registrations by Catalyst ID.
     RbacRegistrationsByCatalystId,
     /// Get invalid RBAC registrations by Catalyst ID.
-    #[allow(dead_code)]
     RbacInvalidRegistrationsByCatalystId,
     /// Get Catalyst ID by transaction ID.
     CatalystIdByTransactionId,
@@ -203,7 +202,8 @@ impl PreparedQueries {
     /// Create new prepared queries for a given session.
     #[allow(clippy::too_many_lines)]
     pub(crate) async fn new(
-        session: Arc<Session>, cfg: &cassandra_db::EnvVars,
+        session: Arc<Session>,
+        cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<Self> {
         // We initialize like this, so that all errors preparing querys get shown before aborting.
         let txi_insert_queries = TxiInsertQuery::prepare_batch(&session, cfg).await?;
@@ -295,7 +295,9 @@ impl PreparedQueries {
 
     /// Prepares a statement.
     pub(crate) async fn prepare(
-        session: Arc<Session>, query: &str, consistency: scylla::statement::Consistency,
+        session: Arc<Session>,
+        query: &str,
+        consistency: scylla::statement::Consistency,
         idempotent: bool,
     ) -> anyhow::Result<PreparedStatement> {
         let mut prepared = session
@@ -321,8 +323,12 @@ impl PreparedQueries {
     /// It is necessary to do this because batches are pre-sized, they can not be dynamic.
     /// Preparing the batches in advance is a very larger performance increase.
     pub(crate) async fn prepare_batch(
-        session: Arc<Session>, query: &str, cfg: &cassandra_db::EnvVars,
-        consistency: scylla::statement::Consistency, idempotent: bool, logged: bool,
+        session: Arc<Session>,
+        query: &str,
+        cfg: &cassandra_db::EnvVars,
+        consistency: scylla::statement::Consistency,
+        idempotent: bool,
+        logged: bool,
     ) -> anyhow::Result<SizedBatch> {
         let sized_batches: SizedBatch = SkipMap::new();
 
@@ -352,9 +358,14 @@ impl PreparedQueries {
     ///
     /// Returns no data, and an error if the query fails.
     pub(crate) async fn execute_upsert<P>(
-        &self, session: Arc<Session>, upsert_query: PreparedUpsertQuery, params: P,
+        &self,
+        session: Arc<Session>,
+        upsert_query: PreparedUpsertQuery,
+        params: P,
     ) -> anyhow::Result<()>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let prepared_stmt = match upsert_query {
             PreparedUpsertQuery::SyncStatusInsert => &self.sync_status_insert,
         };
@@ -381,9 +392,14 @@ impl PreparedQueries {
     /// Returns an iterator that iterates over all the result pages that the query
     /// returns.
     pub(crate) async fn execute_iter<P>(
-        &self, session: Arc<Session>, select_query: PreparedSelectQuery, params: P,
+        &self,
+        session: Arc<Session>,
+        select_query: PreparedSelectQuery,
+        params: P,
     ) -> anyhow::Result<QueryPager>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let prepared_stmt = match select_query {
             PreparedSelectQuery::TxoByStakeAddress => &self.txo_by_stake_address_query,
             PreparedSelectQuery::TxiByTransactionHash => &self.txi_by_txn_hash_query,
@@ -427,7 +443,10 @@ impl PreparedQueries {
     /// This will divide the batch into optimal sized chunks and execute them until all
     /// values have been executed or the first error is encountered.
     pub(crate) async fn execute_batch<T: SerializeRow + Debug>(
-        &self, session: Arc<Session>, cfg: Arc<cassandra_db::EnvVars>, query: PreparedQuery,
+        &self,
+        session: Arc<Session>,
+        cfg: Arc<cassandra_db::EnvVars>,
+        query: PreparedQuery,
         values: Vec<T>,
     ) -> FallibleQueryResults {
         let query_map = match query {
@@ -471,7 +490,10 @@ impl PreparedQueries {
 /// This will divide the batch into optimal sized chunks and execute them until all
 /// values have been executed or the first error is encountered.
 async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
-    session: Arc<Session>, query_map: &SizedBatch, cfg: Arc<cassandra_db::EnvVars>, query: Q,
+    session: Arc<Session>,
+    query_map: &SizedBatch,
+    cfg: Arc<cassandra_db::EnvVars>,
+    query: Q,
     values: Vec<T>,
 ) -> FallibleQueryResults {
     let mut results: Vec<QueryResult> = Vec::new();
@@ -495,7 +517,7 @@ async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
                     set_index_db_liveness(false);
                     error!(error=%err, query=query_str, chunk=chunk_str, "Index DB connection failed. Liveness set to false.");
                     bail!(CassandraSessionError::ConnectionUnavailable { source: err.into() })
-                };
+                }
                 error!(%error, query=query_str, chunk=chunk_str, "Query Execution Failed");
                 errors.push(error);
                 // Defer failure until all batches have been processed.
@@ -515,9 +537,13 @@ async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
 /// Returns an iterator that iterates over all the result pages that the query
 /// returns.
 pub(crate) async fn session_execute_iter<P>(
-    session: Arc<Session>, prepared_stmt: &PreparedStatement, params: P,
+    session: Arc<Session>,
+    prepared_stmt: &PreparedStatement,
+    params: P,
 ) -> anyhow::Result<QueryPager>
-where P: SerializeRow {
+where
+    P: SerializeRow,
+{
     session
         .execute_iter(prepared_stmt.clone(), params)
         .await

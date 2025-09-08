@@ -254,7 +254,7 @@ project: {
 										}
 									}
 									INIT_AND_DROP_DB: {
-										value: string | *"true"
+										value: string | *"false"
 									}
 									WITH_MIGRATIONS: {
 										value: string | *"true"

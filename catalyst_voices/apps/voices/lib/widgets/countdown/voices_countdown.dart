@@ -4,13 +4,14 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-typedef CountdownBuilder = Widget Function(
-  BuildContext context, {
-  required int days,
-  required int hours,
-  required int minutes,
-  required int seconds,
-});
+typedef CountdownBuilder =
+    Widget Function(
+      BuildContext context, {
+      required int days,
+      required int hours,
+      required int minutes,
+      required int seconds,
+    });
 
 class VoicesCountdown extends StatefulWidget {
   final DateTime dateTime;
@@ -70,7 +71,7 @@ class _VoicesCountdownState extends State<VoicesCountdown> {
   }
 
   void _startCountdown() {
-    final initialTimeLeft = widget.dateTime.difference(DateTime.now());
+    final initialTimeLeft = widget.dateTime.difference(DateTimeExt.now());
 
     if (initialTimeLeft.isNegative || _hasStarted) {
       widget.onCountdownStart?.call(false);

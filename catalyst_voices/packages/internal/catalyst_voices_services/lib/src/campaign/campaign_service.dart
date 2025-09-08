@@ -1,6 +1,18 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_services/src/campaign/active_campaign_observer.dart';
+import 'package:flutter/foundation.dart';
+
+Campaign? _mockedActiveCampaign;
+
+/// Overrides the current campaign returned by [CampaignService.getActiveCampaign].
+/// Only for unit testing.
+@visibleForTesting
+//ignore: avoid_setters_without_getters
+set mockedActiveCampaign(Campaign? campaign) {
+  _mockedActiveCampaign = campaign;
+}
 
 /// CampaignService provides campaign-related functionality.
 ///
@@ -11,7 +23,10 @@ abstract interface class CampaignService {
   const factory CampaignService(
     CampaignRepository campaignRepository,
     ProposalRepository proposalRepository,
+    ActiveCampaignObserver activeCampaignObserver,
   ) = CampaignServiceImpl;
+
+  Stream<Campaign?> get watchActiveCampaign;
 
   Future<Campaign?> getActiveCampaign();
 
@@ -19,75 +34,71 @@ abstract interface class CampaignService {
     required String id,
   });
 
-  Future<List<CampaignCategory>> getCampaignCategories();
-
-  Future<List<CampaignTimeline>> getCampaignTimeline();
-
-  Future<CampaignTimeline> getCampaignTimelineByStage(CampaignTimelineStage stage);
+  Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType stage);
 
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
-
-  Future<CurrentCampaign> getCurrentCampaign();
 }
 
 final class CampaignServiceImpl implements CampaignService {
   final CampaignRepository _campaignRepository;
   final ProposalRepository _proposalRepository;
+  final ActiveCampaignObserver _activeCampaignObserver;
 
   const CampaignServiceImpl(
     this._campaignRepository,
     this._proposalRepository,
+    this._activeCampaignObserver,
   );
 
   @override
-  Future<Campaign?> getActiveCampaign() => getCampaign(id: 'F14');
+  Stream<Campaign?> get watchActiveCampaign => _activeCampaignObserver.watchCampaign;
+
+  @override
+  Future<Campaign?> getActiveCampaign() async {
+    if (_activeCampaignObserver.campaign != null) {
+      return _activeCampaignObserver.campaign;
+    }
+    // TODO(LynxLynxx): Call backend to get latest active campaign
+    final campaign = _mockedActiveCampaign ?? await getCampaign(id: Campaign.f14Ref.id);
+    _activeCampaignObserver.campaign = campaign;
+    return campaign;
+  }
 
   @override
   Future<Campaign> getCampaign({
     required String id,
   }) async {
     final campaign = await _campaignRepository.getCampaign(id: id);
+    final campaignProposals = await _proposalRepository.getProposals(
+      type: ProposalsFilterType.finals,
+    );
+    final proposalSubmissionTime = campaign
+        .phaseStateTo(CampaignPhaseType.proposalSubmission)
+        .phase
+        .timeline
+        .to;
+    final totalAsk = _calculateTotalAsk(campaignProposals);
+    final updatedCategories = await _updateCategories(
+      campaign.categories,
+      proposalSubmissionTime,
+    );
 
-    // TODO(damian-molinski): get proposalTemplateRef, document and map.
-
-    return campaign;
+    return campaign.copyWith(
+      totalAsk: totalAsk,
+      categories: updatedCategories,
+    );
   }
 
   @override
-  Future<List<CampaignCategory>> getCampaignCategories() async {
-    final categories = await _campaignRepository.getCampaignCategories();
-    final updatedCategories = <CampaignCategory>[];
-    final proposalSubmissionStage =
-        await getCampaignTimelineByStage(CampaignTimelineStage.proposalSubmission);
-
-    for (final category in categories) {
-      final categoryProposals = await _proposalRepository.getProposals(
-        type: ProposalsFilterType.finals,
-        categoryRef: category.selfRef,
-      );
-      final totalAsk = _calculateTotalAsk(categoryProposals);
-
-      final updatedCategory = category.copyWith(
-        totalAsk: totalAsk,
-        proposalsCount: categoryProposals.length,
-        submissionCloseDate: proposalSubmissionStage.timeline.to,
-      );
-      updatedCategories.add(updatedCategory);
+  Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType type) async {
+    final campaign = await getActiveCampaign();
+    if (campaign == null) {
+      throw StateError('No active campaign found');
     }
-    return updatedCategories;
-  }
 
-  @override
-  Future<List<CampaignTimeline>> getCampaignTimeline() {
-    return _campaignRepository.getCampaignTimeline();
-  }
-
-  @override
-  Future<CampaignTimeline> getCampaignTimelineByStage(CampaignTimelineStage stage) async {
-    final timeline = await getCampaignTimeline();
-    final timelineStage = timeline.firstWhere(
-      (element) => element.stage == stage,
-      orElse: () => throw (StateError('Stage $stage not found')),
+    final timelineStage = campaign.timeline.phases.firstWhere(
+      (element) => element.type == type,
+      orElse: () => throw (StateError('Type $type not found')),
     );
     return timelineStage;
   }
@@ -99,8 +110,9 @@ final class CampaignServiceImpl implements CampaignService {
       type: ProposalsFilterType.finals,
       categoryRef: ref,
     );
-    final proposalSubmissionStage =
-        await getCampaignTimelineByStage(CampaignTimelineStage.proposalSubmission);
+    final proposalSubmissionStage = await getCampaignPhaseTimeline(
+      CampaignPhaseType.proposalSubmission,
+    );
     final totalAsk = _calculateTotalAsk(categoryProposals);
 
     return category.copyWith(
@@ -108,17 +120,6 @@ final class CampaignServiceImpl implements CampaignService {
       proposalsCount: categoryProposals.length,
       submissionCloseDate: proposalSubmissionStage.timeline.to,
     );
-  }
-
-  @override
-  Future<CurrentCampaign> getCurrentCampaign() async {
-    final currentCampaign = await _campaignRepository.getCurrentCampaign();
-    final campaignProposals = await _proposalRepository.getProposals(
-      type: ProposalsFilterType.finals,
-    );
-    final totalAsk = _calculateTotalAsk(campaignProposals);
-
-    return currentCampaign.copyWith(totalAsk: totalAsk);
   }
 
   Coin _calculateTotalAsk(List<ProposalData> proposals) {
@@ -130,5 +131,28 @@ final class CampaignServiceImpl implements CampaignService {
       totalAskBalance += askBalance;
     }
     return totalAskBalance.coin;
+  }
+
+  Future<List<CampaignCategory>> _updateCategories(
+    List<CampaignCategory> categories,
+    DateTime? proposalSubmissionTime,
+  ) async {
+    final updatedCategories = <CampaignCategory>[];
+
+    for (final category in categories) {
+      final categoryProposals = await _proposalRepository.getProposals(
+        type: ProposalsFilterType.finals,
+        categoryRef: category.selfRef,
+      );
+      final totalAsk = _calculateTotalAsk(categoryProposals);
+
+      final updatedCategory = category.copyWith(
+        totalAsk: totalAsk,
+        proposalsCount: categoryProposals.length,
+        submissionCloseDate: proposalSubmissionTime,
+      );
+      updatedCategories.add(updatedCategory);
+    }
+    return updatedCategories;
   }
 }

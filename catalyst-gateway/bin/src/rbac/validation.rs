@@ -3,14 +3,17 @@
 use std::collections::{HashMap, HashSet};
 
 use anyhow::{Context, Result};
-use cardano_blockchain_types::{StakeAddress, TransactionId};
+use cardano_chain_follower::{hashes::TransactionId, StakeAddress};
 use catalyst_types::{
     catalyst_id::{role_index::RoleId, CatalystId},
     problem_report::ProblemReport,
 };
 use ed25519_dalek::VerifyingKey;
 use futures::StreamExt;
-use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
+use rbac_registration::{
+    cardano::cip509::{Cip0134UriSet, Cip509},
+    registration::cardano::RegistrationChain,
+};
 
 use crate::{
     db::index::{
@@ -31,7 +34,9 @@ use crate::{
 /// In case of failure a problem report from the given registration is updated and
 /// returned.
 pub async fn validate_rbac_registration(
-    reg: Cip509, is_persistent: bool, context: &mut RbacBlockIndexingContext,
+    reg: Cip509,
+    is_persistent: bool,
+    context: &mut RbacBlockIndexingContext,
 ) -> RbacValidationResult {
     match reg.previous_transaction() {
         // `Box::pin` is used here because of the future size (`clippy::large_futures` lint).
@@ -44,7 +49,9 @@ pub async fn validate_rbac_registration(
 
 /// Tries to update an existing RBAC chain.
 async fn update_chain(
-    reg: Cip509, previous_txn: TransactionId, is_persistent: bool,
+    reg: Cip509,
+    previous_txn: TransactionId,
+    is_persistent: bool,
     context: &mut RbacBlockIndexingContext,
 ) -> RbacValidationResult {
     let purpose = reg.purpose();
@@ -61,8 +68,8 @@ async fn update_chain(
         .context("{catalyst_id} is present in 'catalyst_id_for_txn_id' table, but not in 'rbac_registration'")?;
 
     // Check that addresses from the new registration aren't used in other chains.
-    let previous_addresses = chain.role_0_stake_addresses();
-    let reg_addresses = reg.role_0_stake_addresses();
+    let previous_addresses = chain.stake_addresses();
+    let reg_addresses = cip509_stake_addresses(&reg);
     let new_addresses: Vec<_> = reg_addresses.difference(&previous_addresses).collect();
     for address in &new_addresses {
         match catalyst_id_from_stake_address(address, is_persistent, context).await? {
@@ -80,7 +87,7 @@ async fn update_chain(
 
     // Store values before consuming the registration.
     let txn_id = reg.txn_hash();
-    let stake_addresses = reg.role_0_stake_addresses();
+    let stake_addresses = cip509_stake_addresses(&reg);
     let origin = reg.origin().to_owned();
 
     // Try to add a new registration to the chain.
@@ -129,12 +136,15 @@ async fn update_chain(
         // Only new chains can take ownership of stake addresses of existing chains, so in this case
         // other chains aren't affected.
         modified_chains: Vec::new(),
+        purpose,
     })
 }
 
 /// Tries to start a new RBAC chain.
 async fn start_new_chain(
-    reg: Cip509, is_persistent: bool, context: &mut RbacBlockIndexingContext,
+    reg: Cip509,
+    is_persistent: bool,
+    context: &mut RbacBlockIndexingContext,
 ) -> RbacValidationResult {
     let catalyst_id = reg.catalyst_id().map(CatalystId::as_short_id);
     let purpose = reg.purpose();
@@ -168,7 +178,7 @@ async fn start_new_chain(
     }
 
     // Validate stake addresses.
-    let new_addresses = new_chain.role_0_stake_addresses();
+    let new_addresses = new_chain.stake_addresses();
     let mut updated_chains: HashMap<_, HashSet<StakeAddress>> = HashMap::new();
     for address in &new_addresses {
         if let Some(id) = catalyst_id_from_stake_address(address, is_persistent, context).await? {
@@ -239,12 +249,15 @@ async fn start_new_chain(
         stake_addresses: new_addresses,
         public_keys,
         modified_chains: updated_chains.into_iter().collect(),
+        purpose,
     })
 }
 
 /// Returns a Catalyst ID corresponding to the given transaction hash.
 async fn catalyst_id_from_txn_id(
-    txn_id: TransactionId, is_persistent: bool, context: &mut RbacBlockIndexingContext,
+    txn_id: TransactionId,
+    is_persistent: bool,
+    context: &mut RbacBlockIndexingContext,
 ) -> Result<Option<CatalystId>> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::Query;
 
@@ -258,7 +271,7 @@ async fn catalyst_id_from_txn_id(
         CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
     if let Some(id) = Query::get(&session, txn_id).await? {
         return Ok(Some(id));
-    };
+    }
 
     // Conditionally check the volatile database.
     if !is_persistent {
@@ -273,7 +286,9 @@ async fn catalyst_id_from_txn_id(
 /// Returns either persistent or "latest" (persistent + volatile) registration chain for
 /// the given Catalyst ID.
 async fn chain(
-    id: &CatalystId, is_persistent: bool, context: &mut RbacBlockIndexingContext,
+    id: &CatalystId,
+    is_persistent: bool,
+    context: &mut RbacBlockIndexingContext,
 ) -> Result<Option<RegistrationChain>> {
     let chain = if is_persistent {
         persistent_rbac_chain(id).await?
@@ -295,7 +310,9 @@ async fn chain(
 
 /// Returns a Catalyst ID corresponding to the given stake address.
 async fn catalyst_id_from_stake_address(
-    address: &StakeAddress, is_persistent: bool, context: &mut RbacBlockIndexingContext,
+    address: &StakeAddress,
+    is_persistent: bool,
+    context: &mut RbacBlockIndexingContext,
 ) -> Result<Option<CatalystId>> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_stake_address::Query;
 
@@ -309,7 +326,7 @@ async fn catalyst_id_from_stake_address(
         CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
     if let Some(id) = Query::latest(&session, address).await? {
         return Ok(Some(id));
-    };
+    }
 
     // Conditionally check the volatile database.
     if !is_persistent {
@@ -324,7 +341,9 @@ async fn catalyst_id_from_stake_address(
 /// Checks that a new registration doesn't contain a signing key that was used by any
 /// other chain. Returns a list of public keys in the registration.
 async fn validate_public_keys(
-    chain: &RegistrationChain, is_persistent: bool, report: &ProblemReport,
+    chain: &RegistrationChain,
+    is_persistent: bool,
+    report: &ProblemReport,
     context: &mut RbacBlockIndexingContext,
 ) -> Result<HashSet<VerifyingKey>> {
     let mut keys = HashSet::new();
@@ -352,7 +371,9 @@ async fn validate_public_keys(
 
 /// Returns a Catalyst ID corresponding to the given public key.
 async fn catalyst_id_from_public_key(
-    key: VerifyingKey, is_persistent: bool, context: &mut RbacBlockIndexingContext,
+    key: VerifyingKey,
+    is_persistent: bool,
+    context: &mut RbacBlockIndexingContext,
 ) -> Result<Option<CatalystId>> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_public_key::Query;
 
@@ -366,7 +387,7 @@ async fn catalyst_id_from_public_key(
         CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
     if let Some(id) = Query::get(&session, key).await? {
         return Ok(Some(id));
-    };
+    }
 
     // Conditionally check the volatile database.
     if !is_persistent {
@@ -383,21 +404,23 @@ async fn catalyst_id_from_public_key(
 /// This function behaves in the same way as `latest_rbac_chain(...).is_some()` but the
 /// implementation is more optimized because we don't need to build the whole chain.
 pub async fn is_chain_known(
-    id: &CatalystId, is_persistent: bool, context: &mut RbacBlockIndexingContext,
+    id: &CatalystId,
+    is_persistent: bool,
+    context: &mut RbacBlockIndexingContext,
 ) -> Result<bool> {
     if context.find_registrations(id).is_some() {
         return Ok(true);
     }
 
+    let session =
+        CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
+
     // We only cache persistent chains, so it is ok to check the cache regardless of the
     // `is_persistent` parameter value.
-    if cached_persistent_rbac_chain(id).is_some() {
+    if cached_persistent_rbac_chain(&session, id).is_some() {
         return Ok(true);
     }
 
-    // Then try to find in the persistent database.
-    let session =
-        CassandraSession::get(true).context("Failed to get Cassandra persistent session")?;
     if is_cat_id_known(&session, id).await? {
         return Ok(true);
     }
@@ -415,7 +438,10 @@ pub async fn is_chain_known(
 }
 
 /// Returns `true` if there is at least one registration with the given Catalyst ID.
-async fn is_cat_id_known(session: &CassandraSession, id: &CatalystId) -> Result<bool> {
+async fn is_cat_id_known(
+    session: &CassandraSession,
+    id: &CatalystId,
+) -> Result<bool> {
     use crate::db::index::queries::rbac::get_rbac_registrations::{Query, QueryParams};
 
     Ok(Query::execute(session, QueryParams {
@@ -425,4 +451,12 @@ async fn is_cat_id_known(session: &CassandraSession, id: &CatalystId) -> Result<
     .next()
     .await
     .is_some())
+}
+
+/// Returns a set of stake addresses in the given registration.
+fn cip509_stake_addresses(cip509: &Cip509) -> HashSet<StakeAddress> {
+    cip509
+        .certificate_uris()
+        .map(Cip0134UriSet::stake_addresses)
+        .unwrap_or_default()
 }

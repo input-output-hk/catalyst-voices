@@ -15,10 +15,10 @@ final class CommentsState extends Equatable {
 
   @override
   List<Object?> get props => [
-        commentsSort,
-        showReplies,
-        showReplyBuilder,
-      ];
+    commentsSort,
+    showReplies,
+    showReplyBuilder,
+  ];
 
   CommentsState copyWith({
     ProposalCommentsSort? commentsSort,

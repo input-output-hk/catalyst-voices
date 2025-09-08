@@ -17,11 +17,11 @@ class CategoryDetailState extends Equatable {
 
   @override
   List<Object?> get props => [
-        category,
-        categories,
-        isLoading,
-        error,
-      ];
+    category,
+    categories,
+    isLoading,
+    error,
+  ];
 
   CategoryDetailState copyWith({
     CampaignCategoryDetailsViewModel? category,

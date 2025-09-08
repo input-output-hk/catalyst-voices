@@ -17,10 +17,11 @@ void main() {
           Material(
             child: SearchTextField(
               hintText: hintText,
-              onSearch: ({
-                required String searchValue,
-                required bool isSubmitted,
-              }) {},
+              onSearch:
+                  ({
+                    required String searchValue,
+                    required bool isSubmitted,
+                  }) {},
             ),
           ),
           voicesColors: lightVoicesColorScheme,
@@ -43,13 +44,14 @@ void main() {
           Material(
             child: SearchTextField(
               hintText: hintText,
-              onSearch: ({
-                required String searchValue,
-                required bool isSubmitted,
-              }) {
-                lastSearchValue = searchValue;
-                lastIsSubmitted = isSubmitted;
-              },
+              onSearch:
+                  ({
+                    required String searchValue,
+                    required bool isSubmitted,
+                  }) {
+                    lastSearchValue = searchValue;
+                    lastIsSubmitted = isSubmitted;
+                  },
             ),
           ),
           voicesColors: lightVoicesColorScheme,
@@ -74,13 +76,14 @@ void main() {
           Material(
             child: SearchTextField(
               hintText: hintText,
-              onSearch: ({
-                required String searchValue,
-                required bool isSubmitted,
-              }) {
-                lastSearchValue = searchValue;
-                lastIsSubmitted = isSubmitted;
-              },
+              onSearch:
+                  ({
+                    required String searchValue,
+                    required bool isSubmitted,
+                  }) {
+                    lastSearchValue = searchValue;
+                    lastIsSubmitted = isSubmitted;
+                  },
             ),
           ),
           voicesColors: lightVoicesColorScheme,
@@ -107,13 +110,14 @@ void main() {
           Material(
             child: SearchTextField(
               hintText: hintText,
-              onSearch: ({
-                required String searchValue,
-                required bool isSubmitted,
-              }) {
-                lastSearchValue = searchValue;
-                lastIsSubmitted = isSubmitted;
-              },
+              onSearch:
+                  ({
+                    required String searchValue,
+                    required bool isSubmitted,
+                  }) {
+                    lastSearchValue = searchValue;
+                    lastIsSubmitted = isSubmitted;
+                  },
             ),
           ),
           voicesColors: lightVoicesColorScheme,
@@ -142,10 +146,11 @@ void main() {
               hintText: hintText,
               width: customWidth,
               height: customHeight,
-              onSearch: ({
-                required String searchValue,
-                required bool isSubmitted,
-              }) {},
+              onSearch:
+                  ({
+                    required String searchValue,
+                    required bool isSubmitted,
+                  }) {},
             ),
           ),
           voicesColors: lightVoicesColorScheme,
@@ -176,12 +181,13 @@ void main() {
           child: SearchTextField(
             hintText: 'Search...',
             showClearButton: true,
-            onSearch: ({
-              required String searchValue,
-              required bool isSubmitted,
-            }) {
-              lastSearchValue = searchValue;
-            },
+            onSearch:
+                ({
+                  required String searchValue,
+                  required bool isSubmitted,
+                }) {
+                  lastSearchValue = searchValue;
+                },
           ),
         ),
         voicesColors: lightVoicesColorScheme,
@@ -213,10 +219,11 @@ void main() {
         Material(
           child: SearchTextField(
             hintText: 'Search...',
-            onSearch: ({
-              required String searchValue,
-              required bool isSubmitted,
-            }) {},
+            onSearch:
+                ({
+                  required String searchValue,
+                  required bool isSubmitted,
+                }) {},
           ),
         ),
         voicesColors: lightVoicesColorScheme,

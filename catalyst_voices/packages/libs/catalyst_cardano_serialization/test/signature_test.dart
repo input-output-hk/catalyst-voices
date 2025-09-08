@@ -12,7 +12,8 @@ void main() {
     });
 
     test('fromSimpleOrExtendedBytes skips chain code', () {
-      const extendedKeyHex = 'bcbf9d3b5b8ef3d6f65fa59ef4bb64e6e56bb3de354bc'
+      const extendedKeyHex =
+          'bcbf9d3b5b8ef3d6f65fa59ef4bb64e6e56bb3de354bc'
           '484fa74f2e19734fa2ef5e94d3e0b9968b8f464ad8b3f'
           'b24ab1fbda4cb0cdaa2960f8f3d07cc4ee3c7f';
 

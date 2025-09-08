@@ -1,6 +1,26 @@
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
+/// The int value of [StringOrInt].
+final class IntValue extends StringOrInt {
+  /// The int value of the [StringOrInt] union.
+  final int value;
+
+  /// The default constructor for [IntValue].
+  const IntValue(this.value);
+
+  /// Deserializes the type from cbor.
+  factory IntValue.fromCbor(CborValue value) {
+    return IntValue((value as CborSmallInt).value);
+  }
+
+  @override
+  List<Object?> get props => [value];
+
+  @override
+  CborValue toCbor() => CborSmallInt(value);
+}
+
 /// A union type for either a string or int.
 ///
 /// In CDDL it's defined as (tstr/int) or (int/tstr).
@@ -20,26 +40,6 @@ sealed class StringOrInt extends Equatable {
   CborValue toCbor();
 }
 
-/// The int value of [StringOrInt].
-final class IntValue extends StringOrInt {
-  /// The int value of the [StringOrInt] union.
-  final int value;
-
-  /// The default constructor for [IntValue].
-  const IntValue(this.value);
-
-  /// Deserializes the type from cbor.
-  factory IntValue.fromCbor(CborValue value) {
-    return IntValue((value as CborSmallInt).value);
-  }
-
-  @override
-  CborValue toCbor() => CborSmallInt(value);
-
-  @override
-  List<Object?> get props => [value];
-}
-
 /// The string value of [StringOrInt].
 final class StringValue extends StringOrInt {
   /// The string value of the [StringOrInt] union.
@@ -54,8 +54,8 @@ final class StringValue extends StringOrInt {
   }
 
   @override
-  CborValue toCbor() => CborString(value);
+  List<Object?> get props => [value];
 
   @override
-  List<Object?> get props => [value];
+  CborValue toCbor() => CborString(value);
 }

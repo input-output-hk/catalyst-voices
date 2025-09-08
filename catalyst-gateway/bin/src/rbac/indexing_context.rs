@@ -2,7 +2,7 @@
 
 use std::collections::{HashMap, HashSet};
 
-use cardano_blockchain_types::{Slot, StakeAddress, TransactionId, TxnIndex};
+use cardano_chain_follower::{hashes::TransactionId, Slot, StakeAddress, TxnIndex};
 use catalyst_types::catalyst_id::CatalystId;
 use ed25519_dalek::VerifyingKey;
 
@@ -47,23 +47,36 @@ impl RbacBlockIndexingContext {
     }
 
     /// Adds a transaction to the context.
-    pub fn insert_transaction(&mut self, transaction: TransactionId, catalyst_id: CatalystId) {
+    pub fn insert_transaction(
+        &mut self,
+        transaction: TransactionId,
+        catalyst_id: CatalystId,
+    ) {
         self.transactions.insert(transaction, catalyst_id);
     }
 
     /// Returns a Catalyst ID of the given transaction ID if it exists in the context.
-    pub fn find_transaction(&self, transaction_id: &TransactionId) -> Option<&CatalystId> {
+    pub fn find_transaction(
+        &self,
+        transaction_id: &TransactionId,
+    ) -> Option<&CatalystId> {
         self.transactions.get(transaction_id)
     }
 
     /// Adds a stake address to the context.
-    pub fn insert_address(&mut self, address: StakeAddress, catalyst_id: CatalystId) {
+    pub fn insert_address(
+        &mut self,
+        address: StakeAddress,
+        catalyst_id: CatalystId,
+    ) {
         self.addresses.insert(address, catalyst_id);
     }
 
     /// Adds multiple addresses to the context.
     pub fn insert_addresses(
-        &mut self, addresses: impl IntoIterator<Item = StakeAddress>, catalyst_id: &CatalystId,
+        &mut self,
+        addresses: impl IntoIterator<Item = StakeAddress>,
+        catalyst_id: &CatalystId,
     ) {
         for address in addresses {
             self.insert_address(address, catalyst_id.clone());
@@ -71,18 +84,27 @@ impl RbacBlockIndexingContext {
     }
 
     /// Returns a Catalyst ID corresponding the given stake address.
-    pub fn find_address(&self, address: &StakeAddress) -> Option<&CatalystId> {
+    pub fn find_address(
+        &self,
+        address: &StakeAddress,
+    ) -> Option<&CatalystId> {
         self.addresses.get(address)
     }
 
     /// Adds a public key to the context.
-    pub fn insert_public_key(&mut self, key: VerifyingKey, catalyst_id: CatalystId) {
+    pub fn insert_public_key(
+        &mut self,
+        key: VerifyingKey,
+        catalyst_id: CatalystId,
+    ) {
         self.public_keys.insert(key, catalyst_id);
     }
 
     /// Adds multiple public keys to the context.
     pub fn insert_public_keys(
-        &mut self, keys: impl IntoIterator<Item = VerifyingKey>, catalyst_id: &CatalystId,
+        &mut self,
+        keys: impl IntoIterator<Item = VerifyingKey>,
+        catalyst_id: &CatalystId,
     ) {
         for key in keys {
             self.insert_public_key(key, catalyst_id.clone());
@@ -90,14 +112,22 @@ impl RbacBlockIndexingContext {
     }
 
     /// Returns a Catalyst ID corresponding the given public key.
-    pub fn find_public_key(&self, key: &VerifyingKey) -> Option<&CatalystId> {
+    pub fn find_public_key(
+        &self,
+        key: &VerifyingKey,
+    ) -> Option<&CatalystId> {
         self.public_keys.get(key)
     }
 
     /// Adds a registration to the context.
     pub fn insert_registration(
-        &mut self, id: CatalystId, txn_id: TransactionId, slot: Slot, txn_index: TxnIndex,
-        prv_txn: Option<TransactionId>, removed_stake_addresses: HashSet<StakeAddress>,
+        &mut self,
+        id: CatalystId,
+        txn_id: TransactionId,
+        slot: Slot,
+        txn_index: TxnIndex,
+        prv_txn: Option<TransactionId>,
+        removed_stake_addresses: HashSet<StakeAddress>,
     ) {
         use std::collections::hash_map::Entry;
 
@@ -123,7 +153,10 @@ impl RbacBlockIndexingContext {
     }
 
     /// Returns a list of registrations.
-    pub fn find_registrations(&self, id: &CatalystId) -> Option<&[RbacQuery]> {
+    pub fn find_registrations(
+        &self,
+        id: &CatalystId,
+    ) -> Option<&[RbacQuery]> {
         self.registrations.get(id).map(Vec::as_slice)
     }
 }

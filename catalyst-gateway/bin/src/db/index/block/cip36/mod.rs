@@ -6,8 +6,9 @@ pub(crate) mod insert_cip36_invalid;
 
 use std::sync::Arc;
 
-use cardano_blockchain_types::{Cip36, MultiEraBlock, Slot, StakeAddress, TxnIndex};
-use catalyst_types::hashes::Blake2b224Hash;
+use cardano_chain_follower::{
+    hashes::Blake2b224Hash, Cip36, MultiEraBlock, Slot, StakeAddress, TxnIndex,
+};
 use scylla::client::session::Session;
 
 use super::certs;
@@ -44,7 +45,8 @@ impl Cip36InsertQuery {
 
     /// Prepare Batch of Insert Cip36 Registration Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+        session: &Arc<Session>,
+        cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch)> {
         let insert_cip36_batch = insert_cip36::Params::prepare_batch(session, cfg).await;
         let insert_cip36_invalid_batch =
@@ -64,7 +66,10 @@ impl Cip36InsertQuery {
 
     /// Index the CIP-36 registrations in a transaction.
     pub(crate) fn index(
-        &mut self, index: TxnIndex, slot_no: Slot, block: &MultiEraBlock,
+        &mut self,
+        index: TxnIndex,
+        slot_no: Slot,
+        block: &MultiEraBlock,
     ) -> anyhow::Result<()> {
         // Catalyst strict is set to true
         match Cip36::new(block, index, true) {
@@ -149,7 +154,10 @@ impl Cip36InsertQuery {
     /// Execute the CIP-36 Registration Indexing Queries.
     ///
     /// Consumes the `self` and returns a vector of futures.
-    pub(crate) fn execute(self, session: &Arc<CassandraSession>) -> FallibleQueryTasks {
+    pub(crate) fn execute(
+        self,
+        session: &Arc<CassandraSession>,
+    ) -> FallibleQueryTasks {
         let mut query_handles: FallibleQueryTasks = Vec::new();
 
         if !self.registrations.is_empty() {

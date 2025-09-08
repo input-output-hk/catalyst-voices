@@ -8,10 +8,7 @@ use tracing::error;
 use crate::{
     db::{
         index::{
-            queries::{
-                caches::txo_by_stake::update as cache_update, FallibleQueryResults,
-                PreparedQueries, PreparedQuery, SizedBatch,
-            },
+            queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, SizedBatch},
             session::CassandraSession,
         },
         types::{DbSlot, DbStakeAddress, DbTxnIndex, DbTxnOutputOffset},
@@ -43,7 +40,8 @@ pub(crate) struct UpdateTxoSpentQuery;
 impl UpdateTxoSpentQuery {
     /// Prepare a batch of update TXO spent queries.
     pub(crate) async fn prepare_batch(
-        session: Arc<Session>, cfg: &cassandra_db::EnvVars,
+        session: Arc<Session>,
+        cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),
@@ -60,13 +58,14 @@ impl UpdateTxoSpentQuery {
 
     /// Executes a update txo spent query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: Vec<UpdateTxoSpentQueryParams>,
+        session: &CassandraSession,
+        params: Vec<UpdateTxoSpentQueryParams>,
     ) -> FallibleQueryResults {
         let results = session
             .execute_batch(PreparedQuery::TxoSpentUpdateQuery, params.clone())
             .await?;
 
-        cache_update(params);
+        session.caches().assets_ada().update(params);
 
         Ok(results)
     }

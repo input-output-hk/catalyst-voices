@@ -2,8 +2,7 @@
 
 use std::{collections::BTreeSet, fmt::Display, sync::Arc, time::Duration};
 
-use cardano_blockchain_types::{MultiEraBlock, Network, Point, Slot};
-use cardano_chain_follower::{ChainFollower, ChainSyncConfig};
+use cardano_chain_follower::{ChainFollower, ChainSyncConfig, MultiEraBlock, Network, Point, Slot};
 use duration_string::DurationString;
 use futures::{stream::FuturesUnordered, StreamExt};
 use rand::{Rng, SeedableRng};
@@ -16,12 +15,9 @@ use crate::{
             index_block,
             roll_forward::{self, PurgeCondition},
         },
-        queries::{
-            caches,
-            sync_status::{
-                get::{get_sync_status, SyncStatus},
-                update::update_sync_status,
-            },
+        queries::sync_status::{
+            get::{get_sync_status, SyncStatus},
+            update::update_sync_status,
         },
         session::CassandraSession,
     },
@@ -84,7 +80,10 @@ struct SyncParams {
 }
 
 impl Display for SyncParams {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
         if self.result.is_none() {
             write!(f, "Sync_Params {{ ")?;
         } else {
@@ -129,7 +128,7 @@ impl Display for SyncParams {
             match result {
                 Ok(()) => write!(f, ", Success")?,
                 Err(error) => write!(f, ", {error}")?,
-            };
+            }
         }
 
         f.write_str(" }")
@@ -141,7 +140,11 @@ const BACKOFF_RANGE_MULTIPLIER: u32 = 3;
 
 impl SyncParams {
     /// Create a new `SyncParams`.
-    fn new(chain: Network, start: Point, end: Point) -> Self {
+    fn new(
+        chain: Network,
+        start: Point,
+        end: Point,
+    ) -> Self {
         Self {
             chain,
             start,
@@ -188,8 +191,13 @@ impl SyncParams {
 
     /// Convert Params into the result of the sync.
     pub(crate) fn done(
-        &self, first: Option<Point>, first_immutable: bool, last: Option<Point>,
-        last_immutable: bool, synced: u64, result: anyhow::Result<()>,
+        &self,
+        first: Option<Point>,
+        first_immutable: bool,
+        last: Option<Point>,
+        last_immutable: bool,
+        synced: u64,
+        result: anyhow::Result<()>,
     ) -> Self {
         if result.is_ok() && self.end != Point::TIP {
             // Update sync status in the Immutable DB.
@@ -237,7 +245,8 @@ impl SyncParams {
 /// Set end to `Point::TIP` to sync the tip continuously.
 #[allow(clippy::too_many_lines)]
 fn sync_subchain(
-    params: SyncParams, mut pending_blocks: watch::Receiver<BTreeSet<Slot>>,
+    params: SyncParams,
+    mut pending_blocks: watch::Receiver<BTreeSet<Slot>>,
 ) -> tokio::task::JoinHandle<SyncParams> {
     tokio::spawn(async move {
         // Backoff hitting the database if we need to.
@@ -383,8 +392,12 @@ fn sync_subchain(
 
 /// Update block related state.
 fn update_block_state(
-    block: &MultiEraBlock, first_indexed_block: &mut Option<Point>, first_immutable: &mut bool,
-    last_indexed_block: &mut Option<Point>, last_immutable: &mut bool, blocks_synced: &mut u64,
+    block: &MultiEraBlock,
+    first_indexed_block: &mut Option<Point>,
+    first_immutable: &mut bool,
+    last_indexed_block: &mut Option<Point>,
+    last_immutable: &mut bool,
+    blocks_synced: &mut u64,
 ) {
     *last_immutable = block.is_immutable();
     *last_indexed_block = Some(block.point());
@@ -446,7 +459,10 @@ impl SyncTask {
     }
 
     /// Add a new `SyncTask` to the queue.
-    fn add_sync_task(&mut self, params: SyncParams) {
+    fn add_sync_task(
+        &mut self,
+        params: SyncParams,
+    ) {
         self.pending_blocks.send_modify(|blocks| {
             blocks.insert(params.end.slot_or_default());
         });
@@ -611,8 +627,13 @@ impl SyncTask {
             if self.sync_tasks.len() == 1 {
                 set_follower_immutable_first_reached_tip();
                 metrics_updater::reached_immutable_tip(true);
-                caches::txo_assets_by_stake::drop();
-                caches::txo_by_stake::drop();
+
+                // Clear asset caches from the persistent Index DB session (volatile asset caches
+                // are disabled)
+                CassandraSession::get(true).inspect(|session| {
+                    session.caches().assets_ada().clear_cache();
+                    session.caches().assets_native().clear_cache();
+                });
 
                 // Purge data up to this slot
                 // Slots arithmetic has saturating semantic, so this is ok.
@@ -672,7 +693,11 @@ impl SyncTask {
     /// If it hasn't just return the slots as points.
     /// If it has, return a subset that hasn't been indexed if any, or None if its been
     /// completely indexed already.
-    fn get_syncable_range(&self, start: Slot, end: Slot) -> Option<(Point, Point)> {
+    fn get_syncable_range(
+        &self,
+        start: Slot,
+        end: Slot,
+    ) -> Option<(Point, Point)> {
         for sync_block in &self.sync_status {
             // Check if we start within a previously synchronized block.
             if start >= sync_block.start_slot && start <= sync_block.end_slot {

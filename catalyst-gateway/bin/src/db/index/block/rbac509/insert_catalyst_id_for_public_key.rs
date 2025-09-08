@@ -2,7 +2,7 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_blockchain_types::Slot;
+use cardano_chain_follower::Slot;
 use catalyst_types::catalyst_id::CatalystId;
 use ed25519_dalek::VerifyingKey;
 use scylla::{client::session::Session, SerializeRow};
@@ -31,7 +31,10 @@ pub(crate) struct Params {
 }
 
 impl Debug for Params {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
         f.debug_struct("Params")
             .field("public_key", &self.public_key)
             .field("catalyst_id", &self.catalyst_id)
@@ -42,7 +45,11 @@ impl Debug for Params {
 
 impl Params {
     /// Creates a new record for this transaction.
-    pub(crate) fn new(public_key: VerifyingKey, slot_no: Slot, catalyst_id: CatalystId) -> Self {
+    pub(crate) fn new(
+        public_key: VerifyingKey,
+        slot_no: Slot,
+        catalyst_id: CatalystId,
+    ) -> Self {
         Params {
             public_key: public_key.into(),
             slot_no: slot_no.into(),
@@ -52,7 +59,8 @@ impl Params {
 
     /// Prepares a batch of queries.
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &EnvVars,
+        session: &Arc<Session>,
+        cfg: &EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),
