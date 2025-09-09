@@ -51,7 +51,7 @@ class ResponsivePadding extends StatelessWidget {
     EdgeInsets? sm,
     EdgeInsets? md,
     EdgeInsets? lg,
-    required EdgeInsets other,
+    EdgeInsets other = EdgeInsets.zero,
     required Widget child,
   }) => ResponsivePadding(
     key: key,
