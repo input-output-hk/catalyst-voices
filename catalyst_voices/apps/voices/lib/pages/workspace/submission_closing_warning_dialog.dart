@@ -21,7 +21,7 @@ class SubmissionClosingWarningDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesTwoPaneDialog(
+    return VoicesTwoPanelDialog(
       left: _LeftSide(dontShowAgain),
       right: _RightSide(submissionCloseAt),
       leftPadding: EdgeInsets.zero,

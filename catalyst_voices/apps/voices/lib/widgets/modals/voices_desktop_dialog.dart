@@ -56,14 +56,14 @@ class VoicesSinglePaneDialog extends StatelessWidget {
 ///
 /// Keep in mind that this dialog has fixed size of 900x600 and
 /// is always adding close button in top right corner.
-class VoicesTwoPaneDialog extends StatelessWidget {
+class VoicesTwoPanelDialog extends StatelessWidget {
   final Widget left;
   final Widget right;
   final bool showCloseButton;
   final EdgeInsets leftPadding;
   final EdgeInsets rightPadding;
 
-  const VoicesTwoPaneDialog({
+  const VoicesTwoPanelDialog({
     super.key,
     required this.left,
     required this.right,

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 /// Opinionated, single panel, dialog that is tailored for desktop
 /// form factors.
 ///
-/// Uses [VoicesTwoPaneDialog] for base structure.
+/// Uses [VoicesTwoPanelDialog] for base structure.
 ///
 /// Call [VoicesDialog.show] with [VoicesDesktopInfoDialog] in order
 /// to show it.

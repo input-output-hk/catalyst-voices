@@ -83,7 +83,7 @@ class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
 
   @override
   Widget build(BuildContext context) {
-    return VoicesTwoPaneDialog(
+    return VoicesTwoPanelDialog(
       left: InformationPanel(
         title: context.l10n.unlockDialogHeader,
         picture: const UnlockKeychainPicture(),
