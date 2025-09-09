@@ -76,7 +76,7 @@ jobs:
         with:
           payload: |
               {
-                "text": ":😭: *Nightly Tests Failed*"
+                "text": ":😭: *Nightly Tests Failed* @channel "
               }
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           webhook-type: webhook-trigger
