@@ -19,11 +19,11 @@ class RegistrationPanelsDialog extends StatelessWidget {
         return [isAccountCompleted, isRecovered].none((value) => value);
       },
       builder: (context, showCloseButton) {
-        return VoicesTwoPanelDialog(
+        return VoicesPanelsDialog(
           key: const Key('RegistrationDialog'),
           left: const RegistrationInfoPanel(),
           right: const RegistrationDetailsPanel(),
-          showCloseButton: showCloseButton,
+          showClose: showCloseButton,
         );
       },
     );

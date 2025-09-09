@@ -1,8 +1,8 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
-import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/voices_panel_dialog.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -32,7 +32,7 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesSinglePaneDialog(
+    return VoicesPanelDialog(
       backgroundColor: Theme.of(context).colors.iconsBackground,
       showBorder: true,
       constraints: const BoxConstraints(maxHeight: 464, maxWidth: 648),

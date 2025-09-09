@@ -1,8 +1,8 @@
 import 'package:catalyst_voices/widgets/modals/upload/info_container.dart';
 import 'package:catalyst_voices/widgets/modals/upload/upload_actions.dart';
 import 'package:catalyst_voices/widgets/modals/upload/upload_container.dart';
-import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/voices_panel_dialog.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
@@ -73,7 +73,7 @@ class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesSinglePaneDialog(
+    return VoicesPanelDialog(
       constraints: const BoxConstraints(maxWidth: 600, maxHeight: 450),
       child: Padding(
         padding: const EdgeInsets.all(16),

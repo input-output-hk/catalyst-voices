@@ -17,7 +17,7 @@ class CategoryBriefDialog extends StatefulWidget {
   }) async {
     return VoicesDialog.show(
       context: context,
-      builder: (context) => VoicesSinglePaneDialog(
+      builder: (context) => VoicesPanelDialog(
         constraints: const BoxConstraints(
           maxWidth: 900,
           maxHeight: 768,

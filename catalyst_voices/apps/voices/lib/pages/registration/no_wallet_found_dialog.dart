@@ -15,7 +15,7 @@ class NoWalletFoundDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const VoicesTwoPanelDialog(
+    return const VoicesPanelsDialog(
       left: _LeftSide(),
       right: _RightSide(),
     );
