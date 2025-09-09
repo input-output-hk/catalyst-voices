@@ -48,6 +48,6 @@ jobs:
     uses: ./.github/workflows/gateway-tests.yml
 
   test-reporting:
-    if: ${{ !github.event.pull_request.draft && always() }}
+    if: success() || failure()
     needs: integration-tests
     uses: ./.github/workflows/generate-allure-report.yml
