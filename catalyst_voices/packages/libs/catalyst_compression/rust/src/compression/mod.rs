@@ -20,7 +20,7 @@ use flutter_rust_bridge::{spawn_blocking_with, DefaultHandler, SimpleThreadPool}
 /// Returns an error if the compression fails.
 pub async fn brotli_compress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let result = spawn_blocking_with(
-        move || brotli_compress_helper(bytes),
+        move || brotli_compress_helper(&bytes),
         CUSTOM_HANDLER.thread_pool(),
     )
     .await??;
@@ -29,10 +29,10 @@ pub async fn brotli_compress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
 }
 
 /// Helper function for `brotli_compress_helper`.
-fn brotli_compress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
+fn brotli_compress_helper(mut bytes: &[u8]) -> anyhow::Result<Vec<u8>> {
     let brotli_params = brotli::enc::BrotliEncoderParams::default();
     let mut buffer = Vec::new();
-    brotli::BrotliCompress(&mut bytes.as_slice(), &mut buffer, &brotli_params)?;
+    brotli::BrotliCompress(&mut bytes, &mut buffer, &brotli_params)?;
     Ok(buffer)
 }
 
@@ -52,7 +52,7 @@ fn brotli_compress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
 /// Returns an error if the decompression fails.
 pub async fn brotli_decompress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let result = spawn_blocking_with(
-        move || brotli_decompress_helper(bytes),
+        move || brotli_decompress_helper(&bytes),
         CUSTOM_HANDLER.thread_pool(),
     )
     .await??;
@@ -61,9 +61,9 @@ pub async fn brotli_decompress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
 }
 
 /// Helper function for `brotli_decompress`.
-fn brotli_decompress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
+fn brotli_decompress_helper(mut bytes: &[u8]) -> anyhow::Result<Vec<u8>> {
     let mut buffer = Vec::new();
-    brotli::BrotliDecompress(&mut bytes.as_slice(), &mut buffer)?;
+    brotli::BrotliDecompress(&mut bytes, &mut buffer)?;
     Ok(buffer)
 }
 
@@ -83,7 +83,7 @@ fn brotli_decompress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
 /// Returns an error if the compression fails.
 pub async fn zstd_compress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let result = spawn_blocking_with(
-        move || zstd_compress_helper(bytes),
+        move || zstd_compress_helper(&bytes),
         CUSTOM_HANDLER.thread_pool(),
     )
     .await??;
@@ -92,8 +92,8 @@ pub async fn zstd_compress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
 }
 
 /// Helper function for `zstd_compress`.
-fn zstd_compress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
-    let compressed = zstd::bulk::compress(&bytes, 0)?;
+fn zstd_compress_helper(bytes: &[u8]) -> anyhow::Result<Vec<u8>> {
+    let compressed = zstd::bulk::compress(bytes, 0)?;
     Ok(compressed)
 }
 
@@ -113,7 +113,7 @@ fn zstd_compress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
 /// Returns an error if the decompression fails.
 pub async fn zstd_decompress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let result = spawn_blocking_with(
-        move || zstd_decompress_helper(bytes),
+        move || zstd_decompress_helper(&bytes),
         CUSTOM_HANDLER.thread_pool(),
     )
     .await??;
@@ -122,9 +122,9 @@ pub async fn zstd_decompress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
 }
 
 /// Helper function for `zstd_decompress`.
-fn zstd_decompress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
+fn zstd_decompress_helper(bytes: &[u8]) -> anyhow::Result<Vec<u8>> {
     let mut buffer = vec![];
-    zstd::stream::copy_decode(bytes.as_slice(), &mut buffer)?;
+    zstd::stream::copy_decode(bytes, &mut buffer)?;
     Ok(buffer)
 }
 
@@ -154,13 +154,13 @@ mod test {
     #[test]
     fn test_brotli_roundtrip() {
         let input = b"hello catalyst compression with brotli".to_vec();
-        let compressed = brotli_compress_helper(input.clone()).expect("brotli compress failed");
+        let compressed = brotli_compress_helper(&input.clone()).expect("brotli compress failed");
         assert!(
             !compressed.is_empty(),
             "compressed output should not be empty"
         );
 
-        let decompressed = brotli_decompress_helper(compressed).expect("brotli decompress failed");
+        let decompressed = brotli_decompress_helper(&compressed).expect("brotli decompress failed");
         assert_eq!(
             decompressed, input,
             "decompressed output should match original"
@@ -170,13 +170,13 @@ mod test {
     #[test]
     fn test_zstd_roundtrip() {
         let input = b"hello catalyst compression with zstd".to_vec();
-        let compressed = zstd_compress_helper(input.clone()).expect("zstd compress failed");
+        let compressed = zstd_compress_helper(&input.clone()).expect("zstd compress failed");
         assert!(
             !compressed.is_empty(),
             "compressed output should not be empty"
         );
 
-        let decompressed = zstd_decompress_helper(compressed).expect("zstd decompress failed");
+        let decompressed = zstd_decompress_helper(&compressed).expect("zstd decompress failed");
         assert_eq!(
             decompressed, input,
             "decompressed output should match original"
@@ -187,7 +187,7 @@ mod test {
     fn test_brotli_invalid_input() {
         // Brotli should fail to decompress invalid data
         let invalid = b"not valid brotli data".to_vec();
-        let result = brotli_decompress_helper(invalid);
+        let result = brotli_decompress_helper(&invalid);
         assert!(result.is_err(), "brotli should fail on invalid input");
     }
 
@@ -195,7 +195,7 @@ mod test {
     fn test_zstd_invalid_input() {
         // Zstd should fail to decompress invalid data
         let invalid = b"not valid zstd data".to_vec();
-        let result = zstd_decompress_helper(invalid);
+        let result = zstd_decompress_helper(&invalid);
         assert!(result.is_err(), "zstd should fail on invalid input");
     }
 }
