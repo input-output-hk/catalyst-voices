@@ -3,6 +3,8 @@
 //! This module provides functions necessary to handle deterministic key derivation
 //! using BIP-0039 mnemonics.
 
+use std::sync::LazyLock;
+
 use bip32::DerivationPath;
 use bip39::Mnemonic;
 pub use ed25519_bip32::{DerivationIndex, DerivationScheme, Signature, XPrv, XPub};
@@ -435,23 +437,24 @@ fn verify_signature_xpub_helper(
     xpub.verify(data, signature)
 }
 
+/// A custom handler capable of creating a thread pool with customized `wasm_bindgen`
+/// module name.
 #[cfg(not(target_family = "wasm"))]
-flutter_rust_bridge::for_generated::lazy_static! {
-    static ref CUSTOM_HANDLER: DefaultHandler<SimpleThreadPool> =
-        DefaultHandler::new_simple(Default::default());
-}
+static CUSTOM_HANDLER: LazyLock<DefaultHandler<SimpleThreadPool>> =
+    LazyLock::new(|| DefaultHandler::new_simple(SimpleThreadPool::default()));
 
 #[cfg(target_family = "wasm")]
 thread_local! {
+    /// A custom thread pool with customized wasm_bindgen module name.
     static THREAD_POOL: SimpleThreadPool = SimpleThreadPool::new(None, None, Some("key_derivation_wasm_bindgen".to_string()).into(), None)
         .expect("failed to create ThreadPool");
 }
 
+/// A custom handler capable of creating a thread pool with customized wasm_bindgen module
+/// name.
 #[cfg(target_family = "wasm")]
-flutter_rust_bridge::for_generated::lazy_static! {
-    static ref CUSTOM_HANDLER: DefaultHandler<&'static std::thread::LocalKey<SimpleThreadPool>> =
-        DefaultHandler::new_simple(&THREAD_POOL);
-}
+static CUSTOM_HANDLER: LazyLock<DefaultHandler<&'static std::thread::LocalKey<SimpleThreadPool>>> =
+    LazyLock::new(|| DefaultHandler::new_simple(&THREAD_POOL));
 
 #[cfg(test)]
 mod test {

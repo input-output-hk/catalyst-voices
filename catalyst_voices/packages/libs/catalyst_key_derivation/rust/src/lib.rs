@@ -2,7 +2,6 @@
 
 // cspell: words uninlined
 
-pub mod key_derivation;
 #[allow(
     clippy::missing_docs_in_private_items,
     clippy::unwrap_used,
@@ -18,3 +17,4 @@ pub mod key_derivation;
 )]
 #[doc(hidden)]
 mod frb_generated;
+pub mod key_derivation;
