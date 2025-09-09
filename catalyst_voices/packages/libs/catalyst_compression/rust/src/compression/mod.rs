@@ -28,6 +28,7 @@ pub async fn brotli_compress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     Ok(result)
 }
 
+/// Helper function for `brotli_compress_helper`.
 fn brotli_compress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let brotli_params = brotli::enc::BrotliEncoderParams::default();
     let mut buffer = Vec::new();
@@ -59,6 +60,7 @@ pub async fn brotli_decompress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     Ok(result)
 }
 
+/// Helper function for `brotli_decompress`.
 fn brotli_decompress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let mut buffer = Vec::new();
     brotli::BrotliDecompress(&mut bytes.as_slice(), &mut buffer)?;
@@ -89,6 +91,7 @@ pub async fn zstd_compress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     Ok(result)
 }
 
+/// Helper function for `zstd_compress`.
 fn zstd_compress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let compressed = zstd::bulk::compress(&bytes, 0)?;
     Ok(compressed)
@@ -118,9 +121,10 @@ pub async fn zstd_decompress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     Ok(result)
 }
 
+/// Helper function for `zstd_decompress`.
 fn zstd_decompress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let mut buffer = vec![];
-    zstd::stream::copy_decode(bytes, &mut buffer)?;
+    zstd::stream::copy_decode(bytes.as_slice(), &mut buffer)?;
     Ok(buffer)
 }
 
