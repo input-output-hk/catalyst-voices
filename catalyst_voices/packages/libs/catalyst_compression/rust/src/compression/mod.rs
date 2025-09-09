@@ -1,7 +1,8 @@
 //! Rust implementation Catalyst Compression exposing brotli and zstd codecs.
 
+use std::sync::LazyLock;
+
 use flutter_rust_bridge::{spawn_blocking_with, DefaultHandler, SimpleThreadPool};
-use std::default::Default;
 
 /// Compress the bytes with brotli compression algorithm.
 /// Runs the computation by a shared thread poll to avoid blocking the main thread.
@@ -13,8 +14,12 @@ use std::default::Default;
 /// # Returns
 ///
 /// Returns compressed bytes as a `Result`.
+///
+/// # Errors
+///
+/// Returns an error if the compression fails.
 pub async fn brotli_compress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
-   let result = spawn_blocking_with(
+    let result = spawn_blocking_with(
         move || brotli_compress_helper(bytes),
         CUSTOM_HANDLER.thread_pool(),
     )
@@ -40,6 +45,10 @@ fn brotli_compress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
 /// # Returns
 ///
 /// Returns uncompressed bytes as `Result`.
+///
+/// # Errors
+///
+/// Returns an error if the decompression fails.
 pub async fn brotli_decompress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let result = spawn_blocking_with(
         move || brotli_decompress_helper(bytes),
@@ -66,6 +75,10 @@ fn brotli_decompress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
 /// # Returns
 ///
 /// Returns compressed bytes as a `Result`.
+///
+/// # Errors
+///
+/// Returns an error if the compression fails.
 pub async fn zstd_compress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let result = spawn_blocking_with(
         move || zstd_compress_helper(bytes),
@@ -91,6 +104,10 @@ fn zstd_compress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
 /// # Returns
 ///
 /// Returns uncompressed bytes as `Result`.
+///
+/// # Errors
+///
+/// Returns an error if the decompression fails.
 pub async fn zstd_decompress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let result = spawn_blocking_with(
         move || zstd_decompress_helper(bytes),
@@ -101,29 +118,30 @@ pub async fn zstd_decompress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     Ok(result)
 }
 
-fn zstd_decompress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
+fn zstd_decompress_helper(bytes: &[u8]) -> anyhow::Result<Vec<u8>> {
     let mut buffer = vec![];
-    zstd::stream::copy_decode(bytes.as_slice(), &mut buffer)?;
+    zstd::stream::copy_decode(bytes, &mut buffer)?;
     Ok(buffer)
 }
 
+/// A custom handler capable of creating a thread pool with customized `wasm_bindgen`
+/// module name.
 #[cfg(not(target_family = "wasm"))]
-flutter_rust_bridge::for_generated::lazy_static! {
-    static ref CUSTOM_HANDLER: DefaultHandler<SimpleThreadPool> =
-        DefaultHandler::new_simple(Default::default());
-}
+static CUSTOM_HANDLER: LazyLock<DefaultHandler<SimpleThreadPool>> =
+    LazyLock::new(|| DefaultHandler::new_simple(SimpleThreadPool::default()));
 
 #[cfg(target_family = "wasm")]
 thread_local! {
-    static THREAD_POOL: SimpleThreadPool = SimpleThreadPool::new(None, None, Some("compression_wasm_bindgen".to_string()).into(), None)
+    /// A custom thread pool with customized wasm_bindgen module name.
+    static THREAD_POOL: SimpleThreadPool = SimpleThreadPool::new(None, None, Some("key_derivation_wasm_bindgen".to_string()).into(), None)
         .expect("failed to create ThreadPool");
 }
 
+/// A custom handler capable of creating a thread pool with customized wasm_bindgen module
+/// name.
 #[cfg(target_family = "wasm")]
-flutter_rust_bridge::for_generated::lazy_static! {
-    static ref CUSTOM_HANDLER: DefaultHandler<&'static std::thread::LocalKey<SimpleThreadPool>> =
-        DefaultHandler::new_simple(&THREAD_POOL);
-}
+static CUSTOM_HANDLER: LazyLock<DefaultHandler<&'static std::thread::LocalKey<SimpleThreadPool>>> =
+    LazyLock::new(|| DefaultHandler::new_simple(&THREAD_POOL));
 
 #[cfg(test)]
 mod test {
@@ -133,20 +151,32 @@ mod test {
     fn test_brotli_roundtrip() {
         let input = b"hello catalyst compression with brotli".to_vec();
         let compressed = brotli_compress_helper(input.clone()).expect("brotli compress failed");
-        assert!(!compressed.is_empty(), "compressed output should not be empty");
+        assert!(
+            !compressed.is_empty(),
+            "compressed output should not be empty"
+        );
 
         let decompressed = brotli_decompress_helper(compressed).expect("brotli decompress failed");
-        assert_eq!(decompressed, input, "decompressed output should match original");
+        assert_eq!(
+            decompressed, input,
+            "decompressed output should match original"
+        );
     }
 
     #[test]
     fn test_zstd_roundtrip() {
         let input = b"hello catalyst compression with zstd".to_vec();
         let compressed = zstd_compress_helper(input.clone()).expect("zstd compress failed");
-        assert!(!compressed.is_empty(), "compressed output should not be empty");
+        assert!(
+            !compressed.is_empty(),
+            "compressed output should not be empty"
+        );
 
         let decompressed = zstd_decompress_helper(compressed).expect("zstd decompress failed");
-        assert_eq!(decompressed, input, "decompressed output should match original");
+        assert_eq!(
+            decompressed, input,
+            "decompressed output should match original"
+        );
     }
 
     #[test]

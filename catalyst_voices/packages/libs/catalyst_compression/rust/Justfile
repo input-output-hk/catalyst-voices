@@ -11,23 +11,23 @@ default:
 cargo-tree:
     cargo tree -e features,normal,build -f "{p}[{f}]" --workspace --frozen
 
+# Generate code using flutter_rust_bridge
+generate:
+    cd ../ && earthly +code-generator --local=true
+
 # Check Dependency licenses and CVE's
 license-check:
     cargo deny check --exclude-dev || true
 
 # Format the rust code
 code-format:
-    # Create a dummy file just to past the CI format check
-    # Add another blank line to satisfy the cargo fmt check
-    #printf "\n" > ./src/frb_generated.rs
-
-    #cargo +nightly fmtfix
-    #cargo +nightly fmtchk
+    cargo +nightly fmtfix
+    cargo +nightly fmtchk
 
 # Lint the rust code
 code-lint:
-    #cargo lintfix -r
-    #cargo lint -r
+    cargo lintfix -r
+    cargo lint -r
 
 # Synchronize Rust Configs
 sync-cfg:
@@ -35,7 +35,7 @@ sync-cfg:
         earthly ./catalyst_voices/packages/libs/catalyst_compression/rust+sync-cfg
 
 # Pre Push Checks
-pre-push: sync-cfg code-format code-lint license-check
+pre-push: sync-cfg generate code-format code-lint license-check
     # Make sure we can actually build inside Earthly which needs to happen in CI.
     cd ../../../../.. && \
         earthly ./catalyst_voices/packages/libs/catalyst_compression/rust+check && \
