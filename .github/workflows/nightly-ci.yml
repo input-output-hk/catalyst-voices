@@ -59,8 +59,33 @@ jobs:
           command: run
           args: ./catalyst-gateway/tests/+all-images
 
-      - name: Schemathesis tests
+      - name: Spin up catalyst-gateway
+        id: gateway-started
         if: ${{ steps.images.conclusion == 'success' }}
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway --detach
+
+      - name: Wait for cat-gateway to become healthy
+        id: gateway-healthy
+        if: ${{ steps.gateway-started.conclusion == 'success' }}
+        run: |
+              echo "Waiting for container to be healthy..."
+              for i in {1..500}; do
+                STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
+                echo "Health status: $STATUS"
+                if [ "$STATUS" == "healthy" ]; then
+                  echo "Container is healthy!"
+                  break
+                fi
+                if [ "$STATUS" == "unhealthy" ]; then
+                  echo "Container became unhealthy."
+                  exit 1
+                fi
+                sleep 5
+              done
+
+      - name: Schemathesis tests
+        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
         run: |
           export HYPOTHESIS_MAX_EXAMPLES=5000
           export MAX_RESPONSE_TIME=20000
