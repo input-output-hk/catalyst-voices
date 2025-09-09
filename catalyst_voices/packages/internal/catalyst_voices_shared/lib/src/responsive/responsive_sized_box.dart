@@ -10,10 +10,6 @@ import 'package:flutter/widgets.dart';
 ///
 /// The possible arguments are xs, sm, md, lg, other following the
 /// Material design standards and the ResponsiveBuilder arguments.
-/// Each screen size has a default value to simplify widget usage.
-///
-///
-
 class ResponsiveSizedBox extends StatelessWidget {
   final Map<ResponsiveBreakpointKey, SizedBox> _sizedBoxes;
 
