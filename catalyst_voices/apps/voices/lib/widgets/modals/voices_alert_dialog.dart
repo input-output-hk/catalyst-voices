@@ -83,11 +83,8 @@ class VoicesAlertDialog extends StatelessWidget {
                           // close button to reserve space on this side of the
                           // row so that the title is centered
                           if (isDismissible)
-                            const Visibility(
+                            const Visibility.maintain(
                               visible: false,
-                              maintainSize: true,
-                              maintainAnimation: true,
-                              maintainState: true,
                               child: _CloseButton(),
                             ),
                           Expanded(
