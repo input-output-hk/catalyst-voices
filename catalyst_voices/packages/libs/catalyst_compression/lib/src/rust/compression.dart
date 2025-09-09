@@ -7,6 +7,8 @@ import 'frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `brotli_compress_helper`, `brotli_decompress_helper`, `zstd_compress_helper`, `zstd_decompress_helper`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `CUSTOM_HANDLER`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `deref`, `initialize`
 
 /// Compress the bytes with brotli compression algorithm.
 /// Runs the computation by a shared thread poll to avoid blocking the main thread.

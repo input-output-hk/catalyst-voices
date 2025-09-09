@@ -3,3 +3,5 @@ rust_root: rust/
 dart_output: lib/src/rust
 default_external_library_loader_web_prefix: /assets/packages/catalyst_compression/assets/js/
 wasm_bindgen_name: compression_wasm_bindgen
+#TODO(dt-iohk): allow to auto-upgrade when we're no longer using the forked flutter_rust_bridge
+auto_upgrade_dependency: false
