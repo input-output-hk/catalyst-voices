@@ -124,3 +124,44 @@ flutter_rust_bridge::for_generated::lazy_static! {
     static ref CUSTOM_HANDLER: DefaultHandler<&'static std::thread::LocalKey<SimpleThreadPool>> =
         DefaultHandler::new_simple(&THREAD_POOL);
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_brotli_roundtrip() {
+        let input = b"hello catalyst compression with brotli".to_vec();
+        let compressed = brotli_compress_helper(input.clone()).expect("brotli compress failed");
+        assert!(!compressed.is_empty(), "compressed output should not be empty");
+
+        let decompressed = brotli_decompress_helper(compressed).expect("brotli decompress failed");
+        assert_eq!(decompressed, input, "decompressed output should match original");
+    }
+
+    #[test]
+    fn test_zstd_roundtrip() {
+        let input = b"hello catalyst compression with zstd".to_vec();
+        let compressed = zstd_compress_helper(input.clone()).expect("zstd compress failed");
+        assert!(!compressed.is_empty(), "compressed output should not be empty");
+
+        let decompressed = zstd_decompress_helper(compressed).expect("zstd decompress failed");
+        assert_eq!(decompressed, input, "decompressed output should match original");
+    }
+
+    #[test]
+    fn test_brotli_invalid_input() {
+        // Brotli should fail to decompress invalid data
+        let invalid = b"not valid brotli data".to_vec();
+        let result = brotli_decompress_helper(invalid);
+        assert!(result.is_err(), "brotli should fail on invalid input");
+    }
+
+    #[test]
+    fn test_zstd_invalid_input() {
+        // Zstd should fail to decompress invalid data
+        let invalid = b"not valid zstd data".to_vec();
+        let result = zstd_decompress_helper(invalid);
+        assert!(result.is_err(), "zstd should fail on invalid input");
+    }
+}
