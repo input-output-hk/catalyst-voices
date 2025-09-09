@@ -10,7 +10,7 @@ license = "Apache-2.0"
 crate-type = ["cdylib", "staticlib", "rlib"]
 
 [dependencies]
-flutter_rust_bridge = { git = "https://github.com/dt-iohk/flutter_rust_bridge.git", rev = "64678315e8f5a877fc7b78524d9441cd05f42d65", package = "flutter_rust_bridge" }
+flutter_rust_bridge = { version = "2.11.1", git = "https://github.com/dt-iohk/flutter_rust_bridge.git", rev = "64678315e8f5a877fc7b78524d9441cd05f42d65", package = "flutter_rust_bridge" }
 anyhow = "1.0.91"
 brotli = "7.0.0"
 zstd = "0.13.2"
