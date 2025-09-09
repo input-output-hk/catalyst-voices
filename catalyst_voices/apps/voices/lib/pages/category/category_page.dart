@@ -62,6 +62,77 @@ class _Body extends StatelessWidget {
   }
 }
 
+class _BodySmall extends StatefulWidget {
+  final CampaignCategoryDetailsViewModel category;
+  final bool isLoading;
+
+  const _BodySmall({required this.category, this.isLoading = false});
+
+  @override
+  State<_BodySmall> createState() => _BodySmallState();
+}
+
+class _BodySmallState extends State<_BodySmall> {
+  DraggableScrollableController dragController = DraggableScrollableController();
+  @override
+  Widget build(BuildContext context) {
+    return Skeletonizer(
+      enabled: widget.isLoading,
+      child: Stack(
+        children: [
+          SingleChildScrollView(
+            child: CategoryDetailView(
+              category: widget.category,
+            ),
+          ),
+          BlocSelector<SessionCubit, SessionState, bool>(
+            selector: (state) {
+              final isProposer = state.account?.isProposer ?? false;
+              return (isProposer && state.isActive);
+            },
+            builder: (context, state) {
+              return DraggableScrollableSheet(
+                minChildSize: 0.1,
+                initialChildSize: 0.1,
+                maxChildSize: state ? 0.95 : 0.3,
+                builder: (context, scrollCotroller) => Container(
+                  height: double.infinity,
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                  ),
+                  child: ListView(
+                    physics: const ClampingScrollPhysics(),
+                    controller: scrollCotroller,
+                    children: [
+                      CategoryProposalsDetailsCard(
+                        categoryId: widget.category.id,
+                        categoryName: widget.category.formattedName,
+                        categoryProposalsCount: widget.category.proposalsCount,
+                      ),
+                      const SizedBox(height: 16),
+                      Offstage(
+                        offstage: !state,
+                        child: CreateProposalCard(
+                          categoryId: widget.category.id,
+                          categoryName: widget.category.formattedName,
+                          categoryDos: widget.category.dos,
+                          categoryDonts: widget.category.donts,
+                          submissionCloseDate: widget.category.submissionCloseDate,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _CardInformation extends StatelessWidget {
   final CampaignCategoryDetailsViewModel category;
 
@@ -158,9 +229,18 @@ class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
         );
       },
       builder: (context, state) {
-        return _Body(
+        final smallBody = _BodySmall(
           category: state.data,
           isLoading: state.show,
+        );
+        return ResponsiveBuilder<Widget>(
+          xs: smallBody,
+          sm: smallBody,
+          builder: (context, data) => data,
+          other: _Body(
+            category: state.data,
+            isLoading: state.show,
+          ),
         );
       },
     );
