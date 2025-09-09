@@ -118,7 +118,7 @@ pub async fn zstd_decompress(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     Ok(result)
 }
 
-fn zstd_decompress_helper(bytes: &[u8]) -> anyhow::Result<Vec<u8>> {
+fn zstd_decompress_helper(bytes: Vec<u8>) -> anyhow::Result<Vec<u8>> {
     let mut buffer = vec![];
     zstd::stream::copy_decode(bytes, &mut buffer)?;
     Ok(buffer)
