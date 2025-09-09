@@ -68,85 +68,84 @@ class VoicesAlertDialog extends StatelessWidget {
             alignment: Alignment.center,
             child: SizedBox(
               width: width,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 10, bottom: 16),
-                child: Column(
-                  key: const Key('VoicesAlertDialog'),
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (title != null || isDismissible)
-                      Row(
-                        key: const Key('VoicesAlertDialogTitleRow'),
-                        children: [
-                          // if widget is dismissible then show an invisible
-                          // close button to reserve space on this side of the
-                          // row so that the title is centered
-                          if (isDismissible)
-                            const Visibility.maintain(
-                              visible: false,
-                              child: _CloseButton(),
-                            ),
-                          Expanded(
-                            child: DefaultTextStyle(
-                              style: Theme.of(context).textTheme.titleLarge!,
-                              textAlign: TextAlign.center,
-                              child: title ?? const SizedBox.shrink(),
-                            ),
+              child: Column(
+                key: const Key('VoicesAlertDialog'),
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 10),
+                  if (title != null || isDismissible)
+                    Row(
+                      key: const Key('VoicesAlertDialogTitleRow'),
+                      children: [
+                        // if widget is dismissible then show an invisible
+                        // close button to reserve space on this side of the
+                        // row so that the title is centered
+                        if (isDismissible)
+                          const Visibility.maintain(
+                            visible: false,
+                            child: _CloseButton(),
                           ),
-                          if (isDismissible) const _CloseButton(),
+                        Expanded(
+                          child: DefaultTextStyle(
+                            style: Theme.of(context).textTheme.titleLarge!,
+                            textAlign: TextAlign.center,
+                            child: title ?? const SizedBox.shrink(),
+                          ),
+                        ),
+                        if (isDismissible) const _CloseButton(),
+                      ],
+                    ),
+                  if (icon != null)
+                    Padding(
+                      padding: EdgeInsets.only(
+                        top: title != null ? 24 : 0,
+                        left: 20,
+                        right: 20,
+                      ),
+                      child: Center(child: icon),
+                    ),
+                  if (subtitle != null)
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 16,
+                        left: 20,
+                        right: 20,
+                      ),
+                      child: DefaultTextStyle(
+                        key: const Key('VoicesAlertDialogSubtitle'),
+                        style: Theme.of(context).textTheme.titleSmall!,
+                        textAlign: TextAlign.center,
+                        child: subtitle,
+                      ),
+                    ),
+                  if (content != null)
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        top: 16,
+                        left: 20,
+                        right: 20,
+                      ),
+                      child: DefaultTextStyle(
+                        style: Theme.of(context).textTheme.bodyMedium!,
+                        textAlign: TextAlign.center,
+                        child: content,
+                      ),
+                    ),
+                  if (buttons.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const SizedBox(height: 24),
+                          ...buttons.separatedBy(const SizedBox(height: 8)),
                         ],
                       ),
-                    if (icon != null)
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: title != null ? 24 : 0,
-                          left: 20,
-                          right: 20,
-                        ),
-                        child: Center(child: icon),
-                      ),
-                    if (subtitle != null)
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          top: 16,
-                          left: 20,
-                          right: 20,
-                        ),
-                        child: DefaultTextStyle(
-                          key: const Key('VoicesAlertDialogSubtitle'),
-                          style: Theme.of(context).textTheme.titleSmall!,
-                          textAlign: TextAlign.center,
-                          child: subtitle,
-                        ),
-                      ),
-                    if (content != null)
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          top: 16,
-                          left: 20,
-                          right: 20,
-                        ),
-                        child: DefaultTextStyle(
-                          style: Theme.of(context).textTheme.bodyMedium!,
-                          textAlign: TextAlign.center,
-                          child: content,
-                        ),
-                      ),
-                    if (buttons.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            const SizedBox(height: 24),
-                            ...buttons.separatedBy(const SizedBox(height: 8)),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
+                    ),
+                  const SizedBox(height: 16),
+                ],
               ),
             ),
           ),
