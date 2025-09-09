@@ -41,8 +41,7 @@ class CurrentCampaign extends StatelessWidget {
                   totalAsk: currentCampaignInfo.totalAsk,
                 ),
               ),
-              ResponsiveBuilder<SizedBox>(
-                builder: (context, data) => data,
+              ResponsiveSizedBox.only(
                 xs: const SizedBox(height: 30),
                 sm: const SizedBox(height: 48),
                 other: const SizedBox(height: 80),
