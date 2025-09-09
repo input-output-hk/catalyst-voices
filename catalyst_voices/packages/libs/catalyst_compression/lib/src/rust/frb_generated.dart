@@ -35,12 +35,8 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 
   /// Initialize flutter_rust_bridge in mock mode.
   /// No libraries for FFI are loaded.
-  static void initMock({
-    required RustLibApi api,
-  }) {
-    instance.initMockImpl(
-      api: api,
-    );
+  static void initMock({required RustLibApi api}) {
+    instance.initMockImpl(api: api);
   }
 
   /// Dispose flutter_rust_bridge
@@ -125,10 +121,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCompressionBrotliCompressConstMeta =>
-      const TaskConstMeta(
-        debugName: "brotli_compress",
-        argNames: ["bytes"],
-      );
+      const TaskConstMeta(debugName: "brotli_compress", argNames: ["bytes"]);
 
   @override
   Future<Uint8List> crateCompressionBrotliDecompress({
@@ -158,10 +151,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCompressionBrotliDecompressConstMeta =>
-      const TaskConstMeta(
-        debugName: "brotli_decompress",
-        argNames: ["bytes"],
-      );
+      const TaskConstMeta(debugName: "brotli_decompress", argNames: ["bytes"]);
 
   @override
   Future<Uint8List> crateCompressionZstdCompress({required List<int> bytes}) {
@@ -189,10 +179,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCompressionZstdCompressConstMeta =>
-      const TaskConstMeta(
-        debugName: "zstd_compress",
-        argNames: ["bytes"],
-      );
+      const TaskConstMeta(debugName: "zstd_compress", argNames: ["bytes"]);
 
   @override
   Future<Uint8List> crateCompressionZstdDecompress({required List<int> bytes}) {
@@ -220,10 +207,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   TaskConstMeta get kCrateCompressionZstdDecompressConstMeta =>
-      const TaskConstMeta(
-        debugName: "zstd_decompress",
-        argNames: ["bytes"],
-      );
+      const TaskConstMeta(debugName: "zstd_decompress", argNames: ["bytes"]);
 
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw) {

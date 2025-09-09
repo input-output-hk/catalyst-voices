@@ -8,7 +8,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `derive_xprv_helper`, `mnemonic_to_xprv_helper`, `sign_data_helper`, `verify_signature_xprv_helper`, `verify_signature_xpub_helper`, `xpublic_key_helper`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `from`, `from`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `CUSTOM_HANDLER`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `assert_receiver_is_total_eq`, `clone`, `clone`, `clone`, `deref`, `eq`, `eq`, `eq`, `fmt`, `fmt`, `fmt`, `from`, `from`, `initialize`
 
 /// Generate a new extended private key (`XPrv`) from a mnemonic and passphrase.
 /// Note that this function only works with BIP-0039 mnemonics.

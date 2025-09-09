@@ -35,12 +35,8 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 
   /// Initialize flutter_rust_bridge in mock mode.
   /// No libraries for FFI are loaded.
-  static void initMock({
-    required RustLibApi api,
-  }) {
-    instance.initMockImpl(
-      api: api,
-    );
+  static void initMock({required RustLibApi api}) {
+    instance.initMockImpl(api: api);
   }
 
   /// Dispose flutter_rust_bridge
@@ -1560,16 +1556,12 @@ class Bip32Ed25519SignatureImpl extends RustOpaque
   );
 
   /// Get the inner bytes.
-  U8Array64 get inner =>
-      RustLib.instance.api.crateKeyDerivationBip32Ed25519SignatureGetInner(
-        that: this,
-      );
+  U8Array64 get inner => RustLib.instance.api
+      .crateKeyDerivationBip32Ed25519SignatureGetInner(that: this);
 
   /// Convert to a hex string.
-  String toHex() =>
-      RustLib.instance.api.crateKeyDerivationBip32Ed25519SignatureToHex(
-        that: this,
-      );
+  String toHex() => RustLib.instance.api
+      .crateKeyDerivationBip32Ed25519SignatureToHex(that: this);
 }
 
 @sealed
@@ -1623,10 +1615,8 @@ class Bip32Ed25519XPrivateKeyImpl extends RustOpaque
       );
 
   /// Drop the extended private key.
-  void drop() =>
-      RustLib.instance.api.crateKeyDerivationBip32Ed25519XPrivateKeyDrop(
-        that: this,
-      );
+  void drop() => RustLib.instance.api
+      .crateKeyDerivationBip32Ed25519XPrivateKeyDrop(that: this);
 
   /// Extract the chain code from the extended private key.
   /// The chain code is the last 32 bytes of the extended private key.
@@ -1635,9 +1625,7 @@ class Bip32Ed25519XPrivateKeyImpl extends RustOpaque
   ///
   /// Returns a 32 length bytes representing the chain code.
   U8Array32 get chainCode => RustLib.instance.api
-      .crateKeyDerivationBip32Ed25519XPrivateKeyGetChainCode(
-        that: this,
-      );
+      .crateKeyDerivationBip32Ed25519XPrivateKeyGetChainCode(that: this);
 
   /// Extract the extended secret key from the extended private key.
   /// The extended secret key is the first 64 bytes of the extended private key.
@@ -1651,10 +1639,8 @@ class Bip32Ed25519XPrivateKeyImpl extends RustOpaque
       );
 
   /// Get the inner bytes.
-  U8Array96 get inner =>
-      RustLib.instance.api.crateKeyDerivationBip32Ed25519XPrivateKeyGetInner(
-        that: this,
-      );
+  U8Array96 get inner => RustLib.instance.api
+      .crateKeyDerivationBip32Ed25519XPrivateKeyGetInner(that: this);
 
   /// Sign the given data with the given extended private key.
   ///
@@ -1675,10 +1661,8 @@ class Bip32Ed25519XPrivateKeyImpl extends RustOpaque
       );
 
   /// Convert to a hex string.
-  String toHex() =>
-      RustLib.instance.api.crateKeyDerivationBip32Ed25519XPrivateKeyToHex(
-        that: this,
-      );
+  String toHex() => RustLib.instance.api
+      .crateKeyDerivationBip32Ed25519XPrivateKeyToHex(that: this);
 
   /// Verify the signature on the given data using extended private key.
   ///
@@ -1714,10 +1698,8 @@ class Bip32Ed25519XPrivateKeyImpl extends RustOpaque
   /// # Errors
   ///
   /// Returns an error if the extended private key is invalid.
-  Future<Bip32Ed25519XPublicKey> xpublicKey() =>
-      RustLib.instance.api.crateKeyDerivationBip32Ed25519XPrivateKeyXpublicKey(
-        that: this,
-      );
+  Future<Bip32Ed25519XPublicKey> xpublicKey() => RustLib.instance.api
+      .crateKeyDerivationBip32Ed25519XPrivateKeyXpublicKey(that: this);
 }
 
 @sealed
@@ -1754,16 +1736,12 @@ class Bip32Ed25519XPublicKeyImpl extends RustOpaque
   /// # Returns
   ///
   /// Returns a 32 length bytes representing the chain code.
-  U8Array32 get chainCode =>
-      RustLib.instance.api.crateKeyDerivationBip32Ed25519XPublicKeyGetChainCode(
-        that: this,
-      );
+  U8Array32 get chainCode => RustLib.instance.api
+      .crateKeyDerivationBip32Ed25519XPublicKeyGetChainCode(that: this);
 
   /// Get the inner bytes.
-  U8Array64 get inner =>
-      RustLib.instance.api.crateKeyDerivationBip32Ed25519XPublicKeyGetInner(
-        that: this,
-      );
+  U8Array64 get inner => RustLib.instance.api
+      .crateKeyDerivationBip32Ed25519XPublicKeyGetInner(that: this);
 
   /// Extract the public key from the extended public key.
   /// The public key is the first 32 bytes of the extended public key.
@@ -1771,16 +1749,12 @@ class Bip32Ed25519XPublicKeyImpl extends RustOpaque
   /// # Returns
   ///
   /// Returns a 32 length bytes representing the public key.
-  U8Array32 get publicKey =>
-      RustLib.instance.api.crateKeyDerivationBip32Ed25519XPublicKeyGetPublicKey(
-        that: this,
-      );
+  U8Array32 get publicKey => RustLib.instance.api
+      .crateKeyDerivationBip32Ed25519XPublicKeyGetPublicKey(that: this);
 
   /// Convert to a hex string.
-  String toHex() =>
-      RustLib.instance.api.crateKeyDerivationBip32Ed25519XPublicKeyToHex(
-        that: this,
-      );
+  String toHex() => RustLib.instance.api
+      .crateKeyDerivationBip32Ed25519XPublicKeyToHex(that: this);
 
   /// Verify the signature on the given data using extended public key.
   ///

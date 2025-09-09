@@ -211,6 +211,17 @@ let compression_wasm_bindgen;
     }
     /**
      * @param {number} func_id
+     * @param {any} port_
+     * @param {any} ptr_
+     * @param {number} rust_vec_len_
+     * @param {number} data_len_
+     */
+    __exports.frb_pde_ffi_dispatcher_primary = function(func_id, port_, ptr_, rust_vec_len_, data_len_) {
+        wasm.frb_pde_ffi_dispatcher_primary(func_id, port_, ptr_, rust_vec_len_, data_len_);
+    };
+
+    /**
+     * @param {number} func_id
      * @param {any} ptr_
      * @param {number} rust_vec_len_
      * @param {number} data_len_
@@ -222,27 +233,6 @@ let compression_wasm_bindgen;
     };
 
     /**
-     * @param {number} call_id
-     * @param {any} ptr_
-     * @param {number} rust_vec_len_
-     * @param {number} data_len_
-     */
-    __exports.frb_dart_fn_deliver_output = function(call_id, ptr_, rust_vec_len_, data_len_) {
-        wasm.frb_dart_fn_deliver_output(call_id, ptr_, rust_vec_len_, data_len_);
-    };
-
-    /**
-     * @param {number} func_id
-     * @param {any} port_
-     * @param {any} ptr_
-     * @param {number} rust_vec_len_
-     * @param {number} data_len_
-     */
-    __exports.frb_pde_ffi_dispatcher_primary = function(func_id, port_, ptr_, rust_vec_len_, data_len_) {
-        wasm.frb_pde_ffi_dispatcher_primary(func_id, port_, ptr_, rust_vec_len_, data_len_);
-    };
-
-    /**
      * @returns {number}
      */
     __exports.frb_get_rust_content_hash = function() {
@@ -251,14 +241,13 @@ let compression_wasm_bindgen;
     };
 
     /**
-     * @param {number} ptr
+     * @param {number} call_id
+     * @param {any} ptr_
+     * @param {number} rust_vec_len_
+     * @param {number} data_len_
      */
-    __exports.frb_dart_opaque_drop_thread_box_persistent_handle = function(ptr) {
-        wasm.frb_dart_opaque_drop_thread_box_persistent_handle(ptr);
-    };
-
-    __exports.wasm_start_callback = function() {
-        wasm.wasm_start_callback();
+    __exports.frb_dart_fn_deliver_output = function(call_id, ptr_, rust_vec_len_, data_len_) {
+        wasm.frb_dart_fn_deliver_output(call_id, ptr_, rust_vec_len_, data_len_);
     };
 
     /**
@@ -316,20 +305,31 @@ let compression_wasm_bindgen;
         }
     };
 
+    /**
+     * @param {number} ptr
+     */
+    __exports.frb_dart_opaque_drop_thread_box_persistent_handle = function(ptr) {
+        wasm.frb_dart_opaque_drop_thread_box_persistent_handle(ptr);
+    };
+
+    __exports.wasm_start_callback = function() {
+        wasm.wasm_start_callback();
+    };
+
     function __wbg_adapter_36(arg0, arg1, arg2) {
-        wasm.closure186_externref_shim(arg0, arg1, arg2);
+        wasm.closure173_externref_shim(arg0, arg1, arg2);
     }
 
     function __wbg_adapter_39(arg0, arg1, arg2) {
-        wasm.closure207_externref_shim(arg0, arg1, arg2);
-    }
-
-    function __wbg_adapter_42(arg0, arg1, arg2) {
         wasm.closure208_externref_shim(arg0, arg1, arg2);
     }
 
+    function __wbg_adapter_42(arg0, arg1, arg2) {
+        wasm.closure207_externref_shim(arg0, arg1, arg2);
+    }
+
     function __wbg_adapter_110(arg0, arg1, arg2, arg3) {
-        wasm.closure250_externref_shim(arg0, arg1, arg2, arg3);
+        wasm.closure251_externref_shim(arg0, arg1, arg2, arg3);
     }
 
     const WorkerPoolFinalization = (typeof FinalizationRegistry === 'undefined')
@@ -703,8 +703,8 @@ let compression_wasm_bindgen;
             const ret = false;
             return ret;
         };
-        imports.wbg.__wbindgen_closure_wrapper5869 = function(arg0, arg1, arg2) {
-            const ret = makeMutClosure(arg0, arg1, 184, __wbg_adapter_36);
+        imports.wbg.__wbindgen_closure_wrapper6017 = function(arg0, arg1, arg2) {
+            const ret = makeMutClosure(arg0, arg1, 185, __wbg_adapter_36);
             return ret;
         };
         imports.wbg.__wbindgen_closure_wrapper6562 = function(arg0, arg1, arg2) {
