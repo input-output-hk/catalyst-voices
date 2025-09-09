@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class CampaignTimeline extends StatefulWidget {
   final List<CampaignTimelineViewModel> timelineItems;
-  final SizedBox horizontalPadding;
+  final Widget horizontalPadding;
 
   const CampaignTimeline({
     super.key,
