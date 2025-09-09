@@ -30,7 +30,6 @@ class RegistrationDialog extends StatefulWidget {
       routeSettings: const RouteSettings(name: '/registration'),
       builder: (context) => RegistrationDialog._(type: type),
       barrierDismissible: false,
-      fullscreenDialog: true,
     );
   }
 }
