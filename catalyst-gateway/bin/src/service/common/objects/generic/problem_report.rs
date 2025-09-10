@@ -5,7 +5,7 @@ use poem_openapi::Object;
 /// Represents an OpenAPI object for Problem Report.
 #[derive(Object, Default)]
 // #[oai(example = true)]
-pub(crate) struct ErrorReport {
+pub(crate) struct ProblemReport {
     /// The kind of problem we are recording.
     pub(crate) kind: String,
     /// The message describing the problem.
