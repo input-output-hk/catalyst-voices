@@ -22,11 +22,11 @@ export class InputPasswordPanel extends OnboardingBasePage {
     await new OnboardingBasePage(this.page).nextButtonClick();
   }
   async inputPassword(password: string) {
-    await this.passwordInput.click();
+    await this.click(this.passwordInput);
     await this.passwordInput.fill(password);
   }
   async confirmPassword(password: string) {
-    await this.passwordConfirmInput.click();
+    await this.click(this.passwordConfirmInput);
     await this.passwordConfirmInput.fill(password);
   }
 }

@@ -1,19 +1,21 @@
 import { Locator, Page } from "@playwright/test";
+import { OnboardingBasePage } from "../onboarding-base-page";
 
-export class SignTransactionPanel {
-  page: Page;
+export class SignTransactionPanel extends OnboardingBasePage {
   signTransactionButton: Locator;
   changeRolesButton: Locator;
-  
+
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.signTransactionButton = page.getByTestId("SignTransactionButton");
-    this.changeRolesButton = page.getByTestId("TransactionReviewChangeRolesButton");
+    this.changeRolesButton = page.getByTestId(
+      "TransactionReviewChangeRolesButton"
+    );
   }
   async signTransactionClick() {
-    await this.signTransactionButton.click();
+    await this.click(this.signTransactionButton);
   }
   async changeRolesClick() {
-    await this.changeRolesButton.click();
+    await this.click(this.changeRolesButton);
   }
 }

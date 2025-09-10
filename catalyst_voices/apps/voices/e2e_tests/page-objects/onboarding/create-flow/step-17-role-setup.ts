@@ -1,14 +1,13 @@
 import { Locator, Page } from "@playwright/test";
+import { OnboardingBasePage } from "../onboarding-base-page";
 
-export class RoleSetupPanel {
-  page: Page;
+export class RoleSetupPanel extends OnboardingBasePage {
   proposerYesButton: Locator;
-  proposerNoButton: Locator;    
+  proposerNoButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.proposerYesButton = page.getByTestId("RoleYesButton");
     this.proposerNoButton = page.getByTestId("RoleNoButton");
   }
-
 }

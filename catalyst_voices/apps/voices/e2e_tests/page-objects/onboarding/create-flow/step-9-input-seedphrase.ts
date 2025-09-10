@@ -16,6 +16,6 @@ export class InputSeedPhrasePanel extends OnboardingBasePage {
     await new OnboardingBasePage(this.page).nextButtonClick();
   }
   async uploadKeyButtonClick() {
-    await this.uploadKeyButton.click();
+    await this.click(this.uploadKeyButton);
   }
 }

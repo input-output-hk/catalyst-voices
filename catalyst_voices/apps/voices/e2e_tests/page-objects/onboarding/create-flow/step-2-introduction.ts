@@ -12,26 +12,34 @@ export class IntroductionPanel extends OnboardingBasePage {
   constructor(page: Page) {
     super(page);
     this.page = page;
-    this.tosCheckbox = page.getByTestId("RegistrationConditionsCheckbox_checkbox");
-    this.privacyPolicyCheckbox = page.getByTestId("tosAndPrivacyPolicyCheckbox_checkbox");
-    this.drepCheckbox = page.getByTestId("drepApprovalContingencyCheckbox_checkbox");
-    this.createYourProfileButton = page.getByTestId("createProfileInstructionsNext");
+    this.tosCheckbox = page.getByTestId(
+      "RegistrationConditionsCheckbox_checkbox"
+    );
+    this.privacyPolicyCheckbox = page.getByTestId(
+      "tosAndPrivacyPolicyCheckbox_checkbox"
+    );
+    this.drepCheckbox = page.getByTestId(
+      "drepApprovalContingencyCheckbox_checkbox"
+    );
+    this.createYourProfileButton = page.getByTestId(
+      "createProfileInstructionsNext"
+    );
   }
 
   async goto() {
-    await  new GetStartedPanel(this.page).goto();
-    await  new GetStartedPanel(this.page).createKeychainClick();
+    await new GetStartedPanel(this.page).goto();
+    await new GetStartedPanel(this.page).createKeychainClick();
   }
   async createYourProfileClick() {
-    await this.createYourProfileButton.click();
+    await this.click(this.createYourProfileButton);
   }
   async tosCheckboxClick() {
-    await this.tosCheckbox.click();
+    await this.click(this.tosCheckbox);
   }
   async privacyPolicyCheckboxClick() {
-    await this.privacyPolicyCheckbox.click();
+    await this.click(this.privacyPolicyCheckbox);
   }
   async drepCheckboxClick() {
-    await this.drepCheckbox.click();
+    await this.click(this.drepCheckbox);
   }
 }

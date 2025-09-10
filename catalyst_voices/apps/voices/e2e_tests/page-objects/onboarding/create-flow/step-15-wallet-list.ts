@@ -19,7 +19,7 @@ export class WalletListPanel extends OnboardingBasePage {
   }
   async clickConnectWallet(name: string): Promise<Page> {
     const pagePromise = this.page.context().waitForEvent("page");
-    await this.walletButton(name).click();
+    await this.click(this.walletButton(name));
     return await pagePromise;
   }
 }

@@ -1,15 +1,15 @@
 import { Locator, Page } from "@playwright/test";
+import { BasePage } from "./base-page";
 
-export class DiscoveryPage {
-  page: Page;
+export class DiscoveryPage extends BasePage {
   getStartedButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.getStartedButton = page.getByTestId("GetStartedButton");
   }
 
   async clickGetStartedButton() {
-    await this.getStartedButton.click();
+    await this.click(this.getStartedButton);
   }
 }

@@ -1,13 +1,13 @@
 import { Locator, Page } from "@playwright/test";
 import { DiscoveryPage } from "../discovery-page";
+import { BasePage } from "../base-page";
 
-export class GetStartedPanel {
-  page: Page;
+export class GetStartedPanel extends BasePage {
   createKeychainButton: Locator;
   restoreKeychainButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
+    super(page);
     this.createKeychainButton = page.getByTestId(
       "CreateAccountType.createNewTitle"
     );
@@ -16,12 +16,13 @@ export class GetStartedPanel {
     );
   }
   async createKeychainClick() {
-    await this.createKeychainButton.click();
+    await this.click(this.createKeychainButton);
   }
   async restoreKeychainClick() {
-    await this.restoreKeychainButton.click();
+    await this.click(this.restoreKeychainButton);
   }
   async goto() {
-    await new DiscoveryPage(this.page).getStartedButton.click();
+    const discoveryPage = new DiscoveryPage(this.page);
+    await discoveryPage.clickGetStartedButton();
   }
 }

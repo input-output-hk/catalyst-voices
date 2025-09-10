@@ -22,9 +22,9 @@ export class WritedownSeedPhrasePanel extends OnboardingBasePage {
     await new OnboardingBasePage(this.page).nextButtonClick();
   }
   async seedphraseStoredCheckboxClick() {
-    await this.seedphraseStoredCheckbox.click();
+    await this.click(this.seedphraseStoredCheckbox);
   }
   async downloadSeedPhraseClick() {
-    await this.downloadSeedPhraseButton.click();
+    await this.click(this.downloadSeedPhraseButton);
   }
 }

@@ -18,6 +18,6 @@ export class LinkWalletInfoPanel extends OnboardingBasePage {
     await new KeychainFinalPanel(this.page).linkWalletButtonClick();
   }
   async chooseCardanoWalletButtonClick() {
-    await this.chooseCardanoWalletButton.click();
+    await this.click(this.chooseCardanoWalletButton);
   }
 }

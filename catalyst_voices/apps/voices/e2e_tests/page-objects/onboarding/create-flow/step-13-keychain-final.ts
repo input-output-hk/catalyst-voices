@@ -18,6 +18,6 @@ export class KeychainFinalPanel extends OnboardingBasePage {
     await new OnboardingBasePage(this.page).nextButtonClick();
   }
   async linkWalletButtonClick() {
-    await this.linkWalletButton.click();
+    await this.click(this.linkWalletButton);
   }
 }

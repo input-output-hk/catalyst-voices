@@ -16,6 +16,6 @@ export class ProfileSetupSuccessPanel extends OnboardingBasePage {
     await new OnboardingBasePage(this.page).nextButtonClick();
   }
   async createKeychainClick() {
-    await this.createKeychainButton.click();
+    await this.click(this.createKeychainButton);
   }
 }
