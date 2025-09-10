@@ -13,7 +13,7 @@ cargo-tree:
 
 # Generate code using flutter_rust_bridge
 generate:
-    cd ../ && earthly +code-generator --local=true
+    just ../code-gen-web
 
 # Check Dependency licenses and CVE's
 license-check:

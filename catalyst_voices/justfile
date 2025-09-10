@@ -15,8 +15,12 @@ generate-code: setup-code
 # Syntax sugar for linking packages and building generated code
 bootstrap: generate-code
 
+# Formats dart code in the workspace
+format-code:
+    melos format-apply
+
 # Runs all static code checks
-check-code: generate-code
+check-code:
     earthly +check-code-formatting
     earthly +check-package-publishing
     earthly +check-license
@@ -27,7 +31,7 @@ test-code:
     earthly +test-unit-native
 
 # Pre Push Checks
-pre-push: check-code test-code
+pre-push: generate-code format-code check-code test-code
 
 license-list: setup-code
     melos license-list

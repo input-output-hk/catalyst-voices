@@ -6,8 +6,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
-import 'frb_generated.io.dart'
-    if (dart.library.js_interop) 'frb_generated.web.dart';
+import 'frb_generated.io.dart' if (dart.library.js_interop) 'frb_generated.web.dart';
 import 'key_derivation.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
@@ -46,12 +45,10 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   static void dispose() => instance.disposeImpl();
 
   @override
-  ApiImplConstructor<RustLibApiImpl, RustLibWire> get apiImplConstructor =>
-      RustLibApiImpl.new;
+  ApiImplConstructor<RustLibApiImpl, RustLibWire> get apiImplConstructor => RustLibApiImpl.new;
 
   @override
-  WireConstructor<RustLibWire> get wireConstructor =>
-      RustLibWire.fromExternalLibrary;
+  WireConstructor<RustLibWire> get wireConstructor => RustLibWire.fromExternalLibrary;
 
   @override
   Future<void> executeRustInitializers() async {}
@@ -66,13 +63,12 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   @override
   int get rustContentHash => -1596077969;
 
-  static const kDefaultExternalLibraryLoaderConfig =
-      ExternalLibraryLoaderConfig(
-        stem: 'catalyst_key_derivation',
-        ioDirectory: 'rust/target/release/',
-        webPrefix: '/assets/packages/catalyst_key_derivation/assets/js/',
-        wasmBindGenName: 'key_derivation_wasm_bindgen',
-      );
+  static const kDefaultExternalLibraryLoaderConfig = ExternalLibraryLoaderConfig(
+    stem: 'catalyst_key_derivation',
+    ioDirectory: 'rust/target/release/',
+    webPrefix: '/assets/packages/catalyst_key_derivation/assets/js/',
+    wasmBindGenName: 'key_derivation_wasm_bindgen',
+  );
 }
 
 abstract class RustLibApi extends BaseApi {
@@ -88,8 +84,7 @@ abstract class RustLibApi extends BaseApi {
     required Bip32Ed25519Signature that,
   });
 
-  Future<Bip32Ed25519XPrivateKey>
-  crateKeyDerivationBip32Ed25519XPrivateKeyDeriveXprv({
+  Future<Bip32Ed25519XPrivateKey> crateKeyDerivationBip32Ed25519XPrivateKeyDeriveXprv({
     required Bip32Ed25519XPrivateKey that,
     required String path,
   });
@@ -114,8 +109,7 @@ abstract class RustLibApi extends BaseApi {
     required U8Array96 xprvBytes,
   });
 
-  Future<Bip32Ed25519Signature>
-  crateKeyDerivationBip32Ed25519XPrivateKeySignData({
+  Future<Bip32Ed25519Signature> crateKeyDerivationBip32Ed25519XPrivateKeySignData({
     required Bip32Ed25519XPrivateKey that,
     required List<int> data,
   });
@@ -130,8 +124,7 @@ abstract class RustLibApi extends BaseApi {
     required Bip32Ed25519Signature signature,
   });
 
-  Future<Bip32Ed25519XPublicKey>
-  crateKeyDerivationBip32Ed25519XPrivateKeyXpublicKey({
+  Future<Bip32Ed25519XPublicKey> crateKeyDerivationBip32Ed25519XPrivateKeyXpublicKey({
     required Bip32Ed25519XPrivateKey that,
   });
 
@@ -166,32 +159,23 @@ abstract class RustLibApi extends BaseApi {
     String? passphrase,
   });
 
-  RustArcIncrementStrongCountFnType
-  get rust_arc_increment_strong_count_Bip32Ed25519Signature;
+  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Bip32Ed25519Signature;
 
-  RustArcDecrementStrongCountFnType
-  get rust_arc_decrement_strong_count_Bip32Ed25519Signature;
+  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Bip32Ed25519Signature;
 
-  CrossPlatformFinalizerArg
-  get rust_arc_decrement_strong_count_Bip32Ed25519SignaturePtr;
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_Bip32Ed25519SignaturePtr;
 
-  RustArcIncrementStrongCountFnType
-  get rust_arc_increment_strong_count_Bip32Ed25519XPrivateKey;
+  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Bip32Ed25519XPrivateKey;
 
-  RustArcDecrementStrongCountFnType
-  get rust_arc_decrement_strong_count_Bip32Ed25519XPrivateKey;
+  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Bip32Ed25519XPrivateKey;
 
-  CrossPlatformFinalizerArg
-  get rust_arc_decrement_strong_count_Bip32Ed25519XPrivateKeyPtr;
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_Bip32Ed25519XPrivateKeyPtr;
 
-  RustArcIncrementStrongCountFnType
-  get rust_arc_increment_strong_count_Bip32Ed25519XPublicKey;
+  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Bip32Ed25519XPublicKey;
 
-  RustArcDecrementStrongCountFnType
-  get rust_arc_decrement_strong_count_Bip32Ed25519XPublicKey;
+  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Bip32Ed25519XPublicKey;
 
-  CrossPlatformFinalizerArg
-  get rust_arc_decrement_strong_count_Bip32Ed25519XPublicKeyPtr;
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_Bip32Ed25519XPublicKeyPtr;
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -256,11 +240,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateKeyDerivationBip32Ed25519SignatureNewConstMeta =>
-      const TaskConstMeta(
-        debugName: "Bip32Ed25519Signature_new",
-        argNames: ["sigBytes"],
-      );
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519SignatureNewConstMeta => const TaskConstMeta(
+    debugName: "Bip32Ed25519Signature_new",
+    argNames: ["sigBytes"],
+  );
 
   @override
   String crateKeyDerivationBip32Ed25519SignatureToHex({
@@ -287,15 +270,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateKeyDerivationBip32Ed25519SignatureToHexConstMeta =>
-      const TaskConstMeta(
-        debugName: "Bip32Ed25519Signature_to_hex",
-        argNames: ["that"],
-      );
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519SignatureToHexConstMeta => const TaskConstMeta(
+    debugName: "Bip32Ed25519Signature_to_hex",
+    argNames: ["that"],
+  );
 
   @override
-  Future<Bip32Ed25519XPrivateKey>
-  crateKeyDerivationBip32Ed25519XPrivateKeyDeriveXprv({
+  Future<Bip32Ed25519XPrivateKey> crateKeyDerivationBip32Ed25519XPrivateKeyDeriveXprv({
     required Bip32Ed25519XPrivateKey that,
     required String path,
   }) {
@@ -320,16 +301,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
               sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey,
           decodeErrorData: sse_decode_AnyhowException,
         ),
-        constMeta:
-            kCrateKeyDerivationBip32Ed25519XPrivateKeyDeriveXprvConstMeta,
+        constMeta: kCrateKeyDerivationBip32Ed25519XPrivateKeyDeriveXprvConstMeta,
         argValues: [that, path],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta
-  get kCrateKeyDerivationBip32Ed25519XPrivateKeyDeriveXprvConstMeta =>
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPrivateKeyDeriveXprvConstMeta =>
       const TaskConstMeta(
         debugName: "Bip32Ed25519XPrivateKey_derive_xprv",
         argNames: ["that", "path"],
@@ -360,11 +339,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPrivateKeyDropConstMeta =>
-      const TaskConstMeta(
-        debugName: "Bip32Ed25519XPrivateKey_drop",
-        argNames: ["that"],
-      );
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPrivateKeyDropConstMeta => const TaskConstMeta(
+    debugName: "Bip32Ed25519XPrivateKey_drop",
+    argNames: ["that"],
+  );
 
   @override
   U8Array32 crateKeyDerivationBip32Ed25519XPrivateKeyGetChainCode({
@@ -384,19 +362,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_u_8_array_32,
           decodeErrorData: null,
         ),
-        constMeta:
-            kCrateKeyDerivationBip32Ed25519XPrivateKeyGetChainCodeConstMeta,
+        constMeta: kCrateKeyDerivationBip32Ed25519XPrivateKeyGetChainCodeConstMeta,
         argValues: [that],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta
-  get kCrateKeyDerivationBip32Ed25519XPrivateKeyGetChainCodeConstMeta =>
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPrivateKeyGetChainCodeConstMeta =>
       const TaskConstMeta(
-        debugName:
-            "Bip32Ed25519XPrivateKey_get_chain_code(dart_style=chain_code)",
+        debugName: "Bip32Ed25519XPrivateKey_get_chain_code(dart_style=chain_code)",
         argNames: ["that"],
       );
 
@@ -418,16 +393,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_u_8_array_64,
           decodeErrorData: null,
         ),
-        constMeta:
-            kCrateKeyDerivationBip32Ed25519XPrivateKeyGetExtendedSecretKeyConstMeta,
+        constMeta: kCrateKeyDerivationBip32Ed25519XPrivateKeyGetExtendedSecretKeyConstMeta,
         argValues: [that],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta
-  get kCrateKeyDerivationBip32Ed25519XPrivateKeyGetExtendedSecretKeyConstMeta =>
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPrivateKeyGetExtendedSecretKeyConstMeta =>
       const TaskConstMeta(
         debugName:
             "Bip32Ed25519XPrivateKey_get_extended_secret_key(dart_style=extended_secret_key)",
@@ -459,8 +432,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta
-  get kCrateKeyDerivationBip32Ed25519XPrivateKeyGetInnerConstMeta =>
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPrivateKeyGetInnerConstMeta =>
       const TaskConstMeta(
         debugName: "Bip32Ed25519XPrivateKey_get_inner(dart_style=inner)",
         argNames: ["that"],
@@ -489,15 +461,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPrivateKeyNewConstMeta =>
-      const TaskConstMeta(
-        debugName: "Bip32Ed25519XPrivateKey_new",
-        argNames: ["xprvBytes"],
-      );
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPrivateKeyNewConstMeta => const TaskConstMeta(
+    debugName: "Bip32Ed25519XPrivateKey_new",
+    argNames: ["xprvBytes"],
+  );
 
   @override
-  Future<Bip32Ed25519Signature>
-  crateKeyDerivationBip32Ed25519XPrivateKeySignData({
+  Future<Bip32Ed25519Signature> crateKeyDerivationBip32Ed25519XPrivateKeySignData({
     required Bip32Ed25519XPrivateKey that,
     required List<int> data,
   }) {
@@ -529,8 +499,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta
-  get kCrateKeyDerivationBip32Ed25519XPrivateKeySignDataConstMeta =>
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPrivateKeySignDataConstMeta =>
       const TaskConstMeta(
         debugName: "Bip32Ed25519XPrivateKey_sign_data",
         argNames: ["that", "data"],
@@ -561,11 +530,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPrivateKeyToHexConstMeta =>
-      const TaskConstMeta(
-        debugName: "Bip32Ed25519XPrivateKey_to_hex",
-        argNames: ["that"],
-      );
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPrivateKeyToHexConstMeta => const TaskConstMeta(
+    debugName: "Bip32Ed25519XPrivateKey_to_hex",
+    argNames: ["that"],
+  );
 
   @override
   Future<bool> crateKeyDerivationBip32Ed25519XPrivateKeyVerifySignature({
@@ -597,24 +565,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_bool,
           decodeErrorData: sse_decode_AnyhowException,
         ),
-        constMeta:
-            kCrateKeyDerivationBip32Ed25519XPrivateKeyVerifySignatureConstMeta,
+        constMeta: kCrateKeyDerivationBip32Ed25519XPrivateKeyVerifySignatureConstMeta,
         argValues: [that, data, signature],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta
-  get kCrateKeyDerivationBip32Ed25519XPrivateKeyVerifySignatureConstMeta =>
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPrivateKeyVerifySignatureConstMeta =>
       const TaskConstMeta(
         debugName: "Bip32Ed25519XPrivateKey_verify_signature",
         argNames: ["that", "data", "signature"],
       );
 
   @override
-  Future<Bip32Ed25519XPublicKey>
-  crateKeyDerivationBip32Ed25519XPrivateKeyXpublicKey({
+  Future<Bip32Ed25519XPublicKey> crateKeyDerivationBip32Ed25519XPrivateKeyXpublicKey({
     required Bip32Ed25519XPrivateKey that,
   }) {
     return handler.executeNormal(
@@ -637,16 +602,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
               sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey,
           decodeErrorData: sse_decode_AnyhowException,
         ),
-        constMeta:
-            kCrateKeyDerivationBip32Ed25519XPrivateKeyXpublicKeyConstMeta,
+        constMeta: kCrateKeyDerivationBip32Ed25519XPrivateKeyXpublicKeyConstMeta,
         argValues: [that],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta
-  get kCrateKeyDerivationBip32Ed25519XPrivateKeyXpublicKeyConstMeta =>
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPrivateKeyXpublicKeyConstMeta =>
       const TaskConstMeta(
         debugName: "Bip32Ed25519XPrivateKey_xpublic_key",
         argNames: ["that"],
@@ -670,19 +633,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_u_8_array_32,
           decodeErrorData: null,
         ),
-        constMeta:
-            kCrateKeyDerivationBip32Ed25519XPublicKeyGetChainCodeConstMeta,
+        constMeta: kCrateKeyDerivationBip32Ed25519XPublicKeyGetChainCodeConstMeta,
         argValues: [that],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta
-  get kCrateKeyDerivationBip32Ed25519XPublicKeyGetChainCodeConstMeta =>
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPublicKeyGetChainCodeConstMeta =>
       const TaskConstMeta(
-        debugName:
-            "Bip32Ed25519XPublicKey_get_chain_code(dart_style=chain_code)",
+        debugName: "Bip32Ed25519XPublicKey_get_chain_code(dart_style=chain_code)",
         argNames: ["that"],
       );
 
@@ -711,8 +671,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta
-  get kCrateKeyDerivationBip32Ed25519XPublicKeyGetInnerConstMeta =>
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPublicKeyGetInnerConstMeta =>
       const TaskConstMeta(
         debugName: "Bip32Ed25519XPublicKey_get_inner(dart_style=inner)",
         argNames: ["that"],
@@ -736,19 +695,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_u_8_array_32,
           decodeErrorData: null,
         ),
-        constMeta:
-            kCrateKeyDerivationBip32Ed25519XPublicKeyGetPublicKeyConstMeta,
+        constMeta: kCrateKeyDerivationBip32Ed25519XPublicKeyGetPublicKeyConstMeta,
         argValues: [that],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta
-  get kCrateKeyDerivationBip32Ed25519XPublicKeyGetPublicKeyConstMeta =>
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPublicKeyGetPublicKeyConstMeta =>
       const TaskConstMeta(
-        debugName:
-            "Bip32Ed25519XPublicKey_get_public_key(dart_style=public_key)",
+        debugName: "Bip32Ed25519XPublicKey_get_public_key(dart_style=public_key)",
         argNames: ["that"],
       );
 
@@ -775,11 +731,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPublicKeyNewConstMeta =>
-      const TaskConstMeta(
-        debugName: "Bip32Ed25519XPublicKey_new",
-        argNames: ["xpubBytes"],
-      );
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPublicKeyNewConstMeta => const TaskConstMeta(
+    debugName: "Bip32Ed25519XPublicKey_new",
+    argNames: ["xpubBytes"],
+  );
 
   @override
   String crateKeyDerivationBip32Ed25519XPublicKeyToHex({
@@ -806,11 +761,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPublicKeyToHexConstMeta =>
-      const TaskConstMeta(
-        debugName: "Bip32Ed25519XPublicKey_to_hex",
-        argNames: ["that"],
-      );
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPublicKeyToHexConstMeta => const TaskConstMeta(
+    debugName: "Bip32Ed25519XPublicKey_to_hex",
+    argNames: ["that"],
+  );
 
   @override
   Future<bool> crateKeyDerivationBip32Ed25519XPublicKeyVerifySignature({
@@ -842,16 +796,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           decodeSuccessData: sse_decode_bool,
           decodeErrorData: sse_decode_AnyhowException,
         ),
-        constMeta:
-            kCrateKeyDerivationBip32Ed25519XPublicKeyVerifySignatureConstMeta,
+        constMeta: kCrateKeyDerivationBip32Ed25519XPublicKeyVerifySignatureConstMeta,
         argValues: [that, data, signature],
         apiImpl: this,
       ),
     );
   }
 
-  TaskConstMeta
-  get kCrateKeyDerivationBip32Ed25519XPublicKeyVerifySignatureConstMeta =>
+  TaskConstMeta get kCrateKeyDerivationBip32Ed25519XPublicKeyVerifySignatureConstMeta =>
       const TaskConstMeta(
         debugName: "Bip32Ed25519XPublicKey_verify_signature",
         argNames: ["that", "data", "signature"],
@@ -887,11 +839,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     );
   }
 
-  TaskConstMeta get kCrateKeyDerivationMnemonicToXprvConstMeta =>
-      const TaskConstMeta(
-        debugName: "mnemonic_to_xprv",
-        argNames: ["mnemonic", "passphrase"],
-      );
+  TaskConstMeta get kCrateKeyDerivationMnemonicToXprvConstMeta => const TaskConstMeta(
+    debugName: "mnemonic_to_xprv",
+    argNames: ["mnemonic", "passphrase"],
+  );
 
   RustArcIncrementStrongCountFnType
   get rust_arc_increment_strong_count_Bip32Ed25519Signature => wire
@@ -1528,8 +1479,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 }
 
 @sealed
-class Bip32Ed25519SignatureImpl extends RustOpaque
-    implements Bip32Ed25519Signature {
+class Bip32Ed25519SignatureImpl extends RustOpaque implements Bip32Ed25519Signature {
   // Not to be used by end users
   Bip32Ed25519SignatureImpl.frbInternalDcoDecode(List<dynamic> wire)
     : super.frbInternalDcoDecode(wire, _kStaticData);
@@ -1541,32 +1491,24 @@ class Bip32Ed25519SignatureImpl extends RustOpaque
   ) : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
-    rustArcIncrementStrongCount: RustLib
-        .instance
-        .api
-        .rust_arc_increment_strong_count_Bip32Ed25519Signature,
-    rustArcDecrementStrongCount: RustLib
-        .instance
-        .api
-        .rust_arc_decrement_strong_count_Bip32Ed25519Signature,
-    rustArcDecrementStrongCountPtr: RustLib
-        .instance
-        .api
-        .rust_arc_decrement_strong_count_Bip32Ed25519SignaturePtr,
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_Bip32Ed25519Signature,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_Bip32Ed25519Signature,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_Bip32Ed25519SignaturePtr,
   );
 
   /// Get the inner bytes.
-  U8Array64 get inner => RustLib.instance.api
-      .crateKeyDerivationBip32Ed25519SignatureGetInner(that: this);
+  U8Array64 get inner =>
+      RustLib.instance.api.crateKeyDerivationBip32Ed25519SignatureGetInner(that: this);
 
   /// Convert to a hex string.
-  String toHex() => RustLib.instance.api
-      .crateKeyDerivationBip32Ed25519SignatureToHex(that: this);
+  String toHex() => RustLib.instance.api.crateKeyDerivationBip32Ed25519SignatureToHex(that: this);
 }
 
 @sealed
-class Bip32Ed25519XPrivateKeyImpl extends RustOpaque
-    implements Bip32Ed25519XPrivateKey {
+class Bip32Ed25519XPrivateKeyImpl extends RustOpaque implements Bip32Ed25519XPrivateKey {
   // Not to be used by end users
   Bip32Ed25519XPrivateKeyImpl.frbInternalDcoDecode(List<dynamic> wire)
     : super.frbInternalDcoDecode(wire, _kStaticData);
@@ -1578,18 +1520,12 @@ class Bip32Ed25519XPrivateKeyImpl extends RustOpaque
   ) : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
-    rustArcIncrementStrongCount: RustLib
-        .instance
-        .api
-        .rust_arc_increment_strong_count_Bip32Ed25519XPrivateKey,
-    rustArcDecrementStrongCount: RustLib
-        .instance
-        .api
-        .rust_arc_decrement_strong_count_Bip32Ed25519XPrivateKey,
-    rustArcDecrementStrongCountPtr: RustLib
-        .instance
-        .api
-        .rust_arc_decrement_strong_count_Bip32Ed25519XPrivateKeyPtr,
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_Bip32Ed25519XPrivateKey,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_Bip32Ed25519XPrivateKey,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_Bip32Ed25519XPrivateKeyPtr,
   );
 
   /// Derive a new extended private key from the given extended private key.
@@ -1615,8 +1551,7 @@ class Bip32Ed25519XPrivateKeyImpl extends RustOpaque
       );
 
   /// Drop the extended private key.
-  void drop() => RustLib.instance.api
-      .crateKeyDerivationBip32Ed25519XPrivateKeyDrop(that: this);
+  void drop() => RustLib.instance.api.crateKeyDerivationBip32Ed25519XPrivateKeyDrop(that: this);
 
   /// Extract the chain code from the extended private key.
   /// The chain code is the last 32 bytes of the extended private key.
@@ -1624,8 +1559,8 @@ class Bip32Ed25519XPrivateKeyImpl extends RustOpaque
   /// # Returns
   ///
   /// Returns a 32 length bytes representing the chain code.
-  U8Array32 get chainCode => RustLib.instance.api
-      .crateKeyDerivationBip32Ed25519XPrivateKeyGetChainCode(that: this);
+  U8Array32 get chainCode =>
+      RustLib.instance.api.crateKeyDerivationBip32Ed25519XPrivateKeyGetChainCode(that: this);
 
   /// Extract the extended secret key from the extended private key.
   /// The extended secret key is the first 64 bytes of the extended private key.
@@ -1633,14 +1568,14 @@ class Bip32Ed25519XPrivateKeyImpl extends RustOpaque
   /// # Returns
   ///
   /// Returns a 64 length bytes representing the extended secret key.
-  U8Array64 get extendedSecretKey => RustLib.instance.api
-      .crateKeyDerivationBip32Ed25519XPrivateKeyGetExtendedSecretKey(
+  U8Array64 get extendedSecretKey =>
+      RustLib.instance.api.crateKeyDerivationBip32Ed25519XPrivateKeyGetExtendedSecretKey(
         that: this,
       );
 
   /// Get the inner bytes.
-  U8Array96 get inner => RustLib.instance.api
-      .crateKeyDerivationBip32Ed25519XPrivateKeyGetInner(that: this);
+  U8Array96 get inner =>
+      RustLib.instance.api.crateKeyDerivationBip32Ed25519XPrivateKeyGetInner(that: this);
 
   /// Sign the given data with the given extended private key.
   ///
@@ -1661,8 +1596,7 @@ class Bip32Ed25519XPrivateKeyImpl extends RustOpaque
       );
 
   /// Convert to a hex string.
-  String toHex() => RustLib.instance.api
-      .crateKeyDerivationBip32Ed25519XPrivateKeyToHex(that: this);
+  String toHex() => RustLib.instance.api.crateKeyDerivationBip32Ed25519XPrivateKeyToHex(that: this);
 
   /// Verify the signature on the given data using extended private key.
   ///
@@ -1681,12 +1615,11 @@ class Bip32Ed25519XPrivateKeyImpl extends RustOpaque
   Future<bool> verifySignature({
     required List<int> data,
     required Bip32Ed25519Signature signature,
-  }) => RustLib.instance.api
-      .crateKeyDerivationBip32Ed25519XPrivateKeyVerifySignature(
-        that: this,
-        data: data,
-        signature: signature,
-      );
+  }) => RustLib.instance.api.crateKeyDerivationBip32Ed25519XPrivateKeyVerifySignature(
+    that: this,
+    data: data,
+    signature: signature,
+  );
 
   /// Get extended public key from the given extended private key.
   ///
@@ -1698,13 +1631,12 @@ class Bip32Ed25519XPrivateKeyImpl extends RustOpaque
   /// # Errors
   ///
   /// Returns an error if the extended private key is invalid.
-  Future<Bip32Ed25519XPublicKey> xpublicKey() => RustLib.instance.api
-      .crateKeyDerivationBip32Ed25519XPrivateKeyXpublicKey(that: this);
+  Future<Bip32Ed25519XPublicKey> xpublicKey() =>
+      RustLib.instance.api.crateKeyDerivationBip32Ed25519XPrivateKeyXpublicKey(that: this);
 }
 
 @sealed
-class Bip32Ed25519XPublicKeyImpl extends RustOpaque
-    implements Bip32Ed25519XPublicKey {
+class Bip32Ed25519XPublicKeyImpl extends RustOpaque implements Bip32Ed25519XPublicKey {
   // Not to be used by end users
   Bip32Ed25519XPublicKeyImpl.frbInternalDcoDecode(List<dynamic> wire)
     : super.frbInternalDcoDecode(wire, _kStaticData);
@@ -1716,18 +1648,12 @@ class Bip32Ed25519XPublicKeyImpl extends RustOpaque
   ) : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
-    rustArcIncrementStrongCount: RustLib
-        .instance
-        .api
-        .rust_arc_increment_strong_count_Bip32Ed25519XPublicKey,
-    rustArcDecrementStrongCount: RustLib
-        .instance
-        .api
-        .rust_arc_decrement_strong_count_Bip32Ed25519XPublicKey,
-    rustArcDecrementStrongCountPtr: RustLib
-        .instance
-        .api
-        .rust_arc_decrement_strong_count_Bip32Ed25519XPublicKeyPtr,
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_Bip32Ed25519XPublicKey,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_Bip32Ed25519XPublicKey,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_Bip32Ed25519XPublicKeyPtr,
   );
 
   /// Extract the chain code from the extended public key.
@@ -1736,12 +1662,12 @@ class Bip32Ed25519XPublicKeyImpl extends RustOpaque
   /// # Returns
   ///
   /// Returns a 32 length bytes representing the chain code.
-  U8Array32 get chainCode => RustLib.instance.api
-      .crateKeyDerivationBip32Ed25519XPublicKeyGetChainCode(that: this);
+  U8Array32 get chainCode =>
+      RustLib.instance.api.crateKeyDerivationBip32Ed25519XPublicKeyGetChainCode(that: this);
 
   /// Get the inner bytes.
-  U8Array64 get inner => RustLib.instance.api
-      .crateKeyDerivationBip32Ed25519XPublicKeyGetInner(that: this);
+  U8Array64 get inner =>
+      RustLib.instance.api.crateKeyDerivationBip32Ed25519XPublicKeyGetInner(that: this);
 
   /// Extract the public key from the extended public key.
   /// The public key is the first 32 bytes of the extended public key.
@@ -1749,12 +1675,11 @@ class Bip32Ed25519XPublicKeyImpl extends RustOpaque
   /// # Returns
   ///
   /// Returns a 32 length bytes representing the public key.
-  U8Array32 get publicKey => RustLib.instance.api
-      .crateKeyDerivationBip32Ed25519XPublicKeyGetPublicKey(that: this);
+  U8Array32 get publicKey =>
+      RustLib.instance.api.crateKeyDerivationBip32Ed25519XPublicKeyGetPublicKey(that: this);
 
   /// Convert to a hex string.
-  String toHex() => RustLib.instance.api
-      .crateKeyDerivationBip32Ed25519XPublicKeyToHex(that: this);
+  String toHex() => RustLib.instance.api.crateKeyDerivationBip32Ed25519XPublicKeyToHex(that: this);
 
   /// Verify the signature on the given data using extended public key.
   ///
@@ -1773,10 +1698,9 @@ class Bip32Ed25519XPublicKeyImpl extends RustOpaque
   Future<bool> verifySignature({
     required List<int> data,
     required Bip32Ed25519Signature signature,
-  }) => RustLib.instance.api
-      .crateKeyDerivationBip32Ed25519XPublicKeyVerifySignature(
-        that: this,
-        data: data,
-        signature: signature,
-      );
+  }) => RustLib.instance.api.crateKeyDerivationBip32Ed25519XPublicKeyVerifySignature(
+    that: this,
+    data: data,
+    signature: signature,
+  );
 }
