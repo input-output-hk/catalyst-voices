@@ -20,9 +20,8 @@ jobs:
   paths-filter:
     runs-on: ubuntu-latest
     outputs:
-      catalyst-gateway: ${{ steps.filter.outputs.changes.catalyst-gateway }}
+      catalyst-gateway: ${{ steps.filter.outputs.catalyst-gateway }}
     steps:
-      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v2
         id: filter
         with:
