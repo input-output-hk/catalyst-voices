@@ -24,6 +24,7 @@ class _WalletListTileState extends State<WalletListTile> {
   @override
   Widget build(BuildContext context) {
     return VoicesWalletTile(
+      semanticsIdentifier: '${widget.wallet.name.toLowerCase()}-wallet',
       iconSrc: widget.wallet.icon,
       name: Text(widget.wallet.name.capitalize()),
       isLoading: _isLoading,

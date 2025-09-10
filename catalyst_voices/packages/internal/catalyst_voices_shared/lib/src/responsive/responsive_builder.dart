@@ -37,6 +37,7 @@ import 'package:flutter/widgets.dart';
 ///   ),
 /// );
 /// ```
+// TODO(damian-molinski): support logical operation like < sm or >= md
 class ResponsiveBuilder<T extends Object> extends StatelessWidget {
   final DataWidgetBuilder<T> builder;
   final ResponsiveState<T> responsiveState;
