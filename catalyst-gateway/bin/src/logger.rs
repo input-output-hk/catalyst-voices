@@ -13,7 +13,7 @@ use tracing_subscriber::{
 
 use crate::settings::Settings;
 /// Default log level
-pub(crate) const LOG_LEVEL_DEFAULT: &str = "debug";
+pub(crate) const LOG_LEVEL_DEFAULT: &str = "warn";
 
 /// All valid logging levels
 #[derive(ValueEnum, Clone, Copy, Debug)]
