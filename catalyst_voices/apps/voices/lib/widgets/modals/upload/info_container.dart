@@ -23,30 +23,26 @@ class InfoContainer extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Theme.of(context).colors.iconsPrimary),
       ),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
+        spacing: 16,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: VoicesAssets.icons.documentAdd.buildIcon(
-              color: Theme.of(context).colors.iconsPrimary,
-              size: 30,
-            ),
+          VoicesAssets.icons.documentAdd.buildIcon(
+            color: Theme.of(context).colors.iconsPrimary,
+            size: 30,
           ),
           if (isUploading)
-            Flexible(
-              child: Wrap(
-                direction: Axis.vertical,
+            Expanded(
+              child: Column(
                 spacing: 8,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     context.l10n.uploadProgressInfo,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
-                  // TODO
-                  const SizedBox(
-                    width: 480,
-                    child: VoicesLinearProgressIndicator(),
-                  ),
+                  const VoicesLinearProgressIndicator(),
                 ],
               ),
             )
