@@ -77,7 +77,7 @@ class _DraggableSheetCategoryInformationState extends State<DraggableSheetCatego
     final delta = details.delta.dy;
     final currentSize = _dragController.size;
 
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenHeight = MediaQuery.sizeOf(context).height;
     final sizeChange = -delta / screenHeight;
     final newSize = currentSize + sizeChange;
 
