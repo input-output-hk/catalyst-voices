@@ -19,6 +19,7 @@ export 'range/range.dart';
 export 'responsive/responsive_builder.dart';
 export 'responsive/responsive_child.dart';
 export 'responsive/responsive_padding.dart';
+export 'responsive/responsive_sized_box.dart';
 export 'user/dummy_catalyst_id_factory.dart';
 export 'user/user_observer.dart';
 export 'utils/active_aware.dart';
