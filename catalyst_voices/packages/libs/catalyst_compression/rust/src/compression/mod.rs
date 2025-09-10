@@ -137,7 +137,7 @@ static CUSTOM_HANDLER: LazyLock<DefaultHandler<SimpleThreadPool>> =
 #[cfg(target_family = "wasm")]
 thread_local! {
     /// A custom thread pool with customized wasm_bindgen module name.
-    static THREAD_POOL: SimpleThreadPool = SimpleThreadPool::new(None, None, Some("key_derivation_wasm_bindgen".to_string()).into(), None)
+    static THREAD_POOL: SimpleThreadPool = SimpleThreadPool::new(None, None, Some("compression_wasm_bindgen".to_string()).into(), None)
         .expect("failed to create ThreadPool");
 }
 

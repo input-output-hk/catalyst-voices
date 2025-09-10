@@ -220,10 +220,14 @@ let compression_wasm_bindgen;
     };
 
     /**
-     * @returns {number}
+     * @param {number} func_id
+     * @param {any} ptr_
+     * @param {number} rust_vec_len_
+     * @param {number} data_len_
+     * @returns {any}
      */
-    __exports.frb_get_rust_content_hash = function() {
-        const ret = wasm.frb_get_rust_content_hash();
+    __exports.frb_pde_ffi_dispatcher_sync = function(func_id, ptr_, rust_vec_len_, data_len_) {
+        const ret = wasm.frb_pde_ffi_dispatcher_sync(func_id, ptr_, rust_vec_len_, data_len_);
         return ret;
     };
 
@@ -239,14 +243,10 @@ let compression_wasm_bindgen;
     };
 
     /**
-     * @param {number} func_id
-     * @param {any} ptr_
-     * @param {number} rust_vec_len_
-     * @param {number} data_len_
-     * @returns {any}
+     * @returns {number}
      */
-    __exports.frb_pde_ffi_dispatcher_sync = function(func_id, ptr_, rust_vec_len_, data_len_) {
-        const ret = wasm.frb_pde_ffi_dispatcher_sync(func_id, ptr_, rust_vec_len_, data_len_);
+    __exports.frb_get_rust_content_hash = function() {
+        const ret = wasm.frb_get_rust_content_hash();
         return ret;
     };
 
@@ -328,7 +328,7 @@ let compression_wasm_bindgen;
         wasm.closure209_externref_shim(arg0, arg1, arg2);
     }
 
-    function __wbg_adapter_111(arg0, arg1, arg2, arg3) {
+    function __wbg_adapter_117(arg0, arg1, arg2, arg3) {
         wasm.closure259_externref_shim(arg0, arg1, arg2, arg3);
     }
 
@@ -577,7 +577,7 @@ let compression_wasm_bindgen;
                     const a = state0.a;
                     state0.a = 0;
                     try {
-                        return __wbg_adapter_111(a, state0.b, arg0, arg1);
+                        return __wbg_adapter_117(a, state0.b, arg0, arg1);
                     } finally {
                         state0.a = a;
                     }
