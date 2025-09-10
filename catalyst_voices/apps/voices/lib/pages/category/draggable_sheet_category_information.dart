@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/category/card_information.dart';
+import 'package:catalyst_voices/widgets/indicators/grab_handler_indicator.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +20,7 @@ class DraggableSheetCategoryInformation extends StatefulWidget {
 }
 
 class _DraggableSheetCategoryInformationState extends State<DraggableSheetCategoryInformation> {
-  final double _minChildSize = 0.1;
+  static const double _minChildSize = 0.1;
 
   late final DraggableScrollableController _dragController;
 
@@ -32,7 +33,7 @@ class _DraggableSheetCategoryInformationState extends State<DraggableSheetCatego
       minChildSize: _minChildSize,
       initialChildSize: _minChildSize,
       maxChildSize: _maxChildSize,
-      builder: (context, scrollCotroller) => Container(
+      builder: (context, scrollController) => Container(
         height: double.infinity,
         decoration: BoxDecoration(
           color: context.colors.elevationsOnSurfaceNeutralLv1White,
@@ -42,14 +43,14 @@ class _DraggableSheetCategoryInformationState extends State<DraggableSheetCatego
           children: [
             GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onVerticalDragUpdate: _onVertialDrag,
-              child: const _GrabHandler(),
+              onVerticalDragUpdate: _onVerticalDrag,
+              child: const GrabHandlerIndicator(),
             ),
             Expanded(
               child: CardInformation(
                 category: widget.category,
                 isActiveProposer: widget.isActiveProposer,
-                scrollController: scrollCotroller,
+                scrollController: scrollController,
                 padding: EdgeInsets.zero,
                 boxConstraints: const BoxConstraints(),
               ),
@@ -72,7 +73,7 @@ class _DraggableSheetCategoryInformationState extends State<DraggableSheetCatego
     _dragController = DraggableScrollableController();
   }
 
-  void _onVertialDrag(DragUpdateDetails details) {
+  void _onVerticalDrag(DragUpdateDetails details) {
     final delta = details.delta.dy;
     final currentSize = _dragController.size;
 
@@ -82,25 +83,5 @@ class _DraggableSheetCategoryInformationState extends State<DraggableSheetCatego
 
     final clampedSize = newSize.clamp(_minChildSize, _maxChildSize);
     _dragController.jumpTo(clampedSize);
-  }
-}
-
-class _GrabHandler extends StatelessWidget {
-  const _GrabHandler();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      alignment: Alignment.center,
-      child: Container(
-        width: 40,
-        height: 4,
-        decoration: BoxDecoration(
-          color: Colors.grey[400],
-          borderRadius: BorderRadius.circular(2),
-        ),
-      ),
-    );
   }
 }
