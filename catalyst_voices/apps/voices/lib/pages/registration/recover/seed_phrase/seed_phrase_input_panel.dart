@@ -69,20 +69,28 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> with Upload
   @override
   Widget build(BuildContext context) {
     return RegistrationDetailsPanelScaffold(
-      title: RegistrationStageMessage(
-        title: Text(
-          context.l10n.recoverySeedPhraseInputTitle,
-          key: const Key('RecoverySeedPhraseInputTitle'),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            RegistrationStageMessage(
+              title: Text(
+                context.l10n.recoverySeedPhraseInputTitle,
+                key: const Key('RecoverySeedPhraseInputTitle'),
+              ),
+              subtitle: Text(
+                context.l10n.recoverySeedPhraseInputSubtitle,
+                key: const Key('RecoverySeedPhraseInputSubtitle'),
+              ),
+              spacing: 12,
+            ),
+            const SizedBox(height: 24),
+            _BlocSeedPhraseField(
+              controller: _controller,
+              focusNode: _focusNode,
+            ),
+          ],
         ),
-        subtitle: Text(
-          context.l10n.recoverySeedPhraseInputSubtitle,
-          key: const Key('RecoverySeedPhraseInputSubtitle'),
-        ),
-        spacing: 12,
-      ),
-      body: _BlocSeedPhraseField(
-        controller: _controller,
-        focusNode: _focusNode,
       ),
       footer: Column(
         mainAxisSize: MainAxisSize.min,
