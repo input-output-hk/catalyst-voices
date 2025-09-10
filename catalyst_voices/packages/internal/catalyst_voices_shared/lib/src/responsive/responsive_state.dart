@@ -45,7 +45,7 @@ mixin ResponsiveStateResolver<T extends Object> implements ResponsiveState<T> {
 
   @override
   T resolve(Size screenSize) {
-    // shortestSide because in landscape mode, height is usually shorted
+    // shortestSide because in landscape mode, height is usually shorter
     final shortestSide = screenSize.shortestSide;
     final breakpointKey = ResponsiveBreakpointKey.values.firstWhereOrNull(
       (breakpoint) => breakpoint.range.contains(shortestSide),
