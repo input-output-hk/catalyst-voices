@@ -1,11 +1,16 @@
-//! OpenAPI Object for Problem Report
+//! OpenAPI Objects for Problem Report
 
-use poem_openapi::Object;
+use poem_openapi::{
+    types::{Example, ToJSON},
+    Object,
+};
 
-/// Represents an OpenAPI object for Problem Report.
-#[derive(Object, Default)]
-// #[oai(example = true)]
-pub(crate) struct ProblemReport {
+use crate::service::common::types::array_types::impl_array_types;
+
+/// Represents an OpenAPI object for a Problem Report entry.
+#[derive(Debug, Clone, Object, Default)]
+#[oai(example = true)]
+pub(crate) struct ProblemReportEntry {
     /// The kind of problem we are recording.
     pub(crate) kind: String,
     /// The message describing the problem.
@@ -34,4 +39,28 @@ pub(crate) struct ProblemReport {
     #[oai(skip_serializing_if_is_none)]
     /// The type that the value was expected to convert to
     pub(crate) expected_type: Option<String>,
+}
+
+impl Example for ProblemReportEntry {
+    fn example() -> Self {
+        // TODO:
+        unimplemented!()
+    }
+}
+
+impl_array_types!(
+    ProblemReport,
+    ProblemReportEntry,
+    Some(poem_openapi::registry::MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(10),
+        items: Some(Box::new(ProblemReportEntry::schema_ref())),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
+);
+
+impl Example for ProblemReport {
+    fn example() -> Self {
+        Self(vec![ProblemReportEntry::example()])
+    }
 }
