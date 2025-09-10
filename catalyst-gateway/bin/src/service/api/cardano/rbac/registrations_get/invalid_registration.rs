@@ -6,9 +6,12 @@ use poem_openapi::{types::Example, Object};
 
 use crate::{
     db::index::queries::rbac::get_rbac_invalid_registrations::Query,
-    service::common::types::{
-        cardano::{slot_no::SlotNo, transaction_id::TxnId, txn_index::TxnIndex},
-        generic::{date_time::DateTime, error_msg::ErrorMessage, uuidv4::UUIDv4},
+    service::common::{
+        objects::generic::problem_report::ProblemReport,
+        types::{
+            cardano::{slot_no::SlotNo, transaction_id::TxnId, txn_index::TxnIndex},
+            generic::{date_time::DateTime, error_msg::ErrorMessage, uuidv4::UUIDv4},
+        },
     },
     settings::Settings,
 };
@@ -30,7 +33,7 @@ pub struct InvalidRegistration {
     /// A registration purpose.
     purpose: Option<UUIDv4>,
     /// A problem report.
-    report: ErrorMessage,
+    report: ProblemReport,
 }
 
 impl Example for InvalidRegistration {
@@ -42,7 +45,7 @@ impl Example for InvalidRegistration {
             txn_index: TxnIndex::example(),
             previous_txn: Some(TxnId::example()),
             purpose: Some(UUIDv4::example()),
-            report: ErrorMessage::example(),
+            report: ProblemReport::example(),
         }
     }
 }

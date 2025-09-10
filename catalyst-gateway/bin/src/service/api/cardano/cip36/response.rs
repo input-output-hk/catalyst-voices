@@ -144,7 +144,7 @@ pub(crate) struct Cip36Details {
     /// If there are errors with this registration, they are listed here.
     /// This field is *NEVER* returned for a valid registration.
     #[oai(skip_serializing_if_is_none)]
-    pub errors: Option<common::types::generic::error_msg::ErrorMessage>,
+    pub errors: Option<common::objects::generic::problem_report::ProblemReport>,
 }
 
 impl Example for Cip36Details {
