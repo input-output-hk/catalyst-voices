@@ -52,6 +52,7 @@ class _DropdownButton extends StatelessWidget {
             borderRadius: BorderRadiusGeometry.circular(8),
             side: BorderSide(color: context.colors.outlineBorderVariant),
           ),
+          borderRadius: BorderRadius.circular(8),
           textStyle: (context.textTheme.labelLarge ?? const TextStyle()).copyWith(
             color: context.colors.textOnPrimaryLevel0,
           ),
@@ -62,6 +63,7 @@ class _DropdownButton extends StatelessWidget {
             ),
             child: InkWell(
               onTap: onTap,
+              borderRadius: BorderRadius.circular(8),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(12, 6, 8, 6),
                 child: AffixDecorator(
