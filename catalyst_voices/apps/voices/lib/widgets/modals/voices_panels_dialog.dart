@@ -139,18 +139,10 @@ class _VerticalPanels extends StatelessWidget {
   Widget build(BuildContext context) {
     final panel = panels[primaryPanelIndex];
 
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _Panel(
-            key: ValueKey('${primaryPanelIndex}Panel'),
-            padding: panel.padding,
-            child: panel.child,
-          ),
-        ],
-      ),
+    return _Panel(
+      key: ValueKey('${primaryPanelIndex}Panel'),
+      padding: panel.padding,
+      child: panel.child,
     );
   }
 }
