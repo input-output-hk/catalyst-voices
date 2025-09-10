@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
-import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
-import 'package:catalyst_voices/widgets/rich_text/markdown_text.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
@@ -28,37 +27,41 @@ class ListLengthPickerWidget extends StatelessWidget {
     final isRequired = list.schema.isRequired;
     final description = list.schema.description ?? MarkdownData.empty;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (title.isNotEmpty) ...[
-          DocumentPropertyBuilderTitle(
-            title: title,
-            isRequired: isRequired,
-          ),
-          const SizedBox(height: 8),
-        ],
-        if (description.data.isNotEmpty && description.data != title) ...[
-          MarkdownText(
-            description,
-            pStyle: context.textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 22),
-        ],
-        SingleSelectDropdown(
-          items: [
-            for (int i = minCount; i <= maxCount; i++)
-              DropdownMenuEntry(
-                value: i,
-                label: list.schema.itemsSchema.title.formatAsPlural(i),
-              ),
+    return Semantics(
+      identifier: 'ListLengthPickerWidget',
+      container: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (title.isNotEmpty) ...[
+            DocumentPropertyBuilderTitle(
+              title: title,
+              isRequired: isRequired,
+            ),
+            const SizedBox(height: 8),
           ],
-          enabled: isEditMode,
-          onChanged: _onChanged,
-          value: currentCount,
-          hintText: list.schema.placeholder,
-        ),
-      ],
+          if (description.data.isNotEmpty && description.data != title) ...[
+            MarkdownText(
+              description,
+              pStyle: context.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 22),
+          ],
+          SingleSelectDropdown(
+            items: [
+              for (int i = minCount; i <= maxCount; i++)
+                DropdownMenuEntry(
+                  value: i,
+                  label: list.schema.itemsSchema.title.formatAsPlural(i),
+                ),
+            ],
+            enabled: isEditMode,
+            onChanged: _onChanged,
+            value: currentCount,
+            hintText: list.schema.placeholder,
+          ),
+        ],
+      ),
     );
   }
 

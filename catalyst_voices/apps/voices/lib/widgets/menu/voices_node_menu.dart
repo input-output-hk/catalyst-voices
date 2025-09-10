@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -32,32 +33,40 @@ class VoicesNodeMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SimpleTreeView(
-      isExpanded: isExpanded,
-      root: SimpleTreeViewRootRow(
-        onTap: isExpandable ? onHeaderTap : null,
-        leading: [
-          VoicesNodeMenuIcon(isOpen: isExpanded),
-          icon ?? VoicesAssets.icons.viewGrid.buildIcon(),
-        ],
-        child: name,
+    return Semantics(
+      identifier: 'VoicesNodeMenu',
+      container: true,
+      child: SimpleTreeView(
+        isExpanded: isExpanded,
+        root: SimpleTreeViewRootRow(
+          onTap: isExpandable ? onHeaderTap : null,
+          leading: [
+            ExcludeSemantics(child: VoicesNodeMenuIcon(isOpen: isExpanded)),
+            ExcludeSemantics(child: icon ?? VoicesAssets.icons.viewGrid.buildIcon()),
+          ],
+          child: name,
+        ),
+        children: items.mapIndexed(
+          (index, item) {
+            return CombineSemantics(
+              identifier: 'VoicesNodeMenuItem[${item.id}]',
+              container: true,
+              child: SimpleTreeViewChildRow(
+                key: ValueKey('NodeMenu${item.id}RowKey'),
+                hasNext: index < items.length - 1,
+                isSelected: item.id == selectedItemId,
+                hasError: item.hasError,
+                onTap: item.isEnabled ? () => onItemTap(item.id) : null,
+                child: Text(
+                  item.label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            );
+          },
+        ).toList(),
       ),
-      children: items.mapIndexed(
-        (index, item) {
-          return SimpleTreeViewChildRow(
-            key: ValueKey('NodeMenu${item.id}RowKey'),
-            hasNext: index < items.length - 1,
-            isSelected: item.id == selectedItemId,
-            hasError: item.hasError,
-            onTap: item.isEnabled ? () => onItemTap(item.id) : null,
-            child: Text(
-              item.label,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          );
-        },
-      ).toList(),
     );
   }
 }

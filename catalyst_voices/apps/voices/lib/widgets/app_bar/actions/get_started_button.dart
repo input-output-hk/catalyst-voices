@@ -15,7 +15,7 @@ class GetStartedButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return FilledButton(
       onPressed: onPressed,
-      child: Text(context.l10n.getStartedButtonLabelText),
+      child: Text(context.l10n.getStartedButtonLabelText, semanticsIdentifier: 'GetStartedButton'),
     );
   }
 }

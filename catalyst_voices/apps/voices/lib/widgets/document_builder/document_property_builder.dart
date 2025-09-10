@@ -41,6 +41,14 @@ class DocumentPropertyBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Semantics(
+      identifier: 'DocumentPropertyBuilder[${property.nodeId}]',
+      container: true,
+      child: _buildChild(context),
+    );
+  }
+
+  Widget _buildChild(BuildContext context) {
     final property = this.property;
     final overrideBuilder = _getOverrideBuilder(property.nodeId);
     if (overrideBuilder != null) {
