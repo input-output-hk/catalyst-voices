@@ -21,8 +21,8 @@ class RegistrationPanelsDialog extends StatelessWidget {
       builder: (context, showCloseButton) {
         return VoicesPanelsDialog(
           key: const Key('RegistrationDialog'),
-          first: const RegistrationInfoPanel(),
-          second: const RegistrationDetailsPanel(),
+          secondary: const RegistrationInfoPanel(),
+          primary: const RegistrationDetailsPanel(),
           showClose: showCloseButton,
         );
       },

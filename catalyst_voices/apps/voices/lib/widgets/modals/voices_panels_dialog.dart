@@ -7,37 +7,36 @@ import 'package:flutter/material.dart';
 /// Commonly used structure for panels dialogs.
 ///
 /// Form factor arranging
-/// - Desktop -> panels are disabled horizontally.
+/// - Desktop -> panels are displayed horizontally.
 /// - Mobile -> only main Panel is displayed and takes full screen.
 ///
 /// Size of dialogs responds to screen size changes. On mobile takes as much space as possible.
 class VoicesPanelsDialog extends StatelessWidget {
   final List<VoicesPanelsDialogPanel> panels;
-  final int mainPanelIndex;
+  final int primaryPanelIndex;
   final bool showClose;
 
   VoicesPanelsDialog({
     Key? key,
-    required Widget first,
-    required Widget second,
+    required Widget primary,
+    required Widget secondary,
     bool showClose = true,
-    EdgeInsets firstPadding = const EdgeInsets.all(20),
-    EdgeInsets secondPadding = const EdgeInsets.all(20),
-    bool isSecondMain = true,
+    EdgeInsets secondaryPadding = const EdgeInsets.all(20),
+    EdgeInsets primaryPadding = const EdgeInsets.all(20),
   }) : this._(
          key: key,
          showClose: showClose,
          panels: [
-           VoicesPanelsDialogPanel(child: first, padding: firstPadding),
-           VoicesPanelsDialogPanel(child: second, padding: secondPadding),
+           VoicesPanelsDialogPanel(child: secondary, padding: secondaryPadding),
+           VoicesPanelsDialogPanel(child: primary, padding: primaryPadding),
          ],
-         mainPanelIndex: isSecondMain ? 1 : 0,
+         primaryPanelIndex: 1,
        );
 
   const VoicesPanelsDialog._({
     super.key,
     required this.panels,
-    required this.mainPanelIndex,
+    required this.primaryPanelIndex,
     this.showClose = true,
   });
 
@@ -52,7 +51,7 @@ class VoicesPanelsDialog extends StatelessWidget {
         xs: (context) {
           return _VerticalPanels(
             panels,
-            mainPanelIndex: mainPanelIndex,
+            primaryPanelIndex: primaryPanelIndex,
           );
         },
         other: (context) {
@@ -129,16 +128,16 @@ class _SideBySidePanels extends StatelessWidget {
 
 class _VerticalPanels extends StatelessWidget {
   final List<VoicesPanelsDialogPanel> panels;
-  final int mainPanelIndex;
+  final int primaryPanelIndex;
 
   const _VerticalPanels(
     this.panels, {
-    required this.mainPanelIndex,
+    required this.primaryPanelIndex,
   });
 
   @override
   Widget build(BuildContext context) {
-    final panel = panels[mainPanelIndex];
+    final panel = panels[primaryPanelIndex];
 
     return SingleChildScrollView(
       child: Column(
@@ -146,7 +145,7 @@ class _VerticalPanels extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _Panel(
-            key: ValueKey('${mainPanelIndex}Panel'),
+            key: ValueKey('${primaryPanelIndex}Panel'),
             padding: panel.padding,
             child: panel.child,
           ),

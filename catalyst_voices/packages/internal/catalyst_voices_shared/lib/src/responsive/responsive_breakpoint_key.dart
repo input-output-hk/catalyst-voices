@@ -21,6 +21,6 @@ enum ResponsiveBreakpointKey {
   });
 }
 
-extension ConstainsExt on ResponsiveBreakpointRange {
+extension ContainsExt on ResponsiveBreakpointRange {
   bool contains(double value) => value >= min && value <= max;
 }
