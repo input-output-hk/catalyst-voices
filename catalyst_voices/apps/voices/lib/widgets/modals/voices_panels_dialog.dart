@@ -3,24 +3,25 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
+// TODO(dm): update doc
 /// Commonly used structure for desktop dialogs.
 ///
 /// Keep in mind that this dialog has fixed size of 900x600 and
 /// is always adding close button in top right corner.
 class VoicesPanelsDialog extends StatelessWidget {
-  final Widget left;
-  final Widget right;
+  final Widget first;
+  final Widget second;
   final bool showClose;
-  final EdgeInsets leftPadding;
-  final EdgeInsets rightPadding;
+  final EdgeInsets firstPadding;
+  final EdgeInsets secondPadding;
 
   const VoicesPanelsDialog({
     super.key,
-    required this.left,
-    required this.right,
+    required this.first,
+    required this.second,
     this.showClose = true,
-    this.leftPadding = const EdgeInsets.all(20),
-    this.rightPadding = const EdgeInsets.all(20),
+    this.firstPadding = const EdgeInsets.all(20),
+    this.secondPadding = const EdgeInsets.all(20),
   });
 
   @override
@@ -31,19 +32,52 @@ class VoicesPanelsDialog extends StatelessWidget {
         xs: const BoxConstraints.tightFor(width: 450, height: 600),
       ),
       child: ResponsiveChild(
-        sm: (context) {
-          return Text('Test');
+        xs: (context) {
+          return _VerticalPanels(
+            header: first,
+            body: second,
+            headerPadding: firstPadding,
+            bodyPadding: secondPadding,
+          );
         },
         other: (context) {
           return _SideBySidePanels(
-            left: left,
-            right: right,
-            leftPadding: leftPadding,
-            rightPadding: rightPadding,
+            left: first,
+            right: second,
+            leftPadding: firstPadding,
+            rightPadding: secondPadding,
           );
         },
       ),
     );
+  }
+}
+
+class _Panel extends StatelessWidget {
+  final EdgeInsets padding;
+  final Color? backgroundColor;
+  final Widget child;
+
+  const _Panel({
+    super.key,
+    this.padding = const EdgeInsets.all(20),
+    this.backgroundColor,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Widget child = Padding(
+      padding: padding,
+      child: this.child,
+    );
+
+    final backgroundColor = this.backgroundColor;
+    if (backgroundColor != null) {
+      child = ColoredBox(color: backgroundColor, child: child);
+    }
+
+    return child;
   }
 }
 
@@ -66,21 +100,50 @@ class _SideBySidePanels extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
-          child: Container(
+          child: _Panel(
+            key: const ValueKey('FirstPanel'),
             padding: leftPadding,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1Grey,
-            ),
+            backgroundColor: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1Grey,
             child: left,
           ),
         ),
         Expanded(
-          child: Padding(
+          child: _Panel(
+            key: const ValueKey('SecondPanel'),
             padding: rightPadding,
             child: right,
           ),
         ),
       ],
+    );
+  }
+}
+
+class _VerticalPanels extends StatelessWidget {
+  final Widget header;
+  final Widget body;
+  final EdgeInsets headerPadding;
+  final EdgeInsets bodyPadding;
+
+  const _VerticalPanels({
+    required this.header,
+    required this.body,
+    required this.headerPadding,
+    required this.bodyPadding,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _Panel(
+            key: const ValueKey('SecondPanel'),
+            padding: bodyPadding,
+            child: body,
+          ),
+        ],
+      ),
     );
   }
 }

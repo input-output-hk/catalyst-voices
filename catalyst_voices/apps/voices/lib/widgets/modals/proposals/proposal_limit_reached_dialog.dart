@@ -26,13 +26,13 @@ class ProposalLimitReachedDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesPanelsDialog(
-      left: const _LeftSide(),
-      right: _RightSide(
+      first: const _LeftSide(),
+      second: _RightSide(
         currentSubmissions: currentSubmissions,
         maxSubmissions: maxSubmissions,
         date: submissionCloseAt,
       ),
-      leftPadding: EdgeInsets.zero,
+      firstPadding: EdgeInsets.zero,
     );
   }
 

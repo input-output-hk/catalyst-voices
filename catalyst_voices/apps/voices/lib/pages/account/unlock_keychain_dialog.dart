@@ -84,12 +84,12 @@ class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
   @override
   Widget build(BuildContext context) {
     return VoicesPanelsDialog(
-      left: InformationPanel(
+      first: InformationPanel(
         title: context.l10n.unlockDialogHeader,
         picture: const UnlockKeychainPicture(),
         onTap: () async => launchUri(VoicesConstants.unlockAccountUrl.getUri()),
       ),
-      right: _UnlockPasswordPanel(
+      second: _UnlockPasswordPanel(
         controller: _passwordController,
         error: _error,
         onUnlock: _onUnlock,
