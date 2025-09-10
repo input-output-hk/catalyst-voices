@@ -326,6 +326,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         segmentTitle: segment.schema.title,
         sectionTitle: sectionTitle,
         description: guidance,
+        nodeId: property.nodeId,
       );
     }
 

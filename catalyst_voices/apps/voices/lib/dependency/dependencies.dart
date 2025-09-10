@@ -332,6 +332,7 @@ final class Dependencies extends DependencyProvider {
     });
     registerLazySingleton<AuthTokenProvider>(() => get<AuthService>());
     registerLazySingleton<DownloaderService>(DownloaderService.new);
+    registerLazySingleton<UploaderService>(UploaderService.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
     registerLazySingleton<RegistrationProgressNotifier>(
       RegistrationProgressNotifier.new,

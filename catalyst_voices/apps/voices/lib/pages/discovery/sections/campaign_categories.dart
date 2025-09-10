@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/cards/campaign_category_card.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -15,8 +16,10 @@ class CampaignCategories extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 120),
+    return ResponsivePadding.only(
+      xs: const EdgeInsets.symmetric(horizontal: 20),
+      sm: const EdgeInsets.symmetric(horizontal: 48),
+      other: const EdgeInsets.symmetric(horizontal: 120),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
