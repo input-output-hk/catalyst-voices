@@ -9,7 +9,7 @@ class ProposalsTabsDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Offstage(
       offstage: MediaQuery.sizeOf(context).width < 1400,
-      child: VoicesDivider(
+      child: VoicesDivider.expanded(
         height: 1,
         color: context.colors.primaryContainer,
       ),
