@@ -22,6 +22,8 @@ final class VoicesPasswordTextField extends StatelessWidget {
   /// [VoicesTextField.autofocus].
   final bool autofocus;
 
+  final String? semanticsIdentifier;
+
   const VoicesPasswordTextField({
     super.key,
     this.controller,
@@ -30,6 +32,7 @@ final class VoicesPasswordTextField extends StatelessWidget {
     this.onSubmitted,
     this.decoration,
     this.autofocus = false,
+    this.semanticsIdentifier,
   });
 
   @override
