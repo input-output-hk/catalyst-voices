@@ -1,8 +1,8 @@
 name: CI nightly
 
 on:
-  #schedule:
-  #- cron: '0 0 * * *' # Runs every day at 00:00
+  schedule:
+  - cron: '0 0 * * *' # Runs every day at 00:00
   workflow_dispatch:
 
 permissions:
@@ -14,27 +14,34 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
-env:
-  REPORT_EXT: .junit-report.xml
-  ALLURE_REPORT_FOLDER: nightly-allure-report
-
 jobs:
-  ci_nightly:
+  ci-nightly:
     uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.10.0
     with:
       forge_version: 0.21.0
       skip_deploy: true
       skip_release: true
-      tags: |
-        nightly
 
-  generate-test-reports:
-    name: Generate test reports
+  tests:
+    name: nightly tests
     runs-on: ubuntu-latest
-    if: always()
-    needs: ci_nightly
     steps:
       - uses: actions/checkout@v4
+
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: false
+          haskell: false
+          large-packages: false
+          docker-images: false
+          swap-storage: true
 
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
@@ -42,70 +49,59 @@ jobs:
           enable_caching: "true"
           version: 0.21.0
 
-      - name: Setup CI
+      - name: Setup
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
 
-      - name: Get python api test report
+      - name: Prepare artifacts
+        id : images
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
-        if: always()
-        continue-on-error: true
         with:
           command: run
-          args: ./catalyst-gateway/tests/api_tests+nightly-test
+          args: ./catalyst-gateway/tests/+all-images
 
-      - name: Collect and upload test reports
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          path: "**/*${{ env.REPORT_EXT }}"
-          if-no-files-found: error
-          retention-days: 1
-
-  generate-allure-report:
-    name: Generate allure report
-    runs-on: ubuntu-latest
-    needs: generate-test-reports
-    if: always() && needs.generate-test-reports.result == 'success'
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@v4
-
-      - name: Setup Allure report
+      - name: Spin up catalyst-gateway
+        id: gateway-started
+        if: ${{ steps.images.conclusion == 'success' }}
         run: |
-          mkdir -p ${{ env.ALLURE_REPORT_FOLDER }}
-          shopt -s globstar
-          cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_REPORT_FOLDER }}
-          ls ${{ env.ALLURE_REPORT_FOLDER }}
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway --detach
 
-      - name: Checkout gh-pages
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages-dir
+      - name: Wait for cat-gateway to become healthy
+        id: gateway-healthy
+        if: ${{ steps.gateway-started.conclusion == 'success' }}
+        run: |
+              echo "Waiting for container to be healthy..."
+              for i in {1..500}; do
+                STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
+                echo "Health status: $STATUS"
+                if [ "$STATUS" == "healthy" ]; then
+                  echo "Container is healthy!"
+                  break
+                fi
+                if [ "$STATUS" == "unhealthy" ]; then
+                  echo "Container became unhealthy."
+                  exit 1
+                fi
+                sleep 5
+              done
 
-      - name: Build Allure report
-        uses: mgrybyk/allure-report-branch-action@v1
-        id: allure
-        with:
-          report_id: "nightly-test-report"
-          gh_pages: "gh-pages-dir"
-          report_dir: ${{ env.ALLURE_REPORT_FOLDER }}
+      - name: Schemathesis tests
+        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
+        run: |
+          export HYPOTHESIS_MAX_EXAMPLES=5000
+          export MAX_RESPONSE_TIME=20000
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up schemathesis-runner --exit-code-from schemathesis-runner
 
-      - name: Git push to gh-pages
-        uses: mgrybyk/git-commit-pull-push-action@v1
-        with:
-          repository: gh-pages-dir
-          branch: gh-pages
-          pull_args: --rebase -X ours
-
-      - name: Send Slack notification
-        if: ${{ always() && steps.allure.outputs.report_url }}
-        uses: slackapi/slack-github-action@v2.1.1
+  slack:
+    name: slack notification
+    needs: tests
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - uses: slackapi/slack-github-action@v2.1.1
         with:
           payload: |
-            {
-              "text": ":rocket: *Test Report*\n<${{ steps.allure.outputs.report_url }}|Click here to view the Allure report>\n*Passed:* ${{ steps.allure.outputs.test_result_passed }}/ ${{ steps.allure.outputs.test_result_total }}\n*Failed:* ${{ steps.allure.outputs.test_result_failed }}/ ${{ steps.allure.outputs.test_result_total }}"
-            }
+              {
+                "text": ":😭: *Nightly Tests Failed* @channel "
+              }
           webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
           webhook-type: webhook-trigger
