@@ -21,11 +21,14 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       catalyst-gateway: ${{ steps.filter.outputs.catalyst-gateway }}
+      catalyst-voices: ${{ steps.filter.outputs.catalyst-voices }}
     steps:
       - uses: dorny/paths-filter@v2
         id: filter
         with:
           filters: |
+            catalyst-voices:
+              - 'catalyst_voices/**'
             catalyst-gateway:
               - 'catalyst-gateway/**'
 
@@ -77,14 +80,20 @@ jobs:
           esac
 
           echo "gateway ${{ needs.paths-filter.outputs.catalyst-gateway }}"
-          echo "main  ${{ github.ref == 'refs/heads/main' }}"
+          echo "main  ${{ github.base_ref == 'main' }}"
           echo "tag ${{startsWith(github.ref, 'refs/tags/') }}"
-  integration-tests:
+
+  gateway-integration-tests:
     needs: [paths-filter]
-    if: ${{ needs.paths-filter.outputs.catalyst-gateway == 'true' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
+    if: ${{ needs.paths-filter.outputs.catalyst-gateway == 'true' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') || github.base_ref == 'main'}}
     uses: ./.github/workflows/gateway-tests.yml
 
+  voices-integration-tests:
+    needs: [paths-filter]
+    if: ${{ needs.paths-filter.outputs.catalyst-voices == 'true' || github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') || github.base_ref == 'main' }}
+    uses: ./.github/workflows/voices-tests.yml
+
   test-reporting:
-    if: success() || failure()
-    needs: integration-tests
+    needs: [ voices-integration-tests, gateway-integration-tests ]
+    if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') || github.base_ref == 'main' }}
     uses: ./.github/workflows/generate-allure-report.yml

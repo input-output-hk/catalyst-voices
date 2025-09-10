@@ -1,0 +1,42 @@
+name: Catalyst Voices integration tests
+
+on:
+  workflow_call:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  REPORT_EXT: .junit-report.xml
+  COVERAGE_EXT: .coverage.info
+
+jobs:
+  tests:
+    name: Cat-Voices integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: false
+          haskell: false
+          large-packages: false
+          docker-images: false
+          swap-storage: true
+
+      - name: Install Forge
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
+        with:
+          enable_caching: "true"
+          version: 0.21.0
+      - name: Setup
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
