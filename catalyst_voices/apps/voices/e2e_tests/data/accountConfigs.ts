@@ -5,7 +5,7 @@ export const accountModels: AccountModel[] = [
   {
     name: "DummyForTesting",
     email: "testuser1@example.com",
-    password: "Test1234!",
+    password: "Test1234!!!!",
     isEmailVerified: false,
     isProposer: false,
     seedPhrase: [],
