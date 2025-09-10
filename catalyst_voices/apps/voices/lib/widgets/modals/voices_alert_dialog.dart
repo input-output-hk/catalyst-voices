@@ -6,13 +6,11 @@ import 'package:flutter/material.dart';
 /// but customized to the project needs.
 ///
 /// On extra small screens (mobile) it will fill the whole screen width,
-/// on larger screens it will take [_width] amount
+/// on larger screens it will take max 360 pixels
 /// of horizontal space and be centered.
 ///
 /// The close (x) button will appear if the dialog [isDismissible].
 class VoicesAlertDialog extends StatelessWidget {
-  static const double _width = 360;
-
   /// The widget which appears at the top of the dialog next to the (x) button.
   /// Usually a [Text] widget.
   final Widget? title;
@@ -56,101 +54,75 @@ class VoicesAlertDialog extends StatelessWidget {
     final subtitle = this.subtitle;
     final content = this.content;
 
-    return ResponsiveBuilder<double>(
-      xs: double.infinity,
-      other: _width,
-      builder: (context, width) {
+    return ResponsiveBuilder<BoxConstraints>(
+      xs: const BoxConstraints(),
+      other: const BoxConstraints(maxWidth: 360),
+      builder: (context, constraints) {
         // TODO(dt-iohk): remove SelectionArea when https://github.com/flutter/flutter/pull/167275
         // is released and we're using this flutter version
         // Note: fix scheduled for 3.34.x / 3.35.x flutter version
         return SelectionArea(
           child: Dialog(
             alignment: Alignment.center,
-            child: SizedBox(
-              width: width,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 10, bottom: 16),
-                child: Column(
-                  key: const Key('VoicesAlertDialog'),
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (title != null || isDismissible)
-                      Row(
-                        key: const Key('VoicesAlertDialogTitleRow'),
-                        children: [
-                          // if widget is dismissible then show an invisible
-                          // close button to reserve space on this side of the
-                          // row so that the title is centered
-                          if (isDismissible)
-                            const Visibility(
-                              visible: false,
-                              maintainSize: true,
-                              maintainAnimation: true,
-                              maintainState: true,
-                              child: _CloseButton(),
-                            ),
-                          Expanded(
-                            child: DefaultTextStyle(
-                              style: Theme.of(context).textTheme.titleLarge!,
-                              textAlign: TextAlign.center,
-                              child: title ?? const SizedBox.shrink(),
-                            ),
-                          ),
-                          if (isDismissible) const _CloseButton(),
-                        ],
-                      ),
-                    if (icon != null)
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: title != null ? 24 : 0,
-                          left: 20,
-                          right: 20,
-                        ),
-                        child: Center(child: icon),
-                      ),
-                    if (subtitle != null)
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          top: 16,
-                          left: 20,
-                          right: 20,
-                        ),
-                        child: DefaultTextStyle(
-                          key: const Key('VoicesAlertDialogSubtitle'),
-                          style: Theme.of(context).textTheme.titleSmall!,
-                          textAlign: TextAlign.center,
-                          child: subtitle,
-                        ),
-                      ),
-                    if (content != null)
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          top: 16,
-                          left: 20,
-                          right: 20,
-                        ),
-                        child: DefaultTextStyle(
-                          style: Theme.of(context).textTheme.bodyMedium!,
-                          textAlign: TextAlign.center,
-                          child: content,
-                        ),
-                      ),
-                    if (buttons.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            const SizedBox(height: 24),
-                            ...buttons.separatedBy(const SizedBox(height: 8)),
-                          ],
-                        ),
-                      ),
-                  ],
-                ),
-              ),
+            constraints: constraints,
+            child: Column(
+              key: const Key('VoicesAlertDialog'),
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 10),
+                if (title != null || isDismissible)
+                  _Title(title: title, isDismissible: isDismissible),
+                if (icon != null)
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: title != null ? 24 : 0,
+                      left: 20,
+                      right: 20,
+                    ),
+                    child: Center(child: icon),
+                  ),
+                if (subtitle != null)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 16,
+                      left: 20,
+                      right: 20,
+                    ),
+                    child: DefaultTextStyle(
+                      key: const Key('VoicesAlertDialogSubtitle'),
+                      style: Theme.of(context).textTheme.titleSmall!,
+                      textAlign: TextAlign.center,
+                      child: subtitle,
+                    ),
+                  ),
+                if (content != null)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 16,
+                      left: 20,
+                      right: 20,
+                    ),
+                    child: DefaultTextStyle(
+                      style: Theme.of(context).textTheme.bodyMedium!,
+                      textAlign: TextAlign.center,
+                      child: content,
+                    ),
+                  ),
+                if (buttons.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 24),
+                        ...buttons.separatedBy(const SizedBox(height: 8)),
+                      ],
+                    ),
+                  ),
+                const SizedBox(height: 16),
+              ],
             ),
           ),
         );
@@ -167,6 +139,41 @@ class _CloseButton extends StatelessWidget {
     return XButton(
       key: const Key('VoicesAlertDialogCloseButton'),
       onTap: () => Navigator.of(context).pop(),
+    );
+  }
+}
+
+class _Title extends StatelessWidget {
+  final bool isDismissible;
+  final Widget? title;
+
+  const _Title({
+    this.title,
+    this.isDismissible = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      key: const Key('VoicesAlertDialogTitleRow'),
+      children: [
+        // if widget is dismissible then show an invisible
+        // close button to reserve space on this side of the
+        // row so that the title is centered
+        if (isDismissible)
+          const Visibility.maintain(
+            visible: false,
+            child: _CloseButton(),
+          ),
+        Expanded(
+          child: DefaultTextStyle(
+            style: Theme.of(context).textTheme.titleLarge!,
+            textAlign: TextAlign.center,
+            child: title ?? const SizedBox.shrink(),
+          ),
+        ),
+        if (isDismissible) const _CloseButton(),
+      ],
     );
   }
 }

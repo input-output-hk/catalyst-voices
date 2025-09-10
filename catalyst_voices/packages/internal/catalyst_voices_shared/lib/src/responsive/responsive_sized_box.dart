@@ -12,6 +12,7 @@ import 'package:flutter/widgets.dart';
 /// Material design standards and the ResponsiveBuilder arguments.
 class ResponsiveSizedBox extends StatelessWidget {
   final Map<ResponsiveBreakpointKey, SizedBox> _sizedBoxes;
+  final SizedBox _fallback;
 
   ResponsiveSizedBox({
     super.key,
@@ -25,8 +26,8 @@ class ResponsiveSizedBox extends StatelessWidget {
          ResponsiveBreakpointKey.sm: sm,
          ResponsiveBreakpointKey.md: md,
          ResponsiveBreakpointKey.lg: lg,
-         ResponsiveBreakpointKey.other: other,
-       };
+       },
+       _fallback = other;
 
   factory ResponsiveSizedBox.only({
     Key? key,
@@ -52,7 +53,7 @@ class ResponsiveSizedBox extends StatelessWidget {
       sm: _sizedBoxes[ResponsiveBreakpointKey.sm],
       md: _sizedBoxes[ResponsiveBreakpointKey.md],
       lg: _sizedBoxes[ResponsiveBreakpointKey.lg],
-      other: _sizedBoxes[ResponsiveBreakpointKey.other]!,
+      other: _fallback,
     );
   }
 }
