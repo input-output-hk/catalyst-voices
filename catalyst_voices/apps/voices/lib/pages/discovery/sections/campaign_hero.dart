@@ -21,7 +21,7 @@ class CampaignHeroSection extends StatelessWidget {
       child: HeroSection(
         asset: VideoCacheKey(name: VoicesAssets.videos.heroDesktop),
         child: ResponsivePadding(
-          xs: const EdgeInsets.only(left: 40, bottom: 16, top: 8, right: 40),
+          xs: const EdgeInsets.only(left: 20, bottom: 16, top: 8, right: 20),
           sm: const EdgeInsets.only(left: 80, bottom: 32, top: 18),
           md: const EdgeInsets.only(left: 150, bottom: 64, top: 32),
           lg: const EdgeInsets.only(left: 150, bottom: 64, top: 32),
