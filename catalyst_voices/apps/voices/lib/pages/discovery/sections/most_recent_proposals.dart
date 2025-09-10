@@ -8,6 +8,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -89,8 +90,10 @@ class _LatestProposalsState extends State<MostRecentProposals> {
           fit: BoxFit.cover,
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 100),
+      child: ResponsivePadding.only(
+        xs: const EdgeInsets.symmetric(horizontal: 48),
+        sm: const EdgeInsets.symmetric(horizontal: 48),
+        other: const EdgeInsets.symmetric(horizontal: 100),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

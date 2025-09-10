@@ -20,6 +20,7 @@ export 'responsive/responsive_box_constraints.dart';
 export 'responsive/responsive_builder.dart';
 export 'responsive/responsive_child.dart';
 export 'responsive/responsive_padding.dart';
+export 'responsive/responsive_sized_box.dart';
 export 'responsive/responsive_state.dart';
 export 'user/dummy_catalyst_id_factory.dart';
 export 'user/user_observer.dart';

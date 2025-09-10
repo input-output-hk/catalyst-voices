@@ -46,6 +46,24 @@ class ResponsivePadding extends StatelessWidget {
        },
        _fallback = other;
 
+  factory ResponsivePadding.only({
+    Key? key,
+    EdgeInsets? xs,
+    EdgeInsets? sm,
+    EdgeInsets? md,
+    EdgeInsets? lg,
+    EdgeInsets other = EdgeInsets.zero,
+    required Widget child,
+  }) => ResponsivePadding(
+    key: key,
+    xs: xs ?? other,
+    sm: sm ?? other,
+    md: md ?? other,
+    lg: lg ?? other,
+    other: other,
+    child: child,
+  );
+
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder<EdgeInsets>(
