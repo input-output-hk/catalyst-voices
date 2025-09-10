@@ -6,10 +6,12 @@ import 'package:flutter/services.dart';
 /// into Clipboard after it's clicked.
 class VoicesClipboardIconButton extends StatelessWidget {
   final String clipboardData;
+  final String semanticsIdentifier;
 
   const VoicesClipboardIconButton({
     super.key,
     required this.clipboardData,
+    this.semanticsIdentifier = 'ClipboardIcon',
   });
 
   @override
@@ -22,7 +24,11 @@ class VoicesClipboardIconButton extends StatelessWidget {
       },
       child: Padding(
         padding: const EdgeInsets.only(top: 2),
-        child: VoicesAssets.icons.clipboardCopy.buildIcon(size: 16),
+        child: Semantics(
+          container: true,
+          identifier: semanticsIdentifier,
+          child: VoicesAssets.icons.clipboardCopy.buildIcon(size: 16),
+        ),
       ),
     );
   }
