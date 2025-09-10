@@ -4,38 +4,26 @@
   * [Features](#features)
   * [Requirements](#requirements)
   * [Install](#install)
-  * [Web setup](#web-setup)
   * [Example](#example)
-  * [Limitations](#limitations)
   * [Support](#support)
   * [License](#license)
 
 ## Features
 
-This package exposes a JS wrapper around Brotli and zstd compression/decompression algorithms.
-
-* [brotli-wasm](https://www.npmjs.com/package/brotli-wasm)
-* [zstd-js](https://www.npmjs.com/package/@oneidentity/zstd-js)
+A Flutter plugin exposing Brotli and zstd compression algorithms through
+[flutter_rust_bridge](https://pub.dev/packages/flutter_rust_bridge).
 
 ## Requirements
 
 * Dart: 3.9.0+
 * Flutter: 3.35.1+
+* [Rust](https://rustup.rs/): 1.80.0+
 
 ## Install
 
 ```yaml
 dependencies:
     catalyst_compression: any # or the latest version on Pub
-    catalyst_compression_web: any # or the latest version on Pub
-```
-
-## Web setup
-
-Add the following line at the end of `<head>` section in web/index.html:
-
-```html
-<script type="module" src="/assets/packages/catalyst_compression_web/assets/js/catalyst_compression.js"></script>
 ```
 
 ## Example
@@ -45,7 +33,9 @@ import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/foundation.dart';
 
-final derCertHex = '''
+
+final derCertHex =
+    '''
 308202343082019DA00302010202145A
 FC371DAF301793CF0B1835A118C2F903
 63D5D9300D06092A864886F70D01010B
@@ -83,13 +73,13 @@ F366A8B930443CA6B69B12DD9DEBEE9C
 E61E8EE7D77E9F7F9804E03EBC31B458
 1313C955A667658B
 '''
-    .replaceAll('\n', '');
+        .replaceAll('\n', '');
 
 Future<void> main() async {
   final rawBytes = hex.decode(derCertHex);
 
   // brotli
-  final brotli = CatalystCompression.instance.brotli;
+  final brotli = CatalystCompression.brotli;
   final brotliCompressed = await brotli.compress(rawBytes);
   final brotliDecompressed = await brotli.decompress(brotliCompressed);
 
@@ -99,7 +89,7 @@ Future<void> main() async {
   );
 
   // zstd
-  final zstd = CatalystCompression.instance.zstd;
+  final zstd = CatalystCompression.zstd;
   final zstdCompressed = await zstd.compress(rawBytes);
   final zstdDecompressed = await zstd.decompress(zstdCompressed);
 
@@ -109,10 +99,6 @@ Future<void> main() async {
   );
 }
 ```
-
-## Limitations
-
-This package supports only web platform at the moment but it's intended that other platforms are supported in the future.
 
 ## Support
 

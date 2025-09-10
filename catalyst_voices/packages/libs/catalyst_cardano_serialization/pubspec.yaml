@@ -14,7 +14,6 @@ dependencies:
   bech32: ^0.2.2
   bip32_ed25519: ^0.6.2
   catalyst_compression: ^1.0.0
-  catalyst_compression_web: ^1.0.0
   catalyst_key_derivation: ^1.0.0
   cbor: 6.3.7
   collection: ^1.19.1

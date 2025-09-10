@@ -67,7 +67,7 @@ allow-git = [
 [licenses]
 version = 2
 # Don't warn if a listed license isn't found
-unused-allowed-license = "allow"
+unused-allowed-license="allow"
 # We want really high confidence when inferring licenses from text
 confidence-threshold = 0.93
 allow = [
@@ -107,6 +107,7 @@ license-files = [{ path = "ext/hdf5/COPYING", hash = 0xf13e3591 }]
 crate = "ring"
 expression = "MIT"
 license-files = [{ path = "LICENSE", hash = 0xbd0eed23 }]
+
 
 # SPDX considers OpenSSL to encompass both the OpenSSL and SSLeay licenses
 # https://spdx.org/licenses/OpenSSL.html

@@ -16,17 +16,18 @@ generate-code: setup-code
 bootstrap: generate-code
 
 # Runs all static code checks
-check-code:
-    earthly +build-static-analysis
+check-code: generate-code
     earthly +check-code-formatting
+    earthly +check-package-publishing
     earthly +check-license
+    earthly +build-static-analysis
 
 # Runs unit tests
 test-code:
     earthly +test-unit-native
 
 # Pre Push Checks
-pre-push: check-code
+pre-push: check-code test-code
 
 license-list: setup-code
     melos license-list

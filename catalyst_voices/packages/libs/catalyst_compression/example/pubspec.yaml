@@ -9,6 +9,7 @@ environment:
 dependencies:
   catalyst_compression:
     path: ../
+  convert: ^3.1.2
   flutter:
     sdk: flutter
 
