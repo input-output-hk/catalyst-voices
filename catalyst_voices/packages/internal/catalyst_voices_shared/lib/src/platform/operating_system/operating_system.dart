@@ -33,5 +33,7 @@ enum CatalystOperatingSystem {
 
   bool get isMacOS => this == CatalystOperatingSystem.macOS;
 
+  bool get isMobile => isAndroid || isIOS;
+
   bool get isWindows => this == CatalystOperatingSystem.windows;
 }
