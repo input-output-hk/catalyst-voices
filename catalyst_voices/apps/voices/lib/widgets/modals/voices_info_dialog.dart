@@ -1,12 +1,10 @@
-import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/voices_panel_dialog.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
 /// Opinionated, single panel, dialog that is tailored for desktop
 /// form factors.
-///
-/// Uses [VoicesTwoPaneDialog] for base structure.
 ///
 /// Call [VoicesDialog.show] with [VoicesDesktopInfoDialog] in order
 /// to show it.
@@ -54,7 +52,7 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
       color: colors.textOnPrimaryLevel0,
     );
 
-    return VoicesSinglePaneDialog(
+    return VoicesPanelDialog(
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 83),

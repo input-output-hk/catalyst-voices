@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
-import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
-import 'package:catalyst_voices/widgets/rich_text/markdown_text.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';

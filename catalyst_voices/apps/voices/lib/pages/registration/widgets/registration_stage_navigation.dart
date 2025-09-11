@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class RegistrationBackNextNavigation extends StatelessWidget {
@@ -55,15 +54,14 @@ class RegistrationStageNavigation extends StatelessWidget {
     switch (axis) {
       case Axis.horizontal:
         return Row(
-          children: children
-              .map<Widget>((e) => Expanded(child: e))
-              .separatedBy(SizedBox(width: spacing))
-              .toList(),
+          spacing: spacing,
+          children: children.map((e) => Expanded(child: e)).toList(),
         );
       case Axis.vertical:
         return Column(
           mainAxisSize: MainAxisSize.min,
-          children: children.separatedBy(SizedBox(width: spacing)).toList(),
+          spacing: spacing,
+          children: children,
         );
     }
   }

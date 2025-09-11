@@ -1,90 +1,10 @@
-import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart';
 import 'package:catalyst_voices/widgets/form/voices_form_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-
-class FilterByDropdown<T> extends StatelessWidget {
-  final List<DropdownMenuEntry<T?>> items;
-  final ValueChanged<T?>? onChanged;
-  final Color? foregroundColor;
-  final Widget? leadingIcon;
-  final bool isOutlined;
-  final bool insertByAll;
-  final T? value;
-
-  const FilterByDropdown({
-    super.key,
-    required this.items,
-    this.onChanged,
-    this.foregroundColor,
-    this.leadingIcon,
-    this.isOutlined = false,
-    this.insertByAll = true,
-    this.value,
-  });
-
-  bool get isEnabled => onChanged != null;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    final foregroundColor = this.foregroundColor ?? theme.colorScheme.primary;
-    final border = isOutlined
-        ? OutlineInputBorder(
-            borderSide: BorderSide(color: context.colors.outlineBorderVariant),
-            borderRadius: BorderRadius.circular(8),
-          )
-        : InputBorder.none;
-
-    return Opacity(
-      opacity: isEnabled ? 1.0 : 0.3,
-      child: DropdownMenu<T?>(
-        dropdownMenuEntries: [
-          if (insertByAll)
-            VoicesDropdownMenuEntry<T?>(
-              value: null,
-              label: context.l10n.all,
-              context: context,
-            ),
-          ...items,
-        ],
-        onSelected: onChanged,
-        initialSelection: value,
-        enableSearch: false,
-        requestFocusOnTap: false,
-        enabled: isEnabled,
-        inputDecorationTheme: InputDecorationTheme(
-          isDense: true,
-          contentPadding: EdgeInsets.zero,
-          border: border,
-          enabledBorder: border,
-          focusedBorder: border,
-          iconColor: foregroundColor,
-          prefixIconColor: foregroundColor,
-          prefixIconConstraints: BoxConstraints.tight(const Size.square(18)),
-          suffixIconColor: foregroundColor,
-        ),
-        menuStyle: MenuStyle(
-          padding: WidgetStateProperty.all(EdgeInsets.zero),
-          visualDensity: VisualDensity.compact,
-        ),
-        leadingIcon: leadingIcon,
-        trailingIcon: VoicesAssets.icons.chevronDown.buildIcon(),
-        selectedTrailingIcon: VoicesAssets.icons.chevronUp.buildIcon(),
-        textAlign: TextAlign.center,
-        textStyle: (theme.textTheme.labelLarge ?? const TextStyle()).copyWith(
-          color: foregroundColor,
-        ),
-      ),
-    );
-  }
-}
 
 class SingleSelectDropdown<T> extends VoicesFormField<T> {
   final List<DropdownMenuEntry<T>> items;
@@ -174,31 +94,6 @@ class SingleSelectDropdown<T> extends VoicesFormField<T> {
       color: Theme.of(context).colors.outlineBorderVariant,
     ),
     borderRadius: BorderRadius.circular(borderRadius),
-  );
-}
-
-class VoicesDropdownMenuEntry<T> extends DropdownMenuEntry<T> {
-  final BuildContext context;
-
-  VoicesDropdownMenuEntry({
-    required super.value,
-    required super.label,
-    required this.context,
-    super.leadingIcon,
-    super.trailingIcon,
-    ButtonStyle? style,
-  }) : super(
-         style: style ?? _createButtonStyle(context),
-       );
-
-  static ButtonStyle _createButtonStyle(BuildContext context) => ButtonStyle(
-    textStyle: WidgetStateProperty.all(
-      Theme.of(context).textTheme.labelLarge,
-    ),
-    foregroundColor: WidgetStateProperty.all(
-      Theme.of(context).colorScheme.primary,
-    ),
-    visualDensity: VisualDensity.compact,
   );
 }
 

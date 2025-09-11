@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:catalyst_voices/widgets/modals/voices_upload_file_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/upload/voices_upload_file_dialog.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:collection/collection.dart';
