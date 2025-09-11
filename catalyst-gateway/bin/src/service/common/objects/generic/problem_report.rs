@@ -1,5 +1,6 @@
 //! OpenAPI Objects for Problem Report
 
+use catalyst_types::problem_report;
 use poem_openapi::{
     types::{Example, ToJSON},
     Object,
@@ -48,6 +49,94 @@ impl Example for ProblemReportEntry {
     }
 }
 
+impl From<problem_report::Entry> for ProblemReportEntry {
+    fn from(value: problem_report::Entry) -> Self {
+        let default = Self {
+            msg: value.context().clone(),
+            ..Default::default()
+        };
+
+        match value.kind() {
+            problem_report::Kind::MissingField { field } => {
+                Self {
+                    kind: "MissingField".to_string(),
+                    field: Some(field).cloned(),
+                    ..default
+                }
+            },
+            problem_report::Kind::UnknownField { field, value } => {
+                Self {
+                    kind: "UnknownField".to_string(),
+                    field: Some(field).cloned(),
+                    value: Some(value).cloned(),
+                    ..default
+                }
+            },
+            problem_report::Kind::InvalidValue {
+                field,
+                value,
+                constraint,
+            } => {
+                Self {
+                    kind: "InvalidValue".to_string(),
+                    field: Some(field).cloned(),
+                    value: Some(value).cloned(),
+                    constraint: Some(constraint).cloned(),
+                    ..default
+                }
+            },
+            problem_report::Kind::InvalidEncoding {
+                field,
+                encoded,
+                expected,
+            } => {
+                Self {
+                    kind: "InvalidEncoding".to_string(),
+                    field: Some(field).cloned(),
+                    encoded: Some(encoded).cloned(),
+                    expected: Some(expected).cloned(),
+                    ..default
+                }
+            },
+            problem_report::Kind::FunctionalValidation { explanation } => {
+                Self {
+                    kind: "FunctionalValidation".to_string(),
+                    explanation: Some(explanation).cloned(),
+                    ..default
+                }
+            },
+            problem_report::Kind::DuplicateField { field, description } => {
+                Self {
+                    kind: "DuplicateField".to_string(),
+                    field: Some(field).cloned(),
+                    description: Some(description).cloned(),
+                    ..default
+                }
+            },
+            problem_report::Kind::ConversionError {
+                field,
+                value,
+                expected_type,
+            } => {
+                Self {
+                    kind: "ConversionError".to_string(),
+                    field: Some(field).cloned(),
+                    value: Some(value).cloned(),
+                    expected_type: Some(expected_type).cloned(),
+                    ..default
+                }
+            },
+            problem_report::Kind::Other { description } => {
+                Self {
+                    kind: "Other".to_string(),
+                    description: Some(description).cloned(),
+                    ..default
+                }
+            },
+        }
+    }
+}
+
 impl_array_types!(
     ProblemReport,
     ProblemReportEntry,
@@ -58,6 +147,17 @@ impl_array_types!(
         ..poem_openapi::registry::MetaSchema::ANY
     })
 );
+
+impl From<problem_report::ProblemReport> for ProblemReport {
+    fn from(value: problem_report::ProblemReport) -> Self {
+        Self(
+            value
+                .entries()
+                .map(|entry| entry.map(|entry| entry.clone().into()))
+                .collect(),
+        )
+    }
+}
 
 impl Example for ProblemReport {
     fn example() -> Self {
