@@ -106,7 +106,7 @@ jobs:
         if: false
         env:
           API_TEST_MARKS: "health_with_proxy_endpoint"
-          EVENT_DB_URL: "haproxy:18080"
+          EVENT_DB_HOST: "haproxy:18080"
           INDEX_DB_URL: "haproxy:18090"
         run: |
           docker stop cat-gateway || true
