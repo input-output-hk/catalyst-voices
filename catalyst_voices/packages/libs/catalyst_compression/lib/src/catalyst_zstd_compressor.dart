@@ -2,7 +2,14 @@ import 'package:catalyst_compression/src/catalyst_compressor.dart';
 import 'package:catalyst_compression/src/rust/compression.dart' as rust;
 import 'package:catalyst_compression/src/rust_initializer.dart';
 
-/// The rust (native) implementation of zstd compressor.
+/// Zstd compressor backed by Rust via `flutter_rust_bridge`.
+///
+/// Usage:
+/// ```dart
+/// final c = CatalystZstdCompressor();
+/// final out = await c.compress(data);
+/// final restored = await c.decompress(out);
+/// ```
 class CatalystZstdCompressor implements CatalystCompressor {
   /// The default constructor for [CatalystZstdCompressor].
   const CatalystZstdCompressor();

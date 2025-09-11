@@ -15,7 +15,7 @@ generate-code: setup-code
 # Syntax sugar for linking packages and building generated code
 bootstrap: generate-code
 
-# Formats dart code in the workspace
+# Formats dart code and translations in the workspace
 format-code:
     melos format-apply
     melos l10n-clean

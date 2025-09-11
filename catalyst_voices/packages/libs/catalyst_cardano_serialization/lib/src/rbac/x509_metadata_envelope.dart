@@ -3,6 +3,9 @@ import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
+import 'package:logging/logging.dart';
+
+final _logger = Logger('X509MetadataEnvelope');
 
 /// Deserializes the type [T] from cbor.
 ///
@@ -261,7 +264,8 @@ final class X509MetadataEnvelope<T> extends Equatable {
   static Future<List<int>?> _compressBrotli(List<int> bytes) async {
     try {
       return await CatalystCompression.brotli.compress(bytes);
-    } on CompressionNotSupportedException {
+    } catch (error, stackTrace) {
+      _logger.severe('compressBrotli', error, stackTrace);
       return null;
     }
   }
@@ -269,7 +273,8 @@ final class X509MetadataEnvelope<T> extends Equatable {
   static Future<List<int>?> _compressZstd(List<int> bytes) async {
     try {
       return await CatalystCompression.zstd.compress(bytes);
-    } on CompressionNotSupportedException {
+    } catch (error, stackTrace) {
+      _logger.severe('compressZstd', error, stackTrace);
       return null;
     }
   }
