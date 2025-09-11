@@ -12,7 +12,7 @@ cargo-tree:
     cargo tree -e features,normal,build -f "{p}[{f}]" --workspace --frozen
 
 # Generate code using flutter_rust_bridge
-generate:
+generate-code:
     just ../code-gen-web
 
 # Check Dependency licenses and CVE's
@@ -35,7 +35,7 @@ sync-cfg:
         earthly ./catalyst_voices/packages/libs/catalyst_compression/rust+sync-cfg
 
 # Pre Push Checks
-pre-push: sync-cfg generate code-format code-lint license-check
+pre-push: sync-cfg generate-code code-format code-lint license-check
     # Make sure we can actually build inside Earthly which needs to happen in CI.
     cd ../../../../.. && \
         earthly ./catalyst_voices/packages/libs/catalyst_compression/rust+check && \
