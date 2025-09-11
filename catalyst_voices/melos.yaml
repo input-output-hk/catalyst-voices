@@ -9,10 +9,9 @@ packages:
 
 ignore:
   # ignore flutter_rust_bridge packages that are non-conformant with melos
-  - packages/libs/**/cargokit/**
+  - /**/cargokit/**
   # ignore temporary packages that are non-conformant with melos
-  - apps/voices/build/**
-  - packages/libs/**/build**
+  - /**/build/**
 
 permittedLicenses:
   - MIT

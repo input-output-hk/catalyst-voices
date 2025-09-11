@@ -18,6 +18,7 @@ bootstrap: generate-code
 # Formats dart code in the workspace
 format-code:
     melos format-apply
+    melos l10n-clean
 
 # Runs all static code checks
 check-code:
