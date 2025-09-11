@@ -47,7 +47,7 @@ void main() {
       expect(
         () => SeedPhrase.fromMnemonic(invalidMnemonic),
         throwsA(
-          isA<AssertionError>().having(
+          isA<ArgumentError>().having(
             (e) => e.message,
             'message',
             contains('Invalid mnemonic phrase'),

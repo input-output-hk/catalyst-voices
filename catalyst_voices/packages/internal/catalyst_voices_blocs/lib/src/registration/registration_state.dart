@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 
 final class RegistrationState extends Equatable {
   final RegistrationStep step;
+  final RegistrationGetStartedState getStarted;
   final BaseProfileStateData baseProfileStateData;
   final KeychainStateData keychainStateData;
   final WalletLinkStateData walletLinkStateData;
@@ -12,6 +13,7 @@ final class RegistrationState extends Equatable {
 
   const RegistrationState({
     this.step = const GetStartedStep(),
+    this.getStarted = const RegistrationGetStartedState(),
     this.baseProfileStateData = const BaseProfileStateData(),
     this.keychainStateData = const KeychainStateData(),
     this.walletLinkStateData = const WalletLinkStateData(),
@@ -64,6 +66,7 @@ final class RegistrationState extends Equatable {
   @override
   List<Object?> get props => [
     step,
+    getStarted,
     baseProfileStateData,
     keychainStateData,
     walletLinkStateData,
@@ -73,6 +76,7 @@ final class RegistrationState extends Equatable {
 
   RegistrationState copyWith({
     RegistrationStep? step,
+    RegistrationGetStartedState? getStarted,
     BaseProfileStateData? baseProfileStateData,
     KeychainStateData? keychainStateData,
     WalletLinkStateData? walletLinkStateData,
@@ -81,6 +85,7 @@ final class RegistrationState extends Equatable {
   }) {
     return RegistrationState(
       step: step ?? this.step,
+      getStarted: getStarted ?? this.getStarted,
       baseProfileStateData: baseProfileStateData ?? this.baseProfileStateData,
       keychainStateData: keychainStateData ?? this.keychainStateData,
       walletLinkStateData: walletLinkStateData ?? this.walletLinkStateData,
