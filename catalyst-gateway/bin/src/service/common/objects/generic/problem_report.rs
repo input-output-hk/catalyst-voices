@@ -42,13 +42,6 @@ pub(crate) struct ProblemReportEntry {
     pub(crate) expected_type: Option<String>,
 }
 
-impl Example for ProblemReportEntry {
-    fn example() -> Self {
-        // TODO:
-        unimplemented!()
-    }
-}
-
 impl From<problem_report::Entry> for ProblemReportEntry {
     fn from(value: problem_report::Entry) -> Self {
         let default = Self {
@@ -137,6 +130,27 @@ impl From<problem_report::Entry> for ProblemReportEntry {
     }
 }
 
+impl From<serde_json::Value> for ProblemReportEntry {
+    fn from(value: serde_json::Value) -> Self {
+        Self {
+            ..Default::default()
+        }
+    }
+}
+
+impl Example for ProblemReportEntry {
+    fn example() -> Self {
+        Self {
+            kind: "InvalidValue".to_string(),
+            msg: "context".to_string(),
+            field: Some("field name".to_string()),
+            value: Some("field valeu".to_string()),
+            constraint: Some("constraint".to_string()),
+            ..Default::default()
+        }
+    }
+}
+
 impl_array_types!(
     ProblemReport,
     ProblemReportEntry,
@@ -156,6 +170,12 @@ impl From<problem_report::ProblemReport> for ProblemReport {
                 .map(|entry| entry.map(|entry| entry.clone().into()))
                 .collect(),
         )
+    }
+}
+
+impl From<String> for ProblemReport {
+    fn from(value: String) -> Self {
+        unimplemented!()
     }
 }
 
