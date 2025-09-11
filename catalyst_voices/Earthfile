@@ -124,6 +124,9 @@ build-web:
     FROM +code-generator
     ARG WORKDIR=/frontend/apps/voices
     ARG UPLOAD_DEBUG_SYMBOLS=false
+    ARG tag='latest'
+
+    RUN echo "WORKDIR -> $WORKDIR, UPLOAD_DEBUG_SYMBOLS -> $UPLOAD_DEBUG_SYMBOLS, tag -> $tag"
 
     DO flutter-ci+BUILD_WEB \
         --WORKDIR=$WORKDIR \
