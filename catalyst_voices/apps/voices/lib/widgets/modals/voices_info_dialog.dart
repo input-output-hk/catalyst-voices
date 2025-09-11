@@ -53,7 +53,7 @@ class VoicesInfoDialog extends StatelessWidget {
 
     return VoicesPanelDialog(
       child: ResponsiveBuilder<EdgeInsets>(
-        sm: const EdgeInsets.symmetric(horizontal: 24),
+        xs: const EdgeInsets.symmetric(horizontal: 24),
         other: const EdgeInsets.symmetric(horizontal: 83),
         builder: (context, padding) {
           return SingleChildScrollView(

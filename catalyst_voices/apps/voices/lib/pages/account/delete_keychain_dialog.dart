@@ -59,6 +59,8 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
           ),
           const SizedBox(height: 24),
           Wrap(
+            spacing: 8,
+            alignment: WrapAlignment.center,
             children: [
               VoicesFilledButton(
                 key: const Key('DeleteKeychainContinueButton'),
@@ -66,7 +68,6 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
                 onTap: _removeKeychain,
                 child: Text(context.l10n.continueText),
               ),
-              const SizedBox(width: 8),
               VoicesTextButton.danger(
                 onTap: () => Navigator.of(context).pop(),
                 child: Text(context.l10n.cancelButtonText),

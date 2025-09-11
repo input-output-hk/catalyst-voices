@@ -22,6 +22,7 @@ import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 final class AccountPage extends StatefulWidget {
@@ -55,7 +56,10 @@ class _AccountPageState extends State<AccountPage>
               padding: const EdgeInsets.all(24),
               children: [
                 const AccountPageTitle(key: Key('AccountPageTitle')),
-                const SizedBox(height: 42),
+                ResponsiveSizedBox(
+                  xs: const SizedBox(height: 18),
+                  other: const SizedBox(height: 42),
+                ),
                 const AccountPageGrid(
                   key: ValueKey('AccountOverviewGrid'),
                   children: [
@@ -63,7 +67,10 @@ class _AccountPageState extends State<AccountPage>
                     AccountActionTile(),
                   ],
                 ),
-                const SizedBox(height: 40),
+                ResponsiveSizedBox(
+                  xs: const SizedBox(height: 18),
+                  other: const SizedBox(height: 40),
+                ),
                 AccountPageGrid(
                   key: const ValueKey('AccountDetailsGrid'),
                   children: [

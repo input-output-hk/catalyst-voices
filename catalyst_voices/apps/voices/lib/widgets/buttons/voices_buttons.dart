@@ -356,6 +356,34 @@ class VoicesLearnMoreFilledButton extends StatelessWidget {
   }
 }
 
+class VoicesLearnMoreIconButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const VoicesLearnMoreIconButton({
+    super.key,
+    required this.onTap,
+  });
+
+  factory VoicesLearnMoreIconButton.url({
+    Key? key,
+    required String url,
+  }) {
+    return VoicesLearnMoreIconButton(
+      key: key,
+      onTap: () => _launchUrl(url),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton.primary(
+      key: const Key('LearnMoreButton'),
+      onTap: onTap,
+      child: VoicesAssets.icons.externalLink.buildIcon(),
+    );
+  }
+}
+
 class VoicesLearnMoreTextButton extends StatelessWidget {
   final VoidCallback onTap;
 
