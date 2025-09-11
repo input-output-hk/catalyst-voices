@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
+import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
+import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
 import 'package:catalyst_voices/pages/account/pending_email_change_dialog.dart';
 import 'package:catalyst_voices/pages/account/verification_email_send_dialog.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_action_tile.dart';
@@ -16,8 +18,10 @@ import 'package:catalyst_voices/pages/account/widgets/account_username_tile.dart
 import 'package:catalyst_voices/pages/spaces/appbar/actions/account_settings_action.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/actions/session_cta_action.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 final class AccountPage extends StatefulWidget {
@@ -49,24 +53,27 @@ class _AccountPageState extends State<AccountPage>
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(24),
-              children: const [
-                AccountPageTitle(key: Key('AccountPageTitle')),
-                SizedBox(height: 42),
-                AccountPageGrid(
+              children: [
+                const AccountPageTitle(key: Key('AccountPageTitle')),
+                const SizedBox(height: 42),
+                const AccountPageGrid(
                   key: ValueKey('AccountOverviewGrid'),
                   children: [
                     AccountHeaderTile(),
                     AccountActionTile(),
                   ],
                 ),
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 AccountPageGrid(
-                  key: ValueKey('AccountDetailsGrid'),
+                  key: const ValueKey('AccountDetailsGrid'),
                   children: [
-                    AccountUsernameTile(),
-                    AccountRolesTile(),
-                    AccountEmailTile(),
-                    AccountKeychainTile(key: Key('AccountKeychainTile')),
+                    const AccountUsernameTile(),
+                    const AccountRolesTile(),
+                    const AccountEmailTile(),
+                    AccountKeychainTile(
+                      key: const Key('AccountKeychainTile'),
+                      onRemoveTap: _removeActiveKeychain,
+                    ),
                   ],
                 ),
               ],
@@ -92,6 +99,37 @@ class _AccountPageState extends State<AccountPage>
     super.initState();
 
     unawaited(context.read<AccountCubit>().updateAccountDetails());
+  }
+
+  Future<void> _removeActiveKeychain() async {
+    final confirmed = await DeleteKeychainDialog.show(context);
+    if (!confirmed) {
+      return;
+    }
+
+    if (mounted) {
+      await context.read<AccountCubit>().deleteActiveKeychain();
+    }
+
+    if (mounted) unawaited(KeychainDeletedDialog.show(context));
+
+    if (mounted) {
+      // TODO(damian-molinski): refactor it. Should be inside AccountCubit and emit signals to page.
+      final phaseType = context.read<CampaignPhaseAwareCubit>().state.activeCampaignPhaseType;
+
+      switch (phaseType) {
+        case CampaignPhaseType.communityReview:
+        case CampaignPhaseType.communityVoting:
+          const VotingRoute($extra: true).go(context);
+        case null:
+        case CampaignPhaseType.proposalSubmission:
+        case CampaignPhaseType.votingRegistration:
+        case CampaignPhaseType.reviewRegistration:
+        case CampaignPhaseType.votingResults:
+        case CampaignPhaseType.projectOnboarding:
+          const DiscoveryRoute($extra: true).go(context);
+      }
+    }
   }
 
   void _showPendingEmailChangeDialog() {
