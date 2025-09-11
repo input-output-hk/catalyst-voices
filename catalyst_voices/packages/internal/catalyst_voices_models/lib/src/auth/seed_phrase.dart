@@ -61,7 +61,7 @@ final class SeedPhrase extends Equatable {
   /// - [mnemonic]: The mnemonic to derive the seed from.
   factory SeedPhrase.fromMnemonic(String mnemonic, {bool validate = true}) {
     if (validate && !bip39.validateMnemonic(mnemonic)) {
-      throw ArgumentError('Invalid SeedPhrase mnemonic', 'mnemonic');
+      throw ArgumentError('Invalid mnemonic phrase', 'mnemonic');
     }
 
     return SeedPhrase._(mnemonic: mnemonic);
