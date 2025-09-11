@@ -101,7 +101,7 @@ jobs:
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
 
-# Skip until bugfix https://github.com/input-output-hk/catalyst-voices/issues/3209
+      # Skip until bugfix https://github.com/input-output-hk/catalyst-voices/issues/3209
       - name: Integration health thru proxy tests
         if: false
         env:
@@ -130,3 +130,95 @@ jobs:
           path: "**/*${{ env.COVERAGE_EXT }}"
           if-no-files-found: error
           retention-days: 1
+
+  devnet-tests:
+    name: Cat-Gateway devnet integration tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: false
+          haskell: false
+          large-packages: false
+          docker-images: false
+          swap-storage: true
+
+      - name: Install Forge
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
+        with:
+          enable_caching: "true"
+          version: 0.21.0
+      - name: Setup
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
+
+      - name: Prepare artifacts
+        id : images
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        with:
+          command: run
+          args: ./catalyst-gateway/tests/+all-images
+
+      - name: Spin up devnet
+        if: ${{ steps.images.conclusion == 'success' }}
+        run: |
+          export ENV_TARGET=Devnet
+          export SCYLLA_CMD="--smp 2 --memory 1G --overprovisioned 1  --rpc-address 0.0.0.0 --broadcast-rpc-address 127.0.0.1 --api-address 0.0.0.0 --alternator-address 0.0.0.0"
+          export EVENT_DB_HOST=localhost
+          export INDEX_DB_URL=localhost
+          export API_SPEC="http://localhost:3030/docs/cat-gateway.json"
+          docker compose -f catalyst-gateway/tests/docker-compose.yml -f catalyst-gateway/tests/docker-compose-localhost.yml --profile devnet up cat-devnet -d
+
+      - name: Wait for cat-devnet to become healthy
+        run: |
+          echo "Waiting for container to be healthy..."
+          for i in {1..500}; do
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-devnet)
+            echo "Health status: $STATUS"
+            if [ "$STATUS" == "healthy" ]; then
+              echo "Container is healthy!"
+              break
+            fi
+            if [ "$STATUS" == "unhealthy" ]; then
+              echo "Container became unhealthy."
+              exit 1
+            fi
+            sleep 5
+          done
+
+      - name: Spin up catalyst-gateway
+        id: gateway-started
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml -f catalyst-gateway/tests/docker-compose-localhost.yml --profile devnet up cat-gateway -d
+
+      - name: Wait for cat-gateway to become healthy
+        id: gateway-healthy
+        if: ${{ steps.gateway-started.conclusion == 'success' }}
+        run: |
+          echo "Waiting for container to be healthy..."
+          for i in {1..500}; do
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
+            echo "Health status: $STATUS"
+            if [ "$STATUS" == "healthy" ]; then
+              echo "Container is healthy!"
+              break
+            fi
+            if [ "$STATUS" == "unhealthy" ]; then
+              echo "Container became unhealthy."
+              exit 1
+            fi
+            sleep 5
+          done
+
+      - name: Schemathesis tests
+        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml -f catalyst-gateway/tests/docker-compose-localhost.yml --profile devnet up schemathesis-runner --exit-code-from schemathesis-runner
