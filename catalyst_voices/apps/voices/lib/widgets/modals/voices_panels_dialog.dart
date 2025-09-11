@@ -45,7 +45,7 @@ class VoicesPanelsDialog extends StatelessWidget {
     return VoicesPanelDialog(
       constraints: ResponsiveBoxConstraints.from(
         fallback: const BoxConstraints.tightFor(width: 900, height: 600),
-        xs: const BoxConstraints(),
+        xs: const BoxConstraints(maxHeight: 600),
       ),
       child: ResponsiveChild(
         xs: (context) {
@@ -139,18 +139,10 @@ class _VerticalPanels extends StatelessWidget {
   Widget build(BuildContext context) {
     final panel = panels[primaryPanelIndex];
 
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _Panel(
-            key: ValueKey('${primaryPanelIndex}Panel'),
-            padding: panel.padding,
-            child: panel.child,
-          ),
-        ],
-      ),
+    return _Panel(
+      key: ValueKey('${primaryPanelIndex}Panel'),
+      padding: panel.padding,
+      child: panel.child,
     );
   }
 }
