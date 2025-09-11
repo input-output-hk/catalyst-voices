@@ -10,7 +10,7 @@ import 'package:flutter/widgets.dart';
 const _allowedExtensions = ['txt'];
 
 mixin UploadSeedPhraseMixin<T extends StatefulWidget> on State<T> {
-  Future<SeedPhrase?> importSeedPhraseWords({
+  Future<SeedPhrase?> importSeedPhrase({
     bool requireConfirmation = true,
     bool validate = true,
   }) async {
@@ -39,7 +39,7 @@ mixin UploadSeedPhraseMixin<T extends StatefulWidget> on State<T> {
       return null;
     }
 
-    return importSeedPhraseWords(
+    return importSeedPhrase(
       requireConfirmation: false,
       validate: validate,
     );

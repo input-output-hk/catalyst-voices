@@ -147,7 +147,7 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> with Upload
 
   Future<void> _uploadSeedPhrase() async {
     final hasWords = _controller.words.isNotEmpty;
-    final seedPhrase = await importSeedPhraseWords(requireConfirmation: hasWords);
+    final seedPhrase = await importSeedPhrase(requireConfirmation: hasWords);
     if (seedPhrase == null || !mounted) {
       return;
     }

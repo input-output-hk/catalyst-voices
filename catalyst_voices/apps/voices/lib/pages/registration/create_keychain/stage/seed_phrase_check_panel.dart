@@ -115,7 +115,7 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> with Upload
       context,
     ).state.keychainStateData.seedPhraseStateData.userWords.isNotEmpty;
 
-    final seedPhrase = await importSeedPhraseWords(requireConfirmation: hasWords);
+    final seedPhrase = await importSeedPhrase(requireConfirmation: hasWords);
     if (seedPhrase == null || !mounted) {
       return;
     }
