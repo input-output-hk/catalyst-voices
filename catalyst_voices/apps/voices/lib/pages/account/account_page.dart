@@ -8,6 +8,7 @@ import 'package:catalyst_voices/pages/account/widgets/account_action_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_email_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_header_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_keychain_tile.dart';
+import 'package:catalyst_voices/pages/account/widgets/account_page_grid.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_page_title.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_roles_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_status_banner.dart';
@@ -17,7 +18,6 @@ import 'package:catalyst_voices/pages/spaces/appbar/actions/session_cta_action.d
 import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 final class AccountPage extends StatefulWidget {
@@ -49,44 +49,24 @@ class _AccountPageState extends State<AccountPage>
           Expanded(
             child: ListView(
               padding: const EdgeInsets.all(24),
-              children: [
-                const AccountPageTitle(
-                  key: Key('AccountPageTitle'),
-                ),
-                const SizedBox(height: 42),
-                const Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                AccountPageTitle(key: Key('AccountPageTitle')),
+                SizedBox(height: 42),
+                AccountPageGrid(
+                  key: ValueKey('AccountOverviewGrid'),
                   children: [
-                    Expanded(child: AccountHeaderTile()),
-                    SizedBox(width: 28),
-                    Expanded(child: AccountActionTile()),
+                    AccountHeaderTile(),
+                    AccountActionTile(),
                   ],
                 ),
-                const SizedBox(height: 40),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                SizedBox(height: 40),
+                AccountPageGrid(
+                  key: ValueKey('AccountDetailsGrid'),
                   children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const <Widget>[
-                          AccountUsernameTile(),
-                          AccountEmailTile(),
-                        ].separatedBy(const SizedBox(height: 20)).toList(),
-                      ),
-                    ),
-                    const SizedBox(width: 28),
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const <Widget>[
-                          AccountRolesTile(),
-                          AccountKeychainTile(
-                            key: Key('AccountKeychainTile'),
-                          ),
-                        ].separatedBy(const SizedBox(height: 20)).toList(),
-                      ),
-                    ),
+                    AccountUsernameTile(),
+                    AccountRolesTile(),
+                    AccountEmailTile(),
+                    AccountKeychainTile(key: Key('AccountKeychainTile')),
                   ],
                 ),
               ],
