@@ -30,7 +30,7 @@ class AccountPageTitle extends StatelessWidget {
               context.l10n.profileAndKeychain,
               style: context.textTheme.displaySmall?.copyWith(color: context.colorScheme.primary),
             ),
-            VoicesLearnMoreTextButton.url(url: VoicesConstants.myAccountUrl),
+            Flexible(child: VoicesLearnMoreTextButton.url(url: VoicesConstants.myAccountUrl)),
           ],
         ),
       ],
