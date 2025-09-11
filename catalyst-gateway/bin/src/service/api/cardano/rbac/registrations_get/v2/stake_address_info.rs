@@ -15,18 +15,18 @@ pub struct RbacStakeAddressInfo {
     /// A stake address.
     stake: Cip19StakeAddress,
     /// A slot number when the registration chain started to use the stake address.
-    active: SlotNo,
+    active_from: SlotNo,
     /// A slot number when the registration chain stopped to use the stake address.
     #[oai(skip_serializing_if_is_empty)]
-    inactive: Option<SlotNo>,
+    inactive_from: Option<SlotNo>,
 }
 
 impl From<StakeAddressInfo> for RbacStakeAddressInfo {
     fn from(info: StakeAddressInfo) -> Self {
         Self {
             stake: info.stake.into(),
-            active: info.active.into(),
-            inactive: info.inactive.map(Into::into),
+            active_from: info.active.into(),
+            inactive_from: info.inactive.map(Into::into),
         }
     }
 }
@@ -35,8 +35,8 @@ impl Example for RbacStakeAddressInfo {
     fn example() -> Self {
         Self {
             stake: Cip19StakeAddress::example(),
-            active: SlotNo::example(),
-            inactive: Some(SlotNo::example()),
+            active_from: SlotNo::example(),
+            inactive_from: Some(SlotNo::example()),
         }
     }
 }

@@ -44,6 +44,7 @@ pub struct RbacRegistrationChainV2 {
     #[oai(skip_serializing_if_is_empty)]
     invalid: InvalidRegistrationList,
     /// A list of stake addresses of the chain.
+    #[oai(skip_serializing_if_is_empty)]
     stake_addresses: StakeAddressInfoList,
 }
 
