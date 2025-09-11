@@ -28,37 +28,41 @@ class ListLengthPickerWidget extends StatelessWidget {
     final isRequired = list.schema.isRequired;
     final description = list.schema.description ?? MarkdownData.empty;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (title.isNotEmpty) ...[
-          DocumentPropertyBuilderTitle(
-            title: title,
-            isRequired: isRequired,
-          ),
-          const SizedBox(height: 8),
-        ],
-        if (description.data.isNotEmpty && description.data != title) ...[
-          MarkdownText(
-            description,
-            pStyle: context.textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 22),
-        ],
-        SingleSelectDropdown(
-          items: [
-            for (int i = minCount; i <= maxCount; i++)
-              DropdownMenuEntry(
-                value: i,
-                label: list.schema.itemsSchema.title.formatAsPlural(i),
-              ),
+    return Semantics(
+      identifier: 'ListLengthPickerWidget',
+      container: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (title.isNotEmpty) ...[
+            DocumentPropertyBuilderTitle(
+              title: title,
+              isRequired: isRequired,
+            ),
+            const SizedBox(height: 8),
           ],
-          enabled: isEditMode,
-          onChanged: _onChanged,
-          value: currentCount,
-          hintText: list.schema.placeholder,
-        ),
-      ],
+          if (description.data.isNotEmpty && description.data != title) ...[
+            MarkdownText(
+              description,
+              pStyle: context.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 22),
+          ],
+          SingleSelectDropdown(
+            items: [
+              for (int i = minCount; i <= maxCount; i++)
+                DropdownMenuEntry(
+                  value: i,
+                  label: list.schema.itemsSchema.title.formatAsPlural(i),
+                ),
+            ],
+            enabled: isEditMode,
+            onChanged: _onChanged,
+            value: currentCount,
+            hintText: list.schema.placeholder,
+          ),
+        ],
+      ),
     );
   }
 

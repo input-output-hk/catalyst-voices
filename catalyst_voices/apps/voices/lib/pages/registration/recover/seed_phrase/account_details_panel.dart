@@ -17,9 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:result_type/result_type.dart';
 
 class AccountDetailsPanel extends StatelessWidget {
-  const AccountDetailsPanel({
-    super.key,
-  });
+  const AccountDetailsPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,9 +39,7 @@ class AccountDetailsPanel extends StatelessWidget {
 class _AccountRoles extends StatelessWidget {
   final Set<AccountRole> roles;
 
-  const _AccountRoles({
-    required this.roles,
-  });
+  const _AccountRoles({required this.roles});
 
   @override
   Widget build(BuildContext context) {
@@ -69,11 +65,7 @@ class _AccountSummaryDetails extends StatelessWidget {
   final String? email;
   final Set<AccountRole> roles;
 
-  const _AccountSummaryDetails({
-    required this.username,
-    required this.email,
-    required this.roles,
-  });
+  const _AccountSummaryDetails({required this.username, required this.email, required this.roles});
 
   @override
   Widget build(BuildContext context) {
@@ -81,25 +73,17 @@ class _AccountSummaryDetails extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          width: 1.5,
-          color: Theme.of(context).colors.outlineBorderVariant,
-        ),
+        border: Border.all(width: 1.5, color: Theme.of(context).colors.outlineBorderVariant),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 12,
         children: [
-          _SummaryDetails(
-            label: Text(context.l10n.nickname),
-            value: UsernameText(username),
-          ),
+          _SummaryDetails(label: Text(context.l10n.nickname), value: UsernameText(username)),
           _SummaryDetails(
             label: Text(context.l10n.email),
-            value: Text(
-              email?.nullIfEmpty() ?? context.l10n.notAvailableAbbr.toLowerCase(),
-            ),
+            value: Text(email?.nullIfEmpty() ?? context.l10n.notAvailableAbbr.toLowerCase()),
           ),
           _SummaryDetails(
             label: Text(context.l10n.registeredRoles),
@@ -141,9 +125,7 @@ class _BlocNavigation extends StatelessWidget {
     return BlocRecoverSelector<bool>(
       selector: (state) => state.isAccountSummaryNextEnabled,
       builder: (context, state) {
-        return _Navigation(
-          isNextEnabled: state,
-        );
+        return _Navigation(isNextEnabled: state);
       },
     );
   }
@@ -160,9 +142,7 @@ class _CheckOnCardanoScanButton extends StatelessWidget with LaunchUrlMixin {
       alignment: Alignment.topLeft,
       child: VoicesTextButton(
         style: const ButtonStyle(
-          padding: WidgetStatePropertyAll(
-            EdgeInsets.symmetric(horizontal: 8),
-          ),
+          padding: WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 8)),
         ),
         child: Text(
           context.l10n.checkOnCardanoScan,
@@ -185,9 +165,7 @@ class _CheckOnCardanoScanButton extends StatelessWidget with LaunchUrlMixin {
 class _Navigation extends StatelessWidget {
   final bool isNextEnabled;
 
-  const _Navigation({
-    this.isNextEnabled = false,
-  });
+  const _Navigation({this.isNextEnabled = false});
 
   @override
   Widget build(BuildContext context) {
@@ -198,7 +176,10 @@ class _Navigation extends StatelessWidget {
         VoicesFilledButton(
           key: const Key('SetUnlockPasswordButton'),
           onTap: isNextEnabled ? () => RegistrationCubit.of(context).nextStep() : null,
-          child: Text(context.l10n.recoveryAccountDetailsAction),
+          child: Text(
+            context.l10n.recoveryAccountDetailsAction,
+            semanticsIdentifier: 'recoveryAccountDetailsAction',
+          ),
         ),
         const SizedBox(height: 10),
         VoicesTextButton(
@@ -218,9 +199,7 @@ class _Navigation extends StatelessWidget {
 class _RecoverAccountFailure extends StatelessWidget {
   final LocalizedException exception;
 
-  const _RecoverAccountFailure({
-    required this.exception,
-  });
+  const _RecoverAccountFailure({required this.exception});
 
   @override
   Widget build(BuildContext context) {
@@ -238,9 +217,7 @@ class _RecoverAccountFailure extends StatelessWidget {
 class _RecoveredAccountSummary extends StatelessWidget {
   final AccountSummaryData account;
 
-  const _RecoveredAccountSummary({
-    required this.account,
-  });
+  const _RecoveredAccountSummary({required this.account});
 
   @override
   Widget build(BuildContext context) {
@@ -291,10 +268,7 @@ class _SummaryDetails extends StatelessWidget {
   final Widget label;
   final Widget value;
 
-  const _SummaryDetails({
-    required this.label,
-    required this.value,
-  });
+  const _SummaryDetails({required this.label, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -309,10 +283,7 @@ class _SummaryDetails extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: DefaultTextStyle(
-            style: textStyle,
-            child: value,
-          ),
+          child: DefaultTextStyle(style: textStyle, child: value),
         ),
       ],
     );
@@ -337,10 +308,7 @@ class _WalletSummaryDetails extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          width: 1.5,
-          color: Theme.of(context).colors.outlineBorderVariant,
-        ),
+        border: Border.all(width: 1.5, color: Theme.of(context).colors.outlineBorderVariant),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -356,26 +324,19 @@ class _WalletSummaryDetails extends StatelessWidget {
                 children: [
                   Text(address),
                   if (clipboardAddress != null)
-                    VoicesClipboardIconButton(
-                      clipboardData: clipboardAddress.toBech32(),
-                    ),
+                    VoicesClipboardIconButton(clipboardData: clipboardAddress.toBech32()),
                 ],
               ),
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: _SummaryDetails(
-              label: Text(context.l10n.balance),
-              value: Text(balance),
-            ),
+            child: _SummaryDetails(label: Text(context.l10n.balance), value: Text(balance)),
           ),
           if (clipboardAddress != null)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: _CheckOnCardanoScanButton(
-                address: clipboardAddress,
-              ),
+              child: _CheckOnCardanoScanButton(address: clipboardAddress),
             ),
         ],
       ),
