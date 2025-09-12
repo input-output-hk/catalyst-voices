@@ -34,6 +34,7 @@ services:
       - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev
       - CASSANDRA_PERSISTENT_URL=localhost:9042
       - CASSANDRA_VOLATILE_URL=localhost:9042
+      - CHAIN_NETWORK=Devnet
     depends_on:
       cat-devnet:
         condition: service_healthy

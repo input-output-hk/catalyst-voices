@@ -192,7 +192,6 @@ jobs:
       - name: Spin up catalyst-gateway
         id: gateway-started
         run: |
-          export ENV_TARGET=Devnet
           docker compose -f catalyst-gateway/tests/docker-compose.yml -f catalyst-gateway/tests/docker-compose-localhost.yml --profile devnet up cat-gateway -d
 
       - name: Wait for cat-gateway to become healthy
