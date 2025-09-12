@@ -10,10 +10,10 @@ class ProposalsControls extends StatelessWidget {
     return const Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 8,
       children: [
         CategorySelector(),
-        SizedBox(width: 8),
-        ProposalsSearch(),
+        Flexible(child: ProposalsSearch()),
       ],
     );
   }
