@@ -17,6 +17,7 @@ class ProposalVotingOverview extends StatelessWidget {
       child: Wrap(
         alignment: WrapAlignment.spaceBetween,
         runSpacing: 16,
+        spacing: 8,
         children: [
           const Row(
             mainAxisSize: MainAxisSize.min,

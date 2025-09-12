@@ -60,7 +60,6 @@ class _ProposalControls extends StatelessWidget {
     // TODO(LynxLynxx): Remove when we support mobile web
     return ResponsiveChild(
       xs: (context) => const SizedBox(),
-
       other: (context) => Row(
         mainAxisSize: MainAxisSize.min,
         spacing: 4,
