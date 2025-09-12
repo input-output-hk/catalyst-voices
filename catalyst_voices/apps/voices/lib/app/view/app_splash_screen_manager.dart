@@ -75,7 +75,7 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
         AppSplashScreenManager.hideSplashScreen();
       }
     });
-    
+
     unawaited(_handleDocumentsSync());
     unawaited(_handleImageAndVideoPrecache());
     unawaited(_handleFonts());
