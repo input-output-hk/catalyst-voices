@@ -126,10 +126,7 @@ build-web:
     ARG UPLOAD_DEBUG_SYMBOLS=false
     ARG tag='latest'
 
-    DO +PREPARE_BUILD_ARGS --tag=$tag
-
-    RUN echo "build_name -> $(cat build_name)"
-    RUN echo "build_number -> $(cat build_number)"
+    DO +PARSE_BUILD_ARGS --tag=$tag
 
     DO flutter-ci+BUILD_WEB \
         --WORKDIR=$WORKDIR \
@@ -165,7 +162,7 @@ docker:
 
    SAVE IMAGE ${container}:${tag}
 
-PREPARE_BUILD_ARGS:
+PARSE_BUILD_ARGS:
     FUNCTION
     ARG tag='latest'
     ARG allow_build_name_suffix=true
