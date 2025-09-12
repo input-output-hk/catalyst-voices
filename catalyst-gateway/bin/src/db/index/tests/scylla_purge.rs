@@ -346,7 +346,7 @@ async fn rbac509_invalid_registration() {
             0.into(),
             Some(UuidV4::new()),
             None,
-            &report,
+            report.clone(),
         ),
         rbac509::insert_rbac509_invalid::Params::new(
             "cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE"
@@ -357,7 +357,7 @@ async fn rbac509_invalid_registration() {
             1.into(),
             Some(UuidV4::new()),
             None,
-            &report,
+            report.clone(),
         ),
     ];
     let data_len = data.len();

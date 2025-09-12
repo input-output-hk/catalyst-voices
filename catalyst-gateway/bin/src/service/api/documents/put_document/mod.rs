@@ -85,7 +85,7 @@ pub(crate) async fn endpoint(
                     return Responses::UnprocessableContent(Json(
                         PutDocumentUnprocessableContent::new(
                             "Failed validating document integrity",
-                            serde_json::to_value(doc.problem_report()).ok(),
+                            None,
                         ),
                     ))
                     .into();
@@ -101,7 +101,7 @@ pub(crate) async fn endpoint(
                     return Responses::UnprocessableContent(Json(
                         PutDocumentUnprocessableContent::new(
                             "Failed validating document integrity",
-                            serde_json::to_value(doc.problem_report()).ok(),
+                            Some(doc.problem_report()),
                         ),
                     ))
                     .into();
@@ -134,7 +134,7 @@ pub(crate) async fn endpoint(
         Ok(false) => {
             return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
                 "Failed validating document signatures",
-                serde_json::to_value(doc.problem_report()).ok(),
+                Some(doc.problem_report()),
             )))
             .into();
         },
@@ -146,7 +146,7 @@ pub(crate) async fn endpoint(
     if doc.problem_report().is_problematic() {
         return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
             "Invalid Catalyst Signed Document",
-            serde_json::to_value(doc.problem_report()).ok(),
+            Some(doc.problem_report()),
         )))
         .into();
     }
@@ -169,7 +169,7 @@ pub(crate) async fn endpoint(
         Err(err) if err.is::<StoreError>() => {
             Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
                 "Document with the same `id` and `ver` already exists",
-                serde_json::to_value(doc.problem_report()).ok(),
+                Some(doc.problem_report()),
             )))
             .into()
         },
