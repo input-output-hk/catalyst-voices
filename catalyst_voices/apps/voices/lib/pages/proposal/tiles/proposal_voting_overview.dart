@@ -12,25 +12,37 @@ class ProposalVotingOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const ProposalShareButton(),
-        const SizedBox(width: 8),
-        const ProposalFavoriteButton(),
-        const Spacer(),
-        VoteButton(
-          onSelected: (action) {
-            final proposal = data.proposalRef;
-            final event = switch (action) {
-              VoteButtonActionRemoveDraft() => RemoveVoteEvent(proposal: proposal),
-              VoteButtonActionVote(:final type) => UpdateVoteEvent(proposal: proposal, type: type),
-            };
+    return SizedBox(
+      width: double.maxFinite,
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        runSpacing: 16,
+        children: [
+          const Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: 8,
+            children: [
+              ProposalShareButton(),
+              ProposalFavoriteButton(),
+            ],
+          ),
+          VoteButton(
+            onSelected: (action) {
+              final proposal = data.proposalRef;
+              final event = switch (action) {
+                VoteButtonActionRemoveDraft() => RemoveVoteEvent(proposal: proposal),
+                VoteButtonActionVote(:final type) => UpdateVoteEvent(
+                  proposal: proposal,
+                  type: type,
+                ),
+              };
 
-            context.read<VotingBallotBloc>().add(event);
-          },
-          data: data.voteButtonData,
-        ),
-      ],
+              context.read<VotingBallotBloc>().add(event);
+            },
+            data: data.voteButtonData,
+          ),
+        ],
+      ),
     );
   }
 }
