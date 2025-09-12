@@ -5,12 +5,12 @@ use std::{cmp::Reverse, sync::Arc};
 use cardano_chain_follower::StakeAddress;
 use dashmap::DashMap;
 use futures::{future, StreamExt};
+use poem_openapi::types::ParseFromJSON;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use tracing::error;
 
 use super::{
     cardano::{cip19_shelley_address::Cip19ShelleyAddress, nonce::Nonce},
-    common::types::generic::error_msg::ErrorMessage,
     response::{
         AllRegistration, Cip36Details, Cip36Registration, Cip36RegistrationList,
         Cip36RegistrationsForVotingPublicKey,
@@ -29,7 +29,10 @@ use crate::{
         },
         session::CassandraSession,
     },
-    service::common::types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey,
+    service::common::{
+        objects::generic::problem_report::ProblemReport,
+        types::generic::ed25519_public_key::Ed25519HexEncodedPublicKey,
+    },
 };
 
 /// Get registration given a stake key hash, it can be time specific based on asat param,
@@ -315,7 +318,9 @@ async fn get_invalid_registrations(
             payment_address,
             is_payable: row.is_payable.into(),
             cip15: (!row.cip36).into(),
-            errors: Some(ErrorMessage::from(row.problem_report)),
+            errors: ProblemReport::parse_from_json_string(&row.problem_report)
+                .map(Some)
+                .unwrap_or_default(),
         });
     }
 
@@ -607,7 +612,9 @@ async fn get_all_invalid_registrations(
             payment_address: payment_addr,
             is_payable: row.is_payable.into(),
             cip15: (!row.cip36).into(),
-            errors: Some(ErrorMessage::from(row.problem_report)),
+            errors: ProblemReport::parse_from_json_string(&row.problem_report)
+                .map(Some)
+                .unwrap_or_default(),
         };
 
         if let Some(mut v) = invalids_map.get_mut(&Ed25519HexEncodedPublicKey::try_from(

@@ -1,10 +1,8 @@
 //! OpenAPI Objects for Problem Report
 
-use std::str::FromStr;
-
 use catalyst_types::problem_report;
 use poem_openapi::{
-    types::{Example, ParseError, ParseFromJSON, ToJSON},
+    types::{Example, ToJSON},
     Object,
 };
 
@@ -164,14 +162,6 @@ impl From<problem_report::ProblemReport> for ProblemReport {
                 .map(|entry| entry.map(|entry| entry.clone().into()))
                 .collect(),
         )
-    }
-}
-
-impl FromStr for ProblemReport {
-    type Err = ParseError<Self>;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::parse_from_json_string(s)
     }
 }
 
