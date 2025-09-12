@@ -328,8 +328,8 @@ let compression_wasm_bindgen;
         wasm.closure211_externref_shim(arg0, arg1, arg2);
     }
 
-    function __wbg_adapter_103(arg0, arg1, arg2, arg3) {
-        wasm.closure259_externref_shim(arg0, arg1, arg2, arg3);
+    function __wbg_adapter_115(arg0, arg1, arg2, arg3) {
+        wasm.closure260_externref_shim(arg0, arg1, arg2, arg3);
     }
 
     const WorkerPoolFinalization = (typeof FinalizationRegistry === 'undefined')
@@ -577,7 +577,7 @@ let compression_wasm_bindgen;
                     const a = state0.a;
                     state0.a = 0;
                     try {
-                        return __wbg_adapter_103(a, state0.b, arg0, arg1);
+                        return __wbg_adapter_115(a, state0.b, arg0, arg1);
                     } finally {
                         state0.a = a;
                     }

@@ -96,9 +96,7 @@ class Bip32Ed25519XPrivateKey extends Equatable {
     return _bytes.verifySignature(
       data: message,
       signature: rust.Bip32Ed25519Signature(
-        sigBytes: rust.U8Array64(
-          Uint8List.fromList(signature.bytes),
-        ),
+        sigBytes: rust.U8Array64(Uint8List.fromList(signature.bytes)),
       ),
     );
   }
