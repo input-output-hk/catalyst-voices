@@ -4,7 +4,7 @@ import 'package:catalyst_voices_services/src/share/share_reviews_resource_url_re
 import 'package:catalyst_voices_services/src/share/strategy/clipboard_share_strategy.dart';
 import 'package:catalyst_voices_services/src/share/strategy/launch_share_strategy.dart';
 import 'package:catalyst_voices_services/src/share/strategy/share_strategy.dart';
-import 'package:flutter/foundation.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 abstract interface class ShareService {
   const factory ShareService(
@@ -49,7 +49,8 @@ final class ShareServiceImpl implements ShareService {
       ShareChannel.xTwitter ||
       ShareChannel.linkedin ||
       ShareChannel.facebook ||
-      ShareChannel.reddit when kIsWeb => const LaunchShareStrategy(),
+      ShareChannel.reddit when CatalystPlatform.isWeb => const LaunchShareStrategy(),
+      // TODO(dt-iohk): handle missing share options
       _ => throw UnimplementedError('Platform share is not implemented'),
     };
   }

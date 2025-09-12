@@ -153,7 +153,6 @@ class _Buttons extends StatelessWidget {
           foregroundColor: context.colorScheme.primary,
           child: Text(context.l10n.viewProposals),
         ),
-        const SizedBox(height: 24),
       ],
     );
   }

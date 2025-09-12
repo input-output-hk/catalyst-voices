@@ -28,6 +28,7 @@ import 'package:flutter/widgets.dart';
 class ResponsivePadding extends StatelessWidget {
   final Widget child;
   final Map<ResponsiveBreakpointKey, EdgeInsets> _paddings;
+  final EdgeInsets _fallback;
 
   ResponsivePadding({
     super.key,
@@ -42,8 +43,26 @@ class ResponsivePadding extends StatelessWidget {
          ResponsiveBreakpointKey.sm: sm,
          ResponsiveBreakpointKey.md: md,
          ResponsiveBreakpointKey.lg: lg,
-         ResponsiveBreakpointKey.other: other,
-       };
+       },
+       _fallback = other;
+
+  factory ResponsivePadding.only({
+    Key? key,
+    EdgeInsets? xs,
+    EdgeInsets? sm,
+    EdgeInsets? md,
+    EdgeInsets? lg,
+    EdgeInsets other = EdgeInsets.zero,
+    required Widget child,
+  }) => ResponsivePadding(
+    key: key,
+    xs: xs ?? other,
+    sm: sm ?? other,
+    md: md ?? other,
+    lg: lg ?? other,
+    other: other,
+    child: child,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +75,7 @@ class ResponsivePadding extends StatelessWidget {
       sm: _paddings[ResponsiveBreakpointKey.sm],
       md: _paddings[ResponsiveBreakpointKey.md],
       lg: _paddings[ResponsiveBreakpointKey.lg],
-      other: _paddings[ResponsiveBreakpointKey.other]!,
+      other: _fallback,
     );
   }
 }

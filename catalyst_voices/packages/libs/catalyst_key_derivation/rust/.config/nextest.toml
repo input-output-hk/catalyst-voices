@@ -47,3 +47,14 @@ store-success-output = true
 # Note that if a description can be extracted from the output, it is always stored in the
 # <description> element.
 store-failure-output = true
+
+[test-groups]
+serial-integration = { max-threads = 1 }
+
+[[profile.default.overrides]]
+filter = 'test(/^serial::/)'
+test-group = 'serial-integration'
+
+[[profile.ci.overrides]]
+filter = 'test(/^serial::/)'
+test-group = "serial-integration"

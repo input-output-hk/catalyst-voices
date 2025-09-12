@@ -37,6 +37,7 @@ class _AccountHeaderTile extends StatelessWidget {
         const SizedBox(width: 24),
         Expanded(
           child: Column(
+            spacing: 16,
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -48,8 +49,7 @@ class _AccountHeaderTile extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              if (data != null) ...[
-                const SizedBox(height: 16),
+              if (data != null)
                 CatalystIdText(
                   data,
                   isCompact: false,
@@ -58,7 +58,6 @@ class _AccountHeaderTile extends StatelessWidget {
                   labelStyle: context.textTheme.titleSmall,
                   backgroundColor: context.colors.onSurfaceNeutralOpaqueLv2,
                 ),
-              ],
             ],
           ),
         ),

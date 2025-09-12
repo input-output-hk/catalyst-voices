@@ -322,7 +322,7 @@ class _WalletSummaryDetails extends StatelessWidget {
               value: Row(
                 spacing: 6,
                 children: [
-                  Text(address),
+                  Flexible(child: Text(address, maxLines: 1, overflow: TextOverflow.ellipsis)),
                   if (clipboardAddress != null)
                     VoicesClipboardIconButton(clipboardData: clipboardAddress.toBech32()),
                 ],

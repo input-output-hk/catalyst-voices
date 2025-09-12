@@ -156,7 +156,7 @@ class _SubmitProposalForReviewDialogState extends State<SubmitProposalForReviewD
 
   @override
   Widget build(BuildContext context) {
-    return VoicesSinglePaneDialog(
+    return VoicesPanelDialog(
       constraints: const BoxConstraints(
         minWidth: 450,
         maxWidth: 450,

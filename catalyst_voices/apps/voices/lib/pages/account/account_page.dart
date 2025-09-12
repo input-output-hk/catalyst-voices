@@ -2,12 +2,15 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
+import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
+import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
 import 'package:catalyst_voices/pages/account/pending_email_change_dialog.dart';
 import 'package:catalyst_voices/pages/account/verification_email_send_dialog.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_action_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_email_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_header_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_keychain_tile.dart';
+import 'package:catalyst_voices/pages/account/widgets/account_page_grid.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_page_title.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_roles_tile.dart';
 import 'package:catalyst_voices/pages/account/widgets/account_status_banner.dart';
@@ -15,8 +18,10 @@ import 'package:catalyst_voices/pages/account/widgets/account_username_tile.dart
 import 'package:catalyst_voices/pages/spaces/appbar/actions/account_settings_action.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/actions/session_cta_action.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
@@ -50,42 +55,31 @@ class _AccountPageState extends State<AccountPage>
             child: ListView(
               padding: const EdgeInsets.all(24),
               children: [
-                const AccountPageTitle(
-                  key: Key('AccountPageTitle'),
+                const AccountPageTitle(key: Key('AccountPageTitle')),
+                ResponsiveSizedBox(
+                  xs: const SizedBox(height: 18),
+                  other: const SizedBox(height: 42),
                 ),
-                const SizedBox(height: 42),
-                const Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                const AccountPageGrid(
+                  key: ValueKey('AccountOverviewGrid'),
                   children: [
-                    Expanded(child: AccountHeaderTile()),
-                    SizedBox(width: 28),
-                    Expanded(child: AccountActionTile()),
+                    AccountHeaderTile(),
+                    AccountActionTile(),
                   ],
                 ),
-                const SizedBox(height: 40),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                ResponsiveSizedBox(
+                  xs: const SizedBox(height: 18),
+                  other: const SizedBox(height: 40),
+                ),
+                AccountPageGrid(
+                  key: const ValueKey('AccountDetailsGrid'),
                   children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const <Widget>[
-                          AccountUsernameTile(),
-                          AccountEmailTile(),
-                        ].separatedBy(const SizedBox(height: 20)).toList(),
-                      ),
-                    ),
-                    const SizedBox(width: 28),
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const <Widget>[
-                          AccountRolesTile(),
-                          AccountKeychainTile(
-                            key: Key('AccountKeychainTile'),
-                          ),
-                        ].separatedBy(const SizedBox(height: 20)).toList(),
-                      ),
+                    const AccountUsernameTile(),
+                    const AccountRolesTile(),
+                    const AccountEmailTile(),
+                    AccountKeychainTile(
+                      key: const Key('AccountKeychainTile'),
+                      onRemoveTap: _removeActiveKeychain,
                     ),
                   ],
                 ),
@@ -112,6 +106,37 @@ class _AccountPageState extends State<AccountPage>
     super.initState();
 
     unawaited(context.read<AccountCubit>().updateAccountDetails());
+  }
+
+  Future<void> _removeActiveKeychain() async {
+    final confirmed = await DeleteKeychainDialog.show(context);
+    if (!confirmed) {
+      return;
+    }
+
+    if (mounted) {
+      await context.read<AccountCubit>().deleteActiveKeychain();
+    }
+
+    if (mounted) {
+      unawaited(KeychainDeletedDialog.show(context));
+
+      // TODO(damian-molinski): refactor it. Should be inside AccountCubit and emit signals to page.
+      final phaseType = context.read<CampaignPhaseAwareCubit>().state.activeCampaignPhaseType;
+
+      switch (phaseType) {
+        case CampaignPhaseType.communityReview:
+        case CampaignPhaseType.communityVoting:
+          const VotingRoute($extra: true).go(context);
+        case null:
+        case CampaignPhaseType.proposalSubmission:
+        case CampaignPhaseType.votingRegistration:
+        case CampaignPhaseType.reviewRegistration:
+        case CampaignPhaseType.votingResults:
+        case CampaignPhaseType.projectOnboarding:
+          const DiscoveryRoute($extra: true).go(context);
+      }
+    }
   }
 
   void _showPendingEmailChangeDialog() {

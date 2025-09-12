@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/voices_panel_dialog.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
@@ -22,7 +22,7 @@ class VoicesDetailsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesSinglePaneDialog(
+    return VoicesPanelDialog(
       showClose: false,
       showBorder: true,
       constraints: constraints,

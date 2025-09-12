@@ -62,7 +62,7 @@ class _ProposalControls extends StatelessWidget {
       xs: (context) => const SizedBox(),
       other: (context) => Row(
         mainAxisSize: MainAxisSize.min,
-        spacing: 8,
+        spacing: 4,
         children: [
           const ProposalVersion(),
           const ProposalShareButton(),

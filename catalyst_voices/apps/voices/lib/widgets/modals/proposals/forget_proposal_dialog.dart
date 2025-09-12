@@ -163,7 +163,7 @@ class _ForgetProposalDialogState extends State<ForgetProposalDialog> {
   @override
   Widget build(BuildContext context) {
     const padding = EdgeInsets.symmetric(horizontal: 24);
-    return VoicesSinglePaneDialog(
+    return VoicesPanelDialog(
       constraints: const BoxConstraints(maxWidth: 450, maxHeight: 576),
       showClose: false,
       child: SingleChildScrollView(

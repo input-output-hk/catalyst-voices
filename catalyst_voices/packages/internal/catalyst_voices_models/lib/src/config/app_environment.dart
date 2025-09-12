@@ -1,11 +1,8 @@
 import 'package:catalyst_voices_models/src/config/env_vars/dart_define_env_vars.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-
-/// Fallback environment type used when an environment cannot be determined.
-/// Defaults to [AppEnvironmentType.relative] on web and [AppEnvironmentType.dev]
-/// on other platforms.
-const _fallbackEnvType = kIsWeb ? AppEnvironmentType.relative : AppEnvironmentType.dev;
+import 'package:flutter/services.dart';
 
 /// The base domain for the Project Catalyst services.
 const _projectCatalyst = 'projectcatalyst.io';
@@ -13,6 +10,13 @@ const _projectCatalyst = 'projectcatalyst.io';
 /// A regular expression to parse the environment name from a hostname.
 /// e.g., "app.dev.projectcatalyst.io" -> "dev"
 final _envRegExp = RegExp(r'app\.([a-z]+)\.projectcatalyst\.io', caseSensitive: false);
+
+/// Fallback environment type used when an environment cannot be determined.
+/// Defaults to [AppEnvironmentType.relative] on web and [AppEnvironmentType.dev]
+/// on other platforms.
+final _fallbackEnvType = CatalystPlatform.isWeb
+    ? AppEnvironmentType.relative
+    : AppEnvironmentType.dev;
 
 /// Represents the application's current runtime environment.
 ///
@@ -40,8 +44,16 @@ final class AppEnvironment extends Equatable {
   /// It looks for an 'envName' variable and maps it to an [AppEnvironmentType].
   /// If the variable is not found or is unsupported, it falls back to [_fallbackEnvType].
   factory AppEnvironment.fromEnv() {
-    final envVars = getDartEnvVars();
-    final envName = envVars.envName;
+    String? envName;
+
+    if (CatalystPlatform.isWeb) {
+      final envVars = getDartEnvVars();
+      envName = envVars.envName;
+    }
+    // For mobile and desktop we use the app flavor
+    else {
+      envName = appFlavor;
+    }
     final type = AppEnvironmentType.values.asNameMap()[envName];
 
     if (type == null && envName != null) {

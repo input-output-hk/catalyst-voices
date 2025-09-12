@@ -71,9 +71,7 @@ class _Footer extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 10),
-        VoicesLearnMoreTextButton(
-          onTap: onTap ?? () {},
-        ),
+        const VoicesLearnMoreTextButton(),
       ],
     );
   }

@@ -4,6 +4,7 @@ import 'package:catalyst_voices/widgets/cards/funds_detail_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' show MarkdownData;
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -24,8 +25,10 @@ class CurrentCampaign extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 120, top: 64, right: 120),
+        ResponsivePadding.only(
+          xs: const EdgeInsets.only(left: 20, top: 32, right: 20),
+          sm: const EdgeInsets.only(left: 42, top: 64, right: 42),
+          other: const EdgeInsets.only(left: 120, top: 64, right: 120),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -38,17 +41,28 @@ class CurrentCampaign extends StatelessWidget {
                   totalAsk: currentCampaignInfo.totalAsk,
                 ),
               ),
-              const SizedBox(height: 80),
+              ResponsiveSizedBox.only(
+                xs: const SizedBox(height: 30),
+                sm: const SizedBox(height: 48),
+                other: const SizedBox(height: 80),
+              ),
               const _SubTitle(),
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 32, bottom: 100),
+        ResponsivePadding.only(
+          xs: const EdgeInsets.only(top: 20, bottom: 32),
+          sm: const EdgeInsets.only(top: 32, bottom: 48),
+          other: const EdgeInsets.only(top: 32, bottom: 100),
           child: CampaignTimeline(
             key: const Key('CampaignTimeline'),
             timelineItems: currentCampaignInfo.timeline,
-            horizontalPadding: const SizedBox(width: 120),
+            horizontalPadding: ResponsiveBuilder<SizedBox>(
+              builder: (context, data) => data,
+              xs: const SizedBox(width: 20),
+              sm: const SizedBox(width: 48),
+              other: const SizedBox(width: 120),
+            ),
           ),
         ),
       ],

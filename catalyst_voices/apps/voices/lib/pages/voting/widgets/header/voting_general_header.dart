@@ -4,6 +4,7 @@ import 'package:catalyst_voices/pages/voting/widgets/header/voting_phase_progres
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class VotingGeneralHeader extends StatelessWidget {
@@ -19,7 +20,7 @@ class VotingGeneralHeader extends StatelessWidget {
     final theme = Theme.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 36),
         Text(
@@ -28,33 +29,39 @@ class VotingGeneralHeader extends StatelessWidget {
             color: theme.colors.textOnPrimaryLevel1,
           ),
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Padding(
-              padding: EdgeInsets.only(top: 4),
-              child: _CatalystFund(),
-            ),
-            if (showCategoryPicker)
-              const Padding(
-                padding: EdgeInsets.only(top: 7, right: 32),
-                child: VotingCategoryPickerSelector(),
-              ),
-          ],
-        ),
-        const SizedBox(height: 32),
-        const SizedBox(
-          height: 192,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 24,
+        Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            spacing: 16,
+            runSpacing: 12,
             children: [
-              VotingPhaseProgressCardSelector(),
-              AccountVotingPowerCardSelector(),
+              const _CatalystFund(),
+              if (showCategoryPicker)
+                ResponsivePadding.only(
+                  lg: const EdgeInsets.only(top: 3, right: 32),
+                  other: const EdgeInsets.only(top: 3),
+                  child: const VotingCategoryPickerSelector(),
+                ),
             ],
           ),
         ),
+        const SizedBox(height: 32),
+        const _Cards(),
       ],
+    );
+  }
+}
+
+class _Cards extends StatelessWidget {
+  const _Cards();
+
+  @override
+  Widget build(BuildContext context) {
+    return ResponsiveChild(
+      xs: (_) => const _SmallCards(),
+      sm: (_) => const _SmallCards(),
+      other: (_) => const _DesktopCards(),
     );
   }
 }
@@ -75,6 +82,39 @@ class _CatalystFund extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _DesktopCards extends StatelessWidget {
+  const _DesktopCards();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Wrap(
+      spacing: 24,
+      runSpacing: 16,
+      children: [
+        VotingPhaseProgressCardSelector(),
+        AccountVotingPowerCardSelector(),
+      ],
+    );
+  }
+}
+
+class _SmallCards extends StatelessWidget {
+  const _SmallCards();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 16,
+      children: [
+        VotingPhaseProgressCardSelector(),
+        AccountVotingPowerCardSelector(),
+      ],
     );
   }
 }

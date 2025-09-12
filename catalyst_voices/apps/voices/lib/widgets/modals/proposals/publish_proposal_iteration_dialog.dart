@@ -25,7 +25,7 @@ class PublishProposalIterationDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesSinglePaneDialog(
+    return VoicesPanelDialog(
       constraints: const BoxConstraints(
         minWidth: 450,
         maxWidth: 450,

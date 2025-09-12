@@ -35,7 +35,8 @@ void main() {
     late X509MetadataEnvelope<RegistrationData> envelope;
 
     setUpAll(() {
-      CatalystCompressionPlatform.instance = _FakeCatalystCompressionPlatform();
+      CatalystCompression.overrideBrotli(const _FakeCompressor());
+      CatalystCompression.overrideZstd(const _FakeCompressor());
     });
 
     setUp(() async {
@@ -477,14 +478,6 @@ class _FakeBip32Ed25519XSignature extends Fake implements kd.Bip32Ed25519XSignat
 
   @override
   CborValue toCbor() => CborBytes(bytes);
-}
-
-class _FakeCatalystCompressionPlatform extends CatalystCompressionPlatform {
-  @override
-  CatalystCompressor get brotli => const _FakeCompressor();
-
-  @override
-  CatalystCompressor get zstd => const _FakeCompressor();
 }
 
 final class _FakeCompressor implements CatalystCompressor {
