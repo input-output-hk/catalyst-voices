@@ -42,18 +42,20 @@ class _AccountVotingPowerCard extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+      constraints: const BoxConstraints(maxWidth: 400),
       decoration: BoxDecoration(
         color: theme.colors.elevationsOnSurfaceNeutralLv1White,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           VoicesAssets.icons.lightningBolt.buildIcon(
             color: theme.colors.textOnPrimaryLevel1,
             size: 24,
           ),
-          const Spacer(),
+          const SizedBox(height: 40),
           _VotingPowerLabelRow(
             votingPower: votingPower,
             labelStyle: labelStyle,
@@ -110,17 +112,24 @@ class _UpdatedAt extends StatelessWidget {
 
     return Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 4,
       children: [
         Text(
           context.l10n.updated,
           style: labelStyle,
         ),
-        TimezoneDateTimeText(
-          updatedAt,
-          formatter: (context, dateTime) => DateFormatter.formatFullDate24Format(dateTime),
-          style: theme.textTheme.labelMedium!.copyWith(color: theme.colors.textOnPrimaryLevel1),
+        ResponsiveBuilder<Axis>(
+          xs: Axis.vertical,
+          other: Axis.horizontal,
+          builder: (context, axis) {
+            return TimezoneDateTimeText(
+              updatedAt,
+              formatter: (context, dateTime) => DateFormatter.formatFullDate24Format(dateTime),
+              style: theme.textTheme.labelMedium!.copyWith(color: theme.colors.textOnPrimaryLevel1),
+              axis: axis,
+            );
+          },
         ),
       ],
     );
@@ -141,7 +150,6 @@ class _VotingPowerLabelRow extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Row(
-      mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
           width: _votingPowerWidth,
@@ -156,9 +164,11 @@ class _VotingPowerLabelRow extends StatelessWidget {
             ),
           ),
         ),
-        _Status(
-          status: votingPower.status,
-          labelStyle: labelStyle,
+        Flexible(
+          child: _Status(
+            status: votingPower.status,
+            labelStyle: labelStyle,
+          ),
         ),
       ],
     );
@@ -179,7 +189,6 @@ class _VotingPowerValueRow extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Row(
-      mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
           width: _votingPowerWidth,
@@ -190,9 +199,11 @@ class _VotingPowerValueRow extends StatelessWidget {
             ),
           ),
         ),
-        _UpdatedAt(
-          updatedAt: votingPower.updatedAt ?? DateTimeExt.now(),
-          labelStyle: labelStyle,
+        Flexible(
+          child: _UpdatedAt(
+            updatedAt: votingPower.updatedAt ?? DateTimeExt.now(),
+            labelStyle: labelStyle,
+          ),
         ),
       ],
     );

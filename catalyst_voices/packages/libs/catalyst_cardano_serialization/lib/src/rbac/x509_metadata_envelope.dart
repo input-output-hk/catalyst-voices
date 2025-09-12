@@ -3,6 +3,9 @@ import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
+import 'package:logging/logging.dart';
+
+final _logger = Logger('X509MetadataEnvelope');
 
 /// Deserializes the type [T] from cbor.
 ///
@@ -260,16 +263,18 @@ final class X509MetadataEnvelope<T> extends Equatable {
 
   static Future<List<int>?> _compressBrotli(List<int> bytes) async {
     try {
-      return await CatalystCompression.instance.brotli.compress(bytes);
-    } on CompressionNotSupportedException {
+      return await CatalystCompression.brotli.compress(bytes);
+    } catch (error, stackTrace) {
+      _logger.severe('compressBrotli', error, stackTrace);
       return null;
     }
   }
 
   static Future<List<int>?> _compressZstd(List<int> bytes) async {
     try {
-      return await CatalystCompression.instance.zstd.compress(bytes);
-    } on CompressionNotSupportedException {
+      return await CatalystCompression.zstd.compress(bytes);
+    } catch (error, stackTrace) {
+      _logger.severe('compressZstd', error, stackTrace);
       return null;
     }
   }
@@ -284,14 +289,14 @@ final class X509MetadataEnvelope<T> extends Equatable {
     final brotliCbor = map[const CborSmallInt(11)] as CborList?;
     if (brotliCbor != null) {
       final bytes = _unchunkCborBytes(brotliCbor);
-      final uncompressedBytes = await CatalystCompression.instance.brotli.decompress(bytes);
+      final uncompressedBytes = await CatalystCompression.brotli.decompress(bytes);
       return cbor.decode(uncompressedBytes);
     }
 
     final zstdCbor = map[const CborSmallInt(12)] as CborList?;
     if (zstdCbor != null) {
       final bytes = _unchunkCborBytes(zstdCbor);
-      final uncompressedBytes = await CatalystCompression.instance.zstd.decompress(bytes);
+      final uncompressedBytes = await CatalystCompression.zstd.decompress(bytes);
       return cbor.decode(uncompressedBytes);
     }
 
