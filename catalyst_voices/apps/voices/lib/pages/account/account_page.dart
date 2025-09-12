@@ -118,9 +118,9 @@ class _AccountPageState extends State<AccountPage>
       await context.read<AccountCubit>().deleteActiveKeychain();
     }
 
-    if (mounted) unawaited(KeychainDeletedDialog.show(context));
-
     if (mounted) {
+      unawaited(KeychainDeletedDialog.show(context));
+
       // TODO(damian-molinski): refactor it. Should be inside AccountCubit and emit signals to page.
       final phaseType = context.read<CampaignPhaseAwareCubit>().state.activeCampaignPhaseType;
 
