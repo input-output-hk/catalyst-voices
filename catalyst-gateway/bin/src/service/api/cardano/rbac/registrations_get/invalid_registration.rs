@@ -2,7 +2,7 @@
 
 use cardano_chain_follower::{hashes::TransactionId, Slot};
 use catalyst_types::uuid::UuidV4;
-use poem_openapi::{types::Example, Object};
+use poem_openapi::{types::{Example, ParseFromJSON}, Object};
 
 use crate::{
     db::index::queries::rbac::get_rbac_invalid_registrations::Query,
@@ -10,7 +10,7 @@ use crate::{
         objects::generic::problem_report::ProblemReport,
         types::{
             cardano::{slot_no::SlotNo, transaction_id::TxnId, txn_index::TxnIndex},
-            generic::{date_time::DateTime, error_msg::ErrorMessage, uuidv4::UUIDv4},
+            generic::{date_time::DateTime, uuidv4::UUIDv4},
         },
     },
     settings::Settings,
@@ -63,7 +63,7 @@ impl From<Query> for InvalidRegistration {
             txn_index: q.txn_index.into(),
             previous_txn: q.prv_txn_id.map(|t| TransactionId::from(t).into()),
             purpose: q.purpose.map(|p| UuidV4::from(p).into()),
-            report: q.problem_report.into(),
+            report: ParseFromJSON::parse_from_json_string(&q.problem_report).unwrap_or_default(),
         }
     }
 }

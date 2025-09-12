@@ -1,8 +1,10 @@
 //! OpenAPI Objects for Problem Report
 
+use std::str::FromStr;
+
 use catalyst_types::problem_report;
 use poem_openapi::{
-    types::{Example, ToJSON},
+    types::{Example, ParseError, ParseFromJSON, ToJSON},
     Object,
 };
 
@@ -130,14 +132,6 @@ impl From<problem_report::Entry> for ProblemReportEntry {
     }
 }
 
-impl From<serde_json::Value> for ProblemReportEntry {
-    fn from(value: serde_json::Value) -> Self {
-        Self {
-            ..Default::default()
-        }
-    }
-}
-
 impl Example for ProblemReportEntry {
     fn example() -> Self {
         Self {
@@ -173,9 +167,11 @@ impl From<problem_report::ProblemReport> for ProblemReport {
     }
 }
 
-impl From<String> for ProblemReport {
-    fn from(value: String) -> Self {
-        unimplemented!()
+impl FromStr for ProblemReport {
+    type Err = ParseError<Self>;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::parse_from_json_string(s)
     }
 }
 
