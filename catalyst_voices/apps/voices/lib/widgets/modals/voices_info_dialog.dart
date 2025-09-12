@@ -1,21 +1,20 @@
 import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/voices_panel_dialog.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-/// Opinionated, single panel, dialog that is tailored for desktop
-/// form factors.
+/// Opinionated, single panel, dialog that adapts to current form factor.
 ///
-/// Call [VoicesDialog.show] with [VoicesDesktopInfoDialog] in order
-/// to show it.
-class VoicesDesktopInfoDialog extends StatelessWidget {
+/// Call [VoicesDialog.show] with [VoicesInfoDialog] in order to show it.
+class VoicesInfoDialog extends StatelessWidget {
   final Widget icon;
   final Widget title;
   final Widget message;
   final Widget? subMessage;
   final Widget action;
 
-  const VoicesDesktopInfoDialog({
+  const VoicesInfoDialog({
     super.key,
     required this.icon,
     required this.title,
@@ -53,44 +52,48 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
     );
 
     return VoicesPanelDialog(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 83),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 36),
-              IconTheme(
-                data: iconThemeData,
-                child: icon,
-              ),
-              const SizedBox(height: 8),
-              DefaultTextStyle(
-                style: titleStyle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                child: title,
-              ),
-              const SizedBox(height: 24),
-              DefaultTextStyle(
-                style: messageStyle,
-                textAlign: TextAlign.center,
-                child: message,
-              ),
-              if (subMessage != null) ...[
-                const SizedBox(height: 15),
-                DefaultTextStyle(
-                  style: subMessageStyle,
-                  textAlign: TextAlign.center,
-                  child: subMessage,
+      child: ResponsiveBuilder<EdgeInsets>(
+        xs: const EdgeInsets.symmetric(horizontal: 24),
+        other: const EdgeInsets.symmetric(horizontal: 83),
+        builder: (context, padding) {
+          return SingleChildScrollView(
+            padding: padding,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 36),
+                IconTheme(
+                  data: iconThemeData,
+                  child: icon,
                 ),
+                const SizedBox(height: 8),
+                DefaultTextStyle(
+                  style: titleStyle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  child: title,
+                ),
+                const SizedBox(height: 24),
+                DefaultTextStyle(
+                  style: messageStyle,
+                  textAlign: TextAlign.center,
+                  child: message,
+                ),
+                if (subMessage != null) ...[
+                  const SizedBox(height: 15),
+                  DefaultTextStyle(
+                    style: subMessageStyle,
+                    textAlign: TextAlign.center,
+                    child: subMessage,
+                  ),
+                ],
+                const SizedBox(height: 24),
+                action,
+                const SizedBox(height: 20),
               ],
-              const SizedBox(height: 24),
-              action,
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

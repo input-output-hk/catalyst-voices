@@ -19,7 +19,7 @@ class SubmitCommentErrorDialog {
         name: '/comments/submit-error',
       ),
       builder: (context) {
-        return VoicesDesktopInfoDialog(
+        return VoicesInfoDialog(
           icon: VoicesAssets.icons.exclamation.buildIcon(
             color: Theme.of(context).colors.iconsWarning,
           ),
