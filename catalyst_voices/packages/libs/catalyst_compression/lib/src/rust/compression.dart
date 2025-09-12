@@ -9,7 +9,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 // These functions are ignored because they are not marked as `pub`: `brotli_compress_helper`, `brotli_decompress_helper`, `zstd_compress_helper`, `zstd_decompress_helper`
 
 /// Compress the bytes with brotli compression algorithm.
-/// Runs the computation by a shared thread poll to avoid blocking the main thread.
+/// Runs the computation by a shared thread pool to avoid blocking the main thread.
 ///
 /// # Arguments
 ///
@@ -26,7 +26,7 @@ Future<Uint8List> brotliCompress({required List<int> bytes}) =>
     RustLib.instance.api.crateCompressionBrotliCompress(bytes: bytes);
 
 /// Decompress the bytes with brotli compression algorithm.
-/// Runs the computation by a shared thread poll to avoid blocking the main thread.
+/// Runs the computation by a shared thread pool to avoid blocking the main thread.
 ///
 /// # Arguments
 ///
@@ -43,7 +43,7 @@ Future<Uint8List> brotliDecompress({required List<int> bytes}) =>
     RustLib.instance.api.crateCompressionBrotliDecompress(bytes: bytes);
 
 /// Compress the bytes with zstd compression algorithm.
-/// Runs the computation by a shared thread poll to avoid blocking the main thread.
+/// Runs the computation by a shared thread pool to avoid blocking the main thread.
 ///
 /// # Arguments
 ///
@@ -60,7 +60,7 @@ Future<Uint8List> zstdCompress({required List<int> bytes}) =>
     RustLib.instance.api.crateCompressionZstdCompress(bytes: bytes);
 
 /// Decompress the bytes with zstd compression algorithm.
-/// Runs the computation by a shared thread poll to avoid blocking the main thread.
+/// Runs the computation by a shared thread pool to avoid blocking the main thread.
 ///
 /// # Arguments
 ///

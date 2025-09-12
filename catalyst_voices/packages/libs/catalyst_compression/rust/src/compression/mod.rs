@@ -5,7 +5,7 @@ use std::sync::LazyLock;
 use flutter_rust_bridge::{spawn_blocking_with, DefaultHandler, SimpleThreadPool};
 
 /// Compress the bytes with brotli compression algorithm.
-/// Runs the computation by a shared thread poll to avoid blocking the main thread.
+/// Runs the computation by a shared thread pool to avoid blocking the main thread.
 ///  
 /// # Arguments
 ///
@@ -37,7 +37,7 @@ fn brotli_compress_helper(mut bytes: &[u8]) -> anyhow::Result<Vec<u8>> {
 }
 
 /// Decompress the bytes with brotli compression algorithm.
-/// Runs the computation by a shared thread poll to avoid blocking the main thread.
+/// Runs the computation by a shared thread pool to avoid blocking the main thread.
 ///  
 /// # Arguments
 ///
@@ -68,7 +68,7 @@ fn brotli_decompress_helper(mut bytes: &[u8]) -> anyhow::Result<Vec<u8>> {
 }
 
 /// Compress the bytes with zstd compression algorithm.
-/// Runs the computation by a shared thread poll to avoid blocking the main thread.
+/// Runs the computation by a shared thread pool to avoid blocking the main thread.
 ///  
 /// # Arguments
 ///
@@ -98,7 +98,7 @@ fn zstd_compress_helper(bytes: &[u8]) -> anyhow::Result<Vec<u8>> {
 }
 
 /// Decompress the bytes with zstd compression algorithm.
-/// Runs the computation by a shared thread poll to avoid blocking the main thread.
+/// Runs the computation by a shared thread pool to avoid blocking the main thread.
 ///  
 /// # Arguments
 ///
