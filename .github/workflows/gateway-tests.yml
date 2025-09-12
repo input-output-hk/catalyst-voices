@@ -170,11 +170,6 @@ jobs:
       - name: Spin up devnet
         if: ${{ steps.images.conclusion == 'success' }}
         run: |
-          export ENV_TARGET=Devnet
-          export SCYLLA_CMD="--smp 2 --memory 1G --overprovisioned 1  --rpc-address 0.0.0.0 --broadcast-rpc-address 127.0.0.1 --api-address 0.0.0.0 --alternator-address 0.0.0.0"
-          export EVENT_DB_HOST=localhost
-          export INDEX_DB_URL=localhost
-          export API_SPEC="http://localhost:3030/docs/cat-gateway.json"
           docker compose -f catalyst-gateway/tests/docker-compose.yml -f catalyst-gateway/tests/docker-compose-localhost.yml --profile devnet up cat-devnet -d
 
       - name: Wait for cat-devnet to become healthy
@@ -197,6 +192,7 @@ jobs:
       - name: Spin up catalyst-gateway
         id: gateway-started
         run: |
+          export ENV_TARGET=Devnet
           docker compose -f catalyst-gateway/tests/docker-compose.yml -f catalyst-gateway/tests/docker-compose-localhost.yml --profile devnet up cat-gateway -d
 
       - name: Wait for cat-gateway to become healthy
