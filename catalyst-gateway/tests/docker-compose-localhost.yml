@@ -1,0 +1,50 @@
+# This docker compose file is a temporary workaround for the devnet environment.
+# It exposes the services on localhost due to a current limitation in how the
+# Mithril aggregator serves snapshots.
+# This file can be removed once the aggregator is updated, allowing services
+# to communicate over the standard Docker network.
+
+services:
+  cat-devnet:
+    network_mode: host
+
+  event-db:
+    network_mode: host
+    profiles:
+      - devnet
+
+  event-db-v1-migrations:
+    network_mode: host
+    profiles:
+      - devnet
+
+  event-db-migrations:
+    network_mode: host
+    profiles:
+      - devnet
+
+  scylla-node:
+    command: --smp 2 --memory 1G --overprovisioned 1  --rpc-address 0.0.0.0 --broadcast-rpc-address 127.0.0.1 --api-address 0.0.0.0 --alternator-address 0.0.0.0
+    network_mode: host
+    profiles:
+      - devnet
+
+  cat-gateway:
+    environment:
+      - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev
+      - CASSANDRA_PERSISTENT_URL=localhost:9042
+      - CASSANDRA_VOLATILE_URL=localhost:9042
+      - CHAIN_NETWORK=Devnet
+    depends_on:
+      cat-devnet:
+        condition: service_healthy
+    network_mode: host
+    profiles:
+      - devnet
+
+  schemathesis-runner:
+    environment:
+      - API_SPEC=http://localhost:3030/docs/cat-gateway.json
+    network_mode: host
+    profiles:
+      - devnet
