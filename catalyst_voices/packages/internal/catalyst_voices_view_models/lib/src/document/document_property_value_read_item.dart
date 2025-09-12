@@ -41,7 +41,7 @@ final class DocumentTextListItem extends DocumentPropertyValueListItem<String> {
     required super.id,
     required super.title,
     required super.value,
-    this.isMultiline = false,
+    this.isMultiline = true,
   });
 
   @override

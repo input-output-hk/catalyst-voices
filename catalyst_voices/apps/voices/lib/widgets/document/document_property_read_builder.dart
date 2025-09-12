@@ -59,8 +59,6 @@ class _DocumentPropertyReadBuilderListTile extends StatelessWidget {
         if (title.isNotEmpty) ...[
           Text(
             title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
             style: textTheme.bodySmall?.copyWith(
               color: colors.textOnPrimaryLevel1,
             ),
@@ -266,7 +264,6 @@ class _DocumentPropertyReadBuilderState extends State<DocumentPropertyReadBuilde
           id: property.nodeId,
           title: schema.title,
           value: text,
-          isMultiline: true,
         );
       case DocumentMultiLineTextEntryMarkdownSchema():
         final text = schema.castValue(value);
