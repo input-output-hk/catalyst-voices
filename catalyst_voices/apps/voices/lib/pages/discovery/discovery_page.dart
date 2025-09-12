@@ -74,7 +74,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   }
 
   @override
-  void didUpdateWidget(covariant DiscoveryPage oldWidget) {
+  void didUpdateWidget(DiscoveryPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (widget.keychainDeleted && widget.keychainDeleted != oldWidget.keychainDeleted) {
