@@ -13,55 +13,53 @@ class _LargeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        spacing: 20,
-        children: [
-          ConstrainedBox(
-            constraints: const BoxConstraints.tightFor(width: 730),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _BodyHeader(
-                  title: proposal.title,
-                  lastUpdate: proposal.updateDate,
-                ),
-                ProposalIterationStageChip(
-                  status: proposal.publish,
-                  versionNumber: proposal.iteration,
-                  useInternalBackground: !isSubmitted,
-                ),
-              ],
-            ),
-          ),
-          Row(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      spacing: 20,
+      children: [
+        ConstrainedBox(
+          constraints: const BoxConstraints.tightFor(width: 730),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            spacing: 30,
             children: [
-              SizedBox(
-                width: 260,
-                child: _CampaignData(
-                  leadValue: proposal.category,
-                  subValue: context.l10n.fundNoCategory(proposal.fundNumber),
-                ),
+              _BodyHeader(
+                title: proposal.title,
+                lastUpdate: proposal.updateDate,
               ),
-              _CampaignData(
-                leadValue: CryptocurrencyFormatter.decimalFormat(proposal.fundsRequested),
-                subValue: context.l10n.proposalViewFundingRequested,
-              ),
-              _CampaignData(
-                leadValue: commentsCount == 0
-                    ? context.l10n.notAvailableAbbr
-                    : commentsCount.toString(),
-                subValue: context.l10n.comments(commentsCount),
+              ProposalIterationStageChip(
+                status: proposal.publish,
+                versionNumber: proposal.iteration,
+                useInternalBackground: !isSubmitted,
               ),
             ],
           ),
-          // This allows to center previous row
-          const SizedBox.shrink(),
-        ],
-      ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          spacing: 30,
+          children: [
+            SizedBox(
+              width: 260,
+              child: _CampaignData(
+                leadValue: proposal.category,
+                subValue: context.l10n.fundNoCategory(proposal.fundNumber),
+              ),
+            ),
+            _CampaignData(
+              leadValue: CryptocurrencyFormatter.decimalFormat(proposal.fundsRequested),
+              subValue: context.l10n.proposalViewFundingRequested,
+            ),
+            _CampaignData(
+              leadValue: commentsCount == 0
+                  ? context.l10n.notAvailableAbbr
+                  : commentsCount.toString(),
+              subValue: context.l10n.comments(commentsCount),
+            ),
+          ],
+        ),
+        // This allows to center previous row
+        const SizedBox.shrink(),
+      ],
     );
   }
 }
@@ -79,51 +77,49 @@ class _MediumScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 10,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _BodyHeader(
-                title: proposal.title,
-                lastUpdate: proposal.updateDate,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 10,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _BodyHeader(
+              title: proposal.title,
+              lastUpdate: proposal.updateDate,
+            ),
+            ProposalIterationStageChip(
+              status: proposal.publish,
+              versionNumber: proposal.iteration,
+              useInternalBackground: !isSubmitted,
+            ),
+          ],
+        ),
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          spacing: 30,
+          runSpacing: 10,
+          children: [
+            SizedBox(
+              width: 260,
+              child: _CampaignData(
+                leadValue: proposal.category,
+                subValue: context.l10n.fundNoCategory(proposal.fundNumber),
               ),
-              ProposalIterationStageChip(
-                status: proposal.publish,
-                versionNumber: proposal.iteration,
-                useInternalBackground: !isSubmitted,
-              ),
-            ],
-          ),
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            spacing: 30,
-            runSpacing: 10,
-            children: [
-              SizedBox(
-                width: 260,
-                child: _CampaignData(
-                  leadValue: proposal.category,
-                  subValue: context.l10n.fundNoCategory(proposal.fundNumber),
-                ),
-              ),
-              _CampaignData(
-                leadValue: CryptocurrencyFormatter.decimalFormat(proposal.fundsRequested),
-                subValue: context.l10n.proposalViewFundingRequested,
-              ),
-              _CampaignData(
-                leadValue: commentsCount == 0
-                    ? context.l10n.notAvailableAbbr
-                    : commentsCount.toString(),
-                subValue: context.l10n.comments(commentsCount),
-              ),
-            ],
-          ),
-        ],
-      ),
+            ),
+            _CampaignData(
+              leadValue: CryptocurrencyFormatter.decimalFormat(proposal.fundsRequested),
+              subValue: context.l10n.proposalViewFundingRequested,
+            ),
+            _CampaignData(
+              leadValue: commentsCount == 0
+                  ? context.l10n.notAvailableAbbr
+                  : commentsCount.toString(),
+              subValue: context.l10n.comments(commentsCount),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -141,46 +137,44 @@ class _SmallScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: 10,
-        children: [
-          _BodyHeader(
-            title: proposal.title,
-            lastUpdate: proposal.updateDate,
-          ),
-          ProposalIterationStageChip(
-            status: proposal.publish,
-            versionNumber: proposal.iteration,
-            useInternalBackground: !isSubmitted,
-          ),
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            runSpacing: 10,
-            spacing: 30,
-            children: [
-              SizedBox(
-                width: 260,
-                child: _CampaignData(
-                  leadValue: proposal.category,
-                  subValue: context.l10n.fundNoCategory(proposal.fundNumber),
-                ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 10,
+      children: [
+        _BodyHeader(
+          title: proposal.title,
+          lastUpdate: proposal.updateDate,
+        ),
+        ProposalIterationStageChip(
+          status: proposal.publish,
+          versionNumber: proposal.iteration,
+          useInternalBackground: !isSubmitted,
+        ),
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          runSpacing: 10,
+          spacing: 30,
+          children: [
+            SizedBox(
+              width: 260,
+              child: _CampaignData(
+                leadValue: proposal.category,
+                subValue: context.l10n.fundNoCategory(proposal.fundNumber),
               ),
-              _CampaignData(
-                leadValue: CryptocurrencyFormatter.decimalFormat(proposal.fundsRequested),
-                subValue: context.l10n.proposalViewFundingRequested,
-              ),
-              _CampaignData(
-                leadValue: commentsCount == 0
-                    ? context.l10n.notAvailableAbbr
-                    : commentsCount.toString(),
-                subValue: context.l10n.comments(commentsCount),
-              ),
-            ],
-          ),
-        ],
-      ),
+            ),
+            _CampaignData(
+              leadValue: CryptocurrencyFormatter.decimalFormat(proposal.fundsRequested),
+              subValue: context.l10n.proposalViewFundingRequested,
+            ),
+            _CampaignData(
+              leadValue: commentsCount == 0
+                  ? context.l10n.notAvailableAbbr
+                  : commentsCount.toString(),
+              subValue: context.l10n.comments(commentsCount),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

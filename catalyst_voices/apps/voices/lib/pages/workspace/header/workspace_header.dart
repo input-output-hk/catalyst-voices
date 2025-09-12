@@ -32,19 +32,16 @@ class _HeaderActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const CreateProposalButton(showTrailingIcon: true),
-          const SizedBox(width: 8),
-          const _ImportProposalButton(),
-          const SizedBox(width: 8),
-          _TimelineToggleButton(
-            onPressed: onTap,
-          ),
-        ],
-      ),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 8,
+      children: [
+        const CreateProposalButton(showTrailingIcon: true),
+        const _ImportProposalButton(),
+        _TimelineToggleButton(
+          onPressed: onTap,
+        ),
+      ],
     );
   }
 }

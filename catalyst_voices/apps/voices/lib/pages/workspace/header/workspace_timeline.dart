@@ -1,12 +1,11 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
+import 'package:catalyst_voices/pages/workspace/header/workspace_campaign_timeline.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
-import 'package:catalyst_voices/widgets/campaign_timeline/campaign_timeline.dart';
 import 'package:catalyst_voices/widgets/gesture/voices_gesture_detector.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class WorkspaceTimeline extends StatelessWidget {
@@ -84,7 +83,13 @@ class _LargeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Row(
       children: [
-        _ViewComments(),
+        _ViewComments(
+          padding: EdgeInsets.only(right: 24),
+          boxConstraints: BoxConstraints(
+            maxWidth: 300,
+            maxHeight: 190,
+          ),
+        ),
         Expanded(
           child: _Timeline(),
         ),
@@ -124,16 +129,7 @@ class _Timeline extends StatelessWidget {
         color: context.colors.onSurfaceNeutralOpaqueLv0.withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: BlocSelector<WorkspaceBloc, WorkspaceState, List<CampaignTimelineViewModel>>(
-        selector: (state) {
-          return state.timelineItems;
-        },
-        builder: (context, timelineItems) {
-          return CampaignTimeline(
-            timelineItems: timelineItems,
-          );
-        },
-      ),
+      child: const WorkspaceCampaignTimeline(),
     );
   }
 }
@@ -143,11 +139,8 @@ class _ViewComments extends StatelessWidget {
   final BoxConstraints boxConstraints;
 
   const _ViewComments({
-    this.padding = const EdgeInsets.only(right: 24),
-    this.boxConstraints = const BoxConstraints(
-      maxWidth: 300,
-      maxHeight: 190,
-    ),
+    required this.padding,
+    required this.boxConstraints,
   });
 
   @override

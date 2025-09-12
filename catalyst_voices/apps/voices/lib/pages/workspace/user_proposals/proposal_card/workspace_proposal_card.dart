@@ -42,12 +42,10 @@ class WorkspaceProposalCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _Body(proposal),
-              Offstage(
-                offstage: isSubmitted || isLocalDraft || proposal.versions.length < 2,
-                child: ProposalIterationHistory(
+              if (!isSubmitted || !isLocalDraft || proposal.versions.length > 2)
+                ProposalIterationHistory(
                   proposal: proposal,
                 ),
-              ),
             ],
           ),
         ),
@@ -67,7 +65,7 @@ class _Body extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _WorkspaceProposalCardResponsiveness(proposal),
+        Expanded(child: _WorkspaceProposalCardResponsiveness(proposal)),
         ProposalMenuActionButton(
           ref: proposal.selfRef,
           proposalPublish: proposal.publish,
@@ -102,11 +100,8 @@ class _ProposalSubmitState extends InheritedWidget {
       isSubmitted ? context.colors.textOnPrimaryWhite : context.colors.textOnPrimaryLevel1;
 
   @override
-  bool updateShouldNotify(covariant _ProposalSubmitState oldWidget) {
-    if (oldWidget.isSubmitted != isSubmitted) {
-      return true;
-    }
-    return false;
+  bool updateShouldNotify(_ProposalSubmitState oldWidget) {
+    return oldWidget.isSubmitted != isSubmitted;
   }
 
   static _ProposalSubmitState? of(BuildContext context) {
