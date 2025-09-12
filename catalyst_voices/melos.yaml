@@ -9,9 +9,9 @@ packages:
 
 ignore:
   # ignore flutter_rust_bridge packages that are non-conformant with melos
-  - packages/libs/catalyst_key_derivation/example/**
+  - /**/cargokit/**
   # ignore temporary packages that are non-conformant with melos
-  - apps/voices/build/**
+  - /**/build/**
 
 permittedLicenses:
   - MIT
@@ -41,16 +41,12 @@ packageLicenseOverride:
   catalyst_cardano_serialization: Apache-2.0
   catalyst_cardano_platform_interface: Apache-2.0
   catalyst_compression: Apache-2.0
-  catalyst_compression_web: Apache-2.0
-  catalyst_cardano_web: Apache-2.0
-  catalyst_compression_platform_interface: Apache-2.0
   catalyst_key_derivation: Apache-2.0
-  catalyst_key_derivation_web: Apache-2.0
-  catalyst_key_derivation_platform_interface: Apache-2.0
   catalyst_voices_assets: Apache-2.0
   catalyst_voices_assets_example: Apache-2.0
   catalyst_cardano: Apache-2.0
   catalyst_cardano_example: Apache-2.0
+  catalyst_cardano_web: Apache-2.0
   catalyst_voices_localization: Apache-2.0
   catalyst_voices_models: Apache-2.0
   example: Apache-2.0
@@ -125,7 +121,11 @@ command:
           url: https://github.com/input-output-hk/flutter-quill
           path: flutter_quill_extensions
           ref: 10be2c8d1fb0d7728183fc883e133b5b48251d62
-      flutter_rust_bridge: 2.11.1
+      flutter_rust_bridge:
+        git:
+          url: https://github.com/dt-iohk/flutter_rust_bridge
+          ref: 64678315e8f5a877fc7b78524d9441cd05f42d65
+          path: frb_dart/
       flutter_secure_storage: ^9.2.4
       formz: ^0.8.0
       google_fonts: ^6.3.0

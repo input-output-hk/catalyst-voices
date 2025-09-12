@@ -38,6 +38,7 @@ This repository contains the Catalyst Voices app and packages.
   * [Visual Studio Code](https://flutter.dev/docs/get-started/editor?tab=vscode)
   * [Android Studio / IntelliJ](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
   * [Emacs](https://docs.flutter.dev/get-started/editor?tab=emacs)
+* [Rust](https://rustup.rs/): 1.80.0+
 
 ❗️We recommend using **Visual Studio Code** as the **default editor** for this project.
 
