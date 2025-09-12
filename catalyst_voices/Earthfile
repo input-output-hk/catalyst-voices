@@ -184,6 +184,11 @@ PREPARE_BUILD_ARGS:
             if echo "$tag" | grep -q "+"; then \
                 _build_number=$(echo "$tag" | cut -d"+" -f2 | cut -d"-" -f1); \
             fi; \
+
+            if [ "$allow_build_name_suffix" = "true" ]; then
+                _suffix=$(echo "$tag" | sed -n "s/.*\(-\S\+\)/\1/p");
+                _build_name="${_build_name}${_suffix}";
+            fi; \
         fi
 
         FINAL_BUILD_NAME=${_build_name:-"0.1.0"}; \
