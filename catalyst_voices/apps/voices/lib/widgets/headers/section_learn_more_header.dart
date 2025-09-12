@@ -50,7 +50,7 @@ class SectionLearnMoreHeader extends StatelessWidget with LaunchUrlMixin {
             ),
           ),
           const Spacer(),
-          VoicesLearnMoreTextButton.url(url: learnMoreUrl),
+          VoicesLearnMoreTextButton(uri: learnMoreUrl.getUri()),
         ],
       ),
     );

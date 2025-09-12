@@ -48,10 +48,10 @@ class _LearnMore extends StatelessWidget {
   Widget build(BuildContext context) {
     return ResponsiveChild(
       xs: (context) {
-        return VoicesLearnMoreIconButton.url(url: VoicesConstants.myAccountUrl);
+        return VoicesLearnMoreIconButton(uri: VoicesConstants.myAccountUrl.getUri());
       },
       other: (context) {
-        return VoicesLearnMoreTextButton.url(url: VoicesConstants.myAccountUrl);
+        return VoicesLearnMoreTextButton(uri: VoicesConstants.myAccountUrl.getUri());
       },
     );
   }

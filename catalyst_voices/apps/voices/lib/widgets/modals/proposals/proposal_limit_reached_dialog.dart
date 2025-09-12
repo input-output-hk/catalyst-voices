@@ -162,9 +162,7 @@ class _RightSide extends StatelessWidget with LaunchUrlMixin {
         _HeadsUpInfo(context.l10n.proposalsLimitReachedPoint3),
         _HeadsUpInfo(context.l10n.proposalsLimitReachedPoint4),
         const SizedBox(height: 32),
-        VoicesLearnMoreFilledButton.url(
-          url: VoicesConstants.proposalPublishingDocsUrl,
-        ),
+        VoicesLearnMoreFilledButton(uri: VoicesConstants.proposalPublishingDocsUrl.getUri()),
         const Spacer(),
         _Countdown(date: date),
         const SizedBox(height: 10),
