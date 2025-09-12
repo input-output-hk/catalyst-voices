@@ -17,6 +17,22 @@ permissions:
   pull-requests: write
 
 jobs:
+  paths-filter:
+    if: ${{ github.event.pull_request }}
+    runs-on: ubuntu-latest
+    outputs:
+      catalyst-gateway: ${{ steps.filter.outputs.catalyst-gateway }}
+      catalyst-voices: ${{ steps.filter.outputs.catalyst-voices }}
+    steps:
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            catalyst-voices:
+              - 'catalyst_voices/**'
+            catalyst-gateway:
+              - 'catalyst-gateway/**'
+
   reject:
     if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
@@ -43,12 +59,17 @@ jobs:
       forge_version: 0.21.0
       release_only: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
 
-  tests:
-    needs: ci
-    name: Cat-Gateway integration tests
+  gateway-integration-tests:
+    needs: [ci, paths-filter]
+    if: ${{ needs.paths-filter.outputs.catalyst-gateway == 'true' || github.base_ref == 'main'}}
     uses: ./.github/workflows/gateway-tests.yml
 
-  test_reporting:
-    if: ${{ !github.event.pull_request.draft && always() }}
-    needs: tests
+  voices-integration-tests:
+    needs: [ci, paths-filter]
+    if: ${{ needs.paths-filter.outputs.catalyst-voices == 'true' || github.base_ref == 'main' }}
+    uses: ./.github/workflows/voices-tests.yml
+
+  test-reporting:
+    needs: [ci, voices-integration-tests, gateway-integration-tests ]
+    if: ${{ github.base_ref == 'main' }}
     uses: ./.github/workflows/generate-allure-report.yml

@@ -1,12 +1,12 @@
-name: Cat Gateway integration tests
+name: Catalyst Gateway integration tests
 
 on:
   workflow_call:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  group: gateway-tests-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
-  
+
 env:
   REPORT_EXT: .junit-report.xml
   COVERAGE_EXT: .coverage.info
@@ -46,7 +46,7 @@ jobs:
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
         with:
           command: run
-          args: ./catalyst-gateway/tests/+prepare-all-images
+          args: ./catalyst-gateway/tests/+all-images
 
       - name: Rust integration tests
         if: ${{ steps.images.conclusion == 'success' }}
@@ -95,7 +95,7 @@ jobs:
           docker cp api-tests-runner:/poetry/coverage.lcov ./api-tests${{ env.COVERAGE_EXT }}
 
       - name: Integration health tests
-        if: ${{ steps.gateway-healthy.conclusion == 'success' }})
+        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
         env:
           API_TEST_MARKS: "health_endpoint"
         run: |
