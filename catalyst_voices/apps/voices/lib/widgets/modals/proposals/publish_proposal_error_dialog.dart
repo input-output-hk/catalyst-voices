@@ -19,7 +19,7 @@ class PublishProposalErrorDialog {
         name: '/proposal-builder/publish-error',
       ),
       builder: (context) {
-        return VoicesDesktopInfoDialog(
+        return VoicesInfoDialog(
           icon: VoicesAssets.icons.exclamation.buildIcon(
             color: Theme.of(context).colors.iconsWarning,
           ),
