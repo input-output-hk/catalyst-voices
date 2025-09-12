@@ -162,6 +162,19 @@ docker:
 
    SAVE IMAGE ${container}:${tag}
 
+# This function centralizes logic behind parsing tag into build_name and build_number.
+#
+# Defaults:
+# - build_name -> 0.1.0
+# - build_number -> timestamp
+#
+# It follows conditions:
+# - if tag has prefix <project>/vx.x.x but prefix is different then voices, uses defaults.
+# - extracts build_name out of vx.x.x, for v0.0.1 it will be 0.0.1
+# - extracts build_number from part after "+". eg v0.0.1+10 will result with 10
+# - if allow_build_name_suffix is true, looks for suffixes after build_number and appends to name
+#
+# Saves build_name and build_number inside respective files.
 PARSE_BUILD_ARGS:
     FUNCTION
     ARG tag='latest'
