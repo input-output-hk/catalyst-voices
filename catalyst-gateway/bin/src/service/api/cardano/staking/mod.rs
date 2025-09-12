@@ -5,14 +5,11 @@ use poem_openapi::{
     OpenApi,
 };
 
-use crate::service::{
-    common::{
-        auth::none_or_rbac::NoneOrRBAC,
-        objects::cardano::network::Network,
-        tags::ApiTags,
-        types::cardano::{self, cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo},
-    },
-    utilities::middleware::schema_validation::schema_version_validation,
+use crate::service::common::{
+    auth::none_or_rbac::NoneOrRBAC,
+    objects::cardano::network::Network,
+    tags::ApiTags,
+    types::cardano::{self, cip19_stake_address::Cip19StakeAddress, slot_no::SlotNo},
 };
 
 mod assets_get;
@@ -29,8 +26,7 @@ impl Api {
     #[oai(
         path = "/v1/cardano/assets/:stake_address",
         method = "get",
-        operation_id = "stakedAssetsGet",
-        transform = "schema_version_validation"
+        operation_id = "stakedAssetsGet"
     )]
     async fn staked_ada_get(
         &self,
