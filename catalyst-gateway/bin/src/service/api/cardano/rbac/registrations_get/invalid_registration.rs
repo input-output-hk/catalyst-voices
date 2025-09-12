@@ -2,7 +2,10 @@
 
 use cardano_chain_follower::{hashes::TransactionId, Slot};
 use catalyst_types::uuid::UuidV4;
-use poem_openapi::{types::{Example, ParseFromJSON}, Object};
+use poem_openapi::{
+    types::{Example, ParseFromJSON},
+    Object,
+};
 
 use crate::{
     db::index::queries::rbac::get_rbac_invalid_registrations::Query,
