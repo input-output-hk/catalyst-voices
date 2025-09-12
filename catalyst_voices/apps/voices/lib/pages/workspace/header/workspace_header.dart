@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/space_ext.dart';
 import 'package:catalyst_voices/pages/workspace/header/workspace_timeline.dart';
 import 'package:catalyst_voices/widgets/buttons/create_proposal_button.dart';
@@ -49,18 +50,14 @@ class _HeaderActions extends StatelessWidget {
 }
 
 class _HeaderText extends StatelessWidget {
-  final ThemeData theme;
-
-  const _HeaderText({
-    required this.theme,
-  });
+  const _HeaderText();
 
   @override
   Widget build(BuildContext context) {
     return Text(
       Space.workspace.localizedName(context.l10n),
-      style: theme.textTheme.headlineLarge?.copyWith(
-        color: theme.colorScheme.primary,
+      style: context.textTheme.headlineLarge?.copyWith(
+        color: context.colorScheme.primary,
       ),
     );
   }
@@ -96,7 +93,7 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
               runSpacing: 10,
               alignment: WrapAlignment.spaceBetween,
               children: [
-                _HeaderText(theme: theme),
+                const _HeaderText(),
                 _HeaderActions(onTap: _toggleTimelineVisibility),
               ],
             ),
