@@ -13,8 +13,10 @@ use crate::{
         types::{
             array_types::impl_array_types,
             document::{
-                doc_ref::DocumentReference, doc_ref_v2::DocumentReferenceListV2,
-                doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
+                doc_ref_v2::{DocumentReferenceListV2, DocumentReferenceV2},
+                doc_type::DocumentType,
+                id::DocumentId,
+                ver::DocumentVer,
             },
         },
     },
@@ -188,7 +190,7 @@ impl Example for IndexedDocumentVersionV2 {
     to_header = false,
     example = true
 )]
-pub(crate) struct FilteredDocumentReferenceV2(DocumentReference);
+pub(crate) struct FilteredDocumentReferenceV2(DocumentReferenceV2);
 
 impl From<catalyst_signed_doc::DocumentRef> for FilteredDocumentReferenceV2 {
     fn from(value: catalyst_signed_doc::DocumentRef) -> Self {
