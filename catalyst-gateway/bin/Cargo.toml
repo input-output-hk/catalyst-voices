@@ -16,11 +16,11 @@ workspace = true
 
 [dependencies]
 cardano-chain-follower = { version = "0.0.13", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower/v0.0.13" }
-rbac-registration = { version = "0.0.9", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "rbac-registration/v0.0.9" }
-catalyst-signed-doc = { version = "0.0.6", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc/v0.0.6" }
+rbac-registration = { version = "0.0.10", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "rbac-registration/v0.0.10" }
+catalyst-signed-doc = { version = "0.0.7", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc/v0.0.7" }
 catalyst-signed-doc-v1 = { package = "catalyst-signed-doc", version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc/v.0.0.4" }
 c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "c509-certificate-v0.0.3" }
-catalyst-types = { version = "0.0.6", git = "https://github.com/input-output-hk/catalyst-libs.git", rev = "8c0be15af9ff05916408e30051fd05e609caaf5a" }
+catalyst-types = { version = "0.0.7", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-types/v0.0.7" }
 
 clap = { version = "4.5.20", features = ["derive", "env"] }
 tracing = { version = "0.1.40", features = ["log"] }
@@ -49,7 +49,7 @@ local-ip-address = "=0.6.3"
 gethostname = "0.5.0"
 hex = "0.4.3"
 handlebars = "6.2.0"
-anyhow = "1.0.95"
+anyhow = "1.0.99"
 duration-string = "0.4.0"
 build-info = "0.0.39"
 ed25519-dalek = "2.1.1"
@@ -112,7 +112,7 @@ darling = { version = "=0.20.10" }
 test-case = "3.3.1"
 
 [build-dependencies]
-build-info-build = "0.0.39"
+build-info-build = "0.0.41"
 
 [package.metadata.cargo-machete]
 # remove that after fixing issues with latest crates
