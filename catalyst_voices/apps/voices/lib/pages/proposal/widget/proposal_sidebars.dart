@@ -18,7 +18,7 @@ class ProposalSidebars extends StatelessWidget {
       xs: 0,
       sm: 16,
       md: 32,
-      other: 56,
+      lg: 56,
       builder: (context, spacing) {
         return SidebarScaffold(
           // TODO(LynxLynxx): Remove when we support mobile web

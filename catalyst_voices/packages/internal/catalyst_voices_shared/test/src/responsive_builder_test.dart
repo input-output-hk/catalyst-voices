@@ -21,7 +21,6 @@ void main() {
       620.0: 'Small device',
       1280.0: 'Medium device',
       1600.0: 'Large device',
-      3000.0: 'Other device',
     };
 
     for (final entry in sizesToTest.entries) {
@@ -34,7 +33,6 @@ void main() {
               sm: 'Small device',
               md: 'Medium device',
               lg: 'Large device',
-              other: 'Other device',
               builder: (context, data) => Text(data),
             ),
           ),
@@ -68,7 +66,6 @@ void main() {
               sm: const EdgeInsets.all(4),
               md: const EdgeInsets.all(8),
               lg: const EdgeInsets.all(16),
-              other: const EdgeInsets.all(32),
               builder: (context, padding) => Padding(
                 padding: padding,
                 child: const Text('Test'),

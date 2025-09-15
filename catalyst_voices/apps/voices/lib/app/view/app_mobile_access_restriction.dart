@@ -270,7 +270,7 @@ class _MobileWebPlaceholder extends StatelessWidget {
         descriptionStyle: context.textTheme.bodyMedium,
         isMobile: true,
       ),
-      other: (
+      sm: (
         titleStyle: context.textTheme.displayMedium?.copyWith(
           color: context.colorScheme.primary,
           fontSize: 78,

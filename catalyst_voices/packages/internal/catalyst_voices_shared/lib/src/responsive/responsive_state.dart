@@ -13,15 +13,11 @@ final class ResponsiveMapState<T extends Object>
   @override
   final Map<ResponsiveBreakpointKey, T> breakpointsData;
 
-  @override
-  final T? fallback;
-
   ResponsiveMapState({
     T? xs,
     T? sm,
     T? md,
     T? lg,
-    T? other,
   }) : this.fromData(
          {
            if (xs != null) ResponsiveBreakpointKey.xs: xs,
@@ -29,16 +25,13 @@ final class ResponsiveMapState<T extends Object>
            if (md != null) ResponsiveBreakpointKey.md: md,
            if (lg != null) ResponsiveBreakpointKey.lg: lg,
          },
-         fallback: other,
        );
 
-  ResponsiveMapState.fromData(
-    this.breakpointsData, {
-    this.fallback,
-  }) : assert(
-         breakpointsData.isNotEmpty || fallback != null,
-         'Either breakpointsData must be provided or fallback.',
-       );
+  ResponsiveMapState.fromData(this.breakpointsData)
+    : assert(
+        breakpointsData.isNotEmpty,
+        'breakpointsData cannot be empty.',
+      );
 }
 
 //ignore: one_member_abstracts
@@ -53,36 +46,17 @@ mixin ResponsiveStateResolver<T extends Object> implements ResponsiveState<T> {
   /// Mapping of responsive breakpoints to their associated data.
   Map<ResponsiveBreakpointKey, T> get breakpointsData;
 
-  /// Fallback data used when no exact match is found in [breakpointsData].
-  ///
-  /// If null, the best matching breakpoint will be resolved instead.
-  T? get fallback;
-
-  @override
-  T resolve(Size screenSize) {
-    assert(
-      breakpointsData.isNotEmpty,
-      'Either breakpointsData must be provided or fallback.',
-    );
-
-    final exactMatch = _findExactMatch(screenSize);
-    if (exactMatch != null) {
-      return exactMatch;
-    }
-
-    final fallback = this.fallback;
-    if (fallback != null) {
-      return fallback;
-    }
-
-    return _findBestMatch(screenSize)!;
-  }
-
   /// Finds the most suitable breakpoint for the given [screenSize].
   ///
   /// Chooses the largest breakpoint whose range includes the screen width.
   /// If none match, falls back to the closest smaller breakpoint.
-  T? _findBestMatch(Size screenSize) {
+  @override
+  T resolve(Size screenSize) {
+    assert(
+      breakpointsData.isNotEmpty,
+      'breakpointsData cannot be empty.',
+    );
+
     final breakpoints = List.of(ResponsiveBreakpointKey.values)..sortBy((a) => a.range.max);
     final breakpointsBiggestToSmallest = breakpoints.reversed.toList();
     final width = screenSize.width;
@@ -95,15 +69,5 @@ mixin ResponsiveStateResolver<T extends Object> implements ResponsiveState<T> {
       if (breakpoint.range.max < width) return data;
     }
 
-    return breakpointsData.values.firstOrNull;
-  }
-
-  /// Finds a breakpoint which range exactly matches the [screenSize].
-  T? _findExactMatch(Size screenSize) {
-    final width = screenSize.width;
-    final key = ResponsiveBreakpointKey.values.firstWhereOrNull(
-      (breakpoint) => breakpoint.range.contains(width),
-    );
-    return breakpointsData[key];
-  }
-}
+    return breakpointsData.values.firstOrNull!;
+  }}

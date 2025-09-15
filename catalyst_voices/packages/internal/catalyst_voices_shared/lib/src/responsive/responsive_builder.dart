@@ -20,7 +20,6 @@ import 'package:flutter/widgets.dart';
 ///   sm: 'Small device',
 ///   md: 'Medium device',
 ///   lg: 'Large device',
-///   other: 'Fallback device',
 ///   builder: (context, title) => Title(title!),
 /// );
 ///
@@ -29,7 +28,6 @@ import 'package:flutter/widgets.dart';
 /// ```dart
 /// ResponsiveBuilder<EdgeInsetsGeometry>(
 ///   xs: EdgeInsets.all(4.0),
-///   other: EdgeInsets.all(10.0),
 ///   builder: (context, padding) => Padding(
 ///     padding: padding,
 ///     child: Text('This is an example.')
@@ -47,13 +45,11 @@ class ResponsiveBuilder<T extends Object> extends StatelessWidget {
     T? sm,
     T? md,
     T? lg,
-    T? other,
   }) : responsiveState = ResponsiveMapState(
          xs: xs,
          sm: sm,
          md: md,
          lg: lg,
-         other: other,
        );
 
   const ResponsiveBuilder.fromState({

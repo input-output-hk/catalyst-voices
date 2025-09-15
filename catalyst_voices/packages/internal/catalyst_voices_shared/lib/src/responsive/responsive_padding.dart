@@ -9,7 +9,7 @@ import 'package:flutter/widgets.dart';
 /// proper padding value based on the screen size and wraps it again in a Padding
 /// to display the selected padding value.
 ///
-/// The possible arguments are `xs`, `sm`, `md`, `lg`, `other` following the
+/// The possible arguments are `xs`, `sm`, `md`, `lg` following the
 /// Material design standards and the ResponsiveBuilder arguments.
 /// Each screen size has a default value to simplify widget usage.
 ///

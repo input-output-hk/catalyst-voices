@@ -8,42 +8,23 @@ import 'package:flutter/widgets.dart';
 /// The widget uses [ResponsiveBuilder] to calculate the proper [SizedBox]
 /// based on the screen size and returns the appropriate [SizedBox] widget.
 ///
-/// The possible arguments are `xs`, `sm`, `md`, `lg`, `other` following the
+/// The possible arguments are `xs`, `sm`, `md` and `lg` following the
 /// Material design standards and the ResponsiveBuilder arguments.
 class ResponsiveSizedBox extends StatelessWidget {
   final Map<ResponsiveBreakpointKey, SizedBox> _sizedBoxes;
-  final SizedBox _fallback;
 
   ResponsiveSizedBox({
     super.key,
-    SizedBox xs = const SizedBox(),
-    SizedBox sm = const SizedBox(),
-    SizedBox md = const SizedBox(),
-    SizedBox lg = const SizedBox(),
-    SizedBox other = const SizedBox(),
-  }) : _sizedBoxes = {
-         ResponsiveBreakpointKey.xs: xs,
-         ResponsiveBreakpointKey.sm: sm,
-         ResponsiveBreakpointKey.md: md,
-         ResponsiveBreakpointKey.lg: lg,
-       },
-       _fallback = other;
-
-  factory ResponsiveSizedBox.only({
-    Key? key,
     SizedBox? xs,
     SizedBox? sm,
     SizedBox? md,
     SizedBox? lg,
-    SizedBox other = const SizedBox.shrink(),
-  }) => ResponsiveSizedBox(
-    key: key,
-    xs: xs ?? other,
-    sm: sm ?? other,
-    md: md ?? other,
-    lg: lg ?? other,
-    other: other,
-  );
+  }) : _sizedBoxes = {
+         if (xs != null) ResponsiveBreakpointKey.xs: xs,
+         if (sm != null) ResponsiveBreakpointKey.sm: sm,
+         if (md != null) ResponsiveBreakpointKey.md: md,
+         if (lg != null) ResponsiveBreakpointKey.lg: lg,
+       };
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +34,6 @@ class ResponsiveSizedBox extends StatelessWidget {
       sm: _sizedBoxes[ResponsiveBreakpointKey.sm],
       md: _sizedBoxes[ResponsiveBreakpointKey.md],
       lg: _sizedBoxes[ResponsiveBreakpointKey.lg],
-      other: _fallback,
     );
   }
 }

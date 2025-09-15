@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 /// This is a simple wrapper around [ResponsiveBuilder] to simplify development and
 /// make it explicit for a reader.
 ///
-/// The possible arguments are `xs`, `sm`, `md`, `lg`, `other` following the
+/// The possible arguments are `xs`, `sm`, `md`, `lg` following the
 /// the [ResponsiveBuilder] arguments.
 ///
-/// If no `other` argument is provided and no exact match found in the provided breakpoints
-/// the implementation will attempt to find the best match breakpoint for given screen size.
+/// If  no exact match found in the provided breakpoints the implementation
+/// will attempt to find the best match breakpoint for given screen size.
 ///
 /// Example usage:
 ///
@@ -30,12 +30,10 @@ import 'package:flutter/material.dart';
 ///       Text('for medium screens.'),
 ///     ],
 ///   ),
-///   other: (context) => const Text('The fallback widget.'),
 /// );
 /// ```
 class ResponsiveChild extends StatelessWidget {
   final Map<ResponsiveBreakpointKey, WidgetBuilder> _widgets;
-  final WidgetBuilder? _fallback;
 
   ResponsiveChild({
     super.key,
@@ -43,24 +41,21 @@ class ResponsiveChild extends StatelessWidget {
     WidgetBuilder? sm,
     WidgetBuilder? md,
     WidgetBuilder? lg,
-    WidgetBuilder? other,
   }) : _widgets = {
          if (xs != null) ResponsiveBreakpointKey.xs: xs,
          if (sm != null) ResponsiveBreakpointKey.sm: sm,
          if (md != null) ResponsiveBreakpointKey.md: md,
          if (lg != null) ResponsiveBreakpointKey.lg: lg,
-       },
-       _fallback = other;
+       };
 
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder<WidgetBuilder>(
-      builder: (context, childBuilder) => childBuilder(context),
       xs: _widgets[ResponsiveBreakpointKey.xs],
       sm: _widgets[ResponsiveBreakpointKey.sm],
       md: _widgets[ResponsiveBreakpointKey.md],
       lg: _widgets[ResponsiveBreakpointKey.lg],
-      other: _fallback,
+      builder: (context, childBuilder) => childBuilder(context),
     );
   }
 }

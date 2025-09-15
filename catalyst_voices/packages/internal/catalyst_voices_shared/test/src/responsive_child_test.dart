@@ -21,7 +21,7 @@ void main() {
               Text('for medium screens.'),
             ],
           ),
-          other: (context) => const Text('The fallback widget.'),
+          lg: (context) => const Text('The large widget.'),
         ),
       ),
     ),
@@ -74,7 +74,7 @@ void main() {
       );
       final testedElements = find.byType(Text);
       expect(testedElements, findsOneWidget);
-      expect(find.text('The fallback widget.'), findsOneWidget);
+      expect(find.text('The large widget.'), findsOneWidget);
     });
   });
 }

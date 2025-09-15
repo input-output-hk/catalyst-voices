@@ -41,10 +41,10 @@ class CurrentCampaign extends StatelessWidget {
                   totalAsk: currentCampaignInfo.totalAsk,
                 ),
               ),
-              ResponsiveSizedBox.only(
+              ResponsiveSizedBox(
                 xs: const SizedBox(height: 30),
                 sm: const SizedBox(height: 48),
-                other: const SizedBox(height: 80),
+                md: const SizedBox(height: 80),
               ),
               const _SubTitle(),
             ],

@@ -58,7 +58,7 @@ class _AccountPageState extends State<AccountPage>
                 const AccountPageTitle(key: Key('AccountPageTitle')),
                 ResponsiveSizedBox(
                   xs: const SizedBox(height: 18),
-                  other: const SizedBox(height: 42),
+                  sm: const SizedBox(height: 42),
                 ),
                 const AccountPageGrid(
                   key: ValueKey('AccountOverviewGrid'),
@@ -69,7 +69,7 @@ class _AccountPageState extends State<AccountPage>
                 ),
                 ResponsiveSizedBox(
                   xs: const SizedBox(height: 18),
-                  other: const SizedBox(height: 40),
+                  sm: const SizedBox(height: 40),
                 ),
                 AccountPageGrid(
                   key: const ValueKey('AccountDetailsGrid'),

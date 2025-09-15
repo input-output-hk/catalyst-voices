@@ -24,13 +24,7 @@ class ResponsiveBoxConstraints extends BoxConstraints
          if (lg != null) ResponsiveBreakpointKey.lg: lg,
        };
 
-  ResponsiveBoxConstraints.adapt(BoxConstraints other)
-    : this(
-        minWidth: other.minWidth,
-        maxWidth: other.maxWidth,
-        minHeight: other.minHeight,
-        maxHeight: other.maxHeight,
-      );
+  ResponsiveBoxConstraints.adapt(BoxConstraints other) : this.from(fallback: other);
 
   ResponsiveBoxConstraints.from({
     required BoxConstraints fallback,
@@ -43,14 +37,11 @@ class ResponsiveBoxConstraints extends BoxConstraints
          maxWidth: fallback.maxWidth,
          minHeight: fallback.minHeight,
          maxHeight: fallback.maxHeight,
-         xs: xs,
-         sm: sm,
-         md: md,
-         lg: lg,
+         xs: xs ?? fallback,
+         sm: sm ?? fallback,
+         md: md ?? fallback,
+         lg: lg ?? fallback,
        );
-
-  @override
-  BoxConstraints get fallback => this;
 }
 
 extension BoxConstraintsAdapter on BoxConstraints {

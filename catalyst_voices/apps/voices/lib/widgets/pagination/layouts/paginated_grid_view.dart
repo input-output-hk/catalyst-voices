@@ -56,7 +56,7 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
               width: double.infinity,
               child: ResponsiveBuilder<WrapAlignment>(
                 sm: WrapAlignment.center,
-                other: WrapAlignment.start,
+                md: WrapAlignment.start,
                 builder: (context, data) {
                   return Wrap(
                     key: const Key('PaginatedGridView'),
