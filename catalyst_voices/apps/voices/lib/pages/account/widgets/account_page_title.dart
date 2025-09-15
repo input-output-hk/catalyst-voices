@@ -2,6 +2,7 @@ import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class AccountPageTitle extends StatelessWidget {
@@ -25,15 +26,33 @@ class AccountPageTitle extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              key: const Key('ProfileAndKeychainText'),
-              context.l10n.profileAndKeychain,
-              style: context.textTheme.displaySmall?.copyWith(color: context.colorScheme.primary),
+            Flexible(
+              child: Text(
+                key: const Key('ProfileAndKeychainText'),
+                context.l10n.profileAndKeychain,
+                style: context.textTheme.displaySmall?.copyWith(color: context.colorScheme.primary),
+              ),
             ),
-            VoicesLearnMoreTextButton.url(url: VoicesConstants.myAccountUrl),
+            const _LearnMore(),
           ],
         ),
       ],
+    );
+  }
+}
+
+class _LearnMore extends StatelessWidget {
+  const _LearnMore();
+
+  @override
+  Widget build(BuildContext context) {
+    return ResponsiveChild(
+      xs: (context) {
+        return VoicesLearnMoreIconButton(uri: VoicesConstants.myAccountUrl.getUri());
+      },
+      other: (context) {
+        return VoicesLearnMoreTextButton(uri: VoicesConstants.myAccountUrl.getUri());
+      },
     );
   }
 }

@@ -16,7 +16,6 @@ export 'cards/action_card.dart';
 export 'cards/proposal/proposal_brief_card.dart';
 export 'cards/proposal/proposal_card_widgets.dart';
 export 'cards/proposal/small_proposal_card.dart';
-export 'cards/proposal/workspace_proposal_card.dart';
 export 'cards/role_chooser_card.dart';
 export 'chips/voices_chip.dart';
 export 'common/delayed_widget.dart';

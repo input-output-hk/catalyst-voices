@@ -51,9 +51,9 @@ class _AccountActionTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                spacing: 8,
                 children: [
                   status.icon.buildIcon(),
-                  const SizedBox(width: 8),
                   Expanded(child: AccountStatusTitleText(data: status)),
                 ],
               ),

@@ -3,7 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 final class RefsSyncException extends SyncException {
   final List<Object> errors;
 
-  RefsSyncException(this.errors);
+  const RefsSyncException(this.errors);
 
   @override
   String toString() => 'RefsSyncException errors[${errors.length}]';

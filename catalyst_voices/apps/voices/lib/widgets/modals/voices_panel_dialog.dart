@@ -50,12 +50,16 @@ class VoicesPanelDialog extends StatelessWidget {
             insetPadding: insetPadding,
             constraints: constraints,
             child: Stack(
-              alignment: Alignment.topRight,
+              fit: StackFit.passthrough,
               children: [
                 child,
-                Offstage(
-                  offstage: !showClose,
-                  child: const _CloseButton(),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Offstage(
+                    offstage: !showClose,
+                    child: const _CloseButton(),
+                  ),
                 ),
               ],
             ),

@@ -841,6 +841,10 @@
   "@defaultPermissionRationale": {
     "description": "Default rationale for permission"
   },
+  "defaultProposalsOrder": "Default",
+  "@defaultProposalsOrder": {
+    "description": "Ordering options for proposals"
+  },
   "defaultRole": "Default",
   "@defaultRole": {
     "description": "Related to account role"
@@ -2073,10 +2077,6 @@
   "@orderProposalsUpdateDateDesc": {
     "description": "Order proposals by update date option"
   },
-  "defaultProposalsOrder": "Default",
-  "@defaultProposalsOrder": {
-    "description": "Ordering options for proposals"
-  },
   "paginationProposalsCounter": "{from}-{to} of {max} {max, plural, =0{proposals} =1{proposal} other{proposals}}",
   "@paginationProposalsCounter": {
     "description": "Below pagination list, next to page switch controls",
@@ -2584,10 +2584,6 @@
   "recoverKeychainMethodsListTitle": "How do you want Restore your Catalyst Keychain?",
   "@recoverKeychainMethodsListTitle": {
     "description": "Header for recovery methods selection list"
-  },
-  "recoverKeychainMethodsNoKeychainFound": "No Catalyst Keychain found on this device.",
-  "@recoverKeychainMethodsNoKeychainFound": {
-    "description": "Message shown when no keychain is found on device"
   },
   "recoverKeychainMethodsSubtitle": "Not to worry, in the next step you can choose the recovery option that applies to you for this device!",
   "@recoverKeychainMethodsSubtitle": {
