@@ -8,10 +8,9 @@ import 'package:flutter/widgets.dart';
 /// consume breakpoint-specific data automatically based on breakpoint that is
 /// detected.
 ///
-/// The breakpoint is identified by using the screen size exposed by MediaQuery
-/// of the context.
-///
-/// [ResponsiveState] is responsible for resolving the appropriate value for a given breakpoint.
+/// The breakpoint is identified by using the screen size exposed by [MediaQuery]
+/// of the context. [ResponsiveMapState] is responsible for resolving the best match value
+/// for a given breakpoint.
 ///
 /// Example to render a specific string based on the breakpoints:
 ///
@@ -37,7 +36,6 @@ import 'package:flutter/widgets.dart';
 ///   ),
 /// );
 /// ```
-// TODO(damian-molinski): support logical operation like < sm or >= md
 class ResponsiveBuilder<T extends Object> extends StatelessWidget {
   final DataWidgetBuilder<T> builder;
   final ResponsiveState<T> responsiveState;
@@ -49,7 +47,7 @@ class ResponsiveBuilder<T extends Object> extends StatelessWidget {
     T? sm,
     T? md,
     T? lg,
-    required T other,
+    T? other,
   }) : responsiveState = ResponsiveMapState(
          xs: xs,
          sm: sm,

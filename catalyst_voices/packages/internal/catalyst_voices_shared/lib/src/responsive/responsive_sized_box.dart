@@ -2,13 +2,13 @@ import 'package:catalyst_voices_shared/src/responsive/responsive_breakpoint_key.
 import 'package:catalyst_voices_shared/src/responsive/responsive_builder.dart';
 import 'package:flutter/widgets.dart';
 
-/// A [ResponsiveSizedBox] is a StatelessWidget that creates a SizedBox based on
+/// A [ResponsiveSizedBox] is a StatelessWidget that creates a [SizedBox] based on
 /// the current screen size.
 ///
-/// The widget uses ResponsiveBuilder to calculate the proper SizedBox
-/// based on the screen size and returns the appropriate SizedBox widget.
+/// The widget uses [ResponsiveBuilder] to calculate the proper [SizedBox]
+/// based on the screen size and returns the appropriate [SizedBox] widget.
 ///
-/// The possible arguments are xs, sm, md, lg, other following the
+/// The possible arguments are `xs`, `sm`, `md`, `lg`, `other` following the
 /// Material design standards and the ResponsiveBuilder arguments.
 class ResponsiveSizedBox extends StatelessWidget {
   final Map<ResponsiveBreakpointKey, SizedBox> _sizedBoxes;
