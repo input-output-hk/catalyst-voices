@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 /// Example usage:
 ///
 /// ```dart
-/// ResponsiveChild(
+/// ResponsiveChildBuilder(
 ///   xs: (context) => const Text('Simple text for extra small screens.'),
 ///   sm: (context) => const Padding(
 ///     padding: EdgeInsets.all(50),
