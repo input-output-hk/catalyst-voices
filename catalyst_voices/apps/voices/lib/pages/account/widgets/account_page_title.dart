@@ -50,7 +50,7 @@ class _LearnMore extends StatelessWidget {
       xs: (context) {
         return VoicesLearnMoreIconButton(uri: VoicesConstants.myAccountUrl.getUri());
       },
-      other: (context) {
+      sm: (context) {
         return VoicesLearnMoreTextButton(uri: VoicesConstants.myAccountUrl.getUri());
       },
     );

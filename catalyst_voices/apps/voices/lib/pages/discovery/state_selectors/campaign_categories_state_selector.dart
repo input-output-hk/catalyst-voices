@@ -20,10 +20,10 @@ class CampaignCategoriesStateSelector extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ResponsivePadding.only(
+        ResponsivePadding(
           xs: const EdgeInsets.symmetric(horizontal: 20),
           sm: const EdgeInsets.symmetric(horizontal: 48),
-          other: const EdgeInsets.symmetric(horizontal: 120),
+          md: const EdgeInsets.symmetric(horizontal: 120),
           child: Text(
             key: const Key('CampaignCategoriesTitle'),
             context.l10n.campaignCategories,

@@ -16,10 +16,10 @@ class CampaignCategories extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsivePadding.only(
+    return ResponsivePadding(
       xs: const EdgeInsets.symmetric(horizontal: 20),
       sm: const EdgeInsets.symmetric(horizontal: 48),
-      other: const EdgeInsets.symmetric(horizontal: 120),
+      md: const EdgeInsets.symmetric(horizontal: 120),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,

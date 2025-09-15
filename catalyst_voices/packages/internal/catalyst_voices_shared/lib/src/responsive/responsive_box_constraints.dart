@@ -18,10 +18,10 @@ class ResponsiveBoxConstraints extends BoxConstraints
     BoxConstraints? md,
     BoxConstraints? lg,
   }) : breakpointsData = {
-         if (xs case final value?) ResponsiveBreakpointKey.xs: value,
-         if (sm case final value?) ResponsiveBreakpointKey.sm: value,
-         if (md case final value?) ResponsiveBreakpointKey.md: value,
-         if (lg case final value?) ResponsiveBreakpointKey.lg: value,
+         if (xs != null) ResponsiveBreakpointKey.xs: xs,
+         if (sm != null) ResponsiveBreakpointKey.sm: sm,
+         if (md != null) ResponsiveBreakpointKey.md: md,
+         if (lg != null) ResponsiveBreakpointKey.lg: lg,
        };
 
   ResponsiveBoxConstraints.adapt(BoxConstraints other)

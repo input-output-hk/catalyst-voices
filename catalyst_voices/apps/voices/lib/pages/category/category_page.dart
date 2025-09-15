@@ -165,14 +165,13 @@ class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
           isActiveProposer: isActiveProposer,
         );
         return ResponsiveBuilder<Widget>(
-          xs: smallBody,
           sm: smallBody,
-          builder: (context, data) => data,
-          other: _Body(
+          md: _Body(
             category: state.data,
             isLoading: state.show,
             isActiveProposer: isActiveProposer,
           ),
+          builder: (context, data) => data,
         );
       },
     );

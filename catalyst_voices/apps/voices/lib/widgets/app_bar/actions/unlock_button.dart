@@ -22,7 +22,7 @@ class UnlockButton extends StatelessWidget {
         color: Theme.of(context).colors.iconsBackground,
         icon: VoicesAssets.icons.lockOpen.buildIcon(),
       ),
-      other: (context) => FilledButton.icon(
+      sm: (context) => FilledButton.icon(
         onPressed: onPressed,
         icon: VoicesAssets.icons.lockOpen.buildIcon(size: 18),
         label: Text(context.l10n.unlockButtonLabelText),

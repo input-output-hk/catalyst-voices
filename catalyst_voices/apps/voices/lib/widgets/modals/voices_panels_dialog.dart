@@ -54,7 +54,7 @@ class VoicesPanelsDialog extends StatelessWidget {
             primaryPanelIndex: primaryPanelIndex,
           );
         },
-        other: (context) {
+        sm: (context) {
           return _SideBySidePanels(panels);
         },
       ),

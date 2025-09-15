@@ -23,9 +23,8 @@ class ProposalSidebars extends StatelessWidget {
         return SidebarScaffold(
           // TODO(LynxLynxx): Remove when we support mobile web
           leftRail: ResponsiveBuilder<bool>(
-            xs: true,
             sm: true,
-            other: false,
+            md: false,
             builder: (context, isSmallScreen) => Offstage(
               offstage: isSmallScreen,
               child: Padding(

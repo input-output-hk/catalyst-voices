@@ -121,7 +121,7 @@ class _UpdatedAt extends StatelessWidget {
         ),
         ResponsiveBuilder<Axis>(
           xs: Axis.vertical,
-          other: Axis.horizontal,
+          sm: Axis.horizontal,
           builder: (context, axis) {
             return TimezoneDateTimeText(
               updatedAt,

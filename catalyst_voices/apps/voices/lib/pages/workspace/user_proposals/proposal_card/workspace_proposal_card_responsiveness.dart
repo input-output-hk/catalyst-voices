@@ -191,7 +191,7 @@ class _WorkspaceProposalCardResponsiveness extends StatelessWidget {
 
     return ResponsiveBuilder<Widget>(
       builder: (context, data) => data,
-      lg: _LargeScreen(
+      sm: _SmallScreen(
         proposal: proposal,
         isSubmitted: isSubmitted,
         commentsCount: commentsCount,
@@ -201,7 +201,7 @@ class _WorkspaceProposalCardResponsiveness extends StatelessWidget {
         isSubmitted: isSubmitted,
         commentsCount: commentsCount,
       ),
-      other: _SmallScreen(
+      lg: _LargeScreen(
         proposal: proposal,
         isSubmitted: isSubmitted,
         commentsCount: commentsCount,

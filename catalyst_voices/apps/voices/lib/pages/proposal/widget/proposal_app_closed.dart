@@ -96,7 +96,7 @@ class _ProposalAppClosedState extends State<ProposalAppClosed> {
               xs: 0,
               sm: 16,
               md: 32,
-              other: 56,
+              lg: 56,
               builder: (context, spacing) => Padding(
                 padding: EdgeInsets.only(left: spacing / 2, right: spacing, top: 12),
                 child: Container(
@@ -108,7 +108,7 @@ class _ProposalAppClosedState extends State<ProposalAppClosed> {
                   width: double.infinity,
                   child: ResponsiveChild(
                     xs: (context) => const _SmallView(),
-                    other: (context) => const Row(
+                    sm: (context) => const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       spacing: 16,
                       children: [
