@@ -13,7 +13,7 @@ import 'package:flutter/widgets.dart';
 /// for a given breakpoint.
 ///
 /// Example usage:
-/// 
+///
 /// ```dart
 /// ResponsiveBuilder<String>(
 ///   xs: 'Extra small device',
