@@ -9,7 +9,7 @@ import 'package:flutter/widgets.dart';
 /// detected.
 ///
 /// The breakpoint is identified by using the screen size exposed by [MediaQuery]
-/// of the context. [ResponsiveStateResolver] is responsible for resolving the best match value
+/// of the context. [Responsive.resolve] is responsible for resolving the best match value
 /// for a given breakpoint.
 ///
 /// Example to render a specific string based on the breakpoints:
@@ -36,26 +36,26 @@ import 'package:flutter/widgets.dart';
 /// ```
 class ResponsiveBuilder<T extends Object> extends StatelessWidget {
   final DataWidgetBuilder<T> builder;
-  final ResponsiveState<T> responsiveState;
+  final Responsive<T> responsive;
 
   ResponsiveBuilder({
     super.key,
-    required this.builder,
     T? xs,
     T? sm,
     T? md,
     T? lg,
-  }) : responsiveState = ResponsiveMapState(
+    required this.builder,
+  }) : responsive = Responsive.breakpoints(
          xs: xs,
          sm: sm,
          md: md,
          lg: lg,
        );
 
-  const ResponsiveBuilder.fromState({
+  const ResponsiveBuilder.fromResponsive({
     super.key,
     required this.builder,
-    required this.responsiveState,
+    required this.responsive,
   });
 
   @override
@@ -66,6 +66,6 @@ class ResponsiveBuilder<T extends Object> extends StatelessWidget {
   T _getResponsiveBreakpoint(BuildContext context) {
     final screenSize = MediaQuery.sizeOf(context);
 
-    return responsiveState.resolve(screenSize);
+    return responsive.resolve(screenSize);
   }
 }

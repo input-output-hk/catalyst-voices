@@ -30,11 +30,11 @@ class ResponsivePadding extends StatelessWidget {
 
   ResponsivePadding({
     super.key,
-    required this.child,
     EdgeInsets? xs,
     EdgeInsets? sm,
     EdgeInsets? md,
     EdgeInsets? lg,
+    required this.child,
   }) : _paddings = {
          if (xs != null) ResponsiveBreakpointKey.xs: xs,
          if (sm != null) ResponsiveBreakpointKey.sm: sm,
@@ -45,14 +45,14 @@ class ResponsivePadding extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder<EdgeInsets>(
-      builder: (context, padding) => Padding(
-        padding: padding,
-        child: child,
-      ),
       xs: _paddings[ResponsiveBreakpointKey.xs],
       sm: _paddings[ResponsiveBreakpointKey.sm],
       md: _paddings[ResponsiveBreakpointKey.md],
       lg: _paddings[ResponsiveBreakpointKey.lg],
+      builder: (context, padding) => Padding(
+        padding: padding,
+        child: child,
+      ),
     );
   }
 }

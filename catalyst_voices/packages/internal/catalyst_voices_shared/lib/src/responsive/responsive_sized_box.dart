@@ -29,11 +29,11 @@ class ResponsiveSizedBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder<SizedBox>(
-      builder: (context, sizedBox) => sizedBox,
       xs: _sizedBoxes[ResponsiveBreakpointKey.xs],
       sm: _sizedBoxes[ResponsiveBreakpointKey.sm],
       md: _sizedBoxes[ResponsiveBreakpointKey.md],
       lg: _sizedBoxes[ResponsiveBreakpointKey.lg],
+      builder: (context, sizedBox) => sizedBox,
     );
   }
 }

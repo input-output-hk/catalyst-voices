@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/pages/category/category_compact_detail_view.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -18,9 +19,11 @@ class CategoryBriefDialog extends StatefulWidget {
     return VoicesDialog.show(
       context: context,
       builder: (context) => VoicesPanelDialog(
-        constraints: const BoxConstraints(
-          maxWidth: 900,
-          maxHeight: 768,
+        constraints: const Responsive.single(
+          BoxConstraints(
+            maxWidth: 900,
+            maxHeight: 768,
+          ),
         ),
         child: CategoryBriefDialog(category: category),
       ),

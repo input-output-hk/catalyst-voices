@@ -4,6 +4,7 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 /// A dialog for publishing a new iteration of a proposal.
@@ -26,10 +27,12 @@ class PublishProposalIterationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesPanelDialog(
-      constraints: const BoxConstraints(
-        minWidth: 450,
-        maxWidth: 450,
-        minHeight: 256,
+      constraints: const Responsive.single(
+        BoxConstraints(
+          minWidth: 450,
+          maxWidth: 450,
+          minHeight: 256,
+        ),
       ),
       showClose: false,
       child: SingleChildScrollView(

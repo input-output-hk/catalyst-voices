@@ -43,9 +43,9 @@ class VoicesPanelsDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesPanelDialog(
-      constraints: ResponsiveBoxConstraints.from(
-        fallback: const BoxConstraints.tightFor(width: 900, height: 600),
-        xs: const BoxConstraints(maxHeight: 600),
+      constraints: const Responsive.breakpoints(
+        xs: BoxConstraints(maxHeight: 600),
+        sm: BoxConstraints.tightFor(width: 900, height: 600),
       ),
       child: ResponsiveChild(
         xs: (context) {

@@ -6,6 +6,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class AccountRoleDialog extends StatelessWidget {
@@ -20,7 +21,9 @@ class AccountRoleDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesPanelDialog(
       backgroundColor: Theme.of(context).colors.iconsBackground,
-      constraints: const BoxConstraints(maxHeight: 460, maxWidth: 750),
+      constraints: const Responsive.single(
+        BoxConstraints(maxHeight: 460, maxWidth: 750),
+      ),
       child: SingleChildScrollView(
         child: Container(
           width: double.infinity,

@@ -6,7 +6,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class VoicesPanelDialog extends StatelessWidget {
-  final BoxConstraints constraints;
+  final Responsive<BoxConstraints> constraints;
   final EdgeInsets insetPadding;
   final Color? backgroundColor;
   final bool showBorder;
@@ -15,10 +15,12 @@ class VoicesPanelDialog extends StatelessWidget {
 
   const VoicesPanelDialog({
     super.key,
-    this.constraints = const BoxConstraints(
-      minWidth: 648,
-      maxWidth: 648,
-      minHeight: 256,
+    this.constraints = const Responsive.single(
+      BoxConstraints(
+        minWidth: 648,
+        maxWidth: 648,
+        minHeight: 256,
+      ),
     ),
     this.insetPadding = const EdgeInsets.symmetric(horizontal: 40, vertical: 90),
     this.backgroundColor,
@@ -33,8 +35,8 @@ class VoicesPanelDialog extends StatelessWidget {
     // is released and we're using this flutter version
     // Note: fix scheduled for 3.34.x / 3.35.x flutter version
     return SelectionArea(
-      child: ResponsiveBuilder.fromState(
-        responsiveState: constraints.toResponsive(),
+      child: ResponsiveBuilder.fromResponsive(
+        responsive: constraints,
         builder: (context, constraints) {
           return Dialog(
             shape: showBorder
