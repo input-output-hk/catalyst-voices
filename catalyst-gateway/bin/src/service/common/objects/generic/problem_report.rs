@@ -136,7 +136,7 @@ impl Example for ProblemReportEntry {
             kind: "InvalidValue".to_string(),
             msg: "context".to_string(),
             field: Some("field name".to_string()),
-            value: Some("field valeu".to_string()),
+            value: Some("field value".to_string()),
             constraint: Some("constraint".to_string()),
             ..Default::default()
         }
