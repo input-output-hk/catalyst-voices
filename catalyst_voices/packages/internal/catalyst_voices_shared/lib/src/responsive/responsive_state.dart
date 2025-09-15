@@ -70,4 +70,5 @@ mixin ResponsiveStateResolver<T extends Object> implements ResponsiveState<T> {
     }
 
     return breakpointsData.values.firstOrNull!;
-  }}
+  }
+}

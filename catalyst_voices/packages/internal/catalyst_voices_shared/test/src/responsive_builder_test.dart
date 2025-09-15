@@ -25,7 +25,7 @@ void main() {
       };
 
       for (final entry in sizesToTest.entries) {
-        testWidgets(' adapts to screen of width ${entry.key}', (tester) async {
+        testWidgets('adapts to screen of width ${entry.key}', (tester) async {
           await tester.pumpWidget(
             buildApp(
               Size.fromWidth(entry.key),
@@ -57,7 +57,7 @@ void main() {
       };
 
       for (final entry in sizesToTest.entries) {
-        testWidgets(' adapts to screen of width ${entry.key}', (tester) async {
+        testWidgets('adapts to screen of width ${entry.key}', (tester) async {
           await tester.pumpWidget(
             buildApp(
               Size.fromWidth(entry.key),
