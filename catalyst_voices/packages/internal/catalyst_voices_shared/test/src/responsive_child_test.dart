@@ -7,7 +7,7 @@ void main() {
     data: MediaQueryData(size: size),
     child: MaterialApp(
       home: Scaffold(
-        body: ResponsiveChild(
+        body: ResponsiveChildBuilder(
           xs: (context) => const Text('Simple text for extra small screens.'),
           sm: (context) => const Padding(
             padding: EdgeInsets.all(50),

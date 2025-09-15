@@ -9,34 +9,23 @@ import 'package:flutter/widgets.dart';
 /// detected.
 ///
 /// The breakpoint is identified by using the screen size exposed by [MediaQuery]
-/// of the context. [Responsive.resolve] is responsible for resolving the best match value
+/// of the context. [Responsive.resolve] is responsible for resolving the best matching value
 /// for a given breakpoint.
 ///
-/// Example to render a specific string based on the breakpoints:
-///
+/// Example usage:
+/// 
 /// ```dart
 /// ResponsiveBuilder<String>(
 ///   xs: 'Extra small device',
 ///   sm: 'Small device',
 ///   md: 'Medium device',
 ///   lg: 'Large device',
-///   builder: (context, title) => Title(title!),
-/// );
-///
-/// or to have a specific padding:
-///
-/// ```dart
-/// ResponsiveBuilder<EdgeInsetsGeometry>(
-///   xs: EdgeInsets.all(4.0),
-///   builder: (context, padding) => Padding(
-///     padding: padding,
-///     child: Text('This is an example.')
-///   ),
+///   builder: (context, title) => Title(title),
 /// );
 /// ```
 class ResponsiveBuilder<T extends Object> extends StatelessWidget {
-  final DataWidgetBuilder<T> builder;
   final Responsive<T> responsive;
+  final DataWidgetBuilder<T> builder;
 
   ResponsiveBuilder({
     super.key,
@@ -54,8 +43,8 @@ class ResponsiveBuilder<T extends Object> extends StatelessWidget {
 
   const ResponsiveBuilder.fromResponsive({
     super.key,
-    required this.builder,
     required this.responsive,
+    required this.builder,
   });
 
   @override

@@ -3,8 +3,18 @@ import 'dart:ui';
 import 'package:catalyst_voices_shared/src/responsive/responsive_breakpoint_key.dart';
 import 'package:collection/collection.dart';
 
-//ignore: one_member_abstracts
+/// The [Responsive] class provides an abstraction for defining and resolving
+/// values that change depending on the screen size.
+///
+/// It allows you to associate data with predefined breakpoints (xs, sm, md, lg)
+/// or provide a single value that is always used regardless of the screen size.
+/// This is particularly useful when building adaptive or responsive Flutter UIs
+/// where widget properties (such as padding, font size, or layout structure)
+/// should adjust depending on the current screen width.
+// ignore: one_member_abstracts
 abstract interface class Responsive<T extends Object> {
+  /// Assigns a data to each [ResponsiveBreakpointKey] and attemps to find
+  /// the best matching breakpoint given the screen size.
   const factory Responsive.breakpoints({
     T? xs,
     T? sm,
@@ -12,6 +22,8 @@ abstract interface class Responsive<T extends Object> {
     T? lg,
   }) = _ResponsiveBreakpoints;
 
+  /// A singleton implementation of responsive, just in case a [Responsive] instance
+  /// is needed even though the widget is not going to be responsive.
   const factory Responsive.single(T value) = _SingleResponsive;
 
   /// Provides responsive data based on the given [screenSize].
@@ -20,8 +32,6 @@ abstract interface class Responsive<T extends Object> {
   T resolve(Size screenSize);
 }
 
-/// A default implementation of the [Responsive].
-///
 /// Assigns a data to each [ResponsiveBreakpointKey] and attemps to find
 /// the best matching breakpoint given the screen size.
 final class _ResponsiveBreakpoints<T extends Object> implements Responsive<T> {
@@ -73,6 +83,8 @@ final class _ResponsiveBreakpoints<T extends Object> implements Responsive<T> {
   }
 }
 
+/// A singleton implementation of responsive, just in case a [Responsive] instance
+/// is needed even though the widget is not going to be responsive.
 final class _SingleResponsive<T extends Object> implements Responsive<T> {
   final T data;
 

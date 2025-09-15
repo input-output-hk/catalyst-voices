@@ -106,7 +106,7 @@ class _ProposalAppClosedState extends State<ProposalAppClosed> {
                   ),
                   padding: const EdgeInsets.all(12),
                   width: double.infinity,
-                  child: ResponsiveChild(
+                  child: ResponsiveChildBuilder(
                     xs: (context) => const _SmallView(),
                     sm: (context) => const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -46,7 +46,7 @@ class _LearnMore extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveChild(
+    return ResponsiveChildBuilder(
       xs: (context) {
         return VoicesLearnMoreIconButton(uri: VoicesConstants.myAccountUrl.getUri());
       },

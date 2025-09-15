@@ -47,7 +47,7 @@ class VoicesPanelsDialog extends StatelessWidget {
         xs: BoxConstraints(maxHeight: 600),
         sm: BoxConstraints.tightFor(width: 900, height: 600),
       ),
-      child: ResponsiveChild(
+      child: ResponsiveChildBuilder(
         xs: (context) {
           return _VerticalPanels(
             panels,

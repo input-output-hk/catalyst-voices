@@ -58,7 +58,7 @@ class _Cards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveChild(
+    return ResponsiveChildBuilder(
       sm: (_) => const _SmallCards(),
       md: (_) => const _DesktopCards(),
     );

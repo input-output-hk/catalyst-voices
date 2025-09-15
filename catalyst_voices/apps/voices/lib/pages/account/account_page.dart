@@ -56,7 +56,7 @@ class _AccountPageState extends State<AccountPage>
               padding: const EdgeInsets.all(24),
               children: [
                 const AccountPageTitle(key: Key('AccountPageTitle')),
-                ResponsiveSizedBox(
+                ResponsiveChild(
                   xs: const SizedBox(height: 18),
                   sm: const SizedBox(height: 42),
                 ),
@@ -67,7 +67,7 @@ class _AccountPageState extends State<AccountPage>
                     AccountActionTile(),
                   ],
                 ),
-                ResponsiveSizedBox(
+                ResponsiveChild(
                   xs: const SizedBox(height: 18),
                   sm: const SizedBox(height: 40),
                 ),

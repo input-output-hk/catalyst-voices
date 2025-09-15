@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_shared/src/responsive/responsive_breakpoint_key.dart';
+import 'package:catalyst_voices_shared/src/responsive/responsive.dart';
 import 'package:catalyst_voices_shared/src/responsive/responsive_builder.dart';
 import 'package:flutter/widgets.dart';
 
@@ -10,8 +10,7 @@ import 'package:flutter/widgets.dart';
 /// to display the selected padding value.
 ///
 /// The possible arguments are `xs`, `sm`, `md`, `lg` following the
-/// Material design standards and the ResponsiveBuilder arguments.
-/// Each screen size has a default value to simplify widget usage.
+/// Material design standards and the [ResponsiveBuilder] arguments.
 ///
 /// Example usage:
 ///
@@ -25,8 +24,8 @@ import 'package:flutter/widgets.dart';
 /// );
 /// ```
 class ResponsivePadding extends StatelessWidget {
+  final Responsive<EdgeInsets> responsive;
   final Widget child;
-  final Map<ResponsiveBreakpointKey, EdgeInsets> _paddings;
 
   ResponsivePadding({
     super.key,
@@ -35,20 +34,23 @@ class ResponsivePadding extends StatelessWidget {
     EdgeInsets? md,
     EdgeInsets? lg,
     required this.child,
-  }) : _paddings = {
-         if (xs != null) ResponsiveBreakpointKey.xs: xs,
-         if (sm != null) ResponsiveBreakpointKey.sm: sm,
-         if (md != null) ResponsiveBreakpointKey.md: md,
-         if (lg != null) ResponsiveBreakpointKey.lg: lg,
-       };
+  }) : responsive = Responsive.breakpoints(
+         xs: xs,
+         sm: sm,
+         md: md,
+         lg: lg,
+       );
+
+  const ResponsivePadding.fromResponsive({
+    super.key,
+    required this.responsive,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveBuilder<EdgeInsets>(
-      xs: _paddings[ResponsiveBreakpointKey.xs],
-      sm: _paddings[ResponsiveBreakpointKey.sm],
-      md: _paddings[ResponsiveBreakpointKey.md],
-      lg: _paddings[ResponsiveBreakpointKey.lg],
+    return ResponsiveBuilder.fromResponsive(
+      responsive: responsive,
       builder: (context, padding) => Padding(
         padding: padding,
         child: child,

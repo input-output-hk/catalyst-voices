@@ -16,7 +16,7 @@ class UnlockButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveChild(
+    return ResponsiveChildBuilder(
       xs: (context) => IconButton.filled(
         onPressed: onPressed,
         color: Theme.of(context).colors.iconsBackground,

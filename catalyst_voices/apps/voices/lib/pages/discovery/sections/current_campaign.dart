@@ -41,7 +41,7 @@ class CurrentCampaign extends StatelessWidget {
                   totalAsk: currentCampaignInfo.totalAsk,
                 ),
               ),
-              ResponsiveSizedBox(
+              ResponsiveChild(
                 xs: const SizedBox(height: 30),
                 sm: const SizedBox(height: 48),
                 md: const SizedBox(height: 80),
@@ -57,8 +57,7 @@ class CurrentCampaign extends StatelessWidget {
           child: CampaignTimeline(
             key: const Key('CampaignTimeline'),
             timelineItems: currentCampaignInfo.timeline,
-            horizontalPadding: ResponsiveBuilder<SizedBox>(
-              builder: (context, data) => data,
+            horizontalPadding: ResponsiveChild(
               xs: const SizedBox(width: 20),
               sm: const SizedBox(width: 48),
               md: const SizedBox(width: 120),
