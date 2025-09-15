@@ -19,12 +19,11 @@ impl PutDocumentUnprocessableContent {
     /// Create a new instance of `ConfigBadRequest`.
     pub(crate) fn new(
         error: &(impl ToString + ?Sized),
-        _report: Option<catalyst_signed_doc::ProblemReport>,
+        report: Option<catalyst_signed_doc::ProblemReport>,
     ) -> Self {
         Self {
             error: error.to_string().into(),
-            // TODO: (apskhem) put error back when catalyst-signed-doc is ready
-            report: None,
+            report: report.map(Into::into),
         }
     }
 }
