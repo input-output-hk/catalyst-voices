@@ -9,7 +9,7 @@ import 'package:flutter/widgets.dart';
 /// detected.
 ///
 /// The breakpoint is identified by using the screen size exposed by [MediaQuery]
-/// of the context. [ResponsiveMapState] is responsible for resolving the best match value
+/// of the context. [ResponsiveStateResolver] is responsible for resolving the best match value
 /// for a given breakpoint.
 ///
 /// Example to render a specific string based on the breakpoints:
