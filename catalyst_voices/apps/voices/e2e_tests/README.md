@@ -24,17 +24,17 @@ These tests cover browser-based end-to-end workflows for the Catalyst Voices app
    or download using [puppeteer](https://pptr.dev/browsers-api))
 * Ability to run the app locally (Check `catalyst_voices/README.md` for instructions)
 * Check `catalyst_voices/apps/voices/e2e_tests/.env.example` for the environment variables
-   (for testing on localhost, use `localhost:5555`)
+   (for testing on localhost, use `localhost:3030`)
 
 ### Installation
 
 1. Run the app locally:
 
-   This ensures the app will be running on port 5555.
+   This ensures the app will be running on port 3030.
 
    ```bash
    cd catalyst_voices/apps/voices &&
-   flutter run --dart-define=ENV_NAME=preprod --web-port 5555 \
+   flutter run --dart-define=ENV_NAME=relative --web-port 3030 \
    --web-header "Cross-Origin-Opener-Policy=same-origin" \
    --web-header "Cross-Origin-Embedder-Policy=require-corp" \
    -d web-server --target lib/configs/main.dart

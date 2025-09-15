@@ -40,3 +40,146 @@ jobs:
           version: 0.21.0
       - name: Setup
         uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
+
+      # Build all required images
+      - name: Prepare artifacts
+        id: images
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        with:
+          command: run
+          args: ./catalyst-gateway/tests/+all-images
+
+      # Start Gateway
+      - name: Spin up catalyst-gateway
+        id: gateway-started
+        if: ${{ steps.images.conclusion == 'success' }}
+        run: |
+          docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway --detach
+
+      - name: Wait for cat-gateway to become healthy
+        id: gateway-healthy
+        if: ${{ steps.gateway-started.conclusion == 'success' }}
+        run: |
+          echo "Waiting for container to be healthy..."
+          for i in {1..500}; do
+            STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
+            echo "Health status: $STATUS"
+            if [ "$STATUS" == "healthy" ]; then
+              echo "Container is healthy!"
+              break
+            fi
+            if [ "$STATUS" == "unhealthy" ]; then
+              echo "Container became unhealthy."
+              exit 1
+            fi
+            sleep 5
+          done
+
+      # Setup Flutter with proper version first
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      # Get OpenAPI spec from gateway
+      - name: Download Gateway OpenAPI spec
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        with:
+          command: run
+          args: ./catalyst-gateway/+build
+
+      - name: Copy OpenAPI spec
+        run: |
+          mkdir -p catalyst_voices/packages/internal/catalyst_voices_repositories/openapi
+          cp catalyst-gateway/doc/cat-gateway-api.json catalyst_voices/packages/internal/catalyst_voices_repositories/openapi/cat-gateway.json || \
+          find . -name "cat-gateway-api.json" -exec cp {} catalyst_voices/packages/internal/catalyst_voices_repositories/openapi/cat-gateway.json \;
+
+      # Generate code and bootstrap project
+      - name: Generate code and bootstrap Flutter project
+        working-directory: catalyst_voices
+        run: |
+          flutter --version
+          dart pub global activate melos
+
+          # Bootstrap first to get dependencies
+          melos bootstrap
+
+          # Generate code using melos (same as Earthly does internally)
+          melos l10n
+          melos build_runner
+          melos build_runner_repository
+
+      - name: Start Flutter web server
+        working-directory: catalyst_voices/apps/voices
+        run: |
+          # Run Flutter on port 3030 with relative environment
+          # Flutter handles proxying to gateway internally
+          flutter run --dart-define=ENV_NAME=relative --web-port 3030 \
+            --web-header "Cross-Origin-Opener-Policy=same-origin" \
+            --web-header "Cross-Origin-Embedder-Policy=require-corp" \
+            -d web-server --target lib/configs/main.dart &
+          echo $! > flutter.pid
+
+      # Run E2E tests
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: catalyst_voices/apps/voices/e2e_tests/package-lock.json
+
+      - name: Install E2E dependencies
+        working-directory: catalyst_voices/apps/voices/e2e_tests
+        run: npm ci
+
+      - name: Download Chrome browser from catalyst-storage
+        run: |
+          mkdir -p /tmp/chrome-browser
+          cd /tmp/chrome-browser
+
+          # Download chrome-linux64_140.zip
+          wget -q https://github.com/input-output-hk/catalyst-storage/raw/main/web-browsers/chrome/chrome-linux64_140.zip
+          unzip -q chrome-linux64_140.zip
+
+          # Chrome executable is at chrome-linux64/chrome
+          export CHROME_PATH="/tmp/chrome-browser/chrome-linux64/chrome"
+
+          echo "Chrome path: $CHROME_PATH"
+          echo "CHROME_PATH=$CHROME_PATH" >> $GITHUB_ENV
+
+          chmod +x "$CHROME_PATH"
+
+          # Test if Chrome can launch with debugging port
+          echo "Testing Chrome launch..."
+          timeout 5s "$CHROME_PATH" --headless --remote-debugging-port=9222 --no-sandbox || true
+          echo "Chrome test complete"
+
+      - name: Run E2E tests
+        working-directory: catalyst_voices/apps/voices/e2e_tests
+        env:
+          ENVIRONMENT: localhost:3030
+          CHROME_PATH: ${{ env.CHROME_PATH }}
+          CI: true
+        run: |
+          echo "Using Chrome at: $CHROME_PATH"
+          npx playwright test --reporter=junit,html
+          cp results.xml ./voices-e2e${{ env.REPORT_EXT }} || true
+
+      # Collect reports
+      - name: Collect and upload test reports
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: test-reports-voices
+          path: "**/*${{ env.REPORT_EXT }}"
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Cleanup
+        if: always()
+        run: |
+          if [ -f catalyst_voices/apps/voices/flutter.pid ]; then
+            kill $(cat catalyst_voices/apps/voices/flutter.pid) || true
+          fi
+          docker compose -f catalyst-gateway/tests/docker-compose.yml down -v

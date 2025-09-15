@@ -1,7 +1,6 @@
 /* cspell:disable */
 import unzip from "@tomjs/unzip-crx";
 import fs, { promises as fsPromises } from "fs";
-import nodeFetch from "node-fetch";
 import * as os from "os";
 import path from "path";
 import { pipeline } from "stream/promises";
@@ -69,7 +68,7 @@ export class ExtensionDownloader {
     await fsPromises.mkdir(this.extensionsDir, { recursive: true });
 
     // Fetch the extension
-    const res = await nodeFetch(url);
+    const res = await fetch(url);
     if (!res.ok) {
       throw new Error(`Failed to download extension: ${res.statusText}`);
     }
@@ -111,7 +110,7 @@ export class ExtensionDownloader {
     const filePath = path.join(this.extensionsDir, `${extensionId}.crx`);
 
     // Fetch the extension
-    const res = await nodeFetch(url);
+    const res = await fetch(url);
     if (!res.ok) {
       throw new Error(`Failed to download extension: ${res.statusText}`);
     }
