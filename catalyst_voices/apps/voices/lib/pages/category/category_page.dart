@@ -159,19 +159,17 @@ class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
         final isActiveProposer = context.select<SessionCubit, bool>(
           (cubit) => cubit.state.isProposerUnlock,
         );
-        final smallBody = _BodySmall(
-          category: state.data,
-          isLoading: state.show,
-          isActiveProposer: isActiveProposer,
-        );
-        return ResponsiveBuilder<Widget>(
-          sm: smallBody,
-          md: _Body(
+        return ResponsiveChildBuilder(
+          sm: (_) => _BodySmall(
             category: state.data,
             isLoading: state.show,
             isActiveProposer: isActiveProposer,
           ),
-          builder: (context, data) => data,
+          md: (_) => _Body(
+            category: state.data,
+            isLoading: state.show,
+            isActiveProposer: isActiveProposer,
+          ),
         );
       },
     );

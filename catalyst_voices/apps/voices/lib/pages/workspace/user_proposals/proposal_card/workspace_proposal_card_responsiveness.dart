@@ -189,19 +189,18 @@ class _WorkspaceProposalCardResponsiveness extends StatelessWidget {
     final isSubmitted = _ProposalSubmitState.of(context)?.isSubmitted ?? false;
     final commentsCount = proposal.commentsCount;
 
-    return ResponsiveBuilder<Widget>(
-      builder: (context, data) => data,
-      sm: _SmallScreen(
+    return ResponsiveChildBuilder(
+      sm: (_) => _SmallScreen(
         proposal: proposal,
         isSubmitted: isSubmitted,
         commentsCount: commentsCount,
       ),
-      md: _MediumScreen(
+      md: (_) => _MediumScreen(
         proposal: proposal,
         isSubmitted: isSubmitted,
         commentsCount: commentsCount,
       ),
-      lg: _LargeScreen(
+      lg: (_) => _LargeScreen(
         proposal: proposal,
         isSubmitted: isSubmitted,
         commentsCount: commentsCount,
