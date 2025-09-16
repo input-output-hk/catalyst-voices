@@ -173,7 +173,6 @@ class _ResponsiveTitle extends StatelessWidget {
         ],
         itemGap: 8,
       ),
-
       sm: (_) => _Title(
         widgets: [
           _BrandPicture(enableBackHome: enableBackHome),
