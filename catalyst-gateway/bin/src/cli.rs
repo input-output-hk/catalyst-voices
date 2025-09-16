@@ -56,12 +56,6 @@ impl Cli {
 
                 // Initialize Event DB connection pool
                 db::event::establish_connection_pool().await;
-                // Test that connection is available
-                if EventDB::connection_is_ok().await {
-                    debug!("Event DB is connected. Liveness set to true");
-                } else {
-                    error!("Event DB connection failed");
-                }
 
                 // Start the chain indexing follower.
                 start_followers().await?;

@@ -3,16 +3,18 @@ use std::{
     str::FromStr,
     sync::{
         atomic::{AtomicBool, Ordering},
-        Arc, OnceLock,
+        Arc, LazyLock, Mutex, OnceLock,
     },
+    time::Duration,
 };
 
 use bb8::{Pool, PooledConnection};
 use bb8_postgres::PostgresConnectionManager;
 use error::NotFoundError;
 use futures::{Stream, StreamExt, TryStreamExt};
+use tokio::task::JoinHandle;
 use tokio_postgres::{types::ToSql, NoTls, Row};
-use tracing::{debug, debug_span, error, Instrument};
+use tracing::{debug, debug_span, error, info, Instrument};
 
 use crate::{
     service::utilities::health::{event_db_is_live, set_event_db_liveness},
@@ -34,6 +36,10 @@ type SqlDbPool = Arc<Pool<PostgresConnectionManager<NoTls>>>;
 
 /// Postgres Connection Manager DB Pool Instance
 static EVENT_DB_POOL: OnceLock<SqlDbPool> = OnceLock::new();
+
+/// Background Event DB probe check
+static EVENT_DB_PROBE_TASK: LazyLock<Mutex<Option<JoinHandle<()>>>> =
+    LazyLock::new(|| Mutex::new(None));
 
 /// Is Deep Query Analysis enabled or not?
 static DEEP_QUERY_INSPECT: AtomicBool = AtomicBool::new(false);
@@ -246,6 +252,45 @@ impl EventDB {
         .instrument(span)
         .await
     }
+
+    /// Wait for the Event DB to be ready before continuing
+    pub(crate) async fn wait_until_ready(interval: Duration) {
+        loop {
+            if Self::connection_is_ok().await {
+                return;
+            }
+
+            tokio::time::sleep(interval).await;
+        }
+    }
+
+    /// Spawns a background task checking for the Event DB to be
+    /// ready.
+    /// Could spawn only one background task at a time
+    pub(crate) fn spawn_ready_probe() {
+        let spawning = || -> anyhow::Result<()> {
+            let mut task = EVENT_DB_PROBE_TASK
+                .lock()
+                .map_err(|e| anyhow::anyhow!("{e}"))?;
+
+            if task.as_ref().is_none_or(JoinHandle::is_finished) {
+                /// Event DB probe check wait interval
+                const INTERVAL: Duration = Duration::from_secs(1);
+
+                *task = Some(tokio::spawn(async move {
+                    Self::wait_until_ready(INTERVAL).await;
+                    info!("Event DB is ready");
+                }));
+            }
+            Ok(())
+        };
+
+        debug!("Waiting for the Event DB background probe check task to be spawned");
+        while let Err(e) = spawning() {
+            error!(error = ?e, "EVENT_DB_PROBE_TASK is poisoned, should never happen");
+            EVENT_DB_PROBE_TASK.clear_poison();
+        }
+    }
 }
 
 /// Establish a connection to the database, and check the schema is up-to-date.
@@ -305,6 +350,7 @@ pub async fn establish_connection_pool() {
             if EVENT_DB_POOL.set(Arc::new(pool)).is_err() {
                 error!("Failed to set EVENT_DB_POOL. Already set?");
             }
+            EventDB::spawn_ready_probe();
         },
         Err(err) => {
             error!(error = %err, "Failed to establish connection with EventDB pool");
