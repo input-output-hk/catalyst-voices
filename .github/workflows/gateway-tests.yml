@@ -137,20 +137,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Free Disk Space (Ubuntu)
-        uses: jlumbroso/free-disk-space@main
-        with:
+     # - name: Free Disk Space (Ubuntu)
+     #   uses: jlumbroso/free-disk-space@main
+     #   with:
           # this might remove tools that are actually needed,
           # if set to "true" but frees about 6 GB
-          tool-cache: false
+     #     tool-cache: false
           # all of these default to true, but feel free to set to
           # "false" if necessary for your workflow
-          android: true
-          dotnet: false
-          haskell: false
-          large-packages: false
-          docker-images: false
-          swap-storage: true
+      #    android: true
+      #    dotnet: false
+      #    haskell: false
+      #    large-packages: false
+      #    docker-images: false
+      #    swap-storage: true
 
       - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.9.0
