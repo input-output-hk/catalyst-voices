@@ -152,6 +152,11 @@ jobs:
           docker-images: false
           swap-storage: true
 
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: test
+
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
         with:
