@@ -1,0 +1,155 @@
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_content.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigation_panel.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
+import 'package:catalyst_voices/widgets/containers/sidebar/sidebar_scaffold.dart';
+import 'package:catalyst_voices/widgets/tiles/specialized/document_builder_section_tile_controller.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/material.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+
+class ProposalBuilderResponsiveness extends StatelessWidget {
+  final ItemScrollController segmentsScrollController;
+  final DocumentBuilderSectionTileController sectionTileController;
+  final VoidCallback onRetryTap;
+
+  const ProposalBuilderResponsiveness({
+    super.key,
+    required this.segmentsScrollController,
+    required this.sectionTileController,
+    required this.onRetryTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ResponsiveBuilder<Widget>(
+      builder: (context, data) => data,
+      sm: _SmallScreenProposalBuilderLayout(
+        segmentsScrollController: segmentsScrollController,
+        sectionTileController: sectionTileController,
+        onRetryTap: onRetryTap,
+      ),
+      md: SidebarScaffold(
+        leftRail: const ProposalBuilderNavigationPanel(),
+        rightRail: const ProposalBuilderSetupPanel(),
+        body: ProposalBuilderContent(
+          itemScrollController: segmentsScrollController,
+          sectionTileController: sectionTileController,
+          onRetryTap: onRetryTap,
+        ),
+        bodyConstraints: const BoxConstraints.expand(),
+      ),
+    );
+  }
+}
+
+class _KeepAliveWrapper extends StatefulWidget {
+  final Widget child;
+
+  const _KeepAliveWrapper({required this.child});
+
+  @override
+  State<_KeepAliveWrapper> createState() => _KeepAliveWrapperState();
+}
+
+class _KeepAliveWrapperState extends State<_KeepAliveWrapper> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return widget.child;
+  }
+}
+
+class _SmallScreenProposalBuilderLayout extends StatefulWidget {
+  final ItemScrollController segmentsScrollController;
+  final DocumentBuilderSectionTileController sectionTileController;
+  final VoidCallback onRetryTap;
+
+  const _SmallScreenProposalBuilderLayout({
+    required this.segmentsScrollController,
+    required this.sectionTileController,
+    required this.onRetryTap,
+  });
+
+  @override
+  State<_SmallScreenProposalBuilderLayout> createState() =>
+      _SmallScreenProposalBuilderLayoutState();
+}
+
+class _SmallScreenProposalBuilderLayoutState extends State<_SmallScreenProposalBuilderLayout>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return DefaultTabController(
+      length: 3,
+      initialIndex: 1,
+      child: Column(
+        children: [
+          SizedBox(
+            height: 50,
+            child: TabBar(
+              tabAlignment: TabAlignment.center,
+              tabs: [
+                _TabBarText(
+                  text: context.l10n.treasuryCampaignBuilderSegments,
+                ),
+                _TabBarText(
+                  text: context.l10n.editor,
+                ),
+                _TabBarText(
+                  text: context.l10n.guidance,
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                const _KeepAliveWrapper(
+                  child: ProposalBuilderNavigationPanel(collapsable: false),
+                ),
+                _KeepAliveWrapper(
+                  child: ProposalBuilderContent(
+                    itemScrollController: widget.segmentsScrollController,
+                    sectionTileController: widget.sectionTileController,
+                    onRetryTap: widget.onRetryTap,
+                  ),
+                ),
+                const _KeepAliveWrapper(
+                  child: ProposalBuilderSetupPanel(collapsable: false),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TabBarText extends StatelessWidget {
+  final String text;
+
+  const _TabBarText({
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 50,
+      child: Center(
+        child: Text(
+          text,
+        ),
+      ),
+    );
+  }
+}
