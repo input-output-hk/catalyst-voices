@@ -1018,6 +1018,10 @@
   "@editRolesDialogTitle": {
     "description": "Title of dialog for editing roles"
   },
+  "editor": "Editor",
+  "@editor": {
+    "description": "Information that it's editor tab"
+  },
   "email": "Email",
   "@email": {
     "description": "Email address (short)"

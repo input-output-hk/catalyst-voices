@@ -22,7 +22,7 @@ class WorkspaceProposalCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isSubmitted = proposal.publish.isPublished;
-    final isLocalDraft = proposal.publish.isLocal;
+    final isPublishedDraft = proposal.publish.isDraft;
 
     return _ProposalSubmitState(
       isSubmitted: isSubmitted,
@@ -42,7 +42,7 @@ class WorkspaceProposalCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _Body(proposal),
-              if (!isSubmitted || !isLocalDraft || proposal.versions.length > 2)
+              if (isPublishedDraft && proposal.versions.length >= 2)
                 ProposalIterationHistory(
                   proposal: proposal,
                 ),
