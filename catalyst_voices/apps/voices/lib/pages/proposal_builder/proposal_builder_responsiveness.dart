@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ProposalBuilderResponsivness extends StatelessWidget {
-  const ProposalBuilderResponsivness({super.key});
+class ProposalBuilderResponsiveness extends StatelessWidget {
+  const ProposalBuilderResponsiveness({super.key});
 
   @override
   Widget build(BuildContext context) {
