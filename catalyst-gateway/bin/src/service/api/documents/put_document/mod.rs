@@ -89,8 +89,6 @@ pub(crate) async fn endpoint(
             },
         };
 
-    let validation_provider = ValidationProvider::new(DocProvider, verifying_key_provider);
-
     match doc.is_deprecated() {
         // apply older validation rule
         Ok(true) => {
@@ -115,6 +113,8 @@ pub(crate) async fn endpoint(
         },
         // apply newest validation rules
         Ok(false) => {
+            let validation_provider = ValidationProvider::new(DocProvider, verifying_key_provider);
+
             match catalyst_signed_doc::validator::validate(&doc, &validation_provider).await {
                 Ok(true) => (),
                 Ok(false) => {
