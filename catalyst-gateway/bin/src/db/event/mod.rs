@@ -183,14 +183,15 @@ impl EventDB {
     /// Checks that connection to `EventDB` is available.
     pub(crate) async fn connection_is_ok() -> bool {
         let event_db_liveness = event_db_is_live();
-        Self::get_pool_connection()
+        Self::schema_version_check()
             .await
             .inspect(|_| {
                 if !event_db_liveness {
                     set_event_db_liveness(true);
                 }
             })
-            .inspect_err(|_| {
+            .inspect_err(|err| {
+                error!(err = err.to_string(), "Event DB connection issues");
                 if event_db_liveness {
                     set_event_db_liveness(false);
                 }
