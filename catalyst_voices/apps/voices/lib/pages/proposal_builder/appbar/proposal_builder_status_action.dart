@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/widget/proposal_builder_menu_item.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_responsive_button.dart';
+import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
+import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/forget_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -42,19 +43,19 @@ class ProposalBuilderStatusAction extends StatelessWidget {
   }
 }
 
-class _Button extends StatelessWidget {
+class _LargeButton extends StatelessWidget {
   final VoidCallback onTap;
 
-  const _Button({required this.onTap});
+  const _LargeButton({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return VoicesResponsiveFilledButton(
+    return VoicesFilledButton(
       style: FilledButton.styleFrom(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       onTap: onTap,
-      icon: VoicesAssets.icons.documentText.buildIcon(),
+      leading: VoicesAssets.icons.documentText.buildIcon(),
       child: Row(
         children: [
           const SizedBox(width: 8),
@@ -93,7 +94,7 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
       offset: const Offset(0, 48),
       clipBehavior: Clip.antiAlias,
       constraints: const BoxConstraints(minWidth: 420),
-      child: _Button(onTap: _showMenu),
+      child: _ResponsiveButton(onTap: _showMenu),
       itemBuilder: (context) {
         return <PopupMenuEntry<int>>[
           for (final item in widget.items)
@@ -183,5 +184,36 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
 
   void _showMenu() {
     _buttonKey.currentState?.showButtonMenu();
+  }
+}
+
+class _ResponsiveButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _ResponsiveButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return ResponsiveChildBuilder(
+      xs: (context) => _SmallButton(onTap: onTap),
+      sm: (context) => _LargeButton(onTap: onTap),
+    );
+  }
+}
+
+class _SmallButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _SmallButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton.outlined(
+      style: OutlinedButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+      onTap: onTap,
+      child: VoicesAssets.icons.documentText.buildIcon(),
+    );
   }
 }
