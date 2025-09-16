@@ -2,6 +2,8 @@ import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_content.
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigation_panel.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
 import 'package:catalyst_voices/widgets/containers/sidebar/sidebar_scaffold.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab.dart';
+import 'package:catalyst_voices/widgets/tabbar/voices_tab_bar.dart';
 import 'package:catalyst_voices/widgets/tiles/specialized/document_builder_section_tile_controller.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -22,8 +24,7 @@ class ProposalBuilderResponsiveness extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveBuilder<Widget>(
-      builder: (context, data) => data,
+    return ResponsiveChild(
       sm: _SmallScreenProposalBuilderLayout(
         segmentsScrollController: segmentsScrollController,
         sectionTileController: sectionTileController,
@@ -63,6 +64,12 @@ class _KeepAliveWrapperState extends State<_KeepAliveWrapper> with AutomaticKeep
   }
 }
 
+enum _ProposalBuilderTap {
+  segmentsView,
+  editorView,
+  guidanceView,
+}
+
 class _SmallScreenProposalBuilderLayout extends StatefulWidget {
   final ItemScrollController segmentsScrollController;
   final DocumentBuilderSectionTileController sectionTileController;
@@ -94,17 +101,26 @@ class _SmallScreenProposalBuilderLayoutState extends State<_SmallScreenProposalB
         children: [
           SizedBox(
             height: 50,
-            child: TabBar(
+            child: VoicesTabBar(
               tabAlignment: TabAlignment.center,
               tabs: [
-                _TabBarText(
-                  text: context.l10n.treasuryCampaignBuilderSegments,
+                VoicesTab<_ProposalBuilderTap>(
+                  data: _ProposalBuilderTap.segmentsView,
+                  child: VoicesTabText(
+                    context.l10n.treasuryCampaignBuilderSegments,
+                  ),
                 ),
-                _TabBarText(
-                  text: context.l10n.editor,
+                VoicesTab<_ProposalBuilderTap>(
+                  data: _ProposalBuilderTap.editorView,
+                  child: VoicesTabText(
+                    context.l10n.editor,
+                  ),
                 ),
-                _TabBarText(
-                  text: context.l10n.guidance,
+                VoicesTab<_ProposalBuilderTap>(
+                  data: _ProposalBuilderTap.guidanceView,
+                  child: VoicesTabText(
+                    context.l10n.guidance,
+                  ),
                 ),
               ],
             ),
