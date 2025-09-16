@@ -101,6 +101,11 @@ dev_dependencies:
   sentry_dart_plugin: ^3.1.1
   url_launcher_platform_interface: ^2.3.2
 
+# TODO(dt-iohk): revert when flutter_secure_storage pulls transitively these or newer versions
+dependency_overrides:
+  flutter_secure_storage_web: ^2.0.0
+  flutter_secure_storage_platform_interface: ^2.0.1
+
 flutter:
   uses-material-design: true
   generate: true
