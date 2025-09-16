@@ -1,4 +1,4 @@
-//! OpenAPI Objects for Problem Report
+//! `OpenAPI` Objects for Problem Report
 
 use catalyst_types::problem_report;
 use poem_openapi::{
@@ -8,7 +8,7 @@ use poem_openapi::{
 
 use crate::service::common::types::array_types::impl_array_types;
 
-/// Represents an OpenAPI object for a Problem Report entry.
+/// Represents an `OpenAPI` object for a Problem Report entry.
 #[derive(Debug, Clone, Object, Default)]
 #[oai(example = true)]
 pub(crate) struct ProblemReportEntry {

@@ -11,16 +11,6 @@ use crate::{
     settings::Settings,
 };
 
-/// Get document cbor bytes from the database
-pub(crate) async fn get_document_cbor_bytes(
-    document_id: &uuid::Uuid,
-    version: Option<&uuid::Uuid>,
-) -> anyhow::Result<Vec<u8>> {
-    // If doesn't exist in the static templates, try to find it in the database
-    let db_doc = FullSignedDoc::retrieve(document_id, version).await?;
-    Ok(db_doc.raw().to_vec())
-}
-
 /// A wrapper struct to unify both implementations of `CatalystSignedDocumentProvider` and
 /// `VerifyingKeyProvider`.
 pub(crate) struct ValidationProvider {
@@ -88,8 +78,8 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         let id = doc_ref.id().uuid();
         let ver = doc_ref.ver().uuid();
-        match get_document_cbor_bytes(&id, Some(&ver)).await {
-            Ok(doc_cbor_bytes) => Ok(Some(doc_cbor_bytes.as_slice().try_into()?)),
+        match FullSignedDoc::retrieve(&id, Some(&ver)).await {
+            Ok(doc_cbor_bytes) => Ok(Some(doc_cbor_bytes.raw().try_into()?)),
             Err(err) if err.is::<NotFoundError>() => Ok(None),
             Err(err) => Err(err),
         }
@@ -100,7 +90,7 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
         id: catalyst_signed_doc::UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         match FullSignedDoc::retrieve(&id.uuid(), None).await {
-            Ok(doc) => Ok(Some(doc.raw().to_vec().as_slice().try_into()?)),
+            Ok(doc) => Ok(Some(doc.raw().try_into()?)),
             Err(err) if err.is::<NotFoundError>() => Ok(None),
             Err(err) => Err(err),
         }
@@ -124,8 +114,8 @@ impl catalyst_signed_doc_v1::providers::CatalystSignedDocumentProvider for DocPr
     ) -> anyhow::Result<Option<catalyst_signed_doc_v1::CatalystSignedDocument>> {
         let id = doc_ref.id.uuid();
         let ver = doc_ref.ver.uuid();
-        match get_document_cbor_bytes(&id, Some(&ver)).await {
-            Ok(doc_cbor_bytes) => Ok(Some(doc_cbor_bytes.as_slice().try_into()?)),
+        match FullSignedDoc::retrieve(&id, Some(&ver)).await {
+            Ok(doc_cbor_bytes) => Ok(Some(doc_cbor_bytes.raw().try_into()?)),
             Err(err) if err.is::<NotFoundError>() => Ok(None),
             Err(err) => Err(err),
         }
