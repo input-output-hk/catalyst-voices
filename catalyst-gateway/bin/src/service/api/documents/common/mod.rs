@@ -99,8 +99,11 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
         &self,
         id: catalyst_signed_doc::UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
-        // TODO:
-        todo!()
+        match FullSignedDoc::retrieve(&id.uuid(), None).await {
+            Ok(doc) => Ok(Some(doc.raw().to_vec().as_slice().try_into()?)),
+            Err(err) if err.is::<NotFoundError>() => Ok(None),
+            Err(err) => Err(err),
+        }
     }
 
     fn future_threshold(&self) -> Option<std::time::Duration> {
