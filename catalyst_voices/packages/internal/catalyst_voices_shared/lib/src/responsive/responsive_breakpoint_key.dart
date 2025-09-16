@@ -1,7 +1,5 @@
 typedef ResponsiveBreakpointRange = ({int min, int max});
 
-/// [ResponsiveBreakpointKey] is enum representing the responsive breakpoints.
-///
 /// The responsive breakpoints are used to define different screen sizes
 /// for responsive design. The available keys are:
 ///   - `xs`: Extra small screens: 0 - 599
@@ -16,11 +14,9 @@ enum ResponsiveBreakpointKey {
 
   final ResponsiveBreakpointRange range;
 
-  const ResponsiveBreakpointKey({
-    required this.range,
-  });
+  const ResponsiveBreakpointKey({required this.range});
 }
 
-extension ContainsExt on ResponsiveBreakpointRange {
+extension ResponsiveBreakpointRangeExt on ResponsiveBreakpointRange {
   bool contains(double value) => value >= min && value <= max;
 }

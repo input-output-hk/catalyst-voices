@@ -13,11 +13,9 @@ class WorkspaceTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveBuilder<Widget>(
-      builder: (context, data) => data,
-      xs: const _SmallScreen(),
-      sm: const _SmallScreen(),
-      other: const _LargeScreen(),
+    return ResponsiveChildBuilder(
+      sm: (_) => const _SmallScreen(),
+      md: (_) => const _LargeScreen(),
     );
   }
 }

@@ -19,10 +19,10 @@ class StayInvolved extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsivePadding.only(
+    return ResponsivePadding(
       xs: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       sm: const EdgeInsets.symmetric(horizontal: 48, vertical: 48),
-      other: const EdgeInsets.symmetric(horizontal: 120, vertical: 72),
+      md: const EdgeInsets.symmetric(horizontal: 120, vertical: 72),
       child: const Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,

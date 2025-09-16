@@ -38,9 +38,9 @@ class VotingGeneralHeader extends StatelessWidget {
             children: [
               const _CatalystFund(),
               if (showCategoryPicker)
-                ResponsivePadding.only(
+                ResponsivePadding(
+                  md: const EdgeInsets.only(top: 3),
                   lg: const EdgeInsets.only(top: 3, right: 32),
-                  other: const EdgeInsets.only(top: 3),
                   child: const VotingCategoryPickerSelector(),
                 ),
             ],
@@ -58,10 +58,9 @@ class _Cards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveChild(
-      xs: (_) => const _SmallCards(),
+    return ResponsiveChildBuilder(
       sm: (_) => const _SmallCards(),
-      other: (_) => const _DesktopCards(),
+      md: (_) => const _DesktopCards(),
     );
   }
 }

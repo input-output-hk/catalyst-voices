@@ -44,8 +44,8 @@ class _Foreground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder<EdgeInsetsGeometry>(
+      md: const EdgeInsetsGeometry.symmetric(horizontal: 16),
       lg: const EdgeInsetsGeometry.symmetric(horizontal: 32),
-      other: const EdgeInsetsGeometry.symmetric(horizontal: 16),
       builder: (context, data) {
         return CustomScrollView(
           slivers: [

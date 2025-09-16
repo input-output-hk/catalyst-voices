@@ -56,9 +56,9 @@ class _AccountPageState extends State<AccountPage>
               padding: const EdgeInsets.all(24),
               children: [
                 const AccountPageTitle(key: Key('AccountPageTitle')),
-                ResponsiveSizedBox(
+                ResponsiveChild(
                   xs: const SizedBox(height: 18),
-                  other: const SizedBox(height: 42),
+                  sm: const SizedBox(height: 42),
                 ),
                 const AccountPageGrid(
                   key: ValueKey('AccountOverviewGrid'),
@@ -67,9 +67,9 @@ class _AccountPageState extends State<AccountPage>
                     AccountActionTile(),
                   ],
                 ),
-                ResponsiveSizedBox(
+                ResponsiveChild(
                   xs: const SizedBox(height: 18),
-                  other: const SizedBox(height: 40),
+                  sm: const SizedBox(height: 40),
                 ),
                 AccountPageGrid(
                   key: const ValueKey('AccountDetailsGrid'),

@@ -25,7 +25,6 @@ class CampaignHeroSection extends StatelessWidget {
           sm: const EdgeInsets.only(left: 80, bottom: 32, top: 18),
           md: const EdgeInsets.only(left: 150, bottom: 64, top: 32),
           lg: const EdgeInsets.only(left: 150, bottom: 64, top: 32),
-          other: const EdgeInsets.only(left: 150, bottom: 64, top: 32),
           child: ConstrainedBox(
             constraints: const BoxConstraints(
               maxWidth: 450,

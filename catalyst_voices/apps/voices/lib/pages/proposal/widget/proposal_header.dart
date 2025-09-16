@@ -58,9 +58,9 @@ class _ProposalControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO(LynxLynxx): Remove when we support mobile web
-    return ResponsiveChild(
+    return ResponsiveChildBuilder(
       xs: (context) => const SizedBox(),
-      other: (context) => Row(
+      sm: (context) => Row(
         mainAxisSize: MainAxisSize.min,
         spacing: 4,
         children: [

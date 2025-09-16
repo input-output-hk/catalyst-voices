@@ -56,7 +56,7 @@ class VoicesAlertDialog extends StatelessWidget {
 
     return ResponsiveBuilder<BoxConstraints>(
       xs: const BoxConstraints(),
-      other: const BoxConstraints(maxWidth: 360),
+      sm: const BoxConstraints(maxWidth: 360),
       builder: (context, constraints) {
         // TODO(dt-iohk): remove SelectionArea when https://github.com/flutter/flutter/pull/167275
         // is released and we're using this flutter version

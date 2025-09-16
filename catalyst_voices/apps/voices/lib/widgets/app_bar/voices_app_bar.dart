@@ -48,7 +48,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
     return _Theme(
       child: ResponsiveBuilder<double>(
         xs: 8,
-        other: 16,
+        sm: 16,
         builder: (context, spacing) {
           return Column(
             mainAxisSize: MainAxisSize.min,
@@ -116,7 +116,7 @@ class _Actions extends StatelessWidget {
         wrapperPadding: EdgeInsets.only(right: 16),
         itemGap: 6,
       ),
-      other: const (
+      md: const (
         wrapperPadding: EdgeInsets.only(right: 24),
         itemGap: 12,
       ),
@@ -187,15 +187,6 @@ class _Title extends StatelessWidget {
       height: 64,
       alignment: Alignment.centerLeft,
       child: ResponsiveBuilder<({List<Widget> widgets, double itemGap})>(
-        builder: (context, data) => ListView.separated(
-          shrinkWrap: true,
-          itemBuilder: (context, index) => data.widgets[index],
-          separatorBuilder: (context, index) => SizedBox(
-            width: data.itemGap,
-          ),
-          itemCount: data.widgets.length,
-          scrollDirection: Axis.horizontal,
-        ),
         xs: (
           widgets: [
             _BrandPicture(enableBackHome: enableBackHome),
@@ -212,7 +203,7 @@ class _Title extends StatelessWidget {
           ],
           itemGap: 16,
         ),
-        other: (
+        md: (
           widgets: [
             _BrandPicture(enableBackHome: enableBackHome),
             if (showSearch)
@@ -221,6 +212,15 @@ class _Title extends StatelessWidget {
               ),
           ],
           itemGap: 24,
+        ),
+        builder: (context, data) => ListView.separated(
+          shrinkWrap: true,
+          itemBuilder: (context, index) => data.widgets[index],
+          separatorBuilder: (context, index) => SizedBox(
+            width: data.itemGap,
+          ),
+          itemCount: data.widgets.length,
+          scrollDirection: Axis.horizontal,
         ),
       ),
     );

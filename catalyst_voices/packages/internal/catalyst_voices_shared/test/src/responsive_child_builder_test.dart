@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  group(ResponsiveChild, () {
+  group(ResponsiveChildBuilder, () {
     Widget buildApp(Size size) => MediaQuery(
       data: MediaQueryData(size: size),
       child: MaterialApp(
         home: Scaffold(
-          body: ResponsiveChild(
-            xs: const Text('xs'),
-            sm: const Text('sm'),
-            md: const Text('md'),
-            lg: const Text('lg'),
+          body: ResponsiveChildBuilder(
+            xs: (_) => const Text('xs'),
+            sm: (_) => const Text('sm'),
+            md: (_) => const Text('md'),
+            lg: (_) => const Text('lg'),
           ),
         ),
       ),

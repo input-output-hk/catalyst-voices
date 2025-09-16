@@ -66,12 +66,10 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    const smallScreenPadding = EdgeInsets.symmetric(horizontal: 12);
 
-    return ResponsivePadding.only(
-      xs: smallScreenPadding,
-      sm: smallScreenPadding,
-      other: const EdgeInsets.symmetric(horizontal: 32),
+    return ResponsivePadding(
+      sm: const EdgeInsets.symmetric(horizontal: 12),
+      md: const EdgeInsets.symmetric(horizontal: 32),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,

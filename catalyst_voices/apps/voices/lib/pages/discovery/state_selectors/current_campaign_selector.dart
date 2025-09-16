@@ -96,10 +96,10 @@ class CurrentCampaignSelector extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ResponsivePadding.only(
+        ResponsivePadding(
           xs: const EdgeInsets.only(left: 20, top: 64, right: 20),
           sm: const EdgeInsets.only(left: 42, top: 64, right: 42),
-          other: const EdgeInsets.only(left: 120, top: 64, right: 120),
+          md: const EdgeInsets.only(left: 120, top: 64, right: 120),
           child: const _Header(),
         ),
         const Stack(

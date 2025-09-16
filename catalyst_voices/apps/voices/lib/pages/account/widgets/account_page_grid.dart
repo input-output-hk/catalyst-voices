@@ -13,9 +13,8 @@ class AccountPageGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder<int>(
-      xs: 1,
       sm: 1,
-      other: 2,
+      md: 2,
       builder: (context, data) {
         return ColumnsRow(
           columnsCount: data,

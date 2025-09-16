@@ -90,10 +90,10 @@ class _LatestProposalsState extends State<MostRecentProposals> {
           fit: BoxFit.cover,
         ),
       ),
-      child: ResponsivePadding.only(
+      child: ResponsivePadding(
         xs: const EdgeInsets.symmetric(horizontal: 48),
         sm: const EdgeInsets.symmetric(horizontal: 48),
-        other: const EdgeInsets.symmetric(horizontal: 100),
+        md: const EdgeInsets.symmetric(horizontal: 100),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

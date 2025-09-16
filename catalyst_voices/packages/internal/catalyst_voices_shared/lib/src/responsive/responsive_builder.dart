@@ -8,12 +8,11 @@ import 'package:flutter/widgets.dart';
 /// consume breakpoint-specific data automatically based on breakpoint that is
 /// detected.
 ///
-/// The breakpoint is identified by using the screen size exposed by MediaQuery
-/// of the context.
+/// The breakpoint is identified by using the screen size exposed by [MediaQuery]
+/// of the context. [Responsive.resolve] is responsible for resolving the best matching value
+/// for a given breakpoint.
 ///
-/// [ResponsiveState] is responsible for resolving the appropriate value for a given breakpoint.
-///
-/// Example to render a specific string based on the breakpoints:
+/// Example usage:
 ///
 /// ```dart
 /// ResponsiveBuilder<String>(
@@ -21,47 +20,31 @@ import 'package:flutter/widgets.dart';
 ///   sm: 'Small device',
 ///   md: 'Medium device',
 ///   lg: 'Large device',
-///   other: 'Fallback device',
-///   builder: (context, title) => Title(title!),
-/// );
-///
-/// or to have a specific padding:
-///
-/// ```dart
-/// ResponsiveBuilder<EdgeInsetsGeometry>(
-///   xs: EdgeInsets.all(4.0),
-///   other: EdgeInsets.all(10.0),
-///   builder: (context, padding) => Padding(
-///     padding: padding,
-///     child: Text('This is an example.')
-///   ),
+///   builder: (context, title) => Title(title),
 /// );
 /// ```
-// TODO(damian-molinski): support logical operation like < sm or >= md
 class ResponsiveBuilder<T extends Object> extends StatelessWidget {
+  final Responsive<T> responsive;
   final DataWidgetBuilder<T> builder;
-  final ResponsiveState<T> responsiveState;
 
   ResponsiveBuilder({
     super.key,
-    required this.builder,
     T? xs,
     T? sm,
     T? md,
     T? lg,
-    required T other,
-  }) : responsiveState = ResponsiveMapState(
+    required this.builder,
+  }) : responsive = Responsive.breakpoints(
          xs: xs,
          sm: sm,
          md: md,
          lg: lg,
-         other: other,
        );
 
-  const ResponsiveBuilder.fromState({
+  const ResponsiveBuilder.fromResponsive({
     super.key,
+    required this.responsive,
     required this.builder,
-    required this.responsiveState,
   });
 
   @override
@@ -72,6 +55,6 @@ class ResponsiveBuilder<T extends Object> extends StatelessWidget {
   T _getResponsiveBreakpoint(BuildContext context) {
     final screenSize = MediaQuery.sizeOf(context);
 
-    return responsiveState.resolve(screenSize);
+    return responsive.resolve(screenSize);
   }
 }

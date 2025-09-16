@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/modals/voices_panel_dialog.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class VoicesDetailsDialog extends StatelessWidget {
@@ -25,7 +26,7 @@ class VoicesDetailsDialog extends StatelessWidget {
     return VoicesPanelDialog(
       showClose: false,
       showBorder: true,
-      constraints: constraints,
+      constraints: Responsive.single(constraints),
       backgroundColor: backgroundColor ?? Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
       child: Column(
         children: [
