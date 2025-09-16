@@ -15,9 +15,12 @@ use crate::{
         },
         index::session::CassandraSessionError,
     },
-    service::common::{
-        auth::rbac::token::CatalystRBACTokenV1, responses::WithErrorResponses,
-        types::headers::retry_after::RetryAfterOption,
+    service::{
+        api::documents::common::ValidationProvider,
+        common::{
+            auth::rbac::token::CatalystRBACTokenV1, responses::WithErrorResponses,
+            types::headers::retry_after::RetryAfterOption,
+        },
     },
 };
 
@@ -71,6 +74,23 @@ pub(crate) async fn endpoint(
         .into();
     };
 
+    // validate document signatures
+    let verifying_key_provider =
+        match VerifyingKeyProvider::try_from_kids(&mut token, &doc.kids()).await {
+            Ok(value) => value,
+            Err(err) if err.is::<CassandraSessionError>() => {
+                return AllResponses::service_unavailable(&err, RetryAfterOption::Default)
+            },
+            Err(err) => {
+                return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
+                    &err, None,
+                )))
+                .into()
+            },
+        };
+
+    let validation_provider = ValidationProvider::new(DocProvider, verifying_key_provider);
+
     match doc.is_deprecated() {
         // apply older validation rule
         Ok(true) => {
@@ -95,7 +115,7 @@ pub(crate) async fn endpoint(
         },
         // apply newest validation rules
         Ok(false) => {
-            match catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
+            match catalyst_signed_doc::validator::validate(&doc, &validation_provider).await {
                 Ok(true) => (),
                 Ok(false) => {
                     return Responses::UnprocessableContent(Json(
@@ -113,34 +133,6 @@ pub(crate) async fn endpoint(
             }
         },
         Err(err) => return AllResponses::handle_error(&err),
-    }
-
-    // validate document signatures
-    let verifying_key_provider =
-        match VerifyingKeyProvider::try_from_kids(&mut token, &doc.kids()).await {
-            Ok(value) => value,
-            Err(err) if err.is::<CassandraSessionError>() => {
-                return AllResponses::service_unavailable(&err, RetryAfterOption::Default)
-            },
-            Err(err) => {
-                return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-                    &err, None,
-                )))
-                .into()
-            },
-        };
-    match catalyst_signed_doc::validator::validate_signatures(&doc, &verifying_key_provider).await {
-        Ok(true) => (),
-        Ok(false) => {
-            return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-                "Failed validating document signatures",
-                Some(doc.problem_report()),
-            )))
-            .into();
-        },
-        Err(err) => {
-            return AllResponses::handle_error(&err);
-        },
     }
 
     if doc.problem_report().is_problematic() {
