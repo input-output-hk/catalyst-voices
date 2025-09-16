@@ -48,7 +48,7 @@ impl From<problem_report::Entry> for ProblemReportEntry {
     fn from(value: problem_report::Entry) -> Self {
         let default = Self {
             msg: ErrorMessage::from(value.context().as_str()),
-            ..Default::default()
+            ..Self::default()
         };
 
         match value.kind() {
@@ -140,7 +140,7 @@ impl Example for ProblemReportEntry {
             field: Some(ErrorMessage::from("field name")),
             value: Some(ErrorMessage::from("field value")),
             constraint: Some(ErrorMessage::from("constraint")),
-            ..Default::default()
+            ..Self::default()
         }
     }
 }

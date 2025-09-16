@@ -57,7 +57,7 @@ impl_string_types!(
 
 impl Default for ErrorMessage {
     fn default() -> Self {
-        Self(Default::default())
+        Self(String::default())
     }
 }
 
