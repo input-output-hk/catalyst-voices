@@ -6,62 +6,64 @@ use poem_openapi::{
     Object,
 };
 
-use crate::service::common::types::array_types::impl_array_types;
+use crate::service::common::types::{
+    array_types::impl_array_types, generic::error_msg::ErrorMessage,
+};
 
 /// Represents an `OpenAPI` object for a Problem Report entry.
 #[derive(Debug, Clone, Object, Default)]
 #[oai(example = true)]
 pub(crate) struct ProblemReportEntry {
     /// The kind of problem we are recording.
-    pub(crate) kind: String,
+    pub(crate) kind: ErrorMessage,
     /// The message describing the problem.
-    pub(crate) msg: String,
+    pub(crate) msg: ErrorMessage,
     /// The field name that causes the problem.
     #[oai(skip_serializing_if_is_none)]
-    pub(crate) field: Option<String>,
+    pub(crate) field: Option<ErrorMessage>,
     /// The value of the field.
     #[oai(skip_serializing_if_is_none)]
-    pub(crate) value: Option<String>,
+    pub(crate) value: Option<ErrorMessage>,
     /// The constraint of what is expected for a valid value
     #[oai(skip_serializing_if_is_none)]
-    pub(crate) constraint: Option<String>,
+    pub(crate) constraint: Option<ErrorMessage>,
     /// Detected encoding
     #[oai(skip_serializing_if_is_none)]
-    pub(crate) encoded: Option<String>,
+    pub(crate) encoded: Option<ErrorMessage>,
     /// Expected encoding
     #[oai(skip_serializing_if_is_none)]
-    pub(crate) expected: Option<String>,
+    pub(crate) expected: Option<ErrorMessage>,
     #[oai(skip_serializing_if_is_none)]
     /// Explanation of the failed or problematic validation
-    pub(crate) explanation: Option<String>,
+    pub(crate) explanation: Option<ErrorMessage>,
     #[oai(skip_serializing_if_is_none)]
     /// Additional information about the duplicate field.
-    pub(crate) description: Option<String>,
+    pub(crate) description: Option<ErrorMessage>,
     #[oai(skip_serializing_if_is_none)]
     /// The type that the value was expected to convert to
-    pub(crate) expected_type: Option<String>,
+    pub(crate) expected_type: Option<ErrorMessage>,
 }
 
 impl From<problem_report::Entry> for ProblemReportEntry {
     fn from(value: problem_report::Entry) -> Self {
         let default = Self {
-            msg: value.context().clone(),
+            msg: ErrorMessage::from(value.context().as_str()),
             ..Default::default()
         };
 
         match value.kind() {
             problem_report::Kind::MissingField { field } => {
                 Self {
-                    kind: "MissingField".to_string(),
-                    field: Some(field).cloned(),
+                    kind: ErrorMessage::from("MissingField"),
+                    field: Some(&ErrorMessage::from(field.as_str())).cloned(),
                     ..default
                 }
             },
             problem_report::Kind::UnknownField { field, value } => {
                 Self {
-                    kind: "UnknownField".to_string(),
-                    field: Some(field).cloned(),
-                    value: Some(value).cloned(),
+                    kind: ErrorMessage::from("UnknownField"),
+                    field: Some(&ErrorMessage::from(field.as_str())).cloned(),
+                    value: Some(&ErrorMessage::from(value.as_str())).cloned(),
                     ..default
                 }
             },
@@ -71,10 +73,10 @@ impl From<problem_report::Entry> for ProblemReportEntry {
                 constraint,
             } => {
                 Self {
-                    kind: "InvalidValue".to_string(),
-                    field: Some(field).cloned(),
-                    value: Some(value).cloned(),
-                    constraint: Some(constraint).cloned(),
+                    kind: ErrorMessage::from("InvalidValue"),
+                    field: Some(&ErrorMessage::from(field.as_str())).cloned(),
+                    value: Some(&ErrorMessage::from(value.as_str())).cloned(),
+                    constraint: Some(&ErrorMessage::from(constraint.as_str())).cloned(),
                     ..default
                 }
             },
@@ -84,25 +86,25 @@ impl From<problem_report::Entry> for ProblemReportEntry {
                 expected,
             } => {
                 Self {
-                    kind: "InvalidEncoding".to_string(),
-                    field: Some(field).cloned(),
-                    encoded: Some(encoded).cloned(),
-                    expected: Some(expected).cloned(),
+                    kind: ErrorMessage::from("InvalidEncoding"),
+                    field: Some(&ErrorMessage::from(field.as_str())).cloned(),
+                    encoded: Some(&ErrorMessage::from(encoded.as_str())).cloned(),
+                    expected: Some(&ErrorMessage::from(expected.as_str())).cloned(),
                     ..default
                 }
             },
             problem_report::Kind::FunctionalValidation { explanation } => {
                 Self {
-                    kind: "FunctionalValidation".to_string(),
-                    explanation: Some(explanation).cloned(),
+                    kind: ErrorMessage::from("FunctionalValidation"),
+                    explanation: Some(&ErrorMessage::from(explanation.as_str())).cloned(),
                     ..default
                 }
             },
             problem_report::Kind::DuplicateField { field, description } => {
                 Self {
-                    kind: "DuplicateField".to_string(),
-                    field: Some(field).cloned(),
-                    description: Some(description).cloned(),
+                    kind: ErrorMessage::from("DuplicateField"),
+                    field: Some(&ErrorMessage::from(field.as_str())).cloned(),
+                    description: Some(&ErrorMessage::from(description.as_str())).cloned(),
                     ..default
                 }
             },
@@ -112,17 +114,17 @@ impl From<problem_report::Entry> for ProblemReportEntry {
                 expected_type,
             } => {
                 Self {
-                    kind: "ConversionError".to_string(),
-                    field: Some(field).cloned(),
-                    value: Some(value).cloned(),
-                    expected_type: Some(expected_type).cloned(),
+                    kind: ErrorMessage::from("ConversionError"),
+                    field: Some(&ErrorMessage::from(field.as_str())).cloned(),
+                    value: Some(&ErrorMessage::from(value.as_str())).cloned(),
+                    expected_type: Some(&ErrorMessage::from(expected_type.as_str())).cloned(),
                     ..default
                 }
             },
             problem_report::Kind::Other { description } => {
                 Self {
-                    kind: "Other".to_string(),
-                    description: Some(description).cloned(),
+                    kind: ErrorMessage::from("Other"),
+                    description: Some(&ErrorMessage::from(description.as_str())).cloned(),
                     ..default
                 }
             },
@@ -133,11 +135,11 @@ impl From<problem_report::Entry> for ProblemReportEntry {
 impl Example for ProblemReportEntry {
     fn example() -> Self {
         Self {
-            kind: "InvalidValue".to_string(),
-            msg: "context".to_string(),
-            field: Some("field name".to_string()),
-            value: Some("field value".to_string()),
-            constraint: Some("constraint".to_string()),
+            kind: ErrorMessage::from("InvalidValue"),
+            msg: ErrorMessage::from("context"),
+            field: Some(ErrorMessage::from("field name")),
+            value: Some(ErrorMessage::from("field value")),
+            constraint: Some(ErrorMessage::from("constraint")),
             ..Default::default()
         }
     }

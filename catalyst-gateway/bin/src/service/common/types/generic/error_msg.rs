@@ -55,6 +55,12 @@ impl_string_types!(
     is_valid
 );
 
+impl Default for ErrorMessage {
+    fn default() -> Self {
+        Self(Default::default())
+    }
+}
+
 impl Example for ErrorMessage {
     /// An example of error message.
     fn example() -> Self {
