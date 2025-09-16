@@ -149,23 +149,3 @@ class _SmallScreenProposalBuilderLayoutState extends State<_SmallScreenProposalB
     );
   }
 }
-
-class _TabBarText extends StatelessWidget {
-  final String text;
-
-  const _TabBarText({
-    required this.text,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 50,
-      child: Center(
-        child: Text(
-          text,
-        ),
-      ),
-    );
-  }
-}
