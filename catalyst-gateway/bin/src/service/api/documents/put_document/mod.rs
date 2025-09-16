@@ -207,8 +207,8 @@ async fn store_document_in_db(
     let doc_meta_json = doc.doc_meta().to_json()?;
 
     let payload = if matches!(
-        doc.doc_content_type()?,
-        catalyst_signed_doc::ContentType::Json
+        doc.doc_content_type(),
+        Some(catalyst_signed_doc::ContentType::Json)
     ) {
         match serde_json::from_slice(doc.decoded_content()?.as_slice()) {
             Ok(payload) => Some(payload),

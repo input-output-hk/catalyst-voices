@@ -112,7 +112,7 @@ darling = { version = "=0.20.10" }
 test-case = "3.3.1"
 
 [build-dependencies]
-build-info-build = "0.0.41"
+build-info-build = "0.0.39"
 
 [package.metadata.cargo-machete]
 # remove that after fixing issues with latest crates
