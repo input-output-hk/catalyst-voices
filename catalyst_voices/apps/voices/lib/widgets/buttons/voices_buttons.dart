@@ -280,7 +280,9 @@ class VoicesEditCancelButton extends StatelessWidget {
 
     if (hasError) {
       return VoicesFilledButton(
-        backgroundColor: theme.colorScheme.error,
+        style: FilledButton.styleFrom(
+          backgroundColor: theme.colorScheme.error,
+        ),
         onTap: onTap,
         child: Text(
           text,

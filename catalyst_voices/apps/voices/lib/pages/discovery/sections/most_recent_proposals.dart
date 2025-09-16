@@ -214,8 +214,10 @@ class _ViewAllProposalsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
-      backgroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
-      foregroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
+      style: FilledButton.styleFrom(
+        backgroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
+        foregroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
+      ),
       child: Text(
         key: const Key('ViewAllProposalsBtn'),
         context.l10n.viewAllProposals,

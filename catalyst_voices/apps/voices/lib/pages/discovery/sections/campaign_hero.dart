@@ -69,8 +69,10 @@ class _CampaignBrief extends StatelessWidget {
               onTap: () {
                 const ProposalsRoute().go(context);
               },
-              backgroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
-              foregroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
+              style: FilledButton.styleFrom(
+                backgroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
+                foregroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
+              ),
               child: Text(context.l10n.viewProposals),
             ),
             const SizedBox(width: 8),

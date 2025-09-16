@@ -64,7 +64,9 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
             children: [
               VoicesFilledButton(
                 key: const Key('DeleteKeychainContinueButton'),
-                backgroundColor: Theme.of(context).colors.iconsError,
+                style: FilledButton.styleFrom(
+                  backgroundColor: Theme.of(context).colors.iconsError,
+                ),
                 onTap: _removeKeychain,
                 child: Text(context.l10n.continueText),
               ),

@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/widget/proposal_builder_menu_item.dart';
+import 'package:catalyst_voices/widgets/buttons/voices_responsive_button.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/forget_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -49,12 +49,14 @@ class _Button extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesFilledButton(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    return VoicesResponsiveFilledButton(
+      style: FilledButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
       onTap: onTap,
+      icon: VoicesAssets.icons.documentText.buildIcon(),
       child: Row(
         children: [
-          VoicesAssets.icons.documentText.buildIcon(size: 16),
           const SizedBox(width: 8),
           Text(
             context.l10n.proposalOptions,

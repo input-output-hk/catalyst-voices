@@ -29,7 +29,7 @@ class DiscoveryAppbar extends StatelessWidget implements PreferredSizeWidget {
       active: (_, __, ___) => VoicesAppBar(
         leading: isAppUnlock ? const DrawerToggleButton() : null,
         actions: [
-          if (isProposer) const CreateProposalButton(),
+          if (isProposer) const ResponsiveCreateProposalButton(),
           const SessionCtaAction(),
           const AccountSettingsAction(),
         ],
