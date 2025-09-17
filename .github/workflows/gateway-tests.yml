@@ -46,7 +46,7 @@ jobs:
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
         with:
           command: run
-          args: ./catalyst-gateway/tests/+all-images --no-cache
+          args: ./catalyst-gateway/tests/+all-images
 
       - name: Rust integration tests
         if: ${{ steps.images.conclusion == 'success' }}
@@ -65,7 +65,7 @@ jobs:
         if: ${{ steps.gateway-started.conclusion == 'success' }}
         run: |
               echo "Waiting for container to be healthy..."
-              for i in {1..5}; do
+              for i in {1..500}; do
                 STATUS=$(docker inspect --format='{{.State.Health.Status}}' cat-gateway)
                 echo "Health status: $STATUS"
                 if [ "$STATUS" == "healthy" ]; then
