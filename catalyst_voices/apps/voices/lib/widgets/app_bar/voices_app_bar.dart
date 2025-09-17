@@ -61,7 +61,10 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
                 leadingWidth: 48.0 + spacing,
                 automaticallyImplyLeading: false,
                 backgroundColor: backgroundColor,
-                title: _Title(showSearch: showSearch, enableBackHome: enableBackHome),
+                title: _ResponsiveTitle(
+                  showSearch: showSearch,
+                  enableBackHome: enableBackHome,
+                ),
                 actions: [
                   _Actions(children: actions),
                 ],
@@ -155,6 +158,39 @@ class _BrandPicture extends StatelessWidget {
   }
 }
 
+class _ResponsiveTitle extends StatelessWidget {
+  final bool showSearch;
+  final bool enableBackHome;
+
+  const _ResponsiveTitle({required this.showSearch, required this.enableBackHome});
+
+  @override
+  Widget build(BuildContext context) {
+    return ResponsiveChildBuilder(
+      xs: (_) => _Title(
+        widgets: [
+          _BrandPicture(enableBackHome: enableBackHome),
+        ],
+        itemGap: 8,
+      ),
+      sm: (_) => _Title(
+        widgets: [
+          _BrandPicture(enableBackHome: enableBackHome),
+          if (showSearch) SearchButton(onPressed: () {}),
+        ],
+        itemGap: 16,
+      ),
+      md: (_) => _Title(
+        widgets: [
+          _BrandPicture(enableBackHome: enableBackHome),
+          if (showSearch) SearchButton(onPressed: () {}),
+        ],
+        itemGap: 24,
+      ),
+    );
+  }
+}
+
 class _Theme extends StatelessWidget {
   final Widget child;
 
@@ -176,52 +212,25 @@ class _Theme extends StatelessWidget {
 }
 
 class _Title extends StatelessWidget {
-  final bool showSearch;
-  final bool enableBackHome;
+  final List<Widget> widgets;
+  final double itemGap;
 
-  const _Title({required this.showSearch, required this.enableBackHome});
+  const _Title({
+    required this.widgets,
+    required this.itemGap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 64,
       alignment: Alignment.centerLeft,
-      child: ResponsiveBuilder<({List<Widget> widgets, double itemGap})>(
-        xs: (
-          widgets: [
-            _BrandPicture(enableBackHome: enableBackHome),
-          ],
-          itemGap: 8,
-        ),
-        sm: (
-          widgets: [
-            _BrandPicture(enableBackHome: enableBackHome),
-            if (showSearch)
-              SearchButton(
-                onPressed: () {},
-              ),
-          ],
-          itemGap: 16,
-        ),
-        md: (
-          widgets: [
-            _BrandPicture(enableBackHome: enableBackHome),
-            if (showSearch)
-              SearchButton(
-                onPressed: () {},
-              ),
-          ],
-          itemGap: 24,
-        ),
-        builder: (context, data) => ListView.separated(
-          shrinkWrap: true,
-          itemBuilder: (context, index) => data.widgets[index],
-          separatorBuilder: (context, index) => SizedBox(
-            width: data.itemGap,
-          ),
-          itemCount: data.widgets.length,
-          scrollDirection: Axis.horizontal,
-        ),
+      child: ListView.separated(
+        shrinkWrap: true,
+        itemCount: widgets.length,
+        itemBuilder: (context, index) => widgets[index],
+        separatorBuilder: (context, index) => SizedBox(width: itemGap),
+        scrollDirection: Axis.horizontal,
       ),
     );
   }
