@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/docs:feat/catalyst-compression-setup AS docs-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/docs:feat/migrate-away-from-melos AS docs-ci
 
 IMPORT .. AS repo
 IMPORT ../catalyst-gateway AS catalyst-gateway
