@@ -46,7 +46,7 @@ jobs:
         uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
         with:
           command: run
-          args: ./catalyst-gateway/tests/+all-images
+          args: ./catalyst-gateway/tests/+all-images --no-cache
 
       - name: Rust integration tests
         if: ${{ steps.images.conclusion == 'success' }}
