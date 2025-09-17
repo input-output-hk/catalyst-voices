@@ -89,8 +89,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 ///
 /// In this service, liveness is assumed unless there are multiple panics generated
 /// by an endpoint in a short window.
-#[allow(clippy::unused_async)]
-pub(crate) async fn endpoint() -> AllResponses {
+pub(crate) fn endpoint() -> AllResponses {
     if is_live() {
         Responses::NoContent.into()
     } else {

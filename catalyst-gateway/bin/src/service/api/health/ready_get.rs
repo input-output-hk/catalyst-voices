@@ -75,17 +75,12 @@
 //! providing ongoing connectivity checks and recovery attempts for the service's
 //! databases.
 use poem_openapi::ApiResponse;
-use tracing::debug;
 
 use crate::{
-    cardano::INDEXING_DB_READY_WAIT_INTERVAL,
-    db::{
-        event::{establish_connection_pool, EventDB},
-        index::session::CassandraSession,
-    },
+    db::{event::EventDB, index::session::CassandraSession},
     service::{
         common::{responses::WithErrorResponses, types::headers::retry_after::RetryAfterOption},
-        utilities::health::condition_for_started,
+        utilities::health::{condition_for_started, event_db_is_live, index_db_is_live},
     },
 };
 
@@ -119,36 +114,24 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// and is not able to properly service requests while it is occurring.
 /// This would let the load balancer shift traffic to other instances of this
 /// service that are ready.
-pub(crate) async fn endpoint() -> AllResponses {
-    // Check Event DB connection
-    if !EventDB::connection_is_ok().await {
-        // When check fails, attempt to re-connect
-        establish_connection_pool().await;
-        // Re-check, and update Event DB service liveness flag
-        let retry_success = EventDB::connection_is_ok().await;
-        debug!(retry_success, "Event DB re-connect attempt.");
-    };
+pub(crate) fn endpoint() -> AllResponses {
+    // Dont need to re-init any of the DB sessions, initialisation should be called only once,
+    // if it was disconnected it will try to reconnect automatically with the existing
+    // session instance.
 
-    // Check Index DB connection
-    if !CassandraSession::is_ready().await {
-        // When check fails, attempt to re-connect
-        CassandraSession::init();
-        // Re-check connection to Indexing DB (internally updates the liveness flag)
-        let retry_success =
-            CassandraSession::wait_until_ready(INDEXING_DB_READY_WAIT_INTERVAL, true)
-                .await
-                .is_ok();
-        debug!(retry_success, "Cassandra Session re-connect attempt.");
+    if !event_db_is_live() {
+        EventDB::spawn_ready_probe();
     }
-
-    // Otherwise, re-check, and return 204 response if all is good.
+    if !index_db_is_live() {
+        CassandraSession::spawn_ready_probe();
+    }
     if condition_for_started() {
-        return Responses::NoContent.into();
+        Responses::NoContent.into()
+    } else {
+        // return 503 response.
+        AllResponses::service_unavailable_with_msg(
+            "Service is not ready, do not send other requests.".to_string(),
+            RetryAfterOption::Default,
+        )
     }
-
-    // Otherwise, return 503 response.
-    AllResponses::service_unavailable_with_msg(
-        "Service is not ready, do not send other requests.".to_string(),
-        RetryAfterOption::Default,
-    )
 }
