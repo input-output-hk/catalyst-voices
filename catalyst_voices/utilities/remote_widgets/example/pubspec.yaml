@@ -1,11 +1,11 @@
 name: remote_widgets_example
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.0+1
+resolution: workspace
 
 environment:
   sdk: ">=3.9.0 <4.0.0"
-resolution: workspace
 
 dependencies:
   flutter:

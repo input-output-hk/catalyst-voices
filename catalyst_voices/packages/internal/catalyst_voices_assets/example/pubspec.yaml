@@ -2,11 +2,11 @@ name: catalyst_voices_assets_example
 description: A Catalyst Voices Assets Example.
 version: 0.1.0+1
 publish_to: none
+resolution: workspace
 
 environment:
   sdk: ">=3.9.0 <4.0.0"
   flutter: ">=3.35.1"
-resolution: workspace
 
 dependencies:
   catalyst_voices_assets:

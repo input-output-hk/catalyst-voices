@@ -2,11 +2,11 @@ name: catalyst_voices_blocs
 description: Catalyst Voices Blocs.
 version: 0.1.0+1
 publish_to: none
+resolution: workspace
 
 environment:
   sdk: ">=3.9.0 <4.0.0"
   flutter: ">=3.35.1"
-resolution: workspace
 
 dependencies:
   bloc_concurrency: ^0.3.0

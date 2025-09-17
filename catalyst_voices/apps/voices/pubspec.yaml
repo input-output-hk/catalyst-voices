@@ -2,11 +2,11 @@ name: catalyst_voices
 description: Catalyst Voices
 version: 0.1.0+1
 publish_to: none
+resolution: workspace
 
 environment:
   sdk: ">=3.9.0 <4.0.0"
   flutter: ">=3.35.1"
-resolution: workspace
 
 dependencies:
   auto_size_text: ^3.0.0

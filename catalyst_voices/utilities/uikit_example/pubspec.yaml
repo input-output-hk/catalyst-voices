@@ -1,11 +1,11 @@
 name: uikit_example
 description: Demonstrates usage of UIKit.
 publish_to: "none"
+resolution: workspace
 
 environment:
   sdk: ">=3.9.0 <4.0.0"
   flutter: ">=3.35.1"
-resolution: workspace
 
 dependencies:
   catalyst_cardano_serialization: ^1.0.0
