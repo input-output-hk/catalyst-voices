@@ -320,7 +320,7 @@ async fn get_invalid_registrations(
             cip15: (!row.cip36).into(),
             errors: ProblemReport::parse_from_json_string(&row.problem_report)
                 .map(Some)
-                .unwrap_or_default(),
+                .map_err(|e| anyhow::anyhow!("{}", e.message()))?,
         });
     }
 
@@ -614,7 +614,7 @@ async fn get_all_invalid_registrations(
             cip15: (!row.cip36).into(),
             errors: ProblemReport::parse_from_json_string(&row.problem_report)
                 .map(Some)
-                .unwrap_or_default(),
+                .map_err(|e| anyhow::anyhow!("{}", e.message()))?,
         };
 
         if let Some(mut v) = invalids_map.get_mut(&Ed25519HexEncodedPublicKey::try_from(

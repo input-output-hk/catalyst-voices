@@ -53,20 +53,23 @@ impl Example for InvalidRegistration {
     }
 }
 
-impl From<Query> for InvalidRegistration {
-    fn from(q: Query) -> Self {
+impl TryFrom<Query> for InvalidRegistration {
+    type Error = anyhow::Error;
+
+    fn try_from(q: Query) -> Result<Self, Self::Error> {
         let time = Settings::cardano_network()
             .slot_to_time(q.slot_no.into())
             .into();
 
-        Self {
+        Ok(Self {
             time,
             txn_id: TransactionId::from(q.txn_id).into(),
             slot: Slot::from(q.slot_no).into(),
             txn_index: q.txn_index.into(),
             previous_txn: q.prv_txn_id.map(|t| TransactionId::from(t).into()),
             purpose: q.purpose.map(|p| UuidV4::from(p).into()),
-            report: ParseFromJSON::parse_from_json_string(&q.problem_report).unwrap_or_default(),
-        }
+            report: ParseFromJSON::parse_from_json_string(&q.problem_report)
+                .map_err(|e| anyhow::anyhow!("{}", e.message()))?,
+        })
     }
 }
