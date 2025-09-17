@@ -7,3 +7,4 @@ topics: [lints, analyzer, analysis]
 
 environment:
   sdk: ">=3.9.0 <4.0.0"
+resolution: workspace

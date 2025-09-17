@@ -1,10 +1,41 @@
 name: catalyst_voices_workspace
 
 environment:
-  sdk: ">=3.3.3 <4.0.0"
+  sdk: ">=3.9.0 <4.0.0"
+
+workspace:
+  - apps/voices
+  - packages/internal/catalyst_voices_assets
+  - packages/internal/catalyst_voices_assets/example
+  - packages/internal/catalyst_voices_blocs
+  - packages/internal/catalyst_voices_brands
+  - packages/internal/catalyst_voices_driver
+  - packages/internal/catalyst_voices_localization
+  - packages/internal/catalyst_voices_models
+  - packages/internal/catalyst_voices_repositories
+  - packages/internal/catalyst_voices_services
+  - packages/internal/catalyst_voices_shared
+  - packages/internal/catalyst_voices_view_models
+  - packages/libs/catalyst_analysis
+  - packages/libs/catalyst_analysis/example
+  - packages/libs/catalyst_cardano/catalyst_cardano
+  - packages/libs/catalyst_cardano/catalyst_cardano/example
+  - packages/libs/catalyst_cardano/catalyst_cardano_platform_interface
+  - packages/libs/catalyst_cardano/catalyst_cardano_web
+  - packages/libs/catalyst_cardano_serialization
+  - packages/libs/catalyst_compression
+  - packages/libs/catalyst_compression/example
+  - packages/libs/catalyst_cose
+  - packages/libs/catalyst_key_derivation
+  - packages/libs/catalyst_key_derivation/example
+  - utilities/poc_local_storage
+  - utilities/remote_widgets
+  - utilities/remote_widgets/example
+  - utilities/uikit_example
 
 dependencies:
-  dart_pubspec_licenses: ^3.0.4
+  dart_pubspec_licenses: ^3.0.9
 
 dev_dependencies:
-  melos: ^6.3.3
+  melos: ^7.1.1
+
