@@ -74,11 +74,12 @@ jobs:
                 fi
                 if [ "$STATUS" == "unhealthy" ]; then
                   echo "Container became unhealthy."
-                  exit 1
+                  break
                 fi
                 sleep 5
               done
-              if [ $? -eq 1 ]; then
+
+              if [ "$STATUS" -ne "healthy" ]; then
                 docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
                 exit 1
               fi
