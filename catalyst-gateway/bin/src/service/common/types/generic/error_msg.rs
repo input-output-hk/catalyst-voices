@@ -57,6 +57,7 @@ impl_string_types!(
 
 impl Default for ErrorMessage {
     fn default() -> Self {
+        #[allow(clippy::derivable_impls)]
         Self(String::default())
     }
 }
