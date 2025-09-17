@@ -79,7 +79,7 @@ jobs:
                 sleep 5
               done
 
-              if [ "$STATUS" -ne "healthy" ]; then
+              if [ "$STATUS" != "healthy" ]; then
                 docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
                 exit 1
               fi
