@@ -25,15 +25,36 @@ class DiscoveryAppbar extends StatelessWidget implements PreferredSizeWidget {
     return CampaignPhaseAware.orElse(
       phase: CampaignPhaseType.proposalSubmission,
       showOnlyDataState: true,
-      orElse: (_, __, ___) => const SizedBox.shrink(),
-      active: (_, __, ___) => VoicesAppBar(
-        leading: isAppUnlock ? const DrawerToggleButton() : null,
-        actions: [
-          if (isProposer) const ResponsiveCreateProposalButton(),
-          const SessionCtaAction(),
-          const AccountSettingsAction(),
-        ],
-      ),
+
+      active: (_, _, _) =>
+          _AppBar(isAppUnlock: isAppUnlock, isProposer: isProposer, isActivePhase: true),
+      orElse: (_, _, _) =>
+          _AppBar(isAppUnlock: isAppUnlock, isProposer: isProposer, isActivePhase: false),
+    );
+  }
+}
+
+class _AppBar extends StatelessWidget {
+  final bool isAppUnlock;
+  final bool isProposer;
+  final bool isActivePhase;
+
+  const _AppBar({
+    required this.isAppUnlock,
+    required this.isProposer,
+    required this.isActivePhase,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesAppBar(
+      automaticallyImplyLeading: false,
+      leading: (isAppUnlock && isActivePhase) ? const DrawerToggleButton() : null,
+      actions: [
+        if (isProposer && isActivePhase) const CreateProposalButton(),
+        const SessionCtaAction(),
+        const AccountSettingsAction(),
+      ],
     );
   }
 }
