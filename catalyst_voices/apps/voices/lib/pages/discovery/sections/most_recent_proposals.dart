@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_slider.dart';
+import 'package:catalyst_voices/widgets/text/app_version_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -31,11 +32,21 @@ class ViewAllProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _Background(
-      key: Key('MostRecentViewAllProposals'),
-      constraints: BoxConstraints(maxHeight: 184),
-      child: Center(
-        child: _ViewAllProposalsButton(),
+    return _Background(
+      key: const Key('MostRecentViewAllProposals'),
+      constraints: const BoxConstraints(maxHeight: 184),
+      child: Stack(
+        children: [
+          const Align(child: _ViewAllProposalsButton()),
+          Positioned(
+            bottom: 10,
+            left: 0,
+            right: 0,
+            child: AppVersionText(
+              color: Colors.white.withValues(alpha: 0.75),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -158,7 +169,11 @@ class _LatestProposalsState extends State<MostRecentProposals> {
             ),
             const SizedBox(height: 16),
             const _ViewAllProposalsButton(),
-            const SizedBox(height: 72),
+            const Spacer(),
+            AppVersionText(
+              color: Colors.white.withValues(alpha: 0.75),
+            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),
