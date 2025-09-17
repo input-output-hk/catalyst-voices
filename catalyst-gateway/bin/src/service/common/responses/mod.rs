@@ -149,9 +149,7 @@ impl<T> WithErrorResponses<T> {
     /// Returns a Server Error or a Service Unavailable response.
     pub(crate) fn handle_error(err: &anyhow::Error) -> Self {
         match err {
-            err if err.is::<bb8::RunError<tokio_postgres::Error>>()
-                || err.is::<EventDBConnectionError>() =>
-            {
+            err if err.is::<EventDBConnectionError>() || err.is::<EventDBConnectionError>() => {
                 // Event DB failed
                 debug!(error=?err, "Handling Response for Event DB Error");
                 set_event_db_liveness(false);

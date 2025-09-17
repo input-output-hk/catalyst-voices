@@ -55,7 +55,7 @@ impl Cli {
                 CassandraSession::init();
 
                 // Initialize Event DB connection pool
-                db::event::establish_connection_pool().await;
+                db::event::establish_connection_pool();
 
                 // Start the chain indexing follower.
                 start_followers().await?;
