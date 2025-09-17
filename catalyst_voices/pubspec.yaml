@@ -166,6 +166,9 @@ melos:
 
     test-report-web:
       run: |
+        # Install requirements
+        dart pub global activate junitreport
+
         # cleanup from previous build and create empty folder where test reports will be stored
         rm -fR $MELOS_ROOT_PATH/test_reports
         mkdir $MELOS_ROOT_PATH/test_reports
@@ -213,6 +216,9 @@ melos:
 
     test-report-native:
       run: |
+        # Install requirements
+        dart pub global activate junitreport
+
         # cleanup from previous build and create empty folder where test reports will be stored
         rm -fR $MELOS_ROOT_PATH/test_reports
         mkdir $MELOS_ROOT_PATH/test_reports
