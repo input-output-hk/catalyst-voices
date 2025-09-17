@@ -80,6 +80,7 @@ jobs:
               done
               if [ $? -eq 1 ]; then
                 docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
+                exit 1
               fi
 
       - name: Schemathesis tests
