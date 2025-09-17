@@ -266,8 +266,7 @@ melos:
 
     docs-generate:
       run: |
-        dart pub global deactivate dartdoc # uninstall previous version
-        dart pub global activate dartdoc 8.3.4
+        dart pub global activate dartdoc
         melos exec -c 1 --scope="*catalyst_voices*" --ignore="*example*" -- flutter analyze && 
         melos exec -c 1 --scope="*catalyst_voices*" --ignore="*example*" -- dart doc --output=MELOS_ROOT_PATH/docs/dartdoc/MELOS_PACKAGE_NAME .
 
