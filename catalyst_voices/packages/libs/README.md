@@ -40,7 +40,7 @@ A collection of Catalyst packages and plugins for Flutter and Dart.
 ```sh
 git clone https://github.com/input-output-hk/catalyst-voices.git
 cd catalyst-voices/catalyst_voices
-melos bootstrap
+melos install && melos bootstrap
 ```
 
 ## Contributing

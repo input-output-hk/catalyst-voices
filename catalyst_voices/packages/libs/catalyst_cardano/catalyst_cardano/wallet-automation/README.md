@@ -25,7 +25,7 @@ It is a part of the Catalyst Voices ecosystem.
 3. Bootstrap the project:
 
    ```sh
-   melos bootstrap
+   melos install && melos bootstrap
    ```
 
 4. Execute earthly command from this directory:

@@ -53,6 +53,18 @@ melos:
         flutter: ">=3.35.1"
 
   scripts:
+    install:
+      run: |
+        dart pub global activate junitreport
+        dart pub global activate dartdoc
+        dart pub global activate coverage
+        dart pub global activate combine_coverage
+        dart pub global activate license_checker
+        dart pub global activate pubviz
+        dart pub global activate dhttpd
+      description: |
+        Installs plugins needed by scripts in this file.
+
     analyze:
       run: |
         melos exec -- dart analyze --fatal-infos --fatal-warnings
@@ -124,7 +136,6 @@ melos:
 
     license-check:
       run: |
-        dart pub global activate license_checker
         cd $MELOS_ROOT_PATH && lic_ck check-licenses -c $MELOS_ROOT_PATH/licenses.yaml -i
       description: Run `lic_ck` checks for all packages.
 
@@ -138,7 +149,7 @@ melos:
 
     dependency-graph:
       run: |
-        dart pub global activate pubviz
+
         melos exec --scope "catalyst_voices" -- \
           'pubviz print --direct-dependencies --production-dependencies --format dot > $MELOS_ROOT_PATH/docs/dependency_graph.dot'
         echo "✅ Output file: $MELOS_ROOT_PATH/docs/dependency_graph.dot"
@@ -146,23 +157,34 @@ melos:
         Generate license list for all packages in docs/dependency_graph.dot file.
         The .dot file can be viewed using software available online such as graphviz.
 
+    test-native-sync:
+      run: |
+        melos exec -c 1 --dir-exists="test" -- \
+          flutter test --no-pub --concurrency 30
+      description: |
+        Run `flutter test` for all packages one by one.
+
     test-native:
       run: |
-        melos exec --dir-exists="test" --order-dependents -- flutter test
-      description: Run `flutter test` for all packages.
+        melos exec --dir-exists="test" -- \
+          flutter test --no-pub --concurrency 10 2>&1 \
+          | grep -v "Waiting for another flutter command to release the startup lock"
+      description: |
+        Run `flutter test` for all packages
+        Filters out irrelevant warning messages related to the startup lock.
 
     # catalyst_voices: this package should contain only widget tests
     test-web:
       run: |
-        melos exec -c 1 --dir-exists="test" --ignore="catalyst_voices" --order-dependents -- flutter test --platform chrome
-      description: Run `flutter test --platform chrome` for all packages.
+        melos exec --dir-exists="test" --ignore="catalyst_voices" -- \
+          flutter test --platform chrome --no-pub --concurrency 10 2>&1 \
+          | grep -v "Waiting for another flutter command to release the startup lock"
+      description: |
+        Run `flutter test --platform chrome` for all packages.
+        Filters out irrelevant warning messages related to the startup lock.
 
     test-report-native:
       run: |
-        # Install requirements
-        dart pub global activate junitreport
-        dart pub global activate combine_coverage
-
         # cleanup from previous build and create empty folder where test reports will be stored
         rm -fR $MELOS_ROOT_PATH/test_reports
         mkdir $MELOS_ROOT_PATH/test_reports
@@ -170,11 +192,13 @@ melos:
         # cleanup old coverage files and create empty folder where coverage files will be stored
         find . -type d -name coverage -prune -exec rm -rf {} \;
         mkdir $MELOS_ROOT_PATH/coverage
+
         # run tests, generate junit reports in /test_reports/ & code coverage report
-        melos exec --dir-exists="test" --order-dependents -- \
+        melos exec --dir-exists="test" -- \
         ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
           JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
-          flutter test --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage ; \
+          flutter test --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage --no-pub --concurrency 10 2>&1 \
+            | grep -v "Waiting for another flutter command to release the startup lock" ; \
           EXIT_CODE=$? ; \
           cat $TESTS_OUTPUT_FILE | tojunit --output $JUNIT_REPORT_FILE ; \
           exit $EXIT_CODE'
@@ -207,13 +231,10 @@ melos:
         The test reports are saved in /test_reports folder.
         The coverages are saved in coverage/lcov.info file for each tested package.
         The combined coverage is saved in the /coverage/lcov.coverage.info file.
+        Filters out irrelevant warning messages related to the startup lock.
 
     test-report-web:
       run: |
-        # Install requirements
-        dart pub global activate junitreport
-        dart pub global activate combine_coverage
-
         # cleanup from previous build and create empty folder where test reports will be stored
         rm -fR $MELOS_ROOT_PATH/test_reports
         mkdir $MELOS_ROOT_PATH/test_reports
@@ -221,11 +242,13 @@ melos:
         # cleanup old coverage files and create empty folder where coverage files will be stored
         find . -type d -name coverage -prune -exec rm -rf {} \;
         mkdir $MELOS_ROOT_PATH/coverage
+
         # run tests, generate junit reports in /test_reports/ & code coverage report
-        melos exec -c 1 --dir-exists="test" --ignore="catalyst_voices" --order-dependents -- \
+        melos exec -c 1 --dir-exists="test" --ignore="catalyst_voices" -- \
         ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
           JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
-          flutter test --platform chrome --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage ; \
+          flutter test --platform chrome --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage --no-pub --concurrency 10 2>&1 \
+            | grep -v "Waiting for another flutter command to release the startup lock" ; \
           EXIT_CODE=$? ; \
           cat $TESTS_OUTPUT_FILE | tojunit --output $JUNIT_REPORT_FILE ; \
           exit $EXIT_CODE'
@@ -258,21 +281,18 @@ melos:
         The test reports are saved in /test_reports folder.
         The coverages are saved in coverage/lcov.info file for each tested package.
         The combined coverage is saved in the /coverage/lcov.coverage.info file.
+        Filters out irrelevant warning messages related to the startup lock.
 
     docs-generate:
       run: |
-        dart pub global activate dartdoc
         melos exec --scope="*catalyst_voices*" --ignore="*example*" -- flutter analyze && 
         melos exec --scope="*catalyst_voices*" --ignore="*example*" -- dart doc --output=MELOS_ROOT_PATH/docs/dartdoc/MELOS_PACKAGE_NAME .
-
       description: |
         Generate internal documentation and saves it to docs/dartdoc directory
 
     docs-view:
-      steps:
-        - dart pub global activate dhttpd
-        - dart pub global run dhttpd --path docs/dartdoc/
-
+      run: |
+        dart pub global run dhttpd --path docs/dartdoc/
       description: |
         Documentation will be served at localhost:8080/<packageName>
         For example catalyst_voices_repository is served at localhost:8080/catalyst_voices_repository
