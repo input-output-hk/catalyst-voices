@@ -245,6 +245,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     final ref = _cache.ref;
     assert(ref != null, 'Proposal ref not found. Load doc first');
 
+    _cache = _cache.copyWith(isFavorite: Optional(value));
     emit(state.copyWithFavorite(isFavorite: value));
 
     if (value) {
