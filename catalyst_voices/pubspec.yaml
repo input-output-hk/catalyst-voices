@@ -53,9 +53,15 @@ melos:
         flutter: ">=3.35.1"
 
   scripts:
+    analyze:
+      run: |
+        melos exec -- dart analyze --fatal-infos --fatal-warnings
+      description: |
+        Run `dart analyze` in every package.
+
     l10n:
       run: |
-        melos exec -c 1 --scope="catalyst_voices_localization" -- flutter gen-l10n
+        melos exec --scope="catalyst_voices_localization" -- flutter gen-l10n
       description: |
         Run `flutter gen-l10n` in catalyst_voices_localization package to generate l10n bindings.
 
@@ -71,9 +77,9 @@ melos:
       description: |
         Clean up unused translation keys and sort them alphabetically in .arb files.
 
-    build_runner:
+    build-runner:
       run: |
-        melos exec -c 1 \
+        melos exec \
         --depends-on="build_runner" \
         --ignore="catalyst_voices_repositories" -- \
             dart run build_runner build --delete-conflicting-outputs
@@ -82,19 +88,19 @@ melos:
         The catalyst_voices_repositories is skipped because to run a build_runner there you
         must generate first swagger docs (see related Earthfile).
 
-    build_runner_repository:
+    build-runner-repository:
       run: |
-        melos exec -c 1 --depends-on="build_runner" --scope="catalyst_voices_repositories" -- dart run build_runner clean && \
-        melos exec -c 1 --scope="catalyst_voices_repositories" -- dart run process_openapi.dart && \
-        melos exec -c 1 \
-        --depends-on="build_runner" \
-        --scope="catalyst_voices_repositories" -- dart run build_runner build --delete-conflicting-outputs
+        melos exec --depends-on="build_runner" --scope="catalyst_voices_repositories" -- dart run build_runner clean && \
+        melos exec --scope="catalyst_voices_repositories" -- dart run process_openapi.dart && \
+        melos exec \
+          --depends-on="build_runner" \
+          --scope="catalyst_voices_repositories" -- dart run build_runner build --delete-conflicting-outputs
       description: |
         Run `build_runner` in catalyst_voices_repositories package
 
     db-make-migration:
       run: |
-        melos exec -c 1 \
+        melos exec \
         --depends-on="build_runner" \
         --scope="catalyst_voices_repositories" -- \
             dart run drift_dev make-migrations
@@ -104,7 +110,7 @@ melos:
 
     metrics:
       run: |
-        melos exec -c 1 -- \
+        melos exec -- \
           flutter pub run dart_code_metrics:metrics analyze
       description: |
         Run `dart_code_metrics` in all packages.
@@ -112,16 +118,16 @@ melos:
 
     format-apply:
       run: |
-        melos exec -c 1 --dir-exists="lib" -- "find lib -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format {} +" &&
-        melos exec -c 1 --dir-exists="test" -- "find test -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format {} +" &&
-        melos exec -c 1 --dir-exists="integration_test" -- "find integration_test -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format {} +"
+        melos exec --dir-exists="lib" -- "find lib -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format {} +" &&
+        melos exec --dir-exists="test" -- "find test -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format {} +" &&
+        melos exec --dir-exists="integration_test" -- "find integration_test -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format {} +"
       description: Run `dart format` for all packages.
 
     format-check:
       run: |
-        melos exec -c 1 --dir-exists="lib" -- "find lib -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format --output none --set-exit-if-changed {} +" &&
-        melos exec -c 1 --dir-exists="test" -- "find test -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format --output none --set-exit-if-changed {} +" &&
-        melos exec -c 1 --dir-exists="integration_test" -- "find integration_test -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format --output none --set-exit-if-changed {} +"
+        melos exec --dir-exists="lib" -- "find lib -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format --output none --set-exit-if-changed {} +" &&
+        melos exec --dir-exists="test" -- "find test -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format --output none --set-exit-if-changed {} +" &&
+        melos exec --dir-exists="integration_test" -- "find integration_test -name '*.dart' ! -name '*.g.dart' ! -path '*/generated/*' ! -path '*/.dart_tool/*' -exec dart format --output none --set-exit-if-changed {} +"
       description: Run `dart format` checks for all packages.
 
     license-check:
@@ -150,7 +156,7 @@ melos:
 
     test:select:
       run: |
-        melos exec -c 1 --dir-exists="test" -- flutter test
+        melos exec --dir-exists="test" -- flutter test
       description: Run `flutter test` for selected packages.
 
     test-native:
@@ -229,7 +235,7 @@ melos:
         find . -type d -name coverage -prune -exec rm -rf {} \;
         mkdir $MELOS_ROOT_PATH/coverage
         # run tests, generate junit reports in /test_reports/ & code coverage report
-        melos exec -c 1 --dir-exists="test" -- \
+        melos exec --dir-exists="test" -- \
         ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
           JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
           flutter test --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage ; \
@@ -269,8 +275,8 @@ melos:
     docs-generate:
       run: |
         dart pub global activate dartdoc
-        melos exec -c 1 --scope="*catalyst_voices*" --ignore="*example*" -- flutter analyze && 
-        melos exec -c 1 --scope="*catalyst_voices*" --ignore="*example*" -- dart doc --output=MELOS_ROOT_PATH/docs/dartdoc/MELOS_PACKAGE_NAME .
+        melos exec --scope="*catalyst_voices*" --ignore="*example*" -- flutter analyze && 
+        melos exec --scope="*catalyst_voices*" --ignore="*example*" -- dart doc --output=MELOS_ROOT_PATH/docs/dartdoc/MELOS_PACKAGE_NAME .
 
       description: |
         Generate internal documentation and saves it to docs/dartdoc directory

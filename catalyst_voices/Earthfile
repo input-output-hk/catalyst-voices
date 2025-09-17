@@ -41,8 +41,8 @@ code-generator:
     WORKDIR /frontend
 
     RUN melos l10n
-    RUN melos build_runner
-    RUN melos build_runner_repository
+    RUN melos build-runner
+    RUN melos build-runner-repository
 
     IF [ $save_locally = true ]
         # This step saves generated files other then OpenApi Services
