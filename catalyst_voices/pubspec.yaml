@@ -197,7 +197,7 @@ melos:
         melos exec --dir-exists="test" -- \
         ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
           JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
-          flutter test --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage --no-pub 2>&1 \
+          flutter test --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage --no-pub --concurrency 10 2>&1 \
             | grep -v "Waiting for another flutter command to release the startup lock" ; \
           EXIT_CODE=$? ; \
           cat $TESTS_OUTPUT_FILE | tojunit --output $JUNIT_REPORT_FILE ; \
@@ -247,7 +247,7 @@ melos:
         melos exec --dir-exists="test" --ignore="catalyst_voices" -- \
         ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
           JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
-          flutter test --platform chrome --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage --no-pub --concurrency 10 2>&1 \
+          flutter test --platform chrome --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage --no-pub 2>&1 \
             | grep -v "Waiting for another flutter command to release the startup lock" ; \
           EXIT_CODE=$? ; \
           cat $TESTS_OUTPUT_FILE | tojunit --output $JUNIT_REPORT_FILE ; \
