@@ -160,14 +160,14 @@ melos:
     test-native-sync:
       run: |
         melos exec -c 1 --dir-exists="test" -- \
-          flutter test --no-pub --concurrency 30
+          flutter test --reporter github --no-pub --concurrency 30
       description: |
         Run `flutter test` for all packages one by one.
 
     test-native:
       run: |
         melos exec --dir-exists="test" -- \
-          flutter test --no-pub --concurrency 10 2>&1 \
+          flutter test --reporter github --no-pub --concurrency 10 2>&1 \
           | grep -v "Waiting for another flutter command to release the startup lock"
       description: |
         Run `flutter test` for all packages
@@ -177,7 +177,7 @@ melos:
     test-web:
       run: |
         melos exec --dir-exists="test" --ignore="catalyst_voices" -- \
-          flutter test --platform chrome --no-pub 2>&1 \
+          flutter test --reporter github --platform chrome --no-pub 2>&1 \
           | grep -v "Waiting for another flutter command to release the startup lock"
       description: |
         Run `flutter test --platform chrome` for all packages.
