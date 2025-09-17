@@ -244,7 +244,7 @@ melos:
         mkdir $MELOS_ROOT_PATH/coverage
 
         # run tests, generate junit reports in /test_reports/ & code coverage report
-        melos exec -c 1 --dir-exists="test" --ignore="catalyst_voices" -- \
+        melos exec --dir-exists="test" --ignore="catalyst_voices" -- \
         ' TESTS_OUTPUT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.tests-output.json"
           JUNIT_REPORT_FILE="$MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml"
           flutter test --platform chrome --reporter github --file-reporter=json:$TESTS_OUTPUT_FILE --coverage --no-pub --concurrency 10 2>&1 \
