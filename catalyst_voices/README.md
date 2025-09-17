@@ -25,11 +25,11 @@ This repository contains the Catalyst Voices app and packages.
 
 ## Requirements
 
-* flutter: 3.32.8+
-* Dart: 3.8.0+
+* Flutter: 3.35.1+
+* Dart: 3.9.0+
 * Ruby: 2.5+
-* Xcode: 15.0+
-* Android Studio: Android Studio Electric Eel | 2022.1.1 +
+* Xcode: latest
+* Android Studio: latest
 * Android SDK: 23+
 * iOS SDK: 15.0+
 * [Melos](https://melos.invertase.dev)
@@ -37,7 +37,6 @@ This repository contains the Catalyst Voices app and packages.
 * Flutter & Dart plugins:
   * [Visual Studio Code](https://flutter.dev/docs/get-started/editor?tab=vscode)
   * [Android Studio / IntelliJ](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
-  * [Emacs](https://docs.flutter.dev/get-started/editor?tab=emacs)
 * [Rust](https://rustup.rs/): 1.80.0+
 
 ❗️We recommend using **Visual Studio Code** as the **default editor** for this project.

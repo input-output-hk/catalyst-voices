@@ -27,20 +27,19 @@ A collection of Catalyst packages and plugins for Flutter and Dart.
 
 * Flutter: 3.35.1+
 * Dart: 3.9.0+
-* Xcode: 15.0+
-* Android Studio: Android Studio Electric Eel | 2022.1.1 +
+* Xcode: latest
+* Android Studio: latest
 * [Melos](https://melos.invertase.dev)
 * Flutter & Dart plugins:
   * [Visual Studio Code](https://flutter.dev/docs/get-started/editor?tab=vscode)
   * [Android Studio / IntelliJ](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
-  * [Emacs](https://docs.flutter.dev/get-started/editor?tab=emacs)
 * [Rust](https://rustup.rs/): 1.80.0+
 
 ## Bootstrapping
 
 ```sh
 git clone https://github.com/input-output-hk/catalyst-voices.git
-cd catalyst-voices
+cd catalyst-voices/catalyst_voices
 melos bootstrap
 ```
 

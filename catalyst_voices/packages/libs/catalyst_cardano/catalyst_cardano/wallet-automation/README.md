@@ -13,7 +13,7 @@ It is a part of the Catalyst Voices ecosystem.
 
    ```sh
    git clone
-   cd catalyst-voices
+   cd catalyst-voices/catalyst_voices
    ```
 
 2. Install Flutter and Dart:
