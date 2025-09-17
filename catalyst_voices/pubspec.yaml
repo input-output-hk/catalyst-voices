@@ -168,6 +168,7 @@ melos:
       run: |
         # Install requirements
         dart pub global activate junitreport
+        dart pub global activate combine_coverage
 
         # cleanup from previous build and create empty folder where test reports will be stored
         rm -fR $MELOS_ROOT_PATH/test_reports
@@ -218,6 +219,7 @@ melos:
       run: |
         # Install requirements
         dart pub global activate junitreport
+        dart pub global activate combine_coverage
 
         # cleanup from previous build and create empty folder where test reports will be stored
         rm -fR $MELOS_ROOT_PATH/test_reports
