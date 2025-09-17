@@ -180,7 +180,7 @@ final class TreasuryRoute extends GoRouteData
   }
 }
 
-final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
+final class VotingRoute extends GoRouteData with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String? categoryId;
   final String? tab;
   final bool? $extra;
@@ -190,6 +190,9 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
     this.tab,
     this.$extra,
   });
+
+  @override
+  List<RouteGuard> get routeGuards => [const UserAccessGuard()];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
