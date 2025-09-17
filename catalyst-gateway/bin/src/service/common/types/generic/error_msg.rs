@@ -1,5 +1,7 @@
 //! Generic Error Messages
 
+// cspell: words impls
+
 use std::sync::LazyLock;
 
 use const_format::concatcp;
