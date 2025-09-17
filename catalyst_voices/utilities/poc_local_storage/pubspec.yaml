@@ -18,7 +18,7 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   go_router: ^15.1.3
-  pointycastle: ^4.0.0
+  pointycastle: ^3.0.0
 
 dev_dependencies:
   catalyst_analysis: ^3.0.0
