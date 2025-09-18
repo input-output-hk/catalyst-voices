@@ -78,7 +78,10 @@ abstract interface class ProposalService {
   ///
   /// Once imported from the version management point of view this becomes
   /// a new standalone proposal not related to the previous one.
-  Future<DocumentRef> importProposal(Uint8List data);
+  Future<DocumentRef> importProposal(
+    Uint8List data, {
+    List<SignedDocumentRef> allowTemplateRefs = const [],
+  });
 
   /// Returns true if the current user has
   /// reached the limit of submitted proposals.
@@ -343,9 +346,22 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<DocumentRef> importProposal(Uint8List data) async {
+  Future<DocumentRef> importProposal(
+    Uint8List data, {
+    List<SignedDocumentRef> allowTemplateRefs = const [],
+  }) async {
     final authorId = _getUserCatalystId();
-    return _proposalRepository.importProposal(data, authorId);
+    final documentData = await _proposalRepository.importProposal(data, authorId);
+
+    // TODO(LynxLynxx): Remove after we support multiple fund templates
+    if (!allowTemplateRefs.contains(documentData.template)) {
+      await deleteDraftProposal(documentData.selfRef as DraftRef);
+      throw const DocumentImportInvalidDataException(
+        SignedDocumentMetadataMalformed(reasons: ['template ref is not allowed to be imported']),
+      );
+    }
+
+    return documentData.selfRef;
   }
 
   @override

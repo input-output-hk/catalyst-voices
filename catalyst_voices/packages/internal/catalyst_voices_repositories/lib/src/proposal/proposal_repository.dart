@@ -52,7 +52,7 @@ abstract interface class ProposalRepository {
     required DocumentRef ref,
   });
 
-  Future<DocumentRef> importProposal(Uint8List data, CatalystId authorId);
+  Future<DocumentDataMetadata> importProposal(Uint8List data, CatalystId authorId);
 
   Future<void> publishProposal({
     required DocumentData document,
@@ -202,7 +202,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<DocumentRef> importProposal(Uint8List data, CatalystId authorId) {
+  Future<DocumentDataMetadata> importProposal(Uint8List data, CatalystId authorId) {
     return _documentRepository.importDocument(data: data, authorId: authorId);
   }
 

@@ -106,7 +106,7 @@ abstract interface class DocumentRepository {
   /// a new standalone document not related to the previous one.
   ///
   /// Returns the reference to the imported document.
-  Future<DocumentRef> importDocument({
+  Future<DocumentDataMetadata> importDocument({
     required Uint8List data,
     required CatalystId authorId,
   });
@@ -339,11 +339,13 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<DocumentRef> importDocument({
+  Future<DocumentDataMetadata> importDocument({
     required Uint8List data,
     required CatalystId authorId,
   }) async {
     final document = _parseDocumentData(data);
+
+    _validateDocumentMetadata(document);
 
     final newMetadata = document.metadata.copyWith(
       selfRef: DraftRef.generateFirstRef(),
@@ -356,7 +358,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
 
     await _drafts.save(data: newDocument);
-    return newDocument.ref;
+    return newDocument.metadata;
   }
 
   @override
@@ -602,6 +604,12 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return _localDocuments.watchRefToDocumentData(refTo: refTo, type: type).distinct();
   }
 
+  void _deleteInvalidDraft(DocumentData documentData) {
+    if (documentData.metadata.selfRef case final DraftRef draftRef) {
+      unawaited(deleteDocumentDraft(ref: draftRef));
+    }
+  }
+
   Future<DocumentData> _getDraftDocumentData({
     required DraftRef ref,
   }) async {
@@ -631,6 +639,19 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return remoteData;
   }
 
+  bool _isDocumentMetadataValid(DocumentData document) {
+    final template = document.metadata.template;
+    final category = document.metadata.categoryId;
+    final documentType = document.metadata.type;
+
+    final isInvalidTemplate = template == null || !template.isValid;
+    final isInvalidCategory = category == null || !category.isValid;
+    final isInvalidType = documentType == DocumentType.unknown;
+    final isInvalidProposal = isInvalidTemplate || isInvalidType || isInvalidCategory;
+
+    return !isInvalidProposal;
+  }
+
   DocumentData _parseDocumentData(Uint8List data) {
     try {
       final jsonData = json.fuse(utf8).decode(data)! as Map<String, dynamic>;
@@ -644,25 +665,59 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required List<DocumentData> documents,
     required ValueResolver<DocumentData, DocumentRef> refGetter,
   }) async {
-    try {
-      final results = await Future.wait(
-        documents.where((doc) => doc.metadata.template != null).map((documentData) async {
-          final templateRef = documentData.metadata.template!;
-          final templateData = await _documentDataLock.synchronized(
-            () => getDocumentData(ref: templateRef),
+    final results = <DocumentsDataWithRefData>[];
+
+    for (final documentData in documents.where(
+      (doc) => doc.metadata.template != null || doc.metadata.categoryId != null,
+    )) {
+      try {
+        if (!_isDocumentMetadataValid(documentData)) {
+          _logger.warning(
+            'Invalid document metadata for document ${documentData.metadata.selfRef}, skipping',
           );
-          return DocumentsDataWithRefData(
+          _deleteInvalidDraft(documentData);
+          continue;
+        }
+
+        final templateRef = documentData.metadata.template!;
+        final categoryRef = documentData.metadata.categoryId!;
+
+        if (!templateRef.isValid) {
+          _logger.warning(
+            'Invalid template reference for document ${documentData.metadata.selfRef}: $templateRef, skipping',
+          );
+          _deleteInvalidDraft(documentData);
+          continue;
+        }
+
+        if (!categoryRef.isValid) {
+          _logger.warning(
+            'Invalid category reference for document ${documentData.metadata.selfRef}: $categoryRef, skipping',
+          );
+          _deleteInvalidDraft(documentData);
+          continue;
+        }
+
+        final templateData = await _documentDataLock.synchronized(
+          () => getDocumentData(ref: templateRef),
+        );
+        results.add(
+          DocumentsDataWithRefData(
             data: documentData,
             refData: templateData,
-          );
-        }).toList(),
-      );
-      return results;
-    } catch (e, st) {
-      _logger.severe('Error processing document', e, st);
+          ),
+        );
+      } catch (e, st) {
+        _logger.warning(
+          'Error processing document ${documentData.metadata.selfRef}',
+          e,
+          st,
+        );
+        _deleteInvalidDraft(documentData);
+      }
     }
 
-    return [];
+    return results;
   }
 
   List<TypedDocumentRef> _uniqueTypedRefs(List<TypedDocumentRef> refs) {
@@ -679,6 +734,12 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     }
 
     return uniqueRefs.values.toList();
+  }
+
+  void _validateDocumentMetadata(DocumentData document) {
+    if (!_isDocumentMetadataValid(document)) {
+      throw const DocumentImportInvalidDataException(SignedDocumentMetadataMalformed);
+    }
   }
 
   Stream<DocumentData?> _watchDocumentData({

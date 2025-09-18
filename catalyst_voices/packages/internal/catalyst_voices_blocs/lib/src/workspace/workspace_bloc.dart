@@ -160,7 +160,13 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   Future<void> _importProposal(ImportProposalEvent event, Emitter<WorkspaceState> emit) async {
     try {
       emit(state.copyWith(isLoading: true));
-      final ref = await _proposalService.importProposal(event.proposalData);
+      final allowTemplateRefs =
+          _cachedCampaign?.categories.map((e) => e.proposalTemplateRef).toList() ?? [];
+
+      final ref = await _proposalService.importProposal(
+        event.proposalData,
+        allowTemplateRefs: allowTemplateRefs,
+      );
       emitSignal(ImportedProposalWorkspaceSignal(proposalRef: ref));
     } on DocumentImportInvalidDataException {
       emit(state.copyWith(isLoading: false));
@@ -169,9 +175,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       _logger.severe('Importing proposal failed', error, stackTrace);
       emit(state.copyWith(isLoading: false));
       emitError(LocalizedException.create(error));
+    } finally {
+      emit(state.copyWith(isLoading: false));
     }
-    // We don't need to emit isLoading false here because it will be emitted
-    // in the stream subscription.
   }
 
   Future<void> _loadProposals(LoadProposalsEvent event, Emitter<WorkspaceState> emit) async {
