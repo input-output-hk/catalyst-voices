@@ -30,7 +30,10 @@ pub(crate) struct DocsQueryFilter {
 }
 
 impl Display for DocsQueryFilter {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
         use std::fmt::Write;
         let mut query = "TRUE".to_string();
 
@@ -102,7 +105,10 @@ impl DocsQueryFilter {
     }
 
     /// Set the `type` field filter condition
-    pub fn with_type(self, doc_type: uuid::Uuid) -> Self {
+    pub fn with_type(
+        self,
+        doc_type: uuid::Uuid,
+    ) -> Self {
         DocsQueryFilter {
             doc_type: Some(doc_type),
             ..self
@@ -110,7 +116,10 @@ impl DocsQueryFilter {
     }
 
     /// Set the `id` field filter condition
-    pub fn with_id(self, id: EqOrRangedUuid) -> Self {
+    pub fn with_id(
+        self,
+        id: EqOrRangedUuid,
+    ) -> Self {
         DocsQueryFilter {
             id: Some(id),
             ..self
@@ -118,7 +127,10 @@ impl DocsQueryFilter {
     }
 
     /// Set the `ver` field filter condition
-    pub fn with_ver(self, ver: EqOrRangedUuid) -> Self {
+    pub fn with_ver(
+        self,
+        ver: EqOrRangedUuid,
+    ) -> Self {
         DocsQueryFilter {
             ver: Some(ver),
             ..self
@@ -126,7 +138,10 @@ impl DocsQueryFilter {
     }
 
     /// Set the `metadata->'ref'` field filter condition
-    pub fn with_ref(self, doc_ref: DocumentRef) -> Self {
+    pub fn with_ref(
+        self,
+        doc_ref: DocumentRef,
+    ) -> Self {
         DocsQueryFilter {
             doc_ref: Some(doc_ref),
             ..self
@@ -134,7 +149,10 @@ impl DocsQueryFilter {
     }
 
     /// Set the `metadata->'template'` field filter condition
-    pub fn with_template(self, template: DocumentRef) -> Self {
+    pub fn with_template(
+        self,
+        template: DocumentRef,
+    ) -> Self {
         DocsQueryFilter {
             template: Some(template),
             ..self
@@ -142,7 +160,10 @@ impl DocsQueryFilter {
     }
 
     /// Set the `metadata->'reply'` field filter condition
-    pub fn with_reply(self, reply: DocumentRef) -> Self {
+    pub fn with_reply(
+        self,
+        reply: DocumentRef,
+    ) -> Self {
         DocsQueryFilter {
             reply: Some(reply),
             ..self
@@ -150,7 +171,10 @@ impl DocsQueryFilter {
     }
 
     /// Set the `metadata->'brand_id'` field filter condition
-    pub fn with_brand_id(self, brand_id: DocumentRef) -> Self {
+    pub fn with_brand_id(
+        self,
+        brand_id: DocumentRef,
+    ) -> Self {
         DocsQueryFilter {
             brand_id: Some(brand_id),
             ..self
@@ -158,7 +182,10 @@ impl DocsQueryFilter {
     }
 
     /// Set the `metadata->'campaign_id'` field filter condition
-    pub fn with_campaign_id(self, campaign_id: DocumentRef) -> Self {
+    pub fn with_campaign_id(
+        self,
+        campaign_id: DocumentRef,
+    ) -> Self {
         DocsQueryFilter {
             campaign_id: Some(campaign_id),
             ..self
@@ -166,7 +193,10 @@ impl DocsQueryFilter {
     }
 
     /// Set the `metadata->'category_id'` field filter condition
-    pub fn with_category_id(self, category_id: DocumentRef) -> Self {
+    pub fn with_category_id(
+        self,
+        category_id: DocumentRef,
+    ) -> Self {
         DocsQueryFilter {
             category_id: Some(category_id),
             ..self

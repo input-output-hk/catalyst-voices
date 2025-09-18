@@ -23,6 +23,7 @@ pub(crate) struct SlotTransactionIndex {
     to_header = false,
     example = true
 )]
+#[allow(dead_code)]
 /// Block's slot number and transaction index.
 pub(crate) struct SlotTxnIdx(pub(crate) SlotTransactionIndex);
 

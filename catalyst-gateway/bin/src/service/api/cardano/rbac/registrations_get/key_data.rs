@@ -40,7 +40,10 @@ pub struct KeyData {
 impl KeyData {
     /// Creates a new `KeyData` instance.
     pub fn new(
-        is_persistent: bool, time: DateTime<Utc>, key_ref: &KeyLocalRef, point: &Point,
+        is_persistent: bool,
+        time: DateTime<Utc>,
+        key_ref: &KeyLocalRef,
+        point: &Point,
         chain: &RegistrationChain,
     ) -> anyhow::Result<Self> {
         let key_value;
@@ -82,7 +85,9 @@ impl Example for KeyData {
 
 /// Finds a X509 certificate with given offset and point and hex encodes it.
 fn encode_x509(
-    certs: &HashMap<usize, Vec<PointData<Option<X509Certificate>>>>, offset: usize, point: &Point,
+    certs: &HashMap<usize, Vec<PointData<Option<X509Certificate>>>>,
+    offset: usize,
+    point: &Point,
 ) -> anyhow::Result<Option<HexEncodedBinaryData>> {
     certs
         .get(&offset)
@@ -102,7 +107,9 @@ fn encode_x509(
 
 /// Finds a C509 certificate with given offset and point and hex encodes it.
 fn encode_c509(
-    certs: &HashMap<usize, Vec<PointData<Option<C509>>>>, offset: usize, point: &Point,
+    certs: &HashMap<usize, Vec<PointData<Option<C509>>>>,
+    offset: usize,
+    point: &Point,
 ) -> anyhow::Result<Option<HexEncodedBinaryData>> {
     certs
         .get(&offset)
@@ -125,7 +132,9 @@ fn encode_c509(
 
 /// Finds a public key with the given offset and point and converts it.
 fn convert_pub_key(
-    keys: &HashMap<usize, Vec<PointData<Option<VerifyingKey>>>>, offset: usize, point: &Point,
+    keys: &HashMap<usize, Vec<PointData<Option<VerifyingKey>>>>,
+    offset: usize,
+    point: &Point,
 ) -> anyhow::Result<Option<HexEncodedBinaryData>> {
     Ok(keys
         .get(&offset)

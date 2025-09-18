@@ -18,7 +18,10 @@ pub(crate) enum PurgeCondition {
 
 impl PurgeCondition {
     /// A filtering condition of the `PurgeOption` and provided `slot` value
-    fn filter(&self, slot: Slot) -> bool {
+    fn filter(
+        &self,
+        slot: Slot,
+    ) -> bool {
         match self {
             Self::PurgeBackwards(purge_to_slot) => &slot <= purge_to_slot,
             Self::PurgeForwards(purge_to_slot) => &slot >= purge_to_slot,
@@ -52,7 +55,8 @@ pub(crate) async fn purge_live_index(purge_condition: PurgeCondition) -> anyhow:
 
 /// Purges the data from `catalyst_id_for_stake_addr`.
 async fn purge_catalyst_id_for_stake_address(
-    session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
+    session: &Arc<CassandraSession>,
+    purge_condition: PurgeCondition,
 ) -> anyhow::Result<()> {
     use purge::catalyst_id_for_stake_address::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -72,7 +76,8 @@ async fn purge_catalyst_id_for_stake_address(
 
 /// Purges the data from `catalyst_id_for_txn_id`.
 async fn purge_catalyst_id_for_txn_id(
-    session: &Arc<CassandraSession>, txn_hashes: &HashSet<TransactionId>,
+    session: &Arc<CassandraSession>,
+    txn_hashes: &HashSet<TransactionId>,
 ) -> anyhow::Result<()> {
     use purge::catalyst_id_for_txn_id::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -93,7 +98,8 @@ async fn purge_catalyst_id_for_txn_id(
 
 /// Purge data from `cip36_registration`.
 async fn purge_cip36_registration(
-    session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
+    session: &Arc<CassandraSession>,
+    purge_condition: PurgeCondition,
 ) -> anyhow::Result<()> {
     use purge::cip36_registration::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -114,7 +120,8 @@ async fn purge_cip36_registration(
 
 /// Purge data from `cip36_registration_for_vote_key`.
 async fn purge_cip36_registration_for_vote_key(
-    session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
+    session: &Arc<CassandraSession>,
+    purge_condition: PurgeCondition,
 ) -> anyhow::Result<()> {
     use purge::cip36_registration_for_vote_key::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -135,7 +142,8 @@ async fn purge_cip36_registration_for_vote_key(
 
 /// Purge data from `cip36_registration_invalid`.
 async fn purge_cip36_registration_invalid(
-    session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
+    session: &Arc<CassandraSession>,
+    purge_condition: PurgeCondition,
 ) -> anyhow::Result<()> {
     use purge::cip36_registration_invalid::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -156,7 +164,8 @@ async fn purge_cip36_registration_invalid(
 
 /// Purge data from `rbac509_registration`.
 async fn purge_rbac509_registration(
-    session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
+    session: &Arc<CassandraSession>,
+    purge_condition: PurgeCondition,
 ) -> anyhow::Result<()> {
     use purge::rbac509_registration::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -176,7 +185,8 @@ async fn purge_rbac509_registration(
 
 /// Purges the data from `rbac509_invalid_registration`.
 async fn purge_invalid_rbac509_registration(
-    session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
+    session: &Arc<CassandraSession>,
+    purge_condition: PurgeCondition,
 ) -> anyhow::Result<()> {
     use purge::rbac509_invalid_registration::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -194,7 +204,8 @@ async fn purge_invalid_rbac509_registration(
 
 /// Purge data from `stake_registration`.
 async fn purge_stake_registration(
-    session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
+    session: &Arc<CassandraSession>,
+    purge_condition: PurgeCondition,
 ) -> anyhow::Result<()> {
     use purge::stake_registration::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -215,7 +226,8 @@ async fn purge_stake_registration(
 
 /// Purge data from `txi_by_hash`.
 async fn purge_txi_by_hash(
-    session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
+    session: &Arc<CassandraSession>,
+    purge_condition: PurgeCondition,
 ) -> anyhow::Result<HashSet<TransactionId>> {
     use purge::txi_by_hash::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -238,7 +250,8 @@ async fn purge_txi_by_hash(
 
 /// Purge data from `txo_ada`.
 async fn purge_txo_ada(
-    session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
+    session: &Arc<CassandraSession>,
+    purge_condition: PurgeCondition,
 ) -> anyhow::Result<()> {
     use purge::txo_ada::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -259,7 +272,8 @@ async fn purge_txo_ada(
 
 /// Purge data from `txo_assets`.
 async fn purge_txo_assets(
-    session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
+    session: &Arc<CassandraSession>,
+    purge_condition: PurgeCondition,
 ) -> anyhow::Result<()> {
     use purge::txo_assets::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -280,7 +294,8 @@ async fn purge_txo_assets(
 
 /// Purge data from `unstaked_txo_ada`.
 async fn purge_unstaked_txo_ada(
-    session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
+    session: &Arc<CassandraSession>,
+    purge_condition: PurgeCondition,
 ) -> anyhow::Result<()> {
     use purge::unstaked_txo_ada::{DeleteQuery, Params, PrimaryKeyQuery};
 
@@ -301,7 +316,8 @@ async fn purge_unstaked_txo_ada(
 
 /// Purge data from `unstaked_txo_assets`.
 async fn purge_unstaked_txo_assets(
-    session: &Arc<CassandraSession>, purge_condition: PurgeCondition,
+    session: &Arc<CassandraSession>,
+    purge_condition: PurgeCondition,
 ) -> anyhow::Result<()> {
     use purge::unstaked_txo_assets::{DeleteQuery, Params, PrimaryKeyQuery};
 

@@ -16,7 +16,10 @@ pub(crate) enum EqOrRangedUuid {
 
 impl EqOrRangedUuid {
     /// Return a sql conditional statement by the provided `table_field`
-    pub(crate) fn conditional_stmt(&self, table_field: &str) -> String {
+    pub(crate) fn conditional_stmt(
+        &self,
+        table_field: &str,
+    ) -> String {
         match self {
             Self::Eq(ids) if ids.is_empty() => "TRUE".to_string(),
             Self::Eq(ids) => {

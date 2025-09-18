@@ -94,7 +94,10 @@ pub(crate) struct SignedDocData {
 /// with its id.
 /// This function should not fail, because template details are hardcoded.
 #[allow(clippy::expect_used)]
-fn build_signed_doc(data: &SignedDocData, sk: &SigningKey) -> (Uuid, CatalystSignedDocument) {
+fn build_signed_doc(
+    data: &SignedDocData,
+    sk: &SigningKey,
+) -> (Uuid, CatalystSignedDocument) {
     /// ID URI network.
     const KID_NETWORK: &str = "cardano";
 
