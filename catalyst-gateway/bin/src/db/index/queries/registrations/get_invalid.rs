@@ -35,7 +35,10 @@ pub(crate) struct GetInvalidRegistrationParams {
 
 impl GetInvalidRegistrationParams {
     /// Create a new instance of [`GetInvalidRegistrationParams`]
-    pub(crate) fn new(stake_public_key: Vec<u8>, slot_no: SlotNo) -> GetInvalidRegistrationParams {
+    pub(crate) fn new(
+        stake_public_key: Vec<u8>,
+        slot_no: SlotNo,
+    ) -> GetInvalidRegistrationParams {
         Self {
             stake_public_key,
             slot_no: u64::from(slot_no).into(),
@@ -78,7 +81,8 @@ impl GetInvalidRegistrationQuery {
 
     /// Executes get invalid registration info for given stake addr query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: GetInvalidRegistrationParams,
+        session: &CassandraSession,
+        params: GetInvalidRegistrationParams,
     ) -> anyhow::Result<TypedRowStream<GetInvalidRegistrationQuery>> {
         let iter = session
             .execute_iter(

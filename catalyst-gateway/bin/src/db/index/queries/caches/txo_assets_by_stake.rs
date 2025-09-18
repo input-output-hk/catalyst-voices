@@ -21,7 +21,7 @@ static ASSETS_CACHE: LazyLock<Cache<DbStakeAddress, Arc<Vec<GetAssetsByStakeAddr
 
 /// Get Native Assets entry from Cache.
 pub(crate) fn get(
-    stake_address: &DbStakeAddress,
+    stake_address: &DbStakeAddress
 ) -> Option<Arc<Vec<GetAssetsByStakeAddressQuery>>> {
     ASSETS_CACHE
         .get(stake_address)
@@ -33,7 +33,10 @@ pub(crate) fn get(
 }
 
 /// Insert Native Assets entry in Cache.
-pub(crate) fn insert(stake_address: DbStakeAddress, rows: Arc<Vec<GetAssetsByStakeAddressQuery>>) {
+pub(crate) fn insert(
+    stake_address: DbStakeAddress,
+    rows: Arc<Vec<GetAssetsByStakeAddressQuery>>,
+) {
     ASSETS_CACHE.insert(stake_address, rows);
 }
 

@@ -52,7 +52,8 @@ impl Rbac509InsertQuery {
 
     /// Prepare Batch of Insert RBAC 509 Registration Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &EnvVars,
+        session: &Arc<Session>,
+        cfg: &EnvVars,
     ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch, SizedBatch)> {
         Ok((
             insert_rbac509::Params::prepare_batch(session, cfg).await?,
@@ -64,7 +65,10 @@ impl Rbac509InsertQuery {
 
     /// Index the RBAC 509 registrations in a transaction.
     pub(crate) async fn index(
-        &mut self, session: &Arc<CassandraSession>, txn_hash: TransactionId, index: TxnIndex,
+        &mut self,
+        session: &Arc<CassandraSession>,
+        txn_hash: TransactionId,
+        index: TxnIndex,
         block: &MultiEraBlock,
     ) {
         let slot = block.slot();
@@ -163,7 +167,10 @@ impl Rbac509InsertQuery {
     /// Execute the RBAC 509 Registration Indexing Queries.
     ///
     /// Consumes the `self` and returns a vector of futures.
-    pub(crate) fn execute(self, session: &Arc<CassandraSession>) -> FallibleQueryTasks {
+    pub(crate) fn execute(
+        self,
+        session: &Arc<CassandraSession>,
+    ) -> FallibleQueryTasks {
         let mut query_handles: FallibleQueryTasks = Vec::new();
 
         if !self.registrations.is_empty() {
@@ -214,8 +221,12 @@ impl Rbac509InsertQuery {
 
 /// Returns a Catalyst ID of the given registration.
 async fn catalyst_id(
-    session: &Arc<CassandraSession>, cip509: &Cip509, txn_id: TransactionId, slot: Slot,
-    index: TxnIndex, is_immutable: bool,
+    session: &Arc<CassandraSession>,
+    cip509: &Cip509,
+    txn_id: TransactionId,
+    slot: Slot,
+    index: TxnIndex,
+    is_immutable: bool,
 ) -> anyhow::Result<CatalystId> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::cache_for_transaction_id;
 
@@ -236,7 +247,9 @@ async fn catalyst_id(
 
 /// Queries a Catalyst ID from the database by the given transaction ID.
 async fn query_catalyst_id(
-    session: &Arc<CassandraSession>, txn_id: TransactionId, is_immutable: bool,
+    session: &Arc<CassandraSession>,
+    txn_id: TransactionId,
+    is_immutable: bool,
 ) -> anyhow::Result<CatalystId> {
     use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::Query;
 

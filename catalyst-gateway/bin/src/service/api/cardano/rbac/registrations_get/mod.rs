@@ -45,7 +45,8 @@ use crate::{
 
 /// Get RBAC registration endpoint.
 pub(crate) async fn endpoint(
-    lookup: Option<CatIdOrStake>, token: Option<CatalystRBACTokenV1>,
+    lookup: Option<CatIdOrStake>,
+    token: Option<CatalystRBACTokenV1>,
 ) -> AllResponses {
     let Some(persistent_session) = CassandraSession::get(true) else {
         return AllResponses::service_unavailable(
@@ -109,7 +110,8 @@ pub(crate) async fn endpoint(
 
 /// Returns a Catalyst ID for the given stake address.
 async fn catalyst_id_from_stake(
-    session: &CassandraSession, address: StakeAddress,
+    session: &CassandraSession,
+    address: StakeAddress,
 ) -> anyhow::Result<Option<CatalystId>> {
     let mut result: Vec<_> = Query::execute(session, QueryParams {
         stake_address: address.into(),

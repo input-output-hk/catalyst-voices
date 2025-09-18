@@ -45,7 +45,8 @@ impl DocumentApi {
         operation_id = "getDocument"
     )]
     async fn get_document(
-        &self, /// UUIDv7 Document ID to retrieve
+        &self,
+        /// UUIDv7 Document ID to retrieve
         document_id: Path<UUIDv7>,
         /// UUIDv7 Version of the Document to retrieve, if omitted, returns the latest
         /// version.
@@ -70,7 +71,8 @@ impl DocumentApi {
     /// submitter, and if it already exists, is identical to the existing document.
     #[oai(path = "/v1/document", method = "put", operation_id = "putDocument")]
     async fn put_document(
-        &self, /// The document to PUT
+        &self,
+        /// The document to PUT
         document: Cbor<Body>,
         /// Authorization required.
         auth: CatalystRBACSecurityScheme,
@@ -103,9 +105,11 @@ impl DocumentApi {
         operation_id = "postDocument"
     )]
     async fn post_document(
-        &self, /// The Query Filter Specification
+        &self,
+        /// The Query Filter Specification
         query: Json<DocumentIndexQueryFilterBody>,
-        page: Query<Option<Page>>, limit: Query<Option<Limit>>,
+        page: Query<Option<Page>>,
+        limit: Query<Option<Limit>>,
         /// No Authorization required, but Token permitted.
         _auth: NoneOrRBAC,
     ) -> post_document_index_query::AllResponses {

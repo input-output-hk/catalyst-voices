@@ -149,7 +149,8 @@ pub(crate) struct PreparedQueries {
 impl PreparedQueries {
     /// Create new prepared queries for a given session.
     pub(crate) async fn new(
-        session: Arc<Session>, cfg: &cassandra_db::EnvVars,
+        session: Arc<Session>,
+        cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<Self> {
         // We initialize like this, so that all errors preparing querys get shown before aborting.
         Ok(Self {
@@ -215,7 +216,9 @@ impl PreparedQueries {
 
     /// Prepares a statement.
     pub(crate) async fn prepare(
-        session: Arc<Session>, query: &str, consistency: scylla::statement::Consistency,
+        session: Arc<Session>,
+        query: &str,
+        consistency: scylla::statement::Consistency,
         idempotent: bool,
     ) -> anyhow::Result<PreparedStatement> {
         super::PreparedQueries::prepare(session, query, consistency, idempotent).await
@@ -225,8 +228,12 @@ impl PreparedQueries {
     /// It is necessary to do this because batches are pre-sized, they can not be dynamic.
     /// Preparing the batches in advance is a very larger performance increase.
     pub(crate) async fn prepare_batch(
-        session: Arc<Session>, query: &str, cfg: &cassandra_db::EnvVars,
-        consistency: scylla::statement::Consistency, idempotent: bool, logged: bool,
+        session: Arc<Session>,
+        query: &str,
+        cfg: &cassandra_db::EnvVars,
+        consistency: scylla::statement::Consistency,
+        idempotent: bool,
+        logged: bool,
     ) -> anyhow::Result<SizedBatch> {
         super::PreparedQueries::prepare_batch(session, query, cfg, consistency, idempotent, logged)
             .await
@@ -237,7 +244,9 @@ impl PreparedQueries {
     /// Returns an iterator that iterates over all the result pages that the query
     /// returns.
     pub(crate) async fn execute_iter(
-        &self, session: Arc<Session>, select_query: PreparedSelectQuery,
+        &self,
+        session: Arc<Session>,
+        select_query: PreparedSelectQuery,
     ) -> anyhow::Result<QueryPager> {
         let prepared_stmt = match select_query {
             PreparedSelectQuery::TxoAda => &self.select_txo_ada,
@@ -266,7 +275,10 @@ impl PreparedQueries {
 
     /// Execute a purge query with the given parameters.
     pub(crate) async fn execute_batch<T: SerializeRow + Debug>(
-        &self, session: Arc<Session>, cfg: Arc<cassandra_db::EnvVars>, query: PreparedDeleteQuery,
+        &self,
+        session: Arc<Session>,
+        cfg: Arc<cassandra_db::EnvVars>,
+        query: PreparedDeleteQuery,
         values: Vec<T>,
     ) -> FallibleQueryResults {
         let query_map = match query {

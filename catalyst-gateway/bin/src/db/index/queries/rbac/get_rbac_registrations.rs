@@ -62,7 +62,8 @@ impl Query {
 
     /// Executes a get registrations by Catalyst ID query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: QueryParams,
+        session: &CassandraSession,
+        params: QueryParams,
     ) -> anyhow::Result<TypedRowStream<Query>> {
         session
             .execute_iter(PreparedSelectQuery::RbacRegistrationsByCatalystId, params)
@@ -75,7 +76,8 @@ impl Query {
 /// Returns a sorted list of all registrations for the given Catalyst ID from the
 /// database.
 pub(crate) async fn indexed_registrations(
-    session: &CassandraSession, catalyst_id: &CatalystId,
+    session: &CassandraSession,
+    catalyst_id: &CatalystId,
 ) -> anyhow::Result<Vec<Query>> {
     let mut result: Vec<_> = Query::execute(session, QueryParams {
         catalyst_id: catalyst_id.clone().into(),
@@ -91,7 +93,8 @@ pub(crate) async fn indexed_registrations(
 ///
 /// # NOTE: provided `reg_queries` must be sorted by `slot_no`, look into `indexed_registrations` function.
 pub(crate) async fn build_reg_chain<OnSuccessFn: FnMut(bool, Slot, &RegistrationChain)>(
-    mut reg_queries_iter: impl Iterator<Item = (bool, Query)>, network: Network,
+    mut reg_queries_iter: impl Iterator<Item = (bool, Query)>,
+    network: Network,
     mut on_success: OnSuccessFn,
 ) -> anyhow::Result<Option<RegistrationChain>> {
     let Some((is_persistent, root)) = reg_queries_iter.next() else {
@@ -139,7 +142,9 @@ pub(crate) async fn build_reg_chain<OnSuccessFn: FnMut(bool, Slot, &Registration
 /// A helper function to load a RBAC registration `Cip509` by the given block and slot
 /// from the `cardano-chain-follower`.
 pub(crate) async fn load_cip509_from_chain(
-    network: Network, slot: Slot, txn_index: TxnIndex,
+    network: Network,
+    slot: Slot,
+    txn_index: TxnIndex,
 ) -> anyhow::Result<Cip509> {
     let point = Point::fuzzy(slot);
     let block = ChainFollower::get_block(network, point)

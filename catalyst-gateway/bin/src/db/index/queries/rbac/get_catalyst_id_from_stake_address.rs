@@ -48,7 +48,8 @@ impl Query {
 
     /// Executes a get Catalyst ID by stake address query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: QueryParams,
+        session: &CassandraSession,
+        params: QueryParams,
     ) -> anyhow::Result<TypedRowStream<Query>> {
         session
             .execute_iter(PreparedSelectQuery::CatalystIdByStakeAddress, params)

@@ -37,7 +37,10 @@ pub(crate) fn get(stake_address: &DbStakeAddress) -> Option<Arc<Vec<GetTxoByStak
 }
 
 /// Insert TXO Assets entry in Cache.
-pub(crate) fn insert(stake_address: DbStakeAddress, rows: Arc<Vec<GetTxoByStakeAddressQuery>>) {
+pub(crate) fn insert(
+    stake_address: DbStakeAddress,
+    rows: Arc<Vec<GetTxoByStakeAddressQuery>>,
+) {
     ASSETS_CACHE.insert(stake_address, rows);
 }
 

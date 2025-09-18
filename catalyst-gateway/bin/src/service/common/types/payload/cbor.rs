@@ -37,12 +37,18 @@ use poem_openapi::{
 /// #[OpenApi]
 /// impl MyApi {
 ///     #[oai(path = "/upload", method = "post")]
-///     async fn upload_binary(&self, data: Cbor<Vec<u8>>) -> Json<usize> {
+///     async fn upload_binary(
+///         &self,
+///         data: Cbor<Vec<u8>>,
+///     ) -> Json<usize> {
 ///         Json(data.len())
 ///     }
 ///
 ///     #[oai(path = "/upload_stream", method = "post")]
-///     async fn upload_binary_stream(&self, data: Cbor<Body>) -> Result<Json<usize>> {
+///     async fn upload_binary_stream(
+///         &self,
+///         data: Cbor<Body>,
+///     ) -> Result<Json<usize>> {
 ///         let mut reader = data.0.into_async_read();
 ///         let mut bytes = Vec::new();
 ///         reader.read_to_end(&mut bytes).await.map_err(BadRequest)?;
@@ -113,7 +119,10 @@ impl<T: Send> Payload for Cbor<T> {
 impl ParsePayload for Cbor<Vec<u8>> {
     const IS_REQUIRED: bool = true;
 
-    async fn from_request(request: &Request, body: &mut RequestBody) -> Result<Self> {
+    async fn from_request(
+        request: &Request,
+        body: &mut RequestBody,
+    ) -> Result<Self> {
         Ok(Self(<Vec<u8>>::from_request(request, body).await?))
     }
 }
@@ -121,7 +130,10 @@ impl ParsePayload for Cbor<Vec<u8>> {
 impl ParsePayload for Cbor<Bytes> {
     const IS_REQUIRED: bool = true;
 
-    async fn from_request(request: &Request, body: &mut RequestBody) -> Result<Self> {
+    async fn from_request(
+        request: &Request,
+        body: &mut RequestBody,
+    ) -> Result<Self> {
         Ok(Self(Bytes::from_request(request, body).await?))
     }
 }
@@ -129,7 +141,10 @@ impl ParsePayload for Cbor<Bytes> {
 impl ParsePayload for Cbor<Body> {
     const IS_REQUIRED: bool = true;
 
-    async fn from_request(request: &Request, body: &mut RequestBody) -> Result<Self> {
+    async fn from_request(
+        request: &Request,
+        body: &mut RequestBody,
+    ) -> Result<Self> {
         Ok(Self(Body::from_request(request, body).await?))
     }
 }

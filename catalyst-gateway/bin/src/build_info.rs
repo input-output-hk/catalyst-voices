@@ -1,5 +1,7 @@
 //! Binary build info
 
+use std::fmt::Write;
+
 use build_info::{self as build_info_crate};
 use local_ip_address::list_afinet_netifas;
 use tracing::info;
@@ -70,7 +72,7 @@ pub(crate) fn log_build_info() {
                 if !interfaces.is_empty() {
                     interfaces.push(',');
                 }
-                interfaces.push_str(&format!("{}:{}", iface.0, iface.1));
+                let _ = write!(interfaces, "{}:{}", iface.0, iface.1);
             }
         }
     }
