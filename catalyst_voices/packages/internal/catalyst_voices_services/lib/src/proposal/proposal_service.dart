@@ -347,18 +347,24 @@ final class ProposalServiceImpl implements ProposalService {
     final allowTemplateRefs =
         _activeCampaignObserver.campaign?.categories.map((e) => e.proposalTemplateRef).toList() ??
         [];
-    final authorId = _getUserCatalystId();
-    final documentData = await _proposalRepository.importProposal(data, authorId);
 
+    final parsedDocument = await _documentRepository.parseDocumentForImport(data: data);
+
+    // Validate template before any DB operations
     // TODO(LynxLynxx): Remove after we support multiple fund templates
-    if (!allowTemplateRefs.contains(documentData.template)) {
-      await deleteDraftProposal(documentData.selfRef as DraftRef);
+    if (!allowTemplateRefs.contains(parsedDocument.metadata.template)) {
       throw const DocumentImportInvalidDataException(
         SignedDocumentMetadataMalformed(reasons: ['template ref is not allowed to be imported']),
       );
     }
 
-    return documentData.selfRef;
+    final authorId = _getUserCatalystId();
+    await _documentRepository.saveImportedDocument(
+      document: parsedDocument,
+      authorId: authorId,
+    );
+
+    return parsedDocument.ref;
   }
 
   @override

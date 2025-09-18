@@ -97,23 +97,20 @@ abstract interface class DocumentRepository {
     required DocumentType type,
   });
 
-  /// Imports a document [data] previously encoded by [encodeDocumentForExport].
-  ///
-  /// The document reference will be altered to avoid linking
-  /// the imported document to the old document.
-  ///
-  /// Once imported from the version management point of view this becomes
-  /// a new standalone document not related to the previous one.
-  ///
-  /// Returns the reference to the imported document.
-  Future<DocumentDataMetadata> importDocument({
-    required Uint8List data,
-    required CatalystId authorId,
-  });
-
   /// Similar to [watchIsDocumentFavorite] but stops after first emit.
   Future<bool> isDocumentFavorite({
     required DocumentRef ref,
+  });
+
+  /// Parses a document [data] previously encoded by [encodeDocumentForExport].
+  ///
+  /// This method only parses and validates the document structure
+  /// without saving it to storage.
+  ///
+  /// Returns the parsed document data for further validation
+  /// before saving with [saveImportedDocument].
+  Future<DocumentData> parseDocumentForImport({
+    required Uint8List data,
   });
 
   Future<void> publishDocument({
@@ -132,6 +129,17 @@ abstract interface class DocumentRepository {
   ///
   /// Returns number of deleted rows.
   Future<int> removeAll();
+
+  /// Saves a pre-parsed and validated document to storage.
+  ///
+  /// The document reference will be altered to avoid linking
+  /// the imported document to the old document.
+  ///
+  /// Returns the reference of the saved document.
+  Future<void> saveImportedDocument({
+    required DocumentData document,
+    required CatalystId authorId,
+  });
 
   /// Updates fav status matching [ref].
   Future<void> updateDocumentFavorite({
@@ -339,33 +347,17 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<DocumentDataMetadata> importDocument({
-    required Uint8List data,
-    required CatalystId authorId,
-  }) async {
-    final document = _parseDocumentData(data);
-
-    _validateDocumentMetadata(document);
-
-    final newMetadata = document.metadata.copyWith(
-      selfRef: DraftRef.generateFirstRef(),
-      authors: Optional([authorId]),
-    );
-
-    final newDocument = DocumentData(
-      metadata: newMetadata,
-      content: document.content,
-    );
-
-    await _drafts.save(data: newDocument);
-    return newDocument.metadata;
-  }
-
-  @override
   Future<bool> isDocumentFavorite({required DocumentRef ref}) {
     assert(!ref.isExact, 'Favorite ref have to be loose!');
 
     return _favoriteDocuments.watchIsDocumentFavorite(ref.id).first;
+  }
+
+  @override
+  Future<DocumentData> parseDocumentForImport({required Uint8List data}) async {
+    final document = _parseDocumentData(data);
+    _validateDocumentMetadata(document);
+    return document;
   }
 
   @override
@@ -409,6 +401,24 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final deletedDocuments = await _localDocuments.deleteAll();
 
     return deletedDrafts + deletedDocuments;
+  }
+
+  @override
+  Future<void> saveImportedDocument({
+    required DocumentData document,
+    required CatalystId authorId,
+  }) async {
+    final newMetadata = document.metadata.copyWith(
+      selfRef: DraftRef.generateFirstRef(),
+      authors: Optional([authorId]),
+    );
+
+    final newDocument = DocumentData(
+      metadata: newMetadata,
+      content: document.content,
+    );
+
+    await _drafts.save(data: newDocument);
   }
 
   @override
@@ -604,12 +614,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return _localDocuments.watchRefToDocumentData(refTo: refTo, type: type).distinct();
   }
 
-  void _deleteInvalidDraft(DocumentData documentData) {
-    if (documentData.metadata.selfRef case final DraftRef draftRef) {
-      unawaited(deleteDocumentDraft(ref: draftRef));
-    }
-  }
-
   Future<DocumentData> _getDraftDocumentData({
     required DraftRef ref,
   }) async {
@@ -672,10 +676,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     )) {
       try {
         if (!_isDocumentMetadataValid(documentData)) {
-          _logger.warning(
+          _logger.info(
             'Invalid document metadata for document ${documentData.metadata.selfRef}, skipping',
           );
-          _deleteInvalidDraft(documentData);
+          unawaited(deleteDocumentDraft(ref: documentData.metadata.selfRef as DraftRef));
           continue;
         }
 
@@ -690,12 +694,12 @@ final class DocumentRepositoryImpl implements DocumentRepository {
           ),
         );
       } catch (e, st) {
-        _logger.warning(
+        _logger.info(
           'Error processing document ${documentData.metadata.selfRef}',
           e,
           st,
         );
-        _deleteInvalidDraft(documentData);
+        unawaited(deleteDocumentDraft(ref: documentData.metadata.selfRef as DraftRef));
       }
     }
 
