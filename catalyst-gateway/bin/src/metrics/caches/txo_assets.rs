@@ -9,7 +9,9 @@ mod reporter {
     //! Prometheus reporter metrics.
     use std::sync::LazyLock;
 
-    use prometheus::{register_counter_vec, register_int_gauge_vec, IntCounterVec, IntGaugeVec};
+    use prometheus::{
+        register_int_counter_vec, register_int_gauge_vec, IntCounterVec, IntGaugeVec,
+    };
 
     /// Labels for the metrics
     const METRIC_LABELS: [&str; 3] = ["api_host_names", "service_id", "network"];
@@ -36,7 +38,7 @@ mod reporter {
 
     /// Number of hits in the TXO Assets cache.
     pub(crate) static TXO_ASSETS_CACHE_HIT_COUNT: LazyLock<IntCounterVec> = LazyLock::new(|| {
-        register_counter_vec!(
+        register_int_counter_vec!(
             "cache_txo_assets_hits_count",
             "Returns the number of hits (entries found) in the TXO Assets cache",
             &METRIC_LABELS
@@ -47,7 +49,7 @@ mod reporter {
     /// Number of misses in the TXO Assets cache.
     pub(crate) static TXO_ASSETS_CACHE_MISSES_COUNT: LazyLock<IntCounterVec> =
         LazyLock::new(|| {
-            register_counter_vec!(
+            register_int_counter_vec!(
                 "cache_txo_assets_misses_count",
                 "Returns the number of misses (entries not found) in the TXO Assets cache",
                 &METRIC_LABELS
