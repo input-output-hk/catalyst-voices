@@ -680,24 +680,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         }
 
         final templateRef = documentData.metadata.template!;
-        final categoryRef = documentData.metadata.categoryId!;
-
-        if (!templateRef.isValid) {
-          _logger.warning(
-            'Invalid template reference for document ${documentData.metadata.selfRef}: $templateRef, skipping',
-          );
-          _deleteInvalidDraft(documentData);
-          continue;
-        }
-
-        if (!categoryRef.isValid) {
-          _logger.warning(
-            'Invalid category reference for document ${documentData.metadata.selfRef}: $categoryRef, skipping',
-          );
-          _deleteInvalidDraft(documentData);
-          continue;
-        }
-
         final templateData = await _documentDataLock.synchronized(
           () => getDocumentData(ref: templateRef),
         );
