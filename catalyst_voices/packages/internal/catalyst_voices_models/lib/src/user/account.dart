@@ -40,6 +40,9 @@ final class Account extends Equatable {
   /// Whether this account is being used.
   final bool isActive;
 
+  /// Status if chain registration transaction
+  final AccountRegistrationStatus registrationStatus;
+
   const Account({
     required this.catalystId,
     this.email,
@@ -49,6 +52,7 @@ final class Account extends Equatable {
     required this.publicStatus,
     this.votingPower,
     this.isActive = false,
+    required this.registrationStatus,
   }) : assert(
          (email == null && publicStatus == AccountPublicStatus.notSetup) ||
              (email != null && publicStatus != AccountPublicStatus.notSetup),
@@ -76,6 +80,7 @@ final class Account extends Equatable {
       publicStatus: AccountPublicStatus.notSetup,
       votingPower: VotingPower.dummy(),
       isActive: isActive,
+      registrationStatus: const AccountRegistrationStatus.notIndexed(),
     );
   }
 
@@ -83,12 +88,6 @@ final class Account extends Equatable {
   bool get isAdmin => false;
 
   bool get isDummy => keychain.id == dummyKeychainId;
-
-  // TODO(damian-molinski): Update this getter.
-  /// When account registration transaction is posted on chain account is
-  /// "provisional". This means backend does not yet know about it because
-  /// transaction was not yet read.
-  bool get isProvisional => true;
 
   @override
   List<Object?> get props => [
@@ -100,6 +99,7 @@ final class Account extends Equatable {
     publicStatus,
     votingPower,
     isActive,
+    registrationStatus,
   ];
 
   String? get username => catalystId.username;
@@ -113,6 +113,7 @@ final class Account extends Equatable {
     AccountPublicStatus? publicStatus,
     Optional<VotingPower>? votingPower,
     bool? isActive,
+    AccountRegistrationStatus? registrationStatus,
   }) {
     return Account(
       catalystId: catalystId ?? this.catalystId,
@@ -123,6 +124,7 @@ final class Account extends Equatable {
       publicStatus: publicStatus ?? this.publicStatus,
       votingPower: votingPower.dataOr(this.votingPower),
       isActive: isActive ?? this.isActive,
+      registrationStatus: registrationStatus ?? this.registrationStatus,
     );
   }
 

@@ -2,6 +2,8 @@ import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart'
+    show RbacRegistrationChain;
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart' hide Uuid;
@@ -306,6 +308,11 @@ class _FakeKeychainSigner extends Fake implements KeychainSigner {}
 
 class _FakeUserRepository extends Fake implements UserRepository {
   User? _user;
+
+  @override
+  Future<RbacRegistrationChain> getRbacRegistration({CatalystId? catalystId}) {
+    throw const UnauthorizedException();
+  }
 
   @override
   Future<User> getUser() async => _user ?? const User.empty();
