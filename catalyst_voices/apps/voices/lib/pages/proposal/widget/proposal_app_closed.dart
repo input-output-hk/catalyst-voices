@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/constants/constants.dart';
+import 'package:catalyst_voices/common/ext/active_fund_number_selector_ext.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -43,7 +44,7 @@ class _AppCloseText extends StatelessWidget {
                 style: context.textTheme.titleMedium,
               ),
               Text(
-                context.l10n.browseProposalsOnProjectCatalyst,
+                context.l10n.browseProposalsOnProjectCatalyst(context.activeCampaignFundNumber),
                 style: context.textTheme.bodyMedium?.copyWith(
                   color: context.colors.textOnPrimaryLevel1,
                 ),
@@ -67,7 +68,7 @@ class _Button extends StatelessWidget with LaunchUrlMixin {
     return VoicesFilledButton(
       trailing: VoicesAssets.icons.externalLink.buildIcon(),
       child: Text(
-        context.l10n.browseFund14Proposals,
+        context.l10n.browseFundProposals(context.activeCampaignFundNumber),
       ),
       onTap: () async {
         await launchUri(VoicesConstants.projectCatalystFund14Url.getUri());
