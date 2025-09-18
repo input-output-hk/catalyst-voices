@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -67,9 +68,13 @@ class _Header extends StatelessWidget {
     return Row(
       children: [
         Expanded(
-          child: Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium,
+          child: CombineSemantics(
+            identifier: 'PropertyTileHeaderTitle',
+            container: true,
+            child: Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
           ),
         ),
         if (action != null) ...[
