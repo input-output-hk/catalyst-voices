@@ -160,13 +160,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   Future<void> _importProposal(ImportProposalEvent event, Emitter<WorkspaceState> emit) async {
     try {
       emit(state.copyWith(isLoading: true));
-      final allowTemplateRefs =
-          _cachedCampaign?.categories.map((e) => e.proposalTemplateRef).toList() ?? [];
-
-      final ref = await _proposalService.importProposal(
-        event.proposalData,
-        allowTemplateRefs: allowTemplateRefs,
-      );
+      final ref = await _proposalService.importProposal(event.proposalData);
       emitSignal(ImportedProposalWorkspaceSignal(proposalRef: ref));
     } on DocumentImportInvalidDataException {
       emit(state.copyWith(isLoading: false));

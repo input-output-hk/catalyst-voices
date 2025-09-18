@@ -78,10 +78,7 @@ abstract interface class ProposalService {
   ///
   /// Once imported from the version management point of view this becomes
   /// a new standalone proposal not related to the previous one.
-  Future<DocumentRef> importProposal(
-    Uint8List data, {
-    List<SignedDocumentRef> allowTemplateRefs = const [],
-  });
+  Future<DocumentRef> importProposal(Uint8List data);
 
   /// Returns true if the current user has
   /// reached the limit of submitted proposals.
@@ -346,10 +343,10 @@ final class ProposalServiceImpl implements ProposalService {
   }
 
   @override
-  Future<DocumentRef> importProposal(
-    Uint8List data, {
-    List<SignedDocumentRef> allowTemplateRefs = const [],
-  }) async {
+  Future<DocumentRef> importProposal(Uint8List data) async {
+    final allowTemplateRefs =
+        _activeCampaignObserver.campaign?.categories.map((e) => e.proposalTemplateRef).toList() ??
+        [];
     final authorId = _getUserCatalystId();
     final documentData = await _proposalRepository.importProposal(data, authorId);
 
