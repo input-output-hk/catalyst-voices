@@ -1,0 +1,94 @@
+VERSION 0.8
+
+IMPORT ../../../ AS catalyst-voices
+IMPORT ../../../../catalyst-gateway/tests AS gateway-tests
+# Import playwright from catalyst-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.5.15 AS playwright-ci
+
+# e2e-base - Base setup for E2E tests
+e2e-base:
+    # Use standard playwright setup
+    DO playwright-ci+SETUP --workdir=/app/e2e_tests
+
+    # Install Chrome v140 manually from catalyst-storage
+    RUN apt-get update && apt-get install -y curl unzip
+    RUN curl -sSL -o /opt/chrome.zip "https://github.com/input-output-hk/catalyst-storage/raw/chrome-for-testing/web-browsers/chrome/chrome-linux64_140.zip" && \
+        unzip /opt/chrome.zip -d /opt/chrome && \
+        chmod +x /opt/chrome/chrome-linux64/chrome && \
+        rm /opt/chrome.zip
+
+    # Copy test files
+    COPY package*.json ./
+    RUN npm ci
+
+    COPY . .
+
+    # Set Chrome executable path for Playwright CDP connection
+    # Tests will launch Chrome with CDP on port 9222
+    ENV CHROME_EXECUTABLE=/opt/chrome/chrome-linux64/chrome
+
+# test-runner - Runs E2E tests against running services
+test-runner:
+    FROM +e2e-base
+
+    # For container environment, use Docker network hostname
+    # For local testing, this can be overridden to localhost:3030
+    ARG APP_URL=http://nginx-proxy:3030
+    ENV APP_URL=$APP_URL
+    ENV CI=true
+
+    # Run tests with the Docker-specific config
+    RUN --no-cache npx playwright test --config=playwright.docker.config.ts
+
+    SAVE ARTIFACT test-results AS LOCAL test-results
+    SAVE ARTIFACT playwright-report AS LOCAL playwright-report
+
+# docker - Build Docker image for E2E tests
+docker:
+    FROM +e2e-base
+
+    # Default entrypoint to run tests with Docker config
+    # APP_URL environment variable will be used for the base URL
+    ENTRYPOINT ["npx", "playwright", "test", "--config=playwright.docker.config.ts"]
+
+    ARG IMAGE_NAME=e2e-tests
+    SAVE IMAGE $IMAGE_NAME:latest
+
+# flutter-web - Build Flutter web app for E2E testing
+flutter-web:
+    # Build the web app using the main Earthfile's code-generator
+    # but with ENV_NAME=relative for E2E testing
+    FROM catalyst-voices+code-generator
+
+    WORKDIR /frontend/apps/voices
+
+    # Build with E2E-specific configuration
+    RUN flutter build web \
+        --release \
+        --dart-define=ENV_NAME=relative \
+        --target=lib/configs/main_web.dart \
+        --pwa-strategy=none
+
+    # Package as nginx image for E2E testing
+    FROM nginx:alpine
+    COPY --from=0 /frontend/apps/voices/build/web /usr/share/nginx/html
+
+    # Configure nginx for SPA routing
+    RUN echo 'server { \
+        listen 8000; \
+        location / { \
+            root /usr/share/nginx/html; \
+            try_files $uri $uri/ /index.html; \
+            add_header Cross-Origin-Opener-Policy same-origin; \
+            add_header Cross-Origin-Embedder-Policy require-corp; \
+        } \
+    }' > /etc/nginx/conf.d/default.conf
+
+    EXPOSE 8000
+    SAVE IMAGE flutter-web:latest
+
+# all-images - Build all required images for E2E tests
+all-images:
+    BUILD gateway-tests+all-images
+    BUILD +docker
+    BUILD +flutter-web

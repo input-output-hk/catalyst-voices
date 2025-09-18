@@ -1,0 +1,92 @@
+# Docker Compose configuration for Catalyst Voices E2E tests
+# Uses Earthly-built images for all services
+version: '3.8'
+
+services:
+  # Import gateway services from existing docker-compose
+  event-db:
+    extends:
+      file: ../../../../catalyst-gateway/tests/docker-compose.yml
+      service: event-db
+
+  event-db-v1-migrations:
+    extends:
+      file: ../../../../catalyst-gateway/tests/docker-compose.yml
+      service: event-db-v1-migrations
+
+  event-db-migrations:
+    extends:
+      file: ../../../../catalyst-gateway/tests/docker-compose.yml
+      service: event-db-migrations
+
+  scylla-node:
+    extends:
+      file: ../../../../catalyst-gateway/tests/docker-compose.yml
+      service: scylla-node
+
+  # Gateway - no port exposed, accessed via nginx
+  cat-gateway:
+    extends:
+      file: ../../../../catalyst-gateway/tests/docker-compose.yml
+      service: cat-gateway
+    ports: []
+    networks:
+      - voices-network
+
+  # Flutter web app from Earthly build
+  flutter-web:
+    image: flutter-web:latest
+    container_name: flutter-web
+    expose:
+      - 8000
+    depends_on:
+      cat-gateway:
+        condition: service_healthy
+    networks:
+      - voices-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  # Nginx reverse proxy - single entry point on port 3030
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "3030:3030"
+    depends_on:
+      flutter-web:
+        condition: service_healthy
+      cat-gateway:
+        condition: service_healthy
+    networks:
+      - voices-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3030/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # E2E test runner from Earthly build
+  e2e-tests:
+    image: e2e-tests:latest
+    container_name: e2e-tests
+    environment:
+      - APP_URL=http://nginx-proxy:3030
+      - CI=true
+    volumes:
+      - ./test-results:/app/e2e_tests/test-results
+      - ./playwright-report:/app/e2e_tests/playwright-report
+    depends_on:
+      nginx-proxy:
+        condition: service_healthy
+    networks:
+      - voices-network
+
+networks:
+  voices-network:
+    driver: bridge
