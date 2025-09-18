@@ -142,12 +142,17 @@ final class UserServiceImpl implements UserService {
       return false;
     }
 
-    if (!activeAccount.registrationStatus.isIndexed) {
-      return false;
+    var account = activeAccount;
+
+    if (!account.registrationStatus.isIndexed) {
+      final registrationStatus = await _getRegistrationStatus(catalystId: account.catalystId);
+
+      account = account.copyWith(registrationStatus: registrationStatus);
     }
 
-    // If already verified just return true.
-    if (activeAccount.publicStatus.isVerified || activeAccount.isDummy) {
+    if (account.publicStatus.isVerified ||
+        account.isDummy ||
+        !account.registrationStatus.isIndexed) {
       return true;
     }
 
@@ -157,9 +162,12 @@ final class UserServiceImpl implements UserService {
       return false;
     }
 
-    if (publicProfile.status != activeAccount.publicStatus) {
-      final updatedAccount = activeAccount.copyWith(publicStatus: publicProfile.status);
-      final updatedUser = user.updateAccount(updatedAccount);
+    if (publicProfile.status != account.publicStatus) {
+      account = account.copyWith(publicStatus: publicProfile.status);
+    }
+
+    if (account != activeAccount) {
+      final updatedUser = user.updateAccount(account);
       await _updateUser(updatedUser);
     }
 
@@ -188,17 +196,9 @@ final class UserServiceImpl implements UserService {
     var account = activeAccount.copyWith();
 
     if (!account.registrationStatus.isIndexed) {
-      final status = await _userRepository
-          .getRbacRegistration(catalystId: account.catalystId)
-          .then(
-            (value) {
-              final isPersistent = value.lastPersistentTxn != null;
-              return AccountRegistrationStatus.indexed(isPersistent: isPersistent);
-            },
-          )
-          .onError((_, _) => const AccountRegistrationStatus.notIndexed());
+      final registrationStatus = await _getRegistrationStatus(catalystId: account.catalystId);
 
-      account = account.copyWith(registrationStatus: status);
+      account = account.copyWith(registrationStatus: registrationStatus);
     }
 
     if (!account.publicStatus.isNotSetup && account.registrationStatus.isIndexed) {
@@ -424,6 +424,20 @@ final class UserServiceImpl implements UserService {
     final user = await _userRepository.getUser();
 
     await _updateUser(user);
+  }
+
+  Future<AccountRegistrationStatus> _getRegistrationStatus({
+    required CatalystId catalystId,
+  }) {
+    return _userRepository
+        .getRbacRegistration(catalystId: catalystId)
+        .then(
+          (value) {
+            final isPersistent = value.lastPersistentTxn != null;
+            return AccountRegistrationStatus.indexed(isPersistent: isPersistent);
+          },
+        )
+        .onError((_, _) => const AccountRegistrationStatus.notIndexed());
   }
 
   void _updateRegistrationStatusPoller({
