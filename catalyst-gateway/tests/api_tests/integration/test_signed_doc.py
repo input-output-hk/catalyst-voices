@@ -538,48 +538,55 @@ def test_document_index_endpoint(
                 resp.status_code == 201
             ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
-        limit = 1
-        page = 0
-        filter = {"id": {"eq": doc.metadata["id"]}}
-        resp = document.post(
-            limit=limit,
-            page=page,
-            filter=filter,
-        )
-        assert (
-            resp.status_code == 200
-        ), f"Failed to post document: {resp.status_code} - {resp.text}"
+        def document_index_endpoint_test_case_with_filter(filter):
+            limit = 1
+            page = 0
+            resp = document.post(
+                limit=limit,
+                page=page,
+                filter=filter,
+            )
+            assert (
+                resp.status_code == 200
+            ), f"Failed to post document: {resp.status_code} - {resp.text}"
 
-        data = resp.json()
-        assert data["page"]["limit"] == limit
-        assert data["page"]["page"] == page
-        assert data["page"]["remaining"] == total_amount - 1 - page
+            data = resp.json()
+            assert data["page"]["limit"] == limit
+            assert data["page"]["page"] == page
+            assert data["page"]["remaining"] == total_amount - 1 - page
 
-        page += 1
-        resp = document.post(
-            limit=limit,
-            page=page,
-            filter=filter,
-        )
-        assert (
-            resp.status_code == 200
-        ), f"Failed to post document: {resp.status_code} - {resp.text}"
-        data = resp.json()
-        assert data["page"]["limit"] == limit
-        assert data["page"]["page"] == page
-        assert data["page"]["remaining"] == total_amount - 1 - page
+            page += 1
+            resp = document.post(
+                limit=limit,
+                page=page,
+                filter=filter,
+            )
+            assert (
+                resp.status_code == 200
+            ), f"Failed to post document: {resp.status_code} - {resp.text}"
+            data = resp.json()
+            assert data["page"]["limit"] == limit
+            assert data["page"]["page"] == page
+            assert data["page"]["remaining"] == total_amount - 1 - page
 
-        resp = document.post(
-            limit=total_amount,
-            filter=filter,
+            resp = document.post(
+                limit=total_amount,
+                filter=filter,
+            )
+            assert (
+                resp.status_code == 200
+            ), f"Failed to post document: {resp.status_code} - {resp.text}"
+            data = resp.json()
+            assert data["page"]["limit"] == total_amount
+            assert data["page"]["page"] == 0  # default value
+            assert data["page"]["remaining"] == 0
+
+        document_index_endpoint_test_case_with_filter(
+            {"id": {"eq": doc.metadata["id"]}}
         )
-        assert (
-            resp.status_code == 200
-        ), f"Failed to post document: {resp.status_code} - {resp.text}"
-        data = resp.json()
-        assert data["page"]["limit"] == total_amount
-        assert data["page"]["page"] == 0  # default value
-        assert data["page"]["remaining"] == 0
+        document_index_endpoint_test_case_with_filter(
+            {"id": {"eq": [doc.metadata["id"]]}}
+        )
 
         # Pagination out of range
         resp = document.post(
