@@ -3,8 +3,8 @@
 /// Search either by a singe UUID, or a Range of UUIDs
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) enum EqOrRangedUuid {
-    /// Search by the exact UUID
-    Eq(uuid::Uuid),
+    /// Search by the exact UUIDs from the list
+    Eq(Vec<uuid::Uuid>),
     /// Search in this UUID's range
     Range {
         /// Minimum UUID to find (inclusive)
@@ -18,7 +18,15 @@ impl EqOrRangedUuid {
     /// Return a sql conditional statement by the provided `table_field`
     pub(crate) fn conditional_stmt(&self, table_field: &str) -> String {
         match self {
-            Self::Eq(id) => format!("{table_field} = '{id}'"),
+            Self::Eq(ids) => {
+                format!(
+                    "{table_field} in ({})",
+                    ids.iter()
+                        .map(|v| v.to_string())
+                        .collect::<Vec<_>>()
+                        .join(",")
+                )
+            },
             Self::Range { min, max } => {
                 format!("{table_field} >= '{min}' AND {table_field} <= '{max}'")
             },
