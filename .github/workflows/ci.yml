@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, f15/cat-gateway]
     tags: ["**"]
   pull_request:
     types:
