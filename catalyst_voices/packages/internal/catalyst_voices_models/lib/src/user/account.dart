@@ -40,7 +40,7 @@ final class Account extends Equatable {
   /// Whether this account is being used.
   final bool isActive;
 
-  /// Status if chain registration transaction
+  /// Account registration transaction status
   final AccountRegistrationStatus registrationStatus;
 
   const Account({

@@ -13,7 +13,7 @@ final class AccountRegistrationStatus extends Equatable {
     required this.isPersistent,
   }) : assert(
          isPersistent && isIndexed || !isPersistent,
-         'Account can be Persistent only if indexed',
+         'Account can be persistent only if already indexed',
        );
 
   const AccountRegistrationStatus.indexed({this.isPersistent = false}) : isIndexed = true;
