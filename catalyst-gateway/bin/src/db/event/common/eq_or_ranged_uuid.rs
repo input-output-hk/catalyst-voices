@@ -3,8 +3,8 @@
 /// Search either by a singe UUID, or a Range of UUIDs
 #[derive(Clone, Debug, PartialEq)]
 pub(crate) enum EqOrRangedUuid {
-    /// Search by the exact UUIDs from the list
-    Eq(Vec<uuid::Uuid>),
+    /// Search by the exact UUID
+    Eq(uuid::Uuid),
     /// Search in this UUID's range
     Range {
         /// Minimum UUID to find (inclusive)
@@ -12,6 +12,8 @@ pub(crate) enum EqOrRangedUuid {
         /// Maximum UUID to find (inclusive)
         max: uuid::Uuid,
     },
+    /// Search by inclusion from the list of UUIDs
+    In(Vec<uuid::Uuid>),
 }
 
 impl EqOrRangedUuid {
@@ -21,8 +23,12 @@ impl EqOrRangedUuid {
         table_field: &str,
     ) -> String {
         match self {
-            Self::Eq(ids) if ids.is_empty() => "TRUE".to_string(),
-            Self::Eq(ids) => {
+            Self::Eq(id) => format!("{table_field} = '{id}'"),
+            Self::Range { min, max } => {
+                format!("{table_field} >= '{min}' AND {table_field} <= '{max}'")
+            },
+            Self::In(ids) if ids.is_empty() => "TRUE".to_string(),
+            Self::In(ids) => {
                 format!(
                     "{table_field} in ({})",
                     ids.iter()
@@ -30,9 +36,6 @@ impl EqOrRangedUuid {
                         .collect::<Vec<_>>()
                         .join(",")
                 )
-            },
-            Self::Range { min, max } => {
-                format!("{table_field} >= '{min}' AND {table_field} <= '{max}'")
             },
         }
     }

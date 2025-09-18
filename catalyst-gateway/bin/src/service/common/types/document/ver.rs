@@ -8,12 +8,14 @@ use anyhow::bail;
 use poem_openapi::{
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
+    NewType, Object, Union,
 };
 use serde_json::Value;
 
 use self::generic::uuidv7;
-use crate::service::common::types::{
-    array_types::impl_array_types, generic, string_types::impl_string_types,
+use crate::{
+    db::event::common::eq_or_ranged_uuid::EqOrRangedUuid,
+    service::common::types::{generic, string_types::impl_string_types},
 };
 
 /// Title.
@@ -91,12 +93,12 @@ impl Example for DocumentVer {
 
 impl DocumentVer {
     /// An example of a minimum Document ID when specifying ranges
-    pub(crate) fn example_min() -> Self {
+    fn example_min() -> Self {
         Self(EXAMPLE_MIN.to_owned())
     }
 
     /// An example of a maximum Document ID when specifying ranges
-    pub(crate) fn example_max() -> Self {
+    fn example_max() -> Self {
         Self(EXAMPLE_MAX.to_owned())
     }
 }
@@ -132,26 +134,132 @@ impl From<catalyst_signed_doc::UuidV7> for DocumentVer {
     }
 }
 
-// List of Document Versions
-impl_array_types!(
-    DocumentVers,
-    DocumentVer,
-    Some(poem_openapi::registry::MetaSchema {
-        example: Self::example().to_json(),
-        max_items: Some(1000),
-        items: Some(Box::new(DocumentVer::schema_ref())),
-        ..poem_openapi::registry::MetaSchema::ANY
-    })
-);
+#[derive(Object, Debug, PartialEq)]
+#[oai(example = true)]
+/// Version Range
+///
+/// A Range of document versions from minimum to maximum inclusive.
+pub(crate) struct VerRange {
+    /// Minimum Document Version to find (inclusive)
+    min: DocumentVer,
+    /// Maximum Document Version to find (inclusive)
+    max: DocumentVer,
+}
 
-impl Example for DocumentVers {
+impl Example for VerRange {
     fn example() -> Self {
-        Self(vec![DocumentVer::example()])
+        Self {
+            min: DocumentVer::example_min(),
+            max: DocumentVer::example_max(),
+        }
     }
 }
 
-impl PartialEq for DocumentVers {
-    fn eq(&self, other: &Self) -> bool {
-        self.0.eq(&other.0)
+#[derive(Object, Debug, PartialEq)]
+#[oai(example = true)]
+/// A single Document IDs.
+pub(crate) struct VerEq {
+    /// The exact Document ID to match against.
+    eq: DocumentVer,
+}
+
+impl Example for VerEq {
+    fn example() -> Self {
+        Self {
+            eq: DocumentVer::example(),
+        }
+    }
+}
+
+// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
+// openapi docs on an object.
+#[derive(NewType, Debug, PartialEq)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+/// Version Equals
+///
+/// A specific single
+/// [Document Version](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver).
+pub(crate) struct VerEqDocumented(VerEq);
+
+impl Example for VerEqDocumented {
+    fn example() -> Self {
+        Self(VerEq::example())
+    }
+}
+
+// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
+// openapi docs on an object.
+#[derive(NewType, Debug, PartialEq)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+/// Version Range
+///
+/// A range of [Document Versions]().
+pub(crate) struct VerRangeDocumented(VerRange);
+
+impl Example for VerRangeDocumented {
+    fn example() -> Self {
+        Self(VerRange::example())
+    }
+}
+
+#[derive(Union, Debug, PartialEq)]
+#[oai(one_of)]
+/// Document or Range of Documents
+///
+/// Either a Single Document Version, or a Range of Document Versions
+pub(crate) enum EqOrRangedVer {
+    /// This exact Document ID
+    Eq(VerEqDocumented),
+    /// Document Versions in this range
+    Range(VerRangeDocumented),
+}
+
+impl Example for EqOrRangedVer {
+    fn example() -> Self {
+        Self::Range(VerRangeDocumented::example())
+    }
+}
+
+#[derive(NewType, Debug, PartialEq)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+/// Document Version Selector
+///
+/// Either a absolute single Document Version or a range of Document Versions
+pub(crate) struct EqOrRangedVerDocumented(pub(crate) EqOrRangedVer);
+
+impl Example for EqOrRangedVerDocumented {
+    fn example() -> Self {
+        Self(EqOrRangedVer::example())
+    }
+}
+
+impl TryFrom<EqOrRangedVerDocumented> for EqOrRangedUuid {
+    type Error = anyhow::Error;
+
+    fn try_from(value: EqOrRangedVerDocumented) -> Result<Self, Self::Error> {
+        match value.0 {
+            EqOrRangedVer::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
+            EqOrRangedVer::Range(range) => {
+                Ok(Self::Range {
+                    min: range.0.min.parse()?,
+                    max: range.0.max.parse()?,
+                })
+            },
+        }
     }
 }
