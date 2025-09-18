@@ -108,6 +108,8 @@ poem-openapi-derive = { version = "=5.1.4" }
 # Its a transitive dependency of the "poem-openapi-derive" crate,
 # but its breaks API after version "0.20.11".
 darling = { version = "=0.20.10" }
+# Its a transitive dependency of the "cardano-chain-follower" crate,
+mithril-client = { version = "=0.12.2", default-features = false }
 
 [dev-dependencies]
 test-case = "3.3.1"
@@ -117,4 +119,4 @@ build-info-build = "0.0.39"
 
 [package.metadata.cargo-machete]
 # remove that after fixing issues with latest crates
-ignored = ["poem-openapi-derive", "darling"]
+ignored = ["poem-openapi-derive", "darling", "mithril-client"]
