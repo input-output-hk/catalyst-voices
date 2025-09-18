@@ -185,14 +185,33 @@ final class UserServiceImpl implements UserService {
       return;
     }
 
-    if (!activeAccount.publicStatus.isNotSetup && activeAccount.registrationStatus.isIndexed) {
+    var account = activeAccount.copyWith();
+
+    if (!account.registrationStatus.isIndexed) {
+      final status = await _userRepository
+          .getRbacRegistration(catalystId: account.catalystId)
+          .then(
+            (value) {
+              final isPersistent = value.lastPersistentTxn != null;
+              return AccountRegistrationStatus.indexed(isPersistent: isPersistent);
+            },
+          )
+          .onError((_, _) => const AccountRegistrationStatus.notIndexed());
+
+      account = account.copyWith(registrationStatus: status);
+    }
+
+    if (!account.publicStatus.isNotSetup && account.registrationStatus.isIndexed) {
       final publicProfile = await _userRepository.getAccountPublicProfile();
       final publicProfileStatus = publicProfile?.status ?? AccountPublicStatus.unknown;
-      final updatedAccount = activeAccount.copyWith(
+      account = account.copyWith(
         email: Optional(publicProfile?.email),
         publicStatus: publicProfileStatus,
       );
-      final updatedUser = user.updateAccount(updatedAccount);
+    }
+
+    if (account != activeAccount) {
+      final updatedUser = user.updateAccount(account);
 
       await _updateUser(updatedUser);
     }
