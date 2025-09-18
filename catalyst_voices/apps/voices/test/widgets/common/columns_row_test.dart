@@ -96,36 +96,19 @@ void main() {
         final secondColumnChildren = columnWidgets[1].widget as Column;
         final thirdColumnChildren = columnWidgets[2].widget as Column;
 
-        expect((firstColumnChildren.children.first as Text).data, 'Item 0');
-        expect(
-          (firstColumnChildren.children[1] as SizedBox).height,
-          crossAxisSpacing,
-        );
-        expect((firstColumnChildren.children[2] as Text).data, 'Item 1');
-        expect(
-          (firstColumnChildren.children[3] as SizedBox).height,
-          crossAxisSpacing,
-        );
-        expect((firstColumnChildren.children[4] as Text).data, 'Item 2');
+        expect(firstColumnChildren.spacing, crossAxisSpacing);
+        expect((firstColumnChildren.children[0] as Text).data, 'Item 0');
+        expect((firstColumnChildren.children[1] as Text).data, 'Item 1');
+        expect((firstColumnChildren.children[2] as Text).data, 'Item 2');
 
-        expect((secondColumnChildren.children.first as Text).data, 'Item 3');
-        expect(
-          (secondColumnChildren.children[1] as SizedBox).height,
-          crossAxisSpacing,
-        );
-        expect((secondColumnChildren.children[2] as Text).data, 'Item 4');
-        expect(
-          (secondColumnChildren.children[3] as SizedBox).height,
-          crossAxisSpacing,
-        );
-        expect((secondColumnChildren.children[4] as Text).data, 'Item 5');
+        expect(secondColumnChildren.spacing, crossAxisSpacing);
+        expect((secondColumnChildren.children[0] as Text).data, 'Item 3');
+        expect((secondColumnChildren.children[1] as Text).data, 'Item 4');
+        expect((secondColumnChildren.children[2] as Text).data, 'Item 5');
 
-        expect((thirdColumnChildren.children.first as Text).data, 'Item 6');
-        expect(
-          (thirdColumnChildren.children[1] as SizedBox).height,
-          crossAxisSpacing,
-        );
-        expect((thirdColumnChildren.children[2] as Text).data, 'Item 7');
+        expect(thirdColumnChildren.spacing, crossAxisSpacing);
+        expect((thirdColumnChildren.children[0] as Text).data, 'Item 6');
+        expect((thirdColumnChildren.children[1] as Text).data, 'Item 7');
       },
     );
   });

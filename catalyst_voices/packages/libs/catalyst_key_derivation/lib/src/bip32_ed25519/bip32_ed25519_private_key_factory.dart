@@ -1,6 +1,6 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_key_derivation/src/bip32_ed25519/bip32_ed25519_private_key.dart';
-import 'package:catalyst_key_derivation/src/rust/api/key_derivation.dart' as rust;
+import 'package:catalyst_key_derivation/src/rust/key_derivation.dart' as rust;
 import 'package:cbor/cbor.dart';
 
 /// A factory that builds instances of [Bip32Ed25519XPrivateKey].

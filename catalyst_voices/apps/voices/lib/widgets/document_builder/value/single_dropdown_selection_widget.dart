@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/widgets/document_builder/common/document_property_builder_title.dart';
-import 'package:catalyst_voices/widgets/dropdown/voices_dropdown.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +24,7 @@ class SingleDropdownSelectionWidget extends StatefulWidget {
 
 class _SingleDropdownSelectionWidgetState extends State<SingleDropdownSelectionWidget> {
   bool get _isRequired => widget.schema.isRequired;
+
   String get _title => widget.schema.title;
 
   @override

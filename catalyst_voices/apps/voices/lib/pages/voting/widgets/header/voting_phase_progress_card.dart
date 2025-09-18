@@ -112,9 +112,6 @@ class _ProgressBar extends StatelessWidget {
 }
 
 class _VotingPhaseProgressCard extends StatelessWidget {
-  static const _minWidth = 256.0;
-  static const _maxWidth = 570.0;
-
   final VotingPhaseProgressDetailsViewModel? votingPhase;
 
   const _VotingPhaseProgressCard({
@@ -125,27 +122,26 @@ class _VotingPhaseProgressCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final width = (MediaQuery.sizeOf(context).width * 0.35).clamp(_minWidth, _maxWidth);
-
     return Container(
-      width: width,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+      constraints: const BoxConstraints(maxWidth: 576),
       decoration: BoxDecoration(
         color: theme.colors.elevationsOnSurfaceNeutralLv1White,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           VoicesAssets.icons.calendar.buildIcon(
             color: theme.colors.textOnPrimaryLevel1,
             size: 24,
           ),
-          const Spacer(),
+          const SizedBox(height: 28),
           _VotingStatus(status: votingPhase?.status),
           const SizedBox(height: 4),
           _DateRange(dateRange: votingPhase?.votingDateRange),
-          const Spacer(),
+          const SizedBox(height: 28),
           _ProgressBar(value: votingPhase?.currentPhaseProgress ?? 0),
           const SizedBox(height: 6),
           _Captions(progress: votingPhase),

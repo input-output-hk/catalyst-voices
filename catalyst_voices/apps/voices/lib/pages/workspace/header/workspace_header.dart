@@ -3,14 +3,14 @@ import 'dart:typed_data';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/space_ext.dart';
-import 'package:catalyst_voices/routes/routing/routing.dart';
+import 'package:catalyst_voices/pages/workspace/header/workspace_timeline.dart';
 import 'package:catalyst_voices/widgets/buttons/create_proposal_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' show ProposalDocument, Space;
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 part 'import_proposal_button.dart';
@@ -23,74 +23,39 @@ class WorkspaceHeader extends StatefulWidget {
   State<WorkspaceHeader> createState() => _WorkspaceHeaderState();
 }
 
-class _HasCommentCard extends StatelessWidget {
-  const _HasCommentCard();
+class _HeaderActions extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _HeaderActions({
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return VoicesGestureDetector(
-      onTap: () async => ProposalsRoute.myProposals().push(context),
-      child: Container(
-        decoration: BoxDecoration(
-          color: context.colors.elevationsOnSurfaceNeutralLv0,
-          borderRadius: BorderRadius.circular(16),
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 8,
+      children: [
+        const CreateProposalButton(showTrailingIcon: true),
+        const _ImportProposalButton(),
+        _TimelineToggleButton(
+          onPressed: onTap,
         ),
-        padding: const EdgeInsets.all(16),
-        constraints: const BoxConstraints(
-          maxWidth: 300,
-          maxHeight: 190,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                VoicesAssets.icons.chat.buildIcon(
-                  color: context.colors.iconsPrimary,
-                ),
-                const Spacer(),
-                VoicesAssets.icons.arrowRight.buildIcon(
-                  color: context.colors.primaryContainer,
-                ),
-              ],
-            ),
-            const Spacer(),
-            Text(
-              context.l10n.viewProposalComments,
-              style: context.textTheme.titleSmall?.copyWith(
-                color: context.colors.textOnPrimaryLevel1,
-              ),
-            ),
-            Text(
-              context.l10n.viewProposalCommentsDescription,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: context.colors.sysColorsNeutralN60,
-              ),
-            ),
-            const Spacer(),
-          ],
-        ),
-      ),
+      ],
     );
   }
 }
 
-class _ViewComments extends StatelessWidget {
-  const _ViewComments();
+class _HeaderText extends StatelessWidget {
+  const _HeaderText();
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState, bool>(
-      selector: (state) => state.hasComments,
-      builder: (context, hasComments) {
-        return hasComments
-            ? const Padding(
-                padding: EdgeInsets.only(right: 24),
-                child: _HasCommentCard(),
-              )
-            : const SizedBox.shrink();
-      },
+    return Text(
+      Space.workspace.localizedName(context.l10n),
+      style: context.textTheme.headlineLarge?.copyWith(
+        color: context.colorScheme.primary,
+      ),
     );
   }
 }
@@ -102,8 +67,9 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
+    return ResponsivePadding(
+      sm: const EdgeInsets.symmetric(horizontal: 12),
+      md: const EdgeInsets.symmetric(horizontal: 32),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,56 +82,20 @@ class _WorkspaceHeaderState extends State<WorkspaceHeader> {
             ),
           ),
           const SizedBox(height: 8),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                Space.workspace.localizedName(context.l10n),
-                style: theme.textTheme.headlineLarge?.copyWith(
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const Spacer(),
-              const CreateProposalButton(showTrailingIcon: true),
-              const SizedBox(width: 8),
-              const _ImportProposalButton(),
-              const SizedBox(width: 8),
-              _TimelineToggleButton(
-                onPressed: _toggleTimelineVisibility,
-              ),
-            ],
+          SizedBox(
+            width: double.maxFinite,
+            child: Wrap(
+              runSpacing: 10,
+              alignment: WrapAlignment.spaceBetween,
+              children: [
+                const _HeaderText(),
+                _HeaderActions(onTap: _toggleTimelineVisibility),
+              ],
+            ),
           ),
           const SizedBox(height: 24),
           if (_isTimelineVisible) ...[
-            Row(
-              children: [
-                const _ViewComments(),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: context.colors.onSurfaceNeutralOpaqueLv0.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child:
-                        BlocSelector<
-                          WorkspaceBloc,
-                          WorkspaceState,
-                          List<CampaignTimelineViewModel>
-                        >(
-                          selector: (state) {
-                            return state.timelineItems;
-                          },
-                          builder: (context, timelineItems) {
-                            return CampaignTimeline(
-                              timelineItems: timelineItems,
-                            );
-                          },
-                        ),
-                  ),
-                ),
-              ],
-            ),
+            const WorkspaceTimeline(),
             const SizedBox(height: 48),
           ],
         ],

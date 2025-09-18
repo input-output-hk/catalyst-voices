@@ -260,7 +260,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     final selectedCategory = _cache.filters.category;
     final categories = _cache.categories ?? const [];
 
-    final categorySelectorItems = categories.map((e) {
+    final items = categories.map((e) {
       return ProposalsCategorySelectorItem(
         ref: e.selfRef,
         name: e.formattedCategoryName,
@@ -268,7 +268,9 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       );
     }).toList();
 
-    emit(state.copyWith(categorySelectorItems: categorySelectorItems));
+    final category = ProposalsCategoryState(items);
+
+    emit(state.copyWith(category: category));
   }
 
   void _rebuildOrder() {
@@ -285,11 +287,13 @@ final class ProposalsCubit extends Cubit<ProposalsState>
             UpdateDate(isAscending: false),
           ];
 
-    final orderItem = options
+    final items = options
         .map((order) => ProposalsDropdownOrderItem(order, isSelected: order == selectedOrder))
         .toList();
 
-    emit(state.copyWith(orderItems: orderItem));
+    final order = ProposalsOrderState(items);
+
+    emit(state.copyWith(order: order));
   }
 
   void _resetCache() {

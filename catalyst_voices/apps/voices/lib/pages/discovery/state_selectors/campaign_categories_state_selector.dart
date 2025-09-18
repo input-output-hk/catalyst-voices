@@ -4,6 +4,7 @@ import 'package:catalyst_voices/pages/discovery/sections/campaign_categories.dar
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -19,8 +20,10 @@ class CampaignCategoriesStateSelector extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 120),
+        ResponsivePadding(
+          xs: const EdgeInsets.symmetric(horizontal: 20),
+          sm: const EdgeInsets.symmetric(horizontal: 48),
+          md: const EdgeInsets.symmetric(horizontal: 120),
           child: Text(
             key: const Key('CampaignCategoriesTitle'),
             context.l10n.campaignCategories,

@@ -16,13 +16,13 @@ class UnlockButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveChild(
+    return ResponsiveChildBuilder(
       xs: (context) => IconButton.filled(
         onPressed: onPressed,
         color: Theme.of(context).colors.iconsBackground,
         icon: VoicesAssets.icons.lockOpen.buildIcon(),
       ),
-      other: (context) => FilledButton.icon(
+      sm: (context) => FilledButton.icon(
         onPressed: onPressed,
         icon: VoicesAssets.icons.lockOpen.buildIcon(size: 18),
         label: Text(context.l10n.unlockButtonLabelText),

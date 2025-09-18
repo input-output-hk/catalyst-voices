@@ -96,7 +96,7 @@ class _ExitFormIssueModeDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDesktopInfoDialog(
+    return VoicesInfoDialog(
       icon: VoicesAssets.icons.exclamation.buildIcon(
         color: context.colors.iconsWarning,
       ),

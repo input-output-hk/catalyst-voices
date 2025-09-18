@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/cards/proposal/workspace_proposal_card.dart';
+import 'package:catalyst_voices/pages/workspace/user_proposals/proposal_card/workspace_proposal_card.dart';
 import 'package:catalyst_voices/widgets/headers/section_learn_more_header.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';

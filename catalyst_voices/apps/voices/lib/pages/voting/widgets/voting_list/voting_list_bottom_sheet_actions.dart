@@ -36,7 +36,9 @@ class VotingListBottomSheetActions extends StatelessWidget {
           child: AbsorbPointer(
             absorbing: isLoading,
             child: VoicesFilledButton(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
               onTap: nextAction,
               child: isLoading
                   ? const SizedBox(

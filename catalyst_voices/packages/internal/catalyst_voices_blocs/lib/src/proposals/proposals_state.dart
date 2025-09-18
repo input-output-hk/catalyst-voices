@@ -3,25 +3,47 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
+final class ProposalsCategoryState extends Equatable {
+  final List<ProposalsCategorySelectorItem> items;
+
+  const ProposalsCategoryState([this.items = const []]);
+
+  @override
+  List<Object?> get props => [items];
+
+  SignedDocumentRef? get selectedCategoryId {
+    return items.singleWhereOrNull((element) => element.isSelected)?.ref;
+  }
+}
+
+final class ProposalsOrderState extends Equatable {
+  final List<ProposalsDropdownOrderItem> items;
+
+  const ProposalsOrderState([this.items = const []]);
+
+  @override
+  List<Object?> get props => [items];
+}
+
 /// The state of available proposals.
 class ProposalsState extends Equatable {
   final bool hasSearchQuery;
   final List<String> favoritesIds;
   final ProposalsCount count;
-  final List<ProposalsCategorySelectorItem> categorySelectorItems;
+  final ProposalsCategoryState category;
   final Duration recentProposalsMaxAge;
   final bool isRecentProposalsEnabled;
-  final List<ProposalsDropdownOrderItem> orderItems;
+  final ProposalsOrderState order;
   final bool isOrderEnabled;
 
   const ProposalsState({
     this.hasSearchQuery = false,
     this.favoritesIds = const [],
     this.count = const ProposalsCount(),
-    this.categorySelectorItems = const [],
+    this.category = const ProposalsCategoryState(),
     required this.recentProposalsMaxAge,
     this.isRecentProposalsEnabled = false,
-    this.orderItems = const [],
+    this.order = const ProposalsOrderState(),
     this.isOrderEnabled = false,
   });
 
@@ -33,7 +55,7 @@ class ProposalsState extends Equatable {
   }
 
   ProposalsStateOrderDropdown get orderDropdown {
-    return ProposalsStateOrderDropdown._(items: orderItems, isEnabled: isOrderEnabled);
+    return ProposalsStateOrderDropdown._(items: order.items, isEnabled: isOrderEnabled);
   }
 
   @override
@@ -41,35 +63,31 @@ class ProposalsState extends Equatable {
     hasSearchQuery,
     favoritesIds,
     count,
-    categorySelectorItems,
+    category,
     recentProposalsMaxAge,
     isRecentProposalsEnabled,
-    orderItems,
+    order,
     isOrderEnabled,
   ];
-
-  SignedDocumentRef? get selectedCategoryId {
-    return categorySelectorItems.singleWhereOrNull((element) => element.isSelected)?.ref;
-  }
 
   ProposalsState copyWith({
     bool? hasSearchQuery,
     List<String>? favoritesIds,
     ProposalsCount? count,
-    List<ProposalsCategorySelectorItem>? categorySelectorItems,
+    ProposalsCategoryState? category,
     Duration? recentProposalsMaxAge,
     bool? isRecentProposalsEnabled,
-    List<ProposalsDropdownOrderItem>? orderItems,
+    ProposalsOrderState? order,
     bool? isOrderEnabled,
   }) {
     return ProposalsState(
       hasSearchQuery: hasSearchQuery ?? this.hasSearchQuery,
       favoritesIds: favoritesIds ?? this.favoritesIds,
       count: count ?? this.count,
-      categorySelectorItems: categorySelectorItems ?? this.categorySelectorItems,
+      category: category ?? this.category,
       recentProposalsMaxAge: recentProposalsMaxAge ?? this.recentProposalsMaxAge,
       isRecentProposalsEnabled: isRecentProposalsEnabled ?? this.isRecentProposalsEnabled,
-      orderItems: orderItems ?? this.orderItems,
+      order: order ?? this.order,
       isOrderEnabled: isOrderEnabled ?? this.isOrderEnabled,
     );
   }

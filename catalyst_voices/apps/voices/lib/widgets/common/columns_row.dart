@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_completer.dart';
 import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_picker.dart';
 import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_viewer.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
@@ -24,6 +23,9 @@ class ColumnsRow extends StatelessWidget {
   /// The horizontal spacing between columns. Defaults to 0.0.
   final double mainAxisSpacing;
 
+  /// The size of columns. Defaults to [MainAxisSize.max].
+  final MainAxisSize crossAxisSize;
+
   /// The vertical spacing between children within each column. Defaults to 0.0.
   final double crossAxisSpacing;
 
@@ -36,6 +38,7 @@ class ColumnsRow extends StatelessWidget {
   const ColumnsRow({
     super.key,
     required this.columnsCount,
+    this.crossAxisSize = MainAxisSize.max,
     this.mainAxisSpacing = 0.0,
     this.crossAxisSpacing = 0.0,
     required this.children,
@@ -47,11 +50,11 @@ class ColumnsRow extends StatelessWidget {
     final columns = children.slices(columnCount).toList();
 
     return Row(
+      spacing: mainAxisSpacing,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: columns
-          .map((e) => _Column(spacing: crossAxisSpacing, children: e))
-          .map<Widget>((e) => Expanded(child: e))
-          .separatedBy(SizedBox(width: mainAxisSpacing))
+          .map((e) => _Column(spacing: crossAxisSpacing, mainAxisSize: crossAxisSize, children: e))
+          .map((e) => Expanded(child: e))
           .toList(),
     );
   }
@@ -60,18 +63,22 @@ class ColumnsRow extends StatelessWidget {
 /// A helper widget that arranges children vertically with optional spacing.
 class _Column extends StatelessWidget {
   final double spacing;
+  final MainAxisSize mainAxisSize;
   final List<Widget> children;
 
   const _Column({
     this.spacing = 0.0,
+    this.mainAxisSize = MainAxisSize.max,
     required this.children,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: mainAxisSize,
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: children.separatedBy(SizedBox(height: spacing)).toList(),
+      spacing: spacing,
+      children: children,
     );
   }
 }

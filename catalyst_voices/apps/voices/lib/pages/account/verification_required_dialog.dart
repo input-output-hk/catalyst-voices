@@ -9,7 +9,7 @@ class VerificationRequiredDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDesktopInfoDialog(
+    return VoicesInfoDialog(
       icon: VoicesAssets.icons.exclamation.buildIcon(color: context.colors.iconsWarning),
       title: Text(context.l10n.emailNotVerifiedDialogTitle),
       message: Text(context.l10n.emailNotVerifiedDialogMessage),
