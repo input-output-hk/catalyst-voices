@@ -31,7 +31,7 @@ dependencies:
 dev_dependencies:
   catalyst_analysis: ^3.0.0
   ffi: ^2.1.0
-  ffigen: ^19.1.0
+  ffigen: ^13.0.0
   flutter_test:
     sdk: flutter
   test: ^1.25.15
