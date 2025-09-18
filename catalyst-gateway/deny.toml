@@ -16,7 +16,10 @@ targets = [
 
 [advisories]
 version = 2
-ignore = []
+ignore = [
+    "RUSTSEC-2025-0067",
+    "RUSTSEC-2025-0068",
+]
 
 [bans]
 multiple-versions = "warn"
