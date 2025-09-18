@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/constants/constants.dart';
+import 'package:catalyst_voices/common/ext/active_fund_number_selector_ext.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -28,7 +29,7 @@ class _DrepApprovalContingencyRichTextState extends State<DrepApprovalContingenc
       placeholderSpanBuilder: (context, placeholder) {
         return switch (placeholder) {
           'fund14ProposalSubmissionNotice' => TextSpan(
-            text: context.l10n.fund14ProposalSubmissionNotice,
+            text: context.l10n.fundProposalSubmissionNotice(context.activeCampaignFundNumber),
             recognizer: _f14ProposalSubmissionNoticeRecognizer,
             style: const TextStyle(decoration: TextDecoration.underline),
           ),
