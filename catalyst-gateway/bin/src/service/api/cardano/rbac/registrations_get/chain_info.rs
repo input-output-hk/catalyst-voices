@@ -31,7 +31,8 @@ pub struct ChainInfo {
 impl ChainInfo {
     /// Creates a new `ChainInfo` instance.
     pub(crate) async fn new(
-        persistent_session: &CassandraSession, volatile_session: &CassandraSession,
+        persistent_session: &CassandraSession,
+        volatile_session: &CassandraSession,
         catalyst_id: &CatalystId,
     ) -> anyhow::Result<Option<Self>> {
         let registrations =
@@ -70,7 +71,8 @@ impl ChainInfo {
 
 /// Returns a last independent chain of both persistent and volatile registrations.
 async fn last_registration_chain(
-    persistent_session: &CassandraSession, volatile_session: &CassandraSession,
+    persistent_session: &CassandraSession,
+    volatile_session: &CassandraSession,
     catalyst_id: &CatalystId,
 ) -> anyhow::Result<Vec<(bool, Query)>> {
     let (persistent_registrations, volatile_registrations) = try_join(

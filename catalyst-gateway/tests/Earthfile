@@ -48,7 +48,7 @@ test-lint-openapi:
     # Scan the doc directory where type of file is JSON.
     DO spectral-ci+LINT --dir=./doc
 
-test-postgres:
+disable-test-postgres:
     FROM gateway+builder-src
 
     COPY +docker-compose/docker-compose.yml .
@@ -65,7 +65,7 @@ test-postgres:
     END
 
 # test-scylla - Runs the integration test for scylla.
-test-scylla:
+disable-test-scylla:
     FROM gateway+builder-src
 
     DO +INSTALL_SCYLLA

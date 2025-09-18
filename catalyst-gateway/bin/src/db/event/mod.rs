@@ -99,7 +99,8 @@ impl EventDB {
     /// `anyhow::Result<Vec<Row>>`
     #[must_use = "ONLY use this function for SELECT type operations which return row data, otherwise use `modify()`"]
     pub(crate) async fn query(
-        stmt: &str, params: &[&(dyn ToSql + Sync)],
+        stmt: &str,
+        params: &[&(dyn ToSql + Sync)],
     ) -> anyhow::Result<Vec<Row>> {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_rollback(stmt, params).await?;
@@ -124,7 +125,8 @@ impl EventDB {
     /// `anyhow::Result<impl Stream<Item = anyhow::Result<Row>>>`
     #[must_use = "ONLY use this function for SELECT type operations which return row data, otherwise use `modify()`"]
     pub(crate) async fn query_stream(
-        stmt: &str, params: &[&(dyn ToSql + Sync)],
+        stmt: &str,
+        params: &[&(dyn ToSql + Sync)],
     ) -> anyhow::Result<impl Stream<Item = anyhow::Result<Row>>> {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_rollback(stmt, params).await?;
@@ -146,7 +148,8 @@ impl EventDB {
     /// `Result<Row, anyhow::Error>`
     #[must_use = "ONLY use this function for SELECT type operations which return row data, otherwise use `modify()`"]
     pub(crate) async fn query_one(
-        stmt: &str, params: &[&(dyn ToSql + Sync)],
+        stmt: &str,
+        params: &[&(dyn ToSql + Sync)],
     ) -> anyhow::Result<Row> {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_rollback(stmt, params).await?;
@@ -169,7 +172,10 @@ impl EventDB {
     /// # Returns
     ///
     /// `anyhow::Result<()>`
-    pub(crate) async fn modify(stmt: &str, params: &[&(dyn ToSql + Sync)]) -> anyhow::Result<()> {
+    pub(crate) async fn modify(
+        stmt: &str,
+        params: &[&(dyn ToSql + Sync)],
+    ) -> anyhow::Result<()> {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_commit(stmt, params).await?;
         } else {
@@ -200,14 +206,16 @@ impl EventDB {
 
     /// Prepend `EXPLAIN ANALYZE` to the query, and rollback the transaction.
     async fn explain_analyze_rollback(
-        stmt: &str, params: &[&(dyn ToSql + Sync)],
+        stmt: &str,
+        params: &[&(dyn ToSql + Sync)],
     ) -> anyhow::Result<()> {
         Self::explain_analyze(stmt, params, true).await
     }
 
     /// Prepend `EXPLAIN ANALYZE` to the query, and commit the transaction.
     async fn explain_analyze_commit(
-        stmt: &str, params: &[&(dyn ToSql + Sync)],
+        stmt: &str,
+        params: &[&(dyn ToSql + Sync)],
     ) -> anyhow::Result<()> {
         Self::explain_analyze(stmt, params, false).await
     }
@@ -222,7 +230,9 @@ impl EventDB {
     /// * `params` - `&[&(dyn ToSql + Sync)]` SQL parameters.
     /// * `rollback` - `bool` whether to roll back the transaction or not.
     async fn explain_analyze(
-        stmt: &str, params: &[&(dyn ToSql + Sync)], rollback: bool,
+        stmt: &str,
+        params: &[&(dyn ToSql + Sync)],
+        rollback: bool,
     ) -> anyhow::Result<()> {
         let span = debug_span!(
             "query_plan",

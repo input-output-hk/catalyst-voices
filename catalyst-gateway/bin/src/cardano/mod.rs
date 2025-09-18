@@ -83,7 +83,10 @@ struct SyncParams {
 }
 
 impl Display for SyncParams {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
         if self.result.is_none() {
             write!(f, "Sync_Params {{ ")?;
         } else {
@@ -128,7 +131,7 @@ impl Display for SyncParams {
             match result {
                 Ok(()) => write!(f, ", Success")?,
                 Err(error) => write!(f, ", {error}")?,
-            };
+            }
         }
 
         f.write_str(" }")
@@ -140,7 +143,11 @@ const BACKOFF_RANGE_MULTIPLIER: u32 = 3;
 
 impl SyncParams {
     /// Create a new `SyncParams`.
-    fn new(chain: Network, start: Point, end: Point) -> Self {
+    fn new(
+        chain: Network,
+        start: Point,
+        end: Point,
+    ) -> Self {
         Self {
             chain,
             start,
@@ -187,8 +194,13 @@ impl SyncParams {
 
     /// Convert Params into the result of the sync.
     pub(crate) fn done(
-        &self, first: Option<Point>, first_immutable: bool, last: Option<Point>,
-        last_immutable: bool, synced: u64, result: anyhow::Result<()>,
+        &self,
+        first: Option<Point>,
+        first_immutable: bool,
+        last: Option<Point>,
+        last_immutable: bool,
+        synced: u64,
+        result: anyhow::Result<()>,
     ) -> Self {
         if result.is_ok() && self.end != Point::TIP {
             // Update sync status in the Immutable DB.
@@ -375,8 +387,12 @@ fn sync_subchain(params: SyncParams) -> tokio::task::JoinHandle<SyncParams> {
 
 /// Update block related state.
 fn update_block_state(
-    block: &MultiEraBlock, first_indexed_block: &mut Option<Point>, first_immutable: &mut bool,
-    last_indexed_block: &mut Option<Point>, last_immutable: &mut bool, blocks_synced: &mut u64,
+    block: &MultiEraBlock,
+    first_indexed_block: &mut Option<Point>,
+    first_immutable: &mut bool,
+    last_indexed_block: &mut Option<Point>,
+    last_immutable: &mut bool,
+    blocks_synced: &mut u64,
 ) {
     *last_immutable = block.is_immutable();
     *last_indexed_block = Some(block.point());
@@ -429,7 +445,10 @@ impl SyncTask {
     }
 
     /// Add a new `SyncTask` to the queue.
-    fn add_sync_task(&mut self, params: SyncParams) {
+    fn add_sync_task(
+        &mut self,
+        params: SyncParams,
+    ) {
         self.sync_tasks.push(sync_subchain(params));
         self.current_sync_tasks = self.current_sync_tasks.saturating_add(1);
         debug!(current_sync_tasks=%self.current_sync_tasks, "Added new Sync Task");
@@ -643,7 +662,11 @@ impl SyncTask {
     /// If it hasn't just return the slots as points.
     /// If it has, return a subset that hasn't been indexed if any, or None if its been
     /// completely indexed already.
-    fn get_syncable_range(&self, start: Slot, end: Slot) -> Option<(Point, Point)> {
+    fn get_syncable_range(
+        &self,
+        start: Slot,
+        end: Slot,
+    ) -> Option<(Point, Point)> {
         for sync_block in &self.sync_status {
             // Check if we start within a previously synchronized block.
             if start >= sync_block.start_slot && start <= sync_block.end_slot {

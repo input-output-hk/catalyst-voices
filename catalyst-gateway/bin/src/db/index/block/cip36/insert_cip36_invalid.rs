@@ -47,7 +47,10 @@ pub(crate) struct Params {
 }
 
 impl Debug for Params {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
         let cip36 = match self.cip36 {
             MaybeUnset::Unset => "UNSET",
             MaybeUnset::Set(v) => &format!("{v:?}"),
@@ -71,7 +74,10 @@ impl Debug for Params {
 impl Params {
     /// Create a new Insert Query.
     pub fn new(
-        vote_key: Option<&VotingPubKey>, slot_no: Slot, txn_index: TxnIndex, cip36: &Cip36,
+        vote_key: Option<&VotingPubKey>,
+        slot_no: Slot,
+        txn_index: TxnIndex,
+        cip36: &Cip36,
     ) -> Self {
         let stake_public_key = cip36
             .stake_pk()
@@ -106,7 +112,8 @@ impl Params {
 
     /// Prepare Batch of Insert CIP-36 Registration Index Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+        session: &Arc<Session>,
+        cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),

@@ -61,7 +61,8 @@ impl Query {
     ///
     /// Don't call directly, use one of the methods instead.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: QueryParams,
+        session: &CassandraSession,
+        params: QueryParams,
     ) -> Result<TypedRowStream<Query>> {
         session
             .execute_iter(PreparedSelectQuery::CatalystIdByTransactionId, params)
@@ -74,7 +75,8 @@ impl Query {
     ///
     /// Unless you really know you need an uncached result, use the cached version.
     pub(crate) async fn get_latest_uncached(
-        session: &CassandraSession, txn_id: DbTransactionId,
+        session: &CassandraSession,
+        txn_id: DbTransactionId,
     ) -> Result<Option<Query>> {
         Self::execute(session, QueryParams { txn_id })
             .await?
@@ -86,7 +88,8 @@ impl Query {
 
     /// Gets the latest Catalyst ID for the given transaction ID.
     pub(crate) async fn get_latest(
-        session: &CassandraSession, transaction_id: DbTransactionId,
+        session: &CassandraSession,
+        transaction_id: DbTransactionId,
     ) -> Result<Option<Query>> {
         // TODO: Caching is disabled because we want to measure the performance without it and be
         // sure that the logic is sound. Also caches needs to be tunable.
@@ -103,7 +106,10 @@ impl Query {
 
 /// Update the cache when a rbac registration is indexed.
 pub(crate) fn cache_for_transaction_id(
-    _transaction_id: TransactionId, _catalyst_id: CatalystId, _slot_no: Slot, _txn_idx: TxnIndex,
+    _transaction_id: TransactionId,
+    _catalyst_id: CatalystId,
+    _slot_no: Slot,
+    _txn_idx: TxnIndex,
 ) {
     // TODO: Caching is disabled because we want to measure the performance without it and
     // be sure that the logic is sound. Also caches needs to be tunable.

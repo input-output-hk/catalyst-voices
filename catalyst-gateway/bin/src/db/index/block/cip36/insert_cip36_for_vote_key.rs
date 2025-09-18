@@ -36,7 +36,11 @@ pub(crate) struct Params {
 impl Params {
     /// Create a new Insert Query.
     pub fn new(
-        vote_key: &VotingPubKey, slot_no: Slot, txn_index: TxnIndex, cip36: &Cip36, valid: bool,
+        vote_key: &VotingPubKey,
+        slot_no: Slot,
+        txn_index: TxnIndex,
+        cip36: &Cip36,
+        valid: bool,
     ) -> Self {
         Params {
             vote_key: vote_key
@@ -55,7 +59,8 @@ impl Params {
 
     /// Prepare Batch of Insert CIP-36 Registration Index Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
+        session: &Arc<Session>,
+        cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),

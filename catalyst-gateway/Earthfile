@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.4.4 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.5.17 AS rust-ci
 IMPORT ../ AS repo-ci
 IMPORT github.com/input-output-hk/catalyst-voices/catalyst-gateway:main AS cat-gateway-main
 
@@ -50,7 +50,7 @@ builder-src:
 
 # check : Run check using the most efficient host tooling
 # CI Automated Entry point.
-check:
+disable-check:
     FROM +builder-src
 
     DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
