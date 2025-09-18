@@ -353,6 +353,18 @@ void main() {
     group('refreshActiveAccountProfile', () {
       setUp(() {
         userRepository = _MockUserRepository();
+        when(
+          () => userRepository.getRbacRegistration(catalystId: any(named: 'catalystId')),
+        ).thenAnswer(
+          (_) {
+            const rbac = RbacRegistrationChain(
+              catalystId: '',
+              purpose: [],
+              roles: '',
+            );
+            return Future.value(rbac);
+          },
+        );
         service = UserService(userRepository, userObserver);
 
         registerFallbackValue(const User.empty());
