@@ -585,7 +585,7 @@ def test_document_index_endpoint(
             {"id": {"eq": doc.metadata["id"]}}
         )
         document_index_endpoint_test_case_with_filter(
-            {"id": {"eq": [doc.metadata["id"]]}}
+            {"id": {"in": [doc.metadata["id"]]}}
         )
 
         # Pagination out of range
