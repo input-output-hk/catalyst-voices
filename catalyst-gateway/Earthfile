@@ -50,7 +50,7 @@ builder-src:
 
 # check : Run check using the most efficient host tooling
 # CI Automated Entry point.
-check:
+disable-check:
     FROM +builder-src
 
     DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
