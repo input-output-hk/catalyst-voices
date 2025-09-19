@@ -14,6 +14,7 @@ abstract interface class UserService implements ActiveAware {
   factory UserService(
     UserRepository userRepository,
     UserObserver userObserver,
+    RegistrationStatusPoller registrationStatusPoller,
   ) = UserServiceImpl;
 
   User get user;
@@ -97,10 +98,13 @@ final class UserServiceImpl implements UserService {
   final UserObserver _userObserver;
   final RegistrationStatusPoller _registrationStatusPoller;
 
+  StreamSubscription<CatalystIdRegStatus>? _accountRegistrationStatusSub;
+
   UserServiceImpl(
     this._userRepository,
     this._userObserver,
-  ) : _registrationStatusPoller = RegistrationStatusPoller(_userRepository);
+    this._registrationStatusPoller,
+  );
 
   @override
   bool get isActive => _userObserver.isActive;
@@ -116,7 +120,8 @@ final class UserServiceImpl implements UserService {
 
   @override
   Future<void> dispose() async {
-    _registrationStatusPoller.stop();
+    await _cancelRegistrationStatusSub();
+    await _registrationStatusPoller.dispose();
   }
 
   @override
@@ -426,6 +431,11 @@ final class UserServiceImpl implements UserService {
     await _updateUser(user);
   }
 
+  Future<void> _cancelRegistrationStatusSub() async {
+    await _accountRegistrationStatusSub?.cancel();
+    _accountRegistrationStatusSub = null;
+  }
+
   Future<AccountRegistrationStatus> _getRegistrationStatus({
     required CatalystId catalystId,
   }) {
@@ -440,12 +450,12 @@ final class UserServiceImpl implements UserService {
         .onError((_, _) => const AccountRegistrationStatus.notIndexed());
   }
 
-  void _updateRegistrationStatusPoller({
+  Future<void> _updateRegistrationStatusPoller({
     Account? current,
     Account? previous,
-  }) {
+  }) async {
     if (current == null || current.registrationStatus.isIndexed) {
-      _registrationStatusPoller.stop();
+      await _cancelRegistrationStatusSub();
       return;
     }
 
@@ -454,15 +464,22 @@ final class UserServiceImpl implements UserService {
       return;
     }
 
-    _registrationStatusPoller.start(
-      current,
-      onChanged: (registrationStatus) {
-        unawaited(updateAccount(id: current.catalystId, registrationStatus: registrationStatus));
+    _accountRegistrationStatusSub = _registrationStatusPoller
+        .start(current.catalystId)
+        .timeout(const Duration(minutes: 30))
+        .listen(
+          (event) async {
+            unawaited(updateAccount(id: event.catalystId, registrationStatus: event.status));
 
-        // At the moment this is all we need to know
-        if (registrationStatus.isIndexed) _registrationStatusPoller.stop();
-      },
-    );
+            // At the moment this is all we need to know
+            if (event.status.isIndexed) {
+              await _cancelRegistrationStatusSub();
+            }
+          },
+          onError: (_) {
+            //ignore
+          },
+        );
   }
 
   Future<void> _updateUser(User user) async {
@@ -471,6 +488,11 @@ final class UserServiceImpl implements UserService {
 
     await _userRepository.saveUser(user);
     _userObserver.user = user;
-    _updateRegistrationStatusPoller(current: currentActiveAccount, previous: previousActiveAccount);
+    unawaited(
+      _updateRegistrationStatusPoller(
+        current: currentActiveAccount,
+        previous: previousActiveAccount,
+      ),
+    );
   }
 }

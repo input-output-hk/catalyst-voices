@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
@@ -18,6 +20,7 @@ void main() {
   group(UserService, () {
     late final KeychainProvider keychainProvider;
     late UserRepository userRepository;
+    late RegistrationStatusPoller poller;
     late final UserObserver userObserver;
     late UserService service;
 
@@ -34,6 +37,12 @@ void main() {
         keychainSigner: _FakeKeychainSigner(),
       );
       userObserver = StreamUserObserver();
+
+      registerFallbackValue(CatalystId(host: '', role0Key: Uint8List(32)));
+      poller = _MockPooler();
+      when(() => poller.start(any())).thenAnswer((_) => const Stream.empty());
+      when(() => poller.stop()).thenAnswer((_) => {});
+      when(() => poller.dispose()).thenAnswer((_) => Future(() {}));
     });
 
     tearDownAll(() async {
@@ -42,7 +51,7 @@ void main() {
 
     setUp(() {
       userRepository = _FakeUserRepository();
-      service = UserService(userRepository, userObserver);
+      service = UserService(userRepository, userObserver, poller);
     });
 
     tearDown(() async {
@@ -365,7 +374,7 @@ void main() {
             return Future.value(rbac);
           },
         );
-        service = UserService(userRepository, userObserver);
+        service = UserService(userRepository, userObserver, poller);
 
         registerFallbackValue(const User.empty());
       });
@@ -474,7 +483,7 @@ void main() {
     group('refreshActiveAccountVotingPower', () {
       setUp(() {
         userRepository = _MockUserRepository();
-        service = UserService(userRepository, userObserver);
+        service = UserService(userRepository, userObserver, poller);
 
         registerFallbackValue(const User.empty());
       });
@@ -518,7 +527,7 @@ void main() {
     group('updateAccount', () {
       setUp(() {
         userRepository = _MockUserRepository();
-        service = UserService(userRepository, userObserver);
+        service = UserService(userRepository, userObserver, poller);
 
         registerFallbackValue(const User.empty());
       });
@@ -769,11 +778,6 @@ class _FakeUserRepository extends Fake implements UserRepository {
   }
 
   @override
-  Future<RbacRegistrationChain> getRbacRegistration({CatalystId? catalystId}) {
-    throw const UnauthorizedException();
-  }
-
-  @override
   Future<User> getUser() async => _user ?? const User.empty();
 
   @override
@@ -789,5 +793,7 @@ class _FakeUserRepository extends Fake implements UserRepository {
     _user = user;
   }
 }
+
+class _MockPooler extends Mock implements RegistrationStatusPoller {}
 
 class _MockUserRepository extends Mock implements UserRepository {}

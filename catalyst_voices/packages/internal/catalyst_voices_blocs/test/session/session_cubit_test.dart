@@ -19,6 +19,7 @@ void main() {
   late final KeychainProvider keychainProvider;
   late final _FakeUserRepository userRepository;
   late final UserObserver userObserver;
+  late final RegistrationStatusPoller poller;
 
   late final UserService userService;
   late final RegistrationService registrationService;
@@ -46,10 +47,12 @@ void main() {
     );
     userRepository = _FakeUserRepository();
     userObserver = StreamUserObserver();
+    poller = _NoOpPoller();
 
     userService = UserService(
       userRepository,
       userObserver,
+      poller,
     );
 
     registrationService = _MockRegistrationService(
@@ -367,4 +370,15 @@ class _MockRegistrationService extends Mock implements RegistrationService {
   Future<List<CardanoWallet>> getCardanoWallets() {
     return Future.value(cardanoWallets);
   }
+}
+
+final class _NoOpPoller implements RegistrationStatusPoller {
+  @override
+  Future<void> dispose() async {}
+
+  @override
+  Stream<CatalystIdRegStatus> start(CatalystId catalystId) => const Stream.empty();
+
+  @override
+  void stop() {}
 }
