@@ -110,7 +110,9 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
     final systemInfo = await _devToolsService.getSystemInfo();
     _appInfo = systemInfo.app;
 
-    _updateState();
+    if (!isClosed) {
+      _updateState();
+    }
   }
 
   Future<void> lock() async {
