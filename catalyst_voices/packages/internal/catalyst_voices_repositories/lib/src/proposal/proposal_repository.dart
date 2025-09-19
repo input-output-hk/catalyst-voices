@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -447,8 +448,169 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       selfRef: documentData.metadata.selfRef,
     );
 
-    final contentData = documentData.content.data;
-    final schema = DocumentSchemaDto.fromJson(contentData).toModel();
+    final contentData =
+        r'''
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/test-minimal.schema.json",
+  "title": "F-X Renderer Verification Template",
+  "description": "Schema designed to verify renderer dynamic ability",
+  "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
+  "type": "object",
+  "additionalProperties": false,
+  "definitions": {
+    "schemaReferenceNonUI": {
+      "$comment": "NOT UI: used to identify the kind of template document used.",
+      "type": "string",
+      "format": "path",
+      "readOnly": true
+    },
+    "segment": {
+      "$comment": "UI - Logical Document Section Break.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "title": { "type": "object" },
+        "proposer": { "type": "object" },
+        "budget": { "type": "object" },
+        "solution": { "type": "object" }
+      },
+      "x-note": "Major sections of the proposal. Each segment contains sections of information grouped together."
+    },
+    "section": {
+      "$comment": "UI - Logical Document Sub-Section Break.",
+      "type": "object",
+      "additionalProperties": false,
+      "x-note": "Subsections containing specific details about the proposal."
+    },
+    "singleLineTextEntry": {
+      "$comment": "UI - Single Line text entry without any markup or rich text capability.",
+      "type": "string",
+      "contentMediaType": "text/plain",
+      "pattern": "^.*$"
+    },
+    "multiLineTextEntryMarkdown": {
+      "$comment": "UI - Multiline text entry with Markdown content.",
+      "type": "string",
+      "contentMediaType": "text/markdown",
+      "pattern": "^[\\S\\s]*$"
+    },
+    "radioButtonSelect": {
+      "$comment": "UI - Radio Button Selection",
+      "type": "string",
+      "format": "radioButtonSelect"
+    },
+    "tokenValueCardanoADA": {
+      "$comment": "UI - A Token Value denominated in Cardano ADA.",
+      "type": "integer",
+      "format": "token:cardano:ada"
+    }
+  },
+  "properties": {
+    "$schema": {
+      "$ref": "#/definitions/schemaReferenceNonUI",
+      "default": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
+      "const": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json"
+    },
+    "setup": {
+      "$ref": "#/definitions/segment",
+      "title": "Section A — Who and What?",
+      "description": "Tell us who you are and give your idea a title",
+      "properties": {
+        "proposer": {
+          "$ref": "#/definitions/section",
+          "title": "Identity Checkpoint",
+          "description": "Who's behind this proposal",
+          "properties": {
+            "applicant": {
+              "$ref": "#/definitions/singleLineTextEntry",
+              "title": "Your Name",
+              "description": "Enter your full name, nickname, or alias",
+              "minLength": 2,
+              "maxLength": 100
+            },
+            "type": {
+              "$ref": "#/definitions/radioButtonSelect",
+              "title": "Choose which best applies",
+              "description": "How are you applying?",
+              "enum": [
+                "Solo",
+                "Group",
+                "Company"
+              ]
+            }
+          },
+          "required": ["applicant", "type"],
+          "x-order": ["applicant", "type"]
+        },
+        "title": {
+          "$ref": "#/definitions/section",
+          "title": "Give It a Title",
+          "description": "What's the title for your idea?",
+          "properties": {
+            "title": {
+              "$ref": "#/definitions/singleLineTextEntry",
+              "title": "Project Banner",
+              "description": "Write a short title (max 60 chars)",
+              "minLength": 3,
+              "maxLength": 60
+            }
+          },
+          "required": ["title"]
+        }
+      },
+      "required": ["proposer", "title"],
+      "x-order": ["proposer", "title"]
+    },
+    "summary": {
+      "$ref": "#/definitions/segment",
+      "title": "Section B — The Core Idea",
+      "description": "Explain the essentials of your project",
+      "properties": {
+        "solution": {
+          "$ref": "#/definitions/section",
+          "title": "What's the secret?",
+          "description": "Describe your project core purpose",
+          "properties": {
+            "summary": {
+              "$ref": "#/definitions/multiLineTextEntryMarkdown",
+              "title": "One-Paragraph Story",
+              "description": "Tell us a story about your idea (50–200 chars)",
+              "minLength": 50,
+              "maxLength": 200
+            }
+          },
+          "required": ["summary"]
+        },
+        "budget": {
+          "$ref": "#/definitions/section",
+          "title": "How Much Will It Cost?",
+          "description": "Tell us how much ADA you need",
+          "properties": {
+            "requestedFunds": {
+              "$ref": "#/definitions/tokenValueCardanoADA",
+              "title": "Requested (ADA)",
+              "description": "Enter your desired amount between ₳15k and ₳60k",
+              "minimum": 15000,
+              "maximum": 60000
+            }
+          },
+          "required": ["requestedFunds"]
+        }
+      },
+      "required": ["solution", "budget"],
+      "x-order": ["solution", "budget"]
+    }
+  },
+  "required": ["setup", "summary"],
+  "x-order": ["setup", "summary"]
+}
+'''
+            .trim();
+
+    final schema = DocumentSchemaDto.fromJson(
+      jsonDecode(contentData) as Map<String, dynamic>,
+    ).toModel();
 
     return ProposalTemplate(
       metadata: metadata,
