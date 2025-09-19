@@ -359,12 +359,12 @@ final class ProposalServiceImpl implements ProposalService {
     }
 
     final authorId = _getUserCatalystId();
-    await _documentRepository.saveImportedDocument(
+    final newRef = await _documentRepository.saveImportedDocument(
       document: parsedDocument,
       authorId: authorId,
     );
 
-    return parsedDocument.ref;
+    return newRef;
   }
 
   @override

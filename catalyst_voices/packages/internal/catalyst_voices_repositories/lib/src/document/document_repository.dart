@@ -136,7 +136,7 @@ abstract interface class DocumentRepository {
   /// the imported document to the old document.
   ///
   /// Returns the reference of the saved document.
-  Future<void> saveImportedDocument({
+  Future<DocumentRef> saveImportedDocument({
     required DocumentData document,
     required CatalystId authorId,
   });
@@ -404,7 +404,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<void> saveImportedDocument({
+  Future<DocumentRef> saveImportedDocument({
     required DocumentData document,
     required CatalystId authorId,
   }) async {
@@ -419,6 +419,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     );
 
     await _drafts.save(data: newDocument);
+    return newDocument.metadata.selfRef;
   }
 
   @override
@@ -671,9 +672,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }) async {
     final results = <DocumentsDataWithRefData>[];
 
-    for (final documentData in documents.where(
-      (doc) => doc.metadata.template != null || doc.metadata.categoryId != null,
-    )) {
+    for (final documentData in documents) {
       try {
         if (!_isDocumentMetadataValid(documentData)) {
           _logger.info(
