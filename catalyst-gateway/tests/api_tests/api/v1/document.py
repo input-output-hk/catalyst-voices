@@ -15,18 +15,3 @@ def put(data: str, token: str):
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/cbor"}
     data = bytes.fromhex(data)
     return requests.put(URL, headers=headers, data=data)
-
-
-# Signed document POST
-def post(filter: dict, limit=None, page=None):
-    headers = {"Content-Type": "application/json"}
-    url = f"{URL}/index"
-    query_params = []
-    if limit is not None:
-        query_params.append(f"limit={limit}")
-    if page is not None:
-        query_params.append(f"page={page}")
-
-    if query_params:
-        url += "?" + "&".join(query_params)
-    return requests.post(url, headers=headers, json=filter)

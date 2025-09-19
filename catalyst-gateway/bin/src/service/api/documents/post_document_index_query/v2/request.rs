@@ -10,8 +10,8 @@ use crate::{
     service::common::types::{
         array_types::impl_array_types,
         document::{
-            doc_ref::IdAndVerRefDocumented, doc_type::DocumentType, id::EqOrRangedIdDocumented,
-            ver::EqOrRangedVerDocumented,
+            doc_type::DocumentType, id::EqOrRangedIdDocumented,
+            id_and_ver_ref::IdAndVerRefDocumented, ver::EqOrRangedVerDocumented,
         },
     },
 };
