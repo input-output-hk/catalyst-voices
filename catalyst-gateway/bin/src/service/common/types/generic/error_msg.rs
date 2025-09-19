@@ -1,5 +1,7 @@
 //! Generic Error Messages
 
+// cspell: words impls
+
 use std::sync::LazyLock;
 
 use const_format::concatcp;
@@ -54,6 +56,13 @@ impl_string_types!(
     Some(SCHEMA.clone()),
     is_valid
 );
+
+#[allow(clippy::derivable_impls)]
+impl Default for ErrorMessage {
+    fn default() -> Self {
+        Self(String::default())
+    }
+}
 
 impl Example for ErrorMessage {
     /// An example of error message.

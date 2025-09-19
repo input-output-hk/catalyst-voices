@@ -70,7 +70,6 @@ impl Example for DocumentReferenceListV2 {
 impl From<catalyst_signed_doc::DocumentRefs> for DocumentReferenceListV2 {
     fn from(value: catalyst_signed_doc::DocumentRefs) -> Self {
         let doc_refs = value
-            .doc_refs()
             .iter()
             .cloned()
             .map(DocumentReferenceV2::from)

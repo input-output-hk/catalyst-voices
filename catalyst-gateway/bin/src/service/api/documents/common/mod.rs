@@ -11,14 +11,60 @@ use crate::{
     settings::Settings,
 };
 
-/// Get document cbor bytes from the database
-pub(crate) async fn get_document_cbor_bytes(
-    document_id: &uuid::Uuid,
-    version: Option<&uuid::Uuid>,
-) -> anyhow::Result<Vec<u8>> {
-    // If doesn't exist in the static templates, try to find it in the database
-    let db_doc = FullSignedDoc::retrieve(document_id, version).await?;
-    Ok(db_doc.raw().to_vec())
+/// A wrapper struct to unify both implementations of `CatalystSignedDocumentProvider` and
+/// `VerifyingKeyProvider`.
+pub(crate) struct ValidationProvider {
+    /// Document provider.
+    doc_provider: DocProvider,
+    /// Verifying key provider.
+    verifying_key_provider: VerifyingKeyProvider,
+}
+
+impl ValidationProvider {
+    /// Creates a unified provider from the existing `CatalystSignedDocumentProvider` and
+    /// `VerifyingKeyProvider` individually.
+    pub(crate) fn new(
+        doc_provider: DocProvider,
+        verifying_key_provider: VerifyingKeyProvider,
+    ) -> Self {
+        Self {
+            doc_provider,
+            verifying_key_provider,
+        }
+    }
+}
+
+impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for ValidationProvider {
+    async fn try_get_doc(
+        &self,
+        doc_ref: &catalyst_signed_doc::DocumentRef,
+    ) -> anyhow::Result<Option<CatalystSignedDocument>> {
+        self.doc_provider.try_get_doc(doc_ref).await
+    }
+
+    async fn try_get_last_doc(
+        &self,
+        id: catalyst_signed_doc::UuidV7,
+    ) -> anyhow::Result<Option<CatalystSignedDocument>> {
+        self.doc_provider.try_get_last_doc(id).await
+    }
+
+    fn future_threshold(&self) -> Option<std::time::Duration> {
+        self.doc_provider.future_threshold()
+    }
+
+    fn past_threshold(&self) -> Option<std::time::Duration> {
+        self.doc_provider.past_threshold()
+    }
+}
+
+impl catalyst_signed_doc::providers::VerifyingKeyProvider for ValidationProvider {
+    async fn try_get_key(
+        &self,
+        kid: &catalyst_signed_doc::CatalystId,
+    ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
+        self.verifying_key_provider.try_get_key(kid).await
+    }
 }
 
 /// A struct which implements a
@@ -32,8 +78,19 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         let id = doc_ref.id().uuid();
         let ver = doc_ref.ver().uuid();
-        match get_document_cbor_bytes(&id, Some(&ver)).await {
-            Ok(doc_cbor_bytes) => Ok(Some(doc_cbor_bytes.as_slice().try_into()?)),
+        match FullSignedDoc::retrieve(&id, Some(&ver)).await {
+            Ok(doc_cbor_bytes) => Ok(Some(doc_cbor_bytes.raw().try_into()?)),
+            Err(err) if err.is::<NotFoundError>() => Ok(None),
+            Err(err) => Err(err),
+        }
+    }
+
+    async fn try_get_last_doc(
+        &self,
+        id: catalyst_signed_doc::UuidV7,
+    ) -> anyhow::Result<Option<CatalystSignedDocument>> {
+        match FullSignedDoc::retrieve(&id.uuid(), None).await {
+            Ok(doc) => Ok(Some(doc.raw().try_into()?)),
             Err(err) if err.is::<NotFoundError>() => Ok(None),
             Err(err) => Err(err),
         }
@@ -57,8 +114,8 @@ impl catalyst_signed_doc_v1::providers::CatalystSignedDocumentProvider for DocPr
     ) -> anyhow::Result<Option<catalyst_signed_doc_v1::CatalystSignedDocument>> {
         let id = doc_ref.id.uuid();
         let ver = doc_ref.ver.uuid();
-        match get_document_cbor_bytes(&id, Some(&ver)).await {
-            Ok(doc_cbor_bytes) => Ok(Some(doc_cbor_bytes.as_slice().try_into()?)),
+        match FullSignedDoc::retrieve(&id, Some(&ver)).await {
+            Ok(doc_cbor_bytes) => Ok(Some(doc_cbor_bytes.raw().try_into()?)),
             Err(err) if err.is::<NotFoundError>() => Ok(None),
             Err(err) => Err(err),
         }

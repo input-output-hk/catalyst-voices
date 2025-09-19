@@ -249,12 +249,7 @@ impl Example for DocumentReferenceList {
 
 impl From<catalyst_signed_doc::DocumentRefs> for DocumentReferenceList {
     fn from(value: catalyst_signed_doc::DocumentRefs) -> Self {
-        let doc_refs = value
-            .doc_refs()
-            .iter()
-            .cloned()
-            .map(DocumentReference::from)
-            .collect();
+        let doc_refs = value.iter().cloned().map(DocumentReference::from).collect();
 
         Self(doc_refs)
     }

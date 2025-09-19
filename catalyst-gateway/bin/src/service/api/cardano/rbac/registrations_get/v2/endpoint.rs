@@ -84,8 +84,8 @@ async fn reg_chain(
         // Note: the sort order is reversed here `|a, b| b.cmp(a)` because by default the ascending
         // order is used, and we want the opposite (latest slots first).
         .sorted_by(|a, b| (b.slot_no, b.txn_index).cmp(&(a.slot_no, a.txn_index)))
-        .map(Into::into)
-        .collect::<Vec<_>>()
+        .map(TryInto::try_into)
+        .collect::<Result<Vec<_>, _>>()?
         .into();
 
     RbacRegistrationChainV2::new(id.into(), info.as_ref(), invalid)
