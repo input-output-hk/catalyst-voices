@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
@@ -10,9 +11,10 @@ import 'package:flutter/foundation.dart';
 /// [UserService] allows to manage user accounts.
 /// [watchUser] returns a stream of user changes which allows to react to user changes.
 abstract interface class UserService implements ActiveAware {
-  const factory UserService(
+  factory UserService(
     UserRepository userRepository,
     UserObserver userObserver,
+    RegistrationStatusPoller registrationStatusPoller,
   ) = UserServiceImpl;
 
   User get user;
@@ -78,6 +80,7 @@ abstract interface class UserService implements ActiveAware {
     Optional<String>? username,
     String? email,
     Set<AccountRole>? roles,
+    AccountRegistrationStatus? registrationStatus,
   });
 
   /// Updates [User]'s settings.
@@ -93,10 +96,14 @@ abstract interface class UserService implements ActiveAware {
 final class UserServiceImpl implements UserService {
   final UserRepository _userRepository;
   final UserObserver _userObserver;
+  final RegistrationStatusPoller _registrationStatusPoller;
 
-  const UserServiceImpl(
+  StreamSubscription<CatalystIdRegStatus>? _accountRegistrationStatusSub;
+
+  UserServiceImpl(
     this._userRepository,
     this._userObserver,
+    this._registrationStatusPoller,
   );
 
   @override
@@ -112,7 +119,10 @@ final class UserServiceImpl implements UserService {
   Stream<User> get watchUser => _userObserver.watchUser;
 
   @override
-  Future<void> dispose() async {}
+  Future<void> dispose() async {
+    await _cancelRegistrationStatusSub();
+    await _registrationStatusPoller.dispose();
+  }
 
   @override
   Future<TransactionHash> getPreviousRegistrationTransactionId() {
@@ -137,8 +147,17 @@ final class UserServiceImpl implements UserService {
       return false;
     }
 
-    // If already verified just return true.
-    if (activeAccount.publicStatus.isVerified || activeAccount.isDummy) {
+    var account = activeAccount;
+
+    if (!account.registrationStatus.isIndexed) {
+      final registrationStatus = await _getRegistrationStatus(catalystId: account.catalystId);
+
+      account = account.copyWith(registrationStatus: registrationStatus);
+    }
+
+    if (account.publicStatus.isVerified ||
+        account.isDummy ||
+        !account.registrationStatus.isIndexed) {
       return true;
     }
 
@@ -148,9 +167,12 @@ final class UserServiceImpl implements UserService {
       return false;
     }
 
-    if (publicProfile.status != activeAccount.publicStatus) {
-      final updatedAccount = activeAccount.copyWith(publicStatus: publicProfile.status);
-      final updatedUser = user.updateAccount(updatedAccount);
+    if (publicProfile.status != account.publicStatus) {
+      account = account.copyWith(publicStatus: publicProfile.status);
+    }
+
+    if (account != activeAccount) {
+      final updatedUser = user.updateAccount(account);
       await _updateUser(updatedUser);
     }
 
@@ -176,14 +198,25 @@ final class UserServiceImpl implements UserService {
       return;
     }
 
-    if (!activeAccount.publicStatus.isNotSetup) {
+    var account = activeAccount.copyWith();
+
+    if (!account.registrationStatus.isIndexed) {
+      final registrationStatus = await _getRegistrationStatus(catalystId: account.catalystId);
+
+      account = account.copyWith(registrationStatus: registrationStatus);
+    }
+
+    if (!account.publicStatus.isNotSetup && account.registrationStatus.isIndexed) {
       final publicProfile = await _userRepository.getAccountPublicProfile();
       final publicProfileStatus = publicProfile?.status ?? AccountPublicStatus.unknown;
-      final updatedAccount = activeAccount.copyWith(
+      account = account.copyWith(
         email: Optional(publicProfile?.email),
         publicStatus: publicProfileStatus,
       );
-      final updatedUser = user.updateAccount(updatedAccount);
+    }
+
+    if (account != activeAccount) {
+      final updatedUser = user.updateAccount(account);
 
       await _updateUser(updatedUser);
     }
@@ -292,6 +325,7 @@ final class UserServiceImpl implements UserService {
     Optional<String>? username,
     String? email,
     Set<AccountRole>? roles,
+    AccountRegistrationStatus? registrationStatus,
   }) async {
     final user = await getUser();
     if (!user.hasAccount(id: id)) {
@@ -348,6 +382,10 @@ final class UserServiceImpl implements UserService {
       }
     }
 
+    if (registrationStatus != null) {
+      updatedAccount = updatedAccount.copyWith(registrationStatus: registrationStatus);
+    }
+
     if (updatedAccount != account) {
       didChanged = true;
 
@@ -393,8 +431,68 @@ final class UserServiceImpl implements UserService {
     await _updateUser(user);
   }
 
+  Future<void> _cancelRegistrationStatusSub() async {
+    await _accountRegistrationStatusSub?.cancel();
+    _accountRegistrationStatusSub = null;
+  }
+
+  Future<AccountRegistrationStatus> _getRegistrationStatus({
+    required CatalystId catalystId,
+  }) {
+    return _userRepository
+        .getRbacRegistration(catalystId: catalystId)
+        .then(
+          (value) {
+            final isPersistent = value.lastPersistentTxn != null;
+            return AccountRegistrationStatus.indexed(isPersistent: isPersistent);
+          },
+        )
+        .onError((_, _) => const AccountRegistrationStatus.notIndexed());
+  }
+
+  Future<void> _updateRegistrationStatusPoller({
+    Account? current,
+    Account? previous,
+  }) async {
+    if (current == null || current.registrationStatus.isIndexed) {
+      await _cancelRegistrationStatusSub();
+      return;
+    }
+
+    // Same account
+    if (previous != null && current.isSameRef(previous)) {
+      return;
+    }
+
+    _accountRegistrationStatusSub = _registrationStatusPoller
+        .start(current.catalystId)
+        .timeout(const Duration(minutes: 30))
+        .listen(
+          (event) async {
+            unawaited(updateAccount(id: event.catalystId, registrationStatus: event.status));
+
+            // At the moment this is all we need to know
+            if (event.status.isIndexed) {
+              await _cancelRegistrationStatusSub();
+            }
+          },
+          onError: (_) {
+            //ignore
+          },
+        );
+  }
+
   Future<void> _updateUser(User user) async {
+    final previousActiveAccount = _userObserver.user.activeAccount;
+    final currentActiveAccount = user.activeAccount;
+
     await _userRepository.saveUser(user);
     _userObserver.user = user;
+    unawaited(
+      _updateRegistrationStatusPoller(
+        current: currentActiveAccount,
+        previous: previousActiveAccount,
+      ),
+    );
   }
 }

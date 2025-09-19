@@ -90,6 +90,7 @@ export 'user/account.dart';
 export 'user/account_public_profile.dart';
 export 'user/account_public_rbac_status.dart';
 export 'user/account_public_status.dart';
+export 'user/account_registration_status.dart';
 export 'user/account_role.dart';
 export 'user/account_update_result.dart';
 export 'user/catalyst_id.dart';
