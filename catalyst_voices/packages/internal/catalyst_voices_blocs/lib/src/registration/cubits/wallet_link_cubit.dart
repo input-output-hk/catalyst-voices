@@ -111,7 +111,9 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
       return true;
     } on WalletApiException catch (error, stackTrace) {
       _logger.log(
-        error.code != WalletApiErrorCode.refused ? Level.SEVERE : Level.FINER,
+        error.code != WalletApiErrorCode.refused && error.code != WalletApiErrorCode.accountChange
+            ? Level.SEVERE
+            : Level.FINER,
         'select wallet',
         error,
         stackTrace,
