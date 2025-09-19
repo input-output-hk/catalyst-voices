@@ -163,11 +163,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       final ref = await _proposalService.importProposal(event.proposalData);
       emitSignal(ImportedProposalWorkspaceSignal(proposalRef: ref));
     } on DocumentImportInvalidDataException {
-      emit(state.copyWith(isLoading: false));
       emitError(const LocalizedDocumentImportInvalidDataException());
     } catch (error, stackTrace) {
-      _logger.severe('Importing proposal failed', error, stackTrace);
-      emit(state.copyWith(isLoading: false));
+      _logger.warning('Importing proposal failed', error, stackTrace);
       emitError(LocalizedException.create(error));
     } finally {
       emit(state.copyWith(isLoading: false));
