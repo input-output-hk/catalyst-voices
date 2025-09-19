@@ -23,6 +23,8 @@ final class DevToolsState extends Equatable {
     this.collectLogs = false,
   });
 
+  AppInfo? get appInfo => systemInfo?.app;
+
   @override
   List<Object?> get props => [
     enableTapCount,
