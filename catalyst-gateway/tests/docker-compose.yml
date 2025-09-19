@@ -96,8 +96,6 @@ services:
       - SERVICE_LIVE_TIMEOUT_INTERVAL=30
       # - LOG_LEVEL=error
       # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
-    ports:
-      - "3030:3030"
     depends_on:
       event-db-migrations:
         condition: service_started

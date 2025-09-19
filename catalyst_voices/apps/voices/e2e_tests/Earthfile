@@ -54,8 +54,8 @@ docker:
     ARG IMAGE_NAME=e2e-tests
     SAVE IMAGE $IMAGE_NAME:latest
 
-# flutter-web - Build Flutter web app for E2E testing
-flutter-web:
+# flutter-web-build - Build Flutter web app for E2E testing
+flutter-web-build:
     # Build the web app using the main Earthfile's code-generator
     # but with ENV_NAME=relative for E2E testing
     FROM catalyst-voices+code-generator
@@ -69,9 +69,15 @@ flutter-web:
         --target=lib/configs/main_web.dart \
         --pwa-strategy=none
 
-    # Package as nginx image for E2E testing
+    # Save the built web artifacts
+    SAVE ARTIFACT build/web web
+
+# flutter-web - Package Flutter web as nginx image
+flutter-web:
     FROM nginx:alpine
-    COPY --from=0 /frontend/apps/voices/build/web /usr/share/nginx/html
+
+    # Copy the built web app
+    COPY +flutter-web-build/web /usr/share/nginx/html
 
     # Configure nginx for SPA routing
     RUN echo 'server { \

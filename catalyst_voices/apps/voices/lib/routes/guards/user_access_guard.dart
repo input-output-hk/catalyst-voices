@@ -35,7 +35,8 @@ final class UserAccessGuard implements RouteGuard {
     if (account.isAdmin) {
       return null;
     }
-    if (state.path == const FundedProjectsRoute().location) {
+    if (state.path == const FundedProjectsRoute().location ||
+        state.path == const VotingRoute().location) {
       return const DiscoveryRoute().location;
     }
 

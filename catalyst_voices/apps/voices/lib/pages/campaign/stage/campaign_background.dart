@@ -1,8 +1,6 @@
 import 'dart:math';
 
 import 'package:catalyst_voices/widgets/painter/bubble_painter.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
 class CampaignBackground extends StatelessWidget {
@@ -18,7 +16,6 @@ class CampaignBackground extends StatelessWidget {
         children: [
           const _Background(),
           const _BubbleShapes(),
-          const _Logo(),
           child,
         ],
       ),
@@ -120,22 +117,5 @@ class _BubbleShapes extends StatelessWidget {
         ),
       ),
     ];
-  }
-}
-
-class _Logo extends StatelessWidget {
-  const _Logo();
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      left: 60,
-      top: 40,
-      child: Theme.of(context).brandAssets.brand
-          .logo(context)
-          .buildPicture(
-            height: 35,
-          ),
-    );
   }
 }
