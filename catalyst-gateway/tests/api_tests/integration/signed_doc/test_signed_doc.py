@@ -28,7 +28,7 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
 
     # Put document with different ver
     new_doc = proposal_doc.copy()
-    new_doc.metadata["ver"] = uuid_v7.uuid_v7()
+    new_doc.new_version()
     new_doc_cbor = new_doc.build_and_sign(cat_id, sk_hex)
     resp = document_v1.put(
         data=new_doc_cbor,
@@ -60,7 +60,7 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
 
     # Put a signed document with same ID, but different version and different content
     new_doc = proposal_doc.copy()
-    new_doc.metadata["ver"] = uuid_v7.uuid_v7()
+    new_doc.new_version()
     new_doc.content["setup"]["title"]["title"] = "another title"
     resp = document_v1.put(
         data=new_doc.build_and_sign(cat_id, sk_hex),
@@ -86,7 +86,7 @@ def test_document_index_endpoint(
     for _ in range(total_amount - 1):
         doc = doc.copy()
         # keep the same id, but different version
-        doc.metadata["ver"] = uuid_v7.uuid_v7()
+        doc.new_version()
         resp = document_v1.put(
             data=doc.build_and_sign(cat_id, sk_hex),
             token=rbac_chain.auth_token(),

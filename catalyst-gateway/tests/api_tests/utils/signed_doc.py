@@ -1,7 +1,8 @@
 import pytest
-from typing import Dict, Any, List
+from typing import Dict, Any
 import copy
 import os
+import time
 import subprocess
 import json
 from api.v1 import document
@@ -14,6 +15,10 @@ class SignedDocumentBase:
     def __init__(self, metadata: Dict[str, Any], content: Dict[str, Any]):
         self.metadata = metadata
         self.content = content
+
+    def new_version(self):
+        time.sleep(1)
+        self.metadata["ver"] = uuid_v7.uuid_v7()
 
     def copy(self):
         new_copy = SignedDocument(
