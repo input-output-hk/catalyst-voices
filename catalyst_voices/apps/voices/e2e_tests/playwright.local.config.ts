@@ -7,7 +7,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   use: {
-    baseURL: "http://localhost:5555",
+    baseURL: "http://localhost:3030",
     trace: "on-first-retry",
   },
 
@@ -21,8 +21,8 @@ export default defineConfig({
 
   webServer: {
     command:
-      "flutter run -d web-server --web-port=5555 --web-hostname=localhost --web-header=Cross-Origin-Opener-Policy=same-origin --web-header=Cross-Origin-Embedder-Policy=require-corp ./lib/configs/main_qa.dart",
-    url: "http://localhost:5555",
+      "flutter run -d web-server --web-port=3030 --web-hostname=localhost --web-header=Cross-Origin-Opener-Policy=same-origin --web-header=Cross-Origin-Embedder-Policy=require-corp ./lib/configs/main_qa.dart",
+    url: "http://localhost:3030",
     timeout: 120 * 1000,
     reuseExistingServer: false,
   },
