@@ -61,7 +61,7 @@ PROPOSAL_FORM_TEMPLATE_ID = "0194d492-1daa-75b5-b4a4-5cf331cd8d1a"
 
 # return a Proposal document which is already published to the cat-gateway and the corresponding RoleID
 @pytest.fixture
-def proposal_doc_factory(f14_proposal_templates, rbac_chain_factory):
+def proposal_doc_factory(rbac_chain_factory):
     def __proposal_doc_factory() -> tuple[SignedDocument, RoleID]:
         role_id = RoleID.PROPOSER
         rbac_chain = rbac_chain_factory()
