@@ -87,6 +87,7 @@ final class Dependencies extends DependencyProvider {
             get<RegistrationProgressNotifier>(),
             get<AccessControl>(),
             get<AdminTools>(),
+            get<DevToolsService>(),
           );
         },
         dispose: (cubit) async => cubit.close(),

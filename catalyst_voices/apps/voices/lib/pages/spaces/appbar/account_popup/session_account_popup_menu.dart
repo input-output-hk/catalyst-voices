@@ -78,9 +78,12 @@ class _AppVersion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8),
-      child: AppVersionText(color: context.colors.textOnPrimaryLevel1),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 8),
+        AppVersionText(color: context.colors.textOnPrimaryLevel1),
+      ],
     );
   }
 }

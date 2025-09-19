@@ -24,6 +24,7 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
   final RegistrationProgressNotifier _registrationProgressNotifier;
   final AccessControl _accessControl;
   final AdminTools _adminTools;
+  final DevToolsService _devToolsService;
 
   final _logger = Logger('SessionCubit');
 
@@ -31,6 +32,7 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
   Account? _account;
   AdminToolsState _adminToolsState;
   bool _hasWallets = false;
+  AppInfo? _appInfo;
 
   StreamSubscription<UserSettings>? _userSettingsSub;
   StreamSubscription<bool>? _keychainUnlockedSub;
@@ -43,6 +45,7 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
     this._registrationProgressNotifier,
     this._accessControl,
     this._adminTools,
+    this._devToolsService,
   ) : _adminToolsState = _adminTools.state,
       super(const SessionState.initial()) {
     _userSettingsSub = _userService.watchUser
@@ -69,6 +72,7 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
     if (!_alwaysAllowRegistration) {
       unawaited(checkAvailableWallets());
     }
+    unawaited(getAppInfo());
   }
 
   Future<bool> checkAvailableWallets() async {
@@ -100,6 +104,13 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
     _adminToolsSub = null;
 
     return super.close();
+  }
+
+  Future<void> getAppInfo() async {
+    final systemInfo = await _devToolsService.getSystemInfo();
+    _appInfo = systemInfo.app;
+
+    _updateState();
   }
 
   Future<void> lock() async {
@@ -167,15 +178,18 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
           overallSpaces: Space.values,
           spacesShortcuts: AccessControl.allSpacesShortcutsActivators,
           canCreateAccount: true,
+          appInfo: _appInfo,
         );
       case SessionStatus.guest:
-        return const SessionState.guest(
+        return SessionState.guest(
           canCreateAccount: true,
+          appInfo: _appInfo,
         );
       case SessionStatus.visitor:
-        return const SessionState.visitor(
+        return SessionState.visitor(
           isRegistrationInProgress: false,
           canCreateAccount: true,
+          appInfo: _appInfo,
         );
     }
   }
@@ -196,6 +210,7 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
         canCreateAccount: canCreateAccount,
         isRegistrationInProgress: !isEmpty,
         settings: sessionSettings,
+        appInfo: _appInfo,
       );
     }
 
@@ -203,6 +218,7 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
       return SessionState.guest(
         canCreateAccount: canCreateAccount,
         settings: sessionSettings,
+        appInfo: _appInfo,
       );
     }
 
@@ -219,6 +235,7 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
       spacesShortcuts: spacesShortcuts,
       canCreateAccount: canCreateAccount,
       settings: sessionSettings,
+      appInfo: _appInfo,
     );
   }
 

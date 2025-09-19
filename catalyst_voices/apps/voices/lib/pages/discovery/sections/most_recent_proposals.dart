@@ -32,22 +32,31 @@ class ViewAllProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _Background(
-      key: const Key('MostRecentViewAllProposals'),
-      constraints: const BoxConstraints(maxHeight: 184),
+    return const _Background(
+      key: Key('MostRecentViewAllProposals'),
+      constraints: BoxConstraints(maxHeight: 184),
       child: Stack(
         children: [
-          const Align(child: _ViewAllProposalsButton()),
+          Align(child: _ViewAllProposalsButton()),
           Positioned(
             bottom: 10,
             left: 0,
             right: 0,
-            child: AppVersionText(
-              color: Colors.white.withValues(alpha: 0.75),
-            ),
+            child: _AppVersionText(),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _AppVersionText extends StatelessWidget {
+  const _AppVersionText();
+
+  @override
+  Widget build(BuildContext context) {
+    return AppVersionText(
+      color: Colors.white.withValues(alpha: 0.75),
     );
   }
 }
@@ -170,9 +179,7 @@ class _LatestProposalsState extends State<MostRecentProposals> {
             const SizedBox(height: 16),
             const _ViewAllProposalsButton(),
             const Spacer(),
-            AppVersionText(
-              color: Colors.white.withValues(alpha: 0.75),
-            ),
+            const _AppVersionText(),
             const SizedBox(height: 16),
           ],
         ),

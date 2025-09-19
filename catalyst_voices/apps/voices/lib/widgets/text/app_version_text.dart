@@ -11,18 +11,18 @@ class AppVersionText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<DevToolsBloc, DevToolsState, AppInfo?>(
+    return BlocSelector<SessionCubit, SessionState, AppInfo?>(
       selector: (state) {
         return state.appInfo;
       },
       builder: (context, appInfo) {
-        if (appInfo == null) {
-          return const Offstage();
-        }
-        return Text(
-          context.l10n.appVersion(appInfo.version, appInfo.buildNumber),
-          style: context.textTheme.bodyMedium?.copyWith(color: color),
-          textAlign: TextAlign.center,
+        return Offstage(
+          offstage: appInfo == null,
+          child: Text(
+            context.l10n.appVersion(appInfo?.version ?? '', appInfo?.buildNumber ?? ''),
+            style: context.textTheme.bodyMedium?.copyWith(color: color),
+            textAlign: TextAlign.center,
+          ),
         );
       },
     );
