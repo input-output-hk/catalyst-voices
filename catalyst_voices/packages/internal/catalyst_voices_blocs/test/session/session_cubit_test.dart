@@ -22,6 +22,7 @@ void main() {
   late final RegistrationService registrationService;
   late final RegistrationProgressNotifier notifier;
   late final AccessControl accessControl;
+  late final DevToolsService devToolsService;
 
   late AdminToolsCubit adminToolsCubit;
   late SessionCubit sessionCubit;
@@ -49,6 +50,8 @@ void main() {
       userRepository,
       userObserver,
     );
+
+    devToolsService = _MockDevToolService();
 
     registrationService = _MockRegistrationService(
       keychainProvider,
@@ -82,6 +85,7 @@ void main() {
       notifier,
       accessControl,
       adminToolsCubit,
+      devToolsService,
     );
   });
 
@@ -259,6 +263,7 @@ void main() {
           notifier,
           accessControl,
           adminToolsCubit,
+          devToolsService,
         );
 
         // Gives time for stream to emit.
@@ -290,6 +295,7 @@ void main() {
           notifier,
           accessControl,
           adminToolsCubit,
+          devToolsService,
         );
 
         // Gives time for stream to emit.
@@ -330,6 +336,13 @@ class _FakeUserRepository extends Fake implements UserRepository {
 
 class _MockCardanoWallet extends Mock implements CardanoWallet {
   _MockCardanoWallet();
+}
+
+class _MockDevToolService extends Mock implements DevToolsService {
+  @override
+  Future<SystemInfo> getSystemInfo() async {
+    return const SystemInfo();
+  }
 }
 
 class _MockRegistrationService extends Mock implements RegistrationService {

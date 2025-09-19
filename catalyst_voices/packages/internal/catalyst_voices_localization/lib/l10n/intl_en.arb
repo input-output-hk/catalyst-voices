@@ -169,6 +169,20 @@
   "@apiErrorUnknown": {
     "description": "A fallback error message when api returns error code"
   },
+  "appVersion": "Version {versionName} ({versionNumber})",
+  "@appVersion": {
+    "description": "Information about app version and number",
+    "placeholders": {
+      "versionName": {
+        "description": "represents version name",
+        "type": "String"
+      },
+      "versionNumber": {
+        "description": "represents version number",
+        "type": "String"
+      }
+    }
+  },
   "back": "Back",
   "@back": {
     "description": "For example in button that goes to previous stage of registration"
@@ -2564,10 +2578,6 @@
   "recoverKeychainMethodsListTitle": "How do you want Restore your Catalyst Keychain?",
   "@recoverKeychainMethodsListTitle": {
     "description": "Header for recovery methods selection list"
-  },
-  "recoverKeychainMethodsNoKeychainFound": "No Catalyst Keychain found on this device.",
-  "@recoverKeychainMethodsNoKeychainFound": {
-    "description": "Message shown when no keychain is found on device"
   },
   "recoverKeychainMethodsSubtitle": "Not to worry, in the next step you can choose the recovery option that applies to you for this device!",
   "@recoverKeychainMethodsSubtitle": {

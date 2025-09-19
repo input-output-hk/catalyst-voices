@@ -29,6 +29,9 @@ final class SessionState extends Equatable {
   /// Hold current session settings.
   final SessionSettings settings;
 
+  /// Holds information about app version
+  final AppInfo? appInfo;
+
   const SessionState({
     required this.status,
     this.account,
@@ -38,16 +41,19 @@ final class SessionState extends Equatable {
     this.spacesShortcuts = const {},
     this.canCreateAccount = false,
     this.settings = const SessionSettings.fallback(),
+    this.appInfo,
   });
 
   const SessionState.guest({
     required bool canCreateAccount,
     SessionSettings settings = const SessionSettings.fallback(),
+    AppInfo? appInfo,
   }) : this(
          status: SessionStatus.guest,
          canCreateAccount: canCreateAccount,
          spaces: AccessControl.defaultSpacesAccess,
          settings: settings,
+         appInfo: appInfo,
        );
 
   const SessionState.initial()
@@ -60,12 +66,14 @@ final class SessionState extends Equatable {
     required bool canCreateAccount,
     required bool isRegistrationInProgress,
     SessionSettings settings = const SessionSettings.fallback(),
+    AppInfo? appInfo,
   }) : this(
          status: SessionStatus.visitor,
          canCreateAccount: canCreateAccount,
          isRegistrationInProgress: isRegistrationInProgress,
          spaces: AccessControl.defaultSpacesAccess,
          settings: settings,
+         appInfo: appInfo,
        );
 
   bool get isActive => status == SessionStatus.actor;
@@ -86,5 +94,6 @@ final class SessionState extends Equatable {
     spacesShortcuts,
     canCreateAccount,
     settings,
+    appInfo,
   ];
 }

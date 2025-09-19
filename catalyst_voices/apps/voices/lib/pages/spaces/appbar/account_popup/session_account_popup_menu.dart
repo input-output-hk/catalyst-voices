@@ -9,6 +9,7 @@ import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_theme_
 import 'package:catalyst_voices/pages/spaces/appbar/account_popup/session_timezone_menu_tile.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/menu/voices_raw_popup_menu.dart';
+import 'package:catalyst_voices/widgets/text/app_version_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -68,6 +69,21 @@ class _AccountHeader extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _AppVersion extends StatelessWidget {
+  const _AppVersion();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 8),
+        AppVersionText(color: context.colors.textOnPrimaryLevel1),
+      ],
     );
   }
 }
@@ -158,6 +174,8 @@ class _PopupMenu extends StatelessWidget {
             _Links(),
             VoicesDivider.expanded(height: 17),
             _Session(),
+            VoicesDivider.expanded(height: 17),
+            _AppVersion(),
             SizedBox(height: 8),
           ],
         ),
