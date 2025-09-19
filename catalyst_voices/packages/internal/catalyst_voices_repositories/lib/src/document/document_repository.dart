@@ -675,7 +675,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     for (final documentData in documents) {
       try {
         if (!_isDocumentMetadataValid(documentData)) {
-          _logger.info(
+          _logger.warning(
             'Invalid document metadata for document ${documentData.metadata.selfRef}, skipping',
           );
           if (documentData.metadata.selfRef is DraftRef) {
@@ -695,7 +695,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
           ),
         );
       } catch (e, st) {
-        _logger.info('Error processing document ${documentData.metadata.selfRef}', e, st);
+        _logger.warning('Error processing document ${documentData.metadata.selfRef}', e, st);
         if (documentData.metadata.selfRef is DraftRef) {
           unawaited(deleteDocumentDraft(ref: documentData.metadata.selfRef as DraftRef));
         }
