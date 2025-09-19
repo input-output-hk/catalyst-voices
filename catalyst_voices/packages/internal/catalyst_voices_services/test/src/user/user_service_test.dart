@@ -39,7 +39,7 @@ void main() {
       userObserver = StreamUserObserver();
 
       registerFallbackValue(CatalystId(host: '', role0Key: Uint8List(32)));
-      poller = _MockPooler();
+      poller = _MockPoller();
       when(() => poller.start(any())).thenAnswer((_) => const Stream.empty());
       when(() => poller.stop()).thenAnswer((_) => {});
       when(() => poller.dispose()).thenAnswer((_) => Future(() {}));
@@ -794,6 +794,6 @@ class _FakeUserRepository extends Fake implements UserRepository {
   }
 }
 
-class _MockPooler extends Mock implements RegistrationStatusPoller {}
+class _MockPoller extends Mock implements RegistrationStatusPoller {}
 
 class _MockUserRepository extends Mock implements UserRepository {}
