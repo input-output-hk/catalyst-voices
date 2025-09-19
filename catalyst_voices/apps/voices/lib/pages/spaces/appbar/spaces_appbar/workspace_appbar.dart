@@ -22,14 +22,30 @@ class WorkspaceAppbar extends StatelessWidget implements PreferredSizeWidget {
     return CampaignPhaseAware.orElse(
       phase: CampaignPhaseType.proposalSubmission,
       showOnlyDataState: true,
-      orElse: (_, __, ___) => const SizedBox.shrink(),
-      active: (_, __, ___) => VoicesAppBar(
-        leading: isAppUnlock ? const DrawerToggleButton() : null,
-        actions: const [
-          SessionCtaAction(),
-          AccountSettingsAction(),
-        ],
-      ),
+      active: (_, _, _) => _AppBar(isAppUnlock: isAppUnlock, isActivePhase: true),
+      orElse: (_, _, _) => _AppBar(isAppUnlock: isAppUnlock, isActivePhase: false),
+    );
+  }
+}
+
+class _AppBar extends StatelessWidget {
+  final bool isActivePhase;
+  final bool isAppUnlock;
+
+  const _AppBar({
+    required this.isAppUnlock,
+    required this.isActivePhase,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesAppBar(
+      automaticallyImplyLeading: false,
+      leading: (isAppUnlock && isActivePhase) ? const DrawerToggleButton() : null,
+      actions: const [
+        SessionCtaAction(),
+        AccountSettingsAction(),
+      ],
     );
   }
 }
