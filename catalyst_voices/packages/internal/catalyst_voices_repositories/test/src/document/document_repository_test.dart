@@ -549,7 +549,7 @@ void main() {
         );
 
         const publicDraftContent = DocumentDataContent({'title': 'My proposal'});
-        final publicDraftRef = DocumentRefFactory.draftRef();
+        final publicDraftRef = DocumentRefFactory.signedDocumentRef();
         final publicDraftData = DocumentDataFactory.build(
           selfRef: publicDraftRef,
           template: templateRef,

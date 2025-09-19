@@ -678,7 +678,9 @@ final class DocumentRepositoryImpl implements DocumentRepository {
           _logger.info(
             'Invalid document metadata for document ${documentData.metadata.selfRef}, skipping',
           );
-          unawaited(deleteDocumentDraft(ref: documentData.metadata.selfRef as DraftRef));
+          if (documentData.metadata.selfRef is DraftRef) {
+            unawaited(deleteDocumentDraft(ref: documentData.metadata.selfRef as DraftRef));
+          }
           continue;
         }
 
@@ -693,12 +695,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
           ),
         );
       } catch (e, st) {
-        _logger.info(
-          'Error processing document ${documentData.metadata.selfRef}',
-          e,
-          st,
-        );
-        unawaited(deleteDocumentDraft(ref: documentData.metadata.selfRef as DraftRef));
+        _logger.info('Error processing document ${documentData.metadata.selfRef}', e, st);
+        if (documentData.metadata.selfRef is DraftRef) {
+          unawaited(deleteDocumentDraft(ref: documentData.metadata.selfRef as DraftRef));
+        }
+        continue;
       }
     }
 
