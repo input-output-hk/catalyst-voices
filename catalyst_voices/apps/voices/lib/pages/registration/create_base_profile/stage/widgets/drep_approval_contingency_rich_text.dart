@@ -22,6 +22,7 @@ class _DrepApprovalContingencyRichTextState extends State<DrepApprovalContingenc
 
   @override
   Widget build(BuildContext context) {
+    final fundNumber = context.activeCampaignFundNumber;
     return PlaceholderRichText(
       key: const Key('DrepApprovalContingencyRichText'),
       context.l10n.createProfileDrepApprovalContingency('{fund14ProposalSubmissionNotice}'),
@@ -29,7 +30,7 @@ class _DrepApprovalContingencyRichTextState extends State<DrepApprovalContingenc
       placeholderSpanBuilder: (context, placeholder) {
         return switch (placeholder) {
           'fund14ProposalSubmissionNotice' => TextSpan(
-            text: context.l10n.fundProposalSubmissionNotice(context.activeCampaignFundNumber),
+            text: context.l10n.fundProposalSubmissionNotice(fundNumber),
             recognizer: _f14ProposalSubmissionNoticeRecognizer,
             style: const TextStyle(decoration: TextDecoration.underline),
           ),
