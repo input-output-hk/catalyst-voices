@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/app/app.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/notification/banner_close_button.dart';
 import 'package:catalyst_voices/notification/banner_content.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
@@ -81,9 +83,16 @@ class CatalystMessengerState extends State<CatalystMessenger> {
     }
 
     final banner = MaterialBanner(
+      leading: notification.type.icon.buildIcon(size: 18),
       content: BannerContent(notification: notification),
       actions: const [BannerCloseButton()],
       minActionBarHeight: 32,
+      backgroundColor: notification.type.backgroundColor(context),
+      contentTextStyle: (context.textTheme.labelLarge ?? const TextStyle()).copyWith(
+        color: notification.type.foregroundColor(context),
+      ),
+      padding: const EdgeInsetsDirectional.only(start: 24),
+      leadingPadding: const EdgeInsetsDirectional.only(end: 8),
     );
     final controller = messengerState.showMaterialBanner(banner);
 

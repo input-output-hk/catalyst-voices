@@ -1,7 +1,11 @@
 part of 'catalyst_notification.dart';
 
 abstract base class BannerNotification extends CatalystNotification {
-  const BannerNotification({required super.id});
+  const BannerNotification({
+    required super.id,
+    super.priority,
+    super.type,
+  });
 
   BannerNotificationMessage message(BuildContext context);
 
@@ -9,7 +13,11 @@ abstract base class BannerNotification extends CatalystNotification {
 }
 
 final class MyAccountBannerNotification extends BannerNotification {
-  MyAccountBannerNotification() : super(id: const Uuid().v4());
+  MyAccountBannerNotification()
+    : super(
+        id: const Uuid().v4(),
+        type: CatalystNotificationType.warning,
+      );
 
   @override
   BannerNotificationMessage message(BuildContext context) {

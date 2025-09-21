@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/gestures.dart';
@@ -34,7 +33,6 @@ class _BannerContentState extends State<BannerContent> {
 
     return PlaceholderRichText(
       text,
-      style: context.textTheme.labelLarge,
       placeholderSpanBuilder: (context, placeholder) {
         if (!placeholders.containsKey(placeholder)) {
           return TextSpan(text: placeholder);
