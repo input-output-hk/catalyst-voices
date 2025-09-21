@@ -146,7 +146,10 @@ class _DocumentPropertyBuilderViewerState extends State<DocumentPropertyBuilderV
         );
       case DocumentTokenValueCardanoAdaSchema():
         final num = schema.castValue(value);
-        final text = num != null ? const Currency.ada().format(num) : null;
+        final money = num != null
+            ? Money.fromMajorUnits(currency: const Currency.ada(), majorUnits: BigInt.from(num))
+            : null;
+        final text = money?.format();
 
         return _TextListItem(
           id: property.nodeId,

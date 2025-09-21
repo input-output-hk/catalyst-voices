@@ -22,6 +22,7 @@ dependencies:
     sdk: flutter
   json_annotation: ^4.9.0
   meta: ^1.16.0
+  money2: ^6.0.5
   password_strength: ^0.2.0
   uuid_plus: ^0.1.0
 
