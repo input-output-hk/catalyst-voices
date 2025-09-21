@@ -71,7 +71,7 @@ final class _LoggingServiceImpl implements LoggingService {
   @override
   Future<void> init() async {
     hierarchicalLoggingEnabled = true;
-    root.level = Level.ALL;
+    root.level = Level.OFF;
 
     // Do not let LoggingService fail on initialization.
     final settings = await getSettings().catchError((_) => const LoggingSettings());

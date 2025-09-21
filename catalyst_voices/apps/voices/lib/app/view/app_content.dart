@@ -7,6 +7,7 @@ import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_manager_scope.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_precache.dart';
 import 'package:catalyst_voices/common/ext/preferences_ext.dart';
+import 'package:catalyst_voices/notification/catalyst_messenger.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/widgets/bubble_campaign_phase_aware_background.dart';
 import 'package:catalyst_voices/share/share_manager.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -20,6 +21,8 @@ const _restorationScopeId = 'rootVoices';
 
 /// Widget where app is setup with [MaterialApp] and router is added to the widget tree.
 class AppContent extends StatelessWidget {
+  static final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
+
   final RouterConfig<Object> routerConfig;
 
   const AppContent({
@@ -61,6 +64,7 @@ final class _AppContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      scaffoldMessengerKey: AppContent.scaffoldMessengerKey,
       restorationScopeId: _restorationScopeId,
       localizationsDelegates: _localizationsDelegates,
       supportedLocales: VoicesLocalizations.supportedLocales,
@@ -88,7 +92,9 @@ final class _AppContent extends StatelessWidget {
                         child: DefaultShareManager(
                           child: _AppContentBackground(
                             key: const Key('AppContentBackground'),
-                            child: child,
+                            child: CatalystMessenger(
+                              child: child!,
+                            ),
                           ),
                         ),
                       ),
