@@ -86,7 +86,10 @@ impl StringEnvVar {
     /// let var = StringEnvVar::new("MY_VAR", "default");
     /// assert_eq!(var.as_str(), "default");
     /// ```
-    pub(super) fn new(var_name: &str, param: StringEnvVarParams) -> Self {
+    pub(super) fn new(
+        var_name: &str,
+        param: StringEnvVarParams,
+    ) -> Self {
         let (default_value, redacted, choices) = match param {
             StringEnvVarParams::Plain(s, c) => (s, false, c),
             StringEnvVarParams::Redacted(s, c) => (s, true, c),
@@ -122,7 +125,10 @@ impl StringEnvVar {
     }
 
     /// New Env Var that is optional.
-    pub(super) fn new_optional(var_name: &str, redacted: bool) -> Option<Self> {
+    pub(super) fn new_optional(
+        var_name: &str,
+        redacted: bool,
+    ) -> Option<Self> {
         match env::var(var_name) {
             Ok(value) => {
                 let value = Self { value, redacted };
@@ -142,9 +148,13 @@ impl StringEnvVar {
 
     /// Convert an Envvar into the required Enum Type.
     pub(super) fn new_as_enum<T: FromStr + Display + VariantNames>(
-        var_name: &str, default: T, redacted: bool,
+        var_name: &str,
+        default: T,
+        redacted: bool,
     ) -> T
-    where <T as std::str::FromStr>::Err: std::fmt::Display {
+    where
+        <T as std::str::FromStr>::Err: std::fmt::Display,
+    {
         let mut choices = String::new();
         for name in T::VARIANTS {
             if choices.is_empty() {
@@ -174,7 +184,10 @@ impl StringEnvVar {
     }
 
     /// Convert an Envvar into the required Duration type.
-    pub(crate) fn new_as_duration(var_name: &str, default: Duration) -> Duration {
+    pub(crate) fn new_as_duration(
+        var_name: &str,
+        default: Duration,
+    ) -> Duration {
         let choices = "A value in the format of `[0-9]+(ns|us|ms|[smhdwy])`";
         let default = DurationString::new(default);
 
@@ -197,27 +210,13 @@ impl StringEnvVar {
             .into()
     }
 
-    /// Convert an Envvar into the required Duration type.
-    pub(crate) fn new_as_duration_optional(var_name: &str) -> Option<Duration> {
-        let choices = "A value in the format of `[0-9]+(ns|us|ms|[smhdwy])`";
-
-        let raw_value = Self::new_optional(var_name, false)?.as_string();
-
-        DurationString::try_from(raw_value.clone())
-            .inspect_err(|err| {
-                error!(
-                    error = ?err,
-                    choices=choices,
-                    duration_str = raw_value,
-                    "Invalid Duration string. Defaulting to None",
-                );
-            })
-            .map(Into::into)
-            .ok()
-    }
-
     /// Convert an Envvar into an integer in the bounded range.
-    pub(super) fn new_as_int<T>(var_name: &str, default: T, min: T, max: T) -> T
+    pub(super) fn new_as_int<T>(
+        var_name: &str,
+        default: T,
+        min: T,
+        max: T,
+    ) -> T
     where
         T: FromStr + Display + PartialOrd + tracing::Value,
         <T as std::str::FromStr>::Err: std::fmt::Display,
@@ -269,7 +268,10 @@ impl StringEnvVar {
 }
 
 impl fmt::Display for StringEnvVar {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter<'_>,
+    ) -> fmt::Result {
         if self.redacted {
             return write!(f, "REDACTED");
         }
@@ -278,7 +280,10 @@ impl fmt::Display for StringEnvVar {
 }
 
 impl fmt::Debug for StringEnvVar {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter<'_>,
+    ) -> fmt::Result {
         if self.redacted {
             return write!(f, "REDACTED");
         }

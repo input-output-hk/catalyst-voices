@@ -23,6 +23,9 @@ class VoicesWalletTile extends StatelessWidget {
   /// A callback called when the widget is pressed.
   final VoidCallback? onTap;
 
+  /// The semantics identifier for the wallet name.
+  final String semanticsIdentifier;
+
   /// The default constructor for the [VoicesWalletTile].
   const VoicesWalletTile({
     super.key,
@@ -30,6 +33,7 @@ class VoicesWalletTile extends StatelessWidget {
     this.name,
     this.isLoading = false,
     this.onTap,
+    this.semanticsIdentifier = 'WalletName',
   });
 
   @override
@@ -45,7 +49,10 @@ class VoicesWalletTile extends StatelessWidget {
               style: Theme.of(context).textTheme.labelLarge!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              child: name,
+              child: Semantics(
+                identifier: semanticsIdentifier,
+                child: name,
+              ),
             ),
       trailing: isLoading
           ? const SizedBox(

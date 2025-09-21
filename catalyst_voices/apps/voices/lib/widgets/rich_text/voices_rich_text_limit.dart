@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/common/semantics/combine_semantics.dart';
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
@@ -30,23 +31,31 @@ class VoicesRichTextLimit extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(
-              error,
-              style: theme.textTheme.bodySmall!.copyWith(
-                color: enabled ? theme.colorScheme.error : theme.colors.textDisabled,
+            child: CombineSemantics(
+              identifier: 'VoicesRichTextError',
+              container: true,
+              child: Text(
+                error,
+                style: theme.textTheme.bodySmall!.copyWith(
+                  color: enabled ? theme.colorScheme.error : theme.colors.textDisabled,
+                ),
               ),
             ),
           ),
-          StreamBuilder(
-            initialData: controller.markdownData.data.length,
-            stream: controller.changes.map((e) => controller.markdownData.data.length).distinct(),
-            builder: (context, snapshot) {
-              final data = snapshot.data;
-              return Text(
-                _formatText(data ?? 0),
-                style: theme.textTheme.bodySmall,
-              );
-            },
+          CombineSemantics(
+            identifier: 'VoicesRichTextLimit',
+            container: true,
+            child: StreamBuilder(
+              initialData: controller.markdownData.data.length,
+              stream: controller.changes.map((e) => controller.markdownData.data.length).distinct(),
+              builder: (context, snapshot) {
+                final data = snapshot.data;
+                return Text(
+                  _formatText(data ?? 0),
+                  style: theme.textTheme.bodySmall,
+                );
+              },
+            ),
           ),
         ],
       ),

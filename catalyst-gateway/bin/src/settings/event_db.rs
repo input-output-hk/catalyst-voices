@@ -4,9 +4,17 @@ use std::time::Duration;
 
 use super::str_env_var::StringEnvVar;
 
-/// Sets the maximum number of connections managed by the pool.
-/// Defaults to 100.
-const EVENT_DB_MAX_CONNECTIONS: u32 = 100;
+/// Default the maximum number of connections managed by the pool.
+const EVENT_DB_MAX_CONNECTIONS_DEFAULT: u32 = 100;
+
+/// Default the timeout when creating a new connection.
+const EVENT_DB_CONN_TIMEOUT_DEFAULT: Duration = Duration::from_secs(5);
+
+/// Default the timeout for waiting for a slot to become available.
+const EVENT_DB_SLOT_WAIT_TIMEOUT_DEFAULT: Duration = Duration::from_secs(5);
+
+/// Default the timeout when for recycling a connection.
+const EVENT_DB_CONN_RECYCLE_TIMEOUT_DEFAULT: Duration = Duration::from_secs(5);
 
 /// Default Event DB URL.
 const EVENT_DB_URL_DEFAULT: &str =
@@ -29,13 +37,16 @@ pub(crate) struct EnvVars {
     max_connections: u32,
 
     /// Sets the timeout when creating a new connection.
-    connection_creation_timeout: Option<Duration>,
+    /// Defaults to 5 seconds.
+    connection_creation_timeout: Duration,
 
     /// Sets the timeout for waiting for a slot to become available.
-    slot_wait_timeout: Option<Duration>,
+    /// Defaults to 5 seconds.
+    slot_wait_timeout: Duration,
 
     /// Sets the timeout when for recycling a connection.
-    connection_recycle_timeout: Option<Duration>,
+    /// Defaults to 5 seconds.
+    connection_recycle_timeout: Duration,
 }
 
 impl EnvVars {
@@ -47,16 +58,21 @@ impl EnvVars {
             password: StringEnvVar::new_optional("EVENT_DB_PASSWORD", true),
             max_connections: StringEnvVar::new_as_int(
                 "EVENT_DB_MAX_CONNECTIONS",
-                EVENT_DB_MAX_CONNECTIONS,
+                EVENT_DB_MAX_CONNECTIONS_DEFAULT,
                 0,
                 u32::MAX,
             ),
-            connection_creation_timeout: StringEnvVar::new_as_duration_optional(
+            connection_creation_timeout: StringEnvVar::new_as_duration(
                 "EVENT_DB_CONN_TIMEOUT",
+                EVENT_DB_CONN_TIMEOUT_DEFAULT,
             ),
-            slot_wait_timeout: StringEnvVar::new_as_duration_optional("EVENT_DB_SLOT_WAIT_TIMEOUT"),
-            connection_recycle_timeout: StringEnvVar::new_as_duration_optional(
+            slot_wait_timeout: StringEnvVar::new_as_duration(
+                "EVENT_DB_SLOT_WAIT_TIMEOUT",
+                EVENT_DB_SLOT_WAIT_TIMEOUT_DEFAULT,
+            ),
+            connection_recycle_timeout: StringEnvVar::new_as_duration(
                 "EVENT_DB_CONN_RECYCLE_TIMEOUT",
+                EVENT_DB_CONN_RECYCLE_TIMEOUT_DEFAULT,
             ),
         }
     }
@@ -82,17 +98,17 @@ impl EnvVars {
     }
 
     /// Returns Event DB `connection_creation_timeout` setting
-    pub(crate) fn connection_creation_timeout(&self) -> Option<Duration> {
+    pub(crate) fn connection_creation_timeout(&self) -> Duration {
         self.connection_creation_timeout
     }
 
     /// Returns Event DB `slot_wait_timeout` setting
-    pub(crate) fn slot_wait_timeout(&self) -> Option<Duration> {
+    pub(crate) fn slot_wait_timeout(&self) -> Duration {
         self.slot_wait_timeout
     }
 
     /// Returns Event DB `connection_recycle_timeout` setting
-    pub(crate) fn connection_recycle_timeout(&self) -> Option<Duration> {
+    pub(crate) fn connection_recycle_timeout(&self) -> Duration {
         self.connection_recycle_timeout
     }
 }

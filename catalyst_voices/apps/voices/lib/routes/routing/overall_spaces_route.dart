@@ -8,7 +8,10 @@ import 'package:go_router/go_router.dart';
 
 part 'overall_spaces_route.g.dart';
 
-@TypedGoRoute<OverallSpacesRoute>(path: '/spaces')
+@TypedGoRoute<OverallSpacesRoute>(
+  path: '/spaces',
+  name: 'spaces',
+)
 final class OverallSpacesRoute extends GoRouteData
     with FadePageTransitionMixin, CompositeRouteGuardMixin {
   const OverallSpacesRoute();

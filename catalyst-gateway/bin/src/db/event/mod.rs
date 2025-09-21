@@ -99,7 +99,8 @@ impl EventDB {
     /// `anyhow::Result<Vec<Row>>`
     #[must_use = "ONLY use this function for SELECT type operations which return row data, otherwise use `modify()`"]
     pub(crate) async fn query(
-        stmt: &str, params: &[&(dyn ToSql + Sync)],
+        stmt: &str,
+        params: &[&(dyn ToSql + Sync)],
     ) -> anyhow::Result<Vec<Row>> {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_rollback(stmt, params).await?;
@@ -124,7 +125,8 @@ impl EventDB {
     /// `anyhow::Result<impl Stream<Item = anyhow::Result<Row>>>`
     #[must_use = "ONLY use this function for SELECT type operations which return row data, otherwise use `modify()`"]
     pub(crate) async fn query_stream(
-        stmt: &str, params: &[&(dyn ToSql + Sync)],
+        stmt: &str,
+        params: &[&(dyn ToSql + Sync)],
     ) -> anyhow::Result<impl Stream<Item = anyhow::Result<Row>>> {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_rollback(stmt, params).await?;
@@ -146,7 +148,8 @@ impl EventDB {
     /// `Result<Row, anyhow::Error>`
     #[must_use = "ONLY use this function for SELECT type operations which return row data, otherwise use `modify()`"]
     pub(crate) async fn query_one(
-        stmt: &str, params: &[&(dyn ToSql + Sync)],
+        stmt: &str,
+        params: &[&(dyn ToSql + Sync)],
     ) -> anyhow::Result<Row> {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_rollback(stmt, params).await?;
@@ -169,7 +172,10 @@ impl EventDB {
     /// # Returns
     ///
     /// `anyhow::Result<()>`
-    pub(crate) async fn modify(stmt: &str, params: &[&(dyn ToSql + Sync)]) -> anyhow::Result<()> {
+    pub(crate) async fn modify(
+        stmt: &str,
+        params: &[&(dyn ToSql + Sync)],
+    ) -> anyhow::Result<()> {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_commit(stmt, params).await?;
         } else {
@@ -182,14 +188,15 @@ impl EventDB {
     /// Checks that connection to `EventDB` is available.
     pub(crate) async fn connection_is_ok() -> bool {
         let event_db_liveness = event_db_is_live();
-        Self::get_pool_connection()
+        Self::schema_version_check()
             .await
             .inspect(|_| {
                 if !event_db_liveness {
                     set_event_db_liveness(true);
                 }
             })
-            .inspect_err(|_| {
+            .inspect_err(|err| {
+                error!(err = err.to_string(), "Event DB connection issues");
                 if event_db_liveness {
                     set_event_db_liveness(false);
                 }
@@ -199,14 +206,16 @@ impl EventDB {
 
     /// Prepend `EXPLAIN ANALYZE` to the query, and rollback the transaction.
     async fn explain_analyze_rollback(
-        stmt: &str, params: &[&(dyn ToSql + Sync)],
+        stmt: &str,
+        params: &[&(dyn ToSql + Sync)],
     ) -> anyhow::Result<()> {
         Self::explain_analyze(stmt, params, true).await
     }
 
     /// Prepend `EXPLAIN ANALYZE` to the query, and commit the transaction.
     async fn explain_analyze_commit(
-        stmt: &str, params: &[&(dyn ToSql + Sync)],
+        stmt: &str,
+        params: &[&(dyn ToSql + Sync)],
     ) -> anyhow::Result<()> {
         Self::explain_analyze(stmt, params, false).await
     }
@@ -221,7 +230,9 @@ impl EventDB {
     /// * `params` - `&[&(dyn ToSql + Sync)]` SQL parameters.
     /// * `rollback` - `bool` whether to roll back the transaction or not.
     async fn explain_analyze(
-        stmt: &str, params: &[&(dyn ToSql + Sync)], rollback: bool,
+        stmt: &str,
+        params: &[&(dyn ToSql + Sync)],
+        rollback: bool,
     ) -> anyhow::Result<()> {
         let span = debug_span!(
             "query_plan",
@@ -326,12 +337,15 @@ pub fn establish_connection_pool() {
     }
 
     let pg_mgr = deadpool_postgres::Manager::new(config, tokio_postgres::NoTls);
-
     match deadpool::managed::Pool::builder(pg_mgr)
         .max_size(Settings::event_db_settings().max_connections() as usize)
-        .create_timeout(Settings::event_db_settings().connection_creation_timeout())
-        .wait_timeout(Settings::event_db_settings().slot_wait_timeout())
-        .recycle_timeout(Settings::event_db_settings().connection_recycle_timeout())
+        .create_timeout(Some(
+            Settings::event_db_settings().connection_creation_timeout(),
+        ))
+        .wait_timeout(Some(Settings::event_db_settings().slot_wait_timeout()))
+        .recycle_timeout(Some(
+            Settings::event_db_settings().connection_recycle_timeout(),
+        ))
         .runtime(deadpool::Runtime::Tokio1)
         .build()
     {

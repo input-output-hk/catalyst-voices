@@ -15,6 +15,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'spaces_route.g.dart';
 
@@ -44,7 +45,7 @@ final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return DiscoveryPage(keychainDeleted: $extra ?? false);
+    return SentryDisplayWidget(child: DiscoveryPage(keychainDeleted: $extra ?? false));
   }
 }
 
@@ -99,19 +100,34 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
   routes: <TypedRoute<RouteData>>[
     TypedGoRoute<DiscoveryRoute>(
       path: '/discovery',
+      name: 'discovery',
       routes: [
         TypedGoRoute<ProposalsRoute>(
           path: 'proposals',
+          name: 'proposals',
         ),
         TypedGoRoute<CategoryDetailRoute>(
           path: 'category/:categoryId',
+          name: 'category_details',
         ),
       ],
     ),
-    TypedGoRoute<WorkspaceRoute>(path: '/workspace'),
-    TypedGoRoute<VotingRoute>(path: '/voting'),
-    TypedGoRoute<FundedProjectsRoute>(path: '/funded_projects'),
-    TypedGoRoute<TreasuryRoute>(path: '/treasury'),
+    TypedGoRoute<WorkspaceRoute>(
+      path: '/workspace',
+      name: 'workspace',
+    ),
+    TypedGoRoute<VotingRoute>(
+      path: '/voting',
+      name: 'voting',
+    ),
+    TypedGoRoute<FundedProjectsRoute>(
+      path: '/funded_projects',
+      name: 'funded_projects',
+    ),
+    TypedGoRoute<TreasuryRoute>(
+      path: '/treasury',
+      name: 'treasury',
+    ),
   ],
 )
 final class SpacesShellRouteData extends ShellRouteData {
@@ -164,7 +180,7 @@ final class TreasuryRoute extends GoRouteData
   }
 }
 
-final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
+final class VotingRoute extends GoRouteData with FadePageTransitionMixin, CompositeRouteGuardMixin {
   final String? categoryId;
   final String? tab;
   final bool? $extra;
@@ -174,6 +190,9 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
     this.tab,
     this.$extra,
   });
+
+  @override
+  List<RouteGuard> get routeGuards => [const UserAccessGuard()];
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
