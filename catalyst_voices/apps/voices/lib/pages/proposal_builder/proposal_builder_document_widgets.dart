@@ -98,7 +98,7 @@ class _StatsItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          CryptocurrencyFormatter.formatAmount(value),
+          CurrencyFormatter.formatAmount(value),
           style: Theme.of(
             context,
           ).textTheme.titleLarge?.copyWith(color: context.colors.textOnPrimaryLevel1),

@@ -117,7 +117,7 @@ class _CampaignFundsDetail extends StatelessWidget {
     this.largeFundsText = true,
   });
 
-  String get _formattedFunds => CryptocurrencyFormatter.decimalFormat(funds);
+  String get _formattedFunds => CurrencyFormatter.decimalFormat(funds);
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +212,7 @@ class _RangeValue extends StatelessWidget {
     required this.value,
   });
 
-  String get _formattedValue => CryptocurrencyFormatter.formatAmount(value);
+  String get _formattedValue => CurrencyFormatter.formatAmount(value);
 
   @override
   Widget build(BuildContext context) {

@@ -1,10 +1,9 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:intl/intl.dart';
+import 'package:money2/money2.dart';
 
-// TODO(damian-molinski): Convert later using money2 package.
 /// Formats amounts of ADA cryptocurrency.
-abstract class CryptocurrencyFormatter {
+abstract class CurrencyFormatter {
   static const _million = 1000000;
   static const _thousand = 1000;
 

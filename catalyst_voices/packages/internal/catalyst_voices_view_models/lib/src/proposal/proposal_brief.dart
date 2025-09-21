@@ -56,7 +56,7 @@ class ProposalBrief extends Equatable {
   }
 
   String get formattedFunds {
-    return CryptocurrencyFormatter.formatAmount(fundsRequested);
+    return CurrencyFormatter.formatAmount(fundsRequested);
   }
 
   @override

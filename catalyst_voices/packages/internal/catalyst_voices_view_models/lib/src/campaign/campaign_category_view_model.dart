@@ -81,7 +81,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   }
 
   String get availableFundsText {
-    return CryptocurrencyFormatter.decimalFormat(availableFunds);
+    return CurrencyFormatter.decimalFormat(availableFunds);
   }
 
   String get formattedName {

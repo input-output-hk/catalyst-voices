@@ -65,7 +65,7 @@ extension on TransactionBuilderConfig {
       },
       'maxTxSize': maxTxSize,
       'maxValueSize': maxValueSize,
-      'coinsPerUtxoByte': CryptocurrencyFormatter.formatExactAmount(coinsPerUtxoByte),
+      'coinsPerUtxoByte': CurrencyFormatter.formatExactAmount(coinsPerUtxoByte),
       'selectionStrategy': selectionStrategy.runtimeType.toString(),
     };
   }

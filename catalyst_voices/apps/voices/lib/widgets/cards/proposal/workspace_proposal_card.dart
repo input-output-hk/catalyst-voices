@@ -101,7 +101,7 @@ class _Body extends StatelessWidget {
                       ),
                     ),
                     _CampaignData(
-                      leadValue: CryptocurrencyFormatter.decimalFormat(proposal.fundsRequested),
+                      leadValue: CurrencyFormatter.decimalFormat(proposal.fundsRequested),
                       subValue: context.l10n.proposalViewFundingRequested,
                     ),
                     _CampaignData(

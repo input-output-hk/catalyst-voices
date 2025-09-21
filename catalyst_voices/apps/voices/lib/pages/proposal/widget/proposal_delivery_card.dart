@@ -39,7 +39,7 @@ class ProposalDeliveryCard extends StatelessWidget {
             _ValueCell(
               title: context.l10n.proposalViewFundingRequested,
               value: '',
-              valueSuffix: CryptocurrencyFormatter.decimalFormat(
+              valueSuffix: CurrencyFormatter.decimalFormat(
                 fundsRequested,
               ),
             ),
