@@ -6,7 +6,7 @@ IMPORT github.com/input-output-hk/catalyst-voices/catalyst-gateway:main AS cat-g
 
 ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub"
 
-#cspell: words rustfmt toolsets USERARCH stdcfgs openapitools
+#cspell: words rustfmt toolsets openapitools trixie
 
 # COPY_SRC:
 #   Copies the source code into the builder.
