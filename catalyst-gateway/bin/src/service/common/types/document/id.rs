@@ -272,7 +272,7 @@ impl Example for IdRangeDocumented {
 #[oai(one_of)]
 /// Either a Single Document ID, or a Range of Document IDs, or Inclusion from the List of
 /// IDs
-pub(crate) enum EqOrRangedId {
+pub(crate) enum IdSelector {
     /// This exact Document ID
     Eq(IdEqDocumented),
     /// Document IDs in this range
@@ -281,7 +281,7 @@ pub(crate) enum EqOrRangedId {
     In(IdInDocumented),
 }
 
-impl Example for EqOrRangedId {
+impl Example for IdSelector {
     fn example() -> Self {
         Self::Eq(IdEqDocumented::example())
     }
@@ -296,28 +296,29 @@ impl Example for EqOrRangedId {
 )]
 /// Document ID Selector
 ///
-/// Either a absolute single Document ID or a range of Document IDs
-pub(crate) struct EqOrRangedIdDocumented(pub(crate) EqOrRangedId);
+/// Either a Single Document ID, or a Range of Document IDs, or Inclusion from the List of
+/// IDs
+pub(crate) struct IdSelectorDocumented(pub(crate) IdSelector);
 
-impl Example for EqOrRangedIdDocumented {
+impl Example for IdSelectorDocumented {
     fn example() -> Self {
-        Self(EqOrRangedId::example())
+        Self(IdSelector::example())
     }
 }
 
-impl TryFrom<EqOrRangedIdDocumented> for EqOrRangedUuid {
+impl TryFrom<IdSelectorDocumented> for EqOrRangedUuid {
     type Error = anyhow::Error;
 
-    fn try_from(value: EqOrRangedIdDocumented) -> Result<Self, Self::Error> {
+    fn try_from(value: IdSelectorDocumented) -> Result<Self, Self::Error> {
         match value.0 {
-            EqOrRangedId::Eq(eq) => Ok(Self::Eq(eq.0.eq.parse()?)),
-            EqOrRangedId::Range(range) => {
+            IdSelector::Eq(eq) => Ok(Self::Eq(eq.0.eq.parse()?)),
+            IdSelector::Range(range) => {
                 Ok(Self::Range {
                     min: range.0.min.parse()?,
                     max: range.0.max.parse()?,
                 })
             },
-            EqOrRangedId::In(r#in) => {
+            IdSelector::In(r#in) => {
                 Ok(Self::In(
                     r#in.0
                         .r#in
