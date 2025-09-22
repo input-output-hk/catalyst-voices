@@ -80,9 +80,9 @@ void main() {
                 description: 'Test description',
                 shortDescription: 'Test short description',
                 proposalsCount: 0,
-                availableFunds: _adaMajorUnits(1000),
+                availableFunds: MultiCurrencyAmount.single(_adaMajorUnits(1000)),
                 imageUrl: '',
-                totalAsk: _adaMajorUnits(0),
+                totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
                 range: ComparableRange(
                   min: _adaMajorUnits(10),
                   max: _adaMajorUnits(100),
@@ -135,9 +135,9 @@ void main() {
                 description: 'Test description',
                 shortDescription: 'Test short description',
                 proposalsCount: 0,
-                availableFunds: _adaMajorUnits(1000),
+                availableFunds: MultiCurrencyAmount.single(_adaMajorUnits(1000)),
                 imageUrl: '',
-                totalAsk: _adaMajorUnits(0),
+                totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
                 range: ComparableRange(
                   min: _adaMajorUnits(10),
                   max: _adaMajorUnits(100),

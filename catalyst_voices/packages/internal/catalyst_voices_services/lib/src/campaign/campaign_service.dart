@@ -76,7 +76,7 @@ final class CampaignServiceImpl implements CampaignService {
         .phase
         .timeline
         .to;
-    final totalAsk = _calculateTotalAskMultiCurrency(campaignProposals);
+    final totalAsk = _calculateTotalAsk(campaignProposals);
     final updatedCategories = await _updateCategories(
       campaign.categories,
       proposalSubmissionTime,
@@ -118,7 +118,7 @@ final class CampaignServiceImpl implements CampaignService {
     final proposalSubmissionStage = await getCampaignPhaseTimeline(
       CampaignPhaseType.proposalSubmission,
     );
-    final totalAsk = _calculateTotalAskSingleCurrency(categoryProposals, category.currency);
+    final totalAsk = _calculateTotalAsk(categoryProposals);
 
     return category.copyWith(
       totalAsk: totalAsk,
@@ -127,16 +127,7 @@ final class CampaignServiceImpl implements CampaignService {
     );
   }
 
-  Money _calculateTotalAskSingleCurrency(List<ProposalData> proposals, Currency currency) {
-    var totalAsk = Money.zero(currency: currency);
-    for (final proposal in proposals) {
-      final fundsRequested = proposal.document.fundsRequested ?? Money.zero(currency: currency);
-      totalAsk += fundsRequested;
-    }
-    return totalAsk;
-  }
-
-  MultiCurrencyAmount _calculateTotalAskMultiCurrency(List<ProposalData> proposals) {
+  MultiCurrencyAmount _calculateTotalAsk(List<ProposalData> proposals) {
     final moneyGroup = MultiCurrencyAmount();
     for (final proposal in proposals) {
       final fundsRequested = proposal.document.fundsRequested;
@@ -158,7 +149,7 @@ final class CampaignServiceImpl implements CampaignService {
         type: ProposalsFilterType.finals,
         categoryRef: category.selfRef,
       );
-      final totalAsk = _calculateTotalAskSingleCurrency(categoryProposals, category.currency);
+      final totalAsk = _calculateTotalAsk(categoryProposals);
 
       final updatedCategory = category.copyWith(
         totalAsk: totalAsk,

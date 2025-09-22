@@ -32,7 +32,7 @@ class CurrentCampaign extends StatelessWidget {
             children: [
               Skeletonizer(
                 enabled: isLoading,
-                child: MultiFundsDetailCard(
+                child: FundsDetailCard(
                   key: const Key('FundsDetailCard'),
                   allFunds: currentCampaignInfo.allFunds,
                   totalAsk: currentCampaignInfo.totalAsk,

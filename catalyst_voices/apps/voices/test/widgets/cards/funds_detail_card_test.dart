@@ -21,12 +21,13 @@ void main() {
           Scaffold(
             body: Center(
               child: FundsDetailCard(
-                allFunds: _adaMajorUnits(100),
-                totalAsk: _adaMajorUnits(100),
+                allFunds: MultiCurrencyAmount.single(_adaMajorUnits(100)),
+                totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(100)),
                 askRange: ComparableRange(
                   min: _adaMajorUnits(100),
                   max: _adaMajorUnits(100),
                 ),
+                type: FundsDetailCardType.category,
               ),
             ),
           ),
@@ -43,12 +44,13 @@ void main() {
           Scaffold(
             body: Center(
               child: FundsDetailCard(
-                allFunds: _adaMajorUnits(1),
-                totalAsk: _adaMajorUnits(2),
+                allFunds: MultiCurrencyAmount.single(_adaMajorUnits(1)),
+                totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(2)),
                 askRange: ComparableRange(
                   min: _adaMajorUnits(3),
                   max: _adaMajorUnits(4),
                 ),
+                type: FundsDetailCardType.category,
               ),
             ),
           ),
@@ -68,9 +70,8 @@ void main() {
           Scaffold(
             body: Center(
               child: FundsDetailCard(
-                allFunds: _adaMajorUnits(100),
-                totalAsk: _adaMajorUnits(100),
-                type: FundsDetailCardType.fund,
+                allFunds: MultiCurrencyAmount.single(_adaMajorUnits(100)),
+                totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(100)),
               ),
             ),
           ),
@@ -87,9 +88,8 @@ void main() {
           Scaffold(
             body: Center(
               child: FundsDetailCard(
-                allFunds: _adaMajorUnits(1),
-                totalAsk: _adaMajorUnits(2),
-                type: FundsDetailCardType.fund,
+                allFunds: MultiCurrencyAmount.single(_adaMajorUnits(1)),
+                totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(2)),
               ),
             ),
           ),
@@ -104,7 +104,7 @@ void main() {
         await tester.pumpApp(
           Scaffold(
             body: Center(
-              child: MultiFundsDetailCard(
+              child: FundsDetailCard(
                 allFunds: MultiCurrencyAmount.list([
                   _adaMajorUnits(1),
                   _usdMajorUnits(2),

@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_assets/generated/assets.gen.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
-    show CampaignCategory, Money, SignedDocumentRef, Currency;
+    show CampaignCategory, Currency, Money, MultiCurrencyAmount, SignedDocumentRef;
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
@@ -15,8 +15,8 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   final String description;
   final String shortDescription;
   final int proposalsCount;
-  final Money availableFunds;
-  final Money totalAsk;
+  final MultiCurrencyAmount availableFunds;
+  final MultiCurrencyAmount totalAsk;
   final ComparableRange<Money> range;
   final List<CategoryDescriptionViewModel> descriptions;
   final SvgGenImage image;
@@ -49,13 +49,17 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
         '''Supports development of open source technology, centered around improving the Cardano developer experience and creating developer-friendly tooling that streamlines an integrated development environment.''',
     shortDescription: '',
     proposalsCount: 263,
-    availableFunds: Money.fromMajorUnits(
-      currency: const Currency.ada(),
-      majorUnits: BigInt.from(8000000),
+    availableFunds: MultiCurrencyAmount.single(
+      Money.fromMajorUnits(
+        currency: const Currency.ada(),
+        majorUnits: BigInt.from(8000000),
+      ),
     ),
-    totalAsk: Money.fromMajorUnits(
-      currency: const Currency.ada(),
-      majorUnits: BigInt.from(400000),
+    totalAsk: MultiCurrencyAmount.single(
+      Money.fromMajorUnits(
+        currency: const Currency.ada(),
+        majorUnits: BigInt.from(400000),
+      ),
     ),
     range: ComparableRange(
       min: Money.fromMajorUnits(
@@ -92,7 +96,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   }
 
   String get availableFundsText {
-    return MoneyFormatter.formatDecimal(availableFunds);
+    return availableFunds.list.map(MoneyFormatter.formatDecimal).join('\n');
   }
 
   String get formattedName {

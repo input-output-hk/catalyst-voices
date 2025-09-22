@@ -19,9 +19,9 @@ final staticCampaignCategories = [
     shortDescription:
         'For Tier-1 collaborations and real-world pilots that scale Cardano adoption through high-impact use cases.',
     proposalsCount: 0,
-    availableFunds: _adaMajorUnits(8500000),
+    availableFunds: MultiCurrencyAmount.single(_adaMajorUnits(8500000)),
     imageUrl: '',
-    totalAsk: _adaMajorUnits(0),
+    totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
     range: ComparableRange(
       min: _adaMajorUnits(250000),
       max: _adaMajorUnits(1000000),
@@ -103,9 +103,9 @@ The following will **not** be funded:
     shortDescription:
         'For early-stage ideas to create, test, and validate Cardano-based prototypes to MVP innovations.',
     proposalsCount: 0,
-    availableFunds: _adaMajorUnits(4000000),
+    availableFunds: MultiCurrencyAmount.single(_adaMajorUnits(4000000)),
     imageUrl: '',
-    totalAsk: _adaMajorUnits(0),
+    totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
     range: ComparableRange(
       min: _adaMajorUnits(15000),
       max: _adaMajorUnits(100000),
@@ -187,9 +187,9 @@ Funds open source tools and environments to enhance the Cardano developer experi
     shortDescription:
         'For developers to build open-source tools that enhance the Cardano developer experience.',
     proposalsCount: 0,
-    availableFunds: _adaMajorUnits(3100000),
+    availableFunds: MultiCurrencyAmount.single(_adaMajorUnits(3100000)),
     imageUrl: '',
-    totalAsk: _adaMajorUnits(0),
+    totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
     range: ComparableRange(
       min: _adaMajorUnits(15000),
       max: _adaMajorUnits(100000),
@@ -272,9 +272,9 @@ Funds non-technical initiatives like marketing, education, and community buildin
     shortDescription:
         'For non-tech projects like marketing, education, or community growth to expand Cardano’s reach.',
     proposalsCount: 0,
-    availableFunds: _adaMajorUnits(3000000),
+    availableFunds: MultiCurrencyAmount.single(_adaMajorUnits(3000000)),
     imageUrl: '',
-    totalAsk: _adaMajorUnits(0),
+    totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
     range: ComparableRange(
       min: _adaMajorUnits(15000),
       max: _adaMajorUnits(60000),
@@ -368,8 +368,8 @@ class CampaignCategory extends Equatable {
   final String description;
   final String shortDescription;
   final int proposalsCount;
-  final Money availableFunds;
-  final Money totalAsk;
+  final MultiCurrencyAmount availableFunds;
+  final MultiCurrencyAmount totalAsk;
   final ComparableRange<Money> range;
   final Currency currency;
   final List<CategoryDescription> descriptions;
@@ -429,9 +429,9 @@ class CampaignCategory extends Equatable {
     String? description,
     String? shortDescription,
     int? proposalsCount,
-    Money? availableFunds,
+    MultiCurrencyAmount? availableFunds,
     String? imageUrl,
-    Money? totalAsk,
+    MultiCurrencyAmount? totalAsk,
     ComparableRange<Money>? range,
     Currency? currency,
     List<CategoryDescription>? descriptions,

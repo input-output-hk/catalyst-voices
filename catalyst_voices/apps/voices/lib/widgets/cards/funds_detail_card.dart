@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class FundsDetailCard extends StatelessWidget {
-  final Money allFunds;
-  final Money totalAsk;
+  final MultiCurrencyAmount allFunds;
+  final MultiCurrencyAmount totalAsk;
   final ComparableRange<Money>? askRange;
   final FundsDetailCardType type;
 
@@ -17,21 +17,62 @@ class FundsDetailCard extends StatelessWidget {
     required this.allFunds,
     required this.totalAsk,
     this.askRange,
-    this.type = FundsDetailCardType.category,
+    this.type = FundsDetailCardType.fund,
   });
 
   @override
   Widget build(BuildContext context) {
-    return _FundsDetailCard(
-      allFunds: _formatFunds(allFunds),
-      totalAsk: _formatFunds(totalAsk),
-      askRange: askRange,
-      type: type,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      decoration: BoxDecoration(
+        color: context.colors.elevationsOnSurfaceNeutralLv2,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: context.colors.outlineBorder,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (type == FundsDetailCardType.fund) ...[
+            VoicesAssets.icons.library.buildIcon(),
+            const SizedBox(height: 32),
+          ],
+          SizedBox(
+            width: double.infinity,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                _CampaignFundsDetail(
+                  key: const Key('FundsDetailBudget'),
+                  title: type.localizedTypeName(context.l10n),
+                  description: type.localizedTypeDescription(context.l10n),
+                  funds: _formatFunds(allFunds),
+                ),
+                Offstage(
+                  offstage: type.isCategoryCompact,
+                  child: _CampaignFundsDetail(
+                    key: const Key('FundsDetailRequested'),
+                    title: type.localizedTotalAsk(context.l10n),
+                    description: context.l10n.campaignTotalAskDescription,
+                    funds: _formatFunds(totalAsk),
+                    largeFundsText: false,
+                  ),
+                ),
+                if (askRange != null && !type.isFund) _RangeAsk(range: askRange!),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  String _formatFunds(Money money) {
-    return MoneyFormatter.formatDecimal(money);
+  String _formatFunds(MultiCurrencyAmount amount) {
+    return amount.list.map(MoneyFormatter.formatDecimal).join('\n');
   }
 }
 
@@ -63,33 +104,6 @@ enum FundsDetailCardType {
       FundsDetailCardType.fund => l10n.campaignTreasury,
       FundsDetailCardType.category || FundsDetailCardType.categoryCompact => l10n.categoryBudget,
     };
-  }
-}
-
-class MultiFundsDetailCard extends StatelessWidget {
-  final MultiCurrencyAmount allFunds;
-  final MultiCurrencyAmount totalAsk;
-  final FundsDetailCardType type;
-
-  const MultiFundsDetailCard({
-    super.key,
-    required this.allFunds,
-    required this.totalAsk,
-    this.type = FundsDetailCardType.fund,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return _FundsDetailCard(
-      allFunds: _formatFunds(allFunds),
-      totalAsk: _formatFunds(totalAsk),
-      askRange: null,
-      type: type,
-    );
-  }
-
-  String _formatFunds(MultiCurrencyAmount amount) {
-    return amount.list.map(MoneyFormatter.formatDecimal).join('\n');
   }
 }
 
@@ -149,71 +163,6 @@ class _CampaignFundsDetail extends StatelessWidget {
     } else {
       return context.textTheme.headlineSmall;
     }
-  }
-}
-
-class _FundsDetailCard extends StatelessWidget {
-  final String allFunds;
-  final String totalAsk;
-  final ComparableRange<Money>? askRange;
-  final FundsDetailCardType type;
-
-  const _FundsDetailCard({
-    required this.allFunds,
-    required this.totalAsk,
-    required this.askRange,
-    required this.type,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: BoxDecoration(
-        color: context.colors.elevationsOnSurfaceNeutralLv2,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: context.colors.outlineBorder,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (type == FundsDetailCardType.fund) ...[
-            VoicesAssets.icons.library.buildIcon(),
-            const SizedBox(height: 32),
-          ],
-          SizedBox(
-            width: double.infinity,
-            child: Wrap(
-              alignment: WrapAlignment.spaceBetween,
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                _CampaignFundsDetail(
-                  key: const Key('FundsDetailBudget'),
-                  title: type.localizedTypeName(context.l10n),
-                  description: type.localizedTypeDescription(context.l10n),
-                  funds: allFunds,
-                ),
-                Offstage(
-                  offstage: type.isCategoryCompact,
-                  child: _CampaignFundsDetail(
-                    key: const Key('FundsDetailRequested'),
-                    title: type.localizedTotalAsk(context.l10n),
-                    description: context.l10n.campaignTotalAskDescription,
-                    funds: totalAsk,
-                    largeFundsText: false,
-                  ),
-                ),
-                if (askRange != null && !type.isFund) _RangeAsk(range: askRange!),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }
 
