@@ -1476,7 +1476,7 @@
   },
   "fundsRequested": "Funds requested",
   "@fundsRequested": {
-    "description": "Indicates the amount of ADA requested in a fund on a proposal card."
+    "description": "Indicates the amount of money requested in a fund on a proposal card."
   },
   "getReadyToVote": "Get ready to vote",
   "@getReadyToVote": {

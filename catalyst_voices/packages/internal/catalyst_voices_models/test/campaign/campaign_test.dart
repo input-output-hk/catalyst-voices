@@ -110,8 +110,8 @@ void main() {
         selfRef: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
-        allFunds: _adaMultiCurrency(100),
-        totalAsk: _adaMultiCurrency(0),
+        allFunds: _multiCurrency(100),
+        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -155,8 +155,8 @@ void main() {
         selfRef: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
-        allFunds: _adaMultiCurrency(100),
-        totalAsk: _adaMultiCurrency(0),
+        allFunds: _multiCurrency(100),
+        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -223,8 +223,8 @@ void main() {
         selfRef: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
-        allFunds: _adaMultiCurrency(100),
-        totalAsk: _adaMultiCurrency(0),
+        allFunds: _multiCurrency(100),
+        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -284,8 +284,8 @@ void main() {
         selfRef: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
-        allFunds: _adaMultiCurrency(100),
-        totalAsk: _adaMultiCurrency(0),
+        allFunds: _multiCurrency(100),
+        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -345,8 +345,8 @@ void main() {
         selfRef: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
-        allFunds: _adaMultiCurrency(100),
-        totalAsk: _adaMultiCurrency(0),
+        allFunds: _multiCurrency(100),
+        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -420,8 +420,8 @@ void main() {
         selfRef: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
-        allFunds: _adaMultiCurrency(100),
-        totalAsk: _adaMultiCurrency(0),
+        allFunds: _multiCurrency(100),
+        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -468,9 +468,22 @@ void main() {
 }
 
 Money _ada(int minorUnits) {
-  return Money(currency: const Currency.ada(), minorUnits: BigInt.from(minorUnits));
+  return Money(
+    currency: const Currency.ada(),
+    minorUnits: BigInt.from(minorUnits),
+  );
 }
 
-MultiCurrencyAmount _adaMultiCurrency(int minorUnits) {
-  return MultiCurrencyAmount.single(_ada(minorUnits));
+MultiCurrencyAmount _multiCurrency(int minorUnits) {
+  return MultiCurrencyAmount.list([
+    _ada(minorUnits),
+    _usd(minorUnits),
+  ]);
+}
+
+Money _usd(int minorUnits) {
+  return Money(
+    currency: const Currency.usd(),
+    minorUnits: BigInt.from(minorUnits),
+  );
 }
