@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
@@ -11,8 +10,8 @@ final class Campaign extends Equatable {
   final DocumentRef selfRef;
   final String name;
   final String description;
-  final Coin allFunds;
-  final Coin totalAsk;
+  final MultiCurrencyAmount allFunds;
+  final MultiCurrencyAmount totalAsk;
   final int fundNumber;
   final CampaignTimeline timeline;
   final List<CampaignCategory> categories;
@@ -36,8 +35,18 @@ final class Campaign extends Equatable {
       name: 'Catalyst Fund14',
       description: '''
 Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.''',
-      allFunds: const Coin.fromWholeAda(20000000),
-      totalAsk: const Coin.fromWholeAda(0),
+      allFunds: MultiCurrencyAmount.single(
+        Money.fromMajorUnits(
+          currency: const Currency.ada(),
+          majorUnits: BigInt.from(20000000),
+        ),
+      ),
+      totalAsk: MultiCurrencyAmount.single(
+        Money(
+          currency: const Currency.ada(),
+          minorUnits: BigInt.zero,
+        ),
+      ),
       fundNumber: 14,
       timeline: CampaignTimeline(phases: CampaignPhaseX.f14StaticContent),
       publish: CampaignPublish.published,
@@ -132,8 +141,8 @@ Project Catalyst turns economic power into innovation power by using the Cardano
     DocumentRef? selfRef,
     String? name,
     String? description,
-    Coin? allFunds,
-    Coin? totalAsk,
+    MultiCurrencyAmount? allFunds,
+    MultiCurrencyAmount? totalAsk,
     int? fundNumber,
     CampaignTimeline? timeline,
     CampaignPublish? publish,

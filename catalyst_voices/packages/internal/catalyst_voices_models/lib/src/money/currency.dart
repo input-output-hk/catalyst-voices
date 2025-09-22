@@ -1,35 +1,61 @@
-import 'dart:math';
-
 import 'package:equatable/equatable.dart';
 import 'package:money2/money2.dart' as money2;
 
+/// Represents a currency with ISO code, symbol, decimal precision,
+/// and formatting patterns.
+///
+/// Provides factory constructors for common currencies
+/// like ADA and USD, as well as helpers to format amounts.
 final class Currency extends Equatable {
-  final String isoCode;
-  final String symbol;
-  final int decimalDigits;
-  final String pattern;
+  /// The ISO 4217 code of the currency (e.g., ADA, USD).
+  final CurrencyIsoCode isoCode;
 
+  /// The symbol used to represent the currency (e.g., ₳, $).
+  final String symbol;
+
+  /// Number of decimal digits supported by the currency.
+  /// For example, ADA has 6, USD has 2.
+  final int decimalDigits;
+
+  /// Default formatting pattern used for display without grouping separators.
+  /// Example: `S0.00` for USD, `S0.######` for ADA.
+  final String defaultPattern;
+
+  /// Decimal formatting pattern with grouping separators.
+  /// Example: `S#,##0.00` for USD, `S#,##0.######` for ADA.
+  final String decimalPattern;
+
+  /// Creates a custom [Currency] with the provided properties.
   const Currency({
     required this.isoCode,
     required this.symbol,
     required this.decimalDigits,
-    required this.pattern,
+    required this.defaultPattern,
+    required this.decimalPattern,
   });
 
+  /// Predefined ADA currency (₳, 6 decimals).
   const Currency.ada()
     : this(
-        isoCode: 'ADA',
+        isoCode: CurrencyIsoCode.ada,
         symbol: '₳',
         decimalDigits: 6,
-        pattern: 'S0.##',
+        defaultPattern: 'S0.######',
+        decimalPattern: 'S#,##0.######',
       );
 
+  /// Fallback currency for historical reasons.
+  /// The first fund used a hardcoded currently, this constructors fallbacks to it.
+  const Currency.fallback() : this.ada();
+
+  /// Predefined USD currency ($, 2 decimals).
   const Currency.usd()
     : this(
-        isoCode: 'USD',
+        isoCode: CurrencyIsoCode.usd,
         symbol: r'$',
         decimalDigits: 2,
-        pattern: 'S0.00',
+        defaultPattern: 'S0.00',
+        decimalPattern: 'S#,##0.00',
       );
 
   @override
@@ -38,36 +64,49 @@ final class Currency extends Equatable {
     symbol,
   ];
 
+  /// Formats [minorUnits] into a string using [defaultPattern].
+  ///
+  /// Example (USD): `12345` → `$123.45`
+  /// Example (ADA): `123456000` → `₳123.456`
   String format(BigInt minorUnits) {
-    final currency = money2.Currency.create(
-      isoCode,
+    final currency = _createCurrency();
+    final money = money2.Money.fromBigIntWithCurrency(minorUnits, currency);
+    return money.format(defaultPattern);
+  }
+
+  /// Formats [minorUnits] into a string using [decimalPattern],
+  /// with grouping separators.
+  ///
+  /// Example (USD): `100012345` → `$1,000,123.45`
+  /// Example (ADA): `1000123456789` → `₳1,000,123.456789`
+  String formatDecimal(BigInt minorUnits) {
+    final currency = _createCurrency();
+    final money = money2.Money.fromBigIntWithCurrency(minorUnits, currency);
+    return money.format(decimalPattern);
+  }
+
+  money2.Currency _createCurrency() {
+    return money2.Currency.create(
+      isoCode.code,
       decimalDigits,
-      pattern: pattern,
+      pattern: defaultPattern,
       symbol: symbol,
     );
-    final money = money2.Money.fromBigIntWithCurrency(minorUnits, currency);
-    return money.format();
   }
 }
 
-final class Money extends Equatable {
-  final Currency currency;
-  final BigInt minorUnits;
+/// ISO-4217 currency code.
+///
+/// For fiat currencies 3 uppercase letter code.
+///
+/// For cryptocurrencies can be longer and usually doesn't represent
+/// a valid ISO-4217 since cryptocurrencies aren't covered.
+enum CurrencyIsoCode {
+  ada('ADA'),
+  usd('USD');
 
-  const Money({
-    required this.currency,
-    required this.minorUnits,
-  });
+  /// The iso code.
+  final String code;
 
-  Money.fromMajorUnits({
-    required this.currency,
-    required BigInt majorUnits,
-  }) : minorUnits = majorUnits * BigInt.from(pow(10, currency.decimalDigits));
-
-  @override
-  List<Object?> get props => [currency, minorUnits];
-
-  String format() {
-    return currency.format(minorUnits);
-  }
+  const CurrencyIsoCode(this.code);
 }

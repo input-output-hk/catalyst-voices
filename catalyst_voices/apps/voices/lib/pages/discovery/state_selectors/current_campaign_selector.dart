@@ -76,7 +76,7 @@ class CurrentCampaignLoading extends StatelessWidget {
         return Offstage(
           offstage: !state,
           child: CurrentCampaign(
-            currentCampaignInfo: const NullCurrentCampaignInfoViewModel(),
+            currentCampaignInfo: NullCurrentCampaignInfoViewModel(),
             isLoading: state,
           ),
         );

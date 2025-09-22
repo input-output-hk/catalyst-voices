@@ -269,12 +269,12 @@ final class RegistrationCubit extends Cubit<RegistrationState> with BlocErrorEmi
       _transaction = transaction;
 
       final fee = transaction.fee;
-      final formattedFree = CurrencyFormatter.formatAmount(fee);
+      final formattedFee = MoneyFormatter.formatCompactRounded(fee.toMoney());
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
           canSubmitTx: Optional.of(Success(true)),
-          transactionFee: Optional.of(formattedFree),
+          transactionFee: Optional.of(formattedFee),
         ),
       );
     } on RegistrationException catch (error, stackTrace) {

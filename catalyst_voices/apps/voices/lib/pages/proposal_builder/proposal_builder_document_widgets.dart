@@ -84,7 +84,7 @@ class _Stats extends StatelessWidget {
 
 class _StatsItem extends StatelessWidget {
   final String label;
-  final Coin value;
+  final Money value;
 
   const _StatsItem({
     required this.label,
@@ -98,7 +98,7 @@ class _StatsItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          CurrencyFormatter.formatAmount(value),
+          MoneyFormatter.formatCompactRounded(value),
           style: Theme.of(
             context,
           ).textTheme.titleLarge?.copyWith(color: context.colors.textOnPrimaryLevel1),

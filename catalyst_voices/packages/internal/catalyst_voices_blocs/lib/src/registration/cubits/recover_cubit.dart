@@ -101,7 +101,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
         roles: account.roles,
         formattedAddress: WalletAddressFormatter.formatShort(address),
         clipboardAddress: address,
-        balance: CurrencyFormatter.formatAmount(balance),
+        balance: MoneyFormatter.formatCompactRounded(balance.toMoney()),
       );
 
       emit(state.copyWith(accountDetails: Optional(Success(accountDetails))));

@@ -3,7 +3,6 @@ import 'package:catalyst_voices/pages/dev_tools/cards/info_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/value_text.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class ConfigCard extends StatelessWidget {
@@ -65,7 +64,7 @@ extension on TransactionBuilderConfig {
       },
       'maxTxSize': maxTxSize,
       'maxValueSize': maxValueSize,
-      'coinsPerUtxoByte': CurrencyFormatter.formatExactAmount(coinsPerUtxoByte),
+      'coinsPerUtxoByte': coinsPerUtxoByte.value,
       'selectionStrategy': selectionStrategy.runtimeType.toString(),
     };
   }

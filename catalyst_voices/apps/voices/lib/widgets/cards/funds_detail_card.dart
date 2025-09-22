@@ -1,15 +1,15 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class FundsDetailCard extends StatelessWidget {
-  final Coin allFunds;
-  final Coin totalAsk;
-  final ComparableRange<Coin>? askRange;
+  final Money allFunds;
+  final Money totalAsk;
+  final ComparableRange<Money>? askRange;
   final FundsDetailCardType type;
 
   const FundsDetailCard({
@@ -17,7 +17,152 @@ class FundsDetailCard extends StatelessWidget {
     required this.allFunds,
     required this.totalAsk,
     this.askRange,
+    this.type = FundsDetailCardType.category,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _FundsDetailCard(
+      allFunds: _formatFunds(allFunds),
+      totalAsk: _formatFunds(totalAsk),
+      askRange: askRange,
+      type: type,
+    );
+  }
+
+  String _formatFunds(Money money) {
+    return MoneyFormatter.formatDecimal(money);
+  }
+}
+
+enum FundsDetailCardType {
+  fund,
+  categoryCompact,
+  category;
+
+  bool get isCategoryCompact => this == FundsDetailCardType.categoryCompact;
+  bool get isFund => this == FundsDetailCardType.fund;
+
+  String localizedTotalAsk(VoicesLocalizations l10n) {
+    return switch (this) {
+      FundsDetailCardType.fund => l10n.campaignTotalAsk,
+      FundsDetailCardType.category || FundsDetailCardType.categoryCompact => l10n.currentAsk,
+    };
+  }
+
+  String localizedTypeDescription(VoicesLocalizations l10n) {
+    return switch (this) {
+      FundsDetailCardType.fund => l10n.campaignTreasuryDescription,
+      FundsDetailCardType.category ||
+      FundsDetailCardType.categoryCompact => l10n.fundsAvailableForCategory,
+    };
+  }
+
+  String localizedTypeName(VoicesLocalizations l10n) {
+    return switch (this) {
+      FundsDetailCardType.fund => l10n.campaignTreasury,
+      FundsDetailCardType.category || FundsDetailCardType.categoryCompact => l10n.categoryBudget,
+    };
+  }
+}
+
+class MultiFundsDetailCard extends StatelessWidget {
+  final MultiCurrencyAmount allFunds;
+  final MultiCurrencyAmount totalAsk;
+  final FundsDetailCardType type;
+
+  const MultiFundsDetailCard({
+    super.key,
+    required this.allFunds,
+    required this.totalAsk,
     this.type = FundsDetailCardType.fund,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _FundsDetailCard(
+      allFunds: _formatFunds(allFunds),
+      totalAsk: _formatFunds(totalAsk),
+      askRange: null,
+      type: type,
+    );
+  }
+
+  String _formatFunds(MultiCurrencyAmount amount) {
+    return amount.list.map(MoneyFormatter.formatDecimal).join('\n');
+  }
+}
+
+class _CampaignFundsDetail extends StatelessWidget {
+  final String title;
+  final String description;
+  final String funds;
+  final bool largeFundsText;
+
+  const _CampaignFundsDetail({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.funds,
+    this.largeFundsText = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Skeleton.keep(
+          child: Text(
+            key: const Key('Title'),
+            title,
+            style: context.textTheme.titleMedium?.copyWith(
+              color: context.colors.textOnPrimaryLevel1,
+            ),
+          ),
+        ),
+        Skeleton.keep(
+          child: Text(
+            key: const Key('Description'),
+            description,
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: context.colors.sysColorsNeutralN60,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          key: const Key('Funds'),
+          funds,
+          style: _foundsTextStyle(context)?.copyWith(
+            color: context.colors.textOnPrimaryLevel1,
+          ),
+        ),
+      ],
+    );
+  }
+
+  TextStyle? _foundsTextStyle(BuildContext context) {
+    if (largeFundsText) {
+      return context.textTheme.headlineLarge;
+    } else {
+      return context.textTheme.headlineSmall;
+    }
+  }
+}
+
+class _FundsDetailCard extends StatelessWidget {
+  final String allFunds;
+  final String totalAsk;
+  final ComparableRange<Money>? askRange;
+  final FundsDetailCardType type;
+
+  const _FundsDetailCard({
+    required this.allFunds,
+    required this.totalAsk,
+    required this.askRange,
+    required this.type,
   });
 
   @override
@@ -72,100 +217,8 @@ class FundsDetailCard extends StatelessWidget {
   }
 }
 
-enum FundsDetailCardType {
-  fund,
-  categoryCompact,
-  category;
-
-  bool get isCategoryCompact => this == FundsDetailCardType.categoryCompact;
-  bool get isFund => this == FundsDetailCardType.fund;
-
-  String localizedTotalAsk(VoicesLocalizations l10n) {
-    return switch (this) {
-      FundsDetailCardType.fund => l10n.campaignTotalAsk,
-      FundsDetailCardType.category || FundsDetailCardType.categoryCompact => l10n.currentAsk,
-    };
-  }
-
-  String localizedTypeDescription(VoicesLocalizations l10n) {
-    return switch (this) {
-      FundsDetailCardType.fund => l10n.campaignTreasuryDescription,
-      FundsDetailCardType.category ||
-      FundsDetailCardType.categoryCompact => l10n.fundsAvailableForCategory,
-    };
-  }
-
-  String localizedTypeName(VoicesLocalizations l10n) {
-    return switch (this) {
-      FundsDetailCardType.fund => l10n.campaignTreasury,
-      FundsDetailCardType.category || FundsDetailCardType.categoryCompact => l10n.categoryBudget,
-    };
-  }
-}
-
-class _CampaignFundsDetail extends StatelessWidget {
-  final String title;
-  final String description;
-  final Coin funds;
-  final bool largeFundsText;
-
-  const _CampaignFundsDetail({
-    super.key,
-    required this.title,
-    required this.description,
-    required this.funds,
-    this.largeFundsText = true,
-  });
-
-  String get _formattedFunds => CurrencyFormatter.decimalFormat(funds);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Skeleton.keep(
-          child: Text(
-            key: const Key('Title'),
-            title,
-            style: context.textTheme.titleMedium?.copyWith(
-              color: context.colors.textOnPrimaryLevel1,
-            ),
-          ),
-        ),
-        Skeleton.keep(
-          child: Text(
-            key: const Key('Description'),
-            description,
-            style: context.textTheme.bodyMedium?.copyWith(
-              color: context.colors.sysColorsNeutralN60,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Text(
-          key: const Key('Funds'),
-          _formattedFunds,
-          style: _foundsTextStyle(context)?.copyWith(
-            color: context.colors.textOnPrimaryLevel1,
-          ),
-        ),
-      ],
-    );
-  }
-
-  TextStyle? _foundsTextStyle(BuildContext context) {
-    if (largeFundsText) {
-      return context.textTheme.headlineLarge;
-    } else {
-      return context.textTheme.headlineSmall;
-    }
-  }
-}
-
 class _RangeAsk extends StatelessWidget {
-  final ComparableRange<Coin> range;
+  final ComparableRange<Money> range;
 
   const _RangeAsk({
     required this.range,
@@ -204,7 +257,7 @@ class _RangeAsk extends StatelessWidget {
 
 class _RangeValue extends StatelessWidget {
   final String title;
-  final Coin value;
+  final Money value;
 
   const _RangeValue({
     super.key,
@@ -212,7 +265,7 @@ class _RangeValue extends StatelessWidget {
     required this.value,
   });
 
-  String get _formattedValue => CurrencyFormatter.formatAmount(value);
+  String get _formattedValue => MoneyFormatter.formatCompactRounded(value);
 
   @override
   Widget build(BuildContext context) {

@@ -6,7 +6,7 @@ export 'dependency/dependency_provider.dart';
 export 'document/extension/document_list_sort_ext.dart';
 export 'document/extension/document_map_to_list_ext.dart';
 export 'document/utils/document_node_traverser.dart';
-export 'formatter/currency_formatter.dart';
+export 'formatter/money_formatter.dart';
 export 'formatter/wallet_address_formatter.dart';
 export 'logging/logger.dart';
 export 'platform/catalyst_platform.dart';

@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/widgets/widgets.dart' show ProposalBriefCard;
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -33,7 +32,10 @@ class VoicesProposalCardExample extends StatelessWidget {
                 selfRef: SignedDocumentRef.generateFirstRef(),
                 categoryName: 'Cardano Use Cases / MVP',
                 title: 'Proposal Title that rocks the world',
-                fundsRequested: const Coin.fromWholeAda(100000),
+                fundsRequested: Money.fromMajorUnits(
+                  currency: const Currency.ada(),
+                  majorUnits: BigInt.from(100000),
+                ),
                 commentsCount: 0,
                 publish: ProposalPublish.publishedDraft,
                 versionNumber: 1,

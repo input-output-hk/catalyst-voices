@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 final class DetailProposal extends CoreProposal {
@@ -9,7 +8,7 @@ final class DetailProposal extends CoreProposal {
     required SignedDocumentRef categoryRef,
     required String title,
     required String description,
-    required Coin fundsRequested,
+    required Money fundsRequested,
     required ProposalPublish publish,
     required int duration,
     required String? author,
@@ -32,13 +31,16 @@ final class DetailProposal extends CoreProposal {
     );
   }
 
-  factory DetailProposal.fromData(ProposalData data, List<ProposalVersion> versions) {
+  factory DetailProposal.fromData(
+    ProposalData data,
+    List<ProposalVersion> versions,
+  ) {
     return DetailProposal(
       selfRef: data.document.metadata.selfRef,
       categoryRef: data.document.metadata.categoryId,
       title: data.document.title ?? '',
       description: data.document.description ?? '',
-      fundsRequested: data.document.fundsRequested ?? const Coin.fromWholeAda(0),
+      fundsRequested: data.document.fundsRequested ?? Money.zero(currency: data.document.currency),
       publish: data.publish,
       duration: data.document.duration ?? 0,
       author: data.document.authorName,
@@ -79,7 +81,7 @@ extension ProposalWithVersionX on DetailProposal {
         categoryRef: categoryRef ?? SignedDocumentRef.generateFirstRef(),
         title: 'Dummy Proposal ver 2',
         description: 'Dummy description',
-        fundsRequested: const Coin(100),
+        fundsRequested: Money(currency: const Currency.ada(), minorUnits: BigInt.from(100)),
         publish: publish,
         duration: 6,
         author: 'Alex Wells',

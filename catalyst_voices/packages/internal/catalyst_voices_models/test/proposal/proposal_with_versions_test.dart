@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/src/catalyst_voices_models.dart';
 import 'package:test/test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
@@ -22,7 +21,7 @@ void main() {
         categoryRef: SignedDocumentRef.generateFirstRef(),
         title: 'Title ver 1',
         description: 'Description ver 1',
-        fundsRequested: const Coin(100),
+        fundsRequested: Money(currency: const Currency.ada(), minorUnits: BigInt.from(100)),
         publish: ProposalPublish.localDraft,
         duration: 6,
         author: 'Alex Wells',
@@ -89,7 +88,7 @@ void main() {
         categoryRef: SignedDocumentRef.generateFirstRef(),
         title: 'Title ver 1',
         description: 'Description ver 1',
-        fundsRequested: const Coin(100),
+        fundsRequested: Money(currency: const Currency.ada(), minorUnits: BigInt.from(100)),
         publish: ProposalPublish.localDraft,
         duration: 6,
         author: 'Alex Wells',

@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 
 import 'package:bloc_test/bloc_test.dart';
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -66,8 +65,8 @@ void main() {
             selfRef: SignedDocumentRef.generateFirstRef(),
             name: 'Catalyst Fund14',
             description: 'Description',
-            allFunds: const Coin.fromWholeAda(20000000),
-            totalAsk: const Coin.fromWholeAda(0),
+            allFunds: MultiCurrencyAmount.single(_adaMajorUnits(20000000)),
+            totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
             fundNumber: 14,
             timeline: const CampaignTimeline(phases: []),
             publish: CampaignPublish.published,
@@ -81,13 +80,14 @@ void main() {
                 description: 'Test description',
                 shortDescription: 'Test short description',
                 proposalsCount: 0,
-                availableFunds: const Coin.fromWholeAda(1000),
+                availableFunds: _adaMajorUnits(1000),
                 imageUrl: '',
-                totalAsk: const Coin(0),
-                range: const ComparableRange(
-                  min: Coin.fromWholeAda(10),
-                  max: Coin.fromWholeAda(100),
+                totalAsk: _adaMajorUnits(0),
+                range: ComparableRange(
+                  min: _adaMajorUnits(10),
+                  max: _adaMajorUnits(100),
                 ),
+                currency: const Currency.ada(),
                 descriptions: const [],
                 dos: const [],
                 donts: const [],
@@ -120,8 +120,8 @@ void main() {
             selfRef: SignedDocumentRef.generateFirstRef(),
             name: 'Catalyst Fund14',
             description: 'Description',
-            allFunds: const Coin.fromWholeAda(20000000),
-            totalAsk: const Coin.fromWholeAda(0),
+            allFunds: MultiCurrencyAmount.single(_adaMajorUnits(20000000)),
+            totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
             fundNumber: 14,
             timeline: const CampaignTimeline(phases: []),
             publish: CampaignPublish.published,
@@ -135,13 +135,14 @@ void main() {
                 description: 'Test description',
                 shortDescription: 'Test short description',
                 proposalsCount: 0,
-                availableFunds: const Coin.fromWholeAda(1000),
+                availableFunds: _adaMajorUnits(1000),
                 imageUrl: '',
-                totalAsk: const Coin(0),
-                range: const ComparableRange(
-                  min: Coin.fromWholeAda(10),
-                  max: Coin.fromWholeAda(100),
+                totalAsk: _adaMajorUnits(0),
+                range: ComparableRange(
+                  min: _adaMajorUnits(10),
+                  max: _adaMajorUnits(100),
                 ),
+                currency: const Currency.ada(),
                 descriptions: const [],
                 dos: const [],
                 donts: const [],
@@ -187,6 +188,10 @@ void main() {
       ],
     );
   });
+}
+
+Money _adaMajorUnits(int majorUnits) {
+  return Money.fromMajorUnits(currency: const Currency.ada(), majorUnits: BigInt.from(majorUnits));
 }
 
 class MockCampaignService extends Mock implements CampaignService {}

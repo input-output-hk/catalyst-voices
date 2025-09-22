@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
@@ -8,8 +7,8 @@ import 'package:equatable/equatable.dart';
 /// This view model is used to display the info of a current campaign.
 class CurrentCampaignInfoViewModel extends Equatable {
   final String title;
-  final Coin allFunds;
-  final Coin totalAsk;
+  final MultiCurrencyAmount allFunds;
+  final MultiCurrencyAmount totalAsk;
   final List<CampaignTimelineViewModel> timeline;
 
   const CurrentCampaignInfoViewModel({
@@ -20,11 +19,21 @@ class CurrentCampaignInfoViewModel extends Equatable {
   });
 
   factory CurrentCampaignInfoViewModel.dummy() {
-    return const CurrentCampaignInfoViewModel(
+    return CurrentCampaignInfoViewModel(
       title: 'Catalyst Fund14',
       // Description is used in dialog detail campaign
-      allFunds: Coin.fromWholeAda(50000000),
-      totalAsk: Coin.fromWholeAda(4020000),
+      allFunds: MultiCurrencyAmount.single(
+        Money.fromMajorUnits(
+          currency: const Currency.ada(),
+          majorUnits: BigInt.from(50000000),
+        ),
+      ),
+      totalAsk: MultiCurrencyAmount.single(
+        Money.fromMajorUnits(
+          currency: const Currency.ada(),
+          majorUnits: BigInt.from(4020000),
+        ),
+      ),
     );
   }
 
@@ -46,10 +55,38 @@ class CurrentCampaignInfoViewModel extends Equatable {
 }
 
 class NullCurrentCampaignInfoViewModel extends CurrentCampaignInfoViewModel {
-  const NullCurrentCampaignInfoViewModel({
-    super.title = '',
-    super.allFunds = const Coin.fromWholeAda(50000000),
-    super.totalAsk = const Coin.fromWholeAda(4020000),
-    super.timeline = const [],
+  factory NullCurrentCampaignInfoViewModel({
+    String? title,
+    MultiCurrencyAmount? allFunds,
+    MultiCurrencyAmount? totalAsk,
+    List<CampaignTimelineViewModel>? timeline,
+  }) {
+    return NullCurrentCampaignInfoViewModel._(
+      title: title ?? '',
+      allFunds:
+          allFunds ??
+          MultiCurrencyAmount.single(
+            Money.fromMajorUnits(
+              currency: const Currency.ada(),
+              majorUnits: BigInt.from(50000000),
+            ),
+          ),
+      totalAsk:
+          totalAsk ??
+          MultiCurrencyAmount.single(
+            Money.fromMajorUnits(
+              currency: const Currency.ada(),
+              majorUnits: BigInt.from(4020000),
+            ),
+          ),
+      timeline: timeline ?? [],
+    );
+  }
+
+  const NullCurrentCampaignInfoViewModel._({
+    required super.title,
+    required super.allFunds,
+    required super.totalAsk,
+    required super.timeline,
   });
 }

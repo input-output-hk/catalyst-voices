@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/campaign/active_campaign_observer.dart';
@@ -77,7 +76,7 @@ final class CampaignServiceImpl implements CampaignService {
         .phase
         .timeline
         .to;
-    final totalAsk = _calculateTotalAsk(campaignProposals);
+    final totalAsk = _calculateTotalAskMultiCurrency(campaignProposals);
     final updatedCategories = await _updateCategories(
       campaign.categories,
       proposalSubmissionTime,
@@ -106,6 +105,12 @@ final class CampaignServiceImpl implements CampaignService {
   @override
   Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
     final category = await _campaignRepository.getCategory(ref);
+    if (category == null) {
+      throw NotFoundException(
+        message: 'Did not find category with ref $ref',
+      );
+    }
+
     final categoryProposals = await _proposalRepository.getProposals(
       type: ProposalsFilterType.finals,
       categoryRef: ref,
@@ -113,7 +118,7 @@ final class CampaignServiceImpl implements CampaignService {
     final proposalSubmissionStage = await getCampaignPhaseTimeline(
       CampaignPhaseType.proposalSubmission,
     );
-    final totalAsk = _calculateTotalAsk(categoryProposals);
+    final totalAsk = _calculateTotalAskSingleCurrency(categoryProposals, category.currency);
 
     return category.copyWith(
       totalAsk: totalAsk,
@@ -122,15 +127,24 @@ final class CampaignServiceImpl implements CampaignService {
     );
   }
 
-  Coin _calculateTotalAsk(List<ProposalData> proposals) {
-    var totalAskBalance = const Balance.zero();
+  Money _calculateTotalAskSingleCurrency(List<ProposalData> proposals, Currency currency) {
+    var totalAsk = Money.zero(currency: currency);
+    for (final proposal in proposals) {
+      final fundsRequested = proposal.document.fundsRequested ?? Money.zero(currency: currency);
+      totalAsk += fundsRequested;
+    }
+    return totalAsk;
+  }
+
+  MultiCurrencyAmount _calculateTotalAskMultiCurrency(List<ProposalData> proposals) {
+    final moneyGroup = MultiCurrencyAmount();
     for (final proposal in proposals) {
       final fundsRequested = proposal.document.fundsRequested;
-      final askBalance = Balance(coin: fundsRequested ?? const Coin(0));
-
-      totalAskBalance += askBalance;
+      if (fundsRequested != null) {
+        moneyGroup.add(fundsRequested);
+      }
     }
-    return totalAskBalance.coin;
+    return moneyGroup;
   }
 
   Future<List<CampaignCategory>> _updateCategories(
@@ -144,7 +158,7 @@ final class CampaignServiceImpl implements CampaignService {
         type: ProposalsFilterType.finals,
         categoryRef: category.selfRef,
       );
-      final totalAsk = _calculateTotalAsk(categoryProposals);
+      final totalAsk = _calculateTotalAskSingleCurrency(categoryProposals, category.currency);
 
       final updatedCategory = category.copyWith(
         totalAsk: totalAsk,
