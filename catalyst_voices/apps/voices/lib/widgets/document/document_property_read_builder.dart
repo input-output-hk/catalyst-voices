@@ -235,8 +235,9 @@ class _DocumentPropertyReadBuilderState extends State<DocumentPropertyReadBuilde
         );
       case DocumentTokenValueCardanoAdaSchema():
         final num = schema.castValue(value);
+        final currency = schema.format?.currency ?? const Currency.fallback();
         final money = num != null
-            ? Money.fromMajorUnits(currency: const Currency.ada(), majorUnits: BigInt.from(num))
+            ? Money.fromMajorUnits(currency: currency, majorUnits: BigInt.from(num))
             : null;
         final text = money?.format();
 

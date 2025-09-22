@@ -1288,7 +1288,7 @@
       }
     }
   },
-  "errorValidationTokenNotParsed": "Invalid input. Could not parse parse.",
+  "errorValidationTokenNotParsed": "Invalid input. Could not parse.",
   "@errorValidationTokenNotParsed": {
     "description": "A validation error when user enters input which cannot be parsed into token value."
   },

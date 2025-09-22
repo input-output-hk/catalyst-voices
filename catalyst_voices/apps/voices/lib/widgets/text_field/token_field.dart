@@ -34,16 +34,13 @@ class TokenField extends StatelessWidget {
     this.placeholder,
     this.focusNode,
     this.range,
-    this.currency = const Currency.ada(),
+    required this.currency,
     this.showHelper = true,
     this.enabled = true,
     this.readOnly = false,
     this.ignorePointers,
     this.helperWidget,
-  }) : assert(
-         currency == const Currency.ada(),
-         'Only supports ADA at the moment',
-       );
+  });
 
   @override
   Widget build(BuildContext context) {
