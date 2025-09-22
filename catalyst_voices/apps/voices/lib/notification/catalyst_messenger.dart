@@ -4,11 +4,12 @@ import 'package:catalyst_voices/app/app.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/notification/banner_close_button.dart';
 import 'package:catalyst_voices/notification/banner_content.dart';
+import 'package:catalyst_voices/routes/app_router_factory.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 final _logger = Logger('CatalystMessenger');
 
@@ -35,13 +36,20 @@ class CatalystMessenger extends StatefulWidget {
 }
 
 class CatalystMessengerState extends State<CatalystMessenger> {
-  final _queue = PriorityQueue<CatalystNotification>();
+  final _pending = <CatalystNotification>[];
   bool _isShowing = false;
+  CatalystNotification? _activeNotification;
+
+  GoRouter? __router;
+
+  GoRouter get _router {
+    return __router ??= _findRouter()..routerDelegate.addListener(_handleRouterChange);
+  }
 
   void add(CatalystNotification notification) {
     _logger.finest('Adding $notification to queue');
-    _queue.add(notification);
 
+    _addSorted(notification);
     _processQueue();
   }
 
@@ -50,30 +58,96 @@ class CatalystMessengerState extends State<CatalystMessenger> {
     return widget.child;
   }
 
-  void _onNotificationCompleted(CatalystNotification notification) {
-    _logger.finer('Completed $notification');
+  @override
+  void dispose() {
+    __router?.routerDelegate.removeListener(_handleRouterChange);
+    __router = null;
+
+    super.dispose();
+  }
+
+  void _addSorted(CatalystNotification notification) {
+    _pending
+      ..add(notification)
+      ..sort();
+  }
+
+  GoRouter _findRouter() {
+    final navigatorContext = AppRouterFactory.rootNavigatorKey.currentContext;
+    assert(navigatorContext != null, 'Navigation context not available');
+
+    return GoRouter.of(navigatorContext!);
+  }
+
+  void _handleRouterChange() {
+    final activeNotification = _activeNotification;
+    if (activeNotification == null) {
+      if (_pending.isNotEmpty) {
+        _processQueue();
+      }
+      return;
+    }
+
+    final routerState = _router.state;
+
+    // if active notification is still valid for router do nothing.
+    if (activeNotification.routerPredicate(routerState)) {
+      return;
+    }
+
+    _logger.finer('Hiding notification(${activeNotification.id}). Not valid for router state');
+
+    _addSorted(activeNotification);
+    _hideCurrentBanner();
+  }
+
+  void _hideCurrentBanner() {
+    final messengerState = AppContent.scaffoldMessengerKey.currentState;
+    if (messengerState == null) {
+      return;
+    }
+    messengerState.removeCurrentMaterialBanner(reason: MaterialBannerClosedReason.hide);
+  }
+
+  void _onNotificationCompleted() {
+    assert(_activeNotification != null, 'Completed notification but active was null');
+    final activeNotification = _activeNotification!;
+
+    _logger.finer('Completed $activeNotification');
 
     _isShowing = false;
+    _activeNotification = null;
+
     _processQueue();
   }
 
   void _processQueue() {
-    if (_queue.isEmpty || _isShowing) {
+    if (_isShowing) {
       return;
     }
 
-    _isShowing = true;
+    final routerState = _router.state;
+    final allowed = _pending.where((notification) => notification.routerPredicate(routerState));
+    if (allowed.isEmpty) {
+      if (_pending.isNotEmpty) {
+        _logger.finest('Found ${_pending.length} notification but none allow for router state');
+      }
+      return;
+    }
 
-    final notification = _queue.removeFirst();
+    final notification = allowed.first;
+    _pending.removeWhere((element) => element.id == notification.id);
+    _activeNotification = notification;
+
+    _isShowing = true;
 
     _logger.finer('Showing $notification');
 
     final future = switch (notification) {
       BannerNotification() => _showBanner(notification),
-      SnackBarNotification() => _showSnackBar(notification),
     };
 
-    unawaited(future.whenComplete(() => _onNotificationCompleted(notification)));
+    unawaited(future.whenComplete(_onNotificationCompleted));
   }
 
   Future<void> _showBanner(BannerNotification notification) async {
@@ -97,24 +171,8 @@ class CatalystMessengerState extends State<CatalystMessenger> {
     final controller = messengerState.showMaterialBanner(banner);
 
     return controller.closed.then(
-      (value) {
-        print('Banner close reason -> $value');
-      },
-    );
-  }
-
-  Future<void> _showSnackBar(SnackBarNotification notification) async {
-    final messengerState = AppContent.scaffoldMessengerKey.currentState;
-    if (messengerState == null) {
-      return;
-    }
-
-    const snackbar = SnackBar(content: Text('Testing'));
-    final controller = messengerState.showSnackBar(snackbar);
-
-    return controller.closed.then(
-      (value) {
-        print('SnackBar close reason -> $value');
+      (reason) {
+        _logger.finest('Notification(${notification.id}) closed with reason -> $reason');
       },
     );
   }

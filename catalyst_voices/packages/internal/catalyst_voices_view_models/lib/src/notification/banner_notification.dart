@@ -5,6 +5,7 @@ abstract base class BannerNotification extends CatalystNotification {
     required super.id,
     super.priority,
     super.type,
+    super.routerPredicate,
   });
 
   BannerNotificationMessage message(BuildContext context);
@@ -13,11 +14,15 @@ abstract base class BannerNotification extends CatalystNotification {
 }
 
 final class MyAccountBannerNotification extends BannerNotification {
-  MyAccountBannerNotification()
-    : super(
-        id: const Uuid().v4(),
-        type: CatalystNotificationType.warning,
-      );
+  final CatalystNotificationTextPartOnTap onMyAccountTap;
+
+  MyAccountBannerNotification({
+    super.routerPredicate,
+    required this.onMyAccountTap,
+  }) : super(
+         id: const Uuid().v4(),
+         type: CatalystNotificationType.info,
+       );
 
   @override
   BannerNotificationMessage message(BuildContext context) {
@@ -28,9 +33,7 @@ final class MyAccountBannerNotification extends BannerNotification {
       placeholders: {
         'destination': CatalystNotificationTextPart(
           text: 'My account',
-          onTap: (context) {
-            print('Tapping my account');
-          },
+          onTap: onMyAccountTap,
         ),
       },
     );

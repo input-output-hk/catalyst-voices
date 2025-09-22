@@ -2,25 +2,36 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
 part 'banner_notification.dart';
 part 'catalyst_notification_text.dart';
-part 'snackbar_notification.dart';
+
+bool _alwaysAllowRouterPredicate(GoRouterState state) => true;
+
+typedef CatalystNotificationRouterPredicate = bool Function(GoRouterState state);
 
 sealed class CatalystNotification extends Equatable implements Comparable<CatalystNotification> {
   final String id;
   final int priority;
   final CatalystNotificationType type;
+  final CatalystNotificationRouterPredicate routerPredicate;
 
   const CatalystNotification({
     required this.id,
     this.priority = 0,
     this.type = CatalystNotificationType.info,
+    this.routerPredicate = _alwaysAllowRouterPredicate,
   });
 
   @override
-  List<Object?> get props => [id, priority, type];
+  List<Object?> get props => [
+    id,
+    priority,
+    type,
+    // routerPredicate not included
+  ];
 
   @override
   int compareTo(CatalystNotification other) => priority.compareTo(other.priority);

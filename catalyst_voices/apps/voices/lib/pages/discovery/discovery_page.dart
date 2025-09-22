@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
-import 'package:catalyst_voices/notification/catalyst_messenger.dart';
 import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
 import 'package:catalyst_voices/pages/discovery/sections/campaign_hero.dart';
@@ -11,10 +10,8 @@ import 'package:catalyst_voices/pages/discovery/state_selectors/campaign_categor
 import 'package:catalyst_voices/pages/discovery/state_selectors/current_campaign_selector.dart';
 import 'package:catalyst_voices/pages/discovery/state_selectors/most_recent_proposals_selector.dart';
 import 'package:catalyst_voices/widgets/banner/widgets/email_need_verification_banner.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_wide_screen_constrained.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
@@ -60,25 +57,6 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     with ErrorHandlerStateMixin<DiscoveryCubit, DiscoveryPage> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      spacing: 8,
-      children: [
-        VoicesFilledButton(
-          onTap: () {
-            CatalystMessenger.of(context).add(MyAccountBannerNotification());
-          },
-          child: Text('Banner'),
-        ),
-        VoicesFilledButton(
-          onTap: null,
-          // onTap: () {
-          //   CatalystMessenger.of(context).add(SnackBarNotification());
-          // },
-          child: Text('SnackBar'),
-        ),
-      ],
-    );
     return const ProposalSubmissionPhaseAware(
       activeChild: SelectionArea(
         child: Stack(
@@ -110,7 +88,7 @@ class _DiscoveryPageState extends State<DiscoveryPage>
 
   Future<void> _loadData() async {
     try {
-      // await context.read<DiscoveryCubit>().getAllData();
+      await context.read<DiscoveryCubit>().getAllData();
     } finally {
       if (mounted) unawaited(SentryDisplayWidget.of(context).reportFullyDisplayed());
     }
