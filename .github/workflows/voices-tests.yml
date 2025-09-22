@@ -29,17 +29,17 @@ jobs:
           swap-storage: true
 
       - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.8.1
         with:
           enable_caching: "true"
           version: 0.21.0
 
       - name: Setup Forge
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.8.1
 
       # Build all images with Earthly
       - name: Build all images
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.10.0
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.8.1
         with:
           command: run
           args: ./catalyst_voices/apps/voices/e2e_tests/+all-images
