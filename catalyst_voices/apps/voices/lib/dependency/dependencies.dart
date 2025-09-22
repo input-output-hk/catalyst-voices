@@ -346,6 +346,7 @@ final class Dependencies extends DependencyProvider {
         return UserService(
           get<UserRepository>(),
           get<UserObserver>(),
+          get<RegistrationStatusPoller>(),
         );
       },
       dispose: (service) => unawaited(service.dispose()),
@@ -500,5 +501,10 @@ final class Dependencies extends DependencyProvider {
     );
     registerLazySingleton<CastedVotesObserver>(CastedVotesObserverImpl.new);
     registerLazySingleton<VotingBallotBuilder>(VotingBallotLocalBuilder.new);
+
+    // Not a singleton
+    registerFactory<RegistrationStatusPoller>(
+      () => RegistrationStatusPoller(get<UserRepository>()),
+    );
   }
 }

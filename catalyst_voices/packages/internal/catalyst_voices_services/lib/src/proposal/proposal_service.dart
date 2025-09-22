@@ -344,8 +344,27 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<DocumentRef> importProposal(Uint8List data) async {
+    final allowTemplateRefs =
+        _activeCampaignObserver.campaign?.categories.map((e) => e.proposalTemplateRef).toList() ??
+        [];
+
+    final parsedDocument = await _documentRepository.parseDocumentForImport(data: data);
+
+    // Validate template before any DB operations
+    // TODO(LynxLynxx): Remove after we support multiple fund templates
+    if (!allowTemplateRefs.contains(parsedDocument.metadata.template)) {
+      throw const DocumentImportInvalidDataException(
+        SignedDocumentMetadataMalformed(reasons: ['template ref is not allowed to be imported']),
+      );
+    }
+
     final authorId = _getUserCatalystId();
-    return _proposalRepository.importProposal(data, authorId);
+    final newRef = await _documentRepository.saveImportedDocument(
+      document: parsedDocument,
+      authorId: authorId,
+    );
+
+    return newRef;
   }
 
   @override
