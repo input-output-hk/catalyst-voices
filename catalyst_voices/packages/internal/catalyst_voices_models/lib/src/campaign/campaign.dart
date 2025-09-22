@@ -35,27 +35,16 @@ final class Campaign extends Equatable {
       name: 'Catalyst Fund14',
       description: '''
 Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.''',
-      allFunds: MultiCurrencyAmount.list([
+      allFunds: MultiCurrencyAmount.single(
         Money.fromMajorUnits(
           currency: const Currency.ada(),
           majorUnits: BigInt.from(20000000),
         ),
-        Money.fromMajorUnits(
+      ),
+      totalAsk: MultiCurrencyAmount.single(
+        Money.zero(
           currency: const Currency.ada(),
-          majorUnits: BigInt.from(20000),
         ),
-      ]),
-      totalAsk: MultiCurrencyAmount.list(
-        [
-          Money(
-            currency: const Currency.ada(),
-            minorUnits: BigInt.zero,
-          ),
-          Money.fromMajorUnits(
-            currency: const Currency.ada(),
-            majorUnits: BigInt.from(20000),
-          ),
-        ],
       ),
       fundNumber: 14,
       timeline: CampaignTimeline(phases: CampaignPhaseX.f14StaticContent),
