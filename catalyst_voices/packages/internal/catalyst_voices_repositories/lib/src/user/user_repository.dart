@@ -101,19 +101,18 @@ final class UserRepositoryImpl implements UserRepository {
     required CatalystId catalystId,
     required String email,
   }) {
-    try {
-      return _apiServices.reviews
-          .apiCatalystIdsMePost(
-            body: CatalystIDCreate(
-              catalystIdUri: catalystId.toUri().toStringWithoutScheme(),
-              email: email,
-            ),
-          )
-          .successBodyOrThrow()
-          .then((value) => value.toModel());
-    } on ResourceConflictException {
-      throw const EmailAlreadyUsedException();
-    }
+    return _apiServices.reviews
+        .apiCatalystIdsMePost(
+          body: CatalystIDCreate(
+            catalystIdUri: catalystId.toUri().toStringWithoutScheme(),
+            email: email,
+          ),
+        )
+        .successBodyOrThrow()
+        .onError<ResourceConflictException>(
+          (error, stackTrace) => throw const EmailAlreadyUsedException(),
+        )
+        .then((value) => value.toModel());
   }
 
   @override
