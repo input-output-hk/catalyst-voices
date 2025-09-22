@@ -2842,7 +2842,7 @@
   "@registrationTransactionFailed": {
     "description": "Indicates an error when submitting a registration transaction failed."
   },
-  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 ADA), be sure your wallet has a minimum of {amount} {currency}.",
+  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 {currency}), be sure your wallet has a minimum of {amount} {currency}.",
   "@registrationTransactionFeeDescription": {
     "description": "Description for the registration transaction fee",
     "placeholders": {

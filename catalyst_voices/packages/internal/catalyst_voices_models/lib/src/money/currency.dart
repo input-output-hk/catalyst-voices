@@ -45,7 +45,7 @@ final class Currency extends Equatable {
       );
 
   /// Fallback currency for historical reasons.
-  /// The first fund used a hardcoded currently, this constructors fallbacks to it.
+  /// The first fund used a hardcoded currency, this constructors fallbacks to it.
   const Currency.fallback() : this.ada();
 
   /// Predefined USD currency ($, 2 decimals).
