@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 final class Proposal extends CoreProposal {
@@ -8,7 +7,7 @@ final class Proposal extends CoreProposal {
     required DocumentRef selfRef,
     required String title,
     required String description,
-    required Coin fundsRequested,
+    required Money fundsRequested,
     required ProposalPublish publish,
     List<String> versionsIds = const [],
     required int duration,
@@ -39,7 +38,7 @@ final class Proposal extends CoreProposal {
       selfRef: document.metadata.selfRef,
       title: document.title ?? '',
       description: document.description ?? '',
-      fundsRequested: document.fundsRequested ?? const Coin.fromWholeAda(0),
+      fundsRequested: document.fundsRequested ?? Money.zero(currency: data.document.currency),
       publish: data.publish,
       duration: document.duration ?? 0,
       author: document.authorName,

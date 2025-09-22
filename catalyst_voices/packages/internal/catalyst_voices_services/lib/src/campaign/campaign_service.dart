@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/campaign/active_campaign_observer.dart';
@@ -106,6 +105,12 @@ final class CampaignServiceImpl implements CampaignService {
   @override
   Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
     final category = await _campaignRepository.getCategory(ref);
+    if (category == null) {
+      throw NotFoundException(
+        message: 'Did not find category with ref $ref',
+      );
+    }
+
     final categoryProposals = await _proposalRepository.getProposals(
       type: ProposalsFilterType.finals,
       categoryRef: ref,
@@ -122,15 +127,15 @@ final class CampaignServiceImpl implements CampaignService {
     );
   }
 
-  Coin _calculateTotalAsk(List<ProposalData> proposals) {
-    var totalAskBalance = const Balance.zero();
+  MultiCurrencyAmount _calculateTotalAsk(List<ProposalData> proposals) {
+    final moneyGroup = MultiCurrencyAmount();
     for (final proposal in proposals) {
       final fundsRequested = proposal.document.fundsRequested;
-      final askBalance = Balance(coin: fundsRequested ?? const Coin(0));
-
-      totalAskBalance += askBalance;
+      if (fundsRequested != null) {
+        moneyGroup.add(fundsRequested);
+      }
     }
-    return totalAskBalance.coin;
+    return moneyGroup;
   }
 
   Future<List<CampaignCategory>> _updateCategories(
