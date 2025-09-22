@@ -1,7 +1,7 @@
 # cspell: words unittests socat
 
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:feat/catalyst-compression-setup AS spectral-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:feat/migrate-away-from-melos AS spectral-ci
 IMPORT .. AS gateway
 
 # build all necessary docker images required to run `docker-compose.yml` services

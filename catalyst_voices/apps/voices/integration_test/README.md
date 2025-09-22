@@ -146,7 +146,7 @@ ensure that you have same versions of chromedriver and chrome.
   * NOTE: `just bootstrap` takes a white to run, so you can first try with `melos clean` and then run:
 
 ```bash
-  melos l10n && melos build_runner && melos build_runner_repository
+  melos l10n && melos build-runner && melos build-runner-repository
 ```
 
 ---
