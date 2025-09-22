@@ -25,14 +25,13 @@ Future<void> main(List<String> args) async {
     'Package Name${_sep}Description${_sep}Authors${_sep}License',
   );
 
-  final deps = await oss.listDependencies(pubspecLockPath: pubspecLockPath);
+  final deps = await oss.listDependencies(pubspecYamlPath: pubspecLockPath);
   for (var entry in deps.allDependencies) {
     final name = _replaceSpecialCharacters(entry.name);
     final license = _replaceSpecialCharacters(entry.license ?? '');
     final description = _replaceSpecialCharacters(entry.description);
     final authors = _replaceSpecialCharacters(entry.authors.join(' | '));
-    outputSink.writeln(
-        '\n${name}${_sep}${description}${_sep}${authors}${_sep}${license}');
+    outputSink.writeln('\n${name}${_sep}${description}${_sep}${authors}${_sep}${license}');
   }
 
   await outputSink.flush();

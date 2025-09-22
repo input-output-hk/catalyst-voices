@@ -37,8 +37,4 @@ final class ProposalRoute extends GoRouteData with FadePageTransitionMixin {
     );
     return ProposalPage(ref: ref);
   }
-
-  static bool isPath(String path) {
-    return ($proposalRoute as GoRoute).path == path;
-  }
 }
