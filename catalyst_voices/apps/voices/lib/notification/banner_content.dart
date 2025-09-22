@@ -60,7 +60,8 @@ class _BannerContentState extends State<BannerContent> {
 
   @override
   void dispose() {
-    for (final key in _gestureRecognizers.keys) {
+    final keys = List.of(_gestureRecognizers.keys);
+    for (final key in keys) {
       _gestureRecognizers.remove(key)?.dispose();
     }
     super.dispose();
