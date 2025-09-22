@@ -32,84 +32,84 @@ void main() {
 
     group('arithmetic operators', () {
       test('addition with same currency', () {
-        final a = Money.fromMajorUnits(
+        final usd100 = Money.fromMajorUnits(
           currency: const Currency.usd(),
           majorUnits: BigInt.from(100),
         );
-        final b = Money.fromMajorUnits(
+        final usd50 = Money.fromMajorUnits(
           currency: const Currency.usd(),
           majorUnits: BigInt.from(50),
         );
-        final sum = a + b;
-        expect(sum.minorUnits, a.minorUnits + b.minorUnits);
+        final sum = usd100 + usd50;
+        expect(sum.minorUnits, usd100.minorUnits + usd50.minorUnits);
       });
 
       test('addition throws on different currencies', () {
-        final a = Money.fromMajorUnits(
+        final usd100 = Money.fromMajorUnits(
           currency: const Currency.usd(),
           majorUnits: BigInt.from(100),
         );
-        final b = Money.fromMajorUnits(
+        final ada100 = Money.fromMajorUnits(
           currency: const Currency.ada(),
           majorUnits: BigInt.from(100),
         );
-        expect(() => a + b, throwsArgumentError);
+        expect(() => usd100 + ada100, throwsArgumentError);
       });
 
       test('subtraction with same currency', () {
-        final a = Money.fromMajorUnits(
+        final usd100 = Money.fromMajorUnits(
           currency: const Currency.usd(),
           majorUnits: BigInt.from(100),
         );
-        final b = Money.fromMajorUnits(
+        final usd50 = Money.fromMajorUnits(
           currency: const Currency.usd(),
           majorUnits: BigInt.from(50),
         );
-        final result = a - b;
-        expect(result.minorUnits, a.minorUnits - b.minorUnits);
+        final result = usd100 - usd50;
+        expect(result.minorUnits, usd100.minorUnits - usd50.minorUnits);
       });
 
       test('subtraction throws on different currencies', () {
-        final a = Money.fromMajorUnits(
+        final usd100 = Money.fromMajorUnits(
           currency: const Currency.usd(),
           majorUnits: BigInt.from(100),
         );
-        final b = Money.fromMajorUnits(
+        final ada100 = Money.fromMajorUnits(
           currency: const Currency.ada(),
           majorUnits: BigInt.from(100),
         );
-        expect(() => a - b, throwsArgumentError);
+        expect(() => usd100 - ada100, throwsArgumentError);
       });
     });
 
     group('comparison operators', () {
-      final a = Money.fromMajorUnits(
+      final usd100 = Money.fromMajorUnits(
         currency: const Currency.usd(),
         majorUnits: BigInt.from(100),
       );
-      final b = Money.fromMajorUnits(
+      final usd200 = Money.fromMajorUnits(
         currency: const Currency.usd(),
         majorUnits: BigInt.from(200),
       );
 
       test('< operator', () {
-        expect(a < b, isTrue);
+        expect(usd100 < usd200, isTrue);
       });
       test('<= operator', () {
-        expect(a <= b, isTrue);
-        expect(a <= a, isTrue);
+        expect(usd100 <= usd200, isTrue);
+        expect(usd100 <= usd100, isTrue);
       });
       test('> operator', () {
-        expect(b > a, isTrue);
+        expect(usd200 > usd100, isTrue);
       });
       test('>= operator', () {
-        expect(b >= a, isTrue);
-        expect(a >= a, isTrue);
+        expect(usd200 >= usd100, isTrue);
+        expect(usd100 >= usd100, isTrue);
       });
       test('compareTo', () {
-        expect(a.compareTo(b), lessThan(0));
-        expect(b.compareTo(a), greaterThan(0));
-        expect(a.compareTo(a), 0);
+        expect(usd100.compareTo(usd200), lessThan(0));
+        expect(usd200.compareTo(usd100), greaterThan(0));
+        expect(usd100.compareTo(usd100), 0);
       });
     });
 
