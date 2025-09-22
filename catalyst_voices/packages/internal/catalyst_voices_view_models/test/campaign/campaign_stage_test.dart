@@ -10,16 +10,10 @@ void main() {
       description: 'description',
       publish: CampaignPublish.draft,
       allFunds: MultiCurrencyAmount.single(
-        Money(
-          currency: const Currency.ada(),
-          minorUnits: BigInt.zero,
-        ),
+        Money.zero(currency: const Currency.ada()),
       ),
       totalAsk: MultiCurrencyAmount.single(
-        Money(
-          currency: const Currency.ada(),
-          minorUnits: BigInt.zero,
-        ),
+        Money.zero(currency: const Currency.ada()),
       ),
       fundNumber: 1,
       timeline: const CampaignTimeline(phases: []),
