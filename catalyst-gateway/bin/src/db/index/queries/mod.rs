@@ -488,7 +488,7 @@ async fn session_execute_batch<T: SerializeRow + Debug, Q: std::fmt::Display>(
         let chunk_size: u16 = chunk.len().try_into()?;
         let Some(batch_query) = query_map.get(&chunk_size) else {
             // This should not actually occur.
-            bail!("No batch query found for size {}", chunk_size);
+            bail!("No batch query found for size {chunk_size}");
         };
         let batch_query_statements = batch_query.value().clone();
         match session.batch(&batch_query_statements, chunk).await {
