@@ -2,3 +2,4 @@
 
 pub(crate) mod json_object;
 pub(crate) mod pagination;
+pub(crate) mod problem_report;
