@@ -128,14 +128,14 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   MultiCurrencyAmount _calculateTotalAsk(List<ProposalData> proposals) {
-    final moneyGroup = MultiCurrencyAmount();
+    final totalAmount = MultiCurrencyAmount();
     for (final proposal in proposals) {
       final fundsRequested = proposal.document.fundsRequested;
       if (fundsRequested != null) {
-        moneyGroup.add(fundsRequested);
+        totalAmount.add(fundsRequested);
       }
     }
-    return moneyGroup;
+    return totalAmount;
   }
 
   Future<List<CampaignCategory>> _updateCategories(
