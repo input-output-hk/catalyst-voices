@@ -410,7 +410,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       'Not a proposalDocument document data type',
     );
 
-    final currency = await _getProposalCurrency(documentData);
+    final currency = await _getProposalCurrency(
+      documentData.metadata.categoryId ?? templateData.metadata.categoryId,
+    );
 
     final metadata = ProposalMetadata(
       selfRef: documentData.metadata.selfRef,
@@ -468,10 +470,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     );
   }
 
-  Future<Currency> _getProposalCurrency(DocumentData documentData) async {
-    final campaignRef = documentData.metadata.campaignId;
-    final category = campaignRef != null
-        ? await _campaignRepository.getCategory(campaignRef)
+  Future<Currency> _getProposalCurrency(SignedDocumentRef? categoryRef) async {
+    final category = categoryRef != null
+        ? await _campaignRepository.getCategory(categoryRef)
         : null;
 
     return category?.currency ?? const Currency.fallback();
