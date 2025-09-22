@@ -76,8 +76,7 @@ fn parse_parameter(param: &str) -> Result<(String, u64)> {
     let whence = &results[1];
     let Ok(when) = results[2].parse::<u64>() else {
         bail!(
-            "Not a valid `as_at` parameter. Invalid {} specified.",
-            whence
+            "Not a valid `as_at` parameter. Invalid {whence} specified.",
         );
     };
     Ok((whence.to_owned(), when))
