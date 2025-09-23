@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_models/src/campaign/constant/f14_static_campaign_categories.dart';
 import 'package:catalyst_voices_models/src/campaign/constant/f14_static_campaign_timeline.dart';
@@ -14,16 +13,22 @@ final class Campaign extends Equatable {
   static const f14Ref = SignedDocumentRef.first('01997695-e26f-70db-b9d4-92574a806bcd');
   static const f15Ref = SignedDocumentRef.first('01997696-2024-7438-9178-f7d29b2c1ddb');
 
+  static List<Campaign> all = [
+    Campaign.f14(),
+    Campaign.f15(),
+  ];
+
   // Using DocumentRef instead of SignedDocumentRef because in Campaign Treasury user can create
   // 'draft' version of campaign like Proposal
   final DocumentRef selfRef;
   final String name;
   final String description;
-  final Coin allFunds;
-  final Coin totalAsk;
+  final MultiCurrencyAmount allFunds;
+  final MultiCurrencyAmount totalAsk;
   final int fundNumber;
   final CampaignTimeline timeline;
   final List<CampaignCategory> categories;
+
   final CampaignPublish publish;
 
   const Campaign({
@@ -38,19 +43,23 @@ final class Campaign extends Equatable {
     required this.publish,
   });
 
-  static List<Campaign> all = [
-    Campaign.f14(),
-    Campaign.f15(),
-  ];
-
   factory Campaign.f14() {
     return Campaign(
       selfRef: f14Ref,
       name: 'Catalyst Fund14',
       description: '''
 Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.''',
-      allFunds: const Coin.fromWholeAda(20000000),
-      totalAsk: const Coin.fromWholeAda(0),
+      allFunds: MultiCurrencyAmount.single(
+        Money.fromMajorUnits(
+          currency: const Currency.ada(),
+          majorUnits: BigInt.from(20000000),
+        ),
+      ),
+      totalAsk: MultiCurrencyAmount.single(
+        Money.zero(
+          currency: const Currency.ada(),
+        ),
+      ),
       fundNumber: 14,
       timeline: f14StaticCampaignTimeline,
       publish: CampaignPublish.published,
@@ -63,8 +72,17 @@ Project Catalyst turns economic power into innovation power by using the Cardano
       selfRef: f15Ref,
       name: 'Catalyst Fund15',
       description: '''TODO''',
-      allFunds: const Coin.fromWholeAda(0),
-      totalAsk: const Coin.fromWholeAda(0),
+      allFunds: MultiCurrencyAmount.single(
+        Money.fromMajorUnits(
+          currency: const Currency.ada(),
+          majorUnits: BigInt.from(20000000),
+        ),
+      ),
+      totalAsk: MultiCurrencyAmount.single(
+        Money.zero(
+          currency: const Currency.ada(),
+        ),
+      ),
       fundNumber: 15,
       timeline: f15StaticCampaignTimeline,
       publish: CampaignPublish.published,
@@ -159,8 +177,8 @@ Project Catalyst turns economic power into innovation power by using the Cardano
     DocumentRef? selfRef,
     String? name,
     String? description,
-    Coin? allFunds,
-    Coin? totalAsk,
+    MultiCurrencyAmount? allFunds,
+    MultiCurrencyAmount? totalAsk,
     int? fundNumber,
     CampaignTimeline? timeline,
     CampaignPublish? publish,

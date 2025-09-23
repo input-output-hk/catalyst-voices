@@ -156,6 +156,8 @@ class _WalletBalanceHeadsUp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final money = CardanoWalletDetails.minAdaForRegistration.toMoney();
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,7 +177,7 @@ class _WalletBalanceHeadsUp extends StatelessWidget {
           desc: Text(
             key: const Key('WalletBalanceHeadsUpList'),
             context.l10n.walletLinkWalletDetailsLowBalanceHeadsUpText(
-              CardanoWalletDetails.minAdaForRegistration.ada,
+              MoneyFormatter.formatCompactRounded(money, decoration: MoneyDecoration.code),
             ),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colors.textOnPrimaryLevel1,

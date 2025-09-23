@@ -267,12 +267,12 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       _transaction = transaction;
 
       final fee = transaction.fee;
-      final formattedFree = CryptocurrencyFormatter.formatAmount(fee);
+      final formattedFee = MoneyFormatter.formatCompactRounded(fee.toMoney());
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
           canSubmitTx: Optional.of(Success(true)),
-          transactionFee: Optional.of(formattedFree),
+          transactionFee: Optional.of(formattedFee),
         ),
       );
     } on RegistrationException catch (error, stackTrace) {

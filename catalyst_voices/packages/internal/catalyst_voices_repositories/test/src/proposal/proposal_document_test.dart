@@ -37,6 +37,7 @@ void main() {
             templateRef: DocumentRefFactory.signedDocumentRef(),
             categoryId: DocumentRefFactory.signedDocumentRef(),
             authors: const [],
+            currency: const Currency.ada(),
           ),
           document: document,
         );

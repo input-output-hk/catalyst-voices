@@ -4,6 +4,7 @@ import 'package:catalyst_voices/pages/registration/widgets/registration_details_
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class InstructionsPanel extends StatelessWidget {
@@ -32,6 +33,7 @@ class _PanelMainMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final money = CardanoWalletDetails.minAdaForRegistration.toMoney();
 
     return RegistrationStageMessage(
       title: Text(
@@ -45,7 +47,9 @@ class _PanelMainMessage extends StatelessWidget {
         spacing: 10,
         children: [
           Text(
-            l10n.createProfileInstructionsMessage(CardanoWalletDetails.minAdaForRegistration.ada),
+            l10n.createProfileInstructionsMessage(
+              MoneyFormatter.formatCompactRounded(money, decoration: MoneyDecoration.code),
+            ),
             semanticsIdentifier: 'createProfileInstructionsMessage',
           ),
         ],

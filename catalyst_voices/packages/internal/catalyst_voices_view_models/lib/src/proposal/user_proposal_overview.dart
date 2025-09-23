@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
@@ -7,7 +6,7 @@ final class UsersProposalOverview extends Equatable {
   final DocumentRef selfRef;
   final String title;
   final DateTime updateDate;
-  final Coin fundsRequested;
+  final Money fundsRequested;
   final ProposalPublish publish;
   final List<ProposalVersionViewModel> versions;
   final int commentsCount;
@@ -81,7 +80,7 @@ final class UsersProposalOverview extends Equatable {
     DocumentRef? selfRef,
     String? title,
     DateTime? updateDate,
-    Coin? fundsRequested,
+    Money? fundsRequested,
     ProposalPublish? publish,
     List<ProposalVersionViewModel>? versions,
     int? commentsCount,

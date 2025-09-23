@@ -89,7 +89,7 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
       );
       final walletSummary = WalletSummaryData(
         walletName: walletInfo.metadata.name,
-        balance: CryptocurrencyFormatter.formatAmount(walletInfo.balance),
+        balance: MoneyFormatter.formatCompactRounded(walletInfo.balance.toMoney()),
         address: WalletAddressFormatter.formatShort(walletInfo.address),
         clipboardAddress: walletInfo.address.toBech32(),
         showLowBalance: walletInfo.balance < CardanoWalletDetails.minAdaForRegistration,

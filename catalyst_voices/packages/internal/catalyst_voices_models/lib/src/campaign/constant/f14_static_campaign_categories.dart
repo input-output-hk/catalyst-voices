@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
@@ -19,13 +18,14 @@ final f14StaticCampaignCategories = [
     shortDescription:
         'For Tier-1 collaborations and real-world pilots that scale Cardano adoption through high-impact use cases.',
     proposalsCount: 0,
-    availableFunds: const Coin.fromWholeAda(8500000),
+    availableFunds: MultiCurrencyAmount.single(CampaignCategory.adaMajorUnits(8500000)),
     imageUrl: '',
-    totalAsk: const Coin(0),
-    range: const ComparableRange(
-      min: Coin.fromWholeAda(250000),
-      max: Coin.fromWholeAda(1000000),
+    totalAsk: MultiCurrencyAmount.single(CampaignCategory.adaMajorUnits(0)),
+    range: ComparableRange(
+      min: CampaignCategory.adaMajorUnits(250000),
+      max: CampaignCategory.adaMajorUnits(1000000),
     ),
+    currency: const Currency.ada(),
     descriptions: const [
       CategoryDescription(
         title: 'Overview',
@@ -102,13 +102,14 @@ The following will **not** be funded:
     shortDescription:
         'For early-stage ideas to create, test, and validate Cardano-based prototypes to MVP innovations.',
     proposalsCount: 0,
-    availableFunds: const Coin.fromWholeAda(4000000),
+    availableFunds: MultiCurrencyAmount.single(CampaignCategory.adaMajorUnits(4000000)),
     imageUrl: '',
-    totalAsk: const Coin(0),
-    range: const ComparableRange(
-      min: Coin.fromWholeAda(15000),
-      max: Coin.fromWholeAda(100000),
+    totalAsk: MultiCurrencyAmount.single(CampaignCategory.adaMajorUnits(0)),
+    range: ComparableRange(
+      min: CampaignCategory.adaMajorUnits(15000),
+      max: CampaignCategory.adaMajorUnits(100000),
     ),
+    currency: const Currency.ada(),
     descriptions: const [
       CategoryDescription(
         title: 'Overview',
@@ -185,13 +186,14 @@ Funds open source tools and environments to enhance the Cardano developer experi
     shortDescription:
         'For developers to build open-source tools that enhance the Cardano developer experience.',
     proposalsCount: 0,
-    availableFunds: const Coin.fromWholeAda(3100000),
+    availableFunds: MultiCurrencyAmount.single(CampaignCategory.adaMajorUnits(3100000)),
     imageUrl: '',
-    totalAsk: const Coin(0),
-    range: const ComparableRange(
-      min: Coin.fromWholeAda(15000),
-      max: Coin.fromWholeAda(100000),
+    totalAsk: MultiCurrencyAmount.single(CampaignCategory.adaMajorUnits(0)),
+    range: ComparableRange(
+      min: CampaignCategory.adaMajorUnits(15000),
+      max: CampaignCategory.adaMajorUnits(100000),
     ),
+    currency: const Currency.ada(),
     descriptions: const [
       CategoryDescription(
         title: 'Overview',
@@ -269,13 +271,14 @@ Funds non-technical initiatives like marketing, education, and community buildin
     shortDescription:
         'For non-tech projects like marketing, education, or community growth to expand Cardano’s reach.',
     proposalsCount: 0,
-    availableFunds: const Coin.fromWholeAda(3000000),
+    availableFunds: MultiCurrencyAmount.single(CampaignCategory.adaMajorUnits(3000000)),
     imageUrl: '',
-    totalAsk: const Coin(0),
-    range: const ComparableRange(
-      min: Coin.fromWholeAda(15000),
-      max: Coin.fromWholeAda(60000),
+    totalAsk: MultiCurrencyAmount.single(CampaignCategory.adaMajorUnits(0)),
+    range: ComparableRange(
+      min: CampaignCategory.adaMajorUnits(15000),
+      max: CampaignCategory.adaMajorUnits(60000),
     ),
+    currency: const Currency.ada(),
     descriptions: const [
       CategoryDescription(
         title: 'Overview',

@@ -1,7 +1,7 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 
 /// Representation of single [Campaign] category.
 ///
@@ -15,14 +15,23 @@ class CampaignCategory extends Equatable {
   final String description;
   final String shortDescription;
   final int proposalsCount;
-  final Coin availableFunds;
-  final Coin totalAsk;
-  final ComparableRange<Coin> range;
+  final MultiCurrencyAmount availableFunds;
+  final MultiCurrencyAmount totalAsk;
+  final ComparableRange<Money> range;
+  final Currency currency;
   final List<CategoryDescription> descriptions;
   final String imageUrl;
   final List<String> dos;
   final List<String> donts;
   final DateTime submissionCloseDate;
+
+  @internal
+  static Money adaMajorUnits(int majorUnits) {
+    return Money.fromMajorUnits(
+      currency: const Currency.ada(),
+      majorUnits: BigInt.from(majorUnits),
+    );
+  }
 
   const CampaignCategory({
     required this.selfRef,
@@ -37,6 +46,7 @@ class CampaignCategory extends Equatable {
     required this.imageUrl,
     required this.totalAsk,
     required this.range,
+    required this.currency,
     required this.descriptions,
     required this.dos,
     required this.donts,
@@ -74,10 +84,11 @@ class CampaignCategory extends Equatable {
     String? description,
     String? shortDescription,
     int? proposalsCount,
-    Coin? availableFunds,
+    MultiCurrencyAmount? availableFunds,
     String? imageUrl,
-    Coin? totalAsk,
-    ComparableRange<Coin>? range,
+    MultiCurrencyAmount? totalAsk,
+    ComparableRange<Money>? range,
+    Currency? currency,
     List<CategoryDescription>? descriptions,
     List<String>? dos,
     List<String>? donts,
@@ -96,6 +107,7 @@ class CampaignCategory extends Equatable {
       imageUrl: imageUrl ?? this.imageUrl,
       totalAsk: totalAsk ?? this.totalAsk,
       range: range ?? this.range,
+      currency: currency ?? this.currency,
       descriptions: descriptions ?? this.descriptions,
       dos: dos ?? this.dos,
       donts: donts ?? this.donts,
