@@ -24,7 +24,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   @override
   Future<DocumentData> get({required DocumentRef ref}) async {
     final bytes = await _api.gateway
-        .apiGatewayV1DocumentDocumentIdGet(
+        .apiV1DocumentDocumentIdGet(
           documentId: ref.id,
           version: ref.version,
         )
@@ -47,11 +47,12 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
     try {
       final index = await _api.gateway
-          .apiGatewayV1DocumentIndexPost(
-            body: DocumentIndexQueryFilter(id: EqOrRangedIdDto.eq(id)),
+          .apiV1DocumentIndexPost(
+            body: DocumentIndexQueryFilter(id: IdSelectorDto.eq(id)),
             limit: 1,
           )
-          .successBodyOrThrow();
+          .successBodyOrThrow()
+          .then((value) => DocumentIndexList.fromJson(value as Map<String, dynamic>));
 
       final docs = index.docs;
       if (docs.isEmpty) {
@@ -111,7 +112,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   Future<void> publish(SignedDocument document) async {
     final bytes = document.toBytes();
     await _api.gateway
-        .apiGatewayV1DocumentPut(
+        .apiV1DocumentPut(
           body: bytes,
           contentType: ContentTypes.applicationCbor,
         )
@@ -123,12 +124,13 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     required int limit,
   }) async {
     return _api.gateway
-        .apiGatewayV1DocumentIndexPost(
-          body: const DocumentIndexQueryFilter(),
+        .apiV1DocumentIndexPost(
           limit: limit,
           page: page,
+          body: const DocumentIndexQueryFilter(),
         )
-        .successBodyOrThrow();
+        .successBodyOrThrow()
+        .then((value) => DocumentIndexList.fromJson(value as Map<String, dynamic>));
   }
 }
 

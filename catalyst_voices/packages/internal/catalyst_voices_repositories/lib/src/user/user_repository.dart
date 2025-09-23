@@ -80,7 +80,7 @@ final class UserRepositoryImpl implements UserRepository {
   @override
   Future<RbacRegistrationChain> getRbacRegistration({CatalystId? catalystId}) {
     return _apiServices.gateway
-        .apiGatewayV1RbacRegistrationGet(lookup: catalystId?.toUri().toStringWithoutScheme())
+        .apiV1RbacRegistrationGet(lookup: catalystId?.toUri().toStringWithoutScheme())
         .successBodyOrThrow();
   }
 
