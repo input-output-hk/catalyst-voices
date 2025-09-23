@@ -72,15 +72,14 @@ class _CampaignData extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 120, top: 64, right: 120),
+        const Padding(
+          padding: EdgeInsets.only(left: 120, top: 64, right: 120),
           child: _CurrentCampaignHeader(),
         ),
         _CurrentCampaignContent(
           currentCampaign: campaignState.currentCampaign,
           isLoading: campaignState.isLoading,
         ),
-
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 120),
           child: Text(
@@ -144,6 +143,8 @@ class _CurrentCampaignContent extends StatelessWidget {
 }
 
 class _CurrentCampaignHeader extends StatelessWidget {
+  const _CurrentCampaignHeader();
+
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(

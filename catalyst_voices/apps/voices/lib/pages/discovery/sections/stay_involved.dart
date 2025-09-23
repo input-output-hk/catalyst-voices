@@ -19,27 +19,22 @@ class StayInvolved extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 120, vertical: 72),
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 120, vertical: 72),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const _Header(),
-          const SizedBox(height: 24),
-          BlocSelector<DiscoveryCubit, DiscoveryState, CampaignDatesEventsState>(
-            selector: (state) => state.campaign.datesEvents,
-            builder: (context, datesEvents) {
-              return Wrap(
-                alignment: WrapAlignment.center,
-                spacing: 16,
-                runSpacing: 16,
-                children: [
-                  _VoterCard(datesEvents: datesEvents),
-                  _ReviewerCard(datesEvents: datesEvents),
-                ],
-              );
-            },
+          _Header(),
+          SizedBox(height: 24),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 16,
+            runSpacing: 16,
+            children: [
+              _VoterCard(),
+              _ReviewerCard(),
+            ],
           ),
         ],
       ),
@@ -156,48 +151,51 @@ class _RangeTimelineCard extends StatelessWidget {
 }
 
 class _ReviewerCard extends StatelessWidget {
-  final CampaignDatesEventsState datesEvents;
-
-  const _ReviewerCard({required this.datesEvents});
+  const _ReviewerCard();
 
   @override
   Widget build(BuildContext context) {
-    return _StayInvolvedCard(
-      icon: VoicesAssets.icons.clipboardCheck,
-      title: context.l10n.becomeReviewer,
-      description: context.l10n.stayInvolvedReviewerDescription,
-      actions: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 16),
-          _RangeTimelineCard(
-            timelineItems: [
-              (
-                dateRange: datesEvents.reviewRegistrationStartsAt,
-                title: context.l10n.reviewRegistration,
+    return BlocSelector<DiscoveryCubit, DiscoveryState, CampaignDatesEventsState>(
+      selector: (state) => state.campaign.datesEvents,
+      builder: (context, datesEvents) {
+        return _StayInvolvedCard(
+          icon: VoicesAssets.icons.clipboardCheck,
+          title: context.l10n.becomeReviewer,
+          description: context.l10n.stayInvolvedReviewerDescription,
+          actions: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              _RangeTimelineCard(
+                timelineItems: [
+                  (
+                    dateRange: datesEvents.reviewRegistrationStartsAt,
+                    title: context.l10n.reviewRegistration,
+                  ),
+                  (
+                    dateRange: datesEvents.reviewStartsAt,
+                    title: context.l10n.reviewTimelineHeader,
+                  ),
+                ],
               ),
-              (
-                dateRange: datesEvents.reviewStartsAt,
-                title: context.l10n.reviewTimelineHeader,
+              const _CopyCatalystIdTipText(),
+              const SessionAccountCatalystId(
+                padding: EdgeInsets.only(top: 20),
+              ),
+              _StayInvolvedActionButton(
+                title: context.l10n.becomeReviewer,
+                onTap: () {
+                  final shareManager = ShareManager.of(context);
+                  final uri = shareManager.becomeReviewer();
+                  unawaited(launchUrl(uri));
+                },
+                trailing: VoicesAssets.icons.externalLink.buildIcon(),
               ),
             ],
           ),
-          const _CopyCatalystIdTipText(),
-          const SessionAccountCatalystId(
-            padding: EdgeInsets.only(top: 20),
-          ),
-          _StayInvolvedActionButton(
-            title: context.l10n.becomeReviewer,
-            onTap: () {
-              final shareManager = ShareManager.of(context);
-              final uri = shareManager.becomeReviewer();
-              unawaited(launchUrl(uri));
-            },
-            trailing: VoicesAssets.icons.externalLink.buildIcon(),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -296,42 +294,45 @@ class _StayInvolvedCard extends StatelessWidget {
 }
 
 class _VoterCard extends StatelessWidget {
-  final CampaignDatesEventsState datesEvents;
-
-  const _VoterCard({required this.datesEvents});
+  const _VoterCard();
 
   @override
   Widget build(BuildContext context) {
-    return _StayInvolvedCard(
-      icon: VoicesAssets.icons.vote,
-      title: context.l10n.registerToVoteFund14,
-      description: context.l10n.stayInvolvedContributorDescription,
-      actions: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 16),
-          _RangeTimelineCard(
-            timelineItems: [
-              (
-                dateRange: datesEvents.votingRegistrationStartsAt,
-                title: context.l10n.votingRegistrationTimelineHeader,
+    return BlocSelector<DiscoveryCubit, DiscoveryState, CampaignDatesEventsState>(
+      selector: (state) => state.campaign.datesEvents,
+      builder: (context, datesEvents) {
+        return _StayInvolvedCard(
+          icon: VoicesAssets.icons.vote,
+          title: context.l10n.registerToVoteFund14,
+          description: context.l10n.stayInvolvedContributorDescription,
+          actions: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 16),
+              _RangeTimelineCard(
+                timelineItems: [
+                  (
+                    dateRange: datesEvents.votingRegistrationStartsAt,
+                    title: context.l10n.votingRegistrationTimelineHeader,
+                  ),
+                  (
+                    dateRange: datesEvents.votingStartsAt,
+                    title: context.l10n.votingTimelineHeader,
+                  ),
+                ],
               ),
-              (
-                dateRange: datesEvents.votingStartsAt,
-                title: context.l10n.votingTimelineHeader,
+              _StayInvolvedActionButton(
+                title: context.l10n.becomeVoter,
+                onTap: () {
+                  final uri = Uri.parse(VoicesConstants.afterSubmissionUrl);
+                  unawaited(launchUrl(uri));
+                },
               ),
             ],
           ),
-          _StayInvolvedActionButton(
-            title: context.l10n.becomeVoter,
-            onTap: () {
-              final uri = Uri.parse(VoicesConstants.afterSubmissionUrl);
-              unawaited(launchUrl(uri));
-            },
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
