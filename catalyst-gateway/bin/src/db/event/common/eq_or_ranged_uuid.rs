@@ -32,7 +32,7 @@ impl EqOrRangedUuid {
                 format!(
                     "{table_field} in ({})",
                     ids.iter()
-                        .map(ToString::to_string)
+                        .map(|v| format!("'{v}'"))
                         .collect::<Vec<_>>()
                         .join(",")
                 )
