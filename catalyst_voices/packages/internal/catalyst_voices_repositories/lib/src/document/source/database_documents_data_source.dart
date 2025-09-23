@@ -11,7 +11,9 @@ final class DatabaseDocumentsDataSource
   );
 
   @override
-  Future<int> deleteAll() => _database.documentsDao.deleteAll();
+  Future<int> deleteAll() {
+    return _database.documentsDao.deleteAll();
+  }
 
   @override
   Future<bool> exists({required DocumentRef ref}) {
@@ -186,6 +188,11 @@ final class DatabaseDocumentsDataSource
     return _database.documentsDao
         .watchRefToDocumentData(refTo: refTo, type: type)
         .map((e) => e?.toModel());
+  }
+
+  @override
+  Future<int> deleteAllRespectingLocalDrafts() {
+    return _database.documentsDao.deleteAll(keepTemplatesForLocalDrafts: true);
   }
 }
 

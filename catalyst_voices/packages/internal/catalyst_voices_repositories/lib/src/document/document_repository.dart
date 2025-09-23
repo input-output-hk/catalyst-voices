@@ -54,7 +54,9 @@ abstract interface class DocumentRepository {
   /// Returns list of refs to all published and any refs it may hold.
   ///
   /// Its using documents index api.
-  Future<List<TypedDocumentRef>> getAllDocumentsRefs();
+  Future<List<TypedDocumentRef>> getAllDocumentsRefs({
+    required Campaign campaign,
+  });
 
   /// Return list of all cached documents id for given [id].
   /// It looks for documents in the local storage and draft storage.
@@ -128,7 +130,11 @@ abstract interface class DocumentRepository {
   /// Removes all locally stored documents.
   ///
   /// Returns number of deleted rows.
-  Future<int> removeAll();
+  ///
+  /// if [keepLocalDrafts] is true local drafts will be kept and related templates.
+  Future<int> removeAll({
+    bool keepLocalDrafts,
+  });
 
   /// Saves a pre-parsed and validated document to storage.
   ///
@@ -263,8 +269,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<List<TypedDocumentRef>> getAllDocumentsRefs() async {
-    final allRefs = await _remoteDocuments.index().then(_uniqueTypedRefs);
+  Future<List<TypedDocumentRef>> getAllDocumentsRefs({
+    required Campaign campaign,
+  }) async {
+    final allRefs = await _remoteDocuments.index(campaign: campaign).then(_uniqueTypedRefs);
     final allConstRefs = allConstantDocumentRefs.expand((element) => element.all);
 
     final nonConstRefs = allRefs
@@ -396,9 +404,13 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<int> removeAll() async {
-    final deletedDrafts = await _drafts.deleteAll();
-    final deletedDocuments = await _localDocuments.deleteAll();
+  Future<int> removeAll({
+    bool keepLocalDrafts = false,
+  }) async {
+    final deletedDrafts = keepLocalDrafts ? 0 : await _drafts.deleteAll();
+    final deletedDocuments = keepLocalDrafts
+        ? await _localDocuments.deleteAllRespectingLocalDrafts()
+        : await _localDocuments.deleteAll();
 
     return deletedDrafts + deletedDocuments;
   }

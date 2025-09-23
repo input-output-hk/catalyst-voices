@@ -13,21 +13,35 @@ import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   final DocumentRepository documentRepository = _MockDocumentRepository();
+
+  late final AppMetaStorage appMetaStorage;
   late final SyncStatsStorage statsStorage;
   late final DocumentsService documentsService;
+  late final CampaignService campaignService;
   late final SyncManager syncManager;
 
-  setUpAll(() {
+  setUpAll(() async {
     SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
 
     statsStorage = SyncStatsLocalStorage(sharedPreferences: SharedPreferencesAsync());
+    appMetaStorage = AppMetaStorageLocalStorage(sharedPreferences: SharedPreferencesAsync());
+
     documentsService = DocumentsService(documentRepository);
+    campaignService = _MockCampaignService();
 
     registerFallbackValue(SignedDocumentRef.first(const Uuid().v7()));
+
+    await appMetaStorage.write(const AppMeta(activeCampaign: Campaign.f15Ref));
+    when(() => campaignService.getActiveCampaign()).thenAnswer((_) => Future.value(Campaign.f15()));
   });
 
   setUp(() {
-    syncManager = SyncManager(statsStorage, documentsService);
+    syncManager = SyncManager(
+      appMetaStorage,
+      statsStorage,
+      documentsService,
+      campaignService,
+    );
   });
 
   tearDown(() async {
@@ -59,5 +73,7 @@ void main() {
     });
   });
 }
+
+class _MockCampaignService extends Mock implements CampaignService {}
 
 class _MockDocumentRepository extends Mock implements DocumentRepository {}

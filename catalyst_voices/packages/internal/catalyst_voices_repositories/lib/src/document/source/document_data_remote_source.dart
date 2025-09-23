@@ -72,7 +72,11 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }
 
   @override
-  Future<List<TypedDocumentRef>> index() async {
+  Future<List<TypedDocumentRef>> index({
+    Campaign? campaign,
+  }) async {
+    assert(campaign != null, 'Should not index all document with api. Always limit to campaign');
+
     final allRefs = <TypedDocumentRef>{};
 
     var page = 0;
@@ -84,6 +88,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
           await _getDocumentIndexList(
             page: page,
             limit: maxPerPage,
+            campaign: campaign!,
           )
           // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
           // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
@@ -121,6 +126,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   Future<DocumentIndexList> _getDocumentIndexList({
     required int page,
     required int limit,
+    required Campaign campaign,
   }) async {
     return _api.gateway
         .apiGatewayV1DocumentIndexPost(
@@ -136,7 +142,7 @@ abstract interface class DocumentDataRemoteSource implements DocumentDataSource 
   Future<String?> getLatestVersion(String id);
 
   @override
-  Future<List<TypedDocumentRef>> index();
+  Future<List<TypedDocumentRef>> index({Campaign? campaign});
 
   Future<void> publish(SignedDocument document);
 }

@@ -9,8 +9,10 @@ import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 final class Campaign extends Equatable {
-  static final f14Ref = SignedDocumentRef.generateFirstRef();
-  static final f15Ref = SignedDocumentRef.generateFirstRef();
+  // Frontend only references. F14 and F15 do not mean anything for backend.
+  // They're only used to difference between campaigns.
+  static const f14Ref = SignedDocumentRef.first('01997695-e26f-70db-b9d4-92574a806bcd');
+  static const f15Ref = SignedDocumentRef.first('01997696-2024-7438-9178-f7d29b2c1ddb');
 
   // Using DocumentRef instead of SignedDocumentRef because in Campaign Treasury user can create
   // 'draft' version of campaign like Proposal
