@@ -50,7 +50,10 @@ final class DatabaseDocumentsDataSource
     required ProposalsFilterType type,
   }) {
     return _database.proposalsDao
-        .queryProposals(categoryRef: categoryRef, type: type)
+        .queryProposals(
+          categoryRef: categoryRef,
+          filters: ProposalsFilters(type: type),
+        )
         .then((value) => value.map((e) => e.toModel()).toList());
   }
 
