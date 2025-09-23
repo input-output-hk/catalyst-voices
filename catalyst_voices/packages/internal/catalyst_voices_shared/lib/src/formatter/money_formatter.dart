@@ -26,14 +26,13 @@ abstract class MoneyFormatter {
   static String decorate({
     required String amount,
     required MoneyDecoration decoration,
-    required String symbol,
-    required CurrencyIsoCode code,
+    required Currency currency,
   }) {
     switch (decoration) {
       case MoneyDecoration.symbol:
-        return '$symbol$amount';
+        return '${currency.symbol}$amount';
       case MoneyDecoration.code:
-        return '\$${code.code} $amount';
+        return '\$${currency.isoCode.code} $amount';
       case MoneyDecoration.none:
         return amount;
     }
@@ -74,8 +73,7 @@ abstract class MoneyFormatter {
     return decorate(
       amount: formatted,
       decoration: decoration,
-      symbol: money.currency.symbol,
-      code: money.currency.isoCode,
+      currency: money.currency,
     );
   }
 
@@ -95,12 +93,19 @@ abstract class MoneyFormatter {
   /// - $123 = $123
   /// - $123.45 = $123.45
   /// - $1000123.45 = $1,000,123.45
-  static String formatDecimal(Money money) {
+  static String formatDecimal(Money money, {MoneyDecoration decoration = MoneyDecoration.symbol}) {
+    final String formatted;
     if (money.minorUnits == BigInt.zero) {
-      return '${money.currency.symbol} -';
+      formatted = '-';
+    } else {
+      formatted = money.formatDecimal();
     }
 
-    return money.formatDecimal();
+    return decorate(
+      amount: formatted,
+      decoration: decoration,
+      currency: money.currency,
+    );
   }
 
   /// Formats the exact [money] amount to the tiniest minor unit (cent/lovelace) precision.
@@ -120,7 +125,14 @@ abstract class MoneyFormatter {
   /// - $123 = $123
   /// - $123.45 = $123.45
   /// - $1000123.45 = $1000123.45
-  static String formatExactAmount(Money money) {
-    return money.format();
+  static String formatExactAmount(
+    Money money, {
+    MoneyDecoration decoration = MoneyDecoration.symbol,
+  }) {
+    return decorate(
+      amount: money.format(),
+      decoration: decoration,
+      currency: money.currency,
+    );
   }
 }

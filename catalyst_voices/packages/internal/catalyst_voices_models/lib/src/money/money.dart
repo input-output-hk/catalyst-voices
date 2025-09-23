@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/src/money/currency.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 /// Represents a monetary amount with a specific [Currency].
@@ -94,21 +95,20 @@ final class Money extends Equatable implements Comparable<Money> {
 
   /// Formats the amount into a string using the currency's default pattern.
   ///
-  /// Example (USD): `12345` → `$123.45`
-  /// Example (ADA): `123456000` → `₳123.456`
+  /// Example (USD): `12345` → `123.45`
+  /// Example (ADA): `123456000` → `123.456`
   String format() => currency.format(minorUnits);
 
   /// Formats the amount into a string using the currency's decimal pattern,
   /// including grouping separators.
   ///
-  /// Example (USD): `100012345` → `$1,000,123.45`
-  /// Example (ADA): `1000123456789` → `₳1,000,123.456789`
+  /// Example (USD): `100012345` → `1,000,123.45`
+  /// Example (ADA): `1000123456789` → `1,000,123.456789`
   String formatDecimal() => currency.formatDecimal(minorUnits);
 
-  /// Returns the formatted string representation of this amount,
-  /// using [format].
+  /// Returns the formatted string representation of this amount with a currency symbol.
   @override
-  String toString() => format();
+  String toString() => MoneyFormatter.formatExactAmount(this);
 
   /// Ensures both [Money] objects share the same [Currency].
   ///

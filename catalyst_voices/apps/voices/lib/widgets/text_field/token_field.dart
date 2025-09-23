@@ -127,8 +127,8 @@ class _Helper extends StatelessWidget {
         context.l10n.requestedAmountShouldBeBetweenMinAndMax('{min}', '{max}'),
         placeholderSpanBuilder: (context, placeholder) {
           return switch (placeholder) {
-            'min' => TextSpan(text: minMoney.format(), style: boldStyle),
-            'max' => TextSpan(text: maxMoney.format(), style: boldStyle),
+            'min' => TextSpan(text: MoneyFormatter.formatExactAmount(minMoney), style: boldStyle),
+            'max' => TextSpan(text: MoneyFormatter.formatExactAmount(maxMoney), style: boldStyle),
             _ => throw ArgumentError('Unknown placeholder[$placeholder]'),
           };
         },
@@ -141,7 +141,7 @@ class _Helper extends StatelessWidget {
         context.l10n.requestedAmountShouldBeMoreThan('{min}'),
         placeholderSpanBuilder: (context, placeholder) {
           return switch (placeholder) {
-            'min' => TextSpan(text: minMoney.format(), style: boldStyle),
+            'min' => TextSpan(text: MoneyFormatter.formatExactAmount(minMoney), style: boldStyle),
             _ => throw ArgumentError('Unknown placeholder[$placeholder]'),
           };
         },
@@ -153,7 +153,7 @@ class _Helper extends StatelessWidget {
         context.l10n.requestedAmountShouldBeLessThan('{max}'),
         placeholderSpanBuilder: (context, placeholder) {
           return switch (placeholder) {
-            'max' => TextSpan(text: maxMoney.format(), style: boldStyle),
+            'max' => TextSpan(text: MoneyFormatter.formatExactAmount(maxMoney), style: boldStyle),
             _ => throw ArgumentError('Unknown placeholder[$placeholder]'),
           };
         },

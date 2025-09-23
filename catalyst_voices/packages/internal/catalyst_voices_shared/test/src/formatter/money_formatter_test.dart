@@ -223,8 +223,7 @@ void main() {
         final formatted = MoneyFormatter.decorate(
           amount: '100.00',
           decoration: MoneyDecoration.symbol,
-          symbol: r'$',
-          code: CurrencyIsoCode.usd,
+          currency: const Currency.usd(),
         );
 
         expect(formatted, equals(r'$100.00'));
@@ -234,8 +233,7 @@ void main() {
         final formatted = MoneyFormatter.decorate(
           amount: '100.00',
           decoration: MoneyDecoration.code,
-          symbol: r'$',
-          code: CurrencyIsoCode.usd,
+          currency: const Currency.usd(),
         );
 
         expect(formatted, equals(r'$USD 100.00'));
@@ -245,8 +243,7 @@ void main() {
         final formatted = MoneyFormatter.decorate(
           amount: '100.00',
           decoration: MoneyDecoration.none,
-          symbol: r'$',
-          code: CurrencyIsoCode.usd,
+          currency: const Currency.usd(),
         );
 
         expect(formatted, equals('100.00'));

@@ -119,13 +119,13 @@ void main() {
           currency: const Currency.usd(),
           majorUnits: BigInt.from(123),
         );
-        expect(usd.format(), r'$123.00');
+        expect(usd.format(), '123.00');
 
         final ada = Money.fromMajorUnits(
           currency: const Currency.ada(),
           majorUnits: BigInt.from(123),
         );
-        expect(ada.format(), '₳123');
+        expect(ada.format(), '123');
       });
 
       test('formatDecimal', () {
@@ -133,21 +133,21 @@ void main() {
           currency: const Currency.usd(),
           minorUnits: BigInt.from(100012345),
         );
-        expect(usd.formatDecimal(), r'$1,000,123.45');
+        expect(usd.formatDecimal(), '1,000,123.45');
 
         final ada = Money(
           currency: const Currency.ada(),
           minorUnits: BigInt.from(1000123456789),
         );
-        expect(ada.formatDecimal(), '₳1,000,123.456789');
+        expect(ada.formatDecimal(), '1,000,123.456789');
       });
 
-      test('toString returns format()', () {
+      test('toString returns money with currency symbol', () {
         final money = Money.fromMajorUnits(
           currency: const Currency.usd(),
           majorUnits: BigInt.from(123),
         );
-        expect(money.toString(), money.format());
+        expect(money.toString(), r'$123.00');
       });
     });
   });

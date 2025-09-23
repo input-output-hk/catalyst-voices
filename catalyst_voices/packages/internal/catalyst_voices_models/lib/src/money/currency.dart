@@ -40,8 +40,8 @@ final class Currency extends Equatable {
         isoCode: CurrencyIsoCode.ada,
         symbol: '₳',
         decimalDigits: 6,
-        defaultPattern: 'S0.######',
-        decimalPattern: 'S#,##0.######',
+        defaultPattern: '0.######',
+        decimalPattern: '#,##0.######',
       );
 
   /// Fallback currency for historical reasons.
@@ -54,8 +54,8 @@ final class Currency extends Equatable {
         isoCode: CurrencyIsoCode.usd,
         symbol: r'$',
         decimalDigits: 2,
-        defaultPattern: 'S0.00',
-        decimalPattern: 'S#,##0.00',
+        defaultPattern: '0.00',
+        decimalPattern: '#,##0.00',
       );
 
   @override
@@ -66,8 +66,8 @@ final class Currency extends Equatable {
 
   /// Formats [minorUnits] into a string using [defaultPattern].
   ///
-  /// Example (USD): `12345` → `$123.45`
-  /// Example (ADA): `123456000` → `₳123.456`
+  /// Example (USD): `12345` → `123.45`
+  /// Example (ADA): `123456000` → `123.456`
   String format(BigInt minorUnits) {
     final currency = _createCurrency();
     final money = money2.Money.fromBigIntWithCurrency(minorUnits, currency);
@@ -77,8 +77,8 @@ final class Currency extends Equatable {
   /// Formats [minorUnits] into a string using [decimalPattern],
   /// with grouping separators.
   ///
-  /// Example (USD): `100012345` → `$1,000,123.45`
-  /// Example (ADA): `1000123456789` → `₳1,000,123.456789`
+  /// Example (USD): `100012345` → `1,000,123.45`
+  /// Example (ADA): `1000123456789` → `1,000,123.456789`
   String formatDecimal(BigInt minorUnits) {
     final currency = _createCurrency();
     final money = money2.Money.fromBigIntWithCurrency(minorUnits, currency);

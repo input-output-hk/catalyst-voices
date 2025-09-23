@@ -150,7 +150,7 @@ class _DocumentPropertyBuilderViewerState extends State<DocumentPropertyBuilderV
         final money = num != null
             ? Money.fromMajorUnits(currency: currency, majorUnits: BigInt.from(num))
             : null;
-        final text = money?.format();
+        final text = money != null ? MoneyFormatter.formatExactAmount(money) : null;
 
         return _TextListItem(
           id: property.nodeId,
