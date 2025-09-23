@@ -126,10 +126,12 @@ class _RangeTimelineCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final validItems = timelineItems
         .where((item) => item.dateRange != null)
-        .map((item) => _DatetimeRangeTimeline(
-              dateRange: item.dateRange,
-              title: item.title,
-            ))
+        .map(
+          (item) => _DatetimeRangeTimeline(
+            dateRange: item.dateRange,
+            title: item.title,
+          ),
+        )
         .toList();
 
     if (validItems.isEmpty) {

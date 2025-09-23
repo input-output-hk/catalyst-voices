@@ -211,15 +211,6 @@ class _ProposalsScrollableListState extends State<_ProposalsScrollableList> {
     _scrollController.addListener(_onScroll);
   }
 
-  void _onScroll() {
-    final scrollPosition = _scrollController.position.pixels;
-    final maxScroll = _scrollController.position.maxScrollExtent;
-
-    if (maxScroll > 0) {
-      _scrollPercentageNotifier.value = scrollPosition / maxScroll;
-    }
-  }
-
   void _onHorizontalDrag(DragUpdateDetails details) {
     final offset = _scrollController.offset - details.delta.dx;
     final overMax = offset > _scrollController.position.maxScrollExtent;
@@ -227,6 +218,15 @@ class _ProposalsScrollableListState extends State<_ProposalsScrollableList> {
     if (offset < 0 || overMax) return;
 
     _scrollController.jumpTo(offset);
+  }
+
+  void _onScroll() {
+    final scrollPosition = _scrollController.position.pixels;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+
+    if (maxScroll > 0) {
+      _scrollPercentageNotifier.value = scrollPosition / maxScroll;
+    }
   }
 
   void _onSliderChanged(double value) {
