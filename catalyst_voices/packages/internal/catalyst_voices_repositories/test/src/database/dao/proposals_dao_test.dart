@@ -1641,7 +1641,7 @@ void main() {
 
           // Then
           final result = await database.proposalsDao.queryProposals(
-            type: ProposalsFilterType.total,
+            filters: const ProposalsFilters(type: ProposalsFilterType.total),
           );
 
           expect(result.length, 2);
@@ -1693,7 +1693,7 @@ void main() {
           // Then
           final result = await database.proposalsDao.queryProposals(
             categoryRef: _getCategoryId(index: 1),
-            type: ProposalsFilterType.total,
+            filters: const ProposalsFilters(),
           );
 
           expect(result.length, 2);
@@ -1759,7 +1759,7 @@ void main() {
 
           // Then
           final result = await database.proposalsDao.queryProposals(
-            type: ProposalsFilterType.finals,
+            filters: const ProposalsFilters(type: ProposalsFilterType.finals),
           );
 
           expect(result.length, 2);
@@ -1831,7 +1831,7 @@ void main() {
 
           // Then
           final result = await database.proposalsDao.queryProposals(
-            type: ProposalsFilterType.total,
+            filters: const ProposalsFilters(),
           );
 
           expect(result.length, 1);

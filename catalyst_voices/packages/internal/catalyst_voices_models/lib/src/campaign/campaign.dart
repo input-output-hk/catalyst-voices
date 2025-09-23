@@ -5,6 +5,7 @@ import 'package:catalyst_voices_models/src/campaign/constant/f14_static_campaign
 import 'package:catalyst_voices_models/src/campaign/constant/f15_static_campaign_categories.dart';
 import 'package:catalyst_voices_models/src/campaign/constant/f15_static_campaign_timeline.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 final class Campaign extends Equatable {
@@ -169,6 +170,10 @@ Project Catalyst turns economic power into innovation power by using the Cardano
       publish: publish ?? this.publish,
       categories: categories ?? this.categories,
     );
+  }
+
+  bool hasCategory(String id) {
+    return categories.any((element) => element.selfRef.id == id);
   }
 
   /// Returns the state of the campaign for a specific phase.
