@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT ../ AS repo-ci
-IMPORT ../catalyst-gateway AS catalyst-gateway
+IMPORT github.com/input-output-hk/catalyst-voices/catalyst-gateway:f15/cat-gateway AS catalyst-gateway
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.5.15 AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
