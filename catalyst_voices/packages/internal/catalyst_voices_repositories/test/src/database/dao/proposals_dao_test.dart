@@ -1641,7 +1641,7 @@ void main() {
 
           // Then
           final result = await database.proposalsDao.queryProposals(
-            filters: const ProposalsFilters(type: ProposalsFilterType.total),
+            filters: const ProposalsFilters(),
           );
 
           expect(result.length, 2);
