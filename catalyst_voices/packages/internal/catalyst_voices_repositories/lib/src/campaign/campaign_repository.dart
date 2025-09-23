@@ -23,7 +23,7 @@ final class CampaignRepositoryImpl implements CampaignRepository {
 
   @override
   Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
-    return staticCampaignCategories.firstWhere(
+    return Campaign.f14().categories.firstWhere(
       (e) => e.selfRef.id == ref.id,
       orElse: () => throw NotFoundException(
         message: 'Did not find category with ref $ref',

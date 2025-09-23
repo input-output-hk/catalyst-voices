@@ -265,7 +265,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<List<TypedDocumentRef>> getAllDocumentsRefs() async {
     final allRefs = await _remoteDocuments.index().then(_uniqueTypedRefs);
-    final allConstRefs = constantDocumentsRefs.expand((element) => element.all);
+    final allConstRefs = allConstantDocumentRefs.expand((element) => element.all);
 
     final nonConstRefs = allRefs
         .where((ref) => allConstRefs.none((e) => e.id == ref.ref.id))
@@ -286,7 +286,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     final uniqueRefs = {
       // Note. categories are mocked on backend so we can't not fetch them.
-      ...constantDocumentsRefs.expand(
+      ...activeConstantDocumentRefs.expand(
         (element) => element.allTyped.where((e) => !e.type.isCategory),
       ),
       ...allLatestRefs,

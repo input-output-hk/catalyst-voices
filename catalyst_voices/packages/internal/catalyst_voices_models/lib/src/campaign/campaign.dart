@@ -1,10 +1,13 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_models/src/campaign/constant/f14_static_campaign_categories.dart';
+import 'package:catalyst_voices_models/src/campaign/constant/f14_static_campaign_timeline.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
 final class Campaign extends Equatable {
   static final f14Ref = SignedDocumentRef.generateFirstRef();
+  static final f15Ref = SignedDocumentRef.generateFirstRef();
 
   // Using DocumentRef instead of SignedDocumentRef because in Campaign Treasury user can create
   // 'draft' version of campaign like Proposal
@@ -39,9 +42,9 @@ Project Catalyst turns economic power into innovation power by using the Cardano
       allFunds: const Coin.fromWholeAda(20000000),
       totalAsk: const Coin.fromWholeAda(0),
       fundNumber: 14,
-      timeline: CampaignTimeline(phases: CampaignPhaseX.f14StaticContent),
+      timeline: f14StaticCampaignTimeline,
       publish: CampaignPublish.published,
-      categories: staticCampaignCategories,
+      categories: f14StaticCampaignCategories,
     );
   }
 

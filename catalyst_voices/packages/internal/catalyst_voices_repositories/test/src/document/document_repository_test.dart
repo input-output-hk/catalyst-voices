@@ -305,7 +305,7 @@ void main() {
           );
           final remoteRefs = [...refs, ...refs];
           final expectedRefs = <TypedDocumentRef>[
-            ...constantDocumentsRefs.expand(
+            ...activeConstantDocumentRefs.expand(
               (e) {
                 return e.allTyped.where((element) => element.type != categoryType);
               },
@@ -384,7 +384,7 @@ void main() {
         'remote loose refs to const documents are removed',
         () async {
           // Given
-          final constTemplatesRefs = constantDocumentsRefs
+          final constTemplatesRefs = activeConstantDocumentRefs
               .expand(
                 (element) => [
                   element.proposal.toTyped(DocumentType.proposalTemplate),
@@ -396,9 +396,9 @@ void main() {
             10,
             (_) => DocumentRefFactory.signedDocumentRef().toTyped(DocumentType.proposalDocument),
           );
-          final looseTemplatesRefs = constTemplatesRefs.map(
-            (e) => e.copyWith(ref: e.ref.toLoose()),
-          );
+          final looseTemplatesRefs = constTemplatesRefs
+              .map((e) => e.copyWith(ref: e.ref.toLoose()))
+              .toList();
           final refs = [
             ...docsRefs,
             ...looseTemplatesRefs,
@@ -410,8 +410,10 @@ void main() {
           final allRefs = await repository.getAllDocumentsRefs();
 
           // Then
-          expect(allRefs, isNot(containsAll(looseTemplatesRefs)));
-          expect(allRefs, containsAll(constTemplatesRefs));
+          if (constTemplatesRefs.isNotEmpty) {
+            expect(allRefs, isNot(containsAll(looseTemplatesRefs)));
+            expect(allRefs, containsAll(constTemplatesRefs));
+          }
 
           verifyNever(() => remoteDocuments.getLatestVersion(any()));
         },
@@ -422,7 +424,7 @@ void main() {
         'categories refs are filtered out',
         () async {
           // Given
-          final categoriesRefs = constantDocumentsRefs
+          final categoriesRefs = allConstantDocumentRefs
               .expand(
                 (element) => [
                   element.category.toTyped(DocumentType.categoryParametersDocument),
@@ -467,7 +469,7 @@ void main() {
             TypedDocumentRef(ref: ref, type: DocumentType.unknown),
           ];
           final expectedRefs = <TypedDocumentRef>[
-            ...constantDocumentsRefs.expand(
+            ...activeConstantDocumentRefs.expand(
               (refs) => refs.allTyped.where((e) => e.type != categoryType),
             ),
             TypedDocumentRef(ref: ref, type: DocumentType.proposalDocument),

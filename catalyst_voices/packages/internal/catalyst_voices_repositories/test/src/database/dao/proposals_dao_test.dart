@@ -411,14 +411,14 @@ void main() {
           () async {
             // Given
             final userId = DummyCatalystIdFactory.create(username: 'damian');
-            final categoryId = constantDocumentsRefs.first.category;
+            final categoryId = _getCategoryId();
 
             final proposalOneRef = DocumentRefFactory.signedDocumentRef();
             final proposalTwoRef = DocumentRefFactory.signedDocumentRef();
             final proposals = [
               _buildProposal(
                 selfRef: proposalOneRef,
-                categoryId: constantDocumentsRefs[1].category,
+                categoryId: _getCategoryId(index: 1),
               ),
               _buildProposal(
                 selfRef: proposalTwoRef,
@@ -761,7 +761,7 @@ void main() {
         () async {
           // Given
           final templateRef = DocumentRefFactory.signedDocumentRef();
-          final categoryId = constantDocumentsRefs.first.category;
+          final categoryId = _getCategoryId();
 
           final templates = [
             _buildProposalTemplate(selfRef: templateRef),
@@ -785,7 +785,7 @@ void main() {
             ),
             _buildProposal(
               template: templateRef,
-              categoryId: constantDocumentsRefs[1].category,
+              categoryId: _getCategoryId(index: 1),
             ),
           ];
 
@@ -1671,18 +1671,18 @@ void main() {
             _buildProposal(
               selfRef: _buildRefAt(DateTime(2025, 4, 2)),
               template: templateRef,
-              categoryId: constantDocumentsRefs[1].category,
+              categoryId: _getCategoryId(index: 1),
             ),
             _buildProposal(
               selfRef: _buildRefAt(DateTime(2025, 4, 3)),
               template: templateRef,
-              categoryId: constantDocumentsRefs[1].category,
+              categoryId: _getCategoryId(index: 1),
             ),
           ];
 
           final expectedRefs = proposals
               .where(
-                (p) => p.document.metadata.categoryId == constantDocumentsRefs[1].category,
+                (p) => p.document.metadata.categoryId == _getCategoryId(index: 1),
               )
               .map((proposal) => proposal.document.ref)
               .toList();
@@ -1692,7 +1692,7 @@ void main() {
 
           // Then
           final result = await database.proposalsDao.queryProposals(
-            categoryRef: constantDocumentsRefs[1].category,
+            categoryRef: _getCategoryId(index: 1),
             type: ProposalsFilterType.total,
           );
 
@@ -1993,6 +1993,8 @@ void main() {
   });
 }
 
+final _dummyCategoriesCache = <int, SignedDocumentRef>{};
+
 DocumentEntityWithMetadata _buildProposal({
   SignedDocumentRef? selfRef,
   SignedDocumentRef? template,
@@ -2009,7 +2011,7 @@ DocumentEntityWithMetadata _buildProposal({
     authors: [
       if (author != null) author,
     ],
-    categoryId: categoryId ?? constantDocumentsRefs.first.category,
+    categoryId: categoryId ?? _getCategoryId(),
   );
   final content = DocumentDataContent({
     if (title != null || contentAuthorName != null)
@@ -2130,6 +2132,13 @@ SignedDocumentRef _buildRefAt(DateTime dateTime) {
 String _buildUuidAt(DateTime dateTime) {
   final config = V7Options(dateTime.millisecondsSinceEpoch, null);
   return const Uuid().v7(config: config);
+}
+
+SignedDocumentRef _getCategoryId({
+  int index = 0,
+}) {
+  return activeConstantDocumentRefs.elementAtOrNull(index)?.category ??
+      _dummyCategoriesCache.putIfAbsent(index, DocumentRefFactory.signedDocumentRef);
 }
 
 extension on DocumentEntity {

@@ -36,7 +36,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
   @override
   Future<String?> getLatestVersion(String id) async {
-    final constVersion = constantDocumentsRefs
+    final constVersion = allConstantDocumentRefs
         .expand((element) => element.all)
         .firstWhereOrNull((element) => element.id == id)
         ?.version;

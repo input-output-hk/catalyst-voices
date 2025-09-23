@@ -1,12 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:equatable/equatable.dart';
 
 /// At the moment categories are hard coded.
 /// See list in link below
 /// https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/catalyst_docs/proposal/#fund-14-defined-category-ids
 /// https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/catalyst_docs/proposal/#fund-14-defined-templates-ids
 /// https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/catalyst_docs/comment/#fund-14-defined-templates-ids
-const constantDocumentsRefs = <CategoryTemplatesRefs>[
+const f14ConstDocumentsRefs = <CategoryTemplatesRefs>[
   CategoryTemplatesRefs(
     category: SignedDocumentRef.first('0194d490-30bf-7473-81c8-a0eaef369619'),
     proposal: SignedDocumentRef.first('0194d492-1daa-75b5-b4a4-5cf331cd8d1a'),
@@ -68,32 +67,3 @@ const constantDocumentsRefs = <CategoryTemplatesRefs>[
     comment: SignedDocumentRef.first('0194d494-4402-7aa5-9dbc-5fe886e60ebc'),
   ),
 ];
-
-/// Groups related [proposal] and [comment] templates to given [category].
-final class CategoryTemplatesRefs extends Equatable {
-  final SignedDocumentRef category;
-  final SignedDocumentRef proposal;
-  final SignedDocumentRef comment;
-
-  const CategoryTemplatesRefs({
-    required this.category,
-    required this.proposal,
-    required this.comment,
-  });
-
-  Iterable<SignedDocumentRef> get all => [category, proposal, comment];
-
-  Iterable<TypedDocumentRef> get allTyped {
-    return [
-      TypedDocumentRef(
-        ref: category,
-        type: DocumentType.categoryParametersDocument,
-      ),
-      TypedDocumentRef(ref: proposal, type: DocumentType.proposalTemplate),
-      TypedDocumentRef(ref: comment, type: DocumentType.commentTemplate),
-    ];
-  }
-
-  @override
-  List<Object?> get props => [category, proposal, comment];
-}
