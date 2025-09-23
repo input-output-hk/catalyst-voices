@@ -3,10 +3,41 @@ import 'dart:math';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:intl/intl.dart';
 
+/// Description of how to decorate a monetary amount during formatting.
+enum MoneyDecoration {
+  /// The amount is decorated with the currency symbol, i.e. $amount.
+  symbol,
+
+  /// The amount is decorated with the currency iso code (ticker), i.e. $USD amount.
+  code,
+
+  /// The amount is not decorated.
+  none,
+}
+
 /// Formats [Money].
 abstract class MoneyFormatter {
   static const _million = 1000000;
   static const _thousand = 1000;
+
+  /// Decorates the formatted [amount] with corresponding [decoration].
+  ///
+  /// See [MoneyDecoration] for examples.
+  static String decorate({
+    required String amount,
+    required MoneyDecoration decoration,
+    required String symbol,
+    required CurrencyIsoCode code,
+  }) {
+    switch (decoration) {
+      case MoneyDecoration.symbol:
+        return '$symbol$amount';
+      case MoneyDecoration.code:
+        return '\$${code.code} $amount';
+      case MoneyDecoration.none:
+        return amount;
+    }
+  }
 
   /// Formats the [money] amount in a compact way.
   /// The amount is rounded up to two most significant decimals.
@@ -14,7 +45,7 @@ abstract class MoneyFormatter {
   /// Uses K (thousands) or M (millions) multipliers.
   /// The currency symbol will come from [money] currency.
   ///
-  /// Examples [includeSymbol] = true:
+  /// Examples (vary on [decoration]):
   /// - ₳123 = ₳123
   /// - ₳123.456 = ₳123.46
   /// - ₳123.000456 = ₳123
@@ -22,18 +53,11 @@ abstract class MoneyFormatter {
   /// - ₳1000000 = ₳1M
   /// - ₳1230000 = ₳1.23M
   /// - ₳1000123.456 = ₳1M
-  ///
-  /// Examples [includeSymbol] = false:
-  /// - ₳123 = 123
-  /// - ₳123.456 = 123.46
-  /// - ₳123.000456 = 123
-  /// - ₳1000 = 1K
-  /// - ₳1000000 = 1M
-  /// - ₳1230000 = 1.23M
-  /// - ₳1000123.456 = 1M
-  static String formatCompactRounded(Money money, {bool includeSymbol = true}) {
+  static String formatCompactRounded(
+    Money money, {
+    MoneyDecoration decoration = MoneyDecoration.symbol,
+  }) {
     final numberFormat = NumberFormat('#.##');
-    final symbol = money.currency.symbol;
     final decimalAmount = money.minorUnits / BigInt.from(pow(10, money.currency.decimalDigits));
 
     final String formatted;
@@ -47,11 +71,12 @@ abstract class MoneyFormatter {
       formatted = numberFormat.format(decimalAmount);
     }
 
-    if (includeSymbol) {
-      return '$symbol$formatted';
-    } else {
-      return formatted;
-    }
+    return decorate(
+      amount: formatted,
+      decoration: decoration,
+      symbol: money.currency.symbol,
+      code: money.currency.isoCode,
+    );
   }
 
   /// Formats the [money] amount in a decimal way with separators.

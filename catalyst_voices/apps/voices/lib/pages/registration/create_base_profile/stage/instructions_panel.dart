@@ -48,8 +48,7 @@ class _PanelMainMessage extends StatelessWidget {
         children: [
           Text(
             l10n.createProfileInstructionsMessage(
-              MoneyFormatter.formatCompactRounded(money, includeSymbol: false),
-              money.currency.isoCode.code,
+              MoneyFormatter.formatCompactRounded(money, decoration: MoneyDecoration.code),
             ),
             semanticsIdentifier: 'createProfileInstructionsMessage',
           ),

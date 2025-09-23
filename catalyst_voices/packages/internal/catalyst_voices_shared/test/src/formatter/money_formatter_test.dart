@@ -5,141 +5,60 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group(MoneyFormatter, () {
     group('formatCompactRounded', () {
-      group('includeSymbol = true', () {
-        test('₳123 = ₳123', () {
-          final money = Money.fromMajorUnits(
-            currency: const Currency.ada(),
-            majorUnits: BigInt.from(123),
-          );
-          expect(MoneyFormatter.formatCompactRounded(money), '₳123');
-        });
-
-        test('₳123.456 = ₳123.46', () {
-          final money = Money(
-            currency: const Currency.ada(),
-            minorUnits: BigInt.from(123456000), // 123.456
-          );
-          expect(MoneyFormatter.formatCompactRounded(money), '₳123.46');
-        });
-
-        test('₳123.000456 = ₳123', () {
-          final money = Money(
-            currency: const Currency.ada(),
-            minorUnits: BigInt.from(123000456),
-          );
-          expect(MoneyFormatter.formatCompactRounded(money), '₳123');
-        });
-
-        test('₳1000 = ₳1K', () {
-          final money = Money.fromMajorUnits(
-            currency: const Currency.ada(),
-            majorUnits: BigInt.from(1000),
-          );
-          expect(MoneyFormatter.formatCompactRounded(money), '₳1K');
-        });
-
-        test('₳1000000 = ₳1M', () {
-          final money = Money.fromMajorUnits(
-            currency: const Currency.ada(),
-            majorUnits: BigInt.from(1000000),
-          );
-          expect(MoneyFormatter.formatCompactRounded(money), '₳1M');
-        });
-
-        test('₳1230000 = ₳1.23M', () {
-          final money = Money.fromMajorUnits(
-            currency: const Currency.ada(),
-            majorUnits: BigInt.from(1230000),
-          );
-          expect(MoneyFormatter.formatCompactRounded(money), '₳1.23M');
-        });
-
-        test('₳1000123.456 = ₳1M', () {
-          final money = Money(
-            currency: const Currency.ada(),
-            minorUnits: BigInt.from(1000123456000), // 1000123.456
-          );
-          expect(MoneyFormatter.formatCompactRounded(money), '₳1M');
-        });
+      test('₳123 = ₳123', () {
+        final money = Money.fromMajorUnits(
+          currency: const Currency.ada(),
+          majorUnits: BigInt.from(123),
+        );
+        expect(MoneyFormatter.formatCompactRounded(money), '₳123');
       });
 
-      group('includeSymbol = false', () {
-        test('₳123 = 123', () {
-          final money = Money.fromMajorUnits(
-            currency: const Currency.ada(),
-            majorUnits: BigInt.from(123),
-          );
-          expect(
-            MoneyFormatter.formatCompactRounded(money, includeSymbol: false),
-            '123',
-          );
-        });
+      test('₳123.456 = ₳123.46', () {
+        final money = Money(
+          currency: const Currency.ada(),
+          minorUnits: BigInt.from(123456000), // 123.456
+        );
+        expect(MoneyFormatter.formatCompactRounded(money), '₳123.46');
+      });
 
-        test('₳123.456 = 123.46', () {
-          final money = Money(
-            currency: const Currency.ada(),
-            minorUnits: BigInt.from(123456000),
-          );
-          expect(
-            MoneyFormatter.formatCompactRounded(money, includeSymbol: false),
-            '123.46',
-          );
-        });
+      test('₳123.000456 = ₳123', () {
+        final money = Money(
+          currency: const Currency.ada(),
+          minorUnits: BigInt.from(123000456),
+        );
+        expect(MoneyFormatter.formatCompactRounded(money), '₳123');
+      });
 
-        test('₳123.000456 = 123', () {
-          final money = Money(
-            currency: const Currency.ada(),
-            minorUnits: BigInt.from(123000456),
-          );
-          expect(
-            MoneyFormatter.formatCompactRounded(money, includeSymbol: false),
-            '123',
-          );
-        });
+      test('₳1000 = ₳1K', () {
+        final money = Money.fromMajorUnits(
+          currency: const Currency.ada(),
+          majorUnits: BigInt.from(1000),
+        );
+        expect(MoneyFormatter.formatCompactRounded(money), '₳1K');
+      });
 
-        test('₳1000 = 1K', () {
-          final money = Money.fromMajorUnits(
-            currency: const Currency.ada(),
-            majorUnits: BigInt.from(1000),
-          );
-          expect(
-            MoneyFormatter.formatCompactRounded(money, includeSymbol: false),
-            '1K',
-          );
-        });
+      test('₳1000000 = ₳1M', () {
+        final money = Money.fromMajorUnits(
+          currency: const Currency.ada(),
+          majorUnits: BigInt.from(1000000),
+        );
+        expect(MoneyFormatter.formatCompactRounded(money), '₳1M');
+      });
 
-        test('₳1000000 = 1M', () {
-          final money = Money.fromMajorUnits(
-            currency: const Currency.ada(),
-            majorUnits: BigInt.from(1000000),
-          );
-          expect(
-            MoneyFormatter.formatCompactRounded(money, includeSymbol: false),
-            '1M',
-          );
-        });
+      test('₳1230000 = ₳1.23M', () {
+        final money = Money.fromMajorUnits(
+          currency: const Currency.ada(),
+          majorUnits: BigInt.from(1230000),
+        );
+        expect(MoneyFormatter.formatCompactRounded(money), '₳1.23M');
+      });
 
-        test('₳1230000 = 1.23M', () {
-          final money = Money.fromMajorUnits(
-            currency: const Currency.ada(),
-            majorUnits: BigInt.from(1230000),
-          );
-          expect(
-            MoneyFormatter.formatCompactRounded(money, includeSymbol: false),
-            '1.23M',
-          );
-        });
-
-        test('₳1000123.456 = 1M', () {
-          final money = Money(
-            currency: const Currency.ada(),
-            minorUnits: BigInt.from(1000123456000),
-          );
-          expect(
-            MoneyFormatter.formatCompactRounded(money, includeSymbol: false),
-            '1M',
-          );
-        });
+      test('₳1000123.456 = ₳1M', () {
+        final money = Money(
+          currency: const Currency.ada(),
+          minorUnits: BigInt.from(1000123456000), // 1000123.456
+        );
+        expect(MoneyFormatter.formatCompactRounded(money), '₳1M');
       });
     });
 
@@ -296,6 +215,41 @@ void main() {
           );
           expect(MoneyFormatter.formatExactAmount(money), r'$1000123.45');
         });
+      });
+    });
+
+    group('decorate', () {
+      test(MoneyDecoration.symbol, () {
+        final formatted = MoneyFormatter.decorate(
+          amount: '100.00',
+          decoration: MoneyDecoration.symbol,
+          symbol: r'$',
+          code: CurrencyIsoCode.usd,
+        );
+
+        expect(formatted, equals(r'$100.00'));
+      });
+
+      test(MoneyDecoration.code, () {
+        final formatted = MoneyFormatter.decorate(
+          amount: '100.00',
+          decoration: MoneyDecoration.code,
+          symbol: r'$',
+          code: CurrencyIsoCode.usd,
+        );
+
+        expect(formatted, equals(r'$USD 100.00'));
+      });
+
+      test(MoneyDecoration.none, () {
+        final formatted = MoneyFormatter.decorate(
+          amount: '100.00',
+          decoration: MoneyDecoration.none,
+          symbol: r'$',
+          code: CurrencyIsoCode.usd,
+        );
+
+        expect(formatted, equals('100.00'));
       });
     });
   });
