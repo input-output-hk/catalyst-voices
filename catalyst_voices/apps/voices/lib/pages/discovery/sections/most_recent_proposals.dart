@@ -10,20 +10,187 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
-class MostRecentProposals extends StatefulWidget {
+class _ProposalsTitle extends StatelessWidget {
+  const _ProposalsTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      key: const Key('MostRecentProposalsTitle'),
+      context.l10n.mostRecent,
+      style: context.textTheme.headlineLarge?.copyWith(
+        color: ThemeBuilder.buildTheme().colors.textOnPrimaryWhite,
+      ),
+    );
+  }
+}
+
+class _ProposalsScrollableList extends StatefulWidget {
   final List<ProposalBrief> proposals;
-  final bool isLoading;
+
+  const _ProposalsScrollableList({required this.proposals});
+
+  @override
+  State<_ProposalsScrollableList> createState() => _ProposalsScrollableListState();
+}
+
+class _ProposalsScrollableListState extends State<_ProposalsScrollableList> {
+  late final ScrollController _scrollController;
+  double _scrollPercentage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        VoicesGestureDetector(
+          onHorizontalDragUpdate: _onHorizontalDrag,
+          child: SizedBox(
+            height: 440,
+            width: 1200,
+            child: Center(
+              child: _ProposalsList(
+                scrollController: _scrollController,
+                proposals: widget.proposals,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 360),
+          child: VoicesSlider(
+            key: const Key('MostRecentProposalsSlider'),
+            value: _scrollPercentage,
+            onChanged: _onSliderChanged,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _onHorizontalDrag(DragUpdateDetails details) {
+    final offset = _scrollController.offset - details.delta.dx;
+    final overMax = offset > _scrollController.position.maxScrollExtent;
+
+    if (offset < 0 || overMax) return;
+
+    _scrollController.jumpTo(offset);
+  }
+
+  void _onScroll() {
+    final scrollPosition = _scrollController.position.pixels;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+
+    if (maxScroll <= 0) return;
+
+    final newPercentage = scrollPosition / maxScroll;
+    if ((newPercentage - _scrollPercentage).abs() > 0.01) {
+      setState(() {
+        _scrollPercentage = newPercentage;
+      });
+    }
+  }
+
+  void _onSliderChanged(double value) {
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    _scrollController.jumpTo(maxScroll * value);
+  }
+}
+
+class _ProposalsList extends StatelessWidget {
+  final ScrollController scrollController;
+  final List<ProposalBrief> proposals;
+
+  const _ProposalsList({
+    required this.scrollController,
+    required this.proposals,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      controller: scrollController,
+      shrinkWrap: true,
+      physics: const ClampingScrollPhysics(),
+      scrollDirection: Axis.horizontal,
+      itemCount: proposals.length,
+      cacheExtent: 1000,
+      itemBuilder: (context, index) {
+        final proposal = proposals[index];
+        final ref = proposal.selfRef;
+        return ProposalBriefCard(
+          key: Key('PendingProposalCard_$ref'),
+          proposal: proposal,
+          onTap: () {
+            unawaited(
+              ProposalRoute(
+                proposalId: ref.id,
+                version: ref.version,
+              ).push(context),
+            );
+          },
+          onFavoriteChanged: (value) async {
+            final bloc = context.read<DiscoveryCubit>();
+            if (value) {
+              await bloc.addFavorite(ref);
+            } else {
+              await bloc.removeFavorite(ref);
+            }
+          },
+        );
+      },
+      separatorBuilder: (context, index) => const SizedBox(width: 24),
+    );
+  }
+}
+
+class MostRecentProposals extends StatelessWidget {
+  final List<ProposalBrief> proposals;
 
   const MostRecentProposals({
     super.key,
     required this.proposals,
-    this.isLoading = false,
   });
 
   @override
-  State<MostRecentProposals> createState() => _LatestProposalsState();
+  Widget build(BuildContext context) {
+    return _Background(
+      constraints: const BoxConstraints.tightFor(
+        height: 800,
+        width: double.infinity,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 100),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 72),
+            const _ProposalsTitle(),
+            const SizedBox(height: 48),
+            _ProposalsScrollableList(proposals: proposals),
+            const SizedBox(height: 16),
+            const _ViewAllProposalsButton(),
+            const SizedBox(height: 72),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class ViewAllProposals extends StatelessWidget {
@@ -69,141 +236,6 @@ class _Background extends StatelessWidget {
   }
 }
 
-class _LatestProposalsState extends State<MostRecentProposals> {
-  late final ScrollController _scrollController;
-  late double _scrollPercentage;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      key: const Key('MostRecentProposals'),
-      constraints: const BoxConstraints.tightFor(
-        height: 800,
-        width: double.infinity,
-      ),
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: CatalystImage.asset(
-            VoicesAssets.images.campaignHero.path,
-          ).image,
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 100),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 72),
-            Text(
-              key: const Key('MostRecentProposalsTitle'),
-              context.l10n.mostRecent,
-              style: context.textTheme.headlineLarge?.copyWith(
-                color: ThemeBuilder.buildTheme().colors.textOnPrimaryWhite,
-              ),
-            ),
-            const SizedBox(height: 48),
-            VoicesGestureDetector(
-              onHorizontalDragUpdate: _onHorizontalDrag,
-              child: SizedBox(
-                height: 440,
-                width: 1200,
-                child: Center(
-                  child: ListView.separated(
-                    controller: _scrollController,
-                    shrinkWrap: true,
-                    physics: const ClampingScrollPhysics(),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: widget.proposals.length,
-                    itemBuilder: (context, index) {
-                      final proposal = widget.proposals[index];
-                      final ref = proposal.selfRef;
-                      return Skeletonizer(
-                        enabled: widget.isLoading,
-                        child: ProposalBriefCard(
-                          key: Key('PendingProposalCard_$ref'),
-                          proposal: proposal,
-                          onTap: () {
-                            unawaited(
-                              ProposalRoute(
-                                proposalId: ref.id,
-                                version: ref.version,
-                              ).push(context),
-                            );
-                          },
-                          onFavoriteChanged: (value) async {
-                            final bloc = context.read<DiscoveryCubit>();
-                            if (value) {
-                              await bloc.addFavorite(ref);
-                            } else {
-                              await bloc.removeFavorite(ref);
-                            }
-                          },
-                        ),
-                      );
-                    },
-                    separatorBuilder: (context, index) => const SizedBox(width: 24),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 360),
-              child: VoicesSlider(
-                key: const Key('MostRecentProposalsSlider'),
-                value: _scrollPercentage,
-                onChanged: _onSliderChanged,
-              ),
-            ),
-            const SizedBox(height: 16),
-            const _ViewAllProposalsButton(),
-            const SizedBox(height: 72),
-          ],
-        ),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-    _scrollController.addListener(_onScroll);
-    _scrollPercentage = 0.0;
-  }
-
-  void _onHorizontalDrag(DragUpdateDetails details) {
-    final offset = _scrollController.offset - details.delta.dx;
-    final overMax = offset > _scrollController.position.maxScrollExtent;
-
-    if (offset < 0 || overMax) {
-      return;
-    }
-    _scrollController.jumpTo(
-      _scrollController.offset - details.delta.dx,
-    );
-  }
-
-  void _onScroll() {
-    final scrollPosition = _scrollController.position.pixels;
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    setState(() {
-      _scrollPercentage = scrollPosition / maxScroll;
-    });
-  }
-
-  void _onSliderChanged(double value) {
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    _scrollController.jumpTo(maxScroll * value);
-  }
-}
 
 class _ViewAllProposalsButton extends StatelessWidget {
   const _ViewAllProposalsButton();

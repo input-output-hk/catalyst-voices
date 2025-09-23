@@ -19,22 +19,27 @@ class StayInvolved extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 120, vertical: 72),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 120, vertical: 72),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _Header(),
-          SizedBox(height: 24),
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 16,
-            runSpacing: 16,
-            children: [
-              _VoterCard(),
-              _ReviewerCard(),
-            ],
+          const _Header(),
+          const SizedBox(height: 24),
+          BlocSelector<DiscoveryCubit, DiscoveryState, CampaignDatesEventsState>(
+            selector: (state) => state.campaign.datesEvents,
+            builder: (context, datesEvents) {
+              return Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 16,
+                runSpacing: 16,
+                children: [
+                  _VoterCard(datesEvents: datesEvents),
+                  _ReviewerCard(datesEvents: datesEvents),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -113,12 +118,24 @@ class _Header extends StatelessWidget {
 }
 
 class _RangeTimelineCard extends StatelessWidget {
-  final List<Widget> children;
+  final List<({DateRange? dateRange, String title})> timelineItems;
 
-  const _RangeTimelineCard({required this.children});
+  const _RangeTimelineCard({required this.timelineItems});
 
   @override
   Widget build(BuildContext context) {
+    final validItems = timelineItems
+        .where((item) => item.dateRange != null)
+        .map((item) => _DatetimeRangeTimeline(
+              dateRange: item.dateRange,
+              title: item.title,
+            ))
+        .toList();
+
+    if (validItems.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -130,14 +147,16 @@ class _RangeTimelineCard extends StatelessWidget {
         alignment: WrapAlignment.spaceBetween,
         spacing: 8,
         runSpacing: 8,
-        children: children,
+        children: validItems,
       ),
     );
   }
 }
 
 class _ReviewerCard extends StatelessWidget {
-  const _ReviewerCard();
+  final CampaignDatesEventsState datesEvents;
+
+  const _ReviewerCard({required this.datesEvents});
 
   @override
   Widget build(BuildContext context) {
@@ -151,28 +170,14 @@ class _ReviewerCard extends StatelessWidget {
         children: [
           const SizedBox(height: 16),
           _RangeTimelineCard(
-            children: [
-              BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
-                selector: (state) {
-                  return state.campaign.reviewRegistrationStartsAt;
-                },
-                builder: (context, date) {
-                  return _DatetimeRangeTimeline(
-                    dateRange: date,
-                    title: context.l10n.reviewRegistration,
-                  );
-                },
+            timelineItems: [
+              (
+                dateRange: datesEvents.reviewRegistrationStartsAt,
+                title: context.l10n.reviewRegistration,
               ),
-              BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
-                selector: (state) {
-                  return state.campaign.votingStartsAt;
-                },
-                builder: (context, date) {
-                  return _DatetimeRangeTimeline(
-                    dateRange: date,
-                    title: context.l10n.reviewTimelineHeader,
-                  );
-                },
+              (
+                dateRange: datesEvents.reviewStartsAt,
+                title: context.l10n.reviewTimelineHeader,
               ),
             ],
           ),
@@ -289,7 +294,9 @@ class _StayInvolvedCard extends StatelessWidget {
 }
 
 class _VoterCard extends StatelessWidget {
-  const _VoterCard();
+  final CampaignDatesEventsState datesEvents;
+
+  const _VoterCard({required this.datesEvents});
 
   @override
   Widget build(BuildContext context) {
@@ -303,29 +310,14 @@ class _VoterCard extends StatelessWidget {
         children: [
           const SizedBox(height: 16),
           _RangeTimelineCard(
-            children: [
-              BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
-                selector: (state) {
-                  return state.campaign.votingRegistrationStartsAt;
-                },
-                builder: (context, date) {
-                  return _DatetimeRangeTimeline(
-                    dateRange: date,
-                    title: context.l10n.votingRegistrationTimelineHeader,
-                  );
-                },
+            timelineItems: [
+              (
+                dateRange: datesEvents.votingRegistrationStartsAt,
+                title: context.l10n.votingRegistrationTimelineHeader,
               ),
-              const SizedBox(height: 16),
-              BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
-                selector: (state) {
-                  return state.campaign.votingStartsAt;
-                },
-                builder: (context, date) {
-                  return _DatetimeRangeTimeline(
-                    dateRange: date,
-                    title: context.l10n.votingTimelineHeader,
-                  );
-                },
+              (
+                dateRange: datesEvents.votingStartsAt,
+                title: context.l10n.votingTimelineHeader,
               ),
             ],
           ),

@@ -6,8 +6,7 @@ import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_p
 import 'package:catalyst_voices/pages/discovery/sections/campaign_hero.dart';
 import 'package:catalyst_voices/pages/discovery/sections/how_it_works.dart';
 import 'package:catalyst_voices/pages/discovery/sections/stay_involved.dart';
-import 'package:catalyst_voices/pages/discovery/state_selectors/campaign_categories_state_selector.dart';
-import 'package:catalyst_voices/pages/discovery/state_selectors/current_campaign_selector.dart';
+import 'package:catalyst_voices/pages/discovery/state_selectors/campaign_details_selector.dart';
 import 'package:catalyst_voices/pages/discovery/state_selectors/most_recent_proposals_selector.dart';
 import 'package:catalyst_voices/widgets/banner/widgets/email_need_verification_banner.dart';
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_wide_screen_constrained.dart';
@@ -36,8 +35,7 @@ class _Body extends StatelessWidget {
             [
               const CampaignHeroSection(),
               const HowItWorks(),
-              const CurrentCampaignSelector(),
-              const CampaignCategoriesStateSelector(),
+              const CampaignDetailsSelector(),
               const StayInvolved(),
               const MostRecentProposalsSelector(),
             ].constrainedDelegate(
