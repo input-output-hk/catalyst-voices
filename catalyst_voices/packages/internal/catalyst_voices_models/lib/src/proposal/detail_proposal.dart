@@ -40,7 +40,8 @@ final class DetailProposal extends CoreProposal {
       categoryRef: data.document.metadata.categoryId,
       title: data.document.title ?? '',
       description: data.document.description ?? '',
-      fundsRequested: data.document.fundsRequested ?? Money.zero(currency: data.document.currency),
+      fundsRequested:
+          data.document.fundsRequested ?? Money.zero(currency: const Currency.fallback()),
       publish: data.publish,
       duration: data.document.duration ?? 0,
       author: data.document.authorName,

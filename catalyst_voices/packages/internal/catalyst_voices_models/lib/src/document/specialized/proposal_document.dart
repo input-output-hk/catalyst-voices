@@ -72,8 +72,6 @@ final class ProposalDocument extends Equatable {
 
   String? get authorName => _metadataAuthorName ?? _contentAuthorName;
 
-  Currency get currency => metadata.currency;
-
   String? get description {
     final property = document.getProperty(descriptionNodeId);
 
@@ -107,7 +105,7 @@ final class ProposalDocument extends Equatable {
     }
 
     return Money.fromMajorUnits(
-      currency: metadata.currency,
+      currency: property.schema.format?.currency ?? const Currency.fallback(),
       majorUnits: BigInt.from(value),
     );
   }
@@ -171,16 +169,14 @@ final class ProposalMetadata extends DocumentMetadata {
   final SignedDocumentRef templateRef;
   final SignedDocumentRef categoryId;
   final List<CatalystId> authors;
-  final Currency currency;
 
   ProposalMetadata({
     required super.selfRef,
     required this.templateRef,
     required this.categoryId,
     required this.authors,
-    required this.currency,
   });
 
   @override
-  List<Object?> get props => super.props + [templateRef, categoryId, authors, currency];
+  List<Object?> get props => super.props + [templateRef, categoryId, authors];
 }

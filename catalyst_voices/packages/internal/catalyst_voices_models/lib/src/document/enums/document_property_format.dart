@@ -16,7 +16,7 @@ enum DocumentPropertyFormat {
   tagGroup('tagGroup'),
   tagSelection('tagSelection'),
   tokenCardanoAda('token:cardano:ada', Currency.ada()),
-  usd('usd', Currency.usd()),
+  fiatUsd('fiat:usd', Currency.usd()),
   durationInMonths('datetime:duration:months'),
   yesNoChoice('yesNoChoice'),
   agreementConfirmation('agreementConfirmation'),
