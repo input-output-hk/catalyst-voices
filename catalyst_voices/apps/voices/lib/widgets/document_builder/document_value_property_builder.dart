@@ -37,7 +37,7 @@ class DocumentValuePropertyBuilder extends StatelessWidget {
         return DocumentTokenValueWidget(
           property: schema.castProperty(property),
           schema: schema,
-          currency: const Currency.ada(),
+          currency: schema.format?.currency ?? const Currency.fallback(),
           isEditMode: isEditMode,
           onChanged: onChanged,
         );

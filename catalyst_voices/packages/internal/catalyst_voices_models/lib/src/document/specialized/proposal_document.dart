@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_models/src/document/document_metadata.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -73,6 +72,8 @@ final class ProposalDocument extends Equatable {
 
   String? get authorName => _metadataAuthorName ?? _contentAuthorName;
 
+  Currency get currency => metadata.currency;
+
   String? get description {
     final property = document.getProperty(descriptionNodeId);
 
@@ -93,7 +94,7 @@ final class ProposalDocument extends Equatable {
     return property.value;
   }
 
-  Coin? get fundsRequested {
+  Money? get fundsRequested {
     final property = document.getProperty(requestedFundsNodeId);
 
     if (property is! DocumentValueProperty<int>) {
@@ -101,8 +102,14 @@ final class ProposalDocument extends Equatable {
     }
 
     final value = property.value;
-    if (value == null) return null;
-    return Coin.fromWholeAda(value);
+    if (value == null) {
+      return null;
+    }
+
+    return Money.fromMajorUnits(
+      currency: metadata.currency,
+      majorUnits: BigInt.from(value),
+    );
   }
 
   int? get milestoneCount {
@@ -164,14 +171,16 @@ final class ProposalMetadata extends DocumentMetadata {
   final SignedDocumentRef templateRef;
   final SignedDocumentRef categoryId;
   final List<CatalystId> authors;
+  final Currency currency;
 
   ProposalMetadata({
     required super.selfRef,
     required this.templateRef,
     required this.categoryId,
     required this.authors,
+    required this.currency,
   });
 
   @override
-  List<Object?> get props => super.props + [templateRef, categoryId, authors];
+  List<Object?> get props => super.props + [templateRef, categoryId, authors, currency];
 }

@@ -75,11 +75,14 @@ class _GoodToKnow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final money = CardanoWalletDetails.minAdaForRegistration.toMoney();
+
     return TipCard(
       headerText: context.l10n.goodToKnow,
       tips: [
         context.l10n.registrationTransactionFeeDescription(
-          CardanoWalletDetails.minAdaForRegistration.ada,
+          MoneyFormatter.formatCompactRounded(money, decoration: MoneyDecoration.code),
+          money.currency.isoCode.code,
         ),
       ],
     );

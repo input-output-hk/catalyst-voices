@@ -725,12 +725,12 @@
   "@createProfileInstructionsEmailRequest": {
     "description": "Request to provide email address"
   },
-  "createProfileInstructionsMessage": "In the following account creation steps we will:\n\n1. Setup your profile\n2. Create your Catalyst Keychain\n3. Link Cardano wallet & roles\n\nTo ensure a smooth experience, completing your account setup in one session is essential—stay focused and avoid interruptions to finalize everything efficiently. Make sure your Cardano wallet has at least {amount} ADA before continuing.",
+  "createProfileInstructionsMessage": "In the following account creation steps we will:\n\n1. Setup your profile\n2. Create your Catalyst Keychain\n3. Link Cardano wallet & roles\n\nTo ensure a smooth experience, completing your account setup in one session is essential—stay focused and avoid interruptions to finalize everything efficiently. Make sure your Cardano wallet has at least {money} before continuing.",
   "@createProfileInstructionsMessage": {
     "description": "Information about account creation steps",
     "placeholders": {
-      "amount": {
-        "type": "double"
+      "money": {
+        "type": "String"
       }
     }
   },
@@ -1285,7 +1285,7 @@
       }
     }
   },
-  "errorValidationTokenNotParsed": "Invalid input. Could not parse parse.",
+  "errorValidationTokenNotParsed": "Invalid input. Could not parse.",
   "@errorValidationTokenNotParsed": {
     "description": "A validation error when user enters input which cannot be parsed into token value."
   },
@@ -1473,7 +1473,7 @@
   },
   "fundsRequested": "Funds requested",
   "@fundsRequested": {
-    "description": "Indicates the amount of ADA requested in a fund on a proposal card."
+    "description": "Indicates the amount of money requested in a fund on a proposal card."
   },
   "getReadyToVote": "Get ready to vote",
   "@getReadyToVote": {
@@ -2839,13 +2839,15 @@
   "@registrationTransactionFailed": {
     "description": "Indicates an error when submitting a registration transaction failed."
   },
-  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 ADA), be sure your wallet has a minimum of {amount} ADA.",
+  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 {currency}), be sure your wallet has a minimum of {money}.",
   "@registrationTransactionFeeDescription": {
     "description": "Description for the registration transaction fee",
     "placeholders": {
-      "amount": {
-        "type": "double",
-        "format": "compact"
+      "money": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
       }
     }
   },
@@ -3857,13 +3859,12 @@
       }
     }
   },
-  "walletLinkWalletDetailsLowBalanceHeadsUpText": "Please ensure your Cardano wallet has at least {amount} ADA before continuing.",
+  "walletLinkWalletDetailsLowBalanceHeadsUpText": "Please ensure your Cardano wallet has at least {money} before continuing.",
   "@walletLinkWalletDetailsLowBalanceHeadsUpText": {
     "description": "A heads up content explaining that the user needs to have some ada for registration.",
     "placeholders": {
-      "amount": {
-        "type": "double",
-        "format": "compact"
+      "money": {
+        "type": "String"
       }
     }
   },

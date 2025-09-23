@@ -2,6 +2,7 @@ import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -235,7 +236,11 @@ class _DocumentPropertyReadBuilderState extends State<DocumentPropertyReadBuilde
         );
       case DocumentTokenValueCardanoAdaSchema():
         final num = schema.castValue(value);
-        final text = num != null ? const Currency.ada().format(num) : null;
+        final currency = schema.format?.currency ?? const Currency.fallback();
+        final money = num != null
+            ? Money.fromMajorUnits(currency: currency, majorUnits: BigInt.from(num))
+            : null;
+        final text = money != null ? MoneyFormatter.formatExactAmount(money) : null;
 
         return DocumentTextListItem(
           id: property.nodeId,
