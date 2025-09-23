@@ -360,7 +360,10 @@ final class VotingCubit extends Cubit<VotingState>
 
   void _resetCache() {
     final activeAccount = _userService.user.activeAccount;
-    final filters = ProposalsFilters(author: activeAccount?.catalystId);
+    final filters = ProposalsFilters(
+      author: activeAccount?.catalystId,
+      campaign: CampaignFilters.active(),
+    );
 
     _cache = VotingCubitCache(
       filters: filters,

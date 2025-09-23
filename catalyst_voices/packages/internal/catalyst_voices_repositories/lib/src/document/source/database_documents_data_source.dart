@@ -52,7 +52,7 @@ final class DatabaseDocumentsDataSource
     return _database.proposalsDao
         .queryProposals(
           categoryRef: categoryRef,
-          filters: ProposalsFilters(type: type),
+          filters: ProposalsFilters(type: type, campaign: CampaignFilters.active()),
         )
         .then((value) => value.map((e) => e.toModel()).toList());
   }
