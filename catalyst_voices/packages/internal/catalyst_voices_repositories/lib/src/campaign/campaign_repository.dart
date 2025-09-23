@@ -29,7 +29,7 @@ final class CampaignRepositoryImpl implements CampaignRepository {
 
   @override
   Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
-    return [Campaign.f14(), Campaign.f15()]
+    return Campaign.all
         .expand((element) => element.categories)
         .firstWhere(
           (e) => e.selfRef.id == ref.id,

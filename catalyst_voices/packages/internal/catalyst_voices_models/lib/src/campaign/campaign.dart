@@ -36,6 +36,11 @@ final class Campaign extends Equatable {
     required this.publish,
   });
 
+  static List<Campaign> all = [
+    Campaign.f14(),
+    Campaign.f15(),
+  ];
+
   factory Campaign.f14() {
     return Campaign(
       selfRef: f14Ref,

@@ -189,9 +189,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       _cachedCampaign ??= await _campaignService.getActiveCampaign();
 
       // TODO(damian-molinski): proposal should have ref to campaign
-      final f14 = Campaign.f14();
-      final f15 = Campaign.f15();
-      final campaigns = [f14, f15];
+      final campaigns = Campaign.all;
 
       final categories = campaigns.expand((element) => element.categories);
       final category = categories.firstWhereOrNull((e) => e.selfRef.id == proposal.categoryRef.id);
