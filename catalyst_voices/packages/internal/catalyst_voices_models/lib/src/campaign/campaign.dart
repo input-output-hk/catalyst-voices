@@ -28,7 +28,6 @@ final class Campaign extends Equatable {
   final int fundNumber;
   final CampaignTimeline timeline;
   final List<CampaignCategory> categories;
-
   final CampaignPublish publish;
 
   const Campaign({
