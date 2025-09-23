@@ -7,6 +7,7 @@ final class ProposalsCountFilters extends Equatable {
   final SignedDocumentRef? category;
   final String? searchQuery;
   final Duration? maxAge;
+  final CampaignFilters? _campaign;
 
   const ProposalsCountFilters({
     this.author,
@@ -14,7 +15,12 @@ final class ProposalsCountFilters extends Equatable {
     this.category,
     this.searchQuery,
     this.maxAge,
-  });
+    CampaignFilters? campaign,
+  }) : _campaign = campaign;
+
+  CampaignFilters get campaign {
+    return _campaign ?? CampaignFilters.active();
+  }
 
   @override
   List<Object?> get props => [
@@ -23,5 +29,6 @@ final class ProposalsCountFilters extends Equatable {
     category,
     searchQuery,
     maxAge,
+    _campaign,
   ];
 }

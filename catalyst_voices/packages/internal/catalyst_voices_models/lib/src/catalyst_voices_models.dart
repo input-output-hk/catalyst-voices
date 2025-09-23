@@ -8,6 +8,7 @@ export 'auth/seed_phrase.dart';
 export 'blockchain/blockchain_slot_config.dart';
 export 'campaign/campaign.dart';
 export 'campaign/campaign_category.dart';
+export 'campaign/campaign_filters.dart';
 export 'campaign/campaign_phase.dart';
 export 'campaign/campaign_timeline.dart';
 export 'common/hi_lo/hi_lo.dart';

@@ -16,8 +16,13 @@ import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/extensions/json1.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
+/// Exposes only public operation on proposals, and related tables.
+/// This is a wrapper around [DocumentsDao] and [DraftsDao] to provide a single interface for proposals.
+/// Since proposals are composed of multiple documents (template, action, comments, etc.) we need to
+/// join multiple tables to get all the information about a proposal, which make sense to create this specialized dao.
 @DriftAccessor(
   tables: [
     Documents,
@@ -25,10 +30,6 @@ import 'package:rxdart/rxdart.dart';
     DocumentsFavorites,
   ],
 )
-/// Exposes only public operation on proposals, and related tables.
-/// This is a wrapper around [DocumentsDao] and [DraftsDao] to provide a single interface for proposals.
-/// Since proposals are composed of multiple documents (template, action, comments, etc.) we need to
-/// join multiple tables to get all the information about a proposal, which make sense to create this specialized dao.
 class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
     with $DriftProposalsDaoMixin
     implements ProposalsDao {
@@ -36,11 +37,25 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
   // TODO(dt-iohk): it seems that this method doesn't correctly filter by ProposalsFilterType.my
   // since it does not check for author, consider to use another type which doesn't have "my" case.
+
+  // TODO(damian-molinski): filters is only used for campaign and type.
   @override
   Future<List<JoinedProposalEntity>> queryProposals({
     SignedDocumentRef? categoryRef,
-    required ProposalsFilterType type,
+    required ProposalsFilters filters,
   }) async {
+    if (<Object?>[
+      filters.author,
+      filters.onlyAuthor,
+      filters.category,
+      filters.searchQuery,
+      filters.maxAge,
+    ].nonNulls.isNotEmpty) {
+      if (kDebugMode) {
+        print('queryProposals supports only campaign and type filters');
+      }
+    }
+
     final latestProposalRef = alias(documents, 'latestProposalRef');
     final proposal = alias(documents, 'proposal');
 
@@ -73,6 +88,9 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
               proposal.type.equalsValue(DocumentType.proposalDocument),
               proposal.metadata.jsonExtract(r'$.template').isNotNull(),
               proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+              proposal.metadata
+                  .jsonExtract(r'$.categoryId.id')
+                  .isIn(filters.campaign.categoriesIds),
             ]),
           )
           ..orderBy([OrderingTerm.asc(proposal.verHi)]);
@@ -81,7 +99,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
       mainQuery.where(proposal.metadata.isCategory(categoryRef));
     }
 
-    final ids = await _getFilterTypeIds(type);
+    final ids = await _getFilterTypeIds(filters.type);
 
     final include = ids.include;
     if (include != null) {
@@ -158,6 +176,9 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
               // Safe check for invalid proposals
               proposal.metadata.jsonExtract(r'$.template').isNotNull(),
               proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+              proposal.metadata
+                  .jsonExtract(r'$.categoryId.id')
+                  .isIn(filters.campaign.categoriesIds),
             ]),
           )
           ..orderBy(order.terms(proposal))
@@ -514,6 +535,9 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
           // Safe check for invalid proposals
           documents.metadata.jsonExtract(r'$.template').isNotNull(),
           documents.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+          documents.metadata
+              .jsonExtract(r'$.categoryId.id')
+              .isIn((filters?.campaign ?? CampaignFilters.active()).categoriesIds),
         ]),
       )
       ..orderBy([OrderingTerm.desc(documents.verHi)])
@@ -714,7 +738,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 abstract interface class ProposalsDao {
   Future<List<JoinedProposalEntity>> queryProposals({
     SignedDocumentRef? categoryRef,
-    required ProposalsFilterType type,
+    required ProposalsFilters filters,
   });
 
   Future<Page<JoinedProposalEntity>> queryProposalsPage({
