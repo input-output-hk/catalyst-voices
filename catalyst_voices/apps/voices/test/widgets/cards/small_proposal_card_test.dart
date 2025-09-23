@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/widgets/cards/proposal/proposal_card_widgets.dart'
     show DraftProposalChip, FinalProposalChip, PrivateProposalChip;
 import 'package:catalyst_voices/widgets/cards/proposal/small_proposal_card.dart';
@@ -33,7 +32,7 @@ void main() {
         selfRef: SignedDocumentRef(id: proposalId, version: latestVersion),
         title: 'Test Proposal',
         updateDate: DateTime.now(),
-        fundsRequested: const Coin(0),
+        fundsRequested: Money.zero(currency: const Currency.ada()),
         publish: ProposalPublish.publishedDraft,
         versions: [
           ProposalVersionViewModel(

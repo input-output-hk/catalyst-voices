@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:collection/collection.dart';
 
 /// Allows access to campaign data, categories, and timeline.
 abstract interface class CampaignRepository {
@@ -8,7 +9,7 @@ abstract interface class CampaignRepository {
     required String id,
   });
 
-  Future<CampaignCategory> getCategory(SignedDocumentRef ref);
+  Future<CampaignCategory?> getCategory(SignedDocumentRef ref);
 }
 
 final class CampaignRepositoryImpl implements CampaignRepository {
@@ -22,12 +23,7 @@ final class CampaignRepositoryImpl implements CampaignRepository {
   }
 
   @override
-  Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
-    return staticCampaignCategories.firstWhere(
-      (e) => e.selfRef.id == ref.id,
-      orElse: () => throw NotFoundException(
-        message: 'Did not find category with ref $ref',
-      ),
-    );
+  Future<CampaignCategory?> getCategory(SignedDocumentRef ref) async {
+    return staticCampaignCategories.firstWhereOrNull((e) => e.selfRef.id == ref.id);
   }
 }

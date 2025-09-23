@@ -34,16 +34,13 @@ class TokenField extends StatelessWidget {
     this.placeholder,
     this.focusNode,
     this.range,
-    this.currency = const Currency.ada(),
+    required this.currency,
     this.showHelper = true,
     this.enabled = true,
     this.readOnly = false,
     this.ignorePointers,
     this.helperWidget,
-  }) : assert(
-         currency == const Currency.ada(),
-         'Only supports ADA at the moment',
-       );
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -115,15 +112,23 @@ class _Helper extends StatelessWidget {
     final min = range?.min;
     final max = range?.max;
 
+    final minMoney = min != null
+        ? Money.fromMajorUnits(currency: currency, majorUnits: BigInt.from(min))
+        : null;
+
+    final maxMoney = max != null
+        ? Money.fromMajorUnits(currency: currency, majorUnits: BigInt.from(max))
+        : null;
+
     const boldStyle = TextStyle(fontWeight: FontWeight.bold);
 
-    if (min != null && max != null) {
+    if (minMoney != null && maxMoney != null) {
       return PlaceholderRichText(
         context.l10n.requestedAmountShouldBeBetweenMinAndMax('{min}', '{max}'),
         placeholderSpanBuilder: (context, placeholder) {
           return switch (placeholder) {
-            'min' => TextSpan(text: currency.format(min), style: boldStyle),
-            'max' => TextSpan(text: currency.format(max), style: boldStyle),
+            'min' => TextSpan(text: MoneyFormatter.formatExactAmount(minMoney), style: boldStyle),
+            'max' => TextSpan(text: MoneyFormatter.formatExactAmount(maxMoney), style: boldStyle),
             _ => throw ArgumentError('Unknown placeholder[$placeholder]'),
           };
         },
@@ -131,24 +136,24 @@ class _Helper extends StatelessWidget {
       );
     }
 
-    if (min != null) {
+    if (minMoney != null) {
       return PlaceholderRichText(
         context.l10n.requestedAmountShouldBeMoreThan('{min}'),
         placeholderSpanBuilder: (context, placeholder) {
           return switch (placeholder) {
-            'min' => TextSpan(text: currency.format(min), style: boldStyle),
+            'min' => TextSpan(text: MoneyFormatter.formatExactAmount(minMoney), style: boldStyle),
             _ => throw ArgumentError('Unknown placeholder[$placeholder]'),
           };
         },
       );
     }
 
-    if (max != null) {
+    if (maxMoney != null) {
       return PlaceholderRichText(
         context.l10n.requestedAmountShouldBeLessThan('{max}'),
         placeholderSpanBuilder: (context, placeholder) {
           return switch (placeholder) {
-            'max' => TextSpan(text: currency.format(max), style: boldStyle),
+            'max' => TextSpan(text: MoneyFormatter.formatExactAmount(maxMoney), style: boldStyle),
             _ => throw ArgumentError('Unknown placeholder[$placeholder]'),
           };
         },

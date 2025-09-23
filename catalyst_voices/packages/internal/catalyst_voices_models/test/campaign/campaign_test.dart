@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
@@ -111,8 +110,8 @@ void main() {
         selfRef: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
-        allFunds: const Coin(100),
-        totalAsk: const Coin(0),
+        allFunds: _multiCurrency(100),
+        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -156,8 +155,8 @@ void main() {
         selfRef: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
-        allFunds: const Coin(100),
-        totalAsk: const Coin(0),
+        allFunds: _multiCurrency(100),
+        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -224,8 +223,8 @@ void main() {
         selfRef: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
-        allFunds: const Coin(100),
-        totalAsk: const Coin(0),
+        allFunds: _multiCurrency(100),
+        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -285,8 +284,8 @@ void main() {
         selfRef: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
-        allFunds: const Coin(100),
-        totalAsk: const Coin(0),
+        allFunds: _multiCurrency(100),
+        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -346,8 +345,8 @@ void main() {
         selfRef: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
-        allFunds: const Coin(100),
-        totalAsk: const Coin(0),
+        allFunds: _multiCurrency(100),
+        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -421,8 +420,8 @@ void main() {
         selfRef: SignedDocumentRef.generateFirstRef(),
         name: 'Campaign 1',
         description: 'Description 1',
-        allFunds: const Coin(100),
-        totalAsk: const Coin(0),
+        allFunds: _multiCurrency(100),
+        totalAsk: _multiCurrency(0),
         fundNumber: 1,
         categories: const [],
         timeline: CampaignTimeline(
@@ -466,4 +465,25 @@ void main() {
       expect(result, equals(now));
     });
   });
+}
+
+Money _ada(int minorUnits) {
+  return Money(
+    currency: const Currency.ada(),
+    minorUnits: BigInt.from(minorUnits),
+  );
+}
+
+MultiCurrencyAmount _multiCurrency(int minorUnits) {
+  return MultiCurrencyAmount.list([
+    _ada(minorUnits),
+    _usd(minorUnits),
+  ]);
+}
+
+Money _usd(int minorUnits) {
+  return Money(
+    currency: const Currency.usd(),
+    minorUnits: BigInt.from(minorUnits),
+  );
 }
