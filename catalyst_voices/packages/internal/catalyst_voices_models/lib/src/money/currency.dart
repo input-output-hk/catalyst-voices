@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/src/money/currency_code.dart';
 import 'package:equatable/equatable.dart';
 import 'package:money2/money2.dart' as money2;
 
@@ -8,7 +9,7 @@ import 'package:money2/money2.dart' as money2;
 /// like ADA and USD, as well as helpers to format amounts.
 final class Currency extends Equatable {
   /// The ISO 4217 code of the currency (e.g., ADA, USD).
-  final CurrencyIsoCode isoCode;
+  final CurrencyCode isoCode;
 
   /// The symbol used to represent the currency (e.g., ₳, $).
   final String symbol;
@@ -37,7 +38,7 @@ final class Currency extends Equatable {
   /// Predefined ADA currency (₳, 6 decimals).
   const Currency.ada()
     : this(
-        isoCode: CurrencyIsoCode.ada,
+        isoCode: CurrencyCode.ada,
         symbol: '₳',
         decimalDigits: 6,
         defaultPattern: '0.######',
@@ -51,7 +52,7 @@ final class Currency extends Equatable {
   /// Predefined USD currency ($, 2 decimals).
   const Currency.usd()
     : this(
-        isoCode: CurrencyIsoCode.usd,
+        isoCode: CurrencyCode.usd,
         symbol: r'$',
         decimalDigits: 2,
         defaultPattern: '0.00',
@@ -95,18 +96,3 @@ final class Currency extends Equatable {
   }
 }
 
-/// ISO-4217 currency code.
-///
-/// For fiat currencies 3 uppercase letter code.
-///
-/// For cryptocurrencies can be longer and usually doesn't represent
-/// a valid ISO-4217 since cryptocurrencies aren't covered.
-enum CurrencyIsoCode {
-  ada('ADA'),
-  usd('USD');
-
-  /// The iso code.
-  final String code;
-
-  const CurrencyIsoCode(this.code);
-}
