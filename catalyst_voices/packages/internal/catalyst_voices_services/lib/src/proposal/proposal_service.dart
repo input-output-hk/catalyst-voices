@@ -603,9 +603,13 @@ final class ProposalServiceImpl implements ProposalService {
         return const Stream.empty();
       }
 
+      final activeCampaign = _activeCampaignObserver.campaign;
+      final categoriesIds = activeCampaign?.categories.map((e) => e.selfRef.id).toList();
+
       final filters = ProposalsCountFilters(
         author: authorId,
         onlyAuthor: true,
+        campaign: categoriesIds != null ? CampaignFilters(categoriesIds: categoriesIds) : null,
       );
 
       return watchProposalsCount(filters: filters);
