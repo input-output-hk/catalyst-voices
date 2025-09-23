@@ -13,6 +13,8 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
     CatalystId? authorId,
   });
 
+  Future<List<TypedDocumentRef>> index();
+
   Future<List<DocumentData>> queryVersionsOfId({required String id});
 
   Future<void> save({required DocumentData data});

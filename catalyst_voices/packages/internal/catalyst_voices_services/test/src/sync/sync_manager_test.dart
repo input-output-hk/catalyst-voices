@@ -59,7 +59,9 @@ void main() {
       final cachedRefs = <TypedDocumentRef>[];
 
       // When
-      when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
+      when(
+        () => documentRepository.getAllDocumentsRefs(campaign: Campaign.f15()),
+      ).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
       when(
         () => documentRepository.cacheDocument(ref: any(named: 'ref')),

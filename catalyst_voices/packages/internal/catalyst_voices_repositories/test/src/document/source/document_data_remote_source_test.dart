@@ -73,7 +73,7 @@ void main() {
           ),
         ).thenAnswer((_) => Future.value(pageOneResponse));
 
-        final refs = await source.index();
+        final refs = await source.index(campaign: Campaign.f14());
 
         // Then
         expect(refs, isNotEmpty);
@@ -130,7 +130,7 @@ void main() {
           ),
         ).thenAnswer((_) => Future.value(response));
 
-        final refs = await source.index();
+        final refs = await source.index(campaign: Campaign.f14());
 
         // Then
         expect(

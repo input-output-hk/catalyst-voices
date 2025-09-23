@@ -313,10 +313,12 @@ void main() {
             ...refs,
           ];
 
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(remoteRefs));
+          when(
+            () => remoteDocuments.index(campaign: Campaign.f14()),
+          ).thenAnswer((_) => Future.value(remoteRefs));
 
           // When
-          final allRefs = await repository.getAllDocumentsRefs();
+          final allRefs = await repository.getAllDocumentsRefs(campaign: Campaign.f14());
 
           // Then
           expect(
@@ -338,9 +340,11 @@ void main() {
           );
 
           // When
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(refs));
+          when(
+            () => remoteDocuments.index(campaign: Campaign.f14()),
+          ).thenAnswer((_) => Future.value(refs));
 
-          await repository.getAllDocumentsRefs();
+          await repository.getAllDocumentsRefs(campaign: Campaign.f14());
 
           // Then
           verifyNever(() => remoteDocuments.getLatestVersion(any()));
@@ -365,12 +369,14 @@ void main() {
           final refs = [...exactRefs, ...looseRefs];
 
           // When
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(refs));
+          when(
+            () => remoteDocuments.index(campaign: Campaign.f14()),
+          ).thenAnswer((_) => Future.value(refs));
           when(
             () => remoteDocuments.getLatestVersion(any()),
           ).thenAnswer((_) => Future(DocumentRefFactory.randomUuidV7));
 
-          final allRefs = await repository.getAllDocumentsRefs();
+          final allRefs = await repository.getAllDocumentsRefs(campaign: Campaign.f14());
 
           // Then
           verify(() => remoteDocuments.getLatestVersion(any())).called(looseRefs.length);
@@ -405,9 +411,11 @@ void main() {
           ];
 
           // When
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(refs));
+          when(
+            () => remoteDocuments.index(campaign: Campaign.f14()),
+          ).thenAnswer((_) => Future.value(refs));
 
-          final allRefs = await repository.getAllDocumentsRefs();
+          final allRefs = await repository.getAllDocumentsRefs(campaign: Campaign.f14());
 
           // Then
           if (constTemplatesRefs.isNotEmpty) {
@@ -444,9 +452,11 @@ void main() {
           ];
 
           // When
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(refs));
+          when(
+            () => remoteDocuments.index(campaign: Campaign.f14()),
+          ).thenAnswer((_) => Future.value(refs));
 
-          final allRefs = await repository.getAllDocumentsRefs();
+          final allRefs = await repository.getAllDocumentsRefs(campaign: Campaign.f14());
 
           // Then
           expect(allRefs, isNot(containsAll(categoriesRefs)));
@@ -476,9 +486,11 @@ void main() {
           ];
 
           // When
-          when(() => remoteDocuments.index()).thenAnswer((_) => Future.value(docsRefs));
+          when(
+            () => remoteDocuments.index(campaign: Campaign.f14()),
+          ).thenAnswer((_) => Future.value(docsRefs));
 
-          final allRefs = await repository.getAllDocumentsRefs();
+          final allRefs = await repository.getAllDocumentsRefs(campaign: Campaign.f14());
 
           // Then
           expect(allRefs, containsAll(expectedRefs));
