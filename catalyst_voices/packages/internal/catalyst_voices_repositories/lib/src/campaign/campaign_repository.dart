@@ -18,7 +18,13 @@ final class CampaignRepositoryImpl implements CampaignRepository {
   Future<Campaign> getCampaign({
     required String id,
   }) async {
-    return Campaign.f14();
+    if (id == Campaign.f15Ref.id) {
+      return Campaign.f15();
+    }
+    if (id == Campaign.f14Ref.id) {
+      return Campaign.f14();
+    }
+    throw NotFoundException(message: 'Campaign $id not found');
   }
 
   @override

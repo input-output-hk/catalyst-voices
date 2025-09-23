@@ -2,6 +2,8 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_models/src/campaign/constant/f14_static_campaign_categories.dart';
 import 'package:catalyst_voices_models/src/campaign/constant/f14_static_campaign_timeline.dart';
+import 'package:catalyst_voices_models/src/campaign/constant/f15_static_campaign_categories.dart';
+import 'package:catalyst_voices_models/src/campaign/constant/f15_static_campaign_timeline.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
@@ -45,6 +47,20 @@ Project Catalyst turns economic power into innovation power by using the Cardano
       timeline: f14StaticCampaignTimeline,
       publish: CampaignPublish.published,
       categories: f14StaticCampaignCategories,
+    );
+  }
+
+  factory Campaign.f15() {
+    return Campaign(
+      selfRef: f15Ref,
+      name: 'Catalyst Fund15',
+      description: '''TODO''',
+      allFunds: const Coin.fromWholeAda(0),
+      totalAsk: const Coin.fromWholeAda(0),
+      fundNumber: 15,
+      timeline: f15StaticCampaignTimeline,
+      publish: CampaignPublish.published,
+      categories: f15StaticCampaignCategories,
     );
   }
 

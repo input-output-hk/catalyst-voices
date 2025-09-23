@@ -59,7 +59,7 @@ final class CampaignServiceImpl implements CampaignService {
       return _activeCampaignObserver.campaign;
     }
     // TODO(LynxLynxx): Call backend to get latest active campaign
-    final campaign = _mockedActiveCampaign ?? await getCampaign(id: Campaign.f14Ref.id);
+    final campaign = _mockedActiveCampaign ?? await getCampaign(id: Campaign.f15Ref.id);
     _activeCampaignObserver.campaign = campaign;
     return campaign;
   }
