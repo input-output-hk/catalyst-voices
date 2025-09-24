@@ -58,15 +58,11 @@ pub async fn latest_rbac_chain(id: &CatalystId) -> Result<Option<ChainInfo>> {
             last_txn
         };
 
-        // TODO: FIXME:
-        let stake_addresses = Vec::new();
-
         ChainInfo {
             chain,
             last_persistent_txn,
             last_volatile_txn,
             last_persistent_slot,
-            stake_addresses,
         }
     }))
 }
@@ -134,9 +130,8 @@ pub async fn apply_regs(
 
     for reg in regs {
         if !reg.removed_stake_addresses.is_empty() {
-            // TODO: FIXME:
             // TODO: This should be handled as a part of the
-            // https://github.com/input-output-hk/catalyst-voices/issues/2599 task.
+            // https://github.com/input-output-hk/catalyst-voices/issues/3464 task.
             continue;
         }
         let reg = cip509(network, reg.slot_no.into(), reg.txn_index.into()).await?;

@@ -77,7 +77,9 @@ impl RbacRegistrationChainV2 {
         let mut last_volatile_txn = None;
         let mut purpose = Vec::new().into();
         let mut roles = Vec::new().into();
-        let mut stake_addresses = Vec::new().into();
+        // TODO: This list needs to be updated as a part of the
+        // https://github.com/input-output-hk/catalyst-voices/issues/3464 task.
+        let stake_addresses = Vec::new().into();
         if let Some(info) = info {
             last_persistent_txn = info.last_persistent_txn.map(Into::into);
             last_volatile_txn = info.last_volatile_txn.map(Into::into);
@@ -90,13 +92,6 @@ impl RbacRegistrationChainV2 {
                 .collect::<Vec<_>>()
                 .into();
             roles = role_data(info)?.into();
-            stake_addresses = info
-                .stake_addresses
-                .iter()
-                .cloned()
-                .map(Into::into)
-                .collect::<Vec<_>>()
-                .into();
         }
 
         Ok(Some(Self {
