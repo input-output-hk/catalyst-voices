@@ -12,6 +12,7 @@ class VoicesDoubleField extends VoicesNumField<double> {
     super.validator,
     required super.onFieldSubmitted,
     List<TextInputFormatter>? inputFormatters,
+    int? decimalDigits,
     super.enabled,
     super.readOnly,
     super.ignorePointers,
@@ -19,7 +20,7 @@ class VoicesDoubleField extends VoicesNumField<double> {
          codec: const DoubleCodec(),
          keyboardType: const TextInputType.numberWithOptions(decimal: true),
          inputFormatters: [
-           FilteringTextInputFormatter.digitsOnly,
+           DecimalTextInputFormatter(maxDecimalDigits: decimalDigits),
            ...?inputFormatters,
          ],
        );
