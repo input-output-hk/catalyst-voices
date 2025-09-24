@@ -1238,6 +1238,15 @@
       }
     }
   },
+  "errorValidationNumNotMultipleOf": "The value should be a multiple of {multipleOf}",
+  "@errorValidationNumNotMultipleOf": {
+    "description": "Validation error when the numerical value is not a multiple of of another value.",
+    "placeholders": {
+      "multipleOf": {
+        "type": "num"
+      }
+    }
+  },
   "errorValidationPatternMismatch": "The value does not match the valid pattern.",
   "@errorValidationPatternMismatch": {
     "description": "Validation error when the user entered value does not match the pattern"

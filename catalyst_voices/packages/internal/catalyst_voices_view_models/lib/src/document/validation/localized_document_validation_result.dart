@@ -83,6 +83,21 @@ final class LocalizedDocumentListItemsOutOfRange extends LocalizedDocumentValida
 }
 
 /// When a numeric value is out of range.
+final class LocalizedDocumentNumNotMultipleOf extends LocalizedDocumentValidationResult {
+  final num multipleOf;
+
+  const LocalizedDocumentNumNotMultipleOf({required this.multipleOf});
+
+  @override
+  List<Object?> get props => [multipleOf];
+
+  @override
+  String? message(BuildContext context) {
+    return context.l10n.errorValidationNumNotMultipleOf(multipleOf);
+  }
+}
+
+/// When a numeric value is out of range.
 final class LocalizedDocumentNumOutOfRange extends LocalizedDocumentValidationResult {
   final NumRange<num> range;
 
@@ -171,6 +186,9 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
       SuccessfulDocumentValidation() => const LocalizedSuccessfulDocumentValidation(),
       MissingRequiredDocumentValue() => const LocalizedMissingRequiredDocumentValue(),
       DocumentNumOutOfRange() => LocalizedDocumentNumOutOfRange(range: result.expectedRange),
+      DocumentNumNotMultipleOf() => LocalizedDocumentNumNotMultipleOf(
+        multipleOf: result.multipleOf,
+      ),
       DocumentStringOutOfRange() => LocalizedDocumentStringOutOfRange(range: result.expectedRange),
       DocumentItemsOutOfRange() => LocalizedDocumentListItemsOutOfRange(
         range: result.expectedRange,

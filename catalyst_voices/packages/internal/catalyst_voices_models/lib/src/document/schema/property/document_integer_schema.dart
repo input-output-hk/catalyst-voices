@@ -14,6 +14,7 @@ final class DocumentDurationInMonthsSchema extends DocumentIntegerSchema {
     required super.constValue,
     required super.enumValues,
     required super.numRange,
+    required super.multipleOf,
   });
 
   @override
@@ -34,6 +35,7 @@ final class DocumentDurationInMonthsSchema extends DocumentIntegerSchema {
       constValue: constValue,
       enumValues: enumValues,
       numRange: numRange,
+      multipleOf: multipleOf,
     );
   }
 }
@@ -52,6 +54,7 @@ final class DocumentGenericIntegerSchema extends DocumentIntegerSchema {
     required super.constValue,
     required super.enumValues,
     required super.numRange,
+    required super.multipleOf,
   });
 
   const DocumentGenericIntegerSchema.optional({
@@ -67,6 +70,7 @@ final class DocumentGenericIntegerSchema extends DocumentIntegerSchema {
     super.constValue,
     super.enumValues,
     super.numRange,
+    super.multipleOf,
   });
 
   @override
@@ -87,12 +91,14 @@ final class DocumentGenericIntegerSchema extends DocumentIntegerSchema {
       constValue: constValue,
       enumValues: enumValues,
       numRange: numRange,
+      multipleOf: multipleOf,
     );
   }
 }
 
 sealed class DocumentIntegerSchema extends DocumentValueSchema<int> {
   final NumRange<int>? numRange;
+  final int? multipleOf;
 
   const DocumentIntegerSchema({
     required super.nodeId,
@@ -107,13 +113,14 @@ sealed class DocumentIntegerSchema extends DocumentValueSchema<int> {
     required super.constValue,
     required super.enumValues,
     required this.numRange,
+    required this.multipleOf,
   }) : super(
          type: DocumentPropertyType.integer,
        );
 
   @override
   @mustCallSuper
-  List<Object?> get props => super.props + [numRange];
+  List<Object?> get props => super.props + [numRange, multipleOf];
 
   @override
   DocumentIntegerSchema copyWith({DocumentNodeId? nodeId, String? title});
@@ -123,6 +130,7 @@ sealed class DocumentIntegerSchema extends DocumentValueSchema<int> {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
       DocumentValidator.validateIntegerRange(this, value),
+      DocumentValidator.validateIntegerMultipleOf(this, value),
       DocumentValidator.validateConstValue(this, value),
       DocumentValidator.validateEnumValues(this, value),
     ]);
@@ -143,6 +151,7 @@ final class DocumentTokenValueCardanoAdaSchema extends DocumentIntegerSchema {
     required super.constValue,
     required super.enumValues,
     required super.numRange,
+    required super.multipleOf,
   });
 
   @override
@@ -163,6 +172,7 @@ final class DocumentTokenValueCardanoAdaSchema extends DocumentIntegerSchema {
       constValue: constValue,
       enumValues: enumValues,
       numRange: numRange,
+      multipleOf: multipleOf,
     );
   }
 }

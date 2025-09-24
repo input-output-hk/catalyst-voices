@@ -22,6 +22,7 @@ final class DocumentIntegerSchemaMapper {
     final constValue = schema.constValue as int?;
     final enumValues = schema.enumValues?.cast<int>();
     final numRange = NumRange.optionalRangeOf(min: schema.minimum, max: schema.maximum);
+    final multipleOf = schema.multipleOf as int?;
     final definition = _DocumentIntegerDefinition.fromDef(schema.definition());
 
     switch (definition) {
@@ -39,6 +40,7 @@ final class DocumentIntegerSchemaMapper {
           constValue: constValue,
           enumValues: enumValues,
           numRange: numRange,
+          multipleOf: multipleOf,
         );
       case _DocumentIntegerDefinition.durationInMonths:
         return DocumentDurationInMonthsSchema(
@@ -54,6 +56,7 @@ final class DocumentIntegerSchemaMapper {
           constValue: constValue,
           enumValues: enumValues,
           numRange: numRange,
+          multipleOf: multipleOf,
         );
       case _DocumentIntegerDefinition.unknown:
         return DocumentGenericIntegerSchema(
@@ -69,6 +72,7 @@ final class DocumentIntegerSchemaMapper {
           constValue: constValue,
           enumValues: enumValues,
           numRange: numRange,
+          multipleOf: multipleOf,
         );
     }
   }

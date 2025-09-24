@@ -52,6 +52,42 @@ final class DocumentValidator {
     return const SuccessfulDocumentValidation();
   }
 
+  static DocumentValidationResult validateIntegerMultipleOf(
+    DocumentIntegerSchema schema,
+    int? value,
+  ) {
+    final multipleOf = schema.multipleOf;
+    if (multipleOf != null && value != null) {
+      if (value % multipleOf != 0) {
+        return DocumentNumNotMultipleOf(
+          invalidNodeId: schema.nodeId,
+          multipleOf: multipleOf,
+          actualValue: value,
+        );
+      }
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
+
+    static DocumentValidationResult validateNumberMultipleOf(
+    DocumentNumberSchema schema,
+    double? value,
+  ) {
+    final multipleOf = schema.multipleOf;
+    if (multipleOf != null && value != null) {
+      if (value % multipleOf != 0) {
+        return DocumentNumNotMultipleOf(
+          invalidNodeId: schema.nodeId,
+          multipleOf: multipleOf,
+          actualValue: value,
+        );
+      }
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
+
   static DocumentValidationResult validateIntegerRange(
     DocumentIntegerSchema schema,
     int? value,

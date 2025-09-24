@@ -58,6 +58,22 @@ final class DocumentItemsOutOfRange<T extends num> extends DocumentValidationRes
   List<Object?> get props => [invalidNodeId, expectedRange, actualItems];
 }
 
+/// The numerical [actualValue] is not a multiple of [multipleOf].
+final class DocumentNumNotMultipleOf extends DocumentValidationResult {
+  final DocumentNodeId invalidNodeId;
+  final num multipleOf;
+  final num actualValue;
+
+  const DocumentNumNotMultipleOf({
+    required this.invalidNodeId,
+    required this.multipleOf,
+    required this.actualValue,
+  });
+
+  @override
+  List<Object?> get props => [invalidNodeId, multipleOf, actualValue];
+}
+
 /// The numerical [actualValue] is not within [expectedRange].
 final class DocumentNumOutOfRange extends DocumentValidationResult {
   final DocumentNodeId invalidNodeId;
