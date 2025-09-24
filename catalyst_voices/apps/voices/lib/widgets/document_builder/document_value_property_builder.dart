@@ -1,5 +1,7 @@
 import 'package:catalyst_voices/widgets/document_builder/value/document_builder_value_widget.dart';
+import 'package:catalyst_voices/widgets/document_builder/value/double_value_widget.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class DocumentValuePropertyBuilder extends StatelessWidget {
@@ -26,9 +28,8 @@ class DocumentValuePropertyBuilder extends StatelessWidget {
           onChanged: onChanged,
         );
       case DocumentAgreementConfirmationSchema():
-        final castProperty = schema.castProperty(property);
         return AgreementConfirmationWidget(
-          property: castProperty,
+          property: schema.castProperty(property),
           schema: schema,
           isEditMode: isEditMode,
           onChanged: onChanged,
@@ -42,13 +43,21 @@ class DocumentValuePropertyBuilder extends StatelessWidget {
           onChanged: onChanged,
         );
       case DocumentYesNoChoiceSchema():
-      case DocumentGenericBooleanSchema():
-        final castSchema = schema as DocumentBooleanSchema;
         return YesNoChoiceWidget(
-          property: castSchema.castProperty(property),
-          schema: castSchema,
+          property: schema.castProperty(property),
+          schema: schema,
           onChanged: onChanged,
           isEditMode: isEditMode,
+        );
+      case DocumentGenericBooleanSchema():
+        return _FallbackDebugSchemaWidget(
+          schema: schema,
+          fallback: YesNoChoiceWidget(
+            property: schema.castProperty(property),
+            schema: schema,
+            onChanged: onChanged,
+            isEditMode: isEditMode,
+          ),
         );
       case DocumentSingleLineHttpsUrlEntrySchema():
         return SingleLineHttpsUrlWidget(
@@ -59,7 +68,6 @@ class DocumentValuePropertyBuilder extends StatelessWidget {
         );
       case DocumentSingleLineTextEntrySchema():
       case DocumentMultiLineTextEntrySchema():
-      case DocumentGenericStringSchema():
         final castSchema = schema as DocumentStringSchema;
         return SimpleTextEntryWidget(
           property: castSchema.castProperty(property),
@@ -67,7 +75,16 @@ class DocumentValuePropertyBuilder extends StatelessWidget {
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
-
+      case DocumentGenericStringSchema():
+        return _FallbackDebugSchemaWidget(
+          schema: schema,
+          fallback: SimpleTextEntryWidget(
+            property: schema.castProperty(property),
+            schema: schema,
+            isEditMode: isEditMode,
+            onChanged: onChanged,
+          ),
+        );
       case DocumentMultiLineTextEntryMarkdownSchema():
         return MultilineTextEntryMarkdownWidget(
           property: schema.castProperty(property),
@@ -75,7 +92,6 @@ class DocumentValuePropertyBuilder extends StatelessWidget {
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
-
       case DocumentRadioButtonSelect():
         return RadioButtonSelectWidget(
           property: schema.castProperty(property),
@@ -83,7 +99,6 @@ class DocumentValuePropertyBuilder extends StatelessWidget {
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
-
       case DocumentDurationInMonthsSchema():
         return DurationInMonthsWidget(
           property: schema.castProperty(property),
@@ -99,16 +114,25 @@ class DocumentValuePropertyBuilder extends StatelessWidget {
           onChanged: onChanged,
         );
       case DocumentGenericIntegerSchema():
-        return IntegerValueWidget(
-          property: schema.castProperty(property),
+        return _FallbackDebugSchemaWidget(
           schema: schema,
-          isEditMode: isEditMode,
-          onChanged: onChanged,
+          fallback: IntegerValueWidget(
+            property: schema.castProperty(property),
+            schema: schema,
+            isEditMode: isEditMode,
+            onChanged: onChanged,
+          ),
         );
       case DocumentGenericNumberSchema():
-        // TODO(dt-iohk): add fallback
-        return _UnimplementedSchemaWidget(schema: schema);
-
+        return _FallbackDebugSchemaWidget(
+          schema: schema,
+          fallback: NumberValueWidget(
+            property: schema.castProperty(property),
+            schema: schema,
+            isEditMode: isEditMode,
+            onChanged: onChanged,
+          ),
+        );
       case DocumentTagGroupSchema():
       case DocumentTagSelectionSchema():
         // DocumentTagGroupSchema and DocumentTagSelectionSchema should
@@ -119,20 +143,53 @@ class DocumentValuePropertyBuilder extends StatelessWidget {
   }
 }
 
+class _FallbackDebugSchemaWidget extends StatelessWidget {
+  final DocumentValueSchema schema;
+  final Widget fallback;
+
+  const _FallbackDebugSchemaWidget({
+    required this.schema,
+    required this.fallback,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (kDebugMode) {
+      // Since we couldn't match the definition lets display this as an error in debug.
+      return _UnimplementedSchemaWidget(
+        schema: schema,
+        fallback: fallback,
+      );
+    } else {
+      // But fallback to a reasonable value in release.
+      return fallback;
+    }
+  }
+}
+
 class _UnimplementedSchemaWidget extends StatelessWidget {
   final DocumentPropertySchema schema;
+  final Widget? fallback;
 
   const _UnimplementedSchemaWidget({
     required this.schema,
+    this.fallback,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      child: Text(
-        'Unimplemented ${schema.runtimeType}: ${schema.nodeId}',
-        style: const TextStyle(color: Colors.red),
+      color: Colors.red,
+      child: Column(
+        spacing: 16,
+        children: [
+          Text(
+            'Unimplemented ${schema.runtimeType}: ${schema.nodeId}',
+            style: const TextStyle(color: Colors.white),
+          ),
+          if (fallback case final fallback?) fallback,
+        ],
       ),
     );
   }

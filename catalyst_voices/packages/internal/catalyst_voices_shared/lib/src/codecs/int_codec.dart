@@ -22,5 +22,5 @@ class IntEncoder extends Converter<int, String> {
   const IntEncoder();
 
   @override
-  String convert(int input) => '$input';
+  String convert(int input) => input.toString();
 }
