@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/src/document/document.dart';
 import 'package:catalyst_voices_models/src/document/schema/property/document_property_schema.dart';
 import 'package:catalyst_voices_models/src/document/validation/document_validation_result.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 
 /// Validates [DocumentProperty].
@@ -70,24 +71,6 @@ final class DocumentValidator {
     return const SuccessfulDocumentValidation();
   }
 
-    static DocumentValidationResult validateNumberMultipleOf(
-    DocumentNumberSchema schema,
-    double? value,
-  ) {
-    final multipleOf = schema.multipleOf;
-    if (multipleOf != null && value != null) {
-      if (value % multipleOf != 0) {
-        return DocumentNumNotMultipleOf(
-          invalidNodeId: schema.nodeId,
-          multipleOf: multipleOf,
-          actualValue: value,
-        );
-      }
-    }
-
-    return const SuccessfulDocumentValidation();
-  }
-
   static DocumentValidationResult validateIntegerRange(
     DocumentIntegerSchema schema,
     int? value,
@@ -138,6 +121,24 @@ final class DocumentValidator {
             return DocumentItemsNotUnique(invalidNodeId: schema.nodeId);
           }
         }
+      }
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
+
+  static DocumentValidationResult validateNumberMultipleOf(
+    DocumentNumberSchema schema,
+    double? value,
+  ) {
+    final multipleOf = schema.multipleOf;
+    if (multipleOf != null && value != null) {
+      if (NumberUtils.isDoubleMultipleOf(value: value, multipleOf: multipleOf)) {
+        return DocumentNumNotMultipleOf(
+          invalidNodeId: schema.nodeId,
+          multipleOf: multipleOf,
+          actualValue: value,
+        );
       }
     }
 
