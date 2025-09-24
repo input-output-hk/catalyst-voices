@@ -52,7 +52,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
             limit: 1,
           )
           .successBodyOrThrow()
-          .then((value) => DocumentIndexList.fromJson(value as Map<String, dynamic>));
+          .then(_mapDynamicResponseValue);
 
       final docs = index.docs;
       if (docs.isEmpty) {
@@ -125,12 +125,24 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }) async {
     return _api.gateway
         .apiV1DocumentIndexPost(
+          body: const DocumentIndexQueryFilter(),
           limit: limit,
           page: page,
-          body: const DocumentIndexQueryFilter(),
         )
         .successBodyOrThrow()
-        .then((value) => DocumentIndexList.fromJson(value as Map<String, dynamic>));
+        .then(_mapDynamicResponseValue);
+  }
+
+  DocumentIndexList _mapDynamicResponseValue(dynamic value) {
+    if (value is DocumentIndexList) {
+      return value;
+    }
+
+    if (value is Map<String, dynamic>) {
+      return DocumentIndexList.fromJson(value);
+    }
+
+    return const DocumentIndexList(docs: [], page: CurrentPage(page: 0, limit: 0, remaining: 0));
   }
 }
 
