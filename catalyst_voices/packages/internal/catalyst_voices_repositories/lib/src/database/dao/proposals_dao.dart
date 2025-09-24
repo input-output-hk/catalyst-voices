@@ -87,10 +87,10 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
             Expression.and([
               proposal.type.equalsValue(DocumentType.proposalDocument),
               proposal.metadata.jsonExtract(r'$.template').isNotNull(),
-              proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+              proposal.metadata.jsonExtract(r'$.categoryId.id').isNotNull(),
               if (filters.campaign != null)
                 proposal.metadata
-                    .jsonExtract(r'$.categoryId.id')
+                    .jsonExtract<String>(r'$.categoryId.id')
                     .isIn(filters.campaign!.categoriesIds),
             ]),
           )
@@ -179,7 +179,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
               proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
               if (filters.campaign != null)
                 proposal.metadata
-                    .jsonExtract(r'$.categoryId.id')
+                    .jsonExtract<String>(r'$.categoryId.id')
                     .isIn(filters.campaign!.categoriesIds),
             ]),
           )
@@ -539,7 +539,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
           documents.metadata.jsonExtract(r'$.categoryId').isNotNull(),
           if (filters?.campaign != null)
             documents.metadata
-                .jsonExtract(r'$.categoryId.id')
+                .jsonExtract<String>(r'$.categoryId.id')
                 .isIn(filters!.campaign!.categoriesIds),
         ]),
       )
