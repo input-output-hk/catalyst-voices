@@ -31,7 +31,6 @@ code-generator:
 
     LET gen_code_path = lib/generated/api
     LET local_gen_code_path = packages/internal/catalyst_voices_repositories/lib/generated/api/
-    LET openapi_spec_path = packages/internal/catalyst_voices_repositories/openapi/cat-gateway.json
 
     WORKDIR packages/internal/catalyst_voices_repositories
 
