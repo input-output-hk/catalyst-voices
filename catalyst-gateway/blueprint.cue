@@ -89,12 +89,6 @@ project: {
 										key:  "db-max-connections"
 									}
 								}
-								"EVENT_DB_CONN_TIMEOUT": {
-									secret: {
-										name: "gateway"
-										key:  "db-connection-timeout"
-									}
-								}
 								"INTERNAL_API_KEY": {
 									secret: {
 										name: "gateway"
