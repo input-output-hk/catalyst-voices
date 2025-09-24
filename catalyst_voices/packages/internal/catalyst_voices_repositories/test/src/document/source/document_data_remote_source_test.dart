@@ -60,14 +60,14 @@ void main() {
 
         // When
         when(
-          () => gateway.apiGatewayV1DocumentIndexPost(
+          () => gateway.apiV1DocumentIndexPost(
             body: const DocumentIndexQueryFilter(),
             limit: maxPageSize,
             page: 0,
           ),
         ).thenAnswer((_) => Future.value(pageZeroResponse));
         when(
-          () => gateway.apiGatewayV1DocumentIndexPost(
+          () => gateway.apiV1DocumentIndexPost(
             body: const DocumentIndexQueryFilter(),
             limit: maxPageSize,
             page: 1,
@@ -80,7 +80,7 @@ void main() {
         expect(refs, isNotEmpty);
 
         verify(
-          () => gateway.apiGatewayV1DocumentIndexPost(
+          () => gateway.apiV1DocumentIndexPost(
             body: any(named: 'body'),
             limit: any(named: 'limit'),
             page: any(named: 'page'),
@@ -124,7 +124,7 @@ void main() {
 
         // When
         when(
-          () => gateway.apiGatewayV1DocumentIndexPost(
+          () => gateway.apiV1DocumentIndexPost(
             body: const DocumentIndexQueryFilter(),
             limit: maxPageSize,
             page: 0,
