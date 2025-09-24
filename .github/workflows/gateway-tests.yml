@@ -4,7 +4,7 @@ on:
   workflow_call:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  group: gateway-tests-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 env:
@@ -74,10 +74,15 @@ jobs:
                 fi
                 if [ "$STATUS" == "unhealthy" ]; then
                   echo "Container became unhealthy."
-                  exit 1
+                  break
                 fi
                 sleep 5
               done
+
+              if [ "$STATUS" != "healthy" ]; then
+                docker compose -f catalyst-gateway/tests/docker-compose.yml logs cat-gateway
+                exit 1
+              fi
 
       - name: Schemathesis tests
         if: ${{ steps.gateway-healthy.conclusion == 'success' }}

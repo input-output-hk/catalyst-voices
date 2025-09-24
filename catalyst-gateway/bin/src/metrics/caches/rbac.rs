@@ -471,7 +471,7 @@ pub(crate) mod reporter {
     pub(super) static PERSISTENT_CHAINS_CACHE_ENTRY_COUNT: LazyLock<IntGaugeVec> =
         LazyLock::new(|| {
             register_int_gauge_vec!(
-                "rbac_persistent_transaction_ids_cache_entry_count",
+                "rbac_persistent_chains_cache_entry_count",
                 "Number of entries in the persistent RBAC chains cache",
                 &METRIC_LABELS
             )
