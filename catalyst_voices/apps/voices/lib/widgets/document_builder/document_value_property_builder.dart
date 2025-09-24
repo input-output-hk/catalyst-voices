@@ -99,7 +99,14 @@ class DocumentValuePropertyBuilder extends StatelessWidget {
           onChanged: onChanged,
         );
       case DocumentGenericIntegerSchema():
+        return IntegerValueWidget(
+          property: schema.castProperty(property),
+          schema: schema,
+          isEditMode: isEditMode,
+          onChanged: onChanged,
+        );
       case DocumentGenericNumberSchema():
+        // TODO(dt-iohk): add fallback
         return _UnimplementedSchemaWidget(schema: schema);
 
       case DocumentTagGroupSchema():
