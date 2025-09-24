@@ -127,9 +127,13 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     required int limit,
     required Campaign campaign,
   }) async {
+    final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toList();
+
     return _api.gateway
         .apiV1DocumentIndexPost(
-          body: const DocumentIndexQueryFilter(),
+          body: DocumentIndexQueryFilter(
+            category: IdSelectorDto.inside(categoriesIds).toJson(),
+          ),
           limit: limit,
           page: page,
         )
