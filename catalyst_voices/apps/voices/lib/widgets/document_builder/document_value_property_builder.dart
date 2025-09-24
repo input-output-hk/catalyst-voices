@@ -182,13 +182,20 @@ class _UnimplementedSchemaWidget extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       color: Colors.red,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 16,
         children: [
           Text(
             'Unimplemented ${schema.runtimeType}: ${schema.nodeId}',
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
-          if (fallback case final fallback?) fallback,
+          if (fallback case final fallback?) ...[
+            const Text(
+              'Fallback widget (when not in debug mode): ',
+              style: TextStyle(color: Colors.white),
+            ),
+            fallback,
+          ],
         ],
       ),
     );
