@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/discovery/sections/session_account_catalyst_id.dart';
+import 'package:catalyst_voices/pages/discovery/state_selectors/campaign_dates_state_selector.dart';
 import 'package:catalyst_voices/share/share_manager.dart';
 import 'package:catalyst_voices/widgets/text/campaign_stage_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -155,47 +156,44 @@ class _ReviewerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<DiscoveryCubit, DiscoveryState, CampaignDatesEventsState>(
-      selector: (state) => state.campaign.datesEvents,
-      builder: (context, datesEvents) {
-        return _StayInvolvedCard(
-          icon: VoicesAssets.icons.clipboardCheck,
-          title: context.l10n.becomeReviewer,
-          description: context.l10n.stayInvolvedReviewerDescription,
-          actions: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              _RangeTimelineCard(
-                timelineItems: [
-                  (
-                    dateRange: datesEvents.reviewRegistrationStartsAt,
-                    title: context.l10n.reviewRegistration,
-                  ),
-                  (
-                    dateRange: datesEvents.reviewStartsAt,
-                    title: context.l10n.reviewTimelineHeader,
-                  ),
-                ],
-              ),
-              const _CopyCatalystIdTipText(),
-              const SessionAccountCatalystId(
-                padding: EdgeInsets.only(top: 20),
-              ),
-              _StayInvolvedActionButton(
-                title: context.l10n.becomeReviewer,
-                onTap: () {
-                  final shareManager = ShareManager.of(context);
-                  final uri = shareManager.becomeReviewer();
-                  unawaited(launchUrl(uri));
-                },
-                trailing: VoicesAssets.icons.externalLink.buildIcon(),
-              ),
-            ],
+    return _StayInvolvedCard(
+      icon: VoicesAssets.icons.clipboardCheck,
+      title: context.l10n.becomeReviewer,
+      description: context.l10n.stayInvolvedReviewerDescription,
+      actions: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 16),
+          CampaignDatesStateSelector(
+            builder: (context, datesEvents) => _RangeTimelineCard(
+              timelineItems: [
+                (
+                  dateRange: datesEvents.reviewRegistrationStartsAt,
+                  title: context.l10n.reviewRegistration,
+                ),
+                (
+                  dateRange: datesEvents.reviewStartsAt,
+                  title: context.l10n.reviewTimelineHeader,
+                ),
+              ],
+            ),
           ),
-        );
-      },
+          const _CopyCatalystIdTipText(),
+          const SessionAccountCatalystId(
+            padding: EdgeInsets.only(top: 20),
+          ),
+          _StayInvolvedActionButton(
+            title: context.l10n.becomeReviewer,
+            onTap: () {
+              final shareManager = ShareManager.of(context);
+              final uri = shareManager.becomeReviewer();
+              unawaited(launchUrl(uri));
+            },
+            trailing: VoicesAssets.icons.externalLink.buildIcon(),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -298,41 +296,38 @@ class _VoterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<DiscoveryCubit, DiscoveryState, CampaignDatesEventsState>(
-      selector: (state) => state.campaign.datesEvents,
-      builder: (context, datesEvents) {
-        return _StayInvolvedCard(
-          icon: VoicesAssets.icons.vote,
-          title: context.l10n.registerToVoteFund14,
-          description: context.l10n.stayInvolvedContributorDescription,
-          actions: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 16),
-              _RangeTimelineCard(
-                timelineItems: [
-                  (
-                    dateRange: datesEvents.votingRegistrationStartsAt,
-                    title: context.l10n.votingRegistrationTimelineHeader,
-                  ),
-                  (
-                    dateRange: datesEvents.votingStartsAt,
-                    title: context.l10n.votingTimelineHeader,
-                  ),
-                ],
-              ),
-              _StayInvolvedActionButton(
-                title: context.l10n.becomeVoter,
-                onTap: () {
-                  final uri = Uri.parse(VoicesConstants.afterSubmissionUrl);
-                  unawaited(launchUrl(uri));
-                },
-              ),
-            ],
+    return _StayInvolvedCard(
+      icon: VoicesAssets.icons.vote,
+      title: context.l10n.registerToVoteFund14,
+      description: context.l10n.stayInvolvedContributorDescription,
+      actions: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 16),
+          CampaignDatesStateSelector(
+            builder: (context, datesEvents) => _RangeTimelineCard(
+              timelineItems: [
+                (
+                  dateRange: datesEvents.votingRegistrationStartsAt,
+                  title: context.l10n.votingRegistrationTimelineHeader,
+                ),
+                (
+                  dateRange: datesEvents.votingStartsAt,
+                  title: context.l10n.votingTimelineHeader,
+                ),
+              ],
+            ),
           ),
-        );
-      },
+          _StayInvolvedActionButton(
+            title: context.l10n.becomeVoter,
+            onTap: () {
+              final uri = Uri.parse(VoicesConstants.afterSubmissionUrl);
+              unawaited(launchUrl(uri));
+            },
+          ),
+        ],
+      ),
     );
   }
 }
