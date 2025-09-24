@@ -5,7 +5,7 @@ use poem_openapi::{types::Example, NewType, Object};
 use crate::{
     db::event::signed_docs::DocsQueryFilter,
     service::common::types::document::{
-        doc_ref::IdAndVerRefDocumented, doc_type::DocumentType, id::EqOrRangedIdDocumented,
+        doc_ref::IdAndVerRefDocumented, doc_type::DocumentType, id::IdSelectorDocumented,
         ver::EqOrRangedVerDocumented,
     },
 };
@@ -32,7 +32,7 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// Either an absolute single Document ID or a range of
     /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
     #[oai(skip_serializing_if_is_none)]
-    id: Option<EqOrRangedIdDocumented>,
+    id: Option<IdSelectorDocumented>,
     /// ## Document Version
     ///
     /// Either an absolute single Document Version or a range of
@@ -129,7 +129,7 @@ impl Example for DocumentIndexQueryFilter {
     fn example() -> Self {
         Self {
             doc_type: Some(DocumentType::example()),
-            id: Some(EqOrRangedIdDocumented::example()),
+            id: Some(IdSelectorDocumented::example()),
             ver: Some(EqOrRangedVerDocumented::example()),
             doc_ref: Some(IdAndVerRefDocumented::example_id_ref()),
             template: Some(IdAndVerRefDocumented::example_id_and_ver_ref()),
