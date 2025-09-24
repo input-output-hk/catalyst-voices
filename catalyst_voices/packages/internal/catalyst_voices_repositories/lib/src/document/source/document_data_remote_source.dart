@@ -24,7 +24,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   @override
   Future<DocumentData> get({required DocumentRef ref}) async {
     final bytes = await _api.gateway
-        .apiGatewayV1DocumentDocumentIdGet(
+        .apiV1DocumentDocumentIdGet(
           documentId: ref.id,
           version: ref.version,
         )
@@ -47,11 +47,12 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
     try {
       final index = await _api.gateway
-          .apiGatewayV1DocumentIndexPost(
-            body: DocumentIndexQueryFilter(id: EqOrRangedIdDto.eq(id)),
+          .apiV1DocumentIndexPost(
+            body: DocumentIndexQueryFilter(id: IdSelectorDto.eq(id)),
             limit: 1,
           )
-          .successBodyOrThrow();
+          .successBodyOrThrow()
+          .then(_mapDynamicResponseValue);
 
       final docs = index.docs;
       if (docs.isEmpty) {
@@ -111,7 +112,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   Future<void> publish(SignedDocument document) async {
     final bytes = document.toBytes();
     await _api.gateway
-        .apiGatewayV1DocumentPut(
+        .apiV1DocumentPut(
           body: bytes,
           contentType: ContentTypes.applicationCbor,
         )
@@ -123,12 +124,25 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     required int limit,
   }) async {
     return _api.gateway
-        .apiGatewayV1DocumentIndexPost(
+        .apiV1DocumentIndexPost(
           body: const DocumentIndexQueryFilter(),
           limit: limit,
           page: page,
         )
-        .successBodyOrThrow();
+        .successBodyOrThrow()
+        .then(_mapDynamicResponseValue);
+  }
+
+  DocumentIndexList _mapDynamicResponseValue(dynamic value) {
+    if (value is DocumentIndexList) {
+      return value;
+    }
+
+    if (value is Map<String, dynamic>) {
+      return DocumentIndexList.fromJson(value);
+    }
+
+    return const DocumentIndexList(docs: [], page: CurrentPage(page: 0, limit: 0, remaining: 0));
   }
 }
 
