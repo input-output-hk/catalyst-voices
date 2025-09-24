@@ -53,8 +53,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     try {
       emit(
         state.copyWith(
-          campaign: const DiscoveryCurrentCampaignState(),
-          categories: const DiscoveryCampaignCategoriesState(),
+          campaign: const DiscoveryCampaignState(),
         ),
       );
       final campaign = (await _campaignService.getActiveCampaign())!;
@@ -67,14 +66,11 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
       if (!isClosed) {
         emit(
           state.copyWith(
-            campaign: DiscoveryCurrentCampaignState(
+            campaign: DiscoveryCampaignState(
               currentCampaign: currentCampaign,
               campaignTimeline: timeline,
-              isLoading: false,
-            ),
-            categories: DiscoveryCampaignCategoriesState(
-              isLoading: false,
               categories: categoriesModel,
+              isLoading: false,
             ),
           ),
         );
@@ -85,8 +81,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
       if (!isClosed) {
         emit(
           state.copyWith(
-            categories: DiscoveryCampaignCategoriesState(error: LocalizedException.create(e)),
-            campaign: DiscoveryCurrentCampaignState(error: LocalizedException.create(e)),
+            campaign: DiscoveryCampaignState(error: LocalizedException.create(e)),
           ),
         );
       }
@@ -193,7 +188,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     emit(
       state.copyWith(
         proposals: state.proposals.copyWith(
-          isLoading: false,
           proposals: proposalList,
         ),
       ),

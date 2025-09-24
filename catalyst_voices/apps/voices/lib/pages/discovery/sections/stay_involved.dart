@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/discovery/sections/session_account_catalyst_id.dart';
+import 'package:catalyst_voices/pages/discovery/state_selectors/campaign_dates_state_selector.dart';
 import 'package:catalyst_voices/share/share_manager.dart';
 import 'package:catalyst_voices/widgets/text/campaign_stage_time_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -113,12 +114,26 @@ class _Header extends StatelessWidget {
 }
 
 class _RangeTimelineCard extends StatelessWidget {
-  final List<Widget> children;
+  final List<({DateRange? dateRange, String title})> timelineItems;
 
-  const _RangeTimelineCard({required this.children});
+  const _RangeTimelineCard({required this.timelineItems});
 
   @override
   Widget build(BuildContext context) {
+    final validItems = timelineItems
+        .where((item) => item.dateRange != null)
+        .map(
+          (item) => _DatetimeRangeTimeline(
+            dateRange: item.dateRange,
+            title: item.title,
+          ),
+        )
+        .toList();
+
+    if (validItems.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -130,7 +145,7 @@ class _RangeTimelineCard extends StatelessWidget {
         alignment: WrapAlignment.spaceBetween,
         spacing: 8,
         runSpacing: 8,
-        children: children,
+        children: validItems,
       ),
     );
   }
@@ -150,31 +165,19 @@ class _ReviewerCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 16),
-          _RangeTimelineCard(
-            children: [
-              BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
-                selector: (state) {
-                  return state.campaign.reviewRegistrationStartsAt;
-                },
-                builder: (context, date) {
-                  return _DatetimeRangeTimeline(
-                    dateRange: date,
-                    title: context.l10n.reviewRegistration,
-                  );
-                },
-              ),
-              BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
-                selector: (state) {
-                  return state.campaign.votingStartsAt;
-                },
-                builder: (context, date) {
-                  return _DatetimeRangeTimeline(
-                    dateRange: date,
-                    title: context.l10n.reviewTimelineHeader,
-                  );
-                },
-              ),
-            ],
+          CampaignDatesStateSelector(
+            builder: (context, datesEvents) => _RangeTimelineCard(
+              timelineItems: [
+                (
+                  dateRange: datesEvents.reviewRegistrationStartsAt,
+                  title: context.l10n.reviewRegistration,
+                ),
+                (
+                  dateRange: datesEvents.reviewStartsAt,
+                  title: context.l10n.reviewTimelineHeader,
+                ),
+              ],
+            ),
           ),
           const _CopyCatalystIdTipText(),
           const SessionAccountCatalystId(
@@ -302,32 +305,19 @@ class _VoterCard extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 16),
-          _RangeTimelineCard(
-            children: [
-              BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
-                selector: (state) {
-                  return state.campaign.votingRegistrationStartsAt;
-                },
-                builder: (context, date) {
-                  return _DatetimeRangeTimeline(
-                    dateRange: date,
-                    title: context.l10n.votingRegistrationTimelineHeader,
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-              BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
-                selector: (state) {
-                  return state.campaign.votingStartsAt;
-                },
-                builder: (context, date) {
-                  return _DatetimeRangeTimeline(
-                    dateRange: date,
-                    title: context.l10n.votingTimelineHeader,
-                  );
-                },
-              ),
-            ],
+          CampaignDatesStateSelector(
+            builder: (context, datesEvents) => _RangeTimelineCard(
+              timelineItems: [
+                (
+                  dateRange: datesEvents.votingRegistrationStartsAt,
+                  title: context.l10n.votingRegistrationTimelineHeader,
+                ),
+                (
+                  dateRange: datesEvents.votingStartsAt,
+                  title: context.l10n.votingTimelineHeader,
+                ),
+              ],
+            ),
           ),
           _StayInvolvedActionButton(
             title: context.l10n.becomeVoter,
