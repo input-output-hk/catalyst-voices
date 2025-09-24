@@ -1,7 +1,6 @@
 VERSION 0.8
 
 IMPORT ../ AS repo-ci
-IMPORT ../catalyst-gateway AS catalyst-gateway
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.5.15 AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
@@ -36,8 +35,6 @@ code-generator:
 
     WORKDIR packages/internal/catalyst_voices_repositories
 
-    COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway.json
-
     WORKDIR /frontend
 
     RUN melos l10n
@@ -66,13 +63,6 @@ code-generator:
     END
 
     WORKDIR packages/internal/catalyst_voices_repositories
-
-    # Saves locally openapi json specs. Useful for local diagnostic.
-    IF [ $save_locally = true ]
-        SAVE ARTIFACT openapi/cat-gateway.json AS LOCAL $openapi_spec_path
-    ELSE
-        SAVE ARTIFACT openapi/cat-gateway.json
-    END
 
     # Saves generated OpenApi Services
     IF [ $save_locally = true ]
