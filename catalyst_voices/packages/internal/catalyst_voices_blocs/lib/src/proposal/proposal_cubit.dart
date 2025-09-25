@@ -355,6 +355,8 @@ final class ProposalCubit extends Cubit<ProposalState>
     required Vote? lastCastedVote,
     required Vote? draftVote,
   }) {
+    return null;
+
     final appCheck = (isVotingStage && hasActiveAccount);
     final proposalCheck = isLatestVersion && isFinal && proposalRef is SignedDocumentRef;
     if (!appCheck || !proposalCheck) {
