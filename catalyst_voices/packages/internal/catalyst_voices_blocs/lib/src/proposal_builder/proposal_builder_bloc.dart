@@ -1035,7 +1035,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         ref: originalProposalRef! as SignedDocumentRef,
         template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
         reply: event.reply,
-        categoryId: originalProposalCategoryId!,
+        categoryId: originalProposalCategoryId,
         authorId: activeAccountId!,
       ),
       document: event.document,

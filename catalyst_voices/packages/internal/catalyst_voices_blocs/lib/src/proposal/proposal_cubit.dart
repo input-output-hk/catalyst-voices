@@ -177,7 +177,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         ref: proposalRef! as SignedDocumentRef,
         template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
         reply: reply,
-        categoryId: proposalCategoryId!,
+        categoryId: proposalCategoryId,
         authorId: activeAccountId!,
       ),
       document: document,
