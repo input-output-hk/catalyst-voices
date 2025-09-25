@@ -33,10 +33,14 @@ class SignedDocument:
         )
 
 
+CATEGORY_ID = "01997fce-fde3-7fd7-8a62-b3a6d5fc20d3"
+
+
 @pytest.fixture
 def proposal_templates() -> List[str]:
-    # comes from the 'templates/data.rs' file
+    # comes from the 'templates/f14.rs' and 'templates/f15.rs' file
     return [
+        # f14
         "0194d492-1daa-75b5-b4a4-5cf331cd8d1a",
         "0194d492-1daa-7371-8bd3-c15811b2b063",
         "0194d492-1daa-79c7-a222-2c3b581443a8",
@@ -49,13 +53,19 @@ def proposal_templates() -> List[str]:
         "0194d492-1daa-7fce-84ee-b872a4661075",
         "0194d492-1daa-7878-9bcc-2c79fef0fc13",
         "0194d492-1daa-722f-94f4-687f2c068a5d",
+        # f15
+        "01997fcf-a7b5-7c48-9438-b2c8049063c3",
+        "01997fcf-c941-780f-b3f2-8c4d0020b363",
+        "01997fcf-e9ca-75bd-9141-013e644527df",
+        "01997fd0-4723-7d8e-9a17-3449c0f81a7a",
     ]
 
 
 @pytest.fixture
 def comment_templates() -> List[str]:
-    # comes from the 'templates/data.rs' file
+    # comes from the 'templates/f14.rs' and 'templates/f15.rs' file
     return [
+        # f14
         "0194d494-4402-7e0e-b8d6-171f8fea18b0",
         "0194d494-4402-7444-9058-9030815eb029",
         "0194d494-4402-7351-b4f7-24938dc2c12e",
@@ -68,6 +78,11 @@ def comment_templates() -> List[str]:
         "0194d494-4402-7202-8ebb-8c4c47c286d8",
         "0194d494-4402-7fb5-b680-c23fe4beb088",
         "0194d494-4402-7aa5-9dbc-5fe886e60ebc",
+        # f15
+        "01997fd0-8006-73ac-a480-08c3b6f50f21",
+        "01997fd0-8006-7d55-b560-8497176fb66e",
+        "01997fd0-8006-78cf-9fb0-9893130d0aa8",
+        "01997fd0-8006-718c-83f4-a671e035ae9d",
     ]
 
 
@@ -78,7 +93,6 @@ def proposal_doc_factory(proposal_templates, rbac_chain_factory):
         role_id = RoleID.PROPOSER
         rbac_chain = rbac_chain_factory()
         proposal_doc_id = uuid_v7.uuid_v7()
-        category_id = "0194d490-30bf-7473-81c8-a0eaef369619"
         proposal_metadata_json = {
             "id": proposal_doc_id,
             "ver": proposal_doc_id,
@@ -86,15 +100,13 @@ def proposal_doc_factory(proposal_templates, rbac_chain_factory):
             "type": "7808d2ba-d511-40af-84e8-c0d1625fdfdc",
             "content-type": "application/json",
             "content-encoding": "br",
-            # referenced to the defined proposal template id, comes from the 'templates/data.rs' file
             "template": {
-                "id": proposal_templates[0],
-                "ver": proposal_templates[0],
+                "id": proposal_templates[12],
+                "ver": proposal_templates[12],
             },
-            # referenced to the defined category id, comes from the 'templates/data.rs' file
             "parameters": {
-                "id": category_id,
-                "ver": category_id,
+                "id": CATEGORY_ID,
+                "ver": CATEGORY_ID,
             },
         }
         with open("./test_data/signed_docs/proposal.json", "r") as proposal_json_file:
@@ -135,8 +147,12 @@ def comment_doc_factory(proposal_doc_factory, comment_templates, rbac_chain_fact
                 "ver": proposal_doc.metadata["ver"],
             },
             "template": {
-                "id": comment_templates[0],
-                "ver": comment_templates[0],
+                "id": comment_templates[12],
+                "ver": comment_templates[12],
+            },
+            "parameters": {
+                "id": CATEGORY_ID,
+                "ver": CATEGORY_ID,
             },
         }
         with open("./test_data/signed_docs/comment.json", "r") as comment_json_file:
@@ -175,6 +191,10 @@ def submission_action_factory(proposal_doc_factory, rbac_chain_factory):
             "ref": {
                 "id": proposal_doc.metadata["id"],
                 "ver": proposal_doc.metadata["ver"],
+            },
+            "parameters": {
+                "id": CATEGORY_ID,
+                "ver": CATEGORY_ID,
             },
         }
         with open(
