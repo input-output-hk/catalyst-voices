@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
 
 /// Representation of single [Campaign] category.
 ///
@@ -24,14 +23,6 @@ class CampaignCategory extends Equatable {
   final List<String> dos;
   final List<String> donts;
   final DateTime submissionCloseDate;
-
-  @internal
-  static Money adaMajorUnits(int majorUnits) {
-    return Money.fromMajorUnits(
-      currency: const Currency.ada(),
-      majorUnits: BigInt.from(majorUnits),
-    );
-  }
 
   const CampaignCategory({
     required this.selfRef,

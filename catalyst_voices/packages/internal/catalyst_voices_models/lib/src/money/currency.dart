@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:money2/money2.dart' as money2;
 
@@ -63,6 +64,46 @@ final class Currency extends Equatable {
     isoCode,
     symbol,
   ];
+
+  /// Syntax sugar for [amountBig].
+  Money amount(
+    int value, {
+    bool majorUnits = true,
+  }) {
+    return amountBig(
+      BigInt.from(value),
+      majorUnits: majorUnits,
+    );
+  }
+
+  /// Creates [Money] instance with this [Currency].
+  ///
+  /// Because [Money] stores values always in minor units
+  /// you have to tell if [value] is passed in minor or major
+  /// units.
+  ///
+  /// Units:
+  /// Ada == major unit
+  /// lovelaces == minor unit.
+  ///
+  /// Examples
+  /// Currency.ada().amount(1)
+  /// Currency.ada().amount(1000000, majorUnits: false)
+  ///
+  /// Gives same amount of money.
+  Money amountBig(
+    BigInt value, {
+    bool majorUnits = true,
+  }) {
+    if (majorUnits) {
+      return Money.fromMajorUnits(
+        currency: this,
+        majorUnits: value,
+      );
+    }
+
+    return Money(currency: this, minorUnits: value);
+  }
 
   /// Formats [minorUnits] into a string using [defaultPattern].
   ///
