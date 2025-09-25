@@ -6,9 +6,7 @@ use poem_openapi::{
 };
 
 use crate::service::{
-    api::cardano::rbac::registrations_get::v2::{
-        payment_data::PaymentData, stake_address_info::RbacStakeAddressInfo,
-    },
+    api::cardano::rbac::registrations_get::v2::stake_address_info::RbacStakeAddressInfo,
     common::types::array_types::impl_array_types,
 };
 
@@ -20,7 +18,7 @@ impl_array_types!(
         example: Self::example().to_json(),
         min_items: Some(1),
         max_items: Some(10000),
-        items: Some(Box::new(PaymentData::schema_ref())),
+        items: Some(Box::new(RbacStakeAddressInfo::schema_ref())),
         ..MetaSchema::ANY
     })
 );
