@@ -19,7 +19,7 @@ cardano-chain-follower = { version = "0.0.10", git = "https://github.com/input-o
 rbac-registration = { version = "0.0.5", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower-v0.0.10" }
 catalyst-types = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250724-01" }
 cardano-blockchain-types = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250724-01" }
-catalyst-signed-doc = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", branch = "f15/cat-signed-doc-updates" }
+catalyst-signed-doc = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc/v0.0.4-f15-rc" }
 c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "r20250724-01" }
 
 pallas = { version = "0.33.0" }
