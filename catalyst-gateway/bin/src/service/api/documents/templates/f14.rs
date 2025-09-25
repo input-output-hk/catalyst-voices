@@ -25,10 +25,10 @@ pub(crate) const CATEGORY_DOCUMENTS: [CategoryDocData; 12] = [
     CategoryDocData("0194d490-30bf-706d-91c6-0d4707f74cdf", CAMPAIGN_ID),
     CategoryDocData("0194d490-30bf-759e-b729-304306fbaa5e", CAMPAIGN_ID),
     CategoryDocData("0194d490-30bf-7e27-b5fd-de3133b54bf6", CAMPAIGN_ID),
-    CategoryDocData("0194d490-30bf-7f9e-8a5d-91fb67c078f2",CAMPAIGN_ID ),
-    CategoryDocData("0194d490-30bf-7676-9658-36c0b67e656e",CAMPAIGN_ID ),
-    CategoryDocData("0194d490-30bf-7978-b031-7aa2ccc5e3fd",CAMPAIGN_ID ),
-    CategoryDocData("0194d490-30bf-7d34-bba9-8498094bd627",CAMPAIGN_ID),
+    CategoryDocData("0194d490-30bf-7f9e-8a5d-91fb67c078f2", CAMPAIGN_ID),
+    CategoryDocData("0194d490-30bf-7676-9658-36c0b67e656e", CAMPAIGN_ID),
+    CategoryDocData("0194d490-30bf-7978-b031-7aa2ccc5e3fd", CAMPAIGN_ID),
+    CategoryDocData("0194d490-30bf-7d34-bba9-8498094bd627", CAMPAIGN_ID),
 ];
 
 impl From<CategoryDocData> for SignedDocData {
