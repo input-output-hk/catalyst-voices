@@ -15,6 +15,7 @@ class VerificationEmailSendDialog extends StatelessWidget {
       message: Text(context.l10n.verificationEmailSendMessage),
       subMessage: Text(context.l10n.verificationEmailSendSubMessage),
       action: VoicesFilledButton(
+        key: const Key('VerificationEmailOkButton'),
         onTap: () => Navigator.of(context).pop(),
         child: Text(context.l10n.ok),
       ),

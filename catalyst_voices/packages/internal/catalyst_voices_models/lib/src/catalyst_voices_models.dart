@@ -19,6 +19,7 @@ export 'common/space.dart';
 export 'common/wildcard_path_handler.dart';
 export 'config/app_config.dart';
 export 'config/app_environment.dart';
+export 'config/reporting_service_config.dart';
 export 'crypto/catalyst_key_factory.dart';
 export 'crypto/catalyst_key_pair.dart';
 export 'crypto/catalyst_private_key.dart';

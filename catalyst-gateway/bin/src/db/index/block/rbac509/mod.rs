@@ -212,7 +212,7 @@ impl Rbac509InsertQuery {
                     index,
                     purpose,
                     previous_transaction,
-                    &report,
+                    report,
                 ));
             },
             // This isn't a hard error because user input can contain invalid information. If there

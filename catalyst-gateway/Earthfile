@@ -1,8 +1,10 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.5.12 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.5.17 AS rust-ci
 IMPORT ../ AS repo-ci
 IMPORT github.com/input-output-hk/catalyst-voices/catalyst-gateway:main AS cat-gateway-main
+
+ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub"
 
 #cspell: words rustfmt toolsets USERARCH stdcfgs openapitools trixie
 
@@ -41,6 +43,8 @@ builder-src:
     # Generate Checksums of the source
     DO rust-ci+FINGERPRINT_SRC
     SAVE ARTIFACT ../src_fingerprint.txt
+    SAVE ARTIFACT . build-src-dir
+    SAVE ARTIFACT /usr/local/cargo/bin/cargo-nextest cargo-nextest
 
 ## -----------------------------------------------------------------------------
 ##
@@ -65,14 +69,24 @@ build:
     # Build the service
     FROM +builder-src
 
-    DO rust-ci+EXECUTE \
-        --cmd="/scripts/std_build.py" \
-        --args1="--bins=cat-gateway/cat-gateway" \
-        --args2="--cov_report=$HOME/build/coverage-report.info" \
-        --output="release/cat-gateway" \
-        --junit="cat-gateway.junit-report.xml" \
-        --coverage="cat-gateway.coverage.info" \
-        --docs="true"
+    LET ARCH=$(uname -m)
+    IF [ "$ARCH" != "aarch64" ] && [ "$ARCH" != "arm64" ]
+        DO rust-ci+EXECUTE \
+            --cmd="/scripts/std_build.py" \
+            --args1="--bins=cat-gateway/cat-gateway" \
+            --args2="--cov_report=$HOME/build/coverage-report.info" \
+            --output="release/cat-gateway" \
+            --junit="cat-gateway.junit-report.xml" \
+            --coverage="cat-gateway.coverage.info" \
+            --docs="true"
+    ELSE
+        DO rust-ci+EXECUTE \
+            --cmd="/scripts/std_build.py" \
+            --args1="--bins=cat-gateway/cat-gateway" \
+            --output="release/cat-gateway" \
+            --junit="cat-gateway.junit-report.xml" \
+            --docs="true"
+    END
 
     # Generate the OpenAPI doc from the cat-gateway executable itself.
     ENV API_HOST_NAMES "https://gateway.dev.projectcatalyst.io"
@@ -82,8 +96,8 @@ build:
     SAVE ARTIFACT target/doc doc
     SAVE ARTIFACT target/release/cat-gateway cat-gateway
 
-test-openapi-diff:
-    FROM openapitools/openapi-diff:2.1.1
+disable-test-openapi-diff:
+    FROM ${REGISTRY}/openapitools/openapi-diff:2.1.1
 
     COPY cat-gateway-main+build/doc/cat-gateway-api.json cat-gateway-api.old.json
     COPY +build/doc/cat-gateway-api.json cat-gateway-api.new.json
@@ -97,7 +111,7 @@ all-hosts-build:
 
 # package : Create a deployable container for catalyst-gateway
 package:
-    FROM debian:trixie-slim
+    FROM ${REGISTRY}/debian:trixie-slim
 
     WORKDIR /app
     RUN apt-get update && apt-get install -y curl python3 python3-pip

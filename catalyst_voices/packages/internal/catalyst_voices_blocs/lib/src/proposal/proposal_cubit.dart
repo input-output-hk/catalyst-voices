@@ -245,6 +245,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     final ref = _cache.ref;
     assert(ref != null, 'Proposal ref not found. Load doc first');
 
+    _cache = _cache.copyWith(isFavorite: Optional(value));
     emit(state.copyWithFavorite(isFavorite: value));
 
     if (value) {
@@ -412,7 +413,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         author: Profile(catalystId: document.authorId!),
         description: document.description,
         status: proposal.publish,
-        createdAt: version?.id.tryDateTime ?? DateTime.now(),
+        createdAt: version?.id.tryDateTime ?? DateTimeExt.now(),
         warningCreatedAt: version?.isLatest == false,
         tag: document.tag,
         commentsCount: commentsCount,
