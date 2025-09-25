@@ -1,6 +1,7 @@
 //! Catalyst signed document templates.
 
 mod f14;
+mod f15;
 
 use std::{collections::HashMap, env, sync::LazyLock};
 
@@ -12,7 +13,7 @@ use hex::FromHex;
 use uuid::Uuid;
 
 /// A map of F14 signed document templates to its ID.
-pub(crate) static F14_TEMPLATES: LazyLock<Option<HashMap<Uuid, CatalystSignedDocument>>> =
+static F14_TEMPLATES: LazyLock<Option<HashMap<Uuid, CatalystSignedDocument>>> =
     LazyLock::new(|| {
         let sk = load_doc_signing_key()?;
 
@@ -29,6 +30,30 @@ pub(crate) static F14_TEMPLATES: LazyLock<Option<HashMap<Uuid, CatalystSignedDoc
         );
         map.extend(
             f14::COMMENT_TEMPLATES
+                .into_iter()
+                .map(|t| build_signed_doc(&t.into(), &sk)),
+        );
+        Some(map)
+    });
+
+/// A map of F15 signed document templates to its ID.
+static F15_TEMPLATES: LazyLock<Option<HashMap<Uuid, CatalystSignedDocument>>> =
+    LazyLock::new(|| {
+        let sk = load_doc_signing_key()?;
+
+        let mut map = HashMap::new();
+        map.extend(
+            f15::CATEGORY_DOCUMENTS
+                .into_iter()
+                .map(|t| build_signed_doc(&t.into(), &sk)),
+        );
+        map.extend(
+            f15::PROPOSAL_TEMPLATES
+                .into_iter()
+                .map(|t| build_signed_doc(&t.into(), &sk)),
+        );
+        map.extend(
+            f15::COMMENT_TEMPLATES
                 .into_iter()
                 .map(|t| build_signed_doc(&t.into(), &sk)),
         );
@@ -114,11 +139,23 @@ fn build_signed_doc(
     (doc_id, doc)
 }
 
+/// Returns true if the provided `document_id` is a Fund 15 template id
+pub(crate) fn is_f15_template(document_id: &uuid::Uuid) -> bool {
+    F15_TEMPLATES
+        .as_ref()
+        .is_some_and(|templates| templates.contains_key(&document_id))
+}
+
 /// Get a static document template from ID and version.
 pub(crate) fn get_doc_static_template(document_id: &uuid::Uuid) -> Option<CatalystSignedDocument> {
-    F14_TEMPLATES
+    F15_TEMPLATES
         .as_ref()
         .and_then(|templates| templates.get(document_id))
+        .or_else(|| {
+            F14_TEMPLATES
+                .as_ref()
+                .and_then(|templates| templates.get(document_id))
+        })
         .cloned()
 }
 

@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use catalyst_signed_doc::CatalystSignedDocument;
 
-use super::templates::get_doc_static_template;
+use super::templates::{get_doc_static_template, is_f15_template};
 use crate::{
     db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
     service::common::auth::rbac::token::CatalystRBACTokenV1,
@@ -38,6 +38,10 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         let id = doc_ref.id.uuid();
         let ver = doc_ref.ver.uuid();
+        if !is_f15_template(&id) {
+            return Ok(None);
+        }
+
         match get_document(&id, Some(&ver)).await {
             Ok(doc) => Ok(Some(doc)),
             Err(err) if err.is::<NotFoundError>() => Ok(None),
