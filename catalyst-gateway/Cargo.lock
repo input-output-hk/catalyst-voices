@@ -828,7 +828,7 @@ dependencies = [
 [[package]]
 name = "catalyst-signed-doc"
 version = "0.0.4"
-source = "git+https://github.com/input-output-hk/catalyst-libs.git?tag=cardano-chain-follower-v0.0.10#cbd70c471d73f72674e07112a4e09c84159e4e13"
+source = "git+https://github.com/input-output-hk/catalyst-libs.git?branch=f15%2Fcat-signed-doc-updates#0a8b2cf41fa56329738597a12eedb371890c9c39"
 dependencies = [
  "anyhow",
  "brotli 7.0.0",
