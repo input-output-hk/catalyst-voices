@@ -1012,6 +1012,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     Emitter<ProposalBuilderState> emit,
   ) async {
     final originalProposalRef = state.metadata.originalDocumentRef;
+    final originalProposalCategoryId = state.metadata.categoryId;
     assert(
       originalProposalRef != null,
       'Proposal ref not found. Load document first!',
@@ -1034,6 +1035,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         ref: originalProposalRef! as SignedDocumentRef,
         template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
         reply: event.reply,
+        categoryId: originalProposalCategoryId,
         authorId: activeAccountId!,
       ),
       document: event.document,
