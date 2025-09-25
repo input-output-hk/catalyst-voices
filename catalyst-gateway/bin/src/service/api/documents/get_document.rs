@@ -2,9 +2,9 @@
 
 use poem_openapi::ApiResponse;
 
-use super::common;
+use super::templates::get_doc_static_template;
 use crate::{
-    db::event::error::NotFoundError,
+    db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
     service::common::{responses::WithErrorResponses, types::payload::cbor::Cbor},
 };
 
@@ -31,13 +31,16 @@ pub(crate) async fn endpoint(
     document_id: uuid::Uuid,
     version: Option<uuid::Uuid>,
 ) -> AllResponses {
-    match common::get_document(&document_id, version.as_ref()).await {
-        Ok(doc) => {
-            match doc.try_into() {
-                Ok(doc_cbor_bytes) => Responses::Ok(Cbor(doc_cbor_bytes)).into(),
-                Err(err) => AllResponses::handle_error(&err),
-            }
-        },
+    // Find the doc in the static templates first
+    if let Some(doc) = get_doc_static_template(&document_id) {
+        return match doc.try_into() {
+            Ok(doc_cbor_bytes) => Responses::Ok(Cbor(doc_cbor_bytes)).into(),
+            Err(err) => AllResponses::handle_error(&err),
+        };
+    }
+
+    match FullSignedDoc::retrieve(&document_id, version.as_ref()).await {
+        Ok(doc) => Responses::Ok(Cbor(doc.raw().to_vec())).into(),
         Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
         Err(err) => AllResponses::handle_error(&err),
     }

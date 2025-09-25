@@ -5,27 +5,12 @@ use std::collections::HashMap;
 
 use catalyst_signed_doc::CatalystSignedDocument;
 
-use super::templates::{get_doc_static_template, is_active_template};
+use super::templates::get_active_doc_static_template;
 use crate::{
     db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
     service::common::auth::rbac::token::CatalystRBACTokenV1,
     settings::Settings,
 };
-
-/// Get document from the database
-pub(crate) async fn get_document(
-    document_id: &uuid::Uuid,
-    version: Option<&uuid::Uuid>,
-) -> anyhow::Result<CatalystSignedDocument> {
-    // Find the doc in the static templates first
-    if let Some(doc) = get_doc_static_template(document_id) {
-        return Ok(doc);
-    }
-
-    // If doesn't exist in the static templates, try to find it in the database
-    let db_doc = FullSignedDoc::retrieve(document_id, version).await?;
-    db_doc.raw().try_into()
-}
 
 /// A struct which implements a
 /// `catalyst_signed_doc::providers::CatalystSignedDocumentProvider` trait
@@ -38,12 +23,14 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         let id = doc_ref.id.uuid();
         let ver = doc_ref.ver.uuid();
-        if !is_active_template(&id) {
-            return Ok(None);
+
+        // Find the doc in the static templates first
+        if let Some(doc) = get_active_doc_static_template(&id) {
+            return Ok(Some(doc));
         }
 
-        match get_document(&id, Some(&ver)).await {
-            Ok(doc) => Ok(Some(doc)),
+        match FullSignedDoc::retrieve(&id, Some(&ver)).await {
+            Ok(doc) => doc.raw().try_into().map(Some),
             Err(err) if err.is::<NotFoundError>() => Ok(None),
             Err(err) => Err(err),
         }

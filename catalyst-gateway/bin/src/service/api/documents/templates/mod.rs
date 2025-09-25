@@ -139,14 +139,8 @@ fn build_signed_doc(
     (doc_id, doc)
 }
 
-/// Returns true if the provided `document_id` is a active template (Fund 15)
-pub(crate) fn is_active_template(document_id: &uuid::Uuid) -> bool {
-    F15_TEMPLATES
-        .as_ref()
-        .is_some_and(|templates| templates.contains_key(document_id))
-}
-
-/// Get a static document template from ID and version.
+/// Get a static document template from ID and version looking from all available static
+/// templates.
 pub(crate) fn get_doc_static_template(document_id: &uuid::Uuid) -> Option<CatalystSignedDocument> {
     F15_TEMPLATES
         .as_ref()
@@ -156,6 +150,16 @@ pub(crate) fn get_doc_static_template(document_id: &uuid::Uuid) -> Option<Cataly
                 .as_ref()
                 .and_then(|templates| templates.get(document_id))
         })
+        .cloned()
+}
+
+/// Get an active static document template from ID and version.
+pub(crate) fn get_active_doc_static_template(
+    document_id: &uuid::Uuid
+) -> Option<CatalystSignedDocument> {
+    F15_TEMPLATES
+        .as_ref()
+        .and_then(|templates| templates.get(document_id))
         .cloned()
 }
 
