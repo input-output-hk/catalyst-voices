@@ -60,7 +60,7 @@ final class DocumentsCommentRepository implements CommentRepository {
 
     assert(ref != null, 'CommentDocument have to have a ref to other document');
     // TODO(damian-molinski): creating SignedDocumentMetadata with correct refs
-    // have to be centralised.
+    // have to be captured single place.
     assert(
       categoryId != null,
       'CommentDocument have to have categoryId because proposals always have categoryId',
