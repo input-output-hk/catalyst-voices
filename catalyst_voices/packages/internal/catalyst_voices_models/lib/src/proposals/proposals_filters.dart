@@ -8,6 +8,7 @@ final class ProposalsFilters extends Equatable {
   final SignedDocumentRef? category;
   final String? searchQuery;
   final Duration? maxAge;
+  final CampaignFilters? campaign;
 
   const ProposalsFilters({
     this.type = ProposalsFilterType.total,
@@ -16,7 +17,17 @@ final class ProposalsFilters extends Equatable {
     this.category,
     this.searchQuery,
     this.maxAge,
+    this.campaign,
   });
+
+  ProposalsFilters.forActiveCampaign({
+    this.type = ProposalsFilterType.total,
+    this.author,
+    this.onlyAuthor,
+    this.category,
+    this.searchQuery,
+    this.maxAge,
+  }) : campaign = CampaignFilters.active();
 
   @override
   List<Object?> get props => [
@@ -26,6 +37,7 @@ final class ProposalsFilters extends Equatable {
     category,
     searchQuery,
     maxAge,
+    campaign,
   ];
 
   ProposalsFilters copyWith({
@@ -35,6 +47,7 @@ final class ProposalsFilters extends Equatable {
     Optional<SignedDocumentRef>? category,
     Optional<String>? searchQuery,
     Optional<Duration>? maxAge,
+    Optional<CampaignFilters>? campaign,
   }) {
     return ProposalsFilters(
       type: type ?? this.type,
@@ -43,6 +56,7 @@ final class ProposalsFilters extends Equatable {
       category: category.dataOr(this.category),
       searchQuery: searchQuery.dataOr(this.searchQuery),
       maxAge: maxAge.dataOr(this.maxAge),
+      campaign: campaign.dataOr(this.campaign),
     );
   }
 
@@ -53,6 +67,7 @@ final class ProposalsFilters extends Equatable {
       category: category,
       searchQuery: searchQuery,
       maxAge: maxAge,
+      campaign: campaign,
     );
   }
 
@@ -64,7 +79,8 @@ final class ProposalsFilters extends Equatable {
       'onlyAuthor[$onlyAuthor], '
       'category[$category], '
       'searchQuery[$searchQuery], '
-      'maxAge[$maxAge]'
+      'maxAge[$maxAge], '
+      'campaign[$campaign]'
       ')';
 }
 

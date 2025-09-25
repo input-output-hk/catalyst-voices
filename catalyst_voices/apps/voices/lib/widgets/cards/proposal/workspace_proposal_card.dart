@@ -122,6 +122,7 @@ class _Body extends StatelessWidget {
           title: proposal.title,
           version: proposal.iteration,
           hasNewerLocalIteration: proposal.hasNewerLocalIteration,
+          fromActiveCampaign: proposal.fromActiveCampaign,
         ),
       ],
     );

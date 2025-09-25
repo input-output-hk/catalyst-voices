@@ -103,8 +103,13 @@ enum ProposalMenuItemAction {
 
   /// Returns the available options for a proposal in a proposal builder
   static List<ProposalMenuItemAction> proposalBuilderAvailableOptions(
-    ProposalPublish proposalPublish,
-  ) {
+    ProposalPublish proposalPublish, {
+    required bool fromActiveCampaign,
+  }) {
+    if (!fromActiveCampaign) {
+      return [view];
+    }
+
     switch (proposalPublish) {
       case ProposalPublish.localDraft:
         return [view, publish, submit, export, delete];
@@ -118,9 +123,11 @@ enum ProposalMenuItemAction {
 
   /// Returns the available options for a proposal in a workspace
   static List<ProposalMenuItemAction> workspaceAvailableOptions(
-    ProposalPublish proposalPublish,
-  ) {
+    ProposalPublish proposalPublish, {
+    required bool fromActiveCampaign,
+  }) {
     return switch (proposalPublish) {
+      _ when !fromActiveCampaign => [view],
       ProposalPublish.localDraft => [edit, export, delete],
       _ => [
         edit,

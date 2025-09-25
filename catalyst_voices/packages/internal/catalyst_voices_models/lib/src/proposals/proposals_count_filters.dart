@@ -7,6 +7,7 @@ final class ProposalsCountFilters extends Equatable {
   final SignedDocumentRef? category;
   final String? searchQuery;
   final Duration? maxAge;
+  final CampaignFilters? campaign;
 
   const ProposalsCountFilters({
     this.author,
@@ -14,6 +15,7 @@ final class ProposalsCountFilters extends Equatable {
     this.category,
     this.searchQuery,
     this.maxAge,
+    this.campaign,
   });
 
   @override
@@ -23,5 +25,6 @@ final class ProposalsCountFilters extends Equatable {
     category,
     searchQuery,
     maxAge,
+    campaign,
   ];
 }

@@ -19,11 +19,19 @@ final class CampaignRepositoryImpl implements CampaignRepository {
   Future<Campaign> getCampaign({
     required String id,
   }) async {
-    return Campaign.f14();
+    if (id == Campaign.f15Ref.id) {
+      return Campaign.f15();
+    }
+    if (id == Campaign.f14Ref.id) {
+      return Campaign.f14();
+    }
+    throw NotFoundException(message: 'Campaign $id not found');
   }
 
   @override
   Future<CampaignCategory?> getCategory(SignedDocumentRef ref) async {
-    return staticCampaignCategories.firstWhereOrNull((e) => e.selfRef.id == ref.id);
+    return Campaign.all
+        .expand((element) => element.categories)
+        .firstWhereOrNull((e) => e.selfRef.id == ref.id);
   }
 }

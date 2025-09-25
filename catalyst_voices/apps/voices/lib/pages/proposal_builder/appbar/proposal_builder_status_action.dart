@@ -29,6 +29,7 @@ class ProposalBuilderStatusAction extends StatelessWidget {
           offstage: state.isLoading || state.error != null,
           items: ProposalMenuItemAction.proposalBuilderAvailableOptions(
             state.metadata.publish,
+            fromActiveCampaign: state.metadata.fromActiveCampaign,
           ),
         );
       },

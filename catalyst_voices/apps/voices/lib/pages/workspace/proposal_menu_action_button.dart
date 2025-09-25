@@ -23,6 +23,7 @@ class ProposalMenuActionButton extends StatefulWidget {
   final int version;
   final String title;
   final bool hasNewerLocalIteration;
+  final bool fromActiveCampaign;
 
   const ProposalMenuActionButton({
     super.key,
@@ -31,6 +32,7 @@ class ProposalMenuActionButton extends StatefulWidget {
     required this.version,
     required this.title,
     required this.hasNewerLocalIteration,
+    required this.fromActiveCampaign,
   });
 
   @override
@@ -65,6 +67,7 @@ class _ProposalMenuActionButtonState extends State<ProposalMenuActionButton> {
 
   List<ProposalMenuItemAction> get _items => ProposalMenuItemAction.workspaceAvailableOptions(
     widget.proposalPublish,
+    fromActiveCampaign: widget.fromActiveCampaign,
   );
 
   @override

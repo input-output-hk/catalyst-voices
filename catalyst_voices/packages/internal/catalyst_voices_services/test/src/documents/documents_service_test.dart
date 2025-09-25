@@ -32,13 +32,15 @@ void main() {
       final cachedRefs = <TypedDocumentRef>[];
 
       // When
-      when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
+      when(
+        () => documentRepository.getAllDocumentsRefs(campaign: Campaign.f14()),
+      ).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
       when(
         () => documentRepository.cacheDocument(ref: any(named: 'ref')),
       ).thenAnswer((_) => Future(() {}));
 
-      await service.sync();
+      await service.sync(campaign: Campaign.f14());
 
       // Then
       verify(() => documentRepository.cacheDocument(ref: any(named: 'ref'))).called(allRefs.length);
@@ -54,13 +56,15 @@ void main() {
       final expectedCalls = allRefs.length - cachedRefs.length;
 
       // When
-      when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
+      when(
+        () => documentRepository.getAllDocumentsRefs(campaign: Campaign.f14()),
+      ).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
       when(
         () => documentRepository.cacheDocument(ref: any(named: 'ref')),
       ).thenAnswer((_) => Future(() {}));
 
-      await service.sync();
+      await service.sync(campaign: Campaign.f14());
 
       // Then
       verify(() => documentRepository.cacheDocument(ref: any(named: 'ref'))).called(expectedCalls);
@@ -81,13 +85,15 @@ void main() {
           );
 
       // When
-      when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
+      when(
+        () => documentRepository.getAllDocumentsRefs(campaign: Campaign.f14()),
+      ).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
       when(
         () => documentRepository.cacheDocument(ref: any(named: 'ref')),
       ).thenAnswer((_) => Future(() {}));
 
-      await service.sync();
+      await service.sync(campaign: Campaign.f14());
 
       // Then
       verifyNever(
@@ -105,7 +111,9 @@ void main() {
       var progress = 0.0;
 
       // When
-      when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
+      when(
+        () => documentRepository.getAllDocumentsRefs(campaign: Campaign.f14()),
+      ).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
       when(
         () => documentRepository.cacheDocument(ref: any(named: 'ref')),
@@ -113,6 +121,7 @@ void main() {
 
       // Then
       await service.sync(
+        campaign: Campaign.f14(),
         onProgress: (value) {
           progress = value;
         },
@@ -131,14 +140,16 @@ void main() {
       final expectedNewRefs = allRefs.sublist(cachedRefs.length);
 
       // When
-      when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
+      when(
+        () => documentRepository.getAllDocumentsRefs(campaign: Campaign.f14()),
+      ).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
       when(
         () => documentRepository.cacheDocument(ref: any(named: 'ref')),
       ).thenAnswer((_) => Future(() {}));
 
       // Then
-      final newRefs = await service.sync();
+      final newRefs = await service.sync(campaign: Campaign.f14());
 
       expect(
         newRefs,

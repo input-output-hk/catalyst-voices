@@ -79,27 +79,28 @@ class NewProposalCubit extends Cubit<NewProposalState>
       if (campaign == null) {
         throw StateError('Cannot load proposal, active campaign not found');
       }
-      final templateRef = await _proposalService.getProposalTemplate(
-        // TODO(LynxLynxx): when we have separate proposal template for generic questions use it here
-        // right now user can start creating proposal without selecting category.
-        // Right now every category have the same requirements for title so we can do a fallback for
-        // first category from the list.
-        ref: campaign.categories
-            .firstWhere(
-              (e) => e.selfRef == categoryRef,
-              orElse: () => campaign.categories.first,
-            )
-            .proposalTemplateRef,
-      );
 
-      final titlePropertySchema =
-          templateRef.schema.getPropertySchema(ProposalDocument.titleNodeId)!
-              as DocumentStringSchema;
-      final titleRange = titlePropertySchema.strLengthRange;
+      // TODO(LynxLynxx): when we have separate proposal template for generic questions use it here
+      // right now user can start creating proposal without selecting category.
+      // Right now every category have the same requirements for title so we can do a fallback for
+      // first category from the list.
+      final templateRef = campaign.categories
+          .cast<CampaignCategory?>()
+          .firstWhere(
+            (e) => e?.selfRef == categoryRef,
+            orElse: () => campaign.categories.firstOrNull,
+          )
+          ?.proposalTemplateRef;
+
+      final template = templateRef != null
+          ? await _proposalService.getProposalTemplate(ref: templateRef)
+          : null;
+      final titleRange = template?.title?.strLengthRange;
 
       final categories = campaign.categories
           .map(CampaignCategoryDetailsViewModel.fromModel)
           .toList();
+
       final newState = state.copyWith(
         isLoading: false,
         step: step,

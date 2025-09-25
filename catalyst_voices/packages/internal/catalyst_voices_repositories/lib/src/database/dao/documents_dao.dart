@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/src/database/query/jsonb_expression
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
+import 'package:catalyst_voices_repositories/src/database/table/drafts.dart';
 import 'package:catalyst_voices_repositories/src/database/typedefs.dart';
 import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
@@ -40,7 +41,11 @@ abstract interface class DocumentsDao {
   });
 
   /// Deletes all documents. Cascades to metadata.
-  Future<int> deleteAll();
+  ///
+  /// If [keepTemplatesForLocalDrafts] is true keeps templates referred by local drafts.
+  Future<int> deleteAll({
+    bool keepTemplatesForLocalDrafts,
+  });
 
   /// If version is specified in [ref] returns this version or null.
   /// Returns newest version with matching id or null of none found.
@@ -110,6 +115,7 @@ abstract interface class DocumentsDao {
   tables: [
     Documents,
     DocumentsMetadata,
+    Drafts,
   ],
 )
 class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
@@ -174,8 +180,28 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<int> deleteAll() async {
-    final deletedRows = await delete(documents).go();
+  Future<int> deleteAll({
+    bool keepTemplatesForLocalDrafts = false,
+  }) async {
+    final query = delete(documents);
+
+    if (keepTemplatesForLocalDrafts) {
+      final templateId = drafts.metadata.jsonExtract<String>(r'$.template.id');
+
+      query.where((documents) {
+        return notExistsQuery(
+          selectOnly(drafts, distinct: true)
+            ..addColumns([
+              templateId,
+            ])
+            ..where(
+              documents.metadata.jsonExtract(r'$.selfRef.id').equalsExp(templateId),
+            ),
+        );
+      });
+    }
+
+    final deletedRows = await query.go();
 
     if (kDebugMode) {
       debugPrint('DocumentsDao: Deleted[$deletedRows] rows');
