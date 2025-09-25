@@ -60,14 +60,14 @@ void main() {
         // When
         when(
           () => gateway.apiV1DocumentIndexPost(
-            body: const DocumentIndexQueryFilter(),
+            body: any(named: 'body'),
             limit: maxPageSize,
             page: 0,
           ),
         ).thenAnswer((_) => Future.value(pageZeroResponse));
         when(
           () => gateway.apiV1DocumentIndexPost(
-            body: const DocumentIndexQueryFilter(),
+            body: any(named: 'body'),
             limit: maxPageSize,
             page: 1,
           ),
@@ -124,7 +124,7 @@ void main() {
         // When
         when(
           () => gateway.apiV1DocumentIndexPost(
-            body: const DocumentIndexQueryFilter(),
+            body: any(named: 'body'),
             limit: maxPageSize,
             page: 0,
           ),
