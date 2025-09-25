@@ -18,6 +18,8 @@ pub struct RbacStakeAddressInfo {
     /// A slot number when the registration chain stopped to use the stake address.
     #[oai(skip_serializing_if_is_empty)]
     inactive_from: Option<SlotNo>,
+    /// TODO: FIXME: remove.
+    is_persistent: SlotNo,
 }
 
 impl Example for RbacStakeAddressInfo {
@@ -26,6 +28,7 @@ impl Example for RbacStakeAddressInfo {
             stake: Cip19StakeAddress::example(),
             active_from: SlotNo::example(),
             inactive_from: Some(SlotNo::example()),
+            is_persistent: SlotNo::example(),
         }
     }
 }
