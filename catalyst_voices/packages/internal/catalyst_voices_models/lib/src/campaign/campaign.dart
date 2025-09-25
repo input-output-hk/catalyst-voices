@@ -13,7 +13,7 @@ final class Campaign extends Equatable {
   static const f14Ref = SignedDocumentRef.first('01997695-e26f-70db-b9d4-92574a806bcd');
   static const f15Ref = SignedDocumentRef.first('01997696-2024-7438-9178-f7d29b2c1ddb');
 
-  static List<Campaign> all = [
+  static final all = <Campaign>[
     Campaign.f14(),
     Campaign.f15(),
   ];
