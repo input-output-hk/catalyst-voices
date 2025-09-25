@@ -139,11 +139,11 @@ fn build_signed_doc(
     (doc_id, doc)
 }
 
-/// Returns true if the provided `document_id` is a Fund 15 template id
-pub(crate) fn is_f15_template(document_id: &uuid::Uuid) -> bool {
+/// Returns true if the provided `document_id` is a active template (Fund 15)
+pub(crate) fn is_active_template(document_id: &uuid::Uuid) -> bool {
     F15_TEMPLATES
         .as_ref()
-        .is_some_and(|templates| templates.contains_key(&document_id))
+        .is_some_and(|templates| templates.contains_key(document_id))
 }
 
 /// Get a static document template from ID and version.
