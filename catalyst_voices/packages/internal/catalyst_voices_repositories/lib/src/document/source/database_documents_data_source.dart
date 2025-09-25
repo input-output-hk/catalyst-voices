@@ -16,6 +16,11 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Future<int> deleteAllRespectingLocalDrafts() {
+    return _database.documentsDao.deleteAll(keepTemplatesForLocalDrafts: true);
+  }
+
+  @override
   Future<bool> exists({required DocumentRef ref}) {
     return _database.documentsDao.count(ref: ref).then((count) => count > 0);
   }
@@ -54,7 +59,7 @@ final class DatabaseDocumentsDataSource
     return _database.proposalsDao
         .queryProposals(
           categoryRef: categoryRef,
-          filters: ProposalsFilters(type: type, campaign: CampaignFilters.active()),
+          filters: ProposalsFilters.forActiveCampaign(type: type),
         )
         .then((value) => value.map((e) => e.toModel()).toList());
   }
@@ -188,11 +193,6 @@ final class DatabaseDocumentsDataSource
     return _database.documentsDao
         .watchRefToDocumentData(refTo: refTo, type: type)
         .map((e) => e?.toModel());
-  }
-
-  @override
-  Future<int> deleteAllRespectingLocalDrafts() {
-    return _database.documentsDao.deleteAll(keepTemplatesForLocalDrafts: true);
   }
 }
 

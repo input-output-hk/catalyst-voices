@@ -153,7 +153,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     return _proposalService
         .watchProposalsPage(
           request: const PageRequest(page: 0, size: _maxRecentProposalsCount),
-          filters: ProposalsFilters(campaign: CampaignFilters.active()),
+          filters: ProposalsFilters.forActiveCampaign(),
           order: const UpdateDate(isAscending: false),
         )
         .map((event) => event.items)

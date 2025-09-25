@@ -294,10 +294,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
 
   void _resetCache() {
     final activeAccount = _userService.user.activeAccount;
-    final filters = ProposalsFilters(
-      author: activeAccount?.catalystId,
-      campaign: CampaignFilters.active(),
-    );
+    final filters = ProposalsFilters.forActiveCampaign(author: activeAccount?.catalystId);
     _cache = ProposalsCubitCache(filters: filters);
   }
 

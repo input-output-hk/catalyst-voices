@@ -20,6 +20,15 @@ final class ProposalsFilters extends Equatable {
     this.campaign,
   });
 
+  ProposalsFilters.forActiveCampaign({
+    this.type = ProposalsFilterType.total,
+    this.author,
+    this.onlyAuthor,
+    this.category,
+    this.searchQuery,
+    this.maxAge,
+  }) : campaign = CampaignFilters.active();
+
   @override
   List<Object?> get props => [
     type,
