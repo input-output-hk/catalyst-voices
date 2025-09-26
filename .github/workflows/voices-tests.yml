@@ -1,4 +1,4 @@
-name: Catalyst Voices integration tests
+name: Catalyst Voices E2E tests
 
 on:
   workflow_call:
@@ -9,23 +9,18 @@ concurrency:
 
 env:
   REPORT_EXT: .junit-report.xml
-  COVERAGE_EXT: .coverage.info
 
 jobs:
   tests:
-    name: Cat-Voices integration tests
+    name: Catalyst Voices E2E tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Free Disk Space (Ubuntu)
+      - name: Free Disk Space
         uses: jlumbroso/free-disk-space@main
         with:
-          # this might remove tools that are actually needed,
-          # if set to "true" but frees about 6 GB
           tool-cache: false
-          # all of these default to true, but feel free to set to
-          # "false" if necessary for your workflow
           android: true
           dotnet: false
           haskell: false
@@ -34,9 +29,110 @@ jobs:
           swap-storage: true
 
       - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.8.1
         with:
           enable_caching: "true"
           version: 0.21.0
-      - name: Setup
-        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.10.0
+
+      - name: Setup Forge
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.8.1
+
+      # Build all images with Earthly
+      - name: Build all images
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.8.1
+        with:
+          command: run
+          args: ./catalyst_voices/apps/voices/e2e_tests/+all-images
+
+      # Start database services
+      - name: Start database services
+        working-directory: catalyst_voices/apps/voices/e2e_tests
+        run: docker compose up -d event-db scylla-node
+
+      # Wait for databases to be healthy
+      - name: Wait for databases
+        working-directory: catalyst_voices/apps/voices/e2e_tests
+        run: |
+          echo "Waiting for databases..."
+          for i in {1..60}; do
+            if docker compose ps scylla-node 2>/dev/null | grep -q "healthy"; then
+              echo "Databases ready"
+              break
+            fi
+            sleep 5
+          done
+
+      # Run database migrations
+      - name: Run migrations
+        working-directory: catalyst_voices/apps/voices/e2e_tests
+        run: |
+          docker compose up event-db-v1-migrations --exit-code-from event-db-v1-migrations
+          docker compose up event-db-migrations --exit-code-from event-db-migrations
+
+      # Start application services
+      - name: Start services
+        working-directory: catalyst_voices/apps/voices/e2e_tests
+        run: docker compose up -d cat-gateway flutter-web nginx-proxy
+
+      # Wait for services to be ready
+      - name: Wait for services
+        working-directory: catalyst_voices/apps/voices/e2e_tests
+        run: |
+          echo "Waiting for services..."
+          for i in {1..60}; do
+            if docker compose ps nginx-proxy 2>/dev/null | grep -q "healthy"; then
+              echo "Services ready"
+              curl -s http://localhost:3030 || true
+              curl -s http://localhost:3030/api/v1/health/ready || true
+              break
+            fi
+            sleep 5
+          done
+
+      # Run E2E tests
+      - name: Run E2E tests
+        working-directory: catalyst_voices/apps/voices/e2e_tests
+        run: docker compose up e2e-tests --exit-code-from e2e-tests
+
+      # Collect test results
+      - name: Collect test results
+        if: always()
+        working-directory: catalyst_voices/apps/voices/e2e_tests
+        run: |
+          # The test results should be available after docker compose down
+          if [ -f test-results/results.xml ]; then
+            cp test-results/results.xml ./voices-e2e${{ env.REPORT_EXT }}
+          fi
+
+      # Upload test reports
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-voices
+          path: |
+            catalyst_voices/apps/voices/e2e_tests/**/*${{ env.REPORT_EXT }}
+            catalyst_voices/apps/voices/e2e_tests/test-results/
+            catalyst_voices/apps/voices/e2e_tests/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 1
+
+      # Cleanup
+      - name: Cleanup
+        if: always()
+        working-directory: catalyst_voices/apps/voices/e2e_tests
+        run: docker compose down -v
+
+      # Show logs on failure
+      - name: Show logs on failure
+        if: failure()
+        working-directory: catalyst_voices/apps/voices/e2e_tests
+        run: |
+          echo "=== Nginx Logs ==="
+          docker compose logs nginx-proxy || true
+          echo "=== Flutter Logs ==="
+          docker compose logs flutter-web || true
+          echo "=== Gateway Logs ==="
+          docker compose logs cat-gateway || true
+          echo "=== E2E Tests Logs ==="
+          docker compose logs e2e-tests || true
