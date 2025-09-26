@@ -1,5 +1,80 @@
 part of 'document_property_schema.dart';
 
+final class DocumentCurrencySchema extends DocumentIntegerSchema {
+  const DocumentCurrencySchema({
+    required super.nodeId,
+    required DocumentCurrencyFormat? super.format,
+    required super.title,
+    required super.description,
+    required super.placeholder,
+    required super.guidance,
+    required super.isSubsection,
+    required super.isRequired,
+    required super.defaultValue,
+    required super.constValue,
+    required super.enumValues,
+    required super.numRange,
+    required super.multipleOf,
+  });
+
+  /// Returns the currency associated with the [format]
+  /// or [Currency.fallback] if there's no format defined.
+  Currency get currency => format?.currency ?? const Currency.fallback();
+
+  @override
+  DocumentCurrencyFormat? get format => super.format as DocumentCurrencyFormat?;
+
+  /// Returns the money units associated with the [format]
+  /// or [MoneyUnits.fallback] if there's no format defined.
+  MoneyUnits get moneyUnits => format?.moneyUnits ?? MoneyUnits.fallback;
+
+  @override
+  DocumentCurrencySchema copyWith({
+    DocumentNodeId? nodeId,
+    String? title,
+  }) {
+    return DocumentCurrencySchema(
+      nodeId: nodeId ?? this.nodeId,
+      format: format,
+      title: title ?? this.title,
+      description: description,
+      placeholder: placeholder,
+      guidance: guidance,
+      isSubsection: isSubsection,
+      isRequired: isRequired,
+      defaultValue: defaultValue,
+      constValue: constValue,
+      enumValues: enumValues,
+      numRange: numRange,
+      multipleOf: multipleOf,
+    );
+  }
+
+  /// Converts the [money] instance to a raw value needed in the document data.
+  ///
+  /// The [money] instance is assumed to be created by [valueToMoney].
+  int moneyToValue(Money money) {
+    switch (moneyUnits) {
+      case MoneyUnits.majorUnits:
+        return money.majorUnits.toInt();
+      case MoneyUnits.minorUnits:
+        return money.minorUnits.toInt();
+    }
+  }
+
+  /// Constructs an instance of [Money] according to the [format]
+  /// from the [value] coming from the document data.
+  ///
+  /// If format not known then fallbacks to a historical representation used by the F14.
+  Money valueToMoney(int value) {
+    return Money.fromUnits(
+      currency: currency,
+      amount: BigInt.from(value),
+      moneyUnits: moneyUnits,
+    );
+  }
+}
+
 final class DocumentDurationInMonthsSchema extends DocumentIntegerSchema {
   const DocumentDurationInMonthsSchema({
     required super.nodeId,
@@ -134,45 +209,5 @@ sealed class DocumentIntegerSchema extends DocumentValueSchema<int> {
       DocumentValidator.validateConstValue(this, value),
       DocumentValidator.validateEnumValues(this, value),
     ]);
-  }
-}
-
-final class DocumentTokenValueCardanoAdaSchema extends DocumentIntegerSchema {
-  const DocumentTokenValueCardanoAdaSchema({
-    required super.nodeId,
-    required super.format,
-    required super.title,
-    required super.description,
-    required super.placeholder,
-    required super.guidance,
-    required super.isSubsection,
-    required super.isRequired,
-    required super.defaultValue,
-    required super.constValue,
-    required super.enumValues,
-    required super.numRange,
-    required super.multipleOf,
-  });
-
-  @override
-  DocumentTokenValueCardanoAdaSchema copyWith({
-    DocumentNodeId? nodeId,
-    String? title,
-  }) {
-    return DocumentTokenValueCardanoAdaSchema(
-      nodeId: nodeId ?? this.nodeId,
-      format: format,
-      title: title ?? this.title,
-      description: description,
-      placeholder: placeholder,
-      guidance: guidance,
-      isSubsection: isSubsection,
-      isRequired: isRequired,
-      defaultValue: defaultValue,
-      constValue: constValue,
-      enumValues: enumValues,
-      numRange: numRange,
-      multipleOf: multipleOf,
-    );
   }
 }

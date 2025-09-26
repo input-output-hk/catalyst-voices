@@ -1,31 +1,36 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/text_field/voices_num_field.dart';
+import 'package:catalyst_voices/widgets/text_field/voices_double_field.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-class TokenField extends StatelessWidget {
-  final VoicesIntFieldController? controller;
-  final ValueChanged<int?>? onChanged;
-  final ValueChanged<int?>? onFieldSubmitted;
-  final VoicesNumFieldValidator<int>? validator;
+typedef VoicesMoneyFieldValidator =
+    VoicesTextFieldValidationResult Function(
+      Money? value,
+      String text,
+    );
+
+class VoicesMoneyField extends StatelessWidget {
+  final VoicesMoneyFieldController controller;
+  final ValueChanged<Money?>? onChanged;
+  final ValueChanged<Money?>? onFieldSubmitted;
+  final VoicesMoneyFieldValidator? validator;
   final String? labelText;
   final String? errorText;
   final String? placeholder;
   final FocusNode? focusNode;
   final NumRange<int>? range;
-  final Currency currency;
   final bool showHelper;
   final bool enabled;
   final bool readOnly;
   final bool? ignorePointers;
   final Widget? helperWidget;
 
-  const TokenField({
+  const VoicesMoneyField({
     super.key,
-    this.controller,
+    required this.controller,
     this.onChanged,
     required this.onFieldSubmitted,
     this.validator,
@@ -34,7 +39,6 @@ class TokenField extends StatelessWidget {
     this.placeholder,
     this.focusNode,
     this.range,
-    required this.currency,
     this.showHelper = true,
     this.enabled = true,
     this.readOnly = false,
@@ -46,19 +50,19 @@ class TokenField extends StatelessWidget {
   Widget build(BuildContext context) {
     final range = this.range;
 
-    return VoicesIntField(
+    return VoicesDoubleField(
       controller: controller,
       focusNode: focusNode,
       decoration: VoicesTextFieldDecoration(
         labelText: labelText,
         errorText: errorText,
-        prefixText: currency.symbol,
+        prefixText: controller.currency.symbol,
         hintText: range != null && range.min != null ? '${range.min}' : null,
         helper:
             helperWidget ??
             (showHelper
                 ? _Helper(
-                    currency: currency,
+                    currency: controller.currency,
                     range: range,
                     placeholder: placeholder,
                   )
@@ -67,32 +71,61 @@ class TokenField extends StatelessWidget {
           color: context.colors.textOnPrimaryLevel1,
         ),
       ),
-      validator: (int? value, text) => _validate(context, value, text),
-      onChanged: onChanged,
-      onFieldSubmitted: onFieldSubmitted,
+      validator: (double? value, text) => _validate(context, value, text),
+      onChanged: onChanged != null ? _onChanged : null,
+      onFieldSubmitted: onFieldSubmitted != null ? _onFieldSubmitted : null,
       enabled: enabled,
       readOnly: readOnly,
       ignorePointers: ignorePointers,
     );
   }
 
+  void _onChanged(double? value) {
+    onChanged?.call(_MoneyMath.doubleToMoney(controller.currency, controller.moneyUnits, value));
+  }
+
+  void _onFieldSubmitted(double? value) {
+    onFieldSubmitted?.call(
+      _MoneyMath.doubleToMoney(controller.currency, controller.moneyUnits, value),
+    );
+  }
+
   VoicesTextFieldValidationResult _validate(
     BuildContext context,
-    int? value,
+    double? value,
     String text,
   ) {
-    // Value could not be parsed into int.
-    if (value == null && text.isNotEmpty) {
+    final money = _MoneyMath.doubleToMoney(controller.currency, controller.moneyUnits, value);
+    if (money == null && text.isNotEmpty) {
       final message = context.l10n.errorValidationTokenNotParsed;
       return VoicesTextFieldValidationResult.error(message);
     }
 
     final validator = this.validator;
     if (validator != null) {
-      return validator(value, text);
+      return validator(money, text);
     }
 
     return const VoicesTextFieldValidationResult.none();
+  }
+}
+
+class VoicesMoneyFieldController extends VoicesDoubleFieldController {
+  final Currency currency;
+  final MoneyUnits moneyUnits;
+
+  VoicesMoneyFieldController({
+    required this.currency,
+    required this.moneyUnits,
+    Money? value,
+  }) : super(_MoneyMath.moneyToDouble(value));
+
+  Money? get money {
+    return _MoneyMath.doubleToMoney(currency, moneyUnits, value);
+  }
+
+  set money(Money? money) {
+    value = _MoneyMath.moneyToDouble(money);
   }
 }
 
@@ -165,5 +198,35 @@ class _Helper extends StatelessWidget {
     }
 
     return const Text('');
+  }
+}
+
+class _MoneyMath {
+  static Money? doubleToMoney(Currency currency, MoneyUnits moneyUnits, double? value) {
+    if (value == null) {
+      return null;
+    }
+
+    switch (moneyUnits) {
+      case MoneyUnits.majorUnits:
+        return Money.fromMajorUnits(
+          currency: currency,
+          majorUnits: BigInt.from(value),
+        );
+      case MoneyUnits.minorUnits:
+        return Money(
+          currency: currency,
+          minorUnits: BigInt.from(value) * currency.decimalDigitsMultiplier,
+        );
+    }
+  }
+
+  static double? moneyToDouble(Money? money) {
+    if (money == null) {
+      return null;
+    }
+
+    // TODO: truncate
+    return money.minorUnits / money.currency.decimalDigitsMultiplier;
   }
 }

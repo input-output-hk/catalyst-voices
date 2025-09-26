@@ -27,9 +27,10 @@ final class DocumentIntegerSchemaMapper {
 
     switch (definition) {
       case _DocumentIntegerDefinition.tokenValueCardanoAda:
-        return DocumentTokenValueCardanoAdaSchema(
+      case _DocumentIntegerDefinition.currency:
+        return DocumentCurrencySchema(
           nodeId: nodeId,
-          format: format,
+          format: format as DocumentCurrencyFormat?,
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,
@@ -80,6 +81,7 @@ final class DocumentIntegerSchemaMapper {
 
 enum _DocumentIntegerDefinition {
   tokenValueCardanoAda('tokenValueCardanoADA'),
+  currency('currency'),
   durationInMonths('durationInMonths'),
   unknown('unknown');
 

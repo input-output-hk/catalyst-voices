@@ -34,11 +34,10 @@ class DocumentValuePropertyBuilder extends StatelessWidget {
           isEditMode: isEditMode,
           onChanged: onChanged,
         );
-      case DocumentTokenValueCardanoAdaSchema():
-        return DocumentTokenValueWidget(
+      case DocumentCurrencySchema():
+        return DocumentCurrencyWidget(
           property: schema.castProperty(property),
           schema: schema,
-          currency: schema.format?.currency ?? const Currency.fallback(),
           isEditMode: isEditMode,
           onChanged: onChanged,
         );

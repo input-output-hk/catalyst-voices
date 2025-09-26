@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/src/money/currency.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -37,8 +35,28 @@ final class Money extends Equatable implements Comparable<Money> {
   }) {
     return Money(
       currency: currency,
-      minorUnits: majorUnits * BigInt.from(pow(10, currency.decimalDigits)),
+      minorUnits: majorUnits * currency.decimalDigitsMultiplier,
     );
+  }
+
+  /// Creates a [Money] amount from [amount], either major or minor units specified by the [moneyUnits].
+  factory Money.fromUnits({
+    required Currency currency,
+    required BigInt amount,
+    required MoneyUnits moneyUnits,
+  }) {
+    switch (moneyUnits) {
+      case MoneyUnits.majorUnits:
+        return Money.fromMajorUnits(
+          currency: currency,
+          majorUnits: amount,
+        );
+      case MoneyUnits.minorUnits:
+        return Money(
+          currency: currency,
+          minorUnits: amount,
+        );
+    }
   }
 
   /// Creates a zero-amount [Money] instance for the given [currency].
@@ -48,6 +66,10 @@ final class Money extends Equatable implements Comparable<Money> {
 
   /// Returns `true` if the amount is equal to zero.
   bool get isZero => minorUnits == BigInt.zero;
+
+  /// Retuns the major units calculated from [minorUnits].
+  /// If the [minorUnits] contains "cents" they will be truncated.
+  BigInt get majorUnits => minorUnits ~/ currency.decimalDigitsMultiplier;
 
   @override
   List<Object?> get props => [currency, minorUnits];
@@ -122,6 +144,17 @@ final class Money extends Equatable implements Comparable<Money> {
       );
     }
   }
+}
+
+enum MoneyUnits {
+  /// The monetary amount is entered in major units, i.e. whole dollars.
+  majorUnits,
+
+  /// The monetary amount is entered in minor units, i.e. cents.
+  minorUnits;
+
+  /// A historical money units, needs to be synced with [Currency.fallback].
+  static MoneyUnits get fallback => majorUnits;
 }
 
 /// Extension methods for [Coin] to interoperate with [Money].

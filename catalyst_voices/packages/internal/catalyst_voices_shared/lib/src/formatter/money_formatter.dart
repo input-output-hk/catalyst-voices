@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:intl/intl.dart';
 
@@ -57,7 +55,7 @@ abstract class MoneyFormatter {
     MoneyDecoration decoration = MoneyDecoration.symbol,
   }) {
     final numberFormat = NumberFormat('#.##');
-    final decimalAmount = money.minorUnits / BigInt.from(pow(10, money.currency.decimalDigits));
+    final decimalAmount = money.minorUnits / money.currency.decimalDigitsMultiplier;
 
     final String formatted;
     if (decimalAmount >= _million) {

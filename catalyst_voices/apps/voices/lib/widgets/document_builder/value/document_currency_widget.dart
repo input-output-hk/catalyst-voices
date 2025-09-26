@@ -1,38 +1,35 @@
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/widgets/rich_text/markdown_text.dart';
-import 'package:catalyst_voices/widgets/text_field/token_field.dart';
-import 'package:catalyst_voices/widgets/text_field/voices_int_field.dart';
+import 'package:catalyst_voices/widgets/text_field/voices_money_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class DocumentTokenValueWidget extends StatefulWidget {
+class DocumentCurrencyWidget extends StatefulWidget {
   final DocumentValueProperty<int> property;
-  final DocumentIntegerSchema schema;
-  final Currency currency;
+  final DocumentCurrencySchema schema;
   final bool isEditMode;
   final ValueChanged<List<DocumentChange>> onChanged;
 
-  const DocumentTokenValueWidget({
+  const DocumentCurrencyWidget({
     super.key,
     required this.property,
     required this.schema,
-    required this.currency,
     required this.isEditMode,
     required this.onChanged,
   });
 
   @override
-  State<DocumentTokenValueWidget> createState() {
-    return _DocumentTokenValueWidgetState();
+  State<DocumentCurrencyWidget> createState() {
+    return _DocumentCurrencyWidgetState();
   }
 }
 
-class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
-  late final VoicesIntFieldController _controller;
+class _DocumentCurrencyWidgetState extends State<DocumentCurrencyWidget> {
+  late VoicesMoneyFieldController _controller;
   late final FocusNode _focusNode;
 
   // TODO(LynxxLynx): After https://github.com/input-output-hk/catalyst-voices/pull/2865
@@ -46,13 +43,11 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
     return false;
   }
 
-  int? get _value => widget.property.value ?? widget.schema.defaultValue;
-
   @override
   Widget build(BuildContext context) {
     final schema = widget.schema;
 
-    return TokenField(
+    return VoicesMoneyField(
       controller: _controller,
       focusNode: _focusNode,
       onChanged: _onChanged,
@@ -61,7 +56,6 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
       labelText: schema.title.isEmpty ? null : schema.formattedTitle,
       placeholder: schema.placeholder,
       range: schema.numRange,
-      currency: widget.currency,
       showHelper: widget.isEditMode,
       enabled: widget.isEditMode,
       ignorePointers: !widget.isEditMode,
@@ -70,14 +64,23 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   }
 
   @override
-  void didUpdateWidget(DocumentTokenValueWidget oldWidget) {
+  void didUpdateWidget(DocumentCurrencyWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    final oldValue = oldWidget.property.value ?? oldWidget.schema.defaultValue;
-    final newValue = widget.property.value ?? widget.schema.defaultValue;
+    final newSchema = widget.schema;
+    final oldSchema = oldWidget.schema;
+    final oldValue = oldWidget.property.value ?? oldSchema.defaultValue;
+    final newValue = widget.property.value ?? newSchema.defaultValue;
 
-    if (oldValue != newValue) {
-      _controller.value = newValue;
+    if (newSchema.currency != oldSchema.currency || newSchema.moneyUnits != oldSchema.moneyUnits) {
+      _controller.dispose();
+      _controller = VoicesMoneyFieldController(
+        currency: newSchema.currency,
+        moneyUnits: newSchema.moneyUnits,
+        value: newValue != null ? newSchema.valueToMoney(newValue) : null,
+      );
+    } else if (oldValue != newValue) {
+      _controller.money = newValue != null ? newSchema.valueToMoney(newValue) : null;
     }
 
     if (widget.isEditMode != oldWidget.isEditMode) {
@@ -96,14 +99,20 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   void initState() {
     super.initState();
 
-    _controller = VoicesIntFieldController(_value);
+    final value = widget.property.value ?? widget.schema.defaultValue;
+    _controller = VoicesMoneyFieldController(
+      currency: widget.schema.currency,
+      moneyUnits: widget.schema.moneyUnits,
+      value: value != null ? widget.schema.valueToMoney(value) : null,
+    );
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
 
-  void _onChanged(int? value) {
+  void _onChanged(Money? value) {
+    final schema = widget.schema;
     final change = DocumentValueChange(
-      nodeId: widget.schema.nodeId,
-      value: value,
+      nodeId: schema.nodeId,
+      value: value != null ? schema.moneyToValue(value) : null,
     );
 
     widget.onChanged([change]);
@@ -119,8 +128,9 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
     }
   }
 
-  VoicesTextFieldValidationResult _validator(int? value, String text) {
-    final result = widget.schema.validate(value);
+  VoicesTextFieldValidationResult _validator(Money? value, String text) {
+    final schema = widget.schema;
+    final result = schema.validate(value != null ? schema.moneyToValue(value) : null);
     if (result.isValid) {
       return const VoicesTextFieldValidationResult.none();
     } else {

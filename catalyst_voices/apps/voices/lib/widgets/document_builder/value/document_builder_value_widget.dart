@@ -1,5 +1,5 @@
 export 'agreement_confirmation_widget.dart';
-export 'document_token_value_widget.dart';
+export 'document_currency_widget.dart';
 export 'duration_in_months_widget.dart';
 export 'integer_value_widget.dart';
 export 'language_code_widget.dart';

@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/src/money/currency_code.dart';
+import 'package:catalyst_voices_models/src/money/money.dart';
 import 'package:equatable/equatable.dart';
 import 'package:money2/money2.dart' as money2;
 
@@ -47,6 +48,8 @@ final class Currency extends Equatable {
 
   /// Fallback currency for historical reasons.
   /// The first fund used a hardcoded currency, this constructors fallbacks to it.
+  ///
+  /// Needs to be synced with [MoneyUnits.fallback].
   const Currency.fallback() : this.ada();
 
   /// Predefined USD currency ($, 2 decimals).
@@ -58,6 +61,9 @@ final class Currency extends Equatable {
         defaultPattern: '0.00',
         decimalPattern: '#,##0.00',
       );
+
+  /// The multiplier of [decimalDigits].
+  BigInt get decimalDigitsMultiplier => BigInt.from(10).pow(decimalDigits);
 
   @override
   List<Object?> get props => [
@@ -95,4 +101,3 @@ final class Currency extends Equatable {
     );
   }
 }
-

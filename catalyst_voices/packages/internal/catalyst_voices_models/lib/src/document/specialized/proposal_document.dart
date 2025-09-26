@@ -104,10 +104,12 @@ final class ProposalDocument extends Equatable {
       return null;
     }
 
-    return Money.fromMajorUnits(
-      currency: property.schema.format?.currency ?? const Currency.fallback(),
-      majorUnits: BigInt.from(value),
-    );
+    final schema = property.schema;
+    if (schema is! DocumentCurrencySchema) {
+      return null;
+    }
+
+    return schema.valueToMoney(value);
   }
 
   int? get milestoneCount {
