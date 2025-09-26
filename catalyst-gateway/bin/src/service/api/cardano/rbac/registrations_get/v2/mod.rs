@@ -15,5 +15,7 @@ mod registration_chain;
 mod response;
 mod role_data;
 mod role_list;
+mod stake_address_info;
+mod stake_address_info_list;
 
 pub use self::{endpoint::endpoint_v2, response::AllResponsesV2};
