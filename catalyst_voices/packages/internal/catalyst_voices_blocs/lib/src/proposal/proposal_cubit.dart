@@ -491,10 +491,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     };
   }
 
-  bool _isVotingStage(Campaign? campaign) {
-    final votingState = campaign?.phaseStateTo(CampaignPhaseType.communityVoting);
-    return votingState?.status.isActive ?? false;
-  }
+  bool _isVotingStage(Campaign? campaign) => false;
 
   ProposalViewData _rebuildProposalState() {
     final proposal = _cache.proposal;

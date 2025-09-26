@@ -8,13 +8,12 @@ import 'package:flutter/services.dart';
 final class AccessControl {
   /// Default spaces access.
   /// For example, spaces that are used in the main drawer of the app.
-  static const defaultSpacesAccess = [Space.discovery, Space.voting];
+  static const defaultSpacesAccess = [Space.discovery];
 
   /// Contributor spaces access.
   /// For example, spaces that are used in the main drawer of the app.
   static const List<Space> _contributorAccess = [
     Space.discovery,
-    Space.voting,
   ];
 
   /// Proposal spaces access.
@@ -22,7 +21,6 @@ final class AccessControl {
   static const List<Space> _proposalAccess = [
     Space.discovery,
     Space.workspace,
-    Space.voting,
   ];
 
   /// Admin spaces access.
