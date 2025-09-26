@@ -82,6 +82,37 @@ final class LocalizedDocumentListItemsOutOfRange extends LocalizedDocumentValida
   }
 }
 
+/// When a currency value is out of range.
+final class LocalizedDocumentMoneyOutOfRange extends LocalizedDocumentValidationResult {
+  final OpenRange<Money> range;
+
+  const LocalizedDocumentMoneyOutOfRange({required this.range});
+
+  @override
+  List<Object?> get props => [range];
+
+  @override
+  String? message(BuildContext context) {
+    final min = range.min;
+    final max = range.max;
+
+    if (min != null && max != null) {
+      return context.l10n.errorValidationNumFieldOutOfRange(
+        MoneyFormatter.formatDecimal(min),
+        MoneyFormatter.formatDecimal(max),
+      );
+    } else if (min != null) {
+      return context.l10n.errorValidationNumFieldBelowMin(MoneyFormatter.formatDecimal(min));
+    } else if (max != null) {
+      return context.l10n.errorValidationNumFieldAboveMax(MoneyFormatter.formatDecimal(max));
+    } else {
+      // the range is unconstrained, so any value is allowed
+      return null;
+    }
+  }
+}
+
+// TODO: for money too
 /// When a numeric value is out of range.
 final class LocalizedDocumentNumNotMultipleOf extends LocalizedDocumentValidationResult {
   final num multipleOf;
@@ -112,11 +143,11 @@ final class LocalizedDocumentNumOutOfRange extends LocalizedDocumentValidationRe
     final max = range.max?.toInt();
 
     if (min != null && max != null) {
-      return context.l10n.errorValidationNumFieldOutOfRange(min, max);
+      return context.l10n.errorValidationNumFieldOutOfRange(min.toString(), max.toString());
     } else if (min != null) {
-      return context.l10n.errorValidationNumFieldBelowMin(min);
+      return context.l10n.errorValidationNumFieldBelowMin(min.toString());
     } else if (max != null) {
-      return context.l10n.errorValidationNumFieldAboveMax(max);
+      return context.l10n.errorValidationNumFieldAboveMax(max.toString());
     } else {
       // the range is unconstrained, so any value is allowed
       return null;
@@ -186,6 +217,7 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
       SuccessfulDocumentValidation() => const LocalizedSuccessfulDocumentValidation(),
       MissingRequiredDocumentValue() => const LocalizedMissingRequiredDocumentValue(),
       DocumentNumOutOfRange() => LocalizedDocumentNumOutOfRange(range: result.expectedRange),
+      DocumentMoneyOutOfRange() => LocalizedDocumentMoneyOutOfRange(range: result.expectedRange),
       DocumentNumNotMultipleOf() => LocalizedDocumentNumNotMultipleOf(
         multipleOf: result.multipleOf,
       ),

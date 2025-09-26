@@ -1213,7 +1213,7 @@
     "description": "Validation error when the user entered numerical value is bigger than max",
     "placeholders": {
       "max": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
@@ -1222,7 +1222,7 @@
     "description": "Validation error when the user entered numerical value is smaller than min",
     "placeholders": {
       "min": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
@@ -1231,10 +1231,10 @@
     "description": "Validation error when the numerical value is out of allowed range between min and max (both inclusive)",
     "placeholders": {
       "min": {
-        "type": "int"
+        "type": "String"
       },
       "max": {
-        "type": "int"
+        "type": "String"
       }
     }
   },

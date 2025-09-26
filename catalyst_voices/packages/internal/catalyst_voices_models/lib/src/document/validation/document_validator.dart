@@ -127,6 +127,30 @@ final class DocumentValidator {
     return const SuccessfulDocumentValidation();
   }
 
+  static DocumentValidationResult validateMoneyRange(
+    DocumentCurrencySchema schema,
+    int? value,
+  ) {
+    final numRange = schema.numRange;
+    if (numRange != null && value != null) {
+      if (!numRange.contains(value)) {
+        final min = numRange.min;
+        final max = numRange.max;
+
+        return DocumentMoneyOutOfRange(
+          invalidNodeId: schema.nodeId,
+          expectedRange: OpenRange(
+            min: min != null ? schema.valueToMoney(min) : null,
+            max: max != null ? schema.valueToMoney(max) : null,
+          ),
+          actualValue: schema.valueToMoney(value),
+        );
+      }
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
+
   static DocumentValidationResult validateNumberMultipleOf(
     DocumentNumberSchema schema,
     double? value,

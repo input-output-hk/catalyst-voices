@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
+import 'package:catalyst_voices_models/src/money/money.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
@@ -56,6 +57,22 @@ final class DocumentItemsOutOfRange<T extends num> extends DocumentValidationRes
 
   @override
   List<Object?> get props => [invalidNodeId, expectedRange, actualItems];
+}
+
+/// The numerical [actualValue] is not within [expectedRange].
+final class DocumentMoneyOutOfRange extends DocumentValidationResult {
+  final DocumentNodeId invalidNodeId;
+  final OpenRange<Money> expectedRange;
+  final Money actualValue;
+
+  const DocumentMoneyOutOfRange({
+    required this.invalidNodeId,
+    required this.expectedRange,
+    required this.actualValue,
+  });
+
+  @override
+  List<Object?> get props => [invalidNodeId, expectedRange, actualValue];
 }
 
 /// The numerical [actualValue] is not a multiple of [multipleOf].
