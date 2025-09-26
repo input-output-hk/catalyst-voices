@@ -24,13 +24,13 @@ class CurrentCampaignInfoViewModel extends Equatable {
       // Description is used in dialog detail campaign
       allFunds: MultiCurrencyAmount.single(
         Money.fromMajorUnits(
-          currency: const Currency.ada(),
+          currency: Currencies.ada,
           majorUnits: BigInt.from(50000000),
         ),
       ),
       totalAsk: MultiCurrencyAmount.single(
         Money.fromMajorUnits(
-          currency: const Currency.ada(),
+          currency: Currencies.ada,
           majorUnits: BigInt.from(4020000),
         ),
       ),
@@ -67,7 +67,7 @@ class NullCurrentCampaignInfoViewModel extends CurrentCampaignInfoViewModel {
           allFunds ??
           MultiCurrencyAmount.single(
             Money.fromMajorUnits(
-              currency: const Currency.ada(),
+              currency: Currencies.ada,
               majorUnits: BigInt.from(50000000),
             ),
           ),
@@ -75,7 +75,7 @@ class NullCurrentCampaignInfoViewModel extends CurrentCampaignInfoViewModel {
           totalAsk ??
           MultiCurrencyAmount.single(
             Money.fromMajorUnits(
-              currency: const Currency.ada(),
+              currency: Currencies.ada,
               majorUnits: BigInt.from(4020000),
             ),
           ),

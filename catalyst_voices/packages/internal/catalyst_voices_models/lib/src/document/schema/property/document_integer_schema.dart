@@ -3,7 +3,7 @@ part of 'document_property_schema.dart';
 final class DocumentCurrencySchema extends DocumentIntegerSchema {
   const DocumentCurrencySchema({
     required super.nodeId,
-    required DocumentCurrencyFormat? super.format,
+    required DocumentCurrencyFormat super.format,
     required super.title,
     required super.description,
     required super.placeholder,
@@ -18,15 +18,15 @@ final class DocumentCurrencySchema extends DocumentIntegerSchema {
   });
 
   /// Returns the currency associated with the [format]
-  /// or [Currency.fallback] if there's no format defined.
-  Currency get currency => format?.currency ?? const Currency.fallback();
+  /// or [Currencies.fallback] if there's no format defined.
+  Currency get currency => format.currency;
 
   @override
-  DocumentCurrencyFormat? get format => super.format as DocumentCurrencyFormat?;
+  DocumentCurrencyFormat get format => super.format! as DocumentCurrencyFormat;
 
   /// Returns the money units associated with the [format]
   /// or [MoneyUnits.fallback] if there's no format defined.
-  MoneyUnits get moneyUnits => format?.moneyUnits ?? MoneyUnits.fallback;
+  MoneyUnits get moneyUnits => format.moneyUnits;
 
   @override
   DocumentCurrencySchema copyWith({

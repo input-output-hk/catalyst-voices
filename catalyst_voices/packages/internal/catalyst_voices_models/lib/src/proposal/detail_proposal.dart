@@ -40,8 +40,7 @@ final class DetailProposal extends CoreProposal {
       categoryRef: data.document.metadata.categoryId,
       title: data.document.title ?? '',
       description: data.document.description ?? '',
-      fundsRequested:
-          data.document.fundsRequested ?? Money.zero(currency: const Currency.fallback()),
+      fundsRequested: data.document.fundsRequested ?? Money.zero(currency: Currencies.fallback),
       publish: data.publish,
       duration: data.document.duration ?? 0,
       author: data.document.authorName,
@@ -82,7 +81,7 @@ extension ProposalWithVersionX on DetailProposal {
         categoryRef: categoryRef ?? SignedDocumentRef.generateFirstRef(),
         title: 'Dummy Proposal ver 2',
         description: 'Dummy description',
-        fundsRequested: Money(currency: const Currency.ada(), minorUnits: BigInt.from(100)),
+        fundsRequested: Money(currency: Currencies.ada, minorUnits: BigInt.from(100)),
         publish: publish,
         duration: 6,
         author: 'Alex Wells',

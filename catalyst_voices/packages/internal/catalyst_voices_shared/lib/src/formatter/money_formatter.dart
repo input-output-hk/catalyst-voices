@@ -30,7 +30,7 @@ abstract class MoneyFormatter {
       case MoneyDecoration.symbol:
         return '${currency.symbol}$amount';
       case MoneyDecoration.code:
-        return '\$${currency.isoCode.code} $amount';
+        return '\$${currency.code.value} $amount';
       case MoneyDecoration.none:
         return amount;
     }
@@ -55,7 +55,7 @@ abstract class MoneyFormatter {
     MoneyDecoration decoration = MoneyDecoration.symbol,
   }) {
     final numberFormat = NumberFormat('#.##');
-    final decimalAmount = money.minorUnits / money.currency.decimalDigitsMultiplier;
+    final decimalAmount = money.minorUnits / money.currency.decimalDigitsFactor;
 
     final String formatted;
     if (decimalAmount >= _million) {

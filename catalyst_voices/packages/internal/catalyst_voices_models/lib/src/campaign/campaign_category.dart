@@ -26,7 +26,7 @@ final staticCampaignCategories = [
       min: _adaMajorUnits(250000),
       max: _adaMajorUnits(1000000),
     ),
-    currency: const Currency.ada(),
+    currency: Currencies.ada,
     descriptions: const [
       CategoryDescription(
         title: 'Overview',
@@ -110,7 +110,7 @@ The following will **not** be funded:
       min: _adaMajorUnits(15000),
       max: _adaMajorUnits(100000),
     ),
-    currency: const Currency.ada(),
+    currency: Currencies.ada,
     descriptions: const [
       CategoryDescription(
         title: 'Overview',
@@ -194,7 +194,7 @@ Funds open source tools and environments to enhance the Cardano developer experi
       min: _adaMajorUnits(15000),
       max: _adaMajorUnits(100000),
     ),
-    currency: const Currency.ada(),
+    currency: Currencies.ada,
     descriptions: const [
       CategoryDescription(
         title: 'Overview',
@@ -279,7 +279,7 @@ Funds non-technical initiatives like marketing, education, and community buildin
       min: _adaMajorUnits(15000),
       max: _adaMajorUnits(60000),
     ),
-    currency: const Currency.ada(),
+    currency: Currencies.ada,
     descriptions: const [
       CategoryDescription(
         title: 'Overview',
@@ -351,7 +351,7 @@ The following will **not** be funded:
 
 Money _adaMajorUnits(int majorUnits) {
   return Money.fromMajorUnits(
-    currency: const Currency.ada(),
+    currency: Currencies.ada,
     majorUnits: BigInt.from(majorUnits),
   );
 }

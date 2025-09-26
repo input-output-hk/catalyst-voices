@@ -82,7 +82,7 @@ class _GoodToKnow extends StatelessWidget {
       tips: [
         context.l10n.registrationTransactionFeeDescription(
           MoneyFormatter.formatCompactRounded(money, decoration: MoneyDecoration.code),
-          money.currency.isoCode.code,
+          money.currency.code.value,
         ),
       ],
     );

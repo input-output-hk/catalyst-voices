@@ -124,7 +124,7 @@ final class DocumentTokenCardanoAdaFormat extends DocumentCurrencyFormat {
   const DocumentTokenCardanoAdaFormat()
     : super(
         'token:cardano:ada',
-        currency: const Currency.ada(),
+        currency: Currencies.ada,
         moneyUnits: MoneyUnits.majorUnits,
       );
 }

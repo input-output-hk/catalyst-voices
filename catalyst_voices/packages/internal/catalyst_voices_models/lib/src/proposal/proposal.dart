@@ -38,7 +38,7 @@ final class Proposal extends CoreProposal {
       selfRef: document.metadata.selfRef,
       title: document.title ?? '',
       description: document.description ?? '',
-      fundsRequested: document.fundsRequested ?? Money.zero(currency: const Currency.fallback()),
+      fundsRequested: document.fundsRequested ?? Money.zero(currency: Currencies.fallback),
       publish: data.publish,
       duration: document.duration ?? 0,
       author: document.authorName,

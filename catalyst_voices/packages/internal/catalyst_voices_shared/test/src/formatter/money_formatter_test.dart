@@ -7,7 +7,7 @@ void main() {
     group('formatCompactRounded', () {
       test('₳123 = ₳123', () {
         final money = Money.fromMajorUnits(
-          currency: const Currency.ada(),
+          currency: Currencies.ada,
           majorUnits: BigInt.from(123),
         );
         expect(MoneyFormatter.formatCompactRounded(money), '₳123');
@@ -15,7 +15,7 @@ void main() {
 
       test('₳123.456 = ₳123.46', () {
         final money = Money(
-          currency: const Currency.ada(),
+          currency: Currencies.ada,
           minorUnits: BigInt.from(123456000), // 123.456
         );
         expect(MoneyFormatter.formatCompactRounded(money), '₳123.46');
@@ -23,7 +23,7 @@ void main() {
 
       test('₳123.000456 = ₳123', () {
         final money = Money(
-          currency: const Currency.ada(),
+          currency: Currencies.ada,
           minorUnits: BigInt.from(123000456),
         );
         expect(MoneyFormatter.formatCompactRounded(money), '₳123');
@@ -31,7 +31,7 @@ void main() {
 
       test('₳1000 = ₳1K', () {
         final money = Money.fromMajorUnits(
-          currency: const Currency.ada(),
+          currency: Currencies.ada,
           majorUnits: BigInt.from(1000),
         );
         expect(MoneyFormatter.formatCompactRounded(money), '₳1K');
@@ -39,7 +39,7 @@ void main() {
 
       test('₳1000000 = ₳1M', () {
         final money = Money.fromMajorUnits(
-          currency: const Currency.ada(),
+          currency: Currencies.ada,
           majorUnits: BigInt.from(1000000),
         );
         expect(MoneyFormatter.formatCompactRounded(money), '₳1M');
@@ -47,7 +47,7 @@ void main() {
 
       test('₳1230000 = ₳1.23M', () {
         final money = Money.fromMajorUnits(
-          currency: const Currency.ada(),
+          currency: Currencies.ada,
           majorUnits: BigInt.from(1230000),
         );
         expect(MoneyFormatter.formatCompactRounded(money), '₳1.23M');
@@ -55,7 +55,7 @@ void main() {
 
       test('₳1000123.456 = ₳1M', () {
         final money = Money(
-          currency: const Currency.ada(),
+          currency: Currencies.ada,
           minorUnits: BigInt.from(1000123456000), // 1000123.456
         );
         expect(MoneyFormatter.formatCompactRounded(money), '₳1M');
@@ -66,7 +66,7 @@ void main() {
       group('ADA', () {
         test('₳123 = ₳123', () {
           final money = Money.fromMajorUnits(
-            currency: const Currency.ada(),
+            currency: Currencies.ada,
             majorUnits: BigInt.from(123),
           );
           expect(MoneyFormatter.formatDecimal(money), '₳123');
@@ -74,7 +74,7 @@ void main() {
 
         test('₳123.456 = ₳123.456', () {
           final money = Money(
-            currency: const Currency.ada(),
+            currency: Currencies.ada,
             minorUnits: BigInt.from(123456000),
           );
           expect(MoneyFormatter.formatDecimal(money), '₳123.456');
@@ -82,7 +82,7 @@ void main() {
 
         test('₳123.000456 = ₳123.000456', () {
           final money = Money(
-            currency: const Currency.ada(),
+            currency: Currencies.ada,
             minorUnits: BigInt.from(123000456),
           );
           expect(MoneyFormatter.formatDecimal(money), '₳123.000456');
@@ -90,7 +90,7 @@ void main() {
 
         test('₳1000 = ₳1,000', () {
           final money = Money.fromMajorUnits(
-            currency: const Currency.ada(),
+            currency: Currencies.ada,
             majorUnits: BigInt.from(1000),
           );
           expect(MoneyFormatter.formatDecimal(money), '₳1,000');
@@ -98,7 +98,7 @@ void main() {
 
         test('₳1000000 = ₳1,000,000', () {
           final money = Money.fromMajorUnits(
-            currency: const Currency.ada(),
+            currency: Currencies.ada,
             majorUnits: BigInt.from(1000000),
           );
           expect(MoneyFormatter.formatDecimal(money), '₳1,000,000');
@@ -106,7 +106,7 @@ void main() {
 
         test('₳1000123.456789 = ₳1,000,123.456789', () {
           final money = Money(
-            currency: const Currency.ada(),
+            currency: Currencies.ada,
             minorUnits: BigInt.from(1000123456789),
           );
           expect(MoneyFormatter.formatDecimal(money), '₳1,000,123.456789');
@@ -116,7 +116,7 @@ void main() {
       group('USD', () {
         test(r'$123 = $123', () {
           final money = Money.fromMajorUnits(
-            currency: const Currency.usd(),
+            currency: Currencies.usdm,
             majorUnits: BigInt.from(123),
           );
           expect(MoneyFormatter.formatDecimal(money), r'$123.00');
@@ -124,7 +124,7 @@ void main() {
 
         test(r'$123.45 = $123.45', () {
           final money = Money(
-            currency: const Currency.usd(),
+            currency: Currencies.usdm,
             minorUnits: BigInt.from(12345),
           );
           expect(MoneyFormatter.formatDecimal(money), r'$123.45');
@@ -132,7 +132,7 @@ void main() {
 
         test(r'$1000123.45 = $1,000,123.45', () {
           final money = Money(
-            currency: const Currency.usd(),
+            currency: Currencies.usdm,
             minorUnits: BigInt.from(100012345),
           );
           expect(MoneyFormatter.formatDecimal(money), r'$1,000,123.45');
@@ -144,7 +144,7 @@ void main() {
       group('ADA', () {
         test('₳123 = ₳123', () {
           final money = Money.fromMajorUnits(
-            currency: const Currency.ada(),
+            currency: Currencies.ada,
             majorUnits: BigInt.from(123),
           );
           expect(MoneyFormatter.formatExactAmount(money), '₳123');
@@ -152,7 +152,7 @@ void main() {
 
         test('₳123.456 = ₳123.456', () {
           final money = Money(
-            currency: const Currency.ada(),
+            currency: Currencies.ada,
             minorUnits: BigInt.from(123456000),
           );
           expect(MoneyFormatter.formatExactAmount(money), '₳123.456');
@@ -160,7 +160,7 @@ void main() {
 
         test('₳123.000456 = ₳123.000456', () {
           final money = Money(
-            currency: const Currency.ada(),
+            currency: Currencies.ada,
             minorUnits: BigInt.from(123000456),
           );
           expect(MoneyFormatter.formatExactAmount(money), '₳123.000456');
@@ -168,7 +168,7 @@ void main() {
 
         test('₳1000 = ₳1000', () {
           final money = Money.fromMajorUnits(
-            currency: const Currency.ada(),
+            currency: Currencies.ada,
             majorUnits: BigInt.from(1000),
           );
           expect(MoneyFormatter.formatExactAmount(money), '₳1000');
@@ -176,7 +176,7 @@ void main() {
 
         test('₳1000000 = ₳1000000', () {
           final money = Money.fromMajorUnits(
-            currency: const Currency.ada(),
+            currency: Currencies.ada,
             majorUnits: BigInt.from(1000000),
           );
           expect(MoneyFormatter.formatExactAmount(money), '₳1000000');
@@ -184,7 +184,7 @@ void main() {
 
         test('₳1000123.456789 = ₳1000123.456789', () {
           final money = Money(
-            currency: const Currency.ada(),
+            currency: Currencies.ada,
             minorUnits: BigInt.from(1000123456789),
           );
           expect(MoneyFormatter.formatExactAmount(money), '₳1000123.456789');
@@ -194,7 +194,7 @@ void main() {
       group('USD', () {
         test(r'$123 = $123', () {
           final money = Money.fromMajorUnits(
-            currency: const Currency.usd(),
+            currency: Currencies.usdm,
             majorUnits: BigInt.from(123),
           );
           expect(MoneyFormatter.formatExactAmount(money), r'$123.00');
@@ -202,7 +202,7 @@ void main() {
 
         test(r'$123.45 = $123.45', () {
           final money = Money(
-            currency: const Currency.usd(),
+            currency: Currencies.usdm,
             minorUnits: BigInt.from(12345),
           );
           expect(MoneyFormatter.formatExactAmount(money), r'$123.45');
@@ -210,7 +210,7 @@ void main() {
 
         test(r'$1000123.45 = $1000123.45', () {
           final money = Money(
-            currency: const Currency.usd(),
+            currency: Currencies.usdm,
             minorUnits: BigInt.from(100012345),
           );
           expect(MoneyFormatter.formatExactAmount(money), r'$1000123.45');
@@ -223,7 +223,7 @@ void main() {
         final formatted = MoneyFormatter.decorate(
           amount: '100.00',
           decoration: MoneyDecoration.symbol,
-          currency: const Currency.usd(),
+          currency: Currencies.usdm,
         );
 
         expect(formatted, equals(r'$100.00'));
@@ -233,7 +233,7 @@ void main() {
         final formatted = MoneyFormatter.decorate(
           amount: '100.00',
           decoration: MoneyDecoration.code,
-          currency: const Currency.usd(),
+          currency: Currencies.usdm,
         );
 
         expect(formatted, equals(r'$USD 100.00'));
@@ -243,7 +243,7 @@ void main() {
         final formatted = MoneyFormatter.decorate(
           amount: '100.00',
           decoration: MoneyDecoration.none,
-          currency: const Currency.usd(),
+          currency: Currencies.usdm,
         );
 
         expect(formatted, equals('100.00'));

@@ -216,7 +216,7 @@ class _MoneyMath {
       case MoneyUnits.minorUnits:
         return Money(
           currency: currency,
-          minorUnits: BigInt.from(value) * currency.decimalDigitsMultiplier,
+          minorUnits: BigInt.from(value) * currency.decimalDigitsFactor,
         );
     }
   }
@@ -226,7 +226,7 @@ class _MoneyMath {
       return null;
     }
 
-    // TODO: truncate
-    return money.minorUnits / money.currency.decimalDigitsMultiplier;
+    final value = money.minorUnits / money.currency.decimalDigitsFactor;
+    return value.truncateToDecimals(money.currency.decimalDigits);
   }
 }

@@ -114,7 +114,7 @@ final class DocumentPropertySchemaDto {
     this.maxLength,
     this.minItems,
     this.maxItems,
-this.multipleOf,
+    this.multipleOf,
     this.oneOf,
     this.required,
     this.order,

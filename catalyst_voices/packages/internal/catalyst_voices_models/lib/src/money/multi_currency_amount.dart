@@ -20,7 +20,7 @@ final class MultiCurrencyAmount extends Equatable {
   ///
   /// Example:
   /// ```dart
-  /// final amounts = MultiCurrencyAmount.list([usdMoney, adaMoney]);
+  /// final amounts = MultiCurrencyAmount.list([usdmMoney, adaMoney]);
   /// ```
   factory MultiCurrencyAmount.list(List<Money> money) {
     final group = MultiCurrencyAmount();
@@ -34,7 +34,7 @@ final class MultiCurrencyAmount extends Equatable {
   ///
   /// Example:
   /// ```dart
-  /// final amount = MultiCurrencyAmount.single(usdMoney);
+  /// final amount = MultiCurrencyAmount.single(usdmMoney);
   /// ```
   factory MultiCurrencyAmount.single(Money money) {
     final group = MultiCurrencyAmount()..add(money);
@@ -58,7 +58,7 @@ final class MultiCurrencyAmount extends Equatable {
   /// Zero amounts are automatically removed from the collection.
   void add(Money money) {
     final currency = money.currency;
-    final current = _map[currency.isoCode];
+    final current = _map[currency.code];
     final updated = (current ?? Money.zero(currency: currency)) + money;
     _updateMap(updated);
   }
@@ -76,7 +76,7 @@ final class MultiCurrencyAmount extends Equatable {
   /// Zero amounts are automatically removed from the collection.
   void subtract(Money money) {
     final currency = money.currency;
-    final current = _map[currency.isoCode];
+    final current = _map[currency.code];
     final updated = (current ?? Money.zero(currency: currency)) - money;
     _updateMap(updated);
   }
@@ -85,7 +85,7 @@ final class MultiCurrencyAmount extends Equatable {
   ///
   /// If the amount is zero, the entry is removed. Otherwise, it is added/updated.
   void _updateMap(Money money) {
-    final isoCode = money.currency.isoCode;
+    final isoCode = money.currency.code;
     if (money.isZero) {
       _map.remove(isoCode);
     } else {

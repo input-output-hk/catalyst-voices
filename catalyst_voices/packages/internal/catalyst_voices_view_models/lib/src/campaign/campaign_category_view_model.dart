@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_assets/generated/assets.gen.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
-    show CampaignCategory, Currency, Money, MultiCurrencyAmount, SignedDocumentRef;
+    show CampaignCategory, Currencies, Money, MultiCurrencyAmount, SignedDocumentRef;
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
@@ -51,23 +51,23 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
     proposalsCount: 263,
     availableFunds: MultiCurrencyAmount.single(
       Money.fromMajorUnits(
-        currency: const Currency.ada(),
+        currency: Currencies.ada,
         majorUnits: BigInt.from(8000000),
       ),
     ),
     totalAsk: MultiCurrencyAmount.single(
       Money.fromMajorUnits(
-        currency: const Currency.ada(),
+        currency: Currencies.ada,
         majorUnits: BigInt.from(400000),
       ),
     ),
     range: ComparableRange(
       min: Money.fromMajorUnits(
-        currency: const Currency.ada(),
+        currency: Currencies.ada,
         majorUnits: BigInt.from(15000),
       ),
       max: Money.fromMajorUnits(
-        currency: const Currency.ada(),
+        currency: Currencies.ada,
         majorUnits: BigInt.from(100000),
       ),
     ),

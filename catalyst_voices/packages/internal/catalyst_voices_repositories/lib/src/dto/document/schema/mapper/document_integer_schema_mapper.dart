@@ -28,9 +28,16 @@ final class DocumentIntegerSchemaMapper {
     switch (definition) {
       case _DocumentIntegerDefinition.tokenValueCardanoAda:
       case _DocumentIntegerDefinition.currency:
+        if (format is! DocumentCurrencyFormat) {
+          throw StateError(
+            'The format of $nodeId must be supported by the '
+            '$DocumentCurrencyFormat, actual format: ${schema.format}',
+          );
+        }
+
         return DocumentCurrencySchema(
           nodeId: nodeId,
-          format: format as DocumentCurrencyFormat?,
+          format: format,
           title: title,
           description: descriptionMarkdown,
           placeholder: placeholder,

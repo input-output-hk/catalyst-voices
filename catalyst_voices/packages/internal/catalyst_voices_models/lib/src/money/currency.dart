@@ -1,5 +1,7 @@
+import 'package:catalyst_voices_models/src/money/currencies.dart';
 import 'package:catalyst_voices_models/src/money/currency_code.dart';
-import 'package:catalyst_voices_models/src/money/money.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:money2/money2.dart' as money2;
 
@@ -10,7 +12,7 @@ import 'package:money2/money2.dart' as money2;
 /// like ADA and USD, as well as helpers to format amounts.
 final class Currency extends Equatable {
   /// The ISO 4217 code of the currency (e.g., ADA, USD).
-  final CurrencyCode isoCode;
+  final CurrencyCode code;
 
   /// The symbol used to represent the currency (e.g., ₳, $).
   final String symbol;
@@ -29,45 +31,22 @@ final class Currency extends Equatable {
 
   /// Creates a custom [Currency] with the provided properties.
   const Currency({
-    required this.isoCode,
+    required this.code,
     required this.symbol,
     required this.decimalDigits,
     required this.defaultPattern,
     required this.decimalPattern,
   });
 
-  /// Predefined ADA currency (₳, 6 decimals).
-  const Currency.ada()
-    : this(
-        isoCode: CurrencyCode.ada,
-        symbol: '₳',
-        decimalDigits: 6,
-        defaultPattern: '0.######',
-        decimalPattern: '#,##0.######',
-      );
-
-  /// Fallback currency for historical reasons.
-  /// The first fund used a hardcoded currency, this constructors fallbacks to it.
+  /// The factor of 10 to divide a minor value by to get the intended
+  /// currency value.
   ///
-  /// Needs to be synced with [MoneyUnits.fallback].
-  const Currency.fallback() : this.ada();
-
-  /// Predefined USD currency ($, 2 decimals).
-  const Currency.usd()
-    : this(
-        isoCode: CurrencyCode.usd,
-        symbol: r'$',
-        decimalDigits: 2,
-        defaultPattern: '0.00',
-        decimalPattern: '#,##0.00',
-      );
-
-  /// The multiplier of [decimalDigits].
-  BigInt get decimalDigitsMultiplier => BigInt.from(10).pow(decimalDigits);
+  ///  e.g. if [decimalDigits] is 2 then this value will be 100.
+  BigInt get decimalDigitsFactor => BigInt.from(10).pow(decimalDigits);
 
   @override
   List<Object?> get props => [
-    isoCode,
+    code,
     symbol,
   ];
 
@@ -94,10 +73,41 @@ final class Currency extends Equatable {
 
   money2.Currency _createCurrency() {
     return money2.Currency.create(
-      isoCode.code,
+      code.value,
       decimalDigits,
       pattern: defaultPattern,
       symbol: symbol,
+    );
+  }
+
+  /// Builds a default [decimalPattern].
+  static String defaultDecimalPattern(int decimalDigits) {
+    return '#,##0.${'0' * decimalDigits}';
+  }
+
+  /// Lookups the currency by [code].
+  static Currency? fromCode(String code) {
+    return _lookupCustomCurrencies(code) ?? _lookupCurrencyByIsoCode(code);
+  }
+
+  static Currency? _lookupCurrencyByIsoCode(String code) {
+    final currency = money2.Currencies().find(code.toUpperCase());
+    if (currency == null) {
+      return null;
+    }
+
+    return Currency(
+      code: CurrencyCode(currency.isoCode),
+      symbol: currency.symbol,
+      decimalDigits: currency.decimalDigits,
+      defaultPattern: currency.pattern,
+      decimalPattern: defaultDecimalPattern(currency.decimalDigits),
+    );
+  }
+
+  static Currency? _lookupCustomCurrencies(String code) {
+    return Currencies.values.firstWhereOrNull(
+      (e) => e.code.value.equalsIgnoreCase(code),
     );
   }
 }

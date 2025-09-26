@@ -1,4 +1,5 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices_models/src/money/currencies.dart';
 import 'package:catalyst_voices_models/src/money/currency.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
@@ -35,7 +36,7 @@ final class Money extends Equatable implements Comparable<Money> {
   }) {
     return Money(
       currency: currency,
-      minorUnits: majorUnits * currency.decimalDigitsMultiplier,
+      minorUnits: majorUnits * currency.decimalDigitsFactor,
     );
   }
 
@@ -69,7 +70,7 @@ final class Money extends Equatable implements Comparable<Money> {
 
   /// Retuns the major units calculated from [minorUnits].
   /// If the [minorUnits] contains "cents" they will be truncated.
-  BigInt get majorUnits => minorUnits ~/ currency.decimalDigitsMultiplier;
+  BigInt get majorUnits => minorUnits ~/ currency.decimalDigitsFactor;
 
   @override
   List<Object?> get props => [currency, minorUnits];
@@ -136,8 +137,8 @@ final class Money extends Equatable implements Comparable<Money> {
   ///
   /// Throws [ArgumentError] if currencies differ.
   void _ensureCurrenciesSame(Money first, Money second) {
-    final firstCurrency = first.currency.isoCode;
-    final secondCurrency = second.currency.isoCode;
+    final firstCurrency = first.currency.code;
+    final secondCurrency = second.currency.code;
     if (firstCurrency != secondCurrency) {
       throw ArgumentError(
         'Detected currency mismatch, first: $firstCurrency, second: $secondCurrency',
@@ -153,7 +154,7 @@ enum MoneyUnits {
   /// The monetary amount is entered in minor units, i.e. cents.
   minorUnits;
 
-  /// A historical money units, needs to be synced with [Currency.fallback].
+  /// A historical money units, needs to be synced with [Currencies.fallback].
   static MoneyUnits get fallback => majorUnits;
 }
 
@@ -163,7 +164,7 @@ extension CoinExt on Coin {
   /// using ADA as the currency.
   Money toMoney() {
     return Money(
-      currency: const Currency.ada(),
+      currency: Currencies.ada,
       minorUnits: BigInt.from(value),
     );
   }

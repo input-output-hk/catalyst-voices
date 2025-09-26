@@ -10,23 +10,23 @@ final class CurrencyCode extends Equatable {
   /// ADA cryptocurrency code.
   static const ada = CurrencyCode._('ADA');
 
-  /// USD fiat currency code.
-  static const usd = CurrencyCode._('USD');
+  /// USDM cryptocurrency code.
+  static const usdm = CurrencyCode._('USDM');
 
-  final String _code;
+  final String _value;
 
-  /// Constructs a new [CurrencyCode], ensures that [code] is uppercase.
-  CurrencyCode(String code) : this._(code.toUpperCase());
+  /// Constructs a new [CurrencyCode], ensures that [value] is uppercase.
+  CurrencyCode(String value) : this._(value.toUpperCase());
 
   /// Internal const constructor.
-  const CurrencyCode._(String code) : _code = code;
+  const CurrencyCode._(String value) : _value = value;
+
+  @override
+  List<Object?> get props => [_value];
 
   /// The iso code.
-  String get code => _code;
+  String get value => _value;
 
   @override
-  List<Object?> get props => [_code];
-
-  @override
-  String toString() => _code;
+  String toString() => _value;
 }
