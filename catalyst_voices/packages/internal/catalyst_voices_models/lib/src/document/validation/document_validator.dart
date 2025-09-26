@@ -127,6 +127,24 @@ final class DocumentValidator {
     return const SuccessfulDocumentValidation();
   }
 
+  static DocumentValidationResult validateMoneyMultipleOf(
+    DocumentCurrencySchema schema,
+    int? value,
+  ) {
+    final multipleOf = schema.multipleOf;
+    if (multipleOf != null && value != null) {
+      if (value % multipleOf != 0) {
+        return DocumentMoneyNotMultipleOf(
+          invalidNodeId: schema.nodeId,
+          multipleOf: schema.valueToMoney(multipleOf),
+          actualValue: schema.valueToMoney(value),
+        );
+      }
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
+
   static DocumentValidationResult validateMoneyRange(
     DocumentCurrencySchema schema,
     int? value,

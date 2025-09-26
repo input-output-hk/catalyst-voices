@@ -82,6 +82,23 @@ final class LocalizedDocumentListItemsOutOfRange extends LocalizedDocumentValida
   }
 }
 
+/// When a money value is out of range.
+final class LocalizedDocumentMoneyNotMultipleOf extends LocalizedDocumentValidationResult {
+  final Money multipleOf;
+
+  const LocalizedDocumentMoneyNotMultipleOf({required this.multipleOf});
+
+  @override
+  List<Object?> get props => [multipleOf];
+
+  @override
+  String? message(BuildContext context) {
+    return context.l10n.errorValidationNumNotMultipleOf(
+      MoneyFormatter.formatExactAmount(multipleOf),
+    );
+  }
+}
+
 /// When a currency value is out of range.
 final class LocalizedDocumentMoneyOutOfRange extends LocalizedDocumentValidationResult {
   final OpenRange<Money> range;
@@ -112,7 +129,6 @@ final class LocalizedDocumentMoneyOutOfRange extends LocalizedDocumentValidation
   }
 }
 
-// TODO: for money too
 /// When a numeric value is out of range.
 final class LocalizedDocumentNumNotMultipleOf extends LocalizedDocumentValidationResult {
   final num multipleOf;
@@ -124,7 +140,7 @@ final class LocalizedDocumentNumNotMultipleOf extends LocalizedDocumentValidatio
 
   @override
   String? message(BuildContext context) {
-    return context.l10n.errorValidationNumNotMultipleOf(multipleOf);
+    return context.l10n.errorValidationNumNotMultipleOf(multipleOf.toString());
   }
 }
 
@@ -219,6 +235,9 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
       DocumentNumOutOfRange() => LocalizedDocumentNumOutOfRange(range: result.expectedRange),
       DocumentMoneyOutOfRange() => LocalizedDocumentMoneyOutOfRange(range: result.expectedRange),
       DocumentNumNotMultipleOf() => LocalizedDocumentNumNotMultipleOf(
+        multipleOf: result.multipleOf,
+      ),
+      DocumentMoneyNotMultipleOf() => LocalizedDocumentMoneyNotMultipleOf(
         multipleOf: result.multipleOf,
       ),
       DocumentStringOutOfRange() => LocalizedDocumentStringOutOfRange(range: result.expectedRange),

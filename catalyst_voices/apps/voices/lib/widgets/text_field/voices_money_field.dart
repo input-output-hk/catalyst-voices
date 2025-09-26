@@ -205,7 +205,7 @@ class _MoneyMath {
       case MoneyUnits.minorUnits:
         return Money(
           currency: currency,
-          minorUnits: BigInt.from(value) * currency.decimalDigitsFactor,
+          minorUnits: BigInt.from(value * currency.decimalDigitsFactor.toInt()),
         );
     }
   }
