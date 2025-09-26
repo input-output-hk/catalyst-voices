@@ -98,13 +98,13 @@ final class LocalizedDocumentMoneyOutOfRange extends LocalizedDocumentValidation
 
     if (min != null && max != null) {
       return context.l10n.errorValidationNumFieldOutOfRange(
-        MoneyFormatter.formatDecimal(min),
-        MoneyFormatter.formatDecimal(max),
+        MoneyFormatter.formatExactAmount(min),
+        MoneyFormatter.formatExactAmount(max),
       );
     } else if (min != null) {
-      return context.l10n.errorValidationNumFieldBelowMin(MoneyFormatter.formatDecimal(min));
+      return context.l10n.errorValidationNumFieldBelowMin(MoneyFormatter.formatExactAmount(min));
     } else if (max != null) {
-      return context.l10n.errorValidationNumFieldAboveMax(MoneyFormatter.formatDecimal(max));
+      return context.l10n.errorValidationNumFieldAboveMax(MoneyFormatter.formatExactAmount(max));
     } else {
       // the range is unconstrained, so any value is allowed
       return null;

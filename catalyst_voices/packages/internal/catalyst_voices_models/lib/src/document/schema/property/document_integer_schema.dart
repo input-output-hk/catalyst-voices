@@ -65,8 +65,8 @@ final class DocumentCurrencySchema extends DocumentIntegerSchema {
   @override
   DocumentValidationResult validate(int? value) {
     return DocumentValidationResult.merge([
-      super.validate(value),
       DocumentValidator.validateMoneyRange(this, value),
+      super.validate(value),
     ]);
   }
 
