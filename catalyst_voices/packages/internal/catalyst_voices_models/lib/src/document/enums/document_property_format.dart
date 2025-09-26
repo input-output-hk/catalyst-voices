@@ -5,7 +5,7 @@ final class DocumentAgreementConfirmationFormat extends DocumentPropertyFormat {
   const DocumentAgreementConfirmationFormat() : super('agreementConfirmation');
 }
 
-sealed class DocumentCurrencyFormat extends DocumentPropertyFormat {
+base class DocumentCurrencyFormat extends DocumentPropertyFormat {
   final Currency currency;
   final MoneyUnits moneyUnits;
 
@@ -14,6 +14,100 @@ sealed class DocumentCurrencyFormat extends DocumentPropertyFormat {
     required this.currency,
     required this.moneyUnits,
   });
+
+  /// Parses the [DocumentCurrencyFormat] from a [format].
+  /// Returns `null` if format is unrecognized.
+  ///
+  /// Format:
+  /// - token|fiat[:$brand]:$code[:$cent]
+  ///
+  /// Examples:
+  /// - token:cardano:ada
+  /// - token:cardano:ada:lovelace
+  /// - token:usdm
+  /// - token:usdm:cent
+  /// - fiat:usd
+  /// - fiat:usd:cent
+  /// - fiat:eur
+  /// - fiat:eur:cent
+  static DocumentCurrencyFormat? parse(String format) {
+    final parts = format.split(':');
+    if (parts.length < 2) {
+      return null;
+    } else if (parts.first == 'token') {
+      return _parseCryptocurrencyFormat(parts, format);
+    } else if (parts.first == 'fiat') {
+      return _parseFiatFormat(parts, format);
+    } else {
+      return null;
+    }
+  }
+
+  static bool _isCentsFormat(String? string) {
+    return switch (string) {
+      'cent' || 'penny' || 'lovelace' || 'sat' || 'wei' => true,
+      _ => false,
+    };
+  }
+
+  /// token[:brand]:code[:cent]
+  static DocumentCurrencyFormat? _parseCryptocurrencyFormat(List<String> parts, String format) {
+    assert(parts.length >= 2, 'parts cannot be shorter than 2');
+    assert(parts.first == 'token', 'first part must be "token"');
+
+    if (parts.first == 'token') {
+      String currencyCode;
+      bool isMinorUnits;
+
+      if (parts.length == 4) {
+        currencyCode = parts[2];
+        isMinorUnits = _isCentsFormat(parts[3]);
+      } else if (parts.length == 3) {
+        final brandOrCurrencyCode = parts[1];
+        if (Currency.fromCode(brandOrCurrencyCode) != null) {
+          // token:code:cent
+          currencyCode = brandOrCurrencyCode;
+          isMinorUnits = _isCentsFormat(parts[2]);
+        } else {
+          // token:brand:code
+          currencyCode = parts[2];
+          isMinorUnits = false;
+        }
+      } else {
+        currencyCode = parts[1];
+        isMinorUnits = false;
+      }
+
+      final currency = Currency.fromCode(currencyCode);
+      if (currency != null) {
+        return DocumentCurrencyFormat(
+          format,
+          currency: currency,
+          moneyUnits: isMinorUnits ? MoneyUnits.minorUnits : MoneyUnits.majorUnits,
+        );
+      }
+    }
+
+    return null;
+  }
+
+  static DocumentCurrencyFormat? _parseFiatFormat(List<String> parts, String format) {
+    assert(parts.length >= 2, 'parts cannot be shorter than 2');
+    assert(parts.first == 'fiat', 'first part must be "fiat"');
+
+    // fiat:code[:cent]
+    final currencyCode = parts[1];
+    final isMinorUnits = parts.length == 3 && _isCentsFormat(parts[2]);
+    final currency = Currency.fromCode(currencyCode);
+    if (currency != null) {
+      return DocumentCurrencyFormat(
+        format,
+        currency: currency,
+        moneyUnits: isMinorUnits ? MoneyUnits.minorUnits : MoneyUnits.majorUnits,
+      );
+    }
+    return null;
+  }
 }
 
 final class DocumentDropdownSingleSelectFormat extends DocumentPropertyFormat {
@@ -74,22 +168,12 @@ sealed class DocumentPropertyFormat extends Equatable {
       'agreementconfirmation' => const DocumentAgreementConfirmationFormat(),
       // cspell: words spdxlicenseorurl
       'spdxlicenseorurl' => const DocumentSpdxLicenseOrUrlFormat(),
-      _ => _parseDynamicFormats(value),
+      _ => DocumentCurrencyFormat.parse(value) ?? const DocumentUnknownFormat(),
     };
   }
 
   @override
   List<Object?> get props => [value];
-
-  static DocumentPropertyFormat _parseDynamicFormats(String string) {
-    final tokenRegex = RegExp(r'^token:([^:]+):([^:]+)$');
-    final tokenMatch = tokenRegex.firstMatch(string);
-    if (tokenMatch != null) {
-      final x = tokenMatch.group(1);
-    }
-
-    return const DocumentUnknownFormat();
-  }
 }
 
 final class DocumentSingleGroupedTagSelectorFormat extends DocumentPropertyFormat {

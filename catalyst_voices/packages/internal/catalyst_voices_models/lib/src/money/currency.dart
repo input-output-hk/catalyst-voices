@@ -86,7 +86,11 @@ final class Currency extends Equatable {
   }
 
   /// Lookups the currency by [code].
-  static Currency? fromCode(String code) {
+  static Currency? fromCode(String? code) {
+    if (code == null) {
+      return null;
+    }
+    
     return _lookupCustomCurrencies(code) ?? _lookupCurrencyByIsoCode(code);
   }
 
