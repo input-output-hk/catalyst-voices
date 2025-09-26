@@ -6,7 +6,17 @@ final class DocumentAgreementConfirmationFormat extends DocumentPropertyFormat {
 }
 
 base class DocumentCurrencyFormat extends DocumentPropertyFormat {
+  /// The currency the property value is denominated in.
   final Currency currency;
+
+  /// The money units the property value is denominated in.
+  ///
+  /// Historically, for F14 the value was in major units (whole ADA)
+  /// without lovelace (minor units).
+  /// Starting from F15 the value will be denominated in minor units.
+  ///
+  /// To maintain backward compatibility the application
+  /// needs to keep track what was denominated in which units.
   final MoneyUnits moneyUnits;
 
   const DocumentCurrencyFormat(
