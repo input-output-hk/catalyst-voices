@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -15,9 +15,9 @@ final _windowsKeysMapping = {
 
 extension LogicalKeyboardKeyExt on LogicalKeyboardKey {
   String get platformKeyLabel {
-    return switch (defaultTargetPlatform) {
-      TargetPlatform.macOS => _macOsKeysMapping[this] ?? keyLabel,
-      TargetPlatform.windows => _windowsKeysMapping[this] ?? keyLabel,
+    return switch (CatalystOperatingSystem.current) {
+      CatalystOperatingSystem.macOS => _macOsKeysMapping[this] ?? keyLabel,
+      CatalystOperatingSystem.windows => _windowsKeysMapping[this] ?? keyLabel,
       _ => keyLabel,
     };
   }

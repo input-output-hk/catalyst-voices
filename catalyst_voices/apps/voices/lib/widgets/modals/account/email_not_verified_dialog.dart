@@ -9,7 +9,7 @@ class EmailNotVerifiedDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDesktopInfoDialog(
+    return VoicesInfoDialog(
       icon: VoicesAssets.icons.exclamation.buildIcon(color: context.colors.warning),
       title: Text(context.l10n.emailNotVerifiedDialogTitle),
       message: Text(context.l10n.emailNotVerifiedDialogMessage),

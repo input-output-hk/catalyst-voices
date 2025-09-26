@@ -60,6 +60,7 @@ class TimezoneDateTimeText extends StatelessWidget {
   final DateTime data;
   final TimezoneDateTimeTextFormatter formatter;
   final bool showTimezone;
+  final Axis axis;
   final TextStyle? style;
   final TextAlign? textAlign;
 
@@ -68,6 +69,7 @@ class TimezoneDateTimeText extends StatelessWidget {
     super.key,
     required this.formatter,
     this.showTimezone = true,
+    this.axis = Axis.horizontal,
     this.style,
     this.textAlign,
   });
@@ -107,6 +109,11 @@ class TimezoneDateTimeText extends StatelessWidget {
     );
 
     return AffixDecorator(
+      axis: axis,
+      crossAxisAlignment: switch (axis) {
+        Axis.horizontal => CrossAxisAlignment.center,
+        Axis.vertical => CrossAxisAlignment.start,
+      },
       gap: showTimezone ? 6 : 0,
       suffix: showTimezone
           ? _TimezoneCard(

@@ -12,10 +12,7 @@ final class Ed25519KeyPair extends Equatable {
   final Ed25519PrivateKey privateKey;
 
   /// The default constructor for [Ed25519KeyPair].
-  const Ed25519KeyPair({
-    required this.publicKey,
-    required this.privateKey,
-  });
+  const Ed25519KeyPair({required this.publicKey, required this.privateKey});
 
   @override
   List<Object?> get props => [publicKey, privateKey];

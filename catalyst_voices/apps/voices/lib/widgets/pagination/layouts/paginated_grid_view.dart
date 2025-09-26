@@ -5,6 +5,7 @@ import 'package:catalyst_voices/widgets/pagination/paging_status.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class PaginatedGridView<ItemType> extends StatelessWidget {
@@ -50,13 +51,23 @@ class PaginatedGridView<ItemType> extends StatelessWidget {
 
           case PagingStatus.ongoing:
           case PagingStatus.completed:
+            // TODO(damian-molinski): Refactor it so it's using GridView and SliverGridView.
             child = SizedBox(
               width: double.infinity,
-              child: Wrap(
-                key: const Key('PaginatedGridView'),
-                spacing: 16,
-                runSpacing: 16,
-                children: pagingState.itemList.map((item) => _itemBuilder(context, item)).toList(),
+              child: ResponsiveBuilder<WrapAlignment>(
+                sm: WrapAlignment.center,
+                md: WrapAlignment.start,
+                builder: (context, data) {
+                  return Wrap(
+                    key: const Key('PaginatedGridView'),
+                    spacing: 16,
+                    runSpacing: 16,
+                    alignment: data,
+                    children: pagingState.itemList
+                        .map((item) => _itemBuilder(context, item))
+                        .toList(),
+                  );
+                },
               ),
             );
             break;

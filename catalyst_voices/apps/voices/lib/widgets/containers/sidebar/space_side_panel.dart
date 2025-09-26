@@ -21,6 +21,7 @@ class SpaceSidePanel extends StatefulWidget {
   final ScrollController? scrollController;
   final List<SpaceSidePanelTab> tabs;
   final EdgeInsetsGeometry margin;
+  final bool collapsable;
 
   const SpaceSidePanel({
     super.key,
@@ -33,6 +34,7 @@ class SpaceSidePanel extends StatefulWidget {
       top: 12,
       bottom: 12,
     ),
+    this.collapsable = true,
   });
 
   @override
@@ -141,13 +143,14 @@ class _SpaceSidePanelState extends State<SpaceSidePanel> with SingleTickerProvid
                   length: widget.tabs.length,
                   child: Column(
                     children: [
-                      _Header(
-                        onCollapseTap: () {
-                          unawaited(_controller.forward());
-                          widget.onCollapseTap?.call();
-                        },
-                        isLeft: widget.isLeft,
-                      ),
+                      if (widget.collapsable)
+                        _Header(
+                          onCollapseTap: () {
+                            unawaited(_controller.forward());
+                            widget.onCollapseTap?.call();
+                          },
+                          isLeft: widget.isLeft,
+                        ),
                       _Tabs(
                         widget.tabs,
                         controller: widget.tabController,

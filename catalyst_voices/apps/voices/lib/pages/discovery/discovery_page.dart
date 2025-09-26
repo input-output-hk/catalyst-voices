@@ -74,6 +74,17 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   }
 
   @override
+  void didUpdateWidget(DiscoveryPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.keychainDeleted && widget.keychainDeleted != oldWidget.keychainDeleted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await _showKeychainDeletedDialog(context);
+      });
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
 

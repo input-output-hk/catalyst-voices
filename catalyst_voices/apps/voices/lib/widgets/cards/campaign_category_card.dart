@@ -149,11 +149,12 @@ class _Buttons extends StatelessWidget {
             final route = ProposalsRoute.fromRef(categoryRef: categoryRef);
             unawaited(route.push(context));
           },
-          backgroundColor: context.colors.elevationsOnSurfaceNeutralLv2,
-          foregroundColor: context.colorScheme.primary,
+          style: FilledButton.styleFrom(
+            backgroundColor: context.colors.elevationsOnSurfaceNeutralLv2,
+            foregroundColor: context.colorScheme.primary,
+          ),
           child: Text(context.l10n.viewProposals),
         ),
-        const SizedBox(height: 24),
       ],
     );
   }

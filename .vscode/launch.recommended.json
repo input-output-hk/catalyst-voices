@@ -6,157 +6,285 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Catalyst Voices [macOS][DEV]",
+      "name": "Catalyst [Web][DEV][debug]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
       "flutterMode": "debug",
-      "program": "lib/configs/main_dev.dart"
-    },
-    {
-      "name": "Catalyst Voices [Web][DEV]",
-      "cwd": "catalyst_voices/apps/voices",
-      "request": "launch",
-      "type": "dart",
-      "flutterMode": "debug",
+      "deviceId": "chrome",
       "program": "lib/configs/main_web.dart",
       "args": [
         "--dart-define",
-        // prod, preprod, dev, relative
-        "ENV_NAME=dev", 
-        // flutter_rust_bridge: https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#when-flutter-run
-        // drift: https://drift.simonbinder.eu/platforms/web/#additional-headers
+        "SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL",
         "--web-header",
         "Cross-Origin-Opener-Policy=same-origin",
         "--web-header",
-        "Cross-Origin-Embedder-Policy=require-corp"
+        "Cross-Origin-Embedder-Policy=require-corp",
+        "--dart-define=ENV_NAME=dev"
+        // "--web-port",
+        // "55555"
       ]
     },
     {
-      "name": "Catalyst Voices [DEV][Debug]",
-      "cwd": "catalyst_voices/apps/voices",
-      "request": "launch",
-      "type": "dart",
-      "program": "lib/configs/main_dev.dart",
-      "args": ["--flavor", "dev"]
-    },
-    {
-      "name": "Catalyst Voices [DEV][Profile]",
+      "name": "Catalyst [Web][DEV][profile]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
       "flutterMode": "profile",
-      "program": "lib/configs/main_dev.dart",
-      "args": ["--flavor", "dev"]
+      "deviceId": "chrome",
+      "program": "lib/configs/main_web.dart",
+      "args": [
+        "--dart-define",
+        "SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL",
+        "--web-header",
+        "Cross-Origin-Opener-Policy=same-origin",
+        "--web-header",
+        "Cross-Origin-Embedder-Policy=require-corp",
+        "--dart-define=ENV_NAME=dev"
+      ]
     },
     {
-      "name": "Catalyst Voices [DEV][Release]",
+      "name": "Catalyst [Web][DEV][release]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
       "flutterMode": "release",
-      "program": "lib/configs/main_dev.dart",
-      "args": ["--flavor", "dev"]
+      "deviceId": "chrome",
+      "program": "lib/configs/main_web.dart",
+      "args": [
+        "--dart-define",
+        "SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL",
+        "--web-header",
+        "Cross-Origin-Opener-Policy=same-origin",
+        "--web-header",
+        "Cross-Origin-Embedder-Policy=require-corp",
+        "--dart-define=ENV_NAME=dev"
+      ]
     },
     {
-      "name": "Catalyst Voices [QA][Debug]",
+      "name": "Catalyst [Web][PREPROD][debug]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
-      "program": "lib/configs/main_qa.dart",
-      // Some storages(like db) are bound to port so if you want to keep using same ones onces between builds add --web-port
-      // "args": ["--web-port", "55555"]
+      "flutterMode": "debug",
+      "deviceId": "chrome",
+      "program": "lib/configs/main_web.dart",
+      "args": [
+        "--dart-define",
+        "SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL",
+        "--web-header",
+        "Cross-Origin-Opener-Policy=same-origin",
+        "--web-header",
+        "Cross-Origin-Embedder-Policy=require-corp",
+        "--dart-define=ENV_NAME=preprod"
+      ]
+    },
+    {
+      "name": "Catalyst [Web][PREPROD][profile]",
+      "cwd": "catalyst_voices/apps/voices",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "deviceId": "chrome",
+      "program": "lib/configs/main_web.dart",
+      "args": [
+        "--dart-define",
+        "SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL",
+        "--web-header",
+        "Cross-Origin-Opener-Policy=same-origin",
+        "--web-header",
+        "Cross-Origin-Embedder-Policy=require-corp",
+        "--dart-define=ENV_NAME=preprod"
+      ]
+    },
+    {
+      "name": "Catalyst [Web][PREPROD][release]",
+      "cwd": "catalyst_voices/apps/voices",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "deviceId": "chrome",
+      "program": "lib/configs/main_web.dart",
+      "args": [
+        "--dart-define",
+        "SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL",
+        "--web-header",
+        "Cross-Origin-Opener-Policy=same-origin",
+        "--web-header",
+        "Cross-Origin-Embedder-Policy=require-corp",
+        "--dart-define=ENV_NAME=preprod"
+      ]
+    },
+    {
+      "name": "Catalyst [Web][PROD][debug]",
+      "cwd": "catalyst_voices/apps/voices",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "deviceId": "chrome",
+      "program": "lib/configs/main_web.dart",
+      "args": [
+        "--dart-define",
+        "SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL",
+        "--web-header",
+        "Cross-Origin-Opener-Policy=same-origin",
+        "--web-header",
+        "Cross-Origin-Embedder-Policy=require-corp",
+        "--dart-define=ENV_NAME=prod"
+      ]
+    },
+    {
+      "name": "Catalyst [Web][PROD][profile]",
+      "cwd": "catalyst_voices/apps/voices",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "deviceId": "chrome",
+      "program": "lib/configs/main_web.dart",
+      "args": [
+        "--dart-define",
+        "SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL",
+        "--web-header",
+        "Cross-Origin-Opener-Policy=same-origin",
+        "--web-header",
+        "Cross-Origin-Embedder-Policy=require-corp",
+        "--dart-define=ENV_NAME=prod"
+      ]
+    },
+    {
+      "name": "Catalyst [Web][PROD][release]",
+      "cwd": "catalyst_voices/apps/voices",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "deviceId": "chrome",
+      "program": "lib/configs/main_web.dart",
+      "args": [
+        "--dart-define",
+        "SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL",
+        "--web-header",
+        "Cross-Origin-Opener-Policy=same-origin",
+        "--web-header",
+        "Cross-Origin-Embedder-Policy=require-corp",
+        "--dart-define=ENV_NAME=prod"
+      ]
+    },
+    {
+      "name": "Catalyst [DEV][debug]",
+      "cwd": "catalyst_voices/apps/voices",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "",
+      "flutterMode": "debug",
+      "program": "lib/configs/main_dev.dart",
       "args": [
         "--flavor",
-        "qa",
-        // flutter_rust_bridge: https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#when-flutter-run
-        // drift: https://drift.simonbinder.eu/platforms/web/#additional-headers
-        "--web-header",
-        "Cross-Origin-Opener-Policy=same-origin",
-        "--web-header",
-        "Cross-Origin-Embedder-Policy=require-corp"
+        "dev"
       ]
     },
     {
-      "name": "Catalyst Voices [QA][Profile]",
+      "name": "Catalyst [DEV][profile]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
+      "deviceId": "",
       "flutterMode": "profile",
-      "program": "lib/configs/main_qa.dart",
-      // Some storages(like db) are bound to port so if you want to keep using same ones onces between builds add --web-port
-      // "args": ["--web-port", "55555"]
+      "program": "lib/configs/main_dev.dart",
       "args": [
         "--flavor",
-        "qa",
-        // flutter_rust_bridge: https://cjycode.com/flutter_rust_bridge/manual/miscellaneous/web-cross-origin#when-flutter-run
-        // drift: https://drift.simonbinder.eu/platforms/web/#additional-headers
-        "--web-header",
-        "Cross-Origin-Opener-Policy=same-origin",
-        "--web-header",
-        "Cross-Origin-Embedder-Policy=require-corp"
+        "dev"
       ]
     },
     {
-      "name": "Catalyst Voices [QA][Release]",
+      "name": "Catalyst [DEV][release]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
+      "deviceId": "",
       "flutterMode": "release",
-      "program": "lib/configs/main_qa.dart",
-      "args": ["--flavor", "qa"]
+      "program": "lib/configs/main_dev.dart",
+      "args": [
+        "--flavor",
+        "dev"
+      ]
     },
     {
-      "name": "Catalyst Voices [PROD][Debug]",
+      "name": "Catalyst [PREPROD][debug]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
-      "program": "lib/configs/main_prod.dart",
-      "args": ["--flavor", "prod"]
-    },
-    {
-      "name": "Catalyst Voices [PROD][Profile]",
-      "cwd": "catalyst_voices/apps/voices",
-      "request": "launch",
-      "type": "dart",
-      "flutterMode": "profile",
-      "program": "lib/configs/main_prod.dart",
-      "args": ["--flavor", "prod"]
-    },
-    {
-      "name": "Catalyst Voices [PROD][Release]",
-      "cwd": "catalyst_voices/apps/voices",
-      "request": "launch",
-      "type": "dart",
-      "flutterMode": "release",
-      "program": "lib/configs/main_prod.dart",
-      "args": ["--flavor", "prod"]
-    },
-    {
-      "name": "Catalyst Voices [PRE:PROD][Debug]",
-      "cwd": "catalyst_voices/apps/voices",
-      "request": "launch",
-      "type": "dart",
+      "deviceId": "",
+      "flutterMode": "debug",
       "program": "lib/configs/main_preprod.dart",
-      "args": ["--flavor", "preprod"]
+      "args": [
+        "--flavor",
+        "preprod"
+      ]
     },
     {
-      "name": "Catalyst Voices [PRE:PROD][Profile]",
+      "name": "Catalyst [PREPROD][profile]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
+      "deviceId": "",
       "flutterMode": "profile",
       "program": "lib/configs/main_preprod.dart",
-      "args": ["--flavor", "preprod"]
+      "args": [
+        "--flavor",
+        "preprod"
+      ]
     },
     {
-      "name": "Catalyst Voices [PRE:PROD][Release]",
+      "name": "Catalyst [PREPROD][release]",
       "cwd": "catalyst_voices/apps/voices",
       "request": "launch",
       "type": "dart",
+      "deviceId": "",
       "flutterMode": "release",
       "program": "lib/configs/main_preprod.dart",
-      "args": ["--flavor", "preprod"]
+      "args": [
+        "--flavor",
+        "preprod"
+      ]
+    },
+    {
+      "name": "Catalyst [PROD][debug]",
+      "cwd": "catalyst_voices/apps/voices",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "",
+      "flutterMode": "debug",
+      "program": "lib/configs/main_prod.dart",
+      "args": [
+        "--flavor",
+        "prod"
+      ]
+    },
+    {
+      "name": "Catalyst [PROD][profile]",
+      "cwd": "catalyst_voices/apps/voices",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "",
+      "flutterMode": "profile",
+      "program": "lib/configs/main_prod.dart",
+      "args": [
+        "--flavor",
+        "prod"
+      ]
+    },
+    {
+      "name": "Catalyst [PROD][release]",
+      "cwd": "catalyst_voices/apps/voices",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "",
+      "flutterMode": "release",
+      "program": "lib/configs/main_prod.dart",
+      "args": [
+        "--flavor",
+        "prod"
+      ]
     }
   ]
 }

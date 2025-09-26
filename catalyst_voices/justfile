@@ -9,24 +9,28 @@ setup-code:
     melos bs
 
 # Builds generated code
-generate-code: setup-code
+generate-code:
     cd .. && earthly ./catalyst_voices+code-generator --platform=linux/amd64 --save_locally=true
 
 # Syntax sugar for linking packages and building generated code
-bootstrap: generate-code
+bootstrap: setup-code generate-code
 
 # Runs all static code checks
 check-code:
-    earthly +build-static-analysis
     earthly +check-code-formatting
+    earthly +check-package-publishing
     earthly +check-license
+    earthly +build-static-analysis
 
 # Runs unit tests
 test-code:
+    # TODO(dt-iohk): enable running unit tests in earthly, remove melos tests,
+    # currently it fails because of `libsqlite3.so.3.49.1` unable to load on arm64 linux.
     earthly +test-unit-native
+    # melos test-native
 
 # Pre Push Checks
-pre-push: check-code
+pre-push: generate-code check-code test-code
 
 license-list: setup-code
     melos license-list

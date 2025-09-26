@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class HeaderAndContentLayout extends StatelessWidget {
@@ -19,21 +20,48 @@ class HeaderAndContentLayout extends StatelessWidget {
     return Stack(
       children: [
         if (background != null) background!,
-        CustomScrollView(
+        _Foreground(
+          header: header,
+          content: content,
+          separateHeaderAndContent: separateHeaderAndContent,
+        ),
+      ],
+    );
+  }
+}
+
+class _Foreground extends StatelessWidget {
+  final Widget header;
+  final Widget content;
+  final bool separateHeaderAndContent;
+
+  const _Foreground({
+    required this.header,
+    required this.content,
+    required this.separateHeaderAndContent,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ResponsiveBuilder<EdgeInsetsGeometry>(
+      md: const EdgeInsetsGeometry.symmetric(horizontal: 16),
+      lg: const EdgeInsetsGeometry.symmetric(horizontal: 32),
+      builder: (context, data) {
+        return CustomScrollView(
           slivers: [
             SliverPadding(
-              padding: const EdgeInsetsGeometry.symmetric(horizontal: 32),
+              padding: data,
               sliver: SliverToBoxAdapter(child: header),
             ),
             if (separateHeaderAndContent) const SliverToBoxAdapter(child: SizedBox(height: 40)),
             SliverPadding(
-              padding: const EdgeInsetsGeometry.symmetric(horizontal: 32),
+              padding: data,
               sliver: SliverFillRemaining(hasScrollBody: false, child: content),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 32)),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 }

@@ -1,9 +1,10 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/typedefs.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
+import 'package:catalyst_voices/pages/category/card_information.dart';
 import 'package:catalyst_voices/pages/category/category_detail_view.dart';
-import 'package:catalyst_voices/widgets/cards/category_proposals_details_card.dart';
-import 'package:catalyst_voices/widgets/cards/create_proposal_card.dart';
+import 'package:catalyst_voices/pages/category/draggable_sheet_category_information.dart';
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_wide_screen_constrained.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_error_indicator.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -12,10 +13,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-
-typedef _StateData = ({bool show, CampaignCategoryDetailsViewModel data});
-
-typedef _StateError = ({bool show, LocalizedException? error});
 
 class CategoryPage extends StatefulWidget {
   final SignedDocumentRef categoryId;
@@ -29,76 +26,73 @@ class CategoryPage extends StatefulWidget {
 class _Body extends StatelessWidget {
   final CampaignCategoryDetailsViewModel category;
   final bool isLoading;
+  final bool isActiveProposer;
 
   const _Body({
     required this.category,
     this.isLoading = false,
+    this.isActiveProposer = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Skeletonizer(
-      enabled: isLoading,
-      child: SelectionArea(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: CategoryDetailView(
-                  category: category,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 120),
+      child: Skeletonizer(
+        enabled: isLoading,
+        child: SelectionArea(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: CategoryDetailView(
+                    category: category,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 48),
-            _CardInformation(
-              category: category,
-            ),
-          ],
+              const SizedBox(width: 48),
+              CardInformation(
+                category: category,
+                isActiveProposer: isActiveProposer,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _CardInformation extends StatelessWidget {
+class _BodySmall extends StatelessWidget {
   final CampaignCategoryDetailsViewModel category;
+  final bool isLoading;
+  final bool isActiveProposer;
 
-  const _CardInformation({
+  const _BodySmall({
     required this.category,
+    this.isLoading = false,
+    this.isActiveProposer = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints.tightFor(width: 300),
-      child: ListView(
-        padding: const EdgeInsets.only(top: 96, bottom: 42),
+    return Skeletonizer(
+      enabled: isLoading,
+      child: Stack(
         children: [
-          CategoryProposalsDetailsCard(
-            categoryId: category.id,
-            categoryName: category.formattedName,
-            categoryProposalsCount: category.proposalsCount,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: SingleChildScrollView(
+              child: CategoryDetailView(
+                category: category,
+              ),
+            ),
           ),
-          const SizedBox(height: 16),
-          BlocSelector<SessionCubit, SessionState, bool>(
-            selector: (state) {
-              final isProposer = state.account?.isProposer ?? false;
-              return (isProposer && state.isActive);
-            },
-            builder: (context, state) {
-              return Offstage(
-                offstage: !state,
-                child: CreateProposalCard(
-                  categoryId: category.id,
-                  categoryName: category.formattedName,
-                  categoryDos: category.dos,
-                  categoryDonts: category.donts,
-                  submissionCloseDate: category.submissionCloseDate,
-                ),
-              );
-            },
+          DraggableSheetCategoryInformation(
+            category: category,
+            isActiveProposer: isActiveProposer,
           ),
         ],
       ),
@@ -113,15 +107,15 @@ class _CategoryDetailErrorSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<CategoryDetailCubit, CategoryDetailState, _StateError>(
+    return BlocSelector<CategoryDetailCubit, CategoryDetailState, ErrorVisibilityState>(
       selector: (state) {
         return (
           show: state.isLoading == false && state.error != null,
-          error: state.error,
+          data: state.error,
         );
       },
       builder: (context, state) {
-        final error = state.error ?? const LocalizedUnknownException();
+        final error = state.data ?? const LocalizedUnknownException();
         return Offstage(
           offstage: !state.show,
           child: Padding(
@@ -150,7 +144,11 @@ class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<CategoryDetailCubit, CategoryDetailState, _StateData>(
+    return BlocSelector<
+      CategoryDetailCubit,
+      CategoryDetailState,
+      DataVisibilityState<CampaignCategoryDetailsViewModel>
+    >(
       selector: (state) {
         return (
           show: state.isLoading,
@@ -158,9 +156,20 @@ class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
         );
       },
       builder: (context, state) {
-        return _Body(
-          category: state.data,
-          isLoading: state.show,
+        final isActiveProposer = context.select<SessionCubit, bool>(
+          (cubit) => cubit.state.isProposerUnlock,
+        );
+        return ResponsiveChildBuilder(
+          sm: (_) => _BodySmall(
+            category: state.data,
+            isLoading: state.show,
+            isActiveProposer: isActiveProposer,
+          ),
+          md: (_) => _Body(
+            category: state.data,
+            isLoading: state.show,
+            isActiveProposer: isActiveProposer,
+          ),
         );
       },
     );
@@ -171,20 +180,13 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   Widget build(BuildContext context) {
     return ProposalSubmissionPhaseAware(
-      activeChild: ResponsivePadding(
-        xs: const EdgeInsets.symmetric(horizontal: 12),
-        sm: const EdgeInsets.symmetric(horizontal: 20),
-        md: const EdgeInsets.symmetric(horizontal: 120),
-        lg: const EdgeInsets.symmetric(horizontal: 120),
-        other: const EdgeInsets.symmetric(horizontal: 120),
-        child: Stack(
-          children: [
-            const _CategoryDetailLoadingOrDataSelector(),
-            _CategoryDetailErrorSelector(
-              categoryId: widget.categoryId,
-            ),
-          ].constrainedDelegate(maxWidth: 1200),
-        ),
+      activeChild: Stack(
+        children: [
+          const _CategoryDetailLoadingOrDataSelector(),
+          _CategoryDetailErrorSelector(
+            categoryId: widget.categoryId,
+          ),
+        ].constrainedDelegate(),
       ),
     );
   }
