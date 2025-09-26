@@ -1,12 +1,11 @@
 //! Handle catching panics created by endpoints, logging them and properly responding.
+
 use std::{any::Any, backtrace::Backtrace, cell::RefCell};
 
-use chrono::prelude::*;
 use panic_message::panic_message;
 use poem::{http::StatusCode, middleware::PanicHandler, IntoResponse};
 use poem_openapi::payload::Json;
-use serde_json::json;
-use tracing::debug;
+use tracing::{debug, error};
 
 use crate::{
     service::{
@@ -101,21 +100,20 @@ impl PanicHandler for ServicePanicHandler {
             None => "Unknown".to_string(),
         };
 
-        // For some reason logging doesn't work here.
-        // So manually form a log message and send to stdout.
-        let time = chrono::Utc::now().to_rfc3339_opts(SecondsFormat::Nanos, true);
+        error!(
+            panic = true,
+            backtrace = backtrace,
+            location = location,
+            id = panic_identifier,
+            message = err_msg,
+        );
 
-        let json_log = json!({
-            "backtrace": backtrace,
-            "location": location,
-            "message": err_msg,
-            "id": panic_identifier,
-            "level": "PANIC",
-            "timestamp": time
-        })
-        .to_string();
-
-        println!("{json_log}");
+        // TODO: FIXME:
+        /*
+            Minimum Method, Headers, Request ID, Path, Body if its got one). Its OK if this log message is gigantic.
+            Binary BODY in log is base-64 encoded
+            Text BODY in log is just be the text as a string
+        */
 
         let mut resp = Json(server_err).into_response();
         resp.set_status(StatusCode::INTERNAL_SERVER_ERROR);
