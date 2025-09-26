@@ -21,7 +21,7 @@ class VoicesMoneyField extends StatelessWidget {
   final String? errorText;
   final String? placeholder;
   final FocusNode? focusNode;
-  final NumRange<int>? range;
+  final OpenRange<Money>? range;
   final bool showHelper;
   final bool enabled;
   final bool readOnly;
@@ -62,7 +62,6 @@ class VoicesMoneyField extends StatelessWidget {
             helperWidget ??
             (showHelper
                 ? _Helper(
-                    currency: controller.currency,
                     range: range,
                     placeholder: placeholder,
                   )
@@ -130,28 +129,18 @@ class VoicesMoneyFieldController extends VoicesDoubleFieldController {
 }
 
 class _Helper extends StatelessWidget {
-  final Currency currency;
-  final NumRange<int>? range;
+  final OpenRange<Money>? range;
   final String? placeholder;
 
   const _Helper({
-    required this.currency,
     required this.range,
     this.placeholder,
   });
 
   @override
   Widget build(BuildContext context) {
-    final min = range?.min;
-    final max = range?.max;
-
-    final minMoney = min != null
-        ? Money.fromMajorUnits(currency: currency, majorUnits: BigInt.from(min))
-        : null;
-
-    final maxMoney = max != null
-        ? Money.fromMajorUnits(currency: currency, majorUnits: BigInt.from(max))
-        : null;
+    final minMoney = range?.min;
+    final maxMoney = range?.max;
 
     const boldStyle = TextStyle(fontWeight: FontWeight.bold);
 

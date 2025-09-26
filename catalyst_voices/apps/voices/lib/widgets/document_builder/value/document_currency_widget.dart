@@ -5,6 +5,7 @@ import 'package:catalyst_voices/widgets/text_field/voices_money_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -55,7 +56,7 @@ class _DocumentCurrencyWidgetState extends State<DocumentCurrencyWidget> {
       validator: _validator,
       labelText: schema.title.isEmpty ? null : schema.formattedTitle,
       placeholder: schema.placeholder,
-      range: schema.numRange,
+      range: _numRangeToMoneyRange(schema.numRange),
       showHelper: widget.isEditMode,
       enabled: widget.isEditMode,
       ignorePointers: !widget.isEditMode,
@@ -77,10 +78,10 @@ class _DocumentCurrencyWidgetState extends State<DocumentCurrencyWidget> {
       _controller = VoicesMoneyFieldController(
         currency: newSchema.currency,
         moneyUnits: newSchema.moneyUnits,
-        value: newValue != null ? newSchema.valueToMoney(newValue) : null,
+        value: _valueToMoney(newValue),
       );
     } else if (oldValue != newValue) {
-      _controller.money = newValue != null ? newSchema.valueToMoney(newValue) : null;
+      _controller.money = _valueToMoney(newValue);
     }
 
     if (widget.isEditMode != oldWidget.isEditMode) {
@@ -99,20 +100,37 @@ class _DocumentCurrencyWidgetState extends State<DocumentCurrencyWidget> {
   void initState() {
     super.initState();
 
-    final value = widget.property.value ?? widget.schema.defaultValue;
     _controller = VoicesMoneyFieldController(
       currency: widget.schema.currency,
       moneyUnits: widget.schema.moneyUnits,
-      value: value != null ? widget.schema.valueToMoney(value) : null,
+      value: _valueToMoney(widget.property.value ?? widget.schema.defaultValue),
     );
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
 
+  int? _moneyToValue(Money? money) {
+    if (money == null) {
+      return null;
+    }
+
+    return widget.schema.moneyToValue(money);
+  }
+
+  OpenRange<Money>? _numRangeToMoneyRange(NumRange<int>? range) {
+    if (range == null) {
+      return null;
+    }
+
+    return OpenRange(
+      min: _valueToMoney(range.min),
+      max: _valueToMoney(range.max),
+    );
+  }
+
   void _onChanged(Money? value) {
-    final schema = widget.schema;
     final change = DocumentValueChange(
-      nodeId: schema.nodeId,
-      value: value != null ? schema.moneyToValue(value) : null,
+      nodeId: widget.schema.nodeId,
+      value: _moneyToValue(value),
     );
 
     widget.onChanged([change]);
@@ -130,13 +148,21 @@ class _DocumentCurrencyWidgetState extends State<DocumentCurrencyWidget> {
 
   VoicesTextFieldValidationResult _validator(Money? value, String text) {
     final schema = widget.schema;
-    final result = schema.validate(value != null ? schema.moneyToValue(value) : null);
+    final result = schema.validate(_moneyToValue(value));
     if (result.isValid) {
       return const VoicesTextFieldValidationResult.none();
     } else {
       final localized = LocalizedDocumentValidationResult.from(result);
       return VoicesTextFieldValidationResult.error(localized.message(context));
     }
+  }
+
+  Money? _valueToMoney(int? value) {
+    if (value == null) {
+      return null;
+    }
+
+    return widget.schema.valueToMoney(value);
   }
 }
 

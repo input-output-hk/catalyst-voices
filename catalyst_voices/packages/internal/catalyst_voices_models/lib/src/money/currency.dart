@@ -90,7 +90,7 @@ final class Currency extends Equatable {
     if (code == null) {
       return null;
     }
-    
+
     return _lookupCustomCurrencies(code) ?? _lookupCurrencyByIsoCode(code);
   }
 
@@ -104,7 +104,7 @@ final class Currency extends Equatable {
       code: CurrencyCode(currency.isoCode),
       symbol: currency.symbol,
       decimalDigits: currency.decimalDigits,
-      defaultPattern: currency.pattern,
+      defaultPattern: _removeSymbolFromPattern(currency.pattern),
       decimalPattern: defaultDecimalPattern(currency.decimalDigits),
     );
   }
@@ -113,5 +113,13 @@ final class Currency extends Equatable {
     return Currencies.values.firstWhereOrNull(
       (e) => e.code.value.equalsIgnoreCase(code),
     );
+  }
+
+  /// Remove the symbol placeholder from the [pattern].
+  ///
+  /// Symbols are added manually by [MoneyFormatter]
+  /// depending on the [MoneyDecoration].
+  static String _removeSymbolFromPattern(String pattern) {
+    return pattern.replaceAll('S', '');
   }
 }
