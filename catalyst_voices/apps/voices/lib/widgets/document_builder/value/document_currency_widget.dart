@@ -57,6 +57,7 @@ class _DocumentCurrencyWidgetState extends State<DocumentCurrencyWidget> {
       labelText: schema.title.isEmpty ? null : schema.formattedTitle,
       placeholder: schema.placeholder,
       range: _numRangeToMoneyRange(schema.numRange),
+      enableDecimals: schema.supportsDecimals,
       showHelper: widget.isEditMode,
       enabled: widget.isEditMode,
       ignorePointers: !widget.isEditMode,

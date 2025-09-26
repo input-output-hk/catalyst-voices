@@ -27,9 +27,16 @@ final class DecimalTextInputFormatter extends TextInputFormatter {
     // Enforce max decimal digits
     final maxDecimalDigits = this.maxDecimalDigits;
     if (maxDecimalDigits != null && maxDecimalDigits >= 0 && normalizedValue.text.contains('.')) {
-      final parts = normalizedValue.text.split('.');
-      if (parts.length > 1 && parts[1].length > maxDecimalDigits) {
-        return oldValue;
+      final separatorIndex = normalizedValue.text.indexOf('.');
+      if (separatorIndex >= 0) {
+        if (maxDecimalDigits == 0) {
+          return oldValue;
+        }
+
+        final decimalPartWithSeparator = normalizedValue.text.substring(separatorIndex);
+        if (decimalPartWithSeparator.length > maxDecimalDigits + 1) {
+          return oldValue;
+        }
       }
     }
 

@@ -10,6 +10,14 @@ import 'package:meta/meta.dart';
 /// See:
 /// - [DocumentNodeId]
 base class NodeId extends Equatable {
+  /// A separator in the [value] which separates segments.
+  static const String separator = '.';
+
+  /// A path consisting of segments separated by [separator].
+  ///
+  /// Examples:
+  /// - proposer
+  /// - proposer.name
   final String value;
 
   const NodeId(this.value);
@@ -22,7 +30,13 @@ base class NodeId extends Equatable {
   NodeId child(String value) => NodeId('${this.value}.$value');
 
   /// Returns true if this node is a child of [parent] node, false otherwise.
-  bool isChildOf(NodeId parent) => value.startsWith(parent.value);
+  ///
+  /// Disambiguation:
+  /// - `proposer.requestedFundsUsd` is not a child of `proposer.requestedFunds`.
+  /// - `proposer.requestedFundsUsd` is a child of `proposer`.
+  bool isChildOf(NodeId parent) {
+    return value.startsWith(parent.value) && value[parent.value.length] == separator;
+  }
 
   /// Returns true if this node id matches the given pattern, supporting '*' as a wildcard for
   /// a single segment.

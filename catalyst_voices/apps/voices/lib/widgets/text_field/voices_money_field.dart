@@ -22,6 +22,7 @@ class VoicesMoneyField extends StatelessWidget {
   final String? placeholder;
   final FocusNode? focusNode;
   final OpenRange<Money>? range;
+  final bool enableDecimals;
   final bool showHelper;
   final bool enabled;
   final bool readOnly;
@@ -39,6 +40,7 @@ class VoicesMoneyField extends StatelessWidget {
     this.placeholder,
     this.focusNode,
     this.range,
+    this.enableDecimals = true,
     this.showHelper = true,
     this.enabled = true,
     this.readOnly = false,
@@ -49,6 +51,7 @@ class VoicesMoneyField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final range = this.range;
+    final rangeMin = range?.min;
 
     return VoicesDoubleField(
       controller: controller,
@@ -57,7 +60,9 @@ class VoicesMoneyField extends StatelessWidget {
         labelText: labelText,
         errorText: errorText,
         prefixText: controller.currency.symbol,
-        hintText: range != null && range.min != null ? '${range.min}' : null,
+        hintText: rangeMin != null
+            ? MoneyFormatter.formatExactAmount(rangeMin, decoration: MoneyDecoration.none)
+            : null,
         helper:
             helperWidget ??
             (showHelper
@@ -73,6 +78,7 @@ class VoicesMoneyField extends StatelessWidget {
       validator: (double? value, text) => _validate(context, value, text),
       onChanged: onChanged != null ? _onChanged : null,
       onFieldSubmitted: onFieldSubmitted != null ? _onFieldSubmitted : null,
+      decimalDigits: enableDecimals ? controller.currency.decimalDigits : 0,
       enabled: enabled,
       readOnly: readOnly,
       ignorePointers: ignorePointers,

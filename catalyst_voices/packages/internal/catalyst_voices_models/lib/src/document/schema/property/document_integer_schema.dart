@@ -28,6 +28,17 @@ final class DocumentCurrencySchema extends DocumentIntegerSchema {
   /// or [MoneyUnits.fallback] if there's no format defined.
   MoneyUnits get moneyUnits => format.moneyUnits;
 
+  /// Returns `true` whether the [format] supports money with cents,
+  /// `false` if only major units (i.e. whole dollars) are supported.
+  bool get supportsDecimals {
+    final multipleOf = this.multipleOf;
+    if (multipleOf == null) {
+      return true;
+    }
+
+    return BigInt.from(multipleOf) % currency.decimalDigitsFactor != BigInt.zero;
+  }
+
   @override
   DocumentCurrencySchema copyWith({
     DocumentNodeId? nodeId,
