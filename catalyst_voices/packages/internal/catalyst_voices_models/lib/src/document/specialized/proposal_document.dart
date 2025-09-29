@@ -121,7 +121,7 @@ final class ProposalDocument extends Equatable {
 
     return DocumentNodeTraverser.findSectionsAndSubsections(
       property,
-    ).where((element) => element.nodeId.isChildOf(milestoneListNodeId)).length;
+    ).where((element) => element.nodeId.isSameOrChildOf(milestoneListNodeId)).length;
   }
 
   @override

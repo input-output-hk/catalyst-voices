@@ -68,7 +68,7 @@ class _DocumentSection extends StatelessWidget {
 
   bool get _isEditable {
     for (final overriddenNodeId in _widgetOverrides.keys) {
-      final sectionHasOverrides = overriddenNodeId.isChildOf(property.nodeId);
+      final sectionHasOverrides = overriddenNodeId.isSameOrChildOf(property.nodeId);
       if (sectionHasOverrides) {
         // disable editing for overridden widgets
         return false;

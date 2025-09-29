@@ -370,7 +370,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     if (nodeId == null) {
       return const ProposalGuidance(isNoneSelected: true);
     } else {
-      final segment = state.documentSegments.firstWhereOrNull((e) => nodeId.isChildOf(e.id));
+      final segment = state.documentSegments.firstWhereOrNull((e) => nodeId.isSameOrChildOf(e.id));
       final section = segment?.sections.firstWhereOrNull((e) => e.id == nodeId);
 
       return _getGuidanceForSection(segment, section);

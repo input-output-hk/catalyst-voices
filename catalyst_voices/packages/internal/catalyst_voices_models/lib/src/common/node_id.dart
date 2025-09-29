@@ -40,6 +40,11 @@ base class NodeId extends Equatable {
         value[parent.value.length] == separator;
   }
 
+  /// Returns true if this node equals [parent] node or this node [isChildOf] parent node.
+  bool isSameOrChildOf(NodeId parent) {
+    return this == parent || isChildOf(parent);
+  }
+
   /// Returns true if this node id matches the given pattern, supporting '*' as a wildcard for
   /// a single segment.
   bool matchesPattern(NodeId pattern) {
