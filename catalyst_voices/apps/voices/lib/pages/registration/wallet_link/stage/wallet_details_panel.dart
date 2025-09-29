@@ -177,7 +177,7 @@ class _WalletBalanceHeadsUp extends StatelessWidget {
           desc: Text(
             key: const Key('WalletBalanceHeadsUpList'),
             context.l10n.walletLinkWalletDetailsLowBalanceHeadsUpText(
-              MoneyFormatter.formatCompactRounded(money, decoration: MoneyDecoration.code),
+              MoneyFormatter.formatCompactRounded(money),
             ),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colors.textOnPrimaryLevel1,

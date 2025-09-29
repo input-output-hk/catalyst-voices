@@ -140,9 +140,16 @@ class _VoicesMoneyFieldState extends State<VoicesMoneyField> {
       focusNode: widget.focusNode,
       decoration: VoicesTextFieldDecoration(
         labelText: widget.labelText,
-        prefixText: widget.currency.symbol,
+        prefixText: MoneyFormatter.decorate(
+          amount: '',
+          decoration: MoneyDecoration.code,
+          currency: widget.currency,
+        ),
         hintText: rangeMin != null
-            ? MoneyFormatter.formatExactAmount(rangeMin, decoration: MoneyDecoration.none)
+            ? MoneyFormatter.formatExactAmount(
+                rangeMin,
+                decoration: MoneyDecoration.none,
+              )
             : null,
         helper:
             widget.helperWidget ??
@@ -240,7 +247,11 @@ class _VoicesMoneyFieldState extends State<VoicesMoneyField> {
 
   String? _toText(Money? money) {
     try {
-      return money?.format();
+      if (money == null) {
+        return null;
+      }
+
+      return MoneyFormatter.formatExactAmount(money, decoration: MoneyDecoration.none);
     } on FormatException {
       return null;
     }

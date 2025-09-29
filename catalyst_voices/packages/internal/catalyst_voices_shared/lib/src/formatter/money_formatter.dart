@@ -52,7 +52,7 @@ abstract class MoneyFormatter {
   /// - ₳1000123.456 = ₳1M
   static String formatCompactRounded(
     Money money, {
-    MoneyDecoration decoration = MoneyDecoration.symbol,
+    MoneyDecoration decoration = MoneyDecoration.code,
   }) {
     final numberFormat = NumberFormat('#.##');
     final decimalAmount = money.minorUnits / money.currency.decimalDigitsFactor;
@@ -91,7 +91,7 @@ abstract class MoneyFormatter {
   /// - $123 = $123
   /// - $123.45 = $123.45
   /// - $1000123.45 = $1,000,123.45
-  static String formatDecimal(Money money, {MoneyDecoration decoration = MoneyDecoration.symbol}) {
+  static String formatDecimal(Money money, {MoneyDecoration decoration = MoneyDecoration.code}) {
     final String formatted;
     if (money.minorUnits == BigInt.zero) {
       formatted = '-';
@@ -125,7 +125,7 @@ abstract class MoneyFormatter {
   /// - $1000123.45 = $1000123.45
   static String formatExactAmount(
     Money money, {
-    MoneyDecoration decoration = MoneyDecoration.symbol,
+    MoneyDecoration decoration = MoneyDecoration.code,
   }) {
     return decorate(
       amount: money.format(),
