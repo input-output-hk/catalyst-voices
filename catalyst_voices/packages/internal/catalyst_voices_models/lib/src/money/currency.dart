@@ -14,6 +14,9 @@ final class Currency extends Equatable {
   /// The ISO 4217 code of the currency (e.g., ADA, USD).
   final CurrencyCode code;
 
+  /// The type of the currency.
+  final CurrencyType type;
+
   /// The symbol used to represent the currency (e.g., ₳, $).
   final String symbol;
 
@@ -32,6 +35,7 @@ final class Currency extends Equatable {
   /// Creates a custom [Currency] with the provided properties.
   const Currency({
     required this.code,
+    required this.type,
     required this.symbol,
     required this.decimalDigits,
     required this.defaultPattern,
@@ -47,7 +51,11 @@ final class Currency extends Equatable {
   @override
   List<Object?> get props => [
     code,
+    type,
     symbol,
+    decimalDigits,
+    defaultPattern,
+    decimalPattern,
   ];
 
   /// Formats [minorUnits] into a string using [defaultPattern].
@@ -81,8 +89,21 @@ final class Currency extends Equatable {
   }
 
   /// Builds a default [decimalPattern].
-  static String defaultDecimalPattern(int decimalDigits) {
-    return '#,##0.${'0' * decimalDigits}';
+  static String buildDefaultDecimalPattern(int decimalDigits) {
+    if (decimalDigits == 0) {
+      return '#,##0';
+    } else {
+      return '#,##0.${'0' * decimalDigits}';
+    }
+  }
+
+  /// Builds a default [defaultPattern].
+  static String buildDefaultPattern(int decimalDigits) {
+    if (decimalDigits == 0) {
+      return '0';
+    } else {
+      return '0.${'0' * decimalDigits}';
+    }
   }
 
   /// Lookups the currency by [code].
@@ -102,10 +123,11 @@ final class Currency extends Equatable {
 
     return Currency(
       code: CurrencyCode(currency.isoCode),
+      type: CurrencyType.fiat,
       symbol: currency.symbol,
       decimalDigits: currency.decimalDigits,
-      defaultPattern: _removeSymbolFromPattern(currency.pattern),
-      decimalPattern: defaultDecimalPattern(currency.decimalDigits),
+      defaultPattern: buildDefaultPattern(currency.decimalDigits),
+      decimalPattern: buildDefaultDecimalPattern(currency.decimalDigits),
     );
   }
 
@@ -114,12 +136,12 @@ final class Currency extends Equatable {
       (e) => e.code.value.equalsIgnoreCase(code),
     );
   }
+}
 
-  /// Remove the symbol placeholder from the [pattern].
-  ///
-  /// Symbols are added manually by [MoneyFormatter]
-  /// depending on the [MoneyDecoration].
-  static String _removeSymbolFromPattern(String pattern) {
-    return pattern.replaceAll('S', '');
-  }
+enum CurrencyType {
+  /// A currency is a traditional (fiat) money.
+  fiat,
+
+  /// A currency is a digital cryptocurrency.
+  crypto,
 }

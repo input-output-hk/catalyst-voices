@@ -6,7 +6,8 @@ enum MoneyDecoration {
   /// The amount is decorated with the currency symbol, i.e. $amount.
   symbol,
 
-  /// The amount is decorated with the currency iso code (ticker), i.e. $USD amount.
+  /// The amount is decorated with the currency code (ticker), i.e. $USDM amount.
+  /// For traditional (fiat) currencies the `$` prefix is skipped.
   code,
 
   /// The amount is not decorated.
@@ -30,7 +31,13 @@ abstract class MoneyFormatter {
       case MoneyDecoration.symbol:
         return '${currency.symbol}$amount';
       case MoneyDecoration.code:
-        return '\$${currency.code.value} $amount';
+        final prefix = switch (currency.type) {
+          // traditional format, no prefix
+          CurrencyType.fiat => '',
+          // format as ticker
+          CurrencyType.crypto => r'$',
+        };
+        return '$prefix${currency.code.value} $amount';
       case MoneyDecoration.none:
         return amount;
     }

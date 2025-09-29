@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/widgets/text_field/voices_num_field.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 class VoicesIntField extends VoicesNumField<int> {

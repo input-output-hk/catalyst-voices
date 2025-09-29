@@ -12,6 +12,7 @@ final class Currencies {
   /// Predefined ADA currency (₳, 6 decimals).
   static const ada = Currency(
     code: CurrencyCode.ada,
+    type: CurrencyType.crypto,
     symbol: '₳',
     decimalDigits: 6,
     defaultPattern: '0.######',
@@ -21,6 +22,7 @@ final class Currencies {
   /// Predefined USDM currency ($, 2 decimals).
   static const usdm = Currency(
     code: CurrencyCode.usdm,
+    type: CurrencyType.crypto,
     symbol: r'$',
     decimalDigits: 2,
     defaultPattern: '0.00',
