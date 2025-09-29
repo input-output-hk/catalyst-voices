@@ -57,10 +57,10 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.textContaining('₳1'), findsOne);
-        expect(find.textContaining('₳2'), findsOne);
-        expect(find.textContaining('₳3'), findsOne);
-        expect(find.textContaining('₳4'), findsOne);
+        expect(find.textContaining(r'$ADA 1'), findsOne);
+        expect(find.textContaining(r'$ADA 2'), findsOne);
+        expect(find.textContaining(r'$ADA 3'), findsOne);
+        expect(find.textContaining(r'$ADA 4'), findsOne);
       });
     });
 
@@ -96,8 +96,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.textContaining('₳1'), findsOne);
-        expect(find.textContaining('₳2'), findsOne);
+        expect(find.textContaining(r'$ADA 1'), findsOne);
+        expect(find.textContaining(r'$ADA 2'), findsOne);
       });
 
       testWidgets('Displays correct multiple values', (tester) async {
@@ -119,10 +119,10 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.textContaining('₳1'), findsOne);
-        expect(find.textContaining(r'$2'), findsOne);
-        expect(find.textContaining('₳3'), findsOne);
-        expect(find.textContaining(r'$4'), findsOne);
+        expect(find.textContaining(r'$ADA 1'), findsOne);
+        expect(find.textContaining(r'$USDM 2'), findsOne);
+        expect(find.textContaining(r'$ADA 3'), findsOne);
+        expect(find.textContaining(r'$USDM 4'), findsOne);
       });
     });
   });
