@@ -158,7 +158,10 @@ class _VoicesMoneyFieldState extends State<VoicesMoneyField> {
       ),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: [
+        // Big values cannot be represented in the proposals template as numbers, therefore for
+        // now we globally limit the maximum length to fit within the supported limit of `int`.
         DecimalTextInputFormatter(
+          maxIntegerDigits: NumberUtils.maxSafeIntDigits - widget.currency.decimalDigits,
           maxDecimalDigits: widget.enableDecimals ? widget.currency.decimalDigits : 0,
         ),
         ...?widget.inputFormatters,

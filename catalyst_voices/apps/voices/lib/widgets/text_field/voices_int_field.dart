@@ -21,9 +21,7 @@ class VoicesIntField extends VoicesNumField<int> {
          keyboardType: TextInputType.number,
          inputFormatters: [
            FilteringTextInputFormatter.digitsOnly,
-           // Note. int.parse returns incorrect values for bigger Strings.
-           // If more is required use BigInt
-           if (kIsWeb) LengthLimitingTextInputFormatter(16),
+           LengthLimitingTextInputFormatter(NumberUtils.maxSafeIntDigits),
            ...?inputFormatters,
          ],
        );

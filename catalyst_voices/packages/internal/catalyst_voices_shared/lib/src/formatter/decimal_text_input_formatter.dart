@@ -1,10 +1,13 @@
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/services.dart';
 
 /// A [TextInputFormatter] which only allows to enter text which can be parsed as [double].
 final class DecimalTextInputFormatter extends TextInputFormatter {
+  final int? maxIntegerDigits;
   final int? maxDecimalDigits;
 
   const DecimalTextInputFormatter({
+    this.maxIntegerDigits,
     this.maxDecimalDigits,
   });
 
@@ -15,7 +18,7 @@ final class DecimalTextInputFormatter extends TextInputFormatter {
   ) {
     // Normalize commas to dots for consistency
     final normalizedValue = newValue.copyWith(
-      text: newValue.text.replaceAll(',', '.'),
+      text: newValue.text.normalizeDecimalSeparator(),
     );
 
     // Allow only digits and a single dot
@@ -24,20 +27,31 @@ final class DecimalTextInputFormatter extends TextInputFormatter {
       return oldValue;
     }
 
+    // Split integer and decimal parts
+    final parts = normalizedValue.text.split('.');
+    final integerPart = parts.elementAt(0);
+    final decimalPart = parts.elementAtOrNull(1);
+
+    // Enforce max integer digits
+    final maxIntegerDigits = this.maxIntegerDigits;
+    if (maxIntegerDigits != null &&
+        maxIntegerDigits >= 0 &&
+        integerPart.length > maxIntegerDigits) {
+      return oldValue;
+    }
+
     // Enforce max decimal digits
     final maxDecimalDigits = this.maxDecimalDigits;
-    if (maxDecimalDigits != null && maxDecimalDigits >= 0 && normalizedValue.text.contains('.')) {
-      final separatorIndex = normalizedValue.text.indexOf('.');
-      if (separatorIndex >= 0) {
-        if (maxDecimalDigits == 0) {
-          return oldValue;
-        }
+    if (maxDecimalDigits != null &&
+        maxDecimalDigits >= 0 &&
+        decimalPart != null &&
+        decimalPart.length > maxDecimalDigits) {
+      return oldValue;
+    }
 
-        final decimalPartWithSeparator = normalizedValue.text.substring(separatorIndex);
-        if (decimalPartWithSeparator.length > maxDecimalDigits + 1) {
-          return oldValue;
-        }
-      }
+    // Don't allow decimal separator if decimals not allowed
+    if (maxDecimalDigits == 0 && decimalPart != null) {
+      return oldValue;
     }
 
     return normalizedValue;

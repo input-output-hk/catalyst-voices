@@ -4,6 +4,11 @@ abstract final class NumberUtils {
   /// A decimal separator used to input fractional values.
   static const String decimalSeparator = '.';
 
+  /// The length of [String] which can be safely parsed into an [int] on all flutter platforms.
+  ///
+  /// The number comes from counting the length of decimally encoded max int value (2^53-1).
+  static const int maxSafeIntDigits = 15;
+
   const NumberUtils._();
 
   /// Checks whether [value] is a multiple of [multipleOf] within the allowed [tolerance].
