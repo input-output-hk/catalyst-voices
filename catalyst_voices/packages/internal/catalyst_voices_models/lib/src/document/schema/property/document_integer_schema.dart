@@ -36,7 +36,8 @@ final class DocumentCurrencySchema extends DocumentIntegerSchema {
       return true;
     }
 
-    return BigInt.from(multipleOf) % currency.decimalDigitsFactor != BigInt.zero;
+    final moneyMultipleOf = valueToMoney(multipleOf);
+    return moneyMultipleOf.minorUnits % currency.decimalDigitsFactor != BigInt.zero;
   }
 
   @override
