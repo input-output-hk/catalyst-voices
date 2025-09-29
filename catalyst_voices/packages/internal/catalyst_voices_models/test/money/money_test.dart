@@ -150,6 +150,102 @@ void main() {
         expect(money.toString(), r'$123.00');
       });
     });
+
+    group('parse', () {
+      test('parses USDM with symbol and decimals', () {
+        final money = Money.parse(r'$10.99', Currencies.usdm);
+        expect(money.minorUnits, BigInt.from(1099));
+        expect(money.currency, Currencies.usdm);
+      });
+
+      test('parses USDM without decimals', () {
+        final money = Money.parse('15', Currencies.usdm);
+        expect(money.minorUnits, BigInt.from(1500));
+        expect(money.currency, Currencies.usdm);
+      });
+
+      test('parses USDM with code instead of symbol', () {
+        final money = Money.parse('USDM12.34', Currencies.usdm);
+        expect(money.minorUnits, BigInt.from(1234));
+        expect(money.currency, Currencies.usdm);
+      });
+
+      test('parses USDM with ticker instead of symbol', () {
+        final money = Money.parse(r'$USDM12.34', Currencies.usdm);
+        expect(money.minorUnits, BigInt.from(1234));
+        expect(money.currency, Currencies.usdm);
+      });
+
+      test('parses USDM with ticker and whitespace instead of symbol', () {
+        final money = Money.parse(r'$USDM 12.34', Currencies.usdm);
+        expect(money.minorUnits, BigInt.from(1234));
+        expect(money.currency, Currencies.usdm);
+      });
+
+      test('parses ADA with symbol and exact decimals', () {
+        final money = Money.parse('₳0.123456', Currencies.ada);
+        expect(money.minorUnits, BigInt.from(123456));
+        expect(money.currency, Currencies.ada);
+      });
+
+      test('parses ADA with too many decimals (truncate)', () {
+        final money = Money.parse('₳0.123456789', Currencies.ada);
+        expect(money.minorUnits, BigInt.from(123456)); // truncated to 6 digits
+        expect(money.currency, Currencies.ada);
+      });
+
+      test('parses ADA with fewer decimals (pad)', () {
+        final money = Money.parse('₳2.5', Currencies.ada);
+        // "2.5" => "2.500000" => 2,500,000
+        expect(money.minorUnits, BigInt.from(2500000));
+        expect(money.currency, Currencies.ada);
+      });
+
+      test('parses with whitespace and random formatting', () {
+        final money = Money.parse(r'   $  99.5  ', Currencies.usdm);
+        // => "9950" for USD
+        expect(money.minorUnits, BigInt.from(9950));
+        expect(money.currency, Currencies.usdm);
+      });
+
+      test('parses with comma decimal separator normalized', () {
+        final money = Money.parse(r'$1,23', Currencies.usdm);
+        // "1.23" => 123 for USD
+        expect(money.minorUnits, BigInt.from(123));
+        expect(money.currency, Currencies.usdm);
+      });
+
+      test('throws $FormatException if money is not given', () {
+        expect(
+          () => Money.parse(r'$', Currencies.usdm),
+          throwsA(isA<FormatException>()),
+        );
+      });
+
+      test('parses major-only ADA', () {
+        final money = Money.parse('3', Currencies.ada);
+        expect(money.minorUnits, BigInt.from(3000000));
+        expect(money.currency, Currencies.ada);
+      });
+
+      test('parses with currency code and decimals', () {
+        final money = Money.parse('ADA10.000001', Currencies.ada);
+        expect(money.minorUnits, BigInt.from(10000001));
+        expect(money.currency, Currencies.ada);
+      });
+
+      test('parses with currency ticker and decimals', () {
+        final money = Money.parse(r'$ADA10.000001', Currencies.ada);
+        expect(money.minorUnits, BigInt.from(10000001));
+        expect(money.currency, Currencies.ada);
+      });
+
+      test('parses with currency ticker and decimals and whitespace', () {
+        final money = Money.parse(r'$ADA 10.000001', Currencies.ada);
+        expect(money.minorUnits, BigInt.from(10000001));
+        expect(money.currency, Currencies.ada);
+      });
+    });
   });
 
   group('CoinExt', () {

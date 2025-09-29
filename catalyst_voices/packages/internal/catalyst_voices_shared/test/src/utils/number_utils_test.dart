@@ -109,4 +109,41 @@ void main() {
       });
     });
   });
+
+  group('StringDoubleExt', () {
+    group('normalizeDecimalSeparator', () {
+      test('keeps single dot unchanged', () {
+        expect('123.45'.normalizeDecimalSeparator(), '123.45');
+      });
+
+      test('replaces commas with dots', () {
+        expect('123,45'.normalizeDecimalSeparator(), '123.45');
+      });
+
+      test('removes all dots except the last one', () {
+        expect('1.2.3.4'.normalizeDecimalSeparator(), '123.4');
+      });
+
+      test('works with mixed commas and dots', () {
+        expect('1,234.56'.normalizeDecimalSeparator(), '1234.56');
+        expect('1.234,56'.normalizeDecimalSeparator(), '1234.56');
+      });
+
+      test('removes extra dots after replacing commas', () {
+        expect('1,2,3,4'.normalizeDecimalSeparator(), '123.4');
+      });
+
+      test('string without separators remains unchanged', () {
+        expect('1234'.normalizeDecimalSeparator(), '1234');
+      });
+
+      test('handles leading/trailing spaces and mixed symbols', () {
+        expect('  1,234.56 '.trim().normalizeDecimalSeparator(), '1234.56');
+      });
+
+      test('empty string returns empty', () {
+        expect(''.normalizeDecimalSeparator(), '');
+      });
+    });
+  });
 }

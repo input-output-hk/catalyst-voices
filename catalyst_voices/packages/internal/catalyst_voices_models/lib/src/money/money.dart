@@ -60,6 +60,43 @@ final class Money extends Equatable implements Comparable<Money> {
     }
   }
 
+  /// Parses [Money] from a [string] using a [currency].
+  ///
+  /// Examples:
+  /// - Money.parse('$10.99', usdm) -> Money(BigInt.from(1099), usdm)
+  /// - Money.parse('₳0.123456', ada) -> Money(BigInt.from(123456), ada)
+  /// - Money.parse('₳0.123456789', ada) -> Money(BigInt.from(123456), ada)
+  factory Money.parse(String string, Currency currency) {
+    final normalized = string
+        .replaceAll(currency.symbol, '')
+        .replaceAll(currency.code.value, '')
+        .replaceAll(r'$', '')
+        .replaceAll(' ', '')
+        .normalizeDecimalSeparator();
+
+    if (normalized.contains(NumberUtils.decimalSeparator)) {
+      final parts = normalized.split(NumberUtils.decimalSeparator);
+      final majorUnits = parts[0];
+      var minorUnits = parts[1];
+
+      if (minorUnits.length < currency.decimalDigits) {
+        minorUnits = minorUnits.padRight(currency.decimalDigits, '0');
+      } else if (minorUnits.length > currency.decimalDigits) {
+        minorUnits = minorUnits.substring(0, currency.decimalDigits);
+      }
+
+      return Money(
+        currency: currency,
+        minorUnits: BigInt.parse(majorUnits + minorUnits),
+      );
+    } else {
+      return Money(
+        currency: currency,
+        minorUnits: BigInt.parse(string) * currency.decimalDigitsFactor,
+      );
+    }
+  }
+
   /// Creates a zero-amount [Money] instance for the given [currency].
   factory Money.zero({required Currency currency}) {
     return Money(currency: currency, minorUnits: BigInt.zero);
