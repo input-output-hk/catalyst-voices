@@ -35,7 +35,9 @@ base class NodeId extends Equatable {
   /// - `proposer.requestedFundsUsd` is not a child of `proposer.requestedFunds`.
   /// - `proposer.requestedFundsUsd` is a child of `proposer`.
   bool isChildOf(NodeId parent) {
-    return value.startsWith(parent.value) && value[parent.value.length] == separator;
+    return value.startsWith(parent.value) &&
+        value.length > parent.value.length &&
+        value[parent.value.length] == separator;
   }
 
   /// Returns true if this node id matches the given pattern, supporting '*' as a wildcard for

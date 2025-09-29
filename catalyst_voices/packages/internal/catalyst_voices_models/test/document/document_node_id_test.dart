@@ -64,6 +64,13 @@ void main() {
       expect(parentNode.isChildOf(childNode), isFalse);
     });
 
+    test('isChildOf does not identify similar nodes as children', () {
+      final parentNode = DocumentNodeId.root.child('requestedFunds');
+      final anotherNode = DocumentNodeId.root.child('requestedFundsUsdm');
+      expect(anotherNode.isChildOf(parentNode), isFalse);
+      expect(parentNode.isChildOf(anotherNode), isFalse);
+    });
+
     test('toString outputs the value', () {
       final node = DocumentNodeId.root.child('section1').child('paragraph1');
       expect(node.toString(), 'section1.paragraph1');
