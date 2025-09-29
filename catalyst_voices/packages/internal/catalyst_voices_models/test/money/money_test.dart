@@ -142,12 +142,12 @@ void main() {
         expect(ada.formatDecimal(), '1,000,123.456789');
       });
 
-      test('toString returns money with currency symbol', () {
+      test('toString returns money with currency code', () {
         final money = Money.fromMajorUnits(
           currency: Currencies.usdm,
           majorUnits: BigInt.from(123),
         );
-        expect(money.toString(), r'$123.00');
+        expect(money.toString(), r'$USDM 123.00');
       });
     });
 
