@@ -158,9 +158,12 @@ sealed class DocumentPropertyFormat extends Equatable {
     return switch (value) {
       'path' => const DocumentPathFormat(),
       'uri' => const DocumentUriFormat(),
+      // cspell: words dropdownsingleselect
       'dropdownsingleselect' => const DocumentDropdownSingleSelectFormat(),
       'multiselect' => const DocumentMultiSelectFormat(),
+      // cspell: words singlelinetextentrylist
       'singlelinetextentrylist' => const DocumentSingleLineTextEntryListFormat(),
+      // cspell: words singlelinetextentrylistmarkdown
       'singlelinetextentrylistmarkdown' => const DocumentSingleLineTextEntryListMarkdownFormat(),
       // cspell: words singlelinehttpsurlentrylist
       'singlelinehttpsurlentrylist' => const DocumentSingleLineHttpsUrlEntryListFormat(),
@@ -170,7 +173,9 @@ sealed class DocumentPropertyFormat extends Equatable {
       'nestedquestions' => const DocumentNestedQuestionsFormat(),
       // cspell: words singlegroupedtagselector
       'singlegroupedtagselector' => const DocumentSingleGroupedTagSelectorFormat(),
+      // cspell: words taggroup
       'taggroup' => const DocumentTagGroupFormat(),
+      // cspell: words tagselection
       'tagselection' => const DocumentTagSelectionFormat(),
       'token:cardano:ada' => const DocumentTokenCardanoAdaFormat(),
       'datetime:duration:months' => const DocumentDurationMonthsFormat(),
