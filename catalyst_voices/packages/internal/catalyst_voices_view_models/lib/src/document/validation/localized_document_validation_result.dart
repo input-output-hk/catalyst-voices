@@ -82,7 +82,7 @@ final class LocalizedDocumentListItemsOutOfRange extends LocalizedDocumentValida
   }
 }
 
-/// When a money value is out of range.
+/// When a money value is not a multiple of [multipleOf].
 final class LocalizedDocumentMoneyNotMultipleOf extends LocalizedDocumentValidationResult {
   final Money multipleOf;
 
@@ -99,7 +99,7 @@ final class LocalizedDocumentMoneyNotMultipleOf extends LocalizedDocumentValidat
   }
 }
 
-/// When a currency value is out of range.
+/// When a money value is out of range.
 final class LocalizedDocumentMoneyOutOfRange extends LocalizedDocumentValidationResult {
   final OpenRange<Money> range;
 
@@ -129,7 +129,7 @@ final class LocalizedDocumentMoneyOutOfRange extends LocalizedDocumentValidation
   }
 }
 
-/// When a numeric value is out of range.
+/// When a numeric value is not a multiple of [multipleOf].
 final class LocalizedDocumentNumNotMultipleOf extends LocalizedDocumentValidationResult {
   final num multipleOf;
 

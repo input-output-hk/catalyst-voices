@@ -1,7 +1,7 @@
-import 'dart:math';
-
 abstract final class NumberUtils {
   /// A decimal separator used to input fractional values.
+  ///
+  /// For now for simplicity no localized separators are supported like commas in some locales.
   static const String decimalSeparator = '.';
 
   /// The length of [String] which can be safely parsed into an [int] on all flutter platforms.
@@ -24,16 +24,6 @@ abstract final class NumberUtils {
 
     final ratio = value / multipleOf;
     return (ratio - ratio.round()).abs() < tolerance;
-  }
-}
-
-extension DoubleExt on double {
-  /// Truncates the double to [decimals] decimal places.
-  double truncateToDecimals(int decimals) {
-    assert(decimals >= 0, 'decimal places are only positive');
-
-    final factor = pow(10, decimals).toDouble();
-    return (this * factor).truncate() / factor;
   }
 }
 

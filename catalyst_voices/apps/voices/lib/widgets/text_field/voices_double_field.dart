@@ -20,7 +20,10 @@ class VoicesDoubleField extends VoicesNumField<double> {
          codec: const DoubleCodec(),
          keyboardType: const TextInputType.numberWithOptions(decimal: true),
          inputFormatters: [
-           DecimalTextInputFormatter(maxDecimalDigits: decimalDigits),
+           DecimalTextInputFormatter(
+             maxIntegerDigits: NumberUtils.maxSafeIntDigits,
+             maxDecimalDigits: decimalDigits,
+           ),
            ...?inputFormatters,
          ],
        );

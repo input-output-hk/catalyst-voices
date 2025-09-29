@@ -25,6 +25,9 @@ base class DocumentCurrencyFormat extends DocumentPropertyFormat {
     required this.moneyUnits,
   });
 
+  @override
+  List<Object?> get props => super.props + [currency, moneyUnits];
+
   /// Parses the [DocumentCurrencyFormat] from a [format].
   /// Returns `null` if format is unrecognized.
   ///
@@ -145,7 +148,6 @@ final class DocumentPathFormat extends DocumentPropertyFormat {
 }
 
 /// The format expected by the property value.
-
 sealed class DocumentPropertyFormat extends Equatable {
   final String value;
 

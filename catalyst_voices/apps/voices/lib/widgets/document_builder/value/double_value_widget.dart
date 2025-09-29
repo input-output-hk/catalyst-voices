@@ -22,9 +22,7 @@ class NumberValueWidget extends StatefulWidget {
   });
 
   @override
-  State<NumberValueWidget> createState() {
-    return _NumberValueWidgetState();
-  }
+  State<NumberValueWidget> createState() => _NumberValueWidgetState();
 }
 
 class _NumberValueWidgetState extends State<NumberValueWidget> {

@@ -113,7 +113,7 @@ void main() {
         });
       });
 
-      group('USD', () {
+      group('USDM', () {
         test(r'$123 = $123', () {
           final money = Money.fromMajorUnits(
             currency: Currencies.usdm,
@@ -191,7 +191,7 @@ void main() {
         });
       });
 
-      group('USD', () {
+      group('USDM', () {
         test(r'$123 = $123', () {
           final money = Money.fromMajorUnits(
             currency: Currencies.usdm,

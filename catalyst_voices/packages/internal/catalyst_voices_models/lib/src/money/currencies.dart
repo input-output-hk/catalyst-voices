@@ -2,9 +2,10 @@ import 'package:catalyst_voices_models/src/money/currency.dart';
 import 'package:catalyst_voices_models/src/money/currency_code.dart';
 import 'package:catalyst_voices_models/src/money/money.dart';
 
+/// A list of known custom currencies.
 final class Currencies {
   /// Fallback currency for historical reasons.
-  /// The first fund used a hardcoded currency, this constructors fallbacks to it.
+  /// The first fund used a hardcoded currency, this constructor fallbacks to it.
   ///
   /// Needs to be synced with [MoneyUnits.fallback].
   static const fallback = ada;

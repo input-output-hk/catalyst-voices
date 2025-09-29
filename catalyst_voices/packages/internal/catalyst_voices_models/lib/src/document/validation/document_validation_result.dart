@@ -75,7 +75,7 @@ final class DocumentMoneyNotMultipleOf extends DocumentValidationResult {
   List<Object?> get props => [invalidNodeId, multipleOf, actualValue];
 }
 
-/// The numerical [actualValue] is not within [expectedRange].
+/// The money [actualValue] is not within [expectedRange].
 final class DocumentMoneyOutOfRange extends DocumentValidationResult {
   final DocumentNodeId invalidNodeId;
   final OpenRange<Money> expectedRange;

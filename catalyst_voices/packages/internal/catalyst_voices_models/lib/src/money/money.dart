@@ -105,7 +105,7 @@ final class Money extends Equatable implements Comparable<Money> {
   /// Returns `true` if the amount is equal to zero.
   bool get isZero => minorUnits == BigInt.zero;
 
-  /// Retuns the major units calculated from [minorUnits].
+  /// Returns the major units calculated from [minorUnits].
   /// If the [minorUnits] contains "cents" they will be truncated.
   BigInt get majorUnits => minorUnits ~/ currency.decimalDigitsFactor;
 

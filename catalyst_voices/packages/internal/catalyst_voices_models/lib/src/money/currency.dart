@@ -11,7 +11,7 @@ import 'package:money2/money2.dart' as money2;
 /// Provides factory constructors for common currencies
 /// like ADA and USD, as well as helpers to format amounts.
 final class Currency extends Equatable {
-  /// The ISO 4217 code of the currency (e.g., ADA, USD).
+  /// The ISO 4217 code of the currency (e.g. USD) or cryptocurrency ticker (e.g. ADA).
   final CurrencyCode code;
 
   /// The type of the currency.
@@ -88,8 +88,17 @@ final class Currency extends Equatable {
     );
   }
 
+  /// Lookups the currency by [code].
+  static Currency? fromCode(String? code) {
+    if (code == null) {
+      return null;
+    }
+
+    return _lookupCustomCurrencies(code) ?? _lookupCurrencyByIsoCode(code);
+  }
+
   /// Builds a default [decimalPattern].
-  static String buildDefaultDecimalPattern(int decimalDigits) {
+  static String _buildDefaultDecimalPattern(int decimalDigits) {
     if (decimalDigits == 0) {
       return '#,##0';
     } else {
@@ -98,21 +107,12 @@ final class Currency extends Equatable {
   }
 
   /// Builds a default [defaultPattern].
-  static String buildDefaultPattern(int decimalDigits) {
+  static String _buildDefaultPattern(int decimalDigits) {
     if (decimalDigits == 0) {
       return '0';
     } else {
       return '0.${'0' * decimalDigits}';
     }
-  }
-
-  /// Lookups the currency by [code].
-  static Currency? fromCode(String? code) {
-    if (code == null) {
-      return null;
-    }
-
-    return _lookupCustomCurrencies(code) ?? _lookupCurrencyByIsoCode(code);
   }
 
   static Currency? _lookupCurrencyByIsoCode(String code) {
@@ -126,8 +126,8 @@ final class Currency extends Equatable {
       type: CurrencyType.fiat,
       symbol: currency.symbol,
       decimalDigits: currency.decimalDigits,
-      defaultPattern: buildDefaultPattern(currency.decimalDigits),
-      decimalPattern: buildDefaultDecimalPattern(currency.decimalDigits),
+      defaultPattern: _buildDefaultPattern(currency.decimalDigits),
+      decimalPattern: _buildDefaultDecimalPattern(currency.decimalDigits),
     );
   }
 
