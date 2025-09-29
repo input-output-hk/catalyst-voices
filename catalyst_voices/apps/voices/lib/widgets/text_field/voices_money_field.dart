@@ -1,10 +1,11 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/widgets/text_field/voices_double_field.dart';
+import 'package:catalyst_voices/common/ext/text_editing_controller_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 typedef VoicesMoneyFieldValidator =
     VoicesTextFieldValidationResult Function(
@@ -12,126 +13,54 @@ typedef VoicesMoneyFieldValidator =
       String text,
     );
 
-class VoicesMoneyField extends StatelessWidget {
+class VoicesMoneyField extends StatefulWidget {
   final VoicesMoneyFieldController controller;
+  final WidgetStatesController? statesController;
+  final FocusNode? focusNode;
+  final List<TextInputFormatter>? inputFormatters;
   final ValueChanged<Money?>? onChanged;
   final ValueChanged<Money?>? onFieldSubmitted;
   final VoicesMoneyFieldValidator? validator;
-  final String? labelText;
-  final String? errorText;
-  final String? placeholder;
-  final FocusNode? focusNode;
-  final OpenRange<Money>? range;
-  final bool enableDecimals;
-  final bool showHelper;
+  final Currency currency;
+  final MoneyUnits moneyUnits;
   final bool enabled;
   final bool readOnly;
   final bool? ignorePointers;
+  final bool enableDecimals;
+  final bool showHelper;
+  final OpenRange<Money>? range;
+  final String? labelText;
+  final String? placeholder;
   final Widget? helperWidget;
 
   const VoicesMoneyField({
     super.key,
     required this.controller,
+    this.statesController,
+    this.focusNode,
+    this.inputFormatters,
     this.onChanged,
     required this.onFieldSubmitted,
     this.validator,
-    this.labelText,
-    this.errorText,
-    this.placeholder,
-    this.focusNode,
-    this.range,
-    this.enableDecimals = true,
-    this.showHelper = true,
+    required this.currency,
+    required this.moneyUnits,
     this.enabled = true,
     this.readOnly = false,
     this.ignorePointers,
+    this.enableDecimals = true,
+    this.showHelper = true,
+    this.range,
+    this.labelText,
+    this.placeholder,
     this.helperWidget,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final range = this.range;
-    final rangeMin = range?.min;
-
-    return VoicesDoubleField(
-      controller: controller,
-      focusNode: focusNode,
-      decoration: VoicesTextFieldDecoration(
-        labelText: labelText,
-        errorText: errorText,
-        prefixText: controller.currency.symbol,
-        hintText: rangeMin != null
-            ? MoneyFormatter.formatExactAmount(rangeMin, decoration: MoneyDecoration.none)
-            : null,
-        helper:
-            helperWidget ??
-            (showHelper
-                ? _Helper(
-                    range: range,
-                    placeholder: placeholder,
-                  )
-                : null),
-        labelStyle: context.textTheme.labelLarge?.copyWith(
-          color: context.colors.textOnPrimaryLevel1,
-        ),
-      ),
-      validator: (double? value, text) => _validate(context, value, text),
-      onChanged: onChanged != null ? _onChanged : null,
-      onFieldSubmitted: onFieldSubmitted != null ? _onFieldSubmitted : null,
-      decimalDigits: enableDecimals ? controller.currency.decimalDigits : 0,
-      enabled: enabled,
-      readOnly: readOnly,
-      ignorePointers: ignorePointers,
-    );
-  }
-
-  void _onChanged(double? value) {
-    onChanged?.call(_MoneyMath.doubleToMoney(controller.currency, controller.moneyUnits, value));
-  }
-
-  void _onFieldSubmitted(double? value) {
-    onFieldSubmitted?.call(
-      _MoneyMath.doubleToMoney(controller.currency, controller.moneyUnits, value),
-    );
-  }
-
-  VoicesTextFieldValidationResult _validate(
-    BuildContext context,
-    double? value,
-    String text,
-  ) {
-    final money = _MoneyMath.doubleToMoney(controller.currency, controller.moneyUnits, value);
-    if (money == null && text.isNotEmpty) {
-      final message = context.l10n.errorValidationTokenNotParsed;
-      return VoicesTextFieldValidationResult.error(message);
-    }
-
-    final validator = this.validator;
-    if (validator != null) {
-      return validator(money, text);
-    }
-
-    return const VoicesTextFieldValidationResult.none();
-  }
+  State<VoicesMoneyField> createState() => _VoicesMoneyFieldState();
 }
 
-class VoicesMoneyFieldController extends VoicesDoubleFieldController {
-  final Currency currency;
-  final MoneyUnits moneyUnits;
-
-  VoicesMoneyFieldController({
-    required this.currency,
-    required this.moneyUnits,
-    Money? value,
-  }) : super(_MoneyMath.moneyToDouble(value));
-
-  Money? get money {
-    return _MoneyMath.doubleToMoney(currency, moneyUnits, value);
-  }
-
-  set money(Money? money) {
-    value = _MoneyMath.moneyToDouble(money);
-  }
+class VoicesMoneyFieldController extends ValueNotifier<Money?> {
+  VoicesMoneyFieldController(super.value);
 }
 
 class _Helper extends StatelessWidget {
@@ -188,40 +117,147 @@ class _Helper extends StatelessWidget {
       );
     }
 
-    if (placeholder != null) {
-      return Text(placeholder!);
-    }
-
     return const Text('');
   }
 }
 
-class _MoneyMath {
-  static Money? doubleToMoney(Currency currency, MoneyUnits moneyUnits, double? value) {
-    if (value == null) {
-      return null;
-    }
+class _VoicesMoneyFieldState extends State<VoicesMoneyField> {
+  late final TextEditingController textEditingController;
 
-    switch (moneyUnits) {
-      case MoneyUnits.majorUnits:
-        return Money.fromMajorUnits(
-          currency: currency,
-          majorUnits: BigInt.from(value),
-        );
-      case MoneyUnits.minorUnits:
-        return Money(
-          currency: currency,
-          minorUnits: BigInt.from(value * currency.decimalDigitsFactor.toInt()),
-        );
+  VoicesMoneyFieldController get _controller => widget.controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final range = widget.range;
+    final rangeMin = range?.min;
+
+    final onChanged = widget.onChanged;
+    final onFieldSubmitted = widget.onFieldSubmitted;
+
+    return VoicesTextField(
+      controller: textEditingController,
+      statesController: widget.statesController,
+      focusNode: widget.focusNode,
+      decoration: VoicesTextFieldDecoration(
+        labelText: widget.labelText,
+        prefixText: widget.currency.symbol,
+        hintText: rangeMin != null
+            ? MoneyFormatter.formatExactAmount(rangeMin, decoration: MoneyDecoration.none)
+            : null,
+        helper:
+            widget.helperWidget ??
+            (widget.showHelper
+                ? _Helper(
+                    range: range,
+                    placeholder: widget.placeholder,
+                  )
+                : null),
+        labelStyle: context.textTheme.labelLarge?.copyWith(
+          color: context.colors.textOnPrimaryLevel1,
+        ),
+      ),
+      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: [
+        DecimalTextInputFormatter(
+          maxDecimalDigits: widget.enableDecimals ? widget.currency.decimalDigits : 0,
+        ),
+        ...?widget.inputFormatters,
+      ],
+      onChanged: onChanged != null ? (value) => onChanged(_toMoney(value ?? '')) : null,
+      onFieldSubmitted: onFieldSubmitted != null
+          ? (value) => onFieldSubmitted(_toMoney(value))
+          : null,
+      textValidator: (value) => _validate(context, value),
+      enabled: widget.enabled,
+      readOnly: widget.readOnly,
+      ignorePointers: widget.ignorePointers,
+    );
+  }
+
+  @override
+  void didUpdateWidget(VoicesMoneyField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.controller != oldWidget.controller) {
+      oldWidget.controller.removeListener(_handleMoneyChange);
+      widget.controller.addListener(_handleMoneyChange);
+
+      _handleMoneyChange();
     }
   }
 
-  static double? moneyToDouble(Money? money) {
-    if (money == null) {
+  @override
+  void dispose() {
+    textEditingController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    final money = _controller.value;
+    final text = _toText(money);
+
+    final textValue = TextEditingValueExt.collapsedAtEndOf(text ?? '');
+
+    textEditingController = TextEditingController.fromValue(textValue)
+      ..addListener(_handleTextChange);
+
+    _controller.addListener(_handleMoneyChange);
+  }
+
+  void _handleMoneyChange() {
+    final money = _controller.value;
+    final text = _toText(money) ?? textEditingController.text;
+
+    // encode to num again to prevent reseting text when num values are identical but the texts different
+    // i.e. we consider these two to be equal and they should not trigger an update: "1.0" == "1."
+    if (_toMoney(textEditingController.text) != _toMoney(text)) {
+      textEditingController.textWithSelection = text;
+    }
+  }
+
+  void _handleTextChange() {
+    final text = textEditingController.text;
+    final money = _toMoney(text);
+
+    if (_controller.value != money) {
+      _controller.value = money;
+    }
+  }
+
+  Money? _toMoney(String text) {
+    try {
+      return Money.parse(text, widget.currency);
+    } on FormatException {
       return null;
     }
+  }
 
-    final value = money.minorUnits / money.currency.decimalDigitsFactor;
-    return value.truncateToDecimals(money.currency.decimalDigits);
+  String? _toText(Money? money) {
+    try {
+      return money?.format();
+    } on FormatException {
+      return null;
+    }
+  }
+
+  VoicesTextFieldValidationResult _validate(
+    BuildContext context,
+    String text,
+  ) {
+    final money = _toMoney(text);
+    if (money == null && text.isNotEmpty) {
+      final message = context.l10n.errorValidationTokenNotParsed;
+      return VoicesTextFieldValidationResult.error(message);
+    }
+
+    final validator = widget.validator;
+    if (validator != null) {
+      return validator(money, text);
+    }
+
+    return const VoicesTextFieldValidationResult.none();
   }
 }

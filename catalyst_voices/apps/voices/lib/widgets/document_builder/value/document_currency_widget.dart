@@ -54,13 +54,15 @@ class _DocumentCurrencyWidgetState extends State<DocumentCurrencyWidget> {
       onChanged: _onChanged,
       onFieldSubmitted: _onChanged,
       validator: _validator,
-      labelText: schema.title.isEmpty ? null : schema.formattedTitle,
-      placeholder: schema.placeholder,
-      range: _numRangeToMoneyRange(schema.numRange),
-      enableDecimals: schema.supportsDecimals,
-      showHelper: widget.isEditMode,
+      currency: schema.currency,
+      moneyUnits: schema.moneyUnits,
       enabled: widget.isEditMode,
       ignorePointers: !widget.isEditMode,
+      enableDecimals: schema.supportsDecimals,
+      showHelper: widget.isEditMode,
+      range: _numRangeToMoneyRange(schema.numRange),
+      labelText: schema.title.isEmpty ? null : schema.formattedTitle,
+      placeholder: schema.placeholder,
       helperWidget: _isMilestone ? const _MilestoneCostHelpText() : null,
     );
   }
@@ -76,13 +78,9 @@ class _DocumentCurrencyWidgetState extends State<DocumentCurrencyWidget> {
 
     if (newSchema.currency != oldSchema.currency || newSchema.moneyUnits != oldSchema.moneyUnits) {
       _controller.dispose();
-      _controller = VoicesMoneyFieldController(
-        currency: newSchema.currency,
-        moneyUnits: newSchema.moneyUnits,
-        value: _valueToMoney(newValue),
-      );
+      _controller = VoicesMoneyFieldController(_valueToMoney(newValue));
     } else if (oldValue != newValue) {
-      _controller.money = _valueToMoney(newValue);
+      _controller.value = _valueToMoney(newValue);
     }
 
     if (widget.isEditMode != oldWidget.isEditMode) {
@@ -101,11 +99,8 @@ class _DocumentCurrencyWidgetState extends State<DocumentCurrencyWidget> {
   void initState() {
     super.initState();
 
-    _controller = VoicesMoneyFieldController(
-      currency: widget.schema.currency,
-      moneyUnits: widget.schema.moneyUnits,
-      value: _valueToMoney(widget.property.value ?? widget.schema.defaultValue),
-    );
+    final money = _valueToMoney(widget.property.value ?? widget.schema.defaultValue);
+    _controller = VoicesMoneyFieldController(money);
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
 
