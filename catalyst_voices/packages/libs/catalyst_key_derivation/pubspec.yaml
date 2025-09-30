@@ -23,7 +23,7 @@ dependencies:
   flutter_rust_bridge:
     git:
       url: https://github.com/input-output-hk/catalyst_flutter_rust_bridge
-      ref: c1c73ce195bfd287b0780c93246eee3bfae17f6f
+      ref: 24888fec8f4cab3999e461fc8c6e065f62560d63
       path: frb_dart/
   plugin_platform_interface: ^2.1.8
 
