@@ -14,6 +14,8 @@ flutter_rust_bridge = { version = "2.11.1", git = "https://github.com/input-outp
 anyhow = "1.0.91"
 brotli = "7.0.0"
 zstd = "0.13.2"
+# TODO(dt-iohk): pinned to last working version, this issue reappeared: https://github.com/wasm-bindgen/wasm-bindgen/issues/3315
+wasm-bindgen = "=0.2.101"
 
 [lints.rust]
 warnings = "deny"

@@ -19,6 +19,8 @@ bip39 = "2.0.0"
 sha2 = "0.10"
 bip32 = "0.5.1"
 hex = "0.4.3"
+# TODO(dt-iohk): pinned to last working version, this issue reappeared: https://github.com/wasm-bindgen/wasm-bindgen/issues/3315
+wasm-bindgen = "=0.2.101"
 
 [lints.rust]
 warnings = "deny"
