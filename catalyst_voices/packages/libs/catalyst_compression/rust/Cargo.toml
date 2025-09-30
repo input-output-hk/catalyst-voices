@@ -17,6 +17,10 @@ zstd = "0.13.2"
 # TODO(dt-iohk): pinned to last working version, this issue reappeared: https://github.com/wasm-bindgen/wasm-bindgen/issues/3315
 wasm-bindgen = "=0.2.101"
 
+# TODO(dt-iohk) remove this section when wasm-bindgen is no longer pinned
+[package.metadata.cargo-machete]
+ignored = ["wasm-bindgen"]
+
 [lints.rust]
 warnings = "deny"
 missing_docs = "deny"
