@@ -124,7 +124,7 @@ command:
       flutter_rust_bridge:
         git:
           url: https://github.com/input-output-hk/catalyst_flutter_rust_bridge
-          ref: 1966be8af292746d38283a0162fcce0ae1fcdbb4
+          ref: 60820717df47b959477d30b8ff9b014185065a10
           path: frb_dart/
       flutter_secure_storage: ^9.2.4
       formz: ^0.8.0
