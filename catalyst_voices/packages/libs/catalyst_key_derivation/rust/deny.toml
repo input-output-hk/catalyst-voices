@@ -63,7 +63,7 @@ allow-git = [
     "https://github.com/input-output-hk/mithril",
     # Maintained fork of an archived crates-io version.
     "https://github.com/dariusc93/rust-ipfs",
-    # TODO(dt-iohk): remove this when changes from forker flutter_rust_bridge are merged into the official version
+    # TODO(dt-iohk): remove this when changes from forked flutter_rust_bridge are merged into the official version
     "https://github.com/input-output-hk/catalyst_flutter_rust_bridge",
 ]
 
