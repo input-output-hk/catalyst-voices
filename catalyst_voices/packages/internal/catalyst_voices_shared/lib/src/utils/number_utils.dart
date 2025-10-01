@@ -12,6 +12,29 @@ abstract final class NumberUtils {
   const NumberUtils._();
 
   /// Checks whether [value] is a multiple of [multipleOf] within the allowed [tolerance].
+  /// The [tolerance] allows to mitigate the floating point rounding errors.
+  ///
+  /// Example (no tolerance):
+  /// ```dart
+  /// final noTolerance = isDoubleMultipleOf(
+  ///   value: 5.00000005,
+  ///   multipleOf: 5.00000,
+  ///   tolerance: 0,
+  /// );
+  ///
+  ///  expect(noTolerance, isFalse);
+  /// ```
+  /// 
+  /// Example (with tolerance):
+  /// ```dart
+  /// final withTolerance = isDoubleMultipleOf(
+  ///   value: 5.00000005,
+  ///   multipleOf: 5.00000,
+  ///   tolerance: 1e-9,
+  /// );
+  ///
+  ///  expect(withTolerance, isTrue);
+  /// ```
   static bool isDoubleMultipleOf({
     required double value,
     required double multipleOf,
