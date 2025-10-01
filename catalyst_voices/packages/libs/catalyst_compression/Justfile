@@ -5,11 +5,6 @@
 # Generated necessary files using Earthly for running Flutter web locally.
 code-gen-web:
     earthly +code-generator --local=true
-    # TODO(dt-iohk): remove dart format since +code-generator triggers it already.
-    # For the time being we need to call it again here since the earthly context does not have
-    # access to our latest analyzer rules which are defined in another package.
-    # The earthly target relies on latest published catalyst_analysis and that hasn't been updated in a while.
-    dart format lib
 
 # Run local Flutter web.
 run-web: code-gen-web
