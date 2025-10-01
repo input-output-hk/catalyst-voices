@@ -58,10 +58,9 @@ void main() {
         expect(format, isNull);
       });
 
-      test('ignores unsupported minor unit names', () {
+      test('returns null for unknown minor units', () {
         final format = DocumentCurrencyFormat.parse('fiat:usd:foobar');
-        expect(format, isNotNull);
-        expect(format!.moneyUnits, equals(MoneyUnits.majorUnits));
+        expect(format, isNull);
       });
     });
   });

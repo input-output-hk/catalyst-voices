@@ -24,7 +24,7 @@ abstract final class NumberUtils {
   ///
   ///  expect(noTolerance, isFalse);
   /// ```
-  /// 
+  ///
   /// Example (with tolerance):
   /// ```dart
   /// final withTolerance = isDoubleMultipleOf(

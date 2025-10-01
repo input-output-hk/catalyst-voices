@@ -45,81 +45,56 @@ base class DocumentCurrencyFormat extends DocumentPropertyFormat {
   /// - fiat:eur:cent
   static DocumentCurrencyFormat? parse(String format) {
     final parts = format.split(':');
-    if (parts.length < 2) {
-      return null;
-    } else if (parts.first == 'token') {
-      return _parseCryptocurrencyFormat(parts, format);
-    } else if (parts.first == 'fiat') {
-      return _parseFiatFormat(parts, format);
-    } else {
-      return null;
-    }
+    return switch (parts) {
+      [final type, _, final code, final minor]
+          when _isValidType(type) && _isValidMinorUnits(minor) =>
+        _createFormat(format, code, MoneyUnits.minorUnits),
+
+      [final type, final code, final minor] when _isValidType(type) && _isValidMinorUnits(minor) =>
+        _createFormat(format, code, MoneyUnits.minorUnits),
+
+      [final type, _, final code] when _isValidType(type) => _createFormat(
+        format,
+        code,
+        MoneyUnits.majorUnits,
+      ),
+
+      [final type, final code] when _isValidType(type) => _createFormat(
+        format,
+        code,
+        MoneyUnits.majorUnits,
+      ),
+      _ => null,
+    };
   }
 
-  static bool _isCentsFormat(String? string) {
-    return switch (string) {
+  static DocumentCurrencyFormat? _createFormat(
+    String format,
+    String currencyCode,
+    MoneyUnits moneyUnits,
+  ) {
+    final currency = Currency.fromCode(currencyCode);
+    if (currency == null) {
+      return null;
+    }
+    return DocumentCurrencyFormat(
+      format,
+      currency: currency,
+      moneyUnits: moneyUnits,
+    );
+  }
+
+  /// Checks if a string identifies a minor currency unit.
+  static bool _isValidMinorUnits(String minorUnits) {
+    return switch (minorUnits) {
       'cent' || 'penny' || 'lovelace' || 'sat' || 'wei' => true,
       _ => false,
     };
   }
 
-  /// token[:brand]:code[:cent]
-  static DocumentCurrencyFormat? _parseCryptocurrencyFormat(List<String> parts, String format) {
-    assert(parts.length >= 2, 'parts cannot be shorter than 2');
-    assert(parts.first == 'token', 'first part must be "token"');
-
-    if (parts.first == 'token') {
-      String currencyCode;
-      bool isMinorUnits;
-
-      if (parts.length == 4) {
-        currencyCode = parts[2];
-        isMinorUnits = _isCentsFormat(parts[3]);
-      } else if (parts.length == 3) {
-        final brandOrCurrencyCode = parts[1];
-        if (Currency.fromCode(brandOrCurrencyCode) != null) {
-          // token:code:cent
-          currencyCode = brandOrCurrencyCode;
-          isMinorUnits = _isCentsFormat(parts[2]);
-        } else {
-          // token:brand:code
-          currencyCode = parts[2];
-          isMinorUnits = false;
-        }
-      } else {
-        currencyCode = parts[1];
-        isMinorUnits = false;
-      }
-
-      final currency = Currency.fromCode(currencyCode);
-      if (currency != null) {
-        return DocumentCurrencyFormat(
-          format,
-          currency: currency,
-          moneyUnits: isMinorUnits ? MoneyUnits.minorUnits : MoneyUnits.majorUnits,
-        );
-      }
-    }
-
-    return null;
-  }
-
-  static DocumentCurrencyFormat? _parseFiatFormat(List<String> parts, String format) {
-    assert(parts.length >= 2, 'parts cannot be shorter than 2');
-    assert(parts.first == 'fiat', 'first part must be "fiat"');
-
-    // fiat:code[:cent]
-    final currencyCode = parts[1];
-    final isMinorUnits = parts.length == 3 && _isCentsFormat(parts[2]);
-    final currency = Currency.fromCode(currencyCode);
-    if (currency != null) {
-      return DocumentCurrencyFormat(
-        format,
-        currency: currency,
-        moneyUnits: isMinorUnits ? MoneyUnits.minorUnits : MoneyUnits.majorUnits,
-      );
-    }
-    return null;
+  /// Checks if the type is 'fiat' or 'token'.
+  static bool _isValidType(String type) {
+    return type == 'fiat' || type == 'token';
   }
 }
 
