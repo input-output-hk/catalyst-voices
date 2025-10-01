@@ -10,7 +10,7 @@ setup-code:
 
 # Builds generated code
 generate-code:
-    cd .. && earthly ./catalyst_voices+code-generator --platform=linux/amd64 --save_locally=true
+    cd .. && earthly ./catalyst_voices+code-generator --save_locally=true
 
 # Syntax sugar for linking packages and building generated code
 bootstrap: setup-code generate-code
