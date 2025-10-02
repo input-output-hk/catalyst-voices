@@ -87,13 +87,13 @@ impl<E: Endpoint> Endpoint for CatchPanicEndpoint<E> {
 
         match AssertUnwindSafe(self.inner.call(req)).catch_unwind().await {
             Ok(resp) => resp.map(IntoResponse::into_response),
-            Err(err) => Ok(panic_response(err, &method, &uri, &headers)),
+            Err(err) => Ok(panic_response(&err, &method, &uri, &headers)),
         }
     }
 }
 
 fn panic_response(
-    err: Box<dyn Any + Send + 'static>,
+    err: &Box<dyn Any + Send + 'static>,
     method: &Method,
     uri: &Uri,
     headers: &HeaderMap,
@@ -118,7 +118,7 @@ fn panic_response(
     let panic_identifier = server_err.id().to_string();
 
     // Get the message from the panic as best we can.
-    let err_msg = panic_message(&err);
+    let err_msg = panic_message(err);
 
     // This is the location of the panic.
     let location = match LOCATION.with(|l| l.borrow_mut().take()) {
