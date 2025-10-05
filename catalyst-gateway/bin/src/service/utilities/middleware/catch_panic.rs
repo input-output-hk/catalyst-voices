@@ -70,6 +70,7 @@ impl<E: Endpoint> Middleware<E> for CatchPanicMiddleware {
 
 /// An endpoint for the `CatchPanicMiddleware` middleware.
 pub struct CatchPanicEndpoint<E> {
+    /// An inner endpoint.
     inner: E,
 }
 
