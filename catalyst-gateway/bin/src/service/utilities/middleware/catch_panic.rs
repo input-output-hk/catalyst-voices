@@ -92,6 +92,7 @@ impl<E: Endpoint> Endpoint for CatchPanicEndpoint<E> {
     }
 }
 
+/// Converts a panic to a response.
 fn panic_response(
     err: &Box<dyn Any + Send + 'static>,
     method: &Method,
