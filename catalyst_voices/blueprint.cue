@@ -1,10 +1,11 @@
 project: {
 	name: "voices"
 	deployment: {
-		on: {
-			merge: {}
-			tag: {}
-		}
+		// TODO: FE related target, disabled for `cat-gateway` release candidate branch
+		//on: {
+		//	merge: {}
+		//	tag: {}
+		//}
 
 		bundle: {
 			env: string | *"dev"
@@ -108,16 +109,17 @@ project: {
 			}
 		}
 	}
-
-	release: {
-		docker: {
-			on: {
-				merge: {}
-				tag: {}
-			}
-			config: {
-				tag: _ @forge(name="GIT_HASH_OR_TAG")
-			}
-		}
-	}
+	
+	// TODO: FE related target, disabled for `cat-gateway` release candidate branch
+	//release: {
+	//	docker: {
+	//		on: {
+	//			merge: {}
+	//			tag: {}
+	//		}
+	//		config: {
+	//			tag: _ @forge(name="GIT_HASH_OR_TAG")
+	//		}
+	//	}
+	//}
 }
