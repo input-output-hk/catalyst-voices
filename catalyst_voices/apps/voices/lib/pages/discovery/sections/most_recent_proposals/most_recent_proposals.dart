@@ -1,33 +1,42 @@
-import 'package:catalyst_voices/pages/discovery/sections/most_recent_proposals.dart';
+import 'package:catalyst_voices/pages/discovery/sections/most_recent_proposals/recent_proposals.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_error_indicator.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-class MostRecentProposalsSelector extends StatelessWidget {
-  static const _minProposalsToShowRecent = 6;
-
-  const MostRecentProposalsSelector({super.key});
+class MostRecentProposals extends StatelessWidget {
+  const MostRecentProposals({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocSelector<DiscoveryCubit, DiscoveryState, DiscoveryMostRecentProposalsState>(
       selector: (state) => state.proposals,
       builder: (context, state) {
-        final hasMinProposalsToShow = state.proposals.length > _minProposalsToShowRecent;
-        return Stack(
-          children: [
-            _MostRecentProposalsError(state),
-            _ViewAllProposals(
-              offstage: state.showError || !hasMinProposalsToShow,
-            ),
-            _MostRecentProposalsData(
-              state,
-              minProposalsToShow: hasMinProposalsToShow,
-            ),
-          ],
-        );
+        return _MostRecentProposals(data: state);
       },
+    );
+  }
+}
+
+class _MostRecentProposals extends StatelessWidget {
+  final DiscoveryMostRecentProposalsState data;
+  const _MostRecentProposals({
+    required this.data,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        _MostRecentProposalsError(data),
+        _ViewAllProposals(
+          offstage: data.showError || !data.hasMinProposalsToShow,
+        ),
+        _MostRecentProposalsData(
+          data,
+          minProposalsToShow: data.hasMinProposalsToShow,
+        ),
+      ],
     );
   }
 }
@@ -43,7 +52,7 @@ class _MostRecentProposalsData extends StatelessWidget {
     return Offstage(
       key: const Key('MostRecentProposalsData'),
       offstage: state.showError || !minProposalsToShow,
-      child: MostRecentProposals(proposals: state.proposals),
+      child: RecentProposals(proposals: state.proposals),
     );
   }
 }

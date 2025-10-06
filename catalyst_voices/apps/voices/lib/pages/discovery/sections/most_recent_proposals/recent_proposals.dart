@@ -12,10 +12,10 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class MostRecentProposals extends StatelessWidget {
+class RecentProposals extends StatelessWidget {
   final List<ProposalBrief> proposals;
 
-  const MostRecentProposals({
+  const RecentProposals({
     super.key,
     required this.proposals,
   });
@@ -74,7 +74,7 @@ class _Background extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      key: const Key('MostRecentProposals'),
+      key: const Key('RecentProposals'),
       constraints: constraints,
       decoration: BoxDecoration(
         image: DecorationImage(
@@ -109,9 +109,9 @@ class _ProposalsList extends StatelessWidget {
         final proposal = proposals[index];
         final ref = proposal.selfRef;
         return Padding(
+          key: Key('PendingProposalCard_$ref'),
           padding: EdgeInsets.only(right: index < proposals.length - 1 ? 12 : 0),
           child: ProposalBriefCard(
-            key: Key('PendingProposalCard_$ref'),
             proposal: proposal,
             onTap: () => _onCardTap(context, ref),
             onFavoriteChanged: (value) => _onCardFavoriteChanged(context, ref, value),

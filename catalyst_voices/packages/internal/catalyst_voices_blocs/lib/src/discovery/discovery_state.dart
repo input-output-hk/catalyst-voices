@@ -90,6 +90,8 @@ final class DiscoveryCampaignState extends Equatable {
 }
 
 final class DiscoveryMostRecentProposalsState extends Equatable {
+  static const _minProposalsToShowRecent = 6;
+
   final LocalizedException? error;
   final List<ProposalBrief> proposals;
   final List<String> favoritesIds;
@@ -101,6 +103,8 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
     this.favoritesIds = const [],
     this.showComments = false,
   });
+
+  bool get hasMinProposalsToShow => proposals.length > _minProposalsToShowRecent;
 
   @override
   List<Object?> get props => [

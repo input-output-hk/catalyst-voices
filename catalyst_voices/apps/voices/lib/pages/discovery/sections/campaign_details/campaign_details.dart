@@ -1,37 +1,21 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/discovery/sections/campaign_categories.dart';
-import 'package:catalyst_voices/pages/discovery/sections/current_campaign.dart';
+import 'package:catalyst_voices/pages/discovery/sections/campaign_details/widgets/campaign_categories.dart';
+import 'package:catalyst_voices/pages/discovery/sections/campaign_details/widgets/current_campaign.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class CampaignDetailsSelector extends StatelessWidget {
-  const CampaignDetailsSelector({super.key});
+class CampaignDetails extends StatelessWidget {
+  const CampaignDetails({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocSelector<DiscoveryCubit, DiscoveryState, DiscoveryCampaignState>(
       selector: (state) => state.campaign,
-      builder: (context, campaignState) {
-        return Stack(
-          children: [
-            Offstage(
-              offstage: campaignState.showError,
-              child: _CampaignData(campaignState: campaignState),
-            ),
-            Offstage(
-              offstage: !campaignState.showError,
-              child: _CampaignError(
-                error: campaignState.error,
-                onRetry: () async {
-                  await context.read<DiscoveryCubit>().getCurrentCampaign();
-                },
-              ),
-            ),
-          ],
-        );
+      builder: (context, campaign) {
+        return _CampaignDetails(campaign);
       },
     );
   }
@@ -92,6 +76,33 @@ class _CampaignData extends StatelessWidget {
         _CampaignCategoriesContent(
           categories: campaignState.categories,
           isLoading: campaignState.isLoading,
+        ),
+      ],
+    );
+  }
+}
+
+class _CampaignDetails extends StatelessWidget {
+  final DiscoveryCampaignState campaign;
+
+  const _CampaignDetails(this.campaign);
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Offstage(
+          offstage: campaign.showError,
+          child: _CampaignData(campaignState: campaign),
+        ),
+        Offstage(
+          offstage: !campaign.showError,
+          child: _CampaignError(
+            error: campaign.error,
+            onRetry: () async {
+              await context.read<DiscoveryCubit>().getCurrentCampaign();
+            },
+          ),
         ),
       ],
     );
