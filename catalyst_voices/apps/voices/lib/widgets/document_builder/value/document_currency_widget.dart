@@ -33,15 +33,8 @@ class _DocumentCurrencyWidgetState extends State<DocumentCurrencyWidget> {
   late VoicesMoneyFieldController _controller;
   late final FocusNode _focusNode;
 
-  // TODO(LynxxLynx): After https://github.com/input-output-hk/catalyst-voices/pull/2865
-  // is merged use wildcard support for NodeId
   bool get _isMilestone {
-    final milestoneWildcardNodeId = ProposalDocument.milestoneCostNodeId.toString().split('*');
-    if (widget.property.nodeId.value.startsWith(milestoneWildcardNodeId[0]) &&
-        widget.property.nodeId.value.endsWith(milestoneWildcardNodeId[1])) {
-      return true;
-    }
-    return false;
+    return widget.property.nodeId.matchesPattern(ProposalDocument.milestoneCostNodeId);
   }
 
   @override
