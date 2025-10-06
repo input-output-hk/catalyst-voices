@@ -179,7 +179,12 @@ mod tests {
         unsafe {
             env::set_var("SIGNED_DOC_SK", sk_hex);
         }
-        for doc in F14_TEMPLATES.as_ref().unwrap().values() {
+        for doc in F14_TEMPLATES
+            .as_ref()
+            .unwrap()
+            .values()
+            .chain(F15_TEMPLATES.as_ref().unwrap().values())
+        {
             println!("{:?}", doc.doc_meta());
             assert!(!doc.problem_report().is_problematic());
         }
