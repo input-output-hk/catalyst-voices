@@ -6,6 +6,7 @@ This repository contains the Catalyst Voices app and packages.
 
 * [Catalyst Voices](#catalyst-voices)
   * [Requirements](#requirements)
+  * [Platforms](#platforms)
   * [Getting Started](#getting-started)
     * [Bootstrapping](#bootstrapping)
     * [Packages](#packages)
@@ -41,6 +42,12 @@ This repository contains the Catalyst Voices app and packages.
 * [Rust](https://rustup.rs/): 1.80.0+
 
 ❗️We recommend using **Visual Studio Code** as the **default editor** for this project.
+
+## Platforms
+
+* Web is fully supported. It is our main target
+* Android is supported. Project builds locally. No CD support at the moment.
+* iOS is supported. Project builds locally. No CD support at the moment.
 
 ## Getting Started
 
