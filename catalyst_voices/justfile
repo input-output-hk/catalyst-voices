@@ -24,10 +24,7 @@ check-code:
 
 # Runs unit tests
 test-code:
-    # TODO(dt-iohk): enable running unit tests in earthly, remove melos tests,
-    # currently it fails because of `libsqlite3.so.3.49.1` unable to load on arm64 linux.
     earthly +test-unit-native
-    # melos test-native
 
 # Pre Push Checks
 pre-push: generate-code check-code test-code
