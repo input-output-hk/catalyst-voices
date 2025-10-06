@@ -16,7 +16,10 @@ targets = [
 
 [advisories]
 version = 2
-ignore = []
+ignore = [
+    "RUSTSEC-2025-0067",
+    "RUSTSEC-2025-0068",
+]
 
 [bans]
 multiple-versions = "warn"
@@ -60,8 +63,8 @@ allow-git = [
     "https://github.com/input-output-hk/mithril",
     # Maintained fork of an archived crates-io version.
     "https://github.com/dariusc93/rust-ipfs",
-    # TODO(dt-iohk): remove this when forked flutter_rust_bridge is no longer needed
-    "https://github.com/dt-iohk/flutter_rust_bridge",
+    # TODO(dt-iohk): remove this when changes from forked flutter_rust_bridge are merged into the official version
+    "https://github.com/input-output-hk/catalyst_flutter_rust_bridge",
 ]
 
 [licenses]
