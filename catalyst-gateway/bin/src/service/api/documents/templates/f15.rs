@@ -2,8 +2,8 @@
 
 use super::SignedDocData;
 
-/// Fund 14 Campaign ID.
-const CAMPAIGN_ID: &str = "0194cfcf-15a2-7e32-b559-386b93d0724e";
+/// Fund 15 Campaign ID.
+const CAMPAIGN_ID: &str = "0199802c-21b4-7d91-986d-0e913cd81391";
 
 /// An empty JSON object bytes slice
 const EMPTY_JSON_OBJECT_BYTES: &[u8] = b"{}";
@@ -17,10 +17,10 @@ pub(crate) struct CategoryDocData(
 /// List of category documents.
 #[rustfmt::skip]
 pub(crate) const CATEGORY_DOCUMENTS: [CategoryDocData; 4] = [
-    CategoryDocData("01997fce-fde3-7fd7-8a62-b3a6d5fc20d3", CAMPAIGN_ID),
-    CategoryDocData("01997fcf-1dd0-707d-8439-c2e6e1d80524", CAMPAIGN_ID),
-    CategoryDocData("01997fcf-369a-7b07-9367-a1eac707b35b", CAMPAIGN_ID),
-    CategoryDocData("01997fcf-72e1-7ff2-8a39-8ad907bcc61a", CAMPAIGN_ID),
+    CategoryDocData("0199802c-21b4-721f-aa1d-5123b006879e", CAMPAIGN_ID),
+    CategoryDocData("0199802c-21b4-7dc8-8537-7eae5ea4c4d3", CAMPAIGN_ID),
+    CategoryDocData("0199802c-21b4-7c84-873c-f55119cdc811", CAMPAIGN_ID),
+    CategoryDocData("0199802c-21b4-7161-a16e-a77af492780f", CAMPAIGN_ID),
 ];
 
 impl From<CategoryDocData> for SignedDocData {
@@ -48,10 +48,10 @@ pub(crate) struct ProposalTemplateDocData(
 /// List of proposal templates, proposals each of which is uniquely associated with one of the predefined categories.
 #[rustfmt::skip]
 pub(crate) const PROPOSAL_TEMPLATES: [ProposalTemplateDocData; 4] = [
-    ProposalTemplateDocData("01997fcf-a7b5-7c48-9438-b2c8049063c3", CATEGORY_DOCUMENTS[0].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-75b5-b4a4-5cf331cd8d1a.schema.json")),
-    ProposalTemplateDocData("01997fcf-c941-780f-b3f2-8c4d0020b363", CATEGORY_DOCUMENTS[1].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-7371-8bd3-c15811b2b063.schema.json")),
-    ProposalTemplateDocData("01997fcf-e9ca-75bd-9141-013e644527df", CATEGORY_DOCUMENTS[2].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-79c7-a222-2c3b581443a8.schema.json")),
-    ProposalTemplateDocData("01997fd0-4723-7d8e-9a17-3449c0f81a7a", CATEGORY_DOCUMENTS[3].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-716f-a04e-f422f08a99dc.schema.json")),
+    ProposalTemplateDocData("0199802c-21b4-717d-9619-11357877f471", CATEGORY_DOCUMENTS[0].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-75b5-b4a4-5cf331cd8d1a.schema.json")),
+    ProposalTemplateDocData("0199802c-21b4-7982-ba3f-ec0cd0207b11", CATEGORY_DOCUMENTS[1].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-7371-8bd3-c15811b2b063.schema.json")),
+    ProposalTemplateDocData("0199802c-21b4-7f75-b14a-331cd1605f74", CATEGORY_DOCUMENTS[2].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-79c7-a222-2c3b581443a8.schema.json")),
+    ProposalTemplateDocData("0199802c-21b4-7d6c-aacd-54aa31fe1e4c", CATEGORY_DOCUMENTS[3].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-716f-a04e-f422f08a99dc.schema.json")),
 ];
 
 impl From<ProposalTemplateDocData> for SignedDocData {
@@ -76,10 +76,10 @@ pub(crate) struct CommentTemplateDocData(
 /// List of comment templates, comments each of which is uniquely associated with one of the predefined categories.
 #[rustfmt::skip]
 pub(crate) const COMMENT_TEMPLATES: [CommentTemplateDocData; 4] = [
-    CommentTemplateDocData("01997fd0-8006-73ac-a480-08c3b6f50f21", CATEGORY_DOCUMENTS[0].0),
-    CommentTemplateDocData("01997fd0-8006-7d55-b560-8497176fb66e", CATEGORY_DOCUMENTS[1].0),
-    CommentTemplateDocData("01997fd0-8006-78cf-9fb0-9893130d0aa8", CATEGORY_DOCUMENTS[2].0),
-    CommentTemplateDocData("01997fd0-8006-718c-83f4-a671e035ae9d", CATEGORY_DOCUMENTS[3].0),
+    CommentTemplateDocData("0199802c-21b4-7b2c-aafd-0af557e8408c", CATEGORY_DOCUMENTS[0].0),
+    CommentTemplateDocData("0199802c-21b4-78d8-a1df-2e4bd2e73507", CATEGORY_DOCUMENTS[1].0),
+    CommentTemplateDocData("0199802c-21b4-76da-9384-4dc1e2dc3d51", CATEGORY_DOCUMENTS[2].0),
+    CommentTemplateDocData("0199802c-21b4-7884-84cb-0bdf6c08e690", CATEGORY_DOCUMENTS[3].0),
 ];
 
 impl From<CommentTemplateDocData> for SignedDocData {
