@@ -6,7 +6,6 @@ topics: [compression, codec]
 version: 1.0.0
 # TODO(dt-iohk): enable publishing once flutter_rust_bridge is reverted to official version
 publish_to: none
-resolution: workspace
 
 environment:
   sdk: ">=3.9.0 <4.0.0"
@@ -17,8 +16,8 @@ dependencies:
     sdk: flutter
   flutter_rust_bridge:
     git:
-      url: https://github.com/dt-iohk/flutter_rust_bridge
-      ref: 34f50173d992b9a1dc6c7f12caee427d03b7dcfc
+      url: https://github.com/input-output-hk/catalyst_flutter_rust_bridge
+      ref: 24888fec8f4cab3999e461fc8c6e065f62560d63
       path: frb_dart/
   plugin_platform_interface: ^2.1.8
 
