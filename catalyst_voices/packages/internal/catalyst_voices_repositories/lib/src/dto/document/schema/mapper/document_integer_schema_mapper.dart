@@ -22,11 +22,20 @@ final class DocumentIntegerSchemaMapper {
     final constValue = schema.constValue as int?;
     final enumValues = schema.enumValues?.cast<int>();
     final numRange = NumRange.optionalRangeOf(min: schema.minimum, max: schema.maximum);
+    final multipleOf = schema.multipleOf as int?;
     final definition = _DocumentIntegerDefinition.fromDef(schema.definition());
 
     switch (definition) {
       case _DocumentIntegerDefinition.tokenValueCardanoAda:
-        return DocumentTokenValueCardanoAdaSchema(
+      case _DocumentIntegerDefinition.currency:
+        if (format is! DocumentCurrencyFormat) {
+          throw StateError(
+            'The format of $nodeId must be supported by the '
+            '$DocumentCurrencyFormat, actual format: ${schema.format}',
+          );
+        }
+
+        return DocumentCurrencySchema(
           nodeId: nodeId,
           format: format,
           title: title,
@@ -39,6 +48,7 @@ final class DocumentIntegerSchemaMapper {
           constValue: constValue,
           enumValues: enumValues,
           numRange: numRange,
+          multipleOf: multipleOf,
         );
       case _DocumentIntegerDefinition.durationInMonths:
         return DocumentDurationInMonthsSchema(
@@ -54,6 +64,7 @@ final class DocumentIntegerSchemaMapper {
           constValue: constValue,
           enumValues: enumValues,
           numRange: numRange,
+          multipleOf: multipleOf,
         );
       case _DocumentIntegerDefinition.unknown:
         return DocumentGenericIntegerSchema(
@@ -69,6 +80,7 @@ final class DocumentIntegerSchemaMapper {
           constValue: constValue,
           enumValues: enumValues,
           numRange: numRange,
+          multipleOf: multipleOf,
         );
     }
   }
@@ -76,6 +88,7 @@ final class DocumentIntegerSchemaMapper {
 
 enum _DocumentIntegerDefinition {
   tokenValueCardanoAda('tokenValueCardanoADA'),
+  currency('currency'),
   durationInMonths('durationInMonths'),
   unknown('unknown');
 

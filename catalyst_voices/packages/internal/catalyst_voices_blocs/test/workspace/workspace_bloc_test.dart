@@ -87,7 +87,7 @@ void main() {
                   min: _adaMajorUnits(10),
                   max: _adaMajorUnits(100),
                 ),
-                currency: const Currency.ada(),
+                currency: Currencies.ada,
                 descriptions: const [],
                 dos: const [],
                 donts: const [],
@@ -142,7 +142,7 @@ void main() {
                   min: _adaMajorUnits(10),
                   max: _adaMajorUnits(100),
                 ),
-                currency: const Currency.ada(),
+                currency: Currencies.ada,
                 descriptions: const [],
                 dos: const [],
                 donts: const [],
@@ -191,7 +191,7 @@ void main() {
 }
 
 Money _adaMajorUnits(int majorUnits) {
-  return Money.fromMajorUnits(currency: const Currency.ada(), majorUnits: BigInt.from(majorUnits));
+  return Money.fromMajorUnits(currency: Currencies.ada, majorUnits: BigInt.from(majorUnits));
 }
 
 class MockCampaignService extends Mock implements CampaignService {}

@@ -1,3 +1,7 @@
+import 'package:catalyst_voices_models/src/money/currencies.dart';
+import 'package:catalyst_voices_models/src/money/currency_code.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:money2/money2.dart' as money2;
 
@@ -7,8 +11,11 @@ import 'package:money2/money2.dart' as money2;
 /// Provides factory constructors for common currencies
 /// like ADA and USD, as well as helpers to format amounts.
 final class Currency extends Equatable {
-  /// The ISO 4217 code of the currency (e.g., ADA, USD).
-  final CurrencyIsoCode isoCode;
+  /// The ISO 4217 code of the currency (e.g. USD) or cryptocurrency ticker (e.g. ADA).
+  final CurrencyCode code;
+
+  /// The type of the currency.
+  final CurrencyType type;
 
   /// The symbol used to represent the currency (e.g., ₳, $).
   final String symbol;
@@ -27,41 +34,28 @@ final class Currency extends Equatable {
 
   /// Creates a custom [Currency] with the provided properties.
   const Currency({
-    required this.isoCode,
+    required this.code,
+    required this.type,
     required this.symbol,
     required this.decimalDigits,
     required this.defaultPattern,
     required this.decimalPattern,
   });
 
-  /// Predefined ADA currency (₳, 6 decimals).
-  const Currency.ada()
-    : this(
-        isoCode: CurrencyIsoCode.ada,
-        symbol: '₳',
-        decimalDigits: 6,
-        defaultPattern: '0.######',
-        decimalPattern: '#,##0.######',
-      );
-
-  /// Fallback currency for historical reasons.
-  /// The first fund used a hardcoded currency, this constructors fallbacks to it.
-  const Currency.fallback() : this.ada();
-
-  /// Predefined USD currency ($, 2 decimals).
-  const Currency.usd()
-    : this(
-        isoCode: CurrencyIsoCode.usd,
-        symbol: r'$',
-        decimalDigits: 2,
-        defaultPattern: '0.00',
-        decimalPattern: '#,##0.00',
-      );
+  /// The factor of 10 to divide a minor value by to get the intended
+  /// currency value.
+  ///
+  ///  e.g. if [decimalDigits] is 2 then this value will be 100.
+  BigInt get decimalDigitsFactor => BigInt.from(10).pow(decimalDigits);
 
   @override
   List<Object?> get props => [
-    isoCode,
+    code,
+    type,
     symbol,
+    decimalDigits,
+    defaultPattern,
+    decimalPattern,
   ];
 
   /// Formats [minorUnits] into a string using [defaultPattern].
@@ -87,26 +81,67 @@ final class Currency extends Equatable {
 
   money2.Currency _createCurrency() {
     return money2.Currency.create(
-      isoCode.code,
+      code.value,
       decimalDigits,
       pattern: defaultPattern,
       symbol: symbol,
     );
   }
+
+  /// Lookups the currency by [code].
+  static Currency? fromCode(String? code) {
+    if (code == null) {
+      return null;
+    }
+
+    return _lookupCustomCurrencies(code) ?? _lookupCurrencyByIsoCode(code);
+  }
+
+  /// Builds a default [decimalPattern].
+  static String _buildDefaultDecimalPattern(int decimalDigits) {
+    if (decimalDigits == 0) {
+      return '#,##0';
+    } else {
+      return '#,##0.${'0' * decimalDigits}';
+    }
+  }
+
+  /// Builds a default [defaultPattern].
+  static String _buildDefaultPattern(int decimalDigits) {
+    if (decimalDigits == 0) {
+      return '0';
+    } else {
+      return '0.${'0' * decimalDigits}';
+    }
+  }
+
+  static Currency? _lookupCurrencyByIsoCode(String code) {
+    final currency = money2.Currencies().find(code.toUpperCase());
+    if (currency == null) {
+      return null;
+    }
+
+    return Currency(
+      code: CurrencyCode(currency.isoCode),
+      type: CurrencyType.fiat,
+      symbol: currency.symbol,
+      decimalDigits: currency.decimalDigits,
+      defaultPattern: _buildDefaultPattern(currency.decimalDigits),
+      decimalPattern: _buildDefaultDecimalPattern(currency.decimalDigits),
+    );
+  }
+
+  static Currency? _lookupCustomCurrencies(String code) {
+    return Currencies.values.firstWhereOrNull(
+      (e) => e.code.value.equalsIgnoreCase(code),
+    );
+  }
 }
 
-/// ISO-4217 currency code.
-///
-/// For fiat currencies 3 uppercase letter code.
-///
-/// For cryptocurrencies can be longer and usually doesn't represent
-/// a valid ISO-4217 since cryptocurrencies aren't covered.
-enum CurrencyIsoCode {
-  ada('ADA'),
-  usd('USD');
+enum CurrencyType {
+  /// A currency is a traditional (fiat) money.
+  fiat,
 
-  /// The iso code.
-  final String code;
-
-  const CurrencyIsoCode(this.code);
+  /// A currency is a digital cryptocurrency.
+  crypto,
 }

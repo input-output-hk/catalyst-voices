@@ -1,6 +1,5 @@
-import 'dart:math';
-
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices_models/src/money/currencies.dart';
 import 'package:catalyst_voices_models/src/money/currency.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
@@ -37,8 +36,65 @@ final class Money extends Equatable implements Comparable<Money> {
   }) {
     return Money(
       currency: currency,
-      minorUnits: majorUnits * BigInt.from(pow(10, currency.decimalDigits)),
+      minorUnits: majorUnits * currency.decimalDigitsFactor,
     );
+  }
+
+  /// Creates a [Money] amount from [amount], either major or minor units specified by the [moneyUnits].
+  factory Money.fromUnits({
+    required Currency currency,
+    required BigInt amount,
+    required MoneyUnits moneyUnits,
+  }) {
+    switch (moneyUnits) {
+      case MoneyUnits.majorUnits:
+        return Money.fromMajorUnits(
+          currency: currency,
+          majorUnits: amount,
+        );
+      case MoneyUnits.minorUnits:
+        return Money(
+          currency: currency,
+          minorUnits: amount,
+        );
+    }
+  }
+
+  /// Parses [Money] from a [string] using a [currency].
+  ///
+  /// Examples:
+  /// - Money.parse('$10.99', usdm) -> Money(BigInt.from(1099), usdm)
+  /// - Money.parse('₳0.123456', ada) -> Money(BigInt.from(123456), ada)
+  /// - Money.parse('₳0.123456789', ada) -> Money(BigInt.from(123456), ada)
+  factory Money.parse(String string, Currency currency) {
+    final normalized = string
+        .replaceAll(currency.symbol, '')
+        .replaceAll(currency.code.value, '')
+        .replaceAll(r'$', '')
+        .replaceAll(' ', '')
+        .normalizeDecimalSeparator();
+
+    if (normalized.contains(NumberUtils.decimalSeparator)) {
+      final parts = normalized.split(NumberUtils.decimalSeparator);
+      final majorUnits = parts[0];
+      var minorUnits = parts[1];
+
+      if (minorUnits.length < currency.decimalDigits) {
+        minorUnits = minorUnits.padRight(currency.decimalDigits, '0');
+      } else if (minorUnits.length > currency.decimalDigits) {
+        minorUnits = minorUnits.substring(0, currency.decimalDigits);
+      }
+
+      return Money(
+        currency: currency,
+        minorUnits: BigInt.parse(majorUnits + minorUnits),
+      );
+    } else {
+      return Money(
+        currency: currency,
+        minorUnits: BigInt.parse(string) * currency.decimalDigitsFactor,
+      );
+    }
   }
 
   /// Creates a zero-amount [Money] instance for the given [currency].
@@ -48,6 +104,10 @@ final class Money extends Equatable implements Comparable<Money> {
 
   /// Returns `true` if the amount is equal to zero.
   bool get isZero => minorUnits == BigInt.zero;
+
+  /// Returns the major units calculated from [minorUnits].
+  /// If the [minorUnits] contains "cents" they will be truncated.
+  BigInt get majorUnits => minorUnits ~/ currency.decimalDigitsFactor;
 
   @override
   List<Object?> get props => [currency, minorUnits];
@@ -114,8 +174,8 @@ final class Money extends Equatable implements Comparable<Money> {
   ///
   /// Throws [ArgumentError] if currencies differ.
   void _ensureCurrenciesSame(Money first, Money second) {
-    final firstCurrency = first.currency.isoCode;
-    final secondCurrency = second.currency.isoCode;
+    final firstCurrency = first.currency.code;
+    final secondCurrency = second.currency.code;
     if (firstCurrency != secondCurrency) {
       throw ArgumentError(
         'Detected currency mismatch, first: $firstCurrency, second: $secondCurrency',
@@ -124,13 +184,24 @@ final class Money extends Equatable implements Comparable<Money> {
   }
 }
 
+enum MoneyUnits {
+  /// The monetary amount is entered in major units, i.e. whole dollars.
+  majorUnits,
+
+  /// The monetary amount is entered in minor units, i.e. cents.
+  minorUnits;
+
+  /// A historical money units, needs to be synced with [Currencies.fallback].
+  static MoneyUnits get fallback => majorUnits;
+}
+
 /// Extension methods for [Coin] to interoperate with [Money].
 extension CoinExt on Coin {
   /// Converts this [Coin] into a [Money] instance
   /// using ADA as the currency.
   Money toMoney() {
     return Money(
-      currency: const Currency.ada(),
+      currency: Currencies.ada,
       minorUnits: BigInt.from(value),
     );
   }

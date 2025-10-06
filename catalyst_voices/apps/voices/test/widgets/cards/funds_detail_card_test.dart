@@ -57,10 +57,10 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.textContaining('₳1'), findsOne);
-        expect(find.textContaining('₳2'), findsOne);
-        expect(find.textContaining('₳3'), findsOne);
-        expect(find.textContaining('₳4'), findsOne);
+        expect(find.textContaining(r'$ADA 1'), findsOne);
+        expect(find.textContaining(r'$ADA 2'), findsOne);
+        expect(find.textContaining(r'$ADA 3'), findsOne);
+        expect(find.textContaining(r'$ADA 4'), findsOne);
       });
     });
 
@@ -96,8 +96,8 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.textContaining('₳1'), findsOne);
-        expect(find.textContaining('₳2'), findsOne);
+        expect(find.textContaining(r'$ADA 1'), findsOne);
+        expect(find.textContaining(r'$ADA 2'), findsOne);
       });
 
       testWidgets('Displays correct multiple values', (tester) async {
@@ -107,11 +107,11 @@ void main() {
               child: FundsDetailCard(
                 allFunds: MultiCurrencyAmount.list([
                   _adaMajorUnits(1),
-                  _usdMajorUnits(2),
+                  _usdmMajorUnits(2),
                 ]),
                 totalAsk: MultiCurrencyAmount.list([
                   _adaMajorUnits(3),
-                  _usdMajorUnits(4),
+                  _usdmMajorUnits(4),
                 ]),
               ),
             ),
@@ -119,10 +119,10 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.textContaining('₳1'), findsOne);
-        expect(find.textContaining(r'$2'), findsOne);
-        expect(find.textContaining('₳3'), findsOne);
-        expect(find.textContaining(r'$4'), findsOne);
+        expect(find.textContaining(r'$ADA 1'), findsOne);
+        expect(find.textContaining(r'$USDM 2'), findsOne);
+        expect(find.textContaining(r'$ADA 3'), findsOne);
+        expect(find.textContaining(r'$USDM 4'), findsOne);
       });
     });
   });
@@ -130,14 +130,14 @@ void main() {
 
 Money _adaMajorUnits(int majorUnits) {
   return Money.fromMajorUnits(
-    currency: const Currency.ada(),
+    currency: Currencies.ada,
     majorUnits: BigInt.from(majorUnits),
   );
 }
 
-Money _usdMajorUnits(int majorUnits) {
+Money _usdmMajorUnits(int majorUnits) {
   return Money.fromMajorUnits(
-    currency: const Currency.usd(),
+    currency: Currencies.usdm,
     majorUnits: BigInt.from(majorUnits),
   );
 }

@@ -33,7 +33,7 @@ class VoicesProposalCardExample extends StatelessWidget {
                 categoryName: 'Cardano Use Cases / MVP',
                 title: 'Proposal Title that rocks the world',
                 fundsRequested: Money.fromMajorUnits(
-                  currency: const Currency.ada(),
+                  currency: Currencies.ada,
                   majorUnits: BigInt.from(100000),
                 ),
                 commentsCount: 0,

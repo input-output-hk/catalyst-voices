@@ -469,7 +469,7 @@ void main() {
 
 Money _ada(int minorUnits) {
   return Money(
-    currency: const Currency.ada(),
+    currency: Currencies.ada,
     minorUnits: BigInt.from(minorUnits),
   );
 }
@@ -477,13 +477,13 @@ Money _ada(int minorUnits) {
 MultiCurrencyAmount _multiCurrency(int minorUnits) {
   return MultiCurrencyAmount.list([
     _ada(minorUnits),
-    _usd(minorUnits),
+    _usdm(minorUnits),
   ]);
 }
 
-Money _usd(int minorUnits) {
+Money _usdm(int minorUnits) {
   return Money(
-    currency: const Currency.usd(),
+    currency: Currencies.usdm,
     minorUnits: BigInt.from(minorUnits),
   );
 }

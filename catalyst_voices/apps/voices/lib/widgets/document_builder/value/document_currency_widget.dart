@@ -1,83 +1,79 @@
 import 'package:catalyst_voices/common/constants/constants.dart';
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
 import 'package:catalyst_voices/widgets/rich_text/markdown_text.dart';
-import 'package:catalyst_voices/widgets/text_field/token_field.dart';
-import 'package:catalyst_voices/widgets/text_field/voices_int_field.dart';
+import 'package:catalyst_voices/widgets/text_field/voices_money_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class DocumentTokenValueWidget extends StatefulWidget {
+class DocumentCurrencyWidget extends StatefulWidget {
   final DocumentValueProperty<int> property;
-  final DocumentIntegerSchema schema;
-  final Currency currency;
+  final DocumentCurrencySchema schema;
   final bool isEditMode;
   final ValueChanged<List<DocumentChange>> onChanged;
 
-  const DocumentTokenValueWidget({
+  const DocumentCurrencyWidget({
     super.key,
     required this.property,
     required this.schema,
-    required this.currency,
     required this.isEditMode,
     required this.onChanged,
   });
 
   @override
-  State<DocumentTokenValueWidget> createState() {
-    return _DocumentTokenValueWidgetState();
+  State<DocumentCurrencyWidget> createState() {
+    return _DocumentCurrencyWidgetState();
   }
 }
 
-class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
-  late final VoicesIntFieldController _controller;
+class _DocumentCurrencyWidgetState extends State<DocumentCurrencyWidget> {
+  late VoicesMoneyFieldController _controller;
   late final FocusNode _focusNode;
 
-  // TODO(LynxxLynx): After https://github.com/input-output-hk/catalyst-voices/pull/2865
-  // is merged use wildcard support for NodeId
   bool get _isMilestone {
-    final milestoneWildcardNodeId = ProposalDocument.milestoneCostNodeId.toString().split('*');
-    if (widget.property.nodeId.value.startsWith(milestoneWildcardNodeId[0]) &&
-        widget.property.nodeId.value.endsWith(milestoneWildcardNodeId[1])) {
-      return true;
-    }
-    return false;
+    return widget.property.nodeId.matchesPattern(ProposalDocument.milestoneCostNodeId);
   }
-
-  int? get _value => widget.property.value ?? widget.schema.defaultValue;
 
   @override
   Widget build(BuildContext context) {
     final schema = widget.schema;
 
-    return TokenField(
+    return VoicesMoneyField(
       controller: _controller,
       focusNode: _focusNode,
       onChanged: _onChanged,
       onFieldSubmitted: _onChanged,
       validator: _validator,
-      labelText: schema.title.isEmpty ? null : schema.formattedTitle,
-      placeholder: schema.placeholder,
-      range: schema.numRange,
-      currency: widget.currency,
-      showHelper: widget.isEditMode,
+      currency: schema.currency,
+      moneyUnits: schema.moneyUnits,
       enabled: widget.isEditMode,
       ignorePointers: !widget.isEditMode,
+      enableDecimals: schema.supportsDecimals,
+      showHelper: widget.isEditMode,
+      range: _numRangeToMoneyRange(schema.numRange),
+      labelText: schema.title.isEmpty ? null : schema.formattedTitle,
+      placeholder: schema.placeholder,
       helperWidget: _isMilestone ? const _MilestoneCostHelpText() : null,
     );
   }
 
   @override
-  void didUpdateWidget(DocumentTokenValueWidget oldWidget) {
+  void didUpdateWidget(DocumentCurrencyWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    final oldValue = oldWidget.property.value ?? oldWidget.schema.defaultValue;
-    final newValue = widget.property.value ?? widget.schema.defaultValue;
+    final newSchema = widget.schema;
+    final oldSchema = oldWidget.schema;
+    final oldValue = oldWidget.property.value ?? oldSchema.defaultValue;
+    final newValue = widget.property.value ?? newSchema.defaultValue;
 
-    if (oldValue != newValue) {
-      _controller.value = newValue;
+    if (newSchema.currency != oldSchema.currency || newSchema.moneyUnits != oldSchema.moneyUnits) {
+      _controller.dispose();
+      _controller = VoicesMoneyFieldController(_valueToMoney(newValue));
+    } else if (oldValue != newValue) {
+      _controller.value = _valueToMoney(newValue);
     }
 
     if (widget.isEditMode != oldWidget.isEditMode) {
@@ -96,14 +92,34 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
   void initState() {
     super.initState();
 
-    _controller = VoicesIntFieldController(_value);
+    final money = _valueToMoney(widget.property.value ?? widget.schema.defaultValue);
+    _controller = VoicesMoneyFieldController(money);
     _focusNode = FocusNode(canRequestFocus: widget.isEditMode);
   }
 
-  void _onChanged(int? value) {
+  int? _moneyToValue(Money? money) {
+    if (money == null) {
+      return null;
+    }
+
+    return widget.schema.moneyToValue(money);
+  }
+
+  OpenRange<Money>? _numRangeToMoneyRange(NumRange<int>? range) {
+    if (range == null) {
+      return null;
+    }
+
+    return OpenRange(
+      min: _valueToMoney(range.min),
+      max: _valueToMoney(range.max),
+    );
+  }
+
+  void _onChanged(Money? value) {
     final change = DocumentValueChange(
       nodeId: widget.schema.nodeId,
-      value: value,
+      value: _moneyToValue(value),
     );
 
     widget.onChanged([change]);
@@ -119,14 +135,23 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
     }
   }
 
-  VoicesTextFieldValidationResult _validator(int? value, String text) {
-    final result = widget.schema.validate(value);
+  VoicesTextFieldValidationResult _validator(Money? value, String text) {
+    final schema = widget.schema;
+    final result = schema.validate(_moneyToValue(value));
     if (result.isValid) {
       return const VoicesTextFieldValidationResult.none();
     } else {
       final localized = LocalizedDocumentValidationResult.from(result);
       return VoicesTextFieldValidationResult.error(localized.message(context));
     }
+  }
+
+  Money? _valueToMoney(int? value) {
+    if (value == null) {
+      return null;
+    }
+
+    return widget.schema.valueToMoney(value);
   }
 }
 

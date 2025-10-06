@@ -37,13 +37,13 @@ final class Campaign extends Equatable {
 Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.''',
       allFunds: MultiCurrencyAmount.single(
         Money.fromMajorUnits(
-          currency: const Currency.ada(),
+          currency: Currencies.ada,
           majorUnits: BigInt.from(20000000),
         ),
       ),
       totalAsk: MultiCurrencyAmount.single(
         Money.zero(
-          currency: const Currency.ada(),
+          currency: Currencies.ada,
         ),
       ),
       fundNumber: 14,

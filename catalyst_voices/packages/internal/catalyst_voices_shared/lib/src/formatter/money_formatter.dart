@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:intl/intl.dart';
 
@@ -8,7 +6,8 @@ enum MoneyDecoration {
   /// The amount is decorated with the currency symbol, i.e. $amount.
   symbol,
 
-  /// The amount is decorated with the currency iso code (ticker), i.e. $USD amount.
+  /// The amount is decorated with the currency code (ticker), i.e. $USDM amount.
+  /// For traditional (fiat) currencies the `$` prefix is skipped.
   code,
 
   /// The amount is not decorated.
@@ -32,7 +31,13 @@ abstract class MoneyFormatter {
       case MoneyDecoration.symbol:
         return '${currency.symbol}$amount';
       case MoneyDecoration.code:
-        return '\$${currency.isoCode.code} $amount';
+        final prefix = switch (currency.type) {
+          // traditional format, no prefix
+          CurrencyType.fiat => '',
+          // format as ticker
+          CurrencyType.crypto => r'$',
+        };
+        return '$prefix${currency.code.value} $amount';
       case MoneyDecoration.none:
         return amount;
     }
@@ -54,10 +59,10 @@ abstract class MoneyFormatter {
   /// - ₳1000123.456 = ₳1M
   static String formatCompactRounded(
     Money money, {
-    MoneyDecoration decoration = MoneyDecoration.symbol,
+    MoneyDecoration decoration = MoneyDecoration.code,
   }) {
     final numberFormat = NumberFormat('#.##');
-    final decimalAmount = money.minorUnits / BigInt.from(pow(10, money.currency.decimalDigits));
+    final decimalAmount = money.minorUnits / money.currency.decimalDigitsFactor;
 
     final String formatted;
     if (decimalAmount >= _million) {
@@ -93,7 +98,7 @@ abstract class MoneyFormatter {
   /// - $123 = $123
   /// - $123.45 = $123.45
   /// - $1000123.45 = $1,000,123.45
-  static String formatDecimal(Money money, {MoneyDecoration decoration = MoneyDecoration.symbol}) {
+  static String formatDecimal(Money money, {MoneyDecoration decoration = MoneyDecoration.code}) {
     final String formatted;
     if (money.minorUnits == BigInt.zero) {
       formatted = '-';
@@ -127,7 +132,7 @@ abstract class MoneyFormatter {
   /// - $1000123.45 = $1000123.45
   static String formatExactAmount(
     Money money, {
-    MoneyDecoration decoration = MoneyDecoration.symbol,
+    MoneyDecoration decoration = MoneyDecoration.code,
   }) {
     return decorate(
       amount: money.format(),

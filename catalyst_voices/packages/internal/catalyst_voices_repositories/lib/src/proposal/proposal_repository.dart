@@ -15,7 +15,6 @@ abstract interface class ProposalRepository {
   const factory ProposalRepository(
     SignedDocumentManager signedDocumentManager,
     DocumentRepository documentRepository,
-    CampaignRepository campaignRepository,
     ProposalDocumentDataLocalSource proposalsLocalSource,
   ) = ProposalRepositoryImpl;
 
@@ -108,13 +107,11 @@ abstract interface class ProposalRepository {
 final class ProposalRepositoryImpl implements ProposalRepository {
   final SignedDocumentManager _signedDocumentManager;
   final DocumentRepository _documentRepository;
-  final CampaignRepository _campaignRepository;
   final ProposalDocumentDataLocalSource _proposalsLocalSource;
 
   const ProposalRepositoryImpl(
     this._signedDocumentManager,
     this._documentRepository,
-    this._campaignRepository,
     this._proposalsLocalSource,
   );
 
@@ -147,7 +144,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     }
     final templateRef = documentData.metadata.template!;
     final documentTemplate = await _documentRepository.getDocumentData(ref: templateRef);
-    final proposalDocument = await _buildProposalDocument(
+    final proposalDocument = _buildProposalDocument(
       documentData: documentData,
       templateData: documentTemplate,
     );
@@ -179,7 +176,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }) async {
     return _proposalsLocalSource
         .getProposals(type: type, categoryRef: categoryRef)
-        .then((value) => value.map(_buildProposalData).wait);
+        .then((value) => value.map(_buildProposalData).toList());
   }
 
   @override
@@ -190,7 +187,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }) {
     return _proposalsLocalSource
         .getProposalsPage(request: request, filters: filters, order: order)
-        .then((value) => value.asyncMap(_buildProposalData));
+        .then((value) => value.map(_buildProposalData));
   }
 
   @override
@@ -264,7 +261,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
             templateData: e.refData,
           ),
         )
-        .wait;
+        .toList();
   }
 
   @override
@@ -301,7 +298,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
                 templateData: templateData,
               );
             },
-          ).wait,
+          ).toList(),
         );
   }
 
@@ -336,7 +333,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }) {
     return _proposalsLocalSource
         .watchProposalsPage(request: request, filters: filters, order: order)
-        .asyncMap((value) => value.asyncMap(_buildProposalData));
+        .map((value) => value.map(_buildProposalData));
   }
 
   @override
@@ -351,7 +348,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           authorId: authorId,
         )
         .whereNotNull()
-        .asyncMap(
+        .map(
           (documents) => documents.map(
             (doc) {
               final documentData = doc.data;
@@ -362,7 +359,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
                 templateData: templateData,
               );
             },
-          ).wait,
+          ).toList(),
         );
   }
 
@@ -376,7 +373,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return dto.action.toModel();
   }
 
-  Future<ProposalData> _buildProposalData(ProposalDocumentData data) async {
+  ProposalData _buildProposalData(ProposalDocumentData data) {
     final action = _buildProposalActionData(data.action);
 
     final publish = switch (action) {
@@ -389,7 +386,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       ),
     };
 
-    final document = await _buildProposalDocument(
+    final document = _buildProposalDocument(
       documentData: data.proposal,
       templateData: data.template,
     );
@@ -401,17 +398,13 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     );
   }
 
-  Future<ProposalDocument> _buildProposalDocument({
+  ProposalDocument _buildProposalDocument({
     required DocumentData documentData,
     required DocumentData templateData,
-  }) async {
+  }) {
     assert(
       documentData.metadata.type == DocumentType.proposalDocument,
       'Not a proposalDocument document data type',
-    );
-
-    final currency = await _getProposalCurrency(
-      documentData.metadata.categoryId ?? templateData.metadata.categoryId,
     );
 
     final metadata = ProposalMetadata(
@@ -419,7 +412,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       templateRef: documentData.metadata.template!,
       categoryId: documentData.metadata.categoryId!,
       authors: documentData.metadata.authors ?? [],
-      currency: currency,
     );
 
     final template = _buildProposalTemplate(documentData: templateData);
@@ -468,14 +460,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       template: template == null ? null : SignedDocumentMetadataRef.fromDocumentRef(template),
       categoryId: categoryId == null ? null : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
     );
-  }
-
-  Future<Currency> _getProposalCurrency(SignedDocumentRef? categoryRef) async {
-    final category = categoryRef != null
-        ? await _campaignRepository.getCategory(categoryRef)
-        : null;
-
-    return category?.currency ?? const Currency.fallback();
   }
 
   ProposalPublish? _getProposalPublish({

@@ -26,6 +26,30 @@ void main() {
     });
   });
 
+  group(OpenRange, () {
+    test('contains() returns true for values within range', () {
+      const range = OpenRange<num>(min: 10, max: 20);
+      expect(range.contains(15), isTrue);
+      expect(range.contains(10), isTrue);
+      expect(range.contains(20), isTrue);
+    });
+
+    test('contains() returns false for values outside range', () {
+      const range = OpenRange<num>(min: 10, max: 20);
+      expect(range.contains(5), isFalse);
+      expect(range.contains(25), isFalse);
+    });
+
+    test('Equality check works correctly', () {
+      const range1 = OpenRange<num>(min: 10, max: 20);
+      const range2 = OpenRange<num>(min: 10, max: 20);
+      const range3 = OpenRange<num>(min: 15, max: 25);
+
+      expect(range1, equals(range2));
+      expect(range1, isNot(equals(range3)));
+    });
+  });
+
   group(NumRange, () {
     test('contains() returns true for constrained range', () {
       const range = NumRange(min: 10, max: 20);

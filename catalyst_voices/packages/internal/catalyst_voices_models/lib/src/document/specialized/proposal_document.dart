@@ -72,8 +72,6 @@ final class ProposalDocument extends Equatable {
 
   String? get authorName => _metadataAuthorName ?? _contentAuthorName;
 
-  Currency get currency => metadata.currency;
-
   String? get description {
     final property = document.getProperty(descriptionNodeId);
 
@@ -106,10 +104,12 @@ final class ProposalDocument extends Equatable {
       return null;
     }
 
-    return Money.fromMajorUnits(
-      currency: metadata.currency,
-      majorUnits: BigInt.from(value),
-    );
+    final schema = property.schema;
+    if (schema is! DocumentCurrencySchema) {
+      return null;
+    }
+
+    return schema.valueToMoney(value);
   }
 
   int? get milestoneCount {
@@ -121,7 +121,7 @@ final class ProposalDocument extends Equatable {
 
     return DocumentNodeTraverser.findSectionsAndSubsections(
       property,
-    ).where((element) => element.nodeId.isChildOf(milestoneListNodeId)).length;
+    ).where((element) => element.nodeId.isSameOrChildOf(milestoneListNodeId)).length;
   }
 
   @override
@@ -171,16 +171,14 @@ final class ProposalMetadata extends DocumentMetadata {
   final SignedDocumentRef templateRef;
   final SignedDocumentRef categoryId;
   final List<CatalystId> authors;
-  final Currency currency;
 
   ProposalMetadata({
     required super.selfRef,
     required this.templateRef,
     required this.categoryId,
     required this.authors,
-    required this.currency,
   });
 
   @override
-  List<Object?> get props => super.props + [templateRef, categoryId, authors, currency];
+  List<Object?> get props => super.props + [templateRef, categoryId, authors];
 }
