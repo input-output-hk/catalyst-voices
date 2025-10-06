@@ -1,45 +1,19 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
-import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 final class CampaignDatesEventsState extends Equatable {
-  final DateRange? reviewRegistrationStartsAt;
-  final DateRange? reviewStartsAt;
-  final DateRange? votingRegistrationStartsAt;
-  final DateRange? votingStartsAt;
+  final List<CampaignTimelineEventWithTitle> reviewTimelineItems;
+  final List<CampaignTimelineEventWithTitle> votingTimelineItems;
 
-  factory CampaignDatesEventsState.fromTimeline(List<CampaignTimelineViewModel> campaignTimeline) {
-    return CampaignDatesEventsState._(
-      reviewRegistrationStartsAt: campaignTimeline
-          .firstWhereOrNull((e) => e.type == CampaignPhaseType.reviewRegistration)
-          ?.timeline,
-      reviewStartsAt: campaignTimeline
-          .firstWhereOrNull((e) => e.type == CampaignPhaseType.communityReview)
-          ?.timeline,
-      votingRegistrationStartsAt: campaignTimeline
-          .firstWhereOrNull((e) => e.type == CampaignPhaseType.votingRegistration)
-          ?.timeline,
-      votingStartsAt: campaignTimeline
-          .firstWhereOrNull((e) => e.type == CampaignPhaseType.communityVoting)
-          ?.timeline,
-    );
-  }
-
-  const CampaignDatesEventsState._({
-    required this.reviewRegistrationStartsAt,
-    required this.reviewStartsAt,
-    required this.votingRegistrationStartsAt,
-    required this.votingStartsAt,
+  const CampaignDatesEventsState({
+    this.reviewTimelineItems = const [],
+    this.votingTimelineItems = const [],
   });
 
   @override
   List<Object?> get props => [
-    reviewRegistrationStartsAt,
-    reviewStartsAt,
-    votingRegistrationStartsAt,
-    votingStartsAt,
+    reviewTimelineItems,
+    votingTimelineItems,
   ];
 }
 
@@ -49,6 +23,7 @@ final class DiscoveryCampaignState extends Equatable {
   final CurrentCampaignInfoViewModel currentCampaign;
   final List<CampaignTimelineViewModel> campaignTimeline;
   final List<CampaignCategoryDetailsViewModel> categories;
+  final CampaignDatesEventsState datesEvents;
 
   const DiscoveryCampaignState({
     this.isLoading = true,
@@ -56,10 +31,8 @@ final class DiscoveryCampaignState extends Equatable {
     CurrentCampaignInfoViewModel? currentCampaign,
     this.campaignTimeline = const [],
     this.categories = const [],
+    this.datesEvents = const CampaignDatesEventsState(),
   }) : currentCampaign = currentCampaign ?? const NullCurrentCampaignInfoViewModel();
-
-  CampaignDatesEventsState get datesEvents =>
-      CampaignDatesEventsState.fromTimeline(campaignTimeline);
 
   @override
   List<Object?> get props => [
@@ -68,6 +41,7 @@ final class DiscoveryCampaignState extends Equatable {
     currentCampaign,
     campaignTimeline,
     categories,
+    datesEvents,
   ];
 
   bool get showError => !isLoading && error != null;
@@ -78,6 +52,7 @@ final class DiscoveryCampaignState extends Equatable {
     CurrentCampaignInfoViewModel? currentCampaign,
     List<CampaignTimelineViewModel>? campaignTimeline,
     List<CampaignCategoryDetailsViewModel>? categories,
+    CampaignDatesEventsState? datesEvents,
   }) {
     return DiscoveryCampaignState(
       isLoading: isLoading ?? this.isLoading,
@@ -85,6 +60,7 @@ final class DiscoveryCampaignState extends Equatable {
       currentCampaign: currentCampaign ?? this.currentCampaign,
       campaignTimeline: campaignTimeline ?? this.campaignTimeline,
       categories: categories ?? this.categories,
+      datesEvents: datesEvents ?? this.datesEvents,
     );
   }
 }

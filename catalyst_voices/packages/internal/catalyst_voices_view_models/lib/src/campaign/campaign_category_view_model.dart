@@ -43,7 +43,30 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
     required this.submissionCloseDate,
   });
 
-  factory CampaignCategoryDetailsViewModel.dummy({String? id}) {
+  factory CampaignCategoryDetailsViewModel.fromModel(CampaignCategory model) {
+    return CampaignCategoryDetailsViewModel(
+      id: model.selfRef,
+      name: model.categoryName,
+      subname: model.categorySubname,
+      description: model.description,
+      shortDescription: model.shortDescription,
+      proposalsCount: model.proposalsCount,
+      availableFunds: model.availableFunds,
+      image: CategoryImageUrl.image(model.selfRef.id),
+      totalAsk: model.totalAsk,
+      range: model.range,
+      descriptions: model.descriptions.map(CategoryDescriptionViewModel.fromModel).toList(),
+      dos: model.dos,
+      donts: model.donts,
+      submissionCloseDate: model.submissionCloseDate,
+    );
+  }
+
+  /// Creates a placeholder instance for use with Skeletonizer.
+  ///
+  /// This factory should only be used when skeleton loading states are needed,
+  /// such as when wrapping widgets with Skeletonizer during data loading.
+  factory CampaignCategoryDetailsViewModel.placeholder({String? id}) {
     return CampaignCategoryDetailsViewModel(
       id: SignedDocumentRef(id: id ?? const Uuid().v7()),
       name: 'Cardano Open:',
@@ -61,25 +84,6 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
       descriptions: List.filled(3, CategoryDescriptionViewModel.dummy()),
       image: CategoryImageUrl.image('1'),
       submissionCloseDate: DateTimeExt.now(),
-    );
-  }
-
-  factory CampaignCategoryDetailsViewModel.fromModel(CampaignCategory model) {
-    return CampaignCategoryDetailsViewModel(
-      id: model.selfRef,
-      name: model.categoryName,
-      subname: model.categorySubname,
-      description: model.description,
-      shortDescription: model.shortDescription,
-      proposalsCount: model.proposalsCount,
-      availableFunds: model.availableFunds,
-      image: CategoryImageUrl.image(model.selfRef.id),
-      totalAsk: model.totalAsk,
-      range: model.range,
-      descriptions: model.descriptions.map(CategoryDescriptionViewModel.fromModel).toList(),
-      dos: model.dos,
-      donts: model.donts,
-      submissionCloseDate: model.submissionCloseDate,
     );
   }
 

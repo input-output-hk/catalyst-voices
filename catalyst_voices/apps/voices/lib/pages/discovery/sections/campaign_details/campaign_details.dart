@@ -33,7 +33,7 @@ class _CampaignCategoriesContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final categoriesToShow = categories.isEmpty
-        ? List.filled(4, CampaignCategoryDetailsViewModel.dummy())
+        ? List.filled(4, CampaignCategoryDetailsViewModel.placeholder())
         : categories;
 
     return CampaignCategories(
