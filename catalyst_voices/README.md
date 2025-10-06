@@ -45,9 +45,9 @@ This repository contains the Catalyst Voices app and packages.
 
 ## Platforms
 
-* Web is fully supported. It is our main target
-* Android is supported. Project builds locally. No CD support at the moment.
-* iOS is supported. Project builds locally. No CD support at the moment.
+* Web is fully supported, it is our main target
+* Android is supported, project builds locally, no CD support at the moment.
+* iOS is supported, project builds locally, no CD support at the moment.
 
 ## Getting Started
 
