@@ -85,43 +85,51 @@ code-generator:
     WORKDIR /frontend
 
 # Runs code formatting checks.
-check-code-formatting:
+# TODO: FE related target, disabled for `cat-gateway` release candidate branch
+disable-check-code-formatting:
     FROM +builder
     DO flutter-ci+FORMAT
 
 # Runs dry-run publish to verify that publishable packages can be published.
-check-package-publishing:
+# TODO: FE related target, disabled for `cat-gateway` release candidate branch
+disable-check-package-publishing:
     FROM +builder
     DO flutter-ci+PUBLISH_DRY_RUN
 
 # Runs the license checks for Catalyst Voices.
-check-license:
+# TODO: FE related target, disabled for `cat-gateway` release candidate branch
+disable-check-license:
     FROM +builder
     RUN melos run license-check
 
 # Run unit tests
-test-unit-native:
+# TODO: FE related target, disabled for `cat-gateway` release candidate branch
+disable-test-unit-native:
     FROM +code-generator
     DO flutter-ci+UNIT_TESTS --PLATFORM=native --REPORT=true
 
-test-unit-web:
+# TODO: FE related target, disabled for `cat-gateway` release candidate branch
+disable-test-unit-web:
     FROM +code-generator
     DO flutter-ci+UNIT_TESTS --PLATFORM=web --REPORT=false
 
 # Runs static analysis on the code.
-build-static-analysis:
+# TODO: FE related target, disabled for `cat-gateway` release candidate branch
+disable-build-static-analysis:
     FROM +code-generator
     DO flutter-ci+ANALYZE
 
 # Build web version of Catalyst Voices
-build-web:
+# TODO: FE related target, disabled for `cat-gateway` release candidate branch
+disable-build-web:
     FROM +code-generator
     ARG WORKDIR=/frontend/apps/voices
 
     DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --BUILD_MODE='--release' --TARGET=lib/configs/main_web.dart
     SAVE ARTIFACT --keep-ts web
 
-package:
+# TODO: FE related target, disabled for `cat-gateway` release candidate branch
+disable-package:
     FROM caddy:2.10
     ARG tag='latest'
 
@@ -136,7 +144,8 @@ package:
 
     SAVE IMAGE voices-frontend:$tag
 
-docker:
+# TODO: FE related target, disabled for `cat-gateway` release candidate branch
+disable-docker:
    FROM +package
 
    ARG container="voices"
