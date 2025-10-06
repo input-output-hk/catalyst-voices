@@ -33,9 +33,6 @@ class SignedDocument:
         )
 
 
-CATEGORY_ID = "01997fce-fde3-7fd7-8a62-b3a6d5fc20d3"
-
-
 @pytest.fixture
 def proposal_templates() -> List[str]:
     # comes from the 'templates/f14.rs' and 'templates/f15.rs' file
@@ -105,8 +102,9 @@ def proposal_doc_factory(proposal_templates, rbac_chain_factory):
                 "ver": proposal_templates[12],
             },
             "parameters": {
-                "id": CATEGORY_ID,
-                "ver": CATEGORY_ID,
+                # corresponding category ref, in accordance with the proposal template
+                "id": "0199802c-21b4-721f-aa1d-5123b006879e",
+                "ver": "0199802c-21b4-721f-aa1d-5123b006879e",
             },
         }
         with open("./test_data/signed_docs/proposal.json", "r") as proposal_json_file:
@@ -151,8 +149,9 @@ def comment_doc_factory(proposal_doc_factory, comment_templates, rbac_chain_fact
                 "ver": comment_templates[12],
             },
             "parameters": {
-                "id": CATEGORY_ID,
-                "ver": CATEGORY_ID,
+                # corresponding category ref, in accordance with the comment template
+                "id": "0199802c-21b4-721f-aa1d-5123b006879e",
+                "ver": "0199802c-21b4-721f-aa1d-5123b006879e",
             },
         }
         with open("./test_data/signed_docs/comment.json", "r") as comment_json_file:
@@ -193,8 +192,9 @@ def submission_action_factory(proposal_doc_factory, rbac_chain_factory):
                 "ver": proposal_doc.metadata["ver"],
             },
             "parameters": {
-                "id": CATEGORY_ID,
-                "ver": CATEGORY_ID,
+                # corresponding category ref, in accordance with proposal doc
+                "id": "0199802c-21b4-721f-aa1d-5123b006879e",
+                "ver": "0199802c-21b4-721f-aa1d-5123b006879e",
             },
         }
         with open(
