@@ -558,48 +558,55 @@ def test_document_index_endpoint(
                 resp.status_code == 201
             ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 
-        limit = 1
-        page = 0
-        filter = {"id": {"eq": doc.metadata["id"]}}
-        resp = document.post(
-            limit=limit,
-            page=page,
-            filter=filter,
-        )
-        assert (
-            resp.status_code == 200
-        ), f"Failed to post document: {resp.status_code} - {resp.text}"
+        def document_index_endpoint_test_case_with_filter(filter):
+            limit = 1
+            page = 0
+            resp = document.post(
+                limit=limit,
+                page=page,
+                filter=filter,
+            )
+            assert (
+                resp.status_code == 200
+            ), f"Failed to post document: {resp.status_code} - {resp.text}"
 
-        data = resp.json()
-        assert data["page"]["limit"] == limit
-        assert data["page"]["page"] == page
-        assert data["page"]["remaining"] == total_amount - 1 - page
+            data = resp.json()
+            assert data["page"]["limit"] == limit
+            assert data["page"]["page"] == page
+            assert data["page"]["remaining"] == total_amount - 1 - page
 
-        page += 1
-        resp = document.post(
-            limit=limit,
-            page=page,
-            filter=filter,
-        )
-        assert (
-            resp.status_code == 200
-        ), f"Failed to post document: {resp.status_code} - {resp.text}"
-        data = resp.json()
-        assert data["page"]["limit"] == limit
-        assert data["page"]["page"] == page
-        assert data["page"]["remaining"] == total_amount - 1 - page
+            page += 1
+            resp = document.post(
+                limit=limit,
+                page=page,
+                filter=filter,
+            )
+            assert (
+                resp.status_code == 200
+            ), f"Failed to post document: {resp.status_code} - {resp.text}"
+            data = resp.json()
+            assert data["page"]["limit"] == limit
+            assert data["page"]["page"] == page
+            assert data["page"]["remaining"] == total_amount - 1 - page
 
-        resp = document.post(
-            limit=total_amount,
-            filter=filter,
+            resp = document.post(
+                limit=total_amount,
+                filter=filter,
+            )
+            assert (
+                resp.status_code == 200
+            ), f"Failed to post document: {resp.status_code} - {resp.text}"
+            data = resp.json()
+            assert data["page"]["limit"] == total_amount
+            assert data["page"]["page"] == 0  # default value
+            assert data["page"]["remaining"] == 0
+
+        document_index_endpoint_test_case_with_filter(
+            {"id": {"eq": doc.metadata["id"]}}
         )
-        assert (
-            resp.status_code == 200
-        ), f"Failed to post document: {resp.status_code} - {resp.text}"
-        data = resp.json()
-        assert data["page"]["limit"] == total_amount
-        assert data["page"]["page"] == 0  # default value
-        assert data["page"]["remaining"] == 0
+        document_index_endpoint_test_case_with_filter(
+            {"id": {"in": [doc.metadata["id"]]}}
+        )
 
         # Pagination out of range
         resp = document.post(
@@ -609,3 +616,87 @@ def test_document_index_endpoint(
         assert (
             resp.status_code == 412
         ), f"Post document, expected 412 Precondition Failed: {resp.status_code} - {resp.text}"
+
+
+@pytest.mark.preprod_indexing
+def test_document_index_endpoint_inclusion_test(
+    submission_action_factory,
+    comment_doc_factory,
+    proposal_doc_factory,
+    rbac_chain_factory,
+):
+
+    for doc_factory in [
+        submission_action_factory,
+        comment_doc_factory,
+        proposal_doc_factory,
+    ]:
+        (doc, role_id) = doc_factory()
+
+        rbac_chain = rbac_chain_factory()
+        (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
+        # submiting 10 documents
+        total_amount = 10
+
+        for _ in range(total_amount - 1):
+            doc = doc.copy()
+            # keep the same id, but different version
+            doc.metadata["ver"] = uuid_v7.uuid_v7()
+            resp = document.put(
+                data=doc.build_and_sign(cat_id, sk_hex),
+                token=rbac_chain.auth_token(),
+            )
+            assert (
+                resp.status_code == 201
+            ), f"Failed to publish document: {resp.status_code} - {resp.text}"
+
+    # comment and proposal templates
+    ids_list = [
+        "0194d492-1daa-75b5-b4a4-5cf331cd8d1a",
+        "0194d494-4402-7e0e-b8d6-171f8fea18b0",
+    ]
+    resp = document.post(
+        filter={"template": {"id": {"in": ids_list}}},
+    )
+    assert (
+        resp.status_code == 200
+    ), f"Failed to post document: {resp.status_code} - {resp.text}"
+    assert all(
+        [
+            doc["template"]["id"] in ids_list
+            for docs in resp.json()["docs"]
+            for doc in docs["ver"]
+        ]
+    )
+
+    # only proposals
+    ids_list = ["0194d492-1daa-75b5-b4a4-5cf331cd8d1a"]
+    resp = document.post(
+        filter={"template": {"id": {"in": ids_list}}},
+    )
+    assert (
+        resp.status_code == 200
+    ), f"Failed to post document: {resp.status_code} - {resp.text}"
+    assert all(
+        [
+            doc["template"]["id"] in ids_list
+            for docs in resp.json()["docs"]
+            for doc in docs["ver"]
+        ]
+    )
+
+    # only comments
+    ids_list = ["0194d494-4402-7e0e-b8d6-171f8fea18b0"]
+    resp = document.post(
+        filter={"template": {"id": {"in": ids_list}}},
+    )
+    assert (
+        resp.status_code == 200
+    ), f"Failed to post document: {resp.status_code} - {resp.text}"
+    assert all(
+        [
+            doc["template"]["id"] in ids_list
+            for docs in resp.json()["docs"]
+            for doc in docs["ver"]
+        ]
+    )

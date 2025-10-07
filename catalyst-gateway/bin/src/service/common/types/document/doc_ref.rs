@@ -6,7 +6,7 @@
 use poem_openapi::{types::Example, NewType, Object, Union};
 
 use super::{
-    id::{DocumentId, EqOrRangedIdDocumented},
+    id::{DocumentId, IdSelectorDocumented},
     ver::{DocumentVer, EqOrRangedVerDocumented},
 };
 use crate::db::event::signed_docs::DocumentRef;
@@ -16,13 +16,13 @@ use crate::db::event::signed_docs::DocumentRef;
 /// A Reference to a Document ID/s and their version/s.
 pub(crate) struct IdRefOnly {
     /// Document ID, or range of Document IDs
-    id: EqOrRangedIdDocumented,
+    id: IdSelectorDocumented,
 }
 
 impl Example for IdRefOnly {
     fn example() -> Self {
         Self {
-            id: EqOrRangedIdDocumented::example(),
+            id: IdSelectorDocumented::example(),
         }
     }
 }
@@ -55,7 +55,7 @@ impl Example for IdRefOnlyDocumented {
 pub(crate) struct VerRefWithOptionalId {
     /// Document ID, or range of Document IDs
     #[oai(skip_serializing_if_is_none)]
-    id: Option<EqOrRangedIdDocumented>,
+    id: Option<IdSelectorDocumented>,
     /// Document Version, or Range of Document Versions
     ver: EqOrRangedVerDocumented,
 }
@@ -73,7 +73,7 @@ impl VerRefWithOptionalId {
     /// Returns an example of this type that includes both an `id` and `ver`
     fn example_id_and_ver_ref() -> Self {
         Self {
-            id: Some(EqOrRangedIdDocumented::example()),
+            id: Some(IdSelectorDocumented::example()),
             ver: EqOrRangedVerDocumented::example(),
         }
     }
