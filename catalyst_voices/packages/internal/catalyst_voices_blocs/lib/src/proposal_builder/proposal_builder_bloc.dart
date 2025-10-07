@@ -538,6 +538,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       }
       final categoryRef = proposal.categoryRef;
       final category = await _campaignService.getCategory(categoryRef);
+      final campaign = await _campaignService.getActiveCampaign();
+
+      final fromActiveCampaign = campaign?.hasCategory(categoryRef.id) ?? false;
 
       return _cacheAndCreateState(
         proposalDocument: proposalData.document.document,
@@ -549,6 +552,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           templateRef: proposalData.document.metadata.templateRef,
           categoryId: categoryRef,
           versions: versions,
+          fromActiveCampaign: fromActiveCampaign,
         ),
         category: category,
       );

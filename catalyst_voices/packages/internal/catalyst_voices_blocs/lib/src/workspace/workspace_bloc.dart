@@ -184,17 +184,28 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
   Future<List<UsersProposalOverview>> _mapProposalToViewModel(
     List<DetailProposal> proposals,
-    int fundNumber,
   ) async {
     final futures = proposals.map((proposal) async {
       _cachedCampaign ??= await _campaignService.getActiveCampaign();
-      final category = _cachedCampaign?.categories.firstWhere(
-        (e) => e.selfRef.id == proposal.categoryRef.id,
-      );
+
+      // TODO(damian-molinski): proposal should have ref to campaign
+      final campaigns = Campaign.all;
+
+      final categories = campaigns.expand((element) => element.categories);
+      final category = categories.firstWhereOrNull((e) => e.selfRef.id == proposal.categoryRef.id);
+
+      // TODO(damian-molinski): refactor it
+      final fundNumber = category != null
+          ? campaigns.firstWhere((campaign) => campaign.hasCategory(category.selfRef.id)).fundNumber
+          : 0;
+
+      final fromActiveCampaign = fundNumber == _cachedCampaign?.fundNumber;
+
       return UsersProposalOverview.fromProposal(
         proposal,
         fundNumber,
         category?.formattedCategoryName ?? '',
+        fromActiveCampaign: fromActiveCampaign,
       );
     }).toList();
 
@@ -212,7 +223,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       (proposals) async {
         if (isClosed) return;
         _logger.info('Stream received ${proposals.length} proposals');
-        final mappedProposals = await _mapProposalToViewModel(proposals, state.fundNumber);
+        final mappedProposals = await _mapProposalToViewModel(proposals);
         add(LoadProposalsEvent(mappedProposals));
       },
       onError: (Object error, StackTrace stackTrace) {

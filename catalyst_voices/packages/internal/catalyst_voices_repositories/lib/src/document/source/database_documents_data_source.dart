@@ -11,7 +11,14 @@ final class DatabaseDocumentsDataSource
   );
 
   @override
-  Future<int> deleteAll() => _database.documentsDao.deleteAll();
+  Future<int> deleteAll() {
+    return _database.documentsDao.deleteAll();
+  }
+
+  @override
+  Future<int> deleteAllRespectingLocalDrafts() {
+    return _database.documentsDao.deleteAll(keepTemplatesForLocalDrafts: true);
+  }
 
   @override
   Future<bool> exists({required DocumentRef ref}) {
@@ -50,7 +57,10 @@ final class DatabaseDocumentsDataSource
     required ProposalsFilterType type,
   }) {
     return _database.proposalsDao
-        .queryProposals(categoryRef: categoryRef, type: type)
+        .queryProposals(
+          categoryRef: categoryRef,
+          filters: ProposalsFilters.forActiveCampaign(type: type),
+        )
         .then((value) => value.map((e) => e.toModel()).toList());
   }
 

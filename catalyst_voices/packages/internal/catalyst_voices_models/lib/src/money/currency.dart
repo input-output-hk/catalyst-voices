@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/src/money/currencies.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_models/src/money/currency_code.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
@@ -57,6 +57,43 @@ final class Currency extends Equatable {
     defaultPattern,
     decimalPattern,
   ];
+
+  /// Syntax sugar for [amountBig].
+  Money amount(
+    int value, {
+    MoneyUnits moneyUnits = MoneyUnits.majorUnits,
+  }) {
+    return amountBig(
+      BigInt.from(value),
+      moneyUnits: moneyUnits,
+    );
+  }
+
+  /// Creates [Money] instance with this [Currency].
+  ///
+  /// Because [Money] stores values always in minor units
+  /// you have to tell if [value] is passed in minor or major
+  /// units.
+  ///
+  /// Units:
+  /// Ada == major unit
+  /// lovelaces == minor unit.
+  ///
+  /// Examples
+  /// Currencies.ada.amount(1)
+  /// Currencies.ada.amount(1000000, moneyUnits: MoneyUnits.minorUnits)
+  ///
+  /// Gives same amount of money.
+  Money amountBig(
+    BigInt value, {
+    MoneyUnits moneyUnits = MoneyUnits.majorUnits,
+  }) {
+    return Money.fromUnits(
+      currency: this,
+      amount: value,
+      moneyUnits: moneyUnits,
+    );
+  }
 
   /// Formats [minorUnits] into a string using [defaultPattern].
   ///

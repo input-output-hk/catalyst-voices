@@ -36,7 +36,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
   @override
   Future<String?> getLatestVersion(String id) async {
-    final constVersion = constantDocumentsRefs
+    final constVersion = allConstantDocumentRefs
         .expand((element) => element.all)
         .firstWhereOrNull((element) => element.id == id)
         ?.version;
@@ -73,7 +73,9 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }
 
   @override
-  Future<List<TypedDocumentRef>> index() async {
+  Future<List<TypedDocumentRef>> index({
+    required Campaign campaign,
+  }) async {
     final allRefs = <TypedDocumentRef>{};
 
     var page = 0;
@@ -85,6 +87,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
           await _getDocumentIndexList(
             page: page,
             limit: maxPerPage,
+            campaign: campaign,
           )
           // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
           // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
@@ -122,10 +125,15 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   Future<DocumentIndexList> _getDocumentIndexList({
     required int page,
     required int limit,
+    required Campaign campaign,
   }) async {
+    final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toList();
+
     return _api.gateway
         .apiV1DocumentIndexPost(
-          body: const DocumentIndexQueryFilter(),
+          body: DocumentIndexQueryFilter(
+            category: IdSelectorDto.inside(categoriesIds).toJson(),
+          ),
           limit: limit,
           page: page,
         )
@@ -149,8 +157,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 abstract interface class DocumentDataRemoteSource implements DocumentDataSource {
   Future<String?> getLatestVersion(String id);
 
-  @override
-  Future<List<TypedDocumentRef>> index();
+  Future<List<TypedDocumentRef>> index({required Campaign campaign});
 
   Future<void> publish(SignedDocument document);
 }

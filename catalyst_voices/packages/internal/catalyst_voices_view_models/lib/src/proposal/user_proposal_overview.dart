@@ -13,6 +13,7 @@ final class UsersProposalOverview extends Equatable {
   final String category;
   final SignedDocumentRef categoryId;
   final int fundNumber;
+  final bool fromActiveCampaign;
 
   const UsersProposalOverview({
     required this.selfRef,
@@ -25,13 +26,15 @@ final class UsersProposalOverview extends Equatable {
     required this.category,
     required this.categoryId,
     required this.fundNumber,
+    required this.fromActiveCampaign,
   });
 
   factory UsersProposalOverview.fromProposal(
     DetailProposal proposal,
     int fundNumber,
-    String categoryName,
-  ) {
+    String categoryName, {
+    required bool fromActiveCampaign,
+  }) {
     return UsersProposalOverview(
       selfRef: proposal.selfRef,
       title: proposal.title,
@@ -43,6 +46,7 @@ final class UsersProposalOverview extends Equatable {
       category: categoryName,
       categoryId: proposal.categoryRef,
       fundNumber: fundNumber,
+      fromActiveCampaign: fromActiveCampaign,
     );
   }
 
@@ -69,6 +73,7 @@ final class UsersProposalOverview extends Equatable {
     category,
     categoryId,
     fundNumber,
+    fromActiveCampaign,
   ];
 
   UsersProposalOverview copyWith({
@@ -82,6 +87,7 @@ final class UsersProposalOverview extends Equatable {
     String? category,
     SignedDocumentRef? categoryId,
     int? fundNumber,
+    bool? fromActiveCampaign,
   }) {
     return UsersProposalOverview(
       selfRef: selfRef ?? this.selfRef,
@@ -94,6 +100,7 @@ final class UsersProposalOverview extends Equatable {
       category: category ?? this.category,
       categoryId: categoryId ?? this.categoryId,
       fundNumber: fundNumber ?? this.fundNumber,
+      fromActiveCampaign: fromActiveCampaign ?? this.fromActiveCampaign,
     );
   }
 }

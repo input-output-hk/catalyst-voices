@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 class SectionLearnMoreHeader extends StatelessWidget with LaunchUrlMixin {
   final String title;
   final String info;
-  final String learnMoreUrl;
+  final String? learnMoreUrl;
   final bool isExpanded;
   final ValueChanged<bool>? onExpandedChanged;
 
@@ -16,7 +16,7 @@ class SectionLearnMoreHeader extends StatelessWidget with LaunchUrlMixin {
     super.key,
     required this.title,
     required this.info,
-    required this.learnMoreUrl,
+    this.learnMoreUrl,
     this.isExpanded = false,
     this.onExpandedChanged,
   });
@@ -50,7 +50,7 @@ class SectionLearnMoreHeader extends StatelessWidget with LaunchUrlMixin {
             ),
           ),
           const Spacer(),
-          VoicesLearnMoreTextButton.url(url: learnMoreUrl),
+          if (learnMoreUrl case final value?) VoicesLearnMoreTextButton.url(url: value),
         ],
       ),
     );

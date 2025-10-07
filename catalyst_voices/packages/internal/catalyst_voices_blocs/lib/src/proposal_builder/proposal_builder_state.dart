@@ -11,6 +11,7 @@ final class ProposalBuilderMetadata extends Equatable {
   final SignedDocumentRef? templateRef;
   final SignedDocumentRef? categoryId;
   final List<DocumentVersion> versions;
+  final bool fromActiveCampaign;
 
   const ProposalBuilderMetadata({
     this.publish = ProposalPublish.localDraft,
@@ -19,6 +20,7 @@ final class ProposalBuilderMetadata extends Equatable {
     this.templateRef,
     this.categoryId,
     this.versions = const [],
+    this.fromActiveCampaign = true,
   });
 
   factory ProposalBuilderMetadata.newDraft({
@@ -43,6 +45,7 @@ final class ProposalBuilderMetadata extends Equatable {
     templateRef,
     categoryId,
     versions,
+    fromActiveCampaign,
   ];
 
   ProposalBuilderMetadata copyWith({
@@ -52,6 +55,7 @@ final class ProposalBuilderMetadata extends Equatable {
     Optional<SignedDocumentRef>? templateRef,
     Optional<SignedDocumentRef>? categoryId,
     List<DocumentVersion>? versions,
+    bool? fromActiveCampaign,
   }) {
     return ProposalBuilderMetadata(
       publish: publish ?? this.publish,
@@ -60,6 +64,7 @@ final class ProposalBuilderMetadata extends Equatable {
       templateRef: templateRef.dataOr(this.templateRef),
       categoryId: categoryId.dataOr(this.categoryId),
       versions: versions ?? this.versions,
+      fromActiveCampaign: fromActiveCampaign ?? this.fromActiveCampaign,
     );
   }
 }

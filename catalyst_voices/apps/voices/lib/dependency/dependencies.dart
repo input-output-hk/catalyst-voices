@@ -469,14 +469,23 @@ final class Dependencies extends DependencyProvider {
       },
       dispose: (storage) async => storage.dispose(),
     );
+    registerLazySingleton<AppMetaStorage>(
+      () {
+        return AppMetaStorageLocalStorage(
+          sharedPreferences: get<SharedPreferencesAsync>(),
+        );
+      },
+    );
   }
 
   void _registerUtils() {
     registerLazySingleton<SyncManager>(
       () {
         return SyncManager(
+          get<AppMetaStorage>(),
           get<SyncStatsStorage>(),
           get<DocumentsService>(),
+          get<CampaignService>(),
         );
       },
       dispose: (manager) async => manager.dispose(),
