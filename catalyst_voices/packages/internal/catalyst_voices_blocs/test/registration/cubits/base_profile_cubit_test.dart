@@ -18,12 +18,12 @@ void main() {
 
     test('creates recovery progress with current username and email', () {
       baseProfileCubit
-        ..updateUsername(const Username.dirty('testuser'))
+        ..updateUsername(const Username.dirty('testUser'))
         ..updateEmail(const Email.dirty('test@example.com'));
 
       final progress = baseProfileCubit.createRecoverProgress();
 
-      expect(progress.username, 'testuser');
+      expect(progress.username, 'testUser');
       expect(progress.email, 'test@example.com');
     });
 
@@ -165,9 +165,9 @@ void main() {
     blocTest<BaseProfileCubit, BaseProfileStateData>(
       'emits updated username when updateUsername is called',
       build: () => baseProfileCubit,
-      act: (cubit) => cubit.updateUsername(const Username.dirty('testuser')),
+      act: (cubit) => cubit.updateUsername(const Username.dirty('testUser')),
       expect: () => [
-        isA<BaseProfileStateData>().having((e) => e.username.value, 'username', 'testuser'),
+        isA<BaseProfileStateData>().having((e) => e.username.value, 'username', 'testUser'),
       ],
     );
   });
