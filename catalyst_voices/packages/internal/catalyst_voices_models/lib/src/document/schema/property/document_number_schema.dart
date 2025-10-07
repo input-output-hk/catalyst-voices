@@ -14,6 +14,7 @@ final class DocumentGenericNumberSchema extends DocumentNumberSchema {
     required super.constValue,
     required super.enumValues,
     required super.numRange,
+    required super.multipleOf,
   });
 
   const DocumentGenericNumberSchema.optional({
@@ -29,6 +30,7 @@ final class DocumentGenericNumberSchema extends DocumentNumberSchema {
     super.constValue,
     super.enumValues,
     super.numRange,
+    super.multipleOf,
   });
 
   @override
@@ -49,12 +51,14 @@ final class DocumentGenericNumberSchema extends DocumentNumberSchema {
       constValue: constValue,
       enumValues: enumValues,
       numRange: numRange,
+      multipleOf: multipleOf,
     );
   }
 }
 
 sealed class DocumentNumberSchema extends DocumentValueSchema<double> {
   final NumRange<double>? numRange;
+  final double? multipleOf;
 
   const DocumentNumberSchema({
     required super.nodeId,
@@ -69,13 +73,14 @@ sealed class DocumentNumberSchema extends DocumentValueSchema<double> {
     required super.constValue,
     required super.enumValues,
     required this.numRange,
+    required this.multipleOf,
   }) : super(
          type: DocumentPropertyType.number,
        );
 
   @override
   @mustCallSuper
-  List<Object?> get props => super.props + [numRange];
+  List<Object?> get props => super.props + [numRange, multipleOf];
 
   @override
   DocumentNumberSchema copyWith({DocumentNodeId? nodeId, String? title});
@@ -85,6 +90,7 @@ sealed class DocumentNumberSchema extends DocumentValueSchema<double> {
     return DocumentValidationResult.merge([
       DocumentValidator.validateIfRequired(this, value),
       DocumentValidator.validateNumberRange(this, value),
+      DocumentValidator.validateNumberMultipleOf(this, value),
       DocumentValidator.validateConstValue(this, value),
       DocumentValidator.validateEnumValues(this, value),
     ]);

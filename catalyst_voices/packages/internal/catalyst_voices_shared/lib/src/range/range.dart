@@ -86,3 +86,36 @@ class NumRange<T extends num> extends Equatable {
     return NumRange(min: min, max: max);
   }
 }
+
+/// A comparable range between [min] and [max] with optional values.
+class OpenRange<T extends Comparable<T>> extends Equatable {
+  /// The minimum range value (inclusive).
+  final T? min;
+
+  /// The maximum range value (inclusive).
+  final T? max;
+
+  const OpenRange({
+    required this.min,
+    required this.max,
+  });
+
+  @override
+  List<Object?> get props => [min, max];
+
+  /// Returns true if this range contains the [value], false otherwise.
+  bool contains(T value) {
+    final min = this.min;
+    final max = this.max;
+
+    if (min != null && max != null) {
+      return min.compareTo(value) <= 0 && max.compareTo(value) >= 0;
+    } else if (min != null && max == null) {
+      return min.compareTo(value) <= 0;
+    } else if (min == null && max != null) {
+      return max.compareTo(value) >= 0;
+    } else {
+      return true;
+    }
+  }
+}

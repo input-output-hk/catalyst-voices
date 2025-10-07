@@ -67,6 +67,7 @@ export 'info/app_info.dart';
 export 'info/gateway_info.dart';
 export 'info/system_info.dart';
 export 'logging/logging_settings.dart';
+export 'money/currencies.dart';
 export 'money/currency.dart';
 export 'money/money.dart';
 export 'money/multi_currency_amount.dart';

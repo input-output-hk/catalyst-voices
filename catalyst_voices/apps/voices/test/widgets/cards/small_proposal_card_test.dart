@@ -32,7 +32,7 @@ void main() {
         selfRef: SignedDocumentRef(id: proposalId, version: latestVersion),
         title: 'Test Proposal',
         updateDate: DateTime.now(),
-        fundsRequested: Money.zero(currency: const Currency.ada()),
+        fundsRequested: Money.zero(currency: Currencies.ada),
         publish: ProposalPublish.publishedDraft,
         versions: [
           ProposalVersionViewModel(

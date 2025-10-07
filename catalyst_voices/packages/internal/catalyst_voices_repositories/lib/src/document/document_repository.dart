@@ -656,13 +656,19 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return remoteData;
   }
 
+  // TODO(damian-molinski): refactor this method.
   bool _isDocumentMetadataValid(DocumentData document) {
     final template = document.metadata.template;
     final category = document.metadata.categoryId;
     final documentType = document.metadata.type;
 
-    final isInvalidTemplate = template == null || !template.isValid;
-    final isInvalidCategory = category == null || !category.isValid;
+    final isComment = documentType == DocumentType.commentDocument;
+    final isAction = documentType == DocumentType.proposalActionDocument;
+
+    final isInvalidTemplate = isAction ? template == null : (template == null || !template.isValid);
+    final isInvalidCategory = isComment
+        ? category != null && !category.isValid
+        : category == null || !category.isValid;
     final isInvalidType = documentType == DocumentType.unknown;
     final isInvalidProposal = isInvalidTemplate || isInvalidType || isInvalidCategory;
 

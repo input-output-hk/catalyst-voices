@@ -1,26 +1,26 @@
-import 'package:catalyst_voices_models/src/money/currency.dart';
+import 'package:catalyst_voices_models/src/money/currency_code.dart';
 import 'package:catalyst_voices_models/src/money/money.dart';
 import 'package:equatable/equatable.dart';
 
 /// Represents a collection of monetary amounts in multiple currencies.
 ///
-/// Internally stores a map of [CurrencyIsoCode] to [Money] and provides
+/// Internally stores a map of [CurrencyCode] to [Money] and provides
 /// methods to add, subtract, and retrieve amounts. Automatically removes
 /// zero amounts from the collection.
 final class MultiCurrencyAmount extends Equatable {
   /// Internal map of currency ISO code to [Money] amounts.
-  final Map<CurrencyIsoCode, Money> _map;
+  final Map<CurrencyCode, Money> _map;
 
   /// Creates an empty [MultiCurrencyAmount] or initializes with an optional map.
   MultiCurrencyAmount({
-    Map<CurrencyIsoCode, Money>? map,
+    Map<CurrencyCode, Money>? map,
   }) : _map = map ?? {};
 
   /// Creates a [MultiCurrencyAmount] from a list of [Money] values.
   ///
   /// Example:
   /// ```dart
-  /// final amounts = MultiCurrencyAmount.list([usdMoney, adaMoney]);
+  /// final amounts = MultiCurrencyAmount.list([usdmMoney, adaMoney]);
   /// ```
   factory MultiCurrencyAmount.list(List<Money> money) {
     final group = MultiCurrencyAmount();
@@ -34,7 +34,7 @@ final class MultiCurrencyAmount extends Equatable {
   ///
   /// Example:
   /// ```dart
-  /// final amount = MultiCurrencyAmount.single(usdMoney);
+  /// final amount = MultiCurrencyAmount.single(usdmMoney);
   /// ```
   factory MultiCurrencyAmount.single(Money money) {
     final group = MultiCurrencyAmount()..add(money);
@@ -48,7 +48,7 @@ final class MultiCurrencyAmount extends Equatable {
   List<Object?> get props => [_map];
 
   /// Returns the [Money] value for the given [isoCode], or null if not present.
-  Money? operator [](CurrencyIsoCode isoCode) {
+  Money? operator [](CurrencyCode isoCode) {
     return _map[isoCode];
   }
 
@@ -58,7 +58,7 @@ final class MultiCurrencyAmount extends Equatable {
   /// Zero amounts are automatically removed from the collection.
   void add(Money money) {
     final currency = money.currency;
-    final current = _map[currency.isoCode];
+    final current = _map[currency.code];
     final updated = (current ?? Money.zero(currency: currency)) + money;
     _updateMap(updated);
   }
@@ -76,7 +76,7 @@ final class MultiCurrencyAmount extends Equatable {
   /// Zero amounts are automatically removed from the collection.
   void subtract(Money money) {
     final currency = money.currency;
-    final current = _map[currency.isoCode];
+    final current = _map[currency.code];
     final updated = (current ?? Money.zero(currency: currency)) - money;
     _updateMap(updated);
   }
@@ -85,7 +85,7 @@ final class MultiCurrencyAmount extends Equatable {
   ///
   /// If the amount is zero, the entry is removed. Otherwise, it is added/updated.
   void _updateMap(Money money) {
-    final isoCode = money.currency.isoCode;
+    final isoCode = money.currency.code;
     if (money.isZero) {
       _map.remove(isoCode);
     } else {

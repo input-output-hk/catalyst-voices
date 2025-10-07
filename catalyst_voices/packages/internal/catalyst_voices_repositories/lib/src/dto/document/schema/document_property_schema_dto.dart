@@ -45,6 +45,7 @@ final class DocumentPropertySchemaDto {
   final int? maxLength;
   final int? minItems;
   final int? maxItems;
+  final num? multipleOf;
   final String? pattern;
 
   /// Logical boolean algebra conditions.
@@ -78,8 +79,9 @@ final class DocumentPropertySchemaDto {
     required this.maximum,
     required this.minLength,
     required this.maxLength,
-    required this.maxItems,
     required this.minItems,
+    required this.maxItems,
+    required this.multipleOf,
     required this.oneOf,
     required this.required,
     required this.order,
@@ -110,8 +112,9 @@ final class DocumentPropertySchemaDto {
     this.maximum,
     this.minLength,
     this.maxLength,
-    this.maxItems,
     this.minItems,
+    this.maxItems,
+    this.multipleOf,
     this.oneOf,
     this.required,
     this.order,
@@ -171,6 +174,7 @@ final class DocumentPropertySchemaDto {
       maxLength: maxLength ?? other.maxLength,
       minItems: minItems ?? other.minItems,
       maxItems: maxItems ?? other.maxItems,
+      multipleOf: multipleOf ?? other.multipleOf,
       oneOf: oneOf ?? other.oneOf,
       required: required ?? other.required,
       order: order ?? other.order,

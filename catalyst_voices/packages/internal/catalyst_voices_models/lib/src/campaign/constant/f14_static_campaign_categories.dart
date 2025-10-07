@@ -18,14 +18,14 @@ final f14StaticCampaignCategories = [
     shortDescription:
         'For Tier-1 collaborations and real-world pilots that scale Cardano adoption through high-impact use cases.',
     proposalsCount: 0,
-    availableFunds: MultiCurrencyAmount.single(const Currency.ada().amount(8500000)),
+    availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(8500000)),
     imageUrl: '',
-    totalAsk: MultiCurrencyAmount.single(const Currency.ada().amount(0)),
+    totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
     range: ComparableRange(
-      min: const Currency.ada().amount(250000),
-      max: const Currency.ada().amount(1000000),
+      min: Currencies.ada.amount(250000),
+      max: Currencies.ada.amount(1000000),
     ),
-    currency: const Currency.ada(),
+    currency: Currencies.ada,
     descriptions: const [
       CategoryDescription(
         title: 'Overview',
@@ -102,14 +102,14 @@ The following will **not** be funded:
     shortDescription:
         'For early-stage ideas to create, test, and validate Cardano-based prototypes to MVP innovations.',
     proposalsCount: 0,
-    availableFunds: MultiCurrencyAmount.single(const Currency.ada().amount(4000000)),
+    availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(4000000)),
     imageUrl: '',
-    totalAsk: MultiCurrencyAmount.single(const Currency.ada().amount(0)),
+    totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
     range: ComparableRange(
-      min: const Currency.ada().amount(15000),
-      max: const Currency.ada().amount(100000),
+      min: Currencies.ada.amount(15000),
+      max: Currencies.ada.amount(100000),
     ),
-    currency: const Currency.ada(),
+    currency: Currencies.ada,
     descriptions: const [
       CategoryDescription(
         title: 'Overview',
@@ -186,14 +186,14 @@ Funds open source tools and environments to enhance the Cardano developer experi
     shortDescription:
         'For developers to build open-source tools that enhance the Cardano developer experience.',
     proposalsCount: 0,
-    availableFunds: MultiCurrencyAmount.single(const Currency.ada().amount(3100000)),
+    availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(3100000)),
     imageUrl: '',
-    totalAsk: MultiCurrencyAmount.single(const Currency.ada().amount(0)),
+    totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
     range: ComparableRange(
-      min: const Currency.ada().amount(15000),
-      max: const Currency.ada().amount(100000),
+      min: Currencies.ada.amount(15000),
+      max: Currencies.ada.amount(100000),
     ),
-    currency: const Currency.ada(),
+    currency: Currencies.ada,
     descriptions: const [
       CategoryDescription(
         title: 'Overview',
@@ -271,14 +271,14 @@ Funds non-technical initiatives like marketing, education, and community buildin
     shortDescription:
         'For non-tech projects like marketing, education, or community growth to expand Cardano’s reach.',
     proposalsCount: 0,
-    availableFunds: MultiCurrencyAmount.single(const Currency.ada().amount(3000000)),
+    availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(3000000)),
     imageUrl: '',
-    totalAsk: MultiCurrencyAmount.single(const Currency.ada().amount(0)),
+    totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
     range: ComparableRange(
-      min: const Currency.ada().amount(15000),
-      max: const Currency.ada().amount(60000),
+      min: Currencies.ada.amount(15000),
+      max: Currencies.ada.amount(60000),
     ),
-    currency: const Currency.ada(),
+    currency: Currencies.ada,
     descriptions: const [
       CategoryDescription(
         title: 'Overview',

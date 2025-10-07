@@ -155,6 +155,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     SignedDocumentRef? reply,
   }) async {
     final proposalRef = _cache.ref;
+    final proposalCategoryId = _cache.proposal?.document.metadata.categoryId;
     assert(proposalRef != null, 'Proposal ref not found. Load document first!');
     assert(
       proposalRef is SignedDocumentRef,
@@ -167,6 +168,8 @@ final class ProposalCubit extends Cubit<ProposalState>
     final commentTemplate = _cache.commentTemplate;
     assert(commentTemplate != null, 'No comment template found!');
 
+    assert(proposalCategoryId != null, 'Proposal categoryId not found!');
+
     final commentRef = SignedDocumentRef.generateFirstRef();
     final comment = CommentDocument(
       metadata: CommentMetadata(
@@ -174,6 +177,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         ref: proposalRef! as SignedDocumentRef,
         template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
         reply: reply,
+        categoryId: proposalCategoryId,
         authorId: activeAccountId!,
       ),
       document: document,
@@ -491,10 +495,7 @@ final class ProposalCubit extends Cubit<ProposalState>
     };
   }
 
-  bool _isVotingStage(Campaign? campaign) {
-    final votingState = campaign?.phaseStateTo(CampaignPhaseType.communityVoting);
-    return votingState?.status.isActive ?? false;
-  }
+  bool _isVotingStage(Campaign? campaign) => false;
 
   ProposalViewData _rebuildProposalState() {
     final proposal = _cache.proposal;

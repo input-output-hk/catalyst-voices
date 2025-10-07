@@ -6,7 +6,7 @@ void main() {
     group(DocumentSingleGroupedTagSelectorSchema, () {
       final groupSchema = DocumentTagGroupSchema(
         nodeId: DocumentNodeId.root.child('group'),
-        format: DocumentPropertyFormat.tagGroup,
+        format: const DocumentTagGroupFormat(),
         contentMediaType: DocumentContentMediaType.textPlain,
         title: 'title',
         description: MarkdownData.empty,
@@ -23,7 +23,7 @@ void main() {
 
       final selectionSchema = DocumentTagSelectionSchema(
         nodeId: DocumentNodeId.root.child('tag'),
-        format: DocumentPropertyFormat.tagSelection,
+        format: const DocumentTagSelectionFormat(),
         contentMediaType: DocumentContentMediaType.textPlain,
         title: 'title',
         description: MarkdownData.empty,
@@ -40,7 +40,7 @@ void main() {
 
       final tagGroupSchema = DocumentSingleGroupedTagSelectorSchema(
         nodeId: DocumentNodeId.root,
-        format: DocumentPropertyFormat.singleGroupedTagSelector,
+        format: const DocumentSingleGroupedTagSelectorFormat(),
         title: 'title',
         description: MarkdownData.empty,
         placeholder: 'placeholder',

@@ -8,7 +8,7 @@ void main() {
         // Given
         const ada = 1;
         const lovelaces = 1000000;
-        const currency = Currency.ada();
+        const currency = Currencies.ada;
 
         // When
         final adaMoney = currency.amount(ada);

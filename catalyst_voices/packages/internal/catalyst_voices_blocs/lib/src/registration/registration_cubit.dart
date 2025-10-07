@@ -267,7 +267,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       _transaction = transaction;
 
       final fee = transaction.fee;
-      final formattedFee = MoneyFormatter.formatCompactRounded(fee.toMoney());
+      final formattedFee = MoneyFormatter.formatExactAmount(fee.toMoney());
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
