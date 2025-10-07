@@ -25,7 +25,7 @@ Future<void> main(List<String> args) async {
     'Package Name${_sep}Description${_sep}Authors${_sep}License',
   );
 
-  final deps = await oss.listDependencies(pubspecYamlPath: pubspecLockPath);
+  final deps = await oss.listDependencies(pubspecLockPath: pubspecLockPath);
   for (var entry in deps.allDependencies) {
     final name = _replaceSpecialCharacters(entry.name);
     final license = _replaceSpecialCharacters(entry.license ?? '');
