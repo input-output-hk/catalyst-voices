@@ -26,7 +26,7 @@ const ReportingService _reportingService = _shouldUseSentry
     ? SentryReportingService()
     : NoopReportingService();
 
-const _shouldUseSentry = kReleaseMode || kProfileMode;
+const _shouldUseSentry = kReleaseMode;
 
 var _bootstrapInitState = const _BootstrapState();
 
