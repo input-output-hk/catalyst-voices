@@ -15,6 +15,8 @@ final class Email extends FormzInput<String, EmailValidationException> {
 
   bool get isNonEmptyAndValid => value.isNotEmpty && isValid;
 
+  bool get isEmptyOrNotValid => value.isEmpty || isNotValid;
+
   @override
   EmailValidationException? validator(String value) {
     if (!lengthRange.contains(value.length)) {
