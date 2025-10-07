@@ -1,6 +1,9 @@
-//! Document templates hardcoded data.
+//! F14 Document templates hardcoded data.
 
 use super::SignedDocData;
+
+/// Fund 14 Campaign ID.
+const CAMPAIGN_ID: &str = "0194cfcf-15a2-7e32-b559-386b93d0724e";
 
 /// An empty JSON object bytes slice
 const EMPTY_JSON_OBJECT_BYTES: &[u8] = b"{}";
@@ -8,23 +11,24 @@ const EMPTY_JSON_OBJECT_BYTES: &[u8] = b"{}";
 pub(crate) struct CategoryDocData(
     /// ID and Version
     &'static str,
+    /// Campaign ID
+    &'static str,
 );
-/// List of category documents, 12 categories for Fund 14.
-// TODO: Fix Content once it is added
+/// List of category documents, categories.
 #[rustfmt::skip]
 pub(crate) const CATEGORY_DOCUMENTS: [CategoryDocData; 12] = [
-    CategoryDocData("0194d490-30bf-7473-81c8-a0eaef369619"),
-    CategoryDocData("0194d490-30bf-7043-8c5c-f0e09f8a6d8c"),
-    CategoryDocData("0194d490-30bf-7e75-95c1-a6cf0e8086d9"),
-    CategoryDocData("0194d490-30bf-7703-a1c0-83a916b001e7"),
-    CategoryDocData("0194d490-30bf-79d1-9a0f-84943123ef38"),
-    CategoryDocData("0194d490-30bf-706d-91c6-0d4707f74cdf"),
-    CategoryDocData("0194d490-30bf-759e-b729-304306fbaa5e"),
-    CategoryDocData("0194d490-30bf-7e27-b5fd-de3133b54bf6"),
-    CategoryDocData("0194d490-30bf-7f9e-8a5d-91fb67c078f2"),
-    CategoryDocData("0194d490-30bf-7676-9658-36c0b67e656e"),
-    CategoryDocData("0194d490-30bf-7978-b031-7aa2ccc5e3fd"),
-    CategoryDocData("0194d490-30bf-7d34-bba9-8498094bd627"),
+    CategoryDocData("0194d490-30bf-7473-81c8-a0eaef369619", CAMPAIGN_ID),
+    CategoryDocData("0194d490-30bf-7043-8c5c-f0e09f8a6d8c", CAMPAIGN_ID),
+    CategoryDocData("0194d490-30bf-7e75-95c1-a6cf0e8086d9", CAMPAIGN_ID),
+    CategoryDocData("0194d490-30bf-7703-a1c0-83a916b001e7", CAMPAIGN_ID),
+    CategoryDocData("0194d490-30bf-79d1-9a0f-84943123ef38", CAMPAIGN_ID),
+    CategoryDocData("0194d490-30bf-706d-91c6-0d4707f74cdf", CAMPAIGN_ID),
+    CategoryDocData("0194d490-30bf-759e-b729-304306fbaa5e", CAMPAIGN_ID),
+    CategoryDocData("0194d490-30bf-7e27-b5fd-de3133b54bf6", CAMPAIGN_ID),
+    CategoryDocData("0194d490-30bf-7f9e-8a5d-91fb67c078f2", CAMPAIGN_ID),
+    CategoryDocData("0194d490-30bf-7676-9658-36c0b67e656e", CAMPAIGN_ID),
+    CategoryDocData("0194d490-30bf-7978-b031-7aa2ccc5e3fd", CAMPAIGN_ID),
+    CategoryDocData("0194d490-30bf-7d34-bba9-8498094bd627", CAMPAIGN_ID),
 ];
 
 impl From<CategoryDocData> for SignedDocData {
@@ -34,7 +38,7 @@ impl From<CategoryDocData> for SignedDocData {
             ver: value.0,
             doc_type: catalyst_signed_doc::doc_types::CATEGORY_DOCUMENT_UUID_TYPE,
             content: EMPTY_JSON_OBJECT_BYTES,
-            category_id: None,
+            category_id: Some(value.1),
         }
     }
 }
@@ -49,13 +53,13 @@ pub(crate) struct ProposalTemplateDocData(
     &'static [u8],
 );
 
-/// List of proposal templates, 12 proposals each of which is uniquely associated with one of the predefined categories.
+/// List of proposal templates, proposals each of which is uniquely associated with one of the predefined categories.
 #[rustfmt::skip]
 pub(crate) const PROPOSAL_TEMPLATES: [ProposalTemplateDocData; 12] = [
-    ProposalTemplateDocData("0194d492-1daa-75b5-b4a4-5cf331cd8d1a", CATEGORY_DOCUMENTS[0].0, include_bytes!("./docs/proposal/f14_partner_product.schema.json")),
-    ProposalTemplateDocData("0194d492-1daa-7371-8bd3-c15811b2b063", CATEGORY_DOCUMENTS[1].0, include_bytes!("./docs/proposal/f14_concept.schema.json")),
-    ProposalTemplateDocData("0194d492-1daa-79c7-a222-2c3b581443a8", CATEGORY_DOCUMENTS[2].0, include_bytes!("./docs/proposal/f14_developer.schema.json")),
-    ProposalTemplateDocData("0194d492-1daa-716f-a04e-f422f08a99dc", CATEGORY_DOCUMENTS[3].0, include_bytes!("./docs/proposal/f14_ecosystem.schema.json")),
+    ProposalTemplateDocData("0194d492-1daa-75b5-b4a4-5cf331cd8d1a", CATEGORY_DOCUMENTS[0].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-75b5-b4a4-5cf331cd8d1a.schema.json")),
+    ProposalTemplateDocData("0194d492-1daa-7371-8bd3-c15811b2b063", CATEGORY_DOCUMENTS[1].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-7371-8bd3-c15811b2b063.schema.json")),
+    ProposalTemplateDocData("0194d492-1daa-79c7-a222-2c3b581443a8", CATEGORY_DOCUMENTS[2].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-79c7-a222-2c3b581443a8.schema.json")),
+    ProposalTemplateDocData("0194d492-1daa-716f-a04e-f422f08a99dc", CATEGORY_DOCUMENTS[3].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-716f-a04e-f422f08a99dc.schema.json")),
     ProposalTemplateDocData("0194d492-1daa-78fc-818a-bf20fc3e9b87", CATEGORY_DOCUMENTS[4].0, EMPTY_JSON_OBJECT_BYTES),
     ProposalTemplateDocData("0194d492-1daa-7d98-a3aa-c57d99121f78", CATEGORY_DOCUMENTS[5].0, EMPTY_JSON_OBJECT_BYTES),
     ProposalTemplateDocData("0194d492-1daa-77be-a1a5-c238fe25fe4f", CATEGORY_DOCUMENTS[6].0, EMPTY_JSON_OBJECT_BYTES),
@@ -85,7 +89,7 @@ pub(crate) struct CommentTemplateDocData(
     /// Category ID
     &'static str,
 );
-/// List of comment templates, 12 comments each of which is uniquely associated with one of the predefined categories.
+/// List of comment templates, comments each of which is uniquely associated with one of the predefined categories.
 #[rustfmt::skip]
 pub(crate) const COMMENT_TEMPLATES: [CommentTemplateDocData; 12] = [
     CommentTemplateDocData("0194d494-4402-7e0e-b8d6-171f8fea18b0", CATEGORY_DOCUMENTS[0].0),
@@ -108,7 +112,7 @@ impl From<CommentTemplateDocData> for SignedDocData {
             id: value.0,
             ver: value.0,
             doc_type: catalyst_signed_doc::doc_types::COMMENT_TEMPLATE_UUID_TYPE,
-            content: include_bytes!("./docs/f14_comment_template.schema.json"),
+            content: include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/F14-Comments/0b8424d4-ebfd-46e3-9577-1775a69d290c.schema.json"),
             category_id: Some(value.1),
         }
     }

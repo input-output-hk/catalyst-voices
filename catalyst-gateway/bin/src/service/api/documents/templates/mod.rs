@@ -1,45 +1,59 @@
 //! Catalyst signed document templates.
 
-mod data;
+mod f14;
+mod f15;
 
 use std::{collections::HashMap, env, sync::LazyLock};
 
 use catalyst_signed_doc::{
     Builder, CatalystId, CatalystSignedDocument, ContentEncoding, ContentType,
 };
-use data::{CATEGORY_DOCUMENTS, COMMENT_TEMPLATES, PROPOSAL_TEMPLATES};
 use ed25519_dalek::{ed25519::signature::Signer, SigningKey};
 use hex::FromHex;
 use uuid::Uuid;
 
-/// Catalyst brand ID.
-const BRAND_ID: &str = "0194cfcd-bddc-7bb3-b5e9-455168bd3ff7";
-/// Catalyst brand Version (same as ID).
-const BRAND_VERSION: &str = BRAND_ID;
-
-/// Fund 14 Campaign ID.
-const CAMPAIGN_ID: &str = "0194cfcf-15a2-7e32-b559-386b93d0724e";
-/// Fund 14 Campaign Version (Same as ID).
-const CAMPAIGN_VERSION: &str = CAMPAIGN_ID;
-
-/// A map of signed document templates to its ID.
-pub(crate) static TEMPLATES: LazyLock<Option<HashMap<Uuid, CatalystSignedDocument>>> =
+/// A map of F14 signed document templates to its ID.
+static F14_TEMPLATES: LazyLock<Option<HashMap<Uuid, CatalystSignedDocument>>> =
     LazyLock::new(|| {
         let sk = load_doc_signing_key()?;
 
         let mut map = HashMap::new();
         map.extend(
-            CATEGORY_DOCUMENTS
+            f14::CATEGORY_DOCUMENTS
                 .into_iter()
                 .map(|t| build_signed_doc(&t.into(), &sk)),
         );
         map.extend(
-            PROPOSAL_TEMPLATES
+            f14::PROPOSAL_TEMPLATES
                 .into_iter()
                 .map(|t| build_signed_doc(&t.into(), &sk)),
         );
         map.extend(
-            COMMENT_TEMPLATES
+            f14::COMMENT_TEMPLATES
+                .into_iter()
+                .map(|t| build_signed_doc(&t.into(), &sk)),
+        );
+        Some(map)
+    });
+
+/// A map of F15 signed document templates to its ID.
+static F15_TEMPLATES: LazyLock<Option<HashMap<Uuid, CatalystSignedDocument>>> =
+    LazyLock::new(|| {
+        let sk = load_doc_signing_key()?;
+
+        let mut map = HashMap::new();
+        map.extend(
+            f15::CATEGORY_DOCUMENTS
+                .into_iter()
+                .map(|t| build_signed_doc(&t.into(), &sk)),
+        );
+        map.extend(
+            f15::PROPOSAL_TEMPLATES
+                .into_iter()
+                .map(|t| build_signed_doc(&t.into(), &sk)),
+        );
+        map.extend(
+            f15::COMMENT_TEMPLATES
                 .into_iter()
                 .map(|t| build_signed_doc(&t.into(), &sk)),
         );
@@ -105,11 +119,9 @@ fn build_signed_doc(
         "type": data.doc_type,
         "id": data.id,
         "ver": data.ver,
-        "category_id": data.category_id.map(|v| serde_json::json!({"id": v, "ver": v })),
+        "parameters": data.category_id.map(|v| serde_json::json!({"id": v, "ver": v })),
         "content-type": ContentType::Json.to_string(),
         "content-encoding": ContentEncoding::Brotli.to_string(),
-        "campaign_id": {"id": CAMPAIGN_ID, "ver": CAMPAIGN_VERSION},
-        "brand_id":  {"id": BRAND_ID, "ver": BRAND_VERSION},
     });
 
     let kid = CatalystId::new(KID_NETWORK, None, sk.verifying_key());
@@ -127,9 +139,25 @@ fn build_signed_doc(
     (doc_id, doc)
 }
 
-/// Get a static document template from ID and version.
+/// Get a static document template from ID and version looking from all available static
+/// templates.
 pub(crate) fn get_doc_static_template(document_id: &uuid::Uuid) -> Option<CatalystSignedDocument> {
-    TEMPLATES
+    F15_TEMPLATES
+        .as_ref()
+        .and_then(|templates| templates.get(document_id))
+        .or_else(|| {
+            F14_TEMPLATES
+                .as_ref()
+                .and_then(|templates| templates.get(document_id))
+        })
+        .cloned()
+}
+
+/// Get an active static document template from ID and version.
+pub(crate) fn get_active_doc_static_template(
+    document_id: &uuid::Uuid
+) -> Option<CatalystSignedDocument> {
+    F15_TEMPLATES
         .as_ref()
         .and_then(|templates| templates.get(document_id))
         .cloned()
@@ -151,7 +179,13 @@ mod tests {
         unsafe {
             env::set_var("SIGNED_DOC_SK", sk_hex);
         }
-        for doc in TEMPLATES.as_ref().unwrap().values() {
+        for doc in F14_TEMPLATES
+            .as_ref()
+            .unwrap()
+            .values()
+            .chain(F15_TEMPLATES.as_ref().unwrap().values())
+        {
+            println!("{:?}", doc.doc_meta());
             assert!(!doc.problem_report().is_problematic());
         }
     }
