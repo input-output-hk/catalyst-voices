@@ -61,11 +61,11 @@ final class Currency extends Equatable {
   /// Syntax sugar for [amountBig].
   Money amount(
     int value, {
-    bool majorUnits = true,
+    MoneyUnits moneyUnits = MoneyUnits.majorUnits,
   }) {
     return amountBig(
       BigInt.from(value),
-      majorUnits: majorUnits,
+      moneyUnits: moneyUnits,
     );
   }
 
@@ -80,22 +80,19 @@ final class Currency extends Equatable {
   /// lovelaces == minor unit.
   ///
   /// Examples
-  /// Currency.ada().amount(1)
-  /// Currency.ada().amount(1000000, majorUnits: false)
+  /// Currencies.ada.amount(1)
+  /// Currencies.ada.amount(1000000, moneyUnits: MoneyUnits.minorUnits)
   ///
   /// Gives same amount of money.
   Money amountBig(
     BigInt value, {
-    bool majorUnits = true,
+    MoneyUnits moneyUnits = MoneyUnits.majorUnits,
   }) {
-    if (majorUnits) {
-      return Money.fromMajorUnits(
-        currency: this,
-        majorUnits: value,
-      );
-    }
-
-    return Money(currency: this, minorUnits: value);
+    return Money.fromUnits(
+      currency: this,
+      amount: value,
+      moneyUnits: moneyUnits,
+    );
   }
 
   /// Formats [minorUnits] into a string using [defaultPattern].

@@ -12,7 +12,7 @@ void main() {
 
         // When
         final adaMoney = currency.amount(ada);
-        final lovelaceMoney = currency.amount(lovelaces, majorUnits: false);
+        final lovelaceMoney = currency.amount(lovelaces, moneyUnits: MoneyUnits.minorUnits);
 
         // Then
         expect(adaMoney, lovelaceMoney);
