@@ -7,7 +7,6 @@ import 'package:catalyst_voices/pages/discovery/sections/stay_involved/widgets/t
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -44,9 +43,10 @@ class _VotingTimeline extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<DiscoveryCubit, DiscoveryState, List<CampaignTimelineEventWithTitle>>(
-      selector: (state) => state.campaign.datesEvents.votingTimelineItems,
-      builder: (context, timelineItems) {
+    return BlocSelector<DiscoveryCubit, DiscoveryState, CampaignDatesEventsState>(
+      selector: (state) => state.campaign.datesEvents,
+      builder: (context, campaignDates) {
+        final timelineItems = campaignDates.votingTimelineItems;
         if (timelineItems.isEmpty) {
           return const SizedBox.shrink();
         }

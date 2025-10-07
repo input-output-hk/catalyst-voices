@@ -1,8 +1,7 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-class StayInvolvedActionButton extends StatelessWidget with LaunchUrlMixin {
+class StayInvolvedActionButton extends StatelessWidget {
   final String title;
   final Widget? trailing;
   final VoidCallback? onTap;
