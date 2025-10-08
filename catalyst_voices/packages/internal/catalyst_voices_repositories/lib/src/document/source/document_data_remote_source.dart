@@ -132,7 +132,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     return _api.gateway
         .apiV1DocumentIndexPost(
           body: DocumentIndexQueryFilter(
-            category: IdSelectorDto.inside(categoriesIds).toJson(),
+            parameters: IdSelectorDto.inside(categoriesIds).toJson(),
           ),
           limit: limit,
           page: page,
