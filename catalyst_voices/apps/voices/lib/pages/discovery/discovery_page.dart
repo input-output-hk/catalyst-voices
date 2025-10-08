@@ -3,12 +3,11 @@ import 'dart:async';
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
+import 'package:catalyst_voices/pages/discovery/sections/campaign_details/campaign_details.dart';
 import 'package:catalyst_voices/pages/discovery/sections/campaign_hero.dart';
 import 'package:catalyst_voices/pages/discovery/sections/how_it_works.dart';
-import 'package:catalyst_voices/pages/discovery/sections/stay_involved.dart';
-import 'package:catalyst_voices/pages/discovery/state_selectors/campaign_categories_state_selector.dart';
-import 'package:catalyst_voices/pages/discovery/state_selectors/current_campaign_selector.dart';
-import 'package:catalyst_voices/pages/discovery/state_selectors/most_recent_proposals_selector.dart';
+import 'package:catalyst_voices/pages/discovery/sections/most_recent_proposals/most_recent_proposals.dart';
+import 'package:catalyst_voices/pages/discovery/sections/stay_involved/stay_involved.dart';
 import 'package:catalyst_voices/widgets/banner/widgets/email_need_verification_banner.dart';
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_wide_screen_constrained.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -36,14 +35,13 @@ class _Body extends StatelessWidget {
             [
               const CampaignHeroSection(),
               const HowItWorks(),
-              const CurrentCampaignSelector(),
-              const CampaignCategoriesStateSelector(),
+              const CampaignDetails(),
               const StayInvolved(),
-              const MostRecentProposalsSelector(),
+              const MostRecentProposals(),
             ].constrainedDelegate(
               excludePredicate: (widget) =>
                   widget is CampaignHeroSection ||
-                  widget is MostRecentProposalsSelector ||
+                  widget is MostRecentProposals ||
                   widget is HowItWorks,
             ),
           ),

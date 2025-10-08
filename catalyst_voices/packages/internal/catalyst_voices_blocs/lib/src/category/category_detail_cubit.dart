@@ -55,7 +55,6 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
     } catch (error) {
       emit(
         state.copyWith(
-          category: CampaignCategoryDetailsViewModel.dummy(),
           isLoading: false,
           error: Optional.of(LocalizedException.create(error)),
         ),
