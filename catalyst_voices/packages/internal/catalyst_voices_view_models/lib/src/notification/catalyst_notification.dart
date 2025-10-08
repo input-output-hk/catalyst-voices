@@ -3,7 +3,6 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:uuid_plus/uuid_plus.dart';
 
 part 'banner_notification.dart';
 part 'catalyst_notification_text.dart';

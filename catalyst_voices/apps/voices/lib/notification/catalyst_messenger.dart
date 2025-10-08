@@ -98,6 +98,8 @@ class CatalystMessengerState extends State<CatalystMessenger> {
     _logger.finer('Hiding notification(${activeNotification.id}). Not valid for router state');
 
     _addSorted(activeNotification);
+    // hiding current banner will trigger _onNotificationCompleted and process
+    // queue.
     _hideCurrentBanner();
   }
 
