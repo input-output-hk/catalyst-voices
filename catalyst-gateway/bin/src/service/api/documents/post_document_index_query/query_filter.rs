@@ -104,6 +104,7 @@ impl Example for DocumentIndexQueryFilter {
             doc_ref: Some(IdAndVerRefDocumented::example_id_ref()),
             template: Some(IdAndVerRefDocumented::example_id_and_ver_ref()),
             reply: Some(IdAndVerRefDocumented::example()),
+            parameters: Some(IdAndVerRefDocumented::example()),
             ..Default::default()
         }
     }
