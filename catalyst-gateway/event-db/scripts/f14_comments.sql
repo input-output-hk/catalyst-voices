@@ -1,3 +1,4 @@
+-- Updating the Fund 14 Comments documents, by adding a 'parameters' field into the metadata column
 UPDATE signed_docs AS t1
 SET
   metadata = t1.metadata || JSONB_BUILD_OBJECT(
