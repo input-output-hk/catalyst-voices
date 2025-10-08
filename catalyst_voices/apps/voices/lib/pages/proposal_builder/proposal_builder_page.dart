@@ -7,11 +7,7 @@ import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_back_action.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/proposal_builder_status_action.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_changing.dart';
-import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_error.dart';
-import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_loading.dart';
-import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_navigation_panel.dart';
-import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_segments.dart';
-import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_setup_panel.dart';
+import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_responsiveness.dart';
 import 'package:catalyst_voices/pages/proposal_builder/proposal_builder_validation_snackbar.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/actions/account_settings_action.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/opportunities_drawer.dart';
@@ -105,15 +101,10 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
           endDrawer: const OpportunitiesDrawer(),
           body: SegmentsControllerScope(
             controller: _segmentsController,
-            child: SidebarScaffold(
-              leftRail: const ProposalBuilderNavigationPanel(),
-              rightRail: const ProposalBuilderSetupPanel(),
-              body: _ProposalBuilderContent(
-                itemScrollController: _segmentsScrollController,
-                sectionTileController: _sectionTileController,
-                onRetryTap: _loadProposal,
-              ),
-              bodyConstraints: const BoxConstraints.expand(),
+            child: ProposalBuilderResponsiveness(
+              segmentsScrollController: _segmentsScrollController,
+              sectionTileController: _sectionTileController,
+              onRetryTap: _loadProposal,
             ),
           ),
         ),
@@ -429,34 +420,5 @@ class _ProposalBuilderBodyState extends State<_ProposalBuilderBody>
         : state.updateSegments(data).copyWith(activeSectionId: Optional(activeSectionId));
 
     _segmentsController.value = newState;
-  }
-}
-
-class _ProposalBuilderContent extends StatelessWidget {
-  final ItemScrollController itemScrollController;
-  final DocumentBuilderSectionTileController sectionTileController;
-  final VoidCallback onRetryTap;
-
-  const _ProposalBuilderContent({
-    required this.itemScrollController,
-    required this.sectionTileController,
-    required this.onRetryTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return FocusTraversalGroup(
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          ProposalBuilderErrorSelector(onRetryTap: onRetryTap),
-          ProposalBuilderSegmentsSelector(
-            itemScrollController: itemScrollController,
-            sectionTileController: sectionTileController,
-          ),
-          const ProposalBuilderLoadingSelector(),
-        ],
-      ),
-    );
   }
 }

@@ -12,9 +12,16 @@ export class EternlActions implements WalletActions {
   }
 
   async restoreWallet(): Promise<void> {
-    await this.page.locator('//button[aria-label="Start setup"]').click();
-    await this.page.locator('#modalSetupSettingsFooter button').click();
+    await this.page.locator('//button[@aria-label="Start setup"]').click();
+    await this.page.locator("#modalSetupSettingsFooter button").click();
+    await this.selectNetwork(this.walletConfig.network);
+    await this.page.locator("#modelSetupSettingsBtnNext").click();
+    await this.page.locator("//input[@type='password']").fill('1234');
+    await this.page.locator("#btnNext").click();
+    await this.page.locator("#passwordInput").fill('1234');
+    await this.page.locator("#modelSetupSettingsBtnNext").click();
     
+
     await this.page.locator('button:has-text("Add Wallet")').click();
 
     // Click Restore wallet
@@ -66,5 +73,21 @@ export class EternlActions implements WalletActions {
 
     // Sign the transaction
     await this.page.locator('//button[.//span[text()="sign"]]').click();
+  }
+
+  private async selectNetwork(network: string): Promise<void> {
+    if (network === "preprod") {
+      await this.page
+        .locator("//button[.//div[contains(text(), 'Pre-Production testnet')]]")
+        .click();
+    } else if (network === "preview") {
+      await this.page
+        .locator("//button[.//div[contains(text(), 'Preview testnet')]]")
+        .click();
+    } else if (network === "mainnet") {
+      return;
+    } else {
+      throw new Error(`Unsupported network: ${network}`);
+    }
   }
 }

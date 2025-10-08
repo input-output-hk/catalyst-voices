@@ -21,11 +21,10 @@ class CampaignHeroSection extends StatelessWidget {
       child: HeroSection(
         asset: VideoCacheKey(name: VoicesAssets.videos.heroDesktop),
         child: ResponsivePadding(
-          xs: const EdgeInsets.only(left: 40, bottom: 16, top: 8, right: 40),
+          xs: const EdgeInsets.only(left: 20, bottom: 16, top: 8, right: 20),
           sm: const EdgeInsets.only(left: 80, bottom: 32, top: 18),
           md: const EdgeInsets.only(left: 150, bottom: 64, top: 32),
           lg: const EdgeInsets.only(left: 150, bottom: 64, top: 32),
-          other: const EdgeInsets.only(left: 150, bottom: 64, top: 32),
           child: ConstrainedBox(
             constraints: const BoxConstraints(
               maxWidth: 450,
@@ -70,8 +69,10 @@ class _CampaignBrief extends StatelessWidget {
               onTap: () {
                 const ProposalsRoute().go(context);
               },
-              backgroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
-              foregroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
+              style: FilledButton.styleFrom(
+                backgroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
+                foregroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
+              ),
               child: Text(context.l10n.viewProposals),
             ),
             const SizedBox(width: 8),

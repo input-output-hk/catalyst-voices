@@ -80,8 +80,7 @@ const launchChrome = async (
     "--no-first-run",
     "--no-default-browser-check",
     `--user-data-dir=${profilePath}`,
-    "--no-sandbox",
-    "--headless",
+    //"--headless",
   ];
 
   if (extensionName) {

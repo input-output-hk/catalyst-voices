@@ -12,7 +12,7 @@ import { getAccountModel } from "../data/accountConfigs";
 import { BrowserExtensionName } from "../models/browserExtensionModel";
 
 for (const walletConfig of [
-  getWalletConfigByExtensionName(BrowserExtensionName.Lace),
+  getWalletConfigByExtensionName(BrowserExtensionName.Eternl),
 ]) {
   test.describe(`Onboarding ${walletConfig.extension.Name}`, () => {
     test.use({

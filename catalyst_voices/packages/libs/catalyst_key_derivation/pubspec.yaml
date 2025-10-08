@@ -4,6 +4,8 @@ repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalys
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [cryptography, encryption]
 version: 1.0.0
+# TODO(dt-iohk): enable publishing once flutter_rust_bridge is reverted to official version
+publish_to: none
 
 environment:
   sdk: ">=3.9.0 <4.0.0"
@@ -18,7 +20,11 @@ dependencies:
   equatable: ^2.0.7
   flutter:
     sdk: flutter
-  flutter_rust_bridge: 2.11.1
+  flutter_rust_bridge:
+    git:
+      url: https://github.com/input-output-hk/catalyst_flutter_rust_bridge
+      ref: 24888fec8f4cab3999e461fc8c6e065f62560d63
+      path: frb_dart/
   plugin_platform_interface: ^2.1.8
 
 dev_dependencies:

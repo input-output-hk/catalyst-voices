@@ -17,13 +17,18 @@ export const browserExtensions: BrowserExtensionModel[] = [
   },
   {
     Name: BrowserExtensionName.Yoroi,
-    Id: "poonlenmfdfbjfeeballhiibknlknepo",
+    Id: "ffnbelfdoeiohenkjibnmadjiehjhajb",
     HomeUrl: "/main_window.html#",
   },
   {
     Name: BrowserExtensionName.Nufi,
     Id: "hbklpdnlgiadjhdadfnfmemmklbopbcm",
     HomeUrl: "/index.html#",
+  },
+  {
+    Name: BrowserExtensionName.Vespr,
+    Id: "bedogdpgdnifilpgeianmmdabklhfkcn",
+    HomeUrl: "/index.html#/app/preprod/welcome",
   },
 ];
 /* cspell: enable */

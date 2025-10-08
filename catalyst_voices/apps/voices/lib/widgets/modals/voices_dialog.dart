@@ -11,16 +11,18 @@ abstract final class VoicesDialog {
     bool useRootNavigator = true,
     bool barrierDismissible = true,
     Color barrierColor = const Color(0x80000000),
+    bool fullscreenDialog = false,
   }) {
     // Similar to showGeneralDialog() but since it requires
     // a barrierLabel we reimplemented the same behavior.
-    return Navigator.of(context, rootNavigator: useRootNavigator).push<T>(
-      RawDialogRoute<T>(
-        pageBuilder: (context, animation, secondaryAnimation) => builder(context),
-        barrierDismissible: barrierDismissible,
-        barrierColor: barrierColor,
-        settings: routeSettings,
-      ),
+    final route = RawDialogRoute<T>(
+      pageBuilder: (context, animation, secondaryAnimation) => builder(context),
+      barrierDismissible: barrierDismissible,
+      barrierColor: barrierColor,
+      settings: routeSettings,
+      fullscreenDialog: fullscreenDialog,
     );
+
+    return Navigator.of(context, rootNavigator: useRootNavigator).push<T>(route);
   }
 }
