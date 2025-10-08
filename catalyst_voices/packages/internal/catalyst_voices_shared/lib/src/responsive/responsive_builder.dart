@@ -47,8 +47,8 @@ import 'package:flutter/widgets.dart';
 // ```
 
 const Map<ResponsiveBreakpointKey, ({int min, int max})> _breakpoints = {
-  ResponsiveBreakpointKey.xs: (min: 0, max: 599),
-  ResponsiveBreakpointKey.sm: (min: 600, max: 1239),
+  ResponsiveBreakpointKey.xs: (min: 0, max: 640),
+  ResponsiveBreakpointKey.sm: (min: 641, max: 1239),
   ResponsiveBreakpointKey.md: (min: 1240, max: 1439),
   ResponsiveBreakpointKey.lg: (min: 1440, max: 2048),
 };
