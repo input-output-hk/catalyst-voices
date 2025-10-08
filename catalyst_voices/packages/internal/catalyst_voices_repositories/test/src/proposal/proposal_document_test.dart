@@ -2,7 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
-import 'package:flutter/foundation.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../fixture/voices_document_templates.dart';
@@ -14,14 +14,12 @@ void main() {
   group(
     ProposalDocument,
     () {
-      var schemaJson = <String, dynamic>{};
-      var documentJson = <String, dynamic>{};
+      late Map<String, dynamic> schemaJson;
+      late Map<String, dynamic> documentJson;
 
       setUpAll(() async {
-        if (!kIsWeb) {
-          schemaJson = await VoicesDocumentsTemplates.proposalF14Schema;
-          documentJson = await VoicesDocumentsTemplates.proposalF14Document;
-        }
+        schemaJson = await VoicesDocumentsTemplates.proposalF14Schema;
+        documentJson = await VoicesDocumentsTemplates.proposalF14Document;
       });
 
       ProposalDocument createProposalDocument() {
@@ -138,6 +136,6 @@ void main() {
     },
     // Skip on web as there is no way to access local files required for
     // those tests to run against template.
-    skip: kIsWeb,
+    skip: CatalystPlatform.isWeb,
   );
 }

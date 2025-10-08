@@ -345,7 +345,7 @@ class VoicesTextFieldState extends VoicesFormFieldState<String> {
   VoicesTextField get widget => super.widget as VoicesTextField;
 
   bool get _isResizableByDefault {
-    return CatalystPlatform.isWebDesktop || CatalystPlatform.isDesktop;
+    return CatalystFormFactor.current.isDesktop;
   }
 
   bool get _isResizableHorizontally {

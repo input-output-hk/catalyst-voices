@@ -837,6 +837,14 @@
       }
     }
   },
+  "defaultPermissionRationale": "This permission is required for the app to function properly",
+  "@defaultPermissionRationale": {
+    "description": "Default rationale for permission"
+  },
+  "defaultProposalsOrder": "Default",
+  "@defaultProposalsOrder": {
+    "description": "Ordering options for proposals"
+  },
   "defaultRole": "Default",
   "@defaultRole": {
     "description": "Related to account role"
@@ -1009,6 +1017,10 @@
   "editRolesDialogTitle": "Editing Roles",
   "@editRolesDialogTitle": {
     "description": "Title of dialog for editing roles"
+  },
+  "editor": "Editor",
+  "@editor": {
+    "description": "Information that it's editor tab"
   },
   "email": "Email",
   "@email": {
@@ -2027,6 +2039,10 @@
   "@open": {
     "description": "Indicates to user that status is in open mode"
   },
+  "openAppSettings": "Open App Settings",
+  "@openAppSettings": {
+    "description": "CTA to open app settings"
+  },
   "openInEditor": "Open in editor",
   "@openInEditor": {
     "description": "description of the button that opens the proposal in editor"
@@ -2093,6 +2109,14 @@
   "pendingEmailChangeTitle": "Pending email change",
   "@pendingEmailChangeTitle": {
     "description": "Title of dialog about pending email change"
+  },
+  "permissionNeedExplanation": "This permission requires additional setup. Please go to app settings to enable it.",
+  "@permissionNeedExplanation": {
+    "description": "Message shown when permission needs explanation and user should go to app settings"
+  },
+  "permissionNeededTitle": "Permission Needed",
+  "@permissionNeededTitle": {
+    "description": "Title for permission needed dialog"
   },
   "placeholderRichText": "Start writing your text...",
   "@placeholderRichText": {
@@ -2558,10 +2582,6 @@
   "recoverKeychainMethodsListTitle": "How do you want Restore your Catalyst Keychain?",
   "@recoverKeychainMethodsListTitle": {
     "description": "Header for recovery methods selection list"
-  },
-  "recoverKeychainMethodsNoKeychainFound": "No Catalyst Keychain found on this device.",
-  "@recoverKeychainMethodsNoKeychainFound": {
-    "description": "Message shown when no keychain is found on device"
   },
   "recoverKeychainMethodsSubtitle": "Not to worry, in the next step you can choose the recovery option that applies to you for this device!",
   "@recoverKeychainMethodsSubtitle": {
@@ -3201,6 +3221,10 @@
   "stepsToDoBeforeAppCloses": "Before the Catalyst app closes, make sure to:",
   "@stepsToDoBeforeAppCloses": {
     "description": "Title for the steps to do before the app closes"
+  },
+  "storagePermissionRationale": "Allow storage access to backup your work and import/export files",
+  "@storagePermissionRationale": {
+    "description": "Rationale for storage permission"
   },
   "storeInSafeLocation": "Store in safe location",
   "@storeInSafeLocation": {

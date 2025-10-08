@@ -1,0 +1,46 @@
+name: catalyst_compression
+description: A Flutter plugin exposing Brotli and zstd compression algorithms.
+repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/libs/catalyst_compression/catalyst_compression
+issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
+topics: [compression, codec]
+version: 1.0.0
+# TODO(dt-iohk): enable publishing once flutter_rust_bridge is reverted to official version
+publish_to: none
+
+environment:
+  sdk: ">=3.9.0 <4.0.0"
+  flutter: ">=3.35.1"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_rust_bridge:
+    git:
+      url: https://github.com/input-output-hk/catalyst_flutter_rust_bridge
+      ref: 24888fec8f4cab3999e461fc8c6e065f62560d63
+      path: frb_dart/
+  plugin_platform_interface: ^2.1.8
+
+dev_dependencies:
+  catalyst_analysis: ^3.0.0
+  ffi: ^2.1.3
+  ffigen: ^13.0.0
+  flutter_test:
+    sdk: flutter
+  test: ^1.25.15
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        ffiPlugin: true
+      ios:
+        ffiPlugin: true
+      linux:
+        ffiPlugin: true
+      macos:
+        ffiPlugin: true
+      windows:
+        ffiPlugin: true
+  assets:
+    - assets/js/

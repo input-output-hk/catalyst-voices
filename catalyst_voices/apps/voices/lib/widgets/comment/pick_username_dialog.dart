@@ -24,7 +24,7 @@ class _PickUsernameDialogState extends State<PickUsernameDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesSinglePaneDialog(
+    return VoicesPanelDialog(
       child: SingleChildScrollView(
         child: FractionallySizedBox(
           widthFactor: 0.65,
