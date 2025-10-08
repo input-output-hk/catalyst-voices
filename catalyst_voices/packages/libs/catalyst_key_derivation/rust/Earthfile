@@ -9,8 +9,7 @@ builder:
     COPY --dir .cargo .config src Cargo.toml clippy.toml deny.toml rustfmt.toml .
 
 # check : Run check using the most efficient host tooling
-# TODO(dt-iohk): enable when https://github.com/input-output-hk/catalyst-voices/pull/3478 is merged.
-disabled-check:
+check:
     FROM +builder
     # Create a dummy file just to past the CI format check
     # Add another blank line to satisfy the cargo fmt check
@@ -18,8 +17,7 @@ disabled-check:
     DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
 
 # build : Run build using the most efficient host tooling
-# TODO(dt-iohk): enable when https://github.com/input-output-hk/catalyst-voices/pull/3478 is merged.
-disabled-build:
+build:
     FROM +builder
 
     COPY flutter-rust-bridge+code-generator/frb_generated.rs ./src/frb_generated.rs
