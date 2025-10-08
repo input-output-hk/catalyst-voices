@@ -494,5 +494,6 @@ final class Dependencies extends DependencyProvider {
     );
     registerLazySingleton<CastedVotesObserver>(CastedVotesObserverImpl.new);
     registerLazySingleton<VotingBallotBuilder>(VotingBallotLocalBuilder.new);
+    registerLazySingleton<EventBus>(EventBus.new, dispose: (bus) => bus.dispose());
   }
 }

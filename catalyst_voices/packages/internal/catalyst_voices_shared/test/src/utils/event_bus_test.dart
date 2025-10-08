@@ -4,10 +4,10 @@ import 'package:test/test.dart';
 
 void main() {
   group(EventBus, () {
-    late EventBus<AppEvent> eventBus;
+    late EventBus eventBus;
 
     setUp(() {
-      eventBus = EventBus<AppEvent>(sync: true);
+      eventBus = EventBus(sync: true);
     });
 
     tearDown(() async {
@@ -83,12 +83,12 @@ void main() {
     });
 
     test('should receive all events when listening on the base event type', () {
-      final receivedEvents = <AppEvent>[];
+      final receivedEvents = <dynamic>[];
       const loggedInEvent = UserLoggedInEvent('Frank');
       const loggedOutEvent = UserLoggedOutEvent();
 
       // Listen for the base AppEvent type
-      eventBus.on().listen(receivedEvents.add);
+      eventBus.on<dynamic>().listen(receivedEvents.add);
 
       // Dispatch multiple, different event subtypes
       eventBus

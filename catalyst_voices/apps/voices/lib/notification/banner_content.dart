@@ -1,5 +1,5 @@
+import 'package:catalyst_voices/notification/catalyst_notification.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
