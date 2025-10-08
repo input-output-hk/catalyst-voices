@@ -6,6 +6,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class ForgetProposalDialog extends StatefulWidget {
@@ -163,8 +164,10 @@ class _ForgetProposalDialogState extends State<ForgetProposalDialog> {
   @override
   Widget build(BuildContext context) {
     const padding = EdgeInsets.symmetric(horizontal: 24);
-    return VoicesSinglePaneDialog(
-      constraints: const BoxConstraints(maxWidth: 450, maxHeight: 576),
+    return VoicesPanelDialog(
+      constraints: const Responsive.single(
+        BoxConstraints(maxWidth: 450, maxHeight: 576),
+      ),
       showClose: false,
       child: SingleChildScrollView(
         child: Column(

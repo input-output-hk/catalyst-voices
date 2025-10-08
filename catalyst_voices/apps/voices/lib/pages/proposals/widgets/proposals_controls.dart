@@ -7,17 +7,14 @@ class ProposalsControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.only(bottom: 8),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          CategorySelector(),
-          SizedBox(width: 8),
-          ProposalsSearch(),
-        ],
-      ),
+    return const Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 8,
+      children: [
+        CategorySelector(),
+        Flexible(child: ProposalsSearch()),
+      ],
     );
   }
 }

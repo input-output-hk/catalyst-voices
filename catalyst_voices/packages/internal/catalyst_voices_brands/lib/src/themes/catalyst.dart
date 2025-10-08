@@ -247,6 +247,13 @@ final ThemeData darkCatalyst = _buildThemeData(
   darkBrandAssets,
 );
 
+/// A safe font family set to act as a fallback in case
+/// a glyph cannot be rendered with the default font.
+const List<String> _fontFamilyFallback = [
+  'sans-serif',
+  'Arial',
+];
+
 TextTheme _buildTextTheme(VoicesColorScheme voicesColorScheme) {
   return TextTheme(
     displayLarge: GoogleFonts.notoSans(
@@ -348,7 +355,7 @@ TextTheme _buildTextTheme(VoicesColorScheme voicesColorScheme) {
       height: 1.45,
       letterSpacing: 0.50,
     ),
-  );
+  ).apply(fontFamilyFallback: _fontFamilyFallback);
 }
 
 /// Note:
