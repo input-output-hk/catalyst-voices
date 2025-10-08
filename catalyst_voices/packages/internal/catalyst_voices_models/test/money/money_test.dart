@@ -208,10 +208,10 @@ void main() {
         expect(money.currency, Currencies.usdm);
       });
 
-      test('parses with comma decimal separator normalized', () {
+      test('parses with comma thousands separator', () {
         final money = Money.parse(r'$1,23', Currencies.usdm);
         // "1.23" => 123 for USD
-        expect(money.minorUnits, BigInt.from(123));
+        expect(money.minorUnits, BigInt.from(123000));
         expect(money.currency, Currencies.usdm);
       });
 

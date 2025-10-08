@@ -34,7 +34,7 @@ final class DocumentCurrencySchema extends DocumentIntegerSchema {
     if (moneyUnits == MoneyUnits.majorUnits) {
       return false;
     }
-    
+
     final multipleOf = this.multipleOf;
     if (multipleOf == null) {
       return true;
