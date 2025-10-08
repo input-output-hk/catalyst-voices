@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-716f-a04e-f422f08a99dc.schema.json",
+    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/f14/0194d492-1daa-716f-a04e-f422f08a99dc.schema.json",
     "title": "F14 Cardano Open: Ecosystem Form",
     "description": "Schema for the F14 Cardano Open: Ecosystem Form",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
