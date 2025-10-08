@@ -142,9 +142,10 @@ final class RecoverCubit extends Cubit<RecoverStateData>
 
   @override
   void setSeedPhraseWords(List<SeedPhraseWord> words) {
-    final isValid = SeedPhrase.isValid(words: words);
+    final mnemonic = words.toMnemonic();
+    final isValid = SeedPhrase.isValid(mnemonic: mnemonic);
     if (isValid) {
-      _seedPhrase = SeedPhrase.fromWords(words);
+      _seedPhrase = SeedPhrase.fromMnemonic(mnemonic);
     }
 
     emit(

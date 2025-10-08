@@ -11,7 +11,13 @@ import 'package:equatable/equatable.dart';
 const _brotliEncoding = StringValue(CoseValues.brotliContentEncoding);
 
 final class SignedDocumentManagerImpl implements SignedDocumentManager {
-  const SignedDocumentManagerImpl();
+  final CatalystCompressor brotli;
+  final CatalystCompressor zstd;
+
+  const SignedDocumentManagerImpl({
+    required this.brotli,
+    required this.zstd,
+  });
 
   @override
   Future<SignedDocument> parseDocument(Uint8List bytes) async {
@@ -60,15 +66,13 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   }
 
   Future<Uint8List> _brotliCompressPayload(Uint8List payload) async {
-    final compressor = CatalystCompression.instance.brotli;
-    final compressed = await compressor.compress(payload);
+    final compressed = await brotli.compress(payload);
     return Uint8List.fromList(compressed);
   }
 
   Future<Uint8List> _brotliDecompressPayload(CoseSign coseSign) async {
     if (coseSign.protectedHeaders.contentEncoding == _brotliEncoding) {
-      final compressor = CatalystCompression.instance.brotli;
-      final decompressed = await compressor.decompress(coseSign.payload);
+      final decompressed = await brotli.decompress(coseSign.payload);
       return Uint8List.fromList(decompressed);
     } else {
       return coseSign.payload;
