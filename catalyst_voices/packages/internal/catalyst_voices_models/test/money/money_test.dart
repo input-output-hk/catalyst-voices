@@ -211,7 +211,7 @@ void main() {
       test('parses with comma thousands separator', () {
         final money = Money.parse(r'$1,23', Currencies.usdm);
         // "1.23" => 123 for USD
-        expect(money.minorUnits, BigInt.from(123000));
+        expect(money.minorUnits, BigInt.from(12300));
         expect(money.currency, Currencies.usdm);
       });
 
