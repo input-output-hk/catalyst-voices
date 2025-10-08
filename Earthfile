@@ -1,8 +1,8 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:feat/catalyst-compression-setup AS mdlint-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:feat/catalyst-compression-setup AS cspell-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:feat/catalyst-compression-setup AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.5.18 AS mdlint-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.5.18 AS cspell-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.5.18 AS postgresql-ci
 
 ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
 FROM ${REGISTRY}/debian:stable-slim
