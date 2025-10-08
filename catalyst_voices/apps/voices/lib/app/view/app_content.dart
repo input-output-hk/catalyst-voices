@@ -80,20 +80,20 @@ final class _AppContent extends StatelessWidget {
             child: AppVideoManagerScope(
               child: AppVideoPrecache(
                 child: GlobalPrecacheImages(
-                  child: GlobalSessionListener(
-                    // IMPORTANT: AppSplashScreenManager must be placed above all
-                    // widgets that render visible UI elements. Any widget that
-                    // displays content should be a descendant of
-                    // AppSplashScreenManager to ensure proper splash
-                    // screen behavior.
-                    child: AppSplashScreenManager(
-                      child: AppMobileAccessRestriction(
-                        routerConfig: routerConfig,
-                        child: DefaultShareManager(
-                          child: _AppContentBackground(
-                            key: const Key('AppContentBackground'),
-                            child: CatalystMessenger(
-                              child: child!,
+                  child: CatalystMessenger(
+                    child: GlobalSessionListener(
+                      // IMPORTANT: AppSplashScreenManager must be placed above all
+                      // widgets that render visible UI elements. Any widget that
+                      // displays content should be a descendant of
+                      // AppSplashScreenManager to ensure proper splash
+                      // screen behavior.
+                      child: AppSplashScreenManager(
+                        child: AppMobileAccessRestriction(
+                          routerConfig: routerConfig,
+                          child: DefaultShareManager(
+                            child: _AppContentBackground(
+                              key: const Key('AppContentBackground'),
+                              child: child,
                             ),
                           ),
                         ),

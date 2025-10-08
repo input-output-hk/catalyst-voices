@@ -13,6 +13,8 @@ import 'package:go_router/go_router.dart';
 
 final _logger = Logger('CatalystMessenger');
 
+typedef CatalystNotificationPredicate = bool Function(CatalystNotification notification);
+
 class CatalystMessenger extends StatefulWidget {
   final Widget child;
 
@@ -58,6 +60,15 @@ class CatalystMessengerState extends State<CatalystMessenger> {
     return widget.child;
   }
 
+  void cancelWhere(CatalystNotificationPredicate test) {
+    _pending.removeWhere(test);
+
+    final activeNotification = _activeNotification;
+    if (activeNotification != null && test(activeNotification)) {
+      _hideCurrentBanner();
+    }
+  }
+
   @override
   void dispose() {
     __router?.routerDelegate.removeListener(_handleRouterChange);
@@ -98,11 +109,10 @@ class CatalystMessengerState extends State<CatalystMessenger> {
     _logger.finer('Hiding notification(${activeNotification.id}). Not valid for router state');
 
     _addSorted(activeNotification);
-    // hiding current banner will trigger _onNotificationCompleted and process
-    // queue.
     _hideCurrentBanner();
   }
 
+  /// Hiding current banner will trigger _onNotificationCompleted and process queue.
   void _hideCurrentBanner() {
     final messengerState = AppContent.scaffoldMessengerKey.currentState;
     if (messengerState == null) {

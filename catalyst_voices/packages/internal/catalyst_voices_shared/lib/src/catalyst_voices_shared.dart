@@ -24,7 +24,6 @@ export 'user/user_observer.dart';
 export 'utils/active_aware.dart';
 export 'utils/date_time_ext.dart';
 export 'utils/debouncer.dart';
-export 'utils/event_bus.dart';
 export 'utils/future_ext.dart';
 export 'utils/iterable_ext.dart';
 export 'utils/launch_url_mixin.dart';
