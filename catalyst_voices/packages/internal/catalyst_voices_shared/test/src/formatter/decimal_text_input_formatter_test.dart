@@ -53,14 +53,14 @@ void main() {
       expect(result.text, '');
     });
 
-    test('normalizes comma to dot', () {
+    test('respects thousands separator', () {
       const formatter = DecimalTextInputFormatter(maxDecimalDigits: 2);
       const oldValue = TextEditingValue.empty;
       const newValue = TextEditingValue(text: '12,34');
 
       final result = formatter.formatEditUpdate(oldValue, newValue);
 
-      expect(result.text, '12.34');
+      expect(result.text, '1234');
     });
 
     test('rejects decimal if maxDecimalDigits is 0', () {
