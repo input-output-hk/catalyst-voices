@@ -27,7 +27,7 @@ class CatalystNotificationTextPart extends Equatable {
   });
 
   @override
-  List<Object?> get props => [text, bool, onTap];
+  List<Object?> get props => [text, bold, onTap];
 
   bool get underlined => onTap != null;
 }
