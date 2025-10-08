@@ -828,7 +828,7 @@ dependencies = [
 [[package]]
 name = "catalyst-signed-doc"
 version = "0.0.4"
-source = "git+https://github.com/input-output-hk/catalyst-libs.git?tag=catalyst-signed-doc%2Fv0.0.4-f15-rc#26b42964c3d2178b8c30e3cc1b367ef185b0ee5f"
+source = "git+https://github.com/input-output-hk/catalyst-libs.git?tag=catalyst-signed-doc%2Fv0.0.4-f15-rc-2#974e33a2c611b74cb525cb3f7a23b261d4afb3f7"
 dependencies = [
  "anyhow",
  "brotli 7.0.0",

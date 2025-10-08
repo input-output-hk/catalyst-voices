@@ -311,6 +311,48 @@ def test_proposal_doc(proposal_doc_factory, rbac_chain_factory):
         resp.status_code == 422
     ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
 
+    # Put a proposal document with missing parameters
+    invalid_doc = proposal_doc.copy()
+    invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
+    del invalid_doc.metadata["parameters"]
+    resp = document.put(
+        data=invalid_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
+    assert (
+        resp.status_code == 422
+    ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
+
+    # Put a proposal document with different parameters than template
+    invalid_doc = proposal_doc.copy()
+    invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
+    invalid_doc.metadata["parameters"] = {
+        "id": "0199802c-21b4-7dc8-8537-7eae5ea4c4d3",
+        "ver": "0199802c-21b4-7dc8-8537-7eae5ea4c4d3",
+    }
+    resp = document.put(
+        data=invalid_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
+    assert (
+        resp.status_code == 422
+    ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
+
+    # Put a proposal document referencing f14 template
+    invalid_doc = proposal_doc.copy()
+    invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
+    invalid_doc.metadata["template"] = {
+        "id": "0194d492-1daa-75b5-b4a4-5cf331cd8d1a",
+        "ver": "0194d492-1daa-75b5-b4a4-5cf331cd8d1a",
+    }
+    resp = document.put(
+        data=invalid_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
+    assert (
+        resp.status_code == 422
+    ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
+
     # Put a submission action document with the non allowed RoleID
     for invalid_role in RoleID:
         if invalid_role != role_id:
@@ -369,6 +411,48 @@ def test_comment_doc(comment_doc_factory, rbac_chain_factory):
     invalid_doc = comment_doc.copy()
     invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
     invalid_doc.content = {}
+    resp = document.put(
+        data=invalid_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
+    assert (
+        resp.status_code == 422
+    ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
+
+    # Put a comment document with missing parameters
+    invalid_doc = comment_doc.copy()
+    invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
+    del invalid_doc.metadata["parameters"]
+    resp = document.put(
+        data=invalid_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
+    assert (
+        resp.status_code == 422
+    ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
+
+    # Put a comment document with different parameters than template and proposal
+    invalid_doc = comment_doc.copy()
+    invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
+    invalid_doc.metadata["parameters"] = {
+        "id": "0199802c-21b4-7dc8-8537-7eae5ea4c4d3",
+        "ver": "0199802c-21b4-7dc8-8537-7eae5ea4c4d3",
+    }
+    resp = document.put(
+        data=invalid_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
+    assert (
+        resp.status_code == 422
+    ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
+
+    # Put a comment document referencing f14 template
+    invalid_doc = comment_doc.copy()
+    invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
+    invalid_doc.metadata["template"] = {
+        "id": "0194d494-4402-7e0e-b8d6-171f8fea18b0",
+        "ver": "0194d494-4402-7e0e-b8d6-171f8fea18b0",
+    }
     resp = document.put(
         data=invalid_doc.build_and_sign(cat_id, sk_hex),
         token=rbac_chain.auth_token(),
@@ -460,6 +544,33 @@ def test_submission_action(submission_action_factory, rbac_chain_factory):
     # Put a submission action document referencing an unknown proposal
     invalid_doc = submission_action.copy()
     invalid_doc.metadata["ref"] = {"id": uuid_v7.uuid_v7()}
+    resp = document.put(
+        data=invalid_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
+    assert (
+        resp.status_code == 422
+    ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
+
+    # Put a submission action document with missing parameters
+    invalid_doc = submission_action.copy()
+    invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
+    del invalid_doc.metadata["parameters"]
+    resp = document.put(
+        data=invalid_doc.build_and_sign(cat_id, sk_hex),
+        token=rbac_chain.auth_token(),
+    )
+    assert (
+        resp.status_code == 422
+    ), f"Publish document, expected 422 Unprocessable Content: {resp.status_code} - {resp.text}"
+
+    # Put a submission action document with different parameters than proposal
+    invalid_doc = submission_action.copy()
+    invalid_doc.metadata["ver"] = uuid_v7.uuid_v7()
+    invalid_doc.metadata["parameters"] = {
+        "id": "0199802c-21b4-7dc8-8537-7eae5ea4c4d3",
+        "ver": "0199802c-21b4-7dc8-8537-7eae5ea4c4d3",
+    }
     resp = document.put(
         data=invalid_doc.build_and_sign(cat_id, sk_hex),
         token=rbac_chain.auth_token(),
