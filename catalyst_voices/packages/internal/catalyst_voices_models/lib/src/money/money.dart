@@ -93,7 +93,7 @@ final class Money extends Equatable implements Comparable<Money> {
     } else {
       return Money(
         currency: currency,
-        minorUnits: BigInt.parse(string) * currency.decimalDigitsFactor,
+        minorUnits: BigInt.parse(normalized) * currency.decimalDigitsFactor,
       );
     }
   }
