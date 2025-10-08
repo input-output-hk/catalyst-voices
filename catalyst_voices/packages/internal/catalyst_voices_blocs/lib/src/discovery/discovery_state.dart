@@ -1,42 +1,37 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
-final class DiscoveryCampaignCategoriesState extends Equatable {
-  final bool isLoading;
-  final LocalizedException? error;
-  final List<CampaignCategoryDetailsViewModel> categories;
+final class CampaignDatesEventsState extends Equatable {
+  final List<CampaignTimelineEventWithTitle> reviewTimelineItems;
+  final List<CampaignTimelineEventWithTitle> votingTimelineItems;
 
-  const DiscoveryCampaignCategoriesState({
-    this.isLoading = true,
-    this.error,
-    this.categories = const [],
+  const CampaignDatesEventsState({
+    this.reviewTimelineItems = const [],
+    this.votingTimelineItems = const [],
   });
 
   @override
   List<Object?> get props => [
-    isLoading,
-    error,
-    categories,
+    reviewTimelineItems,
+    votingTimelineItems,
   ];
-
-  bool get showCategories => !isLoading && categories.isNotEmpty && error == null;
-
-  bool get showError => !isLoading && error != null;
 }
 
-final class DiscoveryCurrentCampaignState extends Equatable {
+final class DiscoveryCampaignState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
   final CurrentCampaignInfoViewModel currentCampaign;
   final List<CampaignTimelineViewModel> campaignTimeline;
+  final List<CampaignCategoryDetailsViewModel> categories;
+  final CampaignDatesEventsState datesEvents;
 
-  const DiscoveryCurrentCampaignState({
+  const DiscoveryCampaignState({
     this.isLoading = true,
     this.error,
     CurrentCampaignInfoViewModel? currentCampaign,
     this.campaignTimeline = const [],
+    this.categories = const [],
+    this.datesEvents = const CampaignDatesEventsState(),
   }) : currentCampaign = currentCampaign ?? const NullCurrentCampaignInfoViewModel();
 
   @override
@@ -45,61 +40,57 @@ final class DiscoveryCurrentCampaignState extends Equatable {
     error,
     currentCampaign,
     campaignTimeline,
+    categories,
+    datesEvents,
   ];
-
-  DateRange? get reviewRegistrationStartsAt {
-    return campaignTimeline
-        .firstWhere((e) => e.type == CampaignPhaseType.reviewRegistration)
-        .timeline;
-  }
-
-  DateRange? get reviewStartsAt {
-    return campaignTimeline.firstWhere((e) => e.type == CampaignPhaseType.communityReview).timeline;
-  }
-
-  bool get showCurrentCampaign =>
-      !isLoading && currentCampaign is! NullCurrentCampaignInfoViewModel;
 
   bool get showError => !isLoading && error != null;
 
-  DateRange? get votingRegistrationStartsAt {
-    return campaignTimeline
-        .firstWhere((e) => e.type == CampaignPhaseType.votingRegistration)
-        .timeline;
-  }
-
-  DateRange? get votingStartsAt {
-    return campaignTimeline.firstWhere((e) => e.type == CampaignPhaseType.communityVoting).timeline;
+  DiscoveryCampaignState copyWith({
+    bool? isLoading,
+    LocalizedException? error,
+    CurrentCampaignInfoViewModel? currentCampaign,
+    List<CampaignTimelineViewModel>? campaignTimeline,
+    List<CampaignCategoryDetailsViewModel>? categories,
+    CampaignDatesEventsState? datesEvents,
+  }) {
+    return DiscoveryCampaignState(
+      isLoading: isLoading ?? this.isLoading,
+      error: error ?? this.error,
+      currentCampaign: currentCampaign ?? this.currentCampaign,
+      campaignTimeline: campaignTimeline ?? this.campaignTimeline,
+      categories: categories ?? this.categories,
+      datesEvents: datesEvents ?? this.datesEvents,
+    );
   }
 }
 
 final class DiscoveryMostRecentProposalsState extends Equatable {
-  final bool isLoading;
+  static const _minProposalsToShowRecent = 6;
+
   final LocalizedException? error;
   final List<ProposalBrief> proposals;
   final List<String> favoritesIds;
   final bool showComments;
 
   const DiscoveryMostRecentProposalsState({
-    this.isLoading = true,
     this.error,
     this.proposals = const [],
     this.favoritesIds = const [],
     this.showComments = false,
   });
 
+  bool get hasMinProposalsToShow => proposals.length > _minProposalsToShowRecent;
+
   @override
   List<Object?> get props => [
-    isLoading,
     error,
     proposals,
     favoritesIds,
     showComments,
   ];
 
-  bool get showError => !isLoading && error != null;
-
-  bool get showProposals => !isLoading && proposals.isNotEmpty && error == null;
+  bool get showError => error != null;
 
   DiscoveryMostRecentProposalsState copyWith({
     bool? isLoading,
@@ -109,7 +100,6 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
     bool? showComments,
   }) {
     return DiscoveryMostRecentProposalsState(
-      isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
       proposals: proposals ?? this.proposals,
       favoritesIds: favoritesIds ?? this.favoritesIds,
@@ -130,31 +120,26 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
 }
 
 final class DiscoveryState extends Equatable {
-  final DiscoveryCurrentCampaignState campaign;
-  final DiscoveryCampaignCategoriesState categories;
+  final DiscoveryCampaignState campaign;
   final DiscoveryMostRecentProposalsState proposals;
 
   const DiscoveryState({
-    this.campaign = const DiscoveryCurrentCampaignState(),
-    this.categories = const DiscoveryCampaignCategoriesState(),
+    this.campaign = const DiscoveryCampaignState(),
     this.proposals = const DiscoveryMostRecentProposalsState(),
   });
 
   @override
   List<Object?> get props => [
     campaign,
-    categories,
     proposals,
   ];
 
   DiscoveryState copyWith({
-    DiscoveryCurrentCampaignState? campaign,
-    DiscoveryCampaignCategoriesState? categories,
+    DiscoveryCampaignState? campaign,
     DiscoveryMostRecentProposalsState? proposals,
   }) {
     return DiscoveryState(
       campaign: campaign ?? this.campaign,
-      categories: categories ?? this.categories,
       proposals: proposals ?? this.proposals,
     );
   }

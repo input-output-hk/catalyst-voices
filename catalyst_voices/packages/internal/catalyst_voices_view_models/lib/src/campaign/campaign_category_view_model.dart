@@ -3,8 +3,9 @@ import 'package:catalyst_voices_assets/generated/assets.gen.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
     show CampaignCategory, SignedDocumentRef;
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart' hide Uuid;
 import 'package:equatable/equatable.dart';
+import 'package:uuid_plus/uuid_plus.dart';
 
 /// View model for campaign category details.
 ///
@@ -42,25 +43,6 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
     required this.submissionCloseDate,
   });
 
-  factory CampaignCategoryDetailsViewModel.dummy({String? id}) => CampaignCategoryDetailsViewModel(
-    id: SignedDocumentRef(id: id ?? '1)'),
-    name: 'Cardano Open:',
-    subname: 'Developers',
-    description:
-        '''Supports development of open source technology, centered around improving the Cardano developer experience and creating developer-friendly tooling that streamlines an integrated development environment.''',
-    shortDescription: '',
-    proposalsCount: 263,
-    availableFunds: const Coin(8000000),
-    totalAsk: const Coin(400000),
-    range: const ComparableRange(
-      min: Coin.fromWholeAda(15000),
-      max: Coin.fromWholeAda(100000),
-    ),
-    descriptions: List.filled(3, CategoryDescriptionViewModel.dummy()),
-    image: CategoryImageUrl.image('1'),
-    submissionCloseDate: DateTimeExt.now(),
-  );
-
   factory CampaignCategoryDetailsViewModel.fromModel(CampaignCategory model) {
     return CampaignCategoryDetailsViewModel(
       id: model.selfRef,
@@ -77,6 +59,31 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
       dos: model.dos,
       donts: model.donts,
       submissionCloseDate: model.submissionCloseDate,
+    );
+  }
+
+  /// Creates a placeholder instance for use with Skeletonizer.
+  ///
+  /// This factory should only be used when skeleton loading states are needed,
+  /// such as when wrapping widgets with Skeletonizer during data loading.
+  factory CampaignCategoryDetailsViewModel.placeholder({String? id}) {
+    return CampaignCategoryDetailsViewModel(
+      id: SignedDocumentRef(id: id ?? const Uuid().v7()),
+      name: 'Cardano Open:',
+      subname: 'Developers',
+      description:
+          '''Supports development of open source technology, centered around improving the Cardano developer experience and creating developer-friendly tooling that streamlines an integrated development environment.''',
+      shortDescription: '',
+      proposalsCount: 263,
+      availableFunds: const Coin(8000000),
+      totalAsk: const Coin(400000),
+      range: const ComparableRange(
+        min: Coin.fromWholeAda(15000),
+        max: Coin.fromWholeAda(100000),
+      ),
+      descriptions: List.filled(3, CategoryDescriptionViewModel.dummy()),
+      image: CategoryImageUrl.image('1'),
+      submissionCloseDate: DateTimeExt.now(),
     );
   }
 
