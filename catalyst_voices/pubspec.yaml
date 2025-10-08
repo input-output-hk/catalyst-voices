@@ -149,7 +149,6 @@ melos:
 
     dependency-graph:
       run: |
-
         melos exec --scope "catalyst_voices" -- \
           'pubviz print --direct-dependencies --production-dependencies --format dot > $MELOS_ROOT_PATH/docs/dependency_graph.dot'
         echo "✅ Output file: $MELOS_ROOT_PATH/docs/dependency_graph.dot"
