@@ -1,4 +1,7 @@
 abstract final class NumberUtils {
+  /// A thousands separator used to group thousands/millions/etc in a numerical value.
+  static const String thousandsSeparator = ',';
+
   /// A decimal separator used to input fractional values.
   ///
   /// For now for simplicity no localized separators are supported like commas in some locales.
@@ -54,6 +57,14 @@ extension StringDoubleExt on String {
   /// Converts commas into dots.
   /// Remains the last dot in the string, removes others.
   String normalizeDecimalSeparator() {
-    return replaceAll(',', NumberUtils.decimalSeparator).replaceAll(RegExp(r'\.(?=.*\.)'), '');
+    return replaceAll(
+      NumberUtils.thousandsSeparator,
+      NumberUtils.decimalSeparator,
+    ).replaceAll(RegExp(r'\.(?=.*\.)'), '');
+  }
+
+  /// Removes commas (thousands separator).
+  String removeThousandsSeparator() {
+    return replaceAll(NumberUtils.thousandsSeparator, '');
   }
 }
