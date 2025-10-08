@@ -16,9 +16,9 @@ final class DecimalTextInputFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    // Normalize commas to dots for consistency
+    // Remove thousands separators, remove unnecessary decimal separators.
     final normalizedValue = newValue.copyWith(
-      text: newValue.text.normalizeDecimalSeparator(),
+      text: newValue.text.removeThousandsSeparator().normalizeDecimalSeparator(),
     );
 
     // Allow only digits and a single dot

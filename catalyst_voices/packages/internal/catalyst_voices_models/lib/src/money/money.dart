@@ -72,6 +72,7 @@ final class Money extends Equatable implements Comparable<Money> {
         .replaceAll(currency.code.value, '')
         .replaceAll(r'$', '')
         .replaceAll(' ', '')
+        .removeThousandsSeparator()
         .normalizeDecimalSeparator();
 
     if (normalized.contains(NumberUtils.decimalSeparator)) {

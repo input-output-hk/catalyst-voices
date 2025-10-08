@@ -108,5 +108,28 @@ void main() {
         expect(''.normalizeDecimalSeparator(), '');
       });
     });
+
+    group('removeThousandsSeparator', () {
+      test('removes commas as thousands separators', () {
+        expect('1,234,567'.removeThousandsSeparator(), '1234567');
+      });
+
+      test('works with mixed decimal formats', () {
+        expect('1,234.56'.removeThousandsSeparator(), '1234.56');
+      });
+
+      test('returns same string if no thousands separator present', () {
+        expect('1234567'.removeThousandsSeparator(), '1234567');
+        expect('1234.56'.removeThousandsSeparator(), '1234.56');
+      });
+
+      test('handles empty string', () {
+        expect(''.removeThousandsSeparator(), '');
+      });
+
+      test('handles string with only separators', () {
+        expect(',,,'.removeThousandsSeparator(), '');
+      });
+    });
   });
 }
