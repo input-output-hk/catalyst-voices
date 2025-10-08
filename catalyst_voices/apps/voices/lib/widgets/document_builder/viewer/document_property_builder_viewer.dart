@@ -147,7 +147,7 @@ class _DocumentPropertyBuilderViewerState extends State<DocumentPropertyBuilderV
       case DocumentCurrencySchema():
         final num = schema.castValue(value);
         final money = num != null ? schema.valueToMoney(num) : null;
-        final text = money != null ? MoneyFormatter.formatExactAmount(money) : null;
+        final text = money != null ? MoneyFormatter.formatDecimal(money) : null;
 
         return _TextListItem(
           id: property.nodeId,

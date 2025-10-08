@@ -72,6 +72,7 @@ final class Money extends Equatable implements Comparable<Money> {
         .replaceAll(currency.code.value, '')
         .replaceAll(r'$', '')
         .replaceAll(' ', '')
+        .removeThousandsSeparator()
         .normalizeDecimalSeparator();
 
     if (normalized.contains(NumberUtils.decimalSeparator)) {
@@ -92,7 +93,7 @@ final class Money extends Equatable implements Comparable<Money> {
     } else {
       return Money(
         currency: currency,
-        minorUnits: BigInt.parse(string) * currency.decimalDigitsFactor,
+        minorUnits: BigInt.parse(normalized) * currency.decimalDigitsFactor,
       );
     }
   }

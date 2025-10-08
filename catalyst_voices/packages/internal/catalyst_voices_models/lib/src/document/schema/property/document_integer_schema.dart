@@ -31,6 +31,10 @@ final class DocumentCurrencySchema extends DocumentIntegerSchema {
   /// Returns `true` whether the [format] supports money with cents,
   /// `false` if only major units (i.e. whole dollars) are supported.
   bool get supportsDecimals {
+    if (moneyUnits == MoneyUnits.majorUnits) {
+      return false;
+    }
+
     final multipleOf = this.multipleOf;
     if (multipleOf == null) {
       return true;
