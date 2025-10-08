@@ -56,7 +56,7 @@ class _AccountPageState extends State<AccountPage>
                   children: [
                     Expanded(child: AccountHeaderTile()),
                     SizedBox(width: 28),
-                    Expanded(child: SizedBox()),
+                    Spacer(),
                   ],
                 ),
                 const SizedBox(height: 40),
