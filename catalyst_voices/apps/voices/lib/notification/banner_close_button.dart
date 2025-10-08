@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/app/app.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/foundation.dart';
@@ -12,7 +11,7 @@ class BannerCloseButton extends StatelessWidget {
     return VoicesIconButton(
       style: const ButtonStyle(iconSize: WidgetStatePropertyAll(18)),
       onTap: () {
-        final messengerState = AppContent.scaffoldMessengerKey.currentState;
+        final messengerState = ScaffoldMessenger.maybeOf(context);
         if (messengerState == null) {
           if (kDebugMode) {
             print('Can not dismiss banner because messenger key state is empty!');

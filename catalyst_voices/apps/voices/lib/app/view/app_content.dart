@@ -21,8 +21,6 @@ const _restorationScopeId = 'rootVoices';
 
 /// Widget where app is setup with [MaterialApp] and router is added to the widget tree.
 class AppContent extends StatelessWidget {
-  static final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
-
   final RouterConfig<Object> routerConfig;
 
   const AppContent({
@@ -64,7 +62,6 @@ final class _AppContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      scaffoldMessengerKey: AppContent.scaffoldMessengerKey,
       restorationScopeId: _restorationScopeId,
       localizationsDelegates: _localizationsDelegates,
       supportedLocales: VoicesLocalizations.supportedLocales,

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/app/app.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/notification/banner_close_button.dart';
 import 'package:catalyst_voices/notification/banner_content.dart';
@@ -114,7 +113,7 @@ class CatalystMessengerState extends State<CatalystMessenger> {
 
   /// Hiding current banner will trigger _onNotificationCompleted and process queue.
   void _hideCurrentBanner() {
-    final messengerState = AppContent.scaffoldMessengerKey.currentState;
+    final messengerState = ScaffoldMessenger.maybeOf(context);
     if (messengerState == null) {
       return;
     }
@@ -163,7 +162,7 @@ class CatalystMessengerState extends State<CatalystMessenger> {
   }
 
   Future<void> _showBanner(BannerNotification notification) async {
-    final messengerState = AppContent.scaffoldMessengerKey.currentState;
+    final messengerState = ScaffoldMessenger.maybeOf(context);
     if (messengerState == null) {
       return;
     }
