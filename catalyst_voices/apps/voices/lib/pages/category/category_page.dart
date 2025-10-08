@@ -106,10 +106,10 @@ class _CardInformation extends StatelessWidget {
   }
 }
 
-class _CategoryDetailErrorSelector extends StatelessWidget {
+class _CategoryDetailError extends StatelessWidget {
   final SignedDocumentRef categoryId;
 
-  const _CategoryDetailErrorSelector({required this.categoryId});
+  const _CategoryDetailError({required this.categoryId});
 
   @override
   Widget build(BuildContext context) {
@@ -145,8 +145,8 @@ class _CategoryDetailErrorSelector extends StatelessWidget {
   }
 }
 
-class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
-  const _CategoryDetailLoadingOrDataSelector();
+class _CategoryDetailContent extends StatelessWidget {
+  const _CategoryDetailContent();
 
   @override
   Widget build(BuildContext context) {
@@ -154,7 +154,7 @@ class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
       selector: (state) {
         return (
           show: state.isLoading,
-          data: state.category ?? CampaignCategoryDetailsViewModel.dummy(),
+          data: state.category ?? CampaignCategoryDetailsViewModel.placeholder(),
         );
       },
       builder: (context, state) {
@@ -179,8 +179,8 @@ class _CategoryPageState extends State<CategoryPage> {
         other: const EdgeInsets.symmetric(horizontal: 120),
         child: Stack(
           children: [
-            const _CategoryDetailLoadingOrDataSelector(),
-            _CategoryDetailErrorSelector(
+            const _CategoryDetailContent(),
+            _CategoryDetailError(
               categoryId: widget.categoryId,
             ),
           ].constrainedDelegate(maxWidth: 1200),
