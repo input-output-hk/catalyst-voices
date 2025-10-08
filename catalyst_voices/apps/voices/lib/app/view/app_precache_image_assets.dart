@@ -61,6 +61,22 @@ class ImagePrecacheService {
     }
   }
 
+  Future<void> _cacheImageAsset(AssetGenImage asset, BuildContext context) async {
+    try {
+      await asset.cache(context: context);
+    } catch (error) {
+      _logger.info('Failed to cache image asset: $error');
+    }
+  }
+
+  Future<void> _cacheSvgAsset(SvgGenImage svg, BuildContext context) async {
+    try {
+      await svg.cache(context: context);
+    } catch (error) {
+      _logger.info('Failed to cache SVG asset: $error');
+    }
+  }
+
   Future<void> _precacheAssets(
     BuildContext context, {
     List<SvgGenImage> svgs = const [],
@@ -73,20 +89,8 @@ class ImagePrecacheService {
       _assets.addAll(assets);
 
       await Future.wait([
-        ..._svgs.map((e) async {
-          try {
-            await e.cache(context: context);
-          } catch (error) {
-            _logger.info('Failed to cache SVG asset: $error');
-          }
-        }),
-        ..._assets.map((e) async {
-          try {
-            await e.cache(context: context);
-          } catch (error) {
-            _logger.info('Failed to cache image asset: $error');
-          }
-        }),
+        ..._svgs.map((e) => _cacheSvgAsset(e, context)),
+        ..._assets.map((e) => _cacheImageAsset(e, context)),
       ]);
 
       if (!_isInitialized.isCompleted) _isInitialized.complete(true);

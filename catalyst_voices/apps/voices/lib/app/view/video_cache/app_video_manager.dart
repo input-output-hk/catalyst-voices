@@ -34,7 +34,7 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
       // to a new VideoPlayer widget instance, even though controller state remains unchanged
       // it has to do with internal logic of VideoPlayer widget that is not exposed to us
       await controller.initialize();
-      await _applyPlaybackConfig(controller, config);
+      await controller.applyConfig(config);
       return controller;
     }
     final controller = await _initializeController(
@@ -83,17 +83,6 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
     }
   }
 
-  Future<void> _applyPlaybackConfig(
-    VideoPlayerController controller,
-    VideoPlaybackConfig config,
-  ) async {
-    await controller.setLooping(config.looping);
-    await controller.setVolume(config.volume);
-    if (config.autoPlay) {
-      await controller.play();
-    }
-  }
-
   String _createKey(String asset, String? package) {
     return '$asset${package != null ? "_$package" : "_unknown"}';
   }
@@ -117,7 +106,7 @@ class VideoManager extends ValueNotifier<VideoManagerState> {
 
     try {
       await controller.initialize();
-      await _applyPlaybackConfig(controller, config);
+      await controller.applyConfig(config);
       return controller;
     } catch (e) {
       _logger.severe('Failed to initialize video controller for $asset: $e');
@@ -197,5 +186,20 @@ class VideoManagerState extends Equatable {
       controllers: controllers ?? this.controllers,
       brightness: brightness.dataOr(this.brightness),
     );
+  }
+}
+
+/// Extension methods for [VideoPlayerController] to apply playback configuration.
+extension VideoPlaybackConfigExt on VideoPlayerController {
+  /// Applies the given [VideoPlaybackConfig] to this controller.
+  ///
+  /// This sets the looping behavior, volume, and optionally starts playback
+  /// based on the configuration.
+  Future<void> applyConfig(VideoPlaybackConfig config) async {
+    await setLooping(config.looping);
+    await setVolume(config.volume);
+    if (config.autoPlay) {
+      await play();
+    }
   }
 }
