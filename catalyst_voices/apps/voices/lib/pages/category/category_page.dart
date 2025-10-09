@@ -100,10 +100,10 @@ class _BodySmall extends StatelessWidget {
   }
 }
 
-class _CategoryDetailErrorSelector extends StatelessWidget {
+class _CategoryDetailError extends StatelessWidget {
   final SignedDocumentRef categoryId;
 
-  const _CategoryDetailErrorSelector({required this.categoryId});
+  const _CategoryDetailError({required this.categoryId});
 
   @override
   Widget build(BuildContext context) {
@@ -139,8 +139,8 @@ class _CategoryDetailErrorSelector extends StatelessWidget {
   }
 }
 
-class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
-  const _CategoryDetailLoadingOrDataSelector();
+class _CategoryDetailContent extends StatelessWidget {
+  const _CategoryDetailContent();
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +152,7 @@ class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
       selector: (state) {
         return (
           show: state.isLoading,
-          data: state.category ?? CampaignCategoryDetailsViewModel.dummy(),
+          data: state.category ?? CampaignCategoryDetailsViewModel.placeholder(),
         );
       },
       builder: (context, state) {
@@ -180,13 +180,19 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   Widget build(BuildContext context) {
     return ProposalSubmissionPhaseAware(
-      activeChild: Stack(
-        children: [
-          const _CategoryDetailLoadingOrDataSelector(),
-          _CategoryDetailErrorSelector(
-            categoryId: widget.categoryId,
-          ),
-        ].constrainedDelegate(),
+      activeChild: ResponsivePadding(
+        xs: const EdgeInsets.symmetric(horizontal: 12),
+        sm: const EdgeInsets.symmetric(horizontal: 20),
+        md: const EdgeInsets.symmetric(horizontal: 120),
+        lg: const EdgeInsets.symmetric(horizontal: 120),
+        child: Stack(
+          children: [
+            const _CategoryDetailContent(),
+            _CategoryDetailError(
+              categoryId: widget.categoryId,
+            ),
+          ].constrainedDelegate(maxWidth: 1200),
+        ),
       ),
     );
   }
