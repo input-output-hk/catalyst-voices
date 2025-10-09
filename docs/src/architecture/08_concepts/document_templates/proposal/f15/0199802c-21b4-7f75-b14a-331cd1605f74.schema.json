@@ -1037,7 +1037,7 @@
                         "goals_kpi": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Clear Goals & KPIs:",
-                            "title": "I confirm the proposal includes clear objectives with both Output Metrics (what proposal did) and Adoption-Focused Metrics (what effect proposal had).",
+                            "title": "I confirm that the proposal includes clear objectives with both Output Metrics (what proposal did) and Adoption-Focused Metrics (what effect proposal had).",
                             "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
                         },
                         "pathway_adoption": {

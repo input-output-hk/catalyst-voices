@@ -1018,13 +1018,13 @@
                         "legal_entity": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Legal Entity:",
-                            "title": "I confirm the lead applicant is a verified legal business entity.",  
+                            "title": "I confirm that the lead applicant is a verified legal business entity.",  
                             "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
                         },
                         "track_record": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Track Record & Revenue:",
-                            "title": "I confirm the lead org has a ≥2-year track record, and the consortium collectively has ≥$5M in verifiable annual revenue.",
+                            "title": "I confirm that the lead org has a ≥2-year track record, and the consortium collectively has ≥$5M in verifiable annual revenue.",
                             "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
                         },
                         "tier_one_collaboration": {
