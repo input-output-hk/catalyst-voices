@@ -3,16 +3,23 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+typedef VoicesVideoErrorBuilder =
+    Widget Function(BuildContext context, Object? error, StackTrace? stackTrace);
+
 class VoicesVideoPlayer extends StatefulWidget {
   final VideoCacheKey asset;
   final BoxFit fit;
   final Clip clipBehavior;
+  final VoicesVideoErrorBuilder? errorBuilder;
+  final VideoPlaybackConfig playbackConfig;
 
   const VoicesVideoPlayer({
     super.key,
     required this.asset,
     this.fit = BoxFit.cover,
     this.clipBehavior = Clip.hardEdge,
+    this.errorBuilder,
+    this.playbackConfig = const VideoPlaybackConfig(),
   });
 
   @override
@@ -33,8 +40,9 @@ class _VoicesVideoPlayerState extends State<VoicesVideoPlayer> with AutomaticKee
       future: _future,
       builder: (context, snapshot) {
         final controller = snapshot.data;
-        if (controller == null) {
-          return const SizedBox.expand();
+        if (snapshot.hasError || controller == null) {
+          return widget.errorBuilder?.call(context, snapshot.error, snapshot.stackTrace) ??
+              const SizedBox.expand();
         }
 
         return FittedBox(
@@ -58,6 +66,9 @@ class _VoicesVideoPlayerState extends State<VoicesVideoPlayer> with AutomaticKee
   }
 
   Future<VideoPlayerController> _getController() {
-    return VideoManagerScope.of(context).createOrReinitializeController(widget.asset);
+    return VideoManagerScope.of(context).createOrReinitializeController(
+      widget.asset,
+      config: widget.playbackConfig,
+    );
   }
 }
