@@ -81,48 +81,18 @@ pub(crate) struct DocumentIndexQueryFilter {
     /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
     reply: Option<IdAndVerRefDocumented>,
-    /// ## Brand
+    /// ## Parameters
     ///
-    /// This is a
-    /// [brand reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#brand_id)
-    /// to a brand document which defines the brand the document falls under.
-    /// This fields can match any brand reference that matches the defined
+    /// This is a reference to a configuration document.
+    /// This fields can match any reference that matches the defined
     /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
     /// and/or
     /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
     ///
-    /// Whether a Document Type has a brand reference is defined by its
-    /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
+    /// Whether a Document Type has a brand, campaign, category etc. reference is defined
+    /// by its [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
     #[oai(skip_serializing_if_is_none)]
-    brand: Option<IdAndVerRefDocumented>,
-    /// ## Campaign
-    ///
-    /// This is a
-    /// [campaign reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#campaign_id)
-    /// to a campaign document which defines the campaign the document falls under.
-    /// This fields can match any campaign reference that matches the defined
-    /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
-    /// and/or
-    /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
-    ///
-    /// Whether a Document Type has a campaign reference is defined by its
-    /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
-    #[oai(skip_serializing_if_is_none)]
-    campaign: Option<IdAndVerRefDocumented>,
-    /// ## Category
-    ///
-    /// This is a
-    /// [category reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#category_id)
-    /// to a category document which defines the category the document falls under.
-    /// This fields can match any category reference that matches the defined
-    /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
-    /// and/or
-    /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
-    ///
-    /// Whether a Document Type has a category reference is defined by its
-    /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
-    #[oai(skip_serializing_if_is_none)]
-    category: Option<IdAndVerRefDocumented>,
+    parameters: Option<IdAndVerRefDocumented>,
 }
 
 impl Example for DocumentIndexQueryFilter {
@@ -134,7 +104,7 @@ impl Example for DocumentIndexQueryFilter {
             doc_ref: Some(IdAndVerRefDocumented::example_id_ref()),
             template: Some(IdAndVerRefDocumented::example_id_and_ver_ref()),
             reply: Some(IdAndVerRefDocumented::example()),
-            ..Default::default()
+            parameters: Some(IdAndVerRefDocumented::example()),
         }
     }
 }
@@ -181,14 +151,8 @@ impl TryFrom<DocumentIndexQueryFilter> for DocsQueryFilter {
         if let Some(reply) = value.reply {
             db_filter = db_filter.with_reply(reply.try_into()?);
         }
-        if let Some(brand) = value.brand {
-            db_filter = db_filter.with_brand_id(brand.try_into()?);
-        }
-        if let Some(campaign) = value.campaign {
-            db_filter = db_filter.with_campaign_id(campaign.try_into()?);
-        }
-        if let Some(category) = value.category {
-            db_filter = db_filter.with_category_id(category.try_into()?);
+        if let Some(parameters) = value.parameters {
+            db_filter = db_filter.with_parameters(parameters.try_into()?);
         }
         // TODO process also the rest of the fields like `ref`, `template` etc.
         Ok(db_filter)

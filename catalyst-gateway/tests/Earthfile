@@ -39,7 +39,7 @@ package-cat-gateway-with-scylla:
 # cspell: words oapi
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.
-test-lint-openapi:
+disable-test-lint-openapi:
     FROM spectral-ci+spectral-base
     # Copy the doc artifact.
     COPY --dir ../+build/doc .

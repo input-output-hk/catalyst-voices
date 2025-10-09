@@ -21,12 +21,8 @@ pub(crate) struct DocsQueryFilter {
     template: Option<DocumentRef>,
     /// `metadata->'reply'` field
     reply: Option<DocumentRef>,
-    /// `metadata->'brand_id'` field
-    brand_id: Option<DocumentRef>,
-    /// `metadata->'campaign_id'` field
-    campaign_id: Option<DocumentRef>,
-    /// `metadata->'category_id'` field
-    category_id: Option<DocumentRef>,
+    /// `metadata->'parameters'` field
+    parameters: Option<DocumentRef>,
 }
 
 impl Display for DocsQueryFilter {
@@ -72,25 +68,11 @@ impl Display for DocsQueryFilter {
                 reply.conditional_stmt("metadata->'reply'")
             )?;
         }
-        if let Some(brand_id) = &self.brand_id {
+        if let Some(parameters) = &self.parameters {
             write!(
                 &mut query,
                 " AND {}",
-                brand_id.conditional_stmt("metadata->'brand_id'")
-            )?;
-        }
-        if let Some(campaign_id) = &self.campaign_id {
-            write!(
-                &mut query,
-                " AND {}",
-                campaign_id.conditional_stmt("metadata->'campaign_id'")
-            )?;
-        }
-        if let Some(category_id) = &self.category_id {
-            write!(
-                &mut query,
-                " AND {}",
-                category_id.conditional_stmt("metadata->'category_id'")
+                parameters.conditional_stmt("metadata->'parameters'")
             )?;
         }
 
@@ -170,35 +152,13 @@ impl DocsQueryFilter {
         }
     }
 
-    /// Set the `metadata->'brand_id'` field filter condition
-    pub fn with_brand_id(
+    /// Set the `metadata->'parameters'` field filter condition
+    pub fn with_parameters(
         self,
-        brand_id: DocumentRef,
+        parameters: DocumentRef,
     ) -> Self {
         DocsQueryFilter {
-            brand_id: Some(brand_id),
-            ..self
-        }
-    }
-
-    /// Set the `metadata->'campaign_id'` field filter condition
-    pub fn with_campaign_id(
-        self,
-        campaign_id: DocumentRef,
-    ) -> Self {
-        DocsQueryFilter {
-            campaign_id: Some(campaign_id),
-            ..self
-        }
-    }
-
-    /// Set the `metadata->'category_id'` field filter condition
-    pub fn with_category_id(
-        self,
-        category_id: DocumentRef,
-    ) -> Self {
-        DocsQueryFilter {
-            category_id: Some(category_id),
+            parameters: Some(parameters),
             ..self
         }
     }
