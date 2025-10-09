@@ -50,7 +50,7 @@ dart run build_runner build --delete-conflicting-outputs
 or melos
 
 ```bash
-melos build_runner_repository
+melos build-runner-repository
 ```
 
 Build migration test files with
