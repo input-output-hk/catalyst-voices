@@ -190,7 +190,7 @@ class VideoManagerState extends Equatable {
 }
 
 /// Extension methods for [VideoPlayerController] to apply playback configuration.
-extension VideoPlaybackConfigExt on VideoPlayerController {
+extension on VideoPlayerController {
   /// Applies the given [VideoPlaybackConfig] to this controller.
   ///
   /// This sets the looping behavior, volume, and optionally starts playback
