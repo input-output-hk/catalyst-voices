@@ -27,7 +27,7 @@ impl EqOrRangedUuid {
             Self::Range { min, max } => {
                 format!("{table_field} >= '{min}' AND {table_field} <= '{max}'")
             },
-            Self::In(ids) if ids.is_empty() => "TRUE".to_string(),
+            Self::In(ids) if ids.is_empty() => "FALSE".to_string(),
             Self::In(ids) => {
                 format!(
                     "{table_field} in ({})",
