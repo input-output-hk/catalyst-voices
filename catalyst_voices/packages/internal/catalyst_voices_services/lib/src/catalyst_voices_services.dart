@@ -31,6 +31,7 @@ export 'share/share_app_resource_url_resolver.dart';
 export 'share/share_reviews_resource_url_resolver.dart';
 export 'share/share_service.dart' show ShareService;
 export 'sync/sync_manager.dart' show SyncManager;
+export 'uploader/uploader_service.dart' show UploaderService;
 export 'user/keychain_signer_service.dart' show KeychainSignerService;
 export 'user/registration_status_poller.dart';
 export 'user/signer_service.dart';

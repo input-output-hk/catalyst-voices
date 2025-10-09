@@ -1,12 +1,10 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/dependency/dependencies.dart';
-import 'package:catalyst_voices/pages/registration/registration_details_panel.dart';
-import 'package:catalyst_voices/pages/registration/registration_error_handler.dart';
-import 'package:catalyst_voices/pages/registration/registration_info_panel.dart';
-import 'package:catalyst_voices/pages/registration/registration_signal_handler.dart';
 import 'package:catalyst_voices/pages/registration/registration_type.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_confirm_dialog.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_dialog_scaffold.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_panels_dialog.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -45,43 +43,8 @@ class _RegistrationDialogState extends State<RegistrationDialog> {
       value: _cubit,
       child: PopScope(
         canPop: false,
-        onPopInvokedWithResult: (didPop, result) {
-          unawaited(
-            _handlePop(
-              context,
-              didPop: didPop,
-            ),
-          );
-        },
-        child: ScaffoldMessenger(
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: RegistrationSignalHandler(
-              child: RegistrationErrorHandler(
-                child: BlocSelector<RegistrationCubit, RegistrationState, bool>(
-                  selector: (state) {
-                    final isAccountCompleted = state.step is AccountCompletedStep;
-                    final isRecovered =
-                        state.step ==
-                        const RecoverWithSeedPhraseStep(
-                          stage: RecoverWithSeedPhraseStage.success,
-                        );
-
-                    return !isAccountCompleted && !isRecovered;
-                  },
-                  builder: (context, showCloseButton) {
-                    return VoicesTwoPaneDialog(
-                      key: const Key('RegistrationDialog'),
-                      left: const RegistrationInfoPanel(),
-                      right: const RegistrationDetailsPanel(),
-                      showCloseButton: showCloseButton,
-                    );
-                  },
-                ),
-              ),
-            ),
-          ),
-        ),
+        onPopInvokedWithResult: (didPop, result) => _handlePop(context, didPop: didPop),
+        child: const RegistrationDialogScaffold(child: RegistrationPanelsDialog()),
       ),
     );
   }

@@ -8,7 +8,7 @@ class EditRolesDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDesktopInfoDialog(
+    return VoicesInfoDialog(
       icon: VoicesAssets.icons.userGroup.buildIcon(),
       title: Text(context.l10n.editRolesDialogTitle),
       message: Text(context.l10n.editRolesDialogMessage),

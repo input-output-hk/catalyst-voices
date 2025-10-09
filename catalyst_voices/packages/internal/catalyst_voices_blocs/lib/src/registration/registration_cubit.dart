@@ -65,9 +65,17 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     _walletLinkCubit.errorStream.listen(emitError);
     _recoverCubit.errorStream.listen(emitError);
 
+    final getStarted = RegistrationGetStartedState(
+      availableMethods: [
+        if (CatalystPlatform.isWeb) CreateAccountType.createNew,
+        CreateAccountType.recover,
+      ],
+    );
+
     // Emits initialization state
     emit(
       state.copyWith(
+        getStarted: getStarted,
         baseProfileStateData: _baseProfileCubit.state,
         keychainStateData: _keychainCreationCubit.state,
         walletLinkStateData: _walletLinkCubit.state,

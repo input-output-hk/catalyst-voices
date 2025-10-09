@@ -2,6 +2,7 @@ name: catalyst_voices_view_models
 description: Catalyst Voices ViewModels.
 version: 0.1.0+1
 publish_to: none
+resolution: workspace
 
 environment:
   sdk: ">=3.9.0 <4.0.0"
@@ -28,6 +29,7 @@ dependencies:
     sdk: flutter
   formz: ^0.8.0
   intl: ^0.20.2
+  permission_handler: ^12.0.1
   uuid_plus: ^0.1.0
 
 dev_dependencies:

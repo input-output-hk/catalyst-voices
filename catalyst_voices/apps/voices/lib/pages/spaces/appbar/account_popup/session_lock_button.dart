@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices/widgets/buttons/voices_responsive_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -11,10 +11,10 @@ class SessionLockButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesOutlinedButton(
+    return VoicesResponsiveOutlinedButton(
       key: const Key('LockButton'),
       onTap: () => unawaited(context.read<SessionCubit>().lock()),
-      leading: VoicesAssets.icons.lockClosed.buildIcon(),
+      icon: VoicesAssets.icons.lockClosed.buildIcon(),
       child: Text(context.l10n.lock),
     );
   }
