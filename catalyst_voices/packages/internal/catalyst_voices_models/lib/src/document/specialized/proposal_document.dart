@@ -22,7 +22,6 @@ final class ProposalDocument extends Equatable {
   static final requestedFundsNodeId = DocumentNodeId.fromString('summary.budget.requestedFunds');
   static final durationNodeId = DocumentNodeId.fromString('summary.time.duration');
   static final authorNameNodeId = DocumentNodeId.fromString('setup.proposer.applicant');
-  static final categoryNodeId = DocumentNodeId.fromString('campaign_category');
   static final categoryDetailsNodeId = DocumentNodeId.fromString(
     'campaign_category.category_details',
   );
@@ -51,7 +50,6 @@ final class ProposalDocument extends Equatable {
     requestedFundsNodeId,
     durationNodeId,
     authorNameNodeId,
-    categoryNodeId,
     categoryDetailsNodeId,
     categoryDetailsNameNodeId,
     milestonesNodeId,
