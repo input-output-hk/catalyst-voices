@@ -6,7 +6,7 @@ default:
 
 # Linking of all packages
 setup-code:
-    melos bs
+    melos bootstrap
 
 # Builds generated code
 generate-code:
