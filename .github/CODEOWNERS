@@ -2,6 +2,8 @@
 
 /catalyst_voices/ @dt-iohk @damian-molinski @LynxLynxx
 
+/catalyst_voices/apps/voices/e2e_tests/ @emiride
+
 /catalyst_voices/packages/libs/catalyst_cardano/ @stevenj @neil-iohk @nathanbogale @damian-molinski 
 
 /catalyst_voices/packages/libs/catalyst_cardano_serialization/ @stevenj @neil-iohk @nathanbogale @damian-molinski 

@@ -11,11 +11,6 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-void _launchUrl(String url) {
-  unawaited(launchUrl(url.getUri()));
-}
 
 class ActionIconButton extends StatelessWidget {
   final VoidCallback? onTap;
@@ -258,7 +253,7 @@ class VoicesBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesOutlinedButton(
       onTap: onTap,
-      child: Text(context.l10n.back),
+      child: Text(context.l10n.back, semanticsIdentifier: 'BackButton'),
     );
   }
 }
@@ -285,7 +280,9 @@ class VoicesEditCancelButton extends StatelessWidget {
 
     if (hasError) {
       return VoicesFilledButton(
-        backgroundColor: theme.colorScheme.error,
+        style: FilledButton.styleFrom(
+          backgroundColor: theme.colorScheme.error,
+        ),
         onTap: onTap,
         child: Text(
           text,
@@ -327,59 +324,63 @@ enum VoicesEditCancelButtonStyle {
 }
 
 /// A "Learn More" button that redirects usually to an external content.
-class VoicesLearnMoreFilledButton extends StatelessWidget {
-  final VoidCallback onTap;
+class VoicesLearnMoreFilledButton extends StatelessWidget with LaunchUrlMixin {
+  final Uri? uri;
 
   const VoicesLearnMoreFilledButton({
     super.key,
-    required this.onTap,
+    this.uri,
   });
-
-  factory VoicesLearnMoreFilledButton.url({
-    Key? key,
-    required String url,
-  }) {
-    return VoicesLearnMoreFilledButton(
-      key: key,
-      onTap: () => _launchUrl(url),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
+    final uri = this.uri;
+
     return VoicesFilledButton(
       key: const Key('LearnMoreButton'),
       trailing: VoicesAssets.icons.externalLink.buildIcon(),
-      onTap: onTap,
-      child: Text(context.l10n.learnMore),
+      onTap: uri == null ? null : () => launchUri(uri),
+      child: Text(context.l10n.learnMore, semanticsIdentifier: 'LearnMoreButton'),
     );
   }
 }
 
-class VoicesLearnMoreTextButton extends StatelessWidget {
-  final VoidCallback onTap;
+class VoicesLearnMoreIconButton extends StatelessWidget with LaunchUrlMixin {
+  final Uri? uri;
 
-  const VoicesLearnMoreTextButton({
+  const VoicesLearnMoreIconButton({
     super.key,
-    required this.onTap,
+    this.uri,
   });
-
-  factory VoicesLearnMoreTextButton.url({
-    Key? key,
-    required String url,
-  }) {
-    return VoicesLearnMoreTextButton(
-      key: key,
-      onTap: () => _launchUrl(url),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
+    final uri = this.uri;
+
+    return VoicesIconButton.primary(
+      key: const Key('LearnMoreButton'),
+      onTap: uri == null ? null : () => launchUri(uri),
+      child: VoicesAssets.icons.externalLink.buildIcon(),
+    );
+  }
+}
+
+class VoicesLearnMoreTextButton extends StatelessWidget with LaunchUrlMixin {
+  final Uri? uri;
+
+  const VoicesLearnMoreTextButton({
+    super.key,
+    this.uri,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final uri = this.uri;
+
     return VoicesTextButton(
       key: const Key('LearnMoreButton'),
       trailing: VoicesAssets.icons.externalLink.buildIcon(),
-      onTap: onTap,
+      onTap: uri == null ? null : () => launchUri(uri),
       child: Text(context.l10n.learnMore),
     );
   }
@@ -396,8 +397,9 @@ class VoicesNextButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
+      key: const Key('NextButton'),
       onTap: onTap,
-      child: Text(context.l10n.next),
+      child: Text(context.l10n.next, semanticsIdentifier: 'NextButton'),
     );
   }
 }

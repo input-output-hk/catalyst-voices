@@ -10,7 +10,7 @@ license = "Apache-2.0"
 crate-type = ["cdylib", "staticlib", "rlib"]
 
 [dependencies]
-flutter_rust_bridge = "=2.11.1"
+flutter_rust_bridge = { version = "2.11.1", git = "https://github.com/input-output-hk/catalyst_flutter_rust_bridge", rev = "24888fec8f4cab3999e461fc8c6e065f62560d63", package = "flutter_rust_bridge" }
 ed25519-bip32 = "0.4.1"
 hmac = "0.12.1"
 pbkdf2 = "0.12.2"
@@ -19,6 +19,12 @@ bip39 = "2.0.0"
 sha2 = "0.10"
 bip32 = "0.5.1"
 hex = "0.4.3"
+# TODO(dt-iohk): pinned to last working version, this issue reappeared: https://github.com/wasm-bindgen/wasm-bindgen/issues/3315
+wasm-bindgen = "=0.2.101"
+
+# TODO(dt-iohk) remove this section when wasm-bindgen is no longer pinned
+[package.metadata.cargo-machete]
+ignored = ["wasm-bindgen"]
 
 [lints.rust]
 warnings = "deny"
@@ -49,7 +55,6 @@ exit = "deny"
 get_unwrap = "deny"
 index_refutable_slice = "deny"
 indexing_slicing = "deny"
-match_on_vec_items = "deny"
 match_wild_err_arm = "deny"
 missing_panics_doc = "deny"
 panic = "deny"

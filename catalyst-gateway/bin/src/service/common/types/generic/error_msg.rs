@@ -1,5 +1,7 @@
 //! Generic Error Messages
 
+// cspell: words impls
+
 use std::sync::LazyLock;
 
 use const_format::concatcp;
@@ -34,7 +36,7 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
         max_length: Some(MAX_LENGTH),
         min_length: Some(MIN_LENGTH),
         pattern: Some(PATTERN.to_string()),
-        ..poem_openapi::registry::MetaSchema::ANY
+        ..MetaSchema::ANY
     }
 });
 
@@ -55,8 +57,15 @@ impl_string_types!(
     is_valid
 );
 
+#[allow(clippy::derivable_impls)]
+impl Default for ErrorMessage {
+    fn default() -> Self {
+        Self(String::default())
+    }
+}
+
 impl Example for ErrorMessage {
-    /// An example 32 bytes ED25519 Public Key.
+    /// An example of error message.
     fn example() -> Self {
         Self(EXAMPLE.to_owned())
     }

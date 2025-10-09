@@ -1,5 +1,29 @@
 project: {
 	name: "voices"
+	ci: targets: {
+		"package": {
+			secrets: [
+				{
+					provider: "aws"
+					path:     "global/ci/sentry"
+					maps: {
+						"token":   "SENTRY_AUTH_TOKEN"
+					}
+				},
+			]
+		}
+		"docker": {
+			secrets: [
+				{
+					provider: "aws"
+					path:     "global/ci/sentry"
+					maps: {
+						"token":   "SENTRY_AUTH_TOKEN"
+					}
+				},
+			]
+		}
+	}
 	deployment: {
 		on: {
 			merge: {}

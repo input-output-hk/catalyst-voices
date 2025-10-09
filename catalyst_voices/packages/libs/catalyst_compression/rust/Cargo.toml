@@ -1,0 +1,60 @@
+[package]
+name = "catalyst_compression"
+version = "0.1.0"
+edition = "2021"
+homepage = "https://input-output-hk.github.io/catalyst-voices"
+repository = "https://github.com/input-output-hk/catalyst-voices"
+license = "Apache-2.0"
+
+[lib]
+crate-type = ["cdylib", "staticlib", "rlib"]
+
+[dependencies]
+flutter_rust_bridge = { version = "2.11.1", git = "https://github.com/input-output-hk/catalyst_flutter_rust_bridge.git", rev = "24888fec8f4cab3999e461fc8c6e065f62560d63", package = "flutter_rust_bridge" }
+anyhow = "1.0.91"
+brotli = "7.0.0"
+zstd = "0.13.2"
+# TODO(dt-iohk): pinned to last working version, this issue reappeared: https://github.com/wasm-bindgen/wasm-bindgen/issues/3315
+wasm-bindgen = "=0.2.101"
+
+# TODO(dt-iohk) remove this section when wasm-bindgen is no longer pinned
+[package.metadata.cargo-machete]
+ignored = ["wasm-bindgen"]
+
+[lints.rust]
+warnings = "deny"
+missing_docs = "deny"
+let_underscore_drop = "deny"
+non_ascii_idents = "deny"
+single_use_lifetimes = "deny"
+trivial_casts = "deny"
+trivial_numeric_casts = "deny"
+# TODO(bkioshn): Revisit the errors https://github.com/input-output-hk/catalyst-voices/issues/1319
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }
+
+[lints.rustdoc]
+broken_intra_doc_links = "deny"
+invalid_codeblock_attributes = "deny"
+invalid_html_tags = "deny"
+invalid_rust_codeblocks = "deny"
+bare_urls = "deny"
+unescaped_backticks = "deny"
+
+[lints.clippy]
+pedantic = { level = "deny", priority = -1 }
+unwrap_used = "deny"
+expect_used = "deny"
+todo = "deny"
+unimplemented = "deny"
+exit = "deny"
+get_unwrap = "deny"
+index_refutable_slice = "deny"
+indexing_slicing = "deny"
+match_wild_err_arm = "deny"
+missing_panics_doc = "deny"
+panic = "deny"
+string_slice = "deny"
+unchecked_duration_subtraction = "deny"
+unreachable = "deny"
+missing_docs_in_private_items = "deny"
+arithmetic_side_effects = "deny"

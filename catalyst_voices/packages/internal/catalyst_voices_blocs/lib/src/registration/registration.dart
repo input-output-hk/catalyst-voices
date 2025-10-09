@@ -1,6 +1,8 @@
 export 'cubits/keychain_creation_cubit.dart' show KeychainCreationManager;
+export 'cubits/recover_cubit.dart' show recoverTestWords;
 export 'cubits/wallet_link_cubit.dart' show WalletLinkManager;
 export 'registration_cubit.dart';
+export 'registration_get_started_state.dart';
 export 'registration_state.dart';
 export 'selectors/bloc_base_profile_selector.dart';
 export 'selectors/bloc_recover_selector.dart';

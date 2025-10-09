@@ -47,7 +47,7 @@ class VoicesModalsExample extends StatelessWidget {
                   context: context,
                   routeSettings: const RouteSettings(name: '/desktop-info'),
                   builder: (context) {
-                    return VoicesDesktopInfoDialog(
+                    return VoicesInfoDialog(
                       icon: VoicesAssets.icons.x.buildIcon(),
                       title: const Text('Desktop modal'),
                       message: const Text('Message'),

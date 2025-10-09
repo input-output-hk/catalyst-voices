@@ -75,10 +75,7 @@ fn parse_parameter(param: &str) -> Result<(String, u64)> {
     };
     let whence = &results[1];
     let Ok(when) = results[2].parse::<u64>() else {
-        bail!(
-            "Not a valid `as_at` parameter. Invalid {} specified.",
-            whence
-        );
+        bail!("Not a valid `as_at` parameter. Invalid {whence} specified.",);
     };
     Ok((whence.to_owned(), when))
 }
@@ -124,7 +121,7 @@ impl Type for AsAt {
     }
 
     fn raw_element_iter<'a>(
-        &'a self,
+        &'a self
     ) -> Box<dyn Iterator<Item = &'a Self::RawElementValueType> + 'a> {
         Box::new(self.as_raw_value().into_iter())
     }
@@ -164,7 +161,10 @@ impl From<AsAt> for SlotNo {
 }
 
 impl Display for AsAt {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut fmt::Formatter<'_>,
+    ) -> fmt::Result {
         write!(f, "{}:{}", self.0 .0, self.0 .1)
     }
 }

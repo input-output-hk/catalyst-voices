@@ -20,7 +20,8 @@ use crate::{
 
 /// Process the endpoint operation
 pub(crate) async fn cip36_registrations(
-    lookup: Option<StakeOrVoter>, asat: Option<SlotNo>,
+    lookup: Option<StakeOrVoter>,
+    asat: Option<SlotNo>,
     _page: common::types::generic::query::pagination::Page,
     _limit: common::types::generic::query::pagination::Limit,
 ) -> AllRegistration {
@@ -44,8 +45,7 @@ pub(crate) async fn cip36_registrations(
                     Ok(a) => a,
                     Err(err) => {
                         return AllRegistration::handle_error(&anyhow::anyhow!(
-                            "Given stake pub key is corrupt {:?}",
-                            err
+                            "Given stake pub key is corrupt {err:?}",
                         ));
                     },
                 };
@@ -70,7 +70,7 @@ pub(crate) async fn cip36_registrations(
                 return snapshot(session, asat).await
             },
         };
-    };
+    }
 
     // If _for is not defined, use the stake addresses defined for Role0 in the _auth
     // parameter. _auth not yet implemented, so put placeholder for that, and return not

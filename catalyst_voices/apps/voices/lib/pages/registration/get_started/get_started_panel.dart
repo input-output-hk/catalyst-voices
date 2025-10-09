@@ -1,12 +1,12 @@
+import 'dart:async';
+
+import 'package:catalyst_voices/pages/registration/get_started/create_account_methods.dart';
 import 'package:catalyst_voices/pages/registration/no_wallet_found_dialog.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
-import 'package:catalyst_voices/pages/registration/widgets/registration_tile.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class GetStartedPanel extends StatelessWidget {
@@ -37,27 +37,10 @@ class GetStartedPanel extends StatelessWidget {
         ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: CreateAccountType.values
-                .map<Widget>((type) {
-                  return RegistrationTile(
-                    key: Key(type.toString()),
-                    icon: type._icon,
-                    title: type._getTitle(context.l10n),
-                    subtitle: type._getSubtitle(context.l10n),
-                    onTap: () async {
-                      switch (type) {
-                        case CreateAccountType.createNew:
-                          await _handleCreateNewAccount(context);
-                        case CreateAccountType.recover:
-                          RegistrationCubit.of(context).recoverKeychain();
-                      }
-                    },
-                  );
-                })
-                .separatedBy(const SizedBox(height: 12))
-                .toList(),
+          child: CreateAccountMethods(
+            onTap: (value) {
+              unawaited(_onCreateAccountTypeSelected(context, type: value));
+            },
           ),
         ),
       ],
@@ -79,20 +62,16 @@ class GetStartedPanel extends StatelessWidget {
       RegistrationCubit.of(context).createNewAccount();
     }
   }
-}
 
-extension _CreateAccountTypeExt on CreateAccountType {
-  SvgGenImage get _icon => switch (this) {
-    CreateAccountType.createNew => VoicesAssets.icons.colorSwatch,
-    CreateAccountType.recover => VoicesAssets.icons.download,
-  };
-
-  String _getSubtitle(VoicesLocalizations l10n) {
-    return l10n.accountCreationOnThisDevice;
+  Future<void> _onCreateAccountTypeSelected(
+    BuildContext context, {
+    required CreateAccountType type,
+  }) async {
+    switch (type) {
+      case CreateAccountType.createNew:
+        await _handleCreateNewAccount(context);
+      case CreateAccountType.recover:
+        RegistrationCubit.of(context).recoverKeychain();
+    }
   }
-
-  String _getTitle(VoicesLocalizations l10n) => switch (this) {
-    CreateAccountType.createNew => l10n.accountCreationCreate,
-    CreateAccountType.recover => l10n.accountCreationRecover,
-  };
 }

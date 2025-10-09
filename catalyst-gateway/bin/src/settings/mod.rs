@@ -30,7 +30,7 @@ pub(crate) mod signed_doc;
 mod str_env_var;
 
 /// Default address to start service on, '0.0.0.0:3030'.
-const ADDRESS_DEFAULT: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(0, 0, 0, 0)), 3030);
+const ADDRESS_DEFAULT: SocketAddr = SocketAddr::new(IpAddr::V4(Ipv4Addr::UNSPECIFIED), 3030);
 
 /// Default Github repo owner
 const GITHUB_REPO_OWNER_DEFAULT: &str = "input-output-hk";
@@ -246,7 +246,7 @@ impl EnvVars {
     pub(crate) fn validate() -> anyhow::Result<()> {
         let mut status = Ok(());
 
-        let url = ENV_VARS.event_db.url.as_str();
+        let url = ENV_VARS.event_db.url();
         if let Err(error) = tokio_postgres::config::Config::from_str(url) {
             error!(error=%error, url=url, "Invalid Postgres DB URL.");
             status = Err(anyhow!("Environment Variable Validation Error."));
@@ -282,44 +282,8 @@ impl Settings {
     }
 
     /// Get the current Event DB settings for this service.
-    pub(crate) fn event_db_settings() -> (
-        &'static str,
-        Option<&'static str>,
-        Option<&'static str>,
-        u32,
-        u32,
-        u32,
-        u32,
-    ) {
-        let url = ENV_VARS.event_db.url.as_str();
-        let user = ENV_VARS
-            .event_db
-            .username
-            .as_ref()
-            .map(StringEnvVar::as_str);
-        let pass = ENV_VARS
-            .event_db
-            .password
-            .as_ref()
-            .map(StringEnvVar::as_str);
-
-        let max_connections = ENV_VARS.event_db.max_connections;
-
-        let max_lifetime = ENV_VARS.event_db.max_lifetime;
-
-        let min_idle = ENV_VARS.event_db.min_idle;
-
-        let connection_timeout = ENV_VARS.event_db.connection_timeout;
-
-        (
-            url,
-            user,
-            pass,
-            max_connections,
-            max_lifetime,
-            min_idle,
-            connection_timeout,
-        )
+    pub(crate) fn event_db_settings() -> &'static event_db::EnvVars {
+        &ENV_VARS.event_db
     }
 
     /// Get the Persistent & Volatile Cassandra DB config for this service.

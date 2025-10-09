@@ -9,12 +9,13 @@ class VerificationEmailSendDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDesktopInfoDialog(
+    return VoicesInfoDialog(
       icon: VoicesAssets.icons.informationCircle.buildIcon(color: context.colors.iconsPrimary),
       title: Text(context.l10n.verificationEmailSendTitle),
       message: Text(context.l10n.verificationEmailSendMessage),
       subMessage: Text(context.l10n.verificationEmailSendSubMessage),
       action: VoicesFilledButton(
+        key: const Key('VerificationEmailOkButton'),
         onTap: () => Navigator.of(context).pop(),
         child: Text(context.l10n.ok),
       ),

@@ -8,8 +8,12 @@ import 'package:catalyst_voices/widgets/indicators/voices_loading_indicator.dart
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+final _logger = Logger('AppSplashScreenManager');
 
 /// Hides the splash screen after a frame is drawn when the widget initializes.
 class AppSplashScreenManager extends StatefulWidget {
@@ -44,10 +48,14 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
   bool _areDocumentsSynced = false;
   bool _areImagesAndVideosCached = false;
   bool _messageShownEnoughTime = true;
+  bool _fontsAreReady = false;
+
+  bool get _isReady =>
+      _areDocumentsSynced && _areImagesAndVideosCached && _messageShownEnoughTime && _fontsAreReady;
 
   @override
   Widget build(BuildContext context) {
-    if (_areDocumentsSynced && _areImagesAndVideosCached && _messageShownEnoughTime) {
+    if (_isReady) {
       return widget.child;
     }
 
@@ -67,8 +75,23 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
         AppSplashScreenManager.hideSplashScreen();
       }
     });
+
     unawaited(_handleDocumentsSync());
     unawaited(_handleImageAndVideoPrecache());
+    unawaited(_handleFonts());
+  }
+
+  void _finishStartupProfilerIfReady() {
+    if (!_isReady) {
+      return;
+    }
+
+    final profiler = Dependencies.instance.get<CatalystStartupProfiler>();
+    if (!profiler.ongoing) {
+      return;
+    }
+
+    profiler.finish();
   }
 
   Future<void> _handleDocumentsSync() async {
@@ -81,7 +104,22 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     if (mounted) {
       setState(() {
         _areDocumentsSynced = true;
+        _finishStartupProfilerIfReady();
       });
+    }
+  }
+
+  Future<void> _handleFonts() async {
+    try {
+      await GoogleFonts.pendingFonts();
+    } catch (error, stackTrace) {
+      _logger.warning('Load pending google fonts', error, stackTrace);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _fontsAreReady = true;
+        });
+      }
     }
   }
 
@@ -97,6 +135,7 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     if (mounted) {
       setState(() {
         _areImagesAndVideosCached = isInitialized.every((e) => e);
+        _finishStartupProfilerIfReady();
       });
     }
   }
@@ -105,6 +144,7 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     if (mounted) {
       setState(() {
         _messageShownEnoughTime = value;
+        _finishStartupProfilerIfReady();
       });
     }
   }

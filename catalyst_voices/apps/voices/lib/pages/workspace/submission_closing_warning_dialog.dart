@@ -21,10 +21,10 @@ class SubmissionClosingWarningDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesTwoPaneDialog(
-      left: _LeftSide(dontShowAgain),
-      right: _RightSide(submissionCloseAt),
-      leftPadding: EdgeInsets.zero,
+    return VoicesPanelsDialog(
+      secondary: _LeftSide(dontShowAgain),
+      primary: _RightSide(submissionCloseAt),
+      secondaryPadding: EdgeInsets.zero,
     );
   }
 
@@ -49,7 +49,7 @@ class SubmissionClosingWarningDialog extends StatelessWidget {
     required DateTime submissionCloseAt,
     int nDays = 3,
   }) async {
-    final now = DateTime.now();
+    final now = DateTimeExt.now();
     final threeDaysBefore = submissionCloseAt.subtract(Duration(days: nDays));
     if (now.isAfter(threeDaysBefore) && now.isBefore(submissionCloseAt)) {
       await VoicesDialog.show<void>(

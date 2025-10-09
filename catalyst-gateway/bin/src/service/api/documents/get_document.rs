@@ -2,9 +2,8 @@
 
 use poem_openapi::ApiResponse;
 
-use super::common;
 use crate::{
-    db::event::error::NotFoundError,
+    db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
     service::common::{responses::WithErrorResponses, types::payload::cbor::Cbor},
 };
 
@@ -27,9 +26,12 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/document`
-pub(crate) async fn endpoint(document_id: uuid::Uuid, version: Option<uuid::Uuid>) -> AllResponses {
-    match common::get_document_cbor_bytes(&document_id, version.as_ref()).await {
-        Ok(doc_cbor_bytes) => Responses::Ok(Cbor(doc_cbor_bytes)).into(),
+pub(crate) async fn endpoint(
+    document_id: uuid::Uuid,
+    version: Option<uuid::Uuid>,
+) -> AllResponses {
+    match FullSignedDoc::retrieve(&document_id, version.as_ref()).await {
+        Ok(doc_cbor_bytes) => Responses::Ok(Cbor(doc_cbor_bytes.raw().to_vec())).into(),
         Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
         Err(err) => AllResponses::handle_error(&err),
     }

@@ -26,6 +26,9 @@ const _testWords = [
 
 final _logger = Logger('RecoverCubit');
 
+@visibleForTesting
+List<SeedPhraseWord> get recoverTestWords => List.unmodifiable(_testWords);
+
 /// Manages the recovery process.
 ///
 /// Allows to recover an account from the seed phrase.
@@ -139,9 +142,10 @@ final class RecoverCubit extends Cubit<RecoverStateData>
 
   @override
   void setSeedPhraseWords(List<SeedPhraseWord> words) {
-    final isValid = SeedPhrase.isValid(words: words);
+    final mnemonic = words.toMnemonic();
+    final isValid = SeedPhrase.isValid(mnemonic: mnemonic);
     if (isValid) {
-      _seedPhrase = SeedPhrase.fromWords(words);
+      _seedPhrase = SeedPhrase.fromMnemonic(mnemonic);
     }
 
     emit(

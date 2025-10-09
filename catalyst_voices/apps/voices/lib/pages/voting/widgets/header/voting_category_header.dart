@@ -25,43 +25,44 @@ class VotingCategoryHeader extends StatelessWidget {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(28, 32, 32, 44),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 24,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      VoicesAssets.icons.viewGrid.buildIcon(
-                        size: 32,
-                        color: context.colors.iconsForeground,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        category.formattedName,
-                        style: context.textTheme.displaySmall,
-                      ),
-                      const SizedBox(height: 48),
-                      Text(
-                        context.l10n.description,
-                        style: context.textTheme.titleSmall?.copyWith(
-                          color: context.colors.textOnPrimaryLevel1,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 628),
-                        child: Text(
-                          category.description,
-                          style: context.textTheme.bodyLarge,
-                        ),
-                      ),
-                    ],
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  spacing: 16,
+                  runSpacing: 16,
+                  children: [
+                    VoicesAssets.icons.viewGrid.buildIcon(
+                      size: 32,
+                      color: context.colors.iconsForeground,
+                    ),
+                    const VotingCategoryPickerSelector(),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  category.formattedName,
+                  style: context.textTheme.displaySmall,
+                ),
+                const SizedBox(height: 48),
+                Text(
+                  context.l10n.description,
+                  style: context.textTheme.titleSmall?.copyWith(
+                    color: context.colors.textOnPrimaryLevel1,
                   ),
                 ),
-                const VotingCategoryPickerSelector(),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 628),
+                    child: Text(
+                      category.description,
+                      style: context.textTheme.bodyLarge,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

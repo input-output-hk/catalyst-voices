@@ -6,10 +6,11 @@ import '../../../utils/translations_utils.dart';
 import '../onboarding_base_page.dart';
 import 'step_5_profile_final.dart';
 
-class CatalystKeychainInfoPanel extends OnboardingPageBase {
+final class CatalystKeychainInfoPanel extends OnboardingPageBase {
   static const createKeychainButton = Key('CreateKeychainButton');
 
   CatalystKeychainInfoPanel(super.$);
+
   Future<void> clickCreateKeychain() async {
     await $(createKeychainButton).tap();
   }

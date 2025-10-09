@@ -20,6 +20,9 @@ final class PasswordLockFactor implements LockFactor {
 
   const PasswordLockFactor(this._data);
 
+  @visibleForTesting
+  String get data => _data;
+
   @override
   int get hashCode => _data.hashCode;
 

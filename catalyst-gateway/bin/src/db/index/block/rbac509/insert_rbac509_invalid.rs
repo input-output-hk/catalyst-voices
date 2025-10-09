@@ -3,7 +3,8 @@
 use std::{fmt::Debug, sync::Arc};
 
 use cardano_chain_follower::{hashes::TransactionId, Slot, TxnIndex};
-use catalyst_types::{catalyst_id::CatalystId, problem_report::ProblemReport, uuid::UuidV4};
+use catalyst_types::{catalyst_id::CatalystId, problem_report, uuid::UuidV4};
+use poem_openapi::types::ToJSON;
 use scylla::{client::session::Session, value::MaybeUnset, SerializeRow};
 use tracing::error;
 
@@ -12,6 +13,7 @@ use crate::{
         index::queries::{PreparedQueries, SizedBatch},
         types::{DbCatalystId, DbSlot, DbTransactionId, DbTxnIndex, DbUuidV4},
     },
+    service::common::objects::generic::problem_report::ProblemReport,
     settings::cassandra_db::EnvVars,
 };
 
@@ -40,15 +42,17 @@ pub(crate) struct Params {
 impl Params {
     /// Create a new record for this transaction.
     pub(crate) fn new(
-        catalyst_id: CatalystId, txn_id: TransactionId, slot_no: Slot, txn_index: TxnIndex,
-        purpose: Option<UuidV4>, prv_txn_id: Option<TransactionId>, report: &ProblemReport,
+        catalyst_id: CatalystId,
+        txn_id: TransactionId,
+        slot_no: Slot,
+        txn_index: TxnIndex,
+        purpose: Option<UuidV4>,
+        prv_txn_id: Option<TransactionId>,
+        report: problem_report::ProblemReport,
     ) -> Self {
         let purpose = purpose.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
         let prv_txn_id = prv_txn_id.map_or(MaybeUnset::Unset, |v| MaybeUnset::Set(v.into()));
-        let problem_report = serde_json::to_string(&report).unwrap_or_else(|e| {
-            error!("Failed to serialize problem report: {e:?}. Report = {report:?}");
-            String::new()
-        });
+        let problem_report = ProblemReport::from(report).to_json_string();
 
         Self {
             catalyst_id: catalyst_id.into(),
@@ -63,7 +67,8 @@ impl Params {
 
     /// Prepare Batch of RBAC Registration Index Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &EnvVars,
+        session: &Arc<Session>,
+        cfg: &EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         PreparedQueries::prepare_batch(
             session.clone(),
@@ -82,7 +87,10 @@ impl Params {
 }
 
 impl Debug for Params {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(
+        &self,
+        f: &mut std::fmt::Formatter<'_>,
+    ) -> std::fmt::Result {
         let prv_txn_id = match self.prv_txn_id {
             MaybeUnset::Unset => "UNSET".to_owned(),
             MaybeUnset::Set(v) => format!("{v}"),

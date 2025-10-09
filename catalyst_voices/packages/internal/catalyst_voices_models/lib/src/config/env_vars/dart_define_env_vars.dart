@@ -1,6 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_models/src/config/env_vars/env_vars.dart';
-import 'package:flutter/services.dart';
 
 /// Have to mach against --dart-define variables
 const _envNameKey = 'ENV_NAME';
@@ -11,6 +10,6 @@ EnvVars getDartEnvVars() {
 
   return const EnvVars(
     // ignore: avoid_redundant_argument_values
-    envName: envName ?? appFlavor,
+    envName: envName,
   );
 }

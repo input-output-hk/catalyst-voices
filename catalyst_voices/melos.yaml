@@ -9,9 +9,9 @@ packages:
 
 ignore:
   # ignore flutter_rust_bridge packages that are non-conformant with melos
-  - packages/libs/catalyst_key_derivation/example/**
+  - /**/cargokit/**
   # ignore temporary packages that are non-conformant with melos
-  - apps/voices/build/**
+  - /**/build/**
 
 permittedLicenses:
   - MIT
@@ -41,16 +41,12 @@ packageLicenseOverride:
   catalyst_cardano_serialization: Apache-2.0
   catalyst_cardano_platform_interface: Apache-2.0
   catalyst_compression: Apache-2.0
-  catalyst_compression_web: Apache-2.0
-  catalyst_cardano_web: Apache-2.0
-  catalyst_compression_platform_interface: Apache-2.0
   catalyst_key_derivation: Apache-2.0
-  catalyst_key_derivation_web: Apache-2.0
-  catalyst_key_derivation_platform_interface: Apache-2.0
   catalyst_voices_assets: Apache-2.0
   catalyst_voices_assets_example: Apache-2.0
   catalyst_cardano: Apache-2.0
   catalyst_cardano_example: Apache-2.0
+  catalyst_cardano_web: Apache-2.0
   catalyst_voices_localization: Apache-2.0
   catalyst_voices_models: Apache-2.0
   example: Apache-2.0
@@ -97,7 +93,10 @@ command:
       bloc_test: ^10.0.0
       chopper: ^8.3.0
       collection: ^1.19.1
+      cross_file: ^0.3.4+2
       cryptography: ^2.7.0
+      device_info_plus: ^11.5.0
+      downloadsfolder: ^1.1.0
       dotted_border: ^3.1.0
       ed25519_hd_key: ^2.3.0
       email_validator: ^3.0.0
@@ -105,7 +104,7 @@ command:
       fake_async: ^1.3.3
       ffi: ^2.1.4
       ffigen: ^19.1.0
-      file_picker: ^10.2.1
+      file_picker: ^10.3.2
       flutter_bloc: ^9.1.1
       flutter_dropzone: ^4.2.1
       flutter_inappwebview: ^6.1.5
@@ -122,7 +121,11 @@ command:
           url: https://github.com/input-output-hk/flutter-quill
           path: flutter_quill_extensions
           ref: 10be2c8d1fb0d7728183fc883e133b5b48251d62
-      flutter_rust_bridge: 2.11.1
+      flutter_rust_bridge:
+        git:
+          url: https://github.com/input-output-hk/catalyst_flutter_rust_bridge
+          ref: 24888fec8f4cab3999e461fc8c6e065f62560d63
+          path: frb_dart/
       flutter_secure_storage: ^9.2.4
       formz: ^0.8.0
       google_fonts: ^6.3.0
@@ -150,11 +153,15 @@ command:
       cbor: 6.3.7
       convert: ^3.1.2
       path: ^1.9.1
+      path_provider: ^2.1.5
       package_info_plus: ^8.3.0
+      permission_handler: ^12.0.1
       pinenacl: ^0.6.0
       pool: ^1.5.1
       uuid_plus: ^0.1.0
+      sentry_drift: ^9.6.0
       sentry_flutter: ^9.6.0
+      sentry_logging: ^9.6.0
       scrollable_positioned_list: ^0.3.8
       shared_preferences: ^2.5.3
       shared_preferences_platform_interface: ^2.4.1
