@@ -5,12 +5,15 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class ProposalBuilderNavigationPanel extends StatelessWidget {
-  const ProposalBuilderNavigationPanel({super.key});
+  final bool collapsable;
+
+  const ProposalBuilderNavigationPanel({super.key, this.collapsable = true});
 
   @override
   Widget build(BuildContext context) {
     return SpaceSidePanel(
       isLeft: true,
+      collapsable: collapsable,
       onCollapseTap: () {},
       tabs: [
         SpaceSidePanelTab(

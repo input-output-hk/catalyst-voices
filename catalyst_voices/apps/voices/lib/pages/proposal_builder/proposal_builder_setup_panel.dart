@@ -7,7 +7,9 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class ProposalBuilderSetupPanel extends StatefulWidget {
-  const ProposalBuilderSetupPanel({super.key});
+  final bool collapsable;
+
+  const ProposalBuilderSetupPanel({super.key, this.collapsable = true});
 
   @override
   State<ProposalBuilderSetupPanel> createState() => _ProposalBuilderSetupPanelState();
@@ -21,6 +23,7 @@ class _ProposalBuilderSetupPanelState extends State<ProposalBuilderSetupPanel> {
   Widget build(BuildContext context) {
     return SpaceSidePanel(
       isLeft: false,
+      collapsable: widget.collapsable,
       scrollController: _scrollController,
       onCollapseTap: () {},
       tabs: [

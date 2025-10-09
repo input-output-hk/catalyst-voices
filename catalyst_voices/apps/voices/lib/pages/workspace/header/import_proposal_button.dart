@@ -35,6 +35,6 @@ class _ImportProposalDialog {
       allowedExtensions: [ProposalDocument.exportFileExt],
     );
 
-    return file?.bytes;
+    return await file?.readAsBytes();
   }
 }
