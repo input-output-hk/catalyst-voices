@@ -17,7 +17,7 @@ Future<void> main(List<String> args) async {
 
   final packageRoot = _parsePackageRoot(args);
   final outputFile = _parseOutputFile(args);
-  final pubspecLockPath = _getPubspecLockPath(packageRoot);
+  final pubspecYamlPath = _getPubspecYamlPath(packageRoot);
 
   await outputFile.create(recursive: true);
   final outputSink = await outputFile.openWrite();
@@ -25,13 +25,15 @@ Future<void> main(List<String> args) async {
     'Package Name${_sep}Description${_sep}Authors${_sep}License',
   );
 
-  final deps = await oss.listDependencies(pubspecLockPath: pubspecLockPath);
+  final deps = await oss.listDependencies(pubspecYamlPath: pubspecYamlPath);
   for (var entry in deps.allDependencies) {
     final name = _replaceSpecialCharacters(entry.name);
     final license = _replaceSpecialCharacters(entry.license ?? '');
     final description = _replaceSpecialCharacters(entry.description);
     final authors = _replaceSpecialCharacters(entry.authors.join(' | '));
-    outputSink.writeln('\n${name}${_sep}${description}${_sep}${authors}${_sep}${license}');
+    outputSink.writeln(
+      '\n${name}${_sep}${description}${_sep}${authors}${_sep}${license}',
+    );
   }
 
   await outputSink.flush();
@@ -40,13 +42,13 @@ Future<void> main(List<String> args) async {
 
 String _sep = ',';
 
-String _getPubspecLockPath(String packageRoot) {
-  final pubspecLockPath = path.join(packageRoot, 'pubspec.lock');
-  if (!File(pubspecLockPath).existsSync()) {
-    throw ArgumentError('$pubspecLockPath not found');
+String _getPubspecYamlPath(String packageRoot) {
+  final pubspecYamlPath = path.join(packageRoot, 'pubspec.yaml');
+  if (!File(pubspecYamlPath).existsSync()) {
+    throw ArgumentError('$pubspecYamlPath not found');
   }
 
-  return pubspecLockPath;
+  return pubspecYamlPath;
 }
 
 File _parseOutputFile(List<String> args) {
