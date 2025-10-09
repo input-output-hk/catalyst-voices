@@ -36,8 +36,6 @@ package-cat-gateway-with-scylla:
     ENTRYPOINT ./scylla_entry.sh && ./cat-gateway run
     SAVE IMAGE cat-gateway-with-scylla:latest
 
-
-
 # cspell: words oapi
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.
