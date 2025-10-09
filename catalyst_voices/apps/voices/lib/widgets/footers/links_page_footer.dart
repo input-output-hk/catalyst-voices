@@ -55,9 +55,9 @@ class _ResponsiveGap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder<double>(
-      builder: (context, data) => SizedBox(width: data),
+      md: 16,
       lg: 32,
-      other: 16,
+      builder: (context, data) => SizedBox(width: data),
     );
   }
 }

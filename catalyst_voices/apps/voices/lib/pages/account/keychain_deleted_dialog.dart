@@ -8,7 +8,7 @@ class KeychainDeletedDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDesktopInfoDialog(
+    return VoicesInfoDialog(
       icon: VoicesAssets.icons.checkCircle.buildIcon(),
       title: Text(context.l10n.keychainDeletedDialogTitle),
       message: Text(context.l10n.keychainDeletedDialogSubtitle),

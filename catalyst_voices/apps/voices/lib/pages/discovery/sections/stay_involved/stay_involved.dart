@@ -2,6 +2,7 @@ import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/discovery/sections/stay_involved/widgets/reviewer_card.dart';
 import 'package:catalyst_voices/pages/discovery/sections/stay_involved/widgets/voter_card.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class StayInvolved extends StatelessWidget {
@@ -9,9 +10,11 @@ class StayInvolved extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 120, vertical: 72),
-      child: Column(
+    return ResponsivePadding(
+      xs: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      sm: const EdgeInsets.symmetric(horizontal: 48, vertical: 48),
+      md: const EdgeInsets.symmetric(horizontal: 120, vertical: 72),
+      child: const Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

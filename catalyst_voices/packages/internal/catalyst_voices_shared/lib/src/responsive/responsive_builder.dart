@@ -1,6 +1,4 @@
-import 'package:catalyst_voices_shared/src/responsive/responsive_breakpoint_key.dart';
-import 'package:catalyst_voices_shared/src/utils/typedefs.dart';
-import 'package:collection/collection.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/widgets.dart';
 
 // A [ResponsiveBuilder] is a StatelessWidget that is aware about the current
@@ -54,24 +52,28 @@ const Map<ResponsiveBreakpointKey, ({int min, int max})> _breakpoints = {
 };
 
 class ResponsiveBuilder<T extends Object> extends StatelessWidget {
+  final Responsive<T> responsive;
   final DataWidgetBuilder<T> builder;
-  final Map<ResponsiveBreakpointKey, T> _responsiveData;
 
   ResponsiveBuilder({
     super.key,
-    required this.builder,
     T? xs,
     T? sm,
     T? md,
     T? lg,
-    required T other,
-  }) : _responsiveData = {
-         if (xs != null) ResponsiveBreakpointKey.xs: xs,
-         if (sm != null) ResponsiveBreakpointKey.sm: sm,
-         if (md != null) ResponsiveBreakpointKey.md: md,
-         if (lg != null) ResponsiveBreakpointKey.lg: lg,
-         ResponsiveBreakpointKey.other: other,
-       };
+    required this.builder,
+  }) : responsive = Responsive.breakpoints(
+         xs: xs,
+         sm: sm,
+         md: md,
+         lg: lg,
+       );
+
+  const ResponsiveBuilder.fromResponsive({
+    super.key,
+    required this.responsive,
+    required this.builder,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -79,25 +81,8 @@ class ResponsiveBuilder<T extends Object> extends StatelessWidget {
   }
 
   T _getResponsiveBreakpoint(BuildContext context) {
-    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenSize = MediaQuery.sizeOf(context);
 
-    final breakpointKey =
-        _breakpoints.entries
-            .where((entry) => _responsiveData.containsKey(entry.key))
-            .firstWhereOrNull((entry) => entry.value.contains(screenWidth))
-            ?.key ??
-        ResponsiveBreakpointKey.other;
-
-    assert(
-      _responsiveData.containsKey(breakpointKey),
-      'Selected key[$breakpointKey] data is not defined. '
-      'Make sure at least .other is not null',
-    );
-
-    return _responsiveData[breakpointKey]!;
+    return responsive.resolve(screenSize);
   }
-}
-
-extension _RangeExt on ({int min, int max}) {
-  bool contains(double value) => value >= min && value <= max;
 }

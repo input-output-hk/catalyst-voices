@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT ../ AS repo-ci
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.5.15 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.5.20 AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
@@ -41,8 +41,8 @@ code-generator:
     WORKDIR /frontend
 
     RUN melos l10n
-    RUN melos build_runner
-    RUN melos build_runner_repository
+    RUN melos build-runner
+    RUN melos build-runner-repository
 
     IF [ $save_locally = true ]
         # This step saves generated files other then OpenApi Services
@@ -124,12 +124,15 @@ build-web:
     FROM +code-generator
     ARG WORKDIR=/frontend/apps/voices
     ARG UPLOAD_DEBUG_SYMBOLS=false
+    ARG tag='latest'
+
+    DO +PARSE_BUILD_ARGS --tag=$tag
 
     DO flutter-ci+BUILD_WEB \
         --WORKDIR=$WORKDIR \
         --BUILD_MODE='--release' \
-        --BUILD_NAME='0.1.0' \
-        --BUILD_NUMBER=$(date +%s) \
+        --BUILD_NAME=$(cat build_name) \
+        --BUILD_NUMBER=$(cat build_number) \
         --TARGET=lib/configs/main_web.dart \
         --UPLOAD_DEBUG_SYMBOLS=$UPLOAD_DEBUG_SYMBOLS \
         --SENTRY_ORG='iohk-j4' \
@@ -158,3 +161,48 @@ docker:
    ARG tag="latest"
 
    SAVE IMAGE ${container}:${tag}
+
+# This function centralizes logic behind parsing tag into build_name and build_number.
+#
+# Defaults:
+# - build_name -> 0.1.0
+# - build_number -> timestamp
+#
+# It follows conditions:
+# - if tag has prefix <project>/vx.x.x but prefix is different then voices, uses defaults.
+# - extracts build_name out of vx.x.x, for v0.0.1 it will be 0.0.1
+# - extracts build_number from part after "+". eg v0.0.1+10 will result with 10
+# - if allow_build_name_suffix is true, looks for suffixes after build_number and appends to name
+#
+# Saves build_name and build_number inside respective files.
+PARSE_BUILD_ARGS:
+    FUNCTION
+    ARG tag='latest'
+    ARG allow_build_name_suffix=true
+
+    RUN bash -c '\
+        set -e; \
+
+        _build_name=""
+        _build_number=""
+
+        if echo "$tag" | grep -q "/" && ! echo "$tag" | grep -q "^voices/"; then
+            echo "Invalid prefix found in tag '\''$tag'\''. Using default values."
+        else
+            _build_name=$(echo "$tag" | sed -n "s|.*v\([0-9]\+\.[0-9]\+\.[0-9]\+\).*|\1|p"); \
+
+            if echo "$tag" | grep -q "+"; then \
+                _build_number=$(echo "$tag" | cut -d"+" -f2 | cut -d"-" -f1); \
+            fi; \
+
+            if [ "$allow_build_name_suffix" = "true" ]; then
+                _suffix=$(echo "$tag" | sed -n "s/.*\(-\S\+\)/\1/p");
+                _build_name="${_build_name}${_suffix}";
+            fi; \
+        fi
+
+        FINAL_BUILD_NAME=${_build_name:-"0.1.0"}; \
+        FINAL_BUILD_NUMBER=${_build_number:-$(date +%s)}; \
+        echo -n "$FINAL_BUILD_NAME" > build_name; \
+        echo -n "$FINAL_BUILD_NUMBER" > build_number; \
+    '
