@@ -32,7 +32,7 @@ class CampaignCategories extends StatelessWidget {
                   .map(
                     (e) => Skeletonizer(
                       enabled: isLoading,
-                      child: CampaignCategoryCard(category: e),
+                      child: CampaignCategoryCard(key: ValueKey(e.id), category: e),
                     ),
                   )
                   .toList(),

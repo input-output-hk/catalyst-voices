@@ -100,10 +100,47 @@ class _BodySmall extends StatelessWidget {
   }
 }
 
-class _CategoryDetailErrorSelector extends StatelessWidget {
+class _CategoryDetailContent extends StatelessWidget {
+  const _CategoryDetailContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<
+      CategoryDetailCubit,
+      CategoryDetailState,
+      DataVisibilityState<CampaignCategoryDetailsViewModel>
+    >(
+      selector: (state) {
+        return (
+          show: state.isLoading,
+          data: state.category ?? CampaignCategoryDetailsViewModel.placeholder(),
+        );
+      },
+      builder: (context, state) {
+        final isActiveProposer = context.select<SessionCubit, bool>(
+          (cubit) => cubit.state.isProposerUnlock,
+        );
+        return ResponsiveChildBuilder(
+          sm: (_) => _BodySmall(
+            category: state.data,
+            isLoading: state.show,
+            isActiveProposer: isActiveProposer,
+          ),
+          md: (_) => _Body(
+            category: state.data,
+            isLoading: state.show,
+            isActiveProposer: isActiveProposer,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CategoryDetailError extends StatelessWidget {
   final SignedDocumentRef categoryId;
 
-  const _CategoryDetailErrorSelector({required this.categoryId});
+  const _CategoryDetailError({required this.categoryId});
 
   @override
   Widget build(BuildContext context) {
@@ -139,51 +176,14 @@ class _CategoryDetailErrorSelector extends StatelessWidget {
   }
 }
 
-class _CategoryDetailLoadingOrDataSelector extends StatelessWidget {
-  const _CategoryDetailLoadingOrDataSelector();
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocSelector<
-      CategoryDetailCubit,
-      CategoryDetailState,
-      DataVisibilityState<CampaignCategoryDetailsViewModel>
-    >(
-      selector: (state) {
-        return (
-          show: state.isLoading,
-          data: state.category ?? CampaignCategoryDetailsViewModel.dummy(),
-        );
-      },
-      builder: (context, state) {
-        final isActiveProposer = context.select<SessionCubit, bool>(
-          (cubit) => cubit.state.isProposerUnlock,
-        );
-        return ResponsiveChildBuilder(
-          sm: (_) => _BodySmall(
-            category: state.data,
-            isLoading: state.show,
-            isActiveProposer: isActiveProposer,
-          ),
-          md: (_) => _Body(
-            category: state.data,
-            isLoading: state.show,
-            isActiveProposer: isActiveProposer,
-          ),
-        );
-      },
-    );
-  }
-}
-
 class _CategoryPageState extends State<CategoryPage> {
   @override
   Widget build(BuildContext context) {
     return ProposalSubmissionPhaseAware(
       activeChild: Stack(
         children: [
-          const _CategoryDetailLoadingOrDataSelector(),
-          _CategoryDetailErrorSelector(
+          const _CategoryDetailContent(),
+          _CategoryDetailError(
             categoryId: widget.categoryId,
           ),
         ].constrainedDelegate(),
