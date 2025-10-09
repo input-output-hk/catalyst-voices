@@ -2,6 +2,7 @@ name: catalyst_key_derivation_example
 description: "Demonstrates how to use the catalyst_key_derivation plugin."
 publish_to: "none"
 version: 1.0.0+1
+resolution: workspace
 
 environment:
   sdk: ">=3.9.0 <4.0.0"

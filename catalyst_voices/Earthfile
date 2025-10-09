@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT ../ AS repo-ci
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.5.18 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.5.20 AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
@@ -41,8 +41,8 @@ code-generator:
     WORKDIR /frontend
 
     RUN melos l10n
-    RUN melos build_runner
-    RUN melos build_runner_repository
+    RUN melos build-runner
+    RUN melos build-runner-repository
 
     IF [ $save_locally = true ]
         # This step saves generated files other then OpenApi Services
