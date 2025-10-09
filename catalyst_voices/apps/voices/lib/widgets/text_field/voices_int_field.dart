@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/widgets/text_field/voices_num_field.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 class VoicesIntField extends VoicesNumField<int> {
@@ -21,9 +20,10 @@ class VoicesIntField extends VoicesNumField<int> {
          keyboardType: TextInputType.number,
          inputFormatters: [
            FilteringTextInputFormatter.digitsOnly,
-           // Note. int.parse returns incorrect values for bigger Strings.
-           // If more is required use BigInt
-           if (kIsWeb) LengthLimitingTextInputFormatter(16),
+           // int.parse returns incorrect values for bigger Strings. If more is required use BigInt.
+           // On web integers can represent numbers up to 2^53.
+           // See: https://dart.dev/resources/language/number-representation#dart-number-representation
+           LengthLimitingTextInputFormatter(16),
            ...?inputFormatters,
          ],
        );

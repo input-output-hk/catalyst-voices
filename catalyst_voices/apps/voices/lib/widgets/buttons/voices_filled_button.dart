@@ -16,14 +16,8 @@ class VoicesFilledButton extends StatelessWidget {
   /// The widget to be displayed after the button's main content.
   final Widget? trailing;
 
-  /// The optional button's background color.
-  final Color? backgroundColor;
-
-  /// The optional button's foreground color.
-  final Color? foregroundColor;
-
-  /// See [ButtonStyle.shape].
-  final OutlinedBorder? shape;
+  /// The optional button style.
+  final ButtonStyle? style;
 
   /// The main content of the button.
   final Widget child;
@@ -33,20 +27,14 @@ class VoicesFilledButton extends StatelessWidget {
     this.onTap,
     this.leading,
     this.trailing,
-    this.backgroundColor,
-    this.foregroundColor,
-    this.shape,
+    this.style,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
     return FilledButton(
-      style: FilledButton.styleFrom(
-        backgroundColor: backgroundColor,
-        foregroundColor: foregroundColor,
-        shape: shape,
-      ),
+      style: style,
       onPressed: onTap,
       child: VoicesButtonAffixDecoration(
         leading: leading,

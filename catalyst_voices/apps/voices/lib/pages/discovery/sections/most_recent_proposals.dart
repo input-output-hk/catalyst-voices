@@ -8,6 +8,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -89,8 +90,10 @@ class _LatestProposalsState extends State<MostRecentProposals> {
           fit: BoxFit.cover,
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 100),
+      child: ResponsivePadding(
+        xs: const EdgeInsets.symmetric(horizontal: 48),
+        sm: const EdgeInsets.symmetric(horizontal: 48),
+        md: const EdgeInsets.symmetric(horizontal: 100),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -211,8 +214,10 @@ class _ViewAllProposalsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
-      backgroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
-      foregroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
+      style: FilledButton.styleFrom(
+        backgroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
+        foregroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
+      ),
       child: Text(
         key: const Key('ViewAllProposalsBtn'),
         context.l10n.viewAllProposals,
