@@ -46,7 +46,7 @@ class _LargeScreen extends StatelessWidget {
               ),
             ),
             _CampaignData(
-              leadValue: CryptocurrencyFormatter.decimalFormat(proposal.fundsRequested),
+              leadValue: MoneyFormatter.formatDecimal(proposal.fundsRequested),
               subValue: context.l10n.proposalViewFundingRequested,
             ),
             _CampaignData(
@@ -108,7 +108,7 @@ class _MediumScreen extends StatelessWidget {
               ),
             ),
             _CampaignData(
-              leadValue: CryptocurrencyFormatter.decimalFormat(proposal.fundsRequested),
+              leadValue: MoneyFormatter.formatDecimal(proposal.fundsRequested),
               subValue: context.l10n.proposalViewFundingRequested,
             ),
             _CampaignData(
@@ -163,7 +163,7 @@ class _SmallScreen extends StatelessWidget {
               ),
             ),
             _CampaignData(
-              leadValue: CryptocurrencyFormatter.decimalFormat(proposal.fundsRequested),
+              leadValue: MoneyFormatter.formatDecimal(proposal.fundsRequested),
               subValue: context.l10n.proposalViewFundingRequested,
             ),
             _CampaignData(
