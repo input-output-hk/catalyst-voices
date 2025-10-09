@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:feat/migrate-away-from-melos AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.5.20 AS python-ci
 IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v.0.0.6-refinery-fix AS cat-libs-rust
 IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v.0.0.4-refinery-fix AS dep-cat-libs-rust
 IMPORT github.com/input-output-hk/catalyst-storage AS cat-storage
