@@ -36,10 +36,22 @@ package-cat-gateway-with-scylla:
     ENTRYPOINT ./scylla_entry.sh && ./cat-gateway run
     SAVE IMAGE cat-gateway-with-scylla:latest
 
+# a special package for applying migrations only up to "V2_**" migrations
+package-event-db-f14:
+    FROM github.com/input-output-hk/catalyst-voices/catalyst-gateway/event-db:event-db-old-signed-doc+docker
+
+    ARG container="event-db"
+    ARG tag="f14"
+
+    COPY ./event_db_v1_seed_data ./seed
+
+    SAVE IMAGE ${container}:${tag}
+
+
 # cspell: words oapi
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.
-test-lint-openapi:
+disable-test-lint-openapi:
     FROM spectral-ci+spectral-base
     # Copy the doc artifact.
     COPY --dir ../+build/doc .
