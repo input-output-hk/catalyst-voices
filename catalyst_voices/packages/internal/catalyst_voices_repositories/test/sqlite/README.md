@@ -1,0 +1,3 @@
+# Sqlite libraries
+
+The sqlite libraries were compiled from the source, see: [https://www.sqlite.org/howtocompile.html].

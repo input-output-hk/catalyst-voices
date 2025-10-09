@@ -34,3 +34,6 @@
 
 **/target
 **/Cargo.lock
+
+# iOS related
+**/Podfile.lock

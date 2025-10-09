@@ -2,6 +2,7 @@ name: catalyst_voices_models
 description: Catalyst Voices Models.
 version: 0.1.0+1
 publish_to: none
+resolution: workspace
 
 environment:
   sdk: ">=3.9.0 <4.0.0"
@@ -15,6 +16,7 @@ dependencies:
     path: ../catalyst_voices_shared
   collection: ^1.19.1
   convert: ^3.1.2
+  device_info_plus: ^11.5.0
   equatable: ^2.0.7
   # Flutter is added because tests are using @visibleForTesting and loggers which are flutter
   # dependencies and tests are requiring them.
@@ -23,6 +25,7 @@ dependencies:
   json_annotation: ^4.9.0
   meta: ^1.16.0
   password_strength: ^0.2.0
+  permission_handler: ^12.0.1
   uuid_plus: ^0.1.0
 
 dev_dependencies:

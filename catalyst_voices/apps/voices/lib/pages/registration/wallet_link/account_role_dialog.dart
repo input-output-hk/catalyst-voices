@@ -1,11 +1,12 @@
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
-import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/voices_panel_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class AccountRoleDialog extends StatelessWidget {
@@ -18,9 +19,11 @@ class AccountRoleDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesSinglePaneDialog(
+    return VoicesPanelDialog(
       backgroundColor: Theme.of(context).colors.iconsBackground,
-      constraints: const BoxConstraints(maxHeight: 460, maxWidth: 750),
+      constraints: const Responsive.single(
+        BoxConstraints(maxHeight: 460, maxWidth: 750),
+      ),
       child: SingleChildScrollView(
         child: Container(
           width: double.infinity,
