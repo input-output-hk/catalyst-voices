@@ -14,7 +14,7 @@ project: {
 			env: string | *"dev"
 			modules: main: {
 				name:    "app"
-				version: "0.11.1"
+				version: "0.13.1"
 				values: {
 					stateful: {
 						containers: gateway: {
