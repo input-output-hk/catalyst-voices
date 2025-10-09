@@ -45,7 +45,7 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
   @override
   void updateEmail(Email value) {
     final receiveEmails = state.receiveEmails.copyWith(
-      isAccepted: value.isNotValid ? false : null,
+      isAccepted: value.isEmptyOrNotValid ? false : null,
       isEnabled: value.isNonEmptyAndValid,
     );
 
