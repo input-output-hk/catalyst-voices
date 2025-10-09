@@ -188,6 +188,11 @@ extension on DocumentIndexList {
                         ref: ver.reply!.toRef(),
                         type: DocumentType.unknown,
                       ),
+                    if (ver.parameters != null)
+                      TypedDocumentRef(
+                        ref: ver.parameters!.toRef(),
+                        type: DocumentType.categoryParametersDocument,
+                      ),
                     if (ver.template != null)
                       TypedDocumentRef(
                         ref: ver.template!.toRef(),
