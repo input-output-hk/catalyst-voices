@@ -38,6 +38,39 @@ class VideoCacheKey extends BaseVideoAsset {
   }
 }
 
+/// Configuration for video playback behavior.
+class VideoPlaybackConfig extends Equatable {
+  /// Whether the video should loop continuously.
+  final bool looping;
+
+  /// Volume level (0.0 to 1.0).
+  final double volume;
+
+  /// Whether to automatically start playing after initialization.
+  final bool autoPlay;
+
+  const VideoPlaybackConfig({
+    this.looping = true,
+    this.volume = 0.0,
+    this.autoPlay = true,
+  });
+
+  @override
+  List<Object?> get props => [looping, volume, autoPlay];
+
+  VideoPlaybackConfig copyWith({
+    bool? looping,
+    double? volume,
+    bool? autoPlay,
+  }) {
+    return VideoPlaybackConfig(
+      looping: looping ?? this.looping,
+      volume: volume ?? this.volume,
+      autoPlay: autoPlay ?? this.autoPlay,
+    );
+  }
+}
+
 /// Represents a list of video assets to be pre-cached.
 class VideoPrecacheAssets extends BaseVideoAsset {
   final List<String> assets;

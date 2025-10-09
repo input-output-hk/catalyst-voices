@@ -2,7 +2,7 @@ import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices/widgets/heroes/section_hero.dart';
-import 'package:catalyst_voices_assets/generated/assets.gen.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -20,6 +20,10 @@ class CampaignHeroSection extends StatelessWidget {
       constraints: const BoxConstraints(minHeight: 450),
       child: HeroSection(
         asset: VideoCacheKey(name: VoicesAssets.videos.heroDesktop),
+        errorBuilder: (context, error, stackTrace) => CatalystImage.asset(
+          VoicesAssets.images.discoveryFallback.path,
+          fit: BoxFit.cover,
+        ),
         child: ResponsivePadding(
           xs: const EdgeInsets.only(left: 20, bottom: 16, top: 8, right: 20),
           sm: const EdgeInsets.only(left: 80, bottom: 32, top: 18),
