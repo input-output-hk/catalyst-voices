@@ -21,7 +21,7 @@ final f14StaticCampaignCategories = [
     availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(8500000)),
     imageUrl: '',
     totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
-    range: ComparableRange(
+    range: Range(
       min: Currencies.ada.amount(250000),
       max: Currencies.ada.amount(1000000),
     ),
@@ -105,7 +105,7 @@ The following will **not** be funded:
     availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(4000000)),
     imageUrl: '',
     totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
-    range: ComparableRange(
+    range: Range(
       min: Currencies.ada.amount(15000),
       max: Currencies.ada.amount(100000),
     ),
@@ -189,7 +189,7 @@ Funds open source tools and environments to enhance the Cardano developer experi
     availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(3100000)),
     imageUrl: '',
     totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
-    range: ComparableRange(
+    range: Range(
       min: Currencies.ada.amount(15000),
       max: Currencies.ada.amount(100000),
     ),
@@ -274,7 +274,7 @@ Funds non-technical initiatives like marketing, education, and community buildin
     availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(3000000)),
     imageUrl: '',
     totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
-    range: ComparableRange(
+    range: Range(
       min: Currencies.ada.amount(15000),
       max: Currencies.ada.amount(60000),
     ),

@@ -105,12 +105,12 @@ class _DocumentCurrencyWidgetState extends State<DocumentCurrencyWidget> {
     return widget.schema.moneyToValue(money);
   }
 
-  OpenRange<Money>? _numRangeToMoneyRange(NumRange<int>? range) {
+  Range<Money?>? _numRangeToMoneyRange(Range<int?>? range) {
     if (range == null) {
       return null;
     }
 
-    return OpenRange(
+    return Range(
       min: _valueToMoney(range.min),
       max: _valueToMoney(range.max),
     );

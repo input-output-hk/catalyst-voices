@@ -157,7 +157,7 @@ final class DocumentValidator {
 
         return DocumentMoneyOutOfRange(
           invalidNodeId: schema.nodeId,
-          expectedRange: OpenRange(
+          expectedRange: Range(
             min: min != null ? schema.valueToMoney(min) : null,
             max: max != null ? schema.valueToMoney(max) : null,
           ),

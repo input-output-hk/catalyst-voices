@@ -9,7 +9,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 class FundsDetailCard extends StatelessWidget {
   final MultiCurrencyAmount allFunds;
   final MultiCurrencyAmount totalAsk;
-  final ComparableRange<Money>? askRange;
+  final Range<Money>? askRange;
   final FundsDetailCardType type;
 
   const FundsDetailCard({
@@ -167,7 +167,7 @@ class _CampaignFundsDetail extends StatelessWidget {
 }
 
 class _RangeAsk extends StatelessWidget {
-  final ComparableRange<Money> range;
+  final Range<Money> range;
 
   const _RangeAsk({
     required this.range,

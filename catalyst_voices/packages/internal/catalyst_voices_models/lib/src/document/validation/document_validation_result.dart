@@ -46,7 +46,7 @@ final class DocumentItemsNotUnique extends DocumentValidationResult {
 /// The [List]'s length is not within [expectedRange].
 final class DocumentItemsOutOfRange<T extends num> extends DocumentValidationResult {
   final DocumentNodeId invalidNodeId;
-  final NumRange<int> expectedRange;
+  final Range<int?> expectedRange;
   final int actualItems;
 
   const DocumentItemsOutOfRange({
@@ -78,7 +78,7 @@ final class DocumentMoneyNotMultipleOf extends DocumentValidationResult {
 /// The money [actualValue] is not within [expectedRange].
 final class DocumentMoneyOutOfRange extends DocumentValidationResult {
   final DocumentNodeId invalidNodeId;
-  final OpenRange<Money> expectedRange;
+  final Range<Money?> expectedRange;
   final Money actualValue;
 
   const DocumentMoneyOutOfRange({
@@ -110,7 +110,7 @@ final class DocumentNumNotMultipleOf extends DocumentValidationResult {
 /// The numerical [actualValue] is not within [expectedRange].
 final class DocumentNumOutOfRange extends DocumentValidationResult {
   final DocumentNodeId invalidNodeId;
-  final NumRange<num> expectedRange;
+  final Range<num?> expectedRange;
   final num actualValue;
 
   const DocumentNumOutOfRange({
@@ -147,7 +147,7 @@ enum DocumentPatternType {
 /// The [String]'s [actualLength] is not within [expectedRange].
 final class DocumentStringOutOfRange<T extends num> extends DocumentValidationResult {
   final DocumentNodeId invalidNodeId;
-  final NumRange<int> expectedRange;
+  final Range<int?> expectedRange;
   final int actualLength;
 
   const DocumentStringOutOfRange({

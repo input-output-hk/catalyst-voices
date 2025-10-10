@@ -197,7 +197,7 @@ final class DocumentGenericIntegerSchema extends DocumentIntegerSchema {
 }
 
 sealed class DocumentIntegerSchema extends DocumentValueSchema<int> {
-  final NumRange<int>? numRange;
+  final Range<int?>? numRange;
   final int? multipleOf;
 
   const DocumentIntegerSchema({

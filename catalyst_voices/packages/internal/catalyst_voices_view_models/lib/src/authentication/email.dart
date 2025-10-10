@@ -7,7 +7,7 @@ import 'package:formz/formz.dart';
 
 /// Form input validator for email
 final class Email extends FormzInput<String, EmailValidationException> {
-  static const NumRange<int> lengthRange = NumRange(min: 0, max: 100);
+  static const Range<int> lengthRange = Range(min: 0, max: 100);
 
   const Email.dirty([super.value = '']) : super.dirty();
 

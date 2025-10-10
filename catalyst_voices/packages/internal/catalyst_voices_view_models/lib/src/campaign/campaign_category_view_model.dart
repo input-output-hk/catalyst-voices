@@ -17,7 +17,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   final int proposalsCount;
   final MultiCurrencyAmount availableFunds;
   final MultiCurrencyAmount totalAsk;
-  final ComparableRange<Money> range;
+  final Range<Money> range;
   final List<CategoryDescriptionViewModel> descriptions;
   final SvgGenImage image;
   final List<String> dos;
@@ -61,7 +61,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
         majorUnits: BigInt.from(400000),
       ),
     ),
-    range: ComparableRange(
+    range: Range(
       min: Money.fromMajorUnits(
         currency: Currencies.ada,
         majorUnits: BigInt.from(15000),

@@ -16,7 +16,7 @@ class CampaignCategory extends Equatable {
   final int proposalsCount;
   final MultiCurrencyAmount availableFunds;
   final MultiCurrencyAmount totalAsk;
-  final ComparableRange<Money> range;
+  final Range<Money> range;
   final Currency currency;
   final List<CategoryDescription> descriptions;
   final String imageUrl;
@@ -78,7 +78,7 @@ class CampaignCategory extends Equatable {
     MultiCurrencyAmount? availableFunds,
     String? imageUrl,
     MultiCurrencyAmount? totalAsk,
-    ComparableRange<Money>? range,
+    Range<Money>? range,
     Currency? currency,
     List<CategoryDescription>? descriptions,
     List<String>? dos,
