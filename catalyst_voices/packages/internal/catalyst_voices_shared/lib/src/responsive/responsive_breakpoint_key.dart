@@ -2,8 +2,8 @@ typedef ResponsiveBreakpointRange = ({int min, int max});
 
 /// The responsive breakpoints are used to define different screen sizes
 /// for responsive design. The available keys are:
-///   - `xs`: Extra small screens: 0 - 599
-///   - `sm`: Small screens: 600 - 959
+///   - `xs`: Extra small screens: 0 - 640
+///   - `sm`: Small screens: 641 - 959
 ///   - `md`: Medium screens: 1240 - 1439
 ///   - `lg`: Large screens: 1440 - 2048
 enum ResponsiveBreakpointKey {
