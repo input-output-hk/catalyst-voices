@@ -57,7 +57,7 @@ void main() {
       expect(range4, isNull);
     });
 
-    test('Equality check works correctly', () {
+    test('equality check works correctly', () {
       const range1 = Range<num>(min: 10, max: 20);
       const range2 = Range<num>(min: 10, max: 20);
       const range3 = Range<num>(min: 15, max: 25);
