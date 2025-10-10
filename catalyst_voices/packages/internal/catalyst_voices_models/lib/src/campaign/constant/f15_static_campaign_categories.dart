@@ -51,8 +51,7 @@ Proposals should focus on mature R&D for products with Tier-1 collaborations, su
       ),
       CategoryDescription(
         title: 'Core Eligibility: Who Can Apply?',
-        // ignore: use_raw_strings
-        description: '''
+        description: r'''
 This category is exclusively for established organizations ready to build on Cardano at scale. To be eligible, the lead applicant must meet all the following criteria. Proposals that do not meet these foundational requirements will not be considered.
 
 * **Be a Registered Business:** You must be a registered legal business entity. Proposals from individuals or unregistered entities will not be accepted.
@@ -203,8 +202,7 @@ All proposals must adhere to the following standards. The primary focus is on tu
       ),
       CategoryDescription(
         title: 'Self-Assessment Checklist',
-        // ignore: use_raw_strings
-        description: '''
+        description: r'''
 Use this checklist to ensure your proposal meets all foundational and content requirements before submission.
 
 | **Rule & Check** | **Description** |
