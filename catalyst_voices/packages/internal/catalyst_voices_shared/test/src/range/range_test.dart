@@ -37,8 +37,8 @@ void main() {
       expect(range.contains(1000), isTrue);
     });
 
-    test('optionalRangeOf() creates correct NumRange', () {
-      final range1 = Range.optionalRangeOf(min: 10, max: 20);
+    test('optionalRangeOf() creates correct range', () {
+      final range1 = Range.optionalRangeOf<num>(min: 10, max: 20);
       expect(range1, isNotNull);
       expect(range1!.min, equals(10));
       expect(range1.max, equals(20));
