@@ -9,7 +9,7 @@ class Range<T extends Comparable<dynamic>?> extends Equatable {
 
   /// The maximum range value (inclusive).
   ///
-  /// If [T] is nullable and [max] is `null` then it means the range is not mmax-constrained.
+  /// If [T] is nullable and [max] is `null` then it means the range is not max-constrained.
   final T max;
 
   const Range({
