@@ -38,9 +38,6 @@ class Range<T extends Comparable<dynamic>?> extends Equatable {
       return null;
     }
 
-    return Range<T>(
-      min: min as T,
-      max: max as T,
-    );
+    return Range<T?>(min: min, max: max);
   }
 }
