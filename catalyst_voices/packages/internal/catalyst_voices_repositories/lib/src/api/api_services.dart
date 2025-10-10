@@ -6,6 +6,7 @@ import 'package:catalyst_voices_repositories/src/api/converters/cbor_or_json_con
 import 'package:catalyst_voices_repositories/src/api/converters/cbor_serializable_converter.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/path_trim_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
+import 'package:catalyst_voices_repositories/src/api/local/local_cat_gateway.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
 import 'package:chopper/chopper.dart';
 import 'package:flutter/foundation.dart';
@@ -37,7 +38,7 @@ final class ApiServices {
     _fixModelsMapping();
 
     return ApiServices.internal(
-      gateway: CatGateway.create(
+      gateway: LocalCatGateway.create(
         httpClient: httpClient?.call(),
         baseUrl: env.app,
         converter: CborOrJsonDelegateConverter(

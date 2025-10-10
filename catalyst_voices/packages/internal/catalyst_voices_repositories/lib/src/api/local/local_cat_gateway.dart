@@ -1,16 +1,30 @@
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.enums.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
-import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart';
+import 'package:catalyst_voices_repositories/src/api/local/local_documents_cat_gateway_mixin.dart';
 import 'package:chopper/chopper.dart';
 import 'package:http/http.dart' as http;
 
-final class LocalCatGateway implements CatGateway {
+final class LocalCatGateway with LocalDocumentsCatGatewayMixin implements CatGateway {
   @override
   ChopperClient client;
 
-  factory LocalCatGateway() {
+  factory LocalCatGateway.create({
+    // ignore: avoid_unused_constructor_parameters
+    ChopperClient? client,
+    // ignore: avoid_unused_constructor_parameters
+    http.Client? httpClient,
+    // ignore: avoid_unused_constructor_parameters
+    Authenticator? authenticator,
+    // ignore: avoid_unused_constructor_parameters
+    ErrorConverter? errorConverter,
+    // ignore: avoid_unused_constructor_parameters
+    Converter? converter,
+    // ignore: avoid_unused_constructor_parameters
+    Uri? baseUrl,
+    // ignore: avoid_unused_constructor_parameters
+    List<Interceptor>? interceptors,
+  }) {
     return LocalCatGateway._(ChopperClient());
   }
 
@@ -48,81 +62,6 @@ final class LocalCatGateway implements CatGateway {
     dynamic contentType,
   }) async {
     return Response<Object>(http.Response('{}', 200), const <String, dynamic>{});
-  }
-
-  @override
-  Future<Response<String>> apiGatewayV1DocumentDocumentIdGet({
-    required String? documentId,
-    String? version,
-    dynamic authorization,
-    dynamic contentType,
-  }) async {
-    return Response(
-      http.Response.bytes([], 200),
-      '',
-    );
-  }
-
-  @override
-  Future<Response<DocumentIndexList>> apiGatewayV1DocumentIndexPost({
-    int? page,
-    int? limit,
-    dynamic authorization,
-    dynamic contentType,
-    required DocumentIndexQueryFilter? body,
-  }) async {
-    page ??= 0;
-    limit ??= 10;
-
-    final id = body?.id as EqOrRangedIdDto?;
-    final eq = id?.eq;
-    if (eq != null) {
-      final rBody = DocumentIndexList(
-        docs: [
-          DocumentIndexListDto(
-            id: eq,
-            ver: [
-              IndividualDocumentVersion(ver: eq, type: ''),
-            ],
-          ).toJson(),
-        ],
-        page: CurrentPage(page: page, limit: limit, remaining: 0),
-      );
-      return Response(http.Response('{}', 200), rBody);
-    }
-
-    final rBody = DocumentIndexList(
-      docs: [
-        DocumentIndexListDto(
-          id: '0199c872-7be4-778c-8430-31e715f41149',
-          ver: [
-            IndividualDocumentVersion(
-              template: DocumentRefForFilteredDocuments(
-                id: '0194d492-1daa-7371-8bd3-c15811b2b063',
-                ver: '0194d492-1daa-7371-8bd3-c15811b2b063',
-              ),
-              category: DocumentRefForFilteredDocuments(
-                id: '0194d490-30bf-7043-8c5c-f0e09f8a6d8c',
-                ver: '0194d490-30bf-7043-8c5c-f0e09f8a6d8c',
-              ),
-              ver: '0199c876-b5e5-79f4-a6f3-842450859bad',
-              type: '7808d2ba-d511-40af-84e8-c0d1625fdfdc',
-            ),
-          ],
-        ),
-      ].map((e) => e.toJson()).toList(),
-      page: CurrentPage(page: page, limit: limit, remaining: 0),
-    );
-    return Response(http.Response('{}', 200), rBody);
-  }
-
-  @override
-  Future<Response<dynamic>> apiGatewayV1DocumentPut({
-    dynamic authorization,
-    dynamic contentType,
-    required Object? body,
-  }) async {
-    return Response(http.Response('{}}', 200), 'ok');
   }
 
   @override
