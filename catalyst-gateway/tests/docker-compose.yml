@@ -78,6 +78,8 @@ services:
   cat-gateway:
     image: cat-gateway:latest
     container_name: cat-gateway
+    ports:
+      - "3030:3030"
     healthcheck:
       test: "curl -s -i localhost:3030/api/v1/health/started | head -n 1 | grep 204"
       start_period: 30s
