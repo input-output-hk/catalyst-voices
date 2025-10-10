@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:catalyst_cose/catalyst_cose.dart';
@@ -14,12 +15,19 @@ import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid_plus/uuid_plus.dart' as u;
 
+const _decompressed = bool.fromEnvironment('name');
+const _proposalsCount = int.fromEnvironment('name', defaultValue: 100);
+
+var _time = DateTime.timestamp().millisecondsSinceEpoch;
+
 String _v7() {
-  return const u.Uuid().v7();
+  final config = u.V7Options(_time--, null);
+  return const u.Uuid().v7(config: config);
 }
 
 mixin LocalDocumentsCatGatewayMixin implements CatGateway {
   final _cache = <String, List<SignedDocumentMetadata>>{};
+  final _docs = <SignedDocumentMetadata, Uint8List>{};
 
   @override
   Future<Response<String>> apiGatewayV1DocumentDocumentIdGet({
@@ -40,53 +48,7 @@ mixin LocalDocumentsCatGatewayMixin implements CatGateway {
       return Response(http.Response.bytes([], 404), '');
     }
 
-    final protectedHeaders = CoseHeaders.protected(
-      contentType: const IntValue(CoseValues.jsonContentType),
-      contentEncoding: const StringValue(CoseValues.brotliContentEncoding),
-      type: metadata.documentType.uuid.asCose,
-      id: metadata.id!.asCose,
-      ver: metadata.ver!.asCose,
-      ref: metadata.ref?.asCose,
-      template: metadata.template?.asCose,
-      reply: metadata.reply?.asCose,
-      categoryId: metadata.categoryId?.asCose,
-    );
-
-    final payload = switch (metadata.documentType) {
-      DocumentType.proposalDocument => compressedProposalPayload,
-      DocumentType.proposalTemplate => compressedProposalTemplatePayload,
-      DocumentType.commentDocument => compressedCommentPayload,
-      DocumentType.commentTemplate => compressedCommentTemplatePayload,
-      DocumentType.proposalActionDocument => compressedProposalActionFinalPayload,
-      DocumentType.reviewDocument ||
-      DocumentType.reviewTemplate ||
-      DocumentType.categoryParametersDocument ||
-      DocumentType.categoryParametersTemplate ||
-      DocumentType.campaignParametersDocument ||
-      DocumentType.campaignParametersTemplate ||
-      DocumentType.brandParametersDocument ||
-      DocumentType.brandParametersTemplate ||
-      DocumentType.unknown => throw UnimplementedError(),
-    };
-
-    final coseSign = CoseSign(
-      protectedHeaders: protectedHeaders,
-      unprotectedHeaders: const CoseHeaders.unprotected(),
-      payload: payload,
-      signatures: [
-        CoseSignature(
-          protectedHeaders: CoseHeaders.protected(
-            kid: utf8.encode(
-              'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
-            ),
-          ),
-          unprotectedHeaders: const CoseHeaders.unprotected(),
-          signature: Uint8List.fromList([]),
-        ),
-      ],
-    );
-
-    final bytes = Uint8List.fromList(cbor.encode(coseSign.toCbor(tagged: false)));
+    final bytes = _docs[metadata] ?? _buildDoc(metadata);
 
     return Response(http.Response.bytes(bytes, 200), '');
   }
@@ -152,6 +114,73 @@ mixin LocalDocumentsCatGatewayMixin implements CatGateway {
     return Response(http.Response('{}', 200), 'ok');
   }
 
+  Uint8List _buildDoc(
+    SignedDocumentMetadata metadata, {
+    ProposalSubmissionAction? action,
+  }) {
+    final protectedHeaders = CoseHeaders.protected(
+      contentType: const IntValue(CoseValues.jsonContentType),
+      // ignore: avoid_redundant_argument_values
+      contentEncoding: _decompressed ? null : const StringValue(CoseValues.brotliContentEncoding),
+      type: metadata.documentType.uuid.asCose,
+      id: metadata.id!.asCose,
+      ver: metadata.ver!.asCose,
+      ref: metadata.ref?.asCose,
+      template: metadata.template?.asCose,
+      reply: metadata.reply?.asCose,
+      categoryId: metadata.categoryId?.asCose,
+    );
+
+    final payload = switch (metadata.documentType) {
+      DocumentType.proposalDocument when _decompressed => decompressedProposalPayload,
+      DocumentType.proposalDocument => compressedProposalPayload,
+      DocumentType.proposalTemplate when _decompressed => decompressedProposalTemplatePayload,
+      DocumentType.proposalTemplate => compressedProposalTemplatePayload,
+      DocumentType.commentDocument when _decompressed => decompressedCommentPayload,
+      DocumentType.commentDocument => compressedCommentPayload,
+      DocumentType.commentTemplate when _decompressed => decompressedCommentTemplatePayload,
+      DocumentType.commentTemplate => compressedCommentTemplatePayload,
+      DocumentType.proposalActionDocument when _decompressed => switch (action) {
+        null || ProposalSubmissionAction.aFinal => decompressedProposalActionFinalPayload,
+        ProposalSubmissionAction.draft => decompressedProposalActionDraftPayload,
+        ProposalSubmissionAction.hide => decompressedProposalActionHidePayload,
+      },
+      DocumentType.proposalActionDocument => switch (action) {
+        null || ProposalSubmissionAction.aFinal => compressedProposalActionFinalPayload,
+        ProposalSubmissionAction.draft => compressedProposalActionDraftPayload,
+        ProposalSubmissionAction.hide => compressedProposalActionHidePayload,
+      },
+      DocumentType.reviewDocument ||
+      DocumentType.reviewTemplate ||
+      DocumentType.categoryParametersDocument ||
+      DocumentType.categoryParametersTemplate ||
+      DocumentType.campaignParametersDocument ||
+      DocumentType.campaignParametersTemplate ||
+      DocumentType.brandParametersDocument ||
+      DocumentType.brandParametersTemplate ||
+      DocumentType.unknown => throw UnimplementedError(),
+    };
+
+    final coseSign = CoseSign(
+      protectedHeaders: protectedHeaders,
+      unprotectedHeaders: const CoseHeaders.unprotected(),
+      payload: payload,
+      signatures: [
+        CoseSignature(
+          protectedHeaders: CoseHeaders.protected(
+            kid: utf8.encode(
+              'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
+            ),
+          ),
+          unprotectedHeaders: const CoseHeaders.unprotected(),
+          signature: Uint8List.fromList([]),
+        ),
+      ],
+    );
+
+    return Uint8List.fromList(cbor.encode(coseSign.toCbor(tagged: false)));
+  }
+
   Future<void> _populate() async {
     for (final constRefs in constantDocumentsRefs) {
       _cache[constRefs.proposal.id] = [
@@ -175,18 +204,58 @@ mixin LocalDocumentsCatGatewayMixin implements CatGateway {
       ];
     }
 
-    for (var i = 0; i < 10; i++) {
+    for (var i = 0; i < _proposalsCount; i++) {
       final id = _v7();
-      _cache[id] = [
-        SignedDocumentMetadata(
+      final versionsCount = Random().nextInt(3) + 1;
+      for (var j = 0; j < versionsCount; j++) {
+        final ver = j == 0 ? id : _v7();
+
+        final proposalMetadata = SignedDocumentMetadata(
           contentType: SignedDocumentContentType.json,
           documentType: DocumentType.proposalDocument,
           id: id,
-          ver: id,
+          ver: ver,
           template: constantDocumentsRefs.first.proposal.asMetadataRef,
           categoryId: constantDocumentsRefs.first.category.asMetadataRef,
-        ),
-      ];
+        );
+        _cache.update(
+          id,
+          (value) => value..add(proposalMetadata),
+          ifAbsent: () => [proposalMetadata],
+        );
+
+        final commentsCount = Random().nextInt(3);
+        for (var c = 0; c < commentsCount; c++) {
+          final commentId = _v7();
+          _cache[commentId] = [
+            SignedDocumentMetadata(
+              contentType: SignedDocumentContentType.json,
+              documentType: DocumentType.commentDocument,
+              id: commentId,
+              ver: commentId,
+              ref: SignedDocumentMetadataRef(id: id, ver: ver),
+              template: constantDocumentsRefs.first.comment.asMetadataRef,
+              categoryId: constantDocumentsRefs.first.category.asMetadataRef,
+            ),
+          ];
+        }
+
+        final actionIndex = Random().nextInt(ProposalSubmissionAction.values.length);
+        final action = ProposalSubmissionAction.values[actionIndex];
+        final actionId = _v7();
+
+        final actionMetadata = SignedDocumentMetadata(
+          contentType: SignedDocumentContentType.json,
+          documentType: DocumentType.proposalActionDocument,
+          id: actionId,
+          ver: actionId,
+          ref: SignedDocumentMetadataRef(id: id, ver: ver),
+          categoryId: constantDocumentsRefs.first.category.asMetadataRef,
+        );
+
+        _cache[actionId] = [actionMetadata];
+        _docs[actionMetadata] = _buildDoc(actionMetadata, action: action);
+      }
     }
   }
 }

@@ -34,22 +34,25 @@ final class ApiServices {
     required AppEnvironmentType env,
     AuthTokenProvider? authTokenProvider,
     ValueGetter<http.Client?>? httpClient,
+    bool stressTest = false,
   }) {
     _fixModelsMapping();
 
     return ApiServices.internal(
-      gateway: LocalCatGateway.create(
-        httpClient: httpClient?.call(),
-        baseUrl: env.app,
-        converter: CborOrJsonDelegateConverter(
-          cborConverter: CborSerializableConverter(),
-          jsonConverter: $JsonSerializableConverter(),
-        ),
-        interceptors: [
-          if (authTokenProvider != null) RbacAuthInterceptor(authTokenProvider),
-          if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
-        ],
-      ),
+      gateway: stressTest
+          ? LocalCatGateway.create()
+          : CatGateway.create(
+              httpClient: httpClient?.call(),
+              baseUrl: env.app,
+              converter: CborOrJsonDelegateConverter(
+                cborConverter: CborSerializableConverter(),
+                jsonConverter: $JsonSerializableConverter(),
+              ),
+              interceptors: [
+                if (authTokenProvider != null) RbacAuthInterceptor(authTokenProvider),
+                if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
+              ],
+            ),
       reviews: CatReviews.create(
         httpClient: httpClient?.call(),
         baseUrl: env.app.replace(path: '/api/reviews'),

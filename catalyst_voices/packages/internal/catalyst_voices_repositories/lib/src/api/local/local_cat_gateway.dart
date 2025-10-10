@@ -9,22 +9,7 @@ final class LocalCatGateway with LocalDocumentsCatGatewayMixin implements CatGat
   @override
   ChopperClient client;
 
-  factory LocalCatGateway.create({
-    // ignore: avoid_unused_constructor_parameters
-    ChopperClient? client,
-    // ignore: avoid_unused_constructor_parameters
-    http.Client? httpClient,
-    // ignore: avoid_unused_constructor_parameters
-    Authenticator? authenticator,
-    // ignore: avoid_unused_constructor_parameters
-    ErrorConverter? errorConverter,
-    // ignore: avoid_unused_constructor_parameters
-    Converter? converter,
-    // ignore: avoid_unused_constructor_parameters
-    Uri? baseUrl,
-    // ignore: avoid_unused_constructor_parameters
-    List<Interceptor>? interceptors,
-  }) {
+  factory LocalCatGateway.create() {
     return LocalCatGateway._(ChopperClient());
   }
 

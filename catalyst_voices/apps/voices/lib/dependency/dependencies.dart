@@ -219,6 +219,7 @@ final class Dependencies extends DependencyProvider {
           env: get<AppEnvironment>().type,
           authTokenProvider: get<AuthTokenProvider>(),
           httpClient: () => get<ReportingService>().buildHttpClient(),
+          stressTest: true,
         );
       },
       dispose: (api) => api.dispose(),
