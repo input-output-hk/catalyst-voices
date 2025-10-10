@@ -3957,5 +3957,13 @@
   "yourNextStep": "Your next step",
   "@yourNextStep": {
     "description": "Generic header for next step instructions"
+  },
+  "doWord": "Do:",
+  "@doWord": {
+    "description": "Label for a list of things to do"
+  },
+  "dontWord": "Don't:",
+  "@dontWord": {
+    "description": "Label for a list of things not to do"
   }
 }
