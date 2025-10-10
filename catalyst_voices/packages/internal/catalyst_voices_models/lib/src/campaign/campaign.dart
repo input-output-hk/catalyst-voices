@@ -11,7 +11,7 @@ final class Campaign extends Equatable {
   // Frontend only references. F14 and F15 do not mean anything for backend.
   // They're only used to difference between campaigns.
   static const f14Ref = SignedDocumentRef.first('01997695-e26f-70db-b9d4-92574a806bcd');
-  static const f15Ref = SignedDocumentRef.first('01997696-2024-7438-9178-f7d29b2c1ddb');
+  static const f15Ref = SignedDocumentRef.first('0199802c-21b4-7d91-986d-0e913cd81391');
 
   static final all = <Campaign>[
     Campaign.f14(),
