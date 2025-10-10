@@ -16,6 +16,8 @@ services:
 
       - INIT_AND_DROP_DB=true
       - WITH_MIGRATIONS=false
+    ports:
+      - 5432:5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_PASSWORD}"]
       interval: 10s
@@ -69,6 +71,8 @@ services:
     container_name: scylla-node
     restart: unless-stopped
     command: --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0
+    ports:
+      - 9042:9042
     healthcheck:
       test: cqlsh -e "SHOW VERSION" || exit 1
       interval: 15s
@@ -98,6 +102,8 @@ services:
       - SERVICE_LIVE_TIMEOUT_INTERVAL=30
       # - LOG_LEVEL=error
       # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
+    ports:
+      - 3030:3030
     depends_on:
       event-db-migrations:
         condition: service_started
