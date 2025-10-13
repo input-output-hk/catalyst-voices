@@ -102,7 +102,9 @@ Future<BootstrapArgs> bootstrap({
   // something
   Bloc.observer = AppBlocObserver(logOnChange: false);
 
-  await Dependencies.instance.get<CatalystDatabase>().clear();
+  if (config.stressTest.isEnabled) {
+    await Dependencies.instance.get<CatalystDatabase>().clear();
+  }
 
   Dependencies.instance.get<ReportingServiceMediator>().init();
   unawaited(
