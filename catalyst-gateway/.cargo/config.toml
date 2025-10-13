@@ -1,3 +1,5 @@
+# cspell: words debuginfo
+
 # Use MOLD linker where possible, but ONLY in CI applicable targets.
 
 # Configure how Docker container targets build.
