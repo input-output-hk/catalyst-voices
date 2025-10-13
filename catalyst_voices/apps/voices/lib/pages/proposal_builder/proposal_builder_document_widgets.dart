@@ -62,7 +62,11 @@ class _Stats extends StatelessWidget {
         Expanded(
           child: _StatsItem(
             label: context.l10n.fundsAvailable,
-            value: category.availableFunds.list.map(MoneyFormatter.formatCompactRounded).join(', '),
+            value: MoneyFormatter.formatMultiCurrencyAmount(
+              category.availableFunds,
+              formatter: MoneyFormatter.formatCompactRounded,
+              separator: ', ',
+            ),
           ),
         ),
         Expanded(
