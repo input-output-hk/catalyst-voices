@@ -7,6 +7,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.enums.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
+import 'package:catalyst_voices_repositories/src/api/internal_error_cat_gateway_mixin.dart';
 import 'package:catalyst_voices_repositories/src/api/local/fixture/fixtures.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart';
@@ -23,7 +24,7 @@ String _v7() {
   return const u.Uuid().v7(config: config);
 }
 
-final class LocalCatGateway implements CatGateway {
+final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGateway {
   @override
   ChopperClient client;
 
@@ -170,30 +171,6 @@ final class LocalCatGateway implements CatGateway {
   }
 
   @override
-  Future<Response<dynamic>> apiGatewayV1HealthLiveGet({
-    dynamic authorization,
-    dynamic contentType,
-  }) async {
-    return Response<Object>(http.Response('{}', 500), const <String, dynamic>{});
-  }
-
-  @override
-  Future<Response<dynamic>> apiGatewayV1HealthReadyGet({
-    dynamic authorization,
-    dynamic contentType,
-  }) async {
-    return Response<Object>(http.Response('{}', 500), const <String, dynamic>{});
-  }
-
-  @override
-  Future<Response<dynamic>> apiGatewayV1HealthStartedGet({
-    dynamic authorization,
-    dynamic contentType,
-  }) async {
-    return Response<Object>(http.Response('{}', 500), const <String, dynamic>{});
-  }
-
-  @override
   Future<Response<RbacRegistrationChain>> apiGatewayV1RbacRegistrationGet({
     String? lookup,
     dynamic authorization,
@@ -247,17 +224,6 @@ final class LocalCatGateway implements CatGateway {
       http.Response('{}', 200),
       body,
     );
-  }
-
-  @override
-  Future<Response<dynamic>> apiGatewayV2DocumentIndexPost({
-    int? page,
-    int? limit,
-    dynamic authorization,
-    dynamic contentType,
-    required DocumentIndexQueryFilterV2? body,
-  }) async {
-    return Response<Object>(http.Response('{}', 500), const <String, dynamic>{});
   }
 
   @override
