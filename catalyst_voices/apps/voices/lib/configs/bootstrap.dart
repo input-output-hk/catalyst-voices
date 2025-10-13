@@ -71,6 +71,10 @@ Future<BootstrapArgs> bootstrap({
   final config = await _getAppConfig(env: environment.type);
   _bootstrapInitState = _bootstrapInitState.copyWith(appConfig: Optional(config));
 
+  if (config.stressTest.isEnabled) {
+    _debugPrintStressTest();
+  }
+
   final endConfigTimestamp = DateTimeExt.now(utc: true);
 
   await _reportingService.init(config: config.sentry);
@@ -199,6 +203,16 @@ Future<void> registerDependencies({
     loggingService: loggingService ?? NoopLoggingService(),
     reportingService: reportingService,
   );
+}
+
+void _debugPrintStressTest() {
+  if (!kProfileMode) {
+    // ignore: avoid_print
+    print('Warning. StressTest is enabled for non profile mode');
+  } else {
+    // ignore: avoid_print
+    print('Running in StressTest environment');
+  }
 }
 
 Widget _defaultBuilder(BootstrapArgs args) {
