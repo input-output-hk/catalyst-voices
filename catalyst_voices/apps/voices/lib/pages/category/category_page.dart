@@ -204,7 +204,7 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   @override
-  Future<void> dispose() async {
+  void dispose() {
     unawaited(_categoryRefSub?.cancel());
     _categoryRefSub = null;
     super.dispose();

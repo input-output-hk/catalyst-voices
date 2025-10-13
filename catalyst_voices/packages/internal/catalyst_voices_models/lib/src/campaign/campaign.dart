@@ -62,8 +62,14 @@ Project Catalyst turns economic power into innovation power by using the Cardano
       selfRef: f15Ref,
       name: 'Catalyst Fund15',
       description: '''TODO''',
-      allFunds: MultiCurrencyAmount.single(Currencies.ada.amount(20000000)),
-      totalAsk: MultiCurrencyAmount.single(Money.zero(currency: Currencies.ada)),
+      allFunds: MultiCurrencyAmount.list([
+        Currencies.ada.amount(20000000),
+        Currencies.usdm.amount(250000),
+      ]),
+      totalAsk: MultiCurrencyAmount.list([
+        Money.zero(currency: Currencies.ada),
+        Money.zero(currency: Currencies.usdm),
+      ]),
       fundNumber: 15,
       timeline: f15StaticCampaignTimeline,
       publish: CampaignPublish.published,

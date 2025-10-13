@@ -7,14 +7,14 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 /// Allows to get the category detail and list of categories.
 class CategoryDetailCubit extends Cubit<CategoryDetailState> {
   final CampaignService _campaignService;
-  Campaign? _cacheCampaign;
+  Campaign? _cachedCampaign;
 
   CategoryDetailCubit(
     this._campaignService,
   ) : super(const CategoryDetailState(isLoading: true));
 
   Future<void> getCategories() async {
-    if (_cacheCampaign != null) return;
+    if (_cachedCampaign != null) return;
 
     if (!state.isLoading) {
       emit(state.copyWith(isLoading: true));
@@ -22,7 +22,7 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
 
     final campaign = await _campaignService.getActiveCampaign();
     if (campaign == null) {
-      _cacheCampaign = campaign;
+      _cachedCampaign = campaign;
       return emit(
         state.copyWith(
           isLoading: false,
