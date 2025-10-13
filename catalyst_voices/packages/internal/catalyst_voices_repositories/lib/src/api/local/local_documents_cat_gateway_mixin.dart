@@ -65,7 +65,7 @@ mixin LocalDocumentsCatGatewayMixin implements CatGateway {
     limit ??= 10;
 
     if (_cache.isEmpty) {
-      await _populate();
+      await _populateIndex();
     }
 
     final id = body?.id as EqOrRangedIdDto?;
@@ -181,7 +181,7 @@ mixin LocalDocumentsCatGatewayMixin implements CatGateway {
     return Uint8List.fromList(cbor.encode(coseSign.toCbor(tagged: false)));
   }
 
-  Future<void> _populate() async {
+  Future<void> _populateIndex() async {
     for (final constRefs in constantDocumentsRefs) {
       _cache[constRefs.proposal.id] = [
         SignedDocumentMetadata(
@@ -207,6 +207,11 @@ mixin LocalDocumentsCatGatewayMixin implements CatGateway {
     for (var i = 0; i < _proposalsCount; i++) {
       final id = _v7();
       final versionsCount = Random().nextInt(3) + 1;
+
+      // only first 4 are used
+      final categoryConstIndex = Random().nextInt(4);
+      final categoryConstRefs = constantDocumentsRefs[categoryConstIndex];
+
       for (var j = 0; j < versionsCount; j++) {
         final ver = j == 0 ? id : _v7();
 
@@ -215,8 +220,8 @@ mixin LocalDocumentsCatGatewayMixin implements CatGateway {
           documentType: DocumentType.proposalDocument,
           id: id,
           ver: ver,
-          template: constantDocumentsRefs.first.proposal.asMetadataRef,
-          categoryId: constantDocumentsRefs.first.category.asMetadataRef,
+          template: categoryConstRefs.proposal.asMetadataRef,
+          categoryId: categoryConstRefs.category.asMetadataRef,
         );
         _cache.update(
           id,
@@ -234,27 +239,29 @@ mixin LocalDocumentsCatGatewayMixin implements CatGateway {
               id: commentId,
               ver: commentId,
               ref: SignedDocumentMetadataRef(id: id, ver: ver),
-              template: constantDocumentsRefs.first.comment.asMetadataRef,
-              categoryId: constantDocumentsRefs.first.category.asMetadataRef,
+              template: categoryConstRefs.comment.asMetadataRef,
+              categoryId: categoryConstRefs.category.asMetadataRef,
             ),
           ];
         }
 
-        final actionIndex = Random().nextInt(ProposalSubmissionAction.values.length);
-        final action = ProposalSubmissionAction.values[actionIndex];
-        final actionId = _v7();
+        final actionIndex = Random().nextInt(ProposalSubmissionAction.values.length + 1);
+        final action = ProposalSubmissionAction.values.elementAtOrNull(actionIndex);
+        if (action != null) {
+          final actionId = _v7();
 
-        final actionMetadata = SignedDocumentMetadata(
-          contentType: SignedDocumentContentType.json,
-          documentType: DocumentType.proposalActionDocument,
-          id: actionId,
-          ver: actionId,
-          ref: SignedDocumentMetadataRef(id: id, ver: ver),
-          categoryId: constantDocumentsRefs.first.category.asMetadataRef,
-        );
+          final actionMetadata = SignedDocumentMetadata(
+            contentType: SignedDocumentContentType.json,
+            documentType: DocumentType.proposalActionDocument,
+            id: actionId,
+            ver: actionId,
+            ref: SignedDocumentMetadataRef(id: id, ver: ver),
+            categoryId: categoryConstRefs.category.asMetadataRef,
+          );
 
-        _cache[actionId] = [actionMetadata];
-        _docs[actionMetadata] = _buildDoc(actionMetadata, action: action);
+          _cache[actionId] = [actionMetadata];
+          _docs[actionMetadata] = _buildDoc(actionMetadata, action: action);
+        }
       }
     }
   }
