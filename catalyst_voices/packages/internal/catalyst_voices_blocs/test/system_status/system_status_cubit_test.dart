@@ -18,7 +18,7 @@ void main() {
     });
 
     test('initial state is empty', () {
-      when(() => repository.watchComponentStatuses()).thenAnswer((_) => const Stream.empty());
+      when(() => repository.pollComponentStatuses()).thenAnswer((_) => const Stream.empty());
 
       cubit = SystemStatusCubit(repository);
 
@@ -31,7 +31,7 @@ void main() {
         const ComponentStatus(name: 'database', isOperational: true),
       ];
 
-      when(() => repository.watchComponentStatuses()).thenAnswer((_) => Stream.value(statuses));
+      when(() => repository.pollComponentStatuses()).thenAnswer((_) => Stream.value(statuses));
 
       cubit = SystemStatusCubit(repository);
 
@@ -47,7 +47,7 @@ void main() {
         const ComponentStatus(name: 'database', isOperational: true),
       ];
 
-      when(() => repository.watchComponentStatuses()).thenAnswer((_) => Stream.value(statuses));
+      when(() => repository.pollComponentStatuses()).thenAnswer((_) => Stream.value(statuses));
 
       cubit = SystemStatusCubit(repository);
 
@@ -61,7 +61,7 @@ void main() {
       final statuses = [const ComponentStatus(name: 'api', isOperational: true)];
 
       when(
-        () => repository.watchComponentStatuses(),
+        () => repository.pollComponentStatuses(),
       ).thenAnswer((_) => Stream.fromIterable([statuses, statuses]));
 
       cubit = SystemStatusCubit(repository);

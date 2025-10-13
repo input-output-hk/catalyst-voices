@@ -85,7 +85,6 @@ final class Dependencies extends DependencyProvider {
       )
       ..registerLazySingleton<SystemStatusCubit>(
         () => SystemStatusCubit(get<SystemStatusRepository>()),
-        dispose: (cubit) async => cubit.close(),
       )
       ..registerLazySingleton<SessionCubit>(
         () {

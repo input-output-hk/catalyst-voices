@@ -4,16 +4,14 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/api/api.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/dto/component_status/component_ext.dart';
+import 'package:rxdart/rxdart.dart';
 
-// ignore: one_member_abstracts
 abstract interface class SystemStatusRepository {
   const factory SystemStatusRepository(ApiServices apiServices) = SystemStatusRepositoryImpl;
 
   Future<List<ComponentStatus>> getComponentStatuses();
 
-  Stream<List<ComponentStatus>> watchComponentStatuses({
-    Duration interval = const Duration(seconds: 120),
-  });
+  Stream<List<ComponentStatus>> pollComponentStatuses({Duration interval});
 }
 
 final class SystemStatusRepositoryImpl implements SystemStatusRepository {
@@ -29,11 +27,12 @@ final class SystemStatusRepositoryImpl implements SystemStatusRepository {
   }
 
   @override
-  Stream<List<ComponentStatus>> watchComponentStatuses({
-    Duration interval = const Duration(seconds: 60),
+  Stream<List<ComponentStatus>> pollComponentStatuses({
+    Duration interval = const Duration(seconds: 120),
   }) {
-    return Stream<void>.periodic(
-      interval,
-    ).asyncMap((_) => getComponentStatuses()).asBroadcastStream();
+    return Stream<void>.periodic(interval) //
+        .startWith(null)
+        .asyncMap((_) async => getComponentStatuses())
+        .asBroadcastStream();
   }
 }

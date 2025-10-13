@@ -18,9 +18,12 @@ final class SystemStatusCubit extends Cubit<SystemStatusState>
     this._systemStatusRepository,
   ) : super(const SystemStatusState()) {
     _systemComponentStatusesSub = _systemStatusRepository
-        .watchComponentStatuses()
+        .pollComponentStatuses()
         .distinct(const DeepCollectionEquality.unordered().equals)
-        .listen(_onSystemComponentStatusesChanged);
+        .listen(
+          _onSystemComponentStatusesChanged,
+          onError: _onSystemComponentStatusesError,
+        );
   }
 
   @override
@@ -39,5 +42,9 @@ final class SystemStatusCubit extends Cubit<SystemStatusState>
       _logger.fine('All components are operational: $statuses');
       emitSignal(const CancelSystemStatusIssueSignal());
     }
+  }
+
+  void _onSystemComponentStatusesError(Object error, StackTrace stackTrace) {
+    _logger.severe('Error fetching system component statuses', error, stackTrace);
   }
 }

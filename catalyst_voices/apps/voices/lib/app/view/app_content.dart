@@ -72,7 +72,6 @@ final class _AppContent extends StatelessWidget {
       theme: ThemeBuilder.buildTheme(),
       darkTheme: ThemeBuilder.buildTheme(brightness: Brightness.dark),
       debugShowCheckedModeBanner: false,
-
       builder: (_, child) {
         return AppGlobalShortcuts(
           child: AppActiveStateListener(

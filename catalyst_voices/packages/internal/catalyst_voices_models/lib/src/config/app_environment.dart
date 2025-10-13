@@ -147,9 +147,7 @@ enum AppEnvironmentType {
   }
 
   /// Gets the URI for the system status page.
-  Uri get status {
-    return Uri.parse('https://status.projectcatalyst.io');
-  }
+  Uri get status => Uri.parse('https://status.projectcatalyst.io');
 
   /// Constructs a base URL from a service name and an optional environment name.
   ///
