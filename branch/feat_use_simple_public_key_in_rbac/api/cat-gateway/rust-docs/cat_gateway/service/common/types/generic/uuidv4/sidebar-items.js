@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["DESCRIPTION","ENCODED_LENGTH","EXAMPLE","FORMAT","PATTERN","TITLE"],"fn":["is_valid"],"static":["SCHEMA"],"struct":["UUIDv4"]};

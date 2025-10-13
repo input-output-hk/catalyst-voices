@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["cardano","config","document","generic"]};

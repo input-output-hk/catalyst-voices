@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["CUSTOM_HEADER_PREFIX"],"fn":["server_info"],"struct":["CatGatewayInfo","CatGatewayInfoImpl"]};

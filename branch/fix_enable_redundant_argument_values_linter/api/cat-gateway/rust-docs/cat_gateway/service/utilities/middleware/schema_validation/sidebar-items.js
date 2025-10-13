@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["schema_version_validation"],"struct":["SchemaVersionValidation","SchemaVersionValidationImpl"]};

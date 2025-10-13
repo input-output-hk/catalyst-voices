@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["ada_value","asset_name","asset_value","catalyst_id","cip19_address","cip19_stake_address","hash28","nonce","query","slot_no","txn_index"]};

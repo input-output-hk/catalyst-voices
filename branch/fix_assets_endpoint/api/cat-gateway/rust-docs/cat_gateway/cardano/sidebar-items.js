@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["start_followers","start_sync_for"],"mod":["event","sync_params","sync_task","util"]};

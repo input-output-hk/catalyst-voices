@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["get_assets_by_stake_address","get_txi_by_txn_hash","get_txo_by_stake_address","update_txo_spent"]};

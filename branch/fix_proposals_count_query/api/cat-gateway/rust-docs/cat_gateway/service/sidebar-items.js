@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["api_spec","run"],"mod":["api","common","docs","poem_service","utilities"]};

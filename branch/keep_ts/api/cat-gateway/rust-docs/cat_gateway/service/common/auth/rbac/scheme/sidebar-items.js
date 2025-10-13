@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["AUTHORIZATION_HEADER","MAX_TOKEN_AGE","MAX_TOKEN_SKEW"],"enum":["AuthTokenError"],"fn":["checker_api_catalyst_auth"],"static":["CACHE"],"struct":["AuthTokenAccessViolation","CatalystRBACSecurityScheme","ServiceUnavailableError"],"type":["EncodedAuthToken"]};

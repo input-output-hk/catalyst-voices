@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["as_raw_bytes","is_network_supported"],"struct":["CatalystRBACTokenV1"]};

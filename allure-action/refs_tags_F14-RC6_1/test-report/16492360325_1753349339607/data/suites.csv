@@ -1,7 +1,0 @@
-"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
-"","565","test_templates","","Thu Jul 24 09:24:18 GMT 2025","passed","Thu Jul 24 09:24:18 GMT 2025","","pytest","integration.test_signed_doc",""
-"","0","test_date_time_to_slot_number_endpoint","","Thu Jul 24 09:24:18 GMT 2025","skipped","Thu Jul 24 09:24:18 GMT 2025","","pytest","integration.test_slot_info",""
-"","0","test_schema_version_mismatch_changes_cat_gateway_behavior","","Thu Jul 24 09:24:18 GMT 2025","skipped","Thu Jul 24 09:24:18 GMT 2025","","pytest","integration.test_schema_mismatch_behavior",""
-"","0","test_voter_registration_endpoint","","Thu Jul 24 09:24:18 GMT 2025","skipped","Thu Jul 24 09:24:18 GMT 2025","","pytest","integration.test_voter_registration",""
-"","15","test_config_frontend","","Thu Jul 24 09:24:18 GMT 2025","passed","Thu Jul 24 09:24:18 GMT 2025","","pytest","integration.test_config_frontend",""
-"","0","test_bech32_encoding","","Thu Jul 24 09:24:18 GMT 2025","skipped","Thu Jul 24 09:24:18 GMT 2025","","pytest","integration.test_utils",""

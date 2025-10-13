@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["GET_STAKE_ADDR_FROM_VOTE_KEY"],"struct":["GetStakeAddrFromVoteKeyParams","GetStakeAddrFromVoteKeyQuery"]};

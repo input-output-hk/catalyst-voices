@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["init_prometheus","metrics_updater_fn"],"mod":["caches","chain_follower","chain_indexer","endpoint","health","memory"]};

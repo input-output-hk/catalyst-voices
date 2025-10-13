@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["get_template"],"static":["JINJA_ENV"],"struct":["JinjaTemplateSource"]};

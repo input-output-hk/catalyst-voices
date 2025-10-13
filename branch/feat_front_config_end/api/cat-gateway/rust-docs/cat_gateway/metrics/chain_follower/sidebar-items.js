@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["init_metrics_reporter","report_live","report_mithril"],"mod":["reporter"],"static":["IS_INITIALIZED"]};

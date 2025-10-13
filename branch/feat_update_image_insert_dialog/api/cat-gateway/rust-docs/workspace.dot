@@ -1,4 +1,0 @@
-digraph {
-    0 [ label = "cat-gateway" shape = box]
-}
-

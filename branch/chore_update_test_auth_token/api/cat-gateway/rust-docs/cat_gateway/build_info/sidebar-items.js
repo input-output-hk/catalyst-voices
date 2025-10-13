@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["BUILD_INFO"],"fn":["build_info","log_build_info"]};

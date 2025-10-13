@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["cip36","rbac","staking"],"struct":["Api"],"type":["CardanoApi"]};

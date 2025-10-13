@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["HEX_ENCODED_LENGTH"],"fn":["verifying_key_from_hex","verifying_key_from_vec"]};

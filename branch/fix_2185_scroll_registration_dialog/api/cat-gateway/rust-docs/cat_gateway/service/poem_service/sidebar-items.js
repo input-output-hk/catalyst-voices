@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["get_app_docs","mk_app","run"]};

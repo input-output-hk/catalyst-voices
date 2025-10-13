@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["QUERY"],"fn":["cache_for_transaction_id"],"static":["CACHE"],"struct":["Query","QueryParams"]};

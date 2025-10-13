@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["get_all_invalids","get_all_registrations","get_from_stake_pk","get_invalid","get_stake_pk_from_stake_addr","get_stake_pk_from_vote_key"]};

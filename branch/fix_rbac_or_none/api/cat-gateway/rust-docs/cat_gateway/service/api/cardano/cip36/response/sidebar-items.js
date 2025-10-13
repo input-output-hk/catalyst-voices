@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Cip36Registration"],"struct":["Cip36Details","Cip36RegistrationList","Cip36RegistrationListPage","Cip36RegistrationUnprocessableContent","Cip36RegistrationsForVotingPublicKey","Cip36RegistrationsForVotingPublicKeyList"],"type":["AllRegistration"]};

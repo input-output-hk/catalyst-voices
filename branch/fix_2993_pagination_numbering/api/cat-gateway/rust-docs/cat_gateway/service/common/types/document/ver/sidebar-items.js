@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["DESCRIPTION","ENCODED_LENGTH","EXAMPLE","EXAMPLE_MAX","EXAMPLE_MIN","FORMAT","PATTERN","TITLE","URI","URI_DESCRIPTION"],"enum":["EqOrRangedVer"],"fn":["is_valid"],"static":["SCHEMA"],"struct":["DocumentVer","EqOrRangedVerDocumented","VerEq","VerEqDocumented","VerRange","VerRangeDocumented"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["FORMAT","PATTERN"],"static":["SCHEMA"],"struct":["CatalystId"]};

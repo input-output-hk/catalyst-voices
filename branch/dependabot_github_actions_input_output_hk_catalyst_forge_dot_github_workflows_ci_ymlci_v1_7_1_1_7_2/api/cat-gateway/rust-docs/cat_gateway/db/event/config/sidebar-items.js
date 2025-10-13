@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["GET_CONFIG","UPSERT_CONFIG"],"mod":["key"],"struct":["Config"]};

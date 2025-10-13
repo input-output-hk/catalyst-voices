@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["CATEGORY_DOCUMENTS","COMMENT_TEMPLATES","EMPTY_JSON_OBJECT_BYTES","PROPOSAL_TEMPLATES"],"struct":["CategoryDocData","CommentTemplateDocData","ProposalTemplateDocData"]};

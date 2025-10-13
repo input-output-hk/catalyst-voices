@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["docs","favicon"],"mod":["stoplight_elements"],"struct":["Files"]};

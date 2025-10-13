@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["registrations_get"],"struct":["Api"]};

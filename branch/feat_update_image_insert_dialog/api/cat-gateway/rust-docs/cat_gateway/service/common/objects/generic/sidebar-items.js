@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["json_object","pagination"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["drop","entry_count","get","insert","size","update"],"static":["ASSETS_CACHE"]};

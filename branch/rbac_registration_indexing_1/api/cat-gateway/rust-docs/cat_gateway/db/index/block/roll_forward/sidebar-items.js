@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["PurgeCondition"],"fn":["purge_cip36_registration","purge_cip36_registration_for_vote_key","purge_cip36_registration_invalid","purge_invalid_rbac509_registration","purge_live_index","purge_rbac509_registration","purge_stake_registration","purge_txi_by_hash","purge_txo_ada","purge_txo_assets","purge_unstaked_txo_ada","purge_unstaked_txo_assets"]};

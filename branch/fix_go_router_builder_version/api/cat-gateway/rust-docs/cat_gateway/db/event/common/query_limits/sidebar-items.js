@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["QueryLimitsInner"],"fn":["cal_offset"],"struct":["QueryLimits"]};

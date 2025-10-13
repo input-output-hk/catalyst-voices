@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Responses"],"fn":["endpoint","is_started","started"],"static":["IS_STARTED"],"type":["AllResponses"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["INSERT_CIP36_REGISTRATION_FOR_VOTE_KEY_QUERY"],"struct":["Params"]};

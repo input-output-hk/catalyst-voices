@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["doc_ref","doc_type","id","ver"]};

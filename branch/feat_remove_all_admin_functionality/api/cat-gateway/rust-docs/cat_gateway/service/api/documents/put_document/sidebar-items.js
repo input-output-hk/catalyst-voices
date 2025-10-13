@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["MAXIMUM_DOCUMENT_SIZE"],"enum":["Responses"],"fn":["endpoint","return_error_report","store_document_in_db"],"mod":["unprocessable_content_request"],"type":["AllResponses"]};

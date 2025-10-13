@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Responses"],"fn":["endpoint","fetch_docs"],"mod":["query_filter","response"],"type":["AllResponses"]};

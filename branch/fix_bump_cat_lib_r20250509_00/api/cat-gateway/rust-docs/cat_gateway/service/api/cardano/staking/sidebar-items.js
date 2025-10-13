@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["assets_get"],"struct":["Api"]};

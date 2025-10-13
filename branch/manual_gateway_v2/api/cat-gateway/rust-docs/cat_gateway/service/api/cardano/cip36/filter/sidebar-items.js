@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["build_response","get_all_invalid_registrations","get_all_valid_registrations","get_invalid_registrations","get_registrations_given_stake_addr","get_registrations_given_vote_key","get_valid_registrations","paginate_registrations","snapshot","sort_registrations"]};

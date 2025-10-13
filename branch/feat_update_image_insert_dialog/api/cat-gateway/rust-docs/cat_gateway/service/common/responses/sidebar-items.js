@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["ErrorResponses","WithErrorResponses"],"mod":["code_401_unauthorized","code_403_forbidden","code_412_precondition_failed","code_429_too_many_requests","code_500_internal_server_error","code_503_service_unavailable"],"struct":["FilteredByStatusCodeResponse"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["DESCRIPTION","EXAMPLE","TITLE"],"static":["SCHEMA"],"struct":["SlotNo"]};

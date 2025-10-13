@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["API_DESCRIPTION","API_TITLE","API_VERSION","TERMS_OF_SERVICE"],"fn":["get_api_contact","get_api_license","mk_api"],"mod":["cardano","config","documents","health"]};

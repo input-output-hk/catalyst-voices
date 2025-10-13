@@ -1,1 +1,0 @@
-searchState.loadedDescShard("cat_gateway", 0, "Intentionally empty This file exists, so that doc tests …")

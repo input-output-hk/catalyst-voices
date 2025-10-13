@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["common","get_document","post_document_index_query","put_document","templates"],"struct":["DocumentApi"]};

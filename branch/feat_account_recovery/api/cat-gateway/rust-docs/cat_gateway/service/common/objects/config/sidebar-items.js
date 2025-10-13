@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["environment","frontend_config","version"],"struct":["ConfigUnprocessableContent"]};

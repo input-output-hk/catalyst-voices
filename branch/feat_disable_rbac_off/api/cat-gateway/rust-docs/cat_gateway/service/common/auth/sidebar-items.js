@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["api_key","none","none_or_rbac","rbac"]};

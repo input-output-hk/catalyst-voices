@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["generate_uuid_string_from_data"]};

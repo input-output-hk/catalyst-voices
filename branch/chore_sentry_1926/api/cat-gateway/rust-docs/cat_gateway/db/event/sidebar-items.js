@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["DATABASE_SCHEMA_VERSION"],"enum":["EventDBConnectionError"],"fn":["establish_connection_pool"],"mod":["common","config","error","schema_check","signed_docs"],"static":["DEEP_QUERY_INSPECT","EVENT_DB_POOL"],"struct":["EventDB"],"type":["SqlDbPool"]};

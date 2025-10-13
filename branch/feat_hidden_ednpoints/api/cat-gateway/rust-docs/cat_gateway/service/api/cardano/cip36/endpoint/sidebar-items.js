@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["cip36_registrations"]};

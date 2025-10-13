@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"enum":["Responses"],"fn":["build_full_stake_info_response","build_stake_info","calculate_assets_state","endpoint","get_stake_address_for_token","get_stake_address_from_cat_id","get_txo","get_txo_assets","update_spent"],"struct":["TxoAssetInfo","TxoAssetsState","TxoInfo"],"type":["AllResponses","TxoAssetsMap","TxoMap"]};

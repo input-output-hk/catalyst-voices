@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["GET_TXI_BY_TXN_HASHES_QUERY"],"struct":["GetTxiByTxnHashesQuery","GetTxiByTxnHashesQueryParams"]};

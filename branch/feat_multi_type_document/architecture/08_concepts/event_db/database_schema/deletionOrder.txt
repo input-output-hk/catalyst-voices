@@ -1,4 +1,0 @@
-signed_docs
-refinery_schema_history
-config
-json_schema_type

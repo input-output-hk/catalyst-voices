@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["eq_or_ranged_uuid","query_limits"]};

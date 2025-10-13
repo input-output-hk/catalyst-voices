@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["INSERT_SYNC_STATUS_QUERY"],"fn":["update_sync_status"],"mod":["row"],"struct":["SyncStatusInsertQuery"]};

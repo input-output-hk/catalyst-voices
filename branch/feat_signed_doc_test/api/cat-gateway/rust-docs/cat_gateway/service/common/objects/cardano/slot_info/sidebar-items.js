@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["CurrentSlot","NextSlot","PreviousSlot","Slot","SlotInfo"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["db_check","metrics_updater","node_info","schema_validation","tracing_mw"]};

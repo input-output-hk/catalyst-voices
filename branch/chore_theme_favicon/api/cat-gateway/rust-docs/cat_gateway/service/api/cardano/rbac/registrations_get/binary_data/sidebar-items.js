@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["DESCRIPTION","EXAMPLE","FORMAT","PATTERN","TITLE"],"fn":["is_valid"],"static":["SCHEMA"],"struct":["HexEncodedBinaryData"]};

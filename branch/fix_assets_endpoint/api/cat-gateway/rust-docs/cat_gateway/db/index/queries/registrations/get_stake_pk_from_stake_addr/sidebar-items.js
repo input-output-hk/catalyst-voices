@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["GET_QUERY"],"struct":["GetStakePublicKeyFromStakeAddrParams","GetStakePublicKeyFromStakeAddrQuery"]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["LOG_LEVEL_DEFAULT"],"enum":["LogLevel"],"fn":["init","modify_logger_level","set_default_span"],"static":["GLOBAL_SPAN","LOGGER_HANDLE","SPAN_GUARD"],"type":["LoggerHandle"]};

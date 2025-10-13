@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":["FullStakeInfo","PersistentStakeInfo","StakeInfo","StakedNativeTokenInfo","StakedNativeTokenInfoList","VolatileStakeInfo"]};

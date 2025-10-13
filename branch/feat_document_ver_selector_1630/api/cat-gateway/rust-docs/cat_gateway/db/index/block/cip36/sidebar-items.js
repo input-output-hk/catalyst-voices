@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["insert_cip36","insert_cip36_for_vote_key","insert_cip36_invalid"],"struct":["Cip36InsertQuery"]};

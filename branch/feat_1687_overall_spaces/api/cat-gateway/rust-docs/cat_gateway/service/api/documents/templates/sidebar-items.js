@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"constant":["BRAND_ID","CAMPAIGN_ID"],"fn":["build_signed_doc","get_doc_static_template","load_doc_signing_key"],"mod":["data"],"static":["TEMPLATES"],"struct":["SignedDocData"]};

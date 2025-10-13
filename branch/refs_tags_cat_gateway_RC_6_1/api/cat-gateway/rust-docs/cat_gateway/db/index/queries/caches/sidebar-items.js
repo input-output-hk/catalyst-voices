@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["txo_assets_by_stake","txo_by_stake"]};
