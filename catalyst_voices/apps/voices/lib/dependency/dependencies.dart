@@ -215,11 +215,18 @@ final class Dependencies extends DependencyProvider {
   void _registerNetwork() {
     registerLazySingleton<ApiServices>(
       () {
+        final appConfig = get<AppConfig>();
+        final appEnvironment = get<AppEnvironment>();
+
+        final config = ApiConfig(
+          env: appEnvironment.type,
+          localGateway: LocalGatewayConfig.stressTest(appConfig.stressTest),
+        );
+
         return ApiServices(
-          env: get<AppEnvironment>().type,
+          config: config,
           authTokenProvider: get<AuthTokenProvider>(),
           httpClient: () => get<ReportingService>().buildHttpClient(),
-          stressTest: true,
         );
       },
       dispose: (api) => api.dispose(),

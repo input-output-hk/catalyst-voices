@@ -1,7 +1,7 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart' show AppEnvironmentType;
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_index.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_mapping.dart';
+import 'package:catalyst_voices_repositories/src/api/api_config.dart';
 import 'package:catalyst_voices_repositories/src/api/converters/cbor_or_json_converter.dart';
 import 'package:catalyst_voices_repositories/src/api/converters/cbor_serializable_converter.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/path_trim_interceptor.dart';
@@ -31,19 +31,21 @@ final class ApiServices {
   final CatReviews reviews;
 
   factory ApiServices({
-    required AppEnvironmentType env,
+    required ApiConfig config,
     AuthTokenProvider? authTokenProvider,
     ValueGetter<http.Client?>? httpClient,
-    bool stressTest = false,
   }) {
     _fixModelsMapping();
 
     return ApiServices.internal(
-      gateway: stressTest
-          ? LocalCatGateway.create()
+      gateway: config.stressTest.isEnabled
+          ? LocalCatGateway.create(
+              initialProposalsCount: config.stressTest.proposalsCount,
+              decompressedDocuments: config.stressTest.decompressedDocuments,
+            )
           : CatGateway.create(
               httpClient: httpClient?.call(),
-              baseUrl: env.app,
+              baseUrl: config.env.app,
               converter: CborOrJsonDelegateConverter(
                 cborConverter: CborSerializableConverter(),
                 jsonConverter: $JsonSerializableConverter(),
@@ -55,7 +57,7 @@ final class ApiServices {
             ),
       reviews: CatReviews.create(
         httpClient: httpClient?.call(),
-        baseUrl: env.app.replace(path: '/api/reviews'),
+        baseUrl: config.env.app.replace(path: '/api/reviews'),
         interceptors: [
           PathTrimInterceptor(),
           if (authTokenProvider != null) RbacAuthInterceptor(authTokenProvider),

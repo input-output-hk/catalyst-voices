@@ -27,6 +27,7 @@ final class AppConfig extends Equatable {
   final DatabaseConfig database;
   final SentryConfig sentry;
   final BlockchainConfig blockchain;
+  final StressTestConfig stressTest;
 
   const AppConfig({
     required this.version,
@@ -34,6 +35,7 @@ final class AppConfig extends Equatable {
     required this.database,
     required this.sentry,
     required this.blockchain,
+    required this.stressTest,
   });
 
   AppConfig.dev()
@@ -64,6 +66,7 @@ final class AppConfig extends Equatable {
           transactionBuilderConfig: _defaultTransactionBuilderConfig,
           slotNumberConfig: BlockchainSlotNumberConfig.testnet(),
         ),
+        stressTest: const StressTestConfig(),
       );
 
   factory AppConfig.env(AppEnvironmentType env) {
@@ -103,6 +106,7 @@ final class AppConfig extends Equatable {
           transactionBuilderConfig: _defaultTransactionBuilderConfig,
           slotNumberConfig: BlockchainSlotNumberConfig.testnet(),
         ),
+        stressTest: const StressTestConfig(),
       );
 
   AppConfig.prod()
@@ -133,6 +137,7 @@ final class AppConfig extends Equatable {
           transactionBuilderConfig: _defaultTransactionBuilderConfig,
           slotNumberConfig: BlockchainSlotNumberConfig.mainnet(),
         ),
+        stressTest: const StressTestConfig(),
       );
 
   @override
@@ -142,6 +147,7 @@ final class AppConfig extends Equatable {
     database,
     sentry,
     blockchain,
+    stressTest,
   ];
 
   AppConfig copyWith({
@@ -150,6 +156,7 @@ final class AppConfig extends Equatable {
     DatabaseConfig? database,
     SentryConfig? sentry,
     BlockchainConfig? blockchain,
+    StressTestConfig? stressTest,
   }) {
     return AppConfig(
       version: version ?? this.version,
@@ -157,6 +164,7 @@ final class AppConfig extends Equatable {
       database: database ?? this.database,
       sentry: sentry ?? this.sentry,
       blockchain: blockchain ?? this.blockchain,
+      stressTest: stressTest ?? this.stressTest,
     );
   }
 }
@@ -330,4 +338,26 @@ final class SentryConfig extends ReportingServiceConfig {
       diagnosticLevel: diagnosticLevel ?? this.diagnosticLevel,
     );
   }
+}
+
+final class StressTestConfig extends Equatable {
+  const StressTestConfig();
+
+  bool get decompressedDocuments {
+    const key = 'STRESS_TEST_DECOMPRESSED';
+    return const bool.hasEnvironment(key) && const bool.fromEnvironment(key);
+  }
+
+  int get indexedProposalsCount {
+    const key = 'STRESS_TEST_INDEX_COUNT';
+    return const bool.hasEnvironment(key) ? const int.fromEnvironment(key, defaultValue: 100) : 0;
+  }
+
+  bool get isEnabled {
+    const key = 'STRESS_TEST';
+    return const bool.hasEnvironment(key) && const bool.fromEnvironment(key);
+  }
+
+  @override
+  List<Object?> get props => [];
 }
