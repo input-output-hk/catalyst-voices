@@ -20,7 +20,9 @@ import 'package:uuid_plus/uuid_plus.dart' as u;
 var _time = DateTime.timestamp().millisecondsSinceEpoch;
 
 String _testAccountAuthorGetter(DocumentRef ref) {
+  /* cSpell:disable */
   return 'id.catalyst://Test@preprod.cardano/kouGJuMn6o18rRpDAZ1oiZadK171f5_-hgcHTYDGbo0=';
+  /* cSpell:enable */
 }
 
 String _v7() {
@@ -186,6 +188,7 @@ final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGate
     dynamic authorization,
     dynamic contentType,
   }) async {
+    /* cSpell:disable */
     final body = RbacRegistrationChain(
       catalystId: lookup!,
       lastPersistentTxn: '0x784433f2735daf8d2cc28c383c49f195cbe7913c8e242cc47d900a11407e3ced',
@@ -230,6 +233,7 @@ final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGate
         },
       },
     );
+    /* cSpell:enable */
     return Response<RbacRegistrationChain>(
       http.Response('{}', 200),
       body,
