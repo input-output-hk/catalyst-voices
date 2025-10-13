@@ -19,10 +19,16 @@ import 'package:uuid_plus/uuid_plus.dart' as u;
 
 var _time = DateTime.timestamp().millisecondsSinceEpoch;
 
+String _testAccountAuthorGetter(DocumentRef ref) {
+  return 'id.catalyst://Test@preprod.cardano/kouGJuMn6o18rRpDAZ1oiZadK171f5_-hgcHTYDGbo0=';
+}
+
 String _v7() {
   final config = u.V7Options(_time--, null);
   return const u.Uuid().v7(config: config);
 }
+
+typedef DocumentAuthorGetter = String Function(DocumentRef ref);
 
 final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGateway {
   @override
@@ -33,15 +39,18 @@ final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGate
 
   final int proposalsCount;
   final bool decompressedDocuments;
+  final DocumentAuthorGetter authorGetter;
 
   factory LocalCatGateway.create({
     int initialProposalsCount = 100,
     bool decompressedDocuments = false,
+    DocumentAuthorGetter authorGetter = _testAccountAuthorGetter,
   }) {
     return LocalCatGateway._(
       ChopperClient(),
       proposalsCount: initialProposalsCount,
       decompressedDocuments: decompressedDocuments,
+      authorGetter: authorGetter,
     );
   }
 
@@ -49,6 +58,7 @@ final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGate
     this.client, {
     required this.proposalsCount,
     required this.decompressedDocuments,
+    required this.authorGetter,
   });
 
   @override
@@ -294,21 +304,20 @@ final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGate
       DocumentType.unknown => throw UnimplementedError(),
     };
 
+    final ref = SignedDocumentRef(id: metadata.id!, version: metadata.ver);
+    final signature = CoseSignature(
+      protectedHeaders: CoseHeaders.protected(
+        kid: utf8.encode(authorGetter(ref)),
+      ),
+      unprotectedHeaders: const CoseHeaders.unprotected(),
+      signature: Uint8List.fromList([]),
+    );
+
     final coseSign = CoseSign(
       protectedHeaders: protectedHeaders,
       unprotectedHeaders: const CoseHeaders.unprotected(),
       payload: payload,
-      signatures: [
-        CoseSignature(
-          protectedHeaders: CoseHeaders.protected(
-            kid: utf8.encode(
-              'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
-            ),
-          ),
-          unprotectedHeaders: const CoseHeaders.unprotected(),
-          signature: Uint8List.fromList([]),
-        ),
-      ],
+      signatures: [signature],
     );
 
     return Uint8List.fromList(cbor.encode(coseSign.toCbor(tagged: false)));
