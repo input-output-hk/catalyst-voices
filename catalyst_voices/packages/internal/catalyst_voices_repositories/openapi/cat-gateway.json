@@ -21,11 +21,11 @@
       "description": "Server at localhost name."
     },
     {
-      "url": "http://[fe80::48d:4a68:826a:ca6f]:3030",
+      "url": "http://[fe80::c8f:3689:db77:cbdb]:3030",
       "description": "Server at local IPv6 address."
     },
     {
-      "url": "http://192.168.100.3:3030",
+      "url": "http://192.168.0.102:3030",
       "description": "Server at local IPv4 address."
     }
   ],
@@ -56,85 +56,8 @@
         "summary": "Service Started",
         "description": "This endpoint is used to determine if the service has started properly\nand is able to serve requests.\n\n## Note\n\n*This endpoint is for internal use of the service deployment infrastructure.\nIt may not be exposed publicly.*",
         "responses": {
-          "403": {
-            "description": "## Forbidden\n\nThe client has not sent valid authentication credentials for the requested\nresource.",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/Forbidden"
-                }
-              }
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
           "204": {
             "description": "## No Content\n\nService is Started and can serve requests.",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "## Bad Request\n\nThe client has not sent valid request, could be an invalid HTTP in general or\nprovided not correct headers, path or query arguments.",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -210,8 +133,195 @@
               }
             }
           },
+          "429": {
+            "description": "## Too Many Requests\n\nThe client has sent too many requests in a given amount of time.",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequests"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              },
+              "RETRY-AFTER": {
+                "required": true,
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "http-date || integer",
+                  "title": "Retry-After Header",
+                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
+                  "example": "300"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available, try again later.\n\n*This is returned when the service either has not started,\nor has become unavailable.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceUnavailable"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RETRY-AFTER": {
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "http-date || integer",
+                  "title": "Retry-After Header",
+                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
+                  "example": "300"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "## Bad Request\n\nThe client has not sent valid request, could be an invalid HTTP in general or\nprovided not correct headers, path or query arguments.",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "## Internal Server Error.\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              }
+            }
+          },
           "431": {
             "description": "## Request Header Fields Too Large\n\nThe client sent a request with too large header fields.",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "414": {
+            "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -287,111 +397,12 @@
               }
             }
           },
-          "414": {
-            "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "## Internal Server Error.\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
+          "403": {
+            "description": "## Forbidden\n\nThe client has not sent valid authentication credentials for the requested\nresource.",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/InternalServerError"
-                }
-              }
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "## Service Unavailable\n\nThe service is not available, try again later.\n\n*This is returned when the service either has not started,\nor has become unavailable.*",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceUnavailable"
-                }
-              }
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RETRY-AFTER": {
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "http-date || integer",
-                  "title": "Retry-After Header",
-                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
-                  "example": "300"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "## Too Many Requests\n\nThe client has sent too many requests in a given amount of time.",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/TooManyRequests"
+                  "$ref": "#/components/schemas/Forbidden"
                 }
               }
             },
@@ -424,17 +435,6 @@
                     "description": "IETF Draft - RateLimit header fields for HTTP"
                   },
                   "example": "\"default\";q=100;w=10"
-                }
-              },
-              "RETRY-AFTER": {
-                "required": true,
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "http-date || integer",
-                  "title": "Retry-After Header",
-                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
-                  "example": "300"
                 }
               }
             }
@@ -456,6 +456,118 @@
         "summary": "Service Ready",
         "description": "This endpoint is used to determine if the service is ready and able to serve\nrequests.\n\n## Note\n\n*This endpoint is for internal use of the service deployment infrastructure.\nIt may not be exposed publicly.*",
         "responses": {
+          "204": {
+            "description": "## No Content\n\nService is Started and can serve requests.",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "## Forbidden\n\nThe client has not sent valid authentication credentials for the requested\nresource.",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forbidden"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "## Bad Request\n\nThe client has not sent valid request, could be an invalid HTTP in general or\nprovided not correct headers, path or query arguments.",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
           "500": {
             "description": "## Internal Server Error.\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
             "content": {
@@ -483,103 +595,15 @@
               }
             }
           },
-          "412": {
-            "description": "## Precondition Failed\n\nThe client has not sent valid data in its request, headers, parameters or body.",
+          "401": {
+            "description": "## Unauthorized\n\nThe client has not sent valid authentication credentials for the requested\nresource.",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/PreconditionFailed"
+                  "$ref": "#/components/schemas/Unauthorized"
                 }
               }
             },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "## Too Many Requests\n\nThe client has sent too many requests in a given amount of time.",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/TooManyRequests"
-                }
-              }
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              },
-              "RETRY-AFTER": {
-                "required": true,
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "http-date || integer",
-                  "title": "Retry-After Header",
-                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
-                  "example": "300"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "## Bad Request\n\nThe client has not sent valid request, could be an invalid HTTP in general or\nprovided not correct headers, path or query arguments.",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -685,6 +709,48 @@
               }
             }
           },
+          "412": {
+            "description": "## Precondition Failed\n\nThe client has not sent valid data in its request, headers, parameters or body.",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreconditionFailed"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
           "414": {
             "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
             "headers": {
@@ -720,12 +786,12 @@
               }
             }
           },
-          "401": {
-            "description": "## Unauthorized\n\nThe client has not sent valid authentication credentials for the requested\nresource.",
+          "429": {
+            "description": "## Too Many Requests\n\nThe client has sent too many requests in a given amount of time.",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/Unauthorized"
+                  "$ref": "#/components/schemas/TooManyRequests"
                 }
               }
             },
@@ -759,82 +825,16 @@
                   },
                   "example": "\"default\";q=100;w=10"
                 }
-              }
-            }
-          },
-          "403": {
-            "description": "## Forbidden\n\nThe client has not sent valid authentication credentials for the requested\nresource.",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/Forbidden"
-                }
-              }
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
               },
-              "RateLimit": {
-                "description": "RateLimit Header.",
+              "RETRY-AFTER": {
+                "required": true,
                 "deprecated": false,
                 "schema": {
                   "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "204": {
-            "description": "## No Content\n\nService is Started and can serve requests.",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
+                  "format": "http-date || integer",
+                  "title": "Retry-After Header",
+                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
+                  "example": "300"
                 }
               }
             }
@@ -856,12 +856,91 @@
         "summary": "Service Live",
         "description": "This endpoint is used to determine if the service is live.\n\n## Note\n\n*This endpoint is for internal use of the service deployment infrastructure.\nIt may not be exposed publicly. Refer to []*",
         "responses": {
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available, try again later.\n\n*This is returned when the service either has not started,\nor has become unavailable.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceUnavailable"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RETRY-AFTER": {
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "http-date || integer",
+                  "title": "Retry-After Header",
+                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
+                  "example": "300"
+                }
+              }
+            }
+          },
           "403": {
             "description": "## Forbidden\n\nThe client has not sent valid authentication credentials for the requested\nresource.",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
                   "$ref": "#/components/schemas/Forbidden"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "## Precondition Failed\n\nThe client has not sent valid data in its request, headers, parameters or body.",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreconditionFailed"
                 }
               }
             },
@@ -933,12 +1012,12 @@
               }
             }
           },
-          "412": {
-            "description": "## Precondition Failed\n\nThe client has not sent valid data in its request, headers, parameters or body.",
+          "500": {
+            "description": "## Internal Server Error.\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/PreconditionFailed"
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             },
@@ -956,56 +1035,6 @@
                     "description": "MDB Web Docs - Access-Control-Allow-Origin"
                   },
                   "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "## Bad Request\n\nThe client has not sent valid request, could be an invalid HTTP in general or\nprovided not correct headers, path or query arguments.",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
                 }
               }
             }
@@ -1087,15 +1116,8 @@
               }
             }
           },
-          "503": {
-            "description": "## Service Unavailable\n\nThe service is not available, try again later.\n\n*This is returned when the service either has not started,\nor has become unavailable.*",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceUnavailable"
-                }
-              }
-            },
+          "414": {
+            "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -1112,14 +1134,19 @@
                   "example": "*"
                 }
               },
-              "RETRY-AFTER": {
+              "RateLimit": {
+                "description": "RateLimit Header.",
                 "deprecated": false,
                 "schema": {
                   "type": "string",
-                  "format": "http-date || integer",
-                  "title": "Retry-After Header",
-                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
-                  "example": "300"
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
                 }
               }
             }
@@ -1177,8 +1204,8 @@
               }
             }
           },
-          "414": {
-            "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
+          "400": {
+            "description": "## Bad Request\n\nThe client has not sent valid request, could be an invalid HTTP in general or\nprovided not correct headers, path or query arguments.",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -1208,33 +1235,6 @@
                     "description": "IETF Draft - RateLimit header fields for HTTP"
                   },
                   "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "## Internal Server Error.\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalServerError"
-                }
-              }
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
                 }
               }
             }
@@ -1274,12 +1274,47 @@
           }
         ],
         "responses": {
-          "401": {
-            "description": "## Unauthorized\n\nThe client has not sent valid authentication credentials for the requested\nresource.",
+          "431": {
+            "description": "## Request Header Fields Too Large\n\nThe client sent a request with too large header fields.",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Response for unprocessable content.",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/Unauthorized"
+                  "$ref": "#/components/schemas/RbacUnprocessableContent"
                 }
               }
             },
@@ -1358,68 +1393,6 @@
               }
             }
           },
-          "500": {
-            "description": "## Internal Server Error.\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalServerError"
-                }
-              }
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "No valid registration.",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
           "412": {
             "description": "## Precondition Failed\n\nThe client has not sent valid data in its request, headers, parameters or body.",
             "content": {
@@ -1429,41 +1402,6 @@
                 }
               }
             },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "414": {
-            "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -1539,140 +1477,8 @@
               }
             }
           },
-          "429": {
-            "description": "## Too Many Requests\n\nThe client has sent too many requests in a given amount of time.",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/TooManyRequests"
-                }
-              }
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              },
-              "RETRY-AFTER": {
-                "required": true,
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "http-date || integer",
-                  "title": "Retry-After Header",
-                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
-                  "example": "300"
-                }
-              }
-            }
-          },
-          "431": {
-            "description": "## Request Header Fields Too Large\n\nThe client sent a request with too large header fields.",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "## Service Unavailable\n\nThe service is not available, try again later.\n\n*This is returned when the service either has not started,\nor has become unavailable.*",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceUnavailable"
-                }
-              }
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RETRY-AFTER": {
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "http-date || integer",
-                  "title": "Retry-After Header",
-                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
-                  "example": "300"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Response for unprocessable content.",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/RbacUnprocessableContent"
-                }
-              }
-            },
+          "404": {
+            "description": "No valid registration.",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -1737,6 +1543,200 @@
                     "description": "IETF Draft - RateLimit header fields for HTTP"
                   },
                   "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "## Too Many Requests\n\nThe client has sent too many requests in a given amount of time.",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequests"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              },
+              "RETRY-AFTER": {
+                "required": true,
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "http-date || integer",
+                  "title": "Retry-After Header",
+                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
+                  "example": "300"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "## Unauthorized\n\nThe client has not sent valid authentication credentials for the requested\nresource.",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "414": {
+            "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "## Internal Server Error.\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available, try again later.\n\n*This is returned when the service either has not started,\nor has become unavailable.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceUnavailable"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RETRY-AFTER": {
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "http-date || integer",
+                  "title": "Retry-After Header",
+                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
+                  "example": "300"
                 }
               }
             }
@@ -1841,8 +1841,8 @@
               }
             }
           },
-          "414": {
-            "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
+          "431": {
+            "description": "## Request Header Fields Too Large\n\nThe client sent a request with too large header fields.",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -1876,12 +1876,12 @@
               }
             }
           },
-          "429": {
-            "description": "## Too Many Requests\n\nThe client has sent too many requests in a given amount of time.",
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available, try again later.\n\n*This is returned when the service either has not started,\nor has become unavailable.*",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/TooManyRequests"
+                  "$ref": "#/components/schemas/ServiceUnavailable"
                 }
               }
             },
@@ -1901,23 +1901,7 @@
                   "example": "*"
                 }
               },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              },
               "RETRY-AFTER": {
-                "required": true,
                 "deprecated": false,
                 "schema": {
                   "type": "string",
@@ -1929,8 +1913,8 @@
               }
             }
           },
-          "404": {
-            "description": "## Not Found\n\nThe queried stake address was not found at the requested slot number.",
+          "400": {
+            "description": "## Bad Request\n\nThe client has not sent valid request, could be an invalid HTTP in general or\nprovided not correct headers, path or query arguments.",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -1964,8 +1948,8 @@
               }
             }
           },
-          "400": {
-            "description": "## Bad Request\n\nThe client has not sent valid request, could be an invalid HTTP in general or\nprovided not correct headers, path or query arguments.",
+          "414": {
+            "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -2083,6 +2067,48 @@
               }
             }
           },
+          "401": {
+            "description": "## Unauthorized\n\nThe client has not sent valid authentication credentials for the requested\nresource.",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
           "412": {
             "description": "## Precondition Failed\n\nThe client has not sent valid data in its request, headers, parameters or body.",
             "content": {
@@ -2125,12 +2151,47 @@
               }
             }
           },
-          "503": {
-            "description": "## Service Unavailable\n\nThe service is not available, try again later.\n\n*This is returned when the service either has not started,\nor has become unavailable.*",
+          "404": {
+            "description": "## Not Found\n\nThe queried stake address was not found at the requested slot number.",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "## Too Many Requests\n\nThe client has sent too many requests in a given amount of time.",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/ServiceUnavailable"
+                  "$ref": "#/components/schemas/TooManyRequests"
                 }
               }
             },
@@ -2150,7 +2211,23 @@
                   "example": "*"
                 }
               },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              },
               "RETRY-AFTER": {
+                "required": true,
                 "deprecated": false,
                 "schema": {
                   "type": "string",
@@ -2158,6 +2235,96 @@
                   "title": "Retry-After Header",
                   "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
                   "example": "300"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "CatalystRBACSecurityScheme": []
+          },
+          {
+            "NoAuthorization": []
+          }
+        ],
+        "operationId": "stakedAssetsGet"
+      }
+    },
+    "/api/v1/config/frontend": {
+      "get": {
+        "tags": [
+          "Config"
+        ],
+        "summary": "Get the configuration for the frontend.",
+        "description": "Get the frontend configuration for the requesting client.\n\n### Security\n\nDoes not require any Catalyst RBAC Token to access.",
+        "responses": {
+          "404": {
+            "description": "No frontend config defined.",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "## Bad Request\n\nThe client has not sent valid request, could be an invalid HTTP in general or\nprovided not correct headers, path or query arguments.",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
                 }
               }
             }
@@ -2200,6 +2367,59 @@
                     "description": "IETF Draft - RateLimit header fields for HTTP"
                   },
                   "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "## Too Many Requests\n\nThe client has sent too many requests in a given amount of time.",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequests"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              },
+              "RETRY-AFTER": {
+                "required": true,
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "http-date || integer",
+                  "title": "Retry-After Header",
+                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
+                  "example": "300"
                 }
               }
             }
@@ -2238,29 +2458,16 @@
                 }
               }
             }
-          }
-        },
-        "security": [
-          {
-            "CatalystRBACSecurityScheme": []
           },
-          {
-            "NoAuthorization": []
-          }
-        ],
-        "operationId": "stakedAssetsGet"
-      }
-    },
-    "/api/v1/config/frontend": {
-      "get": {
-        "tags": [
-          "Config"
-        ],
-        "summary": "Get the configuration for the frontend.",
-        "description": "Get the frontend configuration for the requesting client.\n\n### Security\n\nDoes not require any Catalyst RBAC Token to access.",
-        "responses": {
-          "414": {
-            "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
+          "500": {
+            "description": "## Internal Server Error.\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
+                }
+              }
+            },
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -2276,30 +2483,15 @@
                   },
                   "example": "*"
                 }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
               }
             }
           },
-          "401": {
-            "description": "## Unauthorized\n\nThe client has not sent valid authentication credentials for the requested\nresource.",
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available, try again later.\n\n*This is returned when the service either has not started,\nor has become unavailable.*",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/Unauthorized"
+                  "$ref": "#/components/schemas/ServiceUnavailable"
                 }
               }
             },
@@ -2319,19 +2511,14 @@
                   "example": "*"
                 }
               },
-              "RateLimit": {
-                "description": "RateLimit Header.",
+              "RETRY-AFTER": {
                 "deprecated": false,
                 "schema": {
                   "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
+                  "format": "http-date || integer",
+                  "title": "Retry-After Header",
+                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
+                  "example": "300"
                 }
               }
             }
@@ -2423,8 +2610,8 @@
               }
             }
           },
-          "404": {
-            "description": "No frontend config defined.",
+          "414": {
+            "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -2454,158 +2641,6 @@
                     "description": "IETF Draft - RateLimit header fields for HTTP"
                   },
                   "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "## Service Unavailable\n\nThe service is not available, try again later.\n\n*This is returned when the service either has not started,\nor has become unavailable.*",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceUnavailable"
-                }
-              }
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RETRY-AFTER": {
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "http-date || integer",
-                  "title": "Retry-After Header",
-                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
-                  "example": "300"
-                }
-              }
-            }
-          },
-          "431": {
-            "description": "## Request Header Fields Too Large\n\nThe client sent a request with too large header fields.",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "## Internal Server Error.\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalServerError"
-                }
-              }
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "## Too Many Requests\n\nThe client has sent too many requests in a given amount of time.",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/TooManyRequests"
-                }
-              }
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              },
-              "RETRY-AFTER": {
-                "required": true,
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "http-date || integer",
-                  "title": "Retry-After Header",
-                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
-                  "example": "300"
                 }
               }
             }
@@ -2619,41 +2654,6 @@
                 }
               }
             },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "## Bad Request\n\nThe client has not sent valid request, could be an invalid HTTP in general or\nprovided not correct headers, path or query arguments.",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -2745,8 +2745,89 @@
           }
         ],
         "responses": {
-          "404": {
-            "description": "## Not Found\n\nThe document could not be found.",
+          "200": {
+            "description": "## OK\n\nThe Document that was requested.",
+            "content": {
+              "application/cbor": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary",
+                  "example": "(binary data)"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available, try again later.\n\n*This is returned when the service either has not started,\nor has become unavailable.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceUnavailable"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RETRY-AFTER": {
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "http-date || integer",
+                  "title": "Retry-After Header",
+                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
+                  "example": "300"
+                }
+              }
+            }
+          },
+          "414": {
+            "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -2807,96 +2888,8 @@
               }
             }
           },
-          "503": {
-            "description": "## Service Unavailable\n\nThe service is not available, try again later.\n\n*This is returned when the service either has not started,\nor has become unavailable.*",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServiceUnavailable"
-                }
-              }
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RETRY-AFTER": {
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "http-date || integer",
-                  "title": "Retry-After Header",
-                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
-                  "example": "300"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "## OK\n\nThe Document that was requested.",
-            "content": {
-              "application/cbor": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary",
-                  "example": "(binary data)"
-                }
-              }
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "## Unauthorized\n\nThe client has not sent valid authentication credentials for the requested\nresource.",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/Unauthorized"
-                }
-              }
-            },
+          "400": {
+            "description": "## Bad Request\n\nThe client has not sent valid request, could be an invalid HTTP in general or\nprovided not correct headers, path or query arguments.",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -2972,8 +2965,8 @@
               }
             }
           },
-          "400": {
-            "description": "## Bad Request\n\nThe client has not sent valid request, could be an invalid HTTP in general or\nprovided not correct headers, path or query arguments.",
+          "404": {
+            "description": "## Not Found\n\nThe document could not be found.",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -3060,76 +3053,6 @@
               }
             }
           },
-          "414": {
-            "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "431": {
-            "description": "## Request Header Fields Too Large\n\nThe client sent a request with too large header fields.",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
           "403": {
             "description": "## Forbidden\n\nThe client has not sent valid authentication credentials for the requested\nresource.",
             "content": {
@@ -3139,74 +3062,6 @@
                 }
               }
             },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "CatalystRBACSecurityScheme": []
-          },
-          {
-            "NoAuthorization": []
-          }
-        ],
-        "operationId": "getDocument"
-      }
-    },
-    "/api/v1/document": {
-      "put": {
-        "tags": [
-          "Documents"
-        ],
-        "summary": "Put A Signed Document.",
-        "description": "This endpoint returns OK if the document is valid, able to be put by the\nsubmitter, and if it already exists, is identical to the existing document.",
-        "requestBody": {
-          "description": "The document to PUT",
-          "content": {
-            "application/cbor": {
-              "schema": {
-                "type": "string",
-                "format": "binary",
-                "example": "(binary data)"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "204": {
-            "description": "## No Content\n\nThe Document was already stored, and has not changed.",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -3316,13 +3171,46 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "CatalystRBACSecurityScheme": []
           },
-          "403": {
-            "description": "## Forbidden\n\nThe client has not sent valid authentication credentials for the requested\nresource.",
+          {
+            "NoAuthorization": []
+          }
+        ],
+        "operationId": "getDocument"
+      }
+    },
+    "/api/v1/document": {
+      "put": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Put A Signed Document.",
+        "description": "This endpoint returns OK if the document is valid, able to be put by the\nsubmitter, and if it already exists, is identical to the existing document.",
+        "requestBody": {
+          "description": "The document to PUT",
+          "content": {
+            "application/cbor": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "example": "(binary data)"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "412": {
+            "description": "## Precondition Failed\n\nThe client has not sent valid data in its request, headers, parameters or body.",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/Forbidden"
+                  "$ref": "#/components/schemas/PreconditionFailed"
                 }
               }
             },
@@ -3359,85 +3247,8 @@
               }
             }
           },
-          "422": {
-            "description": "## Unprocessable Content\n\nError Response. The document submitted is invalid.",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/PutDocumentUnprocessableContent"
-                }
-              }
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "## Bad Request\n\nThe client has not sent valid request, could be an invalid HTTP in general or\nprovided not correct headers, path or query arguments.",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "413": {
-            "description": "## Content Too Large\n\nPayload Too Large. The document exceeds the maximum size of a legitimate single\ndocument.",
+          "431": {
+            "description": "## Request Header Fields Too Large\n\nThe client sent a request with too large header fields.",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -3535,15 +3346,120 @@
               }
             }
           },
-          "412": {
-            "description": "## Precondition Failed\n\nThe client has not sent valid data in its request, headers, parameters or body.",
+          "204": {
+            "description": "## No Content\n\nThe Document was already stored, and has not changed.",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "## Content Too Large\n\nPayload Too Large. The document exceeds the maximum size of a legitimate single\ndocument.",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "## Unprocessable Content\n\nError Response. The document submitted is invalid.",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/PreconditionFailed"
+                  "$ref": "#/components/schemas/PutDocumentUnprocessableContent"
                 }
               }
             },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "414": {
+            "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -3612,8 +3528,92 @@
               }
             }
           },
-          "414": {
-            "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
+          "401": {
+            "description": "## Unauthorized\n\nThe client has not sent valid authentication credentials for the requested\nresource.",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/Unauthorized"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "## Forbidden\n\nThe client has not sent valid authentication credentials for the requested\nresource.",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/Forbidden"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "## Bad Request\n\nThe client has not sent valid request, could be an invalid HTTP in general or\nprovided not correct headers, path or query arguments.",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -3834,82 +3834,12 @@
           "required": true
         },
         "responses": {
-          "431": {
-            "description": "## Request Header Fields Too Large\n\nThe client sent a request with too large header fields.",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "## Not Found\n\nNo documents were found which match the query filter.",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "## Too Many Requests\n\nThe client has sent too many requests in a given amount of time.",
+          "500": {
+            "description": "## Internal Server Error.\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
-                  "$ref": "#/components/schemas/TooManyRequests"
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             },
@@ -3927,32 +3857,6 @@
                     "description": "MDB Web Docs - Access-Control-Allow-Origin"
                   },
                   "example": "*"
-                }
-              },
-              "RateLimit": {
-                "description": "RateLimit Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "rate-limit",
-                  "title": "RateLimit HTTP header.",
-                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
-                  "externalDocs": {
-                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
-                    "description": "IETF Draft - RateLimit header fields for HTTP"
-                  },
-                  "example": "\"default\";q=100;w=10"
-                }
-              },
-              "RETRY-AFTER": {
-                "required": true,
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "http-date || integer",
-                  "title": "Retry-After Header",
-                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
-                  "example": "300"
                 }
               }
             }
@@ -3966,6 +3870,41 @@
                 }
               }
             },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "431": {
+            "description": "## Request Header Fields Too Large\n\nThe client sent a request with too large header fields.",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -4041,8 +3980,8 @@
               }
             }
           },
-          "414": {
-            "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
+          "400": {
+            "description": "## Bad Request\n\nThe client has not sent valid request, could be an invalid HTTP in general or\nprovided not correct headers, path or query arguments.",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -4076,15 +4015,8 @@
               }
             }
           },
-          "412": {
-            "description": "## Precondition Failed\n\nThe client has not sent valid data in its request, headers, parameters or body.",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/PreconditionFailed"
-                }
-              }
-            },
+          "404": {
+            "description": "## Not Found\n\nNo documents were found which match the query filter.",
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -4114,33 +4046,6 @@
                     "description": "IETF Draft - RateLimit header fields for HTTP"
                   },
                   "example": "\"default\";q=100;w=10"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "## Internal Server Error.\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
-            "content": {
-              "application/json; charset=utf-8": {
-                "schema": {
-                  "$ref": "#/components/schemas/InternalServerError"
-                }
-              }
-            },
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "description": "Access-Control-Allow-Origin Header.",
-                "deprecated": false,
-                "schema": {
-                  "type": "string",
-                  "format": "origin",
-                  "title": "Access-Control-Allow-Origin header.",
-                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
-                  "externalDocs": {
-                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
-                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
-                  },
-                  "example": "*"
                 }
               }
             }
@@ -4171,6 +4076,59 @@
                 }
               },
               "RETRY-AFTER": {
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "http-date || integer",
+                  "title": "Retry-After Header",
+                  "description": "Http Date or Interval in seconds.\nValid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
+                  "example": "300"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "## Too Many Requests\n\nThe client has sent too many requests in a given amount of time.",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequests"
+                }
+              }
+            },
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              },
+              "RETRY-AFTER": {
+                "required": true,
                 "deprecated": false,
                 "schema": {
                   "type": "string",
@@ -4278,8 +4236,50 @@
               }
             }
           },
-          "400": {
-            "description": "## Bad Request\n\nThe client has not sent valid request, could be an invalid HTTP in general or\nprovided not correct headers, path or query arguments.",
+          "414": {
+            "description": "## URI Too Long\n\nThe client sent a request with the URI is longer than the server is willing to\ninterpret",
+            "headers": {
+              "Access-Control-Allow-Origin": {
+                "description": "Access-Control-Allow-Origin Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "origin",
+                  "title": "Access-Control-Allow-Origin header.",
+                  "description": "Valid formats:\n\n* `Access-Control-Allow-Origin: *`\n* `Access-Control-Allow-Origin: <origin>`\n* `Access-Control-Allow-Origin: null`\n",
+                  "externalDocs": {
+                    "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin",
+                    "description": "MDB Web Docs - Access-Control-Allow-Origin"
+                  },
+                  "example": "*"
+                }
+              },
+              "RateLimit": {
+                "description": "RateLimit Header.",
+                "deprecated": false,
+                "schema": {
+                  "type": "string",
+                  "format": "rate-limit",
+                  "title": "RateLimit HTTP header.",
+                  "description": "Allows this server to advertise its quota policies and the current\nservice limits, thereby allowing clients to avoid being throttled.",
+                  "externalDocs": {
+                    "url": "https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/",
+                    "description": "IETF Draft - RateLimit header fields for HTTP"
+                  },
+                  "example": "\"default\";q=100;w=10"
+                }
+              }
+            }
+          },
+          "412": {
+            "description": "## Precondition Failed\n\nThe client has not sent valid data in its request, headers, parameters or body.",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreconditionFailed"
+                }
+              }
+            },
             "headers": {
               "Access-Control-Allow-Origin": {
                 "description": "Access-Control-Allow-Origin Header.",
@@ -4670,59 +4670,9 @@
               }
             }
           },
-          "brand": {
+          "parameters": {
             "title": "Document Reference",
-            "description": "## Brand\n\nThis is a\n[brand reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#brand_id)\nto a brand document which defines the brand the document falls under.\nThis fields can match any brand reference that matches the defined\n[Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)\nand/or\n[Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)\n\nWhether a Document Type has a brand reference is defined by its\n[Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/IdAndVerRef"
-              },
-              {
-                "title": "Document Reference",
-                "description": "A Signed Documents\n[Reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#ref-document-reference)\nto another Documents ID and/or Version.\n\n*Note: at least one of `id` or `ver` must be defined.*",
-                "example": {
-                  "ver": {
-                    "max": "01944e87-e68c-7f22-9df1-000000000000",
-                    "min": "01944e87-e68c-7f22-9df1-ffffffffffff"
-                  }
-                }
-              }
-            ],
-            "example": {
-              "ver": {
-                "max": "01944e87-e68c-7f22-9df1-000000000000",
-                "min": "01944e87-e68c-7f22-9df1-ffffffffffff"
-              }
-            }
-          },
-          "campaign": {
-            "title": "Document Reference",
-            "description": "## Campaign\n\nThis is a\n[campaign reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#campaign_id)\nto a campaign document which defines the campaign the document falls under.\nThis fields can match any campaign reference that matches the defined\n[Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)\nand/or\n[Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)\n\nWhether a Document Type has a campaign reference is defined by its\n[Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/IdAndVerRef"
-              },
-              {
-                "title": "Document Reference",
-                "description": "A Signed Documents\n[Reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#ref-document-reference)\nto another Documents ID and/or Version.\n\n*Note: at least one of `id` or `ver` must be defined.*",
-                "example": {
-                  "ver": {
-                    "max": "01944e87-e68c-7f22-9df1-000000000000",
-                    "min": "01944e87-e68c-7f22-9df1-ffffffffffff"
-                  }
-                }
-              }
-            ],
-            "example": {
-              "ver": {
-                "max": "01944e87-e68c-7f22-9df1-000000000000",
-                "min": "01944e87-e68c-7f22-9df1-ffffffffffff"
-              }
-            }
-          },
-          "category": {
-            "title": "Document Reference",
-            "description": "## Category\n\nThis is a\n[category reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#category_id)\nto a category document which defines the category the document falls under.\nThis fields can match any category reference that matches the defined\n[Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)\nand/or\n[Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)\n\nWhether a Document Type has a category reference is defined by its\n[Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).",
+            "description": "## Parameters\n\nThis is a reference to a configuration document.\nThis fields can match any reference that matches the defined\n[Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)\nand/or\n[Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)\n\nWhether a Document Type has a brand, campaign, category etc. reference is defined\nby its [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).",
             "allOf": [
               {
                 "$ref": "#/components/schemas/IdAndVerRef"
@@ -4878,7 +4828,7 @@
             "format": "uuid",
             "title": "Error Unique ID",
             "description": "Unique ID of this Server Error so that it can be located easily for debugging.",
-            "example": "42a1fd0d-71db-470f-8e8a-fe09e8142e22"
+            "example": "574d5ebe-dd5e-4e8b-9e06-0166ab5c5fa6"
           },
           "msg": {
             "type": "string",
@@ -4906,7 +4856,7 @@
           }
         },
         "example": {
-          "id": "3eefa30a-82d7-449b-8a23-f9d9bae1b639",
+          "id": "743fcc8c-5b46-411a-9845-d6b4b2b6233d",
           "msg": "Your request was not successful because your authentication credentials do not have the required roles for the requested resource.",
           "required": [
             "VOTER",
@@ -5460,7 +5410,7 @@
             "format": "uuid",
             "title": "Error Unique ID",
             "description": "Unique ID of this Server Error so that it can be located easily for debugging.",
-            "example": "962cd4ec-347c-4eba-bc51-2504423fb24a"
+            "example": "b074a6f8-fb46-4944-8aa9-61e9e1b23bee"
           },
           "msg": {
             "type": "string",
@@ -5481,8 +5431,8 @@
           }
         },
         "example": {
-          "id": "e5878a11-907b-404d-9bce-5dde9cc90b49",
-          "issue": "https://github.com/input-output-hk/catalyst-voices/issues/new?template=bug_report.yml&title=Internal+Server+Error+-+e5878a11-907b-404d-9bce-5dde9cc90b49",
+          "id": "ef6907ae-bed1-4a36-8788-a500d46dee46",
+          "issue": "https://github.com/input-output-hk/catalyst-voices/issues/new?template=bug_report.yml&title=Internal+Server+Error+-+ef6907ae-bed1-4a36-8788-a500d46dee46",
           "msg": "Internal Server Error.  Please report the issue to the service owner."
         }
       },
@@ -5736,7 +5686,7 @@
             "format": "uuid",
             "title": "Error Unique ID",
             "description": "Unique ID of this Server Error so that it can be located easily for debugging.",
-            "example": "f0676bd1-5fbe-4ff6-9c8b-de2ee1e4091a"
+            "example": "6689f242-36ab-4919-b6d3-b3dc9e5172d6"
           },
           "msg": {
             "type": "string",
@@ -5750,7 +5700,7 @@
           }
         },
         "example": {
-          "id": "531ff495-057b-4f37-82e5-10808ec5f872",
+          "id": "e531ac31-0b13-4c16-9942-493e91561f75",
           "msg": "Service Unavailable. Indicates that the server is not ready to handle the request."
         }
       },
@@ -5861,7 +5811,7 @@
             "format": "uuid",
             "title": "Error Unique ID",
             "description": "Unique ID of this Server Error so that it can be located easily for debugging.",
-            "example": "af5930ad-6952-4862-ba64-2dbba2fa6c09"
+            "example": "3bea8f8c-62bd-4f2a-ad45-f80524b09426"
           },
           "msg": {
             "type": "string",
@@ -5875,7 +5825,7 @@
           }
         },
         "example": {
-          "id": "47c7897f-70c6-4e47-bed8-347b4c523fe8",
+          "id": "58a8b428-8691-4045-b4bc-db3decd56460",
           "msg": "Too Many Requests. You have exceeded the rate limit for this endpoint."
         }
       },
@@ -5892,7 +5842,7 @@
             "format": "uuid",
             "title": "Error Unique ID",
             "description": "Unique ID of this Server Error so that it can be located easily for debugging.",
-            "example": "25f4e800-008c-4987-b462-4980c2e7f640"
+            "example": "a91449f9-12fe-449b-b653-dd2dc0762ece"
           },
           "msg": {
             "type": "string",
@@ -5906,7 +5856,7 @@
           }
         },
         "example": {
-          "id": "e792fef9-e8b1-4bba-893e-83ef56064a03",
+          "id": "1671d673-c466-4102-95b5-53d79fc9875c",
           "msg": "Your request was not successful because it lacks valid authentication credentials for the requested resource."
         }
       },
