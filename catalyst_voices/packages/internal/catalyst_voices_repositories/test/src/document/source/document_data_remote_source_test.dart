@@ -12,6 +12,7 @@ import '../../utils/test_factories.dart';
 void main() {
   final CatGateway gateway = _MockedCatGateway();
   final CatReviews reviews = _MockedCatReviews();
+  final CatStatus status = _MockedCatStatus();
   final SignedDocumentManager signedDocumentManager = _MockedSignedDocumentManager();
 
   late final ApiServices apiServices;
@@ -23,6 +24,7 @@ void main() {
     apiServices = ApiServices.internal(
       gateway: gateway,
       reviews: reviews,
+      status: status,
     );
 
     source = CatGatewayDocumentDataSource(apiServices, signedDocumentManager);
@@ -31,6 +33,7 @@ void main() {
   tearDown(() {
     reset(gateway);
     reset(reviews);
+    reset(status);
     reset(signedDocumentManager);
   });
 
@@ -166,5 +169,7 @@ DocumentIndexListDto _buildDocumentIndexList({
 class _MockedCatGateway extends Mock implements CatGateway {}
 
 class _MockedCatReviews extends Mock implements CatReviews {}
+
+class _MockedCatStatus extends Mock implements CatStatus {}
 
 class _MockedSignedDocumentManager extends Mock implements SignedDocumentManager {}

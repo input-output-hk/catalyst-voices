@@ -83,6 +83,10 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<AdminTools>(
         () => get<AdminToolsCubit>(),
       )
+      ..registerLazySingleton<SystemStatusCubit>(
+        () => SystemStatusCubit(get<SystemStatusRepository>()),
+        dispose: (cubit) async => cubit.close(),
+      )
       ..registerLazySingleton<SessionCubit>(
         () {
           return SessionCubit(
@@ -293,6 +297,11 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<VotingRepository>(
         () => VotingRepository(
           get<CastedVotesObserver>(),
+        ),
+      )
+      ..registerLazySingleton<SystemStatusRepository>(
+        () => SystemStatusRepository(
+          get<ApiServices>(),
         ),
       );
   }

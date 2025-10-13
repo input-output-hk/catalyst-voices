@@ -41,6 +41,9 @@ class _AppState extends State<App> {
       BlocProvider<AdminToolsCubit>(
         create: (_) => Dependencies.instance.get<AdminToolsCubit>(),
       ),
+      BlocProvider<SystemStatusCubit>(
+        create: (_) => Dependencies.instance.get<SystemStatusCubit>(),
+      ),
       BlocProvider<SessionCubit>(
         create: (_) => Dependencies.instance.get<SessionCubit>(),
       ),
