@@ -16,7 +16,8 @@ final f15StaticCampaignCategories = <CampaignCategory>[
     categorySubname: 'Tier-1 Enterprise Integrations',
     description:
         '''To fund high-impact R&D pilots and integrations led by or in collaboration with established Tier-1 enterprises, driving mainstream Cardano adoption and creating significant co-marketing opportunities.''',
-    shortDescription: '',
+    shortDescription:
+        'To fund high-impact R&D pilots and integrations led by or in collaboration with established Tier-1 enterprises, driving mainstream Cardano adoption and creating significant co-marketing opportunities.',
     availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(10000000)),
     totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
     range: ComparableRange(
@@ -144,7 +145,8 @@ Use this checklist to ensure your proposal meets all foundational and content re
     categorySubname: 'Prototype & Launch',
     description:
         '''To provide entrepreneurial individuals and teams with funding to build and launch novel prototypes that have already undergone foundational research and design, accelerating the delivery of new on-chain utility for Cardano.''',
-    shortDescription: '',
+    shortDescription:
+        'To provide entrepreneurial individuals and teams with funding to build and launch novel prototypes that have already undergone foundational research and design, accelerating the delivery of new on-chain utility for Cardano.',
     availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(6000000)),
     totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
     range: ComparableRange(
@@ -246,7 +248,8 @@ Use this checklist to ensure your proposal meets all foundational and content re
     categorySubname: 'Ecosystem',
     description:
         '''Funds non-technical initiatives like marketing, education, research, and community building to grow Cardano’s ecosystem and onboard new users globally.''',
-    shortDescription: '',
+    shortDescription:
+        'Funds non-technical initiatives like marketing, education, research, and community building to grow Cardano’s ecosystem and onboard new users globally.',
     availableFunds: MultiCurrencyAmount.single(Currencies.ada.amount(2500000)),
     totalAsk: MultiCurrencyAmount.single(Currencies.ada.amount(0)),
     range: ComparableRange(
@@ -352,7 +355,8 @@ Use this checklist to ensure your proposal meets all foundational and content re
     categorySubname: 'Compact DApps',
     description:
         '''To accelerate developer adoption of Midnight by funding essential open-source reference DApps. This category is seeking reference DApps, and funding will be sponsored by the Midnight Foundation.''',
-    shortDescription: '',
+    shortDescription:
+        'To accelerate developer adoption of Midnight by funding essential open-source reference DApps. This category is seeking reference DApps, and funding will be sponsored by the Midnight Foundation.',
     availableFunds: MultiCurrencyAmount.single(Currencies.usdm.amount(250000)),
     totalAsk: MultiCurrencyAmount.single(Currencies.usdm.amount(0)),
     range: ComparableRange(
