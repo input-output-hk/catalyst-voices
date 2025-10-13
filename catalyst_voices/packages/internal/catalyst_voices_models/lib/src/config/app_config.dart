@@ -343,21 +343,26 @@ final class SentryConfig extends ReportingServiceConfig {
 final class StressTestConfig extends Equatable {
   const StressTestConfig();
 
-  bool get decompressedDocuments {
-    const key = 'STRESS_TEST_DECOMPRESSED';
-    return const bool.hasEnvironment(key) && const bool.fromEnvironment(key);
-  }
+  bool get decompressedDocuments => const bool.fromEnvironment('STRESS_TEST_DECOMPRESSED');
 
   int get indexedProposalsCount {
-    const key = 'STRESS_TEST_INDEX_COUNT';
-    return const bool.hasEnvironment(key) ? const int.fromEnvironment(key, defaultValue: 100) : 0;
+    return const int.fromEnvironment(
+      'STRESS_TEST_PROPOSAL_INDEX_COUNT',
+      defaultValue: 100,
+    );
   }
 
-  bool get isEnabled {
-    const key = 'STRESS_TEST';
-    return const bool.hasEnvironment(key) && const bool.fromEnvironment(key);
-  }
+  bool get isEnabled => const bool.fromEnvironment('STRESS_TEST');
 
   @override
   List<Object?> get props => [];
+
+  @override
+  String toString() {
+    return 'StressTestConfig('
+        'isEnabled[$isEnabled], '
+        'indexedProposalsCount[$indexedProposalsCount], '
+        'decompressedDocuments[$decompressedDocuments]'
+        ')';
+  }
 }
