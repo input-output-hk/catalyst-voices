@@ -63,7 +63,7 @@ class VoicesMoneyField extends StatefulWidget {
   final bool showHelper;
 
   /// Optional minimum and maximum limits for the field.
-  final OpenRange<Money>? range;
+  final Range<Money?>? range;
 
   /// Optional label text for the field.
   final String? labelText;
@@ -106,7 +106,7 @@ class VoicesMoneyFieldController extends ValueNotifier<Money?> {
 }
 
 class _Helper extends StatelessWidget {
-  final OpenRange<Money>? range;
+  final Range<Money?>? range;
   final String? placeholder;
 
   const _Helper({

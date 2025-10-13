@@ -57,7 +57,7 @@ final class LocalizedDocumentListItemsNotUnique extends LocalizedDocumentValidat
 
 /// When list items are out of range.
 final class LocalizedDocumentListItemsOutOfRange extends LocalizedDocumentValidationResult {
-  final NumRange<int> range;
+  final Range<int?> range;
 
   const LocalizedDocumentListItemsOutOfRange({required this.range});
 
@@ -101,7 +101,7 @@ final class LocalizedDocumentMoneyNotMultipleOf extends LocalizedDocumentValidat
 
 /// When a money value is out of range.
 final class LocalizedDocumentMoneyOutOfRange extends LocalizedDocumentValidationResult {
-  final OpenRange<Money> range;
+  final Range<Money?> range;
 
   const LocalizedDocumentMoneyOutOfRange({required this.range});
 
@@ -146,7 +146,7 @@ final class LocalizedDocumentNumNotMultipleOf extends LocalizedDocumentValidatio
 
 /// When a numeric value is out of range.
 final class LocalizedDocumentNumOutOfRange extends LocalizedDocumentValidationResult {
-  final NumRange<num> range;
+  final Range<num?> range;
 
   const LocalizedDocumentNumOutOfRange({required this.range});
 
@@ -193,7 +193,7 @@ final class LocalizedDocumentPatternMismatch extends LocalizedDocumentValidation
 
 /// When a string length is out of range.
 final class LocalizedDocumentStringOutOfRange extends LocalizedDocumentValidationResult {
-  final NumRange<int> range;
+  final Range<int?> range;
 
   const LocalizedDocumentStringOutOfRange({required this.range});
 

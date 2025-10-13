@@ -57,7 +57,7 @@ final class DocumentGenericNumberSchema extends DocumentNumberSchema {
 }
 
 sealed class DocumentNumberSchema extends DocumentValueSchema<double> {
-  final NumRange<double>? numRange;
+  final Range<double?>? numRange;
   final double? multipleOf;
 
   const DocumentNumberSchema({

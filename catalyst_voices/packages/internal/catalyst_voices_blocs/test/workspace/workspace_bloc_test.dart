@@ -83,7 +83,7 @@ void main() {
                 availableFunds: MultiCurrencyAmount.single(_adaMajorUnits(1000)),
                 imageUrl: '',
                 totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
-                range: ComparableRange(
+                range: Range(
                   min: _adaMajorUnits(10),
                   max: _adaMajorUnits(100),
                 ),
@@ -138,7 +138,7 @@ void main() {
                 availableFunds: MultiCurrencyAmount.single(_adaMajorUnits(1000)),
                 imageUrl: '',
                 totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
-                range: ComparableRange(
+                range: Range(
                   min: _adaMajorUnits(10),
                   max: _adaMajorUnits(100),
                 ),

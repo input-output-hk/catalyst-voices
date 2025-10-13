@@ -23,7 +23,7 @@ void main() {
               child: FundsDetailCard(
                 allFunds: MultiCurrencyAmount.single(_adaMajorUnits(100)),
                 totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(100)),
-                askRange: ComparableRange(
+                askRange: Range(
                   min: _adaMajorUnits(100),
                   max: _adaMajorUnits(100),
                 ),
@@ -46,7 +46,7 @@ void main() {
               child: FundsDetailCard(
                 allFunds: MultiCurrencyAmount.single(_adaMajorUnits(1)),
                 totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(2)),
-                askRange: ComparableRange(
+                askRange: Range(
                   min: _adaMajorUnits(3),
                   max: _adaMajorUnits(4),
                 ),

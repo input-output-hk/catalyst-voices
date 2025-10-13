@@ -21,7 +21,7 @@ final class DocumentIntegerSchemaMapper {
     final defaultValue = schema.defaultValue as int?;
     final constValue = schema.constValue as int?;
     final enumValues = schema.enumValues?.cast<int>();
-    final numRange = NumRange.optionalRangeOf(min: schema.minimum, max: schema.maximum);
+    final numRange = Range.optionalRangeOf(min: schema.minimum, max: schema.maximum);
     final multipleOf = schema.multipleOf as int?;
     final definition = _DocumentIntegerDefinition.fromDef(schema.definition());
 
