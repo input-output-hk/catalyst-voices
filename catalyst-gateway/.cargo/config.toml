@@ -48,6 +48,7 @@ lto = "thin"
 panic = "unwind"
 incremental = false
 codegen-units = 16
+strip = "debuginfo"
 
 [profile.test]
 opt-level = 3
