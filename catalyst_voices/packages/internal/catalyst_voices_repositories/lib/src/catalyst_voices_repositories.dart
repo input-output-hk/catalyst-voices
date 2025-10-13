@@ -1,5 +1,4 @@
 export 'api/api.dart';
-export 'api/api_config.dart';
 export 'auth/auth_token_provider.dart' show AuthTokenProvider;
 export 'cache/cache.dart';
 export 'cache/local_tll_cache.dart';

@@ -1,7 +1,7 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_index.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_mapping.dart';
-import 'package:catalyst_voices_repositories/src/api/api_config.dart';
 import 'package:catalyst_voices_repositories/src/api/converters/cbor_or_json_converter.dart';
 import 'package:catalyst_voices_repositories/src/api/converters/cbor_serializable_converter.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/path_trim_interceptor.dart';
@@ -38,10 +38,10 @@ final class ApiServices {
     _fixModelsMapping();
 
     return ApiServices.internal(
-      gateway: config.stressTest.isEnabled
+      gateway: config.localGateway.isEnabled
           ? LocalCatGateway.create(
-              initialProposalsCount: config.stressTest.proposalsCount,
-              decompressedDocuments: config.stressTest.decompressedDocuments,
+              initialProposalsCount: config.localGateway.proposalsCount,
+              decompressedDocuments: config.localGateway.decompressedDocuments,
             )
           : CatGateway.create(
               httpClient: httpClient?.call(),
