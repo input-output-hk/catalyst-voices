@@ -11,9 +11,7 @@ import { TestModel } from "../models/testModel";
 import { getAccountModel } from "../data/accountConfigs";
 import { BrowserExtensionName } from "../models/browserExtensionModel";
 
-for (const walletConfig of [
-  getWalletConfigByExtensionName(BrowserExtensionName.Eternl),
-]) {
+for (const walletConfig of getOneOfEachExtensions()) {
   test.describe(`Onboarding ${walletConfig.extension.Name}`, () => {
     test.use({
       testModel: new TestModel(

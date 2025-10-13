@@ -25,7 +25,7 @@ export const walletConfigs: WalletConfigModel[] = [
     ],
     network: "preprod",
     username: "test123",
-    password: "test12345678@",
+    password: "Test12345678@",
     cipBridge: ["cip-95"],
     mainAddress:
       "addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g",
@@ -54,7 +54,7 @@ export const walletConfigs: WalletConfigModel[] = [
     ],
     network: "preprod",
     username: "test123",
-    password: "test12345678@!!",
+    password: "Test12345678@!!",
     cipBridge: ["cip-30", "cip-95"],
     mainAddress:
       "addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g",
@@ -83,7 +83,7 @@ export const walletConfigs: WalletConfigModel[] = [
     ],
     network: "preprod",
     username: "test123",
-    password: "test12345678@!!",
+    password: "Test12345678@!!",
     cipBridge: ["cip-95"],
     mainAddress:
       "addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g",
@@ -112,7 +112,7 @@ export const walletConfigs: WalletConfigModel[] = [
     ],
     network: "preprod",
     username: "test123",
-    password: "test12345678@!!",
+    password: "Test12345678@!!",
     cipBridge: ["cip-95"],
     mainAddress:
       "addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g",
@@ -141,7 +141,7 @@ export const walletConfigs: WalletConfigModel[] = [
     ],
     network: "preprod",
     username: "test123",
-    password: "test12345678@!!",
+    password: "Test12345678@!!",
     cipBridge: ["cip-95"],
     mainAddress:
       "addr_test1qq2fckuzdvxu074ngumdkwn68tuuse67yg55r8exmkwdnn2lc30fwlx8jy6e54em6dcql0ma3gz75rc4ywuzuny7p7csr9kx9g",

@@ -11,55 +11,41 @@ export class EternlActions implements WalletActions {
     this.page = page;
   }
 
+  async fillSeedPhrase(page: Page, seedPhrase: string[]): Promise<void> {
+    for (let i = 0; i < seedPhrase.length; i++) {
+      const inputField = page.locator(`#word${i}`);
+
+      await inputField.click();
+      await inputField.fill(seedPhrase[i]);
+
+      await page.waitForTimeout(100);
+    }
+  }
+
   async restoreWallet(): Promise<void> {
     await this.page.locator('//button[@aria-label="Start setup"]').click();
     await this.page.locator("#modalSetupSettingsFooter button").click();
     await this.selectNetwork(this.walletConfig.network);
     await this.page.locator("#modelSetupSettingsBtnNext").click();
-    await this.page.locator("//input[@type='password']").fill('1234');
+    await this.page.locator("//input[@type='password']").fill("1234");
     await this.page.locator("#btnNext").click();
-    await this.page.locator("#passwordInput").fill('1234');
+    await this.page.locator("#passwordInput").fill("1234");
     await this.page.locator("#modelSetupSettingsBtnNext").click();
-    
-
-    await this.page.locator('button:has-text("Add Wallet")').click();
-
-    // Click Restore wallet
-    await this.page.locator('button:has-text("Restore wallet")').click();
-
-    // Select 15 words
-    await this.page.locator('button:has-text("15 words")').click();
-
-    // Click next
-    await this.page.locator('button.cc-btn-primary:has-text("next")').click();
-
-    // Enter seed phrase
-    await this.page
-      .locator("#wordInput")
-      .fill(this.walletConfig.seed.join(" "));
-
-    // Continue
-    await this.page.locator('button:has-text("continue")').click();
-
-    // Set wallet name
-    await this.page
-      .locator("#inputWalletName")
-      .fill(this.walletConfig.username);
-
-    // Set password
+    await this.page.locator('button:has-text("Enter a Seed-phrase")').click();
+    await this.page.locator('button:has-text("15-word phrase")').click();
+    await this.fillSeedPhrase(this.page, this.walletConfig.seed);
+    await this.page.locator("#modelRestoreWalletBtnNext").click();
+    await this.page.locator("#modelRestoreWalletBtnNext").click();
+    await this.page.locator("#walletName").click();
+    await this.page.locator("#walletName").fill(this.walletConfig.username);
+    await this.page.locator("#modelRestoreWalletBtnNext").click();
     await this.page.locator("#password").fill(this.walletConfig.password);
-    await this.page.locator("#repeatPassword").fill(this.walletConfig.password);
-
-    // Save wallet
-    await this.page.locator('button:has-text("save")').click();
-    await this.page.locator('button:has-text("save")').click();
-
-    // Click on the light theme area to complete setup
     await this.page
-      .locator(
-        "div.flex.flex-row.justify-center.items-center.cursor-pointer.cc-area-light-1"
-      )
-      .click();
+      .locator("#passwordConfirm")
+      .fill(this.walletConfig.password);
+    await this.page.locator("#password").click();
+    await this.page.locator('button:has-text("Next")').click();
+    await this.page.waitForTimeout(3000);
   }
 
   async connectWallet(): Promise<void> {
