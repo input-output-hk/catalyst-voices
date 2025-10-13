@@ -92,7 +92,6 @@ All proposals submitted to this category must adhere to the following project an
 - **Amplify Cardano:** A plan for co-marketing, public relations, or community engagement must be included to maximize Cardano's visibility.
 - **Detail verifiable team credentials:** Simply listing names and roles is insufficient. The proposal must include verifiable references (e.g. comprehensive LinkedIn profiles, project portfolios, public repositories, corporate bios) that clearly demonstrate each key team member's specific experience, accomplishments, and suitability for their role in the project.
 - **Identify all partners:** All collaborating entities, including the specific Tier-1 partner and any integration partners, must be clearly named within the proposal.
-- **Propose forward-looking work:** Funds are exclusively for future development and project execution. Proposals seeking retroactive funding for work already completed will not be eligible.
 - **Detailed Use of Funds:** Proposals must provide a clear budget. Your budget must be for future activities only and allocated exclusively to the project's execution. Proposals seeking retroactive funding are not eligible. Funds cannot be used for purchasing digital assets, providing liquidity, local treasuries, speculation, or simple branded merchandise. Proposals involving re-granting or incentives/giveaways are not eligible either. Please review [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules) for further details in addition to these.
 ''',
       ),
