@@ -289,5 +289,43 @@ void main() {
         expect(formatted, equals('100.00'));
       });
     });
+
+    group('formatMultiCurrencyAmount', () {
+      test('multiple', () {
+        final amount = MultiCurrencyAmount.list([
+          Currencies.ada.amount(100),
+          Currencies.usdm.amount(50),
+        ]);
+
+        final formatted = MoneyFormatter.formatMultiCurrencyAmount(
+          amount,
+          formatter: MoneyFormatter.formatDecimal,
+        );
+
+        expect(formatted, equals('\$ADA 100\n\$USDM 50.00'));
+      });
+
+      test('single', () {
+        final amount = MultiCurrencyAmount.single(Currencies.ada.amount(100));
+
+        final formatted = MoneyFormatter.formatMultiCurrencyAmount(
+          amount,
+          formatter: MoneyFormatter.formatDecimal,
+        );
+
+        expect(formatted, equals(r'$ADA 100'));
+      });
+
+      test('empty', () {
+        final amount = MultiCurrencyAmount.list(const []);
+
+        final formatted = MoneyFormatter.formatMultiCurrencyAmount(
+          amount,
+          formatter: MoneyFormatter.formatDecimal,
+        );
+
+        expect(formatted, equals('-'));
+      });
+    });
   });
 }
