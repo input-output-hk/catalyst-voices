@@ -47,6 +47,12 @@ class CatalystMessengerState extends State<CatalystMessenger> {
     return __router ??= _findRouter()..routerDelegate.addListener(_handleRouterChange);
   }
 
+  /// Adds a notification to the queue if it is not already present.
+  ///
+  /// This method ensures that duplicate notifications are not added to the queue.
+  /// If the notification already exists in the `_pending` queue, it logs a message
+  /// and skips adding it. Otherwise, the notification is added to the queue in a
+  /// sorted order, and the queue is processed to display notifications.
   void add(CatalystNotification notification) {
     if (_pending.contains(notification)) {
       _logger.fine('$notification already in queue, skipping add');
