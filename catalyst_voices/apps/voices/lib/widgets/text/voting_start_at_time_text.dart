@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/active_fund_number_selector_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -14,7 +15,8 @@ class VotingStartAtTimeText extends StatelessWidget {
       data,
       formatter: (context, dateTime) {
         final date = DateFormatter.formatFullDateTime(dateTime);
-        return context.l10n.votingForF14StartsIn(
+        return context.l10n.votingForFundStartsIn(
+          context.activeCampaignFundNumber,
           date,
         );
       },

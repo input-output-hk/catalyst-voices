@@ -30,6 +30,15 @@ base class Page<E> extends Equatable {
     items,
   ];
 
+  Future<Page<T>> asyncMap<T>(Future<T> Function(E e) mapper) async {
+    return Page<T>(
+      page: page,
+      maxPerPage: maxPerPage,
+      total: total,
+      items: await items.map(mapper).wait,
+    );
+  }
+
   Page<T> copyWithItems<T>(List<T> items) {
     return Page<T>(
       page: page,

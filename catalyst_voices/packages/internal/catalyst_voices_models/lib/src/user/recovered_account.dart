@@ -11,6 +11,7 @@ final class RecoveredAccount extends Equatable {
   final ShelleyAddress stakeAddress;
   final AccountPublicStatus publicStatus;
   final VotingPower? votingPower;
+  final bool isPersistent;
 
   const RecoveredAccount({
     required this.username,
@@ -19,6 +20,7 @@ final class RecoveredAccount extends Equatable {
     required this.stakeAddress,
     required this.publicStatus,
     required this.votingPower,
+    required this.isPersistent,
   });
 
   @override
@@ -29,5 +31,6 @@ final class RecoveredAccount extends Equatable {
     stakeAddress,
     publicStatus,
     votingPower,
+    isPersistent,
   ];
 }

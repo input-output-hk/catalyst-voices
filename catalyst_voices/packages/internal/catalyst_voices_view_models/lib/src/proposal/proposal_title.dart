@@ -6,7 +6,7 @@ import 'package:formz/formz.dart';
 
 /// Form input validator for proposal title.
 final class ProposalTitle extends FormzInput<String, ProposalTitleValidationException> {
-  final NumRange<int>? titleLengthRange;
+  final Range<int?>? titleLengthRange;
 
   const ProposalTitle.dirty([super.value = '', this.titleLengthRange]) : super.dirty();
 

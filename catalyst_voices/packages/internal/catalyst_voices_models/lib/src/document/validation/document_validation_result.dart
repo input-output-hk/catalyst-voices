@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/src/document/document_node_id.dart';
+import 'package:catalyst_voices_models/src/money/money.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 
@@ -45,7 +46,7 @@ final class DocumentItemsNotUnique extends DocumentValidationResult {
 /// The [List]'s length is not within [expectedRange].
 final class DocumentItemsOutOfRange<T extends num> extends DocumentValidationResult {
   final DocumentNodeId invalidNodeId;
-  final NumRange<int> expectedRange;
+  final Range<int?> expectedRange;
   final int actualItems;
 
   const DocumentItemsOutOfRange({
@@ -58,10 +59,58 @@ final class DocumentItemsOutOfRange<T extends num> extends DocumentValidationRes
   List<Object?> get props => [invalidNodeId, expectedRange, actualItems];
 }
 
+/// The money [actualValue] is not a multiple of [multipleOf].
+final class DocumentMoneyNotMultipleOf extends DocumentValidationResult {
+  final DocumentNodeId invalidNodeId;
+  final Money multipleOf;
+  final Money actualValue;
+
+  const DocumentMoneyNotMultipleOf({
+    required this.invalidNodeId,
+    required this.multipleOf,
+    required this.actualValue,
+  });
+
+  @override
+  List<Object?> get props => [invalidNodeId, multipleOf, actualValue];
+}
+
+/// The money [actualValue] is not within [expectedRange].
+final class DocumentMoneyOutOfRange extends DocumentValidationResult {
+  final DocumentNodeId invalidNodeId;
+  final Range<Money?> expectedRange;
+  final Money actualValue;
+
+  const DocumentMoneyOutOfRange({
+    required this.invalidNodeId,
+    required this.expectedRange,
+    required this.actualValue,
+  });
+
+  @override
+  List<Object?> get props => [invalidNodeId, expectedRange, actualValue];
+}
+
+/// The numerical [actualValue] is not a multiple of [multipleOf].
+final class DocumentNumNotMultipleOf extends DocumentValidationResult {
+  final DocumentNodeId invalidNodeId;
+  final num multipleOf;
+  final num actualValue;
+
+  const DocumentNumNotMultipleOf({
+    required this.invalidNodeId,
+    required this.multipleOf,
+    required this.actualValue,
+  });
+
+  @override
+  List<Object?> get props => [invalidNodeId, multipleOf, actualValue];
+}
+
 /// The numerical [actualValue] is not within [expectedRange].
 final class DocumentNumOutOfRange extends DocumentValidationResult {
   final DocumentNodeId invalidNodeId;
-  final NumRange<num> expectedRange;
+  final Range<num?> expectedRange;
   final num actualValue;
 
   const DocumentNumOutOfRange({
@@ -98,7 +147,7 @@ enum DocumentPatternType {
 /// The [String]'s [actualLength] is not within [expectedRange].
 final class DocumentStringOutOfRange<T extends num> extends DocumentValidationResult {
   final DocumentNodeId invalidNodeId;
-  final NumRange<int> expectedRange;
+  final Range<int?> expectedRange;
   final int actualLength;
 
   const DocumentStringOutOfRange({

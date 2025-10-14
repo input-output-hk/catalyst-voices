@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/active_fund_number_selector_ext.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,7 @@ class ProposalsFundInfo extends StatelessWidget {
         children: [
           Text(
             key: const Key('CurrentCampaignTitle'),
-            context.l10n.catalystFundNo(14),
+            context.l10n.catalystFundNo(context.activeCampaignFundNumber),
             style: Theme.of(context).textTheme.displayMedium,
           ),
           const SizedBox(height: 16),

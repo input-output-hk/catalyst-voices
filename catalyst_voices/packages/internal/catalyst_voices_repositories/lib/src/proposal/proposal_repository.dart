@@ -52,8 +52,6 @@ abstract interface class ProposalRepository {
     required DocumentRef ref,
   });
 
-  Future<DocumentRef> importProposal(Uint8List data, CatalystId authorId);
-
   Future<void> publishProposal({
     required DocumentData document,
     required CatalystId catalystId,
@@ -202,11 +200,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Future<DocumentRef> importProposal(Uint8List data, CatalystId authorId) {
-    return _documentRepository.importDocument(data: data, authorId: authorId);
-  }
-
-  @override
   Future<void> publishProposal({
     required DocumentData document,
     required CatalystId catalystId,
@@ -294,7 +287,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           unique: true,
           type: DocumentType.proposalDocument,
         )
-        .map(
+        .asyncMap(
           (documents) => documents.map(
             (doc) {
               final documentData = doc.data;
@@ -414,8 +407,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       'Not a proposalDocument document data type',
     );
 
-    final template = _buildProposalTemplate(documentData: templateData);
-
     final metadata = ProposalMetadata(
       selfRef: documentData.metadata.selfRef,
       templateRef: documentData.metadata.template!,
@@ -423,10 +414,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       authors: documentData.metadata.authors ?? [],
     );
 
-    final content = DocumentDataContentDto.fromModel(
-      documentData.content,
-    );
+    final template = _buildProposalTemplate(documentData: templateData);
     final schema = template.schema;
+    final content = DocumentDataContentDto.fromModel(documentData.content);
     final document = DocumentDto.fromJsonSchema(content, schema).toModel();
 
     return ProposalDocument(
