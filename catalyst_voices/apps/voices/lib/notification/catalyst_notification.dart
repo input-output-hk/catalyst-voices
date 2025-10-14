@@ -11,7 +11,7 @@ bool _alwaysAllowRouterPredicate(GoRouterState state) => true;
 
 typedef CatalystNotificationRouterPredicate = bool Function(GoRouterState state);
 
-sealed class CatalystNotification implements Comparable<CatalystNotification> {
+sealed class CatalystNotification extends Equatable implements Comparable<CatalystNotification> {
   final String id;
   final int priority;
   final CatalystNotificationType type;
@@ -23,6 +23,9 @@ sealed class CatalystNotification implements Comparable<CatalystNotification> {
     this.type = CatalystNotificationType.info,
     this.routerPredicate = _alwaysAllowRouterPredicate,
   });
+
+  @override
+  List<Object> get props => [id, priority, type];
 
   @override
   int compareTo(CatalystNotification other) => priority.compareTo(other.priority);
