@@ -91,6 +91,8 @@ Future<BootstrapArgs> bootstrap({
       fromTo: DateRange(from: startConfigTimestamp, to: endConfigTimestamp),
     );
 
+  CatalystDeveloperProfiler.fromConfig(const CatalystDeveloperProfilerConfig());
+
   await Dependencies.instance.init(
     config: config,
     environment: environment,
