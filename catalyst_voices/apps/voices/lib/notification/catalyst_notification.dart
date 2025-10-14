@@ -25,15 +25,15 @@ sealed class CatalystNotification extends Equatable implements Comparable<Cataly
   });
 
   @override
+  List<Object> get props => [id, priority, type];
+
+  @override
   int compareTo(CatalystNotification other) => priority.compareTo(other.priority);
 
   @override
   String toString() {
     return 'CatalystNotification(id[$id], priority[$priority], type[$type])';
   }
-
-  @override
-  List<Object> get props => [id, priority, type];
 }
 
 enum CatalystNotificationType {
