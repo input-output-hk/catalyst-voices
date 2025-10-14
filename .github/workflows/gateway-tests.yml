@@ -106,9 +106,8 @@ jobs:
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
 
-# Skip until bugfix https://github.com/input-output-hk/catalyst-voices/issues/3209
       - name: Integration health thru proxy tests
-        if: false
+        if: ${{ steps.gateway-healthy.conclusion == 'success' }}
         env:
           API_TEST_MARKS: "health_with_proxy_endpoint"
           EVENT_DB_URL: "haproxy:18080"
