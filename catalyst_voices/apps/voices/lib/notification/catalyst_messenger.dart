@@ -48,6 +48,11 @@ class CatalystMessengerState extends State<CatalystMessenger> {
   }
 
   void add(CatalystNotification notification) {
+    if (_pending.contains(notification)) {
+      _logger.fine('$notification already in queue, skipping add');
+      return;
+    }
+
     _logger.finest('Adding $notification to queue');
 
     _addSorted(notification);
