@@ -12,6 +12,7 @@ final class CoseDocumentLocator extends Equatable {
 
   CoseDocumentLocator.fallback() : this(cid: Uint8List(0));
 
+  /// Deserializes the type from cbor.
   factory CoseDocumentLocator.fromCbor(CborValue value) {
     final map = value as CborMap;
     final cid = map[CborString('cid')]! as CborBytes;
@@ -22,6 +23,7 @@ final class CoseDocumentLocator extends Equatable {
   @override
   List<Object?> get props => [cid];
 
+  /// Serializes the type as cbor.
   CborValue toCbor() {
     return CborMap({
       CborString('cid'): CborBytes(cid, tags: [CborUtils.cidTag]),
@@ -44,14 +46,25 @@ final class CoseDocumentRef extends Equatable {
          documentLocator: documentLocator ?? CoseDocumentLocator.fallback(),
        );
 
+  /// Deserializes the type from cbor.
   factory CoseDocumentRef.fromCbor(CborValue value) {
-    final list = value as CborList;
+    if (value is! CborList) {
+      return CoseDocumentRef.backwardCompatible(
+        documentId: CoseUuid.fromCbor(value),
+      );
+    } else {
+      final documentId = value.elementAtOrNull(0)!;
+      final documentVer = value.elementAtOrNull(1);
+      final documentLocator = value.elementAtOrNull(2);
 
-    return CoseDocumentRef.backwardCompatible(
-      documentId: CoseUuid.fromCbor(list[0]),
-      documentVer: CoseUuid.fromCbor(list[1]),
-      documentLocator: CoseDocumentLocator.fromCbor(list[2]),
-    );
+      return CoseDocumentRef.backwardCompatible(
+        documentId: CoseUuid.fromCbor(documentId),
+        documentVer: documentVer != null ? CoseUuid.fromCbor(documentVer) : null,
+        documentLocator: documentLocator != null
+            ? CoseDocumentLocator.fromCbor(documentLocator)
+            : null,
+      );
+    }
   }
 
   const CoseDocumentRef.latestSpec({
@@ -73,12 +86,22 @@ final class CoseDocumentRef extends Equatable {
   @override
   List<Object?> get props => [documentId, documentVer, documentLocator];
 
+  /// Serializes the type as cbor.
   CborValue toCbor() {
     return CborList([
       documentId.toCbor(),
       if (documentVer case final documentVer?) documentVer.toCbor(),
       if (documentLocator case final documentLocator) documentLocator.toCbor(),
     ]);
+  }
+
+  /// Attemps to deserialize the type from cbor. Returns null if that fails.
+  static CoseDocumentRef? tryFromCbor(CborValue value) {
+    try {
+      return CoseDocumentRef.fromCbor(value);
+    } catch (_) {
+      return null;
+    }
   }
 }
 
@@ -91,15 +114,21 @@ final class CoseDocumentRefs extends Equatable {
         'refs must contain at least one item',
       );
 
+  /// Deserializes the type from cbor.
   factory CoseDocumentRefs.fromCbor(CborValue value) {
-    final list = value as CborList;
-
-    return CoseDocumentRefs(list.map(CoseDocumentRef.fromCbor).toList());
+    final legacyRef = CoseDocumentRef.tryFromCbor(value);
+    if (legacyRef != null) {
+      return CoseDocumentRefs([legacyRef]);
+    } else {
+      final list = value as CborList;
+      return CoseDocumentRefs(list.map(CoseDocumentRef.fromCbor).toList());
+    }
   }
 
   @override
   List<Object?> get props => [refs];
 
+  /// Serializes the type as cbor.
   CborValue toCbor() {
     return CborList(refs.map((e) => e.toCbor()).toList());
   }

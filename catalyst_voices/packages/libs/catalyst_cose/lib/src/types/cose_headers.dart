@@ -59,20 +59,17 @@ final class CoseHeaders extends Equatable {
 
   /// See [CoseHeaderKeys.collaborators].
   ///
-  /// In previous versions of the spec the field was under [CoseHeaderKeys.collabs] key.
+  /// Replaces the old [CoseHeaderKeys.collabs] key.
   final List<String>? collaborators;
 
-  /// See [CoseHeaderKeys.brandId].
-  final CoseReferenceUuid? brandId;
-
-  /// See [CoseHeaderKeys.campaignId].
-  final CoseReferenceUuid? campaignId;
-
-  /// See [CoseHeaderKeys.electionId].
-  final String? electionId;
-
-  /// See [CoseHeaderKeys.categoryId].
-  final CoseReferenceUuid? categoryId;
+  /// See [CoseHeaderKeys.parameters].
+  ///
+  /// Replaces:
+  /// - [CoseHeaderKeys.brandId]
+  /// - [CoseHeaderKeys.campaignId]
+  /// - [CoseHeaderKeys.electionId]
+  /// - [CoseHeaderKeys.categoryId]
+  final CoseDocumentRefs? parameters;
 
   /// Whether the type should be wrapped in extra [CborBytes]
   /// or be a plain [CborMap], both formats are supported.
@@ -95,10 +92,7 @@ final class CoseHeaders extends Equatable {
     this.reply,
     this.section,
     this.collaborators,
-    this.brandId,
-    this.campaignId,
-    this.electionId,
-    this.categoryId,
+    this.parameters,
     required this.encodeAsBytes,
   });
 
@@ -131,10 +125,12 @@ final class CoseHeaders extends Equatable {
       collaborators: CborUtils.deserializeStringList(
         map[CoseHeaderKeys.collaborators] ?? map[CoseHeaderKeys.collabs],
       ),
-      brandId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.brandId]),
-      campaignId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.campaignId]),
-      electionId: CborUtils.deserializeString(map[CoseHeaderKeys.electionId]),
-      categoryId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.categoryId]),
+      parameters: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.parameters]),
+      // TODO(dt-iohk): make it backward compatible
+      // brandId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.brandId]),
+      // campaignId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.campaignId]),
+      // electionId: CborUtils.deserializeString(map[CoseHeaderKeys.electionId]),
+      // categoryId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.categoryId]),
       encodeAsBytes: encodeAsBytes,
     );
   }
@@ -153,10 +149,7 @@ final class CoseHeaders extends Equatable {
     this.reply,
     this.section,
     this.collaborators,
-    this.brandId,
-    this.campaignId,
-    this.electionId,
-    this.categoryId,
+    this.parameters,
   }) : encodeAsBytes = true;
 
   /// The constructor for the unprotected [CoseHeaders].
@@ -173,10 +166,7 @@ final class CoseHeaders extends Equatable {
     this.reply,
     this.section,
     this.collaborators,
-    this.brandId,
-    this.campaignId,
-    this.electionId,
-    this.categoryId,
+    this.parameters,
   }) : encodeAsBytes = false;
 
   @override
@@ -193,10 +183,7 @@ final class CoseHeaders extends Equatable {
     reply,
     section,
     collaborators,
-    brandId,
-    campaignId,
-    electionId,
-    categoryId,
+    parameters,
     encodeAsBytes,
   ];
 
@@ -214,10 +201,7 @@ final class CoseHeaders extends Equatable {
     OptionalValueGetter<CoseDocumentRefs?>? reply,
     OptionalValueGetter<String?>? section,
     OptionalValueGetter<List<String>?>? collaborators,
-    OptionalValueGetter<CoseReferenceUuid?>? brandId,
-    OptionalValueGetter<CoseReferenceUuid?>? campaignId,
-    OptionalValueGetter<String?>? electionId,
-    OptionalValueGetter<CoseReferenceUuid?>? categoryId,
+    OptionalValueGetter<CoseDocumentRefs?>? parameters,
     bool? encodeAsBytes,
   }) {
     return CoseHeaders(
@@ -233,10 +217,7 @@ final class CoseHeaders extends Equatable {
       reply: reply != null ? reply() : this.reply,
       section: section != null ? section() : this.section,
       collaborators: collaborators != null ? collaborators() : this.collaborators,
-      brandId: brandId != null ? brandId() : this.brandId,
-      campaignId: campaignId != null ? campaignId() : this.campaignId,
-      electionId: electionId != null ? electionId() : this.electionId,
-      categoryId: categoryId != null ? categoryId() : this.categoryId,
+      parameters: parameters != null ? parameters() : this.parameters,
       encodeAsBytes: encodeAsBytes ?? this.encodeAsBytes,
     );
   }
@@ -244,22 +225,20 @@ final class CoseHeaders extends Equatable {
   /// Serializes the type as cbor.
   CborValue toCbor() {
     final map = CborMap({
-      if (alg != null) CoseHeaderKeys.alg: alg!.toCbor(),
-      if (kid != null) CoseHeaderKeys.kid: CborBytes(kid!),
-      if (contentType != null) CoseHeaderKeys.contentType: contentType!.toCbor(),
-      if (contentEncoding != null) CoseHeaderKeys.contentEncoding: contentEncoding!.toCbor(),
-      if (type != null) CoseHeaderKeys.type: type!.toCbor(),
-      if (id != null) CoseHeaderKeys.id: id!.toCbor(),
-      if (ver != null) CoseHeaderKeys.ver: ver!.toCbor(),
-      if (ref != null) CoseHeaderKeys.ref: ref!.toCbor(),
-      if (template != null) CoseHeaderKeys.template: template!.toCbor(),
-      if (reply != null) CoseHeaderKeys.reply: reply!.toCbor(),
-      if (section != null) CoseHeaderKeys.section: CborString(section!),
-      if (brandId != null) CoseHeaderKeys.brandId: brandId!.toCbor(),
-      if (campaignId != null) CoseHeaderKeys.campaignId: campaignId!.toCbor(),
-      if (electionId != null) CoseHeaderKeys.electionId: CborString(electionId!),
-      if (categoryId != null) CoseHeaderKeys.categoryId: categoryId!.toCbor(),
-      if (collaborators != null)
+      if (alg case final alg?) CoseHeaderKeys.alg: alg.toCbor(),
+      if (kid case final kid?) CoseHeaderKeys.kid: CborBytes(kid),
+      if (contentType case final contentType?) CoseHeaderKeys.contentType: contentType.toCbor(),
+      if (contentEncoding case final contentEncoding?)
+        CoseHeaderKeys.contentEncoding: contentEncoding.toCbor(),
+      if (type case final type?) CoseHeaderKeys.type: type!.toCbor(),
+      if (id case final id?) CoseHeaderKeys.id: id!.toCbor(),
+      if (ver case final ver?) CoseHeaderKeys.ver: ver!.toCbor(),
+      if (ref case final ref?) CoseHeaderKeys.ref: ref.toCbor(),
+      if (template case final template?) CoseHeaderKeys.template: template.toCbor(),
+      if (reply case final reply?) CoseHeaderKeys.reply: reply.toCbor(),
+      if (section case final section?) CoseHeaderKeys.section: CborString(section),
+      if (parameters case final parameters?) CoseHeaderKeys.parameters: parameters.toCbor(),
+      if (collaborators case final collaborators?)
         CoseHeaderKeys.collaborators: CborUtils.serializeStringList(collaborators),
     });
 

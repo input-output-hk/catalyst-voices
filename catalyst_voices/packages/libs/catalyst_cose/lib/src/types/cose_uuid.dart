@@ -8,10 +8,9 @@ import 'package:uuid_plus/uuid_plus.dart' as uuid;
 ///
 /// What this uuid means depends where and how the class is used.
 /// In CDDL it is defined as (UUID / [UUID, UUID]).
-@Deprecated(
-  'The class should no longer be used. '
-  'The fields which use this class should be migrated to "parameters".',
-)
+///
+// TODO(dt-iohk): the class should no longer be used.
+// The fields which use this class should be migrated to "parameters"
 final class CoseReferenceUuid extends Equatable {
   /// The referenced entity uuid.
   final CoseUuid id;
@@ -20,20 +19,12 @@ final class CoseReferenceUuid extends Equatable {
   final CoseUuid? ver;
 
   /// The default constructor for the [CoseReferenceUuid].
-  @Deprecated(
-    'The class should no longer be used. '
-    'The fields which use this class should be migrated to "parameters".',
-  )
   const CoseReferenceUuid({
     required this.id,
     this.ver,
   });
 
   /// Deserializes the type from cbor.
-  @Deprecated(
-    'The class should no longer be used. '
-    'The fields which use this class should be migrated to "parameters".',
-  )
   factory CoseReferenceUuid.fromCbor(CborValue value) {
     if (value is CborList) {
       return CoseReferenceUuid(

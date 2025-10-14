@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:catalyst_cose/src/types/cose_document_ref.dart';
-import 'package:catalyst_cose/src/types/cose_uuid.dart';
 import 'package:catalyst_cose/src/types/cose_string_or_int.dart';
+import 'package:catalyst_cose/src/types/cose_uuid.dart';
 import 'package:cbor/cbor.dart';
 
 /// A set of utils around cbor encoding/decoding.
@@ -11,7 +11,7 @@ final class CborUtils {
   /// A cbor tag for the UUID type.
   static const int uuidTag = 37;
 
-  /// A cbor tag for content identifiers (IPFS).
+  /// A cbor tag for content identifiers (IPLD / IPFS).
   static const int cidTag = 42;
 
   const CborUtils._();
@@ -29,6 +29,7 @@ final class CborUtils {
     return Uint8List.fromList((value as CborBytes).bytes);
   }
 
+  /// Deserializes optional [CoseDocumentRefs] type.
   static CoseDocumentRefs? deserializeDocumentRefs(CborValue? value) {
     if (value == null) {
       return null;

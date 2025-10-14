@@ -84,6 +84,9 @@ final class CoseHeaderKeys {
   /// The header key for "category_id".
   static final categoryId = CborString('category_id');
 
+  /// The header key for "parameters".
+  static final parameters = CborString('parameters');
+
   const CoseHeaderKeys._();
 }
 
