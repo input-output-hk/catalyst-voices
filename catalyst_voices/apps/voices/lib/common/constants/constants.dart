@@ -47,7 +47,6 @@ abstract class VoicesConstants {
   static const milestoneGuideline =
       '$_docs/current-fund/project-onboarding/milestone-based-proposals';
   static const projectCatalystFund14Url = '$_projectCatalyst/funds/14';
-  static const systemStatusUrl = 'https://status.projectcatalyst.io';
 
   VoicesConstants._();
 

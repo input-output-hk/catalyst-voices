@@ -1,6 +1,7 @@
-import 'package:catalyst_voices/common/constants/constants.dart';
+import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/notification/catalyst_notification.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/widgets.dart';
 import 'package:uuid_plus/uuid_plus.dart';
@@ -27,7 +28,8 @@ final class SystemStatusIssueBanner extends BannerNotification with LaunchUrlMix
         'readMoreLink': CatalystNotificationTextPart(
           text: context.l10n.readMore,
           onTap: (context) async {
-            await launchUri(VoicesConstants.systemStatusUrl.getUri());
+            final systemStatusUrl = Dependencies.instance.get<AppEnvironment>().type.status;
+            await launchUri(systemStatusUrl);
           },
         ),
       },
