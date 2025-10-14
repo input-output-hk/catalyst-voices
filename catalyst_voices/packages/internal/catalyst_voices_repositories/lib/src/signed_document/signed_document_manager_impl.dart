@@ -8,7 +8,7 @@ import 'package:catalyst_voices_repositories/src/signed_document/signed_document
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
-const _brotliEncoding = StringValue(CoseValues.brotliContentEncoding);
+const _brotliEncoding = CoseStringValue(CoseValues.brotliContentEncoding);
 
 final class SignedDocumentManagerImpl implements SignedDocumentManager {
   final CatalystCompressor brotli;
@@ -90,7 +90,7 @@ final class _CatalystSigner implements CatalystCoseSigner {
   );
 
   @override
-  StringOrInt? get alg => null;
+  CoseStringOrInt? get alg => null;
 
   @override
   Future<Uint8List?> get kid async {
@@ -177,23 +177,23 @@ extension _CoseSignatureExt on CoseSignature {
 
 extension _SignedDocumentContentTypeExt on SignedDocumentContentType {
   /// Maps the [SignedDocumentContentType] into COSE representation.
-  StringOrInt? get asCose {
+  CoseStringOrInt? get asCose {
     switch (this) {
       case SignedDocumentContentType.json:
-        return const IntValue(CoseValues.jsonContentType);
+        return const CoseIntValue(CoseValues.jsonContentType);
       case SignedDocumentContentType.unknown:
         return null;
     }
   }
 
-  static SignedDocumentContentType fromCose(StringOrInt? contentType) {
+  static SignedDocumentContentType fromCose(CoseStringOrInt? contentType) {
     switch (contentType) {
-      case IntValue():
+      case CoseIntValue():
         return switch (contentType.value) {
           CoseValues.jsonContentType => SignedDocumentContentType.json,
           _ => SignedDocumentContentType.unknown,
         };
-      case StringValue():
+      case CoseStringValue():
       case null:
         return SignedDocumentContentType.unknown;
     }
@@ -209,15 +209,14 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
       id: id?.asUuid,
       ver: ver?.asUuid,
       ref: ref?.asCose,
-      refHash: refHash?.asCose,
       template: template?.asCose,
       reply: reply?.asCose,
       section: section,
-      collabs: collabs,
-      brandId: brandId?.asCose,
-      campaignId: campaignId?.asCose,
+      collaborators: collaborators,
+      brandId: brandId?.asLegacyCose,
+      campaignId: campaignId?.asLegacyCose,
       electionId: electionId,
-      categoryId: categoryId?.asCose,
+      categoryId: categoryId?.asLegacyCose,
     );
   }
 
@@ -231,7 +230,6 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
   }) {
     final type = protectedHeaders.type?.value;
     final ref = protectedHeaders.ref;
-    final refHash = protectedHeaders.refHash;
     final template = protectedHeaders.template;
     final reply = protectedHeaders.reply;
     final brandId = protectedHeaders.brandId;
@@ -246,47 +244,52 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
       id: protectedHeaders.id?.value,
       ver: protectedHeaders.ver?.value,
       ref: ref == null ? null : _SignedDocumentMetadataRefExt.fromCose(ref),
-      refHash: refHash == null ? null : _SignedDocumentMetadataRefHashExt.fromCose(refHash),
       template: template == null ? null : _SignedDocumentMetadataRefExt.fromCose(template),
       reply: reply == null ? null : _SignedDocumentMetadataRefExt.fromCose(reply),
       section: protectedHeaders.section,
-      collabs: protectedHeaders.collabs,
-      brandId: brandId == null ? null : _SignedDocumentMetadataRefExt.fromCose(brandId),
-      campaignId: campaignId == null ? null : _SignedDocumentMetadataRefExt.fromCose(campaignId),
+      collaborators: protectedHeaders.collaborators,
+      brandId: brandId == null ? null : _SignedDocumentMetadataRefExt.fromLegacyCose(brandId),
+      campaignId: campaignId == null
+          ? null
+          : _SignedDocumentMetadataRefExt.fromLegacyCose(campaignId),
       electionId: protectedHeaders.electionId,
-      categoryId: categoryId == null ? null : _SignedDocumentMetadataRefExt.fromCose(categoryId),
+      categoryId: categoryId == null
+          ? null
+          : _SignedDocumentMetadataRefExt.fromLegacyCose(categoryId),
     );
   }
 }
 
 extension _SignedDocumentMetadataRefExt on SignedDocumentMetadataRef {
-  ReferenceUuid get asCose => ReferenceUuid(
+  CoseDocumentRefs get asCose => CoseDocumentRefs([
+    CoseDocumentRef.backwardCompatible(
+      documentId: id.asUuid,
+      documentVer: ver?.asUuid,
+      documentLocator: CoseDocumentLocator.fallback(),
+    ),
+  ]);
+
+  CoseReferenceUuid get asLegacyCose => CoseReferenceUuid(
     id: id.asUuid,
     ver: ver?.asUuid,
   );
 
-  static SignedDocumentMetadataRef fromCose(ReferenceUuid ref) {
+  static SignedDocumentMetadataRef fromCose(CoseDocumentRefs cose) {
+    final ref = cose.refs.first;
     return SignedDocumentMetadataRef(
-      id: ref.id.value,
-      ver: ref.ver?.value,
+      id: ref.documentId.value,
+      ver: ref.documentVer.value,
     );
   }
-}
 
-extension _SignedDocumentMetadataRefHashExt on SignedDocumentMetadataRefHash {
-  ReferenceUuidHash get asCose => ReferenceUuidHash(
-    ref: ref.asCose,
-    hash: hash,
-  );
-
-  static SignedDocumentMetadataRefHash fromCose(ReferenceUuidHash ref) {
-    return SignedDocumentMetadataRefHash(
-      ref: _SignedDocumentMetadataRefExt.fromCose(ref.ref),
-      hash: ref.hash,
+  static SignedDocumentMetadataRef fromLegacyCose(CoseReferenceUuid cose) {
+    return SignedDocumentMetadataRef(
+      id: cose.id.value,
+      ver: cose.ver?.value,
     );
   }
 }
 
 extension _UuidExt on String {
-  Uuid get asUuid => Uuid(this);
+  CoseUuid get asUuid => CoseUuid(this);
 }

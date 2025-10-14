@@ -31,7 +31,6 @@ final class DocumentDataFactory {
       type: document.metadata.documentType,
       selfRef: SignedDocumentRef(id: id!, version: ver),
       ref: document.metadata.ref?.toModel(),
-      refHash: document.metadata.refHash?.toModel(),
       template: document.metadata.template?.toModel(),
       reply: document.metadata.reply?.toModel(),
       section: document.metadata.section,
@@ -58,13 +57,4 @@ final class DocumentDataFactory {
 
 extension on SignedDocumentMetadataRef {
   SignedDocumentRef toModel() => SignedDocumentRef(id: id, version: ver);
-}
-
-extension on SignedDocumentMetadataRefHash {
-  SecuredDocumentRef toModel() {
-    return SecuredDocumentRef(
-      ref: ref.toModel(),
-      hash: hash,
-    );
-  }
 }

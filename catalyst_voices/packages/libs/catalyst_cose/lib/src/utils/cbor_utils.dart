@@ -1,14 +1,18 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:catalyst_cose/src/types/string_or_int.dart';
-import 'package:catalyst_cose/src/types/uuid.dart';
+import 'package:catalyst_cose/src/types/cose_document_ref.dart';
+import 'package:catalyst_cose/src/types/cose_uuid.dart';
+import 'package:catalyst_cose/src/types/cose_string_or_int.dart';
 import 'package:cbor/cbor.dart';
 
 /// A set of utils around cbor encoding/decoding.
 final class CborUtils {
   /// A cbor tag for the UUID type.
   static const int uuidTag = 37;
+
+  /// A cbor tag for content identifiers (IPFS).
+  static const int cidTag = 42;
 
   const CborUtils._();
 
@@ -25,22 +29,21 @@ final class CborUtils {
     return Uint8List.fromList((value as CborBytes).bytes);
   }
 
-  /// Deserialized optional [ReferenceUuid] type.
-  static ReferenceUuid? deserializeReferenceUuid(CborValue? value) {
+  static CoseDocumentRefs? deserializeDocumentRefs(CborValue? value) {
     if (value == null) {
       return null;
     }
 
-    return ReferenceUuid.fromCbor(value);
+    return CoseDocumentRefs.fromCbor(value);
   }
 
-  /// Deserialized optional [ReferenceUuidHash] type.
-  static ReferenceUuidHash? deserializeReferenceUuidHash(CborValue? value) {
+  /// Deserialized optional [CoseReferenceUuid] type.
+  static CoseReferenceUuid? deserializeReferenceUuid(CborValue? value) {
     if (value == null) {
       return null;
     }
 
-    return ReferenceUuidHash.fromCbor(value);
+    return CoseReferenceUuid.fromCbor(value);
   }
 
   /// Deserializes optional [String] type.
@@ -62,22 +65,22 @@ final class CborUtils {
     return list.map((e) => (e as CborString).toString()).toList();
   }
 
-  /// Deserializes optional [StringOrInt] type.
-  static StringOrInt? deserializeStringOrInt(CborValue? value) {
+  /// Deserializes optional [CoseStringOrInt] type.
+  static CoseStringOrInt? deserializeStringOrInt(CborValue? value) {
     if (value == null) {
       return null;
     }
 
-    return StringOrInt.fromCbor(value);
+    return CoseStringOrInt.fromCbor(value);
   }
 
-  /// Deserializes optional [Uuid] type.
-  static Uuid? deserializeUuid(CborValue? value) {
+  /// Deserializes optional [CoseUuid] type.
+  static CoseUuid? deserializeUuid(CborValue? value) {
     if (value == null) {
       return null;
     }
 
-    return Uuid.fromCbor(value);
+    return CoseUuid.fromCbor(value);
   }
 
   /// Serializes optional `List<String>` type.

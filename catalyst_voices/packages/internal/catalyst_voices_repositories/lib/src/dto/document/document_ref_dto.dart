@@ -47,33 +47,3 @@ final class DocumentRefDto {
 }
 
 enum DocumentRefDtoType { signed, draft }
-
-@JsonSerializable()
-final class SecuredDocumentRefDto {
-  final DocumentRefDto ref;
-  final String hash;
-
-  const SecuredDocumentRefDto({
-    required this.ref,
-    required this.hash,
-  });
-
-  factory SecuredDocumentRefDto.fromJson(Map<String, dynamic> json) {
-    return _$SecuredDocumentRefDtoFromJson(json);
-  }
-
-  SecuredDocumentRefDto.fromModel(SecuredDocumentRef data)
-    : this(
-        ref: DocumentRefDto.fromModel(data.ref),
-        hash: hex.encode(data.hash),
-      );
-
-  Map<String, dynamic> toJson() => _$SecuredDocumentRefDtoToJson(this);
-
-  SecuredDocumentRef toModel() {
-    return SecuredDocumentRef(
-      ref: ref.toModel(),
-      hash: Uint8List.fromList(hexDecode(hash)),
-    );
-  }
-}

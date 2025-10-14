@@ -83,7 +83,6 @@ final class DocumentDataMetadataDto {
   final DocumentType type;
   final DocumentRefDto selfRef;
   final DocumentRefDto? ref;
-  final SecuredDocumentRefDto? refHash;
   final DocumentRefDto? template;
   final DocumentRefDto? reply;
   final String? section;
@@ -97,7 +96,6 @@ final class DocumentDataMetadataDto {
     required this.type,
     required this.selfRef,
     this.ref,
-    this.refHash,
     this.template,
     this.reply,
     this.section,
@@ -120,7 +118,6 @@ final class DocumentDataMetadataDto {
         type: data.type,
         selfRef: data.selfRef.toDto(),
         ref: data.ref?.toDto(),
-        refHash: data.refHash?.toDto(),
         template: data.template?.toDto(),
         reply: data.reply?.toDto(),
         section: data.section,
@@ -138,7 +135,6 @@ final class DocumentDataMetadataDto {
       type: type,
       selfRef: selfRef.toModel(),
       ref: ref?.toModel(),
-      refHash: refHash?.toModel(),
       template: template?.toModel().toSignedDocumentRef(),
       reply: reply?.toModel().toSignedDocumentRef(),
       section: section,
@@ -193,10 +189,4 @@ final class DocumentDataMetadataDto {
 
 extension on DocumentRef {
   DocumentRefDto toDto() => DocumentRefDto.fromModel(this);
-}
-
-extension on SecuredDocumentRef {
-  SecuredDocumentRefDto toDto() {
-    return SecuredDocumentRefDto.fromModel(this);
-  }
 }

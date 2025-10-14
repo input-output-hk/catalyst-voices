@@ -14,9 +14,6 @@ final class DocumentDataMetadata extends Equatable {
   /// on the document type.
   final DocumentRef? ref;
 
-  /// This is a cryptographically secured reference to another document.
-  final SecuredDocumentRef? refHash;
-
   /// If the document was formed from a template, this is a reference to that
   /// template document
   final SignedDocumentRef? template;
@@ -54,7 +51,6 @@ final class DocumentDataMetadata extends Equatable {
     required this.type,
     required this.selfRef,
     this.ref,
-    this.refHash,
     this.template,
     this.reply,
     this.section,
@@ -75,7 +71,6 @@ final class DocumentDataMetadata extends Equatable {
     type,
     selfRef,
     ref,
-    refHash,
     template,
     reply,
     section,
@@ -92,7 +87,6 @@ final class DocumentDataMetadata extends Equatable {
     DocumentType? type,
     DocumentRef? selfRef,
     Optional<DocumentRef>? ref,
-    Optional<SecuredDocumentRef>? refHash,
     Optional<SignedDocumentRef>? template,
     Optional<SignedDocumentRef>? reply,
     Optional<String>? section,
@@ -106,7 +100,6 @@ final class DocumentDataMetadata extends Equatable {
       type: type ?? this.type,
       selfRef: selfRef ?? this.selfRef,
       ref: ref.dataOr(this.ref),
-      refHash: refHash.dataOr(this.refHash),
       template: template.dataOr(this.template),
       reply: reply.dataOr(this.reply),
       section: section.dataOr(this.section),

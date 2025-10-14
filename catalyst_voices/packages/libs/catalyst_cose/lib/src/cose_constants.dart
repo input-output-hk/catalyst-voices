@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:catalyst_cose/src/types/string_or_int.dart';
+import 'package:catalyst_cose/src/types/cose_string_or_int.dart';
 import 'package:cbor/cbor.dart';
 
 /// The interface for the data signer callback.
@@ -8,7 +8,7 @@ import 'package:cbor/cbor.dart';
 abstract interface class CatalystCoseSigner {
   /// Returns the alg identifier that should refer
   /// to the cryptographic algorithm used to [sign] the data.
-  StringOrInt? get alg;
+  CoseStringOrInt? get alg;
 
   /// Returns a key identifier that typically should refer to the public key
   /// of the private key used to sign the data.
@@ -57,9 +57,6 @@ final class CoseHeaderKeys {
   /// The header key for "ref".
   static final ref = CborString('ref');
 
-  /// The header key for "ref_hash".
-  static final refHash = CborString('ref_hash');
-
   /// The header key for "template".
   static final template = CborString('template');
 
@@ -71,6 +68,9 @@ final class CoseHeaderKeys {
 
   /// The header key for "collabs".
   static final collabs = CborString('collabs');
+
+  /// The header key for "collaborators".
+  static final collaborators = CborString('collaborators');
 
   /// The header key for "brand_id".
   static final brandId = CborString('brand_id');

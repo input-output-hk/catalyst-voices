@@ -61,9 +61,6 @@ final class SignedDocumentMetadata extends Equatable {
   /// The purpose of the ref will vary depending on the document type.
   final SignedDocumentMetadataRef? ref;
 
-  /// This is a cryptographically secured reference to another document.
-  final SignedDocumentMetadataRefHash? refHash;
-
   /// If the document was formed from a template,
   /// this is a reference to that template document.
   final SignedDocumentMetadataRef? template;
@@ -79,7 +76,7 @@ final class SignedDocumentMetadata extends Equatable {
   ///
   /// This may be updated by the original author,
   /// or any collaborator that is given "author" privileges.
-  final List<String>? collabs;
+  final List<String>? collaborators;
 
   /// A reference to the brand targeted by the document.
   final SignedDocumentMetadataRef? brandId;
@@ -99,11 +96,10 @@ final class SignedDocumentMetadata extends Equatable {
     this.id,
     this.ver,
     this.ref,
-    this.refHash,
     this.template,
     this.reply,
     this.section,
-    this.collabs,
+    this.collaborators,
     this.brandId,
     this.campaignId,
     this.electionId,
@@ -117,10 +113,9 @@ final class SignedDocumentMetadata extends Equatable {
     id,
     ver,
     ref,
-    refHash,
     template,
     reply,
-    collabs,
+    collaborators,
     brandId,
     campaignId,
     electionId,
@@ -153,22 +148,4 @@ final class SignedDocumentMetadataRef extends Equatable {
 
   @override
   List<Object?> get props => [id, ver];
-}
-
-/// A cryptographically secured reference to another document.
-final class SignedDocumentMetadataRefHash extends Equatable {
-  /// Simple reference to the document.
-  final SignedDocumentMetadataRef ref;
-
-  /// Hash of the referenced document CBOR bytes.
-  final Uint8List hash;
-
-  /// The default constructor for the [SignedDocumentMetadataRefHash].
-  const SignedDocumentMetadataRefHash({
-    required this.ref,
-    required this.hash,
-  });
-
-  @override
-  List<Object?> get props => [ref, hash];
 }

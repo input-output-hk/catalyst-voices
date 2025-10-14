@@ -1,8 +1,9 @@
 import 'dart:typed_data';
 
 import 'package:catalyst_cose/src/cose_constants.dart';
-import 'package:catalyst_cose/src/types/string_or_int.dart';
-import 'package:catalyst_cose/src/types/uuid.dart';
+import 'package:catalyst_cose/src/types/cose_document_ref.dart';
+import 'package:catalyst_cose/src/types/cose_string_or_int.dart';
+import 'package:catalyst_cose/src/types/cose_uuid.dart';
 import 'package:catalyst_cose/src/utils/cbor_utils.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
@@ -21,7 +22,7 @@ final class CoseHeaders extends Equatable {
   ///
   /// Do not set the [alg] directly in the headers,
   /// it will be auto-populated with [CatalystCoseSigner.alg] value.
-  final StringOrInt? alg;
+  final CoseStringOrInt? alg;
 
   /// See [CoseHeaderKeys.kid].
   ///
@@ -30,49 +31,48 @@ final class CoseHeaders extends Equatable {
   final Uint8List? kid;
 
   /// See [CoseHeaderKeys.contentType].
-  final StringOrInt? contentType;
+  final CoseStringOrInt? contentType;
 
   /// See [CoseHeaderKeys.contentEncoding].
-  final StringOrInt? contentEncoding;
+  final CoseStringOrInt? contentEncoding;
 
   /// See [CoseHeaderKeys.type].
-  final Uuid? type;
+  final CoseUuid? type;
 
   /// See [CoseHeaderKeys.id].
-  final Uuid? id;
+  final CoseUuid? id;
 
   /// See [CoseHeaderKeys.ver].
-  final Uuid? ver;
+  final CoseUuid? ver;
 
   /// See [CoseHeaderKeys.ref].
-  final ReferenceUuid? ref;
-
-  /// See [CoseHeaderKeys.refHash].
-  final ReferenceUuidHash? refHash;
+  final CoseDocumentRefs? ref;
 
   /// See [CoseHeaderKeys.template].
-  final ReferenceUuid? template;
+  final CoseDocumentRefs? template;
 
   /// See [CoseHeaderKeys.reply].
-  final ReferenceUuid? reply;
+  final CoseDocumentRefs? reply;
 
   /// See [CoseHeaderKeys.section].
   final String? section;
 
-  /// See [CoseHeaderKeys.collabs].
-  final List<String>? collabs;
+  /// See [CoseHeaderKeys.collaborators].
+  ///
+  /// In previous versions of the spec the field was under [CoseHeaderKeys.collabs] key.
+  final List<String>? collaborators;
 
   /// See [CoseHeaderKeys.brandId].
-  final ReferenceUuid? brandId;
+  final CoseReferenceUuid? brandId;
 
   /// See [CoseHeaderKeys.campaignId].
-  final ReferenceUuid? campaignId;
+  final CoseReferenceUuid? campaignId;
 
   /// See [CoseHeaderKeys.electionId].
   final String? electionId;
 
   /// See [CoseHeaderKeys.categoryId].
-  final ReferenceUuid? categoryId;
+  final CoseReferenceUuid? categoryId;
 
   /// Whether the type should be wrapped in extra [CborBytes]
   /// or be a plain [CborMap], both formats are supported.
@@ -91,11 +91,10 @@ final class CoseHeaders extends Equatable {
     this.id,
     this.ver,
     this.ref,
-    this.refHash,
     this.template,
     this.reply,
     this.section,
-    this.collabs,
+    this.collaborators,
     this.brandId,
     this.campaignId,
     this.electionId,
@@ -125,12 +124,13 @@ final class CoseHeaders extends Equatable {
       type: CborUtils.deserializeUuid(map[CoseHeaderKeys.type]),
       id: CborUtils.deserializeUuid(map[CoseHeaderKeys.id]),
       ver: CborUtils.deserializeUuid(map[CoseHeaderKeys.ver]),
-      ref: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.ref]),
-      refHash: CborUtils.deserializeReferenceUuidHash(map[CoseHeaderKeys.refHash]),
-      template: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.template]),
-      reply: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.reply]),
+      ref: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.ref]),
+      template: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.template]),
+      reply: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.reply]),
       section: CborUtils.deserializeString(map[CoseHeaderKeys.section]),
-      collabs: CborUtils.deserializeStringList(map[CoseHeaderKeys.collabs]),
+      collaborators: CborUtils.deserializeStringList(
+        map[CoseHeaderKeys.collaborators] ?? map[CoseHeaderKeys.collabs],
+      ),
       brandId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.brandId]),
       campaignId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.campaignId]),
       electionId: CborUtils.deserializeString(map[CoseHeaderKeys.electionId]),
@@ -149,11 +149,10 @@ final class CoseHeaders extends Equatable {
     this.id,
     this.ver,
     this.ref,
-    this.refHash,
     this.template,
     this.reply,
     this.section,
-    this.collabs,
+    this.collaborators,
     this.brandId,
     this.campaignId,
     this.electionId,
@@ -170,11 +169,10 @@ final class CoseHeaders extends Equatable {
     this.id,
     this.ver,
     this.ref,
-    this.refHash,
     this.template,
     this.reply,
     this.section,
-    this.collabs,
+    this.collaborators,
     this.brandId,
     this.campaignId,
     this.electionId,
@@ -191,11 +189,10 @@ final class CoseHeaders extends Equatable {
     id,
     ver,
     ref,
-    refHash,
     template,
     reply,
     section,
-    collabs,
+    collaborators,
     brandId,
     campaignId,
     electionId,
@@ -205,23 +202,22 @@ final class CoseHeaders extends Equatable {
 
   /// Returns a copy of the [CoseHeaders] with overwritten properties.
   CoseHeaders copyWith({
-    OptionalValueGetter<StringOrInt?>? alg,
+    OptionalValueGetter<CoseStringOrInt?>? alg,
     OptionalValueGetter<Uint8List?>? kid,
-    OptionalValueGetter<StringOrInt?>? contentType,
-    OptionalValueGetter<StringOrInt?>? contentEncoding,
-    OptionalValueGetter<Uuid?>? type,
-    OptionalValueGetter<Uuid?>? id,
-    OptionalValueGetter<Uuid?>? ver,
-    OptionalValueGetter<ReferenceUuid?>? ref,
-    OptionalValueGetter<ReferenceUuidHash?>? refHash,
-    OptionalValueGetter<ReferenceUuid?>? template,
-    OptionalValueGetter<ReferenceUuid?>? reply,
+    OptionalValueGetter<CoseStringOrInt?>? contentType,
+    OptionalValueGetter<CoseStringOrInt?>? contentEncoding,
+    OptionalValueGetter<CoseUuid?>? type,
+    OptionalValueGetter<CoseUuid?>? id,
+    OptionalValueGetter<CoseUuid?>? ver,
+    OptionalValueGetter<CoseDocumentRefs?>? ref,
+    OptionalValueGetter<CoseDocumentRefs?>? template,
+    OptionalValueGetter<CoseDocumentRefs?>? reply,
     OptionalValueGetter<String?>? section,
-    OptionalValueGetter<List<String>?>? collabs,
-    OptionalValueGetter<ReferenceUuid?>? brandId,
-    OptionalValueGetter<ReferenceUuid?>? campaignId,
+    OptionalValueGetter<List<String>?>? collaborators,
+    OptionalValueGetter<CoseReferenceUuid?>? brandId,
+    OptionalValueGetter<CoseReferenceUuid?>? campaignId,
     OptionalValueGetter<String?>? electionId,
-    OptionalValueGetter<ReferenceUuid?>? categoryId,
+    OptionalValueGetter<CoseReferenceUuid?>? categoryId,
     bool? encodeAsBytes,
   }) {
     return CoseHeaders(
@@ -233,11 +229,10 @@ final class CoseHeaders extends Equatable {
       id: id != null ? id() : this.id,
       ver: ver != null ? ver() : this.ver,
       ref: ref != null ? ref() : this.ref,
-      refHash: refHash != null ? refHash() : this.refHash,
       template: template != null ? template() : this.template,
       reply: reply != null ? reply() : this.reply,
       section: section != null ? section() : this.section,
-      collabs: collabs != null ? collabs() : this.collabs,
+      collaborators: collaborators != null ? collaborators() : this.collaborators,
       brandId: brandId != null ? brandId() : this.brandId,
       campaignId: campaignId != null ? campaignId() : this.campaignId,
       electionId: electionId != null ? electionId() : this.electionId,
@@ -257,7 +252,6 @@ final class CoseHeaders extends Equatable {
       if (id != null) CoseHeaderKeys.id: id!.toCbor(),
       if (ver != null) CoseHeaderKeys.ver: ver!.toCbor(),
       if (ref != null) CoseHeaderKeys.ref: ref!.toCbor(),
-      if (refHash != null) CoseHeaderKeys.refHash: refHash!.toCbor(),
       if (template != null) CoseHeaderKeys.template: template!.toCbor(),
       if (reply != null) CoseHeaderKeys.reply: reply!.toCbor(),
       if (section != null) CoseHeaderKeys.section: CborString(section!),
@@ -265,7 +259,8 @@ final class CoseHeaders extends Equatable {
       if (campaignId != null) CoseHeaderKeys.campaignId: campaignId!.toCbor(),
       if (electionId != null) CoseHeaderKeys.electionId: CborString(electionId!),
       if (categoryId != null) CoseHeaderKeys.categoryId: categoryId!.toCbor(),
-      if (collabs != null) CoseHeaderKeys.collabs: CborUtils.serializeStringList(collabs),
+      if (collaborators != null)
+        CoseHeaderKeys.collaborators: CborUtils.serializeStringList(collaborators),
     });
 
     if (encodeAsBytes) {

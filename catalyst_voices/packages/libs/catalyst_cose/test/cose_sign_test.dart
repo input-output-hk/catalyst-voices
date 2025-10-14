@@ -20,17 +20,23 @@ void main() {
 
     test('sign generates a valid COSE_SIGN structure', () async {
       final coseSign = await CoseSign.sign(
-        protectedHeaders: const CoseHeaders.protected(
-          contentType: IntValue(CoseValues.jsonContentType),
-          contentEncoding: StringValue(CoseValues.brotliContentEncoding),
-          type: Uuid(uuidV4),
-          id: Uuid(uuidV7),
-          ver: Uuid(uuidV7),
-          ref: ReferenceUuid(id: Uuid(uuidV7)),
-          template: ReferenceUuid(id: Uuid(uuidV7)),
-          reply: ReferenceUuid(id: Uuid(uuidV7)),
+        protectedHeaders: CoseHeaders.protected(
+          contentType: const CoseIntValue(CoseValues.jsonContentType),
+          contentEncoding: const CoseStringValue(CoseValues.brotliContentEncoding),
+          type: const CoseUuid(uuidV4),
+          id: const CoseUuid(uuidV7),
+          ver: const CoseUuid(uuidV7),
+          ref: CoseDocumentRefs([
+            CoseDocumentRef.backwardCompatible(documentId: const CoseUuid(uuidV7)),
+          ]),
+          template: CoseDocumentRefs([
+            CoseDocumentRef.backwardCompatible(documentId: const CoseUuid(uuidV7)),
+          ]),
+          reply: CoseDocumentRefs([
+            CoseDocumentRef.backwardCompatible(documentId: const CoseUuid(uuidV7)),
+          ]),
           section: 'section_name',
-          collabs: ['test@domain.com'],
+          collaborators: const ['test@domain.com'],
         ),
         unprotectedHeaders: const CoseHeaders.unprotected(),
         signers: [signerVerifier],
@@ -88,7 +94,7 @@ final class _SignerVerifier implements CatalystCoseSigner, CatalystCoseVerifier 
   const _SignerVerifier(this._algorithm, this._keyPair);
 
   @override
-  StringOrInt? get alg => const IntValue(CoseValues.eddsaAlg);
+  CoseStringOrInt? get alg => const CoseIntValue(CoseValues.eddsaAlg);
 
   @override
   Future<Uint8List?> get kid async {
