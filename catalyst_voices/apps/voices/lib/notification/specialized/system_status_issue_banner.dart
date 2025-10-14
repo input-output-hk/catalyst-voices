@@ -4,14 +4,11 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/widgets.dart';
-import 'package:uuid_plus/uuid_plus.dart';
-
-final _id = const Uuid().v4();
 
 final class SystemStatusIssueBanner extends BannerNotification with LaunchUrlMixin {
   SystemStatusIssueBanner()
     : super(
-        id: _id,
+        id: 'systemStatusIssueBannerId',
         priority: 1,
       );
 
