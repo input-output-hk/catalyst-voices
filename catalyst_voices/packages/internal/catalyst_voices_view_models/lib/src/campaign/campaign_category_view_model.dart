@@ -96,7 +96,10 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   }
 
   String get availableFundsText {
-    return availableFunds.list.map(MoneyFormatter.formatDecimal).join('\n');
+    return MoneyFormatter.formatMultiCurrencyAmount(
+      availableFunds,
+      formatter: MoneyFormatter.formatDecimal,
+    );
   }
 
   String get formattedName {

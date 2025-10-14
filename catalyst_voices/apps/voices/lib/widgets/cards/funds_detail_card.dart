@@ -72,7 +72,10 @@ class FundsDetailCard extends StatelessWidget {
   }
 
   String _formatFunds(MultiCurrencyAmount amount) {
-    return amount.list.map(MoneyFormatter.formatDecimal).join('\n');
+    return MoneyFormatter.formatMultiCurrencyAmount(
+      amount,
+      formatter: MoneyFormatter.formatDecimal,
+    );
   }
 }
 

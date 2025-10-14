@@ -442,10 +442,6 @@
   "@categoryProposals": {
     "description": "Title for proposals filtered by a campaign category."
   },
-  "categoryRequirements": "Category Requirements:",
-  "@categoryRequirements": {
-    "description": "Header for category requirements section"
-  },
   "categorySelectionDescription": "Choose Wisely! Review the category and its rules carefully as this can’t be changed after you make a selection. To switch, you’ll need to start a new proposal.",
   "@categorySelectionDescription": {
     "description": "Text for the category selection description in new proposal dialog"
@@ -960,6 +956,10 @@
   "@displayName": {
     "description": "Label for display name input field"
   },
+  "doWord": "Do:",
+  "@doWord": {
+    "description": "Label for a list of things to do"
+  },
   "documentImportInvalidDataError": "The imported document does not have valid format or is corrupted.",
   "@documentImportInvalidDataError": {
     "description": "Error message when user tries to import a document that is not valid and cannot be parsed"
@@ -967,6 +967,10 @@
   "dontShowAgain": "Don't show again",
   "@dontShowAgain": {
     "description": "Action to not show again"
+  },
+  "dontWord": "Don't:",
+  "@dontWord": {
+    "description": "Label for a list of things not to do"
   },
   "draft": "Draft",
   "@draft": {
@@ -2019,6 +2023,14 @@
   "@normalPasswordStrength": {
     "description": "Describes a password that has medium strength."
   },
+  "notActiveCampaign": "Not active campaign",
+  "@notActiveCampaign": {
+    "description": "Label for proposals from not active campaign"
+  },
+  "notActiveCampaignInfoMarkdown": "**Read only**",
+  "@notActiveCampaignInfoMarkdown": {
+    "description": "Info message shown in tooltip info in workspace page"
+  },
   "notAvailableAbbr": "N/A",
   "@notAvailableAbbr": {
     "description": "Abbreviation for not available"
@@ -2045,14 +2057,6 @@
   },
   "notPublishedInfoMarkdown": "**Not published**\n\nThis draft is saved locally and only you can see it. You can edit it anytime on this device. It’s not eligible for feedback or funding yet. Share for feedback or submit for review to publish it to the network.",
   "@notPublishedInfoMarkdown": {
-    "description": "Info message shown in tooltip info in workspace page"
-  },
-  "notActiveCampaign": "Not active campaign",
-  "@notActiveCampaign": {
-    "description": "Label for proposals from not active campaign"
-  },
-  "notActiveCampaignInfoMarkdown": "**Read only**",
-  "@notActiveCampaignInfoMarkdown": {
     "description": "Info message shown in tooltip info in workspace page"
   },
   "notPublishedProposals": "Not published proposals",

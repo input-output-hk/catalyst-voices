@@ -140,4 +140,23 @@ abstract class MoneyFormatter {
       currency: money.currency,
     );
   }
+
+  /// Formats the [MultiCurrencyAmount] using the specified [formatter].
+  ///
+  /// If the amount is empty a [placeholder] is returned instead.
+  /// Separates amounts in different currencies with [separator].
+  static String formatMultiCurrencyAmount(
+    MultiCurrencyAmount amount, {
+    required String Function(Money) formatter,
+    MoneyDecoration decoration = MoneyDecoration.code,
+    String separator = '\n',
+    String placeholder = '-',
+  }) {
+    final formatted = amount.list.map(formatter).join(separator);
+    if (formatted.isNotEmpty) {
+      return formatted;
+    } else {
+      return placeholder;
+    }
+  }
 }
