@@ -1,0 +1,4 @@
+proposals_count,doc_count,compressed,avg_duration,PR,note
+100,583,0:00:04.008009,true,-,-
+1000,5479,0:00:32.248981,true,-,-
+2000,10976,0:01:30.453520,true,-,-, Queries start to problem
