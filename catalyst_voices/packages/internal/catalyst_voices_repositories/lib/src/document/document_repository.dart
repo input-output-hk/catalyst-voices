@@ -27,11 +27,6 @@ abstract interface class DocumentRepository {
     DocumentFavoriteSource favoriteDocuments,
   ) = DocumentRepositoryImpl;
 
-  /// Making sure document from [ref] is available locally.
-  Future<void> cacheDocument({
-    required SignedDocumentRef ref,
-  });
-
   /// Deletes a document draft from the local storage.
   Future<void> deleteDocumentDraft({
     required DraftRef ref,
@@ -222,13 +217,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     this._remoteDocuments,
     this._favoriteDocuments,
   );
-
-  @override
-  Future<void> cacheDocument({required SignedDocumentRef ref}) async {
-    final documentData = await _remoteDocuments.get(ref: ref);
-
-    await _localDocuments.save(data: documentData);
-  }
 
   @override
   Future<void> deleteDocumentDraft({required DraftRef ref}) {
@@ -624,11 +612,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       return _localDocuments.get(ref: ref);
     }
 
-    final remoteData = await _remoteDocuments.get(ref: ref);
-
-    await _localDocuments.save(data: remoteData);
-
-    return remoteData;
+    return _remoteDocuments.get(ref: ref);
   }
 
   DocumentData _parseDocumentData(Uint8List data) {

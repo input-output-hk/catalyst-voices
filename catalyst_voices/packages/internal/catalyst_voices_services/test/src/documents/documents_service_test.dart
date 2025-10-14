@@ -35,13 +35,15 @@ void main() {
       when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
       when(
-        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
-      ).thenAnswer((_) => Future(() {}));
+        () => documentRepository.getDocumentData(ref: any(named: 'ref')),
+      ).thenAnswer((_) => Future(() => throw UnimplementedError()));
 
       await service.sync();
 
       // Then
-      verify(() => documentRepository.cacheDocument(ref: any(named: 'ref'))).called(allRefs.length);
+      verify(
+        () => documentRepository.getDocumentData(ref: any(named: 'ref')),
+      ).called(allRefs.length);
     });
 
     test('calls cache documents only for missing refs', () async {
@@ -57,13 +59,15 @@ void main() {
       when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
       when(
-        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
-      ).thenAnswer((_) => Future(() {}));
+        () => documentRepository.getDocumentData(ref: any(named: 'ref')),
+      ).thenAnswer((_) => Future(() => throw UnimplementedError()));
 
       await service.sync();
 
       // Then
-      verify(() => documentRepository.cacheDocument(ref: any(named: 'ref'))).called(expectedCalls);
+      verify(
+        () => documentRepository.getDocumentData(ref: any(named: 'ref')),
+      ).called(expectedCalls);
     });
 
     test('when have more cached refs it returns normally', () async {
@@ -84,14 +88,14 @@ void main() {
       when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
       when(
-        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
-      ).thenAnswer((_) => Future(() {}));
+        () => documentRepository.getDocumentData(ref: any(named: 'ref')),
+      ).thenAnswer((_) => Future(() => throw UnimplementedError()));
 
       await service.sync();
 
       // Then
       verifyNever(
-        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
+        () => documentRepository.getDocumentData(ref: any(named: 'ref')),
       );
     });
 
@@ -108,8 +112,8 @@ void main() {
       when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
       when(
-        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
-      ).thenAnswer((_) => Future(() {}));
+        () => documentRepository.getDocumentData(ref: any(named: 'ref')),
+      ).thenAnswer((_) => Future(() => throw UnimplementedError()));
 
       // Then
       await service.sync(
@@ -134,8 +138,8 @@ void main() {
       when(documentRepository.getAllDocumentsRefs).thenAnswer((_) => Future.value(allRefs));
       when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
       when(
-        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
-      ).thenAnswer((_) => Future(() {}));
+        () => documentRepository.getDocumentData(ref: any(named: 'ref')),
+      ).thenAnswer((_) => Future(() => throw UnimplementedError()));
 
       // Then
       final newRefs = await service.sync();
