@@ -71,7 +71,9 @@ class _Button extends StatelessWidget with LaunchUrlMixin {
         context.l10n.browseFundProposals(context.activeCampaignFundNumber),
       ),
       onTap: () async {
-        await launchUri(VoicesConstants.projectCatalystFund14Url.getUri());
+        await launchUri(
+          VoicesConstants.projectCatalystFundUrl(context.activeCampaignFundNumber).getUri(),
+        );
       },
     );
   }
