@@ -207,11 +207,9 @@ Future<void> registerDependencies({
 
 void _debugPrintStressTest() {
   if (!kProfileMode) {
-    // ignore: avoid_print
-    print('Warning. StressTest is enabled for non profile mode');
+    debugPrint('Warning. StressTest is enabled for non profile mode');
   } else {
-    // ignore: avoid_print
-    print('Running in StressTest environment');
+    debugPrint('Running in StressTest environment');
   }
 }
 
