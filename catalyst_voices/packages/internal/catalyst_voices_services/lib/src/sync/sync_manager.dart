@@ -4,6 +4,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:synchronized/synchronized.dart';
 
 final _logger = Logger('SyncManager');
@@ -52,7 +53,7 @@ final class SyncManagerImpl implements SyncManager {
   @override
   Future<void> start() {
     if (_lock.locked) {
-      _logger.finest('Synchronization in progress');
+      debugPrint('Synchronization in progress');
       return Future(() {});
     }
 
@@ -60,7 +61,7 @@ final class SyncManagerImpl implements SyncManager {
     _syncTimer = Timer.periodic(
       const Duration(minutes: 15),
       (_) {
-        _logger.finest('Scheduled synchronization starts');
+        debugPrint('Scheduled synchronization starts');
         // ignore: discarded_futures
         _lock.synchronized(_startSynchronization).ignore();
       },
@@ -76,29 +77,31 @@ final class SyncManagerImpl implements SyncManager {
     final stopwatch = Stopwatch()..start();
 
     try {
-      _logger.fine('Synchronization started');
+      debugPrint('Synchronization started');
 
       final newRefs = await _documentsService.sync(
         onProgress: (value) {
-          _logger.finest('Documents sync progress[$value]');
+          debugPrint('Documents sync progress[$value]');
         },
       );
 
       stopwatch.stop();
 
-      _logger.fine('Synchronization took ${stopwatch.elapsed}');
+      debugPrint('Synchronization took ${stopwatch.elapsed}');
 
       await _updateSuccessfulSyncStats(
         newRefsCount: newRefs.length,
         duration: stopwatch.elapsed,
       );
 
-      _logger.fine('Synchronization completed. NewRefs[${newRefs.length}]');
+      debugPrint('Synchronization completed. NewRefs[${newRefs.length}]');
       _synchronizationCompleter.complete(true);
     } catch (error, stack) {
       stopwatch.stop();
 
-      _logger.severe('Synchronization failed after ${stopwatch.elapsed}', error, stack);
+      debugPrint(
+        'Synchronization failed after ${stopwatch.elapsed}, $error',
+      );
       _synchronizationCompleter.complete(false);
 
       rethrow;

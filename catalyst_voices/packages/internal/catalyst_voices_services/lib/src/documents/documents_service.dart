@@ -28,7 +28,9 @@ abstract interface class DocumentsService {
 
   /// Syncs locally stored documents with api.
   ///
-  /// [onProgress] emits from 0.0 to 1.0.
+  /// Parameters:
+  /// [onProgress] - emits from 0.0 to 1.0.
+  /// [maxConcurrent] requests made at same time
   ///
   /// Returns list of added refs.
   Future<List<TypedDocumentRef>> sync({
@@ -66,7 +68,7 @@ final class DocumentsServiceImpl implements DocumentsService {
     final cachedRefs = await _documentRepository.getCachedDocumentsRefs();
     final missingRefs = List.of(allRefs)..removeWhere(cachedRefs.contains);
 
-    _logger.finest(
+    debugPrint(
       'AllRefs[${allRefs.length}], '
       'CachedRefs[${cachedRefs.length}], '
       'MissingRefs[${missingRefs.length}]',
@@ -90,7 +92,7 @@ final class DocumentsServiceImpl implements DocumentsService {
         .entries
         .sorted((a, b) => a.key.compareTo(b.key) * -1);
 
-    _logger.finest(
+    debugPrint(
       prioritizedMissingRefs
           .map((e) => 'Priority[${e.key}] group refs[${e.value.length}]')
           .join('\n'),
@@ -101,7 +103,7 @@ final class DocumentsServiceImpl implements DocumentsService {
     ///
     /// One such case is Proposal and Template or Action.
     for (final group in prioritizedMissingRefs) {
-      _logger.finest(
+      debugPrint(
         'Syncing priority[${group.key}] '
         'group with refs[${group.value.length}]',
       );
@@ -119,7 +121,8 @@ final class DocumentsServiceImpl implements DocumentsService {
           try {
             if (ref.ref is SignedDocumentRef) {
               final signedRef = ref.ref.toSignedDocumentRef();
-              await _documentRepository.cacheDocument(ref: signedRef);
+              final documentData = await _documentRepository.getDocumentData(ref: signedRef);
+              await _documentRepository.upsertDocument(document: documentData);
             }
             outcomes.add(_RefSuccess(ref));
           } catch (error, stackTrace) {
@@ -142,6 +145,8 @@ final class DocumentsServiceImpl implements DocumentsService {
 
       // Wait for all operations managed by the pool to complete
       await Future.wait(futures);
+
+      debugPrint('Syncing priority[${group.key}] finished');
     }
 
     final failures = outcomes.whereType<_RefFailure>();
