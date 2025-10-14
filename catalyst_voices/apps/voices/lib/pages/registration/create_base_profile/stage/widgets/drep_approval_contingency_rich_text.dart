@@ -52,7 +52,9 @@ class _DrepApprovalContingencyRichTextState extends State<DrepApprovalContingenc
 
     _f14ProposalSubmissionNoticeRecognizer = TapGestureRecognizer();
     _f14ProposalSubmissionNoticeRecognizer.onTap = () {
-      final uri = Uri.parse(VoicesConstants.f14ProposalSubmissionNoticeUrl);
+      final uri = Uri.parse(
+        VoicesConstants.fundProposalSubmissionNoticeUrl(context.activeCampaignFundNumber),
+      );
       unawaited(launchUri(uri));
     };
   }
