@@ -17,6 +17,7 @@ export 'common/node_id.dart';
 export 'common/optional.dart';
 export 'common/space.dart';
 export 'common/wildcard_path_handler.dart';
+export 'config/api_config.dart';
 export 'config/app_config.dart';
 export 'config/app_environment.dart';
 export 'config/reporting_service_config.dart';

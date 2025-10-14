@@ -71,6 +71,10 @@ Future<BootstrapArgs> bootstrap({
   final config = await _getAppConfig(env: environment.type);
   _bootstrapInitState = _bootstrapInitState.copyWith(appConfig: Optional(config));
 
+  if (config.stressTest.isEnabled) {
+    _debugPrintStressTest();
+  }
+
   final endConfigTimestamp = DateTimeExt.now(utc: true);
 
   await _reportingService.init(config: config.sentry);
@@ -101,6 +105,10 @@ Future<BootstrapArgs> bootstrap({
   // Observer is very noisy on Logger. Enable it only if you want to debug
   // something
   Bloc.observer = AppBlocObserver(logOnChange: false);
+
+  if (config.stressTest.isEnabled) {
+    await Dependencies.instance.get<CatalystDatabase>().clear();
+  }
 
   Dependencies.instance.get<ReportingServiceMediator>().init();
   unawaited(
@@ -197,6 +205,14 @@ Future<void> registerDependencies({
   );
 }
 
+void _debugPrintStressTest() {
+  if (!kProfileMode) {
+    debugPrint('Warning. StressTest is enabled for non profile mode');
+  } else {
+    debugPrint('Running in StressTest environment');
+  }
+}
+
 Widget _defaultBuilder(BootstrapArgs args) {
   return App(
     routerConfig: args.routerConfig,
@@ -225,7 +241,8 @@ Future<void> _doBootstrapAndRun(
 Future<AppConfig> _getAppConfig({
   required AppEnvironmentType env,
 }) async {
-  final api = ApiServices(env: env);
+  final config = ApiConfig(env: env);
+  final api = ApiServices(config: config);
   final source = ApiConfigSource(api);
   final service = ConfigService(ConfigRepository(source));
   return service.getAppConfig(env: env);
