@@ -3,6 +3,7 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -30,6 +31,7 @@ class _AgreementConfirmationFormField extends VoicesFormField<bool> {
     required super.onChanged,
     super.enabled,
     super.validator,
+    required String title,
     required MarkdownData description,
   }) : super(
          builder: (field) {
@@ -56,7 +58,7 @@ class _AgreementConfirmationFormField extends VoicesFormField<bool> {
                  isEnabled: enabled,
                  isError: field.hasError,
                  label: Text(
-                   context.l10n.agree,
+                   title.isNotBlank ? title : context.l10n.agree,
                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                      color: !enabled && !value ? Theme.of(context).colors.textDisabled : null,
                    ),
@@ -85,6 +87,7 @@ class _AgreementConfirmationWidgetState extends State<AgreementConfirmationWidge
       onChanged: _onChanged,
       validator: _validator,
       enabled: widget.isEditMode,
+      title: widget.schema.title,
       description: widget.schema.description ?? MarkdownData.empty,
     );
   }

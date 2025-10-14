@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
@@ -8,7 +7,7 @@ base class CoreProposal extends Equatable implements Comparable<CoreProposal> {
   final SignedDocumentRef categoryRef;
   final String title;
   final String description;
-  final Coin fundsRequested;
+  final Money fundsRequested;
   final ProposalPublish publish;
   final int duration;
   final String? author;
@@ -58,7 +57,7 @@ base class CoreProposal extends Equatable implements Comparable<CoreProposal> {
     String? title,
     String? description,
     DateTime? updateDate,
-    Coin? fundsRequested,
+    Money? fundsRequested,
     ProposalPublish? publish,
     int? duration,
     String? author,

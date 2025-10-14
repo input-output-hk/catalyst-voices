@@ -23,21 +23,27 @@ class CategoryRequirementsList extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 16),
-          Text(
-            context.l10n.categoryRequirements,
-            style: context.textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 8),
-          if (dos.isNotEmpty)
+          if (dos.isNotEmpty) ...[
+            Text(
+              context.l10n.doWord,
+              style: context.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 8),
             VoicesList(
               items: dos,
-              icon: VoicesAssets.icons.check.buildIcon(color: context.colors.iconsPrimary),
+              icon: VoicesAssets.icons.check.buildIcon(color: context.colors.iconsSuccess),
             ),
+          ],
           if (donts.isNotEmpty) ...[
             const SizedBox(height: 12),
+            Text(
+              context.l10n.dontWord,
+              style: context.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 8),
             VoicesList(
               items: donts,
-              icon: VoicesAssets.icons.x.buildIcon(color: context.colors.iconsPrimary),
+              icon: VoicesAssets.icons.x.buildIcon(color: context.colors.iconsError),
             ),
           ],
         ],
