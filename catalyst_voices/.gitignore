@@ -20,6 +20,7 @@ docs/
 # Un-ignore vit and cat-reviews openapi spec as they're not generated
 !**/openapi/vit.json
 !**/openapi/cat-reviews.json
+!**/openapi/cat-status.json
 
 # Un-ignore generated files in public packages
 !**/packages/libs/**/*.g.dart

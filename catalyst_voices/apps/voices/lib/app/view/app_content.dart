@@ -4,6 +4,7 @@ import 'package:catalyst_voices/app/view/app_mobile_access_restriction.dart';
 import 'package:catalyst_voices/app/view/app_precache_image_assets.dart';
 import 'package:catalyst_voices/app/view/app_session_listener.dart';
 import 'package:catalyst_voices/app/view/app_splash_screen_manager.dart';
+import 'package:catalyst_voices/app/view/app_system_status_listener.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_manager_scope.dart';
 import 'package:catalyst_voices/app/view/video_cache/app_video_precache.dart';
 import 'package:catalyst_voices/common/ext/preferences_ext.dart';
@@ -88,9 +89,11 @@ final class _AppContent extends StatelessWidget {
                         child: AppMobileAccessRestriction(
                           routerConfig: routerConfig,
                           child: DefaultShareManager(
-                            child: _AppContentBackground(
-                              key: const Key('AppContentBackground'),
-                              child: child,
+                            child: SystemStatusListener(
+                              child: _AppContentBackground(
+                                key: const Key('AppContentBackground'),
+                                child: child,
+                              ),
                             ),
                           ),
                         ),
