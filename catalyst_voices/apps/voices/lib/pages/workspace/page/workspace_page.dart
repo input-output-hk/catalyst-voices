@@ -43,8 +43,8 @@ class _WorkspacePageState extends State<WorkspacePage>
                     WorkspaceHeader(),
                     Stack(
                       children: [
-                        WorkspaceErrorSelector(),
-                        WorkspaceUserProposalsSelector(),
+                        WorkspaceError(),
+                        WorkspaceUserProposals(),
                       ],
                     ),
                     SizedBox(height: 50),

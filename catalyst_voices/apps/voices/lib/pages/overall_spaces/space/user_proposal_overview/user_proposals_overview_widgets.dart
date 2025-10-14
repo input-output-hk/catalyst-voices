@@ -1,11 +1,11 @@
-part of 'user_proposal_selectors.dart';
+part of 'user_proposals_overview.dart';
 
-class _DataProposalWidget extends StatelessWidget {
+class _UserProposalsOverviewList extends StatelessWidget {
   final List<UsersProposalOverview> proposals;
   final String emptyMessage;
   final bool showLatestLocal;
 
-  const _DataProposalWidget({
+  const _UserProposalsOverviewList({
     required this.proposals,
     required this.emptyMessage,
     this.showLatestLocal = false,
@@ -38,8 +38,8 @@ class _DataProposalWidget extends StatelessWidget {
   }
 }
 
-class _ErrorProposalSelector extends StatelessWidget {
-  const _ErrorProposalSelector();
+class _ErrorProposalOverview extends StatelessWidget {
+  const _ErrorProposalOverview();
 
   @override
   Widget build(BuildContext context) {
@@ -90,8 +90,8 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _LoadingProposalSelector extends StatelessWidget {
-  const _LoadingProposalSelector();
+class _LoadingProposalOverview extends StatelessWidget {
+  const _LoadingProposalOverview();
 
   @override
   Widget build(BuildContext context) {

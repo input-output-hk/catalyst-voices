@@ -78,7 +78,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     try {
       emit(state.copyWith(isLoading: true));
       await _proposalService.deleteDraftProposal(event.ref);
-      emit(state.copyWith(userProposals: _removeProposal(event.ref)));
+      emit(state.copyWith(userProposals: state.userProposals.removeProposal(event.ref)));
       emitSignal(const DeletedDraftWorkspaceSignal());
     } catch (error, stackTrace) {
       _logger.severe('Delete proposal failed', error, stackTrace);
@@ -120,7 +120,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   Future<void> _forgetProposal(ForgetProposalEvent event, Emitter<WorkspaceState> emit) async {
-    final proposal = state.userProposals.firstWhereOrNull((e) => e.selfRef == event.ref);
+    final proposal = state.userProposals.allProposals.firstWhereOrNull(
+      (e) => e.selfRef == event.ref,
+    );
     if (proposal == null || proposal.selfRef is! SignedDocumentRef) {
       return emitError(const LocalizedUnknownException());
     }
@@ -130,7 +132,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         proposalRef: proposal.selfRef as SignedDocumentRef,
         categoryId: proposal.categoryId,
       );
-      emit(state.copyWith(userProposals: _removeProposal(event.ref)));
+      emit(state.copyWith(userProposals: state.userProposals.removeProposal(event.ref)));
       emitSignal(const ForgetProposalSuccessWorkspaceSignal());
     } catch (e, stackTrace) {
       emitError(LocalizedException.create(e));
@@ -175,11 +177,13 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   Future<void> _loadProposals(LoadProposalsEvent event, Emitter<WorkspaceState> emit) async {
+    final userProposals = WorkspaceStateUserProposals.fromList(event.proposals);
+
     emit(
       state.copyWith(
         isLoading: false,
         error: const Optional.empty(),
-        userProposals: event.proposals,
+        userProposals: userProposals,
       ),
     );
   }
@@ -203,12 +207,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     return Future.wait(futures);
   }
 
-  List<UsersProposalOverview> _removeProposal(
-    DocumentRef proposalRef,
-  ) {
-    return [...state.userProposals]..removeWhere((e) => e.selfRef.id == proposalRef.id);
-  }
-
   void _setupProposalsSubscription() {
     _proposalsSub = _proposalService.watchUserProposals().listen(
       (proposals) async {
@@ -226,7 +224,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   Future<void> _unlockProposal(UnlockProposalEvent event, Emitter<WorkspaceState> emit) async {
-    final proposal = state.userProposals.firstWhereOrNull((e) => e.selfRef == event.ref);
+    final proposal = state.userProposals.allProposals.firstWhereOrNull(
+      (e) => e.selfRef == event.ref,
+    );
     if (proposal == null || proposal.selfRef is! SignedDocumentRef) {
       return emitError(const LocalizedUnknownException());
     }

@@ -10,6 +10,6 @@ import 'package:flutter/material.dart';
 
 // As widget across two overviews are almost similar and are not reusable
 // anywhere else it useful to use as part
-part 'discovery_overview_proposal_selector.dart';
-part 'user_proposals_selector_widgets.dart';
-part 'workspace_overview_proposal_selector.dart';
+part 'discovery_overview_proposal.dart';
+part 'user_proposals_overview_widgets.dart';
+part 'workspace_overview_proposal.dart';

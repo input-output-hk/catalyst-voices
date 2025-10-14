@@ -166,7 +166,7 @@ void main() {
         isA<WorkspaceState>().having((s) => s.isLoading, 'isLoading', true),
         isA<WorkspaceState>()
             .having((s) => s.isLoading, 'isLoading', false)
-            .having((s) => s.userProposals.length, 'proposals count', 2),
+            .having((s) => s.userProposals.allProposals.length, 'proposals count', 2),
       ],
     );
 

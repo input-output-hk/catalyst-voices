@@ -1,22 +1,22 @@
-part of 'user_proposal_selectors.dart';
+part of 'user_proposals_overview.dart';
 
-class DiscoveryOverviewProposalSelector extends StatelessWidget {
-  const DiscoveryOverviewProposalSelector({super.key});
+class DiscoveryOverviewProposal extends StatelessWidget {
+  const DiscoveryOverviewProposal({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const Stack(
       children: [
-        _LoadingProposalSelector(),
-        _ErrorProposalSelector(),
-        _DataProposalSelector(),
+        _LoadingProposalOverview(),
+        _ErrorProposalOverview(),
+        _DiscoveryOverviewProposalData(),
       ],
     );
   }
 }
 
-class _DataProposalSelector extends StatelessWidget {
-  const _DataProposalSelector();
+class _DiscoveryOverviewProposalData extends StatelessWidget {
+  const _DiscoveryOverviewProposalData();
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class _DataProposalSelector extends StatelessWidget {
             DataVisibilityState<List<UsersProposalOverview>>
           >(
             selector: (state) {
-              return (data: state.published, show: state.showProposals);
+              return (data: state.userProposals.published.items, show: state.showProposals);
             },
             builder: (context, state) {
               return Column(
@@ -40,7 +40,7 @@ class _DataProposalSelector extends StatelessWidget {
                   ),
                   Offstage(
                     offstage: !state.show,
-                    child: _DataProposalWidget(
+                    child: _UserProposalsOverviewList(
                       proposals: state.data,
                       emptyMessage: context.l10n.noPublishedProposals,
                     ),
