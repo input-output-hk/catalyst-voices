@@ -1,39 +1,12 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
-    "title": "F14 Submission Form",
-    "description": "Schema for the F14 Catalyst Proposal Submission Form",
+    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/f15/0199802c-21b4-7982-ba3f-ec0cd0207b11.schema.json",
+    "title": "F15 Cardano Concepts: Prototype & Launch",
+    "description": "Schema for the F15 Cardano Concepts: Prototype & Launch",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
-        "2025-07-04": [
-            "Added maxLength constraint for singleLineHttpsURLEntry.",
-            "Change title for Theme",
-            "Change guidance text for requestedFunds",
-            "Change guidance text for time",
-            "Remove maximum constraint for milestone cost."
-        ],
-        "2025-06-27": [
-            "Legal wording changes.",
-            "Removed coproposers property."
-        ],
-        "2025-06-18": [
-            "Added maximum constraint for milestone cost."
-        ],
-        "2025-05-28": [
-            "Setting titles/description/placeholders/requirements according to generic proposal template requirements for F14"
-        ],
-        "2025-05-15": [
-            "Setting maxLength for Dependency description"
-        ],
-        "2025-04-22": [
-            "Updated schema to make optional text fields mandatory.",
-            "Assigned title to theme property.",
-            "Fixed x-guidance for dependencies section."
-        ],
-        "2025-01-14": [
-            "Updated schema to include new fields for proposal details.",
-            "Fixed validation issues with the URL pattern.",
-            "Improved documentation for open source requirements."
+        "2025-10-08": [
+            "F15 Template Setup"
         ]
     },
     "definitions": {
@@ -67,6 +40,7 @@
                 "team": { "type": "object" },
                 "value": { "type": "object" },
                 "ongoing_projects": { "type": "object" },
+                "self_assessment": { "type": "object" },
                 "consent_confirmation": { "type": "object" }
             },
             "x-note": "Major sections of the proposal. Each segment contains sections of information grouped together."
@@ -267,8 +241,8 @@
     "properties": {
         "$schema": {
             "$ref": "#/definitions/schemaReferenceNonUI",
-            "default": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
-            "const": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json"
+            "default": "./0199802c-21b4-7982-ba3f-ec0cd0207b11.schema.json",
+            "const": "./0199802c-21b4-7982-ba3f-ec0cd0207b11.schema.json"
         },
         "setup": {
             "$ref": "#/definitions/segment",
@@ -285,7 +259,7 @@
                             "$ref": "#/definitions/singleLineTextEntry",
                             "title": "Please provide your proposal title",
                             "description": "**Proposal title**\n\nPlease note we suggest you use no more than 60 characters for your proposal title so that it can be easily viewed in the voting app.",
-                            "minLength": 1,
+                            "minLength": 3,
                             "maxLength": 60,
                             "x-guidance": "This is the first detail about your proposal that voters see so it should clearly express what the proposal is about. A clear, unambiguous, and concise title is very important.",
                             "x-placeholder": "Summarize your proposal in 60 characters or less"
@@ -347,11 +321,11 @@
                         "requestedFunds": {
                             "$ref": "#/definitions/tokenValueCardanoADA",
                             "title": "Enter the amount of funding you are requesting in ADA",
-                            "description": "The amount of funding requested for your proposal",
-                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\nMinimum Funding Amount per proposal:\n\n- Cardano Use Cases: Partners & Products: **₳250k**\n- Cardano Uses Cases: Concepts: **₳15K**\n- Cardano Open: Developers: **₳15K**\n- Cardano Open: Ecosystem: **₳15K**\n\nMaximum Funding Amount per proposal:\n\n- Cardano Use Cases: Partners & Products: **₳1M**\n- Cardano Uses Cases: Concepts: **₳100K**\n- Cardano Open: Developers: **₳100K**\n- Cardano Open: Ecosystem: **₳60K**",
-                            "x-placeholder": "Enter the amount of funding you are requesting in ADA",
+                            "description": "Requested amount should be between $ADA 15,000 and $ADA 200,000",
+                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Concepts: Prototype & Launch**\n\n- Minimum Funding Amount per proposal: **$ADA 15,000**\n- Maximum Funding Amount per proposal: **$ADA 200,000**",
+                            "x-placeholder": "Requested amount should be between $ADA 15,000 and $ADA 200,000",
                             "minimum": 15000,
-                            "maximum": 1000000
+                            "maximum": 200000
                         }
                     },
                     "required": [
@@ -445,7 +419,7 @@
                     "title": "Supporting Documentation",
                     "description": "Additional resources and documentation for your proposal",
                     "x-guidance": "Here, provide links to your or your organization’s website, repository, or marketing materials. Alternatively, provide links to any whitepaper or publication relevant to your proposal.\n\nNote that this is additional information that voters and Community Reviewers might choose not to read. Attaching files does not mean you do not need to answer the questions in this form.",
-                    "x-placeholder": "Enter relevant links (website, GitHub, whitepaper, etc.)",
+                    "x-placeholder": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS. Please make sure that submitters own or have rights to share any linked content.",
                     "properties": {
                         "links": {
                             "$ref": "#/definitions/singleLineHttpsURLEntryList",
@@ -496,8 +470,8 @@
                         "licenseInformation": {
                             "$ref": "#/definitions/multiLineTextEntry",
                             "title": "License and Additional Information",
-                            "description": "Provide the license type and any additional context regarding the open source status of your project. If partially open source, specify which parts are open source.",
-                            "x-placeholder": "Describe the open source status of your project and the license type",
+                            "description": "Please provide details on the intellectual property (IP) status of your project outputs, including whether they will be released as open source or retained under another licence. ",
+                            "x-placeholder": "If applicable, describe the IP status of your project and the license type",
                             "maxLength": 500,
                             "x-guidance": "Open source licenses ensure intellectual property (IP) (such as source code) remains publicly accessible and licensed in a way that allows anyone to use, modify, and share the IP freely, typically under licenses approved by the Open Source Initiative.\n\nProprietary IP (such as source code) is not publicly available and the rights to use, modify, or redistribute the proprietary IP are restricted and typically reserved by the IP's owner.\n\nhttps://opensource.org/licenses"
                         }
@@ -537,159 +511,39 @@
                     "$ref": "#/definitions/section",
                     "title": "Category Questions",
                     "description": "Answer the following questions to determine the eligibility of your proposal.",
+                    "x-guidance": "General Guidance\n\nIn consideration of the Reviewers assessing your proposal, be concise and use bulleted lists where possible.",
                     "properties": {
-                        "informational_content": {
-                            "$ref": "#/definitions/borderGroup",
-                            "properties": {
-                                "answer": {
-                                    "$ref": "#/definitions/yesNoChoice",
-                                    "title": "Does your proposal involve informational content, such as websites, blogs, or similar media?",
-                                    "x-guidance": "Informational content like websites or blogs is not eligible for this category. Focus on real-world utility and adoption. If your project is primarily informational, consider a different category.",
-                                    "description": "Proposals for informational content, such as websites or blogs, are prohibited. This category prioritizes real-world adoption and utility-driven projects."
-                                }
-                            }
+                        "innovative_idea": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "title": "Describe what makes your idea innovative compared to what has been previously launched in the market (whether by you or others).",
+                            "x-placeholder": "Please provide your rationale.",
+                            "description": "Please provide your rationale.",
+                            "x-guidance": "Propose Innovative Ideas\n\n- Clearly state how your idea is new to Cardano.\n- Highlight what innovation or unique approach your idea brings.\n- Avoid rehashing funded work without clear improvements.",
+                            "minLength": 200,
+                            "maxLength": 10240
                         },
-                        "foundational_rd": {
-                            "$ref": "#/definitions/borderGroup",
-                            "properties": {
-                                "answer": {
-                                    "$ref": "#/definitions/yesNoChoice",
-                                    "title": "Is your proposal for foundational R&D or maintenance of Cardano infrastructure (e.g., wallets, explorers, or bridges)?",
-                                    "x-guidance": "Foundational R&D or infrastructure maintenance (e.g., wallets, bridges, explorers) should apply to a category focused on infrastructure funding, not this one.",
-                                    "description": "This category does not cover foundational R&D or ongoing maintenance of Cardano infrastructure (e.g., wallets, explorers, bridges). These are better suited to categories specifically addressing infrastructure needs."
-                                }
-                            }
+                        "prototype_mvp": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "title": "Describe what your prototype or MVP will demonstrate, and where it can be accessed.",
+                            "x-placeholder": "Please provide your rationale.",
+                            "description": "Please provide your rationale.",
+                            "x-guidance": "On-Chain Prototype or MVP\n\n- Make sure your prototype or MVP is deployed or testable on-chain by the end of project phase.\n- Consider how the community could help test your prototype or MVP.",
+                            "minLength": 200,
+                            "maxLength": 10240
                         },
-                        "financial_products": {
-                            "$ref": "#/definitions/borderGroup",
-                            "properties": {
-                                "answer": {
-                                    "$ref": "#/definitions/yesNoChoice",
-                                    "title": "Does your project propose funding for liquidity, loans, buying NFTs, or other financial/token-based products?",
-                                    "x-guidance": "Financial/token-based proposals like liquidity funding, loans, or NFT purchases are ineligible. Focus on real-world applications of Cardano technology.",
-                                    "description": "Proposals requesting funding for liquidity, loans, or token-based financial products, including NFT purchases, are not within scope."
-                                }
-                            }
-                        },
-                        "early_stage_product": {
-                            "$ref": "#/definitions/borderGroup",
-                            "properties": {
-                                "answer": {
-                                    "$ref": "#/definitions/yesNoChoice",
-                                    "title": "Does your proposal focus on a brand-new or early-stage product that is not at least released to an MVP stage?",
-                                    "x-guidance": "Proposals must enhance existing, deployed products or involve enterprise partnerships. Early-stage ideas without an MVP should apply to a different category.",
-                                    "description": "Only projects with an existing product at MVP stage or beyond are eligible. Early-stage ideas should seek funding in more general innovation categories."
-                                }
-                            }
-                        },
-                        "developer_tools": {
-                            "$ref": "#/definitions/borderGroup",
-                            "properties": {
-                                "answer": {
-                                    "$ref": "#/definitions/yesNoChoice",
-                                    "title": "Does your proposal primarily involve developer tools, middleware, APIs, or IDEs?",
-                                    "x-guidance": "Developer tooling projects should apply to a developer-focused category, such as 'Cardano Open: Developers.' This category emphasizes adoption-driven use cases.",
-                                    "description": "Developer tools, middleware, APIs, and IDEs fall outside the scope of this category. These projects should seek funding under developer-specific categories."
-                                }
-                            }
-                        },
-                        "enterprise_partnership": {
-                            "$ref": "#/definitions/borderGroup",
-                            "properties": {
-                                "answer": {
-                                    "$ref": "#/definitions/yesNoChoice",
-                                    "title": "Is your proposal led by or in partnership with an established enterprise or team with a proven business track record?",
-                                    "x-guidance": "Proposals must demonstrate enterprise experience and proven success. Include details about your team or partner's expertise.",
-                                    "description": "Proposals must be led by established enterprises or teams with proven business track records. This ensures credibility and feasibility."
-                                },
-                                "secondary_question": {
-                                    "type": "object",
-                                    "title": "If Yes",
-                                    "properties": {
-                                        "question": {
-                                            "type": "string",
-                                            "description": "What is the name of the enterprise or team, and what is their track record in the industry?"
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        "working_product": {
-                            "$ref": "#/definitions/borderGroup",
-                            "properties": {
-                                "answer": {
-                                    "$ref": "#/definitions/yesNoChoice",
-                                    "title": "Does your project have a working product or measurable adoption metrics?",
-                                    "x-guidance": "Proposals should enhance existing products with measurable success. Include adoption metrics or examples of real-world use.",
-                                    "description": "Proposals should demonstrate a working product and measurable adoption. Projects without existing success metrics are not eligible."
-                                },
-                                "secondary_question": {
-                                    "type": "object",
-                                    "title": "If Yes",
-                                    "properties": {
-                                        "question": {
-                                            "type": "string",
-                                            "description": "Provide a brief description of your product and its current adoption metrics."
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        "timeline": {
-                            "$ref": "#/definitions/borderGroup",
-                            "properties": {
-                                "answer": {
-                                    "$ref": "#/definitions/yesNoChoice",
-                                    "title": "Does your proposal include a timeline for delivery within 12 months?",
-                                    "x-guidance": "Projects must be delivered within 12 months. Include a clear timeline with milestones for evaluation.",
-                                    "description": "All projects must be completed within 12 months. Proposals must include a detailed timeline with key milestones."
-                                }
-                            }
-                        },
-                        "matching_funds": {
-                            "$ref": "#/definitions/borderGroup",
-                            "properties": {
-                                "answer": {
-                                    "$ref": "#/definitions/yesNoChoice",
-                                    "title": "Does your proposal include matching funds or in-kind contributions?",
-                                    "x-guidance": "Matching funds or contributions enhance feasibility and impact. Be transparent about sources and amounts.",
-                                    "description": "Proposals with matching funds or in-kind contributions are prioritized for funding due to their higher feasibility and potential impact."
-                                },
-                                "secondary_question": {
-                                    "type": "object",
-                                    "title": "If Yes",
-                                    "properties": {
-                                        "question": {
-                                            "type": "string",
-                                            "description": "Provide details on the matching funds or contributions, including their source and value."
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        "adoption_potential": {
-                            "$ref": "#/definitions/borderGroup",
-                            "properties": {
-                                "answer": {
-                                    "$ref": "#/definitions/yesNoChoice",
-                                    "title": "Does your proposal showcase high adoption potential with measurable outcomes?",
-                                    "x-guidance": "Proposals must drive tangible adoption with measurable results. Include metrics and methods for evaluating success.",
-                                    "description": "Projects must demonstrate high adoption potential and outline measurable outcomes. Metrics for success should be included."
-                                },
-                                "secondary_question": {
-                                    "type": "object",
-                                    "title": "If Yes",
-                                    "properties": {
-                                        "question": {
-                                            "type": "string",
-                                            "description": "What measurable outcomes do you aim to achieve, and how will you assess success?"
-                                        }
-                                    }
-                                }
-                            }
+                         "performance_metrics": {
+                            "$ref": "#/definitions/multiLineTextEntryMarkdown",
+                            "title": "Describe realistic measures of success, ideally with on-chain metrics.",
+                            "x-placeholder": "Please provide your rationale.",
+                            "description": "Please provide your rationale.",
+                            "x-guidance": "Blockchain usage projections\n\n- Estimate how many users, transactions, or smart contract calls your project expects.\n- Tie projections to Cardano network metrics or similar use cases.\n- Avoid inflated claims, keep it data-based and credible.",
+                            "minLength": 200,
+                            "maxLength": 10240
                         }
+                        
                     },
-                    "x-order": ["informational_content", "foundational_rd", "financial_products", "early_stage_product", "developer_tools", "enterprise_partnership", "working_product", "timeline", "matching_funds", "adoption_potential"]
+                    "required": ["innovative_idea", "prototype_mvp", "performance_metrics"],
+                    "x-order": ["innovative_idea", "prototype_mvp", "performance_metrics"]
                 }
             },
             "x-order": ["category_details", "category_questions"]
@@ -1066,7 +920,7 @@
                                         "title": "Evidence of Completion",
                                         "description": "How you will demonstrate achievement",
                                         "x-placeholder": "Specify the evidence that will demonstrate this milestone is complete",
-                                        "minLength": 200,
+                                        "minLength": 100,
                                         "maxLength": 2000
                                     },
                                     "delivery_month": {
@@ -1153,6 +1007,78 @@
             "x-order": ["team", "budget", "value"],
             "required": ["team", "budget", "value"]
         },
+        "self_assessment": {
+            "$ref": "#/definitions/segment",
+            "title": "Self-Assessment",
+            "x-icon": "shield-check",
+            "properties": {
+                "self_assessment_checklist": {
+                    "$ref": "#/definitions/section",
+                    "title": "Self-Assessment Checklist",
+                    "properties": {
+                        "foundational_work": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Foundational Work:",
+                            "title": "I confirm that evidence of prior research, whitepaper, design, or proof-of-concept is provided.",  
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "builder_credentials": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Builder Credentials:",
+                            "title": "I confirm that the proposal demonstrates technical capability via verifiable in-house talent or a confirmed development partner (GitHub, LinkedIn, portfolio, etc.)",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "catalyst_standing": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Catalyst Standing:",
+                            "title": "I confirm that the proposer and all team members are in good standing with prior Catalyst projects.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "problem_use_case": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Problem & Use Case:",
+                            "title": "I confirm that the proposal clearly defines the problem and the value of the on-chain utility.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "tangible_prototype": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Tangible Prototype:",
+                            "title": "I confirm that the primary goal of the proposal is a working prototype deployed on at least a Cardano testnet.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "technical_approach": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Technical Approach:",
+                            "title": "I confirm that the proposal outlines a credible and clear technical plan and architecture.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "realistic_scope": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Realistic Scope:",
+                            "title": "I confirm that the budget and timeline (≤ 12 months) are realistic for the proposed work.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "community_engagement": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Community Engagement:",
+                            "title": "I confirm that the proposal includes a community engagement and feedback plan to amplify prototype adoption with the Cardano ecosystem.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "budget_compliance": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Budget Compliance:",
+                            "title": "I confirm that the budget is for future development only; excludes retroactive funding, incentives, giveaways, re-granting, or sub-treasuries.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        }
+                    },
+                    "required": ["foundational_work","builder_credentials","catalyst_standing","problem_use_case","tangible_prototype", "technical_approach","realistic_scope", "community_engagement","budget_compliance"],
+                    "x-order": ["foundational_work","builder_credentials","catalyst_standing","problem_use_case","tangible_prototype", "technical_approach","realistic_scope", "community_engagement","budget_compliance"]
+                }
+            },
+            "x-order": [
+                "self_assessment_checklist"
+            ]
+        },
         "agreements": {
             "$ref": "#/definitions/segment",
             "title": "Required Acknowledgements",
@@ -1208,7 +1134,7 @@
                     "properties": {
                         "terms_and_conditions": {
                             "$ref": "#/definitions/agreementConfirmation",
-                            "title": "Terms and Conditions:",
+                            "title": "I Agree",
                             "description": "I confirm that I have read, understand and shall adhere to the [Terms & Conditions](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions), [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules), [Privacy Policy](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy). I understand that providing accurate and truthful information is essential for my proposal to remain eligible to participate in the current Fund."
                         }
                     },
@@ -1229,6 +1155,7 @@
         "details",
         "milestones",
         "pitch",
+        "self_assessment",
         "agreements"
     ],
     "x-order": [
@@ -1239,6 +1166,7 @@
         "details",
         "milestones",
         "pitch",
+        "self_assessment",
         "agreements"
     ]
 }

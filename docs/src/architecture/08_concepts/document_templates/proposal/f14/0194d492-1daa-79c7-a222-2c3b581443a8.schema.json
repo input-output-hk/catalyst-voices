@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-7371-8bd3-c15811b2b063.schema.json",
-    "title": "F14 Cardano Use Cases: Concepts Form",
-    "description": "Schema for the F14 Cardano Use Cases: Concepts Form",
+    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/f14/0194d492-1daa-79c7-a222-2c3b581443a8.schema.json",
+    "title": "F14 Cardano Open: Developers",
+    "description": "Schema for the F14 Cardano Open: Developers",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
         "2025-07-04": [
@@ -335,7 +335,7 @@
                             "$ref": "#/definitions/tokenValueCardanoADA",
                             "title": "Enter the amount of funding you are requesting in ADA",
                             "description": "The amount of funding requested for your proposal",
-                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Uses Cases: Concepts**\n\n- Minimum Funding Amount per proposal: **₳15K**\n- Maximum Funding Amount per proposal: **₳100K**",
+                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Open: Developers**\n\n- Minimum Funding Amount per proposal: **₳15K**\n- Maximum Funding Amount per proposal: **₳100K**",
                             "x-placeholder": "Enter the amount of funding you are requesting in ADA",
                             "minimum": 15000,
                             "maximum": 100000
@@ -526,37 +526,37 @@
                     "description": "Answer the following questions to determine the eligibility of your proposal.",
                     "x-guidance": "General Guidance\n\nIn consideration of the Reviewers assessing your proposal, be concise and use bulleted lists where possible.",
                     "properties": {
-                        "innovative_idea": {
+                        "license_information": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Describe what makes your idea innovative compared to what has been previously funded (whether by you or others).",
+                            "title": "Mention your open source license and describe your open source license rationale.",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your rationale for your innovative idea.",
-                            "x-guidance": "Propose Innovative Ideas\n\n- Clearly state how your idea is new to Cardano.\n- Highlight what innovation or unique approach your idea brings.\n- Avoid rehashing funded work without clear improvements.",
+                            "description": "Please provide your open source license rationale.",
+                            "x-guidance": "Open source license and reasons\n\n- For instance, any recognized open source license (MIT, Apache 2.0, GPL or other).\n- Explain why this license fits your project goals (e.g. broad use, contribution rules, commercial compatibility).\n- Avoid vague terms like “custom license” without justification.",
                             "minLength": 200,
                             "maxLength": 600
                         },
-                        "prototype_information": {
+                        "source_code_accessibility": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Describe what your prototype or MVP will demonstrate, and where it can be accessed.",
+                            "title": "How do you make sure your source code is accessible to the public from project start, and people are informed?",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your rationale for your prototype or MVP.",
-                            "x-guidance": "On-Chain Prototype or MVP\n\n- Make sure your prototype or MVP is deployed or testable on-chain by the end of project phase.\n- Consider how the community could help test your prototype or MVP.",
+                            "description": "Please provide your rationale for how you make sure your source code is accessible to the public from project start, and people are informed.",
+                            "x-guidance": "Public Source Code Access\n\n- Share a public repository link (e.g. GitHub, GitLab) early.\n- Use version control and quality commits regularly.\n- Set clear expectations on progression and communication.",
                             "minLength": 200,
                             "maxLength": 600
                         },
-                         "performance_metrics": {
+                         "documentation_quality": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Describe realistic measures of success, ideally with on-chain metrics.",
+                            "title": "How will you provide high quality documentation?",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your rationale for realistic measures of success.",
-                            "x-guidance": "Blockchain usage projections\n\n- Estimate how many users, transactions, or smart contract calls your project expects.\n- Tie projections to Cardano network metrics or similar use cases.\n- Avoid inflated claims—keep it data-based and credible.",
+                            "description": "Please provide your quality documentation.",
+                            "x-guidance": "High-Quality Documentation\n\n- User and developer documentation (README, setup guide, API docs).\n- Use clear structure, visuals, and examples.\n- Mention tools or standards (e.g. Docusaurus, Markdown, OpenAPI).",
                             "minLength": 200,
                             "maxLength": 600
                         }
                         
                     },
-                    "required": ["innovative_idea", "prototype_information", "performance_metrics"],
-                    "x-order": ["innovative_idea", "prototype_information", "performance_metrics"]
+                    "required": ["license_information", "source_code_accessibility", "documentation_quality"],
+                    "x-order": ["license_information", "source_code_accessibility", "documentation_quality"]
                 }
             },
             "x-order": ["category_details", "category_questions"]
@@ -573,7 +573,7 @@
                     "properties": {
                         "grouped_tag": {
                             "$ref": "#/definitions/singleGroupedTagSelector",
-                            "title": "Please choose the most relevant theme and tag related to the outcomes of your proposal.",
+                            "title": "Please choose the most relevant theme and tag related to the outcomes of your proposal",
                             "oneOf": [
                                 {
                                     "properties": {

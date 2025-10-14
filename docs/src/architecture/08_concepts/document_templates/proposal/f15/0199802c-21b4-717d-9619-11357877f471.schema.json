@@ -1,26 +1,12 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-716f-a04e-f422f08a99dc.schema.json",
-    "title": "F14 Cardano Open: Ecosystem Form",
-    "description": "Schema for the F14 Cardano Open: Ecosystem Form",
+    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/f15/0199802c-21b4-717d-9619-11357877f471.schema.json",
+    "title": "F15 Cardano Partners: Tier-1 Enterprise Integrations",
+    "description": "Schema for the F15 Cardano Partners: Tier-1 Enterprise Integrations",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
-        "2025-07-04": [
-            "Added maxLength constraint for singleLineHttpsURLEntry.",
-            "Change title for Theme",
-            "Change guidance text for requestedFunds",
-            "Change guidance text for time",
-            "Remove maximum constraint for milestone cost."
-        ],
-        "2025-06-27": [
-            "Legal wording changes.",
-            "Removed coproposers property."
-        ],
-        "2025-06-18": [
-            "Added maximum constraint for milestone cost."
-        ],
-        "2025-06-02": [
-            "Adding category questions"
+        "2025-10-08": [
+            "F15 Template Setup"
         ]
     },
     "definitions": {
@@ -54,6 +40,7 @@
                 "team": { "type": "object" },
                 "value": { "type": "object" },
                 "ongoing_projects": { "type": "object" },
+                "self_assessment": { "type": "object" },
                 "consent_confirmation": { "type": "object" }
             },
             "x-note": "Major sections of the proposal. Each segment contains sections of information grouped together."
@@ -254,8 +241,8 @@
     "properties": {
         "$schema": {
             "$ref": "#/definitions/schemaReferenceNonUI",
-            "default": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
-            "const": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json"
+            "default": "./0199802c-21b4-717d-9619-11357877f471.schema.json",
+            "const": "./0199802c-21b4-717d-9619-11357877f471.schema.json"
         },
         "setup": {
             "$ref": "#/definitions/segment",
@@ -291,20 +278,19 @@
                             "$ref": "#/definitions/singleLineTextEntry",
                             "title": "Applicant name and surname",
                             "description": "Name and surname of main applicant",
-                            "x-guidance": "The applicant is the individual or entity responsible for the proposed project.",
+                            "x-guidance": "The applicant is the Consortium or entity responsible for the proposed project.",
                             "x-placeholder": "Enter the full name of the applicant submitting the proposal",
                             "minLength": 2,
                             "maxLength": 100
                         },
                         "type": {
                             "$ref": "#/definitions/radioButtonSelect",
-                            "title": "Are you submitting this proposal as an individual or as an entity (whether formally incorporated or not)?",
-                            "description": "Are you submitting this proposal as an individual or as an entity (whether formally incorporated or not)",
-                            "x-guidance": "Please select from one of the following:\n\n1. Individual\n2. Entity (Incorporated)\n3. Entity (Not Incorporated)",
+                            "title": "Are you submitting this proposal as an Incorporated entity or a Consortium?",
+                            "description": "Are you submitting this proposal as an Incorporated entity or a Consortium?",
+                            "x-guidance": "Please select from one of the following:\n\n1. Entity (Incorporated)\n2. Consortium",
                             "enum": [
-                                "Individual",
                                 "Entity (Incorporated)",
-                                "Entity (Not Incorporated)"
+                                "Consortium"
                             ]
                         }
                     },
@@ -334,11 +320,11 @@
                         "requestedFunds": {
                             "$ref": "#/definitions/tokenValueCardanoADA",
                             "title": "Enter the amount of funding you are requesting in ADA",
-                            "description": "The amount of funding requested for your proposal",
-                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Open: Ecosystem**\n\n- Minimum Funding Amount per proposal: **₳15K**\n- Maximum Funding Amount per proposal: **₳60K**",
-                            "x-placeholder": "Enter the amount of funding you are requesting in ADA",
-                            "minimum": 15000,
-                            "maximum": 60000
+                            "description": "Requested amount should be between $ADA 250,000 and $ADA 750,000",
+                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Partners: Tier1 Enterprise Integrations**\n\n- Minimum Funding Amount per proposal: **$ADA 250,000**\n- Maximum Funding Amount per proposal: **$ADA 750,000**",
+                            "x-placeholder": "Requested amount should be between $ADA 250,000 and $ADA 750,000",
+                            "minimum": 250000,
+                            "maximum": 1000000
                         }
                     },
                     "required": [
@@ -432,12 +418,12 @@
                     "title": "Supporting Documentation",
                     "description": "Additional resources and documentation for your proposal",
                     "x-guidance": "Here, provide links to your or your organization’s website, repository, or marketing materials. Alternatively, provide links to any whitepaper or publication relevant to your proposal.\n\nNote that this is additional information that voters and Community Reviewers might choose not to read. Attaching files does not mean you do not need to answer the questions in this form.",
-                    "x-placeholder": "Enter relevant links (website, GitHub, whitepaper, etc.)",
+                    "x-placeholder": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS. Please make sure that submitters own or have rights to share any linked content.",
                     "properties": {
                         "links": {
                             "$ref": "#/definitions/singleLineHttpsURLEntryList",
                             "title": "Supporting links",
-                            "description": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS.",
+                            "description": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS. Please make sure that submitters own or have rights to share any linked content.",
                             "minItems": 0,
                             "maxItems": 5
                         }
@@ -465,7 +451,7 @@
                         }
                     },
                     "required": [
-                        "hasDependency", 
+                        "hasDependency",
                         "dependencyDetail"
                     ]
                 },
@@ -482,9 +468,9 @@
                         },
                         "licenseInformation": {
                             "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "License and Additional Information",
-                            "description": "Provide the license type and any additional context regarding the open source status of your project. If partially open source, specify which parts are open source.",
-                            "x-placeholder": "Describe the open source status of your project and the license type",
+                            "title": "Please provide details on the intellectual property (IP) status of your project outputs, including whether they will be released as open source or retained under another licence. ",
+                            "description": "Please provide details on the intellectual property (IP) status of your project outputs, including whether they will be released as open source or retained under another licence. ",
+                            "x-placeholder": "If applicable, describe the IP status of your project and the license type",
                             "maxLength": 500,
                             "x-guidance": "Open source licenses ensure intellectual property (IP) (such as source code) remains publicly accessible and licensed in a way that allows anyone to use, modify, and share the IP freely, typically under licenses approved by the Open Source Initiative.\n\nProprietary IP (such as source code) is not publicly available and the rights to use, modify, or redistribute the proprietary IP are restricted and typically reserved by the IP's owner.\n\nhttps://opensource.org/licenses"
                         }
@@ -524,39 +510,39 @@
                     "$ref": "#/definitions/section",
                     "title": "Category Questions",
                     "description": "Answer the following questions to determine the eligibility of your proposal.",
-                    "x-guidance": "General Guidance\n\nIn consideration of the Reviewers assessing your proposal, be concise and use bulleted lists where possible. Avoid any software or hardware development, even if it seems minor.",
+                    "x-guidance": "General Guidance\n\nIn consideration of the Reviewers assessing your proposal, be concise and use bulleted lists where possible.",
                     "properties": {
-                        "target_market": {
+                        "established_partnership": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Who you’re targeting, how you’ll reach them, and why this matters for Cardano.",
+                            "title": "Describe your established collaborations.",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your rationale for your target market.",
-                            "x-guidance": "Grassroots Growth & Onboarding\n\n- Number of new wallets created or ADA transactions initiated.\n- Growth in local/regional community participation.\n- Collaborations formed with local organizations, schools, or groups.",
+                            "description": "Please provide your rationale for your established collaborations.",
+                            "x-guidance": "Established collaborations\n\n- Clearly identify the collaborators and describe their role in your project.\n- Describe the nature of the collaboration and, where applicable, include links to public materials (e.g., press releases, public endorsements).\n- If confidential, contact the Catalyst team.",
                             "minLength": 200,
-                            "maxLength": 600
+                            "maxLength": 10240
                         },
-                        "key_activities": {
+                        "funding_commitments": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Provide a list of key activities of your project?",
+                            "title": "Describe funding commitments.",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your rationale for your key activities.",
-                            "x-guidance": "Education & Awareness\n\n- Number of educational sessions, workshops, or webinars held.\n- Total number of participants reached or trained, and retention rates.\n- Increase in Cardano-related knowledge (measured via pre/post surveys or quizzes).",
+                            "description": "Please provide your rationale for your funding commitments.",
+                            "x-guidance": "Collaborator funding commitments\n\n- Clearly state contributors, including the nature and amount.\n- If confidential, contact the Catalyst team.",
                             "minLength": 200,
-                            "maxLength": 600
+                            "maxLength": 10240
                         },
                          "performance_metrics": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "What are your success metrics?",
+                            "title": "Describe your key performance metrics.",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your rationale for your success metrics.",
-                            "x-guidance": "Community Engagement\n\n- Number of new community groups or meetups formed.\n- Number of events or meetups organized.\n- Event attendance and retention rates (in-person or online).\n- Participant feedback scores or testimonials.\n- Social media growth (followers, engagement rates).\n- Mailing list or community channel sign-ups.",
+                            "description": "Please provide your rationale for your key performance metrics.",
+                            "x-guidance": "Key Performance Metrics (KPIs)\n\n- For instance, data (user numbers, transactions, traffic, adoption rates), screenshots of dashboards or live analytics.\n- Contextualize why your KPIs matter for your project goals.",
                             "minLength": 200,
-                            "maxLength": 600
+                            "maxLength": 10240
                         }
                         
                     },
-                    "required": ["target_market", "key_activities", "performance_metrics"],
-                    "x-order": ["target_market", "key_activities", "performance_metrics"]
+                    "required": ["established_partnership", "funding_commitments", "performance_metrics"],
+                    "x-order": ["established_partnership", "funding_commitments", "performance_metrics"]
                 }
             },
             "x-order": ["category_details", "category_questions"]
@@ -1020,6 +1006,102 @@
             "x-order": ["team", "budget", "value"],
             "required": ["team", "budget", "value"]
         },
+        "self_assessment": {
+            "$ref": "#/definitions/segment",
+            "title": "Self-Assessment",
+            "x-icon": "shield-check",
+            "properties": {
+                "self_assessment_checklist": {
+                    "$ref": "#/definitions/section",
+                    "title": "Self-Assessment Checklist",
+                    "properties": {
+                        "legal_entity": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Legal Entity:",
+                            "title": "I confirm that the lead applicant is a verified legal business entity.",  
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "track_record": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Track Record & Revenue:",
+                            "title": "I confirm that the lead org has a ≥2-year track record, and the consortium collectively has ≥$5M in verifiable annual revenue.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "tier_one_collaboration": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": " Tier-1 Collaboration:",
+                            "title": "I confirm that their is evidence of collaboration with a qualified Tier-1 enterprise is provided.",  
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "catalyst_standing": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Catalyst Standing:",
+                            "title": "I confirm that the proposer and all team members are in good standing with prior Catalyst projects.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "scope_fit": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Scope Fit:",
+                            "title": "I confirm that the proposal is for mature R&D or integration, not an early-stage concept or core infrastructure.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "mature_product_path": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Mature Product & Path:",
+                            "title": "I confirm that evidence of a mature product is provided, with a clear integration plan if not already on Cardano.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "partner_identification": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Partner Identification:",
+                            "title": "I confirm that all key partners, including the Tier-1 collaborator, are clearly identified.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "partner_commitment": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Partner Commitment:",
+                            "title": "I confirm that a clear statement of the partner's in-kind or financial contributions is included.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "verifiable_credentials": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Verifiable Credentials:",
+                            "title": "I confirm that the proposal provides verifiable references (e.g., LinkedIn, portfolio) for key team members.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "measurable_adoption": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Measurable Adoption:",
+                            "title": "I confirm that the proposal includes clear KPIs for adoption (e.g., transaction volume, user growth). Forecast for projected on-chain transaction volume is provided with adequate justification.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "timeline": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Timeline:",
+                            "title": "I confirm that delivery is ≤ 12 months with clear milestones.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "visibility_engagement": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Visibility & Engagement:",
+                            "title": "I confirm that the proposal includes a co-marketing or community engagement plan to amplify Cardano's visibility.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "budget_compliance": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Budget Compliance:",
+                            "title": "I confirm that the proposal budget is for future work only, not for completed tasks. No incentives, giveaways, private treasuries and regranting are included in the budget.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        }
+                    },
+                    "required": ["legal_entity","track_record","tier_one_collaboration","catalyst_standing","scope_fit", "mature_product_path","partner_identification", "partner_commitment","verifiable_credentials","measurable_adoption","timeline","visibility_engagement","budget_compliance" ],
+                    "x-order": ["legal_entity","track_record","tier_one_collaboration","catalyst_standing","scope_fit", "mature_product_path","partner_identification", "partner_commitment","verifiable_credentials","measurable_adoption","timeline","visibility_engagement","budget_compliance" ]
+                }
+            },
+            "x-order": [
+                "self_assessment_checklist"
+            ]
+        },
         "agreements": {
             "$ref": "#/definitions/segment",
             "title": "Required Acknowledgements",
@@ -1075,7 +1157,7 @@
                     "properties": {
                         "terms_and_conditions": {
                             "$ref": "#/definitions/agreementConfirmation",
-                            "title": "Terms and Conditions:",
+                            "title": "I Agree",
                             "description": "I confirm that I have read, understand and shall adhere to the [Terms & Conditions](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions), [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules), [Privacy Policy](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy). I understand that providing accurate and truthful information is essential for my proposal to remain eligible to participate in the current Fund."
                         }
                     },
@@ -1096,6 +1178,7 @@
         "details",
         "milestones",
         "pitch",
+        "self_assessment",
         "agreements"
     ],
     "x-order": [
@@ -1106,6 +1189,7 @@
         "details",
         "milestones",
         "pitch",
+        "self_assessment",
         "agreements"
     ]
 }

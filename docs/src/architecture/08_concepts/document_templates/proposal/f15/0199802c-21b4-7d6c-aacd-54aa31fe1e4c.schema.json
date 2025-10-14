@@ -1,26 +1,12 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-79c7-a222-2c3b581443a8.schema.json",
-    "title": "F14 Cardano Open: Developers",
-    "description": "Schema for the F14 Cardano Open: Developers",
+    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/f15/0199802c-21b4-7d6c-aacd-54aa31fe1e4c.schema.json",
+    "title": "F15 Midnight: Compact DApps",
+    "description": "Schema for the F15 Midnight: Compact DApps",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
-        "2025-07-04": [
-            "Added maxLength constraint for singleLineHttpsURLEntry.",
-            "Change title for Theme",
-            "Change guidance text for requestedFunds",
-            "Change guidance text for time",
-            "Remove maximum constraint for milestone cost."
-        ],
-        "2025-06-27": [
-            "Legal wording changes.",
-            "Removed coproposers property."
-        ],
-        "2025-06-18": [
-            "Added maximum constraint for milestone cost."
-        ],
-        "2025-06-02": [
-            "Adding category questions"
+        "2025-10-08": [
+            "F15 Template Setup"
         ]
     },
     "definitions": {
@@ -54,6 +40,7 @@
                 "team": { "type": "object" },
                 "value": { "type": "object" },
                 "ongoing_projects": { "type": "object" },
+                "self_assessment": { "type": "object" },
                 "consent_confirmation": { "type": "object" }
             },
             "x-note": "Major sections of the proposal. Each segment contains sections of information grouped together."
@@ -200,6 +187,10 @@
             "format": "token:cardano:ada",
             "x-note": "Enter the amount of Cardano ADA to be used in the proposal."
         },
+        "currency": {
+            "title": "Currency/Token amount",
+            "type": "integer"
+        },
         "durationInMonths": {
             "$comment": "UI - A Duration represented in total months.",
             "type": "integer",
@@ -254,8 +245,8 @@
     "properties": {
         "$schema": {
             "$ref": "#/definitions/schemaReferenceNonUI",
-            "default": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
-            "const": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json"
+            "default": "./0199802c-21b4-7d6c-aacd-54aa31fe1e4c.schema.json",
+            "const": "./0199802c-21b4-7d6c-aacd-54aa31fe1e4c.schema.json"
         },
         "setup": {
             "$ref": "#/definitions/segment",
@@ -332,13 +323,14 @@
                     "title": "Budget Information",
                     "properties": {
                         "requestedFunds": {
-                            "$ref": "#/definitions/tokenValueCardanoADA",
-                            "title": "Enter the amount of funding you are requesting in ADA",
-                            "description": "The amount of funding requested for your proposal",
-                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Open: Developers**\n\n- Minimum Funding Amount per proposal: **₳15K**\n- Maximum Funding Amount per proposal: **₳100K**",
-                            "x-placeholder": "Enter the amount of funding you are requesting in ADA",
-                            "minimum": 15000,
-                            "maximum": 100000
+                            "$ref": "#/definitions/currency",
+                            "format": "token:usdm",
+                            "title": "Enter the amount of funding you are requesting in $USDM",
+                            "description": "Requested amount should be between $USDM 2,500 or $USDM 10,000",
+                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Midnight: Compact DApps**\n\n- Minimum Funding Amount per proposal: **$USDM 2,500**\n- Maximum Funding Amount per proposal: **$USDM 10,000**",
+                            "x-placeholder": "Requested amount should be between $USDM 2,500 or $USDM 10,000",
+                            "minimum": 2500,
+                            "maximum": 10000
                         }
                     },
                     "required": [
@@ -354,10 +346,10 @@
                             "$ref": "#/definitions/durationInMonths",
                             "title": "Please specify how many months you expect your project to last ",
                             "description": "Specify the expected duration of your project. Projects must be completable within 2-12 months.",
-                            "x-guidance": "You are expected to produce the deliverables specified in the proposal within the timeframe selected, with a minimum of 2 months and a maximum of 12 months.\n\nProjects can be completed earlier if milestone [Proof-of-Achievements](https://docs.projectcatalyst.io/current-fund/project-onboarding/milestone-based-proposals) and [Project Completion](https://docs.projectcatalyst.io/current-fund/general-information/project-close-out-report-and-project-close-out-video-pcr-and-pcv) steps are submitted and approved ahead of the expected delivery due dates in compliance with the [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules).",
-                            "x-placeholder": "Select the expected duration of your project (2-12 months)",
-                            "minimum": 2,
-                            "maximum": 12
+                            "x-guidance": "Midnight projects must be completed within 3 months.\n\nProjects can be completed earlier if milestone [Proof-of-Achievements](https://docs.projectcatalyst.io/current-fund/project-onboarding/milestone-based-proposals) and [Project Completion](https://docs.projectcatalyst.io/current-fund/general-information/project-close-out-report-and-project-close-out-video-pcr-and-pcv) steps are submitted and approved ahead of the expected delivery due dates in compliance with the [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules).",
+                            "x-placeholder": "Select the expected duration of your project (3 months)",
+                            "minimum": 3,
+                            "maximum": 3
                         }
                     },
                     "required": [
@@ -431,8 +423,8 @@
                     "$ref": "#/definitions/section",
                     "title": "Supporting Documentation",
                     "description": "Additional resources and documentation for your proposal",
-                    "x-guidance": "Here, provide links to your or your organization’s website, repository, or marketing materials. Alternatively, provide links to any whitepaper or publication relevant to your proposal.\n\nNote that this is additional information that voters and Community Reviewers might choose not to read. Attaching files does not mean you do not need to answer the questions in this form.",
-                    "x-placeholder": "Enter relevant links (website, GitHub, whitepaper, etc.)",
+                    "x-guidance": "Provide **GitHub handles for all builders** and **1–3 representative repositories** that show your ability to ship code. Optionally include a link to an early PoC repo for this proposal and any **technical write-ups** (READMEs/docs).\n\n**Do not include** websites, social media, pitch decks, or marketing materials—this fund evaluates **code**, not marketing. All links must use HTTPS.",
+                    "x-placeholder": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS. Please make sure that submitters own or have rights to share any linked content.",
                     "properties": {
                         "links": {
                             "$ref": "#/definitions/singleLineHttpsURLEntryList",
@@ -478,13 +470,13 @@
                             "$ref": "#/definitions/yesNoChoice",
                             "title": "Will your project's outputs be fully open source?",
                             "description": "Select Yes if the project is open source, No if it is not.",
-                            "x-guidance": "If you answered “YES” to the question above:\n\nIf you declare that the project will be open source in the application form, it must remain open source throughout the entire lifecycle of the project, with a publicly accessible repository.\n\nPlease indicate the type of open source license you intend to use and provide any additional information relevant to the open source status of your project outputs. If only specific components of the code will be open source, please specify which parts.\n\nIf you answered “NO” to the question above:\n\nPlease explain why the outputs of your project will not be made open source."
+                            "x-guidance": "If you answered “YES” to the question above:\n\nIf you declare that the project will be open source in the application form, it must remain open source throughout the entire lifecycle of the project, with a publicly accessible repository.\n\nPlease indicate the type of open source license you intend to use and provide any additional information relevant to the open source status of your project outputs.\n\nIf you answered “NO” to the question above:\n\nYou will not be eligible for this funding."
                         },
                         "licenseInformation": {
                             "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "License and Additional Information",
-                            "description": "Provide the license type and any additional context regarding the open source status of your project. If partially open source, specify which parts are open source.",
-                            "x-placeholder": "Describe the open source status of your project and the license type",
+                            "title": "Please provide here more information on the open source status of your project outputs",
+                            "description": "Please provide here more information on the open source status of your project outputs",
+                            "x-placeholder": "",
                             "maxLength": 500,
                             "x-guidance": "Open source licenses ensure intellectual property (IP) (such as source code) remains publicly accessible and licensed in a way that allows anyone to use, modify, and share the IP freely, typically under licenses approved by the Open Source Initiative.\n\nProprietary IP (such as source code) is not publicly available and the rights to use, modify, or redistribute the proprietary IP are restricted and typically reserved by the IP's owner.\n\nhttps://opensource.org/licenses"
                         }
@@ -524,39 +516,39 @@
                     "$ref": "#/definitions/section",
                     "title": "Category Questions",
                     "description": "Answer the following questions to determine the eligibility of your proposal.",
-                    "x-guidance": "General Guidance\n\nIn consideration of the Reviewers assessing your proposal, be concise and use bulleted lists where possible.",
+                    "x-guidance": "General Guidance\n\nIn consideration of the Reviewers assessing your proposal, be concise and use bulleted lists where possible. ",
                     "properties": {
-                        "license_information": {
+                        "dapp_purpose": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Mention your open source license and describe your open source license rationale.",
+                            "title": "What is useful about your DApp within one of the specified industry or enterprise verticals?",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your open source license rationale.",
-                            "x-guidance": "Open source license and reasons\n\n- For instance, any recognized open source license (MIT, Apache 2.0, GPL or other).\n- Explain why this license fits your project goals (e.g. broad use, contribution rules, commercial compatibility).\n- Avoid vague terms like “custom license” without justification.",
+                            "description": "Please provide your rationale.",
+                            "x-guidance": "General Guidance\n\n- Be concise; prefer bullets over prose.\n- This is a code-first PoC, not a company pitch. No pitch decks/marketing.\n- Include concrete details (e.g., file paths, API/entrypoints, test commands).\n- If helpful, include a simple architecture diagram or sequence.\n- Keep within 3 months and 3 milestones; each milestone needs deliverables + acceptance criteria + evidence.\n- Use correct nomenclature (Compact ≠ TypeScript; privacy-enhancing/data protection).",
                             "minLength": 200,
-                            "maxLength": 600
+                            "maxLength": 10240
                         },
-                        "source_code_accessibility": {
+                        "build_goal": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "How do you make sure your source code is accessible to the public from project start, and people are informed?",
+                            "title": "What exactly will you build? List the Compact contract(s) and key functions/proofs, the demo UI flow, Lace (Midnight) wallet integration, and your basic test plan.",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your rationale for how you make sure your source code is accessible to the public from project start, and people are informed.",
-                            "x-guidance": "Public Source Code Access\n\n- Share a public repository link (e.g. GitHub, GitLab) early.\n- Use version control and quality commits regularly.\n- Set clear expectations on progression and communication.",
+                            "description": "Please provide your rationale.",
+                            "x-guidance": "Usefulness (Pattern & Necessity)\n\n- Clear mapping from problem to data-protection pattern (e.g., selective disclosure for KYC, private votes, confidential asset ops).\n- Why this requires Midnight + Compact versus a public ledger.\n- Novelty relative to existing examples; what new building block it adds.",
                             "minLength": 200,
-                            "maxLength": 600
+                            "maxLength": 10240
                         },
-                         "documentation_quality": {
+                         "developer_reuse": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "How will you provide high quality documentation?",
+                            "title": "How will other developers learn from and reuse your repo? Describe repo structure, README contents, docs/tutorials, test instructions, and extension points. Which developer personas benefit, and how will you gauge impact (forks, stars, issues, remixes)?",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your quality documentation.",
-                            "x-guidance": "High-Quality Documentation\n\n- User and developer documentation (README, setup guide, API docs).\n- Use clear structure, visuals, and examples.\n- Mention tools or standards (e.g. Docusaurus, Markdown, OpenAPI).",
+                            "description": "Please provide your rationale.",
+                            "x-guidance": "Developer Value\n\n- Identified developer personas (e.g., DApp devs, zk-curious, integrators) and how this example helps them.\n- Potential to attract new builders (clarity, reusability) and measurable signals (forks, stars, issues, downstream examples)",
                             "minLength": 200,
-                            "maxLength": 600
+                            "maxLength": 10240
                         }
                         
                     },
-                    "required": ["license_information", "source_code_accessibility", "documentation_quality"],
-                    "x-order": ["license_information", "source_code_accessibility", "documentation_quality"]
+                    "required": ["dapp_purpose", "build_goal", "developer_reuse"],
+                    "x-order": ["dapp_purpose", "build_goal", "developer_reuse"]
                 }
             },
             "x-order": ["category_details", "category_questions"]
@@ -688,7 +680,7 @@
                                     "properties": {
                                         "group": {
                                             "$ref": "#/definitions/tagGroup",
-                                            "const": "Real World Applications"
+                                            "const": "Real World Applications (RWA)"
                                         },
                                         "tag": {
                                             "$ref": "#/definitions/tagSelection",
@@ -841,7 +833,7 @@
                             "maxLength": 10240,
                             "title": "Please describe your proposed solution and how it addresses the problem",
                             "description": "Please describe your proposed solution and how it addresses the problem",
-                            "x-guidance": "How you write this section will depend on what type of proposal you are writing. You might want to include details on:\n\n- How do you perceive the problem you are solving?\n- What are your reasons for approaching it in the way that you have?\n- Who will your project engage?\n- How will you demonstrate or prove your impact?\n\nExplain what is unique about your solution, who will benefit, and why this is important to Cardano."
+                            "x-guidance": "How you write this section will depend on what type of proposal you are writing. You might want to include details on:\n\n- How do you perceive the problem you are solving?\n- What are your reasons for approaching it in the way that you have?\n- Who will your project engage?\n- Explain what is unique about your solution, who will benefit, and why this is important to Midnight."
                         }
                     },
                     "required": ["solution"]
@@ -852,11 +844,11 @@
                     "properties": {
                         "impact": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Please define the positive impact your project will have on the wider Cardano community",
-                            "description": "Please define the positive impact your project will have on the wider Cardano community",
+                            "title": "Please define the positive impact your project will have on Midnight ecosystem",
+                            "description": "Please define the positive impact your project will have on Midnight ecosystem",
                             "minLength": 200,
                             "maxLength": 10240,
-                             "x-guidance": "Please include here a description of how you intend to measure impact (whether quantitative or qualitative) and how and with whom you will share your outputs:\n\n- In what way will the success of your project bring value to the Cardano Community?\n- How will you measure this impact?\n- How will you share the outputs and opportunities that result from your project?"
+                             "x-guidance": "Please include here a description of how you intend to measure impact (whether quantitative or qualitative) and how and with whom you will share your outputs:\n\n- In what way will the success of your project bring value to the Midnight ecosystem?\n- How will you measure this impact?\n- How will you share the outputs and opportunities that result from your project?"
                         }
                     },
                     "required": ["impact"]
@@ -894,10 +886,10 @@
                         "milestone_list": {
                             "type": "array",
                             "title": "What are the key milestones you need to achieve in order to complete your project successfully?",
-                            "description": "The number of milestones required depends on the amount of funding requested. Please refer to the Guidance card on the right for details",
-                            "x-guidance": "- For Grant Amounts of up to 75k ada, at least 2 milestones, plus the final one including Project Close-out Report and Video, must be included (**3 milestones in total**)\n- For Grant Amounts over 75k ada up to 150k ada, at least 3 milestones, plus the final one including Project Close-out Report and Video, must be included (**4 milestones in total**)\n- For Grant Amounts over 150k ada up to 300k ada, at least 4 milestones, plus the final one including Project Close-out Report and Video, must be included (**5 milestones in total**)\n- For Grant Amounts exceeding 300k ada, at least 5 milestones, plus the final one including Project Close-out Report and Video, must be included (**6 milestones in total**)",
+                            "description": "Please refer to the Guidance card on the right for details",
+                            "x-guidance": "For Midnight Grant Amounts 2 milestones, plus the final one including Project Close-out Report and Video, must be included (**3 milestones in total**)\n\nExpected Project outcomes:\n\n- M1: Publish public repository of required assets + the smart contract\n\n- M2: Connect smart contract to user interface (UI), make assets available into the repository, and have documentation\n\n- M3: Proof of Concept UI demonstrated in the Project Completion Video, testing suite complete, and Project Completion Report",
                             "minItems": 3,
-                            "maxItems": 6,
+                            "maxItems": 3,
                             "items": {
                                 "type": "object",
                                 "title": "Milestone",
@@ -942,13 +934,17 @@
                                         "description": "The month when this milestone will be delivered",
                                         "x-placeholder": "Enter the month when this milestone is expected to be delivered",
                                         "minimum": 1,
-                                        "maximum": 12
+                                        "maximum": 3
                                     },
                                     "cost": {
-                                        "$ref": "#/definitions/tokenValueCardanoADA",
+                                        "$ref": "#/definitions/currency",
                                         "title": "Cost",
-                                        "description": "The cost of this milestone in ADA",
-                                        "x-placeholder": "Enter the cost associated with this milestone"
+                                        "description": "The cost of this milestone in $USDM",
+                                        "x-placeholder": "Enter the cost associated with this milestone",
+                                        "format": "token:usdm",
+                                        "multipleOf": 1,
+                                        "minimum": 100,
+                                        "maximum": 10000000
                                     },
                                     "progress": {
                                         "$ref": "#/definitions/dropDownSingleSelect",
@@ -994,7 +990,7 @@
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
                             "title": "Please provide a cost breakdown of the proposed work and resources",
                             "description": "Please provide a cost breakdown of the proposed work and resources",
-                            "x-guidance": "Make sure every item of work is budgeted. It may be helpful to refer to your plan and timeline, list the resources you will need at each stage, and what they cost.\n\nProvide a clear description of any third party product or service you will be using: hardware, software licenses, professional services (e.g. legal, accounting, code auditing).\n\nIf the cost of the project will exceed the funding request, please provide information about how you will cover the shortfall of funding.\n\nMost applicants forget to budget for: publicity,  marketing,  promotion, community engagement, project management, documentation, and reporting back to the community.\n\nIt is your responsibility to properly manage the funds provided. Make sure to reference [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules) to understand eligibility around costs.",
+                            "x-guidance": "Give an account of how the work is budgeted. It may be helpful to refer to your plan and timeline, list the resources you will need at each stage, and what they cost.\n\nIt is your responsibility to properly manage the funds provided. Make sure to reference [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules) to understand eligibility around costs.",
                             "minLength": 200,
                             "maxLength": 10240
                         }
@@ -1007,9 +1003,9 @@
                     "properties": {
                         "note": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "How does the cost of the project represent value for the Cardano ecosystem?",
-                            "description": "How does the cost of the project represent value for the Cardano ecosystem?",
-                            "x-guidance": "Provide a compelling reason about how your project represents a good use of funds and justify how it will create value for the Cardano ecosystem.\n\nProvide context or justification about the costs you listed and why you need them.\n\nFor instance, can you reason with supporting evidence that costs are proportional to the average wage in your country, or typical freelance rates in your industry? Is there anything else that helps to support how the project represents value for money?",
+                            "title": "How does the cost of the project represent value for the Midnight ecosystem?",
+                            "description": "How does the cost of the project represent value for the Midnight ecosystem?",
+                            "x-guidance": "Provide a compelling reason about how your project represents a good use of funds and justify how it will create value for the Midnight ecosystem.",
                             "minLength": 200,
                             "maxLength": 10240
                         }
@@ -1019,6 +1015,60 @@
             },
             "x-order": ["team", "budget", "value"],
             "required": ["team", "budget", "value"]
+        },
+        "self_assessment": {
+            "$ref": "#/definitions/segment",
+            "title": "Self-Assessment",
+            "x-icon": "shield-check",
+            "properties": {
+                "self_assessment_checklist": {
+                    "$ref": "#/definitions/section",
+                    "title": "Self-Assessment Checklist",
+                    "properties": {
+                        "strategic_fit": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Strategic Fit:",
+                            "title": "I confirm that the proposal clearly provides a basic prototype reference application for one of the areas of interest.",  
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "developer_experience": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Developer Experience Focus:",
+                            "title": "I confirm that the proposal clearly defines which part of the developer journey it improves and how it makes building on Midnight easier and more productive.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "open_source_commitment": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Open Source Commitment:",
+                            "title": "I confirm that the proposal explicitly states the chosen permissive open-source license (e.g., MIT, Apache 2.0) and commits to a public code repository.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "verifiable_builder_credentials": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Verifiable Builder Credentials:",
+                            "title": "I confirm that the team provides evidence of their technical ability and experience in creating developer tools or high-quality technical content (e.g., GitHub, portfolio).",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "quality_documentation": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "High-Quality Documentation:",
+                            "title": "I confirm that there is a plan for creating and maintaining clear, comprehensive documentation is a core part of the proposal's scope.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
+                        "realistic_scope": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Realistic Scope:",
+                            "title": "I confirm that the budget and timeline (3 months) are realistic for delivering the proposed tool or resource.",
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        }
+                    },
+                    "required": ["strategic_fit","developer_experience","open_source_commitment","verifiable_builder_credentials","quality_documentation", "realistic_scope"],
+                    "x-order": ["strategic_fit","developer_experience","open_source_commitment","verifiable_builder_credentials","quality_documentation", "realistic_scope"]
+                }
+            },
+            "x-order": [
+                "self_assessment_checklist"
+            ]
         },
         "agreements": {
             "$ref": "#/definitions/segment",
@@ -1075,8 +1125,8 @@
                     "properties": {
                         "terms_and_conditions": {
                             "$ref": "#/definitions/agreementConfirmation",
-                            "title": "Terms and Conditions:",
-                            "description": "I confirm that I have read, understand and shall adhere to the [Terms & Conditions](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions), [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules), [Privacy Policy](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy). I understand that providing accurate and truthful information is essential for my proposal to remain eligible to participate in the current Fund."
+                            "title": "I Agree",
+                            "description": "I confirm that I have read, understand and shall adhere to the [Project Catalyst Terms and Conditions – Midnight Compact DApps Submissions](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/project-catalyst-terms-and-conditions-midnight-compact-dapps-submissions), [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules), [Privacy Policy](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy). I understand that providing accurate and truthful information is essential for my proposal to remain eligible to participate in the current Fund."
                         }
                     },
                     "required": ["terms_and_conditions"],
@@ -1096,6 +1146,7 @@
         "details",
         "milestones",
         "pitch",
+        "self_assessment",
         "agreements"
     ],
     "x-order": [
@@ -1106,6 +1157,7 @@
         "details",
         "milestones",
         "pitch",
+        "self_assessment",
         "agreements"
     ]
 }

@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/F14-Generic/0194d492-1daa-75b5-b4a4-5cf331cd8d1a.schema.json",
-    "title": "F14 Cardano Use Cases: Partners & Products Form",
-    "description": "Schema for the F14 Cardano Use Cases: Partners & Products Form",
+    "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/f14/0194d492-1daa-716f-a04e-f422f08a99dc.schema.json",
+    "title": "F14 Cardano Open: Ecosystem Form",
+    "description": "Schema for the F14 Cardano Open: Ecosystem Form",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
         "2025-07-04": [
@@ -335,10 +335,10 @@
                             "$ref": "#/definitions/tokenValueCardanoADA",
                             "title": "Enter the amount of funding you are requesting in ADA",
                             "description": "The amount of funding requested for your proposal",
-                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Use Cases: Partners & Products**\n\n- Minimum Funding Amount per proposal: **₳250K**\n- Maximum Funding Amount per proposal: **₳1M**",
+                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Open: Ecosystem**\n\n- Minimum Funding Amount per proposal: **₳15K**\n- Maximum Funding Amount per proposal: **₳60K**",
                             "x-placeholder": "Enter the amount of funding you are requesting in ADA",
-                            "minimum": 250000,
-                            "maximum": 1000000
+                            "minimum": 15000,
+                            "maximum": 60000
                         }
                     },
                     "required": [
@@ -524,39 +524,39 @@
                     "$ref": "#/definitions/section",
                     "title": "Category Questions",
                     "description": "Answer the following questions to determine the eligibility of your proposal.",
-                    "x-guidance": "General Guidance\n\nIn consideration of the Reviewers assessing your proposal, be concise and use bulleted lists where possible.",
+                    "x-guidance": "General Guidance\n\nIn consideration of the Reviewers assessing your proposal, be concise and use bulleted lists where possible. Avoid any software or hardware development, even if it seems minor.",
                     "properties": {
-                        "established_partnership": {
+                        "target_market": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Describe your established collaborations.",
+                            "title": "Who you’re targeting, how you’ll reach them, and why this matters for Cardano.",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your rationale for your established collaborations.",
-                            "x-guidance": "Established collaborations\n\n- Clearly identify the collaborators and describe their role in your project.\n- Describe the nature of the collaboration and, where applicable, include links to public materials (e.g., press releases, public endorsements).\n- If confidential, contact the Catalyst team.",
+                            "description": "Please provide your rationale for your target market.",
+                            "x-guidance": "Grassroots Growth & Onboarding\n\n- Number of new wallets created or ADA transactions initiated.\n- Growth in local/regional community participation.\n- Collaborations formed with local organizations, schools, or groups.",
                             "minLength": 200,
                             "maxLength": 600
                         },
-                        "funding_commitments": {
+                        "key_activities": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Describe funding commitments.",
+                            "title": "Provide a list of key activities of your project?",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your rationale for your funding commitments.",
-                            "x-guidance": "Collaborator funding commitments\n\n- Clearly state contributors, including the nature and amount.\n- If confidential, contact the Catalyst team.",
+                            "description": "Please provide your rationale for your key activities.",
+                            "x-guidance": "Education & Awareness\n\n- Number of educational sessions, workshops, or webinars held.\n- Total number of participants reached or trained, and retention rates.\n- Increase in Cardano-related knowledge (measured via pre/post surveys or quizzes).",
                             "minLength": 200,
                             "maxLength": 600
                         },
                          "performance_metrics": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Describe your key performance metrics.",
+                            "title": "What are your success metrics?",
                             "x-placeholder": "Please provide your rationale.",
-                            "description": "Please provide your rationale for your key performance metrics.",
-                            "x-guidance": "Key Performance Metrics (KPIs)\n\n- For instance, data (user numbers, transactions, traffic, adoption rates), screenshots of dashboards or live analytics.\n- Contextualize why your KPIs matter for your project goals.",
+                            "description": "Please provide your rationale for your success metrics.",
+                            "x-guidance": "Community Engagement\n\n- Number of new community groups or meetups formed.\n- Number of events or meetups organized.\n- Event attendance and retention rates (in-person or online).\n- Participant feedback scores or testimonials.\n- Social media growth (followers, engagement rates).\n- Mailing list or community channel sign-ups.",
                             "minLength": 200,
                             "maxLength": 600
                         }
                         
                     },
-                    "required": ["established_partnership", "funding_commitments", "performance_metrics"],
-                    "x-order": ["established_partnership", "funding_commitments", "performance_metrics"]
+                    "required": ["target_market", "key_activities", "performance_metrics"],
+                    "x-order": ["target_market", "key_activities", "performance_metrics"]
                 }
             },
             "x-order": ["category_details", "category_questions"]
