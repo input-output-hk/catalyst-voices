@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/pages/overall_spaces/space/space_overview_header.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space/space_overview_nav_tile.dart';
-import 'package:catalyst_voices/pages/overall_spaces/space/user_proposal_overview/user_proposals_overview.dart';
+import 'package:catalyst_voices/pages/overall_spaces/space/user_proposal_overview/workspace_overview_proposal.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space_overview_container.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';

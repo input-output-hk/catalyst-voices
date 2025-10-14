@@ -1,4 +1,12 @@
-part of 'user_proposals_overview.dart';
+import 'package:catalyst_voices/common/typedefs.dart';
+import 'package:catalyst_voices/pages/overall_spaces/space/user_proposal_overview/widgets/error_user_proposal_overview.dart';
+import 'package:catalyst_voices/pages/overall_spaces/space/user_proposal_overview/widgets/loading_user_proposal_overview.dart';
+import 'package:catalyst_voices/pages/overall_spaces/space/user_proposal_overview/widgets/user_proposals_overview_header.dart';
+import 'package:catalyst_voices/pages/overall_spaces/space/user_proposal_overview/widgets/user_proposals_overview_list.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:flutter/material.dart';
 
 class DiscoveryOverviewProposal extends StatelessWidget {
   const DiscoveryOverviewProposal({super.key});
@@ -7,8 +15,8 @@ class DiscoveryOverviewProposal extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Stack(
       children: [
-        _LoadingProposalOverview(),
-        _ErrorProposalOverview(),
+        LoadingProposalOverview(),
+        ErrorProposalOverview(),
         _DiscoveryOverviewProposalData(),
       ],
     );
@@ -35,12 +43,12 @@ class _DiscoveryOverviewProposalData extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _Header(
+                  UserProposalsOverviewHeader(
                     title: context.l10n.publishedProposals,
                   ),
                   Offstage(
                     offstage: !state.show,
-                    child: _UserProposalsOverviewList(
+                    child: UserProposalsOverviewList(
                       proposals: state.data,
                       emptyMessage: context.l10n.noPublishedProposals,
                     ),
