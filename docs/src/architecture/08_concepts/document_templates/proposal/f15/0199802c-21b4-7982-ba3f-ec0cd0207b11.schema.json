@@ -1034,7 +1034,7 @@
                             "title": "I confirm that the proposer and all team members are in good standing with prior Catalyst projects.",
                             "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
                         },
-                        "problem_usecase": {
+                        "problem_use_case": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Problem & Use Case:",
                             "title": "I confirm that the proposal clearly defines the problem and the value of the on-chain utility.",
@@ -1071,8 +1071,8 @@
                             "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
                         }
                     },
-                    "required": ["foundational_work","builder_credentials","catalyst_standing","problem_usecase","tangible_prototype", "technical_approach","realistic_scope", "community_engagement","budget_compliance"],
-                    "x-order": ["foundational_work","builder_credentials","catalyst_standing","problem_usecase","tangible_prototype", "technical_approach","realistic_scope", "community_engagement","budget_compliance"]
+                    "required": ["foundational_work","builder_credentials","catalyst_standing","problem_use_case","tangible_prototype", "technical_approach","realistic_scope", "community_engagement","budget_compliance"],
+                    "x-order": ["foundational_work","builder_credentials","catalyst_standing","problem_use_case","tangible_prototype", "technical_approach","realistic_scope", "community_engagement","budget_compliance"]
                 }
             },
             "x-order": [
