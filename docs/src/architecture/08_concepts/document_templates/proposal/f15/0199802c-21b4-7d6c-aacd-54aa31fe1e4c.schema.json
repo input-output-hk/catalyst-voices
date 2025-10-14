@@ -323,10 +323,11 @@
                     "title": "Budget Information",
                     "properties": {
                         "requestedFunds": {
-                            "$ref": "#/definitions/tokenValueCardanoADA",
+                            "$ref": "#/definitions/currency",
+                            "format": "token:usdm",
                             "title": "Enter the amount of funding you are requesting in $USDM",
                             "description": "Requested amount should be between $USDM 2,500 or $USDM 10,000",
-                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Midnight: Compact DApps**\n\n- Minimum Funding Amount per proposal: $USDM 2,500**\n- Maximum Funding Amount per proposal: $USDM 10,000**",
+                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Midnight: Compact DApps**\n\n- Minimum Funding Amount per proposal: **$USDM 2,500**\n- Maximum Funding Amount per proposal: **$USDM 10,000**",
                             "x-placeholder": "Requested amount should be between $USDM 2,500 or $USDM 10,000",
                             "minimum": 2500,
                             "maximum": 10000
@@ -473,7 +474,7 @@
                         },
                         "licenseInformation": {
                             "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "License and Additional Information",
+                            "title": "Please provide here more information on the open source status of your project outputs",
                             "description": "Please provide here more information on the open source status of your project outputs",
                             "x-placeholder": "",
                             "maxLength": 500,
@@ -832,7 +833,7 @@
                             "maxLength": 10240,
                             "title": "Please describe your proposed solution and how it addresses the problem",
                             "description": "Please describe your proposed solution and how it addresses the problem",
-                            "x-guidance": "How you write this section will depend on what type of proposal you are writing. You might want to include details on:\n\n- How do you perceive the problem you are solving?\n- What are your reasons for approaching it in the way that you have?\n- Who will your project engage?\n- Explain what is unique about your solution, who will benefit, and why this is important to Cardano."
+                            "x-guidance": "How you write this section will depend on what type of proposal you are writing. You might want to include details on:\n\n- How do you perceive the problem you are solving?\n- What are your reasons for approaching it in the way that you have?\n- Who will your project engage?\n- Explain what is unique about your solution, who will benefit, and why this is important to Midnight."
                         }
                     },
                     "required": ["solution"]
@@ -1018,7 +1019,7 @@
         "self_assessment": {
             "$ref": "#/definitions/segment",
             "title": "Self-Assessment",
-            "x-icon": "double_check",
+            "x-icon": "shield-check",
             "properties": {
                 "self_assessment_checklist": {
                     "$ref": "#/definitions/section",
@@ -1125,7 +1126,7 @@
                         "terms_and_conditions": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "title": "I Agree",
-                            "description": "I confirm that I have read, understand and shall adhere to the [Terms & Conditions](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions), [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules), [Privacy Policy](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy). I understand that providing accurate and truthful information is essential for my proposal to remain eligible to participate in the current Fund."
+                            "description": "I confirm that I have read, understand and shall adhere to the [Project Catalyst Terms and Conditions – Midnight Compact DApps Submissions](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/project-catalyst-terms-and-conditions-midnight-compact-dapps-submissions), [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules), [Privacy Policy](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy). I understand that providing accurate and truthful information is essential for my proposal to remain eligible to participate in the current Fund."
                         }
                     },
                     "required": ["terms_and_conditions"],

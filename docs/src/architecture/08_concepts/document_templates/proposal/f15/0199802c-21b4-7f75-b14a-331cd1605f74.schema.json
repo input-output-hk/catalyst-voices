@@ -322,7 +322,7 @@
                             "$ref": "#/definitions/tokenValueCardanoADA",
                             "title": "Enter the amount of funding you are requesting in ADA",
                             "description": "Requested amount should be between $ADA 15,000 and $ADA 60,000",
-                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Concepts: Prototype & Launch**\n\n- Minimum Funding Amount per proposal: **$ADA 15,000**\n- Maximum Funding Amount per proposal: **$ADA 60,000**",
+                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Open: Ecosystem**\n\n- Minimum Funding Amount per proposal: **$ADA 15,000**\n- Maximum Funding Amount per proposal: **$ADA 60,000**",
                             "x-placeholder": "Requested amount should be between $ADA 15,000 and $ADA 60,000",
                             "minimum": 15000,
                             "maximum": 200000
@@ -1010,7 +1010,7 @@
         "self_assessment": {
             "$ref": "#/definitions/segment",
             "title": "Self-Assessment",
-            "x-icon": "double_check",
+            "x-icon": "shield-check",
             "properties": {
                 "self_assessment_checklist": {
                     "$ref": "#/definitions/section",

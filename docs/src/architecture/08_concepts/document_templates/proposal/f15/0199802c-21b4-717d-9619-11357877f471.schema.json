@@ -423,7 +423,7 @@
                         "links": {
                             "$ref": "#/definitions/singleLineHttpsURLEntryList",
                             "title": "Supporting links",
-                            "description": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS.",
+                            "description": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS. Please make sure that submitters own or have rights to share any linked content.",
                             "minItems": 0,
                             "maxItems": 5
                         }
@@ -451,7 +451,7 @@
                         }
                     },
                     "required": [
-                        "hasDependency", 
+                        "hasDependency",
                         "dependencyDetail"
                     ]
                 },
@@ -468,7 +468,7 @@
                         },
                         "licenseInformation": {
                             "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "License and Additional Information",
+                            "title": "Please provide details on the intellectual property (IP) status of your project outputs, including whether they will be released as open source or retained under another licence. ",
                             "description": "Please provide details on the intellectual property (IP) status of your project outputs, including whether they will be released as open source or retained under another licence. ",
                             "x-placeholder": "If applicable, describe the IP status of your project and the license type",
                             "maxLength": 500,
@@ -1009,7 +1009,7 @@
         "self_assessment": {
             "$ref": "#/definitions/segment",
             "title": "Self-Assessment",
-            "x-icon": "double_check",
+            "x-icon": "shield-check",
             "properties": {
                 "self_assessment_checklist": {
                     "$ref": "#/definitions/section",

@@ -1010,7 +1010,7 @@
         "self_assessment": {
             "$ref": "#/definitions/segment",
             "title": "Self-Assessment",
-            "x-icon": "double_check",
+            "x-icon": "shield-check",
             "properties": {
                 "self_assessment_checklist": {
                     "$ref": "#/definitions/section",
