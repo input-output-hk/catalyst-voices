@@ -28,6 +28,7 @@ final class AppConfig extends Equatable {
   final SentryConfig sentry;
   final BlockchainConfig blockchain;
   final StressTestConfig stressTest;
+  final CatalystDeveloperProfilerConfig developerProfiler;
 
   const AppConfig({
     required this.version,
@@ -36,6 +37,7 @@ final class AppConfig extends Equatable {
     required this.sentry,
     required this.blockchain,
     required this.stressTest,
+    required this.developerProfiler,
   });
 
   AppConfig.dev()
@@ -67,6 +69,7 @@ final class AppConfig extends Equatable {
           slotNumberConfig: BlockchainSlotNumberConfig.testnet(),
         ),
         stressTest: const StressTestConfig(),
+        developerProfiler: const CatalystDeveloperProfilerConfig(),
       );
 
   factory AppConfig.env(AppEnvironmentType env) {
@@ -107,6 +110,7 @@ final class AppConfig extends Equatable {
           slotNumberConfig: BlockchainSlotNumberConfig.testnet(),
         ),
         stressTest: const StressTestConfig(),
+        developerProfiler: const CatalystDeveloperProfilerConfig(),
       );
 
   AppConfig.prod()
@@ -138,6 +142,7 @@ final class AppConfig extends Equatable {
           slotNumberConfig: BlockchainSlotNumberConfig.mainnet(),
         ),
         stressTest: const StressTestConfig(),
+        developerProfiler: const CatalystDeveloperProfilerConfig(),
       );
 
   @override
@@ -148,6 +153,7 @@ final class AppConfig extends Equatable {
     sentry,
     blockchain,
     stressTest,
+    developerProfiler,
   ];
 
   AppConfig copyWith({
@@ -157,6 +163,7 @@ final class AppConfig extends Equatable {
     SentryConfig? sentry,
     BlockchainConfig? blockchain,
     StressTestConfig? stressTest,
+    CatalystDeveloperProfilerConfig? developerProfiler,
   }) {
     return AppConfig(
       version: version ?? this.version,
@@ -165,6 +172,7 @@ final class AppConfig extends Equatable {
       sentry: sentry ?? this.sentry,
       blockchain: blockchain ?? this.blockchain,
       stressTest: stressTest ?? this.stressTest,
+      developerProfiler: developerProfiler ?? this.developerProfiler,
     );
   }
 }
