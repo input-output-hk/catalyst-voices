@@ -414,11 +414,11 @@
   "@catalystKnowledgeBase": {
     "description": "Menu item text for accessing knowledge base"
   },
-  "catalystPrivacyPolicy": "Catalyst FC's Privacy Policy",
+  "catalystPrivacyPolicy": "Project Catalyst Platform Privacy Policy",
   "@catalystPrivacyPolicy": {
-    "description": "Link to the Catalyst FC's Privacy Policy"
+    "description": "Link to the Catalyst Privacy Policy"
   },
-  "catalystTos": "Project Catalyst Terms and Conditions",
+  "catalystTos": "Project Catalyst Platform Terms of Use",
   "@catalystTos": {
     "description": "Link to the Catalyst FC's Terms and Conditions"
   },
