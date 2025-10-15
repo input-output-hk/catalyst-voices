@@ -29,10 +29,16 @@ class _Header extends StatelessWidget {
 }
 
 class _UserProposalsState extends State<UserProposals> {
-  List<UsersProposalOverview> get _draft => widget.items.where((e) => e.publish.isDraft).toList();
-  List<UsersProposalOverview> get _local => widget.items.where((e) => e.publish.isLocal).toList();
+  Iterable<UsersProposalOverview> get _active => widget.items.where((e) => e.fromActiveCampaign);
+
+  List<UsersProposalOverview> get _draft => _active.where((e) => e.publish.isDraft).toList();
+
+  Iterable<UsersProposalOverview> get _inactive => widget.items.where((e) => !e.fromActiveCampaign);
+
+  List<UsersProposalOverview> get _local => _active.where((e) => e.publish.isLocal).toList();
+
   List<UsersProposalOverview> get _submitted =>
-      widget.items.where((e) => e.publish.isPublished).toList();
+      _active.where((e) => e.publish.isPublished).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -74,6 +80,13 @@ class _UserProposalsState extends State<UserProposals> {
             info: context.l10n.notPublishedInfoMarkdown,
             learnMoreUrl: VoicesConstants.proposalPublishingDocsUrl,
           ),
+          if (_inactive.isNotEmpty)
+            UserProposalSection(
+              items: _inactive.toList(),
+              emptyTextMessage: '',
+              title: context.l10n.notActiveCampaign,
+              info: context.l10n.notActiveCampaignInfoMarkdown,
+            ),
         ],
       ),
     );

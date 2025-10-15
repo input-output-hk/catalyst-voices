@@ -62,19 +62,23 @@ class _Stats extends StatelessWidget {
         Expanded(
           child: _StatsItem(
             label: context.l10n.fundsAvailable,
-            value: category.availableFunds,
+            value: MoneyFormatter.formatMultiCurrencyAmount(
+              category.availableFunds,
+              formatter: MoneyFormatter.formatCompactRounded,
+              separator: ', ',
+            ),
           ),
         ),
         Expanded(
           child: _StatsItem(
             label: context.l10n.minBudgetRequest,
-            value: category.range.min,
+            value: MoneyFormatter.formatCompactRounded(category.range.min),
           ),
         ),
         Expanded(
           child: _StatsItem(
             label: context.l10n.maxBudgetRequest,
-            value: category.range.max,
+            value: MoneyFormatter.formatCompactRounded(category.range.max),
           ),
         ),
       ],
@@ -84,7 +88,7 @@ class _Stats extends StatelessWidget {
 
 class _StatsItem extends StatelessWidget {
   final String label;
-  final Coin value;
+  final String value;
 
   const _StatsItem({
     required this.label,
@@ -98,7 +102,7 @@ class _StatsItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          CryptocurrencyFormatter.formatAmount(value),
+          value,
           style: Theme.of(
             context,
           ).textTheme.titleLarge?.copyWith(color: context.colors.textOnPrimaryLevel1),

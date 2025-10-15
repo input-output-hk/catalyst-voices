@@ -25,7 +25,6 @@ class DiscoveryAppbar extends StatelessWidget implements PreferredSizeWidget {
     return CampaignPhaseAware.orElse(
       phase: CampaignPhaseType.proposalSubmission,
       showOnlyDataState: true,
-
       active: (_, _, _) =>
           _AppBar(isAppUnlock: isAppUnlock, isProposer: isProposer, isActivePhase: true),
       orElse: (_, _, _) =>
