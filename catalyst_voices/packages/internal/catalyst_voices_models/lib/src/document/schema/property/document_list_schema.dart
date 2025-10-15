@@ -55,7 +55,7 @@ final class DocumentGenericListSchema extends DocumentListSchema {
 
 sealed class DocumentListSchema extends DocumentPropertySchema {
   final DocumentPropertySchema itemsSchema;
-  final NumRange<int>? itemsRange;
+  final Range<int?>? itemsRange;
   final bool uniqueItems;
 
   const DocumentListSchema({

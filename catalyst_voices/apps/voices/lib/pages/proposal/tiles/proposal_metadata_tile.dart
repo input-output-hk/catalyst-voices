@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_delivery_card.dart';
 import 'package:catalyst_voices/pages/proposal/widget/proposal_version.dart';
@@ -17,7 +16,7 @@ class ProposalMetadataTile extends StatelessWidget {
   final bool warningCreatedAt;
   final String? tag;
   final int? commentsCount;
-  final Coin? fundsRequested;
+  final Money? fundsRequested;
   final int? projectDuration;
   final int? milestoneCount;
 

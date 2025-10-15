@@ -21,10 +21,11 @@ final class DocumentNumberSchemaMapper {
     final defaultValue = schema.defaultValue as double?;
     final constValue = schema.constValue as double?;
     final enumValues = schema.enumValues?.cast<double>();
-    final numRange = NumRange.optionalRangeOf(
+    final numRange = Range.optionalRangeOf(
       min: schema.minimum?.toDouble(),
       max: schema.maximum?.toDouble(),
     );
+    final multipleOf = schema.multipleOf as double?;
     final definition = _DocumentNumberDefinition.fromDef(schema.definition());
 
     switch (definition) {
@@ -42,6 +43,7 @@ final class DocumentNumberSchemaMapper {
           constValue: constValue,
           enumValues: enumValues,
           numRange: numRange,
+          multipleOf: multipleOf,
         );
     }
   }

@@ -89,7 +89,7 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
       );
       final walletSummary = WalletSummaryData(
         walletName: walletInfo.metadata.name,
-        balance: CryptocurrencyFormatter.formatAmount(walletInfo.balance),
+        balance: MoneyFormatter.formatCompactRounded(walletInfo.balance.toMoney()),
         address: WalletAddressFormatter.formatShort(walletInfo.address),
         clipboardAddress: walletInfo.address.toBech32(),
         showLowBalance: walletInfo.balance < CardanoWalletDetails.minAdaForRegistration,
@@ -111,7 +111,9 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
       return true;
     } on WalletApiException catch (error, stackTrace) {
       _logger.log(
-        error.code != WalletApiErrorCode.refused ? Level.SEVERE : Level.FINER,
+        error.code != WalletApiErrorCode.refused && error.code != WalletApiErrorCode.accountChange
+            ? Level.SEVERE
+            : Level.FINER,
         'select wallet',
         error,
         stackTrace,
