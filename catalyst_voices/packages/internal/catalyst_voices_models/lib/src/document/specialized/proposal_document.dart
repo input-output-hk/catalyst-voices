@@ -7,7 +7,7 @@ final class ProposalDocument extends Equatable {
   /// The maximum amount of proposal submitted for review per user.
   ///
   /// The limit does not have any effect on drafts or published proposals.
-  static const int maxSubmittedProposalsPerUser = 6;
+  static const int maxSubmittedProposalsPerUser = 2;
 
   /// A hardcoded [NodeId] of the title property.
   ///
