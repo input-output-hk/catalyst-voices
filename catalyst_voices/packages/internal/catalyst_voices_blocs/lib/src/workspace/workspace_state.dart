@@ -30,8 +30,7 @@ final class WorkspaceState extends Equatable {
     fundNumber,
   ];
 
-  bool get showError => error != null && !isLoading;
-  bool get showProposals => error == null;
+  bool get showProposals => error == null && !isLoading;
 
   DateTime? get submissionCloseDate => timelineItems
       .firstWhereOrNull(
@@ -86,31 +85,47 @@ final class WorkspaceStateUserProposals extends Equatable {
   });
 
   factory WorkspaceStateUserProposals.fromList(List<UsersProposalOverview> proposals) {
+    // Single-pass filtering for better performance
+    final localProposalsList = <UsersProposalOverview>[];
+    final draftProposalsList = <UsersProposalOverview>[];
+    final finalProposalsList = <UsersProposalOverview>[];
+    final publishedList = <UsersProposalOverview>[];
+    final notPublishedList = <UsersProposalOverview>[];
+    var hasComments = false;
+
+    for (final proposal in proposals) {
+      if (!hasComments && proposal.commentsCount > 0) {
+        hasComments = true;
+      }
+
+      switch (proposal.publish) {
+        case ProposalPublish.localDraft:
+          localProposalsList.add(proposal);
+          notPublishedList.add(proposal);
+        case ProposalPublish.publishedDraft:
+          draftProposalsList.add(proposal);
+          publishedList.add(proposal);
+          // Check for newer local version
+          if (proposal.versions.any((version) => version.isLatestLocal)) {
+            notPublishedList.add(proposal);
+          }
+        case ProposalPublish.submittedProposal:
+          finalProposalsList.add(proposal);
+          publishedList.add(proposal);
+          // Check for newer local version
+          if (proposal.versions.any((version) => version.isLatestLocal)) {
+            notPublishedList.add(proposal);
+          }
+      }
+    }
+
     return WorkspaceStateUserProposals(
-      localProposals: UserProposalsView(
-        items: proposals.where((element) => element.publish == ProposalPublish.localDraft).toList(),
-      ),
-      draftProposals: UserProposalsView(
-        items: proposals.where((e) => e.publish == ProposalPublish.publishedDraft).toList(),
-      ),
-      finalProposals: UserProposalsView(
-        items: proposals.where((e) => e.publish == ProposalPublish.submittedProposal).toList(),
-      ),
-      published: UserProposalsView(
-        items: proposals.where((e) => (e.publish.isPublished || e.publish.isDraft)).toList(),
-      ),
-      notPublished: UserProposalsView(
-        items: proposals
-            .where(
-              (element) =>
-                  element.versions.any((version) => version.isLatestLocal) ||
-                  element.publish == ProposalPublish.localDraft,
-            )
-            .toList(),
-      ),
-      hasComments: proposals.any(
-        (e) => e.commentsCount > 0,
-      ),
+      localProposals: UserProposalsView(items: localProposalsList),
+      draftProposals: UserProposalsView(items: draftProposalsList),
+      finalProposals: UserProposalsView(items: finalProposalsList),
+      published: UserProposalsView(items: publishedList),
+      notPublished: UserProposalsView(items: notPublishedList),
+      hasComments: hasComments,
     );
   }
 

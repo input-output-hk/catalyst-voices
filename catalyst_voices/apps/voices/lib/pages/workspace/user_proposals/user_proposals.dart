@@ -13,26 +13,39 @@ class UserProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _Header(),
-          _Divider(),
-          SizedBox(height: 20),
-          _UserSubmittedProposals(
-            key: Key('UsersSubmittedProposalsList'),
+    return const SliverMainAxisGroup(
+      slivers: <Widget>[
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: 32),
+          sliver: SliverToBoxAdapter(
+            child: _Header(),
           ),
-          _UserDraftProposals(
-            key: Key('UsersDraftProposalsList'),
+        ),
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: 32),
+          sliver: SliverToBoxAdapter(
+            child: _Divider(),
           ),
-          _UserLocalProposals(
-            key: Key('UsersLocalProposalsList'),
+        ),
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: 32),
+          sliver: SliverToBoxAdapter(
+            child: SizedBox(height: 20),
           ),
-        ],
-      ),
+        ),
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: 32),
+          sliver: _UserSubmittedProposals(),
+        ),
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: 32),
+          sliver: _UserDraftProposals(),
+        ),
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: 32),
+          sliver: _UserLocalProposals(),
+        ),
+      ],
     );
   }
 }
@@ -64,7 +77,7 @@ class _Header extends StatelessWidget {
 }
 
 class _UserDraftProposals extends StatelessWidget {
-  const _UserDraftProposals({super.key});
+  const _UserDraftProposals();
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +99,7 @@ class _UserDraftProposals extends StatelessWidget {
 }
 
 class _UserLocalProposals extends StatelessWidget {
-  const _UserLocalProposals({super.key});
+  const _UserLocalProposals();
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +121,7 @@ class _UserLocalProposals extends StatelessWidget {
 }
 
 class _UserSubmittedProposals extends StatelessWidget {
-  const _UserSubmittedProposals({super.key});
+  const _UserSubmittedProposals();
 
   @override
   Widget build(BuildContext context) {
