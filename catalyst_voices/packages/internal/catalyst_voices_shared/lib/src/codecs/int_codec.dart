@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-/// A [Codec] that parser [int] from decimal [String].
+/// A [Codec] that parses [int] from decimal [String].
 class IntCodec extends Codec<int, String> {
   const IntCodec();
 
@@ -22,5 +22,5 @@ class IntEncoder extends Converter<int, String> {
   const IntEncoder();
 
   @override
-  String convert(int input) => '$input';
+  String convert(int input) => input.toString();
 }

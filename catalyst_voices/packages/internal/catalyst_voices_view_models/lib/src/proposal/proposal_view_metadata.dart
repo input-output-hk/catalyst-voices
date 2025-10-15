@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
@@ -11,7 +10,7 @@ final class ProposalViewMetadata extends Equatable {
   final bool warningCreatedAt;
   final String? tag;
   final int? commentsCount;
-  final Coin? fundsRequested;
+  final Money? fundsRequested;
   final int? projectDuration;
   final int? milestoneCount;
 

@@ -8,8 +8,6 @@ abstract class VoicesConstants {
 
   /// External urls
   static const supportedWalletsUrl = '$_docs/current-fund/voter-registration/supported-wallets';
-  static const f14ProposalSubmissionNoticeUrl =
-      '$_docs/current-fund/fund-basics/fund14-proposal-submission-notice';
   static const tosUrl =
       '$_docs/current-fund/fund-basics/project-catalyst-terms-and-conditions/project-catalyst-platform-terms-of-use';
   static const conditionsUrl =
@@ -46,9 +44,8 @@ abstract class VoicesConstants {
   static const campaignTimeline = '$_docs/current-fund/fund-basics/fund-timeline';
   static const milestoneGuideline =
       '$_docs/current-fund/project-onboarding/milestone-based-proposals';
-  static const projectCatalystFund14Url = '$_projectCatalyst/funds/14';
 
-  VoicesConstants._();
+  const VoicesConstants._();
 
   static String cardanoScanStakeAddressUrl(ShelleyAddress stakeAddress) {
     switch (stakeAddress.network) {
@@ -58,4 +55,9 @@ abstract class VoicesConstants {
         return 'https://preprod.cardanoscan.io/stakekey/${stakeAddress.toBech32()}';
     }
   }
+
+  static String fundProposalSubmissionNoticeUrl(int fundNumber) =>
+      '$_docs/current-fund/fund-basics/fund$fundNumber-proposal-submission-notice';
+
+  static String projectCatalystFundUrl(int fundNumber) => '$_projectCatalyst/funds/$fundNumber';
 }
