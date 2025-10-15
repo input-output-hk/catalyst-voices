@@ -48,10 +48,10 @@ pub(crate) struct ProposalTemplateDocData(
 /// List of proposal templates, proposals each of which is uniquely associated with one of the predefined categories.
 #[rustfmt::skip]
 pub(crate) const PROPOSAL_TEMPLATES: [ProposalTemplateDocData; 4] = [
-    ProposalTemplateDocData("0199802c-21b4-717d-9619-11357877f471", CATEGORY_DOCUMENTS[0].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/f14/0194d492-1daa-75b5-b4a4-5cf331cd8d1a.schema.json")),
-    ProposalTemplateDocData("0199802c-21b4-7982-ba3f-ec0cd0207b11", CATEGORY_DOCUMENTS[1].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/f14/0194d492-1daa-7371-8bd3-c15811b2b063.schema.json")),
-    ProposalTemplateDocData("0199802c-21b4-7f75-b14a-331cd1605f74", CATEGORY_DOCUMENTS[2].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/f14/0194d492-1daa-79c7-a222-2c3b581443a8.schema.json")),
-    ProposalTemplateDocData("0199802c-21b4-7d6c-aacd-54aa31fe1e4c", CATEGORY_DOCUMENTS[3].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/f14/0194d492-1daa-716f-a04e-f422f08a99dc.schema.json")),
+    ProposalTemplateDocData("0199802c-21b4-717d-9619-11357877f471", CATEGORY_DOCUMENTS[0].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/f15/0199802c-21b4-717d-9619-11357877f471.schema.json")),
+    ProposalTemplateDocData("0199802c-21b4-7982-ba3f-ec0cd0207b11", CATEGORY_DOCUMENTS[1].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/f15/0199802c-21b4-7982-ba3f-ec0cd0207b11.schema.json")),
+    ProposalTemplateDocData("0199802c-21b4-7f75-b14a-331cd1605f74", CATEGORY_DOCUMENTS[2].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/f15/0199802c-21b4-7f75-b14a-331cd1605f74.schema.json")),
+    ProposalTemplateDocData("0199802c-21b4-7d6c-aacd-54aa31fe1e4c", CATEGORY_DOCUMENTS[3].0, include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/proposal/f15/0199802c-21b4-7d6c-aacd-54aa31fe1e4c.schema.json")),
 ];
 
 impl From<ProposalTemplateDocData> for SignedDocData {
@@ -88,7 +88,7 @@ impl From<CommentTemplateDocData> for SignedDocData {
             id: value.0,
             ver: value.0,
             doc_type: catalyst_signed_doc::doc_types::COMMENT_TEMPLATE_UUID_TYPE,
-            content: include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/comments/f14/0b8424d4-ebfd-46e3-9577-1775a69d290c.schema.json"),
+            content: include_bytes!("../../../../../../../docs/src/architecture/08_concepts/document_templates/comments/f15/53224f27-5ad0-4a0b-a0af-7e04e4c14622.schema.json"),
             category_id: Some(value.1),
         }
     }
