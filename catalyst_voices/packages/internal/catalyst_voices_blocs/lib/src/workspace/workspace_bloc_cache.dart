@@ -20,12 +20,12 @@ final class WorkspaceBlocCache extends Equatable {
   ];
 
   WorkspaceBlocCache copyWith({
-    Campaign? campaign,
-    List<UsersProposalOverview>? proposals,
+    Optional<Campaign>? campaign,
+    Optional<List<UsersProposalOverview>>? proposals,
   }) {
     return WorkspaceBlocCache(
-      campaign: campaign ?? this.campaign,
-      proposals: proposals ?? this.proposals,
+      campaign: campaign.dataOr(this.campaign),
+      proposals: proposals.dataOr(this.proposals),
     );
   }
 }

@@ -75,13 +75,9 @@ class _ProposalVisibility extends StatelessWidget {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
 
-    return SliverAnimatedOpacity(
-      opacity: isExpanded ? 1.0 : 0.0,
-      duration: const Duration(milliseconds: 200),
-      sliver: _ListOfProposals(
-        items: items,
-        emptyTextMessage: emptyTextMessage,
-      ),
+    return _ListOfProposals(
+      items: items,
+      emptyTextMessage: emptyTextMessage,
     );
   }
 }

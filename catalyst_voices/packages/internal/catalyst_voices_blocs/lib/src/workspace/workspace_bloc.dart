@@ -51,19 +51,6 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     return super.close();
   }
 
-  /// Removes a proposal from the cache by its reference.
-  void _removeProposalFromCache(DocumentRef ref) {
-    final updatedProposals = _cache.proposals?.where((e) => e.selfRef.id != ref.id).toList() ?? [];
-    _cache = _cache.copyWith(proposals: updatedProposals);
-  }
-
-  /// Rebuilds WorkspaceStateUserProposals from the current cache.
-  /// This ensures derived views (published, notPublished, hasComments) stay in sync.
-  WorkspaceStateUserProposals _rebuildProposalsState() {
-    final proposals = _cache.proposals ?? [];
-    return WorkspaceStateUserProposals.fromList(proposals);
-  }
-
   DocumentDataContent _buildDocumentContent(Document document) {
     return _documentMapper.toContent(document);
   }
@@ -167,7 +154,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     final campaign = await _campaignService.getActiveCampaign();
-    _cache = _cache.copyWith(campaign: campaign);
+    _cache = _cache.copyWith(campaign: Optional(campaign));
 
     if (campaign == null) {
       return emitError(const LocalizedUnknownException());
@@ -197,7 +184,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   Future<void> _loadProposals(LoadProposalsEvent event, Emitter<WorkspaceState> emit) async {
-    _cache = _cache.copyWith(proposals: event.proposals);
+    _cache = _cache.copyWith(proposals: Optional(event.proposals));
 
     emit(
       state.copyWith(
@@ -215,7 +202,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     final futures = proposals.map((proposal) async {
       if (_cache.campaign == null) {
         final campaign = await _campaignService.getActiveCampaign();
-        _cache = _cache.copyWith(campaign: campaign);
+        _cache = _cache.copyWith(campaign: Optional(campaign));
       }
       final category = _cache.campaign?.categories.firstWhere(
         (e) => e.selfRef.id == proposal.categoryRef.id,
@@ -228,6 +215,19 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     }).toList();
 
     return Future.wait(futures);
+  }
+
+  /// Rebuilds WorkspaceStateUserProposals from the current cache.
+  /// This ensures derived views (published, notPublished, hasComments) stay in sync.
+  WorkspaceStateUserProposals _rebuildProposalsState() {
+    final proposals = _cache.proposals ?? [];
+    return WorkspaceStateUserProposals.fromList(proposals);
+  }
+
+  /// Removes a proposal from the cache by its reference.
+  void _removeProposalFromCache(DocumentRef ref) {
+    final updatedProposals = _cache.proposals?.where((e) => e.selfRef.id != ref.id).toList() ?? [];
+    _cache = _cache.copyWith(proposals: Optional(updatedProposals));
   }
 
   void _setupProposalsSubscription() {

@@ -13,39 +13,24 @@ class UserProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SliverMainAxisGroup(
-      slivers: <Widget>[
-        SliverPadding(
-          padding: EdgeInsets.symmetric(horizontal: 32),
-          sliver: SliverToBoxAdapter(
+    return const SliverPadding(
+      padding: EdgeInsets.symmetric(horizontal: 32),
+      sliver: SliverMainAxisGroup(
+        slivers: <Widget>[
+          SliverToBoxAdapter(
             child: _Header(),
           ),
-        ),
-        SliverPadding(
-          padding: EdgeInsets.symmetric(horizontal: 32),
-          sliver: SliverToBoxAdapter(
+          SliverToBoxAdapter(
             child: _Divider(),
           ),
-        ),
-        SliverPadding(
-          padding: EdgeInsets.symmetric(horizontal: 32),
-          sliver: SliverToBoxAdapter(
+          SliverToBoxAdapter(
             child: SizedBox(height: 20),
           ),
-        ),
-        SliverPadding(
-          padding: EdgeInsets.symmetric(horizontal: 32),
-          sliver: _UserSubmittedProposals(),
-        ),
-        SliverPadding(
-          padding: EdgeInsets.symmetric(horizontal: 32),
-          sliver: _UserDraftProposals(),
-        ),
-        SliverPadding(
-          padding: EdgeInsets.symmetric(horizontal: 32),
-          sliver: _UserLocalProposals(),
-        ),
-      ],
+          _UserSubmittedProposals(),
+          _UserDraftProposals(),
+          _UserLocalProposals(),
+        ],
+      ),
     );
   }
 }
