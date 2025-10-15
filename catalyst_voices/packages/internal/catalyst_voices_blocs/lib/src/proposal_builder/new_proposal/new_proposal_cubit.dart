@@ -32,7 +32,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
       emit(state.copyWith(isCreatingProposal: true));
 
       final title = state.title.value;
-      final categoryId = state.categoryRef;
+      final categoryId = state.categoryId;
 
       if (categoryId == null) {
         throw StateError('Cannot create draft, category not selected');
@@ -69,10 +69,10 @@ class NewProposalCubit extends Cubit<NewProposalState>
     }
   }
 
-  Future<void> load({SignedDocumentRef? categoryRef}) async {
+  Future<void> load({SignedDocumentRef? categoryId}) async {
     try {
       emit(NewProposalState.loading());
-      final step = categoryRef == null
+      final step = categoryId == null
           ? const CreateProposalWithoutPreselectedCategoryStep()
           : const CreateProposalWithPreselectedCategoryStep();
       final campaign = await _campaignService.getActiveCampaign();
@@ -87,7 +87,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
       final templateRef = campaign.categories
           .cast<CampaignCategory?>()
           .firstWhere(
-            (e) => e?.selfRef == categoryRef,
+            (e) => e?.selfRef == categoryId,
             orElse: () => campaign.categories.firstOrNull,
           )
           ?.proposalTemplateRef;
@@ -104,7 +104,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
       final newState = state.copyWith(
         isLoading: false,
         step: step,
-        categoryRef: Optional(categoryRef),
+        categoryId: Optional(categoryId),
         titleLengthRange: Optional(titleRange),
         categories: categories,
       );
@@ -134,10 +134,10 @@ class NewProposalCubit extends Cubit<NewProposalState>
     emit(state.copyWith(isAgreeToNoFurtherCategoryChange: value));
   }
 
-  void updateSelectedCategory(SignedDocumentRef? categoryRef) {
+  void updateSelectedCategory(SignedDocumentRef? categoryId) {
     emit(
       state.copyWith(
-        categoryRef: Optional(categoryRef),
+        categoryId: Optional(categoryId),
         isAgreeToCategoryCriteria: false,
         isAgreeToNoFurtherCategoryChange: false,
       ),

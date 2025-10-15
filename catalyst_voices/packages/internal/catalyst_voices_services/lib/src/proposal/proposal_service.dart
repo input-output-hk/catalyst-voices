@@ -185,7 +185,7 @@ final class ProposalServiceImpl implements ProposalService {
           type: DocumentType.proposalDocument,
           selfRef: draftRef,
           template: template,
-          categoryId: categoryId,
+          parameters: [categoryId],
           authors: [catalystId],
         ),
         content: content,
@@ -302,7 +302,7 @@ final class ProposalServiceImpl implements ProposalService {
           .toList();
     }
 
-    final categoriesRefs = proposals.map((proposal) => proposal.categoryRef).toSet();
+    final categoriesRefs = proposals.map((proposal) => proposal.categoryId).toSet();
 
     // If we are getting proposals then campaign needs to be active
     // Getting whole campaign with list of categories saves time then calling to get each category separately
@@ -322,7 +322,7 @@ final class ProposalServiceImpl implements ProposalService {
         .map(
           (proposal) => ProposalWithContext(
             proposal: proposal,
-            category: categories[proposal.categoryRef.id]!,
+            category: categories[proposal.categoryId.id]!,
             user: const ProposalUserContext(),
           ),
         )
@@ -484,7 +484,7 @@ final class ProposalServiceImpl implements ProposalService {
           type: DocumentType.proposalDocument,
           selfRef: selfRef,
           template: template,
-          categoryId: categoryId,
+          parameters: [categoryId],
           authors: [catalystId],
         ),
         content: content,

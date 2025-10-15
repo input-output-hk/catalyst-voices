@@ -57,15 +57,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   DocumentDataMetadata _buildDocumentMetadata(ProposalDocument document) {
-    final selfRef = document.metadata.selfRef;
-    final categoryId = document.metadata.categoryId;
-    final templateRef = document.metadata.templateRef;
-
     return DocumentDataMetadata(
       type: DocumentType.proposalDocument,
-      selfRef: selfRef,
-      template: templateRef,
-      categoryId: categoryId,
+      selfRef: document.metadata.selfRef,
+      template: document.metadata.templateRef,
+      parameters: document.metadata.parameters,
     );
   }
 
@@ -192,7 +188,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       final campaigns = Campaign.all;
 
       final categories = campaigns.expand((element) => element.categories);
-      final category = categories.firstWhereOrNull((e) => e.selfRef.id == proposal.categoryRef.id);
+      final category = categories.firstWhereOrNull((e) => e.selfRef.id == proposal.categoryId.id);
 
       // TODO(damian-molinski): refactor it
       final fundNumber = category != null

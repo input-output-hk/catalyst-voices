@@ -34,9 +34,7 @@ final class DocumentDataFactory {
       template: document.metadata.template?.toModel(),
       reply: document.metadata.reply?.toModel(),
       section: document.metadata.section,
-      brandId: document.metadata.brandId?.toModel(),
-      campaignId: document.metadata.campaignId?.toModel(),
-      categoryId: document.metadata.categoryId?.toModel(),
+      parameters: document.metadata.parameters.map((e) => e.toModel()).toList(),
       authors: document.signers,
     );
 

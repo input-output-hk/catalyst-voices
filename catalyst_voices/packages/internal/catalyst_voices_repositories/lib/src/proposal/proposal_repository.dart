@@ -33,7 +33,7 @@ abstract interface class ProposalRepository {
   });
 
   Future<List<ProposalData>> getProposals({
-    SignedDocumentRef? categoryRef,
+    SignedDocumentRef? categoryId,
     required ProposalsFilterType type,
   });
 
@@ -171,11 +171,11 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<List<ProposalData>> getProposals({
-    SignedDocumentRef? categoryRef,
+    SignedDocumentRef? categoryId,
     required ProposalsFilterType type,
   }) async {
     return _proposalsLocalSource
-        .getProposals(type: type, categoryRef: categoryRef)
+        .getProposals(type: type, categoryId: categoryId)
         .then((value) => value.map(_buildProposalData).toList());
   }
 
@@ -235,7 +235,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         id: actionRef.id,
         ver: actionRef.version,
         ref: SignedDocumentMetadataRef.fromDocumentRef(proposalRef),
-        categoryId: SignedDocumentMetadataRef.fromDocumentRef(categoryId),
+        parameters: [
+          SignedDocumentMetadataRef.fromDocumentRef(categoryId),
+        ],
       ),
       catalystId: catalystId,
       privateKey: privateKey,
@@ -410,7 +412,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final metadata = ProposalMetadata(
       selfRef: documentData.metadata.selfRef,
       templateRef: documentData.metadata.template!,
-      categoryId: documentData.metadata.categoryId!,
+      parameters: documentData.metadata.parameters,
       authors: documentData.metadata.authors ?? [],
     );
 
@@ -450,7 +452,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     DocumentDataMetadata metadata,
   ) {
     final template = metadata.template;
-    final categoryId = metadata.categoryId;
 
     return SignedDocumentMetadata(
       contentType: SignedDocumentContentType.json,
@@ -458,7 +459,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       id: metadata.id,
       ver: metadata.version,
       template: template == null ? null : SignedDocumentMetadataRef.fromDocumentRef(template),
-      categoryId: categoryId == null ? null : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
+      parameters: metadata.parameters.map(SignedDocumentMetadataRef.fromDocumentRef).toList(),
     );
   }
 

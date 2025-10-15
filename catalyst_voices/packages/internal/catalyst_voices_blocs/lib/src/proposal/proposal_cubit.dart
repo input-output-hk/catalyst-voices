@@ -85,10 +85,10 @@ final class ProposalCubit extends Cubit<ProposalState>
       emit(state.copyWith(isLoading: true));
 
       final proposal = await _proposalService.getProposalDetail(ref: ref);
-      final category = await _campaignService.getCategory(proposal.document.metadata.categoryId);
-      final commentTemplate = await _commentService.getCommentTemplateFor(
-        category: proposal.document.metadata.categoryId,
-      );
+      // TODO(dt-iohk): fetch all categories, find out which parameter is the category and fetch the category
+      final categoryId = proposal.document.metadata.parameters.first;
+      final category = await _campaignService.getCategory(categoryId);
+      final commentTemplate = await _commentService.getCommentTemplateFor(category: categoryId);
       final isFavorite = await _proposalService.watchIsFavoritesProposal(ref: ref).first;
 
       _cache = _cache.copyWith(
@@ -155,7 +155,6 @@ final class ProposalCubit extends Cubit<ProposalState>
     SignedDocumentRef? reply,
   }) async {
     final proposalRef = _cache.ref;
-    final proposalCategoryId = _cache.proposal?.document.metadata.categoryId;
     assert(proposalRef != null, 'Proposal ref not found. Load document first!');
     assert(
       proposalRef is SignedDocumentRef,
@@ -168,8 +167,6 @@ final class ProposalCubit extends Cubit<ProposalState>
     final commentTemplate = _cache.commentTemplate;
     assert(commentTemplate != null, 'No comment template found!');
 
-    assert(proposalCategoryId != null, 'Proposal categoryId not found!');
-
     final commentRef = SignedDocumentRef.generateFirstRef();
     final comment = CommentDocument(
       metadata: CommentMetadata(
@@ -177,7 +174,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         ref: proposalRef! as SignedDocumentRef,
         template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
         reply: reply,
-        categoryId: proposalCategoryId,
+        parameters: _cache.proposal?.document.metadata.parameters ?? const [],
         authorId: activeAccountId!,
       ),
       document: document,

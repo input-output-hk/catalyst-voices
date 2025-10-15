@@ -78,14 +78,8 @@ final class SignedDocumentMetadata extends Equatable {
   /// or any collaborator that is given "author" privileges.
   final List<String>? collaborators;
 
-  /// A reference to the brand targeted by the document.
-  final SignedDocumentMetadataRef? brandId;
-
-  /// A reference to the campaign targeted by the document.
-  final SignedDocumentMetadataRef? campaignId;
-
-  /// A reference to the category targeted by the document.
-  final SignedDocumentMetadataRef? categoryId;
+  /// A list of referenced parameters, like brand, campaign or category.
+  final List<SignedDocumentMetadataRef> parameters;
 
   const SignedDocumentMetadata({
     required this.contentType,
@@ -97,9 +91,7 @@ final class SignedDocumentMetadata extends Equatable {
     this.reply,
     this.section,
     this.collaborators,
-    this.brandId,
-    this.campaignId,
-    this.categoryId,
+    this.parameters = const [],
   });
 
   @override
@@ -112,9 +104,7 @@ final class SignedDocumentMetadata extends Equatable {
     template,
     reply,
     collaborators,
-    brandId,
-    campaignId,
-    categoryId,
+    parameters,
   ];
 }
 

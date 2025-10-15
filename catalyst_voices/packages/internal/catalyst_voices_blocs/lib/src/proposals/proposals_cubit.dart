@@ -220,7 +220,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
         e.proposal,
         isFavorite: state.favoritesIds.contains(e.proposal.selfRef.id),
         categoryName: campaign.categories
-            .firstWhere((element) => element.selfRef == e.proposal.categoryRef)
+            .firstWhere((element) => element.selfRef == e.proposal.categoryId)
             .formattedCategoryName,
         showComments: showComments,
       ),

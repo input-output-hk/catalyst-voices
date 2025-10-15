@@ -44,7 +44,7 @@ final class UsersProposalOverview extends Equatable {
       versions: proposal.versions.toViewModels(),
       commentsCount: proposal.commentsCount,
       category: categoryName,
-      categoryId: proposal.categoryRef,
+      categoryId: proposal.categoryId,
       fundNumber: fundNumber,
       fromActiveCampaign: fromActiveCampaign,
     );

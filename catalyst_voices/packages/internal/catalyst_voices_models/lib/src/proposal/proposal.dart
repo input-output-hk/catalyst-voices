@@ -13,7 +13,7 @@ final class Proposal extends CoreProposal {
     required int duration,
     required String? author,
     required int commentsCount,
-    required SignedDocumentRef categoryRef,
+    required SignedDocumentRef categoryId,
   }) {
     final versionNumber = versionsIds.versionNumber(selfRef.version!);
 
@@ -27,11 +27,15 @@ final class Proposal extends CoreProposal {
       duration: duration,
       author: author,
       versionNumber: versionNumber,
-      categoryRef: categoryRef,
+      categoryId: categoryId,
     );
   }
 
-  factory Proposal.fromData(ProposalData data, List<String> versionsIds) {
+  factory Proposal.fromData(
+    ProposalData data,
+    SignedDocumentRef categoryId,
+    List<String> versionsIds,
+  ) {
     final document = data.document;
 
     return Proposal(
@@ -43,14 +47,14 @@ final class Proposal extends CoreProposal {
       duration: document.duration ?? 0,
       author: document.authorName,
       commentsCount: data.commentsCount,
-      categoryRef: data.document.metadata.categoryId,
+      categoryId: categoryId,
       versionsIds: versionsIds,
     );
   }
 
   const Proposal._({
     required super.selfRef,
-    required super.categoryRef,
+    required super.categoryId,
     required super.title,
     required super.description,
     required super.fundsRequested,

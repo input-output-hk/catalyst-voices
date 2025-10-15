@@ -140,11 +140,15 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   }
 
   DocumentDataMetadata _buildDocumentMetadata([DocumentRef? selfRef]) {
+    final categoryId = state.metadata.categoryId;
+
     return DocumentDataMetadata(
       type: DocumentType.proposalDocument,
       selfRef: selfRef ?? state.metadata.documentRef!,
       template: state.metadata.templateRef,
-      categoryId: state.metadata.categoryId,
+      parameters: [
+        if (categoryId != null) categoryId,
+      ],
     );
   }
 
@@ -536,11 +540,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       if (firstVersion && proposalData.publish.isLocal && notVerifiedAccount) {
         emitSignal(const NewProposalAndEmailNotVerifiedSignal());
       }
-      final categoryRef = proposal.categoryRef;
-      final category = await _campaignService.getCategory(categoryRef);
+      final categoryId = proposal.categoryId;
+      final category = await _campaignService.getCategory(categoryId);
       final campaign = await _campaignService.getActiveCampaign();
 
-      final fromActiveCampaign = campaign?.hasCategory(categoryRef.id) ?? false;
+      final fromActiveCampaign = campaign?.hasCategory(categoryId.id) ?? false;
 
       return _cacheAndCreateState(
         proposalDocument: proposalData.document.document,
@@ -550,7 +554,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           documentRef: proposal.selfRef,
           originalDocumentRef: proposal.selfRef,
           templateRef: proposalData.document.metadata.templateRef,
-          categoryId: categoryRef,
+          categoryId: categoryId,
           versions: versions,
           fromActiveCampaign: fromActiveCampaign,
         ),
@@ -1039,7 +1043,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         ref: originalProposalRef! as SignedDocumentRef,
         template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
         reply: event.reply,
-        categoryId: originalProposalCategoryId,
+        parameters: [if (originalProposalCategoryId != null) originalProposalCategoryId],
         authorId: activeAccountId!,
       ),
       document: event.document,

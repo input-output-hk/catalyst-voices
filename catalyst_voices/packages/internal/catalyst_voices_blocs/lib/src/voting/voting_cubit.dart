@@ -328,12 +328,12 @@ final class VotingCubit extends Cubit<VotingState>
     final favoriteIds = _cache.favoriteIds ?? const [];
     final votingPower = _cache.votingPower;
     final categories = campaign?.categories ?? const [];
-    final selectedCategoryRef = _cache.filters.category;
+    final selectedCategoryId = _cache.filters.category;
     final filters = _cache.filters;
     final count = _cache.count;
 
     final selectedCategory = campaign?.categories.firstWhereOrNull(
-      (e) => e.selfRef.id == selectedCategoryRef?.id,
+      (e) => e.selfRef.id == selectedCategoryId?.id,
     );
     final selectedCategoryViewModel = selectedCategory != null
         ? CampaignCategoryDetailsViewModel.fromModel(selectedCategory)
@@ -344,7 +344,7 @@ final class VotingCubit extends Cubit<VotingState>
         : const VotingPowerViewModel();
     final votingPhaseViewModel = _buildVotingPhaseDetails(campaign);
     final hasSearchQuery = filters.searchQuery != null;
-    final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategoryRef);
+    final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategoryId);
 
     return state.copyWith(
       selectedCategory: Optional(selectedCategoryViewModel),

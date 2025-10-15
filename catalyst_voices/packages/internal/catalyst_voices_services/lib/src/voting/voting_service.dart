@@ -30,7 +30,7 @@ final class VotingMockService implements VotingService {
     final lastCastedVote = await getProposalLastCastedVote(proposalRef);
 
     final category = _cacheCampaign!.categories.firstWhere(
-      (category) => category.selfRef == proposal.categoryRef,
+      (category) => category.selfRef == proposal.categoryId,
       orElse: () => throw StateError('Category not found'),
     );
 

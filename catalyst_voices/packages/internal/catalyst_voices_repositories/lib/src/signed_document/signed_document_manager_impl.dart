@@ -202,20 +202,22 @@ extension _SignedDocumentContentTypeExt on SignedDocumentContentType {
 
 extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
   CoseHeaders get asCoseProtectedHeaders {
+    final ref = this.ref;
+    final template = this.template;
+    final reply = this.reply;
+
     return CoseHeaders.protected(
       contentType: contentType.asCose,
       contentEncoding: _brotliEncoding,
       type: documentType.uuid.asUuid,
       id: id?.asUuid,
       ver: ver?.asUuid,
-      ref: ref?.asCose,
-      template: template?.asCose,
-      reply: reply?.asCose,
+      ref: ref == null ? null : [ref].asCose,
+      template: template == null ? null : [template].asCose,
+      reply: reply == null ? null : [reply].asCose,
       section: section,
       collaborators: collaborators,
-      brandId: brandId?.asLegacyCose,
-      campaignId: campaignId?.asLegacyCose,
-      categoryId: categoryId?.asLegacyCose,
+      parameters: parameters.asCose,
     );
   }
 
@@ -231,9 +233,7 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
     final ref = protectedHeaders.ref;
     final template = protectedHeaders.template;
     final reply = protectedHeaders.reply;
-    final brandId = protectedHeaders.brandId;
-    final campaignId = protectedHeaders.campaignId;
-    final categoryId = protectedHeaders.categoryId;
+    final parameters = protectedHeaders.parameters;
 
     return SignedDocumentMetadata(
       contentType: _SignedDocumentContentTypeExt.fromCose(
@@ -242,49 +242,38 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
       documentType: type == null ? DocumentType.unknown : DocumentType.fromJson(type),
       id: protectedHeaders.id?.value,
       ver: protectedHeaders.ver?.value,
-      ref: ref == null ? null : _SignedDocumentMetadataRefExt.fromCose(ref),
-      template: template == null ? null : _SignedDocumentMetadataRefExt.fromCose(template),
-      reply: reply == null ? null : _SignedDocumentMetadataRefExt.fromCose(reply),
+      ref: ref == null ? null : _SignedDocumentMetadataRefsExt.fromCose(ref).firstOrNull,
+      template: template == null ? null : _SignedDocumentMetadataRefsExt.fromCose(template).firstOrNull,
+      reply: reply == null ? null : _SignedDocumentMetadataRefsExt.fromCose(reply).firstOrNull,
       section: protectedHeaders.section,
       collaborators: protectedHeaders.collaborators,
-      brandId: brandId == null ? null : _SignedDocumentMetadataRefExt.fromLegacyCose(brandId),
-      campaignId: campaignId == null
-          ? null
-          : _SignedDocumentMetadataRefExt.fromLegacyCose(campaignId),
-      categoryId: categoryId == null
-          ? null
-          : _SignedDocumentMetadataRefExt.fromLegacyCose(categoryId),
+      parameters: parameters == null
+          ? const []
+          : _SignedDocumentMetadataRefsExt.fromCose(parameters),
     );
   }
 }
 
 extension _SignedDocumentMetadataRefExt on SignedDocumentMetadataRef {
-  CoseDocumentRefs get asCose => CoseDocumentRefs([
-    CoseDocumentRef.backwardCompatible(
-      documentId: id.asUuid,
-      documentVer: ver?.asUuid,
-      documentLocator: CoseDocumentLocator.fallback(),
-    ),
-  ]);
-
-  CoseReferenceUuid get asLegacyCose => CoseReferenceUuid(
-    id: id.asUuid,
-    ver: ver?.asUuid,
+  CoseDocumentRef get asCose => CoseDocumentRef.backwardCompatible(
+    documentId: id.asUuid,
+    documentVer: ver?.asUuid,
+    documentLocator: CoseDocumentLocator.fallback(),
   );
 
-  static SignedDocumentMetadataRef fromCose(CoseDocumentRefs cose) {
-    final ref = cose.refs.first;
+  static SignedDocumentMetadataRef fromCose(CoseDocumentRef cose) {
     return SignedDocumentMetadataRef(
-      id: ref.documentId.value,
-      ver: ref.documentVer.value,
+      id: cose.documentId.value,
+      ver: cose.documentVer.value,
     );
   }
+}
 
-  static SignedDocumentMetadataRef fromLegacyCose(CoseReferenceUuid cose) {
-    return SignedDocumentMetadataRef(
-      id: cose.id.value,
-      ver: cose.ver?.value,
-    );
+extension _SignedDocumentMetadataRefsExt on List<SignedDocumentMetadataRef> {
+  CoseDocumentRefs get asCose => CoseDocumentRefs(map((e) => e.asCose).toList());
+
+  static List<SignedDocumentMetadataRef> fromCose(CoseDocumentRefs cose) {
+    return cose.refs.map(_SignedDocumentMetadataRefExt.fromCose).toList();
   }
 }
 

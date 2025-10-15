@@ -86,9 +86,7 @@ final class DocumentDataMetadataDto {
   final DocumentRefDto? template;
   final DocumentRefDto? reply;
   final String? section;
-  final DocumentRefDto? brandId;
-  final DocumentRefDto? campaignId;
-  final DocumentRefDto? categoryId;
+  final List<DocumentRefDto> parameters;
   final List<String>? authors;
 
   DocumentDataMetadataDto({
@@ -98,15 +96,14 @@ final class DocumentDataMetadataDto {
     this.template,
     this.reply,
     this.section,
-    this.brandId,
-    this.campaignId,
-    this.categoryId,
+    this.parameters = const [],
     this.authors,
   });
 
   factory DocumentDataMetadataDto.fromJson(Map<String, dynamic> json) {
     var migrated = _migrateJson1(json);
     migrated = _migrateJson2(migrated);
+    migrated = _migrateJson3(migrated);
 
     return _$DocumentDataMetadataDtoFromJson(migrated);
   }
@@ -119,9 +116,7 @@ final class DocumentDataMetadataDto {
         template: data.template?.toDto(),
         reply: data.reply?.toDto(),
         section: data.section,
-        brandId: data.brandId?.toDto(),
-        campaignId: data.campaignId?.toDto(),
-        categoryId: data.categoryId?.toDto(),
+        parameters: data.parameters.map((e) => e.toDto()).toList(),
         authors: data.authors?.map((e) => e.toString()).toList(),
       );
 
@@ -135,15 +130,13 @@ final class DocumentDataMetadataDto {
       template: template?.toModel().toSignedDocumentRef(),
       reply: reply?.toModel().toSignedDocumentRef(),
       section: section,
-      brandId: brandId?.toModel().toSignedDocumentRef(),
-      campaignId: campaignId?.toModel().toSignedDocumentRef(),
-      categoryId: categoryId?.toModel().toSignedDocumentRef(),
+      parameters: parameters.map((e) => e.toModel().toSignedDocumentRef()).toList(),
       authors: authors?.map((e) => CatalystId.fromUri(e.getUri())).toList(),
     );
   }
 
   static Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
-    final modified = Map<String, dynamic>.from(json);
+    final modified = Map.of(json);
 
     if (modified.containsKey('id') && modified.containsKey('version')) {
       final id = modified.remove('id') as String;
@@ -160,7 +153,7 @@ final class DocumentDataMetadataDto {
   }
 
   static Map<String, dynamic> _migrateJson2(Map<String, dynamic> json) {
-    final modified = Map<String, dynamic>.from(json);
+    final modified = Map.of(json);
 
     if (modified['brandId'] is String) {
       final id = modified.remove('brandId') as String;
@@ -180,6 +173,11 @@ final class DocumentDataMetadataDto {
     }
 
     return modified;
+  }
+
+  static Map<String, dynamic> _migrateJson3(Map<String, dynamic> json) {
+    // TODO(dt-iohk): migrate brandId, campaingId and categoryId into parameters
+    return json;
   }
 }
 

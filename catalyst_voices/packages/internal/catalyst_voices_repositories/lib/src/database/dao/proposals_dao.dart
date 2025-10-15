@@ -41,7 +41,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   // TODO(damian-molinski): filters is only used for campaign and type.
   @override
   Future<List<JoinedProposalEntity>> queryProposals({
-    SignedDocumentRef? categoryRef,
+    SignedDocumentRef? categoryId,
     required ProposalsFilters filters,
   }) async {
     if (<Object?>[
@@ -96,8 +96,8 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
           )
           ..orderBy([OrderingTerm.asc(proposal.verHi)]);
 
-    if (categoryRef != null) {
-      mainQuery.where(proposal.metadata.isCategory(categoryRef));
+    if (categoryId != null) {
+      mainQuery.where(proposal.metadata.isCategory(categoryId));
     }
 
     final ids = await _getFilterTypeIds(filters.type);
@@ -740,7 +740,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
 abstract interface class ProposalsDao {
   Future<List<JoinedProposalEntity>> queryProposals({
-    SignedDocumentRef? categoryRef,
+    SignedDocumentRef? categoryId,
     required ProposalsFilters filters,
   });
 

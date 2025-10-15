@@ -18,14 +18,14 @@ void main() {
     late WorkspaceBloc workspaceBloc;
 
     final proposalRef = SignedDocumentRef.generateFirstRef();
-    final categoryRef = SignedDocumentRef.generateFirstRef();
+    final categoryId = SignedDocumentRef.generateFirstRef();
 
     final documentData = DocumentData(
       metadata: DocumentDataMetadata(
         type: DocumentType.proposalDocument,
         selfRef: proposalRef,
         template: SignedDocumentRef.generateFirstRef(),
-        categoryId: categoryRef,
+        parameters: [categoryId],
       ),
       content: const DocumentDataContent({}),
     );
@@ -72,7 +72,7 @@ void main() {
             publish: CampaignPublish.published,
             categories: [
               CampaignCategory(
-                selfRef: categoryRef,
+                selfRef: categoryId,
                 proposalTemplateRef: SignedDocumentRef.generateFirstRef(),
                 campaignRef: SignedDocumentRef.generateFirstRef(),
                 categoryName: 'Test Category',
@@ -100,7 +100,7 @@ void main() {
       build: () {
         when(() => mockProposalService.watchUserProposals()).thenAnswer(
           (_) => Stream.value(
-            [ProposalWithVersionX.dummy(ProposalPublish.localDraft, categoryRef: categoryRef)],
+            [ProposalWithVersionX.dummy(ProposalPublish.localDraft, categoryId: categoryId)],
           ),
         );
         return workspaceBloc;
@@ -127,7 +127,7 @@ void main() {
             publish: CampaignPublish.published,
             categories: [
               CampaignCategory(
-                selfRef: categoryRef,
+                selfRef: categoryId,
                 proposalTemplateRef: SignedDocumentRef.generateFirstRef(),
                 campaignRef: SignedDocumentRef.generateFirstRef(),
                 categoryName: 'Test Category',
@@ -155,8 +155,8 @@ void main() {
       build: () {
         when(() => mockProposalService.watchUserProposals()).thenAnswer(
           (_) => Stream.value([
-            ProposalWithVersionX.dummy(ProposalPublish.localDraft, categoryRef: categoryRef),
-            ProposalWithVersionX.dummy(ProposalPublish.localDraft, categoryRef: categoryRef),
+            ProposalWithVersionX.dummy(ProposalPublish.localDraft, categoryId: categoryId),
+            ProposalWithVersionX.dummy(ProposalPublish.localDraft, categoryId: categoryId),
           ]),
         );
 

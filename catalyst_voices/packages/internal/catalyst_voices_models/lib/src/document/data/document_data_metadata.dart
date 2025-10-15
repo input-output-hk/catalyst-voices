@@ -24,25 +24,14 @@ final class DocumentDataMetadata extends Equatable {
   /// A reference to a section of a document.
   final String? section;
 
-  /// uuid-v4
-  /// Represents a "brand" who is running the voting, e.g. Catalyst, Midnight.
-  final SignedDocumentRef? brandId;
-
-  /// uuid-v4
-  /// Defines an "campaign", e.g. "Catalyst Fund 1", "Catalyst Fund 2".
-  final SignedDocumentRef? campaignId;
-
-  /// uuid-v4
-  /// Defines a voting category as a collection of proposals, e.g.
-  /// "Development & Infrastructure",
-  /// "Products & Integrations".
-  final SignedDocumentRef? categoryId;
+  /// A list of referenced parameters like brand, category or campaign.
+  final List<SignedDocumentRef> parameters;
 
   /// List of authors represented by CatalystId
   final List<CatalystId>? authors;
 
   // TODO(damian-molinski): refactor with factory constructors for
-  //  proposal/comment to centralize required fields for each type.
+  // proposal/comment to centralize required fields for each type.
   DocumentDataMetadata({
     required this.type,
     required this.selfRef,
@@ -50,9 +39,7 @@ final class DocumentDataMetadata extends Equatable {
     this.template,
     this.reply,
     this.section,
-    this.brandId,
-    this.campaignId,
-    this.categoryId,
+    this.parameters = const [],
     this.authors,
   }) : assert(
          selfRef.isExact,
@@ -69,9 +56,7 @@ final class DocumentDataMetadata extends Equatable {
     template,
     reply,
     section,
-    brandId,
-    campaignId,
-    categoryId,
+    parameters,
     authors,
   ];
 
@@ -84,9 +69,7 @@ final class DocumentDataMetadata extends Equatable {
     Optional<SignedDocumentRef>? template,
     Optional<SignedDocumentRef>? reply,
     Optional<String>? section,
-    Optional<SignedDocumentRef>? brandId,
-    Optional<SignedDocumentRef>? campaignId,
-    Optional<SignedDocumentRef>? categoryId,
+    List<SignedDocumentRef>? parameters,
     Optional<List<CatalystId>>? authors,
   }) {
     return DocumentDataMetadata(
@@ -96,9 +79,7 @@ final class DocumentDataMetadata extends Equatable {
       template: template.dataOr(this.template),
       reply: reply.dataOr(this.reply),
       section: section.dataOr(this.section),
-      brandId: brandId.dataOr(this.brandId),
-      campaignId: campaignId.dataOr(this.campaignId),
-      categoryId: categoryId.dataOr(this.categoryId),
+      parameters: parameters ?? this.parameters,
       authors: authors.dataOr(this.authors),
     );
   }
