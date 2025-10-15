@@ -13,6 +13,7 @@ This repository contains the Catalyst Voices app and packages.
     * [Environment Type vs Flavor](#environment-type-vs-flavor)
     * [Environment types](#environment-types)
       * [Stress Test](#stress-test)
+      * [Debug Performance Flags](#debug-performance-flags)
     * [Flavor types](#flavor-types)
     * [Environment variables](#environment-variables)
       * [Environment config](#environment-config)
@@ -128,6 +129,29 @@ Use following `--dart-define` variables to configure your setup:
 * `--dart-define=STRESS_TEST=true` to enable
 * `--dart-define=STRESS_TEST_PROPOSAL_INDEX_COUNT=100` says how many proposals will be produced
 * `--dart-define=STRESS_TEST_DECOMPRESSED=false` if signed documents should be compressed or not
+
+#### Debug Performance Flags
+
+Each environment can be launched with additional debug performance flags on web in `Profile` mode
+There is four performance flags to choose from:
+
+* **debugProfileBuildsEnabled:** Adds Timeline events for every Widget built.
+* **debugProfileBuildsEnabledUserWidgets:** Adds Timeline events for every user-created Widget built.
+* **debugProfileLayoutsEnabled:** Adds Timeline events for every RenderObject layout.
+* **debugProfilePaintsEnabled:** Adds Timeline events for every RenderObject painted.
+
+To use following `--dart-define` variables to configure your setup:
+
+* `--dart-define=DEBUG_PROFILE_BUILDS_ENABLED` to enable debugProfileBuildsEnabled
+* `--dart-define=DEBUG_PROFILE_BUILDS_ENABLED_USER_WIDGETS` to enable debugProfileBuildsEnabledUserWidgets
+* `--dart-define=DEBUG_PROFILE_LAYOUTS_ENABLED` to enable debugProfileLayoutsEnabled
+* `--dart-define=DEBUG_PROFILE_PAINTS_ENABLED` to enable debugProfilePaintsEnabled
+
+There is `--dart-define` variable to enable all four performance flags at once:
+
+* `--dart-define=DEBUG_PROFILE_DEVELOPER_PROFILER_ENABLE_ALL`
+
+Remember to also use `--profile` mode when running the app.
 
 ### Flavor types
 
