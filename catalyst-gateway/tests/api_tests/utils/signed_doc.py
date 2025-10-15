@@ -60,8 +60,8 @@ class SignedDocument(SignedDocumentBase):
         )
 
 
-CATEGORY_ID = "0194d490-30bf-7473-81c8-a0eaef369619"
-PROPOSAL_FORM_TEMPLATE_ID = "0194d492-1daa-75b5-b4a4-5cf331cd8d1a"
+BRAND_ID = "0199e71b-401e-7160-9139-a398c4d7b8fa"
+PROPOSAL_FORM_TEMPLATE_ID = "0199e71b-4025-7323-bc4a-d39e35762521"
 
 
 # return a Proposal document which is already published to the cat-gateway and the corresponding RoleID
