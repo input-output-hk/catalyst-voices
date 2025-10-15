@@ -24,7 +24,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   @override
   Future<DocumentData> get({required DocumentRef ref}) async {
     final bytes = await _api.gateway
-        .apiGatewayV1DocumentDocumentIdGet(
+        .apiV1DocumentDocumentIdGet(
           documentId: ref.id,
           version: ref.version,
         )
@@ -36,7 +36,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
   @override
   Future<String?> getLatestVersion(String id) async {
-    final constVersion = constantDocumentsRefs
+    final constVersion = allConstantDocumentRefs
         .expand((element) => element.all)
         .firstWhereOrNull((element) => element.id == id)
         ?.version;
@@ -47,11 +47,12 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
     try {
       final index = await _api.gateway
-          .apiGatewayV1DocumentIndexPost(
-            body: DocumentIndexQueryFilter(id: EqOrRangedIdDto.eq(id)),
+          .apiV1DocumentIndexPost(
+            body: DocumentIndexQueryFilter(id: IdSelectorDto.eq(id)),
             limit: 1,
           )
-          .successBodyOrThrow();
+          .successBodyOrThrow()
+          .then(_mapDynamicResponseValue);
 
       final docs = index.docs;
       if (docs.isEmpty) {
@@ -72,7 +73,9 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }
 
   @override
-  Future<List<TypedDocumentRef>> index() async {
+  Future<List<TypedDocumentRef>> index({
+    required Campaign campaign,
+  }) async {
     final allRefs = <TypedDocumentRef>{};
 
     var page = 0;
@@ -84,6 +87,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
           await _getDocumentIndexList(
             page: page,
             limit: maxPerPage,
+            campaign: campaign,
           )
           // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
           // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
@@ -111,7 +115,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   Future<void> publish(SignedDocument document) async {
     final bytes = document.toBytes();
     await _api.gateway
-        .apiGatewayV1DocumentPut(
+        .apiV1DocumentPut(
           body: bytes,
           contentType: ContentTypes.applicationCbor,
         )
@@ -121,22 +125,39 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   Future<DocumentIndexList> _getDocumentIndexList({
     required int page,
     required int limit,
+    required Campaign campaign,
   }) async {
+    final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toList();
+
     return _api.gateway
-        .apiGatewayV1DocumentIndexPost(
-          body: const DocumentIndexQueryFilter(),
+        .apiV1DocumentIndexPost(
+          body: DocumentIndexQueryFilter(
+            parameters: IdRefOnly(id: IdSelectorDto.inside(categoriesIds)).toJson(),
+          ),
           limit: limit,
           page: page,
         )
-        .successBodyOrThrow();
+        .successBodyOrThrow()
+        .then(_mapDynamicResponseValue);
+  }
+
+  DocumentIndexList _mapDynamicResponseValue(dynamic value) {
+    if (value is DocumentIndexList) {
+      return value;
+    }
+
+    if (value is Map<String, dynamic>) {
+      return DocumentIndexList.fromJson(value);
+    }
+
+    return const DocumentIndexList(docs: [], page: CurrentPage(page: 0, limit: 0, remaining: 0));
   }
 }
 
 abstract interface class DocumentDataRemoteSource implements DocumentDataSource {
   Future<String?> getLatestVersion(String id);
 
-  @override
-  Future<List<TypedDocumentRef>> index();
+  Future<List<TypedDocumentRef>> index({required Campaign campaign});
 
   Future<void> publish(SignedDocument document);
 }
@@ -166,6 +187,11 @@ extension on DocumentIndexList {
                       TypedDocumentRef(
                         ref: ver.reply!.toRef(),
                         type: DocumentType.unknown,
+                      ),
+                    if (ver.parameters != null)
+                      TypedDocumentRef(
+                        ref: ver.parameters!.toRef(),
+                        type: DocumentType.categoryParametersDocument,
                       ),
                     if (ver.template != null)
                       TypedDocumentRef(

@@ -11,6 +11,11 @@ final class ProposalTemplate extends Equatable {
     required this.schema,
   });
 
+  DocumentStringSchema? get title {
+    final property = schema.getPropertySchema(ProposalDocument.titleNodeId);
+    return property is DocumentStringSchema ? property : null;
+  }
+
   @override
   List<Object?> get props => [
     metadata,

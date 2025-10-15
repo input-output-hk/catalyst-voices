@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/constants/constants.dart';
+import 'package:catalyst_voices/common/ext/active_fund_number_selector_ext.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -21,6 +22,7 @@ class _DrepApprovalContingencyRichTextState extends State<DrepApprovalContingenc
 
   @override
   Widget build(BuildContext context) {
+    final fundNumber = context.activeCampaignFundNumber;
     return PlaceholderRichText(
       key: const Key('DrepApprovalContingencyRichText'),
       context.l10n.createProfileDrepApprovalContingency('{fund14ProposalSubmissionNotice}'),
@@ -28,7 +30,7 @@ class _DrepApprovalContingencyRichTextState extends State<DrepApprovalContingenc
       placeholderSpanBuilder: (context, placeholder) {
         return switch (placeholder) {
           'fund14ProposalSubmissionNotice' => TextSpan(
-            text: context.l10n.fund14ProposalSubmissionNotice,
+            text: context.l10n.fundProposalSubmissionNotice(fundNumber),
             recognizer: _f14ProposalSubmissionNoticeRecognizer,
             style: const TextStyle(decoration: TextDecoration.underline),
           ),
@@ -50,7 +52,9 @@ class _DrepApprovalContingencyRichTextState extends State<DrepApprovalContingenc
 
     _f14ProposalSubmissionNoticeRecognizer = TapGestureRecognizer();
     _f14ProposalSubmissionNoticeRecognizer.onTap = () {
-      final uri = Uri.parse(VoicesConstants.f14ProposalSubmissionNoticeUrl);
+      final uri = Uri.parse(
+        VoicesConstants.fundProposalSubmissionNoticeUrl(context.activeCampaignFundNumber),
+      );
       unawaited(launchUri(uri));
     };
   }

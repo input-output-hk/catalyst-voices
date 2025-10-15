@@ -16,7 +16,7 @@ final class ApiConfigSource implements RemoteConfigSource {
   @override
   Future<RemoteConfig> get() {
     return _api.gateway
-        .apiGatewayV1ConfigFrontendGet()
+        .apiV1ConfigFrontendGet()
         .successBodyOrThrow()
         .then((value) {
           if (value is Map<String, dynamic>) {
