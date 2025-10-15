@@ -63,6 +63,7 @@ impl EnvVars {
     }
 
     /// The Catalyst Signed Document Admin keys map.
+    #[allow(dead_code)]
     pub(crate) fn admin_keys(
         &self
     ) -> &HashMap<catalyst_signed_doc::CatalystId, ed25519_dalek::VerifyingKey> {
