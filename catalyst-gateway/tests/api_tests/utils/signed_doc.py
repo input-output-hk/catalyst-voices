@@ -87,7 +87,7 @@ def proposal_doc_factory(rbac_chain_factory):
                 }
             ],
             # referenced to the defined category id, comes from the 'templates/data.rs' file
-            "parameters": [{"id": CATEGORY_ID, "ver": CATEGORY_ID, "cid": "0x"}],
+            "parameters": [{"id": BRAND_ID, "ver": BRAND_ID, "cid": "0x"}],
         }
         with open("./test_data/signed_docs/proposal.json", "r") as proposal_json_file:
             proposal_json = json.load(proposal_json_file)
