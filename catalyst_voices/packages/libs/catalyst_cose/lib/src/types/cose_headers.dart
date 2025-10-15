@@ -67,7 +67,6 @@ final class CoseHeaders extends Equatable {
   /// Replaces:
   /// - [CoseHeaderKeys.brandId]
   /// - [CoseHeaderKeys.campaignId]
-  /// - [CoseHeaderKeys.electionId]
   /// - [CoseHeaderKeys.categoryId]
   final CoseDocumentRefs? parameters;
 
@@ -129,7 +128,6 @@ final class CoseHeaders extends Equatable {
       // TODO(dt-iohk): make it backward compatible
       // brandId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.brandId]),
       // campaignId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.campaignId]),
-      // electionId: CborUtils.deserializeString(map[CoseHeaderKeys.electionId]),
       // categoryId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.categoryId]),
       encodeAsBytes: encodeAsBytes,
     );

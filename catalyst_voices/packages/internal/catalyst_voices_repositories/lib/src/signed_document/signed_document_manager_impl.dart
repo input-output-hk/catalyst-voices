@@ -215,7 +215,6 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
       collaborators: collaborators,
       brandId: brandId?.asLegacyCose,
       campaignId: campaignId?.asLegacyCose,
-      electionId: electionId,
       categoryId: categoryId?.asLegacyCose,
     );
   }
@@ -252,7 +251,6 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
       campaignId: campaignId == null
           ? null
           : _SignedDocumentMetadataRefExt.fromLegacyCose(campaignId),
-      electionId: protectedHeaders.electionId,
       categoryId: categoryId == null
           ? null
           : _SignedDocumentMetadataRefExt.fromLegacyCose(categoryId),

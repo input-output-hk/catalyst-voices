@@ -29,12 +29,8 @@ final class DocumentDataMetadata extends Equatable {
   final SignedDocumentRef? brandId;
 
   /// uuid-v4
-  /// Defines a "campaign" of voting, e.g. "treasury campaign".
+  /// Defines an "campaign", e.g. "Catalyst Fund 1", "Catalyst Fund 2".
   final SignedDocumentRef? campaignId;
-
-  /// uuid-v4
-  /// Defines an election, e.g. "Catalyst Fund 1", "Catalyst Fund 2".
-  final String? electionId;
 
   /// uuid-v4
   /// Defines a voting category as a collection of proposals, e.g.
@@ -56,7 +52,6 @@ final class DocumentDataMetadata extends Equatable {
     this.section,
     this.brandId,
     this.campaignId,
-    this.electionId,
     this.categoryId,
     this.authors,
   }) : assert(
@@ -76,7 +71,6 @@ final class DocumentDataMetadata extends Equatable {
     section,
     brandId,
     campaignId,
-    electionId,
     categoryId,
     authors,
   ];
@@ -92,7 +86,6 @@ final class DocumentDataMetadata extends Equatable {
     Optional<String>? section,
     Optional<SignedDocumentRef>? brandId,
     Optional<SignedDocumentRef>? campaignId,
-    Optional<String>? electionId,
     Optional<SignedDocumentRef>? categoryId,
     Optional<List<CatalystId>>? authors,
   }) {
@@ -105,7 +98,6 @@ final class DocumentDataMetadata extends Equatable {
       section: section.dataOr(this.section),
       brandId: brandId.dataOr(this.brandId),
       campaignId: campaignId.dataOr(this.campaignId),
-      electionId: electionId.dataOr(this.electionId),
       categoryId: categoryId.dataOr(this.categoryId),
       authors: authors.dataOr(this.authors),
     );

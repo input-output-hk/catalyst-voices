@@ -78,9 +78,6 @@ final class CoseHeaderKeys {
   /// The header key for "campaign_id".
   static final campaignId = CborString('campaign_id');
 
-  /// The header key for "election_id".
-  static final electionId = CborString('election_id');
-
   /// The header key for "category_id".
   static final categoryId = CborString('category_id');
 

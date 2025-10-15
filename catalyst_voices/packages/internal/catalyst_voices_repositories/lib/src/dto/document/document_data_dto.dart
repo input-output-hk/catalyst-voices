@@ -88,7 +88,6 @@ final class DocumentDataMetadataDto {
   final String? section;
   final DocumentRefDto? brandId;
   final DocumentRefDto? campaignId;
-  final String? electionId;
   final DocumentRefDto? categoryId;
   final List<String>? authors;
 
@@ -101,7 +100,6 @@ final class DocumentDataMetadataDto {
     this.section,
     this.brandId,
     this.campaignId,
-    this.electionId,
     this.categoryId,
     this.authors,
   });
@@ -123,7 +121,6 @@ final class DocumentDataMetadataDto {
         section: data.section,
         brandId: data.brandId?.toDto(),
         campaignId: data.campaignId?.toDto(),
-        electionId: data.electionId,
         categoryId: data.categoryId?.toDto(),
         authors: data.authors?.map((e) => e.toString()).toList(),
       );
@@ -140,7 +137,6 @@ final class DocumentDataMetadataDto {
       section: section,
       brandId: brandId?.toModel().toSignedDocumentRef(),
       campaignId: campaignId?.toModel().toSignedDocumentRef(),
-      electionId: electionId,
       categoryId: categoryId?.toModel().toSignedDocumentRef(),
       authors: authors?.map((e) => CatalystId.fromUri(e.getUri())).toList(),
     );
