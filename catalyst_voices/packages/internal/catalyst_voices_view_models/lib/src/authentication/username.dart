@@ -26,7 +26,7 @@ final class OutOfRangeUsernameException extends UsernameValidationException {
 
 /// Form input validator for username
 final class Username extends FormzInput<String, UsernameValidationException> {
-  static const NumRange<int> lengthRange = NumRange(min: 1, max: 30);
+  static const Range<int> lengthRange = Range(min: 1, max: 30);
 
   const Username.dirty([super.value = '']) : super.dirty();
 

@@ -1,6 +1,8 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart'
+    show RbacRegistrationChain;
 import 'package:catalyst_voices_repositories/generated/api/cat_reviews.models.swagger.dart';
 import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
@@ -23,6 +25,8 @@ abstract interface class UserRepository {
   Future<TransactionHash> getPreviousRegistrationTransactionId({
     required CatalystId catalystId,
   });
+
+  Future<RbacRegistrationChain> getRbacRegistration({CatalystId? catalystId});
 
   Future<User> getUser();
 
@@ -62,11 +66,7 @@ final class UserRepositoryImpl implements UserRepository {
   Future<TransactionHash> getPreviousRegistrationTransactionId({
     required CatalystId catalystId,
   }) async {
-    final lookup = catalystId.toSignificant().toUri().toStringWithoutScheme();
-
-    final rbacChain = await _apiServices.gateway
-        .apiGatewayV1RbacRegistrationGet(lookup: lookup)
-        .successBodyOrThrow();
+    final rbacChain = await getRbacRegistration(catalystId: catalystId);
 
     final transactionId = rbacChain.lastVolatileTxn ?? rbacChain.lastPersistentTxn;
 
@@ -75,6 +75,13 @@ final class UserRepositoryImpl implements UserRepository {
     }
 
     return TransactionHash.fromHex(transactionId);
+  }
+
+  @override
+  Future<RbacRegistrationChain> getRbacRegistration({CatalystId? catalystId}) {
+    return _apiServices.gateway
+        .apiV1RbacRegistrationGet(lookup: catalystId?.toUri().toStringWithoutScheme())
+        .successBodyOrThrow();
   }
 
   @override
@@ -94,19 +101,18 @@ final class UserRepositoryImpl implements UserRepository {
     required CatalystId catalystId,
     required String email,
   }) {
-    try {
-      return _apiServices.reviews
-          .apiCatalystIdsMePost(
-            body: CatalystIDCreate(
-              catalystIdUri: catalystId.toUri().toStringWithoutScheme(),
-              email: email,
-            ),
-          )
-          .successBodyOrThrow()
-          .then((value) => value.toModel());
-    } on ResourceConflictException {
-      throw const EmailAlreadyUsedException();
-    }
+    return _apiServices.reviews
+        .apiCatalystIdsMePost(
+          body: CatalystIDCreate(
+            catalystIdUri: catalystId.toUri().toStringWithoutScheme(),
+            email: email,
+          ),
+        )
+        .successBodyOrThrow()
+        .onError<ResourceConflictException>(
+          (error, stackTrace) => throw const EmailAlreadyUsedException(),
+        )
+        .then((value) => value.toModel());
   }
 
   @override
@@ -114,9 +120,7 @@ final class UserRepositoryImpl implements UserRepository {
     required CatalystId catalystId,
     required RbacToken rbacToken,
   }) async {
-    final rbacRegistration = await _apiServices.gateway
-        .apiGatewayV1RbacRegistrationGet(lookup: catalystId.toUri().toStringWithoutScheme())
-        .successBodyOrThrow();
+    final rbacRegistration = await getRbacRegistration(catalystId: catalystId);
 
     final publicProfile = await _getAccountPublicProfile(token: rbacToken);
     final username =
@@ -130,6 +134,7 @@ final class UserRepositoryImpl implements UserRepository {
       stakeAddress: rbacRegistration.stakeAddress,
       publicStatus: publicProfile?.status ?? AccountPublicStatus.notSetup,
       votingPower: votingPower,
+      isPersistent: rbacRegistration.lastPersistentTxn != null,
     );
   }
 

@@ -27,13 +27,13 @@ class WildcardPathHandler extends Equatable {
       if (segments[i] == '*') {
         // Build prefix (everything up to this wildcard)
         final prefixSegments = segments.sublist(0, i);
-        final prefixNodeId = NodeId(prefixSegments.join('.'));
+        final prefixNodeId = NodeId(prefixSegments.join(NodeId.separator));
 
         // Get suffix (everything after this wildcard)
         NodeId? suffixNodeId;
         if (i < segments.length - 1) {
           final suffixSegments = segments.sublist(i + 1);
-          suffixNodeId = NodeId(suffixSegments.join('.'));
+          suffixNodeId = NodeId(suffixSegments.join(NodeId.separator));
         }
 
         return (prefix: prefixNodeId, suffix: suffixNodeId);
@@ -45,7 +45,7 @@ class WildcardPathHandler extends Equatable {
 
   bool get hasWildcard => pathSegments.contains('*');
 
-  List<String> get pathSegments => path.split('.');
+  List<String> get pathSegments => path.split(NodeId.separator);
 
   @override
   List<Object?> get props => [path];
@@ -53,7 +53,7 @@ class WildcardPathHandler extends Equatable {
   /// Determines if a given NodeId matches this wildcard pattern
   bool matches(NodeId nodeId) {
     final patternSegments = pathSegments;
-    final targetSegments = nodeId.value.split('.');
+    final targetSegments = nodeId.value.split(NodeId.separator);
 
     if (patternSegments.isNotEmpty && patternSegments.first == '*') {
       final subPattern = patternSegments.sublist(1);

@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/src/campaign/campaign_stage.dart';
 import 'package:test/test.dart';
@@ -10,8 +9,12 @@ void main() {
       name: 'name',
       description: 'description',
       publish: CampaignPublish.draft,
-      allFunds: const Coin(0),
-      totalAsk: const Coin(0),
+      allFunds: MultiCurrencyAmount.single(
+        Money.zero(currency: Currencies.ada),
+      ),
+      totalAsk: MultiCurrencyAmount.single(
+        Money.zero(currency: Currencies.ada),
+      ),
       fundNumber: 1,
       timeline: const CampaignTimeline(phases: []),
       categories: const [],

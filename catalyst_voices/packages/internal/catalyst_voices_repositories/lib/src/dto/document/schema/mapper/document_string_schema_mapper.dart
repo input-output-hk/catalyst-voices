@@ -22,7 +22,7 @@ final class DocumentStringSchemaMapper {
     final defaultValue = schema.defaultValue as String?;
     final constValue = schema.constValue as String?;
     final enumValues = schema.enumValues?.cast<String>();
-    final strLengthRange = NumRange.optionalRangeOf(min: schema.minLength, max: schema.maxLength);
+    final strLengthRange = Range.optionalRangeOf(min: schema.minLength, max: schema.maxLength);
     final pattern = schema.pattern;
     final patternRegExp = pattern != null ? RegExp(pattern) : null;
     final definition = _DocumentStringDefinition.fromDef(schema.definition());

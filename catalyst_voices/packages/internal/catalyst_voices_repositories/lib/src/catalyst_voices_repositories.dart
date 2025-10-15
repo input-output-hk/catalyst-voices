@@ -25,6 +25,7 @@ export 'proposal/proposal_repository.dart' show ProposalRepository;
 export 'signed_document/signed_document_manager.dart' show SignedDocumentManager;
 export 'signed_document/signed_document_manager_impl.dart' show SignedDocumentManagerImpl;
 export 'storage/vault/secure_storage_vault.dart';
+export 'sync/app_meta_storage.dart';
 export 'sync/sync_stats_storage.dart';
 export 'system_status/system_status_repository.dart' show SystemStatusRepository;
 export 'user/keychain/keychain_provider.dart' show KeychainProvider;

@@ -32,12 +32,12 @@ final class DiscoveryCurrentCampaignState extends Equatable {
   final CurrentCampaignInfoViewModel currentCampaign;
   final List<CampaignTimelineViewModel> campaignTimeline;
 
-  const DiscoveryCurrentCampaignState({
+  DiscoveryCurrentCampaignState({
     this.isLoading = true,
     this.error,
     CurrentCampaignInfoViewModel? currentCampaign,
     this.campaignTimeline = const [],
-  }) : currentCampaign = currentCampaign ?? const NullCurrentCampaignInfoViewModel();
+  }) : currentCampaign = currentCampaign ?? NullCurrentCampaignInfoViewModel();
 
   @override
   List<Object?> get props => [
@@ -134,11 +134,13 @@ final class DiscoveryState extends Equatable {
   final DiscoveryCampaignCategoriesState categories;
   final DiscoveryMostRecentProposalsState proposals;
 
-  const DiscoveryState({
-    this.campaign = const DiscoveryCurrentCampaignState(),
-    this.categories = const DiscoveryCampaignCategoriesState(),
-    this.proposals = const DiscoveryMostRecentProposalsState(),
-  });
+  DiscoveryState({
+    DiscoveryCurrentCampaignState? campaign,
+    DiscoveryCampaignCategoriesState? categories,
+    DiscoveryMostRecentProposalsState? proposals,
+  }) : campaign = campaign ?? DiscoveryCurrentCampaignState(),
+       categories = categories ?? const DiscoveryCampaignCategoriesState(),
+       proposals = proposals ?? const DiscoveryMostRecentProposalsState();
 
   @override
   List<Object?> get props => [
