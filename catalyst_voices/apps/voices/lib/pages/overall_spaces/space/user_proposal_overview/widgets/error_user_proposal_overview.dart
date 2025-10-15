@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/common/typedefs.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_error_indicator.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -9,14 +8,12 @@ class ErrorProposalOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<WorkspaceBloc, WorkspaceState, ErrorVisibilityState>(
-      selector: (state) {
-        return (data: state.error, show: state.showError);
-      },
-      builder: (context, state) {
+    return BlocSelector<WorkspaceBloc, WorkspaceState, LocalizedException?>(
+      selector: (state) => state.error,
+      builder: (context, error) {
         return Offstage(
-          offstage: !state.show,
-          child: _Error(error: state.data),
+          offstage: error == null,
+          child: _Error(error: error),
         );
       },
     );

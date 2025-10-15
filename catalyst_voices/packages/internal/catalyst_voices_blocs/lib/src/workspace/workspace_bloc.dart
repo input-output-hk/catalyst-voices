@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices_blocs/src/common/bloc_error_emitter_mixin.dart';
 import 'package:catalyst_voices_blocs/src/common/bloc_signal_emitter_mixin.dart';
+import 'package:catalyst_voices_blocs/src/workspace/workspace_bloc_cache.dart';
 import 'package:catalyst_voices_blocs/src/workspace/workspace_event.dart';
 import 'package:catalyst_voices_blocs/src/workspace/workspace_signal.dart';
 import 'package:catalyst_voices_blocs/src/workspace/workspace_state.dart';
@@ -22,12 +23,10 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   final ProposalService _proposalService;
   final DocumentMapper _documentMapper;
   final DownloaderService _downloaderService;
-  Campaign? _cachedCampaign;
+
+  WorkspaceBlocCache _cache = const WorkspaceBlocCache();
 
   StreamSubscription<List<DetailProposal>>? _proposalsSub;
-
-  // ignore: unused_field
-  final List<DetailProposal> _proposals = [];
 
   WorkspaceBloc(
     this._campaignService,
@@ -78,7 +77,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     try {
       emit(state.copyWith(isLoading: true));
       await _proposalService.deleteDraftProposal(event.ref);
-      emit(state.copyWith(userProposals: state.userProposals.removeProposal(event.ref)));
+
+      // Remove proposal from cache and rebuild state
+      _removeProposalFromCache(event.ref);
+      emit(state.copyWith(userProposals: _rebuildProposalsState()));
+
       emitSignal(const DeletedDraftWorkspaceSignal());
     } catch (error, stackTrace) {
       _logger.severe('Delete proposal failed', error, stackTrace);
@@ -120,7 +123,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   Future<void> _forgetProposal(ForgetProposalEvent event, Emitter<WorkspaceState> emit) async {
-    final proposal = state.userProposals.allProposals.firstWhereOrNull(
+    final proposal = _cache.proposals?.firstWhereOrNull(
       (e) => e.selfRef == event.ref,
     );
     if (proposal == null || proposal.selfRef is! SignedDocumentRef) {
@@ -132,7 +135,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         proposalRef: proposal.selfRef as SignedDocumentRef,
         categoryId: proposal.categoryId,
       );
-      emit(state.copyWith(userProposals: state.userProposals.removeProposal(event.ref)));
+
+      // Remove proposal from cache and rebuild state
+      _removeProposalFromCache(event.ref);
+      emit(state.copyWith(userProposals: _rebuildProposalsState()));
+
       emitSignal(const ForgetProposalSuccessWorkspaceSignal());
     } catch (e, stackTrace) {
       emitError(LocalizedException.create(e));
@@ -147,7 +154,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     Emitter<WorkspaceState> emit,
   ) async {
     final campaign = await _campaignService.getActiveCampaign();
-    _cachedCampaign = campaign;
+    _cache = _cache.copyWith(campaign: Optional(campaign));
 
     if (campaign == null) {
       return emitError(const LocalizedUnknownException());
@@ -177,13 +184,13 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   Future<void> _loadProposals(LoadProposalsEvent event, Emitter<WorkspaceState> emit) async {
-    final userProposals = WorkspaceStateUserProposals.fromList(event.proposals);
+    _cache = _cache.copyWith(proposals: Optional(event.proposals));
 
     emit(
       state.copyWith(
         isLoading: false,
         error: const Optional.empty(),
-        userProposals: userProposals,
+        userProposals: _rebuildProposalsState(),
       ),
     );
   }
@@ -193,8 +200,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     int fundNumber,
   ) async {
     final futures = proposals.map((proposal) async {
-      _cachedCampaign ??= await _campaignService.getActiveCampaign();
-      final category = _cachedCampaign?.categories.firstWhere(
+      if (_cache.campaign == null) {
+        final campaign = await _campaignService.getActiveCampaign();
+        _cache = _cache.copyWith(campaign: Optional(campaign));
+      }
+      final category = _cache.campaign?.categories.firstWhere(
         (e) => e.selfRef.id == proposal.categoryRef.id,
       );
       return UsersProposalOverview.fromProposal(
@@ -205,6 +215,19 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     }).toList();
 
     return Future.wait(futures);
+  }
+
+  /// Rebuilds WorkspaceStateUserProposals from the current cache.
+  /// This ensures derived views (published, notPublished, hasComments) stay in sync.
+  WorkspaceStateUserProposals _rebuildProposalsState() {
+    final proposals = _cache.proposals ?? [];
+    return WorkspaceStateUserProposals.fromList(proposals);
+  }
+
+  /// Removes a proposal from the cache by its reference.
+  void _removeProposalFromCache(DocumentRef ref) {
+    final updatedProposals = _cache.proposals?.where((e) => e.selfRef.id != ref.id).toList() ?? [];
+    _cache = _cache.copyWith(proposals: Optional(updatedProposals));
   }
 
   void _setupProposalsSubscription() {
@@ -224,7 +247,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   Future<void> _unlockProposal(UnlockProposalEvent event, Emitter<WorkspaceState> emit) async {
-    final proposal = state.userProposals.allProposals.firstWhereOrNull(
+    final proposal = _cache.proposals?.firstWhereOrNull(
       (e) => e.selfRef == event.ref,
     );
     if (proposal == null || proposal.selfRef is! SignedDocumentRef) {

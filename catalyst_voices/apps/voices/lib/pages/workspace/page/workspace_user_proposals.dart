@@ -10,10 +10,10 @@ class WorkspaceUserProposals extends StatelessWidget {
     return BlocSelector<WorkspaceBloc, WorkspaceState, bool>(
       selector: (state) => state.showProposals,
       builder: (context, show) {
-        return Offstage(
-          offstage: !show,
-          child: const UserProposals(),
-        );
+        if (!show) {
+          return const SliverToBoxAdapter(child: SizedBox.shrink());
+        }
+        return const UserProposals();
       },
     );
   }

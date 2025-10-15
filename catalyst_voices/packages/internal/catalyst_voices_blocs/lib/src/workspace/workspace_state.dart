@@ -21,8 +21,6 @@ final class WorkspaceState extends Equatable {
   WorkspaceStateCampaignTimeline get campaignTimeline =>
       WorkspaceStateCampaignTimeline._(items: timelineItems);
 
-  bool get hasComments => userProposals.allProposals.any((e) => e.commentsCount > 0);
-
   @override
   List<Object?> get props => [
     isLoading,
@@ -32,8 +30,7 @@ final class WorkspaceState extends Equatable {
     fundNumber,
   ];
 
-  bool get showError => error != null && !isLoading;
-  bool get showProposals => error == null;
+  bool get showProposals => error == null && !isLoading;
 
   DateTime? get submissionCloseDate => timelineItems
       .firstWhereOrNull(
@@ -74,82 +71,71 @@ final class WorkspaceStateUserProposals extends Equatable {
   final UserProposalsView localProposals;
   final UserProposalsView draftProposals;
   final UserProposalsView finalProposals;
+  final UserProposalsView published;
+  final UserProposalsView notPublished;
+  final bool hasComments;
 
   const WorkspaceStateUserProposals({
     this.localProposals = const UserProposalsView(),
     this.draftProposals = const UserProposalsView(),
     this.finalProposals = const UserProposalsView(),
+    this.published = const UserProposalsView(),
+    this.notPublished = const UserProposalsView(),
+    this.hasComments = false,
   });
 
   factory WorkspaceStateUserProposals.fromList(List<UsersProposalOverview> proposals) {
+    // Single-pass filtering for better performance
+    final localProposalsList = <UsersProposalOverview>[];
+    final draftProposalsList = <UsersProposalOverview>[];
+    final finalProposalsList = <UsersProposalOverview>[];
+    final publishedList = <UsersProposalOverview>[];
+    final notPublishedList = <UsersProposalOverview>[];
+    var hasComments = false;
+
+    for (final proposal in proposals) {
+      if (!hasComments && proposal.commentsCount > 0) {
+        hasComments = true;
+      }
+
+      switch (proposal.publish) {
+        case ProposalPublish.localDraft:
+          localProposalsList.add(proposal);
+          notPublishedList.add(proposal);
+        case ProposalPublish.publishedDraft:
+          draftProposalsList.add(proposal);
+          publishedList.add(proposal);
+          // Check for newer local version
+          if (proposal.versions.any((version) => version.isLatestLocal)) {
+            notPublishedList.add(proposal);
+          }
+        case ProposalPublish.submittedProposal:
+          finalProposalsList.add(proposal);
+          publishedList.add(proposal);
+          // Check for newer local version
+          if (proposal.versions.any((version) => version.isLatestLocal)) {
+            notPublishedList.add(proposal);
+          }
+      }
+    }
+
     return WorkspaceStateUserProposals(
-      localProposals: UserProposalsView(
-        items: proposals.where((element) => element.publish == ProposalPublish.localDraft).toList(),
-      ),
-      draftProposals: UserProposalsView(
-        items: proposals.where((e) => e.publish == ProposalPublish.publishedDraft).toList(),
-      ),
-      finalProposals: UserProposalsView(
-        items: proposals.where((e) => e.publish == ProposalPublish.submittedProposal).toList(),
-      ),
+      localProposals: UserProposalsView(items: localProposalsList),
+      draftProposals: UserProposalsView(items: draftProposalsList),
+      finalProposals: UserProposalsView(items: finalProposalsList),
+      published: UserProposalsView(items: publishedList),
+      notPublished: UserProposalsView(items: notPublishedList),
+      hasComments: hasComments,
     );
   }
-
-  List<UsersProposalOverview> get allProposals => [
-    ...localProposals.items,
-    ...draftProposals.items,
-    ...finalProposals.items,
-  ];
-
-  UserProposalsView get notPublished => UserProposalsView(
-    items: allProposals
-        .where(
-          (element) =>
-              element.versions.any((version) => version.isLatestLocal) ||
-              element.publish == ProposalPublish.localDraft,
-        )
-        .toList(),
-  );
 
   @override
   List<Object?> get props => [
     localProposals,
     draftProposals,
     finalProposals,
+    published,
+    notPublished,
+    hasComments,
   ];
-
-  UserProposalsView get published => UserProposalsView(
-    items: allProposals.where((e) => (e.publish.isPublished || e.publish.isDraft)).toList(),
-  );
-
-  WorkspaceStateUserProposals removeProposal(DocumentRef proposalRef) {
-    final newLocal = localProposals.items.where((e) => e.selfRef.id != proposalRef.id).toList();
-    if (newLocal.length != localProposals.items.length) {
-      return copyWith(localProposals: UserProposalsView(items: newLocal));
-    }
-
-    final newDraft = draftProposals.items.where((e) => e.selfRef.id != proposalRef.id).toList();
-    if (newDraft.length != draftProposals.items.length) {
-      return copyWith(draftProposals: UserProposalsView(items: newDraft));
-    }
-
-    final newFinal = finalProposals.items.where((e) => e.selfRef.id != proposalRef.id).toList();
-    if (newFinal.length != finalProposals.items.length) {
-      return copyWith(finalProposals: UserProposalsView(items: newFinal));
-    }
-
-    return this;
-  }
-
-  WorkspaceStateUserProposals copyWith({
-    UserProposalsView? localProposals,
-    UserProposalsView? draftProposals,
-    UserProposalsView? finalProposals,
-  }) {
-    return WorkspaceStateUserProposals(
-      localProposals: localProposals ?? this.localProposals,
-      draftProposals: draftProposals ?? this.draftProposals,
-      finalProposals: finalProposals ?? this.finalProposals,
-    );
-  }
 }
