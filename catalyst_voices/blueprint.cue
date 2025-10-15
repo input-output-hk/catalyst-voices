@@ -15,7 +15,6 @@ project: {
 	}
 	deployment: {
 		on: {
-			merge: {}
 			tag: {}
 		}
 
@@ -125,7 +124,6 @@ project: {
 	release: {
 		docker: {
 			on: {
-				merge: {}
 				tag: {}
 			}
 			config: {
