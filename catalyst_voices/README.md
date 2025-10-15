@@ -12,6 +12,7 @@ This repository contains the Catalyst Voices app and packages.
     * [Packages](#packages)
     * [Environment Type vs Flavor](#environment-type-vs-flavor)
     * [Environment types](#environment-types)
+      * [Stress Test](#stress-test)
     * [Flavor types](#flavor-types)
     * [Environment variables](#environment-variables)
       * [Environment config](#environment-config)
@@ -117,6 +118,16 @@ flutter run --target lib/configs/main.dart --dart-define=ENV_NAME=prod -d chrome
 
 > Catalyst Voices works on the Web only.
 > We plan to add support for other targets later.
+
+#### Stress Test
+
+Each environment can be launched in stress test.
+It will use local version of Gateway and produce as many proposals as configured (defaults to 100).
+Use following `--dart-define` variables to configure your setup:
+
+* `--dart-define=STRESS_TEST=true` to enable
+* `--dart-define=STRESS_TEST_PROPOSAL_INDEX_COUNT=100` says how many proposals will be produced
+* `--dart-define=STRESS_TEST_DECOMPRESSED=false` if signed documents should be compressed or not
 
 ### Flavor types
 
