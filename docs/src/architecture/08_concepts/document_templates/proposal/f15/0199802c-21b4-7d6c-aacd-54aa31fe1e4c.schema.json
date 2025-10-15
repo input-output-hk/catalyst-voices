@@ -41,6 +41,7 @@
                 "value": { "type": "object" },
                 "ongoing_projects": { "type": "object" },
                 "self_assessment": { "type": "object" },
+                "self_assessment_checklist": { "type": "object" }, 
                 "consent_confirmation": { "type": "object" }
             },
             "x-note": "Major sections of the proposal. Each segment contains sections of information grouped together."
@@ -1068,7 +1069,9 @@
             },
             "x-order": [
                 "self_assessment_checklist"
-            ]
+            ],
+            "required": ["self_assessment_checklist"]
+
         },
         "agreements": {
             "$ref": "#/definitions/segment",
