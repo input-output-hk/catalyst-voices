@@ -166,7 +166,11 @@ impl catalyst_signed_doc::providers::CatalystIdProvider for VerifyingKeyProvider
         &self,
         kid: &catalyst_signed_doc::CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
-        Ok(self.0.get(kid).copied())
+        Ok(Settings::signed_doc_cfg()
+            .admin_keys()
+            .get(kid)
+            .or_else(|| self.0.get(kid))
+            .copied())
     }
 }
 
