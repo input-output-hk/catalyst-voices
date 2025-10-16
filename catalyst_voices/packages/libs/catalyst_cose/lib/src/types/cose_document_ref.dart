@@ -5,11 +5,15 @@ import 'package:catalyst_cose/src/utils/cbor_utils.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
+/// Where a document can be located, must be a unique identifier.
 final class CoseDocumentLocator extends Equatable {
+  /// IPLD content identifier.
   final Uint8List cid;
 
+  /// The default constructor for the [CoseDocumentLocator].
   const CoseDocumentLocator({required this.cid});
 
+  /// A constructor with default values for [CoseDocumentLocator].
   CoseDocumentLocator.fallback() : this(cid: Uint8List(0));
 
   /// Deserializes the type from cbor.
@@ -31,11 +35,20 @@ final class CoseDocumentLocator extends Equatable {
   }
 }
 
+/// Reference to a single Signed Document.
 final class CoseDocumentRef extends Equatable {
+  /// A document id.
   final CoseUuid documentId;
+
+  /// A document version.
+  ///
+  /// If the document doesn't have any versions then [documentVer] == [documentId].
   final CoseUuid documentVer;
+
+  /// Where a document can be located, must be a unique identifier.
   final CoseDocumentLocator documentLocator;
 
+  /// A constructor for [CoseDocumentRef] which assigns default, backward compatible values.
   CoseDocumentRef.backwardCompatible({
     required CoseUuid documentId,
     CoseUuid? documentVer,
@@ -67,6 +80,7 @@ final class CoseDocumentRef extends Equatable {
     }
   }
 
+  /// A latest spec version of the [CoseDocumentRef] constructor.
   const CoseDocumentRef.latestSpec({
     required CoseUuid documentId,
     required CoseUuid documentVer,
@@ -105,9 +119,12 @@ final class CoseDocumentRef extends Equatable {
   }
 }
 
+/// A reference to the Parameters Document this document lies under.
 final class CoseDocumentRefs extends Equatable {
+  /// References to documents that document is linked to, like brandId, categoryId or campaignId.
   final List<CoseDocumentRef> refs;
 
+  /// The default constructor for the [CoseDocumentRefs].
   CoseDocumentRefs(this.refs)
     : assert(
         refs.isNotEmpty,

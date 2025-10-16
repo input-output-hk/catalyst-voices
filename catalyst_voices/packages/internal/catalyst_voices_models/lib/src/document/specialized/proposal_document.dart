@@ -167,7 +167,7 @@ final class ProposalMetadata extends DocumentMetadata {
   static const authorsNode = NodeId('authors');
 
   final SignedDocumentRef templateRef;
-  final List<SignedDocumentRef> parameters;
+  final DocumentParameters parameters;
   final List<CatalystId> authors;
 
   ProposalMetadata({

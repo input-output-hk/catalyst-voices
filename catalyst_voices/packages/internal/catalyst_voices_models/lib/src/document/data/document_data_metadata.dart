@@ -25,7 +25,7 @@ final class DocumentDataMetadata extends Equatable {
   final String? section;
 
   /// A list of referenced parameters like brand, category or campaign.
-  final List<SignedDocumentRef> parameters;
+  final DocumentParameters parameters;
 
   /// List of authors represented by CatalystId
   final List<CatalystId>? authors;
@@ -39,7 +39,7 @@ final class DocumentDataMetadata extends Equatable {
     this.template,
     this.reply,
     this.section,
-    this.parameters = const [],
+    this.parameters = const DocumentParameters(),
     this.authors,
   }) : assert(
          selfRef.isExact,
@@ -69,7 +69,7 @@ final class DocumentDataMetadata extends Equatable {
     Optional<SignedDocumentRef>? template,
     Optional<SignedDocumentRef>? reply,
     Optional<String>? section,
-    List<SignedDocumentRef>? parameters,
+    DocumentParameters? parameters,
     Optional<List<CatalystId>>? authors,
   }) {
     return DocumentDataMetadata(

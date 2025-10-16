@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:collection/collection.dart';
 
 final class Proposal extends CoreProposal {
   final int versionNumber;
@@ -68,7 +69,7 @@ final class Proposal extends CoreProposal {
 
 extension ProposalVersionsNumber on List<String> {
   int versionNumber(String version) {
-    sort((versionA, versionB) => versionB.compareTo(versionA));
-    return length - indexWhere((element) => element == version);
+    final list = sorted((versionA, versionB) => versionB.compareTo(versionA));
+    return list.length - list.indexWhere((element) => element == version);
   }
 }

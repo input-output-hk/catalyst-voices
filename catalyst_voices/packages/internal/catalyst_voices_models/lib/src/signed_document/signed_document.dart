@@ -115,19 +115,19 @@ final class SignedDocumentMetadataRef extends Equatable {
   final String id;
 
   /// The version of the referenced entity.
-  final String? ver;
+  final String ver;
 
   /// The default constructor for the [SignedDocumentMetadataRef].
   const SignedDocumentMetadataRef({
     required this.id,
-    this.ver,
+    required this.ver,
   });
 
   /// Creates an instance of [SignedDocumentMetadataRef] from [DocumentRef].
   factory SignedDocumentMetadataRef.fromDocumentRef(DocumentRef ref) {
     return SignedDocumentMetadataRef(
       id: ref.id,
-      ver: ref.version,
+      ver: ref.version ?? ref.id,
     );
   }
 

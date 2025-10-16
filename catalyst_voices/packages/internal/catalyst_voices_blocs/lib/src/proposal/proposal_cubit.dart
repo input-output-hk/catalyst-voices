@@ -86,7 +86,7 @@ final class ProposalCubit extends Cubit<ProposalState>
 
       final proposal = await _proposalService.getProposalDetail(ref: ref);
       // TODO(dt-iohk): fetch all categories, find out which parameter is the category and fetch the category
-      final categoryId = proposal.document.metadata.parameters.first;
+      final categoryId = proposal.document.metadata.parameters.set.first;
       final category = await _campaignService.getCategory(categoryId);
       final commentTemplate = await _commentService.getCommentTemplateFor(category: categoryId);
       final isFavorite = await _proposalService.watchIsFavoritesProposal(ref: ref).first;
@@ -174,7 +174,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         ref: proposalRef! as SignedDocumentRef,
         template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
         reply: reply,
-        parameters: _cache.proposal?.document.metadata.parameters ?? const [],
+        parameters: _cache.proposal?.document.metadata.parameters ?? const DocumentParameters(),
         authorId: activeAccountId!,
       ),
       document: document,

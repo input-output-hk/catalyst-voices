@@ -116,7 +116,7 @@ final class DocumentDataMetadataDto {
         template: data.template?.toDto(),
         reply: data.reply?.toDto(),
         section: data.section,
-        parameters: data.parameters.map((e) => e.toDto()).toList(),
+        parameters: data.parameters.set.map((e) => e.toDto()).toList(),
         authors: data.authors?.map((e) => e.toString()).toList(),
       );
 
@@ -130,7 +130,9 @@ final class DocumentDataMetadataDto {
       template: template?.toModel().toSignedDocumentRef(),
       reply: reply?.toModel().toSignedDocumentRef(),
       section: section,
-      parameters: parameters.map((e) => e.toModel().toSignedDocumentRef()).toList(),
+      parameters: DocumentParameters(
+        parameters.map((e) => e.toModel().toSignedDocumentRef()).toSet(),
+      ),
       authors: authors?.map((e) => CatalystId.fromUri(e.getUri())).toList(),
     );
   }

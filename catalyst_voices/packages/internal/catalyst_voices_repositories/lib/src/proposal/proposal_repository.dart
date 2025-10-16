@@ -459,7 +459,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       id: metadata.id,
       ver: metadata.version,
       template: template == null ? null : SignedDocumentMetadataRef.fromDocumentRef(template),
-      parameters: metadata.parameters.map(SignedDocumentMetadataRef.fromDocumentRef).toList(),
+      parameters: metadata.parameters.set.map(SignedDocumentMetadataRef.fromDocumentRef).toList(),
     );
   }
 

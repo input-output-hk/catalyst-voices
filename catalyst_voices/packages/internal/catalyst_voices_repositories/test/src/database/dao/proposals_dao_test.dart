@@ -2011,7 +2011,7 @@ DocumentEntityWithMetadata _buildProposal({
     authors: [
       if (author != null) author,
     ],
-    parameters: [categoryId ?? _getCategoryId()],
+    parameters: DocumentParameters({categoryId ?? _getCategoryId()}),
   );
   final content = DocumentDataContent({
     if (title != null || contentAuthorName != null)

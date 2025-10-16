@@ -34,7 +34,7 @@ void main() {
           metadata: ProposalMetadata(
             selfRef: DocumentRefFactory.draftRef(),
             templateRef: DocumentRefFactory.signedDocumentRef(),
-            parameters: [categoryId],
+            parameters: DocumentParameters({categoryId}),
             authors: const [],
           ),
           document: document,

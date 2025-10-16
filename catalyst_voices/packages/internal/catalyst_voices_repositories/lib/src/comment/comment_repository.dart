@@ -73,7 +73,7 @@ final class DocumentsCommentRepository implements CommentRepository {
         document.metadata.template!,
       ),
       reply: reply != null ? SignedDocumentMetadataRef.fromDocumentRef(reply) : null,
-      parameters: document.metadata.parameters
+      parameters: document.metadata.parameters.set
           .map(SignedDocumentMetadataRef.fromDocumentRef)
           .toList(),
     );

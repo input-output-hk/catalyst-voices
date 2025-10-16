@@ -243,7 +243,9 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
       id: protectedHeaders.id?.value,
       ver: protectedHeaders.ver?.value,
       ref: ref == null ? null : _SignedDocumentMetadataRefsExt.fromCose(ref).firstOrNull,
-      template: template == null ? null : _SignedDocumentMetadataRefsExt.fromCose(template).firstOrNull,
+      template: template == null
+          ? null
+          : _SignedDocumentMetadataRefsExt.fromCose(template).firstOrNull,
       reply: reply == null ? null : _SignedDocumentMetadataRefsExt.fromCose(reply).firstOrNull,
       section: protectedHeaders.section,
       collaborators: protectedHeaders.collaborators,
@@ -257,7 +259,7 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
 extension _SignedDocumentMetadataRefExt on SignedDocumentMetadataRef {
   CoseDocumentRef get asCose => CoseDocumentRef.backwardCompatible(
     documentId: id.asUuid,
-    documentVer: ver?.asUuid,
+    documentVer: ver.asUuid,
     documentLocator: CoseDocumentLocator.fallback(),
   );
 

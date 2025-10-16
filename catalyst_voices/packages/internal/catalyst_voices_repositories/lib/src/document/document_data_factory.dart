@@ -34,7 +34,7 @@ final class DocumentDataFactory {
       template: document.metadata.template?.toModel(),
       reply: document.metadata.reply?.toModel(),
       section: document.metadata.section,
-      parameters: document.metadata.parameters.map((e) => e.toModel()).toList(),
+      parameters: DocumentParameters(document.metadata.parameters.map((e) => e.toModel()).toSet()),
       authors: document.signers,
     );
 

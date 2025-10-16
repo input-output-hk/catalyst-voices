@@ -44,7 +44,7 @@ final class CommentMetadata extends DocumentMetadata {
   final SignedDocumentRef? reply;
 
   /// A list of referenced parameters like brand, campaign or category.
-  final List<SignedDocumentRef> parameters;
+  final DocumentParameters parameters;
 
   /// Creator of document.
   final CatalystId authorId;
