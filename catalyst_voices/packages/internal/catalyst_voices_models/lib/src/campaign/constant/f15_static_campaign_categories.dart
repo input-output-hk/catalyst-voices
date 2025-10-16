@@ -193,8 +193,11 @@ All proposals must adhere to the following standards. The primary focus is on tu
 - **Define the Problem & Use Case:** Clearly define the problem you are solving and why your on-chain utility is valuable for Cardano users. Explain the ‘So What’ of your proposed solution. This must include a thorough analysis of the existing ecosystem. The responsibility to conduct this research lies entirely with the proposer. Your analysis must specifically address:
   1. **Ecosystem Research:** Describe the results of your research into previously funded projects (via Project Catalyst) and existing solutions in the wider Cardano ecosystem. 
   2. **Value Proposition:** Based on your research findings, demonstrate your project's value in one of two ways:
-	  a. **If similar solutions exist:** Justify why your proposal is sufficiently unique, detailing how it substantially differs from, improves upon, or builds on them.
-	  b. **If the solution is novel:** State clearly that no direct precedent was found and explain why introducing this new capability is a valuable and strategic addition to the Cardano ecosystem.
+
+     a. **If similar solutions exist:** Justify why your proposal is sufficiently unique, detailing how it substantially differs from, improves upon, or builds on them.
+	  
+     b. **If the solution is novel:** State clearly that no direct precedent was found and explain why introducing this new capability is a valuable and strategic addition to the Cardano ecosystem.
+	  
 - **Deliver a Functional Prototype:** The primary goal of your project must be a working software prototype deployed on at least a public Cardano testnet that users can interact with. Non-technical projects (e.g., marketing, events) or foundational research only are not eligible. These can be submitted via *"Cardano Open: Ecosystem"* instead.
 - **Detail Verifiable Team Credentials:** Simply listing names and roles is insufficient. The proposal must include verifiable references (e.g., comprehensive LinkedIn profiles, project portfolios, public repositories) that clearly demonstrate each key team member's specific experience, accomplishments, and suitability for their role in the project.
 - **Outline a Credible Technical Plan:** Describe your technical approach, including the architecture and key technologies you will use.
