@@ -10,10 +10,6 @@ import 'package:result_type/result_type.dart';
 
 final _logger = Logger('DocumentsService');
 
-typedef _RefFailure = Failure<TypedDocumentRef, Exception>;
-
-typedef _RefSuccess = Success<TypedDocumentRef, Exception>;
-
 /// Manage documents stored locally.
 abstract interface class DocumentsService {
   const factory DocumentsService(
@@ -30,12 +26,14 @@ abstract interface class DocumentsService {
   ///
   /// Parameters:
   /// [onProgress] - emits from 0.0 to 1.0.
-  /// [maxConcurrent] requests made at same time
+  /// [maxConcurrent] - requests made at same time inside one batch
+  /// [batchSize] - how many documents per one batch
   ///
   /// Returns list of added refs.
   Future<List<TypedDocumentRef>> sync({
     ValueChanged<double>? onProgress,
     int maxConcurrent,
+    int batchSize,
   });
 
   /// Emits change of documents count.
@@ -61,12 +59,15 @@ final class DocumentsServiceImpl implements DocumentsService {
   Future<List<TypedDocumentRef>> sync({
     ValueChanged<double>? onProgress,
     int maxConcurrent = 100,
+    int batchSize = 300,
   }) async {
     onProgress?.call(0.1);
 
     final allRefs = await _documentRepository.getAllDocumentsRefs();
     final cachedRefs = await _documentRepository.getCachedDocumentsRefs();
     final missingRefs = List.of(allRefs)..removeWhere(cachedRefs.contains);
+
+    onProgress?.call(0.2);
 
     debugPrint(
       'AllRefs[${allRefs.length}], '
@@ -79,86 +80,64 @@ final class DocumentsServiceImpl implements DocumentsService {
       return [];
     }
 
-    onProgress?.call(0.2);
+    missingRefs.sort((a, b) => a.type.priority.compareTo(b.type.priority) * -1);
 
-    var completed = 0;
-    final total = missingRefs.length;
+    final batches = missingRefs.slices(batchSize);
+    final batchesCount = batches.length;
+    var batchesCompleted = 0;
+
     final pool = Pool(maxConcurrent);
+    final errors = <RefSyncException>[];
 
-    final outcomes = <Result<TypedDocumentRef, Exception>>[];
+    for (final batch in batches) {
+      final futures = batch.map<Future<Result<DocumentData, RefSyncException>>>(
+        (value) {
+          return pool.withResource(() async {
+            try {
+              final documentData = await _documentRepository.getDocumentData(ref: value.ref);
 
-    final prioritizedMissingRefs = missingRefs
-        .groupListsBy((element) => element.type.priority)
-        .entries
-        .sorted((a, b) => a.key.compareTo(b.key) * -1);
-
-    debugPrint(
-      prioritizedMissingRefs
-          .map((e) => 'Priority[${e.key}] group refs[${e.value.length}]')
-          .join('\n'),
-    );
-
-    /// Prioritize documents synchronization because
-    /// some documents depend on other already being available.
-    ///
-    /// One such case is Proposal and Template or Action.
-    for (final group in prioritizedMissingRefs) {
-      debugPrint(
-        'Syncing priority[${group.key}] '
-        'group with refs[${group.value.length}]',
-      );
-      final futures = <Future<void>>[];
-
-      /// Handling or errors as Outcome because we have to
-      /// give a change to all refs to finish and keep all info about what
-      /// failed.
-      for (final ref in group.value) {
-        /// Its possible that missingRefs can be very large
-        /// and executing too many requests at once throws
-        /// net::ERR_INSUFFICIENT_RESOURCES in chrome.
-        /// That's reason for adding pool and limiting max requests.
-        final future = pool.withResource<void>(() async {
-          try {
-            if (ref.ref is SignedDocumentRef) {
-              final signedRef = ref.ref.toSignedDocumentRef();
-              final documentData = await _documentRepository.getDocumentData(ref: signedRef);
-              await _documentRepository.upsertDocument(document: documentData);
+              return Success(documentData);
+            } catch (error, stackTrace) {
+              final syncError = RefSyncException(
+                value.ref,
+                error: error,
+                stack: stackTrace,
+              );
+              return Failure(syncError);
             }
-            outcomes.add(_RefSuccess(ref));
-          } catch (error, stackTrace) {
-            final exception = RefSyncException(
-              ref.ref,
-              error: error,
-              stack: stackTrace,
-            );
-            outcomes.add(_RefFailure(exception));
-          } finally {
-            completed += 1;
-            final progress = completed / total;
-            final totalProgress = 0.2 + (progress * 0.8);
-            onProgress?.call(totalProgress);
-          }
-        });
+          });
+        },
+      );
 
-        futures.add(future);
-      }
+      final results = await Future.wait(futures);
 
-      // Wait for all operations managed by the pool to complete
-      await Future.wait(futures);
+      final documents = results
+          .where((element) => element.isSuccess)
+          .map((e) => e.success)
+          .toList();
 
-      debugPrint('Syncing priority[${group.key}] finished');
+      await _documentRepository.saveDocumentBulk(documents);
+
+      final batchErrors = results
+          .where((element) => element.isFailure)
+          .map((e) => e.failure)
+          .toList();
+
+      errors.addAll(batchErrors);
+
+      batchesCompleted += 1;
+      final progress = batchesCompleted / batchesCount;
+      final totalProgress = 0.2 + (progress * 0.6);
+      onProgress?.call(totalProgress);
     }
 
-    final failures = outcomes.whereType<_RefFailure>();
-
-    if (failures.isNotEmpty) {
-      final errors = failures.map((e) => e.failure).toList();
+    if (errors.isNotEmpty) {
       throw RefsSyncException(errors);
     }
 
     onProgress?.call(1);
 
-    return outcomes.whereType<_RefSuccess>().map((e) => e.success).toList();
+    return List.empty();
   }
 
   @override
