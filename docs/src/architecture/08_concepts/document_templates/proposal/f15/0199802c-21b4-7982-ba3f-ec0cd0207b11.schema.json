@@ -1023,6 +1023,12 @@
                             "title": "I confirm that evidence of prior research, whitepaper, design, or proof-of-concept is provided.",  
                             "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
                         },
+                        "": {
+                            "$ref": "#/definitions/agreementConfirmation",
+                            "description": "Ecosystem Value Proposition:",
+                            "title": "I confirm that the proposal includes ecosystem research and uses the findings to either (a) justify its uniqueness over existing solutions or (b) demonstrate the value of its novel approach.",  
+                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                        },
                         "builder_credentials": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Builder Credentials:",
@@ -1072,8 +1078,8 @@
                             "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
                         }
                     },
-                    "required": ["foundational_work","builder_credentials","catalyst_standing","problem_use_case","tangible_prototype", "technical_approach","realistic_scope", "community_engagement","budget_compliance"],
-                    "x-order": ["foundational_work","builder_credentials","catalyst_standing","problem_use_case","tangible_prototype", "technical_approach","realistic_scope", "community_engagement","budget_compliance"]
+                    "required": ["foundational_work","ecosystem_value","builder_credentials","catalyst_standing","problem_use_case","tangible_prototype", "technical_approach","realistic_scope", "community_engagement","budget_compliance"],
+                    "x-order": ["foundational_work","ecosystem_value","builder_credentials","catalyst_standing","problem_use_case","tangible_prototype", "technical_approach","realistic_scope", "community_engagement","budget_compliance"]
                 }
             },
             "x-order": [
