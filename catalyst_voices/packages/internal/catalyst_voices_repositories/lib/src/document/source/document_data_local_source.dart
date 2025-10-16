@@ -17,6 +17,8 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
 
   Future<void> save({required DocumentData data});
 
+  Future<void> saveAll(Iterable<DocumentData> data);
+
   Stream<DocumentData?> watch({required DocumentRef ref});
 }
 

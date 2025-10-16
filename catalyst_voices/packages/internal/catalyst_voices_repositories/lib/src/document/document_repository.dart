@@ -128,6 +128,14 @@ abstract interface class DocumentRepository {
   /// Returns number of deleted rows.
   Future<int> removeAll();
 
+  /// Saves a list of documents to the appropriate local storage.
+  ///
+  /// This method iterates through the provided list of [documents] and saves
+  /// each one based on its reference type.
+  /// - [DraftRef] documents are saved as drafts.
+  /// - [SignedDocumentRef] documents are saved as local signed documents.
+  Future<void> saveDocumentBulk(List<DocumentData> documents);
+
   /// Updates fav status matching [ref].
   Future<void> updateDocumentFavorite({
     required DocumentRef ref,
@@ -398,6 +406,19 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
+  Future<void> saveDocumentBulk(List<DocumentData> documents) async {
+    final signedDocs = documents.where((element) => element.ref is SignedDocumentRef);
+    final draftDocs = documents.where((element) => element.ref is DraftRef);
+
+    if (signedDocs.isNotEmpty) {
+      await _localDocuments.saveAll(signedDocs);
+    }
+    if (draftDocs.isNotEmpty) {
+      await _drafts.saveAll(draftDocs);
+    }
+  }
+
+  @override
   Future<void> updateDocumentFavorite({
     required DocumentRef ref,
     required DocumentType type,
@@ -612,7 +633,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       return _localDocuments.get(ref: ref);
     }
 
-    return _remoteDocuments.get(ref: ref);
+    final remoteData = await _remoteDocuments.get(ref: ref);
+
+    await _localDocuments.save(data: remoteData);
+
+    return remoteData;
   }
 
   DocumentData _parseDocumentData(Uint8List data) {
