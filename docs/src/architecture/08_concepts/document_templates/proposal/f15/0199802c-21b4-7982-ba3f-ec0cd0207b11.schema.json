@@ -1023,7 +1023,7 @@
                             "title": "I confirm that evidence of prior research, whitepaper, design, or proof-of-concept is provided.",  
                             "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
                         },
-                        "": {
+                        "ecosystem_value": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Ecosystem Value Proposition:",
                             "title": "I confirm that the proposal includes ecosystem research and uses the findings to either (a) justify its uniqueness over existing solutions or (b) demonstrate the value of its novel approach.",  
