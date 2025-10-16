@@ -1,111 +1,130 @@
 {
-    "$schema": "./0ce8ab38-9258-4fbc-a62e-7faa6e58318f.schema.json",
+    "$schema": "./0199802c-21b4-7d6c-aacd-54aa31fe1e4c.schema.json",
     "setup": {
         "title": {
-            "title": "Example Catalyst Proposal"
+            "title": "First!"
         },
         "proposer": {
-            "applicant": "John Smith",
+            "applicant": "Damian",
             "type": "Individual"
         }
     },
     "summary": {
         "budget": {
-            "requestedFunds": 150000
+            "requestedFunds": 2500
         },
         "time": {
-            "duration": 6
+            "duration": 3
         },
         "translation": {
-            "isTranslated": true,
-            "originalLanguage": "de",
-            "originalDocumentLink": "https://example.com/original-doc"
+            "isTranslated": false,
+            "originalLanguage": "en"
         },
         "problem": {
-            "statement": "Current challenge in the Cardano ecosystem..."
+            "statement": "Work Work Work Work Work Work Work Work Work Work Work Work"
         },
         "solution": {
-            "summary": "Our solution provides a comprehensive toolkit..."
+            "summary": "Work Work Work Work Work Work Work Work Work Work Work Work"
         },
         "supportingLinks": {
-            "links": [
-                "https://github.com/example/project",
-                "https://docs.example.com",
-                "https://example.com/whitepaper",
-                "https://example.com/roadmap"
-            ]
+            "links": []
         },
         "dependencies": {
-            "hasDependency": true,
-            "dependencyDetail": "Integration with third-party API service requires external dependencies..."
+            "hasDependency": false,
+            "dependencyDetail": "Work Work Work Work Work Work Work Work Work Work Work Work"
         },
         "open_source": {
-            "isOpenSource": true,
-            "licenseInformation": "All source code and documentation will be released under the MIT license."
+            "isOpenSource": false,
+            "licenseInformation": "Work Work Work Work Work Work Work Work Work Work Work Work"
         }
     },
     "theme": {
         "theme": {
             "grouped_tag": {
-                "group": "DeFi",
-                "tag": "Staking"
+                "group": "Governance",
+                "tag": "DAO"
             }
+        }
+    },
+    "campaign_category": {
+        "category_questions": {
+            "dapp_purpose": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work",
+            "build_goal": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work",
+            "developer_reuse": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work"
         }
     },
     "details": {
         "solution": {
-            "solution": "Our solution involves developing a comprehensive toolkit that will enhance the Cardano developer experience..."
+            "solution": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work"
         },
         "impact": {
-            "impact": "The project will significantly impact developer productivity by reducing development time and improving code quality..."
+            "impact": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work"
         },
         "feasibility": {
-            "feasibility": "Our team has extensive experience in blockchain development and has successfully delivered similar projects..."
+            "feasibility": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work"
         }
     },
     "milestones": {
         "milestones": {
             "milestone_list": [
                 {
-                    "title": "Initial Setup and Planning",
-                    "outputs": "Project infrastructure setup and detailed planning documents",
-                    "acceptance_criteria": "- Development environment configured\n- Detailed project plan approved",
-                    "evidence": "- GitHub repository setup\n- Documentation of infrastructure\n- Project planning documents",
+                    "title": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work",
+                    "outputs": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work",
+                    "acceptance_criteria": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work",
+                    "evidence": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work",
                     "delivery_month": 1,
-                    "cost": 30000,
-                    "progress": "Not Started"
+                    "cost": 1000,
+                    "progress": "30 %"
                 },
                 {
-                    "title": "Core Development",
-                    "outputs": "Implementation of main features",
-                    "acceptance_criteria": "- Core features implemented\n- Unit tests passing",
-                    "evidence": "- Code repository\n- Test results\n- Technical documentation",
-                    "delivery_month": 3,
-                    "cost": 60000,
-                    "progress": "Not Started"
+                    "title": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work ",
+                    "outputs": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work",
+                    "acceptance_criteria": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work",
+                    "evidence": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work",
+                    "delivery_month": 1,
+                    "cost": 7000,
+                    "progress": "40 %"
                 },
                 {
-                    "title": "Final Release and Documentation",
-                    "outputs": "Project completion, documentation, and Project Close-out Report and Video",
-                    "acceptance_criteria": "- All features implemented and tested\n- Documentation complete\n- Close-out report and video delivered",
-                    "evidence": "- Final release\n- Complete documentation\n- Close-out report and video",
-                    "delivery_month": 6,
-                    "cost": 60000,
-                    "progress": "Not Started"
+                    "title": "Work Work Work Work Work Work Work Work Work Work Work Work Work ",
+                    "outputs": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work",
+                    "acceptance_criteria": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work",
+                    "evidence": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work",
+                    "delivery_month": 2,
+                    "cost": 2000,
+                    "progress": "60 %"
                 }
             ]
         }
     },
     "pitch": {
         "team": {
-            "who": "Our team consists of experienced blockchain developers with proven track records..."
+            "who": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work"
         },
         "budget": {
-            "costs": "Budget breakdown:\n- Development (70%): 105,000 ADA\n- Testing (15%): 22,500 ADA\n- Documentation (15%): 22,500 ADA"
+            "costs": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work"
         },
         "value": {
-            "note": "This project provides excellent value for money by delivering essential developer tools..."
+            "note": "Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work Work"
         }
     },
-    "agreements": {}
+    "self_assessment": {
+        "self_assessment_checklist": {
+            "strategic_fit": true,
+            "developer_experience": true,
+            "open_source_commitment": true,
+            "verifiable_builder_credentials": true,
+            "quality_documentation": true,
+            "realistic_scope": true
+        }
+    },
+    "agreements": {
+        "ongoing_projects": {
+            "has_ongoing_projects": false,
+            "projects": []
+        },
+        "consent_confirmation": {
+            "terms_and_conditions": true
+        }
+    }
 }
