@@ -55,12 +55,14 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   }) async {
     final compressedPayload = await _brotliCompressPayload(document.toBytes());
 
-    final coseSign = await _profileCoseSign(() async => CoseSign.sign(
-      protectedHeaders: metadata.asCoseProtectedHeaders,
-      unprotectedHeaders: metadata.asCoseUnprotectedHeaders,
-      payload: compressedPayload,
-      signers: [_CatalystSigner(catalystId, privateKey)],
-    ));
+    final coseSign = await _profileCoseSign(
+      () async => CoseSign.sign(
+        protectedHeaders: metadata.asCoseProtectedHeaders,
+        unprotectedHeaders: metadata.asCoseUnprotectedHeaders,
+        payload: compressedPayload,
+        signers: [_CatalystSigner(catalystId, privateKey)],
+      ),
+    );
 
     return _CoseSignedDocument(
       coseSign: coseSign,
