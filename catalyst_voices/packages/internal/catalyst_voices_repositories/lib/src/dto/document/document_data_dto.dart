@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_data_dto.g.dart';
@@ -178,8 +179,24 @@ final class DocumentDataMetadataDto {
   }
 
   static Map<String, dynamic> _migrateJson3(Map<String, dynamic> json) {
-    // TODO(dt-iohk): migrate brandId, campaingId and categoryId into parameters
-    return json;
+    final parametersKeys = ['brandId', 'campaignId', 'categoryId'];
+
+    if (parametersKeys.none(json.containsKey)) {
+      return json;
+    } else {
+      final modified = Map.of(json);
+      final parameters = <DocumentRefDto>[];
+
+      for (final key in parametersKeys) {
+        final value = modified.remove(key);
+        if (value is Map<String, dynamic>) {
+          parameters.add(DocumentRefDto.fromJson(value));
+        }
+      }
+
+      modified['parameters'] = parameters.map((e) => e.toJson()).toList();
+      return modified;
+    }
   }
 }
 
