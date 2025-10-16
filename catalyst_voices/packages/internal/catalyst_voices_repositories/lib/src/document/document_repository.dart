@@ -267,7 +267,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       ...constantDocumentsRefs.expand(
         (element) => [
           element.proposal.toTyped(DocumentType.proposalTemplate),
-          element.category.toTyped(DocumentType.commentTemplate),
+          element.comment.toTyped(DocumentType.commentTemplate),
         ],
       ),
       ...nonConstRefs,
