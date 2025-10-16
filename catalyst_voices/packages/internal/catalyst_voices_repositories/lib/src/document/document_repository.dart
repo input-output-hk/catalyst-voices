@@ -70,8 +70,11 @@ abstract interface class DocumentRepository {
   ///
   /// If [DocumentRef] is [DraftRef] it will look for this document in local
   /// storage.
+  ///
+  /// When [useCache] is false.
   Future<DocumentData> getDocumentData({
     required DocumentRef ref,
+    bool useCache,
   });
 
   /// Useful when recovering account and we want to lookup
@@ -259,28 +262,16 @@ final class DocumentRepositoryImpl implements DocumentRepository {
         .where((ref) => allConstRefs.none((e) => e.id == ref.ref.id))
         .toList();
 
-    final exactRefs = nonConstRefs.where((ref) => ref.ref.isExact).toList();
-    final looseRefs = nonConstRefs.where((ref) => !ref.ref.isExact).toList();
-
-    final latestLooseRefs = await looseRefs.map((ref) async {
-      final latestVer = await _remoteDocuments.getLatestVersion(ref.ref.id);
-      return latestVer != null ? ref.copyWithVersion(latestVer) : ref;
-    }).wait;
-
-    final allLatestRefs = [
-      ...exactRefs,
-      ...latestLooseRefs,
-    ];
-
-    final uniqueRefs = {
+    return {
       // Note. categories are mocked on backend so we can't not fetch them.
       ...constantDocumentsRefs.expand(
-        (element) => element.allTyped.where((e) => !e.type.isCategory),
+        (element) => [
+          element.proposal.toTyped(DocumentType.proposalTemplate),
+          element.category.toTyped(DocumentType.commentTemplate),
+        ],
       ),
-      ...allLatestRefs,
-    };
-
-    return uniqueRefs.toList();
+      ...nonConstRefs,
+    }.toList();
   }
 
   @override
@@ -301,9 +292,14 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   @override
   Future<DocumentData> getDocumentData({
     required DocumentRef ref,
+    bool useCache = true,
   }) async {
     return switch (ref) {
-      SignedDocumentRef() => _getSignedDocumentData(ref: ref),
+      SignedDocumentRef() => _getSignedDocumentData(ref: ref, useCache: useCache),
+      DraftRef() when !useCache => throw DocumentNotFoundException(
+        ref: ref,
+        message: '$ref can not be resolved while not using cache',
+      ),
       DraftRef() => _getDraftDocumentData(ref: ref),
     };
   }
@@ -619,6 +615,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   Future<DocumentData> _getSignedDocumentData({
     required SignedDocumentRef ref,
+    bool useCache = true,
   }) async {
     // if version is not specified we're asking remote for latest version
     // if remote does not know about this id its probably draft so
@@ -628,16 +625,18 @@ final class DocumentRepositoryImpl implements DocumentRepository {
       ref = ref.copyWith(version: Optional(latestVersion));
     }
 
-    final isCached = await _localDocuments.exists(ref: ref);
+    final isCached = useCache && await _localDocuments.exists(ref: ref);
     if (isCached) {
       return _localDocuments.get(ref: ref);
     }
 
-    final remoteData = await _remoteDocuments.get(ref: ref);
+    final document = await _remoteDocuments.get(ref: ref);
 
-    await _localDocuments.save(data: remoteData);
+    if (useCache) {
+      await _localDocuments.save(data: document);
+    }
 
-    return remoteData;
+    return document;
   }
 
   DocumentData _parseDocumentData(Uint8List data) {

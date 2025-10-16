@@ -29,8 +29,8 @@ abstract interface class DocumentsService {
   /// [maxConcurrent] - requests made at same time inside one batch
   /// [batchSize] - how many documents per one batch
   ///
-  /// Returns list of added refs.
-  Future<List<TypedDocumentRef>> sync({
+  /// Returns count of new documents.
+  Future<int> sync({
     ValueChanged<double>? onProgress,
     int maxConcurrent,
     int batchSize,
@@ -56,7 +56,7 @@ final class DocumentsServiceImpl implements DocumentsService {
   }
 
   @override
-  Future<List<TypedDocumentRef>> sync({
+  Future<int> sync({
     ValueChanged<double>? onProgress,
     int maxConcurrent = 100,
     int batchSize = 300,
@@ -77,24 +77,29 @@ final class DocumentsServiceImpl implements DocumentsService {
 
     if (missingRefs.isEmpty) {
       onProgress?.call(1);
-      return [];
+      return 0;
     }
 
     missingRefs.sort((a, b) => a.type.priority.compareTo(b.type.priority) * -1);
 
     final batches = missingRefs.slices(batchSize);
     final batchesCount = batches.length;
-    var batchesCompleted = 0;
 
     final pool = Pool(maxConcurrent);
     final errors = <RefSyncException>[];
+
+    var batchesCompleted = 0;
+    var documentsSynchronised = 0;
 
     for (final batch in batches) {
       final futures = batch.map<Future<Result<DocumentData, RefSyncException>>>(
         (value) {
           return pool.withResource(() async {
             try {
-              final documentData = await _documentRepository.getDocumentData(ref: value.ref);
+              final documentData = await _documentRepository.getDocumentData(
+                ref: value.ref,
+                useCache: false,
+              );
 
               return Success(documentData);
             } catch (error, stackTrace) {
@@ -118,6 +123,8 @@ final class DocumentsServiceImpl implements DocumentsService {
 
       await _documentRepository.saveDocumentBulk(documents);
 
+      documentsSynchronised += documents.length;
+
       final batchErrors = results
           .where((element) => element.isFailure)
           .map((e) => e.failure)
@@ -137,7 +144,7 @@ final class DocumentsServiceImpl implements DocumentsService {
 
     onProgress?.call(1);
 
-    return List.empty();
+    return documentsSynchronised;
   }
 
   @override

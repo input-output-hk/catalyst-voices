@@ -79,7 +79,7 @@ final class SyncManagerImpl implements SyncManager {
     try {
       debugPrint('Synchronization started');
 
-      final newRefs = await _documentsService.sync(
+      final docsCount = await _documentsService.sync(
         onProgress: (value) {
           debugPrint('Documents sync progress[$value]');
         },
@@ -90,11 +90,11 @@ final class SyncManagerImpl implements SyncManager {
       debugPrint('Synchronization took ${stopwatch.elapsed}');
 
       await _updateSuccessfulSyncStats(
-        newRefsCount: newRefs.length,
+        newRefsCount: docsCount,
         duration: stopwatch.elapsed,
       );
 
-      debugPrint('Synchronization completed. NewRefs[${newRefs.length}]');
+      debugPrint('Synchronization completed. New documents: $docsCount');
       _synchronizationCompleter.complete(true);
     } catch (error, stack) {
       stopwatch.stop();
