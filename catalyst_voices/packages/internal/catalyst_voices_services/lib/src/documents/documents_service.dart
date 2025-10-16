@@ -92,27 +92,25 @@ final class DocumentsServiceImpl implements DocumentsService {
     var documentsSynchronised = 0;
 
     for (final batch in batches) {
-      final futures = batch.map<Future<Result<DocumentData, RefSyncException>>>(
-        (value) {
-          return pool.withResource(() async {
-            try {
-              final documentData = await _documentRepository.getDocumentData(
-                ref: value.ref,
-                useCache: false,
-              );
+      final futures = [
+        for (final value in batch)
+          pool.withResource(
+            () => _documentRepository
+                .getDocumentData(ref: value.ref, useCache: false)
+                .then<Result<DocumentData, RefSyncException>>(Success.new)
+                .onError(
+                  (error, stackTrace) {
+                    final syncError = RefSyncException(
+                      value.ref,
+                      error: error,
+                      stack: stackTrace,
+                    );
 
-              return Success(documentData);
-            } catch (error, stackTrace) {
-              final syncError = RefSyncException(
-                value.ref,
-                error: error,
-                stack: stackTrace,
-              );
-              return Failure(syncError);
-            }
-          });
-        },
-      );
+                    return Failure(syncError);
+                  },
+                ),
+          ),
+      ];
 
       final results = await Future.wait(futures);
 
