@@ -210,18 +210,18 @@ All proposals must adhere to the following standards. The primary focus is on tu
         description: r'''
 Use this checklist to ensure your proposal meets all foundational and content requirements before submission.
 
-| **Rule & Check**                | **Description**                                                                                                                                                             |
+| **Rule & Check** | **Description** |
 |:--------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Foundational Work**           | Evidence of prior research, whitepaper, design, or proof-of-concept is provided.                                                                                                |
+| **Foundational Work** | Evidence of prior research, whitepaper, design, or proof-of-concept is provided. |
 | **Ecosystem Value Proposition** | The proposal includes ecosystem research and uses the findings to either (a) justify its uniqueness over existing solutions or (b) demonstrate the value of its novel approach. |
-| **Builder Credentials**         | Demonstrates technical capability via verifiable in-house talent or a confirmed development partner (GitHub, LinkedIn, portfolio, etc.)                                         |
-| **Catalyst Standing**           | Proposer and all team members are in good standing with prior Catalyst projects.                                                                                                |
-| **Problem & Use Case**          | The proposal clearly defines the problem and the value of the on-chain utility.                                                                                                 |
-| **Tangible Prototype**          | The primary goal is a working prototype deployed on at least a Cardano testnet.                                                                                                 |
-| **Technical Approach**          | The proposal outlines a credible and clear technical plan and architecture.                                                                                                     |
-| **Realistic Scope**             | The budget and timeline (≤ 12 months) are realistic for the proposed work.                                                                                                      |
-| **Community Engagement**        | Includes a community engagement and feedback plan to amplify prototype adoption with the Cardano ecosystem.                                                                     |
-| **Budget Compliance**           | The budget is for future development only; excludes retroactive funding, incentives, giveaways, re-granting, or sub-treasuries.                                                 |
+| **Builder Credentials** | Demonstrates technical capability via verifiable in-house talent or a confirmed development partner (GitHub, LinkedIn, portfolio, etc.) |
+| **Catalyst Standing** | Proposer and all team members are in good standing with prior Catalyst projects. |
+| **Problem & Use Case** | The proposal clearly defines the problem and the value of the on-chain utility. |
+| **Tangible Prototype** | The primary goal is a working prototype deployed on at least a Cardano testnet. |
+| **Technical Approach** | The proposal outlines a credible and clear technical plan and architecture. |
+| **Realistic Scope** | The budget and timeline (≤ 12 months) are realistic for the proposed work. |
+| **Community Engagement** | Includes a community engagement and feedback plan to amplify prototype adoption with the Cardano ecosystem. |
+| **Budget Compliance** | The budget is for future development only; excludes retroactive funding, incentives, giveaways, re-granting, or sub-treasuries. |
 ''',
       ),
     ],
