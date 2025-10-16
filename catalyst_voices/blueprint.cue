@@ -12,10 +12,20 @@ project: {
 				},
 			]
 		}
+		"docker": {
+			secrets: [
+				{
+					provider: "aws"
+					path:     "global/ci/sentry"
+					maps: {
+						"token":   "SENTRY_AUTH_TOKEN"
+					}
+				},
+			]
+		}
 	}
 	deployment: {
 		on: {
-			merge: {}
 			tag: {}
 		}
 
@@ -125,7 +135,6 @@ project: {
 	release: {
 		docker: {
 			on: {
-				merge: {}
 				tag: {}
 			}
 			config: {

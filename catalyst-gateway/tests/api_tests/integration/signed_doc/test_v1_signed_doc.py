@@ -5,7 +5,7 @@ from api.v1 import document as document_v1
 from api.v2 import document as document_v2
 import json
 from utils.rbac_chain import rbac_chain_factory, RoleID
-from utils.signed_doc import SignedDocumentV1, proposal_templates
+from utils.signed_doc import SignedDocumentV1
 
 
 # Getting documents using GET `/v1/document` endpoint.

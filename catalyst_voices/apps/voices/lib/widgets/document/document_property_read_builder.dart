@@ -2,6 +2,7 @@ import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -59,8 +60,6 @@ class _DocumentPropertyReadBuilderListTile extends StatelessWidget {
         if (title.isNotEmpty) ...[
           Text(
             title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
             style: textTheme.bodySmall?.copyWith(
               color: colors.textOnPrimaryLevel1,
             ),
@@ -233,9 +232,11 @@ class _DocumentPropertyReadBuilderState extends State<DocumentPropertyReadBuilde
           title: schema.title,
           value: text,
         );
-      case DocumentTokenValueCardanoAdaSchema():
+
+      case DocumentCurrencySchema():
         final num = schema.castValue(value);
-        final text = num != null ? const Currency.ada().format(num) : null;
+        final money = num != null ? schema.valueToMoney(num) : null;
+        final text = money != null ? MoneyFormatter.formatDecimal(money) : null;
 
         return DocumentTextListItem(
           id: property.nodeId,
@@ -266,7 +267,6 @@ class _DocumentPropertyReadBuilderState extends State<DocumentPropertyReadBuilde
           id: property.nodeId,
           title: schema.title,
           value: text,
-          isMultiline: true,
         );
       case DocumentMultiLineTextEntryMarkdownSchema():
         final text = schema.castValue(value);

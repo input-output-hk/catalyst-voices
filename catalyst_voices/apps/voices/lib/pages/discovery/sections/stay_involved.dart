@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/constants/constants.dart';
+import 'package:catalyst_voices/common/ext/active_fund_number_selector_ext.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/discovery/sections/session_account_catalyst_id.dart';
 import 'package:catalyst_voices/share/share_manager.dart';
@@ -19,9 +20,11 @@ class StayInvolved extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 120, vertical: 72),
-      child: Column(
+    return ResponsivePadding(
+      xs: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      sm: const EdgeInsets.symmetric(horizontal: 48, vertical: 48),
+      md: const EdgeInsets.symmetric(horizontal: 120, vertical: 72),
+      child: const Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -295,7 +298,7 @@ class _VoterCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return _StayInvolvedCard(
       icon: VoicesAssets.icons.vote,
-      title: context.l10n.registerToVoteFund14,
+      title: context.l10n.registerToVoteFund(context.activeCampaignFundNumber),
       description: context.l10n.stayInvolvedContributorDescription,
       actions: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

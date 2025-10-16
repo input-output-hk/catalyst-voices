@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/constants/constants.dart';
+import 'package:catalyst_voices/common/ext/active_fund_number_selector_ext.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal/proposal_content.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -43,7 +44,7 @@ class _AppCloseText extends StatelessWidget {
                 style: context.textTheme.titleMedium,
               ),
               Text(
-                context.l10n.browseProposalsOnProjectCatalyst,
+                context.l10n.browseProposalsOnProjectCatalyst(context.activeCampaignFundNumber),
                 style: context.textTheme.bodyMedium?.copyWith(
                   color: context.colors.textOnPrimaryLevel1,
                 ),
@@ -67,10 +68,12 @@ class _Button extends StatelessWidget with LaunchUrlMixin {
     return VoicesFilledButton(
       trailing: VoicesAssets.icons.externalLink.buildIcon(),
       child: Text(
-        context.l10n.browseFund14Proposals,
+        context.l10n.browseFundProposals(context.activeCampaignFundNumber),
       ),
       onTap: () async {
-        await launchUri(VoicesConstants.projectCatalystFund14Url.getUri());
+        await launchUri(
+          VoicesConstants.projectCatalystFundUrl(context.activeCampaignFundNumber).getUri(),
+        );
       },
     );
   }
@@ -96,7 +99,7 @@ class _ProposalAppClosedState extends State<ProposalAppClosed> {
               xs: 0,
               sm: 16,
               md: 32,
-              other: 56,
+              lg: 56,
               builder: (context, spacing) => Padding(
                 padding: EdgeInsets.only(left: spacing / 2, right: spacing, top: 12),
                 child: Container(
@@ -106,9 +109,9 @@ class _ProposalAppClosedState extends State<ProposalAppClosed> {
                   ),
                   padding: const EdgeInsets.all(12),
                   width: double.infinity,
-                  child: ResponsiveChild(
+                  child: ResponsiveChildBuilder(
                     xs: (context) => const _SmallView(),
-                    other: (context) => const Row(
+                    sm: (context) => const Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       spacing: 16,
                       children: [

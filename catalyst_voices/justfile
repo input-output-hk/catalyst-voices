@@ -6,27 +6,28 @@ default:
 
 # Linking of all packages
 setup-code:
-    melos bs
+    melos bootstrap
 
 # Builds generated code
-generate-code: setup-code
+generate-code:
     cd .. && earthly ./catalyst_voices+code-generator --platform=linux/amd64 --save_locally=true
 
 # Syntax sugar for linking packages and building generated code
-bootstrap: generate-code
+bootstrap: setup-code generate-code
 
 # Runs all static code checks
 check-code:
-    earthly +build-static-analysis
     earthly +check-code-formatting
+    earthly +check-package-publishing
     earthly +check-license
+    earthly +build-static-analysis
 
 # Runs unit tests
 test-code:
     earthly +test-unit-native
 
 # Pre Push Checks
-pre-push: check-code
+pre-push: generate-code check-code test-code
 
 license-list: setup-code
     melos license-list

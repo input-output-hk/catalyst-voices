@@ -57,7 +57,7 @@ final class LocalizedDocumentListItemsNotUnique extends LocalizedDocumentValidat
 
 /// When list items are out of range.
 final class LocalizedDocumentListItemsOutOfRange extends LocalizedDocumentValidationResult {
-  final NumRange<int> range;
+  final Range<int?> range;
 
   const LocalizedDocumentListItemsOutOfRange({required this.range});
 
@@ -82,9 +82,71 @@ final class LocalizedDocumentListItemsOutOfRange extends LocalizedDocumentValida
   }
 }
 
+/// When a money value is not a multiple of [multipleOf].
+final class LocalizedDocumentMoneyNotMultipleOf extends LocalizedDocumentValidationResult {
+  final Money multipleOf;
+
+  const LocalizedDocumentMoneyNotMultipleOf({required this.multipleOf});
+
+  @override
+  List<Object?> get props => [multipleOf];
+
+  @override
+  String? message(BuildContext context) {
+    return context.l10n.errorValidationNumNotMultipleOf(
+      MoneyFormatter.formatDecimal(multipleOf),
+    );
+  }
+}
+
+/// When a money value is out of range.
+final class LocalizedDocumentMoneyOutOfRange extends LocalizedDocumentValidationResult {
+  final Range<Money?> range;
+
+  const LocalizedDocumentMoneyOutOfRange({required this.range});
+
+  @override
+  List<Object?> get props => [range];
+
+  @override
+  String? message(BuildContext context) {
+    final min = range.min;
+    final max = range.max;
+
+    if (min != null && max != null) {
+      return context.l10n.errorValidationNumFieldOutOfRange(
+        MoneyFormatter.formatDecimal(min),
+        MoneyFormatter.formatDecimal(max),
+      );
+    } else if (min != null) {
+      return context.l10n.errorValidationNumFieldBelowMin(MoneyFormatter.formatDecimal(min));
+    } else if (max != null) {
+      return context.l10n.errorValidationNumFieldAboveMax(MoneyFormatter.formatDecimal(max));
+    } else {
+      // the range is unconstrained, so any value is allowed
+      return null;
+    }
+  }
+}
+
+/// When a numeric value is not a multiple of [multipleOf].
+final class LocalizedDocumentNumNotMultipleOf extends LocalizedDocumentValidationResult {
+  final num multipleOf;
+
+  const LocalizedDocumentNumNotMultipleOf({required this.multipleOf});
+
+  @override
+  List<Object?> get props => [multipleOf];
+
+  @override
+  String? message(BuildContext context) {
+    return context.l10n.errorValidationNumNotMultipleOf(multipleOf.toString());
+  }
+}
+
 /// When a numeric value is out of range.
 final class LocalizedDocumentNumOutOfRange extends LocalizedDocumentValidationResult {
-  final NumRange<num> range;
+  final Range<num?> range;
 
   const LocalizedDocumentNumOutOfRange({required this.range});
 
@@ -97,11 +159,11 @@ final class LocalizedDocumentNumOutOfRange extends LocalizedDocumentValidationRe
     final max = range.max?.toInt();
 
     if (min != null && max != null) {
-      return context.l10n.errorValidationNumFieldOutOfRange(min, max);
+      return context.l10n.errorValidationNumFieldOutOfRange(min.toString(), max.toString());
     } else if (min != null) {
-      return context.l10n.errorValidationNumFieldBelowMin(min);
+      return context.l10n.errorValidationNumFieldBelowMin(min.toString());
     } else if (max != null) {
-      return context.l10n.errorValidationNumFieldAboveMax(max);
+      return context.l10n.errorValidationNumFieldAboveMax(max.toString());
     } else {
       // the range is unconstrained, so any value is allowed
       return null;
@@ -131,7 +193,7 @@ final class LocalizedDocumentPatternMismatch extends LocalizedDocumentValidation
 
 /// When a string length is out of range.
 final class LocalizedDocumentStringOutOfRange extends LocalizedDocumentValidationResult {
-  final NumRange<int> range;
+  final Range<int?> range;
 
   const LocalizedDocumentStringOutOfRange({required this.range});
 
@@ -171,6 +233,13 @@ sealed class LocalizedDocumentValidationResult extends Equatable {
       SuccessfulDocumentValidation() => const LocalizedSuccessfulDocumentValidation(),
       MissingRequiredDocumentValue() => const LocalizedMissingRequiredDocumentValue(),
       DocumentNumOutOfRange() => LocalizedDocumentNumOutOfRange(range: result.expectedRange),
+      DocumentMoneyOutOfRange() => LocalizedDocumentMoneyOutOfRange(range: result.expectedRange),
+      DocumentNumNotMultipleOf() => LocalizedDocumentNumNotMultipleOf(
+        multipleOf: result.multipleOf,
+      ),
+      DocumentMoneyNotMultipleOf() => LocalizedDocumentMoneyNotMultipleOf(
+        multipleOf: result.multipleOf,
+      ),
       DocumentStringOutOfRange() => LocalizedDocumentStringOutOfRange(range: result.expectedRange),
       DocumentItemsOutOfRange() => LocalizedDocumentListItemsOutOfRange(
         range: result.expectedRange,

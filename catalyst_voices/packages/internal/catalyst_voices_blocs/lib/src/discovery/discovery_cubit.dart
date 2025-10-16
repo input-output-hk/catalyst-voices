@@ -20,7 +20,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   StreamSubscription<List<Proposal>>? _proposalsSub;
   StreamSubscription<List<String>>? _favoritesProposalsIdsSub;
 
-  DiscoveryCubit(this._campaignService, this._proposalService) : super(const DiscoveryState());
+  DiscoveryCubit(this._campaignService, this._proposalService) : super(DiscoveryState());
 
   Future<void> addFavorite(DocumentRef ref) async {
     try {
@@ -53,7 +53,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     try {
       emit(
         state.copyWith(
-          campaign: const DiscoveryCurrentCampaignState(),
+          campaign: DiscoveryCurrentCampaignState(),
           categories: const DiscoveryCampaignCategoriesState(),
         ),
       );
@@ -153,7 +153,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     return _proposalService
         .watchProposalsPage(
           request: const PageRequest(page: 0, size: _maxRecentProposalsCount),
-          filters: const ProposalsFilters(),
+          filters: ProposalsFilters.forActiveCampaign(),
           order: const UpdateDate(isAscending: false),
         )
         .map((event) => event.items)

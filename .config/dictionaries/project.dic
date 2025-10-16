@@ -6,6 +6,7 @@ addrof
 addrr
 adminer
 afinet
+allprojects
 androidx
 anypolicy
 apirequest
@@ -35,6 +36,7 @@ bkioshn
 bluefireteam
 bridgefor
 BROTLI
+bstolinski
 buildkitd
 Caddyfile
 canvaskit
@@ -67,6 +69,7 @@ codepoints
 collabs
 commitlog
 concatcp
+configureondemand
 coproposers
 COSE
 coti
@@ -102,6 +105,7 @@ dorny
 dotenv
 dotenvy
 dotglob
+downloadsfolder
 drep
 dreps
 dt-iohk
@@ -138,6 +142,7 @@ gethostname
 Gitbook
 gmtime
 gradlew
+hackathon
 Hackathons
 headful
 headlessui
@@ -205,6 +210,7 @@ libxkbcommon
 libxshmfence
 Lifetimeable
 lintfix
+litepaper
 localizable
 loguru
 lovelace
@@ -269,6 +275,7 @@ Pozhylenkov
 Precache
 Precertificate
 preprod
+proguard
 projectcatalyst
 Prokhorenko
 proptest
@@ -337,6 +344,7 @@ subchain
 Subkey
 submiting
 subosito
+subprojects
 svgs
 syncable
 SYSROOT
@@ -344,6 +352,7 @@ tablestats
 tabview
 tacho
 tailscale
+telehealth
 testcov
 testdocs
 testid
@@ -377,6 +386,7 @@ Unstaked
 Upsert
 Upserts
 upskilling
+USDM
 UTXO
 Utxos
 uuidv

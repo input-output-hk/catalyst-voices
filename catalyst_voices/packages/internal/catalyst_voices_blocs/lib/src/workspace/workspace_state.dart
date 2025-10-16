@@ -3,6 +3,17 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
+final class WorkspaceStateCampaignTimeline extends Equatable {
+  final List<CampaignTimelineViewModel> items;
+
+  const WorkspaceStateCampaignTimeline._({
+    required this.items,
+  });
+
+  @override
+  List<Object?> get props => [items];
+}
+
 final class WorkspaceState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
@@ -17,6 +28,9 @@ final class WorkspaceState extends Equatable {
     this.timelineItems = const [],
     this.fundNumber = 0,
   });
+
+  WorkspaceStateCampaignTimeline get campaignTimeline =>
+      WorkspaceStateCampaignTimeline._(items: timelineItems);
 
   bool get hasComments => userProposals.any((e) => e.commentsCount > 0);
 

@@ -1,7 +1,8 @@
-name: example
+name: catalyst_analysis_example
 version: 1.0.0
 description: A project that showcases how to enable the recommended lints for Catalyst Flutter apps, packages, and plugins.
 publish_to: none
+resolution: workspace
 
 environment:
   sdk: ">=3.9.0 <4.0.0"

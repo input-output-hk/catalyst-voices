@@ -33,6 +33,10 @@ what should be committed.
 
 ## Database
 
+**CatalystDatabase** depends on jsonb queries, which was introduced in sqlite 3.45.0.
+Read more [here](https://sqlite.org/jsonb.html).
+This means we need to ensure minimum version.
+
 ### Drift
 
 Files have to be generated with build runner command.
@@ -46,7 +50,7 @@ dart run build_runner build --delete-conflicting-outputs
 or melos
 
 ```bash
-melos build_runner_repository
+melos build-runner-repository
 ```
 
 Build migration test files with
@@ -80,4 +84,11 @@ Read more [here](https://drift.simonbinder.eu/platforms/web/#prerequisites).
 
 #### Native
 
-TODO
+We're using [Native Drift](https://drift.simonbinder.eu/Platforms/vm/) for android and iOS.
+
+Ensuring minimum version of sqlite by shipping with
+[sqlite3_flutter_libs](https://pub.dev/packages/sqlite3_flutter_libs)
+which is linking compiled version of sqlite3.dart.
+
+* for android in build.gradle (**/android/build.gradle**).
+* for darwin (iOS) in sqlite3_flutter_libs.podspec (**/darwin/sqlite3_flutter_libs.podspec**).

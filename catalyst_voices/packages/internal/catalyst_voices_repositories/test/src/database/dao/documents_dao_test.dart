@@ -1215,6 +1215,55 @@ void main() {
         },
         onPlatform: driftOnPlatforms,
       );
+
+      test(
+        'templates used in local drafts are kept when flat is true',
+        () async {
+          // Given
+          final template = DocumentWithMetadataFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalTemplate,
+              selfRef: DocumentRefFactory.signedDocumentRef(),
+            ),
+          );
+
+          final localDraft = DraftFactory.build(
+            metadata: DocumentDataMetadata(
+              type: DocumentType.proposalDocument,
+              selfRef: DocumentRefFactory.draftRef(),
+              template: template.document.metadata.selfRef as SignedDocumentRef,
+            ),
+          );
+
+          final randomDocuments = List<DocumentEntityWithMetadata>.generate(
+            10,
+            (index) => DocumentWithMetadataFactory.build(),
+          );
+
+          final allDocuments = [
+            template,
+            ...randomDocuments,
+          ];
+
+          final allDrafts = [
+            localDraft,
+          ];
+
+          // When
+          await database.documentsDao.saveAll(allDocuments);
+          await database.draftsDao.saveAll(allDrafts);
+
+          // Then
+          await database.documentsDao.deleteAll(keepTemplatesForLocalDrafts: true);
+
+          final documentsCount = await database.documentsDao.count();
+          final draftsCount = await database.draftsDao.count();
+
+          expect(documentsCount, 1);
+          expect(draftsCount, 1);
+        },
+        onPlatform: driftOnPlatforms,
+      );
     });
   });
 }

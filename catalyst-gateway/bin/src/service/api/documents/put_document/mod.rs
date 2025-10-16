@@ -15,9 +15,12 @@ use crate::{
         },
         index::session::CassandraSessionError,
     },
-    service::common::{
-        auth::rbac::token::CatalystRBACTokenV1, responses::WithErrorResponses,
-        types::headers::retry_after::RetryAfterOption,
+    service::{
+        api::documents::common::ValidationProvider,
+        common::{
+            auth::rbac::token::CatalystRBACTokenV1, responses::WithErrorResponses,
+            types::headers::retry_after::RetryAfterOption,
+        },
     },
 };
 
@@ -71,50 +74,6 @@ pub(crate) async fn endpoint(
         .into();
     };
 
-    match doc.is_deprecated() {
-        // apply older validation rule
-        Ok(true) => {
-            let doc = match doc_bytes.as_slice().try_into() {
-                Ok(doc) => doc,
-                Err(err) => return AllResponses::handle_error(&err),
-            };
-
-            match catalyst_signed_doc_v1::validator::validate(&doc, &DocProvider).await {
-                Ok(true) => (),
-                Ok(false) => {
-                    return Responses::UnprocessableContent(Json(
-                        PutDocumentUnprocessableContent::new(
-                            "Failed validating document integrity",
-                            serde_json::to_value(doc.problem_report()).ok(),
-                        ),
-                    ))
-                    .into();
-                },
-                Err(err) => return AllResponses::handle_error(&err),
-            }
-        },
-        // apply newest validation rules
-        Ok(false) => {
-            match catalyst_signed_doc::validator::validate(&doc, &DocProvider).await {
-                Ok(true) => (),
-                Ok(false) => {
-                    return Responses::UnprocessableContent(Json(
-                        PutDocumentUnprocessableContent::new(
-                            "Failed validating document integrity",
-                            serde_json::to_value(doc.problem_report()).ok(),
-                        ),
-                    ))
-                    .into();
-                },
-                Err(err) => {
-                    // means that something happened inside the `DocProvider`, some db error.
-                    return AllResponses::handle_error(&err);
-                },
-            }
-        },
-        Err(err) => return AllResponses::handle_error(&err),
-    }
-
     // validate document signatures
     let verifying_key_provider =
         match VerifyingKeyProvider::try_from_kids(&mut token, &doc.kids()).await {
@@ -129,24 +88,57 @@ pub(crate) async fn endpoint(
                 .into()
             },
         };
-    match catalyst_signed_doc::validator::validate_signatures(&doc, &verifying_key_provider).await {
-        Ok(true) => (),
+
+    match doc.is_deprecated() {
+        // apply older validation rule
+        Ok(true) => {
+            let doc = match doc_bytes.as_slice().try_into() {
+                Ok(doc) => doc,
+                Err(err) => return AllResponses::handle_error(&err),
+            };
+
+            match catalyst_signed_doc_v1::validator::validate(&doc, &DocProvider).await {
+                Ok(true) => (),
+                Ok(false) => {
+                    return Responses::UnprocessableContent(Json(
+                        PutDocumentUnprocessableContent::new(
+                            "Failed validating document integrity",
+                            None,
+                        ),
+                    ))
+                    .into();
+                },
+                Err(err) => return AllResponses::handle_error(&err),
+            }
+        },
+        // apply newest validation rules
         Ok(false) => {
-            return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-                "Failed validating document signatures",
-                serde_json::to_value(doc.problem_report()).ok(),
-            )))
-            .into();
+            let validation_provider = ValidationProvider::new(DocProvider, verifying_key_provider);
+
+            match catalyst_signed_doc::validator::validate(&doc, &validation_provider).await {
+                Ok(true) => (),
+                Ok(false) => {
+                    return Responses::UnprocessableContent(Json(
+                        PutDocumentUnprocessableContent::new(
+                            "Failed validating document integrity",
+                            Some(doc.problem_report()),
+                        ),
+                    ))
+                    .into();
+                },
+                Err(err) => {
+                    // means that something happened inside the `DocProvider`, some db error.
+                    return AllResponses::handle_error(&err);
+                },
+            }
         },
-        Err(err) => {
-            return AllResponses::handle_error(&err);
-        },
+        Err(err) => return AllResponses::handle_error(&err),
     }
 
     if doc.problem_report().is_problematic() {
         return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
             "Invalid Catalyst Signed Document",
-            serde_json::to_value(doc.problem_report()).ok(),
+            Some(doc.problem_report()),
         )))
         .into();
     }
@@ -169,7 +161,7 @@ pub(crate) async fn endpoint(
         Err(err) if err.is::<StoreError>() => {
             Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
                 "Document with the same `id` and `ver` already exists",
-                serde_json::to_value(doc.problem_report()).ok(),
+                Some(doc.problem_report()),
             )))
             .into()
         },
@@ -207,8 +199,8 @@ async fn store_document_in_db(
     let doc_meta_json = doc.doc_meta().to_json()?;
 
     let payload = if matches!(
-        doc.doc_content_type()?,
-        catalyst_signed_doc::ContentType::Json
+        doc.doc_content_type(),
+        Some(catalyst_signed_doc::ContentType::Json)
     ) {
         match serde_json::from_slice(doc.decoded_content()?.as_slice()) {
             Ok(payload) => Some(payload),

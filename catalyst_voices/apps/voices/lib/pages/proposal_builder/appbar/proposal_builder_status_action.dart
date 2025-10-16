@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal_builder/appbar/widget/proposal_builder_menu_item.dart';
+import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
+import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/forget_proposal_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/proposals/proposal_builder_delete_confirmation_dialog.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -29,6 +30,7 @@ class ProposalBuilderStatusAction extends StatelessWidget {
           offstage: state.isLoading || state.error != null,
           items: ProposalMenuItemAction.proposalBuilderAvailableOptions(
             state.metadata.publish,
+            fromActiveCampaign: state.metadata.fromActiveCampaign,
           ),
         );
       },
@@ -42,19 +44,21 @@ class ProposalBuilderStatusAction extends StatelessWidget {
   }
 }
 
-class _Button extends StatelessWidget {
+class _LargeButton extends StatelessWidget {
   final VoidCallback onTap;
 
-  const _Button({required this.onTap});
+  const _LargeButton({required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      style: FilledButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
       onTap: onTap,
+      leading: VoicesAssets.icons.documentText.buildIcon(),
       child: Row(
         children: [
-          VoicesAssets.icons.documentText.buildIcon(size: 16),
           const SizedBox(width: 8),
           Text(
             context.l10n.proposalOptions,
@@ -91,7 +95,7 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
       offset: const Offset(0, 48),
       clipBehavior: Clip.antiAlias,
       constraints: const BoxConstraints(minWidth: 420),
-      child: _Button(onTap: _showMenu),
+      child: _ResponsiveButton(onTap: _showMenu),
       itemBuilder: (context) {
         return <PopupMenuEntry<int>>[
           for (final item in widget.items)
@@ -181,5 +185,36 @@ class _PopupMenuButtonState extends State<_PopupMenuButton> {
 
   void _showMenu() {
     _buttonKey.currentState?.showButtonMenu();
+  }
+}
+
+class _ResponsiveButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _ResponsiveButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return ResponsiveChildBuilder(
+      xs: (context) => _SmallButton(onTap: onTap),
+      sm: (context) => _LargeButton(onTap: onTap),
+    );
+  }
+}
+
+class _SmallButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _SmallButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton.outlined(
+      style: OutlinedButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+      onTap: onTap,
+      child: VoicesAssets.icons.documentText.buildIcon(),
+    );
   }
 }

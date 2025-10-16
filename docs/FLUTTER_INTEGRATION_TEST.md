@@ -20,8 +20,8 @@
 ## Requirements
 
 * macOS 14.0 + (if you want to run iOS tests locally)
-* Xcode: 14.2+ (required for iOS tests)
-* Android Studio: Android Studio Electric Eel | 2022.1.1 +
+* Xcode: latest
+* Android Studio: latest
 * [gcloud CLI](https://cloud.google.com/sdk/gcloud)
 
 ## Run Integration Tests

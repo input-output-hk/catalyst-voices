@@ -1,6 +1,7 @@
 // cspell: words wordlists WORDLIST
 // ignore_for_file: implementation_imports
 
+import 'dart:convert' show utf8;
 import 'dart:typed_data';
 
 import 'package:bip39/bip39.dart' as bip39;
@@ -38,6 +39,13 @@ final class SeedPhrase extends Equatable {
     return SeedPhrase.fromMnemonic(mnemonic);
   }
 
+  /// Creates a SeedPhrase from an utf8 encoded bytes.
+  factory SeedPhrase.fromBytes(Uint8List bytes, {bool validate = true}) {
+    final mnemonic = utf8.decode(bytes);
+
+    return SeedPhrase.fromMnemonic(mnemonic, validate: validate);
+  }
+
   /// Creates a SeedPhrase from an existing hex-encoded entropy.
   ///
   /// - [encodedData]: The entropy data as a hex string.
@@ -51,8 +59,10 @@ final class SeedPhrase extends Equatable {
   /// Throws an [ArgumentError] if the mnemonic is invalid.
   ///
   /// - [mnemonic]: The mnemonic to derive the seed from.
-  factory SeedPhrase.fromMnemonic(String mnemonic) {
-    assert(bip39.validateMnemonic(mnemonic), 'Invalid mnemonic phrase');
+  factory SeedPhrase.fromMnemonic(String mnemonic, {bool validate = true}) {
+    if (validate && !bip39.validateMnemonic(mnemonic)) {
+      throw ArgumentError('Invalid mnemonic phrase', 'mnemonic');
+    }
 
     return SeedPhrase._(mnemonic: mnemonic);
   }
@@ -110,11 +120,10 @@ final class SeedPhrase extends Equatable {
   @override
   String toString() => 'SeedPhrase(${mnemonic.hashCode})';
 
-  /// Utility method that validates given [words] as [SeedPhrase] data.
+  /// Utility method that validates given [mnemonic] as [SeedPhrase] data.
   static bool isValid({
-    required List<SeedPhraseWord> words,
+    required String mnemonic,
   }) {
-    final mnemonic = words.map((e) => e.data).join(' ');
     return bip39.validateMnemonic(mnemonic);
   }
 }
@@ -141,4 +150,8 @@ final class SeedPhraseWord extends Equatable implements Comparable<SeedPhraseWor
 
   @override
   int compareTo(SeedPhraseWord other) => nr.compareTo(other.nr);
+}
+
+extension SeedPhraseWordIterableExt on Iterable<SeedPhraseWord> {
+  String toMnemonic() => map((e) => e.data).join(' ');
 }

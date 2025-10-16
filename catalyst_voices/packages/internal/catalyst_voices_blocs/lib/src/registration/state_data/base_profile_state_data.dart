@@ -7,7 +7,6 @@ final class BaseProfileStateData extends Equatable {
   final Username username;
   final bool conditionsAccepted;
   final bool tosAndPrivacyPolicyAccepted;
-  final bool drepApprovalContingencyAccepted;
 
   const BaseProfileStateData({
     this.email = const Email.pure(),
@@ -15,11 +14,9 @@ final class BaseProfileStateData extends Equatable {
     this.username = const Username.pure(),
     this.conditionsAccepted = false,
     this.tosAndPrivacyPolicyAccepted = false,
-    this.drepApprovalContingencyAccepted = false,
   });
 
-  bool get arAcknowledgementsAccepted =>
-      conditionsAccepted && tosAndPrivacyPolicyAccepted && drepApprovalContingencyAccepted;
+  bool get arAcknowledgementsAccepted => conditionsAccepted && tosAndPrivacyPolicyAccepted;
 
   bool get isBaseProfileDataValid {
     if (!email.isValid || !username.isValid) {
@@ -42,7 +39,6 @@ final class BaseProfileStateData extends Equatable {
     receiveEmails,
     conditionsAccepted,
     tosAndPrivacyPolicyAccepted,
-    drepApprovalContingencyAccepted,
   ];
 
   BaseProfileStateData copyWith({
@@ -51,7 +47,6 @@ final class BaseProfileStateData extends Equatable {
     Username? username,
     bool? conditionsAccepted,
     bool? tosAndPrivacyPolicyAccepted,
-    bool? drepApprovalContingencyAccepted,
   }) {
     return BaseProfileStateData(
       email: email ?? this.email,
@@ -59,8 +54,6 @@ final class BaseProfileStateData extends Equatable {
       username: username ?? this.username,
       conditionsAccepted: conditionsAccepted ?? this.conditionsAccepted,
       tosAndPrivacyPolicyAccepted: tosAndPrivacyPolicyAccepted ?? this.tosAndPrivacyPolicyAccepted,
-      drepApprovalContingencyAccepted:
-          drepApprovalContingencyAccepted ?? this.drepApprovalContingencyAccepted,
     );
   }
 }

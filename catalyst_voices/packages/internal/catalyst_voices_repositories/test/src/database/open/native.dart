@@ -1,4 +1,4 @@
-import 'dart:ffi' show DynamicLibrary;
+import 'dart:ffi' show Abi, DynamicLibrary;
 import 'dart:io' show File, Platform;
 
 import 'package:sqlite3/open.dart' as sqlite3 show open, OperatingSystem;
@@ -11,14 +11,16 @@ void setupSqlite3() {
 
 DynamicLibrary _openOnLinux() {
   final scriptDir = File(Platform.script.toFilePath()).parent;
-  final path = '${scriptDir.path}/test/sqlite/linux/libsqlite3.so.3.49.1';
-  final libraryNextToScript = File(path);
-  return DynamicLibrary.open(libraryNextToScript.path);
+  final path = switch (Abi.current()) {
+    Abi.linuxArm64 => '${scriptDir.path}/test/sqlite/linux/libsqlite3.3.49.1-arm64.so',
+    Abi.linuxX64 => '${scriptDir.path}/test/sqlite/linux/libsqlite3.3.49.1-amd64.so',
+    _ => throw UnsupportedError('ABI ${Abi.current()} does not support libsqlite3.'),
+  };
+  return DynamicLibrary.open(path);
 }
 
 DynamicLibrary _openOnMacOS() {
   final scriptDir = File(Platform.script.toFilePath()).parent;
   final path = '${scriptDir.path}/test/sqlite/macOS/libsqlite3.3.49.1.dylib';
-  final libraryNextToScript = File(path);
-  return DynamicLibrary.open(libraryNextToScript.path);
+  return DynamicLibrary.open(path);
 }

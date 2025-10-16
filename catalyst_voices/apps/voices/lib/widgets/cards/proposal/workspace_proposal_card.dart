@@ -101,7 +101,7 @@ class _Body extends StatelessWidget {
                       ),
                     ),
                     _CampaignData(
-                      leadValue: CryptocurrencyFormatter.decimalFormat(proposal.fundsRequested),
+                      leadValue: MoneyFormatter.formatDecimal(proposal.fundsRequested),
                       subValue: context.l10n.proposalViewFundingRequested,
                     ),
                     _CampaignData(
@@ -122,6 +122,7 @@ class _Body extends StatelessWidget {
           title: proposal.title,
           version: proposal.iteration,
           hasNewerLocalIteration: proposal.hasNewerLocalIteration,
+          fromActiveCampaign: proposal.fromActiveCampaign,
         ),
       ],
     );

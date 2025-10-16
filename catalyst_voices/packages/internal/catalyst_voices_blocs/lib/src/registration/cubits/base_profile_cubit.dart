@@ -16,7 +16,6 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
                 username: Username.dirty('Dev'),
                 conditionsAccepted: true,
                 tosAndPrivacyPolicyAccepted: true,
-                drepApprovalContingencyAccepted: true,
               )
             : const BaseProfileStateData(),
       );
@@ -36,16 +35,9 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
   }
 
   @override
-  void updateDrepApprovalContingency({
-    required bool accepted,
-  }) {
-    emit(state.copyWith(drepApprovalContingencyAccepted: accepted));
-  }
-
-  @override
   void updateEmail(Email value) {
     final receiveEmails = state.receiveEmails.copyWith(
-      isAccepted: value.isNotValid ? false : null,
+      isAccepted: value.isEmptyOrNotValid ? false : null,
       isEnabled: value.isNonEmptyAndValid,
     );
 
@@ -73,8 +65,6 @@ final class BaseProfileCubit extends Cubit<BaseProfileStateData>
 
 abstract interface class BaseProfileManager {
   void updateConditions({required bool accepted});
-
-  void updateDrepApprovalContingency({required bool accepted});
 
   void updateEmail(Email value);
 
