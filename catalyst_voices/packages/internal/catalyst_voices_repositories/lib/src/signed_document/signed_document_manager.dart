@@ -1,6 +1,7 @@
 import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager_impl.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 
 /// Manages the [SignedDocument]s.
@@ -10,6 +11,7 @@ abstract interface class SignedDocumentManager {
   const factory SignedDocumentManager({
     required CatalystCompressor brotli,
     required CatalystCompressor zstd,
+    CatalystRuntimeProfiler? profiler,
   }) = SignedDocumentManagerImpl;
 
   /// Parses the document from the [bytes] representation.

@@ -93,6 +93,29 @@ final class CatalystDeveloperProfiler implements CatalystProfiler {
       await transaction.finish(arguments: finishArgs);
     }
   }
+
+  @override
+  Future<T> timeWithResult<T>(
+    String name,
+    AsyncOrValueGetter<T> body, {
+    CatalystProfilerTimelineArguments? arguments,
+  }) async {
+    final transaction = startTransaction(name, arguments: arguments);
+    final finishArgs = CatalystProfilerTimelineFinishArguments();
+
+    try {
+      final result = await body();
+      finishArgs.status = 'completed';
+      return result;
+    } catch (error) {
+      finishArgs
+        ..throwable = error
+        ..status = 'failed';
+      rethrow;
+    } finally {
+      await transaction.finish(arguments: finishArgs);
+    }
+  }
 }
 
 final class _DeveloperTask implements CatalystProfilerTimelineTask {
@@ -165,6 +188,29 @@ final class _DeveloperTimeline implements CatalystProfilerTimeline {
     try {
       await body();
       finishArgs.status = 'completed';
+    } catch (error) {
+      finishArgs
+        ..throwable = error
+        ..status = 'failed';
+      rethrow;
+    } finally {
+      await task.finish(arguments: finishArgs);
+    }
+  }
+
+  @override
+  Future<T> timeWithResult<T>(
+    String name,
+    AsyncOrValueGetter<T> body, {
+    CatalystProfilerTimelineTaskArguments? arguments,
+  }) async {
+    final task = startTask(name, arguments: arguments);
+    final finishArgs = CatalystProfilerTimelineTaskFinishArguments();
+
+    try {
+      final result = await body();
+      finishArgs.status = 'completed';
+      return result;
     } catch (error) {
       finishArgs
         ..throwable = error
