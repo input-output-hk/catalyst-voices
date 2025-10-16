@@ -50,32 +50,6 @@ void main() {
     );
 
     blocTest<BaseProfileCubit, BaseProfileStateData>(
-      'emits updated drepApprovalContingencyAccepted when updateDrepApprovalContingency is called with true',
-      build: () => baseProfileCubit,
-      act: (cubit) => cubit.updateDrepApprovalContingency(accepted: true),
-      expect: () => [
-        isA<BaseProfileStateData>().having(
-          (e) => e.drepApprovalContingencyAccepted,
-          'drepApprovalContingencyAccepted',
-          true,
-        ),
-      ],
-    );
-
-    blocTest<BaseProfileCubit, BaseProfileStateData>(
-      'emits updated drepApprovalContingencyAccepted when updateDrepApprovalContingency is called with false',
-      build: () => baseProfileCubit,
-      act: (cubit) => cubit.updateDrepApprovalContingency(accepted: false),
-      expect: () => [
-        isA<BaseProfileStateData>().having(
-          (e) => e.drepApprovalContingencyAccepted,
-          'drepApprovalContingencyAccepted',
-          false,
-        ),
-      ],
-    );
-
-    blocTest<BaseProfileCubit, BaseProfileStateData>(
       'emits updated email when updateEmail is called with valid email',
       build: () => baseProfileCubit,
       act: (cubit) => cubit.updateEmail(const Email.dirty('test@example.com')),
