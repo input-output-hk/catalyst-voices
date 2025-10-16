@@ -6,6 +6,7 @@ final class Proposal extends CoreProposal {
 
   factory Proposal({
     required DocumentRef selfRef,
+    required DocumentParameters parameters,
     required String title,
     required String description,
     required Money fundsRequested,
@@ -14,12 +15,12 @@ final class Proposal extends CoreProposal {
     required int duration,
     required String? author,
     required int commentsCount,
-    required SignedDocumentRef categoryId,
   }) {
     final versionNumber = versionsIds.versionNumber(selfRef.version!);
 
     return Proposal._(
       selfRef: selfRef,
+      parameters: parameters,
       title: title,
       fundsRequested: fundsRequested,
       publish: publish,
@@ -28,19 +29,18 @@ final class Proposal extends CoreProposal {
       duration: duration,
       author: author,
       versionNumber: versionNumber,
-      categoryId: categoryId,
     );
   }
 
   factory Proposal.fromData(
     ProposalData data,
-    SignedDocumentRef categoryId,
     List<String> versionsIds,
   ) {
     final document = data.document;
 
     return Proposal(
       selfRef: document.metadata.selfRef,
+      parameters: document.metadata.parameters,
       title: document.title ?? '',
       description: document.description ?? '',
       fundsRequested: document.fundsRequested ?? Money.zero(currency: Currencies.fallback),
@@ -48,14 +48,13 @@ final class Proposal extends CoreProposal {
       duration: document.duration ?? 0,
       author: document.authorName,
       commentsCount: data.commentsCount,
-      categoryId: categoryId,
       versionsIds: versionsIds,
     );
   }
 
   const Proposal._({
     required super.selfRef,
-    required super.categoryId,
+    required super.parameters,
     required super.title,
     required super.description,
     required super.fundsRequested,

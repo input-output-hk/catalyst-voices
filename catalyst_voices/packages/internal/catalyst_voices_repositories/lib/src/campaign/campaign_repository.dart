@@ -10,6 +10,8 @@ abstract interface class CampaignRepository {
   });
 
   Future<CampaignCategory?> getCategory(SignedDocumentRef ref);
+
+  Future<CampaignCategory?> getCategoryWithParameters(DocumentParameters parameters);
 }
 
 final class CampaignRepositoryImpl implements CampaignRepository {
@@ -33,5 +35,12 @@ final class CampaignRepositoryImpl implements CampaignRepository {
     return Campaign.all
         .expand((element) => element.categories)
         .firstWhereOrNull((e) => e.selfRef.id == ref.id);
+  }
+
+  @override
+  Future<CampaignCategory?> getCategoryWithParameters(DocumentParameters parameters) async {
+    return Campaign.all
+        .expand((element) => element.categories)
+        .firstWhereOrNull((e) => parameters.containsId(e.selfRef.id));
   }
 }

@@ -124,7 +124,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       emit(state.copyWith(isLoading: true));
       await _proposalService.forgetProposal(
         proposalRef: proposal.selfRef as SignedDocumentRef,
-        categoryId: proposal.categoryId,
+        parameters: proposal.parameters,
       );
       emit(state.copyWith(userProposals: _removeProposal(event.ref)));
       emitSignal(const ForgetProposalSuccessWorkspaceSignal());
@@ -188,7 +188,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       final campaigns = Campaign.all;
 
       final categories = campaigns.expand((element) => element.categories);
-      final category = categories.firstWhereOrNull((e) => e.selfRef.id == proposal.categoryId.id);
+      final category = categories.firstWhereOrNull(
+        (e) => proposal.parameters.containsId(e.selfRef.id),
+      );
 
       // TODO(damian-molinski): refactor it
       final fundNumber = category != null
@@ -237,7 +239,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     }
     await _proposalService.unlockProposal(
       proposalRef: proposal.selfRef as SignedDocumentRef,
-      categoryId: proposal.categoryId,
+      proposalParameters: proposal.parameters,
     );
     emitSignal(OpenProposalBuilderSignal(ref: event.ref));
   }

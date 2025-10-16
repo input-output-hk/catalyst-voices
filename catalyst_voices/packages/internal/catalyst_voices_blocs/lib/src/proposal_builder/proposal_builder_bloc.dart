@@ -146,9 +146,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       type: DocumentType.proposalDocument,
       selfRef: selfRef ?? state.metadata.documentRef!,
       template: state.metadata.templateRef,
-      parameters: [
+      parameters: DocumentParameters({
         if (categoryId != null) categoryId,
-      ],
+      }),
     );
   }
 
@@ -352,13 +352,15 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     ProposalBuilderEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final categoryId = state.metadata.categoryId;
-    final proposalRef = state.metadata.documentRef;
     try {
+      final proposalRef = state.metadata.documentRef;
+      final categoryId = state.metadata.categoryId!;
+
       emit(state.copyWith(isChanging: true));
+
       await _proposalService.forgetProposal(
         proposalRef: proposalRef! as SignedDocumentRef,
-        categoryId: categoryId!,
+        parameters: DocumentParameters({categoryId}),
       );
       unawaited(_clearCache());
       emitSignal(const ForgotProposalSuccessBuilderSignal());
@@ -540,11 +542,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       if (firstVersion && proposalData.publish.isLocal && notVerifiedAccount) {
         emitSignal(const NewProposalAndEmailNotVerifiedSignal());
       }
-      final categoryId = proposal.categoryId;
-      final category = await _campaignService.getCategory(categoryId);
+      final category = await _campaignService.getCategoryWithParameters(proposal.parameters);
       final campaign = await _campaignService.getActiveCampaign();
-
-      final fromActiveCampaign = campaign?.hasCategory(categoryId.id) ?? false;
+      final fromActiveCampaign = campaign?.hasCategory(category.selfRef.id) ?? false;
 
       return _cacheAndCreateState(
         proposalDocument: proposalData.document.document,
@@ -554,7 +554,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           documentRef: proposal.selfRef,
           originalDocumentRef: proposal.selfRef,
           templateRef: proposalData.document.metadata.templateRef,
-          categoryId: categoryId,
+          categoryId: category.selfRef,
           versions: versions,
           fromActiveCampaign: fromActiveCampaign,
         ),
@@ -749,7 +749,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     await _proposalService.submitProposalForReview(
       proposalRef: updatedRef,
-      categoryId: state.metadata.categoryId!,
+      proposalParameters: DocumentParameters({state.metadata.categoryId!}),
     );
 
     _updateMetadata(
@@ -1043,7 +1043,9 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         ref: originalProposalRef! as SignedDocumentRef,
         template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
         reply: event.reply,
-        parameters: [if (originalProposalCategoryId != null) originalProposalCategoryId],
+        parameters: DocumentParameters({
+          if (originalProposalCategoryId != null) originalProposalCategoryId,
+        }),
         authorId: activeAccountId!,
       ),
       document: event.document,
@@ -1112,7 +1114,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   ) async {
     await _proposalService.submitProposalForReview(
       proposalRef: state.metadata.documentRef! as SignedDocumentRef,
-      categoryId: state.metadata.categoryId!,
+      proposalParameters: DocumentParameters({state.metadata.categoryId!}),
     );
 
     _updateMetadata(emit, publish: ProposalPublish.submittedProposal);
@@ -1127,9 +1129,10 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       final proposalRef = state.metadata.documentRef! as SignedDocumentRef;
       final categoryId = state.metadata.categoryId!;
       emit(state.copyWith(isChanging: true));
+
       await _proposalService.unlockProposal(
         proposalRef: proposalRef,
-        categoryId: categoryId,
+        proposalParameters: DocumentParameters({categoryId}),
       );
       final stateMetadata = state.metadata.copyWith(publish: ProposalPublish.publishedDraft);
       _cache = _cache.copyWith(proposalMetadata: Optional(stateMetadata));

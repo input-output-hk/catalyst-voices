@@ -72,7 +72,7 @@ void main() {
       expect(
         () async => proposalService.submitProposalForReview(
           proposalRef: proposalRef,
-          categoryId: categoryId,
+          proposalParameters: DocumentParameters({categoryId}),
         ),
         throwsA(isA<ProposalLimitReachedException>()),
       );

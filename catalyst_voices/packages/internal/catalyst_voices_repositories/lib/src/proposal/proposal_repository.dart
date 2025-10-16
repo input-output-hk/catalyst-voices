@@ -61,7 +61,7 @@ abstract interface class ProposalRepository {
   Future<void> publishProposalAction({
     required SignedDocumentRef actionRef,
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters proposalParameters,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -219,7 +219,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<void> publishProposalAction({
     required SignedDocumentRef actionRef,
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters proposalParameters,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -235,9 +235,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         id: actionRef.id,
         ver: actionRef.version,
         ref: SignedDocumentMetadataRef.fromDocumentRef(proposalRef),
-        parameters: [
-          SignedDocumentMetadataRef.fromDocumentRef(categoryId),
-        ],
+        parameters: proposalParameters.set.map(SignedDocumentMetadataRef.fromDocumentRef).toList(),
       ),
       catalystId: catalystId,
       privateKey: privateKey,
