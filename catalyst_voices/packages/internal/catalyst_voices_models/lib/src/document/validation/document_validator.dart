@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/src/document/document.dart';
 import 'package:catalyst_voices_models/src/document/schema/property/document_property_schema.dart';
 import 'package:catalyst_voices_models/src/document/validation/document_validation_result.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 
 /// Validates [DocumentProperty].
@@ -47,6 +48,24 @@ final class DocumentValidator {
   ) {
     if (schema.isRequired && value == null) {
       return MissingRequiredDocumentValue(invalidNodeId: schema.nodeId);
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
+
+  static DocumentValidationResult validateIntegerMultipleOf(
+    DocumentIntegerSchema schema,
+    int? value,
+  ) {
+    final multipleOf = schema.multipleOf;
+    if (multipleOf != null && value != null) {
+      if (value % multipleOf != 0) {
+        return DocumentNumNotMultipleOf(
+          invalidNodeId: schema.nodeId,
+          multipleOf: multipleOf,
+          actualValue: value,
+        );
+      }
     }
 
     return const SuccessfulDocumentValidation();
@@ -102,6 +121,66 @@ final class DocumentValidator {
             return DocumentItemsNotUnique(invalidNodeId: schema.nodeId);
           }
         }
+      }
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
+
+  static DocumentValidationResult validateMoneyMultipleOf(
+    DocumentCurrencySchema schema,
+    int? value,
+  ) {
+    final multipleOf = schema.multipleOf;
+    if (multipleOf != null && value != null) {
+      if (value % multipleOf != 0) {
+        return DocumentMoneyNotMultipleOf(
+          invalidNodeId: schema.nodeId,
+          multipleOf: schema.valueToMoney(multipleOf),
+          actualValue: schema.valueToMoney(value),
+        );
+      }
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
+
+  static DocumentValidationResult validateMoneyRange(
+    DocumentCurrencySchema schema,
+    int? value,
+  ) {
+    final numRange = schema.numRange;
+    if (numRange != null && value != null) {
+      if (!numRange.contains(value)) {
+        final min = numRange.min;
+        final max = numRange.max;
+
+        return DocumentMoneyOutOfRange(
+          invalidNodeId: schema.nodeId,
+          expectedRange: Range(
+            min: min != null ? schema.valueToMoney(min) : null,
+            max: max != null ? schema.valueToMoney(max) : null,
+          ),
+          actualValue: schema.valueToMoney(value),
+        );
+      }
+    }
+
+    return const SuccessfulDocumentValidation();
+  }
+
+  static DocumentValidationResult validateNumberMultipleOf(
+    DocumentNumberSchema schema,
+    double? value,
+  ) {
+    final multipleOf = schema.multipleOf;
+    if (multipleOf != null && value != null) {
+      if (NumberUtils.isDoubleMultipleOf(value: value, multipleOf: multipleOf)) {
+        return DocumentNumNotMultipleOf(
+          invalidNodeId: schema.nodeId,
+          multipleOf: multipleOf,
+          actualValue: value,
+        );
       }
     }
 

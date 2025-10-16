@@ -21,17 +21,21 @@ abstract interface class DocumentsService {
   ) = DocumentsServiceImpl;
 
   /// Removes all locally stored documents.
-  Future<int> clear();
+  ///
+  /// if [keepLocalDrafts] is true local drafts and their templates will be kept.
+  Future<int> clear({bool keepLocalDrafts});
 
   /// Returns all matching [DocumentData] for given [ref].
   Future<List<DocumentData>> lookup(DocumentRef ref);
 
   /// Syncs locally stored documents with api.
   ///
-  /// [onProgress] emits from 0.0 to 1.0.
+  /// * [campaign] is used to sync documents only for it.
+  /// * [onProgress] emits from 0.0 to 1.0.
   ///
   /// Returns list of added refs.
   Future<List<TypedDocumentRef>> sync({
+    required Campaign campaign,
     ValueChanged<double>? onProgress,
     int maxConcurrent,
   });
@@ -48,7 +52,9 @@ final class DocumentsServiceImpl implements DocumentsService {
   );
 
   @override
-  Future<int> clear() => _documentRepository.removeAll();
+  Future<int> clear({bool keepLocalDrafts = false}) {
+    return _documentRepository.removeAll(keepLocalDrafts: keepLocalDrafts);
+  }
 
   @override
   Future<List<DocumentData>> lookup(DocumentRef ref) {
@@ -57,12 +63,15 @@ final class DocumentsServiceImpl implements DocumentsService {
 
   @override
   Future<List<TypedDocumentRef>> sync({
+    required Campaign campaign,
     ValueChanged<double>? onProgress,
     int maxConcurrent = 100,
   }) async {
+    _logger.finer('Indexing documents for f${campaign.fundNumber}');
+
     onProgress?.call(0.1);
 
-    final allRefs = await _documentRepository.getAllDocumentsRefs();
+    final allRefs = await _documentRepository.getAllDocumentsRefs(campaign: campaign);
     final cachedRefs = await _documentRepository.getCachedDocumentsRefs();
     final missingRefs = List.of(allRefs)..removeWhere(cachedRefs.contains);
 

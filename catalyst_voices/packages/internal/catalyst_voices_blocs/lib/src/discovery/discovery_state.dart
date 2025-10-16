@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
@@ -20,7 +21,7 @@ final class CampaignDatesEventsState extends Equatable {
 final class DiscoveryCampaignState extends Equatable {
   final bool isLoading;
   final LocalizedException? error;
-  final CurrentCampaignInfoViewModel currentCampaign;
+  final CurrentCampaignInfoViewModel? currentCampaign;
   final List<CampaignTimelineViewModel> campaignTimeline;
   final List<CampaignCategoryDetailsViewModel> categories;
   final CampaignDatesEventsState datesEvents;
@@ -28,11 +29,11 @@ final class DiscoveryCampaignState extends Equatable {
   const DiscoveryCampaignState({
     this.isLoading = true,
     this.error,
-    CurrentCampaignInfoViewModel? currentCampaign,
+    this.currentCampaign,
     this.campaignTimeline = const [],
     this.categories = const [],
     this.datesEvents = const CampaignDatesEventsState(),
-  }) : currentCampaign = currentCampaign ?? const NullCurrentCampaignInfoViewModel();
+  });
 
   @override
   List<Object?> get props => [
@@ -49,7 +50,7 @@ final class DiscoveryCampaignState extends Equatable {
   DiscoveryCampaignState copyWith({
     bool? isLoading,
     LocalizedException? error,
-    CurrentCampaignInfoViewModel? currentCampaign,
+    Optional<CurrentCampaignInfoViewModel>? currentCampaign,
     List<CampaignTimelineViewModel>? campaignTimeline,
     List<CampaignCategoryDetailsViewModel>? categories,
     CampaignDatesEventsState? datesEvents,
@@ -57,7 +58,7 @@ final class DiscoveryCampaignState extends Equatable {
     return DiscoveryCampaignState(
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
-      currentCampaign: currentCampaign ?? this.currentCampaign,
+      currentCampaign: currentCampaign.dataOr(this.currentCampaign),
       campaignTimeline: campaignTimeline ?? this.campaignTimeline,
       categories: categories ?? this.categories,
       datesEvents: datesEvents ?? this.datesEvents,

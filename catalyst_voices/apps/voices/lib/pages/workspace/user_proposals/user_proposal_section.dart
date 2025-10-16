@@ -8,7 +8,7 @@ class UserProposalSection extends StatefulWidget {
   final List<UsersProposalOverview> items;
   final String title;
   final String info;
-  final String learnMoreUrl;
+  final String? learnMoreUrl;
   final String emptyTextMessage;
 
   const UserProposalSection({
@@ -17,7 +17,7 @@ class UserProposalSection extends StatefulWidget {
     required this.emptyTextMessage,
     required this.title,
     required this.info,
-    required this.learnMoreUrl,
+    this.learnMoreUrl,
   });
 
   @override

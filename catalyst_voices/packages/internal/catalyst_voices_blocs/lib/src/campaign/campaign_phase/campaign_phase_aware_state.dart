@@ -6,6 +6,7 @@ sealed class CampaignPhaseAwareState extends Equatable {
   const CampaignPhaseAwareState();
 
   CampaignPhaseType? get activeCampaignPhaseType => null;
+  int get fundNumber => 15;
 
   @override
   List<Object?> get props => [];
@@ -15,6 +16,7 @@ final class DataCampaignPhaseAwareState extends CampaignPhaseAwareState {
   @override
   final CampaignPhaseType? activeCampaignPhaseType;
   final List<CampaignPhaseState> phasesStates;
+  @override
   final int fundNumber;
 
   const DataCampaignPhaseAwareState({

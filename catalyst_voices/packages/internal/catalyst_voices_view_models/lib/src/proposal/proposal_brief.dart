@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -9,7 +8,7 @@ class ProposalBrief extends Equatable {
   final String title;
   final String categoryName;
   final String? author;
-  final Coin fundsRequested;
+  final Money fundsRequested;
   final int duration;
   final ProposalPublish publish;
   final String description;
@@ -61,7 +60,7 @@ class ProposalBrief extends Equatable {
       title: 'Proposal Title',
       categoryName: 'Category Name',
       author: 'Author Name',
-      fundsRequested: const Coin(0),
+      fundsRequested: Money.zero(currency: Currencies.ada),
       duration: 0,
       publish: ProposalPublish.publishedDraft,
       description: 'Proposal description',
@@ -72,7 +71,7 @@ class ProposalBrief extends Equatable {
   }
 
   String get formattedFunds {
-    return CryptocurrencyFormatter.formatAmount(fundsRequested);
+    return MoneyFormatter.formatCompactRounded(fundsRequested);
   }
 
   @override
@@ -96,7 +95,7 @@ class ProposalBrief extends Equatable {
     String? title,
     String? categoryName,
     Optional<String>? author,
-    Coin? fundsRequested,
+    Money? fundsRequested,
     int? duration,
     ProposalPublish? publish,
     String? description,
@@ -210,7 +209,7 @@ class ProposalBriefVoting extends ProposalBrief {
     String? title,
     String? categoryName,
     Optional<String>? author,
-    Coin? fundsRequested,
+    Money? fundsRequested,
     int? duration,
     ProposalPublish? publish,
     String? description,

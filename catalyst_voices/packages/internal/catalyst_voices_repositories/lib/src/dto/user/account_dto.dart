@@ -16,6 +16,7 @@ final class AccountDto {
   @JsonKey(unknownEnumValue: JsonKey.nullForUndefinedEnumValue)
   final AccountPublicStatus? publicStatus;
   final VotingPowerDto? votingPower;
+  final AccountRegistrationStatusDto? registrationStatus;
 
   const AccountDto({
     required this.catalystId,
@@ -25,6 +26,7 @@ final class AccountDto {
     required this.address,
     this.publicStatus,
     this.votingPower,
+    this.registrationStatus,
   });
 
   factory AccountDto.fromJson(Map<String, dynamic> json) {
@@ -44,6 +46,7 @@ final class AccountDto {
         address: data.address?.toBech32(),
         publicStatus: data.publicStatus,
         votingPower: data.votingPower != null ? VotingPowerDto.fromModel(data.votingPower!) : null,
+        registrationStatus: AccountRegistrationStatusDto.fromModel(data.registrationStatus),
       );
 
   // As part of migration falling back to unknown if email is not set.
@@ -70,11 +73,45 @@ final class AccountDto {
       publicStatus: _publicStatus,
       votingPower: votingPower?.toModel(),
       isActive: keychainId == activeKeychainId,
+      registrationStatus:
+          registrationStatus?.toModel() ??
+          // This assumes already existing accounts are indexed and persistent
+          const AccountRegistrationStatus.indexed(isPersistent: true),
     );
   }
 
   static void _jsonMigration(Map<String, dynamic> json) {
     // empty at the moment.
+  }
+}
+
+@JsonSerializable()
+final class AccountRegistrationStatusDto {
+  final bool isIndexed;
+  final bool isPersistent;
+
+  AccountRegistrationStatusDto({
+    required this.isIndexed,
+    required this.isPersistent,
+  });
+
+  factory AccountRegistrationStatusDto.fromJson(Map<String, dynamic> json) {
+    return _$AccountRegistrationStatusDtoFromJson(json);
+  }
+
+  AccountRegistrationStatusDto.fromModel(AccountRegistrationStatus data)
+    : this(
+        isIndexed: data.isIndexed,
+        isPersistent: data.isPersistent,
+      );
+
+  Map<String, dynamic> toJson() => _$AccountRegistrationStatusDtoToJson(this);
+
+  AccountRegistrationStatus toModel() {
+    return AccountRegistrationStatus(
+      isIndexed: isIndexed,
+      isPersistent: isPersistent,
+    );
   }
 }
 

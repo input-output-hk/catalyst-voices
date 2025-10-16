@@ -64,6 +64,34 @@ void main() {
       expect(parentNode.isChildOf(childNode), isFalse);
     });
 
+    test('isChildOf does not identify similar nodes as children', () {
+      final parentNode = DocumentNodeId.root.child('requestedFunds');
+      final anotherNode = DocumentNodeId.root.child('requestedFundsUsdm');
+      expect(anotherNode.isChildOf(parentNode), isFalse);
+      expect(parentNode.isChildOf(anotherNode), isFalse);
+    });
+
+    test('isSameOrChildOf correctly identifies child nodes', () {
+      final parentNode = DocumentNodeId.root.child('section1');
+      final childNode = parentNode.child('paragraph1');
+      expect(childNode.isSameOrChildOf(parentNode), isTrue);
+      expect(parentNode.isSameOrChildOf(childNode), isFalse);
+    });
+
+    test('isSameOrChildOf does not identify similar nodes as children', () {
+      final parentNode = DocumentNodeId.root.child('requestedFunds');
+      final anotherNode = DocumentNodeId.root.child('requestedFundsUsdm');
+      expect(anotherNode.isSameOrChildOf(parentNode), isFalse);
+      expect(parentNode.isSameOrChildOf(anotherNode), isFalse);
+    });
+
+    test('isSameOrChildOf identifies itself', () {
+      final parentNode = DocumentNodeId.root.child('requestedFunds');
+      final anotherNode = DocumentNodeId.root.child('requestedFundsUsdm');
+      expect(parentNode.isSameOrChildOf(parentNode), isTrue);
+      expect(anotherNode.isSameOrChildOf(anotherNode), isTrue);
+    });
+
     test('toString outputs the value', () {
       final node = DocumentNodeId.root.child('section1').child('paragraph1');
       expect(node.toString(), 'section1.paragraph1');

@@ -1,7 +1,6 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_assets/generated/assets.gen.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart'
-    show CampaignCategory, SignedDocumentRef;
+    show CampaignCategory, Currencies, Money, MultiCurrencyAmount, SignedDocumentRef;
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart' hide Uuid;
 import 'package:equatable/equatable.dart';
@@ -17,9 +16,9 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   final String description;
   final String shortDescription;
   final int proposalsCount;
-  final Coin availableFunds;
-  final Coin totalAsk;
-  final ComparableRange<Coin> range;
+  final MultiCurrencyAmount availableFunds;
+  final MultiCurrencyAmount totalAsk;
+  final Range<Money> range;
   final List<CategoryDescriptionViewModel> descriptions;
   final SvgGenImage image;
   final List<String> dos;
@@ -75,11 +74,27 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
           '''Supports development of open source technology, centered around improving the Cardano developer experience and creating developer-friendly tooling that streamlines an integrated development environment.''',
       shortDescription: '',
       proposalsCount: 263,
-      availableFunds: const Coin(8000000),
-      totalAsk: const Coin(400000),
-      range: const ComparableRange(
-        min: Coin.fromWholeAda(15000),
-        max: Coin.fromWholeAda(100000),
+      availableFunds: MultiCurrencyAmount.single(
+        Money.fromMajorUnits(
+          currency: Currencies.ada,
+          majorUnits: BigInt.from(8000000),
+        ),
+      ),
+      totalAsk: MultiCurrencyAmount.single(
+        Money.fromMajorUnits(
+          currency: Currencies.ada,
+          majorUnits: BigInt.from(400000),
+        ),
+      ),
+      range: Range(
+        min: Money.fromMajorUnits(
+          currency: Currencies.ada,
+          majorUnits: BigInt.from(15000),
+        ),
+        max: Money.fromMajorUnits(
+          currency: Currencies.ada,
+          majorUnits: BigInt.from(100000),
+        ),
       ),
       descriptions: List.filled(3, CategoryDescriptionViewModel.dummy()),
       image: CategoryImageUrl.image('1'),
@@ -88,7 +103,10 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   }
 
   String get availableFundsText {
-    return CryptocurrencyFormatter.decimalFormat(availableFunds);
+    return MoneyFormatter.formatMultiCurrencyAmount(
+      availableFunds,
+      formatter: MoneyFormatter.formatDecimal,
+    );
   }
 
   String get formattedName {

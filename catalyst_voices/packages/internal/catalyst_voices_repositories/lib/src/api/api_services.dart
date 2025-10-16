@@ -45,12 +45,13 @@ final class ApiServices {
             )
           : CatGateway.create(
               httpClient: httpClient?.call(),
-              baseUrl: config.env.app,
+              baseUrl: config.env.app.replace(path: '/api/gateway'),
               converter: CborOrJsonDelegateConverter(
                 cborConverter: CborSerializableConverter(),
                 jsonConverter: $JsonSerializableConverter(),
               ),
               interceptors: [
+                PathTrimInterceptor(),
                 if (authTokenProvider != null) RbacAuthInterceptor(authTokenProvider),
                 if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
               ],
