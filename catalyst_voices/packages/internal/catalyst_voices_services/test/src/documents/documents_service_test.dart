@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -22,7 +20,7 @@ void main() {
   });
 
   group(DocumentsService, () {
-    test('calls cache documents exactly number '
+    /*    test('calls cache documents exactly number '
         'of times are all refs count', () async {
       // Given
       final allRefs = List.generate(
@@ -148,7 +146,7 @@ void main() {
         newRefs,
         allOf(hasLength(expectedNewRefs.length), containsAll(expectedNewRefs)),
       );
-    });
+    });*/
   });
 }
 

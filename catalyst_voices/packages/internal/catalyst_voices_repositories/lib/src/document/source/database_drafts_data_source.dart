@@ -45,11 +45,6 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
-  Future<List<TypedDocumentRef>> index() {
-    return _database.draftsDao.queryAllTypedRefs();
-  }
-
-  @override
   Future<List<DocumentData>> queryVersionsOfId({required String id}) async {
     final documentEntities = await _database.draftsDao.queryVersionsOfId(id: id);
     return documentEntities.map((e) => e.toModel()).toList();

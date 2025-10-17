@@ -84,11 +84,6 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Future<List<TypedDocumentRef>> index() {
-    return _database.documentsDao.queryAllTypedRefs();
-  }
-
-  @override
   Future<List<DocumentData>> queryVersionsOfId({required String id}) async {
     final documentEntities = await _database.documentsDao.queryVersionsOfId(id: id);
     return documentEntities.map((e) => e.toModel()).toList();
@@ -96,6 +91,36 @@ final class DatabaseDocumentsDataSource
 
   @override
   Future<void> save({required DocumentData data}) => saveAll([data]);
+
+  @override
+  Future<void> saveAll(Iterable<DocumentData> data) async {
+    final documentsWithMetadata = data.map(
+      (data) {
+        final idHiLo = UuidHiLo.from(data.metadata.id);
+        final verHiLo = UuidHiLo.from(data.metadata.version);
+
+        final document = DocumentEntity(
+          idHi: idHiLo.high,
+          idLo: idHiLo.low,
+          verHi: verHiLo.high,
+          verLo: verHiLo.low,
+          type: data.metadata.type,
+          content: data.content,
+          metadata: data.metadata,
+          createdAt: DateTime.timestamp(),
+        );
+
+        // TODO(damian-molinski): Need to decide what goes into metadata table.
+        final metadata = <DocumentMetadataEntity>[
+          //
+        ];
+
+        return (document: document, metadata: metadata);
+      },
+    ).toList();
+
+    await _database.documentsDao.saveAll(documentsWithMetadata);
+  }
 
   @override
   Stream<DocumentData?> watch({required DocumentRef ref}) {
@@ -160,36 +185,6 @@ final class DatabaseDocumentsDataSource
     return _database.documentsDao
         .watchRefToDocumentData(refTo: refTo, type: type)
         .map((e) => e?.toModel());
-  }
-
-  @override
-  Future<void> saveAll(Iterable<DocumentData> data) async {
-    final documentsWithMetadata = data.map(
-      (data) {
-        final idHiLo = UuidHiLo.from(data.metadata.id);
-        final verHiLo = UuidHiLo.from(data.metadata.version);
-
-        final document = DocumentEntity(
-          idHi: idHiLo.high,
-          idLo: idHiLo.low,
-          verHi: verHiLo.high,
-          verLo: verHiLo.low,
-          type: data.metadata.type,
-          content: data.content,
-          metadata: data.metadata,
-          createdAt: DateTime.timestamp(),
-        );
-
-        // TODO(damian-molinski): Need to decide what goes into metadata table.
-        final metadata = <DocumentMetadataEntity>[
-          //
-        ];
-
-        return (document: document, metadata: metadata);
-      },
-    ).toList();
-
-    await _database.documentsDao.saveAll(documentsWithMetadata);
   }
 }
 

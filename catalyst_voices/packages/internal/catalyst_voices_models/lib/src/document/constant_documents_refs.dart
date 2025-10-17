@@ -81,19 +81,22 @@ final class CategoryTemplatesRefs extends Equatable {
     required this.comment,
   });
 
-  Iterable<SignedDocumentRef> get all => [category, proposal, comment];
-
-  Iterable<TypedDocumentRef> get allTyped {
-    return [
-      TypedDocumentRef(
-        ref: category,
-        type: DocumentType.categoryParametersDocument,
-      ),
-      TypedDocumentRef(ref: proposal, type: DocumentType.proposalTemplate),
-      TypedDocumentRef(ref: comment, type: DocumentType.commentTemplate),
-    ];
-  }
-
   @override
   List<Object?> get props => [category, proposal, comment];
+
+  bool hasId(String id) => withId(id) != null;
+
+  SignedDocumentRef? withId(String id) {
+    if (category.id == id) {
+      return category;
+    }
+    if (proposal.id == id) {
+      return proposal;
+    }
+    if (comment.id == id) {
+      return comment;
+    }
+
+    return null;
+  }
 }

@@ -46,19 +46,11 @@ abstract interface class DocumentRepository {
     required DocumentRef ref,
   });
 
-  /// Returns list of refs to all published and any refs it may hold.
-  ///
-  /// Its using documents index api.
-  Future<List<TypedDocumentRef>> getAllDocumentsRefs();
-
   /// Return list of all cached documents id for given [id].
   /// It looks for documents in the local storage and draft storage.
   Future<List<DocumentData>> getAllVersionsOfId({
     required String id,
   });
-
-  /// Returns list of locally saved signed documents refs.
-  Future<List<TypedDocumentRef>> getCachedDocumentsRefs();
 
   /// If version is not specified in [ref] method will try to return latest
   /// version of document matching [ref].
@@ -254,27 +246,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<List<TypedDocumentRef>> getAllDocumentsRefs() async {
-    final allRefs = await _remoteDocuments.index().then(_uniqueTypedRefs);
-    final allConstRefs = constantDocumentsRefs.expand((element) => element.all);
-
-    final nonConstRefs = allRefs
-        .where((ref) => allConstRefs.none((e) => e.id == ref.ref.id))
-        .toList();
-
-    return {
-      // Note. categories are mocked on backend so we can't not fetch them.
-      ...constantDocumentsRefs.expand(
-        (element) => [
-          element.proposal.toTyped(DocumentType.proposalTemplate),
-          element.comment.toTyped(DocumentType.commentTemplate),
-        ],
-      ),
-      ...nonConstRefs,
-    }.toList();
-  }
-
-  @override
   Future<List<DocumentData>> getAllVersionsOfId({
     required String id,
   }) async {
@@ -282,11 +253,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final drafts = await _drafts.queryVersionsOfId(id: id);
 
     return [...drafts, ...localRefs];
-  }
-
-  @override
-  Future<List<TypedDocumentRef>> getCachedDocumentsRefs() {
-    return _localDocuments.index();
   }
 
   @override
@@ -673,22 +639,6 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return [];
   }
 
-  List<TypedDocumentRef> _uniqueTypedRefs(List<TypedDocumentRef> refs) {
-    final uniqueRefs = <DocumentRef, TypedDocumentRef>{};
-
-    for (final ref in refs) {
-      uniqueRefs.update(
-        ref.ref,
-        // While indexing we don't know what is type of "ref" or "reply".
-        // Here we're trying to eliminate duplicates with unknown type.
-        (value) => value.type != DocumentType.unknown ? value : ref,
-        ifAbsent: () => ref,
-      );
-    }
-
-    return uniqueRefs.values.toList();
-  }
-
   Stream<DocumentData?> _watchDocumentData({
     required DocumentRef ref,
     bool synchronizedUpdate = false,
@@ -724,8 +674,4 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
     return StreamGroup.merge([updateStream, localStream]);
   }
-}
-
-extension on DocumentType {
-  bool get isCategory => this == DocumentType.categoryParametersDocument;
 }

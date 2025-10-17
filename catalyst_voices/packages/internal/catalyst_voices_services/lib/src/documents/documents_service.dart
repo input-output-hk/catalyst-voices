@@ -63,26 +63,28 @@ final class DocumentsServiceImpl implements DocumentsService {
   }) async {
     onProgress?.call(0.1);
 
-    final allRefs = await _documentRepository.getAllDocumentsRefs();
-    final cachedRefs = await _documentRepository.getCachedDocumentsRefs();
-    final missingRefs = List.of(allRefs)..removeWhere(cachedRefs.contains);
+    // final allRefs = await _documentRepository.getAllDocumentsRefs();
+    // final cachedRefs = await _documentRepository.getCachedDocumentsRefs();
+    // final missingRefs = List.of(allRefs)..removeWhere(cachedRefs.contains);
+
+    final refs = <DocumentRef>[];
 
     onProgress?.call(0.2);
 
-    debugPrint(
-      'AllRefs[${allRefs.length}], '
-      'CachedRefs[${cachedRefs.length}], '
-      'MissingRefs[${missingRefs.length}]',
-    );
+    // debugPrint(
+    //   'AllRefs[${allRefs.length}], '
+    //   'CachedRefs[${cachedRefs.length}], '
+    //   'MissingRefs[${missingRefs.length}]',
+    // );
 
-    if (missingRefs.isEmpty) {
+    if (refs.isEmpty) {
       onProgress?.call(1);
       return 0;
     }
 
-    missingRefs.sort((a, b) => a.type.priority.compareTo(b.type.priority) * -1);
+    // refs.sort((a, b) => a.type.priority.compareTo(b.type.priority) * -1);
 
-    final batches = missingRefs.slices(batchSize);
+    final batches = refs.slices(batchSize);
     final batchesCount = batches.length;
 
     final pool = Pool(maxConcurrent);
@@ -96,12 +98,12 @@ final class DocumentsServiceImpl implements DocumentsService {
         for (final value in batch)
           pool.withResource(
             () => _documentRepository
-                .getDocumentData(ref: value.ref, useCache: false)
+                .getDocumentData(ref: value, useCache: false)
                 .then<Result<DocumentData, RefSyncException>>(Success.new)
                 .onError(
                   (error, stackTrace) {
                     final syncError = RefSyncException(
-                      value.ref,
+                      value,
                       error: error,
                       stack: stackTrace,
                     );

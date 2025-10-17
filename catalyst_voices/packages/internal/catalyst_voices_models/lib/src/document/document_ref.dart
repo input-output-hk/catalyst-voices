@@ -93,11 +93,6 @@ sealed class DocumentRef extends Equatable implements Comparable<DocumentRef> {
   ///
   /// Useful when a draft becomes a signed document after publishing.
   SignedDocumentRef toSignedDocumentRef();
-
-  /// Converts to [TypedDocumentRef] with given [type].
-  TypedDocumentRef toTyped(DocumentType type) {
-    return TypedDocumentRef(ref: this, type: type);
-  }
 }
 
 /// Ref to local draft document.
@@ -215,31 +210,4 @@ final class SignedDocumentRef extends DocumentRef {
   @override
   String toString() =>
       isExact ? 'ExactSignedDocumentRef($id.v$version)' : 'LooseSignedDocumentRef($id)';
-}
-
-final class TypedDocumentRef extends Equatable {
-  final DocumentRef ref;
-  final DocumentType type;
-
-  const TypedDocumentRef({
-    required this.ref,
-    required this.type,
-  });
-
-  @override
-  List<Object?> get props => [ref, type];
-
-  TypedDocumentRef copyWith({
-    DocumentRef? ref,
-    DocumentType? type,
-  }) {
-    return TypedDocumentRef(
-      ref: ref ?? this.ref,
-      type: type ?? this.type,
-    );
-  }
-
-  TypedDocumentRef copyWithVersion(String version) {
-    return copyWith(ref: ref.copyWith(version: Optional(version)));
-  }
 }

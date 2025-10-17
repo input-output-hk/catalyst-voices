@@ -28,9 +28,6 @@ abstract interface class DraftDataSource implements DocumentDataLocalSource {
     required DraftRef ref,
   });
 
-  @override
-  Future<List<TypedDocumentRef>> index();
-
   Future<void> update({
     required DraftRef ref,
     required DocumentDataContent content,

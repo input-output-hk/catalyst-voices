@@ -125,38 +125,6 @@ void main() {
       );
 
       test(
-        'all refs return as expected',
-        () async {
-          // Given
-          final refs = List.generate(
-            10,
-            (_) => DocumentRefFactory.draftRef(),
-          );
-          final drafts = refs.map((ref) {
-            return DraftFactory.build(
-              metadata: DocumentDataMetadata(
-                type: DocumentType.proposalDocument,
-                selfRef: ref,
-              ),
-            );
-          });
-          final typedRefs = refs.map((e) => e.toTyped(DocumentType.proposalDocument)).toList();
-
-          // When
-          await database.draftsDao.saveAll(drafts);
-
-          // Then
-          final allRefs = await database.draftsDao.queryAllTypedRefs();
-
-          expect(
-            allRefs,
-            allOf(hasLength(refs.length), containsAll(typedRefs)),
-          );
-        },
-        onPlatform: driftOnPlatforms,
-      );
-
-      test(
         'authors are correctly extracted',
         () async {
           final authorId1 = CatalystId(host: 'test', role0Key: Uint8List(32));
