@@ -1,15 +1,15 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class FundsDetailCard extends StatelessWidget {
-  final Coin allFunds;
-  final Coin totalAsk;
-  final ComparableRange<Coin>? askRange;
+  final MultiCurrencyAmount allFunds;
+  final MultiCurrencyAmount totalAsk;
+  final Range<Money>? askRange;
   final FundsDetailCardType type;
 
   const FundsDetailCard({
@@ -50,7 +50,7 @@ class FundsDetailCard extends StatelessWidget {
                   key: const Key('FundsDetailBudget'),
                   title: type.localizedTypeName(context.l10n),
                   description: type.localizedTypeDescription(context.l10n),
-                  funds: allFunds,
+                  funds: _formatFunds(allFunds),
                 ),
                 Offstage(
                   offstage: type.isCategoryCompact,
@@ -58,7 +58,7 @@ class FundsDetailCard extends StatelessWidget {
                     key: const Key('FundsDetailRequested'),
                     title: type.localizedTotalAsk(context.l10n),
                     description: context.l10n.campaignTotalAskDescription,
-                    funds: totalAsk,
+                    funds: _formatFunds(totalAsk),
                     largeFundsText: false,
                   ),
                 ),
@@ -68,6 +68,13 @@ class FundsDetailCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  String _formatFunds(MultiCurrencyAmount amount) {
+    return MoneyFormatter.formatMultiCurrencyAmount(
+      amount,
+      formatter: MoneyFormatter.formatDecimal,
     );
   }
 }
@@ -106,7 +113,7 @@ enum FundsDetailCardType {
 class _CampaignFundsDetail extends StatelessWidget {
   final String title;
   final String description;
-  final Coin funds;
+  final String funds;
   final bool largeFundsText;
 
   const _CampaignFundsDetail({
@@ -116,8 +123,6 @@ class _CampaignFundsDetail extends StatelessWidget {
     required this.funds,
     this.largeFundsText = true,
   });
-
-  String get _formattedFunds => CryptocurrencyFormatter.decimalFormat(funds);
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +151,7 @@ class _CampaignFundsDetail extends StatelessWidget {
         const SizedBox(height: 16),
         Text(
           key: const Key('Funds'),
-          _formattedFunds,
+          funds,
           style: _foundsTextStyle(context)?.copyWith(
             color: context.colors.textOnPrimaryLevel1,
           ),
@@ -165,7 +170,7 @@ class _CampaignFundsDetail extends StatelessWidget {
 }
 
 class _RangeAsk extends StatelessWidget {
-  final ComparableRange<Coin> range;
+  final Range<Money> range;
 
   const _RangeAsk({
     required this.range,
@@ -204,7 +209,7 @@ class _RangeAsk extends StatelessWidget {
 
 class _RangeValue extends StatelessWidget {
   final String title;
-  final Coin value;
+  final Money value;
 
   const _RangeValue({
     super.key,
@@ -212,7 +217,7 @@ class _RangeValue extends StatelessWidget {
     required this.value,
   });
 
-  String get _formattedValue => CryptocurrencyFormatter.formatAmount(value);
+  String get _formattedValue => MoneyFormatter.formatCompactRounded(value);
 
   @override
   Widget build(BuildContext context) {

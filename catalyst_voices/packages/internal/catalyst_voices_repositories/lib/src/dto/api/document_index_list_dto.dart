@@ -48,6 +48,8 @@ final class IndividualDocumentVersion {
   final String type;
   final DocumentRefForFilteredDocuments? ref;
   final DocumentRefForFilteredDocuments? reply;
+  @JsonKey(name: 'doc_parameters')
+  final DocumentRefForFilteredDocuments? parameters;
   final DocumentRefForFilteredDocuments? template;
   final DocumentRefForFilteredDocuments? brand;
   final DocumentRefForFilteredDocuments? campaign;
@@ -58,6 +60,7 @@ final class IndividualDocumentVersion {
     required this.type,
     this.ref,
     this.reply,
+    this.parameters,
     this.template,
     this.brand,
     this.campaign,

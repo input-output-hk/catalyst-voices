@@ -35,6 +35,7 @@ abstract interface class RegistrationService {
     AccountPublicStatus? publicStatus,
     bool isActive,
     bool unlocked,
+    AccountRegistrationStatus registrationStatus,
   });
 
   /// Creates a dummy [Account] using [Account.dummySeedPhrase] and other
@@ -135,6 +136,9 @@ final class RegistrationServiceImpl implements RegistrationService {
     AccountPublicStatus? publicStatus,
     bool isActive = false,
     bool unlocked = true,
+    AccountRegistrationStatus registrationStatus = const AccountRegistrationStatus.indexed(
+      isPersistent: true,
+    ),
   }) async {
     return _keyDerivationService.deriveMasterKey(seedPhrase: seedPhrase).use((masterKey) async {
       final keychain = await _keychainProvider.create(keychainId ?? const Uuid().v4());
@@ -168,6 +172,7 @@ final class RegistrationServiceImpl implements RegistrationService {
           address: address,
           publicStatus: publicStatus ?? AccountPublicStatus.notSetup,
           isActive: isActive,
+          registrationStatus: registrationStatus,
         );
       });
     });
@@ -324,6 +329,10 @@ final class RegistrationServiceImpl implements RegistrationService {
         final keychainId = const Uuid().v4();
         final keychain = await _keychainProvider.create(keychainId);
 
+        final registrationStatus = AccountRegistrationStatus.indexed(
+          isPersistent: recovered.isPersistent,
+        );
+
         return Account(
           catalystId: catalystId.copyWith(
             username: Optional(recovered.username),
@@ -334,6 +343,7 @@ final class RegistrationServiceImpl implements RegistrationService {
           address: recovered.stakeAddress,
           publicStatus: recovered.publicStatus,
           votingPower: recovered.votingPower,
+          registrationStatus: registrationStatus,
         );
       });
     });
@@ -374,6 +384,7 @@ final class RegistrationServiceImpl implements RegistrationService {
             publicStatus: data.email != null
                 ? AccountPublicStatus.verifying
                 : AccountPublicStatus.notSetup,
+            registrationStatus: const AccountRegistrationStatus.notIndexed(),
           );
         });
       });

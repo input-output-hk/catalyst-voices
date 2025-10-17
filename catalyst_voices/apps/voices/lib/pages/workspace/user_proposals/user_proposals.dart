@@ -29,6 +29,7 @@ class UserProposals extends StatelessWidget {
           _UserSubmittedProposals(),
           _UserDraftProposals(),
           _UserLocalProposals(),
+          _UserInactiveProposals(),
         ],
       ),
     );
@@ -77,6 +78,30 @@ class _UserDraftProposals extends StatelessWidget {
           title: context.l10n.sharedForPublicInProgress,
           info: context.l10n.sharedForPublicInfoMarkdown,
           learnMoreUrl: VoicesConstants.proposalPublishingDocsUrl,
+        );
+      },
+    );
+  }
+}
+
+class _UserInactiveProposals extends StatelessWidget {
+  const _UserInactiveProposals();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<WorkspaceBloc, WorkspaceState, UserProposalsView>(
+      selector: (state) {
+        return state.userProposals.inactiveProposals;
+      },
+      builder: (context, proposals) {
+        if (proposals.items.isEmpty) {
+          return const SliverToBoxAdapter();
+        }
+        return UserProposalSection(
+          items: proposals.items,
+          emptyTextMessage: '',
+          title: context.l10n.notActiveCampaign,
+          info: context.l10n.notActiveCampaignInfoMarkdown,
         );
       },
     );

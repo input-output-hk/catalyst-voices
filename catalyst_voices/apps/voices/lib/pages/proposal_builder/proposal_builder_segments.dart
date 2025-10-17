@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/proposal_builder/tiles/proposal_builder_comment_tile.dart';
 import 'package:catalyst_voices/widgets/comment/proposal_add_comment_tile.dart';
@@ -69,7 +68,7 @@ class _DocumentSection extends StatelessWidget {
 
   bool get _isEditable {
     for (final overriddenNodeId in _widgetOverrides.keys) {
-      final sectionHasOverrides = overriddenNodeId.isChildOf(property.nodeId);
+      final sectionHasOverrides = overriddenNodeId.isSameOrChildOf(property.nodeId);
       if (sectionHasOverrides) {
         // disable editing for overridden widgets
         return false;

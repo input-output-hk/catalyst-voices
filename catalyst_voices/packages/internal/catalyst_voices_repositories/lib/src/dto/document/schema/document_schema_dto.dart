@@ -12,7 +12,7 @@ final class DocumentSchemaDto {
   @JsonKey(name: r'$id')
   final String id;
   final String title;
-  final String description;
+  final String? description;
   final DocumentDefinitionsDto definitions;
   final String type;
   final bool additionalProperties;
@@ -46,6 +46,7 @@ final class DocumentSchemaDto {
     const nodeId = DocumentNodeId.root;
     final required = this.required ?? const [];
     final order = this.order ?? const [];
+    final description = this.description;
 
     final mappedProperties = properties.entries
         .map(
@@ -61,7 +62,7 @@ final class DocumentSchemaDto {
       parentSchemaUrl: schema,
       schemaSelfUrl: id,
       title: title,
-      description: MarkdownData(description),
+      description: description != null ? MarkdownData(description) : null,
       properties: mappedProperties,
       order: order.map(nodeId.child).toList(),
     );

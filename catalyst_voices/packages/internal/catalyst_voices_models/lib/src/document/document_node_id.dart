@@ -18,7 +18,7 @@ final class DocumentNodeId extends NodeId {
 
   /// Creates a [DocumentNodeId] from a formatted string, i.e: "setup.title".
   factory DocumentNodeId.fromString(String value) {
-    return DocumentNodeId._(value, paths: value.split('.'));
+    return DocumentNodeId._(value, paths: value.split(NodeId.separator));
   }
 
   /// The default constructor for the [DocumentNodeId].
@@ -30,14 +30,10 @@ final class DocumentNodeId extends NodeId {
     required this.paths,
   });
 
-  // TODO(damian-molinski): uncomment if we have confirmation about dots in
-  // paths
-  // List<String> get paths => value.isNotEmpty ? value.split('.') : const [];
-
   /// Utility constructor which ensure that value always has correct format.
   DocumentNodeId._fromPaths(List<String> paths)
     : this._(
-        paths.join('.'),
+        paths.join(NodeId.separator),
         paths: paths,
       );
 
