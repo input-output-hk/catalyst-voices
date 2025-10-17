@@ -190,7 +190,14 @@ This category is for the builders. It is open to individuals and technical teams
         description: '''
 All proposals must adhere to the following standards. The primary focus is on turning a validated concept into a tangible, working piece of software - a prototype on Cardano's testnet or mainnet.
 
-- **Define the Problem & Use Case:** Clearly define the problem you are solving and why your on-chain utility is valuable for Cardano users. Explain *So What* of your proposed solution.
+- **Define the Problem & Use Case:** Clearly define the problem you are solving and why your on-chain utility is valuable for Cardano users. Explain the ‘So What’ of your proposed solution. This must include a thorough analysis of the existing ecosystem. The responsibility to conduct this research lies entirely with the proposer. Your analysis must specifically address:
+  1. **Ecosystem Research:** Describe the results of your research into previously funded projects (via Project Catalyst) and existing solutions in the wider Cardano ecosystem. 
+  2. **Value Proposition:** Based on your research findings, demonstrate your project's value in one of two ways:
+
+     a. **If similar solutions exist:** Justify why your proposal is sufficiently unique, detailing how it substantially differs from, improves upon, or builds on them.
+	  
+     b. **If the solution is novel:** State clearly that no direct precedent was found and explain why introducing this new capability is a valuable and strategic addition to the Cardano ecosystem.
+	  
 - **Deliver a Functional Prototype:** The primary goal of your project must be a working software prototype deployed on at least a public Cardano testnet that users can interact with. Non-technical projects (e.g., marketing, events) or foundational research only are not eligible. These can be submitted via *"Cardano Open: Ecosystem"* instead.
 - **Detail Verifiable Team Credentials:** Simply listing names and roles is insufficient. The proposal must include verifiable references (e.g., comprehensive LinkedIn profiles, project portfolios, public repositories) that clearly demonstrate each key team member's specific experience, accomplishments, and suitability for their role in the project.
 - **Outline a Credible Technical Plan:** Describe your technical approach, including the architecture and key technologies you will use.
@@ -203,14 +210,13 @@ All proposals must adhere to the following standards. The primary focus is on tu
       ),
       CategoryDescription(
         title: 'Self-Assessment Checklist',
-        description: r'''
+        description: '''
 Use this checklist to ensure your proposal meets all foundational and content requirements before submission.
 
 | **Rule & Check** | **Description** |
-|:----------|:----------|
-| **Legal Entity** | Lead applicant is a verified legal business entity. |
-| **Track Record & Revenue** | Lead org has a ≥2-year track record, and the consortium collectively has ≥\$5M in verifiable annual revenue. |
+|:--------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Foundational Work** | Evidence of prior research, whitepaper, design, or proof-of-concept is provided. |
+| **Ecosystem Value Proposition** | The proposal includes ecosystem research and uses the findings to either (a) justify its uniqueness over existing solutions or (b) demonstrate the value of its novel approach. |
 | **Builder Credentials** | Demonstrates technical capability via verifiable in-house talent or a confirmed development partner (GitHub, LinkedIn, portfolio, etc.) |
 | **Catalyst Standing** | Proposer and all team members are in good standing with prior Catalyst projects. |
 | **Problem & Use Case** | The proposal clearly defines the problem and the value of the on-chain utility. |
@@ -375,7 +381,7 @@ Use this checklist to ensure your proposal meets all foundational and content re
 
   To celebrate the collaboration between the Midnight and Cardano ecosystems, project selection will be a two-stage process:
 
-  1. **Community Recommendation:** Cardano's ADA holders will vote on proposals through Project Catalyst to create a list of recommended projects.
+  1. **Community Recommendation:** Cardano's ADA holders will vote on proposals through Project Catalyst to create a shortlist of recommended projects.
   2. **Final Selection:** The Midnight Foundation will make the final funding decisions from the recommended list on behalf of the Midnight Foundation.
 
   ### Additional Notes
