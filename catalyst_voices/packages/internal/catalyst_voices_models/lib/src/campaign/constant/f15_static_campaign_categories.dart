@@ -210,7 +210,7 @@ All proposals must adhere to the following standards. The primary focus is on tu
       ),
       CategoryDescription(
         title: 'Self-Assessment Checklist',
-        description: r'''
+        description: '''
 Use this checklist to ensure your proposal meets all foundational and content requirements before submission.
 
 | **Rule & Check** | **Description** |
