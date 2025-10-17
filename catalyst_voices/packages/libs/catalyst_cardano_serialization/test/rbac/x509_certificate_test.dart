@@ -1,17 +1,18 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_key_derivation/catalyst_key_derivation.dart' hide Ed25519PublicKey;
-import 'package:collection/collection.dart';
-import 'package:mocktail/mocktail.dart';
-import 'package:test/test.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart'
+    as kd hide Ed25519PublicKey;
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart' as test;
 
 void main() {
-  group(X509Certificate, () {
-    final signature = _FakeBip32Ed25519XSignature();
+  test.group(X509Certificate, () {
+    final signature = FakeBip32Ed25519XSignature([4, 5, 6]);
     final privateKey = _FakeBip32Ed25519XPrivateKey(signature: signature);
     final publicKey = Ed25519PublicKey.seeded(0);
 
-    setUpAll(() {
-      Bip32Ed25519XPublicKeyFactory.instance = _FakeBip32Ed25519XPublicKeyFactory();
+    test.setUpAll(() {
+      kd.Bip32Ed25519XPublicKeyFactory.instance = FakeBip32Ed25519XPublicKeyFactory();
     });
 
     /* cSpell:disable */
@@ -42,20 +43,20 @@ void main() {
     );
     /* cSpell:enable */
 
-    test('generateSelfSigned X509 certificate', () async {
+    test.test('generateSelfSigned X509 certificate', () async {
       final certificate = await X509Certificate.generateSelfSigned(
         tbsCertificate: tbs,
         privateKey: privateKey,
       );
 
-      expect(certificate.tbsCertificate, equals(tbs));
-      expect(certificate.signature, equals(signature.bytes));
+      test.expect(certificate.tbsCertificate, test.equals(tbs));
+      test.expect(certificate.signature, test.equals(signature.bytes));
 
-      expect(certificate.toPem(), isNotEmpty);
-      expect(certificate.toDer().bytes, isNotEmpty);
+      test.expect(certificate.toPem(), test.isNotEmpty);
+      test.expect(certificate.toDer().bytes, test.isNotEmpty);
     });
 
-    test('generateSelfSigned and re-encode', () async {
+    test.test('generateSelfSigned and re-encode', () async {
       final certificate = await X509Certificate.generateSelfSigned(
         tbsCertificate: tbs,
         privateKey: privateKey,
@@ -63,44 +64,20 @@ void main() {
 
       final derCertificate = certificate.toDer();
       final decodedCertificate = X509Certificate.fromDer(derCertificate);
-      expect(decodedCertificate, equals(decodedCertificate));
+      test.expect(decodedCertificate, test.equals(decodedCertificate));
     });
   });
 }
 
-class _FakeBip32Ed25519XPrivateKey extends Fake implements Bip32Ed25519XPrivateKey {
-  final Bip32Ed25519XSignature signature;
+// Custom fake for this specific test that returns a specific signature
+class _FakeBip32Ed25519XPrivateKey extends Fake
+    implements kd.Bip32Ed25519XPrivateKey {
+  final kd.Bip32Ed25519XSignature signature;
 
   _FakeBip32Ed25519XPrivateKey({required this.signature});
 
   @override
-  Future<Bip32Ed25519XSignature> sign(List<int> message) async {
+  Future<kd.Bip32Ed25519XSignature> sign(List<int> message) async {
     return signature;
   }
-}
-
-class _FakeBip32Ed25519XPublicKey extends Fake implements Bip32Ed25519XPublicKey {
-  @override
-  List<int> get bytes => [1, 2, 3];
-
-  @override
-  int get hashCode => bytes.hashCode;
-
-  @override
-  bool operator ==(Object other) {
-    return other is Bip32Ed25519XPublicKey &&
-        const DeepCollectionEquality().equals(bytes, other.bytes);
-  }
-}
-
-class _FakeBip32Ed25519XPublicKeyFactory extends Fake implements Bip32Ed25519XPublicKeyFactory {
-  @override
-  Bip32Ed25519XPublicKey fromBytes(List<int> bytes) {
-    return _FakeBip32Ed25519XPublicKey();
-  }
-}
-
-class _FakeBip32Ed25519XSignature extends Fake implements Bip32Ed25519XSignature {
-  @override
-  List<int> get bytes => [4, 5, 6];
 }

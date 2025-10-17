@@ -2,15 +2,15 @@ import 'dart:convert';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/rbac_registration_chain_dto.dart';
-import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group(RbacRegistrationChain, () {
     setUpAll(() {
-      Bip32Ed25519XPublicKeyFactory.instance = _FakeBip32Ed25519XPublicKeyFactory();
+      Bip32Ed25519XPublicKeyFactory.instance = FakeBip32Ed25519XPublicKeyFactory();
     });
 
     RbacRegistrationChain getRegistrationChain(String jsonString) {
@@ -231,16 +231,4 @@ const _voterJson = '''
 ''';
 /* cSpell:enable */
 
-class _FakeBip32Ed25519XPublicKey extends Fake implements Bip32Ed25519XPublicKey {
-  @override
-  final List<int> bytes;
-
-  _FakeBip32Ed25519XPublicKey(this.bytes);
-}
-
-class _FakeBip32Ed25519XPublicKeyFactory extends Fake implements Bip32Ed25519XPublicKeyFactory {
-  @override
-  Bip32Ed25519XPublicKey fromBytes(List<int> bytes) {
-    return _FakeBip32Ed25519XPublicKey(bytes);
-  }
-}
+// Fake implementations now provided by catalyst_voices_dev package
