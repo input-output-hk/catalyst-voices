@@ -70,29 +70,7 @@ final class DocumentsServiceImpl implements DocumentsService {
   }) async {
     _logger.finer('Indexing documents for f${campaign.fundNumber}');
 
-    onProgress?.call(0.1);
-
-    // final allRefs = await _documentRepository.getAllDocumentsRefs();
-    // final cachedRefs = await _documentRepository.getCachedDocumentsRefs();
-    // final missingRefs = List.of(allRefs)..removeWhere(cachedRefs.contains);
-
     final refs = <DocumentRef>[];
-
-    onProgress?.call(0.2);
-
-    // debugPrint(
-    //   'AllRefs[${allRefs.length}], '
-    //   'CachedRefs[${cachedRefs.length}], '
-    //   'MissingRefs[${missingRefs.length}]',
-    // );
-
-    if (refs.isEmpty) {
-      onProgress?.call(1);
-      return 0;
-    }
-
-    // refs.sort((a, b) => a.type.priority.compareTo(b.type.priority) * -1);
-
     final batches = refs.slices(batchSize);
     final batchesCount = batches.length;
 

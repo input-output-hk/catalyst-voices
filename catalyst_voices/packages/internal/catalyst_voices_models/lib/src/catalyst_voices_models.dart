@@ -1,6 +1,8 @@
 library catalyst_voices_models;
 
 export 'api/api_response_status_code.dart';
+export 'api/document_index.dart';
+export 'api/document_index_filters.dart';
 export 'api/exception/api_exception.dart';
 export 'app/app_meta.dart';
 export 'auth/password_strength.dart';

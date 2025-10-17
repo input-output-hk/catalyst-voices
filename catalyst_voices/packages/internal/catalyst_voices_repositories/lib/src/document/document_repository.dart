@@ -88,6 +88,15 @@ abstract interface class DocumentRepository {
     required DocumentType type,
   });
 
+  /// Looks up all signed document refs according to [filters].
+  ///
+  /// Response is paginated using [page] and [limit].
+  Future<DocumentIndex> index({
+    required int page,
+    required int limit,
+    required DocumentIndexFilters filters,
+  });
+
   /// Similar to [watchIsDocumentFavorite] but stops after first emit.
   Future<bool> isDocumentFavorite({
     required DocumentRef ref,
@@ -370,6 +379,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     return deletedDrafts + deletedDocuments;
   }
 
+  @override
   Future<void> saveDocumentBulk(List<DocumentData> documents) async {
     final signedDocs = documents.where((element) => element.ref is SignedDocumentRef);
     final draftDocs = documents.where((element) => element.ref is DraftRef);
@@ -728,5 +738,18 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final localStream = _localDocuments.watch(ref: ref);
 
     return StreamGroup.merge([updateStream, localStream]);
+  }
+
+  @override
+  Future<DocumentIndex> index({
+    required int page,
+    required int limit,
+    required DocumentIndexFilters filters,
+  }) {
+    return _remoteDocuments.index(
+      page: page,
+      limit: limit,
+      filters: filters,
+    );
   }
 }

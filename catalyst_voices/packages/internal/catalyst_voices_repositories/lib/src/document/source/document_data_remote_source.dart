@@ -31,52 +31,41 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }
 
   @override
-  Future<String?> getLatestVersion(String id) async {
+  Future<String?> getLatestVersion(String id) {
     final ver = allConstantDocumentRefs
         .firstWhereOrNull((element) => element.hasId(id))
         ?.withId(id)
         ?.version;
 
     if (ver != null) {
-      return ver;
+      return Future.value(ver);
     }
 
-    try {
-      final index = await _api.gateway
-          .apiV1DocumentIndexPost(
-            body: DocumentIndexQueryFilter(id: IdSelectorDto.eq(id)),
-            limit: 1,
-          )
-          .successBodyOrThrow()
-          .then(_mapDynamicResponseValue);
-
-      final docs = index.docs;
-      if (docs.isEmpty) {
-        return null;
-      }
-
-      return docs
-          .sublist(0, 1)
-          .cast<Map<String, dynamic>>()
-          .map(DocumentIndexListDto.fromJson)
-          .firstOrNull
-          ?.ver
-          .firstOrNull
-          ?.ver;
-    } on NotFoundException {
-      return null;
-    }
+    return _getDocumentIndexList(
+          page: 0,
+          limit: 1,
+          body: DocumentIndexQueryFilter(id: IdSelectorDto.eq(id)),
+        )
+        .then(_mapDynamicResponseValue)
+        .then((response) => response._docs.firstOrNull?.ver.firstOrNull?.ver);
   }
 
   @override
-  Future<DocumentIndexList> index({
-    required Campaign campaign,
-  }) async {
-    return _getDocumentIndexList(
-      page: 0,
-      limit: 100,
-      campaign: campaign,
+  Future<DocumentIndex> index({
+    int page = 0,
+    int limit = 100,
+    required DocumentIndexFilters filters,
+  }) {
+    final body = DocumentIndexQueryFilter(
+      type: filters.type?.uuid,
+      parameters: IdRefOnly(id: IdSelectorDto.inside(filters.categoriesIds)).toJson(),
     );
+
+    return _getDocumentIndexList(
+      page: page,
+      limit: limit,
+      body: body,
+    ).then((value) => value.toModel());
   }
 
   @override
@@ -90,18 +79,70 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
         .successOrThrow();
   }
 
+  // TODO(damian-molinski): Remove this when backend can serve const documents
+  DocumentIndexList _forConstRefs({
+    required int page,
+    required int limit,
+    required Iterable<SignedDocumentRef> refs,
+    required DocumentType type,
+  }) {
+    final skip = page * limit;
+
+    final docs = refs
+        .skip(skip)
+        .take(limit)
+        .map(
+          (e) {
+            return DocumentIndexListDto(
+              id: e.id,
+              ver: [
+                IndividualDocumentVersion(ver: e.version!, type: type.uuid),
+              ],
+            );
+          },
+        )
+        .map((e) => e.toJson())
+        .toList();
+
+    final remaining = skip + docs.length - refs.length;
+
+    return DocumentIndexList(
+      docs: docs,
+      page: CurrentPage(
+        page: page,
+        limit: limit,
+        remaining: remaining,
+      ),
+    );
+  }
+
   Future<DocumentIndexList> _getDocumentIndexList({
     required int page,
     required int limit,
-    required Campaign campaign,
+    required DocumentIndexQueryFilter body,
   }) async {
-    final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toList();
+    // TODO(damian-molinski): Remove this when backend can serve const documents
+    if (body.type == DocumentType.proposalTemplate.uuid) {
+      return _forConstRefs(
+        page: page,
+        limit: limit,
+        refs: activeConstantDocumentRefs.map((e) => e.proposal),
+        type: DocumentType.proposalTemplate,
+      );
+    }
+    // TODO(damian-molinski): Remove this when backend can serve const documents
+    if (body.type == DocumentType.commentTemplate.uuid) {
+      return _forConstRefs(
+        page: page,
+        limit: limit,
+        refs: activeConstantDocumentRefs.map((e) => e.comment),
+        type: DocumentType.commentTemplate,
+      );
+    }
 
     return _api.gateway
         .apiV1DocumentIndexPost(
-          body: DocumentIndexQueryFilter(
-            parameters: IdRefOnly(id: IdSelectorDto.inside(categoriesIds)).toJson(),
-          ),
+          body: body,
           limit: limit,
           page: page,
         )
@@ -145,7 +186,11 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 abstract interface class DocumentDataRemoteSource implements DocumentDataSource {
   Future<String?> getLatestVersion(String id);
 
-  Future<DocumentIndexList> index({required Campaign campaign});
+  Future<DocumentIndex> index({
+    int page,
+    int limit,
+    required DocumentIndexFilters filters,
+  });
 
   Future<void> publish(SignedDocument document);
 }
@@ -154,11 +199,9 @@ extension on DocumentRefForFilteredDocuments {
   SignedDocumentRef toRef() => SignedDocumentRef(id: id, version: ver);
 }
 
-extension DocumentIndexListExt on DocumentIndexList {
+extension on DocumentIndexList {
   List<SignedDocumentRef> get refs {
-    return docs
-        .cast<Map<String, dynamic>>()
-        .map(DocumentIndexListDto.fromJson)
+    return _docs
         .map((ref) {
           return <SignedDocumentRef>[
             ...ref.ver
@@ -179,5 +222,18 @@ extension DocumentIndexListExt on DocumentIndexList {
         })
         .expand((element) => element)
         .toList();
+  }
+
+  Iterable<DocumentIndexListDto> get _docs {
+    return docs.cast<Map<String, dynamic>>().map(DocumentIndexListDto.fromJson);
+  }
+
+  DocumentIndex toModel() {
+    final indexPage = DocumentIndexPage(
+      page: page.page,
+      limit: page.limit,
+      remaining: page.remaining,
+    );
+    return DocumentIndex(refs: refs, page: indexPage);
   }
 }
