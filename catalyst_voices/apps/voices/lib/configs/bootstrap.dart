@@ -19,9 +19,6 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_strategy/url_strategy.dart';
 
-const CatalystProfiler _profiler = _shouldUseSentry
-    ? CatalystSentryProfiler()
-    : CatalystNoopProfiler();
 const ReportingService _reportingService = _shouldUseSentry
     ? SentryReportingService()
     : NoopReportingService();
@@ -85,7 +82,9 @@ Future<BootstrapArgs> bootstrap({
   }
 
   // profilers
-  final startupProfiler = CatalystStartupProfiler(_profiler)
+  final profiler = _createProfiler(config);
+
+  final startupProfiler = CatalystStartupProfiler(profiler)
     ..start(at: bootstrapStartTimestamp)
     ..appConfig(
       fromTo: DateRange(from: startConfigTimestamp, to: endConfigTimestamp),
@@ -96,7 +95,7 @@ Future<BootstrapArgs> bootstrap({
     environment: environment,
     loggingService: _loggingService,
     reportingService: _reportingService,
-    profiler: _profiler,
+    profiler: profiler,
     startupProfiler: startupProfiler,
   );
 
@@ -203,6 +202,24 @@ Future<void> registerDependencies({
     loggingService: loggingService ?? NoopLoggingService(),
     reportingService: reportingService,
   );
+}
+
+/// Creates the appropriate profiler based on the current build mode.
+///
+/// Returns:
+/// - [CatalystDeveloperProfiler] when running in profile mode
+/// - [CatalystSentryProfiler] when running in release mode
+/// - [CatalystNoopProfiler] for debug mode (no overhead)
+CatalystProfiler _createProfiler(AppConfig config) {
+  if (kProfileMode) {
+    return CatalystDeveloperProfiler.fromConfig(config.developerProfiler);
+  }
+
+  if (_shouldUseSentry) {
+    return const CatalystSentryProfiler();
+  }
+
+  return const CatalystNoopProfiler();
 }
 
 void _debugPrintStressTest() {

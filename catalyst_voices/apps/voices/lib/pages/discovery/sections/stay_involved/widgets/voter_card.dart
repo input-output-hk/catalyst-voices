@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/constants/constants.dart';
+import 'package:catalyst_voices/common/ext/active_fund_number_selector_ext.dart';
 import 'package:catalyst_voices/pages/discovery/sections/stay_involved/widgets/stay_involved_action_button.dart';
 import 'package:catalyst_voices/pages/discovery/sections/stay_involved/widgets/stay_involved_card.dart';
 import 'package:catalyst_voices/pages/discovery/sections/stay_involved/widgets/timeline_card.dart';
@@ -17,7 +18,7 @@ class VoterCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return StayInvolvedCard(
       icon: VoicesAssets.icons.vote,
-      title: context.l10n.registerToVoteFund14,
+      title: context.l10n.registerToVoteFund(context.activeCampaignFundNumber),
       description: context.l10n.stayInvolvedContributorDescription,
       actions: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

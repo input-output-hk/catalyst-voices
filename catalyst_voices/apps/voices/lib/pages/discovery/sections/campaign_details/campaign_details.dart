@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/common/ext/active_fund_number_selector_ext.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/discovery/sections/campaign_details/widgets/campaign_categories.dart';
 import 'package:catalyst_voices/pages/discovery/sections/campaign_details/widgets/current_campaign.dart';
@@ -61,7 +62,7 @@ class _CampaignData extends StatelessWidget {
           child: _CurrentCampaignHeader(),
         ),
         _CurrentCampaignContent(
-          currentCampaign: campaignState.currentCampaign,
+          currentCampaign: campaignState.currentCampaign ?? NullCurrentCampaignInfoViewModel(),
           isLoading: campaignState.isLoading,
         ),
         Padding(
@@ -172,7 +173,7 @@ class _CurrentCampaignHeader extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             key: const Key('Subtitle'),
-            context.l10n.catalystFundNo(14),
+            context.l10n.catalystFundNo(context.activeCampaignFundNumber),
             style: context.textTheme.displayMedium?.copyWith(
               color: context.colorScheme.primary,
             ),

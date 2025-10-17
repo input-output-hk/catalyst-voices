@@ -12,8 +12,10 @@ final _logger = Logger('SyncManager');
 /// [SyncManager] provides synchronization functionality for documents.
 abstract interface class SyncManager {
   factory SyncManager(
+    AppMetaStorage appMetaStorage,
     SyncStatsStorage statsStorage,
     DocumentsService documentsService,
+    CampaignService campaignService,
   ) = SyncManagerImpl;
 
   Future<bool> get waitForSync;
@@ -24,8 +26,10 @@ abstract interface class SyncManager {
 }
 
 final class SyncManagerImpl implements SyncManager {
+  final AppMetaStorage _appMetaStorage;
   final SyncStatsStorage _statsStorage;
   final DocumentsService _documentsService;
+  final CampaignService _campaignService;
 
   final _lock = Lock();
 
@@ -33,8 +37,10 @@ final class SyncManagerImpl implements SyncManager {
   var _synchronizationCompleter = Completer<bool>();
 
   SyncManagerImpl(
+    this._appMetaStorage,
     this._statsStorage,
     this._documentsService,
+    this._campaignService,
   );
 
   @override
@@ -75,11 +81,19 @@ final class SyncManagerImpl implements SyncManager {
     }
 
     final stopwatch = Stopwatch()..start();
-
     try {
       debugPrint('Synchronization started');
 
+      // This means when campaign will become document we'll have get it first
+      // with separate request
+      final activeCampaign = await _updateActiveCampaign();
+      if (activeCampaign == null) {
+        _logger.finer('No active campaign found!');
+        return;
+      }
+
       final docsCount = await _documentsService.sync(
+        campaign: activeCampaign,
         onProgress: (value) {
           debugPrint('Documents sync progress[$value]');
         },
@@ -96,16 +110,38 @@ final class SyncManagerImpl implements SyncManager {
 
       debugPrint('Synchronization completed. New documents: $docsCount');
       _synchronizationCompleter.complete(true);
-    } catch (error, stack) {
-      stopwatch.stop();
-
+    } catch (error, _) {
       debugPrint(
         'Synchronization failed after ${stopwatch.elapsed}, $error',
       );
       _synchronizationCompleter.complete(false);
 
       rethrow;
+    } finally {
+      stopwatch.stop();
+
+      debugPrint('Synchronization took ${stopwatch.elapsed}');
     }
+  }
+
+  Future<Campaign?> _updateActiveCampaign() async {
+    final appMeta = await _appMetaStorage.read();
+    final activeCampaign = await _campaignService.getActiveCampaign();
+
+    final previous = appMeta.activeCampaign;
+    final current = activeCampaign?.selfRef;
+
+    if (previous == current) {
+      return activeCampaign;
+    }
+
+    _logger.fine('Active campaign changed from [$previous] to [$current]!');
+
+    final updatedAppMeta = appMeta.copyWith(activeCampaign: Optional(current));
+    await _appMetaStorage.write(updatedAppMeta);
+    await _documentsService.clear(keepLocalDrafts: true);
+
+    return activeCampaign;
   }
 
   Future<void> _updateSuccessfulSyncStats({

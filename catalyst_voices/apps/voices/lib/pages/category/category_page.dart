@@ -5,6 +5,7 @@ import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_p
 import 'package:catalyst_voices/pages/category/card_information.dart';
 import 'package:catalyst_voices/pages/category/category_detail_view.dart';
 import 'package:catalyst_voices/pages/category/draggable_sheet_category_information.dart';
+import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_wide_screen_constrained.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_error_indicator.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -177,6 +178,8 @@ class _CategoryDetailError extends StatelessWidget {
 }
 
 class _CategoryPageState extends State<CategoryPage> {
+  StreamSubscription<DocumentRef?>? _categoryRefSub;
+
   @override
   Widget build(BuildContext context) {
     return ProposalSubmissionPhaseAware(
@@ -203,11 +206,37 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   @override
+  void dispose() {
+    unawaited(_categoryRefSub?.cancel());
+    _categoryRefSub = null;
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     unawaited(context.read<CategoryDetailCubit>().getCategories());
     unawaited(
       context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId),
     );
+    _listenForProposalRef(context.read<CategoryDetailCubit>());
+  }
+
+  void _listenForProposalRef(CategoryDetailCubit cubit) {
+    // listen for updates
+    _categoryRefSub = cubit.stream
+        .map((event) => event.category?.id)
+        .distinct()
+        .listen(_onCategoryRefChanged);
+  }
+
+  void _onCategoryRefChanged(DocumentRef? categoryRef) {
+    if (categoryRef == null || categoryRef is! SignedDocumentRef) {
+      return;
+    }
+
+    Router.neglect(context, () {
+      CategoryDetailRoute.fromRef(categoryRef: categoryRef).replace(context);
+    });
   }
 }

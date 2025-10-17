@@ -361,6 +361,7 @@ final class Dependencies extends DependencyProvider {
         return UserService(
           get<UserRepository>(),
           get<UserObserver>(),
+          get<RegistrationStatusPoller>(),
         );
       },
       dispose: (service) => unawaited(service.dispose()),
@@ -488,14 +489,23 @@ final class Dependencies extends DependencyProvider {
       },
       dispose: (storage) async => storage.dispose(),
     );
+    registerLazySingleton<AppMetaStorage>(
+      () {
+        return AppMetaStorageLocalStorage(
+          sharedPreferences: get<SharedPreferencesAsync>(),
+        );
+      },
+    );
   }
 
   void _registerUtils() {
     registerLazySingleton<SyncManager>(
       () {
         return SyncManager(
+          get<AppMetaStorage>(),
           get<SyncStatsStorage>(),
           get<DocumentsService>(),
+          get<CampaignService>(),
         );
       },
       dispose: (manager) async => manager.dispose(),
@@ -519,6 +529,11 @@ final class Dependencies extends DependencyProvider {
     );
     registerLazySingleton<CastedVotesObserver>(CastedVotesObserverImpl.new);
     registerLazySingleton<VotingBallotBuilder>(VotingBallotLocalBuilder.new);
+
+    // Not a singleton
+    registerFactory<RegistrationStatusPoller>(
+      () => RegistrationStatusPoller(get<UserRepository>()),
+    );
     registerLazySingleton<DeviceInfoPlugin>(DeviceInfoPlugin.new);
     registerLazySingleton<PermissionHandler>(
       () => PermissionHandlerImpl(

@@ -20,7 +20,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   @override
   Future<DocumentData> get({required DocumentRef ref}) async {
     final bytes = await _api.gateway
-        .apiGatewayV1DocumentDocumentIdGet(
+        .apiV1DocumentDocumentIdGet(
           documentId: ref.id,
           version: ref.version,
         )
@@ -32,7 +32,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
   @override
   Future<String?> getLatestVersion(String id) async {
-    final ver = constantDocumentsRefs
+    final ver = allConstantDocumentRefs
         .firstWhereOrNull((element) => element.hasId(id))
         ?.withId(id)
         ?.version;
@@ -43,11 +43,12 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
     try {
       final index = await _api.gateway
-          .apiGatewayV1DocumentIndexPost(
-            body: DocumentIndexQueryFilter(id: EqOrRangedIdDto.eq(id)),
+          .apiV1DocumentIndexPost(
+            body: DocumentIndexQueryFilter(id: IdSelectorDto.eq(id)),
             limit: 1,
           )
-          .successBodyOrThrow();
+          .successBodyOrThrow()
+          .then(_mapDynamicResponseValue);
 
       final docs = index.docs;
       if (docs.isEmpty) {
@@ -68,10 +69,13 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }
 
   @override
-  Future<DocumentIndexList> index() async {
+  Future<DocumentIndexList> index({
+    required Campaign campaign,
+  }) async {
     return _getDocumentIndexList(
       page: 0,
       limit: 100,
+      campaign: campaign,
     );
   }
 
@@ -79,7 +83,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   Future<void> publish(SignedDocument document) async {
     final bytes = document.toBytes();
     await _api.gateway
-        .apiGatewayV1DocumentPut(
+        .apiV1DocumentPut(
           body: bytes,
           contentType: ContentTypes.applicationCbor,
         )
@@ -89,14 +93,20 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   Future<DocumentIndexList> _getDocumentIndexList({
     required int page,
     required int limit,
+    required Campaign campaign,
   }) async {
+    final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toList();
+
     return _api.gateway
-        .apiGatewayV1DocumentIndexPost(
-          body: const DocumentIndexQueryFilter(),
+        .apiV1DocumentIndexPost(
+          body: DocumentIndexQueryFilter(
+            parameters: IdRefOnly(id: IdSelectorDto.inside(categoriesIds)).toJson(),
+          ),
           limit: limit,
           page: page,
         )
         .successBodyOrThrow()
+        .then(_mapDynamicResponseValue)
         .then(
           (response) {
             // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
@@ -118,12 +128,24 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
           },
         );
   }
+
+  DocumentIndexList _mapDynamicResponseValue(dynamic value) {
+    if (value is DocumentIndexList) {
+      return value;
+    }
+
+    if (value is Map<String, dynamic>) {
+      return DocumentIndexList.fromJson(value);
+    }
+
+    return const DocumentIndexList(docs: [], page: CurrentPage(page: 0, limit: 0, remaining: 0));
+  }
 }
 
 abstract interface class DocumentDataRemoteSource implements DocumentDataSource {
   Future<String?> getLatestVersion(String id);
 
-  Future<DocumentIndexList> index();
+  Future<DocumentIndexList> index({required Campaign campaign});
 
   Future<void> publish(SignedDocument document);
 }
@@ -149,6 +171,7 @@ extension DocumentIndexListExt on DocumentIndexList {
                     if (ver.brand case final value?) value.toRef(),
                     if (ver.campaign case final value?) value.toRef(),
                     if (ver.category case final value?) value.toRef(),
+                    if (ver.parameters case final value?) value.toRef(),
                   ];
                 })
                 .expand((element) => element),

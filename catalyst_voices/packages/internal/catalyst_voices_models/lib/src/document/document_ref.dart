@@ -182,6 +182,13 @@ final class SignedDocumentRef extends DocumentRef {
 
   const SignedDocumentRef.loose({required super.id});
 
+  bool get isValid {
+    final isIdValid = Uuid.isValidUUID(fromString: id);
+    final isVersionValid = version == null || Uuid.isValidUUID(fromString: version!);
+
+    return isIdValid && isVersionValid;
+  }
+
   @override
   SignedDocumentRef copyWith({
     String? id,

@@ -17,7 +17,9 @@ abstract interface class DocumentsService {
   ) = DocumentsServiceImpl;
 
   /// Removes all locally stored documents.
-  Future<int> clear();
+  ///
+  /// if [keepLocalDrafts] is true local drafts and their templates will be kept.
+  Future<int> clear({bool keepLocalDrafts});
 
   /// Returns all matching [DocumentData] for given [ref].
   Future<List<DocumentData>> lookup(DocumentRef ref);
@@ -25,12 +27,14 @@ abstract interface class DocumentsService {
   /// Syncs locally stored documents with api.
   ///
   /// Parameters:
-  /// [onProgress] - emits from 0.0 to 1.0.
-  /// [maxConcurrent] - requests made at same time inside one batch
-  /// [batchSize] - how many documents per one batch
+  /// * [campaign] is used to sync documents only for it.
+  /// * [onProgress] - emits from 0.0 to 1.0.
+  /// * [maxConcurrent] - requests made at same time inside one batch
+  /// * [batchSize] - how many documents per one batch
   ///
   /// Returns count of new documents.
   Future<int> sync({
+    required Campaign campaign,
     ValueChanged<double>? onProgress,
     int maxConcurrent,
     int batchSize,
@@ -48,7 +52,9 @@ final class DocumentsServiceImpl implements DocumentsService {
   );
 
   @override
-  Future<int> clear() => _documentRepository.removeAll();
+  Future<int> clear({bool keepLocalDrafts = false}) {
+    return _documentRepository.removeAll(keepLocalDrafts: keepLocalDrafts);
+  }
 
   @override
   Future<List<DocumentData>> lookup(DocumentRef ref) {
@@ -57,10 +63,13 @@ final class DocumentsServiceImpl implements DocumentsService {
 
   @override
   Future<int> sync({
+    required Campaign campaign,
     ValueChanged<double>? onProgress,
     int maxConcurrent = 100,
     int batchSize = 300,
   }) async {
+    _logger.finer('Indexing documents for f${campaign.fundNumber}');
+
     onProgress?.call(0.1);
 
     // final allRefs = await _documentRepository.getAllDocumentsRefs();

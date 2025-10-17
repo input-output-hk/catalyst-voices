@@ -7,10 +7,10 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.enums.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
-import 'package:catalyst_voices_repositories/src/api/internal_error_cat_gateway_mixin.dart';
 import 'package:catalyst_voices_repositories/src/api/local/fixture/fixtures.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart'
+    show IdSelectorDto;
 import 'package:cbor/cbor.dart';
 import 'package:chopper/chopper.dart';
 import 'package:collection/collection.dart';
@@ -32,7 +32,7 @@ String _v7() {
 
 typedef DocumentAuthorGetter = String Function(DocumentRef ref);
 
-final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGateway {
+final class LocalCatGateway implements CatGateway {
   @override
   ChopperClient client;
 
@@ -67,7 +67,7 @@ final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGate
   Type get definitionType => CatGateway;
 
   @override
-  Future<Response<FullStakeInfo>> apiGatewayV1CardanoAssetsStakeAddressGet({
+  Future<Response<FullStakeInfo>> apiV1CardanoAssetsStakeAddressGet({
     required String? stakeAddress,
     Network? network,
     String? asat,
@@ -90,7 +90,7 @@ final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGate
   }
 
   @override
-  Future<Response<Object>> apiGatewayV1ConfigFrontendGet({
+  Future<Response<Object>> apiV1ConfigFrontendGet({
     dynamic authorization,
     dynamic contentType,
   }) async {
@@ -98,7 +98,7 @@ final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGate
   }
 
   @override
-  Future<Response<String>> apiGatewayV1DocumentDocumentIdGet({
+  Future<Response<String>> apiV1DocumentDocumentIdGet({
     required String? documentId,
     String? version,
     dynamic authorization,
@@ -122,7 +122,7 @@ final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGate
   }
 
   @override
-  Future<Response<DocumentIndexList>> apiGatewayV1DocumentIndexPost({
+  Future<Response<DocumentIndexList>> apiV1DocumentIndexPost({
     int? page,
     int? limit,
     dynamic authorization,
@@ -136,7 +136,7 @@ final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGate
       await _populateIndex();
     }
 
-    final id = body?.id as EqOrRangedIdDto?;
+    final id = body?.id as IdSelectorDto?;
     final eq = id?.eq;
     if (eq != null) {
       final versions = _cache[eq] ?? [];
@@ -174,7 +174,7 @@ final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGate
   }
 
   @override
-  Future<Response<dynamic>> apiGatewayV1DocumentPut({
+  Future<Response<dynamic>> apiV1DocumentPut({
     dynamic authorization,
     dynamic contentType,
     required Object? body,
@@ -183,7 +183,7 @@ final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGate
   }
 
   @override
-  Future<Response<RbacRegistrationChain>> apiGatewayV1RbacRegistrationGet({
+  Future<Response<RbacRegistrationChain>> apiV1RbacRegistrationGet({
     String? lookup,
     dynamic authorization,
     dynamic contentType,
@@ -238,24 +238,6 @@ final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGate
       http.Response('{}', 200),
       body,
     );
-  }
-
-  @override
-  Future<Response<RbacRegistrationChainV2>> apiGatewayV2RbacRegistrationGet({
-    String? lookup,
-    bool? showAllInvalid,
-    dynamic authorization,
-    dynamic contentType,
-  }) async {
-    final body = RbacRegistrationChainV2(
-      catalystId: lookup!,
-      purpose: [],
-      roles: [],
-      invalid: [],
-      stakeAddresses: [],
-    );
-
-    return Response<RbacRegistrationChainV2>(http.Response('{}', 500), body);
   }
 
   Uint8List _buildDoc(
@@ -328,7 +310,7 @@ final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGate
   }
 
   Future<void> _populateIndex() async {
-    for (final constRefs in constantDocumentsRefs) {
+    for (final constRefs in activeConstantDocumentRefs) {
       _cache[constRefs.proposal.id] = [
         SignedDocumentMetadata(
           contentType: SignedDocumentContentType.json,
@@ -356,7 +338,7 @@ final class LocalCatGateway with InternalErrorCatGatewayMixin implements CatGate
 
       // only first 4 are used
       final categoryConstIndex = Random().nextInt(4);
-      final categoryConstRefs = constantDocumentsRefs[categoryConstIndex];
+      final categoryConstRefs = activeConstantDocumentRefs[categoryConstIndex];
 
       for (var j = 0; j < versionsCount; j++) {
         final ver = j == 0 ? id : _v7();
