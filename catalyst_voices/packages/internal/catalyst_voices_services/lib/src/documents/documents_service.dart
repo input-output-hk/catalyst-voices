@@ -88,7 +88,11 @@ final class DocumentsServiceImpl implements DocumentsService {
         pool: pool,
         batchSize: batchSize,
         filters: filters,
-        skip: categoriesIds,
+        skip: [
+          ...categoriesIds,
+          // if (documentType == null) ...activeConstantDocumentRefs.map((e) => e.proposal.id),
+          // if (documentType == null) ...activeConstantDocumentRefs.map((e) => e.comment.id),
+        ],
         onProgressChanged: (value) {
           onProgress?.call(value * i / syncOrder.length);
         },

@@ -115,7 +115,7 @@ final class SyncManagerImpl implements SyncManager {
       }
 
       _synchronizationCompleter.complete(true);
-    } catch (error, _) {
+    } catch (error, stack) {
       debugPrint(
         'Synchronization failed after ${stopwatch.elapsed}, $error',
       );
