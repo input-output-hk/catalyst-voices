@@ -110,8 +110,8 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
   }
 
   Future<void> _handleFonts() async {
-    final profiler = Dependencies.instance.get<CatalystStartupProfiler>();
     try {
+      final profiler = Dependencies.instance.get<CatalystStartupProfiler>();
       await profiler.awaitingFonts(body: () async => GoogleFonts.pendingFonts());
     } catch (error, stackTrace) {
       _logger.warning('Load pending google fonts', error, stackTrace);
