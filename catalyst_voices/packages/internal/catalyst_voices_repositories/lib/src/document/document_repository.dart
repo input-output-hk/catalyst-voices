@@ -63,7 +63,8 @@ abstract interface class DocumentRepository {
   /// If [DocumentRef] is [DraftRef] it will look for this document in local
   /// storage.
   ///
-  /// When [useCache] is false.
+  /// When [useCache] is false [ref] will be looped up only remotely. If [ref] is referees to
+  /// local draft it will throw [DocumentNotFoundException].
   Future<DocumentData> getDocumentData({
     required DocumentRef ref,
     bool useCache,
