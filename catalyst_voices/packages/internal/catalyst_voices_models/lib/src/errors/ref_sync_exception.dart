@@ -1,20 +1,12 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:equatable/equatable.dart';
 
-final class RefsSyncException extends SyncException {
-  final List<Object> errors;
-
-  const RefsSyncException(this.errors);
-
-  @override
-  String toString() => 'RefsSyncException errors[${errors.length}]';
-}
-
-final class RefSyncException extends SyncException {
+final class RefSyncException extends Equatable implements Exception {
   final DocumentRef ref;
-  final Object? error;
+  final Object? source;
 
-  const RefSyncException(this.ref, {this.error});
+  const RefSyncException(this.ref, {this.source});
 
   @override
-  String toString() => 'RefSyncException($ref) failed with $error';
+  List<Object?> get props => [ref, source];
 }

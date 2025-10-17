@@ -97,6 +97,11 @@ abstract interface class DocumentRepository {
     required DocumentIndexFilters filters,
   });
 
+  /// Looks up local source if matching document exists.
+  Future<bool> isCached({
+    required DocumentRef ref,
+  });
+
   /// Similar to [watchIsDocumentFavorite] but stops after first emit.
   Future<bool> isDocumentFavorite({
     required DocumentRef ref,
@@ -316,6 +321,27 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     required DocumentType type,
   }) {
     return _localDocuments.getRefToDocumentData(refTo: refTo, type: type);
+  }
+
+  @override
+  Future<DocumentIndex> index({
+    required int page,
+    required int limit,
+    required DocumentIndexFilters filters,
+  }) {
+    return _remoteDocuments.index(
+      page: page,
+      limit: limit,
+      filters: filters,
+    );
+  }
+
+  @override
+  Future<bool> isCached({required DocumentRef ref}) {
+    return switch (ref) {
+      DraftRef() => _drafts.exists(ref: ref),
+      SignedDocumentRef() => _localDocuments.exists(ref: ref),
+    };
   }
 
   @override
@@ -738,18 +764,5 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final localStream = _localDocuments.watch(ref: ref);
 
     return StreamGroup.merge([updateStream, localStream]);
-  }
-
-  @override
-  Future<DocumentIndex> index({
-    required int page,
-    required int limit,
-    required DocumentIndexFilters filters,
-  }) {
-    return _remoteDocuments.index(
-      page: page,
-      limit: limit,
-      filters: filters,
-    );
   }
 }

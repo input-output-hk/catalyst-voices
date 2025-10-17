@@ -92,7 +92,7 @@ final class SyncManagerImpl implements SyncManager {
         return;
       }
 
-      final docsCount = await _documentsService.sync(
+      final result = await _documentsService.sync(
         campaign: activeCampaign,
         onProgress: (value) {
           debugPrint('Documents sync progress[$value]');
@@ -104,11 +104,16 @@ final class SyncManagerImpl implements SyncManager {
       debugPrint('Synchronization took ${stopwatch.elapsed}');
 
       await _updateSuccessfulSyncStats(
-        newRefsCount: docsCount,
+        newRefsCount: result.newDocumentsCount,
         duration: stopwatch.elapsed,
       );
 
-      debugPrint('Synchronization completed. New documents: $docsCount');
+      debugPrint('Synchronization completed. New documents: ${result.newDocumentsCount}');
+
+      if (result.failedDocumentsCount > 0) {
+        debugPrint('Synchronization failed for documents: ${result.failedDocumentsCount}');
+      }
+
       _synchronizationCompleter.complete(true);
     } catch (error, _) {
       debugPrint(

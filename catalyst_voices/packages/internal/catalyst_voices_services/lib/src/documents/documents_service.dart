@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pool/pool.dart';
 import 'package:result_type/result_type.dart';
@@ -31,9 +30,7 @@ abstract interface class DocumentsService {
   /// * [onProgress] - emits from 0.0 to 1.0.
   /// * [maxConcurrent] - requests made at same time inside one batch
   /// * [batchSize] - how many documents per one batch
-  ///
-  /// Returns count of new documents.
-  Future<int> sync({
+  Future<DocumentsSyncResult> sync({
     required Campaign campaign,
     ValueChanged<double>? onProgress,
     int maxConcurrent,
@@ -62,7 +59,7 @@ final class DocumentsServiceImpl implements DocumentsService {
   }
 
   @override
-  Future<int> sync({
+  Future<DocumentsSyncResult> sync({
     required Campaign campaign,
     ValueChanged<double>? onProgress,
     int maxConcurrent = 100,
@@ -70,36 +67,89 @@ final class DocumentsServiceImpl implements DocumentsService {
   }) async {
     _logger.finer('Indexing documents for f${campaign.fundNumber}');
 
-    final refs = <DocumentRef>[];
-    final batches = refs.slices(batchSize);
-    final batchesCount = batches.length;
+    var syncResult = const DocumentsSyncResult();
+    final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toSet().toList();
+
+    final syncOrder = <DocumentType?>[
+      DocumentType.proposalTemplate,
+      DocumentType.commentTemplate,
+      null,
+    ];
 
     final pool = Pool(maxConcurrent);
-    final errors = <RefSyncException>[];
+    for (var i = 0; i < syncOrder.length; i++) {
+      final documentType = syncOrder[i];
+      final filters = DocumentIndexFilters(
+        type: documentType,
+        categoriesIds: categoriesIds,
+      );
 
-    var batchesCompleted = 0;
-    var documentsSynchronised = 0;
+      final result = await _sync(
+        pool: pool,
+        batchSize: batchSize,
+        filters: filters,
+        skip: categoriesIds,
+        onProgressChanged: (value) {
+          onProgress?.call(value * i / syncOrder.length);
+        },
+      );
 
-    for (final batch in batches) {
-      final futures = [
-        for (final value in batch)
-          pool.withResource(
-            () => _documentRepository
-                .getDocumentData(ref: value, useCache: false)
+      syncResult += result;
+    }
+
+    onProgress?.call(1);
+
+    return syncResult;
+  }
+
+  @override
+  Stream<int> watchCount() {
+    return _documentRepository.watchCount();
+  }
+
+  Future<DocumentsSyncResult> _sync({
+    required Pool pool,
+    required int batchSize,
+    required DocumentIndexFilters filters,
+    List<String> skip = const [],
+    ValueChanged<double>? onProgressChanged,
+  }) async {
+    var page = 0;
+    var remaining = 0;
+    var newDocumentsCount = 0;
+    var failedDocumentsCount = 0;
+
+    do {
+      final index = await _documentRepository.index(
+        page: page,
+        limit: batchSize,
+        filters: filters,
+      );
+
+      final missingRefs = <SignedDocumentRef>[];
+
+      for (final ref in index.refs) {
+        final isSkipped = skip.contains(ref.id);
+        if (isSkipped) continue;
+
+        final isCached = await _documentRepository.isCached(ref: ref);
+        if (!isCached) {
+          missingRefs.add(ref);
+        }
+      }
+
+      final futures = missingRefs.map(
+        (ref) {
+          return pool.withResource(() {
+            return _documentRepository
+                .getDocumentData(ref: ref, useCache: false)
                 .then<Result<DocumentData, RefSyncException>>(Success.new)
-                .onError(
-                  (error, stackTrace) {
-                    final syncError = RefSyncException(
-                      value,
-                      error: error,
-                      stack: stackTrace,
-                    );
-
-                    return Failure(syncError);
-                  },
-                ),
-          ),
-      ];
+                .onError((error, stack) {
+                  return Failure(RefSyncException(ref, source: error));
+                });
+          });
+        },
+      );
 
       final results = await Future.wait(futures);
 
@@ -110,32 +160,23 @@ final class DocumentsServiceImpl implements DocumentsService {
 
       await _documentRepository.saveDocumentBulk(documents);
 
-      documentsSynchronised += documents.length;
+      newDocumentsCount += documents.length;
+      failedDocumentsCount += results.where((element) => element.isFailure).length;
 
-      final batchErrors = results
-          .where((element) => element.isFailure)
-          .map((e) => e.failure)
-          .toList();
+      // Pages star from 0
+      final completed = page + 1 * index.page.limit;
+      final total = completed + index.page.remaining;
+      final progress = completed / total;
 
-      errors.addAll(batchErrors);
+      onProgressChanged?.call(progress);
 
-      batchesCompleted += 1;
-      final progress = batchesCompleted / batchesCount;
-      final totalProgress = 0.2 + (progress * 0.6);
-      onProgress?.call(totalProgress);
-    }
+      page = index.page.page + 1;
+      remaining = index.page.remaining;
+    } while (remaining > 0);
 
-    if (errors.isNotEmpty) {
-      throw RefsSyncException(errors);
-    }
-
-    onProgress?.call(1);
-
-    return documentsSynchronised;
-  }
-
-  @override
-  Stream<int> watchCount() {
-    return _documentRepository.watchCount();
+    return DocumentsSyncResult(
+      newDocumentsCount: newDocumentsCount,
+      failedDocumentsCount: failedDocumentsCount,
+    );
   }
 }
