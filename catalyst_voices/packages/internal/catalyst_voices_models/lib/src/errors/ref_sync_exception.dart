@@ -12,14 +12,9 @@ final class RefsSyncException extends SyncException {
 final class RefSyncException extends SyncException {
   final DocumentRef ref;
   final Object? error;
-  final StackTrace? stack;
 
-  const RefSyncException(this.ref, {this.error, this.stack});
+  const RefSyncException(this.ref, {this.error});
 
   @override
   String toString() => 'RefSyncException($ref) failed with $error';
-}
-
-sealed class SyncException implements Exception {
-  const SyncException();
 }

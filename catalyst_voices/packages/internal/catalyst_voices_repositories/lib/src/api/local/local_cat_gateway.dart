@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:catalyst_cose/catalyst_cose.dart';
@@ -17,7 +17,7 @@ import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid_plus/uuid_plus.dart' as u;
 
-var _time = DateTime.timestamp().millisecondsSinceEpoch;
+var _time = DateTime.utc(2025, 10, 17, 4).millisecondsSinceEpoch;
 
 String _testAccountAuthorGetter(DocumentRef ref) {
   /* cSpell:disable */
@@ -38,6 +38,7 @@ final class LocalCatGateway implements CatGateway {
 
   final _cache = <String, List<SignedDocumentMetadata>>{};
   final _docs = <SignedDocumentMetadata, Uint8List>{};
+  final _cachePopulateCompleter = Completer<bool>();
 
   final int proposalsCount;
   final bool decompressedDocuments;
@@ -61,7 +62,13 @@ final class LocalCatGateway implements CatGateway {
     required this.proposalsCount,
     required this.decompressedDocuments,
     required this.authorGetter,
-  });
+  }) {
+    unawaited(
+      _populateIndex().catchError((error) {
+        print('error -> $error');
+      }),
+    );
+  }
 
   @override
   Type get definitionType => CatGateway;
@@ -104,6 +111,8 @@ final class LocalCatGateway implements CatGateway {
     dynamic authorization,
     dynamic contentType,
   }) async {
+    await _cachePopulateCompleter.future;
+
     if (documentId == null || !_cache.containsKey(documentId)) {
       return Response(http.Response.bytes([], 404), '');
     }
@@ -132,9 +141,7 @@ final class LocalCatGateway implements CatGateway {
     page ??= 0;
     limit ??= 10;
 
-    if (_cache.isEmpty) {
-      await _populateIndex();
-    }
+    await _cachePopulateCompleter.future;
 
     final id = body?.id as IdSelectorDto?;
     final eq = id?.eq;
@@ -334,11 +341,10 @@ final class LocalCatGateway implements CatGateway {
 
     for (var i = 0; i < proposalsCount; i++) {
       final id = _v7();
-      final versionsCount = Random().nextInt(3) + 1;
+      const versionsCount = 2;
 
       // only first 4 are used
-      final categoryConstIndex = Random().nextInt(4);
-      final categoryConstRefs = activeConstantDocumentRefs[categoryConstIndex];
+      final categoryConstRefs = activeConstantDocumentRefs[3 & i];
 
       for (var j = 0; j < versionsCount; j++) {
         final ver = j == 0 ? id : _v7();
@@ -357,7 +363,7 @@ final class LocalCatGateway implements CatGateway {
           ifAbsent: () => [proposalMetadata],
         );
 
-        final commentsCount = Random().nextInt(3);
+        const commentsCount = 2;
         for (var c = 0; c < commentsCount; c++) {
           final commentId = _v7();
           _cache[commentId] = [
@@ -373,7 +379,7 @@ final class LocalCatGateway implements CatGateway {
           ];
         }
 
-        final actionIndex = Random().nextInt(ProposalSubmissionAction.values.length + 1);
+        final actionIndex = (ProposalSubmissionAction.values.length + 1) & i;
         final action = ProposalSubmissionAction.values.elementAtOrNull(actionIndex);
         if (action != null) {
           final actionId = _v7();
@@ -392,6 +398,8 @@ final class LocalCatGateway implements CatGateway {
         }
       }
     }
+
+    _cachePopulateCompleter.complete(true);
   }
 }
 
