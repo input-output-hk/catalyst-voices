@@ -163,6 +163,12 @@ final class ProposalDocument extends Equatable {
 }
 
 final class ProposalMetadata extends DocumentMetadata {
+  /// Proposal parameters like brandId, campaignId or categoryId.
+  ///
+  /// Legacy documents stored them in separate fields, see [categoryIdNode].
+  static const parametersNode = NodeId('parameters');
+
+  /// Legacy parameter name for the category. New format of the metadata uses [parameters].
   static const categoryIdNode = NodeId('categoryId.id');
   static const authorsNode = NodeId('authors');
 

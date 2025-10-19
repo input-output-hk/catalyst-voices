@@ -60,6 +60,16 @@ final class ContainsMetadataAuthorName extends BaseJsonQueryExpression {
        );
 }
 
+final class ContainsParameterWithId extends BaseJsonQueryExpression {
+  ContainsParameterWithId({
+    required String query,
+  }) : super(
+         searchValue: query,
+         nodeId: ProposalMetadata.parametersNode,
+         jsonContent: 'metadata',
+       );
+}
+
 final class ContainsTitle extends BaseJsonQueryExpression {
   ContainsTitle({
     required String query,
@@ -195,6 +205,9 @@ extension MetadataColumnExt on GeneratedColumnWithTypeConverter<DocumentDataMeta
   Expression<bool> isAuthor(CatalystId id) => ContainsAuthorId(id: id);
 
   Expression<bool> isCategory(SignedDocumentRef ref) {
-    return jsonExtract<String>(ProposalMetadata.categoryIdNode.asPath).equals(ref.id);
+    return Expression.or([
+      jsonExtract<String>(ProposalMetadata.categoryIdNode.asPath).equals(ref.id),
+      ContainsParameterWithId(query: ref.id),
+    ]);
   }
 }
