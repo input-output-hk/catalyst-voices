@@ -168,6 +168,9 @@ final class ProposalMetadata extends DocumentMetadata {
   /// Legacy documents stored them in separate fields, see [categoryIdNode].
   static const parametersNode = NodeId('parameters');
 
+  /// The id part of the [parametersNode].
+  static const parametersIdNode = NodeId('parameters.*.id');
+
   /// Legacy parameter name for the category. New format of the metadata uses [parameters].
   static const categoryIdNode = NodeId('categoryId.id');
   static const authorsNode = NodeId('authors');

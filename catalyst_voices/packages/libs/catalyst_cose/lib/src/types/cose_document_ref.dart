@@ -108,15 +108,6 @@ final class CoseDocumentRef extends Equatable {
       if (documentLocator case final documentLocator) documentLocator.toCbor(),
     ]);
   }
-
-  /// Attemps to deserialize the type from cbor. Returns null if that fails.
-  static CoseDocumentRef? tryFromCbor(CborValue value) {
-    try {
-      return CoseDocumentRef.fromCbor(value);
-    } catch (_) {
-      return null;
-    }
-  }
 }
 
 /// A reference to the Parameters Document this document lies under.
@@ -133,13 +124,11 @@ final class CoseDocumentRefs extends Equatable {
 
   /// Deserializes the type from cbor.
   factory CoseDocumentRefs.fromCbor(CborValue value) {
-    final legacyRef = CoseDocumentRef.tryFromCbor(value);
-    if (legacyRef != null) {
-      return CoseDocumentRefs([legacyRef]);
-    } else {
-      final list = value as CborList;
-      return CoseDocumentRefs(list.map(CoseDocumentRef.fromCbor).toList());
-    }
+    value = _migrateCbor1(value);
+    value = _migrateCbor2(value);
+
+    final list = value as CborList;
+    return CoseDocumentRefs(list.map(CoseDocumentRef.fromCbor).toList());
   }
 
   @override
@@ -148,5 +137,24 @@ final class CoseDocumentRefs extends Equatable {
   /// Serializes the type as cbor.
   CborValue toCbor() {
     return CborList(refs.map((e) => e.toCbor()).toList());
+  }
+
+  static CborValue _migrateCbor1(CborValue value) {
+    if (value is CborBytes) {
+      final documentId = CoseUuid.fromCbor(value);
+
+      return CoseDocumentRef.backwardCompatible(documentId: documentId).toCbor();
+    }
+
+    return value;
+  }
+
+  static CborValue _migrateCbor2(CborValue value) {
+    if (value is CborList && value.firstOrNull is CborBytes) {
+      final documentRef = CoseDocumentRef.fromCbor(value);
+      return CoseDocumentRefs([documentRef]).toCbor();
+    }
+
+    return value;
   }
 }

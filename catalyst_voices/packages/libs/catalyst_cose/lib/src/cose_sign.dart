@@ -7,7 +7,9 @@ import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 /// The COSE_SIGN structure implementation, supporting multiple signatures.
-///
+/// 
+/// Implements Signed Doc spec v0.0.4: https://github.com/input-output-hk/catalyst-libs/pull/341/files#diff-2827956d681587dfd09dc733aca731165ff44812f8322792bf6c4a61cf2d3b85
+/// 
 /// [RFC-9052](https://datatracker.ietf.org/doc/rfc9052/),
 /// [RFC 9053](https://datatracker.ietf.org/doc/rfc9053/).
 final class CoseSign extends Equatable {

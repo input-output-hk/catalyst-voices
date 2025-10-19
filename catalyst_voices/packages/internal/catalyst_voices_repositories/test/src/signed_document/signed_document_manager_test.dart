@@ -4,6 +4,8 @@ import 'package:catalyst_voices_repositories/src/signed_document/signed_document
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../utils/test_factories.dart';
+
 void main() {
   group(SignedDocumentManager, () {
     const documentManager = SignedDocumentManager(
@@ -43,14 +45,17 @@ void main() {
   });
 }
 
-const _metadata = SignedDocumentMetadata(
-  contentType: SignedDocumentContentType.json,
-  documentType: DocumentType.proposalDocument,
-);
-
 final _catalystId = CatalystId(
   host: CatalystIdHost.cardanoPreprod.host,
   role0Key: _publicKey.publicKeyBytes,
+);
+
+final _categoryId = DocumentRefFactory.signedDocumentRef();
+
+final _metadata = SignedDocumentMetadata(
+  contentType: SignedDocumentContentType.json,
+  documentType: DocumentType.proposalDocument,
+  parameters: [SignedDocumentMetadataRef.fromDocumentRef(_categoryId)],
 );
 
 final _privateKey = _FakeCatalystPrivateKey(bytes: _privateKeyBytes);
