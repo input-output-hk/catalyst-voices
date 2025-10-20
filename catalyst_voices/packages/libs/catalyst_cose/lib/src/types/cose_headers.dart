@@ -100,6 +100,7 @@ final class CoseHeaders extends Equatable {
   factory CoseHeaders.fromCbor(CborValue value, {bool encodeAsBytes = true}) {
     var map = _decodeCbor(value);
     map = _migrateCbor1(map);
+    map = _migrateCbor2(map);
 
     return CoseHeaders(
       alg: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.alg]),
@@ -113,9 +114,7 @@ final class CoseHeaders extends Equatable {
       template: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.template]),
       reply: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.reply]),
       section: CborUtils.deserializeString(map[CoseHeaderKeys.section]),
-      collaborators: CborUtils.deserializeStringList(
-        map[CoseHeaderKeys.collaborators] ?? map[CoseHeaderKeys.collabs],
-      ),
+      collaborators: CborUtils.deserializeStringList(map[CoseHeaderKeys.collaborators]),
       parameters: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.parameters]),
       encodeAsBytes: encodeAsBytes,
     );
@@ -248,6 +247,8 @@ final class CoseHeaders extends Equatable {
   }
 
   /// v0.0.1 -> v0.0.4 spec: https://github.com/input-output-hk/catalyst-libs/pull/341/files#diff-2827956d681587dfd09dc733aca731165ff44812f8322792bf6c4a61cf2d3b85
+  ///
+  /// Migrate brandId, campaignId and categoryId into parameters.
   static CborMap _migrateCbor1(CborMap map) {
     final parametersKeys = [
       CoseHeaderKeys.brandId,
@@ -270,6 +271,19 @@ final class CoseHeaders extends Equatable {
 
       modified[CoseHeaderKeys.parameters] = CoseDocumentRefs(parameters).toCbor();
       return modified;
+    }
+  }
+
+  /// v0.0.1 -> v0.0.4 spec: https://github.com/input-output-hk/catalyst-libs/pull/341/files#diff-2827956d681587dfd09dc733aca731165ff44812f8322792bf6c4a61cf2d3b85
+  ///
+  /// Migrate collabs into collaborators.
+  static CborMap _migrateCbor2(CborMap map) {
+    if (map.containsKey(CoseHeaderKeys.collabs)) {
+      final modified = CborMap.fromEntries(map.entries, tags: map.tags, type: map.type);
+      modified[CoseHeaderKeys.collaborators] = map.remove(CoseHeaderKeys.collabs)!;
+      return modified;
+    } else {
+      return map;
     }
   }
 }

@@ -32,10 +32,7 @@ final class Proposal extends CoreProposal {
     );
   }
 
-  factory Proposal.fromData(
-    ProposalData data,
-    List<String> versionsIds,
-  ) {
+  factory Proposal.fromData(ProposalData data, List<String> versionsIds) {
     final document = data.document;
 
     return Proposal(
