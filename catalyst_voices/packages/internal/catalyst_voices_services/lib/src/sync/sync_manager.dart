@@ -17,10 +17,10 @@ abstract interface class SyncManager {
     CampaignService campaignService,
   ) = SyncManagerImpl;
 
-  Future<bool> get waitForSync;
-
   /// Stream of synchronization progress (0.0 to 1.0).
   Stream<double> get progressStream;
+
+  Future<bool> get waitForSync;
 
   Future<void> dispose();
 
@@ -47,10 +47,10 @@ final class SyncManagerImpl implements SyncManager {
   );
 
   @override
-  Future<bool> get waitForSync => _synchronizationCompleter.future;
+  Stream<double> get progressStream => _progressController.stream;
 
   @override
-  Stream<double> get progressStream => _progressController.stream;
+  Future<bool> get waitForSync => _synchronizationCompleter.future;
 
   @override
   Future<void> dispose() async {
@@ -100,6 +100,10 @@ final class SyncManagerImpl implements SyncManager {
         return;
       }
 
+      if (!_progressController.isClosed) {
+        _progressController.add(0);
+      }
+
       final newRefs = await _documentsService.sync(
         campaign: activeCampaign,
         onProgress: (value) {
@@ -122,6 +126,10 @@ final class SyncManagerImpl implements SyncManager {
 
       rethrow;
     } finally {
+      if (!_progressController.isClosed) {
+        _progressController.add(1);
+      }
+
       stopwatch.stop();
 
       _logger.fine('Synchronization took ${stopwatch.elapsed}');

@@ -45,6 +45,47 @@ class AppSplashScreenManager extends StatefulWidget {
   }
 }
 
+class _AnimatedProgressSection extends StatelessWidget {
+  final String message;
+  final double progress;
+  final bool showProgressBar;
+
+  const _AnimatedProgressSection({
+    required this.message,
+    required this.progress,
+    required this.showProgressBar,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+      opacity: showProgressBar ? 1.0 : 0.0,
+      duration: const Duration(milliseconds: 300),
+      child: Column(
+        children: [
+          Text(
+            message,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: 360,
+            child: AnimatedVoicesLinearProgressIndicator(
+              value: progress,
+              animationDuration: const Duration(milliseconds: 800),
+              animationCurve: Curves.easeInOutCubic,
+              weight: VoicesProgressIndicatorWeight.heavy,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     with SingleTickerProviderStateMixin {
   bool _areDocumentsSynced = false;
@@ -56,6 +97,8 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
   bool _showProgressIndicator = false;
   Timer? _minimumVisibilityTimer;
 
+  late final SyncManager _syncManager;
+
   bool get _isReady =>
       _areDocumentsSynced && _areImagesAndVideosCached && _messageShownEnoughTime && _fontsAreReady;
 
@@ -65,10 +108,8 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
       return widget.child;
     }
 
-    final syncManager = Dependencies.instance.get<SyncManager>();
-
     // Throttle progress updates to reduce rebuilds
-    final throttledStream = syncManager.progressStream.distinct((prev, curr) {
+    final throttledStream = _syncManager.progressStream.distinct((prev, curr) {
       if (prev == 0 || curr == 1.0) return false;
 
       return (curr - prev).abs() < 0.008; // ~0.8% minimum change
@@ -79,7 +120,7 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
       initialData: 0,
       builder: (context, snapshot) {
         final progress = snapshot.data ?? 0;
-        final shouldShow = _calculateProgressBarVisibility(progress);
+        final shouldShow = _handleProgressBarVisibility(progress);
 
         return _InAppLoading(
           key: const Key('AppLoadingScreen'),
@@ -94,7 +135,6 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
   @override
   void dispose() {
     _minimumVisibilityTimer?.cancel();
-    _loadingStopwatch.stop();
     super.dispose();
   }
 
@@ -102,6 +142,7 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
   void initState() {
     super.initState();
 
+    _syncManager = Dependencies.instance.get<SyncManager>();
     _loadingStopwatch.start();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -129,10 +170,9 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
   }
 
   Future<void> _handleDocumentsSync() async {
-    final syncManager = Dependencies.instance.get<SyncManager>();
     final campaignPhaseAwareCubit = context.read<CampaignPhaseAwareCubit>();
 
-    await syncManager.waitForSync;
+    await _syncManager.waitForSync;
     await campaignPhaseAwareCubit.awaitForInitialize;
 
     if (mounted) {
@@ -175,7 +215,7 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
     }
   }
 
-  bool _calculateProgressBarVisibility(double progress) {
+  bool _handleProgressBarVisibility(double progress) {
     final elapsed = _loadingStopwatch.elapsedMilliseconds;
     var showProgressBar = false;
 
@@ -243,30 +283,10 @@ class _InAppLoading extends StatelessWidget {
                 const VoicesLoadingIndicator(
                   key: Key('PersistentLoadingIndicator'),
                 ),
-                AnimatedOpacity(
-                  opacity: showProgressBar ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 300),
-                  child: Text(
-                    message,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                AnimatedOpacity(
-                  opacity: showProgressBar ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 300),
-                  child: SizedBox(
-                    width: 360,
-                    child: AnimatedVoicesLinearProgressIndicator(
-                      value: progress,
-                      animationDuration: const Duration(milliseconds: 800),
-                      animationCurve: Curves.easeInOutCubic,
-                      weight: VoicesProgressIndicatorWeight.heavy,
-                    ),
-                  ),
+                _AnimatedProgressSection(
+                  message: message,
+                  progress: progress,
+                  showProgressBar: showProgressBar,
                 ),
               ],
             ),
