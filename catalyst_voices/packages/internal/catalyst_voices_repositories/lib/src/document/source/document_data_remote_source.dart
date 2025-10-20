@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
+import 'package:catalyst_voices_repositories/src/common/future_response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
 import 'package:catalyst_voices_repositories/src/models/current_page.dart';
 import 'package:catalyst_voices_repositories/src/models/document_index_list.dart';

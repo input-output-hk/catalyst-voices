@@ -1,10 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/src/api/cat_gateway_api_service.dart';
-import 'package:catalyst_voices_repositories/src/api/cat_reviews_api_service.dart';
-import 'package:catalyst_voices_repositories/src/api/models/document_index_models.dart';
-import 'package:catalyst_voices_repositories/src/api/models/document_index_query.dart';
-import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
+import 'package:catalyst_voices_repositories/src/models/current_page.dart';
+import 'package:catalyst_voices_repositories/src/models/document_index_list.dart';
+import 'package:catalyst_voices_repositories/src/models/document_index_query_filter.dart';
+import 'package:catalyst_voices_repositories/src/models/document_reference.dart';
+import 'package:catalyst_voices_repositories/src/models/indexed_document.dart';
+import 'package:catalyst_voices_repositories/src/models/indexed_document_version.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -21,7 +22,7 @@ void main() {
   const maxPageSize = CatGatewayDocumentDataSource.indexPageSize;
 
   setUpAll(() {
-    registerFallbackValue(DocumentIndexQueryFilter());
+    registerFallbackValue(const DocumentIndexQueryFilter());
 
     apiServices = ApiServices.internal(
       gateway: gateway,
@@ -44,14 +45,14 @@ void main() {
         final pageZero = DocumentIndexList(
           docs: List.generate(
             maxPageSize,
-            (_) => _buildDocumentIndexList().toJson(),
+            (_) => _buildDocumentIndexList(),
           ),
           page: const CurrentPage(page: 0, limit: maxPageSize, remaining: 5),
         );
         final pageOne = DocumentIndexList(
           docs: List.generate(
             5,
-            (_) => _buildDocumentIndexList().toJson(),
+            (_) => _buildDocumentIndexList(),
           ),
           page: const CurrentPage(page: 1, limit: maxPageSize, remaining: 0),
         );
@@ -95,19 +96,19 @@ void main() {
 
         final page = DocumentIndexList(
           docs: [
-            DocumentIndexListDto(
+            IndexedDocument(
               id: proposalId,
               ver: proposalRefs.map((e) {
-                return IndividualDocumentVersion(
+                return IndexedDocumentVersion(
                   ver: e.version!,
                   type: DocumentType.proposalDocument.uuid,
-                  template: DocumentRefForFilteredDocuments(
+                  template: DocumentReference(
                     id: templateRef.id,
-                    ver: templateRef.version,
+                    ver: templateRef.version!,
                   ),
                 );
               }).toList(),
-            ).toJson(),
+            ),
           ],
           page: const CurrentPage(page: 0, limit: maxPageSize, remaining: 0),
         );
@@ -136,17 +137,17 @@ void main() {
   });
 }
 
-DocumentIndexListDto _buildDocumentIndexList({
+IndexedDocument _buildDocumentIndexList({
   int verCount = 2,
-  DocumentRefForFilteredDocuments? template,
-  DocumentRefForFilteredDocuments? ref,
+  DocumentReference? template,
+  DocumentReference? ref,
 }) {
-  return DocumentIndexListDto(
+  return IndexedDocument(
     id: DocumentRefFactory.randomUuidV7(),
     ver: List.generate(
       verCount,
       (index) {
-        return IndividualDocumentVersion(
+        return IndexedDocumentVersion(
           ver: DocumentRefFactory.randomUuidV7(),
           type: DocumentRefFactory.randomUuidV7(),
           template: template,

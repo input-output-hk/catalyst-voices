@@ -2,7 +2,7 @@
 
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/api/api_services.dart';
-import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
+import 'package:catalyst_voices_repositories/src/common/future_response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/dto/config/remote_config.dart';
 
 final class ApiConfigSource implements RemoteConfigSource {
@@ -11,11 +11,12 @@ final class ApiConfigSource implements RemoteConfigSource {
   ApiConfigSource(this._api);
 
   @override
-  Future<RemoteConfig> get() {
-    return _api.gateway
-        .fetchFrontendConfig() //
-        .successBodyOrThrow()
-        .catchError((_) => const RemoteConfig());
+  Future<RemoteConfig> get() async {
+    try {
+      return _api.gateway.fetchFrontendConfig().successBodyOrThrow();
+    } catch (_) {
+      return const RemoteConfig();
+    }
   }
 }
 

@@ -25,36 +25,19 @@ final class RbacAuthInterceptor extends Interceptor {
   const RbacAuthInterceptor(this._authTokenProvider);
 
   @override
-  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
-    if (options.headers[HttpHeaders.authorization] != null) {
-      // token is already added
-      return handler.next(options);
-    }
-
-    final token = await _authTokenProvider.createRbacToken();
-    if (token == null) {
-      // keychain locked or not existing
-      return handler.next(options);
-    }
-
-    options.headers[HttpHeaders.authorization] = token.authHeader();
-    handler.next(options);
-  }
-
-  @override
   Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
     final statusCode = err.response?.statusCode;
     if (statusCode != null && _retryStatusCodes.contains(statusCode)) {
-      final options = err.requestOptions;
-      final rawRetryCount = options.headers[_retryCountHeaderName];
-      final retryCount = int.tryParse(rawRetryCount?.toString() ?? '') ?? 0;
-
-      if (retryCount >= _maxRetries) {
-        _logger.severe('Giving up on ${options.uri} auth retry[$retryCount]');
-        return handler.next(err);
-      }
-
       try {
+        final options = err.requestOptions;
+        final rawRetryCount = options.headers[_retryCountHeaderName];
+        final retryCount = int.tryParse(rawRetryCount?.toString() ?? '') ?? 0;
+
+        if (retryCount >= _maxRetries) {
+          _logger.severe('Giving up on ${options.uri} auth retry[$retryCount]');
+          return handler.next(err);
+        }
+
         final newToken = await _authTokenProvider.createRbacToken(forceRefresh: true);
 
         if (newToken == null) {
@@ -76,5 +59,25 @@ final class RbacAuthInterceptor extends Interceptor {
     }
 
     handler.next(err);
+  }
+
+  @override
+  Future<void> onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    if (options.headers[HttpHeaders.authorization] != null) {
+      // token is already added
+      return handler.next(options);
+    }
+
+    final token = await _authTokenProvider.createRbacToken();
+    if (token == null) {
+      // keychain locked or not existing
+      return handler.next(options);
+    }
+
+    options.headers[HttpHeaders.authorization] = token.authHeader();
+    handler.next(options);
   }
 }
