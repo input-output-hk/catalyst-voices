@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pool/pool.dart';
 import 'package:result_type/result_type.dart';
@@ -70,15 +71,21 @@ final class DocumentsServiceImpl implements DocumentsService {
     var syncResult = const DocumentsSyncResult();
     final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toSet().toList();
 
-    final syncOrder = <DocumentType?>[
+    // Later we'll change this list to include all templates,
+    final syncOrder = <DocumentType>[
       DocumentType.proposalTemplate,
       DocumentType.commentTemplate,
-      null,
     ];
+    // +1 because i want last element to be null. Meaning index remaining types.
+    final syncIterationsCount = syncOrder.length + 1;
+    final progressPerIteration = 1 / syncIterationsCount;
+    var completedIterations = 0;
 
     final pool = Pool(maxConcurrent);
-    for (var i = 0; i < syncOrder.length; i++) {
-      final documentType = syncOrder[i];
+    onProgress?.call(0);
+
+    for (var i = 0; i < syncIterationsCount; i++) {
+      final documentType = syncOrder.elementAtOrNull(i);
       final filters = DocumentIndexFilters(
         type: documentType,
         categoriesIds: categoriesIds,
@@ -88,16 +95,44 @@ final class DocumentsServiceImpl implements DocumentsService {
         pool: pool,
         batchSize: batchSize,
         filters: filters,
-        skip: [
+        exclude: {
+          // categories are not documents at the moment
+          DocumentBaseType.category,
+        },
+        excludeIds: {
+          // this should not be needed. Remove it later when categories are documents too.
           ...categoriesIds,
-          // if (documentType == null) ...activeConstantDocumentRefs.map((e) => e.proposal.id),
-          // if (documentType == null) ...activeConstantDocumentRefs.map((e) => e.comment.id),
-        ],
-        onProgressChanged: (value) {
-          onProgress?.call(value * i / syncOrder.length);
+          ...syncOrder
+              .where((element) => element != documentType)
+              .map(
+                (excludedType) {
+                  return allConstantDocumentRefs
+                      .map(
+                        (constRefs) {
+                          return constRefs
+                              .asMap()
+                              .entries
+                              .where((constRef) => constRef.key == excludedType)
+                              .map((constRef) => constRef.value);
+                        },
+                      )
+                      .expand((element) => element);
+                },
+              )
+              .expand((element) => element.map((e) => e.id)),
+        },
+        onProgress: (value) {
+          if (onProgress == null) {
+            return;
+          }
+          final prevProgress = completedIterations * progressPerIteration;
+          final curProgress = value * progressPerIteration;
+          final progress = prevProgress + curProgress;
+          onProgress.call(progress);
         },
       );
 
+      completedIterations++;
       syncResult += result;
     }
 
@@ -115,13 +150,16 @@ final class DocumentsServiceImpl implements DocumentsService {
     required Pool pool,
     required int batchSize,
     required DocumentIndexFilters filters,
-    List<String> skip = const [],
-    ValueChanged<double>? onProgressChanged,
+    Set<DocumentBaseType> exclude = const {},
+    Set<String> excludeIds = const {},
+    ValueChanged<double>? onProgress,
   }) async {
     var page = 0;
     var remaining = 0;
     var newDocumentsCount = 0;
     var failedDocumentsCount = 0;
+
+    onProgress?.call(0);
 
     do {
       final index = await _documentRepository.index(
@@ -130,19 +168,21 @@ final class DocumentsServiceImpl implements DocumentsService {
         filters: filters,
       );
 
-      final missingRefs = <SignedDocumentRef>[];
+      final refs = await index.docs
+          .map((e) => e.refs(exclude: exclude))
+          .expand((refs) => refs)
+          .where((ref) => !excludeIds.contains(ref.id))
+          .toSet()
+          .map((ref) {
+            return _documentRepository
+                .isCached(ref: ref)
+                .onError((_, _) => false)
+                .then((value) => value ? null : ref);
+          })
+          .wait
+          .then((refs) => refs.nonNulls.toList());
 
-      for (final ref in index.refs) {
-        final isSkipped = skip.contains(ref.id);
-        if (isSkipped) continue;
-
-        final isCached = await _documentRepository.isCached(ref: ref);
-        if (!isCached) {
-          missingRefs.add(ref);
-        }
-      }
-
-      final futures = missingRefs.map(
+      final futures = refs.map(
         (ref) {
           return pool.withResource(() {
             return _documentRepository
@@ -168,15 +208,20 @@ final class DocumentsServiceImpl implements DocumentsService {
       failedDocumentsCount += results.where((element) => element.isFailure).length;
 
       // Pages star from 0
-      final completed = page + 1 * index.page.limit;
-      final total = completed + index.page.remaining;
-      final progress = completed / total;
 
-      onProgressChanged?.call(progress);
+      if (onProgress != null) {
+        final completed = (page * index.page.limit) + index.docs.length;
+        final total = completed + index.page.remaining;
+        final progress = completed / total;
+
+        onProgress.call(progress);
+      }
 
       page = index.page.page + 1;
       remaining = index.page.remaining;
     } while (remaining > 0);
+
+    onProgress?.call(1);
 
     return DocumentsSyncResult(
       newDocumentsCount: newDocumentsCount,

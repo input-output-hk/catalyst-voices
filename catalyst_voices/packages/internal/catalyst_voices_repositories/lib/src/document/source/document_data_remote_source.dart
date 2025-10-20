@@ -200,40 +200,49 @@ extension on DocumentRefForFilteredDocuments {
 }
 
 extension on DocumentIndexList {
-  List<SignedDocumentRef> get refs {
-    return _docs
-        .map((ref) {
-          return <SignedDocumentRef>[
-            ...ref.ver
-                .map<List<SignedDocumentRef>>((ver) {
-                  return [
-                    SignedDocumentRef(id: ref.id, version: ver.ver),
-                    if (ver.ref case final value?) value.toRef(),
-                    if (ver.reply case final value?) value.toRef(),
-                    if (ver.template case final value?) value.toRef(),
-                    if (ver.brand case final value?) value.toRef(),
-                    if (ver.campaign case final value?) value.toRef(),
-                    if (ver.category case final value?) value.toRef(),
-                    if (ver.parameters case final value?) value.toRef(),
-                  ];
-                })
-                .expand((element) => element),
-          ];
-        })
-        .expand((element) => element)
-        .toList();
-  }
-
   Iterable<DocumentIndexListDto> get _docs {
     return docs.cast<Map<String, dynamic>>().map(DocumentIndexListDto.fromJson);
   }
 
   DocumentIndex toModel() {
-    final indexPage = DocumentIndexPage(
-      page: page.page,
-      limit: page.limit,
-      remaining: page.remaining,
+    final docs = _docs.map((e) => e.toModel()).toList();
+    final page = this.page.toModel();
+
+    return DocumentIndex(docs: docs, page: page);
+  }
+}
+
+extension on CurrentPage {
+  DocumentIndexPage toModel() {
+    return DocumentIndexPage(
+      page: page,
+      limit: limit,
+      remaining: remaining,
     );
-    return DocumentIndex(refs: refs, page: indexPage);
+  }
+}
+
+extension on DocumentIndexListDto {
+  DocumentIndexDoc toModel() {
+    return DocumentIndexDoc(
+      id: id,
+      ver: ver.map(
+        (e) {
+          return DocumentIndexDocVersion(
+            ver: e.ver,
+            type: DocumentType.fromJson(e.type),
+            ref: e.ref?.toRef(),
+            reply: e.reply?.toRef(),
+            parameters: [
+              if (e.parameters case final value?) value.toRef(),
+            ],
+            template: e.template?.toRef(),
+            brand: e.brand?.toRef(),
+            campaign: e.campaign?.toRef(),
+            category: e.category?.toRef(),
+          );
+        },
+      ).toList(),
+    );
   }
 }

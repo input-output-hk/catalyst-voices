@@ -1,7 +1,7 @@
 // TODO(damian-molinski): update this list base on specs.
 /// https://github.com/input-output-hk/catalyst-libs/blob/main/docs/src/architecture/08_concepts/signed_doc/types.md#document-base-types
 enum DocumentBaseType {
-  action(),
+  action,
   brand,
   proposal,
   campaign,
@@ -59,35 +59,6 @@ enum DocumentType {
     required this.uuid,
     this.baseTypes = const [],
   });
-
-  DocumentType? get template {
-    return switch (this) {
-      // proposal
-      DocumentType.proposalDocument ||
-      DocumentType.proposalTemplate => DocumentType.proposalTemplate,
-
-      // comment
-      DocumentType.commentDocument || DocumentType.commentTemplate => DocumentType.commentTemplate,
-
-      // review
-      DocumentType.reviewDocument || DocumentType.reviewTemplate => DocumentType.reviewTemplate,
-
-      // category
-      DocumentType.categoryParametersDocument ||
-      DocumentType.categoryParametersTemplate => DocumentType.categoryParametersTemplate,
-
-      // campaign
-      DocumentType.campaignParametersDocument ||
-      DocumentType.campaignParametersTemplate => DocumentType.campaignParametersTemplate,
-
-      // brand
-      DocumentType.brandParametersDocument ||
-      DocumentType.brandParametersTemplate => DocumentType.brandParametersTemplate,
-
-      // other
-      DocumentType.proposalActionDocument || DocumentType.unknown => null,
-    };
-  }
 
   static DocumentType fromJson(String data) {
     return DocumentType.values.firstWhere(

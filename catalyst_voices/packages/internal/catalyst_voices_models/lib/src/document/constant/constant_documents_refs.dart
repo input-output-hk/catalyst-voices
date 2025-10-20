@@ -15,6 +15,12 @@ final class CategoryTemplatesRefs extends Equatable {
 
   Iterable<SignedDocumentRef> get all => [category, proposal, comment];
 
+  Map<DocumentType, SignedDocumentRef> asMap() => {
+    DocumentType.categoryParametersDocument: category,
+    DocumentType.proposalTemplate: proposal,
+    DocumentType.commentTemplate: comment,
+  };
+
   @override
   List<Object?> get props => [category, proposal, comment];
 
