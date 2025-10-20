@@ -9,7 +9,7 @@ import 'package:go_router/go_router.dart';
 part 'root_route.g.dart';
 
 @TypedGoRoute<RootRoute>(path: '/')
-final class RootRoute extends GoRouteData {
+final class RootRoute extends GoRouteData with $RootRoute {
   const RootRoute();
 
   @override

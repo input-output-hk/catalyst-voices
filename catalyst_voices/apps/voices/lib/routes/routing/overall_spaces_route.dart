@@ -13,7 +13,7 @@ part 'overall_spaces_route.g.dart';
   name: 'spaces',
 )
 final class OverallSpacesRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+    with $OverallSpacesRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
   const OverallSpacesRoute();
 
   @override
