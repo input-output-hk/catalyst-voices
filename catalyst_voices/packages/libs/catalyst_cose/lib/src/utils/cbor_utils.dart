@@ -38,15 +38,6 @@ final class CborUtils {
     return CoseDocumentRefs.fromCbor(value);
   }
 
-  /// Deserialized optional [CoseReferenceUuid] type.
-  static CoseReferenceUuid? deserializeReferenceUuid(CborValue? value) {
-    if (value == null) {
-      return null;
-    }
-
-    return CoseReferenceUuid.fromCbor(value);
-  }
-
   /// Deserializes optional [String] type.
   static String? deserializeString(CborValue? value) {
     if (value == null) {

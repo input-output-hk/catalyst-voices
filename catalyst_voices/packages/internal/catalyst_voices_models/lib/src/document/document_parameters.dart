@@ -15,7 +15,6 @@ final class DocumentParameters extends Equatable {
     return set.contains(ref);
   }
 
-  // TODO(dt-iohk): resign from it, just match by exact ref
   bool containsId(String id) {
     return set.any((e) => e.id.equalsIgnoreCase(id));
   }

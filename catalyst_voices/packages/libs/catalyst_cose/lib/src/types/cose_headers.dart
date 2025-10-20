@@ -6,6 +6,7 @@ import 'package:catalyst_cose/src/types/cose_string_or_int.dart';
 import 'package:catalyst_cose/src/types/cose_uuid.dart';
 import 'package:catalyst_cose/src/utils/cbor_utils.dart';
 import 'package:cbor/cbor.dart';
+import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 /// A callback to get an optional value.
@@ -97,17 +98,8 @@ final class CoseHeaders extends Equatable {
 
   /// Deserializes the type from cbor.
   factory CoseHeaders.fromCbor(CborValue value, {bool encodeAsBytes = true}) {
-    final CborMap map;
-
-    if (value is CborMap) {
-      // cose headers per specification might be wrapped in extra CborBytes,
-      // both formats are valid
-      map = value;
-    } else {
-      final cborBytes = value as CborBytes;
-      final encodedMap = cbor.decode(cborBytes.bytes);
-      map = encodedMap as CborMap;
-    }
+    var map = _decodeCbor(value);
+    map = _migrateCbor1(map);
 
     return CoseHeaders(
       alg: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.alg]),
@@ -125,10 +117,6 @@ final class CoseHeaders extends Equatable {
         map[CoseHeaderKeys.collaborators] ?? map[CoseHeaderKeys.collabs],
       ),
       parameters: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.parameters]),
-      // TODO(dt-iohk): make it backward compatible
-      // brandId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.brandId]),
-      // campaignId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.campaignId]),
-      // categoryId: CborUtils.deserializeReferenceUuid(map[CoseHeaderKeys.categoryId]),
       encodeAsBytes: encodeAsBytes,
     );
   }
@@ -244,6 +232,41 @@ final class CoseHeaders extends Equatable {
       return CborBytes(cbor.encode(map));
     } else {
       return map;
+    }
+  }
+
+  static CborMap _decodeCbor(CborValue value) {
+    if (value is CborMap) {
+      // cose headers per specification might be wrapped in extra CborBytes,
+      // both formats are valid
+      return value;
+    } else {
+      final cborBytes = value as CborBytes;
+      final encodedMap = cbor.decode(cborBytes.bytes);
+      return encodedMap as CborMap;
+    }
+  }
+
+  static CborMap _migrateCbor1(CborMap map) {
+    final parametersKeys = [
+      CoseHeaderKeys.brandId,
+      CoseHeaderKeys.campaignId,
+      CoseHeaderKeys.categoryId,
+    ];
+
+    if (parametersKeys.none(map.containsKey)) {
+      return map;
+    } else {
+      final modified = CborMap.fromEntries(map.entries, tags: map.tags, type: map.type);
+      final parameters = <CoseDocumentRef>[];
+
+      for (final key in parametersKeys) {
+        final value = modified.remove(key)!;
+        parameters.add(CoseDocumentRef.fromCbor(value));
+      }
+
+      modified[CoseHeaderKeys.parameters] = CoseDocumentRefs(parameters).toCbor();
+      return modified;
     }
   }
 }
