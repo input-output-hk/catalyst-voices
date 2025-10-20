@@ -135,12 +135,12 @@ Use this checklist to ensure your proposal meets all foundational and content re
     imageUrl: '',
   ),
 
-  //Cardano Concepts: Prototype & Launch
+  //Cardano Use Cases: Prototype & Launch
   CampaignCategory(
     selfRef: f15ConstDocumentsRefs[1].category,
     proposalTemplateRef: f15ConstDocumentsRefs[1].proposal,
     campaignRef: f15ConstDocumentsRefs[1].comment,
-    categoryName: 'Cardano Concepts:',
+    categoryName: 'Cardano Use Cases:',
     categorySubname: 'Prototype & Launch',
     description:
         '''To provide entrepreneurial individuals and teams with funding to build and launch novel prototypes that have already undergone foundational research and design, accelerating the delivery of new on-chain utility for Cardano.''',
