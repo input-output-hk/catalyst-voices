@@ -104,8 +104,8 @@ final class CoseDocumentRef extends Equatable {
   CborValue toCbor() {
     return CborList([
       documentId.toCbor(),
-      if (documentVer case final documentVer?) documentVer.toCbor(),
-      if (documentLocator case final documentLocator) documentLocator.toCbor(),
+      documentVer.toCbor(),
+      documentLocator.toCbor(),
     ]);
   }
 }

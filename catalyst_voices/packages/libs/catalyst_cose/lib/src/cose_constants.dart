@@ -67,21 +67,33 @@ final class CoseHeaderKeys {
   static final section = CborString('section');
 
   /// The header key for "collabs".
+  ///
+  /// Replaced by [collaborators].
   static final collabs = CborString('collabs');
 
   /// The header key for "collaborators".
+  ///
+  /// Replaces [collabs].
   static final collaborators = CborString('collaborators');
 
   /// The header key for "brand_id".
+  ///
+  /// Replaced by [parameters].
   static final brandId = CborString('brand_id');
 
   /// The header key for "campaign_id".
+  ///
+  /// Replaced by [parameters].
   static final campaignId = CborString('campaign_id');
 
   /// The header key for "category_id".
+  ///
+  /// Replaced by [parameters].
   static final categoryId = CborString('category_id');
 
   /// The header key for "parameters".
+  ///
+  /// Replaces [brandId], [campaignId], [categoryId].
   static final parameters = CborString('parameters');
 
   const CoseHeaderKeys._();
