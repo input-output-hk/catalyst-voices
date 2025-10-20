@@ -38,7 +38,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
         throw StateError('Cannot create draft, category not selected');
       }
 
-      final category = await _campaignService.getCategory(categoryId);
+      final category = await _campaignService.getCategory(DocumentParameters({categoryId}));
       final templateRef = category.proposalTemplateRef;
       final template = await _proposalService.getProposalTemplate(
         ref: templateRef,

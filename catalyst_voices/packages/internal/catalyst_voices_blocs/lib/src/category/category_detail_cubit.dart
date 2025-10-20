@@ -51,7 +51,7 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
     }
 
     try {
-      final category = await _campaignService.getCategory(categoryId);
+      final category = await _campaignService.getCategory(DocumentParameters({categoryId}));
       emit(
         state.copyWith(
           isLoading: false,

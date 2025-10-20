@@ -542,7 +542,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       if (firstVersion && proposalData.publish.isLocal && notVerifiedAccount) {
         emitSignal(const NewProposalAndEmailNotVerifiedSignal());
       }
-      final category = await _campaignService.getCategoryWithParameters(proposal.parameters);
+      final category = await _campaignService.getCategory(proposal.parameters);
       final campaign = await _campaignService.getActiveCampaign();
       final fromActiveCampaign = campaign?.hasCategory(category.selfRef.id) ?? false;
 
@@ -571,7 +571,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     _logger.info('Loading proposal category: $categoryId');
 
     await _loadState(emit, () async {
-      final category = await _campaignService.getCategory(categoryId);
+      final category = await _campaignService.getCategory(DocumentParameters({categoryId}));
       final templateRef = category.proposalTemplateRef;
       final proposalTemplate = await _proposalService.getProposalTemplate(
         ref: templateRef,

@@ -35,9 +35,7 @@ abstract interface class CampaignService {
 
   Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType stage);
 
-  Future<CampaignCategory> getCategory(SignedDocumentRef ref);
-
-  Future<CampaignCategory> getCategoryWithParameters(DocumentParameters parameters);
+  Future<CampaignCategory> getCategory(DocumentParameters parameters);
 }
 
 final class CampaignServiceImpl implements CampaignService {
@@ -105,20 +103,8 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
-    final category = await _campaignRepository.getCategory(ref);
-    if (category == null) {
-      throw NotFoundException(
-        message: 'Did not find category with ref $ref',
-      );
-    }
-
-    return _loadCampaignCategoryDetails(category);
-  }
-
-  @override
-  Future<CampaignCategory> getCategoryWithParameters(DocumentParameters parameters) async {
-    final category = await _campaignRepository.getCategoryWithParameters(parameters);
+  Future<CampaignCategory> getCategory(DocumentParameters parameters) async {
+    final category = await _campaignRepository.getCategory(parameters);
     if (category == null) {
       throw NotFoundException(
         message: 'Did not find category with parameters $parameters',

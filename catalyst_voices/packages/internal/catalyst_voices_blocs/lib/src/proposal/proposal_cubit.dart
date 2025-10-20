@@ -85,10 +85,8 @@ final class ProposalCubit extends Cubit<ProposalState>
       emit(state.copyWith(isLoading: true));
 
       final proposal = await _proposalService.getProposalDetail(ref: ref);
-      // TODO(dt-iohk): fetch all categories, find out which parameter is the category and fetch the category
-      final categoryId = proposal.document.metadata.parameters.set.first;
-      final category = await _campaignService.getCategory(categoryId);
-      final commentTemplate = await _commentService.getCommentTemplateFor(category: categoryId);
+      final category = await _campaignService.getCategory(proposal.document.metadata.parameters);
+      final commentTemplate = await _commentService.getCommentTemplateFor(category: category.selfRef);
       final isFavorite = await _proposalService.watchIsFavoritesProposal(ref: ref).first;
 
       _cache = _cache.copyWith(
