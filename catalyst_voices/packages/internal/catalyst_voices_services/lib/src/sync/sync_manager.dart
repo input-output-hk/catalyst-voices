@@ -4,7 +4,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:synchronized/synchronized.dart';
 
 final _logger = Logger('SyncManager');
@@ -59,7 +58,7 @@ final class SyncManagerImpl implements SyncManager {
   @override
   Future<void> start() {
     if (_lock.locked) {
-      debugPrint('Synchronization in progress');
+      _logger.finest('Synchronization in progress');
       return Future(() {});
     }
 
@@ -67,7 +66,7 @@ final class SyncManagerImpl implements SyncManager {
     _syncTimer = Timer.periodic(
       const Duration(minutes: 15),
       (_) {
-        debugPrint('Scheduled synchronization starts');
+        _logger.finest('Scheduled synchronization starts');
         // ignore: discarded_futures
         _lock.synchronized(_startSynchronization).ignore();
       },
@@ -82,7 +81,7 @@ final class SyncManagerImpl implements SyncManager {
 
     final stopwatch = Stopwatch()..start();
     try {
-      debugPrint('Synchronization started');
+      _logger.fine('Synchronization started');
 
       // This means when campaign will become document we'll have get it first
       // with separate request
@@ -95,37 +94,33 @@ final class SyncManagerImpl implements SyncManager {
       final result = await _documentsService.sync(
         campaign: activeCampaign,
         onProgress: (value) {
-          debugPrint('Documents sync progress[$value]');
+          _logger.finest('Documents sync progress[$value]');
         },
       );
 
       stopwatch.stop();
-
-      debugPrint('Synchronization took ${stopwatch.elapsed}');
 
       await _updateSuccessfulSyncStats(
         newRefsCount: result.newDocumentsCount,
         duration: stopwatch.elapsed,
       );
 
-      debugPrint('Synchronization completed. New documents: ${result.newDocumentsCount}');
+      _logger.fine('Synchronization completed. New documents: ${result.newDocumentsCount}');
 
       if (result.failedDocumentsCount > 0) {
-        debugPrint('Synchronization failed for documents: ${result.failedDocumentsCount}');
+        _logger.info('Synchronization failed for documents: ${result.failedDocumentsCount}');
       }
 
       _synchronizationCompleter.complete(true);
     } catch (error, stack) {
-      debugPrint(
-        'Synchronization failed after ${stopwatch.elapsed}, $error',
-      );
+      _logger.fine('Synchronization failed after ${stopwatch.elapsed}', error, stack);
       _synchronizationCompleter.complete(false);
 
       rethrow;
     } finally {
       stopwatch.stop();
 
-      debugPrint('Synchronization took ${stopwatch.elapsed}');
+      _logger.fine('Synchronization took ${stopwatch.elapsed}');
     }
   }
 

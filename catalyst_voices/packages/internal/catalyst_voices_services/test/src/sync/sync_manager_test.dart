@@ -47,29 +47,7 @@ void main() {
   });
 
   group(SyncManager, () {
-    /*test('sync throws error when documents sync fails', () async {
-      // Given
-      final allRefs = List.generate(
-        10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()).toTyped(DocumentType.proposalDocument),
-      );
-      final cachedRefs = <TypedDocumentRef>[];
-
-      // When
-      when(
-        () => documentRepository.getAllDocumentsRefs(campaign: Campaign.f15()),
-      ).thenAnswer((_) => Future.value(allRefs));
-      when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
-      when(
-        () => documentRepository.getDocumentData(ref: any(named: 'ref')),
-      ).thenAnswer((_) => Future.error(const HttpException('Unknown ref')));
-
-      // Then
-      expect(
-        () => syncManager.start(),
-        throwsA(isA<RefsSyncException>()),
-      );
-    });*/
+    // TODO(damian-molinski): rewrite test once performance work is finished
   });
 }
 

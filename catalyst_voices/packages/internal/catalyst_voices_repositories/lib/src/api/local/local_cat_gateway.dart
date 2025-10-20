@@ -63,11 +63,7 @@ final class LocalCatGateway implements CatGateway {
     required this.decompressedDocuments,
     required this.authorGetter,
   }) {
-    unawaited(
-      _populateIndex().catchError((error) {
-        print('error -> $error');
-      }),
-    );
+    unawaited(_populateIndex());
   }
 
   @override
