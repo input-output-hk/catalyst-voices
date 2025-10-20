@@ -5,6 +5,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_cardano_serialization/src/raw_transaction_aspect.dart';
 import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart' as kd;
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:cbor/cbor.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -35,8 +36,8 @@ void main() {
     late X509MetadataEnvelope<RegistrationData> envelope;
 
     setUpAll(() {
-      CatalystCompression.overrideBrotli(const _FakeCompressor());
-      CatalystCompression.overrideZstd(const _FakeCompressor());
+      CatalystCompression.overrideBrotli(const FakeCompressor());
+      CatalystCompression.overrideZstd(const FakeCompressor());
     });
 
     setUp(() async {
@@ -478,14 +479,4 @@ class _FakeBip32Ed25519XSignature extends Fake implements kd.Bip32Ed25519XSignat
 
   @override
   CborValue toCbor() => CborBytes(bytes);
-}
-
-final class _FakeCompressor implements CatalystCompressor {
-  const _FakeCompressor();
-
-  @override
-  Future<List<int>> compress(List<int> bytes) async => bytes;
-
-  @override
-  Future<List<int>> decompress(List<int> bytes) async => bytes;
 }
