@@ -7,7 +7,7 @@ import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
 /// The COSE_SIGN structure implementation, supporting multiple signatures.
-/// 
+///
 /// [RFC-9052](https://datatracker.ietf.org/doc/rfc9052/),
 /// [RFC 9053](https://datatracker.ietf.org/doc/rfc9053/).
 final class CoseSign extends Equatable {
