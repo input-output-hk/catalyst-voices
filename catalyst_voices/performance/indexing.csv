@@ -1,6 +1,8 @@
 proposals_count,stored_docs_count,new_docs_count,compressed,avg_duration,   PR,     note
 100,            ,0               ,583           ,true      ,0:00:04.008009  ,-      ,-
+100,            ,559             ,548           ,true      ,0:00:04.530291  ,-      ,-
 1000,           ,0               ,5479          ,true      ,0:00:32.248981  ,-      ,-
+1000,           ,5398            ,5480          ,true      ,0:00:51.579570  ,-      ,-
 2000,           ,0               ,10976         ,true      ,0:01:30.453520  ,-      ,Queries start to problem
 100,            ,0               ,712           ,true      ,0:00:01.406726  ,#3555  ,-
 100,            ,0               ,712           ,false     ,0:00:01.182925  ,#3555  ,-
