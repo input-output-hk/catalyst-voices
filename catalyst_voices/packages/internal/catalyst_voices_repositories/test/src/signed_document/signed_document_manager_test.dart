@@ -53,7 +53,9 @@ final _catalystId = CatalystId(
   role0Key: _publicKey.publicKeyBytes,
 );
 
-final _privateKey = FakeCatalystPrivateKey(bytes: _privateKeyBytes);
+final _privateKey = FakeCatalystPrivateKey(bytes: _privateKeyBytes, signature: _signature);
 final _privateKeyBytes = Uint8List.fromList(List.filled(32, 0));
-final _publicKey = FakeCatalystPublicKey(bytes: _publicKeyBytes);
+final _publicKey = FakeCatalystPublicKey(bytes: _publicKeyBytes, signatureBytes: _signatureBytes);
 final _publicKeyBytes = Uint8List.fromList(List.filled(32, 1));
+final _signature = FakeCatalystSignature(bytes: _signatureBytes);
+final _signatureBytes = Uint8List.fromList(List.filled(32, 2));

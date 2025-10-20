@@ -4,9 +4,8 @@
 /// across all test suites without duplicating code.
 library;
 
-import 'dart:typed_data';
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:mocktail/mocktail.dart';
 
 /// A fake implementation of [CatalystPrivateKey] for testing.
@@ -14,11 +13,13 @@ import 'package:mocktail/mocktail.dart';
 /// This fake returns predictable derived keys and public keys based on the
 /// input bytes and derivation paths.
 class FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
+  final CatalystSignature? signature;
+
   @override
   final Uint8List bytes;
 
   /// Creates a fake private key with the given [bytes].
-  FakeCatalystPrivateKey({required this.bytes});
+  FakeCatalystPrivateKey({required this.bytes, this.signature});
 
   @override
   CatalystSignatureAlgorithm get algorithm => CatalystSignatureAlgorithm.ed25519;
@@ -36,12 +37,12 @@ class FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   }
 
   @override
-  Future<CatalystSignature> sign(Uint8List data) async {
-    return FakeCatalystSignature(bytes: data);
-  }
+  void drop() {}
 
   @override
-  void drop() {}
+  Future<CatalystSignature> sign(Uint8List data) async {
+    return signature ?? FakeCatalystSignature(bytes: data);
+  }
 }
 
 /// A fake factory for creating [FakeCatalystPrivateKey] instances.
@@ -56,14 +57,26 @@ class FakeCatalystPrivateKeyFactory extends Fake implements CatalystPrivateKeyFa
 ///
 /// This fake uses the provided bytes for the public key representation.
 class FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
+  final Uint8List _signatureBytes;
   @override
   final Uint8List bytes;
 
   /// Creates a fake public key with the given [bytes].
-  FakeCatalystPublicKey({required this.bytes});
+  FakeCatalystPublicKey({
+    required this.bytes,
+    Uint8List? signatureBytes,
+  }) : _signatureBytes = signatureBytes ?? Uint8List.fromList(List.filled(32, 2));
 
   @override
   Uint8List get publicKeyBytes => bytes;
+
+  @override
+  Future<bool> verify(
+    Uint8List data, {
+    required CatalystSignature signature,
+  }) async {
+    return listEquals(signature.bytes, _signatureBytes);
+  }
 }
 
 /// A fake factory for creating [FakeCatalystPublicKey] instances.
