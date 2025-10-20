@@ -1,11 +1,22 @@
+/// Factory classes for creating test DocumentData, DocumentRef, and related objects.
+///
+/// These factories provide convenient methods for generating test data with
+/// predictable, unique values.
+library;
+
 import 'dart:math';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide Document;
-import 'package:catalyst_voices_repositories/src/database/database.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+// ignore: implementation_imports
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
+/// Factory for creating [DocumentData] instances for testing.
 abstract final class DocumentDataFactory {
+  /// Builds a [DocumentData] with configurable properties.
+  ///
+  /// All parameters are optional and have sensible defaults for testing.
   static DocumentData build({
     DocumentType type = DocumentType.proposalDocument,
     DocumentRef? selfRef,
@@ -25,7 +36,11 @@ abstract final class DocumentDataFactory {
   }
 }
 
+/// Factory for creating [DocumentEntity] instances for testing.
 abstract final class DocumentFactory {
+  /// Builds a [DocumentEntity] with configurable properties.
+  ///
+  /// All parameters are optional and have sensible defaults for testing.
   static DocumentEntity build({
     DocumentDataContent? content,
     DocumentDataMetadata? metadata,
@@ -54,7 +69,9 @@ abstract final class DocumentFactory {
   }
 }
 
+/// Factory for creating [DocumentMetadataEntity] instances for testing.
 abstract final class DocumentMetadataFactory {
+  /// Builds a [DocumentMetadataEntity] with configurable properties.
   static DocumentMetadataEntity build({
     String? ver,
     required DocumentMetadataFieldKey fieldKey,
@@ -72,15 +89,20 @@ abstract final class DocumentMetadataFactory {
   }
 }
 
+/// Factory for creating [DocumentRef] instances for testing.
+///
+/// Generates random, unique UUIDs using UUIDv7 with a seeded random generator
+/// to ensure reproducible test results.
 abstract final class DocumentRefFactory {
   static final Random _random = Random(57342052346526);
   static var _timestamp = DateTime.now().millisecondsSinceEpoch;
 
-  /// Generates random, unique [DraftRef].
+  /// Generates a random, unique [DraftRef].
   static DraftRef draftRef() {
     return DraftRef.first(randomUuidV7());
   }
 
+  /// Generates a random UUIDv7 string.
   static String randomUuidV7() {
     return const UuidV7().generate(
       options: V7Options(
@@ -90,7 +112,7 @@ abstract final class DocumentRefFactory {
     );
   }
 
-  /// Generates random, unique [SignedDocumentRef].
+  /// Generates a random, unique [SignedDocumentRef].
   static SignedDocumentRef signedDocumentRef() {
     return SignedDocumentRef.first(randomUuidV7());
   }
@@ -108,7 +130,9 @@ abstract final class DocumentRefFactory {
   }
 }
 
+/// Factory for creating [DocumentEntityWithMetadata] instances for testing.
 abstract final class DocumentWithMetadataFactory {
+  /// Builds a [DocumentEntityWithMetadata] with configurable properties.
   static DocumentEntityWithMetadata build({
     DocumentDataContent? content,
     DocumentDataMetadata? metadata,
@@ -135,7 +159,9 @@ abstract final class DocumentWithMetadataFactory {
   }
 }
 
+/// Factory for creating [DocumentDraftEntity] instances for testing.
 abstract final class DraftFactory {
+  /// Builds a [DocumentDraftEntity] with configurable properties.
   static DocumentDraftEntity build({
     DocumentDataContent? content,
     DocumentDataMetadata? metadata,
