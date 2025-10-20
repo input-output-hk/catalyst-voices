@@ -90,6 +90,8 @@ Future<BootstrapArgs> bootstrap({
       fromTo: DateRange(from: startConfigTimestamp, to: endConfigTimestamp),
     );
 
+  final runtimeProfiler = CatalystRuntimeProfiler(profiler)..start(at: bootstrapStartTimestamp);
+
   await Dependencies.instance.init(
     config: config,
     environment: environment,
@@ -97,6 +99,7 @@ Future<BootstrapArgs> bootstrap({
     reportingService: _reportingService,
     profiler: profiler,
     startupProfiler: startupProfiler,
+    runtimeProfiler: runtimeProfiler,
   );
 
   final router = buildAppRouter(initialLocation: initialLocation);

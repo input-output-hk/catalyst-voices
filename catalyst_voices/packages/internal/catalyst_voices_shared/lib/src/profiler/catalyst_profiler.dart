@@ -13,6 +13,12 @@ abstract interface class CatalystProfiler {
     AsyncOrValueGetter<void> body, {
     CatalystProfilerTimelineArguments? arguments,
   });
+
+  Future<T> timeWithResult<T>(
+    String name,
+    AsyncOrValueGetter<T> body, {
+    CatalystProfilerTimelineArguments? arguments,
+  });
 }
 
 abstract interface class CatalystProfilerTimeline {
@@ -30,6 +36,12 @@ abstract interface class CatalystProfilerTimeline {
   Future<void> time(
     String name,
     AsyncOrValueGetter<void> body, {
+    CatalystProfilerTimelineTaskArguments? arguments,
+  });
+
+  Future<T> timeWithResult<T>(
+    String name,
+    AsyncOrValueGetter<T> body, {
     CatalystProfilerTimelineTaskArguments? arguments,
   });
 }
