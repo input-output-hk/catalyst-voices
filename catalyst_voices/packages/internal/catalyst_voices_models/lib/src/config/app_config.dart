@@ -351,6 +351,8 @@ final class SentryConfig extends ReportingServiceConfig {
 final class StressTestConfig extends Equatable {
   const StressTestConfig();
 
+  bool get clearDatabase => const bool.fromEnvironment('STRESS_TEST_CLEAR_DB');
+
   bool get decompressedDocuments => const bool.fromEnvironment('STRESS_TEST_DECOMPRESSED');
 
   int get indexedProposalsCount {
@@ -370,7 +372,8 @@ final class StressTestConfig extends Equatable {
     return 'StressTestConfig('
         'isEnabled[$isEnabled], '
         'indexedProposalsCount[$indexedProposalsCount], '
-        'decompressedDocuments[$decompressedDocuments]'
+        'decompressedDocuments[$decompressedDocuments], '
+        'clearDatabase[$clearDatabase]'
         ')';
   }
 }
