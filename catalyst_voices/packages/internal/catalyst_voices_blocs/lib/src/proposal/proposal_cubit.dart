@@ -155,11 +155,10 @@ final class ProposalCubit extends Cubit<ProposalState>
     SignedDocumentRef? reply,
   }) async {
     final proposalRef = _cache.ref;
+    final proposalParameters = _cache.proposal?.document.metadata.parameters;
     assert(proposalRef != null, 'Proposal ref not found. Load document first!');
-    assert(
-      proposalRef is SignedDocumentRef,
-      'Can comment only on signed documents',
-    );
+    assert(proposalRef is SignedDocumentRef, 'Can comment only on signed documents');
+    assert(proposalParameters != null, 'Proposal parameters not found!');
 
     final activeAccountId = _cache.activeAccountId;
     assert(activeAccountId != null, 'No active account found!');
@@ -174,7 +173,7 @@ final class ProposalCubit extends Cubit<ProposalState>
         ref: proposalRef! as SignedDocumentRef,
         template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
         reply: reply,
-        parameters: _cache.proposal?.document.metadata.parameters ?? const DocumentParameters(),
+        parameters: proposalParameters ?? const DocumentParameters(),
         authorId: activeAccountId!,
       ),
       document: document,

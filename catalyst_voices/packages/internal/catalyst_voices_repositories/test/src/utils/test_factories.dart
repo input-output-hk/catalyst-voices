@@ -18,7 +18,7 @@ abstract final class DocumentDataFactory {
         type: type,
         selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
         template: template,
-        parameters: DocumentParameters({if (categoryId != null) categoryId}),
+        parameters: DocumentParameters({?categoryId}),
       ),
       content: content,
     );
