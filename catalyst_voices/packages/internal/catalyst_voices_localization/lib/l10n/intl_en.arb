@@ -402,11 +402,11 @@
   "@catalystKnowledgeBase": {
     "description": "Menu item text for accessing knowledge base"
   },
-  "catalystPrivacyPolicy": "Catalyst FC's Privacy Policy",
+  "catalystPrivacyPolicy": "Project Catalyst Platform Privacy Policy",
   "@catalystPrivacyPolicy": {
-    "description": "Link to the Catalyst FC's Privacy Policy"
+    "description": "Link to the Catalyst Privacy Policy"
   },
-  "catalystTos": "Project Catalyst Terms and Conditions",
+  "catalystTos": "Project Catalyst Platform Terms of Use",
   "@catalystTos": {
     "description": "Link to the Catalyst FC's Terms and Conditions"
   },
@@ -695,15 +695,6 @@
   "createProfileCreatedTitle": "Congratulations your profile is setup!",
   "@createProfileCreatedTitle": {
     "description": "Title for the profile created"
-  },
-  "createProfileDrepApprovalContingency": "I understand that for my proposal to move to Community Review and/or Voting and be eligible for funding, the Project Catalyst budget proposal must first be approved by the Cardano DReps, as detailed in the {fundProposalSubmissionNotice}. If the budget is not approved, my proposal will not move forward and no funding will be provided.",
-  "@createProfileDrepApprovalContingency": {
-    "description": "Text acknowledging that the user is aware of the Drep Approval Contingency",
-    "placeholders": {
-      "fundProposalSubmissionNotice": {
-        "type": "String"
-      }
-    }
   },
   "createProfileInstructionsEmailRequest": "Email request",
   "@createProfileInstructionsEmailRequest": {

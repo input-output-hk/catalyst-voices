@@ -200,7 +200,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         service_id: StringEnvVar::new("SERVICE_ID", calculate_service_uuid().into()),
         client_id_key: StringEnvVar::new("CLIENT_ID_KEY", CLIENT_ID_KEY_DEFAULT.into()),
         api_host_names: string_to_api_host_names(
-            &StringEnvVar::new_optional("c", false)
+            &StringEnvVar::new_optional("API_HOST_NAMES", false)
                 .map(|v| v.as_string())
                 .unwrap_or_default(),
         ),
