@@ -124,7 +124,7 @@ void main() {
             description: 'Description',
             allFunds: MultiCurrencyAmount.single(_adaMajorUnits(20000000)),
             totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(0)),
-            // TODO(LynxLynxx): refator it when _mapProposalToViewModel will be refactored
+            // TODO(LynxLynxx): refactor it when _mapProposalToViewModel will be refactored
             fundNumber: 0,
             timeline: const CampaignTimeline(phases: []),
             publish: CampaignPublish.published,
