@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://raw.githubusercontent.com/input-output-hk/catalyst-voices/refs/heads/main/docs/src/architecture/08_concepts/document_templates/proposal/f15/0199802c-21b4-7982-ba3f-ec0cd0207b11.schema.json",
-    "title": "F15 Cardano Concepts: Prototype & Launch",
-    "description": "Schema for the F15 Cardano Concepts: Prototype & Launch",
+    "title": "F15 Cardano Use Cases: Prototype & Launch",
+    "description": "Schema for the F15 Cardano Use Cases: Prototype & Launch",
     "maintainers": [{ "name": "Catalyst Team", "url": "https://projectcatalyst.io/" }],
     "x-changelog": {
         "2025-10-08": [
@@ -323,7 +323,7 @@
                             "$ref": "#/definitions/tokenValueCardanoADA",
                             "title": "Enter the amount of funding you are requesting in ADA",
                             "description": "Requested amount should be between $ADA 15,000 and $ADA 200,000",
-                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Concepts: Prototype & Launch**\n\n- Minimum Funding Amount per proposal: **$ADA 15,000**\n- Maximum Funding Amount per proposal: **$ADA 200,000**",
+                            "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Use Cases: Prototype & Launch**\n\n- Minimum Funding Amount per proposal: **$ADA 15,000**\n- Maximum Funding Amount per proposal: **$ADA 200,000**",
                             "x-placeholder": "Requested amount should be between $ADA 15,000 and $ADA 200,000",
                             "minimum": 15000,
                             "maximum": 200000
