@@ -202,6 +202,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
         _cache = _cache.copyWith(campaign: Optional(campaign));
       }
       // TODO(damian-molinski): proposal should have ref to campaign
+      // TODO(LynxLynxx): refactor `watch user proposals - success` test after this refator
       final campaigns = Campaign.all;
 
       final categories = campaigns.expand((element) => element.categories);
