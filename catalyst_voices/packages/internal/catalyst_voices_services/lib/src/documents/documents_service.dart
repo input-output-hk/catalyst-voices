@@ -31,6 +31,8 @@ abstract interface class DocumentsService {
   /// * [onProgress] - emits from 0.0 to 1.0.
   /// * [maxConcurrent] - requests made at same time inside one batch
   /// * [batchSize] - how many documents per one batch
+  ///
+  /// Returns [DocumentsSyncResult] with count of new and failed refs.
   Future<DocumentsSyncResult> sync({
     required Campaign campaign,
     ValueChanged<double>? onProgress,
@@ -84,6 +86,12 @@ final class DocumentsServiceImpl implements DocumentsService {
     final pool = Pool(maxConcurrent);
     onProgress?.call(0);
 
+    /// Synchronizing documents is done in certain order, according to [syncOrder]
+    /// because some are more important then others and should be here first, like templates.
+    /// Most of other docs refs to them.
+    ///
+    /// Doing it using such loop allows us to now have to query all cached documents for
+    /// checking if something is cached or not.
     for (var i = 0; i < syncIterationsCount; i++) {
       final documentType = syncOrder.elementAtOrNull(i);
       final filters = DocumentIndexFilters(
@@ -96,11 +104,12 @@ final class DocumentsServiceImpl implements DocumentsService {
         batchSize: batchSize,
         filters: filters,
         exclude: {
-          // categories are not documents at the moment
+          // categories are not documents at the moment.
           DocumentBaseType.category,
         },
         excludeIds: {
-          // this should not be needed. Remove it later when categories are documents too.
+          // this should not be needed. Remove it later when categories are documents too
+          // and we have no more const refs.
           ...categoriesIds,
           ...syncOrder
               .where((element) => element != documentType)
@@ -125,6 +134,8 @@ final class DocumentsServiceImpl implements DocumentsService {
           if (onProgress == null) {
             return;
           }
+
+          /// Each iteration progress is counted equally
           final prevProgress = completedIterations * progressPerIteration;
           final curProgress = value * progressPerIteration;
           final progress = prevProgress + curProgress;
@@ -184,10 +195,17 @@ final class DocumentsServiceImpl implements DocumentsService {
 
       final futures = refs.map(
         (ref) {
+          /// Its possible that missingRefs can be very large
+          /// and executing too many requests at once throws
+          /// net::ERR_INSUFFICIENT_RESOURCES in chrome.
+          /// That's reason for adding pool and limiting max requests.
           return pool.withResource(() {
             return _documentRepository
                 .getDocumentData(ref: ref, useCache: false)
                 .then<Result<DocumentData, RefSyncException>>(Success.new)
+                /// Handling errors as Outcome because we have to
+                /// give a change to all refs to finish and keep all info about what
+                /// failed.
                 .onError((error, stack) {
                   return Failure(RefSyncException(ref, source: error));
                 });
