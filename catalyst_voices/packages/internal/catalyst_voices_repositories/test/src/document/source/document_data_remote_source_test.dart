@@ -1,17 +1,18 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
+import 'package:catalyst_voices_repositories/src/api/cat_gateway_api_service.dart';
+import 'package:catalyst_voices_repositories/src/api/cat_reviews_api_service.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_index_models.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_index_query.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
-import 'package:chopper/chopper.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
 
 import '../../utils/test_factories.dart';
 
 void main() {
-  final CatGateway gateway = _MockedCatGateway();
-  final CatReviews reviews = _MockedCatReviews();
+  final CatGatewayService gateway = _MockedCatGateway();
+  final CatReviewsService reviews = _MockedCatReviews();
   final SignedDocumentManager signedDocumentManager = _MockedSignedDocumentManager();
 
   late final ApiServices apiServices;
@@ -20,6 +21,8 @@ void main() {
   const maxPageSize = CatGatewayDocumentDataSource.indexPageSize;
 
   setUpAll(() {
+    registerFallbackValue(DocumentIndexQueryFilter());
+
     apiServices = ApiServices.internal(
       gateway: gateway,
       reviews: reviews,
@@ -37,8 +40,7 @@ void main() {
   group(CatGatewayDocumentDataSource, () {
     group('index', () {
       test('loops thru all pages until there is no remaining refs '
-          'and exacts refs from them', () async {
-        // Given
+          'and extracts refs from them', () async {
         final pageZero = DocumentIndexList(
           docs: List.generate(
             maxPageSize,
@@ -54,33 +56,29 @@ void main() {
           page: const CurrentPage(page: 1, limit: maxPageSize, remaining: 0),
         );
 
-        final pageZeroResponse = Response(http.Response('', 200), pageZero);
-        final pageOneResponse = Response(http.Response('', 200), pageOne);
-
-        // When
         when(
-          () => gateway.apiV1DocumentIndexPost(
-            body: any(named: 'body'),
+          () => gateway.searchDocuments(
+            filter: any(named: 'filter'),
             limit: maxPageSize,
             page: 0,
           ),
-        ).thenAnswer((_) => Future.value(pageZeroResponse));
+        ).thenAnswer((_) async => pageZero);
+
         when(
-          () => gateway.apiV1DocumentIndexPost(
-            body: any(named: 'body'),
+          () => gateway.searchDocuments(
+            filter: any(named: 'filter'),
             limit: maxPageSize,
             page: 1,
           ),
-        ).thenAnswer((_) => Future.value(pageOneResponse));
+        ).thenAnswer((_) async => pageOne);
 
         final refs = await source.index(campaign: Campaign.f14());
 
-        // Then
         expect(refs, isNotEmpty);
 
         verify(
-          () => gateway.apiV1DocumentIndexPost(
-            body: any(named: 'body'),
+          () => gateway.searchDocuments(
+            filter: any(named: 'filter'),
             limit: any(named: 'limit'),
             page: any(named: 'page'),
           ),
@@ -88,7 +86,6 @@ void main() {
       });
 
       test('expands all page refs correctly', () async {
-        // Given
         final proposalId = DocumentRefFactory.randomUuidV7();
         final proposalRefs = [
           SignedDocumentRef(id: proposalId, version: DocumentRefFactory.randomUuidV7()),
@@ -114,25 +111,22 @@ void main() {
           ],
           page: const CurrentPage(page: 0, limit: maxPageSize, remaining: 0),
         );
-        final response = Response(http.Response('', 200), page);
 
         final expectedRefs = <TypedDocumentRef>[
           ...proposalRefs.map((e) => e.toTyped(DocumentType.proposalDocument)),
           templateRef.toTyped(DocumentType.proposalTemplate),
         ];
 
-        // When
         when(
-          () => gateway.apiV1DocumentIndexPost(
-            body: any(named: 'body'),
+          () => gateway.searchDocuments(
+            filter: any(named: 'filter'),
             limit: maxPageSize,
             page: 0,
           ),
-        ).thenAnswer((_) => Future.value(response));
+        ).thenAnswer((_) async => page);
 
         final refs = await source.index(campaign: Campaign.f14());
 
-        // Then
         expect(
           refs,
           allOf(hasLength(expectedRefs.length), containsAll(expectedRefs)),
@@ -163,8 +157,8 @@ DocumentIndexListDto _buildDocumentIndexList({
   );
 }
 
-class _MockedCatGateway extends Mock implements CatGateway {}
+class _MockedCatGateway extends Mock implements CatGatewayService {}
 
-class _MockedCatReviews extends Mock implements CatReviews {}
+class _MockedCatReviews extends Mock implements CatReviewsService {}
 
 class _MockedSignedDocumentManager extends Mock implements SignedDocumentManager {}

@@ -1,15 +1,15 @@
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:chopper/chopper.dart';
+import 'package:catalyst_voices_repositories/src/api/cat_gateway_api_service.dart';
+import 'package:catalyst_voices_repositories/src/api/cat_reviews_api_service.dart';
+import 'package:catalyst_voices_repositories/src/dto/config/remote_config.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart' as http;
 import 'package:mocktail/mocktail.dart';
 
 void main() {
-  final CatGateway gateway = _MockedCatGateway();
-  final CatReviews reviews = _MockedCatReviews();
+  final CatGatewayService gateway = _MockedCatGateway();
+  final CatReviewsService reviews = _MockedCatReviews();
 
   late final ApiServices apiServices;
-
   late final ApiConfigSource source;
 
   setUpAll(() {
@@ -27,74 +27,26 @@ void main() {
   });
 
   group(ApiConfigSource, () {
-    test('empty config is parsed correctly', () async {
-      // Given
-      const configJson = '{}';
-      final response = Response<Object>(http.Response('', 200), configJson);
+    test('returns remote config from gateway', () async {
+      const remoteConfig = RemoteConfig();
 
-      // When
-      when(gateway.apiV1ConfigFrontendGet).thenAnswer((_) => Future.value(response));
+      when(() => gateway.fetchFrontendConfig()).thenAnswer((_) async => remoteConfig);
 
-      // Then
       final config = await source.get();
 
-      expect(config.blockchain, isNull);
-      expect(config.sentry, isNull);
-      expect(config.cache, isNull);
+      expect(config, same(remoteConfig));
     });
 
-    test('invalid type is falling back to empty', () async {
-      // Given
-      const configJson = '1';
-      final response = Response<Object>(http.Response('', 200), configJson);
+    test('falls back to empty config on error', () async {
+      when(() => gateway.fetchFrontendConfig()).thenThrow(Exception('network error'));
 
-      // When
-      when(gateway.apiV1ConfigFrontendGet).thenAnswer((_) => Future.value(response));
-
-      // Then
       final config = await source.get();
 
-      expect(config.blockchain, isNull);
-      expect(config.sentry, isNull);
-      expect(config.cache, isNull);
-    });
-
-    test('invalid json is falling back to empty', () async {
-      // Given
-      const configJson = '[]';
-      final response = Response<Object>(http.Response('', 200), configJson);
-
-      // When
-      when(gateway.apiV1ConfigFrontendGet).thenAnswer((_) => Future.value(response));
-
-      // Then
-      final config = await source.get();
-
-      expect(config.blockchain, isNull);
-      expect(config.sentry, isNull);
-      expect(config.cache, isNull);
-    });
-
-    test('a json map is passed through not changed', () async {
-      // Given
-      const configJson = <String, dynamic>{
-        'blockchain': {
-          'networkId': 'mainnet',
-        },
-      };
-      final response = Response<Object>(http.Response('', 200), configJson);
-
-      // When
-      when(gateway.apiV1ConfigFrontendGet).thenAnswer((_) => Future.value(response));
-
-      // Then
-      final config = await source.get();
-
-      expect(config.blockchain?.networkId, 'mainnet');
+      expect(config, const RemoteConfig());
     });
   });
 }
 
-class _MockedCatGateway extends Mock implements CatGateway {}
+class _MockedCatGateway extends Mock implements CatGatewayService {}
 
-class _MockedCatReviews extends Mock implements CatReviews {}
+class _MockedCatReviews extends Mock implements CatReviewsService {}
