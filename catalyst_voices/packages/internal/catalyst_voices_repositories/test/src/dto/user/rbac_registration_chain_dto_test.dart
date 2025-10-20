@@ -231,5 +231,3 @@ const _voterJson = '''
 }
 ''';
 /* cSpell:enable */
-
-// Fake implementations now provided by catalyst_voices_dev package

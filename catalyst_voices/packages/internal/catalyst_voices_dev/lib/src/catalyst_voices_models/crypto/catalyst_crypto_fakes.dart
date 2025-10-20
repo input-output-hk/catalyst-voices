@@ -1,24 +1,13 @@
-/// Fake implementations of Catalyst cryptographic interfaces for testing.
-///
-/// These fakes provide simple, predictable implementations that can be used
-/// across all test suites without duplicating code.
-library;
-
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mocktail/mocktail.dart';
 
-/// A fake implementation of [CatalystPrivateKey] for testing.
-///
-/// This fake returns predictable derived keys and public keys based on the
-/// input bytes and derivation paths.
 class FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   final CatalystSignature? signature;
 
   @override
   final Uint8List bytes;
 
-  /// Creates a fake private key with the given [bytes].
   FakeCatalystPrivateKey({required this.bytes, this.signature});
 
   @override
@@ -45,7 +34,6 @@ class FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
   }
 }
 
-/// A fake factory for creating [FakeCatalystPrivateKey] instances.
 class FakeCatalystPrivateKeyFactory extends Fake implements CatalystPrivateKeyFactory {
   @override
   CatalystPrivateKey create(Uint8List bytes) {
@@ -53,15 +41,11 @@ class FakeCatalystPrivateKeyFactory extends Fake implements CatalystPrivateKeyFa
   }
 }
 
-/// A fake implementation of [CatalystPublicKey] for testing.
-///
-/// This fake uses the provided bytes for the public key representation.
 class FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
   final Uint8List _signatureBytes;
   @override
   final Uint8List bytes;
 
-  /// Creates a fake public key with the given [bytes].
   FakeCatalystPublicKey({
     required this.bytes,
     Uint8List? signatureBytes,
@@ -79,7 +63,6 @@ class FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
   }
 }
 
-/// A fake factory for creating [FakeCatalystPublicKey] instances.
 class FakeCatalystPublicKeyFactory extends Fake implements CatalystPublicKeyFactory {
   @override
   CatalystPublicKey create(Uint8List bytes) {
@@ -87,18 +70,13 @@ class FakeCatalystPublicKeyFactory extends Fake implements CatalystPublicKeyFact
   }
 }
 
-/// A fake implementation of [CatalystSignature] for testing.
-///
-/// This fake uses the provided bytes for the signature representation.
 class FakeCatalystSignature extends Fake implements CatalystSignature {
   @override
   final Uint8List bytes;
 
-  /// Creates a fake signature with the given [bytes].
   FakeCatalystSignature({required this.bytes});
 }
 
-/// A fake factory for creating [FakeCatalystSignature] instances.
 class FakeCatalystSignatureFactory extends Fake implements CatalystSignatureFactory {
   @override
   CatalystSignature create(Uint8List bytes) {

@@ -1,31 +1,13 @@
-/// Fake implementations of Bip32Ed25519 cryptographic interfaces for testing.
-///
-/// These fakes provide simple, predictable implementations that can be used
-/// across all test suites without duplicating code.
-library;
-
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:cbor/cbor.dart';
 import 'package:mocktail/mocktail.dart';
 
-/// A fake implementation of [Bip32Ed25519XPrivateKey] for testing.
-///
-/// This fake returns predictable signatures based on the message being signed.
-/// The signature is constructed from the first 32 bytes of the message
-/// followed by 32 zero bytes.
-///
-/// If [customSignature] is provided, it will always return that signature
-/// instead of generating one based on the message.
 class FakeBip32Ed25519XPrivateKey extends Fake implements Bip32Ed25519XPrivateKey {
   @override
   final List<int> bytes;
 
-  /// Optional custom signature to return from [sign] method.
   final Bip32Ed25519XSignature? customSignature;
 
-  /// Creates a fake private key with the given [bytes].
-  ///
-  /// If [customSignature] is provided, [sign] will always return that signature.
   FakeBip32Ed25519XPrivateKey(this.bytes, {this.customSignature});
 
   @override
@@ -40,22 +22,21 @@ class FakeBip32Ed25519XPrivateKey extends Fake implements Bip32Ed25519XPrivateKe
   }
 
   @override
+  Future<R> use<R>(
+    Future<R> Function(Bip32Ed25519XPrivateKey key) callback,
+  ) async {
+    return callback(this);
+  }
+
+  @override
   Future<bool> verify(
     List<int> message, {
     required Bip32Ed25519XSignature signature,
   }) async {
     return true;
   }
-
-  @override
-  Future<R> use<R>(
-    Future<R> Function(Bip32Ed25519XPrivateKey key) callback,
-  ) async {
-    return callback(this);
-  }
 }
 
-/// A fake factory for creating [FakeBip32Ed25519XPrivateKey] instances.
 class FakeBip32Ed25519XPrivateKeyFactory extends Bip32Ed25519XPrivateKeyFactory {
   @override
   Bip32Ed25519XPrivateKey fromBytes(List<int> bytes) {
@@ -63,14 +44,10 @@ class FakeBip32Ed25519XPrivateKeyFactory extends Bip32Ed25519XPrivateKeyFactory 
   }
 }
 
-/// A fake implementation of [Bip32Ed25519XPublicKey] for testing.
-///
-/// This fake uses the provided bytes and can convert to [Ed25519PublicKey].
 class FakeBip32Ed25519XPublicKey extends Fake implements Bip32Ed25519XPublicKey {
   @override
   final List<int> bytes;
 
-  /// Creates a fake public key with the given [bytes].
   FakeBip32Ed25519XPublicKey(this.bytes);
 
   @override
@@ -79,7 +56,6 @@ class FakeBip32Ed25519XPublicKey extends Fake implements Bip32Ed25519XPublicKey 
   );
 }
 
-/// A fake factory for creating [FakeBip32Ed25519XPublicKey] instances.
 class FakeBip32Ed25519XPublicKeyFactory extends Bip32Ed25519XPublicKeyFactory {
   @override
   Bip32Ed25519XPublicKey fromBytes(List<int> bytes) {
@@ -87,21 +63,16 @@ class FakeBip32Ed25519XPublicKeyFactory extends Bip32Ed25519XPublicKeyFactory {
   }
 }
 
-/// A fake implementation of [Bip32Ed25519XSignature] for testing.
-///
-/// This fake uses the provided bytes and can serialize to CBOR.
 class FakeBip32Ed25519XSignature extends Fake implements Bip32Ed25519XSignature {
   @override
   final List<int> bytes;
 
-  /// Creates a fake signature with the given [bytes].
   FakeBip32Ed25519XSignature(this.bytes);
 
   @override
   CborValue toCbor() => CborBytes(bytes);
 }
 
-/// A fake factory for creating [FakeBip32Ed25519XSignature] instances.
 class FakeBip32Ed25519XSignatureFactory extends Bip32Ed25519XSignatureFactory {
   @override
   Bip32Ed25519XSignature fromBytes(List<int> bytes) {
