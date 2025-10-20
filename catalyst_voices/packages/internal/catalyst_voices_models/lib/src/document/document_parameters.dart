@@ -8,6 +8,10 @@ final class DocumentParameters extends Equatable {
 
   const DocumentParameters([this.set = const {}]);
 
+  bool get isEmpty => set.isEmpty;
+
+  bool get isNotEmpty => set.isNotEmpty;
+
   @override
   List<Object?> get props => [set];
 

@@ -27,13 +27,13 @@ void main() {
           id: const CoseUuid(uuidV7),
           ver: const CoseUuid(uuidV7),
           ref: CoseDocumentRefs([
-            CoseDocumentRef.backwardCompatible(documentId: const CoseUuid(uuidV7)),
+            CoseDocumentRef.optional(documentId: const CoseUuid(uuidV7)),
           ]),
           template: CoseDocumentRefs([
-            CoseDocumentRef.backwardCompatible(documentId: const CoseUuid(uuidV7)),
+            CoseDocumentRef.optional(documentId: const CoseUuid(uuidV7)),
           ]),
           reply: CoseDocumentRefs([
-            CoseDocumentRef.backwardCompatible(documentId: const CoseUuid(uuidV7)),
+            CoseDocumentRef.optional(documentId: const CoseUuid(uuidV7)),
           ]),
           section: 'section_name',
           collaborators: const ['test@domain.com'],

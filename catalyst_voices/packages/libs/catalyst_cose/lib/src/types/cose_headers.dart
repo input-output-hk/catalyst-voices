@@ -247,6 +247,7 @@ final class CoseHeaders extends Equatable {
     }
   }
 
+  /// v0.0.1 -> v0.0.4 spec: https://github.com/input-output-hk/catalyst-libs/pull/341/files#diff-2827956d681587dfd09dc733aca731165ff44812f8322792bf6c4a61cf2d3b85
   static CborMap _migrateCbor1(CborMap map) {
     final parametersKeys = [
       CoseHeaderKeys.brandId,
@@ -261,8 +262,10 @@ final class CoseHeaders extends Equatable {
       final parameters = <CoseDocumentRef>[];
 
       for (final key in parametersKeys) {
-        final value = modified.remove(key)!;
-        parameters.add(CoseDocumentRef.fromCbor(value));
+        final value = modified.remove(key);
+        if (value != null) {
+          parameters.add(CoseDocumentRef.fromCbor(value));
+        }
       }
 
       modified[CoseHeaderKeys.parameters] = CoseDocumentRefs(parameters).toCbor();

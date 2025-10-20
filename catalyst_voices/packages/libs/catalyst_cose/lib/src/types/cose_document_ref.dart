@@ -48,21 +48,21 @@ final class CoseDocumentRef extends Equatable {
   /// Where a document can be located, must be a unique identifier.
   final CoseDocumentLocator documentLocator;
 
-  /// A constructor for [CoseDocumentRef] which assigns default, backward compatible values.
-  CoseDocumentRef.backwardCompatible({
+  /// A latest spec version of the [CoseDocumentRef] constructor.
+  const CoseDocumentRef({
     required CoseUuid documentId,
-    CoseUuid? documentVer,
-    CoseDocumentLocator? documentLocator,
+    required CoseUuid documentVer,
+    required CoseDocumentLocator documentLocator,
   }) : this._(
          documentId: documentId,
-         documentVer: documentVer ?? documentId,
-         documentLocator: documentLocator ?? CoseDocumentLocator.fallback(),
+         documentVer: documentVer,
+         documentLocator: documentLocator,
        );
 
   /// Deserializes the type from cbor.
   factory CoseDocumentRef.fromCbor(CborValue value) {
     if (value is! CborList) {
-      return CoseDocumentRef.backwardCompatible(
+      return CoseDocumentRef.optional(
         documentId: CoseUuid.fromCbor(value),
       );
     } else {
@@ -70,7 +70,7 @@ final class CoseDocumentRef extends Equatable {
       final documentVer = value.elementAtOrNull(1);
       final documentLocator = value.elementAtOrNull(2);
 
-      return CoseDocumentRef.backwardCompatible(
+      return CoseDocumentRef.optional(
         documentId: CoseUuid.fromCbor(documentId),
         documentVer: documentVer != null ? CoseUuid.fromCbor(documentVer) : null,
         documentLocator: documentLocator != null
@@ -80,15 +80,15 @@ final class CoseDocumentRef extends Equatable {
     }
   }
 
-  /// A latest spec version of the [CoseDocumentRef] constructor.
-  const CoseDocumentRef.latestSpec({
+  /// A constructor for [CoseDocumentRef] which assigns default, backward compatible values.
+  CoseDocumentRef.optional({
     required CoseUuid documentId,
-    required CoseUuid documentVer,
-    required CoseDocumentLocator documentLocator,
+    CoseUuid? documentVer,
+    CoseDocumentLocator? documentLocator,
   }) : this._(
          documentId: documentId,
-         documentVer: documentVer,
-         documentLocator: documentLocator,
+         documentVer: documentVer ?? documentId,
+         documentLocator: documentLocator ?? CoseDocumentLocator.fallback(),
        );
 
   const CoseDocumentRef._({
@@ -139,16 +139,18 @@ final class CoseDocumentRefs extends Equatable {
     return CborList(refs.map((e) => e.toCbor()).toList());
   }
 
+  /// Pre v0.0.1 spec, the document ref was just a string representing the documentId, not documented.
   static CborValue _migrateCbor1(CborValue value) {
     if (value is CborBytes) {
       final documentId = CoseUuid.fromCbor(value);
 
-      return CoseDocumentRef.backwardCompatible(documentId: documentId).toCbor();
+      return CoseDocumentRef.optional(documentId: documentId).toCbor();
     }
 
     return value;
   }
 
+  /// v0.0.1 -> v0.0.4 spec: https://github.com/input-output-hk/catalyst-libs/pull/341/files#diff-2827956d681587dfd09dc733aca731165ff44812f8322792bf6c4a61cf2d3b85
   static CborValue _migrateCbor2(CborValue value) {
     if (value is CborList && value.firstOrNull is CborBytes) {
       final documentRef = CoseDocumentRef.fromCbor(value);

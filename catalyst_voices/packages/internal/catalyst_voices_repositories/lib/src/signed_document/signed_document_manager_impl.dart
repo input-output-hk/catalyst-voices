@@ -257,7 +257,7 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
 }
 
 extension _SignedDocumentMetadataRefExt on SignedDocumentMetadataRef {
-  CoseDocumentRef get asCose => CoseDocumentRef.backwardCompatible(
+  CoseDocumentRef get asCose => CoseDocumentRef.optional(
     documentId: id.asUuid,
     documentVer: ver.asUuid,
     documentLocator: CoseDocumentLocator.fallback(),
