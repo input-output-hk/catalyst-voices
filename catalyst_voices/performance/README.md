@@ -31,3 +31,4 @@ Be aware that number of produced documents will be higher then number of proposa
 * `STRESS_TEST_PROPOSAL_INDEX_COUNT`=1000, `STRESS_TEST_CLEAR_DB`=false
 * `STRESS_TEST_PROPOSAL_INDEX_COUNT`=2000, `STRESS_TEST_CLEAR_DB`=true
 * `STRESS_TEST_PROPOSAL_INDEX_COUNT`=2000, `STRESS_TEST_CLEAR_DB`=false
+* 
