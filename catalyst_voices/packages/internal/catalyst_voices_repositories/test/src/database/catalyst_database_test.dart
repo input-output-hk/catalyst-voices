@@ -1,7 +1,7 @@
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../utils/test_factories.dart';
 import 'connection/test_connection.dart';
 import 'drift_test_platforms.dart';
 

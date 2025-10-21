@@ -39,6 +39,8 @@ dependencies:
 dev_dependencies:
   bloc_test: ^10.0.0
   catalyst_analysis: ^3.0.0
+  catalyst_voices_dev:
+    path: ../catalyst_voices_dev
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.4

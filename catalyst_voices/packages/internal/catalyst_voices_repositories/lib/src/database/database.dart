@@ -7,6 +7,7 @@ export 'dao/proposals_dao.dart' show ProposalsDao;
 export 'model/joined_proposal_entity.dart';
 export 'table/documents.drift.dart' show DocumentEntity;
 export 'table/documents_favorite.drift.dart' show DocumentFavoriteEntity;
+export 'table/documents_metadata.dart';
 export 'table/documents_metadata.drift.dart' show DocumentMetadataEntity;
 export 'table/drafts.drift.dart' show DocumentDraftEntity;
 export 'typedefs.dart';
