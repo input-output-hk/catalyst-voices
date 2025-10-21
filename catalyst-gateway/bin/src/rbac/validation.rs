@@ -22,7 +22,9 @@ where
     match reg.previous_transaction() {
         // `Box::pin` is used here because of the future size (`clippy::large_futures` lint).
         Some(previous_txn) => {
-            Box::pin(update_chain(reg, previous_txn, is_persistent, provider)).await
+            let result = Box::pin(update_chain(reg, previous_txn, is_persistent, provider)).await;
+
+            result
         },
         None => Box::pin(start_new_chain(reg, is_persistent, provider)).await,
     }

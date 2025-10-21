@@ -13,7 +13,7 @@ use std::{
 
 use anyhow::{Context, Result};
 use cardano_chain_follower::{hashes::TransactionId, MultiEraBlock, Slot, TxnIndex};
-use rbac_registration::cardano::cip509::Cip509;
+use rbac_registration::{cardano::cip509::Cip509, registration::cardano::validation::RbacValidationError};
 use scylla::client::session::Session;
 use tokio::sync::watch;
 use tracing::{debug, error};
@@ -25,8 +25,7 @@ use crate::{
     },
     metrics::caches::rbac::{inc_index_sync, inc_invalid_rbac_reg_count},
     rbac::{
-        validate_rbac_registration, RbacBlockIndexingContext, RbacValidationError,
-        RbacValidationSuccess,
+        validate_rbac_registration, RbacBlockIndexingContext,
     },
     settings::cassandra_db::EnvVars,
 };
@@ -134,13 +133,13 @@ impl Rbac509InsertQuery {
             // Write updates to the database. There can be multiple updates in one registration
             // because a new chain can take ownership of stake addresses of the existing chains and
             // in that case we want to record changes to all those chains as well as the new one.
-            Ok(RbacValidationSuccess {
-                catalyst_id,
-                stake_addresses,
-                public_keys,
-                modified_chains,
-                purpose,
-            }) => {
+            Ok(cip509) => {
+                let catalyst_id = cip509.catalyst_id().context("Cip509 error: cannot read Catalyst ID")?;
+                let stake_addresses = cip509.stake_addresses().clone();
+                let public_keys = cip509.public_keys().clone();
+                let modified_chains = cip509.modified_chains().clone();
+                let purpose = cip509.purpose();
+
                 // Record the transaction identifier (hash) of a new registration.
                 self.catalyst_id_for_txn_id
                     .push(insert_catalyst_id_for_txn_id::Params::new(
@@ -171,7 +170,7 @@ impl Rbac509InsertQuery {
                 }
                 // Update the chain this registration belongs to.
                 self.registrations.push(insert_rbac509::Params::new(
-                    catalyst_id,
+                    catalyst_id.clone(),
                     txn_hash,
                     slot,
                     index,
