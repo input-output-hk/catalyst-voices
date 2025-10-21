@@ -9,7 +9,6 @@ import 'package:catalyst_voices/pages/workspace/page/workspace_loading.dart';
 import 'package:catalyst_voices/pages/workspace/page/workspace_user_proposals.dart';
 import 'package:catalyst_voices/pages/workspace/submission_closing_warning_dialog.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
-import 'package:catalyst_voices/widgets/banner/widgets/email_need_verification_banner.dart';
 import 'package:catalyst_voices/widgets/snackbar/common_snackbars.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
@@ -34,25 +33,20 @@ class _WorkspacePageState extends State<WorkspacePage>
     return const ProposalSubmissionPhaseAware(
       activeChild: Scaffold(
         body: WorkspaceLoadingSelector(
-          child: Stack(
-            children: [
-              SingleChildScrollView(
-                child: Column(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(height: 10),
+                WorkspaceHeader(),
+                Stack(
                   children: [
-                    SizedBox(height: 10),
-                    WorkspaceHeader(),
-                    Stack(
-                      children: [
-                        WorkspaceErrorSelector(),
-                        WorkspaceUserProposalsSelector(),
-                      ],
-                    ),
-                    SizedBox(height: 50),
+                    WorkspaceErrorSelector(),
+                    WorkspaceUserProposalsSelector(),
                   ],
                 ),
-              ),
-              EmailNeedVerificationBanner(),
-            ],
+                SizedBox(height: 50),
+              ],
+            ),
           ),
         ),
       ),

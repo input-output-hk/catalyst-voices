@@ -1,3 +1,6 @@
+import 'package:catalyst_voices/common/signal_handler.dart';
+import 'package:catalyst_voices/notification/catalyst_messenger.dart';
+import 'package:catalyst_voices/notification/specialized/account_needs_verification_banner.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
@@ -21,16 +24,33 @@ class GlobalSessionListener extends StatefulWidget {
   State<GlobalSessionListener> createState() => _GlobalSessionListenerState();
 }
 
-class _GlobalSessionListenerState extends State<GlobalSessionListener> {
+class _GlobalSessionListenerState extends State<GlobalSessionListener>
+    with SignalHandlerStateMixin<SessionCubit, SessionSignal, GlobalSessionListener> {
   String? _lastLocation;
 
   @override
   Widget build(BuildContext context) {
+    // TODO(damian-molinski): refactor it to use signals
     return BlocListener<SessionCubit, SessionState>(
       listenWhen: _listenToSessionChangesWhen,
       listener: _onSessionChanged,
       child: widget.child,
     );
+  }
+
+  @override
+  void handleSignal(SessionSignal signal) {
+    switch (signal) {
+      case AccountNeedsVerificationSignal(:final isProposer):
+        final notification = isProposer
+            ? AccountProposerNeedsVerificationBanner()
+            : AccountContributorNeedsVerificationBanner();
+        CatalystMessenger.of(context).add(notification);
+      case CancelAccountNeedsVerificationSignal():
+        CatalystMessenger.of(
+          context,
+        ).cancelWhere((notification) => notification is AccountNeedsVerificationBanner);
+    }
   }
 
   bool _listenToSessionChangesWhen(SessionState prev, SessionState next) {

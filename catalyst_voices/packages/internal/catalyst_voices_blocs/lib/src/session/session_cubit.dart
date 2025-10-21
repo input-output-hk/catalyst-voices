@@ -18,7 +18,8 @@ set alwaysAllowRegistration(bool newValue) {
 }
 
 /// Manages the user session and provides access to the user settings, account, and admin tools.
-final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin {
+final class SessionCubit extends Cubit<SessionState>
+    with BlocErrorEmitterMixin, BlocSignalEmitterMixin<SessionSignal, SessionState> {
   final UserService _userService;
   final RegistrationService _registrationService;
   final RegistrationProgressNotifier _registrationProgressNotifier;
@@ -222,6 +223,22 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
     );
   }
 
+  // TODO(damian-molinski): Refactor active account stream so it emits null when account
+  // keychain is locked.
+  void _emitAccountBasedSignal() {
+    final account = _account;
+
+    if (account == null || !account.keychain.lastIsUnlocked) {
+      emitSignal(const CancelAccountNeedsVerificationSignal());
+      return;
+    }
+
+    if (account.email != null && !account.publicStatus.isVerified) {
+      final isProposer = account.hasRole(AccountRole.proposer);
+      emitSignal(AccountNeedsVerificationSignal(isProposer: isProposer));
+    }
+  }
+
   Future<Account> _getDummyAccount() async {
     final dummyAccount = _userService.user.accounts.firstWhereOrNull((e) => e.isDummy);
 
@@ -239,12 +256,14 @@ final class SessionCubit extends Cubit<SessionState> with BlocErrorEmitterMixin 
 
     _account = account;
 
+    _emitAccountBasedSignal();
     _updateState();
   }
 
   void _onActiveKeychainUnlockChanged(bool isUnlocked) {
     _logger.fine('Keychain unlock changed [$isUnlocked]');
 
+    _emitAccountBasedSignal();
     _updateState();
   }
 
