@@ -50,6 +50,7 @@ void main() {
     });
   });
 }
+
 class _FakeCatalystKeyDerivation extends Fake implements CatalystKeyDerivation {
   @override
   Future<Bip32Ed25519XPrivateKey> deriveMasterKey({
