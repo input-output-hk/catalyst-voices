@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -13,7 +14,7 @@ void main() {
   group(AuthService, () {
     late final AuthTokenCache cache;
     late UserObserver userObserver;
-    late _FakeKeyDerivationService keyDerivationService;
+    late FakeKeyDerivationService keyDerivationService;
     late AuthTokenGenerator authTokenGenerator;
     late AuthService authService;
 
@@ -26,7 +27,7 @@ void main() {
 
     setUp(() {
       userObserver = StreamUserObserver();
-      keyDerivationService = _FakeKeyDerivationService();
+      keyDerivationService = FakeKeyDerivationService();
       authTokenGenerator = AuthTokenGenerator(keyDerivationService);
       authService = AuthService(
         cache,
@@ -44,11 +45,13 @@ void main() {
     });
 
     group('createRbacToken', () {
-      final keychain = _MockKeychain();
+      final keychain = MockKeychain();
 
       setUp(() {
         when(() => keychain.id).thenReturn('keychain_id');
-        when(keychain.getMasterKey).thenAnswer((_) async => _FakeCatalystPrivateKey(Uint8List(32)));
+        when(
+          keychain.getMasterKey,
+        ).thenAnswer((_) async => FakeCatalystPrivateKey(bytes: Uint8List(32)));
       });
 
       tearDown(() {
@@ -137,52 +140,3 @@ void main() {
     });
   });
 }
-
-class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
-  @override
-  final Uint8List bytes;
-
-  _FakeCatalystPrivateKey(this.bytes);
-
-  @override
-  void drop() {
-    // do nothing
-  }
-
-  @override
-  Future<CatalystSignature> sign(Uint8List data) async {
-    return _FakeCatalystSignature(data);
-  }
-}
-
-class _FakeCatalystPublicKey extends Fake implements CatalystPublicKey {
-  @override
-  final Uint8List bytes;
-
-  _FakeCatalystPublicKey(this.bytes);
-
-  @override
-  Uint8List get publicKeyBytes => bytes;
-}
-
-class _FakeCatalystSignature extends Fake implements CatalystSignature {
-  @override
-  final Uint8List bytes;
-
-  _FakeCatalystSignature(this.bytes);
-}
-
-class _FakeKeyDerivationService extends Fake implements KeyDerivationService {
-  @override
-  Future<CatalystKeyPair> deriveAccountRoleKeyPair({
-    required CatalystPrivateKey masterKey,
-    required AccountRole role,
-  }) async {
-    return CatalystKeyPair(
-      publicKey: _FakeCatalystPublicKey(masterKey.bytes),
-      privateKey: _FakeCatalystPrivateKey(masterKey.bytes),
-    );
-  }
-}
-
-class _MockKeychain extends Mock implements Keychain {}

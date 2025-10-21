@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
@@ -9,7 +10,6 @@ import 'package:mocktail/mocktail.dart';
 import '../../fixture/voices_document_templates.dart';
 import '../database/connection/test_connection.dart';
 import '../database/drift_test_platforms.dart';
-import '../utils/test_factories.dart';
 
 void main() {
   // this is required only by VoicesDocumentsTemplates

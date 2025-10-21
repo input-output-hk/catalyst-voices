@@ -1,10 +1,11 @@
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 void main() {
-  final CatGateway gateway = _MockedCatGateway();
-  final CatReviews reviews = _MockedCatReviews();
+  final CatGateway gateway = MockCatGateway();
+  final CatReviews reviews = MockCatReviews();
   final SignedDocumentManager signedDocumentManager = _MockedSignedDocumentManager();
 
   late final ApiServices apiServices;
@@ -53,9 +54,5 @@ void main() {
     ),
   );
 }*/
-
-class _MockedCatGateway extends Mock implements CatGateway {}
-
-class _MockedCatReviews extends Mock implements CatReviews {}
 
 class _MockedSignedDocumentManager extends Mock implements SignedDocumentManager {}

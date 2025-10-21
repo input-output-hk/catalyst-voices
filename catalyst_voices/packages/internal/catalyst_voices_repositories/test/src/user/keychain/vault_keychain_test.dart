@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/user/keychain/vault_keychain.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -21,7 +21,7 @@ void main() {
 
       final store = InMemorySharedPreferencesAsync.empty();
       SharedPreferencesAsyncPlatform.instance = store;
-      CatalystPrivateKey.factory = _FakeCatalystPrivateKeyFactory();
+      CatalystPrivateKey.factory = FakeCatalystPrivateKeyFactory();
 
       secureStorage = const FlutterSecureStorage();
       sharedPreferences = SharedPreferencesAsync();
@@ -37,7 +37,7 @@ void main() {
         id: id,
         secureStorage: secureStorage,
         sharedPreferences: sharedPreferences,
-        signer: _FakeKeychainSigner(),
+        signer: FakeKeychainSigner(),
       );
     }
 
@@ -87,19 +87,3 @@ void main() {
     });
   });
 }
-
-class _FakeCatalystPrivateKey extends Fake implements CatalystPrivateKey {
-  @override
-  final Uint8List bytes;
-
-  _FakeCatalystPrivateKey({required this.bytes});
-}
-
-class _FakeCatalystPrivateKeyFactory extends Fake implements CatalystPrivateKeyFactory {
-  @override
-  CatalystPrivateKey create(Uint8List bytes) {
-    return _FakeCatalystPrivateKey(bytes: bytes);
-  }
-}
-
-class _FakeKeychainSigner extends Fake implements KeychainSigner {}

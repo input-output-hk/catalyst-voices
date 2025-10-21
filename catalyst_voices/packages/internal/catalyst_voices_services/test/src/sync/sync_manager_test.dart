@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -9,7 +12,7 @@ import 'package:test/test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
-  final DocumentRepository documentRepository = _MockDocumentRepository();
+  final DocumentRepository documentRepository = MockDocumentRepository();
 
   late final AppMetaStorage appMetaStorage;
   late final SyncStatsStorage statsStorage;
@@ -52,5 +55,3 @@ void main() {
 }
 
 class _MockCampaignService extends Mock implements CampaignService {}
-
-class _MockDocumentRepository extends Mock implements DocumentRepository {}

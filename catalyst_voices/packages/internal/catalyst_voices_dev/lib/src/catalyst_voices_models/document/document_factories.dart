@@ -1,8 +1,7 @@
 import 'dart:math';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart' hide Document;
-import 'package:catalyst_voices_repositories/src/database/database.dart';
-import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
 abstract final class DocumentDataFactory {
@@ -76,7 +75,6 @@ abstract final class DocumentRefFactory {
   static final Random _random = Random(57342052346526);
   static var _timestamp = DateTime.now().millisecondsSinceEpoch;
 
-  /// Generates random, unique [DraftRef].
   static DraftRef draftRef() {
     return DraftRef.first(randomUuidV7());
   }
@@ -90,7 +88,6 @@ abstract final class DocumentRefFactory {
     );
   }
 
-  /// Generates random, unique [SignedDocumentRef].
   static SignedDocumentRef signedDocumentRef() {
     return SignedDocumentRef.first(randomUuidV7());
   }
@@ -99,7 +96,6 @@ abstract final class DocumentRefFactory {
     return List.generate(length, (index) => _random.nextInt(256));
   }
 
-  /// Generates a random date & time, where each method call is guaranteed to return a newer date.
   static DateTime _randomDateTime() {
     final timestamp = _timestamp;
     _timestamp++;
@@ -125,7 +121,7 @@ abstract final class DocumentWithMetadataFactory {
         DocumentMetadataFieldKey.title => DocumentMetadataFactory.build(
           ver: document.metadata.version,
           fieldKey: fieldKey,
-          // This should come from document.metadata
+
           fieldValue: 'Document[${document.metadata.version}] title',
         ),
       };
