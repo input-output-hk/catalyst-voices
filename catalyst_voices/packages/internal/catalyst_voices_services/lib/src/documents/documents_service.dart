@@ -27,10 +27,10 @@ abstract interface class DocumentsService {
   /// Syncs locally stored documents with api.
   ///
   /// Parameters:
-  /// * [campaign] is used to sync documents only for it.
+  /// * [campaign] - used to sync documents only for it.
   /// * [onProgress] - emits from 0.0 to 1.0.
-  /// * [maxConcurrent] - requests made at same time inside one batch
-  /// * [batchSize] - how many documents per one batch
+  /// * [maxConcurrent] - number of concurrent requests made at same time inside one batch.
+  /// * [batchSize] - how many documents to request from the index in a single page.
   ///
   /// Returns [DocumentsSyncResult] with count of new and failed refs.
   Future<DocumentsSyncResult> sync({
@@ -73,78 +73,69 @@ final class DocumentsServiceImpl implements DocumentsService {
     var syncResult = const DocumentsSyncResult();
     final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toSet().toList();
 
-    // Later we'll change this list to include all templates,
+    // The sync process is ordered. Templates are synced first as other documents
+    // may depend on them.
     final syncOrder = <DocumentType>[
       DocumentType.proposalTemplate,
       DocumentType.commentTemplate,
     ];
-    // +1 because i want last element to be null. Meaning index remaining types.
-    final syncIterationsCount = syncOrder.length + 1;
-    final progressPerIteration = 1 / syncIterationsCount;
-    var completedIterations = 0;
+
+    // We perform one pass for each type in syncOrder, plus one final pass
+    // for all remaining document types (when documentType is null).
+    final totalSyncSteps = syncOrder.length + 1;
+    final progressPerStep = 1 / totalSyncSteps;
+    var completedSteps = 0;
 
     final pool = Pool(maxConcurrent);
     onProgress?.call(0);
 
-    /// Synchronizing documents is done in certain order, according to [syncOrder]
-    /// because some are more important then others and should be here first, like templates.
-    /// Most of other docs refs to them.
-    ///
-    /// Doing it using such loop allows us to now have to query all cached documents for
-    /// checking if something is cached or not.
-    for (var i = 0; i < syncIterationsCount; i++) {
-      final documentType = syncOrder.elementAtOrNull(i);
-      final filters = DocumentIndexFilters(
-        type: documentType,
-        categoriesIds: categoriesIds,
-      );
+    try {
+      /// Synchronizing documents is done in certain order, according to [syncOrder]
+      /// because some are more important then others and should be here first, like templates.
+      /// Most of other docs refs to them.
+      ///
+      /// Doing it using such loop allows us to now have to query all cached documents for
+      /// checking if something is cached or not.
+      for (var stepIndex = 0; stepIndex < totalSyncSteps; stepIndex++) {
+        final baseProgress = completedSteps * progressPerStep;
 
-      final result = await _sync(
-        pool: pool,
-        batchSize: batchSize,
-        filters: filters,
-        exclude: {
-          // categories are not documents at the moment.
-          DocumentBaseType.category,
-        },
-        excludeIds: {
-          // this should not be needed. Remove it later when categories are documents too
-          // and we have no more const refs.
-          ...categoriesIds,
-          ...syncOrder
-              .where((element) => element != documentType)
-              .map(
-                (excludedType) {
-                  return allConstantDocumentRefs
-                      .map(
-                        (constRefs) {
-                          return constRefs
-                              .asMap()
-                              .entries
-                              .where((constRef) => constRef.key == excludedType)
-                              .map((constRef) => constRef.value);
-                        },
-                      )
-                      .expand((element) => element);
+        // In the final pass, `documentType` will be null, which signals _sync
+        // to handle all remaining documents not covered by the explicit syncOrder.
+        final documentType = syncOrder.elementAtOrNull(stepIndex);
+        final filters = DocumentIndexFilters(
+          type: documentType,
+          categoriesIds: categoriesIds,
+        );
+
+        final result = await _sync(
+          pool: pool,
+          batchSize: batchSize,
+          filters: filters,
+          exclude: {
+            // categories are not documents at the moment.
+            DocumentBaseType.category,
+          },
+          excludeIds: _syncExcludeIds(
+            syncOrder,
+            documentType: documentType,
+            // this should not be needed. Remove it later when categories are documents too
+            // and we have no more const refs.
+            additional: categoriesIds,
+          ),
+          onProgress: onProgress == null
+              ? null
+              : (value) {
+                  final currentIterationProgress = value * progressPerStep;
+                  onProgress(baseProgress + currentIterationProgress);
                 },
-              )
-              .expand((element) => element.map((e) => e.id)),
-        },
-        onProgress: (value) {
-          if (onProgress == null) {
-            return;
-          }
+        );
 
-          /// Each iteration progress is counted equally
-          final prevProgress = completedIterations * progressPerIteration;
-          final curProgress = value * progressPerIteration;
-          final progress = prevProgress + curProgress;
-          onProgress.call(progress);
-        },
-      );
-
-      completedIterations++;
-      syncResult += result;
+        completedSteps++;
+        syncResult += result;
+      }
+    } finally {
+      await pool.close();
+      _logger.finer('Sync pool closed.');
     }
 
     onProgress?.call(1);
@@ -157,6 +148,23 @@ final class DocumentsServiceImpl implements DocumentsService {
     return _documentRepository.watchCount();
   }
 
+  /// Performs a paginated sync of documents based on the provided filters.
+  ///
+  /// This method iterates through pages of a document index, fetches the
+  /// necessary documents, and saves them to the local repository. It is designed
+  /// to handle large sets of documents by processing them in batches.
+  ///
+  /// - [pool]: A [Pool] to manage concurrent document fetching.
+  /// - [batchSize]: The number of documents to request from the index in a
+  ///   single page.
+  /// - [filters]: [DocumentIndexFilters] to apply when querying the index.
+  /// - [exclude]: A set of [DocumentBaseType]s to exclude from the sync.
+  /// - [excludeIds]: A set of document IDs to explicitly exclude from the sync.
+  /// - [onProgress]: An optional callback that reports the progress of the sync
+  ///   operation as a value between 0.0 and 1.0.
+  ///
+  /// Returns a [DocumentsSyncResult] summarizing the number of new and failed
+  /// documents synced during the operation.
   Future<DocumentsSyncResult> _sync({
     required Pool pool,
     required int batchSize,
@@ -167,8 +175,7 @@ final class DocumentsServiceImpl implements DocumentsService {
   }) async {
     var page = 0;
     var remaining = 0;
-    var newDocumentsCount = 0;
-    var failedDocumentsCount = 0;
+    var result = const DocumentsSyncResult();
 
     onProgress?.call(0);
 
@@ -179,51 +186,11 @@ final class DocumentsServiceImpl implements DocumentsService {
         filters: filters,
       );
 
-      final refs = await index.docs
-          .map((e) => e.refs(exclude: exclude))
-          .expand((refs) => refs)
-          .where((ref) => !excludeIds.contains(ref.id))
-          .toSet()
-          .map((ref) {
-            return _documentRepository
-                .isCached(ref: ref)
-                .onError((_, _) => false)
-                .then((value) => value ? null : ref);
-          })
-          .wait
-          .then((refs) => refs.nonNulls.toList());
+      final refs = await _syncFilterRefs(index, exclude, excludeIds);
+      final results = await _syncGetDocuments(refs, pool);
+      final syncResults = await _syncSaveBatchResults(results);
 
-      final futures = refs.map(
-        (ref) {
-          /// Its possible that missingRefs can be very large
-          /// and executing too many requests at once throws
-          /// net::ERR_INSUFFICIENT_RESOURCES in chrome.
-          /// That's reason for adding pool and limiting max requests.
-          return pool.withResource(() {
-            return _documentRepository
-                .getDocumentData(ref: ref, useCache: false)
-                .then<Result<DocumentData, RefSyncException>>(Success.new)
-                /// Handling errors as Outcome because we have to
-                /// give a chance to all refs to finish and keep all info about what
-                /// failed.
-                .onError((error, stack) {
-                  return Failure(RefSyncException(ref, source: error));
-                });
-          });
-        },
-      );
-
-      final results = await Future.wait(futures);
-
-      final documents = results
-          .where((element) => element.isSuccess)
-          .map((e) => e.success)
-          .toList();
-
-      await _documentRepository.saveDocumentBulk(documents);
-
-      newDocumentsCount += documents.length;
-      failedDocumentsCount += results.where((element) => element.isFailure).length;
+      result += syncResults;
 
       if (onProgress != null) {
         final completed = (page * index.page.limit) + index.docs.length;
@@ -239,9 +206,120 @@ final class DocumentsServiceImpl implements DocumentsService {
 
     onProgress?.call(1);
 
+    return result;
+  }
+
+  /// Determines which document IDs to exclude from a sync operation based on the
+  /// sync order and the current document type being processed.
+  ///
+  /// When syncing documents in a specific order (e.g., templates first), this
+  /// method helps to exclude documents of types that are not yet supposed to be
+  /// synced. This is particularly useful for excluding constant document
+  /// references (like templates for proposals or comments) until it is their
+  /// turn to be synced according to the [syncOrder].
+  ///
+  /// - [syncOrder]: The list defining the priority order for syncing document types.
+  /// - [documentType]: The [DocumentType] currently being synced. If null, no
+  ///   types from the `syncOrder` are excluded.
+  /// - [additional]: A list of extra document IDs to add to the exclusion set.
+  ///
+  /// Returns a [Set] of document IDs that should be skipped in the current sync pass.
+  Set<String> _syncExcludeIds(
+    List<DocumentType> syncOrder, {
+    DocumentType? documentType,
+    List<String> additional = const [],
+  }) {
+    final excludedDocumentTypes = syncOrder.where((type) => type != documentType).toSet();
+    final excludedConstIds = allConstantDocumentRefs
+        .expand((element) => element.asMap().entries)
+        .where((entry) => excludedDocumentTypes.contains(entry.key))
+        .map((entry) => entry.value.id);
+
+    return {
+      ...additional,
+      ...excludedConstIds,
+    };
+  }
+
+  /// Takes a [DocumentIndex], extracts all document references from it,
+  /// filters out any references that are already cached locally, and returns
+  /// the list of non-cached [SignedDocumentRef]s.
+  ///
+  /// This is used to identify which documents need to be fetched from the
+  /// remote repository during a sync operation.
+  ///
+  /// The [exclude] and [excludeIds] sets are used to further filter out
+  /// references that should not be considered for syncing.
+  Future<List<SignedDocumentRef>> _syncFilterRefs(
+    DocumentIndex index,
+    Set<DocumentBaseType> exclude,
+    Set<String> excludeIds,
+  ) {
+    return index.docs
+        .map((e) => e.refs(exclude: exclude))
+        .expand((refs) => refs)
+        .where((ref) => !excludeIds.contains(ref.id))
+        .toSet()
+        .map((ref) {
+          return _documentRepository
+              .isCached(ref: ref)
+              .onError((_, _) => false)
+              .then((value) => value ? null : ref);
+        })
+        .wait
+        .then((refs) => refs.nonNulls.toList());
+  }
+
+  /// Fetches the [DocumentData] for a list of [SignedDocumentRef]s concurrently.
+  ///
+  /// This method takes a list of document references and uses a [Pool] to manage
+  /// the concurrency of network requests, preventing resource exhaustion issues
+  /// like `net::ERR_INSUFFICIENT_RESOURCES` in browsers when fetching a large
+  /// number of documents simultaneously.
+  ///
+  /// Each fetch operation is wrapped in a [Result] type. This ensures that even
+  /// if some requests fail, the overall process completes, and a list of all
+  /// successes and failures can be returned for further processing.
+  Future<List<Result<DocumentData, RefSyncException>>> _syncGetDocuments(
+    List<SignedDocumentRef> refs,
+    Pool pool,
+  ) {
+    return refs.map(
+      (ref) {
+        return pool.withResource(() {
+          return _documentRepository
+              .getDocumentData(ref: ref, useCache: false)
+              .then<Result<DocumentData, RefSyncException>>(Success.new)
+              .onError((error, stack) {
+                return Failure(RefSyncException(ref, source: error));
+              });
+        });
+      },
+    ).wait;
+  }
+
+  /// Processes the results of fetching a batch of documents, saves the
+  /// successful ones to the local repository, and returns a summary of the
+  /// operation.
+  ///
+  /// This method takes a list of [Result] objects, where each object
+  /// represents either a successfully fetched [DocumentData] or a
+  /// [RefSyncException] for a failed fetch.
+  ///
+  /// It separates the successful fetches from the failures, saves all the
+  /// successful documents in a single bulk operation, and then returns a
+  /// [DocumentsSyncResult] that tallies the number of new and failed documents.
+  Future<DocumentsSyncResult> _syncSaveBatchResults(
+    List<Result<DocumentData, RefSyncException>> results,
+  ) async {
+    final documents = results.where((element) => element.isSuccess).map((e) => e.success).toList();
+    final failures = results.where((element) => element.isFailure);
+
+    await _documentRepository.saveDocumentBulk(documents);
+
     return DocumentsSyncResult(
-      newDocumentsCount: newDocumentsCount,
-      failedDocumentsCount: failedDocumentsCount,
+      newDocumentsCount: documents.length,
+      failedDocumentsCount: failures.length,
     );
   }
 }
