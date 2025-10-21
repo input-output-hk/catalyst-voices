@@ -204,7 +204,7 @@ final class DocumentsServiceImpl implements DocumentsService {
                 .getDocumentData(ref: ref, useCache: false)
                 .then<Result<DocumentData, RefSyncException>>(Success.new)
                 /// Handling errors as Outcome because we have to
-                /// give a change to all refs to finish and keep all info about what
+                /// give a chance to all refs to finish and keep all info about what
                 /// failed.
                 .onError((error, stack) {
                   return Failure(RefSyncException(ref, source: error));
@@ -224,8 +224,6 @@ final class DocumentsServiceImpl implements DocumentsService {
 
       newDocumentsCount += documents.length;
       failedDocumentsCount += results.where((element) => element.isFailure).length;
-
-      // Pages star from 0
 
       if (onProgress != null) {
         final completed = (page * index.page.limit) + index.docs.length;
