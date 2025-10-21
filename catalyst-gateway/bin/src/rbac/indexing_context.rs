@@ -5,6 +5,7 @@ use std::collections::{HashMap, HashSet};
 use cardano_chain_follower::{hashes::TransactionId, Slot, StakeAddress, TxnIndex};
 use catalyst_types::catalyst_id::CatalystId;
 use ed25519_dalek::VerifyingKey;
+use rbac_registration::providers::RbacRegistrationProvider;
 
 use crate::db::index::queries::rbac::get_rbac_registrations::Query as RbacQuery;
 
@@ -158,5 +159,47 @@ impl RbacBlockIndexingContext {
         id: &CatalystId,
     ) -> Option<&[RbacQuery]> {
         self.registrations.get(id).map(Vec::as_slice)
+    }
+}
+
+impl RbacRegistrationProvider for RbacBlockIndexingContext {
+    async fn chain(
+            &self,
+            id: CatalystId,
+            is_persistent: bool,
+        ) -> anyhow::Result<Option<rbac_registration::registration::cardano::RegistrationChain>> {
+        unimplemented!()
+    }
+
+    async fn catalyst_id_from_txn_id(
+            &self,
+            txn_id: TransactionId,
+            is_persistent: bool,
+        ) -> anyhow::Result<Option<CatalystId>> {
+        unimplemented!()
+    }
+
+    async fn catalyst_id_from_stake_address(
+            &self,
+            address: &StakeAddress,
+            is_persistent: bool,
+        ) -> anyhow::Result<Option<CatalystId>> {
+        unimplemented!()
+    }
+
+    async fn catalyst_id_from_public_key(
+            &self,
+            key: VerifyingKey,
+            is_persistent: bool,
+        ) -> anyhow::Result<Option<CatalystId>> {
+        unimplemented!()
+    }
+
+    async fn is_chain_known(
+            &self,
+            id: CatalystId,
+            is_persistent: bool,
+        ) -> anyhow::Result<bool> {
+        unimplemented!()
     }
 }
