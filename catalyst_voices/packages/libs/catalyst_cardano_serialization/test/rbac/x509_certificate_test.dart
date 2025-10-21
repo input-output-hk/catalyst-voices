@@ -1,16 +1,16 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart' hide Ed25519PublicKey;
-import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group(X509Certificate, () {
-    final signature = FakeBip32Ed25519XSignature([4, 5, 6]);
-    final privateKey = FakeBip32Ed25519XPrivateKey([], customSignature: signature);
+    final signature = _FakeBip32Ed25519XSignature();
+    final privateKey = _FakeBip32Ed25519XPrivateKey(signature: signature);
     final publicKey = Ed25519PublicKey.seeded(0);
 
     setUpAll(() {
-      Bip32Ed25519XPublicKeyFactory.instance = FakeBip32Ed25519XPublicKeyFactory();
+      Bip32Ed25519XPublicKeyFactory.instance = _FakeBip32Ed25519XPublicKeyFactory();
     });
 
     /* cSpell:disable */
@@ -65,4 +65,41 @@ void main() {
       expect(decodedCertificate, equals(decodedCertificate));
     });
   });
+}
+
+class _FakeBip32Ed25519XPrivateKey extends Fake implements Bip32Ed25519XPrivateKey {
+  final Bip32Ed25519XSignature signature;
+
+  _FakeBip32Ed25519XPrivateKey({required this.signature});
+
+  @override
+  Future<Bip32Ed25519XSignature> sign(List<int> message) async {
+    return signature;
+  }
+}
+
+class _FakeBip32Ed25519XPublicKey extends Fake implements Bip32Ed25519XPublicKey {
+  @override
+  List<int> get bytes => [1, 2, 3];
+
+  @override
+  int get hashCode => bytes.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other is Bip32Ed25519XPublicKey &&
+        const DeepCollectionEquality().equals(bytes, other.bytes);
+  }
+}
+
+class _FakeBip32Ed25519XPublicKeyFactory extends Fake implements Bip32Ed25519XPublicKeyFactory {
+  @override
+  Bip32Ed25519XPublicKey fromBytes(List<int> bytes) {
+    return _FakeBip32Ed25519XPublicKey();
+  }
+}
+
+class _FakeBip32Ed25519XSignature extends Fake implements Bip32Ed25519XSignature {
+  @override
+  List<int> get bytes => [4, 5, 6];
 }
