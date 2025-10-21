@@ -62,6 +62,8 @@ class _AnimatedProgressSection extends StatelessWidget {
       opacity: showProgressBar ? 1.0 : 0.0,
       duration: const Duration(milliseconds: 300),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
+        spacing: 16,
         children: [
           Text(
             message,
@@ -70,7 +72,6 @@ class _AnimatedProgressSection extends StatelessWidget {
               fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 16),
           SizedBox(
             width: 360,
             child: AnimatedVoicesLinearProgressIndicator(
@@ -110,7 +111,7 @@ class _AppSplashScreenManagerState extends State<AppSplashScreenManager>
 
     // Throttle progress updates to reduce rebuilds
     final throttledStream = _syncManager.progressStream.distinct((prev, curr) {
-      if (prev == 0 || curr == 1.0) return false;
+      if (prev <= 0 || curr >= 1.0) return false;
 
       return (curr - prev).abs() < 0.008; // ~0.8% minimum change
     });
