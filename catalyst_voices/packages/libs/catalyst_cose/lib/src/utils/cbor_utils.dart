@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:catalyst_cose/src/types/cose_custom_types.dart';
 import 'package:catalyst_cose/src/types/cose_document_ref.dart';
 import 'package:catalyst_cose/src/types/cose_string_or_int.dart';
 import 'package:catalyst_cose/src/types/cose_uuid.dart';
@@ -38,6 +39,29 @@ final class CborUtils {
     return CoseDocumentRefs.fromCbor(value);
   }
 
+  /// Deserializes optional [CatalystIdKid] type.
+  static CatalystIdKid? deserializeKid(CborValue? value) {
+    if (value == null) {
+      return null;
+    }
+
+    if (value is CborString) {
+      return CatalystIdKid(utf8.encode(value.toString()));
+    }
+
+    return CatalystIdKid.fromCbor(value);
+  }
+
+  /// Deserializes optional `List<String>` type.
+  static List<CatalystIdKid>? deserializeKidList(CborValue? value) {
+    if (value == null) {
+      return null;
+    }
+
+    final list = value as CborList;
+    return list.map(deserializeKid).nonNulls.toList().cast<CatalystIdKid>();
+  }
+
   /// Deserializes optional [String] type.
   static String? deserializeString(CborValue? value) {
     if (value == null) {
@@ -73,6 +97,17 @@ final class CborUtils {
     }
 
     return CoseUuid.fromCbor(value);
+  }
+
+/// Serializes optional `List<CatalystIdKid>` type.
+  static CborValue serializeKidList(List<CatalystIdKid>? values) {
+    if (values == null) {
+      return const CborNull();
+    }
+
+    return CborList([
+      for (final value in values) value.toCbor(),
+    ]);
   }
 
   /// Serializes optional `List<String>` type.

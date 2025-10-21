@@ -1,6 +1,5 @@
-import 'dart:typed_data';
-
 import 'package:catalyst_cose/src/cose_constants.dart';
+import 'package:catalyst_cose/src/types/cose_custom_types.dart';
 import 'package:catalyst_cose/src/types/cose_document_ref.dart';
 import 'package:catalyst_cose/src/types/cose_string_or_int.dart';
 import 'package:catalyst_cose/src/types/cose_uuid.dart';
@@ -29,7 +28,7 @@ final class CoseHeaders extends Equatable {
   ///
   /// Do not set the [kid] directly in the headers,
   /// it will be auto-populated with [CatalystCoseSigner.kid] value.
-  final Uint8List? kid;
+  final CatalystIdKid? kid;
 
   /// See [CoseHeaderKeys.contentType].
   final CoseStringOrInt? contentType;
@@ -61,7 +60,7 @@ final class CoseHeaders extends Equatable {
   /// See [CoseHeaderKeys.collaborators].
   ///
   /// Replaces the old [CoseHeaderKeys.collabs] key.
-  final List<String>? collaborators;
+  final List<CatalystIdKid>? collaborators;
 
   /// See [CoseHeaderKeys.parameters].
   ///
@@ -104,7 +103,7 @@ final class CoseHeaders extends Equatable {
 
     return CoseHeaders(
       alg: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.alg]),
-      kid: CborUtils.deserializeBytes(map[CoseHeaderKeys.kid]),
+      kid: CborUtils.deserializeKid(map[CoseHeaderKeys.kid]),
       contentType: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.contentType]),
       contentEncoding: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.contentEncoding]),
       type: CborUtils.deserializeUuid(map[CoseHeaderKeys.type]),
@@ -114,7 +113,7 @@ final class CoseHeaders extends Equatable {
       template: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.template]),
       reply: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.reply]),
       section: CborUtils.deserializeString(map[CoseHeaderKeys.section]),
-      collaborators: CborUtils.deserializeStringList(map[CoseHeaderKeys.collaborators]),
+      collaborators: CborUtils.deserializeKidList(map[CoseHeaderKeys.collaborators]),
       parameters: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.parameters]),
       encodeAsBytes: encodeAsBytes,
     );
@@ -175,7 +174,7 @@ final class CoseHeaders extends Equatable {
   /// Returns a copy of the [CoseHeaders] with overwritten properties.
   CoseHeaders copyWith({
     OptionalValueGetter<CoseStringOrInt?>? alg,
-    OptionalValueGetter<Uint8List?>? kid,
+    OptionalValueGetter<CatalystIdKid?>? kid,
     OptionalValueGetter<CoseStringOrInt?>? contentType,
     OptionalValueGetter<CoseStringOrInt?>? contentEncoding,
     OptionalValueGetter<CoseUuid?>? type,
@@ -185,7 +184,7 @@ final class CoseHeaders extends Equatable {
     OptionalValueGetter<CoseDocumentRefs?>? template,
     OptionalValueGetter<CoseDocumentRefs?>? reply,
     OptionalValueGetter<String?>? section,
-    OptionalValueGetter<List<String>?>? collaborators,
+    OptionalValueGetter<List<CatalystIdKid>?>? collaborators,
     OptionalValueGetter<CoseDocumentRefs?>? parameters,
     bool? encodeAsBytes,
   }) {
@@ -211,7 +210,7 @@ final class CoseHeaders extends Equatable {
   CborValue toCbor() {
     final map = CborMap({
       if (alg case final alg?) CoseHeaderKeys.alg: alg.toCbor(),
-      if (kid case final kid?) CoseHeaderKeys.kid: CborBytes(kid),
+      if (kid case final kid?) CoseHeaderKeys.kid: kid.toCbor(),
       if (contentType case final contentType?) CoseHeaderKeys.contentType: contentType.toCbor(),
       if (contentEncoding case final contentEncoding?)
         CoseHeaderKeys.contentEncoding: contentEncoding.toCbor(),
@@ -224,7 +223,7 @@ final class CoseHeaders extends Equatable {
       if (section case final section?) CoseHeaderKeys.section: CborString(section),
       if (parameters case final parameters?) CoseHeaderKeys.parameters: parameters.toCbor(),
       if (collaborators case final collaborators?)
-        CoseHeaderKeys.collaborators: CborUtils.serializeStringList(collaborators),
+        CoseHeaderKeys.collaborators: CborUtils.serializeKidList(collaborators),
     });
 
     if (encodeAsBytes) {

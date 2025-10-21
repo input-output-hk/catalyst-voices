@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:catalyst_cose/src/types/cose_custom_types.dart';
 import 'package:catalyst_cose/src/types/cose_string_or_int.dart';
 import 'package:cbor/cbor.dart';
 
@@ -12,7 +13,7 @@ abstract interface class CatalystCoseSigner {
 
   /// Returns a key identifier that typically should refer to the public key
   /// of the private key used to sign the data.
-  Future<Uint8List?> get kid;
+  Future<CatalystIdKid?> get kid;
 
   /// The [data] should be signed with a private key
   /// and the resulting signature returned as [Uint8List].
@@ -24,7 +25,7 @@ abstract interface class CatalystCoseSigner {
 abstract interface class CatalystCoseVerifier {
   /// Returns a key identifier that typically should refer to the public key
   /// of the private key used to sign the data.
-  Future<Uint8List?> get kid;
+  Future<CatalystIdKid?> get kid;
 
   /// The [signature] should be verified against
   /// a known public/private key over the [data].

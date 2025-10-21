@@ -76,7 +76,7 @@ final class SignedDocumentMetadata extends Equatable {
   ///
   /// This may be updated by the original author,
   /// or any collaborator that is given "author" privileges.
-  final List<String>? collaborators;
+  final List<CatalystId>? collaborators;
 
   /// A list of referenced parameters, like brand, campaign or category.
   final List<SignedDocumentMetadataRef> parameters;

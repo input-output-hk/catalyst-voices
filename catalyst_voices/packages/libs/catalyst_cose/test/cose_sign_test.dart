@@ -36,7 +36,7 @@ void main() {
             CoseDocumentRef.optional(documentId: const CoseUuid(uuidV7)),
           ]),
           section: 'section_name',
-          collaborators: const ['test@domain.com'],
+          collaborators: [CatalystIdKid.fromString('test@domain.com')],
         ),
         unprotectedHeaders: const CoseHeaders.unprotected(),
         signers: [signerVerifier],
@@ -97,9 +97,9 @@ final class _SignerVerifier implements CatalystCoseSigner, CatalystCoseVerifier 
   CoseStringOrInt? get alg => const CoseIntValue(CoseValues.eddsaAlg);
 
   @override
-  Future<Uint8List?> get kid async {
+  Future<CatalystIdKid?> get kid async {
     final pk = await _keyPair.extractPublicKey();
-    return Uint8List.fromList(pk.bytes);
+    return CatalystIdKid(Uint8List.fromList(pk.bytes));
   }
 
   @override

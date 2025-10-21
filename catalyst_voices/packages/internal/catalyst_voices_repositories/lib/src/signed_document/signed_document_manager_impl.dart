@@ -37,7 +37,9 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
       coseSign: coseSign,
       payload: payload,
       metadata: metadata,
-      signers: coseSign.signatures.map((e) => e.decodeCatalystId()).nonNulls.toList(),
+      signers: _CatalystIdListExt.fromCose(
+        coseSign.signatures.map((e) => e.protectedHeaders.kid).nonNulls.toList().cast(),
+      ),
     );
   }
 
@@ -93,9 +95,8 @@ final class _CatalystSigner implements CatalystCoseSigner {
   CoseStringOrInt? get alg => null;
 
   @override
-  Future<Uint8List?> get kid async {
-    final string = _catalystId.toUri().toString();
-    return utf8.encode(string);
+  Future<CatalystIdKid?> get kid async {
+    return CatalystIdKid.fromString(_catalystId.toString());
   }
 
   @override
@@ -111,9 +112,8 @@ final class _CatalystVerifier implements CatalystCoseVerifier {
   const _CatalystVerifier(this._catalystId);
 
   @override
-  Future<Uint8List?> get kid async {
-    final string = _catalystId.toUri().toString();
-    return utf8.encode(string);
+  Future<CatalystIdKid?> get kid async {
+    return CatalystIdKid.fromString(_catalystId.toString());
   }
 
   @override
@@ -162,16 +162,23 @@ final class _CoseSignedDocument with EquatableMixin implements SignedDocument {
   }
 }
 
-extension _CoseSignatureExt on CoseSignature {
-  CatalystId? decodeCatalystId() {
-    final kid = protectedHeaders.kid;
-    if (kid == null) return null;
+extension _CatalystIdExt on CatalystId {
+  CatalystIdKid get asCose => CatalystIdKid(utf8.encode(toString()));
 
-    final string = utf8.decode(kid);
+  static CatalystId? fromCose(CatalystIdKid kid) {
+    final string = utf8.decode(kid.bytes);
     final uri = Uri.tryParse(string);
     if (uri == null) return null;
 
     return CatalystId.fromUri(uri);
+  }
+}
+
+extension _CatalystIdListExt on List<CatalystId> {
+  List<CatalystIdKid> get asCose => map((e) => e.asCose).toList();
+
+  static List<CatalystId> fromCose(List<CatalystIdKid> list) {
+    return list.map(_CatalystIdExt.fromCose).nonNulls.toList();
   }
 }
 
@@ -216,7 +223,7 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
       template: template == null ? null : [template].asCose,
       reply: reply == null ? null : [reply].asCose,
       section: section,
-      collaborators: collaborators,
+      collaborators: collaborators?.asCose,
       parameters: parameters.asCose,
     );
   }
@@ -233,6 +240,7 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
     final ref = protectedHeaders.ref;
     final template = protectedHeaders.template;
     final reply = protectedHeaders.reply;
+    final collaborators = protectedHeaders.collaborators;
     final parameters = protectedHeaders.parameters;
 
     return SignedDocumentMetadata(
@@ -248,7 +256,7 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
           : _SignedDocumentMetadataRefsExt.fromCose(template).firstOrNull,
       reply: reply == null ? null : _SignedDocumentMetadataRefsExt.fromCose(reply).firstOrNull,
       section: protectedHeaders.section,
-      collaborators: protectedHeaders.collaborators,
+      collaborators: collaborators == null ? null : _CatalystIdListExt.fromCose(collaborators),
       parameters: parameters == null
           ? const []
           : _SignedDocumentMetadataRefsExt.fromCose(parameters),
