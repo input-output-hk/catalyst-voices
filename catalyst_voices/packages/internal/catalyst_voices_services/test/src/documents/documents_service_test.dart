@@ -7,6 +7,7 @@ import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
   final DocumentRepository documentRepository = _MockDocumentRepository();
+  // ignore: unused_local_variable
   late final DocumentsService service;
 
   setUpAll(() {
