@@ -5,7 +5,6 @@ import 'package:catalyst_voices_repositories/src/api/models/document_index_list.
 import 'package:catalyst_voices_repositories/src/api/models/document_index_query_filter.dart';
 import 'package:catalyst_voices_repositories/src/api/models/document_reference.dart';
 import 'package:catalyst_voices_repositories/src/api/models/eq_or_ranged_id.dart';
-import 'package:catalyst_voices_repositories/src/api/models/id_and_ver_ref.dart';
 import 'package:catalyst_voices_repositories/src/common/future_response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
 import 'package:collection/collection.dart';
@@ -116,16 +115,12 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     required int limit,
     required Campaign campaign,
   }) async {
-    final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toList();
-    final categoryFilter = categoriesIds.isNotEmpty
-        ? IdAndVerRef.idOnly(
-            EqOrRangedId.range(
-              min: categoriesIds.first,
-              max: categoriesIds.last,
-            ),
-          )
-        : null;
-    final filter = DocumentIndexQueryFilter(category: categoryFilter);
+    // TODO(bs): previously it was possible to use `inside` filter for categories.
+    // final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toList();
+    // final categoryFilter = DocumentIndexQueryFilter(
+    //   parameters: IdRefOnly(id: IdSelectorDto.inside(categoriesIds)).toJson(),
+    // );
+    const filter = DocumentIndexQueryFilter();
 
     return _api.gateway
         .documentIndex(
