@@ -35,7 +35,7 @@ void main() {
           reply: CoseDocumentRefs([
             CoseDocumentRef.optional(documentId: const CoseUuid(uuidV7)),
           ]),
-          section: 'section_name',
+          section: const SectionRef('section_name'),
           collaborators: [CatalystIdKid.fromString('test@domain.com')],
         ),
         unprotectedHeaders: const CoseHeaders.unprotected(),

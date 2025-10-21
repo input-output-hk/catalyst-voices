@@ -212,6 +212,7 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
     final ref = this.ref;
     final template = this.template;
     final reply = this.reply;
+    final section = this.section;
 
     return CoseHeaders.protected(
       contentType: contentType.asCose,
@@ -222,7 +223,7 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
       ref: ref == null ? null : [ref].asCose,
       template: template == null ? null : [template].asCose,
       reply: reply == null ? null : [reply].asCose,
-      section: section,
+      section: section == null ? null : SectionRef(section),
       collaborators: collaborators?.asCose,
       parameters: parameters.asCose,
     );
@@ -255,7 +256,7 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
           ? null
           : _SignedDocumentMetadataRefsExt.fromCose(template).firstOrNull,
       reply: reply == null ? null : _SignedDocumentMetadataRefsExt.fromCose(reply).firstOrNull,
-      section: protectedHeaders.section,
+      section: protectedHeaders.section?.text,
       collaborators: collaborators == null ? null : _CatalystIdListExt.fromCose(collaborators),
       parameters: parameters == null
           ? const []

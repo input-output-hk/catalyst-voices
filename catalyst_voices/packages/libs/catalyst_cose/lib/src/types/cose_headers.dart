@@ -55,7 +55,7 @@ final class CoseHeaders extends Equatable {
   final CoseDocumentRefs? reply;
 
   /// See [CoseHeaderKeys.section].
-  final String? section;
+  final SectionRef? section;
 
   /// See [CoseHeaderKeys.collaborators].
   ///
@@ -112,7 +112,7 @@ final class CoseHeaders extends Equatable {
       ref: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.ref]),
       template: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.template]),
       reply: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.reply]),
-      section: CborUtils.deserializeString(map[CoseHeaderKeys.section]),
+      section: CborUtils.deserializeSectionRef(map[CoseHeaderKeys.section]),
       collaborators: CborUtils.deserializeKidList(map[CoseHeaderKeys.collaborators]),
       parameters: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.parameters]),
       encodeAsBytes: encodeAsBytes,
@@ -183,7 +183,7 @@ final class CoseHeaders extends Equatable {
     OptionalValueGetter<CoseDocumentRefs?>? ref,
     OptionalValueGetter<CoseDocumentRefs?>? template,
     OptionalValueGetter<CoseDocumentRefs?>? reply,
-    OptionalValueGetter<String?>? section,
+    OptionalValueGetter<SectionRef?>? section,
     OptionalValueGetter<List<CatalystIdKid>?>? collaborators,
     OptionalValueGetter<CoseDocumentRefs?>? parameters,
     bool? encodeAsBytes,
@@ -220,7 +220,7 @@ final class CoseHeaders extends Equatable {
       if (ref case final ref?) CoseHeaderKeys.ref: ref.toCbor(),
       if (template case final template?) CoseHeaderKeys.template: template.toCbor(),
       if (reply case final reply?) CoseHeaderKeys.reply: reply.toCbor(),
-      if (section case final section?) CoseHeaderKeys.section: CborString(section),
+      if (section case final section?) CoseHeaderKeys.section: section.toCbor(),
       if (parameters case final parameters?) CoseHeaderKeys.parameters: parameters.toCbor(),
       if (collaborators case final collaborators?)
         CoseHeaderKeys.collaborators: CborUtils.serializeKidList(collaborators),

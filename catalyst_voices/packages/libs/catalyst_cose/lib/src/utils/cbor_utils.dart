@@ -62,6 +62,15 @@ final class CborUtils {
     return list.map(deserializeKid).nonNulls.toList().cast<CatalystIdKid>();
   }
 
+  /// Deserializes optional [SectionRef] type.
+  static SectionRef? deserializeSectionRef(CborValue? value) {
+    if (value == null) {
+      return null;
+    }
+
+    return SectionRef.fromCbor(value);
+  }
+
   /// Deserializes optional [String] type.
   static String? deserializeString(CborValue? value) {
     if (value == null) {
@@ -99,7 +108,7 @@ final class CborUtils {
     return CoseUuid.fromCbor(value);
   }
 
-/// Serializes optional `List<CatalystIdKid>` type.
+  /// Serializes optional `List<CatalystIdKid>` type.
   static CborValue serializeKidList(List<CatalystIdKid>? values) {
     if (values == null) {
       return const CborNull();
