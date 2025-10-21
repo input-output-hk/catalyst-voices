@@ -1,0 +1,32 @@
+import 'package:catalyst_voices_repositories/src/api/models/staked_txo_asset_info.dart';
+import 'package:catalyst_voices_repositories/src/common/json.dart';
+import 'package:json_annotation/json_annotation.dart';
+
+part 'stake_info.g.dart';
+
+/// User's cardano stake info.
+@JsonSerializable()
+final class StakeInfo {
+  /// Cardano Blockchain ADA coins value
+  /// Total stake amount.
+  @JsonKey(name: 'ada_amount')
+  final int adaAmount;
+
+  /// Cardano Blockchain Slot Number
+  /// Block's slot number which contains the latest unspent UTXO.
+  @JsonKey(name: 'slot_number')
+  final int? slotNumber;
+
+  /// TXO assets infos.
+  final List<StakedTxoAssetInfo> assets;
+
+  const StakeInfo({
+    required this.adaAmount,
+    this.slotNumber,
+    this.assets = const <StakedTxoAssetInfo>[],
+  });
+
+  factory StakeInfo.fromJson(Json json) => _$StakeInfoFromJson(json);
+
+  Json toJson() => _$StakeInfoToJson(this);
+}

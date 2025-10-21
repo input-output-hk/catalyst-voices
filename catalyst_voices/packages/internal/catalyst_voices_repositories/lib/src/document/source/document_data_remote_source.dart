@@ -1,11 +1,12 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
-import 'package:catalyst_voices_repositories/src/common/content_types.dart';
-import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
+import 'package:catalyst_voices_repositories/src/api/models/current_page.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_index_list.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_index_query_filter.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_reference.dart';
+import 'package:catalyst_voices_repositories/src/api/models/eq_or_ranged_id.dart';
+import 'package:catalyst_voices_repositories/src/common/future_response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
-import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
@@ -24,11 +25,11 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   @override
   Future<DocumentData> get({required DocumentRef ref}) async {
     final bytes = await _api.gateway
-        .apiV1DocumentDocumentIdGet(
+        .getDocument(
           documentId: ref.id,
           version: ref.version,
         )
-        .successBodyBytesOrThrow();
+        .successBodyOrThrow();
 
     final signedDocument = await _signedDocumentManager.parseDocument(bytes);
     return DocumentDataFactory.create(signedDocument);
@@ -47,26 +48,18 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
     try {
       final index = await _api.gateway
-          .apiV1DocumentIndexPost(
-            body: DocumentIndexQueryFilter(id: IdSelectorDto.eq(id)),
+          .documentIndex(
+            filter: DocumentIndexQueryFilter(id: EqOrRangedId.eq(id)),
             limit: 1,
           )
-          .successBodyOrThrow()
-          .then(_mapDynamicResponseValue);
+          .successBodyOrThrow();
 
       final docs = index.docs;
       if (docs.isEmpty) {
         return null;
       }
 
-      return docs
-          .sublist(0, 1)
-          .cast<Map<String, dynamic>>()
-          .map(DocumentIndexListDto.fromJson)
-          .firstOrNull
-          ?.ver
-          .firstOrNull
-          ?.ver;
+      return docs.sublist(0, 1).firstOrNull?.ver.firstOrNull?.ver;
     } on NotFoundException {
       return null;
     }
@@ -114,12 +107,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   @override
   Future<void> publish(SignedDocument document) async {
     final bytes = document.toBytes();
-    await _api.gateway
-        .apiV1DocumentPut(
-          body: bytes,
-          contentType: ContentTypes.applicationCbor,
-        )
-        .successOrThrow();
+    await _api.gateway.uploadDocument(body: bytes).successBodyOrThrow();
   }
 
   Future<DocumentIndexList> _getDocumentIndexList({
@@ -127,30 +115,20 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     required int limit,
     required Campaign campaign,
   }) async {
-    final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toList();
+    // TODO(bs): previously it was possible to use `inside` filter for categories.
+    // final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toList();
+    // final categoryFilter = DocumentIndexQueryFilter(
+    //   parameters: IdRefOnly(id: IdSelectorDto.inside(categoriesIds)).toJson(),
+    // );
+    const filter = DocumentIndexQueryFilter();
 
     return _api.gateway
-        .apiV1DocumentIndexPost(
-          body: DocumentIndexQueryFilter(
-            parameters: IdRefOnly(id: IdSelectorDto.inside(categoriesIds)).toJson(),
-          ),
+        .documentIndex(
+          filter: filter,
           limit: limit,
           page: page,
         )
-        .successBodyOrThrow()
-        .then(_mapDynamicResponseValue);
-  }
-
-  DocumentIndexList _mapDynamicResponseValue(dynamic value) {
-    if (value is DocumentIndexList) {
-      return value;
-    }
-
-    if (value is Map<String, dynamic>) {
-      return DocumentIndexList.fromJson(value);
-    }
-
-    return const DocumentIndexList(docs: [], page: CurrentPage(page: 0, limit: 0, remaining: 0));
+        .successBodyOrThrow();
   }
 }
 
@@ -165,8 +143,6 @@ abstract interface class DocumentDataRemoteSource implements DocumentDataSource 
 extension on DocumentIndexList {
   List<TypedDocumentRef> get refs {
     return docs
-        .cast<Map<String, dynamic>>()
-        .map(DocumentIndexListDto.fromJson)
         .map((ref) {
           return <TypedDocumentRef>[
             ...ref.ver
@@ -178,40 +154,25 @@ extension on DocumentIndexList {
                       ref: SignedDocumentRef(id: ref.id, version: ver.ver),
                       type: documentType,
                     ),
-                    if (ver.ref != null)
+                    if (ver.ref case final ref?)
                       TypedDocumentRef(
-                        ref: ver.ref!.toRef(),
+                        ref: ref.toRef(),
                         type: DocumentType.unknown,
                       ),
-                    if (ver.reply != null)
+                    if (ver.reply case final reply?)
                       TypedDocumentRef(
-                        ref: ver.reply!.toRef(),
+                        ref: reply.toRef(),
                         type: DocumentType.unknown,
                       ),
-                    if (ver.parameters != null)
+                    if (ver.parameters case final parameters?)
                       TypedDocumentRef(
-                        ref: ver.parameters!.toRef(),
+                        ref: parameters.toRef(),
                         type: DocumentType.categoryParametersDocument,
                       ),
-                    if (ver.template != null)
+                    if (ver.template case final template?)
                       TypedDocumentRef(
-                        ref: ver.template!.toRef(),
+                        ref: template.toRef(),
                         type: documentType.template ?? DocumentType.unknown,
-                      ),
-                    if (ver.brand != null)
-                      TypedDocumentRef(
-                        ref: ver.brand!.toRef(),
-                        type: DocumentType.brandParametersDocument,
-                      ),
-                    if (ver.campaign != null)
-                      TypedDocumentRef(
-                        ref: ver.campaign!.toRef(),
-                        type: DocumentType.campaignParametersDocument,
-                      ),
-                    if (ver.category != null)
-                      TypedDocumentRef(
-                        ref: ver.category!.toRef(),
-                        type: DocumentType.categoryParametersDocument,
                       ),
                   ];
                 })
@@ -223,6 +184,6 @@ extension on DocumentIndexList {
   }
 }
 
-extension on DocumentRefForFilteredDocuments {
+extension on DocumentReference {
   SignedDocumentRef toRef() => SignedDocumentRef(id: id, version: ver);
 }

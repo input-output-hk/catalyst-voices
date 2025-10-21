@@ -2,9 +2,10 @@ import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/reporting/reporting_service.dart';
+import 'package:dio/dio.dart' show Dio;
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:sentry_dio/sentry_dio.dart';
 import 'package:sentry_drift/sentry_drift.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:sentry_logging/sentry_logging.dart';
@@ -15,11 +16,6 @@ final class SentryReportingService implements ReportingService {
   @override
   QueryInterceptor? buildDbInterceptor({required String databaseName}) {
     return SentryQueryInterceptor(databaseName: databaseName);
-  }
-
-  @override
-  http.Client buildHttpClient() {
-    return SentryHttpClient();
   }
 
   @override
@@ -59,6 +55,9 @@ final class SentryReportingService implements ReportingService {
       },
     );
   }
+
+  @override
+  void registerDio(Dio dio) => dio.addSentry();
 
   @override
   Future<void> reportingAs(Account? account) async {
