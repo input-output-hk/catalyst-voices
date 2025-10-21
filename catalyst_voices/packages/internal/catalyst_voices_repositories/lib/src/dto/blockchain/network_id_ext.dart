@@ -1,5 +1,5 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_voices_repositories/src/models/network.dart';
+import 'package:catalyst_voices_repositories/src/api/models/network.dart';
 
 extension NetworkIdExt on NetworkId {
   Network toApiValue() {

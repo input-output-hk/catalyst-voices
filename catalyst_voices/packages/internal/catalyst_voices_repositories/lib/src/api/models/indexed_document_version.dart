@@ -1,5 +1,5 @@
+import 'package:catalyst_voices_repositories/src/api/models/document_reference.dart';
 import 'package:catalyst_voices_repositories/src/common/json.dart';
-import 'package:catalyst_voices_repositories/src/models/document_reference.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'indexed_document_version.g.dart';
@@ -24,27 +24,21 @@ final class IndexedDocumentVersion {
   final DocumentReference? reply;
 
   /// Document Reference for filtered Documents.
+  /// Document Template Reference that matches the filter
+  final DocumentReference? template;
+
+  /// Document Reference for filtered Documents.
   /// Document Parameter Reference that matches the filter
   @JsonKey(name: 'doc_parameters')
   final DocumentReference? parameters;
-
-  /// Document Reference for filtered Documents.
-  /// Document Template Reference that matches the filter
-  final DocumentReference? template;
-  final DocumentReference? brand;
-  final DocumentReference? campaign;
-  final DocumentReference? category;
 
   IndexedDocumentVersion({
     required this.ver,
     required this.type,
     this.ref,
     this.reply,
-    this.parameters,
     this.template,
-    this.brand,
-    this.campaign,
-    this.category,
+    this.parameters,
   });
 
   factory IndexedDocumentVersion.fromJson(Json json) => _$IndexedDocumentVersionFromJson(json);

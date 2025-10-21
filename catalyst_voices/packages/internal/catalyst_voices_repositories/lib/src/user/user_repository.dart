@@ -1,14 +1,14 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/api/models/catalyst_id_create.dart';
+import 'package:catalyst_voices_repositories/src/api/models/catalyst_id_public.dart';
+import 'package:catalyst_voices_repositories/src/api/models/rbac_registration_chain.dart';
 import 'package:catalyst_voices_repositories/src/common/future_response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/common/rbac_token_ext.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/catalyst_id_public_ext.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/rbac_registration_chain_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/user_dto.dart';
-import 'package:catalyst_voices_repositories/src/models/catalyst_id_create.dart';
-import 'package:catalyst_voices_repositories/src/models/catalyst_id_public.dart';
-import 'package:catalyst_voices_repositories/src/models/rbac_registration_chain.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 
@@ -80,7 +80,7 @@ final class UserRepositoryImpl implements UserRepository {
   @override
   Future<RbacRegistrationChain> getRbacRegistration({CatalystId? catalystId}) {
     return _apiServices.gateway
-        .fetchRbacRegistration(lookup: catalystId?.toUri().toStringWithoutScheme())
+        .rbacRegistration(lookup: catalystId?.toUri().toStringWithoutScheme())
         .successBodyOrThrow();
   }
 
@@ -102,7 +102,7 @@ final class UserRepositoryImpl implements UserRepository {
     required String email,
   }) {
     return _apiServices.reviews
-        .upsertCatalystId(
+        .upsertPublicProfile(
           body: CatalystIdCreate(
             catalystIdUri: catalystId.toUri().toStringWithoutScheme(),
             email: email,
@@ -147,7 +147,7 @@ final class UserRepositoryImpl implements UserRepository {
   /// account if [token] is not specified.
   Future<AccountPublicProfile?> _getAccountPublicProfile({RbacToken? token}) async {
     return _apiServices.reviews
-        .fetchCurrentCatalystId(authorization: token?.authHeader())
+        .getPublicProfile(authorization: token?.authHeader())
         .successBodyOrThrow()
         .then<CatalystIdPublic?>((value) => value)
         .onError<NotFoundException>((error, stackTrace) => null)

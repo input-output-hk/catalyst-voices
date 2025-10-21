@@ -91,20 +91,9 @@ melos:
 
     build-runner:
       run: |
-        melos exec --depends-on="build_runner" --ignore="catalyst_voices_repositories" --order-dependents -- \
-            dart run build_runner build --delete-conflicting-outputs
+        melos exec --depends-on="build_runner" --order-dependents -- dart run build_runner build --delete-conflicting-outputs
       description: |
         Run `build_runner` in every package which contains the build_runner dependency.
-        The catalyst_voices_repositories is skipped because to run a build_runner there you
-        must generate first swagger docs (see related Earthfile).
-
-    build-runner-repository:
-      run: |
-        melos exec --scope="catalyst_voices_repositories" -- dart run build_runner clean && \
-        melos exec --scope="catalyst_voices_repositories" -- dart run process_openapi.dart && \
-        melos exec --scope="catalyst_voices_repositories" -- dart run build_runner build --delete-conflicting-outputs
-      description: |
-        Run `build_runner` in catalyst_voices_repositories package
 
     db-make-migration:
       run: |

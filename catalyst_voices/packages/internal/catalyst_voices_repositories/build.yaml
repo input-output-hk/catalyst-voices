@@ -2,7 +2,6 @@ targets:
   $default:
     sources:
       - lib/**
-      - openapi/**
       - $package$
       - pubspec.*
     builders:

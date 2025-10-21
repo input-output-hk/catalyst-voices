@@ -31,7 +31,7 @@ void main() {
       const remoteConfig = RemoteConfig();
 
       // When
-      when(gateway.fetchFrontendConfig).thenAnswer((_) async => remoteConfig);
+      when(gateway.frontendConfig).thenAnswer((_) async => remoteConfig);
 
       // Then
       final config = await source.get();
@@ -43,7 +43,7 @@ void main() {
 
     test('error is falling back to empty', () async {
       // When
-      when(gateway.fetchFrontendConfig).thenThrow(Exception('network error'));
+      when(gateway.frontendConfig).thenThrow(Exception('network error'));
 
       // Then
       final config = await source.get();
@@ -60,7 +60,7 @@ void main() {
       );
 
       // When
-      when(gateway.fetchFrontendConfig).thenAnswer((_) async => remoteConfig);
+      when(gateway.frontendConfig).thenAnswer((_) async => remoteConfig);
 
       // Then
       final config = await source.get();

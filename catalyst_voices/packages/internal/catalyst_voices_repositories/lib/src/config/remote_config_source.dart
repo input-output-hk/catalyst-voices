@@ -13,7 +13,7 @@ final class ApiConfigSource implements RemoteConfigSource {
   @override
   Future<RemoteConfig> get() async {
     try {
-      return _api.gateway.fetchFrontendConfig().successBodyOrThrow();
+      return _api.gateway.frontendConfig().successBodyOrThrow();
     } catch (_) {
       return const RemoteConfig();
     }

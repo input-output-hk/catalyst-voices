@@ -1,11 +1,15 @@
 import 'package:catalyst_voices_repositories/src/api/api_services.dart';
 import 'package:catalyst_voices_repositories/src/api/dio_client.dart';
+import 'package:catalyst_voices_repositories/src/api/models/catalyst_id_create.dart';
+import 'package:catalyst_voices_repositories/src/api/models/catalyst_id_public.dart';
 import 'package:catalyst_voices_repositories/src/common/http_headers.dart';
 import 'package:catalyst_voices_repositories/src/common/json.dart';
-import 'package:catalyst_voices_repositories/src/models/catalyst_id_create.dart';
-import 'package:catalyst_voices_repositories/src/models/catalyst_id_public.dart';
 import 'package:dio/dio.dart';
 
+/// # Catalyst Reviews API.
+///
+/// Based on OpenAPI Catalyst Reviews API version 0.1.0
+/// reviews-api/v1.2.5 - https://github.com/input-output-hk/catalyst-reviews/releases/tag/reviews-api%2Fv1.2.5
 abstract interface class CatReviewsService {
   factory CatReviewsService.dio({
     required String baseUrl,
@@ -24,10 +28,10 @@ abstract interface class CatReviewsService {
   void close();
 
   /// Get a catalyst id from request.
-  Future<CatalystIdPublic> fetchCurrentCatalystId({String? authorization});
+  Future<CatalystIdPublic> getPublicProfile({String? authorization});
 
   /// Update info associated with a catalyst id.
-  Future<CatalystIdPublic> upsertCatalystId({
+  Future<CatalystIdPublic> upsertPublicProfile({
     required CatalystIdCreate body,
     String? authorization,
   });
@@ -42,7 +46,7 @@ final class DioCatReviewsService implements CatReviewsService {
   void close() => _dio.close();
 
   @override
-  Future<CatalystIdPublic> fetchCurrentCatalystId({String? authorization}) {
+  Future<CatalystIdPublic> getPublicProfile({String? authorization}) {
     return _dio.get<Json, CatalystIdPublic>(
       '/catalyst-ids/me',
       options: Options(
@@ -55,7 +59,7 @@ final class DioCatReviewsService implements CatReviewsService {
   }
 
   @override
-  Future<CatalystIdPublic> upsertCatalystId({
+  Future<CatalystIdPublic> upsertPublicProfile({
     required CatalystIdCreate body,
     String? authorization,
   }) {

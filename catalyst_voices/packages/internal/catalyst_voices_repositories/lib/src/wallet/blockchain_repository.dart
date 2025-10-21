@@ -29,7 +29,7 @@ final class BlockchainRepositoryImpl implements BlockchainRepository {
     RbacToken? rbacToken,
   }) {
     return _apiServices.gateway
-        .fetchStakeAssets(
+        .stakeAssets(
           stakeAddress: stakeAddress.toBech32(),
           network: networkId.toApiValue(),
           authorization: rbacToken?.authHeader(),

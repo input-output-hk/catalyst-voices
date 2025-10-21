@@ -1,13 +1,13 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/api/models/current_page.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_index_list.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_index_query_filter.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_reference.dart';
+import 'package:catalyst_voices_repositories/src/api/models/eq_or_ranged_id.dart';
+import 'package:catalyst_voices_repositories/src/api/models/id_and_ver_ref.dart';
 import 'package:catalyst_voices_repositories/src/common/future_response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
-import 'package:catalyst_voices_repositories/src/models/current_page.dart';
-import 'package:catalyst_voices_repositories/src/models/document_index_list.dart';
-import 'package:catalyst_voices_repositories/src/models/document_index_query_filter.dart';
-import 'package:catalyst_voices_repositories/src/models/document_reference.dart';
-import 'package:catalyst_voices_repositories/src/models/id_and_ver_ref.dart';
-import 'package:catalyst_voices_repositories/src/models/id_selector.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 
@@ -26,7 +26,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   @override
   Future<DocumentData> get({required DocumentRef ref}) async {
     final bytes = await _api.gateway
-        .downloadDocument(
+        .getDocument(
           documentId: ref.id,
           version: ref.version,
         )
@@ -49,8 +49,8 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 
     try {
       final index = await _api.gateway
-          .searchDocuments(
-            filter: DocumentIndexQueryFilter(id: IdSelector.eq(id)),
+          .documentIndex(
+            filter: DocumentIndexQueryFilter(id: EqOrRangedId.eq(id)),
             limit: 1,
           )
           .successBodyOrThrow();
@@ -117,14 +117,19 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     required Campaign campaign,
   }) async {
     final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toList();
+    final categoryFilter = categoriesIds.isNotEmpty
+        ? IdAndVerRef.idOnly(
+            EqOrRangedId.range(
+              min: categoriesIds.first,
+              max: categoriesIds.last,
+            ),
+          )
+        : null;
+    final filter = DocumentIndexQueryFilter(category: categoryFilter);
 
     return _api.gateway
-        .searchDocuments(
-          filter: DocumentIndexQueryFilter(
-            parameters: IdAndVerRef.idOnly(
-              IdSelector.inside(categoriesIds),
-            ),
-          ),
+        .documentIndex(
+          filter: filter,
           limit: limit,
           page: page,
         )
@@ -173,21 +178,6 @@ extension on DocumentIndexList {
                       TypedDocumentRef(
                         ref: template.toRef(),
                         type: documentType.template ?? DocumentType.unknown,
-                      ),
-                    if (ver.brand case final brand?)
-                      TypedDocumentRef(
-                        ref: brand.toRef(),
-                        type: DocumentType.brandParametersDocument,
-                      ),
-                    if (ver.campaign case final campaign?)
-                      TypedDocumentRef(
-                        ref: campaign.toRef(),
-                        type: DocumentType.campaignParametersDocument,
-                      ),
-                    if (ver.category case final category?)
-                      TypedDocumentRef(
-                        ref: category.toRef(),
-                        type: DocumentType.categoryParametersDocument,
                       ),
                   ];
                 })

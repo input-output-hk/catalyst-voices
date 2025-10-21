@@ -1,5 +1,5 @@
+import 'package:catalyst_voices_repositories/src/api/models/staked_txo_asset_info.dart';
 import 'package:catalyst_voices_repositories/src/common/json.dart';
-import 'package:catalyst_voices_repositories/src/models/staked_txo_asset_info.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'stake_info.g.dart';

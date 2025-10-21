@@ -1,6 +1,6 @@
+import 'package:catalyst_voices_repositories/src/api/models/current_page.dart';
+import 'package:catalyst_voices_repositories/src/api/models/indexed_document.dart';
 import 'package:catalyst_voices_repositories/src/common/json.dart';
-import 'package:catalyst_voices_repositories/src/models/current_page.dart';
-import 'package:catalyst_voices_repositories/src/models/indexed_document.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_index_list.g.dart';

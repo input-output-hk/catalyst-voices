@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/models/catalyst_id_public.dart';
-import 'package:catalyst_voices_repositories/src/models/catalyst_id_status.dart';
-import 'package:catalyst_voices_repositories/src/models/catalyst_rbac_registration_status.dart';
+import 'package:catalyst_voices_repositories/src/api/models/catalyst_id_public.dart';
+import 'package:catalyst_voices_repositories/src/api/models/catalyst_id_status.dart';
+import 'package:catalyst_voices_repositories/src/api/models/catalyst_rbac_registration_status.dart';
 
 String? _tryDecodeUsername(dynamic source) {
   if (source is! String) {

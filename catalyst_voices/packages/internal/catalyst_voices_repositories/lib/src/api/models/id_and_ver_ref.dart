@@ -1,6 +1,6 @@
+import 'package:catalyst_voices_repositories/src/api/models/eq_or_ranged_id.dart';
+import 'package:catalyst_voices_repositories/src/api/models/eq_or_ranged_ver.dart';
 import 'package:catalyst_voices_repositories/src/common/json.dart';
-import 'package:catalyst_voices_repositories/src/models/eq_or_ranged_ver.dart';
-import 'package:catalyst_voices_repositories/src/models/id_selector.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'id_and_ver_ref.g.dart';
@@ -13,7 +13,7 @@ final class IdAndVerRef {
   ///
   /// This will match any document that matches the defined Document ID only.
   /// The Document Version is not considered, and will match any version.
-  final IdSelector? id;
+  final EqOrRangedId? id;
 
   /// Document Version Selector
   /// Document Version, or Range of Document Versions

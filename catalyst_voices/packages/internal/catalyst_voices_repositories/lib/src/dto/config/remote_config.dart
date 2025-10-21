@@ -3,6 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'remote_config.g.dart';
 
+/// Based on OpenAPI Catalyst Gateway API version 0.3.0
 @JsonSerializable(createToJson: false)
 final class RemoteConfig {
   final String? version;

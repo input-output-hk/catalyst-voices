@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/api/models/catalyst_id_public.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/catalyst_id_public_ext.dart';
-import 'package:catalyst_voices_repositories/src/models/catalyst_id_public.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

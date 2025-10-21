@@ -1,7 +1,7 @@
+import 'package:catalyst_voices_repositories/src/api/models/eq_or_ranged_id.dart';
+import 'package:catalyst_voices_repositories/src/api/models/eq_or_ranged_ver.dart';
+import 'package:catalyst_voices_repositories/src/api/models/id_and_ver_ref.dart';
 import 'package:catalyst_voices_repositories/src/common/json.dart';
-import 'package:catalyst_voices_repositories/src/models/eq_or_ranged_ver.dart';
-import 'package:catalyst_voices_repositories/src/models/id_and_ver_ref.dart';
-import 'package:catalyst_voices_repositories/src/models/id_selector.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_index_query_filter.g.dart';
@@ -28,7 +28,7 @@ final class DocumentIndexQueryFilter {
   ///
   /// Either an absolute single Document ID or a range of
   /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
-  final IdSelector? id;
+  final EqOrRangedId? id;
 
   /// Document Version Selector
   /// ## Document Version
@@ -83,17 +83,49 @@ final class DocumentIndexQueryFilter {
   final IdAndVerRef? reply;
 
   /// Document Reference
-  /// ## Parameters
+  /// ## Brand
   ///
-  /// This is a reference to a configuration document.
-  /// This fields can match any reference that matches the defined
+  /// This is a
+  /// [brand reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#brand_id)
+  /// to a brand document which defines the brand the document falls under.
+  /// This fields can match any brand reference that matches the defined
   /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
   /// and/or
   /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
   ///
-  /// Whether a Document Type has a brand, campaign, category etc. reference is defined
-  /// by its [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
-  final IdAndVerRef? parameters;
+  /// Whether a Document Type has a brand reference is defined by its
+  /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
+  final IdAndVerRef? brand;
+
+  /// Document Reference
+  /// ## Campaign
+  ///
+  /// This is a
+  /// [campaign reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#campaign_id)
+  /// to a campaign document which defines the campaign the document falls under.
+  /// This fields can match any campaign reference that matches the defined
+  /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
+  /// and/or
+  /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
+  ///
+  /// Whether a Document Type has a campaign reference is defined by its
+  /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
+  final IdAndVerRef? campaign;
+
+  /// Document Reference
+  /// ## Category
+  ///
+  /// This is a
+  /// [category reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#category_id)
+  /// to a category document which defines the category the document falls under.
+  /// This fields can match any category reference that matches the defined
+  /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
+  /// and/or
+  /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
+  ///
+  /// Whether a Document Type has a category reference is defined by its
+  /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
+  final IdAndVerRef? category;
 
   const DocumentIndexQueryFilter({
     this.type,
@@ -102,7 +134,9 @@ final class DocumentIndexQueryFilter {
     this.ref,
     this.template,
     this.reply,
-    this.parameters,
+    this.brand,
+    this.campaign,
+    this.category,
   });
 
   Json toJson() => _$DocumentIndexQueryFilterToJson(this);

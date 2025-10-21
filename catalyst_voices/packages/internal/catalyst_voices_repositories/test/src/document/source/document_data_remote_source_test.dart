@@ -1,11 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/src/models/current_page.dart';
-import 'package:catalyst_voices_repositories/src/models/document_index_list.dart';
-import 'package:catalyst_voices_repositories/src/models/document_index_query_filter.dart';
-import 'package:catalyst_voices_repositories/src/models/document_reference.dart';
-import 'package:catalyst_voices_repositories/src/models/indexed_document.dart';
-import 'package:catalyst_voices_repositories/src/models/indexed_document_version.dart';
+import 'package:catalyst_voices_repositories/src/api/models/current_page.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_index_list.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_index_query_filter.dart';
+import 'package:catalyst_voices_repositories/src/api/models/document_reference.dart';
+import 'package:catalyst_voices_repositories/src/api/models/indexed_document.dart';
+import 'package:catalyst_voices_repositories/src/api/models/indexed_document_version.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -58,7 +58,7 @@ void main() {
         );
 
         when(
-          () => gateway.searchDocuments(
+          () => gateway.documentIndex(
             filter: any(named: 'filter'),
             limit: maxPageSize,
             page: 0,
@@ -66,7 +66,7 @@ void main() {
         ).thenAnswer((_) async => pageZero);
 
         when(
-          () => gateway.searchDocuments(
+          () => gateway.documentIndex(
             filter: any(named: 'filter'),
             limit: maxPageSize,
             page: 1,
@@ -78,7 +78,7 @@ void main() {
         expect(refs, isNotEmpty);
 
         verify(
-          () => gateway.searchDocuments(
+          () => gateway.documentIndex(
             filter: any(named: 'filter'),
             limit: any(named: 'limit'),
             page: any(named: 'page'),
@@ -119,7 +119,7 @@ void main() {
         ];
 
         when(
-          () => gateway.searchDocuments(
+          () => gateway.documentIndex(
             filter: any(named: 'filter'),
             limit: maxPageSize,
             page: 0,

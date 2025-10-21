@@ -1,6 +1,6 @@
+import 'package:catalyst_voices_repositories/src/api/models/catalyst_id_status.dart';
+import 'package:catalyst_voices_repositories/src/api/models/catalyst_rbac_registration_status.dart';
 import 'package:catalyst_voices_repositories/src/common/json.dart';
-import 'package:catalyst_voices_repositories/src/models/catalyst_id_status.dart';
-import 'package:catalyst_voices_repositories/src/models/catalyst_rbac_registration_status.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'catalyst_id_public.g.dart';
