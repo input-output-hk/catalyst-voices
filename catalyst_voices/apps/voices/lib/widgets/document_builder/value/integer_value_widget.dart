@@ -1,76 +1,62 @@
-import 'package:catalyst_voices/common/constants/constants.dart';
+import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/common/ext/document_property_schema_ext.dart';
-import 'package:catalyst_voices/widgets/rich_text/markdown_text.dart';
-import 'package:catalyst_voices/widgets/text_field/token_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_int_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
-class DocumentTokenValueWidget extends StatefulWidget {
+/// A fallback for [DocumentGenericIntegerSchema] if no other widget matched this schema.
+class IntegerValueWidget extends StatefulWidget {
   final DocumentValueProperty<int> property;
   final DocumentIntegerSchema schema;
-  final Currency currency;
   final bool isEditMode;
   final ValueChanged<List<DocumentChange>> onChanged;
 
-  const DocumentTokenValueWidget({
+  const IntegerValueWidget({
     super.key,
     required this.property,
     required this.schema,
-    required this.currency,
     required this.isEditMode,
     required this.onChanged,
   });
 
   @override
-  State<DocumentTokenValueWidget> createState() {
-    return _DocumentTokenValueWidgetState();
-  }
+  State<IntegerValueWidget> createState() => _IntegerValueWidgetState();
 }
 
-class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
+class _IntegerValueWidgetState extends State<IntegerValueWidget> {
   late final VoicesIntFieldController _controller;
   late final FocusNode _focusNode;
-
-  // TODO(LynxxLynx): After https://github.com/input-output-hk/catalyst-voices/pull/2865
-  // is merged use wildcard support for NodeId
-  bool get _isMilestone {
-    final milestoneWildcardNodeId = ProposalDocument.milestoneCostNodeId.toString().split('*');
-    if (widget.property.nodeId.value.startsWith(milestoneWildcardNodeId[0]) &&
-        widget.property.nodeId.value.endsWith(milestoneWildcardNodeId[1])) {
-      return true;
-    }
-    return false;
-  }
 
   int? get _value => widget.property.value ?? widget.schema.defaultValue;
 
   @override
   Widget build(BuildContext context) {
     final schema = widget.schema;
+    final range = schema.numRange;
 
-    return TokenField(
+    return VoicesIntField(
       controller: _controller,
       focusNode: _focusNode,
       onChanged: _onChanged,
       onFieldSubmitted: _onChanged,
       validator: _validator,
-      labelText: schema.title.isEmpty ? null : schema.formattedTitle,
-      placeholder: schema.placeholder,
-      range: schema.numRange,
-      currency: widget.currency,
-      showHelper: widget.isEditMode,
+      decoration: VoicesTextFieldDecoration(
+        labelText: schema.title.isEmpty ? null : schema.formattedTitle,
+        hintText: range != null && range.min != null ? '${range.min}' : null,
+        helperText: schema.placeholder,
+        labelStyle: context.textTheme.labelLarge?.copyWith(
+          color: context.colors.textOnPrimaryLevel1,
+        ),
+      ),
       enabled: widget.isEditMode,
       ignorePointers: !widget.isEditMode,
-      helperWidget: _isMilestone ? const _MilestoneCostHelpText() : null,
     );
   }
 
   @override
-  void didUpdateWidget(DocumentTokenValueWidget oldWidget) {
+  void didUpdateWidget(IntegerValueWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     final oldValue = oldWidget.property.value ?? oldWidget.schema.defaultValue;
@@ -127,16 +113,5 @@ class _DocumentTokenValueWidgetState extends State<DocumentTokenValueWidget> {
       final localized = LocalizedDocumentValidationResult.from(result);
       return VoicesTextFieldValidationResult.error(localized.message(context));
     }
-  }
-}
-
-class _MilestoneCostHelpText extends StatelessWidget {
-  const _MilestoneCostHelpText();
-
-  @override
-  Widget build(BuildContext context) {
-    return MarkdownText(
-      MarkdownData(context.l10n.milestoneGuidelinesLink(VoicesConstants.milestoneGuideline)),
-    );
   }
 }

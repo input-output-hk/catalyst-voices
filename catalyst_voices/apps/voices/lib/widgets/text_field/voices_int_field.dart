@@ -20,10 +20,7 @@ class VoicesIntField extends VoicesNumField<int> {
          keyboardType: TextInputType.number,
          inputFormatters: [
            FilteringTextInputFormatter.digitsOnly,
-           // int.parse returns incorrect values for bigger Strings. If more is required use BigInt.
-           // On web integers can represent numbers up to 2^53.
-           // See: https://dart.dev/resources/language/number-representation#dart-number-representation
-           LengthLimitingTextInputFormatter(16),
+           LengthLimitingTextInputFormatter(NumberUtils.maxSafeIntDigits),
            ...?inputFormatters,
          ],
        );

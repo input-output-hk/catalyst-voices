@@ -23,7 +23,7 @@ final class DocumentListSchemaMapper {
       nodeId: nodeId,
       isRequired: true,
     );
-    final itemsRange = NumRange.optionalRangeOf(
+    final itemsRange = Range.optionalRangeOf(
       min: schema.minItems,
       max: schema.maxItems,
     );

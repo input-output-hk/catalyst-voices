@@ -107,7 +107,7 @@ final class SegmentsController extends ValueNotifier<SegmentsControllerState> {
     var index = listItems.indexWhere((e) => e.id == id);
 
     if (index == -1) {
-      index = listItems.indexWhere((e) => e.id.isChildOf(id));
+      index = listItems.indexWhere((e) => e.id.isSameOrChildOf(id));
     }
 
     if (index == -1) {

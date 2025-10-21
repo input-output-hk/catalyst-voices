@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/constants/constants.dart';
+import 'package:catalyst_voices/common/ext/active_fund_number_selector_ext.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/session_account_drawer_catalyst_id.dart';
 import 'package:catalyst_voices/share/share_manager.dart';
@@ -188,7 +189,7 @@ class _RegisterAsVoter extends StatelessWidget with LaunchUrlMixin {
         children: [
           const SizedBox(height: 16),
           Text(
-            context.l10n.f14Voting,
+            context.l10n.fundVoting(context.activeCampaignFundNumber),
             style: context.textTheme.headlineMedium?.copyWith(
               color: context.colorScheme.primary,
               height: 1,

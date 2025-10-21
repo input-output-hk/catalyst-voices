@@ -19,7 +19,11 @@ services:
     ports:
       - 5432:5432
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_PASSWORD}" ]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_PASSWORD}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -60,6 +64,7 @@ services:
       - DB_USER_PASSWORD=CHANGE_ME
 
       - INIT_AND_DROP_DB=false
+      - WITH_SEED_DATA=.
       - WITH_MIGRATIONS=true
     restart: "no"
     depends_on:
@@ -130,7 +135,13 @@ services:
       - "18090:18090"
       - "9999:9999"
     healthcheck:
-      test: [ "CMD", "sh", "-c", "echo 'show info' | socat tcp:localhost:9999 stdio | grep -q ^Name" ]
+      test:
+        [
+          "CMD",
+          "sh",
+          "-c",
+          "echo 'show info' | socat tcp:localhost:9999 stdio | grep -q ^Name",
+        ]
       interval: 10s
       timeout: 3s
       retries: 3

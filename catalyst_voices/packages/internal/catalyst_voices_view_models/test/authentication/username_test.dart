@@ -30,7 +30,7 @@ void main() {
       test('too long value returns error', () {
         // Given
         final value = List.generate(
-          (Username.lengthRange.max ?? 0) + 1,
+          Username.lengthRange.max + 1,
           (_) => 'A',
         ).join();
 

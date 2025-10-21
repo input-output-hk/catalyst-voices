@@ -144,9 +144,10 @@ class _DocumentPropertyBuilderViewerState extends State<DocumentPropertyBuilderV
           isRequired: schema.isRequired,
           value: text,
         );
-      case DocumentTokenValueCardanoAdaSchema():
+      case DocumentCurrencySchema():
         final num = schema.castValue(value);
-        final text = num != null ? const Currency.ada().format(num) : null;
+        final money = num != null ? schema.valueToMoney(num) : null;
+        final text = money != null ? MoneyFormatter.formatDecimal(money) : null;
 
         return _TextListItem(
           id: property.nodeId,
