@@ -17,7 +17,7 @@ import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid_plus/uuid_plus.dart' as u;
 
-var _time = DateTime.utc(2025, 10, 17, 4).millisecondsSinceEpoch;
+var _time = DateTime.timestamp().millisecondsSinceEpoch;
 
 String _testAccountAuthorGetter(DocumentRef ref) {
   /* cSpell:disable */
