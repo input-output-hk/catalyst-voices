@@ -126,7 +126,8 @@ final class DocumentsServiceImpl implements DocumentsService {
               ? null
               : (value) {
                   final currentIterationProgress = value * progressPerStep;
-                  onProgress(baseProgress + currentIterationProgress);
+                  final progress = baseProgress + currentIterationProgress;
+                  onProgress(progress);
                 },
         );
 
@@ -136,9 +137,8 @@ final class DocumentsServiceImpl implements DocumentsService {
     } finally {
       await pool.close();
       _logger.finer('Sync pool closed.');
+      onProgress?.call(1);
     }
-
-    onProgress?.call(1);
 
     return syncResult;
   }
@@ -312,14 +312,26 @@ final class DocumentsServiceImpl implements DocumentsService {
   Future<DocumentsSyncResult> _syncSaveBatchResults(
     List<Result<DocumentData, RefSyncException>> results,
   ) async {
-    final documents = results.where((element) => element.isSuccess).map((e) => e.success).toList();
-    final failures = results.where((element) => element.isFailure);
+    final (List<DocumentData> documents, int failures) = results.fold(
+      (<DocumentData>[], 0),
+      (acc, result) {
+        final (docs, failCount) = acc;
+        if (result.isSuccess) {
+          docs.add(result.success);
+        }
+        final failures = result.isFailure ? failCount + 1 : failCount;
 
-    await _documentRepository.saveDocumentBulk(documents);
+        return (docs, failures);
+      },
+    );
+
+    if (documents.isNotEmpty) {
+      await _documentRepository.saveDocumentBulk(documents);
+    }
 
     return DocumentsSyncResult(
       newDocumentsCount: documents.length,
-      failedDocumentsCount: failures.length,
+      failedDocumentsCount: failures,
     );
   }
 }
