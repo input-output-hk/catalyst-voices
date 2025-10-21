@@ -146,9 +146,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       type: DocumentType.proposalDocument,
       selfRef: selfRef ?? state.metadata.documentRef!,
       template: state.metadata.templateRef,
-      parameters: DocumentParameters({
-        if (categoryId != null) categoryId,
-      }),
+      parameters: DocumentParameters({?categoryId}),
     );
   }
 
