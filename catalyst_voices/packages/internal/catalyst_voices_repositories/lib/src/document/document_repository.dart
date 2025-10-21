@@ -410,12 +410,12 @@ final class DocumentRepositoryImpl implements DocumentRepository {
     final signedDocs = documents.where((element) => element.ref is SignedDocumentRef);
     final draftDocs = documents.where((element) => element.ref is DraftRef);
 
-    if (signedDocs.isNotEmpty) {
-      await _localDocuments.saveAll(signedDocs);
-    }
-    if (draftDocs.isNotEmpty) {
-      await _drafts.saveAll(draftDocs);
-    }
+    final signedDocsSave = signedDocs.isNotEmpty
+        ? _localDocuments.saveAll(signedDocs)
+        : Future(() {});
+    final draftsDocsSave = draftDocs.isNotEmpty ? _drafts.saveAll(draftDocs) : Future(() {});
+
+    await [signedDocsSave, draftsDocsSave].wait;
   }
 
   @override
