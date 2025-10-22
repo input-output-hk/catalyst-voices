@@ -568,7 +568,7 @@ void main() {
         final publicDraftData = DocumentDataFactory.build(
           selfRef: publicDraftRef,
           template: templateRef,
-          categoryId: DocumentRefFactory.signedDocumentRef(),
+          categoryRef: DocumentRefFactory.signedDocumentRef(),
           content: publicDraftContent,
         );
 

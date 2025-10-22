@@ -33,7 +33,7 @@ abstract interface class ProposalRepository {
   });
 
   Future<List<ProposalData>> getProposals({
-    SignedDocumentRef? categoryId,
+    SignedDocumentRef? categoryRef,
     required ProposalsFilterType type,
   });
 
@@ -171,11 +171,11 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<List<ProposalData>> getProposals({
-    SignedDocumentRef? categoryId,
+    SignedDocumentRef? categoryRef,
     required ProposalsFilterType type,
   }) async {
     return _proposalsLocalSource
-        .getProposals(type: type, categoryId: categoryId)
+        .getProposals(type: type, categoryRef: categoryRef)
         .then((value) => value.map(_buildProposalData).toList());
   }
 

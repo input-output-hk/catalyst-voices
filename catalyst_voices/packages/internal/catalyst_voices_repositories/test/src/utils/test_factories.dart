@@ -10,7 +10,7 @@ abstract final class DocumentDataFactory {
     DocumentType type = DocumentType.proposalDocument,
     DocumentRef? selfRef,
     SignedDocumentRef? template,
-    SignedDocumentRef? categoryId,
+    SignedDocumentRef? categoryRef,
     DocumentDataContent content = const DocumentDataContent({}),
   }) {
     return DocumentData(
@@ -18,7 +18,7 @@ abstract final class DocumentDataFactory {
         type: type,
         selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
         template: template,
-        parameters: DocumentParameters({?categoryId}),
+        parameters: DocumentParameters({?categoryRef}),
       ),
       content: content,
     );

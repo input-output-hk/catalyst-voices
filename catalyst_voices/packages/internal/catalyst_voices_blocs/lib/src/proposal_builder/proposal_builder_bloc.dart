@@ -352,13 +352,13 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   ) async {
     try {
       final proposalRef = state.metadata.documentRef;
-      final categoryId = state.metadata.categoryRef!;
+      final categoryRef = state.metadata.categoryRef!;
 
       emit(state.copyWith(isChanging: true));
 
       await _proposalService.forgetProposal(
         proposalRef: proposalRef! as SignedDocumentRef,
-        parameters: DocumentParameters({categoryId}),
+        parameters: DocumentParameters({categoryRef}),
       );
       unawaited(_clearCache());
       emitSignal(const ForgotProposalSuccessBuilderSignal());
@@ -484,7 +484,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         proposalBuilder: documentBuilder,
         proposalMetadata: ProposalBuilderMetadata.newDraft(
           templateRef: templateRef,
-          categoryId: category.selfRef,
+          categoryRef: category.selfRef,
         ),
         category: category,
       );
@@ -565,11 +565,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     LoadProposalCategoryEvent event,
     Emitter<ProposalBuilderState> emit,
   ) async {
-    final categoryId = event.categoryId;
-    _logger.info('Loading proposal category: $categoryId');
+    final categoryRef = event.categoryRef;
+    _logger.info('Loading proposal category: $categoryRef');
 
     await _loadState(emit, () async {
-      final category = await _campaignService.getCategory(DocumentParameters({categoryId}));
+      final category = await _campaignService.getCategory(DocumentParameters({categoryRef}));
       final templateRef = category.proposalTemplateRef;
       final proposalTemplate = await _proposalService.getProposalTemplate(
         ref: templateRef,
@@ -582,7 +582,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         proposalBuilder: documentBuilder,
         proposalMetadata: ProposalBuilderMetadata.newDraft(
           templateRef: templateRef,
-          categoryId: categoryId,
+          categoryRef: categoryRef,
         ),
         category: category,
       );
@@ -1018,7 +1018,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     Emitter<ProposalBuilderState> emit,
   ) async {
     final originalProposalRef = state.metadata.originalDocumentRef;
-    final originalProposalCategoryId = state.metadata.categoryRef;
+    final originalProposalCategoryRef = state.metadata.categoryRef;
     assert(
       originalProposalRef != null,
       'Proposal ref not found. Load document first!',
@@ -1041,7 +1041,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         ref: originalProposalRef! as SignedDocumentRef,
         template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
         reply: event.reply,
-        parameters: DocumentParameters({?originalProposalCategoryId}),
+        parameters: DocumentParameters({?originalProposalCategoryRef}),
         authorId: activeAccountId!,
       ),
       document: event.document,
@@ -1123,12 +1123,12 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   ) async {
     try {
       final proposalRef = state.metadata.documentRef! as SignedDocumentRef;
-      final categoryId = state.metadata.categoryRef!;
+      final categoryRef = state.metadata.categoryRef!;
       emit(state.copyWith(isChanging: true));
 
       await _proposalService.unlockProposal(
         proposalRef: proposalRef,
-        proposalParameters: DocumentParameters({categoryId}),
+        proposalParameters: DocumentParameters({categoryRef}),
       );
       final stateMetadata = state.metadata.copyWith(publish: ProposalPublish.publishedDraft);
       _cache = _cache.copyWith(proposalMetadata: Optional(stateMetadata));
@@ -1220,14 +1220,14 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     final currentRef = state.metadata.documentRef!;
     final originalRef = state.metadata.originalDocumentRef;
     final template = state.metadata.templateRef!;
-    final categoryId = state.metadata.categoryRef!;
+    final categoryRef = state.metadata.categoryRef!;
 
     DraftRef nextRef;
     if (originalRef == null) {
       nextRef = await _proposalService.createDraftProposal(
         content: document,
         template: template,
-        categoryId: categoryId,
+        categoryRef: categoryRef,
       );
     } else {
       nextRef = currentRef.nextVersion();
@@ -1235,7 +1235,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         selfRef: nextRef,
         content: document,
         template: template,
-        categoryId: categoryId,
+        categoryRef: categoryRef,
       );
     }
 

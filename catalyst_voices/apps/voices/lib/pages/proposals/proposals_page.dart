@@ -17,12 +17,12 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ProposalsPage extends StatefulWidget {
-  final SignedDocumentRef? categoryId;
+  final SignedDocumentRef? categoryRef;
   final ProposalsPageTab? tab;
 
   const ProposalsPage({
     super.key,
-    this.categoryId,
+    this.categoryRef,
     this.tab,
   });
 
@@ -58,10 +58,10 @@ class _ProposalsPageState extends State<ProposalsPage>
 
     final tab = widget.tab ?? ProposalsPageTab.total;
 
-    if (widget.categoryId != oldWidget.categoryId || widget.tab != oldWidget.tab) {
+    if (widget.categoryRef != oldWidget.categoryRef || widget.tab != oldWidget.tab) {
       context.read<ProposalsCubit>().changeFilters(
         onlyMy: Optional(tab == ProposalsPageTab.my),
-        category: Optional(widget.categoryId),
+        category: Optional(widget.categoryRef),
         type: tab.filter,
       );
 
@@ -85,7 +85,7 @@ class _ProposalsPageState extends State<ProposalsPage>
   void handleSignal(ProposalsSignal signal) {
     switch (signal) {
       case ChangeCategoryProposalsSignal(:final to):
-        _updateRoute(categoryId: Optional(to?.id));
+        _updateRoute(categoryRef: Optional(to?.id));
       case ChangeTabProposalsSignal(:final tab):
         _updateRoute(tab: tab);
       case ResetPaginationProposalsSignal():
@@ -129,7 +129,7 @@ class _ProposalsPageState extends State<ProposalsPage>
 
     proposalsCubit.init(
       onlyMyProposals: selectedTab == ProposalsPageTab.my,
-      category: widget.categoryId,
+      category: widget.categoryRef,
       type: selectedTab.filter,
       order: const Alphabetical(),
     );
@@ -171,11 +171,11 @@ class _ProposalsPageState extends State<ProposalsPage>
   }
 
   void _updateRoute({
-    Optional<String>? categoryId,
+    Optional<String>? categoryRef,
     ProposalsPageTab? tab,
   }) {
     Router.neglect(context, () {
-      final effectiveCategoryId = categoryId.dataOr(widget.categoryId?.id);
+      final effectiveCategoryId = categoryRef.dataOr(widget.categoryRef?.id);
       final effectiveTab = tab?.name ?? widget.tab?.name;
 
       ProposalsRoute(

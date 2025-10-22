@@ -107,8 +107,8 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     }
   }
 
-  void changeSelectedCategory(SignedDocumentRef? categoryId) {
-    emitSignal(ChangeCategoryProposalsSignal(to: categoryId));
+  void changeSelectedCategory(SignedDocumentRef? categoryRef) {
+    emitSignal(ChangeCategoryProposalsSignal(to: categoryRef));
   }
 
   @override

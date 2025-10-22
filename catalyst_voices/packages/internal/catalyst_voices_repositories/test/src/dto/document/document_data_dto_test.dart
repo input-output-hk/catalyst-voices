@@ -28,9 +28,9 @@ void main() {
       test('parameters migration works as expected', () {
         // Given
         final selfRef = DocumentRefFactory.signedDocumentRef();
-        final brandId = DocumentRefFactory.signedDocumentRef();
-        final campaignId = DocumentRefFactory.signedDocumentRef();
-        final categoryId = DocumentRefFactory.signedDocumentRef();
+        final brandRef = DocumentRefFactory.signedDocumentRef();
+        final campaignRef = DocumentRefFactory.signedDocumentRef();
+        final categoryRef = DocumentRefFactory.signedDocumentRef();
 
         final oldJson = <String, dynamic>{
           'type': DocumentType.proposalDocument.uuid,
@@ -40,18 +40,18 @@ void main() {
             'type': 'signed',
           },
           'brandId': {
-            'id': brandId.id,
-            'version': brandId.version,
+            'id': brandRef.id,
+            'version': brandRef.version,
             'type': 'signed',
           },
           'campaignId': {
-            'id': campaignId.id,
-            'version': campaignId.version,
+            'id': campaignRef.id,
+            'version': campaignRef.version,
             'type': 'signed',
           },
           'categoryId': {
-            'id': categoryId.id,
-            'version': categoryId.version,
+            'id': categoryRef.id,
+            'version': categoryRef.version,
             'type': 'signed',
           },
         };
@@ -63,7 +63,7 @@ void main() {
         // Then
         expect(
           model.parameters,
-          equals(DocumentParameters({brandId, campaignId, categoryId})),
+          equals(DocumentParameters({brandRef, campaignRef, categoryRef})),
         );
       });
     });

@@ -90,8 +90,8 @@ final class VotingCubit extends Cubit<VotingState>
     }
   }
 
-  void changeSelectedCategory(SignedDocumentRef? categoryId) {
-    emitSignal(ChangeCategoryVotingSignal(to: categoryId));
+  void changeSelectedCategory(SignedDocumentRef? categoryRef) {
+    emitSignal(ChangeCategoryVotingSignal(to: categoryRef));
   }
 
   @override
@@ -328,12 +328,12 @@ final class VotingCubit extends Cubit<VotingState>
     final favoriteIds = _cache.favoriteIds ?? const [];
     final votingPower = _cache.votingPower;
     final categories = campaign?.categories ?? const [];
-    final selectedCategoryId = _cache.filters.category;
+    final selectedCategoryRef = _cache.filters.category;
     final filters = _cache.filters;
     final count = _cache.count;
 
     final selectedCategory = campaign?.categories.firstWhereOrNull(
-      (e) => e.selfRef.id == selectedCategoryId?.id,
+      (e) => e.selfRef.id == selectedCategoryRef?.id,
     );
     final selectedCategoryViewModel = selectedCategory != null
         ? CampaignCategoryDetailsViewModel.fromModel(selectedCategory)
@@ -344,7 +344,7 @@ final class VotingCubit extends Cubit<VotingState>
         : const VotingPowerViewModel();
     final votingPhaseViewModel = _buildVotingPhaseDetails(campaign);
     final hasSearchQuery = filters.searchQuery != null;
-    final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategoryId);
+    final categorySelectorItems = _buildCategorySelectorItems(categories, selectedCategoryRef);
 
     return state.copyWith(
       selectedCategory: Optional(selectedCategoryViewModel),

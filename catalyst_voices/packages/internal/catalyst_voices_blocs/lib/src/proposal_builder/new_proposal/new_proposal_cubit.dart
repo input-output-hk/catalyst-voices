@@ -58,7 +58,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
       return await _proposalService.createDraftProposal(
         content: documentContent,
         template: templateRef,
-        categoryId: categoryRef,
+        categoryRef: categoryRef,
       );
     } catch (error, stackTrace) {
       _logger.severe('Create draft', error, stackTrace);
@@ -134,10 +134,10 @@ class NewProposalCubit extends Cubit<NewProposalState>
     emit(state.copyWith(isAgreeToNoFurtherCategoryChange: value));
   }
 
-  void updateSelectedCategory(SignedDocumentRef? categoryId) {
+  void updateSelectedCategory(SignedDocumentRef? categoryRef) {
     emit(
       state.copyWith(
-        categoryRef: Optional(categoryId),
+        categoryRef: Optional(categoryRef),
         isAgreeToCategoryCriteria: false,
         isAgreeToNoFurtherCategoryChange: false,
       ),

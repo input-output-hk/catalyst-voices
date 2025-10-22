@@ -16,9 +16,9 @@ import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class CategoryPage extends StatefulWidget {
-  final SignedDocumentRef categoryId;
+  final SignedDocumentRef categoryRef;
 
-  const CategoryPage({super.key, required this.categoryId});
+  const CategoryPage({super.key, required this.categoryRef});
 
   @override
   State<CategoryPage> createState() => _CategoryPageState();
@@ -102,9 +102,9 @@ class _BodySmall extends StatelessWidget {
 }
 
 class _CategoryDetailErrorSelector extends StatelessWidget {
-  final SignedDocumentRef categoryId;
+  final SignedDocumentRef categoryRef;
 
-  const _CategoryDetailErrorSelector({required this.categoryId});
+  const _CategoryDetailErrorSelector({required this.categoryRef});
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +128,7 @@ class _CategoryDetailErrorSelector extends StatelessWidget {
                     ? null
                     : () {
                         unawaited(
-                          context.read<CategoryDetailCubit>().getCategoryDetail(categoryId),
+                          context.read<CategoryDetailCubit>().getCategoryDetail(categoryRef),
                         );
                       },
               ),
@@ -187,7 +187,7 @@ class _CategoryPageState extends State<CategoryPage> {
         children: [
           const _CategoryDetailLoadingOrDataSelector(),
           _CategoryDetailErrorSelector(
-            categoryId: widget.categoryId,
+            categoryRef: widget.categoryRef,
           ),
         ].constrainedDelegate(),
       ),
@@ -198,9 +198,9 @@ class _CategoryPageState extends State<CategoryPage> {
   void didUpdateWidget(CategoryPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.categoryId != oldWidget.categoryId) {
+    if (widget.categoryRef != oldWidget.categoryRef) {
       unawaited(
-        context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId),
+        context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryRef),
       );
     }
   }
@@ -217,7 +217,7 @@ class _CategoryPageState extends State<CategoryPage> {
     super.initState();
     unawaited(context.read<CategoryDetailCubit>().getCategories());
     unawaited(
-      context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId),
+      context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryRef),
     );
     _listenForProposalRef(context.read<CategoryDetailCubit>());
   }
@@ -225,7 +225,7 @@ class _CategoryPageState extends State<CategoryPage> {
   void _listenForProposalRef(CategoryDetailCubit cubit) {
     // listen for updates
     _categoryRefSub = cubit.stream
-        .map((event) => event.category?.id)
+        .map((event) => event.category?.ref)
         .distinct()
         .listen(_onCategoryRefChanged);
   }

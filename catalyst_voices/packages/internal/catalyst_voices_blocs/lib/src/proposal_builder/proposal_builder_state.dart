@@ -25,13 +25,13 @@ final class ProposalBuilderMetadata extends Equatable {
 
   factory ProposalBuilderMetadata.newDraft({
     required SignedDocumentRef templateRef,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef categoryRef,
   }) {
     final firstRef = DraftRef.generateFirstRef();
     return ProposalBuilderMetadata(
       documentRef: firstRef,
       templateRef: templateRef,
-      categoryRef: categoryId,
+      categoryRef: categoryRef,
     );
   }
 
