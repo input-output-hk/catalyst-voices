@@ -219,6 +219,7 @@ LTRB
 ltwh
 LynxLynxx
 Lynxx
+MAJOROUTAGE
 mdlint
 metadatum
 metadatums
@@ -228,6 +229,7 @@ mgrybyk
 miniaturizable
 minicbor
 minijinja
+MINOROUTAGE
 mithril
 mitigations
 mitmdump
@@ -260,6 +262,7 @@ openapi
 opentelemetry
 overprovisioned
 pageobject
+PARTIALOUTAGE
 Pbkdf2
 pbxproj
 Pdart

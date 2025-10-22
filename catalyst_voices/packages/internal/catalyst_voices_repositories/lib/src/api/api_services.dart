@@ -52,7 +52,6 @@ final class ApiServices {
     );
     final status = CatStatusService.dio(
       baseUrl: env.status.toString(),
-      options: catDioOptions,
       interceptClient: interceptClient,
       interceptors: [?catLogInterceptor],
     );
