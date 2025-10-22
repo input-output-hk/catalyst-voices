@@ -125,7 +125,7 @@ class _CreateNewProposalDialogState extends State<CreateNewProposalDialog>
   @override
   void initState() {
     super.initState();
-    unawaited(context.read<NewProposalCubit>().load(categoryId: widget.categoryRef));
+    unawaited(context.read<NewProposalCubit>().load(categoryRef: widget.categoryRef));
   }
 
   String _getTitle() {
@@ -169,7 +169,7 @@ class _ProposalCategory extends StatelessWidget {
           selector: (state) {
             return (
               categories: state.categories,
-              value: state.categoryId,
+              value: state.categoryRef,
             );
           },
           builder: (context, state) {

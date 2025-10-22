@@ -32,13 +32,13 @@ class NewProposalCubit extends Cubit<NewProposalState>
       emit(state.copyWith(isCreatingProposal: true));
 
       final title = state.title.value;
-      final categoryId = state.categoryId;
+      final categoryRef = state.categoryRef;
 
-      if (categoryId == null) {
+      if (categoryRef == null) {
         throw StateError('Cannot create draft, category not selected');
       }
 
-      final category = await _campaignService.getCategory(DocumentParameters({categoryId}));
+      final category = await _campaignService.getCategory(DocumentParameters({categoryRef}));
       final templateRef = category.proposalTemplateRef;
       final template = await _proposalService.getProposalTemplate(
         ref: templateRef,
@@ -58,7 +58,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
       return await _proposalService.createDraftProposal(
         content: documentContent,
         template: templateRef,
-        categoryId: categoryId,
+        categoryId: categoryRef,
       );
     } catch (error, stackTrace) {
       _logger.severe('Create draft', error, stackTrace);
@@ -69,10 +69,10 @@ class NewProposalCubit extends Cubit<NewProposalState>
     }
   }
 
-  Future<void> load({SignedDocumentRef? categoryId}) async {
+  Future<void> load({SignedDocumentRef? categoryRef}) async {
     try {
       emit(NewProposalState.loading());
-      final step = categoryId == null
+      final step = categoryRef == null
           ? const CreateProposalWithoutPreselectedCategoryStep()
           : const CreateProposalWithPreselectedCategoryStep();
       final campaign = await _campaignService.getActiveCampaign();
@@ -87,7 +87,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
       final templateRef = campaign.categories
           .cast<CampaignCategory?>()
           .firstWhere(
-            (e) => e?.selfRef == categoryId,
+            (e) => e?.selfRef == categoryRef,
             orElse: () => campaign.categories.firstOrNull,
           )
           ?.proposalTemplateRef;
@@ -104,7 +104,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
       final newState = state.copyWith(
         isLoading: false,
         step: step,
-        categoryId: Optional(categoryId),
+        categoryRef: Optional(categoryRef),
         titleLengthRange: Optional(titleRange),
         categories: categories,
       );
@@ -137,7 +137,7 @@ class NewProposalCubit extends Cubit<NewProposalState>
   void updateSelectedCategory(SignedDocumentRef? categoryId) {
     emit(
       state.copyWith(
-        categoryId: Optional(categoryId),
+        categoryRef: Optional(categoryId),
         isAgreeToCategoryCriteria: false,
         isAgreeToNoFurtherCategoryChange: false,
       ),

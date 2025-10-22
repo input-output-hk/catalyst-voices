@@ -12,7 +12,7 @@ class NewProposalState extends Equatable {
   final ProposalCreationStep step;
   final ProposalTitle title;
   final Range<int?>? titleLengthRange;
-  final SignedDocumentRef? categoryId;
+  final SignedDocumentRef? categoryRef;
   final List<CampaignCategoryDetailsViewModel> categories;
 
   const NewProposalState({
@@ -23,7 +23,7 @@ class NewProposalState extends Equatable {
     this.step = const CreateProposalWithoutPreselectedCategoryStep(),
     required this.title,
     this.titleLengthRange,
-    this.categoryId,
+    this.categoryRef,
     this.categories = const [],
   });
 
@@ -34,7 +34,7 @@ class NewProposalState extends Equatable {
     );
   }
 
-  bool get isValid => title.isValid && categoryId != null && _isAgreementValid;
+  bool get isValid => title.isValid && categoryRef != null && _isAgreementValid;
 
   @override
   List<Object?> get props => [
@@ -45,11 +45,11 @@ class NewProposalState extends Equatable {
     step,
     title,
     titleLengthRange,
-    categoryId,
+    categoryRef,
     categories,
   ];
   String? get selectedCategoryName =>
-      categories.firstWhereOrNull((e) => e.id == categoryId)?.formattedName;
+      categories.firstWhereOrNull((e) => e.id == categoryRef)?.formattedName;
 
   bool get _isAgreementValid => isAgreeToCategoryCriteria && isAgreeToNoFurtherCategoryChange;
 
@@ -62,7 +62,7 @@ class NewProposalState extends Equatable {
     ProposalCreationStep? step,
     ProposalTitle? title,
     Optional<Range<int?>>? titleLengthRange,
-    Optional<SignedDocumentRef>? categoryId,
+    Optional<SignedDocumentRef>? categoryRef,
     List<CampaignCategoryDetailsViewModel>? categories,
   }) {
     return NewProposalState(
@@ -74,7 +74,7 @@ class NewProposalState extends Equatable {
       step: step ?? this.step,
       title: title ?? this.title,
       titleLengthRange: titleLengthRange.dataOr(this.titleLengthRange),
-      categoryId: categoryId.dataOr(this.categoryId),
+      categoryRef: categoryRef.dataOr(this.categoryRef),
       categories: categories ?? this.categories,
     );
   }
