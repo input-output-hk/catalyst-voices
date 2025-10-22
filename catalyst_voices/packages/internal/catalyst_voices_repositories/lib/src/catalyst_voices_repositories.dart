@@ -27,6 +27,7 @@ export 'signed_document/signed_document_manager_impl.dart' show SignedDocumentMa
 export 'storage/vault/secure_storage_vault.dart';
 export 'sync/app_meta_storage.dart';
 export 'sync/sync_stats_storage.dart';
+export 'system_status/system_status_repository.dart' show SystemStatusRepository;
 export 'user/keychain/keychain_provider.dart' show KeychainProvider;
 export 'user/keychain/keychain_signer.dart' show KeychainSigner;
 export 'user/keychain/vault_keychain_provider.dart' show VaultKeychainProvider;

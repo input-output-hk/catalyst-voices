@@ -37,7 +37,7 @@ impl<E: Endpoint> Endpoint for DatabaseConnectionImpl<E> {
 
         // TODO: find a better way to filter URI paths
         let is_health_endpoint = req_path.starts_with("/api/v1/health/");
-        let is_metrics_endpoint = req_path == "/metrics";
+        let is_metrics_endpoint = req_path == "/metrics" || req_path == "/panic";
 
         if !(is_health_endpoint || is_metrics_endpoint) {
             if !event_db_is_live() {
