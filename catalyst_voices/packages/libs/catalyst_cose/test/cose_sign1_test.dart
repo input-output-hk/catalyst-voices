@@ -23,7 +23,7 @@ void main() {
         protectedHeaders: CoseHeaders.protected(
           contentType: const CoseIntValue(CoseValues.jsonContentType),
           contentEncoding: const CoseStringValue(CoseValues.brotliContentEncoding),
-          type: CoseDocumentType([CoseUuidV4.fromString(uuidV4)]),
+          type: CoseDocumentType(CoseUuidV4.fromString(uuidV4)),
           id: CoseDocumentId(CoseUuidV7.fromString(uuidV7)),
           ver: CoseDocumentVer(CoseUuidV7.fromString(uuidV7)),
           ref: CoseDocumentRefs([

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:catalyst_cose/src/exception/cose_format_exception.dart';
 import 'package:catalyst_cose/src/types/cose_uuid.dart';
 import 'package:cbor/cbor.dart';
 
@@ -47,26 +46,14 @@ extension type const CoseDocumentId(CoseUuidV7 value) {
 }
 
 /// Document Type.
-extension type const CoseDocumentType._(List<CoseUuidV4> list) {
-  /// The default constructor for the [CoseDocumentType].
-  factory CoseDocumentType(List<CoseUuidV4> list) {
-    if (list.isEmpty) {
-      throw const CoseFormatException('CoseDocumentType must contain at least one item');
-    }
-
-    return CoseDocumentType._(list);
-  }
-
+extension type const CoseDocumentType(CoseUuidV4 value) {
   /// Deserializes the type from cbor.
   factory CoseDocumentType.fromCbor(CborValue value) {
-    final list = value as CborList;
-    return CoseDocumentType(list.map(CoseUuidV4.fromCbor).toList());
+    return CoseDocumentType(CoseUuidV4.fromCbor(value));
   }
 
   /// Serializes the type as cbor.
-  CborValue toCbor() {
-    return CborList(list.map((e) => e.toCbor()).toList());
-  }
+  CborValue toCbor() => value.toCbor();
 }
 
 /// Document Version.

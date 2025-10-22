@@ -220,7 +220,7 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
     return CoseHeaders.protected(
       contentType: contentType.asCose,
       contentEncoding: _brotliEncoding,
-      type: CoseDocumentType([documentType.uuid.asUuidV4]),
+      type: CoseDocumentType(documentType.uuid.asUuidV4),
       id: id == null ? null : CoseDocumentId(id.asUuidV7),
       ver: ver == null ? null : CoseDocumentVer(ver.asUuidV7),
       ref: ref == null ? null : [ref].asCose,
@@ -240,7 +240,7 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
     required CoseHeaders protectedHeaders,
     required CoseHeaders unprotectedHeaders,
   }) {
-    final type = protectedHeaders.type?.list.firstOrNull?.format();
+    final type = protectedHeaders.type?.value.format();
     final ref = protectedHeaders.ref;
     final template = protectedHeaders.template;
     final reply = protectedHeaders.reply;
