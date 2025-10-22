@@ -17,6 +17,9 @@ abstract interface class SyncManager {
     CampaignService campaignService,
   ) = SyncManagerImpl;
 
+  /// Stream of synchronization progress (0.0 to 1.0).
+  Stream<double> get progressStream;
+
   Future<bool> get waitForSync;
 
   Future<void> dispose();
@@ -31,6 +34,7 @@ final class SyncManagerImpl implements SyncManager {
   final CampaignService _campaignService;
 
   final _lock = Lock();
+  final _progressController = StreamController<double>.broadcast();
 
   Timer? _syncTimer;
   var _synchronizationCompleter = Completer<bool>();
@@ -43,6 +47,9 @@ final class SyncManagerImpl implements SyncManager {
   );
 
   @override
+  Stream<double> get progressStream => _progressController.stream;
+
+  @override
   Future<bool> get waitForSync => _synchronizationCompleter.future;
 
   @override
@@ -53,6 +60,8 @@ final class SyncManagerImpl implements SyncManager {
     if (!_synchronizationCompleter.isCompleted) {
       _synchronizationCompleter.complete(false);
     }
+
+    await _progressController.close();
   }
 
   @override
@@ -91,10 +100,16 @@ final class SyncManagerImpl implements SyncManager {
         return;
       }
 
+      if (!_progressController.isClosed) {
+        _progressController.add(0);
+      }
+
       final newRefs = await _documentsService.sync(
         campaign: activeCampaign,
         onProgress: (value) {
-          _logger.finest('Documents sync progress[$value]');
+          if (!_progressController.isClosed) {
+            _progressController.add(value);
+          }
         },
       );
 
@@ -111,6 +126,10 @@ final class SyncManagerImpl implements SyncManager {
 
       rethrow;
     } finally {
+      if (!_progressController.isClosed) {
+        _progressController.add(1);
+      }
+
       stopwatch.stop();
 
       _logger.fine('Synchronization took ${stopwatch.elapsed}');
