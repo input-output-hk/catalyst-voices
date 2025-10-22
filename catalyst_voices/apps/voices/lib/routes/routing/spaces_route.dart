@@ -19,7 +19,8 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 
 part 'spaces_route.g.dart';
 
-final class CategoryDetailRoute extends GoRouteData with FadePageTransitionMixin {
+final class CategoryDetailRoute extends GoRouteData
+    with $CategoryDetailRoute, FadePageTransitionMixin {
   final String categoryId;
 
   const CategoryDetailRoute({required this.categoryId});
@@ -38,7 +39,7 @@ final class CategoryDetailRoute extends GoRouteData with FadePageTransitionMixin
   }
 }
 
-final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
+final class DiscoveryRoute extends GoRouteData with $DiscoveryRoute, FadePageTransitionMixin {
   final bool? $extra;
 
   const DiscoveryRoute({this.$extra});
@@ -50,7 +51,7 @@ final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
 }
 
 final class FundedProjectsRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+    with $FundedProjectsRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
   const FundedProjectsRoute();
 
   @override
@@ -65,7 +66,7 @@ final class FundedProjectsRoute extends GoRouteData
   }
 }
 
-final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
+final class ProposalsRoute extends GoRouteData with $ProposalsRoute, FadePageTransitionMixin {
   final String? categoryId;
   final String? tab;
 
@@ -165,7 +166,7 @@ final class SpacesShellRouteData extends ShellRouteData {
 }
 
 final class TreasuryRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+    with $TreasuryRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
   const TreasuryRoute();
 
   @override
@@ -180,7 +181,7 @@ final class TreasuryRoute extends GoRouteData
   }
 }
 
-final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
+final class VotingRoute extends GoRouteData with $VotingRoute, FadePageTransitionMixin {
   final String? categoryId;
   final String? tab;
   final bool? $extra;
@@ -207,7 +208,7 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
 }
 
 final class WorkspaceRoute extends GoRouteData
-    with FadePageTransitionMixin, CompositeRouteGuardMixin {
+    with $WorkspaceRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
   const WorkspaceRoute();
 
   @override
