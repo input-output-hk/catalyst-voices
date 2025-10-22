@@ -1,5 +1,4 @@
 export 'account/account.dart';
-export 'account/public_profile/public_profile_email.dart';
 export 'admin_tools/admin_tools.dart';
 export 'brand/brand.dart';
 export 'campaign/campaign_builder/campaign_builder.dart';
@@ -18,6 +17,7 @@ export 'proposal_builder/proposal_builder.dart';
 export 'proposals/proposals.dart';
 export 'registration/registration.dart';
 export 'session/session.dart';
+export 'system_status/system_status.dart';
 export 'voting/voting.dart';
 export 'voting_ballot/voting_ballot.dart';
 export 'workspace/workspace.dart';

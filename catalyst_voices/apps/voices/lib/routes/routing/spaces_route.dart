@@ -40,6 +40,8 @@ final class CategoryDetailRoute extends GoRouteData
 }
 
 final class DiscoveryRoute extends GoRouteData with $DiscoveryRoute, FadePageTransitionMixin {
+  static const name = 'discovery';
+
   final bool? $extra;
 
   const DiscoveryRoute({this.$extra});
@@ -101,7 +103,7 @@ final class ProposalsRoute extends GoRouteData with $ProposalsRoute, FadePageTra
   routes: <TypedRoute<RouteData>>[
     TypedGoRoute<DiscoveryRoute>(
       path: '/discovery',
-      name: 'discovery',
+      name: DiscoveryRoute.name,
       routes: [
         TypedGoRoute<ProposalsRoute>(
           path: 'proposals',
@@ -115,7 +117,7 @@ final class ProposalsRoute extends GoRouteData with $ProposalsRoute, FadePageTra
     ),
     TypedGoRoute<WorkspaceRoute>(
       path: '/workspace',
-      name: 'workspace',
+      name: WorkspaceRoute.name,
     ),
     TypedGoRoute<VotingRoute>(
       path: '/voting',
@@ -209,6 +211,8 @@ final class VotingRoute extends GoRouteData with $VotingRoute, FadePageTransitio
 
 final class WorkspaceRoute extends GoRouteData
     with $WorkspaceRoute, FadePageTransitionMixin, CompositeRouteGuardMixin {
+  static const name = 'workspace';
+
   const WorkspaceRoute();
 
   @override
