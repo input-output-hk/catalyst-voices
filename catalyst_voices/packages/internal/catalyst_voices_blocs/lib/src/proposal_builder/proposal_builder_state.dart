@@ -53,7 +53,7 @@ final class ProposalBuilderMetadata extends Equatable {
     Optional<DocumentRef>? documentRef,
     Optional<DocumentRef>? originalDocumentRef,
     Optional<SignedDocumentRef>? templateRef,
-    Optional<SignedDocumentRef>? categoryId,
+    Optional<SignedDocumentRef>? categoryRef,
     List<DocumentVersion>? versions,
     bool? fromActiveCampaign,
   }) {
@@ -62,7 +62,7 @@ final class ProposalBuilderMetadata extends Equatable {
       documentRef: documentRef.dataOr(this.documentRef),
       originalDocumentRef: originalDocumentRef.dataOr(this.originalDocumentRef),
       templateRef: templateRef.dataOr(this.templateRef),
-      categoryRef: categoryId.dataOr(this.categoryRef),
+      categoryRef: categoryRef.dataOr(this.categoryRef),
       versions: versions ?? this.versions,
       fromActiveCampaign: fromActiveCampaign ?? this.fromActiveCampaign,
     );
