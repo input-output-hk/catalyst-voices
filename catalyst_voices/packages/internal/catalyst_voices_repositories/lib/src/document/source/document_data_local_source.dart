@@ -13,11 +13,11 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
     CatalystId? authorId,
   });
 
-  Future<List<TypedDocumentRef>> index();
-
   Future<List<DocumentData>> queryVersionsOfId({required String id});
 
   Future<void> save({required DocumentData data});
+
+  Future<void> saveAll(Iterable<DocumentData> data);
 
   Stream<DocumentData?> watch({required DocumentRef ref});
 }
@@ -27,9 +27,6 @@ abstract interface class DraftDataSource implements DocumentDataLocalSource {
   Future<void> delete({
     required DraftRef ref,
   });
-
-  @override
-  Future<List<TypedDocumentRef>> index();
 
   Future<void> update({
     required DraftRef ref,

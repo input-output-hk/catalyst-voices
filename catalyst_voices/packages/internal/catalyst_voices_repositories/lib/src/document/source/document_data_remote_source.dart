@@ -7,12 +7,8 @@ import 'package:catalyst_voices_repositories/src/document/document_data_factory.
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_list_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/api/document_index_query_filters_dto.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/foundation.dart';
 
 final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
-  @visibleForTesting
-  static const indexPageSize = 200;
-
   final ApiServices _api;
   final SignedDocumentManager _signedDocumentManager;
 
@@ -35,80 +31,41 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
   }
 
   @override
-  Future<String?> getLatestVersion(String id) async {
-    final constVersion = allConstantDocumentRefs
-        .expand((element) => element.all)
-        .firstWhereOrNull((element) => element.id == id)
+  Future<String?> getLatestVersion(String id) {
+    final ver = allConstantDocumentRefs
+        .firstWhereOrNull((element) => element.hasId(id))
+        ?.withId(id)
         ?.version;
 
-    if (constVersion != null) {
-      return constVersion;
+    if (ver != null) {
+      return Future.value(ver);
     }
 
-    try {
-      final index = await _api.gateway
-          .apiV1DocumentIndexPost(
-            body: DocumentIndexQueryFilter(id: IdSelectorDto.eq(id)),
-            limit: 1,
-          )
-          .successBodyOrThrow()
-          .then(_mapDynamicResponseValue);
-
-      final docs = index.docs;
-      if (docs.isEmpty) {
-        return null;
-      }
-
-      return docs
-          .sublist(0, 1)
-          .cast<Map<String, dynamic>>()
-          .map(DocumentIndexListDto.fromJson)
-          .firstOrNull
-          ?.ver
-          .firstOrNull
-          ?.ver;
-    } on NotFoundException {
-      return null;
-    }
+    return _getDocumentIndexList(
+          page: 0,
+          limit: 1,
+          body: DocumentIndexQueryFilter(id: IdSelectorDto.eq(id)),
+        )
+        .then(_mapDynamicResponseValue)
+        .then((response) => response._docs.firstOrNull?.ver.firstOrNull?.ver);
   }
 
   @override
-  Future<List<TypedDocumentRef>> index({
-    required Campaign campaign,
-  }) async {
-    final allRefs = <TypedDocumentRef>{};
+  Future<DocumentIndex> index({
+    int page = 0,
+    int limit = 100,
+    required DocumentIndexFilters filters,
+  }) {
+    final body = DocumentIndexQueryFilter(
+      type: filters.type?.uuid,
+      parameters: IdRefOnly(id: IdSelectorDto.inside(filters.categoriesIds)).toJson(),
+    );
 
-    var page = 0;
-    const maxPerPage = indexPageSize;
-    var remaining = 0;
-
-    do {
-      final response =
-          await _getDocumentIndexList(
-            page: page,
-            limit: maxPerPage,
-            campaign: campaign,
-          )
-          // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
-          // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
-          .onError<NotFoundException>(
-            (_, _) {
-              return DocumentIndexList(
-                docs: [],
-                page: CurrentPage(page: page, limit: maxPerPage, remaining: 0),
-              );
-            },
-          );
-
-      allRefs.addAll(response.refs);
-
-      // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
-      // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
-      remaining = response.docs.length < maxPerPage ? 0 : response.page.remaining;
-      page = response.page.page + 1;
-    } while (remaining > 0);
-
-    return allRefs.toList();
+    return _getDocumentIndexList(
+      page: page,
+      limit: limit,
+      body: body,
+    ).then((value) => value.toModel());
   }
 
   @override
@@ -122,23 +79,95 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
         .successOrThrow();
   }
 
+  // TODO(damian-molinski): Remove this when backend can serve const documents
+  DocumentIndexList _forConstRefs({
+    required int page,
+    required int limit,
+    required Iterable<SignedDocumentRef> refs,
+    required DocumentType type,
+  }) {
+    final skip = page * limit;
+
+    final docs = refs
+        .skip(skip)
+        .take(limit)
+        .map(
+          (e) {
+            return DocumentIndexListDto(
+              id: e.id,
+              ver: [
+                IndividualDocumentVersion(ver: e.version!, type: type.uuid),
+              ],
+            );
+          },
+        )
+        .map((e) => e.toJson())
+        .toList();
+
+    final remaining = skip + docs.length - refs.length;
+
+    return DocumentIndexList(
+      docs: docs,
+      page: CurrentPage(
+        page: page,
+        limit: limit,
+        remaining: remaining,
+      ),
+    );
+  }
+
   Future<DocumentIndexList> _getDocumentIndexList({
     required int page,
     required int limit,
-    required Campaign campaign,
+    required DocumentIndexQueryFilter body,
   }) async {
-    final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toList();
+    // TODO(damian-molinski): Remove this when backend can serve const documents
+    if (body.type == DocumentType.proposalTemplate.uuid) {
+      return _forConstRefs(
+        page: page,
+        limit: limit,
+        refs: activeConstantDocumentRefs.map((e) => e.proposal),
+        type: DocumentType.proposalTemplate,
+      );
+    }
+    // TODO(damian-molinski): Remove this when backend can serve const documents
+    if (body.type == DocumentType.commentTemplate.uuid) {
+      return _forConstRefs(
+        page: page,
+        limit: limit,
+        refs: activeConstantDocumentRefs.map((e) => e.comment),
+        type: DocumentType.commentTemplate,
+      );
+    }
 
     return _api.gateway
         .apiV1DocumentIndexPost(
-          body: DocumentIndexQueryFilter(
-            parameters: IdRefOnly(id: IdSelectorDto.inside(categoriesIds)).toJson(),
-          ),
+          body: body,
           limit: limit,
           page: page,
         )
         .successBodyOrThrow()
-        .then(_mapDynamicResponseValue);
+        .then(_mapDynamicResponseValue)
+        .then(
+          (response) {
+            // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
+            // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
+            final remaining = response.docs.length < limit ? 0 : response.page.remaining;
+            final page = response.page.copyWith(remaining: remaining);
+
+            return response.copyWith(page: page);
+          },
+        )
+        // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
+        // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
+        .onError<NotFoundException>(
+          (_, _) {
+            return DocumentIndexList(
+              docs: [],
+              page: CurrentPage(page: page, limit: limit, remaining: 0),
+            );
+          },
+        );
   }
 
   DocumentIndexList _mapDynamicResponseValue(dynamic value) {
@@ -157,72 +186,63 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
 abstract interface class DocumentDataRemoteSource implements DocumentDataSource {
   Future<String?> getLatestVersion(String id);
 
-  Future<List<TypedDocumentRef>> index({required Campaign campaign});
+  Future<DocumentIndex> index({
+    int page,
+    int limit,
+    required DocumentIndexFilters filters,
+  });
 
   Future<void> publish(SignedDocument document);
 }
 
-extension on DocumentIndexList {
-  List<TypedDocumentRef> get refs {
-    return docs
-        .cast<Map<String, dynamic>>()
-        .map(DocumentIndexListDto.fromJson)
-        .map((ref) {
-          return <TypedDocumentRef>[
-            ...ref.ver
-                .map((ver) {
-                  final documentType = DocumentType.fromJson(ver.type);
+extension on DocumentRefForFilteredDocuments {
+  SignedDocumentRef toRef() => SignedDocumentRef(id: id, version: ver);
+}
 
-                  return <TypedDocumentRef>[
-                    TypedDocumentRef(
-                      ref: SignedDocumentRef(id: ref.id, version: ver.ver),
-                      type: documentType,
-                    ),
-                    if (ver.ref != null)
-                      TypedDocumentRef(
-                        ref: ver.ref!.toRef(),
-                        type: DocumentType.unknown,
-                      ),
-                    if (ver.reply != null)
-                      TypedDocumentRef(
-                        ref: ver.reply!.toRef(),
-                        type: DocumentType.unknown,
-                      ),
-                    if (ver.parameters != null)
-                      TypedDocumentRef(
-                        ref: ver.parameters!.toRef(),
-                        type: DocumentType.categoryParametersDocument,
-                      ),
-                    if (ver.template != null)
-                      TypedDocumentRef(
-                        ref: ver.template!.toRef(),
-                        type: documentType.template ?? DocumentType.unknown,
-                      ),
-                    if (ver.brand != null)
-                      TypedDocumentRef(
-                        ref: ver.brand!.toRef(),
-                        type: DocumentType.brandParametersDocument,
-                      ),
-                    if (ver.campaign != null)
-                      TypedDocumentRef(
-                        ref: ver.campaign!.toRef(),
-                        type: DocumentType.campaignParametersDocument,
-                      ),
-                    if (ver.category != null)
-                      TypedDocumentRef(
-                        ref: ver.category!.toRef(),
-                        type: DocumentType.categoryParametersDocument,
-                      ),
-                  ];
-                })
-                .expand((element) => element),
-          ];
-        })
-        .expand((element) => element)
-        .toList();
+extension on DocumentIndexList {
+  Iterable<DocumentIndexListDto> get _docs {
+    return docs.cast<Map<String, dynamic>>().map(DocumentIndexListDto.fromJson);
+  }
+
+  DocumentIndex toModel() {
+    final docs = _docs.map((e) => e.toModel()).toList();
+    final page = this.page.toModel();
+
+    return DocumentIndex(docs: docs, page: page);
   }
 }
 
-extension on DocumentRefForFilteredDocuments {
-  SignedDocumentRef toRef() => SignedDocumentRef(id: id, version: ver);
+extension on CurrentPage {
+  DocumentIndexPage toModel() {
+    return DocumentIndexPage(
+      page: page,
+      limit: limit,
+      remaining: remaining,
+    );
+  }
+}
+
+extension on DocumentIndexListDto {
+  DocumentIndexDoc toModel() {
+    return DocumentIndexDoc(
+      id: id,
+      ver: ver.map(
+        (e) {
+          return DocumentIndexDocVersion(
+            ver: e.ver,
+            type: DocumentType.fromJson(e.type),
+            ref: e.ref?.toRef(),
+            reply: e.reply?.toRef(),
+            parameters: [
+              if (e.parameters case final value?) value.toRef(),
+            ],
+            template: e.template?.toRef(),
+            brand: e.brand?.toRef(),
+            campaign: e.campaign?.toRef(),
+            category: e.category?.toRef(),
+          );
+        },
+      ).toList(),
+    );
+  }
 }

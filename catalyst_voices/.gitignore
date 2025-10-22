@@ -3,7 +3,9 @@
 devtools_options.yaml
 
 # Documentation
-docs/
+docs/dartdoc
+docs/licenses
+docs/*.dot
 
 # Generated files from code generation tools
 *.g.dart

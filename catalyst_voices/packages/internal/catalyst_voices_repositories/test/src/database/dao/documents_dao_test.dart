@@ -202,39 +202,6 @@ void main() {
       );
 
       test(
-        'all refs return as expected',
-        () async {
-          // Given
-          final refs = List.generate(
-            10,
-            (_) => DocumentRefFactory.signedDocumentRef(),
-          );
-
-          final documentsWithMetadata = refs.map((ref) {
-            return DocumentWithMetadataFactory.build(
-              metadata: DocumentDataMetadata(
-                type: DocumentType.proposalDocument,
-                selfRef: ref,
-              ),
-            );
-          });
-          final typedRefs = refs.map((e) => e.toTyped(DocumentType.proposalDocument)).toList();
-
-          // When
-          await database.documentsDao.saveAll(documentsWithMetadata);
-
-          // Then
-          final allRefs = await database.documentsDao.queryAllTypedRefs();
-
-          expect(
-            allRefs,
-            allOf(hasLength(refs.length), containsAll(typedRefs)),
-          );
-        },
-        onPlatform: driftOnPlatforms,
-      );
-
-      test(
         'Return latest unique documents',
         () async {
           final id = DocumentRefFactory.randomUuidV7();

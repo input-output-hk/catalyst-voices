@@ -104,7 +104,7 @@ final class SyncManagerImpl implements SyncManager {
         _progressController.add(0);
       }
 
-      final newRefs = await _documentsService.sync(
+      final result = await _documentsService.sync(
         campaign: activeCampaign,
         onProgress: (value) {
           if (!_progressController.isClosed) {
@@ -113,15 +113,22 @@ final class SyncManagerImpl implements SyncManager {
         },
       );
 
+      stopwatch.stop();
+
       await _updateSuccessfulSyncStats(
-        newRefsCount: newRefs.length,
+        newRefsCount: result.newDocumentsCount,
         duration: stopwatch.elapsed,
       );
 
-      _logger.fine('Synchronization completed. NewRefs[${newRefs.length}]');
+      _logger.fine('Synchronization completed. New documents: ${result.newDocumentsCount}');
+
+      if (result.failedDocumentsCount > 0) {
+        _logger.info('Synchronization failed for documents: ${result.failedDocumentsCount}');
+      }
+
       _synchronizationCompleter.complete(true);
     } catch (error, stack) {
-      _logger.severe('Synchronization failed', error, stack);
+      _logger.fine('Synchronization failed after ${stopwatch.elapsed}', error, stack);
       _synchronizationCompleter.complete(false);
 
       rethrow;
