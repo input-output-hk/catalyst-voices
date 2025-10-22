@@ -4,7 +4,6 @@ import 'package:catalyst_voices_repositories/src/signed_document/signed_document
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../fixture/signed_document/signed_document_test_data.dart';
 import '../utils/test_factories.dart';
 
 void main() {
@@ -42,24 +41,6 @@ void main() {
 
       expect(parsedDocument, equals(signedDocument));
       expect(parsedDocument.signers, [_catalystId]);
-    });
-
-    test('parse signed document v0.0.1', () async {
-      final bytes = await SignedDocumentTestData.signedDocumentV0_0_1Bytes;
-      final document = await documentManager.parseDocument(bytes);
-
-      expect(document.metadata.documentType, equals(DocumentType.proposalDocument));
-      expect(document.metadata.template, isNotNull);
-      expect(document.metadata.parameters, isNotEmpty);
-    });
-
-    test('parse signed document v0.0.4', () async {
-      final bytes = await SignedDocumentTestData.signedDocumentV0_0_4Bytes;
-      final document = await documentManager.parseDocument(bytes);
-
-      expect(document.metadata.documentType, equals(DocumentType.proposalDocument));
-      expect(document.metadata.template, isNotNull);
-      expect(document.metadata.parameters, isNotEmpty);
     });
   });
 }

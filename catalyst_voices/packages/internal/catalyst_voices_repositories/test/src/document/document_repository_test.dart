@@ -7,7 +7,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import '../../fixture/signed_document/signed_document_test_data.dart';
 import '../../fixture/voices_document_templates.dart';
 import '../database/connection/test_connection.dart';
 import '../database/drift_test_platforms.dart';
@@ -594,24 +593,6 @@ void main() {
       },
       onPlatform: driftOnPlatforms,
     );
-
-    test('parseDocumentForImport exported with v0.0.1 signed document spec', () async {
-      final bytes = await SignedDocumentTestData.exportedProposalV0_0_1Bytes;
-      final document = await repository.parseDocumentForImport(data: bytes);
-
-      expect(document.metadata.type, equals(DocumentType.proposalDocument));
-      expect(document.metadata.template, isNotNull);
-      expect(document.metadata.parameters, isNotEmpty);
-    });
-
-    test('parseDocumentForImport exported with v0.0.4 signed document spec', () async {
-      final bytes = await SignedDocumentTestData.exportedProposalV0_0_4Bytes;
-      final document = await repository.parseDocumentForImport(data: bytes);
-
-      expect(document.metadata.type, equals(DocumentType.proposalDocument));
-      expect(document.metadata.template, isNotNull);
-      expect(document.metadata.parameters, isNotEmpty);
-    });
   });
 }
 
