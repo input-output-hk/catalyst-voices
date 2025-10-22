@@ -4,7 +4,6 @@ abnf
 addr
 addrof
 addrr
-COAP
 adminer
 afinet
 allprojects
@@ -64,6 +63,7 @@ ciphertext
 ciphertexts
 CIPs
 CNFT
+COAP
 COCOAPODS
 codegen
 codepoints
