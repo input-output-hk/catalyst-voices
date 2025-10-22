@@ -8,8 +8,8 @@ final f15StaticCampaignTimeline = CampaignTimeline(
       description:
           '''Proposers submit initial ideas to solve challenges. Each proposal includes the problem, solution, requested ADA budget, and a clear implementation plan.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 09, 23, 8),
-        to: DateTime.utc(2025, 12, 30, 18),
+        from: DateTime.utc(2025, 07, 05, 18),
+        to: DateTime.utc(2026, 03, 12, 10),
       ),
       type: CampaignPhaseType.proposalSubmission,
     ),
@@ -46,8 +46,8 @@ final f15StaticCampaignTimeline = CampaignTimeline(
       title: 'Community Voting',
       description: '''Community members cast their votes using the Catalyst Voting app.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 8, 22, 12),
-        to: DateTime.utc(2025, 12, 30, 18),
+        from: DateTime.utc(2027, 07, 05, 18),
+        to: DateTime.utc(2027, 07, 12, 10),
       ),
       type: CampaignPhaseType.communityVoting,
     ),
