@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:catalyst_cose/src/exception/cose_format_exception.dart';
 import 'package:catalyst_cose/src/types/cose_uuid.dart';
 import 'package:catalyst_cose/src/utils/cbor_utils.dart';
 import 'package:cbor/cbor.dart';
@@ -38,20 +39,20 @@ final class CoseDocumentLocator extends Equatable {
 /// Reference to a single Signed Document.
 final class CoseDocumentRef extends Equatable {
   /// A document id.
-  final CoseUuid documentId;
+  final CoseUuidV7 documentId;
 
   /// A document version.
   ///
   /// If the document doesn't have any versions then [documentVer] == [documentId].
-  final CoseUuid documentVer;
+  final CoseUuidV7 documentVer;
 
   /// Where a document can be located, must be a unique identifier.
   final CoseDocumentLocator documentLocator;
 
   /// A latest spec version of the [CoseDocumentRef] constructor.
   const CoseDocumentRef({
-    required CoseUuid documentId,
-    required CoseUuid documentVer,
+    required CoseUuidV7 documentId,
+    required CoseUuidV7 documentVer,
     required CoseDocumentLocator documentLocator,
   }) : this._(
          documentId: documentId,
@@ -63,7 +64,7 @@ final class CoseDocumentRef extends Equatable {
   factory CoseDocumentRef.fromCbor(CborValue value) {
     if (value is! CborList) {
       return CoseDocumentRef.optional(
-        documentId: CoseUuid.fromCbor(value),
+        documentId: CoseUuidV7.fromCbor(value),
       );
     } else {
       final documentId = value.elementAtOrNull(0)!;
@@ -71,8 +72,8 @@ final class CoseDocumentRef extends Equatable {
       final documentLocator = value.elementAtOrNull(2);
 
       return CoseDocumentRef.optional(
-        documentId: CoseUuid.fromCbor(documentId),
-        documentVer: documentVer != null ? CoseUuid.fromCbor(documentVer) : null,
+        documentId: CoseUuidV7.fromCbor(documentId),
+        documentVer: documentVer != null ? CoseUuidV7.fromCbor(documentVer) : null,
         documentLocator: documentLocator != null
             ? CoseDocumentLocator.fromCbor(documentLocator)
             : null,
@@ -82,8 +83,8 @@ final class CoseDocumentRef extends Equatable {
 
   /// A constructor for [CoseDocumentRef] which assigns default, backward compatible values.
   CoseDocumentRef.optional({
-    required CoseUuid documentId,
-    CoseUuid? documentVer,
+    required CoseUuidV7 documentId,
+    CoseUuidV7? documentVer,
     CoseDocumentLocator? documentLocator,
   }) : this._(
          documentId: documentId,
@@ -111,16 +112,15 @@ final class CoseDocumentRef extends Equatable {
 }
 
 /// A reference to the Parameters Document this document lies under.
-final class CoseDocumentRefs extends Equatable {
-  /// References to documents that document is linked to, like brandId, categoryId or campaignId.
-  final List<CoseDocumentRef> refs;
-
+extension type const CoseDocumentRefs._(List<CoseDocumentRef> refs) {
   /// The default constructor for the [CoseDocumentRefs].
-  CoseDocumentRefs(this.refs)
-    : assert(
-        refs.isNotEmpty,
-        'refs must contain at least one item',
-      );
+  factory CoseDocumentRefs(List<CoseDocumentRef> refs) {
+    if (refs.isEmpty) {
+      throw const CoseFormatException('CoseDocumentRefs must contain at least one item');
+    }
+
+    return CoseDocumentRefs._(refs);
+  }
 
   /// Deserializes the type from cbor.
   factory CoseDocumentRefs.fromCbor(CborValue value) {
@@ -131,9 +131,6 @@ final class CoseDocumentRefs extends Equatable {
     return CoseDocumentRefs(list.map(CoseDocumentRef.fromCbor).toList());
   }
 
-  @override
-  List<Object?> get props => [refs];
-
   /// Serializes the type as cbor.
   CborValue toCbor() {
     return CborList(refs.map((e) => e.toCbor()).toList());
@@ -142,7 +139,7 @@ final class CoseDocumentRefs extends Equatable {
   /// Pre v0.0.1 spec, the document ref was just a string representing the documentId, not documented.
   static CborValue _migrateCbor1(CborValue value) {
     if (value is CborBytes) {
-      final documentId = CoseUuid.fromCbor(value);
+      final documentId = CoseUuidV7.fromCbor(value);
 
       return CoseDocumentRef.optional(documentId: documentId).toCbor();
     }

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:catalyst_cose/src/types/cose_custom_types.dart';
 import 'package:catalyst_cose/src/types/cose_document_ref.dart';
@@ -17,17 +16,22 @@ final class CborUtils {
 
   const CborUtils._();
 
-  /// Deserializes optional [Uint8List] type.
-  static Uint8List? deserializeBytes(CborValue? value) {
+  /// Deserializes optional [CoseCollaborators] type.
+  static CoseCollaborators? deserializeCollaborators(CborValue? value) {
     if (value == null) {
       return null;
     }
 
-    if (value is CborString) {
-      return utf8.encode(value.toString());
+    return CoseCollaborators.fromCbor(value);
+  }
+
+  /// Deserializes optional [CoseDocumentId] type.
+  static CoseDocumentId? deserializeDocumentId(CborValue? value) {
+    if (value == null) {
+      return null;
     }
 
-    return Uint8List.fromList((value as CborBytes).bytes);
+    return CoseDocumentId.fromCbor(value);
   }
 
   /// Deserializes optional [CoseDocumentRefs] type.
@@ -37,6 +41,24 @@ final class CborUtils {
     }
 
     return CoseDocumentRefs.fromCbor(value);
+  }
+
+  /// Deserializes optional [CoseDocumentType] type.
+  static CoseDocumentType? deserializeDocumentType(CborValue? value) {
+    if (value == null) {
+      return null;
+    }
+
+    return CoseDocumentType.fromCbor(value);
+  }
+
+  /// Deserializes optional [CoseDocumentVer] type.
+  static CoseDocumentVer? deserializeDocumentVer(CborValue? value) {
+    if (value == null) {
+      return null;
+    }
+
+    return CoseDocumentVer.fromCbor(value);
   }
 
   /// Deserializes optional [CatalystIdKid] type.
@@ -52,42 +74,13 @@ final class CborUtils {
     return CatalystIdKid.fromCbor(value);
   }
 
-  /// Deserializes optional `List<String>` type.
-  static List<CatalystIdKid>? deserializeKidList(CborValue? value) {
+  /// Deserializes optional [CoseSectionRef] type.
+  static CoseSectionRef? deserializeSectionRef(CborValue? value) {
     if (value == null) {
       return null;
     }
 
-    final list = value as CborList;
-    return list.map(deserializeKid).nonNulls.toList().cast<CatalystIdKid>();
-  }
-
-  /// Deserializes optional [SectionRef] type.
-  static SectionRef? deserializeSectionRef(CborValue? value) {
-    if (value == null) {
-      return null;
-    }
-
-    return SectionRef.fromCbor(value);
-  }
-
-  /// Deserializes optional [String] type.
-  static String? deserializeString(CborValue? value) {
-    if (value == null) {
-      return null;
-    }
-
-    return (value as CborString).toString();
-  }
-
-  /// Deserializes optional `List<String>` type.
-  static List<String>? deserializeStringList(CborValue? value) {
-    if (value == null) {
-      return null;
-    }
-
-    final list = value as CborList;
-    return list.map((e) => (e as CborString).toString()).toList();
+    return CoseSectionRef.fromCbor(value);
   }
 
   /// Deserializes optional [CoseStringOrInt] type.
@@ -99,34 +92,21 @@ final class CborUtils {
     return CoseStringOrInt.fromCbor(value);
   }
 
-  /// Deserializes optional [CoseUuid] type.
-  static CoseUuid? deserializeUuid(CborValue? value) {
+  /// Deserializes optional [CoseUuidV4] type.
+  static CoseUuidV4? deserializeUuidV4(CborValue? value) {
     if (value == null) {
       return null;
     }
 
-    return CoseUuid.fromCbor(value);
+    return CoseUuidV4.fromCbor(value);
   }
 
-  /// Serializes optional `List<CatalystIdKid>` type.
-  static CborValue serializeKidList(List<CatalystIdKid>? values) {
-    if (values == null) {
-      return const CborNull();
+  /// Deserializes optional [CoseUuidV7] type.
+  static CoseUuidV7? deserializeUuidV7(CborValue? value) {
+    if (value == null) {
+      return null;
     }
 
-    return CborList([
-      for (final value in values) value.toCbor(),
-    ]);
-  }
-
-  /// Serializes optional `List<String>` type.
-  static CborValue serializeStringList(List<String>? values) {
-    if (values == null) {
-      return const CborNull();
-    }
-
-    return CborList([
-      for (final value in values) CborString(value),
-    ]);
+    return CoseUuidV7.fromCbor(value);
   }
 }

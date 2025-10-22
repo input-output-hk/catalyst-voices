@@ -23,20 +23,20 @@ void main() {
         protectedHeaders: CoseHeaders.protected(
           contentType: const CoseIntValue(CoseValues.jsonContentType),
           contentEncoding: const CoseStringValue(CoseValues.brotliContentEncoding),
-          type: const CoseUuid(uuidV4),
-          id: const CoseUuid(uuidV7),
-          ver: const CoseUuid(uuidV7),
+          type: CoseDocumentType([CoseUuidV4.fromString(uuidV4)]),
+          id: CoseDocumentId(CoseUuidV7.fromString(uuidV7)),
+          ver: CoseDocumentVer(CoseUuidV7.fromString(uuidV7)),
           ref: CoseDocumentRefs([
-            CoseDocumentRef.optional(documentId: const CoseUuid(uuidV7)),
+            CoseDocumentRef.optional(documentId: CoseUuidV7.fromString(uuidV7)),
           ]),
           template: CoseDocumentRefs([
-            CoseDocumentRef.optional(documentId: const CoseUuid(uuidV7)),
+            CoseDocumentRef.optional(documentId: CoseUuidV7.fromString(uuidV7)),
           ]),
           reply: CoseDocumentRefs([
-            CoseDocumentRef.optional(documentId: const CoseUuid(uuidV7)),
+            CoseDocumentRef.optional(documentId: CoseUuidV7.fromString(uuidV7)),
           ]),
-          section: const SectionRef('section_name'),
-          collaborators: [CatalystIdKid.fromString('test@domain.com')],
+          section: const CoseSectionRef(CoseJsonPointer('section_name')),
+          collaborators: CoseCollaborators([CatalystIdKid.fromString('test@domain.com')]),
         ),
         unprotectedHeaders: const CoseHeaders.unprotected(),
         signers: [signerVerifier],

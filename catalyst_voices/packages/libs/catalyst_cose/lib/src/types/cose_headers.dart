@@ -30,20 +30,22 @@ final class CoseHeaders extends Equatable {
   /// it will be auto-populated with [CatalystCoseSigner.kid] value.
   final CatalystIdKid? kid;
 
+  // TODO(dt-iohk): convert it to media_type and validate it's values
   /// See [CoseHeaderKeys.contentType].
   final CoseStringOrInt? contentType;
 
+  // TODO(dt-iohk): convert it to http_content_encoding and validate it's values
   /// See [CoseHeaderKeys.contentEncoding].
   final CoseStringOrInt? contentEncoding;
 
   /// See [CoseHeaderKeys.type].
-  final CoseUuid? type;
+  final CoseDocumentType? type;
 
   /// See [CoseHeaderKeys.id].
-  final CoseUuid? id;
+  final CoseDocumentId? id;
 
   /// See [CoseHeaderKeys.ver].
-  final CoseUuid? ver;
+  final CoseDocumentVer? ver;
 
   /// See [CoseHeaderKeys.ref].
   final CoseDocumentRefs? ref;
@@ -55,12 +57,12 @@ final class CoseHeaders extends Equatable {
   final CoseDocumentRefs? reply;
 
   /// See [CoseHeaderKeys.section].
-  final SectionRef? section;
+  final CoseSectionRef? section;
 
   /// See [CoseHeaderKeys.collaborators].
   ///
   /// Replaces the old [CoseHeaderKeys.collabs] key.
-  final List<CatalystIdKid>? collaborators;
+  final CoseCollaborators? collaborators;
 
   /// See [CoseHeaderKeys.parameters].
   ///
@@ -100,20 +102,21 @@ final class CoseHeaders extends Equatable {
     var map = _decodeCbor(value);
     map = _migrateCbor1(map);
     map = _migrateCbor2(map);
+    map = _migrateCbor3(map);
 
     return CoseHeaders(
       alg: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.alg]),
       kid: CborUtils.deserializeKid(map[CoseHeaderKeys.kid]),
       contentType: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.contentType]),
       contentEncoding: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.contentEncoding]),
-      type: CborUtils.deserializeUuid(map[CoseHeaderKeys.type]),
-      id: CborUtils.deserializeUuid(map[CoseHeaderKeys.id]),
-      ver: CborUtils.deserializeUuid(map[CoseHeaderKeys.ver]),
+      type: CborUtils.deserializeDocumentType(map[CoseHeaderKeys.type]),
+      id: CborUtils.deserializeDocumentId(map[CoseHeaderKeys.id]),
+      ver: CborUtils.deserializeDocumentVer(map[CoseHeaderKeys.ver]),
       ref: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.ref]),
       template: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.template]),
       reply: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.reply]),
       section: CborUtils.deserializeSectionRef(map[CoseHeaderKeys.section]),
-      collaborators: CborUtils.deserializeKidList(map[CoseHeaderKeys.collaborators]),
+      collaborators: CborUtils.deserializeCollaborators(map[CoseHeaderKeys.collaborators]),
       parameters: CborUtils.deserializeDocumentRefs(map[CoseHeaderKeys.parameters]),
       encodeAsBytes: encodeAsBytes,
     );
@@ -177,14 +180,14 @@ final class CoseHeaders extends Equatable {
     OptionalValueGetter<CatalystIdKid?>? kid,
     OptionalValueGetter<CoseStringOrInt?>? contentType,
     OptionalValueGetter<CoseStringOrInt?>? contentEncoding,
-    OptionalValueGetter<CoseUuid?>? type,
-    OptionalValueGetter<CoseUuid?>? id,
-    OptionalValueGetter<CoseUuid?>? ver,
+    OptionalValueGetter<CoseDocumentType?>? type,
+    OptionalValueGetter<CoseDocumentId?>? id,
+    OptionalValueGetter<CoseDocumentVer?>? ver,
     OptionalValueGetter<CoseDocumentRefs?>? ref,
     OptionalValueGetter<CoseDocumentRefs?>? template,
     OptionalValueGetter<CoseDocumentRefs?>? reply,
-    OptionalValueGetter<SectionRef?>? section,
-    OptionalValueGetter<List<CatalystIdKid>?>? collaborators,
+    OptionalValueGetter<CoseSectionRef?>? section,
+    OptionalValueGetter<CoseCollaborators?>? collaborators,
     OptionalValueGetter<CoseDocumentRefs?>? parameters,
     bool? encodeAsBytes,
   }) {
@@ -214,7 +217,7 @@ final class CoseHeaders extends Equatable {
       if (contentType case final contentType?) CoseHeaderKeys.contentType: contentType.toCbor(),
       if (contentEncoding case final contentEncoding?)
         CoseHeaderKeys.contentEncoding: contentEncoding.toCbor(),
-      if (type case final type?) CoseHeaderKeys.type: type!.toCbor(),
+      if (type case final type?) CoseHeaderKeys.type: type.toCbor(),
       if (id case final id?) CoseHeaderKeys.id: id!.toCbor(),
       if (ver case final ver?) CoseHeaderKeys.ver: ver!.toCbor(),
       if (ref case final ref?) CoseHeaderKeys.ref: ref.toCbor(),
@@ -223,7 +226,7 @@ final class CoseHeaders extends Equatable {
       if (section case final section?) CoseHeaderKeys.section: section.toCbor(),
       if (parameters case final parameters?) CoseHeaderKeys.parameters: parameters.toCbor(),
       if (collaborators case final collaborators?)
-        CoseHeaderKeys.collaborators: CborUtils.serializeKidList(collaborators),
+        CoseHeaderKeys.collaborators: collaborators.toCbor(),
     });
 
     if (encodeAsBytes) {
@@ -247,7 +250,7 @@ final class CoseHeaders extends Equatable {
 
   /// v0.0.1 -> v0.0.4 spec: https://github.com/input-output-hk/catalyst-libs/pull/341/files#diff-2827956d681587dfd09dc733aca731165ff44812f8322792bf6c4a61cf2d3b85
   ///
-  /// Migrate brandId, campaignId and categoryId into parameters.
+  /// Migrate "brandId", "campaignId" and "categoryId" into "parameters".
   static CborMap _migrateCbor1(CborMap map) {
     final parametersKeys = [
       CoseHeaderKeys.brandId,
@@ -275,11 +278,25 @@ final class CoseHeaders extends Equatable {
 
   /// v0.0.1 -> v0.0.4 spec: https://github.com/input-output-hk/catalyst-libs/pull/341/files#diff-2827956d681587dfd09dc733aca731165ff44812f8322792bf6c4a61cf2d3b85
   ///
-  /// Migrate collabs into collaborators.
+  /// Migrate "collabs" into "collaborators".
   static CborMap _migrateCbor2(CborMap map) {
     if (map.containsKey(CoseHeaderKeys.collabs)) {
       final modified = CborMap.fromEntries(map.entries, tags: map.tags, type: map.type);
       modified[CoseHeaderKeys.collaborators] = map.remove(CoseHeaderKeys.collabs)!;
+      return modified;
+    } else {
+      return map;
+    }
+  }
+
+  /// v0.0.1 -> v0.0.4 spec: https://github.com/input-output-hk/catalyst-libs/pull/341/files#diff-2827956d681587dfd09dc733aca731165ff44812f8322792bf6c4a61cf2d3b85
+  ///
+  /// Migrate "type" from string into list.
+  static CborMap _migrateCbor3(CborMap map) {
+    final type = map[CoseHeaderKeys.type];
+    if (type is CborBytes) {
+      final modified = CborMap.fromEntries(map.entries, tags: map.tags, type: map.type);
+      map[CoseHeaderKeys.type] = CoseDocumentType([CoseUuidV4.fromCbor(type)]).toCbor();
       return modified;
     } else {
       return map;

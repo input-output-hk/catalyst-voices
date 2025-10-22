@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:catalyst_cose/src/cose_constants.dart';
+import 'package:catalyst_cose/src/exception/cose_format_exception.dart';
 import 'package:catalyst_cose/src/types/cose_headers.dart';
 import 'package:cbor/cbor.dart';
 import 'package:collection/collection.dart';
@@ -36,7 +37,7 @@ final class CoseSign extends Equatable {
   /// Deserializes the type from cbor.
   factory CoseSign.fromCbor(CborValue value) {
     if (value is! CborList || value.length != 4) {
-      throw FormatException('$value is not a valid COSE_SIGN structure');
+      throw CoseFormatException('$value is not a valid COSE_SIGN structure');
     }
 
     final protectedHeaders = value[0];

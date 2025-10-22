@@ -1,6 +1,7 @@
 export 'src/cose_constants.dart';
 export 'src/cose_sign.dart';
 export 'src/cose_sign1.dart';
+export 'src/exception/cose_format_exception.dart';
 export 'src/types/cose_custom_types.dart';
 export 'src/types/cose_document_ref.dart';
 export 'src/types/cose_headers.dart';

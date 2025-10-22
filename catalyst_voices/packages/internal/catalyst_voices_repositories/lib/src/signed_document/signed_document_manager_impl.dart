@@ -209,22 +209,25 @@ extension _SignedDocumentContentTypeExt on SignedDocumentContentType {
 
 extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
   CoseHeaders get asCoseProtectedHeaders {
+    final id = this.id;
+    final ver = this.ver;
     final ref = this.ref;
     final template = this.template;
     final reply = this.reply;
     final section = this.section;
+    final collaborators = this.collaborators;
 
     return CoseHeaders.protected(
       contentType: contentType.asCose,
       contentEncoding: _brotliEncoding,
-      type: documentType.uuid.asUuid,
-      id: id?.asUuid,
-      ver: ver?.asUuid,
+      type: CoseDocumentType([documentType.uuid.asUuidV4]),
+      id: id == null ? null : CoseDocumentId(id.asUuidV7),
+      ver: ver == null ? null : CoseDocumentVer(ver.asUuidV7),
       ref: ref == null ? null : [ref].asCose,
       template: template == null ? null : [template].asCose,
       reply: reply == null ? null : [reply].asCose,
-      section: section == null ? null : SectionRef(section),
-      collaborators: collaborators?.asCose,
+      section: section == null ? null : CoseSectionRef(CoseJsonPointer(section)),
+      collaborators: collaborators == null ? null : CoseCollaborators(collaborators.asCose),
       parameters: parameters.asCose,
     );
   }
@@ -237,7 +240,7 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
     required CoseHeaders protectedHeaders,
     required CoseHeaders unprotectedHeaders,
   }) {
-    final type = protectedHeaders.type?.value;
+    final type = protectedHeaders.type?.list.firstOrNull?.format();
     final ref = protectedHeaders.ref;
     final template = protectedHeaders.template;
     final reply = protectedHeaders.reply;
@@ -249,15 +252,15 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
         protectedHeaders.contentType,
       ),
       documentType: type == null ? DocumentType.unknown : DocumentType.fromJson(type),
-      id: protectedHeaders.id?.value,
-      ver: protectedHeaders.ver?.value,
+      id: protectedHeaders.id?.value?.format(),
+      ver: protectedHeaders.ver?.value?.format(),
       ref: ref == null ? null : _SignedDocumentMetadataRefsExt.fromCose(ref).firstOrNull,
       template: template == null
           ? null
           : _SignedDocumentMetadataRefsExt.fromCose(template).firstOrNull,
       reply: reply == null ? null : _SignedDocumentMetadataRefsExt.fromCose(reply).firstOrNull,
-      section: protectedHeaders.section?.text,
-      collaborators: collaborators == null ? null : _CatalystIdListExt.fromCose(collaborators),
+      section: protectedHeaders.section?.value.text,
+      collaborators: collaborators == null ? null : _CatalystIdListExt.fromCose(collaborators.list),
       parameters: parameters == null
           ? const []
           : _SignedDocumentMetadataRefsExt.fromCose(parameters),
@@ -267,15 +270,15 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
 
 extension _SignedDocumentMetadataRefExt on SignedDocumentMetadataRef {
   CoseDocumentRef get asCose => CoseDocumentRef.optional(
-    documentId: id.asUuid,
-    documentVer: ver.asUuid,
+    documentId: id.asUuidV7,
+    documentVer: ver.asUuidV7,
     documentLocator: CoseDocumentLocator.fallback(),
   );
 
   static SignedDocumentMetadataRef fromCose(CoseDocumentRef cose) {
     return SignedDocumentMetadataRef(
-      id: cose.documentId.value,
-      ver: cose.documentVer.value,
+      id: cose.documentId.format(),
+      ver: cose.documentVer.format(),
     );
   }
 }
@@ -289,5 +292,7 @@ extension _SignedDocumentMetadataRefsExt on List<SignedDocumentMetadataRef> {
 }
 
 extension _UuidExt on String {
-  CoseUuid get asUuid => CoseUuid(this);
+  CoseUuidV4 get asUuidV4 => CoseUuidV4.fromString(this);
+
+  CoseUuidV7 get asUuidV7 => CoseUuidV7.fromString(this);
 }

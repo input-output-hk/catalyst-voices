@@ -1,37 +1,9 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:catalyst_cose/src/exception/cose_format_exception.dart';
+import 'package:catalyst_cose/src/types/cose_uuid.dart';
 import 'package:cbor/cbor.dart';
-import 'package:equatable/equatable.dart';
-
-/// RFC6901 Standard JSON Pointer
-class JsonPointer extends Equatable {
-  /// The string [text] of the pointer.
-  final String text;
-
-  /// The default constructor for the [JsonPointer].
-  const JsonPointer(this.text);
-
-  /// Deserializes the type from cbor.
-  JsonPointer.fromCbor(CborValue value) : this(((value as CborString).toString()));
-
-  @override
-  List<Object?> get props => [text];
-
-  /// Serializes the type as cbor.
-  CborValue toCbor() {
-    return CborString(text);
-  }
-}
-
-/// Reference to a section in a referenced document.
-class SectionRef extends JsonPointer {
-  /// The default constructor for the [SectionRef].
-  const SectionRef(super.text);
-
-  /// Deserializes the type from cbor.
-  SectionRef.fromCbor(super.value) : super.fromCbor();
-}
 
 /// UTF-8 Catalyst ID URI encoded as a bytes string.
 extension type const CatalystIdKid(Uint8List bytes) {
@@ -46,7 +18,84 @@ extension type const CatalystIdKid(Uint8List bytes) {
   }
 
   /// Serializes the type as cbor.
-  CborValue toCbor() {
-    return CborBytes(bytes);
+  CborValue toCbor() => CborBytes(bytes);
+}
+
+/// Allowed Collaborators on the next subsequent version of a document.
+extension type const CoseCollaborators(List<CatalystIdKid> list) {
+  /// Deserializes the type from cbor.
+  factory CoseCollaborators.fromCbor(CborValue value) {
+    final list = value as CborList;
+    return CoseCollaborators(list.map(CatalystIdKid.fromCbor).toList());
   }
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() {
+    return CborList(list.map((e) => e.toCbor()).toList());
+  }
+}
+
+/// Document ID.
+extension type const CoseDocumentId(CoseUuidV7 value) {
+  /// Deserializes the type from cbor.
+  factory CoseDocumentId.fromCbor(CborValue value) {
+    return CoseDocumentId(CoseUuidV7.fromCbor(value));
+  }
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() => value.toCbor();
+}
+
+/// Document Type.
+extension type const CoseDocumentType._(List<CoseUuidV4> list) {
+  /// The default constructor for the [CoseDocumentType].
+  factory CoseDocumentType(List<CoseUuidV4> list) {
+    if (list.isEmpty) {
+      throw const CoseFormatException('CoseDocumentType must contain at least one item');
+    }
+
+    return CoseDocumentType._(list);
+  }
+
+  /// Deserializes the type from cbor.
+  factory CoseDocumentType.fromCbor(CborValue value) {
+    final list = value as CborList;
+    return CoseDocumentType(list.map(CoseUuidV4.fromCbor).toList());
+  }
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() {
+    return CborList(list.map((e) => e.toCbor()).toList());
+  }
+}
+
+/// Document Version.
+extension type const CoseDocumentVer(CoseUuidV7 value) {
+  /// Deserializes the type from cbor.
+  factory CoseDocumentVer.fromCbor(CborValue value) {
+    return CoseDocumentVer(CoseUuidV7.fromCbor(value));
+  }
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() {
+    return value.toCbor();
+  }
+}
+
+/// RFC6901 Standard JSON Pointer
+extension type const CoseJsonPointer(String text) {
+  /// Deserializes the type from cbor.
+  CoseJsonPointer.fromCbor(CborValue value) : this(((value as CborString).toString()));
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() => CborString(text);
+}
+
+/// Reference to a section in a referenced document.
+extension type const CoseSectionRef(CoseJsonPointer value) {
+  /// Deserializes the type from cbor.
+  CoseSectionRef.fromCbor(CborValue value) : this(CoseJsonPointer.fromCbor(value));
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() => value.toCbor();
 }
