@@ -1,9 +1,6 @@
 import 'dart:convert';
 
-import 'package:catalyst_cose/src/types/cose_custom_types.dart';
-import 'package:catalyst_cose/src/types/cose_document_ref.dart';
-import 'package:catalyst_cose/src/types/cose_string_or_int.dart';
-import 'package:catalyst_cose/src/types/cose_uuid.dart';
+import 'package:catalyst_cose/catalyst_cose.dart';
 import 'package:cbor/cbor.dart';
 
 /// A set of utils around cbor encoding/decoding.
@@ -61,6 +58,15 @@ final class CborUtils {
     return CoseDocumentVer.fromCbor(value);
   }
 
+  /// Deserializes optional [CoseHttpContentEncoding] type.
+  static CoseHttpContentEncoding? deserializeHttpContentEncoding(CborValue? value) {
+    if (value == null) {
+      return null;
+    }
+
+    return CoseHttpContentEncoding.fromCbor(value);
+  }
+
   /// Deserializes optional [CatalystIdKid] type.
   static CatalystIdKid? deserializeKid(CborValue? value) {
     if (value == null) {
@@ -72,6 +78,15 @@ final class CborUtils {
     }
 
     return CatalystIdKid.fromCbor(value);
+  }
+
+  /// Deserializes optional [CoseMediaType] type.
+  static CoseMediaType? deserializeMediaType(CborValue? value) {
+    if (value == null) {
+      return null;
+    }
+
+    return CoseMediaType.fromCbor(value);
   }
 
   /// Deserializes optional [CoseSectionRef] type.

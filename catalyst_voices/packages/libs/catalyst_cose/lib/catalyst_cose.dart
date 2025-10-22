@@ -5,5 +5,7 @@ export 'src/exception/cose_format_exception.dart';
 export 'src/types/cose_custom_types.dart';
 export 'src/types/cose_document_ref.dart';
 export 'src/types/cose_headers.dart';
+export 'src/types/cose_http_content_encoding.dart';
+export 'src/types/cose_media_type.dart';
 export 'src/types/cose_string_or_int.dart';
 export 'src/types/cose_uuid.dart';

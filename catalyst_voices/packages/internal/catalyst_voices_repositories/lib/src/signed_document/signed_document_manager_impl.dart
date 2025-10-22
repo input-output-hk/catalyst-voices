@@ -8,8 +8,6 @@ import 'package:catalyst_voices_repositories/src/signed_document/signed_document
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
-const _brotliEncoding = CoseStringValue(CoseValues.brotliContentEncoding);
-
 final class SignedDocumentManagerImpl implements SignedDocumentManager {
   final CatalystCompressor brotli;
   final CatalystCompressor zstd;
@@ -73,7 +71,7 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   }
 
   Future<Uint8List> _brotliDecompressPayload(CoseSign coseSign) async {
-    if (coseSign.protectedHeaders.contentEncoding == _brotliEncoding) {
+    if (coseSign.protectedHeaders.contentEncoding == CoseHttpContentEncoding.brotli) {
       final decompressed = await brotli.decompress(coseSign.payload);
       return Uint8List.fromList(decompressed);
     } else {
@@ -184,23 +182,30 @@ extension _CatalystIdListExt on List<CatalystId> {
 
 extension _SignedDocumentContentTypeExt on SignedDocumentContentType {
   /// Maps the [SignedDocumentContentType] into COSE representation.
-  CoseStringOrInt? get asCose {
+  CoseMediaType? get asCose {
     switch (this) {
       case SignedDocumentContentType.json:
-        return const CoseIntValue(CoseValues.jsonContentType);
+        return CoseMediaType.json;
       case SignedDocumentContentType.unknown:
         return null;
     }
   }
 
-  static SignedDocumentContentType fromCose(CoseStringOrInt? contentType) {
-    switch (contentType) {
-      case CoseIntValue():
-        return switch (contentType.value) {
-          CoseValues.jsonContentType => SignedDocumentContentType.json,
-          _ => SignedDocumentContentType.unknown,
-        };
-      case CoseStringValue():
+  static SignedDocumentContentType fromCose(CoseMediaType? mediaType) {
+    switch (mediaType) {
+      case CoseMediaType.json:
+        return SignedDocumentContentType.json;
+      case CoseMediaType.cbor:
+      case CoseMediaType.cddl:
+      case CoseMediaType.schemaJson:
+      case CoseMediaType.css:
+      case CoseMediaType.cssHandlebars:
+      case CoseMediaType.html:
+      case CoseMediaType.htmlHandlebars:
+      case CoseMediaType.markdown:
+      case CoseMediaType.markdownHandlebars:
+      case CoseMediaType.plain:
+      case CoseMediaType.plainHandlebars:
       case null:
         return SignedDocumentContentType.unknown;
     }
@@ -218,8 +223,8 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
     final collaborators = this.collaborators;
 
     return CoseHeaders.protected(
-      contentType: contentType.asCose,
-      contentEncoding: _brotliEncoding,
+      mediaType: contentType.asCose,
+      contentEncoding: CoseHttpContentEncoding.brotli,
       type: CoseDocumentType(documentType.uuid.asUuidV4),
       id: id == null ? null : CoseDocumentId(id.asUuidV7),
       ver: ver == null ? null : CoseDocumentVer(ver.asUuidV7),
@@ -248,9 +253,7 @@ extension _SignedDocumentMetadataExt on SignedDocumentMetadata {
     final parameters = protectedHeaders.parameters;
 
     return SignedDocumentMetadata(
-      contentType: _SignedDocumentContentTypeExt.fromCose(
-        protectedHeaders.contentType,
-      ),
+      contentType: _SignedDocumentContentTypeExt.fromCose(protectedHeaders.mediaType),
       documentType: type == null ? DocumentType.unknown : DocumentType.fromJson(type),
       id: protectedHeaders.id?.value?.format(),
       ver: protectedHeaders.ver?.value?.format(),

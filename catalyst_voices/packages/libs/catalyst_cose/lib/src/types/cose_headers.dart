@@ -1,7 +1,4 @@
-import 'package:catalyst_cose/src/cose_constants.dart';
-import 'package:catalyst_cose/src/types/cose_custom_types.dart';
-import 'package:catalyst_cose/src/types/cose_document_ref.dart';
-import 'package:catalyst_cose/src/types/cose_string_or_int.dart';
+import 'package:catalyst_cose/catalyst_cose.dart';
 import 'package:catalyst_cose/src/utils/cbor_utils.dart';
 import 'package:cbor/cbor.dart';
 import 'package:collection/collection.dart';
@@ -29,13 +26,11 @@ final class CoseHeaders extends Equatable {
   /// it will be auto-populated with [CatalystCoseSigner.kid] value.
   final CatalystIdKid? kid;
 
-  // TODO(dt-iohk): convert it to media_type and validate it's values
-  /// See [CoseHeaderKeys.contentType].
-  final CoseStringOrInt? contentType;
+  /// See [CoseHeaderKeys.mediaType].
+  final CoseMediaType? mediaType;
 
-  // TODO(dt-iohk): convert it to http_content_encoding and validate it's values
   /// See [CoseHeaderKeys.contentEncoding].
-  final CoseStringOrInt? contentEncoding;
+  final CoseHttpContentEncoding? contentEncoding;
 
   /// See [CoseHeaderKeys.type].
   final CoseDocumentType? type;
@@ -82,7 +77,7 @@ final class CoseHeaders extends Equatable {
   const CoseHeaders({
     this.alg,
     this.kid,
-    this.contentType,
+    this.mediaType,
     this.contentEncoding,
     this.type,
     this.id,
@@ -105,8 +100,10 @@ final class CoseHeaders extends Equatable {
     return CoseHeaders(
       alg: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.alg]),
       kid: CborUtils.deserializeKid(map[CoseHeaderKeys.kid]),
-      contentType: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.contentType]),
-      contentEncoding: CborUtils.deserializeStringOrInt(map[CoseHeaderKeys.contentEncoding]),
+      mediaType: CborUtils.deserializeMediaType(map[CoseHeaderKeys.mediaType]),
+      contentEncoding: CborUtils.deserializeHttpContentEncoding(
+        map[CoseHeaderKeys.contentEncoding],
+      ),
       type: CborUtils.deserializeDocumentType(map[CoseHeaderKeys.type]),
       id: CborUtils.deserializeDocumentId(map[CoseHeaderKeys.id]),
       ver: CborUtils.deserializeDocumentVer(map[CoseHeaderKeys.ver]),
@@ -124,7 +121,7 @@ final class CoseHeaders extends Equatable {
   const CoseHeaders.protected({
     this.alg,
     this.kid,
-    this.contentType,
+    this.mediaType,
     this.contentEncoding,
     this.type,
     this.id,
@@ -141,7 +138,7 @@ final class CoseHeaders extends Equatable {
   const CoseHeaders.unprotected({
     this.alg,
     this.kid,
-    this.contentType,
+    this.mediaType,
     this.contentEncoding,
     this.type,
     this.id,
@@ -158,7 +155,7 @@ final class CoseHeaders extends Equatable {
   List<Object?> get props => [
     alg,
     kid,
-    contentType,
+    mediaType,
     contentEncoding,
     type,
     id,
@@ -176,8 +173,8 @@ final class CoseHeaders extends Equatable {
   CoseHeaders copyWith({
     OptionalValueGetter<CoseStringOrInt?>? alg,
     OptionalValueGetter<CatalystIdKid?>? kid,
-    OptionalValueGetter<CoseStringOrInt?>? contentType,
-    OptionalValueGetter<CoseStringOrInt?>? contentEncoding,
+    OptionalValueGetter<CoseMediaType?>? mediaType,
+    OptionalValueGetter<CoseHttpContentEncoding?>? contentEncoding,
     OptionalValueGetter<CoseDocumentType?>? type,
     OptionalValueGetter<CoseDocumentId?>? id,
     OptionalValueGetter<CoseDocumentVer?>? ver,
@@ -192,7 +189,7 @@ final class CoseHeaders extends Equatable {
     return CoseHeaders(
       alg: alg != null ? alg() : this.alg,
       kid: kid != null ? kid() : this.kid,
-      contentType: contentType != null ? contentType() : this.contentType,
+      mediaType: mediaType != null ? mediaType() : this.mediaType,
       contentEncoding: contentEncoding != null ? contentEncoding() : this.contentEncoding,
       type: type != null ? type() : this.type,
       id: id != null ? id() : this.id,
@@ -212,7 +209,7 @@ final class CoseHeaders extends Equatable {
     final map = CborMap({
       if (alg case final alg?) CoseHeaderKeys.alg: alg.toCbor(),
       if (kid case final kid?) CoseHeaderKeys.kid: kid.toCbor(),
-      if (contentType case final contentType?) CoseHeaderKeys.contentType: contentType.toCbor(),
+      if (mediaType case final contentType?) CoseHeaderKeys.mediaType: contentType.toCbor(),
       if (contentEncoding case final contentEncoding?)
         CoseHeaderKeys.contentEncoding: contentEncoding.toCbor(),
       if (type case final type?) CoseHeaderKeys.type: type.toCbor(),
