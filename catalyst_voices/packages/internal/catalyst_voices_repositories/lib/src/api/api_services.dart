@@ -13,9 +13,11 @@ typedef InterceptClient = void Function(Dio dio);
 /// It provides access to the following services:
 /// - [CatGatewayService]
 /// - [CatReviewsService]
+/// - [CatStatusService]
 final class ApiServices {
   final CatGatewayService gateway;
   final CatReviewsService reviews;
+  final CatStatusService status;
 
   factory ApiServices.dio({
     required AppEnvironmentType env,
@@ -24,37 +26,54 @@ final class ApiServices {
   }) {
     final catApiServiceLogger = Logger('CatApiServices');
     final catDioOptions = BaseOptions(contentType: ContentTypes.applicationJson);
-    final catInterceptors = [
-      if (authTokenProvider != null) RbacAuthInterceptor(authTokenProvider),
-      if (kDebugMode) LogInterceptor(logPrint: catApiServiceLogger.fine),
-    ];
+    final rbacAuthInterceptor = authTokenProvider != null
+        ? RbacAuthInterceptor(authTokenProvider)
+        : null;
+    final catLogInterceptor = kDebugMode
+        ? LogInterceptor(logPrint: catApiServiceLogger.fine)
+        : null;
     final gateway = CatGatewayService.dio(
       baseUrl: env.app.replace(path: '/api/gateway').toString(),
       options: catDioOptions,
       interceptClient: interceptClient,
-      interceptors: catInterceptors,
+      interceptors: [
+        ?rbacAuthInterceptor,
+        ?catLogInterceptor,
+      ],
     );
     final reviews = CatReviewsService.dio(
       baseUrl: env.app.replace(path: '/api/reviews').toString(),
       options: catDioOptions,
       interceptClient: interceptClient,
-      interceptors: catInterceptors,
+      interceptors: [
+        ?rbacAuthInterceptor,
+        ?catLogInterceptor,
+      ],
+    );
+    final status = CatStatusService.dio(
+      baseUrl: env.status.toString(),
+      options: catDioOptions,
+      interceptClient: interceptClient,
+      interceptors: [?catLogInterceptor],
     );
 
     return ApiServices.internal(
       gateway: gateway,
       reviews: reviews,
+      status: status,
     );
   }
 
   @visibleForTesting
-  ApiServices.internal({
+  const ApiServices.internal({
     required this.gateway,
     required this.reviews,
+    required this.status,
   });
 
   void dispose() {
     gateway.close();
     reviews.close();
+    status.close();
   }
 }

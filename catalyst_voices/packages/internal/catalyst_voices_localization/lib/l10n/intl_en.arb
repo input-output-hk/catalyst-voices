@@ -48,18 +48,6 @@
   "@accountEmailVerifyHelper": {
     "description": "Explanation message blow email field in account page"
   },
-  "accountFinishedNotificationMessage": "You are now able to vote, submit proposals and…",
-  "@accountFinishedNotificationMessage": {
-    "description": "Message explaining new account capabilities"
-  },
-  "accountFinishedNotificationTitle": "Account Finalized",
-  "@accountFinishedNotificationTitle": {
-    "description": "Title of notification shown when account setup is complete"
-  },
-  "accountFinishedNotificationTitleDesc": "Account blockchain verified",
-  "@accountFinishedNotificationTitleDesc": {
-    "description": "Description of account verification status"
-  },
   "accountInstructionsMessage": "On the next screen, you're going to see 12 words. \nThis is called your \"Catalyst seed phrase\".\n\nIt's like a super secure password that only you know, \nthat allows you to prove ownership of your keychain.\n\nUse your Catalyst seed phrase to login and recover your account on different devices, so be sure to put it somewhere safe!\n\nIt is a super secure password that only you know, so best is to write it down with pen and paper, so get this ready.",
   "@accountInstructionsMessage": {
     "description": "Message for the account creation instructions screen"
@@ -1059,13 +1047,17 @@
   "@emailAddress": {
     "description": "Label for email address input field"
   },
-  "emailNotVerifiedBannerContributor": "**Email Not Verified:** Check your inbox to verify your email and unlock all features.",
-  "@emailNotVerifiedBannerContributor": {
-    "description": "Message used in banner to inform user that email is not verified when user is a contributor"
+  "emailNotVerifiedBannerContributorMessage": "Check your inbox to verify your email and unlock all features.",
+  "@emailNotVerifiedBannerContributorMessage": {
+    "description": "Message of banner shown when user account is not verified"
   },
-  "emailNotVerifiedBannerProposer": "**Email Not Verified**: You can’t publish a proposal until your email is verified.",
-  "@emailNotVerifiedBannerProposer": {
-    "description": "Message used in banner to inform user that email is not verified when user is a proposer"
+  "emailNotVerifiedBannerProposerMessage": "You can’t publish a proposal until your email is verified. Go to {destination} to verify it.",
+  "@emailNotVerifiedBannerProposerMessage": {
+    "description": "Message of banner shown when user account is not verified"
+  },
+  "emailNotVerifiedBannerTitle": "Email Not Verified",
+  "@emailNotVerifiedBannerTitle": {
+    "description": "Title of banner shown when user account is not verified"
   },
   "emailNotVerifiedDialogAction": "Go to My Account",
   "@emailNotVerifiedDialogAction": {
@@ -1522,16 +1514,6 @@
   "goMyProposals": "Go My proposals",
   "@goMyProposals": {
     "description": "Action to go to my proposals"
-  },
-  "goToMyAccountForEmailVerification": "Go to {destination} to verify it.",
-  "@goToMyAccountForEmailVerification": {
-    "description": "Message used in banner for CTA to inform user to go to My Account to verify email",
-    "placeholders": {
-      "destination": {
-        "type": "String",
-        "description": "Text for the destination link"
-      }
-    }
   },
   "goodPasswordStrength": "Good password strength",
   "@goodPasswordStrength": {
@@ -2631,6 +2613,10 @@
   "@readCategoryBriefButtonLabel": {
     "description": "Label for the read category brief button"
   },
+  "readMore": "Read More",
+  "@readMore": {
+    "description": "Text for the read more link"
+  },
   "recoverCatalystKeychain": "Restore Catalyst keychain",
   "@recoverCatalystKeychain": {
     "description": "Title for keychain recovery process"
@@ -3361,6 +3347,14 @@
   "successToCastVotesTitle": "Your Votes Have Been Submitted",
   "@successToCastVotesTitle": {
     "description": "Title for success to cast votes"
+  },
+  "systemStatusIssueBannerMessage": "We're aware of an issue and are working on a fix. Thanks for your patience! {readMoreLink}",
+  "@systemStatusIssueBannerMessage": {
+    "description": "Message of banner shown when there is a system status issue"
+  },
+  "systemStatusIssueBannerTitle": "Heads Up",
+  "@systemStatusIssueBannerTitle": {
+    "description": "Title of banner shown when there is a system status issue"
   },
   "theme": "Theme",
   "@theme": {
