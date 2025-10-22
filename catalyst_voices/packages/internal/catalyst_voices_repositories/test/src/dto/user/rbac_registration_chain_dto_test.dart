@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/generated/api/cat_gateway.models.swagger.dart';
+import 'package:catalyst_voices_repositories/src/api/models/rbac_registration_chain.dart';
 import 'package:catalyst_voices_repositories/src/dto/user/rbac_registration_chain_dto.dart';
 import 'package:flutter_test/flutter_test.dart';
 
