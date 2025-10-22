@@ -115,7 +115,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     required int limit,
     required Campaign campaign,
   }) async {
-    // TODO(bs): previously it was possible to use `inside` filter for categories.
+    // TODO(bstolinski): previously it was possible to use `inside` filter for categories.
     // final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toList();
     // final categoryFilter = DocumentIndexQueryFilter(
     //   parameters: IdRefOnly(id: IdSelectorDto.inside(categoriesIds)).toJson(),

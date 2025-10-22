@@ -22,14 +22,14 @@ final class EqOrRangedVer {
 
   /// A single Document IDs.
   /// The exact Document ID to match against.
-  const EqOrRangedVer.eq(this.eq) : min = null, max = null;
+  const EqOrRangedVer.eq(String this.eq) : min = null, max = null;
 
   /// Version Range
   ///
   /// A Range of document versions from minimum to maximum inclusive.
   const EqOrRangedVer.range({
-    required this.min,
-    required this.max,
+    required String this.min,
+    required String this.max,
   }) : eq = null;
 
   Json toJson() => _$EqOrRangedVerToJson(this);

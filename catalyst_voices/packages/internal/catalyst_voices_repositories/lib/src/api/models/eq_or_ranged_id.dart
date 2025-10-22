@@ -19,12 +19,12 @@ final class EqOrRangedId {
   final String? max;
 
   /// A single Document IDs.
-  const EqOrRangedId.eq(this.eq) : min = null, max = null;
+  const EqOrRangedId.eq(String this.eq) : min = null, max = null;
 
   /// A range of Document IDs.
   const EqOrRangedId.range({
-    required this.min,
-    required this.max,
+    required String this.min,
+    required String this.max,
   }) : eq = null;
 
   Json toJson() => _$EqOrRangedIdToJson(this);

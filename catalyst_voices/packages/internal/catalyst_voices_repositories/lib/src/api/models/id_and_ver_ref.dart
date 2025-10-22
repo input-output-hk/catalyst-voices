@@ -24,7 +24,7 @@ final class IdAndVerRef {
   ///
   /// This will match any document that matches the defined Document ID only.
   /// The Document Version is not considered, and will match any version.
-  const IdAndVerRef.idOnly(this.id) : ver = null;
+  const IdAndVerRef.idOnly(EqOrRangedId this.id) : ver = null;
 
   /// A Reference to the Document Version, and optionally also the Document ID.
   ///
@@ -33,7 +33,7 @@ final class IdAndVerRef {
   /// If the Document ID is not specified, then all documents that match the version will be
   /// returned in the index.
   const IdAndVerRef.verWithOptionalId({
-    required this.ver,
+    required EqOrRangedVer this.ver,
     this.id,
   });
 
