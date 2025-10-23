@@ -86,12 +86,18 @@ abstract interface class CatGatewayService {
     String? version,
   });
 
-  /// Get RBAC registrations
+  /// Get RBAC registrations V2.
   /// This endpoint returns RBAC registrations by provided auth Catalyst Id credentials
   /// or by the [lookup] argument if provided.
   ///
   /// [lookup] Stake address or Catalyst ID to get the RBAC registration for.
-  Future<RbacRegistrationChain> rbacRegistration({String? lookup});
+  /// [showAllInvalid] If this parameter is set to `true`, then all the invalid registrations are
+  /// returned. Otherwise, only the invalid registrations after the last valid one
+  /// are shown. Defaults to `false` if not present.
+  Future<RbacRegistrationChain> rbacRegistration({
+    String? lookup,
+    bool? showAllInvalid,
+  });
 
   /// Get staked assets.
   /// This endpoint returns the total Cardano's staked assets to the corresponded
@@ -188,10 +194,16 @@ final class DioCatGatewayService implements CatGatewayService {
   }
 
   @override
-  Future<RbacRegistrationChain> rbacRegistration({String? lookup}) {
+  Future<RbacRegistrationChain> rbacRegistration({
+    String? lookup,
+    bool? showAllInvalid = false,
+  }) {
     return _dio.get<Json, RbacRegistrationChain>(
-      '/v1/rbac/registration',
-      queryParameters: {'lookup': ?lookup},
+      '/v2/rbac/registration',
+      queryParameters: {
+        'lookup': ?lookup,
+        'show_all_invalid': ?showAllInvalid,
+      },
       mapper: RbacRegistrationChain.fromJson,
     );
   }
