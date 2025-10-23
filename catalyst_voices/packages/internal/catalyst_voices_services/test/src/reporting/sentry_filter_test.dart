@@ -68,7 +68,8 @@ void main() {
               stackTrace: SentryStackTrace(
                 frames: [
                   SentryStackFrame(
-                    absPath: 'chrome-extension://fijngjgcjhjmmpcmkeiomlglpeiijkld/page.js',
+                    absPath:
+                        'chrome-extension://fijngjgcjhjmmpcmkeiomlglpeiijkld/page.js', // cspell:disable-line
                     fileName: 'page.js',
                     function: 'handleResponse',
                   ),
@@ -95,8 +96,9 @@ void main() {
               stackTrace: SentryStackTrace(
                 frames: [
                   SentryStackFrame(
-                    absPath: 'chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/inpage.js',
-                    fileName: 'inpage.js',
+                    absPath:
+                        'chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/inpage.js', // cspell:disable-line
+                    fileName: 'inpage.js', // cspell:disable-line
                   ),
                 ],
               ),
@@ -450,8 +452,8 @@ void main() {
                   frames: [
                     SentryStackFrame(
                       absPath:
-                          'chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js',
-                      fileName: 'inpage.js',
+                          'chrome-extension://nkbihfbeogaeaoehlefnkodbefgpgknn/scripts/inpage.js', // cspell:disable-line
+                      fileName: 'inpage.js', // cspell:disable-line
                       function: 'connect',
                     ),
                   ],
@@ -481,7 +483,8 @@ void main() {
                 stackTrace: SentryStackTrace(
                   frames: [
                     SentryStackFrame(
-                      absPath: 'chrome-extension://gafhhkghbfjjkeiendhlofajokpaflmk/app/content.js',
+                      absPath:
+                          'chrome-extension://gafhhkghbfjjkeiendhlofajokpaflmk/app/content.js', // cspell:disable-line
                       fileName: 'content.js',
                     ),
                   ],
@@ -511,8 +514,9 @@ void main() {
                 stackTrace: SentryStackTrace(
                   frames: [
                     SentryStackFrame(
-                      absPath: 'chrome-extension://opfgelmcmbiajamepnmloijbpoleiama/inpage.js',
-                      fileName: 'inpage.js',
+                      absPath:
+                          'chrome-extension://opfgelmcmbiajamepnmloijbpoleiama/inpage.js', // cspell:disable-line
+                      fileName: 'inpage.js', // cspell:disable-line
                     ),
                   ],
                 ),
@@ -542,7 +546,7 @@ void main() {
                   frames: [
                     SentryStackFrame(
                       absPath:
-                          'chrome-extension://bopcbmipnjdcdfflfgjdgdjejmgpoaab/blankProvider.js',
+                          'chrome-extension://bopcbmipnjdcdfflfgjdgdjejmgpoaab/blankProvider.js', // cspell:disable-line
                       fileName: 'blankProvider.js',
                       lineNo: 432,
                     ),
@@ -573,7 +577,8 @@ void main() {
                 stackTrace: SentryStackTrace(
                   frames: [
                     SentryStackFrame(
-                      absPath: 'chrome-extension://gafhhkghbfjjkeiendhlofajokpaflmk/app/content.js',
+                      absPath:
+                          'chrome-extension://gafhhkghbfjjkeiendhlofajokpaflmk/app/content.js', // cspell:disable-line
                       fileName: 'content.js',
                       function: 'AsyncScheduler.flush',
                     ),
