@@ -90,8 +90,8 @@ final class VotingCubit extends Cubit<VotingState>
     }
   }
 
-  void changeSelectedCategory(SignedDocumentRef? categoryId) {
-    emitSignal(ChangeCategoryVotingSignal(to: categoryId));
+  void changeSelectedCategory(SignedDocumentRef? categoryRef) {
+    emitSignal(ChangeCategoryVotingSignal(to: categoryRef));
   }
 
   @override

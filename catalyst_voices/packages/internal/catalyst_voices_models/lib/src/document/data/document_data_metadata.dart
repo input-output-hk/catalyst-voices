@@ -14,9 +14,6 @@ final class DocumentDataMetadata extends Equatable {
   /// on the document type.
   final DocumentRef? ref;
 
-  /// This is a cryptographically secured reference to another document.
-  final SecuredDocumentRef? refHash;
-
   /// If the document was formed from a template, this is a reference to that
   /// template document
   final SignedDocumentRef? template;
@@ -27,41 +24,22 @@ final class DocumentDataMetadata extends Equatable {
   /// A reference to a section of a document.
   final String? section;
 
-  /// uuid-v4
-  /// Represents a "brand" who is running the voting, e.g. Catalyst, Midnight.
-  final SignedDocumentRef? brandId;
-
-  /// uuid-v4
-  /// Defines a "campaign" of voting, e.g. "treasury campaign".
-  final SignedDocumentRef? campaignId;
-
-  /// uuid-v4
-  /// Defines an election, e.g. "Catalyst Fund 1", "Catalyst Fund 2".
-  final String? electionId;
-
-  /// uuid-v4
-  /// Defines a voting category as a collection of proposals, e.g.
-  /// "Development & Infrastructure",
-  /// "Products & Integrations".
-  final SignedDocumentRef? categoryId;
+  /// A list of referenced parameters like brand, category or campaign.
+  final DocumentParameters parameters;
 
   /// List of authors represented by CatalystId
   final List<CatalystId>? authors;
 
   // TODO(damian-molinski): refactor with factory constructors for
-  //  proposal/comment to centralize required fields for each type.
+  // proposal/comment to centralize required fields for each type.
   DocumentDataMetadata({
     required this.type,
     required this.selfRef,
     this.ref,
-    this.refHash,
     this.template,
     this.reply,
     this.section,
-    this.brandId,
-    this.campaignId,
-    this.electionId,
-    this.categoryId,
+    this.parameters = const DocumentParameters(),
     this.authors,
   }) : assert(
          selfRef.isExact,
@@ -75,14 +53,10 @@ final class DocumentDataMetadata extends Equatable {
     type,
     selfRef,
     ref,
-    refHash,
     template,
     reply,
     section,
-    brandId,
-    campaignId,
-    electionId,
-    categoryId,
+    parameters,
     authors,
   ];
 
@@ -92,28 +66,20 @@ final class DocumentDataMetadata extends Equatable {
     DocumentType? type,
     DocumentRef? selfRef,
     Optional<DocumentRef>? ref,
-    Optional<SecuredDocumentRef>? refHash,
     Optional<SignedDocumentRef>? template,
     Optional<SignedDocumentRef>? reply,
     Optional<String>? section,
-    Optional<SignedDocumentRef>? brandId,
-    Optional<SignedDocumentRef>? campaignId,
-    Optional<String>? electionId,
-    Optional<SignedDocumentRef>? categoryId,
+    DocumentParameters? parameters,
     Optional<List<CatalystId>>? authors,
   }) {
     return DocumentDataMetadata(
       type: type ?? this.type,
       selfRef: selfRef ?? this.selfRef,
       ref: ref.dataOr(this.ref),
-      refHash: refHash.dataOr(this.refHash),
       template: template.dataOr(this.template),
       reply: reply.dataOr(this.reply),
       section: section.dataOr(this.section),
-      brandId: brandId.dataOr(this.brandId),
-      campaignId: campaignId.dataOr(this.campaignId),
-      electionId: electionId.dataOr(this.electionId),
-      categoryId: categoryId.dataOr(this.categoryId),
+      parameters: parameters ?? this.parameters,
       authors: authors.dataOr(this.authors),
     );
   }

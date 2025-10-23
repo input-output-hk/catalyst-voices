@@ -87,11 +87,12 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
             Expression.and([
               proposal.type.equalsValue(DocumentType.proposalDocument),
               proposal.metadata.jsonExtract(r'$.template').isNotNull(),
-              proposal.metadata.jsonExtract(r'$.categoryId.id').isNotNull(),
+              Expression.or([
+                proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+                proposal.metadata.jsonExtract(r'$.parameters').isNotNull(),
+              ]),
               if (filters.campaign != null)
-                proposal.metadata
-                    .jsonExtract<String>(r'$.categoryId.id')
-                    .isIn(filters.campaign!.categoriesIds),
+                proposal.metadata.isInCategoryList(filters.campaign!.categoriesIds),
             ]),
           )
           ..orderBy([OrderingTerm.asc(proposal.verHi)]);
@@ -176,11 +177,12 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
               proposal.type.equalsValue(DocumentType.proposalDocument),
               // Safe check for invalid proposals
               proposal.metadata.jsonExtract(r'$.template').isNotNull(),
-              proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+              Expression.or([
+                proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+                proposal.metadata.jsonExtract(r'$.parameters').isNotNull(),
+              ]),
               if (filters.campaign != null)
-                proposal.metadata
-                    .jsonExtract<String>(r'$.categoryId.id')
-                    .isIn(filters.campaign!.categoriesIds),
+                proposal.metadata.isInCategoryList(filters.campaign!.categoriesIds),
             ]),
           )
           ..orderBy(order.terms(proposal))
@@ -535,12 +537,12 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         Expression.and([
           documents.type.equalsValue(DocumentType.proposalDocument),
           // Safe check for invalid proposals
-          documents.metadata.jsonExtract(r'$.template').isNotNull(),
-          documents.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+          Expression.or([
+            documents.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+            documents.metadata.jsonExtract(r'$.parameters').isNotNull(),
+          ]),
           if (filters?.campaign != null)
-            documents.metadata
-                .jsonExtract<String>(r'$.categoryId.id')
-                .isIn(filters!.campaign!.categoriesIds),
+            documents.metadata.isInCategoryList(filters!.campaign!.categoriesIds),
         ]),
       )
       ..orderBy([OrderingTerm.desc(documents.verHi)])
