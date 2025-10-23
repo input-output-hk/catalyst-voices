@@ -106,7 +106,7 @@ jobs:
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
 
-# Skip until bugfix https://github.com/input-output-hk/catalyst-voices/issues/3209
+# Skip for now as it adds ~10mins to CI execution time, will try to incorporate this in nightly instead
       - name: Integration health thru proxy tests
         if: false
         env:

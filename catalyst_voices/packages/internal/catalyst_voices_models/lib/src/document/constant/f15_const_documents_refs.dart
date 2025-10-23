@@ -16,7 +16,7 @@ const f15ConstDocumentsRefs = <CategoryTemplatesRefs>[
       version: '0199802c-21b4-7b2c-aafd-0af557e8408c',
     ),
   ),
-  //Cardano Concepts: Prototype & Launch
+  //Cardano Use Cases: Prototype & Launch
   CategoryTemplatesRefs(
     category: SignedDocumentRef.exact(
       id: '0199802c-21b4-7dc8-8537-7eae5ea4c4d3',

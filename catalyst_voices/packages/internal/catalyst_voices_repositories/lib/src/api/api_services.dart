@@ -29,6 +29,7 @@ void _fixModelsMapping() {
 final class ApiServices {
   final CatGateway gateway;
   final CatReviews reviews;
+  final CatStatus status;
 
   factory ApiServices({
     required ApiConfig config,
@@ -65,6 +66,13 @@ final class ApiServices {
           if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
         ],
       ),
+      status: CatStatus.create(
+        httpClient: httpClient?.call(),
+        baseUrl: config.env.status,
+        interceptors: [
+          if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
+        ],
+      ),
     );
   }
 
@@ -72,10 +80,12 @@ final class ApiServices {
   const ApiServices.internal({
     required this.gateway,
     required this.reviews,
+    required this.status,
   });
 
   Future<void> dispose() async {
     gateway.client.dispose();
     reviews.client.dispose();
+    status.client.dispose();
   }
 }
