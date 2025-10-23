@@ -41,7 +41,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
   // TODO(damian-molinski): filters is only used for campaign and type.
   @override
   Future<List<JoinedProposalEntity>> queryProposals({
-    SignedDocumentRef? categoryRef,
+    SignedDocumentRef? categoryId,
     required ProposalsFilters filters,
   }) async {
     if (<Object?>[
@@ -87,17 +87,18 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
             Expression.and([
               proposal.type.equalsValue(DocumentType.proposalDocument),
               proposal.metadata.jsonExtract(r'$.template').isNotNull(),
-              proposal.metadata.jsonExtract(r'$.categoryId.id').isNotNull(),
+              Expression.or([
+                proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+                proposal.metadata.jsonExtract(r'$.parameters').isNotNull(),
+              ]),
               if (filters.campaign != null)
-                proposal.metadata
-                    .jsonExtract<String>(r'$.categoryId.id')
-                    .isIn(filters.campaign!.categoriesIds),
+                proposal.metadata.isInCategoryList(filters.campaign!.categoriesIds),
             ]),
           )
           ..orderBy([OrderingTerm.asc(proposal.verHi)]);
 
-    if (categoryRef != null) {
-      mainQuery.where(proposal.metadata.isCategory(categoryRef));
+    if (categoryId != null) {
+      mainQuery.where(proposal.metadata.isCategory(categoryId));
     }
 
     final ids = await _getFilterTypeIds(filters.type);
@@ -176,11 +177,12 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
               proposal.type.equalsValue(DocumentType.proposalDocument),
               // Safe check for invalid proposals
               proposal.metadata.jsonExtract(r'$.template').isNotNull(),
-              proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+              Expression.or([
+                proposal.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+                proposal.metadata.jsonExtract(r'$.parameters').isNotNull(),
+              ]),
               if (filters.campaign != null)
-                proposal.metadata
-                    .jsonExtract<String>(r'$.categoryId.id')
-                    .isIn(filters.campaign!.categoriesIds),
+                proposal.metadata.isInCategoryList(filters.campaign!.categoriesIds),
             ]),
           )
           ..orderBy(order.terms(proposal))
@@ -535,12 +537,12 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
         Expression.and([
           documents.type.equalsValue(DocumentType.proposalDocument),
           // Safe check for invalid proposals
-          documents.metadata.jsonExtract(r'$.template').isNotNull(),
-          documents.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+          Expression.or([
+            documents.metadata.jsonExtract(r'$.categoryId').isNotNull(),
+            documents.metadata.jsonExtract(r'$.parameters').isNotNull(),
+          ]),
           if (filters?.campaign != null)
-            documents.metadata
-                .jsonExtract<String>(r'$.categoryId.id')
-                .isIn(filters!.campaign!.categoriesIds),
+            documents.metadata.isInCategoryList(filters!.campaign!.categoriesIds),
         ]),
       )
       ..orderBy([OrderingTerm.desc(documents.verHi)])
@@ -740,7 +742,7 @@ class DriftProposalsDao extends DatabaseAccessor<DriftCatalystDatabase>
 
 abstract interface class ProposalsDao {
   Future<List<JoinedProposalEntity>> queryProposals({
-    SignedDocumentRef? categoryRef,
+    SignedDocumentRef? categoryId,
     required ProposalsFilters filters,
   });
 

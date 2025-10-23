@@ -658,13 +658,11 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   bool _isDocumentMetadataValid(DocumentData document) {
     final template = document.metadata.template;
-    final category = document.metadata.categoryId;
     final documentType = document.metadata.type;
 
     final isInvalidTemplate = template == null || !template.isValid;
-    final isInvalidCategory = category == null || !category.isValid;
     final isInvalidType = documentType == DocumentType.unknown;
-    final isInvalidProposal = isInvalidTemplate || isInvalidType || isInvalidCategory;
+    final isInvalidProposal = isInvalidTemplate || isInvalidType;
 
     return !isInvalidProposal;
   }
@@ -736,7 +734,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   void _validateDocumentMetadata(DocumentData document) {
     if (!_isDocumentMetadataValid(document)) {
-      throw const DocumentImportInvalidDataException(SignedDocumentMetadataMalformed);
+      throw const DocumentImportInvalidDataException(SignedDocumentMetadataMalformedException);
     }
   }
 

@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart' show Uint8List;
 import 'package:uuid_plus/uuid_plus.dart';
 
 /// Represents ref to any kind of document. Documents often have refs to other document
@@ -148,20 +147,6 @@ final class DraftRef extends DocumentRef {
 
   @override
   String toString() => isExact ? 'ExactDraftRef($id.v$version)' : 'LooseDraftRef($id)';
-}
-
-///
-final class SecuredDocumentRef extends Equatable {
-  final DocumentRef ref;
-  final Uint8List hash;
-
-  const SecuredDocumentRef({
-    required this.ref,
-    required this.hash,
-  });
-
-  @override
-  List<Object?> get props => [ref, hash];
 }
 
 /// Ref to published document.

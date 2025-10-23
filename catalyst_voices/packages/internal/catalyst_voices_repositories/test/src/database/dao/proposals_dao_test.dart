@@ -1654,7 +1654,7 @@ void main() {
       );
 
       test(
-        'filters by category when categoryRef is provided',
+        'filters by category when categoryId is provided',
         () async {
           // Given
           final templateRef = DocumentRefFactory.signedDocumentRef();
@@ -1682,7 +1682,7 @@ void main() {
 
           final expectedRefs = proposals
               .where(
-                (p) => p.document.metadata.categoryId == _getCategoryId(index: 1),
+                (p) => p.document.metadata.parameters.contains(_getCategoryId(index: 1)),
               )
               .map((proposal) => proposal.document.ref)
               .toList();
@@ -1692,7 +1692,7 @@ void main() {
 
           // Then
           final result = await database.proposalsDao.queryProposals(
-            categoryRef: _getCategoryId(index: 1),
+            categoryId: _getCategoryId(index: 1),
             filters: const ProposalsFilters(),
           );
 
@@ -2011,7 +2011,7 @@ DocumentEntityWithMetadata _buildProposal({
     authors: [
       if (author != null) author,
     ],
-    categoryId: categoryId ?? _getCategoryId(),
+    parameters: DocumentParameters({categoryId ?? _getCategoryId()}),
   );
   final content = DocumentDataContent({
     if (title != null || contentAuthorName != null)

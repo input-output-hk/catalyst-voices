@@ -56,15 +56,11 @@ final class DocumentsCommentRepository implements CommentRepository {
   }) async {
     final ref = document.metadata.ref;
     final reply = document.metadata.reply;
-    final categoryId = document.metadata.categoryId;
 
     assert(ref != null, 'CommentDocument have to have a ref to other document');
+
     // TODO(damian-molinski): creating SignedDocumentMetadata with correct refs
     // have to be captured single place.
-    assert(
-      categoryId != null,
-      'CommentDocument have to have categoryId because proposals always have categoryId',
-    );
 
     final payload = SignedDocumentJsonPayload(document.content.data);
     final metadata = SignedDocumentMetadata(
@@ -77,7 +73,9 @@ final class DocumentsCommentRepository implements CommentRepository {
         document.metadata.template!,
       ),
       reply: reply != null ? SignedDocumentMetadataRef.fromDocumentRef(reply) : null,
-      categoryId: SignedDocumentMetadataRef.fromDocumentRef(categoryId!),
+      parameters: document.metadata.parameters.set
+          .map(SignedDocumentMetadataRef.fromDocumentRef)
+          .toList(),
     );
 
     final signedDocument = await _signedDocumentManager.signDocument(
@@ -147,7 +145,7 @@ final class DocumentsCommentRepository implements CommentRepository {
       ref: documentData.metadata.ref! as SignedDocumentRef,
       template: templateData.metadata.selfRef as SignedDocumentRef,
       reply: documentData.metadata.reply,
-      categoryId: documentData.metadata.categoryId,
+      parameters: documentData.metadata.parameters,
       authorId: authors!.single,
     );
     final content = DocumentDataContentDto.fromModel(

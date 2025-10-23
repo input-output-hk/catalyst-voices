@@ -24,6 +24,48 @@ void main() {
         expect(dto.selfRef.id, id);
         expect(dto.selfRef.version, version);
       });
+
+      test('parameters migration works as expected', () {
+        // Given
+        final selfRef = DocumentRefFactory.signedDocumentRef();
+        final brandId = DocumentRefFactory.signedDocumentRef();
+        final campaignId = DocumentRefFactory.signedDocumentRef();
+        final categoryId = DocumentRefFactory.signedDocumentRef();
+
+        final oldJson = <String, dynamic>{
+          'type': DocumentType.proposalDocument.uuid,
+          'selfRef': {
+            'id': selfRef.id,
+            'version': selfRef.version,
+            'type': 'signed',
+          },
+          'brandId': {
+            'id': brandId.id,
+            'version': brandId.version,
+            'type': 'signed',
+          },
+          'campaignId': {
+            'id': campaignId.id,
+            'version': campaignId.version,
+            'type': 'signed',
+          },
+          'categoryId': {
+            'id': categoryId.id,
+            'version': categoryId.version,
+            'type': 'signed',
+          },
+        };
+
+        // When
+        final dto = DocumentDataMetadataDto.fromJson(oldJson);
+        final model = dto.toModel();
+
+        // Then
+        expect(
+          model.parameters,
+          equals(DocumentParameters({brandId, campaignId, categoryId})),
+        );
+      });
     });
   });
 }

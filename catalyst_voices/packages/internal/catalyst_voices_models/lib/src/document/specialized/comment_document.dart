@@ -16,9 +16,7 @@ final class CommentDocument extends Equatable {
   @override
   List<Object?> get props => [metadata, document];
 
-  DocumentData toDocumentData({
-    required DocumentMapper mapper,
-  }) {
+  DocumentData toDocumentData({required DocumentMapper mapper}) {
     return DocumentData(
       metadata: DocumentDataMetadata(
         type: DocumentType.commentDocument,
@@ -27,7 +25,7 @@ final class CommentDocument extends Equatable {
         template: metadata.template,
         reply: metadata.reply,
         authors: [metadata.authorId],
-        categoryId: metadata.categoryId,
+        parameters: metadata.parameters,
       ),
       content: mapper.toContent(document),
     );
@@ -45,9 +43,8 @@ final class CommentMetadata extends DocumentMetadata {
   /// [reply] equals other comment of this is a reply to it.
   final SignedDocumentRef? reply;
 
-  // Nullable only for backwards compatibility.
-  /// Pointer to category of proposal that [ref] points to.
-  final SignedDocumentRef? categoryId;
+  /// A list of referenced parameters like brand, campaign or category.
+  final DocumentParameters parameters;
 
   /// Creator of document.
   final CatalystId authorId;
@@ -58,7 +55,7 @@ final class CommentMetadata extends DocumentMetadata {
     required this.ref,
     required this.template,
     this.reply,
-    required this.categoryId,
+    required this.parameters,
     required this.authorId,
   }) : assert(
          ref.isExact,
@@ -72,7 +69,7 @@ final class CommentMetadata extends DocumentMetadata {
         ref,
         template,
         reply,
-        categoryId,
+        parameters,
         authorId,
       ];
 

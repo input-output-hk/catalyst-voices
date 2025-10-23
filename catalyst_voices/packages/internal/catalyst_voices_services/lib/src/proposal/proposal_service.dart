@@ -45,7 +45,7 @@ abstract interface class ProposalService {
   /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
   Future<void> forgetProposal({
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters parameters,
   });
 
   /// Similar to [watchFavoritesProposalsIds] stops after first emit.
@@ -102,13 +102,13 @@ abstract interface class ProposalService {
   /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
   Future<SignedDocumentRef> submitProposalForReview({
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters proposalParameters,
   });
 
   /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
   Future<SignedDocumentRef> unlockProposal({
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters proposalParameters,
   });
 
   /// Upserts a proposal draft in the local storage.
@@ -185,7 +185,7 @@ final class ProposalServiceImpl implements ProposalService {
           type: DocumentType.proposalDocument,
           selfRef: draftRef,
           template: template,
-          categoryId: categoryId,
+          parameters: DocumentParameters({categoryId}),
           authors: [catalystId],
         ),
         content: content,
@@ -212,7 +212,7 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<SignedDocumentRef> forgetProposal({
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters parameters,
   }) {
     return _signerService.useProposerCredentials(
       (catalystId, privateKey) async {
@@ -221,7 +221,7 @@ final class ProposalServiceImpl implements ProposalService {
         await _proposalRepository.publishProposalAction(
           actionRef: actionRef,
           proposalRef: proposalRef,
-          categoryId: categoryId,
+          proposalParameters: parameters,
           action: ProposalSubmissionAction.hide,
           catalystId: catalystId,
           privateKey: privateKey,
@@ -302,27 +302,14 @@ final class ProposalServiceImpl implements ProposalService {
           .toList();
     }
 
-    final categoriesRefs = proposals.map((proposal) => proposal.categoryRef).toSet();
-
     // If we are getting proposals then campaign needs to be active
     // Getting whole campaign with list of categories saves time then calling to get each category separately
     // for each proposal
-    final activeCampaign = _activeCampaignObserver.campaign;
-
-    final categories = Map<String, CampaignCategory>.fromEntries(
-      categoriesRefs.map((ref) {
-        final category = activeCampaign!.categories.firstWhere(
-          (category) => category.selfRef == ref,
-        );
-        return MapEntry(ref.id, category);
-      }),
-    );
-
     final proposalsWithContext = proposals
         .map(
           (proposal) => ProposalWithContext(
             proposal: proposal,
-            category: categories[proposal.categoryRef.id]!,
+            category: _findActiveCampaignCategory(proposal.parameters),
             user: const ProposalUserContext(),
           ),
         )
@@ -354,7 +341,9 @@ final class ProposalServiceImpl implements ProposalService {
     // TODO(LynxLynxx): Remove after we support multiple fund templates
     if (!allowTemplateRefs.contains(parsedDocument.metadata.template)) {
       throw const DocumentImportInvalidDataException(
-        SignedDocumentMetadataMalformed(reasons: ['template ref is not allowed to be imported']),
+        SignedDocumentMetadataMalformedException(
+          reasons: ['template ref is not allowed to be imported'],
+        ),
       );
     }
 
@@ -415,7 +404,7 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<SignedDocumentRef> submitProposalForReview({
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters proposalParameters,
   }) async {
     if (await isMaxProposalsLimitReached()) {
       throw const ProposalLimitReachedException(
@@ -430,7 +419,7 @@ final class ProposalServiceImpl implements ProposalService {
         await _proposalRepository.publishProposalAction(
           actionRef: actionRef,
           proposalRef: proposalRef,
-          categoryId: categoryId,
+          proposalParameters: proposalParameters,
           action: ProposalSubmissionAction.aFinal,
           catalystId: catalystId,
           privateKey: privateKey,
@@ -444,7 +433,7 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<SignedDocumentRef> unlockProposal({
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters proposalParameters,
   }) async {
     return _signerService.useProposerCredentials(
       (catalystId, privateKey) async {
@@ -453,7 +442,7 @@ final class ProposalServiceImpl implements ProposalService {
         await _proposalRepository.publishProposalAction(
           actionRef: actionRef,
           proposalRef: proposalRef,
-          categoryId: categoryId,
+          proposalParameters: proposalParameters,
           action: ProposalSubmissionAction.draft,
           catalystId: catalystId,
           privateKey: privateKey,
@@ -482,7 +471,7 @@ final class ProposalServiceImpl implements ProposalService {
           type: DocumentType.proposalDocument,
           selfRef: selfRef,
           template: template,
-          categoryId: categoryId,
+          parameters: DocumentParameters({categoryId}),
           authors: [catalystId],
         ),
         content: content,
@@ -637,6 +626,13 @@ final class ProposalServiceImpl implements ProposalService {
           commentsCount: commentsCount,
         );
       },
+    );
+  }
+
+  CampaignCategory _findActiveCampaignCategory(DocumentParameters parameters) {
+    final activeCampaign = _activeCampaignObserver.campaign;
+    return activeCampaign!.categories.firstWhere(
+      (category) => parameters.contains(category.selfRef),
     );
   }
 

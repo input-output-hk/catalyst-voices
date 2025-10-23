@@ -57,15 +57,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   DocumentDataMetadata _buildDocumentMetadata(ProposalDocument document) {
-    final selfRef = document.metadata.selfRef;
-    final categoryId = document.metadata.categoryId;
-    final templateRef = document.metadata.templateRef;
-
     return DocumentDataMetadata(
       type: DocumentType.proposalDocument,
-      selfRef: selfRef,
-      template: templateRef,
-      categoryId: categoryId,
+      selfRef: document.metadata.selfRef,
+      template: document.metadata.templateRef,
+      parameters: document.metadata.parameters,
     );
   }
 
@@ -128,7 +124,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       emit(state.copyWith(isLoading: true));
       await _proposalService.forgetProposal(
         proposalRef: proposal.selfRef as SignedDocumentRef,
-        categoryId: proposal.categoryId,
+        parameters: proposal.parameters,
       );
       emit(state.copyWith(userProposals: _removeProposal(event.ref)));
       emitSignal(const ForgetProposalSuccessWorkspaceSignal());
@@ -192,7 +188,9 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       final campaigns = Campaign.all;
 
       final categories = campaigns.expand((element) => element.categories);
-      final category = categories.firstWhereOrNull((e) => e.selfRef.id == proposal.categoryRef.id);
+      final category = categories.firstWhereOrNull(
+        (e) => proposal.parameters.containsId(e.selfRef.id),
+      );
 
       // TODO(damian-molinski): refactor it
       final fundNumber = category != null
@@ -241,7 +239,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
     }
     await _proposalService.unlockProposal(
       proposalRef: proposal.selfRef as SignedDocumentRef,
-      categoryId: proposal.categoryId,
+      proposalParameters: proposal.parameters,
     );
     emitSignal(OpenProposalBuilderSignal(ref: event.ref));
   }
