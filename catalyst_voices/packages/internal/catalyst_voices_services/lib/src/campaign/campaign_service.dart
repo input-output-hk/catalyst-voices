@@ -128,7 +128,7 @@ final class CampaignServiceImpl implements CampaignService {
   Future<CampaignCategory> _loadCampaignCategoryDetails(CampaignCategory base) async {
     final categoryProposals = await _proposalRepository.getProposals(
       type: ProposalsFilterType.finals,
-      categoryId: base.selfRef,
+      categoryRef: base.selfRef,
     );
     final proposalSubmissionStage = await getCampaignPhaseTimeline(
       CampaignPhaseType.proposalSubmission,
@@ -151,7 +151,7 @@ final class CampaignServiceImpl implements CampaignService {
     for (final category in categories) {
       final categoryProposals = await _proposalRepository.getProposals(
         type: ProposalsFilterType.finals,
-        categoryId: category.selfRef,
+        categoryRef: category.selfRef,
       );
       final totalAsk = _calculateTotalAsk(categoryProposals);
 

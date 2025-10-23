@@ -23,9 +23,9 @@ final class ProposalBuilderDraftRoute extends GoRouteData
   });
 
   factory ProposalBuilderDraftRoute.fromRef({
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef categoryRef,
   }) {
-    return ProposalBuilderDraftRoute(categoryId: categoryId.id);
+    return ProposalBuilderDraftRoute(categoryId: categoryRef.id);
   }
 
   @override
@@ -38,7 +38,7 @@ final class ProposalBuilderDraftRoute extends GoRouteData
   Widget build(BuildContext context, GoRouterState state) {
     final categoryId = this.categoryId;
     final categoryRef = categoryId != null ? SignedDocumentRef(id: categoryId) : null;
-    return ProposalBuilderPage(categoryId: categoryRef);
+    return ProposalBuilderPage(categoryRef: categoryRef);
   }
 }
 

@@ -53,12 +53,12 @@ final class DatabaseDocumentsDataSource
 
   @override
   Future<List<ProposalDocumentData>> getProposals({
-    SignedDocumentRef? categoryId,
+    SignedDocumentRef? categoryRef,
     required ProposalsFilterType type,
   }) {
     return _database.proposalsDao
         .queryProposals(
-          categoryId: categoryId,
+          categoryRef: categoryRef,
           filters: ProposalsFilters.forActiveCampaign(type: type),
         )
         .then((value) => value.map((e) => e.toModel()).toList());

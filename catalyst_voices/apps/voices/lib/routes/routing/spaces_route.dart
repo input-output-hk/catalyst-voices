@@ -33,7 +33,7 @@ final class CategoryDetailRoute extends GoRouteData with FadePageTransitionMixin
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return CategoryPage(
-      categoryId: SignedDocumentRef(id: categoryId),
+      categoryRef: SignedDocumentRef(id: categoryId),
     );
   }
 }
@@ -92,7 +92,7 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
     final tab = ProposalsPageTab.values.asNameMap()[this.tab];
 
     return ProposalsPage(
-      categoryId: categoryRef,
+      categoryRef: categoryRef,
       tab: tab,
     );
   }
@@ -201,7 +201,7 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
     final tab = VotingPageTab.values.asNameMap()[this.tab];
 
     return VotingPage(
-      categoryId: categoryRef,
+      categoryRef: categoryRef,
       tab: tab,
       keychainDeleted: $extra ?? false,
     );

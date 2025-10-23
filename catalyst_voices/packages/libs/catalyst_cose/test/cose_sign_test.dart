@@ -21,8 +21,8 @@ void main() {
     test('sign generates a valid COSE_SIGN structure', () async {
       final coseSign = await CoseSign.sign(
         protectedHeaders: CoseHeaders.protected(
-          contentType: const CoseIntValue(CoseValues.jsonContentType),
-          contentEncoding: const CoseStringValue(CoseValues.brotliContentEncoding),
+          mediaType: CoseMediaType.json,
+          contentEncoding: CoseHttpContentEncoding.brotli,
           type: CoseDocumentType(CoseUuidV4.fromString(uuidV4)),
           id: CoseDocumentId(CoseUuidV7.fromString(uuidV7)),
           ver: CoseDocumentVer(CoseUuidV7.fromString(uuidV7)),

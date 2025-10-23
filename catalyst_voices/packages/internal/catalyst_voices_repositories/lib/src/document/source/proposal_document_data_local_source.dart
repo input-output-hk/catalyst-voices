@@ -8,9 +8,9 @@ abstract interface class ProposalDocumentDataLocalSource {
   /// Used to retrieve all proposals. Offers way to filter proposals by passing
   /// category ref and proposal filter type.
   ///
-  /// If [categoryId] is null then all proposals are returned.
+  /// If [categoryRef] is null then all proposals are returned.
   Future<List<ProposalDocumentData>> getProposals({
-    SignedDocumentRef? categoryId,
+    SignedDocumentRef? categoryRef,
     required ProposalsFilterType type,
   });
 

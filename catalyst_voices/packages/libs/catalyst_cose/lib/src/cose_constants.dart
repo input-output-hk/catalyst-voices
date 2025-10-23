@@ -37,8 +37,8 @@ final class CoseHeaderKeys {
   /// The header key describing the signature algorithm.
   static const alg = CborSmallInt(1);
 
-  /// The header key describing the content-type of the payload.
-  static const contentType = CborSmallInt(3);
+  /// The header key describing the media-type of the payload.
+  static const mediaType = CborSmallInt(3);
 
   /// The header key describing the key identifier.
   static const kid = CborSmallInt(4);
@@ -115,9 +115,6 @@ abstract final class CoseTags {
 final class CoseValues {
   /// The Edwards-Curve Digital Signature Algorithm (EdDSA).
   static const eddsaAlg = -8;
-
-  /// The json content type value.
-  static const jsonContentType = 50;
 
   /// The brotli compression content encoding.
   static const brotliContentEncoding = 'br';

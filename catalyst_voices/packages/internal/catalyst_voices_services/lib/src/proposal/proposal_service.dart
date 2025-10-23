@@ -25,7 +25,7 @@ abstract interface class ProposalService {
   Future<DraftRef> createDraftProposal({
     required DocumentDataContent content,
     required SignedDocumentRef template,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef categoryRef,
   });
 
   /// Delete a draft proposal from local storage.
@@ -116,7 +116,7 @@ abstract interface class ProposalService {
     required DraftRef selfRef,
     required DocumentDataContent content,
     required SignedDocumentRef template,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef categoryRef,
   });
 
   /// Fetches favorites proposals ids of the user
@@ -175,7 +175,7 @@ final class ProposalServiceImpl implements ProposalService {
   Future<DraftRef> createDraftProposal({
     required DocumentDataContent content,
     required SignedDocumentRef template,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef categoryRef,
   }) async {
     final draftRef = DraftRef.generateFirstRef();
     final catalystId = _getUserCatalystId();
@@ -185,7 +185,7 @@ final class ProposalServiceImpl implements ProposalService {
           type: DocumentType.proposalDocument,
           selfRef: draftRef,
           template: template,
-          parameters: DocumentParameters({categoryId}),
+          parameters: DocumentParameters({categoryRef}),
           authors: [catalystId],
         ),
         content: content,
@@ -458,7 +458,7 @@ final class ProposalServiceImpl implements ProposalService {
     required DraftRef selfRef,
     required DocumentDataContent content,
     required SignedDocumentRef template,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef categoryRef,
   }) async {
     // TODO(LynxLynxx): when we start supporting multiple authors
     // we need to get the list of authors actually stored in the db and
@@ -471,7 +471,7 @@ final class ProposalServiceImpl implements ProposalService {
           type: DocumentType.proposalDocument,
           selfRef: selfRef,
           template: template,
-          parameters: DocumentParameters({categoryId}),
+          parameters: DocumentParameters({categoryRef}),
           authors: [catalystId],
         ),
         content: content,
