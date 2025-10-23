@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/api/api.dart';
-import 'package:catalyst_voices_repositories/src/common/response_mapper.dart';
+import 'package:catalyst_voices_repositories/src/common/future_response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/dto/component_status/component_ext.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -21,7 +21,7 @@ final class SystemStatusRepositoryImpl implements SystemStatusRepository {
 
   @override
   Future<List<ComponentStatus>> getComponentStatuses() {
-    return _apiServices.status.v2ComponentsJsonGet().successBodyOrThrow().then(
+    return _apiServices.status.componentStatuses().successBodyOrThrow().then(
       (e) => e.components.map((c) => c.toModel()).toList(),
     );
   }
