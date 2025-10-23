@@ -10,20 +10,16 @@
 
 Our current deployment practices create instability and coordination problems:
 
-1. **Deployment process mismatch**: Frontend auto-deploys to `dev` on every `main` merge,
-but backend/gateway deploys are fully manual and controlled.
-This creates environment drift and makes it difficult to test compatible versions together.
-
-2. **Shared environment blocking**: The `dev` environment frequently gets blocked by specific versions (e.g., fund15)
+1. **Shared environment blocking**: The `dev` environment frequently gets blocked by specific versions (e.g., fund15)
 that teams want to stabilize and test, preventing other work from being deployed and tested.
 
-3. **Version traceability**: When issues occur, it's difficult to identify which version caused the problem
+2. **Version traceability**: When issues occur, it's difficult to identify which version caused the problem
 because deployments aren't tied to explicit release tags.
 
-4. **Test environment accessibility**: Alternative test environments exist but require manual setup and
+3. **Test environment accessibility**: Alternative test environments exist but require manual setup and
 training, making them not straightforward for general use.
 
-5. **Breaking changes in main**: Large breaking changes (like API V2) merged to `main` cause problems
+4. **Breaking changes in main**: Large breaking changes (like API V2) merged to `main` cause problems
 for both teams - backend loses ability to release from `main`, and frontend can't deploy without breaking changes.
 
 We agreed (Oct 13, 2025 discussion) to standardize on **releasing from tags only (not every merge)** for both BE and FE,
@@ -45,7 +41,7 @@ Adopt an **OpenAPI-driven, spec-first release model** with **tag-based deploymen
 
 ### Core Principle: Deploy from Tags, Not from Main
 
-Both backend and frontend will **only deploy tagged releases** to shared environments (`dev`, `qa`, `prod`).
+Both backend and frontend will **only deploy tagged releases** to shared environments (`dev`, `qa`, `prod` and `feature env`).
 This ensures:
 - Explicit version tracking for troubleshooting
 - Controlled, coordinated releases between teams
@@ -74,7 +70,7 @@ This ensures:
    - Release promotion requires green conformance.
 
 ### 5. **Environment strategy & promotions**
-   - **Shared environments (`dev`, `qa`, `prod`)** only receive tagged releases:
+   - **Shared environments (`dev`, `preprod`, `prod`)** only receive tagged releases:
      - `dev`: latest unstable tagged release
      - `qa`: promoted release candidates
      - `prod`: production-ready releases
