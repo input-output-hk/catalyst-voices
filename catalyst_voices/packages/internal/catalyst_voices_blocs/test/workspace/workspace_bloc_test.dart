@@ -25,7 +25,7 @@ void main() {
         type: DocumentType.proposalDocument,
         selfRef: proposalRef,
         template: SignedDocumentRef.generateFirstRef(),
-        categoryId: categoryRef,
+        parameters: DocumentParameters({categoryRef}),
       ),
       content: const DocumentDataContent({}),
     );

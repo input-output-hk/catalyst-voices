@@ -7,10 +7,10 @@ final class DocumentDataFactory {
 
   /// Creates correct [DocumentData] from [document].
   ///
-  /// Throws [SignedDocumentMetadataMalformed] in case of any required fields
+  /// Throws [SignedDocumentMetadataMalformedException] in case of any required fields
   /// missing.
   ///
-  /// Throws [UnknownSignedDocumentContentType] in case of not supported
+  /// Throws [UnknownSignedDocumentContentTypeException] in case of not supported
   /// [document] contentType.
   static DocumentData create(SignedDocument document) {
     final malformedReasons = <String>[];
@@ -24,27 +24,23 @@ final class DocumentDataFactory {
     }
 
     if (malformedReasons.isNotEmpty) {
-      throw SignedDocumentMetadataMalformed(reasons: malformedReasons);
+      throw SignedDocumentMetadataMalformedException(reasons: malformedReasons);
     }
 
     final metadata = DocumentDataMetadata(
       type: document.metadata.documentType,
       selfRef: SignedDocumentRef(id: id!, version: ver),
       ref: document.metadata.ref?.toModel(),
-      refHash: document.metadata.refHash?.toModel(),
       template: document.metadata.template?.toModel(),
       reply: document.metadata.reply?.toModel(),
       section: document.metadata.section,
-      brandId: document.metadata.brandId?.toModel(),
-      campaignId: document.metadata.campaignId?.toModel(),
-      electionId: document.metadata.electionId,
-      categoryId: document.metadata.categoryId?.toModel(),
+      parameters: DocumentParameters(document.metadata.parameters.map((e) => e.toModel()).toSet()),
       authors: document.signers,
     );
 
     final content = switch (document.payload) {
       SignedDocumentJsonPayload(:final data) => DocumentDataContent(data),
-      SignedDocumentUnknownPayload() => throw UnknownSignedDocumentContentType(
+      SignedDocumentUnknownPayload() => throw UnknownSignedDocumentContentTypeException(
         type: document.metadata.contentType,
       ),
     };
@@ -58,13 +54,4 @@ final class DocumentDataFactory {
 
 extension on SignedDocumentMetadataRef {
   SignedDocumentRef toModel() => SignedDocumentRef(id: id, version: ver);
-}
-
-extension on SignedDocumentMetadataRefHash {
-  SecuredDocumentRef toModel() {
-    return SecuredDocumentRef(
-      ref: ref.toModel(),
-      hash: hash,
-    );
-  }
 }

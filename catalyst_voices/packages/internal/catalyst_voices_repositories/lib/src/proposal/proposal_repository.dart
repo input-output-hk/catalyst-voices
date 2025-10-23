@@ -61,7 +61,7 @@ abstract interface class ProposalRepository {
   Future<void> publishProposalAction({
     required SignedDocumentRef actionRef,
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters proposalParameters,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -219,7 +219,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<void> publishProposalAction({
     required SignedDocumentRef actionRef,
     required SignedDocumentRef proposalRef,
-    required SignedDocumentRef categoryId,
+    required DocumentParameters proposalParameters,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -235,7 +235,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         id: actionRef.id,
         ver: actionRef.version,
         ref: SignedDocumentMetadataRef.fromDocumentRef(proposalRef),
-        categoryId: SignedDocumentMetadataRef.fromDocumentRef(categoryId),
+        parameters: proposalParameters.set.map(SignedDocumentMetadataRef.fromDocumentRef).toList(),
       ),
       catalystId: catalystId,
       privateKey: privateKey,
@@ -410,7 +410,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final metadata = ProposalMetadata(
       selfRef: documentData.metadata.selfRef,
       templateRef: documentData.metadata.template!,
-      categoryId: documentData.metadata.categoryId!,
+      parameters: documentData.metadata.parameters,
       authors: documentData.metadata.authors ?? [],
     );
 
@@ -450,7 +450,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     DocumentDataMetadata metadata,
   ) {
     final template = metadata.template;
-    final categoryId = metadata.categoryId;
 
     return SignedDocumentMetadata(
       contentType: SignedDocumentContentType.json,
@@ -458,7 +457,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
       id: metadata.id,
       ver: metadata.version,
       template: template == null ? null : SignedDocumentMetadataRef.fromDocumentRef(template),
-      categoryId: categoryId == null ? null : SignedDocumentMetadataRef.fromDocumentRef(categoryId),
+      parameters: metadata.parameters.set.map(SignedDocumentMetadataRef.fromDocumentRef).toList(),
     );
   }
 

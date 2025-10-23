@@ -24,20 +24,20 @@ final class DraftNotFoundException implements DocumentException {
 }
 
 /// Exception thrown when signed document metadata is malformed.
-final class SignedDocumentMetadataMalformed implements DocumentException {
+final class SignedDocumentMetadataMalformedException implements DocumentException {
   final List<String> reasons;
 
-  const SignedDocumentMetadataMalformed({required this.reasons});
+  const SignedDocumentMetadataMalformedException({required this.reasons});
 
   @override
   String toString() => 'SignedDocument malformed because of $reasons';
 }
 
 /// Exception thrown when signed document content type is unknown.
-final class UnknownSignedDocumentContentType implements DocumentException {
+final class UnknownSignedDocumentContentTypeException implements DocumentException {
   final SignedDocumentContentType type;
 
-  const UnknownSignedDocumentContentType({required this.type});
+  const UnknownSignedDocumentContentTypeException({required this.type});
 
   @override
   String toString() => 'Unknown SignedDocument contentType($type)';

@@ -9,7 +9,7 @@ final class ProposalBuilderMetadata extends Equatable {
   final DocumentRef? documentRef;
   final DocumentRef? originalDocumentRef;
   final SignedDocumentRef? templateRef;
-  final SignedDocumentRef? categoryId;
+  final SignedDocumentRef? categoryRef;
   final List<DocumentVersion> versions;
   final bool fromActiveCampaign;
 
@@ -18,20 +18,20 @@ final class ProposalBuilderMetadata extends Equatable {
     this.documentRef,
     this.originalDocumentRef,
     this.templateRef,
-    this.categoryId,
+    this.categoryRef,
     this.versions = const [],
     this.fromActiveCampaign = true,
   });
 
   factory ProposalBuilderMetadata.newDraft({
     required SignedDocumentRef templateRef,
-    required SignedDocumentRef categoryId,
+    required SignedDocumentRef categoryRef,
   }) {
     final firstRef = DraftRef.generateFirstRef();
     return ProposalBuilderMetadata(
       documentRef: firstRef,
       templateRef: templateRef,
-      categoryId: categoryId,
+      categoryRef: categoryRef,
     );
   }
 
@@ -43,7 +43,7 @@ final class ProposalBuilderMetadata extends Equatable {
     documentRef,
     originalDocumentRef,
     templateRef,
-    categoryId,
+    categoryRef,
     versions,
     fromActiveCampaign,
   ];
@@ -53,7 +53,7 @@ final class ProposalBuilderMetadata extends Equatable {
     Optional<DocumentRef>? documentRef,
     Optional<DocumentRef>? originalDocumentRef,
     Optional<SignedDocumentRef>? templateRef,
-    Optional<SignedDocumentRef>? categoryId,
+    Optional<SignedDocumentRef>? categoryRef,
     List<DocumentVersion>? versions,
     bool? fromActiveCampaign,
   }) {
@@ -62,7 +62,7 @@ final class ProposalBuilderMetadata extends Equatable {
       documentRef: documentRef.dataOr(this.documentRef),
       originalDocumentRef: originalDocumentRef.dataOr(this.originalDocumentRef),
       templateRef: templateRef.dataOr(this.templateRef),
-      categoryId: categoryId.dataOr(this.categoryId),
+      categoryRef: categoryRef.dataOr(this.categoryRef),
       versions: versions ?? this.versions,
       fromActiveCampaign: fromActiveCampaign ?? this.fromActiveCampaign,
     );
