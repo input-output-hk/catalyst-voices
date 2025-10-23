@@ -129,17 +129,21 @@ impl Rbac509InsertQuery {
 
         let previous_transaction = cip509.previous_transaction();
 
+        // Before it is consumed
+        let txn_id = cip509.txn_hash();
+        let origin = cip509.origin().clone();
+        let purpose = cip509.purpose();
+
         // `Box::pin` is used here because of the future size (`clippy::large_futures` lint).
         let result = if let Some(previous_txn) = cip509.previous_transaction() {
             let result = Box::pin(update_chain(
-                cip509.clone(),
+                cip509,
                 previous_txn,
                 block.is_immutable(),
                 context,
             ))
             .await;
 
-            // Everything is fine: update the context.
             if let Ok(RbacValidationSuccess {
                 catalyst_id,
                 stake_addresses,
@@ -148,9 +152,6 @@ impl Rbac509InsertQuery {
                 ..
             }) = &result
             {
-                let txn_id = cip509.txn_hash();
-                let origin = cip509.origin();
-
                 context.insert_transaction(txn_id, catalyst_id.clone());
                 context.insert_addresses(stake_addresses.clone(), catalyst_id);
                 context.insert_public_keys(public_keys.clone(), catalyst_id);
@@ -171,14 +172,8 @@ impl Rbac509InsertQuery {
 
             result
         } else {
-            let result = Box::pin(start_new_chain(
-                cip509.clone(),
-                block.is_immutable(),
-                context,
-            ))
-            .await;
+            let result = Box::pin(start_new_chain(cip509, block.is_immutable(), context)).await;
 
-            // Everything is fine: update the context.
             if let Ok(RbacValidationSuccess {
                 catalyst_id,
                 stake_addresses: new_addresses,
@@ -268,7 +263,7 @@ impl Rbac509InsertQuery {
                     // Addresses can only be removed from other chains, so this list is always
                     // empty for the chain that is being updated.
                     HashSet::new(),
-                    cip509.purpose(),
+                    purpose,
                 ));
 
                 // Update other chains that were affected by this registration.
