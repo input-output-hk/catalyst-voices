@@ -41,6 +41,9 @@ class _AppState extends State<App> {
       BlocProvider<AdminToolsCubit>(
         create: (_) => Dependencies.instance.get<AdminToolsCubit>(),
       ),
+      BlocProvider<SystemStatusCubit>(
+        create: (_) => Dependencies.instance.get<SystemStatusCubit>(),
+      ),
       BlocProvider<SessionCubit>(
         create: (_) => Dependencies.instance.get<SessionCubit>(),
       ),
@@ -73,9 +76,6 @@ class _AppState extends State<App> {
       ),
       BlocProvider<DevToolsBloc>(
         create: (_) => Dependencies.instance.get<DevToolsBloc>(),
-      ),
-      BlocProvider<PublicProfileEmailStatusCubit>(
-        create: (_) => Dependencies.instance.get<PublicProfileEmailStatusCubit>(),
       ),
       BlocProvider<CampaignPhaseAwareCubit>(
         // Making it not lazy to not show two loading screens in a row (one for app splash screen and one for campaign phase aware)

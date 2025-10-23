@@ -6,6 +6,8 @@ import 'package:mocktail/mocktail.dart';
 void main() {
   final CatGateway gateway = MockCatGateway();
   final CatReviews reviews = MockCatReviews();
+  final CatStatus status = MockedCatStatus();
+
   final SignedDocumentManager signedDocumentManager = _MockedSignedDocumentManager();
 
   late final ApiServices apiServices;
@@ -16,6 +18,7 @@ void main() {
     apiServices = ApiServices.internal(
       gateway: gateway,
       reviews: reviews,
+      status: status,
     );
 
     source = CatGatewayDocumentDataSource(apiServices, signedDocumentManager);
@@ -24,6 +27,7 @@ void main() {
   tearDown(() {
     reset(gateway);
     reset(reviews);
+    reset(status);
     reset(signedDocumentManager);
   });
 
@@ -33,26 +37,5 @@ void main() {
     });
   });
 }
-
-/*DocumentIndexListDto _buildDocumentIndexList({
-  int verCount = 2,
-  DocumentRefForFilteredDocuments? template,
-  DocumentRefForFilteredDocuments? ref,
-}) {
-  return DocumentIndexListDto(
-    id: DocumentRefFactory.randomUuidV7(),
-    ver: List.generate(
-      verCount,
-      (index) {
-        return IndividualDocumentVersion(
-          ver: DocumentRefFactory.randomUuidV7(),
-          type: DocumentRefFactory.randomUuidV7(),
-          template: template,
-          ref: ref,
-        );
-      },
-    ),
-  );
-}*/
 
 class _MockedSignedDocumentManager extends Mock implements SignedDocumentManager {}

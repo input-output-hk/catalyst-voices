@@ -12,19 +12,27 @@ class AnimatedVoicesLinearProgressIndicator extends StatelessWidget {
   /// The weight of the progress indicator.
   final VoicesProgressIndicatorWeight weight;
 
+  /// The duration of the animation when the progress value changes.
+  final Duration animationDuration;
+
+  /// The curve of the animation when the progress value changes.
+  final Curve animationCurve;
+
   const AnimatedVoicesLinearProgressIndicator({
     super.key,
     required this.value,
     this.showTrack = true,
     this.weight = VoicesProgressIndicatorWeight.medium,
+    this.animationDuration = const Duration(milliseconds: 200),
+    this.animationCurve = Curves.easeInOut,
   });
 
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: value),
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeInOut,
+      duration: animationDuration,
+      curve: animationCurve,
       builder: (context, value, _) {
         return VoicesLinearProgressIndicator(
           value: value,

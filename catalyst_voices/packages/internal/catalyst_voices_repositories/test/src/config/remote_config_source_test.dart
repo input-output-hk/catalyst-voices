@@ -8,6 +8,7 @@ import 'package:mocktail/mocktail.dart';
 void main() {
   final CatGateway gateway = MockCatGateway();
   final CatReviews reviews = MockCatReviews();
+  final CatStatus status = MockedCatStatus();
 
   late final ApiServices apiServices;
 
@@ -17,6 +18,7 @@ void main() {
     apiServices = ApiServices.internal(
       gateway: gateway,
       reviews: reviews,
+      status: status,
     );
 
     source = ApiConfigSource(apiServices);
@@ -25,6 +27,7 @@ void main() {
   tearDown(() {
     reset(gateway);
     reset(reviews);
+    reset(status);
   });
 
   group(ApiConfigSource, () {
