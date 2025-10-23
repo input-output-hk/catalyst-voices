@@ -8,7 +8,6 @@ import 'package:catalyst_voices/pages/discovery/sections/campaign_hero.dart';
 import 'package:catalyst_voices/pages/discovery/sections/how_it_works.dart';
 import 'package:catalyst_voices/pages/discovery/sections/most_recent_proposals/most_recent_proposals.dart';
 import 'package:catalyst_voices/pages/discovery/sections/stay_involved/stay_involved.dart';
-import 'package:catalyst_voices/widgets/banner/widgets/email_need_verification_banner.dart';
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_wide_screen_constrained.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
@@ -57,14 +56,9 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   Widget build(BuildContext context) {
     return const ProposalSubmissionPhaseAware(
       activeChild: SelectionArea(
-        child: Stack(
-          children: [
-            CustomScrollView(
-              slivers: [
-                _Body(),
-              ],
-            ),
-            EmailNeedVerificationBanner(),
+        child: CustomScrollView(
+          slivers: [
+            _Body(),
           ],
         ),
       ),

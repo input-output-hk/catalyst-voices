@@ -4,3 +4,5 @@ import 'package:mocktail/mocktail.dart';
 class MockCatGateway extends Mock implements CatGateway {}
 
 class MockCatReviews extends Mock implements CatReviews {}
+
+class MockedCatStatus extends Mock implements CatStatus {}
