@@ -325,7 +325,7 @@
                             "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Partners: Tier1 Enterprise Integrations**\n\n- Minimum Funding Amount per proposal: **$ADA 250,000**\n- Maximum Funding Amount per proposal: **$ADA 750,000**",
                             "x-placeholder": "Requested amount should be between $ADA 250,000 and $ADA 750,000",
                             "minimum": 250000,
-                            "maximum": 1000000
+                            "maximum": 750000
                         }
                     },
                     "required": [
@@ -1025,74 +1025,62 @@
                         "track_record": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Track Record & Revenue:",
-                            "title": "I confirm that the lead org has a ≥2-year track record, and the consortium collectively has ≥$5M in verifiable annual revenue.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the lead org has a ≥2-year track record, and the consortium collectively has ≥$5M in verifiable annual revenue."
                         },
                         "tier_one_collaboration": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": " Tier-1 Collaboration:",
-                            "title": "I confirm that their is evidence of collaboration with a qualified Tier-1 enterprise is provided.",  
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that there is evidence of collaboration with a qualified Tier-1 enterprise is provided."
                         },
                         "catalyst_standing": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Catalyst Standing:",
-                            "title": "I confirm that the proposer and all team members are in good standing with prior Catalyst projects.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposer and all team members are in good standing with prior Catalyst projects."
                         },
                         "scope_fit": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Scope Fit:",
-                            "title": "I confirm that the proposal is for mature R&D or integration, not an early-stage concept or core infrastructure.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal is for mature R&D or integration, not an early-stage concept or core infrastructure."
                         },
                         "mature_product_path": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Mature Product & Path:",
-                            "title": "I confirm that evidence of a mature product is provided, with a clear integration plan if not already on Cardano.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that evidence of a mature product is provided, with a clear integration plan if not already on Cardano."
                         },
                         "partner_identification": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Partner Identification:",
-                            "title": "I confirm that all key partners, including the Tier-1 collaborator, are clearly identified.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that all key partners, including the Tier-1 collaborator, are clearly identified."
                         },
                         "partner_commitment": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Partner Commitment:",
-                            "title": "I confirm that a clear statement of the partner's in-kind or financial contributions is included.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that a clear statement of the partner's in-kind or financial contributions is included."
                         },
                         "verifiable_credentials": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Verifiable Credentials:",
-                            "title": "I confirm that the proposal provides verifiable references (e.g., LinkedIn, portfolio) for key team members.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal provides verifiable references (e.g., LinkedIn, portfolio) for key team members."
                         },
                         "measurable_adoption": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Measurable Adoption:",
-                            "title": "I confirm that the proposal includes clear KPIs for adoption (e.g., transaction volume, user growth). Forecast for projected on-chain transaction volume is provided with adequate justification.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal includes clear KPIs for adoption (e.g., transaction volume, user growth). Forecast for projected on-chain transaction volume is provided with adequate justification."
                         },
                         "timeline": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Timeline:",
-                            "title": "I confirm that delivery is ≤ 12 months with clear milestones.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that delivery is ≤ 12 months with clear milestones."
                         },
                         "visibility_engagement": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Visibility & Engagement:",
-                            "title": "I confirm that the proposal includes a co-marketing or community engagement plan to amplify Cardano's visibility.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal includes a co-marketing or community engagement plan to amplify Cardano's visibility."
                         },
                         "budget_compliance": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Budget Compliance:",
-                            "title": "I confirm that the proposal budget is for future work only, not for completed tasks. No incentives, giveaways, private treasuries and regranting are included in the budget.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal budget is for future work only, not for completed tasks. No incentives, giveaways, private treasuries and regranting are included in the budget."
                         }
                     },
                     "required": ["legal_entity","track_record","tier_one_collaboration","catalyst_standing","scope_fit", "mature_product_path","partner_identification", "partner_commitment","verifiable_credentials","measurable_adoption","timeline","visibility_engagement","budget_compliance" ],

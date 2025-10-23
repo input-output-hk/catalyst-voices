@@ -326,7 +326,7 @@
                             "x-guidance": "Each funding category has a minimum and maximum amount of funding a single proposal can request.\n\n**Cardano Open: Ecosystem**\n\n- Minimum Funding Amount per proposal: **$ADA 15,000**\n- Maximum Funding Amount per proposal: **$ADA 60,000**",
                             "x-placeholder": "Requested amount should be between $ADA 15,000 and $ADA 60,000",
                             "minimum": 15000,
-                            "maximum": 200000
+                            "maximum": 60000
                         }
                     },
                     "required": [
@@ -425,7 +425,7 @@
                         "links": {
                             "$ref": "#/definitions/singleLineHttpsURLEntryList",
                             "title": "Supporting links",
-                            "description": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS.",
+                            "description": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS. Please make sure that submitters own or have rights to share any linked content.",
                             "minItems": 0,
                             "maxItems": 5
                         }
@@ -468,17 +468,17 @@
                             "description": "Select Yes if the project is open source, No if it is not.",
                             "x-guidance": "If you answered “YES” to the question above:\n\nIf you declare that the project will be open source in the application form, it must remain open source throughout the entire lifecycle of the project, with a publicly accessible repository.\n\nPlease indicate the type of open source license you intend to use and provide any additional information relevant to the open source status of your project outputs. If only specific components of the code will be open source, please specify which parts.\n\nIf you answered “NO” to the question above:\n\nPlease explain why the outputs of your project will not be made open source."
                         },
-                        "licenseInformation": {
+                        "openSourceInformation": {
                             "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "License and Additional Information",
-                            "description": "Please provide details on the intellectual property (IP) status of your project outputs, including whether they will be released as open source or retained under another licence. ",
-                            "x-placeholder": "If applicable, describe the IP status of your project and the license type",
+                            "title": "Please provide here more information on the open source status of your project outputs",
+                            "description": "Please provide here more information on the open source status of your project outputs",
+                            "x-placeholder": "Describe the open source status of your project and the license type",
                             "maxLength": 500,
                             "x-guidance": "Open source licenses ensure intellectual property (IP) (such as source code) remains publicly accessible and licensed in a way that allows anyone to use, modify, and share the IP freely, typically under licenses approved by the Open Source Initiative.\n\nProprietary IP (such as source code) is not publicly available and the rights to use, modify, or redistribute the proprietary IP are restricted and typically reserved by the IP's owner.\n\nhttps://opensource.org/licenses"
                         }
                     },
-                    "required": ["isOpenSource", "licenseInformation"],
-                    "x-order": ["isOpenSource", "licenseInformation"]
+                    "required": ["isOpenSource", "openSourceInformation"],
+                    "x-order": ["isOpenSource", "openSourceInformation"]
                 }
             },
             "x-order": [
@@ -519,7 +519,7 @@
                             "title": "Who you’re targeting, how you’ll reach them, and why this matters for Cardano.",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your rationale.",
-                            "x-guidance": "Grassroots Growth & Onboarding\n\n- Number of new wallets created or ADA transactions initiated.\n- Growth in local/regional community participation.\n -Collaborations formed with local organizations, schools, or groups.",
+                            "x-guidance": "Grassroots Growth & Onboarding\n\n- Number of new wallets created or ADA transactions initiated.\n- Growth in local/regional community participation.\n- Collaborations formed with local organizations, schools, or groups.",
                             "minLength": 200,
                             "maxLength": 10240
                         },
@@ -1026,50 +1026,42 @@
                         "relevant_experience": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Relevant Experience:",
-                            "title": "I confirm that the proposal provides verifiable evidence (portfolio, links, reports) of the team's ability to deliver the project.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal provides verifiable evidence (portfolio, links, reports) of the team's ability to deliver the project."
                         },
                         "catalyst_standing": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Catalyst Standing:",
-                            "title": "I confirm that the proposer and all team members are in good standing with prior Catalyst projects.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposer and all team members are in good standing with prior Catalyst projects."
                         },
                         "goals_kpi": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Clear Goals & KPIs:",
-                            "title": "I confirm that the proposal includes clear objectives with both Output Metrics (what proposal did) and Adoption-Focused Metrics (what effect proposal had).",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal includes clear objectives with both Output Metrics (what proposal did) and Adoption-Focused Metrics (what effect proposal had)."
                         },
                         "pathway_adoption": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Pathway to Adoption:",
-                            "title": "I confirm that the proposal clearly explains the user journey and provides a credible plan for how the project will equip and motivate users for future on-chain activity.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal clearly explains the user journey and provides a credible plan for how the project will equip and motivate users for future on-chain activity."
                         },
                         "community_value": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Community Value:",
-                            "title": "I confirm that the initiative clearly demonstrates how it will grow the Cardano ecosystem or onboard users.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the initiative clearly demonstrates how it will grow the Cardano ecosystem or onboard users."
                         },
                         "realistic_timeline": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Realistic Timeline:",
-                            "title": "I confirm that the project plan and timeline (≤ 12 months) are realistic and well-defined.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the project plan and timeline (≤ 12 months) are realistic and well-defined."
                         },
                         "public_outputs": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Public Outputs:",
-                            "title": "I confirm that the proposal commits to public outputs and justifies any exceptions.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal commits to public outputs and justifies any exceptions."
                         },
                         "budget_compliance": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Budget Compliance:",
-                            "title": "I confirm that the budget adheres to all policies: it is for future work, follows the merchandise rule, and excludes establishing local treasuries, incentives/giveaways, re-grants.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the budget adheres to all policies: it is for future work, follows the merchandise rule, and excludes establishing local treasuries, incentives/giveaways, re-grants."
                         }
                     },
                     "required": ["scope_fit","relevant_experience","catalyst_standing","goals_kpi","pathway_adoption", "community_value","realistic_timeline", "public_outputs","budget_compliance"],

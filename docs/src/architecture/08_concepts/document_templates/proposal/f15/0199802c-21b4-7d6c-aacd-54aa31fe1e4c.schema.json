@@ -424,13 +424,13 @@
                     "$ref": "#/definitions/section",
                     "title": "Supporting Documentation",
                     "description": "Additional resources and documentation for your proposal",
-                    "x-guidance": "Provide **GitHub handles for all builders** and **1–3 representative repositories** that show your ability to ship code. Optionally include a link to an early PoC repo for this proposal and any **technical write-ups** (READMEs/docs).\n\n**Do not include** websites, social media, pitch decks, or marketing materials—this fund evaluates **code**, not marketing. All links must use HTTPS.",
+                    "x-guidance": "Provide **GitHub handles for all builders** and **1–3 representative repositories** that show your ability to ship code. Optionally include a link to an early PoC repo for this proposal and any **technical write-ups** (READMEs/docs).\n\n**Do not include** websites, social media, pitch decks, or marketing materials-this fund evaluates **code**, not marketing. All links must use HTTPS.",
                     "x-placeholder": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS. Please make sure that submitters own or have rights to share any linked content.",
                     "properties": {
                         "links": {
                             "$ref": "#/definitions/singleLineHttpsURLEntryList",
                             "title": "Supporting links",
-                            "description": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS.",
+                            "description": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS. Please make sure that submitters own or have rights to share any linked content.",
                             "minItems": 0,
                             "maxItems": 5
                         }
@@ -473,17 +473,17 @@
                             "description": "Select Yes if the project is open source, No if it is not.",
                             "x-guidance": "If you answered “YES” to the question above:\n\nIf you declare that the project will be open source in the application form, it must remain open source throughout the entire lifecycle of the project, with a publicly accessible repository.\n\nPlease indicate the type of open source license you intend to use and provide any additional information relevant to the open source status of your project outputs.\n\nIf you answered “NO” to the question above:\n\nYou will not be eligible for this funding."
                         },
-                        "licenseInformation": {
+                        "openSourceInformation": {
                             "$ref": "#/definitions/multiLineTextEntry",
                             "title": "Please provide here more information on the open source status of your project outputs",
                             "description": "Please provide here more information on the open source status of your project outputs",
-                            "x-placeholder": "",
+                            "x-placeholder": "Describe the open source status of your project and the license type",
                             "maxLength": 500,
                             "x-guidance": "Open source licenses ensure intellectual property (IP) (such as source code) remains publicly accessible and licensed in a way that allows anyone to use, modify, and share the IP freely, typically under licenses approved by the Open Source Initiative.\n\nProprietary IP (such as source code) is not publicly available and the rights to use, modify, or redistribute the proprietary IP are restricted and typically reserved by the IP's owner.\n\nhttps://opensource.org/licenses"
                         }
                     },
-                    "required": ["isOpenSource", "licenseInformation"],
-                    "x-order": ["isOpenSource", "licenseInformation"]
+                    "required": ["isOpenSource", "openSourceInformation"],
+                    "x-order": ["isOpenSource", "openSourceInformation"]
                 }
             },
             "x-order": [
@@ -834,7 +834,7 @@
                             "maxLength": 10240,
                             "title": "Please describe your proposed solution and how it addresses the problem",
                             "description": "Please describe your proposed solution and how it addresses the problem",
-                            "x-guidance": "How you write this section will depend on what type of proposal you are writing. You might want to include details on:\n\n- How do you perceive the problem you are solving?\n- What are your reasons for approaching it in the way that you have?\n- Who will your project engage?\n- Explain what is unique about your solution, who will benefit, and why this is important to Midnight."
+                            "x-guidance": "How you write this section will depend on what type of proposal you are writing. You might want to include details on:\n\n- How do you perceive the problem you are solving?\n- What are your reasons for approaching it in the way that you have?\n- Who will your project engage?\n\n Explain what is unique about your solution, who will benefit, and why this is important to Midnight."
                         }
                     },
                     "required": ["solution"]
@@ -943,9 +943,7 @@
                                         "description": "The cost of this milestone in $USDM",
                                         "x-placeholder": "Enter the cost associated with this milestone",
                                         "format": "token:usdm",
-                                        "multipleOf": 1,
-                                        "minimum": 100,
-                                        "maximum": 10000000
+                                        "multipleOf": 1
                                     },
                                     "progress": {
                                         "$ref": "#/definitions/dropDownSingleSelect",
@@ -1035,32 +1033,27 @@
                         "developer_experience": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Developer Experience Focus:",
-                            "title": "I confirm that the proposal clearly defines which part of the developer journey it improves and how it makes building on Midnight easier and more productive.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal clearly defines which part of the developer journey it improves and how it makes building on Midnight easier and more productive."
                         },
                         "open_source_commitment": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Open Source Commitment:",
-                            "title": "I confirm that the proposal explicitly states the chosen permissive open-source license (e.g., MIT, Apache 2.0) and commits to a public code repository.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal explicitly states the chosen permissive open-source license (e.g., MIT, Apache 2.0) and commits to a public code repository."
                         },
                         "verifiable_builder_credentials": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Verifiable Builder Credentials:",
-                            "title": "I confirm that the team provides evidence of their technical ability and experience in creating developer tools or high-quality technical content (e.g., GitHub, portfolio).",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the team provides evidence of their technical ability and experience in creating developer tools or high-quality technical content (e.g., GitHub, portfolio)."
                         },
                         "quality_documentation": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "High-Quality Documentation:",
-                            "title": "I confirm that there is a plan for creating and maintaining clear, comprehensive documentation is a core part of the proposal's scope.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that there is a plan for creating and maintaining clear, comprehensive documentation is a core part of the proposal's scope."
                         },
                         "realistic_scope": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Realistic Scope:",
-                            "title": "I confirm that the budget and timeline (3 months) are realistic for delivering the proposed tool or resource.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the budget and timeline (3 months) are realistic for delivering the proposed tool or resource."
                         }
                     },
                     "required": ["strategic_fit","developer_experience","open_source_commitment","verifiable_builder_credentials","quality_documentation", "realistic_scope"],
