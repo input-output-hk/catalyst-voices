@@ -180,7 +180,6 @@ on used env type.
 
 This project utilizes automatic code generation for the following components:
 
-* Catalyst Gateway OpenAPI
 * Localization files
 * Asset files
 * Navigation route files
