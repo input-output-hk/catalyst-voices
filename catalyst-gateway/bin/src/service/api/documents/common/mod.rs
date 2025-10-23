@@ -49,6 +49,13 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for Validati
         self.doc_provider.try_get_last_doc(id).await
     }
 
+    async fn try_get_first_doc(
+        &self,
+        id: catalyst_signed_doc::UuidV7,
+    ) -> anyhow::Result<Option<CatalystSignedDocument>> {
+        self.doc_provider.try_get_first_doc(id).await
+    }
+
     fn future_threshold(&self) -> Option<std::time::Duration> {
         self.doc_provider.future_threshold()
     }
@@ -58,12 +65,14 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for Validati
     }
 }
 
-impl catalyst_signed_doc::providers::VerifyingKeyProvider for ValidationProvider {
-    async fn try_get_key(
+impl catalyst_signed_doc::providers::CatalystIdProvider for ValidationProvider {
+    async fn try_get_registered_key(
         &self,
         kid: &catalyst_signed_doc::CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
-        self.verifying_key_provider.try_get_key(kid).await
+        self.verifying_key_provider
+            .try_get_registered_key(kid)
+            .await
     }
 }
 
@@ -90,6 +99,17 @@ impl catalyst_signed_doc::providers::CatalystSignedDocumentProvider for DocProvi
         id: catalyst_signed_doc::UuidV7,
     ) -> anyhow::Result<Option<CatalystSignedDocument>> {
         match FullSignedDoc::retrieve(&id.uuid(), None).await {
+            Ok(doc) => Ok(Some(doc.raw().try_into()?)),
+            Err(err) if err.is::<NotFoundError>() => Ok(None),
+            Err(err) => Err(err),
+        }
+    }
+
+    async fn try_get_first_doc(
+        &self,
+        id: catalyst_signed_doc::UuidV7,
+    ) -> anyhow::Result<Option<CatalystSignedDocument>> {
+        match FullSignedDoc::retrieve(&id.uuid(), Some(&id.uuid())).await {
             Ok(doc) => Ok(Some(doc.raw().try_into()?)),
             Err(err) if err.is::<NotFoundError>() => Ok(None),
             Err(err) => Err(err),
@@ -141,8 +161,8 @@ pub(crate) struct VerifyingKeyProvider(
     HashMap<catalyst_signed_doc::CatalystId, ed25519_dalek::VerifyingKey>,
 );
 
-impl catalyst_signed_doc::providers::VerifyingKeyProvider for VerifyingKeyProvider {
-    async fn try_get_key(
+impl catalyst_signed_doc::providers::CatalystIdProvider for VerifyingKeyProvider {
+    async fn try_get_registered_key(
         &self,
         kid: &catalyst_signed_doc::CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
