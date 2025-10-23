@@ -200,13 +200,10 @@ melos:
           lcov --remove {} -o {} --ignore-errors unused,unused \
           '*.g.dart' \
           '*.freezed.dart' \
-          '*.chopper.dart' \
-          '*.swagger.dart' \
-          '*.openapi.dart' \
           '*.gen.dart' \
-          '*.swagger.*.dart' \
           '*.drift.dart' \
-          'lib/generated/**' \;
+          'generated/catalyst_voices_localizations_*.dart' \
+          'generated/catalyst_voices_localizations.dart' \;
 
         # merges all coverage reports into a single one and puts it in /coverage/lcov.info
         dart pub global run combine_coverage --repo-path=.
@@ -250,13 +247,10 @@ melos:
           lcov --remove {} -o {} --ignore-errors unused,unused \
           '*.g.dart' \
           '*.freezed.dart' \
-          '*.chopper.dart' \
-          '*.swagger.dart' \
-          '*.openapi.dart' \
           '*.gen.dart' \
-          '*.swagger.*.dart' \
           '*.drift.dart' \
-          'lib/generated/**' \;
+          'generated/catalyst_voices_localizations_*.dart' \
+          'generated/catalyst_voices_localizations.dart' \;
 
         # merges all coverage reports into a single one and puts it in /coverage/lcov.info
         dart pub global run combine_coverage --repo-path=.

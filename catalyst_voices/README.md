@@ -5,23 +5,23 @@
 This repository contains the Catalyst Voices app and packages.
 
 * [Catalyst Voices](#catalyst-voices)
-  * [Requirements](#requirements)
-  * [Platforms](#platforms)
-  * [Getting Started](#getting-started)
-    * [Bootstrapping](#bootstrapping)
-    * [Packages](#packages)
-    * [Environment Type vs Flavor](#environment-type-vs-flavor)
-    * [Environment types](#environment-types)
-    * [Flavor types](#flavor-types)
-    * [Environment variables](#environment-variables)
-      * [Environment config](#environment-config)
-    * [Code Generation](#code-generation)
-      * [Running Code Generation](#running-code-generation)
-        * [Basic Generation](#basic-generation)
-        * [Local Saving](#local-saving)
-      * [GitHub Token / PAT Setup](#github-token--pat-setup)
-      * [Security Notes](#security-notes)
-  * [Running Tests](#running-tests)
+    * [Requirements](#requirements)
+    * [Platforms](#platforms)
+    * [Getting Started](#getting-started)
+        * [Bootstrapping](#bootstrapping)
+        * [Packages](#packages)
+        * [Environment Type vs Flavor](#environment-type-vs-flavor)
+        * [Environment types](#environment-types)
+        * [Flavor types](#flavor-types)
+        * [Environment variables](#environment-variables)
+            * [Environment config](#environment-config)
+        * [Code Generation](#code-generation)
+            * [Running Code Generation](#running-code-generation)
+                * [Basic Generation](#basic-generation)
+                * [Local Saving](#local-saving)
+            * [GitHub Token / PAT Setup](#github-token--pat-setup)
+            * [Security Notes](#security-notes)
+    * [Running Tests](#running-tests)
 
 ## Requirements
 
@@ -35,8 +35,8 @@ This repository contains the Catalyst Voices app and packages.
 * [Melos](https://melos.invertase.dev)
 * [Fastlane](https://fastlane.tools)
 * Flutter & Dart plugins:
-  * [Visual Studio Code](https://flutter.dev/docs/get-started/editor?tab=vscode)
-  * [Android Studio / IntelliJ](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
+    * [Visual Studio Code](https://flutter.dev/docs/get-started/editor?tab=vscode)
+    * [Android Studio / IntelliJ](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
 * [Rust](https://rustup.rs/): 1.80.0+
 
 ❗️We recommend using **Visual Studio Code** as the **default editor** for this project.
@@ -62,16 +62,16 @@ just bootstrap
 
 <!-- markdownlint-disable MD042 -->
 
-| Package                                                                  | Description              | Example   |
-|--------------------------------------------------------------------------|--------------------------|-----------|
-| [catalyst_voices_assets](./packages/internal/catalyst_voices_assets/)    | Assets used in Catalyst Voices |[example](./packages/internal/catalyst_voices_assets/example/lib/src/main.dart)|
-| [catalyst_voices_blocs](./packages/internal/catalyst_voices_blocs/)               | State management of Catalyst Voices |[example](./packages/internal/catalyst_voices_blocs/)|
-| [catalyst_voices_localization](./packages/internal/catalyst_voices_localization/) | Localization files for Catalyst Voices |[example](./packages/internal/catalyst_voices_localization/)|
-| [catalyst_voices_models](./packages/internal/catalyst_voices_models/)             | Models |[example](./packages/internal/catalyst_voices_models/)|
-| [catalyst_voices_repositories](./packages/internal/catalyst_voices_repositories/) | Repositories |[example](./packages/internal/catalyst_voices_repositories/)|
-| [catalyst_voices_services](./packages/internal/catalyst_voices_services/)         | Services |[example](./packages/internal/catalyst_voices_services/)|
-| [catalyst_voices_shared](./packages/internal/catalyst_voices_shared/)             | Shared code  |[example](./packages/internal/catalyst_voices_shared/)|
-| [catalyst_voices_view_models](./packages/internal/catalyst_voices_view_models/)   | ViewModels  |[example](./packages/internal/catalyst_voices_view_models/)|
+| Package                                                                           | Description                            | Example                                                                         |
+|-----------------------------------------------------------------------------------|----------------------------------------|---------------------------------------------------------------------------------|
+| [catalyst_voices_assets](./packages/internal/catalyst_voices_assets/)             | Assets used in Catalyst Voices         | [example](./packages/internal/catalyst_voices_assets/example/lib/src/main.dart) |
+| [catalyst_voices_blocs](./packages/internal/catalyst_voices_blocs/)               | State management of Catalyst Voices    | [example](./packages/internal/catalyst_voices_blocs/)                           |
+| [catalyst_voices_localization](./packages/internal/catalyst_voices_localization/) | Localization files for Catalyst Voices | [example](./packages/internal/catalyst_voices_localization/)                    |
+| [catalyst_voices_models](./packages/internal/catalyst_voices_models/)             | Models                                 | [example](./packages/internal/catalyst_voices_models/)                          |
+| [catalyst_voices_repositories](./packages/internal/catalyst_voices_repositories/) | Repositories                           | [example](./packages/internal/catalyst_voices_repositories/)                    |
+| [catalyst_voices_services](./packages/internal/catalyst_voices_services/)         | Services                               | [example](./packages/internal/catalyst_voices_services/)                        |
+| [catalyst_voices_shared](./packages/internal/catalyst_voices_shared/)             | Shared code                            | [example](./packages/internal/catalyst_voices_shared/)                          |
+| [catalyst_voices_view_models](./packages/internal/catalyst_voices_view_models/)   | ViewModels                             | [example](./packages/internal/catalyst_voices_view_models/)                     |
 
 ### Environment Type vs Flavor
 
@@ -162,9 +162,10 @@ Priority looks as follow:
 1. `dart-define` vars
 2. `flavor` var
 
-If none of above is defined app will fallback to **relative** type for web or **dev** in other cases.
+If none of above is defined app will fallback to **relative** type for web or **dev** in other
+cases.
 
-Using following command below will resolve in **relative** env type for web  and **dev** for mobile
+Using following command below will resolve in **relative** env type for web and **dev** for mobile
 and desktop because **ENV_NAME** nor **flavor** is defined.
 
 ```sh
@@ -180,7 +181,6 @@ on used env type.
 
 This project utilizes automatic code generation for the following components:
 
-* Catalyst Gateway OpenAPI
 * Localization files
 * Asset files
 * Navigation route files
@@ -220,7 +220,8 @@ To run all unit and widget tests use the following command:
 flutter test --coverage --test-randomize-ordering-seed random
 ```
 
-To view the generated coverage report you can use [lcov](https://github.com/linux-test-project/lcov).
+To view the generated coverage report you can
+use [lcov](https://github.com/linux-test-project/lcov).
 
 ```sh
 # Generate Coverage Report
