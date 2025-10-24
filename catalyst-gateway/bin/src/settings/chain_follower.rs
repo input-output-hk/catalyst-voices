@@ -111,6 +111,7 @@ enum NetworkFromStr {
 }
 
 impl From<NetworkFromStr> for Network {
+    #[allow(clippy::too_many_lines)]
     fn from(value: NetworkFromStr) -> Self {
         match value {
             NetworkFromStr::Mainnet => Self::Mainnet,
@@ -155,10 +156,10 @@ impl From<NetworkFromStr> for Network {
                     u64::MAX,
                 );
                 let byron_known_hash = StringEnvVar::new(
-                    "CHAIN_FOLLOWER_DEVNET_BYRON_KNOWN_TIME",
+                    "CHAIN_FOLLOWER_DEVNET_BYRON_KNOWN_HASH",
                     StringEnvVarParams::Plain(
-                        "DEFAULT_DEVNET_BYRON_KNOWN_TIME".into(),
-                        DEFAULT_DEVNET_BYRON_KNOWN_TIME.to_string().into(),
+                        "DEFAULT_DEVNET_BYRON_KNOWN_HASH".into(),
+                        DEFAULT_DEVNET_BYRON_KNOWN_HASH.to_string().into(),
                     ),
                 );
                 let byron_known_time = StringEnvVar::new_as_int(
@@ -222,7 +223,8 @@ impl From<NetworkFromStr> for Network {
 impl EnvVars {
     /// Create a config for a cassandra cluster, identified by a default namespace.
     pub(super) fn new() -> Self {
-        let chain = StringEnvVar::new_as_enum("CHAIN_NETWORK", DEFAULT_NETWORK, false).into();
+        let chain: Network =
+            StringEnvVar::new_as_enum("CHAIN_NETWORK", DEFAULT_NETWORK, false).into();
 
         let sync_tasks: u16 = StringEnvVar::new_as_int(
             "CHAIN_FOLLOWER_SYNC_TASKS",
@@ -238,7 +240,7 @@ impl EnvVars {
             MAX_SYNC_MAX_SLOTS,
         );
 
-        let cfg = ChainSyncConfig::default_for(chain);
+        let cfg = ChainSyncConfig::default_for(chain.clone());
         let mut dl_config = cfg.mithril_cfg.dl_config.clone().unwrap_or_default();
 
         let workers = StringEnvVar::new_as_int(

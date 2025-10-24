@@ -41,7 +41,7 @@ fn mk_app(base_route: Option<Route>) -> impl Endpoint {
     let api_service = mk_api();
     let docs = docs(&api_service);
 
-    if Settings::cardano_network() != Network::Mainnet && Settings::is_panic_endpoint_enabled() {
+    if Settings::cardano_network() != &Network::Mainnet && Settings::is_panic_endpoint_enabled() {
         base_route = base_route.nest("/panic", panic_endpoint);
     }
 

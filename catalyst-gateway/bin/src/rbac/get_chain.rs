@@ -145,7 +145,7 @@ pub async fn apply_regs(
 
 /// Loads and parses a `Cip509` registration from a block using chain follower.
 async fn cip509(
-    network: Network,
+    network: &Network,
     slot: Slot,
     txn_index: TxnIndex,
 ) -> Result<Cip509> {
