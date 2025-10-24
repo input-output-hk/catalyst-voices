@@ -44,5 +44,11 @@ final class KeyData {
 
   factory KeyData.fromJson(Json json) => _$KeyDataFromJson(json);
 
+  String? get effectiveKeyValue => switch (keyType) {
+    KeyType.pubkey => keyValue?.pubkey,
+    KeyType.x509 => keyValue?.x509,
+    KeyType.c509 => keyValue?.c509,
+  };
+
   Json toJson() => _$KeyDataToJson(this);
 }

@@ -5,7 +5,7 @@ import 'package:json_annotation/json_annotation.dart';
 enum KeyType {
   pubkey('pubkey'),
   x509('x509'),
-  minorOutage('c509');
+  c509('c509');
 
   final String value;
 
