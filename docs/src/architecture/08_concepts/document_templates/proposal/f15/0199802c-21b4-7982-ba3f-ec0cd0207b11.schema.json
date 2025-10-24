@@ -425,7 +425,7 @@
                         "links": {
                             "$ref": "#/definitions/singleLineHttpsURLEntryList",
                             "title": "Supporting links",
-                            "description": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS.",
+                            "description": "Links to any relevant documentation, code repositories, or marketing materials. All links must use HTTPS. Please make sure that submitters own or have rights to share any linked content.",
                             "minItems": 0,
                             "maxItems": 5
                         }
@@ -468,17 +468,17 @@
                             "description": "Select Yes if the project is open source, No if it is not.",
                             "x-guidance": "If you answered “YES” to the question above:\n\nIf you declare that the project will be open source in the application form, it must remain open source throughout the entire lifecycle of the project, with a publicly accessible repository.\n\nPlease indicate the type of open source license you intend to use and provide any additional information relevant to the open source status of your project outputs. If only specific components of the code will be open source, please specify which parts.\n\nIf you answered “NO” to the question above:\n\nPlease explain why the outputs of your project will not be made open source."
                         },
-                        "licenseInformation": {
+                        "openSourceInformation": {
                             "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "License and Additional Information",
-                            "description": "Please provide details on the intellectual property (IP) status of your project outputs, including whether they will be released as open source or retained under another licence. ",
-                            "x-placeholder": "If applicable, describe the IP status of your project and the license type",
+                            "title": "Please provide here more information on the open source status of your project outputs",
+                            "description": "Please provide here more information on the open source status of your project outputs",
+                            "x-placeholder": "Describe the open source status of your project and the license type",
                             "maxLength": 500,
                             "x-guidance": "Open source licenses ensure intellectual property (IP) (such as source code) remains publicly accessible and licensed in a way that allows anyone to use, modify, and share the IP freely, typically under licenses approved by the Open Source Initiative.\n\nProprietary IP (such as source code) is not publicly available and the rights to use, modify, or redistribute the proprietary IP are restricted and typically reserved by the IP's owner.\n\nhttps://opensource.org/licenses"
                         }
                     },
-                    "required": ["isOpenSource", "licenseInformation"],
-                    "x-order": ["isOpenSource", "licenseInformation"]
+                    "required": ["isOpenSource", "openSourceInformation"],
+                    "x-order": ["isOpenSource", "openSourceInformation"]
                 }
             },
             "x-order": [
@@ -1021,61 +1021,53 @@
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Foundational Work:",
                             "title": "I confirm that evidence of prior research, whitepaper, design, or proof-of-concept is provided.",  
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                             "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+
                         },
                         "ecosystem_value": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Ecosystem Value Proposition:",
-                            "title": "I confirm that the proposal includes ecosystem research and uses the findings to either (a) justify its uniqueness over existing solutions or (b) demonstrate the value of its novel approach.",  
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal includes ecosystem research and uses the findings to either (a) justify its uniqueness over existing solutions or (b) demonstrate the value of its novel approach."
                         },
                         "builder_credentials": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Builder Credentials:",
-                            "title": "I confirm that the proposal demonstrates technical capability via verifiable in-house talent or a confirmed development partner (GitHub, LinkedIn, portfolio, etc.)",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal demonstrates technical capability via verifiable in-house talent or a confirmed development partner (GitHub, LinkedIn, portfolio, etc.)"
                         },
                         "catalyst_standing": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Catalyst Standing:",
-                            "title": "I confirm that the proposer and all team members are in good standing with prior Catalyst projects.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposer and all team members are in good standing with prior Catalyst projects."
                         },
                         "problem_use_case": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Problem & Use Case:",
-                            "title": "I confirm that the proposal clearly defines the problem and the value of the on-chain utility.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal clearly defines the problem and the value of the on-chain utility."
                         },
                         "tangible_prototype": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Tangible Prototype:",
-                            "title": "I confirm that the primary goal of the proposal is a working prototype deployed on at least a Cardano testnet.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the primary goal of the proposal is a working prototype deployed on at least a Cardano testnet."
                         },
                         "technical_approach": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Technical Approach:",
-                            "title": "I confirm that the proposal outlines a credible and clear technical plan and architecture.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal outlines a credible and clear technical plan and architecture."
                         },
                         "realistic_scope": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Realistic Scope:",
-                            "title": "I confirm that the budget and timeline (≤ 12 months) are realistic for the proposed work.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the budget and timeline (≤ 12 months) are realistic for the proposed work."
                         },
                         "community_engagement": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Community Engagement:",
-                            "title": "I confirm that the proposal includes a community engagement and feedback plan to amplify prototype adoption with the Cardano ecosystem.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal includes a community engagement and feedback plan to amplify prototype adoption with the Cardano ecosystem."
                         },
                         "budget_compliance": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Budget Compliance:",
-                            "title": "I confirm that the budget is for future development only; excludes retroactive funding, incentives, giveaways, re-granting, or sub-treasuries.",
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the budget is for future development only; excludes retroactive funding, incentives, giveaways, re-granting, or sub-treasuries."
                         }
                     },
                     "required": ["foundational_work","ecosystem_value","builder_credentials","catalyst_standing","problem_use_case","tangible_prototype", "technical_approach","realistic_scope", "community_engagement","budget_compliance"],
