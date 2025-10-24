@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/common/ext/active_fund_number_selector_ext.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
@@ -88,7 +87,7 @@ class _AgreementCheckboxes extends StatelessWidget {
             context.read<NewProposalCubit>().updateAgreeToNoFurtherCategoryChange(value: value);
           },
           label: Text(
-            context.l10n.agreementCantChangeCategory(context.activeCampaignFundNumber),
+            context.l10n.agreementCantChangeCategory,
           ),
         ),
       ],
