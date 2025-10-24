@@ -125,15 +125,9 @@
   "@agree": {
     "description": "Button text for confirming agreement"
   },
-  "agreementCantChangeCategory": "I understand that I can’t change my category selection in Fund{fundNumber}.",
+  "agreementCantChangeCategory": "I understand that after I choose a category, the proposal’s category is locked and switching categories requires creating a new proposal.",
   "@agreementCantChangeCategory": {
-    "description": "Text for the agreement checkbox that explains that user can't change category selection in Fund",
-    "placeholders": {
-      "fundNumber": {
-        "description": "Number of fund",
-        "type": "int"
-      }
-    }
+    "description": "Text for the agreement checkbox that explains that user can't change category selection"
   },
   "agreementFitToCategoryCriteria": "I understand the category brief and will make sure my proposal fits the criteria.",
   "@agreementFitToCategoryCriteria": {
