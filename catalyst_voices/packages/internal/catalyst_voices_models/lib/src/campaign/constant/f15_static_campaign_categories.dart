@@ -383,7 +383,6 @@ Use this checklist to ensure your proposal meets all foundational and content re
   - **Proposal Range:** From $USDM 2,500 to $USDM 10,000
   - Funding amounts are intended for small, focused prototypes, not full product builds.
 
-
   Sponsored by a $USDM 250,000 commitment from the Midnight Foundation, this initiative aims to build foundational “Reference DApps” for the new ecosystem. The Midnight Foundation is looking to fund high-impact, open-source projects that directly demonstrate high-value use cases for privacy-preserving applications, laying the critical groundwork of basic UI design and prototyping.
 
   ### Community Governance & Voting
@@ -437,14 +436,14 @@ This category is for the builders. To be eligible, you and your project must mee
       ),
       CategoryDescription(
         title: 'Proposal Requirements',
-        description: '''
+        description: r'''
 All proposals must provide the following information:
 
 - **Demonstrate Novelty & Privacy Rationale:** Propose a unique, novel project (not a minor tweak of an existing Midnight reference dApp). If inspired by other ecosystems, clearly explain what's different and why it matters here. Explain why privacy improves this DApp; show you've thought through selective disclosure/programmable privacy. Don't treat Compact like TypeScript. They are distinct; proposals must use Compact for ZKPs.
 - **Define Target Audience:** Clearly describe both the target end-user of the DApp and the developer personas who will learn from your code repository.
 - **Provide Verifiable Team Credentials:** Link to GitHub profiles, past projects, or code samples that prove your team has the technical ability to deliver the project.
 - **Detailed Project Deliverables:** All final projects must include the following technical baseline:
-   - **Compact contract:** At least one **.compact** smart contract demonstrating programmable privacy/selective disclosure.
+   - **Compact contract:** At least one **\*.compact** smart contract demonstrating programmable privacy/selective disclosure.
    - **Demo UI:** A simple UI in the repo that calls your Compact contract and shows a demo flow.
    - **Wallet integration:** Integrate with the Lace (Midnight) wallet.
    - **Open-source repo:** Public code with a permissive OSI license (MIT or Apache-2.0).
