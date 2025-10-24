@@ -104,6 +104,7 @@ void main() {
     });
 
     test('extractBase64FromPem removes header and footer', () {
+      /* cSpell:disable */
       const pem = '''
 -----BEGIN CERTIFICATE-----
 MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE
@@ -118,9 +119,11 @@ MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE
       expect(base64, isNot(contains('\n')));
       expect(base64, isNot(contains(' ')));
       expect(base64, equals('MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE'));
+      /* cSpell:enable */
     });
 
     test('extractBase64FromPem handles custom label', () {
+      /* cSpell:disable */
       const pem = '''
 -----BEGIN CUSTOM LABEL-----
 MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE
@@ -130,9 +133,11 @@ MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE
       final base64 = X509Certificate.extractBase64FromPem(pem);
 
       expect(base64, equals('MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE'));
+      /* cSpell:enable */
     });
 
     test('extractBase64FromPem handles label without spaces', () {
+      /* cSpell:disable */
       const pem = '''
 -----BEGIN-----
 MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE
@@ -142,9 +147,11 @@ MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE
       final base64 = X509Certificate.extractBase64FromPem(pem);
 
       expect(base64, equals('MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE'));
+      /* cSpell:enable */
     });
 
     test('extractBase64FromPem removes all whitespace types', () {
+      /* cSpell:disable */
       const pem = '''
 -----BEGIN CERTIFICATE-----
 MIIB /DCC Aa6g
@@ -158,9 +165,11 @@ AwIB  AgIF\tAI0A
       expect(base64, isNot(contains(' ')));
       expect(base64, isNot(contains('\t')));
       expect(base64, isNot(contains('\n')));
+      /* cSpell:enable */
     });
 
     test('extractBase64FromPem handles multiple newlines', () {
+      /* cSpell:disable */
       const pem = '''
 -----BEGIN CERTIFICATE-----
 
@@ -181,6 +190,7 @@ A1UE
       final base64 = X509Certificate.extractBase64FromPem(pem);
 
       expect(base64, equals('MIIB/DCCAa6gAwIBAgIFAI0AzRIwBQYDK2VwMEIxCTAHBgNVBAYTADEJMAcGA1UE'));
+      /* cSpell:enable */
     });
   });
 }
