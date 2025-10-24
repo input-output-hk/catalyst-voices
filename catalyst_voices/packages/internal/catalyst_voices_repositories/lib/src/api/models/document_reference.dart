@@ -14,9 +14,14 @@ final class DocumentReference {
   /// Document Version
   final String ver;
 
+  /// Signed Document Locator
+  ///Document Locator
+  final String? cid;
+
   const DocumentReference({
     required this.id,
     required this.ver,
+    this.cid,
   });
 
   factory DocumentReference.fromJson(Json json) => _$DocumentReferenceFromJson(json);

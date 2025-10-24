@@ -1,10 +1,10 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_repositories/src/api/models/current_page.dart';
 import 'package:catalyst_voices_repositories/src/api/models/document_index_list.dart';
 import 'package:catalyst_voices_repositories/src/api/models/document_index_query_filter.dart';
 import 'package:catalyst_voices_repositories/src/api/models/document_reference.dart';
 import 'package:catalyst_voices_repositories/src/api/models/eq_or_ranged_id.dart';
+import 'package:catalyst_voices_repositories/src/api/models/id_and_ver_ref.dart';
 import 'package:catalyst_voices_repositories/src/common/future_response_mapper.dart';
 import 'package:catalyst_voices_repositories/src/document/document_data_factory.dart';
 import 'package:collection/collection.dart';
@@ -49,7 +49,7 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     try {
       final index = await _api.gateway
           .documentIndex(
-            filter: DocumentIndexQueryFilter(id: EqOrRangedId.eq(id)),
+            filter: DocumentIndexQueryFilter(id: [EqOrRangedId.eq(id)]),
             limit: 1,
           )
           .successBodyOrThrow();
@@ -76,28 +76,15 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     var remaining = 0;
 
     do {
-      final response =
-          await _getDocumentIndexList(
-            page: page,
-            limit: maxPerPage,
-            campaign: campaign,
-          )
-          // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
-          // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
-          .onError<NotFoundException>(
-            (_, _) {
-              return DocumentIndexList(
-                docs: [],
-                page: CurrentPage(page: page, limit: maxPerPage, remaining: 0),
-              );
-            },
-          );
+      final response = await _getDocumentIndexList(
+        page: page,
+        limit: maxPerPage,
+        campaign: campaign,
+      );
 
       allRefs.addAll(response.refs);
 
-      // TODO(damian-molinski): Remove this workaround when migrated to V2 endpoint.
-      // https://github.com/input-output-hk/catalyst-voices/issues/3199#issuecomment-3204803465
-      remaining = response.docs.length < maxPerPage ? 0 : response.page.remaining;
+      remaining = response.page.remaining;
       page = response.page.page + 1;
     } while (remaining > 0);
 
@@ -115,16 +102,17 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     required int limit,
     required Campaign campaign,
   }) async {
-    // TODO(bstolinski): previously it was possible to use `inside` filter for categories.
-    // final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toList();
-    // final categoryFilter = DocumentIndexQueryFilter(
-    //   parameters: IdRefOnly(id: IdSelectorDto.inside(categoriesIds)).toJson(),
-    // );
-    const filter = DocumentIndexQueryFilter();
+    assert(campaign.categories.length <= 10, 'Max 10 categories are allowed in the filter.');
+
+    final categoryFilter = campaign.categories
+        .take(10)
+        .map((e) => IdAndVerRef.idOnly(EqOrRangedId.eq(e.selfRef.id)))
+        .toList();
+    final documentFilter = DocumentIndexQueryFilter(category: categoryFilter);
 
     return _api.gateway
         .documentIndex(
-          filter: filter,
+          filter: documentFilter,
           limit: limit,
           page: page,
         )
@@ -155,24 +143,32 @@ extension on DocumentIndexList {
                       type: documentType,
                     ),
                     if (ver.ref case final ref?)
-                      TypedDocumentRef(
-                        ref: ref.toRef(),
-                        type: DocumentType.unknown,
+                      ...ref.map(
+                        (ref) => TypedDocumentRef(
+                          ref: ref.toRef(),
+                          type: DocumentType.unknown,
+                        ),
                       ),
                     if (ver.reply case final reply?)
-                      TypedDocumentRef(
-                        ref: reply.toRef(),
-                        type: DocumentType.unknown,
+                      ...reply.map(
+                        (reply) => TypedDocumentRef(
+                          ref: reply.toRef(),
+                          type: DocumentType.unknown,
+                        ),
                       ),
                     if (ver.parameters case final parameters?)
-                      TypedDocumentRef(
-                        ref: parameters.toRef(),
-                        type: DocumentType.categoryParametersDocument,
+                      ...parameters.map(
+                        (parameters) => TypedDocumentRef(
+                          ref: parameters.toRef(),
+                          type: DocumentType.categoryParametersDocument,
+                        ),
                       ),
                     if (ver.template case final template?)
-                      TypedDocumentRef(
-                        ref: template.toRef(),
-                        type: documentType.template ?? DocumentType.unknown,
+                      ...template.map(
+                        (template) => TypedDocumentRef(
+                          ref: template.toRef(),
+                          type: documentType.template ?? DocumentType.unknown,
+                        ),
                       ),
                   ];
                 })

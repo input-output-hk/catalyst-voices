@@ -15,22 +15,22 @@ final class IndexedDocumentVersion {
   /// Document Type that matches the filter
   final String type;
 
-  /// Document Reference for filtered Documents.
   /// Document Reference that matches the filter
-  final DocumentReference? ref;
+  /// Max items 10
+  final List<DocumentReference>? ref;
 
-  /// Document Reference for filtered Documents.
   /// DDocument Reply Reference that matches the filter
-  final DocumentReference? reply;
+  /// Max items 10
+  final List<DocumentReference>? reply;
 
-  /// Document Reference for filtered Documents.
   /// Document Template Reference that matches the filter
-  final DocumentReference? template;
+  /// Max items 10
+  final List<DocumentReference>? template;
 
-  /// Document Reference for filtered Documents.
   /// Document Parameter Reference that matches the filter
+  /// Max items 10
   @JsonKey(name: 'doc_parameters')
-  final DocumentReference? parameters;
+  final List<DocumentReference>? parameters;
 
   IndexedDocumentVersion({
     required this.ver,

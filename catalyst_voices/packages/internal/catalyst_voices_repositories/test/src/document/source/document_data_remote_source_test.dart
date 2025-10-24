@@ -105,10 +105,12 @@ void main() {
                 return IndexedDocumentVersion(
                   ver: e.version!,
                   type: DocumentType.proposalDocument.uuid,
-                  template: DocumentReference(
-                    id: templateRef.id,
-                    ver: templateRef.version!,
-                  ),
+                  template: [
+                    DocumentReference(
+                      id: templateRef.id,
+                      ver: templateRef.version!,
+                    ),
+                  ],
                 );
               }).toList(),
             ),
@@ -142,8 +144,8 @@ void main() {
 
 IndexedDocument _buildDocumentIndexList({
   int verCount = 2,
-  DocumentReference? template,
-  DocumentReference? ref,
+  List<DocumentReference>? template,
+  List<DocumentReference>? ref,
 }) {
   return IndexedDocument(
     id: DocumentRefFactory.randomUuidV7(),

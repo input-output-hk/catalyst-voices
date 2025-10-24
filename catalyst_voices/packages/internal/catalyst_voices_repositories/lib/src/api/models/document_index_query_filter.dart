@@ -12,7 +12,7 @@ part 'document_index_query_filter.g.dart';
 /// which do not strictly match the metadata or payload fields included in the query
 /// itself.
 ///
-/// Used as request body for POST /api/v1/document/index
+/// Used as request body for POST /api/v2/document/index
 @JsonSerializable(createFactory: false, includeIfNull: false)
 final class DocumentIndexQueryFilter {
   /// ## Signed Document Type.
@@ -21,23 +21,26 @@ final class DocumentIndexQueryFilter {
   /// [Registered Document Types](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
   ///
   /// UUIDv4 Formatted 128bit value.
-  final String? type;
+  ///
+  /// Max items 10
+  final List<String>? type;
 
-  /// Document ID Selector
   /// ## Document ID
   ///
   /// Either an absolute single Document ID or a range of
   /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
-  final EqOrRangedId? id;
+  ///
+  /// Max items 10
+  final List<EqOrRangedId>? id;
 
-  /// Document Version Selector
   /// ## Document Version
   ///
   /// Either an absolute single Document Version or a range of
   /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
-  final EqOrRangedVer? ver;
+  ///
+  /// Max items 10
+  final List<EqOrRangedVer>? ver;
 
-  /// Document Reference
   /// ## Document Reference
   ///
   /// A [reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#ref-document-reference)
@@ -48,9 +51,10 @@ final class DocumentIndexQueryFilter {
   ///
   /// The kind of document that the reference refers to is defined by the
   /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
-  final IdAndVerRef? ref;
+  ///
+  /// Max items 10
+  final List<IdAndVerRef>? ref;
 
-  /// Document Reference
   /// ## Document Template
   ///
   /// Documents that are created based on a template include the
@@ -64,9 +68,10 @@ final class DocumentIndexQueryFilter {
   /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
   /// however, it will always be a template type document that matches the document
   /// itself.
-  final IdAndVerRef? template;
+  ///
+  /// Max items 10
+  final List<IdAndVerRef>? template;
 
-  /// Document Reference
   /// ## Document Reply
   ///
   /// This is a
@@ -80,9 +85,10 @@ final class DocumentIndexQueryFilter {
   ///
   /// The kind of document that the reference refers to is defined by the
   /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
-  final IdAndVerRef? reply;
+  ///
+  /// Max items 10
+  final List<IdAndVerRef>? reply;
 
-  /// Document Reference
   /// ## Brand
   ///
   /// This is a
@@ -95,9 +101,10 @@ final class DocumentIndexQueryFilter {
   ///
   /// Whether a Document Type has a brand reference is defined by its
   /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
-  final IdAndVerRef? brand;
+  ///
+  /// Max items 10
+  final List<IdAndVerRef>? brand;
 
-  /// Document Reference
   /// ## Campaign
   ///
   /// This is a
@@ -110,9 +117,10 @@ final class DocumentIndexQueryFilter {
   ///
   /// Whether a Document Type has a campaign reference is defined by its
   /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
-  final IdAndVerRef? campaign;
+  ///
+  /// Max items 10
+  final List<IdAndVerRef>? campaign;
 
-  /// Document Reference
   /// ## Category
   ///
   /// This is a
@@ -125,7 +133,9 @@ final class DocumentIndexQueryFilter {
   ///
   /// Whether a Document Type has a category reference is defined by its
   /// [Document Type](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/).
-  final IdAndVerRef? category;
+  ///
+  /// Max items 10
+  final List<IdAndVerRef>? category;
 
   const DocumentIndexQueryFilter({
     this.type,
