@@ -62,7 +62,7 @@ This category is exclusively for established organizations ready to build on Car
 
 ### Defining a "Tier-1 Enterprise"
 
-An organization is considered "Tier-1" if it qualifies under one of the following pathways:
+An organization is considered "Tier-1" if it qualifies under **one** of the following pathways:
 
 1. The partner must meet the following criteria:
    - Verifiably generates \$5M USD or more in annual revenue on their own or in aggregate as a consortium.
@@ -83,7 +83,7 @@ All proposals submitted to this category must adhere to the following project an
 - **Focus on integration and growth, not ideas:** Proposals must be for mature R&D demonstrator pilots or direct integrations. Early-stage concepts, prototypes, core Cardano infrastructure, or developer tooling proposals are out of scope.
 - **Demonstrate a mature product & integration path:** Applicants must provide documentary  evidence of a mature, deployed product according to one of the following two scenarios:
    1. **Cardano-native product:** The product is already deployed and operational on the Cardano mainnet.
-   2. **Cross-ecosystem product:** The product is deployed and operational on another blockchain or ecosystem and is seeking integration with Cardano. The proposal must provide evidence of the existing product and a clear integration plan, including a confirmed integration partner or demonstrated in-house capability to execute it.
+   2. **Cross-ecosystem product:** The product is deployed and operational on another blockchain or ecosystem and is seeking integration with Cardano. The proposal must provide evidence of the existing product *and* a clear integration plan, including a confirmed integration partner or demonstrated in-house capability to execute it.
 - **Verify Partnership:** Evidence of the Tier-1 collaboration (e.g. signed letter of intent) must be emailed to the Catalyst team no later than the start of the Community Review in Fund15. This partnership must be declared high level including its role in the public proposal as well. This category is not for product enhancements or feature improvements in isolation. For those - submit under “Cardano use Cases: Prototype And Launch” category instead.
 - **Justify On-Chain Transaction Impact:** The proposal's core proposition must include  a clear and compelling explanation of how the project will drive meaningful on-chain transaction volume for Cardano. Applicants must articulate why their solution requires a blockchain and how its implementation on Cardano will directly lead to a verifiable increase in network activity.
 - **Define measurable outcomes:** The proposal must include clear, measurable adoption outcomes, with a mandatory forecast for projected on-chain transaction volume. Other KPIs (e.g. user growth, tokenized asset value) are also required.
@@ -92,6 +92,7 @@ All proposals submitted to this category must adhere to the following project an
 - **Amplify Cardano:** A plan for co-marketing, public relations, or community engagement must be included to maximize Cardano's visibility.
 - **Detail verifiable team credentials:** Simply listing names and roles is insufficient. The proposal must include verifiable references (e.g. comprehensive LinkedIn profiles, project portfolios, public repositories, corporate bios) that clearly demonstrate each key team member's specific experience, accomplishments, and suitability for their role in the project.
 - **Identify all partners:** All collaborating entities, including the specific Tier-1 partner and any integration partners, must be clearly named within the proposal.
+- **Propose forward-looking work:** Funds are exclusively for future development and project execution. Proposals seeking retroactive funding for work already completed will not be eligible.
 - **Detailed Use of Funds:** Proposals must provide a clear budget. Your budget must be for future activities only and allocated exclusively to the project's execution. Proposals seeking retroactive funding are not eligible. Funds cannot be used for purchasing digital assets, providing liquidity, local treasuries, speculation, or simple branded merchandise. Proposals involving re-granting or incentives/giveaways are not eligible either. Please review [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules) for further details in addition to these.
 ''',
       ),
@@ -374,6 +375,12 @@ Use this checklist to ensure your proposal meets all foundational and content re
         description: r'''
   Midnight Compact DApps is a strategic fund dedicated to building use cases and utility that will empower the future of privacy-enabled applications. This initiative leverages Catalyst's robust infrastructure and the wisdom of the Cardano community to help select the most promising projects that demonstrate the power of programmable privacy.
 
+  ### Budget & Constraints
+
+  - **Total Budget:** $USDM 250,000 
+  - **Proposal Range:** From $USDM 2,500 to $USDM 10,000
+  - Funding amounts are intended for small, focused prototypes, not full product builds.
+
   Sponsored by a $USDM 250,000 commitment from the Midnight Foundation, this initiative aims to build foundational “Reference DApps” for the new ecosystem. The Midnight Foundation is looking to fund high-impact, open-source projects that directly demonstrate high-value use cases for privacy-preserving applications, laying the critical groundwork of basic UI design and prototyping.
 
   ### Community Governance & Voting
@@ -420,21 +427,21 @@ This category is for the builders. To be eligible, you and your project must mee
 - **Technical Focus:** You must be proposing a functional software prototype with code as the primary outcome. Non-technical projects (marketing, content-only, community ops) are not eligible.
 - **Verifiable Identity & Experience:** Anonymous or unverifiable teams are not eligible. The proposal must include verifiable identity and references (e.g., comprehensive LinkedIn profiles, GitHub profiles, project portfolios) that clearly demonstrate each key team member's specific experience and suitability for their role. Simply listing names/aliases is insufficient.
 - **Direct Builders Only:** Proposals must be submitted by the builders who will perform the core work. Outsourcing the primary development to a third party agency is not permitted.
-- **A 3-month timeline:** The project delivery timeline can be a maximum of three months with three milestones each (one per month).
+- **A 3-month timeline:** The project delivery timeline can be three months with three milestones each (one per month).
 - **Open Source Commitment:** All code produced must be under a permissive open-source license (MIT or Apache-2.0) and source available from day one.
 - **Maintain Good Standing with Catalyst:** The lead proposer and all named team members must be in full compliance with commitments for any previously funded Catalyst projects. Proposers can verify their compliance status by reviewing their reporting dashboard on the Project Catalyst platform. All milestone reports for previously funded projects must be submitted and approved on time prior to this fund's submission. [Learn more about it here.](https://forum.cardano.org/t/submitting-a-proposal-in-upcoming-fund15-read-this-first/149527)
 ''',
       ),
       CategoryDescription(
         title: 'Proposal Requirements',
-        description: '''
+        description: r'''
 All proposals must provide the following information:
 
 - **Demonstrate Novelty & Privacy Rationale:** Propose a unique, novel project (not a minor tweak of an existing Midnight reference dApp). If inspired by other ecosystems, clearly explain what's different and why it matters here. Explain why privacy improves this DApp; show you've thought through selective disclosure/programmable privacy. Don't treat Compact like TypeScript. They are distinct; proposals must use Compact for ZKPs.
 - **Define Target Audience:** Clearly describe both the target end-user of the DApp and the developer personas who will learn from your code repository.
 - **Provide Verifiable Team Credentials:** Link to GitHub profiles, past projects, or code samples that prove your team has the technical ability to deliver the project.
 - **Detailed Project Deliverables:** All final projects must include the following technical baseline:
-   - **Compact contract:** At least one *.compact* smart contract demonstrating programmable privacy/selective disclosure.
+   - **Compact contract:** At least one **\*.compact** smart contract demonstrating programmable privacy/selective disclosure.
    - **Demo UI:** A simple UI in the repo that calls your Compact contract and shows a demo flow.
    - **Wallet integration:** Integrate with the Lace (Midnight) wallet.
    - **Open-source repo:** Public code with a permissive OSI license (MIT or Apache-2.0).
