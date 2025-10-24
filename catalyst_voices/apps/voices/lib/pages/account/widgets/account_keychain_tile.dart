@@ -2,13 +2,15 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
-import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
+
+// TODO(damian-molinski): Remove this once KeychainDeletedDialog is migrated to CatalystMessenger.
+bool showKeychainDeletedDialog = false;
 
 class AccountKeychainTile extends StatefulWidget {
   const AccountKeychainTile({super.key});
@@ -77,9 +79,8 @@ class _AccountKeychainTileState extends State<AccountKeychainTile> {
 
     if (mounted) {
       await context.read<AccountCubit>().deleteActiveKeychain();
+      showKeychainDeletedDialog = true;
     }
-
-    if (mounted) unawaited(KeychainDeletedDialog.show(context));
 
     if (mounted) {
       // TODO(damian-molinski): refactor it. Should be inside AccountCubit and emit signals to page.
