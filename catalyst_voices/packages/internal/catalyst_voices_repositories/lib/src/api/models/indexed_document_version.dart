@@ -1,5 +1,4 @@
 import 'package:catalyst_voices_repositories/src/api/models/document_reference.dart';
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'indexed_document_version.g.dart';
@@ -41,7 +40,8 @@ final class IndexedDocumentVersion {
     this.parameters,
   });
 
-  factory IndexedDocumentVersion.fromJson(Json json) => _$IndexedDocumentVersionFromJson(json);
+  factory IndexedDocumentVersion.fromJson(Map<String, dynamic> json) =>
+      _$IndexedDocumentVersionFromJson(json);
 
-  Json toJson() => _$IndexedDocumentVersionToJson(this);
+  Map<String, dynamic> toJson() => _$IndexedDocumentVersionToJson(this);
 }

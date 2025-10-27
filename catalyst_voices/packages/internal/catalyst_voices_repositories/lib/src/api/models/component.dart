@@ -1,5 +1,4 @@
 import 'package:catalyst_voices_repositories/src/api/models/component_status.dart';
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'component.g.dart';
@@ -22,5 +21,5 @@ final class Component {
     this.isParent,
   });
 
-  factory Component.fromJson(Json json) => _$ComponentFromJson(json);
+  factory Component.fromJson(Map<String, dynamic> json) => _$ComponentFromJson(json);
 }

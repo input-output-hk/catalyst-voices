@@ -11,7 +11,6 @@ import 'package:catalyst_voices_repositories/src/api/models/network.dart';
 import 'package:catalyst_voices_repositories/src/api/models/rbac_registration_chain.dart';
 import 'package:catalyst_voices_repositories/src/common/content_types.dart';
 import 'package:catalyst_voices_repositories/src/common/http_headers.dart';
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:catalyst_voices_repositories/src/dto/config/remote_config.dart';
 import 'package:dio/dio.dart';
 
@@ -86,12 +85,18 @@ abstract interface class CatGatewayService {
     String? version,
   });
 
-  /// Get RBAC registrations
+  /// Get RBAC registrations V2.
   /// This endpoint returns RBAC registrations by provided auth Catalyst Id credentials
   /// or by the [lookup] argument if provided.
   ///
   /// [lookup] Stake address or Catalyst ID to get the RBAC registration for.
-  Future<RbacRegistrationChain> rbacRegistration({String? lookup});
+  /// [showAllInvalid] If this parameter is set to `true`, then all the invalid registrations are
+  /// returned. Otherwise, only the invalid registrations after the last valid one
+  /// are shown. Defaults to `false` if not present.
+  Future<RbacRegistrationChain> rbacRegistration({
+    String? lookup,
+    bool? showAllInvalid,
+  });
 
   /// Get staked assets.
   /// This endpoint returns the total Cardano's staked assets to the corresponded
@@ -144,7 +149,7 @@ final class DioCatGatewayService implements CatGatewayService {
       },
       body: filter.toJson(),
       mapper: (response) {
-        if (response is Json) {
+        if (response is Map<String, dynamic>) {
           return DocumentIndexList.fromJson(response);
         }
 
@@ -161,12 +166,12 @@ final class DioCatGatewayService implements CatGatewayService {
     return _dio.get<dynamic, RemoteConfig>(
       '/v1/config/frontend',
       mapper: (response) {
-        if (response is Json) {
+        if (response is Map<String, dynamic>) {
           return RemoteConfig.fromJson(response);
         }
 
         if (response is String) {
-          return RemoteConfig.fromJson(jsonDecode(response) as Json);
+          return RemoteConfig.fromJson(jsonDecode(response) as Map<String, dynamic>);
         }
 
         return const RemoteConfig();
@@ -188,10 +193,16 @@ final class DioCatGatewayService implements CatGatewayService {
   }
 
   @override
-  Future<RbacRegistrationChain> rbacRegistration({String? lookup}) {
-    return _dio.get<Json, RbacRegistrationChain>(
-      '/v1/rbac/registration',
-      queryParameters: {'lookup': ?lookup},
+  Future<RbacRegistrationChain> rbacRegistration({
+    String? lookup,
+    bool? showAllInvalid = false,
+  }) {
+    return _dio.get<Map<String, dynamic>, RbacRegistrationChain>(
+      '/v2/rbac/registration',
+      queryParameters: {
+        'lookup': ?lookup,
+        'show_all_invalid': ?showAllInvalid,
+      },
       mapper: RbacRegistrationChain.fromJson,
     );
   }
@@ -203,7 +214,7 @@ final class DioCatGatewayService implements CatGatewayService {
     String? asat,
     String? authorization,
   }) {
-    return _dio.get<Json, FullStakeInfo>(
+    return _dio.get<Map<String, dynamic>, FullStakeInfo>(
       '/v1/cardano/assets/$stakeAddress',
       queryParameters: {
         'network': ?network?.value,

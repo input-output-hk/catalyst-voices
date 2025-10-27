@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_repositories/src/api/api_services.dart';
 import 'package:catalyst_voices_repositories/src/api/dio_client.dart';
 import 'package:catalyst_voices_repositories/src/api/models/components.dart';
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:dio/dio.dart';
 
 abstract interface class CatStatusService {
@@ -34,7 +33,7 @@ final class DioCatStatusService implements CatStatusService {
 
   @override
   Future<Components> componentStatuses({String? authorization}) {
-    return _dio.get<Json, Components>(
+    return _dio.get<Map<String, dynamic>, Components>(
       '/v2/components.json',
       mapper: Components.fromJson,
     );

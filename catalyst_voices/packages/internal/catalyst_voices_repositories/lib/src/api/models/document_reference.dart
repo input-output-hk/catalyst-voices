@@ -1,4 +1,3 @@
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_reference.g.dart';
@@ -21,7 +20,8 @@ final class DocumentReference {
     this.cid,
   });
 
-  factory DocumentReference.fromJson(Json json) => _$DocumentReferenceFromJson(json);
+  factory DocumentReference.fromJson(Map<String, dynamic> json) =>
+      _$DocumentReferenceFromJson(json);
 
-  Json toJson() => _$DocumentReferenceToJson(this);
+  Map<String, dynamic> toJson() => _$DocumentReferenceToJson(this);
 }

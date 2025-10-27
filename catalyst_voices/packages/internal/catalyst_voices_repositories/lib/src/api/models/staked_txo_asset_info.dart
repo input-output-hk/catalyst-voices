@@ -1,4 +1,3 @@
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'staked_txo_asset_info.g.dart';
@@ -24,7 +23,8 @@ final class StakedTxoAssetInfo {
     required this.amount,
   });
 
-  factory StakedTxoAssetInfo.fromJson(Json json) => _$StakedTxoAssetInfoFromJson(json);
+  factory StakedTxoAssetInfo.fromJson(Map<String, dynamic> json) =>
+      _$StakedTxoAssetInfoFromJson(json);
 
-  Json toJson() => _$StakedTxoAssetInfoToJson(this);
+  Map<String, dynamic> toJson() => _$StakedTxoAssetInfoToJson(this);
 }
