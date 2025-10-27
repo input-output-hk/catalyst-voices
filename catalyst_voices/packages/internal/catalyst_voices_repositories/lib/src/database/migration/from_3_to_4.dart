@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dri
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.drift.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:drift/drift.dart' hide JsonKey;
+import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sqlite3/common.dart' as sqlite3 show jsonb;
 
@@ -91,9 +92,13 @@ Future<void> _migrateDocs(
         rows.add(insertable);
       }
 
-      if (rows.isNotEmpty) await schema.documentsV2.insertAll(rows);
+      batch.insertAll(schema.documentsV2, rows);
       docsOffset += oldDocs.length;
     });
+  }
+
+  if (kDebugMode) {
+    print('Finished migrating docs[$docsOffset], totalCount[$docsCount]');
   }
 }
 
@@ -145,9 +150,13 @@ Future<void> _migrateDrafts(
         rows.add(insertable);
       }
 
-      if (rows.isNotEmpty) await schema.localDocumentsDrafts.insertAll(rows);
+      batch.insertAll(schema.localDocumentsDrafts, rows);
       localDraftsOffset += oldDrafts.length;
     });
+  }
+
+  if (kDebugMode) {
+    print('Finished migrating drafts[$localDraftsOffset], totalCount[$localDraftsCount]');
   }
 }
 
@@ -162,30 +171,36 @@ Future<void> _migrateFavorites(
   var favOffset = 0;
 
   while (favOffset < favCount) {
-    final query = schema.documentsFavorites.select()..limit(batchSize, offset: favOffset);
-    final oldFav = await query.get();
+    await m.database.batch((batch) async {
+      final query = schema.documentsFavorites.select()..limit(batchSize, offset: favOffset);
+      final oldFav = await query.get();
 
-    final rows = <RawValuesInsertable<QueryRow>>[];
+      final rows = <RawValuesInsertable<QueryRow>>[];
 
-    for (final oldDoc in oldFav) {
-      final idHi = oldDoc.read<BigInt>('id_hi');
-      final idLo = oldDoc.read<BigInt>('id_lo');
-      final isFavorite = oldDoc.read<bool>('is_favorite');
+      for (final oldDoc in oldFav) {
+        final idHi = oldDoc.read<BigInt>('id_hi');
+        final idLo = oldDoc.read<BigInt>('id_lo');
+        final isFavorite = oldDoc.read<bool>('is_favorite');
 
-      final id = UuidHiLo(high: idHi, low: idLo).uuid;
+        final id = UuidHiLo(high: idHi, low: idLo).uuid;
 
-      final entity = DocumentLocalMetadataEntity(
-        id: id,
-        isFavorite: isFavorite,
-      );
+        final entity = DocumentLocalMetadataEntity(
+          id: id,
+          isFavorite: isFavorite,
+        );
 
-      final insertable = RawValuesInsertable<QueryRow>(entity.toColumns(true));
+        final insertable = RawValuesInsertable<QueryRow>(entity.toColumns(true));
 
-      rows.add(insertable);
-    }
+        rows.add(insertable);
+      }
 
-    if (rows.isNotEmpty) await schema.documentsLocalMetadata.insertAll(rows);
-    favOffset += oldFav.length;
+      batch.insertAll(schema.documentsLocalMetadata, rows);
+      favOffset += oldFav.length;
+    });
+  }
+
+  if (kDebugMode) {
+    print('Finished migrating fav[$favOffset], totalCount[$favCount]');
   }
 }
 

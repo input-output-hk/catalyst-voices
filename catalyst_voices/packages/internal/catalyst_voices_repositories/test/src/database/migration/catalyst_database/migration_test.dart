@@ -24,7 +24,7 @@ void main() {
     verifier = SchemaVerifier(GeneratedHelper());
   });
 
-  group('simple database migrations', () {
+  group('database migrations', () {
     const versions = GeneratedHelper.versions;
     for (final (i, fromVersion) in versions.indexed) {
       group('from $fromVersion', () {
