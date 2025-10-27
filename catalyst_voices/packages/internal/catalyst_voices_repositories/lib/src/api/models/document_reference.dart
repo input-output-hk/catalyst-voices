@@ -7,16 +7,18 @@ part 'document_reference.g.dart';
 @JsonSerializable()
 final class DocumentReference {
   /// Signed Document ID
-  /// Document ID Reference
   final String id;
 
   /// Signed Document Version
-  /// Document Version
   final String ver;
+
+  /// Signed Document Locator
+  final String? cid;
 
   const DocumentReference({
     required this.id,
     required this.ver,
+    this.cid,
   });
 
   factory DocumentReference.fromJson(Json json) => _$DocumentReferenceFromJson(json);
