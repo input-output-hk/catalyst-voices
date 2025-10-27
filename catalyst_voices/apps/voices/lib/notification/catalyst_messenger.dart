@@ -5,6 +5,7 @@ import 'package:catalyst_voices/notification/banner_close_button.dart';
 import 'package:catalyst_voices/notification/banner_content.dart';
 import 'package:catalyst_voices/notification/catalyst_notification.dart';
 import 'package:catalyst_voices/routes/app_router_factory.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
@@ -167,6 +168,7 @@ class CatalystMessengerState extends State<CatalystMessenger> {
 
     final future = switch (notification) {
       BannerNotification() => _showBanner(notification),
+      SnackbarNotification() => _showSnackbar(notification),
     };
 
     unawaited(future.whenComplete(_onNotificationCompleted));
@@ -191,6 +193,30 @@ class CatalystMessengerState extends State<CatalystMessenger> {
       leadingPadding: const EdgeInsetsDirectional.only(end: 8),
     );
     final controller = messengerState.showMaterialBanner(banner);
+
+    return controller.closed.then(
+      (reason) {
+        _logger.finest('Notification(${notification.id}) closed with reason -> $reason');
+      },
+    );
+  }
+
+  Future<void> _showSnackbar(SnackbarNotification notification) async {
+    final messengerState = ScaffoldMessenger.maybeOf(context);
+    if (messengerState == null) {
+      return;
+    }
+
+    final controller = VoicesSnackBar(
+      type: notification.type.toVoicesSnackBarType(),
+      behavior: notification.behavior,
+      icon: notification.icon(context),
+      title: notification.title(context),
+      message: notification.message(context),
+      duration: notification.duration ?? const Duration(seconds: 4),
+      showClose: notification.showClose,
+      actions: notification.actions,
+    ).show(context);
 
     return controller.closed.then(
       (reason) {

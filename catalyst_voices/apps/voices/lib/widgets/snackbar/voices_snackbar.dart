@@ -135,8 +135,8 @@ class VoicesSnackBar extends StatelessWidget {
     );
   }
 
-  void show(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
+  ScaffoldFeatureController<SnackBar, SnackBarClosedReason> show(BuildContext context) {
+    return ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: this,
         behavior: behavior,
