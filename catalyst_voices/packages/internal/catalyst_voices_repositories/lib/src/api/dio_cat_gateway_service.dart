@@ -39,7 +39,7 @@ abstract interface class CatGatewayService {
 
   /// Post A Signed Document Index Query for Newer Versions of v0.0.4.
   /// Produces a summary of signed documents that meet the criteria
-  /// defined in the request body for new signed document versions of v0.04.
+  /// defined in the request body for new signed document versions of v0.0.4.
   ///
   /// It does not return the actual documents, just an index of the document identifiers
   /// which allows the documents to be retrieved by the `GET document` endpoint.
