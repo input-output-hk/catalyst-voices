@@ -25,7 +25,7 @@ void main() {
   });
 
   group(ProposalsV2Dao, () {
-    group('getProposalsPage', () {
+    group('getProposalsBriefPage', () {
       final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
       final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
       final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
@@ -35,7 +35,7 @@ void main() {
         const request = PageRequest(page: 0, size: 10);
 
         // When
-        final result = await dao.getProposalsPage(request);
+        final result = await dao.getProposalsBriefPage(request);
 
         // Then
         expect(result.items, isEmpty);
@@ -64,7 +64,7 @@ void main() {
         const request = PageRequest(page: 0, size: 2);
 
         // When
-        final result = await dao.getProposalsPage(request);
+        final result = await dao.getProposalsBriefPage(request);
 
         // Then
         expect(result.items.length, 2);
@@ -91,7 +91,7 @@ void main() {
         const request = PageRequest(page: 1, size: 2);
 
         // When
-        final result = await dao.getProposalsPage(request);
+        final result = await dao.getProposalsBriefPage(request);
 
         // Then: Returns remaining items (1), total unchanged
         expect(result.items.length, 1);
@@ -122,7 +122,7 @@ void main() {
         const request = PageRequest(page: 0, size: 10);
 
         // When
-        final result = await dao.getProposalsPage(request);
+        final result = await dao.getProposalsBriefPage(request);
 
         // Then
         expect(result.items.length, 2);
@@ -150,7 +150,7 @@ void main() {
         const request = PageRequest(page: 0, size: 10);
 
         // When
-        final result = await dao.getProposalsPage(request);
+        final result = await dao.getProposalsBriefPage(request);
 
         // Then
         expect(result.items.length, 1);

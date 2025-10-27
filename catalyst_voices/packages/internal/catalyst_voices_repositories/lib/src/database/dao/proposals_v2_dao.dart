@@ -37,7 +37,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<Page<JoinedProposalBriefEntity>> getProposalsPage(PageRequest request) async {
+  Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage(PageRequest request) async {
     final effectivePage = request.page;
     final effectiveSize = request.size;
 
@@ -111,5 +111,5 @@ abstract interface class ProposalsV2Dao {
   /// Returns latest version per id, ordered by descending ver (UUIDv7 lexical).
   /// Handles pagination via request.page (0-based) and request.size.
   /// Each item is a [JoinedProposalBriefEntity] (extensible for joins).
-  Future<Page<JoinedProposalBriefEntity>> getProposalsPage(PageRequest request);
+  Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage(PageRequest request);
 }
