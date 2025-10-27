@@ -56,12 +56,6 @@ final class CatGatewayDocumentDataSource implements DocumentDataRemoteSource {
     int limit = 100,
     required DocumentIndexFilters filters,
   }) {
-    return Future(
-      () => DocumentIndex(
-        docs: const [],
-        page: DocumentIndexPage(page: page, limit: limit, remaining: 0),
-      ),
-    );
     final body = DocumentIndexQueryFilter(
       type: filters.type?.uuid,
       parameters: IdRefOnly(id: IdSelectorDto.inside(filters.categoriesIds)).toJson(),
