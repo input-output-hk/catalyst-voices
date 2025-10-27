@@ -4,6 +4,7 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart
 import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
@@ -503,7 +504,9 @@ void main() {
 }
 
 String _buildUuidV7At(DateTime dateTime) {
-  return const UuidV7().generate(options: V7Options(dateTime.millisecondsSinceEpoch, null));
+  final ts = dateTime.millisecondsSinceEpoch;
+  final rand = Uint8List.fromList([42, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  return const UuidV7().generate(options: V7Options(ts, rand));
 }
 
 DocumentEntityV2 _createTestDocumentEntity({
