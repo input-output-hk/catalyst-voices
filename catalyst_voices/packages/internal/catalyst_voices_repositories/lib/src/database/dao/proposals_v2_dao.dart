@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
@@ -36,9 +37,11 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<Page<DocumentEntityV2>> getProposalsPage(PageRequest request) async {
-    final effectivePage = request.page.clamp(0, double.infinity).toInt();
-    final effectiveSize = request.size.clamp(0, double.infinity).toInt();
+  Future<Page<JoinedProposalBriefEntity>> getProposalsPage(PageRequest request) async {
+    final effectivePage = request.page;
+    final effectiveSize = request.size;
+
+    assert(effectiveSize < 1000, 'Max query size is 999');
 
     if (effectiveSize == 0) {
       return Page(items: const [], total: 0, page: effectivePage, maxPerPage: effectiveSize);
@@ -69,9 +72,13 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
           ..orderBy([OrderingTerm.desc(proposals.ver)])
           ..limit(effectiveSize, offset: effectivePage * effectiveSize);
 
-    final items = await proposalsQuery.map((row) => row.readTable(proposals)).get();
+    final items = await proposalsQuery.map((row) {
+      final proposal = row.readTable(proposals);
 
-    // Separate total count: Unique ids (filtered by type)
+      return JoinedProposalBriefEntity(proposal: proposal);
+    }).get();
+
+    // Separate total count
     final totalQuery = (selectOnly(documentsV2)
       ..addColumns([documentsV2.id.count(distinct: true)])
       ..where(documentsV2.type.equals(DocumentType.proposalDocument.uuid)));
@@ -98,10 +105,11 @@ abstract interface class ProposalsV2Dao {
   /// Returns null if no matching proposal is found.
   Future<DocumentEntityV2?> getProposal(DocumentRef ref);
 
-  /// Retrieves a paginated page of latest proposals.
+  /// Retrieves a paginated page of brief proposals (lightweight for lists/UI).
   ///
   /// Filters by type == proposalDocument.
-  /// Returns latest version per id, ordered by descending createdAt.
+  /// Returns latest version per id, ordered by descending ver (UUIDv7 lexical).
   /// Handles pagination via request.page (0-based) and request.size.
-  Future<Page<DocumentEntityV2>> getProposalsPage(PageRequest request);
+  /// Each item is a [JoinedProposalBriefEntity] (extensible for joins).
+  Future<Page<JoinedProposalBriefEntity>> getProposalsPage(PageRequest request);
 }

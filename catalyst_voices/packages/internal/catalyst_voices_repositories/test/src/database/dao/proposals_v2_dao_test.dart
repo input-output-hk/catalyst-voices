@@ -69,8 +69,8 @@ void main() {
         // Then
         expect(result.items.length, 2);
         expect(result.total, 3);
-        expect(result.items[0].id, 'id-2');
-        expect(result.items[1].id, 'id-3');
+        expect(result.items[0].proposal.id, 'id-2');
+        expect(result.items[1].proposal.id, 'id-3');
       });
 
       test('returns partial page for out-of-bounds request', () async {
@@ -127,10 +127,10 @@ void main() {
         // Then
         expect(result.items.length, 2);
         expect(result.total, 2);
-        expect(result.items[0].id, 'multi-id');
-        expect(result.items[0].ver, _buildUuidV7At(latest));
-        expect(result.items[0].content.data['title'], 'new');
-        expect(result.items[1].id, 'other-id');
+        expect(result.items[0].proposal.id, 'multi-id');
+        expect(result.items[0].proposal.ver, _buildUuidV7At(latest));
+        expect(result.items[0].proposal.content.data['title'], 'new');
+        expect(result.items[1].proposal.id, 'other-id');
       });
 
       test('ignores non-proposal documents in count and items', () async {
@@ -155,7 +155,7 @@ void main() {
         // Then
         expect(result.items.length, 1);
         expect(result.total, 1);
-        expect(result.items[0].type, DocumentType.proposalDocument);
+        expect(result.items[0].proposal.type, DocumentType.proposalDocument);
       });
     });
   });
