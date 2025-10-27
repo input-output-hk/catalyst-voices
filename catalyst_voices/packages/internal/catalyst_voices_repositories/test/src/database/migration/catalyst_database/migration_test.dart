@@ -52,11 +52,13 @@ void main() {
         type: index.isEven
             ? DocumentType.proposalDocument
             : DocumentType.commentDocument,
+        /* cSpell:disable */
         authors: [
           'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
           if (index.isEven)
             'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
         ],
+        /* cSpell:enable */
       );
     });
     final expectedNewDocumentsData = <v4.DocumentsData>[];
@@ -81,11 +83,13 @@ void main() {
         type: index.isEven
             ? DocumentType.proposalDocument
             : DocumentType.commentDocument,
+        /* cSpell:disable */
         authors: [
           'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
           if (index.isEven)
             'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
         ],
+        /* cSpell:enable */
       );
     });
     final expectedNewDraftsData = <v4.DraftsData>[];
