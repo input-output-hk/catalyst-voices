@@ -7,7 +7,7 @@ import 'package:drift/drift.dart';
 /// related metadata).
 ///
 /// Its representation of [DocumentData] class.
-@DataClassName('DocumentEntity')
+@DataClassName('DocumentEntityV2')
 class DocumentsV2 extends Table with DocumentTableContentMixin, DocumentTableMetadataMixin {
   /// Timestamp extracted from [ver].
   DateTimeColumn get createdAt => dateTime()();

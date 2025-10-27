@@ -428,10 +428,10 @@
             ]
           },
           {
-            "name": "id",
-            "getter_name": "id",
+            "name": "category_id",
+            "getter_name": "categoryId",
             "moor_type": "string",
-            "nullable": false,
+            "nullable": true,
             "customConstraints": null,
             "default_dart": null,
             "default_client_dart": null,
@@ -439,8 +439,19 @@
             ]
           },
           {
-            "name": "parameters",
-            "getter_name": "parameters",
+            "name": "category_ver",
+            "getter_name": "categoryVer",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "id",
+            "getter_name": "id",
             "moor_type": "string",
             "nullable": false,
             "customConstraints": null,
@@ -580,7 +591,7 @@
       ],
       "type": "table",
       "data": {
-        "name": "documents_favorites_v2",
+        "name": "documents_local_metadata",
         "was_declared_in_moor": false,
         "columns": [
           {
@@ -608,21 +619,6 @@
             "default_client_dart": null,
             "dsl_features": [
             ]
-          },
-          {
-            "name": "type",
-            "getter_name": "type",
-            "moor_type": "string",
-            "nullable": false,
-            "customConstraints": null,
-            "default_dart": null,
-            "default_client_dart": null,
-            "dsl_features": [
-            ],
-            "type_converter": {
-              "dart_expr": "DocumentConverters.type",
-              "dart_type_name": "DocumentType"
-            }
           }
         ],
         "is_virtual": false,
@@ -670,10 +666,10 @@
             ]
           },
           {
-            "name": "id",
-            "getter_name": "id",
+            "name": "category_id",
+            "getter_name": "categoryId",
             "moor_type": "string",
-            "nullable": false,
+            "nullable": true,
             "customConstraints": null,
             "default_dart": null,
             "default_client_dart": null,
@@ -681,8 +677,19 @@
             ]
           },
           {
-            "name": "parameters",
-            "getter_name": "parameters",
+            "name": "category_ver",
+            "getter_name": "categoryVer",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+            ]
+          },
+          {
+            "name": "id",
+            "getter_name": "id",
             "moor_type": "string",
             "nullable": false,
             "customConstraints": null,
