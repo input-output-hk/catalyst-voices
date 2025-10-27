@@ -12,6 +12,7 @@ import 'package:drift_dev/api/migrations_native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/common.dart' as sqlite3 show jsonb;
 
+import '../../drift_test_platforms.dart';
 import 'generated/schema.dart';
 import 'generated/schema_v3.dart' as v3;
 import 'generated/schema_v4.dart' as v4;
@@ -29,114 +30,126 @@ void main() {
     for (final (i, fromVersion) in versions.indexed) {
       group('from $fromVersion', () {
         for (final toVersion in versions.skip(i + 1)) {
-          test('to $toVersion', () async {
-            final schema = await verifier.schemaAt(fromVersion);
-            final db = DriftCatalystDatabase(schema.newConnection());
-            await verifier.migrateAndValidate(db, toVersion);
-            await db.close();
-          });
+          test(
+            'to $toVersion',
+            () async {
+              final schema = await verifier.schemaAt(fromVersion);
+              final db = DriftCatalystDatabase(schema.newConnection());
+              await verifier.migrateAndValidate(db, toVersion);
+              await db.close();
+            },
+            onPlatform: driftOnPlatforms,
+          );
         }
       });
     }
   });
 
-  test('migration from v3 to v4 does not corrupt data', () async {
-    final oldDocumentsData = List<v3.DocumentsData>.generate(10, (
-      index,
-    ) {
-      return _buildDocV3(
-        ref: index.isEven ? DocumentRefFactory.signedDocumentRef() : null,
-        reply: index.isOdd ? DocumentRefFactory.signedDocumentRef() : null,
-        template: DocumentRefFactory.signedDocumentRef(),
-        categoryId: DocumentRefFactory.signedDocumentRef(),
-        type: index.isEven
-            ? DocumentType.proposalDocument
-            : DocumentType.commentDocument,
-        authors: [
-          'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
-          if (index.isEven)
-            'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
-        ],
+  test(
+    'migration from v3 to v4 does not corrupt data',
+    () async {
+      final oldDocumentsData = List<v3.DocumentsData>.generate(10, (
+        index,
+      ) {
+        return _buildDocV3(
+          ref: index.isEven ? DocumentRefFactory.signedDocumentRef() : null,
+          reply: index.isOdd ? DocumentRefFactory.signedDocumentRef() : null,
+          template: DocumentRefFactory.signedDocumentRef(),
+          categoryId: DocumentRefFactory.signedDocumentRef(),
+          type: index.isEven
+              ? DocumentType.proposalDocument
+              : DocumentType.commentDocument,
+          /* cSpell:disable */
+          authors: [
+            'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
+            if (index.isEven)
+              'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
+          ],
+          /* cSpell:enable */
+        );
+      });
+      final expectedNewDocumentsData = <v4.DocumentsData>[];
+
+      final oldDocumentsMetadataData = <v3.DocumentsMetadataData>[];
+      final expectedNewDocumentsMetadataData = <v4.DocumentsMetadataData>[];
+
+      final oldDocumentsFavoritesData = List.generate(
+        5,
+        (index) => _buildDocFavV3(isFavorite: index.isEven),
       );
-    });
-    final expectedNewDocumentsData = <v4.DocumentsData>[];
+      final expectedNewDocumentsFavoritesData = <v4.DocumentsFavoritesData>[];
 
-    final oldDocumentsMetadataData = <v3.DocumentsMetadataData>[];
-    final expectedNewDocumentsMetadataData = <v4.DocumentsMetadataData>[];
+      final oldDraftsData = List<v3.DraftsData>.generate(10, (
+        index,
+      ) {
+        return _buildDraftV3(
+          ref: index.isEven ? DocumentRefFactory.signedDocumentRef() : null,
+          reply: index.isOdd ? DocumentRefFactory.signedDocumentRef() : null,
+          template: DocumentRefFactory.signedDocumentRef(),
+          categoryId: DocumentRefFactory.signedDocumentRef(),
+          type: index.isEven
+              ? DocumentType.proposalDocument
+              : DocumentType.commentDocument,
+          /* cSpell:disable */
+          authors: [
+            'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
+            if (index.isEven)
+              'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
+          ],
+          /* cSpell:enable */
+        );
+      });
+      final expectedNewDraftsData = <v4.DraftsData>[];
 
-    final oldDocumentsFavoritesData = List.generate(
-      5,
-      (index) => _buildDocFavV3(isFavorite: index.isEven),
-    );
-    final expectedNewDocumentsFavoritesData = <v4.DocumentsFavoritesData>[];
+      await verifier.testWithDataIntegrity(
+        oldVersion: 3,
+        newVersion: 4,
+        createOld: v3.DatabaseAtV3.new,
+        createNew: v4.DatabaseAtV4.new,
+        openTestedDatabase: DriftCatalystDatabase.new,
+        createItems: (batch, oldDb) {
+          batch
+            ..insertAll(oldDb.documents, oldDocumentsData)
+            ..insertAll(oldDb.documentsMetadata, oldDocumentsMetadataData)
+            ..insertAll(oldDb.documentsFavorites, oldDocumentsFavoritesData)
+            ..insertAll(oldDb.drafts, oldDraftsData);
+        },
+        validateItems: (newDb) async {
+          expect(
+            oldDocumentsData.length,
+            await newDb.documentsV2.count().getSingle(),
+          );
+          expect(
+            oldDocumentsFavoritesData.length,
+            await newDb.documentsLocalMetadata.count().getSingle(),
+          );
+          expect(
+            oldDraftsData.length,
+            await newDb.localDocumentsDrafts.count().getSingle(),
+          );
 
-    final oldDraftsData = List<v3.DraftsData>.generate(10, (
-      index,
-    ) {
-      return _buildDraftV3(
-        ref: index.isEven ? DocumentRefFactory.signedDocumentRef() : null,
-        reply: index.isOdd ? DocumentRefFactory.signedDocumentRef() : null,
-        template: DocumentRefFactory.signedDocumentRef(),
-        categoryId: DocumentRefFactory.signedDocumentRef(),
-        type: index.isEven
-            ? DocumentType.proposalDocument
-            : DocumentType.commentDocument,
-        authors: [
-          'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
-          if (index.isEven)
-            'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
-        ],
+          // TODO(damian-molinski): remove after migration is done and old tables are dropped
+          expect(
+            oldDocumentsData.length,
+            await newDb.documents.count().getSingle(),
+          );
+          expect(
+            oldDocumentsMetadataData.length,
+            await newDb.documentsMetadata.count().getSingle(),
+          );
+          expect(
+            oldDocumentsFavoritesData.length,
+            await newDb.documentsFavorites.count().getSingle(),
+          );
+          expect(
+            oldDraftsData.length,
+            await newDb.drafts.count().getSingle(),
+          );
+        },
       );
-    });
-    final expectedNewDraftsData = <v4.DraftsData>[];
-
-    await verifier.testWithDataIntegrity(
-      oldVersion: 3,
-      newVersion: 4,
-      createOld: v3.DatabaseAtV3.new,
-      createNew: v4.DatabaseAtV4.new,
-      openTestedDatabase: DriftCatalystDatabase.new,
-      createItems: (batch, oldDb) {
-        batch
-          ..insertAll(oldDb.documents, oldDocumentsData)
-          ..insertAll(oldDb.documentsMetadata, oldDocumentsMetadataData)
-          ..insertAll(oldDb.documentsFavorites, oldDocumentsFavoritesData)
-          ..insertAll(oldDb.drafts, oldDraftsData);
-      },
-      validateItems: (newDb) async {
-        expect(
-          oldDocumentsData.length,
-          await newDb.documentsV2.count().getSingle(),
-        );
-        expect(
-          oldDocumentsFavoritesData.length,
-          await newDb.documentsLocalMetadata.count().getSingle(),
-        );
-        expect(
-          oldDraftsData.length,
-          await newDb.localDocumentsDrafts.count().getSingle(),
-        );
-
-        // TODO(damian-molinski): remove after migration is done and old tables are dropped
-        expect(
-          oldDocumentsData.length,
-          await newDb.documents.count().getSingle(),
-        );
-        expect(
-          oldDocumentsMetadataData.length,
-          await newDb.documentsMetadata.count().getSingle(),
-        );
-        expect(
-          oldDocumentsFavoritesData.length,
-          await newDb.documentsFavorites.count().getSingle(),
-        );
-        expect(
-          oldDraftsData.length,
-          await newDb.drafts.count().getSingle(),
-        );
-      },
-    );
-  });
+    },
+    onPlatform: driftOnPlatforms,
+  );
 }
 
 v3.DocumentsFavoritesData _buildDocFavV3({
