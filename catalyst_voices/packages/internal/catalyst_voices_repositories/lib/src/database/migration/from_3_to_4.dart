@@ -10,7 +10,7 @@ import 'package:sqlite3/common.dart' as sqlite3 show jsonb;
 
 part 'from_3_to_4.g.dart';
 
-const _batchSize = 50;
+const _batchSize = 300;
 
 Future<void> from3To4(Migrator m, Schema4 schema) async {
   await m.createTable(schema.documentsV2);
