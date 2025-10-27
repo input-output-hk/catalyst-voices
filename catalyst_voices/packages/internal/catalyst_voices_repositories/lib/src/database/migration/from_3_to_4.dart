@@ -38,14 +38,6 @@ Future<void> from3To4(Migrator m, Schema4 schema) async {
   await m.drop(schema.idxDraftType);*/
 }
 
-Map<String, dynamic> _decodeContent(Uint8List data) {
-  try {
-    return sqlite3.jsonb.decode(data)! as Map<String, dynamic>;
-  } catch (_) {
-    return <String, dynamic>{};
-  }
-}
-
 Future<void> _migrateDocs(
   Migrator m,
   Schema4 schema, {
@@ -62,7 +54,7 @@ Future<void> _migrateDocs(
       final rows = <RawValuesInsertable<QueryRow>>[];
       for (final oldDoc in oldDocs) {
         final rawContent = oldDoc.read<Uint8List>('content');
-        final content = _decodeContent(rawContent);
+        final content = sqlite3.jsonb.decode(rawContent)! as Map<String, dynamic>;
 
         final rawMetadata = oldDoc.read<Uint8List>('metadata');
         final encodedMetadata = sqlite3.jsonb.decode(rawMetadata)! as Map<String, dynamic>;
@@ -120,7 +112,7 @@ Future<void> _migrateDrafts(
       final rows = <RawValuesInsertable<QueryRow>>[];
       for (final oldDoc in oldDrafts) {
         final rawContent = oldDoc.read<Uint8List>('content');
-        final content = _decodeContent(rawContent);
+        final content = sqlite3.jsonb.decode(rawContent)! as Map<String, dynamic>;
 
         final rawMetadata = oldDoc.read<Uint8List>('metadata');
         final encodedMetadata = sqlite3.jsonb.decode(rawMetadata)! as Map<String, dynamic>;
