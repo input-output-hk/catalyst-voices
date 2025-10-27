@@ -12,12 +12,10 @@ final class StakedTxoAssetInfo {
   final String policyHash;
 
   /// Cardano Native Asset Name
-  /// Token policies Asset Name.
   @JsonKey(name: 'asset_name')
   final String assetName;
 
   /// Cardano native Asset Value
-  /// Token Asset Value.
   final int amount;
 
   const StakedTxoAssetInfo({
