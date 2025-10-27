@@ -1,4 +1,3 @@
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'current_page.g.dart';
@@ -30,7 +29,7 @@ final class CurrentPage {
     required this.remaining,
   });
 
-  factory CurrentPage.fromJson(Json json) => _$CurrentPageFromJson(json);
+  factory CurrentPage.fromJson(Map<String, dynamic> json) => _$CurrentPageFromJson(json);
 
-  Json toJson() => _$CurrentPageToJson(this);
+  Map<String, dynamic> toJson() => _$CurrentPageToJson(this);
 }

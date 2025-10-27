@@ -25,7 +25,7 @@ extension RbacRegistrationChainExt on RbacRegistrationChain {
 
     final signingKeyType = signingKey.keyType;
 
-    if (signingKeyType.value != RegistrationCertificate.certificateType) {
+    if (signingKeyType != RegistrationCertificate.certificateType) {
       throw ArgumentError.value(
         signingKeyType,
         'signingKeyType',
@@ -33,13 +33,13 @@ extension RbacRegistrationChainExt on RbacRegistrationChain {
       );
     }
 
-    final signingKeyValue = signingKey.effectiveKeyValue;
+    final signingKeyValue = signingKey.keyValue?.x509;
 
     if (signingKeyValue == null) {
       throw ArgumentError.value(
         signingKeyValue,
         'signingKeyValue',
-        'Was null for $signingKeyType key (the key was deleted or key type mismatch).',
+        'Was null for $signingKeyType key (the value was deleted or key type mismatch).',
       );
     }
 

@@ -1,4 +1,3 @@
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'key_value.g.dart';
@@ -18,7 +17,7 @@ final class KeyValue {
 
   const KeyValue.c509(String this.c509) : pubkey = null, x509 = null;
 
-  factory KeyValue.fromJson(Json json) => _$KeyValueFromJson(json);
+  factory KeyValue.fromJson(Map<String, dynamic> json) => _$KeyValueFromJson(json);
 
   const KeyValue.pubkey(String this.pubkey) : x509 = null, c509 = null;
 
@@ -30,5 +29,5 @@ final class KeyValue {
     this.c509,
   });
 
-  Json toJson() => _$KeyValueToJson(this);
+  Map<String, dynamic> toJson() => _$KeyValueToJson(this);
 }

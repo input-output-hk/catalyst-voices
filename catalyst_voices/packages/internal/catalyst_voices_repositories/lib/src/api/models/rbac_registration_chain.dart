@@ -1,6 +1,5 @@
 import 'package:catalyst_voices_repositories/src/api/models/invalid_registration.dart';
 import 'package:catalyst_voices_repositories/src/api/models/rbac_role_data.dart';
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'rbac_registration_chain.g.dart';
@@ -44,7 +43,8 @@ final class RbacRegistrationChain {
     this.invalid = const [],
   });
 
-  factory RbacRegistrationChain.fromJson(Json json) => _$RbacRegistrationChainFromJson(json);
+  factory RbacRegistrationChain.fromJson(Map<String, dynamic> json) =>
+      _$RbacRegistrationChainFromJson(json);
 
-  Json toJson() => _$RbacRegistrationChainToJson(this);
+  Map<String, dynamic> toJson() => _$RbacRegistrationChainToJson(this);
 }

@@ -3,7 +3,6 @@ import 'package:catalyst_voices_repositories/src/api/dio_client.dart';
 import 'package:catalyst_voices_repositories/src/api/models/catalyst_id_create.dart';
 import 'package:catalyst_voices_repositories/src/api/models/catalyst_id_public.dart';
 import 'package:catalyst_voices_repositories/src/common/http_headers.dart';
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:dio/dio.dart';
 
 /// # Catalyst Reviews API.
@@ -47,7 +46,7 @@ final class DioCatReviewsService implements CatReviewsService {
 
   @override
   Future<CatalystIdPublic> getPublicProfile({String? authorization}) {
-    return _dio.get<Json, CatalystIdPublic>(
+    return _dio.get<Map<String, dynamic>, CatalystIdPublic>(
       '/catalyst-ids/me',
       options: Options(
         headers: {
@@ -63,7 +62,7 @@ final class DioCatReviewsService implements CatReviewsService {
     required CatalystIdCreate body,
     String? authorization,
   }) {
-    return _dio.post<Json, CatalystIdPublic>(
+    return _dio.post<Map<String, dynamic>, CatalystIdPublic>(
       '/catalyst-ids/me',
       body: body.toJson(),
       options: Options(

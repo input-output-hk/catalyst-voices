@@ -11,7 +11,6 @@ import 'package:catalyst_voices_repositories/src/api/models/network.dart';
 import 'package:catalyst_voices_repositories/src/api/models/rbac_registration_chain.dart';
 import 'package:catalyst_voices_repositories/src/common/content_types.dart';
 import 'package:catalyst_voices_repositories/src/common/http_headers.dart';
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:catalyst_voices_repositories/src/dto/config/remote_config.dart';
 import 'package:dio/dio.dart';
 
@@ -150,7 +149,7 @@ final class DioCatGatewayService implements CatGatewayService {
       },
       body: filter.toJson(),
       mapper: (response) {
-        if (response is Json) {
+        if (response is Map<String, dynamic>) {
           return DocumentIndexList.fromJson(response);
         }
 
@@ -167,12 +166,12 @@ final class DioCatGatewayService implements CatGatewayService {
     return _dio.get<dynamic, RemoteConfig>(
       '/v1/config/frontend',
       mapper: (response) {
-        if (response is Json) {
+        if (response is Map<String, dynamic>) {
           return RemoteConfig.fromJson(response);
         }
 
         if (response is String) {
-          return RemoteConfig.fromJson(jsonDecode(response) as Json);
+          return RemoteConfig.fromJson(jsonDecode(response) as Map<String, dynamic>);
         }
 
         return const RemoteConfig();
@@ -198,7 +197,7 @@ final class DioCatGatewayService implements CatGatewayService {
     String? lookup,
     bool? showAllInvalid = false,
   }) {
-    return _dio.get<Json, RbacRegistrationChain>(
+    return _dio.get<Map<String, dynamic>, RbacRegistrationChain>(
       '/v2/rbac/registration',
       queryParameters: {
         'lookup': ?lookup,
@@ -215,7 +214,7 @@ final class DioCatGatewayService implements CatGatewayService {
     String? asat,
     String? authorization,
   }) {
-    return _dio.get<Json, FullStakeInfo>(
+    return _dio.get<Map<String, dynamic>, FullStakeInfo>(
       '/v1/cardano/assets/$stakeAddress',
       queryParameters: {
         'network': ?network?.value,

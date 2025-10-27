@@ -1,4 +1,3 @@
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'eq_or_ranged_id.g.dart';
@@ -27,5 +26,5 @@ final class EqOrRangedId {
     required String this.max,
   }) : eq = null;
 
-  Json toJson() => _$EqOrRangedIdToJson(this);
+  Map<String, dynamic> toJson() => _$EqOrRangedIdToJson(this);
 }

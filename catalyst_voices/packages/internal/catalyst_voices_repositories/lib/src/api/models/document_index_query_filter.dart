@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_repositories/src/api/models/eq_or_ranged_id.dart';
 import 'package:catalyst_voices_repositories/src/api/models/eq_or_ranged_ver.dart';
 import 'package:catalyst_voices_repositories/src/api/models/id_and_ver_ref.dart';
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_index_query_filter.g.dart';
@@ -149,5 +148,5 @@ final class DocumentIndexQueryFilter {
     this.category,
   });
 
-  Json toJson() => _$DocumentIndexQueryFilterToJson(this);
+  Map<String, dynamic> toJson() => _$DocumentIndexQueryFilterToJson(this);
 }

@@ -1,4 +1,3 @@
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'invalid_registration.g.dart';
@@ -45,7 +44,8 @@ final class InvalidRegistration {
     this.purpose,
   });
 
-  factory InvalidRegistration.fromJson(Json json) => _$InvalidRegistrationFromJson(json);
+  factory InvalidRegistration.fromJson(Map<String, dynamic> json) =>
+      _$InvalidRegistrationFromJson(json);
 
-  Json toJson() => _$InvalidRegistrationToJson(this);
+  Map<String, dynamic> toJson() => _$InvalidRegistrationToJson(this);
 }

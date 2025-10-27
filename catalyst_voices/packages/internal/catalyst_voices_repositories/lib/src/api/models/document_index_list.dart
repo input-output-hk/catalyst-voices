@@ -1,6 +1,5 @@
 import 'package:catalyst_voices_repositories/src/api/models/current_page.dart';
 import 'package:catalyst_voices_repositories/src/api/models/indexed_document.dart';
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'document_index_list.g.dart';
@@ -24,7 +23,8 @@ class DocumentIndexList {
     required this.page,
   });
 
-  factory DocumentIndexList.fromJson(Json json) => _$DocumentIndexListFromJson(json);
+  factory DocumentIndexList.fromJson(Map<String, dynamic> json) =>
+      _$DocumentIndexListFromJson(json);
 
-  Json toJson() => _$DocumentIndexListToJson(this);
+  Map<String, dynamic> toJson() => _$DocumentIndexListToJson(this);
 }

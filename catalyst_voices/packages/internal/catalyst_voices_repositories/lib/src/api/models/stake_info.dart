@@ -1,5 +1,4 @@
 import 'package:catalyst_voices_repositories/src/api/models/staked_txo_asset_info.dart';
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'stake_info.g.dart';
@@ -26,7 +25,7 @@ final class StakeInfo {
     this.assets = const <StakedTxoAssetInfo>[],
   });
 
-  factory StakeInfo.fromJson(Json json) => _$StakeInfoFromJson(json);
+  factory StakeInfo.fromJson(Map<String, dynamic> json) => _$StakeInfoFromJson(json);
 
-  Json toJson() => _$StakeInfoToJson(this);
+  Map<String, dynamic> toJson() => _$StakeInfoToJson(this);
 }

@@ -1,4 +1,3 @@
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'catalyst_id_create.g.dart';
@@ -20,7 +19,7 @@ final class CatalystIdCreate {
     required this.catalystIdUri,
   });
 
-  factory CatalystIdCreate.fromJson(Json json) => _$CatalystIdCreateFromJson(json);
+  factory CatalystIdCreate.fromJson(Map<String, dynamic> json) => _$CatalystIdCreateFromJson(json);
 
-  Json toJson() => _$CatalystIdCreateToJson(this);
+  Map<String, dynamic> toJson() => _$CatalystIdCreateToJson(this);
 }

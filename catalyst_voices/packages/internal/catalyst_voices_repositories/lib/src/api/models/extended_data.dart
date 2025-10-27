@@ -1,4 +1,3 @@
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'extended_data.g.dart';
@@ -17,7 +16,7 @@ final class ExtendedData {
     required this.value,
   });
 
-  factory ExtendedData.fromJson(Json json) => _$ExtendedDataFromJson(json);
+  factory ExtendedData.fromJson(Map<String, dynamic> json) => _$ExtendedDataFromJson(json);
 
-  Json toJson() => _$ExtendedDataToJson(this);
+  Map<String, dynamic> toJson() => _$ExtendedDataToJson(this);
 }

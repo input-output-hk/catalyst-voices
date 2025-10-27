@@ -1,6 +1,5 @@
 import 'package:catalyst_voices_repositories/src/api/models/catalyst_id_status.dart';
 import 'package:catalyst_voices_repositories/src/api/models/catalyst_rbac_registration_status.dart';
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'catalyst_id_public.g.dart';
@@ -37,7 +36,7 @@ final class CatalystIdPublic {
     this.rbacRegStatus = CatalystRbacRegistrationStatus.initialized,
   });
 
-  factory CatalystIdPublic.fromJson(Json json) => _$CatalystIdPublicFromJson(json);
+  factory CatalystIdPublic.fromJson(Map<String, dynamic> json) => _$CatalystIdPublicFromJson(json);
 
-  Json toJson() => _$CatalystIdPublicToJson(this);
+  Map<String, dynamic> toJson() => _$CatalystIdPublicToJson(this);
 }

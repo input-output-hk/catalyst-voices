@@ -1,6 +1,5 @@
-import 'package:catalyst_voices_repositories/src/api/models/key_type.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/api/models/key_value.dart';
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'key_data.g.dart';
@@ -25,7 +24,7 @@ final class KeyData {
 
   /// A key type for role data.
   @JsonKey(name: 'key_type')
-  final KeyType keyType;
+  final CertificateType keyType;
 
   /// A key value for role data.
   /// A value of the key.
@@ -42,13 +41,13 @@ final class KeyData {
     this.keyValue,
   });
 
-  factory KeyData.fromJson(Json json) => _$KeyDataFromJson(json);
+  factory KeyData.fromJson(Map<String, dynamic> json) => _$KeyDataFromJson(json);
 
   String? get effectiveKeyValue => switch (keyType) {
-    KeyType.pubkey => keyValue?.pubkey,
-    KeyType.x509 => keyValue?.x509,
-    KeyType.c509 => keyValue?.c509,
+    CertificateType.pubkey => keyValue?.pubkey,
+    CertificateType.x509 => keyValue?.x509,
+    CertificateType.c509 => keyValue?.c509,
   };
 
-  Json toJson() => _$KeyDataToJson(this);
+  Map<String, dynamic> toJson() => _$KeyDataToJson(this);
 }

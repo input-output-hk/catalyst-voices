@@ -1,4 +1,3 @@
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'payment_data.g.dart';
@@ -34,7 +33,7 @@ final class PaymentData {
     this.address,
   });
 
-  factory PaymentData.fromJson(Json json) => _$PaymentDataFromJson(json);
+  factory PaymentData.fromJson(Map<String, dynamic> json) => _$PaymentDataFromJson(json);
 
-  Json toJson() => _$PaymentDataToJson(this);
+  Map<String, dynamic> toJson() => _$PaymentDataToJson(this);
 }

@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_repositories/src/api/models/extended_data.dart';
 import 'package:catalyst_voices_repositories/src/api/models/key_data.dart';
 import 'package:catalyst_voices_repositories/src/api/models/payment_data.dart';
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'rbac_role_data.g.dart';
@@ -38,7 +37,7 @@ final class RbacRoleData {
     required this.extendedData,
   });
 
-  factory RbacRoleData.fromJson(Json json) => _$RbacRoleDataFromJson(json);
+  factory RbacRoleData.fromJson(Map<String, dynamic> json) => _$RbacRoleDataFromJson(json);
 
-  Json toJson() => _$RbacRoleDataToJson(this);
+  Map<String, dynamic> toJson() => _$RbacRoleDataToJson(this);
 }
