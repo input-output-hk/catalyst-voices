@@ -1,9 +1,12 @@
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database_config.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.dart';
+import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/favorites_dao.dart';
+import 'package:catalyst_voices_repositories/src/database/dao/local_drafts_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_dao.dart';
+import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/migration/drift_migration_strategy.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
@@ -35,12 +38,16 @@ abstract interface class CatalystDatabase {
   /// Do not confuse it with other documents.
   DocumentsDao get documentsDao;
 
+  DocumentsV2Dao get documentsV2Dao;
+
   /// Contains all operations related to [DocumentDraftEntity] which is db
   /// specific. Do not confuse it with other documents / drafts.
   DraftsDao get draftsDao;
 
   /// Contains all operations related to fav status of documents.
   FavoritesDao get favoritesDao;
+
+  LocalDraftsV2Dao get localDraftsV2Dao;
 
   /// Allows to await completion of pending operations.
   ///
@@ -50,6 +57,8 @@ abstract interface class CatalystDatabase {
 
   /// Specialized version of [DocumentsDao].
   ProposalsDao get proposalsDao;
+
+  ProposalsV2Dao get proposalsV2Dao;
 
   /// Removes all data from this db.
   Future<void> clear();
@@ -75,6 +84,11 @@ abstract interface class CatalystDatabase {
     DriftFavoritesDao,
     DriftDraftsDao,
     DriftProposalsDao,
+
+    //
+    DriftDocumentsV2Dao,
+    DriftLocalDraftsV2Dao,
+    DriftProposalsV2Dao,
   ],
   queries: {},
   views: [],
@@ -113,10 +127,16 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase implements CatalystDa
   DocumentsDao get documentsDao => driftDocumentsDao;
 
   @override
+  DocumentsV2Dao get documentsV2Dao => driftDocumentsV2Dao;
+
+  @override
   DraftsDao get draftsDao => driftDraftsDao;
 
   @override
   FavoritesDao get favoritesDao => driftFavoritesDao;
+
+  @override
+  LocalDraftsV2Dao get localDraftsV2Dao => driftLocalDraftsV2Dao;
 
   @override
   MigrationStrategy get migration {
@@ -134,6 +154,9 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase implements CatalystDa
 
   @override
   ProposalsDao get proposalsDao => driftProposalsDao;
+
+  @override
+  ProposalsV2Dao get proposalsV2Dao => driftProposalsV2Dao;
 
   @override
   int get schemaVersion => 4;
