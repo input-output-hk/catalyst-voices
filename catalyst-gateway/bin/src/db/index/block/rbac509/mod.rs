@@ -151,7 +151,6 @@ impl Rbac509InsertQuery {
                             .map(|(key, _)| key)
                     })
                     .collect();
-                // modified_chains,
 
                 if let Some(previous_txn) = previous_txn {
                     context.insert_transaction(txn_id, catalyst_id.clone());
