@@ -1,4 +1,5 @@
-import 'package:catalyst_voices_repositories/src/common/json.dart';
+import 'package:catalyst_voices_repositories/src/api/models/invalid_registration.dart';
+import 'package:catalyst_voices_repositories/src/api/models/rbac_role_data.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'rbac_registration_chain.g.dart';
@@ -6,7 +7,7 @@ part 'rbac_registration_chain.g.dart';
 /// A chain of valid RBAC registrations.
 /// A unified data of multiple RBAC registrations.
 ///
-/// Used as response for GET /api/v1/rbac/registration
+/// Used as response for GET /api/v2/rbac/registration
 @JsonSerializable()
 final class RbacRegistrationChain {
   /// Catalyst ID
@@ -27,19 +28,23 @@ final class RbacRegistrationChain {
   /// 128 Bit UUID Version 4 - Random
   final List<String> purpose;
 
-  /// RBAC role data map
-  /// A map of role number to role data.
-  final Json roles;
+  /// A list of role data.
+  final List<RbacRoleData> roles;
+
+  /// A list of invalid registrations.
+  final List<InvalidRegistration> invalid;
 
   const RbacRegistrationChain({
     required this.catalystId,
     this.lastPersistentTxn,
     this.lastVolatileTxn,
-    this.purpose = const <String>[],
-    this.roles = const <String, dynamic>{},
+    this.purpose = const [],
+    this.roles = const [],
+    this.invalid = const [],
   });
 
-  factory RbacRegistrationChain.fromJson(Json json) => _$RbacRegistrationChainFromJson(json);
+  factory RbacRegistrationChain.fromJson(Map<String, dynamic> json) =>
+      _$RbacRegistrationChainFromJson(json);
 
-  Json toJson() => _$RbacRegistrationChainToJson(this);
+  Map<String, dynamic> toJson() => _$RbacRegistrationChainToJson(this);
 }

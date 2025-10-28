@@ -1,6 +1,5 @@
 import 'package:catalyst_voices_repositories/src/api/models/eq_or_ranged_id.dart';
 import 'package:catalyst_voices_repositories/src/api/models/eq_or_ranged_ver.dart';
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'id_and_ver_ref.g.dart';
@@ -37,5 +36,5 @@ final class IdAndVerRef {
     this.id,
   });
 
-  Json toJson() => _$IdAndVerRefToJson(this);
+  Map<String, dynamic> toJson() => _$IdAndVerRefToJson(this);
 }

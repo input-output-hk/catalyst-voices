@@ -1,5 +1,4 @@
 import 'package:catalyst_voices_repositories/src/api/models/stake_info.dart';
-import 'package:catalyst_voices_repositories/src/common/json.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'full_stake_info.g.dart';
@@ -20,7 +19,7 @@ final class FullStakeInfo {
     required this.persistent,
   });
 
-  factory FullStakeInfo.fromJson(Json json) => _$FullStakeInfoFromJson(json);
+  factory FullStakeInfo.fromJson(Map<String, dynamic> json) => _$FullStakeInfoFromJson(json);
 
-  Json toJson() => _$FullStakeInfoToJson(this);
+  Map<String, dynamic> toJson() => _$FullStakeInfoToJson(this);
 }
