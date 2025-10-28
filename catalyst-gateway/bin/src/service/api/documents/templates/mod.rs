@@ -178,7 +178,7 @@ mod tests {
         w: &mut impl std::io::Write,
         mut docs_iter: std::iter::Peekable<I>,
     ) -> anyhow::Result<()> {
-        const INSERT_STMT: &str = "INSERT INTO signed_docs (\n  id,\n  ver,\n  type,\n  authors,\n  metadata,\n  payload,\n  raw\n)\nVALUES";
+        const INSERT_STMT: &str = "INSERT INTO signed_docs (\n  id,\n  ver,\n  type,\n  authors,\n  metadata,\n  payload,\n  raw\n)\nVALUES\n-- cspell: disable";
         writeln!(w, "{INSERT_STMT}").unwrap();
 
         while let Some(doc) = docs_iter.next() {
@@ -201,7 +201,7 @@ mod tests {
 
             write!(
                 w,
-                "(\n  '{id}',\n  '{ver}',\n  '{type}',\n  [{authors}],\n  '{metadata}',\n  '{payload}',\n  DECODE('{raw}')\n)",
+                "(\n  '{id}',\n  '{ver}',\n  '{type}',\n  ARRAY[{authors}], -- noqa: LT05\n  '{metadata}', -- noqa: LT05\n  '{payload}', -- noqa: LT05\n  DECODE('{raw}', 'hex') -- noqa: LT05\n)",
                 id = doc.doc_id()?,
                 ver = doc.doc_ver()?,
                 r#type = doc.doc_type()?,
@@ -211,7 +211,7 @@ mod tests {
                     .map(|v| format!("'{v}'"))
                     .collect::<Vec<_>>()
                     .join(","),
-                payload = serde_json::from_slice::<serde_json::Value>(doc.doc_content().decoded_bytes()?)?,
+                payload = serde_json::from_slice::<serde_json::Value>(doc.doc_content().decoded_bytes()?)?.to_string().replace('\'', "''"),
                 raw = hex::encode(minicbor::to_vec(doc)?)
             )?;
             if docs_iter.peek().is_some() {
@@ -219,7 +219,7 @@ mod tests {
                 writeln!(w, ",")?;
             }
         }
-        write!(w, ";")?;
+        write!(w, ";\n-- cspell: enable")?;
         Ok(())
     }
 
@@ -228,7 +228,6 @@ mod tests {
         let mut rand = OsRng;
         let sk_bytes: SigningKey = SigningKey::generate(&mut rand);
         let sk_hex = format!("0x{}", hex::encode(sk_bytes.to_bytes()).as_str());
-        println!("sk: {sk_hex}");
         unsafe {
             env::set_var("SIGNED_DOC_SK", sk_hex);
         }
