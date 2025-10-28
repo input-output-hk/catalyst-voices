@@ -40,6 +40,7 @@ pub(crate) enum ResponsesV2 {
     UnprocessableContent(Json<ErrorMessage>),
 }
 
+/// All responses.
 pub type AllResponsesV2 = WithErrorResponses<ResponsesV2>;
 
 /// Get Cardano assets V2 endpoint.
@@ -70,6 +71,7 @@ pub(crate) async fn endpoint(
         .into()
 }
 
+/// Returns a stake address from provided parameters.
 async fn stake_address(
     address: Option<Cip19StakeAddress>,
     token: Option<CatalystRBACTokenV1>,
