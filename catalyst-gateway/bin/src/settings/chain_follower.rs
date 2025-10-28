@@ -5,7 +5,7 @@ use std::{cmp::min, time::Duration};
 use cardano_chain_follower::{turbo_downloader::DlConfig, ChainSyncConfig, Network};
 use tracing::info;
 
-use super::str_env_var::StringEnvVar;
+use super::str_env_var::{StringEnvVar, StringEnvVarParams};
 
 /// Default chain to follow.
 const DEFAULT_NETWORK: NetworkFromStr = NetworkFromStr::Mainnet;
@@ -40,6 +40,47 @@ const MAX_DL_TIMEOUT: u64 = 300;
 /// Number of bytes in a Megabyte
 const ONE_MEGABYTE: usize = 1_048_576;
 
+/// A default devnet genesis key.
+const DEFAULT_DEVNET_GENESIS_KEY: &str = "5b33322c3235332c3138362c3230312c3137372c31312c3131372c3133352c3138372c3136372c3138312c3138382c32322c35392c3230362c3130352c3233312c3135302c3231352c33302c37382c3231322c37362c31362c3235322c3138302c37322c3133342c3133372c3234372c3136312c36385d";
+
+/// A default devnet Cardano networking magic number.
+const DEFAULT_DEVNET_MAGIC: u64 = 42;
+
+/// A default devnet Cardano networking identifier.
+const DEFAULT_DEVNET_NETWORK_ID: u64 = 42;
+
+/// A default devnet byron epoch length.
+const DEFAULT_DEVNET_BYRON_EPOCH_LENGTH: u32 = 100_000;
+
+/// A default devnet byron slot length.
+const DEFAULT_DEVNET_BYRON_SLOT_LENGTH: u32 = 1000;
+
+/// A default devnet byron known slot.
+const DEFAULT_DEVNET_BYRON_KNOWN_SLOT: u64 = 0;
+
+/// A default devnet byron known time.
+const DEFAULT_DEVNET_BYRON_KNOWN_TIME: u64 = 1_564_010_416;
+
+/// A default devnet byron known hash.
+const DEFAULT_DEVNET_BYRON_KNOWN_HASH: &str =
+    "8f8602837f7c6f8b8867dd1cbc1842cf51a27eaed2c70ef48325d00f8efb320f";
+
+/// A default devnet shelley epoch length.
+const DEFAULT_DEVNET_SHELLEY_EPOCH_LENGTH: u32 = 100;
+
+/// A default devnet shelley slot length.
+const DEFAULT_DEVNET_SHELLEY_SLOT_LENGTH: u32 = 1;
+
+/// A default devnet shelley known slot.
+const DEFAULT_DEVNET_SHELLEY_KNOWN_SLOT: u64 = 1_598_400;
+
+/// A default devnet shelley known hash.
+const DEFAULT_DEVNET_SHELLEY_KNOWN_HASH: &str =
+    "02b1c561715da9e540411123a6135ee319b02f60b9a11a603d3305556c04329f";
+
+/// A default devnet shelley known time.
+const DEFAULT_DEVNET_SHELLEY_KNOWN_TIME: u64 = 1_595_967_616;
+
 /// Configuration for the chain follower.
 #[derive(Clone)]
 pub(crate) struct EnvVars {
@@ -70,25 +111,110 @@ enum NetworkFromStr {
 }
 
 impl From<NetworkFromStr> for Network {
+    #[allow(clippy::too_many_lines)]
     fn from(value: NetworkFromStr) -> Self {
         match value {
             NetworkFromStr::Mainnet => Self::Mainnet,
             NetworkFromStr::Preprod => Self::Preprod,
             NetworkFromStr::Preview => Self::Preview,
-            NetworkFromStr::Devnet => Self::Devnet {
-                genesis_key: "5b33322c3235332c3138362c3230312c3137372c31312c3131372c3133352c3138372c3136372c3138312c3138382c32322c35392c3230362c3130352c3233312c3135302c3231352c33302c37382c3231322c37362c31362c3235322c3138302c37322c3133342c3133372c3234372c3136312c36385d",
-                magic: 42,
-                network_id: 0,
-                byron_epoch_length: 100_000,
-                byron_slot_length: 1000,
-                byron_known_slot: 0,
-                byron_known_time: 1_564_010_416,
-                byron_known_hash: "8f8602837f7c6f8b8867dd1cbc1842cf51a27eaed2c70ef48325d00f8efb320f",
-                shelley_epoch_length: 100,
-                shelley_slot_length: 1,
-                shelley_known_slot: 1_598_400,
-                shelley_known_hash: "02b1c561715da9e540411123a6135ee319b02f60b9a11a603d3305556c04329f",
-                shelley_known_time: 1_595_967_616,
+            NetworkFromStr::Devnet => {
+                let genesis_key = StringEnvVar::new(
+                    "CHAIN_FOLLOWER_DEVNET_GENESIS_KEY",
+                    StringEnvVarParams::Plain(
+                        "DEFAULT_DEVNET_GENESIS_KEY".into(),
+                        DEFAULT_DEVNET_GENESIS_KEY.to_string().into(),
+                    ),
+                );
+                let magic = StringEnvVar::new_as_int(
+                    "CHAIN_FOLLOWER_DEVNET_MAGIC",
+                    DEFAULT_DEVNET_MAGIC,
+                    0,
+                    u64::MAX,
+                );
+                let network_id = StringEnvVar::new_as_int(
+                    "CHAIN_FOLLOWER_DEVNET_NETWORK_ID",
+                    DEFAULT_DEVNET_NETWORK_ID,
+                    0,
+                    u64::MAX,
+                );
+                let byron_epoch_length = StringEnvVar::new_as_int(
+                    "CHAIN_FOLLOWER_DEVNET_BYRON_EPOCH_LENGTH",
+                    DEFAULT_DEVNET_BYRON_EPOCH_LENGTH,
+                    0,
+                    u32::MAX,
+                );
+                let byron_slot_length = StringEnvVar::new_as_int(
+                    "CHAIN_FOLLOWER_DEVNET_BYRON_SLOT_LENGTH",
+                    DEFAULT_DEVNET_BYRON_SLOT_LENGTH,
+                    0,
+                    u32::MAX,
+                );
+                let byron_known_slot = StringEnvVar::new_as_int(
+                    "CHAIN_FOLLOWER_DEVNET_BYRON_KNOWN_SLOT",
+                    DEFAULT_DEVNET_BYRON_KNOWN_SLOT,
+                    0,
+                    u64::MAX,
+                );
+                let byron_known_hash = StringEnvVar::new(
+                    "CHAIN_FOLLOWER_DEVNET_BYRON_KNOWN_HASH",
+                    StringEnvVarParams::Plain(
+                        "DEFAULT_DEVNET_BYRON_KNOWN_HASH".into(),
+                        DEFAULT_DEVNET_BYRON_KNOWN_HASH.to_string().into(),
+                    ),
+                );
+                let byron_known_time = StringEnvVar::new_as_int(
+                    "CHAIN_FOLLOWER_DEVNET_BYRON_KNOWN_TIME",
+                    DEFAULT_DEVNET_BYRON_KNOWN_TIME,
+                    0,
+                    u64::MAX,
+                );
+                let shelley_epoch_length = StringEnvVar::new_as_int(
+                    "CHAIN_FOLLOWER_DEVNET_SHELLEY_EPOCH_LENGTH",
+                    DEFAULT_DEVNET_SHELLEY_EPOCH_LENGTH,
+                    0,
+                    u32::MAX,
+                );
+                let shelley_slot_length = StringEnvVar::new_as_int(
+                    "CHAIN_FOLLOWER_DEVNET_SHELLEY_SLOT_LENGTH",
+                    DEFAULT_DEVNET_SHELLEY_SLOT_LENGTH,
+                    0,
+                    u32::MAX,
+                );
+                let shelley_known_slot = StringEnvVar::new_as_int(
+                    "CHAIN_FOLLOWER_DEVNET_SHELLEY_KNOWN_SLOT",
+                    DEFAULT_DEVNET_SHELLEY_KNOWN_SLOT,
+                    0,
+                    u64::MAX,
+                );
+                let shelley_known_hash = StringEnvVar::new(
+                    "CHAIN_FOLLOWER_DEVNET_SHELLEY_KNOWN_HASH",
+                    StringEnvVarParams::Plain(
+                        "DEFAULT_DEVNET_SHELLEY_KNOWN_HASH".into(),
+                        DEFAULT_DEVNET_SHELLEY_KNOWN_HASH.to_string().into(),
+                    ),
+                );
+                let shelley_known_time = StringEnvVar::new_as_int(
+                    "CHAIN_FOLLOWER_DEVNET_SHELLEY_KNOWN_TIME",
+                    DEFAULT_DEVNET_SHELLEY_KNOWN_TIME,
+                    0,
+                    u64::MAX,
+                );
+
+                Self::Devnet {
+                    genesis_key: genesis_key.as_string(),
+                    magic,
+                    network_id,
+                    byron_epoch_length,
+                    byron_slot_length,
+                    byron_known_slot,
+                    byron_known_hash: byron_known_hash.as_string(),
+                    byron_known_time,
+                    shelley_epoch_length,
+                    shelley_slot_length,
+                    shelley_known_slot,
+                    shelley_known_hash: shelley_known_hash.as_string(),
+                    shelley_known_time,
+                }
             },
         }
     }
@@ -97,7 +223,8 @@ impl From<NetworkFromStr> for Network {
 impl EnvVars {
     /// Create a config for a cassandra cluster, identified by a default namespace.
     pub(super) fn new() -> Self {
-        let chain = StringEnvVar::new_as_enum("CHAIN_NETWORK", DEFAULT_NETWORK, false).into();
+        let chain: Network =
+            StringEnvVar::new_as_enum("CHAIN_NETWORK", DEFAULT_NETWORK, false).into();
 
         let sync_tasks: u16 = StringEnvVar::new_as_int(
             "CHAIN_FOLLOWER_SYNC_TASKS",
@@ -113,7 +240,7 @@ impl EnvVars {
             MAX_SYNC_MAX_SLOTS,
         );
 
-        let cfg = ChainSyncConfig::default_for(chain);
+        let cfg = ChainSyncConfig::default_for(chain.clone());
         let mut dl_config = cfg.mithril_cfg.dl_config.clone().unwrap_or_default();
 
         let workers = StringEnvVar::new_as_int(
@@ -132,11 +259,11 @@ impl EnvVars {
             1,
             MAX_DL_CHUNK_SIZE,
         )
-        .checked_mul(ONE_MEGABYTE)
-        .unwrap_or_else(|| {
-            info!("Too big 'CHAIN_FOLLOWER_DL_CHUNK_SIZE' value, default value {default_dl_chunk_size} is used");
-            default_dl_chunk_size
-        });
+            .checked_mul(ONE_MEGABYTE)
+            .unwrap_or_else(|| {
+                info!("Too big 'CHAIN_FOLLOWER_DL_CHUNK_SIZE' value, default value {default_dl_chunk_size} is used");
+                default_dl_chunk_size
+            });
         dl_config = dl_config.with_chunk_size(chunk_size);
 
         let queue_ahead = StringEnvVar::new_as_int(

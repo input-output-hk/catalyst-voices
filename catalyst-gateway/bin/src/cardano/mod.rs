@@ -33,10 +33,10 @@ pub(crate) const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs
 
 /// Start syncing a particular network
 async fn start_sync_for(cfg: &chain_follower::EnvVars) -> anyhow::Result<()> {
-    let chain = cfg.chain;
+    let chain = &cfg.chain;
     let dl_config = cfg.dl_config.clone();
 
-    let mut cfg = ChainSyncConfig::default_for(chain);
+    let mut cfg = ChainSyncConfig::default_for(chain.clone());
     cfg.mithril_cfg = cfg.mithril_cfg.with_dl_config(dl_config);
     info!(chain = %chain, "Starting Chain Sync Task");
 
@@ -263,9 +263,9 @@ fn sync_subchain(
         let mut blocks_synced = 0u64;
 
         let mut follower =
-            ChainFollower::new(params.chain, params.actual_start(), params.end.clone()).await;
+            ChainFollower::new(&params.chain, params.actual_start(), params.end.clone()).await;
         while let Some(chain_update) = follower.next().await {
-            let tips = ChainFollower::get_tips(params.chain).await;
+            let tips = ChainFollower::get_tips(&params.chain).await;
             let immutable_slot = tips.0.slot_or_default();
             let live_slot = tips.1.slot_or_default();
             metrics_updater::current_tip_slot(live_slot, immutable_slot);
@@ -495,7 +495,7 @@ impl SyncTask {
     async fn run(&mut self) {
         // We can't sync until the local chain data is synced.
         // This call will wait until we sync.
-        let tips = ChainFollower::get_tips(self.cfg.chain).await;
+        let tips = ChainFollower::get_tips(&self.cfg.chain).await;
         self.immutable_tip_slot = tips.0.slot_or_default();
         self.live_tip_slot = tips.1.slot_or_default();
         info!(chain=%self.cfg.chain, immutable_tip=?self.immutable_tip_slot, live_tip=?self.live_tip_slot, "Running the primary blockchain follower task.");
@@ -516,7 +516,7 @@ impl SyncTask {
         // Start the Live Chain sync task - This can never end because it is syncing to TIP.
         // So, if it fails, it will automatically be restarted.
         self.add_sync_task(SyncParams::new(
-            self.cfg.chain,
+            self.cfg.chain.clone(),
             Point::fuzzy(self.immutable_tip_slot),
             Point::TIP,
         ));
@@ -542,7 +542,7 @@ impl SyncTask {
 
             match completed {
                 Ok(finished) => {
-                    let tips = ChainFollower::get_tips(self.cfg.chain).await;
+                    let tips = ChainFollower::get_tips(&self.cfg.chain).await;
                     let immutable_tip_slot = tips.0.slot_or_default();
                     let live_tip_slot = tips.1.slot_or_default();
                     info!(immutable_tip_slot=?immutable_tip_slot, live_tip_slot=?live_tip_slot, "Chain Indexer task finished");
@@ -672,7 +672,7 @@ impl SyncTask {
                     self.get_syncable_range(self.start_slot, end_slot)
                 {
                     self.add_sync_task(SyncParams::new(
-                        self.cfg.chain,
+                        self.cfg.chain.clone(),
                         first_point,
                         last_point.clone(),
                     ));
