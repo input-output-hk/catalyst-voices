@@ -203,11 +203,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   }) async {
-    final metadata = SignedDocumentMetadata.fromDocumentMetadata(document.metadata);
-
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(document.content.data),
-      metadata: metadata,
+      metadata: document.metadata,
       catalystId: catalystId,
       privateKey: privateKey,
     );
@@ -228,7 +226,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(dto.toJson()),
-      metadata: SignedDocumentMetadata.fromDocumentMetadata(metadata),
+      metadata: metadata,
       catalystId: catalystId,
       privateKey: privateKey,
     );

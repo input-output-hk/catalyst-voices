@@ -59,11 +59,9 @@ final class DocumentsCommentRepository implements CommentRepository {
       'CommentDocument have to have a ref to other document',
     );
 
-    final metadata = SignedDocumentMetadata.fromDocumentMetadata(document.metadata);
-
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(document.content.data),
-      metadata: metadata,
+      metadata: document.metadata,
       catalystId: catalystId,
       privateKey: privateKey,
     );

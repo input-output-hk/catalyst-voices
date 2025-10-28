@@ -345,7 +345,7 @@ final class ProposalServiceImpl implements ProposalService {
     // TODO(LynxLynxx): Remove after we support multiple fund templates
     if (!allowTemplateRefs.contains(parsedDocument.metadata.template)) {
       throw const DocumentImportInvalidDataException(
-        SignedDocumentMetadataMalformedException(
+        DocumentMetadataMalformedException(
           reasons: ['template ref is not allowed to be imported'],
         ),
       );

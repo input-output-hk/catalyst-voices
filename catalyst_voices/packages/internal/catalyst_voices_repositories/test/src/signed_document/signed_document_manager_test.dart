@@ -48,7 +48,7 @@ void main() {
       final bytes = await SignedDocumentTestData.signedDocumentV0_0_1Bytes;
       final document = await documentManager.parseDocument(bytes);
 
-      expect(document.metadata.documentType, equals(DocumentType.proposalDocument));
+      expect(document.metadata.type, equals(DocumentType.proposalDocument));
       expect(document.metadata.template, isNotNull);
       expect(document.metadata.parameters, isNotEmpty);
     });
@@ -57,7 +57,7 @@ void main() {
       final bytes = await SignedDocumentTestData.signedDocumentV0_0_4Bytes;
       final document = await documentManager.parseDocument(bytes);
 
-      expect(document.metadata.documentType, equals(DocumentType.proposalDocument));
+      expect(document.metadata.type, equals(DocumentType.proposalDocument));
       expect(document.metadata.template, isNotNull);
       expect(document.metadata.parameters, isNotEmpty);
     });
@@ -71,10 +71,11 @@ final _catalystId = CatalystId(
 
 final _categoryRef = DocumentRefFactory.signedDocumentRef();
 
-final _metadata = SignedDocumentMetadata(
-  contentType: SignedDocumentContentType.json,
-  documentType: DocumentType.proposalDocument,
-  parameters: [SignedDocumentMetadataRef.fromDocumentRef(_categoryRef)],
+final _metadata = DocumentDataMetadata(
+  contentType: DocumentContentType.json,
+  type: DocumentType.proposalDocument,
+  selfRef: DocumentRefFactory.signedDocumentRef(),
+  parameters: DocumentParameters({_categoryRef}),
 );
 
 final _privateKey = _FakeCatalystPrivateKey(bytes: _privateKeyBytes);
