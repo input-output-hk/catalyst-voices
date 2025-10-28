@@ -15,6 +15,7 @@ abstract final class DocumentDataFactory {
   }) {
     return DocumentData(
       metadata: DocumentDataMetadata(
+        contentType: DocumentContentType.json,
         type: type,
         selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
         template: template,
@@ -34,6 +35,7 @@ abstract final class DocumentFactory {
     content ??= const DocumentDataContent({});
 
     metadata ??= DocumentDataMetadata(
+      contentType: DocumentContentType.json,
       type: DocumentType.proposalDocument,
       selfRef: DocumentRefFactory.signedDocumentRef(),
     );
@@ -144,6 +146,7 @@ abstract final class DraftFactory {
     content ??= const DocumentDataContent({});
 
     metadata ??= DocumentDataMetadata(
+      contentType: DocumentContentType.json,
       type: DocumentType.proposalDocument,
       selfRef: DocumentRefFactory.draftRef(),
     );

@@ -22,6 +22,7 @@ void main() {
 
     final documentData = DocumentData(
       metadata: DocumentDataMetadata(
+        contentType: DocumentContentType.json,
         type: DocumentType.proposalDocument,
         selfRef: proposalRef,
         template: SignedDocumentRef.generateFirstRef(),

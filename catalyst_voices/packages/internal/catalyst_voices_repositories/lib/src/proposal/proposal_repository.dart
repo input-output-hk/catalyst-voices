@@ -59,9 +59,7 @@ abstract interface class ProposalRepository {
   });
 
   Future<void> publishProposalAction({
-    required SignedDocumentRef actionRef,
-    required SignedDocumentRef proposalRef,
-    required DocumentParameters proposalParameters,
+    required DocumentDataMetadata metadata,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -205,9 +203,11 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   }) async {
+    final metadata = SignedDocumentMetadata.fromDocumentMetadata(document.metadata);
+
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(document.content.data),
-      metadata: _createProposalMetadata(document.metadata),
+      metadata: metadata,
       catalystId: catalystId,
       privateKey: privateKey,
     );
@@ -217,9 +217,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
   @override
   Future<void> publishProposalAction({
-    required SignedDocumentRef actionRef,
-    required SignedDocumentRef proposalRef,
-    required DocumentParameters proposalParameters,
+    required DocumentDataMetadata metadata,
     required ProposalSubmissionAction action,
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
@@ -227,16 +225,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     final dto = ProposalSubmissionActionDocumentDto(
       action: ProposalSubmissionActionDto.fromModel(action),
     );
+
     final signedDocument = await _signedDocumentManager.signDocument(
       SignedDocumentJsonPayload(dto.toJson()),
-      metadata: SignedDocumentMetadata(
-        contentType: SignedDocumentContentType.json,
-        documentType: DocumentType.proposalActionDocument,
-        id: actionRef.id,
-        ver: actionRef.version,
-        ref: SignedDocumentMetadataRef.fromDocumentRef(proposalRef),
-        parameters: proposalParameters.set.map(SignedDocumentMetadataRef.fromDocumentRef).toList(),
-      ),
+      metadata: SignedDocumentMetadata.fromDocumentMetadata(metadata),
       catalystId: catalystId,
       privateKey: privateKey,
     );
@@ -435,6 +427,7 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
     final metadata = ProposalTemplateMetadata(
       selfRef: documentData.metadata.selfRef,
+      parameters: documentData.metadata.parameters,
     );
 
     final contentData = documentData.content.data;
@@ -443,21 +436,6 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return ProposalTemplate(
       metadata: metadata,
       schema: schema,
-    );
-  }
-
-  SignedDocumentMetadata _createProposalMetadata(
-    DocumentDataMetadata metadata,
-  ) {
-    final template = metadata.template;
-
-    return SignedDocumentMetadata(
-      contentType: SignedDocumentContentType.json,
-      documentType: DocumentType.proposalDocument,
-      id: metadata.id,
-      ver: metadata.version,
-      template: template == null ? null : SignedDocumentMetadataRef.fromDocumentRef(template),
-      parameters: metadata.parameters.set.map(SignedDocumentMetadataRef.fromDocumentRef).toList(),
     );
   }
 

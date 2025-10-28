@@ -2005,6 +2005,7 @@ DocumentEntityWithMetadata _buildProposal({
   Coin? requestedFunds,
 }) {
   final metadata = DocumentDataMetadata(
+    contentType: DocumentContentType.json,
     type: DocumentType.proposalDocument,
     selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
     template: template ?? DocumentRefFactory.signedDocumentRef(),
@@ -2056,6 +2057,7 @@ DocumentEntityWithMetadata _buildProposalAction({
   required DocumentRef proposalRef,
 }) {
   final metadata = DocumentDataMetadata(
+    contentType: DocumentContentType.json,
     type: DocumentType.proposalActionDocument,
     selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
     ref: proposalRef,
@@ -2078,6 +2080,7 @@ DocumentEntityWithMetadata _buildProposalComment({
   required DocumentRef proposalRef,
 }) {
   final metadata = DocumentDataMetadata(
+    contentType: DocumentContentType.json,
     type: DocumentType.commentDocument,
     selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
     ref: proposalRef,
@@ -2110,6 +2113,7 @@ DocumentEntityWithMetadata _buildProposalTemplate({
   SignedDocumentRef? selfRef,
 }) {
   final metadata = DocumentDataMetadata(
+    contentType: DocumentContentType.json,
     type: DocumentType.proposalTemplate,
     selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
   );

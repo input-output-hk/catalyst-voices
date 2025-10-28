@@ -58,6 +58,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
 
   DocumentDataMetadata _buildDocumentMetadata(ProposalDocument document) {
     return DocumentDataMetadata(
+      contentType: DocumentContentType.json,
       type: DocumentType.proposalDocument,
       selfRef: document.metadata.selfRef,
       template: document.metadata.templateRef,
@@ -102,7 +103,10 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       final documentContent = _buildDocumentContent(docData.document.document);
 
       final encodedProposal = await _proposalService.encodeProposalForExport(
-        document: DocumentData(metadata: docMetadata, content: documentContent),
+        document: DocumentData(
+          metadata: docMetadata,
+          content: documentContent,
+        ),
       );
 
       final filename = '${event.prefix}_${event.ref.id}';
@@ -124,7 +128,7 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
       emit(state.copyWith(isLoading: true));
       await _proposalService.forgetProposal(
         proposalRef: proposal.selfRef as SignedDocumentRef,
-        parameters: proposal.parameters,
+        proposalParameters: proposal.parameters,
       );
       emit(state.copyWith(userProposals: _removeProposal(event.ref)));
       emitSignal(const ForgetProposalSuccessWorkspaceSignal());

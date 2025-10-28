@@ -45,7 +45,7 @@ abstract interface class ProposalService {
   /// Returns the [SignedDocumentRef] of the created [ProposalSubmissionAction].
   Future<void> forgetProposal({
     required SignedDocumentRef proposalRef,
-    required DocumentParameters parameters,
+    required DocumentParameters proposalParameters,
   });
 
   /// Similar to [watchFavoritesProposalsIds] stops after first emit.
@@ -179,9 +179,11 @@ final class ProposalServiceImpl implements ProposalService {
   }) async {
     final draftRef = DraftRef.generateFirstRef();
     final catalystId = _getUserCatalystId();
+
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
         metadata: DocumentDataMetadata(
+          contentType: DocumentContentType.json,
           type: DocumentType.proposalDocument,
           selfRef: draftRef,
           template: template,
@@ -212,16 +214,18 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Future<SignedDocumentRef> forgetProposal({
     required SignedDocumentRef proposalRef,
-    required DocumentParameters parameters,
+    required DocumentParameters proposalParameters,
   }) {
     return _signerService.useProposerCredentials(
       (catalystId, privateKey) async {
         final actionRef = SignedDocumentRef.generateFirstRef();
 
         await _proposalRepository.publishProposalAction(
-          actionRef: actionRef,
-          proposalRef: proposalRef,
-          proposalParameters: parameters,
+          metadata: DocumentDataMetadata.proposalAction(
+            selfRef: actionRef,
+            proposalRef: proposalRef,
+            proposalParameters: proposalParameters,
+          ),
           action: ProposalSubmissionAction.hide,
           catalystId: catalystId,
           privateKey: privateKey,
@@ -417,9 +421,11 @@ final class ProposalServiceImpl implements ProposalService {
         final actionRef = SignedDocumentRef.generateFirstRef();
 
         await _proposalRepository.publishProposalAction(
-          actionRef: actionRef,
-          proposalRef: proposalRef,
-          proposalParameters: proposalParameters,
+          metadata: DocumentDataMetadata.proposalAction(
+            selfRef: actionRef,
+            proposalRef: proposalRef,
+            proposalParameters: proposalParameters,
+          ),
           action: ProposalSubmissionAction.aFinal,
           catalystId: catalystId,
           privateKey: privateKey,
@@ -440,9 +446,11 @@ final class ProposalServiceImpl implements ProposalService {
         final actionRef = SignedDocumentRef.generateFirstRef();
 
         await _proposalRepository.publishProposalAction(
-          actionRef: actionRef,
-          proposalRef: proposalRef,
-          proposalParameters: proposalParameters,
+          metadata: DocumentDataMetadata.proposalAction(
+            selfRef: actionRef,
+            proposalRef: proposalRef,
+            proposalParameters: proposalParameters,
+          ),
           action: ProposalSubmissionAction.draft,
           catalystId: catalystId,
           privateKey: privateKey,
@@ -468,6 +476,7 @@ final class ProposalServiceImpl implements ProposalService {
     await _proposalRepository.upsertDraftProposal(
       document: DocumentData(
         metadata: DocumentDataMetadata(
+          contentType: DocumentContentType.json,
           type: DocumentType.proposalDocument,
           selfRef: selfRef,
           template: template,

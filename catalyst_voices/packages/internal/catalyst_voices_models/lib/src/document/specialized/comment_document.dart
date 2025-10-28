@@ -19,6 +19,7 @@ final class CommentDocument extends Equatable {
   DocumentData toDocumentData({required DocumentMapper mapper}) {
     return DocumentData(
       metadata: DocumentDataMetadata(
+        contentType: DocumentContentType.json,
         type: DocumentType.commentDocument,
         selfRef: metadata.selfRef,
         ref: metadata.ref,
@@ -43,19 +44,16 @@ final class CommentMetadata extends DocumentMetadata {
   /// [reply] equals other comment of this is a reply to it.
   final SignedDocumentRef? reply;
 
-  /// A list of referenced parameters like brand, campaign or category.
-  final DocumentParameters parameters;
-
   /// Creator of document.
   final CatalystId authorId;
 
   CommentMetadata({
     // Note. no drafts for comments
     required SignedDocumentRef super.selfRef,
+    required super.parameters,
     required this.ref,
     required this.template,
     this.reply,
-    required this.parameters,
     required this.authorId,
   }) : assert(
          ref.isExact,
@@ -69,7 +67,6 @@ final class CommentMetadata extends DocumentMetadata {
         ref,
         template,
         reply,
-        parameters,
         authorId,
       ];
 

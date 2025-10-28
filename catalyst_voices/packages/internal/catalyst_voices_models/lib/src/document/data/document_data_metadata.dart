@@ -1,9 +1,12 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
-/// Describes what [DocumentDataContent] is about. It only makes sens in
-/// context of [type].
+/// Describes what [DocumentDataContent] is about. It only makes sense in
+/// the context of [type].
 final class DocumentDataMetadata extends Equatable {
+  /// The content type of the document payload this metadata is attached to.
+  final DocumentContentType contentType;
+
   /// Type of this signed document
   final DocumentType type;
 
@@ -30,9 +33,8 @@ final class DocumentDataMetadata extends Equatable {
   /// List of authors represented by CatalystId
   final List<CatalystId>? authors;
 
-  // TODO(damian-molinski): refactor with factory constructors for
-  // proposal/comment to centralize required fields for each type.
   DocumentDataMetadata({
+    required this.contentType,
     required this.type,
     required this.selfRef,
     this.ref,
@@ -50,6 +52,7 @@ final class DocumentDataMetadata extends Equatable {
 
   @override
   List<Object?> get props => [
+    contentType,
     type,
     selfRef,
     ref,
@@ -63,6 +66,7 @@ final class DocumentDataMetadata extends Equatable {
   String get version => selfRef.version!;
 
   DocumentDataMetadata copyWith({
+    DocumentContentType? contentType,
     DocumentType? type,
     DocumentRef? selfRef,
     Optional<DocumentRef>? ref,
@@ -73,6 +77,7 @@ final class DocumentDataMetadata extends Equatable {
     Optional<List<CatalystId>>? authors,
   }) {
     return DocumentDataMetadata(
+      contentType: contentType ?? this.contentType,
       type: type ?? this.type,
       selfRef: selfRef ?? this.selfRef,
       ref: ref.dataOr(this.ref),

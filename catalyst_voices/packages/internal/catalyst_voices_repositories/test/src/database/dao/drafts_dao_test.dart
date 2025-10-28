@@ -76,12 +76,14 @@ void main() {
           final drafts = <DocumentDraftEntity>[
             DraftFactory.build(
               metadata: DocumentDataMetadata(
+                contentType: DocumentContentType.json,
                 type: DocumentType.proposalDocument,
                 selfRef: DraftRef(id: id, version: firstVersionId),
               ),
             ),
             DraftFactory.build(
               metadata: DocumentDataMetadata(
+                contentType: DocumentContentType.json,
                 type: DocumentType.proposalDocument,
                 selfRef: DraftRef(id: id, version: secondVersionId),
               ),
@@ -135,6 +137,7 @@ void main() {
           final drafts = refs.map((ref) {
             return DraftFactory.build(
               metadata: DocumentDataMetadata(
+                contentType: DocumentContentType.json,
                 type: DocumentType.proposalDocument,
                 selfRef: ref,
               ),
@@ -166,6 +169,7 @@ void main() {
           // Given
           final draft = DraftFactory.build(
             metadata: DocumentDataMetadata(
+              contentType: DocumentContentType.json,
               type: DocumentType.proposalDocument,
               selfRef: ref,
               authors: [
@@ -198,6 +202,7 @@ void main() {
           // Given
           final draft = DraftFactory.build(
             metadata: DocumentDataMetadata(
+              contentType: DocumentContentType.json,
               type: DocumentType.proposalDocument,
               selfRef: ref,
               authors: [
@@ -247,6 +252,7 @@ void main() {
 
           final draft1 = DraftFactory.build(
             metadata: DocumentDataMetadata(
+              contentType: DocumentContentType.json,
               type: DocumentType.proposalDocument,
               selfRef: DocumentRefFactory.signedDocumentRef(),
               authors: [originalId],
@@ -254,6 +260,7 @@ void main() {
           );
           final draft2 = DraftFactory.build(
             metadata: DocumentDataMetadata(
+              contentType: DocumentContentType.json,
               type: DocumentType.proposalDocument,
               selfRef: DocumentRefFactory.signedDocumentRef(),
               authors: [updatedId],
@@ -298,6 +305,7 @@ void main() {
             (index) {
               return DraftFactory.build(
                 metadata: DocumentDataMetadata(
+                  contentType: DocumentContentType.json,
                   type: DocumentType.proposalDocument,
                   selfRef: DraftRef(
                     id: id,
@@ -329,12 +337,14 @@ void main() {
           final drafts = <DocumentDraftEntity>[
             DraftFactory.build(
               metadata: DocumentDataMetadata(
+                contentType: DocumentContentType.json,
                 type: DocumentType.proposalDocument,
                 selfRef: DraftRef(id: id, version: version),
               ),
             ),
             DraftFactory.build(
               metadata: DocumentDataMetadata(
+                contentType: DocumentContentType.json,
                 type: DocumentType.proposalDocument,
                 selfRef: DraftRef.first(id),
               ),
@@ -414,6 +424,7 @@ void main() {
             5,
             (index) => DraftFactory.build(
               metadata: DocumentDataMetadata(
+                contentType: DocumentContentType.json,
                 type: DocumentType.proposalDocument,
                 selfRef: DraftRef(id: id, version: const Uuid().v7()),
               ),
@@ -451,6 +462,7 @@ void main() {
 
           final draft = DraftFactory.build(
             metadata: DocumentDataMetadata(
+              contentType: DocumentContentType.json,
               type: DocumentType.proposalDocument,
               selfRef: ref,
             ),

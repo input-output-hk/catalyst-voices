@@ -2,6 +2,8 @@
 
 import 'dart:typed_data';
 
+import 'package:catalyst_voices_models/src/document/data/document_content_type.dart';
+import 'package:catalyst_voices_models/src/document/data/document_data_metadata.dart';
 import 'package:catalyst_voices_models/src/document/data/document_type.dart';
 import 'package:catalyst_voices_models/src/document/document_ref.dart';
 import 'package:catalyst_voices_models/src/signed_document/signed_document_payload.dart';
@@ -37,10 +39,21 @@ abstract interface class SignedDocument {
 /// Defines the content type of the [SignedDocumentPayload].
 enum SignedDocumentContentType {
   /// The document's content type is JSON.
-  json,
+  json(DocumentContentType.json),
 
   /// Unrecognized content type.
-  unknown,
+  unknown(DocumentContentType.unknown);
+
+  final DocumentContentType contentType;
+
+  const SignedDocumentContentType(this.contentType);
+
+  static SignedDocumentContentType fromDocumentContentType(DocumentContentType contentType) {
+    return values.firstWhere(
+      (element) => element.contentType == contentType,
+      orElse: () => SignedDocumentContentType.unknown,
+    );
+  }
 }
 
 final class SignedDocumentMetadata extends Equatable {
@@ -93,6 +106,25 @@ final class SignedDocumentMetadata extends Equatable {
     this.collaborators,
     this.parameters = const [],
   });
+
+  /// Creates a [SignedDocumentMetadata] from [DocumentDataMetadata].
+  factory SignedDocumentMetadata.fromDocumentMetadata(DocumentDataMetadata metadata) {
+    final ref = metadata.ref;
+    final template = metadata.template;
+    final reply = metadata.reply;
+
+    return SignedDocumentMetadata(
+      contentType: SignedDocumentContentType.fromDocumentContentType(metadata.contentType),
+      documentType: metadata.type,
+      id: metadata.id,
+      ver: metadata.version,
+      ref: ref == null ? null : SignedDocumentMetadataRef.fromDocumentRef(ref),
+      template: template == null ? null : SignedDocumentMetadataRef.fromDocumentRef(template),
+      reply: reply != null ? SignedDocumentMetadataRef.fromDocumentRef(reply) : null,
+      section: metadata.section,
+      parameters: metadata.parameters.set.map(SignedDocumentMetadataRef.fromDocumentRef).toList(),
+    );
+  }
 
   @override
   List<Object?> get props => [
