@@ -39,8 +39,8 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
   @override
   Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage(PageRequest request) async {
-    final effectivePage = request.page;
-    final effectiveSize = request.size;
+    final effectivePage = request.page.clamp(0, double.infinity).toInt();
+    final effectiveSize = request.size.clamp(0, 999);
 
     assert(effectiveSize < 1000, 'Max query size is 999');
 
@@ -48,77 +48,50 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       return Page(items: const [], total: 0, page: effectivePage, maxPerPage: effectiveSize);
     }
 
-    final proposals = alias(documentsV2, 'proposals');
-    final latestVer = alias(documentsV2, 'latestVer');
+    // Aliases because we're querying same table multiple times, and for clarity.
+    final proposalTable = alias(documentsV2, 'proposals');
+    final latestProposalVerTable = alias(documentsV2, 'latestVer');
 
-    final maxVer = latestVer.ver.max();
-    final proposalLatestQuery = selectOnly(latestVer)
-      ..where(latestVer.type.equals(DocumentType.proposalDocument.uuid))
-      ..addColumns([latestVer.id, maxVer])
-      ..groupBy([latestVer.id]);
-    final proposalLatestSubquery = Subquery(proposalLatestQuery, 'proposalLatest');
+    // Subquery: Groups by id to find max ver (latest) for proposals.
+    final maxProposalVer = latestProposalVerTable.ver.max();
+    final latestProposalQuery = selectOnly(latestProposalVerTable)
+      ..where(latestProposalVerTable.type.equalsValue(DocumentType.proposalDocument))
+      ..addColumns([latestProposalVerTable.id, maxProposalVer])
+      ..groupBy([latestProposalVerTable.id]);
+    final latestProposalSubquery = Subquery(latestProposalQuery, 'latestProposal');
 
-    SimpleSelectStatement<DocumentsV2, DocumentEntityV2> hiddenCheckSubquery(String name) {
-      final subActions = alias(documentsV2, name);
-
-      final maxVerSubquery = subqueryExpression<String>(
-        selectOnly(subActions)
-          ..addColumns([subActions.ver.max()])
-          ..where(subActions.type.equals(DocumentType.proposalActionDocument.uuid))
-          ..where(subActions.refId.equalsExp(proposals.id)),
-      );
-
-      return select(subActions)
-        ..where((tbl) => tbl.type.equals(DocumentType.proposalActionDocument.uuid))
-        ..where((tbl) => tbl.refId.equalsExp(proposals.id))
-        ..where((tbl) => tbl.ver.equalsExp(maxVerSubquery))
-        ..where((tbl) => tbl.content.jsonExtract<String>(r'$.action').equals('hide'))
-        ..limit(1);
-    }
-
+    // Main paginated query: Latest proposals, filtered by non-hidden.
     final proposalsQuery =
-        select(proposals).join([
+        select(proposalTable).join([
             innerJoin(
-              proposalLatestSubquery,
+              latestProposalSubquery,
               Expression.and([
-                proposalLatestSubquery.ref(latestVer.id).equalsExp(proposals.id),
-                proposalLatestSubquery.ref(maxVer).equalsExp(proposals.ver),
+                latestProposalSubquery.ref(latestProposalVerTable.id).equalsExp(proposalTable.id),
+                latestProposalSubquery.ref(maxProposalVer).equalsExp(proposalTable.ver),
               ]),
               useColumns: false,
             ),
           ])
-          ..where(proposals.type.equalsValue(DocumentType.proposalDocument))
-          ..where(existsQuery(hiddenCheckSubquery('hidden_check')).not())
-          ..orderBy([OrderingTerm.desc(proposals.ver)])
+          ..where(proposalTable.type.equalsValue(DocumentType.proposalDocument))
+          ..where(existsQuery(_hiddenCheckSubquery('hidden_check', proposalTable)).not())
+          ..orderBy([OrderingTerm.desc(proposalTable.ver)])
           ..limit(effectiveSize, offset: effectivePage * effectiveSize);
 
     final items = await proposalsQuery.map((row) {
-      final proposal = row.readTable(proposals);
+      final proposal = row.readTable(proposalTable);
 
       return JoinedProposalBriefEntity(proposal: proposal);
     }).get();
 
-    // Separate total count
-    final proposalsTotal = alias(documentsV2, 'proposals');
-    final totalQuery = selectOnly(proposalsTotal)
-      // TODO(damian-molinski): Maybe bring it back later
-      /* ..join([
-        innerJoin(
-          proposalLatestSubquery,
-          Expression.and([
-            proposalLatestSubquery.ref(latestVer.id).equalsExp(proposalsTotal.id),
-            proposalLatestSubquery.ref(maxVer).equalsExp(proposalsTotal.ver),
-          ]),
-          useColumns: false,
-        ),
-      ])*/
-      ..where(proposalsTotal.type.equals(DocumentType.proposalDocument.uuid))
-      ..where(existsQuery(hiddenCheckSubquery('total_hidden_check')).not())
-      ..addColumns([proposalsTotal.id.count(distinct: true)]);
+    // Total count query: Mirror the main query for distinct non-hidden latest proposal IDs.
+    final totalProposalTable = alias(documentsV2, 'proposals');
+    final totalExpr = totalProposalTable.id.count(distinct: true);
+    final totalQuery = selectOnly(totalProposalTable)
+      ..where(totalProposalTable.type.equalsValue(DocumentType.proposalDocument))
+      ..where(existsQuery(_hiddenCheckSubquery('total_hidden_check', totalProposalTable)).not())
+      ..addColumns([totalExpr]);
 
-    final total = await totalQuery
-        .map((row) => row.read(proposalsTotal.id.count(distinct: true)) ?? 0)
-        .getSingle();
+    final total = await totalQuery.map((row) => row.read(totalExpr) ?? 0).getSingle();
 
     return Page(
       items: items,
@@ -126,6 +99,28 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       page: effectivePage,
       maxPerPage: effectiveSize,
     );
+  }
+
+  /// Extracted helper: Reusable correlated subquery for "exists latest hide action".
+  SimpleSelectStatement<DocumentsV2, DocumentEntityV2> _hiddenCheckSubquery(
+    String name,
+    $DocumentsV2Table outerTable,
+  ) {
+    final subActions = alias(documentsV2, name);
+
+    final maxVerSubquery = subqueryExpression<String>(
+      selectOnly(subActions)
+        ..addColumns([subActions.ver.max()])
+        ..where(subActions.type.equals(DocumentType.proposalActionDocument.uuid))
+        ..where(subActions.refId.equalsExp(outerTable.id)),
+    );
+
+    return select(subActions)
+      ..where((tbl) => tbl.type.equals(DocumentType.proposalActionDocument.uuid))
+      ..where((tbl) => tbl.refId.equalsExp(outerTable.id))
+      ..where((tbl) => tbl.ver.equalsExp(maxVerSubquery))
+      ..where((tbl) => tbl.content.jsonExtract<String>(r'$.action').equals('hide'))
+      ..limit(1);
   }
 }
 
