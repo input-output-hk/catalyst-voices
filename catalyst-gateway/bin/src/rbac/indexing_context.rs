@@ -175,6 +175,7 @@ impl RbacBlockIndexingContext {
         self.registrations.get(id).map(Vec::as_slice)
     }
 
+    /// Sets `is_persistent`.
     pub fn set_persistent(
         &mut self,
         value: bool,

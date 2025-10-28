@@ -16,7 +16,7 @@ workspace = true
 
 [dependencies]
 cardano-chain-follower = { version = "0.0.17", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "cardano-chain-follower/v0.0.17" }
-rbac-registration = { version = "0.0.13", git = "https://github.com/input-output-hk/catalyst-libs.git", rev = "90eeb733981beac81f2f47d823edccf1396707f4" }
+rbac-registration = { version = "0.0.13", git = "https://github.com/input-output-hk/catalyst-libs.git", rev = "95af33a685341bcb69993677c361253f2b9c404e" }
 catalyst-signed-doc = { version = "0.0.9", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc/v0.0.9" }
 catalyst-signed-doc-v1 = { package = "catalyst-signed-doc", version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "catalyst-signed-doc/v.0.0.4" }
 c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "c509-certificate-v0.0.3" }

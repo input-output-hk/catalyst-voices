@@ -131,19 +131,26 @@ impl Rbac509InsertQuery {
         let txn_id = cip509.txn_hash();
         let origin = cip509.origin().clone();
         let purpose = cip509.purpose();
+        let previous_txn = cip509.previous_transaction();
 
         context.set_persistent(block.is_immutable());
-
-        let previous_txn = cip509.previous_transaction();
 
         match RegistrationChain::update_from_previous_txn(cip509, context).await {
             // Write updates to the database. There can be multiple updates in one registration
             // because a new chain can take ownership of stake addresses of the existing chains and
             // in that case we want to record changes to all those chains as well as the new one.
-            Ok(chain) => {
+            Ok((chain, modified_chains)) => {
                 let catalyst_id = chain.catalyst_id();
                 let stake_addresses = chain.stake_addresses();
-                // public_keys,
+                let public_keys: HashSet<_> = chain
+                    .role_data_history()
+                    .keys()
+                    .filter_map(|role| {
+                        chain
+                            .get_latest_signing_pk_for_role(role)
+                            .map(|(key, _)| key)
+                    })
+                    .collect();
                 // modified_chains,
 
                 if let Some(previous_txn) = previous_txn {
@@ -183,7 +190,7 @@ impl Rbac509InsertQuery {
 
                     // This cache must be updated because these addresses previously belonged to
                     // other chains.
-                    for (catalyst_id, addresses) in modified_chains {
+                    for (catalyst_id, addresses) in &modified_chains {
                         for address in addresses {
                             cache_stake_address(
                                 block.is_immutable(),
