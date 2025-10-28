@@ -1,0 +1,1 @@
+enum CatalystDatabaseLanguage { dsl, raw }
