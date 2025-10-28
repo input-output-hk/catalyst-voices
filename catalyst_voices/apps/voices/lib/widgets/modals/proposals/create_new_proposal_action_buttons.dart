@@ -28,24 +28,29 @@ class CreateNewProposalActionButtons extends StatelessWidget {
             color: context.colors.outlineBorderVariant,
           ),
         ),
+        color: context.colors.elevationsOnSurfaceNeutralLv1White,
       ),
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
       child: switch (step) {
         CreateProposalWithPreselectedCategoryStep() => const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          spacing: 8,
           children: [
-            _AgreementCheckboxes(),
+            Flexible(
+              child: _AgreementCheckboxes(),
+            ),
             _StartProposalButton(),
           ],
         ),
         CreateProposalWithoutPreselectedCategoryStep(:final stage)
             when stage == CreateProposalStage.selectCategory =>
           const Row(
+            spacing: 8,
             children: [
-              _AgreementCheckboxes(),
-              Spacer(),
+              Flexible(
+                child: _AgreementCheckboxes(),
+              ),
               _BackButton(),
-              SizedBox(width: 8),
               _StartProposalButton(),
             ],
           ),
