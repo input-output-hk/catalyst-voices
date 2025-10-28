@@ -40,6 +40,8 @@ pub struct RbacBlockIndexingContext {
     /// A map containing pending data that will be written in the `rbac_registration`
     /// table.
     registrations: HashMap<CatalystId, Vec<RbacQuery>>,
+    /// Indicates whether the provider should fetch data from persistent storage.
+    is_persistent: bool,
 }
 
 impl RbacBlockIndexingContext {
@@ -55,6 +57,7 @@ impl RbacBlockIndexingContext {
             addresses,
             public_keys,
             registrations,
+            is_persistent: false,
         }
     }
 
@@ -171,15 +174,21 @@ impl RbacBlockIndexingContext {
     ) -> Option<&[RbacQuery]> {
         self.registrations.get(id).map(Vec::as_slice)
     }
+
+    pub fn set_persistent(
+        &mut self,
+        value: bool,
+    ) {
+        self.is_persistent = value;
+    }
 }
 
 impl RbacRegistrationProvider for RbacBlockIndexingContext {
     async fn chain(
         &self,
         id: CatalystId,
-        is_persistent: bool,
     ) -> anyhow::Result<Option<rbac_registration::registration::cardano::RegistrationChain>> {
-        let chain = if is_persistent {
+        let chain = if self.is_persistent {
             persistent_rbac_chain(&id).await?
         } else {
             latest_rbac_chain(&id).await?.map(|i| i.chain)
@@ -200,7 +209,6 @@ impl RbacRegistrationProvider for RbacBlockIndexingContext {
     async fn catalyst_id_from_txn_id(
         &self,
         txn_id: TransactionId,
-        is_persistent: bool,
     ) -> anyhow::Result<Option<CatalystId>> {
         use crate::db::index::queries::rbac::get_catalyst_id_from_transaction_id::Query;
 
@@ -217,7 +225,7 @@ impl RbacRegistrationProvider for RbacBlockIndexingContext {
         }
 
         // Conditionally check the volatile database.
-        if !is_persistent {
+        if !self.is_persistent {
             let session =
                 CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
             return Query::get(&session, txn_id).await;
@@ -229,7 +237,6 @@ impl RbacRegistrationProvider for RbacBlockIndexingContext {
     async fn catalyst_id_from_stake_address(
         &self,
         address: &StakeAddress,
-        is_persistent: bool,
     ) -> anyhow::Result<Option<CatalystId>> {
         use crate::db::index::queries::rbac::get_catalyst_id_from_stake_address::Query;
 
@@ -246,7 +253,7 @@ impl RbacRegistrationProvider for RbacBlockIndexingContext {
         }
 
         // Conditionally check the volatile database.
-        if !is_persistent {
+        if !self.is_persistent {
             let session =
                 CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
             return Query::latest(&session, address).await;
@@ -258,7 +265,6 @@ impl RbacRegistrationProvider for RbacBlockIndexingContext {
     async fn catalyst_id_from_public_key(
         &self,
         key: VerifyingKey,
-        is_persistent: bool,
     ) -> anyhow::Result<Option<CatalystId>> {
         use crate::db::index::queries::rbac::get_catalyst_id_from_public_key::Query;
 
@@ -275,7 +281,7 @@ impl RbacRegistrationProvider for RbacBlockIndexingContext {
         }
 
         // Conditionally check the volatile database.
-        if !is_persistent {
+        if !self.is_persistent {
             let session =
                 CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
             return Query::get(&session, key).await;
@@ -287,7 +293,6 @@ impl RbacRegistrationProvider for RbacBlockIndexingContext {
     async fn is_chain_known(
         &self,
         id: CatalystId,
-        is_persistent: bool,
     ) -> anyhow::Result<bool> {
         if self.find_registrations(&id).is_some() {
             return Ok(true);
@@ -307,7 +312,7 @@ impl RbacRegistrationProvider for RbacBlockIndexingContext {
         }
 
         // Conditionally check the volatile database.
-        if !is_persistent {
+        if !self.is_persistent {
             let session =
                 CassandraSession::get(false).context("Failed to get Cassandra volatile session")?;
             if is_cat_id_known(&session, &id).await? {
