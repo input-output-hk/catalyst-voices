@@ -166,7 +166,7 @@ class _ReviewerCard extends StatelessWidget {
               ),
               BlocSelector<DiscoveryCubit, DiscoveryState, DateRange?>(
                 selector: (state) {
-                  return state.campaign.votingStartsAt;
+                  return state.campaign.reviewStartsAt;
                 },
                 builder: (context, date) {
                   return _DatetimeRangeTimeline(
