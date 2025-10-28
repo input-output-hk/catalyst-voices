@@ -85,9 +85,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       emit(state.copyWith(isLoading: true));
 
       final proposal = await _proposalService.getProposalDetail(ref: ref);
-      final category = await _campaignService.getCategory(
-        proposal.document.metadata.parameters,
-      );
+      final category = await _campaignService.getCategory(proposal.document.metadata.parameters);
       final commentTemplate = await _commentService.getCommentTemplateFor(
         category: category.selfRef,
       );

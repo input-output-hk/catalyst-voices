@@ -98,6 +98,7 @@ void main() {
 
       expect(currentAccount?.catalystId, account.catalystId);
       expect(currentAccount?.isActive, isTrue);
+      expect(service.activeAccountId, equals(account.catalystId));
     });
 
     test('when using a new account with the same catalystId '
@@ -129,6 +130,7 @@ void main() {
 
       expect(currentAccount, equals(newAccount));
       expect(currentAccount, isNot(oldAccount));
+      expect(service.activeAccountId, equals(newAccount.catalystId));
     });
 
     test('using different account emits update in stream', () async {
