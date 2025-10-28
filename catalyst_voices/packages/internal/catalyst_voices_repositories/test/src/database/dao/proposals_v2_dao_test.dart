@@ -284,6 +284,61 @@ void main() {
         expect(result.items[0].proposal.id, 'p2');
         expect(result.items[1].proposal.id, 'p1');
       });
+
+      test(
+        'excludes hidden proposals based on latest version only, '
+        'fails without latestProposalSubquery join',
+        () async {
+          // Given: Multiple versions for one proposal, with hide action on latest version only.
+          final earliest = DateTime(2025, 2, 5, 5, 23, 27);
+          final middle = DateTime(2025, 2, 5, 5, 25, 33);
+          final latest = DateTime(2025, 8, 11, 11, 20, 18);
+
+          // Proposal A: Old version (visible, no hide action for this ver).
+          final proposalAOldVer = _buildUuidV7At(earliest);
+          final proposalAOld = _createTestDocumentEntity(
+            id: 'proposal-a',
+            ver: proposalAOldVer,
+          );
+
+          // Proposal A: Latest version (hidden, with hide action for this ver).
+          final proposalALatestVer = _buildUuidV7At(latest);
+          final proposalALatest = _createTestDocumentEntity(
+            id: 'proposal-a',
+            ver: proposalALatestVer,
+          );
+
+          // Hide action for latest version only (refVer = latestVer, ver after latest proposal).
+          final actionHideVer = _buildUuidV7At(latest.add(const Duration(seconds: 1)));
+          final actionHide = _createTestDocumentEntity(
+            id: 'action-hide',
+            ver: actionHideVer,
+            type: DocumentType.proposalActionDocument,
+            refId: 'proposal-a',
+            refVer: proposalALatestVer,
+            // Specific to latest ver.
+            contentData: ProposalSubmissionActionDto.hide.toJson(),
+          );
+
+          // Proposal B: Single version, visible (no action).
+          final proposalBVer = _buildUuidV7At(middle);
+          final proposalB = _createTestDocumentEntity(
+            id: 'proposal-b',
+            ver: proposalBVer,
+          );
+
+          await db.documentsV2Dao.saveAll([proposalAOld, proposalALatest, actionHide, proposalB]);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then: With join, latest A is hidden → exclude A, total =1 (B only), items =1 (B).
+          expect(result.total, 1);
+          expect(result.items.length, 1);
+          expect(result.items[0].proposal.id, 'proposal-b');
+        },
+      );
     });
   });
 }

@@ -87,12 +87,8 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
               useColumns: false,
             ),
           ])
-          ..where(
-            Expression.and([
-              proposals.type.equalsValue(DocumentType.proposalDocument),
-              existsQuery(hiddenCheckSubquery('hidden_check')).not(),
-            ]),
-          )
+          ..where(proposals.type.equalsValue(DocumentType.proposalDocument))
+          ..where(existsQuery(hiddenCheckSubquery('hidden_check')).not())
           ..orderBy([OrderingTerm.desc(proposals.ver)])
           ..limit(effectiveSize, offset: effectivePage * effectiveSize);
 
@@ -105,7 +101,8 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     // Separate total count
     final proposalsTotal = alias(documentsV2, 'proposals');
     final totalQuery = selectOnly(proposalsTotal)
-      ..join([
+      // TODO(damian-molinski): Maybe bring it back later
+      /* ..join([
         innerJoin(
           proposalLatestSubquery,
           Expression.and([
@@ -114,7 +111,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
           ]),
           useColumns: false,
         ),
-      ])
+      ])*/
       ..where(proposalsTotal.type.equals(DocumentType.proposalDocument.uuid))
       ..where(existsQuery(hiddenCheckSubquery('total_hidden_check')).not())
       ..addColumns([proposalsTotal.id.count(distinct: true)]);
