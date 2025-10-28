@@ -399,7 +399,7 @@ async fn make_session(cfg: &cassandra_db::EnvVars) -> anyhow::Result<Arc<Session
 /// Display reasonable logs to help diagnose DB connection issues.
 async fn retry_init(
     cfg: cassandra_db::EnvVars,
-    network: Network,
+    network: &Network,
     persistent: bool,
 ) {
     let mut retry_delay = Duration::from_secs(0);

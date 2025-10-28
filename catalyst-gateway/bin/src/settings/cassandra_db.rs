@@ -102,7 +102,7 @@ impl EnvVars {
     pub(crate) fn log(
         &self,
         persistent: bool,
-        network: Network,
+        network: &Network,
     ) {
         let db_type = if persistent { "Persistent" } else { "Volatile" };
 
