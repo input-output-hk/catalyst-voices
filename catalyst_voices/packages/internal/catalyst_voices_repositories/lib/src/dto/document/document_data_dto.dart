@@ -215,7 +215,7 @@ final class DocumentDataMetadataDto {
       return json;
     } else {
       final modified = Map.of(json);
-      json['contentType'] = DocumentContentType.toJson(DocumentContentType.json);
+      modified['contentType'] = DocumentContentType.toJson(DocumentContentType.json);
       return modified;
     }
   }

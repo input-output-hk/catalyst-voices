@@ -43,6 +43,7 @@ final class ProposalBuilderMetadata extends Equatable {
     documentRef,
     originalDocumentRef,
     templateRef,
+    parameters,
     versions,
     fromActiveCampaign,
   ];

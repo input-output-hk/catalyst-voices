@@ -66,6 +66,35 @@ void main() {
           equals(DocumentParameters({brandRef, campaignRef, categoryRef})),
         );
       });
+
+      test('content type migration works as expected', () {
+        // Given
+        final selfRef = DocumentRefFactory.signedDocumentRef();
+        final categoryRef = DocumentRefFactory.signedDocumentRef();
+
+        final oldJson = <String, dynamic>{
+          'type': DocumentType.proposalDocument.uuid,
+          'selfRef': {
+            'id': selfRef.id,
+            'version': selfRef.version,
+            'type': 'signed',
+          },
+          'parameters': [
+            {
+              'id': categoryRef.id,
+              'version': categoryRef.version,
+              'type': 'signed',
+            },
+          ],
+        };
+
+        // When
+        final dto = DocumentDataMetadataDto.fromJson(oldJson);
+        final model = dto.toModel();
+
+        // Then
+        expect(model.contentType, equals(DocumentContentType.json));
+      });
     });
   });
 }
