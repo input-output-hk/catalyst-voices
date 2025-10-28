@@ -470,9 +470,9 @@
                         },
                         "openSourceInformation": {
                             "$ref": "#/definitions/multiLineTextEntry",
-                            "title": "Please provide here more information on the open source status of your project outputs",
+                            "title": "Please provide details on the intellectual property (IP) status of your project outputs, including whether they will be released as open source or retained under another licence.",
                             "description": "Please provide here more information on the open source status of your project outputs",
-                            "x-placeholder": "Describe the open source status of your project and the license type",
+                            "x-placeholder": "If applicable, describe the IP  status of your project and the license type",
                             "maxLength": 500,
                             "x-guidance": "Open source licenses ensure intellectual property (IP) (such as source code) remains publicly accessible and licensed in a way that allows anyone to use, modify, and share the IP freely, typically under licenses approved by the Open Source Initiative.\n\nProprietary IP (such as source code) is not publicly available and the rights to use, modify, or redistribute the proprietary IP are restricted and typically reserved by the IP's owner.\n\nhttps://opensource.org/licenses"
                         }
