@@ -171,22 +171,76 @@ mod tests {
 
     use super::*;
 
+    /// A convinient function to prepare an SQL queries to insert a hardcoded data into
+    /// the `event-db`.
+    #[allow(clippy::indexing_slicing)]
+    fn process_docs<'a, I: Iterator<Item = &'a CatalystSignedDocument>>(
+        w: &mut impl std::io::Write,
+        mut docs_iter: std::iter::Peekable<I>,
+    ) -> anyhow::Result<()> {
+        const INSERT_STMT: &str = "INSERT INTO signed_docs (\n  id,\n  ver,\n  type,\n  authors,\n  metadata,\n  payload,\n  raw\n)\nVALUES";
+        writeln!(w, "{INSERT_STMT}").unwrap();
+
+        while let Some(doc) = docs_iter.next() {
+            let mut metadata = serde_json::json!({
+                "id": doc.doc_id()?,
+                "ver": doc.doc_ver()?,
+                "type": doc.doc_type()?,
+                "content-type": doc.doc_content_type()?.to_string(),
+                "content-encoding": doc.doc_content_encoding().ok_or(anyhow::anyhow!("missing content-encoding field"))?.to_string(),
+            });
+            if let Some(parameters) = doc.doc_meta().parameters() {
+                metadata["parameters"] = serde_json::json!([
+                    {
+                        "id": parameters.id,
+                        "ver": parameters.ver,
+                        "cid": "0x",
+                    }
+                ]);
+            }
+
+            write!(
+                w,
+                "(\n  '{id}',\n  '{ver}',\n  '{type}',\n  [{authors}],\n  '{metadata}',\n  '{payload}',\n  DECODE('{raw}')\n)",
+                id = doc.doc_id()?,
+                ver = doc.doc_ver()?,
+                r#type = doc.doc_type()?,
+                authors = doc
+                    .authors()
+                    .iter()
+                    .map(|v| format!("'{v}'"))
+                    .collect::<Vec<_>>()
+                    .join(","),
+                payload = serde_json::from_slice::<serde_json::Value>(doc.doc_content().decoded_bytes()?)?,
+                raw = hex::encode(minicbor::to_vec(doc)?)
+            )?;
+            if docs_iter.peek().is_some() {
+                // If so, we are NOT at the last item, so write ","
+                writeln!(w, ",")?;
+            }
+        }
+        write!(w, ";")?;
+        Ok(())
+    }
+
     #[test]
     fn templates() {
         let mut rand = OsRng;
         let sk_bytes: SigningKey = SigningKey::generate(&mut rand);
         let sk_hex = format!("0x{}", hex::encode(sk_bytes.to_bytes()).as_str());
+        println!("sk: {sk_hex}");
         unsafe {
             env::set_var("SIGNED_DOC_SK", sk_hex);
         }
-        for doc in F14_TEMPLATES
-            .as_ref()
-            .unwrap()
-            .values()
-            .chain(F15_TEMPLATES.as_ref().unwrap().values())
-        {
-            println!("{:?}", doc.doc_meta());
-            assert!(!doc.problem_report().is_problematic());
-        }
+        process_docs(
+            &mut std::fs::File::create("f14.sql").unwrap(),
+            F14_TEMPLATES.as_ref().unwrap().values().peekable(),
+        )
+        .unwrap();
+        process_docs(
+            &mut std::fs::File::create("f15.sql").unwrap(),
+            F15_TEMPLATES.as_ref().unwrap().values().peekable(),
+        )
+        .unwrap();
     }
 }
