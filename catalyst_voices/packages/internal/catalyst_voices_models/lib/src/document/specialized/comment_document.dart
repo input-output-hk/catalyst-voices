@@ -18,28 +18,19 @@ final class CommentDocument extends Equatable {
 
   DocumentData toDocumentData({required DocumentMapper mapper}) {
     return DocumentData(
-      metadata: DocumentDataMetadata(
-        contentType: DocumentContentType.json,
-        type: DocumentType.commentDocument,
-        selfRef: metadata.selfRef,
-        ref: metadata.ref,
-        template: metadata.template,
-        reply: metadata.reply,
-        authors: [metadata.authorId],
-        parameters: metadata.parameters,
-      ),
+      metadata: metadata.toDocumentMetadata(),
       content: mapper.toContent(document),
     );
   }
 }
 
 final class CommentMetadata extends DocumentMetadata {
-  /// [ref] is document ref that this comment refers to. Comment can not
+  /// [proposalRef] is document ref that this comment refers to. Comment can not
   /// exist on its own but just in a context of other documents.
-  final SignedDocumentRef ref;
+  final SignedDocumentRef proposalRef;
 
-  /// against which [CommentDocument] is valid.
-  final SignedDocumentRef template;
+  /// Against which [CommentDocument] is valid.
+  final SignedDocumentRef commentTemplate;
 
   /// [reply] equals other comment of this is a reply to it.
   final SignedDocumentRef? reply;
@@ -51,12 +42,12 @@ final class CommentMetadata extends DocumentMetadata {
     // Note. no drafts for comments
     required SignedDocumentRef super.selfRef,
     required super.parameters,
-    required this.ref,
-    required this.template,
+    required this.proposalRef,
+    required this.commentTemplate,
     this.reply,
     required this.authorId,
   }) : assert(
-         ref.isExact,
+         proposalRef.isExact,
          'Comments can refer only exact documents',
        );
 
@@ -64,12 +55,23 @@ final class CommentMetadata extends DocumentMetadata {
   List<Object?> get props =>
       super.props +
       [
-        ref,
-        template,
+        proposalRef,
+        commentTemplate,
         reply,
         authorId,
       ];
 
   @override
   SignedDocumentRef get selfRef => super.selfRef as SignedDocumentRef;
+
+  DocumentDataMetadata toDocumentMetadata() {
+    return DocumentDataMetadata.comment(
+      selfRef: selfRef,
+      proposalRef: proposalRef,
+      template: commentTemplate,
+      reply: reply,
+      authors: [authorId],
+      parameters: parameters,
+    );
+  }
 }

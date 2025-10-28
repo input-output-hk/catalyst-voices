@@ -33,6 +33,7 @@ final class DocumentDataMetadata extends Equatable {
   /// List of authors represented by CatalystId
   final List<CatalystId>? authors;
 
+  /// The default constructor for the [DocumentDataMetadata].
   DocumentDataMetadata({
     required this.contentType,
     required this.type,
@@ -47,6 +48,80 @@ final class DocumentDataMetadata extends Equatable {
          selfRef.isExact,
          'selfRef have to be exact. Make sure version is not null',
        );
+
+  /// Creates a [DocumentDataMetadata] representing a [DocumentType.commentDocument].
+  ///
+  /// The [parameters] should be the ones assigned to the [proposalRef].
+  factory DocumentDataMetadata.comment({
+    required SignedDocumentRef selfRef,
+    required SignedDocumentRef proposalRef,
+    required SignedDocumentRef template,
+    required DocumentParameters parameters,
+    required List<CatalystId> authors,
+    SignedDocumentRef? reply,
+  }) {
+    return DocumentDataMetadata(
+      contentType: DocumentContentType.json,
+      type: DocumentType.commentDocument,
+      selfRef: selfRef,
+      ref: proposalRef,
+      template: template,
+      reply: reply,
+      parameters: parameters,
+      authors: authors,
+    );
+  }
+
+  /// Creates a [DocumentDataMetadata] representing a [DocumentType.proposalDocument].
+  ///
+  /// The [parameters] should be the ones assigned to the [template].
+  factory DocumentDataMetadata.proposal({
+    required DocumentRef selfRef,
+    required SignedDocumentRef template,
+    required DocumentParameters parameters,
+    required List<CatalystId> authors,
+  }) {
+    return DocumentDataMetadata(
+      type: DocumentType.proposalDocument,
+      contentType: DocumentContentType.json,
+      selfRef: selfRef,
+      template: template,
+      parameters: parameters,
+      authors: authors,
+    );
+  }
+
+  /// Creates a [DocumentDataMetadata] representing a [DocumentType.proposalActionDocument].
+  ///
+  /// The [parameters] should be the ones assigned to the [proposalRef].
+  factory DocumentDataMetadata.proposalAction({
+    required SignedDocumentRef selfRef,
+    required SignedDocumentRef proposalRef,
+    required DocumentParameters parameters,
+  }) {
+    return DocumentDataMetadata(
+      type: DocumentType.proposalActionDocument,
+      contentType: DocumentContentType.json,
+      selfRef: selfRef,
+      ref: proposalRef,
+      parameters: parameters,
+    );
+  }
+
+  /// Creates a [DocumentDataMetadata] representing a [DocumentType.proposalTemplate].
+  ///
+  /// The [parameters] should be the ones assigned to template's parent, most likely the category.
+  factory DocumentDataMetadata.proposalTemplate({
+    required DocumentRef selfRef,
+    required DocumentParameters parameters,
+  }) {
+    return DocumentDataMetadata(
+      type: DocumentType.proposalTemplate,
+      contentType: DocumentContentType.json,
+      selfRef: selfRef,
+      parameters: parameters,
+    );
+  }
 
   String get id => selfRef.id;
 

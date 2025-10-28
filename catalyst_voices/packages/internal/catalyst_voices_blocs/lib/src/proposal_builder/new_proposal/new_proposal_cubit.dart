@@ -57,8 +57,8 @@ class NewProposalCubit extends Cubit<NewProposalState>
 
       return await _proposalService.createDraftProposal(
         content: documentContent,
-        template: templateRef,
-        categoryRef: categoryRef,
+        templateRef: templateRef,
+        parameters: template.metadata.parameters,
       );
     } catch (error, stackTrace) {
       _logger.severe('Create draft', error, stackTrace);

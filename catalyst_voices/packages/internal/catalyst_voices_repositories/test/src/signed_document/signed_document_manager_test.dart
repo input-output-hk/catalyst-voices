@@ -71,11 +71,11 @@ final _catalystId = CatalystId(
 
 final _categoryRef = DocumentRefFactory.signedDocumentRef();
 
-final _metadata = DocumentDataMetadata(
-  contentType: DocumentContentType.json,
-  type: DocumentType.proposalDocument,
+final _metadata = DocumentDataMetadata.proposal(
   selfRef: DocumentRefFactory.signedDocumentRef(),
   parameters: DocumentParameters({_categoryRef}),
+  template: DocumentRefFactory.signedDocumentRef(),
+  authors: [_catalystId],
 );
 
 final _privateKey = _FakeCatalystPrivateKey(bytes: _privateKeyBytes);

@@ -146,9 +146,7 @@ void main() {
           final documentsWithMetadata = <DocumentEntityWithMetadata>[
             DocumentWithMetadataFactory.build(
               content: const DocumentDataContent({'title': 'D'}),
-              metadata: DocumentDataMetadata(
-                contentType: DocumentContentType.json,
-                type: DocumentType.proposalDocument,
+              metadata: _buildProposalMetadata(
                 selfRef: SignedDocumentRef(
                   id: id,
                   version: firstVersionId,
@@ -157,9 +155,7 @@ void main() {
             ),
             DocumentWithMetadataFactory.build(
               content: secondContent,
-              metadata: DocumentDataMetadata(
-                contentType: DocumentContentType.json,
-                type: DocumentType.proposalDocument,
+              metadata: _buildProposalMetadata(
                 selfRef: SignedDocumentRef(
                   id: id,
                   version: secondVersionId,
@@ -214,11 +210,7 @@ void main() {
 
           final documentsWithMetadata = refs.map((ref) {
             return DocumentWithMetadataFactory.build(
-              metadata: DocumentDataMetadata(
-                contentType: DocumentContentType.json,
-                type: DocumentType.proposalDocument,
-                selfRef: ref,
-              ),
+              metadata: _buildProposalMetadata(selfRef: ref),
             );
           });
           final typedRefs = refs.map((e) => e.toTyped(DocumentType.proposalDocument)).toList();
@@ -245,16 +237,12 @@ void main() {
           final version2 = DocumentRefFactory.randomUuidV7();
 
           final document = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalDocument,
+            metadata: _buildProposalMetadata(
               selfRef: SignedDocumentRef(id: id, version: version),
             ),
           );
           final document2 = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalDocument,
+            metadata: _buildProposalMetadata(
               selfRef: SignedDocumentRef(id: id, version: version2),
             ),
           );
@@ -342,9 +330,7 @@ void main() {
           final v2 = DocumentRefFactory.randomUuidV7();
 
           final documentsWithMetadata = [v1, v2].map((version) {
-            final metadata = DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalDocument,
+            final metadata = _buildProposalMetadata(
               selfRef: SignedDocumentRef(
                 id: id,
                 version: version,
@@ -386,9 +372,7 @@ void main() {
           final v2 = DocumentRefFactory.randomUuidV7();
 
           final documentsWithMetadata = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalDocument,
+            metadata: _buildProposalMetadata(
               selfRef: SignedDocumentRef(
                 id: id,
                 version: v1,
@@ -397,9 +381,7 @@ void main() {
           );
 
           final newVersion = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalDocument,
+            metadata: _buildProposalMetadata(
               selfRef: SignedDocumentRef(
                 id: id,
                 version: v2,
@@ -440,9 +422,7 @@ void main() {
           final v2 = DocumentRefFactory.randomUuidV7();
 
           final document1 = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalDocument,
+            metadata: _buildProposalMetadata(
               selfRef: SignedDocumentRef(
                 id: id1,
                 version: v1,
@@ -451,9 +431,7 @@ void main() {
           );
 
           final document2 = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalDocument,
+            metadata: _buildProposalMetadata(
               selfRef: SignedDocumentRef(
                 id: id2,
                 version: v2,
@@ -491,19 +469,13 @@ void main() {
           final updatedId = originalId.copyWith(username: const Optional('dev'));
 
           final document1 = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.signedDocumentRef(),
+            metadata: _buildProposalMetadata(
               authors: [originalId],
             ),
           );
 
           final document2 = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.signedDocumentRef(),
+            metadata: _buildProposalMetadata(
               authors: [updatedId],
             ),
           );
@@ -538,18 +510,14 @@ void main() {
         'queryRefToDocumentData returns correct document',
         () async {
           final document1 = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.signedDocumentRef(),
-            ),
+            metadata: _buildProposalMetadata(),
           );
           final document2 = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.signedDocumentRef(),
-              ref: document1.document.metadata.selfRef,
+            metadata: _buildCommentMetadata(
+              proposalRef: document1.document.metadata.selfRef as SignedDocumentRef,
+              parameters: document1.document.metadata.parameters,
+              authors: [_catalystId],
+              template: _commentTemplateRef,
             ),
           );
 
@@ -573,31 +541,23 @@ void main() {
         () async {
           // Given
           final baseDocument = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalDocument,
-              selfRef: DocumentRefFactory.signedDocumentRef(),
-            ),
+            metadata: _buildProposalMetadata(),
           );
 
           final referencingDocument = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.commentTemplate,
+            metadata: _buildCommentMetadata(
               selfRef: DocumentRefFactory.signedDocumentRef(),
-              ref: baseDocument.document.metadata.selfRef,
+              proposalRef: baseDocument.document.metadata.selfRef as SignedDocumentRef,
             ),
           );
 
           final newerVersion = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.commentTemplate,
+            metadata: _buildCommentMetadata(
               selfRef: SignedDocumentRef(
                 id: referencingDocument.document.metadata.id,
                 version: DocumentRefFactory.randomUuidV7(),
               ),
-              ref: baseDocument.document.metadata.selfRef,
+              proposalRef: baseDocument.document.metadata.selfRef as SignedDocumentRef,
             ),
           );
 
@@ -690,9 +650,7 @@ void main() {
 
             final doc1 = DocumentWithMetadataFactory.build(
               content: content1,
-              metadata: DocumentDataMetadata(
-                contentType: DocumentContentType.json,
-                type: DocumentType.proposalDocument,
+              metadata: _buildProposalMetadata(
                 selfRef: ref1,
                 template: SignedDocumentRef(id: templateRef, version: templateRef),
               ),
@@ -700,9 +658,7 @@ void main() {
 
             final doc2 = DocumentWithMetadataFactory.build(
               content: content2,
-              metadata: DocumentDataMetadata(
-                contentType: DocumentContentType.json,
-                type: DocumentType.proposalDocument,
+              metadata: _buildProposalMetadata(
                 selfRef: ref2,
                 template: SignedDocumentRef(id: templateRef, version: templateRef),
               ),
@@ -763,9 +719,7 @@ void main() {
 
             final doc1 = DocumentWithMetadataFactory.build(
               content: content1,
-              metadata: DocumentDataMetadata(
-                contentType: DocumentContentType.json,
-                type: DocumentType.proposalDocument,
+              metadata: _buildProposalMetadata(
                 selfRef: ref1,
                 template: SignedDocumentRef(id: templateRef, version: templateRef),
               ),
@@ -846,9 +800,7 @@ void main() {
 
             final doc1 = DocumentWithMetadataFactory.build(
               content: content1,
-              metadata: DocumentDataMetadata(
-                contentType: DocumentContentType.json,
-                type: DocumentType.proposalDocument,
+              metadata: _buildProposalMetadata(
                 selfRef: ref1,
                 template: SignedDocumentRef(id: templateRef, version: templateRef),
               ),
@@ -856,9 +808,7 @@ void main() {
 
             final doc2 = DocumentWithMetadataFactory.build(
               content: content2,
-              metadata: DocumentDataMetadata(
-                contentType: DocumentContentType.json,
-                type: DocumentType.proposalDocument,
+              metadata: _buildProposalMetadata(
                 selfRef: ref2,
                 template: SignedDocumentRef(id: templateRef, version: templateRef),
               ),
@@ -895,9 +845,7 @@ void main() {
           final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
             20,
             (index) => DocumentWithMetadataFactory.build(
-              metadata: DocumentDataMetadata(
-                contentType: DocumentContentType.json,
-                type: DocumentType.proposalDocument,
+              metadata: _buildProposalMetadata(
                 selfRef: _buildRefAt(dateTime.add(Duration(seconds: index))),
               ),
             ),
@@ -922,9 +870,7 @@ void main() {
           final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
             2,
             (index) {
-              final metadata = DocumentDataMetadata(
-                contentType: DocumentContentType.json,
-                type: DocumentType.proposalDocument,
+              final metadata = _buildProposalMetadata(
                 selfRef: SignedDocumentRef(id: id, version: DocumentRefFactory.randomUuidV7()),
               );
               return DocumentWithMetadataFactory.build(metadata: metadata);
@@ -950,9 +896,7 @@ void main() {
           final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
             2,
             (index) {
-              final metadata = DocumentDataMetadata(
-                contentType: DocumentContentType.json,
-                type: DocumentType.proposalDocument,
+              final metadata = _buildProposalMetadata(
                 selfRef: SignedDocumentRef(id: id, version: DocumentRefFactory.randomUuidV7()),
               );
               return DocumentWithMetadataFactory.build(metadata: metadata);
@@ -981,9 +925,7 @@ void main() {
           final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
             2,
             (index) {
-              final metadata = DocumentDataMetadata(
-                contentType: DocumentContentType.json,
-                type: DocumentType.proposalDocument,
+              final metadata = _buildProposalMetadata(
                 selfRef: SignedDocumentRef(id: id, version: DocumentRefFactory.randomUuidV7()),
               );
               return DocumentWithMetadataFactory.build(metadata: metadata);
@@ -1011,11 +953,7 @@ void main() {
           final documentsWithMetadata = List<DocumentEntityWithMetadata>.generate(
             10,
             (index) {
-              final metadata = DocumentDataMetadata(
-                contentType: DocumentContentType.json,
-                type: DocumentType.proposalDocument,
-                selfRef: DocumentRefFactory.signedDocumentRef(),
-              );
+              final metadata = _buildProposalMetadata();
               return DocumentWithMetadataFactory.build(metadata: metadata);
             },
           );
@@ -1045,9 +983,7 @@ void main() {
             version: versionId,
           );
           final proposal = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalDocument,
+            metadata: _buildProposalMetadata(
               selfRef: proposalRef,
             ),
           );
@@ -1057,22 +993,18 @@ void main() {
           final comments = List.generate(
             10,
             (index) => DocumentWithMetadataFactory.build(
-              metadata: DocumentDataMetadata(
-                contentType: DocumentContentType.json,
-                type: DocumentType.commentTemplate,
+              metadata: _buildCommentMetadata(
                 selfRef: DocumentRefFactory.signedDocumentRef(),
-                ref: proposalRef,
+                proposalRef: proposalRef,
               ),
             ),
           );
           final otherComments = List.generate(
             5,
             (index) => DocumentWithMetadataFactory.build(
-              metadata: DocumentDataMetadata(
-                contentType: DocumentContentType.json,
-                type: DocumentType.commentTemplate,
+              metadata: _buildCommentMetadata(
                 selfRef: DocumentRefFactory.signedDocumentRef(),
-                ref: DocumentRefFactory.signedDocumentRef(),
+                proposalRef: DocumentRefFactory.signedDocumentRef(),
               ),
             ),
           );
@@ -1098,9 +1030,7 @@ void main() {
             version: versionId,
           );
           final proposal = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalDocument,
+            metadata: _buildProposalMetadata(
               selfRef: proposalRef,
             ),
           );
@@ -1111,14 +1041,11 @@ void main() {
             10,
             (index) {
               return DocumentWithMetadataFactory.build(
-                metadata: DocumentDataMetadata(
-                  contentType: DocumentContentType.json,
-                  type: DocumentType.proposalDocument,
+                metadata: _buildProposalMetadata(
                   selfRef: SignedDocumentRef(
                     id: proposalId,
                     version: DocumentRefFactory.randomUuidV7(),
                   ),
-                  ref: proposalRef,
                 ),
               );
             },
@@ -1147,9 +1074,7 @@ void main() {
             version: versionId,
           );
           final proposal = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalDocument,
+            metadata: _buildProposalMetadata(
               selfRef: proposalRef,
             ),
           );
@@ -1163,21 +1088,17 @@ void main() {
 
           final comments = List.generate(2, (index) {
             return DocumentWithMetadataFactory.build(
-              metadata: DocumentDataMetadata(
-                contentType: DocumentContentType.json,
-                type: DocumentType.commentTemplate,
+              metadata: _buildCommentMetadata(
                 selfRef: DocumentRefFactory.signedDocumentRef(),
-                ref: proposalRef,
+                proposalRef: proposalRef,
               ),
             );
           });
 
           final otherComment = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.commentTemplate,
+            metadata: _buildCommentMetadata(
               selfRef: DocumentRefFactory.signedDocumentRef(),
-              ref: proposalRef2,
+              proposalRef: proposalRef2,
             ),
           );
 
@@ -1256,17 +1177,11 @@ void main() {
         () async {
           // Given
           final template = DocumentWithMetadataFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalTemplate,
-              selfRef: DocumentRefFactory.signedDocumentRef(),
-            ),
+            metadata: _buildProposalMetadata(),
           );
 
           final localDraft = DraftFactory.build(
-            metadata: DocumentDataMetadata(
-              contentType: DocumentContentType.json,
-              type: DocumentType.proposalDocument,
+            metadata: _buildProposalMetadata(
               selfRef: DocumentRefFactory.draftRef(),
               template: template.document.metadata.selfRef as SignedDocumentRef,
             ),
@@ -1303,6 +1218,41 @@ void main() {
       );
     });
   });
+}
+
+final _catalystId = DummyCatalystIdFactory.create(username: 'john');
+final _categoryRef = DocumentRefFactory.signedDocumentRef();
+final _commentTemplateRef = DocumentRefFactory.signedDocumentRef();
+final _proposalTemplateRef = DocumentRefFactory.signedDocumentRef();
+
+DocumentDataMetadata _buildCommentMetadata({
+  SignedDocumentRef? selfRef,
+  SignedDocumentRef? proposalRef,
+  SignedDocumentRef? template,
+  DocumentParameters? parameters,
+  List<CatalystId>? authors,
+}) {
+  return DocumentDataMetadata.comment(
+    selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
+    proposalRef: proposalRef ?? DocumentRefFactory.signedDocumentRef(),
+    template: template ?? _commentTemplateRef,
+    parameters: parameters ?? DocumentParameters({_categoryRef}),
+    authors: authors ?? [_catalystId],
+  );
+}
+
+DocumentDataMetadata _buildProposalMetadata({
+  DocumentRef? selfRef,
+  SignedDocumentRef? template,
+  DocumentParameters? parameters,
+  List<CatalystId>? authors,
+}) {
+  return DocumentDataMetadata.proposal(
+    selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
+    template: template ?? _proposalTemplateRef,
+    parameters: parameters ?? DocumentParameters({_categoryRef}),
+    authors: authors ?? [_catalystId],
+  );
 }
 
 SignedDocumentRef _buildRefAt(DateTime dateTime) {

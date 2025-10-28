@@ -140,13 +140,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   }
 
   DocumentDataMetadata _buildDocumentMetadata([DocumentRef? selfRef]) {
-    final categoryRef = state.metadata.categoryRef;
-
-    return DocumentDataMetadata(
-      type: DocumentType.proposalDocument,
+    return DocumentDataMetadata.proposal(
       selfRef: selfRef ?? state.metadata.documentRef!,
-      template: state.metadata.templateRef,
-      parameters: DocumentParameters({?categoryRef}),
+      template: state.metadata.templateRef!,
+      parameters: state.metadata.parameters!,
+      authors: [_userService.activeAccountId],
     );
   }
 
@@ -351,14 +349,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     Emitter<ProposalBuilderState> emit,
   ) async {
     try {
-      final proposalRef = state.metadata.documentRef;
-      final categoryRef = state.metadata.categoryRef!;
-
       emit(state.copyWith(isChanging: true));
 
       await _proposalService.forgetProposal(
-        proposalRef: proposalRef! as SignedDocumentRef,
-        parameters: DocumentParameters({categoryRef}),
+        proposalRef: state.metadata.documentRef! as SignedDocumentRef,
+        proposalParameters: state.metadata.parameters!,
       );
       unawaited(_clearCache());
       emitSignal(const ForgotProposalSuccessBuilderSignal());
@@ -473,10 +468,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       final category = campaign.categories.first;
       final templateRef = category.proposalTemplateRef;
 
-      final proposalTemplate = await _proposalService.getProposalTemplate(
-        ref: templateRef,
-      );
-
+      final proposalTemplate = await _proposalService.getProposalTemplate(ref: templateRef);
+      final templateParameters = proposalTemplate.metadata.parameters;
       final documentBuilder = DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
 
       return _cacheAndCreateState(
@@ -484,7 +477,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         proposalBuilder: documentBuilder,
         proposalMetadata: ProposalBuilderMetadata.newDraft(
           templateRef: templateRef,
-          categoryRef: category.selfRef,
+          parameters: templateParameters,
         ),
         category: category,
       );
@@ -552,7 +545,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           documentRef: proposal.selfRef,
           originalDocumentRef: proposal.selfRef,
           templateRef: proposalData.document.metadata.templateRef,
-          categoryRef: category.selfRef,
+          parameters: proposalData.document.metadata.parameters,
           versions: versions,
           fromActiveCampaign: fromActiveCampaign,
         ),
@@ -571,10 +564,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     await _loadState(emit, () async {
       final category = await _campaignService.getCategory(DocumentParameters({categoryRef}));
       final templateRef = category.proposalTemplateRef;
-      final proposalTemplate = await _proposalService.getProposalTemplate(
-        ref: templateRef,
-      );
-
+      final proposalTemplate = await _proposalService.getProposalTemplate(ref: templateRef);
+      final templateParameters = proposalTemplate.metadata.parameters;
       final documentBuilder = DocumentBuilder.fromSchema(schema: proposalTemplate.schema);
 
       return _cacheAndCreateState(
@@ -582,7 +573,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         proposalBuilder: documentBuilder,
         proposalMetadata: ProposalBuilderMetadata.newDraft(
           templateRef: templateRef,
-          categoryRef: categoryRef,
+          parameters: templateParameters,
         ),
         category: category,
       );
@@ -747,7 +738,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     await _proposalService.submitProposalForReview(
       proposalRef: updatedRef,
-      proposalParameters: DocumentParameters({state.metadata.categoryRef!}),
+      proposalParameters: state.metadata.parameters!,
     );
 
     _updateMetadata(
@@ -1018,7 +1009,6 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     Emitter<ProposalBuilderState> emit,
   ) async {
     final originalProposalRef = state.metadata.originalDocumentRef;
-    final originalProposalCategoryRef = state.metadata.categoryRef;
     assert(
       originalProposalRef != null,
       'Proposal ref not found. Load document first!',
@@ -1038,10 +1028,10 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     final comment = CommentDocument(
       metadata: CommentMetadata(
         selfRef: commentRef,
-        ref: originalProposalRef! as SignedDocumentRef,
-        template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
+        proposalRef: originalProposalRef! as SignedDocumentRef,
+        commentTemplate: commentTemplate!.metadata.selfRef as SignedDocumentRef,
         reply: event.reply,
-        parameters: DocumentParameters({?originalProposalCategoryRef}),
+        parameters: state.metadata.parameters!,
         authorId: activeAccountId!,
       ),
       document: event.document,
@@ -1110,7 +1100,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   ) async {
     await _proposalService.submitProposalForReview(
       proposalRef: state.metadata.documentRef! as SignedDocumentRef,
-      proposalParameters: DocumentParameters({state.metadata.categoryRef!}),
+      proposalParameters: state.metadata.parameters!,
     );
 
     _updateMetadata(emit, publish: ProposalPublish.submittedProposal);
@@ -1123,16 +1113,16 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   ) async {
     try {
       final proposalRef = state.metadata.documentRef! as SignedDocumentRef;
-      final categoryRef = state.metadata.categoryRef!;
+      final parameters = state.metadata.parameters!;
       emit(state.copyWith(isChanging: true));
 
       await _proposalService.unlockProposal(
         proposalRef: proposalRef,
-        proposalParameters: DocumentParameters({categoryRef}),
+        proposalParameters: parameters,
       );
-      final stateMetadata = state.metadata.copyWith(publish: ProposalPublish.publishedDraft);
-      _cache = _cache.copyWith(proposalMetadata: Optional(stateMetadata));
-      emit(state.copyWith(metadata: stateMetadata, isChanging: false));
+      final updatedMetadata = state.metadata.copyWith(publish: ProposalPublish.publishedDraft);
+      _cache = _cache.copyWith(proposalMetadata: Optional(updatedMetadata));
+      emit(state.copyWith(metadata: updatedMetadata, isChanging: false));
     } catch (e, stackTrace) {
       _logger.severe('Unlock proposal failed', e, stackTrace);
       emitError(LocalizedException.create(e));
@@ -1219,23 +1209,23 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
   Future<DraftRef> _upsertDraftProposal(DocumentDataContent document) async {
     final currentRef = state.metadata.documentRef!;
     final originalRef = state.metadata.originalDocumentRef;
-    final template = state.metadata.templateRef!;
-    final categoryRef = state.metadata.categoryRef!;
+    final templateRef = state.metadata.templateRef!;
+    final parameters = state.metadata.parameters!;
 
     DraftRef nextRef;
     if (originalRef == null) {
       nextRef = await _proposalService.createDraftProposal(
         content: document,
-        template: template,
-        categoryRef: categoryRef,
+        templateRef: templateRef,
+        parameters: parameters,
       );
     } else {
       nextRef = currentRef.nextVersion();
       await _proposalService.upsertDraftProposal(
         selfRef: nextRef,
         content: document,
-        template: template,
-        categoryRef: categoryRef,
+        templateRef: templateRef,
+        parameters: parameters,
       );
     }
 

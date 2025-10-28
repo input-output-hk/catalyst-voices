@@ -57,12 +57,11 @@ final class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState>
   }
 
   DocumentDataMetadata _buildDocumentMetadata(ProposalDocument document) {
-    return DocumentDataMetadata(
-      contentType: DocumentContentType.json,
-      type: DocumentType.proposalDocument,
+    return DocumentDataMetadata.proposal(
       selfRef: document.metadata.selfRef,
       template: document.metadata.templateRef,
       parameters: document.metadata.parameters,
+      authors: document.metadata.authors,
     );
   }
 

@@ -433,6 +433,7 @@ void main() {
               _buildProposalAction(
                 action: ProposalSubmissionActionDto.aFinal,
                 proposalRef: proposalTwoRef,
+                categoryRef: categoryRef,
               ),
             ];
 
@@ -2004,11 +2005,9 @@ DocumentEntityWithMetadata _buildProposal({
   SignedDocumentRef? categoryRef,
   Coin? requestedFunds,
 }) {
-  final metadata = DocumentDataMetadata(
-    contentType: DocumentContentType.json,
-    type: DocumentType.proposalDocument,
-    selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
-    template: template ?? DocumentRefFactory.signedDocumentRef(),
+  final metadata = DocumentDataMetadataFactory.proposal(
+    selfRef: selfRef,
+    template: template,
     authors: [
       if (author != null) author,
     ],
@@ -2052,15 +2051,15 @@ DocumentEntityWithMetadata _buildProposal({
 }
 
 DocumentEntityWithMetadata _buildProposalAction({
-  DocumentRef? selfRef,
+  SignedDocumentRef? selfRef,
   required ProposalSubmissionActionDto action,
-  required DocumentRef proposalRef,
+  required SignedDocumentRef proposalRef,
+  SignedDocumentRef? categoryRef,
 }) {
-  final metadata = DocumentDataMetadata(
-    contentType: DocumentContentType.json,
-    type: DocumentType.proposalActionDocument,
-    selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
-    ref: proposalRef,
+  final metadata = DocumentDataMetadataFactory.proposalAction(
+    selfRef: selfRef,
+    proposalRef: proposalRef,
+    parameters: DocumentParameters({categoryRef ?? _getCategoryRef()}),
   );
   final dto = ProposalSubmissionActionDocumentDto(action: action);
   final content = DocumentDataContent(dto.toJson());
@@ -2077,13 +2076,11 @@ DocumentEntityWithMetadata _buildProposalAction({
 
 DocumentEntityWithMetadata _buildProposalComment({
   SignedDocumentRef? selfRef,
-  required DocumentRef proposalRef,
+  required SignedDocumentRef proposalRef,
 }) {
-  final metadata = DocumentDataMetadata(
-    contentType: DocumentContentType.json,
-    type: DocumentType.commentDocument,
+  final metadata = DocumentDataMetadataFactory.comment(
     selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
-    ref: proposalRef,
+    proposalRef: proposalRef,
   );
   const content = DocumentDataContent({});
 
@@ -2112,11 +2109,7 @@ DocumentFavoriteEntity _buildProposalFavorite({
 DocumentEntityWithMetadata _buildProposalTemplate({
   SignedDocumentRef? selfRef,
 }) {
-  final metadata = DocumentDataMetadata(
-    contentType: DocumentContentType.json,
-    type: DocumentType.proposalTemplate,
-    selfRef: selfRef ?? DocumentRefFactory.signedDocumentRef(),
-  );
+  final metadata = DocumentDataMetadataFactory.proposalTemplate(selfRef: selfRef);
   const content = DocumentDataContent({});
 
   final document = DocumentFactory.build(

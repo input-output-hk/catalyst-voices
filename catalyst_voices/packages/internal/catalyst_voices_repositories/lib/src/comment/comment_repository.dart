@@ -123,8 +123,8 @@ final class DocumentsCommentRepository implements CommentRepository {
     final authors = documentData.metadata.authors;
     final metadata = CommentMetadata(
       selfRef: documentData.metadata.selfRef as SignedDocumentRef,
-      ref: documentData.metadata.ref! as SignedDocumentRef,
-      template: templateData.metadata.selfRef as SignedDocumentRef,
+      proposalRef: documentData.metadata.ref! as SignedDocumentRef,
+      commentTemplate: templateData.metadata.selfRef as SignedDocumentRef,
       reply: documentData.metadata.reply,
       parameters: documentData.metadata.parameters,
       authorId: authors!.single,

@@ -9,7 +9,7 @@ final class ProposalBuilderMetadata extends Equatable {
   final DocumentRef? documentRef;
   final DocumentRef? originalDocumentRef;
   final SignedDocumentRef? templateRef;
-  final SignedDocumentRef? categoryRef;
+  final DocumentParameters? parameters;
   final List<DocumentVersion> versions;
   final bool fromActiveCampaign;
 
@@ -18,20 +18,20 @@ final class ProposalBuilderMetadata extends Equatable {
     this.documentRef,
     this.originalDocumentRef,
     this.templateRef,
-    this.categoryRef,
+    this.parameters,
     this.versions = const [],
     this.fromActiveCampaign = true,
   });
 
   factory ProposalBuilderMetadata.newDraft({
     required SignedDocumentRef templateRef,
-    required SignedDocumentRef categoryRef,
+    required DocumentParameters parameters,
   }) {
     final firstRef = DraftRef.generateFirstRef();
     return ProposalBuilderMetadata(
       documentRef: firstRef,
       templateRef: templateRef,
-      categoryRef: categoryRef,
+      parameters: parameters,
     );
   }
 
@@ -43,7 +43,6 @@ final class ProposalBuilderMetadata extends Equatable {
     documentRef,
     originalDocumentRef,
     templateRef,
-    categoryRef,
     versions,
     fromActiveCampaign,
   ];
@@ -53,7 +52,7 @@ final class ProposalBuilderMetadata extends Equatable {
     Optional<DocumentRef>? documentRef,
     Optional<DocumentRef>? originalDocumentRef,
     Optional<SignedDocumentRef>? templateRef,
-    Optional<SignedDocumentRef>? categoryRef,
+    Optional<DocumentParameters>? parameters,
     List<DocumentVersion>? versions,
     bool? fromActiveCampaign,
   }) {
@@ -62,7 +61,7 @@ final class ProposalBuilderMetadata extends Equatable {
       documentRef: documentRef.dataOr(this.documentRef),
       originalDocumentRef: originalDocumentRef.dataOr(this.originalDocumentRef),
       templateRef: templateRef.dataOr(this.templateRef),
-      categoryRef: categoryRef.dataOr(this.categoryRef),
+      parameters: parameters.dataOr(this.parameters),
       versions: versions ?? this.versions,
       fromActiveCampaign: fromActiveCampaign ?? this.fromActiveCampaign,
     );

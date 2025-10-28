@@ -85,7 +85,9 @@ final class ProposalCubit extends Cubit<ProposalState>
       emit(state.copyWith(isLoading: true));
 
       final proposal = await _proposalService.getProposalDetail(ref: ref);
-      final category = await _campaignService.getCategory(proposal.document.metadata.parameters);
+      final category = await _campaignService.getCategory(
+        proposal.document.metadata.parameters,
+      );
       final commentTemplate = await _commentService.getCommentTemplateFor(
         category: category.selfRef,
       );
@@ -170,10 +172,10 @@ final class ProposalCubit extends Cubit<ProposalState>
     final comment = CommentDocument(
       metadata: CommentMetadata(
         selfRef: commentRef,
-        ref: proposalRef! as SignedDocumentRef,
-        template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
+        proposalRef: proposalRef! as SignedDocumentRef,
+        commentTemplate: commentTemplate!.metadata.selfRef as SignedDocumentRef,
         reply: reply,
-        parameters: proposalParameters ?? const DocumentParameters(),
+        parameters: proposalParameters!,
         authorId: activeAccountId!,
       ),
       document: document,
