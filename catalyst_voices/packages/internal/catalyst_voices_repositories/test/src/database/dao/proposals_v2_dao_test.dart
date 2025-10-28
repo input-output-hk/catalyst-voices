@@ -3,6 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
+import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -157,6 +158,132 @@ void main() {
         expect(result.total, 1);
         expect(result.items[0].proposal.type, DocumentType.proposalDocument);
       });
+
+      test('excludes hidden proposals based on latest action', () async {
+        // Given
+        final proposal1Ver = _buildUuidV7At(latest);
+        final proposal1 = _createTestDocumentEntity(id: 'p1', ver: proposal1Ver);
+
+        final proposal2Ver = _buildUuidV7At(latest);
+        final proposal2 = _createTestDocumentEntity(id: 'p2', ver: proposal2Ver);
+
+        final actionOldVer = _buildUuidV7At(middle);
+        final actionOld = _createTestDocumentEntity(
+          id: 'action-old',
+          ver: actionOldVer,
+          type: DocumentType.proposalActionDocument,
+          refId: 'p2',
+          contentData: ProposalSubmissionActionDto.draft.toJson(),
+        );
+        final actionHideVer = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
+        final actionHide = _createTestDocumentEntity(
+          id: 'action-hide',
+          ver: actionHideVer,
+          type: DocumentType.proposalActionDocument,
+          refId: 'p2',
+          contentData: ProposalSubmissionActionDto.hide.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([proposal1, proposal2, actionOld, actionHide]);
+
+        // When
+        const request = PageRequest(page: 0, size: 10);
+        final result = await dao.getProposalsBriefPage(request);
+
+        // Then: Only visible (p1); total=1.
+        expect(result.items.length, 1);
+        expect(result.total, 1);
+        expect(result.items[0].proposal.id, 'p1');
+      });
+
+      test('excludes hidden proposals, even later versions, based on latest action', () async {
+        // Given
+        final proposal1Ver = _buildUuidV7At(latest);
+        final proposal1 = _createTestDocumentEntity(id: 'p1', ver: proposal1Ver);
+
+        final proposal2Ver = _buildUuidV7At(latest);
+        final proposal2 = _createTestDocumentEntity(id: 'p2', ver: proposal2Ver);
+
+        final proposal3Ver = _buildUuidV7At(latest.add(const Duration(days: 1)));
+        final proposal3 = _createTestDocumentEntity(id: 'p2', ver: proposal3Ver);
+
+        final actionOldVer = _buildUuidV7At(middle);
+        final actionOld = _createTestDocumentEntity(
+          id: 'action-old',
+          ver: actionOldVer,
+          type: DocumentType.proposalActionDocument,
+          refId: 'p2',
+          contentData: ProposalSubmissionActionDto.draft.toJson(),
+        );
+        final actionHideVer = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
+        final actionHide = _createTestDocumentEntity(
+          id: 'action-hide',
+          ver: actionHideVer,
+          type: DocumentType.proposalActionDocument,
+          refId: 'p2',
+          contentData: ProposalSubmissionActionDto.hide.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3, actionOld, actionHide]);
+
+        // When
+        const request = PageRequest(page: 0, size: 10);
+        final result = await dao.getProposalsBriefPage(request);
+
+        // Then: Only visible (p1); total=1.
+        expect(result.items.length, 1);
+        expect(result.total, 1);
+        expect(result.items[0].proposal.id, 'p1');
+      });
+
+      test('latest, non hide, action, overrides previous hide', () async {
+        // Given
+        final proposal1Ver = _buildUuidV7At(latest);
+        final proposal1 = _createTestDocumentEntity(id: 'p1', ver: proposal1Ver);
+
+        final proposal2Ver = _buildUuidV7At(latest);
+        final proposal2 = _createTestDocumentEntity(id: 'p2', ver: proposal2Ver);
+
+        final proposal3Ver = _buildUuidV7At(latest.add(const Duration(days: 1)));
+        final proposal3 = _createTestDocumentEntity(id: 'p2', ver: proposal3Ver);
+
+        final actionOldHideVer = _buildUuidV7At(middle);
+        final actionOldHide = _createTestDocumentEntity(
+          id: 'action-hide',
+          ver: actionOldHideVer,
+          type: DocumentType.proposalActionDocument,
+          refId: 'p2',
+          refVer: proposal2Ver,
+          contentData: ProposalSubmissionActionDto.hide.toJson(),
+        );
+        final actionDraftVer = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
+        final actionDraft = _createTestDocumentEntity(
+          id: 'action-draft',
+          ver: actionDraftVer,
+          type: DocumentType.proposalActionDocument,
+          refId: 'p2',
+          replyVer: proposal3Ver,
+          contentData: ProposalSubmissionActionDto.draft.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([
+          proposal1,
+          proposal2,
+          proposal3,
+          actionOldHide,
+          actionDraft,
+        ]);
+
+        // When
+        const request = PageRequest(page: 0, size: 10);
+        final result = await dao.getProposalsBriefPage(request);
+
+        // Then: total=2, both are visible
+        expect(result.items.length, 2);
+        expect(result.total, 2);
+        expect(result.items[0].proposal.id, 'p2');
+        expect(result.items[1].proposal.id, 'p1');
+      });
     });
   });
 }
@@ -204,4 +331,10 @@ DocumentEntityV2 _createTestDocumentEntity({
     templateId: templateId,
     templateVer: templateVer,
   );
+}
+
+extension on ProposalSubmissionActionDto {
+  Map<String, dynamic> toJson() {
+    return ProposalSubmissionActionDocumentDto(action: this).toJson();
+  }
 }

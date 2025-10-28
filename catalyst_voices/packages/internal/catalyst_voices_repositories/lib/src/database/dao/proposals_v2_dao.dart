@@ -7,6 +7,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dar
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.dart';
 import 'package:drift/drift.dart';
+import 'package:drift/extensions/json1.dart';
 
 @DriftAccessor(
   tables: [
@@ -51,24 +52,47 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     final latestVer = alias(documentsV2, 'latestVer');
 
     final maxVer = latestVer.ver.max();
-    final latestVerQuery = selectOnly(latestVer)
+    final proposalLatestQuery = selectOnly(latestVer)
       ..where(latestVer.type.equals(DocumentType.proposalDocument.uuid))
       ..addColumns([latestVer.id, maxVer])
       ..groupBy([latestVer.id]);
-    final latestVerSubquery = Subquery(latestVerQuery, 'latestVer');
+    final proposalLatestSubquery = Subquery(proposalLatestQuery, 'proposalLatest');
+
+    SimpleSelectStatement<DocumentsV2, DocumentEntityV2> hiddenCheckSubquery(String name) {
+      final subActions = alias(documentsV2, name);
+
+      final maxVerSubquery = subqueryExpression<String>(
+        selectOnly(subActions)
+          ..addColumns([subActions.ver.max()])
+          ..where(subActions.type.equals(DocumentType.proposalActionDocument.uuid))
+          ..where(subActions.refId.equalsExp(proposals.id)),
+      );
+
+      return select(subActions)
+        ..where((tbl) => tbl.type.equals(DocumentType.proposalActionDocument.uuid))
+        ..where((tbl) => tbl.refId.equalsExp(proposals.id))
+        ..where((tbl) => tbl.ver.equalsExp(maxVerSubquery))
+        ..where((tbl) => tbl.content.jsonExtract<String>(r'$.action').equals('hide'))
+        ..limit(1);
+    }
 
     final proposalsQuery =
         select(proposals).join([
             innerJoin(
-              latestVerSubquery,
+              proposalLatestSubquery,
               Expression.and([
-                latestVerSubquery.ref(latestVer.id).equalsExp(proposals.id),
-                latestVerSubquery.ref(maxVer).equalsExp(proposals.ver),
+                proposalLatestSubquery.ref(latestVer.id).equalsExp(proposals.id),
+                proposalLatestSubquery.ref(maxVer).equalsExp(proposals.ver),
               ]),
               useColumns: false,
             ),
           ])
-          ..where(proposals.type.equalsValue(DocumentType.proposalDocument))
+          ..where(
+            Expression.and([
+              proposals.type.equalsValue(DocumentType.proposalDocument),
+              existsQuery(hiddenCheckSubquery('hidden_check')).not(),
+            ]),
+          )
           ..orderBy([OrderingTerm.desc(proposals.ver)])
           ..limit(effectiveSize, offset: effectivePage * effectiveSize);
 
@@ -79,12 +103,24 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     }).get();
 
     // Separate total count
-    final totalQuery = (selectOnly(documentsV2)
-      ..addColumns([documentsV2.id.count(distinct: true)])
-      ..where(documentsV2.type.equals(DocumentType.proposalDocument.uuid)));
+    final proposalsTotal = alias(documentsV2, 'proposals');
+    final totalQuery = selectOnly(proposalsTotal)
+      ..join([
+        innerJoin(
+          proposalLatestSubquery,
+          Expression.and([
+            proposalLatestSubquery.ref(latestVer.id).equalsExp(proposalsTotal.id),
+            proposalLatestSubquery.ref(maxVer).equalsExp(proposalsTotal.ver),
+          ]),
+          useColumns: false,
+        ),
+      ])
+      ..where(proposalsTotal.type.equals(DocumentType.proposalDocument.uuid))
+      ..where(existsQuery(hiddenCheckSubquery('total_hidden_check')).not())
+      ..addColumns([proposalsTotal.id.count(distinct: true)]);
 
     final total = await totalQuery
-        .map((row) => row.read(documentsV2.id.count(distinct: true)) ?? 0)
+        .map((row) => row.read(proposalsTotal.id.count(distinct: true)) ?? 0)
         .getSingle();
 
     return Page(
