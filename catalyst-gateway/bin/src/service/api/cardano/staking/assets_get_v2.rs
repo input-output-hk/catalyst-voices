@@ -1,14 +1,14 @@
 //! An implementation of the GET `v2/cardano/assets` endpoint.
 
+use std::collections::HashSet;
+
 use anyhow::Context;
+use futures::future::try_join_all;
 use poem_openapi::payload::Json;
 use poem_openapi_derive::ApiResponse;
 
 use crate::service::{
-    api::cardano::staking::{
-        assets_get,
-        assets_get::{AllResponses, Responses},
-    },
+    api::cardano::staking::assets_get::{build_full_stake_info_response, AllResponses, Responses},
     common::{
         auth::{none_or_rbac::NoneOrRBAC, rbac::token::CatalystRBACTokenV1},
         objects::cardano::{network::Network, stake_info::FullStakeInfo},
@@ -60,24 +60,59 @@ pub(crate) async fn endpoint(
         .into();
     }
 
-    let stake_address = match stake_address(address, token).await {
-        Ok(Some(a)) => a,
-        Ok(None) => return ResponsesV2::NotFound.into(),
+    let stake_addresses = match stake_addresses(address, token).await {
         Err(e) => return AllResponsesV2::handle_error(&e),
+        Ok(addresses) => addresses,
+    };
+    let infos: Vec<_> = match try_join_all(
+        stake_addresses
+            .into_iter()
+            .map(|a| build_full_stake_info_response(a, network.clone(), slot)),
+    )
+    .await
+    {
+        Err(e) => return AllResponsesV2::handle_error(&e),
+        Ok(r) => r.into_iter().flatten().collect(),
     };
 
-    assets_get::endpoint(stake_address, network, slot)
-        .await
-        .into()
+    let info = infos.into_iter().reduce(|mut acc, mut info| {
+        acc.persistent.0.ada_amount = acc
+            .persistent
+            .0
+            .ada_amount
+            .saturating_add(info.persistent.0.ada_amount);
+        acc.persistent.0.slot_number =
+            std::cmp::max(acc.persistent.0.slot_number, info.persistent.0.slot_number);
+        acc.persistent
+            .0
+            .assets
+            .append(&mut info.persistent.0.assets);
+
+        acc.volatile.0.ada_amount = acc
+            .volatile
+            .0
+            .ada_amount
+            .saturating_add(info.volatile.0.ada_amount);
+        acc.volatile.0.slot_number =
+            std::cmp::max(acc.volatile.0.slot_number, info.volatile.0.slot_number);
+        acc.volatile.0.assets.append(&mut info.volatile.0.assets);
+
+        acc
+    });
+
+    match info {
+        Some(i) => ResponsesV2::Ok(Json(i)).into(),
+        None => ResponsesV2::NotFound.into(),
+    }
 }
 
 /// Returns a stake address from provided parameters.
-async fn stake_address(
+async fn stake_addresses(
     address: Option<Cip19StakeAddress>,
     token: Option<CatalystRBACTokenV1>,
-) -> anyhow::Result<Option<Cip19StakeAddress>> {
+) -> anyhow::Result<HashSet<Cip19StakeAddress>> {
     if let Some(address) = address {
-        return Ok(Some(address));
+        return Ok([address].into());
     }
 
     if let Some(mut token) = token {
@@ -87,13 +122,14 @@ async fn stake_address(
             .reg_chain()
             .await?
             .context("Missing registration chain for token")?;
-        // TODO: Handle multiple stake addresses!
-        if let Some(a) = chain.stake_addresses().iter().next().cloned() {
-            return Ok(Some(a.into()));
-        }
+        Ok(chain
+            .stake_addresses()
+            .into_iter()
+            .map(Into::into)
+            .collect())
+    } else {
+        Ok(HashSet::new())
     }
-
-    Ok(None)
 }
 
 impl From<AllResponses> for AllResponsesV2 {
