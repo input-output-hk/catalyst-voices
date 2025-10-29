@@ -266,6 +266,7 @@ Pdart
 permissionless
 pg_isready
 pinenacl
+PITR
 plpgsql
 podfile
 podhelper
