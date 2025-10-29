@@ -59,7 +59,6 @@ class _AccountPageState extends State<AccountPage>
                   key: ValueKey('AccountOverviewGrid'),
                   children: [
                     AccountHeaderTile(),
-                    Spacer(),
                   ],
                 ),
                 ResponsiveChild(
