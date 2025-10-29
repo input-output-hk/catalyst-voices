@@ -1,13 +1,13 @@
 ---
-    title: Separation of concerns for bloc state-dependent widgets
-      adr:
+    title: 0010 Separation of concerns for bloc state-dependent widgets
+    adr:
         author: Damian Molinski
         created: 06-Jun-2025
         status: accepted
         extends:
-          - 0001-flutter
-          - 0005-flutter-app
-      tags:
+            - 0003-flutter
+            - 0005-flutter-app
+    tags:
         - flutter
         - dart
         - state management

@@ -1,5 +1,5 @@
 ---
-    title: 0013 Signed Documents with COSE over CBOR (Ed25519)
+    title: 0013 Signed Documents with COSE over CBOR
     adr:
         author: Assistant
         created: 29-Oct-2025

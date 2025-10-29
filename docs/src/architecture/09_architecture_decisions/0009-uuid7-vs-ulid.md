@@ -4,7 +4,7 @@
         author: Assistant
         created: 17-Oct-2024
         status: superseded
-        superseded_by: 0011-identifiers-uuidv7-and-ulid
+        superseded_by: 0011-identifiers-uuid7-and-ulid
     tags:
         - uuid
         - identifiers

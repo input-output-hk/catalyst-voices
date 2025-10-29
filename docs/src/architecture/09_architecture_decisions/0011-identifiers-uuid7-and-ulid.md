@@ -1,5 +1,5 @@
 ---
-    title: 0011 Identifier Strategy (UUIDv7 and ULID)
+    title: 0011 Identifier Strategy
     adr:
         author: Assistant
         created: 29-Oct-2025
