@@ -201,7 +201,7 @@ mod tests {
 
             write!(
                 w,
-                "(\n  '{id}',\n  '{ver}',\n  '{type}',\n  [{authors}], -- noqa: LT05\n  '{metadata}', -- noqa: LT05\n  '{payload}', -- noqa: LT05\n  DECODE('{raw}', 'hex') -- noqa: LT05\n)",
+                "(\n  '{id}',\n  '{ver}',\n  '{type}',\n  ARRAY[{authors}], -- noqa: LT05\n  '{metadata}', -- noqa: LT05\n  '{payload}', -- noqa: LT05\n  DECODE('{raw}', 'hex') -- noqa: LT05\n)",
                 id = doc.doc_id()?,
                 ver = doc.doc_ver()?,
                 r#type = doc.doc_type()?,
@@ -211,7 +211,7 @@ mod tests {
                     .map(|v| format!("'{v}'"))
                     .collect::<Vec<_>>()
                     .join(","),
-                payload = serde_json::from_slice::<serde_json::Value>(doc.doc_content().decoded_bytes()?)?,
+                payload = serde_json::from_slice::<serde_json::Value>(doc.doc_content().decoded_bytes()?)?.to_string().replace('\'', "''"),
                 raw = hex::encode(minicbor::to_vec(doc)?)
             )?;
             if docs_iter.peek().is_some() {
