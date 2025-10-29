@@ -3,7 +3,7 @@
     adr:
         author: Oleksandr Prokhorenko
         created: 22-Dec-2023
-        status:  proposed
+        status:  accepted
     tags:
         - flutter
 ---
