@@ -23,7 +23,7 @@ final class SignedDocumentJsonPayload extends SignedDocumentPayload {
 }
 
 /// Represents [SignedDocument] payload. Type of payload depends on a
-/// [SignedDocumentMetadata.contentType] and subclasses
+/// [DocumentDataMetadata.contentType] and subclasses
 /// of [SignedDocumentPayload] are meant to reflect that.
 ///
 /// Use [SignedDocumentPayload.fromBytes] factory to create correct
@@ -36,11 +36,11 @@ sealed class SignedDocumentPayload extends Equatable {
   /// which keeps [bytes] as is.
   factory SignedDocumentPayload.fromBytes(
     Uint8List bytes, {
-    required SignedDocumentContentType contentType,
+    required DocumentContentType contentType,
   }) {
     return switch (contentType) {
-      SignedDocumentContentType.json => SignedDocumentJsonPayload.fromBytes(bytes),
-      SignedDocumentContentType.unknown => SignedDocumentUnknownPayload(bytes),
+      DocumentContentType.json => SignedDocumentJsonPayload.fromBytes(bytes),
+      DocumentContentType.unknown => SignedDocumentUnknownPayload(bytes),
     };
   }
 

@@ -170,10 +170,10 @@ final class ProposalCubit extends Cubit<ProposalState>
     final comment = CommentDocument(
       metadata: CommentMetadata(
         selfRef: commentRef,
-        ref: proposalRef! as SignedDocumentRef,
-        template: commentTemplate!.metadata.selfRef as SignedDocumentRef,
+        proposalRef: proposalRef! as SignedDocumentRef,
+        commentTemplate: commentTemplate!.metadata.selfRef as SignedDocumentRef,
         reply: reply,
-        parameters: proposalParameters ?? const DocumentParameters(),
+        parameters: proposalParameters!,
         authorId: activeAccountId!,
       ),
       document: document,

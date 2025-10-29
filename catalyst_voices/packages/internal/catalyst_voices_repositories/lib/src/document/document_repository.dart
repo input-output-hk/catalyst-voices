@@ -734,7 +734,7 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   void _validateDocumentMetadata(DocumentData document) {
     if (!_isDocumentMetadataValid(document)) {
-      throw const DocumentImportInvalidDataException(SignedDocumentMetadataMalformedException);
+      throw const DocumentImportInvalidDataException(DocumentMetadataMalformedException);
     }
   }
 

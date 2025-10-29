@@ -78,6 +78,11 @@ final class DocumentDataDto {
 @JsonSerializable()
 final class DocumentDataMetadataDto {
   @JsonKey(
+    toJson: DocumentContentType.toJson,
+    fromJson: DocumentContentType.fromJson,
+  )
+  final DocumentContentType contentType;
+  @JsonKey(
     toJson: DocumentType.toJson,
     fromJson: DocumentType.fromJson,
   )
@@ -91,6 +96,7 @@ final class DocumentDataMetadataDto {
   final List<String>? authors;
 
   DocumentDataMetadataDto({
+    required this.contentType,
     required this.type,
     required this.selfRef,
     this.ref,
@@ -105,12 +111,14 @@ final class DocumentDataMetadataDto {
     var migrated = _migrateJson1(json);
     migrated = _migrateJson2(migrated);
     migrated = _migrateJson3(migrated);
+    migrated = _migrateJson4(migrated);
 
     return _$DocumentDataMetadataDtoFromJson(migrated);
   }
 
   DocumentDataMetadataDto.fromModel(DocumentDataMetadata data)
     : this(
+        contentType: data.contentType,
         type: data.type,
         selfRef: data.selfRef.toDto(),
         ref: data.ref?.toDto(),
@@ -125,6 +133,7 @@ final class DocumentDataMetadataDto {
 
   DocumentDataMetadata toModel() {
     return DocumentDataMetadata(
+      contentType: contentType,
       type: type,
       selfRef: selfRef.toModel(),
       ref: ref?.toModel(),
@@ -196,6 +205,17 @@ final class DocumentDataMetadataDto {
       }
 
       modified['parameters'] = parameters.map((e) => e.toJson()).toList();
+      return modified;
+    }
+  }
+
+  /// Adds missing contentType field.
+  static Map<String, dynamic> _migrateJson4(Map<String, dynamic> json) {
+    if (json.containsKey('contentType')) {
+      return json;
+    } else {
+      final modified = Map.of(json);
+      modified['contentType'] = DocumentContentType.toJson(DocumentContentType.json);
       return modified;
     }
   }

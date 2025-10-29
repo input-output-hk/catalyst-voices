@@ -7,51 +7,19 @@ final class DocumentDataFactory {
 
   /// Creates correct [DocumentData] from [document].
   ///
-  /// Throws [SignedDocumentMetadataMalformedException] in case of any required fields
-  /// missing.
-  ///
-  /// Throws [UnknownSignedDocumentContentTypeException] in case of not supported
+  /// Throws [UnknownDocumentContentTypeException] in case of not supported
   /// [document] contentType.
   static DocumentData create(SignedDocument document) {
-    final malformedReasons = <String>[];
-    final id = document.metadata.id;
-    if (id == null) {
-      malformedReasons.add('id is missing');
-    }
-    final ver = document.metadata.ver;
-    if (ver == null) {
-      malformedReasons.add('version is missing');
-    }
-
-    if (malformedReasons.isNotEmpty) {
-      throw SignedDocumentMetadataMalformedException(reasons: malformedReasons);
-    }
-
-    final metadata = DocumentDataMetadata(
-      type: document.metadata.documentType,
-      selfRef: SignedDocumentRef(id: id!, version: ver),
-      ref: document.metadata.ref?.toModel(),
-      template: document.metadata.template?.toModel(),
-      reply: document.metadata.reply?.toModel(),
-      section: document.metadata.section,
-      parameters: DocumentParameters(document.metadata.parameters.map((e) => e.toModel()).toSet()),
-      authors: document.signers,
-    );
-
     final content = switch (document.payload) {
       SignedDocumentJsonPayload(:final data) => DocumentDataContent(data),
-      SignedDocumentUnknownPayload() => throw UnknownSignedDocumentContentTypeException(
+      SignedDocumentUnknownPayload() => throw UnknownDocumentContentTypeException(
         type: document.metadata.contentType,
       ),
     };
 
     return DocumentData(
-      metadata: metadata,
+      metadata: document.metadata,
       content: content,
     );
   }
-}
-
-extension on SignedDocumentMetadataRef {
-  SignedDocumentRef toModel() => SignedDocumentRef(id: id, version: ver);
 }
