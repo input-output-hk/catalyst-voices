@@ -13,7 +13,7 @@ Technical constraints:
   [catalyst-gateway/event-db](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst-gateway/event-db).
 * Chain indexing and caches backed by Scylla clusters, which are Cassandra compatible, for persistent and volatile data.
 * Identifiers use UUIDv7 where applicable for time ordered IDs.
-* Cryptography uses Ed25519 keys and COSE Sign over CBOR payloads for signed documents.
+* Cryptography uses Ed25519 keys and COSE_Sign over CBOR payloads for signed documents.
 * Document templates and references are versioned and linked by `[id, ver]` pairs.
 
 Client constraints:
