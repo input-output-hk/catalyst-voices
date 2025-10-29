@@ -5,7 +5,6 @@ import 'package:catalyst_voices/notification/banner_close_button.dart';
 import 'package:catalyst_voices/notification/banner_content.dart';
 import 'package:catalyst_voices/notification/catalyst_notification.dart';
 import 'package:catalyst_voices/routes/app_router_factory.dart';
-import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
@@ -168,7 +167,6 @@ class CatalystMessengerState extends State<CatalystMessenger> {
 
     final future = switch (notification) {
       BannerNotification() => _showBanner(notification),
-      DialogNotification() => _showDialog(notification),
     };
 
     unawaited(future.whenComplete(_onNotificationCompleted));
@@ -201,17 +199,17 @@ class CatalystMessengerState extends State<CatalystMessenger> {
     );
   }
 
-  Future<void> _showDialog(DialogNotification notification) async {
-    final widget = notification.dialog(context);
+  // Future<void> _showDialog(DialogNotification notification) async {
+  //   final widget = notification.dialog(context);
 
-    await VoicesDialog.show<void>(
-      context: context,
-      routeSettings: RouteSettings(name: '/dialog-${notification.id}'),
-      builder: (context) => widget,
-    ).then(
-      (_) {
-        _logger.finest('Dialog(${notification.id}) closed');
-      },
-    );
-  }
+  //   await VoicesDialog.show<void>(
+  //     context: context,
+  //     routeSettings: RouteSettings(name: '/dialog-${notification.id}'),
+  //     builder: (context) => widget,
+  //   ).then(
+  //     (_) {
+  //       _logger.finest('Dialog(${notification.id}) closed');
+  //     },
+  //   );
+  // }
 }
