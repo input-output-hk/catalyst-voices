@@ -1,6 +1,8 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 final class DatabaseDocumentsDataSource
     implements SignedDocumentDataSource, ProposalDocumentDataLocalSource {
@@ -23,6 +25,11 @@ final class DatabaseDocumentsDataSource
   @override
   Future<bool> exists({required DocumentRef ref}) {
     return _database.documentsDao.count(ref: ref).then((count) => count > 0);
+  }
+
+  @override
+  Future<List<DocumentRef>> filterExisting(List<DocumentRef> refs) {
+    return _database.documentsV2Dao.filterExisting(refs);
   }
 
   @override
@@ -104,32 +111,9 @@ final class DatabaseDocumentsDataSource
 
   @override
   Future<void> saveAll(Iterable<DocumentData> data) async {
-    final documentsWithMetadata = data.map(
-      (data) {
-        final idHiLo = UuidHiLo.from(data.metadata.id);
-        final verHiLo = UuidHiLo.from(data.metadata.version);
+    final entries = data.map((e) => e.toEntity()).toList();
 
-        final document = DocumentEntity(
-          idHi: idHiLo.high,
-          idLo: idHiLo.low,
-          verHi: verHiLo.high,
-          verLo: verHiLo.low,
-          type: data.metadata.type,
-          content: data.content,
-          metadata: data.metadata,
-          createdAt: DateTime.timestamp(),
-        );
-
-        // TODO(damian-molinski): Need to decide what goes into metadata table.
-        final metadata = <DocumentMetadataEntity>[
-          //
-        ];
-
-        return (document: document, metadata: metadata);
-      },
-    ).toList();
-
-    await _database.documentsDao.saveAll(documentsWithMetadata);
+    await _database.documentsV2Dao.saveAll(entries);
   }
 
   @override
@@ -203,6 +187,28 @@ extension on DocumentEntity {
     return DocumentData(
       metadata: metadata,
       content: content,
+    );
+  }
+}
+
+extension on DocumentData {
+  DocumentEntityV2 toEntity() {
+    return DocumentEntityV2(
+      content: content,
+      id: metadata.id,
+      ver: metadata.version,
+      type: metadata.type,
+      refId: metadata.ref?.id,
+      refVer: metadata.ref?.version,
+      replyId: metadata.reply?.id,
+      replyVer: metadata.reply?.version,
+      section: metadata.section,
+      categoryId: metadata.categoryId?.id,
+      categoryVer: metadata.categoryId?.version,
+      templateId: metadata.template?.id,
+      templateVer: metadata.template?.version,
+      authors: metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
+      createdAt: metadata.version.dateTime,
     );
   }
 }
