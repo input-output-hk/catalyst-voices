@@ -1,15 +1,15 @@
 # Content
 
 * [Content](#content)
-  * [Features](#features)
-  * [References](#references)
-  * [Requirements](#requirements)
-  * [Install](#install)
-  * [Web setup](#web-setup)
-  * [Example](#example)
-  * [How to contribute changes](#how-to-contribute-changes)
-  * [Support](#support)
-  * [License](#license)
+    * [Features](#features)
+    * [References](#references)
+    * [Requirements](#requirements)
+    * [Install](#install)
+    * [Web setup](#web-setup)
+    * [Example](#example)
+    * [How to contribute changes](#how-to-contribute-changes)
+    * [Support](#support)
+    * [License](#license)
 
 ## Features
 

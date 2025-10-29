@@ -51,4 +51,3 @@ Operational overhead for cluster management offset by performance gains.
 ## More Information
 
 * [ScyllaDB Documentation](https://docs.scylladb.com/)
-

@@ -39,7 +39,7 @@ The public widget will act as the interface, encapsulating the state selection l
 It will delegate rendering to a private, internal widget that is unaware of the Bloc and simply
 receives the selected data as parameters.
 
-Only exception from spliting delegating rendering into separate, private, widget is having
+Only exception from splitting delegating rendering into separate, private, widget is having
 "atomic" or "trivial" widgets with less or equals than 2 children.
 
 ### Example

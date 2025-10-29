@@ -51,4 +51,3 @@ Additional maintenance for migrations and platform setup.
 
 * [Drift](https://drift.simonbinder.eu/)
 * [sqlite3.wasm](https://github.com/simolus3/sqlite3.dart)
-

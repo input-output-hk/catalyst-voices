@@ -29,6 +29,7 @@ autoresizing
 autovalidate
 backendpython
 backgrounding
+backpressure
 bech
 bimap
 bindgen
@@ -308,6 +309,7 @@ ristretto
 rlib
 rngs
 rolname
+rollouts
 RPATH
 ruleset
 rustc

@@ -58,4 +58,3 @@ Minimal migration effort compared to a single type strategy.
 
 * [RFC 9562 - UUIDv7 Specification](https://datatracker.ietf.org/doc/rfc9562/)
 * [ULID Specification](https://github.com/ulid/spec)
-
