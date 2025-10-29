@@ -8,7 +8,7 @@ use poem_openapi::payload::Json;
 use poem_openapi_derive::ApiResponse;
 
 use crate::service::{
-    api::cardano::staking::assets_get::{build_full_stake_info_response, AllResponses, Responses},
+    api::cardano::staking::assets_get::build_full_stake_info_response,
     common::{
         auth::{none_or_rbac::NoneOrRBAC, rbac::token::CatalystRBACTokenV1},
         objects::cardano::{network::Network, stake_info::FullStakeInfo},
@@ -129,19 +129,5 @@ async fn stake_addresses(
             .collect())
     } else {
         Ok(HashSet::new())
-    }
-}
-
-impl From<AllResponses> for AllResponsesV2 {
-    fn from(value: AllResponses) -> Self {
-        match value {
-            AllResponses::With(r) => {
-                match r {
-                    Responses::Ok(v) => AllResponsesV2::With(ResponsesV2::Ok(v)),
-                    Responses::NotFound => AllResponsesV2::With(ResponsesV2::NotFound),
-                }
-            },
-            AllResponses::Error(e) => AllResponsesV2::Error(e),
-        }
     }
 }
