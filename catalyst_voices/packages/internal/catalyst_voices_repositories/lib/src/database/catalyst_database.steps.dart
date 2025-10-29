@@ -22,6 +22,12 @@ final class Schema4 extends i0.VersionedSchema {
     idxFavType,
     idxFavUniqueId,
     idxDraftType,
+    idxDocumentsV2TypeId,
+    idxDocumentsV2TypeIdVer,
+    idxDocumentsV2TypeRefId,
+    idxDocumentsV2TypeRefIdVer,
+    idxDocumentsV2RefIdVer,
+    idxDocumentsV2TypeCreatedAt,
   ];
   late final Shape0 documents = Shape0(
     source: i0.VersionedTable(
@@ -173,6 +179,30 @@ final class Schema4 extends i0.VersionedSchema {
   final i1.Index idxDraftType = i1.Index(
     'idx_draft_type',
     'CREATE INDEX idx_draft_type ON drafts (type)',
+  );
+  final i1.Index idxDocumentsV2TypeId = i1.Index(
+    'idx_documents_v2_type_id',
+    'CREATE INDEX idx_documents_v2_type_id ON documents_v2 (type, id)',
+  );
+  final i1.Index idxDocumentsV2TypeIdVer = i1.Index(
+    'idx_documents_v2_type_id_ver',
+    'CREATE INDEX idx_documents_v2_type_id_ver ON documents_v2 (type, id, ver)',
+  );
+  final i1.Index idxDocumentsV2TypeRefId = i1.Index(
+    'idx_documents_v2_type_ref_id',
+    'CREATE INDEX idx_documents_v2_type_ref_id ON documents_v2 (type, ref_id)',
+  );
+  final i1.Index idxDocumentsV2TypeRefIdVer = i1.Index(
+    'idx_documents_v2_type_ref_id_ver',
+    'CREATE INDEX idx_documents_v2_type_ref_id_ver ON documents_v2 (type, ref_id, ver)',
+  );
+  final i1.Index idxDocumentsV2RefIdVer = i1.Index(
+    'idx_documents_v2_ref_id_ver',
+    'CREATE INDEX idx_documents_v2_ref_id_ver ON documents_v2 (ref_id, ver)',
+  );
+  final i1.Index idxDocumentsV2TypeCreatedAt = i1.Index(
+    'idx_documents_v2_type_created_at',
+    'CREATE INDEX idx_documents_v2_type_created_at ON documents_v2 (type, created_at)',
   );
 }
 

@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/database/migration/schema_versions.dart';
+import 'package:catalyst_voices_repositories/src/database/catalyst_database.steps.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.drift.dart';
@@ -17,6 +17,13 @@ Future<void> from3To4(Migrator m, Schema4 schema) async {
   await m.createTable(schema.documentsV2);
   await m.createTable(schema.documentsLocalMetadata);
   await m.createTable(schema.localDocumentsDrafts);
+
+  await m.createIndex(schema.idxDocumentsV2TypeId);
+  await m.createIndex(schema.idxDocumentsV2TypeIdVer);
+  await m.createIndex(schema.idxDocumentsV2TypeRefId);
+  await m.createIndex(schema.idxDocumentsV2TypeRefIdVer);
+  await m.createIndex(schema.idxDocumentsV2RefIdVer);
+  await m.createIndex(schema.idxDocumentsV2TypeCreatedAt);
 
   // TODO(damian-molinski): created indexes, views and queries.
 
