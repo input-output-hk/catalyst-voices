@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:equatable/equatable.dart';
@@ -67,15 +66,6 @@ enum CatalystNotificationType {
       CatalystNotificationType.error => Theme.of(context).colors.onErrorContainer,
       CatalystNotificationType.success => Theme.of(context).colors.onSuccessContainer,
       CatalystNotificationType.info => Theme.of(context).colors.textOnPrimaryLevel0,
-    };
-  }
-
-  VoicesSnackBarType toVoicesSnackBarType() {
-    return switch (this) {
-      CatalystNotificationType.warning => VoicesSnackBarType.warning,
-      CatalystNotificationType.error => VoicesSnackBarType.error,
-      CatalystNotificationType.success => VoicesSnackBarType.success,
-      CatalystNotificationType.info => VoicesSnackBarType.info,
     };
   }
 }
