@@ -38,8 +38,8 @@ class CatalystMessenger extends StatefulWidget {
 
 class CatalystMessengerState extends State<CatalystMessenger> {
   final _pending = <CatalystNotification>[];
-  bool _isShowing = false;
-  CatalystNotification? _activeNotification;
+  bool _isShowingBanner = false;
+  BannerNotification? _activeBanner;
 
   GoRouter? __router;
 
@@ -73,8 +73,8 @@ class CatalystMessengerState extends State<CatalystMessenger> {
   void cancelWhere(CatalystNotificationPredicate test) {
     _pending.removeWhere(test);
 
-    final activeNotification = _activeNotification;
-    if (activeNotification != null && test(activeNotification)) {
+    final activeBanner = _activeBanner;
+    if (activeBanner != null && test(activeBanner)) {
       _hideCurrentBanner();
     }
   }
@@ -101,28 +101,23 @@ class CatalystMessengerState extends State<CatalystMessenger> {
   }
 
   void _handleRouterChange() {
-    final activeNotification = _activeNotification;
-    if (activeNotification == null) {
-      if (_pending.isNotEmpty) {
-        _processQueue();
-      }
-      return;
-    }
-
     final routerState = _router.state;
 
-    // if active notification is still valid for router do nothing.
-    if (activeNotification.routerPredicate(routerState)) {
-      return;
+    // Handle active banner
+    final activeBanner = _activeBanner;
+    if (activeBanner != null && !activeBanner.routerPredicate(routerState)) {
+      _logger.finer('Hiding banner(${activeBanner.id}). Not valid for router state');
+      _addSorted(activeBanner);
+      _hideCurrentBanner();
     }
 
-    _logger.finer('Hiding notification(${activeNotification.id}). Not valid for router state');
-
-    _addSorted(activeNotification);
-    _hideCurrentBanner();
+    // Process queue if there are pending notifications
+    if (_pending.isNotEmpty) {
+      _processQueue();
+    }
   }
 
-  /// Hiding current banner will trigger _onNotificationCompleted and process queue.
+  /// Hiding current banner will trigger _onBannerCompleted and process queue.
   void _hideCurrentBanner() {
     final messengerState = ScaffoldMessenger.maybeOf(context);
     if (messengerState == null) {
@@ -131,25 +126,22 @@ class CatalystMessengerState extends State<CatalystMessenger> {
     messengerState.removeCurrentMaterialBanner(reason: MaterialBannerClosedReason.hide);
   }
 
-  void _onNotificationCompleted() {
-    assert(_activeNotification != null, 'Completed notification but active was null');
-    final activeNotification = _activeNotification!;
+  void _onBannerCompleted() {
+    assert(_activeBanner != null, 'Completed banner but active was null');
+    final activeBanner = _activeBanner!;
 
-    _logger.finer('Completed $activeNotification');
+    _logger.finer('Completed banner $activeBanner');
 
-    _isShowing = false;
-    _activeNotification = null;
+    _isShowingBanner = false;
+    _activeBanner = null;
 
     _processQueue();
   }
 
   void _processQueue() {
-    if (_isShowing) {
-      return;
-    }
-
     final routerState = _router.state;
     final allowed = _pending.where((notification) => notification.routerPredicate(routerState));
+
     if (allowed.isEmpty) {
       if (_pending.isNotEmpty) {
         _logger.finest('Found ${_pending.length} notification but none allow for router state');
@@ -157,19 +149,19 @@ class CatalystMessengerState extends State<CatalystMessenger> {
       return;
     }
 
-    final notification = allowed.first;
-    _pending.removeWhere((element) => element.id == notification.id);
-    _activeNotification = notification;
+    // Process banners
+    if (!_isShowingBanner) {
+      final banner = allowed.whereType<BannerNotification>().firstOrNull;
+      if (banner != null) {
+        _pending.removeWhere((element) => element.id == banner.id);
+        _activeBanner = banner;
+        _isShowingBanner = true;
 
-    _isShowing = true;
+        _logger.finer('Showing banner $banner');
 
-    _logger.finer('Showing $notification');
-
-    final future = switch (notification) {
-      BannerNotification() => _showBanner(notification),
-    };
-
-    unawaited(future.whenComplete(_onNotificationCompleted));
+        unawaited(_showBanner(banner).whenComplete(_onBannerCompleted));
+      }
+    }
   }
 
   Future<void> _showBanner(BannerNotification notification) async {
