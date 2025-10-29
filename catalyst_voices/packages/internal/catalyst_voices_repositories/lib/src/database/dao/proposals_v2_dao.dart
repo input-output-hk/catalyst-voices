@@ -184,6 +184,18 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       WHERE type = ?
       GROUP BY id
     ),
+    version_lists AS (
+      SELECT 
+        id,
+        GROUP_CONCAT(ver, ',') as version_ids_str
+      FROM (
+        SELECT id, ver
+        FROM documents_v2
+        WHERE type = ?
+        ORDER BY id, ver ASC
+      )
+      GROUP BY id
+    ),
     latest_actions AS (
       SELECT ref_id, MAX(ver) as max_action_ver
       FROM documents_v2
@@ -206,15 +218,17 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
           WHEN ast.action_type = 'final' AND ast.ref_ver IS NOT NULL AND ast.ref_ver != '' THEN ast.ref_ver
           ELSE lp.max_ver
         END as ver,
-        ast.action_type
+        ast.action_type,
+        vl.version_ids_str
       FROM latest_proposals lp
       LEFT JOIN action_status ast ON lp.id = ast.ref_id
+      LEFT JOIN version_lists vl ON lp.id = vl.id
       WHERE NOT EXISTS (
         SELECT 1 FROM action_status hidden 
         WHERE hidden.ref_id = lp.id AND hidden.action_type = 'hide'
       )
     )
-    SELECT p.*, ep.action_type
+    SELECT p.*, ep.action_type, ep.version_ids_str
     FROM documents_v2 p
     INNER JOIN effective_proposals ep ON p.id = ep.id AND p.ver = ep.ver
     WHERE p.type = ?
@@ -226,6 +240,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       cteQuery,
       variables: [
         Variable.withString(DocumentType.proposalDocument.uuid),
+        Variable.withString(DocumentType.proposalDocument.uuid),
         Variable.withString(DocumentType.proposalActionDocument.uuid),
         Variable.withString(DocumentType.proposalActionDocument.uuid),
         Variable.withString(DocumentType.proposalDocument.uuid),
@@ -235,12 +250,17 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       readsFrom: {documentsV2},
     ).map((row) {
       final proposal = documentsV2.map(row.data);
-      final rawActionType = row.readNullable<String>('action_type') ?? '';
-      final actionType = ProposalSubmissionActionDto.fromJson(rawActionType)?.toModel();
+
+      final actionTypeRaw = row.readNullable<String>('action_type') ?? '';
+      final actionType = ProposalSubmissionActionDto.fromJson(actionTypeRaw)?.toModel();
+
+      final versionIdsRaw = row.readNullable<String>('version_ids_str') ?? '';
+      final versionIds = versionIdsRaw.split(',');
 
       return JoinedProposalBriefEntity(
         proposal: proposal,
         actionType: actionType,
+        versionIds: versionIds,
       );
     }).get();
   }

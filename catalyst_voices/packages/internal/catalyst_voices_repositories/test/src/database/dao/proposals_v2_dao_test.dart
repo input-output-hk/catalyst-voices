@@ -1135,7 +1135,7 @@ void main() {
         });
       });
 
-      group('ActionType select', () {
+      group('ActionType', () {
         final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
         final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
         final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
@@ -1353,6 +1353,44 @@ void main() {
           expect(result.items.first.proposal.id, 'p1');
           expect(result.items.first.actionType, ProposalSubmissionAction.draft);
         });
+      });
+
+      group('VersionIds', () {
+        test('returns single version for proposal with one version', () async {
+          final proposalVer = _buildUuidV7At(latest);
+          final proposal = _createTestDocumentEntity(id: 'p1', ver: proposalVer);
+          await db.documentsV2Dao.saveAll([proposal]);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          expect(result.items.length, 1);
+          expect(result.items.first.versionIds.length, 1);
+          expect(result.items.first.proposal.ver, proposalVer);
+          expect(result.items.first.versionIds, [proposalVer]);
+        });
+
+        test(
+          'returns all versions ordered by ver ASC for proposal with multiple versions',
+          () async {
+            final ver1 = _buildUuidV7At(earliest);
+            final ver2 = _buildUuidV7At(middle);
+            final ver3 = _buildUuidV7At(latest);
+
+            final proposal1 = _createTestDocumentEntity(id: 'p1', ver: ver1);
+            final proposal2 = _createTestDocumentEntity(id: 'p1', ver: ver2);
+            final proposal3 = _createTestDocumentEntity(id: 'p1', ver: ver3);
+            await db.documentsV2Dao.saveAll([proposal3, proposal1, proposal2]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(request);
+
+            expect(result.items.length, 1);
+            expect(result.items.first.proposal.ver, ver3);
+            expect(result.items.first.versionIds.length, 3);
+            expect(result.items.first.versionIds, [ver1, ver2, ver3]);
+          },
+        );
       });
     });
   });
