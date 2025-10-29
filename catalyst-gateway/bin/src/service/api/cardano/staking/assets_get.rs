@@ -91,7 +91,7 @@ async fn build_full_stake_info_response(
     slot_num: Option<SlotNo>,
 ) -> anyhow::Result<Option<FullStakeInfo>> {
     if let Some(provided_network) = provided_network {
-        if cardano_chain_follower::Network::from(provided_network) != Settings::cardano_network() {
+        if &cardano_chain_follower::Network::from(provided_network) != Settings::cardano_network() {
             return Ok(None);
         }
     }

@@ -24,7 +24,7 @@ fn report_mithril(
     stats: &Statistics,
     api_host_names: &str,
     service_id: &str,
-    network: Network,
+    network: &Network,
 ) {
     let stats = &stats.mithril;
     let network = network.to_string();
@@ -109,7 +109,7 @@ fn report_live(
     stats: &Statistics,
     api_host_names: &str,
     service_id: &str,
-    network: Network,
+    network: &Network,
 ) {
     let stats = &stats.live;
     let network = network.to_string();
