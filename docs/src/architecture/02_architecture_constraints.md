@@ -12,6 +12,7 @@ Technical constraints:
 * Event data stored in PostgreSQL with schema in the Event DB
   [catalyst-gateway/event-db](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst-gateway/event-db).
 * Chain indexing and caches backed by Scylla clusters, which are Cassandra compatible, for persistent and volatile data.
+* Cardano chain ingestion uses Node-to-Node (N2N) protocol from a relay, not HTTP or gRPC bridges.
 * Identifiers use UUIDv7 where applicable for time ordered IDs.
 * Cryptography uses Ed25519 keys and COSE_Sign over CBOR payloads for signed documents.
 * Document templates and references are versioned and linked by `[id, ver]` pairs.
@@ -29,6 +30,7 @@ Standards and interoperability:
 * Legacy voter registration tracking uses CIP-36 for historical compatibility only.
 * Role based access control is linked to on-chain registrations per CIP-509.
 * Hierarchical key derivation follows a Catalyst specific derivation path aligned with CIP-1852 principles.
+* RBAC registrations and CIP-36 registrations are on-chain transactions submitted via wallets or node transaction submission.
 
 Operational constraints:
 
