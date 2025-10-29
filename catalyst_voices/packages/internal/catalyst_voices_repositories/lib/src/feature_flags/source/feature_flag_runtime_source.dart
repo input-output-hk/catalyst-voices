@@ -2,7 +2,7 @@ part of 'feature_flag_source.dart';
 
 /// Dynamic runtime configuration (e.g., from documents)
 final class FeatureFlagRuntimeSource with FeatureFlagSourceCompareTo implements FeatureFlagSource {
-  final Map<String, bool> _values;
+  final Map<FeatureName, bool> _values;
 
   FeatureFlagRuntimeSource() : _values = {};
 

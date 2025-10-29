@@ -2,7 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 class FeatureFlagsState extends Equatable {
-  final Map<String, FeatureFlagInfo> features;
+  final Map<FeatureName, FeatureFlagInfo> features;
 
   const FeatureFlagsState({
     required this.features,
@@ -12,7 +12,7 @@ class FeatureFlagsState extends Equatable {
   List<Object?> get props => [features];
 
   FeatureFlagsState copyWith({
-    Map<String, FeatureFlagInfo>? features,
+    Map<FeatureName, FeatureFlagInfo>? features,
   }) {
     return FeatureFlagsState(
       features: features ?? this.features,

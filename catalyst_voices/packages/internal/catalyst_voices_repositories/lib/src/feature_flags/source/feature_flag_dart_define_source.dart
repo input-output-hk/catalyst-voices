@@ -4,7 +4,7 @@ part of 'feature_flag_source.dart';
 final class FeatureFlagDartDefineSource
     with FeatureFlagSourceCompareTo
     implements FeatureFlagSource {
-  final Map<String, bool> _defines;
+  final Map<FeatureName, bool> _defines;
 
   FeatureFlagDartDefineSource() : _defines = {};
 
@@ -17,13 +17,12 @@ final class FeatureFlagDartDefineSource
   @override
   void load() => _initialize();
 
-  bool? _getEnvironmentValue(String featureName) {
+  bool? _getEnvironmentValue(FeatureName featureName) {
     switch (featureName) {
-      case 'voting':
-        const envKey = 'FEATURE_VOTING';
-        return const bool.hasEnvironment(envKey) ? const bool.fromEnvironment(envKey) : null;
-      default:
-        return null;
+      case FeatureName.voting:
+        return const bool.hasEnvironment(Features.votingEnvKey)
+            ? const bool.fromEnvironment(Features.votingEnvKey)
+            : null;
     }
   }
 

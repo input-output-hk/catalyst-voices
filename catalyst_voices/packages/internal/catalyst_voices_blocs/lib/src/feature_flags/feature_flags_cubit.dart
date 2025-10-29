@@ -37,7 +37,7 @@ final class FeatureFlagsCubit extends Cubit<FeatureFlagsState> {
     });
   }
 
-  static Map<String, FeatureFlagInfo> _buildFeaturesMap(List<FeatureFlagInfo> infos) {
+  static Map<FeatureName, FeatureFlagInfo> _buildFeaturesMap(List<FeatureFlagInfo> infos) {
     return {for (final info in infos) info.feature.name: info};
   }
 }

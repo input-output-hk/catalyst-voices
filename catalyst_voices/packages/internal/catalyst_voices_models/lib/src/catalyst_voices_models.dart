@@ -66,6 +66,7 @@ export 'errors/sync_exception.dart';
 export 'feature_flags/feature.dart';
 export 'feature_flags/feature_flag_info.dart';
 export 'feature_flags/feature_flag_source_priority.dart';
+export 'feature_flags/feature_name.dart';
 export 'feature_flags/features.dart';
 export 'info/app_info.dart';
 export 'info/gateway_info.dart';

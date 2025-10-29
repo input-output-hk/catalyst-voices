@@ -2,7 +2,7 @@ part of 'feature_flag_source.dart';
 
 /// Backend configuration from API
 final class FeatureFlagConfigSource with FeatureFlagSourceCompareTo implements FeatureFlagSource {
-  final Map<String, bool> _config;
+  final Map<FeatureName, bool> _config;
 
   // TODO(bstolinski): implement load()
   // ignore: unused_field

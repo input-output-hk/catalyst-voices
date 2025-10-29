@@ -4,7 +4,7 @@ part of 'feature_flag_source.dart';
 final class FeatureFlagUserOverrideSource
     with FeatureFlagSourceCompareTo
     implements FeatureFlagSource {
-  final Map<String, bool> _values;
+  final Map<FeatureName, bool> _values;
 
   FeatureFlagUserOverrideSource() : _values = {};
 
