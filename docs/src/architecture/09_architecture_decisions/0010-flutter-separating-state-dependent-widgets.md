@@ -26,8 +26,8 @@ While this maximizes rendering efficiency, it increases visual complexity and re
 
 * System will grow and UI will become more complex
 * We need to make widget tree as simple to read and understand as possible in order to
-  * make it easier to maintain
-  * modify and apply changes while system grows
+    * make it easier to maintain
+    * modify and apply changes while system grows
 
 ## Decision
 
@@ -48,7 +48,8 @@ Simple example but it quickly becomes more complex
 
 #### Before
 
-`spaces/spaces_shell_page.dart`
+<!-- markdownlint-disable-next-line MD013 -->
+[spaces/spaces_shell_page.dart](https://github.com/input-output-hk/catalyst-voices/blob/main/catalyst_voices/apps/voices/lib/pages/spaces/spaces_shell_page.dart)
 
 ```dart
     return BlocSelector<SessionCubit, SessionState, _SessionStateData>(
@@ -145,7 +146,8 @@ class _SpacesScaffold extends StatelessWidget {
 
 ```
 
-`spaces/spaces_shell_page.dart`
+<!-- markdownlint-disable-next-line MD013 -->
+[spaces/spaces_shell_page.dart](https://github.com/input-output-hk/catalyst-voices/blob/main/catalyst_voices/apps/voices/lib/pages/spaces/spaces_shell_page.dart)
 
 ```dart
 return SpacesScaffold(
