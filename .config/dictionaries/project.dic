@@ -246,6 +246,7 @@ pageobject
 Pbkdf2
 pbxproj
 Pdart
+peekable
 permissionless
 pg_isready
 pinenacl

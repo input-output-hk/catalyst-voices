@@ -171,7 +171,7 @@ mod tests {
 
     use super::*;
 
-    /// A convinient function to prepare an SQL queries to insert a hardcoded data into
+    /// A convenient function to prepare an SQL queries to insert a hardcoded data into
     /// the `event-db`.
     #[allow(clippy::indexing_slicing)]
     fn process_docs<'a, I: Iterator<Item = &'a CatalystSignedDocument>>(
