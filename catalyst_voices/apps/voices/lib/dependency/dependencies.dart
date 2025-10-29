@@ -207,6 +207,11 @@ final class Dependencies extends DependencyProvider {
           get<VotingBallotBuilder>(),
           get<VotingService>(),
         );
+      })
+      ..registerFactory<FeatureFlagsCubit>(() {
+        return FeatureFlagsCubit(
+          get<FeatureFlagsService>(),
+        );
       });
   }
 
@@ -302,6 +307,15 @@ final class Dependencies extends DependencyProvider {
         () => SystemStatusRepository(
           get<ApiServices>(),
         ),
+      )
+      ..registerLazySingleton<FeatureFlagsRepository>(
+        () => FeatureFlagsRepository([
+          const FeatureFlagDefaultsSource(),
+          FeatureFlagRuntimeSource(),
+          FeatureFlagConfigSource(get<AppConfig>()),
+          FeatureFlagDartDefineSource(),
+          FeatureFlagUserOverrideSource(),
+        ]),
       );
   }
 
@@ -438,6 +452,11 @@ final class Dependencies extends DependencyProvider {
       },
       dispose: (mediator) => mediator.dispose(),
     );
+    registerLazySingleton<FeatureFlagsService>(() {
+      return FeatureFlagsService(
+        get<FeatureFlagsRepository>(),
+      );
+    });
   }
 
   void _registerStorages() {
