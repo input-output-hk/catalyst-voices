@@ -41,6 +41,10 @@ This repository contains the Catalyst Voices app and packages.
 
 ❗️We recommend using **Visual Studio Code** as the **default editor** for this project.
 
+## Recommended VS code plugins
+
+* [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - formatting html and js files.
+
 ## Platforms
 
 * Web is fully supported, it is our main target
