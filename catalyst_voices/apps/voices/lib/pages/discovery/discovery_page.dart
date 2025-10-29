@@ -9,8 +9,6 @@ import 'package:catalyst_voices/pages/discovery/sections/how_it_works.dart';
 import 'package:catalyst_voices/pages/discovery/sections/most_recent_proposals/most_recent_proposals.dart';
 import 'package:catalyst_voices/pages/discovery/sections/stay_involved/stay_involved.dart';
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_wide_screen_constrained.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
@@ -89,13 +87,6 @@ class _DiscoveryPageState extends State<DiscoveryPage>
         await _showKeychainDeletedDialog(context);
       });
     }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      const VoicesSnackBar(
-        type: VoicesSnackBarType.info,
-        duration: Duration(seconds: 40),
-      ).show(context);
-    });
   }
 
   Future<void> _loadData() async {
