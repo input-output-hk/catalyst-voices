@@ -7,12 +7,14 @@ class JoinedProposalBriefEntity extends Equatable {
   final ProposalSubmissionAction? actionType;
   final List<String> versionIds;
   final int commentsCount;
+  final bool isFavorite;
 
   const JoinedProposalBriefEntity({
     required this.proposal,
     this.actionType,
-    required this.versionIds,
-    required this.commentsCount,
+    this.versionIds = const [],
+    this.commentsCount = 0,
+    this.isFavorite = false,
   });
 
   @override
@@ -21,5 +23,6 @@ class JoinedProposalBriefEntity extends Equatable {
     actionType,
     versionIds,
     commentsCount,
+    isFavorite,
   ];
 }

@@ -241,10 +241,12 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       p.*, 
       ep.action_type, 
       ep.version_ids_str,
-      COALESCE(cc.count, 0) as comments_count
+      COALESCE(cc.count, 0) as comments_count,
+      COALESCE(dlm.is_favorite, 0) as is_favorite
     FROM documents_v2 p
     INNER JOIN effective_proposals ep ON p.id = ep.id AND p.ver = ep.ver
     LEFT JOIN comments_count cc ON p.id = cc.ref_id AND p.ver = cc.ref_ver
+    LEFT JOIN documents_local_metadata dlm ON p.id = dlm.id
     WHERE p.type = ?
     ORDER BY p.ver DESC
     LIMIT ? OFFSET ?
@@ -273,12 +275,14 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final versionIds = versionIdsRaw.split(',');
 
       final commentsCount = row.readNullable<int>('comments_count') ?? 0;
+      final isFavorite = (row.readNullable<int>('is_favorite') ?? 0) == 1;
 
       return JoinedProposalBriefEntity(
         proposal: proposal,
         actionType: actionType,
         versionIds: versionIds,
         commentsCount: commentsCount,
+        isFavorite: isFavorite,
       );
     }).get();
   }
