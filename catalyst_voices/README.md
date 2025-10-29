@@ -74,6 +74,7 @@ just bootstrap
 | [catalyst_voices_services](./packages/internal/catalyst_voices_services/)         | Services |[example](./packages/internal/catalyst_voices_services/)|
 | [catalyst_voices_shared](./packages/internal/catalyst_voices_shared/)             | Shared code  |[example](./packages/internal/catalyst_voices_shared/)|
 | [catalyst_voices_view_models](./packages/internal/catalyst_voices_view_models/)   | ViewModels  |[example](./packages/internal/catalyst_voices_view_models/)|
+| [catalyst_voices_dev](./packages/internal/catalyst_voices_dev/)                   | Dev | [example](./packages/internal/catalyst_voices_dev/)|
 
 ### Environment Type vs Flavor
 
