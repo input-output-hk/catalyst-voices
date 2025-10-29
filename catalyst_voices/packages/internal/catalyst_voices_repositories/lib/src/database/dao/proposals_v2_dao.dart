@@ -227,10 +227,24 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         SELECT 1 FROM action_status hidden 
         WHERE hidden.ref_id = lp.id AND hidden.action_type = 'hide'
       )
+    ),
+    comments_count AS (
+      SELECT 
+        c.ref_id,
+        c.ref_ver,
+        COUNT(*) as count
+      FROM documents_v2 c
+      WHERE c.type = ?
+      GROUP BY c.ref_id, c.ref_ver
     )
-    SELECT p.*, ep.action_type, ep.version_ids_str
+    SELECT 
+      p.*, 
+      ep.action_type, 
+      ep.version_ids_str,
+      COALESCE(cc.count, 0) as comments_count
     FROM documents_v2 p
     INNER JOIN effective_proposals ep ON p.id = ep.id AND p.ver = ep.ver
+    LEFT JOIN comments_count cc ON p.id = cc.ref_id AND p.ver = cc.ref_ver
     WHERE p.type = ?
     ORDER BY p.ver DESC
     LIMIT ? OFFSET ?
@@ -243,6 +257,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         Variable.withString(DocumentType.proposalDocument.uuid),
         Variable.withString(DocumentType.proposalActionDocument.uuid),
         Variable.withString(DocumentType.proposalActionDocument.uuid),
+        Variable.withString(DocumentType.commentDocument.uuid),
         Variable.withString(DocumentType.proposalDocument.uuid),
         Variable.withInt(size),
         Variable.withInt(page * size),
@@ -257,10 +272,13 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       final versionIdsRaw = row.readNullable<String>('version_ids_str') ?? '';
       final versionIds = versionIdsRaw.split(',');
 
+      final commentsCount = row.readNullable<int>('comments_count') ?? 0;
+
       return JoinedProposalBriefEntity(
         proposal: proposal,
         actionType: actionType,
         versionIds: versionIds,
+        commentsCount: commentsCount,
       );
     }).get();
   }

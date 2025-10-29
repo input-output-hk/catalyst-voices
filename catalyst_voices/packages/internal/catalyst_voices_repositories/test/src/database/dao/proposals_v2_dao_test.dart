@@ -1392,6 +1392,246 @@ void main() {
           },
         );
       });
+
+      group('CommentsCount', () {
+        test('returns zero comments for proposal without comments', () async {
+          final proposalVer = _buildUuidV7At(latest);
+          final proposal = _createTestDocumentEntity(id: 'p1', ver: proposalVer);
+          await db.documentsV2Dao.saveAll([proposal]);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          expect(result.items.length, 1);
+          expect(result.items.first.commentsCount, 0);
+        });
+
+        test('returns correct count for proposal with comments on effective version', () async {
+          final proposalVer = _buildUuidV7At(latest);
+          final proposal = _createTestDocumentEntity(id: 'p1', ver: proposalVer);
+
+          final comment1Ver = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
+          final comment1 = _createTestDocumentEntity(
+            id: 'c1',
+            ver: comment1Ver,
+            type: DocumentType.commentDocument,
+            refId: 'p1',
+            refVer: proposalVer,
+          );
+
+          final comment2Ver = _buildUuidV7At(earliest.add(const Duration(hours: 2)));
+          final comment2 = _createTestDocumentEntity(
+            id: 'c2',
+            ver: comment2Ver,
+            type: DocumentType.commentDocument,
+            refId: 'p1',
+            refVer: proposalVer,
+          );
+
+          await db.documentsV2Dao.saveAll([proposal, comment1, comment2]);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          expect(result.items.length, 1);
+          expect(result.items.first.commentsCount, 2);
+        });
+
+        test(
+          'counts comments only for effective version when proposal has multiple versions',
+          () async {
+            final ver1 = _buildUuidV7At(earliest);
+            final ver2 = _buildUuidV7At(latest);
+            final proposal1 = _createTestDocumentEntity(id: 'p1', ver: ver1);
+            final proposal2 = _createTestDocumentEntity(id: 'p1', ver: ver2);
+
+            final comment1Ver = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
+            final comment1 = _createTestDocumentEntity(
+              id: 'c1',
+              ver: comment1Ver,
+              type: DocumentType.commentDocument,
+              refId: 'p1',
+              refVer: ver1,
+            );
+
+            final comment2Ver = _buildUuidV7At(latest.add(const Duration(hours: 1)));
+            final comment2 = _createTestDocumentEntity(
+              id: 'c2',
+              ver: comment2Ver,
+              type: DocumentType.commentDocument,
+              refId: 'p1',
+              refVer: ver2,
+            );
+
+            final comment3Ver = _buildUuidV7At(latest.add(const Duration(hours: 2)));
+            final comment3 = _createTestDocumentEntity(
+              id: 'c3',
+              ver: comment3Ver,
+              type: DocumentType.commentDocument,
+              refId: 'p1',
+              refVer: ver2,
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2, comment1, comment2, comment3]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(request);
+
+            expect(result.items.length, 1);
+            expect(result.items.first.proposal.ver, ver2);
+            expect(result.items.first.commentsCount, 2);
+          },
+        );
+
+        test('counts comments for final action version when specified', () async {
+          final ver1 = _buildUuidV7At(earliest);
+          final ver2 = _buildUuidV7At(middle);
+          final ver3 = _buildUuidV7At(latest);
+
+          final proposal1 = _createTestDocumentEntity(id: 'p1', ver: ver1);
+          final proposal2 = _createTestDocumentEntity(id: 'p1', ver: ver2);
+          final proposal3 = _createTestDocumentEntity(id: 'p1', ver: ver3);
+
+          final actionVer = _buildUuidV7At(latest.add(const Duration(hours: 1)));
+          final action = _createTestDocumentEntity(
+            id: 'action-1',
+            ver: actionVer,
+            type: DocumentType.proposalActionDocument,
+            refId: 'p1',
+            refVer: ver2,
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          final comment1Ver = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
+          final comment1 = _createTestDocumentEntity(
+            id: 'c1',
+            ver: comment1Ver,
+            type: DocumentType.commentDocument,
+            refId: 'p1',
+            refVer: ver1,
+          );
+
+          final comment2Ver = _buildUuidV7At(middle.add(const Duration(hours: 1)));
+          final comment2 = _createTestDocumentEntity(
+            id: 'c2',
+            ver: comment2Ver,
+            type: DocumentType.commentDocument,
+            refId: 'p1',
+            refVer: ver2,
+          );
+
+          final comment3Ver = _buildUuidV7At(latest.add(const Duration(hours: 2)));
+          final comment3 = _createTestDocumentEntity(
+            id: 'c3',
+            ver: comment3Ver,
+            type: DocumentType.commentDocument,
+            refId: 'p1',
+            refVer: ver3,
+          );
+
+          await db.documentsV2Dao.saveAll([
+            proposal1,
+            proposal2,
+            proposal3,
+            action,
+            comment1,
+            comment2,
+            comment3,
+          ]);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          expect(result.items.length, 1);
+          expect(result.items.first.proposal.ver, ver2);
+          expect(result.items.first.commentsCount, 1);
+        });
+
+        test('excludes comments from other proposals', () async {
+          final proposal1Ver = _buildUuidV7At(latest);
+          final proposal1 = _createTestDocumentEntity(id: 'p1', ver: proposal1Ver);
+
+          final proposal2Ver = _buildUuidV7At(latest);
+          final proposal2 = _createTestDocumentEntity(id: 'p2', ver: proposal2Ver);
+
+          final comment1Ver = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
+          final comment1 = _createTestDocumentEntity(
+            id: 'c1',
+            ver: comment1Ver,
+            type: DocumentType.commentDocument,
+            refId: 'p1',
+            refVer: proposal1Ver,
+          );
+
+          final comment2Ver = _buildUuidV7At(earliest.add(const Duration(hours: 2)));
+          final comment2 = _createTestDocumentEntity(
+            id: 'c2',
+            ver: comment2Ver,
+            type: DocumentType.commentDocument,
+            refId: 'p2',
+            refVer: proposal2Ver,
+          );
+
+          final comment3Ver = _buildUuidV7At(earliest.add(const Duration(hours: 3)));
+          final comment3 = _createTestDocumentEntity(
+            id: 'c3',
+            ver: comment3Ver,
+            type: DocumentType.commentDocument,
+            refId: 'p2',
+            refVer: proposal2Ver,
+          );
+
+          await db.documentsV2Dao.saveAll([
+            proposal1,
+            proposal2,
+            comment1,
+            comment2,
+            comment3,
+          ]);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          expect(result.items.length, 2);
+
+          final p1 = result.items.firstWhere((e) => e.proposal.id == 'p1');
+          final p2 = result.items.firstWhere((e) => e.proposal.id == 'p2');
+
+          expect(p1.commentsCount, 1);
+          expect(p2.commentsCount, 2);
+        });
+
+        test('excludes non-comment documents from count', () async {
+          final proposalVer = _buildUuidV7At(latest);
+          final proposal = _createTestDocumentEntity(id: 'p1', ver: proposalVer);
+
+          final commentVer = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
+          final comment = _createTestDocumentEntity(
+            id: 'c1',
+            ver: commentVer,
+            type: DocumentType.commentDocument,
+            refId: 'p1',
+            refVer: proposalVer,
+          );
+
+          final otherDocVer = _buildUuidV7At(earliest.add(const Duration(hours: 2)));
+          final otherDoc = _createTestDocumentEntity(
+            id: 'other1',
+            ver: otherDocVer,
+            type: DocumentType.reviewDocument,
+            refId: 'p1',
+            refVer: proposalVer,
+          );
+
+          await db.documentsV2Dao.saveAll([proposal, comment, otherDoc]);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          expect(result.items.length, 1);
+          expect(result.items.first.commentsCount, 1);
+        });
+      });
     });
   });
 }

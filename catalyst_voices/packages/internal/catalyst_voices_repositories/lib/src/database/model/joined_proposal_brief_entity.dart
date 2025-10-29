@@ -6,11 +6,13 @@ class JoinedProposalBriefEntity extends Equatable {
   final DocumentEntityV2 proposal;
   final ProposalSubmissionAction? actionType;
   final List<String> versionIds;
+  final int commentsCount;
 
   const JoinedProposalBriefEntity({
     required this.proposal,
     this.actionType,
     required this.versionIds,
+    required this.commentsCount,
   });
 
   @override
@@ -18,5 +20,6 @@ class JoinedProposalBriefEntity extends Equatable {
     proposal,
     actionType,
     versionIds,
+    commentsCount,
   ];
 }
