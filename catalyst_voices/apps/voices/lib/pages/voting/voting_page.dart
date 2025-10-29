@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
-import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/campaign_phase_aware.dart';
 import 'package:catalyst_voices/pages/voting/widgets/content/pre_voting_content.dart';
 import 'package:catalyst_voices/pages/voting/widgets/content/voting_background.dart';
@@ -199,7 +198,7 @@ class _VotingPageState extends State<VotingPage>
   }
 
   Future<void> _showKeychainDeletedDialog(BuildContext context) async {
-    await KeychainDeletedDialog.show(context);
+    // await KeychainDeletedDialog.show(context);
   }
 
   void _updateRoute({

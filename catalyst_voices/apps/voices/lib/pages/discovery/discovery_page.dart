@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
-import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
 import 'package:catalyst_voices/pages/discovery/sections/campaign_details/campaign_details.dart';
 import 'package:catalyst_voices/pages/discovery/sections/campaign_hero.dart';
@@ -98,6 +97,6 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   }
 
   Future<void> _showKeychainDeletedDialog(BuildContext context) async {
-    await KeychainDeletedDialog.show(context);
+    // await KeychainDeletedDialog.show(context);
   }
 }
