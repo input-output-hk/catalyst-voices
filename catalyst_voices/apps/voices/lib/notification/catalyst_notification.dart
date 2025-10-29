@@ -7,7 +7,6 @@ import 'package:go_router/go_router.dart';
 
 part 'banner_notification.dart';
 part 'catalyst_notification_text.dart';
-part 'snackbar_notification.dart';
 
 bool _alwaysAllowRouterPredicate(GoRouterState state) => true;
 

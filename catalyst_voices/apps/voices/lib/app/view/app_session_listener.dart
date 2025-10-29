@@ -1,10 +1,12 @@
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/notification/catalyst_messenger.dart';
 import 'package:catalyst_voices/notification/specialized/banner/account_needs_verification_banner.dart';
-import 'package:catalyst_voices/notification/specialized/snackbar/locked_keychain_snackbar.dart';
-import 'package:catalyst_voices/notification/specialized/snackbar/unlocked_keychain_snackbar.dart';
 import 'package:catalyst_voices/routes/routes.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -44,20 +46,40 @@ class _GlobalSessionListenerState extends State<GlobalSessionListener>
           (notification) => notification is AccountNeedsVerificationBanner,
         );
       case KeychainLockedSignal():
-        CatalystMessenger.of(context).add(LockedKeychainSnackbar());
-
-        final routerContext = AppRouterFactory.rootNavigatorKey.currentContext;
-        if (routerContext != null) {
-          _lastLocation = GoRouter.of(routerContext).state.uri.toString();
-          routerContext.go(const DiscoveryRoute().location);
-        }
+        _handleKeychainLock();
       case KeychainUnlockedSignal():
-        CatalystMessenger.of(context).add(UnlockedKeychainSnackbar());
+        _handleKeychainUnlock();
+    }
+  }
 
-        final routerContext = AppRouterFactory.rootNavigatorKey.currentContext;
-        if (_lastLocation != null && routerContext != null) {
-          routerContext.go(_lastLocation!);
-        }
+  void _handleKeychainLock() {
+    VoicesSnackBar(
+      type: VoicesSnackBarType.error,
+      behavior: SnackBarBehavior.floating,
+      title: context.l10n.lockSnackbarTitle,
+      message: context.l10n.lockSnackbarMessage,
+      icon: VoicesAssets.icons.lockClosed.buildIcon(),
+    ).show(context);
+
+    final routerContext = AppRouterFactory.rootNavigatorKey.currentContext;
+    if (routerContext != null) {
+      _lastLocation = GoRouter.of(routerContext).state.uri.toString();
+      routerContext.go(const DiscoveryRoute().location);
+    }
+  }
+
+  void _handleKeychainUnlock() {
+    VoicesSnackBar(
+      type: VoicesSnackBarType.success,
+      behavior: SnackBarBehavior.floating,
+      title: context.l10n.unlockSnackbarTitle,
+      message: context.l10n.unlockSnackbarMessage,
+      icon: VoicesAssets.icons.lockOpen.buildIcon(),
+    ).show(context);
+
+    final routerContext = AppRouterFactory.rootNavigatorKey.currentContext;
+    if (_lastLocation != null && routerContext != null) {
+      routerContext.go(_lastLocation!);
     }
   }
 }
