@@ -6,6 +6,7 @@ This repository contains the Catalyst Voices app and packages.
 
 * [Catalyst Voices](#catalyst-voices)
   * [Requirements](#requirements)
+  * [Recommended VS code plugins](#recommended-vs-code-plugins)
   * [Platforms](#platforms)
   * [Getting Started](#getting-started)
     * [Bootstrapping](#bootstrapping)
@@ -40,6 +41,10 @@ This repository contains the Catalyst Voices app and packages.
 * [Rust](https://rustup.rs/): 1.80.0+
 
 ❗️We recommend using **Visual Studio Code** as the **default editor** for this project.
+
+## Recommended VS code plugins
+
+* [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - formatting html and js files.
 
 ## Platforms
 
