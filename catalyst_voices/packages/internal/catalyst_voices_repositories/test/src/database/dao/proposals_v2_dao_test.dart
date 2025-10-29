@@ -5,6 +5,7 @@ import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.d
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
@@ -507,6 +508,632 @@ void main() {
         expect(result.items[0].proposal.ver, proposal1Ver2);
         expect(result.items[0].proposal.content.data['version'], 2);
       });
+
+      group('NOT IN with NULL values', () {
+        final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
+        final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
+
+        test('action with NULL ref_id does not break query', () async {
+          // Given
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: _buildUuidV7At(latest),
+          );
+          await db.documentsV2Dao.saveAll([proposal]);
+
+          // And: Action with NULL ref_id
+          final actionVer = _buildUuidV7At(latest.add(const Duration(hours: 1)));
+          final actionNullRef = _createTestDocumentEntity(
+            id: 'action-null-ref',
+            ver: actionVer,
+            type: DocumentType.proposalActionDocument,
+            refId: null,
+            contentData: {'action': 'hide'},
+          );
+          await db.documentsV2Dao.saveAll([actionNullRef]);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then: Should still return the proposal (NOT IN with NULL should not fail)
+          expect(result.items.length, 1);
+          expect(result.items[0].proposal.id, 'p1');
+          expect(result.total, 1);
+        });
+
+        test('multiple proposals with NULL ref_id actions return all visible proposals', () async {
+          // Given
+          final proposal1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: _buildUuidV7At(earliest),
+          );
+          final proposal2 = _createTestDocumentEntity(
+            id: 'p2',
+            ver: _buildUuidV7At(latest),
+          );
+          await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+          // And: Multiple actions with NULL ref_id
+          final actions = <DocumentEntityV2>[];
+          for (int i = 0; i < 3; i++) {
+            final actionVer = _buildUuidV7At(latest.add(Duration(hours: i)));
+            actions.add(
+              _createTestDocumentEntity(
+                id: 'action-null-$i',
+                ver: actionVer,
+                type: DocumentType.proposalActionDocument,
+                refId: null,
+                contentData: {'action': 'hide'},
+              ),
+            );
+          }
+          await db.documentsV2Dao.saveAll(actions);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then
+          expect(result.items.length, 2);
+          expect(result.total, 2);
+        });
+      });
+
+      group('JSON extraction NULL safety', () {
+        final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
+        final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
+        final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
+
+        test('action with malformed JSON does not crash query', () async {
+          // Given
+          final proposal1OldVer = _buildUuidV7At(earliest);
+          final proposal1Old = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1OldVer,
+            contentData: {'title': 'old'},
+          );
+          final proposal1NewVer = _buildUuidV7At(middle);
+          final proposal1New = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1NewVer,
+            contentData: {'title': 'new'},
+          );
+          // Action with malformed JSON
+          final actionVer = _buildUuidV7At(latest);
+          final action = _createTestDocumentEntity(
+            id: 'action-malformed',
+            ver: actionVer,
+            refId: 'p1',
+            type: DocumentType.proposalActionDocument,
+            contentData: {'wrong': true},
+          );
+
+          await db.documentsV2Dao.saveAll([proposal1Old, proposal1New, action]);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then: Should treat as draft and return latest version
+          expect(result.items.length, 1);
+          expect(result.items[0].proposal.ver, proposal1NewVer);
+          expect(result.items[0].proposal.content.data['title'], 'new');
+        });
+
+        test('action without action field treats as draft', () async {
+          // Given
+          final proposal1OldVer = _buildUuidV7At(earliest);
+          final proposal1Old = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1OldVer,
+            contentData: {'title': 'old'},
+          );
+          final proposal1NewVer = _buildUuidV7At(middle);
+          final proposal1New = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1NewVer,
+            contentData: {'title': 'new'},
+          );
+          await db.documentsV2Dao.saveAll([proposal1Old, proposal1New]);
+
+          // And: Action without 'action' field
+          final actionVer = _buildUuidV7At(latest);
+          final actionNoField = _createTestDocumentEntity(
+            id: 'action-no-field',
+            ver: actionVer,
+            type: DocumentType.proposalActionDocument,
+            refId: 'p1',
+            contentData: {'status': 'pending'},
+          );
+          await db.documentsV2Dao.saveAll([actionNoField]);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then: Should treat as draft and return latest version
+          expect(result.items.length, 1);
+          expect(result.items[0].proposal.ver, proposal1NewVer);
+        });
+
+        test('action with null action value treats as draft', () async {
+          // Given
+          final proposal1OldVer = _buildUuidV7At(earliest);
+          final proposal1Old = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1OldVer,
+            contentData: {'title': 'old'},
+          );
+          final proposal1NewVer = _buildUuidV7At(middle);
+          final proposal1New = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1NewVer,
+            contentData: {'title': 'new'},
+          );
+          await db.documentsV2Dao.saveAll([proposal1Old, proposal1New]);
+
+          // And: Action with null value
+          final actionVer = _buildUuidV7At(latest);
+          final actionNullValue = _createTestDocumentEntity(
+            id: 'action-null-value',
+            ver: actionVer,
+            type: DocumentType.proposalActionDocument,
+            refId: 'p1',
+            contentData: {'action': null},
+          );
+          await db.documentsV2Dao.saveAll([actionNullValue]);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then: Should treat as draft and return latest version
+          expect(result.items.length, 1);
+          expect(result.items[0].proposal.ver, proposal1NewVer);
+        });
+
+        test('action with empty string action treats as draft', () async {
+          // Given
+          final proposal1OldVer = _buildUuidV7At(earliest);
+          final proposal1Old = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1OldVer,
+            contentData: {'title': 'old'},
+          );
+          final proposal1NewVer = _buildUuidV7At(middle);
+          final proposal1New = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1NewVer,
+            contentData: {'title': 'new'},
+          );
+          await db.documentsV2Dao.saveAll([proposal1Old, proposal1New]);
+
+          // And: Action with empty string
+          final actionVer = _buildUuidV7At(latest);
+          final actionEmpty = _createTestDocumentEntity(
+            id: 'action-empty',
+            ver: actionVer,
+            type: DocumentType.proposalActionDocument,
+            refId: 'p1',
+            contentData: {'action': ''},
+          );
+          await db.documentsV2Dao.saveAll([actionEmpty]);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then: Should treat as draft and return latest version
+          expect(result.items.length, 1);
+          expect(result.items[0].proposal.ver, proposal1NewVer);
+        });
+
+        test('action with wrong type (number) handles gracefully', () async {
+          // Given
+          final proposal1OldVer = _buildUuidV7At(earliest);
+          final proposal1Old = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1OldVer,
+            contentData: {'title': 'old'},
+          );
+          final proposal1NewVer = _buildUuidV7At(middle);
+          final proposal1New = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1NewVer,
+            contentData: {'title': 'new'},
+          );
+          await db.documentsV2Dao.saveAll([proposal1Old, proposal1New]);
+
+          // And: Action with number instead of string
+          final actionVer = _buildUuidV7At(latest);
+          final actionNumber = _createTestDocumentEntity(
+            id: 'action-number',
+            ver: actionVer,
+            type: DocumentType.proposalActionDocument,
+            refId: 'p1',
+            contentData: {'action': 42},
+          );
+          await db.documentsV2Dao.saveAll([actionNumber]);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then: Should handle gracefully and return latest version
+          expect(result.items.length, 1);
+          expect(result.items[0].proposal.ver, proposal1NewVer);
+        });
+
+        test('action with boolean value handles gracefully', () async {
+          // Given
+          final proposal1OldVer = _buildUuidV7At(earliest);
+          final proposal1Old = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1OldVer,
+            contentData: {'title': 'old'},
+          );
+          final proposal1NewVer = _buildUuidV7At(middle);
+          final proposal1New = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1NewVer,
+            contentData: {'title': 'new'},
+          );
+          await db.documentsV2Dao.saveAll([proposal1Old, proposal1New]);
+
+          // And: Action with boolean value
+          final actionVer = _buildUuidV7At(latest);
+          final actionBool = _createTestDocumentEntity(
+            id: 'action-bool',
+            ver: actionVer,
+            type: DocumentType.proposalActionDocument,
+            refId: 'p1',
+            contentData: {'action': true},
+          );
+          await db.documentsV2Dao.saveAll([actionBool]);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then: Should handle gracefully and return latest version
+          expect(result.items.length, 1);
+          expect(result.items[0].proposal.ver, proposal1NewVer);
+        });
+
+        test('action with nested JSON structure extracts correctly', () async {
+          // Given
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: _buildUuidV7At(earliest),
+          );
+          await db.documentsV2Dao.saveAll([proposal]);
+
+          // And: Action with nested structure (should extract $.action, not nested value)
+          final actionVer = _buildUuidV7At(latest);
+          final actionNested = _createTestDocumentEntity(
+            id: 'action-nested',
+            ver: actionVer,
+            type: DocumentType.proposalActionDocument,
+            refId: 'p1',
+            contentData: {
+              'metadata': {'action': 'ignore'},
+              'action': 'hide',
+            },
+          );
+          await db.documentsV2Dao.saveAll([actionNested]);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then: Should be hidden based on top-level action field
+          expect(result.items.length, 0);
+          expect(result.total, 0);
+        });
+      });
+
+      group('Ordering by createdAt vs UUID string', () {
+        test('proposals ordered by createdAt not ver string', () async {
+          // Given: Three proposals with specific createdAt times
+          final time1 = DateTime.utc(2025, 1, 1, 10, 0, 0);
+          final time2 = DateTime.utc(2025, 6, 15, 14, 30, 0);
+          final time3 = DateTime.utc(2025, 12, 31, 23, 59, 59);
+
+          final ver1 = _buildUuidV7At(time1);
+          final ver2 = _buildUuidV7At(time2);
+          final ver3 = _buildUuidV7At(time3);
+
+          final proposal1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: ver1,
+            contentData: {'order': 'oldest'},
+          );
+          final proposal2 = _createTestDocumentEntity(
+            id: 'p2',
+            ver: ver2,
+            contentData: {'order': 'middle'},
+          );
+          final proposal3 = _createTestDocumentEntity(
+            id: 'p3',
+            ver: ver3,
+            contentData: {'order': 'newest'},
+          );
+
+          await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then: Should be ordered newest first by createdAt
+          expect(result.items.length, 3);
+          expect(result.items[0].proposal.content.data['order'], 'newest');
+          expect(result.items[1].proposal.content.data['order'], 'middle');
+          expect(result.items[2].proposal.content.data['order'], 'oldest');
+        });
+
+        test('proposals with manually set createdAt respect createdAt not ver', () async {
+          // Given: Non-UUIDv7 versions with explicit createdAt
+          final proposal1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: '00000000-0000-0000-0000-000000000001',
+            createdAt: DateTime.utc(2025, 1, 1),
+            contentData: {'when': 'second'},
+          );
+          final proposal2 = _createTestDocumentEntity(
+            id: 'p2',
+            ver: '00000000-0000-0000-0000-000000000002',
+            createdAt: DateTime.utc(2025, 12, 31),
+            contentData: {'when': 'first'},
+          );
+
+          await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then: Should order by createdAt (Dec 31 first), not ver string
+          expect(result.items.length, 2);
+          expect(result.items[0].proposal.content.data['when'], 'first');
+          expect(result.items[1].proposal.content.data['when'], 'second');
+        });
+      });
+
+      group('Count consistency', () {
+        final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
+        final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
+        final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
+
+        test('count matches items in complex scenario', () async {
+          // Given: Multiple proposals with various actions
+          final proposal1Ver = _buildUuidV7At(earliest);
+          final proposal1 = _createTestDocumentEntity(id: 'p1', ver: proposal1Ver);
+
+          final proposal2Ver = _buildUuidV7At(middle);
+          final proposal2 = _createTestDocumentEntity(id: 'p2', ver: proposal2Ver);
+
+          final proposal3Ver = _buildUuidV7At(latest);
+          final proposal3 = _createTestDocumentEntity(id: 'p3', ver: proposal3Ver);
+
+          final actionHideVer = _buildUuidV7At(latest.add(const Duration(hours: 1)));
+          final actionHide = _createTestDocumentEntity(
+            id: 'action-hide',
+            ver: actionHideVer,
+            type: DocumentType.proposalActionDocument,
+            refId: 'p1',
+            contentData: {'action': 'hide'},
+          );
+
+          final actionFinalVer = _buildUuidV7At(latest.add(const Duration(hours: 2)));
+          final actionFinal = _createTestDocumentEntity(
+            id: 'action-final',
+            ver: actionFinalVer,
+            type: DocumentType.proposalActionDocument,
+            refId: 'p2',
+            refVer: proposal2Ver,
+            contentData: {'action': 'final'},
+          );
+
+          await db.documentsV2Dao.saveAll([
+            proposal1,
+            proposal2,
+            proposal3,
+            actionHide,
+            actionFinal,
+          ]);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then: Count should match visible items (p2 final, p3 draft)
+          expect(result.items.length, 2);
+          expect(result.total, 2);
+        });
+
+        test('count remains consistent across pagination', () async {
+          // Given: 25 proposals
+          final proposals = <DocumentEntityV2>[];
+          for (int i = 0; i < 25; i++) {
+            final time = DateTime.utc(2025, 1, 1).add(Duration(hours: i));
+            final ver = _buildUuidV7At(time);
+            proposals.add(
+              _createTestDocumentEntity(
+                id: 'p$i',
+                ver: ver,
+                contentData: {'index': i},
+              ),
+            );
+          }
+          await db.documentsV2Dao.saveAll(proposals);
+
+          // When: Query multiple pages
+          final page1 = await dao.getProposalsBriefPage(const PageRequest(page: 0, size: 10));
+          final page2 = await dao.getProposalsBriefPage(const PageRequest(page: 1, size: 10));
+          final page3 = await dao.getProposalsBriefPage(const PageRequest(page: 2, size: 10));
+
+          // Then: Total should be consistent across all pages
+          expect(page1.total, 25);
+          expect(page2.total, 25);
+          expect(page3.total, 25);
+
+          expect(page1.items.length, 10);
+          expect(page2.items.length, 10);
+          expect(page3.items.length, 5);
+        });
+      });
+
+      group('NULL ref_ver handling', () {
+        final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
+        final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
+        final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
+
+        test('final action with NULL ref_ver uses latest version', () async {
+          // Given
+          final proposal1OldVer = _buildUuidV7At(earliest);
+          final proposal1Old = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1OldVer,
+            contentData: {'title': 'old'},
+          );
+          final proposal1NewVer = _buildUuidV7At(middle);
+          final proposal1New = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1NewVer,
+            contentData: {'title': 'new'},
+          );
+          await db.documentsV2Dao.saveAll([proposal1Old, proposal1New]);
+
+          // And: Final action with NULL ref_ver
+          final actionVer = _buildUuidV7At(latest);
+          final actionFinal = _createTestDocumentEntity(
+            id: 'action-final',
+            ver: actionVer,
+            type: DocumentType.proposalActionDocument,
+            refId: 'p1',
+            refVer: null,
+            contentData: {'action': 'final'},
+          );
+          await db.documentsV2Dao.saveAll([actionFinal]);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then: Should use latest version
+          expect(result.items.length, 1);
+          expect(result.items[0].proposal.ver, proposal1NewVer);
+          expect(result.items[0].proposal.content.data['title'], 'new');
+        });
+
+        test('final action with empty string ref_ver uses latest version', () async {
+          // Given
+          final proposal1OldVer = _buildUuidV7At(earliest);
+          final proposal1Old = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1OldVer,
+            contentData: {'title': 'old'},
+          );
+          final proposal1NewVer = _buildUuidV7At(middle);
+          final proposal1New = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1NewVer,
+            contentData: {'title': 'new'},
+          );
+          await db.documentsV2Dao.saveAll([proposal1Old, proposal1New]);
+
+          // And: Final action with empty string ref_ver
+          final actionVer = _buildUuidV7At(latest);
+          final actionFinal = _createTestDocumentEntity(
+            id: 'action-final',
+            ver: actionVer,
+            type: DocumentType.proposalActionDocument,
+            refId: 'p1',
+            refVer: '',
+            contentData: {'action': 'final'},
+          );
+          await db.documentsV2Dao.saveAll([actionFinal]);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then: Should use latest version
+          expect(result.items.length, 1);
+          expect(result.items[0].proposal.ver, proposal1NewVer);
+        });
+      });
+
+      group('Case sensitivity', () {
+        final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
+        final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
+
+        test('uppercase HIDE action does not hide proposal', () async {
+          // Given
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: _buildUuidV7At(earliest),
+          );
+          await db.documentsV2Dao.saveAll([proposal]);
+
+          // And: Action with uppercase HIDE
+          final actionVer = _buildUuidV7At(latest);
+          final actionUpper = _createTestDocumentEntity(
+            id: 'action-upper',
+            ver: actionVer,
+            type: DocumentType.proposalActionDocument,
+            refId: 'p1',
+            contentData: {'action': 'HIDE'},
+          );
+          await db.documentsV2Dao.saveAll([actionUpper]);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then: Should NOT hide (case sensitive)
+          expect(result.items.length, 1);
+        });
+
+        test('mixed case Final action does not treat as final', () async {
+          // Given
+          final proposal1OldVer = _buildUuidV7At(earliest);
+          final proposal1Old = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1OldVer,
+            contentData: {'title': 'old'},
+          );
+          final proposal1NewVer = _buildUuidV7At(latest);
+          final proposal1New = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1NewVer,
+            contentData: {'title': 'new'},
+          );
+          await db.documentsV2Dao.saveAll([proposal1Old, proposal1New]);
+
+          // And: Action with mixed case
+          final actionVer = _buildUuidV7At(latest.add(const Duration(hours: 1)));
+          final actionMixed = _createTestDocumentEntity(
+            id: 'action-mixed',
+            ver: actionVer,
+            type: DocumentType.proposalActionDocument,
+            refId: 'p1',
+            refVer: proposal1OldVer,
+            contentData: {'action': 'Final'},
+          );
+          await db.documentsV2Dao.saveAll([actionMixed]);
+
+          // When
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          // Then: Should treat as draft and use latest version
+          expect(result.items.length, 1);
+          expect(result.items[0].proposal.ver, proposal1NewVer);
+        });
+      });
     });
   });
 }
@@ -522,6 +1149,7 @@ DocumentEntityV2 _createTestDocumentEntity({
   String? ver,
   Map<String, dynamic> contentData = const {},
   DocumentType type = DocumentType.proposalDocument,
+  DateTime? createdAt,
   String? authors,
   String? categoryId,
   String? categoryVer,
@@ -541,7 +1169,7 @@ DocumentEntityV2 _createTestDocumentEntity({
     id: id,
     ver: ver,
     content: DocumentDataContent(contentData),
-    createdAt: ver.tryDateTime ?? DateTime.now(),
+    createdAt: createdAt ?? ver.tryDateTime ?? DateTime.now(),
     type: type,
     authors: authors,
     categoryId: categoryId,

@@ -177,7 +177,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// Returns: List of [JoinedProposalBriefEntity] mapped from raw rows of customSelect
   Future<List<JoinedProposalBriefEntity>> _queryVisibleProposalsPage(int page, int size) async {
     const cteQuery = r'''
-    WITH latest_proposals AS (
+   WITH latest_proposals AS (
       SELECT id, MAX(ver) as max_ver
       FROM documents_v2
       WHERE type = ?
@@ -193,29 +193,24 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       SELECT 
         a.ref_id,
         a.ref_ver,
-        json_extract(a.content, '$.action') as action_type
+        COALESCE(json_extract(a.content, '$.action'), 'draft') as action_type
       FROM documents_v2 a
       INNER JOIN latest_actions la ON a.ref_id = la.ref_id AND a.ver = la.max_action_ver
       WHERE a.type = ?
     ),
-    hidden_proposals AS (
-      SELECT ref_id
-      FROM action_status
-      WHERE action_type = 'hide'
-    ),
     effective_proposals AS (
       SELECT 
-        COALESCE(
-          CASE WHEN ast.action_type = 'final' THEN ast.ref_id END,
-          lp.id
-        ) as id,
-        COALESCE(
-          CASE WHEN ast.action_type = 'final' AND ast.ref_ver IS NOT NULL THEN ast.ref_ver END,
-          lp.max_ver
-        ) as ver
+        lp.id,
+        CASE 
+          WHEN ast.action_type = 'final' AND ast.ref_ver IS NOT NULL AND ast.ref_ver != '' THEN ast.ref_ver
+          ELSE lp.max_ver
+        END as ver
       FROM latest_proposals lp
       LEFT JOIN action_status ast ON lp.id = ast.ref_id
-      WHERE lp.id NOT IN (SELECT ref_id FROM hidden_proposals)
+      WHERE NOT EXISTS (
+        SELECT 1 FROM action_status hidden 
+        WHERE hidden.ref_id = lp.id AND hidden.action_type = 'hide'
+      )
     )
     SELECT p.*
     FROM documents_v2 p
