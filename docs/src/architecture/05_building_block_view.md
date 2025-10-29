@@ -8,71 +8,128 @@ icon: material/toy-brick-search
 
 ## White box Overall System
 
-... ***~Overview Diagram~***
+The system is split into a Flutter client and a Rust gateway with shared specifications and generated clients.
 
-Motivation  
-... *~text explanation~*
+```mermaid
+flowchart TB
+  subgraph Client
+    UI[UI Layer]
+    REPO[Repositories]
+    LDB[(Drift/SQLite)]
+    CRYPTO[WASM Crypto]
+  end
 
-Contained Building Blocks  
-... *~Description of contained building block (black boxes)~*
+  subgraph Gateway
+    HTTP[HTTP Router]
+    DOCS[Document Service]
+    CARD[Cardano Service]
+    EVT[Event DB Access]
+    IDX[(Scylla Caches)]
+    METRICS[Metrics/Health]
+  end
 
-Important Interfaces  
-... *~Description of important interfaces~*
+  PG[(PostgreSQL)]
+  CARDANO[Cardano Network]
 
-### ~Name black box 1~
+  UI --> REPO
+  REPO <--> LDB
+  REPO <--> HTTP
+  REPO --> CRYPTO
+  HTTP --> DOCS
+  HTTP --> CARD
+  DOCS <--> EVT
+  EVT <--> PG
+  CARD <--> IDX
+  IDX <--> CARDANO
+  METRICS -.-> HTTP
+```
 
-... *~Purpose/Responsibility~*
+Motivation:
 
-... *~Interface(s)~*
+The separation enables fast client experiences with local data while centralizing validation and integration with Cardano.
 
-... *~(Optional) Quality/Performance Characteristics~*
+Contained building blocks:
 
-... *~(Optional) Directory/File Location~*
+* UI Layer: Screens and user flows for proposal and voting features.
+* Repositories: Data access orchestrating HTTP APIs, local cache, and transformations.
+* Local Database: Drift based SQLite for offline and responsive UX.
+* Crypto Libraries: WASM backed key derivation and compression used from Dart.
+* HTTP Router: Poem powered API surface and OpenAPI documentation.
+* Document Service: Validation and storage of signed documents and their versions.
+* Cardano Service: Read-only endpoints for RBAC registrations (CIP-509 primary), legacy CIP-36 data, and staking information.
+* Event DB Access: Persistence layer for event data in PostgreSQL.
+* Scylla Caches: Chain follower and caches for chain derived information at scale.
+* Metrics and Health: Liveness, readiness, and Prometheus metrics for operations.
 
-... *~(Optional) Fulfilled Requirements~*
+Important interfaces:
 
-... *~(optional) Open Issues/Problems/Risks~*
-
-### ~Name black box 2~
-
-... *~black box template~*
-
-### ~Name black box n~
-
-... *~black box template~*
-
-### ~Name interface 1~
-
-…
-
-### ~Name interface m~
+* `PUT /v1/document` Accepts a COSE_Sign CBOR document for idempotent creation.
+* `GET /v1/document/:id` Returns a COSE CBOR document at a version or latest.
+* `POST /v2/document/index` Returns a paged index of documents matching a filter.
+* `GET /cardano/rbac/...` Returns on-chain RBAC registration information.
+* `GET /cardano/cip36/...` Returns legacy voter registration and stake related data.
+* All registration submissions occur on-chain via Cardano transaction submission and not through the gateway.
+* `GET /health/*` and `/metrics` expose operational status and metrics.
 
 ## Level 2
 
-### White Box *~building block 1~*
+### White Box Document Service
 
-... *~white box template~*
+Purpose and responsibilities:
 
-### White Box *~building block 2~*
+* Validate COSE signatures and signer permissions.
+* Enforce template compatibility and version references.
+* Persist documents and maintain latest pointers and indexes.
 
-... *~white box template~*
+Interfaces:
 
-…
+* `PUT /v1/document` and `GET /v1/document/:id` plus index query endpoint.
 
-### White Box *~building block m~*
+Quality characteristics:
 
-... *~white box template~*
+* Idempotent writes and content based deduplication reduce accidental duplication.
+* Validation errors return structured unprocessable content details.
+
+### White Box Cardano Service
+
+Purpose and responsibilities:
+
+* Serve RBAC registration chains and stake information for clients and gateway checks.
+* Normalize data from Scylla caches into API responses.
+
+Interfaces:
+
+* `GET /cardano/rbac/...` and `GET /cardano/cip36/...` (legacy) endpoints.
+
+Quality characteristics:
+
+* Read heavy endpoints optimized via Scylla and in memory caches.
+
+### White Box Repositories (Client)
+
+Purpose and responsibilities:
+
+* Aggregate server responses and local state into UI friendly models.
+* Handle pagination, retries, and background refresh.
+
+Interfaces:
+
+* HTTP client generated from OpenAPI with request and response interceptors.
+
+Quality characteristics:
+
+* Predictable behavior and testability with generated types and fixtures.
 
 ## Level 3
 
-### White Box ~\_building block x.1\_\~
+### White Box Chain Follower and Caches
 
-... *~white box template~*
+Responsibilities:
 
-### White Box ~\_building block x.2\_\~
+* Track registered transactions and chains relevant to Catalyst roles.
+* Maintain persistent and volatile caches for low latency lookups.
 
-... *~white box template~*
+Interactions:
 
-### White Box ~\_building block y.1\_\~
-
-... *~white box template~*
+* Periodically synchronize with configured Cardano networks.
+* Update metrics for freshness and cache hit ratios.

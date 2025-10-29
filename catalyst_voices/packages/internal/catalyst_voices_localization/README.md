@@ -3,12 +3,12 @@
 This package contains the localization files for the Catalyst Voices app.
 
 * [Catalyst Voices Localization](#catalyst-voices-localization)
-  * [Working with Translations](#working-with-translations)
-  * [Creating New Locale Messages](#creating-new-locale-messages)
-    * [Adding Strings](#adding-strings)
-    * [Adding Translations](#adding-translations)
-    * [Adding Supported Locales](#adding-supported-locales)
-  * [Generating VoicesLocalizations](#generating-voiceslocalizations)
+    * [Working with Translations](#working-with-translations)
+    * [Creating New Locale Messages](#creating-new-locale-messages)
+        * [Adding Strings](#adding-strings)
+        * [Adding Translations](#adding-translations)
+        * [Adding Supported Locales](#adding-supported-locales)
+    * [Generating VoicesLocalizations](#generating-voiceslocalizations)
 
 ## Working with Translations
 
