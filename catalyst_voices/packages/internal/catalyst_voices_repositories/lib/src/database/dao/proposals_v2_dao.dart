@@ -6,6 +6,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents_local_
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.dart';
+import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:drift/drift.dart';
 
 /// Data Access Object for Proposal-specific queries.
@@ -204,7 +205,8 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         CASE 
           WHEN ast.action_type = 'final' AND ast.ref_ver IS NOT NULL AND ast.ref_ver != '' THEN ast.ref_ver
           ELSE lp.max_ver
-        END as ver
+        END as ver,
+        ast.action_type
       FROM latest_proposals lp
       LEFT JOIN action_status ast ON lp.id = ast.ref_id
       WHERE NOT EXISTS (
@@ -212,7 +214,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         WHERE hidden.ref_id = lp.id AND hidden.action_type = 'hide'
       )
     )
-    SELECT p.*
+    SELECT p.*, ep.action_type
     FROM documents_v2 p
     INNER JOIN effective_proposals ep ON p.id = ep.id AND p.ver = ep.ver
     WHERE p.type = ?
@@ -221,20 +223,26 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   ''';
 
     return customSelect(
-          cteQuery,
-          variables: [
-            Variable.withString(DocumentType.proposalDocument.uuid),
-            Variable.withString(DocumentType.proposalActionDocument.uuid),
-            Variable.withString(DocumentType.proposalActionDocument.uuid),
-            Variable.withString(DocumentType.proposalDocument.uuid),
-            Variable.withInt(size),
-            Variable.withInt(page * size),
-          ],
-          readsFrom: {documentsV2},
-        )
-        .map((row) => documentsV2.map(row.data))
-        .map((proposal) => JoinedProposalBriefEntity(proposal: proposal))
-        .get();
+      cteQuery,
+      variables: [
+        Variable.withString(DocumentType.proposalDocument.uuid),
+        Variable.withString(DocumentType.proposalActionDocument.uuid),
+        Variable.withString(DocumentType.proposalActionDocument.uuid),
+        Variable.withString(DocumentType.proposalDocument.uuid),
+        Variable.withInt(size),
+        Variable.withInt(page * size),
+      ],
+      readsFrom: {documentsV2},
+    ).map((row) {
+      final proposal = documentsV2.map(row.data);
+      final rawActionType = row.readNullable<String>('action_type') ?? '';
+      final actionType = ProposalSubmissionActionDto.fromJson(rawActionType)?.toModel();
+
+      return JoinedProposalBriefEntity(
+        proposal: proposal,
+        actionType: actionType,
+      );
+    }).get();
   }
 }
 
