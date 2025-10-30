@@ -30,7 +30,6 @@ abstract interface class FeatureFlagsService {
   });
 
   /// Watch changes for a specific feature
-  /// Extracts and emits only the requested feature's state from the global list
   Stream<bool> watchFeature(Feature feature);
 }
 

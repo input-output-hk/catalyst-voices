@@ -183,8 +183,8 @@ on used env type.
 Feature flags allow you to enable or disable specific features at compile-time or runtime.
 The feature flag system provides flexible configuration through multiple sources.
 
-All feature flags can be found in the [Features](./packages/internal/catalyst_voices_models/lib/src/feature_flags/features.dart) class.
-
+All feature flags can be found in the [Features](./packages/internal/catalyst_voices_models/lib/src/feature_flags/features.dart)
+class.
 
 #### Using Feature Flags with --dart-define
 
