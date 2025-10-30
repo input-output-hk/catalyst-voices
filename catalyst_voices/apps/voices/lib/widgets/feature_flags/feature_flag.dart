@@ -4,14 +4,14 @@ import 'package:flutter/widgets.dart';
 
 class FeatureFlag extends StatelessWidget {
   final Feature feature;
-  final Widget featureChild;
-  final Widget? fallbackChild;
+  final Widget enabledChild;
+  final Widget? disabledChild;
 
   const FeatureFlag({
     super.key,
     required this.feature,
-    required this.featureChild,
-    this.fallbackChild,
+    required this.enabledChild,
+    this.disabledChild,
   });
 
   @override
@@ -19,7 +19,7 @@ class FeatureFlag extends StatelessWidget {
     return BlocSelector<FeatureFlagsCubit, FeatureFlagsState, bool>(
       selector: (state) => state.isEnabled(feature),
       builder: (context, enabled) {
-        return enabled ? featureChild : (fallbackChild ?? const SizedBox.shrink());
+        return enabled ? enabledChild : (disabledChild ?? const SizedBox.shrink());
       },
     );
   }

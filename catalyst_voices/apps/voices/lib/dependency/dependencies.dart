@@ -211,7 +211,6 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<FeatureFlagsCubit>(() {
         return FeatureFlagsCubit(
           get<FeatureFlagsService>(),
-          get<AppEnvironment>().type,
         );
       });
   }

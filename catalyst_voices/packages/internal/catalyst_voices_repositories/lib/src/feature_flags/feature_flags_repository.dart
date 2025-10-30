@@ -16,7 +16,7 @@ abstract interface class FeatureFlagsRepository {
   FeatureFlagInfo getInfo(Feature feature);
 
   /// Get value for a feature from sources (with highest priority source)
-  bool getValue(Feature feature);
+  bool isEnabled(Feature feature);
 
   /// Set value for a feature in a specific source
   void setValue({
@@ -75,7 +75,7 @@ final class FeatureFlagsRepositoryImpl implements FeatureFlagsRepository {
   }
 
   @override
-  bool getValue(Feature feature) {
+  bool isEnabled(Feature feature) {
     return getInfo(feature).enabled;
   }
 
@@ -86,11 +86,9 @@ final class FeatureFlagsRepositoryImpl implements FeatureFlagsRepository {
     required bool? value,
   }) {
     final source = _sources.firstWhereOrNull((s) => s.sourceType == sourceType);
-    if (source != null) {
-      source.setValue(
-        feature,
-        value: value,
-      );
+    if (source == null) {
+      throw ArgumentError('No source found for type $sourceType.');
     }
+    source.setValue(feature, value: value);
   }
 }

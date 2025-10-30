@@ -23,8 +23,8 @@ abstract interface class FeatureFlagsService {
   /// Check if a feature is enabled
   bool isEnabled(Feature feature);
 
-  /// Set a user override feature flag and notify listeners
-  void setUserOverrideFeature(
+  /// Set a user override feature and notify listeners
+  void setUserOverride(
     Feature feature, {
     required bool? value,
   });
@@ -63,11 +63,11 @@ final class FeatureFlagsServiceImpl implements FeatureFlagsService {
 
   @override
   bool isEnabled(Feature feature) {
-    return _featureFlagsRepository.getValue(feature);
+    return _featureFlagsRepository.isEnabled(feature);
   }
 
   @override
-  void setUserOverrideFeature(
+  void setUserOverride(
     Feature feature, {
     required bool? value,
   }) {

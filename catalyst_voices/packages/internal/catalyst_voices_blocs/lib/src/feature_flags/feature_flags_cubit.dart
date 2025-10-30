@@ -9,15 +9,8 @@ final class FeatureFlagsCubit extends Cubit<FeatureFlagsState> {
 
   StreamSubscription<List<FeatureFlagInfo>>? _subscription;
 
-  FeatureFlagsCubit(
-    this._featureFlagsService,
-    AppEnvironmentType environmentType,
-  ) : super(
-        FeatureFlagsState(
-          environmentType,
-          features: _buildFeaturesMap(_featureFlagsService.getAllInfo()),
-        ),
-      ) {
+  FeatureFlagsCubit(this._featureFlagsService)
+    : super(FeatureFlagsState(features: _buildFeaturesMap(_featureFlagsService.getAllInfo()))) {
     _subscribeToChanges();
   }
 
