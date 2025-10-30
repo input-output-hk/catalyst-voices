@@ -118,6 +118,14 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Future<void> updateProposalFavorite({
+    required String id,
+    required bool isFavorite,
+  }) async {
+    await _database.proposalsV2Dao.updateProposalFavorite(id: id, isFavorite: isFavorite);
+  }
+
+  @override
   Stream<DocumentData?> watch({required DocumentRef ref}) {
     return _database.documentsDao.watch(ref: ref).map((entity) => entity?.toModel());
   }

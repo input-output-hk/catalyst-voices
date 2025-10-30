@@ -74,6 +74,11 @@ abstract interface class ProposalRepository {
     bool includeLocalDrafts = false,
   });
 
+  Future<void> updateProposalFavorite({
+    required String id,
+    required bool isFavorite,
+  });
+
   Future<void> upsertDraftProposal({required DocumentData document});
 
   Stream<int> watchCommentsCount({
@@ -268,6 +273,14 @@ final class ProposalRepositoryImpl implements ProposalRepository {
           ),
         )
         .toList();
+  }
+
+  @override
+  Future<void> updateProposalFavorite({
+    required String id,
+    required bool isFavorite,
+  }) {
+    return _proposalsLocalSource.updateProposalFavorite(id: id, isFavorite: isFavorite);
   }
 
   @override

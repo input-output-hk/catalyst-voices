@@ -3,6 +3,7 @@ import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.dart';
+import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.dart';
@@ -79,6 +80,25 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       total: total,
       page: effectivePage,
       maxPerPage: effectiveSize,
+    );
+  }
+
+  @override
+  Future<void> updateProposalFavorite({
+    required String id,
+    required bool isFavorite,
+  }) async {
+    await transaction(
+      () async {
+        if (!isFavorite) {
+          await (delete(documentsLocalMetadata)..where((tbl) => tbl.id.equals(id))).go();
+          return;
+        }
+
+        final entity = DocumentLocalMetadataEntity(id: id, isFavorite: isFavorite);
+
+        await into(documentsLocalMetadata).insert(entity);
+      },
     );
   }
 
@@ -344,6 +364,18 @@ abstract interface class ProposalsV2Dao {
   ///
   /// Returns: Page object with items, total count, and pagination metadata
   Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage(PageRequest request);
+
+  /// Updates the favorite status of a proposal.
+  ///
+  /// This method updates or inserts a record in the local metadata table
+  /// to mark a proposal as a favorite.
+  ///
+  /// - [id]: The unique identifier of the proposal.
+  /// - [isFavorite]: A boolean indicating whether the proposal should be marked as a favorite.
+  Future<void> updateProposalFavorite({
+    required String id,
+    required bool isFavorite,
+  });
 
   /// Same as [getProposalsBriefPage] but rebuilds when database changes
   Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage(PageRequest request);

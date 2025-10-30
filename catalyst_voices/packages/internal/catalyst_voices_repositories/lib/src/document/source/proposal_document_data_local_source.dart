@@ -20,6 +20,11 @@ abstract interface class ProposalDocumentDataLocalSource {
     required ProposalsOrder order,
   });
 
+  Future<void> updateProposalFavorite({
+    required String id,
+    required bool isFavorite,
+  });
+
   Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage(PageRequest request);
 
   Stream<ProposalsCount> watchProposalsCount({
