@@ -38,9 +38,6 @@ abstract interface class DraftsDao {
     DocumentRef? ref,
   });
 
-  /// Returns all known document drafts refs.
-  Future<List<TypedDocumentRef>> queryAllTypedRefs();
-
   Future<DocumentDraftEntity?> queryLatest({
     CatalystId? authorId,
   });
@@ -119,33 +116,6 @@ class DriftDraftsDao extends DatabaseAccessor<DriftCatalystDatabase>
     }
 
     return query.get();
-  }
-
-  @override
-  Future<List<TypedDocumentRef>> queryAllTypedRefs() {
-    final select = selectOnly(drafts)
-      ..addColumns([
-        drafts.idHi,
-        drafts.idLo,
-        drafts.verHi,
-        drafts.verLo,
-        drafts.type,
-      ]);
-
-    return select.map((row) {
-      final id = UuidHiLo(
-        high: row.read(drafts.idHi)!,
-        low: row.read(drafts.idLo)!,
-      );
-      final version = UuidHiLo(
-        high: row.read(drafts.verHi)!,
-        low: row.read(drafts.verLo)!,
-      );
-      final ref = DraftRef(id: id.uuid, version: version.uuid);
-      final type = row.readWithConverter(drafts.type)!;
-
-      return TypedDocumentRef(ref: ref, type: type);
-    }).get();
   }
 
   @override

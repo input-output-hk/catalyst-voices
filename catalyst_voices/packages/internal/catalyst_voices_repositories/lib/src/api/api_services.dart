@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart' show AppEnvironmentType;
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/generated/api/cat_gateway.swagger.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_index.dart';
 import 'package:catalyst_voices_repositories/generated/api/client_mapping.dart';
@@ -6,6 +6,7 @@ import 'package:catalyst_voices_repositories/src/api/converters/cbor_or_json_con
 import 'package:catalyst_voices_repositories/src/api/converters/cbor_serializable_converter.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/path_trim_interceptor.dart';
 import 'package:catalyst_voices_repositories/src/api/interceptors/rbac_auth_interceptor.dart';
+import 'package:catalyst_voices_repositories/src/api/local/local_cat_gateway.dart';
 import 'package:catalyst_voices_repositories/src/auth/auth_token_provider.dart';
 import 'package:chopper/chopper.dart';
 import 'package:flutter/foundation.dart';
@@ -31,29 +32,34 @@ final class ApiServices {
   final CatStatus status;
 
   factory ApiServices({
-    required AppEnvironmentType env,
+    required ApiConfig config,
     AuthTokenProvider? authTokenProvider,
     ValueGetter<http.Client?>? httpClient,
   }) {
     _fixModelsMapping();
 
     return ApiServices.internal(
-      gateway: CatGateway.create(
-        httpClient: httpClient?.call(),
-        baseUrl: env.app.replace(path: '/api/gateway'),
-        converter: CborOrJsonDelegateConverter(
-          cborConverter: CborSerializableConverter(),
-          jsonConverter: $JsonSerializableConverter(),
-        ),
-        interceptors: [
-          PathTrimInterceptor(),
-          if (authTokenProvider != null) RbacAuthInterceptor(authTokenProvider),
-          if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
-        ],
-      ),
+      gateway: config.localGateway.isEnabled
+          ? LocalCatGateway.create(
+              initialProposalsCount: config.localGateway.proposalsCount,
+              decompressedDocuments: config.localGateway.decompressedDocuments,
+            )
+          : CatGateway.create(
+              httpClient: httpClient?.call(),
+              baseUrl: config.env.app.replace(path: '/api/gateway'),
+              converter: CborOrJsonDelegateConverter(
+                cborConverter: CborSerializableConverter(),
+                jsonConverter: $JsonSerializableConverter(),
+              ),
+              interceptors: [
+                PathTrimInterceptor(),
+                if (authTokenProvider != null) RbacAuthInterceptor(authTokenProvider),
+                if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
+              ],
+            ),
       reviews: CatReviews.create(
         httpClient: httpClient?.call(),
-        baseUrl: env.app.replace(path: '/api/reviews'),
+        baseUrl: config.env.app.replace(path: '/api/reviews'),
         interceptors: [
           PathTrimInterceptor(),
           if (authTokenProvider != null) RbacAuthInterceptor(authTokenProvider),
@@ -62,7 +68,7 @@ final class ApiServices {
       ),
       status: CatStatus.create(
         httpClient: httpClient?.call(),
-        baseUrl: env.status,
+        baseUrl: config.env.status,
         interceptors: [
           if (kDebugMode) HttpLoggingInterceptor(onlyErrors: true),
         ],

@@ -1,16 +1,15 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart' show Coin;
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_dao.dart';
-import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
-import '../../utils/test_factories.dart';
 import '../connection/test_connection.dart';
 import '../drift_test_platforms.dart';
 

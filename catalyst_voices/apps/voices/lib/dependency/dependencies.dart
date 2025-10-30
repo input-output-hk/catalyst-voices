@@ -42,6 +42,7 @@ final class Dependencies extends DependencyProvider {
     required ReportingService reportingService,
     CatalystProfiler? profiler,
     CatalystStartupProfiler? startupProfiler,
+    CatalystRuntimeProfiler? runtimeProfiler,
   }) async {
     DependencyProvider.instance = this;
 
@@ -54,6 +55,9 @@ final class Dependencies extends DependencyProvider {
     }
     if (startupProfiler != null) {
       registerSingleton(startupProfiler);
+    }
+    if (runtimeProfiler != null) {
+      registerSingleton(runtimeProfiler);
     }
 
     _registerStorages();
@@ -213,8 +217,16 @@ final class Dependencies extends DependencyProvider {
   void _registerNetwork() {
     registerLazySingleton<ApiServices>(
       () {
+        final appConfig = get<AppConfig>();
+        final appEnvironment = get<AppEnvironment>();
+
+        final config = ApiConfig(
+          env: appEnvironment.type,
+          localGateway: LocalGatewayConfig.stressTest(appConfig.stressTest),
+        );
+
         return ApiServices(
-          env: get<AppEnvironment>().type,
+          config: config,
           authTokenProvider: get<AuthTokenProvider>(),
           httpClient: () => get<ReportingService>().buildHttpClient(),
         );
@@ -237,9 +249,10 @@ final class Dependencies extends DependencyProvider {
         return BlockchainRepository(get<ApiServices>());
       })
       ..registerLazySingleton<SignedDocumentManager>(() {
-        return const SignedDocumentManager(
-          brotli: CatalystBrotliCompressor(),
-          zstd: CatalystZstdCompressor(),
+        return SignedDocumentManager(
+          brotli: const CatalystBrotliCompressor(),
+          zstd: const CatalystZstdCompressor(),
+          profiler: get<CatalystRuntimeProfiler>(),
         );
       })
       ..registerLazySingleton<DatabaseDraftsDataSource>(() {

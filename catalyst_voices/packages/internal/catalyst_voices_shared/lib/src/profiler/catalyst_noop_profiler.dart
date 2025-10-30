@@ -22,6 +22,15 @@ final class CatalystNoopProfiler implements CatalystProfiler {
   }) async {
     return body();
   }
+
+  @override
+  Future<T> timeWithResult<T>(
+    String name,
+    FutureOr<T> Function() body, {
+    CatalystProfilerTimelineArguments? arguments,
+  }) async {
+    return body();
+  }
 }
 
 final class _NoopTask implements CatalystProfilerTimelineTask {
@@ -64,6 +73,15 @@ final class _NoopTimeline implements CatalystProfilerTimeline {
   Future<void> time(
     String name,
     AsyncOrValueGetter<void> body, {
+    CatalystProfilerTimelineTaskArguments? arguments,
+  }) async {
+    return body();
+  }
+
+  @override
+  Future<T> timeWithResult<T>(
+    String name,
+    AsyncOrValueGetter<T> body, {
     CatalystProfilerTimelineTaskArguments? arguments,
   }) async {
     return body();

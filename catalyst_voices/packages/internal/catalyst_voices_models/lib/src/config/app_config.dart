@@ -27,6 +27,8 @@ final class AppConfig extends Equatable {
   final DatabaseConfig database;
   final SentryConfig sentry;
   final BlockchainConfig blockchain;
+  final StressTestConfig stressTest;
+  final CatalystDeveloperProfilerConfig developerProfiler;
 
   const AppConfig({
     required this.version,
@@ -34,6 +36,8 @@ final class AppConfig extends Equatable {
     required this.database,
     required this.sentry,
     required this.blockchain,
+    required this.stressTest,
+    required this.developerProfiler,
   });
 
   AppConfig.dev()
@@ -64,6 +68,8 @@ final class AppConfig extends Equatable {
           transactionBuilderConfig: _defaultTransactionBuilderConfig,
           slotNumberConfig: BlockchainSlotNumberConfig.testnet(),
         ),
+        stressTest: const StressTestConfig(),
+        developerProfiler: const CatalystDeveloperProfilerConfig(),
       );
 
   factory AppConfig.env(AppEnvironmentType env) {
@@ -103,6 +109,8 @@ final class AppConfig extends Equatable {
           transactionBuilderConfig: _defaultTransactionBuilderConfig,
           slotNumberConfig: BlockchainSlotNumberConfig.testnet(),
         ),
+        stressTest: const StressTestConfig(),
+        developerProfiler: const CatalystDeveloperProfilerConfig(),
       );
 
   AppConfig.prod()
@@ -133,6 +141,8 @@ final class AppConfig extends Equatable {
           transactionBuilderConfig: _defaultTransactionBuilderConfig,
           slotNumberConfig: BlockchainSlotNumberConfig.mainnet(),
         ),
+        stressTest: const StressTestConfig(),
+        developerProfiler: const CatalystDeveloperProfilerConfig(),
       );
 
   @override
@@ -142,6 +152,8 @@ final class AppConfig extends Equatable {
     database,
     sentry,
     blockchain,
+    stressTest,
+    developerProfiler,
   ];
 
   AppConfig copyWith({
@@ -150,6 +162,8 @@ final class AppConfig extends Equatable {
     DatabaseConfig? database,
     SentryConfig? sentry,
     BlockchainConfig? blockchain,
+    StressTestConfig? stressTest,
+    CatalystDeveloperProfilerConfig? developerProfiler,
   }) {
     return AppConfig(
       version: version ?? this.version,
@@ -157,6 +171,8 @@ final class AppConfig extends Equatable {
       database: database ?? this.database,
       sentry: sentry ?? this.sentry,
       blockchain: blockchain ?? this.blockchain,
+      stressTest: stressTest ?? this.stressTest,
+      developerProfiler: developerProfiler ?? this.developerProfiler,
     );
   }
 }
@@ -329,5 +345,35 @@ final class SentryConfig extends ReportingServiceConfig {
       attachViewHierarchy: attachViewHierarchy ?? this.attachViewHierarchy,
       diagnosticLevel: diagnosticLevel ?? this.diagnosticLevel,
     );
+  }
+}
+
+final class StressTestConfig extends Equatable {
+  const StressTestConfig();
+
+  bool get clearDatabase => const bool.fromEnvironment('STRESS_TEST_CLEAR_DB');
+
+  bool get decompressedDocuments => const bool.fromEnvironment('STRESS_TEST_DECOMPRESSED');
+
+  int get indexedProposalsCount {
+    return const int.fromEnvironment(
+      'STRESS_TEST_PROPOSAL_INDEX_COUNT',
+      defaultValue: 100,
+    );
+  }
+
+  bool get isEnabled => const bool.fromEnvironment('STRESS_TEST');
+
+  @override
+  List<Object?> get props => [];
+
+  @override
+  String toString() {
+    return 'StressTestConfig('
+        'isEnabled[$isEnabled], '
+        'indexedProposalsCount[$indexedProposalsCount], '
+        'decompressedDocuments[$decompressedDocuments], '
+        'clearDatabase[$clearDatabase]'
+        ')';
   }
 }

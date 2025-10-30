@@ -21,7 +21,6 @@ class CurrentCampaignInfoViewModel extends Equatable {
   factory CurrentCampaignInfoViewModel.dummy() {
     return CurrentCampaignInfoViewModel(
       title: 'Catalyst Fund14',
-      // Description is used in dialog detail campaign
       allFunds: MultiCurrencyAmount.single(
         Money.fromMajorUnits(
           currency: Currencies.ada,

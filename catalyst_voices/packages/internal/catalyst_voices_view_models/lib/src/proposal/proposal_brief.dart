@@ -54,6 +54,22 @@ class ProposalBrief extends Equatable {
     );
   }
 
+  factory ProposalBrief.prototype() {
+    return ProposalBrief(
+      selfRef: SignedDocumentRef.generateFirstRef(),
+      title: 'Proposal Title',
+      categoryName: 'Category Name',
+      author: 'Author Name',
+      fundsRequested: Money.zero(currency: Currencies.ada),
+      duration: 0,
+      publish: ProposalPublish.publishedDraft,
+      description: 'Proposal description',
+      versionNumber: 1,
+      updateDate: DateTime.now(),
+      commentsCount: 0,
+    );
+  }
+
   String get formattedFunds {
     return MoneyFormatter.formatCompactRounded(fundsRequested);
   }

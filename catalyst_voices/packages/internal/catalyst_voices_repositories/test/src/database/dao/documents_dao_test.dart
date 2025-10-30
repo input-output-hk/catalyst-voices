@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.dart';
@@ -7,7 +8,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
-import '../../utils/test_factories.dart';
 import '../connection/test_connection.dart';
 import '../drift_test_platforms.dart';
 
@@ -197,39 +197,6 @@ void main() {
           final entity = await database.documentsDao.query(ref: ref);
 
           expect(entity, isNull);
-        },
-        onPlatform: driftOnPlatforms,
-      );
-
-      test(
-        'all refs return as expected',
-        () async {
-          // Given
-          final refs = List.generate(
-            10,
-            (_) => DocumentRefFactory.signedDocumentRef(),
-          );
-
-          final documentsWithMetadata = refs.map((ref) {
-            return DocumentWithMetadataFactory.build(
-              metadata: DocumentDataMetadata(
-                type: DocumentType.proposalDocument,
-                selfRef: ref,
-              ),
-            );
-          });
-          final typedRefs = refs.map((e) => e.toTyped(DocumentType.proposalDocument)).toList();
-
-          // When
-          await database.documentsDao.saveAll(documentsWithMetadata);
-
-          // Then
-          final allRefs = await database.documentsDao.queryAllTypedRefs();
-
-          expect(
-            allRefs,
-            allOf(hasLength(refs.length), containsAll(typedRefs)),
-          );
         },
         onPlatform: driftOnPlatforms,
       );

@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:io';
 
+import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -12,7 +12,7 @@ import 'package:test/test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
 
 void main() {
-  final DocumentRepository documentRepository = _MockDocumentRepository();
+  final DocumentRepository documentRepository = MockDocumentRepository();
 
   late final AppMetaStorage appMetaStorage;
   late final SyncStatsStorage statsStorage;
@@ -50,32 +50,8 @@ void main() {
   });
 
   group(SyncManager, () {
-    test('sync throws error when documents sync fails', () async {
-      // Given
-      final allRefs = List.generate(
-        10,
-        (_) => SignedDocumentRef.first(const Uuid().v7()).toTyped(DocumentType.proposalDocument),
-      );
-      final cachedRefs = <TypedDocumentRef>[];
-
-      // When
-      when(
-        () => documentRepository.getAllDocumentsRefs(campaign: Campaign.f15()),
-      ).thenAnswer((_) => Future.value(allRefs));
-      when(documentRepository.getCachedDocumentsRefs).thenAnswer((_) => Future.value(cachedRefs));
-      when(
-        () => documentRepository.cacheDocument(ref: any(named: 'ref')),
-      ).thenAnswer((_) => Future.error(const HttpException('Unknown ref')));
-
-      // Then
-      expect(
-        () => syncManager.start(),
-        throwsA(isA<RefsSyncException>()),
-      );
-    });
+    // TODO(damian-molinski): rewrite test once performance work is finished
   });
 }
 
 class _MockCampaignService extends Mock implements CampaignService {}
-
-class _MockDocumentRepository extends Mock implements DocumentRepository {}

@@ -19,7 +19,6 @@ final class DocumentIndexListDto {
     return _$DocumentIndexListDtoFromJson(json);
   }
 
-  @visibleForTesting
   Map<String, dynamic> toJson() => _$DocumentIndexListDtoToJson(this);
 }
 

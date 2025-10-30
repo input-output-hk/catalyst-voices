@@ -15,6 +15,16 @@ final class CancelAccountNeedsVerificationSignal extends SessionSignal {
   const CancelAccountNeedsVerificationSignal();
 }
 
+/// Signal emitted when the keychain is locked.
+final class KeychainLockedSignal extends SessionSignal {
+  const KeychainLockedSignal();
+}
+
+/// Signal emitted when the keychain is unlocked.
+final class KeychainUnlockedSignal extends SessionSignal {
+  const KeychainUnlockedSignal();
+}
+
 sealed class SessionSignal extends Equatable {
   const SessionSignal();
 
