@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/common/ext/active_fund_number_selector_ext.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices/routes/routing/proposal_builder_route.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
@@ -28,24 +27,29 @@ class CreateNewProposalActionButtons extends StatelessWidget {
             color: context.colors.outlineBorderVariant,
           ),
         ),
+        color: context.colors.elevationsOnSurfaceNeutralLv1White,
       ),
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
       child: switch (step) {
         CreateProposalWithPreselectedCategoryStep() => const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          spacing: 8,
           children: [
-            _AgreementCheckboxes(),
+            Flexible(
+              child: _AgreementCheckboxes(),
+            ),
             _StartProposalButton(),
           ],
         ),
         CreateProposalWithoutPreselectedCategoryStep(:final stage)
             when stage == CreateProposalStage.selectCategory =>
           const Row(
+            spacing: 8,
             children: [
-              _AgreementCheckboxes(),
-              Spacer(),
+              Flexible(
+                child: _AgreementCheckboxes(),
+              ),
               _BackButton(),
-              SizedBox(width: 8),
               _StartProposalButton(),
             ],
           ),
@@ -88,7 +92,7 @@ class _AgreementCheckboxes extends StatelessWidget {
             context.read<NewProposalCubit>().updateAgreeToNoFurtherCategoryChange(value: value);
           },
           label: Text(
-            context.l10n.agreementCantChangeCategory(context.activeCampaignFundNumber),
+            context.l10n.agreementCantChangeCategory,
           ),
         ),
       ],

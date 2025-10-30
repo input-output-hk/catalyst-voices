@@ -23,7 +23,7 @@ pub(crate) mod health;
 const API_TITLE: &str = "Catalyst Gateway";
 
 /// The version of the API
-const API_VERSION: &str = "0.6.0";
+const API_VERSION: &str = "0.7.0";
 
 /// Get the contact details for inquiring about the API
 fn get_api_contact() -> ContactObject {

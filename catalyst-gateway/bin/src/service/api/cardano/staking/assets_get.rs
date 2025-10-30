@@ -85,7 +85,7 @@ struct TxoInfo {
 }
 
 /// Building a full stake info response from the provided arguments.
-async fn build_full_stake_info_response(
+pub(crate) async fn build_full_stake_info_response(
     stake_address: Cip19StakeAddress,
     provided_network: Option<Network>,
     slot_num: Option<SlotNo>,
