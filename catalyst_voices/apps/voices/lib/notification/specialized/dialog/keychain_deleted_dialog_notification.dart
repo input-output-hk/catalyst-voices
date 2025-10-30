@@ -14,7 +14,7 @@ final class KeychainDeletedDialogNotification extends DialogNotification {
       );
 
   @override
-  Widget dialog(BuildContext context) {
+  Widget buildDialog(BuildContext context) {
     return const _KeychainDeletedDialog();
   }
 }

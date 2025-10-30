@@ -283,7 +283,7 @@ class CatalystMessengerState extends State<CatalystMessenger> {
       return;
     }
 
-    final widget = notification.dialog(navigatorContext);
+    final widget = notification.buildDialog(navigatorContext);
 
     if (navigatorContext.mounted) {
       await VoicesDialog.show<void>(

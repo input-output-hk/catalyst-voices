@@ -8,5 +8,5 @@ abstract base class DialogNotification extends CatalystNotification {
     super.type,
   });
 
-  Widget dialog(BuildContext context);
+  Widget buildDialog(BuildContext context);
 }
