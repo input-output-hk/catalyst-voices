@@ -9,6 +9,7 @@ import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 
 final _logger = Logger('CatalystMessenger');
@@ -264,9 +265,23 @@ class CatalystMessengerState extends State<CatalystMessenger> {
   Future<void> _showDialog(DialogNotification notification) async {
     // Wait for the current frame to complete to ensure navigation has finished
     // So dialog not end up "below" current page widgets
-    await WidgetsBinding.instance.endOfFrame;
+    // Navigation can take multiple frames (redirects, page builds, etc.),
+    // so we use addPostFrameCallback to schedule after the current frame,
+    // which gives the router time to settle.
+    final completer = Completer<void>();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      completer.complete();
+    });
+    await completer.future;
 
+    // Check if the dialog is still active after navigation
     if (_activeDialog?.id != notification.id) {
+      return;
+    }
+
+    // Verify the dialog is still allowed for the current route
+    if (!notification.routerPredicate(_router.state)) {
+      _logger.finer('Dialog ${notification.id} no longer valid for current route after navigation');
       return;
     }
 
