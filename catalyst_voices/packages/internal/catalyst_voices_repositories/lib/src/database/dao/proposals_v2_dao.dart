@@ -83,6 +83,12 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     );
   }
 
+  String _buildPrefixedColumns(String tableAlias, String prefix) {
+    return documentsV2.$columns
+        .map((col) => '$tableAlias.${col.$name} as ${prefix}_${col.$name}')
+        .join(', \n');
+  }
+
   /// Counts total number of effective (non-hidden) proposals.
   ///
   /// This query mirrors the pagination query but only counts results.
@@ -177,7 +183,11 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   ///
   /// Returns: List of [JoinedProposalBriefEntity] mapped from raw rows of customSelect
   Future<List<JoinedProposalBriefEntity>> _queryVisibleProposalsPage(int page, int size) async {
-    const cteQuery = r'''
+    final proposalColumns = _buildPrefixedColumns('p', 'p');
+    final templateColumns = _buildPrefixedColumns('t', 't');
+
+    final cteQuery =
+        '''
    WITH latest_proposals AS (
       SELECT id, MAX(ver) as max_ver
       FROM documents_v2
@@ -206,7 +216,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       SELECT 
         a.ref_id,
         a.ref_ver,
-        COALESCE(json_extract(a.content, '$.action'), 'draft') as action_type
+        COALESCE(json_extract(a.content, '\$.action'), 'draft') as action_type
       FROM documents_v2 a
       INNER JOIN latest_actions la ON a.ref_id = la.ref_id AND a.ver = la.max_action_ver
       WHERE a.type = ?
@@ -238,7 +248,8 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       GROUP BY c.ref_id, c.ref_ver
     )
     SELECT 
-      p.*, 
+      $proposalColumns, 
+      $templateColumns, 
       ep.action_type, 
       ep.version_ids_str,
       COALESCE(cc.count, 0) as comments_count,
@@ -247,6 +258,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     INNER JOIN effective_proposals ep ON p.id = ep.id AND p.ver = ep.ver
     LEFT JOIN comments_count cc ON p.id = cc.ref_id AND p.ver = cc.ref_ver
     LEFT JOIN documents_local_metadata dlm ON p.id = dlm.id
+    LEFT JOIN documents_v2 t ON p.template_id = t.id AND p.template_ver = t.ver AND t.type = ?
     WHERE p.type = ?
     ORDER BY p.ver DESC
     LIMIT ? OFFSET ?
@@ -260,13 +272,25 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         Variable.withString(DocumentType.proposalActionDocument.uuid),
         Variable.withString(DocumentType.proposalActionDocument.uuid),
         Variable.withString(DocumentType.commentDocument.uuid),
+        Variable.withString(DocumentType.proposalTemplate.uuid),
         Variable.withString(DocumentType.proposalDocument.uuid),
         Variable.withInt(size),
         Variable.withInt(page * size),
       ],
       readsFrom: {documentsV2},
     ).map((row) {
-      final proposal = documentsV2.map(row.data);
+      final proposalData = {
+        for (final col in documentsV2.$columns)
+          col.$name: row.readNullableWithType(col.type, 'p_${col.$name}'),
+      };
+      final proposal = documentsV2.map(proposalData);
+
+      final templateData = {
+        for (final col in documentsV2.$columns)
+          col.$name: row.readNullableWithType(col.type, 't_${col.$name}'),
+      };
+
+      final template = templateData['id'] != null ? documentsV2.map(templateData) : null;
 
       final actionTypeRaw = row.readNullable<String>('action_type') ?? '';
       final actionType = ProposalSubmissionActionDto.fromJson(actionTypeRaw)?.toModel();
@@ -279,6 +303,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
       return JoinedProposalBriefEntity(
         proposal: proposal,
+        template: template,
         actionType: actionType,
         versionIds: versionIds,
         commentsCount: commentsCount,

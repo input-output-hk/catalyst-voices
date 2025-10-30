@@ -6,7 +6,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents_local_
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:drift/drift.dart' hide isNull;
+import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:uuid_plus/uuid_plus.dart';
@@ -1793,6 +1793,253 @@ void main() {
           expect(result.items.length, 1);
           expect(result.items.first.proposal.ver, ver1);
           expect(result.items.first.isFavorite, true);
+        });
+      });
+
+      group('Template', () {
+        test('returns null when proposal has no template', () async {
+          final proposalVer = _buildUuidV7At(latest);
+          final proposal = _createTestDocumentEntity(id: 'p1', ver: proposalVer);
+          await db.documentsV2Dao.saveAll([proposal]);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          expect(result.items.length, 1);
+          expect(result.items.first.template, isNull);
+        });
+
+        test('returns null when template does not exist in database', () async {
+          final proposalVer = _buildUuidV7At(latest);
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposalVer,
+            templateId: 'template-1',
+            templateVer: 'template-ver-1',
+          );
+          await db.documentsV2Dao.saveAll([proposal]);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          expect(result.items.length, 1);
+          expect(result.items.first.template, isNull);
+        });
+
+        test('returns template when it exists with matching id and ver', () async {
+          final templateVer = _buildUuidV7At(earliest);
+          final template = _createTestDocumentEntity(
+            id: 'template-1',
+            ver: templateVer,
+            type: DocumentType.proposalTemplate,
+            contentData: {'title': 'Template Title'},
+          );
+
+          final proposalVer = _buildUuidV7At(latest);
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposalVer,
+            templateId: 'template-1',
+            templateVer: templateVer,
+          );
+
+          await db.documentsV2Dao.saveAll([template, proposal]);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          expect(result.items.length, 1);
+          expect(result.items.first.template, isNotNull);
+          expect(result.items.first.template!.id, 'template-1');
+          expect(result.items.first.template!.ver, templateVer);
+          expect(result.items.first.template!.type, DocumentType.proposalTemplate);
+          expect(result.items.first.template!.content.data['title'], 'Template Title');
+        });
+
+        test('returns null when template id matches but ver does not', () async {
+          final templateVer1 = _buildUuidV7At(earliest);
+          final template1 = _createTestDocumentEntity(
+            id: 'template-1',
+            ver: templateVer1,
+            type: DocumentType.proposalTemplate,
+          );
+
+          final templateVer2 = _buildUuidV7At(middle);
+          final template2 = _createTestDocumentEntity(
+            id: 'template-1',
+            ver: templateVer2,
+            type: DocumentType.proposalTemplate,
+          );
+
+          final proposalVer = _buildUuidV7At(latest);
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposalVer,
+            templateId: 'template-1',
+            templateVer: templateVer1,
+          );
+
+          await db.documentsV2Dao.saveAll([template1, template2, proposal]);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          expect(result.items.length, 1);
+          expect(result.items.first.template, isNotNull);
+          expect(result.items.first.template!.ver, templateVer1);
+        });
+
+        test('returns null when document type is not proposalTemplate', () async {
+          final templateVer = _buildUuidV7At(earliest);
+          final template = _createTestDocumentEntity(
+            id: 'template-1',
+            ver: templateVer,
+            type: DocumentType.commentDocument,
+          );
+
+          final proposalVer = _buildUuidV7At(latest);
+          final proposal = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposalVer,
+            templateId: 'template-1',
+            templateVer: templateVer,
+          );
+
+          await db.documentsV2Dao.saveAll([template, proposal]);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          expect(result.items.length, 1);
+          expect(result.items.first.template, isNull);
+        });
+
+        test('returns correct templates for multiple proposals with different templates', () async {
+          final template1Ver = _buildUuidV7At(earliest);
+          final template1 = _createTestDocumentEntity(
+            id: 'template-1',
+            ver: template1Ver,
+            type: DocumentType.proposalTemplate,
+            contentData: {'title': 'Template 1'},
+          );
+
+          final template2Ver = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
+          final template2 = _createTestDocumentEntity(
+            id: 'template-2',
+            ver: template2Ver,
+            type: DocumentType.proposalTemplate,
+            contentData: {'title': 'Template 2'},
+          );
+
+          final proposal1Ver = _buildUuidV7At(latest);
+          final proposal1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: proposal1Ver,
+            templateId: 'template-1',
+            templateVer: template1Ver,
+          );
+
+          final proposal2Ver = _buildUuidV7At(latest);
+          final proposal2 = _createTestDocumentEntity(
+            id: 'p2',
+            ver: proposal2Ver,
+            templateId: 'template-2',
+            templateVer: template2Ver,
+          );
+
+          final proposal3Ver = _buildUuidV7At(latest);
+          final proposal3 = _createTestDocumentEntity(
+            id: 'p3',
+            ver: proposal3Ver,
+          );
+
+          await db.documentsV2Dao.saveAll([
+            template1,
+            template2,
+            proposal1,
+            proposal2,
+            proposal3,
+          ]);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          expect(result.items.length, 3);
+
+          final p1 = result.items.firstWhere((e) => e.proposal.id == 'p1');
+          final p2 = result.items.firstWhere((e) => e.proposal.id == 'p2');
+          final p3 = result.items.firstWhere((e) => e.proposal.id == 'p3');
+
+          expect(p1.template, isNotNull);
+          expect(p1.template!.id, 'template-1');
+          expect(p1.template!.content.data['title'], 'Template 1');
+
+          expect(p2.template, isNotNull);
+          expect(p2.template!.id, 'template-2');
+          expect(p2.template!.content.data['title'], 'Template 2');
+
+          expect(p3.template, isNull);
+        });
+
+        test('template is associated with effective proposal version', () async {
+          final template1Ver = _buildUuidV7At(earliest);
+          final template1 = _createTestDocumentEntity(
+            id: 'template-1',
+            ver: template1Ver,
+            type: DocumentType.proposalTemplate,
+            contentData: {'title': 'Template 1'},
+          );
+
+          final template2Ver = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
+          final template2 = _createTestDocumentEntity(
+            id: 'template-2',
+            ver: template2Ver,
+            type: DocumentType.proposalTemplate,
+            contentData: {'title': 'Template 2'},
+          );
+
+          final ver1 = _buildUuidV7At(middle);
+          final proposal1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: ver1,
+            templateId: 'template-1',
+            templateVer: template1Ver,
+          );
+
+          final ver2 = _buildUuidV7At(latest);
+          final proposal2 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: ver2,
+            templateId: 'template-2',
+            templateVer: template2Ver,
+          );
+
+          final actionVer = _buildUuidV7At(latest.add(const Duration(hours: 1)));
+          final action = _createTestDocumentEntity(
+            id: 'action-1',
+            ver: actionVer,
+            type: DocumentType.proposalActionDocument,
+            refId: 'p1',
+            refVer: ver1,
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          await db.documentsV2Dao.saveAll([
+            template1,
+            template2,
+            proposal1,
+            proposal2,
+            action,
+          ]);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(request);
+
+          expect(result.items.length, 1);
+          expect(result.items.first.proposal.ver, ver1);
+          expect(result.items.first.template, isNotNull);
+          expect(result.items.first.template!.id, 'template-1');
+          expect(result.items.first.template!.content.data['title'], 'Template 1');
         });
       });
     });

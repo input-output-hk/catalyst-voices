@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 
 class JoinedProposalBriefEntity extends Equatable {
   final DocumentEntityV2 proposal;
+  final DocumentEntityV2? template;
   final ProposalSubmissionAction? actionType;
   final List<String> versionIds;
   final int commentsCount;
@@ -11,6 +12,7 @@ class JoinedProposalBriefEntity extends Equatable {
 
   const JoinedProposalBriefEntity({
     required this.proposal,
+    this.template,
     this.actionType,
     this.versionIds = const [],
     this.commentsCount = 0,
@@ -20,6 +22,7 @@ class JoinedProposalBriefEntity extends Equatable {
   @override
   List<Object?> get props => [
     proposal,
+    template,
     actionType,
     versionIds,
     commentsCount,
