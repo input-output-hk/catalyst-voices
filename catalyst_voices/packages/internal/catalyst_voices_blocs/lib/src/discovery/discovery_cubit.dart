@@ -148,7 +148,13 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
 
   void _handleProposalsChange(List<ProposalBrief> proposals) {
     _logger.finer('Got proposals[${proposals.length}]');
-    emit(state.copyWith(proposals: state.proposals.copyWith(proposals: proposals)));
+
+    final updatedProposalsState = state.proposals.copyWith(
+      proposals: proposals,
+      showSection: proposals.length == _maxRecentProposalsCount,
+    );
+
+    emit(state.copyWith(proposals: updatedProposalsState));
   }
 
   void _watchMostRecentProposals() {
