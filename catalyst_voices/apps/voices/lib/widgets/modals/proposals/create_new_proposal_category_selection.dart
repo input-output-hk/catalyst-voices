@@ -94,40 +94,37 @@ class _CreateNewProposalCategorySelectionState extends State<CreateNewProposalCa
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 68),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: ListView.separated(
-                itemBuilder: (context, index) => _CategoryCard(
-                  name: widget.categories[index].formattedName,
-                  description: widget.categories[index].shortDescription,
-                  ref: widget.categories[index].id,
-                  isSelected: widget.categories[index].id == widget.selectedCategory,
-                  onCategorySelected: widget.onCategorySelected,
-                ),
-                separatorBuilder: (context, index) => const SizedBox(height: 16),
-                itemCount: widget.categories.length,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: ListView.separated(
+              itemBuilder: (context, index) => _CategoryCard(
+                name: widget.categories[index].formattedName,
+                description: widget.categories[index].shortDescription,
+                ref: widget.categories[index].id,
+                isSelected: widget.categories[index].id == widget.selectedCategory,
+                onCategorySelected: widget.onCategorySelected,
               ),
+              separatorBuilder: (context, index) => const SizedBox(height: 16),
+              itemCount: widget.categories.length,
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              flex: 2,
-              child: _selectedCategory != null
-                  ? VoicesScrollbar(
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            flex: 2,
+            child: _selectedCategory != null
+                ? VoicesScrollbar(
+                    controller: _scrollController,
+                    alwaysVisible: true,
+                    child: SingleChildScrollView(
                       controller: _scrollController,
-                      alwaysVisible: true,
-                      child: SingleChildScrollView(
-                        controller: _scrollController,
-                        child: CategoryCompactDetailView(category: _selectedCategory!),
-                      ),
-                    )
-                  : const _NoneCategorySelected(),
-            ),
-          ],
-        ),
+                      child: CategoryCompactDetailView(category: _selectedCategory!),
+                    ),
+                  )
+                : const _NoneCategorySelected(),
+          ),
+        ],
       ),
     );
   }

@@ -63,11 +63,6 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   }
 
   @override
-  void didUpdateWidget(DiscoveryPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
   void initState() {
     super.initState();
 
