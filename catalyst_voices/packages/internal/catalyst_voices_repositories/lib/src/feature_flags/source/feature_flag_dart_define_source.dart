@@ -4,34 +4,38 @@ part of 'feature_flag_source.dart';
 final class FeatureFlagDartDefineSource
     with FeatureFlagSourceCompareTo
     implements FeatureFlagSource {
-  final Map<FeatureName, bool> _defines;
+  final Map<FeatureType, bool> _defines;
 
-  FeatureFlagDartDefineSource() : _defines = {};
+  FeatureFlagDartDefineSource()
+    : _defines = Map.fromEntries(
+        Features.allFeatures.map((feature) {
+          final value = _getEnvironmentValue(feature.type);
+          if (value != null) {
+            return MapEntry(feature.type, value);
+          }
+        }).nonNulls,
+      );
 
   @override
-  FeatureFlagSourcePriority get sourcePriority => FeatureFlagSourcePriority.dartDefine;
+  FeatureFlagSourceType get sourceType => FeatureFlagSourceType.dartDefine;
 
   @override
-  bool? getValue(Feature feature) => _defines[feature.name];
+  bool? getValue(Feature feature) => _defines[feature.type];
 
   @override
-  void load() => _initialize();
+  void setValue(
+    Feature feature, {
+    required bool? value,
+  }) {
+    throw ArgumentError('Cannot set value for Dart Define feature flags at runtime.');
+  }
 
-  bool? _getEnvironmentValue(FeatureName featureName) {
+  static bool? _getEnvironmentValue(FeatureType featureName) {
     switch (featureName) {
-      case FeatureName.voting:
+      case FeatureType.voting:
         return const bool.hasEnvironment(Features.votingEnvKey)
             ? const bool.fromEnvironment(Features.votingEnvKey)
             : null;
-    }
-  }
-
-  void _initialize() {
-    for (final feature in Features.allFeatures) {
-      final value = _getEnvironmentValue(feature.name);
-      if (value != null) {
-        _defines[feature.name] = value;
-      }
     }
   }
 }

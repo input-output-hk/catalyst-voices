@@ -5,10 +5,8 @@ import 'package:catalyst_voices/pages/dev_tools/cards/gateway_info_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/cards/logs_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/environment_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/x_close_button.dart';
-import 'package:catalyst_voices/widgets/feature_flags/feature_flag_builder.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class DevToolsPage extends StatefulWidget {
@@ -42,7 +40,7 @@ class _DevToolsPageState extends State<DevToolsPage> {
       appBar: const VoicesAppBar(leading: XCloseButton()),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        children: [
+        children: const [
           EnvironmentCard(),
           SizedBox(height: 12),
           AppInfoCard(),
@@ -54,28 +52,6 @@ class _DevToolsPageState extends State<DevToolsPage> {
           DocumentsCard(),
           SizedBox(height: 12),
           LogsCard(),
-          FeatureFlagBuilder(
-            feature: Features.voting,
-            builder: (context, child, info) {
-              return Row(
-                children: [
-                  Text('Voting Feature $info'),
-                  VoicesFilledButton(
-                    child: Text('Toggle'),
-                    onTap: () {
-                      context.read<FeatureFlagsCubit>().toggleFeatureOverride(Features.voting);
-                    },
-                  ),
-                  VoicesFilledButton(
-                    child: Text('Remove'),
-                    onTap: () {
-                      context.read<FeatureFlagsCubit>().clearFeatureOverride(Features.voting);
-                    },
-                  ),
-                ],
-              );
-            },
-          ),
         ],
       ),
     );

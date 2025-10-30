@@ -5,7 +5,8 @@ import 'package:collection/collection.dart';
 /// Repository for managing feature flags from multiple sources
 abstract interface class FeatureFlagsRepository {
   factory FeatureFlagsRepository(
-    List<FeatureFlagSource> sources,
+    AppEnvironmentType environmentType,
+    AppConfig appConfig,
   ) = FeatureFlagsRepositoryImpl;
 
   /// Get info for all features
@@ -14,23 +15,30 @@ abstract interface class FeatureFlagsRepository {
   /// Get detailed info about a feature (with highest priority source)
   FeatureFlagInfo getInfo(Feature feature);
 
-  /// Get a specific feature flag source by type
-  T? getSource<T extends FeatureFlagSource>();
-
   /// Get value for a feature from sources (with highest priority source)
-  bool? getValue(Feature feature);
+  bool getValue(Feature feature);
 
-  /// Reload a specific feature flag source by type
-  void reloadSource<T extends FeatureFlagSource>();
+  /// Set value for a feature in a specific source
+  void setValue({
+    required FeatureFlagSourceType sourceType,
+    required Feature feature,
+    required bool? value,
+  });
 }
 
 final class FeatureFlagsRepositoryImpl implements FeatureFlagsRepository {
   final List<FeatureFlagSource> _sources;
+  final AppEnvironmentType _environmentType;
 
-  FeatureFlagsRepositoryImpl(List<FeatureFlagSource> sources)
-    : _sources = List.from(sources)..sort() {
-    _loadAllSources();
-  }
+  FeatureFlagsRepositoryImpl(
+    this._environmentType,
+    AppConfig appConfig,
+  ) : _sources = [
+        FeatureFlagUserOverrideSource(),
+        FeatureFlagDartDefineSource(),
+        FeatureFlagConfigSource(appConfig),
+        FeatureFlagRuntimeSource(),
+      ]..sort();
 
   @override
   List<FeatureFlagInfo> getAllInfo() {
@@ -39,49 +47,50 @@ final class FeatureFlagsRepositoryImpl implements FeatureFlagsRepository {
 
   @override
   FeatureFlagInfo getInfo(Feature feature) {
+    final environmentSetting = feature.getEnvironmentSetting(_environmentType);
+    if (!environmentSetting.available) {
+      return FeatureFlagInfo(
+        featureType: feature.type,
+        enabled: false,
+        sourceType: FeatureFlagSourceType.defaults,
+      );
+    }
+
     for (final source in _sources) {
       final value = source.getValue(feature);
       if (value != null) {
         return FeatureFlagInfo(
-          feature: feature,
+          featureType: feature.type,
           enabled: value,
-          source: source.sourcePriority,
+          sourceType: source.sourceType,
         );
       }
     }
+
     return FeatureFlagInfo(
-      feature: feature,
-      enabled: feature.defaultValue,
-      source: FeatureFlagSourcePriority.defaults,
+      featureType: feature.type,
+      enabled: environmentSetting.enabledByDefault,
+      sourceType: FeatureFlagSourceType.defaults,
     );
   }
 
   @override
-  T? getSource<T extends FeatureFlagSource>() {
-    return _sources.whereType<T>().firstOrNull;
+  bool getValue(Feature feature) {
+    return getInfo(feature).enabled;
   }
 
   @override
-  bool? getValue(Feature feature) {
-    for (final source in _sources) {
-      final value = source.getValue(feature);
-      if (value != null) return value;
-    }
-    return null;
-  }
-
-  @override
-  void reloadSource<T extends FeatureFlagSource>() {
-    final source = getSource<T>();
+  void setValue({
+    required FeatureFlagSourceType sourceType,
+    required Feature feature,
+    required bool? value,
+  }) {
+    final source = _sources.firstWhereOrNull((s) => s.sourceType == sourceType);
     if (source != null) {
-      source.load();
-    }
-  }
-
-  /// Load all feature flag sources
-  void _loadAllSources() {
-    for (final source in _sources) {
-      source.load();
+      source.setValue(
+        feature,
+        value: value,
+      );
     }
   }
 }

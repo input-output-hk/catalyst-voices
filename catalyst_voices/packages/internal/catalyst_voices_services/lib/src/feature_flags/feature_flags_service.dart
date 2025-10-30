@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:collection/collection.dart';
 
 abstract interface class FeatureFlagsService {
   factory FeatureFlagsService(
@@ -10,7 +9,7 @@ abstract interface class FeatureFlagsService {
   ) = FeatureFlagsServiceImpl;
 
   /// Stream of all feature flags state
-  Stream<List<FeatureFlagInfo>> get changes;
+  Stream<List<FeatureFlagInfo>> get allInfoChanges;
 
   /// Clean up resources
   Future<void> dispose();
@@ -45,7 +44,7 @@ final class FeatureFlagsServiceImpl implements FeatureFlagsService {
   }
 
   @override
-  Stream<List<FeatureFlagInfo>> get changes => _changeController.stream;
+  Stream<List<FeatureFlagInfo>> get allInfoChanges => _changeController.stream;
 
   @override
   Future<void> dispose() async {
@@ -64,8 +63,7 @@ final class FeatureFlagsServiceImpl implements FeatureFlagsService {
 
   @override
   bool isEnabled(Feature feature) {
-    final value = _featureFlagsRepository.getValue(feature);
-    return value ?? feature.defaultValue;
+    return _featureFlagsRepository.getValue(feature);
   }
 
   @override
@@ -73,24 +71,24 @@ final class FeatureFlagsServiceImpl implements FeatureFlagsService {
     Feature feature, {
     required bool? value,
   }) {
-    final userOverride = _featureFlagsRepository.getSource<FeatureFlagUserOverrideSource>();
-    if (userOverride != null) {
-      userOverride.setValue(feature, value: value);
-      _emitAllFeatures();
-    }
+    _featureFlagsRepository.setValue(
+      sourceType: FeatureFlagSourceType.userOverride,
+      feature: feature,
+      value: value,
+    );
+    _emitAllFeatures();
   }
 
   @override
   Stream<bool> watchFeature(Feature feature) {
     return _changeController.stream.map((allFeatures) {
-      final info = allFeatures.firstWhereOrNull((info) => info.feature.name == feature.name);
-      return info?.enabled ?? feature.defaultValue;
+      return allFeatures.firstWhere((info) => info.featureType == feature.type).enabled;
     }).distinct();
   }
 
   /// Emit current state of all features
   void _emitAllFeatures() {
-    final allInfo = Features.allFeatures.map(getInfo).toList();
+    final allInfo = getAllInfo();
     _changeController.add(allInfo);
   }
 }

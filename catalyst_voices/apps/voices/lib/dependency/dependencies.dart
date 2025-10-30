@@ -211,6 +211,7 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<FeatureFlagsCubit>(() {
         return FeatureFlagsCubit(
           get<FeatureFlagsService>(),
+          get<AppEnvironment>().type,
         );
       });
   }
@@ -309,13 +310,10 @@ final class Dependencies extends DependencyProvider {
         ),
       )
       ..registerLazySingleton<FeatureFlagsRepository>(
-        () => FeatureFlagsRepository([
-          const FeatureFlagDefaultsSource(),
-          FeatureFlagRuntimeSource(),
-          FeatureFlagConfigSource(get<AppConfig>()),
-          FeatureFlagDartDefineSource(),
-          FeatureFlagUserOverrideSource(),
-        ]),
+        () => FeatureFlagsRepository(
+          get<AppEnvironment>().type,
+          get<AppConfig>(),
+        ),
       );
   }
 
@@ -452,11 +450,14 @@ final class Dependencies extends DependencyProvider {
       },
       dispose: (mediator) => mediator.dispose(),
     );
-    registerLazySingleton<FeatureFlagsService>(() {
-      return FeatureFlagsService(
-        get<FeatureFlagsRepository>(),
-      );
-    });
+    registerLazySingleton<FeatureFlagsService>(
+      () {
+        return FeatureFlagsService(
+          get<FeatureFlagsRepository>(),
+        );
+      },
+      dispose: (service) => unawaited(service.dispose()),
+    );
   }
 
   void _registerStorages() {

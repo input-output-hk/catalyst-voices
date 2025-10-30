@@ -2,24 +2,26 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 part 'feature_flag_config_source.dart';
 part 'feature_flag_dart_define_source.dart';
-part 'feature_flag_default_source.dart';
 part 'feature_flag_runtime_source.dart';
 part 'feature_flag_user_override_source.dart';
 
 /// Base interface for all feature flag sources
 abstract interface class FeatureFlagSource implements Comparable<FeatureFlagSource> {
-  FeatureFlagSourcePriority get sourcePriority;
+  FeatureFlagSourceType get sourceType;
 
   @override
   int compareTo(FeatureFlagSource other);
 
   bool? getValue(Feature feature);
 
-  void load();
+  void setValue(
+    Feature feature, {
+    required bool? value,
+  });
 }
 
 mixin FeatureFlagSourceCompareTo implements FeatureFlagSource {
   @override
   int compareTo(FeatureFlagSource other) =>
-      other.sourcePriority.priority.compareTo(sourcePriority.priority);
+      other.sourceType.priority.compareTo(sourceType.priority);
 }

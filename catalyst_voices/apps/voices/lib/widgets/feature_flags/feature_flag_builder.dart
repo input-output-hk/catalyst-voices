@@ -6,7 +6,8 @@ typedef FeatureFlagWidgetBuilder =
     Widget Function(
       BuildContext context,
       Widget? child,
-      FeatureFlagInfo? info,
+      // ignore: avoid_positional_boolean_parameters
+      bool isEnabled,
     );
 
 class FeatureFlagBuilder extends StatelessWidget {
@@ -23,10 +24,10 @@ class FeatureFlagBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<FeatureFlagsCubit, FeatureFlagsState, FeatureFlagInfo?>(
-      selector: (state) => state.getFeature(feature),
-      builder: (context, featureFlagInfo) {
-        return builder(context, child, featureFlagInfo);
+    return BlocSelector<FeatureFlagsCubit, FeatureFlagsState, bool>(
+      selector: (state) => state.isEnabled(feature),
+      builder: (context, isEnabled) {
+        return builder(context, child, isEnabled);
       },
     );
   }

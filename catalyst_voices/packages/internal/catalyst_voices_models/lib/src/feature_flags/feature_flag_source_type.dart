@@ -1,5 +1,5 @@
 /// Priority levels for feature flag sources (higher = higher priority)
-enum FeatureFlagSourcePriority {
+enum FeatureFlagSourceType {
   defaults(0),
   runtimeSource(1),
   config(2),
@@ -8,5 +8,5 @@ enum FeatureFlagSourcePriority {
 
   final int priority;
 
-  const FeatureFlagSourcePriority(this.priority);
+  const FeatureFlagSourceType(this.priority);
 }
