@@ -31,43 +31,38 @@ class VoicesPanelDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(dt-iohk): remove SelectionArea when https://github.com/flutter/flutter/pull/167275
-    // is released and we're using this flutter version
-    // Note: fix scheduled for 3.34.x / 3.35.x flutter version
-    return SelectionArea(
-      child: ResponsiveBuilder.fromResponsive(
-        responsive: constraints,
-        builder: (context, constraints) {
-          return Dialog(
-            shape: showBorder
-                ? RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(
-                      color: Theme.of(context).colors.outlineBorderVariant,
-                    ),
-                  )
-                : Theme.of(context).dialogTheme.shape,
-            backgroundColor: backgroundColor,
-            alignment: Alignment.center,
-            insetPadding: insetPadding,
-            constraints: constraints,
-            child: Stack(
-              fit: StackFit.passthrough,
-              children: [
-                child,
-                Positioned(
-                  top: 0,
-                  right: 0,
-                  child: Offstage(
-                    offstage: !showClose,
-                    child: const _CloseButton(),
+    return ResponsiveBuilder.fromResponsive(
+      responsive: constraints,
+      builder: (context, constraints) {
+        return Dialog(
+          shape: showBorder
+              ? RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(
+                    color: Theme.of(context).colors.outlineBorderVariant,
                   ),
+                )
+              : Theme.of(context).dialogTheme.shape,
+          backgroundColor: backgroundColor,
+          alignment: Alignment.center,
+          insetPadding: insetPadding,
+          constraints: constraints,
+          child: Stack(
+            fit: StackFit.passthrough,
+            children: [
+              child,
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Offstage(
+                  offstage: !showClose,
+                  child: const _CloseButton(),
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

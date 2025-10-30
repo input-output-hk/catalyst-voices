@@ -181,28 +181,23 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
     return showDialog<String>(
       context: context,
       builder: (context) {
-        // TODO(dt-iohk): remove SelectionArea when https://github.com/flutter/flutter/pull/167275
-        // is released and we're using this flutter version
-        // Note: fix scheduled for 3.34.x / 3.35.x flutter version
-        return SelectionArea(
-          child: AlertDialog(
-            title: Text(message),
-            content: TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(hintText: 'Enter password'),
-            ),
-            actions: [
-              TextButton(
-                child: const Text('Cancel'),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () => Navigator.of(context).pop(_passwordController.text),
-              ),
-            ],
+        return AlertDialog(
+          title: Text(message),
+          content: TextField(
+            controller: _passwordController,
+            obscureText: true,
+            decoration: const InputDecoration(hintText: 'Enter password'),
           ),
+          actions: [
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () => Navigator.of(context).pop(_passwordController.text),
+            ),
+          ],
         );
       },
     );
