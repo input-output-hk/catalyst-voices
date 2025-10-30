@@ -183,6 +183,8 @@ class _PropertyValue extends StatelessWidget {
 class _ProposalBriefCardState extends State<ProposalBriefCard> {
   late final WidgetStatesController _statesController;
 
+  bool _isFavorite = false;
+
   @override
   Widget build(BuildContext context) {
     final proposal = widget.proposal;
@@ -215,8 +217,8 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                 children: [
                   _Topbar(
                     proposalRef: proposal.selfRef,
-                    isFavorite: proposal.isFavorite,
-                    onFavoriteChanged: widget.onFavoriteChanged,
+                    isFavorite: _isFavorite,
+                    onFavoriteChanged: widget.onFavoriteChanged != null ? _onFavoriteChanged : null,
                   ),
                   const SizedBox(height: 2),
                   _Category(
@@ -260,6 +262,14 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
   }
 
   @override
+  void didUpdateWidget(covariant ProposalBriefCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Always override from proposal as its main source of truth
+    _isFavorite = widget.proposal.isFavorite;
+  }
+
+  @override
   void dispose() {
     _statesController.dispose();
     super.dispose();
@@ -269,6 +279,16 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
   void initState() {
     super.initState();
     _statesController = WidgetStatesController();
+
+    _isFavorite = widget.proposal.isFavorite;
+  }
+
+  // This method is here only because updating state locally gives faster feedback to the user.
+  void _onFavoriteChanged(bool isFavorite) {
+    setState(() {
+      _isFavorite = isFavorite;
+      widget.onFavoriteChanged?.call(isFavorite);
+    });
   }
 }
 

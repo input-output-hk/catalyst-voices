@@ -24,7 +24,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
 
   Future<void> addFavorite(DocumentRef ref) async {
     try {
-      _updateFavoriteLocally(ref, isFavorite: true);
       await _proposalService.addFavoriteProposal(ref: ref);
     } catch (e, st) {
       _logger.severe('Error adding favorite', e, st);
@@ -95,7 +94,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
 
   Future<void> removeFavorite(DocumentRef ref) async {
     try {
-      _updateFavoriteLocally(ref, isFavorite: false);
       await _proposalService.removeFavoriteProposal(ref: ref);
     } catch (e, st) {
       _logger.severe('Error adding favorite', e, st);
@@ -149,7 +147,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   }
 
   void _handleProposalsChange(List<ProposalBrief> proposals) {
-    _logger.finer('Got proposals[${proposals.length}]');
+    _logger.finest('Got proposals[${proposals.length}]');
 
     final updatedProposalsState = state.proposals.copyWith(
       proposals: proposals,
@@ -157,21 +155,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     );
 
     emit(state.copyWith(proposals: updatedProposalsState));
-  }
-
-  /// This function is only here because it's faster to update data locally and user
-  /// has faster response
-  void _updateFavoriteLocally(DocumentRef ref, {required bool isFavorite}) {
-    final updatedProposals = List.of(state.proposals.proposals);
-
-    for (var i = 0; i < updatedProposals.length; i++) {
-      final proposal = updatedProposals[i];
-      if (proposal.selfRef.id == ref.id) {
-        updatedProposals[i] = proposal.copyWith(isFavorite: isFavorite);
-      }
-    }
-
-    emit(state.copyWith(proposals: state.proposals.copyWith(proposals: updatedProposals)));
   }
 
   void _watchMostRecentProposals() {
