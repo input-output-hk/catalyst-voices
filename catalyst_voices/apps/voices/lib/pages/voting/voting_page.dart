@@ -89,13 +89,6 @@ class _VotingPageState extends State<VotingPage>
     if (widget.tab != oldWidget.tab) {
       _tabController.animateToTab(tab);
     }
-
-    if (showKeychainDeletedDialog) {
-      showKeychainDeletedDialog = false;
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await _showKeychainDeletedDialog(context);
-      });
-    }
   }
 
   @override
