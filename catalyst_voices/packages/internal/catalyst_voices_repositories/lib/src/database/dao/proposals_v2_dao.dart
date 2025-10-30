@@ -277,7 +277,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         Variable.withInt(size),
         Variable.withInt(page * size),
       ],
-      readsFrom: {documentsV2},
+      readsFrom: {documentsV2, documentsLocalMetadata},
     ).map((row) {
       final proposalData = {
         for (final col in documentsV2.$columns)
