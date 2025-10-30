@@ -28,82 +28,82 @@ reactive streams.
 
 * **Cross-Platform Local Storage**
 
-  * Must support Web, iOS, Android, macOS, Linux, and Windows within a single Flutter codebase.
+    * Must support Web, iOS, Android, macOS, Linux, and Windows within a single Flutter codebase.
 
 * **JSON Document Storage & Querying**
 
-  * Utilize SQLite’s JSON1/JSONB functions for efficient querying of JSON-structured documents.
+    * Utilize SQLite’s JSON1/JSONB functions for efficient querying of JSON-structured documents.
 
 * **UUIDv7-Based Identification**
 
-  * Enforce time-ordered identifiers for both documents and version management.
+    * Enforce time-ordered identifiers for both documents and version management.
 
 * **External Document API Integration**
 
-  * Retrieve, index, and post documents to Catalyst backend API however consideration is given to future implementations where
+    * Retrieve, index, and post documents to Catalyst backend API however consideration is given to future implementations where
 multiple storage options are available.
 
 * **Reactive UI Updates**
 
-  * Rely on Drift ORM streams to automatically update the UI when local data changes.
+    * Rely on Drift ORM streams to automatically update the UI when local data changes.
 
 * **Offline Access & Caching**
 
-  * Provide offline read/write capabilities and cache documents/metadata locally.
+    * Provide offline read/write capabilities and cache documents/metadata locally.
 
 * **Document Versioning & Metadata Indexing**
 
-  * Track multiple versions of a document and maintain indexed metadata for fast lookups.
+    * Track multiple versions of a document and maintain indexed metadata for fast lookups.
 
 ### 2.2 Non-Functional Requirements
 
 * **Performance**
 
-  * Ensure fast read/write operations with indexing for large datasets, local caching of documents is required to avoid requests
+    * Ensure fast read/write operations with indexing for large datasets, local caching of documents is required to avoid requests
 to the backend every time a new document is required.
 
 * **Scalability**
 
-  * Design schema and data flows to accommodate future data models, addition of indexes and additional metadata will be enabled
+    * Design schema and data flows to accommodate future data models, addition of indexes and additional metadata will be enabled
 with out significant re-work.
 
 * **Security & Data Integrity**
 
-  * Consider future requirements for encryption of sensitive documents to avoid significant refactoring of solution.
+    * Consider future requirements for encryption of sensitive documents to avoid significant refactoring of solution.
 
 * **Maintainability**
 
-  * Use a service/repository pattern and dependency injection (DI) for clearer separation of concerns, follow best practices of
+    * Use a service/repository pattern and dependency injection (DI) for clearer separation of concerns, follow best practices of
 clean separation of concerns when defining the data layer implementation.
 
-  * Allow future enhancements (e.g., advanced sync logic) without redefining core elements of the local storage.
+    * Allow future enhancements (e.g., advanced sync logic) without redefining core elements of the local storage.
 
 ### 2.3 Constraints & Assumptions
 
 * **SQLite Version Requirement**
 
-  * Requires SQLite 3.38.0+ for JSONB support (or 3.45.0+ for advanced JSON functions).
+    * Requires SQLite 3.38.0+ for JSONB support (or 3.45.0+ for advanced JSON functions).
 
 * **Technology Stack**
 
-  * Drift ORM is used for type-safe queries, reactive streams, and schema migrations.
+    * Drift ORM is used for type-safe queries, reactive streams, and schema migrations.
 
 * **Out of Scope**
 
-  * No built-in device synchronization or complex conflict resolution in this phase.
+    * No built-in device synchronization or complex conflict resolution in this phase.
 
-  * No advanced collaboration features (e.g., CRDTs) are required at this time.
-  * Encryption of documents is currently out of scope.
-  * Approach assumes the application is not used on shared devices and the account holder is responsible for the management
+    * No advanced collaboration features (e.g., CRDTs) are required at this time.
+    * Encryption of documents is currently out of scope.
+    * Approach assumes the application is not used on shared devices and the account holder is responsible for the management
   of sensitive data, if the application is used on a shared device.
 
 * **Implementation Scope**
 
-  * This phase covers only the architecture proposal and high-level design; no direct code implementation.
+    * This phase covers only the architecture proposal and high-level design; no direct code implementation.
 
 * **Existing Flutter Architecture Integration**
 
-  * Must integrate seamlessly with the current Flutter codebase and follow established design patterns.
+    * Must integrate seamlessly with the current Flutter codebase and follow established design patterns.
 
 ## 3 System Overview
 
@@ -111,38 +111,38 @@ clean separation of concerns when defining the data layer implementation.
 
 * **Document Storage**
 
-  * JSON documents stored in SQLite with partial metadata extraction for indexing.
+    * JSON documents stored in SQLite with partial metadata extraction for indexing.
 
-  * UUIDv7 ensures time-based ordering for documents and version tracking.
+    * UUIDv7 ensures time-based ordering for documents and version tracking.
 
-  * Consideration for future support of secure local document storage with version management.
+    * Consideration for future support of secure local document storage with version management.
 
 * **Query Performance**
 
-  * Indexed JSON fields and reactive UI updates via Drift streams.
+    * Indexed JSON fields and reactive UI updates via Drift streams.
 
 * **Caching**
 
-  * Local caching of frequently accessed data and metadata, supporting offline reads and writes.
+    * Local caching of frequently accessed data and metadata, supporting offline reads and writes.
 
 ### 3.2 Core Components
 
 * **Data Layer**
 
-  * Tables: `documents`, `drafts`, `metadata`.
+    * Tables: `documents`, `drafts`, `metadata`.
 
-  * Support for storing UUIDv7 as INT8 pairs (recommended), BLOB, or TEXT.
+    * Support for storing UUIDv7 as INT8 pairs (recommended), BLOB, or TEXT.
 
 * **Service Layer**
 
-  * API management for document index retrieval and document actions.
-  * Session management and encryption at the service layer is out of scope.
+    * API management for document index retrieval and document actions.
+    * Session management and encryption at the service layer is out of scope.
 
 * **UI Layer**
 
-  * Drift ORM for type-safe queries and reactive streams.
+    * Drift ORM for type-safe queries and reactive streams.
 
-  * Automatic UI updates when data changes (e.g., proposals, comments).
+    * Automatic UI updates when data changes (e.g., proposals, comments).
 
 ### 3.3 System Context and Component Relationship
 
@@ -178,35 +178,35 @@ end
 
 * **Data Layer**:
 
-  * Tables: `documents`, `drafts`, `metadata`.
+    * Tables: `documents`, `drafts`, `metadata`.
 
 * **Service Layer**:
 
-  * Repository pattern for database operations.
+    * Repository pattern for database operations.
 
-  * Dependency injection for modularity.
+    * Dependency injection for modularity.
 
 * **UI Layer**:
 
-  * Reactive updates via Drift `Stream` integration.
+    * Reactive updates via Drift `Stream` integration.
 
 #### 3.4.2 Data Storage Tables
 
 * **Metadata Table**:
 
-  * Stores extracted fields for querying.
+    * Stores extracted fields for querying.
 
-  * Enables UI elements like counts and categories.
+    * Enables UI elements like counts and categories.
 
-  * Updates via index api frequently.
+    * Updates via index api frequently.
 
 * **Drafts Table**:
 
-  * Stores draft documents not yet submitted and signed by the account owner.
+    * Stores draft documents not yet submitted and signed by the account owner.
 
 * **Documents Table**:
 
-  * Stores the raw JSON documents pulled from the API.
+    * Stores the raw JSON documents pulled from the API.
 
 ## 4 Technology Evaluation
 
@@ -337,21 +337,21 @@ Each row represents a specific version of a document.
 
 * **Primary Key (Composite):** `(idHi, idLo, verIdHi, verIdLo)`
 
-  * These pairs (`idHi`, `idLo`) and (`verIdHi`, `verIdLo`) together uniquely identify a specific document version.
+    * These pairs (`idHi`, `idLo`) and (`verIdHi`, `verIdLo`) together uniquely identify a specific document version.
 
 * **Fields:**
 
-  * `documentType` (Text): Indicates the high-level type or category of the document defined by Catalyst.
+    * `documentType` (Text): Indicates the high-level type or category of the document defined by Catalyst.
 
-  * `content` (Text): The main JSON or raw text of the document itself.
+    * `content` (Text): The main JSON or raw text of the document itself.
 
-  * `createdAt` (Int): Timestamp or epoch to record when this document version was created.
+    * `createdAt` (Int): Timestamp or epoch to record when this document version was created.
 
-  * `metadata` (Text): Inline metadata (often JSON) that may be needed alongside the main content.
+    * `metadata` (Text): Inline metadata (often JSON) that may be needed alongside the main content.
 
 * **Indexes:**
 
-  * `idx_unique_ver_id` (UNIQUE on `verIdHi, verIdLo`): Ensures the version ID pair is unique across the table.
+    * `idx_unique_ver_id` (UNIQUE on `verIdHi, verIdLo`): Ensures the version ID pair is unique across the table.
 
 #### 5.1.2 `DocumentMetadata` Table
 
@@ -361,17 +361,17 @@ which are more efficient than querying the JSON content directly.
 
 * **Primary Key (Composite):** `(verIdHi, verIdLo, fieldKey)`
 
-  * Ties each metadata entry to a specific document version and a metadata key.
+    * Ties each metadata entry to a specific document version and a metadata key.
 
 * **Fields:**
 
-  * `fieldKey` (Text): The name/identifier of the metadata field (e.g., "author", "fund", "category").
+    * `fieldKey` (Text): The name/identifier of the metadata field (e.g., "author", "fund", "category").
 
-  * `fieldValue` (Text): The value corresponding to that field key.
+    * `fieldValue` (Text): The value corresponding to that field key.
 
 * **Indexes:**
 
-  * `idx_doc_metadata_key_value` on `(fieldKey, fieldValue)`: Speeds up lookups by metadata key/value pairs.
+    * `idx_doc_metadata_key_value` on `(fieldKey, fieldValue)`: Speeds up lookups by metadata key/value pairs.
 
 #### 5.1.3 `Drafts` Table
 
@@ -379,19 +379,19 @@ This table holds in-progress (draft) versions of documents that are not yet been
 
 * **Primary Key (Composite):** `(idHi, idLo, verIdHi, verIdLo)`
 
-  * Matches the document identifier plus the version identifier, similar to `Documents`.
+    * Matches the document identifier plus the version identifier, similar to `Documents`.
 
 * **Fields:**
 
-  * `type` (Text): Designation of the draft’s type (e.g., "proposal", "comment").
+    * `type` (Text): Designation of the draft’s type (e.g., "proposal", "comment").
 
-  * `content` (Text): Local saved draft content.
+    * `content` (Text): Local saved draft content.
 
-  * `title` (Text): Human-readable title for quick reference in the UI.
+    * `title` (Text): Human-readable title for quick reference in the UI.
 
 * **Indexes:**
 
-  * `idx_draft_type` on `(type)`: Allows filtering drafts by type.
+    * `idx_draft_type` on `(type)`: Allows filtering drafts by type.
 
 ### 5.2 UUID
 
@@ -463,16 +463,17 @@ following advantages:
 
 * **Better Indexing**
 
-  * SQLite indexes `INT` columns efficiently.
-  * Splitting UUIDs into two parts enables faster lookups.
+    * SQLite indexes `INT` columns efficiently.
+    * Splitting UUIDs into two parts enables faster lookups.
 
 * **Range Queries**:
 
-  * With UUIDv7, the first 48 bits of the UUID represent a timestamp.
-  * By storing the timestamp portion in one `INT8` column (`IDHI`), you can perform range-based searches.
+    * With UUIDv7, the first 48 bits of the UUID represent a timestamp.
+    * By storing the timestamp portion in one `INT8` column (`IDHI`), you can perform range-based searches.
 
 * **Structured Operations**:
-  * Separating the "time" and "random" portions of the UUID simplifies operations like sorting, filtering, and datetime extraction.
+    * Separating the "time" and "random" portions of the UUID simplifies operations like sorting, filtering,
+      and datetime extraction.
 
 UUIDv7 is structured as follows:
 
@@ -731,15 +732,15 @@ support defined at a system level.
 ### 7.2 Draft Workflow
 
 * **Draft Creation and Editing**:
-  * Draft content is kept in plaintext in memory while being edited.
-  * When saving, metadata (e.g., title, status) is extracted and stored in specific columns in the drafts table or in the metadata
+    * Draft content is kept in plaintext in memory while being edited.
+    * When saving, metadata (e.g., title, status) is extracted and stored in specific columns in the drafts table or in the metadata
   table.
-  * The main content is stored unencrypted in the drafts table.
+    * The main content is stored unencrypted in the drafts table.
 * **Accessing Drafts**:
-  * The app fetches content from `drafts` table using a combination of document id and version (iteration).
+    * The app fetches content from `drafts` table using a combination of document id and version (iteration).
 * **Session & Authentication**:
-  * All drafts are stored unencrypted in local storage and are not tied to a session therefore drafts will persist across sessions,
-  and are not explicitly tied to the users keychain.
+    * All drafts are stored unencrypted in local storage and are not tied to a session therefore drafts will
+      persist across sessions, and are not explicitly tied to the users keychain.
 
 ### 7.3 Draft Database Design
 
@@ -782,61 +783,61 @@ performed intelligently to maintain data consistency without compromising offlin
 
 * **Key Principle:** Any operation that can operate on local cached data should do so first.
 * **Operations That Should Be Supported Locally:**
-  * Creating new drafts.
-  * Editing existing drafts.
-  * Viewing cached documents.
-  * Querying local metadata for document lists or details.
+    * Creating new drafts.
+    * Editing existing drafts.
+    * Viewing cached documents.
+    * Querying local metadata for document lists or details.
 * **Fallback:** For operations where the required data is not available locally, fetch the necessary document or index data from
   the API and update the local cache.
 
 ### 8.2 Document Retrieval Workflow
 
 * **When Requesting a Document (By ID or ID and Version):**
-  * **Check Local Cache:**
-    * If the document request is available locally **and the request includes a version**, the document is returned from the
+    * **Check Local Cache:**
+        * If the document request is available locally **and the request includes a version**, the document is returned from the
       local cache.
-  * **If Only an ID is Provided (No Document Version Specified):**
-    * If no version is specified in the request, there is no way to determine if any document version stored in the local cache
+    * **If Only an ID is Provided (No Document Version Specified):**
+        * If no version is specified in the request, there is no way to determine if any document version stored in the local cache
       is the latest version therefore a request to the api is required to get the documents metadata and list of versions.
-    * **Query the Index API** to fetch the full version history of the document.
-    * Update the local metadata cache with the latest version info.
-    * If the latest version is not cached locally:
-      * Fetch the latest version from the document API.
-      * Cache it locally for future access.
-      * Return the latest version to the user.
-  * **If ID and Version Are Provided:**
-    * Check if the specified version exists locally.
-    * If not found, fetch it from the document API and cache it locally.
+        * **Query the Index API** to fetch the full version history of the document.
+        * Update the local metadata cache with the latest version info.
+        * If the latest version is not cached locally:
+            * Fetch the latest version from the document API.
+            * Cache it locally for future access.
+            * Return the latest version to the user.
+    * **If ID and Version Are Provided:**
+        * Check if the specified version exists locally.
+        * If not found, fetch it from the document API and cache it locally.
 
 ### 8.3 Index API Usage
 
 * **Purpose:** The index API is used to retrieve metadata about documents, such as available document IDs, versions, and other
   attributes.
 * **Triggers for Index API Calls:**
-  * On application startup if the client is online: Perform an initial lightweight sync to ensure the required metadata is up to
+    * On application startup if the client is online: Perform an initial lightweight sync to ensure the required metadata is up to
     date.
-  * (Optional with performance consideration) Periodically in the background: Configurable intervals ensure ongoing metadata
+    * (Optional with performance consideration) Periodically in the background: Configurable intervals ensure ongoing metadata
     synchronisation.
-  * On user request: Explicit refreshes initiated by the user.
-  * When a document is requested by ID only and the local cache cannot verify its latest version.
+    * On user request: Explicit refreshes initiated by the user.
+    * When a document is requested by ID only and the local cache cannot verify its latest version.
 * **Filtered Queries:** The index API can return metadata for a subset of documents to minimize bandwidth and local storage usage.
 
 ### 8.4 Draft Management
 
 * **Local-Only Drafts:**
-  * Drafts are created and stored exclusively in the **local drafts table**.
-  * Changes to drafts are not synced to the server until explicitly published as a final document.
+    * Drafts are created and stored exclusively in the **local drafts table**.
+    * Changes to drafts are not synced to the server until explicitly published as a final document.
 * **Draft Synchronization:**
-  * On publication, the draft is sent to the document API.
-  * If the publication succeeds:
-    * The draft can be stored in the regular documents table, as the document owner and the user of the client are the same new
+    * On publication, the draft is sent to the document API.
+    * If the publication succeeds:
+        * The draft can be stored in the regular documents table, as the document owner and the user of the client are the same new
     versions of the document can be edited and stored in the draft table however the draft must be signed and published again
     if it is to supersede a previous version.
-    * Local metadata is updated with the published version info.
-  * If the publication fails:
-    * The draft remains in the drafts table.
-    * Notify the user of the failure and allow retry upon regaining connectivity.
-  * If an older draft is edited locally and saved it will get a new version id, this will become the latest version in the local
+        * Local metadata is updated with the published version info.
+    * If the publication fails:
+        * The draft remains in the drafts table.
+        * Notify the user of the failure and allow retry upon regaining connectivity.
+    * If an older draft is edited locally and saved it will get a new version id, this will become the latest version in the local
     draft database, if this draft is published it will supersede the previously published version even if it does not contain all of
     the data from the previous public version, the responsibility for draft management and versioning is the responsibility of the
     document owner.
@@ -844,15 +845,15 @@ performed intelligently to maintain data consistency without compromising offlin
 ### 8.5 Version Management
 
 * **UUIDv7 for Versions:**
-  * Document versions are identified using UUIDv7, which encodes a timestamp for chronological ordering.
-  * This allows efficient sorting and comparison of document versions.
+    * Document versions are identified using UUIDv7, which encodes a timestamp for chronological ordering.
+    * This allows efficient sorting and comparison of document versions.
 * **Version Lookup:**
-  * If a document is requested **without specifying a version**, the index API must be queried to retrieve the full version
+    * If a document is requested **without specifying a version**, the index API must be queried to retrieve the full version
     history of the document.
-  * The latest version in the metadata is compared against the locally cached version:
-    * If the latest version is not cached locally, fetch it from the document API and update the cache.
+    * The latest version in the metadata is compared against the locally cached version:
+        * If the latest version is not cached locally, fetch it from the document API and update the cache.
 * **Conflict Prevention:**
-  * Always rely on the latest version metadata from the index API when there’s uncertainty about the latest version.
+    * Always rely on the latest version metadata from the index API when there’s uncertainty about the latest version.
 
 ### 8.6 Conflict Resolution
 
@@ -865,23 +866,23 @@ performed intelligently to maintain data consistency without compromising offlin
 * **Offline Capability:** All local operations, such as creating, editing drafts, and querying cached data, continue to function
   without network connectivity.
 * **Queuing Failed Requests:**
-  * API requests (e.g., fetches, publications) that fail due to connectivity issues can be queued, however the queue should be
+    * API requests (e.g., fetches, publications) that fail due to connectivity issues can be queued, however the queue should be
     limited in size and only used for requests relating to the operation of the client, for example requesting the latest
     `Category Parameters Document`
-  * Upon reconnecting to the network, queued requests are processed in order.
+    * Upon reconnecting to the network, queued requests are processed in order.
 * **Fallback Retrieval:** If a document isn’t cached locally during offline mode, display an error or notify the user of the need
   to reconnect.
 
 ### 8.8 Client metadata bootstrap
 
 * **Fixed document definitions**
-  * Catalyst defines fixed document types and identifiers, these type ids will not change and can be used to identify the
+    * Catalyst defines fixed document types and identifiers, these type ids will not change and can be used to identify the
     latest documents required to bootstrap a client.
     Examples include, the `Brand Parameters Document`,
     `Campaign Parameters Document`, `Category Parameters Document`.
-  * The ids of these document types can be used to pull the latest documents from the API when boot strapping the client and
+    * The ids of these document types can be used to pull the latest documents from the API when boot strapping the client and
     performing initial local caching operations.
-  * A list of document types and specifications can be
+    * A list of document types and specifications can be
     found [here](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
 
 ### 8.9 Background Synchronisation (Optional)
@@ -890,12 +891,12 @@ performed intelligently to maintain data consistency without compromising offlin
   achieved using explicit requests when required.
 * **Purpose:** Keep local metadata and document caches up to date while minimizing bandwidth and performance considerations.
 * **Sync Triggers:**
-  * Periodic intervals (configurable by the user).
-  * Application startup.
-  * Explicit user action (manual refresh).
+    * Periodic intervals (configurable by the user).
+    * Application startup.
+    * Explicit user action (manual refresh).
 * **Lightweight Syncing:**
-  * Fetch only critical metadata updates (e.g., new document versions, added documents).
-  * Avoid unnecessary retrieval of documents already cached and up-to-date locally.
+    * Fetch only critical metadata updates (e.g., new document versions, added documents).
+    * Avoid unnecessary retrieval of documents already cached and up-to-date locally.
 
 ### 8.10 Performance Considerations
 
@@ -920,50 +921,50 @@ For the latest and most detailed API specification, refer to the following locat
 ## 10 Out of Scope
 
 * Device Synchronization
-  * Multi-device sync, conflict resolution, P2P.
+    * Multi-device sync, conflict resolution, P2P.
 * Multiple Storage Providers
-  * Alternative backends, cloud storage, distributed systems.
+    * Alternative backends, cloud storage, distributed systems.
 * Advanced Collaboration
-  * Real-time multi-user editing, differential sync, IPFS integration.
+    * Real-time multi-user editing, differential sync, IPFS integration.
 * Index Synchronization
-  * Remote or distributed index updates.
+    * Remote or distributed index updates.
 * Cache Management
-  * Purging of old metadata and document versions.
+    * Purging of old metadata and document versions.
 * Encryption
-  * Draft document will be stored in plain text in local storage.
+    * Draft document will be stored in plain text in local storage.
 * User linked sessions
-  * Session management tied to a user is out of scope.
+    * Session management tied to a user is out of scope.
 
 ## 11 Known Limitations
 
 * JSON Storage
-  * Complex queries may affect performance.
-  * Drift lacks native JSONB; using TEXT with JSON1.
-  * Large documents can cause high memory usage.
+    * Complex queries may affect performance.
+    * Drift lacks native JSONB; using TEXT with JSON1.
+    * Large documents can cause high memory usage.
 
 ## 12 References
 
 * **SQLite**
-  * [SQLite Official Website](https://sqlite.org/index.html)
-  * [SQLite JSON1 Extension](https://sqlite.org/json1.html)
-  * [SQLite UUIDv7 Proposal](https://www.ietf.org/archive/id/draft-ietf-uuidrev-rfc4122bis-00.html) (for UUIDv7-related details).
+    * [SQLite Official Website](https://sqlite.org/index.html)
+    * [SQLite JSON1 Extension](https://sqlite.org/json1.html)
+    * [SQLite UUIDv7 Proposal](https://www.ietf.org/archive/id/draft-ietf-uuidrev-rfc4122bis-00.html) (for UUIDv7-related details).
 * **Drift ORM**
-  * [Drift Documentation](https://drift.simonbinder.eu/)
-  * A type-safe database library for Flutter that supports SQLite.
+    * [Drift Documentation](https://drift.simonbinder.eu/)
+    * A type-safe database library for Flutter that supports SQLite.
 * **Flutter**
-  * [Flutter Official Documentation](https://flutter.dev/docs)
-  * [sqlite3_flutter_libs Plugin](https://pub.dev/packages/sqlite3_flutter_libs)
+    * [Flutter Official Documentation](https://flutter.dev/docs)
+    * [sqlite3_flutter_libs Plugin](https://pub.dev/packages/sqlite3_flutter_libs)
 * **Dart**
-  * [Dart Official Documentation](https://dart.dev/)
+    * [Dart Official Documentation](https://dart.dev/)
 * **UUIDv7 Specification**
-  * [UUID Revision Specification (IETF Draft)](https://datatracker.ietf.org/doc/draft-ietf-uuidrev-rfc4122bis/)
+    * [UUID Revision Specification (IETF Draft)](https://datatracker.ietf.org/doc/draft-ietf-uuidrev-rfc4122bis/)
 * **Catalyst Signed Document Types**
-  * [Catalyst Document Types Reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
+    * [Catalyst Document Types Reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/types/)
 
 * **Catalyst API**
-  * [Catalyst API Swagger Documentation](https://input-output-hk.github.io/catalyst-voices/api/cat-gateway/openapi-swagger/)
+    * [Catalyst API Swagger Documentation](https://input-output-hk.github.io/catalyst-voices/api/cat-gateway/openapi-swagger/)
 * **CBOR Encoding**
-  * [CBOR Specification (RFC 8949)](https://datatracker.ietf.org/doc/rfc8949/)
+    * [CBOR Specification (RFC 8949)](https://datatracker.ietf.org/doc/rfc8949/)
 
 ## 13 Document Version Changes
 

@@ -147,8 +147,8 @@ While they can share a common name across entities their purpose may differ from
 
 | **Attribute** | **Required** | **Type**                 | **Category**       | **Description**                                                       | **Constraints**                                                                                                         | **Notes**                                        |
 | ------------- | ------------ | ------------------------ | ------------------ | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| `id`          | Yes          | UUID                     | Unprotected header | Unique identifier for the entity                                      | Primary Key                                                                                                             | Ensures global uniqueness for the entity.        |
-| `ver`         | Yes          | ULID                     | Unprotected header | Version ID for the Proposal                                           | The initial ver assigned when published will be identical to the `id`                                                   | Enables versioning and traceability.             |
+| `id`          | Yes          | UUIDv7                   | Unprotected header | Unique identifier for the entity                                      | Primary Key                                                                                                             | Ensures global uniqueness for the entity.        |
+| `ver`         | Yes          | UUIDv7                   | Unprotected header | Version ID for the Proposal                                           | The initial ver assigned when published will be identical to the `id`                                                   | Enables versioning and traceability.             |
 | `alg`         | Yes          | String                   | Unprotected header | Indicates the cryptography algorithm used for the security processing | It must be equal to EdDSA value.                                                                                        |                                                  |
 | `type`        | Yes          | ULID or CBOR Array       | Unprotected header | Indicates the content type of the COSE payload                        | Define Media Types from IANA where possible [Reference](https://www.iana.org/assignments/media-types/media-types.xhtml) |                                                  |
 | `encoding`    | Yes          | ULID or CBOR Array       | Unprotected header | Indicate the content encoding algorithm of the payload                | Current supported encoding algorithms: br - Brotli compressed data.                                                     |                                                  |
@@ -251,48 +251,48 @@ graph TD
 
 * **Issue**: Users submit incomplete or invalid Proposals that do not conform to the Proposal Schema.
 * **Detection**:
-  * Validation is performed locally in the Catalyst interface against the Proposal Schema.
+    * Validation is performed locally in the Catalyst interface against the Proposal Schema.
 * **Handling**:
-  * Notify users immediately of validation failures with descriptive error messages, e.g., "Field X is missing" or
+    * Notify users immediately of validation failures with descriptive error messages, e.g., "Field X is missing" or
   "Invalid format for Field Y."
-  * Provide actionable suggestions or links to guidelines.
+    * Provide actionable suggestions or links to guidelines.
 
 #### **Storage Errors**
 
 * **Issue**: Data becomes inaccessible due to node failure or unpinned content or api issues
 * **Detection**:
-  * Validate the data is accessible on the Catalyst interface.
+    * Validate the data is accessible on the Catalyst interface.
 * **Handling**:
-  * Notify users of inaccessible data with recommendations.
+    * Notify users of inaccessible data with recommendations.
 
 #### **Versioning Conflicts**
 
 * **Issue**: Users inadvertently create conflicting versions of the same Proposal by submitting multiple updates simultaneously.
 * **Detection**:
-  * Conflicts should be detected during submission by comparing version ULID
+    * Conflicts should be detected during submission by comparing version UUIDv7
 * **Handling**:
-  * Notify users of conflicts and provide options to resolve them:
-    * "Retain most recent version."
-    * "Merge changes manually."
-    * "Discard specific updates."
-  * Implement automatic conflict resolution rules, such as prioritizing updates with the latest timestamp.
+    * Notify users of conflicts and provide options to resolve them:
+        * "Retain most recent version."
+        * "Merge changes manually."
+        * "Discard specific updates."
+    * Implement automatic conflict resolution rules, such as prioritizing updates with the latest timestamp.
 
 #### **Access / Retrieval Errors**
 
 * **Issue**: Users or reviewers encounter access issues due to incorrect permissions or expired links.
 * **Detection**:
-  * Catalyst interface should detect access errors as they occur.
+    * Catalyst interface should detect access errors as they occur.
 * **Handling**:
-  * Notify users of permission issues with clear instructions on how to proceed.
-  * Log the issue for operational and audit purposes.
+    * Notify users of permission issues with clear instructions on how to proceed.
+    * Log the issue for operational and audit purposes.
 
 #### **User-Generated Errors**
 
 * **Issue**: Users make mistakes such as incorrect data entries or submission of incomplete drafts.
 * **Detection**:
-  * Front end validation catches errors before data is submitted
+    * Front end validation catches errors before data is submitted
 * **Handling**:
-  * Auto-save drafts locally with periodic prompts to review and finalize.
+    * Auto-save drafts locally with periodic prompts to review and finalize.
 
 ---
 
@@ -302,14 +302,14 @@ graph TD
 
 * **Issue**: If a user encrypts their Proposal and loses their private key, the Proposal becomes inaccessible.
 * **Impact**:
-  * **Proposal Inaccessibility**: The Proposal cannot be decrypted, effectively rendering it unusable for evaluation or funding.
-  * **Dependency Impact**: Comments or other entities referencing the Proposal can not reference private drafts and therefore will
+    * **Proposal Inaccessibility**: The Proposal cannot be decrypted, effectively rendering it unusable for evaluation or funding.
+    * **Dependency Impact**: Comments or other entities referencing the Proposal can not reference private drafts and therefore will
   have no impact on their context and relevance.
 * **Mitigation**:
-  * **Key Backup**:
-    * Encourage users to store backup keys securely using a trusted wallet or key management service.
-  * **Transparent Submission**:
-    * Enforce public non encrypted final submissions to ensure Proposals are accessible to evaluators.
+    * **Key Backup**:
+        * Encourage users to store backup keys securely using a trusted wallet or key management service.
+    * **Transparent Submission**:
+        * Enforce public non encrypted final submissions to ensure Proposals are accessible to evaluators.
 * **Result**: Reduces total data loss risk while preserving decentralized ownership principles.
 
 #### **Risk 2: Entity Disappears (Data Loss)**
@@ -317,56 +317,56 @@ graph TD
 * **Issue**: A Proposal stored on decentralized storage becomes permanently inaccessible (e.g., due to node failures or
   insufficient pinning).
 * **Impact**:
-  * **Proposal Loss**: Funding decisions cannot be made if Proposals are lost.
-  * **Dependency Impact**: Comments, reviews, and votes lose their reference, creating orphaned records.
+    * **Proposal Loss**: Funding decisions cannot be made if Proposals are lost.
+    * **Dependency Impact**: Comments, reviews, and votes lose their reference, creating orphaned records.
 * **Mitigation**:
-  * **Redundant Storage**:
-    * Encourage users to pin their Proposal on multiple nodes .
-  * **Backup References**:
-    * Maintain metadata logs with Proposal content hashes and alternative storage for recovery.
+    * **Redundant Storage**:
+        * Encourage users to pin their Proposal on multiple nodes .
+    * **Backup References**:
+        * Maintain metadata logs with Proposal content hashes and alternative storage for recovery.
 * **Result**: Minimizes the impact of missing data and ensures continuity for dependent entities.
 
 #### **Risk 3: User Fails to Pay Storage Costs**
 
 * **Issue**: If users fail to pay for storage, their Proposal may be deleted or become inaccessible.
 * **Impact**:
-  * **Proposal Inaccessibility**: Without storage, Proposals cannot be evaluated or referenced.
-  * **Dependency Impact**: Comments and votes referencing the Proposal lose their association.
+    * **Proposal Inaccessibility**: Without storage, Proposals cannot be evaluated or referenced.
+    * **Dependency Impact**: Comments and votes referencing the Proposal lose their association.
 * **Mitigation**:
-  * **Cost Transparency**:
-    * Provide users with clear estimates of storage costs during Proposal creation.
-  * **User Notifications**:
-    * Notify users of impending storage expiry and issues.
-  * **Default Migration**:
-    * Automatically migrate unpaid Proposals to a shared storage archive with time boxed removal if storage remains unpaid.
+    * **Cost Transparency**:
+        * Provide users with clear estimates of storage costs during Proposal creation.
+    * **User Notifications**:
+        * Notify users of impending storage expiry and issues.
+    * **Default Migration**:
+        * Automatically migrate unpaid Proposals to a shared storage archive with time boxed removal if storage remains unpaid.
 * **Result**: Ensures Proposals remain available while balancing user responsibility for cost of ownership.
 
 #### **Risk 4: Regulatory Non-Compliance**
 
 * **Issue**: Proposals contain data violating GDPR, CCPA, or other laws or regulations.
 * **Impact**:
-  * **Penalties**: The data owner may face fines or restrictions due to non-compliance with regulations.
-  * **Operational Risks**: Catalyst risks operational disruptions and loss of trust.
+    * **Penalties**: The data owner may face fines or restrictions due to non-compliance with regulations.
+    * **Operational Risks**: Catalyst risks operational disruptions and loss of trust.
 * **Mitigation**:
-  * **Minimal Data Collection**:
-    * Restrict Proposals to predefined questions, ensuring compliance with data minimization principles.
-    * Ensure that any data with a Sensitivity Type defined is owned, stored and controlled by the user.
-  * **Encryption Options**:
-    * Allow users to encrypt sensitive data to comply with privacy regulations.
-  * **Retention and Removal**:
-    * Implement automated archival processes for expired or retracted Proposals to reduce regulatory exposure.
+    * **Minimal Data Collection**:
+        * Restrict Proposals to predefined questions, ensuring compliance with data minimization principles.
+        * Ensure that any data with a Sensitivity Type defined is owned, stored and controlled by the user.
+    * **Encryption Options**:
+        * Allow users to encrypt sensitive data to comply with privacy regulations.
+    * **Retention and Removal**:
+        * Implement automated archival processes for expired or retracted Proposals to reduce regulatory exposure.
 * **Result**: Ensures that Catalyst remains compliant with global data privacy regulations.
 
 #### **Risk 5: Non Compliance with Catalyst Rules**
 
 * **Issue**: Users fail to adhere to Catalyst defined rules (e.g., not publishing their Proposal by the deadline).
 * **Impact**:
-  * **Disqualification**: Non compliant Proposals are excluded from funding consideration.
+    * **Disqualification**: Non compliant Proposals are excluded from funding consideration.
 * **Mitigation**:
-  * **Early Notifications**:
-    * Provide users with real time progress tracking and reminders about submission deadlines.
-  * **Education and Support**:
-    * Include clear documentation to guide users through the application process.
+    * **Early Notifications**:
+        * Provide users with real time progress tracking and reminders about submission deadlines.
+    * **Education and Support**:
+        * Include clear documentation to guide users through the application process.
 * **Result**: Encourages compliance while reducing friction in user interactions.
 
 ---

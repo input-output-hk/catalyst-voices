@@ -31,19 +31,19 @@ It has 3 Internal nodes, configured as:
 These services are installed by default and provide the basic management and monitoring of the cluster.
 
 * [Container Registry API](http://registry.cluster.test/v2/)
-  * [HTTPS](https://registry.cluster.test/v2/)
-  * [192.168.58.10:5000](http://192.168.58.10:5000)
+    * [HTTPS](https://registry.cluster.test/v2/)
+    * [192.168.58.10:5000](http://192.168.58.10:5000)
 * [Container Registry Web UI](http://registry-ui.cluster.test/)
-  * Note: HTTPS not supported currently for this UI.
+    * Note: HTTPS not supported currently for this UI.
 * [Traefik Ingress Dashboard](http://traefik.cluster.test/)
-  * [HTTPS](https://traefik.cluster.test/)
-  * [192.168.58.10:3000](http://192.168.58.10:3000)
+    * [HTTPS](https://traefik.cluster.test/)
+    * [192.168.58.10:3000](http://192.168.58.10:3000)
 * [Grafana Dashboard](http://grafana.cluster.test/)
-  * [HTTPS](https://grafana.cluster.test/)
+    * [HTTPS](https://grafana.cluster.test/)
 * [Prometheus Dashboard](http://prometheus.cluster.test/)
-  * [HTTPS](https://prometheus.cluster.test/)
+    * [HTTPS](https://prometheus.cluster.test/)
 * [Alert manager UI](http://alert-manager.cluster.test/)
-  * [HTTPS](https://alert-manager.cluster.test/)
+    * [HTTPS](https://alert-manager.cluster.test/)
 
 ### Scylla DB
 
@@ -121,11 +121,11 @@ just stop-cluster
 These services are not deployed by default.
 
 * [Catalyst Voices Frontend](http://voices.cluster.test/)
-  * [HTTPS](https://voices.cluster.test/)
+    * [HTTPS](https://voices.cluster.test/)
 * [Catalyst Voices Backend](http://voices.cluster.test/api/)
-  * [HTTPS](https://voices.cluster.test/api/)
+    * [HTTPS](https://voices.cluster.test/api/)
 * [Catalyst Voices Documentation](http://docs.voices.cluster.test/)
-  * [HTTPS](https://docs.voices.cluster.test/)
+    * [HTTPS](https://docs.voices.cluster.test/)
 
 ### Deploying Catalyst Voices Frontend and Backend Services
 
