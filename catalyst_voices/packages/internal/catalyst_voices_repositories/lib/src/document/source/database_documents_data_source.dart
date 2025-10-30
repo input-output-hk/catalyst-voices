@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -154,6 +155,13 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage(PageRequest request) {
+    return _database.proposalsV2Dao
+        .watchProposalsBriefPage(request)
+        .map((page) => page.map((data) => data.toModel()));
+  }
+
+  @override
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
   }) {
@@ -191,6 +199,35 @@ extension on DocumentEntity {
   }
 }
 
+extension on DocumentEntityV2 {
+  DocumentData toModel() {
+    return DocumentData(
+      metadata: DocumentDataMetadata(
+        type: type,
+        selfRef: SignedDocumentRef(id: id, version: ver),
+        ref: refId.toRef(refVer),
+        template: templateId.toRef(templateVer),
+        reply: replyId.toRef(replyVer),
+        section: section,
+        categoryId: categoryId.toRef(categoryVer),
+        authors: authors.split(',').map((e) => CatalystId.fromUri(e.getUri())).toList(),
+      ),
+      content: content,
+    );
+  }
+}
+
+extension on String? {
+  SignedDocumentRef? toRef([String? ver]) {
+    final id = this;
+    if (id == null) {
+      return null;
+    }
+
+    return SignedDocumentRef(id: id, version: ver);
+  }
+}
+
 extension on DocumentData {
   DocumentEntityV2 toEntity() {
     return DocumentEntityV2(
@@ -221,6 +258,19 @@ extension on JoinedProposalEntity {
       action: action?.toModel(),
       commentsCount: commentsCount,
       versions: versions,
+    );
+  }
+}
+
+extension on JoinedProposalBriefEntity {
+  JoinedProposalBriefData toModel() {
+    return JoinedProposalBriefData(
+      proposal: proposal.toModel(),
+      template: template?.toModel(),
+      actionType: actionType,
+      versionIds: versionIds,
+      commentsCount: commentsCount,
+      isFavorite: isFavorite,
     );
   }
 }

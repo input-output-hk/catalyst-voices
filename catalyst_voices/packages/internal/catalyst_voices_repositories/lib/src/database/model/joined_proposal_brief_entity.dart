@@ -12,11 +12,11 @@ class JoinedProposalBriefEntity extends Equatable {
 
   const JoinedProposalBriefEntity({
     required this.proposal,
-    this.template,
-    this.actionType,
-    this.versionIds = const [],
-    this.commentsCount = 0,
-    this.isFavorite = false,
+    required this.template,
+    required this.actionType,
+    required this.versionIds,
+    required this.commentsCount,
+    required this.isFavorite,
   });
 
   @override

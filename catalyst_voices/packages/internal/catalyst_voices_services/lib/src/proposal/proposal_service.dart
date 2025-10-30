@@ -130,6 +130,10 @@ abstract interface class ProposalService {
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
 
+  Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
+    required PageRequest request,
+  });
+
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
   });
@@ -700,5 +704,12 @@ final class ProposalServiceImpl implements ProposalService {
     ).wait;
 
     return page.copyWithItems(proposals);
+  }
+
+  @override
+  Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
+    required PageRequest request,
+  }) {
+    return _proposalRepository.watchProposalsBriefPage(request: request);
   }
 }

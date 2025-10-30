@@ -71,13 +71,11 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
 
   final LocalizedException? error;
   final List<ProposalBrief> proposals;
-  final List<String> favoritesIds;
   final bool showComments;
 
   const DiscoveryMostRecentProposalsState({
     this.error,
     this.proposals = const [],
-    this.favoritesIds = const [],
     this.showComments = false,
   });
 
@@ -87,7 +85,6 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
   List<Object?> get props => [
     error,
     proposals,
-    favoritesIds,
     showComments,
   ];
 
@@ -97,25 +94,12 @@ final class DiscoveryMostRecentProposalsState extends Equatable {
     bool? isLoading,
     LocalizedException? error,
     List<ProposalBrief>? proposals,
-    List<String>? favoritesIds,
     bool? showComments,
   }) {
     return DiscoveryMostRecentProposalsState(
       error: error ?? this.error,
       proposals: proposals ?? this.proposals,
-      favoritesIds: favoritesIds ?? this.favoritesIds,
       showComments: showComments ?? this.showComments,
-    );
-  }
-
-  DiscoveryMostRecentProposalsState updateFavorites(List<String> ids) {
-    final updatedProposals = [
-      ...proposals,
-    ].map((e) => e.copyWith(isFavorite: ids.contains(e.selfRef.id))).toList();
-
-    return copyWith(
-      proposals: updatedProposals,
-      favoritesIds: ids,
     );
   }
 }

@@ -20,6 +20,8 @@ abstract interface class ProposalDocumentDataLocalSource {
     required ProposalsOrder order,
   });
 
+  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage(PageRequest request);
+
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
   });

@@ -32,6 +32,23 @@ class ProposalBrief extends Equatable {
     this.isFavorite = false,
   });
 
+  factory ProposalBrief.fromData(ProposalBriefData data) {
+    return ProposalBrief(
+      selfRef: data.selfRef,
+      title: data.title,
+      categoryName: data.categoryName,
+      author: data.authorName,
+      fundsRequested: data.fundsRequested,
+      duration: data.durationInMonths,
+      publish: data.isFinal ? ProposalPublish.submittedProposal : ProposalPublish.publishedDraft,
+      description: data.description,
+      versionNumber: data.iteration,
+      updateDate: data.createdAt,
+      commentsCount: data.commentsCount,
+      isFavorite: data.isFavorite,
+    );
+  }
+
   factory ProposalBrief.fromProposal(
     Proposal proposal, {
     bool isFavorite = false,

@@ -8,6 +8,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dri
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:drift/drift.dart';
+import 'package:rxdart/rxdart.dart';
 
 /// Data Access Object for Proposal-specific queries.
 ///
@@ -67,17 +68,41 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     final effectiveSize = request.size.clamp(0, 999);
 
     if (effectiveSize == 0) {
-      return Page(items: const [], total: 0, page: effectivePage, maxPerPage: effectiveSize);
+      return Page.empty(page: effectivePage, maxPerPage: effectiveSize);
     }
 
-    final items = await _queryVisibleProposalsPage(effectivePage, effectiveSize);
-    final total = await _countVisibleProposals();
+    final items = await _queryVisibleProposalsPage(effectivePage, effectiveSize).get();
+    final total = await _countVisibleProposals().getSingle();
 
     return Page(
       items: items,
       total: total,
       page: effectivePage,
       maxPerPage: effectiveSize,
+    );
+  }
+
+  @override
+  Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage(PageRequest request) {
+    final effectivePage = request.page.clamp(0, double.infinity).toInt();
+    final effectiveSize = request.size.clamp(0, 999);
+
+    if (effectiveSize == 0) {
+      return Stream.value(Page.empty(page: effectivePage, maxPerPage: effectiveSize));
+    }
+
+    final itemsStream = _queryVisibleProposalsPage(effectivePage, effectiveSize).watch();
+    final totalStream = _countVisibleProposals().watchSingle();
+
+    return Rx.combineLatest2<List<JoinedProposalBriefEntity>, int, Page<JoinedProposalBriefEntity>>(
+      itemsStream,
+      totalStream,
+      (items, total) => Page(
+        items: items,
+        total: total,
+        page: effectivePage,
+        maxPerPage: effectiveSize,
+      ),
     );
   }
 
@@ -97,12 +122,10 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// - Uses COUNT(DISTINCT lp.id) to count unique proposal ids
   /// - Faster than pagination query since no document joining needed
   ///
-  /// Expected Performance:
-  /// - ~10-20ms for 10k documents with proper indices
-  /// - Must match pagination query's filtering logic exactly eg.[_queryVisibleProposalsPage]
+  /// Must match pagination query's filtering logic exactly eg.[_queryVisibleProposalsPage]
   ///
   /// Returns: Total count of visible proposals (not including hidden)
-  Future<int> _countVisibleProposals() async {
+  Selectable<int> _countVisibleProposals() {
     const cteQuery = r'''
     WITH latest_proposals AS (
       SELECT id, MAX(ver) as max_ver
@@ -142,13 +165,14 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         Variable.withString(DocumentType.proposalActionDocument.uuid),
       ],
       readsFrom: {documentsV2},
-    ).map((row) => row.readNullable<int>('total') ?? 0).getSingle();
+    ).map((row) => row.readNullable<int>('total') ?? 0);
   }
 
   /// Fetches paginated proposal pages using complex CTE logic.
   ///
-  /// Returns: List of [JoinedProposalBriefEntity] mapped from raw rows of customSelect
-  Future<List<JoinedProposalBriefEntity>> _queryVisibleProposalsPage(int page, int size) async {
+  /// Returns: Selectable of [JoinedProposalBriefEntity] mapped from raw rows of customSelect.
+  /// This may be used as single get of watch.
+  Selectable<JoinedProposalBriefEntity> _queryVisibleProposalsPage(int page, int size) {
     final proposalColumns = _buildPrefixedColumns('p', 'p');
     final templateColumns = _buildPrefixedColumns('t', 't');
 
@@ -275,7 +299,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         commentsCount: commentsCount,
         isFavorite: isFavorite,
       );
-    }).get();
+    });
   }
 }
 
@@ -320,4 +344,7 @@ abstract interface class ProposalsV2Dao {
   ///
   /// Returns: Page object with items, total count, and pagination metadata
   Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage(PageRequest request);
+
+  /// Same as [getProposalsBriefPage] but rebuilds when database changes
+  Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage(PageRequest request);
 }

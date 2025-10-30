@@ -20,6 +20,7 @@ class MostRecentProposals extends StatelessWidget {
 
 class _MostRecentProposals extends StatelessWidget {
   final DiscoveryMostRecentProposalsState data;
+
   const _MostRecentProposals({
     required this.data,
   });
@@ -74,7 +75,7 @@ class _MostRecentProposalsError extends StatelessWidget {
           child: VoicesErrorIndicator(
             message: errorMessage ?? context.l10n.somethingWentWrong,
             onRetry: () async {
-              await context.read<DiscoveryCubit>().getMostRecentProposals();
+              context.read<DiscoveryCubit>().getMostRecentProposals();
             },
           ),
         ),
