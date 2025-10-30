@@ -18,14 +18,9 @@ import 'package:drift/drift.dart';
 /// - Latest version is determined by comparing [createdAt] timestamps or `ver` UUIDv7 values.
 /// - Example: Proposal with id='abc' can have ver='v1', ver='v2', ver='v3', etc.
 ///
-/// Document Type Examples:
-/// - proposalDocument: Main proposal content
-/// - proposalActionDocument: Status change for proposal (draft, final, hide)
-/// - commentDocument: Comment on a proposal
-/// - reviewDocument: Review/assessment of a proposal
-/// - *Template documents: Templates for creating documents
-///
 /// Reference Relationships:
+/// - proposal: uses [templateId] to reference the template's [id]
+/// - proposal: uses [templateVer] to reference specific template [ver]
 /// - proposalActionDocument: uses [refId] to reference the proposal's [id]
 /// - proposalActionDocument: uses [refVer] to pin final action to specific proposal [ver]
 /// - commentDocument: uses [refId] to reference commented proposal

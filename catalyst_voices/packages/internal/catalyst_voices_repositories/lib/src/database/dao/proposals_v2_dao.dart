@@ -12,8 +12,6 @@ import 'package:drift/drift.dart';
 /// Data Access Object for Proposal-specific queries.
 ///
 /// This DAO handles complex queries for retrieving proposals with proper status handling.
-///
-/// See PROPOSALS_QUERY_GUIDE.md for detailed explanation of query logic.
 @DriftAccessor(
   tables: [
     DocumentsV2,
@@ -148,38 +146,6 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   /// Fetches paginated proposal pages using complex CTE logic.
-  ///
-  /// CTE 1 - latest_proposals:
-  ///   Groups all proposals by id and finds the maximum version.
-  ///   This identifies the newest version of each proposal.
-  ///
-  /// CTE 2 - latest_actions:
-  ///   Groups all proposal actions by ref_id and finds the maximum version.
-  ///   This ensures we only check the most recent action for each proposal.
-  ///
-  /// CTE 3 - action_status:
-  ///   Joins actual action documents with latest_actions to extract the action type
-  ///   (draft/final/hide) from JSON content using json_extract.
-  ///   Also includes ref_ver which may point to a specific proposal version.
-  ///
-  /// CTE 4 - hidden_proposals:
-  ///   Identifies proposals with 'hide' action. ALL versions are hidden.
-  ///
-  /// CTE 5 - effective_proposals:
-  ///   Applies COALESCE logic to determine display version:
-  ///   - If action_type='final' AND ref_ver IS NOT NULL: Use ref_ver (specific final version)
-  ///   - Else: Use latest version (max_ver)
-  ///   - Exclude any proposal in hidden_proposals
-  ///
-  /// Final Join:
-  ///   Retrieves full document records and orders by version descending.
-  ///   Uses idx_documents_v2_type_id_ver for efficient lookup.
-  ///
-  /// Parameters:
-  ///   - proposalType: UUID string for proposalDocument type
-  ///   - actionType: UUID string for proposalActionDocument type
-  ///   - page: 0-based page number
-  ///   - pageSize: Items per page (max 999)
   ///
   /// Returns: List of [JoinedProposalBriefEntity] mapped from raw rows of customSelect
   Future<List<JoinedProposalBriefEntity>> _queryVisibleProposalsPage(int page, int size) async {
