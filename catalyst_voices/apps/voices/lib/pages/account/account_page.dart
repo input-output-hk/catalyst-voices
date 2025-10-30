@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/notification/catalyst_messenger.dart';
-import 'package:catalyst_voices/notification/specialized/keychain_deleted_dialog_notification.dart';
+import 'package:catalyst_voices/notification/specialized/dialog/keychain_deleted_dialog_notification.dart';
 import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
 import 'package:catalyst_voices/pages/account/pending_email_change_dialog.dart';
 import 'package:catalyst_voices/pages/account/verification_email_send_dialog.dart';
