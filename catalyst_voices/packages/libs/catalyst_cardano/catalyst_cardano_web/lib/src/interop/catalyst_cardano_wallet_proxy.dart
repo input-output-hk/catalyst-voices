@@ -5,6 +5,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_cardano_web/src/interop/catalyst_cardano_interop.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
+import 'package:flutter/foundation.dart';
 
 /// The minimal set of wallet extensions that
 /// must be supported by every wallet extension.
@@ -24,6 +25,16 @@ WalletApiException _fallbackApiException(Object ex) {
     code: WalletApiErrorCode.invalidRequest,
     info: ex.toString(),
   );
+}
+
+/// wasm is not able to represent "undefined" therefore we create a compatible null values
+/// and use "undefined" when in js runtime.
+JSAny? _makeUndefinedOrNull() {
+  if (isSkwasm) {
+    return null;
+  }
+
+  return makeUndefined();
 }
 
 WalletApiException? _mapApiException(Object ex) {
@@ -172,7 +183,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   @override
   Future<List<ShelleyAddress>> getUsedAddresses({Paginate? paginate}) async {
     try {
-      final jsPaginate = paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined();
+      final jsPaginate = paginate != null ? JSPaginate.fromDart(paginate) : _makeUndefinedOrNull();
 
       return await _delegate
           .getUsedAddresses(jsPaginate)
@@ -192,8 +203,8 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   }) async {
     try {
       final utxos = _delegate.getUtxos(
-        amount != null ? hex.encode(cbor.encode(amount.toCbor())).toJS : makeUndefined(),
-        paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined(),
+        amount != null ? hex.encode(cbor.encode(amount.toCbor())).toJS : _makeUndefinedOrNull(),
+        paginate != null ? JSPaginate.fromDart(paginate) : _makeUndefinedOrNull(),
       );
 
       if (utxos == null) return {};
