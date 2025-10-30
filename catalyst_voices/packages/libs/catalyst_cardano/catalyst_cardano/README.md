@@ -1,15 +1,15 @@
 # Content
 
 * [Content](#content)
-  * [Features](#features)
-  * [Requirements](#requirements)
-  * [Install](#install)
-  * [Web setup](#web-setup)
-  * [Example](#example)
-  * [Limitations](#limitations)
-  * [Reference documentation](#reference-documentation)
-  * [Support](#support)
-  * [License](#license)
+    * [Features](#features)
+    * [Requirements](#requirements)
+    * [Install](#install)
+    * [Web setup](#web-setup)
+    * [Example](#example)
+    * [Limitations](#limitations)
+    * [Reference documentation](#reference-documentation)
+    * [Support](#support)
+    * [License](#license)
 
 ## Features
 
