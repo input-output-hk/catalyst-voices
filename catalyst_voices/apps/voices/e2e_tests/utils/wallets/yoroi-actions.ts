@@ -13,58 +13,36 @@ export class YoroiActions implements WalletActions {
 
   async restoreWallet(): Promise<void> {
     /* cspell: disable */
-    // Accept terms of service
     await this.page.locator("#initialPage-tosAgreement-checkbox").check();
     await this.page.locator("#initialPage-continue-button").click();
-
-    // Accept analytics
     await this.page.locator("#startupAnalytics-accept-button").click();
-
-    // Select location
-    await this.page.locator("#somewhere-checkbox").check();
-    await this.page.locator('button:has-text("Continue")').click();
-
-    // Skip URI prompt
     await this.page
       .locator(".UriPromptForm_buttonsWrapper button.MuiButton-secondary")
       .click();
-
-    // Start restore process
     await this.page.locator("#restoreWalletButton").click();
-
-    // Select 15 words
     await this.page.locator("#fifteenWordsButton").click();
-
-    // Enter seed phrase
     const seedPhrase = this.walletConfig.seed;
     for (let i = 0; i < seedPhrase.length; i++) {
       const ftSeedPhraseSelector = `#downshift-${i}-input`;
       await this.page.locator(ftSeedPhraseSelector).fill(seedPhrase[i]);
     }
-
-    // Blur the last input to trigger validation
     await this.page.locator(`#downshift-${seedPhrase.length - 1}-input`).blur();
-
-    // Continue
     await this.page.locator("#primaryButton").click();
     await this.page.locator("#infoDialogContinueButton").click();
-
-    // Set wallet name and password
     await this.page
       .locator("#walletNameInput-label")
       .fill(this.walletConfig.username);
     await this.page
       .locator("#walletPasswordInput-label")
-      .fill(this.walletConfig.password);
+      .pressSequentially(this.walletConfig.password);
     await this.page
       .locator("#repeatPasswordInput-label")
-      .fill(this.walletConfig.password);
+      .pressSequentially(this.walletConfig.password);
 
     // Create wallet
     await this.page.locator("#primaryButton").click();
 
-    // Go to wallet
-    await this.page.locator("#dialog-gotothewallet-button").click();
+    await this.page.locator('button:has-text("Skip")').click();
 
     // Switch to preprod network
     await this.page.locator('xpath=//*[@id="sidebar.settings"]').click();
@@ -77,10 +55,6 @@ export class YoroiActions implements WalletActions {
       .locator("#switchNetworkDialog-selectNetwork_250-menuItem")
       .click();
     await this.page.locator("#switchNetworkDialog-apply-button").click();
-
-    // Complete location setup
-    await this.page.locator("#somewhere-checkbox").click();
-    await this.page.locator('button:has-text("Continue")').click();
     /* cspell: enable */
   }
 
