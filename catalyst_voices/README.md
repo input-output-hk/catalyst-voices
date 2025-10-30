@@ -15,6 +15,8 @@ This repository contains the Catalyst Voices app and packages.
     * [Flavor types](#flavor-types)
     * [Environment variables](#environment-variables)
       * [Environment config](#environment-config)
+    * [Feature Flags](#feature-flags)
+      * [Using Feature Flags with --dart-define](#using-feature-flags-with---dart-define)
     * [Code Generation](#code-generation)
       * [Running Code Generation](#running-code-generation)
         * [Basic Generation](#basic-generation)
@@ -175,6 +177,26 @@ flutter build web --target apps/voices/lib/configs/main_web.dart
 
 Configuration is downloaded dynamically from **gateway** backend where **gateway** base url depends
 on used env type.
+
+### Feature Flags
+
+Feature flags allow you to enable or disable specific features at compile-time or runtime.
+The feature flag system provides flexible configuration through multiple sources.
+
+All feature flags can be found in the [Features](./packages/internal/catalyst_voices_models/lib/src/feature_flags/features.dart) class.
+
+
+#### Using Feature Flags with --dart-define
+
+You can control features at compile-time using `--dart-define` parameters:
+
+```sh
+# Enable voting feature
+flutter run --dart-define=FEATURE_VOTING=true
+
+# Disable voting feature
+flutter run --dart-define=FEATURE_VOTING=false
+```
 
 ### Code Generation
 
