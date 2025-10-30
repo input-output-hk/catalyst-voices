@@ -9,7 +9,6 @@ import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 
 final _logger = Logger('CatalystMessenger');
@@ -263,16 +262,10 @@ class CatalystMessengerState extends State<CatalystMessenger> {
   }
 
   Future<void> _showDialog(DialogNotification notification) async {
-    // Wait for the current frame to complete to ensure navigation has finished
-    // So dialog not end up "below" current page widgets
-    // Navigation can take multiple frames (redirects, page builds, etc.),
-    // so we use addPostFrameCallback to schedule after the current frame,
-    // which gives the router time to settle.
-    final completer = Completer<void>();
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      completer.complete();
-    });
-    await completer.future;
+    // Wait for all pending frames to complete. Navigation (especially with
+    // redirects) can take multiple frames. By waiting while Flutter has
+    // scheduled frames, we ensure navigation has fully completed.
+    await WidgetsBinding.instance.endOfFrame;
 
     // Check if the dialog is still active after navigation
     if (_activeDialog?.id != notification.id) {
