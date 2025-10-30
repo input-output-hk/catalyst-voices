@@ -5,6 +5,7 @@ import 'package:catalyst_voices/notification/banner_close_button.dart';
 import 'package:catalyst_voices/notification/banner_content.dart';
 import 'package:catalyst_voices/notification/catalyst_notification.dart';
 import 'package:catalyst_voices/routes/app_router_factory.dart';
+import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
@@ -37,9 +38,12 @@ class CatalystMessenger extends StatefulWidget {
 }
 
 class CatalystMessengerState extends State<CatalystMessenger> {
-  final _pending = <CatalystNotification>[];
+  final _pendingDialogs = <DialogNotification>[];
+  final _pendingBanners = <BannerNotification>[];
   bool _isShowingBanner = false;
+  bool _isShowingDialog = false;
   BannerNotification? _activeBanner;
+  DialogNotification? _activeDialog;
 
   GoRouter? __router;
 
@@ -50,18 +54,26 @@ class CatalystMessengerState extends State<CatalystMessenger> {
   /// Adds a notification to the queue if it is not already present.
   ///
   /// This method ensures that duplicate notifications are not added to the queue.
-  /// If the notification already exists in the `_pending` queue, it logs a message
-  /// and skips adding it. Otherwise, the notification is added to the queue in a
-  /// sorted order, and the queue is processed to display notifications.
+  /// Notifications are routed to the appropriate queue (dialogs or banners)
+  /// and sorted by priority within each queue.
   void add(CatalystNotification notification) {
-    if (_pending.contains(notification)) {
-      _logger.fine('$notification already in queue, skipping add');
-      return;
-    }
-
     _logger.finest('Adding $notification to queue');
 
-    _addSorted(notification);
+    switch (notification) {
+      case DialogNotification():
+        if (_pendingDialogs.any((n) => n.id == notification.id)) {
+          _logger.fine('$notification already in dialogs queue, skipping add');
+          return;
+        }
+        _addToQueue(notification);
+      case BannerNotification():
+        if (_pendingBanners.any((n) => n.id == notification.id)) {
+          _logger.fine('$notification already in banners queue, skipping add');
+          return;
+        }
+        _addToQueue(notification);
+    }
+
     _processQueue();
   }
 
@@ -71,7 +83,13 @@ class CatalystMessengerState extends State<CatalystMessenger> {
   }
 
   void cancelWhere(CatalystNotificationPredicate test) {
-    _pending.removeWhere(test);
+    _pendingDialogs.removeWhere(test);
+    _pendingBanners.removeWhere(test);
+
+    final activeDialog = _activeDialog;
+    if (activeDialog != null && test(activeDialog)) {
+      _hideCurrentDialog();
+    }
 
     final activeBanner = _activeBanner;
     if (activeBanner != null && test(activeBanner)) {
@@ -87,10 +105,18 @@ class CatalystMessengerState extends State<CatalystMessenger> {
     super.dispose();
   }
 
-  void _addSorted(CatalystNotification notification) {
-    _pending
-      ..add(notification)
-      ..sort();
+  void _addToQueue(CatalystNotification notification) {
+    switch (notification) {
+      case BannerNotification():
+        _pendingBanners
+          ..add(notification)
+          ..sort();
+        break;
+      case DialogNotification():
+        _pendingDialogs
+          ..add(notification)
+          ..sort();
+    }
   }
 
   GoRouter _findRouter() {
@@ -103,16 +129,24 @@ class CatalystMessengerState extends State<CatalystMessenger> {
   void _handleRouterChange() {
     final routerState = _router.state;
 
+    // Handle active dialog
+    final activeDialog = _activeDialog;
+    if (activeDialog != null && !activeDialog.routerPredicate(routerState)) {
+      _logger.finer('Hiding dialog(${activeDialog.id}). Not valid for router state');
+      _addToQueue(activeDialog);
+      _hideCurrentDialog();
+    }
+
     // Handle active banner
     final activeBanner = _activeBanner;
     if (activeBanner != null && !activeBanner.routerPredicate(routerState)) {
       _logger.finer('Hiding banner(${activeBanner.id}). Not valid for router state');
-      _addSorted(activeBanner);
+      _addToQueue(activeBanner);
       _hideCurrentBanner();
     }
 
     // Process queue if there are pending notifications
-    if (_pending.isNotEmpty) {
+    if (_pendingDialogs.isNotEmpty || _pendingBanners.isNotEmpty) {
       _processQueue();
     }
   }
@@ -124,6 +158,15 @@ class CatalystMessengerState extends State<CatalystMessenger> {
       return;
     }
     messengerState.removeCurrentMaterialBanner(reason: MaterialBannerClosedReason.hide);
+  }
+
+  /// Hiding current dialog will trigger _onDialogCompleted and process queue.
+  void _hideCurrentDialog() {
+    final navigatorContext = _router.routerDelegate.navigatorKey.currentContext;
+    if (navigatorContext == null) {
+      return;
+    }
+    Navigator.of(navigatorContext, rootNavigator: true).pop();
   }
 
   void _onBannerCompleted() {
@@ -138,29 +181,56 @@ class CatalystMessengerState extends State<CatalystMessenger> {
     _processQueue();
   }
 
+  void _onDialogCompleted() {
+    assert(_activeDialog != null, 'Completed dialog but active was null');
+    final activeDialog = _activeDialog!;
+
+    _logger.finer('Completed dialog $activeDialog');
+
+    _isShowingDialog = false;
+    _activeDialog = null;
+
+    _processQueue();
+  }
+
   void _processQueue() {
     final routerState = _router.state;
-    final allowed = _pending.where((notification) => notification.routerPredicate(routerState));
 
-    if (allowed.isEmpty) {
-      if (_pending.isNotEmpty) {
-        _logger.finest('Found ${_pending.length} notification but none allow for router state');
+    // Filter notifications that are allowed for current router state
+    final allowedDialogs = _pendingDialogs.where((n) => n.routerPredicate(routerState));
+    final allowedBanners = _pendingBanners.where((n) => n.routerPredicate(routerState));
+
+    if (allowedDialogs.isEmpty && allowedBanners.isEmpty) {
+      final totalPending = _pendingDialogs.length + _pendingBanners.length;
+      if (totalPending > 0) {
+        _logger.finest('Found $totalPending notification(s) but none allow for router state');
       }
       return;
     }
 
-    // Process banners
-    if (!_isShowingBanner) {
-      final banner = allowed.whereType<BannerNotification>().firstOrNull;
-      if (banner != null) {
-        _pending.removeWhere((element) => element.id == banner.id);
-        _activeBanner = banner;
-        _isShowingBanner = true;
+    // Get next notification respecting priority across both queues
+    final nextDialog = allowedDialogs.firstOrNull;
+    final nextBanner = allowedBanners.firstOrNull;
 
-        _logger.finer('Showing banner $banner');
+    // Banners and dialog can be shown at the same time
+    if (!_isShowingDialog && nextDialog != null) {
+      _pendingDialogs.removeWhere((element) => element.id == nextDialog.id);
+      _activeDialog = nextDialog;
+      _isShowingDialog = true;
 
-        unawaited(_showBanner(banner).whenComplete(_onBannerCompleted));
-      }
+      _logger.finer('Showing dialog $nextDialog');
+
+      unawaited(_showDialog(nextDialog).whenComplete(_onDialogCompleted));
+    }
+
+    if (!_isShowingBanner && nextBanner != null) {
+      _pendingBanners.removeWhere((element) => element.id == nextBanner.id);
+      _activeBanner = nextBanner;
+      _isShowingBanner = true;
+
+      _logger.finer('Showing banner $nextBanner');
+
+      unawaited(_showBanner(nextBanner).whenComplete(_onBannerCompleted));
     }
   }
 
@@ -191,17 +261,28 @@ class CatalystMessengerState extends State<CatalystMessenger> {
     );
   }
 
-  // Future<void> _showDialog(DialogNotification notification) async {
-  //   final widget = notification.dialog(context);
+  Future<void> _showDialog(DialogNotification notification) async {
+    // Wait for the current frame to complete to ensure navigation has finished
+    // So dialog not end up "below" current page widgets
+    await WidgetsBinding.instance.endOfFrame;
 
-  //   await VoicesDialog.show<void>(
-  //     context: context,
-  //     routeSettings: RouteSettings(name: '/dialog-${notification.id}'),
-  //     builder: (context) => widget,
-  //   ).then(
-  //     (_) {
-  //       _logger.finest('Dialog(${notification.id}) closed');
-  //     },
-  //   );
-  // }
+    if (_activeDialog?.id != notification.id) {
+      return;
+    }
+
+    final navigatorContext = _router.routerDelegate.navigatorKey.currentContext;
+    if (navigatorContext == null || !navigatorContext.mounted) {
+      return;
+    }
+
+    final widget = notification.dialog(navigatorContext);
+
+    if (navigatorContext.mounted) {
+      await VoicesDialog.show<void>(
+        context: navigatorContext,
+        routeSettings: RouteSettings(name: '/dialog-${notification.id}'),
+        builder: (context) => widget,
+      );
+    }
+  }
 }

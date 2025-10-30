@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
+import 'package:catalyst_voices/notification/catalyst_messenger.dart';
+import 'package:catalyst_voices/notification/specialized/keychain_deleted_dialog_notification.dart';
 import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
 import 'package:catalyst_voices/pages/account/pending_email_change_dialog.dart';
 import 'package:catalyst_voices/pages/account/verification_email_send_dialog.dart';
@@ -113,25 +115,9 @@ class _AccountPageState extends State<AccountPage>
     }
 
     if (mounted) {
-      // unawaited(KeychainDeletedDialog.show(context));
-      
+      final notification = KeychainDeletedDialogNotification();
+      CatalystMessenger.of(context).add(notification);
       const RootRoute().go(context);
-
-      // // TODO(damian-molinski): refactor it. Should be inside AccountCubit and emit signals to page.
-      // final phaseType = context.read<CampaignPhaseAwareCubit>().state.activeCampaignPhaseType;
-
-      // switch (phaseType) {
-      //   case CampaignPhaseType.communityReview:
-      //   case CampaignPhaseType.communityVoting:
-      //     const VotingRoute($extra: true).go(context);
-      //   case null:
-      //   case CampaignPhaseType.proposalSubmission:
-      //   case CampaignPhaseType.votingRegistration:
-      //   case CampaignPhaseType.reviewRegistration:
-      //   case CampaignPhaseType.votingResults:
-      //   case CampaignPhaseType.projectOnboarding:
-      //     const DiscoveryRoute($extra: true).go(context);
-      // }
     }
   }
 

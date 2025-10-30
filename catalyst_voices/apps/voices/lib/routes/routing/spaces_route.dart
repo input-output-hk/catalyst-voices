@@ -120,7 +120,7 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
     ),
     TypedGoRoute<VotingRoute>(
       path: '/voting',
-      name: 'voting',
+      name: VotingRoute.name,
     ),
     TypedGoRoute<FundedProjectsRoute>(
       path: '/funded_projects',
@@ -183,6 +183,8 @@ final class TreasuryRoute extends GoRouteData
 }
 
 final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
+  static const name = 'voting';
+
   final String? categoryId;
   final String? tab;
   final bool? $extra;
