@@ -13,6 +13,7 @@ use crate::service::common::{
 };
 
 mod assets_get;
+mod assets_get_v2;
 
 /// Cardano Staking API Endpoints
 pub(crate) struct Api;
@@ -51,6 +52,43 @@ impl Api {
             stake_address.0,
             network.0,
             SlotNo::into_option(asat.0),
+        ))
+        .await
+    }
+
+    /// Get staked assets v2.
+    ///
+    /// This endpoint returns the total Cardano's staked assets to the corresponded
+    /// user's stake address or RBAC token.
+    #[oai(
+        path = "/v2/cardano/assets/",
+        method = "get",
+        operation_id = "stakedAssetsGetV2"
+    )]
+    async fn staked_ada_get_v2(
+        &self,
+        /// An optional stake address of the user.
+        /// Should be a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
+        Query(stake_address): Query<Option<Cip19StakeAddress>>,
+        /// Cardano network type.
+        /// If omitted network type is identified from the stake address.
+        /// If specified it must be correspondent to the network type encoded in the stake
+        /// address.
+        /// As `preprod` and `preview` network types in the stake address encoded as a
+        /// `testnet`, to specify `preprod` or `preview` network type use this
+        /// query parameter.
+        Query(network): Query<Option<Network>>,
+        /// A time point at which the assets should be calculated.
+        /// If omitted latest slot number is used.
+        asat: Query<Option<cardano::query::AsAt>>,
+        /// No Authorization required, but Token permitted.
+        auth: NoneOrRBAC,
+    ) -> assets_get_v2::AllResponsesV2 {
+        Box::pin(assets_get_v2::endpoint(
+            stake_address,
+            network,
+            SlotNo::into_option(asat.0),
+            auth,
         ))
         .await
     }
