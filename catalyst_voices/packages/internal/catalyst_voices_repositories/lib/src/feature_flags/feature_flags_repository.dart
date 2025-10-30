@@ -2,7 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/feature_flags/source/feature_flag_source.dart';
 import 'package:collection/collection.dart';
 
-/// Repository for managing feature flags from multiple sources
+/// Repository for managing feature flags
 abstract interface class FeatureFlagsRepository {
   factory FeatureFlagsRepository(
     AppEnvironmentType environmentType,
