@@ -41,13 +41,11 @@ final class CategoryDetailRoute extends GoRouteData with FadePageTransitionMixin
 final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
   static const name = 'discovery';
 
-  final bool? $extra;
-
-  const DiscoveryRoute({this.$extra});
+  const DiscoveryRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return SentryDisplayWidget(child: DiscoveryPage(keychainDeleted: $extra ?? false));
+    return const SentryDisplayWidget(child: DiscoveryPage());
   }
 }
 
@@ -187,12 +185,10 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
 
   final String? categoryId;
   final String? tab;
-  final bool? $extra;
 
   const VotingRoute({
     this.categoryId,
     this.tab,
-    this.$extra,
   });
 
   @override
@@ -205,7 +201,6 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
     return VotingPage(
       categoryId: categoryRef,
       tab: tab,
-      keychainDeleted: $extra ?? false,
     );
   }
 }

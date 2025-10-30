@@ -13,9 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 class DiscoveryPage extends StatefulWidget {
-  final bool keychainDeleted;
-
-  const DiscoveryPage({super.key, this.keychainDeleted = false});
+  const DiscoveryPage({super.key});
 
   @override
   State<DiscoveryPage> createState() => _DiscoveryPageState();
@@ -67,12 +65,6 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   @override
   void didUpdateWidget(DiscoveryPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-
-    if (widget.keychainDeleted && widget.keychainDeleted != oldWidget.keychainDeleted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await _showKeychainDeletedDialog(context);
-      });
-    }
   }
 
   @override
@@ -80,12 +72,6 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     super.initState();
 
     unawaited(_loadData());
-
-    if (widget.keychainDeleted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await _showKeychainDeletedDialog(context);
-      });
-    }
   }
 
   Future<void> _loadData() async {
@@ -94,9 +80,5 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     } finally {
       if (mounted) unawaited(SentryDisplayWidget.of(context).reportFullyDisplayed());
     }
-  }
-
-  Future<void> _showKeychainDeletedDialog(BuildContext context) async {
-    // await KeychainDeletedDialog.show(context);
   }
 }

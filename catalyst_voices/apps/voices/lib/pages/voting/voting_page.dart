@@ -21,13 +21,11 @@ import 'package:rxdart/rxdart.dart';
 class VotingPage extends StatefulWidget {
   final SignedDocumentRef? categoryId;
   final VotingPageTab? tab;
-  final bool keychainDeleted;
 
   const VotingPage({
     super.key,
     this.categoryId,
     this.tab,
-    this.keychainDeleted = false,
   });
 
   @override
@@ -156,14 +154,6 @@ class _VotingPageState extends State<VotingPage>
     _pagingController
       ..addPageRequestListener(_handleProposalsPageRequest)
       ..notifyPageRequestListeners(0);
-
-    // TODO(damian-molinski): same behavior already exists in DiscoveryPage because
-    // of way confirmation dialog is shown. Refactor it.
-    if (widget.keychainDeleted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await _showKeychainDeletedDialog(context);
-      });
-    }
   }
 
   VotingPageTab _determineTab(
@@ -195,10 +185,6 @@ class _VotingPageState extends State<VotingPage>
   ) async {
     final request = PageRequest(page: pageKey, size: pageSize);
     await context.read<VotingCubit>().getProposals(request);
-  }
-
-  Future<void> _showKeychainDeletedDialog(BuildContext context) async {
-    // await KeychainDeletedDialog.show(context);
   }
 
   void _updateRoute({
