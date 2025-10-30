@@ -13,21 +13,24 @@ use std::{
 
 use anyhow::{Context, Result};
 use cardano_chain_follower::{hashes::TransactionId, MultiEraBlock, Slot, TxnIndex};
-use rbac_registration::cardano::cip509::Cip509;
+use rbac_registration::{
+    cardano::cip509::Cip509,
+    registration::cardano::{RbacValidationError, RegistrationChain},
+};
 use scylla::client::session::Session;
 use tokio::sync::watch;
 use tracing::{debug, error};
 
 use crate::{
     db::index::{
-        queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
+        queries::{
+            rbac::get_catalyst_id_from_stake_address::cache_stake_address, FallibleQueryTasks,
+            PreparedQuery, SizedBatch,
+        },
         session::CassandraSession,
     },
     metrics::caches::rbac::{inc_index_sync, inc_invalid_rbac_reg_count},
-    rbac::{
-        validate_rbac_registration, RbacBlockIndexingContext, RbacValidationError,
-        RbacValidationSuccess,
-    },
+    rbac::{cache_persistent_rbac_chain, RbacBlockIndexingContext},
     settings::cassandra_db::EnvVars,
 };
 
@@ -123,24 +126,80 @@ impl Rbac509InsertQuery {
         wait_for_previous_blocks(pending_blocks, our_end, block.slot()).await?;
 
         let previous_transaction = cip509.previous_transaction();
-        // `Box::pin` is used here because of the future size (`clippy::large_futures` lint).
-        match Box::pin(validate_rbac_registration(
-            cip509,
-            block.is_immutable(),
-            context,
-        ))
-        .await
-        {
+
+        // Before it is consumed
+        let txn_id = cip509.txn_hash();
+        let origin = cip509.origin().clone();
+        let purpose = cip509.purpose();
+        let previous_txn = cip509.previous_transaction();
+
+        context.set_persistent(block.is_immutable());
+
+        match RegistrationChain::update_from_previous_txn(cip509, context).await {
             // Write updates to the database. There can be multiple updates in one registration
             // because a new chain can take ownership of stake addresses of the existing chains and
             // in that case we want to record changes to all those chains as well as the new one.
-            Ok(RbacValidationSuccess {
-                catalyst_id,
-                stake_addresses,
-                public_keys,
-                modified_chains,
-                purpose,
-            }) => {
+            Ok((chain, modified_chains)) => {
+                let catalyst_id = chain.catalyst_id();
+                let stake_addresses = chain.stake_addresses();
+                let public_keys: HashSet<_> = chain
+                    .role_data_history()
+                    .keys()
+                    .filter_map(|role| {
+                        chain
+                            .get_latest_signing_pk_for_role(role)
+                            .map(|(key, _)| key)
+                    })
+                    .collect();
+
+                if let Some(previous_txn) = previous_txn {
+                    context.insert_transaction(txn_id, catalyst_id.clone());
+                    context.insert_addresses(stake_addresses.clone(), catalyst_id);
+                    context.insert_public_keys(public_keys.clone(), catalyst_id);
+                    context.insert_registration(
+                        catalyst_id.clone(),
+                        txn_id,
+                        origin.point().slot_or_default(),
+                        origin.txn_index(),
+                        Some(previous_txn),
+                        // Only a new chain can remove stake addresses from an existing one.
+                        HashSet::new(),
+                    );
+
+                    if block.is_immutable() {
+                        cache_persistent_rbac_chain(catalyst_id.clone(), chain.clone());
+                    }
+                } else {
+                    context.insert_transaction(chain.current_tx_id_hash(), catalyst_id.clone());
+                    // This will also update the addresses that are already present in the context
+                    // if they were reassigned to the new chain.
+                    context.insert_addresses(stake_addresses.clone(), catalyst_id);
+                    context.insert_public_keys(public_keys.clone(), catalyst_id);
+                    context.insert_registration(
+                        catalyst_id.clone(),
+                        chain.current_tx_id_hash(),
+                        chain.current_point().slot_or_default(),
+                        chain.current_txn_index(),
+                        // No previous transaction for the root registration.
+                        None,
+                        // This chain has just been created, so no addresses have been removed from
+                        // it.
+                        HashSet::new(),
+                    );
+
+                    // This cache must be updated because these addresses previously belonged to
+                    // other chains.
+                    for (catalyst_id, addresses) in &modified_chains {
+                        for address in addresses {
+                            cache_stake_address(
+                                block.is_immutable(),
+                                address.clone(),
+                                catalyst_id.clone(),
+                            );
+                        }
+                    }
+                }
+
                 // Record the transaction identifier (hash) of a new registration.
                 self.catalyst_id_for_txn_id
                     .push(insert_catalyst_id_for_txn_id::Params::new(
@@ -171,7 +230,7 @@ impl Rbac509InsertQuery {
                 }
                 // Update the chain this registration belongs to.
                 self.registrations.push(insert_rbac509::Params::new(
-                    catalyst_id,
+                    catalyst_id.clone(),
                     txn_hash,
                     slot,
                     index,
