@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_redundant_argument_values
+
 import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
@@ -407,7 +409,6 @@ void main() {
           ver: actionFinalVer,
           type: DocumentType.proposalActionDocument,
           refId: 'p1',
-          // ignore: avoid_redundant_argument_values
           refVer: null,
           contentData: ProposalSubmissionActionDto.aFinal.toJson(),
         );
@@ -557,7 +558,7 @@ void main() {
 
           // And: Multiple actions with NULL ref_id
           final actions = <DocumentEntityV2>[];
-          for (int i = 0; i < 3; i++) {
+          for (var i = 0; i < 3; i++) {
             final actionVer = _buildUuidV7At(latest.add(Duration(hours: i)));
             actions.add(
               _createTestDocumentEntity(
@@ -957,7 +958,7 @@ void main() {
         test('count remains consistent across pagination', () async {
           // Given: 25 proposals
           final proposals = <DocumentEntityV2>[];
-          for (int i = 0; i < 25; i++) {
+          for (var i = 0; i < 25; i++) {
             final time = DateTime.utc(2025, 1, 1).add(Duration(hours: i));
             final ver = _buildUuidV7At(time);
             proposals.add(
