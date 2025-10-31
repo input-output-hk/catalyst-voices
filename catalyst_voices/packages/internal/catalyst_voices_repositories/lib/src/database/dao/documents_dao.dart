@@ -269,7 +269,7 @@ class DriftDocumentsDao extends DatabaseAccessor<DriftCatalystDatabase>
   }) async {
     final query = select(documents)
       ..where(
-        (tbl) => BaseJsonQueryExpression(
+        (tbl) => JsonQuerySearchExpression(
           jsonContent: content,
           nodeId: nodeId,
           searchValue: value,

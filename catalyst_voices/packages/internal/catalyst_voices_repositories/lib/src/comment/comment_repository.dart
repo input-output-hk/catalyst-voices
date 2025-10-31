@@ -54,35 +54,14 @@ final class DocumentsCommentRepository implements CommentRepository {
     required CatalystId catalystId,
     required CatalystPrivateKey privateKey,
   }) async {
-    final ref = document.metadata.ref;
-    final reply = document.metadata.reply;
-    final categoryId = document.metadata.categoryId;
-
-    assert(ref != null, 'CommentDocument have to have a ref to other document');
-    // TODO(damian-molinski): creating SignedDocumentMetadata with correct refs
-    // have to be captured single place.
     assert(
-      categoryId != null,
-      'CommentDocument have to have categoryId because proposals always have categoryId',
-    );
-
-    final payload = SignedDocumentJsonPayload(document.content.data);
-    final metadata = SignedDocumentMetadata(
-      contentType: SignedDocumentContentType.json,
-      documentType: DocumentType.commentDocument,
-      id: document.metadata.id,
-      ver: document.metadata.version,
-      ref: SignedDocumentMetadataRef.fromDocumentRef(ref!),
-      template: SignedDocumentMetadataRef.fromDocumentRef(
-        document.metadata.template!,
-      ),
-      reply: reply != null ? SignedDocumentMetadataRef.fromDocumentRef(reply) : null,
-      categoryId: SignedDocumentMetadataRef.fromDocumentRef(categoryId!),
+      document.metadata.ref != null,
+      'CommentDocument have to have a ref to other document',
     );
 
     final signedDocument = await _signedDocumentManager.signDocument(
-      payload,
-      metadata: metadata,
+      SignedDocumentJsonPayload(document.content.data),
+      metadata: document.metadata,
       catalystId: catalystId,
       privateKey: privateKey,
     );
@@ -144,10 +123,10 @@ final class DocumentsCommentRepository implements CommentRepository {
     final authors = documentData.metadata.authors;
     final metadata = CommentMetadata(
       selfRef: documentData.metadata.selfRef as SignedDocumentRef,
-      ref: documentData.metadata.ref! as SignedDocumentRef,
-      template: templateData.metadata.selfRef as SignedDocumentRef,
+      proposalRef: documentData.metadata.ref! as SignedDocumentRef,
+      commentTemplate: templateData.metadata.selfRef as SignedDocumentRef,
       reply: documentData.metadata.reply,
-      categoryId: documentData.metadata.categoryId,
+      parameters: documentData.metadata.parameters,
       authorId: authors!.single,
     );
     final content = DocumentDataContentDto.fromModel(
@@ -176,6 +155,7 @@ final class DocumentsCommentRepository implements CommentRepository {
 
     final metadata = CommentTemplateMetadata(
       selfRef: documentData.metadata.selfRef as SignedDocumentRef,
+      parameters: documentData.metadata.parameters,
     );
 
     final contentData = documentData.content.data;

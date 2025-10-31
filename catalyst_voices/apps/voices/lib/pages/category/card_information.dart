@@ -28,7 +28,7 @@ class CardInformation extends StatelessWidget {
         padding: padding,
         children: [
           CategoryProposalsDetailsCard(
-            categoryId: category.id,
+            categoryRef: category.ref,
             categoryName: category.formattedName,
             categoryProposalsCount: category.proposalsCount,
           ),
@@ -36,7 +36,7 @@ class CardInformation extends StatelessWidget {
           Offstage(
             offstage: !isActiveProposer,
             child: CreateProposalCard(
-              categoryId: category.id,
+              categoryRef: category.ref,
               categoryName: category.formattedName,
               categoryDos: category.dos,
               categoryDonts: category.donts,

@@ -10,7 +10,7 @@ part 'proposal_route.g.dart';
   path: '/proposal/:proposalId',
   name: 'proposal_viewer',
 )
-final class ProposalRoute extends GoRouteData with FadePageTransitionMixin {
+final class ProposalRoute extends GoRouteData with $ProposalRoute, FadePageTransitionMixin {
   final String proposalId;
   final String? version;
   final bool local;

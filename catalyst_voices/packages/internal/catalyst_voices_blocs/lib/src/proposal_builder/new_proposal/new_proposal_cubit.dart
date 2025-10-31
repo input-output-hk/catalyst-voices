@@ -32,17 +32,16 @@ class NewProposalCubit extends Cubit<NewProposalState>
       emit(state.copyWith(isCreatingProposal: true));
 
       final title = state.title.value;
-      final categoryId = state.categoryRef;
+      final categoryRef = state.categoryRef;
 
-      if (categoryId == null) {
+      if (categoryRef == null) {
         throw StateError('Cannot create draft, category not selected');
       }
 
-      final category = await _campaignService.getCategory(categoryId);
+      final category = await _campaignService.getCategory(DocumentParameters({categoryRef}));
       final templateRef = category.proposalTemplateRef;
-      final template = await _proposalService.getProposalTemplate(
-        ref: templateRef,
-      );
+      final template = await _proposalService.getProposalTemplate(ref: templateRef);
+      final parameters = template.metadata.parameters;
 
       final documentBuilder = DocumentBuilder.fromSchema(schema: template.schema)
         ..addChange(
@@ -57,8 +56,8 @@ class NewProposalCubit extends Cubit<NewProposalState>
 
       return await _proposalService.createDraftProposal(
         content: documentContent,
-        template: templateRef,
-        categoryId: categoryId,
+        templateRef: templateRef,
+        parameters: parameters,
       );
     } catch (error, stackTrace) {
       _logger.severe('Create draft', error, stackTrace);

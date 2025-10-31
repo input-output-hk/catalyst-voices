@@ -10,13 +10,18 @@ import 'package:meta/meta.dart';
 abstract base class DocumentMetadata extends Equatable {
   final DocumentRef selfRef;
 
+  /// A list of referenced parameters like brand, campaign or category.
+  final DocumentParameters parameters;
+
   DocumentMetadata({
     required this.selfRef,
+    required this.parameters,
   }) : assert(selfRef.isExact, 'SelfRef have to be exact!');
 
   @override
   @mustCallSuper
   List<Object?> get props => [
     selfRef,
+    parameters,
   ];
 }

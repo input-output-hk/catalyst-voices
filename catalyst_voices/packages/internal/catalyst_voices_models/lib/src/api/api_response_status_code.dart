@@ -2,7 +2,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
 /// Defines well-known status codes.
 ///
-/// See [ApiErrorResponseException].
+/// See [ApiBadResponseException].
 abstract class ApiResponseStatusCode {
   /// The client has not sent valid request, could be an invalid HTTP in
   /// general or provided not correct headers, path or query arguments.
