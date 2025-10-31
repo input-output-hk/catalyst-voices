@@ -3,7 +3,8 @@
     adr:
         author: Assistant
         created: 17-Oct-2024
-        status: proposed
+        status: superseded
+        superseded_by: 0011-identifiers-uuid7-and-ulid
     tags:
         - uuid
         - identifiers
@@ -14,6 +15,7 @@
 The system needs globally unique identifiers for various entities and resources.
 Currently, we use ULIDs (Universally Unique Lexicographically Sortable Identifiers) in some parts of the system.
 With the recent standardization of UUIDv7 through [RFC 9562], we need to evaluate our identifier strategy.
+This record is superseded by 0011 which documents the final identifier strategy.
 
 ## Assumptions
 
@@ -32,23 +34,23 @@ We will:
 ### Rationale
 
 * UUIDv7 provides similar benefits to ULID:
-  * Time-ordered
-  * Globally unique
-  * Contains timestamp information
+    * Time-ordered
+    * Globally unique
+    * Contains timestamp information
 * UUIDv7 has several advantages over ULID:
-  * Standardized through RFC 9562
-  * Wider system compatibility (native UUID support)
-  * No special encoding requirements
-  * Clear disambiguation from UUIDv4 (allowing two distinct identifier spaces)
-  * Eliminates need for custom ULID code
-  * Better database indexing support
+    * Standardized through RFC 9562
+    * Wider system compatibility (native UUID support)
+    * No special encoding requirements
+    * Clear disambiguation from UUIDv4 (allowing two distinct identifier spaces)
+    * Eliminates need for custom ULID code
+    * Better database indexing support
 * Standard UUID implementations are widely available across programming languages and platforms
 
 ### Implementation Guidelines
 
 * New features should exclusively use:
-  * UUIDv7 for time-ordered identifiers
-  * UUIDv4 for non-time-ordered type identifiers
+    * UUIDv7 for time-ordered identifiers
+    * UUIDv4 for non-time-ordered type identifiers
 * Existing ULID implementations should be migrated to UUIDv7 during regular maintenance cycles
 * Database schemas should use UUID types rather than string/custom types
 * API contracts should specify UUID format requirements in their documentation
