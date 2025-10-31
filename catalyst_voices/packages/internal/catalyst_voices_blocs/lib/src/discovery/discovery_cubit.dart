@@ -18,8 +18,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   final CampaignService _campaignService;
   final ProposalService _proposalService;
 
-  StreamSubscription<List<Proposal>>? _proposalsSub;
-  StreamSubscription<List<String>>? _favoritesProposalsIdsSub;
+  StreamSubscription<List<ProposalBrief>>? _proposalsV2Sub;
 
   DiscoveryCubit(this._campaignService, this._proposalService) : super(const DiscoveryState());
 
@@ -34,29 +33,21 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
 
   @override
   Future<void> close() async {
-    await _proposalsSub?.cancel();
-    _proposalsSub = null;
-
-    await _favoritesProposalsIdsSub?.cancel();
-    _favoritesProposalsIdsSub = null;
+    await _proposalsV2Sub?.cancel();
+    _proposalsV2Sub = null;
 
     return super.close();
   }
 
   Future<void> getAllData() async {
-    await Future.wait([
-      getCurrentCampaign(),
-      getMostRecentProposals(),
-    ]);
+    getMostRecentProposals();
+    await getCurrentCampaign();
   }
 
   Future<void> getCurrentCampaign() async {
     try {
-      emit(
-        state.copyWith(
-          campaign: const DiscoveryCampaignState(),
-        ),
-      );
+      emit(state.copyWith(campaign: const DiscoveryCampaignState()));
+
       final campaign = (await _campaignService.getActiveCampaign())!;
       final timeline = campaign.timeline.phases.map(CampaignTimelineViewModel.fromModel).toList();
       final currentCampaign = CurrentCampaignInfoViewModel.fromModel(campaign);
@@ -64,20 +55,24 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
           .map(CampaignCategoryDetailsViewModel.fromModel)
           .toList();
       final datesEvents = _buildCampaignDatesEvents(timeline);
+      final supportsComments = campaign.supportsComments;
 
-      if (!isClosed) {
-        emit(
-          state.copyWith(
-            campaign: DiscoveryCampaignState(
-              currentCampaign: currentCampaign,
-              campaignTimeline: timeline,
-              categories: categoriesModel,
-              datesEvents: datesEvents,
-              isLoading: false,
-            ),
-          ),
-        );
+      if (isClosed) {
+        return;
       }
+
+      emit(
+        state.copyWith(
+          campaign: DiscoveryCampaignState(
+            currentCampaign: currentCampaign,
+            campaignTimeline: timeline,
+            categories: categoriesModel,
+            datesEvents: datesEvents,
+            isLoading: false,
+          ),
+          proposals: state.proposals.copyWith(showComments: supportsComments),
+        ),
+      );
     } catch (e, st) {
       _logger.severe('Error getting current campaign', e, st);
 
@@ -91,37 +86,10 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     }
   }
 
-  Future<void> getMostRecentProposals() async {
-    try {
-      unawaited(_proposalsSub?.cancel());
-      unawaited(_favoritesProposalsIdsSub?.cancel());
+  void getMostRecentProposals() {
+    emit(state.copyWith(proposals: const DiscoveryMostRecentProposalsState()));
 
-      emit(state.copyWith(proposals: const DiscoveryMostRecentProposalsState()));
-      final campaign = await _campaignService.getActiveCampaign();
-      if (!isClosed) {
-        _proposalsSub = _buildProposalsSub();
-        _favoritesProposalsIdsSub = _buildFavoritesProposalsIdsSub();
-
-        emit(
-          state.copyWith(
-            proposals: state.proposals.copyWith(
-              isLoading: false,
-              showComments: campaign?.supportsComments ?? false,
-            ),
-          ),
-        );
-      }
-    } catch (e, st) {
-      _logger.severe('Error getting most recent proposals', e, st);
-
-      if (!isClosed) {
-        emit(
-          state.copyWith(
-            proposals: DiscoveryMostRecentProposalsState(error: LocalizedException.create(e)),
-          ),
-        );
-      }
-    }
+    _watchMostRecentProposals();
   }
 
   Future<void> removeFavorite(DocumentRef ref) async {
@@ -178,73 +146,27 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     );
   }
 
-  StreamSubscription<List<String>> _buildFavoritesProposalsIdsSub() {
-    _logger.info('Building favorites proposals ids subscription');
+  void _handleProposalsChange(List<ProposalBrief> proposals) {
+    _logger.finest('Got proposals[${proposals.length}]');
 
-    return _proposalService
-        .watchFavoritesProposalsIds()
-        .distinct(listEquals)
-        .listen(
-          _emitFavoritesIds,
-          onError: _emitMostRecentError,
-        );
+    final updatedProposalsState = state.proposals.copyWith(
+      proposals: proposals,
+      showSection: proposals.length == _maxRecentProposalsCount,
+    );
+
+    emit(state.copyWith(proposals: updatedProposalsState));
   }
 
-  StreamSubscription<List<Proposal>> _buildProposalsSub() {
-    _logger.fine('Building proposals subscription');
+  void _watchMostRecentProposals() {
+    unawaited(_proposalsV2Sub?.cancel());
 
-    return _proposalService
-        .watchProposalsPage(
+    _proposalsV2Sub = _proposalService
+        .watchProposalsBriefPage(
           request: const PageRequest(page: 0, size: _maxRecentProposalsCount),
-          filters: ProposalsFilters.forActiveCampaign(),
-          order: const UpdateDate(isAscending: false),
         )
-        .map((event) => event.items)
+        .map((page) => page.items)
         .distinct(listEquals)
-        .listen(_handleProposals, onError: _emitMostRecentError);
-  }
-
-  void _emitFavoritesIds(List<String> ids) {
-    emit(state.copyWith(proposals: state.proposals.updateFavorites(ids)));
-  }
-
-  void _emitMostRecentError(Object error, StackTrace stackTrace) {
-    _logger.severe('Loading recent proposals emitted', error, stackTrace);
-
-    emit(
-      state.copyWith(
-        proposals: state.proposals.copyWith(
-          isLoading: false,
-          error: LocalizedException.create(error),
-          proposals: const [],
-        ),
-      ),
-    );
-  }
-
-  void _emitMostRecentProposals(List<Proposal> proposals) {
-    final proposalList = proposals
-        .map(
-          (e) => ProposalBrief.fromProposal(
-            e,
-            isFavorite: state.proposals.favoritesIds.contains(e.selfRef.id),
-            showComments: state.proposals.showComments,
-          ),
-        )
-        .toList();
-
-    emit(
-      state.copyWith(
-        proposals: state.proposals.copyWith(
-          proposals: proposalList,
-        ),
-      ),
-    );
-  }
-
-  Future<void> _handleProposals(List<Proposal> proposals) async {
-    _logger.info('Got proposals: ${proposals.length}');
-
-    _emitMostRecentProposals(proposals);
+        .map((items) => items.map(ProposalBrief.fromData).toList())
+        .listen(_handleProposalsChange);
   }
 }

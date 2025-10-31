@@ -23,6 +23,12 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
   }
 
   @override
+  Future<List<DocumentRef>> filterExisting(List<DocumentRef> refs) {
+    // TODO(damian-molinski): not implemented
+    return Future(() => []);
+  }
+
+  @override
   Future<DocumentData> get({required DocumentRef ref}) async {
     final entity = await _database.draftsDao.query(ref: ref);
     if (entity == null) {
@@ -55,25 +61,10 @@ final class DatabaseDraftsDataSource implements DraftDataSource {
 
   @override
   Future<void> saveAll(Iterable<DocumentData> data) async {
-    final entities = data.map(
-      (data) {
-        final idHiLo = UuidHiLo.from(data.metadata.id);
-        final verHiLo = UuidHiLo.from(data.metadata.version);
+    // TODO(damian-molinski): migrate to V2
+    /*final entries = data.map((e) => e.toEntity()).toList();
 
-        return DocumentDraftEntity(
-          idHi: idHiLo.high,
-          idLo: idHiLo.low,
-          verHi: verHiLo.high,
-          verLo: verHiLo.low,
-          type: data.metadata.type,
-          content: data.content,
-          metadata: data.metadata,
-          title: data.content.title ?? '',
-        );
-      },
-    );
-
-    await _database.draftsDao.saveAll(entities);
+    await _database.localDraftsV2Dao.saveAll(entries);*/
   }
 
   @override
@@ -115,4 +106,26 @@ extension on DocumentDraftEntity {
       content: content,
     );
   }
+}
+
+extension on DocumentData {
+  /*LocalDocumentDraftEntity toEntity() {
+    return LocalDocumentDraftEntity(
+      content: content,
+      id: metadata.id,
+      ver: metadata.version,
+      type: metadata.type,
+      refId: metadata.ref?.id,
+      refVer: metadata.ref?.version,
+      replyId: metadata.reply?.id,
+      replyVer: metadata.reply?.version,
+      section: metadata.section,
+      categoryId: metadata.categoryId?.id,
+      categoryVer: metadata.categoryId?.version,
+      templateId: metadata.template?.id,
+      templateVer: metadata.template?.version,
+      authors: metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
+      createdAt: metadata.version.dateTime,
+    );
+  }*/
 }

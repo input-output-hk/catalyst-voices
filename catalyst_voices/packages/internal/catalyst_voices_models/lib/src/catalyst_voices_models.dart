@@ -79,6 +79,8 @@ export 'pagination/page.dart';
 export 'pagination/page_request.dart';
 export 'permissions/exceptions/permission_exceptions.dart';
 export 'proposal/core_proposal.dart';
+export 'proposal/data/joined_proposal_brief_data.dart';
+export 'proposal/data/proposal_brief_data.dart';
 export 'proposal/detail_proposal.dart';
 export 'proposal/exception/proposal_limit_reached_exception.dart';
 export 'proposal/proposal.dart';

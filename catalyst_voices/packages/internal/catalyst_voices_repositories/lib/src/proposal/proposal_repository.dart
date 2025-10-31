@@ -7,6 +7,8 @@ import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.
 import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:rxdart/rxdart.dart';
 
 /// Base interface to interact with proposals. A specialized version of [DocumentRepository] which
@@ -72,6 +74,11 @@ abstract interface class ProposalRepository {
     bool includeLocalDrafts = false,
   });
 
+  Future<void> updateProposalFavorite({
+    required String id,
+    required bool isFavorite,
+  });
+
   Future<void> upsertDraftProposal({required DocumentData document});
 
   Stream<int> watchCommentsCount({
@@ -87,6 +94,10 @@ abstract interface class ProposalRepository {
   /// [refTo] document.
   Stream<ProposalPublish?> watchProposalPublish({
     required DocumentRef refTo,
+  });
+
+  Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
+    required PageRequest request,
   });
 
   Stream<ProposalsCount> watchProposalsCount({
@@ -265,6 +276,14 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
+  Future<void> updateProposalFavorite({
+    required String id,
+    required bool isFavorite,
+  }) {
+    return _proposalsLocalSource.updateProposalFavorite(id: id, isFavorite: isFavorite);
+  }
+
+  @override
   Future<void> upsertDraftProposal({required DocumentData document}) {
     return _documentRepository.upsertDocument(document: document);
   }
@@ -316,6 +335,15 @@ final class ProposalRepositoryImpl implements ProposalRepository {
 
           return _getProposalPublish(ref: refTo, action: action);
         });
+  }
+
+  @override
+  Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
+    required PageRequest request,
+  }) {
+    return _proposalsLocalSource
+        .watchProposalsBriefPage(request)
+        .map((page) => page.map(_mapJoinedProposalBriefData));
   }
 
   @override
@@ -475,5 +503,55 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
       };
     }
+  }
+
+  ProposalBriefData _mapJoinedProposalBriefData(JoinedProposalBriefData data) {
+    ProposalDocument? document;
+
+    final template = data.template;
+    if (template != null) {
+      document = _buildProposalDocument(
+        documentData: data.proposal,
+        templateData: template,
+      );
+    }
+
+    final metadata = data.proposal.metadata;
+    final content = data.proposal.content.data;
+
+    final authorName = document?.authorName ?? metadata.authors?.firstOrNull?.username;
+    final title = document?.title ?? ProposalDocument.titleNodeId.from(content);
+    final description = document?.description ?? ProposalDocument.descriptionNodeId.from(content);
+    // TODO(damian-molinski): Category name should come from query but atm those are not documents.
+    final categoryName = Campaign.all
+        .map((e) => e.categories)
+        .flattened
+        .firstWhereOrNull((category) => category.selfRef == metadata.categoryId)
+        ?.formattedCategoryName;
+    final durationInMonths = document?.duration ?? ProposalDocument.durationNodeId.from(content);
+    // without template we don't know currency so we can't Currencies.fallback or
+    // assume major unit status
+    final fundsRequested = document?.fundsRequested;
+
+    return ProposalBriefData(
+      selfRef: metadata.selfRef,
+      authorName: authorName ?? '',
+      title: title ?? '',
+      description: description ?? '',
+      categoryName: categoryName ?? '',
+      durationInMonths: durationInMonths ?? 0,
+      fundsRequested: fundsRequested ?? Money.zero(currency: Currencies.fallback),
+      createdAt: metadata.version.dateTime,
+      iteration: data.iteration,
+      commentsCount: data.commentsCount,
+      isFinal: data.isFinal,
+      isFavorite: data.isFavorite,
+    );
+  }
+}
+
+extension on DocumentNodeId {
+  T? from<T extends Object>(Map<String, dynamic> data) {
+    return DocumentNodeTraverser.getValue<T>(this, data);
   }
 }

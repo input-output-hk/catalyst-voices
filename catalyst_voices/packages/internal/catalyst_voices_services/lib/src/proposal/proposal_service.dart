@@ -130,6 +130,10 @@ abstract interface class ProposalService {
   /// Streams changes to [isMaxProposalsLimitReached].
   Stream<bool> watchMaxProposalsLimitReached();
 
+  Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
+    required PageRequest request,
+  });
+
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
   });
@@ -164,11 +168,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> addFavoriteProposal({required DocumentRef ref}) {
-    return _documentRepository.updateDocumentFavorite(
-      ref: ref.toLoose(),
-      type: DocumentType.proposalDocument,
-      isFavorite: true,
-    );
+    return _proposalRepository.updateProposalFavorite(id: ref.id, isFavorite: true);
   }
 
   @override
@@ -405,11 +405,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Future<void> removeFavoriteProposal({required DocumentRef ref}) {
-    return _documentRepository.updateDocumentFavorite(
-      ref: ref.toLoose(),
-      type: DocumentType.proposalDocument,
-      isFavorite: false,
-    );
+    return _proposalRepository.updateProposalFavorite(id: ref.id, isFavorite: false);
   }
 
   @override
@@ -507,6 +503,13 @@ final class ProposalServiceImpl implements ProposalService {
     return watchUserProposalsCount().map((count) {
       return count.finals >= ProposalDocument.maxSubmittedProposalsPerUser;
     });
+  }
+
+  @override
+  Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
+    required PageRequest request,
+  }) {
+    return _proposalRepository.watchProposalsBriefPage(request: request);
   }
 
   @override
