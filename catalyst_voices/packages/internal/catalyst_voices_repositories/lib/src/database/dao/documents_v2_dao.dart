@@ -63,12 +63,13 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<bool> exists(DocumentRef ref) {
     final query = selectOnly(documentsV2)
       ..addColumns([const Constant(1)])
-      ..where(documentsV2.id.equals(ref.id))
-      ..limit(1);
+      ..where(documentsV2.id.equals(ref.id));
 
     if (ref.isExact) {
-      query.where((documentsV2.ver.equals(ref.version!)));
+      query.where(documentsV2.ver.equals(ref.version!));
     }
+
+    query.limit(1);
 
     return query.getSingleOrNull().then((result) => result != null);
   }
@@ -125,6 +126,9 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<void> save(DocumentEntityV2 entity) => saveAll([entity]);
+
+  @override
   Future<void> saveAll(List<DocumentEntityV2> entries) async {
     if (entries.isEmpty) return;
 
@@ -136,7 +140,4 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       );
     });
   }
-
-  @override
-  Future<void> save(DocumentEntityV2 entity) => saveAll([entity]);
 }

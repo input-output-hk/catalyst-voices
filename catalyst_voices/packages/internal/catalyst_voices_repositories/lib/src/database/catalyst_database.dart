@@ -84,8 +84,6 @@ abstract interface class CatalystDatabase {
     DriftFavoritesDao,
     DriftDraftsDao,
     DriftProposalsDao,
-
-    //
     DriftDocumentsV2Dao,
     DriftLocalDraftsV2Dao,
     DriftProposalsV2Dao,

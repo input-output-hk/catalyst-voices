@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.drift.dart';
@@ -65,7 +67,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// - Single query with CTEs (no N+1 queries)
   @override
   Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage(PageRequest request) async {
-    final effectivePage = request.page.clamp(0, double.infinity).toInt();
+    final effectivePage = math.max(request.page, 0);
     final effectiveSize = request.size.clamp(0, 999);
 
     if (effectiveSize == 0) {
@@ -104,7 +106,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
   @override
   Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage(PageRequest request) {
-    final effectivePage = request.page.clamp(0, double.infinity).toInt();
+    final effectivePage = math.max(request.page, 0);
     final effectiveSize = request.size.clamp(0, 999);
 
     if (effectiveSize == 0) {
@@ -377,6 +379,13 @@ abstract interface class ProposalsV2Dao {
     required bool isFavorite,
   });
 
-  /// Same as [getProposalsBriefPage] but rebuilds when database changes
+  /// Watches for changes and returns a paginated page of proposal briefs.
+  ///
+  /// This method provides a reactive stream that emits a new [Page] of proposal
+  /// briefs whenever the underlying data changes in the database. It has the
+  /// same filtering, status handling, and pagination logic as
+  /// [getProposalsBriefPage].
+  ///
+  /// Returns a [Stream] that emits a [Page] of [JoinedProposalBriefEntity].
   Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage(PageRequest request);
 }
