@@ -227,7 +227,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
         );
       }
 
-      if (promise == null) return {};
+      if (promise == null) return const {};
 
       return await promise.toDart.then(
         (array) => array.toDart
