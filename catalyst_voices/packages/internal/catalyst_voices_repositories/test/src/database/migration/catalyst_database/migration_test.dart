@@ -7,6 +7,7 @@ import 'package:catalyst_voices_repositories/src/database/migration/from_3_to_4.
 import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/document/document_ref_dto.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 import 'package:drift_dev/api/migrations_native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -48,58 +49,27 @@ void main() {
   test(
     'migration from v3 to v4 does not corrupt data',
     () async {
-      final oldDocumentsData = List<v3.DocumentsData>.generate(10, (
-        index,
-      ) {
-        return _buildDocV3(
-          ref: index.isEven ? DocumentRefFactory.signedDocumentRef() : null,
-          reply: index.isOdd ? DocumentRefFactory.signedDocumentRef() : null,
-          template: DocumentRefFactory.signedDocumentRef(),
-          categoryId: DocumentRefFactory.signedDocumentRef(),
-          type: index.isEven
-              ? DocumentType.proposalDocument
-              : DocumentType.commentDocument,
-          /* cSpell:disable */
-          authors: [
-            'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
-            if (index.isEven)
-              'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
-          ],
-          /* cSpell:enable */
-        );
-      });
-      final expectedNewDocumentsData = <v4.DocumentsData>[];
+      // 1. Documents
+      final docs = _generateDocuments(10);
+      final oldDocumentsData = docs.map((e) => e.v3()).toList();
+      final expectedNewDocumentsData = docs.map((e) => e.v4()).toList();
 
-      final oldDocumentsMetadataData = <v3.DocumentsMetadataData>[];
-      final expectedNewDocumentsMetadataData = <v4.DocumentsMetadataData>[];
+      // 2. Document Favorites
+      final oldDocumentsFavoritesData = docs
+          .mapIndexed(
+            (index, e) => _buildDocFavV3(id: e.id, isFavorite: index.isEven),
+          )
+          .toList();
+      final expectedNewDocumentsFavoritesData = docs
+          .mapIndexed(
+            (index, e) => _buildDocFavV4(id: e.id, isFavorite: index.isEven),
+          )
+          .toList();
 
-      final oldDocumentsFavoritesData = List.generate(
-        5,
-        (index) => _buildDocFavV3(isFavorite: index.isEven),
-      );
-      final expectedNewDocumentsFavoritesData = <v4.DocumentsFavoritesData>[];
-
-      final oldDraftsData = List<v3.DraftsData>.generate(10, (
-        index,
-      ) {
-        return _buildDraftV3(
-          ref: index.isEven ? DocumentRefFactory.signedDocumentRef() : null,
-          reply: index.isOdd ? DocumentRefFactory.signedDocumentRef() : null,
-          template: DocumentRefFactory.signedDocumentRef(),
-          categoryId: DocumentRefFactory.signedDocumentRef(),
-          type: index.isEven
-              ? DocumentType.proposalDocument
-              : DocumentType.commentDocument,
-          /* cSpell:disable */
-          authors: [
-            'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
-            if (index.isEven)
-              'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=',
-          ],
-          /* cSpell:enable */
-        );
-      });
-      final expectedNewDraftsData = <v4.DraftsData>[];
+      // 3. Drafts
+      final drafts = _generateDocuments(5, isDraft: true);
+      final oldDraftsData = drafts.map((e) => e.v3Draft()).toList();
+      final expectedNewDraftsData = drafts.map((e) => e.v4Draft()).toList();
 
       await verifier.testWithDataIntegrity(
         oldVersion: 3,
@@ -110,40 +80,55 @@ void main() {
         createItems: (batch, oldDb) {
           batch
             ..insertAll(oldDb.documents, oldDocumentsData)
-            ..insertAll(oldDb.documentsMetadata, oldDocumentsMetadataData)
             ..insertAll(oldDb.documentsFavorites, oldDocumentsFavoritesData)
             ..insertAll(oldDb.drafts, oldDraftsData);
         },
         validateItems: (newDb) async {
+          // Documents
+          final migratedDocs = await newDb.documentsV2.select().get();
           expect(
-            oldDocumentsData.length,
-            await newDb.documentsV2.count().getSingle(),
+            migratedDocs.length,
+            expectedNewDocumentsData.length,
+            reason: 'Should migrate the same number of documents',
           );
+          // Using a collection matcher for a more readable assertion
           expect(
-            oldDocumentsFavoritesData.length,
-            await newDb.documentsLocalMetadata.count().getSingle(),
-          );
-          expect(
-            oldDraftsData.length,
-            await newDb.localDocumentsDrafts.count().getSingle(),
+            migratedDocs,
+            orderedEquals(expectedNewDocumentsData),
+            reason:
+                'Migrated documents should match expected '
+                'format and data in the correct order',
           );
 
-          // TODO(damian-molinski): remove after migration is done and old tables are dropped
+          // LocalMetadata (eg. fav)
+          final migratedFavorites = await newDb.documentsLocalMetadata
+              .select()
+              .get();
           expect(
-            oldDocumentsData.length,
-            await newDb.documents.count().getSingle(),
+            migratedFavorites.length,
+            expectedNewDocumentsFavoritesData.length,
+            reason: 'Should migrate the same number of favorites',
           );
           expect(
-            oldDocumentsMetadataData.length,
-            await newDb.documentsMetadata.count().getSingle(),
+            migratedFavorites,
+            // Use unorderedEquals if the insertion order is not guaranteed
+            unorderedEquals(expectedNewDocumentsFavoritesData),
+            reason: 'All favorites should be migrated correctly',
+          );
+
+          // Local drafts
+          final migratedDrafts = await newDb.localDocumentsDrafts
+              .select()
+              .get();
+          expect(
+            migratedDrafts.length,
+            expectedNewDraftsData.length,
+            reason: 'Should migrate the same number of drafts',
           );
           expect(
-            oldDocumentsFavoritesData.length,
-            await newDb.documentsFavorites.count().getSingle(),
-          );
-          expect(
-            oldDraftsData.length,
-            await newDb.drafts.count().getSingle(),
+            migratedDrafts,
+            orderedEquals(expectedNewDraftsData),
+            reason: 'Migrated drafts should match expected format and data',
           );
         },
       );
@@ -152,121 +137,192 @@ void main() {
   );
 }
 
-v3.DocumentsFavoritesData _buildDocFavV3({
+const _testOrgCatalystIdUri =
+    'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=';
+
+const _testUserCatalystIdUri =
+    'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=';
+
+DocumentData _buildDoc({
   String? id,
   String? ver,
-  bool? isFavorite,
-  DocumentType? type,
+  DocumentType type = DocumentType.proposalDocument,
+  Map<String, dynamic> content = const <String, dynamic>{},
+  String? section,
+  DocumentRef? ref,
+  SignedDocumentRef? reply,
+  SignedDocumentRef? template,
+  SignedDocumentRef? categoryId,
+  List<CatalystId>? authors,
+  bool isDraft = false,
 }) {
   id ??= DocumentRefFactory.randomUuidV7();
   ver ??= id;
-  isFavorite ??= false;
-  type ??= DocumentType.proposalDocument;
 
+  final metadata = DocumentDataMetadata(
+    type: type,
+    selfRef: DocumentRef.build(id: id, version: ver, isDraft: isDraft),
+    section: section,
+    ref: ref,
+    reply: reply,
+    template: template,
+    categoryId: categoryId,
+    authors: authors,
+  );
+
+  return DocumentData(
+    content: DocumentDataContent(content),
+    metadata: metadata,
+  );
+}
+
+v3.DocumentsFavoritesData _buildDocFavV3({
+  required String id,
+  required bool isFavorite,
+}) {
   final idHiLo = UuidHiLo.from(id);
 
   return v3.DocumentsFavoritesData(
     idHi: idHiLo.high,
     idLo: idHiLo.low,
     isFavorite: isFavorite,
-    type: type.uuid,
+    type: DocumentType.proposalDocument.uuid,
   );
 }
 
-v3.DocumentsData _buildDocV3({
-  String? id,
-  String? ver,
-  DocumentType? type,
-  Map<String, dynamic>? content,
-  String? section,
-  DocumentRef? ref,
-  DocumentRef? reply,
-  DocumentRef? template,
-  DocumentRef? categoryId,
-  List<String>? authors,
+v4.DocumentsLocalMetadataData _buildDocFavV4({
+  required String id,
+  required bool isFavorite,
 }) {
-  id ??= DocumentRefFactory.randomUuidV7();
-  ver ??= id;
-  type ??= DocumentType.proposalDocument;
-  content ??= <String, dynamic>{};
-
-  final idHiLo = UuidHiLo.from(id);
-  final verHiLo = UuidHiLo.from(ver);
-
-  final metadata = DocumentDataMetadataDtoDbV3(
-    type: type.uuid,
-    selfRef: DocumentRefDtoDbV3(
-      id: id,
-      version: ver,
-      type: DocumentRefDtoTypeDbV3.signed,
-    ),
-    section: section,
-    ref: ref != null ? DocumentRefDtoDbV3.fromModel(ref) : null,
-    reply: reply != null ? DocumentRefDtoDbV3.fromModel(reply) : null,
-    template: template != null ? DocumentRefDtoDbV3.fromModel(template) : null,
-    categoryId: categoryId != null
-        ? DocumentRefDtoDbV3.fromModel(categoryId)
-        : null,
-    authors: authors,
-  );
-
-  return v3.DocumentsData(
-    idHi: idHiLo.high,
-    idLo: idHiLo.low,
-    verHi: verHiLo.high,
-    verLo: verHiLo.low,
-    content: sqlite3.jsonb.encode(content),
-    metadata: sqlite3.jsonb.encode(metadata.toJson()),
-    type: type.uuid,
-    createdAt: DateTime.now(),
+  return v4.DocumentsLocalMetadataData(
+    id: id,
+    isFavorite: isFavorite,
   );
 }
 
-v3.DraftsData _buildDraftV3({
-  String? id,
-  String? ver,
-  DocumentType? type,
-  Map<String, dynamic>? content,
-  String? section,
-  DocumentRef? ref,
-  DocumentRef? reply,
-  DocumentRef? template,
-  DocumentRef? categoryId,
-  List<String>? authors,
+List<DocumentData> _generateDocuments(
+  int count, {
+  bool isDraft = false,
 }) {
-  id ??= DocumentRefFactory.randomUuidV7();
-  ver ??= id;
-  type ??= DocumentType.proposalDocument;
-  content ??= <String, dynamic>{};
+  return List<DocumentData>.generate(count, (index) {
+    return _buildDoc(
+      isDraft: isDraft,
+      ref: index.isEven ? DocumentRefFactory.signedDocumentRef() : null,
+      reply: index.isOdd ? DocumentRefFactory.signedDocumentRef() : null,
+      template: DocumentRefFactory.signedDocumentRef(),
+      categoryId: DocumentRefFactory.signedDocumentRef(),
+      type: index.isEven
+          ? DocumentType.proposalDocument
+          : DocumentType.commentDocument,
+      /* cSpell:disable */
+      authors: [
+        CatalystId.fromUri(Uri.parse(_testUserCatalystIdUri)),
+        if (index.isEven) CatalystId.fromUri(Uri.parse(_testOrgCatalystIdUri)),
+      ],
+      /* cSpell:enable */
+    );
+  });
+}
 
-  final idHiLo = UuidHiLo.from(id);
-  final verHiLo = UuidHiLo.from(ver);
+typedef _NewDocumentData = v4.DocumentsV2Data;
 
-  final metadata = DocumentDataMetadataDtoDbV3(
-    type: type.uuid,
-    selfRef: DocumentRefDtoDbV3(
-      id: id,
-      version: ver,
-      type: DocumentRefDtoTypeDbV3.signed,
-    ),
-    section: section,
-    ref: ref != null ? DocumentRefDtoDbV3.fromModel(ref) : null,
-    reply: reply != null ? DocumentRefDtoDbV3.fromModel(reply) : null,
-    template: template != null ? DocumentRefDtoDbV3.fromModel(template) : null,
-    categoryId: categoryId != null
-        ? DocumentRefDtoDbV3.fromModel(categoryId)
-        : null,
-    authors: authors,
-  );
+typedef _NewDraftData = v4.LocalDocumentsDraftsData;
 
-  return v3.DraftsData(
-    idHi: idHiLo.high,
-    idLo: idHiLo.low,
-    verHi: verHiLo.high,
-    verLo: verHiLo.low,
-    content: sqlite3.jsonb.encode(content),
-    metadata: sqlite3.jsonb.encode(metadata.toJson()),
-    type: type.uuid,
-    title: '',
-  );
+typedef _OldDocumentData = v3.DocumentsData;
+
+typedef _OldDraftData = v3.DraftsData;
+
+extension on DocumentData {
+  String get id => metadata.id;
+}
+
+extension on DocumentData {
+  _OldDocumentData v3() {
+    final idHiLo = UuidHiLo.from(metadata.id);
+    final verHiLo = UuidHiLo.from(metadata.version);
+
+    final metadataJson = DocumentDataMetadataDtoDbV3.fromModel(
+      metadata,
+    ).toJson();
+
+    return _OldDocumentData(
+      idHi: idHiLo.high,
+      idLo: idHiLo.low,
+      verHi: verHiLo.high,
+      verLo: verHiLo.low,
+      content: sqlite3.jsonb.encode(content.data),
+      metadata: sqlite3.jsonb.encode(metadataJson),
+      type: metadata.type.uuid,
+      createdAt: metadata.version.tryDateTime ?? DateTime.timestamp(),
+    );
+  }
+
+  _OldDraftData v3Draft() {
+    final idHiLo = UuidHiLo.from(metadata.id);
+    final verHiLo = UuidHiLo.from(metadata.version);
+
+    final metadataJson = DocumentDataMetadataDtoDbV3.fromModel(
+      metadata,
+    ).toJson();
+
+    return _OldDraftData(
+      idHi: idHiLo.high,
+      idLo: idHiLo.low,
+      verHi: verHiLo.high,
+      verLo: verHiLo.low,
+      content: sqlite3.jsonb.encode(content.data),
+      metadata: sqlite3.jsonb.encode(metadataJson),
+      type: metadata.type.uuid,
+      title: '',
+    );
+  }
+
+  _NewDocumentData v4() {
+    return _NewDocumentData(
+      content: sqlite3.jsonb.encode(content.data),
+      id: metadata.id,
+      type: metadata.type.uuid,
+      ver: metadata.version,
+      authors:
+          metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
+      refId: metadata.ref?.id,
+      refVer: metadata.ref?.version,
+      replyId: metadata.reply?.id,
+      replyVer: metadata.reply?.version,
+      section: metadata.section,
+      templateId: metadata.template?.id,
+      templateVer: metadata.template?.version,
+      categoryId: metadata.categoryId?.id,
+      categoryVer: metadata.categoryId?.version,
+      createdAt: metadata.version.tryDateTime ?? DateTime.timestamp(),
+    );
+  }
+
+  _NewDraftData v4Draft() {
+    final idHiLo = UuidHiLo.from(metadata.id);
+    final verHiLo = UuidHiLo.from(metadata.version);
+
+    final metadataJson = DocumentDataMetadataDtoDbV3.fromModel(
+      metadata,
+    ).toJson();
+
+    return _NewDraftData(
+      content: sqlite3.jsonb.encode(content.data),
+      id: metadata.id,
+      type: metadata.type.uuid,
+      ver: metadata.version,
+      authors:
+          metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
+      refId: metadata.ref?.id,
+      refVer: metadata.ref?.version,
+      replyId: metadata.reply?.id,
+      replyVer: metadata.reply?.version,
+      section: metadata.section,
+      templateId: metadata.template?.id,
+      templateVer: metadata.template?.version,
+      categoryId: metadata.categoryId?.id,
+      categoryVer: metadata.categoryId?.version,
+      createdAt: metadata.version.tryDateTime ?? DateTime.timestamp(),
+    );
+  }
 }
