@@ -60,25 +60,8 @@ Future<void> _migrateDocs(
         final rawMetadata = oldDoc.read<Uint8List>('metadata');
         final encodedMetadata = sqlite3.jsonb.decode(rawMetadata)! as Map<String, dynamic>;
         final metadata = DocumentDataMetadataDtoDbV3.fromJson(encodedMetadata);
-        final ver = metadata.selfRef.version!;
 
-        final entity = DocumentEntityV2(
-          id: metadata.selfRef.id,
-          ver: ver,
-          type: DocumentType.fromJson(metadata.type),
-          createdAt: ver.dateTime,
-          refId: metadata.ref?.id,
-          refVer: metadata.ref?.version,
-          replyId: metadata.reply?.id,
-          replyVer: metadata.reply?.version,
-          section: metadata.section,
-          categoryId: metadata.categoryId?.id,
-          categoryVer: metadata.categoryId?.version,
-          templateId: metadata.template?.id,
-          templateVer: metadata.template?.version,
-          authors: metadata.authors?.join(',') ?? '',
-          content: DocumentDataContent(content),
-        );
+        final entity = metadata.toDocEntity(content: content);
 
         final insertable = RawValuesInsertable<QueryRow>(entity.toColumns(true));
 
@@ -118,25 +101,8 @@ Future<void> _migrateDrafts(
         final rawMetadata = oldDoc.read<Uint8List>('metadata');
         final encodedMetadata = sqlite3.jsonb.decode(rawMetadata)! as Map<String, dynamic>;
         final metadata = DocumentDataMetadataDtoDbV3.fromJson(encodedMetadata);
-        final ver = metadata.selfRef.version!;
 
-        final entity = LocalDocumentDraftEntity(
-          id: metadata.selfRef.id,
-          ver: ver,
-          type: DocumentType.fromJson(metadata.type),
-          createdAt: ver.dateTime,
-          refId: metadata.ref?.id,
-          refVer: metadata.ref?.version,
-          replyId: metadata.reply?.id,
-          replyVer: metadata.reply?.version,
-          section: metadata.section,
-          categoryId: metadata.categoryId?.id,
-          categoryVer: metadata.categoryId?.version,
-          templateId: metadata.template?.id,
-          templateVer: metadata.template?.version,
-          authors: metadata.authors?.join(',') ?? '',
-          content: DocumentDataContent(content),
-        );
+        final entity = metadata.toDraftEntity(content: content);
 
         final insertable = RawValuesInsertable<QueryRow>(entity.toColumns(true));
 
@@ -358,5 +324,51 @@ extension on DocumentRef {
 extension on SecuredDocumentRef {
   SecuredDocumentRefDtoDbV3 toDto() {
     return SecuredDocumentRefDtoDbV3.fromModel(this);
+  }
+}
+
+extension on DocumentDataMetadataDtoDbV3 {
+  DocumentEntityV2 toDocEntity({
+    required Map<String, dynamic> content,
+  }) {
+    return DocumentEntityV2(
+      id: selfRef.id,
+      ver: selfRef.version!,
+      type: DocumentType.fromJson(type),
+      createdAt: selfRef.version!.dateTime,
+      refId: ref?.id,
+      refVer: ref?.version,
+      replyId: reply?.id,
+      replyVer: reply?.version,
+      section: section,
+      categoryId: categoryId?.id,
+      categoryVer: categoryId?.version,
+      templateId: template?.id,
+      templateVer: template?.version,
+      authors: authors?.join(',') ?? '',
+      content: DocumentDataContent(content),
+    );
+  }
+
+  LocalDocumentDraftEntity toDraftEntity({
+    required Map<String, dynamic> content,
+  }) {
+    return LocalDocumentDraftEntity(
+      id: selfRef.id,
+      ver: selfRef.version!,
+      type: DocumentType.fromJson(type),
+      createdAt: selfRef.version!.dateTime,
+      refId: ref?.id,
+      refVer: ref?.version,
+      replyId: reply?.id,
+      replyVer: reply?.version,
+      section: section,
+      categoryId: categoryId?.id,
+      categoryVer: categoryId?.version,
+      templateId: template?.id,
+      templateVer: template?.version,
+      authors: authors?.join(',') ?? '',
+      content: DocumentDataContent(content),
+    );
   }
 }
