@@ -4,6 +4,7 @@ import 'package:catalyst_voices_repositories/src/database/table/documents_local_
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.drift.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:convert/convert.dart' show hex;
 import 'package:drift/drift.dart' hide JsonKey;
 import 'package:flutter/foundation.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -233,6 +234,22 @@ class DocumentDataMetadataDtoDbV3 {
     return _$DocumentDataMetadataDtoDbV3FromJson(migrated);
   }
 
+  DocumentDataMetadataDtoDbV3.fromModel(DocumentDataMetadata data)
+    : this(
+        type: data.type.uuid,
+        selfRef: data.selfRef.toDto(),
+        ref: data.ref?.toDto(),
+        refHash: data.refHash?.toDto(),
+        template: data.template?.toDto(),
+        reply: data.reply?.toDto(),
+        section: data.section,
+        brandId: data.brandId?.toDto(),
+        campaignId: data.campaignId?.toDto(),
+        electionId: data.electionId,
+        categoryId: data.categoryId?.toDto(),
+        authors: data.authors?.map((e) => e.toString()).toList(),
+      );
+
   Map<String, dynamic> toJson() => _$DocumentDataMetadataDtoDbV3ToJson(this);
 
   static Map<String, dynamic> _migrateJson1(Map<String, dynamic> json) {
@@ -325,5 +342,21 @@ final class SecuredDocumentRefDtoDbV3 {
     return _$SecuredDocumentRefDtoDbV3FromJson(json);
   }
 
+  SecuredDocumentRefDtoDbV3.fromModel(SecuredDocumentRef data)
+    : this(
+        ref: DocumentRefDtoDbV3.fromModel(data.ref),
+        hash: hex.encode(data.hash),
+      );
+
   Map<String, dynamic> toJson() => _$SecuredDocumentRefDtoDbV3ToJson(this);
+}
+
+extension on DocumentRef {
+  DocumentRefDtoDbV3 toDto() => DocumentRefDtoDbV3.fromModel(this);
+}
+
+extension on SecuredDocumentRef {
+  SecuredDocumentRefDtoDbV3 toDto() {
+    return SecuredDocumentRefDtoDbV3.fromModel(this);
+  }
 }
