@@ -828,11 +828,12 @@ dependencies = [
 [[package]]
 name = "catalyst-signed-doc"
 version = "0.0.4"
-source = "git+https://github.com/input-output-hk/catalyst-libs.git?tag=catalyst-signed-doc%2Fv0.0.4-f15-rc-2#974e33a2c611b74cb525cb3f7a23b261d4afb3f7"
+source = "git+https://github.com/input-output-hk/catalyst-libs.git?tag=catalyst-signed-doc%2Fv0.0.4-f15-rc3#88394bf6d0edfbfe122b1c6cb36edbc433eaf8ef"
 dependencies = [
  "anyhow",
  "brotli 7.0.0",
  "catalyst-types",
+ "chrono",
  "clap",
  "coset",
  "ed25519-bip32",
