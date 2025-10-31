@@ -218,7 +218,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
         throw UnsupportedError(
           'Due to wasm limitations, the "undefined" values are not supported '
           'therefore the "paginate" parameter must not be given if "amount" is not given too. '
-          'The JS interface of CIP-30 strictly relies on undefined values which we may not satisfy in wasm. ',
+          'The JS interface of CIP-30 strictly relies on undefined values which we may not satisfy in wasm.',
         );
       } else {
         promise = _delegate.getUtxos(
