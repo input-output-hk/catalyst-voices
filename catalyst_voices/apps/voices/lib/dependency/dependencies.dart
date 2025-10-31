@@ -207,6 +207,11 @@ final class Dependencies extends DependencyProvider {
           get<VotingBallotBuilder>(),
           get<VotingService>(),
         );
+      })
+      ..registerFactory<FeatureFlagsCubit>(() {
+        return FeatureFlagsCubit(
+          get<FeatureFlagsService>(),
+        );
       });
   }
 
@@ -301,6 +306,12 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<SystemStatusRepository>(
         () => SystemStatusRepository(
           get<ApiServices>(),
+        ),
+      )
+      ..registerLazySingleton<FeatureFlagsRepository>(
+        () => FeatureFlagsRepository(
+          get<AppEnvironment>().type,
+          get<AppConfig>(),
         ),
       );
   }
@@ -437,6 +448,14 @@ final class Dependencies extends DependencyProvider {
         );
       },
       dispose: (mediator) => mediator.dispose(),
+    );
+    registerLazySingleton<FeatureFlagsService>(
+      () {
+        return FeatureFlagsService(
+          get<FeatureFlagsRepository>(),
+        );
+      },
+      dispose: (service) => unawaited(service.dispose()),
     );
   }
 

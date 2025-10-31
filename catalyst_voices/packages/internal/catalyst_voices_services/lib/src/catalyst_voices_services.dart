@@ -14,6 +14,7 @@ export 'crypto/key_derivation_service.dart' show KeyDerivationService;
 export 'dev_tools/dev_tools_service.dart' show DevToolsService;
 export 'documents/documents_service.dart' show DocumentsService;
 export 'downloader/downloader_service.dart' show DownloaderService;
+export 'feature_flags/feature_flags_service.dart' show FeatureFlagsService;
 export 'logging/formatter/logs_formatter.dart';
 export 'logging/formatter/text_logs_formatter.dart';
 export 'logging/logging_service.dart';
