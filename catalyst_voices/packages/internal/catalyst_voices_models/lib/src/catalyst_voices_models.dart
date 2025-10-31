@@ -94,6 +94,7 @@ export 'proposal/proposal_with_context.dart';
 export 'proposals/proposals_count.dart';
 export 'proposals/proposals_count_filters.dart';
 export 'proposals/proposals_filters.dart';
+export 'proposals/proposals_filters_v2.dart';
 export 'proposals/proposals_order.dart';
 export 'registration/account_submit_data.dart';
 export 'registration/registration.dart';

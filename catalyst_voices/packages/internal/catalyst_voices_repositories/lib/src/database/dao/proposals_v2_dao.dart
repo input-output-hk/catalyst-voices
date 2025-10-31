@@ -69,6 +69,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order = const UpdateDate.desc(),
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) async {
     final effectivePage = math.max(request.page, 0);
     final effectiveSize = request.size.clamp(0, 999);
@@ -81,8 +82,9 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       effectivePage,
       effectiveSize,
       order: order,
+      filters: filters,
     ).get();
-    final total = await _countVisibleProposals().getSingle();
+    final total = await _countVisibleProposals(filters: filters).getSingle();
 
     return Page(
       items: items,
@@ -115,6 +117,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order = const UpdateDate.desc(),
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
     final effectivePage = math.max(request.page, 0);
     final effectiveSize = request.size.clamp(0, 999);
@@ -127,8 +130,9 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       effectivePage,
       effectiveSize,
       order: order,
+      filters: filters,
     ).watch();
-    final totalStream = _countVisibleProposals().watchSingle();
+    final totalStream = _countVisibleProposals(filters: filters).watchSingle();
 
     return Rx.combineLatest2<List<JoinedProposalBriefEntity>, int, Page<JoinedProposalBriefEntity>>(
       itemsStream,
@@ -173,7 +177,9 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// Must match pagination query's filtering logic exactly eg.[_queryVisibleProposalsPage]
   ///
   /// Returns: Total count of visible proposals (not including hidden)
-  Selectable<int> _countVisibleProposals() {
+  Selectable<int> _countVisibleProposals({
+    required ProposalsFiltersV2 filters,
+  }) {
     const cteQuery = r'''
     WITH latest_proposals AS (
       SELECT id, MAX(ver) as max_ver
@@ -224,6 +230,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     int page,
     int size, {
     required ProposalsOrder order,
+    required ProposalsFiltersV2 filters,
   }) {
     final proposalColumns = _buildPrefixedColumns('p', 'p');
     final templateColumns = _buildPrefixedColumns('t', 't');
@@ -399,6 +406,7 @@ abstract interface class ProposalsV2Dao {
   Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
+    ProposalsFiltersV2 filters,
   });
 
   /// Updates the favorite status of a proposal.
@@ -424,5 +432,6 @@ abstract interface class ProposalsV2Dao {
   Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
+    ProposalsFiltersV2 filters,
   });
 }
