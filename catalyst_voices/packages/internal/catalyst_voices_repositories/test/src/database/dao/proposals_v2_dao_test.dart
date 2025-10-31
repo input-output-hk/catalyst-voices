@@ -1,4 +1,5 @@
 // ignore_for_file: avoid_redundant_argument_values
+// ignore_for_file: avoid_dynamic_calls
 
 import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -2047,6 +2048,650 @@ void main() {
           expect(result.items.first.template, isNotNull);
           expect(result.items.first.template!.id, 'template-1');
           expect(result.items.first.template!.content.data['title'], 'Template 1');
+        });
+      });
+
+      group('Ordering', () {
+        test('sorts alphabetically by title', () async {
+          final entities = [
+            _createTestDocumentEntity(
+              id: 'id-1',
+              ver: _buildUuidV7At(earliest),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Zebra Project'},
+                },
+              },
+            ),
+            _createTestDocumentEntity(
+              id: 'id-2',
+              ver: _buildUuidV7At(middle),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Alpha Project'},
+                },
+              },
+            ),
+            _createTestDocumentEntity(
+              id: 'id-3',
+              ver: _buildUuidV7At(latest),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Middle Project'},
+                },
+              },
+            ),
+          ];
+          await db.documentsV2Dao.saveAll(entities);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(
+            request: request,
+            order: const Alphabetical(),
+          );
+
+          expect(result.items.length, 3);
+          expect(
+            result.items[0].proposal.content.data['setup']['title']['title'],
+            'Alpha Project',
+          );
+          expect(
+            result.items[1].proposal.content.data['setup']['title']['title'],
+            'Middle Project',
+          );
+          expect(
+            result.items[2].proposal.content.data['setup']['title']['title'],
+            'Zebra Project',
+          );
+        });
+
+        test('sorts alphabetically case-insensitively', () async {
+          final entities = [
+            _createTestDocumentEntity(
+              id: 'id-1',
+              ver: _buildUuidV7At(earliest),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'zebra project'},
+                },
+              },
+            ),
+            _createTestDocumentEntity(
+              id: 'id-2',
+              ver: _buildUuidV7At(middle),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Alpha PROJECT'},
+                },
+              },
+            ),
+            _createTestDocumentEntity(
+              id: 'id-3',
+              ver: _buildUuidV7At(latest),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'MIDDLE project'},
+                },
+              },
+            ),
+          ];
+          await db.documentsV2Dao.saveAll(entities);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(
+            request: request,
+            order: const Alphabetical(),
+          );
+
+          expect(result.items.length, 3);
+          expect(
+            result.items[0].proposal.content.data['setup']['title']['title'],
+            'Alpha PROJECT',
+          );
+          expect(
+            result.items[1].proposal.content.data['setup']['title']['title'],
+            'MIDDLE project',
+          );
+          expect(
+            result.items[2].proposal.content.data['setup']['title']['title'],
+            'zebra project',
+          );
+        });
+
+        test('sorts alphabetically with missing titles at the end', () async {
+          final entities = [
+            _createTestDocumentEntity(
+              id: 'id-1',
+              ver: _buildUuidV7At(earliest),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Zebra Project'},
+                },
+              },
+            ),
+            _createTestDocumentEntity(
+              id: 'id-2',
+              ver: _buildUuidV7At(middle),
+              contentData: {},
+            ),
+            _createTestDocumentEntity(
+              id: 'id-3',
+              ver: _buildUuidV7At(latest),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Alpha Project'},
+                },
+              },
+            ),
+          ];
+          await db.documentsV2Dao.saveAll(entities);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(
+            request: request,
+            order: const Alphabetical(),
+          );
+
+          expect(result.items.length, 3);
+          expect(
+            result.items[0].proposal.content.data['setup']['title']['title'],
+            'Alpha Project',
+          );
+          expect(
+            result.items[1].proposal.content.data['setup']['title']['title'],
+            'Zebra Project',
+          );
+          expect(result.items[2].proposal.id, 'id-2');
+        });
+
+        test('sorts alphabetically with empty string titles at the end', () async {
+          final entities = [
+            _createTestDocumentEntity(
+              id: 'id-1',
+              ver: _buildUuidV7At(earliest),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Zebra Project'},
+                },
+              },
+            ),
+            _createTestDocumentEntity(
+              id: 'id-2',
+              ver: _buildUuidV7At(middle),
+              contentData: {
+                'setup': {
+                  'title': {'title': ''},
+                },
+              },
+            ),
+            _createTestDocumentEntity(
+              id: 'id-3',
+              ver: _buildUuidV7At(latest),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Alpha Project'},
+                },
+              },
+            ),
+          ];
+          await db.documentsV2Dao.saveAll(entities);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(
+            request: request,
+            order: const Alphabetical(),
+          );
+
+          expect(result.items.length, 3);
+          expect(
+            result.items[0].proposal.content.data['setup']['title']['title'],
+            'Alpha Project',
+          );
+          expect(
+            result.items[1].proposal.content.data['setup']['title']['title'],
+            'Zebra Project',
+          );
+          expect(result.items[2].proposal.id, 'id-2');
+        });
+
+        test('sorts by budget ascending', () async {
+          final entities = [
+            _createTestDocumentEntity(
+              id: 'id-1',
+              ver: _buildUuidV7At(earliest),
+              contentData: {
+                'summary': {
+                  'budget': {'requestedFunds': 50000},
+                },
+              },
+            ),
+            _createTestDocumentEntity(
+              id: 'id-2',
+              ver: _buildUuidV7At(middle),
+              contentData: {
+                'summary': {
+                  'budget': {'requestedFunds': 10000},
+                },
+              },
+            ),
+            _createTestDocumentEntity(
+              id: 'id-3',
+              ver: _buildUuidV7At(latest),
+              contentData: {
+                'summary': {
+                  'budget': {'requestedFunds': 30000},
+                },
+              },
+            ),
+          ];
+          await db.documentsV2Dao.saveAll(entities);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(
+            request: request,
+            order: const Budget(isAscending: true),
+          );
+
+          expect(result.items.length, 3);
+          expect(
+            result.items[0].proposal.content.data['summary']['budget']['requestedFunds'],
+            10000,
+          );
+          expect(
+            result.items[1].proposal.content.data['summary']['budget']['requestedFunds'],
+            30000,
+          );
+          expect(
+            result.items[2].proposal.content.data['summary']['budget']['requestedFunds'],
+            50000,
+          );
+        });
+
+        test('sorts by budget descending', () async {
+          final entities = [
+            _createTestDocumentEntity(
+              id: 'id-1',
+              ver: _buildUuidV7At(earliest),
+              contentData: {
+                'summary': {
+                  'budget': {'requestedFunds': 50000},
+                },
+              },
+            ),
+            _createTestDocumentEntity(
+              id: 'id-2',
+              ver: _buildUuidV7At(middle),
+              contentData: {
+                'summary': {
+                  'budget': {'requestedFunds': 10000},
+                },
+              },
+            ),
+            _createTestDocumentEntity(
+              id: 'id-3',
+              ver: _buildUuidV7At(latest),
+              contentData: {
+                'summary': {
+                  'budget': {'requestedFunds': 30000},
+                },
+              },
+            ),
+          ];
+          await db.documentsV2Dao.saveAll(entities);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(
+            request: request,
+            order: const Budget(isAscending: false),
+          );
+
+          expect(result.items.length, 3);
+          expect(
+            result.items[0].proposal.content.data['summary']['budget']['requestedFunds'],
+            50000,
+          );
+          expect(
+            result.items[1].proposal.content.data['summary']['budget']['requestedFunds'],
+            30000,
+          );
+          expect(
+            result.items[2].proposal.content.data['summary']['budget']['requestedFunds'],
+            10000,
+          );
+        });
+
+        test('sorts by budget ascending with missing values at the end', () async {
+          final entities = [
+            _createTestDocumentEntity(
+              id: 'id-1',
+              ver: _buildUuidV7At(earliest),
+              contentData: {
+                'summary': {
+                  'budget': {'requestedFunds': 50000},
+                },
+              },
+            ),
+            _createTestDocumentEntity(
+              id: 'id-2',
+              ver: _buildUuidV7At(middle),
+              contentData: {},
+            ),
+            _createTestDocumentEntity(
+              id: 'id-3',
+              ver: _buildUuidV7At(latest),
+              contentData: {
+                'summary': {
+                  'budget': {'requestedFunds': 10000},
+                },
+              },
+            ),
+          ];
+          await db.documentsV2Dao.saveAll(entities);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(
+            request: request,
+            order: const Budget(isAscending: true),
+          );
+
+          expect(result.items.length, 3);
+          expect(
+            result.items[0].proposal.content.data['summary']['budget']['requestedFunds'],
+            10000,
+          );
+          expect(
+            result.items[1].proposal.content.data['summary']['budget']['requestedFunds'],
+            50000,
+          );
+          expect(result.items[2].proposal.id, 'id-2');
+        });
+
+        test('sorts by budget descending with missing values at the end', () async {
+          final entities = [
+            _createTestDocumentEntity(
+              id: 'id-1',
+              ver: _buildUuidV7At(earliest),
+              contentData: {
+                'summary': {
+                  'budget': {'requestedFunds': 50000},
+                },
+              },
+            ),
+            _createTestDocumentEntity(
+              id: 'id-2',
+              ver: _buildUuidV7At(middle),
+              contentData: {},
+            ),
+            _createTestDocumentEntity(
+              id: 'id-3',
+              ver: _buildUuidV7At(latest),
+              contentData: {
+                'summary': {
+                  'budget': {'requestedFunds': 10000},
+                },
+              },
+            ),
+          ];
+          await db.documentsV2Dao.saveAll(entities);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(
+            request: request,
+            order: const Budget(isAscending: false),
+          );
+
+          expect(result.items.length, 3);
+          expect(
+            result.items[0].proposal.content.data['summary']['budget']['requestedFunds'],
+            50000,
+          );
+          expect(
+            result.items[1].proposal.content.data['summary']['budget']['requestedFunds'],
+            10000,
+          );
+          expect(result.items[2].proposal.id, 'id-2');
+        });
+
+        test('sorts by update date ascending', () async {
+          final entities = [
+            _createTestDocumentEntity(
+              id: 'id-1',
+              ver: _buildUuidV7At(latest),
+            ),
+            _createTestDocumentEntity(
+              id: 'id-2',
+              ver: _buildUuidV7At(earliest),
+            ),
+            _createTestDocumentEntity(
+              id: 'id-3',
+              ver: _buildUuidV7At(middle),
+            ),
+          ];
+          await db.documentsV2Dao.saveAll(entities);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(
+            request: request,
+            order: const UpdateDate.asc(),
+          );
+
+          expect(result.items.length, 3);
+          expect(result.items[0].proposal.id, 'id-2');
+          expect(result.items[1].proposal.id, 'id-3');
+          expect(result.items[2].proposal.id, 'id-1');
+        });
+
+        test('sorts by update date descending', () async {
+          final entities = [
+            _createTestDocumentEntity(
+              id: 'id-1',
+              ver: _buildUuidV7At(earliest),
+            ),
+            _createTestDocumentEntity(
+              id: 'id-2',
+              ver: _buildUuidV7At(latest),
+            ),
+            _createTestDocumentEntity(
+              id: 'id-3',
+              ver: _buildUuidV7At(middle),
+            ),
+          ];
+          await db.documentsV2Dao.saveAll(entities);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(
+            request: request,
+            order: const UpdateDate.desc(),
+          );
+
+          expect(result.items.length, 3);
+          expect(result.items[0].proposal.id, 'id-2');
+          expect(result.items[1].proposal.id, 'id-3');
+          expect(result.items[2].proposal.id, 'id-1');
+        });
+
+        test('respects pagination', () async {
+          final entities = List.generate(
+            5,
+            (i) => _createTestDocumentEntity(
+              id: 'id-$i',
+              ver: _buildUuidV7At(earliest.add(Duration(hours: i))),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Project ${String.fromCharCode(65 + i)}'},
+                },
+              },
+            ),
+          );
+          await db.documentsV2Dao.saveAll(entities);
+
+          const request = PageRequest(page: 1, size: 2);
+          final result = await dao.getProposalsBriefPage(
+            request: request,
+            order: const Alphabetical(),
+          );
+
+          expect(result.items.length, 2);
+          expect(result.total, 5);
+          expect(result.page, 1);
+          expect(
+            result.items[0].proposal.content.data['setup']['title']['title'],
+            'Project C',
+          );
+          expect(
+            result.items[1].proposal.content.data['setup']['title']['title'],
+            'Project D',
+          );
+        });
+
+        test('works with multiple versions of same proposal', () async {
+          final oldVer = _buildUuidV7At(earliest);
+          final oldProposal = _createTestDocumentEntity(
+            id: 'multi-id',
+            ver: oldVer,
+            contentData: {
+              'setup': {
+                'title': {'title': 'Old Title'},
+              },
+              'summary': {
+                'budget': {'requestedFunds': 10000},
+              },
+            },
+          );
+
+          final newVer = _buildUuidV7At(latest);
+          final newProposal = _createTestDocumentEntity(
+            id: 'multi-id',
+            ver: newVer,
+            contentData: {
+              'setup': {
+                'title': {'title': 'New Title'},
+              },
+              'summary': {
+                'budget': {'requestedFunds': 50000},
+              },
+            },
+          );
+
+          final otherVer = _buildUuidV7At(middle);
+          final otherProposal = _createTestDocumentEntity(
+            id: 'other-id',
+            ver: otherVer,
+            contentData: {
+              'setup': {
+                'title': {'title': 'Middle Title'},
+              },
+              'summary': {
+                'budget': {'requestedFunds': 30000},
+              },
+            },
+          );
+
+          await db.documentsV2Dao.saveAll([oldProposal, newProposal, otherProposal]);
+
+          const request = PageRequest(page: 0, size: 10);
+          final resultAlphabetical = await dao.getProposalsBriefPage(
+            request: request,
+            order: const Alphabetical(),
+          );
+
+          expect(resultAlphabetical.items.length, 2);
+          expect(
+            resultAlphabetical.items[0].proposal.content.data['setup']['title']['title'],
+            'Middle Title',
+          );
+          expect(
+            resultAlphabetical.items[1].proposal.content.data['setup']['title']['title'],
+            'New Title',
+          );
+
+          final resultBudget = await dao.getProposalsBriefPage(
+            request: request,
+            order: const Budget(isAscending: true),
+          );
+
+          expect(resultBudget.items.length, 2);
+          expect(
+            resultBudget.items[0].proposal.content.data['summary']['budget']['requestedFunds'],
+            30000,
+          );
+          expect(
+            resultBudget.items[1].proposal.content.data['summary']['budget']['requestedFunds'],
+            50000,
+          );
+        });
+
+        test('works with final action pointing to specific version', () async {
+          final ver1 = _buildUuidV7At(earliest);
+          final proposal1 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: ver1,
+            contentData: {
+              'setup': {
+                'title': {'title': 'Version 1'},
+              },
+              'summary': {
+                'budget': {'requestedFunds': 10000},
+              },
+            },
+          );
+
+          final ver2 = _buildUuidV7At(middle);
+          final proposal2 = _createTestDocumentEntity(
+            id: 'p1',
+            ver: ver2,
+            contentData: {
+              'setup': {
+                'title': {'title': 'Version 2'},
+              },
+              'summary': {
+                'budget': {'requestedFunds': 50000},
+              },
+            },
+          );
+
+          final actionVer = _buildUuidV7At(latest);
+          final action = _createTestDocumentEntity(
+            id: 'action-1',
+            ver: actionVer,
+            type: DocumentType.proposalActionDocument,
+            refId: 'p1',
+            refVer: ver1,
+            contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+          );
+
+          final otherVer = _buildUuidV7At(middle);
+          final otherProposal = _createTestDocumentEntity(
+            id: 'other-id',
+            ver: otherVer,
+            contentData: {
+              'setup': {
+                'title': {'title': 'Other Proposal'},
+              },
+              'summary': {
+                'budget': {'requestedFunds': 30000},
+              },
+            },
+          );
+
+          await db.documentsV2Dao.saveAll([proposal1, proposal2, action, otherProposal]);
+
+          const request = PageRequest(page: 0, size: 10);
+          final result = await dao.getProposalsBriefPage(
+            request: request,
+            order: const Budget(isAscending: true),
+          );
+
+          expect(result.items.length, 2);
+          expect(result.items[0].proposal.ver, ver1);
+          expect(
+            result.items[0].proposal.content.data['summary']['budget']['requestedFunds'],
+            10000,
+          );
+          expect(
+            result.items[1].proposal.content.data['summary']['budget']['requestedFunds'],
+            30000,
+          );
         });
       });
     });

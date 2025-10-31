@@ -77,7 +77,11 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       return Page.empty(page: effectivePage, maxPerPage: effectiveSize);
     }
 
-    final items = await _queryVisibleProposalsPage(effectivePage, effectiveSize).get();
+    final items = await _queryVisibleProposalsPage(
+      effectivePage,
+      effectiveSize,
+      order: order,
+    ).get();
     final total = await _countVisibleProposals().getSingle();
 
     return Page(
@@ -119,7 +123,11 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       return Stream.value(Page.empty(page: effectivePage, maxPerPage: effectiveSize));
     }
 
-    final itemsStream = _queryVisibleProposalsPage(effectivePage, effectiveSize).watch();
+    final itemsStream = _queryVisibleProposalsPage(
+      effectivePage,
+      effectiveSize,
+      order: order,
+    ).watch();
     final totalStream = _countVisibleProposals().watchSingle();
 
     return Rx.combineLatest2<List<JoinedProposalBriefEntity>, int, Page<JoinedProposalBriefEntity>>(
@@ -132,6 +140,18 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         maxPerPage: effectiveSize,
       ),
     );
+  }
+
+  String _buildOrderByClause(ProposalsOrder order) {
+    return switch (order) {
+      Alphabetical() =>
+        "LOWER(NULLIF(json_extract(p.content, '\$.${ProposalDocument.titleNodeId.value}'), '')) ASC NULLS LAST",
+      Budget(:final isAscending) =>
+        isAscending
+            ? "CAST(json_extract(p.content, '\$.${ProposalDocument.requestedFundsNodeId.value}') AS INTEGER) ASC NULLS LAST"
+            : "CAST(json_extract(p.content, '\$.${ProposalDocument.requestedFundsNodeId.value}') AS INTEGER) DESC NULLS LAST",
+      UpdateDate(:final isAscending) => isAscending ? 'p.ver ASC' : 'p.ver DESC',
+    };
   }
 
   String _buildPrefixedColumns(String tableAlias, String prefix) {
@@ -200,9 +220,14 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   ///
   /// Returns: Selectable of [JoinedProposalBriefEntity] mapped from raw rows of customSelect.
   /// This may be used as single get of watch.
-  Selectable<JoinedProposalBriefEntity> _queryVisibleProposalsPage(int page, int size) {
+  Selectable<JoinedProposalBriefEntity> _queryVisibleProposalsPage(
+    int page,
+    int size, {
+    required ProposalsOrder order,
+  }) {
     final proposalColumns = _buildPrefixedColumns('p', 'p');
     final templateColumns = _buildPrefixedColumns('t', 't');
+    final orderByClause = _buildOrderByClause(order);
 
     final cteQuery =
         '''
@@ -278,7 +303,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     LEFT JOIN documents_local_metadata dlm ON p.id = dlm.id
     LEFT JOIN documents_v2 t ON p.template_id = t.id AND p.template_ver = t.ver AND t.type = ?
     WHERE p.type = ?
-    ORDER BY p.ver DESC
+    ORDER BY $orderByClause
     LIMIT ? OFFSET ?
   ''';
 
