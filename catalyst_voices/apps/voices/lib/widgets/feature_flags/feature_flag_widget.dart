@@ -2,12 +2,12 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/widgets.dart';
 
-class FeatureFlag extends StatelessWidget {
+class FeatureFlagWidget extends StatelessWidget {
   final Feature feature;
-  final Widget enabledChild;
-  final Widget? disabledChild;
+  final WidgetBuilder enabledChild;
+  final WidgetBuilder? disabledChild;
 
-  const FeatureFlag({
+  const FeatureFlagWidget({
     super.key,
     required this.feature,
     required this.enabledChild,
@@ -19,7 +19,9 @@ class FeatureFlag extends StatelessWidget {
     return BlocSelector<FeatureFlagsCubit, FeatureFlagsState, bool>(
       selector: (state) => state.isEnabled(feature),
       builder: (context, enabled) {
-        return enabled ? enabledChild : (disabledChild ?? const SizedBox.shrink());
+        return enabled
+            ? enabledChild(context)
+            : (disabledChild?.call(context) ?? const SizedBox.shrink());
       },
     );
   }

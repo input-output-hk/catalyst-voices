@@ -38,12 +38,13 @@ final class FeatureFlagsServiceImpl implements FeatureFlagsService {
 
   final _changeController = StreamController<List<FeatureFlagInfo>>.broadcast();
 
-  FeatureFlagsServiceImpl(this._featureFlagsRepository) {
-    _emitAllFeatures();
-  }
+  FeatureFlagsServiceImpl(this._featureFlagsRepository);
 
   @override
-  Stream<List<FeatureFlagInfo>> get allInfoChanges => _changeController.stream;
+  Stream<List<FeatureFlagInfo>> get allInfoChanges async* {
+    yield getAllInfo();
+    yield* _changeController.stream;
+  }
 
   @override
   Future<void> dispose() async {
@@ -79,8 +80,9 @@ final class FeatureFlagsServiceImpl implements FeatureFlagsService {
   }
 
   @override
-  Stream<bool> watchFeature(Feature feature) {
-    return _changeController.stream.map((allFeatures) {
+  Stream<bool> watchFeature(Feature feature) async* {
+    yield isEnabled(feature);
+    yield* _changeController.stream.map((allFeatures) {
       return allFeatures.firstWhere((info) => info.featureType == feature.type).enabled;
     }).distinct();
   }

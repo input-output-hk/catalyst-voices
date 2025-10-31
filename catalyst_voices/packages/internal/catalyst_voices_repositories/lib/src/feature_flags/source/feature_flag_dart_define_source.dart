@@ -30,8 +30,8 @@ final class FeatureFlagDartDefineSource
     throw ArgumentError('Cannot set value for Dart Define feature flags at runtime.');
   }
 
-  static bool? _getEnvironmentValue(FeatureType featureName) {
-    switch (featureName) {
+  static bool? _getEnvironmentValue(FeatureType featureType) {
+    switch (featureType) {
       case FeatureType.voting:
         return const bool.hasEnvironment(Features.votingEnvKey)
             ? const bool.fromEnvironment(Features.votingEnvKey)

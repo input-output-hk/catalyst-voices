@@ -4,7 +4,7 @@ part of 'feature_flag_source.dart';
 final class FeatureFlagConfigSource with FeatureFlagSourceCompareTo implements FeatureFlagSource {
   final Map<FeatureType, bool> _config;
 
-  // TODO(bstolinski): implement
+  // TODO(bstolinski): extract from appConfig values for feature flags
   // ignore: avoid_unused_constructor_parameters
   FeatureFlagConfigSource(AppConfig appConfig) : _config = {};
 
