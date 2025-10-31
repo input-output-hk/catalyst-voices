@@ -17,8 +17,8 @@ import 'package:dio/dio.dart';
 /// # Catalyst Gateway API.
 /// The Catalyst Gateway API provides realtime data for all prior, current and future Catalyst Voices voting events.
 ///
-/// Based on OpenAPI Catalyst Gateway API version 0.3.0
-/// catalyst-openapi/v0.3.0 - https://github.com/input-output-hk/catalyst-voices/releases/tag/catalyst-openapi%2Fv0.3.0
+/// Based on OpenAPI Catalyst Gateway API version 0.7.0
+/// catalyst-openapi/v0.7.0 - https://github.com/input-output-hk/catalyst-voices/releases/tag/catalyst-openapi%2Fv0.7.0
 abstract interface class CatGatewayService {
   factory CatGatewayService.dio({
     required String baseUrl,
@@ -98,12 +98,15 @@ abstract interface class CatGatewayService {
     bool? showAllInvalid,
   });
 
-  /// Get staked assets.
+  /// Get staked assets v2.
   /// This endpoint returns the total Cardano's staked assets to the corresponded
   /// user's stake address.
   ///
-  /// [stakeAddress] The stake address of the user.
+  /// [stakeAddress] Cardano stake address, also known as a reward address. An optional stake address of the user.
   /// Should be a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
+  /// If missing, a list of associated stake addresses is taken using the RBAC token (for one RBAC registration
+  /// chain could be assigned multiple different cardano stake addresses). An aggregated response would be returned
+  /// (total ADA sum across all stake addresses, an aggregated native tokens list across all stake addresses etc.)
   /// [network] Cardano network type.
   /// If omitted network type is identified from the stake address.
   /// If specified it must be correspondent to the network type encoded in the stake address.
@@ -113,7 +116,7 @@ abstract interface class CatGatewayService {
   /// [asat] A time point at which the assets should be calculated.
   /// If omitted latest slot number is used.
   Future<FullStakeInfo> stakeAssets({
-    required String stakeAddress,
+    String? stakeAddress,
     Network? network,
     String? asat,
     String? authorization,
@@ -209,14 +212,15 @@ final class DioCatGatewayService implements CatGatewayService {
 
   @override
   Future<FullStakeInfo> stakeAssets({
-    required String stakeAddress,
+    String? stakeAddress,
     Network? network,
     String? asat,
     String? authorization,
   }) {
     return _dio.get<Map<String, dynamic>, FullStakeInfo>(
-      '/v1/cardano/assets/$stakeAddress',
+      '/v2/cardano/assets',
       queryParameters: {
+        'stake_address': ?stakeAddress,
         'network': ?network?.value,
         'asat': ?asat,
       },
