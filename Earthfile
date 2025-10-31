@@ -1,8 +1,8 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.5.20 AS mdlint-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.5.20 AS cspell-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.5.20 AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:feat/enable-wasm-for-flutter-builds AS mdlint-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:feat/enable-wasm-for-flutter-builds AS cspell-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:feat/enable-wasm-for-flutter-builds AS postgresql-ci
 
 ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
 FROM ${REGISTRY}/debian:stable-slim
