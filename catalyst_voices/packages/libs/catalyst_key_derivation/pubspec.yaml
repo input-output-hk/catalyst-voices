@@ -17,7 +17,11 @@ dependencies:
   cbor: 6.3.7
   collection: ^1.19.1
   convert: ^3.1.2
-  cryptography: ^2.7.0
+  cryptography_plus:
+    git:
+      url: https://github.com/dt-iohk/dart-cryptography
+      ref: a75f7b22d65bba2c96d5cc7ab4ce7fa6682bee18
+      path: cryptography/
   equatable: ^2.0.7
   flutter:
     sdk: flutter

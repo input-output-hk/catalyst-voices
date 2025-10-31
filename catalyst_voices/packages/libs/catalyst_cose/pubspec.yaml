@@ -5,6 +5,7 @@ issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [cryptography, encryption, codec]
 version: 1.0.0
 resolution: workspace
+publish_to: none
 
 environment:
   sdk: ">=3.9.0 <4.0.0"
@@ -13,7 +14,11 @@ dependencies:
   cbor: 6.3.7
   collection: ^1.19.1
   convert: ^3.1.2
-  cryptography: ^2.7.0
+  cryptography_plus:
+    git:
+      url: https://github.com/dt-iohk/dart-cryptography
+      ref: a75f7b22d65bba2c96d5cc7ab4ce7fa6682bee18
+      path: cryptography/
   equatable: ^2.0.7
   uuid_plus: ^0.1.0
 

@@ -3,7 +3,7 @@ import 'package:catalyst_key_derivation/src/ed25519/ed25519_public_key.dart';
 import 'package:catalyst_key_derivation/src/ed25519/ed25519_signature.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
-import 'package:cryptography/cryptography.dart';
+import 'package:cryptography_plus/cryptography_plus.dart';
 
 /// The Ed25519 private key that is 256 bits long.
 ///
