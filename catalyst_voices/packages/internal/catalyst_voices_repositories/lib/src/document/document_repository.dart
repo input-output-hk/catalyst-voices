@@ -338,10 +338,10 @@ final class DocumentRepositoryImpl implements DocumentRepository {
 
   @override
   Future<List<DocumentRef>> isCachedBulk({required List<DocumentRef> refs}) {
-    final signeRefs = refs.whereType<SignedDocumentRef>().toList();
+    final signedRefs = refs.whereType<SignedDocumentRef>().toList();
     final localDraftsRefs = refs.whereType<DraftRef>().toList();
 
-    final signedDocsSave = _localDocuments.filterExisting(signeRefs);
+    final signedDocsSave = _localDocuments.filterExisting(signedRefs);
     final draftsDocsSave = _drafts.filterExisting(localDraftsRefs);
 
     return [
