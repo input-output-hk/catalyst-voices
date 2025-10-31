@@ -262,7 +262,7 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
   }
 
   @override
-  void didUpdateWidget(covariant ProposalBriefCard oldWidget) {
+  void didUpdateWidget(ProposalBriefCard oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     // Always override from proposal as its main source of truth
