@@ -8,9 +8,12 @@ import 'package:catalyst_voices_repositories/src/database/migration/drift_migrat
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.dart';
+import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_metadata.dart';
+import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.dart';
 import 'package:catalyst_voices_repositories/src/database/table/drafts.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.dart';
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter/foundation.dart';
@@ -63,6 +66,9 @@ abstract interface class CatalystDatabase {
     DocumentsMetadata,
     DocumentsFavorites,
     Drafts,
+    DocumentsV2,
+    DocumentsLocalMetadata,
+    LocalDocumentsDrafts,
   ],
   daos: [
     DriftDocumentsDao,
@@ -130,7 +136,7 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase implements CatalystDa
   ProposalsDao get proposalsDao => driftProposalsDao;
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   Future<void> clear() {

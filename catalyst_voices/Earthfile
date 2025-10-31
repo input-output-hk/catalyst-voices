@@ -38,6 +38,7 @@ code-generator:
     WORKDIR /frontend
 
     RUN melos l10n
+    RUN melos build-db-migration
     RUN melos build-runner
     RUN melos build-runner-repository
 
