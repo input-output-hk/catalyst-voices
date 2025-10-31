@@ -132,6 +132,7 @@ abstract interface class ProposalService {
 
   Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
+    ProposalsOrder order,
   });
 
   Stream<ProposalsCount> watchProposalsCount({
@@ -508,8 +509,9 @@ final class ProposalServiceImpl implements ProposalService {
   @override
   Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
+    ProposalsOrder order = const UpdateDate.desc(),
   }) {
-    return _proposalRepository.watchProposalsBriefPage(request: request);
+    return _proposalRepository.watchProposalsBriefPage(request: request, order: order);
   }
 
   @override

@@ -51,6 +51,10 @@ final class UpdateDate extends ProposalsOrder {
     required this.isAscending,
   });
 
+  const UpdateDate.asc() : this(isAscending: true);
+
+  const UpdateDate.desc() : this(isAscending: false);
+
   @override
   List<Object?> get props => [isAscending];
 

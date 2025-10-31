@@ -40,7 +40,7 @@ void main() {
         const request = PageRequest(page: 0, size: 10);
 
         // When
-        final result = await dao.getProposalsBriefPage(request);
+        final result = await dao.getProposalsBriefPage(request: request);
 
         // Then
         expect(result.items, isEmpty);
@@ -69,7 +69,7 @@ void main() {
         const request = PageRequest(page: 0, size: 2);
 
         // When
-        final result = await dao.getProposalsBriefPage(request);
+        final result = await dao.getProposalsBriefPage(request: request);
 
         // Then
         expect(result.items.length, 2);
@@ -96,7 +96,7 @@ void main() {
         const request = PageRequest(page: 1, size: 2);
 
         // When
-        final result = await dao.getProposalsBriefPage(request);
+        final result = await dao.getProposalsBriefPage(request: request);
 
         // Then: Returns remaining items (1), total unchanged
         expect(result.items.length, 1);
@@ -127,7 +127,7 @@ void main() {
         const request = PageRequest(page: 0, size: 10);
 
         // When
-        final result = await dao.getProposalsBriefPage(request);
+        final result = await dao.getProposalsBriefPage(request: request);
 
         // Then
         expect(result.items.length, 2);
@@ -155,7 +155,7 @@ void main() {
         const request = PageRequest(page: 0, size: 10);
 
         // When
-        final result = await dao.getProposalsBriefPage(request);
+        final result = await dao.getProposalsBriefPage(request: request);
 
         // Then
         expect(result.items.length, 1);
@@ -192,7 +192,7 @@ void main() {
 
         // When
         const request = PageRequest(page: 0, size: 10);
-        final result = await dao.getProposalsBriefPage(request);
+        final result = await dao.getProposalsBriefPage(request: request);
 
         // Then: Only visible (p1); total=1.
         expect(result.items.length, 1);
@@ -232,7 +232,7 @@ void main() {
 
         // When
         const request = PageRequest(page: 0, size: 10);
-        final result = await dao.getProposalsBriefPage(request);
+        final result = await dao.getProposalsBriefPage(request: request);
 
         // Then: Only visible (p1); total=1.
         expect(result.items.length, 1);
@@ -280,7 +280,7 @@ void main() {
 
         // When
         const request = PageRequest(page: 0, size: 10);
-        final result = await dao.getProposalsBriefPage(request);
+        final result = await dao.getProposalsBriefPage(request: request);
 
         // Then: total=2, both are visible
         expect(result.items.length, 2);
@@ -335,7 +335,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: With join, latest A is hidden → exclude A, total =1 (B only), items =1 (B).
           expect(result.total, 1);
@@ -377,7 +377,7 @@ void main() {
 
         // When
         const request = PageRequest(page: 0, size: 10);
-        final result = await dao.getProposalsBriefPage(request);
+        final result = await dao.getProposalsBriefPage(request: request);
 
         // Then
         expect(result.items.length, 2);
@@ -417,7 +417,7 @@ void main() {
 
         // When
         const request = PageRequest(page: 0, size: 10);
-        final result = await dao.getProposalsBriefPage(request);
+        final result = await dao.getProposalsBriefPage(request: request);
 
         // Then
         expect(result.items.length, 1);
@@ -456,7 +456,7 @@ void main() {
 
         // When
         const request = PageRequest(page: 0, size: 10);
-        final result = await dao.getProposalsBriefPage(request);
+        final result = await dao.getProposalsBriefPage(request: request);
 
         // Then
         expect(result.items.length, 1);
@@ -502,7 +502,7 @@ void main() {
 
         // When
         const request = PageRequest(page: 0, size: 10);
-        final result = await dao.getProposalsBriefPage(request);
+        final result = await dao.getProposalsBriefPage(request: request);
 
         // Then
         expect(result.items.length, 1);
@@ -536,7 +536,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Should still return the proposal (NOT IN with NULL should not fail)
           expect(result.items.length, 1);
@@ -574,7 +574,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then
           expect(result.items.length, 2);
@@ -615,7 +615,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Should treat as draft and return latest version
           expect(result.items.length, 1);
@@ -652,7 +652,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Should treat as draft and return latest version
           expect(result.items.length, 1);
@@ -688,7 +688,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Should treat as draft and return latest version
           expect(result.items.length, 1);
@@ -724,7 +724,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Should treat as draft and return latest version
           expect(result.items.length, 1);
@@ -760,7 +760,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Should handle gracefully and return latest version
           expect(result.items.length, 1);
@@ -796,7 +796,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Should handle gracefully and return latest version
           expect(result.items.length, 1);
@@ -827,7 +827,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Should be hidden based on top-level action field
           expect(result.items.length, 0);
@@ -866,7 +866,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Should be ordered newest first by createdAt
           expect(result.items.length, 3);
@@ -894,7 +894,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Should order by createdAt (Dec 31 first), not ver string
           expect(result.items.length, 2);
@@ -948,7 +948,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Count should match visible items (p2 final, p3 draft)
           expect(result.items.length, 2);
@@ -972,9 +972,15 @@ void main() {
           await db.documentsV2Dao.saveAll(proposals);
 
           // When: Query multiple pages
-          final page1 = await dao.getProposalsBriefPage(const PageRequest(page: 0, size: 10));
-          final page2 = await dao.getProposalsBriefPage(const PageRequest(page: 1, size: 10));
-          final page3 = await dao.getProposalsBriefPage(const PageRequest(page: 2, size: 10));
+          final page1 = await dao.getProposalsBriefPage(
+            request: const PageRequest(page: 0, size: 10),
+          );
+          final page2 = await dao.getProposalsBriefPage(
+            request: const PageRequest(page: 1, size: 10),
+          );
+          final page3 = await dao.getProposalsBriefPage(
+            request: const PageRequest(page: 2, size: 10),
+          );
 
           // Then: Total should be consistent across all pages
           expect(page1.total, 25);
@@ -1022,7 +1028,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Should use latest version
           expect(result.items.length, 1);
@@ -1060,7 +1066,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Should use latest version
           expect(result.items.length, 1);
@@ -1093,7 +1099,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Should NOT hide (case sensitive)
           expect(result.items.length, 1);
@@ -1129,7 +1135,7 @@ void main() {
 
           // When
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           // Then: Should treat as draft and use latest version
           expect(result.items.length, 1);
@@ -1151,7 +1157,7 @@ void main() {
           await db.documentsV2Dao.save(proposal);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.proposal.id, 'p1');
@@ -1174,7 +1180,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal, action]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.proposal.id, 'p1');
@@ -1197,7 +1203,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal, action]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.proposal.id, 'p1');
@@ -1219,7 +1225,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal, action]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items, isEmpty);
           expect(result.total, 0);
@@ -1251,7 +1257,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal, action1, action2]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.proposal.id, 'p1');
@@ -1297,7 +1303,7 @@ void main() {
           ]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 3);
 
@@ -1326,7 +1332,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal, action]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.proposal.id, 'p1');
@@ -1349,7 +1355,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal, action]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.proposal.id, 'p1');
@@ -1364,7 +1370,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.versionIds.length, 1);
@@ -1385,7 +1391,7 @@ void main() {
             await db.documentsV2Dao.saveAll([proposal3, proposal1, proposal2]);
 
             const request = PageRequest(page: 0, size: 10);
-            final result = await dao.getProposalsBriefPage(request);
+            final result = await dao.getProposalsBriefPage(request: request);
 
             expect(result.items.length, 1);
             expect(result.items.first.proposal.ver, ver3);
@@ -1402,7 +1408,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.commentsCount, 0);
@@ -1433,7 +1439,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal, comment1, comment2]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.commentsCount, 2);
@@ -1477,7 +1483,7 @@ void main() {
             await db.documentsV2Dao.saveAll([proposal1, proposal2, comment1, comment2, comment3]);
 
             const request = PageRequest(page: 0, size: 10);
-            final result = await dao.getProposalsBriefPage(request);
+            final result = await dao.getProposalsBriefPage(request: request);
 
             expect(result.items.length, 1);
             expect(result.items.first.proposal.ver, ver2);
@@ -1542,7 +1548,7 @@ void main() {
           ]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.proposal.ver, ver2);
@@ -1592,7 +1598,7 @@ void main() {
           ]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 2);
 
@@ -1628,7 +1634,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal, comment, otherDoc]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.commentsCount, 1);
@@ -1642,7 +1648,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.isFavorite, false);
@@ -1663,7 +1669,7 @@ void main() {
               );
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.isFavorite, false);
@@ -1684,7 +1690,7 @@ void main() {
               );
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.isFavorite, true);
@@ -1707,7 +1713,7 @@ void main() {
               );
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.proposal.ver, ver2);
@@ -1745,7 +1751,7 @@ void main() {
               );
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 3);
 
@@ -1789,7 +1795,7 @@ void main() {
               );
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.proposal.ver, ver1);
@@ -1804,7 +1810,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.template, isNull);
@@ -1821,7 +1827,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.template, isNull);
@@ -1847,7 +1853,7 @@ void main() {
           await db.documentsV2Dao.saveAll([template, proposal]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.template, isNotNull);
@@ -1883,7 +1889,7 @@ void main() {
           await db.documentsV2Dao.saveAll([template1, template2, proposal]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.template, isNotNull);
@@ -1909,7 +1915,7 @@ void main() {
           await db.documentsV2Dao.saveAll([template, proposal]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.template, isNull);
@@ -1963,7 +1969,7 @@ void main() {
           ]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 3);
 
@@ -2034,7 +2040,7 @@ void main() {
           ]);
 
           const request = PageRequest(page: 0, size: 10);
-          final result = await dao.getProposalsBriefPage(request);
+          final result = await dao.getProposalsBriefPage(request: request);
 
           expect(result.items.length, 1);
           expect(result.items.first.proposal.ver, ver1);

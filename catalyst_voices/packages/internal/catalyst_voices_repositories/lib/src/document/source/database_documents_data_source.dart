@@ -163,9 +163,12 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage(PageRequest request) {
+  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
+    required PageRequest request,
+    ProposalsOrder order = const UpdateDate.desc(),
+  }) {
     return _database.proposalsV2Dao
-        .watchProposalsBriefPage(request)
+        .watchProposalsBriefPage(request: request, order: order)
         .map((page) => page.map((data) => data.toModel()));
   }
 

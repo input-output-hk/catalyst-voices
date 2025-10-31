@@ -66,7 +66,10 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// - Uses covering indices to avoid table lookups
   /// - Single query with CTEs (no N+1 queries)
   @override
-  Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage(PageRequest request) async {
+  Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage({
+    required PageRequest request,
+    ProposalsOrder order = const UpdateDate.desc(),
+  }) async {
     final effectivePage = math.max(request.page, 0);
     final effectiveSize = request.size.clamp(0, 999);
 
@@ -105,7 +108,10 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage(PageRequest request) {
+  Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage({
+    required PageRequest request,
+    ProposalsOrder order = const UpdateDate.desc(),
+  }) {
     final effectivePage = math.max(request.page, 0);
     final effectiveSize = request.size.clamp(0, 999);
 
@@ -365,7 +371,10 @@ abstract interface class ProposalsV2Dao {
   ///   - Single query with CTEs (no N+1 queries)
   ///
   /// Returns: Page object with items, total count, and pagination metadata
-  Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage(PageRequest request);
+  Future<Page<JoinedProposalBriefEntity>> getProposalsBriefPage({
+    required PageRequest request,
+    ProposalsOrder order,
+  });
 
   /// Updates the favorite status of a proposal.
   ///
@@ -387,5 +396,8 @@ abstract interface class ProposalsV2Dao {
   /// [getProposalsBriefPage].
   ///
   /// Returns a [Stream] that emits a [Page] of [JoinedProposalBriefEntity].
-  Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage(PageRequest request);
+  Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage({
+    required PageRequest request,
+    ProposalsOrder order,
+  });
 }

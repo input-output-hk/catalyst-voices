@@ -98,6 +98,7 @@ abstract interface class ProposalRepository {
 
   Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
+    ProposalsOrder order,
   });
 
   Stream<ProposalsCount> watchProposalsCount({
@@ -340,9 +341,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   @override
   Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
+    ProposalsOrder order = const UpdateDate.desc(),
   }) {
     return _proposalsLocalSource
-        .watchProposalsBriefPage(request)
+        .watchProposalsBriefPage(request: request, order: order)
         .map((page) => page.map(_mapJoinedProposalBriefData));
   }
 

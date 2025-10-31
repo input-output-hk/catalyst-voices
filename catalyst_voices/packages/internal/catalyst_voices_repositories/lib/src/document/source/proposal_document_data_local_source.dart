@@ -25,7 +25,10 @@ abstract interface class ProposalDocumentDataLocalSource {
     required bool isFavorite,
   });
 
-  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage(PageRequest request);
+  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
+    required PageRequest request,
+    ProposalsOrder order,
+  });
 
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
