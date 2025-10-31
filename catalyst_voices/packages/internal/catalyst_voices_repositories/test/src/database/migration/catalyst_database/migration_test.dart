@@ -146,8 +146,8 @@ const _testUserCatalystIdUri =
 DocumentData _buildDoc({
   String? id,
   String? ver,
-  DocumentType? type,
-  Map<String, dynamic>? content,
+  DocumentType type = DocumentType.proposalDocument,
+  Map<String, dynamic> content = const <String, dynamic>{},
   String? section,
   DocumentRef? ref,
   SignedDocumentRef? reply,
@@ -158,8 +158,6 @@ DocumentData _buildDoc({
 }) {
   id ??= DocumentRefFactory.randomUuidV7();
   ver ??= id;
-  type ??= DocumentType.proposalDocument;
-  content ??= <String, dynamic>{};
 
   final metadata = DocumentDataMetadata(
     type: type,
@@ -196,8 +194,6 @@ v4.DocumentsLocalMetadataData _buildDocFavV4({
   required String id,
   required bool isFavorite,
 }) {
-  final idHiLo = UuidHiLo.from(id);
-
   return v4.DocumentsLocalMetadataData(
     id: id,
     isFavorite: isFavorite,
@@ -221,7 +217,7 @@ List<DocumentData> _generateDocuments(
       /* cSpell:disable */
       authors: [
         CatalystId.fromUri(Uri.parse(_testUserCatalystIdUri)),
-        if (index.isEven) CatalystId.fromUri(Uri.parse(_testUserCatalystIdUri)),
+        if (index.isEven) CatalystId.fromUri(Uri.parse(_testOrgCatalystIdUri)),
       ],
       /* cSpell:enable */
     );
