@@ -1023,12 +1023,12 @@
                 "self_assessment_checklist": {
                     "$ref": "#/definitions/section",
                     "title": "Self-Assessment Checklist",
+                    "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission.",
                     "properties": {
                         "strategic_fit": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Strategic Fit:",
-                            "title": "I confirm that the proposal clearly provides a basic prototype reference application for one of the areas of interest.",  
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal clearly provides a basic prototype reference application for one of the areas of interest."  
                         },
                         "developer_experience": {
                             "$ref": "#/definitions/agreementConfirmation",
@@ -1043,7 +1043,7 @@
                         "verifiable_builder_credentials": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Verifiable Builder Credentials:",
-                            "title": "I confirm that the team provides evidence of their technical ability and experience in creating developer tools or high-quality technical content (e.g., GitHub, portfolio)."
+                            "title": "I confirm that a plan for creating and maintaining clear, comprehensive documentation is a core part of the proposal's scope."
                         },
                         "quality_documentation": {
                             "$ref": "#/definitions/agreementConfirmation",
