@@ -25,7 +25,7 @@ final class DatabaseDocumentsDataSource
 
   @override
   Future<bool> exists({required DocumentRef ref}) {
-    return _database.documentsDao.count(ref: ref).then((count) => count > 0);
+    return _database.documentsV2Dao.exists(ref);
   }
 
   @override
@@ -35,7 +35,7 @@ final class DatabaseDocumentsDataSource
 
   @override
   Future<DocumentData> get({required DocumentRef ref}) async {
-    final entity = await _database.documentsDao.query(ref: ref);
+    final entity = await _database.documentsV2Dao.getDocument(ref);
     if (entity == null) {
       throw DocumentNotFoundException(ref: ref);
     }
@@ -218,7 +218,10 @@ extension on DocumentEntityV2 {
         reply: replyId.toRef(replyVer),
         section: section,
         categoryId: categoryId.toRef(categoryVer),
-        authors: authors.split(',').map((e) => CatalystId.fromUri(e.getUri())).toList(),
+        // TODO(damian-molinski): Make sure to add unit tests
+        authors: authors.isEmpty
+            ? null
+            : authors.split(',').map((e) => CatalystId.fromUri(e.getUri())).toList(),
       ),
       content: content,
     );
