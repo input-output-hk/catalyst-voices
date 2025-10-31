@@ -1,8 +1,6 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
-import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
-import 'package:catalyst_voices/pages/account/widgets/account_keychain_tile.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
 import 'package:catalyst_voices/pages/discovery/sections/campaign_details/campaign_details.dart';
 import 'package:catalyst_voices/pages/discovery/sections/campaign_hero.dart';
@@ -15,12 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 class DiscoveryPage extends StatefulWidget {
-  final bool keychainDeleted;
-
-  const DiscoveryPage({
-    super.key,
-    this.keychainDeleted = false,
-  });
+  const DiscoveryPage({super.key});
 
   @override
   State<DiscoveryPage> createState() => _DiscoveryPageState();
@@ -70,29 +63,10 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   }
 
   @override
-  void didUpdateWidget(DiscoveryPage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (showKeychainDeletedDialog) {
-      showKeychainDeletedDialog = false;
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await _showKeychainDeletedDialog(context);
-      });
-    }
-  }
-
-  @override
   void initState() {
     super.initState();
 
     unawaited(_loadData());
-
-    if (showKeychainDeletedDialog) {
-      showKeychainDeletedDialog = false;
-      WidgetsBinding.instance.addPostFrameCallback((_) async {
-        await _showKeychainDeletedDialog(context);
-      });
-    }
   }
 
   Future<void> _loadData() async {
@@ -101,9 +75,5 @@ class _DiscoveryPageState extends State<DiscoveryPage>
     } finally {
       if (mounted) unawaited(SentryDisplayWidget.of(context).reportFullyDisplayed());
     }
-  }
-
-  Future<void> _showKeychainDeletedDialog(BuildContext context) async {
-    await KeychainDeletedDialog.show(context);
   }
 }
