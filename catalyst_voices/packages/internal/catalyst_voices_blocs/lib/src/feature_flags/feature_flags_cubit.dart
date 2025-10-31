@@ -20,6 +20,20 @@ final class FeatureFlagsCubit extends Cubit<FeatureFlagsState> {
     return super.close();
   }
 
+  bool? getUserOverride(Feature feature) {
+    return _featureFlagsService.getUserOverride(feature);
+  }
+
+  void setUserOverride(
+    Feature feature, {
+    required bool? value,
+  }) {
+    _featureFlagsService.setUserOverride(
+      feature,
+      value: value,
+    );
+  }
+
   void _subscribeToChanges() {
     _subscription = _featureFlagsService.allInfoChanges.listen((allFeatures) {
       emit(state.copyWith(features: _buildFeaturesMap(allFeatures)));
@@ -27,6 +41,6 @@ final class FeatureFlagsCubit extends Cubit<FeatureFlagsState> {
   }
 
   static Map<FeatureType, FeatureFlagInfo> _buildFeaturesMap(List<FeatureFlagInfo> infos) {
-    return {for (final info in infos) info.featureType: info};
+    return {for (final info in infos) info.feature.type: info};
   }
 }

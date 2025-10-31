@@ -72,5 +72,24 @@ void main() {
         ],
       );
     });
+
+    group('user override', () {
+      test('getUserOverride returns null initially', () {
+        expect(cubit.getUserOverride(Features.voting), isNull);
+      });
+
+      blocTest<FeatureFlagsCubit, FeatureFlagsState>(
+        'setUserOverride emits new state',
+        build: () => cubit,
+        act: (cubit) => cubit.setUserOverride(Features.voting, value: false),
+        expect: () => [
+          isA<FeatureFlagsState>().having(
+            (s) => s.isEnabled(Features.voting),
+            'voting enabled',
+            isFalse,
+          ),
+        ],
+      );
+    });
   });
 }
