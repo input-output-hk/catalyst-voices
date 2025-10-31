@@ -1015,14 +1015,13 @@
             "properties": {
                 "self_assessment_checklist": {
                     "$ref": "#/definitions/section",
-                    "title": "Self-Assessment Checklist",
+                    "title": "Self-Assessment Checklist",  
+                    "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission.",
                     "properties": {
                         "foundational_work": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Foundational Work:",
-                            "title": "I confirm that evidence of prior research, whitepaper, design, or proof-of-concept is provided.",  
-                             "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
-
+                            "title": "I confirm that evidence of prior research, whitepaper, design, or proof-of-concept is provided."
                         },
                         "ecosystem_value": {
                             "$ref": "#/definitions/agreementConfirmation",

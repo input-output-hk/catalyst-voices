@@ -1014,13 +1014,13 @@
             "properties": {
                 "self_assessment_checklist": {
                     "$ref": "#/definitions/section",
-                    "title": "Self-Assessment Checklist",
+                    "title": "Self-Assessment Checklist",  
+                    "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission.",
                     "properties": {
                         "legal_entity": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Legal Entity:",
-                            "title": "I confirm that the lead applicant is a verified legal business entity.",  
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the lead applicant is a verified legal business entity."
                         },
                         "track_record": {
                             "$ref": "#/definitions/agreementConfirmation",
