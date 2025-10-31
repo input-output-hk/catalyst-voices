@@ -137,11 +137,13 @@ void main() {
   );
 }
 
+/* cSpell:disable */
 const _testOrgCatalystIdUri =
     'id.catalyst://cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=';
 
 const _testUserCatalystIdUri =
     'id.catalyst://john@preprod.cardano/FftxFnOrj2qmTuB2oZG2v0YEWJfKvQ9Gg8AgNAhDsKE=';
+/* cSpell:enable */
 
 DocumentData _buildDoc({
   String? id,
