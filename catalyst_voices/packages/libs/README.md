@@ -3,12 +3,12 @@
 A collection of Catalyst packages and plugins for Flutter and Dart.
 
 * [Catalyst Voices Packages](#catalyst-voices-packages)
-  * [Packages](#packages)
-  * [Requirements](#requirements)
-  * [Bootstrapping](#bootstrapping)
-  * [Contributing](#contributing)
-  * [Support](#support)
-  * [License](#license)
+    * [Packages](#packages)
+    * [Requirements](#requirements)
+    * [Bootstrapping](#bootstrapping)
+    * [Contributing](#contributing)
+    * [Support](#support)
+    * [License](#license)
 
 ## Packages
 
@@ -31,8 +31,8 @@ A collection of Catalyst packages and plugins for Flutter and Dart.
 * Android Studio: latest
 * [Melos](https://melos.invertase.dev)
 * Flutter & Dart plugins:
-  * [Visual Studio Code](https://flutter.dev/docs/get-started/editor?tab=vscode)
-  * [Android Studio / IntelliJ](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
+    * [Visual Studio Code](https://flutter.dev/docs/get-started/editor?tab=vscode)
+    * [Android Studio / IntelliJ](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
 * [Rust](https://rustup.rs/): 1.80.0+
 
 ## Bootstrapping
