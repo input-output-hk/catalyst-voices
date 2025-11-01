@@ -52,7 +52,7 @@ jobs:
           args: ./catalyst_voices+test-unit-native
 
       - name: Collect and upload test reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: test-reports
@@ -61,7 +61,7 @@ jobs:
           retention-days: 1
 
       - name: Collect and upload test coverage
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always()
         with:
           name: coverage-reports
