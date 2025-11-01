@@ -93,7 +93,7 @@ dev_dependencies:
     sdk: flutter
   flutter_test:
     sdk: flutter
-  go_router_builder: ^2.9.0
+  go_router_builder: ^3.0.0
   integration_test:
     sdk: flutter
   mocktail: ^1.0.4
