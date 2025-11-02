@@ -11,7 +11,7 @@ project: {
 		}
 
 		bundle: {
-			env: string | *"preprod"
+			env: string | *"dev"
 			modules: main: {
 				name:    "app"
 				version: "0.13.1"
