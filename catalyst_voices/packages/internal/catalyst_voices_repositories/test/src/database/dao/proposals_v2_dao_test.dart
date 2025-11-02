@@ -2701,6 +2701,64 @@ void main() {
         final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
 
         group('by status', () {
+          test('filters draft proposals without action documents', () async {
+            final draftProposal1 = _createTestDocumentEntity(
+              id: 'draft-no-action',
+              ver: _buildUuidV7At(latest),
+            );
+
+            final draftProposal2 = _createTestDocumentEntity(
+              id: 'draft-with-action',
+              ver: _buildUuidV7At(middle.add(const Duration(hours: 1))),
+            );
+
+            final draftActionVer = _buildUuidV7At(middle);
+            final draftAction = _createTestDocumentEntity(
+              id: 'action-draft',
+              ver: draftActionVer,
+              type: DocumentType.proposalActionDocument,
+              refId: 'draft-with-action',
+              contentData: ProposalSubmissionActionDto.draft.toJson(),
+            );
+
+            final finalProposalVer = _buildUuidV7At(earliest.add(const Duration(hours: 1)));
+            final finalProposal = _createTestDocumentEntity(
+              id: 'final-id',
+              ver: finalProposalVer,
+            );
+
+            final finalActionVer = _buildUuidV7At(earliest);
+            final finalAction = _createTestDocumentEntity(
+              id: 'action-final',
+              ver: finalActionVer,
+              type: DocumentType.proposalActionDocument,
+              refId: 'final-id',
+              refVer: finalProposalVer,
+              contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+            );
+
+            await db.documentsV2Dao.saveAll([
+              draftProposal1,
+              draftProposal2,
+              draftAction,
+              finalProposal,
+              finalAction,
+            ]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(status: ProposalStatusFilter.draft),
+            );
+
+            expect(result.items.length, 2);
+            expect(result.total, 2);
+            expect(
+              result.items.map((e) => e.proposal.id).toSet(),
+              {'draft-no-action', 'draft-with-action'},
+            );
+          });
+
           test('filters draft proposals', () async {
             final draftProposal = _createTestDocumentEntity(
               id: 'draft-id',
