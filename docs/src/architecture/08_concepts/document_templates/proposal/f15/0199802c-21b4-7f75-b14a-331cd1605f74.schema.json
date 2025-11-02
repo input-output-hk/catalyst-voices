@@ -1016,12 +1016,12 @@
                 "self_assessment_checklist": {
                     "$ref": "#/definitions/section",
                     "title": "Self-Assessment Checklist",
+                    "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission.",
                     "properties": {
                         "scope_fit": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Scope Fit:",
-                            "title": "I confirm that the proposal is a non-technical initiative, with ≤20% of the budget for tech support.",  
-                            "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission."
+                            "title": "I confirm that the proposal is a non-technical initiative, with ≤20% of the budget for tech support."                            
                         },
                         "relevant_experience": {
                             "$ref": "#/definitions/agreementConfirmation",
