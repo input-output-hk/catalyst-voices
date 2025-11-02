@@ -153,7 +153,7 @@ async fn validate_against_original_doc(doc: &CatalystSignedDocument) -> anyhow::
     let original_doc = match FullSignedDoc::retrieve(&doc.doc_id()?.uuid(), None).await {
         Ok(doc) => doc,
         Err(e) if e.is::<error::NotFoundError>() => return Ok(true),
-        Err(e) => anyhow::bail!("Database error: {e}"),
+        Err(e) => return Err(e),
     };
 
     let original_authors = original_doc
