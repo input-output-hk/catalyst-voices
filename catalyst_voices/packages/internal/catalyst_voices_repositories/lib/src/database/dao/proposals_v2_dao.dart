@@ -150,8 +150,13 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     final clauses = <String>[];
 
     if (filters.status != null) {
-      final statusValue = filters.status == ProposalStatusFilter.draft ? 'draft' : 'final';
-      clauses.add("ep.action_type = '$statusValue'");
+      if (filters.status == ProposalStatusFilter.draft) {
+        // NULL = no action = draft (default)
+        clauses.add("(ep.action_type IS NULL OR ep.action_type = 'draft')");
+      } else {
+        // Final requires explicit action
+        clauses.add("ep.action_type = 'final'");
+      }
     }
 
     if (filters.isFavorite != null) {
