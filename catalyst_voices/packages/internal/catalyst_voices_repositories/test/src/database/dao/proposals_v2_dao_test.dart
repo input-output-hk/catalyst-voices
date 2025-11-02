@@ -3542,6 +3542,269 @@ void main() {
             expect(result.items[0].proposal.id, 'matching');
           });
         });
+
+        group('by campaign', () {
+          test('filters proposals by campaign categories', () async {
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              categoryId: 'cat-1',
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle.add(const Duration(hours: 1))),
+              categoryId: 'cat-2',
+            );
+
+            final proposal3 = _createTestDocumentEntity(
+              id: 'p3',
+              ver: _buildUuidV7At(middle),
+              categoryId: 'cat-3',
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(
+                campaign: ProposalsCampaignFilters(categoriesIds: {'cat-1', 'cat-2'}),
+              ),
+            );
+
+            expect(result.items.length, 2);
+            expect(result.total, 2);
+            expect(result.items.map((e) => e.proposal.id).toSet(), {'p1', 'p2'});
+          });
+
+          test('returns empty when campaign categories is empty', () async {
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              categoryId: 'cat-1',
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle),
+              categoryId: 'cat-2',
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(
+                campaign: ProposalsCampaignFilters(categoriesIds: {}),
+              ),
+            );
+
+            expect(result.items.length, 0);
+            expect(result.total, 0);
+          });
+
+          test('combines categoryId with campaign filter when compatible', () async {
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              categoryId: 'cat-1',
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle.add(const Duration(hours: 1))),
+              categoryId: 'cat-2',
+            );
+
+            final proposal3 = _createTestDocumentEntity(
+              id: 'p3',
+              ver: _buildUuidV7At(middle),
+              categoryId: 'cat-3',
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(
+                campaign: ProposalsCampaignFilters(categoriesIds: {'cat-1', 'cat-2'}),
+                categoryId: 'cat-1',
+              ),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'p1');
+            expect(result.items[0].proposal.categoryId, 'cat-1');
+          });
+
+          test('returns empty when categoryId not in campaign', () async {
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              categoryId: 'cat-1',
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle.add(const Duration(hours: 1))),
+              categoryId: 'cat-2',
+            );
+
+            final proposal3 = _createTestDocumentEntity(
+              id: 'p3',
+              ver: _buildUuidV7At(middle),
+              categoryId: 'cat-3',
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(
+                campaign: ProposalsCampaignFilters(categoriesIds: {'cat-1', 'cat-2'}),
+                categoryId: 'cat-3',
+              ),
+            );
+
+            expect(result.items.length, 0);
+            expect(result.total, 0);
+          });
+
+          test('ignores campaign filter when null', () async {
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              categoryId: 'cat-1',
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle.add(const Duration(hours: 1))),
+              categoryId: 'cat-2',
+            );
+
+            final proposal3 = _createTestDocumentEntity(
+              id: 'p3',
+              ver: _buildUuidV7At(middle),
+              categoryId: 'cat-3',
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(campaign: null),
+            );
+
+            expect(result.items.length, 3);
+            expect(result.total, 3);
+          });
+
+          test('handles null category_id in database', () async {
+            final proposalWithCategory = _createTestDocumentEntity(
+              id: 'p-with-cat',
+              ver: _buildUuidV7At(latest),
+              categoryId: 'cat-1',
+            );
+
+            final proposalWithoutCategory = _createTestDocumentEntity(
+              id: 'p-without-cat',
+              ver: _buildUuidV7At(middle),
+              categoryId: null,
+            );
+
+            await db.documentsV2Dao.saveAll([proposalWithCategory, proposalWithoutCategory]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(
+                campaign: ProposalsCampaignFilters(categoriesIds: {'cat-1', 'cat-2'}),
+              ),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'p-with-cat');
+          });
+
+          test('handles multiple categories efficiently', () async {
+            final proposals = List.generate(
+              5,
+              (i) => _createTestDocumentEntity(
+                id: 'p-$i',
+                ver: _buildUuidV7At(earliest.add(Duration(hours: i))),
+                categoryId: 'cat-$i',
+              ),
+            );
+
+            await db.documentsV2Dao.saveAll(proposals);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(
+                campaign: ProposalsCampaignFilters(
+                  categoriesIds: {'cat-0', 'cat-2', 'cat-4'},
+                ),
+              ),
+            );
+
+            expect(result.items.length, 3);
+            expect(result.total, 3);
+            expect(
+              result.items.map((e) => e.proposal.categoryId).toSet(),
+              {'cat-0', 'cat-2', 'cat-4'},
+            );
+          });
+
+          test('campaign filter respects status filter', () async {
+            final draftProposalVer = _buildUuidV7At(latest);
+            final draftProposal = _createTestDocumentEntity(
+              id: 'draft-p',
+              ver: draftProposalVer,
+              categoryId: 'cat-1',
+            );
+
+            final finalProposalVer = _buildUuidV7At(middle);
+            final finalProposal = _createTestDocumentEntity(
+              id: 'final-p',
+              ver: finalProposalVer,
+              categoryId: 'cat-1',
+            );
+
+            final finalActionVer = _buildUuidV7At(earliest);
+            final finalAction = _createTestDocumentEntity(
+              id: 'action-final',
+              ver: finalActionVer,
+              type: DocumentType.proposalActionDocument,
+              refId: 'final-p',
+              refVer: finalProposalVer,
+              contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+            );
+
+            await db.documentsV2Dao.saveAll([draftProposal, finalProposal, finalAction]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(
+                campaign: ProposalsCampaignFilters(categoriesIds: {'cat-1'}),
+                status: ProposalStatusFilter.draft,
+              ),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'draft-p');
+          });
+        });
       });
     });
   });

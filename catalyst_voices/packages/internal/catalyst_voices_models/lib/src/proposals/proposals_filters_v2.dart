@@ -1,6 +1,29 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
+/// A set of filters to be applied when querying for campaign proposals.
+final class ProposalsCampaignFilters extends Equatable {
+  /// Filters proposals by their category IDs.
+  final Set<String> categoriesIds;
+
+  /// Creates a set of filters for querying campaign proposals.
+  const ProposalsCampaignFilters({
+    required this.categoriesIds,
+  });
+
+  /// Currently hardcoded active campaign helper constructor.
+  factory ProposalsCampaignFilters.active() {
+    final categoriesIds = activeConstantDocumentRefs.map((e) => e.category.id).toSet();
+    return ProposalsCampaignFilters(categoriesIds: categoriesIds);
+  }
+
+  @override
+  List<Object?> get props => [categoriesIds];
+
+  @override
+  String toString() => 'categoriesIds: $categoriesIds';
+}
+
 /// A set of filters to be applied when querying for proposals.
 final class ProposalsFiltersV2 extends Equatable {
   /// Filters proposals by their effective status. If null, this filter is not applied.
@@ -27,6 +50,11 @@ final class ProposalsFiltersV2 extends Equatable {
   /// If null, this filter is not applied.
   final Duration? latestUpdate;
 
+  /// Filters proposals based on their campaign categories.
+  /// If [campaign] is not null and [categoryId] is not included, empty list will be returned.
+  /// If null, this filter is not applied.
+  final ProposalsCampaignFilters? campaign;
+
   /// Creates a set of filters for querying proposals.
   const ProposalsFiltersV2({
     this.status,
@@ -35,6 +63,7 @@ final class ProposalsFiltersV2 extends Equatable {
     this.categoryId,
     this.searchQuery,
     this.latestUpdate,
+    this.campaign,
   });
 
   @override
@@ -45,6 +74,7 @@ final class ProposalsFiltersV2 extends Equatable {
     categoryId,
     searchQuery,
     latestUpdate,
+    campaign,
   ];
 
   ProposalsFiltersV2 copyWith({
@@ -54,6 +84,7 @@ final class ProposalsFiltersV2 extends Equatable {
     Optional<String>? categoryId,
     Optional<String>? searchQuery,
     Optional<Duration>? latestUpdate,
+    Optional<ProposalsCampaignFilters>? campaign,
   }) {
     return ProposalsFiltersV2(
       status: status.dataOr(this.status),
@@ -62,6 +93,7 @@ final class ProposalsFiltersV2 extends Equatable {
       categoryId: categoryId.dataOr(this.categoryId),
       searchQuery: searchQuery.dataOr(this.searchQuery),
       latestUpdate: latestUpdate.dataOr(this.latestUpdate),
+      campaign: campaign.dataOr(this.campaign),
     );
   }
 
@@ -87,6 +119,9 @@ final class ProposalsFiltersV2 extends Equatable {
     }
     if (latestUpdate != null) {
       parts.add('latestUpdate: $latestUpdate');
+    }
+    if (campaign != null) {
+      parts.add('campaign: $campaign');
     }
 
     buffer

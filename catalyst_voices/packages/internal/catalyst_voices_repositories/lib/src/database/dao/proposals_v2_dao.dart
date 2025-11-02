@@ -78,6 +78,23 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       return Page.empty(page: effectivePage, maxPerPage: effectiveSize);
     }
 
+    final campaign = filters.campaign;
+    if (campaign != null) {
+      assert(
+        campaign.categoriesIds.length <= 100,
+        'Campaign filter with more than 100 categories may impact performance. '
+        'Consider pagination or alternative filtering strategy.',
+      );
+
+      if (campaign.categoriesIds.isEmpty) {
+        return Page.empty(page: effectivePage, maxPerPage: effectiveSize);
+      }
+
+      if (filters.categoryId != null && !campaign.categoriesIds.contains(filters.categoryId)) {
+        return Page.empty(page: effectivePage, maxPerPage: effectiveSize);
+      }
+    }
+
     final items = await _queryVisibleProposalsPage(
       effectivePage,
       effectiveSize,
@@ -126,6 +143,23 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       return Stream.value(Page.empty(page: effectivePage, maxPerPage: effectiveSize));
     }
 
+    final campaign = filters.campaign;
+    if (campaign != null) {
+      assert(
+        campaign.categoriesIds.length <= 100,
+        'Campaign filter with more than 100 categories may impact performance. '
+        'Consider pagination or alternative filtering strategy.',
+      );
+
+      if (campaign.categoriesIds.isEmpty) {
+        return Stream.value(Page.empty(page: effectivePage, maxPerPage: effectiveSize));
+      }
+
+      if (filters.categoryId != null && !campaign.categoriesIds.contains(filters.categoryId)) {
+        return Stream.value(Page.empty(page: effectivePage, maxPerPage: effectiveSize));
+      }
+    }
+
     final itemsStream = _queryVisibleProposalsPage(
       effectivePage,
       effectiveSize,
@@ -151,10 +185,8 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
 
     if (filters.status != null) {
       if (filters.status == ProposalStatusFilter.draft) {
-        // NULL = no action = draft (default)
         clauses.add("(ep.action_type IS NULL OR ep.action_type = 'draft')");
       } else {
-        // Final requires explicit action
         clauses.add("ep.action_type = 'final'");
       }
     }
@@ -168,7 +200,6 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     }
 
     if (filters.author != null) {
-      // TODO(damian): .toSignificant().toUri().toString()
       final authorUri = filters.author.toString();
       final escapedAuthor = _escapeForSqlLike(authorUri);
       clauses.add("p.authors LIKE '%$escapedAuthor%' ESCAPE '\\'");
@@ -177,6 +208,11 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     if (filters.categoryId != null) {
       final escapedCategory = _escapeSqlString(filters.categoryId!);
       clauses.add("p.category_id = '$escapedCategory'");
+    } else if (filters.campaign != null) {
+      final escapedIds = filters.campaign!.categoriesIds
+          .map((id) => "'${_escapeSqlString(id)}'")
+          .join(', ');
+      clauses.add('p.category_id IN ($escapedIds)');
     }
 
     if (filters.searchQuery != null && filters.searchQuery!.isNotEmpty) {
