@@ -8,10 +8,12 @@ use std::{
     time::Duration,
 };
 
+use bb8::{Pool, PooledConnection};
+use bb8_postgres::PostgresConnectionManager;
 use error::NotFoundError;
 use futures::{Stream, StreamExt, TryStreamExt};
 use tokio::task::JoinHandle;
-use tokio_postgres::{types::ToSql, Row};
+use tokio_postgres::{types::ToSql, NoTls, Row};
 use tracing::{debug, debug_span, error, info, Instrument};
 
 use crate::{
@@ -30,7 +32,7 @@ pub(crate) mod signed_docs;
 pub(crate) const DATABASE_SCHEMA_VERSION: i32 = 2;
 
 /// Postgres Connection Manager DB Pool
-type SqlDbPool = Arc<deadpool::managed::Pool<deadpool_postgres::Manager>>;
+type SqlDbPool = Arc<Pool<PostgresConnectionManager<NoTls>>>;
 
 /// Postgres Connection Manager DB Pool Instance
 static EVENT_DB_POOL: OnceLock<SqlDbPool> = OnceLock::new();
@@ -58,16 +60,15 @@ pub(crate) enum EventDBConnectionError {
 
 impl EventDB {
     /// Get a connection from the pool.
-    async fn get_pool_connection(
-    ) -> Result<deadpool::managed::Object<deadpool_postgres::Manager>, EventDBConnectionError> {
+    async fn get_pool_connection<'a>(
+    ) -> Result<PooledConnection<'a, PostgresConnectionManager<NoTls>>, EventDBConnectionError>
+    {
         let pool = EVENT_DB_POOL
             .get()
             .ok_or(EventDBConnectionError::DbPoolUninitialized)?;
-        let res = pool
-            .get()
+        pool.get()
             .await
-            .map_err(|_| EventDBConnectionError::PoolConnectionUnavailable)?;
-        Ok(res)
+            .map_err(|_| EventDBConnectionError::PoolConnectionUnavailable)
     }
 
     /// Determine if deep query inspection is enabled.
@@ -303,9 +304,7 @@ impl EventDB {
     }
 }
 
-/// Establish a connection pool to the database.
-/// After successful initialisation of the connection pool, spawns a background ready
-/// probe task.
+/// Establish a connection to the database, and check the schema is up-to-date.
 ///
 /// # Parameters
 ///
@@ -329,36 +328,33 @@ impl EventDB {
 /// `.env` file.
 ///
 /// If connection to the pool is `OK`, the `LIVE_EVENT_DB` atomic flag is set to `true`.
-pub fn establish_connection_pool() {
+pub async fn establish_connection_pool() {
+    let (url, user, pass, max_connections, max_lifetime, min_idle, connection_timeout) =
+        Settings::event_db_settings();
     debug!("Establishing connection with Event DB pool");
 
     // This was pre-validated and can't fail, but provide default in the impossible case it
     // does.
-    let url = Settings::event_db_settings().url();
     let mut config = tokio_postgres::config::Config::from_str(url).unwrap_or_else(|_| {
         error!(url = url, "Postgres URL Pre Validation has failed.");
         tokio_postgres::config::Config::default()
     });
-    if let Some(user) = Settings::event_db_settings().username() {
+    if let Some(user) = user {
         config.user(user);
     }
-    if let Some(pass) = Settings::event_db_settings().password() {
+    if let Some(pass) = pass {
         config.password(pass);
     }
 
-    let pg_mgr = deadpool_postgres::Manager::new(config, tokio_postgres::NoTls);
+    let pg_mgr = PostgresConnectionManager::new(config, tokio_postgres::NoTls);
 
-    match deadpool::managed::Pool::builder(pg_mgr)
-        .max_size(Settings::event_db_settings().max_connections() as usize)
-        .create_timeout(Some(
-            Settings::event_db_settings().connection_creation_timeout(),
-        ))
-        .wait_timeout(Some(Settings::event_db_settings().slot_wait_timeout()))
-        .recycle_timeout(Some(
-            Settings::event_db_settings().connection_recycle_timeout(),
-        ))
-        .runtime(deadpool::Runtime::Tokio1)
-        .build()
+    match Pool::builder()
+        .max_size(max_connections)
+        .max_lifetime(Some(core::time::Duration::from_secs(max_lifetime.into())))
+        .min_idle(min_idle)
+        .connection_timeout(core::time::Duration::from_secs(connection_timeout.into()))
+        .build(pg_mgr)
+        .await
     {
         Ok(pool) => {
             debug!("Event DB pool configured.");
