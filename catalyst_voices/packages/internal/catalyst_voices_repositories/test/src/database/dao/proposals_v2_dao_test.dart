@@ -2694,6 +2694,797 @@ void main() {
           );
         });
       });
+
+      group('Filtering', () {
+        final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
+        final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
+        final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
+
+        group('by status', () {
+          test('filters draft proposals', () async {
+            final draftProposal = _createTestDocumentEntity(
+              id: 'draft-id',
+              ver: _buildUuidV7At(latest),
+            );
+
+            final finalProposalVer = _buildUuidV7At(middle);
+            final finalProposal = _createTestDocumentEntity(
+              id: 'final-id',
+              ver: finalProposalVer,
+            );
+
+            final finalActionVer = _buildUuidV7At(earliest);
+            final finalAction = _createTestDocumentEntity(
+              id: 'action-final',
+              ver: finalActionVer,
+              type: DocumentType.proposalActionDocument,
+              refId: 'final-id',
+              refVer: finalProposalVer,
+              contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+            );
+
+            await db.documentsV2Dao.saveAll([draftProposal, finalProposal, finalAction]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(status: ProposalStatusFilter.draft),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'draft-id');
+          });
+
+          test('filters final proposals', () async {
+            final draftProposal = _createTestDocumentEntity(
+              id: 'draft-id',
+              ver: _buildUuidV7At(latest),
+            );
+
+            final finalProposalVer = _buildUuidV7At(middle);
+            final finalProposal = _createTestDocumentEntity(
+              id: 'final-id',
+              ver: finalProposalVer,
+            );
+
+            final finalActionVer = _buildUuidV7At(earliest);
+            final finalAction = _createTestDocumentEntity(
+              id: 'action-final',
+              ver: finalActionVer,
+              type: DocumentType.proposalActionDocument,
+              refId: 'final-id',
+              refVer: finalProposalVer,
+              contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+            );
+
+            await db.documentsV2Dao.saveAll([draftProposal, finalProposal, finalAction]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(status: ProposalStatusFilter.aFinal),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'final-id');
+          });
+        });
+
+        group('by favorite', () {
+          test('filters favorite proposals', () async {
+            final favoriteProposal = _createTestDocumentEntity(
+              id: 'favorite-id',
+              ver: _buildUuidV7At(latest),
+            );
+
+            final notFavoriteProposal = _createTestDocumentEntity(
+              id: 'not-favorite-id',
+              ver: _buildUuidV7At(middle),
+            );
+
+            await db.documentsV2Dao.saveAll([favoriteProposal, notFavoriteProposal]);
+
+            await dao.updateProposalFavorite(id: 'favorite-id', isFavorite: true);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(isFavorite: true),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'favorite-id');
+            expect(result.items[0].isFavorite, true);
+          });
+
+          test('filters non-favorite proposals', () async {
+            final favoriteProposal = _createTestDocumentEntity(
+              id: 'favorite-id',
+              ver: _buildUuidV7At(latest),
+            );
+
+            final notFavoriteProposal = _createTestDocumentEntity(
+              id: 'not-favorite-id',
+              ver: _buildUuidV7At(middle),
+            );
+
+            await db.documentsV2Dao.saveAll([favoriteProposal, notFavoriteProposal]);
+
+            await dao.updateProposalFavorite(id: 'favorite-id', isFavorite: true);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(isFavorite: false),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'not-favorite-id');
+            expect(result.items[0].isFavorite, false);
+          });
+        });
+
+        group('by author', () {
+          test('filters proposals by author CatalystId', () async {
+            final author1 = _createTestAuthor(name: 'john_doe', role0KeySeed: 1);
+            final author2 = _createTestAuthor(name: 'alice', role0KeySeed: 2);
+            final author3 = _createTestAuthor(name: 'bob', role0KeySeed: 3);
+
+            final p1Authors = [author1, author2].map((e) => e.toUri().toString()).join(',');
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              authors: p1Authors,
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle),
+              authors: author3.toString(),
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: ProposalsFiltersV2(author: author1),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'p1');
+          });
+
+          test('filters proposals by different author CatalystId', () async {
+            final author1 = _createTestAuthor(name: 'john_doe', role0KeySeed: 1);
+            final author2 = _createTestAuthor(name: 'alice', role0KeySeed: 2);
+
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              authors: author1.toString(),
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle),
+              authors: author2.toString(),
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: ProposalsFiltersV2(author: author2),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'p2');
+          });
+
+          test('handles author with special characters in username', () async {
+            final authorWithSpecialChars = _createTestAuthor(
+              /* cSpell:disable */
+              name: "test'user_100%",
+              /* cSpell:enable */
+              role0KeySeed: 1,
+            );
+            final normalAuthor = _createTestAuthor(name: 'normal', role0KeySeed: 2);
+
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              authors: authorWithSpecialChars.toString(),
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle),
+              authors: normalAuthor.toString(),
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: ProposalsFiltersV2(author: authorWithSpecialChars),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'p1');
+          });
+        });
+
+        group('by category', () {
+          test('filters proposals by category id', () async {
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              categoryId: 'category-1',
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle),
+              categoryId: 'category-2',
+            );
+
+            final proposal3 = _createTestDocumentEntity(
+              id: 'p3',
+              ver: _buildUuidV7At(earliest),
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(categoryId: 'category-1'),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'p1');
+          });
+        });
+
+        group('by search query', () {
+          test('searches in authors field', () async {
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              authors: 'john-doe,jane-smith',
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Other Title'},
+                  'proposer': {'applicant': 'Other Name'},
+                },
+              },
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle),
+              authors: 'alice-wonder',
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Different Title'},
+                  'proposer': {'applicant': 'Different Name'},
+                },
+              },
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(searchQuery: 'john'),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'p1');
+          });
+
+          test('searches in applicant name from JSON content', () async {
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              authors: 'other-author',
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Other Title'},
+                  'proposer': {'applicant': 'John Doe'},
+                },
+              },
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle),
+              authors: 'different-author',
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Different Title'},
+                  'proposer': {'applicant': 'Jane Smith'},
+                },
+              },
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(searchQuery: 'John'),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'p1');
+          });
+
+          test('searches in title from JSON content', () async {
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              authors: 'other-author',
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Blockchain Revolution'},
+                  'proposer': {'applicant': 'Other Name'},
+                },
+              },
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle),
+              authors: 'different-author',
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Smart Contracts Study'},
+                  'proposer': {'applicant': 'Different Name'},
+                },
+              },
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(searchQuery: 'Revolution'),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'p1');
+          });
+
+          test('searches case-insensitively', () async {
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Blockchain Revolution'},
+                },
+              },
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(searchQuery: 'blockchain'),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.items[0].proposal.id, 'p1');
+          });
+
+          test('returns multiple matches from different fields', () async {
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              authors: 'tech-author',
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Other Title'},
+                },
+              },
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Tech Innovation'},
+                },
+              },
+            );
+
+            final proposal3 = _createTestDocumentEntity(
+              id: 'p3',
+              ver: _buildUuidV7At(earliest),
+              contentData: {
+                'setup': {
+                  'proposer': {'applicant': 'Tech Expert'},
+                },
+              },
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(searchQuery: 'tech'),
+            );
+
+            expect(result.items.length, 3);
+            expect(result.total, 3);
+          });
+        });
+
+        group('SQL injection protection', () {
+          test('escapes single quotes in search query', () async {
+            final proposal = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              contentData: {
+                'setup': {
+                  'title': {'title': "Project with 'quotes'"},
+                },
+              },
+            );
+
+            await db.documentsV2Dao.saveAll([proposal]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(searchQuery: "Project with 'quotes'"),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.items[0].proposal.id, 'p1');
+          });
+
+          test('prevents SQL injection via search query', () async {
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Legitimate Title'},
+                },
+              },
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Other Title'},
+                },
+              },
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(
+                searchQuery: "' OR '1'='1",
+              ),
+            );
+
+            expect(result.items.length, 0);
+            expect(result.total, 0);
+          });
+
+          test('escapes LIKE wildcards in search query', () async {
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              contentData: {
+                'setup': {
+                  'title': {'title': '100% Complete'},
+                },
+              },
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle),
+              contentData: {
+                'setup': {
+                  'title': {'title': '100X Complete'},
+                },
+              },
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(searchQuery: '100%'),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.items[0].proposal.id, 'p1');
+          });
+
+          test('escapes underscores in search query', () async {
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'test_case'},
+                },
+              },
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'testXcase'},
+                },
+              },
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(searchQuery: 'test_case'),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.items[0].proposal.id, 'p1');
+          });
+
+          test('escapes backslashes in search query', () async {
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              contentData: {
+                'setup': {
+                  'title': {'title': r'path\to\file'},
+                },
+              },
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle),
+              contentData: {
+                'setup': {
+                  'title': {'title': 'path/to/file'},
+                },
+              },
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(searchQuery: r'path\to\file'),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.items[0].proposal.id, 'p1');
+          });
+
+          test('escapes special characters in category id', () async {
+            final proposal1 = _createTestDocumentEntity(
+              id: 'p1',
+              ver: _buildUuidV7At(latest),
+              categoryId: "cat'egory-1",
+            );
+
+            final proposal2 = _createTestDocumentEntity(
+              id: 'p2',
+              ver: _buildUuidV7At(middle),
+              categoryId: 'category-2',
+            );
+
+            await db.documentsV2Dao.saveAll([proposal1, proposal2]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              /* cSpell:disable */
+              filters: const ProposalsFiltersV2(categoryId: "cat'egory-1"),
+              /* cSpell:enable */
+            );
+
+            expect(result.items.length, 1);
+            expect(result.items[0].proposal.id, 'p1');
+          });
+        });
+
+        group('by latest update', () {
+          test('filters proposals created within duration', () async {
+            final now = DateTime.now();
+            final oneHourAgo = now.subtract(const Duration(hours: 1));
+            final twoDaysAgo = now.subtract(const Duration(days: 2));
+
+            final recentProposal = _createTestDocumentEntity(
+              id: 'recent',
+              ver: _buildUuidV7At(oneHourAgo),
+              createdAt: oneHourAgo,
+            );
+
+            final oldProposal = _createTestDocumentEntity(
+              id: 'old',
+              ver: _buildUuidV7At(twoDaysAgo),
+              createdAt: twoDaysAgo,
+            );
+
+            await db.documentsV2Dao.saveAll([recentProposal, oldProposal]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(latestUpdate: Duration(days: 1)),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'recent');
+          });
+        });
+
+        group('combined filters', () {
+          test('applies status and favorite filters together', () async {
+            final draftFavorite = _createTestDocumentEntity(
+              id: 'draft-fav',
+              ver: _buildUuidV7At(latest),
+            );
+
+            final draftNotFavorite = _createTestDocumentEntity(
+              id: 'draft-not-fav',
+              ver: _buildUuidV7At(middle.add(const Duration(hours: 1))),
+            );
+
+            final finalProposalVer = _buildUuidV7At(middle);
+            final finalFavorite = _createTestDocumentEntity(
+              id: 'final-fav',
+              ver: finalProposalVer,
+            );
+
+            final finalActionVer = _buildUuidV7At(earliest);
+            final finalAction = _createTestDocumentEntity(
+              id: 'action-final',
+              ver: finalActionVer,
+              type: DocumentType.proposalActionDocument,
+              refId: 'final-fav',
+              refVer: finalProposalVer,
+              contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+            );
+
+            await db.documentsV2Dao.saveAll([
+              draftFavorite,
+              draftNotFavorite,
+              finalFavorite,
+              finalAction,
+            ]);
+
+            await dao.updateProposalFavorite(id: 'draft-fav', isFavorite: true);
+            await dao.updateProposalFavorite(id: 'final-fav', isFavorite: true);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: const ProposalsFiltersV2(
+                status: ProposalStatusFilter.draft,
+                isFavorite: true,
+              ),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'draft-fav');
+          });
+
+          test('applies author, category, and search filters together', () async {
+            final author1 = _createTestAuthor(name: 'john', role0KeySeed: 1);
+            final author2 = _createTestAuthor(name: 'jane', role0KeySeed: 2);
+
+            final matchingProposal = _createTestDocumentEntity(
+              id: 'matching',
+              ver: _buildUuidV7At(latest),
+              authors: author1.toString(),
+              categoryId: 'cat-1',
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Blockchain Project'},
+                },
+              },
+            );
+
+            final wrongAuthor = _createTestDocumentEntity(
+              id: 'wrong-author',
+              ver: _buildUuidV7At(middle.add(const Duration(hours: 2))),
+              authors: author2.toString(),
+              categoryId: 'cat-1',
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Blockchain Project'},
+                },
+              },
+            );
+
+            final wrongCategory = _createTestDocumentEntity(
+              id: 'wrong-category',
+              ver: _buildUuidV7At(middle.add(const Duration(hours: 1))),
+              authors: author1.toString(),
+              categoryId: 'cat-2',
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Blockchain Project'},
+                },
+              },
+            );
+
+            final wrongTitle = _createTestDocumentEntity(
+              id: 'wrong-title',
+              ver: _buildUuidV7At(middle),
+              authors: author1.toString(),
+              categoryId: 'cat-1',
+              contentData: {
+                'setup': {
+                  'title': {'title': 'Other Project'},
+                },
+              },
+            );
+
+            await db.documentsV2Dao.saveAll([
+              matchingProposal,
+              wrongAuthor,
+              wrongCategory,
+              wrongTitle,
+            ]);
+
+            const request = PageRequest(page: 0, size: 10);
+            final result = await dao.getProposalsBriefPage(
+              request: request,
+              filters: ProposalsFiltersV2(
+                author: author1,
+                categoryId: 'cat-1',
+                searchQuery: 'Blockchain',
+              ),
+            );
+
+            expect(result.items.length, 1);
+            expect(result.total, 1);
+            expect(result.items[0].proposal.id, 'matching');
+          });
+        });
+      });
     });
   });
 }
@@ -2702,6 +3493,28 @@ String _buildUuidV7At(DateTime dateTime) {
   final ts = dateTime.millisecondsSinceEpoch;
   final rand = Uint8List.fromList([42, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
   return const UuidV7().generate(options: V7Options(ts, rand));
+}
+
+CatalystId _createTestAuthor({
+  String? name,
+  int role0KeySeed = 0,
+}) {
+  final buffer = StringBuffer('id.catalyst://');
+  final role0Key = Uint8List.fromList(List.filled(32, role0KeySeed));
+
+  if (name != null) {
+    buffer
+      ..write(name)
+      ..write('@');
+  }
+
+  buffer
+    ..write('preprod.cardano/')
+    ..write(base64UrlNoPadEncode(role0Key));
+
+  final uri = Uri.parse(buffer.toString());
+
+  return CatalystId.fromUri(uri);
 }
 
 DocumentEntityV2 _createTestDocumentEntity({

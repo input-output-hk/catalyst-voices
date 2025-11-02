@@ -146,6 +146,55 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     );
   }
 
+  List<String> _buildFilterClauses(ProposalsFiltersV2 filters) {
+    final clauses = <String>[];
+
+    if (filters.status != null) {
+      final statusValue = filters.status == ProposalStatusFilter.draft ? 'draft' : 'final';
+      clauses.add("ep.action_type = '$statusValue'");
+    }
+
+    if (filters.isFavorite != null) {
+      clauses.add(
+        filters.isFavorite!
+            ? 'dlm.is_favorite = 1'
+            : '(dlm.is_favorite IS NULL OR dlm.is_favorite = 0)',
+      );
+    }
+
+    if (filters.author != null) {
+      // TODO(damian): .toSignificant().toUri().toString()
+      final authorUri = filters.author.toString();
+      final escapedAuthor = _escapeForSqlLike(authorUri);
+      clauses.add("p.authors LIKE '%$escapedAuthor%' ESCAPE '\\'");
+    }
+
+    if (filters.categoryId != null) {
+      final escapedCategory = _escapeSqlString(filters.categoryId!);
+      clauses.add("p.category_id = '$escapedCategory'");
+    }
+
+    if (filters.searchQuery != null && filters.searchQuery!.isNotEmpty) {
+      final escapedQuery = _escapeForSqlLike(filters.searchQuery!);
+      clauses.add(
+        '''
+        (
+          p.authors LIKE '%$escapedQuery%' ESCAPE '\\' OR
+          json_extract(p.content, '\$.setup.proposer.applicant') LIKE '%$escapedQuery%' ESCAPE '\\' OR
+          json_extract(p.content, '\$.setup.title.title') LIKE '%$escapedQuery%' ESCAPE '\\'
+        )''',
+      );
+    }
+
+    if (filters.latestUpdate != null) {
+      final cutoffTime = DateTime.now().subtract(filters.latestUpdate!);
+      final escapedTimestamp = _escapeSqlString(cutoffTime.toIso8601String());
+      clauses.add("p.created_at >= '$escapedTimestamp'");
+    }
+
+    return clauses;
+  }
+
   String _buildOrderByClause(ProposalsOrder order) {
     return switch (order) {
       Alphabetical() =>
@@ -161,7 +210,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   String _buildPrefixedColumns(String tableAlias, String prefix) {
     return documentsV2.$columns
         .map((col) => '$tableAlias.${col.$name} as ${prefix}_${col.$name}')
-        .join(', \n');
+        .join(', \n      ');
   }
 
   /// Counts total number of effective (non-hidden) proposals.
@@ -180,7 +229,11 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   Selectable<int> _countVisibleProposals({
     required ProposalsFiltersV2 filters,
   }) {
-    const cteQuery = r'''
+    final filterClauses = _buildFilterClauses(filters);
+    final whereClause = filterClauses.isEmpty ? '' : 'AND ${filterClauses.join(' AND ')}';
+
+    final cteQuery =
+        '''
     WITH latest_proposals AS (
       SELECT id, MAX(ver) as max_ver
       FROM documents_v2
@@ -196,19 +249,32 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     action_status AS (
       SELECT 
         a.ref_id,
-        json_extract(a.content, '$.action') as action_type
+        a.ref_ver,
+        COALESCE(json_extract(a.content, '\$.action'), 'draft') as action_type
       FROM documents_v2 a
       INNER JOIN latest_actions la ON a.ref_id = la.ref_id AND a.ver = la.max_action_ver
       WHERE a.type = ?
     ),
-    hidden_proposals AS (
-      SELECT ref_id
-      FROM action_status
-      WHERE action_type = 'hide'
+    effective_proposals AS (
+      SELECT 
+        lp.id,
+        CASE 
+          WHEN ast.action_type = 'final' AND ast.ref_ver IS NOT NULL AND ast.ref_ver != '' THEN ast.ref_ver
+          ELSE lp.max_ver
+        END as ver,
+        ast.action_type
+      FROM latest_proposals lp
+      LEFT JOIN action_status ast ON lp.id = ast.ref_id
+      WHERE NOT EXISTS (
+        SELECT 1 FROM action_status hidden 
+        WHERE hidden.ref_id = lp.id AND hidden.action_type = 'hide'
+      )
     )
-    SELECT COUNT(DISTINCT lp.id) as total
-    FROM latest_proposals lp
-    WHERE lp.id NOT IN (SELECT ref_id FROM hidden_proposals)
+    SELECT COUNT(DISTINCT ep.id) as total
+    FROM effective_proposals ep
+    INNER JOIN documents_v2 p ON ep.id = p.id AND ep.ver = p.ver
+    LEFT JOIN documents_local_metadata dlm ON p.id = dlm.id
+    WHERE p.type = ? $whereClause
   ''';
 
     return customSelect(
@@ -217,9 +283,22 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         Variable.withString(DocumentType.proposalDocument.uuid),
         Variable.withString(DocumentType.proposalActionDocument.uuid),
         Variable.withString(DocumentType.proposalActionDocument.uuid),
+        Variable.withString(DocumentType.proposalDocument.uuid),
       ],
-      readsFrom: {documentsV2},
+      readsFrom: {documentsV2, documentsLocalMetadata},
     ).map((row) => row.readNullable<int>('total') ?? 0);
+  }
+
+  String _escapeForSqlLike(String input) {
+    return input
+        .replaceAll(r'\', r'\\')
+        .replaceAll('%', r'\%')
+        .replaceAll('_', r'\_')
+        .replaceAll("'", "''");
+  }
+
+  String _escapeSqlString(String input) {
+    return input.replaceAll("'", "''");
   }
 
   /// Fetches paginated proposal pages using complex CTE logic.
@@ -235,6 +314,8 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     final proposalColumns = _buildPrefixedColumns('p', 'p');
     final templateColumns = _buildPrefixedColumns('t', 't');
     final orderByClause = _buildOrderByClause(order);
+    final filterClauses = _buildFilterClauses(filters);
+    final whereClause = filterClauses.isEmpty ? '' : 'AND ${filterClauses.join(' AND ')}';
 
     final cteQuery =
         '''
@@ -309,7 +390,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     LEFT JOIN comments_count cc ON p.id = cc.ref_id AND p.ver = cc.ref_ver
     LEFT JOIN documents_local_metadata dlm ON p.id = dlm.id
     LEFT JOIN documents_v2 t ON p.template_id = t.id AND p.template_ver = t.ver AND t.type = ?
-    WHERE p.type = ?
+    WHERE p.type = ? $whereClause
     ORDER BY $orderByClause
     LIMIT ? OFFSET ?
   ''';
