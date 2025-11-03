@@ -26,7 +26,7 @@ String _testAccountAuthorGetter(DocumentRef ref) {
 }
 
 String _v7() {
-  final config = u.V7Options(_time--, null);
+  final config = u.V7Options(_time -= 2000, null);
   return const u.Uuid().v7(config: config);
 }
 
