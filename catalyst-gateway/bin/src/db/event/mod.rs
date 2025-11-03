@@ -52,8 +52,8 @@ pub(crate) enum EventDBConnectionError {
     #[error("DB Pool uninitialized")]
     DbPoolUninitialized,
     /// Failed to get a DB Pool Connection
-    #[error("DB Pool connection is unavailable")]
-    PoolConnectionUnavailable,
+    #[error("DB Pool connection is unavailable, err: {0}")]
+    PoolConnectionUnavailable(String),
 }
 
 impl EventDB {
@@ -66,7 +66,7 @@ impl EventDB {
         let res = pool
             .get()
             .await
-            .map_err(|_| EventDBConnectionError::PoolConnectionUnavailable)?;
+            .map_err(|e| EventDBConnectionError::PoolConnectionUnavailable(e.to_string()))?;
         Ok(res)
     }
 
