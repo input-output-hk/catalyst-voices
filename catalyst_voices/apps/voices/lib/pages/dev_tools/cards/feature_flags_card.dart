@@ -43,7 +43,7 @@ class _FeatureFlagsTable extends StatelessWidget {
               ],
             ),
             // Features flags rows
-            ...state.features.values.map((info) {
+            ...state.featureFlags.values.map((info) {
               return TableRow(
                 decoration: info.isAvailable
                     ? null
@@ -111,7 +111,7 @@ class _FeatureTableCell extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = context.theme.textTheme;
     final colors = context.colors;
-    final feature = featureFlagInfo.feature;
+    final feature = featureFlagInfo.featureFlag;
     final isAvailable = featureFlagInfo.isAvailable;
 
     return Padding(
@@ -170,7 +170,7 @@ class _UserOverrideTableCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final feature = featureFlagInfo.feature;
+    final feature = featureFlagInfo.featureFlag;
     final isAvailable = featureFlagInfo.isAvailable;
     final cubit = context.read<FeatureFlagsCubit>();
     final userOverrideValue = isAvailable ? cubit.getUserOverride(feature) : null;

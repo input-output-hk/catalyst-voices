@@ -10,7 +10,13 @@ final class FeatureFlagsCubit extends Cubit<FeatureFlagsState> {
   StreamSubscription<List<FeatureFlagInfo>>? _subscription;
 
   FeatureFlagsCubit(this._featureFlagsService)
-    : super(FeatureFlagsState(features: _buildFeaturesMap(_featureFlagsService.getAllInfo()))) {
+    : super(
+        FeatureFlagsState(
+          featureFlags: _buildFeatureFlagsMap(
+            _featureFlagsService.getAllInfo(),
+          ),
+        ),
+      ) {
     _subscribeToChanges();
   }
 
@@ -20,27 +26,27 @@ final class FeatureFlagsCubit extends Cubit<FeatureFlagsState> {
     return super.close();
   }
 
-  bool? getUserOverride(Feature feature) {
-    return _featureFlagsService.getUserOverride(feature);
+  bool? getUserOverride(FeatureFlag featureFlag) {
+    return _featureFlagsService.getUserOverride(featureFlag);
   }
 
   void setUserOverride(
-    Feature feature, {
+    FeatureFlag featureFlag, {
     required bool? value,
   }) {
     _featureFlagsService.setUserOverride(
-      feature,
+      featureFlag,
       value: value,
     );
   }
 
   void _subscribeToChanges() {
     _subscription = _featureFlagsService.allInfoChanges.listen((allFeatures) {
-      emit(state.copyWith(features: _buildFeaturesMap(allFeatures)));
+      emit(state.copyWith(featureFlags: _buildFeatureFlagsMap(allFeatures)));
     });
   }
 
-  static Map<FeatureType, FeatureFlagInfo> _buildFeaturesMap(List<FeatureFlagInfo> infos) {
-    return {for (final info in infos) info.feature.type: info};
+  static Map<FeatureType, FeatureFlagInfo> _buildFeatureFlagsMap(List<FeatureFlagInfo> infos) {
+    return {for (final info in infos) info.featureFlag.type: info};
   }
 }

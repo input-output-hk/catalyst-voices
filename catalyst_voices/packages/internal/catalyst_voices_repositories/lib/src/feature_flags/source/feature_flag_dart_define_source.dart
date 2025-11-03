@@ -8,7 +8,7 @@ final class FeatureFlagDartDefineSource
 
   FeatureFlagDartDefineSource()
     : _defines = Map.fromEntries(
-        Features.allFeatures.map((feature) {
+        Features.allFeatureFlags.map((feature) {
           final value = _getEnvironmentValue(feature.type);
           if (value != null) {
             return MapEntry(feature.type, value);
@@ -20,18 +20,18 @@ final class FeatureFlagDartDefineSource
   FeatureFlagSourceType get sourceType => FeatureFlagSourceType.dartDefine;
 
   @override
-  bool? getValue(Feature feature) => _defines[feature.type];
+  bool? getValue(FeatureFlag featureFlag) => _defines[featureFlag.type];
 
   @override
   void setValue(
-    Feature feature, {
+    FeatureFlag featureFlag, {
     required bool? value,
   }) {
     throw ArgumentError('Cannot set value for Dart Define feature flags at runtime.');
   }
 
-  static bool? _getEnvironmentValue(FeatureType featureName) {
-    switch (featureName) {
+  static bool? _getEnvironmentValue(FeatureType featureType) {
+    switch (featureType) {
       case FeatureType.voting:
         return const bool.hasEnvironment(Features.votingEnvKey)
             ? const bool.fromEnvironment(Features.votingEnvKey)

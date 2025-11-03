@@ -17,26 +17,26 @@ abstract interface class FeatureFlagsService {
   /// Get info for all features
   List<FeatureFlagInfo> getAllInfo();
 
-  /// Get detailed information about a feature
-  FeatureFlagInfo getInfo(Feature feature);
+  /// Get detailed information about a feature flag
+  FeatureFlagInfo getInfo(FeatureFlag featureFlag);
 
-  /// Get user override value for a feature (null if not overridden)
-  bool? getUserOverride(Feature feature);
+  /// Get user override value for a feature flag (null if not overridden)
+  bool? getUserOverride(FeatureFlag featureFlag);
 
-  /// Check if a feature is available
-  bool isAvailable(Feature feature);
+  /// Check if a feature flag is available
+  bool isAvailable(FeatureFlag featureFlag);
 
-  /// Check if a feature is enabled
-  bool isEnabled(Feature feature);
+  /// Check if a feature flag is enabled
+  bool isEnabled(FeatureFlag featureFlag);
 
-  /// Set a user override feature and notify listeners
+  /// Set a user override feature flag and notify listeners
   void setUserOverride(
-    Feature feature, {
+    FeatureFlag featureFlag, {
     required bool? value,
   });
 
-  /// Watch changes for a specific feature
-  Stream<bool> watchFeature(Feature feature);
+  /// Watch changes for a specific feature flag
+  Stream<bool> watchFeatureFlag(FeatureFlag featureFlag);
 }
 
 final class FeatureFlagsServiceImpl implements FeatureFlagsService {
@@ -44,12 +44,13 @@ final class FeatureFlagsServiceImpl implements FeatureFlagsService {
 
   final _changeController = StreamController<List<FeatureFlagInfo>>.broadcast();
 
-  FeatureFlagsServiceImpl(this._featureFlagsRepository) {
-    _emitAllFeatures();
-  }
+  FeatureFlagsServiceImpl(this._featureFlagsRepository);
 
   @override
-  Stream<List<FeatureFlagInfo>> get allInfoChanges => _changeController.stream;
+  Stream<List<FeatureFlagInfo>> get allInfoChanges async* {
+    yield getAllInfo();
+    yield* _changeController.stream;
+  }
 
   @override
   Future<void> dispose() async {
@@ -62,45 +63,46 @@ final class FeatureFlagsServiceImpl implements FeatureFlagsService {
   }
 
   @override
-  FeatureFlagInfo getInfo(Feature feature) {
-    return _featureFlagsRepository.getInfo(feature);
+  FeatureFlagInfo getInfo(FeatureFlag featureFlag) {
+    return _featureFlagsRepository.getInfo(featureFlag);
   }
 
   @override
-  bool? getUserOverride(Feature feature) {
+  bool? getUserOverride(FeatureFlag featureFlag) {
     return _featureFlagsRepository.getSourceValue(
-      feature,
+      featureFlag,
       sourceType: FeatureFlagSourceType.userOverride,
     );
   }
 
   @override
-  bool isAvailable(Feature feature) {
-    return _featureFlagsRepository.isAvailable(feature);
+  bool isAvailable(FeatureFlag featureFlag) {
+    return _featureFlagsRepository.isAvailable(featureFlag);
   }
 
   @override
-  bool isEnabled(Feature feature) {
-    return _featureFlagsRepository.isEnabled(feature);
+  bool isEnabled(FeatureFlag featureFlag) {
+    return _featureFlagsRepository.isEnabled(featureFlag);
   }
 
   @override
   void setUserOverride(
-    Feature feature, {
+    FeatureFlag featureFlag, {
     required bool? value,
   }) {
     _featureFlagsRepository.setValue(
       sourceType: FeatureFlagSourceType.userOverride,
-      feature: feature,
+      featureFlag: featureFlag,
       value: value,
     );
     _emitAllFeatures();
   }
 
   @override
-  Stream<bool> watchFeature(Feature feature) {
-    return _changeController.stream.map((allFeatures) {
-      return allFeatures.firstWhere((info) => info.feature.type == feature.type).enabled;
+  Stream<bool> watchFeatureFlag(FeatureFlag featureFlag) async* {
+    yield isEnabled(featureFlag);
+    yield* _changeController.stream.map((allFeatures) {
+      return allFeatures.firstWhere((info) => info.featureFlag.type == featureFlag.type).enabled;
     }).distinct();
   }
 

@@ -12,10 +12,10 @@ abstract interface class FeatureFlagSource implements Comparable<FeatureFlagSour
   @override
   int compareTo(FeatureFlagSource other);
 
-  bool? getValue(Feature feature);
+  bool? getValue(FeatureFlag featureFlag);
 
   void setValue(
-    Feature feature, {
+    FeatureFlag featureFlag, {
     required bool? value,
   });
 }
