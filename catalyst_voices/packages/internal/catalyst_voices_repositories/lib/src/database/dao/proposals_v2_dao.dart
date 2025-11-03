@@ -439,7 +439,10 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         Variable.withString(DocumentType.proposalActionDocument.uuid),
         Variable.withString(DocumentType.proposalDocument.uuid),
       ],
-      readsFrom: {documentsV2, documentsLocalMetadata},
+      readsFrom: {
+        documentsV2,
+        if (filters.isFavorite != null) documentsLocalMetadata,
+      },
     ).map((row) => row.readNullable<int>('total') ?? 0);
   }
 
