@@ -99,6 +99,7 @@ abstract interface class ProposalRepository {
   Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
+    ProposalsFiltersV2 filters,
   });
 
   Stream<ProposalsCount> watchProposalsCount({
@@ -342,9 +343,10 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order = const UpdateDate.desc(),
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
     return _proposalsLocalSource
-        .watchProposalsBriefPage(request: request, order: order)
+        .watchProposalsBriefPage(request: request, order: order, filters: filters)
         .map((page) => page.map(_mapJoinedProposalBriefData));
   }
 

@@ -28,6 +28,7 @@ abstract interface class ProposalDocumentDataLocalSource {
   Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
+    ProposalsFiltersV2 filters,
   });
 
   Stream<ProposalsCount> watchProposalsCount({

@@ -166,9 +166,10 @@ final class DatabaseDocumentsDataSource
   Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order = const UpdateDate.desc(),
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
     return _database.proposalsV2Dao
-        .watchProposalsBriefPage(request: request, order: order)
+        .watchProposalsBriefPage(request: request, order: order, filters: filters)
         .map((page) => page.map((data) => data.toModel()));
   }
 

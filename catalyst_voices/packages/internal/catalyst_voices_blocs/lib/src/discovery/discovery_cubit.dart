@@ -161,7 +161,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     unawaited(_proposalsV2Sub?.cancel());
 
     _proposalsV2Sub = _proposalService
-        .watchProposalsBriefPage(
+        .watchProposalsBriefPageV2(
           request: const PageRequest(page: 0, size: _maxRecentProposalsCount),
         )
         .map((page) => page.items)
