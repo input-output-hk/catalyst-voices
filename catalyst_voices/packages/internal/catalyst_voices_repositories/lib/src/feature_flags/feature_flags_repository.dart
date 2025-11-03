@@ -15,10 +15,20 @@ abstract interface class FeatureFlagsRepository {
   /// Get detailed info about a feature flag (with highest priority source)
   FeatureFlagInfo getInfo(FeatureFlag featureFlag);
 
+  /// Get value for a [featureFlag] in a specific [sourceType] (null if not set)
+  bool? getSourceValue(
+    FeatureFlag featureFlag, {
+    required FeatureFlagSourceType sourceType,
+  });
+
+  /// Check if a feature flag is available for current environment
+  bool isAvailable(FeatureFlag featureFlag);
+
   /// Get value for a feature flag from sources (with highest priority source)
   bool isEnabled(FeatureFlag featureFlag);
 
   /// Set value for a feature flag in a specific source
+  /// Throws [ArgumentError] if feature flag is not available for environment or source is not found
   void setValue({
     required FeatureFlagSourceType sourceType,
     required FeatureFlag featureFlag,
@@ -47,12 +57,14 @@ final class FeatureFlagsRepositoryImpl implements FeatureFlagsRepository {
 
   @override
   FeatureFlagInfo getInfo(FeatureFlag featureFlag) {
-    final environmentSetting = featureFlag.getEnvironmentSetting(_environmentType);
-    if (!environmentSetting.available) {
+    final environmentSetting = _getEnvironmentSetting(featureFlag);
+    final isAvailable = environmentSetting.available;
+    if (!isAvailable) {
       return FeatureFlagInfo(
-        featureType: featureFlag.type,
+        featureFlag: featureFlag,
         enabled: false,
         sourceType: FeatureFlagSourceType.defaults,
+        isAvailable: isAvailable,
       );
     }
 
@@ -60,18 +72,37 @@ final class FeatureFlagsRepositoryImpl implements FeatureFlagsRepository {
       final value = source.getValue(featureFlag);
       if (value != null) {
         return FeatureFlagInfo(
-          featureType: featureFlag.type,
+          featureFlag: featureFlag,
           enabled: value,
           sourceType: source.sourceType,
+          isAvailable: isAvailable,
         );
       }
     }
 
     return FeatureFlagInfo(
-      featureType: featureFlag.type,
+      featureFlag: featureFlag,
       enabled: environmentSetting.enabledByDefault,
       sourceType: FeatureFlagSourceType.defaults,
+      isAvailable: isAvailable,
     );
+  }
+
+  @override
+  bool? getSourceValue(
+    FeatureFlag featureFlag, {
+    required FeatureFlagSourceType sourceType,
+  }) {
+    final isAvailableForEnvironment = isAvailable(featureFlag);
+    if (!isAvailableForEnvironment) {
+      return false;
+    }
+    return _sources.firstWhereOrNull((e) => e.sourceType == sourceType)?.getValue(featureFlag);
+  }
+
+  @override
+  bool isAvailable(FeatureFlag featureFlag) {
+    return _getEnvironmentSetting(featureFlag).available;
   }
 
   @override
@@ -85,10 +116,21 @@ final class FeatureFlagsRepositoryImpl implements FeatureFlagsRepository {
     required FeatureFlag featureFlag,
     required bool? value,
   }) {
+    final isAvailableForEnvironment = isAvailable(featureFlag);
+    if (!isAvailableForEnvironment) {
+      throw ArgumentError(
+        'Feature $featureFlag is not available for environment $_environmentType.',
+      );
+    }
+
     final source = _sources.firstWhereOrNull((s) => s.sourceType == sourceType);
     if (source == null) {
       throw ArgumentError('No source found for type $sourceType.');
     }
     source.setValue(featureFlag, value: value);
+  }
+
+  FeatureAppEnvironmentTypeSetting _getEnvironmentSetting(FeatureFlag featureFlag) {
+    return featureFlag.getEnvironmentSetting(_environmentType);
   }
 }

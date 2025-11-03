@@ -1,5 +1,7 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_models/src/config/app_environment.dart';
 import 'package:catalyst_voices_models/src/feature_flags/feature_app_environment_type_setting.dart';
+import 'package:catalyst_voices_models/src/feature_flags/feature_flag.dart';
+import 'package:catalyst_voices_models/src/feature_flags/feature_type.dart';
 
 abstract class Features {
   static const votingEnvKey = 'FEATURE_VOTING';

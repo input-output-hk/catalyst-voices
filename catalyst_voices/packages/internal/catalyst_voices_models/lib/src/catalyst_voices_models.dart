@@ -63,6 +63,7 @@ export 'document/validation/document_validator.dart';
 export 'document/values/grouped_tags.dart';
 export 'errors/errors.dart';
 export 'errors/sync_exception.dart';
+export 'feature_flags/feature_app_environment_type_setting.dart';
 export 'feature_flags/feature_flag.dart';
 export 'feature_flags/feature_flag_info.dart';
 export 'feature_flags/feature_flag_source_type.dart';

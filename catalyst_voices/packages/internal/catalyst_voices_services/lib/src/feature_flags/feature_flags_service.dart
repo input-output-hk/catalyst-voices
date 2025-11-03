@@ -20,6 +20,12 @@ abstract interface class FeatureFlagsService {
   /// Get detailed information about a feature flag
   FeatureFlagInfo getInfo(FeatureFlag featureFlag);
 
+  /// Get user override value for a feature flag (null if not overridden)
+  bool? getUserOverride(FeatureFlag featureFlag);
+
+  /// Check if a feature flag is available
+  bool isAvailable(FeatureFlag featureFlag);
+
   /// Check if a feature flag is enabled
   bool isEnabled(FeatureFlag featureFlag);
 
@@ -62,6 +68,19 @@ final class FeatureFlagsServiceImpl implements FeatureFlagsService {
   }
 
   @override
+  bool? getUserOverride(FeatureFlag featureFlag) {
+    return _featureFlagsRepository.getSourceValue(
+      featureFlag,
+      sourceType: FeatureFlagSourceType.userOverride,
+    );
+  }
+
+  @override
+  bool isAvailable(FeatureFlag featureFlag) {
+    return _featureFlagsRepository.isAvailable(featureFlag);
+  }
+
+  @override
   bool isEnabled(FeatureFlag featureFlag) {
     return _featureFlagsRepository.isEnabled(featureFlag);
   }
@@ -83,7 +102,7 @@ final class FeatureFlagsServiceImpl implements FeatureFlagsService {
   Stream<bool> watchFeatureFlag(FeatureFlag featureFlag) async* {
     yield isEnabled(featureFlag);
     yield* _changeController.stream.map((allFeatures) {
-      return allFeatures.firstWhere((info) => info.featureType == featureFlag.type).enabled;
+      return allFeatures.firstWhere((info) => info.featureFlag.type == featureFlag.type).enabled;
     }).distinct();
   }
 

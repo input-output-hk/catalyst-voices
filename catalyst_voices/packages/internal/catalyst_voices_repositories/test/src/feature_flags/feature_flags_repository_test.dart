@@ -18,7 +18,7 @@ void main() {
 
       expect(allInfo, hasLength(Features.allFeatureFlags.length));
       expect(
-        allInfo.map((e) => e.featureType).toSet(),
+        allInfo.map((e) => e.featureFlag.type).toSet(),
         equals(Features.allFeatureFlags.map((e) => e.type).toSet()),
       );
     });
@@ -32,7 +32,7 @@ void main() {
 
         final info = repository.getInfo(Features.voting);
 
-        expect(info.featureType, equals(FeatureType.voting));
+        expect(info.featureFlag.type, equals(FeatureType.voting));
         expect(info.enabled, isFalse);
         expect(info.sourceType, equals(FeatureFlagSourceType.defaults));
       });
