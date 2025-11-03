@@ -139,6 +139,30 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<int> getVisibleProposalsCount({
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+  }) {
+    final campaign = filters.campaign;
+    if (campaign != null) {
+      assert(
+        campaign.categoriesIds.length <= 100,
+        'Campaign filter with more than 100 categories may impact performance. '
+        'Consider pagination or alternative filtering strategy.',
+      );
+
+      if (campaign.categoriesIds.isEmpty) {
+        return Future.value(0);
+      }
+
+      if (filters.categoryId != null && !campaign.categoriesIds.contains(filters.categoryId)) {
+        return Future.value(0);
+      }
+    }
+
+    return _countVisibleProposals(filters: filters).getSingle();
+  }
+
+  @override
   Future<void> updateProposalFavorite({
     required String id,
     required bool isFavorite,
@@ -205,6 +229,30 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         maxPerPage: effectiveSize,
       ),
     );
+  }
+
+  @override
+  Stream<int> watchVisibleProposalsCount({
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+  }) {
+    final campaign = filters.campaign;
+    if (campaign != null) {
+      assert(
+        campaign.categoriesIds.length <= 100,
+        'Campaign filter with more than 100 categories may impact performance. '
+        'Consider pagination or alternative filtering strategy.',
+      );
+
+      if (campaign.categoriesIds.isEmpty) {
+        return Stream.value(0);
+      }
+
+      if (filters.categoryId != null && !campaign.categoriesIds.contains(filters.categoryId)) {
+        return Stream.value(0);
+      }
+    }
+
+    return _countVisibleProposals(filters: filters).watchSingle();
   }
 
   /// Builds SQL WHERE clauses from the provided filters.
@@ -677,6 +725,20 @@ abstract interface class ProposalsV2Dao {
     ProposalsFiltersV2 filters,
   });
 
+  /// Counts the total number of visible proposals that match the given filters.
+  ///
+  /// This method respects the same status handling logic as [getProposalsBriefPage],
+  /// ensuring the count is consistent with the total items that would be paginated.
+  /// It is more efficient than fetching all pages to get a total count.
+  ///
+  /// **Parameters:**
+  /// - [filters]: Optional filters to apply before counting.
+  ///
+  /// **Returns:** The total number of visible proposals.
+  Future<int> getVisibleProposalsCount({
+    ProposalsFiltersV2 filters,
+  });
+
   /// Updates the favorite status of a proposal.
   ///
   /// Manages local metadata to mark proposals as favorites.
@@ -713,6 +775,22 @@ abstract interface class ProposalsV2Dao {
   Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
+    ProposalsFiltersV2 filters,
+  });
+
+  /// Watches for changes and emits the total count of visible proposals.
+  ///
+  /// Provides a reactive stream that emits a new integer count whenever the
+  /// underlying data changes in a way that affects the total number of
+  /// visible proposals matching the filters.
+  ///
+  /// **Parameters:**
+  /// - [filters]: Optional filters to apply before counting.
+  ///
+  /// **Reactivity:**
+  /// - Emits new count when documents_v2 changes (proposals, actions)
+  ///   that match the filter criteria.
+  Stream<int> watchVisibleProposalsCount({
     ProposalsFiltersV2 filters,
   });
 }

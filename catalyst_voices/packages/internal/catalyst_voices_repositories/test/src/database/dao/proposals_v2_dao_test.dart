@@ -31,6 +31,380 @@ void main() {
   });
 
   group(ProposalsV2Dao, () {
+    group('getVisibleProposalsCount', () {
+      final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
+      final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
+      final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
+
+      test('returns 0 for empty database', () async {
+        final result = await dao.getVisibleProposalsCount();
+
+        expect(result, 0);
+      });
+
+      test('returns correct count for proposals without actions', () async {
+        final entities = List.generate(
+          5,
+          (i) => _createTestDocumentEntity(
+            id: 'p-$i',
+            ver: _buildUuidV7At(earliest.add(Duration(hours: i))),
+          ),
+        );
+        await db.documentsV2Dao.saveAll(entities);
+
+        final result = await dao.getVisibleProposalsCount();
+
+        expect(result, 5);
+      });
+
+      test('counts only latest version of proposals with multiple versions', () async {
+        final entityOldV1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: _buildUuidV7At(earliest),
+        );
+        final entityNewV1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: _buildUuidV7At(latest),
+        );
+        final entityOldV2 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: _buildUuidV7At(earliest),
+        );
+        final entityNewV2 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: _buildUuidV7At(middle),
+        );
+        await db.documentsV2Dao.saveAll([entityOldV1, entityNewV1, entityOldV2, entityNewV2]);
+
+        final result = await dao.getVisibleProposalsCount();
+
+        expect(result, 2);
+      });
+
+      test('excludes hidden proposals from count', () async {
+        final proposal1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: _buildUuidV7At(latest),
+        );
+
+        final proposal2Ver = _buildUuidV7At(latest);
+        final proposal2 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: proposal2Ver,
+        );
+
+        final hideAction = _createTestDocumentEntity(
+          id: 'action-hide',
+          ver: _buildUuidV7At(earliest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p2',
+          contentData: ProposalSubmissionActionDto.hide.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([proposal1, proposal2, hideAction]);
+
+        final result = await dao.getVisibleProposalsCount();
+
+        expect(result, 1);
+      });
+
+      test('excludes all versions when latest action is hide', () async {
+        final proposal1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: _buildUuidV7At(latest),
+        );
+
+        final proposal2V1 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: _buildUuidV7At(earliest),
+        );
+        final proposal2V2 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: _buildUuidV7At(middle),
+        );
+        final proposal2V3 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: _buildUuidV7At(latest),
+        );
+
+        final hideAction = _createTestDocumentEntity(
+          id: 'action-hide',
+          ver: _buildUuidV7At(latest.add(const Duration(hours: 1))),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p2',
+          contentData: ProposalSubmissionActionDto.hide.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([
+          proposal1,
+          proposal2V1,
+          proposal2V2,
+          proposal2V3,
+          hideAction,
+        ]);
+
+        final result = await dao.getVisibleProposalsCount();
+
+        expect(result, 1);
+      });
+
+      test('counts only proposals matching category filter', () async {
+        final proposal1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: _buildUuidV7At(latest),
+          categoryId: 'cat-1',
+        );
+
+        final proposal2 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: _buildUuidV7At(middle),
+          categoryId: 'cat-2',
+        );
+
+        final proposal3 = _createTestDocumentEntity(
+          id: 'p3',
+          ver: _buildUuidV7At(earliest),
+          categoryId: 'cat-3',
+        );
+
+        await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
+
+        final result = await dao.getVisibleProposalsCount(
+          filters: const ProposalsFiltersV2(categoryId: 'cat-1'),
+        );
+
+        expect(result, 1);
+      });
+
+      test('respects campaign categories filter', () async {
+        final proposal1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: _buildUuidV7At(latest),
+          categoryId: 'cat-1',
+        );
+
+        final proposal2 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: _buildUuidV7At(middle),
+          categoryId: 'cat-2',
+        );
+
+        final proposal3 = _createTestDocumentEntity(
+          id: 'p3',
+          ver: _buildUuidV7At(earliest),
+          categoryId: 'cat-3',
+        );
+
+        await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
+
+        final result = await dao.getVisibleProposalsCount(
+          filters: const ProposalsFiltersV2(
+            campaign: ProposalsCampaignFilters(categoriesIds: {'cat-1', 'cat-2'}),
+          ),
+        );
+
+        expect(result, 2);
+      });
+
+      test('returns 0 for empty campaign categories', () async {
+        final proposal1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: _buildUuidV7At(latest),
+          categoryId: 'cat-1',
+        );
+        await db.documentsV2Dao.saveAll([proposal1]);
+
+        final result = await dao.getVisibleProposalsCount(
+          filters: const ProposalsFiltersV2(
+            campaign: ProposalsCampaignFilters(categoriesIds: {}),
+          ),
+        );
+
+        expect(result, 0);
+      });
+
+      test('returns 0 when categoryId not in campaign categories', () async {
+        final proposal1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: _buildUuidV7At(latest),
+          categoryId: 'cat-1',
+        );
+        await db.documentsV2Dao.saveAll([proposal1]);
+
+        final result = await dao.getVisibleProposalsCount(
+          filters: const ProposalsFiltersV2(
+            campaign: ProposalsCampaignFilters(categoriesIds: {'cat-2', 'cat-3'}),
+            categoryId: 'cat-1',
+          ),
+        );
+
+        expect(result, 0);
+      });
+
+      test('respects status filter for draft proposals', () async {
+        final draftProposal = _createTestDocumentEntity(
+          id: 'draft-p',
+          ver: _buildUuidV7At(latest),
+        );
+
+        final finalProposalVer = _buildUuidV7At(middle);
+        final finalProposal = _createTestDocumentEntity(
+          id: 'final-p',
+          ver: finalProposalVer,
+        );
+
+        final finalAction = _createTestDocumentEntity(
+          id: 'action-final',
+          ver: _buildUuidV7At(earliest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'final-p',
+          refVer: finalProposalVer,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([draftProposal, finalProposal, finalAction]);
+
+        final result = await dao.getVisibleProposalsCount(
+          filters: const ProposalsFiltersV2(status: ProposalStatusFilter.draft),
+        );
+
+        expect(result, 1);
+      });
+
+      test('respects status filter for final proposals', () async {
+        final draftProposal = _createTestDocumentEntity(
+          id: 'draft-p',
+          ver: _buildUuidV7At(latest),
+        );
+
+        final finalProposalVer = _buildUuidV7At(middle);
+        final finalProposal = _createTestDocumentEntity(
+          id: 'final-p',
+          ver: finalProposalVer,
+        );
+
+        final finalAction = _createTestDocumentEntity(
+          id: 'action-final',
+          ver: _buildUuidV7At(earliest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'final-p',
+          refVer: finalProposalVer,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([draftProposal, finalProposal, finalAction]);
+
+        final result = await dao.getVisibleProposalsCount(
+          filters: const ProposalsFiltersV2(status: ProposalStatusFilter.aFinal),
+        );
+
+        expect(result, 1);
+      });
+
+      test('counts proposals with authors filter', () async {
+        final author1 = _createTestAuthor(name: 'author1');
+        final author2 = _createTestAuthor(name: 'author2', role0KeySeed: 1);
+
+        final proposal1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: _buildUuidV7At(latest),
+          authors: author1.toString(),
+        );
+
+        final proposal2 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: _buildUuidV7At(middle),
+          authors: author2.toString(),
+        );
+
+        final proposal3 = _createTestDocumentEntity(
+          id: 'p3',
+          ver: _buildUuidV7At(earliest),
+          authors: author1.toString(),
+        );
+
+        await db.documentsV2Dao.saveAll([proposal1, proposal2, proposal3]);
+
+        final result = await dao.getVisibleProposalsCount(
+          filters: ProposalsFiltersV2(author: author1),
+        );
+
+        expect(result, 2);
+      });
+
+      test('ignores non-proposal documents in count', () async {
+        final proposal = _createTestDocumentEntity(
+          id: 'p1',
+          ver: _buildUuidV7At(latest),
+        );
+
+        final comment = _createTestDocumentEntity(
+          id: 'c1',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.commentDocument,
+        );
+
+        final template = _createTestDocumentEntity(
+          id: 't1',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalTemplate,
+        );
+
+        await db.documentsV2Dao.saveAll([proposal, comment, template]);
+
+        final result = await dao.getVisibleProposalsCount();
+
+        expect(result, 1);
+      });
+    });
+
+    group('updateProposalFavorite', () {
+      test('marks proposal as favorite when isFavorite is true', () async {
+        await dao.updateProposalFavorite(id: 'p1', isFavorite: true);
+
+        final metadata = await (db.select(
+          db.documentsLocalMetadata,
+        )..where((tbl) => tbl.id.equals('p1'))).getSingleOrNull();
+
+        expect(metadata, isNotNull);
+        expect(metadata!.id, 'p1');
+        expect(metadata.isFavorite, true);
+      });
+
+      test('removes favorite status when isFavorite is false', () async {
+        await dao.updateProposalFavorite(id: 'p1', isFavorite: true);
+
+        await dao.updateProposalFavorite(id: 'p1', isFavorite: false);
+
+        final metadata = await (db.select(
+          db.documentsLocalMetadata,
+        )..where((tbl) => tbl.id.equals('p1'))).getSingleOrNull();
+
+        expect(metadata, isNull);
+      });
+
+      test('does nothing when removing non-existent favorite', () async {
+        await dao.updateProposalFavorite(id: 'p1', isFavorite: false);
+
+        final metadata = await (db.select(
+          db.documentsLocalMetadata,
+        )..where((tbl) => tbl.id.equals('p1'))).getSingleOrNull();
+
+        expect(metadata, isNull);
+      });
+
+      test('can mark multiple proposals as favorites', () async {
+        await dao.updateProposalFavorite(id: 'p1', isFavorite: true);
+        await dao.updateProposalFavorite(id: 'p2', isFavorite: true);
+        await dao.updateProposalFavorite(id: 'p3', isFavorite: true);
+
+        final favorites = await db.select(db.documentsLocalMetadata).get();
+
+        expect(favorites.length, 3);
+        expect(favorites.map((e) => e.id).toSet(), {'p1', 'p2', 'p3'});
+      });
+    });
+
     group('getProposalsBriefPage', () {
       final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
       final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
