@@ -1043,7 +1043,7 @@
                         "verifiable_builder_credentials": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Verifiable Builder Credentials:",
-                            "title": "I confirm that a plan for creating and maintaining clear, comprehensive documentation is a core part of the proposal's scope."
+                            "title": "I confirm that the team provides evidence of their technical ability and experience in creating developer tools or high-quality technical content (e.g., GitHub, portfolio)."
                         },
                         "quality_documentation": {
                             "$ref": "#/definitions/agreementConfirmation",
