@@ -1030,7 +1030,7 @@
                         "tier_one_collaboration": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": " Tier-1 Collaboration:",
-                            "title": "I confirm that there is evidence of collaboration with a qualified Tier-1 enterprise is provided."
+                            "title": "I confirm that evidence of collaboration with a qualified Tier-1 enterprise is provided."
                         },
                         "catalyst_standing": {
                             "$ref": "#/definitions/agreementConfirmation",

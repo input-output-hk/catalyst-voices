@@ -1048,7 +1048,7 @@
                         "quality_documentation": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "High-Quality Documentation:",
-                            "title": "I confirm that there is a plan for creating and maintaining clear, comprehensive documentation is a core part of the proposal's scope."
+                            "title": "I confirm that a plan for creating and maintaining clear, comprehensive documentation is a core part of the proposal's scope."
                         },
                         "realistic_scope": {
                             "$ref": "#/definitions/agreementConfirmation",
