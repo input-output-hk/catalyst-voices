@@ -86,13 +86,10 @@ final class ProposalsRoute extends GoRouteData with FadePageTransitionMixin {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    final categoryId = this.categoryId;
-    final categoryRef = categoryId != null ? SignedDocumentRef(id: categoryId) : null;
-
     final tab = ProposalsPageTab.values.asNameMap()[this.tab];
 
     return ProposalsPage(
-      categoryId: categoryRef,
+      categoryId: categoryId,
       tab: tab,
     );
   }

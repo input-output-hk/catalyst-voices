@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ProposalsPage extends StatefulWidget {
-  final SignedDocumentRef? categoryId;
+  final String? categoryId;
   final ProposalsPageTab? tab;
 
   const ProposalsPage({
@@ -54,15 +54,15 @@ class _ProposalsPageState extends State<ProposalsPage>
 
   @override
   void didUpdateWidget(ProposalsPage oldWidget) {
+    print('ProposalsPage.didUpdateWidget');
     super.didUpdateWidget(oldWidget);
 
     final tab = widget.tab ?? ProposalsPageTab.total;
 
     if (widget.categoryId != oldWidget.categoryId || widget.tab != oldWidget.tab) {
       context.read<ProposalsCubit>().changeFilters(
-        onlyMy: Optional(tab == ProposalsPageTab.my),
         category: Optional(widget.categoryId),
-        type: tab.filter,
+        tab: Optional(tab),
       );
 
       _doResetPagination();
@@ -75,6 +75,7 @@ class _ProposalsPageState extends State<ProposalsPage>
 
   @override
   void dispose() {
+    print('ProposalsPage.dispose');
     _tabController.dispose();
     _pagingController.dispose();
     unawaited(_tabsSubscription.cancel());
@@ -103,6 +104,7 @@ class _ProposalsPageState extends State<ProposalsPage>
 
   @override
   void initState() {
+    print('ProposalsPage.initState');
     super.initState();
 
     final proposalsCubit = context.read<ProposalsCubit>();
@@ -128,10 +130,8 @@ class _ProposalsPageState extends State<ProposalsPage>
     ).distinct().listen(_updateTabsIfNeeded);
 
     proposalsCubit.init(
-      onlyMyProposals: selectedTab == ProposalsPageTab.my,
-      category: widget.categoryId,
-      type: selectedTab.filter,
-      order: const Alphabetical(),
+      categoryId: widget.categoryId,
+      tab: widget.tab ?? ProposalsPageTab.total,
     );
 
     _pagingController
@@ -175,7 +175,7 @@ class _ProposalsPageState extends State<ProposalsPage>
     ProposalsPageTab? tab,
   }) {
     Router.neglect(context, () {
-      final effectiveCategoryId = categoryId.dataOr(widget.categoryId?.id);
+      final effectiveCategoryId = categoryId.dataOr(widget.categoryId);
       final effectiveTab = tab?.name ?? widget.tab?.name;
 
       ProposalsRoute(

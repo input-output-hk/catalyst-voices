@@ -181,6 +181,13 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Stream<int> watchProposalsCountV2({
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+  }) {
+    return _database.proposalsV2Dao.watchVisibleProposalsCount(filters: filters);
+  }
+
+  @override
   Stream<Page<ProposalDocumentData>> watchProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,

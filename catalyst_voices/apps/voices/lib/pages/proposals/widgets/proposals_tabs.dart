@@ -3,7 +3,6 @@ import 'package:catalyst_voices/widgets/tabbar/voices_tab_bar.dart';
 import 'package:catalyst_voices/widgets/tabbar/voices_tab_controller.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +16,7 @@ class ProposalsTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<ProposalsCubit, ProposalsState, ProposalsCount>(
+    return BlocSelector<ProposalsCubit, ProposalsState, Map<ProposalsPageTab, int>>(
       selector: (state) => state.count,
       builder: (context, state) {
         return _ProposalsTabs(
@@ -30,7 +29,7 @@ class ProposalsTabs extends StatelessWidget {
 }
 
 class _ProposalsTabs extends StatelessWidget {
-  final ProposalsCount data;
+  final Map<ProposalsPageTab, int> data;
   final VoicesTabController<ProposalsPageTab> controller;
 
   const _ProposalsTabs({
@@ -51,7 +50,7 @@ class _ProposalsTabs extends StatelessWidget {
           VoicesTab(
             data: tab,
             key: tab.tabKey(),
-            child: VoicesTabText(tab.noOf(context, count: data.ofType(tab.filter))),
+            child: VoicesTabText(tab.noOf(context, count: data[tab] ?? 0)),
           ),
       ],
     );

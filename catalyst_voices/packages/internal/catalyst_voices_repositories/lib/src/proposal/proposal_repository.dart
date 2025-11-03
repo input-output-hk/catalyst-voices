@@ -106,6 +106,10 @@ abstract interface class ProposalRepository {
     required ProposalsCountFilters filters,
   });
 
+  Stream<int> watchProposalsCountV2({
+    ProposalsFiltersV2 filters,
+  });
+
   Stream<Page<ProposalData>> watchProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
@@ -355,6 +359,13 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required ProposalsCountFilters filters,
   }) {
     return _proposalsLocalSource.watchProposalsCount(filters: filters);
+  }
+
+  @override
+  Stream<int> watchProposalsCountV2({
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+  }) {
+    return _proposalsLocalSource.watchProposalsCountV2(filters: filters);
   }
 
   @override

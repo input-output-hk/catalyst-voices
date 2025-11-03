@@ -31,6 +31,10 @@ abstract interface class ProposalDocumentDataLocalSource {
     ProposalsFiltersV2 filters,
   });
 
+  Stream<int> watchProposalsCountV2({
+    ProposalsFiltersV2 filters,
+  });
+
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
   });
