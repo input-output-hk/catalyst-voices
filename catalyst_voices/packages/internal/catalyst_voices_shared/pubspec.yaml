@@ -17,8 +17,8 @@ dependencies:
   convert: ^3.1.2
   cryptography_plus:
     git:
-      url: https://github.com/dt-iohk/dart-cryptography
-      ref: a75f7b22d65bba2c96d5cc7ab4ce7fa6682bee18
+      url: https://github.com/emz-hanauer/dart-cryptography
+      ref: 2eae39aa0f469cf065e67b760c9493b2628d3f8e
       path: cryptography/
   equatable: ^2.0.7
   fake_async: ^1.3.3
