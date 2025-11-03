@@ -10,17 +10,17 @@ final class FeatureFlagRuntimeSource with FeatureFlagSourceCompareTo implements 
   FeatureFlagSourceType get sourceType => FeatureFlagSourceType.runtimeSource;
 
   @override
-  bool? getValue(Feature feature) => _values[feature.type];
+  bool? getValue(FeatureFlag featureFlag) => _values[featureFlag.type];
 
   @override
   void setValue(
-    Feature feature, {
+    FeatureFlag featureFlag, {
     required bool? value,
   }) {
     if (value == null) {
-      _values.remove(feature.type);
+      _values.remove(featureFlag.type);
     } else {
-      _values[feature.type] = value;
+      _values[featureFlag.type] = value;
     }
   }
 }

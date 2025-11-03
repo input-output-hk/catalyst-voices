@@ -27,7 +27,7 @@ void main() {
 
     group('initialization', () {
       test('initial state contains all features', () {
-        expect(cubit.state.features, hasLength(Features.allFeatures.length));
+        expect(cubit.state.featureFlags, hasLength(Features.allFeatureFlags.length));
       });
 
       test('initial state reflects repository state', () {

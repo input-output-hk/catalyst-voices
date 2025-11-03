@@ -4,7 +4,7 @@ import 'package:catalyst_voices_models/src/feature_flags/feature_app_environment
 abstract class Features {
   static const votingEnvKey = 'FEATURE_VOTING';
 
-  static const voting = Feature(
+  static const voting = FeatureFlag(
     type: FeatureType.voting,
     description: 'Enable voting functionality',
     appEnvSettings: {
@@ -15,8 +15,8 @@ abstract class Features {
     },
   );
 
-  /// List of all features
-  static const allFeatures = <Feature>[voting];
+  /// List of all feature flags
+  static const allFeatureFlags = <FeatureFlag>[voting];
 
   Features._();
 }

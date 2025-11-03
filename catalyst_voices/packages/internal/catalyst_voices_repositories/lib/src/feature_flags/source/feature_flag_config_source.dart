@@ -12,11 +12,11 @@ final class FeatureFlagConfigSource with FeatureFlagSourceCompareTo implements F
   FeatureFlagSourceType get sourceType => FeatureFlagSourceType.config;
 
   @override
-  bool? getValue(Feature feature) => _config[feature.type];
+  bool? getValue(FeatureFlag featureFlag) => _config[featureFlag.type];
 
   @override
   void setValue(
-    Feature feature, {
+    FeatureFlag featureFlag, {
     required bool? value,
   }) {
     throw ArgumentError('Cannot set value for Config feature flags at runtime.');

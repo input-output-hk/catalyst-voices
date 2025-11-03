@@ -3,18 +3,18 @@ import 'package:catalyst_voices_models/src/feature_flags/feature_app_environment
 import 'package:catalyst_voices_models/src/feature_flags/feature_type.dart';
 import 'package:equatable/equatable.dart';
 
-final class Feature extends Equatable {
+final class FeatureFlag extends Equatable {
   final FeatureType type;
   final String description;
   final Map<AppEnvironmentType, FeatureAppEnvironmentTypeSetting> appEnvSettings;
 
-  const Feature({
+  const FeatureFlag({
     required this.type,
     required this.description,
     required this.appEnvSettings,
   });
 
-  Feature.allEnvironments({
+  FeatureFlag.allEnvironments({
     required this.type,
     required this.description,
     bool enabledByDefault = false,
@@ -26,7 +26,7 @@ final class Feature extends Equatable {
            ),
        };
 
-  Feature.fullyEnabled({
+  FeatureFlag.fullyEnabled({
     required this.type,
     required this.description,
   }) : appEnvSettings = {

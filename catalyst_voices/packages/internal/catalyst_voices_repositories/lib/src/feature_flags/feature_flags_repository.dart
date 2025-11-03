@@ -9,19 +9,19 @@ abstract interface class FeatureFlagsRepository {
     AppConfig appConfig,
   ) = FeatureFlagsRepositoryImpl;
 
-  /// Get info for all features
+  /// Get info for all feature flags
   List<FeatureFlagInfo> getAllInfo();
 
-  /// Get detailed info about a feature (with highest priority source)
-  FeatureFlagInfo getInfo(Feature feature);
+  /// Get detailed info about a feature flag (with highest priority source)
+  FeatureFlagInfo getInfo(FeatureFlag featureFlag);
 
-  /// Get value for a feature from sources (with highest priority source)
-  bool isEnabled(Feature feature);
+  /// Get value for a feature flag from sources (with highest priority source)
+  bool isEnabled(FeatureFlag featureFlag);
 
-  /// Set value for a feature in a specific source
+  /// Set value for a feature flag in a specific source
   void setValue({
     required FeatureFlagSourceType sourceType,
-    required Feature feature,
+    required FeatureFlag featureFlag,
     required bool? value,
   });
 }
@@ -42,25 +42,25 @@ final class FeatureFlagsRepositoryImpl implements FeatureFlagsRepository {
 
   @override
   List<FeatureFlagInfo> getAllInfo() {
-    return Features.allFeatures.map(getInfo).toList();
+    return Features.allFeatureFlags.map(getInfo).toList();
   }
 
   @override
-  FeatureFlagInfo getInfo(Feature feature) {
-    final environmentSetting = feature.getEnvironmentSetting(_environmentType);
+  FeatureFlagInfo getInfo(FeatureFlag featureFlag) {
+    final environmentSetting = featureFlag.getEnvironmentSetting(_environmentType);
     if (!environmentSetting.available) {
       return FeatureFlagInfo(
-        featureType: feature.type,
+        featureType: featureFlag.type,
         enabled: false,
         sourceType: FeatureFlagSourceType.defaults,
       );
     }
 
     for (final source in _sources) {
-      final value = source.getValue(feature);
+      final value = source.getValue(featureFlag);
       if (value != null) {
         return FeatureFlagInfo(
-          featureType: feature.type,
+          featureType: featureFlag.type,
           enabled: value,
           sourceType: source.sourceType,
         );
@@ -68,27 +68,27 @@ final class FeatureFlagsRepositoryImpl implements FeatureFlagsRepository {
     }
 
     return FeatureFlagInfo(
-      featureType: feature.type,
+      featureType: featureFlag.type,
       enabled: environmentSetting.enabledByDefault,
       sourceType: FeatureFlagSourceType.defaults,
     );
   }
 
   @override
-  bool isEnabled(Feature feature) {
-    return getInfo(feature).enabled;
+  bool isEnabled(FeatureFlag featureFlag) {
+    return getInfo(featureFlag).enabled;
   }
 
   @override
   void setValue({
     required FeatureFlagSourceType sourceType,
-    required Feature feature,
+    required FeatureFlag featureFlag,
     required bool? value,
   }) {
     final source = _sources.firstWhereOrNull((s) => s.sourceType == sourceType);
     if (source == null) {
       throw ArgumentError('No source found for type $sourceType.');
     }
-    source.setValue(feature, value: value);
+    source.setValue(featureFlag, value: value);
   }
 }

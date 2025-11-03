@@ -11,13 +11,13 @@ typedef FeatureFlagWidgetBuilder =
     );
 
 class FeatureFlagBuilder extends StatelessWidget {
-  final Feature feature;
+  final FeatureFlag featureFlag;
   final FeatureFlagWidgetBuilder builder;
   final Widget? child;
 
   const FeatureFlagBuilder({
     super.key,
-    required this.feature,
+    required this.featureFlag,
     required this.builder,
     this.child,
   });
@@ -25,7 +25,7 @@ class FeatureFlagBuilder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSelector<FeatureFlagsCubit, FeatureFlagsState, bool>(
-      selector: (state) => state.isEnabled(feature),
+      selector: (state) => state.isEnabled(featureFlag),
       builder: (context, isEnabled) {
         return builder(context, child, isEnabled);
       },

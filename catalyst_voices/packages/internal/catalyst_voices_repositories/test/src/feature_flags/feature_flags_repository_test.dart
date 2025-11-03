@@ -16,10 +16,10 @@ void main() {
     test('getAllInfo returns info for all features', () {
       final allInfo = repository.getAllInfo();
 
-      expect(allInfo, hasLength(Features.allFeatures.length));
+      expect(allInfo, hasLength(Features.allFeatureFlags.length));
       expect(
         allInfo.map((e) => e.featureType).toSet(),
-        equals(Features.allFeatures.map((e) => e.type).toSet()),
+        equals(Features.allFeatureFlags.map((e) => e.type).toSet()),
       );
     });
 
@@ -40,7 +40,7 @@ void main() {
       test('respects user override priority', () {
         repository.setValue(
           sourceType: FeatureFlagSourceType.userOverride,
-          feature: Features.voting,
+          featureFlag: Features.voting,
           value: false,
         );
 
@@ -53,7 +53,7 @@ void main() {
       test('respects runtime source when no user override', () {
         repository.setValue(
           sourceType: FeatureFlagSourceType.runtimeSource,
-          feature: Features.voting,
+          featureFlag: Features.voting,
           value: false,
         );
 
@@ -67,12 +67,12 @@ void main() {
         repository
           ..setValue(
             sourceType: FeatureFlagSourceType.runtimeSource,
-            feature: Features.voting,
+            featureFlag: Features.voting,
             value: false,
           )
           ..setValue(
             sourceType: FeatureFlagSourceType.userOverride,
-            feature: Features.voting,
+            featureFlag: Features.voting,
             value: true,
           );
 
@@ -86,7 +86,7 @@ void main() {
     test('isEnabled returns enabled state from getInfo', () {
       repository.setValue(
         sourceType: FeatureFlagSourceType.userOverride,
-        feature: Features.voting,
+        featureFlag: Features.voting,
         value: false,
       );
 
@@ -94,7 +94,7 @@ void main() {
 
       repository.setValue(
         sourceType: FeatureFlagSourceType.userOverride,
-        feature: Features.voting,
+        featureFlag: Features.voting,
         value: true,
       );
 
@@ -105,14 +105,14 @@ void main() {
       test('removes value when set to null', () {
         repository.setValue(
           sourceType: FeatureFlagSourceType.userOverride,
-          feature: Features.voting,
+          featureFlag: Features.voting,
           value: false,
         );
         expect(repository.isEnabled(Features.voting), isFalse);
 
         repository.setValue(
           sourceType: FeatureFlagSourceType.userOverride,
-          feature: Features.voting,
+          featureFlag: Features.voting,
           value: null,
         );
 
@@ -127,7 +127,7 @@ void main() {
         expect(
           () => repository.setValue(
             sourceType: FeatureFlagSourceType.config,
-            feature: Features.voting,
+            featureFlag: Features.voting,
             value: true,
           ),
           throwsArgumentError,
@@ -138,7 +138,7 @@ void main() {
         expect(
           () => repository.setValue(
             sourceType: FeatureFlagSourceType.dartDefine,
-            feature: Features.voting,
+            featureFlag: Features.voting,
             value: true,
           ),
           throwsArgumentError,
@@ -149,7 +149,7 @@ void main() {
         expect(
           () => repository.setValue(
             sourceType: FeatureFlagSourceType.defaults,
-            feature: Features.voting,
+            featureFlag: Features.voting,
             value: true,
           ),
           throwsArgumentError,

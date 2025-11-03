@@ -17,20 +17,20 @@ abstract interface class FeatureFlagsService {
   /// Get info for all features
   List<FeatureFlagInfo> getAllInfo();
 
-  /// Get detailed information about a feature
-  FeatureFlagInfo getInfo(Feature feature);
+  /// Get detailed information about a feature flag
+  FeatureFlagInfo getInfo(FeatureFlag featureFlag);
 
-  /// Check if a feature is enabled
-  bool isEnabled(Feature feature);
+  /// Check if a feature flag is enabled
+  bool isEnabled(FeatureFlag featureFlag);
 
-  /// Set a user override feature and notify listeners
+  /// Set a user override feature flag and notify listeners
   void setUserOverride(
-    Feature feature, {
+    FeatureFlag featureFlag, {
     required bool? value,
   });
 
-  /// Watch changes for a specific feature
-  Stream<bool> watchFeature(Feature feature);
+  /// Watch changes for a specific feature flag
+  Stream<bool> watchFeatureFlag(FeatureFlag featureFlag);
 }
 
 final class FeatureFlagsServiceImpl implements FeatureFlagsService {
@@ -57,33 +57,33 @@ final class FeatureFlagsServiceImpl implements FeatureFlagsService {
   }
 
   @override
-  FeatureFlagInfo getInfo(Feature feature) {
-    return _featureFlagsRepository.getInfo(feature);
+  FeatureFlagInfo getInfo(FeatureFlag featureFlag) {
+    return _featureFlagsRepository.getInfo(featureFlag);
   }
 
   @override
-  bool isEnabled(Feature feature) {
-    return _featureFlagsRepository.isEnabled(feature);
+  bool isEnabled(FeatureFlag featureFlag) {
+    return _featureFlagsRepository.isEnabled(featureFlag);
   }
 
   @override
   void setUserOverride(
-    Feature feature, {
+    FeatureFlag featureFlag, {
     required bool? value,
   }) {
     _featureFlagsRepository.setValue(
       sourceType: FeatureFlagSourceType.userOverride,
-      feature: feature,
+      featureFlag: featureFlag,
       value: value,
     );
     _emitAllFeatures();
   }
 
   @override
-  Stream<bool> watchFeature(Feature feature) async* {
-    yield isEnabled(feature);
+  Stream<bool> watchFeatureFlag(FeatureFlag featureFlag) async* {
+    yield isEnabled(featureFlag);
     yield* _changeController.stream.map((allFeatures) {
-      return allFeatures.firstWhere((info) => info.featureType == feature.type).enabled;
+      return allFeatures.firstWhere((info) => info.featureType == featureFlag.type).enabled;
     }).distinct();
   }
 
