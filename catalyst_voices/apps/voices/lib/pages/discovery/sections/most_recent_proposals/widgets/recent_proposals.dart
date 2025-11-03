@@ -3,7 +3,6 @@ import 'package:catalyst_voices/pages/discovery/sections/most_recent_proposals/w
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
@@ -77,7 +76,7 @@ class _ProposalsTitle extends StatelessWidget {
       key: const Key('MostRecentProposalsTitle'),
       context.l10n.mostRecent,
       style: context.textTheme.headlineLarge?.copyWith(
-        color: ThemeBuilder.buildTheme().colors.textOnPrimaryWhite,
+        color: context.colors.discoveryTextOnPrimaryWhite,
       ),
     );
   }
@@ -90,8 +89,8 @@ class _ViewAllProposalsButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       style: FilledButton.styleFrom(
-        backgroundColor: ThemeBuilder.buildTheme().colorScheme.onPrimary,
-        foregroundColor: ThemeBuilder.buildTheme().colorScheme.primary,
+        backgroundColor: context.colors.discoveryOnPrimary,
+        foregroundColor: context.colors.discoveryPrimary,
       ),
       child: Text(
         key: const Key('ViewAllProposalsBtn'),
