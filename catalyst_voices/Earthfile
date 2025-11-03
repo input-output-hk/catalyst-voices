@@ -127,6 +127,7 @@ build-web:
         --UPLOAD_DEBUG_SYMBOLS=$UPLOAD_DEBUG_SYMBOLS \
         --SENTRY_ORG='iohk-j4' \
         --SENTRY_PROJECT='catalyst-voices'
+        --WASM=true
     SAVE ARTIFACT --keep-ts web
 
 package:
