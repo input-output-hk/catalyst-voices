@@ -98,5 +98,17 @@ abstract class Configs {
 }
 ''';
 
+  static String invalidSentryDsn = '''
+{
+  "version": "0.1.0",
+  "createdAt": "2025-04-02T12:59:50.841808Z",
+  "sentry": {
+    "dsn": "https://example.com",
+    "environment": "dev",
+    "release": "1.0.0"
+  }
+}
+''';
+
   const Configs._();
 }
