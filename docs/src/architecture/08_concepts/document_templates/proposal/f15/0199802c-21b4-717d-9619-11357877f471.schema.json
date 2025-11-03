@@ -941,7 +941,7 @@
                                         "$ref": "#/definitions/dropDownSingleSelect",
                                         "title": "Progress",
                                         "description": "Current status of the milestone",
-                                        "x-placeholder": "Enter the percentage of overall project  completion progress for this milestone (10-100%)",
+                                        "x-placeholder": "Enter the percentage of overall project completion progress for this milestone (10-100%)",
                                         "enum": ["10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %", "80 %", "90 %", "100 %"]
                                     }
                                 }
@@ -1014,7 +1014,7 @@
             "properties": {
                 "self_assessment_checklist": {
                     "$ref": "#/definitions/section",
-                    "title": "Self-Assessment Checklist",  
+                    "title": "Self-Assessment Checklist",
                     "x-guidance": "Use this checklist to ensure your proposal meets all foundational and content requirements before submission.",
                     "properties": {
                         "legal_entity": {
@@ -1030,7 +1030,7 @@
                         "tier_one_collaboration": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": " Tier-1 Collaboration:",
-                            "title": "I confirm that there is evidence of collaboration with a qualified Tier-1 enterprise is provided."
+                            "title": "I confirm that evidence of collaboration with a qualified Tier-1 enterprise is provided."
                         },
                         "catalyst_standing": {
                             "$ref": "#/definitions/agreementConfirmation",

@@ -472,7 +472,7 @@
                             "$ref": "#/definitions/multiLineTextEntry",
                             "title": "Please provide details on the intellectual property (IP) status of your project outputs, including whether they will be released as open source or retained under another licence.",
                             "description": "Please provide here more information on the open source status of your project outputs",
-                            "x-placeholder": "If applicable, describe the IP  status of your project and the license type",
+                            "x-placeholder": "If applicable, describe the IP status of your project and the license type",
                             "maxLength": 500,
                             "x-guidance": "Open source licenses ensure intellectual property (IP) (such as source code) remains publicly accessible and licensed in a way that allows anyone to use, modify, and share the IP freely, typically under licenses approved by the Open Source Initiative.\n\nProprietary IP (such as source code) is not publicly available and the rights to use, modify, or redistribute the proprietary IP are restricted and typically reserved by the IP's owner.\n\nhttps://opensource.org/licenses"
                         }
@@ -516,7 +516,7 @@
                     "properties": {
                         "target": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Who you’re targeting, how you’ll reach them, and why this matters for Cardano.",
+                            "title": "Who you’re targeting, how you’ll reach them, and why this matters for Cardano?",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your rationale.",
                             "x-guidance": "Grassroots Growth & Onboarding\n\n- Number of new wallets created or ADA transactions initiated.\n- Growth in local/regional community participation.\n- Collaborations formed with local organizations, schools, or groups.",
@@ -525,7 +525,7 @@
                         },
                         "activities": {
                             "$ref": "#/definitions/multiLineTextEntryMarkdown",
-                            "title": "Provide a list of key activities of your project?",
+                            "title": "Provide a list of key activities of your project:",
                             "x-placeholder": "Please provide your rationale.",
                             "description": "Please provide your rationale.",
                             "x-guidance": "Education & Awareness\n\n- Number of educational sessions, workshops, or webinars held.\n- Total number of participants reached or trained, and retention rates.\n- Increase in Cardano-related knowledge (measured via pre/post surveys or quizzes).",
@@ -942,7 +942,7 @@
                                         "$ref": "#/definitions/dropDownSingleSelect",
                                         "title": "Progress",
                                         "description": "Current status of the milestone",
-                                        "x-placeholder": "Enter the percentage of overall project  completion progress for this milestone (10-100%)",
+                                        "x-placeholder": "Enter the percentage of overall project completion progress for this milestone (10-100%)",
                                         "enum": ["10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %", "80 %", "90 %", "100 %"]
                                     }
                                 }
@@ -1021,7 +1021,7 @@
                         "scope_fit": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "description": "Scope Fit:",
-                            "title": "I confirm that the proposal is a non-technical initiative, with ≤20% of the budget for tech support."                            
+                            "title": "I confirm that the proposal is a non-technical initiative, with ≤20% of the budget for tech support."
                         },
                         "relevant_experience": {
                             "$ref": "#/definitions/agreementConfirmation",
