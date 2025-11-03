@@ -26,10 +26,6 @@ final class FeatureFlagsCubit extends Cubit<FeatureFlagsState> {
     return super.close();
   }
 
-  bool? getUserOverride(FeatureFlag featureFlag) {
-    return _featureFlagsService.getUserOverride(featureFlag);
-  }
-
   void setUserOverride(
     FeatureFlag featureFlag, {
     required bool? value,

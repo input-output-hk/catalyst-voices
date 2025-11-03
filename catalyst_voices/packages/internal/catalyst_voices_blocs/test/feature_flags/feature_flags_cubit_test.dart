@@ -74,10 +74,6 @@ void main() {
     });
 
     group('user override', () {
-      test('getUserOverride returns null initially', () {
-        expect(cubit.getUserOverride(Features.voting), isNull);
-      });
-
       blocTest<FeatureFlagsCubit, FeatureFlagsState>(
         'setUserOverride emits new state',
         build: () => cubit,

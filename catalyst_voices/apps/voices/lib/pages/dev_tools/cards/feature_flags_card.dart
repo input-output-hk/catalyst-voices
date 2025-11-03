@@ -23,8 +23,9 @@ class _FeatureFlagsTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    return BlocBuilder<FeatureFlagsCubit, FeatureFlagsState>(
-      builder: (context, state) {
+    return BlocSelector<FeatureFlagsCubit, FeatureFlagsState, Map<FeatureType, FeatureFlagInfo>>(
+      selector: (state) => state.featureFlags,
+      builder: (context, featureFlags) {
         return Table(
           border: TableBorder.all(color: colors.outlineBorder),
           columnWidths: const {
@@ -43,7 +44,7 @@ class _FeatureFlagsTable extends StatelessWidget {
               ],
             ),
             // Features flags rows
-            ...state.featureFlags.values.map((info) {
+            ...featureFlags.values.map((info) {
               return TableRow(
                 decoration: info.isAvailable
                     ? null
@@ -173,7 +174,8 @@ class _UserOverrideTableCell extends StatelessWidget {
     final feature = featureFlagInfo.featureFlag;
     final isAvailable = featureFlagInfo.isAvailable;
     final cubit = context.read<FeatureFlagsCubit>();
-    final userOverrideValue = isAvailable ? cubit.getUserOverride(feature) : null;
+    final isUserOverride = featureFlagInfo.sourceType == FeatureFlagSourceType.userOverride;
+    final userOverrideValue = isAvailable && isUserOverride ? featureFlagInfo.enabled : null;
 
     return Padding(
       padding: const EdgeInsets.all(8),
