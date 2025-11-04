@@ -3,7 +3,13 @@ import 'dart:math';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:cryptography/cryptography.dart';
+import 'package:cryptography_plus/cryptography_plus.dart';
+// TODO(dt-iohk): It will no longer be necessary to import this after that PR is merged:
+// https://github.com/emz-hanauer/dart-cryptography/pull/17
+// ignore: implementation_imports
+import 'package:cryptography_plus/src/browser/browser_cryptography_when_not_browser.dart'
+    if (dart.library.js_interop) 'package:cryptography_plus/src/browser/browser_cryptography.dart'
+    as br;
 import 'package:flutter/foundation.dart';
 
 final _logger = Logger('LocalCryptoService');
@@ -19,6 +25,9 @@ final _logger = Logger('LocalCryptoService');
 ///
 /// Supports version for future changes.
 final class LocalCryptoService implements CryptoService {
+  /// The length for the aes secret in bytes.
+  static const int _aesSecretLength = 32;
+
   /// Salt length for key derivation.
   static const int _saltLength = 16;
 
@@ -63,7 +72,8 @@ final class LocalCryptoService implements CryptoService {
         throw CryptoAlgorithmUnsupported('Algorithm $version');
       }
 
-      final algorithm = AesGcm.with256bits();
+      // ignore: avoid_redundant_argument_values
+      final algorithm = br.BrowserCryptography().aesGcm(secretKeyLength: _aesSecretLength);
       final secretKey = SecretKey(key.sublist(_saltLength));
 
       final encryptedData = data.sublist(2);
@@ -146,7 +156,8 @@ final class LocalCryptoService implements CryptoService {
     required Uint8List key,
   }) {
     Future<Uint8List> run() async {
-      final algorithm = AesGcm.with256bits();
+      // ignore: avoid_redundant_argument_values
+      final algorithm = br.BrowserCryptography().aesGcm(secretKeyLength: _aesSecretLength);
       final secretKey = SecretKey(key.sublist(_saltLength));
 
       final checksum = _checksum;
