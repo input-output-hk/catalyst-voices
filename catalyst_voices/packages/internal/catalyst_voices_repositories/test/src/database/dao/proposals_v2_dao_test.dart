@@ -3680,7 +3680,9 @@ void main() {
               ver: _buildUuidV7At(middle),
               contentData: {
                 'setup': {
+                  /* cSpell:disable */
                   'title': {'title': 'testXcase'},
+                  /* cSpell:enable */
                 },
               },
             );
@@ -3734,7 +3736,9 @@ void main() {
             final proposal1 = _createTestDocumentEntity(
               id: 'p1',
               ver: _buildUuidV7At(latest),
+              /* cSpell:disable */
               categoryId: "cat'egory-1",
+              /* cSpell:enable */
             );
 
             final proposal2 = _createTestDocumentEntity(
