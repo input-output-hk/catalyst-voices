@@ -1,5 +1,5 @@
-import 'package:catalyst_voices_repositories/src/database/catalyst_database.steps.dart';
 import 'package:catalyst_voices_repositories/src/database/migration/from_3_to_4.dart';
+import 'package:catalyst_voices_repositories/src/database/migration/schema_versions.g.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 

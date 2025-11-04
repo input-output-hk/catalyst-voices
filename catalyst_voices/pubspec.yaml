@@ -115,7 +115,7 @@ melos:
 
     build-db-migration:
       run: |
-        melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev schema steps drift_schemas/catalyst_database lib/src/database/catalyst_database.steps.dart
+        melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev schema steps drift_schemas/catalyst_database lib/src/database/migration/schema_versions.g.dart
         melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev schema generate drift_schemas/catalyst_database test/src/database/migration/catalyst_database/generated/
         melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev schema generate --data-classes --companions drift_schemas/catalyst_database/ test/src/database/migration/catalyst_database/generated/
       description: |

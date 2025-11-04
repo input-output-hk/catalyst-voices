@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/src/database/catalyst_database.steps.dart';
+import 'package:catalyst_voices_repositories/src/database/migration/schema_versions.g.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.drift.dart';
@@ -13,6 +13,7 @@ import 'package:sqlite3/common.dart' as sqlite3 show jsonb;
 part 'from_3_to_4.g.dart';
 
 const _batchSize = 300;
+final _logger = Logger('Migration[3-4]');
 
 Future<void> from3To4(Migrator m, Schema4 schema) async {
   await m.createTable(schema.documentsV2);
@@ -51,38 +52,40 @@ Future<void> _migrateDocs(
   Schema4 schema, {
   required int batchSize,
 }) async {
-  final docsCount = await schema.documents.count().getSingleOrNull().then((value) => value ?? 0);
-  var docsOffset = 0;
+  await m.database.transaction(
+    () async {
+      final docsCount = await schema.documents.count().getSingleOrNull().then((e) => e ?? 0);
+      var docsOffset = 0;
 
-  while (docsOffset < docsCount) {
-    await m.database.batch((batch) async {
-      final query = schema.documents.select()..limit(batchSize, offset: docsOffset);
-      final oldDocs = await query.get();
+      while (docsOffset < docsCount) {
+        await m.database.batch((batch) async {
+          final query = schema.documents.select()..limit(batchSize, offset: docsOffset);
+          final oldDocs = await query.get();
 
-      final rows = <RawValuesInsertable<QueryRow>>[];
-      for (final oldDoc in oldDocs) {
-        final rawContent = oldDoc.read<Uint8List>('content');
-        final content = sqlite3.jsonb.decode(rawContent)! as Map<String, dynamic>;
+          final rows = <RawValuesInsertable<QueryRow>>[];
+          for (final oldDoc in oldDocs) {
+            final rawContent = oldDoc.read<Uint8List>('content');
+            final content = sqlite3.jsonb.decode(rawContent)! as Map<String, dynamic>;
 
-        final rawMetadata = oldDoc.read<Uint8List>('metadata');
-        final encodedMetadata = sqlite3.jsonb.decode(rawMetadata)! as Map<String, dynamic>;
-        final metadata = DocumentDataMetadataDtoDbV3.fromJson(encodedMetadata);
+            final rawMetadata = oldDoc.read<Uint8List>('metadata');
+            final encodedMetadata = sqlite3.jsonb.decode(rawMetadata)! as Map<String, dynamic>;
+            final metadata = DocumentDataMetadataDtoDbV3.fromJson(encodedMetadata);
 
-        final entity = metadata.toDocEntity(content: content);
+            final entity = metadata.toDocEntity(content: content);
 
-        final insertable = RawValuesInsertable<QueryRow>(entity.toColumns(true));
+            final insertable = RawValuesInsertable<QueryRow>(entity.toColumns(true));
 
-        rows.add(insertable);
+            rows.add(insertable);
+          }
+
+          batch.insertAll(schema.documentsV2, rows);
+          docsOffset += oldDocs.length;
+        });
       }
 
-      batch.insertAll(schema.documentsV2, rows);
-      docsOffset += oldDocs.length;
-    });
-  }
-
-  if (kDebugMode) {
-    print('Finished migrating docs[$docsOffset], totalCount[$docsCount]');
-  }
+      _logger.info('Finished migrating docs[$docsOffset], totalCount[$docsCount]');
+    },
+  );
 }
 
 Future<void> _migrateDrafts(
