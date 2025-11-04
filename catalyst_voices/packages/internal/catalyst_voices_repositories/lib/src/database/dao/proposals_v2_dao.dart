@@ -29,10 +29,8 @@ import 'package:rxdart/rxdart.dart';
 /// - For hide: Returns nothing (filtered out)
 ///
 /// **Performance Characteristics:**
-/// - Optimized for 10k+ documents
 /// - Uses composite indices for efficient GROUP BY and JOIN operations
 /// - Single-query CTE approach (no N+1 queries)
-/// - Typical query time: 20-50ms for paginated results
 @DriftAccessor(
   tables: [
     DocumentsV2,
@@ -81,10 +79,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// - idx_documents_v2_type_id_ver: For final document retrieval
   ///
   /// **Performance:**
-  /// - ~20-50ms for typical page query with 10k documents
-  /// - Uses covering indices to minimize table lookups
   /// - Single query with CTEs (no N+1 queries)
-  /// - Efficient pagination with LIMIT/OFFSET on final result set
   ///
   /// **Parameters:**
   /// - [request]: Pagination parameters (page number and size)
@@ -374,10 +369,6 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// - Applies same filter logic to ensure consistency
   /// - Counts DISTINCT proposal ids (not versions)
   /// - Faster than pagination query since no document joining needed
-  ///
-  /// **Performance:**
-  /// - ~10-20ms for 10k documents with proper indices
-  /// - Must match pagination query's filtering logic exactly
   ///
   /// **Returns:** Selectable<int> that can be used with getSingle() or watchSingle()
   Selectable<int> _countVisibleProposals({
@@ -718,7 +709,6 @@ abstract interface class ProposalsV2Dao {
   ///   - request.size: Items per page (clamped to 999 max)
   ///
   /// **Performance:**
-  ///   - Optimized for 10k+ documents with composite indices
   ///   - Single query with CTEs (no N+1 queries)
   ///
   /// **Returns:** Page object with items, total count, and pagination metadata
@@ -771,8 +761,6 @@ abstract interface class ProposalsV2Dao {
   ///
   /// **Performance:**
   /// - Same query optimization as [getProposalsBriefPage]
-  /// - Uses Drift's built-in stream debouncing
-  /// - Efficient incremental updates via SQLite triggers
   ///
   /// **Returns:** Stream of Page objects with current state
   Stream<Page<JoinedProposalBriefEntity>> watchProposalsBriefPage({
