@@ -15,6 +15,7 @@ dependencies:
     path: ../catalyst_voices_models
   collection: ^1.19.1
   convert: ^3.1.2
+  # TODO(dt-iohk): revert to pub.dev version once this is merged and released: https://github.com/emz-hanauer/dart-cryptography/pull/17
   cryptography_plus:
     git:
       url: https://github.com/emz-hanauer/dart-cryptography
