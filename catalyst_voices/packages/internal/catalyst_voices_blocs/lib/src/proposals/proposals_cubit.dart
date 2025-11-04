@@ -187,6 +187,8 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     DocumentRef ref, {
     required bool isFavorite,
   }) async {
+    _updateFavoriteProposalLocally(ref, isFavorite);
+
     try {
       if (isFavorite) {
         await _proposalService.addFavoriteProposal(ref: ref);
@@ -259,6 +261,8 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     if (requestCompleter != null && !requestCompleter.isCompleted) {
       requestCompleter.complete();
     }
+
+    _cache = _cache.copyWith(page: Optional(page));
 
     emitSignal(PageReadyProposalsSignal(page: page));
   }
@@ -355,5 +359,37 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     }
 
     return selectedOrder ?? const Alphabetical();
+  }
+
+  void _updateFavoriteProposalLocally(DocumentRef ref, bool isFavorite) {
+    final count = Map.of(state.count)
+      ..update(
+        ProposalsPageTab.favorites,
+        (value) => value + (isFavorite ? 1 : -1),
+        ifAbsent: () => (isFavorite ? 1 : 0),
+      );
+
+    emit(state.copyWith(count: Map.unmodifiable(count)));
+
+    final page = _cache.page;
+    if (page != null) {
+      var items = List.of(page.items);
+      if (_cache.tab != ProposalsPageTab.favorites || isFavorite) {
+        items = items
+            .map((e) => e.selfRef == ref ? e.copyWith(isFavorite: isFavorite) : e)
+            .toList();
+      } else {
+        items = items.where((element) => element.selfRef != ref).toList();
+      }
+
+      final diff = page.items.length - items.length;
+
+      final updatedPage = page.copyWith(
+        items: items,
+        total: page.total - diff,
+      );
+
+      _handleProposalsChange(updatedPage);
+    }
   }
 }

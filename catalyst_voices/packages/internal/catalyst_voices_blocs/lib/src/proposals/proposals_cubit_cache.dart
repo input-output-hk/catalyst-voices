@@ -9,6 +9,7 @@ final class ProposalsCubitCache extends Equatable {
   final ProposalsPageTab? tab;
   final ProposalsOrder? order;
   final List<CampaignCategory>? categories;
+  final Page<ProposalBrief>? page;
 
   const ProposalsCubitCache({
     this.campaign,
@@ -17,6 +18,7 @@ final class ProposalsCubitCache extends Equatable {
     this.filters = const ProposalsFiltersV2(),
     this.order,
     this.categories,
+    this.page,
   });
 
   @override
@@ -27,6 +29,7 @@ final class ProposalsCubitCache extends Equatable {
     filters,
     order,
     categories,
+    page,
   ];
 
   ProposalsCubitCache copyWith({
@@ -37,6 +40,7 @@ final class ProposalsCubitCache extends Equatable {
     Optional<ProposalsOrder>? order,
     Optional<List<CampaignCategory>>? categories,
     Map<ProposalsPageTab, ProposalsFiltersV2>? proposalsCountFilters,
+    Optional<Page<ProposalBrief>>? page,
   }) {
     return ProposalsCubitCache(
       campaign: campaign.dataOr(this.campaign),
@@ -45,6 +49,7 @@ final class ProposalsCubitCache extends Equatable {
       filters: filters ?? this.filters,
       order: order.dataOr(this.order),
       categories: categories.dataOr(this.categories),
+      page: page.dataOr(this.page),
     );
   }
 }
