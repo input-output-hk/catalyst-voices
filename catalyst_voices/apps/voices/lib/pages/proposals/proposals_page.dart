@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
+import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_content.dart';
 import 'package:catalyst_voices/pages/proposals/widgets/proposals_header.dart';
@@ -35,18 +36,29 @@ class _ProposalsPageState extends State<ProposalsPage>
         TickerProviderStateMixin,
         ErrorHandlerStateMixin<ProposalsCubit, ProposalsPage>,
         SignalHandlerStateMixin<ProposalsCubit, ProposalsSignal, ProposalsPage> {
+  late final _cubit = Dependencies.instance.get<ProposalsCubit>();
+
   late VoicesTabController<ProposalsPageTab> _tabController;
   late final PagingController<ProposalBrief> _pagingController;
   late final StreamSubscription<List<ProposalsPageTab>> _tabsSubscription;
 
   @override
+  ProposalsCubit get errorEmitter => _cubit;
+
+  @override
+  ProposalsCubit get signalEmitter => _cubit;
+
+  @override
   Widget build(BuildContext context) {
-    return ProposalSubmissionPhaseAware(
-      activeChild: HeaderAndContentLayout(
-        header: const ProposalsHeader(),
-        content: ProposalsContent(
-          tabController: _tabController,
-          pagingController: _pagingController,
+    return BlocProvider.value(
+      value: _cubit,
+      child: ProposalSubmissionPhaseAware(
+        activeChild: HeaderAndContentLayout(
+          header: const ProposalsHeader(),
+          content: ProposalsContent(
+            tabController: _tabController,
+            pagingController: _pagingController,
+          ),
         ),
       ),
     );
@@ -54,13 +66,12 @@ class _ProposalsPageState extends State<ProposalsPage>
 
   @override
   void didUpdateWidget(ProposalsPage oldWidget) {
-    print('ProposalsPage.didUpdateWidget');
     super.didUpdateWidget(oldWidget);
 
     final tab = widget.tab ?? ProposalsPageTab.total;
 
     if (widget.categoryId != oldWidget.categoryId || widget.tab != oldWidget.tab) {
-      context.read<ProposalsCubit>().changeFilters(
+      _cubit.changeFilters(
         category: Optional(widget.categoryId),
         tab: Optional(tab),
       );
@@ -75,7 +86,7 @@ class _ProposalsPageState extends State<ProposalsPage>
 
   @override
   void dispose() {
-    print('ProposalsPage.dispose');
+    unawaited(_cubit.close());
     _tabController.dispose();
     _pagingController.dispose();
     unawaited(_tabsSubscription.cancel());
@@ -104,12 +115,10 @@ class _ProposalsPageState extends State<ProposalsPage>
 
   @override
   void initState() {
-    print('ProposalsPage.initState');
     super.initState();
 
-    final proposalsCubit = context.read<ProposalsCubit>();
     final sessionCubit = context.read<SessionCubit>();
-    final supportedTabs = _determineTabs(sessionCubit.state.isProposerUnlock, proposalsCubit.state);
+    final supportedTabs = _determineTabs(sessionCubit.state.isProposerUnlock, _cubit.state);
     final selectedTab = _determineTab(supportedTabs, widget.tab);
 
     _tabController = VoicesTabController(
@@ -125,11 +134,11 @@ class _ProposalsPageState extends State<ProposalsPage>
 
     _tabsSubscription = Rx.combineLatest2(
       sessionCubit.watchState().map((e) => e.isProposerUnlock),
-      proposalsCubit.watchState(),
+      _cubit.watchState(),
       _determineTabs,
     ).distinct().listen(_updateTabsIfNeeded);
 
-    proposalsCubit.init(
+    _cubit.init(
       categoryId: widget.categoryId,
       tab: widget.tab ?? ProposalsPageTab.total,
     );
@@ -167,7 +176,7 @@ class _ProposalsPageState extends State<ProposalsPage>
     ProposalBrief? lastProposalId,
   ) async {
     final request = PageRequest(page: pageKey, size: pageSize);
-    await context.read<ProposalsCubit>().getProposals(request);
+    await _cubit.getProposals(request);
   }
 
   void _updateRoute({
