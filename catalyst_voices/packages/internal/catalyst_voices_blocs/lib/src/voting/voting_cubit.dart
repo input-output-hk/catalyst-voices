@@ -255,7 +255,7 @@ final class VotingCubit extends Cubit<VotingState>
             lastCastedVote: Optional(lastCastedVote.forProposal(proposal.selfRef)),
           ),
         );
-        return ProposalBriefVoting.fromProposalWithContext(
+        return ProposalBriefVoting.fromProposaWithContext(
           proposalWithContext,
           draftVote: _ballotBuilder.getVoteOn(proposal.selfRef),
           showComments: showComments,

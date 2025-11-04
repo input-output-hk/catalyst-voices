@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
@@ -517,11 +518,10 @@ final class ProposalServiceImpl implements ProposalService {
     ProposalsOrder order = const UpdateDate.desc(),
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    return _proposalRepository.watchProposalsBriefPage(
-      request: request,
-      order: order,
-      filters: filters,
-    );
+    // TODO(damian-molinski): add _ballotBuilder and expose stream
+    return _proposalRepository
+        .watchProposalsBriefPage(request: request, order: order, filters: filters)
+        .map((page) => page.map(_mapJoinedProposalBriefData));
   }
 
   @override
@@ -703,6 +703,28 @@ final class ProposalServiceImpl implements ProposalService {
 
   bool _isProposer(User user) {
     return user.activeAccount?.roles.contains(AccountRole.proposer) ?? false;
+  }
+
+  ProposalBriefData _mapJoinedProposalBriefData(JoinedProposalBriefData data) {
+    final proposal = data.proposal;
+    final isFinal = data.isFinal;
+
+    return ProposalBriefData(
+      selfRef: proposal.selfRef,
+      authorName: proposal.authorName ?? '',
+      title: proposal.title ?? '',
+      description: proposal.description ?? '',
+      categoryName: proposal.categoryName ?? '',
+      durationInMonths: proposal.durationInMonths ?? 0,
+      fundsRequested: proposal.fundsRequested ?? Money.zero(currency: Currencies.fallback),
+      createdAt: proposal.selfRef.version!.dateTime,
+      iteration: data.iteration,
+      commentsCount: isFinal ? null : data.commentsCount,
+      isFinal: isFinal,
+      isFavorite: data.isFavorite,
+      // TODO(damian-molinski): need more data. Votes are contextual to active account.
+      votes: isFinal ? const ProposalBriefDataVotes(draft: null, signed: null) : null,
+    );
   }
 
   Future<Page<Proposal>> _mapProposalDataPage(Page<ProposalData> page) async {

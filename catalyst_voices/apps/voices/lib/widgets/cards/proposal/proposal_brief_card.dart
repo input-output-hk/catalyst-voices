@@ -189,7 +189,7 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
   Widget build(BuildContext context) {
     final proposal = widget.proposal;
 
-    final voteData = proposal is ProposalBriefVoting ? proposal.voteData : null;
+    final voteData = proposal.voteData;
     final onVoteAction = widget.onVoteAction;
 
     return ConstrainedBox(

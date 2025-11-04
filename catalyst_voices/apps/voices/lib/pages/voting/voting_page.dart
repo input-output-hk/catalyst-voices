@@ -41,7 +41,7 @@ class _VotingPageState extends State<VotingPage>
         ErrorHandlerStateMixin<VotingCubit, VotingPage>,
         SignalHandlerStateMixin<VotingCubit, VotingSignal, VotingPage> {
   late VoicesTabController<VotingPageTab> _tabController;
-  late final PagingController<ProposalBriefVoting> _pagingController;
+  late final PagingController<ProposalBrief> _pagingController;
   late final StreamSubscription<List<VotingPageTab>> _tabsSubscription;
 
   @override
@@ -192,7 +192,7 @@ class _VotingPageState extends State<VotingPage>
   Future<void> _handleProposalsPageRequest(
     int pageKey,
     int pageSize,
-    ProposalBriefVoting? lastProposalId,
+    ProposalBrief? lastProposalId,
   ) async {
     final request = PageRequest(page: pageKey, size: pageSize);
     await context.read<VotingCubit>().getProposals(request);

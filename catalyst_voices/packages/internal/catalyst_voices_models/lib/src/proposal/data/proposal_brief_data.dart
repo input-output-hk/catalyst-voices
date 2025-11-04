@@ -11,9 +11,10 @@ final class ProposalBriefData extends Equatable {
   final Money fundsRequested;
   final DateTime createdAt;
   final int iteration;
-  final int commentsCount;
+  final int? commentsCount;
   final bool isFinal;
   final bool isFavorite;
+  final ProposalBriefDataVotes? votes;
 
   const ProposalBriefData({
     required this.selfRef,
@@ -21,13 +22,14 @@ final class ProposalBriefData extends Equatable {
     required this.title,
     required this.description,
     required this.categoryName,
-    required this.durationInMonths,
+    this.durationInMonths = 0,
     required this.fundsRequested,
     required this.createdAt,
-    required this.iteration,
-    required this.commentsCount,
-    required this.isFinal,
-    required this.isFavorite,
+    this.iteration = 1,
+    this.commentsCount,
+    this.isFinal = false,
+    this.isFavorite = false,
+    this.votes,
   });
 
   @override
@@ -44,5 +46,19 @@ final class ProposalBriefData extends Equatable {
     commentsCount,
     isFinal,
     isFavorite,
+    votes,
   ];
+}
+
+final class ProposalBriefDataVotes extends Equatable {
+  final Vote? draft;
+  final Vote? signed;
+
+  const ProposalBriefDataVotes({
+    this.draft,
+    this.signed,
+  });
+
+  @override
+  List<Object?> get props => [draft, signed];
 }
