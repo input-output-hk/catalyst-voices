@@ -11,11 +11,9 @@ import 'web_asset_versioner.dart';
 /// - build_dir: Path to the build/web directory (default: apps/voices/build/web)
 ///
 /// This script:
-/// 1. Calculates MD5 hash for each auto-versioned file
-/// 2. Renames files with hash in filename (e.g., flutter_bootstrap.abc12345.js)
-/// 3. Updates index.html with versioned flutter_bootstrap.js reference
-/// 4. Updates asset references in generated JavaScript files
-/// 5. Generates a manifest file with all versioned assets
+/// 1. Calculates MD5 hash for each auto-versioned file and renames them
+/// 2. Updates all asset references in HTML and JavaScript files
+/// 3. Generates a manifest file with all versioned assets
 Future<void> main(List<String> args) async {
   final parser = ArgParser()
     ..addOption(

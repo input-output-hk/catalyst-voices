@@ -18,7 +18,7 @@ class WebAssetVersioner {
     'canvaskit/chromium/canvaskit.wasm',
   ];
 
-  /// Large files that should be manually versioned
+  /// Hardcoded files that should be manually versioned
   /// (These are just for documentation/warning purposes)
   static const manuallyVersionedFiles = [
     'sqlite3.wasm',
@@ -27,7 +27,6 @@ class WebAssetVersioner {
     'catalyst_compression_bg.wasm',
   ];
   final String buildDir;
-
   final bool verbose;
 
   /// Maps original filename to versioned filename
@@ -50,13 +49,10 @@ class WebAssetVersioner {
     _log('Step 1: Calculating MD5 hashes and renaming files...');
     await _calculateHashesAndRenameFiles();
 
-    _log('\nStep 2: Updating index.html...');
-    await _updateIndexHtml();
+    _log('\nStep 2: Updating asset references in HTML and JavaScript files...');
+    await _updateAssetReferences();
 
-    _log('\nStep 3: Updating asset references in JavaScript files...');
-    await _updateJavaScriptReferences();
-
-    _log('\nStep 4: Generating version manifest...');
+    _log('\nStep 3: Generating version manifest...');
     await _generateManifest();
 
     _log('\nVersioning summary:');
@@ -84,7 +80,6 @@ class WebAssetVersioner {
       final versionedFilename = _createVersionedFilename(filePath, shortHash);
       final versionedFile = File(path.join(buildDir, versionedFilename));
 
-      // Rename the file
       await file.rename(versionedFile.path);
 
       // Store mapping: original -> versioned
@@ -120,7 +115,7 @@ class WebAssetVersioner {
     final manifestFile = File(path.join(buildDir, 'asset_versions.json'));
 
     final manifest = AssetVersionManifest(
-      generated: DateTime.now().toIso8601String(),
+      generated: DateTime.now().toUtc().toIso8601String(),
       versionedAssets: _versionMap,
       assetHashes: _hashMap,
       manuallyVersionedFiles: manuallyVersionedFiles.toList(),
@@ -139,50 +134,23 @@ class WebAssetVersioner {
     }
   }
 
-  Future<void> _updateIndexHtml() async {
-    final indexFile = File(path.join(buildDir, 'index.html'));
-
-    if (!indexFile.existsSync()) {
-      throw Exception('index.html not found in build directory');
-    }
-
-    String content = await indexFile.readAsString();
-
-    final versionedFilename = _versionMap['flutter_bootstrap.js'];
-    if (versionedFilename != null) {
-      final patterns = [
-        RegExp(r'src="flutter_bootstrap\.js(?:\?v=[^"]*)?"\s*'),
-        RegExp(r"src='flutter_bootstrap\.js(?:\?v=[^']*)?'\s*"),
-        RegExp(r'src="flutter_bootstrap\.[a-f0-9]{8}\.js"\s*'),
-        RegExp(r"src='flutter_bootstrap\.[a-f0-9]{8}\.js'\s*"),
-      ];
-
-      bool updated = false;
-      for (final pattern in patterns) {
-        if (pattern.hasMatch(content)) {
-          content = content.replaceAll(pattern, 'src="$versionedFilename" ');
-          updated = true;
-        }
-      }
-
-      if (updated) {
-        _log('✓ Updated flutter_bootstrap.js reference in index.html');
-      }
-    }
-
-    await indexFile.writeAsString(content);
-  }
-
-  Future<void> _updateJavaScriptReferences() async {
-    final jsFiles = await Directory(buildDir)
+  /// Updates all asset references in HTML and JavaScript files.
+  /// Searches through all .html and .js files and replaces references
+  /// to original filenames with their versioned equivalents.
+  Future<void> _updateAssetReferences() async {
+    final targetFiles = await Directory(buildDir)
         .list(recursive: true)
-        .where((entity) => entity is File && entity.path.endsWith('.js'))
+        .where(
+          (entity) =>
+              entity is File &&
+              (entity.path.endsWith('.html') || entity.path.endsWith('.js')),
+        )
         .cast<File>()
         .toList();
 
-    for (final jsFile in jsFiles) {
+    for (final file in targetFiles) {
       bool fileModified = false;
-      String content = await jsFile.readAsString();
+      String content = await file.readAsString();
 
       for (final entry in _versionMap.entries) {
         final originalPath = entry.key;
@@ -193,6 +161,9 @@ class WebAssetVersioner {
         final patterns = [
           RegExp('"$escapedOriginal(?:\\?v=[^"]*)?"\s*'),
           RegExp("'$escapedOriginal(?:\\?v=[^']*)?'\s*"),
+          RegExp(
+            '"${RegExp.escape(originalPath.replaceAll(RegExp(r'\.[^.]+$'), ''))}\\.[a-f0-9]{8}${RegExp.escape(path.extension(originalPath))}"\s*',
+          ),
         ];
 
         for (final pattern in patterns) {
@@ -204,8 +175,8 @@ class WebAssetVersioner {
       }
 
       if (fileModified) {
-        await jsFile.writeAsString(content);
-        _log('✓ Updated references in ${path.basename(jsFile.path)}');
+        await file.writeAsString(content);
+        _log('✓ Updated references in ${path.basename(file.path)}');
       }
     }
   }

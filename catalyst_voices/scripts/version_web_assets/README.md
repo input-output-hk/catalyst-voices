@@ -12,11 +12,10 @@ This ensures users always receive the latest version of the application after de
 
 The `version_web_assets.dart` script:
 
-1. Calculates MD5 hash for each auto-versioned file
-2. Renames files with hash in filename (e.g., `flutter_bootstrap.js` → `flutter_bootstrap.abc12345.js`)
-3. Updates `index.html` to reference the versioned filenames
-4. Updates asset references in generated JavaScript files
-5. Generates a manifest file (`asset_versions.json`) with all versioned assets
+1. Calculates MD5 hash for each auto-versioned file and renames them
+   (e.g., `flutter_bootstrap.js` → `flutter_bootstrap.abc12345.js`)
+2. Updates all asset references in HTML and JavaScript files
+3. Generates a manifest file (`asset_versions.json`) with all versioned assets
 
 ### Auto-Versioned Files
 
