@@ -1,0 +1,77 @@
+import 'dart:io';
+
+import 'package:args/args.dart';
+
+import 'web_asset_versioner.dart';
+
+/// Versions Flutter web assets by renaming files with content-based MD5 hashes
+/// to prevent browser caching issues.
+///
+/// Usage: dart run version_web_assets.dart [build_dir]
+/// - build_dir: Path to the build/web directory (default: apps/voices/build/web)
+///
+/// This script:
+/// 1. Calculates MD5 hash for each auto-versioned file
+/// 2. Renames files with hash in filename (e.g., flutter_bootstrap.abc12345.js)
+/// 3. Updates index.html with versioned flutter_bootstrap.js reference
+/// 4. Updates asset references in generated JavaScript files
+/// 5. Generates a manifest file with all versioned assets
+Future<void> main(List<String> args) async {
+  final parser = ArgParser()
+    ..addOption(
+      'build-dir',
+      abbr: 'b',
+      defaultsTo: 'apps/voices/build/web',
+      help: 'Path to the build/web directory',
+    )
+    ..addFlag(
+      'verbose',
+      abbr: 'v',
+      defaultsTo: true,
+      help: 'Enable verbose logging',
+    )
+    ..addFlag(
+      'help',
+      abbr: 'h',
+      negatable: false,
+      help: 'Show usage information',
+    );
+
+  ArgResults argResults;
+  try {
+    argResults = parser.parse(args);
+  } catch (e) {
+    stderr.writeln('Error parsing arguments: $e');
+    _printUsage(parser);
+    exitCode = 1;
+    return;
+  }
+
+  if (argResults['help'] as bool) {
+    _printUsage(parser);
+    return;
+  }
+
+  final buildDir = argResults['build-dir'] as String;
+  final verbose = argResults['verbose'] as bool;
+
+  final versioner = WebAssetVersioner(buildDir: buildDir, verbose: verbose);
+
+  try {
+    await versioner.versionAssets();
+    stdout.writeln('\n✓ Web asset versioning completed successfully!');
+  } catch (e, stackTrace) {
+    stderr.writeln('\n✗ Error versioning web assets: $e');
+    if (verbose) {
+      stderr.writeln(stackTrace);
+    }
+    exitCode = 1;
+  }
+}
+
+void _printUsage(ArgParser parser) {
+  stdout.writeln('Usage: dart run version_web_assets.dart [options]');
+  stdout.writeln('\nVersions Flutter web assets with content-based MD5 hashes');
+  stdout.writeln('\nOptions:');
+  stdout.writeln(parser.usage);
+}

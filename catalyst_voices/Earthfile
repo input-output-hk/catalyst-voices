@@ -127,6 +127,10 @@ build-web:
         --UPLOAD_DEBUG_SYMBOLS=$UPLOAD_DEBUG_SYMBOLS \
         --SENTRY_ORG='iohk-j4' \
         --SENTRY_PROJECT='catalyst-voices'
+
+    # Version web assets with content-based MD5 hashes for cache busting
+    RUN dart run /frontend/scripts/version_web_assets/version_web_assets.dart --build-dir=$WORKDIR/build/web
+
     SAVE ARTIFACT --keep-ts web
 
 package:
