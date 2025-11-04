@@ -13,8 +13,8 @@ class WebAssetVersioner {
     'main.dart.js',
     'main.dart.wasm',
     'canvaskit/canvaskit.wasm',
-    'canvaskit/skwasm_heavy.wasm',
-    'canvaskit/skwasm.wasm',
+    'canvaskit/skwasm_heavy.wasm', //cspell:disable-line
+    'canvaskit/skwasm.wasm', //cspell:disable-line
     'canvaskit/chromium/canvaskit.wasm',
   ];
 
