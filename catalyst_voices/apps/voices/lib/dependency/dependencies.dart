@@ -400,6 +400,7 @@ final class Dependencies extends DependencyProvider {
         get<SignerService>(),
         get<ActiveCampaignObserver>(),
         get<CastedVotesObserver>(),
+        get<VotingBallotBuilder>(),
       );
     });
     registerLazySingleton<CommentService>(() {
