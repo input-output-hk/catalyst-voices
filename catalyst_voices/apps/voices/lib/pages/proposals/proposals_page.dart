@@ -37,7 +37,6 @@ class _ProposalsPageState extends State<ProposalsPage>
         ErrorHandlerStateMixin<ProposalsCubit, ProposalsPage>,
         SignalHandlerStateMixin<ProposalsCubit, ProposalsSignal, ProposalsPage> {
   late final _cubit = Dependencies.instance.get<ProposalsCubit>();
-
   late VoicesTabController<ProposalsPageTab> _tabController;
   late final PagingController<ProposalBrief> _pagingController;
   late final StreamSubscription<List<ProposalsPageTab>> _tabsSubscription;
@@ -72,7 +71,7 @@ class _ProposalsPageState extends State<ProposalsPage>
 
     if (widget.categoryId != oldWidget.categoryId || widget.tab != oldWidget.tab) {
       _cubit.changeFilters(
-        category: Optional(widget.categoryId),
+        categoryId: Optional(widget.categoryId),
         tab: Optional(tab),
       );
 

@@ -59,7 +59,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   }
 
   void changeFilters({
-    Optional<String>? category,
+    Optional<String>? categoryId,
     Optional<ProposalsPageTab>? tab,
     Optional<String>? searchQuery,
     bool? isRecentEnabled,
@@ -80,7 +80,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
           ? const Optional(true)
           : const Optional.empty(),
       author: Optional(_cache.tab == ProposalsPageTab.my ? _cache.activeAccountId : null),
-      categoryId: category,
+      categoryId: categoryId,
       searchQuery: searchQuery,
       latestUpdate: isRecentEnabled != null
           ? Optional(isRecentEnabled ? _recentProposalsMaxAge : null)
@@ -109,7 +109,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
       ),
     );
 
-    if (category != null) _rebuildCategories();
+    if (categoryId != null) _rebuildCategories();
     if (statusChanged) _rebuildOrder();
     if (shouldRebuildCountSubs) _rebuildProposalsCountSubs();
     if (resetProposals) emitSignal(const ResetPaginationProposalsSignal());
@@ -178,7 +178,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     _rebuildOrder();
     unawaited(_loadCampaignCategories());
 
-    changeFilters(category: Optional(categoryId), tab: Optional(tab));
+    changeFilters(categoryId: Optional(categoryId), tab: Optional(tab));
     changeOrder(order);
   }
 
