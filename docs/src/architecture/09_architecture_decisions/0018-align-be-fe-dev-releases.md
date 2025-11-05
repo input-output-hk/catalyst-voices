@@ -14,7 +14,7 @@ Our current deployment practices create instability and coordination problems:
 that teams want to stabilize and test, preventing other work from being deployed and tested.
 
 2. **Version traceability**: When issues occur, it's difficult to identify which version caused the problem
-because deployments aren't tied to explicit release tags.
+because deployments weren't tied to explicit release tags.
 
 3. **Test environment accessibility**: Alternative test environments exist but require manual setup and
 training, making them not straightforward for general use.
