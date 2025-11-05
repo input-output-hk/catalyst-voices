@@ -172,14 +172,19 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   @override
   Future<List<ShelleyAddress>> getUsedAddresses({Paginate? paginate}) async {
     try {
-      final jsPaginate = paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined();
+      final JSPromise<JSArray<JSString>> promise;
+      if (paginate != null) {
+        promise = _delegate.getUsedAddresses(JSPaginate.fromDart(paginate));
+      } else {
+        // Currently it's not possible to make "undefined" value in wasm
+        // https://api.flutter.dev/flutter/dart-js_interop/NullableUndefineableJSAnyExtension/isUndefined.html
+        // Not passing the argument will fill it with "undefined" on the JS side.
+        promise = _delegate.getUsedAddresses();
+      }
 
-      return await _delegate
-          .getUsedAddresses(jsPaginate)
-          .toDart
-          .then(
-            (array) => array.toDart.map((item) => ShelleyAddress(hexDecode(item.toDart))).toList(),
-          );
+      return await promise.toDart.then(
+        (array) => array.toDart.map((item) => ShelleyAddress(hexDecode(item.toDart))).toList(),
+      );
     } catch (ex) {
       throw _mapApiException(ex) ?? _mapPaginateException(ex) ?? _fallbackApiException(ex);
     }
@@ -191,14 +196,40 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
     Paginate? paginate,
   }) async {
     try {
-      final utxos = _delegate.getUtxos(
-        amount != null ? hex.encode(cbor.encode(amount.toCbor())).toJS : makeUndefined(),
-        paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined(),
-      );
+      final JSPromise<JSArray<JSString>>? promise;
+      if (amount == null && paginate == null) {
+        // Currently it's not possible to make "undefined" value in wasm
+        // https://api.flutter.dev/flutter/dart-js_interop/NullableUndefineableJSAnyExtension/isUndefined.html
+        // Not passing the argument will fill it with "undefined" on the JS side.
+        promise = _delegate.getUtxos();
+      } else if (amount != null && paginate != null) {
+        promise = _delegate.getUtxos(
+          hex.encode(cbor.encode(amount.toCbor())).toJS,
+          JSPaginate.fromDart(paginate),
+        );
+      } else if (amount == null && paginate != null) {
+        // TODO(dt-iohk): instead of throwing an error rewrite the JS side so that it can accept "null" values,
+        // and from JS side communicate with the wallet extension translating it to "undefined".
+        //
+        // Currently we're talking to the wallet extension directly from dart (wasm) and there's
+        // no man-in-the-middle who could translate nulls to undefined.
+        //
+        // Best to do together with https://github.com/input-output-hk/catalyst-voices/issues/3382
+        throw UnsupportedError(
+          'Due to wasm limitations, the "undefined" values are not supported '
+          'therefore the "paginate" parameter must not be given if "amount" is not given too. '
+          'The JS interface of CIP-30 strictly relies on undefined values which we may not satisfy in wasm.',
+        );
+      } else {
+        promise = _delegate.getUtxos(
+          amount != null ? hex.encode(cbor.encode(amount.toCbor())).toJS : makeUndefined(),
+          paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined(),
+        );
+      }
 
-      if (utxos == null) return {};
+      if (promise == null) return const {};
 
-      return await utxos.toDart.then(
+      return await promise.toDart.then(
         (array) => array.toDart
             .map(
               (item) => TransactionUnspentOutput.fromCbor(
