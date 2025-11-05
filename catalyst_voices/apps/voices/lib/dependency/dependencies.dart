@@ -536,7 +536,10 @@ final class Dependencies extends DependencyProvider {
       dispose: (observer) async => observer.dispose(),
     );
     registerLazySingleton<CastedVotesObserver>(CastedVotesObserverImpl.new);
-    registerLazySingleton<VotingBallotBuilder>(VotingBallotLocalBuilder.new);
+    registerLazySingleton<VotingBallotBuilder>(
+      VotingBallotLocalBuilder.new,
+      dispose: (builder) => builder.dispose(),
+    );
 
     // Not a singleton
     registerFactory<RegistrationStatusPoller>(

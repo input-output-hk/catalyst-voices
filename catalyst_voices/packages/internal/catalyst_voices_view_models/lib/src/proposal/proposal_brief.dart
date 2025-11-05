@@ -129,7 +129,7 @@ extension on ProposalBriefDataVotes? {
     }
     return VoteButtonData.fromVotes(
       currentDraft: instance.draft,
-      lastCasted: instance.signed,
+      lastCasted: instance.casted,
     );
   }
 }

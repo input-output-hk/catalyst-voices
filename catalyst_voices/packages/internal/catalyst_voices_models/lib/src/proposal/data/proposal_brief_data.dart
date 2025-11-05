@@ -52,13 +52,13 @@ final class ProposalBriefData extends Equatable {
 
 final class ProposalBriefDataVotes extends Equatable {
   final Vote? draft;
-  final Vote? signed;
+  final Vote? casted;
 
   const ProposalBriefDataVotes({
     this.draft,
-    this.signed,
+    this.casted,
   });
 
   @override
-  List<Object?> get props => [draft, signed];
+  List<Object?> get props => [draft, casted];
 }

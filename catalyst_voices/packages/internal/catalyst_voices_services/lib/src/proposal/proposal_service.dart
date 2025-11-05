@@ -16,6 +16,7 @@ abstract interface class ProposalService {
     SignerService signerService,
     ActiveCampaignObserver activeCampaignObserver,
     CastedVotesObserver castedVotesObserver,
+    VotingBallotBuilder ballotBuilder,
   ) = ProposalServiceImpl;
 
   Future<void> addFavoriteProposal({
@@ -163,6 +164,7 @@ final class ProposalServiceImpl implements ProposalService {
   final SignerService _signerService;
   final ActiveCampaignObserver _activeCampaignObserver;
   final CastedVotesObserver _castedVotesObserver;
+  final VotingBallotBuilder _ballotBuilder;
 
   const ProposalServiceImpl(
     this._proposalRepository,
@@ -171,6 +173,7 @@ final class ProposalServiceImpl implements ProposalService {
     this._signerService,
     this._activeCampaignObserver,
     this._castedVotesObserver,
+    this._ballotBuilder,
   );
 
   @override
@@ -518,10 +521,24 @@ final class ProposalServiceImpl implements ProposalService {
     ProposalsOrder order = const UpdateDate.desc(),
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    // TODO(damian-molinski): add _ballotBuilder and expose stream
-    return _proposalRepository
-        .watchProposalsBriefPage(request: request, order: order, filters: filters)
-        .map((page) => page.map(_mapJoinedProposalBriefData));
+    final proposals = _proposalRepository.watchProposalsBriefPage(
+      request: request,
+      order: order,
+      filters: filters,
+    );
+    final draftVotes = _ballotBuilder.watchVotes;
+    final castedVotes = _castedVotesObserver.watchCastedVotes;
+
+    return Rx.combineLatest3(
+      proposals,
+      draftVotes,
+      castedVotes,
+      (page, draftVotes, castedVotes) {
+        return page.map(
+          (proposal) => _mapJoinedProposalBriefData(proposal, castedVotes, castedVotes),
+        );
+      },
+    );
   }
 
   @override
@@ -705,9 +722,20 @@ final class ProposalServiceImpl implements ProposalService {
     return user.activeAccount?.roles.contains(AccountRole.proposer) ?? false;
   }
 
-  ProposalBriefData _mapJoinedProposalBriefData(JoinedProposalBriefData data) {
+  ProposalBriefData _mapJoinedProposalBriefData(
+    JoinedProposalBriefData data,
+    List<Vote> draftVotes,
+    List<Vote> castedVotes,
+  ) {
     final proposal = data.proposal;
     final isFinal = data.isFinal;
+
+    final draftVote = isFinal
+        ? draftVotes.firstWhereOrNull((vote) => vote.proposal == proposal.selfRef)
+        : null;
+    final castedVote = isFinal
+        ? castedVotes.firstWhereOrNull((vote) => vote.proposal == proposal.selfRef)
+        : null;
 
     return ProposalBriefData(
       selfRef: proposal.selfRef,
@@ -722,8 +750,7 @@ final class ProposalServiceImpl implements ProposalService {
       commentsCount: isFinal ? null : data.commentsCount,
       isFinal: isFinal,
       isFavorite: data.isFavorite,
-      // TODO(damian-molinski): need more data. Votes are contextual to active account.
-      votes: isFinal ? const ProposalBriefDataVotes(draft: null, signed: null) : null,
+      votes: isFinal ? ProposalBriefDataVotes(draft: draftVote, casted: castedVote) : null,
     );
   }
 
