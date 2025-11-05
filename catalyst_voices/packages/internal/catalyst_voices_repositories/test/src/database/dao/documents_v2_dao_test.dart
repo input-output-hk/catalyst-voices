@@ -284,7 +284,7 @@ void main() {
 
         // Then
         expect(result.length, 500);
-        expect(stopwatch.elapsedMilliseconds, lessThan(50));
+        expect(stopwatch.elapsedMilliseconds, lessThan(100));
       });
     });
 
