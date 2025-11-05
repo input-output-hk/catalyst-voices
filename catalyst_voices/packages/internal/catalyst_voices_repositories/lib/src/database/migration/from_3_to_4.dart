@@ -16,35 +16,37 @@ const _batchSize = 300;
 final _logger = Logger('Migration[3-4]');
 
 Future<void> from3To4(Migrator m, Schema4 schema) async {
-  await m.createTable(schema.documentsV2);
-  await m.createTable(schema.documentsLocalMetadata);
-  await m.createTable(schema.localDocumentsDrafts);
+  await m.database.transaction(() async {
+    await m.createTable(schema.documentsV2);
+    await m.createTable(schema.documentsLocalMetadata);
+    await m.createTable(schema.localDocumentsDrafts);
 
-  await m.createIndex(schema.idxDocumentsV2TypeId);
-  await m.createIndex(schema.idxDocumentsV2TypeIdVer);
-  await m.createIndex(schema.idxDocumentsV2TypeRefId);
-  await m.createIndex(schema.idxDocumentsV2TypeRefIdVer);
-  await m.createIndex(schema.idxDocumentsV2RefIdVer);
-  await m.createIndex(schema.idxDocumentsV2TypeCreatedAt);
+    await m.createIndex(schema.idxDocumentsV2TypeId);
+    await m.createIndex(schema.idxDocumentsV2TypeIdVer);
+    await m.createIndex(schema.idxDocumentsV2TypeRefId);
+    await m.createIndex(schema.idxDocumentsV2TypeRefIdVer);
+    await m.createIndex(schema.idxDocumentsV2RefIdVer);
+    await m.createIndex(schema.idxDocumentsV2TypeCreatedAt);
 
-  // TODO(damian-molinski): created indexes, views and queries.
+    // TODO(damian-molinski): created indexes, views and queries.
 
-  await _migrateDocs(m, schema, batchSize: _batchSize);
-  await _migrateDrafts(m, schema, batchSize: _batchSize);
-  await _migrateFavorites(m, schema, batchSize: _batchSize);
+    await _migrateDocs(m, schema, batchSize: _batchSize);
+    await _migrateDrafts(m, schema, batchSize: _batchSize);
+    await _migrateFavorites(m, schema, batchSize: _batchSize);
 
-  // TODO(damian-molinski): uncomment when migration is done
-  /*await m.drop(schema.documents);
-  await m.drop(schema.drafts);
-  await m.drop(schema.documentsMetadata);
-  await m.drop(schema.documentsFavorites);
+    // TODO(damian-molinski): uncomment when migration is done
+    /*await m.drop(schema.documents);
+    await m.drop(schema.drafts);
+    await m.drop(schema.documentsMetadata);
+    await m.drop(schema.documentsFavorites);
 
-  await m.drop(schema.idxDocType);
-  await m.drop(schema.idxUniqueVer);
-  await m.drop(schema.idxDocMetadataKeyValue);
-  await m.drop(schema.idxFavType);
-  await m.drop(schema.idxFavUniqueId);
-  await m.drop(schema.idxDraftType);*/
+    await m.drop(schema.idxDocType);
+    await m.drop(schema.idxUniqueVer);
+    await m.drop(schema.idxDocMetadataKeyValue);
+    await m.drop(schema.idxFavType);
+    await m.drop(schema.idxFavUniqueId);
+    await m.drop(schema.idxDraftType);*/
+  });
 }
 
 Future<void> _migrateDocs(
@@ -52,40 +54,36 @@ Future<void> _migrateDocs(
   Schema4 schema, {
   required int batchSize,
 }) async {
-  await m.database.transaction(
-    () async {
-      final docsCount = await schema.documents.count().getSingleOrNull().then((e) => e ?? 0);
-      var docsOffset = 0;
+  final docsCount = await schema.documents.count().getSingleOrNull().then((e) => e ?? 0);
+  var docsOffset = 0;
 
-      while (docsOffset < docsCount) {
-        await m.database.batch((batch) async {
-          final query = schema.documents.select()..limit(batchSize, offset: docsOffset);
-          final oldDocs = await query.get();
+  while (docsOffset < docsCount) {
+    await m.database.batch((batch) async {
+      final query = schema.documents.select()..limit(batchSize, offset: docsOffset);
+      final oldDocs = await query.get();
 
-          final rows = <RawValuesInsertable<QueryRow>>[];
-          for (final oldDoc in oldDocs) {
-            final rawContent = oldDoc.read<Uint8List>('content');
-            final content = sqlite3.jsonb.decode(rawContent)! as Map<String, dynamic>;
+      final rows = <RawValuesInsertable<QueryRow>>[];
+      for (final oldDoc in oldDocs) {
+        final rawContent = oldDoc.read<Uint8List>('content');
+        final content = sqlite3.jsonb.decode(rawContent)! as Map<String, dynamic>;
 
-            final rawMetadata = oldDoc.read<Uint8List>('metadata');
-            final encodedMetadata = sqlite3.jsonb.decode(rawMetadata)! as Map<String, dynamic>;
-            final metadata = DocumentDataMetadataDtoDbV3.fromJson(encodedMetadata);
+        final rawMetadata = oldDoc.read<Uint8List>('metadata');
+        final encodedMetadata = sqlite3.jsonb.decode(rawMetadata)! as Map<String, dynamic>;
+        final metadata = DocumentDataMetadataDtoDbV3.fromJson(encodedMetadata);
 
-            final entity = metadata.toDocEntity(content: content);
+        final entity = metadata.toDocEntity(content: content);
 
-            final insertable = RawValuesInsertable<QueryRow>(entity.toColumns(true));
+        final insertable = RawValuesInsertable<QueryRow>(entity.toColumns(true));
 
-            rows.add(insertable);
-          }
-
-          batch.insertAll(schema.documentsV2, rows);
-          docsOffset += oldDocs.length;
-        });
+        rows.add(insertable);
       }
 
-      _logger.info('Finished migrating docs[$docsOffset], totalCount[$docsCount]');
-    },
-  );
+      batch.insertAll(schema.documentsV2, rows);
+      docsOffset += oldDocs.length;
+    });
+  }
+
+  _logger.info('Finished migrating docs[$docsOffset], totalCount[$docsCount]');
 }
 
 Future<void> _migrateDrafts(
