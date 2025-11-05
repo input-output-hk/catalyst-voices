@@ -13,9 +13,17 @@ class WebAssetVersioner {
     'main.dart.js',
     'main.dart.wasm',
     'canvaskit/canvaskit.wasm',
+    'canvaskit/canvaskit.js',
+    'canvaskit/canvaskit.js.symbols',
     'canvaskit/skwasm_heavy.wasm', //cspell:disable-line
+    'canvaskit/skwasm_heavy.js', //cspell:disable-line
+    'canvaskit/skwasm_heavy.js.symbols', //cspell:disable-line
     'canvaskit/skwasm.wasm', //cspell:disable-line
+    'canvaskit/skwasm.js', //cspell:disable-line
+    'canvaskit/skwasm.js.symbols', //cspell:disable-line
     'canvaskit/chromium/canvaskit.wasm',
+    'canvaskit/chromium/canvaskit.js',
+    'canvaskit/chromium/canvaskit.js.symbols',
   ];
 
   /// Hardcoded files that should be manually versioned
@@ -68,25 +76,19 @@ class WebAssetVersioner {
       final file = File(path.join(buildDir, filePath));
 
       if (!file.existsSync()) {
-        _log('Warning: File not found: $filePath');
-        continue;
+        throw Exception(
+          'Required file not found: $filePath\n'
+          'This file is expected to exist after flutter build web. '
+          'If this file has been removed or renamed in Flutter, '
+          'update the autoVersionedFiles list in web_asset_versioner.dart',
+        );
       }
 
-      final bytes = await file.readAsBytes();
-      final hash = md5.convert(bytes).toString();
-      final shortHash = hash.substring(0, 8);
+      await _versionFile(file, filePath);
 
-      // Generate versioned filename: filename.hash.ext
-      final versionedFilename = _createVersionedFilename(filePath, shortHash);
-      final versionedFile = File(path.join(buildDir, versionedFilename));
-
-      await file.rename(versionedFile.path);
-
-      // Store mapping: original -> versioned
-      _versionMap[filePath] = versionedFilename;
-      _hashMap[filePath] = shortHash;
-
-      _log('✓ $filePath -> $versionedFilename');
+      if (filePath.endsWith('.js')) {
+        await _versionPartFiles(filePath);
+      }
     }
   }
 
@@ -124,7 +126,7 @@ class WebAssetVersioner {
     const encoder = JsonEncoder.withIndent('  ');
     final jsonString = encoder.convert(manifest.toJson());
 
-    await manifestFile.writeAsString('$jsonString\n');
+    await manifestFile.writeAsString('$jsonString\n', flush: true);
     _log('✓ Generated manifest: asset_versions.json');
   }
 
@@ -134,9 +136,6 @@ class WebAssetVersioner {
     }
   }
 
-  /// Updates all asset references in HTML and JavaScript files.
-  /// Searches through all .html and .js files and replaces references
-  /// to original filenames with their versioned equivalents.
   Future<void> _updateAssetReferences() async {
     final targetFiles = await Directory(buildDir)
         .list(recursive: true)
@@ -155,29 +154,107 @@ class WebAssetVersioner {
       for (final entry in _versionMap.entries) {
         final originalPath = entry.key;
         final versionedPath = entry.value;
-
         final escapedOriginal = RegExp.escape(originalPath);
 
-        final patterns = [
-          RegExp('"$escapedOriginal(?:\\?v=[^"]*)?"\s*'),
-          RegExp("'$escapedOriginal(?:\\?v=[^']*)?'\s*"),
-          RegExp(
-            '"${RegExp.escape(originalPath.replaceAll(RegExp(r'\.[^.]+$'), ''))}\\.[a-f0-9]{8}${RegExp.escape(path.extension(originalPath))}"\s*',
-          ),
-        ];
+        // Handle full path references (more specific matches first)
+        final fullPathPatternDouble = RegExp('"$escapedOriginal"');
+        final fullPathPatternSingle = RegExp("'$escapedOriginal'");
 
-        for (final pattern in patterns) {
-          if (pattern.hasMatch(content)) {
-            content = content.replaceAll(pattern, '"$versionedPath"');
+        if (fullPathPatternDouble.hasMatch(content)) {
+          content = content.replaceAll(
+            fullPathPatternDouble,
+            '"$versionedPath"',
+          );
+          fileModified = true;
+        }
+
+        if (fullPathPatternSingle.hasMatch(content)) {
+          content = content.replaceAll(
+            fullPathPatternSingle,
+            "'$versionedPath'",
+          );
+          fileModified = true;
+        }
+
+        // Handle basename-only references (only for files in subdirectories)
+        // For example: "canvaskit.wasm" -> "canvaskit.f60c5daf.wasm"
+        if (originalPath.contains('/')) {
+          final basename = path.basename(originalPath);
+          final escapedBasename = RegExp.escape(basename);
+          final versionedBasename = path.basename(versionedPath);
+
+          final basenamePatternDouble = RegExp('"$escapedBasename"');
+          final basenamePatternSingle = RegExp("'$escapedBasename'");
+
+          if (basenamePatternDouble.hasMatch(content)) {
+            content = content.replaceAll(
+              basenamePatternDouble,
+              '"$versionedBasename"',
+            );
+            fileModified = true;
+          }
+
+          if (basenamePatternSingle.hasMatch(content)) {
+            content = content.replaceAll(
+              basenamePatternSingle,
+              "'$versionedBasename'",
+            );
             fileModified = true;
           }
         }
       }
 
       if (fileModified) {
-        await file.writeAsString(content);
+        await file.writeAsString(content, flush: true);
         _log('✓ Updated references in ${path.basename(file.path)}');
       }
+    }
+  }
+
+  /// Versions a single file with its MD5 hash.
+  Future<void> _versionFile(File file, String filePath) async {
+    final bytes = await file.readAsBytes();
+    final hash = md5.convert(bytes).toString();
+    final shortHash = hash.substring(0, 8);
+
+    final versionedFilename = _createVersionedFilename(filePath, shortHash);
+    final versionedFile = File(path.join(buildDir, versionedFilename));
+
+    await file.rename(versionedFile.path);
+
+    // Store mapping: original -> versioned
+    _versionMap[filePath] = versionedFilename;
+    _hashMap[filePath] = shortHash;
+
+    _log('✓ $filePath -> $versionedFilename');
+  }
+
+  Future<void> _versionPartFiles(String originalFilePath) async {
+    final fileDir = path.dirname(path.join(buildDir, originalFilePath));
+    final baseFileName = path.basename(originalFilePath);
+
+    final partPattern = RegExp(
+      '^${RegExp.escape(baseFileName)}_\\d+\\.part\\.js\$',
+    );
+
+    final directory = Directory(fileDir);
+    if (!directory.existsSync()) return;
+
+    final partFiles = directory
+        .listSync()
+        .whereType<File>()
+        .where((file) => partPattern.hasMatch(path.basename(file.path)))
+        .toList();
+
+    for (final partFile in partFiles) {
+      final partFileName = path.basename(partFile.path);
+
+      final originalDir = path.dirname(originalFilePath);
+      final relativePath = originalDir.isNotEmpty && originalDir != '.'
+          ? '$originalDir/$partFileName'
+          : partFileName;
+
+      await _versionFile(partFile, relativePath);
     }
   }
 }

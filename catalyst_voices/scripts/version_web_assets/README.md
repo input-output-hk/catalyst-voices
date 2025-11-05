@@ -14,7 +14,9 @@ The `version_web_assets.dart` script:
 
 1. Calculates MD5 hash for each auto-versioned file and renames them
    (e.g., `flutter_bootstrap.js` → `flutter_bootstrap.abc12345.js`)
+   * Automatically detects and versions JavaScript part files (e.g., `main.dart.js_1.part.js`)
 2. Updates all asset references in HTML and JavaScript files
+   * Includes updating references to part files
 3. Generates a manifest file (`asset_versions.json`) with all versioned assets
 
 ### Auto-Versioned Files
@@ -22,12 +24,22 @@ The `version_web_assets.dart` script:
 The following files are automatically versioned using content-based MD5 hashes:
 
 * `flutter_bootstrap.js`
-* `main.dart.js`
+* `main.dart.js` (plus any part files like `main.dart.js_1.part.js`, `main.dart.js_2.part.js`, etc.)
 * `main.dart.wasm`
 * `canvaskit/canvaskit.wasm`
+* `canvaskit/canvaskit.js`
 * `canvaskit/skwasm_heavy.wasm`
+* `canvaskit/skwasm_heavy.js`
+* `canvaskit/skwasm_heavy.symbols`
 * `canvaskit/skwasm.wasm`
+* `canvaskit/skwasm.js`
 * `canvaskit/chromium/canvaskit.wasm`
+* `canvaskit/chromium/canvaskit.js`
+* `canvaskit/chromium/canvaskit.js.symbols`
+
+**Note:** For large JavaScript files, Flutter may split them into multiple parts
+(e.g., `main.dart.js_1.part.js`, `main.dart.js_2.part.js`).
+The script automatically detects and versions all part files.
 
 ### Manually-Versioned Files
 
@@ -112,12 +124,16 @@ After running the script, you'll find:
   "versioned_assets": {
     "flutter_bootstrap.js": "flutter_bootstrap.abc12345.js",
     "main.dart.js": "main.dart.def67890.js",
+    "main.dart.js_1.part.js": "main.dart.js_1.part.11223344.js",
+    "main.dart.js_2.part.js": "main.dart.js_2.part.55667788.js",
     "main.dart.wasm": "main.dart.123abcde.wasm",
     "canvaskit/canvaskit.wasm": "canvaskit/canvaskit.456fghij.wasm"
   },
   "asset_hashes": {
     "flutter_bootstrap.js": "abc12345",
     "main.dart.js": "def67890",
+    "main.dart.js_1.part.js": "11223344",
+    "main.dart.js_2.part.js": "55667788",
     "main.dart.wasm": "123abcde",
     "canvaskit/canvaskit.wasm": "456fghij"
   },

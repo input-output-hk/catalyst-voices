@@ -7,8 +7,8 @@ import 'web_asset_versioner.dart';
 /// Versions Flutter web assets by renaming files with content-based MD5 hashes
 /// to prevent browser caching issues.
 ///
-/// Usage: dart run version_web_assets.dart [build_dir]
-/// - build_dir: Path to the build/web directory (default: apps/voices/build/web)
+/// Usage: dart run version_web_assets.dart [build-dir]
+/// - build-dir: Path to the build/web directory (default: apps/voices/build/web)
 ///
 /// This script:
 /// 1. Calculates MD5 hash for each auto-versioned file and renames them
