@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.4.7 AS mdlint-ci
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.4.7 AS cspell-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.4.7 AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.5.26 AS postgresql-ci
 
 FROM debian:stable-slim
 
