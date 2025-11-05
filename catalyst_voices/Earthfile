@@ -128,7 +128,7 @@ build-web:
         --SENTRY_ORG='iohk-j4' \
         --SENTRY_PROJECT='catalyst-voices' \
         --WASM=true
-    SAVE ARTIFACT --keep-ts web AS LOCAL web
+    SAVE ARTIFACT --keep-ts web
 
 package:
     FROM harbor.shared-services.projectcatalyst.io/dockerhub/caddy:2.10
