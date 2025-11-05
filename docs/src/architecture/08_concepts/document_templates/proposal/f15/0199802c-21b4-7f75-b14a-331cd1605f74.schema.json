@@ -7,6 +7,9 @@
     "x-changelog": {
         "2025-10-08": [
             "F15 Template Setup"
+        ],
+        "2025-11-05": [
+            "Included two additional links in the Consent & Confirmation question"
         ]
     },
     "definitions": {
@@ -1129,7 +1132,7 @@
                         "terms_and_conditions": {
                             "$ref": "#/definitions/agreementConfirmation",
                             "title": "I Agree",
-                            "description": "I confirm that I have read, understand and shall adhere to the [Terms & Conditions](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions), [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules), [Privacy Policy](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy). I understand that providing accurate and truthful information is essential for my proposal to remain eligible to participate in the current Fund."
+                            "description": "I confirm that I have read, understand and shall adhere to the [Project Catalyst Platform Terms of Use](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/project-catalyst-platform-terms-of-use), [Project Catalyst Platform Privacy Policy](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/project-catalyst-platform-privacy-policy), [Terms & Conditions](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions), [Fund Rules](https://docs.projectcatalyst.io/current-fund/fund-basics/fund-rules), [Privacy Policy](https://docs.projectcatalyst.io/current-fund/fund-basics/project-catalyst-terms-and-conditions/catalyst-fc-privacy-policy). I understand that providing accurate and truthful information is essential for my proposal to remain eligible to participate in the current Fund."
                         }
                     },
                     "required": ["terms_and_conditions"],
