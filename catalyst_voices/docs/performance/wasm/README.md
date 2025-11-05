@@ -20,7 +20,7 @@ Benchmark script (include `--wasm` flag only when testing wasm):
 flutter run --target=lib/configs/main_web.dart \
 --device-id=chrome \
 --profile \
---wasm
+--wasm \
 --dart-define=ENV_NAME=dev \
 --dart-define=STRESS_TEST=true \
 --dart-define=STRESS_TEST_PROPOSAL_INDEX_COUNT=4000 \
@@ -51,7 +51,7 @@ Benchmark script (include `--wasm` flag only when testing wasm):
 flutter run --target=lib/configs/main_web.dart \
 --device-id=chrome \
 --profile \
---wasm
+--wasm \
 --dart-define=ENV_NAME=dev \
 --dart-define=STRESS_TEST=true \
 --dart-define=STRESS_TEST_PROPOSAL_INDEX_COUNT=4000 \
