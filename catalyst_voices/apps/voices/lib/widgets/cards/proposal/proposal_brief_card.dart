@@ -16,8 +16,10 @@ class ProposalBriefCard extends StatefulWidget {
   final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
   final ValueChanged<VoteButtonAction>? onVoteAction;
+
   // TODO(LynxxLynx): This should come from campaign settings
   final bool readOnly;
+  final bool showComments;
 
   const ProposalBriefCard({
     super.key,
@@ -26,6 +28,7 @@ class ProposalBriefCard extends StatefulWidget {
     this.onFavoriteChanged,
     this.onVoteAction,
     this.readOnly = false,
+    this.showComments = true,
   });
 
   @override
@@ -180,6 +183,8 @@ class _PropertyValue extends StatelessWidget {
 class _ProposalBriefCardState extends State<ProposalBriefCard> {
   late final WidgetStatesController _statesController;
 
+  bool _isFavorite = false;
+
   @override
   Widget build(BuildContext context) {
     final proposal = widget.proposal;
@@ -212,8 +217,8 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                 children: [
                   _Topbar(
                     proposalRef: proposal.selfRef,
-                    isFavorite: proposal.isFavorite,
-                    onFavoriteChanged: widget.onFavoriteChanged,
+                    isFavorite: _isFavorite,
+                    onFavoriteChanged: widget.onFavoriteChanged != null ? _onFavoriteChanged : null,
                   ),
                   const SizedBox(height: 2),
                   _Category(
@@ -238,7 +243,7 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                     publish: proposal.publish,
                     version: proposal.versionNumber,
                     updateDate: proposal.updateDate,
-                    commentsCount: proposal.commentsCount,
+                    commentsCount: widget.showComments ? proposal.commentsCount : null,
                   ),
                   if (voteData?.hasVoted ?? false) const SizedBox(height: 12),
                   if (voteData != null && onVoteAction != null)
@@ -257,6 +262,14 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
   }
 
   @override
+  void didUpdateWidget(ProposalBriefCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Always override from proposal as its main source of truth
+    _isFavorite = widget.proposal.isFavorite;
+  }
+
+  @override
   void dispose() {
     _statesController.dispose();
     super.dispose();
@@ -266,6 +279,16 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
   void initState() {
     super.initState();
     _statesController = WidgetStatesController();
+
+    _isFavorite = widget.proposal.isFavorite;
+  }
+
+  // This method is here only because updating state locally gives faster feedback to the user.
+  void _onFavoriteChanged(bool isFavorite) {
+    setState(() {
+      _isFavorite = isFavorite;
+      widget.onFavoriteChanged?.call(isFavorite);
+    });
   }
 }
 

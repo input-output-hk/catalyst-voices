@@ -67,55 +67,32 @@ final class DiscoveryCampaignState extends Equatable {
 }
 
 final class DiscoveryMostRecentProposalsState extends Equatable {
-  static const _minProposalsToShowRecent = 6;
-
-  final LocalizedException? error;
   final List<ProposalBrief> proposals;
-  final List<String> favoritesIds;
   final bool showComments;
+  final bool showSection;
 
   const DiscoveryMostRecentProposalsState({
-    this.error,
     this.proposals = const [],
-    this.favoritesIds = const [],
     this.showComments = false,
+    this.showSection = false,
   });
-
-  bool get hasMinProposalsToShow => proposals.length > _minProposalsToShowRecent;
 
   @override
   List<Object?> get props => [
-    error,
     proposals,
-    favoritesIds,
     showComments,
+    showSection,
   ];
 
-  bool get showError => error != null;
-
   DiscoveryMostRecentProposalsState copyWith({
-    bool? isLoading,
-    LocalizedException? error,
     List<ProposalBrief>? proposals,
-    List<String>? favoritesIds,
     bool? showComments,
+    bool? showSection,
   }) {
     return DiscoveryMostRecentProposalsState(
-      error: error ?? this.error,
       proposals: proposals ?? this.proposals,
-      favoritesIds: favoritesIds ?? this.favoritesIds,
       showComments: showComments ?? this.showComments,
-    );
-  }
-
-  DiscoveryMostRecentProposalsState updateFavorites(List<String> ids) {
-    final updatedProposals = [
-      ...proposals,
-    ].map((e) => e.copyWith(isFavorite: ids.contains(e.selfRef.id))).toList();
-
-    return copyWith(
-      proposals: updatedProposals,
-      favoritesIds: ids,
+      showSection: showSection ?? this.showSection,
     );
   }
 }

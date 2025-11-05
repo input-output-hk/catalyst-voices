@@ -1,6 +1,9 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 final class DatabaseDocumentsDataSource
     implements SignedDocumentDataSource, ProposalDocumentDataLocalSource {
@@ -22,12 +25,17 @@ final class DatabaseDocumentsDataSource
 
   @override
   Future<bool> exists({required DocumentRef ref}) {
-    return _database.documentsDao.count(ref: ref).then((count) => count > 0);
+    return _database.documentsV2Dao.exists(ref);
+  }
+
+  @override
+  Future<List<DocumentRef>> filterExisting(List<DocumentRef> refs) {
+    return _database.documentsV2Dao.filterExisting(refs);
   }
 
   @override
   Future<DocumentData> get({required DocumentRef ref}) async {
-    final entity = await _database.documentsDao.query(ref: ref);
+    final entity = await _database.documentsV2Dao.getDocument(ref);
     if (entity == null) {
       throw DocumentNotFoundException(ref: ref);
     }
@@ -104,32 +112,17 @@ final class DatabaseDocumentsDataSource
 
   @override
   Future<void> saveAll(Iterable<DocumentData> data) async {
-    final documentsWithMetadata = data.map(
-      (data) {
-        final idHiLo = UuidHiLo.from(data.metadata.id);
-        final verHiLo = UuidHiLo.from(data.metadata.version);
+    final entries = data.map((e) => e.toEntity()).toList();
 
-        final document = DocumentEntity(
-          idHi: idHiLo.high,
-          idLo: idHiLo.low,
-          verHi: verHiLo.high,
-          verLo: verHiLo.low,
-          type: data.metadata.type,
-          content: data.content,
-          metadata: data.metadata,
-          createdAt: DateTime.timestamp(),
-        );
+    await _database.documentsV2Dao.saveAll(entries);
+  }
 
-        // TODO(damian-molinski): Need to decide what goes into metadata table.
-        final metadata = <DocumentMetadataEntity>[
-          //
-        ];
-
-        return (document: document, metadata: metadata);
-      },
-    ).toList();
-
-    await _database.documentsDao.saveAll(documentsWithMetadata);
+  @override
+  Future<void> updateProposalFavorite({
+    required String id,
+    required bool isFavorite,
+  }) async {
+    await _database.proposalsV2Dao.updateProposalFavorite(id: id, isFavorite: isFavorite);
   }
 
   @override
@@ -170,6 +163,13 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
+  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage(PageRequest request) {
+    return _database.proposalsV2Dao
+        .watchProposalsBriefPage(request)
+        .map((page) => page.map((data) => data.toModel()));
+  }
+
+  @override
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
   }) {
@@ -207,6 +207,60 @@ extension on DocumentEntity {
   }
 }
 
+extension on DocumentEntityV2 {
+  DocumentData toModel() {
+    return DocumentData(
+      metadata: DocumentDataMetadata(
+        type: type,
+        selfRef: SignedDocumentRef(id: id, version: ver),
+        ref: refId.toRef(refVer),
+        template: templateId.toRef(templateVer),
+        reply: replyId.toRef(replyVer),
+        section: section,
+        categoryId: categoryId.toRef(categoryVer),
+        // TODO(damian-molinski): Make sure to add unit tests
+        authors: authors.isEmpty
+            ? null
+            : authors.split(',').map((e) => CatalystId.fromUri(e.getUri())).toList(),
+      ),
+      content: content,
+    );
+  }
+}
+
+extension on String? {
+  SignedDocumentRef? toRef([String? ver]) {
+    final id = this;
+    if (id == null) {
+      return null;
+    }
+
+    return SignedDocumentRef(id: id, version: ver);
+  }
+}
+
+extension on DocumentData {
+  DocumentEntityV2 toEntity() {
+    return DocumentEntityV2(
+      content: content,
+      id: metadata.id,
+      ver: metadata.version,
+      type: metadata.type,
+      refId: metadata.ref?.id,
+      refVer: metadata.ref?.version,
+      replyId: metadata.reply?.id,
+      replyVer: metadata.reply?.version,
+      section: metadata.section,
+      categoryId: metadata.categoryId?.id,
+      categoryVer: metadata.categoryId?.version,
+      templateId: metadata.template?.id,
+      templateVer: metadata.template?.version,
+      authors: metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
+      createdAt: metadata.version.dateTime,
+    );
+  }
+}
+
 extension on JoinedProposalEntity {
   ProposalDocumentData toModel() {
     return ProposalDocumentData(
@@ -215,6 +269,19 @@ extension on JoinedProposalEntity {
       action: action?.toModel(),
       commentsCount: commentsCount,
       versions: versions,
+    );
+  }
+}
+
+extension on JoinedProposalBriefEntity {
+  JoinedProposalBriefData toModel() {
+    return JoinedProposalBriefData(
+      proposal: proposal.toModel(),
+      template: template?.toModel(),
+      actionType: actionType,
+      versionIds: versionIds,
+      commentsCount: commentsCount,
+      isFavorite: isFavorite,
     );
   }
 }

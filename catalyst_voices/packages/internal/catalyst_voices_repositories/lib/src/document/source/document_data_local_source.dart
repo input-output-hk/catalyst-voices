@@ -7,6 +7,8 @@ abstract interface class DocumentDataLocalSource implements DocumentDataSource {
 
   Future<bool> exists({required DocumentRef ref});
 
+  Future<List<DocumentRef>> filterExisting(List<DocumentRef> refs);
+
   Future<List<DocumentData>> getAll({required DocumentRef ref});
 
   Future<DocumentData?> getLatest({

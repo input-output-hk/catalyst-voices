@@ -21,6 +21,13 @@ Future<void> from3To4(Migrator m, Schema4 schema) async {
     await m.createTable(schema.documentsLocalMetadata);
     await m.createTable(schema.localDocumentsDrafts);
 
+    await m.createIndex(schema.idxDocumentsV2TypeId);
+    await m.createIndex(schema.idxDocumentsV2TypeIdVer);
+    await m.createIndex(schema.idxDocumentsV2TypeRefId);
+    await m.createIndex(schema.idxDocumentsV2TypeRefIdVer);
+    await m.createIndex(schema.idxDocumentsV2RefIdVer);
+    await m.createIndex(schema.idxDocumentsV2TypeCreatedAt);
+
     // TODO(damian-molinski): created indexes, views and queries.
 
     await _migrateDocs(m, schema, batchSize: _batchSize);

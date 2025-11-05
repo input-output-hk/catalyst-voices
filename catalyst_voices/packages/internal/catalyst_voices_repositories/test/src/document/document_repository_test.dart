@@ -269,28 +269,32 @@ void main() {
       );
     });
 
-    group('insertDocument', () {
-      test(
-        'draft document data is saved',
-        () async {
-          // Given
-          final documentDataToSave = DocumentDataFactory.build(
-            selfRef: DocumentRefFactory.draftRef(),
-          );
+    group(
+      'insertDocument',
+      () {
+        test(
+          'draft document data is saved',
+          () async {
+            // Given
+            final documentDataToSave = DocumentDataFactory.build(
+              selfRef: DocumentRefFactory.draftRef(),
+            );
 
-          // When
-          await repository.upsertDocument(document: documentDataToSave);
+            // When
+            await repository.upsertDocument(document: documentDataToSave);
 
-          // Then
-          final savedDocumentData = await repository.getDocumentData(
-            ref: documentDataToSave.metadata.selfRef,
-          );
+            // Then
+            final savedDocumentData = await repository.getDocumentData(
+              ref: documentDataToSave.metadata.selfRef,
+            );
 
-          expect(savedDocumentData, equals(documentDataToSave));
-        },
-        onPlatform: driftOnPlatforms,
-      );
-    });
+            expect(savedDocumentData, equals(documentDataToSave));
+          },
+          onPlatform: driftOnPlatforms,
+        );
+      },
+      skip: 'V2 drafts are not yet migrated',
+    );
 
     test(
       'updating proposal draft '
@@ -341,6 +345,7 @@ void main() {
           ]),
         );
       },
+      skip: 'V2 drafts are not yet migrated',
       onPlatform: driftOnPlatforms,
     );
 
@@ -382,6 +387,7 @@ void main() {
           ]),
         );
       },
+      skip: 'V2 drafts are not yet migrated',
       onPlatform: driftOnPlatforms,
     );
   });

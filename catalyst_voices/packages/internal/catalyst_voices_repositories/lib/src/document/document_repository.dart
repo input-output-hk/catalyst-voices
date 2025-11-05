@@ -97,9 +97,9 @@ abstract interface class DocumentRepository {
     required DocumentIndexFilters filters,
   });
 
-  /// Looks up local source if matching document exists.
-  Future<bool> isCached({
-    required DocumentRef ref,
+  /// Filters and returns only the DocumentRefs from [refs] which are cached.
+  Future<List<DocumentRef>> isCachedBulk({
+    required List<DocumentRef> refs,
   });
 
   /// Similar to [watchIsDocumentFavorite] but stops after first emit.
@@ -337,11 +337,17 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   }
 
   @override
-  Future<bool> isCached({required DocumentRef ref}) {
-    return switch (ref) {
-      DraftRef() => _drafts.exists(ref: ref),
-      SignedDocumentRef() => _localDocuments.exists(ref: ref),
-    };
+  Future<List<DocumentRef>> isCachedBulk({required List<DocumentRef> refs}) {
+    final signedRefs = refs.whereType<SignedDocumentRef>().toList();
+    final localDraftsRefs = refs.whereType<DraftRef>().toList();
+
+    final signedDocsSave = _localDocuments.filterExisting(signedRefs);
+    final draftsDocsSave = _drafts.filterExisting(localDraftsRefs);
+
+    return [
+      signedDocsSave,
+      draftsDocsSave,
+    ].wait.then((value) => value.expand((refs) => refs).toList());
   }
 
   @override
