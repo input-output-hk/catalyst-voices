@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT ../ AS repo-ci
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.5.25 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:feat-browser-version-flutter-setup AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
@@ -17,7 +17,7 @@ repo-catalyst-voices:
 
 # Copy all the necessary files and running bootstrap
 builder:
-    DO flutter-ci+SETUP
+    DO flutter-ci+SETUP --CHROME_VERSION=132.0.6834.159
     COPY +repo-catalyst-voices/repo .
     DO flutter-ci+BOOTSTRAP
 
