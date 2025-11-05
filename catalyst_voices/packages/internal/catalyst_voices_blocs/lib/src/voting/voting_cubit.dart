@@ -109,6 +109,11 @@ final class VotingCubit extends Cubit<VotingState>
 
     _countdownTimer.cancel();
 
+    if (_proposalsRequestCompleter != null && !_proposalsRequestCompleter!.isCompleted) {
+      _proposalsRequestCompleter!.complete();
+    }
+    _proposalsRequestCompleter = null;
+
     return super.close();
   }
 

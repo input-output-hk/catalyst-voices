@@ -16,29 +16,6 @@ class VotingProposalsTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSelector<VotingCubit, VotingState, Map<VotingPageTab, int>>(
-      selector: (state) => state.count,
-      builder: (context, state) {
-        return _VotingProposalsTabs(
-          data: state,
-          controller: controller,
-        );
-      },
-    );
-  }
-}
-
-class _VotingProposalsTabs extends StatelessWidget {
-  final Map<VotingPageTab, int> data;
-  final VoicesTabController<VotingPageTab> controller;
-
-  const _VotingProposalsTabs({
-    required this.data,
-    required this.controller,
-  });
-
-  @override
-  Widget build(BuildContext context) {
     return VoicesTabBar(
       dividerHeight: 0,
       controller: controller,
@@ -50,9 +27,26 @@ class _VotingProposalsTabs extends StatelessWidget {
           VoicesTab(
             data: tab,
             key: tab.tabKey(),
-            child: VoicesTabText(tab.noOf(context, count: data[tab] ?? 0)),
+            child: _TabText(key: ValueKey('${tab.name}Text'), tab: tab),
           ),
       ],
+    );
+  }
+}
+
+class _TabText extends StatelessWidget {
+  final VotingPageTab tab;
+
+  const _TabText({
+    required super.key,
+    required this.tab,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<VotingCubit, VotingState, int>(
+      selector: (state) => state.count[tab] ?? 0,
+      builder: (context, state) => VoicesTabText(tab.noOf(context, count: state)),
     );
   }
 }
