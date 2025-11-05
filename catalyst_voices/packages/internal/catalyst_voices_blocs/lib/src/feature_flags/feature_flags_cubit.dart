@@ -23,6 +23,7 @@ final class FeatureFlagsCubit extends Cubit<FeatureFlagsState> {
   @override
   Future<void> close() async {
     await _subscription?.cancel();
+    _subscription = null;
     return super.close();
   }
 

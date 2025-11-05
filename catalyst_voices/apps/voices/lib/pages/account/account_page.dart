@@ -124,7 +124,12 @@ class _AccountPageState extends State<AccountPage>
       switch (phaseType) {
         case CampaignPhaseType.communityReview:
         case CampaignPhaseType.communityVoting:
-          const VotingRoute($extra: true).go(context);
+          final isVotingEnable = context.read<FeatureFlagsCubit>().state.isEnabled(Features.voting);
+          if (isVotingEnable) {
+            const VotingRoute($extra: true).go(context);
+          } else {
+            const DiscoveryRoute($extra: true).go(context);
+          }
         case null:
         case CampaignPhaseType.proposalSubmission:
         case CampaignPhaseType.votingRegistration:

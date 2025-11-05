@@ -240,7 +240,9 @@ final class VotingCubit extends Cubit<VotingState>
     final page = _cache.page;
     final favoriteIds = _cache.favoriteIds ?? [];
     final lastCastedVote = _cache.lastCastedVote ?? [];
-    final showComments = campaign?.supportsComments ?? false;
+    final showComments =
+        campaign != null &&
+        !campaign.phaseStateTo(CampaignPhaseType.communityVoting).status.isActive;
 
     if (campaign == null || page == null) {
       return;
