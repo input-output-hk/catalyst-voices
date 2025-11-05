@@ -9,6 +9,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
+import 'package:rxdart/rxdart.dart';
 
 final _logger = Logger('ProposalBloc');
 
@@ -48,7 +49,13 @@ final class ProposalCubit extends Cubit<ProposalState>
       activeAccountId: Optional(_userService.user.activeAccount?.catalystId),
     );
     _activeAccountIdSub = _userService.watchUser
-        .map((event) => event.activeAccount?.catalystId)
+        .map((user) => user.activeAccount)
+        .switchMap(
+          (account) {
+            final isUnlockedStream = account?.keychain.watchIsUnlocked ?? Stream.value(false);
+            return isUnlockedStream.map((isUnlocked) => isUnlocked ? account?.catalystId : null);
+          },
+        )
         .distinct()
         .listen(_handleActiveAccountIdChanged);
   }
