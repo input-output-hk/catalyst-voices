@@ -12,6 +12,8 @@ pub(crate) enum EqOrRangedUuid {
         /// Maximum UUID to find (inclusive)
         max: uuid::Uuid,
     },
+    /// Search UUIDs in the given list.
+    In(Vec<uuid::Uuid>),
 }
 
 impl EqOrRangedUuid {
@@ -24,6 +26,13 @@ impl EqOrRangedUuid {
             Self::Eq(id) => format!("{table_field} = '{id}'"),
             Self::Range { min, max } => {
                 format!("{table_field} >= '{min}' AND {table_field} <= '{max}'")
+            },
+            Self::In(ids) => {
+                itertools::intersperse(
+                    ids.iter().map(|id| format!("{table_field} = '{id}'")),
+                    " OR ".to_string(),
+                )
+                .collect()
             },
         }
     }

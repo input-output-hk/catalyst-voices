@@ -212,35 +212,82 @@ impl Example for VerRangeDocumented {
     }
 }
 
+/// Document versions from the list.
+#[derive(Object, Debug, Clone, PartialEq)]
+#[oai(example = true)]
+pub(crate) struct VerIn {
+    /// Matching any document versions from the list.
+    r#in: Vec<DocumentVer>,
+}
+
+impl Example for VerIn {
+    fn example() -> Self {
+        Self {
+            r#in: vec![DocumentVer::example()],
+        }
+    }
+}
+
+// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
+// openapi docs on an object.
+#[derive(NewType, Debug, Clone, PartialEq)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+/// Document versions from the list.
+///
+/// A range of [Document Versions]().
+pub(crate) struct VerInDocumented(VerIn);
+
+impl Example for VerInDocumented {
+    fn example() -> Self {
+        Self(VerIn::example())
+    }
+}
+
 #[derive(Union, Debug, Clone, PartialEq)]
 #[oai(one_of)]
 /// Document or Range of Documents
 ///
 /// Either a Single Document Version, or a Range of Document Versions
-pub(crate) enum EqOrRangedVer {
+pub(crate) enum VerSelector {
     /// This exact Document ID
     Eq(VerEqDocumented),
     /// Document Versions in this range
     Range(VerRangeDocumented),
+    /// Document versions in the list.
+    In(VerInDocumented),
 }
 
-impl Example for EqOrRangedVer {
+impl Example for VerSelector {
     fn example() -> Self {
         Self::Range(VerRangeDocumented::example())
     }
 }
 
-impl TryFrom<EqOrRangedVer> for EqOrRangedUuid {
+impl TryFrom<VerSelector> for EqOrRangedUuid {
     type Error = anyhow::Error;
 
-    fn try_from(value: EqOrRangedVer) -> Result<Self, Self::Error> {
+    fn try_from(value: VerSelector) -> Result<Self, Self::Error> {
         match value {
-            EqOrRangedVer::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
-            EqOrRangedVer::Range(range) => {
+            VerSelector::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
+            VerSelector::Range(range) => {
                 Ok(Self::Range {
                     min: range.0.min.parse()?,
                     max: range.0.max.parse()?,
                 })
+            },
+            VerSelector::In(vers) => {
+                Ok(Self::In(
+                    vers.0
+                        .r#in
+                        .into_iter()
+                        .map(|v| v.0.parse::<uuid::Uuid>())
+                        .collect::<Result<_, _>>()?,
+                ))
             },
         }
     }
@@ -256,25 +303,34 @@ impl TryFrom<EqOrRangedVer> for EqOrRangedUuid {
 /// Document Version Selector
 ///
 /// Either a absolute single Document Version or a range of Document Versions
-pub(crate) struct EqOrRangedVerDocumented(pub(crate) EqOrRangedVer);
+pub(crate) struct VerSelectorDocumented(pub(crate) VerSelector);
 
-impl Example for EqOrRangedVerDocumented {
+impl Example for VerSelectorDocumented {
     fn example() -> Self {
-        Self(EqOrRangedVer::example())
+        Self(VerSelector::example())
     }
 }
 
-impl TryFrom<EqOrRangedVerDocumented> for EqOrRangedUuid {
+impl TryFrom<VerSelectorDocumented> for EqOrRangedUuid {
     type Error = anyhow::Error;
 
-    fn try_from(value: EqOrRangedVerDocumented) -> Result<Self, Self::Error> {
+    fn try_from(value: VerSelectorDocumented) -> Result<Self, Self::Error> {
         match value.0 {
-            EqOrRangedVer::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
-            EqOrRangedVer::Range(range) => {
+            VerSelector::Eq(ver) => Ok(Self::Eq(ver.0.eq.parse()?)),
+            VerSelector::Range(range) => {
                 Ok(Self::Range {
                     min: range.0.min.parse()?,
                     max: range.0.max.parse()?,
                 })
+            },
+            VerSelector::In(vers) => {
+                Ok(Self::In(
+                    vers.0
+                        .r#in
+                        .into_iter()
+                        .map(|v| v.0.parse())
+                        .collect::<Result<_, _>>()?,
+                ))
             },
         }
     }

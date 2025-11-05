@@ -203,33 +203,80 @@ impl Example for IdRangeDocumented {
     }
 }
 
+/// Document IDs from the list.
+#[derive(Object, Debug, Clone, PartialEq)]
+#[oai(example = true)]
+pub(crate) struct IdIn {
+    /// Matching any document IDs from the list.
+    r#in: Vec<DocumentId>,
+}
+
+impl Example for IdIn {
+    fn example() -> Self {
+        Self {
+            r#in: vec![DocumentId::example()],
+        }
+    }
+}
+
+// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
+// openapi docs on an object.
+#[derive(NewType, Debug, Clone, PartialEq)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+/// Document IDs from the list.
+///
+/// A list of
+/// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id).
+pub(crate) struct IdInDocumented(IdIn);
+impl Example for IdInDocumented {
+    fn example() -> Self {
+        Self(IdIn::example())
+    }
+}
+
 #[derive(Union, Debug, Clone, PartialEq)]
 #[oai(one_of)]
 /// Either a Single Document ID, or a Range of Document IDs
-pub(crate) enum EqOrRangedId {
+pub(crate) enum IdSelector {
     /// This exact Document ID
     Eq(IdEqDocumented),
     /// Document IDs in this range
     Range(IdRangeDocumented),
+    /// Document IDs in the list
+    In(IdInDocumented),
 }
 
-impl Example for EqOrRangedId {
+impl Example for IdSelector {
     fn example() -> Self {
         Self::Eq(IdEqDocumented::example())
     }
 }
 
-impl TryFrom<EqOrRangedId> for EqOrRangedUuid {
+impl TryFrom<IdSelector> for EqOrRangedUuid {
     type Error = anyhow::Error;
 
-    fn try_from(value: EqOrRangedId) -> Result<Self, Self::Error> {
+    fn try_from(value: IdSelector) -> Result<Self, Self::Error> {
         match value {
-            EqOrRangedId::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
-            EqOrRangedId::Range(range) => {
+            IdSelector::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
+            IdSelector::Range(range) => {
                 Ok(Self::Range {
                     min: range.0.min.parse()?,
                     max: range.0.max.parse()?,
                 })
+            },
+            IdSelector::In(ids) => {
+                Ok(Self::In(
+                    ids.0
+                        .r#in
+                        .into_iter()
+                        .map(|id| id.0.parse::<uuid::Uuid>())
+                        .collect::<Result<_, _>>()?,
+                ))
             },
         }
     }
@@ -245,25 +292,34 @@ impl TryFrom<EqOrRangedId> for EqOrRangedUuid {
 /// Document ID Selector
 ///
 /// Either a absolute single Document ID or a range of Document IDs
-pub(crate) struct EqOrRangedIdDocumented(pub(crate) EqOrRangedId);
+pub(crate) struct IdSelectorDocumented(pub(crate) IdSelector);
 
-impl Example for EqOrRangedIdDocumented {
+impl Example for IdSelectorDocumented {
     fn example() -> Self {
-        Self(EqOrRangedId::example())
+        Self(IdSelector::example())
     }
 }
 
-impl TryFrom<EqOrRangedIdDocumented> for EqOrRangedUuid {
+impl TryFrom<IdSelectorDocumented> for EqOrRangedUuid {
     type Error = anyhow::Error;
 
-    fn try_from(value: EqOrRangedIdDocumented) -> Result<Self, Self::Error> {
+    fn try_from(value: IdSelectorDocumented) -> Result<Self, Self::Error> {
         match value.0 {
-            EqOrRangedId::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
-            EqOrRangedId::Range(range) => {
+            IdSelector::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
+            IdSelector::Range(range) => {
                 Ok(Self::Range {
                     min: range.0.min.parse()?,
                     max: range.0.max.parse()?,
                 })
+            },
+            IdSelector::In(list) => {
+                Ok(Self::In(
+                    list.0
+                        .r#in
+                        .into_iter()
+                        .map(|id| id.0.parse::<uuid::Uuid>())
+                        .collect::<Result<_, _>>()?,
+                ))
             },
         }
     }
