@@ -120,7 +120,7 @@ final class Dependencies extends DependencyProvider {
           get<ProposalService>(),
         ),
       )
-      ..registerLazySingleton<VotingCubit>(
+      ..registerFactory<VotingCubit>(
         () => VotingCubit(
           get<UserService>(),
           get<CampaignService>(),

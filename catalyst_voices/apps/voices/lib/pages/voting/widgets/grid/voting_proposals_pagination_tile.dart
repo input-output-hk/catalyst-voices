@@ -24,9 +24,11 @@ class VotingProposalsPaginationTile extends StatelessWidget {
         unawaited(route.push(context));
       },
       onFavoriteChanged: (isFavorite) {
-        context.read<VotingCubit>().onChangeFavoriteProposal(
-          proposal.selfRef,
-          isFavorite: isFavorite,
+        unawaited(
+          context.read<VotingCubit>().onChangeFavoriteProposal(
+            proposal.selfRef,
+            isFavorite: isFavorite,
+          ),
         );
       },
       onVoteAction: (action) {
