@@ -7,6 +7,9 @@
     "x-changelog": {
         "2025-10-08": [
             "F15 Template Setup"
+        ],
+        "2025-11-05": [
+            "Included two additional links in the Consent & Confirmation question"
         ]
     },
     "definitions": {
