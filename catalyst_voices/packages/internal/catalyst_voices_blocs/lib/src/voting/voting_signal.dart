@@ -3,7 +3,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class ChangeCategoryVotingSignal extends VotingSignal {
-  final SignedDocumentRef? to;
+  final String? to;
 
   const ChangeCategoryVotingSignal({
     this.to,

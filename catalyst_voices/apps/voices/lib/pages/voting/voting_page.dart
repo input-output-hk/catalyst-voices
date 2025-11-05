@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class VotingPage extends StatefulWidget {
-  final SignedDocumentRef? categoryId;
+  final String? categoryId;
   final VotingPageTab? tab;
 
   const VotingPage({
@@ -78,9 +78,8 @@ class _VotingPageState extends State<VotingPage>
 
     if (widget.categoryId != oldWidget.categoryId || widget.tab != oldWidget.tab) {
       context.read<VotingCubit>().changeFilters(
-        onlyMy: Optional(tab == VotingPageTab.my),
-        category: Optional(widget.categoryId),
-        type: tab.filter,
+        categoryId: Optional(widget.categoryId),
+        tab: Optional(tab),
       );
 
       _doResetPagination();
@@ -103,7 +102,7 @@ class _VotingPageState extends State<VotingPage>
   void handleSignal(VotingSignal signal) {
     switch (signal) {
       case ChangeCategoryVotingSignal(:final to):
-        _updateRoute(categoryId: Optional(to?.id));
+        _updateRoute(categoryId: Optional(to));
       case ChangeTabVotingSignal(:final tab):
         _updateRoute(tab: tab);
       case ResetPaginationVotingSignal():
@@ -146,9 +145,8 @@ class _VotingPageState extends State<VotingPage>
     ).distinct().listen(_updateTabsIfNeeded);
 
     votingCubit.init(
-      onlyMyProposals: selectedTab == VotingPageTab.my,
-      category: widget.categoryId,
-      type: selectedTab.filter,
+      categoryId: widget.categoryId,
+      tab: selectedTab,
     );
 
     _pagingController
@@ -192,7 +190,7 @@ class _VotingPageState extends State<VotingPage>
     VotingPageTab? tab,
   }) {
     Router.neglect(context, () {
-      final effectiveCategoryId = categoryId.dataOr(widget.categoryId?.id);
+      final effectiveCategoryId = categoryId.dataOr(widget.categoryId);
       final effectiveTab = tab?.name ?? widget.tab?.name;
 
       VotingRoute(

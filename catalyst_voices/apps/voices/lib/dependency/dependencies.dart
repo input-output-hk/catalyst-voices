@@ -125,8 +125,6 @@ final class Dependencies extends DependencyProvider {
           get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
-          get<VotingBallotBuilder>(),
-          get<VotingService>(),
         ),
       )
       // TODO(LynxLynxx): add repository for campaign management

@@ -191,12 +191,11 @@ final class VotingRoute extends GoRouteData with FadePageTransitionMixin {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     final categoryId = this.categoryId;
-    final categoryRef = categoryId != null ? SignedDocumentRef(id: categoryId) : null;
 
     final tab = VotingPageTab.values.asNameMap()[this.tab];
 
     return VotingPage(
-      categoryId: categoryRef,
+      categoryId: categoryId,
       tab: tab,
     );
   }
