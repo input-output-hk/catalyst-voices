@@ -96,25 +96,9 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     final effectivePage = math.max(request.page, 0);
     final effectiveSize = request.size.clamp(0, 999);
 
-    if (effectiveSize == 0) {
+    final shouldReturn = _shouldReturnEarlyFor(filters: filters, size: effectiveSize);
+    if (shouldReturn) {
       return Page.empty(page: effectivePage, maxPerPage: effectiveSize);
-    }
-
-    final campaign = filters.campaign;
-    if (campaign != null) {
-      assert(
-        campaign.categoriesIds.length <= 100,
-        'Campaign filter with more than 100 categories may impact performance. '
-        'Consider pagination or alternative filtering strategy.',
-      );
-
-      if (campaign.categoriesIds.isEmpty) {
-        return Page.empty(page: effectivePage, maxPerPage: effectiveSize);
-      }
-
-      if (filters.categoryId != null && !campaign.categoriesIds.contains(filters.categoryId)) {
-        return Page.empty(page: effectivePage, maxPerPage: effectiveSize);
-      }
     }
 
     final items = await _queryVisibleProposalsPage(
@@ -137,21 +121,9 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   Future<int> getVisibleProposalsCount({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    final campaign = filters.campaign;
-    if (campaign != null) {
-      assert(
-        campaign.categoriesIds.length <= 100,
-        'Campaign filter with more than 100 categories may impact performance. '
-        'Consider pagination or alternative filtering strategy.',
-      );
-
-      if (campaign.categoriesIds.isEmpty) {
-        return Future.value(0);
-      }
-
-      if (filters.categoryId != null && !campaign.categoriesIds.contains(filters.categoryId)) {
-        return Future.value(0);
-      }
+    final shouldReturn = _shouldReturnEarlyFor(filters: filters);
+    if (shouldReturn) {
+      return Future.value(0);
     }
 
     return _countVisibleProposals(filters: filters).getSingle();
@@ -185,25 +157,9 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     final effectivePage = math.max(request.page, 0);
     final effectiveSize = request.size.clamp(0, 999);
 
-    if (effectiveSize == 0) {
+    final shouldReturn = _shouldReturnEarlyFor(filters: filters, size: effectiveSize);
+    if (shouldReturn) {
       return Stream.value(Page.empty(page: effectivePage, maxPerPage: effectiveSize));
-    }
-
-    final campaign = filters.campaign;
-    if (campaign != null) {
-      assert(
-        campaign.categoriesIds.length <= 100,
-        'Campaign filter with more than 100 categories may impact performance. '
-        'Consider pagination or alternative filtering strategy.',
-      );
-
-      if (campaign.categoriesIds.isEmpty) {
-        return Stream.value(Page.empty(page: effectivePage, maxPerPage: effectiveSize));
-      }
-
-      if (filters.categoryId != null && !campaign.categoriesIds.contains(filters.categoryId)) {
-        return Stream.value(Page.empty(page: effectivePage, maxPerPage: effectiveSize));
-      }
     }
 
     final itemsStream = _queryVisibleProposalsPage(
@@ -230,21 +186,9 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   Stream<int> watchVisibleProposalsCount({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    final campaign = filters.campaign;
-    if (campaign != null) {
-      assert(
-        campaign.categoriesIds.length <= 100,
-        'Campaign filter with more than 100 categories may impact performance. '
-        'Consider pagination or alternative filtering strategy.',
-      );
-
-      if (campaign.categoriesIds.isEmpty) {
-        return Stream.value(0);
-      }
-
-      if (filters.categoryId != null && !campaign.categoriesIds.contains(filters.categoryId)) {
-        return Stream.value(0);
-      }
+    final shouldReturn = _shouldReturnEarlyFor(filters: filters);
+    if (shouldReturn) {
+      return Stream.value(0);
     }
 
     return _countVisibleProposals(filters: filters).watchSingle();
@@ -664,6 +608,34 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         isFavorite: isFavorite,
       );
     });
+  }
+
+  bool _shouldReturnEarlyFor({
+    required ProposalsFiltersV2 filters,
+    int? size,
+  }) {
+    if (size != null && size == 0) {
+      return true;
+    }
+
+    final campaign = filters.campaign;
+    if (campaign != null) {
+      assert(
+        campaign.categoriesIds.length <= 100,
+        'Campaign filter with more than 100 categories may impact performance. '
+        'Consider pagination or alternative filtering strategy.',
+      );
+
+      if (campaign.categoriesIds.isEmpty) {
+        return true;
+      }
+
+      if (filters.categoryId != null && !campaign.categoriesIds.contains(filters.categoryId)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
 
