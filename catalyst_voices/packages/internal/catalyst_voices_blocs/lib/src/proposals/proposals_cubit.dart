@@ -147,6 +147,11 @@ final class ProposalsCubit extends Cubit<ProposalsState>
     await _proposalsPageSub?.cancel();
     _proposalsPageSub = null;
 
+    if (_proposalsRequestCompleter != null && !_proposalsRequestCompleter!.isCompleted) {
+      _proposalsRequestCompleter!.complete();
+    }
+    _proposalsRequestCompleter = null;
+
     return super.close();
   }
 
