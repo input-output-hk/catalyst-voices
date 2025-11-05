@@ -29,6 +29,7 @@ autoresizing
 autovalidate
 backendpython
 backgrounding
+backpressure
 bech
 bimap
 bindgen
@@ -66,6 +67,7 @@ CNFT
 COCOAPODS
 codegen
 codepoints
+COEP
 collabs
 commitlog
 concatcp
@@ -266,6 +268,7 @@ Pdart
 permissionless
 pg_isready
 pinenacl
+PITR
 plpgsql
 podfile
 podhelper
@@ -306,6 +309,7 @@ ristretto
 rlib
 rngs
 rolname
+rollouts
 RPATH
 ruleset
 rustc

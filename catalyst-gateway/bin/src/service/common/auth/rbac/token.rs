@@ -180,8 +180,8 @@ impl CatalystRBACTokenV1 {
 
     /// Returns a network.
     #[allow(dead_code)]
-    pub(crate) fn network(&self) -> Network {
-        self.network
+    pub(crate) fn network(&self) -> &Network {
+        &self.network
     }
 
     /// Returns a corresponded registration chain if any registrations present.

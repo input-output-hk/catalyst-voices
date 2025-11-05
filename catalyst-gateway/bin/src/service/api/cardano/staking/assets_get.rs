@@ -85,13 +85,13 @@ struct TxoInfo {
 }
 
 /// Building a full stake info response from the provided arguments.
-async fn build_full_stake_info_response(
+pub(crate) async fn build_full_stake_info_response(
     stake_address: Cip19StakeAddress,
     provided_network: Option<Network>,
     slot_num: Option<SlotNo>,
 ) -> anyhow::Result<Option<FullStakeInfo>> {
     if let Some(provided_network) = provided_network {
-        if cardano_chain_follower::Network::from(provided_network) != Settings::cardano_network() {
+        if &cardano_chain_follower::Network::from(provided_network) != Settings::cardano_network() {
             return Ok(None);
         }
     }

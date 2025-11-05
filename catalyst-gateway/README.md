@@ -1,13 +1,13 @@
 # Catalyst Data Gateway
 
 * [Catalyst Data Gateway](#catalyst-data-gateway)
-  * [Code Organization](#code-organization)
-    * [`./bin`](#bin)
-    * [`./crates`](#crates)
-    * [`./event-db`](#event-db)
-  * [Build and Run](#build-and-run)
-    * [Docker images](#docker-images)
-    * [Rust binary](#rust-binary)
+    * [Code Organization](#code-organization)
+        * [`./bin`](#bin)
+        * [`./crates`](#crates)
+        * [`./event-db`](#event-db)
+    * [Build and Run](#build-and-run)
+        * [Docker images](#docker-images)
+        * [Rust binary](#rust-binary)
 
 The Catalyst Data Gateway is the backend of the Catalyst Voices hosted stack.
 
