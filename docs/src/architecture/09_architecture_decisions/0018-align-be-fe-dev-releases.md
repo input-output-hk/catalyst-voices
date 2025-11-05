@@ -1,9 +1,9 @@
 ---
-    title: 0011  Align BE / FE unstable releases
+    title: 0018  Align BE / FE unstable releases
     adr:
         author: Oleksandr Prokhorenko
         created: 21-Oct-2025
-        status:  draft
+        status:  proposed
 ---
 
 ## Context
