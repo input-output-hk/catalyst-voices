@@ -32,12 +32,14 @@ code-generator:
 
     LET gen_code_path = lib/generated/api
     LET local_gen_code_path = packages/internal/catalyst_voices_repositories/lib/generated/api/
+    LET local_gen_db_code_path = packages/internal/catalyst_voices_repositories/test/src/database/migration/catalyst_database/generated/
 
     WORKDIR packages/internal/catalyst_voices_repositories
 
     WORKDIR /frontend
 
     RUN melos l10n
+    RUN melos build-db-migration
     RUN melos build-runner
     RUN melos build-runner-repository
 
@@ -58,6 +60,11 @@ code-generator:
                                           -o -name "*.drift.dart" \))
            SAVE ARTIFACT $generated_file AS LOCAL $generated_file
         END
+
+        # Save database migration generated files
+        WORKDIR packages/internal/catalyst_voices_repositories/test/src/database/migration/catalyst_database
+        SAVE ARTIFACT generated/* AS LOCAL $local_gen_db_code_path
+        WORKDIR /frontend
     ELSE
        SAVE ARTIFACT .
     END
