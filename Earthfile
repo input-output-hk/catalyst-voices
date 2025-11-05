@@ -28,7 +28,7 @@ check-spelling:
 
 # check if the sql files are properly formatted and pass lint quality checks.
 check-sqlfluff:
-    FROM postgresql-ci+postgres-base
+    FROM postgresql-ci+sqlfluff-base
 
     COPY . .
 
