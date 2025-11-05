@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/notification/catalyst_messenger.dart';
-import 'package:catalyst_voices/notification/specialized/system_status_issue_banner.dart';
+import 'package:catalyst_voices/notification/specialized/banner/system_status_issue_banner.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 

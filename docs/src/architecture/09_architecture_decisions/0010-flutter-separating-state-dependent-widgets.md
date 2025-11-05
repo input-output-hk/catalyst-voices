@@ -1,13 +1,13 @@
 ---
-    title: Separation of concerns for bloc state-dependent widgets
-      adr:
+    title: 0010 Separation of concerns for bloc state-dependent widgets
+    adr:
         author: Damian Molinski
         created: 06-Jun-2025
         status: accepted
         extends:
-          - 0001-flutter
-          - 0005-flutter-app
-      tags:
+            - 0003-flutter
+            - 0005-flutter-app
+    tags:
         - flutter
         - dart
         - state management
@@ -26,8 +26,8 @@ While this maximizes rendering efficiency, it increases visual complexity and re
 
 * System will grow and UI will become more complex
 * We need to make widget tree as simple to read and understand as possible in order to
-  * make it easier to maintain
-  * modify and apply changes while system grows
+    * make it easier to maintain
+    * modify and apply changes while system grows
 
 ## Decision
 
@@ -39,7 +39,7 @@ The public widget will act as the interface, encapsulating the state selection l
 It will delegate rendering to a private, internal widget that is unaware of the Bloc and simply
 receives the selected data as parameters.
 
-Only exception from spliting delegating rendering into separate, private, widget is having
+Only exception from splitting delegating rendering into separate, private, widget is having
 "atomic" or "trivial" widgets with less or equals than 2 children.
 
 ### Example
@@ -48,7 +48,8 @@ Simple example but it quickly becomes more complex
 
 #### Before
 
-`spaces/spaces_shell_page.dart`
+<!-- markdownlint-disable-next-line MD013 -->
+[spaces/spaces_shell_page.dart](https://github.com/input-output-hk/catalyst-voices/blob/main/catalyst_voices/apps/voices/lib/pages/spaces/spaces_shell_page.dart)
 
 ```dart
     return BlocSelector<SessionCubit, SessionState, _SessionStateData>(
@@ -145,7 +146,8 @@ class _SpacesScaffold extends StatelessWidget {
 
 ```
 
-`spaces/spaces_shell_page.dart`
+<!-- markdownlint-disable-next-line MD013 -->
+[spaces/spaces_shell_page.dart](https://github.com/input-output-hk/catalyst-voices/blob/main/catalyst_voices/apps/voices/lib/pages/spaces/spaces_shell_page.dart)
 
 ```dart
 return SpacesScaffold(

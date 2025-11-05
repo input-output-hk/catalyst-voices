@@ -187,7 +187,7 @@ impl CertInsertQuery {
     ) {
         let (stake_address, pubkey, script) = match *cred {
             conway::StakeCredential::AddrKeyhash(cred) => {
-                let stake_address = StakeAddress::new(block.network(), false, cred.into());
+                let stake_address = StakeAddress::new(block.network().clone(), false, cred.into());
                 let addr = block.witness_for_tx(&VKeyHash::from(*cred), txn);
                 // Note: it is totally possible for the Registration Certificate to not be
                 // witnessed.
@@ -195,7 +195,7 @@ impl CertInsertQuery {
             },
             conway::StakeCredential::ScriptHash(h) => {
                 (
-                    StakeAddress::new(block.network(), true, h.into()),
+                    StakeAddress::new(block.network().clone(), true, h.into()),
                     None,
                     true,
                 )

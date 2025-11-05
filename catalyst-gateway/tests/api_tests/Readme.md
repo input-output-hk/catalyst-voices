@@ -62,11 +62,11 @@ export CAT_GATEWAY_TEST_URL="http://127.0.0.1:3030"
 
 * Run the tests, by specifying one of the markers:
 
-  * ci (marks tests to be run in ci),
-  * nightly (marks tests to be run nightly),
-  * preprod_indexing (marks test which requires indexing of the cardano preprod network),
-  * health_endpoint (marks tests for health endpoint)
-  * health_with_proxy_endpoint (marks tests for health endpoint which requires a proxy for testing)
+    * ci (marks tests to be run in ci),
+    * nightly (marks tests to be run nightly),
+    * preprod_indexing (marks test which requires indexing of the cardano preprod network),
+    * health_endpoint (marks tests for health endpoint)
+    * health_with_proxy_endpoint (marks tests for health endpoint which requires a proxy for testing)
 
 ```shell
 poetry run pytest -s -m <marker>

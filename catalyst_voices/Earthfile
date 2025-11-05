@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT ../ AS repo-ci
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.5.20 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:master AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
@@ -133,7 +133,8 @@ build-web:
         --TARGET=lib/configs/main_web.dart \
         --UPLOAD_DEBUG_SYMBOLS=$UPLOAD_DEBUG_SYMBOLS \
         --SENTRY_ORG='iohk-j4' \
-        --SENTRY_PROJECT='catalyst-voices'
+        --SENTRY_PROJECT='catalyst-voices' \
+        --WASM=true
     SAVE ARTIFACT --keep-ts web
 
 package:

@@ -5,16 +5,16 @@
 Welcome to the Catalyst Voices mono repo, where we manage and maintain the interconnected projects.
 
 * [Catalyst Voices](#catalyst-voices)
-  * [Overview](#overview)
-  * [Getting Started](#getting-started)
-  * [Projects](#projects)
-    * [Athena](#athena)
-    * [Catalyst Voices](#catalyst-voices-1)
-    * [Catalyst Data Gateway](#catalyst-data-gateway)
-    * [Catalyst Voices Packages](#catalyst-voices-packages)
-  * [Development](#development)
-  * [Contributing](#contributing)
-  * [License](#license)
+    * [Overview](#overview)
+    * [Getting Started](#getting-started)
+    * [Projects](#projects)
+        * [Athena](#athena)
+        * [Catalyst Voices](#catalyst-voices-1)
+        * [Catalyst Data Gateway](#catalyst-data-gateway)
+        * [Catalyst Voices Packages](#catalyst-voices-packages)
+    * [Development](#development)
+    * [Contributing](#contributing)
+    * [License](#license)
 
 ## Overview
 

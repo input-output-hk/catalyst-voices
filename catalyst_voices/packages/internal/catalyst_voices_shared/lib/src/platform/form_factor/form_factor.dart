@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_shared/src/platform/form_factor/helpers/stub_form_factor.dart'
     if (dart.library.io) 'helpers/io_form_factor.dart'
-    if (dart.library.html) 'helpers/web_form_factor.dart';
+    if (dart.library.js_interop) 'helpers/web_form_factor.dart';
 
 /// A form factor of the device the app is executing on.
 ///
