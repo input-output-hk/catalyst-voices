@@ -132,7 +132,7 @@ build-web:
     # Version web assets with content-based MD5 hashes for cache busting
     RUN dart run /frontend/scripts/version_web_assets/version_web_assets.dart --build-dir=$WORKDIR/build/web
     
-    SAVE ARTIFACT --keep-ts web AS LOCAL web
+    SAVE ARTIFACT --keep-ts web
 
 package:
     FROM harbor.shared-services.projectcatalyst.io/dockerhub/caddy:2.10
