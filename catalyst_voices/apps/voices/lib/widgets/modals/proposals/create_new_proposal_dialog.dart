@@ -92,16 +92,15 @@ class _ContentView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-          child: child,
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 0, 24, 6),
+            child: child,
+          ),
         ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: CreateNewProposalActionButtons(step: step),
-        ),
+        CreateNewProposalActionButtons(step: step),
       ],
     );
   }
@@ -159,6 +158,7 @@ class _ProposalCategory extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       spacing: 28,
       children: [
         _SectionTitle(

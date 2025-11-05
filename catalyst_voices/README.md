@@ -5,25 +5,26 @@
 This repository contains the Catalyst Voices app and packages.
 
 * [Catalyst Voices](#catalyst-voices)
-  * [Requirements](#requirements)
-  * [Platforms](#platforms)
-  * [Getting Started](#getting-started)
-    * [Bootstrapping](#bootstrapping)
-    * [Packages](#packages)
-    * [Environment Type vs Flavor](#environment-type-vs-flavor)
-    * [Environment types](#environment-types)
-      * [Stress Test](#stress-test)
-      * [Debug Performance Flags](#debug-performance-flags)
-    * [Flavor types](#flavor-types)
-    * [Environment variables](#environment-variables)
-      * [Environment config](#environment-config)
+    * [Requirements](#requirements)
+    * [Recommended VS code plugins](#recommended-vs-code-plugins)
+    * [Platforms](#platforms)
+    * [Getting Started](#getting-started)
+        * [Bootstrapping](#bootstrapping)
+        * [Packages](#packages)
+        * [Environment Type vs Flavor](#environment-type-vs-flavor)
+        * [Environment types](#environment-types)
+            * [Stress Test](#stress-test)
+            * [Debug Performance Flags](#debug-performance-flags)
+        * [Flavor types](#flavor-types)
+        * [Environment variables](#environment-variables)
+            * [Environment config](#environment-config)
     * [Code Generation](#code-generation)
-      * [Running Code Generation](#running-code-generation)
-        * [Basic Generation](#basic-generation)
-        * [Local Saving](#local-saving)
-      * [GitHub Token / PAT Setup](#github-token--pat-setup)
-      * [Security Notes](#security-notes)
-  * [Running Tests](#running-tests)
+            *[Running Code Generation](#running-code-generation)
+                * [Basic Generation](#basic-generation)
+                *[Local Saving](#local-saving)
+            * [GitHub Token / PAT Setup](#github-token--pat-setup)
+            * [Security Notes](#security-notes)
+    * [Running Tests](#running-tests)
 
 ## Requirements
 
@@ -37,11 +38,15 @@ This repository contains the Catalyst Voices app and packages.
 * [Melos](https://melos.invertase.dev)
 * [Fastlane](https://fastlane.tools)
 * Flutter & Dart plugins:
-  * [Visual Studio Code](https://flutter.dev/docs/get-started/editor?tab=vscode)
-  * [Android Studio / IntelliJ](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
+    * [Visual Studio Code](https://flutter.dev/docs/get-started/editor?tab=vscode)
+    * [Android Studio / IntelliJ](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
 * [Rust](https://rustup.rs/): 1.80.0+
 
 ❗️We recommend using **Visual Studio Code** as the **default editor** for this project.
+
+## Recommended VS code plugins
+
+* [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - formatting html and js files.
 
 ## Platforms
 
@@ -74,6 +79,7 @@ just bootstrap
 | [catalyst_voices_services](./packages/internal/catalyst_voices_services/)         | Services |[example](./packages/internal/catalyst_voices_services/)|
 | [catalyst_voices_shared](./packages/internal/catalyst_voices_shared/)             | Shared code  |[example](./packages/internal/catalyst_voices_shared/)|
 | [catalyst_voices_view_models](./packages/internal/catalyst_voices_view_models/)   | ViewModels  |[example](./packages/internal/catalyst_voices_view_models/)|
+| [catalyst_voices_dev](./packages/internal/catalyst_voices_dev/)                   | Dev | [example](./packages/internal/catalyst_voices_dev/)|
 
 ### Environment Type vs Flavor
 
