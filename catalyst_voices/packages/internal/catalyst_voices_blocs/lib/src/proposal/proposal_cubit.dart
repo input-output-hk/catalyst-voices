@@ -48,7 +48,7 @@ final class ProposalCubit extends Cubit<ProposalState>
       activeAccountId: Optional(_userService.user.activeAccount?.catalystId),
     );
     _activeAccountIdSub = _userService.watchUnlockedActiveAccount
-        .map((account) => account?.catalystId)
+        .map((activeAccount) => activeAccount?.catalystId)
         .distinct()
         .listen(_handleActiveAccountIdChanged);
   }

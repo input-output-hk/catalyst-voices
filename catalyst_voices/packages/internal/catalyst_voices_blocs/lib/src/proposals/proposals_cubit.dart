@@ -36,8 +36,8 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   ) : super(const ProposalsState(recentProposalsMaxAge: _recentProposalsMaxAge)) {
     _resetCache();
 
-    _activeAccountIdSub = _userService.watchUnlockedActiveAccount
-        .map((account) => account?.catalystId)
+    _activeAccountIdSub = _userService.watchUser
+        .map((event) => event.activeAccount?.catalystId)
         .distinct()
         .listen(_handleActiveAccountIdChange);
 

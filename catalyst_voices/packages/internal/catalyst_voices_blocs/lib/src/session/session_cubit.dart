@@ -57,7 +57,9 @@ final class SessionCubit extends Cubit<SessionState>
 
     _registrationProgressNotifier.addListener(_onRegistrationProgressChanged);
 
-    _accountSub = _userService.watchUnlockedActiveAccount.listen(_onActiveAccountChanged);
+    _accountSub = _userService.watchUser
+        .map((user) => user.activeAccount)
+        .listen(_onActiveAccountChanged);
 
     _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
 

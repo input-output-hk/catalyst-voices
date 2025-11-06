@@ -538,9 +538,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<List<DetailProposal>> watchUserProposals() async* {
-    yield* _userService.watchUser.distinct().switchMap(_userWhenAccountUnlocked).switchMap((user) {
-      if (user == null) return const Stream.empty();
-
+    yield* _userService.watchUser.distinct().switchMap((user) {
       final authorId = user.activeAccount?.catalystId;
       if (!_isProposer(user) || authorId == null) {
         return const Stream.empty();
@@ -598,9 +596,7 @@ final class ProposalServiceImpl implements ProposalService {
 
   @override
   Stream<ProposalsCount> watchUserProposalsCount() {
-    return _userService.watchUser.distinct().switchMap(_userWhenAccountUnlocked).switchMap((user) {
-      if (user == null) return const Stream.empty();
-
+    return _userService.watchUser.distinct().switchMap((user) {
       final authorId = user.activeAccount?.catalystId;
       if (!_isProposer(user) || authorId == null) {
         // user is not eligible for creating proposals
@@ -704,14 +700,5 @@ final class ProposalServiceImpl implements ProposalService {
     ).wait;
 
     return page.copyWithItems(proposals);
-  }
-
-  Stream<User?> _userWhenAccountUnlocked(User user) {
-    final activeAccount = user.activeAccount;
-
-    if (activeAccount == null) return Stream.value(null);
-
-    final isUnlockedStream = activeAccount.keychain.watchIsUnlocked;
-    return isUnlockedStream.map((isUnlocked) => isUnlocked ? user : null);
   }
 }

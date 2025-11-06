@@ -82,9 +82,12 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       accountPublicStatus: Optional(activeAccount?.publicStatus),
     );
 
-    _activeAccountSub = _userService.watchUnlockedActiveAccount.listen(
-      (value) => add(RebuildActiveAccountProposalEvent(account: value)),
-    );
+    _activeAccountSub = _userService.watchUser
+        .map((event) => event.activeAccount)
+        .distinct()
+        .listen(
+          (value) => add(RebuildActiveAccountProposalEvent(account: value)),
+        );
 
     _isMaxProposalsLimitReachedSub = _proposalService.watchMaxProposalsLimitReached().listen((
       event,

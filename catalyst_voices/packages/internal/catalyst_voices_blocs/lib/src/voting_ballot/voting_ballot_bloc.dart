@@ -47,8 +47,8 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     on<CancelCastingVotesEvent>(_cancelCastingVotes);
     on<CheckPasswordEvent>(_checkPassword);
 
-    _votingPowerSub = _userService.watchUnlockedActiveAccount
-        .map((account) => account?.votingPower)
+    _votingPowerSub = _userService.watchUser
+        .map((user) => user.activeAccount?.votingPower)
         .distinct()
         .listen(_handleVotingPowerChange);
 
