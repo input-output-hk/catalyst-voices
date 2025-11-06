@@ -10,6 +10,7 @@ Launch app using, from [voices](../apps/voices) directory using:
 flutter run --target=lib/configs/main_web.dart \
 --device-id=chrome \
 --profile \
+--wasm \
 --dart-define=ENV_NAME=dev \
 --dart-define=STRESS_TEST=true \
 --dart-define=STRESS_TEST_PROPOSAL_INDEX_COUNT=0 \
