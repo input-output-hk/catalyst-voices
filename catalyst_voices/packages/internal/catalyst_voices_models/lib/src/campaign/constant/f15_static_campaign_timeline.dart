@@ -19,7 +19,7 @@ final f15StaticCampaignTimeline = CampaignTimeline(
           'During Voter registration, ADA holders register via supported wallet to participate in the Voting.',
       timeline: DateRange(
         from: DateTime.utc(2025, 11, 11, 12),
-        to: DateTime.utc(2026, 01, 04, 09, 45),
+        to: DateTime.utc(2026, 01, 04, 21, 45),
       ),
       type: CampaignPhaseType.votingRegistration,
     ),
@@ -66,8 +66,8 @@ final f15StaticCampaignTimeline = CampaignTimeline(
       description:
           '''This phase involves finalizing the key milestones submitted in the Catalyst App during the proposal submission type within the Catalyst Milestone Module. It also includes conducting formal due diligence, and fulfilling all required onboarding steps to become eligible for funding.''',
       timeline: DateRange(
-        from: DateTime.utc(2025, 07, 25, 06),
-        to: DateTime.utc(2025, 07, 30, 06),
+        from: DateTime.utc(2026, 01, 30, 12),
+        to: DateTime.utc(2026, 03, 01, 12),
       ),
       type: CampaignPhaseType.projectOnboarding,
     ),
