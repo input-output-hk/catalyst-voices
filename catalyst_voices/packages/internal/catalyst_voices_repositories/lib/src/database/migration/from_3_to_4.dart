@@ -26,9 +26,9 @@ Future<void> from3To4(Migrator m, Schema4 schema) async {
     await m.createIndex(schema.idxDocumentsV2TypeRefId);
     await m.createIndex(schema.idxDocumentsV2TypeRefIdVer);
     await m.createIndex(schema.idxDocumentsV2RefIdVer);
-    await m.createIndex(schema.idxDocumentsV2TypeCreatedAt);
-
-    // TODO(damian-molinski): created indexes, views and queries.
+    await m.createIndex(schema.idxDocumentsV2TypeIdCreatedAt);
+    await m.createIndex(schema.idxDocumentsV2TypeCategoryId);
+    await m.createIndex(schema.idxDocumentsV2TypeRefIdRefVer);
 
     await _migrateDocs(m, schema, batchSize: _batchSize);
     await _migrateDrafts(m, schema, batchSize: _batchSize);

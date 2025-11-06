@@ -227,7 +227,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     }
 
     if (filters.author != null) {
-      final authorUri = filters.author.toString();
+      final authorUri = filters.author!.toSignificant().toString();
       final escapedAuthor = _escapeForSqlLike(authorUri);
       clauses.add("p.authors LIKE '%$escapedAuthor%' ESCAPE '\\'");
     }

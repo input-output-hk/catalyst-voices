@@ -1017,12 +1017,48 @@
       "type": "index",
       "data": {
         "on": 4,
-        "name": "idx_documents_v2_type_created_at",
+        "name": "idx_documents_v2_type_id_created_at",
         "sql": null,
         "unique": false,
         "columns": [
           "type",
+          "id",
           "created_at"
+        ]
+      }
+    },
+    {
+      "id": 19,
+      "references": [
+        4
+      ],
+      "type": "index",
+      "data": {
+        "on": 4,
+        "name": "idx_documents_v2_type_category_id",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type",
+          "category_id"
+        ]
+      }
+    },
+    {
+      "id": 20,
+      "references": [
+        4
+      ],
+      "type": "index",
+      "data": {
+        "on": 4,
+        "name": "idx_documents_v2_type_ref_id_ref_ver",
+        "sql": null,
+        "unique": false,
+        "columns": [
+          "type",
+          "ref_id",
+          "ref_ver"
         ]
       }
     }
