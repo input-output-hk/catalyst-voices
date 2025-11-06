@@ -102,11 +102,11 @@ class WebAssetVersioner {
   /// Creates a versioned filename by inserting the hash before the extension.
   /// Example: 'flutter_bootstrap.js' -> 'flutter_bootstrap.abc123.js'
   String _createVersionedFilename(String filename, String hash) {
-    final dir = path.url.dirname(filename);
-    final basename = path.url.basenameWithoutExtension(filename);
-    final ext = path.url.extension(filename);
+    final dir = path.dirname(filename);
+    final basename = path.basenameWithoutExtension(filename);
+    final ext = path.extension(filename);
     final versioned = '$basename.$hash$ext';
-    return dir == '.' ? versioned : path.url.join(dir, versioned);
+    return dir == '.' ? versioned : path.join(dir, versioned);
   }
 
   Future<void> _generateManifest() async {
@@ -174,12 +174,12 @@ class WebAssetVersioner {
 
         // Handle relative path suffixes for files in subdirectories
         if (originalPath.contains('/')) {
-          final parts = path.url.split(originalPath);
-          final versionedParts = path.url.split(versionedPath);
+          final parts = path.split(originalPath);
+          final versionedParts = path.split(versionedPath);
 
           for (var i = 1; i < parts.length; i++) {
-            final suffix = path.url.joinAll(parts.sublist(i));
-            final versionedSuffix = path.url.joinAll(versionedParts.sublist(i));
+            final suffix = path.joinAll(parts.sublist(i));
+            final versionedSuffix = path.joinAll(versionedParts.sublist(i));
 
             final updated = _replacePathInContent(
               content,
@@ -221,7 +221,7 @@ class WebAssetVersioner {
 
   Future<void> _versionPartFiles(String originalFilePath) async {
     final fileDir = path.dirname(path.join(buildDir, originalFilePath));
-    final baseFileName = path.url.basename(originalFilePath);
+    final baseFileName = path.basename(originalFilePath);
 
     final partPattern = RegExp(
       '^${RegExp.escape(baseFileName)}_\\d+\\.part\\.js\$',
@@ -239,9 +239,9 @@ class WebAssetVersioner {
     for (final partFile in partFiles) {
       final partFileName = path.basename(partFile.path);
 
-      final originalDir = path.url.dirname(originalFilePath);
+      final originalDir = path.dirname(originalFilePath);
       final relativePath = originalDir.isNotEmpty && originalDir != '.'
-          ? path.url.join(originalDir, partFileName)
+          ? path.join(originalDir, partFileName)
           : partFileName;
 
       await _versionFile(partFile, relativePath);
