@@ -31,3 +31,10 @@ Be aware that number of produced documents will be higher then number of proposa
 * `STRESS_TEST_PROPOSAL_INDEX_COUNT`=1000, `STRESS_TEST_CLEAR_DB`=false
 * `STRESS_TEST_PROPOSAL_INDEX_COUNT`=2000, `STRESS_TEST_CLEAR_DB`=true
 * `STRESS_TEST_PROPOSAL_INDEX_COUNT`=2000, `STRESS_TEST_CLEAR_DB`=false
+
+## Proposals Query
+
+### Machine
+
+Current results are captured on **MacBook Pro, OS Version 15.6.1 (24G90), M1 Pro, 32 GB**.
+Measurements from different machines should be in separate .csv files.
