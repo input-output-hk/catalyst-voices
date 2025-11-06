@@ -71,6 +71,9 @@ void main() {
       final oldDraftsData = drafts.map((e) => e.v3Draft()).toList();
       final expectedNewDraftsData = drafts.map((e) => e.v4Draft()).toList();
 
+      // 4. Authors
+      final expectedAuthors = docs.map((e) => e.v4Authors()).flattened.toList();
+
       await verifier.testWithDataIntegrity(
         oldVersion: 3,
         newVersion: 4,
@@ -84,7 +87,7 @@ void main() {
             ..insertAll(oldDb.drafts, oldDraftsData);
         },
         validateItems: (newDb) async {
-          // Documents
+          // 1. Documents
           final migratedDocs = await newDb.documentsV2.select().get();
           expect(
             migratedDocs.length,
@@ -100,7 +103,7 @@ void main() {
                 'format and data in the correct order',
           );
 
-          // LocalMetadata (eg. fav)
+          // 2. LocalMetadata (eg. fav)
           final migratedFavorites = await newDb.documentsLocalMetadata
               .select()
               .get();
@@ -116,7 +119,7 @@ void main() {
             reason: 'All favorites should be migrated correctly',
           );
 
-          // Local drafts
+          // 3. Local drafts
           final migratedDrafts = await newDb.localDocumentsDrafts
               .select()
               .get();
@@ -129,6 +132,19 @@ void main() {
             migratedDrafts,
             orderedEquals(expectedNewDraftsData),
             reason: 'Migrated drafts should match expected format and data',
+          );
+
+          // 4. Authors
+          final authors = await newDb.documentAuthors.select().get();
+          expect(
+            authors.length,
+            expectedAuthors.length,
+            reason: 'Should migrate the same number of authors',
+          );
+          expect(
+            authors,
+            orderedEquals(expectedAuthors),
+            reason: 'Migrated authors should match expected format and data',
           );
         },
       );
@@ -226,6 +242,8 @@ List<DocumentData> _generateDocuments(
   });
 }
 
+typedef _NewDocumentAuthor = v4.DocumentAuthorsData;
+
 typedef _NewDocumentData = v4.DocumentsV2Data;
 
 typedef _NewDraftData = v4.LocalDocumentsDraftsData;
@@ -298,6 +316,27 @@ extension on DocumentData {
       categoryVer: metadata.categoryId?.version,
       createdAt: metadata.version.tryDateTime ?? DateTime.timestamp(),
     );
+  }
+
+  List<_NewDocumentAuthor> v4Authors() {
+    final documentId = metadata.selfRef.id;
+    final documentVer = metadata.selfRef.version!;
+
+    return (metadata.authors ?? []).map(
+      (catId) {
+        return _NewDocumentAuthor(
+          documentId: documentId,
+          documentVer: documentVer,
+          authorCatId: catId.toUri().toString(),
+          authorCatIdSignificant: catId.toSignificant().toUri().toString(),
+          authorCatIdWithoutUsername: catId
+              .copyWith(username: const Optional.empty())
+              .toUri()
+              .toString(),
+          authorUsername: catId.username,
+        );
+      },
+    ).toList();
   }
 
   _NewDraftData v4Draft() {

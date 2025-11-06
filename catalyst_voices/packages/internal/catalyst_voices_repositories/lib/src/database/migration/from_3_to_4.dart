@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/migration/schema_versions.g.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.drift.dart';
@@ -18,6 +19,7 @@ final _logger = Logger('Migration[3-4]');
 Future<void> from3To4(Migrator m, Schema4 schema) async {
   await m.database.transaction(() async {
     await m.createTable(schema.documentsV2);
+    await m.createTable(schema.documentAuthors);
     await m.createTable(schema.documentsLocalMetadata);
     await m.createTable(schema.localDocumentsDrafts);
 
@@ -66,6 +68,7 @@ Future<void> _migrateDocs(
       final oldDocs = await query.get();
 
       final rows = <RawValuesInsertable<QueryRow>>[];
+      final authors = <RawValuesInsertable<QueryRow>>[];
       for (final oldDoc in oldDocs) {
         final rawContent = oldDoc.read<Uint8List>('content');
         final content = sqlite3.jsonb.decode(rawContent)! as Map<String, dynamic>;
@@ -79,9 +82,18 @@ Future<void> _migrateDocs(
         final insertable = RawValuesInsertable<QueryRow>(entity.toColumns(true));
 
         rows.add(insertable);
+
+        final authorsInjectable = metadata.toAuthorEntity().map(
+          (entity) => RawValuesInsertable<QueryRow>(entity.toColumns(true)),
+        );
+
+        authors.addAll(authorsInjectable);
       }
 
-      batch.insertAll(schema.documentsV2, rows);
+      batch
+        ..insertAll(schema.documentsV2, rows)
+        ..insertAll(schema.documentAuthors, authors);
+
       docsOffset += oldDocs.length;
     });
   }
@@ -339,6 +351,22 @@ extension on SecuredDocumentRef {
 }
 
 extension on DocumentDataMetadataDtoDbV3 {
+  List<DocumentAuthorEntity> toAuthorEntity() {
+    return (authors ?? const []).map(CatalystId.parse).map((catId) {
+      return DocumentAuthorEntity(
+        documentId: selfRef.id,
+        documentVer: selfRef.version!,
+        authorCatId: catId.toUri().toString(),
+        authorCatIdSignificant: catId.toSignificant().toUri().toString(),
+        authorCatIdWithoutUsername: catId
+            .copyWith(username: const Optional.empty())
+            .toUri()
+            .toString(),
+        authorUsername: catId.username,
+      );
+    }).toList();
+  }
+
   DocumentEntityV2 toDocEntity({
     required Map<String, dynamic> content,
   }) {
