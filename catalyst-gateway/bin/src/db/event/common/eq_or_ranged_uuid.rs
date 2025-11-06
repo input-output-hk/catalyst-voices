@@ -1,8 +1,8 @@
 //! `EqOrRangedUuid` query conditional stmt object.
 
-/// Search either by a singe UUID, or a Range of UUIDs
+/// Search either by a singe UUID, a range of UUIDs or a list of UUIDs.
 #[derive(Clone, Debug, PartialEq)]
-pub(crate) enum EqOrRangedUuid {
+pub(crate) enum UuidSelector {
     /// Search by the exact UUID
     Eq(uuid::Uuid),
     /// Search in this UUID's range
@@ -16,7 +16,7 @@ pub(crate) enum EqOrRangedUuid {
     In(Vec<uuid::Uuid>),
 }
 
-impl EqOrRangedUuid {
+impl UuidSelector {
     /// Return a sql conditional statement by the provided `table_field`
     pub(crate) fn conditional_stmt(
         &self,

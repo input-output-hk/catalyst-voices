@@ -14,7 +14,7 @@ use serde_json::Value;
 
 use self::generic::uuidv7;
 use crate::{
-    db::event::common::eq_or_ranged_uuid::EqOrRangedUuid,
+    db::event::common::eq_or_ranged_uuid::UuidSelector,
     service::common::types::{generic, string_types::impl_string_types},
 };
 
@@ -257,7 +257,7 @@ impl Example for IdSelector {
     }
 }
 
-impl TryFrom<IdSelector> for EqOrRangedUuid {
+impl TryFrom<IdSelector> for UuidSelector {
     type Error = anyhow::Error;
 
     fn try_from(value: IdSelector) -> Result<Self, Self::Error> {
@@ -300,7 +300,7 @@ impl Example for IdSelectorDocumented {
     }
 }
 
-impl TryFrom<IdSelectorDocumented> for EqOrRangedUuid {
+impl TryFrom<IdSelectorDocumented> for UuidSelector {
     type Error = anyhow::Error;
 
     fn try_from(value: IdSelectorDocumented) -> Result<Self, Self::Error> {
