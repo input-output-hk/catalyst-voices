@@ -79,6 +79,16 @@ final class CatalystId extends Equatable {
     );
   }
 
+  /// A convenience factory for parsing a [CatalystId] from a string.
+  ///
+  /// This method is a wrapper around [CatalystId.fromUri] that first parses
+  /// the input [data] string into a [Uri] and then constructs the [CatalystId].
+  ///
+  /// Throws a [FormatException] if the [data] string is not a valid URI.
+  factory CatalystId.parse(String data) {
+    return CatalystId.fromUri(Uri.parse(data));
+  }
+
   @override
   List<Object?> get props => [
     host,
@@ -155,6 +165,19 @@ final class CatalystId extends Equatable {
     ];
     final userInfo = parts.join(':');
     return userInfo.isNotEmpty ? userInfo : null;
+  }
+
+  /// A convenience method that wraps [CatalystId.parse] in a `try-catch`
+  /// block.
+  ///
+  /// If [data] is a valid [CatalystId] string, it will be parsed and
+  /// a [CatalystId] instance will be returned. Otherwise, `null` is returned.
+  static CatalystId? tryParse(String data) {
+    try {
+      return CatalystId.parse(data);
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Parses the data from [Uri.path].

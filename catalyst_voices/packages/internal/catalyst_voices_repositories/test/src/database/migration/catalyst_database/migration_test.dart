@@ -218,8 +218,8 @@ List<DocumentData> _generateDocuments(
           : DocumentType.commentDocument,
       /* cSpell:disable */
       authors: [
-        CatalystId.fromUri(Uri.parse(_testUserCatalystIdUri)),
-        if (index.isEven) CatalystId.fromUri(Uri.parse(_testOrgCatalystIdUri)),
+        CatalystId.parse(_testUserCatalystIdUri),
+        if (index.isEven) CatalystId.parse(_testOrgCatalystIdUri),
       ],
       /* cSpell:enable */
     );
