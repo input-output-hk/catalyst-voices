@@ -17,7 +17,6 @@ class ProposalBriefCard extends StatefulWidget {
   final ValueChanged<bool>? onFavoriteChanged;
   final ValueChanged<VoteButtonAction>? onVoteAction;
   final bool canVote;
-  final bool showComments;
 
   const ProposalBriefCard({
     super.key,
@@ -26,7 +25,6 @@ class ProposalBriefCard extends StatefulWidget {
     this.onFavoriteChanged,
     this.onVoteAction,
     this.canVote = true,
-    this.showComments = true,
   });
 
   @override
@@ -241,7 +239,7 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                     publish: proposal.publish,
                     version: proposal.versionNumber,
                     updateDate: proposal.updateDate,
-                    commentsCount: widget.showComments ? proposal.commentsCount : null,
+                    commentsCount: proposal.commentsCount,
                   ),
                   if (voteData != null && onVoteAction != null) ...[
                     const SizedBox(height: 12),
