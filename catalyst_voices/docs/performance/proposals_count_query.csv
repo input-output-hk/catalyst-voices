@@ -1,4 +1,20 @@
-docs_count  ,stored_docs_count  ,avg_duration,   PR,     note
-583,        ,0                  ,0:00:04.008009  ,-      ,-
-712         ,0                  ,0:00:01.406726  ,#3555  ,-
-712,        ,0                  ,0:00:00.942015  ,#3614  ,-
+docs_count  ,filer              ,avg_duration    ,PR     ,note
+712         ,categories         ,0:00:00.264954  ,#3555  ,-
+712         ,categories,drafts  ,0:00:00.188969  ,#3555  ,-
+712         ,categories,finals  ,0:00:00.207445  ,#3555  ,-
+7008        ,categories         ,0:00:01.416110  ,#3555  ,-
+7008        ,categories,drafts  ,0:00:01.474370  ,#3555  ,-
+7008        ,categories,finals  ,0:00:01.466851  ,#3555  ,-
+14008       ,categories         ,0:00:04.123159  ,#3555  ,-
+14008       ,categories,drafts  ,0:00:04.306970  ,#3555  ,-
+14008       ,categories,finals  ,0:00:04.242760  ,#3555  ,-
+
+712         ,categories         ,0:00:00.146675  ,#3614  ,-
+712         ,categories,drafts  ,0:00:00.161375  ,#3614  ,-
+712         ,categories,finals  ,0:00:00.175615  ,#3614  ,-
+7008        ,categories         ,0:00:00.275420  ,#3614  ,-
+7008        ,categories,drafts  ,0:00:00.343510  ,#3614  ,-
+7008        ,categories,finals  ,0:00:00.392119  ,#3614  ,-
+14008       ,categories         ,0:00:00.551765  ,#3614  ,-
+14008       ,categories,drafts  ,0:00:00.692240  ,#3614  ,-
+14008       ,categories,finals  ,0:00:00.832700  ,#3614  ,-
