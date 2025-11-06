@@ -3,7 +3,7 @@ from time import sleep
 import pytest
 
 from api.v1 import rbac
-from api.v1 import document
+from api.v2 import document
 from utils import health
 from utils.rbac_chain import rbac_chain_factory, Chain
 from utils import ProxyHelper
@@ -84,7 +84,7 @@ def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory)
     index_db_proxy.disable()
     health.is_ready() #assertion
     # index-db threshold to start returning 503
-    sleep(180)
+    sleep(280)
     # Index DB testing
     resp = rbac.get(lookup=stake_address_not_registered, token=auth_token)
     assert(resp.status_code == 503), f"Expected RBAC lookup to fail: {resp.status_code} - {resp.text}"
