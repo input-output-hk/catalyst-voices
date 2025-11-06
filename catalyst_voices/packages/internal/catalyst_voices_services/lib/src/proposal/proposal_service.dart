@@ -535,7 +535,7 @@ final class ProposalServiceImpl implements ProposalService {
       castedVotes,
       (page, draftVotes, castedVotes) {
         return page.map(
-          (proposal) => _mapJoinedProposalBriefData(proposal, castedVotes, castedVotes),
+          (proposal) => _mapJoinedProposalBriefData(proposal, draftVotes, castedVotes),
         );
       },
     );

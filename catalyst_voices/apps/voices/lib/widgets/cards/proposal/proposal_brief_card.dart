@@ -16,9 +16,7 @@ class ProposalBriefCard extends StatefulWidget {
   final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
   final ValueChanged<VoteButtonAction>? onVoteAction;
-
-  // TODO(LynxxLynx): This should come from campaign settings
-  final bool readOnly;
+  final bool canVote;
   final bool showComments;
 
   const ProposalBriefCard({
@@ -27,7 +25,7 @@ class ProposalBriefCard extends StatefulWidget {
     this.onTap,
     this.onFavoriteChanged,
     this.onVoteAction,
-    this.readOnly = false,
+    this.canVote = true,
     this.showComments = true,
   });
 
@@ -245,13 +243,14 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                     updateDate: proposal.updateDate,
                     commentsCount: widget.showComments ? proposal.commentsCount : null,
                   ),
-                  if (voteData?.hasVoted ?? false) const SizedBox(height: 12),
-                  if (voteData != null && onVoteAction != null)
+                  if (voteData != null && onVoteAction != null) ...[
+                    const SizedBox(height: 12),
                     VoteButton(
                       data: voteData,
                       onSelected: onVoteAction,
-                      readOnly: widget.readOnly,
+                      readOnly: !widget.canVote,
                     ),
+                  ],
                 ],
               ),
             ),

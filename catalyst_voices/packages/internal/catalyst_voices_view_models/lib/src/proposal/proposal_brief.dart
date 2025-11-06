@@ -86,6 +86,7 @@ class ProposalBrief extends Equatable {
     updateDate,
     commentsCount,
     isFavorite,
+    voteData,
   ];
 
   ProposalBrief copyWith({

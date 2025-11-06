@@ -40,7 +40,6 @@ class VotingProposalsPaginationTile extends StatelessWidget {
 
         context.read<VotingBallotBloc>().add(event);
       },
-      readOnly: true,
     );
   }
 }
