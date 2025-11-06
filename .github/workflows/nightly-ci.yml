@@ -70,7 +70,7 @@ jobs:
           docker compose -f catalyst-gateway/tests/docker-compose.yml up cat-gateway --detach
 
       - name: Wait for cat-gateway to become healthy
-        id: gateway-healthy
+        id: gateway-with-proxy-healthy
         if: ${{ steps.gateway-with-proxy-started.conclusion == 'success' }}
         run: |
           echo "Waiting for container to be healthy..."
@@ -89,8 +89,7 @@ jobs:
           done
 
       - name: Integration health thru proxy tests
-        id: gateway-thru-proxy-started
-        if: false
+        if: ${{ steps.gateway-with-proxy-healthy.conclusion == 'success' }}
         env:
           API_TEST_MARKS: "health_with_proxy_endpoint"
         run: |
