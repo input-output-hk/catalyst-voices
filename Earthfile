@@ -1,8 +1,8 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:master AS mdlint-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:master AS cspell-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:master AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:feat/enable-release-mode-for-flutter-rust-bridge AS mdlint-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:feat/enable-release-mode-for-flutter-rust-bridge AS cspell-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:feat/enable-release-mode-for-flutter-rust-bridge AS postgresql-ci
 
 ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
 FROM ${REGISTRY}/debian:stable-slim

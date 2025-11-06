@@ -1,7 +1,7 @@
 # cspell: words unittests socat
 
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:master AS spectral-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:feat/enable-release-mode-for-flutter-rust-bridge AS spectral-ci
 IMPORT .. AS gateway
 
 # build all necessary docker images required to run `docker-compose.yml` services
