@@ -61,20 +61,43 @@ class WebAssetVersioner {
       throw Exception('Build directory not found: $buildDir');
     }
 
-    _log('Step 1: Calculating MD5 hashes and renaming files...');
+    _log('Discovering manually versioned files...');
+    await _discoverManuallyVersionedFiles();
+
+    _log('\nCalculating MD5 hashes and renaming files...');
     await _calculateHashesAndRenameFiles();
 
-    _log('\nStep 2: Updating asset references in HTML and JavaScript files...');
+    _log('\nUpdating asset references in HTML and JavaScript files...');
     await _updateAssetReferences();
 
-    _log('\nStep 3: Generating version manifest...');
+    _log('\nFixing dynamic skwasm filename construction...');
+    await _fixDynamicSkwasmReferences();
+
+    _log('\nGenerating version manifest...');
     await _generateManifest();
 
     _log('\nVersioning summary:');
     _log('- Total files versioned: ${_versionMap.length}');
-    _log('- Manually versioned files (require manual updates):');
-    for (final file in manuallyVersionedFiles) {
-      _log('  * $file');
+
+    final discoveredManual = manuallyVersionedFiles
+        .where((file) => _versionMap.containsKey(file))
+        .toList();
+    final notFoundManual = manuallyVersionedFiles
+        .where((file) => !_versionMap.containsKey(file))
+        .toList();
+
+    if (discoveredManual.isNotEmpty) {
+      _log('- Manually versioned files discovered:');
+      for (final file in discoveredManual) {
+        _log('  ✓ $file -> ${_versionMap[file]}');
+      }
+    }
+
+    if (notFoundManual.isNotEmpty) {
+      _log('- Manually versioned files not found (may not be used):');
+      for (final file in notFoundManual) {
+        _log('  ⚠ $file');
+      }
     }
   }
 
@@ -107,6 +130,83 @@ class WebAssetVersioner {
     final ext = path.extension(filename);
     final versioned = '$basename.$hash$ext';
     return dir == '.' ? versioned : path.join(dir, versioned);
+  }
+
+  Future<void> _discoverManuallyVersionedFiles() async {
+    for (final fileName in manuallyVersionedFiles) {
+      final basename = path.basenameWithoutExtension(fileName);
+      final ext = path.extension(fileName);
+
+      final allFiles = await Directory(buildDir)
+          .list(recursive: true)
+          .where((entity) => entity is File)
+          .cast<File>()
+          .toList();
+
+      final matchingFiles = allFiles.where((file) {
+        final name = path.basename(file.path);
+        final versionedPattern = RegExp(
+          '^${RegExp.escape(basename)}\\.[a-f0-9]+${RegExp.escape(ext)}\$',
+        );
+        return name == fileName || versionedPattern.hasMatch(name);
+      }).toList();
+
+      if (matchingFiles.isEmpty) {
+        _log('⚠ Manually versioned file not found: $fileName (skipping)');
+        continue;
+      }
+
+      if (matchingFiles.length > 1) {
+        _log(
+          '⚠ Multiple matches for $fileName: ${matchingFiles.map((f) => path.basename(f.path)).join(", ")}',
+        );
+      }
+
+      // Use the first match
+      final matchedFile = matchingFiles.first;
+      final matchedFileName = path.basename(matchedFile.path);
+
+      // Only add to map if it's actually versioned (not the original filename)
+      if (matchedFileName != fileName) {
+        // Extract the hash from the filename
+        final hashPattern = RegExp(
+          r'^' +
+              RegExp.escape(basename) +
+              r'\.([a-f0-9]+)' +
+              RegExp.escape(ext) +
+              r'$',
+        );
+        final hashMatch = hashPattern.firstMatch(matchedFileName);
+        final hash = hashMatch?.group(1) ?? '';
+
+        _versionMap[fileName] = matchedFileName;
+        _hashMap[fileName] = hash;
+      }
+    }
+  }
+
+  Future<void> _fixDynamicSkwasmReferences() async {
+    final bootstrapEntry = _versionMap.entries.firstWhere(
+      (entry) => entry.key == 'flutter_bootstrap.js',
+    );
+    final bootstrapFile = File(path.join(buildDir, bootstrapEntry.value));
+
+    String content = await bootstrapFile.readAsString();
+
+    final skwasmHash = _hashMap['canvaskit/skwasm.js'];
+    final skwasmHeavyHash = _hashMap['canvaskit/skwasm_heavy.js'];
+
+    if (skwasmHash == null || skwasmHeavyHash == null) {
+      _log('Skwasm hashes not found, skipping dynamic replacement');
+      return;
+    }
+    final pattern = RegExp(r'\?"skwasm_heavy":"skwasm"');
+    final replacement = '?"skwasm_heavy.$skwasmHeavyHash":"skwasm.$skwasmHash"';
+
+    if (content.contains(pattern)) {
+      content = content.replaceAll(pattern, replacement);
+      await bootstrapFile.writeAsString(content, flush: true);
+    }
   }
 
   Future<void> _generateManifest() async {
