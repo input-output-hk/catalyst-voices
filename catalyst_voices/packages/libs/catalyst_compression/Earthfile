@@ -12,7 +12,7 @@ builder:
 # Generated necessary files for running Flutter web locally and save it locally.
 code-generator:
     FROM +builder
-    DO flutter_rust_bridge+CODE_GENERATOR_WEB --WASM_MODULE_NAME="compression_wasm_bindgen"
+    DO flutter_rust_bridge+CODE_GENERATOR_WEB --WASM_MODULE_NAME="compression_wasm_bindgen" --RELEASE_MODE=true
 
     ARG local = false
     IF [ $local = true ]
