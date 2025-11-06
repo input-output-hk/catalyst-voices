@@ -10,6 +10,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 
 final _logger = Logger('VotingBallotBloc');
+
 typedef _VoteWithProposal = ({Vote vote, VoteProposal? proposal});
 
 final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
@@ -46,8 +47,8 @@ final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
     on<CancelCastingVotesEvent>(_cancelCastingVotes);
     on<CheckPasswordEvent>(_checkPassword);
 
-    _votingPowerSub = _userService.watchUser
-        .map((user) => user.activeAccount?.votingPower)
+    _votingPowerSub = _userService.watchUnlockedActiveAccount
+        .map((account) => account?.votingPower)
         .distinct()
         .listen(_handleVotingPowerChange);
 

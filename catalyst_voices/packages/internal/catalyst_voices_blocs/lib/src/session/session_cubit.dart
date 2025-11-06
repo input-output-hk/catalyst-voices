@@ -7,7 +7,6 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
-import 'package:rxdart/rxdart.dart';
 
 bool _alwaysAllowRegistration = kDebugMode;
 
@@ -51,19 +50,14 @@ final class SessionCubit extends Cubit<SessionState>
         .distinct()
         .listen(_handleUserSettings);
 
-    _keychainUnlockedSub = _userService.watchUser
-        .map((user) => user.activeAccount)
-        .switchMap((account) {
-          return account?.keychain.watchIsUnlocked ?? Stream.value(false);
-        })
+    _keychainUnlockedSub = _userService.watchUnlockedActiveAccount
+        .map((account) => account != null)
         .distinct()
         .listen(_onActiveKeychainUnlockChanged);
 
     _registrationProgressNotifier.addListener(_onRegistrationProgressChanged);
 
-    _accountSub = _userService.watchUser
-        .map((user) => user.activeAccount)
-        .listen(_onActiveAccountChanged);
+    _accountSub = _userService.watchUnlockedActiveAccount.listen(_onActiveAccountChanged);
 
     _adminToolsSub = _adminTools.stream.listen(_onAdminToolsChanged);
 

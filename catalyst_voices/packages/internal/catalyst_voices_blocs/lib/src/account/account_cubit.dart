@@ -17,10 +17,7 @@ final class AccountCubit extends Cubit<AccountState>
   AccountCubit(
     this._userService,
   ) : super(_buildState(from: _userService.user.activeAccount)) {
-    _accountSub = _userService.watchUser
-        .map((user) => user.activeAccount)
-        .distinct()
-        .listen(_handleActiveAccountChange);
+    _accountSub = _userService.watchUnlockedActiveAccount.listen(_handleActiveAccountChange);
   }
 
   @override

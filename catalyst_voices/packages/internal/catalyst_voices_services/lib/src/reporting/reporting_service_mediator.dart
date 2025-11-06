@@ -35,10 +35,7 @@ final class ReportingServiceMediatorImpl implements ReportingServiceMediator {
   FutureOr<void> init() {
     assert(_activeAccountSub == null, 'Reporting service already initialized');
 
-    _activeAccountSub = _userService.watchUser
-        .map((event) => event.activeAccount)
-        .distinct()
-        .listen(_onActiveAccountChanged);
+    _activeAccountSub = _userService.watchUnlockedActiveAccount.listen(_onActiveAccountChanged);
   }
 
   void _onActiveAccountChanged(Account? account) {

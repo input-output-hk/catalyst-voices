@@ -37,10 +37,7 @@ final class VotingCubit extends Cubit<VotingState>
   ) : super(const VotingState()) {
     _resetCache();
 
-    _activeAccountSub = _userService.watchUser
-        .map((event) => event.activeAccount)
-        .distinct()
-        .listen(_handleActiveAccountChange);
+    _activeAccountSub = _userService.watchUnlockedActiveAccount.listen(_handleActiveAccountChange);
 
     _favoritesProposalsIdsSub = _proposalService
         .watchFavoritesProposalsIds()
