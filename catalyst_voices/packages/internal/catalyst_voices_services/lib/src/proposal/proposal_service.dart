@@ -521,11 +521,16 @@ final class ProposalServiceImpl implements ProposalService {
     ProposalsOrder order = const UpdateDate.desc(),
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    final proposals = _proposalRepository.watchProposalsBriefPage(
-      request: request,
-      order: order,
-      filters: filters,
+    final proposals = _adaptFilters(filters).switchMap(
+      (effectiveFilters) {
+        return _proposalRepository.watchProposalsBriefPage(
+          request: request,
+          order: order,
+          filters: effectiveFilters,
+        );
+      },
     );
+
     final draftVotes = _ballotBuilder.watchVotes;
     final castedVotes = _castedVotesObserver.watchCastedVotes;
 
@@ -561,7 +566,11 @@ final class ProposalServiceImpl implements ProposalService {
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    return _proposalRepository.watchProposalsCountV2(filters: filters);
+    return _adaptFilters(filters).switchMap(
+      (effectiveFilters) {
+        return _proposalRepository.watchProposalsCountV2(filters: effectiveFilters);
+      },
+    );
   }
 
   @override
@@ -653,6 +662,17 @@ final class ProposalServiceImpl implements ProposalService {
 
       return watchProposalsCount(filters: filters);
     });
+  }
+
+  // TODO(damian-molinski): Remove this when voteBy is implemented.
+  Stream<ProposalsFiltersV2> _adaptFilters(ProposalsFiltersV2 filters) {
+    if (filters.voteBy == null) {
+      return Stream.value(filters);
+    }
+
+    return _castedVotesObserver.watchCastedVotes
+        .map((votes) => votes.map((e) => e.proposal.id).toList())
+        .map((ids) => filters.copyWith(voteBy: const Optional.empty(), ids: Optional(ids)));
   }
 
   Future<Stream<ProposalData?>> _createProposalDataStream(

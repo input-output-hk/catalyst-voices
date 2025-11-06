@@ -75,6 +75,9 @@ final class VotingCubit extends Cubit<VotingState>
       searchQuery: searchQuery,
       latestUpdate: const Optional.empty(),
       campaign: Optional(ProposalsCampaignFilters.active()),
+      voteBy: _cache.tab == VotingPageTab.votedOn
+          ? Optional(_cache.activeAccountId)
+          : const Optional.empty(),
     );
 
     if (_cache.filters == filters) {
@@ -194,7 +197,6 @@ final class VotingCubit extends Cubit<VotingState>
     }).toList();
   }
 
-  // TODO(damian-molinski): add filtering option with votedOn
   ProposalsFiltersV2 _buildProposalsCountFilters(VotingPageTab tab) {
     return switch (tab) {
       VotingPageTab.total => _cache.filters.copyWith(
@@ -216,6 +218,7 @@ final class VotingCubit extends Cubit<VotingState>
         status: const Optional(ProposalStatusFilter.aFinal),
         isFavorite: const Optional.empty(),
         author: const Optional.empty(),
+        voteBy: Optional(_cache.activeAccountId),
       ),
     };
   }
@@ -248,7 +251,7 @@ final class VotingCubit extends Cubit<VotingState>
   }
 
   void _handleActiveAccountChange(Account? account) {
-    if (account?.catalystId != _cache.filters.author) {
+    if (account?.catalystId != _cache.activeAccountId) {
       _cache = _cache.copyWith(activeAccountId: Optional(account?.catalystId));
       changeFilters(resetProposals: true);
     }

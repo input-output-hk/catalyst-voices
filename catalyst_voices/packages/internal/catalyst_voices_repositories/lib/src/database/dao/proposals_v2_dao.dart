@@ -260,6 +260,11 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       clauses.add("p.created_at >= '$escapedTimestamp'");
     }
 
+    if (filters.ids != null) {
+      final escapedIds = filters.ids!.map((id) => "'${_escapeSqlString(id)}'").join(', ');
+      clauses.add('p.id IN ($escapedIds)');
+    }
+
     return clauses;
   }
 
@@ -633,6 +638,11 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       if (filters.categoryId != null && !campaign.categoriesIds.contains(filters.categoryId)) {
         return true;
       }
+    }
+
+    // TODO(damian-molinski): remove when voting is implemented.
+    if (filters.voteBy != null) {
+      return true;
     }
 
     return false;
