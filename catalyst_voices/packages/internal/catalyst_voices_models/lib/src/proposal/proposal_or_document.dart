@@ -3,16 +3,30 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 
+/// A sealed class that represents either a full proposal document with a
+/// defined template (`ProposalDocument`) or a generic document without a
+/// specific template (`DocumentData`).
+///
+/// This class provides a unified interface to access common properties
+/// like [title], [authorName], [description], etc., regardless of the
+/// underlying data type.
+///
+/// It's useful when dealing with list of proposals and some of them may not have templates
+/// loaded yet.
 sealed class ProposalOrDocument extends Equatable {
   const ProposalOrDocument();
 
+  /// Creates a [ProposalOrDocument] from a generic [DocumentData].
   const factory ProposalOrDocument.data(DocumentData data) = _Document;
 
+  /// Creates a [ProposalOrDocument] from a structured [ProposalDocument].
   const factory ProposalOrDocument.proposal(ProposalDocument data) = _Proposal;
 
+  /// The name of the proposal's author.
   String? get authorName;
 
   // TODO(damian-molinski): Category name should come from query but atm those are not documents.
+  /// The name of the proposal's category.
   String? get categoryName {
     return Campaign.all
         .map((e) => e.categories)
@@ -21,18 +35,26 @@ sealed class ProposalOrDocument extends Equatable {
         ?.formattedCategoryName;
   }
 
+  /// A brief description of the proposal.
   String? get description;
 
+  /// The duration of the proposal in months.
   int? get durationInMonths;
 
+  /// The amount of funds requested by the proposal.
   Money? get fundsRequested;
 
+  /// A reference to the document itself.
   DocumentRef get selfRef;
 
+  /// The title of the proposal.
   String? get title;
 
+  /// The version of the document.
   String get version;
 
+  /// A private getter for the category reference, used to find the
+  /// [categoryName].
   SignedDocumentRef? get _category;
 }
 
