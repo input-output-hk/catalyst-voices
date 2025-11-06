@@ -29,6 +29,9 @@ Future<void> from3To4(Migrator m, Schema4 schema) async {
     await m.createIndex(schema.idxDocumentsV2TypeIdCreatedAt);
     await m.createIndex(schema.idxDocumentsV2TypeCategoryId);
     await m.createIndex(schema.idxDocumentsV2TypeRefIdRefVer);
+    await m.createIndex(schema.idxDocumentAuthorsComposite);
+    await m.createIndex(schema.idxDocumentAuthorsIdentity);
+    await m.createIndex(schema.idxDocumentAuthorsUsername);
 
     await _migrateDocs(m, schema, batchSize: _batchSize);
     await _migrateDrafts(m, schema, batchSize: _batchSize);

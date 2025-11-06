@@ -1,6 +1,8 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/database/model/document_with_authors_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
 import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
@@ -114,7 +116,9 @@ final class DatabaseDocumentsDataSource
 
   @override
   Future<void> saveAll(Iterable<DocumentData> data) async {
-    final entries = data.map((e) => e.toEntity()).toList();
+    final entries = data
+        .map((e) => DocumentWithAuthorsEntity(e.toDocEntity(), e.toAuthorEntities()))
+        .toList();
 
     await _database.documentsV2Dao.saveAll(entries);
   }
@@ -232,9 +236,7 @@ extension on DocumentEntityV2 {
         section: section,
         categoryId: categoryId.toRef(categoryVer),
         // TODO(damian-molinski): Make sure to add unit tests
-        authors: authors.isEmpty
-            ? null
-            : authors.split(',').map((e) => CatalystId.fromUri(e.getUri())).toList(),
+        authors: authors.isEmpty ? null : authors.split(',').map(CatalystId.parse).toList(),
       ),
       content: content,
     );
@@ -253,7 +255,23 @@ extension on String? {
 }
 
 extension on DocumentData {
-  DocumentEntityV2 toEntity() {
+  List<DocumentAuthorEntity> toAuthorEntities() {
+    return (metadata.authors ?? const []).map((catId) {
+      return DocumentAuthorEntity(
+        documentId: metadata.id,
+        documentVer: metadata.version,
+        authorCatId: catId.toUri().toString(),
+        authorCatIdSignificant: catId.toSignificant().toUri().toString(),
+        authorCatIdWithoutUsername: catId
+            .copyWith(username: const Optional.empty())
+            .toUri()
+            .toString(),
+        authorUsername: catId.username,
+      );
+    }).toList();
+  }
+
+  DocumentEntityV2 toDocEntity() {
     return DocumentEntityV2(
       content: content,
       id: metadata.id,
@@ -268,7 +286,7 @@ extension on DocumentData {
       categoryVer: metadata.categoryId?.version,
       templateId: metadata.template?.id,
       templateVer: metadata.template?.version,
-      authors: metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
+      authors: metadata.authors?.map((e) => e.toString()).join(',') ?? '',
       createdAt: metadata.version.dateTime,
     );
   }

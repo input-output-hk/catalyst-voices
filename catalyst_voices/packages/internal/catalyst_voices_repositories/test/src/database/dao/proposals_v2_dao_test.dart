@@ -5,6 +5,8 @@ import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.dart';
+import 'package:catalyst_voices_repositories/src/database/model/document_with_authors_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
@@ -932,7 +934,7 @@ void main() {
           await db.documentsV2Dao.saveAll([proposal1, proposal2]);
 
           // And: Multiple actions with NULL ref_id
-          final actions = <DocumentEntityV2>[];
+          final actions = <DocumentWithAuthorsEntity>[];
           for (var i = 0; i < 3; i++) {
             final actionVer = _buildUuidV7At(latest.add(Duration(hours: i)));
             actions.add(
@@ -1332,7 +1334,7 @@ void main() {
 
         test('count remains consistent across pagination', () async {
           // Given: 25 proposals
-          final proposals = <DocumentEntityV2>[];
+          final proposals = <DocumentWithAuthorsEntity>[];
           for (var i = 0; i < 25; i++) {
             final time = DateTime.utc(2025, 1, 1).add(Duration(hours: i));
             final ver = _buildUuidV7At(time);
@@ -3394,7 +3396,7 @@ void main() {
             final proposal1 = _createTestDocumentEntity(
               id: 'p1',
               ver: _buildUuidV7At(latest),
-              authors: 'john-doe,jane-smith',
+              authors: _createTestAuthors(['john-doe', 'jane-smith']),
               contentData: {
                 'setup': {
                   'title': {'title': 'Other Title'},
@@ -3406,7 +3408,7 @@ void main() {
             final proposal2 = _createTestDocumentEntity(
               id: 'p2',
               ver: _buildUuidV7At(middle),
-              authors: 'alice-wonder',
+              authors: _createTestAuthors(['alice-wonder']),
               contentData: {
                 'setup': {
                   'title': {'title': 'Different Title'},
@@ -3432,7 +3434,7 @@ void main() {
             final proposal1 = _createTestDocumentEntity(
               id: 'p1',
               ver: _buildUuidV7At(latest),
-              authors: 'other-author',
+              authors: _createTestAuthors(['other-author']),
               contentData: {
                 'setup': {
                   'title': {'title': 'Other Title'},
@@ -3444,7 +3446,7 @@ void main() {
             final proposal2 = _createTestDocumentEntity(
               id: 'p2',
               ver: _buildUuidV7At(middle),
-              authors: 'different-author',
+              authors: _createTestAuthors(['different-author']),
               contentData: {
                 'setup': {
                   'title': {'title': 'Different Title'},
@@ -3470,7 +3472,7 @@ void main() {
             final proposal1 = _createTestDocumentEntity(
               id: 'p1',
               ver: _buildUuidV7At(latest),
-              authors: 'other-author',
+              authors: _createTestAuthors(['other-author']),
               contentData: {
                 'setup': {
                   'title': {'title': 'Blockchain Revolution'},
@@ -3482,7 +3484,7 @@ void main() {
             final proposal2 = _createTestDocumentEntity(
               id: 'p2',
               ver: _buildUuidV7At(middle),
-              authors: 'different-author',
+              authors: _createTestAuthors(['different-author']),
               contentData: {
                 'setup': {
                   'title': {'title': 'Smart Contracts Study'},
@@ -3531,7 +3533,7 @@ void main() {
             final proposal1 = _createTestDocumentEntity(
               id: 'p1',
               ver: _buildUuidV7At(latest),
-              authors: 'tech-author',
+              authors: _createTestAuthors(['tech-author']),
               contentData: {
                 'setup': {
                   'title': {'title': 'Other Title'},
@@ -4211,12 +4213,21 @@ CatalystId _createTestAuthor({
     ..write('preprod.cardano/')
     ..write(base64UrlNoPadEncode(role0Key));
 
-  final uri = Uri.parse(buffer.toString());
-
-  return CatalystId.fromUri(uri);
+  return CatalystId.parse(buffer.toString());
 }
 
-DocumentEntityV2 _createTestDocumentEntity({
+String _createTestAuthors(
+  List<String> names, {
+  // ignore: unused_element_parameter
+  int Function(String) role0KeySeed = _seedRole0KeySeedGetter,
+}) {
+  return names
+      .map((e) => _createTestAuthor(name: e, role0KeySeed: _seedRole0KeySeedGetter(e)))
+      .map((e) => e.toUri().toString())
+      .join(',');
+}
+
+DocumentWithAuthorsEntity _createTestDocumentEntity({
   String? id,
   String? ver,
   Map<String, dynamic> contentData = const {},
@@ -4237,7 +4248,7 @@ DocumentEntityV2 _createTestDocumentEntity({
   ver ??= id;
   authors ??= '';
 
-  return DocumentEntityV2(
+  final docEntity = DocumentEntityV2(
     id: id,
     ver: ver,
     content: DocumentDataContent(contentData),
@@ -4254,7 +4265,31 @@ DocumentEntityV2 _createTestDocumentEntity({
     templateId: templateId,
     templateVer: templateVer,
   );
+
+  final authorsEntities = authors
+      .split(',')
+      .where((element) => element.trim().isNotEmpty)
+      .map(CatalystId.tryParse)
+      .nonNulls
+      .map(
+        (e) => DocumentAuthorEntity(
+          documentId: docEntity.id,
+          documentVer: docEntity.ver,
+          authorCatId: e.toUri().toString(),
+          authorCatIdSignificant: e.toSignificant().toUri().toString(),
+          authorCatIdWithoutUsername: e
+              .copyWith(username: const Optional.empty())
+              .toUri()
+              .toString(),
+          authorUsername: e.username,
+        ),
+      )
+      .toList();
+
+  return DocumentWithAuthorsEntity(docEntity, authorsEntities);
 }
+
+int _seedRole0KeySeedGetter(String name) => 0;
 
 extension on ProposalSubmissionActionDto {
   Map<String, dynamic> toJson() {
