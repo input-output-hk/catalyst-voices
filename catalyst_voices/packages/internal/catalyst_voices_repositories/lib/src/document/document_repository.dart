@@ -21,11 +21,19 @@ DocumentRef _templateResolver(DocumentData data) => data.metadata.template!;
 /// document type.
 abstract interface class DocumentRepository {
   factory DocumentRepository(
+    CatalystDatabase db,
     DraftDataSource drafts,
     SignedDocumentDataSource localDocuments,
     DocumentDataRemoteSource remoteDocuments,
     DocumentFavoriteSource favoriteDocuments,
   ) = DocumentRepositoryImpl;
+
+  /// Analyzes the database to gather statistics and potentially optimize it.
+  ///
+  /// This can be a long-running operation, so it should be used judiciously,
+  /// for example, during application startup or in a background process
+  /// for maintenance.
+  Future<void> analyzeDatabase();
 
   /// Deletes a document draft from the local storage.
   Future<void> deleteDocumentDraft({
@@ -234,6 +242,7 @@ abstract interface class DocumentRepository {
 }
 
 final class DocumentRepositoryImpl implements DocumentRepository {
+  final CatalystDatabase _db;
   final DraftDataSource _drafts;
   final SignedDocumentDataSource _localDocuments;
   final DocumentDataRemoteSource _remoteDocuments;
@@ -242,11 +251,15 @@ final class DocumentRepositoryImpl implements DocumentRepository {
   final _documentDataLock = Lock();
 
   DocumentRepositoryImpl(
+    this._db,
     this._drafts,
     this._localDocuments,
     this._remoteDocuments,
     this._favoriteDocuments,
   );
+
+  @override
+  Future<void> analyzeDatabase() => _db.analyze();
 
   @override
   Future<void> deleteDocumentDraft({required DraftRef ref}) {

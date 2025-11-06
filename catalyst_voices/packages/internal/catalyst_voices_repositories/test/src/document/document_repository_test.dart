@@ -34,6 +34,7 @@ void main() {
     favoriteDocuments = DatabaseDocumentFavoriteSource(database);
 
     repository = DocumentRepositoryImpl(
+      database,
       draftsSource,
       localDocuments,
       remoteDocuments,

@@ -277,6 +277,7 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
+          get<CatalystDatabase>(),
           get<DatabaseDraftsDataSource>(),
           get<DatabaseDocumentsDataSource>(),
           get<CatGatewayDocumentDataSource>(),

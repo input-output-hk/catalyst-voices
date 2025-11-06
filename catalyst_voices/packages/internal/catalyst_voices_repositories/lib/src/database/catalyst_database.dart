@@ -58,6 +58,8 @@ abstract interface class CatalystDatabase {
 
   ProposalsV2Dao get proposalsV2Dao;
 
+  Future<void> analyze();
+
   /// Removes all data from this db.
   Future<void> clear();
 
@@ -153,6 +155,11 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase implements CatalystDa
 
   @override
   int get schemaVersion => 4;
+
+  @override
+  Future<void> analyze() async {
+    await customStatement('ANALYZE');
+  }
 
   @override
   Future<void> clear() {
