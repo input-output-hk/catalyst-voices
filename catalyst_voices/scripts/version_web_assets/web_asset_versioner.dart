@@ -7,11 +7,37 @@ import 'package:path/path.dart' as path;
 import 'asset_version_manifest.dart';
 
 class WebAssetVersioner {
+  /// Hardcoded files that should be manually versioned
+  /// (These are just for documentation/warning purposes)
+  static const manuallyVersionedFiles = [
+    'sqlite3.wasm',
+    'drift_worker.js',
+    'catalyst_key_derivation_bg.wasm',
+    'catalyst_compression_bg.wasm',
+  ];
+
+  final String buildDir;
+  final bool verbose;
+  final bool wasm;
+
+  /// Maps original filename to versioned filename
+  final Map<String, String> _versionMap = {};
+
+  /// Maps original filename to hash
+  final Map<String, String> _hashMap = {};
+
+  WebAssetVersioner({
+    required this.buildDir,
+    this.verbose = true,
+    required this.wasm,
+  });
+
   /// Files that will be automatically versioned with content-based MD5 hashes
-  static const autoVersionedFiles = [
+  List<String> get autoVersionedFiles => [
     'flutter_bootstrap.js',
     'main.dart.js',
-    'main.dart.wasm',
+    if (wasm) 'main.dart.wasm',
+    if (wasm) 'main.dart.mjs',
     'canvaskit/canvaskit.wasm',
     'canvaskit/canvaskit.js',
     'canvaskit/canvaskit.js.symbols',
@@ -25,25 +51,6 @@ class WebAssetVersioner {
     'canvaskit/chromium/canvaskit.js',
     'canvaskit/chromium/canvaskit.js.symbols',
   ];
-
-  /// Hardcoded files that should be manually versioned
-  /// (These are just for documentation/warning purposes)
-  static const manuallyVersionedFiles = [
-    'sqlite3.wasm',
-    'drift_worker.js',
-    'catalyst_key_derivation_bg.wasm',
-    'catalyst_compression_bg.wasm',
-  ];
-  final String buildDir;
-  final bool verbose;
-
-  /// Maps original filename to versioned filename
-  final Map<String, String> _versionMap = {};
-
-  /// Maps original filename to hash
-  final Map<String, String> _hashMap = {};
-
-  WebAssetVersioner({required this.buildDir, this.verbose = true});
 
   Future<void> versionAssets() async {
     _log('Starting web asset versioning...');
@@ -95,22 +102,11 @@ class WebAssetVersioner {
   /// Creates a versioned filename by inserting the hash before the extension.
   /// Example: 'flutter_bootstrap.js' -> 'flutter_bootstrap.abc123.js'
   String _createVersionedFilename(String filename, String hash) {
-    final parsedPath = path.split(filename);
-    final basename = parsedPath.last;
-    final dir = parsedPath.length > 1
-        ? parsedPath.sublist(0, parsedPath.length - 1).join('/')
-        : '';
-
-    final lastDot = basename.lastIndexOf('.');
-    if (lastDot == -1) {
-      final versioned = '$basename.$hash';
-      return dir.isEmpty ? versioned : '$dir/$versioned';
-    }
-
-    final name = basename.substring(0, lastDot);
-    final ext = basename.substring(lastDot);
-    final versioned = '$name.$hash$ext';
-    return dir.isEmpty ? versioned : '$dir/$versioned';
+    final dir = path.url.dirname(filename);
+    final basename = path.url.basenameWithoutExtension(filename);
+    final ext = path.url.extension(filename);
+    final versioned = '$basename.$hash$ext';
+    return dir == '.' ? versioned : path.url.join(dir, versioned);
   }
 
   Future<void> _generateManifest() async {
@@ -136,6 +132,17 @@ class WebAssetVersioner {
     }
   }
 
+  String _replacePathInContent(
+    String content,
+    String originalPath,
+    String versionedPath,
+  ) {
+    final escaped = RegExp.escape(originalPath);
+    return content
+        .replaceAll(RegExp('"$escaped"'), '"$versionedPath"')
+        .replaceAll(RegExp("'$escaped'"), "'$versionedPath'");
+  }
+
   Future<void> _updateAssetReferences() async {
     final targetFiles = await Directory(buildDir)
         .list(recursive: true)
@@ -154,52 +161,35 @@ class WebAssetVersioner {
       for (final entry in _versionMap.entries) {
         final originalPath = entry.key;
         final versionedPath = entry.value;
-        final escapedOriginal = RegExp.escape(originalPath);
 
-        // Handle full path references (more specific matches first)
-        final fullPathPatternDouble = RegExp('"$escapedOriginal"');
-        final fullPathPatternSingle = RegExp("'$escapedOriginal'");
-
-        if (fullPathPatternDouble.hasMatch(content)) {
-          content = content.replaceAll(
-            fullPathPatternDouble,
-            '"$versionedPath"',
-          );
+        final updated = _replacePathInContent(
+          content,
+          originalPath,
+          versionedPath,
+        );
+        if (updated != content) {
+          content = updated;
           fileModified = true;
         }
 
-        if (fullPathPatternSingle.hasMatch(content)) {
-          content = content.replaceAll(
-            fullPathPatternSingle,
-            "'$versionedPath'",
-          );
-          fileModified = true;
-        }
-
-        // Handle basename-only references (only for files in subdirectories)
-        // For example: "canvaskit.wasm" -> "canvaskit.f60c5daf.wasm"
+        // Handle relative path suffixes for files in subdirectories
         if (originalPath.contains('/')) {
-          final basename = path.basename(originalPath);
-          final escapedBasename = RegExp.escape(basename);
-          final versionedBasename = path.basename(versionedPath);
+          final parts = path.url.split(originalPath);
+          final versionedParts = path.url.split(versionedPath);
 
-          final basenamePatternDouble = RegExp('"$escapedBasename"');
-          final basenamePatternSingle = RegExp("'$escapedBasename'");
+          for (var i = 1; i < parts.length; i++) {
+            final suffix = path.url.joinAll(parts.sublist(i));
+            final versionedSuffix = path.url.joinAll(versionedParts.sublist(i));
 
-          if (basenamePatternDouble.hasMatch(content)) {
-            content = content.replaceAll(
-              basenamePatternDouble,
-              '"$versionedBasename"',
+            final updated = _replacePathInContent(
+              content,
+              suffix,
+              versionedSuffix,
             );
-            fileModified = true;
-          }
-
-          if (basenamePatternSingle.hasMatch(content)) {
-            content = content.replaceAll(
-              basenamePatternSingle,
-              "'$versionedBasename'",
-            );
-            fileModified = true;
+            if (updated != content) {
+              content = updated;
+              fileModified = true;
+            }
           }
         }
       }
@@ -231,7 +221,7 @@ class WebAssetVersioner {
 
   Future<void> _versionPartFiles(String originalFilePath) async {
     final fileDir = path.dirname(path.join(buildDir, originalFilePath));
-    final baseFileName = path.basename(originalFilePath);
+    final baseFileName = path.url.basename(originalFilePath);
 
     final partPattern = RegExp(
       '^${RegExp.escape(baseFileName)}_\\d+\\.part\\.js\$',
@@ -249,9 +239,9 @@ class WebAssetVersioner {
     for (final partFile in partFiles) {
       final partFileName = path.basename(partFile.path);
 
-      final originalDir = path.dirname(originalFilePath);
+      final originalDir = path.url.dirname(originalFilePath);
       final relativePath = originalDir.isNotEmpty && originalDir != '.'
-          ? '$originalDir/$partFileName'
+          ? path.url.join(originalDir, partFileName)
           : partFileName;
 
       await _versionFile(partFile, relativePath);

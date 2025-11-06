@@ -23,23 +23,32 @@ The `version_web_assets.dart` script:
 
 The following files are automatically versioned using content-based MD5 hashes:
 
+**Always versioned:**
+
 * `flutter_bootstrap.js`
 * `main.dart.js` (plus any part files like `main.dart.js_1.part.js`, `main.dart.js_2.part.js`, etc.)
-* `main.dart.wasm`
 * `canvaskit/canvaskit.wasm`
 * `canvaskit/canvaskit.js`
+* `canvaskit/canvaskit.js.symbols`
 * `canvaskit/skwasm_heavy.wasm`
 * `canvaskit/skwasm_heavy.js`
-* `canvaskit/skwasm_heavy.symbols`
+* `canvaskit/skwasm_heavy.js.symbols`
 * `canvaskit/skwasm.wasm`
 * `canvaskit/skwasm.js`
+* `canvaskit/skwasm.js.symbols`
 * `canvaskit/chromium/canvaskit.wasm`
 * `canvaskit/chromium/canvaskit.js`
 * `canvaskit/chromium/canvaskit.js.symbols`
 
-**Note:** For large JavaScript files, Flutter may split them into multiple parts
-(e.g., `main.dart.js_1.part.js`, `main.dart.js_2.part.js`).
-The script automatically detects and versions all part files.
+**Conditionally versioned:**
+
+* `main.dart.wasm` - Only included when `--wasm=true` (default)
+
+**Notes:**
+
+* For large JavaScript files, Flutter may split them into multiple parts (e.g., `main.dart.js_1.part.js`, `main.dart.js_2.part.js`).
+  The script automatically detects and versions all part files.
+* Use `--wasm=false` when building with JS-only output to skip `main.dart.wasm` versioning.
 
 ### Manually-Versioned Files
 
@@ -104,7 +113,24 @@ Options:
                       (defaults to "apps/voices/build/web")
   -v, --[no-]verbose  Enable verbose logging
                       (defaults to on)
+  -w, --wasm          Include main.dart.wasm in versioning (true/false)
+                      (defaults to true)
   -h, --help          Show usage information
+```
+
+### Examples
+
+```bash
+# Version all files including main.dart.wasm (default)
+dart run scripts/version_web_assets.dart
+# or explicitly:
+dart run scripts/version_web_assets.dart --wasm=true
+
+# Exclude main.dart.wasm from versioning (for JS-only builds)
+dart run scripts/version_web_assets.dart --wasm=false
+
+# Custom build directory without main.dart.wasm
+dart run scripts/version_web_assets.dart -b custom/path --wasm=false
 ```
 
 ## Output

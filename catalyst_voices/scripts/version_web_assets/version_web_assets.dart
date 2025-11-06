@@ -28,6 +28,13 @@ Future<void> main(List<String> args) async {
       defaultsTo: true,
       help: 'Enable verbose logging',
     )
+    ..addOption(
+      'wasm',
+      abbr: 'w',
+      defaultsTo: 'true',
+      allowed: ['true', 'false'],
+      help: 'Include main.dart.wasm in versioning (true/false)',
+    )
     ..addFlag(
       'help',
       abbr: 'h',
@@ -52,8 +59,13 @@ Future<void> main(List<String> args) async {
 
   final buildDir = argResults['build-dir'] as String;
   final verbose = argResults['verbose'] as bool;
+  final wasm = (argResults['wasm'] as String) == 'true';
 
-  final versioner = WebAssetVersioner(buildDir: buildDir, verbose: verbose);
+  final versioner = WebAssetVersioner(
+    buildDir: buildDir,
+    verbose: verbose,
+    wasm: wasm,
+  );
 
   try {
     await versioner.versionAssets();
