@@ -219,8 +219,6 @@ final class SessionCubit extends Cubit<SessionState>
     );
   }
 
-  // TODO(damian-molinski): Refactor active account stream so it emits null when account
-  // keychain is locked.
   void _emitAccountBasedSignal() {
     final account = _account;
 
