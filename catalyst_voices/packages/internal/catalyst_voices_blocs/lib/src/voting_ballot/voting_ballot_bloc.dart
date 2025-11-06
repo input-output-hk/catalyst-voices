@@ -10,7 +10,6 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:collection/collection.dart';
 
 final _logger = Logger('VotingBallotBloc');
-
 typedef _VoteWithProposal = ({Vote vote, VoteProposal? proposal});
 
 final class VotingBallotBloc extends Bloc<VotingBallotEvent, VotingBallotState>
