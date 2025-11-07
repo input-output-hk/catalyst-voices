@@ -64,10 +64,11 @@ jobs:
       releases: '[{"project":"./docs","name":"docs"}]'
       forge_version: 0.21.0
 
+  # https://github.com/actions/runner/issues/491#issuecomment-850884422
   ci:
     if: |
       always() && 
-      needs.reject.result == 'success' || needs.reject.result == 'skipped' &&
+      (needs.reject.result == 'success' || needs.reject.result == 'skipped') &&
       (!github.event.pull_request.draft && needs.docs-only.result == 'skipped')
     needs: [reject, docs-only]
     uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.10.0
