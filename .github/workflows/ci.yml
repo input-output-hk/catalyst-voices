@@ -63,11 +63,8 @@ jobs:
       forge_version: 0.21.0
 
   ci:
-    if: |
-      always() && 
-      needs.reject.result == 'success' || needs.reject.result == 'skipped' &&
-      (!github.event.pull_request.draft && needs.docs-only.result == 'skipped')
-    needs: [reject, docs-only]
+    if: ${{ !github.event.pull_request.draft }}
+    needs: [reject]
     uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.10.0
     with:
       forge_version: 0.21.0
