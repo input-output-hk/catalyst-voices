@@ -1,8 +1,8 @@
 //! Document Index Query V1 endpoint request objects.
 
 use poem_openapi::{
-    types::{Example, ToJSON},
     NewType, Object,
+    types::{Example, ToJSON},
 };
 
 use crate::{

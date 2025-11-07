@@ -2,9 +2,9 @@
 use std::sync::Arc;
 
 use scylla::{
+    DeserializeRow, SerializeRow,
     client::{pager::TypedRowStream, session::Session},
     statement::prepared::PreparedStatement,
-    DeserializeRow, SerializeRow,
 };
 use tracing::error;
 

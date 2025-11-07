@@ -3,7 +3,7 @@
 use super::SignedDocBody;
 use crate::{
     db::event::EventDB,
-    jinja::{get_template, JinjaTemplateSource},
+    jinja::{JinjaTemplateSource, get_template},
 };
 
 /// Insert sql query

@@ -5,7 +5,7 @@ use poem_openapi::payload::Json;
 
 use crate::{
     db::index::session::CassandraSession,
-    rbac::{latest_rbac_chain, ChainInfo},
+    rbac::{ChainInfo, latest_rbac_chain},
     service::{
         api::cardano::rbac::registrations_get::{
             unprocessable_content::RbacUnprocessableContent,

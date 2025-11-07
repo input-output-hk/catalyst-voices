@@ -6,9 +6,9 @@ use std::sync::LazyLock;
 
 use anyhow::bail;
 use poem_openapi::{
+    NewType, Object, Union,
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
-    NewType, Object, Union,
 };
 use serde_json::Value;
 

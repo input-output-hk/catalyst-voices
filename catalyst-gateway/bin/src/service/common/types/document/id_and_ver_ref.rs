@@ -1,6 +1,6 @@
 //! Signed Document ID and Version Reference Objects
 
-use poem_openapi::{types::Example, NewType, Object, Union};
+use poem_openapi::{NewType, Object, Union, types::Example};
 
 use super::{id::EqOrRangedIdDocumented, ver::EqOrRangedVerDocumented};
 use crate::db::event::signed_docs::DocumentRef;

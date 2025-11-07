@@ -1,7 +1,7 @@
 //! A role payment address information.
 
 use cardano_chain_follower::pallas_addresses::ShelleyAddress;
-use poem_openapi::{types::Example, Object};
+use poem_openapi::{Object, types::Example};
 
 use crate::service::common::types::{
     cardano::{cip19_shelley_address::Cip19ShelleyAddress, slot_no::SlotNo, txn_index::TxnIndex},

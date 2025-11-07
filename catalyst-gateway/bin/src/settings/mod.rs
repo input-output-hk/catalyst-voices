@@ -15,8 +15,8 @@ use tracing::error;
 use url::Url;
 
 use crate::{
-    build_info::{log_build_info, BUILD_INFO},
-    logger::{self, LogLevel, LOG_LEVEL_DEFAULT},
+    build_info::{BUILD_INFO, log_build_info},
+    logger::{self, LOG_LEVEL_DEFAULT, LogLevel},
     service::utilities::net::{get_public_ipv4, get_public_ipv6},
     utils::blake2b_hash::generate_uuid_string_from_data,
 };
@@ -491,7 +491,9 @@ mod tests {
     fn generate_github_issue_url_test() {
         let title = "Hello, World! How are you?";
         assert_eq!(
-            Settings::generate_github_issue_url(title).expect("Failed to generate url").as_str(),
+            Settings::generate_github_issue_url(title)
+                .expect("Failed to generate url")
+                .as_str(),
             "https://github.com/input-output-hk/catalyst-voices/issues/new?template=bug_report.yml&title=Hello%2C+World%21+How+are+you%3F"
         );
     }

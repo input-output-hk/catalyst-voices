@@ -234,7 +234,9 @@ impl VerifyingKeyProvider {
             })?;
 
         if rotation != kid_rotation {
-            anyhow::bail!("Invalid KID {kid}: KID's rotation ({kid_rotation}) is not the latest rotation ({rotation})");
+            anyhow::bail!(
+                "Invalid KID {kid}: KID's rotation ({kid_rotation}) is not the latest rotation ({rotation})"
+            );
         }
 
         Ok(Self {
