@@ -113,7 +113,7 @@ final class Dependencies extends DependencyProvider {
           blockchainConfig: get<AppConfig>().blockchain,
         );
       })
-      ..registerLazySingleton<ProposalsCubit>(
+      ..registerFactory<ProposalsCubit>(
         () => ProposalsCubit(
           get<UserService>(),
           get<CampaignService>(),

@@ -24,9 +24,11 @@ class ProposalsPaginationTile extends StatelessWidget {
         unawaited(route.push(context));
       },
       onFavoriteChanged: (isFavorite) {
-        context.read<ProposalsCubit>().onChangeFavoriteProposal(
-          proposal.selfRef,
-          isFavorite: isFavorite,
+        unawaited(
+          context.read<ProposalsCubit>().onChangeFavoriteProposal(
+            proposal.selfRef,
+            isFavorite: isFavorite,
+          ),
         );
       },
     );

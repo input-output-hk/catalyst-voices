@@ -163,9 +163,13 @@ final class DatabaseDocumentsDataSource
   }
 
   @override
-  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage(PageRequest request) {
+  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
+    required PageRequest request,
+    ProposalsOrder order = const UpdateDate.desc(),
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+  }) {
     return _database.proposalsV2Dao
-        .watchProposalsBriefPage(request)
+        .watchProposalsBriefPage(request: request, order: order, filters: filters)
         .map((page) => page.map((data) => data.toModel()));
   }
 
@@ -174,6 +178,13 @@ final class DatabaseDocumentsDataSource
     required ProposalsCountFilters filters,
   }) {
     return _database.proposalsDao.watchCount(filters: filters);
+  }
+
+  @override
+  Stream<int> watchProposalsCountV2({
+    ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
+  }) {
+    return _database.proposalsV2Dao.watchVisibleProposalsCount(filters: filters);
   }
 
   @override
