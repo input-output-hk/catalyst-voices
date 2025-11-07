@@ -55,7 +55,7 @@ jobs:
               No images should be built using the 'latest' tag
 
   docs-only:
-    if: ${{ needs.paths-filter.outputs.catalyst-gateway == 'fasle' && needs.paths-filter.outputs.catalyst_voices == 'fasle' && needs.paths-filter.outputs.docs == 'true' }}
+    if: ${{ needs.paths-filter.outputs.docs == 'true' }}
     needs: [reject, paths-filter]
     uses: input-output-hk/catalyst-forge/.github/workflows/release.yml@ci/v1.10.0
     with:
