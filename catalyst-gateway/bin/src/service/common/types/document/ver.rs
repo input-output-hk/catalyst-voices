@@ -15,7 +15,9 @@ use serde_json::Value;
 use self::generic::uuidv7;
 use crate::{
     db::event::common::eq_or_ranged_uuid::UuidSelector,
-    service::common::types::{generic, string_types::impl_string_types},
+    service::common::types::{
+        array_types::impl_array_types, generic, string_types::impl_string_types,
+    },
 };
 
 /// Title.
@@ -134,6 +136,23 @@ impl From<catalyst_signed_doc::UuidV7> for DocumentVer {
     }
 }
 
+impl_array_types!(
+    DocumentVerList,
+    DocumentVer,
+    Some(MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(100),
+        items: Some(Box::new(DocumentVer::schema_ref())),
+        ..MetaSchema::ANY
+    })
+);
+
+impl Example for DocumentVerList {
+    fn example() -> Self {
+        Self(vec![DocumentVer::example()])
+    }
+}
+
 #[derive(Object, Debug, Clone, PartialEq)]
 #[oai(example = true)]
 /// Version Range
@@ -217,13 +236,13 @@ impl Example for VerRangeDocumented {
 #[oai(example = true)]
 pub(crate) struct VerIn {
     /// Matching any document versions from the list.
-    r#in: Vec<DocumentVer>,
+    r#in: DocumentVerList,
 }
 
 impl Example for VerIn {
     fn example() -> Self {
         Self {
-            r#in: vec![DocumentVer::example()],
+            r#in: DocumentVerList::example(),
         }
     }
 }
@@ -282,8 +301,7 @@ impl TryFrom<VerSelector> for UuidSelector {
             },
             VerSelector::In(vers) => {
                 Ok(Self::In(
-                    vers.0
-                        .r#in
+                    Vec::<_>::from(vers.0.r#in)
                         .into_iter()
                         .map(|v| v.0.parse::<uuid::Uuid>())
                         .collect::<Result<_, _>>()?,
@@ -325,8 +343,7 @@ impl TryFrom<VerSelectorDocumented> for UuidSelector {
             },
             VerSelector::In(vers) => {
                 Ok(Self::In(
-                    vers.0
-                        .r#in
+                    Vec::<_>::from(vers.0.r#in)
                         .into_iter()
                         .map(|v| v.0.parse())
                         .collect::<Result<_, _>>()?,
