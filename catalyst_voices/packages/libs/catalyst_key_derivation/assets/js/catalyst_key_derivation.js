@@ -27,7 +27,7 @@ let key_derivation_wasm_bindgen;
     let cachedUint8ArrayMemory0 = null;
 
     function getUint8ArrayMemory0() {
-        if (cachedUint8ArrayMemory0 === null || cachedUint8ArrayMemory0.buffer !== wasm.memory.buffer) {
+        if (cachedUint8ArrayMemory0 === null || cachedUint8ArrayMemory0.byteLength === 0) {
             cachedUint8ArrayMemory0 = new Uint8Array(wasm.memory.buffer);
         }
         return cachedUint8ArrayMemory0;
@@ -35,14 +35,18 @@ let key_derivation_wasm_bindgen;
 
     const cachedTextEncoder = (typeof TextEncoder !== 'undefined' ? new TextEncoder('utf-8') : { encode: () => { throw Error('TextEncoder not available') } } );
 
-    const encodeString = function (arg, view) {
+    const encodeString = (typeof cachedTextEncoder.encodeInto === 'function'
+        ? function (arg, view) {
+        return cachedTextEncoder.encodeInto(arg, view);
+    }
+        : function (arg, view) {
         const buf = cachedTextEncoder.encode(arg);
         view.set(buf);
         return {
             read: arg.length,
             written: buf.length
         };
-    };
+    });
 
     function passStringToWasm0(arg, malloc, realloc) {
 
@@ -86,7 +90,7 @@ let key_derivation_wasm_bindgen;
     let cachedDataViewMemory0 = null;
 
     function getDataViewMemory0() {
-        if (cachedDataViewMemory0 === null || cachedDataViewMemory0.buffer !== wasm.memory.buffer) {
+        if (cachedDataViewMemory0 === null || cachedDataViewMemory0.buffer.detached === true || (cachedDataViewMemory0.buffer.detached === undefined && cachedDataViewMemory0.buffer !== wasm.memory.buffer)) {
             cachedDataViewMemory0 = new DataView(wasm.memory.buffer);
         }
         return cachedDataViewMemory0;
@@ -97,7 +101,7 @@ let key_derivation_wasm_bindgen;
     if (typeof TextDecoder !== 'undefined') { cachedTextDecoder.decode(); };
 
     function decodeText(ptr, len) {
-        return cachedTextDecoder.decode(getUint8ArrayMemory0().slice(ptr, ptr + len));
+        return cachedTextDecoder.decode(getUint8ArrayMemory0().subarray(ptr, ptr + len));
     }
 
     function getStringFromWasm0(ptr, len) {
@@ -117,7 +121,7 @@ let key_derivation_wasm_bindgen;
     const CLOSURE_DTORS = (typeof FinalizationRegistry === 'undefined')
         ? { register: () => {}, unregister: () => {} }
         : new FinalizationRegistry(state => {
-        wasm.__wbindgen_export_7.get(state.dtor)(state.a, state.b)
+        wasm.__wbindgen_export_6.get(state.dtor)(state.a, state.b)
     });
 
     function makeMutClosure(arg0, arg1, dtor, f) {
@@ -133,7 +137,7 @@ let key_derivation_wasm_bindgen;
                 return f(a, state.b, ...args);
             } finally {
                 if (--state.cnt === 0) {
-                    wasm.__wbindgen_export_7.get(state.dtor)(a, state.b);
+                    wasm.__wbindgen_export_6.get(state.dtor)(a, state.b);
                     CLOSURE_DTORS.unregister(state);
                 } else {
                     state.a = a;
@@ -210,15 +214,10 @@ let key_derivation_wasm_bindgen;
         return className;
     }
     /**
-     * @param {number} func_id
-     * @param {any} ptr_
-     * @param {number} rust_vec_len_
-     * @param {number} data_len_
-     * @returns {any}
+     * @param {number} ptr
      */
-    __exports.frb_pde_ffi_dispatcher_sync = function(func_id, ptr_, rust_vec_len_, data_len_) {
-        const ret = wasm.frb_pde_ffi_dispatcher_sync(func_id, ptr_, rust_vec_len_, data_len_);
-        return ret;
+    __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey = function(ptr) {
+        wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(ptr);
     };
 
     /**
@@ -235,8 +234,51 @@ let key_derivation_wasm_bindgen;
     /**
      * @param {number} ptr
      */
-    __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey = function(ptr) {
-        wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(ptr);
+    __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature = function(ptr) {
+        wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(ptr);
+    };
+
+    /**
+     * @param {number} ptr
+     */
+    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey = function(ptr) {
+        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(ptr);
+    };
+
+    /**
+     * @param {number} call_id
+     * @param {any} ptr_
+     * @param {number} rust_vec_len_
+     * @param {number} data_len_
+     */
+    __exports.frb_dart_fn_deliver_output = function(call_id, ptr_, rust_vec_len_, data_len_) {
+        wasm.frb_dart_fn_deliver_output(call_id, ptr_, rust_vec_len_, data_len_);
+    };
+
+    /**
+     * @param {number} ptr
+     */
+    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey = function(ptr) {
+        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(ptr);
+    };
+
+    /**
+     * @param {number} func_id
+     * @param {any} ptr_
+     * @param {number} rust_vec_len_
+     * @param {number} data_len_
+     * @returns {any}
+     */
+    __exports.frb_pde_ffi_dispatcher_sync = function(func_id, ptr_, rust_vec_len_, data_len_) {
+        const ret = wasm.frb_pde_ffi_dispatcher_sync(func_id, ptr_, rust_vec_len_, data_len_);
+        return ret;
+    };
+
+    /**
+     * @param {number} ptr
+     */
+    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature = function(ptr) {
+        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(ptr);
     };
 
     /**
@@ -250,46 +292,8 @@ let key_derivation_wasm_bindgen;
     /**
      * @param {number} ptr
      */
-    __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature = function(ptr) {
-        wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(ptr);
-    };
-
-    /**
-     * @param {number} ptr
-     */
     __exports.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey = function(ptr) {
         wasm.rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(ptr);
-    };
-
-    /**
-     * @param {number} ptr
-     */
-    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey = function(ptr) {
-        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPublicKey(ptr);
-    };
-
-    /**
-     * @param {number} ptr
-     */
-    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey = function(ptr) {
-        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519XPrivateKey(ptr);
-    };
-
-    /**
-     * @param {number} ptr
-     */
-    __exports.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature = function(ptr) {
-        wasm.rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBip32Ed25519Signature(ptr);
-    };
-
-    /**
-     * @param {number} call_id
-     * @param {any} ptr_
-     * @param {number} rust_vec_len_
-     * @param {number} data_len_
-     */
-    __exports.frb_dart_fn_deliver_output = function(call_id, ptr_, rust_vec_len_, data_len_) {
-        wasm.frb_dart_fn_deliver_output(call_id, ptr_, rust_vec_len_, data_len_);
     };
 
     function takeFromExternrefTable0(idx) {
@@ -297,6 +301,25 @@ let key_derivation_wasm_bindgen;
         wasm.__externref_table_dealloc(idx);
         return value;
     }
+    /**
+     * @param {number} ptr
+     */
+    __exports.frb_dart_opaque_drop_thread_box_persistent_handle = function(ptr) {
+        wasm.frb_dart_opaque_drop_thread_box_persistent_handle(ptr);
+    };
+
+    /**
+     * @param {number} ptr
+     * @returns {any}
+     */
+    __exports.frb_dart_opaque_rust2dart_decode = function(ptr) {
+        const ret = wasm.frb_dart_opaque_rust2dart_decode(ptr);
+        return ret;
+    };
+
+    __exports.wasm_start_callback = function() {
+        wasm.wasm_start_callback();
+    };
 
     function passArrayJsValueToWasm0(array, malloc) {
         const ptr = malloc(array.length * 4, 4) >>> 0;
@@ -326,13 +349,6 @@ let key_derivation_wasm_bindgen;
     };
 
     /**
-     * @param {number} ptr
-     */
-    __exports.frb_dart_opaque_drop_thread_box_persistent_handle = function(ptr) {
-        wasm.frb_dart_opaque_drop_thread_box_persistent_handle(ptr);
-    };
-
-    /**
      * # Safety
      *
      * This should never be called manually.
@@ -345,33 +361,16 @@ let key_derivation_wasm_bindgen;
         return ret >>> 0;
     };
 
-    /**
-     * @param {number} ptr
-     * @returns {any}
-     */
-    __exports.frb_dart_opaque_rust2dart_decode = function(ptr) {
-        const ret = wasm.frb_dart_opaque_rust2dart_decode(ptr);
-        return ret;
-    };
-
-    __exports.wasm_start_callback = function() {
-        wasm.wasm_start_callback();
-    };
-
     function __wbg_adapter_36(arg0, arg1, arg2) {
-        wasm.closure146_externref_shim(arg0, arg1, arg2);
+        wasm.closure143_externref_shim(arg0, arg1, arg2);
     }
 
     function __wbg_adapter_39(arg0, arg1, arg2) {
         wasm.closure177_externref_shim(arg0, arg1, arg2);
     }
 
-    function __wbg_adapter_42(arg0, arg1, arg2) {
-        wasm.closure179_externref_shim(arg0, arg1, arg2);
-    }
-
-    function __wbg_adapter_107(arg0, arg1, arg2, arg3) {
-        wasm.closure277_externref_shim(arg0, arg1, arg2, arg3);
+    function __wbg_adapter_143(arg0, arg1, arg2, arg3) {
+        wasm.closure230_externref_shim(arg0, arg1, arg2, arg3);
     }
 
     const WorkerPoolFinalization = (typeof FinalizationRegistry === 'undefined')
@@ -619,7 +618,7 @@ let key_derivation_wasm_bindgen;
                     const a = state0.a;
                     state0.a = 0;
                     try {
-                        return __wbg_adapter_107(a, state0.b, arg0, arg1);
+                        return __wbg_adapter_143(a, state0.b, arg0, arg1);
                     } finally {
                         state0.a = a;
                     }
@@ -745,16 +744,16 @@ let key_derivation_wasm_bindgen;
             const ret = false;
             return ret;
         };
-        imports.wbg.__wbindgen_closure_wrapper656 = function(arg0, arg1, arg2) {
-            const ret = makeMutClosure(arg0, arg1, 145, __wbg_adapter_36);
+        imports.wbg.__wbindgen_closure_wrapper435 = function(arg0, arg1, arg2) {
+            const ret = makeMutClosure(arg0, arg1, 142, __wbg_adapter_36);
             return ret;
         };
-        imports.wbg.__wbindgen_closure_wrapper788 = function(arg0, arg1, arg2) {
+        imports.wbg.__wbindgen_closure_wrapper536 = function(arg0, arg1, arg2) {
             const ret = makeMutClosure(arg0, arg1, 176, __wbg_adapter_39);
             return ret;
         };
-        imports.wbg.__wbindgen_closure_wrapper790 = function(arg0, arg1, arg2) {
-            const ret = makeMutClosure(arg0, arg1, 178, __wbg_adapter_42);
+        imports.wbg.__wbindgen_closure_wrapper537 = function(arg0, arg1, arg2) {
+            const ret = makeMutClosure(arg0, arg1, 176, __wbg_adapter_39);
             return ret;
         };
         imports.wbg.__wbindgen_debug_string = function(arg0, arg1) {
@@ -845,27 +844,27 @@ let key_derivation_wasm_bindgen;
     }
 
     function __wbg_init_memory(imports, memory) {
-        imports.wbg.memory = memory || new WebAssembly.Memory({initial:23,maximum:16384,shared:true});
+
     }
 
-    function __wbg_finalize_init(instance, module, thread_stack_size) {
+    function __wbg_finalize_init(instance, module) {
         wasm = instance.exports;
         __wbg_init.__wbindgen_wasm_module = module;
         cachedDataViewMemory0 = null;
         cachedUint8ArrayMemory0 = null;
 
-        if (typeof thread_stack_size !== 'undefined' && (typeof thread_stack_size !== 'number' || thread_stack_size === 0 || thread_stack_size % 65536 !== 0)) { throw 'invalid stack size' }
-        wasm.__wbindgen_start(thread_stack_size);
+
+        wasm.__wbindgen_start();
         return wasm;
     }
 
-    function initSync(module, memory) {
+    function initSync(module) {
         if (wasm !== undefined) return wasm;
 
-        let thread_stack_size
+
         if (typeof module !== 'undefined') {
             if (Object.getPrototypeOf(module) === Object.prototype) {
-                ({module, memory, thread_stack_size} = module)
+                ({module} = module)
             } else {
                 console.warn('using deprecated parameters for `initSync()`; pass a single object instead')
             }
@@ -873,7 +872,7 @@ let key_derivation_wasm_bindgen;
 
         const imports = __wbg_get_imports();
 
-        __wbg_init_memory(imports, memory);
+        __wbg_init_memory(imports);
 
         if (!(module instanceof WebAssembly.Module)) {
             module = new WebAssembly.Module(module);
@@ -881,16 +880,16 @@ let key_derivation_wasm_bindgen;
 
         const instance = new WebAssembly.Instance(module, imports);
 
-        return __wbg_finalize_init(instance, module, thread_stack_size);
+        return __wbg_finalize_init(instance, module);
     }
 
-    async function __wbg_init(module_or_path, memory) {
+    async function __wbg_init(module_or_path) {
         if (wasm !== undefined) return wasm;
 
-        let thread_stack_size
+
         if (typeof module_or_path !== 'undefined') {
             if (Object.getPrototypeOf(module_or_path) === Object.prototype) {
-                ({module_or_path, memory, thread_stack_size} = module_or_path)
+                ({module_or_path} = module_or_path)
             } else {
                 console.warn('using deprecated parameters for the initialization function; pass a single object instead')
             }
@@ -905,11 +904,11 @@ let key_derivation_wasm_bindgen;
             module_or_path = fetch(module_or_path);
         }
 
-        __wbg_init_memory(imports, memory);
+        __wbg_init_memory(imports);
 
         const { instance, module } = await __wbg_load(await module_or_path, imports);
 
-        return __wbg_finalize_init(instance, module, thread_stack_size);
+        return __wbg_finalize_init(instance, module);
     }
 
     key_derivation_wasm_bindgen = Object.assign(__wbg_init, { initSync }, __exports);
