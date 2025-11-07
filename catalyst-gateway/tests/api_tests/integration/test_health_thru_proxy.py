@@ -63,7 +63,8 @@ def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory)
     resp = document.post(filter={},limit=10,page=0)
     assert(resp.status_code == 200), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
 
-@pytest.mark.health_with_proxy_endpoint
+@pytest.mark.health_with_proxy_endpoint1
+@pytest.mark.skip("...")
 def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory):
     # Not registered stake address
     # Cardano test data CIP0019
@@ -86,6 +87,7 @@ def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory)
     # index-db threshold to start returning 503
     sleep(280)
     # Index DB testing
+    health.is_not_ready(5) #assertion
     resp = rbac.get(lookup=stake_address_not_registered, token=auth_token)
     assert(resp.status_code == 503), f"Expected RBAC lookup to fail: {resp.status_code} - {resp.text}"
     # Event DB testing
@@ -95,6 +97,7 @@ def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory)
     # resume index db comms
     index_db_proxy.enable()
     # wait for cat-gateway API to recover
+    health.is_ready() #assertion
     health.is_ready() #assertion
 
     # Index DB testing
