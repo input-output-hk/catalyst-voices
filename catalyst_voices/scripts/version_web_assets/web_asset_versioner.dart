@@ -134,54 +134,48 @@ class WebAssetVersioner {
 
   Future<void> _discoverManuallyVersionedFiles() async {
     for (final fileName in manuallyVersionedFiles) {
+      final dir = path.join(buildDir, path.dirname(fileName));
       final basename = path.basenameWithoutExtension(fileName);
       final ext = path.extension(fileName);
 
-      final allFiles = await Directory(buildDir)
-          .list(recursive: true)
-          .where((entity) => entity is File)
-          .cast<File>()
-          .toList();
-
-      final matchingFiles = allFiles.where((file) {
-        final name = path.basename(file.path);
-        final versionedPattern = RegExp(
-          '^${RegExp.escape(basename)}\\.[a-f0-9]+${RegExp.escape(ext)}\$',
-        );
-        return name == fileName || versionedPattern.hasMatch(name);
-      }).toList();
-
-      if (matchingFiles.isEmpty) {
-        _log('⚠ Manually versioned file not found: $fileName (skipping)');
+      final directory = Directory(dir);
+      if (!directory.existsSync()) {
         continue;
       }
 
-      if (matchingFiles.length > 1) {
-        _log(
-          '⚠ Multiple matches for $fileName: ${matchingFiles.map((f) => path.basename(f.path)).join(", ")}',
-        );
+      // Look for versioned file: name.HASH.ext
+      final versionedPattern = RegExp(
+        '^${RegExp.escape(basename)}\\.[a-f0-9]+${RegExp.escape(ext)}\$',
+      );
+
+      final versionedFiles = directory
+          .listSync()
+          .whereType<File>()
+          .where((f) => versionedPattern.hasMatch(path.basename(f.path)))
+          .toList();
+
+      if (versionedFiles.isEmpty) {
+        continue;
       }
 
-      // Use the first match
-      final matchedFile = matchingFiles.first;
-      final matchedFileName = path.basename(matchedFile.path);
+      final versionedFile = versionedFiles.first;
+      final versionedFileName = path.basename(versionedFile.path);
 
-      // Only add to map if it's actually versioned (not the original filename)
-      if (matchedFileName != fileName) {
-        // Extract the hash from the filename
-        final hashPattern = RegExp(
-          r'^' +
-              RegExp.escape(basename) +
-              r'\.([a-f0-9]+)' +
-              RegExp.escape(ext) +
-              r'$',
-        );
-        final hashMatch = hashPattern.firstMatch(matchedFileName);
-        final hash = hashMatch?.group(1) ?? '';
+      // Extract hash
+      final hashPattern = RegExp(
+        r'^' +
+            RegExp.escape(basename) +
+            r'\.([a-f0-9]+)' +
+            RegExp.escape(ext) +
+            r'$',
+      );
+      final hashMatch = hashPattern.firstMatch(versionedFileName);
+      final hash = hashMatch?.group(1) ?? '';
 
-        _versionMap[fileName] = matchedFileName;
-        _hashMap[fileName] = hash;
-      }
+      // Store with relative path from buildDir
+      final relativePath = path.relative(versionedFile.path, from: buildDir);
+      _versionMap[fileName] = relativePath;
+      _hashMap[fileName] = hash;
     }
   }
 
