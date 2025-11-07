@@ -19,7 +19,8 @@ pub(crate) struct EnvVars {
     /// The Catalyst Signed Document threshold, document cannot be too far behind.
     past_threshold: Duration,
 
-    /// The Catalyst Signed Document Admin Catalyst ID from the `SIGNED_DOC_ADMIN_KEYS` env.
+    /// The Catalyst Signed Document Admin Catalyst ID from the `SIGNED_DOC_ADMIN_KEYS`
+    /// env.
     admin_key: catalyst_signed_doc::CatalystId,
 }
 

@@ -6,7 +6,7 @@ use catalyst_signed_doc::CatalystSignedDocument;
 use crate::{
     db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
     service::common::auth::rbac::token::CatalystRBACTokenV1,
-    settings::Settings,
+    settings::{admin::get_admin_key, Settings},
 };
 
 /// A wrapper struct to unify both implementations of `CatalystSignedDocumentProvider` and
@@ -68,9 +68,14 @@ impl catalyst_signed_doc::providers::CatalystIdProvider for ValidationProvider {
         &self,
         kid: &catalyst_signed_doc::CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
-        self.verifying_key_provider
-            .try_get_registered_key(kid)
-            .await
+        let Some(admin_key) = get_admin_key(kid) else {
+            return self
+                .verifying_key_provider
+                .try_get_registered_key(kid)
+                .await;
+        };
+
+        Ok(Some(admin_key))
     }
 }
 
