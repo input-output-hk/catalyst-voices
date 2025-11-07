@@ -36,8 +36,6 @@ class DocumentAuthors extends Table {
 
   TextColumn get authorCatIdSignificant => text()();
 
-  TextColumn get authorCatIdWithoutUsername => text()();
-
   TextColumn get authorUsername => text().nullable()();
 
   @override

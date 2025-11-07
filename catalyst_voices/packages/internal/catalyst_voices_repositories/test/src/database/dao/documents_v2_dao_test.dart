@@ -560,10 +560,6 @@ DocumentWithAuthorsEntity _createTestDocumentEntity({
           documentVer: docEntity.ver,
           authorCatId: e.toUri().toString(),
           authorCatIdSignificant: e.toSignificant().toUri().toString(),
-          authorCatIdWithoutUsername: e
-              .copyWith(username: const Optional.empty())
-              .toUri()
-              .toString(),
           authorUsername: e.username,
         ),
       )

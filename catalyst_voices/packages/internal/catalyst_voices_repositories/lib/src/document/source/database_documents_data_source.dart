@@ -262,10 +262,6 @@ extension on DocumentData {
         documentVer: metadata.version,
         authorCatId: catId.toUri().toString(),
         authorCatIdSignificant: catId.toSignificant().toUri().toString(),
-        authorCatIdWithoutUsername: catId
-            .copyWith(username: const Optional.empty())
-            .toUri()
-            .toString(),
         authorUsername: catId.username,
       );
     }).toList();
