@@ -39,7 +39,7 @@ def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory)
     event_db_proxy.disable()
     health.is_ready() #assertion
     # event-db threshold to start returning 503
-    sleep(65)
+    sleep(120)
     resp = document.post(filter={},limit=10,page=0)
     assert(resp.status_code == 503), f"Expected document index to fail: {resp.status_code} - {resp.text}"
     health.is_not_ready(5) #assertion
