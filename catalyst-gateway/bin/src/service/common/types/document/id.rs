@@ -147,6 +147,15 @@ impl Example for DocumentIdList {
     }
 }
 
+impl PartialEq for DocumentIdList {
+    fn eq(
+        &self,
+        other: &Self,
+    ) -> bool {
+        self.0.eq(&other.0)
+    }
+}
+
 #[derive(Object, Debug, Clone, PartialEq)]
 #[oai(example = true)]
 /// A range of Document IDs.

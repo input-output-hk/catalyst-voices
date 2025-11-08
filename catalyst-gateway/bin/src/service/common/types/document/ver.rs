@@ -153,6 +153,15 @@ impl Example for DocumentVerList {
     }
 }
 
+impl PartialEq for DocumentVerList {
+    fn eq(
+        &self,
+        other: &Self,
+    ) -> bool {
+        self.0.eq(&other.0)
+    }
+}
+
 #[derive(Object, Debug, Clone, PartialEq)]
 #[oai(example = true)]
 /// Version Range
