@@ -28,9 +28,9 @@ services:
       timeout: 5s
       retries: 10
 
-  scylla-node:
+  index-db:
     image: scylladb/scylla:latest
-    container_name: scylla-node
+    container_name: index-db
     restart: unless-stopped
     command: --smp 2 --memory 1G --overprovisioned 1 --api-address 0.0.0.0
     healthcheck:
@@ -52,8 +52,8 @@ services:
       retries: 45
     environment:
       - EVENT_DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
-      - CASSANDRA_PERSISTENT_URL=scylla-node:9042
-      - CASSANDRA_VOLATILE_URL=scylla-node:9042
+      - CASSANDRA_PERSISTENT_URL=index-db:9042
+      - CASSANDRA_VOLATILE_URL=index-db:9042
       - CHAIN_NETWORK=Preprod
       - SIGNED_DOC_SK=0x6455585b5dcc565c8975bc136e215d6d4dd96540620f37783c564da3cb3686dd
       - INTERNAL_API_KEY=123
@@ -64,5 +64,5 @@ services:
     depends_on:
       event-db:
         condition: service_healthy
-      scylla-node:
+      index-db:
         condition: service_healthy
