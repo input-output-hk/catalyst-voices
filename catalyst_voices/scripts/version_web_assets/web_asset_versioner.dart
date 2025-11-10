@@ -5,15 +5,17 @@ import 'package:crypto/crypto.dart';
 import 'package:path/path.dart' as path;
 
 import 'asset_version_manifest.dart';
+import 'ref_updater.dart';
 
 class WebAssetVersioner {
-  /// Hardcoded files that should be manually versioned
-  /// (These are just for documentation/warning purposes)
+  //version of these files should be: v1, v2, v3
   static const manuallyVersionedFiles = [
     'sqlite3.wasm',
     'drift_worker.js',
-    'catalyst_key_derivation_bg.wasm',
-    'catalyst_compression_bg.wasm',
+    'assets/packages/catalyst_key_derivation/assets/js/catalyst_key_derivation_bg.wasm',
+    'assets/packages/catalyst_key_derivation/assets/js/catalyst_key_derivation.js',
+    'assets/packages/catalyst_compression/assets/js/catalyst_compression_bg.wasm',
+    'assets/packages/catalyst_compression/assets/js/catalyst_compression.js',
   ];
 
   final String buildDir;
@@ -61,49 +63,27 @@ class WebAssetVersioner {
       throw Exception('Build directory not found: $buildDir');
     }
 
-    _log('Discovering manually versioned files...');
-    await _discoverManuallyVersionedFiles();
+    _log('Find manually versioned files...');
+    _findManuallyVersionFiles();
 
-    _log('\nCalculating MD5 hashes and renaming files...');
+    _log('Calculating MD5 hashes and rename files...');
     await _calculateHashesAndRenameFiles();
 
     _log('\nUpdating asset references in HTML and JavaScript files...');
     await _updateAssetReferences();
 
-    _log('\nFixing dynamic skwasm filename construction...');
-    await _fixDynamicSkwasmReferences();
-
-    _log('\nGenerating version manifest...');
-    await _generateManifest();
-
-    _log('\nVersioning summary:');
-    _log('- Total files versioned: ${_versionMap.length}');
-
-    final discoveredManual = manuallyVersionedFiles
-        .where((file) => _versionMap.containsKey(file))
-        .toList();
-    final notFoundManual = manuallyVersionedFiles
-        .where((file) => !_versionMap.containsKey(file))
-        .toList();
-
-    if (discoveredManual.isNotEmpty) {
-      _log('- Manually versioned files discovered:');
-      for (final file in discoveredManual) {
-        _log('  ✓ $file -> ${_versionMap[file]}');
-      }
-    }
-
-    if (notFoundManual.isNotEmpty) {
-      _log('- Manually versioned files not found (may not be used):');
-      for (final file in notFoundManual) {
-        _log('  ⚠ $file');
-      }
-    }
+    _log('\nGeneratig Asset Version File...');
+    _generateAssetVersionFile();
   }
 
   Future<void> _calculateHashesAndRenameFiles() async {
     for (final filePath in autoVersionedFiles) {
       final file = File(path.join(buildDir, filePath));
+
+      // Skip symbol files as they need have same hash as they "parent"
+      if (path.extension(filePath) == '.symbols') {
+        continue;
+      }
 
       if (!file.existsSync()) {
         throw Exception(
@@ -119,6 +99,9 @@ class WebAssetVersioner {
       if (filePath.endsWith('.js')) {
         await _versionPartFiles(filePath);
       }
+
+      // Find all symbols files and add same hash as their parent
+      await _versionSymbolFiles(filePath);
     }
   }
 
@@ -132,92 +115,59 @@ class WebAssetVersioner {
     return dir == '.' ? versioned : path.join(dir, versioned);
   }
 
-  Future<void> _discoverManuallyVersionedFiles() async {
-    for (final fileName in manuallyVersionedFiles) {
-      final dir = path.join(buildDir, path.dirname(fileName));
-      final basename = path.basenameWithoutExtension(fileName);
-      final ext = path.extension(fileName);
+  void _findManuallyVersionFiles() {
+    for (final file in manuallyVersionedFiles) {
+      final fullPath = path.join(buildDir, path.dirname(file));
+      final basename = path.basenameWithoutExtension(file);
+      final ext = path.extension(file);
 
-      final directory = Directory(dir);
+      final directory = Directory(fullPath);
       if (!directory.existsSync()) {
         continue;
       }
 
-      // Look for versioned file: name.HASH.ext
       final versionedPattern = RegExp(
-        '^${RegExp.escape(basename)}\\.[a-f0-9]+${RegExp.escape(ext)}\$',
+        '^${RegExp.escape(basename)}(?:\\.v(\\d+))?${RegExp.escape(ext)}\$',
       );
 
       final versionedFiles = directory
           .listSync()
           .whereType<File>()
-          .where((f) => versionedPattern.hasMatch(path.basename(f.path)))
+          .where((file) => versionedPattern.hasMatch(path.basename(file.path)))
           .toList();
 
       if (versionedFiles.isEmpty) {
         continue;
       }
 
+      //Find out what version is assigned to this file
       final versionedFile = versionedFiles.first;
       final versionedFileName = path.basename(versionedFile.path);
 
-      // Extract hash
-      final hashPattern = RegExp(
-        r'^' +
-            RegExp.escape(basename) +
-            r'\.([a-f0-9]+)' +
-            RegExp.escape(ext) +
-            r'$',
-      );
-      final hashMatch = hashPattern.firstMatch(versionedFileName);
+      final hashMatch = versionedPattern.firstMatch(versionedFileName);
       final hash = hashMatch?.group(1) ?? '';
 
-      // Store with relative path from buildDir
       final relativePath = path.relative(versionedFile.path, from: buildDir);
-      _versionMap[fileName] = relativePath;
-      _hashMap[fileName] = hash;
+      _versionMap[file] = relativePath;
+      _hashMap[file] = hash;
     }
   }
 
-  Future<void> _fixDynamicSkwasmReferences() async {
-    final bootstrapEntry = _versionMap.entries.firstWhere(
-      (entry) => entry.key == 'flutter_bootstrap.js',
-    );
-    final bootstrapFile = File(path.join(buildDir, bootstrapEntry.value));
+  Future<void> _generateAssetVersionFile() async {
+    final assetVersionsFile = File(path.join(buildDir, 'asset_version.json'));
 
-    String content = await bootstrapFile.readAsString();
-
-    final skwasmHash = _hashMap['canvaskit/skwasm.js'];
-    final skwasmHeavyHash = _hashMap['canvaskit/skwasm_heavy.js'];
-
-    if (skwasmHash == null || skwasmHeavyHash == null) {
-      _log('Skwasm hashes not found, skipping dynamic replacement');
-      return;
-    }
-    final pattern = RegExp(r'\?"skwasm_heavy":"skwasm"');
-    final replacement = '?"skwasm_heavy.$skwasmHeavyHash":"skwasm.$skwasmHash"';
-
-    if (content.contains(pattern)) {
-      content = content.replaceAll(pattern, replacement);
-      await bootstrapFile.writeAsString(content, flush: true);
-    }
-  }
-
-  Future<void> _generateManifest() async {
-    final manifestFile = File(path.join(buildDir, 'asset_versions.json'));
-
-    final manifest = AssetVersionManifest(
+    final assetVersion = AssetVersionManifest(
       generated: DateTime.now().toUtc().toIso8601String(),
       versionedAssets: _versionMap,
       assetHashes: _hashMap,
-      manuallyVersionedFiles: manuallyVersionedFiles.toList(),
+      manuallyVersionedFiles: manuallyVersionedFiles,
     );
 
     const encoder = JsonEncoder.withIndent('  ');
-    final jsonString = encoder.convert(manifest.toJson());
+    final jsonString = encoder.convert(assetVersion.toJson());
 
-    await manifestFile.writeAsString('$jsonString\n', flush: true);
-    _log('✓ Generated manifest: asset_versions.json');
+    await assetVersionsFile.writeAsString('$jsonString\n', flush: true);
+    _log('Generated asset version file');
   }
 
   void _log(String message) {
@@ -226,76 +176,28 @@ class WebAssetVersioner {
     }
   }
 
-  String _replacePathInContent(
-    String content,
-    String originalPath,
-    String versionedPath,
-  ) {
-    final escaped = RegExp.escape(originalPath);
-    return content
-        .replaceAll(RegExp('"$escaped"'), '"$versionedPath"')
-        .replaceAll(RegExp("'$escaped'"), "'$versionedPath'");
-  }
-
   Future<void> _updateAssetReferences() async {
     final targetFiles = await Directory(buildDir)
         .list(recursive: true)
         .where(
-          (entity) =>
-              entity is File &&
-              (entity.path.endsWith('.html') || entity.path.endsWith('.js')),
+          (file) =>
+              file is File &&
+              (path.extension(file.path).contains('.html') ||
+                  path.extension(file.path).contains('.js')),
         )
         .cast<File>()
         .toList();
 
+    final updateRefRegistry = RefUpdaterRegistry();
+
     for (final file in targetFiles) {
-      bool fileModified = false;
-      String content = await file.readAsString();
-
-      for (final entry in _versionMap.entries) {
-        final originalPath = entry.key;
-        final versionedPath = entry.value;
-
-        final updated = _replacePathInContent(
-          content,
-          originalPath,
-          versionedPath,
-        );
-        if (updated != content) {
-          content = updated;
-          fileModified = true;
-        }
-
-        // Handle relative path suffixes for files in subdirectories
-        if (originalPath.contains('/')) {
-          final parts = path.split(originalPath);
-          final versionedParts = path.split(versionedPath);
-
-          for (var i = 1; i < parts.length; i++) {
-            final suffix = path.joinAll(parts.sublist(i));
-            final versionedSuffix = path.joinAll(versionedParts.sublist(i));
-
-            final updated = _replacePathInContent(
-              content,
-              suffix,
-              versionedSuffix,
-            );
-            if (updated != content) {
-              content = updated;
-              fileModified = true;
-            }
-          }
-        }
-      }
-
-      if (fileModified) {
-        await file.writeAsString(content, flush: true);
-        _log('✓ Updated references in ${path.basename(file.path)}');
-      }
+      updateRefRegistry.updateFileReferences(
+        file: file,
+        versionMap: _versionMap,
+      );
     }
   }
 
-  /// Versions a single file with its MD5 hash.
   Future<void> _versionFile(File file, String filePath) async {
     final bytes = await file.readAsBytes();
     final hash = md5.convert(bytes).toString();
@@ -340,5 +242,33 @@ class WebAssetVersioner {
 
       await _versionFile(partFile, relativePath);
     }
+  }
+
+  Future<void> _versionSymbolFiles(String parentFilePath) async {
+    final symbolFilePath = '$parentFilePath.symbols';
+    final symbolFile = File(path.join(buildDir, symbolFilePath));
+
+    if (!symbolFile.existsSync()) {
+      return;
+    }
+
+    final parentHash = _hashMap[parentFilePath];
+    if (parentHash == null) {
+      _log('Warning: No hash found for parent file: $parentFilePath');
+      return;
+    }
+
+    final versionedFilename = _createVersionedFilename(
+      symbolFilePath,
+      parentHash,
+    );
+    final versionedFile = File(path.join(buildDir, versionedFilename));
+
+    await symbolFile.rename(versionedFile.path);
+
+    _versionMap[symbolFilePath] = versionedFilename;
+    _hashMap[symbolFilePath] = parentHash;
+
+    _log('✓ $symbolFilePath -> $versionedFilename (using parent hash)');
   }
 }

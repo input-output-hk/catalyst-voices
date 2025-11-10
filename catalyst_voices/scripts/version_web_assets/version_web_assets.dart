@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 
-import 'web_asset_versioner2.dart';
+import 'web_asset_versioner.dart';
 
 /// Versions Flutter web assets by renaming files with content-based MD5 hashes
 /// to prevent browser caching issues.
@@ -61,7 +61,7 @@ Future<void> main(List<String> args) async {
   final verbose = argResults['verbose'] as bool;
   final wasm = (argResults['wasm'] as String) == 'true';
 
-  final versioner = WebAssetVersioner2(
+  final versioner = WebAssetVersioner(
     buildDir: buildDir,
     verbose: verbose,
     wasm: wasm,

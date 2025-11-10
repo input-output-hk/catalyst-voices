@@ -7,10 +7,10 @@ import 'package:test/test.dart';
 void main() {
   group('WASM build type', () {
     const String mainPath = "scripts/version_web_assets/test";
-    final src = Directory('$mainPath/temp_build_wasm');
-    final dst = Directory('$mainPath/build_wasm');
+    final src = Directory('$mainPath/helper/build_wasm');
+    final dst = Directory('$mainPath/helper/tmp');
 
-    setUp(() async {
+    setUpAll(() async {
       if (dst.existsSync()) {
         await dst.delete(recursive: true);
       }
@@ -24,7 +24,15 @@ void main() {
           await _copyDir(entity, Directory('${dst.path}/$name'));
         }
       }
+
+      await Process.run('dart', [
+        'run',
+        'scripts/version_web_assets/version_web_assets.dart',
+        '--wasm=true',
+        '--build-dir=${dst.path}',
+      ]);
     });
+
     tearDown(() async {
       if (await dst.exists()) {
         await dst.delete(recursive: true);
@@ -32,17 +40,8 @@ void main() {
     });
 
     test("WebAssetVersioner find manually version files", () async {
-      final result = await Process.run('dart', [
-        'run',
-        'scripts/version_web_assets/version_web_assets.dart',
-        '--wasm=true',
-        '--build-dir=$mainPath/build_wasm',
-      ]);
-
-      print(result.stderr);
-      print(result.stdout);
-
-      final file = File('$mainPath/build_wasm/asset_version.json');
+      final file = File('${dst.path}/asset_version.json');
+      //scripts/version_web_assets/test/helper/tmp/drift_worker.js
       final fileData = file.readAsStringSync();
       final json = jsonDecode(fileData) as Map<String, dynamic>;
       print(json);
@@ -55,14 +54,7 @@ void main() {
     test(
       "WebAssetVersioner add same hash for symbols file as parent has",
       () async {
-        final result = await Process.run('dart', [
-          'run',
-          'scripts/version_web_assets/version_web_assets.dart',
-          '--wasm=true',
-          '--build-dir=$mainPath/build_wasm',
-        ]);
-
-        final file = File('$mainPath/build_wasm/asset_version.json');
+        final file = File('${dst.path}/asset_version.json');
         final fileData = file.readAsStringSync();
         final json = jsonDecode(fileData) as Map<String, dynamic>;
 
@@ -71,15 +63,11 @@ void main() {
         final symbolHash =
             json['asset_hashes']['canvaskit/skwasm_heavy.js.symbols'] as String;
 
-        print(result.stdout);
-
         expect(file.existsSync(), isTrue);
         expect(parentHash, symbolHash);
       },
     );
   });
-
-  // group('JS build type', () {});
 }
 
 Future<void> _copyDir(Directory source, Directory destination) async {
