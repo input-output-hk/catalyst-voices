@@ -8,9 +8,11 @@ import 'package:drift/drift.dart';
 ///
 /// **Why Normalization?**
 /// Documents store authors as comma-separated URIs in the `authors` metadata field:
+/// /* cSpell:disable */
 /// ```
 /// "id.catalyst://john@preprod.cardano/FftxFn...,id.catalyst://alice@cardano/AbcDef..."
 /// ```
+/// /* cSpell:enable */
 ///
 /// Direct querying against this field would require:
 /// - JSON extraction or string parsing on every row
