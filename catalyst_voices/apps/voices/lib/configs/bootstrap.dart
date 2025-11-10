@@ -74,7 +74,8 @@ Future<BootstrapArgs> bootstrap({
 
   final endConfigTimestamp = DateTimeExt.now(utc: true);
 
-  await _reportingService.init(config: config.sentry);
+  await _initReportingService(config.sentry);
+
   await cleanUpStorages(onlyOld: true);
   if (!_bootstrapInitState.didInitializeCryptoUtils) {
     await _initCryptoUtils();
@@ -275,6 +276,18 @@ Future<void> _initCryptoUtils() async {
   CatalystPrivateKey.factory = const Bip32Ed25519XCatalystPrivateKeyFactory();
   CatalystPublicKey.factory = const Bip32Ed25519XCatalystPublicKeyFactory();
   CatalystSignature.factory = const Bip32Ed25519XCatalystSignatureFactory();
+}
+
+Future<void> _initReportingService(SentryConfig sentryConfig) async {
+  await _reportingService.init(config: sentryConfig).onError(
+    (error, stackTrace) {
+      _loggerBootstrap.info(
+        'Failed to initialize ReportingService. App will continue without error reporting.',
+        error,
+        stackTrace,
+      );
+    },
+  );
 }
 
 Future<void> _reportBootstrapError(Object error, StackTrace stack) async {
