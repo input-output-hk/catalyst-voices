@@ -38,8 +38,7 @@ jobs:
               - 'docs/**'
               - '.config/dictionaries/project.dic'
             not-only-docs:
-              - '!docs/**'
-              - '!.config/dictionaries/project.dic'
+              - '!(docs/**|.config/dictionaries/project.dic)'
 
   reject:
     if: ${{ !github.event.pull_request.draft }}
