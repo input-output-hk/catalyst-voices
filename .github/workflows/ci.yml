@@ -24,6 +24,7 @@ jobs:
       catalyst-gateway: ${{ steps.filter.outputs.catalyst-gateway }}
       catalyst-voices: ${{ steps.filter.outputs.catalyst-voices }}
       docs: ${{ steps.filter.outputs.docs }}
+      not-only-docs: ${{ steps.filter.outputs.not_only_docs }}
     steps:
       - uses: dorny/paths-filter@v2
         id: filter
@@ -35,7 +36,7 @@ jobs:
               - 'catalyst-gateway/**'
             docs:
               - 'docs/**'
-            not_only_docs:
+            not-only-docs:
               - '!docs/**'
 
   reject:
@@ -57,7 +58,7 @@ jobs:
               No images should be built using the 'latest' tag
 
   docs-only:
-    if: ${{ needs.paths-filter.outputs.docs == 'true' && needs.paths-filter.outputs.not_only_docs != 'true' }}
+    if: ${{ needs.paths-filter.outputs.docs == 'true' && needs.paths-filter.outputs.not-only-docs != 'true' }}
     needs: [reject, paths-filter]
     uses: input-output-hk/catalyst-forge/.github/workflows/release.yml@ci/v1.10.0
     with:
