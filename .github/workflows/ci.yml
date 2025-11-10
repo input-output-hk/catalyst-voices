@@ -24,7 +24,7 @@ jobs:
       catalyst-gateway: ${{ steps.filter.outputs.catalyst-gateway }}
       catalyst-voices: ${{ steps.filter.outputs.catalyst-voices }}
       docs: ${{ steps.filter.outputs.docs }}
-      not-only-docs: ${{ steps.filter.outputs.not_only_docs }}
+      not-only-docs: ${{ steps.filter.outputs.not-only-docs }}
     steps:
       - uses: dorny/paths-filter@v2
         id: filter
