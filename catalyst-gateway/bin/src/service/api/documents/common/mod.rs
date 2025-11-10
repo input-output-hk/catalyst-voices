@@ -68,14 +68,13 @@ impl catalyst_signed_doc::providers::CatalystIdProvider for ValidationProvider {
         &self,
         kid: &catalyst_signed_doc::CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
-        let Some(admin_key) = get_admin_key(kid) else {
-            return self
-                .verifying_key_provider
+        if kid.to_string().starts_with("admin.catalyst") {
+            Ok(get_admin_key(kid))
+        } else {
+            self.verifying_key_provider
                 .try_get_registered_key(kid)
-                .await;
-        };
-
-        Ok(Some(admin_key))
+                .await
+        }
     }
 }
 

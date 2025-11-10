@@ -21,7 +21,7 @@ pub(crate) struct EnvVars {
 
     /// The Catalyst Signed Document Admin Catalyst ID from the `SIGNED_DOC_ADMIN_KEYS`
     /// env.
-    admin_key: catalyst_signed_doc::CatalystId,
+    admin_key: Option<catalyst_signed_doc::CatalystId>,
 }
 
 impl EnvVars {
@@ -33,13 +33,15 @@ impl EnvVars {
         let past_threshold =
             StringEnvVar::new_as_duration("SIGNED_DOC_PAST_THRESHOLD", DEFAULT_PAST_THRESHOLD);
 
-        let Some(admin_key) = string_to_catalyst_id(
+        let admin_key = string_to_catalyst_id(
             &StringEnvVar::new_optional("SIGNED_DOC_ADMIN_KEYS", false)
                 .map(|v| v.as_string())
                 .unwrap_or_default(),
-        ) else {
-            panic!("Missing or invalid Catalyst ID for Admin. This is required.");
-        };
+        );
+
+        if admin_key.is_none() {
+            tracing::error!("Missing or invalid Catalyst ID for Admin. This is required.");
+        }
 
         Self {
             future_threshold,
@@ -62,8 +64,8 @@ impl EnvVars {
 
     /// The Catalyst Signed Document Admin key.
     #[allow(dead_code)]
-    pub(crate) fn admin_key(&self) -> &catalyst_signed_doc::CatalystId {
-        &self.admin_key
+    pub(crate) fn admin_key(&self) -> Option<&catalyst_signed_doc::CatalystId> {
+        self.admin_key.as_ref()
     }
 }
 
