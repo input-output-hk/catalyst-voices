@@ -125,7 +125,10 @@ class NoopRefUpdater extends RefUpdater {
     return p.extension(path) == '.wasm' ||
         p.extension(path) == '.symbols' ||
         p.basename(path).contains('version.json') ||
-        p.basename(path).contains('drift_worker.js');
+        p.basename(path).contains('drift_worker.js') ||
+        p.basename(path).contains('catalyst_compression') ||
+        p.basename(path).contains('catalyst_key_derivation') ||
+        p.basename(path).contains('package.json');
   }
 
   @override

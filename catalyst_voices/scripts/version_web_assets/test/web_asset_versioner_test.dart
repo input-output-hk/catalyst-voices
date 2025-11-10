@@ -9,6 +9,7 @@ void main() {
     const String mainPath = "scripts/version_web_assets/test";
     final src = Directory('$mainPath/helper/build_wasm');
     final dst = Directory('$mainPath/helper/tmp');
+    late final Map<String, dynamic> assetVersionData;
 
     setUpAll(() async {
       if (dst.existsSync()) {
@@ -31,6 +32,10 @@ void main() {
         '--wasm=true',
         '--build-dir=${dst.path}',
       ]);
+
+      final file = File('${dst.path}/asset_version.json');
+      final fileData = file.readAsStringSync();
+      assetVersionData = jsonDecode(fileData) as Map<String, dynamic>;
     });
 
     tearDown(() async {
@@ -40,32 +45,43 @@ void main() {
     });
 
     test("WebAssetVersioner find manually version files", () async {
-      final file = File('${dst.path}/asset_version.json');
-      final fileData = file.readAsStringSync();
-      final json = jsonDecode(fileData) as Map<String, dynamic>;
-      print(json);
-
-      expect(file.existsSync(), isTrue);
-      expect(json['asset_hashes']['sqlite3.wasm'], '1');
-      expect(json['asset_hashes']['drift_worker.js'], '');
+      expect(assetVersionData['asset_hashes']['sqlite3.wasm'], '1');
+      expect(assetVersionData['asset_hashes']['drift_worker.js'], '');
     });
 
     test(
       "WebAssetVersioner add same hash for symbols file as parent has",
       () async {
-        final file = File('${dst.path}/asset_version.json');
-        final fileData = file.readAsStringSync();
-        final json = jsonDecode(fileData) as Map<String, dynamic>;
-
         final parentHash =
-            json['asset_hashes']['canvaskit/skwasm_heavy.js'] as String;
+            assetVersionData['asset_hashes']['canvaskit/skwasm_heavy.js']
+                as String;
         final symbolHash =
-            json['asset_hashes']['canvaskit/skwasm_heavy.js.symbols'] as String;
+            assetVersionData['asset_hashes']['canvaskit/skwasm_heavy.js.symbols']
+                as String;
 
-        expect(file.existsSync(), isTrue);
         expect(parentHash, symbolHash);
       },
     );
+
+    test('DirectRefUpdater updates correctly refs', () {
+      final versionedCanvaskit =
+          assetVersionData['versioned_assets']['canvaskit/canvaskit.js']
+              as String;
+      final file = File('${dst.path}/$versionedCanvaskit');
+      final content = file.readAsStringSync();
+
+      final versionedCanvaskitWasm =
+          assetVersionData['asset_hashes']['canvaskit/canvaskit.wasm']
+              as String;
+
+      final wasmRef = content.contains(versionedCanvaskitWasm);
+      final notContainsNoVersionWasm = !content.contains(
+        'canvaskit/canvaskit.wasm',
+      );
+
+      expect(wasmRef, isTrue);
+      expect(notContainsNoVersionWasm, isTrue);
+    });
   });
 }
 
