@@ -55,12 +55,15 @@ class _Timeline implements CatalystProfilerTimeline {
       buffer.write(' $startArgs');
     }
 
-    final args = arguments?.toMap() ?? {};
+    final effectiveArguments = (arguments ?? CatalystProfilerTimelineFinishArguments())
+      ..took = _stopwatch.elapsed;
+
+    final args = effectiveArguments.toMap();
     if (args.isNotEmpty) {
       buffer.write(' $args');
     }
 
-    debugPrint('$buffer took ${_stopwatch.elapsed}');
+    debugPrint('$buffer');
   }
 
   @override
@@ -120,13 +123,17 @@ class _TimelineTask implements CatalystProfilerTimelineTask {
     _stopwatch.stop();
 
     final buffer = StringBuffer(name);
-    final args = arguments?.toMap() ?? {};
+
+    final effectiveArguments = arguments ?? CatalystProfilerTimelineTaskFinishArguments()
+      ..took ??= _stopwatch.elapsed;
+
+    final args = effectiveArguments.toMap();
 
     if (args.isNotEmpty) {
       buffer.write(' $args');
     }
 
-    debugPrint('$buffer took ${_stopwatch.elapsed}');
+    debugPrint('$buffer');
   }
 
   @override

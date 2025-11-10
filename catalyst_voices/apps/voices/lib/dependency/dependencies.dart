@@ -514,6 +514,7 @@ final class Dependencies extends DependencyProvider {
           get<SyncStatsStorage>(),
           get<DocumentsService>(),
           get<CampaignService>(),
+          get<CatalystProfiler>(),
         );
       },
       dispose: (manager) async => manager.dispose(),

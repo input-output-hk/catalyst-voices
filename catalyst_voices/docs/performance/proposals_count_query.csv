@@ -18,3 +18,13 @@ docs_count  ,filer              ,avg_duration    ,PR     ,note
 14008       ,categories         ,0:00:00.551765  ,#3614  ,-
 14008       ,categories,drafts  ,0:00:00.692240  ,#3614  ,-
 14008       ,categories,finals  ,0:00:00.832700  ,#3614  ,-
+
+712         ,categories         ,0:00:00.072415  ,#3672  ,-
+712         ,categories,drafts  ,0:00:00.081024  ,#3672  ,-
+712         ,categories,finals  ,0:00:00.081195  ,#3672  ,-
+7008        ,categories         ,0:00:00.116349  ,#3672  ,-
+7008        ,categories,drafts  ,0:00:00.174726  ,#3672  ,-
+7008        ,categories,finals  ,0:00:00.221865  ,#3672  ,-
+14008       ,categories         ,0:00:00.189561  ,#3672  ,-
+14008       ,categories,drafts  ,0:00:00.307680  ,#3672  ,-
+14008       ,categories,finals  ,0:00:00.468149  ,#3672  ,-
