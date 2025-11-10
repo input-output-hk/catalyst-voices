@@ -19,7 +19,7 @@ docs_count  ,filer              ,avg_duration    ,PR     ,note
 14008       ,categories,drafts  ,0:00:00.380780  ,#3614  ,-
 14008       ,categories,finals  ,0:00:04.466084  ,#3614  ,-
 
-712         ,categories         ,0:00:00.076324  ,#3672  ,-
+712         ,categories         ,0:00:00.076324  ,#3672  ,DocumentAuthors table (2x more db entries)
 712         ,categories,drafts  ,0:00:00.097465  ,#3672  ,-
 712         ,categories,finals  ,0:00:00.094671  ,#3672  ,-
 7008        ,categories         ,0:00:00.567814  ,#3672  ,-
