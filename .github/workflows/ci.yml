@@ -66,7 +66,7 @@ jobs:
       forge_version: 0.21.0
 
   ci:
-    if: ${{ !github.event.pull_request.draft && needs.paths-filter.outputs.not_only_docs == 'true' }}
+    if: ${{ !github.event.pull_request.draft && needs.paths-filter.outputs.not-only-docs == 'true' }}
     needs: [reject, docs-only]
     uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.10.0
     with:
