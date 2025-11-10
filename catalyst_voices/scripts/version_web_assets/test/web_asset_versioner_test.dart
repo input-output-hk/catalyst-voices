@@ -41,7 +41,6 @@ void main() {
 
     test("WebAssetVersioner find manually version files", () async {
       final file = File('${dst.path}/asset_version.json');
-      //scripts/version_web_assets/test/helper/tmp/drift_worker.js
       final fileData = file.readAsStringSync();
       final json = jsonDecode(fileData) as Map<String, dynamic>;
       print(json);

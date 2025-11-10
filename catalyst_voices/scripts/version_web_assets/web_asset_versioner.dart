@@ -72,7 +72,7 @@ class WebAssetVersioner {
     _log('\nUpdating asset references in HTML and JavaScript files...');
     await _updateAssetReferences();
 
-    _log('\nGeneratig Asset Version File...');
+    _log('\nGenerating Asset Version File...');
     _generateAssetVersionFile();
   }
 
