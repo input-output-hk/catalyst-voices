@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/model/document_with_authors_entity.dart';
@@ -8,13 +10,16 @@ import 'package:catalyst_voices_repositories/src/document/source/proposal_docume
 import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
 import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:rxdart/rxdart.dart';
 
 final class DatabaseDocumentsDataSource
     implements SignedDocumentDataSource, ProposalDocumentDataLocalSource {
   final CatalystDatabase _database;
+  final CatalystProfiler _profiler;
 
   DatabaseDocumentsDataSource(
     this._database,
+    this._profiler,
   );
 
   @override
@@ -174,8 +179,15 @@ final class DatabaseDocumentsDataSource
     ProposalsOrder order = const UpdateDate.desc(),
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
+    final tr = _profiler.startTransaction('Query proposals: $request:$order:$filters');
+
     return _database.proposalsV2Dao
         .watchProposalsBriefPage(request: request, order: order, filters: filters)
+        .doOnData(
+          (_) {
+            if (!tr.finished) unawaited(tr.finish());
+          },
+        )
         .map((page) => page.map((data) => data.toModel()));
   }
 
@@ -190,7 +202,13 @@ final class DatabaseDocumentsDataSource
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    return _database.proposalsV2Dao.watchVisibleProposalsCount(filters: filters);
+    final tr = _profiler.startTransaction('Query proposals count: $filters');
+
+    return _database.proposalsV2Dao.watchVisibleProposalsCount(filters: filters).doOnData(
+      (_) {
+        if (!tr.finished) unawaited(tr.finish());
+      },
+    );
   }
 
   @override

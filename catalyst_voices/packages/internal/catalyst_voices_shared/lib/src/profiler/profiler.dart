@@ -1,4 +1,5 @@
 export 'catalyst_base_profiler.dart';
+export 'catalyst_console_profiler.dart';
 export 'catalyst_developer_profiler.dart';
 export 'catalyst_noop_profiler.dart';
 export 'catalyst_profiler.dart';

@@ -215,14 +215,16 @@ Future<void> registerDependencies({
 /// - [CatalystNoopProfiler] for debug mode (no overhead)
 CatalystProfiler _createProfiler(AppConfig config) {
   if (kProfileMode) {
-    return CatalystDeveloperProfiler.fromConfig(config.developerProfiler);
+    return config.profiler.console
+        ? const CatalystProfiler.console()
+        : CatalystProfiler.developer(config.profiler);
   }
 
   if (_shouldUseSentry) {
-    return const CatalystSentryProfiler();
+    return const CatalystProfiler.sentry();
   }
 
-  return const CatalystNoopProfiler();
+  return const CatalystProfiler.noop();
 }
 
 void _debugPrintStressTest() {

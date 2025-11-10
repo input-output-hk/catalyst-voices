@@ -247,10 +247,9 @@ final class Dependencies extends DependencyProvider {
         return BlockchainRepository(get<ApiServices>());
       })
       ..registerLazySingleton<SignedDocumentManager>(() {
-        return SignedDocumentManager(
-          brotli: const CatalystBrotliCompressor(),
-          zstd: const CatalystZstdCompressor(),
-          profiler: get<CatalystRuntimeProfiler>(),
+        return const SignedDocumentManager(
+          brotli: CatalystBrotliCompressor(),
+          zstd: CatalystZstdCompressor(),
         );
       })
       ..registerLazySingleton<DatabaseDraftsDataSource>(() {
@@ -261,6 +260,7 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<DatabaseDocumentsDataSource>(() {
         return DatabaseDocumentsDataSource(
           get<CatalystDatabase>(),
+          get<CatalystProfiler>(),
         );
       })
       ..registerLazySingleton<DocumentFavoriteSource>(() {
