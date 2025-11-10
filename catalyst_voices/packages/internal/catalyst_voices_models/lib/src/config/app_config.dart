@@ -163,7 +163,7 @@ final class AppConfig extends Equatable {
     SentryConfig? sentry,
     BlockchainConfig? blockchain,
     StressTestConfig? stressTest,
-    CatalystDeveloperProfilerConfig? developerProfiler,
+    CatalystDeveloperProfilerConfig? profiler,
   }) {
     return AppConfig(
       version: version ?? this.version,
@@ -172,7 +172,7 @@ final class AppConfig extends Equatable {
       sentry: sentry ?? this.sentry,
       blockchain: blockchain ?? this.blockchain,
       stressTest: stressTest ?? this.stressTest,
-      profiler: developerProfiler ?? this.profiler,
+      profiler: profiler ?? this.profiler,
     );
   }
 }
