@@ -356,8 +356,8 @@ extension on DocumentDataMetadataDtoDbV3 {
       return DocumentAuthorEntity(
         documentId: selfRef.id,
         documentVer: selfRef.version!,
-        authorCatId: catId.toUri().toString(),
-        authorCatIdSignificant: catId.toSignificant().toUri().toString(),
+        authorId: catId.toUri().toString(),
+        authorIdSignificant: catId.toSignificant().toUri().toString(),
         authorUsername: catId.username,
       );
     }).toList();

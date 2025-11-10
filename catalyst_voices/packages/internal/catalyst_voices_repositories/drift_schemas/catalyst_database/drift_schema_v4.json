@@ -595,8 +595,8 @@
         "was_declared_in_moor": false,
         "columns": [
           {
-            "name": "author_cat_id",
-            "getter_name": "authorCatId",
+            "name": "author_id",
+            "getter_name": "authorId",
             "moor_type": "string",
             "nullable": false,
             "customConstraints": null,
@@ -606,19 +606,8 @@
             ]
           },
           {
-            "name": "author_cat_id_significant",
-            "getter_name": "authorCatIdSignificant",
-            "moor_type": "string",
-            "nullable": false,
-            "customConstraints": null,
-            "default_dart": null,
-            "default_client_dart": null,
-            "dsl_features": [
-            ]
-          },
-          {
-            "name": "author_cat_id_without_username",
-            "getter_name": "authorCatIdWithoutUsername",
+            "name": "author_id_significant",
+            "getter_name": "authorIdSignificant",
             "moor_type": "string",
             "nullable": false,
             "customConstraints": null,
@@ -669,7 +658,7 @@
         "explicit_pk": [
           "document_id",
           "document_ver",
-          "author_cat_id"
+          "author_id"
         ]
       }
     },
@@ -1164,7 +1153,7 @@
         "columns": [
           "document_id",
           "document_ver",
-          "author_cat_id_significant"
+          "author_id_significant"
         ]
       }
     },
@@ -1180,7 +1169,7 @@
         "sql": null,
         "unique": false,
         "columns": [
-          "author_cat_id_significant"
+          "author_id_significant"
         ]
       }
     },

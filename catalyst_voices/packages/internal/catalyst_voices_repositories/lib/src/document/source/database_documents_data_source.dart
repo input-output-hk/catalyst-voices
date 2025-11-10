@@ -278,8 +278,8 @@ extension on DocumentData {
       return DocumentAuthorEntity(
         documentId: metadata.id,
         documentVer: metadata.version,
-        authorCatId: catId.toUri().toString(),
-        authorCatIdSignificant: catId.toSignificant().toUri().toString(),
+        authorId: catId.toUri().toString(),
+        authorIdSignificant: catId.toSignificant().toUri().toString(),
         authorUsername: catId.username,
       );
     }).toList();

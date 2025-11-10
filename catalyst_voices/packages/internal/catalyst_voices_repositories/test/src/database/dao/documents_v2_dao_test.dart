@@ -558,8 +558,8 @@ DocumentWithAuthorsEntity _createTestDocumentEntity({
         (e) => DocumentAuthorEntity(
           documentId: docEntity.id,
           documentVer: docEntity.ver,
-          authorCatId: e.toUri().toString(),
-          authorCatIdSignificant: e.toSignificant().toUri().toString(),
+          authorId: e.toUri().toString(),
+          authorIdSignificant: e.toSignificant().toUri().toString(),
           authorUsername: e.username,
         ),
       )

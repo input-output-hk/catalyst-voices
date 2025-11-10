@@ -235,7 +235,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
           SELECT 1 FROM document_authors da
           WHERE da.document_id = p.id 
             AND da.document_ver = p.ver
-            AND da.author_cat_id_significant = '$escapedSignificant'
+            AND da.author_id_significant = '$escapedSignificant'
         )
       ''');
     }

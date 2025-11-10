@@ -27,14 +27,14 @@ import 'package:drift/drift.dart';
 @DataClassName('DocumentAuthorEntity')
 @TableIndex(
   name: 'idx_document_authors_composite',
-  columns: {#documentId, #documentVer, #authorCatIdSignificant},
+  columns: {#documentId, #documentVer, #authorIdSignificant},
 )
-@TableIndex(name: 'idx_document_authors_identity', columns: {#authorCatIdSignificant})
+@TableIndex(name: 'idx_document_authors_identity', columns: {#authorIdSignificant})
 @TableIndex(name: 'idx_document_authors_username', columns: {#authorUsername})
 class DocumentAuthors extends Table {
-  TextColumn get authorCatId => text()();
+  TextColumn get authorId => text()();
 
-  TextColumn get authorCatIdSignificant => text()();
+  TextColumn get authorIdSignificant => text()();
 
   TextColumn get authorUsername => text().nullable()();
 
@@ -48,5 +48,5 @@ class DocumentAuthors extends Table {
   TextColumn get documentVer => text()();
 
   @override
-  Set<Column> get primaryKey => {documentId, documentVer, authorCatId};
+  Set<Column> get primaryKey => {documentId, documentVer, authorId};
 }

@@ -327,12 +327,8 @@ extension on DocumentData {
         return _NewDocumentAuthor(
           documentId: documentId,
           documentVer: documentVer,
-          authorCatId: catId.toUri().toString(),
-          authorCatIdSignificant: catId.toSignificant().toUri().toString(),
-          authorCatIdWithoutUsername: catId
-              .copyWith(username: const Optional.empty())
-              .toUri()
-              .toString(),
+          authorId: catId.toUri().toString(),
+          authorIdSignificant: catId.toSignificant().toUri().toString(),
           authorUsername: catId.username,
         );
       },
