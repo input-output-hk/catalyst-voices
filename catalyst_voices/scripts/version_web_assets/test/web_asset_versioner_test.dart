@@ -38,7 +38,7 @@ void main() {
       assetVersionData = jsonDecode(fileData) as Map<String, dynamic>;
     });
 
-    tearDown(() async {
+    tearDownAll(() async {
       if (await dst.exists()) {
         await dst.delete(recursive: true);
       }
