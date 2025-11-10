@@ -338,26 +338,27 @@ impl Example for VerSelectorDocumented {
     }
 }
 
-impl TryFrom<VerSelectorDocumented> for UuidSelector {
+impl TryFrom<VerSelectorDocumented> for Option<UuidSelector> {
     type Error = anyhow::Error;
 
     fn try_from(value: VerSelectorDocumented) -> Result<Self, Self::Error> {
         match value.0 {
-            VerSelector::Eq(ver) => Ok(Self::Eq(ver.0.eq.parse()?)),
+            VerSelector::Eq(ver) => Ok(Some(UuidSelector::Eq(ver.0.eq.parse()?))),
             VerSelector::Range(range) => {
-                Ok(Self::Range {
+                Ok(Some(UuidSelector::Range {
                     min: range.0.min.parse()?,
                     max: range.0.max.parse()?,
-                })
+                }))
             },
-            VerSelector::In(vers) => {
-                Ok(Self::In(
+            VerSelector::In(vers) if !vers.0.r#in.is_empty() => {
+                Ok(Some(UuidSelector::In(
                     Vec::<_>::from(vers.0.r#in)
                         .into_iter()
                         .map(|v| v.0.parse())
                         .collect::<Result<_, _>>()?,
-                ))
+                )))
             },
+            VerSelector::In(_) => Ok(None),
         }
     }
 }

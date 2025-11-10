@@ -214,10 +214,14 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
             );
         }
         if let Some(id) = value.id {
-            db_filter = db_filter.with_id(id.try_into()?);
+            if let Some(id) = id.try_into()? {
+                db_filter = db_filter.with_id(id);
+            }
         }
         if let Some(version) = value.ver {
-            db_filter = db_filter.with_ver(version.try_into()?);
+            if let Some(version) = version.try_into()? {
+                db_filter = db_filter.with_ver(version);
+            }
         }
         if let Some(doc_refs) = value.doc_ref {
             let doc_refs = doc_refs

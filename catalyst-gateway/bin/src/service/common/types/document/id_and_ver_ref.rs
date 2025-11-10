@@ -65,14 +65,14 @@ impl TryFrom<IdAndVerRefDocumented> for DocumentRef {
         match value.0 {
             IdAndVerRef::IdRefOnly(val) => {
                 Ok(DocumentRef {
-                    id: Some(val.0.id.try_into()?),
+                    id: val.0.id.try_into()?,
                     ver: None,
                 })
             },
             IdAndVerRef::IdAndVerRef(val) => {
                 Ok(DocumentRef {
-                    id: val.0.id.map(TryInto::try_into).transpose()?,
-                    ver: Some(val.0.ver.try_into()?),
+                    id: val.0.id.map(TryFrom::try_from).transpose()?.flatten(),
+                    ver: val.0.ver.try_into()?,
                 })
             },
         }

@@ -327,26 +327,27 @@ impl Example for IdSelectorDocumented {
     }
 }
 
-impl TryFrom<IdSelectorDocumented> for UuidSelector {
+impl TryFrom<IdSelectorDocumented> for Option<UuidSelector> {
     type Error = anyhow::Error;
 
     fn try_from(value: IdSelectorDocumented) -> Result<Self, Self::Error> {
         match value.0 {
-            IdSelector::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
+            IdSelector::Eq(id) => Ok(Some(UuidSelector::Eq(id.0.eq.parse()?))),
             IdSelector::Range(range) => {
-                Ok(Self::Range {
+                Ok(Some(UuidSelector::Range {
                     min: range.0.min.parse()?,
                     max: range.0.max.parse()?,
-                })
+                }))
             },
-            IdSelector::In(list) => {
-                Ok(Self::In(
-                    Vec::from(list.0.r#in)
+            IdSelector::In(ids) if !ids.0.r#in.is_empty() => {
+                Ok(Some(UuidSelector::In(
+                    Vec::from(ids.0.r#in)
                         .into_iter()
                         .map(|id| id.0.parse::<uuid::Uuid>())
                         .collect::<Result<_, _>>()?,
-                ))
+                )))
             },
+            IdSelector::In(_) => Ok(None),
         }
     }
 }
