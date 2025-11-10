@@ -236,7 +236,7 @@ impl Example for IdRangeDocumented {
 #[oai(example = true)]
 pub(crate) struct IdIn {
     /// Matching any document IDs from the list.
-    pub(crate) r#in: DocumentIdList,
+    r#in: DocumentIdList,
 }
 
 impl Example for IdIn {
@@ -260,7 +260,7 @@ impl Example for IdIn {
 ///
 /// A list of
 /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id).
-pub(crate) struct IdInDocumented(pub(crate) IdIn);
+pub(crate) struct IdInDocumented(IdIn);
 impl Example for IdInDocumented {
     fn example() -> Self {
         Self(IdIn::example())

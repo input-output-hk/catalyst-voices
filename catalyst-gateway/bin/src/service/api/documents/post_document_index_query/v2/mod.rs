@@ -25,14 +25,8 @@ use crate::{
             objects::generic::pagination::CurrentPage,
             responses::WithErrorResponses,
             types::{
-                document::{
-                    id::{DocumentId, IdIn, IdInDocumented, IdSelector, IdSelectorDocumented},
-                    ver::{VerIn, VerInDocumented, VerSelector, VerSelectorDocumented},
-                },
-                generic::{
-                    error_msg::ErrorMessage,
-                    query::pagination::{Limit, Page, Remaining},
-                },
+                document::id::DocumentId,
+                generic::query::pagination::{Limit, Page, Remaining},
             },
         },
     },
@@ -51,9 +45,6 @@ pub(crate) enum Responses {
     /// No documents were found which match the query filter.
     #[oai(status = 404)]
     NotFound,
-    /// Response for unprocessable content.
-    #[oai(status = 422)]
-    UnprocessableContent(Json<ErrorMessage>),
 }
 
 /// All responses.
@@ -65,25 +56,6 @@ pub(crate) async fn endpoint(
     page: Option<Page>,
     limit: Option<Limit>,
 ) -> AllResponses {
-    if matches!(
-        &filter.id,
-        Some(IdSelectorDocumented(IdSelector::In(IdInDocumented(IdIn {
-            r#in
-        })))) if r#in.is_empty()
-    ) {
-        return Responses::UnprocessableContent(Json("IdSelector::In must not be empty.".into()))
-            .into();
-    }
-    if matches!(
-        &filter.ver,
-        Some(VerSelectorDocumented(VerSelector::In(VerInDocumented(VerIn {
-            r#in
-        })))) if r#in.is_empty()
-    ) {
-        return Responses::UnprocessableContent(Json("VerSelector::In must not be empty.".into()))
-            .into();
-    }
-
     let query_limits = QueryLimits::new(limit, page);
     let conditions = match filter.try_into() {
         Ok(db_filter) => db_filter,

@@ -245,7 +245,7 @@ impl Example for VerRangeDocumented {
 #[oai(example = true)]
 pub(crate) struct VerIn {
     /// Matching any document versions from the list.
-    pub(crate) r#in: DocumentVerList,
+    r#in: DocumentVerList,
 }
 
 impl Example for VerIn {
@@ -268,7 +268,7 @@ impl Example for VerIn {
 /// Document versions from the list.
 ///
 /// A range of [Document Versions]().
-pub(crate) struct VerInDocumented(pub(crate) VerIn);
+pub(crate) struct VerInDocumented(VerIn);
 
 impl Example for VerInDocumented {
     fn example() -> Self {

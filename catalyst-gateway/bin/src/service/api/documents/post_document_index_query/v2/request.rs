@@ -38,13 +38,13 @@ pub(crate) struct DocumentIndexQueryFilterV2 {
     /// Either an absolute single Document ID or a range of
     /// [Document IDs](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#id)
     #[oai(skip_serializing_if_is_none)]
-    pub(crate) id: Option<IdSelectorDocumented>,
+    id: Option<IdSelectorDocumented>,
     /// ## Document Version
     ///
     /// Either an absolute single Document Version or a range of
     /// [Document Versions](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#ver)
     #[oai(skip_serializing_if_is_none)]
-    pub(crate) ver: Option<VerSelectorDocumented>,
+    ver: Option<VerSelectorDocumented>,
     /// ## Document Reference
     ///
     /// A [reference](https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/meta/#ref-document-reference)
