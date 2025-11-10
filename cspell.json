@@ -185,7 +185,7 @@
         "**/*.svg",
         "catalyst_voices/docs/licenses/**",
         "catalyst_voices/docs/dependency_graph.dot",
-        "catalyst-gateway/tests/api_tests/test_data/**",
+        "catalyst_voices/scripts/version_web_assets/test/helper"
     ],
     "enableFiletypes": [
         "earthfile",
