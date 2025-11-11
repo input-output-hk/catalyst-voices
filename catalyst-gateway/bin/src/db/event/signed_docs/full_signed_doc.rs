@@ -1,8 +1,10 @@
 //! `FullSignedDoc` struct implementation.
 
+use anyhow::Context;
+
 use super::SignedDocBody;
 use crate::{
-    db::event::EventDB,
+    db::event::{EventDB, EventDBConnectionError},
     jinja::{get_template, JinjaTemplateSource},
 };
 
@@ -90,17 +92,16 @@ impl FullSignedDoc {
         match EventDB::modify(INSERT_SIGNED_DOCS, &self.postgres_db_fields()).await {
             // Able to insert, no conflict
             Ok(()) => Ok(true),
-            Err(_) => {
+            Err(e) if !e.is::<EventDBConnectionError>() => {
                 // Attempt to retrieve the document now that we failed to insert
-                match Self::retrieve(self.id(), Some(self.ver())).await {
-                    Ok(res_doc) => {
-                        anyhow::ensure!(&res_doc == self, StoreError);
-                        // Document already exists and matches, return false
-                        Ok(false)
-                    },
-                    Err(e) => Err(e),
-                }
+                let doc = Self::retrieve(self.id(), Some(self.ver()))
+                    .await
+                    .context("Cannot retrieve the document which has failed")?;
+                anyhow::ensure!(&doc == self, StoreError);
+                // Document already exists and matches, return false
+                Ok(false)
             },
+            Err(e) => Err(e),
         }
     }
 
