@@ -53,10 +53,10 @@ void main() {
       "WebAssetVersioner add same hash for symbols file as parent has",
       () async {
         final parentHash =
-            assetVersionData['asset_hashes']['canvaskit/skwasm_heavy.js']
+            assetVersionData['asset_hashes']['canvaskit/skwasm_heavy.js'] // cspell:disable-line
                 as String;
         final symbolHash =
-            assetVersionData['asset_hashes']['canvaskit/skwasm_heavy.js.symbols']
+            assetVersionData['asset_hashes']['canvaskit/skwasm_heavy.js.symbols'] // cspell:disable-line
                 as String;
 
         expect(parentHash, symbolHash);
