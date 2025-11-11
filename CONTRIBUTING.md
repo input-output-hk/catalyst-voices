@@ -3,22 +3,22 @@
 First off, thanks for taking the time to contribute! ❤️
 
 * [Contributing to Catalyst Voices](#contributing-to-catalyst-voices)
-  * [Code of Conduct](#code-of-conduct)
-  * [I Have a Question](#i-have-a-question)
-  * [I Want To Contribute](#i-want-to-contribute)
-    * [Reporting Bugs](#reporting-bugs)
-      * [Before Submitting a Bug Report](#before-submitting-a-bug-report)
-      * [How Do I Submit a Good Bug Report?](#how-do-i-submit-a-good-bug-report)
-    * [Suggesting Enhancements](#suggesting-enhancements)
-      * [Before Submitting an Enhancement](#before-submitting-an-enhancement)
-      * [How Do I Submit a Good Enhancement Suggestion?](#how-do-i-submit-a-good-enhancement-suggestion)
-    * [Your First Code Contribution](#your-first-code-contribution)
-    * [Improving The Documentation](#improving-the-documentation)
-  * [Style guides](#style-guides)
-    * [Rust](#rust)
-    * [Dart](#dart)
-    * [Flutter](#flutter)
-    * [Commit Messages](#commit-messages)
+    * [Code of Conduct](#code-of-conduct)
+    * [I Have a Question](#i-have-a-question)
+    * [I Want To Contribute](#i-want-to-contribute)
+        * [Reporting Bugs](#reporting-bugs)
+            * [Before Submitting a Bug Report](#before-submitting-a-bug-report)
+            * [How Do I Submit a Good Bug Report?](#how-do-i-submit-a-good-bug-report)
+        * [Suggesting Enhancements](#suggesting-enhancements)
+            * [Before Submitting an Enhancement](#before-submitting-an-enhancement)
+            * [How Do I Submit a Good Enhancement Suggestion?](#how-do-i-submit-a-good-enhancement-suggestion)
+        * [Your First Code Contribution](#your-first-code-contribution)
+        * [Improving The Documentation](#improving-the-documentation)
+    * [Style guides](#style-guides)
+        * [Rust](#rust)
+        * [Dart](#dart)
+        * [Flutter](#flutter)
+        * [Commit Messages](#commit-messages)
 
 All types of contributions are encouraged and valued.
 Please make sure to read the relevant section before making your contribution.
@@ -75,11 +75,11 @@ Please complete the following steps in advance to help us fix any potential bug 
 * Also make sure to search the internet (including Stack Overflow)
   to see if users outside the GitHub community have discussed the issue.
 * Collect information about the bug:
-  * Stack trace (Traceback)
-  * OS, Platform and Version (Windows, Linux, macOS, x86, ARM)
-  * Version of the interpreter, compiler, SDK, runtime environment, package manager, depending on what seems relevant.
-  * Possibly your input and the output
-  * Can you reliably reproduce the issue?
+    * Stack trace (Traceback)
+    * OS, Platform and Version (Windows, Linux, macOS, x86, ARM)
+    * Version of the interpreter, compiler, SDK, runtime environment, package manager, depending on what seems relevant.
+    * Possibly your input and the output
+    * Can you reliably reproduce the issue?
     And can you also reproduce it with older versions?
 
 #### How Do I Submit a Good Bug Report?

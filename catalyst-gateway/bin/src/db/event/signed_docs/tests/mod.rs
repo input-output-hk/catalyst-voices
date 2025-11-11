@@ -6,7 +6,7 @@ use futures::TryStreamExt;
 
 use super::*;
 use crate::db::event::{
-    common::{eq_or_ranged_uuid::EqOrRangedUuid, query_limits::QueryLimits},
+    common::{eq_or_ranged_uuid::UuidSelector, query_limits::QueryLimits},
     establish_connection_pool,
 };
 
@@ -122,7 +122,7 @@ async fn retrieve_full_signed_doc(doc: &FullSignedDoc) {
 }
 
 async fn filter_by_id(doc: &FullSignedDoc) {
-    let filter = DocsQueryFilter::all().with_id(EqOrRangedUuid::Eq(*doc.id()));
+    let filter = DocsQueryFilter::all().with_id(UuidSelector::Eq(*doc.id()));
     let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
         .await
         .unwrap();
@@ -130,7 +130,7 @@ async fn filter_by_id(doc: &FullSignedDoc) {
     assert_eq!(doc.body(), &res_doc);
     assert!(res_docs.try_next().await.unwrap().is_none());
 
-    let filter = DocsQueryFilter::all().with_id(EqOrRangedUuid::Range {
+    let filter = DocsQueryFilter::all().with_id(UuidSelector::Range {
         min: *doc.id(),
         max: *doc.id(),
     });
@@ -143,7 +143,7 @@ async fn filter_by_id(doc: &FullSignedDoc) {
 }
 
 async fn filter_by_ver(doc: &FullSignedDoc) {
-    let filter = DocsQueryFilter::all().with_ver(EqOrRangedUuid::Eq(*doc.ver()));
+    let filter = DocsQueryFilter::all().with_ver(UuidSelector::Eq(*doc.ver()));
     let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
         .await
         .unwrap();
@@ -151,7 +151,7 @@ async fn filter_by_ver(doc: &FullSignedDoc) {
     assert_eq!(doc.body(), &res_doc);
     assert!(res_docs.try_next().await.unwrap().is_none());
 
-    let filter = DocsQueryFilter::all().with_ver(EqOrRangedUuid::Range {
+    let filter = DocsQueryFilter::all().with_ver(UuidSelector::Range {
         min: *doc.ver(),
         max: *doc.ver(),
     });
@@ -165,8 +165,8 @@ async fn filter_by_ver(doc: &FullSignedDoc) {
 
 async fn filter_by_id_and_ver(doc: &FullSignedDoc) {
     let filter = DocsQueryFilter::all()
-        .with_id(EqOrRangedUuid::Eq(*doc.id()))
-        .with_ver(EqOrRangedUuid::Eq(*doc.ver()));
+        .with_id(UuidSelector::Eq(*doc.id()))
+        .with_ver(UuidSelector::Eq(*doc.ver()));
     let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
         .await
         .unwrap();
@@ -189,9 +189,9 @@ async fn filter_by_type(
     }
 }
 
-/// Pre-seeded Fund 14 documents `V3__signed_documents.sql` and
-/// `old_format_signed_doc.sql`
-const PRE_SEED_DATA: usize = 43;
+/// Pre-seeded documents `f14.sql`, `f15.sql`, `old_format_signed_doc.sql` and
+/// `test_signed_documents.sql`
+const PRE_SEED_DATA: usize = 57;
 
 async fn filter_all(docs: &[FullSignedDoc]) {
     let filter = DocsQueryFilter::all();

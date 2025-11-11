@@ -48,18 +48,6 @@
   "@accountEmailVerifyHelper": {
     "description": "Explanation message blow email field in account page"
   },
-  "accountFinishedNotificationMessage": "You are now able to vote, submit proposals and…",
-  "@accountFinishedNotificationMessage": {
-    "description": "Message explaining new account capabilities"
-  },
-  "accountFinishedNotificationTitle": "Account Finalized",
-  "@accountFinishedNotificationTitle": {
-    "description": "Title of notification shown when account setup is complete"
-  },
-  "accountFinishedNotificationTitleDesc": "Account blockchain verified",
-  "@accountFinishedNotificationTitleDesc": {
-    "description": "Description of account verification status"
-  },
   "accountInstructionsMessage": "On the next screen, you're going to see 12 words. \nThis is called your \"Catalyst seed phrase\".\n\nIt's like a super secure password that only you know, \nthat allows you to prove ownership of your keychain.\n\nUse your Catalyst seed phrase to login and recover your account on different devices, so be sure to put it somewhere safe!\n\nIt is a super secure password that only you know, so best is to write it down with pen and paper, so get this ready.",
   "@accountInstructionsMessage": {
     "description": "Message for the account creation instructions screen"
@@ -125,9 +113,9 @@
   "@agree": {
     "description": "Button text for confirming agreement"
   },
-  "agreementCantChangeCategory": "I understand that I can’t change my category selection in Fund14.",
+  "agreementCantChangeCategory": "I understand that after I choose a category, the proposal’s category is locked and switching categories requires creating a new proposal.",
   "@agreementCantChangeCategory": {
-    "description": "Text for the agreement checkbox that explains that user can't change category selection in Fund14"
+    "description": "Text for the agreement checkbox that explains that user can't change category selection"
   },
   "agreementFitToCategoryCriteria": "I understand the category brief and will make sure my proposal fits the criteria.",
   "@agreementFitToCategoryCriteria": {
@@ -197,13 +185,25 @@
   "@browse": {
     "description": "Button or link text for browsing files or content"
   },
-  "browseFund14Proposals": "Browse Fund14 proposals",
-  "@browseFund14Proposals": {
-    "description": "Text shown when Catalyst app is closed"
+  "browseFundProposals": "Browse Fund{fundNumber} proposals",
+  "@browseFundProposals": {
+    "description": "Text shown when Catalyst app is closed",
+    "placeholders": {
+      "fundNumber": {
+        "description": "Number of fund",
+        "type": "int"
+      }
+    }
   },
-  "browseProposalsOnProjectCatalyst": "Please browse other Catalyst Fund14 proposals on ProjectCatalyst.io",
+  "browseProposalsOnProjectCatalyst": "Please browse other Catalyst Fund{fundNumber} proposals on ProjectCatalyst.io",
   "@browseProposalsOnProjectCatalyst": {
-    "description": "Text shown when Catalyst app is closed"
+    "description": "Text shown when Catalyst app is closed",
+    "placeholders": {
+      "fundNumber": {
+        "description": "Number of fund",
+        "type": "int"
+      }
+    }
   },
   "campaign": "Campaign",
   "@campaign": {
@@ -396,11 +396,11 @@
   "@catalystKnowledgeBase": {
     "description": "Menu item text for accessing knowledge base"
   },
-  "catalystPrivacyPolicy": "Catalyst FC's Privacy Policy",
+  "catalystPrivacyPolicy": "Project Catalyst Platform Privacy Policy",
   "@catalystPrivacyPolicy": {
-    "description": "Link to the Catalyst FC's Privacy Policy"
+    "description": "Link to the Catalyst Privacy Policy"
   },
-  "catalystTos": "Project Catalyst Terms and Conditions",
+  "catalystTos": "Project Catalyst Platform Terms of Use",
   "@catalystTos": {
     "description": "Link to the Catalyst FC's Terms and Conditions"
   },
@@ -423,10 +423,6 @@
   "categoryProposals": "Category Proposals",
   "@categoryProposals": {
     "description": "Title for proposals filtered by a campaign category."
-  },
-  "categoryRequirements": "Category Requirements:",
-  "@categoryRequirements": {
-    "description": "Header for category requirements section"
   },
   "categorySelectionDescription": "Choose Wisely! Review the category and its rules carefully as this can’t be changed after you make a selection. To switch, you’ll need to start a new proposal.",
   "@categorySelectionDescription": {
@@ -694,25 +690,16 @@
   "@createProfileCreatedTitle": {
     "description": "Title for the profile created"
   },
-  "createProfileDrepApprovalContingency": "I understand that for my proposal to move to Community Review and/or Voting and be eligible for funding, the Project Catalyst budget proposal must first be approved by the Cardano DReps, as detailed in the {fund14ProposalSubmissionNotice}. If the budget is not approved, my proposal will not move forward and no funding will be provided.",
-  "@createProfileDrepApprovalContingency": {
-    "description": "Text acknowledging that the user is aware of the Drep Approval Contingency",
-    "placeholders": {
-      "fund14ProposalSubmissionNotice": {
-        "type": "String"
-      }
-    }
-  },
   "createProfileInstructionsEmailRequest": "Email request",
   "@createProfileInstructionsEmailRequest": {
     "description": "Request to provide email address"
   },
-  "createProfileInstructionsMessage": "In the following account creation steps we will:\n\n1. Setup your profile\n2. Create your Catalyst Keychain\n3. Link Cardano wallet & roles\n\nTo ensure a smooth experience, completing your account setup in one session is essential—stay focused and avoid interruptions to finalize everything efficiently. Make sure your Cardano wallet has at least {amount} ADA before continuing.",
+  "createProfileInstructionsMessage": "In the following account creation steps we will:\n\n1. Setup your profile\n2. Create your Catalyst Keychain\n3. Link Cardano wallet & roles\n\nTo ensure a smooth experience, completing your account setup in one session is essential—stay focused and avoid interruptions to finalize everything efficiently. Make sure your Cardano wallet has at least {money} before continuing.",
   "@createProfileInstructionsMessage": {
     "description": "Information about account creation steps",
     "placeholders": {
-      "amount": {
-        "type": "double"
+      "money": {
+        "type": "String"
       }
     }
   },
@@ -942,6 +929,10 @@
   "@displayName": {
     "description": "Label for display name input field"
   },
+  "doWord": "Do:",
+  "@doWord": {
+    "description": "Label for a list of things to do"
+  },
   "documentImportInvalidDataError": "The imported document does not have valid format or is corrupted.",
   "@documentImportInvalidDataError": {
     "description": "Error message when user tries to import a document that is not valid and cannot be parsed"
@@ -949,6 +940,10 @@
   "dontShowAgain": "Don't show again",
   "@dontShowAgain": {
     "description": "Action to not show again"
+  },
+  "dontWord": "Don't:",
+  "@dontWord": {
+    "description": "Label for a list of things not to do"
   },
   "draft": "Draft",
   "@draft": {
@@ -1030,13 +1025,17 @@
   "@emailAddress": {
     "description": "Label for email address input field"
   },
-  "emailNotVerifiedBannerContributor": "**Email Not Verified:** Check your inbox to verify your email and unlock all features.",
-  "@emailNotVerifiedBannerContributor": {
-    "description": "Message used in banner to inform user that email is not verified when user is a contributor"
+  "emailNotVerifiedBannerContributorMessage": "Check your inbox to verify your email and unlock all features.",
+  "@emailNotVerifiedBannerContributorMessage": {
+    "description": "Message of banner shown when user account is not verified"
   },
-  "emailNotVerifiedBannerProposer": "**Email Not Verified**: You can’t publish a proposal until your email is verified.",
-  "@emailNotVerifiedBannerProposer": {
-    "description": "Message used in banner to inform user that email is not verified when user is a proposer"
+  "emailNotVerifiedBannerProposerMessage": "You can’t publish a proposal until your email is verified. Go to {destination} to verify it.",
+  "@emailNotVerifiedBannerProposerMessage": {
+    "description": "Message of banner shown when user account is not verified"
+  },
+  "emailNotVerifiedBannerTitle": "Email Not Verified",
+  "@emailNotVerifiedBannerTitle": {
+    "description": "Title of banner shown when user account is not verified"
   },
   "emailNotVerifiedDialogAction": "Go to My Account",
   "@emailNotVerifiedDialogAction": {
@@ -1207,7 +1206,7 @@
     "description": "Validation error when the user entered numerical value is bigger than max",
     "placeholders": {
       "max": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
@@ -1216,7 +1215,7 @@
     "description": "Validation error when the user entered numerical value is smaller than min",
     "placeholders": {
       "min": {
-        "type": "int"
+        "type": "String"
       }
     }
   },
@@ -1225,10 +1224,19 @@
     "description": "Validation error when the numerical value is out of allowed range between min and max (both inclusive)",
     "placeholders": {
       "min": {
-        "type": "int"
+        "type": "String"
       },
       "max": {
-        "type": "int"
+        "type": "String"
+      }
+    }
+  },
+  "errorValidationNumNotMultipleOf": "The value should be a multiple of {multipleOf}",
+  "@errorValidationNumNotMultipleOf": {
+    "description": "Validation error when the numerical value is not a multiple of of another value.",
+    "placeholders": {
+      "multipleOf": {
+        "type": "String"
       }
     }
   },
@@ -1279,7 +1287,7 @@
       }
     }
   },
-  "errorValidationTokenNotParsed": "Invalid input. Could not parse parse.",
+  "errorValidationTokenNotParsed": "Invalid input. Could not parse.",
   "@errorValidationTokenNotParsed": {
     "description": "A validation error when user enters input which cannot be parsed into token value."
   },
@@ -1334,10 +1342,6 @@
   "exportProposalsIndividually": "Export proposals individually",
   "@exportProposalsIndividually": {
     "description": "Title for section informing user that they can export their proposals individually"
-  },
-  "f14Voting": "F14 Voting: Make sure you're ready.",
-  "@f14Voting": {
-    "description": "Title for registration for F14 voting"
   },
   "failedAuthenticationDescription": "You did not authorise the Catalyst App in your wallet, follow specific wallet instructions.",
   "@failedAuthenticationDescription": {
@@ -1419,15 +1423,31 @@
   "@from": {
     "description": "Label for start point or date"
   },
-  "fund14ProposalSubmissionNotice": "Fund14 Proposal Submission Notice",
-  "@fund14ProposalSubmissionNotice": {
-    "description": "Link to the Fund14 Proposal Submission Notice"
-  },
   "fundNoCategory": "Fund{number} Category",
   "@fundNoCategory": {
     "description": "Describes that category comes from fund number",
     "placeholders": {
       "number": {
+        "type": "int"
+      }
+    }
+  },
+  "fundProposalSubmissionNotice": "Fund{fundNumber} Proposal Submission Notice",
+  "@fundProposalSubmissionNotice": {
+    "description": "Link to the Fund Proposal Submission Notice",
+    "placeholders": {
+      "fundNumber": {
+        "description": "Number of fund",
+        "type": "int"
+      }
+    }
+  },
+  "fundVoting": "F{fundNumber} Voting: Make sure you're ready.",
+  "@fundVoting": {
+    "description": "Title for registration for F{fundNumber} voting",
+    "placeholders": {
+      "fundNumber": {
+        "description": "Number of fund",
         "type": "int"
       }
     }
@@ -1455,7 +1475,7 @@
   },
   "fundsRequested": "Funds requested",
   "@fundsRequested": {
-    "description": "Indicates the amount of ADA requested in a fund on a proposal card."
+    "description": "Indicates the amount of money requested in a fund on a proposal card."
   },
   "getReadyToVote": "Get ready to vote",
   "@getReadyToVote": {
@@ -1472,16 +1492,6 @@
   "goMyProposals": "Go My proposals",
   "@goMyProposals": {
     "description": "Action to go to my proposals"
-  },
-  "goToMyAccountForEmailVerification": "Go to {destination} to verify it.",
-  "@goToMyAccountForEmailVerification": {
-    "description": "Message used in banner for CTA to inform user to go to My Account to verify email",
-    "placeholders": {
-      "destination": {
-        "type": "String",
-        "description": "Text for the destination link"
-      }
-    }
   },
   "goodPasswordStrength": "Good password strength",
   "@goodPasswordStrength": {
@@ -1979,6 +1989,14 @@
   "normalPasswordStrength": "Normal password strength",
   "@normalPasswordStrength": {
     "description": "Describes a password that has medium strength."
+  },
+  "notActiveCampaign": "Not active campaign",
+  "@notActiveCampaign": {
+    "description": "Label for proposals from not active campaign"
+  },
+  "notActiveCampaignInfoMarkdown": "**Read only**",
+  "@notActiveCampaignInfoMarkdown": {
+    "description": "Info message shown in tooltip info in workspace page"
   },
   "notAvailableAbbr": "N/A",
   "@notAvailableAbbr": {
@@ -2573,6 +2591,10 @@
   "@readCategoryBriefButtonLabel": {
     "description": "Label for the read category brief button"
   },
+  "readMore": "Read More",
+  "@readMore": {
+    "description": "Text for the read more link"
+  },
   "recoverCatalystKeychain": "Restore Catalyst keychain",
   "@recoverCatalystKeychain": {
     "description": "Title for keychain recovery process"
@@ -2673,9 +2695,15 @@
   "@refresh": {
     "description": "Refresh button label"
   },
-  "registerToVoteFund14": "Register to Vote in Fund14",
-  "@registerToVoteFund14": {
-    "description": "Title of the register to vote section"
+  "registerToVoteFund": "Register to Vote in Fund{fundNumber}",
+  "@registerToVoteFund": {
+    "description": "Title of the register to vote section",
+    "placeholders": {
+      "fundNumber": {
+        "description": "Number of fund",
+        "type": "int"
+      }
+    }
   },
   "registeredRoles": "Registered Roles",
   "@registeredRoles": {
@@ -2827,13 +2855,15 @@
   "@registrationTransactionFailed": {
     "description": "Indicates an error when submitting a registration transaction failed."
   },
-  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 ADA), be sure your wallet has a minimum of {amount} ADA.",
+  "registrationTransactionFeeDescription": "The creation of a Catalyst account costs, a transaction fee of (0,21 {currency}), be sure your wallet has a minimum of {money}.",
   "@registrationTransactionFeeDescription": {
     "description": "Description for the registration transaction fee",
     "placeholders": {
-      "amount": {
-        "type": "double",
-        "format": "compact"
+      "money": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
       }
     }
   },
@@ -3296,6 +3326,14 @@
   "@successToCastVotesTitle": {
     "description": "Title for success to cast votes"
   },
+  "systemStatusIssueBannerMessage": "We're aware of an issue and are working on a fix. Thanks for your patience! {readMoreLink}",
+  "@systemStatusIssueBannerMessage": {
+    "description": "Message of banner shown when there is a system status issue"
+  },
+  "systemStatusIssueBannerTitle": "Heads Up",
+  "@systemStatusIssueBannerTitle": {
+    "description": "Title of banner shown when there is a system status issue"
+  },
   "theme": "Theme",
   "@theme": {
     "description": "Label for theme/appearance settings"
@@ -3621,10 +3659,13 @@
       }
     }
   },
-  "votingForF14StartsIn": "Voting for Fund14 start {date}",
-  "@votingForF14StartsIn": {
-    "description": "Description for the voting for f14 card in stay involved section",
+  "votingForFundStartsIn": "Voting for Fund{fundNumber} start {date}",
+  "@votingForFundStartsIn": {
+    "description": "Description for the voting for fund card in stay involved section",
     "placeholders": {
+      "fundNumber": {
+        "type": "int"
+      },
       "date": {
         "type": "String"
       }
@@ -3846,13 +3887,12 @@
       }
     }
   },
-  "walletLinkWalletDetailsLowBalanceHeadsUpText": "Please ensure your Cardano wallet has at least {amount} ADA before continuing.",
+  "walletLinkWalletDetailsLowBalanceHeadsUpText": "Please ensure your Cardano wallet has at least {money} before continuing.",
   "@walletLinkWalletDetailsLowBalanceHeadsUpText": {
     "description": "A heads up content explaining that the user needs to have some ada for registration.",
     "placeholders": {
-      "amount": {
-        "type": "double",
-        "format": "compact"
+      "money": {
+        "type": "String"
       }
     }
   },

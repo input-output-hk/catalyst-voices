@@ -137,7 +137,9 @@ class _VoicesNumFieldState<T extends num> extends State<VoicesNumField<T>> {
     final num = _effectiveController.value;
     final text = _toText(num) ?? _textEditingController.text;
 
-    if (_textEditingController.text != text) {
+    // encode to num again to prevent reseting text when num values are identical but the texts different
+    // i.e. we consider these two to be equal and they should not trigger an update: "1.0" == "1."
+    if (_toNum(_textEditingController.text) != _toNum(text)) {
       _textEditingController.textWithSelection = text;
     }
   }

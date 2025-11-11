@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
+import 'package:catalyst_voices/pages/account/widgets/account_keychain_tile.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/proposal_submission_phase_aware.dart';
 import 'package:catalyst_voices/pages/discovery/sections/campaign_hero.dart';
 import 'package:catalyst_voices/pages/discovery/sections/how_it_works.dart';
@@ -9,7 +10,6 @@ import 'package:catalyst_voices/pages/discovery/sections/stay_involved.dart';
 import 'package:catalyst_voices/pages/discovery/state_selectors/campaign_categories_state_selector.dart';
 import 'package:catalyst_voices/pages/discovery/state_selectors/current_campaign_selector.dart';
 import 'package:catalyst_voices/pages/discovery/state_selectors/most_recent_proposals_selector.dart';
-import 'package:catalyst_voices/widgets/banner/widgets/email_need_verification_banner.dart';
 import 'package:catalyst_voices/widgets/common/infrastructure/voices_wide_screen_constrained.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +18,10 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 class DiscoveryPage extends StatefulWidget {
   final bool keychainDeleted;
 
-  const DiscoveryPage({super.key, this.keychainDeleted = false});
+  const DiscoveryPage({
+    super.key,
+    this.keychainDeleted = false,
+  });
 
   @override
   State<DiscoveryPage> createState() => _DiscoveryPageState();
@@ -59,14 +62,9 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   Widget build(BuildContext context) {
     return const ProposalSubmissionPhaseAware(
       activeChild: SelectionArea(
-        child: Stack(
-          children: [
-            CustomScrollView(
-              slivers: [
-                _Body(),
-              ],
-            ),
-            EmailNeedVerificationBanner(),
+        child: CustomScrollView(
+          slivers: [
+            _Body(),
           ],
         ),
       ),
@@ -77,7 +75,8 @@ class _DiscoveryPageState extends State<DiscoveryPage>
   void didUpdateWidget(DiscoveryPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.keychainDeleted && widget.keychainDeleted != oldWidget.keychainDeleted) {
+    if (showKeychainDeletedDialog) {
+      showKeychainDeletedDialog = false;
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await _showKeychainDeletedDialog(context);
       });
@@ -90,7 +89,8 @@ class _DiscoveryPageState extends State<DiscoveryPage>
 
     unawaited(_loadData());
 
-    if (widget.keychainDeleted) {
+    if (showKeychainDeletedDialog) {
+      showKeychainDeletedDialog = false;
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await _showKeychainDeletedDialog(context);
       });

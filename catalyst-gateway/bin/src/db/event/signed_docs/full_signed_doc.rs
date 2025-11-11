@@ -1,10 +1,10 @@
 //! `FullSignedDoc` struct implementation.
 
-use futures::{Stream, StreamExt};
+use anyhow::Context;
 
 use super::SignedDocBody;
 use crate::{
-    db::event::{common::query_limits::QueryLimits, signed_docs::DocsQueryFilter, EventDB},
+    db::event::{EventDB, EventDBConnectionError},
     jinja::{get_template, JinjaTemplateSource},
 };
 
@@ -16,13 +16,6 @@ pub(crate) const SELECT_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource = JinjaTemplat
     name: "select_signed_documents.jinja.template",
     source: include_str!("./sql/select_signed_documents.sql.jinja"),
 };
-
-/// Filtered select sql query jinja template
-pub(crate) const FILTERED_SELECT_FULL_SIGNED_DOCS_TEMPLATE: JinjaTemplateSource =
-    JinjaTemplateSource {
-        name: "filtered_select_full_signed_documents.sql.jinja.template",
-        source: include_str!("./sql/filtered_select_full_signed_documents.sql.jinja"),
-    };
 
 /// `FullSignedDoc::store` method error.
 #[derive(thiserror::Error, Debug)]
@@ -61,6 +54,7 @@ impl FullSignedDoc {
     }
 
     /// Returns the document metadata.
+    #[allow(dead_code)]
     pub(crate) fn metadata(&self) -> Option<&serde_json::Value> {
         self.body.metadata()
     }
@@ -98,17 +92,16 @@ impl FullSignedDoc {
         match EventDB::modify(INSERT_SIGNED_DOCS, &self.postgres_db_fields()).await {
             // Able to insert, no conflict
             Ok(()) => Ok(true),
-            Err(_) => {
+            Err(e) if !e.is::<EventDBConnectionError>() => {
                 // Attempt to retrieve the document now that we failed to insert
-                match Self::retrieve(self.id(), Some(self.ver())).await {
-                    Ok(res_doc) => {
-                        anyhow::ensure!(&res_doc == self, StoreError);
-                        // Document already exists and matches, return false
-                        Ok(false)
-                    },
-                    Err(e) => Err(e),
-                }
+                let doc = Self::retrieve(self.id(), Some(self.ver()))
+                    .await
+                    .context("Cannot retrieve the document which has failed")?;
+                anyhow::ensure!(&doc == self, StoreError);
+                // Document already exists and matches, return false
+                Ok(false)
             },
+            Err(e) => Err(e),
         }
     }
 
@@ -137,29 +130,6 @@ impl FullSignedDoc {
         let row = EventDB::query_one(&query, &[]).await?;
 
         Self::from_row(id, ver, &row)
-    }
-
-    /// Loads a async stream of `FullSignedDoc` from the event db based on the given
-    /// `conditions`.
-    pub(crate) async fn retrieve_conditions(
-        conditions: &DocsQueryFilter,
-        query_limits: &QueryLimits,
-    ) -> anyhow::Result<impl Stream<Item = anyhow::Result<Self>>> {
-        let query_template = get_template(&FILTERED_SELECT_FULL_SIGNED_DOCS_TEMPLATE)?;
-        let query = query_template.render(serde_json::json!({
-            "conditions": conditions.to_string(),
-            "query_limits": query_limits.to_string(),
-        }))?;
-        let rows = EventDB::query_stream(&query, &[]).await?;
-        let docs = rows.map(|res_row| {
-            res_row.and_then(|row| {
-                let id = row.try_get("id")?;
-                let ver = row.try_get("ver")?;
-
-                FullSignedDoc::from_row(&id, Some(&ver), &row)
-            })
-        });
-        Ok(docs)
     }
 
     /// Returns all signed document fields for the event db queries

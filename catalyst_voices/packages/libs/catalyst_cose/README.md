@@ -1,13 +1,13 @@
 # Content
 
 * [Content](#content)
-  * [Features](#features)
-  * [Requirements](#requirements)
-  * [Install](#install)
-  * [Example](#example)
-  * [Limitations](#limitations)
-  * [Support](#support)
-  * [License](#license)
+    * [Features](#features)
+    * [Requirements](#requirements)
+    * [Install](#install)
+    * [Example](#example)
+    * [Limitations](#limitations)
+    * [Support](#support)
+    * [License](#license)
 
 ## Features
 

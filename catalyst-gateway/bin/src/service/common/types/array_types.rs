@@ -26,6 +26,12 @@ macro_rules! impl_array_types {
             }
         }
 
+        impl From<$ty> for Vec<$item_ty> {
+            fn from(value: $ty) -> Vec<$item_ty> {
+                value.0
+            }
+        }
+
         impl std::ops::Deref for $ty {
             type Target = Vec<$item_ty>;
 

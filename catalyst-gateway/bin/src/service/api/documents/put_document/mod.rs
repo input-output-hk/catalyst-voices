@@ -76,7 +76,7 @@ pub(crate) async fn endpoint(
 
     // validate document signatures
     let verifying_key_provider =
-        match VerifyingKeyProvider::try_from_kids(&mut token, &doc.kids()).await {
+        match VerifyingKeyProvider::try_from_kids(&mut token, &doc.authors()).await {
             Ok(value) => value,
             Err(err) if err.is::<CassandraSessionError>() => {
                 return AllResponses::service_unavailable(&err, RetryAfterOption::Default)
@@ -174,7 +174,7 @@ async fn validate_against_original_doc(doc: &CatalystSignedDocument) -> anyhow::
     let original_doc = match FullSignedDoc::retrieve(&doc.doc_id()?.uuid(), None).await {
         Ok(doc) => doc,
         Err(e) if e.is::<error::NotFoundError>() => return Ok(true),
-        Err(e) => anyhow::bail!("Database error: {e}"),
+        Err(e) => return Err(e),
     };
 
     let original_authors = original_doc
@@ -194,7 +194,11 @@ async fn store_document_in_db(
     doc: &catalyst_signed_doc::CatalystSignedDocument,
     doc_bytes: Vec<u8>,
 ) -> anyhow::Result<bool> {
-    let authors = doc.authors().iter().map(ToString::to_string).collect();
+    let authors = doc
+        .authors()
+        .iter()
+        .map(|v| v.as_short_id().to_string())
+        .collect();
 
     let doc_meta_json = doc.doc_meta().to_json()?;
 

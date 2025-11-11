@@ -11,7 +11,7 @@ class NewProposalState extends Equatable {
   final bool isAgreeToNoFurtherCategoryChange;
   final ProposalCreationStep step;
   final ProposalTitle title;
-  final NumRange<int>? titleLengthRange;
+  final Range<int?>? titleLengthRange;
   final SignedDocumentRef? categoryRef;
   final List<CampaignCategoryDetailsViewModel> categories;
 
@@ -61,7 +61,7 @@ class NewProposalState extends Equatable {
     bool? isAgreeToNoFurtherCategoryChange,
     ProposalCreationStep? step,
     ProposalTitle? title,
-    Optional<NumRange<int>>? titleLengthRange,
+    Optional<Range<int?>>? titleLengthRange,
     Optional<SignedDocumentRef>? categoryRef,
     List<CampaignCategoryDetailsViewModel>? categories,
   }) {

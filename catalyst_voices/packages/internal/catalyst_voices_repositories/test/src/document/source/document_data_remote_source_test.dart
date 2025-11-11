@@ -12,6 +12,7 @@ import '../../utils/test_factories.dart';
 void main() {
   final CatGateway gateway = _MockedCatGateway();
   final CatReviews reviews = _MockedCatReviews();
+  final CatStatus status = _MockedCatStatus();
   final SignedDocumentManager signedDocumentManager = _MockedSignedDocumentManager();
 
   late final ApiServices apiServices;
@@ -23,6 +24,7 @@ void main() {
     apiServices = ApiServices.internal(
       gateway: gateway,
       reviews: reviews,
+      status: status,
     );
 
     source = CatGatewayDocumentDataSource(apiServices, signedDocumentManager);
@@ -31,6 +33,7 @@ void main() {
   tearDown(() {
     reset(gateway);
     reset(reviews);
+    reset(status);
     reset(signedDocumentManager);
   });
 
@@ -59,27 +62,27 @@ void main() {
 
         // When
         when(
-          () => gateway.apiGatewayV1DocumentIndexPost(
-            body: const DocumentIndexQueryFilter(),
+          () => gateway.apiV1DocumentIndexPost(
+            body: any(named: 'body'),
             limit: maxPageSize,
             page: 0,
           ),
         ).thenAnswer((_) => Future.value(pageZeroResponse));
         when(
-          () => gateway.apiGatewayV1DocumentIndexPost(
-            body: const DocumentIndexQueryFilter(),
+          () => gateway.apiV1DocumentIndexPost(
+            body: any(named: 'body'),
             limit: maxPageSize,
             page: 1,
           ),
         ).thenAnswer((_) => Future.value(pageOneResponse));
 
-        final refs = await source.index();
+        final refs = await source.index(campaign: Campaign.f14());
 
         // Then
         expect(refs, isNotEmpty);
 
         verify(
-          () => gateway.apiGatewayV1DocumentIndexPost(
+          () => gateway.apiV1DocumentIndexPost(
             body: any(named: 'body'),
             limit: any(named: 'limit'),
             page: any(named: 'page'),
@@ -123,14 +126,14 @@ void main() {
 
         // When
         when(
-          () => gateway.apiGatewayV1DocumentIndexPost(
-            body: const DocumentIndexQueryFilter(),
+          () => gateway.apiV1DocumentIndexPost(
+            body: any(named: 'body'),
             limit: maxPageSize,
             page: 0,
           ),
         ).thenAnswer((_) => Future.value(response));
 
-        final refs = await source.index();
+        final refs = await source.index(campaign: Campaign.f14());
 
         // Then
         expect(
@@ -166,5 +169,7 @@ DocumentIndexListDto _buildDocumentIndexList({
 class _MockedCatGateway extends Mock implements CatGateway {}
 
 class _MockedCatReviews extends Mock implements CatReviews {}
+
+class _MockedCatStatus extends Mock implements CatStatus {}
 
 class _MockedSignedDocumentManager extends Mock implements SignedDocumentManager {}

@@ -1,6 +1,6 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/widgets/cards/funds_detail_card.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,14 +18,14 @@ void main() {
     group(FundsDetailCardType.category, () {
       testWidgets('Displays corrects translation', (tester) async {
         await tester.pumpApp(
-          const Scaffold(
+          Scaffold(
             body: Center(
               child: FundsDetailCard(
-                allFunds: Coin.fromWholeAda(100),
-                totalAsk: Coin.fromWholeAda(100),
-                askRange: ComparableRange(
-                  min: Coin.fromWholeAda(100),
-                  max: Coin.fromWholeAda(100),
+                allFunds: MultiCurrencyAmount.single(_adaMajorUnits(100)),
+                totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(100)),
+                askRange: Range(
+                  min: _adaMajorUnits(100),
+                  max: _adaMajorUnits(100),
                 ),
                 type: FundsDetailCardType.category,
               ),
@@ -41,14 +41,14 @@ void main() {
 
       testWidgets('Displays corrects values', (tester) async {
         await tester.pumpApp(
-          const Scaffold(
+          Scaffold(
             body: Center(
               child: FundsDetailCard(
-                allFunds: Coin.fromWholeAda(1),
-                totalAsk: Coin.fromWholeAda(2),
-                askRange: ComparableRange(
-                  min: Coin.fromWholeAda(3),
-                  max: Coin.fromWholeAda(4),
+                allFunds: MultiCurrencyAmount.single(_adaMajorUnits(1)),
+                totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(2)),
+                askRange: Range(
+                  min: _adaMajorUnits(3),
+                  max: _adaMajorUnits(4),
                 ),
                 type: FundsDetailCardType.category,
               ),
@@ -57,25 +57,21 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        expect(find.textContaining('1'), findsOne);
-        expect(find.textContaining('2'), findsOne);
-        expect(find.textContaining('3'), findsOne);
-        expect(find.textContaining('4'), findsOne);
+        expect(find.textContaining(r'$ADA 1'), findsOne);
+        expect(find.textContaining(r'$ADA 2'), findsOne);
+        expect(find.textContaining(r'$ADA 3'), findsOne);
+        expect(find.textContaining(r'$ADA 4'), findsOne);
       });
     });
 
     group(FundsDetailCardType.fund, () {
       testWidgets('Displays corrects translation', (tester) async {
         await tester.pumpApp(
-          const Scaffold(
+          Scaffold(
             body: Center(
               child: FundsDetailCard(
-                allFunds: Coin.fromWholeAda(100),
-                totalAsk: Coin.fromWholeAda(100),
-                askRange: ComparableRange(
-                  min: Coin.fromWholeAda(100),
-                  max: Coin.fromWholeAda(100),
-                ),
+                allFunds: MultiCurrencyAmount.single(_adaMajorUnits(100)),
+                totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(100)),
               ),
             ),
           ),
@@ -89,26 +85,61 @@ void main() {
 
       testWidgets('Displays corrects values', (tester) async {
         await tester.pumpApp(
-          const Scaffold(
+          Scaffold(
             body: Center(
               child: FundsDetailCard(
-                allFunds: Coin.fromWholeAda(1),
-                totalAsk: Coin.fromWholeAda(2),
-                askRange: ComparableRange(
-                  min: Coin.fromWholeAda(3),
-                  max: Coin.fromWholeAda(4),
-                ),
+                allFunds: MultiCurrencyAmount.single(_adaMajorUnits(1)),
+                totalAsk: MultiCurrencyAmount.single(_adaMajorUnits(2)),
               ),
             ),
           ),
         );
         await tester.pumpAndSettle();
 
-        expect(find.textContaining('1'), findsOne);
-        expect(find.textContaining('2'), findsOne);
+        expect(find.textContaining(r'$ADA 1'), findsOne);
+        expect(find.textContaining(r'$ADA 2'), findsOne);
+      });
+
+      testWidgets('Displays correct multiple values', (tester) async {
+        await tester.pumpApp(
+          Scaffold(
+            body: Center(
+              child: FundsDetailCard(
+                allFunds: MultiCurrencyAmount.list([
+                  _adaMajorUnits(1),
+                  _usdmMajorUnits(2),
+                ]),
+                totalAsk: MultiCurrencyAmount.list([
+                  _adaMajorUnits(3),
+                  _usdmMajorUnits(4),
+                ]),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.textContaining(r'$ADA 1'), findsOne);
+        expect(find.textContaining(r'$USDM 2'), findsOne);
+        expect(find.textContaining(r'$ADA 3'), findsOne);
+        expect(find.textContaining(r'$USDM 4'), findsOne);
       });
     });
   });
+}
+
+Money _adaMajorUnits(int majorUnits) {
+  return Money.fromMajorUnits(
+    currency: Currencies.ada,
+    majorUnits: BigInt.from(majorUnits),
+  );
+}
+
+Money _usdmMajorUnits(int majorUnits) {
+  return Money.fromMajorUnits(
+    currency: Currencies.usdm,
+    majorUnits: BigInt.from(majorUnits),
+  );
 }
 
 class _FakeVoicesLocalizations extends Fake implements VoicesLocalizations {

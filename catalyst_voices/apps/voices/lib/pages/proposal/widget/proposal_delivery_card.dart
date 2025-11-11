@@ -1,11 +1,11 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class ProposalDeliveryCard extends StatelessWidget {
-  final Coin? fundsRequested;
+  final Money? fundsRequested;
   final int? projectDuration;
   final int? milestoneCount;
 
@@ -39,7 +39,7 @@ class ProposalDeliveryCard extends StatelessWidget {
             _ValueCell(
               title: context.l10n.proposalViewFundingRequested,
               value: '',
-              valueSuffix: CryptocurrencyFormatter.decimalFormat(
+              valueSuffix: MoneyFormatter.formatDecimal(
                 fundsRequested,
               ),
             ),
