@@ -21,7 +21,7 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
         resp.status_code == 200
     ), f"Failed to get document: {resp.status_code} - {resp.text}"
 
-    resp = document_v2.post(filter={"id": [{"eq": proposal_doc_id}]})
+    resp = document_v2.post(filter={"id": {"eq": proposal_doc_id}})
     assert (
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
@@ -98,7 +98,7 @@ def test_document_index_endpoint(
 
     limit = 1
     page = 0
-    filter = {"id": [{"eq": doc.metadata["id"]}]}
+    filter = {"id": {"eq": doc.metadata["id"]}}
     resp = document_v2.post(
         limit=limit,
         page=page,
