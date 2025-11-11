@@ -18,7 +18,6 @@ permissions:
 
 jobs:
   paths-filter:
-    if: ${{ github.event.pull_request }}
     runs-on: ubuntu-latest
     outputs:
       catalyst-gateway: ${{ steps.filter.outputs.catalyst-gateway }}
