@@ -6,7 +6,7 @@ IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v.0.0.4
 IMPORT github.com/input-output-hk/catalyst-storage AS cat-storage
 
 builder:
-    FROM python-ci+python-base
+    FROM python-ci+python-base-deprecated
 
     # prepare tests
     COPY --dir ./api .
