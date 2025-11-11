@@ -25,6 +25,7 @@ jobs:
       docs: ${{ steps.filter.outputs.docs }}
       not-only-docs: ${{ steps.filter.outputs.not-only-docs }}
     steps:
+      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -66,7 +67,7 @@ jobs:
       forge_version: 0.21.0
 
   ci:
-    if: ${{ !github.event.pull_request.draft && needs.paths-filter.outputs.not-only-docs == 'true' }}
+    if: ${{ (!github.event.pull_request.draft && needs.paths-filter.outputs.not-only-docs == 'true') || startsWith(github.ref, 'refs/tags/') }}
     needs: [reject, paths-filter]
     uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.10.0
     with:
