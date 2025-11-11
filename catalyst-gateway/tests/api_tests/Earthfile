@@ -18,7 +18,7 @@ builder:
     # mk_signed_doc cli tool for building deprecated version of documents
     COPY dep-cat-libs-rust+build/mk_signed_doc ./dep_mk_signed_doc
     COPY cat-storage+cardano-asset-preprod/cardano-asset-preprod.json .
-    DO python-ci+BUILDER
+    DO python-ci+BUILDER_WITH_POETRY
 
 # Creates a package of the python integration test runner
 package:
