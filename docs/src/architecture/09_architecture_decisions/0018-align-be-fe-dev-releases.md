@@ -3,7 +3,7 @@
     adr:
         author: Oleksandr Prokhorenko
         created: 21-Oct-2025
-        status:  proposed
+        status:  draft
 ---
 
 ## Context
