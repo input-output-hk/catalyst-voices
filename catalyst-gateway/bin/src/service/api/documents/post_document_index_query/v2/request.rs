@@ -213,15 +213,15 @@ impl TryFrom<DocumentIndexQueryFilterV2> for DocsQueryFilter {
                     .collect::<Result<Vec<_>, _>>()?,
             );
         }
-        if let Some(id) = value.id {
-            if let Some(id) = id.try_into()? {
-                db_filter = db_filter.with_id(id);
-            }
+        if let Some(id) = value.id
+            && let Some(id) = id.try_into()?
+        {
+            db_filter = db_filter.with_id(id);
         }
-        if let Some(version) = value.ver {
-            if let Some(version) = version.try_into()? {
-                db_filter = db_filter.with_ver(version);
-            }
+        if let Some(version) = value.ver
+            && let Some(version) = version.try_into()?
+        {
+            db_filter = db_filter.with_ver(version);
         }
         if let Some(doc_refs) = value.doc_ref {
             let doc_refs = doc_refs

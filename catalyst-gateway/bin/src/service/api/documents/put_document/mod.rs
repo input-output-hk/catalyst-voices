@@ -82,9 +82,9 @@ pub(crate) async fn endpoint(
                 return AllResponses::service_unavailable(&err, RetryAfterOption::Default);
             },
             Err(err) => {
-                return Responses::UnprocessableContent(Json(PutDocumentUnprocessableContent::new(
-                    &err, None,
-                )))
+                return Responses::UnprocessableContent(Json(
+                    PutDocumentUnprocessableContent::new(&err, None),
+                ))
                 .into();
             },
         };

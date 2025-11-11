@@ -8,10 +8,10 @@ use crate::settings::ENV_VARS;
 /// assigned Admin Catalyst ID.
 pub(crate) fn get_admin_key(cat_id: &catalyst_signed_doc::CatalystId) -> Option<VerifyingKey> {
     let admin_key = ENV_VARS.signed_doc.admin_key();
-    if let Some(admin_key) = admin_key {
-        if cat_id == admin_key {
-            return Some(admin_key.role0_pk());
-        }
+    if let Some(admin_key) = admin_key
+        && cat_id == admin_key
+    {
+        return Some(admin_key.role0_pk());
     }
 
     None
