@@ -26,7 +26,7 @@ pub struct PaymentData {
 
 impl PaymentData {
     /// Creates a new `PaymentData` instance.
-    pub fn new(
+    pub(crate) fn new(
         is_persistent: bool,
         time: DateTime,
         slot: SlotNo,

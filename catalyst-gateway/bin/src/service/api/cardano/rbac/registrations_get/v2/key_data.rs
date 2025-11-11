@@ -51,7 +51,7 @@ pub struct KeyData {
 
 impl KeyData {
     /// Creates a new `KeyData` instance.
-    pub fn new(
+    pub(crate) fn new(
         is_persistent: bool,
         time: DateTime,
         slot: SlotNo,
