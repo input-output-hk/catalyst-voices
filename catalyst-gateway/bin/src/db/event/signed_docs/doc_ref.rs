@@ -2,15 +2,15 @@
 
 use std::fmt::Write;
 
-use crate::db::event::common::eq_or_ranged_uuid::EqOrRangedUuid;
+use crate::db::event::common::eq_or_ranged_uuid::UuidSelector;
 
 /// Document Reference filtering struct.
 #[derive(Clone, Debug)]
 pub(crate) struct DocumentRef {
     /// Document id filtering
-    pub(crate) id: Option<EqOrRangedUuid>,
+    pub(crate) id: Option<UuidSelector>,
     /// Document ver filtering
-    pub(crate) ver: Option<EqOrRangedUuid>,
+    pub(crate) ver: Option<UuidSelector>,
 }
 
 impl DocumentRef {
