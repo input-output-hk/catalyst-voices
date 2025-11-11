@@ -23,8 +23,10 @@ jobs:
     outputs:
       catalyst-gateway: ${{ steps.filter.outputs.catalyst-gateway }}
       catalyst-voices: ${{ steps.filter.outputs.catalyst-voices }}
+      docs: ${{ steps.filter.outputs.docs }}
+      not-only-docs: ${{ steps.filter.outputs.not-only-docs }}
     steps:
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
@@ -32,6 +34,11 @@ jobs:
               - 'catalyst_voices/**'
             catalyst-gateway:
               - 'catalyst-gateway/**'
+            docs:
+              - 'docs/**'
+              - '.config/dictionaries/project.dic'
+            not-only-docs:
+              - '!((docs/**)|.config/dictionaries/project.dic)'
 
   reject:
     if: ${{ !github.event.pull_request.draft }}
@@ -51,9 +58,17 @@ jobs:
             \s*FROM.*?:latest
               No images should be built using the 'latest' tag
 
+  docs-only:
+    if: ${{ needs.paths-filter.outputs.docs == 'true' && needs.paths-filter.outputs.not-only-docs != 'true' }}
+    needs: [reject, paths-filter]
+    uses: input-output-hk/catalyst-forge/.github/workflows/release.yml@ci/v1.10.0
+    with:
+      releases: '[{"project":"./docs","name":"docs"}]'
+      forge_version: 0.21.0
+
   ci:
-    if: ${{ !github.event.pull_request.draft }}
-    needs: [reject]
+    if: ${{ !github.event.pull_request.draft && needs.paths-filter.outputs.not-only-docs == 'true' }}
+    needs: [reject, paths-filter]
     uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.10.0
     with:
       forge_version: 0.21.0
