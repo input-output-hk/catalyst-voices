@@ -8,7 +8,7 @@ use std::sync::LazyLock;
 use bip32::DerivationPath;
 use bip39::Mnemonic;
 pub use ed25519_bip32::{DerivationIndex, DerivationScheme, Signature, XPrv, XPub};
-use flutter_rust_bridge::{frb, spawn_blocking_with, DefaultHandler, SimpleThreadPool};
+use flutter_rust_bridge::{DefaultHandler, SimpleThreadPool, frb, spawn_blocking_with};
 use hmac::Hmac;
 use pbkdf2::pbkdf2;
 use sha2::Sha512;
@@ -475,8 +475,10 @@ mod test {
         let xprv = mnemonic_to_xprv_helper(MNEMONIC.to_string(), None).unwrap();
         let path = "m/1852'/1815'/0'/2/0";
         let derive_xprv = derive_xprv_helper(xprv, path).unwrap();
-        assert_eq!(derive_xprv.to_string(),
-        "b8ab42f1aacbcdb3ae858e3a3df88142b3ed27a2d3f432024e0d943fc1e597442d57545d84c8db2820b11509d944093bc605350e60c533b8886a405bd59eed6dcf356648fe9e9219d83e989c8ff5b5b337e2897b6554c1ab4e636de791fe5427");
+        assert_eq!(
+            derive_xprv.to_string(),
+            "b8ab42f1aacbcdb3ae858e3a3df88142b3ed27a2d3f432024e0d943fc1e597442d57545d84c8db2820b11509d944093bc605350e60c533b8886a405bd59eed6dcf356648fe9e9219d83e989c8ff5b5b337e2897b6554c1ab4e636de791fe5427"
+        );
     }
 
     #[test]
