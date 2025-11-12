@@ -9,15 +9,15 @@ import 'package:flutter/foundation.dart';
 /// See: https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/rbac_id_uri/catalyst-id-uri/
 final class CatalystId extends Equatable {
   /// The default scheme for the Catalyst ID.
-  static const String idSchema = 'id.catalyst';
+  static const String idScheme = 'id.catalyst';
 
   /// [Uri.fragment] if the key is for encryption.
   ///
   /// If the fragment is not present in the uri then the key is for signing.
   static const String encryptFragment = 'encrypt';
 
-  /// The schema part of the URI.
-  final String schema;
+  /// The scheme part of the URI.
+  final String scheme;
 
   /// The host refers to the network type where the RBAC registration was made.
   ///
@@ -52,7 +52,7 @@ final class CatalystId extends Equatable {
 
   /// The default constructor that builds [CatalystId] from [Uri] parts.
   const CatalystId({
-    this.schema = CatalystId.idSchema,
+    this.scheme = CatalystId.idScheme,
     required this.host,
     this.username,
     this.nonce,
@@ -69,12 +69,12 @@ final class CatalystId extends Equatable {
 
   /// Parses the [CatalystId] from [Uri].
   factory CatalystId.fromUri(Uri uri) {
-    final schema = uri.scheme;
+    final scheme = uri.scheme;
     final (username, nonce) = _parseUserInfo(uri.userInfo);
     final (role0Key, role, rotation) = _parsePath(uri.path);
 
     return CatalystId(
-      schema: schema,
+      scheme: scheme,
       host: uri.host,
       username: username,
       nonce: nonce,
@@ -107,7 +107,7 @@ final class CatalystId extends Equatable {
   ];
 
   CatalystId copyWith({
-    String? schema,
+    String? scheme,
     String? host,
     Optional<String>? username,
     Optional<int>? nonce,
@@ -117,7 +117,7 @@ final class CatalystId extends Equatable {
     bool? encrypt,
   }) {
     return CatalystId(
-      schema: schema ?? this.schema,
+      scheme: scheme ?? this.scheme,
       host: host ?? this.host,
       username: username.dataOr(this.username),
       nonce: nonce.dataOr(this.nonce),
@@ -131,7 +131,7 @@ final class CatalystId extends Equatable {
   /// Objects which holds [CatalystId] can be uniquely identified only by
   /// comparing [role0Key] and [host] thus they're significant parts of
   /// [CatalystId].
-  CatalystId toSignificant() => CatalystId(schema: schema, host: host, role0Key: role0Key);
+  CatalystId toSignificant() => CatalystId(scheme: scheme, host: host, role0Key: role0Key);
 
   @override
   String toString() => toUri().toString();
@@ -139,7 +139,7 @@ final class CatalystId extends Equatable {
   /// Builds the [Uri] from the [CatalystId].
   Uri toUri() {
     return Uri(
-      scheme: schema,
+      scheme: scheme,
       userInfo: _formatUserInfo(),
       host: host,
       path: _formatPath(),
