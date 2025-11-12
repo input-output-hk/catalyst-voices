@@ -217,7 +217,7 @@ class WebAssetVersioner {
         .cast<File>()
         .toList();
 
-    final assetBasenames = _versionMap.keys
+    final assetsBasename = _versionMap.keys
         .map((key) => path.basename(key))
         .toSet();
 
@@ -226,7 +226,7 @@ class WebAssetVersioner {
     for (final file in allFiles) {
       final content = await file.readAsString();
 
-      final containsAssetReference = assetBasenames.any(
+      final containsAssetReference = assetsBasename.any(
         (basename) => content.contains(basename),
       );
 
@@ -319,5 +319,3 @@ class WebAssetVersioner {
     _log('✓ $symbolFilePath -> $versionedFilename (using parent hash)');
   }
 }
-
-//cspell:ignore Basenames
