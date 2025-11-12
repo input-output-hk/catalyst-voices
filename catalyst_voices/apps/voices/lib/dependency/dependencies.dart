@@ -42,7 +42,6 @@ final class Dependencies extends DependencyProvider {
     required ReportingService reportingService,
     CatalystProfiler? profiler,
     CatalystStartupProfiler? startupProfiler,
-    CatalystRuntimeProfiler? runtimeProfiler,
   }) async {
     DependencyProvider.instance = this;
 
@@ -55,9 +54,6 @@ final class Dependencies extends DependencyProvider {
     }
     if (startupProfiler != null) {
       registerSingleton(startupProfiler);
-    }
-    if (runtimeProfiler != null) {
-      registerSingleton(runtimeProfiler);
     }
 
     _registerStorages();
