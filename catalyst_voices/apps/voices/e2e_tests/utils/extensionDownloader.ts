@@ -1,10 +1,10 @@
 /* cspell:disable */
 import unzip from "@tomjs/unzip-crx";
 import fs, { promises as fsPromises } from "fs";
-import nodeFetch from "node-fetch";
-import * as os from "os";
+import os from "os";
 import path from "path";
 import { pipeline } from "stream/promises";
+import { Readable } from "stream";
 import { BrowserExtensionName } from "../models/browserExtensionModel";
 import { getBrowserExtension } from "../data/browserExtensionConfigs";
 
@@ -32,9 +32,7 @@ export class ExtensionDownloader {
    * Output: /path/to/extension
    *
    */
-  public async getExtension(
-    extensionName: BrowserExtensionName
-  ): Promise<string> {
+  public async getExtension(extensionName: BrowserExtensionName): Promise<string> {
     const extensionId = getBrowserExtension(extensionName).Id;
     const extensionPath = path.join(this.extensionsDir, extensionId);
 
@@ -58,34 +56,27 @@ export class ExtensionDownloader {
   }
 
   private async downloadNufiExtension(): Promise<string> {
-    const url =
-      "https://assets.nu.fi/extension/testnet/nufi-cwe-testnet-latest.zip";
-    const filePath = path.join(
-      this.extensionsDir,
-      "nufi-cwe-testnet-latest.zip"
-    );
+    const url = "https://assets.nu.fi/extension/testnet/nufi-cwe-testnet-latest.zip";
+    const filePath = path.join(this.extensionsDir, "nufi-cwe-testnet-latest.zip");
 
     // Ensure the download directory exists
     await fsPromises.mkdir(this.extensionsDir, { recursive: true });
 
     // Fetch the extension
-    const res = await nodeFetch(url);
+    const res = await fetch(url);
     if (!res.ok) {
       throw new Error(`Failed to download extension: ${res.statusText}`);
     }
 
     // Stream the response directly to a file
     const fileStream = fs.createWriteStream(filePath);
-    await pipeline(res.body, fileStream);
+    await pipeline(Readable.fromWeb(res.body as any), fileStream);
 
     console.log(`Extension has been downloaded to: ${filePath}`);
     return filePath;
   }
 
-  private async extractExtension(
-    extensionPath: string,
-    extractPath: string
-  ): Promise<void> {
+  private async extractExtension(extensionPath: string, extractPath: string): Promise<void> {
     // Ensure the extraction directory exists
     await fsPromises.mkdir(extractPath, { recursive: true });
 
@@ -99,9 +90,7 @@ export class ExtensionDownloader {
     }
   }
 
-  private async downloadExtension(
-    extensionName: BrowserExtensionName
-  ): Promise<string> {
+  private async downloadExtension(extensionName: BrowserExtensionName): Promise<string> {
     const extensionId = getBrowserExtension(extensionName).Id;
     const url = this.getCrxUrl(extensionName);
 
@@ -111,14 +100,14 @@ export class ExtensionDownloader {
     const filePath = path.join(this.extensionsDir, `${extensionId}.crx`);
 
     // Fetch the extension
-    const res = await nodeFetch(url);
+    const res = await fetch(url);
     if (!res.ok) {
       throw new Error(`Failed to download extension: ${res.statusText}`);
     }
 
     // Stream the response directly to a file
     const fileStream = fs.createWriteStream(filePath);
-    await pipeline(res.body, fileStream);
+    await pipeline(Readable.fromWeb(res.body as any), fileStream);
 
     console.log(`Extension has been downloaded to: ${filePath}`);
     return filePath;
@@ -132,8 +121,7 @@ export class ExtensionDownloader {
     const productChannel = "unknown";
     let productVersion = "9999.0.9999.0";
 
-    let url =
-      "https://clients2.google.com/service/update2/crx?response=redirect";
+    let url = "https://clients2.google.com/service/update2/crx?response=redirect";
     url += "&os=" + platformInfo.os;
     url += "&arch=" + platformInfo.arch;
     url += "&os_arch=" + platformInfo.os_arch;

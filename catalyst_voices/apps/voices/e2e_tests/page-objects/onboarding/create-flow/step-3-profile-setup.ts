@@ -17,6 +17,7 @@ export class ProfileSetupPanel extends OnboardingBasePage {
   async receiveEmailsCheckboxClick() {
     await this.click(this.receiveEmailsCheckbox);
   }
+  
   async goto() {
     await new IntroductionPanel(this.page).goto();
     await new IntroductionPanel(this.page).createYourProfileClick();
