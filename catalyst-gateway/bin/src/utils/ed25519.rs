@@ -1,6 +1,6 @@
 //! Utility functions for Ed25519 keys and crypto.
 
-use anyhow::{bail, Error};
+use anyhow::{Error, bail};
 
 /// Length of the hex encoded string;
 pub(crate) const HEX_ENCODED_LENGTH: usize = "0x".len() + (ed25519_dalek::PUBLIC_KEY_LENGTH * 2);

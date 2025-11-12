@@ -6,7 +6,7 @@ pub(crate) mod response;
 use std::collections::HashMap;
 
 use futures::TryStreamExt;
-use poem_openapi::{payload::Json, ApiResponse};
+use poem_openapi::{ApiResponse, payload::Json};
 
 use crate::{
     db::event::{
@@ -39,7 +39,7 @@ pub(crate) enum Responses {
     ///
     /// The Index of documents which match the query filter.
     #[oai(status = 200)]
-    Ok(Json<response::DocumentIndexListDocumentedV2>),
+    Ok(Json<DocumentIndexListDocumentedV2>),
     /// ## Not Found
     ///
     /// No documents were found which match the query filter.

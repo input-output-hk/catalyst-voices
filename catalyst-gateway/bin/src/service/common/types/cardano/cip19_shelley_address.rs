@@ -92,13 +92,13 @@ fn is_valid(addr: &str) -> bool {
     #[allow(clippy::unwrap_used)] // Safe because the Regex is constant.
     static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
 
-    if RE.is_match(addr) {
-        if let Ok((hrp, addr)) = bech32::decode(addr) {
-            let hrp = hrp.as_str();
-            return (addr.len() == (DECODED_UNSTAKED_ADDR_LEN + HEADER_LEN)
-                || addr.len() == (DECODED_STAKED_ADDR_LEN + HEADER_LEN))
-                && (hrp == PROD || hrp == TEST);
-        }
+    if RE.is_match(addr)
+        && let Ok((hrp, addr)) = bech32::decode(addr)
+    {
+        let hrp = hrp.as_str();
+        return (addr.len() == (DECODED_UNSTAKED_ADDR_LEN + HEADER_LEN)
+            || addr.len() == (DECODED_STAKED_ADDR_LEN + HEADER_LEN))
+            && (hrp == PROD || hrp == TEST);
     }
     false
 }
@@ -163,8 +163,8 @@ mod tests {
         // cspell: disable
         let valid = [
             EXAMPLE,
-            "addr1qx2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3n0d3vllmyqwsx5wktcd8cc3sq835lu7drv2xwl2wywfgse35a3x", 
-            "addr1z8phkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gten0d3vllmyqwsx5wktcd8cc3sq835lu7drv2xwl2wywfgs9yc0hh", 
+            "addr1qx2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3n0d3vllmyqwsx5wktcd8cc3sq835lu7drv2xwl2wywfgse35a3x",
+            "addr1z8phkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gten0d3vllmyqwsx5wktcd8cc3sq835lu7drv2xwl2wywfgs9yc0hh",
             "addr1yx2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzerkr0vd4msrxnuwnccdxlhdjar77j6lg0wypcc9uar5d2shs2z78ve",
             "addr1x8phkx6acpnf78fuvxn0mkew3l0fd058hzquvz7w36x4gt7r0vd4msrxnuwnccdxlhdjar77j6lg0wypcc9uar5d2shskhj42g",
             "addr1vx2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzers66hrl8",
