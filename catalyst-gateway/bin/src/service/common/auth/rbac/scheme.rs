@@ -2,8 +2,8 @@
 use std::{env, error::Error, time::Duration};
 
 use catalyst_types::catalyst_id::role_index::RoleId;
-use poem::{error::ResponseError, http::StatusCode, IntoResponse, Request};
-use poem_openapi::{auth::Bearer, SecurityScheme};
+use poem::{IntoResponse, Request, error::ResponseError, http::StatusCode};
+use poem_openapi::{SecurityScheme, auth::Bearer};
 use tracing::{debug, error};
 
 use super::token::CatalystRBACTokenV1;
@@ -176,7 +176,7 @@ async fn checker_api_catalyst_auth(
     if let Err(error) = token.verify(&latest_pk) {
         debug!(error=%error, "Invalid signature for token: {token}");
         Err(AuthTokenAccessViolation(vec![
-            "INVALID SIGNATURE".to_string()
+            "INVALID SIGNATURE".to_string(),
         ]))?;
     }
 

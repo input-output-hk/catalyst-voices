@@ -3,10 +3,9 @@ use std::ops::{Deref, DerefMut};
 use bytes::Bytes;
 use poem::{Body, FromRequest, IntoResponse, Request, RequestBody, Response, Result};
 use poem_openapi::{
-    impl_apirequest_for_payload,
+    ApiResponse, impl_apirequest_for_payload,
     payload::{ParsePayload, Payload},
     registry::{MetaMediaType, MetaResponse, MetaResponses, MetaSchema, MetaSchemaRef, Registry},
-    ApiResponse,
 };
 
 // use crate::{
@@ -21,14 +20,14 @@ use poem_openapi::{
 ///
 /// ```rust
 /// use poem::{
+///     Body, IntoEndpoint, Request, Result,
 ///     error::BadRequest,
 ///     http::{Method, StatusCode, Uri},
 ///     test::TestClient,
-///     Body, IntoEndpoint, Request, Result,
 /// };
 /// use poem_openapi::{
-///     payload::{Cbor, Json},
 ///     OpenApi, OpenApiService,
+///     payload::{Cbor, Json},
 /// };
 /// use tokio::io::AsyncReadExt;
 ///

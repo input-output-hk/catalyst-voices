@@ -4,9 +4,9 @@ use std::sync::Arc;
 
 use cardano_chain_follower::StakeAddress;
 use scylla::{
+    DeserializeRow, SerializeRow,
     client::{pager::TypedRowStream, session::Session},
     statement::prepared::PreparedStatement,
-    DeserializeRow, SerializeRow,
 };
 use tracing::error;
 

@@ -1,13 +1,13 @@
 //! Configuration Endpoints
 
 use poem::web::RealIp;
-use poem_openapi::{param::Query, payload::Json, ApiResponse, OpenApi};
+use poem_openapi::{ApiResponse, OpenApi, param::Query, payload::Json};
 use serde_json::{Map, Value};
 use tracing::error;
 
 use crate::{
     db::event::{
-        config::{key::ConfigKey, Config},
+        config::{Config, key::ConfigKey},
         error::NotFoundError,
     },
     service::common::{

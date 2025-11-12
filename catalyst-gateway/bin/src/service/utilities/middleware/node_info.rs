@@ -62,17 +62,18 @@ impl<E: Endpoint> Endpoint for CatGatewayInfoImpl<E> {
 fn server_info() -> String {
     let cat_gateway_info = build_info();
     let mut server_info = format!("cat-gateway/{}", settings::Settings::service_id());
-    if let Some(vc) = &cat_gateway_info.version_control {
-        if let Some(git) = vc.git() {
-            let _ = write!(&mut server_info, " commit:{}", git.commit_short_id);
-            if let Some(branch) = &git.branch {
-                let _ = write!(&mut server_info, ",branch:{branch}");
-            }
-            if !git.tags.is_empty() {
-                let _ = write!(&mut server_info, ",tags:{}", git.tags.join(","));
-            }
+    if let Some(vc) = &cat_gateway_info.version_control
+        && let Some(git) = vc.git()
+    {
+        let _ = write!(&mut server_info, " commit:{}", git.commit_short_id);
+        if let Some(branch) = &git.branch {
+            let _ = write!(&mut server_info, ",branch:{branch}");
+        }
+        if !git.tags.is_empty() {
+            let _ = write!(&mut server_info, ",tags:{}", git.tags.join(","));
         }
     }
+
     server_info
 }
 

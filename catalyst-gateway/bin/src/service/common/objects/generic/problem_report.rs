@@ -2,8 +2,8 @@
 
 use catalyst_types::problem_report;
 use poem_openapi::{
-    types::{Example, ToJSON},
     Object,
+    types::{Example, ToJSON},
 };
 
 use crate::service::common::types::{
