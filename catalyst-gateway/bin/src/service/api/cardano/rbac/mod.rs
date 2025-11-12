@@ -1,6 +1,6 @@
 //! RBAC endpoints.
 
-use poem_openapi::{param::Query, OpenApi};
+use poem_openapi::{OpenApi, param::Query};
 
 use crate::service::common::{
     auth::none_or_rbac::NoneOrRBAC,

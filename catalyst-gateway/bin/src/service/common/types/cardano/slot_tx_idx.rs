@@ -1,6 +1,6 @@
 //! Block's slot and transaction index API object.
 
-use poem_openapi::{types::Example, NewType, Object};
+use poem_openapi::{NewType, Object, types::Example};
 use rbac_registration::cardano::cip509::PointTxnIdx;
 
 use super::{slot_no::SlotNo, txn_index::TxnIndex};

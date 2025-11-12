@@ -1,5 +1,5 @@
 //! Provides a `OpenAPI` UI using the Stoplight Elements interface.
-use poem::{endpoint::make_sync, web::Html, Endpoint};
+use poem::{Endpoint, endpoint::make_sync, web::Html};
 
 /// Stoplight Elements UI JavaScript
 const STOPLIGHT_UI_JS: &str = include_str!("web-components.min.js");
@@ -44,7 +44,7 @@ fn create_html(document: &str) -> String {
 }
 
 /// Create an endpoint to return the Stoplight documentation for our API.
-pub(crate) fn create_endpoint(document: &str) -> impl Endpoint {
+pub(crate) fn create_endpoint(document: &str) -> impl Endpoint + use<> {
     let ui_html = create_html(document);
     poem::Route::new().at("/", make_sync(move |_| Html(ui_html.clone())))
 }

@@ -1,8 +1,9 @@
 //! Implementation of the GET `/cardano/cip36` endpoint
 
 use super::{
+    SlotNo,
     filter::{get_registration_given_stake_key_hash, get_registration_given_vote_key, snapshot},
-    response, SlotNo,
+    response,
 };
 use crate::{
     db::index::session::CassandraSession,
@@ -67,7 +68,7 @@ pub(crate) async fn cip36_registrations(
             // Snapshot replacement, returns all registrations or returns a
             // subset of registrations if constrained by a given time.
             {
-                return snapshot(session, asat).await
+                return snapshot(session, asat).await;
             },
         };
     }
