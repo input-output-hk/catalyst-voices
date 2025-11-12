@@ -177,16 +177,34 @@ class WebAssetVersioner {
   }
 
   Future<void> _updateAssetReferences() async {
-    final targetFiles = await Directory(buildDir)
+    final allFiles = await Directory(buildDir)
         .list(recursive: true)
         .where(
           (file) =>
               file is File &&
               (path.extension(file.path).contains('.html') ||
-                  path.extension(file.path).contains('.js')),
+                  path.extension(file.path) == '.js'),
         )
         .cast<File>()
         .toList();
+
+    final assetsBasename = _versionMap.keys
+        .map((key) => path.basename(key))
+        .toSet();
+
+    // Filter files to only those that contain references to versioned assets
+    final targetFiles = <File>[];
+    for (final file in allFiles) {
+      final content = await file.readAsString();
+
+      final containsAssetReference = assetsBasename.any(
+        (basename) => content.contains(basename),
+      );
+
+      if (containsAssetReference) {
+        targetFiles.add(file);
+      }
+    }
 
     final updateRefRegistry = RefUpdaterRegistry();
 
