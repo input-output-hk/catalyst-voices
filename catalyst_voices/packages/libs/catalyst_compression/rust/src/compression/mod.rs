@@ -2,7 +2,7 @@
 
 use std::sync::LazyLock;
 
-use flutter_rust_bridge::{spawn_blocking_with, DefaultHandler, SimpleThreadPool};
+use flutter_rust_bridge::{DefaultHandler, SimpleThreadPool, spawn_blocking_with};
 
 /// Compress the bytes with brotli compression algorithm.
 /// Runs the computation by a shared thread pool to avoid blocking the main thread.

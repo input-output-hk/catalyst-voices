@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use anyhow::Context;
 use cardano_chain_follower::Slot;
-use poem_openapi::{types::Example, Object};
+use poem_openapi::{Object, types::Example};
 use rbac_registration::{
     cardano::cip509::{PointData, RoleData},
     registration::cardano::RegistrationChain,

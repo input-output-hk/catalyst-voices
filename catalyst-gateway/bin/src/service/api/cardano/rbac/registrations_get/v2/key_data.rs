@@ -6,8 +6,8 @@ use anyhow::Context;
 use c509_certificate::c509::C509;
 use cardano_chain_follower::Point;
 use ed25519_dalek::VerifyingKey;
-use minicbor::{encode::Encode, Encoder};
-use poem_openapi::{types::Example, Object};
+use minicbor::{Encoder, encode::Encode};
+use poem_openapi::{Object, types::Example};
 use rbac_registration::{
     cardano::cip509::{KeyLocalRef, LocalRefInt, PointData},
     registration::cardano::RegistrationChain,

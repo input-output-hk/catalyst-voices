@@ -3,7 +3,7 @@
 use std::{fmt::Debug, sync::Arc};
 
 use cardano_chain_follower::{Cip36, Slot, TxnIndex, VotingPubKey};
-use scylla::{client::session::Session, value::MaybeUnset, SerializeRow};
+use scylla::{SerializeRow, client::session::Session, value::MaybeUnset};
 use tracing::error;
 
 use crate::{

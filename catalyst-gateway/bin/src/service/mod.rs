@@ -11,7 +11,7 @@ pub(crate) mod utilities;
 
 use api::mk_api;
 pub(crate) use poem_service::get_app_docs;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use tracing::error;
 
 /// # Run Catalyst Gateway Service.

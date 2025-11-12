@@ -4,12 +4,12 @@ use std::fmt::{Display, Formatter};
 
 use cardano_chain_follower::hashes::TransactionId;
 use scylla::{
-    deserialize::{value::DeserializeValue, DeserializationError, FrameSlice, TypeCheckError},
+    deserialize::{DeserializationError, FrameSlice, TypeCheckError, value::DeserializeValue},
     frame::response::result::ColumnType,
     serialize::{
+        SerializationError,
         value::SerializeValue,
         writers::{CellWriter, WrittenCellProof},
-        SerializationError,
     },
 };
 
