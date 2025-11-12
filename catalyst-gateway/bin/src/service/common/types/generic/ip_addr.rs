@@ -1,6 +1,6 @@
 //! `IpAddr` Type.
 
-use poem_openapi::{types::Example, NewType};
+use poem_openapi::{NewType, types::Example};
 
 /// IP Address.
 #[derive(NewType)]

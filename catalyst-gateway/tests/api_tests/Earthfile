@@ -1,12 +1,12 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.5.20 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.6.0 AS python-ci
 IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v0.0.8 AS cat-libs-rust
 IMPORT github.com/input-output-hk/catalyst-libs/rust:catalyst-signed-doc/v.0.0.4-fix-earthly-build AS dep-cat-libs-rust
 IMPORT github.com/input-output-hk/catalyst-storage AS cat-storage
 
 builder:
-    FROM python-ci+python-base
+    FROM python-ci+python-base-deprecated
 
     # prepare tests
     COPY --dir ./api .
@@ -18,7 +18,7 @@ builder:
     # mk_signed_doc cli tool for building deprecated version of documents
     COPY dep-cat-libs-rust+build/mk_signed_doc ./dep_mk_signed_doc
     COPY cat-storage+cardano-asset-preprod/cardano-asset-preprod.json .
-    DO python-ci+BUILDER
+    DO python-ci+BUILDER_WITH_POETRY
 
 # Creates a package of the python integration test runner
 package:

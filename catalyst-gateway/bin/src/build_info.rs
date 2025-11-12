@@ -48,15 +48,15 @@ pub(crate) fn log_build_info() {
     let mut branch = "Unknown".to_string();
     let mut tags = "Unknown".to_string();
 
-    if let Some(ref vc) = info.version_control {
-        if let Some(git) = vc.git() {
-            commit_id.clone_from(&git.commit_short_id);
-            commit_timestamp = git.commit_timestamp.to_rfc3339();
-            if let Some(git_branch) = git.branch.clone() {
-                branch = git_branch;
-            }
-            tags = git.tags.join(",");
+    if let Some(ref vc) = info.version_control
+        && let Some(git) = vc.git()
+    {
+        commit_id.clone_from(&git.commit_short_id);
+        commit_timestamp = git.commit_timestamp.to_rfc3339();
+        if let Some(git_branch) = git.branch.clone() {
+            branch = git_branch;
         }
+        tags = git.tags.join(",");
     }
 
     let ipv4 = utilities::net::get_public_ipv4().to_string();
@@ -65,15 +65,15 @@ pub(crate) fn log_build_info() {
     let mut interfaces: String = "Unknown".to_string();
 
     // Get local IP address v4 and v6
-    if let Ok(network_interfaces) = list_afinet_netifas() {
-        if !network_interfaces.is_empty() {
-            interfaces.clear();
-            for iface in network_interfaces {
-                if !interfaces.is_empty() {
-                    interfaces.push(',');
-                }
-                let _ = write!(interfaces, "{}:{}", iface.0, iface.1);
+    if let Ok(network_interfaces) = list_afinet_netifas()
+        && !network_interfaces.is_empty()
+    {
+        interfaces.clear();
+        for iface in network_interfaces {
+            if !interfaces.is_empty() {
+                interfaces.push(',');
             }
+            let _ = write!(interfaces, "{}:{}", iface.0, iface.1);
         }
     }
 

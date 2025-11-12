@@ -5,7 +5,7 @@
 
 use std::sync::LazyLock;
 
-use prometheus::{register_int_gauge_vec, IntGaugeVec};
+use prometheus::{IntGaugeVec, register_int_gauge_vec};
 
 /// Labels for the chain follower metrics
 const FOLLOWER_METRIC_LABELS: [&str; 3] = ["api_host_names", "service_id", "network"];

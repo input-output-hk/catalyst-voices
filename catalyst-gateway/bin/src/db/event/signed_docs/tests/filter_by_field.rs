@@ -12,7 +12,7 @@ macro_rules! filter_by_field {
 
             // With id
             let filter = DocsQueryFilter::all().$with_method(DocumentRef {
-                id: Some(EqOrRangedUuid::Eq(id)),
+                id: Some(UuidSelector::Eq(id)),
                 ver: None,
             });
             let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
@@ -24,7 +24,7 @@ macro_rules! filter_by_field {
             // With ver
             let filter = DocsQueryFilter::all().$with_method(DocumentRef {
                 id: None,
-                ver: Some(EqOrRangedUuid::Eq(ver)),
+                ver: Some(UuidSelector::Eq(ver)),
             });
             let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
                 .await
@@ -34,8 +34,8 @@ macro_rules! filter_by_field {
 
             // With both id and ver
             let filter = DocsQueryFilter::all().$with_method(DocumentRef {
-                id: Some(EqOrRangedUuid::Eq(id)),
-                ver: Some(EqOrRangedUuid::Eq(ver)),
+                id: Some(UuidSelector::Eq(id)),
+                ver: Some(UuidSelector::Eq(ver)),
             });
             let mut res_docs = SignedDocBody::retrieve(&filter, &QueryLimits::ALL)
                 .await

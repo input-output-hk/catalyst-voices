@@ -1,8 +1,8 @@
 //! Signed Document ID and Version Reference Objects
 
-use poem_openapi::{types::Example, NewType, Object, Union};
+use poem_openapi::{NewType, Object, Union, types::Example};
 
-use super::{id::EqOrRangedIdDocumented, ver::EqOrRangedVerDocumented};
+use super::{id::IdSelectorDocumented, ver::VerSelectorDocumented};
 use crate::db::event::signed_docs::DocumentRef;
 
 #[derive(Union, Debug, Clone, PartialEq)]
@@ -65,14 +65,14 @@ impl TryFrom<IdAndVerRefDocumented> for DocumentRef {
         match value.0 {
             IdAndVerRef::IdRefOnly(val) => {
                 Ok(DocumentRef {
-                    id: Some(val.0.id.try_into()?),
+                    id: val.0.id.try_into()?,
                     ver: None,
                 })
             },
             IdAndVerRef::IdAndVerRef(val) => {
                 Ok(DocumentRef {
-                    id: val.0.id.map(TryInto::try_into).transpose()?,
-                    ver: Some(val.0.ver.try_into()?),
+                    id: val.0.id.map(TryFrom::try_from).transpose()?.flatten(),
+                    ver: val.0.ver.try_into()?,
                 })
             },
         }
@@ -154,16 +154,16 @@ impl VerRefWithOptionalIdDocumented {
 pub(crate) struct VerRefWithOptionalId {
     /// Document ID, or range of Document IDs
     #[oai(skip_serializing_if_is_none)]
-    id: Option<EqOrRangedIdDocumented>,
+    id: Option<IdSelectorDocumented>,
     /// Document Version, or Range of Document Versions
-    ver: EqOrRangedVerDocumented,
+    ver: VerSelectorDocumented,
 }
 
 impl Example for VerRefWithOptionalId {
     fn example() -> Self {
         Self {
             id: None,
-            ver: EqOrRangedVerDocumented::example(),
+            ver: VerSelectorDocumented::example(),
         }
     }
 }
@@ -173,8 +173,8 @@ impl VerRefWithOptionalId {
     #[allow(dead_code)]
     fn example_id_and_ver_ref() -> Self {
         Self {
-            id: Some(EqOrRangedIdDocumented::example()),
-            ver: EqOrRangedVerDocumented::example(),
+            id: Some(IdSelectorDocumented::example()),
+            ver: VerSelectorDocumented::example(),
         }
     }
 }
@@ -184,13 +184,13 @@ impl VerRefWithOptionalId {
 /// A Reference to a Document ID/s and their version/s.
 pub(crate) struct IdRefOnly {
     /// Document ID, or range of Document IDs
-    id: EqOrRangedIdDocumented,
+    id: IdSelectorDocumented,
 }
 
 impl Example for IdRefOnly {
     fn example() -> Self {
         Self {
-            id: EqOrRangedIdDocumented::example(),
+            id: IdSelectorDocumented::example(),
         }
     }
 }
