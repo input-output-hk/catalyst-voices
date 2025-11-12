@@ -159,9 +159,9 @@ services:
       - SERVICE_LIVE_TIMEOUT_INTERVAL=30
     command: >
       poetry run pytest -m "${API_TEST_MARKS}" -s --junitxml junit-report.xml --cov integration --cov-report lcov
-    depends_on:
-      cat-gateway:
-        condition: service_healthy
+#    depends_on:
+#      cat-gateway:
+#        condition: service_healthy
 
   schemathesis-runner:
     image: schemathesis-runner:latest
