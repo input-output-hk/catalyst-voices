@@ -319,3 +319,5 @@ class WebAssetVersioner {
     _log('✓ $symbolFilePath -> $versionedFilename (using parent hash)');
   }
 }
+
+//cspell:ignore Basenames
