@@ -172,6 +172,7 @@
         "**/historic_data/**/*.yaml",
         "**/historic_data/**/*.json",
         "**/test_data/**/*.sql",
+        "**/test_data/rbac_regs/*.jsonc",
         "styles.min.css",
         "web-components.min.js",
         "**/generated/**",
