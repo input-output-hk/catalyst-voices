@@ -95,12 +95,6 @@ jobs:
         run: |
           docker compose -f catalyst-gateway/tests/docker-compose.yml up api-tests-runner --exit-code-from api-tests-runner
 
-#      - name: Setup upterm session
-#        uses: lhotari/action-upterm@v1
-      - name: Setup upterm session
-        if: always()
-        uses: owenthereal/action-upterm@v1
-
       - name: Spin up catalyst-gateway
         id: gateway-started
         if: ${{ steps.images.conclusion == 'success' }}
