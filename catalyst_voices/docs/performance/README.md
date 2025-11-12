@@ -16,7 +16,7 @@ flutter run --target=lib/configs/main_web.dart \
 --dart-define=STRESS_TEST_PROPOSAL_INDEX_COUNT=0 \
 --dart-define=STRESS_TEST_DECOMPRESSED=false \
 --dart-define=STRESS_TEST_CLEAR_DB=true \
---dart-define=CONSOLE_PROFILE=true
+--dart-define=CONSOLE_PROFILE=true \
 --web-port=5554 \
 --web-header=Cross-Origin-Opener-Policy=same-origin \
 --web-header=Cross-Origin-Embedder-Policy=require-corp
