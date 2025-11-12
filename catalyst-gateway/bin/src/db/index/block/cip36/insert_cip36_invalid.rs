@@ -3,6 +3,7 @@
 use std::{fmt::Debug, sync::Arc};
 
 use cardano_chain_follower::{pallas_addresses::Address, Cip36, Slot, TxnIndex, VotingPubKey};
+use poem_openapi::types::ToJSON;
 use scylla::{client::session::Session, value::MaybeUnset, SerializeRow};
 use tracing::error;
 
@@ -11,6 +12,7 @@ use crate::{
         index::queries::{PreparedQueries, SizedBatch},
         types::{DbSlot, DbTxnIndex},
     },
+    service::common::objects::generic::problem_report::ProblemReport,
     settings::cassandra_db,
 };
 
@@ -86,13 +88,7 @@ impl Params {
             .unwrap_or_default();
         let is_cip36 = cip36.is_cip36().map_or(MaybeUnset::Unset, MaybeUnset::Set);
         let payment_address = cip36.payment_address().map_or(Vec::new(), Address::to_vec);
-        let problem_report = serde_json::to_string(cip36.err_report()).unwrap_or_else(|e| {
-            error!(
-                "Failed to serialize problem report: {e:?}. Report = {:?}",
-                cip36.err_report()
-            );
-            String::new()
-        });
+        let problem_report = ProblemReport::from(cip36.err_report().clone()).to_json_string();
 
         Params {
             stake_public_key,

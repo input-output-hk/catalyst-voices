@@ -16,16 +16,17 @@ for (const walletConfig of [getWalletConfigByExtensionName(BrowserExtensionName.
     test(`Connect wallet - ${walletConfig.extension.Name}`, async ({
       restoreWallet,
       appBaseURL,
+      testModel,
     }) => {
       const page = restoreWallet.pages()[0];
       await page.goto(appBaseURL);
       await page
         .locator("//*[@aria-label='Enable accessibility']")
         .evaluate((element: HTMLElement) => element.click());
-      const walletListPanel = await new WalletListPanel(page).goto();
+      const walletListPanel = await new WalletListPanel(page, testModel).goto();
       const walletPage = await walletListPanel.clickConnectWallet(walletConfig.extension.Name);
       await createWalletActions(walletConfig, walletPage).connectWallet();
-      const walletConnectedPanel = new WalletConnectedPanel(page);
+      const walletConnectedPanel = new WalletConnectedPanel(page, testModel);
 
       expect(await walletConnectedPanel.getWalletNameValue()).toContain(
         walletConfig.extension.Name

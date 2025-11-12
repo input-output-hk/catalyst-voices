@@ -363,7 +363,7 @@ def test_put_deprecated_documents(rbac_chain_factory):
             resp.status_code == 200
         ), f"Failed to get document: {resp.status_code} - {resp.text}"
 
-        resp = document_v2.post(filter={"id": [{"eq": id}]})
+        resp = document_v2.post(filter={"id": {"eq": id}})
         assert (
             resp.status_code == 200
         ), f"Failed to get document: {resp.status_code} - {resp.text}"
