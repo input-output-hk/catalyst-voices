@@ -17,7 +17,7 @@ services:
       - INIT_AND_DROP_DB=true
       - WITH_MIGRATIONS=true
     ports:
-      - 5432:5432
+      - "5432:5432"
     healthcheck:
       test:
         [
@@ -60,7 +60,7 @@ services:
       # - LOG_LEVEL=error
       # - RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug"
     ports:
-      - 3030:3030
+      - "3030:3030"
     depends_on:
       event-db:
         condition: service_healthy
