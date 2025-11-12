@@ -3,6 +3,8 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
+import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
+import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
 final class DatabaseDocumentsDataSource
@@ -286,9 +288,23 @@ extension on JoinedProposalEntity {
 
 extension on JoinedProposalBriefEntity {
   JoinedProposalBriefData toModel() {
+    final proposalDocumentData = proposal.toModel();
+    final templateDocumentData = template?.toModel();
+
+    final proposalOrDocument = templateDocumentData == null
+        ? ProposalOrDocument.data(proposalDocumentData)
+        : () {
+            final template = ProposalTemplateFactory.create(templateDocumentData);
+            final proposal = ProposalDocumentFactory.create(
+              proposalDocumentData,
+              template: template,
+            );
+
+            return ProposalOrDocument.proposal(proposal);
+          }();
+
     return JoinedProposalBriefData(
-      proposal: proposal.toModel(),
-      template: template?.toModel(),
+      proposal: proposalOrDocument,
       actionType: actionType,
       versionIds: versionIds,
       commentsCount: commentsCount,

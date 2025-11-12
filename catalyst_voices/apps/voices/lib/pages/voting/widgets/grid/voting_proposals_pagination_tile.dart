@@ -7,7 +7,7 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class VotingProposalsPaginationTile extends StatelessWidget {
-  final ProposalBriefVoting proposal;
+  final ProposalBrief proposal;
 
   const VotingProposalsPaginationTile({
     super.key,
@@ -24,9 +24,11 @@ class VotingProposalsPaginationTile extends StatelessWidget {
         unawaited(route.push(context));
       },
       onFavoriteChanged: (isFavorite) {
-        context.read<VotingCubit>().onChangeFavoriteProposal(
-          proposal.selfRef,
-          isFavorite: isFavorite,
+        unawaited(
+          context.read<VotingCubit>().onChangeFavoriteProposal(
+            proposal.selfRef,
+            isFavorite: isFavorite,
+          ),
         );
       },
       onVoteAction: (action) {
@@ -38,7 +40,6 @@ class VotingProposalsPaginationTile extends StatelessWidget {
 
         context.read<VotingBallotBloc>().add(event);
       },
-      readOnly: true,
     );
   }
 }

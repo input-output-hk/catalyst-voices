@@ -55,7 +55,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
           .map(CampaignCategoryDetailsViewModel.fromModel)
           .toList();
       final datesEvents = _buildCampaignDatesEvents(timeline);
-      final supportsComments = campaign.supportsComments;
 
       if (isClosed) {
         return;
@@ -70,7 +69,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
             datesEvents: datesEvents,
             isLoading: false,
           ),
-          proposals: state.proposals.copyWith(showComments: supportsComments),
         ),
       );
     } catch (e, st) {

@@ -55,6 +55,15 @@ final class ProposalsFiltersV2 extends Equatable {
   /// If null, this filter is not applied.
   final ProposalsCampaignFilters? campaign;
 
+  /// Filters proposals based on whether a specific user has voted on them.
+  /// The value is the [CatalystId] of the user.
+  /// If null, this filter is not applied.
+  final CatalystId? voteBy;
+
+  // TODO(damian-molinski): Remove this when voteBy is implemented
+  /// Temporary filter only for mocked implementation of [voteBy].
+  final List<String>? ids;
+
   /// Creates a set of filters for querying proposals.
   const ProposalsFiltersV2({
     this.status,
@@ -64,6 +73,8 @@ final class ProposalsFiltersV2 extends Equatable {
     this.searchQuery,
     this.latestUpdate,
     this.campaign,
+    this.voteBy,
+    this.ids,
   });
 
   @override
@@ -75,6 +86,8 @@ final class ProposalsFiltersV2 extends Equatable {
     searchQuery,
     latestUpdate,
     campaign,
+    voteBy,
+    ids,
   ];
 
   ProposalsFiltersV2 copyWith({
@@ -85,6 +98,8 @@ final class ProposalsFiltersV2 extends Equatable {
     Optional<String>? searchQuery,
     Optional<Duration>? latestUpdate,
     Optional<ProposalsCampaignFilters>? campaign,
+    Optional<CatalystId>? voteBy,
+    Optional<List<String>>? ids,
   }) {
     return ProposalsFiltersV2(
       status: status.dataOr(this.status),
@@ -94,6 +109,8 @@ final class ProposalsFiltersV2 extends Equatable {
       searchQuery: searchQuery.dataOr(this.searchQuery),
       latestUpdate: latestUpdate.dataOr(this.latestUpdate),
       campaign: campaign.dataOr(this.campaign),
+      voteBy: voteBy.dataOr(this.voteBy),
+      ids: ids.dataOr(this.ids),
     );
   }
 
@@ -122,6 +139,12 @@ final class ProposalsFiltersV2 extends Equatable {
     }
     if (campaign != null) {
       parts.add('campaign: $campaign');
+    }
+    if (voteBy != null) {
+      parts.add('votedBy: $voteBy');
+    }
+    if (ids != null) {
+      parts.add('ids: ${ids!.join(',')}');
     }
 
     buffer

@@ -3,12 +3,9 @@ import 'dart:typed_data';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
-import 'package:catalyst_voices_repositories/src/dto/document/schema/document_schema_dto.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
-import 'package:collection/collection.dart';
+import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
+import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
 import 'package:rxdart/rxdart.dart';
 
 /// Base interface to interact with proposals. A specialized version of [DocumentRepository] which
@@ -96,7 +93,7 @@ abstract interface class ProposalRepository {
     required DocumentRef refTo,
   });
 
-  Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
+  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order,
     ProposalsFiltersV2 filters,
@@ -211,9 +208,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   Future<ProposalTemplate> getProposalTemplate({
     required DocumentRef ref,
   }) async {
-    final proposalDocument = await _documentRepository.getDocumentData(ref: ref);
+    final documentData = await _documentRepository.getDocumentData(ref: ref);
 
-    return _buildProposalTemplate(documentData: proposalDocument);
+    return ProposalTemplateFactory.create(documentData);
   }
 
   @override
@@ -344,14 +341,16 @@ final class ProposalRepositoryImpl implements ProposalRepository {
   }
 
   @override
-  Stream<Page<ProposalBriefData>> watchProposalsBriefPage({
+  Stream<Page<JoinedProposalBriefData>> watchProposalsBriefPage({
     required PageRequest request,
     ProposalsOrder order = const UpdateDate.desc(),
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    return _proposalsLocalSource
-        .watchProposalsBriefPage(request: request, order: order, filters: filters)
-        .map((page) => page.map(_mapJoinedProposalBriefData));
+    return _proposalsLocalSource.watchProposalsBriefPage(
+      request: request,
+      order: order,
+      filters: filters,
+    );
   }
 
   @override
@@ -445,48 +444,9 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     required DocumentData documentData,
     required DocumentData templateData,
   }) {
-    assert(
-      documentData.metadata.type == DocumentType.proposalDocument,
-      'Not a proposalDocument document data type',
-    );
-
-    final metadata = ProposalMetadata(
-      selfRef: documentData.metadata.selfRef,
-      templateRef: documentData.metadata.template!,
-      categoryId: documentData.metadata.categoryId!,
-      authors: documentData.metadata.authors ?? [],
-    );
-
-    final template = _buildProposalTemplate(documentData: templateData);
-    final schema = template.schema;
-    final content = DocumentDataContentDto.fromModel(documentData.content);
-    final document = DocumentDto.fromJsonSchema(content, schema).toModel();
-
-    return ProposalDocument(
-      metadata: metadata,
-      document: document,
-    );
-  }
-
-  ProposalTemplate _buildProposalTemplate({
-    required DocumentData documentData,
-  }) {
-    assert(
-      documentData.metadata.type == DocumentType.proposalTemplate,
-      'Not a proposalTemplate document data type',
-    );
-
-    final metadata = ProposalTemplateMetadata(
-      selfRef: documentData.metadata.selfRef,
-    );
-
-    final contentData = documentData.content.data;
-    final schema = DocumentSchemaDto.fromJson(contentData).toModel();
-
-    return ProposalTemplate(
-      metadata: metadata,
-      schema: schema,
-    );
+    final template = ProposalTemplateFactory.create(templateData);
+    final proposal = ProposalDocumentFactory.create(documentData, template: template);
+    return proposal;
   }
 
   SignedDocumentMetadata _createProposalMetadata(
@@ -518,55 +478,5 @@ final class ProposalRepositoryImpl implements ProposalRepository {
         ProposalSubmissionAction.draft || null => ProposalPublish.publishedDraft,
       };
     }
-  }
-
-  ProposalBriefData _mapJoinedProposalBriefData(JoinedProposalBriefData data) {
-    ProposalDocument? document;
-
-    final template = data.template;
-    if (template != null) {
-      document = _buildProposalDocument(
-        documentData: data.proposal,
-        templateData: template,
-      );
-    }
-
-    final metadata = data.proposal.metadata;
-    final content = data.proposal.content.data;
-
-    final authorName = document?.authorName ?? metadata.authors?.firstOrNull?.username;
-    final title = document?.title ?? ProposalDocument.titleNodeId.from(content);
-    final description = document?.description ?? ProposalDocument.descriptionNodeId.from(content);
-    // TODO(damian-molinski): Category name should come from query but atm those are not documents.
-    final categoryName = Campaign.all
-        .map((e) => e.categories)
-        .flattened
-        .firstWhereOrNull((category) => category.selfRef == metadata.categoryId)
-        ?.formattedCategoryName;
-    final durationInMonths = document?.duration ?? ProposalDocument.durationNodeId.from(content);
-    // without template we don't know currency so we can't Currencies.fallback or
-    // assume major unit status
-    final fundsRequested = document?.fundsRequested;
-
-    return ProposalBriefData(
-      selfRef: metadata.selfRef,
-      authorName: authorName ?? '',
-      title: title ?? '',
-      description: description ?? '',
-      categoryName: categoryName ?? '',
-      durationInMonths: durationInMonths ?? 0,
-      fundsRequested: fundsRequested ?? Money.zero(currency: Currencies.fallback),
-      createdAt: metadata.version.dateTime,
-      iteration: data.iteration,
-      commentsCount: data.commentsCount,
-      isFinal: data.isFinal,
-      isFavorite: data.isFavorite,
-    );
-  }
-}
-
-extension on DocumentNodeId {
-  T? from<T extends Object>(Map<String, dynamic> data) {
-    return DocumentNodeTraverser.getValue<T>(this, data);
   }
 }

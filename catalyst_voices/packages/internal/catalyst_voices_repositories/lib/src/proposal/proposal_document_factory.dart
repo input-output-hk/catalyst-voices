@@ -1,0 +1,33 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_data_dto.dart';
+import 'package:catalyst_voices_repositories/src/dto/document/document_dto.dart';
+
+abstract final class ProposalDocumentFactory {
+  ProposalDocumentFactory._();
+
+  static ProposalDocument create(
+    DocumentData documentData, {
+    required ProposalTemplate template,
+  }) {
+    assert(
+      documentData.metadata.type == DocumentType.proposalDocument,
+      'Not a proposalDocument document data type',
+    );
+
+    final metadata = ProposalMetadata(
+      selfRef: documentData.metadata.selfRef,
+      templateRef: documentData.metadata.template!,
+      categoryId: documentData.metadata.categoryId!,
+      authors: documentData.metadata.authors ?? [],
+    );
+
+    final schema = template.schema;
+    final content = DocumentDataContentDto.fromModel(documentData.content);
+    final document = DocumentDto.fromJsonSchema(content, schema).toModel();
+
+    return ProposalDocument(
+      metadata: metadata,
+      document: document,
+    );
+  }
+}

@@ -120,13 +120,11 @@ final class Dependencies extends DependencyProvider {
           get<ProposalService>(),
         ),
       )
-      ..registerLazySingleton<VotingCubit>(
+      ..registerFactory<VotingCubit>(
         () => VotingCubit(
           get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
-          get<VotingBallotBuilder>(),
-          get<VotingService>(),
         ),
       )
       // TODO(LynxLynxx): add repository for campaign management
@@ -400,6 +398,7 @@ final class Dependencies extends DependencyProvider {
         get<SignerService>(),
         get<ActiveCampaignObserver>(),
         get<CastedVotesObserver>(),
+        get<VotingBallotBuilder>(),
       );
     });
     registerLazySingleton<CommentService>(() {
@@ -536,7 +535,10 @@ final class Dependencies extends DependencyProvider {
       dispose: (observer) async => observer.dispose(),
     );
     registerLazySingleton<CastedVotesObserver>(CastedVotesObserverImpl.new);
-    registerLazySingleton<VotingBallotBuilder>(VotingBallotLocalBuilder.new);
+    registerLazySingleton<VotingBallotBuilder>(
+      VotingBallotLocalBuilder.new,
+      dispose: (builder) => builder.dispose(),
+    );
 
     // Not a singleton
     registerFactory<RegistrationStatusPoller>(

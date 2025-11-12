@@ -68,30 +68,25 @@ final class DiscoveryCampaignState extends Equatable {
 
 final class DiscoveryMostRecentProposalsState extends Equatable {
   final List<ProposalBrief> proposals;
-  final bool showComments;
   final bool showSection;
 
   const DiscoveryMostRecentProposalsState({
     this.proposals = const [],
-    this.showComments = false,
     this.showSection = false,
   });
 
   @override
   List<Object?> get props => [
     proposals,
-    showComments,
     showSection,
   ];
 
   DiscoveryMostRecentProposalsState copyWith({
     List<ProposalBrief>? proposals,
-    bool? showComments,
     bool? showSection,
   }) {
     return DiscoveryMostRecentProposalsState(
       proposals: proposals ?? this.proposals,
-      showComments: showComments ?? this.showComments,
       showSection: showSection ?? this.showSection,
     );
   }

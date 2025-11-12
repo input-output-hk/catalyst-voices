@@ -23,8 +23,7 @@ class VotingState extends Equatable {
   final VotingPowerViewModel votingPower;
   final VotingPhaseProgressDetailsViewModel? votingPhase;
   final bool hasSearchQuery;
-  final List<String> favoritesIds;
-  final ProposalsCount count;
+  final Map<VotingPageTab, int> count;
   final List<ProposalsCategorySelectorItem> categorySelectorItems;
 
   const VotingState({
@@ -33,8 +32,7 @@ class VotingState extends Equatable {
     this.votingPower = const VotingPowerViewModel(),
     this.votingPhase,
     this.hasSearchQuery = false,
-    this.favoritesIds = const [],
-    this.count = const ProposalsCount(),
+    this.count = const {},
     this.categorySelectorItems = const [],
   });
 
@@ -52,7 +50,6 @@ class VotingState extends Equatable {
     votingPower,
     votingPhase,
     hasSearchQuery,
-    favoritesIds,
     count,
     categorySelectorItems,
   ];
@@ -67,8 +64,7 @@ class VotingState extends Equatable {
     VotingPowerViewModel? votingPower,
     Optional<VotingPhaseProgressDetailsViewModel>? votingPhase,
     bool? hasSearchQuery,
-    List<String>? favoritesIds,
-    ProposalsCount? count,
+    Map<VotingPageTab, int>? count,
     List<ProposalsCategorySelectorItem>? categorySelectorItems,
   }) {
     return VotingState(
@@ -77,7 +73,6 @@ class VotingState extends Equatable {
       votingPower: votingPower ?? this.votingPower,
       votingPhase: votingPhase.dataOr(this.votingPhase),
       hasSearchQuery: hasSearchQuery ?? this.hasSearchQuery,
-      favoritesIds: favoritesIds ?? this.favoritesIds,
       count: count ?? this.count,
       categorySelectorItems: categorySelectorItems ?? this.categorySelectorItems,
     );

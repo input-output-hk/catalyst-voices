@@ -23,7 +23,6 @@ class MostRecentProposalsList extends StatelessWidget {
         return _MostRecentProposalsList(
           scrollController: scrollController,
           proposals: state.proposals,
-          showComments: state.showComments,
         );
       },
     );
@@ -32,12 +31,10 @@ class MostRecentProposalsList extends StatelessWidget {
 
 class _MostRecentProposalsList extends StatelessWidget {
   final List<ProposalBrief> proposals;
-  final bool showComments;
   final ScrollController? scrollController;
 
   const _MostRecentProposalsList({
     required this.proposals,
-    required this.showComments,
     this.scrollController,
   });
 
@@ -58,7 +55,6 @@ class _MostRecentProposalsList extends StatelessWidget {
             proposal: proposal,
             onTap: () => _onCardTap(context, ref),
             onFavoriteChanged: (value) => _onCardFavoriteChanged(context, ref, value),
-            showComments: showComments,
           ),
         );
       },

@@ -16,10 +16,7 @@ class ProposalBriefCard extends StatefulWidget {
   final VoidCallback? onTap;
   final ValueChanged<bool>? onFavoriteChanged;
   final ValueChanged<VoteButtonAction>? onVoteAction;
-
-  // TODO(LynxxLynx): This should come from campaign settings
-  final bool readOnly;
-  final bool showComments;
+  final bool canVote;
 
   const ProposalBriefCard({
     super.key,
@@ -27,8 +24,7 @@ class ProposalBriefCard extends StatefulWidget {
     this.onTap,
     this.onFavoriteChanged,
     this.onVoteAction,
-    this.readOnly = false,
-    this.showComments = true,
+    this.canVote = true,
   });
 
   @override
@@ -189,7 +185,7 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
   Widget build(BuildContext context) {
     final proposal = widget.proposal;
 
-    final voteData = proposal is ProposalBriefVoting ? proposal.voteData : null;
+    final voteData = proposal.voteData;
     final onVoteAction = widget.onVoteAction;
 
     return ConstrainedBox(
@@ -243,15 +239,16 @@ class _ProposalBriefCardState extends State<ProposalBriefCard> {
                     publish: proposal.publish,
                     version: proposal.versionNumber,
                     updateDate: proposal.updateDate,
-                    commentsCount: widget.showComments ? proposal.commentsCount : null,
+                    commentsCount: proposal.commentsCount,
                   ),
-                  if (voteData?.hasVoted ?? false) const SizedBox(height: 12),
-                  if (voteData != null && onVoteAction != null)
+                  if (voteData != null && onVoteAction != null) ...[
+                    const SizedBox(height: 12),
                     VoteButton(
                       data: voteData,
                       onSelected: onVoteAction,
-                      readOnly: widget.readOnly,
+                      readOnly: !widget.canVote,
                     ),
+                  ],
                 ],
               ),
             ),

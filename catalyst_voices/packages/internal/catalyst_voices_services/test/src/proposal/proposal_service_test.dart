@@ -15,6 +15,7 @@ void main() {
   late MockUserService mockUserService;
   late MockSignerService mockSignerService;
   late MockCastedVotesObserver mockCastedVotesObserver;
+  late VotingBallotBuilder ballotBuilder;
 
   late ProposalService proposalService;
 
@@ -25,6 +26,7 @@ void main() {
     mockUserService = MockUserService();
     mockActiveCampaignObserver = MockActiveCampaignObserver();
     mockCastedVotesObserver = MockCastedVotesObserver();
+    ballotBuilder = VotingBallotLocalBuilder();
 
     proposalService = ProposalService(
       mockProposalRepository,
@@ -33,6 +35,7 @@ void main() {
       mockSignerService,
       mockActiveCampaignObserver,
       mockCastedVotesObserver,
+      ballotBuilder,
     );
 
     registerFallbackValue(const SignedDocumentRef(id: 'fallback-id'));
