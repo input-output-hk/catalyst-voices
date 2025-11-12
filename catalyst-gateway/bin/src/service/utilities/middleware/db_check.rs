@@ -1,6 +1,6 @@
 //! Middleware to verify that there is connection the databases.
 
-use poem::{http::StatusCode, Endpoint, Middleware, Request, Result};
+use poem::{Endpoint, Middleware, Request, Result, http::StatusCode};
 use tracing::error;
 
 use crate::service::utilities::health::{event_db_is_live, index_db_is_live};

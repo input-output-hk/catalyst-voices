@@ -1,8 +1,8 @@
 //! Define `Precondition Failed` response type.
 
 use poem_openapi::{
-    types::{Example, ToJSON},
     Object,
+    types::{Example, ToJSON},
 };
 
 use crate::service::{common, common::types::array_types::impl_array_types};

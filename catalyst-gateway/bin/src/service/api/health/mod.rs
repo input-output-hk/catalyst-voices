@@ -1,5 +1,5 @@
 //! Health Endpoints
-use poem_openapi::{param::Query, OpenApi};
+use poem_openapi::{OpenApi, param::Query};
 
 use crate::service::common::{
     auth::{api_key::InternalApiKeyAuthorization, none::NoAuthorization},

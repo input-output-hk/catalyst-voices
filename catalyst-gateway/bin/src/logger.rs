@@ -5,10 +5,10 @@ use std::sync::OnceLock;
 use clap::ValueEnum;
 use tracing::{level_filters::LevelFilter, log::error};
 use tracing_subscriber::{
+    Registry,
     fmt::{self, format::FmtSpan, time},
     prelude::*,
     reload::{self, Handle},
-    Registry,
 };
 
 use crate::settings::Settings;

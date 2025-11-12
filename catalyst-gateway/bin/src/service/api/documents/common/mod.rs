@@ -6,7 +6,7 @@ use catalyst_signed_doc::CatalystSignedDocument;
 use crate::{
     db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
     service::common::auth::rbac::token::CatalystRBACTokenV1,
-    settings::{admin::get_admin_key, Settings},
+    settings::{Settings, admin::get_admin_key},
 };
 
 /// A wrapper struct to unify both implementations of `CatalystSignedDocumentProvider` and
@@ -238,7 +238,9 @@ impl VerifyingKeyProvider {
             })?;
 
         if rotation != kid_rotation {
-            anyhow::bail!("Invalid KID {kid}: KID's rotation ({kid_rotation}) is not the latest rotation ({rotation})");
+            anyhow::bail!(
+                "Invalid KID {kid}: KID's rotation ({kid_rotation}) is not the latest rotation ({rotation})"
+            );
         }
 
         Ok(Self {
