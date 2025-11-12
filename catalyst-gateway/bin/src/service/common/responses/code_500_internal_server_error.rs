@@ -1,6 +1,6 @@
 //! Define `ServerError` type.
 
-use poem_openapi::{types::Example, Object};
+use poem_openapi::{Object, types::Example};
 use uuid::Uuid;
 
 /// While using macro-vis lib, you will get the `uncommon_codepoints` warning, so you will

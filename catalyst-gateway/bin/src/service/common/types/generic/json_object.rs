@@ -6,7 +6,7 @@ use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseResult, ToJSON, Type},
 };
-use serde_json::{json, Map, Value};
+use serde_json::{Map, Value, json};
 
 /// `JSON` Object API definition
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]

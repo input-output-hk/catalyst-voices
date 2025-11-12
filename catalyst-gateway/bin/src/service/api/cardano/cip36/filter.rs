@@ -4,18 +4,18 @@ use std::{cmp::Reverse, sync::Arc};
 
 use cardano_chain_follower::StakeAddress;
 use dashmap::DashMap;
-use futures::{future, StreamExt};
+use futures::{StreamExt, future};
 use poem_openapi::types::ParseFromJSON;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use tracing::error;
 
 use super::{
+    SlotNo,
     cardano::{cip19_shelley_address::Cip19ShelleyAddress, nonce::Nonce},
     response::{
         AllRegistration, Cip36Details, Cip36Registration, Cip36RegistrationList,
         Cip36RegistrationsForVotingPublicKey,
     },
-    SlotNo,
 };
 use crate::{
     db::index::{

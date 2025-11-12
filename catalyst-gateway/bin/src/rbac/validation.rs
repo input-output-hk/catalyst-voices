@@ -3,9 +3,9 @@
 use std::collections::{HashMap, HashSet};
 
 use anyhow::{Context, Result};
-use cardano_chain_follower::{hashes::TransactionId, StakeAddress};
+use cardano_chain_follower::{StakeAddress, hashes::TransactionId};
 use catalyst_types::{
-    catalyst_id::{role_index::RoleId, CatalystId},
+    catalyst_id::{CatalystId, role_index::RoleId},
     problem_report::ProblemReport,
 };
 use ed25519_dalek::VerifyingKey;
@@ -21,10 +21,10 @@ use crate::{
         session::CassandraSession,
     },
     rbac::{
+        RbacBlockIndexingContext, RbacValidationError, RbacValidationResult, RbacValidationSuccess,
         chains_cache::{cache_persistent_rbac_chain, cached_persistent_rbac_chain},
         get_chain::{apply_regs, build_rbac_chain, persistent_rbac_chain},
-        latest_rbac_chain, RbacBlockIndexingContext, RbacValidationError, RbacValidationResult,
-        RbacValidationSuccess,
+        latest_rbac_chain,
     },
 };
 
@@ -355,13 +355,12 @@ async fn validate_public_keys(
         if let Some((key, _)) = chain.get_latest_signing_pk_for_role(role) {
             keys.insert(key);
             if let Some(previous) = catalyst_id_from_public_key(key, is_persistent, context).await?
+                && previous != catalyst_id
             {
-                if previous != catalyst_id {
-                    report.functional_validation(
+                report.functional_validation(
                         &format!("An update to {catalyst_id} registration chain uses the same public key ({key:?}) as {previous} chain"),
                         "It isn't allowed to use role 0 signing (certificate subject public) key in different chains",
                     );
-                }
             }
         }
     }
