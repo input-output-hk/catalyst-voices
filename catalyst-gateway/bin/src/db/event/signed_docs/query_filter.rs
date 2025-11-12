@@ -3,7 +3,7 @@
 use std::fmt::Display;
 
 use super::DocumentRef;
-use crate::db::event::common::eq_or_ranged_uuid::EqOrRangedUuid;
+use crate::db::event::common::eq_or_ranged_uuid::UuidSelector;
 
 /// A `select_signed_docs` query filtering argument.
 /// If all fields would be `None` the query will search for all entries from the db.
@@ -12,9 +12,9 @@ pub(crate) struct DocsQueryFilter {
     /// `type` field. Empty list if unspecified.
     doc_type: Vec<uuid::Uuid>,
     /// `id` field. `None` if unspecified.
-    id: Option<EqOrRangedUuid>,
+    id: Option<UuidSelector>,
     /// `ver` field. `None` if unspecified.
-    ver: Option<EqOrRangedUuid>,
+    ver: Option<UuidSelector>,
     /// `metadata->'ref'` field. Empty list if unspecified.
     doc_ref: Vec<DocumentRef>,
     /// `metadata->'template'` field. Empty list if unspecified.
@@ -95,7 +95,7 @@ impl DocsQueryFilter {
     /// Set the `id` field filter condition
     pub fn with_id(
         self,
-        id: EqOrRangedUuid,
+        id: UuidSelector,
     ) -> Self {
         DocsQueryFilter {
             id: Some(id),
@@ -106,7 +106,7 @@ impl DocsQueryFilter {
     /// Set the `ver` field filter condition
     pub fn with_ver(
         self,
-        ver: EqOrRangedUuid,
+        ver: UuidSelector,
     ) -> Self {
         DocsQueryFilter {
             ver: Some(ver),

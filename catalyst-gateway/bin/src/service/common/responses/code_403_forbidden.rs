@@ -1,8 +1,8 @@
 //! Define `Forbidden` response type.
 
 use poem_openapi::{
-    types::{Example, ToJSON},
     Object,
+    types::{Example, ToJSON},
 };
 use uuid::Uuid;
 

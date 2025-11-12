@@ -2,7 +2,7 @@
 
 use std::sync::LazyLock;
 
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 use crate::service::api_spec;
 
@@ -61,7 +61,7 @@ pub(crate) fn update_refs(
                     "$ref" => {
                         // Modify the ref value to a new path, which is
                         // "#/definitions/{schema_name}"
-                        if let Value::String(ref ref_str) = value {
+                        if let Value::String(ref_str) = value {
                             let original_ref = ref_str.clone();
                             let parts: Vec<&str> = ref_str.split('/').collect();
                             if let Some(schema_name) = parts.last() {
@@ -92,16 +92,16 @@ pub(crate) fn update_refs(
     // Traverse the references and retrieve the values
     for r in references {
         let path = extract_ref(&r);
-        if let Some(value) = get_nested_value(base, &path) {
-            if let Some(obj) = value.as_object() {
-                for (key, val) in obj {
-                    if let Some(definitions_obj) = definitions
-                        .get_mut("definitions")
-                        .and_then(|v| v.as_object_mut())
-                    {
-                        // Insert the key-value pair into the definitions object
-                        definitions_obj.insert(key.clone(), val.clone());
-                    }
+        if let Some(value) = get_nested_value(base, &path)
+            && let Some(obj) = value.as_object()
+        {
+            for (key, val) in obj {
+                if let Some(definitions_obj) = definitions
+                    .get_mut("definitions")
+                    .and_then(|v| v.as_object_mut())
+                {
+                    // Insert the key-value pair into the definitions object
+                    definitions_obj.insert(key.clone(), val.clone());
                 }
             }
         }
@@ -139,7 +139,7 @@ fn get_nested_value(
 
     for segment in path {
         current_value = match current_value {
-            Value::Object(ref obj) => {
+            Value::Object(obj) => {
                 // If this is the last segment, return the key-value as a JSON object
                 if segment == path.last().unwrap_or(&String::new()) {
                     return obj.get(segment).map(|v| json!({ segment: v }));
@@ -169,7 +169,7 @@ fn extract_ref(ref_str: &str) -> Vec<String> {
 
 #[cfg(test)]
 mod test {
-    use serde_json::{json, Value};
+    use serde_json::{Value, json};
 
     use crate::utils::schema::{extract_json_schema_for, update_refs};
 

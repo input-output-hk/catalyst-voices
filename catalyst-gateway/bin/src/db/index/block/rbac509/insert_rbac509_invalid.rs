@@ -2,10 +2,10 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_chain_follower::{hashes::TransactionId, Slot, TxnIndex};
+use cardano_chain_follower::{Slot, TxnIndex, hashes::TransactionId};
 use catalyst_types::{catalyst_id::CatalystId, problem_report, uuid::UuidV4};
 use poem_openapi::types::ToJSON;
-use scylla::{client::session::Session, value::MaybeUnset, SerializeRow};
+use scylla::{SerializeRow, client::session::Session, value::MaybeUnset};
 use tracing::error;
 
 use crate::{

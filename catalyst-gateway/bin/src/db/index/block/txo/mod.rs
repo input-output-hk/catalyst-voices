@@ -10,7 +10,7 @@ pub(crate) mod insert_unstaked_txo_asset;
 use std::sync::Arc;
 
 use cardano_chain_follower::{
-    hashes::TransactionId, Network, Slot, StakeAddress, TxnIndex, TxnOutputOffset,
+    Network, Slot, StakeAddress, TxnIndex, TxnOutputOffset, hashes::TransactionId,
 };
 use scylla::client::session::Session;
 use tracing::{error, warn};

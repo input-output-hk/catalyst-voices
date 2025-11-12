@@ -3,10 +3,10 @@
 use std::sync::Arc;
 
 use cardano_chain_follower::{
-    hashes::{Blake2b256Hash, TransactionId},
     Slot, TxnOutputOffset,
+    hashes::{Blake2b256Hash, TransactionId},
 };
-use scylla::{client::session::Session, SerializeRow};
+use scylla::{SerializeRow, client::session::Session};
 use tracing::error;
 
 use crate::{
