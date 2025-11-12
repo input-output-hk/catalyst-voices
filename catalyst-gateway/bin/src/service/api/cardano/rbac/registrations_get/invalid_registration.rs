@@ -1,10 +1,10 @@
 //! An invalid RBAC registration.
 
-use cardano_chain_follower::{hashes::TransactionId, Slot};
+use cardano_chain_follower::{Slot, hashes::TransactionId};
 use catalyst_types::uuid::UuidV4;
 use poem_openapi::{
-    types::{Example, ParseFromJSON},
     Object,
+    types::{Example, ParseFromJSON},
 };
 
 use crate::{

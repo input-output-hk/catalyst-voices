@@ -6,16 +6,18 @@ use std::sync::LazyLock;
 
 use anyhow::bail;
 use poem_openapi::{
+    NewType, Object, Union,
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
     types::{Example, ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
-    NewType, Object, Union,
 };
 use serde_json::Value;
 
 use self::generic::uuidv7;
 use crate::{
-    db::event::common::eq_or_ranged_uuid::EqOrRangedUuid,
-    service::common::types::{generic, string_types::impl_string_types},
+    db::event::common::eq_or_ranged_uuid::UuidSelector,
+    service::common::types::{
+        array_types::impl_array_types, generic, string_types::impl_string_types,
+    },
 };
 
 /// Title.
@@ -134,6 +136,32 @@ impl From<catalyst_signed_doc::UuidV7> for DocumentVer {
     }
 }
 
+impl_array_types!(
+    DocumentVerList,
+    DocumentVer,
+    Some(MetaSchema {
+        example: Self::example().to_json(),
+        max_items: Some(100),
+        items: Some(Box::new(DocumentVer::schema_ref())),
+        ..MetaSchema::ANY
+    })
+);
+
+impl Example for DocumentVerList {
+    fn example() -> Self {
+        Self(vec![DocumentVer::example()])
+    }
+}
+
+impl PartialEq for DocumentVerList {
+    fn eq(
+        &self,
+        other: &Self,
+    ) -> bool {
+        self.0.eq(&other.0)
+    }
+}
+
 #[derive(Object, Debug, Clone, PartialEq)]
 #[oai(example = true)]
 /// Version Range
@@ -212,35 +240,81 @@ impl Example for VerRangeDocumented {
     }
 }
 
+/// Document versions from the list.
+#[derive(Object, Debug, Clone, PartialEq)]
+#[oai(example = true)]
+pub(crate) struct VerIn {
+    /// Matching any document versions from the list.
+    r#in: DocumentVerList,
+}
+
+impl Example for VerIn {
+    fn example() -> Self {
+        Self {
+            r#in: DocumentVerList::example(),
+        }
+    }
+}
+
+// Note: We need to do this, because POEM doesn't give us a way to set `"title"` for the
+// openapi docs on an object.
+#[derive(NewType, Debug, Clone, PartialEq)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+/// Document versions from the list.
+///
+/// A range of [Document Versions]().
+pub(crate) struct VerInDocumented(VerIn);
+
+impl Example for VerInDocumented {
+    fn example() -> Self {
+        Self(VerIn::example())
+    }
+}
+
 #[derive(Union, Debug, Clone, PartialEq)]
 #[oai(one_of)]
 /// Document or Range of Documents
 ///
 /// Either a Single Document Version, or a Range of Document Versions
-pub(crate) enum EqOrRangedVer {
+pub(crate) enum VerSelector {
     /// This exact Document ID
     Eq(VerEqDocumented),
     /// Document Versions in this range
     Range(VerRangeDocumented),
+    /// Document versions in the list.
+    In(VerInDocumented),
 }
 
-impl Example for EqOrRangedVer {
+impl Example for VerSelector {
     fn example() -> Self {
         Self::Range(VerRangeDocumented::example())
     }
 }
 
-impl TryFrom<EqOrRangedVer> for EqOrRangedUuid {
+impl TryFrom<VerSelector> for UuidSelector {
     type Error = anyhow::Error;
 
-    fn try_from(value: EqOrRangedVer) -> Result<Self, Self::Error> {
+    fn try_from(value: VerSelector) -> Result<Self, Self::Error> {
         match value {
-            EqOrRangedVer::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
-            EqOrRangedVer::Range(range) => {
+            VerSelector::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
+            VerSelector::Range(range) => {
                 Ok(Self::Range {
                     min: range.0.min.parse()?,
                     max: range.0.max.parse()?,
                 })
+            },
+            VerSelector::In(vers) => {
+                Ok(Self::In(
+                    Vec::<_>::from(vers.0.r#in)
+                        .into_iter()
+                        .map(|v| v.0.parse::<uuid::Uuid>())
+                        .collect::<Result<_, _>>()?,
+                ))
             },
         }
     }
@@ -256,26 +330,35 @@ impl TryFrom<EqOrRangedVer> for EqOrRangedUuid {
 /// Document Version Selector
 ///
 /// Either a absolute single Document Version or a range of Document Versions
-pub(crate) struct EqOrRangedVerDocumented(pub(crate) EqOrRangedVer);
+pub(crate) struct VerSelectorDocumented(pub(crate) VerSelector);
 
-impl Example for EqOrRangedVerDocumented {
+impl Example for VerSelectorDocumented {
     fn example() -> Self {
-        Self(EqOrRangedVer::example())
+        Self(VerSelector::example())
     }
 }
 
-impl TryFrom<EqOrRangedVerDocumented> for EqOrRangedUuid {
+impl TryFrom<VerSelectorDocumented> for Option<UuidSelector> {
     type Error = anyhow::Error;
 
-    fn try_from(value: EqOrRangedVerDocumented) -> Result<Self, Self::Error> {
+    fn try_from(value: VerSelectorDocumented) -> Result<Self, Self::Error> {
         match value.0 {
-            EqOrRangedVer::Eq(id) => Ok(Self::Eq(id.0.eq.parse()?)),
-            EqOrRangedVer::Range(range) => {
-                Ok(Self::Range {
+            VerSelector::Eq(ver) => Ok(Some(UuidSelector::Eq(ver.0.eq.parse()?))),
+            VerSelector::Range(range) => {
+                Ok(Some(UuidSelector::Range {
                     min: range.0.min.parse()?,
                     max: range.0.max.parse()?,
-                })
+                }))
             },
+            VerSelector::In(vers) if !vers.0.r#in.is_empty() => {
+                Ok(Some(UuidSelector::In(
+                    Vec::<_>::from(vers.0.r#in)
+                        .into_iter()
+                        .map(|v| v.0.parse())
+                        .collect::<Result<_, _>>()?,
+                )))
+            },
+            VerSelector::In(_) => Ok(None),
         }
     }
 }

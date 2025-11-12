@@ -2,8 +2,8 @@
 
 use std::alloc::System;
 
-use memory_stats::{memory_stats, MemoryStats};
-use stats_alloc::{Region, StatsAlloc, INSTRUMENTED_SYSTEM};
+use memory_stats::{MemoryStats, memory_stats};
+use stats_alloc::{INSTRUMENTED_SYSTEM, Region, StatsAlloc};
 
 use crate::settings::Settings;
 
@@ -60,7 +60,7 @@ mod reporter {
 
     use std::sync::LazyLock;
 
-    use prometheus::{register_int_gauge_vec, IntGaugeVec};
+    use prometheus::{IntGaugeVec, register_int_gauge_vec};
 
     /// Labels for the memory metrics
     const MEMORY_METRIC_LABELS: [&str; 2] = ["api_host_names", "service_id"];

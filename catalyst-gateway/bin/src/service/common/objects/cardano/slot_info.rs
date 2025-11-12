@@ -3,7 +3,7 @@
 use std::str::FromStr;
 
 use derive_more::{From, Into};
-use poem_openapi::{types::Example, NewType, Object};
+use poem_openapi::{NewType, Object, types::Example};
 
 use crate::service::common::{
     objects::cardano::hash::Hash256,

@@ -12,7 +12,7 @@ use std::{
     sync::LazyLock,
 };
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use cardano_chain_follower::Slot;
 use chrono::DateTime;
 use const_format::concatcp;
@@ -156,7 +156,7 @@ impl ParseFromParameter for AsAt {
 
 impl From<AsAt> for SlotNo {
     fn from(value: AsAt) -> Self {
-        value.0 .2
+        value.0.2
     }
 }
 
@@ -165,7 +165,7 @@ impl Display for AsAt {
         &self,
         f: &mut fmt::Formatter<'_>,
     ) -> fmt::Result {
-        write!(f, "{}:{}", self.0 .0, self.0 .1)
+        write!(f, "{}:{}", self.0.0, self.0.1)
     }
 }
 

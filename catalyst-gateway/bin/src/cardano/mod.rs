@@ -4,7 +4,7 @@ use std::{collections::BTreeSet, fmt::Display, sync::Arc, time::Duration};
 
 use cardano_chain_follower::{ChainFollower, ChainSyncConfig, MultiEraBlock, Network, Point, Slot};
 use duration_string::DurationString;
-use futures::{stream::FuturesUnordered, StreamExt};
+use futures::{StreamExt, stream::FuturesUnordered};
 use rand::{Rng, SeedableRng};
 use tokio::sync::watch;
 use tracing::{debug, error, info};
@@ -16,7 +16,7 @@ use crate::{
             roll_forward::{self, PurgeCondition},
         },
         queries::sync_status::{
-            get::{get_sync_status, SyncStatus},
+            get::{SyncStatus, get_sync_status},
             update::update_sync_status,
         },
         session::CassandraSession,
@@ -25,7 +25,7 @@ use crate::{
     service::utilities::health::{
         set_follower_immutable_first_reached_tip, set_follower_live_first_reached_tip,
     },
-    settings::{chain_follower, Settings},
+    settings::{Settings, chain_follower},
 };
 
 /// How long we wait between checks for connection to the indexing DB to be ready.

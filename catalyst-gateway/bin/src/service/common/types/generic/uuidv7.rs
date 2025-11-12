@@ -47,10 +47,10 @@ fn is_valid(uuidv7: &str) -> bool {
     #[allow(clippy::unwrap_used)] // Safe because the Regex is constant.
     static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
 
-    if RE.is_match(uuidv7) {
-        if let Ok(uuid) = uuid::Uuid::parse_str(uuidv7) {
-            return uuid.get_version() == Some(uuid::Version::SortRand);
-        }
+    if RE.is_match(uuidv7)
+        && let Ok(uuid) = uuid::Uuid::parse_str(uuidv7)
+    {
+        return uuid.get_version() == Some(uuid::Version::SortRand);
     }
     false
 }
