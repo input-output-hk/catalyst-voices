@@ -34,7 +34,7 @@ class CatalystStartupProfiler extends CatalystBaseProfiler {
   }) async {
     assert(ongoing, 'Startup profiler already finished');
 
-    return timeline!.time('sync', body);
+    return timeline!.time('startup_documents_sync', body);
   }
 
   Future<void> imagesCache({
