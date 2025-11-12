@@ -19,6 +19,7 @@ def event_db_proxy():
     yield proxy
 
 @pytest.mark.health_with_proxy_endpoint
+# @pytest.mark.skip("...")
 def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory):
     # Not registered stake address
     # Cardano test data CIP0019
@@ -63,7 +64,7 @@ def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory)
     resp = document.post(filter={},limit=10,page=0)
     assert(resp.status_code == 200), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
 
-@pytest.mark.health_with_proxy_endpoint1
+@pytest.mark.health_with_proxy_endpoint
 @pytest.mark.skip("...")
 def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory):
     # Not registered stake address
@@ -85,14 +86,14 @@ def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory)
     index_db_proxy.disable()
     health.is_ready() #assertion
     # index-db threshold to start returning 503
-    sleep(280)
-    # Index DB testing
-    health.is_not_ready(5) #assertion
-    resp = rbac.get(lookup=stake_address_not_registered, token=auth_token)
-    assert(resp.status_code == 503), f"Expected RBAC lookup to fail: {resp.status_code} - {resp.text}"
+    # sleep(280)
+    health.is_not_ready(280) #assertion
     # Event DB testing
     resp = document.post(filter={},limit=10,page=0)
     assert(resp.status_code == 503), f"Expected document index to fail: {resp.status_code} - {resp.text}"
+    # Index DB testing
+    resp = rbac.get(lookup=stake_address_not_registered, token=auth_token)
+    assert(resp.status_code == 503), f"Expected RBAC lookup to fail: {resp.status_code} - {resp.text}"
 
     # resume index db comms
     index_db_proxy.enable()
