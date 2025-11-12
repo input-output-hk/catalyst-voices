@@ -1,10 +1,10 @@
 //! Either has No Authorization, or RBAC Token.
 
 use poem::{
-    web::headers::{authorization::Bearer, Authorization, HeaderMapExt},
     Request, RequestBody,
+    web::headers::{Authorization, HeaderMapExt, authorization::Bearer},
 };
-use poem_openapi::{registry::Registry, ApiExtractor, ApiExtractorType, ExtractParamOptions};
+use poem_openapi::{ApiExtractor, ApiExtractorType, ExtractParamOptions, registry::Registry};
 
 use super::{
     none::NoAuthorization,

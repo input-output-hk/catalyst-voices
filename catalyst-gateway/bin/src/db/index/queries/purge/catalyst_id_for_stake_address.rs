@@ -3,9 +3,9 @@
 use std::{fmt::Debug, sync::Arc};
 
 use scylla::{
+    SerializeRow,
     client::{pager::TypedRowStream, session::Session},
     statement::prepared::PreparedStatement,
-    SerializeRow,
 };
 use tracing::error;
 
@@ -13,8 +13,8 @@ use crate::{
     db::{
         index::{
             queries::{
-                purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
                 FallibleQueryResults, SizedBatch,
+                purge::{PreparedDeleteQuery, PreparedQueries, PreparedSelectQuery},
             },
             session::CassandraSession,
         },

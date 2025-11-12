@@ -12,7 +12,7 @@ use std::{
 };
 
 use anyhow::{Context, Result};
-use cardano_chain_follower::{hashes::TransactionId, MultiEraBlock, Slot, TxnIndex};
+use cardano_chain_follower::{MultiEraBlock, Slot, TxnIndex, hashes::TransactionId};
 use rbac_registration::cardano::cip509::Cip509;
 use scylla::client::session::Session;
 use tokio::sync::watch;
@@ -25,8 +25,8 @@ use crate::{
     },
     metrics::caches::rbac::{inc_index_sync, inc_invalid_rbac_reg_count},
     rbac::{
-        validate_rbac_registration, RbacBlockIndexingContext, RbacValidationError,
-        RbacValidationSuccess,
+        RbacBlockIndexingContext, RbacValidationError, RbacValidationSuccess,
+        validate_rbac_registration,
     },
     settings::cassandra_db::EnvVars,
 };
