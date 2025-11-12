@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use catalyst_types::catalyst_id::role_index::RoleId;
-use poem_openapi::{types::Example, Object};
+use poem_openapi::{Object, types::Example};
 
 use crate::{
     rbac::ChainInfo,

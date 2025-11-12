@@ -238,7 +238,7 @@ pub(crate) async fn create_schema(
                     errors.push(anyhow::anyhow!(
                         "Failed to Execute Create Schema Query: {err}\n--\nSchema: {schema_name}\n--\n{schema}"
                     ));
-                };
+                }
             },
             Err(err) => {
                 error!(schema=schema_name, error=%err, "Failed to Prepare Create Schema Query");

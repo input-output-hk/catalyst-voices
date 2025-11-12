@@ -5,9 +5,9 @@
 use std::sync::Arc;
 
 use cardano_chain_follower::{
-    hashes::TransactionId, Slot, StakeAddress, TxnIndex, TxnOutputOffset,
+    Slot, StakeAddress, TxnIndex, TxnOutputOffset, hashes::TransactionId,
 };
-use scylla::{client::session::Session, SerializeRow};
+use scylla::{SerializeRow, client::session::Session};
 use tracing::error;
 
 use crate::{

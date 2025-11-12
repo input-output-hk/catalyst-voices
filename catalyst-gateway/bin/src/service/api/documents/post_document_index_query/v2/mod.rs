@@ -6,7 +6,7 @@ pub(crate) mod response;
 use std::collections::HashMap;
 
 use futures::TryStreamExt;
-use poem_openapi::{payload::Json, ApiResponse};
+use poem_openapi::{ApiResponse, payload::Json};
 
 use crate::{
     db::event::{

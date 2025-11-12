@@ -24,15 +24,15 @@ use tracing::{debug, error, info};
 
 use super::{
     queries::{
-        purge::{self, PreparedDeleteQuery},
         FallibleQueryResults, PreparedQueries, PreparedQuery, PreparedSelectQuery,
         PreparedUpsertQuery,
+        purge::{self, PreparedDeleteQuery},
     },
     schema::create_schema,
 };
 use crate::{
     service::utilities::health::{index_db_is_live, set_index_db_liveness},
-    settings::{cassandra_db, Settings},
+    settings::{Settings, cassandra_db},
 };
 
 /// Configuration Choices for compression
@@ -383,10 +383,10 @@ async fn make_session(cfg: &cassandra_db::EnvVars) -> anyhow::Result<Arc<Session
     }
 
     // Set the username and password, if required.
-    if let Some(username) = &cfg.username {
-        if let Some(password) = &cfg.password {
-            sb = sb.user(username.as_str(), password.as_str());
-        }
+    if let Some(username) = &cfg.username
+        && let Some(password) = &cfg.password
+    {
+        sb = sb.user(username.as_str(), password.as_str());
     }
 
     let session = Box::pin(sb.build()).await?;
