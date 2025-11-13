@@ -1,14 +1,12 @@
 //! A module for placing common structs, functions, and variables across the `document`
 //! endpoint module not specified to a specific endpoint.
 
-use std::collections::HashMap;
-
 use catalyst_signed_doc::CatalystSignedDocument;
 
 use crate::{
     db::event::{error::NotFoundError, signed_docs::FullSignedDoc},
     service::common::auth::rbac::token::CatalystRBACTokenV1,
-    settings::Settings,
+    settings::{Settings, admin::get_admin_key},
 };
 
 /// A wrapper struct to unify both implementations of `CatalystSignedDocumentProvider` and
@@ -70,9 +68,13 @@ impl catalyst_signed_doc::providers::CatalystIdProvider for ValidationProvider {
         &self,
         kid: &catalyst_signed_doc::CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
-        self.verifying_key_provider
-            .try_get_registered_key(kid)
-            .await
+        if kid.is_admin() {
+            Ok(get_admin_key(kid))
+        } else {
+            self.verifying_key_provider
+                .try_get_registered_key(kid)
+                .await
+        }
     }
 }
 
@@ -157,16 +159,23 @@ impl catalyst_signed_doc_v1::providers::CatalystSignedDocumentProvider for DocPr
 // TODO: make the struct to support multi sigs validation
 /// A struct which implements a
 /// `catalyst_signed_doc::providers::CatalystSignedDocumentProvider` trait
-pub(crate) struct VerifyingKeyProvider(
-    HashMap<catalyst_signed_doc::CatalystId, ed25519_dalek::VerifyingKey>,
-);
+pub(crate) struct VerifyingKeyProvider {
+    /// A user's `CatalystId` from the corresponding `CatalystRBACTokenV1`
+    kid: catalyst_signed_doc::CatalystId,
+    /// A corresponding `VerifyingKey` derived from the `CatalystRBACTokenV1`
+    pk: ed25519_dalek::VerifyingKey,
+}
 
 impl catalyst_signed_doc::providers::CatalystIdProvider for VerifyingKeyProvider {
     async fn try_get_registered_key(
         &self,
         kid: &catalyst_signed_doc::CatalystId,
     ) -> anyhow::Result<Option<ed25519_dalek::VerifyingKey>> {
-        Ok(self.0.get(kid).copied())
+        if &self.kid == kid {
+            Ok(Some(self.pk))
+        } else {
+            Ok(None)
+        }
     }
 }
 
@@ -203,10 +212,11 @@ impl VerifyingKeyProvider {
             anyhow::bail!("Multi-signature document is currently unsupported");
         }
 
-        if kids
-            .iter()
-            .any(|kid| kid.as_short_id() != token.catalyst_id().as_short_id())
-        {
+        let [kid] = kids else {
+            anyhow::bail!("Multi-signature document is currently unsupported");
+        };
+
+        if kid != token.catalyst_id() {
             anyhow::bail!("RBAC Token CatID does not match with the document KIDs");
         }
 
@@ -214,28 +224,28 @@ impl VerifyingKeyProvider {
             anyhow::bail!("Failed to retrieve a registration from corresponding Catalyst ID");
         };
 
-        let result = kids.iter().map(|kid| {
-            if !kid.is_signature_key() {
-                anyhow::bail!("Invalid KID {kid}: KID must be a signing key not an encryption key");
-            }
+        if !kid.is_signature_key() {
+            anyhow::bail!("Invalid KID {kid}: KID must be a signing key not an encryption key");
+        }
 
-            let (kid_role_index, kid_rotation) = kid.role_and_rotation();
-            let (latest_pk, rotation) = reg_chain
-                .get_latest_signing_pk_for_role(&kid_role_index)
-                .ok_or_else(|| {
+        let (kid_role_index, kid_rotation) = kid.role_and_rotation();
+        let (latest_pk, rotation) = reg_chain
+            .get_latest_signing_pk_for_role(&kid_role_index)
+            .ok_or_else(|| {
                 anyhow::anyhow!(
                     "Failed to get last signing key for the proposer role for {kid} Catalyst ID"
                 )
             })?;
 
-            if rotation != kid_rotation {
-                anyhow::bail!("Invalid KID {kid}: KID's rotation ({kid_rotation}) is not the latest rotation ({rotation})");
-            }
+        if rotation != kid_rotation {
+            anyhow::bail!(
+                "Invalid KID {kid}: KID's rotation ({kid_rotation}) is not the latest rotation ({rotation})"
+            );
+        }
 
-            Ok((kid.clone(), latest_pk))
+        Ok(Self {
+            kid: kid.clone(),
+            pk: latest_pk,
         })
-        .collect::<Result<_, _>>()?;
-
-        Ok(Self(result))
     }
 }

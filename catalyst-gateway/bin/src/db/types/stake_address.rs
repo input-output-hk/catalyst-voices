@@ -5,12 +5,12 @@ use std::fmt::{Debug, Display, Formatter};
 
 use cardano_chain_follower::StakeAddress;
 use scylla::{
-    deserialize::{value::DeserializeValue, DeserializationError, FrameSlice, TypeCheckError},
+    deserialize::{DeserializationError, FrameSlice, TypeCheckError, value::DeserializeValue},
     frame::response::result::ColumnType,
     serialize::{
+        SerializationError,
         value::SerializeValue,
         writers::{CellWriter, WrittenCellProof},
-        SerializationError,
     },
 };
 

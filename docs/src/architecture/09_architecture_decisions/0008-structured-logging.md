@@ -26,37 +26,39 @@ That both the Frontend and Backend are using logging libraries capable of struct
 * We will use structured logging for all log messages that are to be sent to a log collection system.
 * We will not use string formatting within structured log messages, but embed all data within fields in the log message.
 * All log levels *MUST* use structured logging.
-  * It is possible that **DEBUG** or **TRACE** level logs can selectively be enabled in production to help investigate issues.
+    * It is possible that **DEBUG** or **TRACE** level logs can selectively be enabled in production to help investigate issues.
 * Log text messages should be specific enough to identify the actual log messages when searching or summarizing logs.
-  * Avoid using the same log message multiple times in the same code.
+    * Avoid using the same log message multiple times in the same code.
 * As far as we are able, we should be consistent with field names.
-  * For example, we always use "error" for error values, not "Error" or "err" or "e".
-  * Fields do not need to have the same name as the variable, what is important is the field name be unambiguous and consistent.
+    * For example, we always use "error" for error values, not "Error" or "err" or "e".
+    * Fields do not need to have the same name as the variable, what is important is the field name be unambiguous and consistent.
 * Logs *MUST* include the date and time of the event being logged.
-  * Date and Time *MUST* always be referenced to UTC, and not Local Time.
-  * Date and Time *SHOULD* be formatted according to [RFC3339] (An open formalized subset of [ISO8601]).
-  * If [RFC3339] is not possible to use, then [ISO8601] format *MAY* be used instead.
+    * Date and Time *MUST* always be referenced to UTC, and not Local Time.
+    * Date and Time *SHOULD* be formatted according to [RFC3339] (An open formalized subset of [ISO8601]).
+    * If [RFC3339] is not possible to use, then [ISO8601] format *MAY* be used instead.
 * Logs *SHOULD*, if possible, include the filename, and line of the log message in the code.
 * Loggers *SHOULD* be configured to automatically include log fields required for every log message.
 * All logs *MUST* obfuscate a client's private information before logging.
-  * A non-exhaustive list of private information includes:
-    * IP Addresses
-    * User-Agent Strings
-    * Location Information (Longitude/Latitude)
-    * Device identifiers (IMEI, MAC Address, etc.)
-    * Browser Fingerprints
-  * For data like this, that uniquely identifies a client or session, the obfuscation of that data should be consistent.
-    * For example, `ip addresses` can be hashed and turned into a [UUID].
-      * The [UUID] in this case will always be the same for an `ip address`.
-      * The privacy of the client is protected because it is not easily possible to derive the `ip address` from the [UUID].
-      * This gives us the ability to cluster multiple interactions from a common connection without revealing the users' identity.
-      * It also allows the Logs to help provide support to a user if they supply their IP Address. (Client Directed Unmasking).
+    * A non-exhaustive list of private information includes:
+        * IP Addresses
+        * User-Agent Strings
+        * Location Information (Longitude/Latitude)
+        * Device identifiers (IMEI, MAC Address, etc.)
+        * Browser Fingerprints
+    * For data like this, that uniquely identifies a client or session, the obfuscation of that data should be consistent.
+        * For example, `ip addresses` can be hashed and turned into a [UUID].
+            * The [UUID] in this case will always be the same for an `ip address`.
+            * The privacy of the client is protected because it is not easily possible to derive the `ip address` from the [UUID].
+            * This gives us the ability to cluster multiple interactions from a common connection without
+              revealing the users' identity.
+            * It also allows the Logs to help provide support to a user if they supply their IP Address.
+             (Client Directed Unmasking).
 * *NEVER* log Security sensitive information either in the clear or obfuscated, such as (non-exhaustive):
-  * Usernames
-  * Email Addresses
-  * Passwords
-  * API Keys
-  * Private Encryption Keys
+    * Usernames
+    * Email Addresses
+    * Passwords
+    * API Keys
+    * Private Encryption Keys
 
 *NOTE :* **IF AND ONLY IF** log messages are a developer convenience,
 **AND** will never be collected for online diagnostic purposes,
@@ -68,12 +70,12 @@ That both the Frontend and Backend are using logging libraries capable of struct
 The Standard Abstract Log levels are defined (from the highest priority to lowest) as:
 
 * **CRITICAL** *(Optional)* - When a system has completely failed.
-  * **ERROR** can also be used for this.
+    * **ERROR** can also be used for this.
 * **ERROR** - Something has failed which normally should not.
-  * Does not have to be a fatal failure.
-  * The Log message should clearly show if the error is fatal or unrecoverable.
-    * For example, a failed DB connection is an *ERROR* but is not fatal.
-    * Errors should be considered not fatal, unless they explicitly state otherwise.
+    * Does not have to be a fatal failure.
+    * The Log message should clearly show if the error is fatal or unrecoverable.
+        * For example, a failed DB connection is an *ERROR* but is not fatal.
+        * Errors should be considered not fatal, unless they explicitly state otherwise.
 * **WARNING** - Something which can happen, but normally shouldn't.
 * **INFO** - Important System informational messages.
 * **DEBUG** - Highest level detailed system operation logs.
@@ -87,7 +89,7 @@ In all such cases, use the next most appropriate level which matches closest wit
 #### Logging in Libraries
 
 * Libraries *SHOULD NOT* use *INFO* level logs.
-  * this level of log should be used only by applications or services.
+    * this level of log should be used only by applications or services.
 * Libraries *MAY* use any other log level.
 
 ### Log Verbosity
@@ -95,17 +97,17 @@ In all such cases, use the next most appropriate level which matches closest wit
 Logs should aim to provide exactly the right amount of information, and no more.
 
 * All **ERROR** logs should be logged in the most appropriate location.
-  * **ERROR** or **WARNING** logs, *SHOULD* include enough context to identify the actual source of the error.
+    * **ERROR** or **WARNING** logs, *SHOULD* include enough context to identify the actual source of the error.
 * Info level logs should only be used to provide ***IMPORTANT*** operational data.
-  * Such as:
-    * Build or configuration information.
-    * The start of internal persistent services
-  * **INFO** logs should not typically continuously stream as a result of normal system use.
-  * API Endpoint statistics logs are an example of an exception to this guidance.
-    * However, they *SHOULD* also have a method of selectively enabling/disabling these *INFO* logs.
-    * The same principle *SHOULD* apply to any other regularly logged **INFO** level logs that may be required.
+    * Such as:
+        * Build or configuration information.
+        * The start of internal persistent services
+    * **INFO** logs should not typically continuously stream as a result of normal system use.
+    * API Endpoint statistics logs are an example of an exception to this guidance.
+        * However, they *SHOULD* also have a method of selectively enabling/disabling these *INFO* logs.
+        * The same principle *SHOULD* apply to any other regularly logged **INFO** level logs that may be required.
 * **DEBUG** level logs should be assumed to be enabled selectively in production.
-  * Their purpose *SHOULD* be aimed to helping to diagnose faults.
+    * Their purpose *SHOULD* be aimed to helping to diagnose faults.
 * Detailed and Verbose or Streaming Debug level logs should be at **TRACE** level.
 
 ### Example of Unstructured Logging to avoid

@@ -42,7 +42,7 @@ mod reporter {
     use std::sync::LazyLock;
 
     use prometheus::{
-        register_int_counter_vec, register_int_gauge_vec, IntCounterVec, IntGaugeVec,
+        IntCounterVec, IntGaugeVec, register_int_counter_vec, register_int_gauge_vec,
     };
 
     /// Labels for the metrics

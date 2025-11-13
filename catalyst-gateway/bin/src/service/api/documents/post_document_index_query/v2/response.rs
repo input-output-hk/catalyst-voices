@@ -2,8 +2,8 @@
 
 use derive_more::{From, Into};
 use poem_openapi::{
-    types::{Example, ToJSON},
     NewType, Object,
+    types::{Example, ToJSON},
 };
 
 use crate::{

@@ -1,6 +1,6 @@
 //! CIP36 Registration Endpoints
 
-use poem_openapi::{param::Query, OpenApi};
+use poem_openapi::{OpenApi, param::Query};
 
 use self::cardano::slot_no::SlotNo;
 use crate::service::common::{

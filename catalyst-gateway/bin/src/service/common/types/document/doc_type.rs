@@ -21,8 +21,7 @@ const DESCRIPTION: &str = "Document Type.  UUIDv4 Formatted 128bit value.";
 /// Example.
 pub(crate) const EXAMPLE: &str = "7808d2ba-d511-40af-84e8-c0d1625fdfdc";
 /// External Documentation URI
-const URI: &str =
-    "https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#type";
+const URI: &str = "https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/signed_doc/spec/#type";
 /// Description of the URI
 const URI_DESCRIPTION: &str = "Specification";
 /// Length of the hex encoded string
