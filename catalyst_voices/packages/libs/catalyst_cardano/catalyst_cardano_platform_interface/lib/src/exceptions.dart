@@ -12,6 +12,14 @@ enum TxSendErrorCode {
   final int tag;
 
   const TxSendErrorCode({required this.tag});
+
+  /// Maps a [tag] to the [TxSendErrorCode].
+  static TxSendErrorCode fromTag(int tag) {
+    return values.firstWhere(
+      (e) => e.tag == tag,
+      orElse: () => throw UnsupportedError('TxSendErrorCode: unsupported tag $tag'),
+    );
+  }
 }
 
 /// Exception thrown when submitting the transaction fails.
@@ -50,6 +58,14 @@ enum TxSignErrorCode {
   final int tag;
 
   const TxSignErrorCode({required this.tag});
+
+  /// Maps a [tag] to the [TxSignErrorCode].
+  static TxSignErrorCode fromTag(int tag) {
+    return values.firstWhere(
+      (e) => e.tag == tag,
+      orElse: () => throw UnsupportedError('TxSignErrorCode: unsupported tag $tag'),
+    );
+  }
 }
 
 /// Exception thrown when signing the transaction fails.
@@ -136,6 +152,14 @@ enum WalletDataSignErrorCode {
   final int tag;
 
   const WalletDataSignErrorCode({required this.tag});
+
+  /// Maps a [tag] to the [WalletDataSignErrorCode].
+  static WalletDataSignErrorCode fromTag(int tag) {
+    return values.firstWhere(
+      (e) => e.tag == tag,
+      orElse: () => throw UnsupportedError('WalletDataSignErrorCode: unsupported tag $tag'),
+    );
+  }
 }
 
 /// Defines a set of possible exceptions that might occur when
