@@ -25,8 +25,8 @@ export class CardanoWalletInitialApi {
    */
   async enable(...args) {
     try {
-        const fullApi = await this.delegate.enable(...args);
-        return new CardanoWalletFullApi(fullApi);
+      const fullApi = await this.delegate.enable(...args);
+      return new CardanoWalletFullApi(fullApi);
     } catch (err) {
       throw _mapError(err);
     }
@@ -116,6 +116,19 @@ export class CardanoWalletFullApi {
   constructor(delegate) {
     if (!delegate) throw new Error("Missing delegate in CardanoWalletFullApi!");
     this.delegate = delegate;
+  }
+
+  /**
+   * [CIP-95] cip95: Governance Extension API
+   *
+   * @see {@link https://cips.cardano.org/cip/CIP-0095}
+   */
+  get cip95() {
+    try {
+      return CardanoWalletCip95Api(this.delegate.cip95);
+    } catch (err) {
+      throw _mapError(err);
+    }
   }
 
   /**
@@ -256,6 +269,92 @@ export class CardanoWalletFullApi {
   async submitTx(...args) {
     try {
       return await this.delegate.submitTx(...args);
+    } catch (err) {
+      throw _mapError(err);
+    }
+  }
+}
+
+/**
+ * The Governance Extension API of the CIP-95 wallet interface: https://cips.cardano.org/cip/CIP-0095#governance-extension-api.
+ *
+ * All the methods, properties or fields are pass-through only to the wallet delegate
+ * as well the return types are pass through from the wallet delegate to the caller.
+ *
+ * All this class does is wrap each method, pass the parameters to the delegate,
+ * catch errors and map them to a format understandable by the dart layer.
+ */
+export class CardanoWalletCip95Api {
+  /**
+   * Creates a new instance of the class.
+   *
+   * @param {any} delegate - The CIP-95 governance extension api delegate.
+   */
+  constructor(delegate) {
+    if (!delegate) throw new Error("Missing delegate in CardanoWalletCip95Api!");
+    this.delegate = delegate;
+  }
+
+  /**
+   * [CIP-95] getPubDRepKey(): Promise<PubDRepKey>
+   *
+   * @see {@link https://cips.cardano.org/cip/CIP-0095#apicip95getpubdrepkey-promisepubdrepkey}
+   */
+  async getPubDRepKey() {
+    try {
+      return await this.delegate.getPubDRepKey();
+    } catch (err) {
+      throw _mapError(err);
+    }
+  }
+
+  /**
+   * [CIP-95] getRegisteredPubStakeKeys(): Promise<PubStakeKey[]>
+   *
+   * @see {@link https://cips.cardano.org/cip/CIP-0095#apigetregisteredpubstakekeys-promisepubstakekey}
+   */
+  async getRegisteredPubStakeKeys() {
+    try {
+      return await this.delegate.getRegisteredPubStakeKeys();
+    } catch (err) {
+      throw _mapError(err);
+    }
+  }
+
+  /**
+   * [CIP-95] getUnregisteredPubStakeKeys(): Promise<PubStakeKey[]>
+   *
+   * @see {@link https://cips.cardano.org/cip/CIP-0095#apicip95getunregisteredpubstakekeys-promisepubstakekey}
+   */
+  async getUnregisteredPubStakeKeys() {
+    try {
+      return await this.delegate.getUnregisteredPubStakeKeys();
+    } catch (err) {
+      throw _mapError(err);
+    }
+  }
+
+  /**
+   * [CIP-95] signTx(tx: cbor<transaction>, partialSign: bool = false): Promise<cbor<transaction_witness_set>>
+   *
+   * @see {@link https://cips.cardano.org/cip/CIP-0095#apisigntxtx-cbortransaction-partialsign-bool--false-promisecbortransaction_witness_set}
+   */
+  async signTx(...args) {
+    try {
+      return await this.delegate.signTx(...args);
+    } catch (err) {
+      throw _mapError(err);
+    }
+  }
+
+  /**
+   * [CIP-95] signData(addr: Address | DRepID, payload: Bytes): Promise<DataSignature>
+   *
+   * @see {@link https://cips.cardano.org/cip/CIP-0095#apicip95signdataaddr-address--drepid-payload-bytes-promisedatasignature}
+   */
+  async signData(...args) {
+    try {
+      return await this.delegate.signData(...args);
     } catch (err) {
       throw _mapError(err);
     }

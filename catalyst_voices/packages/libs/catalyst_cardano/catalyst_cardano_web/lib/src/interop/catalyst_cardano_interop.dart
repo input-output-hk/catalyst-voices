@@ -111,11 +111,17 @@ extension type JSCardanoWalletCip95Api(JSObject _) implements JSObject {
   /// See [CardanoWalletCip95Api.getUnregisteredPubStakeKeys].
   external JSPromise<JSArray<JSString>> getUnregisteredPubStakeKeys();
 
-  /// See [CardanoWalletApi.signData].
+  /// See [CardanoWalletCip95Api.signData].
   external JSPromise<JSString> signData(
     JSString address,
     JSString payload,
   );
+
+  /// See [CardanoWalletCip95Api.signTx].
+  external JSPromise<JSString> signTx(
+    JSString tx, [
+    JSBoolean? partialSign,
+  ]);
 }
 
 /// The JS representation of the [CipExtension].

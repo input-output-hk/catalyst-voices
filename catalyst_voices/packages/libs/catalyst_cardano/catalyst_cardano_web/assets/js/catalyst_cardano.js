@@ -1,4 +1,4 @@
-import { CardanoWalletInitialApi } from "./cardano_wallet.js";
+import { CardanoWalletInitialApi } from "./cardano_wallet_api.js";
 
 // Returns available wallet extensions exposed under
 // cardano.{walletName} according to CIP-30 standard.
