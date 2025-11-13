@@ -10,7 +10,7 @@ pub(crate) mod insert_unstaked_txo_asset;
 use std::sync::Arc;
 
 use cardano_chain_follower::{
-    hashes::TransactionId, Network, Slot, StakeAddress, TxnIndex, TxnOutputOffset,
+    Network, Slot, StakeAddress, TxnIndex, TxnOutputOffset, hashes::TransactionId,
 };
 use scylla::client::session::Session;
 use tracing::{error, warn};
@@ -77,7 +77,7 @@ impl TxoInsertQuery {
     /// stake address, and still have a primary key on the table. Otherwise return the
     /// header and the stake key hash as a vec of 29 bytes.
     fn extract_stake_address(
-        network: Network,
+        network: &Network,
         txo: &cardano_chain_follower::pallas_traverse::MultiEraOutput<'_>,
         slot_no: Slot,
         txn_id: &str,
@@ -101,10 +101,10 @@ impl TxoInsertQuery {
 
                         let address = match address.delegation() {
                             cardano_chain_follower::pallas_addresses::ShelleyDelegationPart::Script(hash) => {
-                                Some(StakeAddress::new(network, true, (*hash).into()))
+                                Some(StakeAddress::new(network.clone(), true, (*hash).into()))
                             },
                             cardano_chain_follower::pallas_addresses::ShelleyDelegationPart::Key(hash) => {
-                                Some(StakeAddress::new(network, false, (*hash).into()))
+                                Some(StakeAddress::new(network.clone(), false, (*hash).into()))
                             },
                             cardano_chain_follower::pallas_addresses::ShelleyDelegationPart::Pointer(_pointer) => {
                                 // These are not supported from Conway, so we don't support them
@@ -140,7 +140,7 @@ impl TxoInsertQuery {
     /// Index the transaction Inputs.
     pub(crate) fn index(
         &mut self,
-        network: Network,
+        network: &Network,
         txn: &cardano_chain_follower::pallas_traverse::MultiEraTx<'_>,
         slot_no: Slot,
         txn_hash: TransactionId,

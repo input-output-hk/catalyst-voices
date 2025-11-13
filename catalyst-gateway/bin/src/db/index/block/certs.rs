@@ -3,12 +3,12 @@
 use std::{fmt::Debug, sync::Arc};
 
 use cardano_chain_follower::{
+    MultiEraBlock, Slot, StakeAddress, TxnIndex, VKeyHash,
     pallas_primitives::{alonzo, conway},
     pallas_traverse::{MultiEraCert, MultiEraTx},
-    MultiEraBlock, Slot, StakeAddress, TxnIndex, VKeyHash,
 };
 use ed25519_dalek::VerifyingKey;
-use scylla::{client::session::Session, value::MaybeUnset, SerializeRow};
+use scylla::{SerializeRow, client::session::Session, value::MaybeUnset};
 use tracing::error;
 
 use crate::{
@@ -187,7 +187,7 @@ impl CertInsertQuery {
     ) {
         let (stake_address, pubkey, script) = match *cred {
             conway::StakeCredential::AddrKeyhash(cred) => {
-                let stake_address = StakeAddress::new(block.network(), false, cred.into());
+                let stake_address = StakeAddress::new(block.network().clone(), false, cred.into());
                 let addr = block.witness_for_tx(&VKeyHash::from(*cred), txn);
                 // Note: it is totally possible for the Registration Certificate to not be
                 // witnessed.
@@ -195,7 +195,7 @@ impl CertInsertQuery {
             },
             conway::StakeCredential::ScriptHash(h) => {
                 (
-                    StakeAddress::new(block.network(), true, h.into()),
+                    StakeAddress::new(block.network().clone(), true, h.into()),
                     None,
                     true,
                 )

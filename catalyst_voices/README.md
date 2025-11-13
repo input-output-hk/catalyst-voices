@@ -5,25 +5,25 @@
 This repository contains the Catalyst Voices app and packages.
 
 * [Catalyst Voices](#catalyst-voices)
-  * [Requirements](#requirements)
-  * [Platforms](#platforms)
-  * [Getting Started](#getting-started)
-    * [Bootstrapping](#bootstrapping)
-    * [Packages](#packages)
-    * [Environment Type vs Flavor](#environment-type-vs-flavor)
-    * [Environment types](#environment-types)
-    * [Flavor types](#flavor-types)
-    * [Environment variables](#environment-variables)
-      * [Environment config](#environment-config)
-    * [Feature Flags](#feature-flags)
-      * [Using Feature Flags with --dart-define](#using-feature-flags-with---dart-define)
-    * [Code Generation](#code-generation)
-      * [Running Code Generation](#running-code-generation)
-        * [Basic Generation](#basic-generation)
-        * [Local Saving](#local-saving)
-      * [GitHub Token / PAT Setup](#github-token--pat-setup)
-      * [Security Notes](#security-notes)
-  * [Running Tests](#running-tests)
+    * [Requirements](#requirements)
+    * [Platforms](#platforms)
+    * [Getting Started](#getting-started)
+        * [Bootstrapping](#bootstrapping)
+        * [Packages](#packages)
+        * [Environment Type vs Flavor](#environment-type-vs-flavor)
+        * [Environment types](#environment-types)
+        * [Flavor types](#flavor-types)
+        * [Environment variables](#environment-variables)
+            * [Environment config](#environment-config)
+        * [Feature Flags](#feature-flags)
+            * [Using Feature Flags with --dart-define](#using-feature-flags-with---dart-define)
+        * [Code Generation](#code-generation)
+            * [Running Code Generation](#running-code-generation)
+                * [Basic Generation](#basic-generation)
+                * [Local Saving](#local-saving)
+            * [GitHub Token / PAT Setup](#github-token--pat-setup)
+            * [Security Notes](#security-notes)
+    * [Running Tests](#running-tests)
 
 ## Requirements
 
@@ -37,11 +37,15 @@ This repository contains the Catalyst Voices app and packages.
 * [Melos](https://melos.invertase.dev)
 * [Fastlane](https://fastlane.tools)
 * Flutter & Dart plugins:
-  * [Visual Studio Code](https://flutter.dev/docs/get-started/editor?tab=vscode)
-  * [Android Studio / IntelliJ](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
+    * [Visual Studio Code](https://flutter.dev/docs/get-started/editor?tab=vscode)
+    * [Android Studio / IntelliJ](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
 * [Rust](https://rustup.rs/): 1.80.0+
 
 ❗️We recommend using **Visual Studio Code** as the **default editor** for this project.
+
+## Recommended VS code plugins
+
+* [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - formatting html and js files.
 
 ## Platforms
 

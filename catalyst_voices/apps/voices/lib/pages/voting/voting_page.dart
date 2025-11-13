@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
+import 'package:catalyst_voices/pages/account/widgets/account_keychain_tile.dart';
 import 'package:catalyst_voices/pages/campaign_phase_aware/campaign_phase_aware.dart';
 import 'package:catalyst_voices/pages/voting/widgets/content/pre_voting_content.dart';
 import 'package:catalyst_voices/pages/voting/widgets/content/voting_background.dart';
@@ -92,6 +93,13 @@ class _VotingPageState extends State<VotingPage>
     if (widget.tab != oldWidget.tab) {
       _tabController.animateToTab(tab);
     }
+
+    if (showKeychainDeletedDialog) {
+      showKeychainDeletedDialog = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await _showKeychainDeletedDialog(context);
+      });
+    }
   }
 
   @override
@@ -160,7 +168,8 @@ class _VotingPageState extends State<VotingPage>
 
     // TODO(damian-molinski): same behavior already exists in DiscoveryPage because
     // of way confirmation dialog is shown. Refactor it.
-    if (widget.keychainDeleted) {
+    if (showKeychainDeletedDialog) {
+      showKeychainDeletedDialog = false;
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await _showKeychainDeletedDialog(context);
       });

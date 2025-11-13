@@ -7,7 +7,7 @@ pub(crate) mod insert_cip36_invalid;
 use std::sync::Arc;
 
 use cardano_chain_follower::{
-    hashes::Blake2b224Hash, Cip36, MultiEraBlock, Slot, StakeAddress, TxnIndex,
+    Cip36, MultiEraBlock, Slot, StakeAddress, TxnIndex, hashes::Blake2b224Hash,
 };
 use scylla::client::session::Session;
 
@@ -85,7 +85,8 @@ impl Cip36InsertQuery {
                     "Valid CIP36 registration must have one stake public key"
                 ))?;
                 let stake_pk_hash = Blake2b224Hash::new(&stake_pk.to_bytes());
-                let stake_address = StakeAddress::new(block.network(), false, stake_pk_hash);
+                let stake_address =
+                    StakeAddress::new(block.network().clone(), false, stake_pk_hash);
 
                 self.registrations.push(insert_cip36::Params::new(
                     voting_key, slot_no, index, &cip36,
@@ -131,7 +132,8 @@ impl Cip36InsertQuery {
                     }
 
                     let stake_pk_hash = Blake2b224Hash::new(&stake_pk.to_bytes());
-                    let stake_address = StakeAddress::new(block.network(), false, stake_pk_hash);
+                    let stake_address =
+                        StakeAddress::new(block.network().clone(), false, stake_pk_hash);
                     self.stake_regs
                         .push(certs::StakeRegistrationInsertQuery::new(
                             stake_address,

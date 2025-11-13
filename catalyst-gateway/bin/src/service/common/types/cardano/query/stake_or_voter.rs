@@ -8,7 +8,7 @@ use std::{
     sync::LazyLock,
 };
 
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use const_format::concatcp;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},

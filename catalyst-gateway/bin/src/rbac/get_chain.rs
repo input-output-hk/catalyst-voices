@@ -1,9 +1,9 @@
 //! Utilities for obtaining a RBAC registration chain (`RegistrationChain`).
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use cardano_chain_follower::{ChainFollower, Network, Point, Slot, TxnIndex};
 use catalyst_types::catalyst_id::CatalystId;
-use futures::{future::try_join, TryFutureExt, TryStreamExt};
+use futures::{TryFutureExt, TryStreamExt, future::try_join};
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
 
 use crate::{
@@ -14,8 +14,8 @@ use crate::{
         session::CassandraSession,
     },
     rbac::{
-        chains_cache::{cache_persistent_rbac_chain, cached_persistent_rbac_chain},
         ChainInfo,
+        chains_cache::{cache_persistent_rbac_chain, cached_persistent_rbac_chain},
     },
     settings::Settings,
 };
@@ -23,15 +23,13 @@ use crate::{
 /// Returns the latest (including the volatile part) registration chain by the given
 /// Catalyst ID.
 pub async fn latest_rbac_chain(id: &CatalystId) -> Result<Option<ChainInfo>> {
-    let id = id.as_short_id();
-
     let volatile_session =
         CassandraSession::get(false).context("Failed to get volatile Cassandra session")?;
     // Get the persistent part of the chain and volatile registrations. Both of these parts
     // can be non-existing.
     let (chain, volatile_regs) = try_join(
-        persistent_rbac_chain(&id),
-        indexed_regs(&volatile_session, &id),
+        persistent_rbac_chain(id),
+        indexed_regs(&volatile_session, id),
     )
     .await?;
 
@@ -70,14 +68,11 @@ pub async fn latest_rbac_chain(id: &CatalystId) -> Result<Option<ChainInfo>> {
 /// Returns only the persistent part of a registration chain by the given Catalyst ID.
 pub async fn persistent_rbac_chain(id: &CatalystId) -> Result<Option<RegistrationChain>> {
     let session = CassandraSession::get(true).context("Failed to get Cassandra session")?;
-
-    let id = id.as_short_id();
-
-    if let Some(chain) = cached_persistent_rbac_chain(&session, &id) {
+    if let Some(chain) = cached_persistent_rbac_chain(&session, id) {
         return Ok(Some(chain));
     }
 
-    let regs = indexed_regs(&session, &id).await?;
+    let regs = indexed_regs(&session, id).await?;
     let chain = build_rbac_chain(regs).await?.inspect(|c| {
         cache_persistent_rbac_chain(id.clone(), c.clone());
     });
@@ -145,7 +140,7 @@ pub async fn apply_regs(
 
 /// Loads and parses a `Cip509` registration from a block using chain follower.
 async fn cip509(
-    network: Network,
+    network: &Network,
     slot: Slot,
     txn_index: TxnIndex,
 ) -> Result<Cip509> {

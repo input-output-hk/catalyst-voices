@@ -7,9 +7,9 @@ use cardano_chain_follower::StakeAddress;
 use catalyst_types::catalyst_id::CatalystId;
 use futures::{StreamExt, TryStreamExt};
 use scylla::{
-    client::{pager::TypedRowStream, session::Session},
-    statement::{prepared::PreparedStatement, Consistency},
     DeserializeRow, SerializeRow,
+    client::{pager::TypedRowStream, session::Session},
+    statement::{Consistency, prepared::PreparedStatement},
 };
 use tracing::error;
 

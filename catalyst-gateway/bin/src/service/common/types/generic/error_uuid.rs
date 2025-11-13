@@ -1,7 +1,7 @@
 //! Implement API endpoint interfacing `ErrorUuid`.
 
 use derive_more::{From, Into};
-use poem_openapi::{types::Example, NewType};
+use poem_openapi::{NewType, types::Example};
 use uuid::Uuid;
 
 /// Error Unique ID

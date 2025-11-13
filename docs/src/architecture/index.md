@@ -22,4 +22,4 @@ Created, maintained and © by Dr.
 Peter Hruschka, Dr.
 Gernot Starke and
 contributors.
-See <https://arc42.org>.
+See [arc42.org](https://arc42.org).

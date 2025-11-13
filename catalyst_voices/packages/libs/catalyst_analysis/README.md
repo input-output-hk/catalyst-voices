@@ -8,12 +8,12 @@ see the [complete list of options](/catalyst_voices/packages/libs/catalyst_analy
 > and real-life experience building products with Dart and Flutter.
 
 * [🧐 Catalyst Analysis](#-catalyst-analysis)
-  * [Usage](#usage)
-  * [Suppressing Lints](#suppressing-lints)
-    * [Line Level](#line-level)
-    * [File Level](#file-level)
-    * [Project Level](#project-level)
-  * [Evolving the lint sets](#evolving-the-lint-sets)
+    * [Usage](#usage)
+    * [Suppressing Lints](#suppressing-lints)
+        * [Line Level](#line-level)
+        * [File Level](#file-level)
+        * [Project Level](#project-level)
+    * [Evolving the lint sets](#evolving-the-lint-sets)
 
 ## Usage
 

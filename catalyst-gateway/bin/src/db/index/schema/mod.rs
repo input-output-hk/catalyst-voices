@@ -165,7 +165,7 @@ fn generate_cql_schema_version() -> String {
 /// Get the namespace for a particular db configuration
 pub(crate) fn namespace(
     persistent: bool,
-    network: Network,
+    network: &Network,
 ) -> String {
     // Build and set the Keyspace to use.
     let namespace = if persistent { "p" } else { "v" };
@@ -181,7 +181,7 @@ async fn create_namespace(
     session: &mut Arc<Session>,
     cfg: &cassandra_db::EnvVars,
     persistent: bool,
-    network: Network,
+    network: &Network,
 ) -> anyhow::Result<()> {
     let keyspace = namespace(persistent, network);
 
@@ -222,7 +222,7 @@ pub(crate) async fn create_schema(
     session: &mut Arc<Session>,
     cfg: &cassandra_db::EnvVars,
     persistent: bool,
-    network: Network,
+    network: &Network,
 ) -> anyhow::Result<()> {
     create_namespace(session, cfg, persistent, network)
         .await
@@ -238,7 +238,7 @@ pub(crate) async fn create_schema(
                     errors.push(anyhow::anyhow!(
                         "Failed to Execute Create Schema Query: {err}\n--\nSchema: {schema_name}\n--\n{schema}"
                     ));
-                };
+                }
             },
             Err(err) => {
                 error!(schema=schema_name, error=%err, "Failed to Prepare Create Schema Query");
@@ -290,7 +290,7 @@ mod tests {
     fn test_namespace_persistent() {
         let network = Network::Preprod;
         let persistent = true;
-        let namespace = namespace(persistent, network);
+        let namespace = namespace(persistent, &network);
         let schema_version = generate_cql_schema_version().replace('-', "_");
         let expected = format!("p_{network}_{schema_version}");
         assert_eq!(namespace, expected);
@@ -300,7 +300,7 @@ mod tests {
     fn test_namespace_volatile() {
         let network = Network::Preprod;
         let persistent = false;
-        let namespace = namespace(persistent, network);
+        let namespace = namespace(persistent, &network);
         let schema_version = generate_cql_schema_version().replace('-', "_");
         let expected = format!("v_{network}_{schema_version}");
         assert_eq!(namespace, expected);

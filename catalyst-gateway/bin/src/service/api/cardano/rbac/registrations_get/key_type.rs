@@ -1,6 +1,6 @@
 //! A key type for role data.
 
-use poem_openapi::{types::Example, Enum};
+use poem_openapi::{Enum, types::Example};
 use poem_openapi_derive::NewType;
 
 /// A key type for role data.

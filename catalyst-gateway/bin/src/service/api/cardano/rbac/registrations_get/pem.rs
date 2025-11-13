@@ -10,7 +10,7 @@ use poem_openapi::{
 use serde_json::Value;
 use x509_cert::{
     certificate::Certificate,
-    der::{pem::LineEnding, DecodePem, EncodePem},
+    der::{DecodePem, EncodePem, pem::LineEnding},
 };
 
 /// A title.

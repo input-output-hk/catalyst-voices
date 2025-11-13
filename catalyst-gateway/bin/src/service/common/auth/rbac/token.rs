@@ -8,12 +8,12 @@ use std::{
     time::Duration,
 };
 
-use anyhow::{anyhow, Context, Result};
-use base64::{prelude::BASE64_URL_SAFE_NO_PAD, Engine};
+use anyhow::{Context, Result, anyhow};
+use base64::{Engine, prelude::BASE64_URL_SAFE_NO_PAD};
 use cardano_chain_follower::Network;
 use catalyst_types::catalyst_id::CatalystId;
 use chrono::{TimeDelta, Utc};
-use ed25519_dalek::{ed25519::signature::Signer, Signature, SigningKey, VerifyingKey};
+use ed25519_dalek::{Signature, SigningKey, VerifyingKey, ed25519::signature::Signer};
 use rbac_registration::registration::cardano::RegistrationChain;
 use regex::Regex;
 
@@ -180,8 +180,8 @@ impl CatalystRBACTokenV1 {
 
     /// Returns a network.
     #[allow(dead_code)]
-    pub(crate) fn network(&self) -> Network {
-        self.network
+    pub(crate) fn network(&self) -> &Network {
+        &self.network
     }
 
     /// Returns a corresponded registration chain if any registrations present.
