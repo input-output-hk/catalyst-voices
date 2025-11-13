@@ -26,7 +26,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   final DateTime submissionCloseDate;
 
   const CampaignCategoryDetailsViewModel({
-    required super.id,
+    required super.ref,
     required super.name,
     required this.subname,
     required this.description,
@@ -42,17 +42,21 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
     required this.submissionCloseDate,
   });
 
-  factory CampaignCategoryDetailsViewModel.fromModel(CampaignCategory model) {
+  factory CampaignCategoryDetailsViewModel.fromModel(
+    CampaignCategory model, {
+    int finalProposalsCount = 0,
+    MultiCurrencyAmount? totalAsk,
+  }) {
     return CampaignCategoryDetailsViewModel(
-      id: model.selfRef,
+      ref: model.selfRef,
       name: model.categoryName,
       subname: model.categorySubname,
       description: model.description,
       shortDescription: model.shortDescription,
-      finalProposalsCount: model.finalProposalsCount,
+      finalProposalsCount: finalProposalsCount,
       availableFunds: model.availableFunds,
       image: CategoryImageUrl.image(model.selfRef.id),
-      totalAsk: model.totalAsk,
+      totalAsk: totalAsk ?? MultiCurrencyAmount.single(Money.zero(currency: Currencies.fallback)),
       range: model.range,
       descriptions: model.descriptions.map(CategoryDescriptionViewModel.fromModel).toList(),
       dos: model.dos,
@@ -67,7 +71,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   /// such as when wrapping widgets with Skeletonizer during data loading.
   factory CampaignCategoryDetailsViewModel.placeholder({String? id}) {
     return CampaignCategoryDetailsViewModel(
-      id: SignedDocumentRef(id: id ?? const Uuid().v7()),
+      ref: SignedDocumentRef(id: id ?? const Uuid().v7()),
       name: 'Cardano Open:',
       subname: 'Developers',
       description:
@@ -131,16 +135,16 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
 }
 
 final class CampaignCategoryViewModel extends Equatable {
-  final SignedDocumentRef id;
+  final SignedDocumentRef ref;
   final String name;
 
   const CampaignCategoryViewModel({
-    required this.id,
+    required this.ref,
     required this.name,
   });
 
   @override
-  List<Object?> get props => [id, name];
+  List<Object?> get props => [ref, name];
 }
 
 final class CategoryImageUrl {

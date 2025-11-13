@@ -88,7 +88,7 @@ class _CreateNewProposalCategorySelectionState extends State<CreateNewProposalCa
   late final ScrollController _scrollController;
 
   CampaignCategoryDetailsViewModel? get _selectedCategory {
-    return widget.categories.firstWhereOrNull((element) => element.id == widget.selectedCategory);
+    return widget.categories.firstWhereOrNull((element) => element.ref == widget.selectedCategory);
   }
 
   @override
@@ -102,8 +102,8 @@ class _CreateNewProposalCategorySelectionState extends State<CreateNewProposalCa
               itemBuilder: (context, index) => _CategoryCard(
                 name: widget.categories[index].formattedName,
                 description: widget.categories[index].shortDescription,
-                ref: widget.categories[index].id,
-                isSelected: widget.categories[index].id == widget.selectedCategory,
+                ref: widget.categories[index].ref,
+                isSelected: widget.categories[index].ref == widget.selectedCategory,
                 onCategorySelected: widget.onCategorySelected,
               ),
               separatorBuilder: (context, index) => const SizedBox(height: 16),

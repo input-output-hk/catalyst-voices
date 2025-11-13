@@ -48,8 +48,9 @@ class NewProposalState extends Equatable {
     categoryRef,
     categories,
   ];
+
   String? get selectedCategoryName =>
-      categories.firstWhereOrNull((e) => e.id == categoryRef)?.formattedName;
+      categories.firstWhereOrNull((e) => e.ref == categoryRef)?.formattedName;
 
   bool get _isAgreementValid => isAgreeToCategoryCriteria && isAgreeToNoFurtherCategoryChange;
 

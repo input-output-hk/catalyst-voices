@@ -225,7 +225,7 @@ class _CategoryPageState extends State<CategoryPage> {
   void _listenForProposalRef(CategoryDetailCubit cubit) {
     // listen for updates
     _categoryRefSub = cubit.stream
-        .map((event) => event.category?.id)
+        .map((event) => event.category?.ref)
         .distinct()
         .listen(_onCategoryRefChanged);
   }

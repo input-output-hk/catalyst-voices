@@ -44,7 +44,7 @@ class CategoryDetailCubit extends Cubit<CategoryDetailState> {
   }
 
   Future<void> getCategoryDetail(SignedDocumentRef categoryId) async {
-    if (categoryId.id == state.category?.id.id) {
+    if (categoryId.id == state.category?.ref.id) {
       return emit(state.copyWith(isLoading: false));
     }
 
