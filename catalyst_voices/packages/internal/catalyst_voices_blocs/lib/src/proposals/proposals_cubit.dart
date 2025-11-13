@@ -319,8 +319,7 @@ final class ProposalsCubit extends Cubit<ProposalsState>
   bool _showComments(Campaign? campaign) {
     if (campaign == null) return false;
 
-    return !(_featureFlagsService.isEnabled(Features.voting) &&
-        campaign.phaseStateTo(CampaignPhaseType.communityVoting).status.isActive);
+    return !(_featureFlagsService.isEnabled(Features.voting) && campaign.isVotingStateActive);
   }
 
   Future<void> _updateFavoriteProposal(

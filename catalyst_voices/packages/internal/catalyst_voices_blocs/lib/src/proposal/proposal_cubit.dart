@@ -500,8 +500,7 @@ final class ProposalCubit extends Cubit<ProposalState>
   bool _isVotingStage(Campaign? campaign) {
     if (!_featureFlagsService.isEnabled(Features.voting)) return false;
 
-    final votingState = campaign?.phaseStateTo(CampaignPhaseType.communityVoting);
-    return votingState?.status.isActive ?? false;
+    return campaign?.isVotingStateActive ?? false;
   }
 
   ProposalViewData _rebuildProposalState() {

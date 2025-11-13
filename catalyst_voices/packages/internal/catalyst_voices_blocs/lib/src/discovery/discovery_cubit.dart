@@ -215,7 +215,6 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   bool _showComments(Campaign? campaign) {
     if (campaign == null) return false;
 
-    return !(_featureFlagsService.isEnabled(Features.voting) &&
-        campaign.phaseStateTo(CampaignPhaseType.communityVoting).status.isActive);
+    return !(_featureFlagsService.isEnabled(Features.voting) && campaign.isVotingStateActive);
   }
 }

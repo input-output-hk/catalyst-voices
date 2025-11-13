@@ -106,6 +106,10 @@ Project Catalyst turns economic power into innovation power by using the Cardano
     return closestPhase;
   }
 
+  bool get isVotingStateActive {
+    return phaseStateTo(CampaignPhaseType.communityVoting).status.isActive;
+  }
+
   @override
   List<Object?> get props => [
     selfRef,
