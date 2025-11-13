@@ -1,3 +1,5 @@
+// ignore_for_file: only_throw_errors
+
 import 'dart:js_interop';
 
 import 'package:catalyst_cardano_platform_interface/catalyst_cardano_platform_interface.dart';
