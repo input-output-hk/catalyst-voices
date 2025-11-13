@@ -1,5 +1,5 @@
 import {
-  CardanoWalletCodeError as CardanoWalletInfoCodeError,
+  CardanoWalletInfoCodeError,
   CardanoWalletPaginateError,
 } from "./cardano_wallet_error.js";
 

@@ -6,7 +6,7 @@
  * - https://cips.cardano.org/cip/CIP-30#txsenderror
  * - https://cips.cardano.org/cip/CIP-30#txsignerror
  */
-export class CardanoWalletCodeError {
+export class CardanoWalletInfoCodeError {
   constructor(code, info) {
     this.code = code;
     this.info = info;
@@ -16,7 +16,7 @@ export class CardanoWalletCodeError {
     if (!obj || typeof obj.code !== "number" || typeof obj.info !== "string") {
       return null;
     }
-    return new CardanoWalletCodeError(obj.code, obj.info);
+    return new CardanoWalletInfoCodeError(obj.code, obj.info);
   }
 
   stringify() {
