@@ -36,6 +36,8 @@ abstract interface class CampaignService {
   Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType stage);
 
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
+
+  Stream<CampaignTotalAsk> watchCampaignTotalAsk({required CampaignFilters filters});
 }
 
 final class CampaignServiceImpl implements CampaignService {
@@ -113,5 +115,11 @@ final class CampaignServiceImpl implements CampaignService {
     return category.copyWith(
       submissionCloseDate: proposalSubmissionStage.timeline.to,
     );
+  }
+
+  @override
+  Stream<CampaignTotalAsk> watchCampaignTotalAsk({required CampaignFilters filters}) {
+    // TODO(damian-molinski): implement it.
+    return Stream.value(const CampaignTotalAsk(categoriesAsks: {}));
   }
 }

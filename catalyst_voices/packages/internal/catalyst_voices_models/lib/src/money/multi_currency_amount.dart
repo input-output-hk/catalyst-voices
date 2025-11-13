@@ -1,13 +1,12 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_models/src/money/currency_code.dart';
-import 'package:catalyst_voices_models/src/money/money.dart';
-import 'package:equatable/equatable.dart';
 
 /// Represents a collection of monetary amounts in multiple currencies.
 ///
 /// Internally stores a map of [CurrencyCode] to [Money] and provides
 /// methods to add, subtract, and retrieve amounts. Automatically removes
 /// zero amounts from the collection.
-final class MultiCurrencyAmount extends Equatable {
+final class MultiCurrencyAmount {
   /// Internal map of currency ISO code to [Money] amounts.
   final Map<CurrencyCode, Money> _map;
 
@@ -41,11 +40,17 @@ final class MultiCurrencyAmount extends Equatable {
     return group;
   }
 
-  /// Returns all [Money] values in this collection as a list.
-  List<Money> get list => _map.values.toList();
+  /// Creates a [MultiCurrencyAmount] with a single zero [Money] value.
+  ///
+  /// The currency defaults to [Currencies.fallback] if not specified.
+  factory MultiCurrencyAmount.zero({
+    Currency currency = Currencies.fallback,
+  }) {
+    return MultiCurrencyAmount.single(Money.zero(currency: currency));
+  }
 
-  @override
-  List<Object?> get props => [_map];
+  /// Returns all [Money] values in this collection as a list.
+  List<Money> get list => List.unmodifiable(_map.values);
 
   /// Returns the [Money] value for the given [isoCode], or null if not present.
   Money? operator [](CurrencyCode isoCode) {
@@ -80,6 +85,9 @@ final class MultiCurrencyAmount extends Equatable {
     final updated = (current ?? Money.zero(currency: currency)) - money;
     _updateMap(updated);
   }
+
+  @override
+  String toString() => 'MultiCurrencyAmount(${_map.values.join(', ')})';
 
   /// Updates the internal map with [money].
   ///

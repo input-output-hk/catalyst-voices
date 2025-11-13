@@ -13,6 +13,11 @@ final class CampaignFilters extends Equatable {
     return CampaignFilters(categoriesIds: categoriesIds);
   }
 
+  factory CampaignFilters.from(Campaign campaign) {
+    final categoriesIds = campaign.categories.map((e) => e.selfRef.id).toList();
+    return CampaignFilters(categoriesIds: categoriesIds);
+  }
+
   @override
   List<Object?> get props => [categoriesIds];
 

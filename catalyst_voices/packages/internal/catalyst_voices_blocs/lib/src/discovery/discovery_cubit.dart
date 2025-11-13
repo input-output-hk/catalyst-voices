@@ -25,6 +25,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
 
   StreamSubscription<List<ProposalBrief>>? _proposalsV2Sub;
   StreamSubscription<Campaign?>? _activeCampaignSub;
+  StreamSubscription<CampaignTotalAsk>? _activeCampaignTotalAskSub;
 
   DiscoveryCubit(
     this._campaignService,
@@ -47,6 +48,9 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
 
     await _activeCampaignSub?.cancel();
     _activeCampaignSub = null;
+
+    await _activeCampaignTotalAskSub?.cancel();
+    _activeCampaignTotalAskSub = null;
 
     return super.close();
   }
@@ -119,9 +123,21 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
       return;
     }
 
-    _cache = _cache.copyWith(activeCampaign: Optional(campaign));
+    _cache = _cache.copyWith(
+      activeCampaign: Optional(campaign),
+      campaignTotalAsk: const Optional.empty(),
+    );
 
     _updateCampaignState();
+
+    unawaited(_activeCampaignTotalAskSub?.cancel());
+    _activeCampaignTotalAskSub = null;
+
+    if (campaign != null) _watchCampaignTotalAsk(campaign);
+  }
+
+  void _handleCampaignTotalAskChange(CampaignTotalAsk data) {
+    //
   }
 
   void _handleProposalsChange(List<ProposalBrief> proposals) {
@@ -137,6 +153,7 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
 
   void _updateCampaignState() {
     final campaign = _cache.activeCampaign;
+    final campaignTotalAsk = _cache.campaignTotalAsk ?? const CampaignTotalAsk(categoriesAsks: {});
 
     final phases = campaign?.timeline.phases ?? [];
     final timeline = phases
@@ -147,20 +164,22 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
 
     final currentCampaign = CurrentCampaignInfoViewModel(
       title: campaign?.name ?? '',
-      allFunds:
-          campaign?.allFunds ??
-          MultiCurrencyAmount.single(Money.zero(currency: Currencies.fallback)),
-      totalAsk: MultiCurrencyAmount.single(Money.zero(currency: Currencies.fallback)),
+      allFunds: campaign?.allFunds ?? MultiCurrencyAmount.zero(),
+      totalAsk: campaignTotalAsk.totalAsk,
       timeline: timeline,
     );
 
     final categories = campaign?.categories ?? [];
     final categoriesModel = categories.map(
-      (e) {
+      (category) {
+        final categoryTotalAsk =
+            campaignTotalAsk.categoriesAsks[category.selfRef] ??
+            CampaignCategoryTotalAsk.zero(category.selfRef);
+
         return CampaignCategoryDetailsViewModel.fromModel(
-          e,
-          finalProposalsCount: 0,
-          totalAsk: MultiCurrencyAmount.single(Money.zero(currency: Currencies.fallback)),
+          category,
+          finalProposalsCount: categoryTotalAsk.finalProposalsCount,
+          totalAsk: categoryTotalAsk.totalAsk,
         );
       },
     ).toList();
@@ -181,6 +200,13 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
     _activeCampaignSub = _campaignService.watchActiveCampaign
         .distinct((previous, next) => previous?.selfRef != next?.selfRef)
         .listen(_handleActiveCampaignChange);
+  }
+
+  void _watchCampaignTotalAsk(Campaign campaign) {
+    _activeCampaignTotalAskSub = _campaignService
+        .watchCampaignTotalAsk(filters: CampaignFilters.from(campaign))
+        .distinct()
+        .listen(_handleCampaignTotalAskChange);
   }
 
   void _watchMostRecentProposals() {
