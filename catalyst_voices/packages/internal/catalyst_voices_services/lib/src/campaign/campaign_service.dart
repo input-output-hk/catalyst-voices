@@ -68,22 +68,17 @@ final class CampaignServiceImpl implements CampaignService {
     required String id,
   }) async {
     final campaign = await _campaignRepository.getCampaign(id: id);
-    final campaignProposals = await _proposalRepository.getProposals(
-      type: ProposalsFilterType.finals,
-    );
     final proposalSubmissionTime = campaign
         .phaseStateTo(CampaignPhaseType.proposalSubmission)
         .phase
         .timeline
         .to;
-    final totalAsk = _calculateTotalAsk(campaignProposals);
-    final updatedCategories = await _updateCategories(
-      campaign.categories,
-      proposalSubmissionTime,
-    );
+
+    final updatedCategories = campaign.categories
+        .map((e) => e.copyWith(submissionCloseDate: proposalSubmissionTime))
+        .toList();
 
     return campaign.copyWith(
-      totalAsk: totalAsk,
       categories: updatedCategories,
     );
   }
@@ -97,7 +92,7 @@ final class CampaignServiceImpl implements CampaignService {
 
     final timelineStage = campaign.timeline.phases.firstWhere(
       (element) => element.type == type,
-      orElse: () => throw (StateError('Type $type not found')),
+      orElse: () => throw StateError('Type $type not found'),
     );
     return timelineStage;
   }
@@ -111,53 +106,12 @@ final class CampaignServiceImpl implements CampaignService {
       );
     }
 
-    final categoryProposals = await _proposalRepository.getProposals(
-      type: ProposalsFilterType.finals,
-      categoryRef: ref,
-    );
     final proposalSubmissionStage = await getCampaignPhaseTimeline(
       CampaignPhaseType.proposalSubmission,
     );
-    final totalAsk = _calculateTotalAsk(categoryProposals);
 
     return category.copyWith(
-      totalAsk: totalAsk,
-      proposalsCount: categoryProposals.length,
       submissionCloseDate: proposalSubmissionStage.timeline.to,
     );
-  }
-
-  MultiCurrencyAmount _calculateTotalAsk(List<ProposalData> proposals) {
-    final totalAmount = MultiCurrencyAmount();
-    for (final proposal in proposals) {
-      final fundsRequested = proposal.document.fundsRequested;
-      if (fundsRequested != null) {
-        totalAmount.add(fundsRequested);
-      }
-    }
-    return totalAmount;
-  }
-
-  Future<List<CampaignCategory>> _updateCategories(
-    List<CampaignCategory> categories,
-    DateTime? proposalSubmissionTime,
-  ) async {
-    final updatedCategories = <CampaignCategory>[];
-
-    for (final category in categories) {
-      final categoryProposals = await _proposalRepository.getProposals(
-        type: ProposalsFilterType.finals,
-        categoryRef: category.selfRef,
-      );
-      final totalAsk = _calculateTotalAsk(categoryProposals);
-
-      final updatedCategory = category.copyWith(
-        totalAsk: totalAsk,
-        proposalsCount: categoryProposals.length,
-        submissionCloseDate: proposalSubmissionTime,
-      );
-      updatedCategories.add(updatedCategory);
-    }
-    return updatedCategories;
   }
 }

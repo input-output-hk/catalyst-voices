@@ -27,7 +27,7 @@ final class DiscoveryCampaignState extends Equatable {
   final CampaignDatesEventsState datesEvents;
 
   const DiscoveryCampaignState({
-    this.isLoading = true,
+    this.isLoading = false,
     this.error,
     this.currentCampaign,
     this.campaignTimeline = const [],
