@@ -116,7 +116,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
             (array) => array.toDart.map((item) => ShelleyAddress(hexDecode(item.toDart))).toList(),
           );
     } catch (ex) {
-      throw mapApiException(ex) ?? fallbackApiException(ex);
+      throw mapApiException(ex) ?? mapPaginateException(ex) ?? fallbackApiException(ex);
     }
   }
 

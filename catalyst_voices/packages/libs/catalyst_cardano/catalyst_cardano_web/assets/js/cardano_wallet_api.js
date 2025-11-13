@@ -369,7 +369,7 @@ export class CardanoWalletCip95Api {
 /**
  * Maps an error to a format understandable by the dart layer.
  *
- * @param {*} err - The error description.
+ * @param {any} err - The error description.
  * @returns A json representing the mapped error.
  */
 function _mapError(err) {
