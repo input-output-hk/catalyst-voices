@@ -9,6 +9,7 @@ void main() {
   final CatGateway gateway = MockCatGateway();
   final CatReviews reviews = MockCatReviews();
   final CatStatus status = MockedCatStatus();
+  final AppMetaService appMeta = MockedAppMetaService();
 
   late final ApiServices apiServices;
 
@@ -19,6 +20,7 @@ void main() {
       gateway: gateway,
       reviews: reviews,
       status: status,
+      appMeta: appMeta,
     );
 
     source = ApiConfigSource(apiServices);

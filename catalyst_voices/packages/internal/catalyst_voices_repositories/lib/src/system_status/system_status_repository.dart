@@ -9,6 +9,8 @@ import 'package:rxdart/rxdart.dart';
 abstract interface class SystemStatusRepository {
   const factory SystemStatusRepository(ApiServices apiServices) = SystemStatusRepositoryImpl;
 
+  Future<AppVersion> currentAppVersion();
+
   Future<List<ComponentStatus>> getComponentStatuses();
 
   Stream<List<ComponentStatus>> pollComponentStatuses({Duration interval});
@@ -18,6 +20,11 @@ final class SystemStatusRepositoryImpl implements SystemStatusRepository {
   final ApiServices _apiServices;
 
   const SystemStatusRepositoryImpl(this._apiServices);
+
+  @override
+  Future<AppVersion> currentAppVersion() {
+    return _apiServices.appMeta.versionInfo().then((e) => e.toModel());
+  }
 
   @override
   Future<List<ComponentStatus>> getComponentStatuses() {
@@ -30,9 +37,8 @@ final class SystemStatusRepositoryImpl implements SystemStatusRepository {
   Stream<List<ComponentStatus>> pollComponentStatuses({
     Duration interval = const Duration(seconds: 120),
   }) {
-    return Stream<void>.periodic(interval) //
-        .startWith(null)
-        .asyncMap((_) async => getComponentStatuses())
-        .asBroadcastStream();
+    return Stream<void>.periodic(
+      interval,
+    ).startWith(null).asyncMap((_) async => getComponentStatuses()).asBroadcastStream();
   }
 }

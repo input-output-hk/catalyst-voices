@@ -7,6 +7,7 @@ void main() {
   final CatGateway gateway = MockCatGateway();
   final CatReviews reviews = MockCatReviews();
   final CatStatus status = MockedCatStatus();
+  final AppMetaService appMeta = MockedAppMetaService();
 
   final SignedDocumentManager signedDocumentManager = _MockedSignedDocumentManager();
 
@@ -19,6 +20,7 @@ void main() {
       gateway: gateway,
       reviews: reviews,
       status: status,
+      appMeta: appMeta,
     );
 
     source = CatGatewayDocumentDataSource(apiServices, signedDocumentManager);
