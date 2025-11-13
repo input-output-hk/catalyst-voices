@@ -125,7 +125,7 @@ export class CardanoWalletFullApi {
    */
   get cip95() {
     try {
-      return CardanoWalletCip95Api(this.delegate.cip95);
+      return new CardanoWalletCip95Api(this.delegate.cip95);
     } catch (err) {
       throw _mapError(err);
     }
