@@ -44,8 +44,8 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
 
   factory CampaignCategoryDetailsViewModel.fromModel(
     CampaignCategory model, {
-    int finalProposalsCount = 0,
-    MultiCurrencyAmount? totalAsk,
+    required int finalProposalsCount,
+    required MultiCurrencyAmount totalAsk,
   }) {
     return CampaignCategoryDetailsViewModel(
       ref: model.selfRef,
@@ -56,7 +56,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
       finalProposalsCount: finalProposalsCount,
       availableFunds: model.availableFunds,
       image: CategoryImageUrl.image(model.selfRef.id),
-      totalAsk: totalAsk ?? MultiCurrencyAmount.single(Money.zero(currency: Currencies.fallback)),
+      totalAsk: totalAsk,
       range: model.range,
       descriptions: model.descriptions.map(CategoryDescriptionViewModel.fromModel).toList(),
       dos: model.dos,
