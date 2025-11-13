@@ -796,7 +796,7 @@
   "@currentCampaign": {
     "description": "Header for current campaign section"
   },
-  "currentCampaignDescription": "Project Catalyst turns economic power into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.",
+  "currentCampaignDescription": "Project Catalyst turns economic energy into innovation power by using the Cardano Treasury to incentivize and fund community-approved ideas.",
   "@currentCampaignDescription": {
     "description": "Description of current campaign purpose"
   },
