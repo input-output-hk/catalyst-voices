@@ -91,6 +91,14 @@ enum WalletApiErrorCode {
   final int tag;
 
   const WalletApiErrorCode({required this.tag});
+
+  /// Maps a [tag] to the [WalletApiErrorCode].
+  static WalletApiErrorCode fromTag(int tag) {
+    return values.firstWhere(
+      (e) => e.tag == tag,
+      orElse: () => throw UnsupportedError('WalletApiErrorCode: unsupported tag $tag'),
+    );
+  }
 }
 
 /// Defines a set of possible exceptions that might occur when
