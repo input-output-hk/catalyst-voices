@@ -14,6 +14,7 @@ final class Schema4 extends i0.VersionedSchema {
     documentsFavorites,
     drafts,
     documentsV2,
+    documentAuthors,
     documentsLocalMetadata,
     localDocumentsDrafts,
     idxDocType,
@@ -27,7 +28,12 @@ final class Schema4 extends i0.VersionedSchema {
     idxDocumentsV2TypeRefId,
     idxDocumentsV2TypeRefIdVer,
     idxDocumentsV2RefIdVer,
-    idxDocumentsV2TypeCreatedAt,
+    idxDocumentsV2TypeIdCreatedAt,
+    idxDocumentsV2TypeCategoryId,
+    idxDocumentsV2TypeRefIdRefVer,
+    idxDocumentAuthorsComposite,
+    idxDocumentAuthorsIdentity,
+    idxDocumentAuthorsUsername,
   ];
   late final Shape0 documents = Shape0(
     source: i0.VersionedTable(
@@ -118,7 +124,21 @@ final class Schema4 extends i0.VersionedSchema {
     ),
     alias: null,
   );
-  late final Shape5 documentsLocalMetadata = Shape5(
+  late final Shape5 documentAuthors = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'document_authors',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(document_id, document_ver, author_id)',
+        'FOREIGN KEY (document_id, document_ver) REFERENCES documents_v2(id, ver) ON DELETE CASCADE',
+      ],
+      columns: [_column_24, _column_25, _column_26, _column_27, _column_28],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape6 documentsLocalMetadata = Shape6(
     source: i0.VersionedTable(
       entityName: 'documents_local_metadata',
       withoutRowId: false,
@@ -200,9 +220,29 @@ final class Schema4 extends i0.VersionedSchema {
     'idx_documents_v2_ref_id_ver',
     'CREATE INDEX idx_documents_v2_ref_id_ver ON documents_v2 (ref_id, ver)',
   );
-  final i1.Index idxDocumentsV2TypeCreatedAt = i1.Index(
-    'idx_documents_v2_type_created_at',
-    'CREATE INDEX idx_documents_v2_type_created_at ON documents_v2 (type, created_at)',
+  final i1.Index idxDocumentsV2TypeIdCreatedAt = i1.Index(
+    'idx_documents_v2_type_id_created_at',
+    'CREATE INDEX idx_documents_v2_type_id_created_at ON documents_v2 (type, id, created_at)',
+  );
+  final i1.Index idxDocumentsV2TypeCategoryId = i1.Index(
+    'idx_documents_v2_type_category_id',
+    'CREATE INDEX idx_documents_v2_type_category_id ON documents_v2 (type, category_id)',
+  );
+  final i1.Index idxDocumentsV2TypeRefIdRefVer = i1.Index(
+    'idx_documents_v2_type_ref_id_ref_ver',
+    'CREATE INDEX idx_documents_v2_type_ref_id_ref_ver ON documents_v2 (type, ref_id, ref_ver)',
+  );
+  final i1.Index idxDocumentAuthorsComposite = i1.Index(
+    'idx_document_authors_composite',
+    'CREATE INDEX idx_document_authors_composite ON document_authors (document_id, document_ver, author_id_significant)',
+  );
+  final i1.Index idxDocumentAuthorsIdentity = i1.Index(
+    'idx_document_authors_identity',
+    'CREATE INDEX idx_document_authors_identity ON document_authors (author_id_significant)',
+  );
+  final i1.Index idxDocumentAuthorsUsername = i1.Index(
+    'idx_document_authors_username',
+    'CREATE INDEX idx_document_authors_username ON document_authors (author_username)',
   );
 }
 
@@ -482,6 +522,56 @@ i1.GeneratedColumn<String> _column_23(String aliasedName) =>
 
 class Shape5 extends i0.VersionedTable {
   Shape5({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get authorId =>
+      columnsByName['author_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get authorIdSignificant =>
+      columnsByName['author_id_significant']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get authorUsername =>
+      columnsByName['author_username']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get documentId =>
+      columnsByName['document_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get documentVer =>
+      columnsByName['document_ver']! as i1.GeneratedColumn<String>;
+}
+
+i1.GeneratedColumn<String> _column_24(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'author_id',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+    );
+i1.GeneratedColumn<String> _column_25(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'author_id_significant',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+    );
+i1.GeneratedColumn<String> _column_26(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'author_username',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+    );
+i1.GeneratedColumn<String> _column_27(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'document_id',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+    );
+i1.GeneratedColumn<String> _column_28(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'document_ver',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+    );
+
+class Shape6 extends i0.VersionedTable {
+  Shape6({required super.source, required super.alias}) : super.aliased();
   i1.GeneratedColumn<String> get id =>
       columnsByName['id']! as i1.GeneratedColumn<String>;
   i1.GeneratedColumn<bool> get isFavorite =>

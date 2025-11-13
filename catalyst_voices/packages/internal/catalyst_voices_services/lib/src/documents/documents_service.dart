@@ -140,6 +140,11 @@ final class DocumentsServiceImpl implements DocumentsService {
       onProgress?.call(1);
     }
 
+    // Analyze is kind of expensive so run it when significant amount of docs were added
+    if (syncResult.newDocumentsCount > 100) {
+      await _documentRepository.analyzeDatabase();
+    }
+
     return syncResult;
   }
 

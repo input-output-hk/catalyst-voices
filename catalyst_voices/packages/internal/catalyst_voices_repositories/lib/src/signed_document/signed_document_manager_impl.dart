@@ -14,18 +14,26 @@ const _brotliEncoding = StringValue(CoseValues.brotliContentEncoding);
 final class SignedDocumentManagerImpl implements SignedDocumentManager {
   final CatalystCompressor brotli;
   final CatalystCompressor zstd;
-  final CatalystRuntimeProfiler? profiler;
+  final CatalystProfiler profiler;
 
   const SignedDocumentManagerImpl({
     required this.brotli,
     required this.zstd,
-    this.profiler,
+    this.profiler = const CatalystNoopProfiler(),
   });
 
   @override
   Future<SignedDocument> parseDocument(Uint8List bytes) async {
-    final cborValue = await _profileCborDecode<CborValue>(() async => cbor.decode(bytes));
-    final coseSign = await _profileCoseParse<CoseSign>(() async => CoseSign.fromCbor(cborValue));
+    final cborValue = await profiler.timeWithResult(
+      'cbor_decode_doc',
+      () => cbor.decode(bytes),
+      debounce: true,
+    );
+    final coseSign = await profiler.timeWithResult(
+      'cose_decode',
+      () => CoseSign.fromCbor(cborValue),
+      debounce: true,
+    );
 
     final metadata = _SignedDocumentMetadataExt.fromCose(
       protectedHeaders: coseSign.protectedHeaders,
@@ -55,13 +63,17 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   }) async {
     final compressedPayload = await _brotliCompressPayload(document.toBytes());
 
-    final coseSign = await _profileCoseSign(
-      () async => CoseSign.sign(
-        protectedHeaders: metadata.asCoseProtectedHeaders,
-        unprotectedHeaders: metadata.asCoseUnprotectedHeaders,
-        payload: compressedPayload,
-        signers: [_CatalystSigner(catalystId, privateKey)],
-      ),
+    final coseSign = await profiler.timeWithResult(
+      'cose_sign_doc',
+      () {
+        return CoseSign.sign(
+          protectedHeaders: metadata.asCoseProtectedHeaders,
+          unprotectedHeaders: metadata.asCoseUnprotectedHeaders,
+          payload: compressedPayload,
+          signers: [_CatalystSigner(catalystId, privateKey)],
+        );
+      },
+      debounce: true,
     );
 
     return _CoseSignedDocument(
@@ -73,61 +85,25 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   }
 
   Future<Uint8List> _brotliCompressPayload(Uint8List payload) async {
-    return _profileBrotliCompress(() async {
-      final compressed = await brotli.compress(payload);
-      return Uint8List.fromList(compressed);
-    });
+    final compressed = await profiler.timeWithResult(
+      'brotli_compress',
+      () => brotli.compress(payload),
+      debounce: true,
+    );
+    return Uint8List.fromList(compressed);
   }
 
   Future<Uint8List> _brotliDecompressPayload(CoseSign coseSign) async {
     if (coseSign.protectedHeaders.contentEncoding == _brotliEncoding) {
-      return _profileBrotliDecompress(() async {
-        final decompressed = await brotli.decompress(coseSign.payload);
-        return Uint8List.fromList(decompressed);
-      });
+      final decompressed = await profiler.timeWithResult(
+        'brotli_decompress',
+        () => brotli.decompress(coseSign.payload),
+        debounce: true,
+      );
+      return Uint8List.fromList(decompressed);
     } else {
       return coseSign.payload;
     }
-  }
-
-  Future<T> _profileBrotliCompress<T>(AsyncValueGetter<T> body) async {
-    final profiler = this.profiler;
-    if (profiler != null && profiler.ongoing) {
-      return profiler.brotliCompress(body: body);
-    }
-    return body();
-  }
-
-  Future<T> _profileBrotliDecompress<T>(AsyncValueGetter<T> body) async {
-    final profiler = this.profiler;
-    if (profiler != null && profiler.ongoing) {
-      return profiler.brotliDecompress(body: body);
-    }
-    return body();
-  }
-
-  Future<T> _profileCborDecode<T>(AsyncValueGetter<T> body) async {
-    final profiler = this.profiler;
-    if (profiler != null && profiler.ongoing) {
-      return profiler.cborDecode(body: body);
-    }
-    return body();
-  }
-
-  Future<T> _profileCoseParse<T>(AsyncValueGetter<T> body) async {
-    final profiler = this.profiler;
-    if (profiler != null && profiler.ongoing) {
-      return profiler.coseParse(name: 'document', body: body);
-    }
-    return body();
-  }
-
-  Future<T> _profileCoseSign<T>(AsyncValueGetter<T> body) async {
-    final profiler = this.profiler;
-    if (profiler != null && profiler.ongoing) {
-      return profiler.coseSign(name: 'document', body: body);
-    }
-    return body();
   }
 }
 

@@ -4,6 +4,7 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/document/document_repository.dart';
 import 'package:catalyst_voices_repositories/src/dto/document_data_with_ref_dat.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -29,11 +30,12 @@ void main() {
     database = DriftCatalystDatabase(connection);
 
     draftsSource = DatabaseDraftsDataSource(database);
-    localDocuments = DatabaseDocumentsDataSource(database);
+    localDocuments = DatabaseDocumentsDataSource(database, const CatalystProfiler.noop());
     remoteDocuments = _MockDocumentDataRemoteSource();
     favoriteDocuments = DatabaseDocumentFavoriteSource(database);
 
     repository = DocumentRepositoryImpl(
+      database,
       draftsSource,
       localDocuments,
       remoteDocuments,

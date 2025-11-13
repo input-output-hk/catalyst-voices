@@ -1,8 +1,11 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_dao.drift.dart';
+import 'package:catalyst_voices_repositories/src/database/model/document_with_authors_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
+import 'package:collection/collection.dart';
 import 'package:drift/drift.dart';
 
 abstract interface class DocumentsV2Dao {
@@ -35,18 +38,19 @@ abstract interface class DocumentsV2Dao {
   /// Saves a single document, ignoring if it conflicts on {id, ver}.
   ///
   /// Delegates to [saveAll] for consistent conflict handling and reuse.
-  Future<void> save(DocumentEntityV2 entity);
+  Future<void> save(DocumentWithAuthorsEntity entity);
 
   /// Saves multiple documents in a batch operation, ignoring conflicts.
   ///
   /// [entries] is a list of DocumentEntity instances.
   /// Uses insertOrIgnore to skip on primary key conflicts ({id, ver}).
-  Future<void> saveAll(List<DocumentEntityV2> entries);
+  Future<void> saveAll(List<DocumentWithAuthorsEntity> entries);
 }
 
 @DriftAccessor(
   tables: [
     DocumentsV2,
+    DocumentAuthors,
   ],
 )
 class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
@@ -126,18 +130,29 @@ class DriftDocumentsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
-  Future<void> save(DocumentEntityV2 entity) => saveAll([entity]);
+  Future<void> save(DocumentWithAuthorsEntity entity) => saveAll([entity]);
 
   @override
-  Future<void> saveAll(List<DocumentEntityV2> entries) async {
+  Future<void> saveAll(List<DocumentWithAuthorsEntity> entries) async {
     if (entries.isEmpty) return;
+
+    final docs = entries.map((e) => e.doc);
+    final authors = entries.map((e) => e.authors).flattened;
 
     await batch((batch) {
       batch.insertAll(
         documentsV2,
-        entries,
+        docs,
         mode: InsertMode.insertOrIgnore,
       );
+
+      if (authors.isNotEmpty) {
+        batch.insertAll(
+          documentAuthors,
+          authors,
+          mode: InsertMode.insertOrIgnore,
+        );
+      }
     });
   }
 }

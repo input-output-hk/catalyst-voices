@@ -4,11 +4,11 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_local_metadata.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
-import 'package:catalyst_voices_repositories/src/database/table/local_documents_drafts.dart';
 import 'package:catalyst_voices_repositories/src/dto/proposal/proposal_submission_action_dto.dart';
 import 'package:drift/drift.dart';
 import 'package:rxdart/rxdart.dart';
@@ -34,7 +34,7 @@ import 'package:rxdart/rxdart.dart';
 @DriftAccessor(
   tables: [
     DocumentsV2,
-    LocalDocumentsDrafts,
+    DocumentAuthors,
     DocumentsLocalMetadata,
   ],
 )
@@ -227,9 +227,17 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     }
 
     if (filters.author != null) {
-      final authorUri = filters.author.toString();
-      final escapedAuthor = _escapeForSqlLike(authorUri);
-      clauses.add("p.authors LIKE '%$escapedAuthor%' ESCAPE '\\'");
+      final significant = filters.author!.toSignificant();
+      final escapedSignificant = _escapeSqlString(significant.toString());
+
+      clauses.add('''
+        EXISTS (
+          SELECT 1 FROM document_authors da
+          WHERE da.document_id = p.id 
+            AND da.document_ver = p.ver
+            AND da.author_id_significant = '$escapedSignificant'
+        )
+      ''');
     }
 
     if (filters.categoryId != null) {
@@ -247,7 +255,12 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
       clauses.add(
         '''
         (
-          p.authors LIKE '%$escapedQuery%' ESCAPE '\\' OR
+          EXISTS (
+            SELECT 1 FROM document_authors da
+            WHERE da.document_id = p.id 
+              AND da.document_ver = p.ver
+              AND da.author_username LIKE '%$escapedQuery%' ESCAPE '\\'
+          ) OR
           json_extract(p.content, '\$.setup.proposer.applicant') LIKE '%$escapedQuery%' ESCAPE '\\' OR
           json_extract(p.content, '\$.setup.title.title') LIKE '%$escapedQuery%' ESCAPE '\\'
         )''',
@@ -567,6 +580,16 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
     LIMIT ? OFFSET ?
   ''';
 
+    final readsFromTables = <ResultSetImplementation<dynamic, dynamic>>{
+      documentsV2,
+      documentsLocalMetadata,
+    };
+
+    if (filters.author != null ||
+        (filters.searchQuery != null && filters.searchQuery!.isNotEmpty)) {
+      readsFromTables.add(documentAuthors);
+    }
+
     return customSelect(
       cteQuery,
       variables: [
@@ -580,7 +603,7 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         Variable.withInt(size),
         Variable.withInt(page * size),
       ],
-      readsFrom: {documentsV2, documentsLocalMetadata},
+      readsFrom: readsFromTables,
     ).map((row) {
       final proposalData = {
         for (final col in documentsV2.$columns)

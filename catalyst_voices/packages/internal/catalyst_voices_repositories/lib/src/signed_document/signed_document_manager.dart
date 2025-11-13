@@ -11,7 +11,7 @@ abstract interface class SignedDocumentManager {
   const factory SignedDocumentManager({
     required CatalystCompressor brotli,
     required CatalystCompressor zstd,
-    CatalystRuntimeProfiler? profiler,
+    CatalystProfiler profiler,
   }) = SignedDocumentManagerImpl;
 
   /// Parses the document from the [bytes] representation.

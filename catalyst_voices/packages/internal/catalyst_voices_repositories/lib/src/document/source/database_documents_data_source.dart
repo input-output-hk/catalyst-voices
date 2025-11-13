@@ -1,18 +1,25 @@
+import 'dart:async';
+
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_repositories/src/database/model/document_with_authors_entity.dart';
 import 'package:catalyst_voices_repositories/src/database/model/joined_proposal_brief_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_repositories/src/document/source/proposal_document_data_local_source.dart';
 import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
 import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:rxdart/rxdart.dart';
 
 final class DatabaseDocumentsDataSource
     implements SignedDocumentDataSource, ProposalDocumentDataLocalSource {
   final CatalystDatabase _database;
+  final CatalystProfiler _profiler;
 
   DatabaseDocumentsDataSource(
     this._database,
+    this._profiler,
   );
 
   @override
@@ -114,7 +121,9 @@ final class DatabaseDocumentsDataSource
 
   @override
   Future<void> saveAll(Iterable<DocumentData> data) async {
-    final entries = data.map((e) => e.toEntity()).toList();
+    final entries = data
+        .map((e) => DocumentWithAuthorsEntity(e.toDocEntity(), e.toAuthorEntities()))
+        .toList();
 
     await _database.documentsV2Dao.saveAll(entries);
   }
@@ -170,8 +179,15 @@ final class DatabaseDocumentsDataSource
     ProposalsOrder order = const UpdateDate.desc(),
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
+    final tr = _profiler.startTransaction('Query proposals: $request:$order:$filters');
+
     return _database.proposalsV2Dao
         .watchProposalsBriefPage(request: request, order: order, filters: filters)
+        .doOnData(
+          (_) {
+            if (!tr.finished) unawaited(tr.finish());
+          },
+        )
         .map((page) => page.map((data) => data.toModel()));
   }
 
@@ -186,7 +202,13 @@ final class DatabaseDocumentsDataSource
   Stream<int> watchProposalsCountV2({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
-    return _database.proposalsV2Dao.watchVisibleProposalsCount(filters: filters);
+    final tr = _profiler.startTransaction('Query proposals count: $filters');
+
+    return _database.proposalsV2Dao.watchVisibleProposalsCount(filters: filters).doOnData(
+      (_) {
+        if (!tr.finished) unawaited(tr.finish());
+      },
+    );
   }
 
   @override
@@ -232,9 +254,7 @@ extension on DocumentEntityV2 {
         section: section,
         categoryId: categoryId.toRef(categoryVer),
         // TODO(damian-molinski): Make sure to add unit tests
-        authors: authors.isEmpty
-            ? null
-            : authors.split(',').map((e) => CatalystId.fromUri(e.getUri())).toList(),
+        authors: authors.isEmpty ? null : authors.split(',').map(CatalystId.parse).toList(),
       ),
       content: content,
     );
@@ -253,7 +273,19 @@ extension on String? {
 }
 
 extension on DocumentData {
-  DocumentEntityV2 toEntity() {
+  List<DocumentAuthorEntity> toAuthorEntities() {
+    return (metadata.authors ?? const []).map((catId) {
+      return DocumentAuthorEntity(
+        documentId: metadata.id,
+        documentVer: metadata.version,
+        authorId: catId.toUri().toString(),
+        authorIdSignificant: catId.toSignificant().toUri().toString(),
+        authorUsername: catId.username,
+      );
+    }).toList();
+  }
+
+  DocumentEntityV2 toDocEntity() {
     return DocumentEntityV2(
       content: content,
       id: metadata.id,
@@ -268,7 +300,7 @@ extension on DocumentData {
       categoryVer: metadata.categoryId?.version,
       templateId: metadata.template?.id,
       templateVer: metadata.template?.version,
-      authors: metadata.authors?.map((e) => e.toUri().toString()).join(',') ?? '',
+      authors: metadata.authors?.map((e) => e.toString()).join(',') ?? '',
       createdAt: metadata.version.dateTime,
     );
   }

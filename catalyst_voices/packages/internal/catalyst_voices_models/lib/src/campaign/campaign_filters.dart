@@ -15,4 +15,7 @@ final class CampaignFilters extends Equatable {
 
   @override
   List<Object?> get props => [categoriesIds];
+
+  @override
+  String toString() => 'CampaignFilters($categoriesIds)';
 }

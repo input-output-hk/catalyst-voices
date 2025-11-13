@@ -42,7 +42,6 @@ final class Dependencies extends DependencyProvider {
     required ReportingService reportingService,
     CatalystProfiler? profiler,
     CatalystStartupProfiler? startupProfiler,
-    CatalystRuntimeProfiler? runtimeProfiler,
   }) async {
     DependencyProvider.instance = this;
 
@@ -55,9 +54,6 @@ final class Dependencies extends DependencyProvider {
     }
     if (startupProfiler != null) {
       registerSingleton(startupProfiler);
-    }
-    if (runtimeProfiler != null) {
-      registerSingleton(runtimeProfiler);
     }
 
     _registerStorages();
@@ -247,10 +243,11 @@ final class Dependencies extends DependencyProvider {
         return BlockchainRepository(get<ApiServices>());
       })
       ..registerLazySingleton<SignedDocumentManager>(() {
+        final profiler = get<CatalystProfiler>();
         return SignedDocumentManager(
           brotli: const CatalystBrotliCompressor(),
           zstd: const CatalystZstdCompressor(),
-          profiler: get<CatalystRuntimeProfiler>(),
+          profiler: profiler is CatalystConsoleProfiler ? profiler : const CatalystNoopProfiler(),
         );
       })
       ..registerLazySingleton<DatabaseDraftsDataSource>(() {
@@ -261,6 +258,7 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<DatabaseDocumentsDataSource>(() {
         return DatabaseDocumentsDataSource(
           get<CatalystDatabase>(),
+          get<CatalystProfiler>(),
         );
       })
       ..registerLazySingleton<DocumentFavoriteSource>(() {
@@ -277,6 +275,7 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<CampaignRepository>(CampaignRepository.new)
       ..registerLazySingleton<DocumentRepository>(() {
         return DocumentRepository(
+          get<CatalystDatabase>(),
           get<DatabaseDraftsDataSource>(),
           get<DatabaseDocumentsDataSource>(),
           get<CatGatewayDocumentDataSource>(),
@@ -513,6 +512,7 @@ final class Dependencies extends DependencyProvider {
           get<SyncStatsStorage>(),
           get<DocumentsService>(),
           get<CampaignService>(),
+          get<CatalystProfiler>(),
         );
       },
       dispose: (manager) async => manager.dispose(),

@@ -394,7 +394,7 @@ final class ProposalServiceImpl implements ProposalService {
     // where version timestamp is not older than a predefined interval.
     // Because of it we're regenerating a version just before publishing.
     final freshRef = originalRef.freshVersion();
-    final freshDocument = document.copyWithSelfRef(selfRef: freshRef);
+    final freshDocument = document.copyWith(selfRef: freshRef);
 
     await _signerService.useProposerCredentials(
       (catalystId, privateKey) {

@@ -2,6 +2,8 @@ import 'package:catalyst_voices_dev/catalyst_voices_dev.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/database/catalyst_database.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_dao.dart';
+import 'package:catalyst_voices_repositories/src/database/model/document_with_authors_entity.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_authors.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_v2.drift.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
@@ -54,7 +56,7 @@ void main() {
       test('ignores conflicts and returns accurate count', () async {
         // Given
         final existing = _createTestDocumentEntity(id: 'test-id', ver: 'test-ver');
-        await db.into(db.documentsV2).insert(existing);
+        await dao.save(existing);
 
         final entities = [
           _createTestDocumentEntity(id: 'test-id', ver: 'test-ver'), // Conflict
@@ -85,7 +87,7 @@ void main() {
       test('returns true for existing exact ref', () async {
         // Given
         final entity = _createTestDocumentEntity(id: 'test-id', ver: 'test-ver');
-        await db.into(db.documentsV2).insert(entity);
+        await dao.save(entity);
 
         // And
         const ref = SignedDocumentRef.exact(id: 'test-id', version: 'test-ver');
@@ -100,7 +102,7 @@ void main() {
       test('returns false for non-existing exact ref', () async {
         // Given
         final entity = _createTestDocumentEntity(id: 'test-id', ver: 'test-ver');
-        await db.into(db.documentsV2).insert(entity);
+        await dao.save(entity);
 
         // And
         const ref = SignedDocumentRef.exact(id: 'test-id', version: 'wrong-ver');
@@ -131,7 +133,7 @@ void main() {
       test('returns false for loose ref if no versions exist', () async {
         // Given
         final entity = _createTestDocumentEntity(id: 'other-id', ver: 'other-ver');
-        await db.into(db.documentsV2).insert(entity);
+        await dao.save(entity);
 
         // And
         const ref = SignedDocumentRef.loose(id: 'non-existent-id');
@@ -146,7 +148,7 @@ void main() {
       test('handles null version in exact ref (treats as loose)', () async {
         // Given
         final entity = _createTestDocumentEntity(id: 'test-id', ver: 'test-ver');
-        await db.into(db.documentsV2).insert(entity);
+        await dao.save(entity);
 
         // And
         const ref = SignedDocumentRef.loose(id: 'test-id');
@@ -218,7 +220,7 @@ void main() {
       test('filters out non-existing refs (mixed exact and loose)', () async {
         // Given
         final entity = _createTestDocumentEntity(id: 'existing-id', ver: 'existing-ver');
-        await db.into(db.documentsV2).insert(entity);
+        await dao.save(entity);
 
         // And
         final refs = [
@@ -303,7 +305,7 @@ void main() {
       test('returns entity for existing exact ref', () async {
         // Given
         final entity = _createTestDocumentEntity(id: 'test-id', ver: 'test-ver');
-        await db.into(db.documentsV2).insert(entity);
+        await dao.save(entity);
 
         // And
         const ref = SignedDocumentRef.exact(id: 'test-id', version: 'test-ver');
@@ -320,7 +322,7 @@ void main() {
       test('returns null for non-existing exact ref', () async {
         // Given
         final entity = _createTestDocumentEntity(id: 'test-id', ver: 'test-ver');
-        await db.into(db.documentsV2).insert(entity);
+        await dao.save(entity);
 
         // And
         const ref = SignedDocumentRef.exact(id: 'test-id', version: 'wrong-ver');
@@ -358,7 +360,7 @@ void main() {
       test('returns null for loose ref if no versions exist', () async {
         // Given
         final entity = _createTestDocumentEntity(id: 'other-id', ver: 'other-ver');
-        await db.into(db.documentsV2).insert(entity);
+        await dao.save(entity);
 
         // And
         const ref = SignedDocumentRef.loose(id: 'non-existent-id');
@@ -374,7 +376,7 @@ void main() {
     group('saveAll', () {
       test('does nothing for empty list', () async {
         // Given
-        final entities = <DocumentEntityV2>[];
+        final entities = <DocumentWithAuthorsEntity>[];
 
         // When
         await dao.saveAll(entities);
@@ -397,7 +399,7 @@ void main() {
         // Then
         final saved = await db.select(db.documentsV2).get();
         final savedIds = saved.map((e) => e.id);
-        final expectedIds = entities.map((e) => e.id);
+        final expectedIds = entities.map((e) => e.doc.id);
 
         expect(savedIds, expectedIds);
       });
@@ -409,7 +411,7 @@ void main() {
           ver: 'test-ver',
           contentData: {'key': 'original'},
         );
-        await db.into(db.documentsV2).insert(existing);
+        await dao.save(existing);
 
         // And
         final entities = [
@@ -436,8 +438,8 @@ void main() {
         // Given
         final existing1 = _createTestDocumentEntity(id: 'existing-1', ver: 'ver-1');
         final existing2 = _createTestDocumentEntity(id: 'existing-2', ver: 'ver-2');
-        await db.into(db.documentsV2).insert(existing1);
-        await db.into(db.documentsV2).insert(existing2);
+        await dao.save(existing1);
+        await dao.save(existing2);
 
         // And:
         final entities = [
@@ -482,7 +484,7 @@ void main() {
           ver: '0194d492-1daa-7371-8bd3-c15811b2b063',
           contentData: {'key': 'original'},
         );
-        await db.into(db.documentsV2).insert(existing);
+        await dao.save(existing);
 
         // And
         final conflicting = _createTestDocumentEntity(
@@ -509,7 +511,7 @@ String _buildUuidV7At(DateTime dateTime) {
   return const UuidV7().generate(options: V7Options(ts, rand));
 }
 
-DocumentEntityV2 _createTestDocumentEntity({
+DocumentWithAuthorsEntity _createTestDocumentEntity({
   String? id,
   String? ver,
   Map<String, dynamic> contentData = const {},
@@ -529,7 +531,7 @@ DocumentEntityV2 _createTestDocumentEntity({
   ver ??= id;
   authors ??= '';
 
-  return DocumentEntityV2(
+  final docEntity = DocumentEntityV2(
     id: id,
     ver: ver,
     content: DocumentDataContent(contentData),
@@ -546,4 +548,22 @@ DocumentEntityV2 _createTestDocumentEntity({
     templateId: templateId,
     templateVer: templateVer,
   );
+
+  final authorsEntities = authors
+      .split(',')
+      .where((element) => element.trim().isNotEmpty)
+      .map(CatalystId.tryParse)
+      .nonNulls
+      .map(
+        (e) => DocumentAuthorEntity(
+          documentId: docEntity.id,
+          documentVer: docEntity.ver,
+          authorId: e.toUri().toString(),
+          authorIdSignificant: e.toSignificant().toUri().toString(),
+          authorUsername: e.username,
+        ),
+      )
+      .toList();
+
+  return DocumentWithAuthorsEntity(docEntity, authorsEntities);
 }

@@ -9,12 +9,15 @@ import 'package:flutter/foundation.dart';
 /// See: https://input-output-hk.github.io/catalyst-libs/architecture/08_concepts/rbac_id_uri/catalyst-id-uri/
 final class CatalystId extends Equatable {
   /// The default scheme for the Catalyst ID.
-  static const String scheme = 'id.catalyst';
+  static const String idScheme = 'id.catalyst';
 
   /// [Uri.fragment] if the key is for encryption.
   ///
   /// If the fragment is not present in the uri then the key is for signing.
   static const String encryptFragment = 'encrypt';
+
+  /// The scheme part of the URI.
+  final String scheme;
 
   /// The host refers to the network type where the RBAC registration was made.
   ///
@@ -49,6 +52,7 @@ final class CatalystId extends Equatable {
 
   /// The default constructor that builds [CatalystId] from [Uri] parts.
   const CatalystId({
+    this.scheme = CatalystId.idScheme,
     required this.host,
     this.username,
     this.nonce,
@@ -65,10 +69,12 @@ final class CatalystId extends Equatable {
 
   /// Parses the [CatalystId] from [Uri].
   factory CatalystId.fromUri(Uri uri) {
+    final scheme = uri.scheme;
     final (username, nonce) = _parseUserInfo(uri.userInfo);
     final (role0Key, role, rotation) = _parsePath(uri.path);
 
     return CatalystId(
+      scheme: scheme,
       host: uri.host,
       username: username,
       nonce: nonce,
@@ -77,6 +83,16 @@ final class CatalystId extends Equatable {
       rotation: rotation,
       encrypt: uri.fragment.equalsIgnoreCase(encryptFragment),
     );
+  }
+
+  /// A convenience factory for parsing a [CatalystId] from a string.
+  ///
+  /// This method is a wrapper around [CatalystId.fromUri] that first parses
+  /// the input [data] string into a [Uri] and then constructs the [CatalystId].
+  ///
+  /// Throws a [FormatException] if the [data] string is not a valid URI.
+  factory CatalystId.parse(String data) {
+    return CatalystId.fromUri(Uri.parse(data));
   }
 
   @override
@@ -91,6 +107,7 @@ final class CatalystId extends Equatable {
   ];
 
   CatalystId copyWith({
+    String? scheme,
     String? host,
     Optional<String>? username,
     Optional<int>? nonce,
@@ -100,6 +117,7 @@ final class CatalystId extends Equatable {
     bool? encrypt,
   }) {
     return CatalystId(
+      scheme: scheme ?? this.scheme,
       host: host ?? this.host,
       username: username.dataOr(this.username),
       nonce: nonce.dataOr(this.nonce),
@@ -113,7 +131,7 @@ final class CatalystId extends Equatable {
   /// Objects which holds [CatalystId] can be uniquely identified only by
   /// comparing [role0Key] and [host] thus they're significant parts of
   /// [CatalystId].
-  CatalystId toSignificant() => CatalystId(host: host, role0Key: role0Key);
+  CatalystId toSignificant() => CatalystId(scheme: scheme, host: host, role0Key: role0Key);
 
   @override
   String toString() => toUri().toString();
@@ -155,6 +173,19 @@ final class CatalystId extends Equatable {
     ];
     final userInfo = parts.join(':');
     return userInfo.isNotEmpty ? userInfo : null;
+  }
+
+  /// A convenience method that wraps [CatalystId.parse] in a `try-catch`
+  /// block.
+  ///
+  /// If [data] is a valid [CatalystId] string, it will be parsed and
+  /// a [CatalystId] instance will be returned. Otherwise, `null` is returned.
+  static CatalystId? tryParse(String data) {
+    try {
+      return CatalystId.parse(data);
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Parses the data from [Uri.path].

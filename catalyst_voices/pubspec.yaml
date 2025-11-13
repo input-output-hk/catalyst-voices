@@ -111,7 +111,7 @@ melos:
       description: |
         Run `build_runner` in catalyst_voices_repositories package
 
-    db-make-migration:
+    build-db-schema:
       run: |
         melos exec --scope="catalyst_voices_repositories" -- dart run drift_dev make-migrations
       description: |

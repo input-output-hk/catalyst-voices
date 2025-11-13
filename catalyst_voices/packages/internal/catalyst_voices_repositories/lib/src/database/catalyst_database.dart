@@ -4,10 +4,10 @@ import 'package:catalyst_voices_repositories/src/database/dao/documents_dao.dart
 import 'package:catalyst_voices_repositories/src/database/dao/documents_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/drafts_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/favorites_dao.dart';
-import 'package:catalyst_voices_repositories/src/database/dao/local_drafts_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/dao/proposals_v2_dao.dart';
 import 'package:catalyst_voices_repositories/src/database/migration/drift_migration_strategy.dart';
+import 'package:catalyst_voices_repositories/src/database/table/document_authors.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents.drift.dart';
 import 'package:catalyst_voices_repositories/src/database/table/documents_favorite.dart';
@@ -47,8 +47,6 @@ abstract interface class CatalystDatabase {
   /// Contains all operations related to fav status of documents.
   FavoritesDao get favoritesDao;
 
-  LocalDraftsV2Dao get localDraftsV2Dao;
-
   /// Allows to await completion of pending operations.
   ///
   /// Useful when tearing down integration tests.
@@ -59,6 +57,8 @@ abstract interface class CatalystDatabase {
   ProposalsDao get proposalsDao;
 
   ProposalsV2Dao get proposalsV2Dao;
+
+  Future<void> analyze();
 
   /// Removes all data from this db.
   Future<void> clear();
@@ -76,6 +76,7 @@ abstract interface class CatalystDatabase {
     DocumentsFavorites,
     Drafts,
     DocumentsV2,
+    DocumentAuthors,
     DocumentsLocalMetadata,
     LocalDocumentsDrafts,
   ],
@@ -85,7 +86,6 @@ abstract interface class CatalystDatabase {
     DriftDraftsDao,
     DriftProposalsDao,
     DriftDocumentsV2Dao,
-    DriftLocalDraftsV2Dao,
     DriftProposalsV2Dao,
   ],
   queries: {},
@@ -134,9 +134,6 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase implements CatalystDa
   FavoritesDao get favoritesDao => driftFavoritesDao;
 
   @override
-  LocalDraftsV2Dao get localDraftsV2Dao => driftLocalDraftsV2Dao;
-
-  @override
   MigrationStrategy get migration {
     return DriftMigrationStrategy(
       database: this,
@@ -158,6 +155,11 @@ class DriftCatalystDatabase extends $DriftCatalystDatabase implements CatalystDa
 
   @override
   int get schemaVersion => 4;
+
+  @override
+  Future<void> analyze() async {
+    await customStatement('ANALYZE');
+  }
 
   @override
   Future<void> clear() {
