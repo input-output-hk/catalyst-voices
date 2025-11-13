@@ -4,6 +4,7 @@ import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_cose/catalyst_cose.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/signed_document/signed_document_manager.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -13,16 +14,26 @@ const _brotliEncoding = StringValue(CoseValues.brotliContentEncoding);
 final class SignedDocumentManagerImpl implements SignedDocumentManager {
   final CatalystCompressor brotli;
   final CatalystCompressor zstd;
+  final CatalystProfiler profiler;
 
   const SignedDocumentManagerImpl({
     required this.brotli,
     required this.zstd,
+    this.profiler = const CatalystNoopProfiler(),
   });
 
   @override
   Future<SignedDocument> parseDocument(Uint8List bytes) async {
-    final cborValue = cbor.decode(bytes);
-    final coseSign = CoseSign.fromCbor(cborValue);
+    final cborValue = await profiler.timeWithResult(
+      'cbor_decode_doc',
+      () => cbor.decode(bytes),
+      debounce: true,
+    );
+    final coseSign = await profiler.timeWithResult(
+      'cose_decode',
+      () => CoseSign.fromCbor(cborValue),
+      debounce: true,
+    );
 
     final metadata = _SignedDocumentMetadataExt.fromCose(
       protectedHeaders: coseSign.protectedHeaders,
@@ -52,11 +63,17 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   }) async {
     final compressedPayload = await _brotliCompressPayload(document.toBytes());
 
-    final coseSign = await CoseSign.sign(
-      protectedHeaders: metadata.asCoseProtectedHeaders,
-      unprotectedHeaders: metadata.asCoseUnprotectedHeaders,
-      payload: compressedPayload,
-      signers: [_CatalystSigner(catalystId, privateKey)],
+    final coseSign = await profiler.timeWithResult(
+      'cose_sign_doc',
+      () {
+        return CoseSign.sign(
+          protectedHeaders: metadata.asCoseProtectedHeaders,
+          unprotectedHeaders: metadata.asCoseUnprotectedHeaders,
+          payload: compressedPayload,
+          signers: [_CatalystSigner(catalystId, privateKey)],
+        );
+      },
+      debounce: true,
     );
 
     return _CoseSignedDocument(
@@ -68,13 +85,21 @@ final class SignedDocumentManagerImpl implements SignedDocumentManager {
   }
 
   Future<Uint8List> _brotliCompressPayload(Uint8List payload) async {
-    final compressed = await brotli.compress(payload);
+    final compressed = await profiler.timeWithResult(
+      'brotli_compress',
+      () => brotli.compress(payload),
+      debounce: true,
+    );
     return Uint8List.fromList(compressed);
   }
 
   Future<Uint8List> _brotliDecompressPayload(CoseSign coseSign) async {
     if (coseSign.protectedHeaders.contentEncoding == _brotliEncoding) {
-      final decompressed = await brotli.decompress(coseSign.payload);
+      final decompressed = await profiler.timeWithResult(
+        'brotli_decompress',
+        () => brotli.decompress(coseSign.payload),
+        debounce: true,
+      );
       return Uint8List.fromList(decompressed);
     } else {
       return coseSign.payload;

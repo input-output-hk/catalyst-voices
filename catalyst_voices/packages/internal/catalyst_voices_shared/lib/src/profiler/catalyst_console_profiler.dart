@@ -1,6 +1,9 @@
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/foundation.dart';
 
+final _debounce = Debouncer();
+final _debounceMaxDuration = <String, Duration>{};
+
 final class CatalystConsoleProfiler implements CatalystProfiler {
   const CatalystConsoleProfiler();
 
@@ -18,7 +21,7 @@ final class CatalystConsoleProfiler implements CatalystProfiler {
     AsyncOrValueGetter<void> body, {
     CatalystProfilerTimelineArguments? arguments,
   }) {
-    return _Timeline(name, arguments: arguments).timeWithResult('', body);
+    return _Timeline('', arguments: arguments).timeWithResult(name, body);
   }
 
   @override
@@ -26,8 +29,9 @@ final class CatalystConsoleProfiler implements CatalystProfiler {
     String name,
     AsyncOrValueGetter<T> body, {
     CatalystProfilerTimelineArguments? arguments,
+    bool debounce = false,
   }) {
-    return _Timeline(name, arguments: arguments).timeWithResult('', body);
+    return _Timeline('', arguments: arguments).timeWithResult(name, body, debounce: debounce);
   }
 }
 
@@ -88,6 +92,7 @@ class _Timeline implements CatalystProfilerTimeline {
     String name,
     AsyncOrValueGetter<T> body, {
     CatalystProfilerTimelineTaskArguments? arguments,
+    bool debounce = false,
   }) async {
     final buffer = StringBuffer(name);
     final args = arguments?.toMap() ?? {};
@@ -101,7 +106,24 @@ class _Timeline implements CatalystProfilerTimeline {
     } finally {
       stopwatch.stop();
 
-      debugPrint('$buffer took ${stopwatch.elapsed}');
+      final name = buffer.toString();
+      final elapsed = stopwatch.elapsed;
+
+      if (debounce) {
+        _debounceMaxDuration.update(
+          name,
+          (value) => value < elapsed ? elapsed : value,
+          ifAbsent: () => elapsed,
+        );
+        _debounce.run(
+          () {
+            final elapsed = _debounceMaxDuration.remove(name);
+            debugPrint('$name took $elapsed');
+          },
+        );
+      } else {
+        debugPrint('$name took $elapsed');
+      }
     }
   }
 }

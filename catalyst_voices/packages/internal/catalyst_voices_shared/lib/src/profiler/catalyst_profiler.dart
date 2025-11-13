@@ -28,6 +28,7 @@ abstract interface class CatalystProfiler {
     String name,
     AsyncOrValueGetter<T> body, {
     CatalystProfilerTimelineArguments? arguments,
+    bool debounce,
   });
 }
 

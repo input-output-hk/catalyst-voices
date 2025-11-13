@@ -243,9 +243,11 @@ final class Dependencies extends DependencyProvider {
         return BlockchainRepository(get<ApiServices>());
       })
       ..registerLazySingleton<SignedDocumentManager>(() {
-        return const SignedDocumentManager(
-          brotli: CatalystBrotliCompressor(),
-          zstd: CatalystZstdCompressor(),
+        final profiler = get<CatalystProfiler>();
+        return SignedDocumentManager(
+          brotli: const CatalystBrotliCompressor(),
+          zstd: const CatalystZstdCompressor(),
+          profiler: profiler is CatalystConsoleProfiler ? profiler : const CatalystNoopProfiler(),
         );
       })
       ..registerLazySingleton<DatabaseDraftsDataSource>(() {
