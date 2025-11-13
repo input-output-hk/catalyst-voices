@@ -30,7 +30,7 @@ class CardInformation extends StatelessWidget {
           CategoryProposalsDetailsCard(
             categoryId: category.id,
             categoryName: category.formattedName,
-            categoryProposalsCount: category.proposalsCount,
+            categoryFinalProposalsCount: category.finalProposalsCount,
           ),
           const SizedBox(height: 16),
           Offstage(

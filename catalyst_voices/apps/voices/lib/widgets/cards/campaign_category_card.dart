@@ -50,7 +50,7 @@ class CampaignCategoryCard extends StatelessWidget {
                   const SizedBox(height: 16),
                   _CampaignStats(
                     availableFunds: category.availableFundsText,
-                    proposalsCount: category.proposalsCount,
+                    finalProposalsCount: category.finalProposalsCount,
                   ),
                   const SizedBox(height: 16),
                   Flexible(
@@ -162,11 +162,11 @@ class _Buttons extends StatelessWidget {
 
 class _CampaignStats extends StatelessWidget {
   final String availableFunds;
-  final int proposalsCount;
+  final int finalProposalsCount;
 
   const _CampaignStats({
     required this.availableFunds,
-    required this.proposalsCount,
+    required this.finalProposalsCount,
   });
 
   @override
@@ -202,7 +202,7 @@ class _CampaignStats extends StatelessWidget {
                   _TextStats(
                     key: const Key('ProposalsCount'),
                     text: context.l10n.proposals,
-                    value: proposalsCount.toString(),
+                    value: finalProposalsCount.toString(),
                   ),
                 ],
               ),

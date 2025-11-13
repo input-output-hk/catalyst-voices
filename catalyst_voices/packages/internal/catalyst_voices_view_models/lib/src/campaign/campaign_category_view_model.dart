@@ -15,7 +15,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
   final String subname;
   final String description;
   final String shortDescription;
-  final int proposalsCount;
+  final int finalProposalsCount;
   final MultiCurrencyAmount availableFunds;
   final MultiCurrencyAmount totalAsk;
   final Range<Money> range;
@@ -31,7 +31,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
     required this.subname,
     required this.description,
     required this.shortDescription,
-    required this.proposalsCount,
+    required this.finalProposalsCount,
     required this.availableFunds,
     required this.image,
     required this.totalAsk,
@@ -49,7 +49,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
       subname: model.categorySubname,
       description: model.description,
       shortDescription: model.shortDescription,
-      proposalsCount: model.proposalsCount,
+      finalProposalsCount: model.finalProposalsCount,
       availableFunds: model.availableFunds,
       image: CategoryImageUrl.image(model.selfRef.id),
       totalAsk: model.totalAsk,
@@ -73,7 +73,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
       description:
           '''Supports development of open source technology, centered around improving the Cardano developer experience and creating developer-friendly tooling that streamlines an integrated development environment.''',
       shortDescription: '',
-      proposalsCount: 263,
+      finalProposalsCount: 263,
       availableFunds: MultiCurrencyAmount.single(
         Money.fromMajorUnits(
           currency: Currencies.ada,
@@ -118,7 +118,7 @@ final class CampaignCategoryDetailsViewModel extends CampaignCategoryViewModel {
     ...super.props,
     subname,
     description,
-    proposalsCount,
+    finalProposalsCount,
     availableFunds,
     totalAsk,
     range,

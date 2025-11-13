@@ -34,7 +34,7 @@ class CategoryDetailView extends StatelessWidget {
             categoryDescription: category.description,
             categoryRef: category.id,
             image: category.image,
-            proposalCount: category.proposalsCount,
+            finalProposalsCount: category.finalProposalsCount,
           ),
           const SizedBox(height: 64),
           FundsDetailCard(
@@ -59,14 +59,14 @@ class _CategoryBrief extends StatelessWidget {
   final String categoryDescription;
   final SignedDocumentRef categoryRef;
   final SvgGenImage image;
-  final int proposalCount;
+  final int finalProposalsCount;
 
   const _CategoryBrief({
     required this.categoryName,
     required this.categoryDescription,
     required this.categoryRef,
     required this.image,
-    required this.proposalCount,
+    required this.finalProposalsCount,
   });
 
   @override
@@ -98,7 +98,7 @@ class _CategoryBrief extends StatelessWidget {
               categoryName: categoryName,
               categoryDescription: categoryDescription,
               categoryRef: categoryRef,
-              showViewAllButton: proposalCount > 0,
+              showViewAllButton: finalProposalsCount > 0,
             ),
           ),
         ],
