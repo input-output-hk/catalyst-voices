@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/notification/catalyst_messenger.dart';
+import 'package:catalyst_voices/notification/specialized/banner/new_version_available_banner.dart';
 import 'package:catalyst_voices/notification/specialized/banner/system_status_issue_banner.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,8 @@ class _SystemStatusListenerState extends State<SystemStatusListener>
   @override
   void handleSignal(SystemStatusSignal signal) {
     switch (signal) {
+      case NewVersionAvailable():
+        CatalystMessenger.of(context).add(const NewVersionAvailableBanner());
       case SystemStatusIssueSignal():
         CatalystMessenger.of(context).add(SystemStatusIssueBanner());
       case CancelSystemStatusIssueSignal():

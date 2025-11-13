@@ -1,5 +1,4 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_models/src/app/app_version.dart';
 import 'package:equatable/equatable.dart';
 
 final class AppMeta extends Equatable {

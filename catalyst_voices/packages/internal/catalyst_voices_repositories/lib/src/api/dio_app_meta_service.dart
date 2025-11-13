@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:catalyst_voices_repositories/src/api/models/version_info.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:dio/dio.dart';
@@ -24,12 +26,14 @@ class DioAppMetaService implements AppMetaService {
 
   @override
   Future<VersionInfo> versionInfo() async {
+    // TODO(LynxLynxx): This will be replaced with DioClient implementation and better error handling
     final timestamp = DateTimeExt.now().toUtc().millisecondsSinceEpoch;
     try {
-      final response = await _dio.get<Map<String, dynamic>>(
+      final response = await _dio.get<String>(
         '/version.json?v=$timestamp',
       );
-      return VersionInfo.fromJson(response.data!);
+      final jsonData = json.decode(response.data!) as Map<String, dynamic>;
+      return VersionInfo.fromJson(jsonData);
     } catch (e) {
       rethrow;
     }

@@ -13,7 +13,7 @@ abstract interface class SystemStatusRepository {
 
   Future<List<ComponentStatus>> getComponentStatuses();
 
-  Stream<List<ComponentStatus>> pollComponentStatuses({Duration interval});
+  Stream<List<ComponentStatus>> pollComponentStatuses({required Duration interval});
 }
 
 final class SystemStatusRepositoryImpl implements SystemStatusRepository {
@@ -35,7 +35,7 @@ final class SystemStatusRepositoryImpl implements SystemStatusRepository {
 
   @override
   Stream<List<ComponentStatus>> pollComponentStatuses({
-    Duration interval = const Duration(seconds: 120),
+    required Duration interval,
   }) {
     return Stream<void>.periodic(
       interval,
