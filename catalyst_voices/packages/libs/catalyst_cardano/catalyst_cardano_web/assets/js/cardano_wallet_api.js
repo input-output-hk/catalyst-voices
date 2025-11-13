@@ -373,9 +373,6 @@ export class CardanoWalletCip95Api {
  * @returns A json representing the mapped error.
  */
 function _mapError(err) {
-  // TODO(dt-iohk): remove logs when not needed
-  console.log(JSON.stringify(err));
-
   const infoCodeError = CardanoWalletInfoCodeError.tryFromObject(err);
   if (infoCodeError) {
     return infoCodeError.stringify();
