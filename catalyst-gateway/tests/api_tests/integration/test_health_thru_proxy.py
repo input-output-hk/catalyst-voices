@@ -19,7 +19,6 @@ def event_db_proxy():
     yield proxy
 
 @pytest.mark.health_with_proxy_endpoint
-# @pytest.mark.skip("...")
 def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory):
     # Not registered stake address
     # Cardano test data CIP0019
@@ -65,7 +64,6 @@ def test_ready_endpoint_with_event_db_outage(event_db_proxy, rbac_chain_factory)
     assert(resp.status_code == 200), f"Expected document index to succeed: {resp.status_code} - {resp.text}"
 
 @pytest.mark.health_with_proxy_endpoint
-# @pytest.mark.skip("...")
 def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory):
     # Not registered stake address
     # Cardano test data CIP0019
@@ -98,6 +96,7 @@ def test_ready_endpoint_with_index_db_outage(index_db_proxy, rbac_chain_factory)
     index_db_proxy.enable()
     # wait for cat-gateway API to recover
     health.is_ready() #assertion
+    # sleep needs to stay until bug is fixed https://github.com/input-output-hk/catalyst-voices/issues/3705
     sleep(20)
     # Index DB testing
     resp = rbac.get(lookup=stake_address_not_registered, token=auth_token)
