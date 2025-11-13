@@ -2,9 +2,9 @@
 
 use std::{fmt::Debug, sync::Arc};
 
-use cardano_chain_follower::{pallas_addresses::Address, Cip36, Slot, TxnIndex, VotingPubKey};
+use cardano_chain_follower::{Cip36, Slot, TxnIndex, VotingPubKey, pallas_addresses::Address};
 use poem_openapi::types::ToJSON;
-use scylla::{client::session::Session, value::MaybeUnset, SerializeRow};
+use scylla::{SerializeRow, client::session::Session, value::MaybeUnset};
 use tracing::error;
 
 use crate::{

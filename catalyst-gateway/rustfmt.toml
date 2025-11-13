@@ -21,7 +21,7 @@
 unstable_features = true
 
 # Compatibility:
-edition = "2021"
+edition = "2024"
 
 # Tabs & spaces - Defaults, listed for clarity
 tab_spaces = 4

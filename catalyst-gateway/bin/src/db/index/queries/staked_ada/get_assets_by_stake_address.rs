@@ -4,7 +4,7 @@ use std::sync::Arc;
 use cardano_chain_follower::StakeAddress;
 use futures::TryStreamExt;
 use scylla::{
-    client::session::Session, statement::prepared::PreparedStatement, DeserializeRow, SerializeRow,
+    DeserializeRow, SerializeRow, client::session::Session, statement::prepared::PreparedStatement,
 };
 use tracing::error;
 
@@ -121,10 +121,10 @@ impl GetAssetsByStakeAddressQuery {
         session: &CassandraSession,
         params: GetAssetsByStakeAddressParams,
     ) -> anyhow::Result<Arc<Vec<GetAssetsByStakeAddressQuery>>> {
-        if session.is_persistent() {
-            if let Some(res) = session.caches().assets_native().get(&params.stake_address) {
-                return Ok(res);
-            }
+        if session.is_persistent()
+            && let Some(res) = session.caches().assets_native().get(&params.stake_address)
+        {
+            return Ok(res);
         }
 
         let res: Vec<GetAssetsByStakeAddressQueryInner> = session

@@ -2,7 +2,7 @@
 #![allow(clippy::indexing_slicing)] // TODO: remove this when https://github.com/pyrossh/rust-embed/issues/243 is resolved positively
 
 mod stoplight_elements;
-use poem::{endpoint::EmbeddedFileEndpoint, get, Route};
+use poem::{Route, endpoint::EmbeddedFileEndpoint, get};
 use poem_openapi::{OpenApi, OpenApiService, Webhook};
 use rust_embed::RustEmbed;
 

@@ -2,7 +2,7 @@
 
 use std::sync::LazyLock;
 
-use cardano_chain_follower::hashes::{TransactionId, BLAKE_2B256_SIZE};
+use cardano_chain_follower::hashes::{BLAKE_2B256_SIZE, TransactionId};
 use const_format::concatcp;
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
@@ -46,10 +46,10 @@ fn is_valid(hash: &str) -> bool {
     #[allow(clippy::unwrap_used)] // Safe because the Regex is constant.
     static RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(PATTERN).unwrap());
 
-    if RE.is_match(hash) {
-        if let Some(h) = hash.strip_prefix("0x") {
-            return hex::decode(h).is_ok();
-        }
+    if RE.is_match(hash)
+        && let Some(h) = hash.strip_prefix("0x")
+    {
+        return hex::decode(h).is_ok();
     }
     false
 }
