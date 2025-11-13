@@ -25,12 +25,17 @@ void main() {
 
     group('getInfo', () {
       test('returns disabled for unavailable feature in environment', () {
+        final unavailableFeatureFlagForEnv = _createTestFeatureFlag(
+          appEnvSettings: {
+            AppEnvironmentType.prod: const FeatureAppEnvironmentTypeSetting(),
+          },
+        );
         repository = FeatureFlagsRepository(
           AppEnvironmentType.prod,
           AppConfig.prod(),
         );
 
-        final info = repository.getInfo(Features.voting);
+        final info = repository.getInfo(unavailableFeatureFlagForEnv);
 
         expect(info.featureFlag.type, equals(FeatureType.voting));
         expect(info.enabled, isFalse);
@@ -157,4 +162,14 @@ void main() {
       });
     });
   });
+}
+
+FeatureFlag _createTestFeatureFlag({
+  required Map<AppEnvironmentType, FeatureAppEnvironmentTypeSetting> appEnvSettings,
+}) {
+  return FeatureFlag(
+    type: FeatureType.voting,
+    description: 'Test feature flag',
+    appEnvSettings: appEnvSettings,
+  );
 }

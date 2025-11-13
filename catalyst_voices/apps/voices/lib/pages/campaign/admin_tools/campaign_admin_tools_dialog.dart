@@ -127,6 +127,7 @@ class _BlocFooter extends StatelessWidget {
           // since the user can't change it to anything else
           offstage: spaces.length <= 1,
           child: _Footer(
+            spaces: spaces,
             selectedSpace: selectedSpace,
             onSpaceSelected: onSpaceSelected,
           ),
@@ -208,10 +209,12 @@ class _DraggableCampaignAdminToolsDialogState extends State<DraggableCampaignAdm
 }
 
 class _Footer extends StatelessWidget {
+  final List<Space> spaces;
   final Space selectedSpace;
   final ValueChanged<Space> onSpaceSelected;
 
   const _Footer({
+    required this.spaces,
     required this.selectedSpace,
     required this.onSpaceSelected,
   });
@@ -231,7 +234,7 @@ class _Footer extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              for (final space in Space.values)
+              for (final space in spaces)
                 _SpaceItem(
                   space: space,
                   isActive: space == selectedSpace,

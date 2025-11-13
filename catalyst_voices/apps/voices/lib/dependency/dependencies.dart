@@ -94,6 +94,7 @@ final class Dependencies extends DependencyProvider {
             get<RegistrationProgressNotifier>(),
             get<AccessControl>(),
             get<AdminTools>(),
+            get<FeatureFlagsService>(),
           );
         },
         dispose: (cubit) async => cubit.close(),
@@ -114,6 +115,7 @@ final class Dependencies extends DependencyProvider {
           get<UserService>(),
           get<CampaignService>(),
           get<ProposalService>(),
+          get<FeatureFlagsService>(),
         ),
       )
       ..registerLazySingleton<VotingCubit>(
@@ -151,6 +153,7 @@ final class Dependencies extends DependencyProvider {
         return DiscoveryCubit(
           get<CampaignService>(),
           get<ProposalService>(),
+          get<FeatureFlagsService>(),
         );
       })
       ..registerFactory<CategoryDetailCubit>(() {
@@ -170,6 +173,7 @@ final class Dependencies extends DependencyProvider {
           get<DocumentMapper>(),
           get<VotingBallotBuilder>(),
           get<VotingService>(),
+          get<FeatureFlagsService>(),
         );
       })
       ..registerFactory<NewProposalCubit>(() {
