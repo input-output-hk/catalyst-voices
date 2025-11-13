@@ -1,64 +1,51 @@
 import 'package:catalyst_voices/common/ext/build_context_ext.dart';
-import 'package:catalyst_voices/pages/dev_tools/cards/info_card.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
-class FeatureFlagsCard extends StatelessWidget {
-  const FeatureFlagsCard({super.key});
+class FeatureFlagsTable extends StatelessWidget {
+  final Map<FeatureType, FeatureFlagInfo> featureFlags;
 
-  @override
-  Widget build(BuildContext context) {
-    return const InfoCard(
-      title: Text('Feature Flags'),
-      children: [_FeatureFlagsTable()],
-    );
-  }
-}
-
-class _FeatureFlagsTable extends StatelessWidget {
-  const _FeatureFlagsTable();
+  const FeatureFlagsTable(
+    this.featureFlags, {
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    return BlocSelector<FeatureFlagsCubit, FeatureFlagsState, Map<FeatureType, FeatureFlagInfo>>(
-      selector: (state) => state.featureFlags,
-      builder: (context, featureFlags) {
-        return Table(
-          border: TableBorder.all(color: colors.outlineBorder),
-          columnWidths: const {
-            0: FlexColumnWidth(2),
-            1: FlexColumnWidth(3),
-            2: FlexColumnWidth(2),
-          },
-          children: [
-            // Header row
-            TableRow(
-              decoration: BoxDecoration(color: colors.onSurfaceNeutralOpaqueLv1),
-              children: const [
-                _HeaderTableCell(title: 'Feature'),
-                _HeaderTableCell(title: 'Effective (Source)'),
-                _HeaderTableCell(title: 'User Override'),
-              ],
-            ),
-            // Features flags rows
-            ...featureFlags.values.map((info) {
-              return TableRow(
-                decoration: info.isAvailable
-                    ? null
-                    : BoxDecoration(color: colors.onSurfaceNeutralOpaqueLv1),
-                children: [
-                  _FeatureTableCell(info),
-                  _FeatureFlagValueTableCell(info),
-                  _UserOverrideTableCell(info),
-                ],
-              );
-            }),
-          ],
-        );
+    return Table(
+      border: TableBorder.all(color: colors.outlineBorder),
+      columnWidths: const {
+        0: FlexColumnWidth(2),
+        1: FlexColumnWidth(3),
+        2: FlexColumnWidth(2),
       },
+      children: [
+        // Header row
+        TableRow(
+          decoration: BoxDecoration(color: colors.onSurfaceNeutralOpaqueLv1),
+          children: const [
+            _HeaderTableCell(title: 'Feature'),
+            _HeaderTableCell(title: 'Effective (Source)'),
+            _HeaderTableCell(title: 'User Override'),
+          ],
+        ),
+        // Features flags rows
+        ...featureFlags.values.map((info) {
+          return TableRow(
+            decoration: info.isAvailable
+                ? null
+                : BoxDecoration(color: colors.onSurfaceNeutralOpaqueLv1),
+            children: [
+              _FeatureTableCell(info),
+              _FeatureFlagValueTableCell(info),
+              _UserOverrideTableCell(info),
+            ],
+          );
+        }),
+      ],
     );
   }
 }
