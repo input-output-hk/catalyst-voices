@@ -335,6 +335,28 @@ class JSCardanoWalletCip95ApiProxy implements CardanoWalletCip95Api {
       throw _mapApiException(ex) ?? _mapDataSignException(ex) ?? _fallbackApiException(ex);
     }
   }
+
+  @override
+  Future<TransactionWitnessSet> signTx({
+    required BaseTransaction transaction,
+    bool partialSign = false,
+  }) async {
+    try {
+      final bytes = transaction.bytes;
+      final hexString = hex.encode(bytes);
+
+      return await _delegate
+          .signTx(hexString.toJS, partialSign.toJS)
+          .toDart
+          .then(
+            (e) => TransactionWitnessSet.fromCbor(
+              cbor.decode(hexDecode(e.toDart)),
+            ),
+          );
+    } catch (ex) {
+      throw _mapApiException(ex) ?? _mapTxSignException(ex) ?? _fallbackApiException(ex);
+    }
+  }
 }
 
 /// A wrapper around [JSCardanoWallet] that translates between JS/dart layers.
