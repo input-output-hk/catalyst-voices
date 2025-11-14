@@ -1,4 +1,4 @@
-# This docker compose file is a temporary workaround for the devnet environment.
+# This docker compose file is a temporary workaround for the devnet environment
 # It exposes the services on localhost due to a current limitation in how the
 # Mithril aggregator serves snapshots.
 # This file can be removed once the aggregator is updated, allowing services
