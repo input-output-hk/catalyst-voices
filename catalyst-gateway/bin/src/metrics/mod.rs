@@ -1,6 +1,6 @@
 //! This module contains submodules related to metrics report and analytics.
 
-use prometheus::{default_registry, Registry};
+use prometheus::{Registry, default_registry};
 
 pub(crate) mod caches;
 pub(crate) mod chain_follower;

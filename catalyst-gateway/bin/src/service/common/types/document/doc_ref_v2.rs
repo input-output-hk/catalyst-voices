@@ -4,8 +4,8 @@
 //! document.
 
 use poem_openapi::{
-    types::{Example, ToJSON},
     Object,
+    types::{Example, ToJSON},
 };
 
 use super::{id::DocumentId, locator::DocumentLocator, ver::DocumentVer};

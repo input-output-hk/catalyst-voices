@@ -1,10 +1,12 @@
 //! Check if the schema is up-to-date.
 
-use crate::db::event::{EventDB, DATABASE_SCHEMA_VERSION};
+use crate::db::event::{DATABASE_SCHEMA_VERSION, EventDB};
 
 /// Schema in database does not match schema supported by the Crate.
 #[derive(thiserror::Error, Debug, PartialEq, Eq)]
-#[error(" Schema in database does not match schema supported by the Crate. The current schema version: {was}, the schema version we expected: {expected}")]
+#[error(
+    " Schema in database does not match schema supported by the Crate. The current schema version: {was}, the schema version we expected: {expected}"
+)]
 pub(crate) struct MismatchedSchemaError {
     /// The current DB schema version.
     was: i32,

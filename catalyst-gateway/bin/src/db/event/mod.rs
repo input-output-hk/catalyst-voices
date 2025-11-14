@@ -2,8 +2,8 @@
 use std::{
     str::FromStr,
     sync::{
-        atomic::{AtomicBool, Ordering},
         Arc, LazyLock, Mutex, OnceLock,
+        atomic::{AtomicBool, Ordering},
     },
     time::Duration,
 };
@@ -11,8 +11,8 @@ use std::{
 use error::NotFoundError;
 use futures::{Stream, StreamExt, TryStreamExt};
 use tokio::task::JoinHandle;
-use tokio_postgres::{types::ToSql, Row};
-use tracing::{debug, debug_span, error, info, Instrument};
+use tokio_postgres::{Row, types::ToSql};
+use tracing::{Instrument, debug, debug_span, error, info};
 
 use crate::{
     service::utilities::health::{event_db_is_live, set_event_db_liveness},
@@ -27,7 +27,7 @@ pub(crate) mod signed_docs;
 
 /// Database version this crate matches.
 /// Must equal the last Migrations Version Number from `event-db/migrations`.
-pub(crate) const DATABASE_SCHEMA_VERSION: i32 = 4;
+pub(crate) const DATABASE_SCHEMA_VERSION: i32 = 3;
 
 /// Postgres Connection Manager DB Pool
 type SqlDbPool = Arc<deadpool::managed::Pool<deadpool_postgres::Manager>>;
@@ -58,8 +58,8 @@ pub(crate) enum EventDBConnectionError {
 
 impl EventDB {
     /// Get a connection from the pool.
-    async fn get_pool_connection(
-    ) -> Result<deadpool::managed::Object<deadpool_postgres::Manager>, EventDBConnectionError> {
+    async fn get_pool_connection()
+    -> Result<deadpool::managed::Object<deadpool_postgres::Manager>, EventDBConnectionError> {
         let pool = EVENT_DB_POOL
             .get()
             .ok_or(EventDBConnectionError::DbPoolUninitialized)?;
@@ -127,7 +127,7 @@ impl EventDB {
     pub(crate) async fn query_stream(
         stmt: &str,
         params: &[&(dyn ToSql + Sync)],
-    ) -> anyhow::Result<impl Stream<Item = anyhow::Result<Row>>> {
+    ) -> anyhow::Result<impl Stream<Item = anyhow::Result<Row>> + use<>> {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_rollback(stmt, params).await?;
         }

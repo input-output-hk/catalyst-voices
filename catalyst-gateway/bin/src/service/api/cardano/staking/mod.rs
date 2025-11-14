@@ -1,8 +1,8 @@
 //! Cardano Staking API Endpoints.
 
 use poem_openapi::{
-    param::{Path, Query},
     OpenApi,
+    param::{Path, Query},
 };
 
 use crate::service::common::{
