@@ -15,7 +15,7 @@ final class SystemStatusIssueBanner extends BannerNotification with LaunchUrlMix
   @override
   BannerNotificationMessage message(BuildContext context) {
     return BannerNotificationMessage(
-      text: context.l10n.systemStatusIssueBannerMessage,
+      text: context.l10n.systemStatusIssueBannerMessage('{readMoreLink}'),
       placeholders: {
         'readMoreLink': CatalystNotificationTextPart(
           text: context.l10n.readMore,
