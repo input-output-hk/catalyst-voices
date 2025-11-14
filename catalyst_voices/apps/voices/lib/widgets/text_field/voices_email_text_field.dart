@@ -16,6 +16,7 @@ final class VoicesEmailTextField extends VoicesTextField {
     super.decoration,
     super.readOnly = false,
     super.maxLength,
+    super.semanticsIdentifier,
   }) : super(
          keyboardType: TextInputType.emailAddress,
          style: const TextStyle(
