@@ -223,7 +223,9 @@ class NewProposalCubit extends Cubit<NewProposalState>
       categories: stateCategories,
     );
 
-    emit(newState);
+    if (!isClosed) {
+      emit(newState);
+    }
   }
 
   void _watchActiveCampaign() {
