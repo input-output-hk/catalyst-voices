@@ -161,45 +161,12 @@ class ProxyRefUpdater extends RefUpdater {
     }
   }
 
-  String _replaceProxyPattern({
-    required String content,
-    required String pattern,
-    required String versionMapKey,
-    required Map<String, String> versionMap,
-  }) {
-    if (!content.contains(pattern)) {
-      return content;
-    }
-
-    final versionedPath = versionMap[versionMapKey];
-    if (versionedPath == null || versionedPath.isEmpty) {
-      return content;
-    }
-
-    final versionedBasename = p.basename(versionedPath);
-    return content.replaceAll(pattern, 'c(a,"$versionedBasename")');
-  }
-
   String _updateContent(String content, Map<String, String> versionMap) {
-    // Handle special proxy patterns for canvaskit files
-    content = _replaceProxyPattern(
-      content: content,
-      pattern: 'c(a,"canvaskit.wasm")',
-      versionMapKey: 'canvaskit/chromium/canvaskit.wasm',
-      versionMap: versionMap,
-    );
-
-    content = _replaceProxyPattern(
-      content: content,
-      pattern: 'c(a,"canvaskit.js")',
-      versionMapKey: 'canvaskit/chromium/canvaskit.js',
-      versionMap: versionMap,
-    );
-
-    // Replace basename references for all versioned files
     for (final entry in versionMap.entries) {
       final originalBasename = p.basename(entry.key);
       final versionedBasename = p.basename(entry.value);
+
+      if (originalBasename.contains('canvaskit')) continue;
 
       if (content.contains(originalBasename)) {
         content = content.replaceAll(originalBasename, versionedBasename);
