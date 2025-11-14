@@ -1,20 +1,20 @@
 import { Locator, Page } from "@playwright/test";
 import { OnboardingBasePage } from "../onboarding-base-page";
 import { LinkWalletInfoPanel } from "./step-14-link-wallet-info";
+import { TestModel } from "../../../models/testModel";
 
 export class WalletListPanel extends OnboardingBasePage {
   page: Page;
   walletButton: (name: string) => Locator;
 
-  constructor(page: Page) {
-    super(page);
+  constructor(page: Page, testModel: TestModel) {
+    super(page, testModel);
     this.page = page;
-    this.walletButton = (name: string) =>
-      page.getByTestId(`${name.toLowerCase()}-wallet`);
+    this.walletButton = (name: string) => page.getByTestId(`${name.toLowerCase()}-wallet`);
   }
   async goto() {
-    await new LinkWalletInfoPanel(this.page).goto();
-    await new LinkWalletInfoPanel(this.page).chooseCardanoWalletButtonClick();
+    await new LinkWalletInfoPanel(this.page, this.testModel).goto();
+    await new LinkWalletInfoPanel(this.page, this.testModel).chooseCardanoWalletButtonClick();
     return this;
   }
   async clickConnectWallet(name: string): Promise<Page> {
