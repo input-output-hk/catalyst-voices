@@ -143,6 +143,7 @@ final class CampaignServiceImpl implements CampaignService {
 
   @override
   Stream<CampaignCategoryTotalAsk> watchCategoryTotalAsk({required SignedDocumentRef ref}) {
+    // TODO(damian-molinski): implement it.
     return Stream.value(CampaignCategoryTotalAsk.zero(ref));
   }
 }
