@@ -1,9 +1,9 @@
 import 'package:catalyst_voices/pages/dev_tools/cards/app_info_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/cards/config_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/cards/documents_card.dart';
+import 'package:catalyst_voices/pages/dev_tools/cards/feature_flags_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/cards/gateway_info_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/cards/logs_card.dart';
-import 'package:catalyst_voices/pages/dev_tools/cards/widgets/feature_flags_card/feature_flags_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/environment_card.dart';
 import 'package:catalyst_voices/pages/dev_tools/widgets/x_close_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
