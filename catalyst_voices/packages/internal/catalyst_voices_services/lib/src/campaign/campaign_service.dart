@@ -35,6 +35,8 @@ abstract interface class CampaignService {
 
   Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType stage);
 
+  Future<CampaignTotalAsk> getCampaignTotalAsk({required CampaignFilters filters});
+
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 
   Stream<CampaignTotalAsk> watchCampaignTotalAsk({required CampaignFilters filters});
@@ -97,6 +99,12 @@ final class CampaignServiceImpl implements CampaignService {
       orElse: () => throw StateError('Type $type not found'),
     );
     return timelineStage;
+  }
+
+  @override
+  Future<CampaignTotalAsk> getCampaignTotalAsk({required CampaignFilters filters}) {
+    // TODO(damian-molinski): implement it.
+    return Future(() => const CampaignTotalAsk(categoriesAsks: {}));
   }
 
   @override

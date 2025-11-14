@@ -137,7 +137,9 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   }
 
   void _handleCampaignTotalAskChange(CampaignTotalAsk data) {
-    //
+    _cache = _cache.copyWith(campaignTotalAsk: Optional(data));
+
+    _updateCampaignState();
   }
 
   void _handleProposalsChange(List<ProposalBrief> proposals) {
