@@ -137,8 +137,8 @@ class DiscoveryCubit extends Cubit<DiscoveryState> with BlocErrorEmitterMixin {
   }
 
   void _handleCampaignTotalAskChange(CampaignTotalAsk data) {
+    _logger.finest('Campaign total ask changed: $data');
     _cache = _cache.copyWith(campaignTotalAsk: Optional(data));
-
     _updateCampaignState();
   }
 

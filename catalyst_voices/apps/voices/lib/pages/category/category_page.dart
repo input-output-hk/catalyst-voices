@@ -16,9 +16,9 @@ import 'package:flutter/material.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class CategoryPage extends StatefulWidget {
-  final SignedDocumentRef categoryId;
+  final SignedDocumentRef categoryRef;
 
-  const CategoryPage({super.key, required this.categoryId});
+  const CategoryPage({super.key, required this.categoryRef});
 
   @override
   State<CategoryPage> createState() => _CategoryPageState();
@@ -106,6 +106,8 @@ class _CategoryDetailContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO(damian-molinski): refactor it into single class object in category_detail_state.dart
+    // and do not rely on context.select<SessionCubit> here.
     return BlocSelector<
       CategoryDetailCubit,
       CategoryDetailState,
@@ -114,7 +116,7 @@ class _CategoryDetailContent extends StatelessWidget {
       selector: (state) {
         return (
           show: state.isLoading,
-          data: state.category ?? CampaignCategoryDetailsViewModel.placeholder(),
+          data: state.selectedCategoryDetails ?? CampaignCategoryDetailsViewModel.placeholder(),
         );
       },
       builder: (context, state) {
@@ -187,7 +189,7 @@ class _CategoryPageState extends State<CategoryPage> {
         children: [
           const _CategoryDetailContent(),
           _CategoryDetailError(
-            categoryId: widget.categoryId,
+            categoryId: widget.categoryRef,
           ),
         ].constrainedDelegate(),
       ),
@@ -198,9 +200,9 @@ class _CategoryPageState extends State<CategoryPage> {
   void didUpdateWidget(CategoryPage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.categoryId != oldWidget.categoryId) {
+    if (widget.categoryRef != oldWidget.categoryRef) {
       unawaited(
-        context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId),
+        context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryRef),
       );
     }
   }
@@ -215,17 +217,16 @@ class _CategoryPageState extends State<CategoryPage> {
   @override
   void initState() {
     super.initState();
-    unawaited(context.read<CategoryDetailCubit>().getCategories());
-    unawaited(
-      context.read<CategoryDetailCubit>().getCategoryDetail(widget.categoryId),
-    );
-    _listenForProposalRef(context.read<CategoryDetailCubit>());
+    final cubit = context.read<CategoryDetailCubit>()..watchActiveCampaignCategories();
+    unawaited(cubit.getCategoryDetail(widget.categoryRef));
+    _listenForProposalRef(cubit);
   }
 
+  // TODO(damian-molinski): refactor it to signal pattern
   void _listenForProposalRef(CategoryDetailCubit cubit) {
     // listen for updates
     _categoryRefSub = cubit.stream
-        .map((event) => event.category?.ref)
+        .map((event) => event.selectedCategoryRef)
         .distinct()
         .listen(_onCategoryRefChanged);
   }
