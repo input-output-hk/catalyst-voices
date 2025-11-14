@@ -1,3 +1,8 @@
+import {
+  CardanoWalletInfoCodeError,
+  CardanoWalletPaginateError,
+} from "./cardano_wallet_error.js";
+
 /**
  * The initial API of the CIP-30 wallet interface: https://cips.cardano.org/cip/CIP-30#initial-api.
  *
@@ -361,8 +366,22 @@ export class CardanoWalletCip95Api {
   }
 }
 
+/**
+ * Maps an error to a format understandable by the dart layer.
+ *
+ * @param {any} err - The error description.
+ * @returns A json representing the mapped error.
+ */
 function _mapError(err) {
-  // TODO(dt-iohk): extract error details from err, map it to a format understandable
-  // by dart side and then deserialize it in dart and convert to dart model.
-  return err;
+  const infoCodeError = CardanoWalletInfoCodeError.tryFromObject(err);
+  if (infoCodeError) {
+    return infoCodeError.stringify();
+  }
+
+  const paginateError = CardanoWalletPaginateError.tryFromObject(err);
+  if (paginateError) {
+    return paginateError.stringify();
+  }
+
+  return JSON.stringify(err);
 }
