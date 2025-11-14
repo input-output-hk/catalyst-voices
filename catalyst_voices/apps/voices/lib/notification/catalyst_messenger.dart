@@ -46,9 +46,19 @@ class CatalystMessengerState extends State<CatalystMessenger> {
   DialogNotification? _activeDialog;
 
   GoRouter? __router;
+  bool _routerListenerAttached = false;
+  bool _retryScheduled = false;
 
-  GoRouter get _router {
-    return __router ??= _findRouter()..routerDelegate.addListener(_handleRouterChange);
+  GoRouter? get _router {
+    if (__router != null) return __router;
+
+    final router = _tryFindRouter();
+    if (router != null && !_routerListenerAttached) {
+      router.routerDelegate.addListener(_handleRouterChange);
+      _routerListenerAttached = true;
+      __router = router;
+    }
+    return router;
   }
 
   /// Adds a notification to the queue if it is not already present.
@@ -119,15 +129,21 @@ class CatalystMessengerState extends State<CatalystMessenger> {
     }
   }
 
-  GoRouter _findRouter() {
+  GoRouter? _tryFindRouter() {
     final navigatorContext = AppRouterFactory.rootNavigatorKey.currentContext;
-    assert(navigatorContext != null, 'Navigation context not available');
+    if (navigatorContext == null) {
+      _logger.finest('Navigation context not yet available, deferring queue processing');
+      return null;
+    }
 
-    return GoRouter.of(navigatorContext!);
+    return GoRouter.of(navigatorContext);
   }
 
   void _handleRouterChange() {
-    final routerState = _router.state;
+    final router = _router;
+    if (router == null) return; // Router should always exist if this listener fires
+
+    final routerState = router.state;
 
     // Handle active dialog
     final activeDialog = _activeDialog;
@@ -162,7 +178,10 @@ class CatalystMessengerState extends State<CatalystMessenger> {
 
   /// Hiding current dialog will trigger _onDialogCompleted and process queue.
   void _hideCurrentDialog() {
-    final navigatorContext = _router.routerDelegate.navigatorKey.currentContext;
+    final router = _router;
+    if (router == null) return;
+
+    final navigatorContext = router.routerDelegate.navigatorKey.currentContext;
     if (navigatorContext == null) {
       return;
     }
@@ -194,7 +213,24 @@ class CatalystMessengerState extends State<CatalystMessenger> {
   }
 
   void _processQueue() {
-    final routerState = _router.state;
+    final router = _router;
+    if (router == null) {
+      // Navigation context not ready yet, schedule retry after next frame
+      final totalPending = _pendingDialogs.length + _pendingBanners.length;
+      if (totalPending > 0 && !_retryScheduled) {
+        _retryScheduled = true;
+        _logger.finest('Router not available, scheduling retry for $totalPending notification(s)');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _retryScheduled = false;
+          if (mounted) {
+            _processQueue();
+          }
+        });
+      }
+      return;
+    }
+
+    final routerState = router.state;
 
     // Filter notifications that are allowed for current router state
     final allowedDialogs = _pendingDialogs.where((n) => n.routerPredicate(routerState));
@@ -272,13 +308,19 @@ class CatalystMessengerState extends State<CatalystMessenger> {
       return;
     }
 
+    final router = _router;
+    if (router == null) {
+      _logger.finest('Router not available when showing dialog ${notification.id}');
+      return;
+    }
+
     // Verify the dialog is still allowed for the current route
-    if (!notification.routerPredicate(_router.state)) {
+    if (!notification.routerPredicate(router.state)) {
       _logger.finer('Dialog ${notification.id} no longer valid for current route after navigation');
       return;
     }
 
-    final navigatorContext = _router.routerDelegate.navigatorKey.currentContext;
+    final navigatorContext = router.routerDelegate.navigatorKey.currentContext;
     if (navigatorContext == null || !navigatorContext.mounted) {
       return;
     }
