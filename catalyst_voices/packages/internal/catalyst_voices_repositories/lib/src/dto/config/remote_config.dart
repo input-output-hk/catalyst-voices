@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/dto/config/config.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -21,5 +22,17 @@ final class RemoteConfig {
 
   factory RemoteConfig.fromJson(Map<String, dynamic> json) {
     return _$RemoteConfigFromJson(json);
+  }
+
+  RemoteConfig copyWith({
+    Optional<RemoteSentryConfig>? sentry,
+  }) {
+    return RemoteConfig(
+      version: version,
+      createdAt: createdAt,
+      cache: cache,
+      sentry: sentry.dataOr(this.sentry),
+      blockchain: blockchain,
+    );
   }
 }
