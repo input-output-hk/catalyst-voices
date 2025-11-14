@@ -152,6 +152,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     required Document proposalDocument,
     required ProposalBuilderMetadata proposalMetadata,
     required CampaignCategory category,
+    required CampaignCategoryTotalAsk categoryTotalAsk,
     required DocumentSchema? commentSchema,
     required List<CommentWithReplies> comments,
     required CommentsState commentsState,
@@ -177,7 +178,11 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     final firstSegment = documentSegments.firstOrNull;
     final firstSection = firstSegment?.sections.firstOrNull;
     final guidance = _getGuidanceForSection(firstSegment, firstSection);
-    final categoryVM = CampaignCategoryDetailsViewModel.fromModel(category);
+    final stateCategory = CampaignCategoryDetailsViewModel.fromModel(
+      category,
+      finalProposalsCount: categoryTotalAsk.finalProposalsCount,
+      totalAsk: categoryTotalAsk.totalAsk,
+    );
 
     return ProposalBuilderState(
       documentSegments: documentSegments,
@@ -185,7 +190,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       guidance: guidance,
       document: proposalDocument,
       metadata: proposalMetadata,
-      category: categoryVM,
+      category: stateCategory,
       activeNodeId: firstSection?.id,
       validationErrors: state.validationErrors?.withErrorList(proposalDocument.collectErrors()),
       canPublish: isEmailVerified && proposalDocument.isValid,
@@ -198,6 +203,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     required DocumentBuilder proposalBuilder,
     required ProposalBuilderMetadata proposalMetadata,
     required CampaignCategory category,
+    required CampaignCategoryTotalAsk categoryTotalAsk,
   }) async {
     final commentTemplate = await _commentService.getCommentTemplateFor(category: category.selfRef);
 
@@ -208,6 +214,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       category: Optional(category),
       commentTemplate: Optional(commentTemplate),
       comments: const Optional.empty(),
+      categoryTotalAsk: Optional(categoryTotalAsk),
     );
 
     await _commentsSub?.cancel();
@@ -467,6 +474,8 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
         throw StateError('Cannot load proposal, active campaign not found');
       }
       final category = campaign.categories.first;
+      final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: category.selfRef);
+
       final templateRef = category.proposalTemplateRef;
 
       final proposalTemplate = await _proposalService.getProposalTemplate(
@@ -483,6 +492,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           categoryId: category.selfRef,
         ),
         category: category,
+        categoryTotalAsk: categoryTotalAsk,
       );
     });
   }
@@ -538,6 +548,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       }
       final categoryRef = proposal.categoryRef;
       final category = await _campaignService.getCategory(categoryRef);
+      final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: categoryRef);
       final campaign = await _campaignService.getActiveCampaign();
 
       final fromActiveCampaign = campaign?.hasCategory(categoryRef.id) ?? false;
@@ -555,6 +566,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           fromActiveCampaign: fromActiveCampaign,
         ),
         category: category,
+        categoryTotalAsk: categoryTotalAsk,
       );
     });
   }
@@ -568,6 +580,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
 
     await _loadState(emit, () async {
       final category = await _campaignService.getCategory(categoryId);
+      final categoryTotalAsk = await _campaignService.getCategoryTotalAsk(ref: categoryId);
       final templateRef = category.proposalTemplateRef;
       final proposalTemplate = await _proposalService.getProposalTemplate(
         ref: templateRef,
@@ -583,6 +596,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
           categoryId: categoryId,
         ),
         category: category,
+        categoryTotalAsk: categoryTotalAsk,
       );
     });
   }
@@ -827,6 +841,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
     final proposalDocument = _cache.proposalDocument;
     final proposalMetadata = _cache.proposalMetadata;
     final category = _cache.category;
+    final categoryTotalAsk = _cache.categoryTotalAsk;
     final commentTemplate = _cache.commentTemplate;
     final comments = _cache.comments ?? [];
     final commentsState = state.comments;
@@ -848,6 +863,7 @@ final class ProposalBuilderBloc extends Bloc<ProposalBuilderEvent, ProposalBuild
       proposalDocument: proposalDocument,
       proposalMetadata: proposalMetadata,
       category: category,
+      categoryTotalAsk: categoryTotalAsk ?? CampaignCategoryTotalAsk.zero(category.selfRef),
       commentSchema: commentTemplate.schema,
       comments: comments,
       commentsState: commentsState,

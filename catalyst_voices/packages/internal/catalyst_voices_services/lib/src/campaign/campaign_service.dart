@@ -39,7 +39,11 @@ abstract interface class CampaignService {
 
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 
+  Future<CampaignCategoryTotalAsk> getCategoryTotalAsk({required SignedDocumentRef ref});
+
   Stream<CampaignTotalAsk> watchCampaignTotalAsk({required CampaignFilters filters});
+
+  Stream<CampaignCategoryTotalAsk> watchCategoryTotalAsk({required SignedDocumentRef ref});
 }
 
 final class CampaignServiceImpl implements CampaignService {
@@ -126,8 +130,19 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
+  Future<CampaignCategoryTotalAsk> getCategoryTotalAsk({required SignedDocumentRef ref}) {
+    // TODO(damian-molinski): implement it.
+    return Future(() => CampaignCategoryTotalAsk.zero(ref));
+  }
+
+  @override
   Stream<CampaignTotalAsk> watchCampaignTotalAsk({required CampaignFilters filters}) {
     // TODO(damian-molinski): implement it.
     return Stream.value(const CampaignTotalAsk(categoriesAsks: {}));
+  }
+
+  @override
+  Stream<CampaignCategoryTotalAsk> watchCategoryTotalAsk({required SignedDocumentRef ref}) {
+    return Stream.value(CampaignCategoryTotalAsk.zero(ref));
   }
 }
