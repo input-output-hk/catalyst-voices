@@ -107,9 +107,7 @@
         "required": [
           "id",
           "name",
-          "xname",
           "description",
-          "xdescription",
           "status"
         ]
       }
