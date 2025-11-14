@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/signal_handler.dart';
 import 'package:catalyst_voices/notification/catalyst_messenger.dart';
 import 'package:catalyst_voices/notification/specialized/banner/new_version_available_banner.dart';
@@ -36,5 +38,11 @@ class _SystemStatusListenerState extends State<SystemStatusListener>
           context,
         ).cancelWhere((notification) => notification is SystemStatusIssueBanner);
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(context.read<SystemStatusCubit>().checkAppVersion());
   }
 }

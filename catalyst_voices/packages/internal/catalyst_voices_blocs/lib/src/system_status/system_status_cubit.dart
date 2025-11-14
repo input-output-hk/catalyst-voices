@@ -24,18 +24,9 @@ final class SystemStatusCubit extends Cubit<SystemStatusState>
           _onSystemComponentStatusesChanged,
           onError: _onSystemComponentStatusesError,
         );
-    unawaited(_checkAppVersion());
   }
 
-  @override
-  Future<void> close() async {
-    await _systemComponentStatusesSub?.cancel();
-    _systemComponentStatusesSub = null;
-
-    return super.close();
-  }
-
-  Future<void> _checkAppVersion() async {
+  Future<void> checkAppVersion() async {
     try {
       final isUpdateAvailable = await _systemStatusService.isUpdateAvailable();
       if (isUpdateAvailable) {
@@ -44,6 +35,14 @@ final class SystemStatusCubit extends Cubit<SystemStatusState>
     } catch (e, st) {
       _logger.warning("Couldn't retrieve app version info", e, st);
     }
+  }
+
+  @override
+  Future<void> close() async {
+    await _systemComponentStatusesSub?.cancel();
+    _systemComponentStatusesSub = null;
+
+    return super.close();
   }
 
   void _onSystemComponentStatusesChanged(List<ComponentStatus> statuses) {
