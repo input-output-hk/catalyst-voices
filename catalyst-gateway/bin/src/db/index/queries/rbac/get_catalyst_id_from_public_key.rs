@@ -7,9 +7,9 @@ use catalyst_types::catalyst_id::CatalystId;
 use ed25519_dalek::VerifyingKey;
 use futures::{StreamExt, TryStreamExt};
 use scylla::{
-    client::session::Session,
-    statement::{prepared::PreparedStatement, Consistency},
     DeserializeRow, SerializeRow,
+    client::session::Session,
+    statement::{Consistency, prepared::PreparedStatement},
 };
 use tracing::error;
 

@@ -5,8 +5,8 @@
 use std::sync::LazyLock;
 
 use prometheus::{
-    register_histogram_vec, register_int_counter, register_int_counter_vec, HistogramVec,
-    IntCounter, IntCounterVec,
+    HistogramVec, IntCounter, IntCounterVec, register_histogram_vec, register_int_counter,
+    register_int_counter_vec,
 };
 
 /// Labels for the metrics

@@ -2,7 +2,7 @@
 
 use cardano_chain_follower::pallas_addresses::ShelleyAddress;
 use chrono::{DateTime, Utc};
-use poem_openapi::{types::Example, Object};
+use poem_openapi::{Object, types::Example};
 
 use crate::service::common::types::{
     cardano::cip19_shelley_address::Cip19ShelleyAddress,

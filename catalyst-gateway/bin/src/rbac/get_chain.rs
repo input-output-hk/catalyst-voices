@@ -1,9 +1,9 @@
 //! Utilities for obtaining a RBAC registration chain (`RegistrationChain`).
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use cardano_chain_follower::{ChainFollower, Network, Point, Slot, TxnIndex};
 use catalyst_types::catalyst_id::CatalystId;
-use futures::{future::try_join, TryFutureExt, TryStreamExt};
+use futures::{TryFutureExt, TryStreamExt, future::try_join};
 use rbac_registration::{cardano::cip509::Cip509, registration::cardano::RegistrationChain};
 
 use crate::{
@@ -14,8 +14,8 @@ use crate::{
         session::CassandraSession,
     },
     rbac::{
-        chains_cache::{cache_persistent_rbac_chain, cached_persistent_rbac_chain},
         ChainInfo,
+        chains_cache::{cache_persistent_rbac_chain, cached_persistent_rbac_chain},
     },
     settings::Settings,
 };

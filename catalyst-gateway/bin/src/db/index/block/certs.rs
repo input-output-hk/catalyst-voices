@@ -3,12 +3,12 @@
 use std::{fmt::Debug, sync::Arc};
 
 use cardano_chain_follower::{
+    MultiEraBlock, Slot, StakeAddress, TxnIndex, VKeyHash,
     pallas_primitives::{alonzo, conway},
     pallas_traverse::{MultiEraCert, MultiEraTx},
-    MultiEraBlock, Slot, StakeAddress, TxnIndex, VKeyHash,
 };
 use ed25519_dalek::VerifyingKey;
-use scylla::{client::session::Session, value::MaybeUnset, SerializeRow};
+use scylla::{SerializeRow, client::session::Session, value::MaybeUnset};
 use tracing::error;
 
 use crate::{

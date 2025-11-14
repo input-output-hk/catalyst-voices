@@ -3,7 +3,7 @@
 use std::str::FromStr;
 
 use derive_more::{From, Into};
-use poem_openapi::{types::Example, NewType};
+use poem_openapi::{NewType, types::Example};
 
 /// URL String
 #[derive(Debug, Clone, NewType, From, Into)]
