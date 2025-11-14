@@ -72,13 +72,6 @@ final class _InfoCodeError {
 
   const _InfoCodeError({required this.code, required this.info});
 
-  factory _InfoCodeError.fromJson(Map<String, dynamic> json) {
-    return _InfoCodeError(
-      code: json['code'] as int,
-      info: json['info'] as String,
-    );
-  }
-
   WalletApiException toApiException() {
     return WalletApiException(
       code: WalletApiErrorCode.fromTag(code),
@@ -107,20 +100,22 @@ final class _InfoCodeError {
     );
   }
 
-  static _InfoCodeError? tryFrom(Object object) {
-    try {
-      if (object is _InfoCodeError) {
-        return object;
-      } else if (object is String) {
-        final json = jsonDecode(object) as Map<String, dynamic>;
-        return _InfoCodeError.fromJson(json);
-      } else if (object is Map<String, dynamic>) {
-        return _InfoCodeError.fromJson(object);
-      } else {
+  static _InfoCodeError? tryFrom(Object? object) {
+    switch (object) {
+      case final _InfoCodeError instance:
+        return instance;
+      case {'code': final int code, 'info': final String info}:
+        return _InfoCodeError(code: code, info: info);
+      case final String jsonString:
+        try {
+          final decoded = jsonDecode(jsonString);
+          return tryFrom(decoded);
+        } catch (_) {
+          return null;
+        }
+
+      case _:
         return null;
-      }
-    } catch (_) {
-      return null;
     }
   }
 }
@@ -133,30 +128,26 @@ final class _PaginateError {
 
   const _PaginateError({required this.maxSize});
 
-  factory _PaginateError.fromJson(Map<String, dynamic> json) {
-    return _PaginateError(
-      maxSize: json['maxSize'] as int,
-    );
-  }
-
   WalletPaginateException toPaginateException() {
     return WalletPaginateException(maxSize: maxSize);
   }
 
-  static _PaginateError? tryFrom(Object object) {
-    try {
-      if (object is _PaginateError) {
-        return object;
-      } else if (object is String) {
-        final json = jsonDecode(object) as Map<String, dynamic>;
-        return _PaginateError.fromJson(json);
-      } else if (object is Map<String, dynamic>) {
-        return _PaginateError.fromJson(object);
-      } else {
+  static _PaginateError? tryFrom(Object? object) {
+    switch (object) {
+      case final _PaginateError instance:
+        return instance;
+      case {'maxSize': final int maxSize}:
+        return _PaginateError(maxSize: maxSize);
+      case final String jsonString:
+        try {
+          final decoded = jsonDecode(jsonString);
+          return tryFrom(decoded);
+        } catch (_) {
+          return null;
+        }
+
+      case _:
         return null;
-      }
-    } catch (_) {
-      return null;
     }
   }
 }
