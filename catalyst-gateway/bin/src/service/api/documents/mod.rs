@@ -90,7 +90,7 @@ impl DocumentApi {
         }
     }
 
-    /// Post A Signed Document Index Query for Newer Versions of v0.04.
+    /// Post A Signed Document Index Query (v2).
     ///
     /// Produces a summary of signed documents that meet the criteria
     /// defined in the request body for new signed document versions of v0.04.
