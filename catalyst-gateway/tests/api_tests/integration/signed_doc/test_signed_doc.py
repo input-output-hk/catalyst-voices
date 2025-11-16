@@ -23,6 +23,10 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
 
     resp = document_v2.post(filter={"id": {"eq": proposal_doc_id}})
     assert (
+        1 == 2
+    ), f"FIXME: {resp}"
+
+    assert (
         resp.status_code == 200
     ), f"Failed to post document: {resp.status_code} - {resp.text}"
 
@@ -34,10 +38,6 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
         data=new_doc_cbor,
         token=rbac_chain.auth_token(),
     )
-    assert (
-        1 == 2
-    ), f"FIXME: {resp}"
-    
     assert (
         resp.status_code == 201
     ), f"Failed to publish document: {resp.status_code} - {resp.text}"
