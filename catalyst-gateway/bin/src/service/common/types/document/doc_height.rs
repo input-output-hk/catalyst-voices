@@ -20,21 +20,15 @@ static SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
         title: Some(TITLE.to_owned()),
         description: Some(DESCRIPTION),
         example: DocumentHeight::example().to_json(),
-        maximum: Some(i32::MAX as f64),
-        minimum: Some(i32::MIN as f64),
+        maximum: Some(f64::from(i32::MAX)),
+        minimum: Some(f64::from(i32::MIN)),
         ..MetaSchema::ANY
     }
 });
 
 /// A consecutive sequence number of the current document in the chain.
-#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy, PartialOrd, Ord)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy, PartialOrd, Ord, Default)]
 pub(crate) struct DocumentHeight(i32);
-
-impl Default for DocumentHeight {
-    fn default() -> Self {
-        Self(0)
-    }
-}
 
 impl Type for DocumentHeight {
     type RawElementValueType = Self;

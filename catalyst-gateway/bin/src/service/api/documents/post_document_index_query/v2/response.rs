@@ -282,7 +282,7 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumentedV2 {
             parameters = meta.parameters().cloned().map(Into::into);
             collaborators = meta
                 .collaborators()
-                .into_iter()
+                .iter()
                 .cloned()
                 .map(Into::into)
                 .collect::<Vec<_>>()
