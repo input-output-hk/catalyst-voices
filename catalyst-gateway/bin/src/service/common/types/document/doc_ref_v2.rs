@@ -12,7 +12,7 @@ use super::{id::DocumentId, locator::DocumentLocator, ver::DocumentVer};
 use crate::service::common::types::array_types::impl_array_types;
 
 #[derive(Object, Debug, Clone, PartialEq)]
-#[oai(example = true)]
+#[oai(example)]
 /// A Reference to another Signed Document
 pub(crate) struct DocumentReferenceV2 {
     /// Document ID Reference

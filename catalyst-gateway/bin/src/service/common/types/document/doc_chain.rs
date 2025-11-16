@@ -10,6 +10,7 @@ use crate::service::common::types::document::{
 
 /// A reference to the previous signed document in a sequence.
 #[derive(Object, Debug, Clone)]
+#[oai(example)]
 pub struct DocumentChain {
     /// A consecutive sequence number of the current document in the chain.
     height: DocumentHeight,
