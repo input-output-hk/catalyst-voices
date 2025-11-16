@@ -3,8 +3,9 @@
 //! A Reference is used by the `ref` metadata, and any other reference to another
 //! document.
 
+use derive_more::{From, Into};
 use poem_openapi::{
-    Object,
+    NewType, Object,
     types::{Example, ToJSON},
 };
 
@@ -76,5 +77,27 @@ impl From<catalyst_signed_doc::DocumentRefs> for DocumentReferenceListV2 {
             .collect();
 
         Self(doc_refs)
+    }
+}
+
+/// Document Reference for filtered Documents.
+#[derive(NewType, Debug, Clone, From, Into)]
+#[oai(
+    from_multipart = false,
+    from_parameter = false,
+    to_header = false,
+    example = true
+)]
+pub(crate) struct FilteredDocumentReferenceV2(DocumentReferenceV2);
+
+impl From<catalyst_signed_doc::DocumentRef> for FilteredDocumentReferenceV2 {
+    fn from(value: catalyst_signed_doc::DocumentRef) -> Self {
+        Self(value.into())
+    }
+}
+
+impl Example for FilteredDocumentReferenceV2 {
+    fn example() -> Self {
+        Self(Example::example())
     }
 }

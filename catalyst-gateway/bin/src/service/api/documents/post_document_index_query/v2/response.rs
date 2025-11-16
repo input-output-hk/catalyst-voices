@@ -14,11 +14,8 @@ use crate::{
             array_types::impl_array_types,
             cardano::catalyst_id_list::CatalystIdList,
             document::{
-                doc_chain::DocumentChain,
-                doc_ref_v2::{DocumentReferenceListV2, DocumentReferenceV2},
-                doc_type::DocumentType,
-                id::DocumentId,
-                ver::DocumentVer,
+                doc_chain::DocumentChainDocumented, doc_ref_v2::DocumentReferenceListV2,
+                doc_type::DocumentType, id::DocumentId, ver::DocumentVer,
             },
         },
     },
@@ -177,7 +174,7 @@ pub(crate) struct IndexedDocumentVersionV2 {
     pub collaborators: CatalystIdList,
     /// A link to a previous document in a chained sequence that matches the filter.
     #[oai(skip_serializing_if_is_none)]
-    pub chain: Option<DocumentChain>,
+    pub chain: Option<DocumentChainDocumented>,
 }
 
 impl Example for IndexedDocumentVersionV2 {
@@ -193,28 +190,6 @@ impl Example for IndexedDocumentVersionV2 {
             collaborators: CatalystIdList::example(),
             chain: None,
         }
-    }
-}
-
-/// Document Reference for filtered Documents.
-#[derive(NewType, Debug, Clone, From, Into)]
-#[oai(
-    from_multipart = false,
-    from_parameter = false,
-    to_header = false,
-    example = true
-)]
-pub(crate) struct FilteredDocumentReferenceV2(DocumentReferenceV2);
-
-impl From<catalyst_signed_doc::DocumentRef> for FilteredDocumentReferenceV2 {
-    fn from(value: catalyst_signed_doc::DocumentRef) -> Self {
-        Self(value.into())
-    }
-}
-
-impl Example for FilteredDocumentReferenceV2 {
-    fn example() -> Self {
-        Self(Example::example())
     }
 }
 
