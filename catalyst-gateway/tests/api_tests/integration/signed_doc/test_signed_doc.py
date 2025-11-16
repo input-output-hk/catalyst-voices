@@ -35,6 +35,10 @@ def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory
         token=rbac_chain.auth_token(),
     )
     assert (
+        1 == 2
+    ), f"FIXME: {resp}"
+    
+    assert (
         resp.status_code == 201
     ), f"Failed to publish document: {resp.status_code} - {resp.text}"
 

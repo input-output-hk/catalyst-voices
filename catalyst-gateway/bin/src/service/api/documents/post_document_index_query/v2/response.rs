@@ -278,7 +278,6 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumentedV2 {
                     reply,
                     template,
                     parameters,
-                    // TODO: FIXME:
                     collaborators,
                     chain,
                 },
