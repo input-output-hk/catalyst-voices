@@ -170,8 +170,8 @@ pub(crate) struct IndexedDocumentVersionV2 {
     pub parameters: Option<DocumentReferenceListV2>,
     /// A list of collaborators who can participate in drafting and submitting a document
     /// that matches the filter.
-    #[oai(skip_serializing_if_is_empty)]
-    pub collaborators: CatalystIdList,
+    #[oai(skip_serializing_if_is_none)]
+    pub collaborators: Option<CatalystIdList>,
     /// A link to a previous document in a chained sequence that matches the filter.
     #[oai(skip_serializing_if_is_none)]
     pub chain: Option<DocumentChainDocumented>,
@@ -187,8 +187,8 @@ impl Example for IndexedDocumentVersionV2 {
             reply: None,
             template: None,
             parameters: None,
-            collaborators: CatalystIdList::example(),
-            chain: None,
+            collaborators: Some(Example::example()),
+            chain: Some(Example::example()),
         }
     }
 }
@@ -245,7 +245,7 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumentedV2 {
         let mut reply = None;
         let mut template = None;
         let mut parameters = None;
-        let mut collaborators = CatalystIdList::default();
+        let mut collaborators = None;
         let mut chain = None;
         if let Some(json_meta) = doc.metadata() {
             let meta = catalyst_signed_doc::Metadata::from_json(json_meta.clone())?;
@@ -255,13 +255,16 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumentedV2 {
             reply = meta.reply().cloned().map(Into::into);
             template = meta.template().cloned().map(Into::into);
             parameters = meta.parameters().cloned().map(Into::into);
-            collaborators = meta
-                .collaborators()
-                .iter()
-                .cloned()
-                .map(Into::into)
-                .collect::<Vec<_>>()
-                .into();
+            if !meta.collaborators().is_empty() {
+                collaborators = Some(
+                    meta.collaborators()
+                        .iter()
+                        .cloned()
+                        .map(Into::into)
+                        .collect::<Vec<_>>()
+                        .into(),
+                );
+            }
             chain = meta.chain().map(Into::into);
         }
 
@@ -275,6 +278,7 @@ impl TryFrom<SignedDocBody> for IndexedDocumentVersionDocumentedV2 {
                     reply,
                     template,
                     parameters,
+                    // TODO: FIXME:
                     collaborators,
                     chain,
                 },
