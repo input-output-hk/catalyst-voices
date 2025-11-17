@@ -21,6 +21,7 @@ dev_dependencies:
   flutter_gen_runner: ^5.11.0
   flutter_test:
     sdk: flutter
+  path: ^1.9.1
   vector_graphics_compiler: ^1.1.19
 
 flutter:
@@ -44,7 +45,7 @@ flutter_gen:
   assets:
     enabled: true
     exclude:
-      - assets_svg_copy/**
+      - assets_svg_source/**
     outputs:
       class_name: VoicesAssets
       package_parameter_enabled: false

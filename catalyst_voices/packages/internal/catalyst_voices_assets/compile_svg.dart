@@ -1,12 +1,13 @@
 // ignore_for_file: avoid_print
 import 'dart:io';
 
+import 'package:path/path.dart' as path;
 import 'package:vector_graphics_compiler/vector_graphics_compiler.dart';
 
 Future<void> main() async {
   initializePathOpsFromFlutterCache();
 
-  final inputDir = Directory('assets_svg_copy');
+  final inputDir = Directory('assets_svg_source');
 
   final svgFiles = await inputDir
       .list(recursive: true)
@@ -17,8 +18,8 @@ Future<void> main() async {
   print('Found ${svgFiles.length} SVG files');
 
   for (final svgFile in svgFiles) {
-    final relativePath = svgFile.path.replaceFirst('assets_svg_copy/', '');
-    final outputPath = 'assets/$relativePath';
+    final relativePath = path.relative(svgFile.path, from: 'assets_svg_source');
+    final outputPath = path.join('assets', relativePath);
     final outputFile = File(outputPath);
 
     await outputFile.parent.create(recursive: true);
