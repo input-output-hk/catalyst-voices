@@ -65,8 +65,13 @@
 						localhost:8080 {
 							root * /app
 
+							# Compress on-the-fly if not precompressed
+                            encode
+
 							file_server {
-							try_files {path} {path}/ /index.html
+                                # default order br zstd gzip
+                                precompressed
+							    try_files {path} {path}/ /index.html
 							}
 
 							header {
