@@ -17,6 +17,7 @@ class CatalystIdText extends StatefulWidget {
   final bool isCompact;
   final bool showCopy;
   final bool showLabel;
+  final bool includeUsername;
   final TextStyle? style;
   final TextStyle? labelStyle;
   final double labelGap;
@@ -28,6 +29,7 @@ class CatalystIdText extends StatefulWidget {
     required this.isCompact,
     this.showCopy = true,
     this.showLabel = false,
+    this.includeUsername = false,
     this.style,
     this.labelStyle,
     this.labelGap = 6,
@@ -45,6 +47,12 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   bool _highlightCopied = false;
 
   Timer? _highlightCopiedFadeoutTimer;
+
+  String get _catalystId {
+    final catalystId = widget.includeUsername ? widget.data : widget.data.withoutUsername();
+
+    return catalystId.toUri().toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,8 +101,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.data != oldWidget.data || widget.isCompact != oldWidget.isCompact) {
-      final id = widget.data;
-      _fullDataAsString = id.withoutUsername().toUri().toString();
+      _fullDataAsString = _catalystId;
       _effectiveData = _buildTextData();
       _tooltipVisible = _isTooltipVisible();
     }
@@ -112,8 +119,7 @@ class _CatalystIdTextState extends State<CatalystIdText> {
   void initState() {
     super.initState();
 
-    final id = widget.data;
-    _fullDataAsString = id.withoutUsername().toString();
+    _fullDataAsString = _catalystId;
     _effectiveData = _buildTextData();
     _tooltipVisible = _isTooltipVisible();
   }
