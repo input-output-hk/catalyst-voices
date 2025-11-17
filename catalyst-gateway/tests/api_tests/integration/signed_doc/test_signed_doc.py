@@ -10,8 +10,8 @@ from utils.signed_doc import (
 
 @pytest.mark.preprod_indexing
 def test_document_put_and_get_endpoints(proposal_doc_factory, rbac_chain_factory):
-    (proposal_doc, role_id) = proposal_doc_factory()
     rbac_chain = rbac_chain_factory()
+    (proposal_doc, role_id) = proposal_doc_factory()
     (cat_id, sk_hex) = rbac_chain.cat_id_for_role(role_id)
     proposal_doc_id = proposal_doc.metadata["id"]
 

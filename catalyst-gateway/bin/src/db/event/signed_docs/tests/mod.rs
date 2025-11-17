@@ -189,9 +189,8 @@ async fn filter_by_type(
     }
 }
 
-/// Pre-seeded documents `f14.sql`, `f15.sql`, `old_format_signed_doc.sql` and
-/// `test_signed_documents.sql`
-const PRE_SEED_DATA: usize = 57;
+/// Pre-seeded documents `f14.sql`, `f15.sql`, `old_format_signed_doc.sql`
+const PRE_SEED_DATA: usize = 55;
 
 async fn filter_all(docs: &[FullSignedDoc]) {
     let filter = DocsQueryFilter::all();
