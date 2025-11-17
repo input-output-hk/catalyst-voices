@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT ../ AS repo-ci
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.6.1 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:feat/flutter-compress-web-files AS flutter-ci
 
 # repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
@@ -127,6 +127,9 @@ build-web:
         --UPLOAD_DEBUG_SYMBOLS=$UPLOAD_DEBUG_SYMBOLS \
         --SENTRY_ORG='iohk-j4' \
         --SENTRY_PROJECT='catalyst-voices'
+
+    DO flutter-ci+COMPRESS_WEB_FILES
+
     SAVE ARTIFACT --keep-ts web
 
 package:
