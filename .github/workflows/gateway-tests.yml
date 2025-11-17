@@ -21,7 +21,7 @@ jobs:
       - name: Save SSH key to file
         run: |
           mkdir -p ~/.ssh
-          touch ~/.ssh/id_rsa
+          touch ~/.ssh/id_rsa1
           echo "${{ secrets.PRIVATE_SSH_KEY }}" > ~/.ssh/id_rsa1
           chmod 600 ~/.ssh/id_rsa1
 
