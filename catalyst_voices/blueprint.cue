@@ -82,17 +82,17 @@ project: {
 						http://:8080 {
 							root * /app
 
-              encode
+							encode
 
 							handle /healthz {
 							  respond `{"status":"ok"}` 200
 							}
 
 							handle {
-								try_files {path} /index.html
+							  try_files {path} /index.html
 							  file_server {
-							  	precompressed
-                }
+							    precompressed
+							  }
 							}
 
 							header {
