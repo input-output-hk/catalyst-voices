@@ -152,10 +152,13 @@ jobs:
       #    docker-images: false
       #    swap-storage: true
 
-      - name: Setup SSH Agent
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.PRIVATE_SSH_KEY }}
+      - name: Setup upterm session
+        uses: owenthereal/action-upterm@v1
+
+#      - name: Setup SSH Agent
+#        uses: webfactory/ssh-agent@v0.9.0
+#        with:
+#          ssh-private-key: ${{ secrets.PRIVATE_SSH_KEY }}
 
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.10.0
