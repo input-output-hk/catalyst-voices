@@ -23,7 +23,7 @@ class InsertNewImageDialogHeader extends StatelessWidget {
               SizedBox(
                 width: 32,
                 height: 32,
-                child: images.insertImage.buildIcon(),
+                child: images.svg.insertImage.buildIcon(),
               ),
               const SizedBox(width: 12),
               Text(
