@@ -118,6 +118,23 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   }
 
   @override
+  Future<Map<DocumentRef, ProposalTemplateTotalAsk>> getProposalTemplatesTotalTask({
+    required CampaignFilters filters,
+    required NodeId nodeId,
+  }) async {
+    if (filters.categoriesIds.isEmpty) {
+      return {};
+    }
+
+    final entries = await _queryProposalTemplatesTotalTask(
+      filters: filters,
+      nodeId: nodeId,
+    ).get();
+
+    return Map.fromEntries(entries);
+  }
+
+  @override
   Future<int> getVisibleProposalsCount({
     ProposalsFiltersV2 filters = const ProposalsFiltersV2(),
   }) {
@@ -180,6 +197,21 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
         maxPerPage: effectiveSize,
       ),
     );
+  }
+
+  @override
+  Stream<Map<DocumentRef, ProposalTemplateTotalAsk>> watchProposalTemplatesTotalTask({
+    required CampaignFilters filters,
+    required NodeId nodeId,
+  }) {
+    if (filters.categoriesIds.isEmpty) {
+      return Stream.value({});
+    }
+
+    return _queryProposalTemplatesTotalTask(
+      filters: filters,
+      nodeId: nodeId,
+    ).watch().map(Map.fromEntries);
   }
 
   @override
@@ -438,6 +470,82 @@ class DriftProposalsV2Dao extends DatabaseAccessor<DriftCatalystDatabase>
   /// Returns: The escaped string.
   String _escapeSqlString(String input) {
     return input.replaceAll("'", "''");
+  }
+
+  Selectable<MapEntry<DocumentRef, ProposalTemplateTotalAsk>> _queryProposalTemplatesTotalTask({
+    required CampaignFilters filters,
+    required NodeId nodeId,
+  }) {
+    final escapedCategories = filters.categoriesIds
+        .map((id) => "'${_escapeSqlString(id)}'")
+        .join(', ');
+
+    final query =
+        '''
+    WITH latest_actions AS (
+      SELECT ref_id, MAX(ver) as max_action_ver
+      FROM documents_v2
+      WHERE type = ?
+      GROUP BY ref_id
+    ),
+    action_status AS (
+      SELECT 
+        a.ref_id,
+        a.ref_ver,
+        COALESCE(json_extract(a.content, '\$.action'), 'draft') as action_type
+      FROM documents_v2 a
+      INNER JOIN latest_actions la ON a.ref_id = la.ref_id AND a.ver = la.max_action_ver
+      WHERE a.type = ?
+    ),
+    effective_final_proposals AS (
+      SELECT 
+        ast.ref_id as id,
+        ast.ref_ver as ver
+      FROM action_status ast
+      WHERE ast.action_type = 'final'
+        AND ast.ref_ver IS NOT NULL
+        AND ast.ref_ver != ''
+    )
+    SELECT 
+      p.template_id,
+      p.template_ver,
+      SUM(COALESCE(CAST(json_extract(p.content, '\$.${nodeId.value}') AS INTEGER), 0)) as total_ask,
+      COUNT(*) as final_proposals_count
+    FROM documents_v2 p
+    INNER JOIN effective_final_proposals efp ON p.id = efp.id AND p.ver = efp.ver
+    WHERE p.type = ?
+      AND p.category_id IN ($escapedCategories)
+      AND p.template_id IS NOT NULL
+      AND p.template_ver IS NOT NULL
+    GROUP BY p.template_id, p.template_ver
+  ''';
+
+    return customSelect(
+      query,
+      variables: [
+        Variable.withString(DocumentType.proposalActionDocument.uuid),
+        Variable.withString(DocumentType.proposalActionDocument.uuid),
+        Variable.withString(DocumentType.proposalDocument.uuid),
+      ],
+      readsFrom: {documentsV2},
+    ).map((row) {
+      final templateId = row.read<String>('template_id');
+      final templateVer = row.read<String>('template_ver');
+      final totalAsk = row.read<int>('total_ask');
+      final finalProposalsCount = row.read<int>('final_proposals_count');
+
+      final ref = SignedDocumentRef(
+        id: templateId,
+        version: templateVer,
+      );
+
+      final value = ProposalTemplateTotalAsk(
+        totalAsk: totalAsk,
+        finalProposalsCount: finalProposalsCount,
+      );
+
+      return MapEntry(ref, value);
+    });
   }
 
   /// Fetches a page of visible proposals using multi-stage CTE logic.
@@ -723,6 +831,11 @@ abstract interface class ProposalsV2Dao {
     ProposalsFiltersV2 filters,
   });
 
+  Future<Map<DocumentRef, ProposalTemplateTotalAsk>> getProposalTemplatesTotalTask({
+    required CampaignFilters filters,
+    required NodeId nodeId,
+  });
+
   /// Counts the total number of visible proposals that match the given filters.
   ///
   /// This method respects the same status handling logic as [getProposalsBriefPage],
@@ -772,6 +885,11 @@ abstract interface class ProposalsV2Dao {
     required PageRequest request,
     ProposalsOrder order,
     ProposalsFiltersV2 filters,
+  });
+
+  Stream<Map<DocumentRef, ProposalTemplateTotalAsk>> watchProposalTemplatesTotalTask({
+    required CampaignFilters filters,
+    required NodeId nodeId,
   });
 
   /// Watches for changes and emits the total count of visible proposals.

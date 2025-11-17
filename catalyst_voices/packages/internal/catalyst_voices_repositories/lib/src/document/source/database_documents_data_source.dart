@@ -10,6 +10,7 @@ import 'package:catalyst_voices_repositories/src/document/source/proposal_docume
 import 'package:catalyst_voices_repositories/src/proposal/proposal_document_factory.dart';
 import 'package:catalyst_voices_repositories/src/proposal/proposal_template_factory.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rxdart/rxdart.dart';
 
 final class DatabaseDocumentsDataSource
@@ -220,6 +221,26 @@ final class DatabaseDocumentsDataSource
     return _database.proposalsDao
         .watchProposalsPage(request: request, filters: filters, order: order)
         .map((page) => page.map((e) => e.toModel()));
+  }
+
+  @override
+  Stream<List<DocumentData>> watchProposalTemplates({
+    required CampaignFilters filters,
+  }) {
+    return _database.documentsV2Dao
+        .watchDocuments(type: DocumentType.proposalTemplate, filters: filters)
+        .distinct(listEquals)
+        .map((event) => event.map((e) => e.toModel()).toList());
+  }
+
+  @override
+  Stream<Map<DocumentRef, ProposalTemplateTotalAsk>> watchProposalTemplatesTotalTask({
+    required CampaignFilters filters,
+    required NodeId nodeId,
+  }) {
+    return _database.proposalsV2Dao
+        .watchProposalTemplatesTotalTask(filters: filters, nodeId: nodeId)
+        .distinct();
   }
 
   @override

@@ -4187,6 +4187,771 @@ void main() {
         });
       });
     });
+
+    group('getProposalTemplatesTotalTask', () {
+      final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
+      final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
+      final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
+
+      final nodeId = DocumentNodeId.fromString('summary.budget.requestedFunds');
+
+      test('returns empty map when categories list is empty', () async {
+        const filters = CampaignFilters(categoriesIds: []);
+
+        final result = await dao.getProposalTemplatesTotalTask(
+          filters: filters,
+          nodeId: nodeId,
+        );
+
+        expect(result, <DocumentRef, ProposalTemplateTotalAsk>{});
+      });
+
+      test('returns empty map when no final proposals exist', () async {
+        final draftProposal = _createTestDocumentEntity(
+          id: 'p1',
+          ver: _buildUuidV7At(latest),
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 10000},
+            },
+          },
+        );
+
+        await db.documentsV2Dao.saveAll([draftProposal]);
+
+        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+
+        final result = await dao.getProposalTemplatesTotalTask(
+          filters: filters,
+          nodeId: nodeId,
+        );
+
+        expect(result, <DocumentRef, ProposalTemplateTotalAsk>{});
+      });
+
+      test('aggregates budget from single template with final proposals', () async {
+        final proposal1Ver = _buildUuidV7At(middle);
+        final proposal1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: proposal1Ver,
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 10000},
+            },
+          },
+        );
+
+        final proposal2Ver = _buildUuidV7At(middle);
+        final proposal2 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: proposal2Ver,
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 25000},
+            },
+          },
+        );
+
+        final finalAction1 = _createTestDocumentEntity(
+          id: 'action-1',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p1',
+          refVer: proposal1Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        final finalAction2 = _createTestDocumentEntity(
+          id: 'action-2',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p2',
+          refVer: proposal2Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
+
+        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+
+        final result = await dao.getProposalTemplatesTotalTask(
+          filters: filters,
+          nodeId: nodeId,
+        );
+
+        const templateRef = SignedDocumentRef(
+          id: 'template-1',
+          version: 'template-1-ver',
+        );
+        final templateResult = result[templateRef];
+
+        expect(result.length, 1);
+        expect(templateResult, isNotNull);
+        expect(templateResult!.totalAsk, 35000);
+        expect(templateResult.finalProposalsCount, 2);
+      });
+
+      test('groups by different template versions separately', () async {
+        final proposal1Ver = _buildUuidV7At(middle);
+        final proposal1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: proposal1Ver,
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1-v1',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 10000},
+            },
+          },
+        );
+
+        final proposal2Ver = _buildUuidV7At(middle);
+        final proposal2 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: proposal2Ver,
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1-v2',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 20000},
+            },
+          },
+        );
+
+        final finalAction1 = _createTestDocumentEntity(
+          id: 'action-1',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p1',
+          refVer: proposal1Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        final finalAction2 = _createTestDocumentEntity(
+          id: 'action-2',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p2',
+          refVer: proposal2Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
+
+        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+
+        final result = await dao.getProposalTemplatesTotalTask(
+          filters: filters,
+          nodeId: nodeId,
+        );
+
+        const templateRef1 = SignedDocumentRef(
+          id: 'template-1',
+          version: 'template-1-v1',
+        );
+        const templateRef2 = SignedDocumentRef(
+          id: 'template-1',
+          version: 'template-1-v2',
+        );
+
+        expect(result.length, 2);
+        expect(result[templateRef1]!.totalAsk, 10000);
+        expect(result[templateRef1]!.finalProposalsCount, 1);
+        expect(result[templateRef2]!.totalAsk, 20000);
+        expect(result[templateRef2]!.finalProposalsCount, 1);
+      });
+
+      test('groups by different templates separately', () async {
+        final proposal1Ver = _buildUuidV7At(middle);
+        final proposal1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: proposal1Ver,
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 10000},
+            },
+          },
+        );
+
+        final proposal2Ver = _buildUuidV7At(middle);
+        final proposal2 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: proposal2Ver,
+          categoryId: 'cat-1',
+          templateId: 'template-2',
+          templateVer: 'template-2-ver',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 30000},
+            },
+          },
+        );
+
+        final finalAction1 = _createTestDocumentEntity(
+          id: 'action-1',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p1',
+          refVer: proposal1Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        final finalAction2 = _createTestDocumentEntity(
+          id: 'action-2',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p2',
+          refVer: proposal2Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
+
+        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+
+        final result = await dao.getProposalTemplatesTotalTask(
+          filters: filters,
+          nodeId: nodeId,
+        );
+
+        const templateRef1 = SignedDocumentRef(
+          id: 'template-1',
+          version: 'template-1-ver',
+        );
+        const templateRef2 = SignedDocumentRef(
+          id: 'template-2',
+          version: 'template-2-ver',
+        );
+
+        expect(result.length, 2);
+        expect(result[templateRef1]!.totalAsk, 10000);
+        expect(result[templateRef1]!.finalProposalsCount, 1);
+        expect(result[templateRef2]!.totalAsk, 30000);
+        expect(result[templateRef2]!.finalProposalsCount, 1);
+      });
+
+      test('treats non-integer budget values as 0', () async {
+        final proposal1Ver = _buildUuidV7At(middle);
+        final proposal1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: proposal1Ver,
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 'not-a-number'},
+            },
+          },
+        );
+
+        final proposal2Ver = _buildUuidV7At(middle);
+        final proposal2 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: proposal2Ver,
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 15000},
+            },
+          },
+        );
+
+        final finalAction1 = _createTestDocumentEntity(
+          id: 'action-1',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p1',
+          refVer: proposal1Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        final finalAction2 = _createTestDocumentEntity(
+          id: 'action-2',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p2',
+          refVer: proposal2Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
+
+        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+
+        final result = await dao.getProposalTemplatesTotalTask(
+          filters: filters,
+          nodeId: nodeId,
+        );
+
+        const templateRef = SignedDocumentRef(
+          id: 'template-1',
+          version: 'template-1-ver',
+        );
+
+        expect(result[templateRef]!.totalAsk, 15000);
+        expect(result[templateRef]!.finalProposalsCount, 2);
+      });
+
+      test('respects category filter', () async {
+        final proposal1Ver = _buildUuidV7At(middle);
+        final proposal1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: proposal1Ver,
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 10000},
+            },
+          },
+        );
+
+        final proposal2Ver = _buildUuidV7At(middle);
+        final proposal2 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: proposal2Ver,
+          categoryId: 'cat-2',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 30000},
+            },
+          },
+        );
+
+        final finalAction1 = _createTestDocumentEntity(
+          id: 'action-1',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p1',
+          refVer: proposal1Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        final finalAction2 = _createTestDocumentEntity(
+          id: 'action-2',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p2',
+          refVer: proposal2Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
+
+        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+
+        final result = await dao.getProposalTemplatesTotalTask(
+          filters: filters,
+          nodeId: nodeId,
+        );
+
+        const templateRef = SignedDocumentRef(
+          id: 'template-1',
+          version: 'template-1-ver',
+        );
+
+        expect(result.length, 1);
+        expect(result[templateRef]!.totalAsk, 10000);
+        expect(result[templateRef]!.finalProposalsCount, 1);
+      });
+
+      test('handles multiple categories in filter', () async {
+        final proposal1Ver = _buildUuidV7At(middle);
+        final proposal1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: proposal1Ver,
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 10000},
+            },
+          },
+        );
+
+        final proposal2Ver = _buildUuidV7At(middle);
+        final proposal2 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: proposal2Ver,
+          categoryId: 'cat-2',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 20000},
+            },
+          },
+        );
+
+        final proposal3Ver = _buildUuidV7At(middle);
+        final proposal3 = _createTestDocumentEntity(
+          id: 'p3',
+          ver: proposal3Ver,
+          categoryId: 'cat-3',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 30000},
+            },
+          },
+        );
+
+        final finalAction1 = _createTestDocumentEntity(
+          id: 'action-1',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p1',
+          refVer: proposal1Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        final finalAction2 = _createTestDocumentEntity(
+          id: 'action-2',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p2',
+          refVer: proposal2Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        final finalAction3 = _createTestDocumentEntity(
+          id: 'action-3',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p3',
+          refVer: proposal3Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([
+          proposal1,
+          proposal2,
+          proposal3,
+          finalAction1,
+          finalAction2,
+          finalAction3,
+        ]);
+
+        const filters = CampaignFilters(categoriesIds: ['cat-1', 'cat-2']);
+
+        final result = await dao.getProposalTemplatesTotalTask(
+          filters: filters,
+          nodeId: nodeId,
+        );
+
+        const templateRef = SignedDocumentRef(
+          id: 'template-1',
+          version: 'template-1-ver',
+        );
+
+        expect(result.length, 1);
+        expect(result[templateRef]!.totalAsk, 30000);
+        expect(result[templateRef]!.finalProposalsCount, 2);
+      });
+
+      test('uses correct version when final action points to specific version', () async {
+        final proposalV1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: _buildUuidV7At(earliest),
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 10000},
+            },
+          },
+        );
+
+        final proposalV2Ver = _buildUuidV7At(middle);
+        final proposalV2 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: proposalV2Ver,
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 25000},
+            },
+          },
+        );
+
+        final proposalV3 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: _buildUuidV7At(latest),
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 50000},
+            },
+          },
+        );
+
+        final finalAction = _createTestDocumentEntity(
+          id: 'action-final',
+          ver: _buildUuidV7At(latest.add(const Duration(hours: 1))),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p1',
+          refVer: proposalV2Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([proposalV1, proposalV2, proposalV3, finalAction]);
+
+        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+
+        final result = await dao.getProposalTemplatesTotalTask(
+          filters: filters,
+          nodeId: nodeId,
+        );
+
+        const templateRef = SignedDocumentRef(
+          id: 'template-1',
+          version: 'template-1-ver',
+        );
+
+        expect(result[templateRef]!.totalAsk, 25000);
+        expect(result[templateRef]!.finalProposalsCount, 1);
+      });
+
+      test('excludes final actions without valid ref_ver', () async {
+        final proposalV1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: _buildUuidV7At(earliest),
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 10000},
+            },
+          },
+        );
+
+        final proposalV2Ver = _buildUuidV7At(latest);
+        final proposalV2 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: proposalV2Ver,
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 30000},
+            },
+          },
+        );
+
+        final finalActionWithoutRefVer = _createTestDocumentEntity(
+          id: 'action-final',
+          ver: _buildUuidV7At(latest.add(const Duration(hours: 1))),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p1',
+          refVer: null,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([proposalV1, proposalV2, finalActionWithoutRefVer]);
+
+        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+
+        final result = await dao.getProposalTemplatesTotalTask(
+          filters: filters,
+          nodeId: nodeId,
+        );
+
+        expect(result, <DocumentRef, ProposalTemplateTotalAsk>{});
+      });
+
+      test('extracts value from custom nodeId path', () async {
+        final customNodeId = DocumentNodeId.fromString('custom.path.value');
+
+        final proposal1Ver = _buildUuidV7At(middle);
+        final proposal1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: proposal1Ver,
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'custom': {
+              'path': {'value': 5000},
+            },
+          },
+        );
+
+        final proposal2Ver = _buildUuidV7At(middle);
+        final proposal2 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: proposal2Ver,
+          categoryId: 'cat-1',
+          templateId: 'template-1',
+          templateVer: 'template-1-ver',
+          contentData: {
+            'custom': {
+              'path': {'value': 7500},
+            },
+          },
+        );
+
+        final finalAction1 = _createTestDocumentEntity(
+          id: 'action-1',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p1',
+          refVer: proposal1Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        final finalAction2 = _createTestDocumentEntity(
+          id: 'action-2',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p2',
+          refVer: proposal2Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([proposal1, proposal2, finalAction1, finalAction2]);
+
+        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+
+        final result = await dao.getProposalTemplatesTotalTask(
+          filters: filters,
+          nodeId: customNodeId,
+        );
+
+        const templateRef = SignedDocumentRef(
+          id: 'template-1',
+          version: 'template-1-ver',
+        );
+
+        expect(result[templateRef]!.totalAsk, 12500);
+        expect(result[templateRef]!.finalProposalsCount, 2);
+      });
+    });
+
+    group('watchProposalTemplatesTotalTask', () {
+      // ignore: unused_local_variable
+      final earliest = DateTime.utc(2025, 2, 5, 5, 23, 27);
+      final middle = DateTime.utc(2025, 2, 5, 5, 25, 33);
+      final latest = DateTime.utc(2025, 8, 11, 11, 20, 18);
+
+      final nodeId = DocumentNodeId.fromString('summary.budget.requestedFunds');
+
+      test('returns empty map when categories list is empty', () async {
+        const filters = CampaignFilters(categoriesIds: []);
+
+        final stream = dao.watchProposalTemplatesTotalTask(
+          filters: filters,
+          nodeId: nodeId,
+        );
+
+        await expectLater(
+          stream,
+          emits({}),
+        );
+      });
+
+      test('stream emits updated values when data changes', () async {
+        const templateRef = SignedDocumentRef(
+          id: 'template-1',
+          version: 'template-1-ver',
+        );
+
+        final proposal1Ver = _buildUuidV7At(middle);
+        final proposal1 = _createTestDocumentEntity(
+          id: 'p1',
+          ver: proposal1Ver,
+          categoryId: 'cat-1',
+          templateId: templateRef.id,
+          templateVer: templateRef.version,
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 10000},
+            },
+          },
+        );
+
+        final finalAction1 = _createTestDocumentEntity(
+          id: 'action-1',
+          ver: _buildUuidV7At(latest),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p1',
+          refVer: proposal1Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([proposal1, finalAction1]);
+
+        final emissions = <Map<DocumentRef, ProposalTemplateTotalAsk>>[];
+        const filters = CampaignFilters(categoriesIds: ['cat-1']);
+
+        final subscription = dao
+            .watchProposalTemplatesTotalTask(filters: filters, nodeId: nodeId)
+            .listen(emissions.add);
+
+        await pumpEventQueue();
+        expect(emissions.length, 1);
+        expect(emissions[0][templateRef]!.totalAsk, 10000);
+
+        final proposal2Ver = _buildUuidV7At(middle.add(const Duration(hours: 1)));
+        final proposal2 = _createTestDocumentEntity(
+          id: 'p2',
+          ver: proposal2Ver,
+          categoryId: 'cat-1',
+          templateId: templateRef.id,
+          templateVer: templateRef.version,
+          contentData: {
+            'summary': {
+              'budget': {'requestedFunds': 20000},
+            },
+          },
+        );
+
+        final finalAction2 = _createTestDocumentEntity(
+          id: 'action-2',
+          ver: _buildUuidV7At(latest.add(const Duration(hours: 1))),
+          type: DocumentType.proposalActionDocument,
+          refId: 'p2',
+          refVer: proposal2Ver,
+          contentData: ProposalSubmissionActionDto.aFinal.toJson(),
+        );
+
+        await db.documentsV2Dao.saveAll([proposal2, finalAction2]);
+        await pumpEventQueue();
+
+        expect(emissions.length, 2);
+        expect(emissions[1][templateRef]!.totalAsk, 30000);
+
+        await subscription.cancel();
+      });
+    });
   });
 }
 

@@ -113,6 +113,10 @@ abstract interface class ProposalRepository {
     required ProposalsOrder order,
   });
 
+  Stream<List<ProposalTemplate>> watchProposalTemplates({
+    required CampaignFilters filters,
+  });
+
   Stream<List<ProposalDocument>> watchUserProposals({
     required CatalystId authorId,
   });
@@ -376,6 +380,15 @@ final class ProposalRepositoryImpl implements ProposalRepository {
     return _proposalsLocalSource
         .watchProposalsPage(request: request, filters: filters, order: order)
         .map((value) => value.map(_buildProposalData));
+  }
+
+  @override
+  Stream<List<ProposalTemplate>> watchProposalTemplates({
+    required CampaignFilters filters,
+  }) {
+    return _proposalsLocalSource
+        .watchProposalTemplates(filters: filters)
+        .map((event) => event.map(ProposalTemplateFactory.create).toList());
   }
 
   @override

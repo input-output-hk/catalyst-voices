@@ -1,7 +1,12 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/campaign/active_campaign_observer.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
+import 'package:rxdart/rxdart.dart';
+
+final logger = Logger('CampaignService');
 
 Campaign? _mockedActiveCampaign;
 
@@ -12,6 +17,11 @@ Campaign? _mockedActiveCampaign;
 set mockedActiveCampaign(Campaign? campaign) {
   _mockedActiveCampaign = campaign;
 }
+
+typedef _ProposalTemplateCategoryAndMoneyFormat = ({
+  SignedDocumentRef? category,
+  MoneyFormat? moneyFormat,
+});
 
 /// CampaignService provides campaign-related functionality.
 ///
@@ -34,8 +44,6 @@ abstract interface class CampaignService {
   });
 
   Future<CampaignPhase> getCampaignPhaseTimeline(CampaignPhaseType stage);
-
-  Future<CampaignTotalAsk> getCampaignTotalAsk({required CampaignFilters filters});
 
   Future<CampaignCategory> getCategory(SignedDocumentRef ref);
 
@@ -106,12 +114,6 @@ final class CampaignServiceImpl implements CampaignService {
   }
 
   @override
-  Future<CampaignTotalAsk> getCampaignTotalAsk({required CampaignFilters filters}) {
-    // TODO(damian-molinski): implement it.
-    return Future(() => const CampaignTotalAsk(categoriesAsks: {}));
-  }
-
-  @override
   Future<CampaignCategory> getCategory(SignedDocumentRef ref) async {
     final category = await _campaignRepository.getCategory(ref);
     if (category == null) {
@@ -131,19 +133,85 @@ final class CampaignServiceImpl implements CampaignService {
 
   @override
   Future<CampaignCategoryTotalAsk> getCategoryTotalAsk({required SignedDocumentRef ref}) {
-    // TODO(damian-molinski): implement it.
-    return Future(() => CampaignCategoryTotalAsk.zero(ref));
+    return watchCategoryTotalAsk(ref: ref).first;
   }
 
   @override
   Stream<CampaignTotalAsk> watchCampaignTotalAsk({required CampaignFilters filters}) {
-    // TODO(damian-molinski): implement it.
-    return Stream.value(const CampaignTotalAsk(categoriesAsks: {}));
+    return _proposalRepository
+        .watchProposalTemplates(filters: filters)
+        .map((templates) => templates.map((template) => template.toMapEntry()))
+        .map(Map.fromEntries)
+        .switchMap((templatesMoneyFormat) {
+          // This could come from templates
+          final nodeId = ProposalDocument.requestedFundsNodeId;
+
+          return _campaignRepository
+              .watchProposalTemplatesTotalTask(filters: filters, nodeId: nodeId)
+              .map((totalAsk) => _calculateCampaignTotalAsk(templatesMoneyFormat, totalAsk));
+        });
   }
 
   @override
   Stream<CampaignCategoryTotalAsk> watchCategoryTotalAsk({required SignedDocumentRef ref}) {
-    // TODO(damian-molinski): implement it.
-    return Stream.value(CampaignCategoryTotalAsk.zero(ref));
+    return watchCampaignTotalAsk(filters: CampaignFilters(categoriesIds: [ref.id])).map(
+      (campaignTotalAsk) {
+        return campaignTotalAsk.categoriesAsks.entries
+                .firstWhereOrNull((entry) => entry.key.id == ref.id)
+                ?.value ??
+            CampaignCategoryTotalAsk.zero(ref);
+      },
+    );
+  }
+
+  CampaignTotalAsk _calculateCampaignTotalAsk(
+    Map<DocumentRef, _ProposalTemplateCategoryAndMoneyFormat> templatesMoneyFormat,
+    Map<DocumentRef, ProposalTemplateTotalAsk> totalAsk,
+  ) {
+    final categoriesAsks = <DocumentRef, CampaignCategoryTotalAsk>{};
+
+    for (final entry in totalAsk.entries) {
+      final templateRef = entry.key;
+      final categoryRef = templatesMoneyFormat[templateRef]?.category;
+      final moneyFormat = templatesMoneyFormat[templateRef]?.moneyFormat;
+
+      if (categoryRef == null || moneyFormat == null) {
+        if (categoryRef == null) logger.info('Template[$templateRef] do not have category');
+        if (moneyFormat == null) logger.info('Template[$templateRef] do not have moneyFormat');
+        continue;
+      }
+
+      final proposalTotalAsk = entry.value;
+      final finalProposalsCount = proposalTotalAsk.finalProposalsCount;
+      final money = Money.fromUnits(
+        currency: moneyFormat.currency,
+        amount: BigInt.from(proposalTotalAsk.totalAsk),
+        moneyUnits: moneyFormat.moneyUnits,
+      );
+
+      final ask = CampaignCategoryTotalAsk(
+        ref: categoryRef,
+        finalProposalsCount: finalProposalsCount,
+        money: [money],
+      );
+
+      categoriesAsks.update(categoryRef, (value) => value + ask, ifAbsent: () => ask);
+    }
+
+    return CampaignTotalAsk(categoriesAsks: Map.unmodifiable(categoriesAsks));
+  }
+}
+
+extension on ProposalTemplate {
+  MapEntry<DocumentRef, _ProposalTemplateCategoryAndMoneyFormat> toMapEntry() {
+    final ref = metadata.selfRef;
+    final category = metadata.categoryId;
+
+    final currencySchema = requestedFunds;
+    final moneyFormat = currencySchema != null
+        ? MoneyFormat(currency: currencySchema.currency, moneyUnits: currencySchema.moneyUnits)
+        : null;
+
+    return MapEntry(ref, (category: category, moneyFormat: moneyFormat));
   }
 }

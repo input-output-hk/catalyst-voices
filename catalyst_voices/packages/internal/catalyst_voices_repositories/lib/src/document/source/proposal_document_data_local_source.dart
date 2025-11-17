@@ -31,17 +31,26 @@ abstract interface class ProposalDocumentDataLocalSource {
     ProposalsFiltersV2 filters,
   });
 
-  Stream<int> watchProposalsCountV2({
-    ProposalsFiltersV2 filters,
-  });
-
   Stream<ProposalsCount> watchProposalsCount({
     required ProposalsCountFilters filters,
+  });
+
+  Stream<int> watchProposalsCountV2({
+    ProposalsFiltersV2 filters,
   });
 
   Stream<Page<ProposalDocumentData>> watchProposalsPage({
     required PageRequest request,
     required ProposalsFilters filters,
     required ProposalsOrder order,
+  });
+
+  Stream<List<DocumentData>> watchProposalTemplates({
+    required CampaignFilters filters,
+  });
+
+  Stream<Map<DocumentRef, ProposalTemplateTotalAsk>> watchProposalTemplatesTotalTask({
+    required CampaignFilters filters,
+    required NodeId nodeId,
   });
 }

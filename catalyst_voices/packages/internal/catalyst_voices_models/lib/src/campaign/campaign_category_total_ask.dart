@@ -22,4 +22,28 @@ final class CampaignCategoryTotalAsk extends Equatable {
   ];
 
   MultiCurrencyAmount get totalAsk => MultiCurrencyAmount.list(money);
+
+  CampaignCategoryTotalAsk operator +(CampaignCategoryTotalAsk other) {
+    assert(ref == other.ref, 'Refs do not match');
+
+    final finalProposalsCount = this.finalProposalsCount + other.finalProposalsCount;
+    final money = [...this.money, ...other.money];
+
+    return copyWith(
+      finalProposalsCount: finalProposalsCount,
+      money: money,
+    );
+  }
+
+  CampaignCategoryTotalAsk copyWith({
+    DocumentRef? ref,
+    int? finalProposalsCount,
+    List<Money>? money,
+  }) {
+    return CampaignCategoryTotalAsk(
+      ref: ref ?? this.ref,
+      finalProposalsCount: finalProposalsCount ?? this.finalProposalsCount,
+      money: money ?? this.money,
+    );
+  }
 }
