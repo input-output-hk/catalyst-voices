@@ -82,7 +82,6 @@ project: {
 						http://:8080 {
 							root * /app
 
-							# Compress on-the-fly if not precompressed
                             encode
 
 							handle /healthz {
@@ -92,7 +91,6 @@ project: {
 							handle {
 							  try_files {path} /index.html
 							  file_server {
-                                  # default order br zstd gzip
                                   precompressed
                               }
 							}
