@@ -122,6 +122,7 @@ class _SeedPhraseWords extends StatelessWidget {
         children: [
           const SizedBox(height: 20),
           SeedPhrasesViewer(
+            semanticsIdentifier: 'SeedPhraseWords',
             words: words,
             crossAxisSpacing: 6,
           ),
