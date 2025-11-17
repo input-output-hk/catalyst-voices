@@ -23,7 +23,7 @@ final class Example extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              VoicesAssets.images.roleVoter.buildIcon(
+              VoicesAssets.images.svg.roleVoter.buildIcon(
                 size: 200,
                 allowColorFilter: false,
               ),
